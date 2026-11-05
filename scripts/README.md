@@ -57,6 +57,8 @@ uv run --locked --extra dev python -m scripts.astronomy.audit_complete_moshier_a
 
 固定队列已有测试直接调用验证函数时，不再另维护只解析默认路径、打印 JSON 的脚本。梅花取数、历表、原典和天气规则统一运行 `uv run --locked --extra dev python -m pytest -q tests/meihua`；`scripts/meihua/` 保留参考采集、明确指纹的外部输入和原研究绑定检查。
 
+果老卷45异本和人类图具名定爻例分别运行 `tests/guolao/test_guolao_witnesses.py` 与 `tests/human_design/test_human_design_primary_fixing_source.py`。测试直接执行来源审计，保留全部异文、未决项、冻结资料身份检查和错误注入；不另维护固定结果打印入口。
+
 六爻的常规来源配置统一用 `uv run --locked --extra dev python -m scripts.liuyao.build_profile --check` 核对，也可在 `--check` 前指定 `role`、`strength` 等名称。各配置仍校验自己的冻结材料、原扫描和适用勘误；扫描校读、月破、刑及动巳的专门裁定继续由各自的构建器处理。果老原历不再为每个领域函数维护 JSON 打印命令；直接对照见 `tests/guolao/`，独立参考采集与完整来源审计仍在 `scripts/guolao/`。
 
 八字未来时钟队列只保留 [一个执行器](bazi/audit_bazi_dayun_future_clocks_shard.py) 和 [一个合并器](bazi/merge_bazi_future_clock_shards.py)。执行器默认单片完整运行，需要分片时显式传入 `--shard-index` 与 `--shard-count`；合并仍检查完整原队列、顺序、未知状态与失败记录。

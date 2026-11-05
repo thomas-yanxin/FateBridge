@@ -25,27 +25,6 @@ def reference() -> dict[str, Any]:
     return json.loads((CORPUS / "reference.json").read_text())
 
 
-TABLES = reference()["literal_tables"]
-
-
-def literal_positions(
-    stem: str, hour: str, general: str, natal: str, diurnal: bool
-) -> list[str]:
-    """Independent small table expansion, not production's position builder."""
-    tables = TABLES
-    branches, stems = tables["branches"], tables["day_stems"]
-    i, n = stems.index(stem), branches.index(natal)
-    start = tables["noble_day" if diurnal else "noble_night"][i]
-    direction = -1 if start in tables["reverse_starts"] else 1
-    god_index = ((n - branches.index(start)) * direction) % 12
-    return [
-        stems[(stems.index(tables["wuzi_start"][i]) + n) % 10],
-        tables["god_inherent_branches"][god_index],
-        branches[(branches.index(general) + n - branches.index(hour)) % 12],
-        natal,
-    ]
-
-
 def observe(case: dict[str, Any]) -> dict[str, Any]:
     from fatebridge.core.metaphysics.jinkou_natal_course import build_natal_course
     from scripts.ren.audit_ren_classical import make_seed

@@ -11,20 +11,11 @@ from fatebridge.core import heluo_texts as ht
 from fatebridge.core.heluo import _tiaowen, gua_lines, lines_to_gua, yao_text
 from fatebridge.core.heluo_timing import _selected_text
 from fatebridge.utils.errors import NumerologySourceError
-from tests.support.heluo_source_facts import HEADER_COUNT, PENDING_COUNT
 
 ROOT = Path(__file__).parents[1] / "fixtures/heluo_qian15_v1"
 READINGS = json.loads((ROOT / "verified-readings.json").read_bytes())
 REFERENCES = json.loads((ROOT / "references.json").read_bytes())["references"]
 FREEZE = json.loads((ROOT / "freeze.json").read_bytes())
-
-
-def canonical(value):
-    return hashlib.sha256(
-        json.dumps(
-            value, ensure_ascii=False, sort_keys=True, separators=(",", ":")
-        ).encode()
-    ).hexdigest()
 
 
 def test_source_artifacts_preserve_first_misreadings_and_all_six_lines():

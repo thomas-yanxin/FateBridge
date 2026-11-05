@@ -72,14 +72,3 @@ def test_frozen_reference_cannot_be_narrowed_or_relabelled(tmp_path, mutation):
     path.write_text(json.dumps(value))
     with pytest.raises(ValueError, match="reference changed"):
         checks.primary_fixing_checks(tmp_path)
-
-
-def test_strict_command_retains_incomplete_full_acceptance(monkeypatch, tmp_path):
-    from scripts.human_design.check_human_design_primary_fixing import main
-
-    output = tmp_path / "report.json"
-    monkeypatch.setattr(
-        "sys.argv", ["check", "--require-full-acceptance", "--output", str(output)]
-    )
-    assert main() == 1
-    assert json.loads(output.read_text())["cases_matched"] == 14

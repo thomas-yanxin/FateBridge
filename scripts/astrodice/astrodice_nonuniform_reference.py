@@ -6,9 +6,7 @@ TT/TDB conversion; those missing premises prohibit production acceptance.
 """
 
 import argparse
-import csv
 import json
-import re
 from decimal import Decimal
 from fractions import Fraction as Q
 from itertools import combinations
@@ -25,49 +23,6 @@ from scripts.astrodice.astrodice_joint_epoch import exact_state
 from scripts.astrodice.astrodice_vector_clock import check_inputs, save, sha, tube
 
 DEGREES = (5, 7)
-
-
-def observer_angles(raw, query, plan):
-    payload = json.loads(raw)
-    if payload.get("error"):
-        raise ValueError("Observer service error")
-    pre, data = payload["result"].split("$$SOE")
-    data, _ = data.split("$$EOE")
-    for expression in [
-        r"Target body name: Venus.*?\(299\).*?DE441",
-        r"Center body name: Earth \(399\).*?DE441",
-        r"Calendar mode\s*:\s*Gregorian",
-        r"Date__\(TT\)",
-        r"JDTT",
-        r"RA_\(ICRF-a-app\)",
-    ]:
-        if not re.search(expression, pre):
-            raise ValueError("Observer quantity/frame/time mismatch")
-    output = {}
-    for cells in csv.reader(data.strip().splitlines()):
-        c = [x.strip() for x in cells]
-        if len(c) != 7 or c[-1]:
-            raise ValueError("Observer columns changed")
-        epoch = Q(c[1])
-        matches = [
-            case
-            for case in query["cases"]
-            if abs(epoch - Q(case["nominal_JD"]))
-            <= Q(plan["returned_label_match_budget_days"])
-        ]
-        if len(matches) != 1 or matches[0]["id"] in output:
-            raise ValueError("Observer row outside original unique label budget")
-        if not all(Decimal(v).is_finite() for v in c[4:6]):
-            raise ValueError("Nonfinite observer angle")
-        case = matches[0]
-        output[case["id"]] = c[4:6]
-    if set(output) != {c["id"] for c in query["cases"]}:
-        raise ValueError("Observer population incomplete")
-    return {
-        str(c["offset_seconds"]): output[c["id"]]
-        for c in query["cases"]
-        if c["role"] != "auxiliary_not_primary"
-    }
 
 
 def interpolate(nodes, values):

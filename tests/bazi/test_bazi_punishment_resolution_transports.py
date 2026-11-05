@@ -1,4 +1,4 @@
-"""False v9 resolution is rejected before projection on every entrance."""
+"""False and missed punishment resolution are rejected before projection on every entrance."""
 
 import asyncio
 import json
@@ -15,12 +15,37 @@ from tests.support.transports import rest as shared_rest
 
 rest = shared_rest
 ROOT = Path(__file__).resolve().parents[2]
-DATA = json.loads(
+CASES = []
+for source, before, after, faults in [
     (
-        ROOT / "tests/data/bazi_punishment_resolution_v1/protocol-cases-first.json"
-    ).read_text()
-)
-CASES = DATA["cases"][:12]
+        "bazi_punishment_resolution_v1/protocol-cases-first.json",
+        "active",
+        "resolved_by_combination",
+        [
+            "false_resolution",
+            "without_inventory",
+            "without_strength_context_or_wrong_policy",
+        ],
+    ),
+    (
+        "bazi/single-end-transport-inputs.json",
+        "resolved_by_combination",
+        "active",
+        [
+            "missed_resolution",
+            "without_inventory",
+            "without_strength_context_or_without_ledger",
+        ],
+    ),
+]:
+    data = json.loads((ROOT / "tests/data" / source).read_text())
+    for case in data["cases"][:12]:
+        for fault in faults:
+            CASES.append(
+                pytest.param(
+                    case, before, after, fault, id=f"{after}-{case['id']}-{fault}"
+                )
+            )
 
 
 def evidence(payload, tool):
@@ -31,17 +56,9 @@ def evidence(payload, tool):
     return payload[tool.removeprefix("bazi_") + "_analysis"]["evidence_chain"]
 
 
-@pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
-@pytest.mark.parametrize(
-    "fault",
-    [
-        "false_resolution",
-        "without_inventory",
-        "without_strength_context_or_wrong_policy",
-    ],
-)
-def test_false_resolution_cannot_hide_behind_unrelated_projection(
-    case, fault, rest, monkeypatch, tmp_path, capsys
+@pytest.mark.parametrize("case,before,after,fault", CASES)
+def test_invalid_resolution_cannot_hide_behind_unrelated_projection(
+    case, before, after, fault, rest, monkeypatch, tmp_path, capsys
 ):
     tool, spec = case["tool"], SPECS[case["tool"]]
     with call_clock(AS_OF):
@@ -54,7 +71,10 @@ def test_false_resolution_cannot_hide_behind_unrelated_projection(
         target = current["assessment"]["relations"]
         if fault == "without_inventory":
             current.pop("branch_combination_candidates")
-        if fault == "without_strength_context_or_wrong_policy":
+        if fault in {
+            "without_strength_context_or_wrong_policy",
+            "without_strength_context_or_without_ledger",
+        }:
             current["assessment"][
                 "punishment_resolution_policy"
             ] = "initial_candidate_protection_v1"
@@ -68,7 +88,10 @@ def test_false_resolution_cannot_hide_behind_unrelated_projection(
         target = [e["receipt"] for e in chain["classical_passage_relations"]["events"]]
         if fault == "without_inventory":
             chain["classical_passage_relations"].pop("branch_combination_candidates")
-        if fault == "without_strength_context_or_wrong_policy":
+        if fault in {
+            "without_strength_context_or_wrong_policy",
+            "without_strength_context_or_without_ledger",
+        }:
             chain.pop("strength_context")
         path = (
             "day_master.stem"
@@ -80,8 +103,8 @@ def test_false_resolution_cannot_hide_behind_unrelated_projection(
             )
         )
     punishment = next(e for e in target if e["kind"] == "刑")
-    assert punishment["status"] == "active"
-    punishment["status"] = "resolved_by_combination"
+    assert punishment["status"] == before
+    punishment["status"] = after
     original = execution.execute_spec
 
     def broken(actual, request):

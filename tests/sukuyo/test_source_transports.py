@@ -7,7 +7,6 @@ from tests.sukuyo.test_sukuyo_transports import (
 )
 
 
-# candidate_day_transports
 @pytest.mark.parametrize("part", [None, "first_half", "second_half"])
 def test_conditional_mansion_days_across_all_surfaces(monkeypatch, capsys, part):
     payload = {
@@ -37,7 +36,6 @@ def test_conditional_mansion_days_across_all_surfaces(monkeypatch, capsys, part)
     )
 
 
-# general_days_transports
 @pytest.mark.parametrize("date", ["2024-06-15", "1957-09-24"])
 def test_whole_day_lists_across_actual_transports(monkeypatch, capsys, date):
     _check_surfaces(
@@ -60,11 +58,22 @@ def test_whole_day_lists_across_actual_transports(monkeypatch, capsys, date):
     )
 
 
-# hinoo_context_transports
 @pytest.mark.parametrize("part", [None, "first_half", "second_half"])
-def test_qualified_context_across_rest_mcp_and_cli(monkeypatch, capsys, part):
+@pytest.mark.parametrize(
+    "date,reference",
+    [
+        ("1957-09-24", "image_witness_context_followup"),
+        ("1957-09-24", "calendar_clause_meanings"),
+        ("1957-09-24", "natal_half_application"),
+        ("1903-06-25", "image_witness_native_completion"),
+        ("1957-09-24", "later_seibunkan_comparison"),
+    ],
+)
+def test_critical_source_context_across_rest_mcp_cli(
+    monkeypatch, capsys, part, date, reference
+):
     payload = {
-        "date": "1957-09-24",
+        "date": date,
         "time": "12:00:00",
         "zone": "+08:00",
         "calendar_profile": "hinoo_t1299_host27",
@@ -77,7 +86,7 @@ def test_qualified_context_across_rest_mcp_and_cli(monkeypatch, capsys, part):
         "suzhan",
         payload,
         [
-            "sukuyo.calendar.profile_calculation.hinoo_source.critical_calendar_reference.image_witness_context_followup",
+            f"sukuyo.calendar.profile_calculation.hinoo_source.critical_calendar_reference.{reference}",
             "sukuyo.calendar.status",
             "sukuyo.calendar.natal_su27",
             "sukuyo.calendar.candidate_su27s",
@@ -86,59 +95,6 @@ def test_qualified_context_across_rest_mcp_and_cli(monkeypatch, capsys, part):
     )
 
 
-# hinoo_meanings_transports
-@pytest.mark.parametrize("part", [None, "first_half", "second_half"])
-def test_bound_hinoo_meanings_across_rest_mcp_and_cli(monkeypatch, capsys, part):
-    payload = {
-        "date": "1957-09-24",
-        "time": "12:00:00",
-        "zone": "+08:00",
-        "calendar_profile": "hinoo_t1299_host27",
-    }
-    if part is not None:
-        payload["calendar_day_part"] = part
-    _check_surfaces(
-        monkeypatch,
-        capsys,
-        "suzhan",
-        payload,
-        [
-            "sukuyo.calendar.profile_calculation.hinoo_source.critical_calendar_reference.calendar_clause_meanings",
-            "sukuyo.calendar.status",
-            "sukuyo.calendar.natal_su27",
-            "sukuyo.calendar.candidate_su27s",
-            "sukuyo.reading_text",
-        ],
-    )
-
-
-# hinoo_natal_scope_transports
-@pytest.mark.parametrize("part", [None, "first_half", "second_half"])
-def test_natal_applicability_across_rest_mcp_and_cli(monkeypatch, capsys, part):
-    payload = {
-        "date": "1957-09-24",
-        "time": "12:00:00",
-        "zone": "+08:00",
-        "calendar_profile": "hinoo_t1299_host27",
-    }
-    if part is not None:
-        payload["calendar_day_part"] = part
-    _check_surfaces(
-        monkeypatch,
-        capsys,
-        "suzhan",
-        payload,
-        [
-            "sukuyo.calendar.profile_calculation.hinoo_source.critical_calendar_reference.natal_half_application",
-            "sukuyo.calendar.status",
-            "sukuyo.calendar.natal_su27",
-            "sukuyo.calendar.candidate_su27s",
-            "sukuyo.reading_text",
-        ],
-    )
-
-
-# joint_transports
 @pytest.mark.parametrize(
     "first_part, second_part, first_date, first_zone",
     [
@@ -174,7 +130,6 @@ def test_sukuyo_joint_support_across_rest_native_mcp_and_cli(
     )
 
 
-# kenyu_lingbi_transports
 @pytest.mark.parametrize(
     "date,basis,zone",
     [
@@ -207,7 +162,6 @@ def test_sukuyo_lingbi_reference_across_actual_transports(
     )
 
 
-# kenyu_pairs_transports
 @pytest.mark.parametrize("date", ["2017-10-17", "2017-10-19", "1957-09-24"])
 def test_sukuyo_pair_comparison_across_actual_transports(monkeypatch, capsys, date):
     _check_surfaces(
@@ -225,7 +179,6 @@ def test_sukuyo_pair_comparison_across_actual_transports(monkeypatch, capsys, da
     )
 
 
-# kenyu_transports
 @pytest.mark.parametrize(
     "date,basis,zone",
     [
@@ -258,7 +211,6 @@ def test_sukuyo_printed_clock_across_actual_transports(
     )
 
 
-# kyoto_enpo_transports
 @pytest.mark.parametrize("date", ["2025-01-06", "2025-01-11", "1957-09-24"])
 def test_sukuyo_enpo_reference_across_actual_transports(monkeypatch, capsys, date):
     _check_surfaces(
@@ -281,35 +233,6 @@ def test_sukuyo_enpo_reference_across_actual_transports(monkeypatch, capsys, dat
     )
 
 
-# native_completion_transports
-@pytest.mark.parametrize("part", [None, "first_half", "second_half"])
-def test_native_completion_and_unchanged_result_across_local_surfaces(
-    monkeypatch, capsys, part
-):
-    payload = {
-        "date": "1903-06-25",
-        "time": "12:00:00",
-        "zone": "+08:00",
-        "calendar_profile": "hinoo_t1299_host27",
-    }
-    if part is not None:
-        payload["calendar_day_part"] = part
-    _check_surfaces(
-        monkeypatch,
-        capsys,
-        "suzhan",
-        payload,
-        [
-            "sukuyo.calendar.profile_calculation.hinoo_source.critical_calendar_reference.image_witness_native_completion",
-            "sukuyo.calendar.status",
-            "sukuyo.calendar.natal_su27",
-            "sukuyo.calendar.candidate_su27s",
-            "sukuyo.reading_text",
-        ],
-    )
-
-
-# native_followup_transports
 @pytest.mark.parametrize("part", [None, "first_half", "second_half"])
 def test_local_surfaces_keep_old_capture_new_followup_and_half_condition(
     monkeypatch, capsys, part
@@ -338,7 +261,6 @@ def test_local_surfaces_keep_old_capture_new_followup_and_half_condition(
     )
 
 
-# quotation_transports
 @pytest.mark.parametrize("date", ["1903-06-25", "2024-08-04"])
 def test_quotation_comparison_across_actual_transports(monkeypatch, capsys, date):
     _check_surfaces(
@@ -360,7 +282,6 @@ def test_quotation_comparison_across_actual_transports(monkeypatch, capsys, date
     )
 
 
-# research_direction_transports
 @pytest.mark.parametrize("date", ["1903-06-25", "2024-08-04"])
 def test_research_direction_reference_across_actual_transports(
     monkeypatch, capsys, date
@@ -383,33 +304,6 @@ def test_research_direction_reference_across_actual_transports(
     )
 
 
-# seibunkan_transports
-@pytest.mark.parametrize("part", [None, "first_half", "second_half"])
-def test_later_book_context_across_rest_mcp_cli(monkeypatch, capsys, part):
-    payload = {
-        "date": "1957-09-24",
-        "time": "12:00:00",
-        "zone": "+08:00",
-        "calendar_profile": "hinoo_t1299_host27",
-    }
-    if part is not None:
-        payload["calendar_day_part"] = part
-    _check_surfaces(
-        monkeypatch,
-        capsys,
-        "suzhan",
-        payload,
-        [
-            "sukuyo.calendar.profile_calculation.hinoo_source.critical_calendar_reference.later_seibunkan_comparison",
-            "sukuyo.calendar.status",
-            "sukuyo.calendar.natal_su27",
-            "sukuyo.calendar.candidate_su27s",
-            "sukuyo.reading_text",
-        ],
-    )
-
-
-# t2217_transports
 @pytest.mark.parametrize("date", ["2025-01-29", "1903-06-25"])
 def test_printed_collation_across_actual_transports(monkeypatch, capsys, date):
     suffix = "calendar_day.clock_doctrine.source_specific_time_calibration.daybreak_source_comparison.T2217_printed_collation"
@@ -423,7 +317,6 @@ def test_printed_collation_across_actual_transports(monkeypatch, capsys, date):
     _check_surfaces(monkeypatch, capsys, "suzhan", payload, fields)
 
 
-# zhidu_transports
 @pytest.mark.parametrize("date", ["1903-06-25", "2024-08-04"])
 def test_zhidu_context_across_actual_transports(monkeypatch, capsys, date):
     _check_surfaces(

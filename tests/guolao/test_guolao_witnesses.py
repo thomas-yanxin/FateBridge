@@ -3,8 +3,6 @@
 import copy
 import hashlib
 import json
-import runpy
-import sys
 from fractions import Fraction
 from pathlib import Path
 
@@ -159,23 +157,3 @@ def test_changed_siku_baseline_is_rejected_instead_of_silently_rebased(
     audit.DATA.write_text(json.dumps(data))
     with pytest.raises(ValueError, match="指纹改变"):
         audit.audit_gujin45_witness_variants()
-
-
-def test_targeted_cli_prints_the_complete_unadjudicated_matrix(monkeypatch, capsys):
-    monkeypatch.setattr(sys, "argv", ["audit_guolao_witnesses.py", "--targeted-audit"])
-    with pytest.raises(SystemExit) as exit_info:
-        runpy.run_path(
-            str(ROOT / "scripts/guolao/audit_guolao_witnesses.py"), run_name="__main__"
-        )
-    assert exit_info.value.code == 0
-    assert json.loads(capsys.readouterr().out) == audit.audit_gujin45_witness_variants()
-
-
-def test_cli_requires_explicit_targeted_scope(monkeypatch, capsys):
-    monkeypatch.setattr(sys, "argv", ["audit_guolao_witnesses.py"])
-    with pytest.raises(SystemExit) as exit_info:
-        runpy.run_path(
-            str(ROOT / "scripts/guolao/audit_guolao_witnesses.py"), run_name="__main__"
-        )
-    assert exit_info.value.code == 2
-    assert not capsys.readouterr().out

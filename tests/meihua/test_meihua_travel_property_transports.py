@@ -1,4 +1,4 @@
-"""Selected lost-property chapter across REST, MCP and CLI; no model executions."""
+"""Traveler and lost-property chapters across REST, MCP, CLI and same-run paging."""
 
 import hashlib
 import json
@@ -16,6 +16,11 @@ from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.divination import calculate_meihua_analysis
 from fatebridge.services.meihua import calculate_meihua_cast
 from tests.support.transports import SPECS, call_cli, rest
+
+TOPICS = [
+    ("traveler", "MEIHUA_V53_EXPECTED_PACKAGE_ROOT"),
+    ("lost_property", "MEIHUA_V48_EXPECTED_PACKAGE_ROOT"),
+]
 
 FIELD = "interpretation.topic_reading"
 CASES = [
@@ -64,11 +69,12 @@ CASES = [
 
 
 @pytest.mark.parametrize("tool,arguments", CASES)
+@pytest.mark.parametrize("topic,package_env", TOPICS)
 @pytest.mark.asyncio
 async def test_new_branch_domain_and_three_transports_agree(
-    tool, arguments, rest, capsys, tmp_path
+    topic, package_env, tool, arguments, rest, capsys, tmp_path
 ):
-    arguments = {**arguments, "interpretation_topic": "lost_property"}
+    arguments = {**arguments, "interpretation_topic": topic}
     domain = (
         calculate_meihua_cast if tool == "meihua_cast" else calculate_meihua_analysis
     )(**arguments)
@@ -127,8 +133,11 @@ async def test_new_branch_domain_and_three_transports_agree(
         assert FIELD in suggested_fields(spec, view=view)
 
 
+@pytest.mark.parametrize("topic,package_env", TOPICS)
 @pytest.mark.asyncio
 async def test_fresh_stdio_schema_and_actual_default_fields_accept_the_new_enum(
+    topic,
+    package_env,
     tmp_path,
 ):
     root = Path(__file__).resolve().parents[2]
@@ -137,9 +146,7 @@ async def test_fresh_stdio_schema_and_actual_default_fields_accept_the_new_enum(
         args=["-m", "fatebridge.mcp_server"],
         cwd=str(root),
         env={
-            "PYTHONPATH": os.environ.get(
-                "MEIHUA_V48_EXPECTED_PACKAGE_ROOT", str(root / "src")
-            ),
+            "PYTHONPATH": os.environ.get(package_env, str(root / "src")),
             "FATEBRIDGE_MCP_SCENARIOS": "onda-zhanbu",
             "FATEBRIDGE_MCP_TOOL_SCOPE": "topic",
         },
@@ -149,14 +156,12 @@ async def test_fresh_stdio_schema_and_actual_default_fields_accept_the_new_enum(
         tools = {t.name: t for t in await client.list_tools()}
         for name, args in [CASES[0], CASES[3]]:
             schema = tools[name].inputSchema
-            assert (
-                "lost_property" in schema["properties"]["interpretation_topic"]["enum"]
-            )
+            assert topic in schema["properties"]["interpretation_topic"]["enum"]
             reply = await client.call_tool(
                 name,
                 {
                     **args,
-                    "interpretation_topic": "lost_property",
+                    "interpretation_topic": topic,
                     "fields": suggested_fields(SPECS[name]),
                     "strict_fields": True,
                     "include_snapshot_text": False,
@@ -168,7 +173,7 @@ async def test_fresh_stdio_schema_and_actual_default_fields_accept_the_new_enum(
             payload = reply.structured_content
             assert (
                 payload["interpretation"]["topic_reading"]["ruleset_id"]
-                == "meihua_lost_property_nlc1925_v1"
+                == f"meihua_{topic}_nlc1925_v1"
             )
             assert payload["run_metadata"]["run_id"]
             assert (
@@ -180,13 +185,14 @@ async def test_fresh_stdio_schema_and_actual_default_fields_accept_the_new_enum(
 
 
 @pytest.mark.parametrize("tool,arguments", [CASES[0], CASES[2], CASES[3]])
+@pytest.mark.parametrize("topic,package_env", TOPICS)
 @pytest.mark.asyncio
 async def test_bounded_default_projection_restores_same_run_complete_evidence(
-    tool, arguments, tmp_path
+    topic, package_env, tool, arguments, tmp_path
 ):
     root = Path(__file__).resolve().parents[2]
-    package = os.environ.get("MEIHUA_V48_EXPECTED_PACKAGE_ROOT", str(root / "src"))
-    arguments = {**arguments, "interpretation_topic": "lost_property"}
+    package = os.environ.get(package_env, str(root / "src"))
+    arguments = {**arguments, "interpretation_topic": topic}
     expected = (
         calculate_meihua_cast if tool == "meihua_cast" else calculate_meihua_analysis
     )(**arguments)

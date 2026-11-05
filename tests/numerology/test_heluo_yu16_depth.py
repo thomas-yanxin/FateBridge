@@ -9,19 +9,10 @@ import pytest
 
 from fatebridge.core import heluo_texts as ht
 from fatebridge.core.heluo import _tiaowen, yao_text
-from tests.support.heluo_source_facts import HEADER_COUNT, PENDING_COUNT
 
 ROOT = Path(__file__).parents[1] / "fixtures/heluo_yu16_v1"
 READINGS = json.loads((ROOT / "verified-readings.json").read_bytes())
 FREEZE = json.loads((ROOT / "freeze.json").read_bytes())
-
-
-def canonical(value):
-    return hashlib.sha256(
-        json.dumps(
-            value, ensure_ascii=False, sort_keys=True, separators=(",", ":")
-        ).encode()
-    ).hexdigest()
 
 
 def test_header_uncertainty_is_not_suppressed_by_clear_commentary_status():

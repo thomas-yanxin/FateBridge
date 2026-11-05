@@ -1,11 +1,7 @@
 """Reference-frame alignment cannot erase the old PMO/cross-frame failures."""
 
-import hashlib
 import importlib.util
-import json
 import shutil
-import zipfile
-from copy import deepcopy
 from pathlib import Path
 
 import pytest
@@ -77,20 +73,6 @@ def test_frozen_reference_inventory_is_complete(tmp_path, change):
         (corpus / "extra.json").write_text("{}")
     with pytest.raises(ValueError, match="Frozen ecliptic"):
         AUDIT.reference(corpus)
-
-
-def reseal(corpus):
-    sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
-    files = {
-        name: hashlib.sha256(data).hexdigest()
-        for name, data in AUDIT.source_contents(corpus).items()
-        if name != "precomparison-freeze.json"
-    }
-    (corpus / "precomparison-freeze.json").write_text(
-        json.dumps(dict(files=files, production_calculations_performed=False))
-    )
-    files["precomparison-freeze.json"] = sha(corpus / "precomparison-freeze.json")
-    (corpus / "freeze.json").write_text(json.dumps(dict(files=files)))
 
 
 def test_fallback_model_is_reported_without_relabelling_it_swiss():
