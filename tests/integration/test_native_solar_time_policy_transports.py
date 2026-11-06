@@ -38,12 +38,16 @@ async def stdio(payload, options, log):
 
 
 @pytest.mark.parametrize(
-    "year,historical,future",
-    [(1700, True, False), (1972, False, False), (2300, False, True)],
+    "year,method,historical,future",
+    [
+        (1700, "pre_1972_swiss_UT1_delta_t", True, False),
+        (1972, "IERS_UTC_to_TT_swiss_delta_t_to_UT1", False, False),
+        (2300, "IERS_UTC_to_TT_swiss_delta_t_to_UT1", False, True),
+    ],
 )
 @pytest.mark.parametrize("project", [False, True])
 def test_actual_three_protocol_native_policy(
-    year, historical, future, project, monkeypatch, rest, tmp_path, capsys
+    year, method, historical, future, project, monkeypatch, rest, tmp_path, capsys
 ):
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
@@ -77,7 +81,17 @@ def test_actual_three_protocol_native_policy(
             calendar["bazi_month_boundary"]["next_term"],
         ]:
             details = term["solar_model_details"]
-            assert term["ephemeris_model"] == details["ephemeris_model"] == "moshier"
+            assert term["resolution_provider"] == "fatebridge_moshier"
+            assert (
+                term["ephemeris_model"]
+                == details["model_id"]
+                == details["ephemeris_model"]
+                == "fatebridge_complete_moshier_solar_v1"
+            )
+            assert "ephemeris_retflags" not in term
+            assert "ephemeris_retflags" not in details
+            assert details["native_moshier_relabelled"] is False
+            assert details["civil_time_policy"] == method
             assert details["historical_ut1_convention"] is historical
             assert details["future_leap_seconds_assumed_unchanged"] is future
             assert details["accuracy_certified"] is False

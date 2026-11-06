@@ -459,11 +459,25 @@ def test_actual_native_calendar_carries_each_clock_policy(
     assert len(terms) == 24
     for term in terms:
         details = term.as_dict()["solar_model_details"]
-        assert term.ephemeris_model == "moshier"
+        # Native file fallback now solves the named complete revision, not
+        # the stock Swiss Sun. Its identity must not borrow native Sun flags.
+        assert term.resolution_provider == "fatebridge_moshier"
+        assert (
+            term.ephemeris_model
+            == details["model_id"]
+            == details["ephemeris_model"]
+            == "fatebridge_complete_moshier_solar_v1"
+        )
+        assert term.ephemeris_retflags == ()
+        assert "ephemeris_retflags" not in details
+        assert details["native_moshier_relabelled"] is False
         assert details["civil_time_policy"] == method
         assert details["historical_ut1_convention"] is historical
         assert details["future_leap_seconds_assumed_unchanged"] is future
         assert details["accuracy_certified"] is False
+        assert details["root_time_scale"] == "TT"
+        assert details["civil_time_method"] == "datetime_from_tt_point"
+        assert details["numerical_resolution_is_physical_accuracy"] is False
 
 
 @pytest.mark.parametrize(

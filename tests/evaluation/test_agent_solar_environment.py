@@ -1,6 +1,5 @@
 """An evaluation's declared solar backend must reach its real MCP child."""
 
-import hashlib
 import json
 from pathlib import Path
 
@@ -9,6 +8,7 @@ from fastmcp import Client
 from fastmcp.client.transports import StdioTransport
 
 from scripts.evaluate_agent import command_for
+from tests.fixtures.mcp_result_delivery import read_full_result
 
 ROOT = Path(__file__).resolve().parents[2]
 MODE = "FATEBRIDGE_SOLAR_TERM_MODEL"
@@ -51,7 +51,10 @@ def test_unspecified_selection_stays_unspecified_and_secrets_are_not_forwarded(
 @pytest.mark.asyncio
 @pytest.mark.parametrize(
     "mode,parent_after_build,expected",
-    [("native", "auto", "moshier"), ("auto", "native", "fatebridge_de440_solar_v1")],
+    [
+        ("native", "auto", "fatebridge_complete_moshier_solar_v1"),
+        ("auto", "native", "fatebridge_de440_solar_v1"),
+    ],
 )
 async def test_actual_mcp_uses_the_constructed_configuration(
     mode, parent_after_build, expected, monkeypatch, tmp_path
@@ -88,19 +91,43 @@ async def test_actual_mcp_uses_the_constructed_configuration(
                 "fields": ["solar_term.boundary_context"],
                 "strict_fields": True,
                 "include_snapshot_text": False,
+                "response_char_limit": 8192,
             },
             raise_on_error=False,
         )
         assert not result.is_error
-        data = result.structured_content
-        if "result_delivery" in data:
-            receipt = data["result_delivery"]
-            retained = json.loads(Path(receipt["file_path"]).read_text())["payload"]
-            original_order = json.dumps(
-                retained, ensure_ascii=False, separators=(",", ":")
-            ).encode()
-            assert hashlib.sha256(original_order).hexdigest() == receipt["sha256"]
-            assert retained["run_metadata"]["run_id"] == data["run_metadata"]["run_id"]
-            data = retained
+        assert len(result.content[0].text) <= 8192
+        inline = result.structured_content
+        receipt = inline["result_delivery"]
+        assert "sha256" not in receipt
+        # Compact receipts may omit file_path. Read every page of this run
+        # through MCP and check the complete manifest, offsets and metadata.
+        data = await read_full_result(client, inline)
+        run_id = data["run_metadata"]["run_id"]
+        verified = json.loads(
+            (
+                await client.read_resource(
+                    f"fatebridge://results/{receipt['result_id']}/verified/{run_id}/0"
+                )
+            )[0].text
+        )
+        assert verified["result_id"] == receipt["result_id"]
+        assert verified["total_chars"] == receipt["total_chars"]
+        assert verified["verification"]["method"] == "retained_payload_integrity_v2"
+        assert verified["verification"]["scope"] == "entire_retained_payload"
+        assert verified["verification"]["run_id"] == run_id
+        assert verified["verification"]["calculation_repeated"] is False
+        text = json.dumps(data, ensure_ascii=False, separators=(",", ":"))
+        assert verified["text"] == text[:2048]
+        assert data["run_metadata"]["runtime"]["solar_term_policy"]["mode"] == mode
         rows = data["solar_term"]["boundary_context"]["dependencies"]
         assert {row["record"]["ephemeris_model"] for row in rows} == {expected}
+        for row in rows:
+            record = row["record"]
+            details = record["solar_model_details"]
+            assert details["model_id"] == expected
+            assert record["resolution_provider"] == (
+                "fatebridge_moshier" if mode == "native" else "jpl_de440"
+            )
+            assert "ephemeris_retflags" not in record
+            assert details["accuracy_certified"] is False
