@@ -64,7 +64,7 @@ _MCP_INSTRUCTIONS = (
     "只用已确认资料，不猜生时、不套默认或示例；必要缺项简短追问，未知后继续已有可答部分。"
     "区分计算、传统解释和现实建议；分数不是成功概率。"
     "已连接且定义清楚时直接调用，不为咨询查仓库或运行诊断。"
-    "主题与时间范围按对应 Onda 技能选择；照片是候选，partial 只限制对应层，动作许可不阻塞普通解释。"
+    "按当前问题、指定方法和实际时间范围选择公开能力；照片是候选，partial 只限制对应层，动作许可不阻塞普通解释。"
     "摘要按任务视图选 fields，strict_fields=true、include_snapshot_text=false；"
     "完整导出首次 fields=null，再读同一 run 的 result_delivery。"
     "isError 按 error_code/issues 修正，仅 retryable=true 才重试。"

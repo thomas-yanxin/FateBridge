@@ -1,6 +1,6 @@
 # MCP 部署指南
 
-通过 MCP，可以让 AI 助手调用 FateBridge 的本地计算。完成接入需要选择传输方式、安装服务并配置客户端，最后确认一次实际调用；后续升级和停用也沿用同一套部署方式。客户端与模型负责理解问题和解释结果，Onda 技能提供按主题组织咨询的指引。
+通过 MCP，可以让 AI 助手调用 FateBridge 的本地计算。完成接入需要选择传输方式、安装服务并配置客户端，最后确认一次实际调用；后续升级和停用也沿用同一套部署方式。客户端与模型根据实际工具合同理解问题和解释结果。
 
 先按下表选择部署方式，再完成对应的安装与连接验证。人物示例均为虚构资料；项目能力见[项目首页](../README.md)，接口集成见 [Agent 接入指南](agent-guide.md)。
 
@@ -25,9 +25,9 @@ uv tool install --python 3.12 fatebridge
 fatebridge doctor --mcp
 ```
 
-命令找不到时，执行 `uv tool update-shell` 并重开终端。doctor 的 `version` 是实际安装版本，`executable` 是该工具环境的 Python 绝对路径。wheel 包含工具与场景数据，不包含 Onda 技能文件。已发布包的文档以[对应 Git 标签](https://github.com/thomas-yanxin/FateBridge/tags)为准。
+命令找不到时，执行 `uv tool update-shell` 并重开终端。doctor 的 `version` 是实际安装版本，`executable` 是该工具环境的 Python 绝对路径。wheel 包含计算代码、规则和场景数据。已发布包的文档以[对应 Git 标签](https://github.com/thomas-yanxin/FateBridge/tags)为准。
 
-### 当前源码与 Onda 技能
+### 当前源码
 
 ```bash
 git clone https://github.com/thomas-yanxin/FateBridge.git
@@ -148,9 +148,11 @@ uv run --locked --extra dev fatebridge bazi_birth `
 
 路径必须替换为本次安装的真实路径；`PYTHONUTF8=1` 使子进程使用 UTF-8。
 
-## 工具范围、环境与技能
+## 工具筛选与运行环境
 
 默认不筛选工具。可在客户端的 `env` 中明确设置：
+
+`onda-*` 是保留的场景 ID，不代表仍有同名技能。14 个配置由 `configs/scenarios/` 中的13份 YAML 与[住宅基础路由](scenario-routing.md#家居风水基础计算)生成；配置来源与维护命令见[场景配置说明](../configs/scenarios/README.md)。
 
 `FATEBRIDGE_MCP_TOOL_SCOPE` 选择场景依赖范围，需当前源码环境；已发布版本按对应标签的文档。支持延迟工具加载时可保留完整目录；不支持时在选定场景下加 `FATEBRIDGE_MCP_TOOL_SCOPE=topic`。默认 `complete` 保留条件依赖，topic 只公开直接工具和知识支撑。隐藏分支在场景 `availability` 中如实标缺，不会通过通用调度工具绕过过滤；需要条件技法时切回 complete 并重启连接。未指定场景的 `topic` 配置启动失败；未知 scope 值也会拒绝启动。
 
@@ -168,7 +170,7 @@ uv run --locked --extra dev fatebridge doctor --mcp --scenario onda-shiye --tool
 
 源码 MCP 启动时读取仓库根目录 `.env`，已有进程环境优先。GUI 客户端应通过 `env` 注入设置，独立工具安装不要依赖当前工作目录的 `.env`。自定义星历目录可加 `SE_EPHE_PATH`，下载步骤与精度检查见[星历说明](ephemeris.md)。日志写 stderr，stdout 留给 stdio 协议；启动包装脚本也应遵守此约定。
 
-[Onda 技能](../skills/README.md)与 MCP 进程分开加载。Codex 使用该源码仓库作为项目时，从 `AGENTS.md` 和 `.agents/skills/` 获取项目指导及技能入口；其他客户端需按自身机制加载 `skills/`。只安装 Python 包或连接远程 MCP，不会向客户端复制技能文件。
+旧 Onda 技能已移除。Codex 使用本仓库作为项目时读取 `AGENTS.md`；其他客户端按自身机制使用工具说明。参考文档可按需读取，不需要安装技能包。
 
 ## HTTP 与远程部署
 
@@ -276,34 +278,9 @@ WantedBy=multi-user.target
 
 上述服务没有 MCP 网络鉴权，保持回环监听并通过 SSH 使用。若要开放公网，需在 FastMCP 或前置网关实现客户端兼容的鉴权、TLS 与访问限制，并验证 MCP POST / GET / DELETE 和流式响应可通过；不能只转发普通 REST POST。**`FATEBRIDGE_API_KEYS` 只保护 REST，不保护此 MCP 服务。** 当前共享结果存储不提供多租户结果所有权隔离；不同信任边界应隔离运行用户与实例，详见[安全策略](../SECURITY.md)。
 
-## Onda 插件的构建与安装
+## 旧 Onda 插件退役
 
-本仓库根的 `plugin.json` 与 `mcp.json` 声明 Onda 技能与本地 stdio MCP。插件同时携带构建时源码的计算后端、数据和锁定依赖清单，插件版本独立于 Python 包版本。
-
-### 构建插件包
-
-在源码的锁定环境中执行：
-
-```bash
-uv run --locked --extra dev python scripts/build_onda_plugin.py --output dist/fatebridge-onda-0.2.0.zip
-uv run --locked --extra dev python -m pytest -q tests/quality/test_onda_plugin.py
-```
-
-输出路径须尚不存在，避免覆盖旧包。构建器保留 `skills/`、兄弟 `_shared/`、分支参考及本地文档依赖，并加入 `src/fatebridge/`、包数据、`pyproject.toml` 与 `uv.lock`。运行时依赖由 `uv export --locked --no-dev --no-emit-project` 导出至 `backend-requirements.txt`，保留版本、平台标记和散列。`backend-source.json` 记录后端文件与依赖清单的 SHA-256，可核对安装内容。
-
-构建器拒绝包外或不存在的引用；不复制虚拟环境、运行时私密配置或缓存。不把单一技能文件夹单独拷贝后当作完整包。
-
-### 安装插件包
-
-先安装 uv，并确认客户端启动环境能找到 `uvx`。解压到用户选择的插件目录。按客户端的本地插件或 marketplace 机制指向该目录；操作方式见 [OpenAI 插件包装文档](https://developers.openai.com/plugins/build/plugins)。仓库作者不需要代用户修改个人配置。
-
-本插件通过 `uvx --python 3.12 --isolated --with-requirements "${PLUGIN_ROOT}/backend-requirements.txt" --from "${PLUGIN_ROOT}" fatebridge-mcp` 运行包内后端，工作目录也指向 `${PLUGIN_ROOT}`。`${PLUGIN_ROOT}` 由插件宿主解析。启动不依赖本机仓库路径、已有 FateBridge 安装或旧版 PyPI 后端；首次仍需联网下载 Python 和目标平台的锁定依赖，不是离线安装包。
-
-从源码目录手动注册开发服务仍使用 doctor 输出，见本页[注册本地 stdio](#注册本地-stdio)。根 `mcp.json` 中的依赖导出文件在插件构建时产生，因此安装应选择构建并解压后的插件包。可分发包内不放私有 Hosted URL、令牌或本机绝对路径。
-
-在源码项目已发现同名技能、或已注册同名 MCP 时，选择使用项目入口或插件入口，避免重复安装。安装后新开聊天，确认技能及 MCP 工具存在，再用 [Codex 指南](codex-guide.md)的虚构资料实际调用。包结构、引用和 stdio 计算通过，不等于所有宿主、操作系统或公网部署都已验收。
-
-当前没有发布到公共插件目录，也没有远程 HTTPS MCP 端点；本地插件不冒充 ChatGPT 网页端可连接的公网服务。公开分发的要求见官方[桌面插件说明](https://developers.openai.com/plugins/deploy/desktop-only)。
+当前源码已移除 Onda 技能和插件打包入口。使用本页的本地 stdio 或远程 HTTP 方式连接 FateBridge；结果读取与来源说明见[方法参考](interpretation/README.md)。已安装的旧插件属于独立副本，源码删除不会自动卸载它；请在原宿主中停用旧插件并重新加载连接。
 
 ## 客户端验收与排错
 

@@ -11,10 +11,10 @@ FateBridge 把这些问题拆开处理。本文介绍接入时需要理解的分
 | 组成 | 负责什么 | 使用方式 |
 | --- | --- | --- |
 | FateBridge 计算引擎 | 按输入执行排盘、历法和规则计算，返回结构化结果及相应运行说明 | 本地运行，通过 MCP、REST 或 CLI 调用 |
-| Onda 咨询技能 | 指导 Agent 判断本轮主题、选择计算依据、解释传统含义并组织回答 | 技能文件随源码仓库提供，由支持技能的客户端加载 |
+| 方法参考 | 说明结果读取、传统来源与适用范围 | `docs/interpretation/` 按需查阅 |
 | 接入应用、Agent 客户端与模型 | 提供界面与对话，理解问题、调用计算并表达结果 | 由使用者或应用开发者选择和配置 |
 
-例如，用户问工作方向：Onda 指导 Agent 选择相关结构与时间依据，FateBridge 完成所选计算，模型再依据实际结果组织解读。计算服务本身无需 LLM API Key；对话模型的配置取决于所选客户端。技能与场景清单的发现方式见[Onda 索引](../skills/README.md)。
+例如，用户问工作方向：Agent 根据当前工具合同选择相关结构与时间依据，FateBridge 完成所选计算，模型再依据实际结果组织解读。计算服务本身无需 LLM API Key；对话模型的配置取决于所选客户端。结果读取与来源说明见[方法参考](interpretation/README.md)。
 
 ## 工具与入口
 
@@ -25,11 +25,10 @@ FateBridge 把这些问题拆开处理。本文介绍接入时需要理解的分
 | 工具 | 具体计算或查询的输入与输出合同 | 已知道要算什么，读取其 Schema 后调用 |
 | family | 工具目录的能力分类 | 从较大的目录缩小发现范围 |
 | 场景 scenario | 按用户任务组织候选工具的发现入口 | 从事业、关系、时运等问题选择相关依据 |
-| Onda 技能 skill | 主题取证、范围判断、解读与交付规则 | 让 Agent 围绕当前问题使用计算结果 |
 
-问题与工具并非一一对应：一个场景可能涉及多个 family，一个工具也可能服务于多个场景。场景列表和技能清单提供选择指引，不会自动执行其中所有工具。`FATEBRIDGE_MCP_FAMILIES` 与 `FATEBRIDGE_MCP_SCENARIOS` 会限制连接公开的工具，两者同时设置时取交集；配置后需要重启连接。
+问题与工具并非一一对应：一个场景可能涉及多个 family，一个工具也可能服务于多个场景。场景列表提供可选筛选配置，不会自动执行其中所有工具。原 `onda-*` ID 继续保留，但不再对应技能；配置源与生成方式见[场景配置](../configs/scenarios/README.md)。`FATEBRIDGE_MCP_FAMILIES` 与 `FATEBRIDGE_MCP_SCENARIOS` 只限制 MCP 连接公开的工具，两者同时设置时取交集；配置后需要重启连接。REST／CLI 的场景发现筛选不限制业务调用。
 
-选工具看[场景路由](scenario-routing.md)，了解技能发现与维护看[技能索引](../skills/README.md)，核对名称映射看[三端能力边界](api-reference.md#24-三端能力边界)。
+选工具看[场景路由](scenario-routing.md)，核对结果读取与来源看[方法参考](interpretation/README.md)，核对名称映射看[三端能力边界](api-reference.md#24-三端能力边界)。
 
 ## 输入与时间口径
 
@@ -41,7 +40,7 @@ FateBridge 把这些问题拆开处理。本文介绍接入时需要理解的分
 
 出生时区取决于地点和历史日期。中式工具与西占的真太阳时默认策略不同，核对实际工具合同和返回的时间校正，不把一个体系的默认值复制给另一个体系。西占推运若指定精确目标时刻，应同时提供 `analysis_hour` 和 `analysis_minute`，并核对 `analysis_context.analysis_datetime`。
 
-传统周期也有各自边界：节气年／月、公历范围、生日年、返照周期和法达分期不能只用“今年”合并。时间层的选择与比较见[共享时间选择](../skills/_shared/timing-selection.md)。
+传统周期也有各自边界：节气年／月、公历范围、生日年、返照周期和法达分期不能只用“今年”合并。时间层的选择与比较见[共享时间选择](interpretation/shared/timing-selection.md)。
 
 ## 一次结果包含什么
 
@@ -84,6 +83,6 @@ REST 的投影等公共输出选项使用查询参数；MCP 使用工具参数�
 
 第一问对应计算事实，第二问对应传统解释，第三问可能涉及职责、预算、双方回应或现场条件。三者应能区分，不能把建议冒充引擎原结论。
 
-规则分数不是现实成功概率，多体系描述相近也不是独立统计验证。数值可复现、规则有来源、测试通过与预测有效性分别说明。星历精度还需核对实际 `chart_profile.ephemeris_model` 与 `run_metadata.engine_is_approximate`，详见[算法覆盖矩阵](algorithm-coverage.md)。咨询的允许范围见[硬边界](../skills/_shared/safety-boundaries.md)。
+规则分数不是现实成功概率，多体系描述相近也不是独立统计验证。数值可复现、规则有来源、测试通过与预测有效性分别说明。星历精度还需核对实际 `chart_profile.ephemeris_model` 与 `run_metadata.engine_is_approximate`，详见[算法覆盖矩阵](algorithm-coverage.md)。咨询的允许范围见[硬边界](interpretation/shared/safety-boundaries.md)。
 
 下一步可按[接入指南](agent-guide.md)实现客户端，或回到[文档中心](README.md)选择具体任务。

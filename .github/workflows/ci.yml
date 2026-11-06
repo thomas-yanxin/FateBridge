@@ -21,7 +21,7 @@ jobs:
       contents: read
       pull-requests: read
     outputs:
-      checks: ${{ steps.paths.outputs.code == 'true' || steps.paths.outputs.scenario == 'true' }}
+      checks: ${{ steps.paths.outputs.code == 'true' || steps.paths.outputs.scenario == 'true' || steps.paths.outputs.reference == 'true' }}
     steps:
       - name: Checkout push history for path filtering
         if: github.event_name != 'pull_request'
@@ -39,6 +39,8 @@ jobs:
               - '!docs/**/*.md'
             scenario:
               - 'docs/scenario-routing.md'
+            reference:
+              - 'docs/interpretation/shared/**'
 
   documentation:
     runs-on: ubuntu-24.04

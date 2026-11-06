@@ -18,10 +18,9 @@
   <a href="https://github.com/thomas-yanxin/FateBridge/actions/workflows/ci.yml"><img src="https://github.com/thomas-yanxin/FateBridge/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-blue.svg" alt="License"></a>
   <a href="https://www.modelscope.cn/mcp/servers/thomas/FateBridge"><img src="https://img.shields.io/badge/ModelScope-MCP%20Server-624AFF.svg" alt="ModelScope MCP Server"></a>
-  <a href="https://www.modelscope.cn/collections/thomas/Onda-Skills"><img src="https://img.shields.io/badge/ModelScope-Onda%20Skills-624AFF.svg" alt="ModelScope Onda Skills Collection"></a>
 </p>
 
-FateBridge provides local metaphysics and astrology calculations for AI applications through **MCP, REST API, and CLI**. Results include structured data, time conventions, and execution receipts. [Onda consultation skills](skills/README.md) guide an agent in selecting evidence and explaining traditional interpretations. Your application supplies the model conversation and interface.
+FateBridge provides local metaphysics and astrology calculations for AI applications through **MCP, REST API, and CLI**. Results include structured data, time conventions, and execution receipts. [Method references](docs/interpretation/README.md) document result reading, sources, and limitations. Your application supplies the model conversation and interface.
 
 The calculation service requires no LLM API key. It serves application developers, MCP clients, and researchers checking calendar calculations and selected traditional rules. Reproducibility, source conformity, and predictive validity are evaluated separately.
 
@@ -52,7 +51,7 @@ This provides `fatebridge`, `fatebridge-api`, and `fatebridge-mcp`. If they are 
 
 ### Current source
 
-For current branch features, Onda skills, or development:
+For current branch features or development:
 
 ```bash
 git clone https://github.com/thomas-yanxin/FateBridge.git
@@ -61,7 +60,7 @@ uv sync --locked --extra dev
 uv run --locked --extra dev fatebridge doctor
 ```
 
-This README describes the development branch. For a released package, use the documentation at its [Git tag](https://github.com/thomas-yanxin/FateBridge/tags); pending changes appear in the [Changelog](CHANGELOG.md#unreleased). The Python wheel contains calculation code and rule data. Onda skills are distributed separately through the repository or a [plugin bundle](docs/mcp-deployment.md#onda-插件的构建与安装).
+This README describes the development branch. For a released package, use the documentation at its [Git tag](https://github.com/thomas-yanxin/FateBridge/tags); pending changes appear in the [Changelog](CHANGELOG.md#unreleased). The Python wheel contains calculation code and rule data. The former Onda skills and plugin builder have been removed.
 
 ### Run a calculation
 
@@ -93,7 +92,7 @@ fatebridge describe bazi_birth --detail input
 | Web, mobile, or backend application | Independent REST service | [Start REST](docs/getting-started.md#启动-rest-并检查状态) · [Integration guide](docs/agent-guide.md) |
 | Scripts and batch jobs | One-shot CLI execution | [Getting started](docs/getting-started.md) · [Requests](docs/examples/README.md) |
 
-For local MCP, run `fatebridge doctor --mcp` and register the absolute Python path returned as `executable`. The client manages the stdio process. After saving the configuration, verify tool visibility and a real call in a new chat. MCP and Onda skills load separately.
+For local MCP, run `fatebridge doctor --mcp` and register the absolute Python path returned as `executable`. The client manages the stdio process. After saving the configuration, verify tool visibility and a real call in a new chat. Reload the MCP connection after upgrading.
 
 Start REST locally with `API_HOST=127.0.0.1 fatebridge-api`. The default port is `8010`, with interactive API documentation at `/docs`. The default bind address listens on all interfaces; review [configuration](docs/configuration.md) and [security](SECURITY.md). REST API keys do not protect MCP.
 
@@ -108,19 +107,19 @@ Start REST locally with `API_HOST=127.0.0.1 fatebridge-api`. The default port is
 
 The package uses a Python `src` layout. FastAPI, FastMCP, and CLI adapters call shared execution and domain services through a central `ToolSpec` catalog. See [architecture](docs/architecture.md). Dependencies are declared in [pyproject.toml](pyproject.toml), with development resolutions pinned in [uv.lock](uv.lock).
 
-Contributions to documentation, algorithms, interfaces, tests, and Onda skills are welcome. Follow [CONTRIBUTING](CONTRIBUTING.md) and select checks from the [development guide](docs/development-guide.md). See the [documentation writing guide (Chinese)](docs/documentation-guide.md). Start documentation-only validation with:
+Contributions to documentation, algorithms, interfaces, and tests are welcome. Follow [CONTRIBUTING](CONTRIBUTING.md) and select checks from the [development guide](docs/development-guide.md). See the [documentation writing guide (Chinese)](docs/documentation-guide.md). Start documentation-only validation with:
 
 ```bash
 uv run --locked --extra dev python scripts/check_docs.py
 uv run --locked --extra dev python -m pytest -q tests/quality/test_documentation_integrity.py tests/quality/test_doc_tool_counts.py
 ```
 
-[Documentation maintenance](docs/development-guide.md#文档维护与验证) covers interface, skill, and generated-source synchronization. Include the version, a minimal fictional reproduction, and the actual error in bug reports. Report vulnerabilities privately under [SECURITY.md](SECURITY.md).
+[Documentation maintenance](docs/development-guide.md#文档维护与验证) covers interface, scenario configuration, and generated-source synchronization. Include the version, a minimal fictional reproduction, and the actual error in bug reports. Report vulnerabilities privately under [SECURITY.md](SECURITY.md).
 
 ## Documentation and scope
 
-The [documentation index](docs/README.md) organizes installation, integration, domain references, and development. [Troubleshooting](docs/troubleshooting.md) starts from symptoms. Platform listings: [ModelScope MCP Server](https://www.modelscope.cn/mcp/servers/thomas/FateBridge) · [Onda Skills](https://www.modelscope.cn/collections/thomas/Onda-Skills).
+The [documentation index](docs/README.md) organizes installation, integration, domain references, and development. [Troubleshooting](docs/troubleshooting.md) starts from symptoms. Platform listings: [ModelScope MCP Server](https://www.modelscope.cn/mcp/servers/thomas/FateBridge).
 
-Traditional interpretations and rule scores are cultural references. Scores are not real-world success probabilities. Consultations exclude lifespan/death prediction, assertions of disasters, clinical diagnosis/treatment, and medical timing; see [consultation boundaries](skills/_shared/safety-boundaries.md). Agent clients, model providers, chat histories, and exports have their own personal-data handling boundaries beyond local calculation.
+Traditional interpretations and rule scores are cultural references. Scores are not real-world success probabilities. Consultations exclude lifespan/death prediction, assertions of disasters, clinical diagnosis/treatment, and medical timing; see [consultation boundaries](docs/interpretation/shared/safety-boundaries.md). Agent clients, model providers, chat histories, and exports have their own personal-data handling boundaries beyond local calculation.
 
 Project code is licensed under [Apache-2.0](LICENSE). Third-party components and materials appear in [NOTICE](NOTICE). Check the separate licenses of dependencies, downloaded ephemerides, and source materials before redistribution or commercial integration.

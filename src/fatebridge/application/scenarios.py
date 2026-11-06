@@ -262,7 +262,7 @@ def discover_scenarios(
                 }
             )
             record["required_inputs_scope"] = (
-                "skill-level guidance; per-tool required parameters remain authoritative"
+                "profile-level guidance; per-tool required parameters remain authoritative"
             )
             record["tools"] = [
                 {

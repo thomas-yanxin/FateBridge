@@ -1,8 +1,8 @@
 # 家居风水基础计算
 
-[文档中心](README.md) · [请求示例](examples/README.md) · [玄空宅盘](fengshui-xuankong.md) · [咨询技能](../skills/onda-fengshui/SKILL.md)
+[文档中心](README.md) · [请求示例](examples/README.md) · [玄空宅盘](fengshui-xuankong.md) · [资料与来源](interpretation/fengshui/consultation.md)
 
-住宅、工位与合租空间的风水审查，从已知的空间事实和所选规则出发。个人命卦、宅盘与年盘分别提供依据；布局、室内关系、材质和候选方案也各有审查范围。应用接入与结果阅读按下方任务展开，咨询解读由 [Onda 风水技能](../skills/onda-fengshui/SKILL.md)指导。
+住宅、工位与合租空间的风水审查，从已知的空间事实和所选规则出发。个人命卦、宅盘与年盘分别提供依据；布局、室内关系、材质和候选方案也各有审查范围。应用接入与结果阅读按下方任务展开，现场事实与来源核对见[风水参考](interpretation/fengshui/consultation.md)。
 
 当前提供八个工具：公共方位、个人命卦、八宅、金锁玉关基础砂水、年度紫白飞星、月紫白、玄空历史宅盘和分层合参。三端来自同一目录，核心规则离线计算，不依赖外部风水服务。布局、室内关系、材质及候选方案通过 `fengshui_assess` 的独立分支审查。结果表示选定传统规则中的关系；规则来源、计算一致性和现实预测效力是不同事项。
 
@@ -14,7 +14,7 @@
 | --- | --- |
 | 运行一个请求 | [入口与最小输入](#入口与最小输入)、[三端例子](#三端例子) |
 | 区分个人命卦、宅盘与年盘 | [规则与版本](#规则与版本)、[输入语义和边界](#输入语义和边界) |
-| 关联门床桌灶或比较候选 | [布局对象](#布局对象的通用计算)、[候选布局合同](../skills/onda-fengshui/references/scene-planning.md) |
+| 关联门床桌灶或比较候选 | [布局对象](#布局对象的通用计算)、[候选布局合同](interpretation/fengshui/scene-planning.md) |
 | 判断结果是否完整、是否可以执行 | [分层结果与覆盖状态](#分层结果与覆盖状态) |
 | 维护实现与验收 | [实现与规则数据](#实现与规则数据)、[验证与维护](#验证与维护) |
 
@@ -31,15 +31,15 @@
 | `/api/fengshui/xuankong_natal` | `fengshui_xuankong_natal` | `house`、历史 `period`，按需提供测量误差及 `interpretation` | 运／山／向盘、下卦／替星与分界候选；有限解释须显式启用 |
 | `/api/fengshui/assess` | `fengshui_assess` | 已确认的住宅、住户、环境、年度或历史宅运输入；可选 `methods`、`scene`，布局时 `analyze_layout=true` | `bazhai` / `jinsuo` / `annual_stars` / `xuankong_natal` 独立分层；布局及所请求补充审查 |
 
-同一宅向的已知测量误差使用 `house.bearing_uncertainty_degrees`，在已选八宅及玄空层共同传播。八宅跨宫时保留各自宅卦及布局条件，详见[共享宅向误差](../skills/onda-fengshui/references/house-bearing-uncertainty.md)。省略误差只沿用点输入约定，不认证现场误差为零。
+同一宅向的已知测量误差使用 `house.bearing_uncertainty_degrees`，在已选八宅及玄空层共同传播。八宅跨宫时保留各自宅卦及布局条件，详见[共享宅向误差](interpretation/fengshui/house-bearing-uncertainty.md)。省略误差只沿用点输入约定，不认证现场误差为零。
 
 数值用JSON数值，日期和时刻按明确的ISO形式提交；布尔值、数字字符串或Unix时间戳不能冒充角度、运数及历法事实。范围内的整数值 `8.0` 仍可使用，非整数不舍入。详见风水输入类型。
 
-可运行输入按用途列于[示例索引](examples/README.md)。完整约束见 `/openapi.json`、MCP `tools/list` 和 `fatebridge describe fengshui_assess`。工具分类为 `fengshui`；不加入个人 `analyze_destiny` 或 `profile` 默认系统。[月紫白参考](../skills/onda-fengshui/references/monthly-stars.md)说明立春有效年、十二节换月、原表标签差异与原始回执核验；合参可显式选择 `monthly_stars` 或提供独立 `monthly`。
+可运行输入按用途列于[示例索引](examples/README.md)。完整约束见 `/openapi.json`、MCP `tools/list` 和 `fatebridge describe fengshui_assess`。工具分类为 `fengshui`；不加入个人 `analyze_destiny` 或 `profile` 默认系统。[月紫白参考](interpretation/fengshui/monthly-stars.md)说明立春有效年、十二节换月、原表标签差异与原始回执核验；合参可显式选择 `monthly_stars` 或提供独立 `monthly`。
 
 `fengshui_xuankong_natal` 提供中州派完整运／山／向数字盘与兼向替星；聚合时显式选择 `xuankong_natal`，与年度飞星独立。定运资料、分界候选、规则版本及独立盘例见 [玄空宅盘](fengshui-xuankong.md)。
 
-按问题展开的资料入口：基础[规则来源](../skills/onda-fengshui/references/rule-sources.md)、[布局形态](../skills/onda-fengshui/references/layout-rules.md)、[场景与候选比较](../skills/onda-fengshui/references/scene-planning.md)、[室内关系及材质器形](../skills/onda-fengshui/references/sourced-interior-rules.md)、[玄空有限解释](../skills/onda-fengshui/references/xuankong-interpretation.md)。[BTB 桌面作者规则](../skills/onda-fengshui/references/surface-rules.md)仅在用户明确另选时使用，不作为无方位的默认替代。
+按问题展开的资料入口：基础[规则来源](interpretation/fengshui/rule-sources.md)、[布局形态](interpretation/fengshui/layout-rules.md)、[场景与候选比较](interpretation/fengshui/scene-planning.md)、[室内关系及材质器形](interpretation/fengshui/sourced-interior-rules.md)、[玄空有限解释](interpretation/fengshui/xuankong-interpretation.md)。[BTB 桌面作者规则](interpretation/fengshui/surface-rules.md)仅在用户明确另选时使用，不作为无方位的默认替代。
 
 ## 三端例子
 
@@ -119,7 +119,7 @@ asyncio.run(main())
 | `jinsuo_basic_fixed_v1` | 一二三四砂、六七八九水；逐个确认观察 | 署名陈益峰《九砂九水》注解所引传本；转载及底本归属限制明确登记 |
 | `annual_zibai_lichun_v1` | 年度紫白入中、顺飞九宫、立春区间、当前20年元运 | 《沈氏玄空学》转录、Joey Yap 2026年盘、作者立春约定与香港天文台年历 |
 
-详见[基础规则与来源](../skills/onda-fengshui/references/rule-sources.md)。未知规则 ID 拒绝；改变纪元、换年、坐山起法或砂水规则时，应新增规则版本与独立样本，不能静默替换原版本。`january_1` 是命卦中显式可选的现代计算约定，不宣称所有《八宅明镜》古本都按立春换年。
+详见[基础规则与来源](interpretation/fengshui/rule-sources.md)。未知规则 ID 拒绝；改变纪元、换年、坐山起法或砂水规则时，应新增规则版本与独立样本，不能静默替换原版本。`january_1` 是命卦中显式可选的现代计算约定，不宣称所有《八宅明镜》古本都按立春换年。
 
 八宅1.1.0新增累计变爻与净变爻、宫星有向关系及伏位文本语境；历法输入拒绝不存在的地区钟时，并保留已指定重时时刻。专业缺口、独立来源样本与验证范围见[深度审计](fengshui-xuankong.md)。
 
@@ -131,7 +131,7 @@ asyncio.run(main())
 
 ## 输入语义和边界
 
-工位／合租／家居可传 `scene=workstation|shared_rental|home`；未显式传方法时按已有事实选层，独立形态/桌面不再自动引入无关三法。局部优先顺序只组织核对和说明，不补历史定运、年份或方位。家具动作许可与独立候选方案分别用 `layout_constraints` / `layout_alternatives`，详见[场景选法与候选布局合同](../skills/onda-fengshui/references/scene-planning.md)。候选重算现有规则、不继承旧形态、不平均评分；完整古典形势、独立阳宅三要结构、三合/大卦及完整玄空组合解释仍明确未覆盖。
+工位／合租／家居可传 `scene=workstation|shared_rental|home`；未显式传方法时按已有事实选层，独立形态/桌面不再自动引入无关三法。局部优先顺序只组织核对和说明，不补历史定运、年份或方位。家具动作许可与独立候选方案分别用 `layout_constraints` / `layout_alternatives`，详见[场景选法与候选布局合同](interpretation/fengshui/scene-planning.md)。候选重算现有规则、不继承旧形态、不平均评分；完整古典形势、独立阳宅三要结构、三合/大卦及完整玄空组合解释仍明确未覆盖。
 
 `method_policy.priority_review_status` 与每法 `not_selected_reason` 单独报告优先审查范围，区分自动缺输入和显式排除；不改变已选方法的计算完成状态，也不把未选方法算成已审。局部所需飞星／金锁缺资料时保留范围，不为了 complete 补事实；用户排除或仅问其他已选范围时不强追资料。
 
@@ -143,11 +143,11 @@ asyncio.run(main())
 
 ### 环境与实际使用范围
 
-`environmental_context` 可独立保存方位／图纸对齐与中心确认、同住家庭辈分／排行、独立确认生肖、各楼层／院落与明确形态观察；不要求为这些事实提交生辰。输出位于 `layout_analysis.environmental_context`，其中上下文宫位绑定须经过方向、户型对齐与立极三个门槛。该模块不计算飞星，也不把家庭象征索引当成现实人物受影响结论。院落归第一层但共享整体关系仍需复核；局限本层且异层适宜有依据时，不自动将该局部不利归给异层住户。厨卫、材质和器形事实不自动变成禁忌，未有具体判据的项目保留未覆盖。具体字段以当前输入 Schema 为准，核对流程见[风水咨询闭环](../skills/onda-fengshui/references/consultation.md)。
+`environmental_context` 可独立保存方位／图纸对齐与中心确认、同住家庭辈分／排行、独立确认生肖、各楼层／院落与明确形态观察；不要求为这些事实提交生辰。输出位于 `layout_analysis.environmental_context`，其中上下文宫位绑定须经过方向、户型对齐与立极三个门槛。该模块不计算飞星，也不把家庭象征索引当成现实人物受影响结论。院落归第一层但共享整体关系仍需复核；局限本层且异层适宜有依据时，不自动将该局部不利归给异层住户。厨卫、材质和器形事实不自动变成禁忌，未有具体判据的项目保留未覆盖。具体字段以当前输入 Schema 为准，核对流程见[风水咨询闭环](interpretation/fengshui/consultation.md)。
 
 仅解释家庭卦名／对宫用 `household_scope=symbolic_reference`，不绑定真实方向或为此追罗盘；默认 `environmental_binding` 才关联环境方区。家庭及生肖输出的 `scope`／适用方法限定为飞星、金锁的环境象征索引，不作为八宅命卦；实际个人匹配看八宅层。
 
-无方位具体关系新增 `environmental_context.interior_relations`：以源／目标对象及明确角色检查本次有来源的厨卫、床灶、镜面、梁管和尖角关系；床位尖角规则限实体柱角，床头／灶背共墙须确认墙另一侧实际便器，旧四类粗粒度 `observations` 不自动触发更强规则。`material_facts` 另存材质、器形、颜色与明确代表物资格问题。实际提供对应输入才返回 `layout_analysis.interior_analysis/material_analysis`；关系 null 和照片均待确认，确认 false 只说明本条不成立。资格不确认摆位或 ready，作者来源、条件工程动作和镜面方法异议分列，详见[室内关系与材质规则](../skills/onda-fengshui/references/sourced-interior-rules.md)。
+无方位具体关系新增 `environmental_context.interior_relations`：以源／目标对象及明确角色检查本次有来源的厨卫、床灶、镜面、梁管和尖角关系；床位尖角规则限实体柱角，床头／灶背共墙须确认墙另一侧实际便器，旧四类粗粒度 `observations` 不自动触发更强规则。`material_facts` 另存材质、器形、颜色与明确代表物资格问题。实际提供对应输入才返回 `layout_analysis.interior_analysis/material_analysis`；关系 null 和照片均待确认，确认 false 只说明本条不成立。资格不确认摆位或 ready，作者来源、条件工程动作和镜面方法异议分列，详见[室内关系与材质规则](interpretation/fengshui/sourced-interior-rules.md)。
 
 多层及独立院落还须各自确认 `floors[].floorplan_alignment_confirmed`、`center_confirmed`，并以 `uses_shared_orientation=true` 采用全宅已确认方向；全宅中心不自动成为每层中心。逐层门槛不足时不能提交关联对象的物理落宫事实。当前各层复用本次已明确声明的宅／年盘，位置按各自确认中心提供；不会自动建立每层宅运或自动立极。
 
@@ -161,7 +161,7 @@ asyncio.run(main())
 
 年盘有效期是 `[立春, 下次立春)`，不硬编码2月4日午夜，也不按春节。节气沿用现有 `almanac`，逐端点报告实际求解器、星历返回模型及时间政策；选定模型无法求根时返回不可重试的503错误，不使用线性节气回退。外部分钟表与独立421年TT实现比对各自保留，均不认证绝对UTC秒级精度；详见[太阳模型与边界](solar-backends.md)。
 
-月层另有1800–2200年全部十二节4,812个独立TT参考交点，完整Swiss配置通过一秒实现门槛，Moshier保留569项失败。Moshier计算交节前后5秒使用候选保护，年星、命卦和宅运跨运边界共用；保护不改变原始数值验收门槛，也不证明现实准确率。只有日期的命卦会考虑该窗口跨过的相邻民用日。[月紫白参考](../skills/onda-fengshui/references/monthly-stars.md)给出模型、时标、候选与离线复核范围。
+月层另有1800–2200年全部十二节4,812个独立TT参考交点，完整Swiss配置通过一秒实现门槛，Moshier保留569项失败。Moshier计算交节前后5秒使用候选保护，年星、命卦和宅运跨运边界共用；保护不改变原始数值验收门槛，也不证明现实准确率。只有日期的命卦会考虑该窗口跨过的相邻民用日。[月紫白参考](interpretation/fengshui/monthly-stars.md)给出模型、时标、候选与离线复核范围。
 
 源码与本地wheel可通过[完整星历安装配置](solar-backends.md)补齐宅运端点数据，并在新进程中发现已验证缓存。未取得数据的Moshier配置仍保留降级标记和原精度失败，不能借用完整配置的验收结果。
 
@@ -217,7 +217,7 @@ asyncio.run(main())
 
 方案同时返回 `cross_scope_effects`，显示加入的元素对同一对象其他已算层的生/泄/克关系；这些关系不合成一个“全宅有利”结论。`supplemental_rulesets` 和顶层 `rulesets`/`rule_trace` 保留作者、版本和原文位置；检索文件的 SHA-256 由内部来源资料维护；`supplement_statuses` 区分未请求、完成、部分及年份不支持。不同作者对物件路线的分歧在 `method_disagreements` 明示。
 
-可运行示例见 [形态输入](examples/fengshui-forms.json)、[元素目标](examples/fengshui-elements.json) 和 [年度作者候选](examples/fengshui-annual-remedy.json)。来源核对、采用与排除的规则见[形态与元素规则证据](../skills/onda-fengshui/references/layout-rules.md)。
+可运行示例见 [形态输入](examples/fengshui-forms.json)、[元素目标](examples/fengshui-elements.json) 和 [年度作者候选](examples/fengshui-annual-remedy.json)。来源核对、采用与排除的规则见[形态与元素规则证据](interpretation/fengshui/layout-rules.md)。
 
 环境特征要求方位、`classification=sand|water|mixed|unknown`、`classification_basis=measured|user_confirmed` 与非空 `evidence`。标签不参与分类；道路、镜子、高楼、缺水都不能自动推导砂水。`mixed`／`unknown` 返回 `undetermined` 和缺失项，不给吉凶。
 
@@ -250,7 +250,7 @@ run_metadata: 三端通用运行元数据
 
 八宅游年星与年度紫白星有不同名称空间，例如八宅生气贪狼属木、一白贪狼属水。`palace_number` 始终是固定宫数，`annual_star_number` 才是当年临宫星数；`current_period` 是当前日历元运，不是住宅建造元运。
 
-`method_details.status=reference_only` 表示方法与象意参考。按 `mapping_boundaries` 区分固定宫 `palaces`、实际临宫星数 `flying_star_references`、八宅游年星名 `bazhai_you_nian_references`，不能因同名混用五行。跨文本本卦人物／器物、Joey Yap 一至九星主题与有限职业例分别保留来源及条件；未覆盖职业不补造。`object_observation_references`、各法 `application_references`、砂水 `form_condition_references` 和 `material_shape_reference` 补观察与用途说明，不构成自动分类、摆放处方或职业预测。精确字段以实际返回的 `method_details` 为准，来源及剩余边界见[方法补充说明](../skills/onda-fengshui/references/sourced-interior-rules.md#与方法细节的区别)。
+`method_details.status=reference_only` 表示方法与象意参考。按 `mapping_boundaries` 区分固定宫 `palaces`、实际临宫星数 `flying_star_references`、八宅游年星名 `bazhai_you_nian_references`，不能因同名混用五行。跨文本本卦人物／器物、Joey Yap 一至九星主题与有限职业例分别保留来源及条件；未覆盖职业不补造。`object_observation_references`、各法 `application_references`、砂水 `form_condition_references` 和 `material_shape_reference` 补观察与用途说明，不构成自动分类、摆放处方或职业预测。精确字段以实际返回的 `method_details` 为准，来源及剩余边界见[方法补充说明](interpretation/fengshui/sourced-interior-rules.md#与方法细节的区别)。
 
 月紫白已支持独立十二节换月；实测工位已支持人工标注几何和有限候选生成。明确未实现：金锁24山全部细断及形态／距离／元运组合、自动图片建模与立极。24山角度索引可用不表示这些24山论断可用。没有三法总分，也不生成疾病、死亡或财富断语。
 
@@ -293,7 +293,7 @@ uv run --locked --extra dev pytest -q tests/fengshui/test_fengshui.py tests/feng
 
 请求拒绝未知规则版本及无效枚举；未知朝向、未知起算法或未知砂水不得静默转成默认吉凶。有效但资料不足时保留 `partial`；不合法输入走校验错误。计算状态、规则覆盖、方法优先审查和动作可执行性分别报告。
 
-实际 `rulesets`、`rule_trace` 和分层结果保留来源、版本、对象、使用人、位置／朝向、事实依据及不确定性；其完整形状由当前输出合同定义，不使用过时设计示意充当运行结果。首轮字段与咨询闭环见[场景技能](../skills/onda-fengshui/SKILL.md)，候选独立事实和许可见[候选布局合同](../skills/onda-fengshui/references/scene-planning.md)。
+实际 `rulesets`、`rule_trace` 和分层结果保留来源、版本、对象、使用人、位置／朝向、事实依据及不确定性；其完整形状由当前输出合同定义，不使用过时设计示意充当运行结果。首轮字段与咨询闭环见[资料与来源](interpretation/fengshui/consultation.md)，候选独立事实和许可见[候选布局合同](interpretation/fengshui/scene-planning.md)。
 
 
 ## 补充规则的验证
@@ -310,6 +310,6 @@ uv run --locked --extra dev pytest -q tests/fengshui/test_fengshui.py tests/feng
 
 ## 工位活动、隔挡与材料条件
 
-书桌工作／学习用途、入口隔挡与材料施用条件沿用 `fengshui_assess` 的共享请求模型，详细字段、来源与边界见[工位作者规则](../skills/onda-fengshui/references/workstation-authored.md)。可运行虚构请求：[玄空活动](examples/fengshui-workstation-activity.json)、[入口隔挡](examples/fengshui-entry-barrier.json)、[材料条件](examples/fengshui-material-application.json)。REST、MCP、CLI 使用同一嵌套输入，严格投影按需追加 `layout_analysis.workstation_analysis` 或 `layout_analysis.material_analysis`。旧工位分支中的 WOFS 内容继续仅作参考。
+书桌工作／学习用途、入口隔挡与材料施用条件沿用 `fengshui_assess` 的共享请求模型，详细字段、来源与边界见[工位作者规则](interpretation/fengshui/workstation-authored.md)。可运行虚构请求：[玄空活动](examples/fengshui-workstation-activity.json)、[入口隔挡](examples/fengshui-entry-barrier.json)、[材料条件](examples/fengshui-material-application.json)。REST、MCP、CLI 使用同一嵌套输入，严格投影按需追加 `layout_analysis.workstation_analysis` 或 `layout_analysis.material_analysis`。旧工位分支中的 WOFS 内容继续仅作参考。
 
 带尺寸的工位现状、形势计算、条件解释及自动有限候选用[实测工位布局](fengshui-workstation-layout.md)的 `workstation_layout`，读取 `layout_analysis.workstation_layout_analysis`。该分支支持显式另选 `wofs_desktop_compass_v1`，不改写旧参考分支，不默认启用BTB或WOFS。现状与每个候选均按自己的几何重算，保留全部搜索回执、失败和未知，没有风水总分。

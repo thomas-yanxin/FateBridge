@@ -71,7 +71,7 @@ for _name, _service, _model, _summary in (
         "有尺寸的工位可用workstation_layout计算几何、屏幕遮挡及有限网格候选，按需读workstation_layout_analysis；算法覆盖读research_coverage。"
         "只传确认事实，照片保留候选；位置、朝向、使用人与行动许可分开。"
         "解释已有依据与条件，不等待动作 ready；保留 rulesets/rule_trace 与来源。"
-        "具体分支按参数说明及 Onda 风水技能读取，不把个人八字喜忌当环境规则。",
+        "具体分支按当前参数说明、结果层与规则来源读取，不把个人八字喜忌当环境规则。",
     ),
 ):
     SPECS.append(

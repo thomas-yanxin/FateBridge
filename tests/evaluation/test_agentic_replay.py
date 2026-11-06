@@ -92,9 +92,7 @@ def test_generated_scenarios_are_current_and_join_live_catalog():
     assert definitions() == build_manifest()
     full = discover_scenarios(CATALOG)
     interfaces = list(
-        (Path(__file__).resolve().parents[2] / "skills").glob(
-            "onda-*/agents/interface.yaml"
-        )
+        (Path(__file__).resolve().parents[2] / "configs/scenarios").glob("*.yaml")
     )
     assert len(full["scenarios"]) == len(interfaces) + 1
     keys = {spec.key for spec in CATALOG}

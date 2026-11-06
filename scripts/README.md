@@ -17,7 +17,6 @@ uv run --locked --extra dev python scripts/run_ci_checks.py
 | 文档链接、代码块和 JSON 语法 | [check_docs.py](check_docs.py) |
 | 场景清单、按需调用合同 | [build_scenario_manifest.py](build_scenario_manifest.py) · [build_codex_call_contracts.py](build_codex_call_contracts.py)；生成后用 `--check` 核对 |
 | 自包含 CI 集合 | [run_ci_checks.py](run_ci_checks.py)，分片插件为 [ci_sharding.py](ci_sharding.py) |
-| Onda 插件打包 | [build_onda_plugin.py](build_onda_plugin.py) |
 | 本地协议体验、真实模型评测 | [experience_codex.py](experience_codex.py) · [evaluate_agent.py](evaluate_agent.py) |
 | 发布检查与 GitHub Release 同步 | [check_pypi_release.py](check_pypi_release.py) · [sync_github_release.py](sync_github_release.py) |
 | 构建、缓存与原始扫描去重 | [clean_repository.py](clean_repository.py)，默认预览，`--apply` 执行；原始扫描另加 `--deduplicate-scans` |

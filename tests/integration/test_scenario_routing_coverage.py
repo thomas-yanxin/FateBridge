@@ -128,7 +128,7 @@ def test_every_section_c_tool_appears_in_section_c_body():
 
 def test_doc_notes_mcp_name_when_it_differs_from_key():
     """key≠mcp_name 的工具（如西占流派盘），其 MCP 名必须在文档里注明，
-    否则技能照 §C 表抄 key 喂 MCP 会 unknown_tool。"""
+    否则客户端照矩阵抄 key 调 MCP 会 unknown_tool。"""
     text = DOC.read_text(encoding="utf-8")
     missing = []
     for spec in CATALOG:

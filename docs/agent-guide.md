@@ -2,7 +2,7 @@
 
 一次能跑通的调用，只是接入的开始。应用还要选对工具，知道输入从哪里来，分清计算失败与部分结果，并在需要时交付同一次运行的完整输出。本文按这些任务组织调用约定和示例，帮助开发者逐步核对输入、响应与交付。
 
-FateBridge 提供计算能力，自然语言咨询可搭配 Onda 技能选择方法并指导解读。对话、界面和模型仍由接入应用提供，具体分工见[核心概念](concepts.md#计算解读与对话的分工)。
+FateBridge 提供计算能力，自然语言咨询由接入方根据实际工具合同选择方法并解释结果。对话、界面和模型仍由接入应用提供，具体分工见[核心概念](concepts.md#计算解读与对话的分工)。
 
 开始前请完成[安装](getting-started.md#安装)。本文的 shell 命令在已激活的环境中运行；源码环境也可统一加 `uv run --locked --extra dev` 前缀。
 
@@ -42,7 +42,7 @@ FateBridge 的领域能力通过三条通道暴露出来：
 
 场景发现使用 REST `/api/scenarios?detail=summary`、CLI `fatebridge scenarios` 或 MCP `fatebridge://scenarios`；`discover --scenario onda-shiye` 可缩小候选。替代工具组不要求全部调用，路由不是自动执行计划。场景过滤会展开已声明的共享／条件／组合依赖；`dependencies` 的条件仍约束何时使用，family 限制造成的缺项由 availability 明示。场景返回 consultation.kind/topics 和共享咨询策略：按本轮主题、任务、时间与深度选依据，追问复用相关视角，禁区请求在调用前停止。
 
-咨询组织见[技能分布](../skills/README.md)、[时间选择](../skills/_shared/timing-selection.md)与[硬边界](../skills/_shared/safety-boundaries.md)。公共接口拒绝已知明确的生死／临床请求，卜卦不公开 death/health/pregnancy，择时不公开 surgery。文本拦截不能替代调用方的跨轮语义判断。
+咨询组织见[方法参考](interpretation/README.md)、[时间选择](interpretation/shared/timing-selection.md)与[硬边界](interpretation/shared/safety-boundaries.md)。公共接口拒绝已知明确的生死／临床请求，卜卦不公开 death/health/pregnancy，择时不公开 surgery。文本拦截不能替代调用方的跨轮语义判断。
 
 ### REST：`GET /api/tools`
 
@@ -391,7 +391,7 @@ fatebridge profile --systems bazi,ziwei,astro \
 
 ## Agent 接入建议
 
-接口连通后，Agent 还要完成一段面向人的对话：收集必要资料、选择工具、解释结果，再处理追问。技能负责本轮问题、解释方式及边界，Schema 规定可以提交哪些参数。用一条完整的虚构对话验证这些环节；连接成功本身无法证明它们都能正常工作。
+接口连通后，Agent 还要完成一段面向人的对话：收集必要资料、选择工具、解释结果，再处理追问。接入方负责本轮问题、解释方式及边界，Schema 规定可以提交哪些参数。用一条完整的虚构对话验证这些环节；连接成功本身无法证明它们都能正常工作。
 
 1. 发现：已知 Schema 且工具公开时直接调用；有缺口时按场景 / family 获取摘要或单工具契约。
 2. 路由：按用户意图选 family，例如八字走 `bazi`、运势走 `timing`、星盘走 `astro`、术数走 `metaphysics` / `divination`。场景级取舍（谁主谁次、怎么省 token、怎么避免结论打架）见 [scenario-routing.md](scenario-routing.md)。

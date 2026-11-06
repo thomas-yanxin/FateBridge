@@ -2,7 +2,7 @@
 
 [文档中心](README.md) · [贡献流程](../CONTRIBUTING.md) · [架构说明](architecture.md)
 
-改进计算引擎、接入接口或 Onda 技能，从建立可复现的环境和找到对应职责层开始。完成修改后，再按影响范围验证计算依据与接入行为。FateBridge 使用 Python `src` 布局，需先安装包再运行；对话模型与前端由接入应用提供。协作、Issue 和 PR 流程见[贡献指南](../CONTRIBUTING.md)。
+改进计算引擎、接入接口或方法参考，从建立可复现的环境和找到对应职责层开始。完成修改后，再按影响范围验证计算依据与接入行为。FateBridge 使用 Python `src` 布局，需先安装包再运行；对话模型与前端由接入应用提供。协作、Issue 和 PR 流程见[贡献指南](../CONTRIBUTING.md)。
 
 阅读导航：[环境准备](#环境准备) · [项目结构](#项目结构概览) · [本地运行](#本地运行) · [开发流程](#推荐开发流程) · [设计约束](#设计约束) · [测试策略](#测试策略) · [文档维护](#文档维护与验证) · [打包发布](#ci打包与发布)
 
@@ -45,7 +45,7 @@ cp -n .env.example .env
 
 ## 项目结构概览
 
-代码位于 `src/fatebridge/`。领域声明由 `services/catalog/` 装配为中央目录，REST、MCP、CLI 经 `application/` 的共享执行层调用 `services/`，再进入 `core/` 与 `analysis/`。规则与知识位于包内 `data/`，Onda 技能在仓库 `skills/`。
+代码位于 `src/fatebridge/`。领域声明由 `services/catalog/` 装配为中央目录，REST、MCP、CLI 经 `application/` 的共享执行层调用 `services/`，再进入 `core/` 与 `analysis/`。规则与知识位于包内 `data/`，方法参考在 `docs/interpretation/`，场景筛选配置在 `configs/scenarios/`。
 
 完整目录职责、导入方向、请求流和[历法依赖](architecture.md#历法与星历依赖)统一维护在[架构说明](architecture.md#分层职责)。开发时从实际工具的目录声明、请求模型及领域测试定位修改入口。
 
@@ -97,7 +97,7 @@ uv run --locked --extra dev python -m scripts.astronomy.prepare_reference_kernel
 
 ### CI 运行范围
 
-代码变更在 PR 与 main／master push 上保留同一组自包含检查。同一 PR 的新提交取消旧 CI；主分支每次 push 使用独立并发组，运行中与排队中的提交均不互相替换。普通 README 和 `docs/` Markdown 变更仍运行独立的 `documentation` 作业与 `CI result` 汇总，不启动重测试；`docs/scenario-routing.md` 是生成源，仍执行检查。文档 JSON、技能、工作流、源码和测试变更也保留完整检查。
+代码变更在 PR 与 main／master push 上保留同一组自包含检查。同一 PR 的新提交取消旧 CI；主分支每次 push 使用独立并发组，运行中与排队中的提交均不互相替换。普通 README 和 `docs/` Markdown 变更仍运行独立的 `documentation` 作业与 `CI result` 汇总，不启动重测试；`docs/scenario-routing.md` 与 `docs/interpretation/shared/` 是生成源，仍执行检查。文档 JSON、场景配置、工作流、源码和测试变更也保留完整检查。
 
 Python 3.10–3.13 最新依赖、Python 3.10 最低直接依赖及 Windows／Python 3.12 锁定依赖共六种环境，各按收集后的节点分成三片并行执行；按近期 CI 的相对耗时均衡分配，每片再使用最多四个独立 pytest 进程调度。`.github/ci-test-costs.json` 只影响分片归属，不筛掉任何测试，也不是数值验收门槛。`scripts/run_ci_checks.py` 的默认本地命令仍运行整个自包含集合；分片不改变标记排除与断言。每片上传实际节点清单，汇总验证每个环境的全部节点恰好执行一次。uv 使用 setup action 的依赖缓存，按 Python／依赖策略隔离并仅由首片写入，不缓存测试资料或虚拟环境。只有 Ubuntu 静态检查作业另缓存 Black／Mypy 的增量状态，按锁文件、工具配置与 Python 源码区分；工具仍按文件内容自行失效。
 
@@ -136,7 +136,7 @@ uv run --locked --extra dev mypy src/fatebridge/
 4. 在 `src/fatebridge/services/catalog/` 的对应领域 `SPECS` 追加一个 `ToolSpec`；新领域还须接入 `tool_catalog.py` 的有序装配。声明的 REST / MCP 入口及 CLI 可支持的命令会自动派生，常规新增不需要再改 `api.py`、`mcp_server.py` 或 `cli.py`。`execution_hints` 默认描述已有本地只读计算；新增外部访问或写入能力时须声明实际环境影响，不能用 `idempotentHint` 表示结果确定性。
 5. 在 `tests/` 增加能力测试。三端 parity 由 `tests/integration/test_full_surface_validation.py` 自动覆盖，记得为新工具补一个代表性的 payload fixture。
    修改输出合同时运行 `tests/integration/test_output_projection_contracts.py`：检查全目录可投影对象的必填字段、当前代表请求的合法叶路径，以及原生 MCP 客户端与 REST、CLI 的结果。可经点路径裁剪的对象不能要求兄弟字段同时存在；数组条目与始终整块保留的 `run_metadata` 可保留必填事实。
-6. 更新 `docs/api-reference.md`、`docs/algorithm-coverage.md`、`docs/scenario-routing.md` 与相关技能说明；若改了技能工具/输入，同步 `agents/interface.yaml`。工具计数、路由覆盖和技能契约均有现成测试。
+6. 更新 `docs/api-reference.md`、`docs/algorithm-coverage.md`、`docs/scenario-routing.md` 与相关方法说明；若改了场景工具/输入，同步 `configs/scenarios/*.yaml` 并重新生成。工具计数、路由覆盖和场景合同均有现成测试。
 
 家居风水的 `cli_request_file=True` 同时启用 JSON 对象／数组参数与 `--request-file`；新增复杂工具需明确启用、补嵌套校验与文件合并测试，不能仅依据模型顶层是否嵌套声称 CLI 可用。规则数据必须登记来源类别、版本、适用范围与约定，独立比较事实记录提交与 SHA-256；详见 [家居风水维护](fengshui.md#验证与维护)。
 
@@ -182,24 +182,24 @@ CI 仅运行[明确选择的自包含集合](#ci-运行范围)；`local_data` �
 uv run --locked --extra dev python scripts/check_docs.py
 uv run --locked --extra dev python -m pytest -q tests/quality/test_documentation_integrity.py \
   tests/quality/test_doc_tool_counts.py tests/integration/test_scenario_routing_coverage.py \
-  tests/quality/test_skills_interface_contract.py tests/quality/test_skills_engine_contract.py \
+  tests/quality/test_interpretation_examples.py tests/evaluation/test_agentic_replay.py \
   tests/quality/test_codex_call_contracts.py
 uv run --locked --extra dev python scripts/build_scenario_manifest.py --check
 uv run --locked --extra dev python scripts/build_codex_call_contracts.py --check
 git diff --check
 ```
 
-`check_docs.py` 只使用标准库，默认检查根目录、`docs/` 中的当前维护文档与 `skills/` 的 Markdown 内联／引用式链接、HTML 的 `href/src`、本地标题锚点、代码围栏、JSON 代码块及示例 JSON 语法。当前引用的文件和标题必须存在；原始文献按其实际位置保留，不混入过程日志。本地 `reviews/` 始终排除。它不访问外网，不执行代码块，也不证明自然语言或接口参数正确；外部来源保留版本，按受影响内容另行核对。CI 的独立 `documentation` 作业执行文档检查；纯文档变更也必须通过。
+`check_docs.py` 只使用标准库，默认检查根目录、`configs/scenarios/` 与 `docs/` 中的当前维护文档 的 Markdown 内联／引用式链接、HTML 的 `href/src`、本地标题锚点、代码围栏、JSON 代码块及示例 JSON 语法。当前引用的文件和标题必须存在；原始文献按其实际位置保留，不混入过程日志。本地 `reviews/` 始终排除。它不访问外网，不执行代码块，也不证明自然语言或接口参数正确；外部来源保留版本，按受影响内容另行核对。CI 的独立 `documentation` 作业执行文档检查；纯文档变更也必须通过。
 
-现有文档测试把计数、路由覆盖、技能与生成合同关联到实时目录；`test_skills_engine_contract.py` 还会实际执行 CLI 示例，绑定测试进程解释器。修改可运行请求时，按[示例索引](examples/README.md)选择对应工具，验证模型与实际结果；结构校验成功不能替代三端或真实模型体验。
+现有文档测试把计数、路由覆盖、场景配置与生成合同关联到实时目录；`test_interpretation_examples.py` 还会实际执行 CLI 示例，绑定测试进程解释器。修改可运行请求时，按[示例索引](examples/README.md)选择对应工具，验证模型与实际结果；结构校验成功不能替代三端或真实模型体验。
 
-`docs/contracts/` 的逐工具 JSON 与索引由 `scripts/build_codex_call_contracts.py` 从实际 MCP 输入 Schema 和共享首轮字段生成，不能手改生成文件。根 `AGENTS.md` 不嵌入这些大合同。接口或首轮字段变化后先运行生成器，再用 `--check` 核对。场景矩阵或技能接口变化后同样重新生成 `data/agent_scenarios.json`，其中包含源文件散列，纯文案变更也可能需要同步生成物。
+`docs/contracts/` 的逐工具 JSON 与索引由 `scripts/build_codex_call_contracts.py` 从实际 MCP 输入 Schema 和共享首轮字段生成，不能手改生成文件。根 `AGENTS.md` 不嵌入这些大合同。接口或首轮字段变化后先运行生成器，再用 `--check` 核对。场景矩阵或独立 YAML 配置变化后同样重新生成 `data/agent_scenarios.json`，其中包含源文件散列，纯文案变更也可能需要同步生成物。
 
 完整执行的必需业务根在 `core/response_models.py` 声明；嵌套必需事实使用 `FullFact[T]` 或 `PresentFact[T]`，由完整执行上下文递归核验，规则在完整执行时核对。公开投影允许缺少兄弟字段与合法 null，投影读取不启用完整执行上下文。不能为接收错误输出而放宽声明；相关验证从 `test_complete_output_contracts.py`、`test_algorithm_review_repairs.py` 和对应领域测试开始。
 
 ### 最低同步面
 
-接口或能力范围变化至少检查 README、API 参考和算法覆盖矩阵；涉及路由或技能再检查场景源及生成物。结构变化更新架构说明，删除支持的入口更新故障排除中的升级说明。非生成源页面的导航或措辞调整通常无需改生成数据；生成器 `--check` 报告源文件散列变化时，重新生成后审查差异。
+接口或能力范围变化至少检查 README、API 参考和算法覆盖矩阵；涉及路由或场景配置再检查场景源及生成物。结构变化更新架构说明，删除支持的入口更新故障排除中的升级说明。非生成源页面的导航或措辞调整通常无需改生成数据；生成器 `--check` 报告源文件散列变化时，重新生成后审查差异。
 
 当前维护文档与具体实现应相互指向；历史审计只作为特定版本证据。一轮修改的测试数量、临时回执与工作区路径写在验收报告中，不作为长期能力承诺。历史报告并入专题时标明日期、模型与范围，保留失败和未决项，并与当前使用步骤分开。
 
@@ -222,7 +222,7 @@ CI 的 `locked` 作业检查 `uv.lock`、安装环境、命令入口与真实 st
 
 版本来自 `src/fatebridge/__init__.py::__version__`。发布时递增该版本并同步更新 CHANGELOG；`publish.yml` 在 `master` 的 push CI 成功完成后，检出该次 CI 实际测试的提交，查询 PyPI，仅在版本尚未发布时构建 sdist/wheel。版本已存在则跳过构建与发布；查询失败则停止，不把网络错误当成新版本。流程不会自动递增版本，因此普通提交沿用已发布版本时不会更新 PyPI。
 
-GitHub Release published 入口继续保留，并要求标签严格匹配 `v<包版本>`；已经由 `master` 自动发布的版本会跳过。两个入口串行执行，检查元数据、JSON 数据、`py.typed` 和安装包运行情况后，通过 PyPI Trusted Publishing 发布。PyPI 的 Trusted Publisher 须匹配仓库实际 owner/name、`publish.yml` 与 GitHub `pypi` environment；若该 environment 设置了人工审批，发布仍需审批。新增数据文件需确认被 `pyproject.toml` 的 package-data 覆盖；场景 `skills/` 目前随 Git 仓库分发，不由 wheel 包含。
+GitHub Release published 入口继续保留，并要求标签严格匹配 `v<包版本>`；已经由 `master` 自动发布的版本会跳过。两个入口串行执行，检查元数据、JSON 数据、`py.typed` 和安装包运行情况后，通过 PyPI Trusted Publishing 发布。PyPI 的 Trusted Publisher 须匹配仓库实际 owner/name、`publish.yml` 与 GitHub `pypi` environment；若该 environment 设置了人工审批，发布仍需审批。新增数据文件需确认被 `pyproject.toml` 的 package-data 覆盖；场景 YAML 源随 Git 仓库分发，生成的 `agent_scenarios.json` 随 wheel 包含。
 
 新版本的 PyPI 上传成功后，独立的 `github_release` 作业使用 `contents: write` 创建
 `v<包版本>` 标签和 GitHub Release，目标为同一个实际构建并发布的提交；其余作业继续
@@ -254,6 +254,6 @@ uv run --locked --extra dev python scripts/sync_github_release.py \
 - API 参考：[api-reference.md](api-reference.md)
 - 故障排除：[troubleshooting.md](troubleshooting.md)
 
-真实模型行为与激活评测按[Agent 行为验收](agent-evaluation.md)执行，分别报告机械判据与人工解释质量；安装分发见[Onda 插件](mcp-deployment.md#onda-插件的构建与安装)。
+真实模型行为与激活评测按[Agent 行为验收](agent-evaluation.md)执行，分别报告机械判据与人工解释质量；安装接入见[MCP 部署](mcp-deployment.md)。
 
 [MingLi-Bench 外部评估](mingli-bench-evaluation.md)另行维护固定来源、完整题目分类和命例级开发／留出划分。运行 `uv run --locked --extra dev python -m scripts.evaluation.build_mingli_evaluation --check` 核对清洗产物漂移；普通测试不启动模型，真实对话继续使用上述运行器，分别保留机械成绩和待人工审阅状态。

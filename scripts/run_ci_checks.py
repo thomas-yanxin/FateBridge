@@ -77,8 +77,7 @@ CHECKS = (
 POSIX_CHECKS = (
     "quality/test_documentation_integrity.py",
     "quality/test_doc_tool_counts.py",
-    "quality/test_skills_interface_contract.py",
-    "quality/test_skills_engine_contract.py",
+    "quality/test_interpretation_examples.py",
     "quality/test_codex_call_contracts.py",
     "quality/test_codex_experience.py",
     "quality/test_ci_workflow.py",

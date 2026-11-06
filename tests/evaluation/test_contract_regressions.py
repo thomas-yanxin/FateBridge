@@ -16,6 +16,7 @@ from fatebridge.validation.gauquelin import method_profile
 from scripts.evaluate_agent import (
     _without_evaluation_private_sections,
     prepare_workspace,
+    source_manifest,
 )
 from scripts.evaluation.audit_gauquelin_definitions import (
     BASELINE_POLICY,
@@ -25,6 +26,37 @@ from scripts.evaluation.audit_gauquelin_definitions import (
     read_baseline,
 )
 from tests.evaluation.test_gauquelin_request_guard import HOUSE_SPECS, payload
+
+
+def test_evaluation_without_skills_retains_profile_provenance_and_method_references(
+    tmp_path,
+):
+    source = tmp_path / "source"
+    source.mkdir()
+    files = {
+        "AGENTS.md": "Use actual tool contracts",
+        "pyproject.toml": "Project dependencies",
+        "uv.lock": "Locked environment",
+        "scripts/evaluate_agent.py": "Evaluator implementation",
+        "configs/scenarios/example.yaml": "engine_tools: [bazi_birth]",
+        "docs/interpretation/example.md": "Read the actual returned evidence",
+        "src/fatebridge/domain.py": "Executable backend",
+    }
+    for name, value in files.items():
+        path = source / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(value)
+    manifest = source_manifest(source)
+    assert "configs/scenarios/example.yaml" in manifest
+    workspace = tmp_path / "workspace"
+    workspace.mkdir()
+    prepare_workspace(workspace, source)
+    for name, value in files.items():
+        if name.startswith(("scripts/", "uv.lock", "pyproject.toml")):
+            continue
+        assert value in (workspace / name).read_text()
+    assert not (workspace / "skills").exists()
+    assert not list((workspace / ".agents/skills").iterdir())
 
 
 def test_reviewer_artifacts_stay_in_snapshot_but_outside_the_model_workspace(tmp_path):

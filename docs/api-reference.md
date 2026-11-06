@@ -200,7 +200,7 @@ REST 对应 `GET /api/results/{result_id}` 和 `GET /api/results/{result_id}/pag
 
 ### 2.7 渐进发现与执行提示
 
-场景发现使用 `GET /api/scenarios?detail=summary`，按 `scenario=onda-shiyun` 读取完整 manifest；CLI 对应 `fatebridge scenarios --scenario onda-shiyun --detail full`。14 个场景从13个 Onda YAML 接口、共享规则与住宅路由表生成，包括 `onda-fengshui` 咨询和 `fengshui` 基础计算两个独立入口，保留意图、主证/旁证/深调、条件和替代工具组。`required_inputs` 是技能层采集指引，每个工具的 `required_parameters` 与输入 Schema 才是调用要求；路由不是自动执行计划。
+场景发现使用 `GET /api/scenarios?detail=summary`，按 `scenario=onda-shiyun` 读取完整 manifest；CLI 对应 `fatebridge scenarios --scenario onda-shiyun --detail full`。14 个场景从 `configs/scenarios/` 的13个独立配置、共享参考与住宅路由表生成，包括 `onda-fengshui` 咨询和 `fengshui` 基础计算两个独立入口，保留意图、主证/旁证/深调、条件和替代工具组。`required_inputs` 是配置级采集指引，每个工具的 `required_parameters` 与输入 Schema 才是调用要求；路由不是自动执行计划。
 
 `/api/tools`、CLI `discover` / `list --json` 新增 `scenario` 筛选（CLI 为 `--scenario`），支持逗号并集，与 family / q / surface 取交集。未知场景返回 422 / CLI 退出 1。嵌套 REST 与扁平 MCP/CLI 孪生工具由中央目录关联实际入口。MCP resources 新增 `fatebridge://scenarios` 摘要与 `fatebridge://scenarios/{scenario}` 完整路由；只列当前配置可调用工具，通过 `availability` 和路由组 `available=false` 明示缺失能力，不将旁证升级为主证。
 
@@ -898,7 +898,7 @@ uv run --locked --extra dev python -m fatebridge.mcp_server
 
 ## 咨询范围与禁区校验
 
-场景按9主题、3服务和1多主题组合组织，另有风水基础计算。机器发现返回 consultation 元数据与共享策略，细则见 [技能分布](../skills/README.md)。
+场景按9主题、3服务和1多主题组合组织，另有风水基础计算。机器发现返回 consultation 元数据与共享策略，细则见 [场景配置](../configs/scenarios/README.md)。
 
 生死寿命、灾祸断言、临床诊断治疗与医疗择时不提供。卜卦 category 不再接受 death、health、pregnancy，择时 topic_id 不再接受 surgery；直接服务／核心调用亦不能将这些类别静默回退为 general 或 marriage。对已知明确的禁区问法，REST／MCP／CLI 在计算前返回非重试错误 consultation_restricted，issues 保留安全路径而不回显问题。其他无效枚举仍按 validation_error 处理。调用方须在选工具前完成语义判断；有限文本检测不是完整语义安全保证。
 

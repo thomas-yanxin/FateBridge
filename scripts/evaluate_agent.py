@@ -84,7 +84,7 @@ def source_files(root=ROOT, profile="full", extra_files=()):
         path = root / name
         if path.is_file():
             selected.append(path)
-    for folder in ("skills", "docs", "src"):
+    for folder in ("skills", "configs", "docs", "src"):
         selected.extend(
             p
             for p in (root / folder).rglob("*")
@@ -441,8 +441,10 @@ def _without_evaluation_private_sections(text):
 
 def prepare_workspace(workspace, source=ROOT):
     shutil.copy2(source / "AGENTS.md", workspace / "AGENTS.md")
-    for name in ("skills", "src"):
-        shutil.copytree(source / name, workspace / name)
+    shutil.copytree(source / "src", workspace / "src")
+    for name in ("skills", "configs"):
+        if (source / name).is_dir():
+            shutil.copytree(source / name, workspace / name)
     shutil.copytree(
         source / "docs",
         workspace / "docs",
@@ -455,7 +457,9 @@ def prepare_workspace(workspace, source=ROOT):
             path.write_text(visible, encoding="utf-8")
     entries = workspace / ".agents/skills"
     entries.mkdir(parents=True)
-    for skill in (workspace / "skills").glob("onda-*"):
+    for skill in (workspace / "skills").glob("*"):
+        if not (skill / "SKILL.md").is_file():
+            continue
         (entries / skill.name).symlink_to(
             Path("../../skills") / skill.name, target_is_directory=True
         )
@@ -969,7 +973,7 @@ def main():
         "--snapshot-profile",
         choices=("full", "runtime"),
         default="full",
-        help="runtime retains all backend/data/skills/public docs and judge code; excludes past docs/validation archives",
+        help="runtime retains backend/data, scenario configs, optional skills, public docs and judge code; excludes past docs/validation archives",
     )
     parser.add_argument(
         "--prepare-only",

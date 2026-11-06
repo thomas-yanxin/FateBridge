@@ -184,7 +184,7 @@ def audit(preparation: Path) -> dict[str, Any]:
             raise ValueError("Reviewer data leaked into the model workspace")
         retained = [
             "AGENTS.md",
-            "skills/onda-zhanbu/references/ren-evidence.md",
+            "docs/interpretation/zhanbu/ren-evidence.md",
             "docs/contracts/jinkou.json",
             "docs/contracts/liureng_gods.json",
             "src/fatebridge/core/metaphysics/jinkou.py",

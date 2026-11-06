@@ -242,7 +242,7 @@ ASC无法在本角度模型中解析时，实际13扇区返回未定，后端约
 
 预测研究评估器将每条预测和结果绑定完整方案，防止同一批记录在更换事件、窗口、基线或统计政策后直接重用。这项保护不增加现实预测样本或效力认证。
 
-咨询技能现有[汉堡中点取证卡](../skills/onda-xingpan/references/hamburg-evidence.md)，明确本命／推运 MC、直接／折叠占据、同一依据去重及出生误差条件。另备 5 个虚构模型验收用例（本地数据：`../tests/fixtures/agent_behavior/other_chart_cases.json`），参数已通过当前公开工具的预检；真实独立模型执行与人工语义复核尚未完成，不能将用例已准备记为解释忠实度已验收。执行和审阅方法见[Agent 验收](agent-evaluation.md)。
+方法参考包含[汉堡中点取证卡](interpretation/xingpan/hamburg-evidence.md)，明确本命／推运 MC、直接／折叠占据、同一依据去重及出生误差条件。另备 5 个虚构模型验收用例（本地数据：`../tests/fixtures/agent_behavior/other_chart_cases.json`），参数已通过当前公开工具的预检；真实独立模型执行与人工语义复核尚未完成，不能将用例已准备记为解释忠实度已验收。执行和审阅方法见[Agent 验收](agent-evaluation.md)。
 
 ## 调用与复现
 

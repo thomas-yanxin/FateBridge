@@ -1,4 +1,4 @@
-"""Generate bundled scenario definitions from existing interfaces and routing.
+"""Generate bundled tool profiles from standalone configuration and routing.
 
 Run with the dev extra (PyYAML). Production reads only the generated JSON.
 """
@@ -29,7 +29,7 @@ def build_manifest():
             routing_path.read_bytes()
         ).hexdigest()
     }
-    for path in sorted((ROOT / "skills/_shared").glob("*.md")):
+    for path in sorted((ROOT / "docs/interpretation/shared").glob("*.md")):
         sources[str(path.relative_to(ROOT))] = hashlib.sha256(
             path.read_bytes()
         ).hexdigest()
@@ -75,7 +75,7 @@ def build_manifest():
         return rows
 
     scenarios = []
-    for path in sorted((ROOT / "skills").glob("onda-*/agents/interface.yaml")):
+    for path in sorted((ROOT / "configs/scenarios").glob("*.yaml")):
         source = yaml.safe_load(path.read_text())
         name = source["name"]
         section = next(s for s in sections if f"（{name}）" in s.splitlines()[0])
@@ -170,8 +170,8 @@ def build_manifest():
             "scope": "current_question",
             "integration": "additional_relevant_evidence_not_tool_quota",
             "follow_up": "retain_topic_and_reuse_unchanged_results",
-            "boundaries": "skills/_shared/safety-boundaries.md",
-            "time_selection": "skills/_shared/timing-selection.md",
+            "boundaries": "docs/interpretation/shared/safety-boundaries.md",
+            "time_selection": "docs/interpretation/shared/timing-selection.md",
         },
         "scenarios": scenarios,
     }

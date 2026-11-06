@@ -180,11 +180,8 @@ SOURCE_PATHS = [
     "scripts/sukuyo/freeze_sukuyo_japanese_candidate.py",
     "scripts/sukuyo/build_sukuyo_japanese_calendar.py",
     "scripts/sukuyo/check_sukuyo_wheel.py",
-    "skills/_shared/sukuyo-evidence.md",
-    "skills/_shared/fatebridge-engine.md",
-    "skills/onda-xingpan/SKILL.md",
-    "skills/onda-zhanbu/SKILL.md",
-    "skills/onda-renji/SKILL.md",
+    "docs/interpretation/shared/sukuyo-evidence.md",
+    "docs/interpretation/shared/fatebridge-engine.md",
 ]
 
 

@@ -58,7 +58,7 @@ dev = [
     "black>=23.0.0",
     "isort>=5.12.0",
     "mypy>=1.5.0",
-    "pyyaml>=6.0",  # test_skills_interface_contract parses agents/interface.yaml
+    "pyyaml>=6.0",  # standalone scenario profile generation
     "opencc-python-reimplemented==0.1.7",  # place-catalog importer only; no runtime dependency
     "pyerfa>=2.0.1.5,<3",
     "jplephem>=2.24,<3",

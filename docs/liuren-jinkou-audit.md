@@ -2,7 +2,7 @@
 
 [文档中心](README.md) · [API 参考](api-reference.md) · [算法状态](algorithm-status.md)
 
-`liureng_gods` 与 `jinkou` 提供有限的盘式规则、同课条件及来源轨迹。先核对时刻、地分、昼夜贵人和所选规则，再阅读三传、四位及条件事实；完整字段见[API 参考](api-reference.md)，咨询取证见[占卜技能](../skills/onda-zhanbu/SKILL.md)。
+`liureng_gods` 与 `jinkou` 提供有限的盘式规则、同课条件及来源轨迹。先核对时刻、地分、昼夜贵人和所选规则，再阅读三传、四位及条件事实；完整字段见[API 参考](api-reference.md)，咨询取证见[占式参考](interpretation/zhanbu/ren-evidence.md)。
 
 当前支持的课内关系包括六壬三传、旬空、十二运、干支相加与三合名义局体，以及金口诀四位、遁干、阴阳用位、得气、破支和课钤条件。支未齐、原文未裁或条件缺失时保留未知；支齐不证明实际合化，用位不等于完整综合用神。
 

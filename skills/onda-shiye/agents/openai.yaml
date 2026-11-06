@@ -1,9 +1,0 @@
-interface:
-  display_name: "事业与工作"
-  short_description: "围绕岗位、工作方向与创业角色，结合相关结构和时间变化，讨论现实选项与条件"
-  default_prompt: "使用 $onda-shiye 围绕我这次的问题，按主题、对象与时间范围选择有价值的依据，解释差异与可核对的安排。"
-dependencies:
-  tools:
-    - type: "mcp"
-      value: "fatebridge"
-      description: "FateBridge 本地计算；未连接可用 CLI，技能不会自动配置远程地址"

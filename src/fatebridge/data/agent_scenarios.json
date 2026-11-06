@@ -1,33 +1,33 @@
 {
   "schema_version": "1.1",
   "sources_sha256": {
-    "docs/scenario-routing.md": "d04cc2e9f82da55ec9c6b488c88000043506bca36497052c0ff7dfa96de7f18d",
-    "skills/_shared/bazi-topic-evidence.md": "9c1d7ca691dc1ef759559da54384e30cae9ad2ba8c8c317b5143655bcfed5e06",
-    "skills/_shared/consultation-core.md": "60db81179a2678286f8389e010a72244c7d73ce847133e47f2f1455f1a276384",
-    "skills/_shared/consultation-delivery.md": "3ca3d9e81b0a1dcfa71b731ca95eab98ea6d9ec595e18630b154104607d30c4b",
-    "skills/_shared/consultation-routing.md": "67987ebc83603e8f4c902958d8139ecad221b660e7a1ae134c9a552108693c08",
-    "skills/_shared/fatebridge-engine.md": "8f9d3761a591fc40b1bed106531a3a6946f17bb19716cd9810b0b3a1ae0f38c4",
-    "skills/_shared/onda-counsel.md": "37b565a39296933e32569471e9e3423b243ad7fd7836970eeedafe092ae50d00",
-    "skills/_shared/safety-boundaries.md": "5b0fffdc53369e684825515117b21cd5e1e9380459f4a12e89f856b5447a9cf3",
-    "skills/_shared/sukuyo-evidence.md": "d59e58ff33439d533a39886d4e204b1b603eb669c99eba3c02d8dae7bc32890f",
-    "skills/_shared/timing-selection.md": "53e231413305d69efbe88de4f7905b6a124673c6bedef0ce07019525b9c96233",
-    "skills/_shared/vedic-evidence.md": "861d9255aeb4add1e551281f6fb858c77bb10fe89173670d67bcaeafd72d6211",
-    "skills/_shared/western-deep-evidence.md": "e8747414d6b0ae73819404f9dc91f44190f960fc9fe3c4cc118cd8715d1d032a",
-    "skills/_shared/western-topic-evidence.md": "d4c9c29428efd852c7f15e1d499cdd7eb0f9c8f6f1945697f7f44c1f49fb015b",
-    "skills/_shared/ziwei-topic-evidence.md": "019fe61e9d54fd6cdcf6bb72ddcdb5d51ad815335f415864eedb6af57d4d11bd",
-    "skills/onda-caiwu/agents/interface.yaml": "0f9e525315daca90ce61d3174df3c71f3ca5b09717fdc30d582279b4062f635b",
-    "skills/onda-fengshui/agents/interface.yaml": "bb5c7930972ae628aa908564995a8bc6cbe70ff616153a6bc533172438f82898",
-    "skills/onda-jiankang/agents/interface.yaml": "a8c6c17b1ad5046c44ee1e2af65a0ffee7e48db06124d1ce929ca64f8ea4bbdb",
-    "skills/onda-jiating/agents/interface.yaml": "1c04e0e7f95451d98291017c6e4a9d071a6bad89a09472c30ec714757317de2f",
-    "skills/onda-mingge/agents/interface.yaml": "80ccb67be53606e8cf774aadc28a99a90c83efc2ce2d5767cd954a5ec09dac65",
-    "skills/onda-renji/agents/interface.yaml": "ca0af48e088d5d9302547ae32335f46d88decb5d753e2f9fa068191a83815bd6",
-    "skills/onda-shiye/agents/interface.yaml": "1115317a55f24ce5d8075ae6c04a0cb95029499726badd5eced65f27b84104d8",
-    "skills/onda-shiyun/agents/interface.yaml": "5ddac03bbdfbef54e3d2a7572fe00ba9f40e2cdadfa7e16f7528e31aeb2b7e0d",
-    "skills/onda-xingpan/agents/interface.yaml": "0c8493fa02a8d770947b5d515bbf913b6b5b7ff8d722522153a3c2b918075e1f",
-    "skills/onda-xueye/agents/interface.yaml": "9a961f7fecb947dc612a4107fa26fe937ed551a5e24a46179c42155569eed164",
-    "skills/onda-yuanfen/agents/interface.yaml": "4bd624728e6865279a4db4aff23cfd07421cb5d5832921094d4321def5990bdc",
-    "skills/onda-zhanbu/agents/interface.yaml": "efccb1bf7456f3d7dd6adbf6b94e6ee331df7953430e1c9718dc338267bc9800",
-    "skills/onda-zige/agents/interface.yaml": "c5fc64795fbac2ec5e6590736eac47430170b228c2d33d4d97345cb5e2503b22"
+    "docs/scenario-routing.md": "7eaf9c19e5ec3926c2623a670a26b26ad70ce4b889f580bd05b7abdf7b83469f",
+    "docs/interpretation/shared/bazi-topic-evidence.md": "73951e1e0c19b7f3e14a4d0643b78b5bcb79a3e25dfbd53c224e3b1d464d0053",
+    "docs/interpretation/shared/consultation-core.md": "895549b3c4735bc5527e3b6f10877142e8755e1411fbf1089c7b67163e42fe7f",
+    "docs/interpretation/shared/consultation-delivery.md": "b3d3e2e223a42f5552b1157002513d2a0dc956579f036316afa7ecd32ea741f8",
+    "docs/interpretation/shared/consultation-routing.md": "0b50890a6f25ef3e31f51ea3ea3a84d442ab643b5193ac7316eaaa65a103b672",
+    "docs/interpretation/shared/fatebridge-engine.md": "b21b8d08b5be5279f2437a41c7699abe6be2f350d784f11a2b1f9eb364448b06",
+    "docs/interpretation/shared/interpretation.md": "4dcc37e702c37229b52d4341f70368f2535f5d1e2e380ae14b10018b46dc14f8",
+    "docs/interpretation/shared/safety-boundaries.md": "5b0fffdc53369e684825515117b21cd5e1e9380459f4a12e89f856b5447a9cf3",
+    "docs/interpretation/shared/sukuyo-evidence.md": "3b5c7d326cd6ec6462b8428cbb2403211683e0a7690fa678cf70f04529d56ddb",
+    "docs/interpretation/shared/timing-selection.md": "c718be2837b4bbb8588257af248d4a77246246c512573c4f37c2e29278ed8142",
+    "docs/interpretation/shared/vedic-evidence.md": "cad56c6e0bed1d99d576754c27faa14d6743601b314f3e9e2f7a1210f014e86e",
+    "docs/interpretation/shared/western-deep-evidence.md": "b1efd94629d0448409fc2a62ff37ca75bb392b3cd9562b1f710bbe0a3ab691c1",
+    "docs/interpretation/shared/western-topic-evidence.md": "d4c9c29428efd852c7f15e1d499cdd7eb0f9c8f6f1945697f7f44c1f49fb015b",
+    "docs/interpretation/shared/ziwei-topic-evidence.md": "019fe61e9d54fd6cdcf6bb72ddcdb5d51ad815335f415864eedb6af57d4d11bd",
+    "configs/scenarios/onda-caiwu.yaml": "6063b73f6471025beeb704dab3f7dc055d7e6e9007655dc3ced156ff97157641",
+    "configs/scenarios/onda-fengshui.yaml": "c58cbb8734673ae9d4336a66806433e8718955c064b09debcb17862c41895951",
+    "configs/scenarios/onda-jiankang.yaml": "e2b147ae5211ce5bc0e5f783b21d80847c03fb5e2b7a3c6a7c2a426055083d73",
+    "configs/scenarios/onda-jiating.yaml": "9fca627e408302005c24b634d53c170ca2f480203a98c88e120bd492f1776d67",
+    "configs/scenarios/onda-mingge.yaml": "3b8a34513c1e3c8cdb4dcce754b95a7c61c66fd9abfcfefc6e1b563392602928",
+    "configs/scenarios/onda-renji.yaml": "99e8729951b7b2aeff2277736a2b5e7ddea8bae0c58d90016c21c1dfa3866cd1",
+    "configs/scenarios/onda-shiye.yaml": "cf67d414706f931b9028f7556f2568870a9eae222b2c5dbc8b5f047de4b733a6",
+    "configs/scenarios/onda-shiyun.yaml": "5805a09ca1b76c0f5053b58445ac526325093ea07c1d406ccdbdbc769f9e96d4",
+    "configs/scenarios/onda-xingpan.yaml": "2cfb8597f25e7e00b64f608fcc6ce70e60687cbf86808b903a638646b3e88221",
+    "configs/scenarios/onda-xueye.yaml": "f6273408f450c1b7dd7b12eb57f8eb1eb73a9901c467b15873f7de05d2af5030",
+    "configs/scenarios/onda-yuanfen.yaml": "a2648cdaa16b354f50c3aeeef503c170986333e343270500b14c53e37d7d6b9f",
+    "configs/scenarios/onda-zhanbu.yaml": "29d42ee3b54fd8bb36ee6400dc70e7c31e3f017d583ef256b89076165e19baa3",
+    "configs/scenarios/onda-zige.yaml": "090956f146f4d608b5b57f3a776f58619434086b77fd2f71241dcb11e8d42704"
   },
   "consultation_policy": {
     "id": "consultation_boundaries_v1",
@@ -35,8 +35,8 @@
     "scope": "current_question",
     "integration": "additional_relevant_evidence_not_tool_quota",
     "follow_up": "retain_topic_and_reuse_unchanged_results",
-    "boundaries": "skills/_shared/safety-boundaries.md",
-    "time_selection": "skills/_shared/timing-selection.md"
+    "boundaries": "docs/interpretation/shared/safety-boundaries.md",
+    "time_selection": "docs/interpretation/shared/timing-selection.md"
   },
   "scenarios": [
     {
@@ -88,8 +88,7 @@
       "required_inputs": [],
       "output": {
         "kind": "interpretation",
-        "grounding": "engine_fields",
-        "voice": "onda-counsel"
+        "grounding": "engine_fields"
       },
       "boundary": "传统文化参考；禁止生死寿命、重大灾祸断言、临床诊断治疗与医疗择时；多工具不扩大本轮范围。",
       "license": "Apache-2.0",
@@ -157,7 +156,7 @@
           ]
         }
       ],
-      "source": "skills/onda-caiwu/agents/interface.yaml"
+      "source": "configs/scenarios/onda-caiwu.yaml"
     },
     {
       "id": "onda-fengshui",
@@ -204,8 +203,7 @@
       "required_inputs": [],
       "output": {
         "kind": "interpretation",
-        "grounding": "engine_fields",
-        "voice": "onda-counsel"
+        "grounding": "engine_fields"
       },
       "boundary": "传统文化参考；禁止生死寿命、重大灾祸断言、临床诊断治疗与医疗择时；多工具不扩大本轮范围。",
       "license": "Apache-2.0",
@@ -355,7 +353,7 @@
           ]
         }
       ],
-      "source": "skills/onda-fengshui/agents/interface.yaml"
+      "source": "configs/scenarios/onda-fengshui.yaml"
     },
     {
       "id": "onda-jiankang",
@@ -394,8 +392,7 @@
       "required_inputs": [],
       "output": {
         "kind": "interpretation",
-        "grounding": "engine_fields",
-        "voice": "onda-counsel"
+        "grounding": "engine_fields"
       },
       "boundary": "传统文化参考；禁止生死寿命、重大灾祸断言、临床诊断治疗与医疗择时；多工具不扩大本轮范围。",
       "license": "Apache-2.0",
@@ -439,7 +436,7 @@
           ]
         }
       ],
-      "source": "skills/onda-jiankang/agents/interface.yaml"
+      "source": "configs/scenarios/onda-jiankang.yaml"
     },
     {
       "id": "onda-jiating",
@@ -494,8 +491,7 @@
       "required_inputs": [],
       "output": {
         "kind": "interpretation",
-        "grounding": "engine_fields",
-        "voice": "onda-counsel"
+        "grounding": "engine_fields"
       },
       "boundary": "传统文化参考；禁止生死寿命、重大灾祸断言、临床诊断治疗与医疗择时；多工具不扩大本轮范围。",
       "license": "Apache-2.0",
@@ -587,7 +583,7 @@
           ]
         }
       ],
-      "source": "skills/onda-jiating/agents/interface.yaml"
+      "source": "configs/scenarios/onda-jiating.yaml"
     },
     {
       "id": "onda-mingge",
@@ -641,8 +637,7 @@
       "required_inputs": [],
       "output": {
         "kind": "interpretation",
-        "grounding": "engine_fields",
-        "voice": "onda-counsel"
+        "grounding": "engine_fields"
       },
       "boundary": "传统文化参考；禁止生死寿命、重大灾祸断言、临床诊断治疗与医疗择时；多工具不扩大本轮范围。",
       "license": "Apache-2.0",
@@ -727,7 +722,7 @@
           ]
         }
       ],
-      "source": "skills/onda-mingge/agents/interface.yaml"
+      "source": "configs/scenarios/onda-mingge.yaml"
     },
     {
       "id": "onda-renji",
@@ -781,8 +776,7 @@
       "required_inputs": [],
       "output": {
         "kind": "interpretation",
-        "grounding": "engine_fields",
-        "voice": "onda-counsel"
+        "grounding": "engine_fields"
       },
       "boundary": "传统文化参考；禁止生死寿命、重大灾祸断言、临床诊断治疗与医疗择时；多工具不扩大本轮范围。",
       "license": "Apache-2.0",
@@ -858,7 +852,7 @@
           ]
         }
       ],
-      "source": "skills/onda-renji/agents/interface.yaml"
+      "source": "configs/scenarios/onda-renji.yaml"
     },
     {
       "id": "onda-shiye",
@@ -913,8 +907,7 @@
       "required_inputs": [],
       "output": {
         "kind": "interpretation",
-        "grounding": "engine_fields",
-        "voice": "onda-counsel"
+        "grounding": "engine_fields"
       },
       "boundary": "传统文化参考；禁止生死寿命、重大灾祸断言、临床诊断治疗与医疗择时；多工具不扩大本轮范围。",
       "license": "Apache-2.0",
@@ -1010,7 +1003,7 @@
           ]
         }
       ],
-      "source": "skills/onda-shiye/agents/interface.yaml"
+      "source": "configs/scenarios/onda-shiye.yaml"
     },
     {
       "id": "onda-shiyun",
@@ -1090,8 +1083,7 @@
       "required_inputs": [],
       "output": {
         "kind": "interpretation",
-        "grounding": "engine_fields",
-        "voice": "onda-counsel"
+        "grounding": "engine_fields"
       },
       "boundary": "传统文化参考；禁止生死寿命、重大灾祸断言、临床诊断治疗与医疗择时；多工具不扩大本轮范围。",
       "license": "Apache-2.0",
@@ -1240,7 +1232,7 @@
           ]
         }
       ],
-      "source": "skills/onda-shiyun/agents/interface.yaml"
+      "source": "configs/scenarios/onda-shiyun.yaml"
     },
     {
       "id": "onda-xingpan",
@@ -1310,8 +1302,7 @@
       "required_inputs": [],
       "output": {
         "kind": "interpretation",
-        "grounding": "engine_fields",
-        "voice": "onda-counsel"
+        "grounding": "engine_fields"
       },
       "boundary": "传统文化参考；禁止生死寿命、重大灾祸断言、临床诊断治疗与医疗择时；多工具不扩大本轮范围。",
       "license": "Apache-2.0",
@@ -1415,7 +1406,7 @@
           ]
         }
       ],
-      "source": "skills/onda-xingpan/agents/interface.yaml"
+      "source": "configs/scenarios/onda-xingpan.yaml"
     },
     {
       "id": "onda-xueye",
@@ -1465,8 +1456,7 @@
       "required_inputs": [],
       "output": {
         "kind": "interpretation",
-        "grounding": "engine_fields",
-        "voice": "onda-counsel"
+        "grounding": "engine_fields"
       },
       "boundary": "传统文化参考；禁止生死寿命、重大灾祸断言、临床诊断治疗与医疗择时；多工具不扩大本轮范围。",
       "license": "Apache-2.0",
@@ -1534,7 +1524,7 @@
           ]
         }
       ],
-      "source": "skills/onda-xueye/agents/interface.yaml"
+      "source": "configs/scenarios/onda-xueye.yaml"
     },
     {
       "id": "onda-yuanfen",
@@ -1595,8 +1585,7 @@
       "required_inputs": [],
       "output": {
         "kind": "interpretation",
-        "grounding": "engine_fields",
-        "voice": "onda-counsel"
+        "grounding": "engine_fields"
       },
       "boundary": "传统文化参考；禁止生死寿命、重大灾祸断言、临床诊断治疗与医疗择时；多工具不扩大本轮范围。",
       "license": "Apache-2.0",
@@ -1685,7 +1674,7 @@
           ]
         }
       ],
-      "source": "skills/onda-yuanfen/agents/interface.yaml"
+      "source": "configs/scenarios/onda-yuanfen.yaml"
     },
     {
       "id": "onda-zhanbu",
@@ -1739,8 +1728,7 @@
       "required_inputs": [],
       "output": {
         "kind": "interpretation",
-        "grounding": "engine_fields",
-        "voice": "onda-counsel"
+        "grounding": "engine_fields"
       },
       "boundary": "传统文化参考；禁止生死寿命、重大灾祸断言、临床诊断治疗与医疗择时；多工具不扩大本轮范围。",
       "license": "Apache-2.0",
@@ -1796,7 +1784,7 @@
           ]
         }
       ],
-      "source": "skills/onda-zhanbu/agents/interface.yaml"
+      "source": "configs/scenarios/onda-zhanbu.yaml"
     },
     {
       "id": "onda-zige",
@@ -1847,49 +1835,48 @@
         {
           "kind": "composite_topic",
           "scenario": "onda-mingge",
-          "condition": "仅请求包含此主题或后续深入该主题时，读取对应技能并复用已有结果"
+          "condition": "仅请求包含此主题或后续深入该主题时，选择对应计算并复用已有结果"
         },
         {
           "kind": "composite_topic",
           "scenario": "onda-shiye",
-          "condition": "仅请求包含此主题或后续深入该主题时，读取对应技能并复用已有结果"
+          "condition": "仅请求包含此主题或后续深入该主题时，选择对应计算并复用已有结果"
         },
         {
           "kind": "composite_topic",
           "scenario": "onda-caiwu",
-          "condition": "仅请求包含此主题或后续深入该主题时，读取对应技能并复用已有结果"
+          "condition": "仅请求包含此主题或后续深入该主题时，选择对应计算并复用已有结果"
         },
         {
           "kind": "composite_topic",
           "scenario": "onda-yuanfen",
-          "condition": "仅请求包含此主题或后续深入该主题时，读取对应技能并复用已有结果"
+          "condition": "仅请求包含此主题或后续深入该主题时，选择对应计算并复用已有结果"
         },
         {
           "kind": "composite_topic",
           "scenario": "onda-xueye",
-          "condition": "仅请求包含此主题或后续深入该主题时，读取对应技能并复用已有结果"
+          "condition": "仅请求包含此主题或后续深入该主题时，选择对应计算并复用已有结果"
         },
         {
           "kind": "composite_topic",
           "scenario": "onda-jiating",
-          "condition": "仅请求包含此主题或后续深入该主题时，读取对应技能并复用已有结果"
+          "condition": "仅请求包含此主题或后续深入该主题时，选择对应计算并复用已有结果"
         },
         {
           "kind": "composite_topic",
           "scenario": "onda-renji",
-          "condition": "仅请求包含此主题或后续深入该主题时，读取对应技能并复用已有结果"
+          "condition": "仅请求包含此主题或后续深入该主题时，选择对应计算并复用已有结果"
         },
         {
           "kind": "composite_topic",
           "scenario": "onda-jiankang",
-          "condition": "仅请求包含此主题或后续深入该主题时，读取对应技能并复用已有结果"
+          "condition": "仅请求包含此主题或后续深入该主题时，选择对应计算并复用已有结果"
         }
       ],
       "required_inputs": [],
       "output": {
         "kind": "interpretation",
-        "grounding": "engine_fields",
-        "voice": "onda-counsel"
+        "grounding": "engine_fields"
       },
       "boundary": "传统文化参考；禁止生死寿命、重大灾祸断言、临床诊断治疗与医疗择时；多工具不扩大本轮范围。",
       "license": "Apache-2.0",
@@ -1947,7 +1934,7 @@
           ]
         }
       ],
-      "source": "skills/onda-zige/agents/interface.yaml"
+      "source": "configs/scenarios/onda-zige.yaml"
     },
     {
       "id": "fengshui",

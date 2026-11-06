@@ -2,7 +2,7 @@
 
 按任务选择入口：第一次运行看快速入门，接入应用看协议指南，核对计算看领域专题，贡献修改看开发与验证。
 
-FateBridge 提供术数与占星计算，Onda 技能指导咨询，接入应用提供模型对话与界面。这些部分各有职责：[核心概念](concepts.md)解释它们如何配合，以及如何区分计算结果、传统解释和现实建议。
+FateBridge 提供术数与占星计算，接入应用提供模型对话、解释与界面。这些部分各有职责：[核心概念](concepts.md)解释它们如何配合，以及如何区分计算结果、传统解释和现实建议。
 
 文档对应当前开发分支。使用已发布包时，查阅对应 Git 标签的文档；尚未发布的变化见 [CHANGELOG](../CHANGELOG.md#unreleased)。
 
@@ -24,10 +24,10 @@ CLI 可直接运行；REST 默认端口为 `8010`；MCP 默认通过 stdio 由�
 | 安装与首次计算 | [快速入门](getting-started.md) |
 | 环境变量、加载顺序与 REST 密钥 | [运行配置](configuration.md) |
 | 下载星历、校验文件与核对实际模型 | [星历数据安装](ephemeris.md) |
-| 本地 stdio、远程 HTTP、Onda 插件与停用 | [MCP 部署](mcp-deployment.md) |
+| 本地 stdio、远程 HTTP 与停用 | [MCP 部署](mcp-deployment.md) |
 | 工具发现、错误恢复与字段投影 | [Agent 接入](agent-guide.md) |
 | 读取和保存同次完整结果 | [完整结果交付](agent-guide.md#完整结果交付与同次导出) |
-| 按问题选择咨询场景 | [场景路由](scenario-routing.md) · [Onda 技能](../skills/README.md) |
+| 按问题选择咨询场景 | [场景路由](scenario-routing.md) · [方法参考](interpretation/README.md) |
 | 运行请求示例 | [示例索引](examples/README.md) |
 | 升级旧接口或解决故障 | [故障排除](troubleshooting.md) |
 | 报告安全问题 | [安全策略](../SECURITY.md) |
@@ -52,7 +52,7 @@ CLI 可直接运行；REST 默认端口为 `8010`；MCP 默认通过 stdio 由�
 | 风水 | [家居与布局](fengshui.md) · [玄空宅盘](fengshui-xuankong.md) · [实测工位与有限搜索](fengshui-workstation-layout.md) |
 | 计算基础 | [可选太阳后端](solar-backends.md) · [地点与坐标](place-catalog.md) |
 
-风水咨询从 [onda-fengshui](../skills/onda-fengshui/SKILL.md)进入；规则作者、版本、现场条件与动作许可在该技能及其参考资料中维护。
+风水现场资料、规则作者、版本与动作条件见[风水参考](interpretation/fengshui/consultation.md)及对应领域文档。
 
 ## 开发与验证
 

@@ -2,23 +2,23 @@
 
 [文档中心](README.md) · [API 参考](api-reference.md) · [算法状态](algorithm-status.md)
 
-事业方向、关系磨合、学习方式与阶段变化，需要的计算依据各不相同。场景路由将这些日常问题连接到对应的咨询入口，指导 Agent 按结构、双方互动、人生阶段和目标时段选择相关方法。
+事业方向、关系磨合、学习方式与阶段变化，需要的计算依据各不相同。下表保留现有可选工具配置的路由，供已使用场景筛选的客户端核对；它不定义完整能力，也不是强制咨询流程。
 
 机器入口为 `/api/scenarios`、CLI `scenarios` 与 MCP `fatebridge://scenarios`。现有九个主题、三个服务、一个全面画像组合入口，加独立 `fengshui` 基础计算场景，共14项。机器发现包含 consultation.kind/topics、当轮范围与共享安全／时间策略，供 Agent 选择所需工具，不会自动执行整个清单。
 
-维护源为本矩阵与 `skills/onda-*/agents/interface.yaml`。`engine_tools` 保留直接工具；接口的 `dependencies` 显式声明知识支撑、条件时间服务与组合主题，生成与运行时均校验依赖闭包、未知引用和循环。条件控制使用时机，工具公开不代表本轮必须调用。
+旧 Onda 技能已移除，维护源现为本矩阵与 `configs/scenarios/*.yaml`。保留原场景 ID 以继续支持已有筛选配置；默认不筛选场景时公开全部工具。`engine_tools` 保留直接工具；接口的 `dependencies` 显式声明知识支撑、条件时间服务与组合主题，生成与运行时均校验依赖闭包、未知引用和循环。条件控制使用时机，工具公开不代表本轮必须调用。
 
 ## 如何使用本页
 
-用户咨询先选择最贴近当前问题的[技能入口](../skills/README.md)，再看下方对应场景；维护工具覆盖时查[覆盖核对清单](#覆盖核对清单)。已有实际 Schema 且工具已公开时可直接调用，不必先遍历矩阵。
+按当前问题与实际工具 Schema 选能力；结果读取可按需查[方法参考](interpretation/README.md)；维护工具覆盖时查[覆盖核对清单](#覆盖核对清单)。已有实际 Schema 且工具已公开时可直接调用，不必先遍历矩阵。
 
 [调用纪律](#全局调用纪律) · [主旁深的含义](#交叉印证与去重) · [场景矩阵](#场景路由矩阵) · [长尾工具](#长尾与专家级工具) · [覆盖清单](#覆盖核对清单)
 
 ## 全局调用纪律
 
-1. 先应用[咨询硬边界](../skills/_shared/safety-boundaries.md)，禁区请求不排盘、不起卦、不先算后免责声明。公共接口禁用生死／临床卜卦与手术择时，健康输出限传统分类；语义判断仍由咨询方负责。
-2. 按[用户问题与范围](../skills/_shared/consultation-routing.md)识别主题、对象、任务、时间和深度。当前问什么就回答什么；首轮明确全面则覆盖，追问保留原主题与已有相关视角，只补新增范围。
-3. 命盘与专项已有层复用。八字综合已含命盘、喜用与格局，不重复原始盘；专项已含时机背景，不默认补大运流年。时间问题统一读[共享时间选择](../skills/_shared/timing-selection.md)。法达、大运与紫微运限均是普通阶段问题的正常候选。
+1. 先应用[咨询硬边界](interpretation/shared/safety-boundaries.md)，禁区请求不排盘、不起卦、不先算后免责声明。公共接口禁用生死／临床卜卦与手术择时，健康输出限传统分类；语义判断仍由咨询方负责。
+2. 按[用户问题与范围](interpretation/shared/consultation-routing.md)识别主题、对象、任务、时间和深度。当前问什么就回答什么；首轮明确全面则覆盖，追问保留原主题与已有相关视角，只补新增范围。
+3. 命盘与专项已有层复用。八字综合已含命盘、喜用与格局，不重复原始盘；专项已含时机背景，不默认补大运流年。时间问题统一读[共享时间选择](interpretation/shared/timing-selection.md)。法达、大运与紫微运限均是普通阶段问题的正常候选。
 4. 多层确有价值才聚合，窄查询可单技法。后台多工具不等于正文多报告，不为凑数增工具或索取其他体系资料。
 5. 普通首轮按任务／盘型选择公开 evidence_views 中的 fields（视图名不是请求参数），没有对应视图时按已验证合同选择必要字段，使用 strict_fields=true、include_snapshot_text=false；完整 JSON／全部时间线／文件首次 fields=null，保留默认预算并读同 run 交付。selected_sections 只裁剪导出文本。未知生时不填默认，不重复追问用户已说无法提供的缺项。
 
@@ -34,7 +34,7 @@
 
 ## 场景路由矩阵
 
-每行是用户任务，列为候选工具组。一个组内按具体方法／职责选择；工具清单不要求逐个执行。具体字段、精度和来源以实际工具及技能参考为准。
+每行是用户任务，列为候选工具组。一个组内按具体方法／职责选择；工具清单不要求逐个执行。具体字段、精度和来源以实际工具及方法参考为准。
 
 ### 认识自己与个人发展（onda-mingge）
 
@@ -44,7 +44,6 @@
 | 阶段中的自我变化 | 旁（已有结构） | 旁（已有结构） | 旁（已有结构） | 主（按时间任务选层） |  |
 | 指定原始盘／数算 |  |  |  |  | 主（按用户方法选择） |
 
-详细选择与读法见 [认识自己与个人发展](../skills/onda-mingge/SKILL.md)。
 本入口可用清单（非必调）：`analyze_destiny`、`astro_chart`、`bazi_birth`、`bazi_personality`、`canping`、`firdaria`、`heluo`、`timing_analysis`、`western_timing_analysis`、`ziwei_birth`、`ziwei_horoscope`、`ziwei_rules`。
 
 ### 事业与工作（onda-shiye）
@@ -55,8 +54,7 @@
 | 今年／未来几年事业 | 主（复用已有时机） | 旁（已有结构） | 旁（已有结构） | 主（仅补所需时间层） |  |
 | 给定求职／签约候选时刻 |  |  |  | 旁（独立背景） | 主（给定候选，非区间最优搜索） |
 
-详细选择与读法见 [事业与工作](../skills/onda-shiye/SKILL.md)。
-印占的 D1/D9/D10 与 Vimshottari 按[独立取证规则](../skills/_shared/vedic-evidence.md)解释；仅在本轮有价值或明确指定时选择。
+印占的 D1/D9/D10 与 Vimshottari 按[独立取证规则](interpretation/shared/vedic-evidence.md)解释；仅在本轮有价值或明确指定时选择。
 本入口可用清单（非必调）：`astro_india_chart`、`astro_vimshottari`、`analyze_destiny`、`astro_chart`、`astro_election`、`bazi_career`、`firdaria`、`timing_analysis`、`western_timing_analysis`、`ziwei_birth`、`ziwei_horoscope`。
 
 ### 财务与资源（onda-caiwu）
@@ -66,7 +64,6 @@
 | 收入／支出／积累方式 | 主 | 旁（相关宫位） | 旁（相关配置） |  |
 | 今年／未来几年财务 | 主（已有时机复用） | 旁 | 旁 | 主（按阶段和目标范围选择） |
 
-详细选择与读法见 [财务与资源](../skills/onda-caiwu/SKILL.md)。
 本入口可用清单（非必调）：`astro_chart`、`bazi_wealth`、`firdaria`、`timing_analysis`、`western_timing_analysis`、`ziwei_birth`、`ziwei_horoscope`。
 
 ### 感情与伴侣关系（onda-yuanfen）
@@ -77,8 +74,7 @@
 | 双方互动综合 |  | 主（跨盘、双向范围） | 旁（各自结构） | 主（明确星盘互动） |  |
 | 年度／阶段／月份变化 | 主（已有时机复用） |  |  |  | 主（仅补所需粒度） |
 
-详细选择与读法见 [感情与伴侣关系](../skills/onda-yuanfen/SKILL.md)。
-印占的 D1/D9/D10 与 Vimshottari 按[独立取证规则](../skills/_shared/vedic-evidence.md)解释；仅在本轮有价值或明确指定时选择。
+印占的 D1/D9/D10 与 Vimshottari 按[独立取证规则](interpretation/shared/vedic-evidence.md)解释；仅在本轮有价值或明确指定时选择。
 本入口可用清单（非必调）：`astro_india_chart`、`astro_vimshottari`、`astro_chart`、`astro_relative_chart`、`bazi_marriage`、`bazi_romance`、`firdaria`、`liunian_analysis`、`liuyue_analysis`、`meihua_analysis`、`sixyao`、`sukuyo_compatibility`、`timing_analysis`、`two_person_compatibility`、`western_timing_analysis`、`ziwei_birth`、`ziwei_horoscope`。
 
 ### 学习与成长（onda-xueye）
@@ -88,7 +84,6 @@
 | 学习方式／深造选项 | 主 | 旁（相关结构） | 旁（相关配置） |  |
 | 考试年份／阶段比较 | 主（已有时机复用） | 旁 | 旁 | 主（同粒度，非录取承诺） |
 
-详细选择与读法见 [学习与成长](../skills/onda-xueye/SKILL.md)。
 本入口可用清单（非必调）：`astro_chart`、`bazi_education`、`firdaria`、`timing_analysis`、`western_timing_analysis`、`ziwei_birth`、`ziwei_horoscope`。
 
 ### 家庭与亲子（onda-jiating）
@@ -100,7 +95,6 @@
 | 亲子／家人双方互动 |  |  |  | 主（双方资料与实际关系） |  |
 | 家庭阶段与责任 | 旁（已有结构） |  | 旁 |  | 主（只限问题所需时段） |
 
-详细选择与读法见 [家庭与亲子](../skills/onda-jiating/SKILL.md)。
 本入口可用清单（非必调）：`analyze_destiny`、`astro_chart`、`astro_relative_chart`、`bazi_children`、`bazi_personality`、`bazi_relatives`、`firdaria`、`timing_analysis`、`two_person_compatibility`、`western_timing_analysis`、`ziwei_birth`、`ziwei_horoscope`。
 
 ### 人际与合作（onda-renji）
@@ -111,7 +105,6 @@
 | 朋友／合伙双方互动 | 旁（各自结构） | 主（按实际关系） |  |
 | 合作阶段／年度变化 | 旁（已有结构） | 旁（已有互动） | 主（不推对方行为） |
 
-详细选择与读法见 [人际与合作](../skills/onda-renji/SKILL.md)。
 本入口可用清单（非必调）：`analyze_destiny`、`astro_chart`、`astro_relative_chart`、`firdaria`、`sukuyo_compatibility`、`timing_analysis`、`two_person_compatibility`、`western_timing_analysis`、`ziwei_birth`、`ziwei_horoscope`。
 
 ### 传统身心文化参考（onda-jiankang）
@@ -121,7 +114,6 @@
 | 五行标签／传统对应 | 主（非体质诊断） | 旁（仅未覆盖背景） |  |
 | 文化关系的阶段变化 | 主（已有时机复用） |  | 旁（未覆盖的传统时间层） |
 
-详细选择与读法见 [传统身心文化参考](../skills/onda-jiankang/SKILL.md)。
 本入口可用清单（非必调）：`analyze_destiny`、`bazi_health`、`timing_analysis`。
 
 ### 整体时运与阶段（onda-shiyun）
@@ -133,8 +125,7 @@
 | 月份／某日／时点 | 旁（已有背景） | 主（相应运限） | 旁（已有阶段） | 主（所需粒度） | 主（西占相关单技法） |  |
 | 活动候选时刻比较 |  |  |  |  |  | 主（给定非医疗候选） |
 
-详细选择与读法见 [整体时运与阶段](../skills/onda-shiyun/SKILL.md)。其他生命周期／历法方法按共享时间参考与技法参考选择，不自动全调用。
-印占的 D1/D9/D10 与 Vimshottari 按[独立取证规则](../skills/_shared/vedic-evidence.md)解释；仅在本轮有价值或明确指定时选择。
+印占的 D1/D9/D10 与 Vimshottari 按[独立取证规则](interpretation/shared/vedic-evidence.md)解释；仅在本轮有价值或明确指定时选择。
 本入口可用清单（非必调）：`astro_india_chart`、`astro_vimshottari`、`astro_agepoint`、`astro_balbillus`、`astro_distributions`、`astro_election`、`astro_extrareturns`、`astro_harmonic`、`astro_jaynesprog`、`astro_keypoints`、`astro_lunation_phase`、`astro_mundane`、`astro_persiandirected`、`astro_planetary_ages`、`astro_planetaryarc`、`astro_triplicity_rulers`、`astro_vedicprog`、`astro_yearsystem129`、`dayun_analysis`、`decennials`、`firdaria`、`givenyear`、`jieqi_timeline_analysis`、`jieqi_year`、`liunian_analysis`、`liuri_analysis`、`liushi_analysis`、`liuyue_analysis`、`lunarreturn`、`nongli_time`、`pd`、`pdchart`、`profection`、`solararc`、`solarreturn`、`timing_analysis`、`transit`、`western_timing_analysis`、`ziwei_horoscope`、`zr`。
 
 ### 命盘与指定方法解读（onda-xingpan）
@@ -148,8 +139,7 @@
 | 指定阶段方法／法达 |  |  |  |  | 主（按用户所选窄查询） |  |
 | 指定河洛／参评数 |  |  |  |  |  | 主（按指定方法） |
 
-详细选择与读法见 [命盘与指定方法解读](../skills/onda-xingpan/SKILL.md)。
-印占的 D1/D9/D10 与 Vimshottari 按[独立取证规则](../skills/_shared/vedic-evidence.md)解释；仅在本轮有价值或明确指定时选择。
+印占的 D1/D9/D10 与 Vimshottari 按[独立取证规则](interpretation/shared/vedic-evidence.md)解释；仅在本轮有价值或明确指定时选择。
 原典已给出四柱时，可用 `bazi_source_compare` 核对登记编释；不补造生日，保留差异与未裁定。
 本入口可用清单（非必调）：`bazi_source_compare`、`human_design`、`astro_india_chart`、`astro_vimshottari`、`analyze_destiny`、`astro_chart`、`astro_chart13`、`astro_germany_chart`、`astro_guolao_chart`、`astro_hellen_chart`、`astro_relative_chart`、`bazi_birth`、`canping`、`heluo`、`dayun_analysis`、`firdaria`、`liunian_analysis`、`western_timing_analysis`、`ziwei_birth`、`ziwei_horoscope`。
 
@@ -161,7 +151,6 @@
 | --- | --- | --- | --- | --- | --- |
 | 明确求卦／已选卜法 | 主（按所选方式） | 主（按所选方式） | 主（按所选方式与实际输入） | 主（非禁区类别） | 旁（只查义，不重起） |
 
-详细选择与读法见 [具体问事与占卜](../skills/onda-zhanbu/SKILL.md)。
 本入口可用清单（非必调）：`astro_horary`、`gua_lookup`、`gua_meiyi`、`jinkou`、`liureng_gods`、`liureng_runyear`、`meihua_analysis`、`meihua_cast`、`otherbu`、`qimen`、`sanshiunited`、`sixyao`、`suzhan`、`taiyi`、`tongshefa`。
 
 金口诀将命大绝使用已确认的问课对象本命年支 `natal_branch`；未提供时只限制这一关系，保留未知并继续解释已有四位，不从占时年、日、时或行年支代入。
@@ -173,7 +162,6 @@
 | 多主题全面画像 | 主（按范围） | 主（按范围） | 主（按范围） |
 | 明确三体系完整画像 | 主（已有则复用） | 主（缺失保留） | 主（缺失保留） |
 
-详细选择与读法见 [全面画像多主题组合](../skills/onda-zige/SKILL.md)。这是多主题组合入口；单主题多体系仍由对应主题主持，深入追问保留已有视角。
 本入口可用清单（非必调）：`analyze_destiny`、`astro_chart`、`ziwei_birth`。
 
 ### 风水 · 空间布局（onda-fengshui）
@@ -193,7 +181,7 @@
 | 某节月九宫月星 | | | | | | | 主（十二节瞬间；有效年与公历年分开） | |
 | 历史玄空宅盘 | | | | | | | | 主（磁北宅向及历史定运依据） |
 
-技能入口与资料／来源／执行闭环见 [onda-fengshui](../skills/onda-fengshui/SKILL.md)。不为形态或桌面咨询强制收集生辰；聚合已算的层不重复计算。
+资料／来源／动作条件见[风水参考](interpretation/fengshui/consultation.md)。不为形态或桌面咨询强制收集生辰；聚合已算的层不重复计算。
 
 ### 家居风水基础计算
 
@@ -212,7 +200,7 @@
 | 三法合参 | `fengshui_assess` | 聚合调用保留三层与差异，不平均评分；缺失资料明确 partial |
 | 工位/家居多方案与动作限制 | `fengshui_assess` | layout_constraints记录搬位/转向/新增许可；layout_alternatives独立重算新位置事实；ready仅指所选门槛满足，不评分、不选综合赢家 |
 
-完整输入与 [规则范围](fengshui.md) 优先于解释。不能从户型图片猜测参考北、宅向、立极或砂水，也不能从缺失值生成确定吉凶。基础层结果只覆盖本版本规则；完整运山向宅盘须显式调用已定版本的玄空工具，不推断其他门派或金锁进阶断语。Onda 个人命理场景不自动加入住宅工具；空间咨询由独立 onda-fengshui 技能组织，原 fengshui 基础计算场景仍保留。
+完整输入与 [规则范围](fengshui.md) 优先于解释。不能从户型图片猜测参考北、宅向、立极或砂水，也不能从缺失值生成确定吉凶。基础层结果只覆盖本版本规则；完整运山向宅盘须显式调用已定版本的玄空工具，不推断其他门派或金锁进阶断语。个人命理筛选配置不自动加入住宅工具；`onda-fengshui` 与 `fengshui` 保留为两个可选工具配置。
 
 ## 长尾与专家级工具
 

@@ -83,6 +83,23 @@ def test_invalid_example_json_fails(tmp_path, monkeypatch, capsys, name):
     assert f"{name}: invalid JSON" in capsys.readouterr().out
 
 
+def test_configuration_and_interpretation_docs_are_checked(
+    tmp_path, monkeypatch, capsys
+):
+    monkeypatch.setattr(check_docs, "ROOT", tmp_path)
+    for name in (
+        "configs/scenarios/README.md",
+        "docs/interpretation/shared/reference.md",
+    ):
+        path = tmp_path / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("[retired entry](missing.md)\n", encoding="utf-8")
+    assert check_docs.main([]) == 1
+    output = capsys.readouterr().out
+    assert "configs/scenarios/README.md:1: missing local target" in output
+    assert "docs/interpretation/shared/reference.md:1: missing local target" in output
+
+
 def test_current_links_to_missing_historical_files_or_anchors_still_fail(
     tmp_path, monkeypatch, capsys
 ):

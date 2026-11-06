@@ -80,6 +80,7 @@ def test_passive_docs_skip_heavy_jobs_but_keep_a_completed_summary():
     filters = yaml.safe_load(paths["with"]["filters"])
     assert filters["code"] == ["**", "!README*.md", "!docs/**/*.md"]
     assert filters["scenario"] == ["docs/scenario-routing.md"]
+    assert filters["reference"] == ["docs/interpretation/shared/**"]
     assert (
         "steps.paths.outputs.scenario"
         in WORKFLOW["jobs"]["changes"]["outputs"]["checks"]

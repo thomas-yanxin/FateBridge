@@ -1,10 +1,10 @@
 # Codex 使用 FateBridge
 
-在 Codex 中，你可以直接提出事业、关系或学习方面的问题。Codex 调用 FateBridge 完成计算，并结合 Onda 技能解释依据。
+在 Codex 中，你可以直接提出事业、关系或学习方面的问题。Codex 调用 FateBridge 完成计算，并按实际返回与方法来源解释依据。
 
 要让这一过程真正发生，需要先连接本地 MCP。下面三个步骤将带你检查安装、注册服务，并用虚构资料完成一次咨询。
 
-使用项目技能体验咨询，需要[源码安装](getting-started.md#安装)，无需启动 REST。仅使用已发布工具的 PyPI 安装、其他 MCP host、Windows 与远程 HTTP 接入见 [MCP 部署指南](mcp-deployment.md)。
+使用当前源码功能时按[源码安装](getting-started.md#安装)准备，无需启动 REST。仅使用已发布工具的 PyPI 安装、其他 MCP host、Windows 与远程 HTTP 接入见 [MCP 部署指南](mcp-deployment.md)。
 
 1. [确认安装与接入范围](#1-确认安装与接入范围)：运行 doctor，取得当前解释器的注册命令。
 2. [注册到 Codex](#2-注册到-codex)：保存配置并在新聊天检查工具。
@@ -19,23 +19,24 @@ Codex 负责理解问题、选择工具和解释结果，FateBridge 负责计算
 在已经按[快速入门](getting-started.md#安装)安装的仓库中执行：
 
 ```bash
-.venv/bin/fatebridge doctor --mcp --scenario onda-shiye
+.venv/bin/fatebridge doctor --mcp
 ```
 
 看到 `ok=true`，表示依赖版本检查、独立 stdio 进程初始化、工具发现、资源读取和一条虚构计算通过。进程在仓库之外的临时目录启动，能检查 GUI host 常见的工作目录问题。这个结果不证明所有工具、真实对话或远程部署都已验证。
 
 `codex.add_command` 给出使用当前解释器绝对路径的注册命令；`codex.cli` 记录 CLI 来源。桌面环境存在 `CODEX_CLI_PATH` 时优先使用桌面版自带 CLI，避免 PATH 中旧版 CLI 与账号可用模型不一致。诊断只输出配置，不修改 Codex 设置。`--scenario` 限制实际公开的工具，并展开场景声明的知识支撑、条件服务和组合主题依赖；这些工具按问题使用，不自动全部执行；`--family` 可以进一步筛选，二者取交集。没有筛选时检查全部 MCP 工具。无效分类和空交集返回失败，先修正筛选。
 
-普通安装检查可用 `fatebridge doctor`；它不启动 MCP，也不验证星历精度。全量工具 Schema 较大，首次接入可选当前问题对应的场景。下面的 `onda-shiye` 只公开事业场景所需工具；需要跨主题咨询时，扩大范围或清空筛选。配置含义见[核心概念](concepts.md)。 支持工具搜索的宿主可使用完整场景并按需加载；需要更小的固定目录时，doctor 加 `--tool-scope topic`，把注册配置中的 `FATEBRIDGE_MCP_TOOL_SCOPE` 同步设为 `topic`。该模式保留主题直接依据和知识支撑，条件技法如实标为未公开；需要时切回 `complete`，不把缺失分支说成已算。
+普通安装检查可用 `fatebridge doctor`；它不启动 MCP，也不验证星历精度。下方配置默认公开全部工具，支持工具搜索的宿主可按需加载。需要较小的固定目录时，可明确选择 family 或现有场景；`--tool-scope topic` 还会缩小到场景直接工具与知识支撑，需同步设置 `FATEBRIDGE_MCP_TOOL_SCOPE=topic`。受限配置中的缺失分支以 `availability` 为准，不能解释为整个引擎不支持。配置含义见[核心概念](concepts.md)。
 
 ## 2. 注册到 Codex
 
-复制 doctor 输出中的 `codex.add_command` 执行。下面是事业场景的语法示例；桌面环境请将示例中的 `codex` 换成 doctor 返回的 CLI 绝对路径：
+复制 doctor 输出中的 `codex.add_command` 执行。下面是公开全部工具的语法示例；桌面环境请将示例中的 `codex` 换成 doctor 返回的 CLI 绝对路径：
 
 ```bash
 codex mcp add fatebridge \
   --env FATEBRIDGE_MCP_FAMILIES= \
-  --env FATEBRIDGE_MCP_SCENARIOS=onda-shiye \
+  --env FATEBRIDGE_MCP_SCENARIOS= \
+  --env FATEBRIDGE_MCP_TOOL_SCOPE=complete \
   -- "$PWD/.venv/bin/python" -m fatebridge.mcp_server
 codex mcp get fatebridge
 ```
@@ -51,7 +52,8 @@ tool_timeout_sec = 60
 
 [mcp_servers.fatebridge.env]
 FATEBRIDGE_MCP_FAMILIES = ""
-FATEBRIDGE_MCP_SCENARIOS = "onda-shiye"
+FATEBRIDGE_MCP_SCENARIOS = ""
+FATEBRIDGE_MCP_TOOL_SCOPE = "complete"
 ```
 
 Codex 使用 `[mcp_servers.fatebridge]`；其他 host 的 `mcpServers` JSON 不能直接粘进 TOML。stdio 服务由 Codex 启动，无需另外开一个终端运行，也不使用 `http://localhost:8010`。
@@ -75,7 +77,7 @@ Codex 使用 `[mcp_servers.fatebridge]`；其他 host 的 `mcpServers` JSON 不�
 连接完成后，怎样判断一次调用与解读是否到位？维护集成或检查 Agent 行为时，可以按以下流程核对。普通用户可在完成上述对话后按实际问题继续追问，无需逐项操作。
 
 1. 按所选计算核对当前用户已确认的资料；缺小时或只有时段时说明影响并简短追问，用户明确不知道后停止索取同项，转交可用范围。不能补零点、借用示例或沿用确定时刻的盘。可选精度和无关方法缺项不作为全局门槛。双人关系未说明类型时用 `general`，不能从性别推断婚姻。
-2. 先读取匹配的场景技能，按主题与时间范围选择有价值的依据。已发布工具的参数 Schema 和描述够用时直接计算；描述包含经过验证的首轮 `fields` 建议。专项已自动推算的大运、流年不重复计算，也不手工覆盖。普通咨询无需先列资源、读完整输出契约或搜索仓库。
+2. 按用户问题、指定方法、已确认资料与时间范围选择有价值的公开能力。已发布工具的参数 Schema 和描述够用时直接计算；描述包含经过验证的首轮 `fields` 建议。专项已自动推算的大运、流年不重复计算，也不手工覆盖。普通咨询无需先列资源、读完整输出契约或搜索仓库。
 3. 仅在选择不明确时读场景/目录；参数不清楚时读 `fatebridge://tools/{tool}/input`，需要更细字段时读完整工具契约。资源用于补足缺口，不是每轮必经步骤。
 4. 冻结明确的分析日期，例如 `as_of="2026-10-12T04:00:00Z"` 对应上海中午 12 点；设置 `strict_fields=true`、`include_snapshot_text=false`，按问题取必要字段。明确的分析日期仍优先。
 5. 先检查 `isError`，再读取 `structuredContent`。保存原输入与 `run_metadata`；后续调用沿用前次 `trace_id`，用前次 `run_id` 作为 `parent_run_id`。不要把同一出生资料的多次计算当成独立证据。
@@ -85,13 +87,13 @@ Codex 使用 `[mcp_servers.fatebridge]`；其他 host 的 `mcpServers` JSON 不�
 
 双人关系中，`summary.overall_score` 是 0–100 的规则加权分，`traditional_compatibility.score` 是加减净分，`detailed_analysis.traditional_analysis.score` 是独立摩擦维度；三处的 `score_basis` 说明口径。不能平均、视为成功概率或用一个子项等级替代整体评价。首轮建议字段保留完整依据、人物和建议，避免为了补解释再计算一遍。
 
-根目录 `AGENTS.md` 只保留工作规则和技能路由。常用输入合同与任务字段由 `scripts/build_codex_call_contracts.py` 从实际 MCP 生成到[按需合同目录](contracts/README.md)，一工具一文件，保留参数说明与完整约束。已连接且定义清楚时直接调用；仅离线核对或定义缺失时读取所选文件，不默认加载全部 Schema。
+根目录 `AGENTS.md` 保留工程、资料与调用约束。常用输入合同与任务字段由 `scripts/build_codex_call_contracts.py` 从实际 MCP 生成到[按需合同目录](contracts/README.md)，一工具一文件，保留参数说明与完整约束。已连接且定义清楚时直接调用；仅离线核对或定义缺失时读取所选文件，不默认加载全部 Schema。
 
 合同未覆盖的工具可能仍需 `ALL_TOOLS` 检索。此时一次返回所需主证的完整条目，保留说明和参数定义；不要先展开全部候选、再检索同一工具，也不要只返回名称。用途确有歧义再展开候选。工具定义在当前对话已取得且未改变时，后续计算沿用已知合同，无需为解释已有结果重新发现或计算。当前聊天与新聊天的连接加载状态需分别核对。
 
 ### 风水布局咨询
 
-从 [onda-fengshui](../skills/onda-fengshui/SKILL.md) 及其[咨询闭环](../skills/onda-fengshui/references/consultation.md)进入。布局调用 `fengshui_assess` 并设置 `analyze_layout=true`；只提交已确认事实，位置、朝向、宅向与使用人分别核对。只知道桌子朝西时可算朝向部分，不能补成桌在西宫或住宅坐向。
+现场资料核对见[风水参考](interpretation/fengshui/consultation.md)。布局调用 `fengshui_assess` 并设置 `analyze_layout=true`；只提交已确认事实，位置、朝向、宅向与使用人分别核对。只知道桌子朝西时可算朝向部分，不能补成桌在西宫或住宅坐向。
 
 独立形态可用 `methods=[]` 与 `form_observations`，无需生辰或罗盘；照片保留为候选。原始盘、布局关联、规则审查和动作可执行状态分别报告，已有判断先解释，搬动许可与物理可行性只约束落实动作。无规则或未实现的项目直接说明范围。
 
@@ -132,7 +134,7 @@ MCP 场景 `onda-fengshui` 与 `fengshui` 分别供咨询和基础计算发现�
 | 现象 | 下一步 |
 | --- | --- |
 | `isError=true` / 退出码非零 | 读 `error_code` 和 `issues`，不要先解读业务数据 |
-| 所选工具必需但缺少 `birth_hour` | 确认时刻；明确未知后按对应技能交付可答部分，不用默认时刻补齐 |
+| 所选工具必需但缺少 `birth_hour` | 确认时刻；明确未知后按实际工具能力交付可答部分，不用默认时刻补齐 |
 | 日期无效、未知字段、投影拼错 | 按字段路径修正后重发；不要重复发送原请求 |
 | `dependency_missing` | 用 doctor 检查同一解释器，再核对具体后端/星历；不伪造成功结果 |
 | 工具或资源不可见 | 检查 family/scenario 交集与当前连接的 `tools/list` |
@@ -150,4 +152,4 @@ uv run --locked --extra dev python scripts/experience_codex.py --output /tmp/fat
 
 脚本用虚构资料检查多种计算、输出 Schema、裁剪前后业务摘要、错误恢复和场景范围，输出报告及原始结果。它不启动另一位模型，也不修改 Codex 配置；实际 Codex 聊天的选工具与解读质量需在连接加载后另行观察。
 
-真实模型验收使用 `scripts/evaluate_agent.py` 与虚构任务集，检查技能读取、工具选择、必要资料、范围和完整导出，并保存原始事件、回答及机械判据。运行方法、人工评分与限制见[Agent 行为验收](agent-evaluation.md)。它独立于 pytest、协议体验及部署验收，不会在普通 CI 中自动消耗模型额度。
+真实模型验收使用 `scripts/evaluate_agent.py` 与虚构任务集，检查工具选择、必要资料、范围和完整导出，并保存原始事件、回答及机械判据。运行方法、人工评分与限制见[Agent 行为验收](agent-evaluation.md)。它独立于 pytest、协议体验及部署验收，不会在普通 CI 中自动消耗模型额度。

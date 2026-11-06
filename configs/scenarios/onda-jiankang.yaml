@@ -1,0 +1,34 @@
+name: onda-jiankang
+version: 0.2.0
+scenario: 传统身心文化参考
+summary: 解释实际五行权重与传统对应，区分文化观点和健康信息，保持非诊断非治疗边界
+consultation:
+  kind: topic
+  topics:
+  - health_culture
+  scope: current_question
+  time_selection: shared
+  safety_policy: consultation_boundaries_v1
+triggers:
+- 传统健康文化
+- 五行健康标签
+- 中医文化
+engine_tools:
+- analyze_destiny
+- bazi_health
+- timing_analysis
+dependencies:
+- kind: shared_support
+  tools:
+  - knowledge_registry
+  - knowledge_read
+  condition: 需要查证内置传统知识或来源时；不自动新增个人计算
+required_inputs: []
+input_notes:
+- 按当前问题与所选工具实际 Schema 核对必要资料；不是完整问卷
+- 主题、对象与时间范围沿用当前聊天，限定方法优先，缺项仅限制对应层
+output:
+  kind: interpretation
+  grounding: engine_fields
+boundary: 传统文化参考；禁止生死寿命、重大灾祸断言、临床诊断治疗与医疗择时；多工具不扩大本轮范围。
+license: Apache-2.0
