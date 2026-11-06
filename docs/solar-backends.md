@@ -35,7 +35,7 @@ export FATEBRIDGE_SOLAR_TERM_MODEL=swiss
 
 每个交点仍返回实际旗标、TT 括区和观测到的行星／月球文件身份；环境回执的 `analytical_fallback_allowed=false` 仅描述选择政策。能使用文件不自动证明任意年份或全部交点达到一秒；数值验收必须同时绑定所用文件、参考和样本。依据为 [Swiss 请求与实际返回模型的区别](https://www.astro.com/swisseph/swephprg.htm)。
 
-当前数值门槛为与固定 DE440 参考比较的1秒 TT，参考输入与原数值见 [96点当前参考](../tests/data/solar/de440-guard-tt.json)。原版 Swiss Moshier 同一队列的12项失败继续单列；FateBridge完整修订按独立身份验收，不将旧模型失败改判。
+当前数值门槛为与固定 DE440 参考比较的1秒 TT，参考输入与原数值见 96点当前参考（本地 `tests/data/solar/de440-guard-tt.json`）。原版 Swiss Moshier 同一队列的12项失败继续单列；FateBridge完整修订按独立身份验收，不将旧模型失败改判。
 
 当前原生求根使用 `native_swiss_tt_solar_bisection_v2`：返回首个达到或越过目标太阳黄经的可表示 TT 浮点点，其前一浮点点仍在交点之前，策略为 `first_post_crossing_tt_float`。这是同一太阳模型数值方程的边界取点约定，不修正星历系数，也不把浮点分辨率当作物理精度。实现见 [`almanac.py`](../src/fatebridge/core/almanac.py)，当前前后侧验证见 [`test_native_solar_crossing_side.py`](../tests/integration/test_ci_regressions.py)。
 

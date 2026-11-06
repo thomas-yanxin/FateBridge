@@ -188,7 +188,7 @@ MCP 使用同名工具及相同业务参数。首次按工具公开的 `natal/ca
 
 另用 [NASA/JPL Horizons](https://ssd.jpl.nasa.gov/horizons/manual.html) 的地心视黄经冻结数据独立对照七个物理天体、三个 UTC 时刻；不使用 FateBridge 或 Swiss 产生参考答案。精确有理数测试覆盖星宿、足、D1／D9／D10 分界及主次运公式，独立几何公式另核对上升。验收范围、发现的缺陷和原书例 50 的日期分歧见独立算法审计。
 
-`india.ashtakavarga`按具名Rao2000规则为每张返回分盘提供PAV（逐贡献者二元表）、BAV（八个贡献者计数）及SAV（七曜BAV合计）。1按该作者称rekha，SAV不合计上升目标表，上升仍作为贡献者。分盘沿用各自声明的构造方法及来源，不能写成整部Rao原书已验收。生时变体位于`india.birth_time_sensitivity.ashtakavarga_variants`，按每个样本自己的星座保留完整计数；样本数不是概率。另保留[Rao原书的D10与BAV／SAV转录](../tests/data/astro/source_materials/jyotish-ashtakavarga-primary-supplement.json)作为来源资料；保留资料本身不增加已完成的验证样本数。
+`india.ashtakavarga`按具名Rao2000规则为每张返回分盘提供PAV（逐贡献者二元表）、BAV（八个贡献者计数）及SAV（七曜BAV合计）。1按该作者称rekha，SAV不合计上升目标表，上升仍作为贡献者。分盘沿用各自声明的构造方法及来源，不能写成整部Rao原书已验收。生时变体位于`india.birth_time_sensitivity.ashtakavarga_variants`，按每个样本自己的星座保留完整计数；样本数不是概率。另保留Rao原书的D10与BAV／SAV转录（本地 `tests/data/astro/source_materials/jyotish-ashtakavarga-primary-supplement.json`）作为来源资料；保留资料本身不增加已完成的验证样本数。
 
 一手参考准备在实现前已冻结768个规则单元和89组软件数值；未削减计数的验收见接入审计。读取任务视图`evidence_views.ashtakavarga`提供的fields即可；视图名不是输入参数。
 

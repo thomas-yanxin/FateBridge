@@ -6,7 +6,7 @@
 
 计算验证、原典解释、来源身份和现实预测分别报告。当前没有可用于认证现实预测的数据，完整原典、完整线义及出版方全部软件约定也未验收。内部算术一致或测试通过不能代替这些证据。
 
-[公开教学来源索引](../tests/data/human_design/source_materials/public-teaching-index.json)保留出处、取得日期及具体未决范围；索引不是全文校勘。近太阳的[原17时刻调查输入](../tests/data/human_design/source_materials/horizons-investigation-inputs.json)保留当时暴露的3.803758角秒天王星差异；当前同源共同框架参考另行核对，不把旧输出作为当前预期答案。
+公开教学来源索引（本地 `tests/data/human_design/source_materials/public-teaching-index.json`）保留出处、取得日期及具体未决范围；索引不是全文校勘。近太阳的原17时刻调查输入（本地 `tests/data/human_design/source_materials/horizons-investigation-inputs.json`）保留当时暴露的3.803758角秒天王星差异；当前同源共同框架参考另行核对，不把旧输出作为当前预期答案。
 
 ## 计算口径
 
@@ -26,7 +26,7 @@ JPL原始文件头范围是TDB，返回`range_time_scale=TDB`及`start_julian_da
 
 数字时区按十进制小时解释并舍入至最近微秒（中点取偶）；ISO小数小时／分钟保持自身单位。周期参考最多6位秒小数，使用精确民用标签及已声明时标关系比较先后，不能先转换成相同double TT再决定先后。微秒标签不认证微秒物理精度。
 
-独立SOFA参考保留233个历史UTC时刻、81个闰秒邻点，以及全部135个分数偏移闰秒输入、126个ISO约分形式和24个十进制偏移输入。时间换算门槛为0.2毫秒；资料在[当前参考目录](../tests/data/human_design/)及[SOFA历史UTC向量](../tests/fixtures/historical-utc-sofa.json)。这些是时标算术检验，不能认证星体坐标或真实地方钟。
+独立SOFA参考保留233个历史UTC时刻、81个闰秒邻点，以及全部135个分数偏移闰秒输入、126个ISO约分形式和24个十进制偏移输入。时间换算门槛为0.2毫秒；资料在当前参考目录（本地 `tests/data/human_design/`）及SOFA历史UTC向量（本地 `tests/fixtures/historical-utc-sofa.json`）。这些是时标算术检验，不能认证星体坐标或真实地方钟。
 
 ### 设计太阳弧与精确分类
 
@@ -40,13 +40,13 @@ JPL原始文件头范围是TDB，返回`range_time_scale=TDB`及`start_julian_da
 
 `ephemeris_backend_comparison`实际用对照后端重算26项激活并独立求出自身设计根。两盘的设计TT可不同，因此差值包含求根位移，不能当成同一TT的位置误差。`reference_chart`保留参考坐标、旗标、时标和结构；主盘不被替换。所选天体已为Moshier时返回`same_backend_not_independent`；对照不可用不能记成零差。
 
-[预声明天文计划](../tests/fixtures/human-design-astronomy-plan.json)保留1800–2399年的122个出生TT。[独立DE440生成器](../scripts/human_design/gen_human_design_astronomy_reference.py)不导入FateBridge或Swiss，分别求122个设计根，两时刻十个物理目标共2,440位置。[原参考](../tests/fixtures/human-design-astronomy-de440.json)及[18个Horizons锚点](../tests/fixtures/human-design-astronomy-horizons.json)保留原数值与出处。
+预声明天文计划（本地 `tests/fixtures/human-design-astronomy-plan.json`）保留1800–2399年的122个出生TT。[独立DE440生成器](../scripts/human_design/gen_human_design_astronomy_reference.py)不导入FateBridge或Swiss，分别求122个设计根，两时刻十个物理目标共2,440位置。原参考（本地 `tests/fixtures/human-design-astronomy-de440.json`）及18个Horizons锚点（本地 `tests/fixtures/human-design-astronomy-horizons.json`）保留原数值与出处。
 
 原门槛是同TT位置2角秒、设计根5秒。当前Swiss文件后端通过这批2,440位置及122根；Moshier保留228项位置超差、1项跨线、8项Color、22项Tone及77项Base差异。Moshier设计根通过5秒不弥补其它天体位置超差。该有限样本不建立全时域或临界细分误差界。
 
-[扩展季节参考](../tests/fixtures/human-design-calendar-span-de440.json)保留1,200对双时刻。其方向检查对全部48,000个后端位置运行当前算法，节点参考另覆盖2,400个时刻及原122个控制。门槛仍分别为物理位置2角秒、节点1角秒、根5秒；不能仅据相同返回旗标宣布通过。
+扩展季节参考（本地 `tests/fixtures/human-design-calendar-span-de440.json`）保留1,200对双时刻。其方向检查对全部48,000个后端位置运行当前算法，节点参考另覆盖2,400个时刻及原122个控制。门槛仍分别为物理位置2角秒、节点1角秒、根5秒；不能仅据相同返回旗标宣布通过。
 
-[太阳附近诊断](../tests/data/human_design/calendar_horizons/)和[ICRF诊断](../tests/data/human_design/icrf_horizons/)各保留17个TT下太阳与天王星的34个位置，直接绑定原NASA请求、响应和DE440参考。当前采样保留超过2角秒的绝对位置／完整方向差异。无光偏折及共同框架对照用来定位约定差异，不替换原绝对坐标，也不将一维黄经吻合改称三维方向通过。
+太阳附近诊断（本地 `tests/data/human_design/calendar_horizons/`）和ICRF诊断（本地 `tests/data/human_design/icrf_horizons/`）各保留17个TT下太阳与天王星的34个位置，直接绑定原NASA请求、响应和DE440参考。当前采样保留超过2角秒的绝对位置／完整方向差异。无光偏折及共同框架对照用来定位约定差异，不替换原绝对坐标，也不将一维黄经吻合改称三维方向通过。
 
 ### 数据安装与计算期间的一致性
 
@@ -83,7 +83,7 @@ uv run --locked --extra dev python -m fatebridge.fetch_ephe --profile human_desi
 
 58.5保留2001表与2002通讯假设的条件比较；两张已观察官方PDF的下降标记不删除，也未据未经认证的通讯切换默认极性。该分支的historical指真实来源年代，不是退役软件兼容。
 
-[当前原始PDF索引](../tests/data/human_design/primary-source-index.json)保留当前目录／观察表直接引用的234份唯一PDF字节。索引和出处使材料可检查，不自动认证作者、图上符号含义或未公开原典。
+当前原始PDF索引（本地 `tests/data/human_design/primary-source-index.json`）保留当前目录／观察表直接引用的234份唯一PDF字节。索引和出处使材料可检查，不自动认证作者、图上符号含义或未公开原典。
 
 ## 可选行星周期交会
 

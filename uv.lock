@@ -988,7 +988,7 @@ requires-dist = [
     { name = "pyerfa", marker = "extra == 'jpl'", specifier = ">=2.0.1.5,<3" },
     { name = "pygeomag", specifier = "==1.1.0" },
     { name = "pyswisseph", specifier = ">=2.10.0" },
-    { name = "pytest", marker = "extra == 'dev'", specifier = ">=7.0.0" },
+    { name = "pytest", marker = "extra == 'dev'", specifier = ">=7.1.0" },
     { name = "pytest-asyncio", marker = "extra == 'dev'", specifier = ">=0.21.0" },
     { name = "pytest-xdist", marker = "extra == 'dev'", specifier = ">=3.6.1" },
     { name = "python-dateutil", specifier = ">=2.8.0" },

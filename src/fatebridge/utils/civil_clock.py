@@ -16,13 +16,18 @@ def parse_iso_datetime(value: str) -> datetime:
     """Preserve the UTC offset when reading an ISO datetime.
 
     CPython gh-152079 drops a fractional offset whose whole-second part is
-    zero. Validate with the existing parser first, then restore that component
-    from its text. Other accepted forms and exceptions retain stdlib behavior;
-    runtimes that already preserve the component need no correction.
+    zero. Normalize that offset to six fractional digits for Python 3.10,
+    validate with the stdlib parser, then restore the component from its text.
+    Naive clocks retain their original parsing and timezone behavior.
     """
-    parsed = datetime.fromisoformat(value)
+    match = _SUBSECOND_ZERO_OFFSET.search(value)
+    parser_value = value
+    if match is not None and match.start() > 10:
+        parser_value = (
+            value[: match.start()] + match[1] + "00:00:00." + match[2][:6].ljust(6, "0")
+        )
+    parsed = datetime.fromisoformat(parser_value)
     if parsed.utcoffset() == timedelta(0):
-        match = _SUBSECOND_ZERO_OFFSET.search(value)
         if match is not None:
             sign, fraction = match.groups()
             # Match datetime's microsecond resolution and truncation policy.

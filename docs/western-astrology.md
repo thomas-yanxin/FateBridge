@@ -14,7 +14,7 @@
 
 `calendar_conversion` 保留原历法、原日期、原钟时及换算后的本地日期；`analysis_context.input_calendar/input_date` 同样保留原标签，`question_datetime/candidate_datetime` 为内部格里历本地钟时。儒略历1700年2月29日合法，换算为格里历3月11日；格里历同名闰日仍拒绝。输入年采用公元1月至12月编号，不推断英国旧式3月25日换年或双年份。转换超出Python公元1–9999年范围时明确拒绝。`date_label_jdn` 是日期标签的整数日编号，不能当成实际UTC／UT1／TT历元。原典钟时、地方平太阳时／视太阳时及地区改历仍须另核，见历法入口与历史例题诊断。
 
-卜卦的 `question_clock_basis`、择日的 `candidate_clock_basis` 可显式选择 `civil`、`local_mean_solar`、`local_apparent_solar`。默认 `civil` 沿用民用时区；`timezone_name` 省略／null时采用API默认 `+08:00`，回执标明 `legacy_api_default`，不能把它当成已确认地点时区。太阳时必须省略／null时区，避免重复修正。按 [USNO钟时定义](https://aa.usno.navy.mil/faq/eqtime)和[Swiss接口9.4节](https://www.astro.com/swisseph/swephprg.htm)，平太阳时为UT1加东经时差，视太阳时再加均时差（LAT−LMT）；后者按地心视太阳反解，未复原具体日晷的站心、折射或读数误差。原始[JPL请求与响应、接口定义](../tests/data/astro/source_materials/source-files.json)作为来源资料保留，不作为新增观测样本。
+卜卦的 `question_clock_basis`、择日的 `candidate_clock_basis` 可显式选择 `civil`、`local_mean_solar`、`local_apparent_solar`。默认 `civil` 沿用民用时区；`timezone_name` 省略／null时采用API默认 `+08:00`，回执标明 `legacy_api_default`，不能把它当成已确认地点时区。太阳时必须省略／null时区，避免重复修正。按 [USNO钟时定义](https://aa.usno.navy.mil/faq/eqtime)和[Swiss接口9.4节](https://www.astro.com/swisseph/swephprg.htm)，平太阳时为UT1加东经时差，视太阳时再加均时差（LAT−LMT）；后者按地心视太阳反解，未复原具体日晷的站心、折射或读数误差。原始JPL请求与响应、接口定义（本地 `tests/data/astro/source_materials/source-files.json`）作为来源资料保留，不作为新增观测样本。
 
 日期规范化完成后再解析声明的钟时。`clock_conversion` 与公开 `clock_input` 字段卡分别保留原钟面、钟时口径、有效民用时区、UTC命名载体及实际TT／UT1；`question_datetime/candidate_datetime` 仍是规范化后的输入钟面，须连同 `analysis_context.input_clock_basis` 解释，太阳时的 `analysis_context.timezone=null`，内部载体时区在 `chart_timezone`。1960年前的UTC命名载体承载模型UT1，不能据名称宣称当时已有原子UTC。太阳时反解复用共享引擎，未改变普通现代输入的物理时刻；钟时数值残差不认证原始分钟记录的准确度。原书未说明的钟时保持未知，不能按上升点或结局拟合。见显式事件钟时核验。
 
@@ -28,7 +28,7 @@
 
 行星使用 `swe.calc(TT)`，宫位和地平坐标默认使用 Swiss ΔT 模型反解的 UT1。卜卦／择日可显式选择下述 IERS20 C04 UT1；其他入口及未指定选项的默认路径仍使用模型。`chart_profile` 返回 `calendar/time_scale/julian_day_tt/julian_day_ut1/horizon_method/sect_convention`。实际星历文件模型仍看 `ephemeris_model`，不能只看是否安装了包。[Swiss Ephemeris 官方接口文档](https://www.astro.com/swisseph/swephprg.htm)区分这些时间尺度与 `azalt` 的真实／折射高度。
 
-跨年代位置还依赖对应的`sepl`／`semo`分段。可用现有下载器按固定清单补齐公元1–9999年的34份日月／行星分段，再用`SE_EPHE_PATH`显式选择；这不包括小行星、EOP或未来钟时认证。覆盖与位置专项在同一133个TT时刻、266组日月参考中保留补全前的49项超线和184项不可计算；补全后主机与ARM Linux均符合原0.02角秒线，最大差异约0.00217角秒。参考与数据共享DE441谱系，不是独立动力学或全历元绝对精度证明。当前参考在[日月覆盖向量](../tests/data/astro/ephemeris_coverage/)、[TT事件](../tests/data/astro/tt_events/)及[共同框架](../tests/data/astro/tt_common_frame/)；普通本命统一来源看`chart_profile.ephemeris_model`；`planetary_models`仅在混合／近似分支出现，详细物理来源也按入口条件交付，不能请求不存在于本次结果的条件字段。共享输入中的非默认`ephemeris_policy`目前只对印占开放。
+跨年代位置还依赖对应的`sepl`／`semo`分段。可用现有下载器按固定清单补齐公元1–9999年的34份日月／行星分段，再用`SE_EPHE_PATH`显式选择；这不包括小行星、EOP或未来钟时认证。覆盖与位置专项在同一133个TT时刻、266组日月参考中保留补全前的49项超线和184项不可计算；补全后主机与ARM Linux均符合原0.02角秒线，最大差异约0.00217角秒。参考与数据共享DE441谱系，不是独立动力学或全历元绝对精度证明。当前参考在日月覆盖向量（本地 `tests/data/astro/ephemeris_coverage/`）、TT事件（本地 `tests/data/astro/tt_events/`）及共同框架（本地 `tests/data/astro/tt_common_frame/`）；普通本命统一来源看`chart_profile.ephemeris_model`；`planetary_models`仅在混合／近似分支出现，详细物理来源也按入口条件交付，不能请求不存在于本次结果的条件字段。共享输入中的非默认`ephemeris_policy`目前只对印占开放。
 
 独立安装版还须核对实际默认发现，不能用仓库已有历表替代安装验收。2026-10-25已将固定清单的34份分段发布到本机用户缓存；未设`SE_EPHE_PATH`的新安装进程可自动发现，常驻进程未重启。相同266组参考由补齐前6组符合原判定线、76组超线、184组不可计算，改善为266组符合；这是默认数据配置的修复，不增加独立天文样本或现实预测证据，见安装版默认历表核验。
 
@@ -157,7 +157,7 @@ uv run --locked --extra dev python -m scripts.western.audit_western_relationship
 
 修复前审计保留原始失败证据：ASC／上子午线交点84/126组满足固定容差；13宫制共1638组中1068组满足容差、72组方法无定义、498组存在差异。旋转基准修复后的完整审计为126/126组轴满足同一容差，宫头1488组满足、72组无定义、78组仍有差异。全部样本及预先固定的阈值均保留；完整审计仍返回非零。无定义和 Astrolog 的替代宫制不计为数值通过，剩余差异涉及其十次固定迭代的 Placidus、极区宫头和MC分支，尚不能全部归因于某一实现。
 
-修复前最大ASC差约74.50角秒，上子午线MC约1.98角秒。[Swiss 2.10.03源码](https://github.com/aloistr/swisseph/blob/v2.10.03/swephlib.c)及[官方说明6.1节](https://www.astro.com/swisseph/swisseph.htm)表明原生恒星时在1850／2050年转换长期表达式。现在按 [IERS Table 5.2e](https://iers-conventions.obspm.fr/content/chapter5/additional_info/tab5.2e.txt)实现ERA、多项式、章动及34项补充项（保留[原表转录](../tests/data/astro/source_materials/western-iers2010-series.json)作为来源资料），沿用当前Swiss章动和平均黄赤交角。在J2000前后两个儒略世纪采用此表达式，1850–2050的原生路径保持；外侧保留Swiss长期变化并在相应边界作常量相位对齐。窗口位置及对齐常量为FateBridge策略，不能说成IERS规定的精度保证；远古／远未来绝对精度和导数连续性尚未认证。
+修复前最大ASC差约74.50角秒，上子午线MC约1.98角秒。[Swiss 2.10.03源码](https://github.com/aloistr/swisseph/blob/v2.10.03/swephlib.c)及[官方说明6.1节](https://www.astro.com/swisseph/swisseph.htm)表明原生恒星时在1850／2050年转换长期表达式。现在按 [IERS Table 5.2e](https://iers-conventions.obspm.fr/content/chapter5/additional_info/tab5.2e.txt)实现ERA、多项式、章动及34项补充项（原表转录作为本地来源资料保存在 `tests/data/astro/source_materials/western-iers2010-series.json`），沿用当前Swiss章动和平均黄赤交角。在J2000前后两个儒略世纪采用此表达式，1850–2050的原生路径保持；外侧保留Swiss长期变化并在相应边界作常量相位对齐。窗口位置及对齐常量为FateBridge策略，不能说成IERS规定的精度保证；远古／远未来绝对精度和导数连续性尚未认证。
 
 适配仅使用公开Python接口：根据“地方恒星时＝格林尼治恒星时＋经度”对传给底层几何的经度参考架作旋转，公开出生地经纬度保持原值。宫位、地平坐标和日出事件由同一共享入口处理；事件在返回时刻迭代相位，未收敛时报错，并恢复观察者状态。运行时不依赖ERFA或NumPy，也不使用部分Windows轮包未导出的私有C函数。Windows检查目前限于轮包导出表，尚无真实Windows执行证据。
 
@@ -336,7 +336,7 @@ uv run --locked --extra dev python -m scripts.western.audit_western_horary_motio
 
 `fixed_stars` 使用20颗已明确识别恒星的 [CDS SIMBAD 天体测量记录](https://simbad.cds.unistra.fr/Pages/guide/sim-url.htx)，每颗的ICRS J2000坐标、自行、视差、径向速度、文献及采集回执存于[随包来源表](../src/fatebridge/data/western_stars/sources.json)。这是现代观测资料，不重建古代观测星表。Swiss原生视位置按本次TT传播；[官方固定恒星接口](https://www.astro.com/swisseph/swephprg.htm)说明该计算包含自行、岁差、章动、光行差和视差。回归盘使用日期真黄道，恒星盘使用原生Lahiri位置，恒星与盘内因素必须处于同一坐标基准。
 
-恒星位置采用当前SIMBAD输入及原生视位置。预声明的[协议](../tests/fixtures/western-fixed-star-protocol.json)采用1角秒线，20颗星乘6个1900–2099年TT历元，共120个位置；[独立ERFA参考](../tests/fixtures/western-fixed-stars-erfa.json)共享星表输入，但不共享数值算法或地球状态。该队列检验坐标与来源关系，不认证观测绝对精度或全部年代。朴素线性岁差近似及其比较已退役，不能代替当前误差线。
+恒星位置采用当前SIMBAD输入及原生视位置。预声明的协议（本地 `tests/fixtures/western-fixed-star-protocol.json`）采用1角秒线，20颗星乘6个1900–2099年TT历元，共120个位置；独立ERFA参考（本地 `tests/fixtures/western-fixed-stars-erfa.json`）共享星表输入，但不共享数值算法或地球状态。该队列检验坐标与来源关系，不认证观测绝对精度或全部年代。朴素线性岁差近似及其比较已退役，不能代替当前误差线。
 
 `chart_profile.fixed_stars` 返回星表指纹、TT、黄道、模型版本及状态。星表单独随包分发，调用不依赖可选完整 `sefstars.txt`；缓存和操作员路径在共享锁下隔离。恒星函数可返回SWIEPH请求标志，而地球状态实际回退Moshier，故保留恒星标志并另测、另列 `earth_ephemeris_model`，不由请求标志认证精度。状态为 `unavailable` 时文本明确显示“未计算”，空列表不能被解释成没有合相。
 

@@ -46,7 +46,7 @@ pytest 使用 `importlib` 导入模式，允许不同领域的同名模块一起
 
 私有结果存储夹具和同次分页重建在 [support/result_delivery.py](support/result_delivery.py) 维护；MCP 分页与收据比较统一使用 [fixtures/mcp_result_delivery.py](fixtures/mcp_result_delivery.py)，首次响应的预算与业务可见性仍由对应断言核对。领域测试直接导入公共辅助，业务公式和独立断言继续留在所属测试中。
 
-西占角度边界的独立 Decimal 参考在 [support/western_angular_reference.py](support/western_angular_reference.py)，测试与审计命令共用它；参考不导入生产几何公式。法达默认日期的历史完整参考在 [fixtures/firdaria-default-regression.json](fixtures/firdaria-default-regression.json)，随文件记录原提交和来源散列，维护时不从当前输出重生期望值。
+西占角度边界的独立 Decimal 参考在 [support/western_angular_reference.py](support/western_angular_reference.py)，测试与审计命令共用它；参考不导入生产几何公式。法达默认日期的历史完整参考保存在本地 `tests/fixtures/firdaria-default-regression.json`，随文件记录原提交和来源散列，维护时不从当前输出重生期望值。
 
 六壬与金口诀当前锚点请求维护在 [fixtures/ren_anchors.py](fixtures/ren_anchors.py)，完整服务调用复用 [support/ren_anchors.py](support/ren_anchors.py)。原冻结资料继续保存故障构造和原始请求；现行三式请求仅去掉已退役的太乙 `accNum=0`，六壬时刻、地点、来源配置和全部故障条件保持原值。
 

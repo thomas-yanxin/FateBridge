@@ -49,7 +49,7 @@ def rest_spec(spec):
 
 def call_cli(spec, payload, tmp_path, capsys, flags=()):
     subject = tmp_path / "subject.json"
-    subject.write_text(json.dumps(payload, ensure_ascii=False))
+    subject.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
     prefix = ["--no-metadata"] if "--no-metadata" in flags else []
     flags = [flag for flag in flags if flag != "--no-metadata"]
     code = cli_run(
@@ -238,7 +238,7 @@ def three_surfaces(spec, payload, fields, as_of, tmp_path, monkeypatch, capsys):
 
     protocol = asyncio.run(native())
     request = tmp_path / "request.json"
-    request.write_text(json.dumps(payload, ensure_ascii=False))
+    request.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
     capsys.readouterr()
     code = cli_run(
         [
@@ -270,7 +270,8 @@ def three_surfaces(spec, payload, fields, as_of, tmp_path, monkeypatch, capsys):
         (tmp_path / f"{label}.json").write_text(
             json.dumps(
                 body, ensure_ascii=False, sort_keys=True, indent=2, allow_nan=False
-            )
+            ),
+            encoding="utf-8",
         )
         body = dict(body)
         body.pop("run_metadata")

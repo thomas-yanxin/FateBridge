@@ -10,6 +10,21 @@ from pathlib import Path
 import pytest
 
 
+def test_repository_helpers_precede_dependency_tests_module(tmp_path):
+    (tmp_path / "tests.py").write_text(
+        "raise AssertionError('dependency tests module imported')\n", encoding="utf-8"
+    )
+    result = subprocess.run(
+        [sys.executable, "-c", "import tests.support; import tests.fixtures"],
+        cwd=Path(__file__).resolve().parents[2],
+        env={**os.environ, "PYTHONPATH": str(tmp_path)},
+        capture_output=True,
+        text=True,
+        timeout=30,
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
 def test_shards_cover_every_eligible_node_once(tmp_path):
     source = tmp_path / "test_cases.py"
     source.write_text(

@@ -1,6 +1,6 @@
 """Fractional ISO offsets must not move a casting across the late-Zi boundary."""
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import pytest
 
@@ -8,6 +8,7 @@ from fatebridge.core.local_techniques.chart import (
     _build_metaphysics_seed,
     parse_local_datetime,
 )
+from fatebridge.utils.civil_clock import parse_iso_datetime
 from tests.support.transports import SPECS, business, rest, surface_calls
 
 CASES = [
@@ -24,6 +25,33 @@ CASES = [
         "庚子",
     ),
 ]
+
+
+@pytest.mark.parametrize(
+    "suffix,microseconds",
+    [
+        ("+00:00:00.5", 500000),
+        ("-00:00:00.5", -500000),
+        ("+00:00:00.000001", 1),
+        ("+00:00:00.1234567", 123456),
+        ("+00:00:00.0", 0),
+    ],
+)
+def test_fractional_zero_offsets_keep_microseconds_on_supported_python_versions(
+    suffix, microseconds
+):
+    moment = parse_iso_datetime("2026-11-03T23:00:00" + suffix)
+    assert moment.utcoffset() == timedelta(microseconds=microseconds)
+    assert moment.replace(tzinfo=None) == datetime(2026, 11, 3, 23)
+
+
+@pytest.mark.parametrize(
+    "clock", ["2000-01-01T00:00:00.000360", "2000-01-01+00.000360"]
+)
+def test_naive_fractional_clock_is_not_promoted_to_an_offset(clock):
+    moment = parse_iso_datetime(clock)
+    assert moment == datetime(2000, 1, 1, microsecond=360)
+    assert moment.tzinfo is None
 
 
 @pytest.mark.parametrize("clock,expected_clock,day,hour", CASES)
