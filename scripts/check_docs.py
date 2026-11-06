@@ -124,7 +124,6 @@ def markdown_paths() -> list[Path]:
         for path in (ROOT / "scripts/README.md", ROOT / "tests/README.md")
         if path.is_file()
     )
-    paths.update((ROOT / "configs").rglob("*.md"))
     for current, directories, files in os.walk(ROOT / "docs", followlinks=False):
         directories[:] = [
             name

@@ -1,14 +1,12 @@
-"""Scenario generation, native transport replay and isolation contracts."""
+"""Catalog discovery, native transport replay and isolation contracts."""
 
 import asyncio
 import json
-import os
 import subprocess
 import sys
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import replace
 from datetime import timezone
-from pathlib import Path
 from threading import Barrier
 
 import pytest
@@ -21,16 +19,10 @@ import fatebridge.api as api
 import fatebridge.mcp_server as mcp
 from fatebridge.application.discovery import discover_specs
 from fatebridge.application.execution import execute_tool
-from fatebridge.application.scenarios import (
-    definitions,
-    discover_scenarios,
-    scenario_keys,
-)
 from fatebridge.application.tool_spec import ToolSpec
 from fatebridge.core.execution_context import ExecutionOptions, current_datetime
 from fatebridge.core.reproducibility import ReproducibilityPolicy
 from fatebridge.services.tool_catalog import CATALOG
-from scripts.build_scenario_manifest import build_manifest
 from tests.fixtures.surface_payloads import REST_POST_CASES
 
 BIRTH = REST_POST_CASES["/api/cn/bazi/birth"]()
@@ -88,133 +80,46 @@ def business(payload):
     return {key: value for key, value in payload.items() if key != "run_metadata"}
 
 
-def test_generated_scenarios_are_current_and_join_live_catalog():
-    assert definitions() == build_manifest()
-    full = discover_scenarios(CATALOG)
-    interfaces = list(
-        (Path(__file__).resolve().parents[2] / "configs/scenarios").glob("*.yaml")
-    )
-    assert len(full["scenarios"]) == len(interfaces) + 1
-    keys = {spec.key for spec in CATALOG}
-    for record in full["scenarios"]:
-        assert record["availability"]["complete"]
-        declared = {tool["key"] for tool in record["tools"]}
-        assert declared <= keys
-        for route in record["routing"]:
-            for group in route["evidence"]:
-                assert group["available"]
-                assert set(group["alternatives"]) <= declared
-                assert group["role"] in {"primary", "supporting", "deep"}
-    pair = scenario_keys(CATALOG, "onda-yuanfen")
-    assert {"astro_relative", "astro_relative_chart"} <= pair
-
-
-@pytest.mark.parametrize("detail", ["summary", "full"])
-@pytest.mark.parametrize(
-    "scenario", ["onda-shiyun", "onda-fengshui", "onda-caiwu", "onda-zige"]
-)
-def test_scenario_manifest_parity_across_three_interfaces(rest, detail, scenario):
-    params = {"scenario": scenario, "surface": "mcp", "detail": detail}
-    http = rest.get("/api/scenarios", params=params)
+@pytest.mark.parametrize("family", ["bazi", "fengshui"])
+def test_family_discovery_matches_rest_cli_and_mcp(rest, family):
+    params = {"family": family, "surface": "mcp", "detail": "summary"}
+    http = rest.get("/api/tools", params=params)
     code, output = cli(
-        "scenarios",
+        "discover",
         {},
-        flags=["--scenario", scenario, "--surface", "mcp", "--detail", detail],
+        flags=["--family", family, "--surface", "mcp", "--detail", "summary"],
     )
 
     async def read():
-        async with Client(mcp.app) as client:
-            uri = (
-                "fatebridge://scenarios"
-                if detail == "summary"
-                else f"fatebridge://scenarios/{scenario}"
+        async with Client(mcp.create_mcp_app(families=family)) as client:
+            catalog = json.loads(
+                (await client.read_resource("fatebridge://catalog/summary"))[0].text
             )
-            return json.loads((await client.read_resource(uri))[0].text)
+            assert {tool.name for tool in await client.list_tools()} == {
+                record["tool"] for record in catalog["tools"]
+            }
+            return catalog
 
-    protocol = asyncio.run(read())
-    if detail == "summary":
-        protocol = {
-            **protocol,
-            "matched_count": 1,
-            "scenarios": [
-                record for record in protocol["scenarios"] if record["id"] == scenario
-            ],
-        }
     assert http.status_code == 200 and code == 0
-    assert http.json() == output == protocol
+    assert http.json() == output == asyncio.run(read())
+    assert all(record["family"] == family for record in output["tools"])
 
 
-def test_scenario_tool_filter_and_invalid_ids_are_explicit(rest):
-    params = {"scenario": "onda-xingpan", "surface": "mcp", "detail": "summary"}
-    code, output = cli(
-        "discover", {}, flags=["--scenario", "onda-xingpan", "--surface", "mcp"]
-    )
-    assert code == 0 and output == rest.get("/api/tools", params=params).json()
-    for endpoint, command in [
-        ("/api/tools", "discover"),
-        ("/api/scenarios", "scenarios"),
-    ]:
-        response = rest.get(endpoint, params={"scenario": "onda-xingpan,typo"})
-        code, error = cli(command, {}, flags=["--scenario", "onda-xingpan,typo"])
-        assert response.status_code == 422 and code == 1
-        assert error["issues"] == response.json()["issues"]
-        assert error["issues"][0]["code"] == "unknown_scenario"
+def test_retired_scenario_entrypoints_are_absent(rest):
+    assert rest.get("/api/scenarios").status_code == 404
+    assert cli("scenarios", {})[0] == 2
 
-
-def test_mcp_scenario_profiles_and_family_intersection_do_not_invent_routes():
-    app = mcp.create_mcp_app(families="bazi", scenarios="onda-jiankang")
-    expected = {
-        spec.tool_name
-        for spec in CATALOG
-        if spec.key in scenario_keys(CATALOG, "onda-jiankang")
-        and spec.family == "bazi"
-        and spec.mcp_name
-    }
-
-    async def check():
-        async with Client(app) as client:
-            assert {tool.name for tool in await client.list_tools()} == expected
-            manifest = json.loads(
-                (await client.read_resource("fatebridge://scenarios/onda-jiankang"))[
-                    0
-                ].text
+    async def read():
+        async with Client(mcp.create_mcp_app()) as client:
+            templates = await client.list_resource_templates()
+            assert not any(
+                "scenarios" in item.model_dump(by_alias=True)["uriTemplate"]
+                for item in templates
             )
-            record = manifest["scenarios"][0]
-            assert not record["availability"]["complete"]
-            assert {tool["tool"] for tool in record["tools"]} == expected
-            assert any(
-                not group["available"]
-                for row in record["routing"]
-                for group in row["evidence"]
-            )
+            resources = await client.list_resources()
+            assert not any("scenarios" in str(item.uri) for item in resources)
 
-    asyncio.run(check())
-    with pytest.raises(ValueError):
-        mcp.create_mcp_app(scenarios="typo")
-
-
-@pytest.mark.parametrize("scenario", ["onda-jiankang", "onda-fengshui"])
-def test_actual_process_uses_mcp_scenario_configuration(scenario):
-    env = {
-        **os.environ,
-        "FATEBRIDGE_MCP_FAMILIES": "",
-        "FATEBRIDGE_MCP_SCENARIOS": scenario,
-    }
-    code = "import asyncio,json; from fatebridge.mcp_server import app; print(json.dumps([t.name for t in asyncio.run(app.list_tools(run_middleware=False))]))"
-    result = subprocess.run(
-        [sys.executable, "-c", code],
-        capture_output=True,
-        text=True,
-        env=env,
-        timeout=30,
-    )
-    assert result.returncode == 0
-    expected = {
-        spec.tool_name
-        for spec in CATALOG
-        if spec.mcp_name and spec.key in scenario_keys(CATALOG, scenario)
-    }
-    assert set(json.loads(result.stdout)) == expected
+    asyncio.run(read())
 
 
 @pytest.mark.parametrize(

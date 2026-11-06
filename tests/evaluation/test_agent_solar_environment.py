@@ -60,11 +60,7 @@ async def test_actual_mcp_uses_the_constructed_configuration(
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
     monkeypatch.delenv(SPK, raising=False)
-    settings = server_settings(
-        command_for(
-            "codex", ROOT, tmp_path, {"scenario": "onda-xingpan", "tool_scope": "topic"}
-        )
-    )
+    settings = server_settings(command_for("codex", ROOT, tmp_path, {}))
     prefix = "mcp_servers.fatebridge.env."
     env = {
         key[len(prefix) :]: value

@@ -24,9 +24,8 @@ Codex 负责理解问题、选择工具和解释结果，FateBridge 负责计算
 
 看到 `ok=true`，表示依赖版本检查、独立 stdio 进程初始化、工具发现、资源读取和一条虚构计算通过。进程在仓库之外的临时目录启动，能检查 GUI host 常见的工作目录问题。这个结果不证明所有工具、真实对话或远程部署都已验证。
 
-`codex.add_command` 给出使用当前解释器绝对路径的注册命令；`codex.cli` 记录 CLI 来源。桌面环境存在 `CODEX_CLI_PATH` 时优先使用桌面版自带 CLI，避免 PATH 中旧版 CLI 与账号可用模型不一致。诊断只输出配置，不修改 Codex 设置。`--scenario` 限制实际公开的工具，并展开场景声明的知识支撑、条件服务和组合主题依赖；这些工具按问题使用，不自动全部执行；`--family` 可以进一步筛选，二者取交集。没有筛选时检查全部 MCP 工具。无效分类和空交集返回失败，先修正筛选。
+`codex.add_command` 给出使用当前解释器绝对路径的注册命令；`codex.cli` 记录 CLI 来源。桌面环境存在 `CODEX_CLI_PATH` 时优先使用桌面版自带 CLI，避免 PATH 中旧版 CLI 与账号可用模型不一致。诊断只输出配置，不修改 Codex 设置。`--family` 限制 MCP 实际公开的工具分类；多个分类用逗号分隔，不筛选时检查全部工具。无效分类返回失败，先修正分类。
 
-普通安装检查可用 `fatebridge doctor`；它不启动 MCP，也不验证星历精度。下方配置默认公开全部工具，支持工具搜索的宿主可按需加载。需要较小的固定目录时，可明确选择 family 或现有场景；`--tool-scope topic` 还会缩小到场景直接工具与知识支撑，需同步设置 `FATEBRIDGE_MCP_TOOL_SCOPE=topic`。受限配置中的缺失分支以 `availability` 为准，不能解释为整个引擎不支持。配置含义见[核心概念](concepts.md)。
 
 ## 2. 注册到 Codex
 
@@ -35,8 +34,6 @@ Codex 负责理解问题、选择工具和解释结果，FateBridge 负责计算
 ```bash
 codex mcp add fatebridge \
   --env FATEBRIDGE_MCP_FAMILIES= \
-  --env FATEBRIDGE_MCP_SCENARIOS= \
-  --env FATEBRIDGE_MCP_TOOL_SCOPE=complete \
   -- "$PWD/.venv/bin/python" -m fatebridge.mcp_server
 codex mcp get fatebridge
 ```
@@ -52,15 +49,13 @@ tool_timeout_sec = 60
 
 [mcp_servers.fatebridge.env]
 FATEBRIDGE_MCP_FAMILIES = ""
-FATEBRIDGE_MCP_SCENARIOS = ""
-FATEBRIDGE_MCP_TOOL_SCOPE = "complete"
 ```
 
 Codex 使用 `[mcp_servers.fatebridge]`；其他 host 的 `mcpServers` JSON 不能直接粘进 TOML。stdio 服务由 Codex 启动，无需另外开一个终端运行，也不使用 `http://localhost:8010`。
 
 注册或调整范围后，在新聊天中检查 FateBridge 工具是否可见；CLI TUI 可用 `/mcp` 查看连接。这一步有自己的意义：`codex mcp get` 只证明配置存在，doctor 只证明 MCP 进程可用，都不等于当前聊天已加载。配置约定依据 [OpenAI 官方 MCP 文档](https://developers.openai.com/codex/mcp)。
 
-想公开全部工具时，清空两个筛选变量并重新启动连接；想查住宅风水时可以只设 `FATEBRIDGE_MCP_FAMILIES=fengshui` 并清空场景变量。更新已有配置中的同一条目即可。范围受限的连接不能调用隐藏工具，读取场景详情时检查 `availability`。
+想公开全部工具时，清空 `FATEBRIDGE_MCP_FAMILIES` 并重新启动连接；只需风水工具时设为 `fengshui`。更新已有配置中的同一条目即可。范围受限的连接只能调用当前目录公开的工具。
 
 ## 3. 完成第一次对话
 
@@ -78,7 +73,7 @@ Codex 使用 `[mcp_servers.fatebridge]`；其他 host 的 `mcpServers` JSON 不�
 
 1. 按所选计算核对当前用户已确认的资料；缺小时或只有时段时说明影响并简短追问，用户明确不知道后停止索取同项，转交可用范围。不能补零点、借用示例或沿用确定时刻的盘。可选精度和无关方法缺项不作为全局门槛。双人关系未说明类型时用 `general`，不能从性别推断婚姻。
 2. 按用户问题、指定方法、已确认资料与时间范围选择有价值的公开能力。已发布工具的参数 Schema 和描述够用时直接计算；描述包含经过验证的首轮 `fields` 建议。专项已自动推算的大运、流年不重复计算，也不手工覆盖。普通咨询无需先列资源、读完整输出契约或搜索仓库。
-3. 仅在选择不明确时读场景/目录；参数不清楚时读 `fatebridge://tools/{tool}/input`，需要更细字段时读完整工具契约。资源用于补足缺口，不是每轮必经步骤。
+3. 仅在选择不明确时读工具目录；参数不清楚时读 `fatebridge://tools/{tool}/input`，需要更细字段时读完整工具契约。资源用于补足缺口，不是每轮必经步骤。
 4. 冻结明确的分析日期，例如 `as_of="2026-10-12T04:00:00Z"` 对应上海中午 12 点；设置 `strict_fields=true`、`include_snapshot_text=false`，按问题取必要字段。明确的分析日期仍优先。
 5. 先检查 `isError`，再读取 `structuredContent`。保存原输入与 `run_metadata`；后续调用沿用前次 `trace_id`，用前次 `run_id` 作为 `parent_run_id`。不要把同一出生资料的多次计算当成独立证据。
 6. 先回答问题，再讲清依据的传统含义与本题的联系，区分可复算计算、有来源解释和现实建议。有充分依据的选项偏向应直接说明理由与条件，避免只有“不能替你决定”。用户要求深入时再扩展已有结果；同一主题边界无需反复重述。日期、时区、地点、太阳时及精度以实际返回为准。
@@ -97,14 +92,14 @@ Codex 使用 `[mcp_servers.fatebridge]`；其他 host 的 `mcpServers` JSON 不�
 
 独立形态可用 `methods=[]` 与 `form_observations`，无需生辰或罗盘；照片保留为候选。原始盘、布局关联、规则审查和动作可执行状态分别报告，已有判断先解释，搬动许可与物理可行性只约束落实动作。无规则或未实现的项目直接说明范围。
 
-MCP 场景 `onda-fengshui` 与 `fengshui` 分别供咨询和基础计算发现。完整输入、支持对象及规则版本见[家居风水](fengshui.md)，可运行输入见[示例索引](examples/README.md)。更正事实时重建受影响输入并沿用 trace / parent 关联；仅解释未改变的结果不重算。
+风水工具按 `family=fengshui` 发现。完整输入、支持对象及规则版本见[家居风水](fengshui.md)，可运行输入见[示例索引](examples/README.md)。更正事实时重建受影响输入并沿用 trace / parent 关联；仅解释未改变的结果不重算。
 
 ## 4. 当前聊天尚未加载 MCP 时直接用 CLI
 
 ```bash
 # 先按问题发现工具，再取输入契约；默认 describe full 还包含输出 Schema。
-.venv/bin/fatebridge discover --query 跳槽 --surface cli
-.venv/bin/fatebridge scenarios --scenario onda-shiye --detail full
+.venv/bin/fatebridge discover --q 事业 --surface cli
+.venv/bin/fatebridge discover --family bazi --surface mcp --detail summary
 .venv/bin/fatebridge describe bazi_career --detail input
 
 # 同一份虚构资料可以用于多次调用。
@@ -137,7 +132,7 @@ MCP 场景 `onda-fengshui` 与 `fengshui` 分别供咨询和基础计算发现�
 | 所选工具必需但缺少 `birth_hour` | 确认时刻；明确未知后按实际工具能力交付可答部分，不用默认时刻补齐 |
 | 日期无效、未知字段、投影拼错 | 按字段路径修正后重发；不要重复发送原请求 |
 | `dependency_missing` | 用 doctor 检查同一解释器，再核对具体后端/星历；不伪造成功结果 |
-| 工具或资源不可见 | 检查 family/scenario 交集与当前连接的 `tools/list` |
+| 工具或资源不可见 | 检查 family 配置与当前连接的 `tools/list` |
 | 有结果但近似 / `partial` | 按精度与 coverage 字段说明已算范围和缺失信息 |
 
 CLI 错误 JSON 写 stdout，日志写 stderr；0 成功、1 模型/计算失败、2 用法错误。MCP 工具错误使用原生 `isError`，资源错误使用资源协议错误。完整错误、投影与复现合同见 [Agent 接入指南](agent-guide.md)。
@@ -150,6 +145,6 @@ CLI 错误 JSON 写 stdout，日志写 stderr；0 成功、1 模型/计算失败
 uv run --locked --extra dev python scripts/experience_codex.py --output /tmp/fatebridge-experience
 ```
 
-脚本用虚构资料检查多种计算、输出 Schema、裁剪前后业务摘要、错误恢复和场景范围，输出报告及原始结果。它不启动另一位模型，也不修改 Codex 配置；实际 Codex 聊天的选工具与解读质量需在连接加载后另行观察。
+脚本用虚构资料检查多种计算、输出 Schema、裁剪前后业务摘要、错误恢复和 family 筛选，输出报告及原始结果。它不启动另一位模型，也不修改 Codex 配置；实际 Codex 聊天的选工具与解读质量需在连接加载后另行观察。
 
 真实模型验收使用 `scripts/evaluate_agent.py` 与虚构任务集，检查工具选择、必要资料、范围和完整导出，并保存原始事件、回答及机械判据。运行方法、人工评分与限制见[Agent 行为验收](agent-evaluation.md)。它独立于 pytest、协议体验及部署验收，不会在普通 CI 中自动消耗模型额度。

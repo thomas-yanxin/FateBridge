@@ -342,8 +342,6 @@ def stdio(tmp_path):
         cwd=str(root),
         env={
             "PYTHONPATH": str(root / "src"),
-            "FATEBRIDGE_MCP_SCENARIOS": "onda-zhanbu",
-            "FATEBRIDGE_MCP_TOOL_SCOPE": "topic",
         },
         log_file=tmp_path / "stdio.log",
     )

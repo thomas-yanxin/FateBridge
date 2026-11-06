@@ -534,8 +534,6 @@ async def test_actual_local_stdio_projection_and_field_resources_bind_without_mo
         env={
             "PYTHONPATH": str(ROOT / "src"),
             "FATEBRIDGE_EVALUATION_LOG": str(capture),
-            "FATEBRIDGE_MCP_SCENARIOS": "onda-zhanbu",
-            "FATEBRIDGE_MCP_TOOL_SCOPE": "complete",
         },
         log_file=tmp_path / "stderr.log",
     )

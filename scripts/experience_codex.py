@@ -57,15 +57,14 @@ async def exercise(output):
         "errors": [],
     }
     with tempfile.TemporaryDirectory(prefix="fatebridge-journey-") as cwd:
-        for label, scenario in [("all", ""), ("career", "onda-shiye")]:
+        for label, family in [("all", ""), ("bazi", "bazi")]:
             with (output / f"{label}-stderr.log").open("w") as log:
                 transport = StdioTransport(
                     command=sys.executable,
                     args=["-m", "fatebridge.mcp_server"],
                     cwd=cwd,
                     env={
-                        "FATEBRIDGE_MCP_FAMILIES": "",
-                        "FATEBRIDGE_MCP_SCENARIOS": scenario,
+                        "FATEBRIDGE_MCP_FAMILIES": family,
                     },
                     log_file=log,
                 )
@@ -87,12 +86,14 @@ async def exercise(output):
                             ).encode()
                         ),
                     }
-                    if label == "career":
-                        scenario_data = await client.read_resource(
-                            "fatebridge://scenarios/onda-shiye"
+                    if family:
+                        family_data = await client.read_resource(
+                            f"fatebridge://families/{family}"
                         )
-                        manifest = json.loads(scenario_data[0].text)
-                        assert manifest["scenarios"][0]["availability"]["complete"]
+                        manifest = json.loads(family_data[0].text)
+                        assert {tool["tool"] for tool in manifest["tools"]} == set(
+                            tools
+                        )
                         continue
                     alias = await client.read_resource(
                         "fatebridge://tools/astro_hellen"
@@ -208,7 +209,7 @@ async def exercise(output):
                     assert not corrected.is_error
                     report["error_recovery"] = True
     with TestClient(rest_app) as rest:
-        search = rest.get("/api/tools", params={"q": "跳槽", "detail": "summary"})
+        search = rest.get("/api/tools", params={"q": "事业", "detail": "summary"})
         assert search.status_code == 200 and search.json()["matched_count"] > 0
         spec = records["bazi_birth"]
         inputs = example_input(spec)

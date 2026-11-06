@@ -168,8 +168,6 @@ async def test_fresh_stdio_advertises_and_projects_the_new_evidence_card(tmp_pat
         cwd=str(root),
         env={
             "PYTHONPATH": str(root / "src"),
-            "FATEBRIDGE_MCP_SCENARIOS": "onda-zhanbu",
-            "FATEBRIDGE_MCP_TOOL_SCOPE": "topic",
         },
         log_file=tmp_path / "stdio.log",
     )

@@ -115,8 +115,6 @@ async def test_bounded_stdio_read_restores_complete_same_run_field(tmp_path):
         cwd=str(root),
         env={
             "PYTHONPATH": str(package_root),
-            "FATEBRIDGE_MCP_SCENARIOS": "onda-zhanbu",
-            "FATEBRIDGE_MCP_TOOL_SCOPE": "topic",
         },
         log_file=tmp_path / "stdio.log",
     )

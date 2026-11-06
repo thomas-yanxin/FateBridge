@@ -9,7 +9,7 @@
 | 在 Codex 中用自然语言咨询 | 安装后转到 [Codex 使用指南](codex-guide.md) |
 | 部署本地或远程 MCP、接入其他 host | [MCP 部署指南](mcp-deployment.md) |
 
-字段含义见 [API 参考](api-reference.md)，工具与场景等概念见 [核心概念](concepts.md)。
+字段含义见 [API 参考](api-reference.md)，工具与分类等概念见 [核心概念](concepts.md)。
 
 ## 安装
 
@@ -151,5 +151,5 @@ MCP 默认响应预算为 8192 字符，超限时返回 `result_delivery`；需�
 ## 下一步
 
 - 为应用接入错误处理、字段投影和完整结果读取：[开发者与 Agent 接入指南](agent-guide.md)。
-- 按自己的问题选择工具与示例：[场景路由](scenario-routing.md)和[示例索引](examples/README.md)。
+- 按自己的问题选择工具与示例：[工具覆盖](algorithm-coverage.md)和[示例索引](examples/README.md)。
 - 确认算法、星历及传统规则的适用范围：[算法覆盖](algorithm-coverage.md)。

@@ -66,15 +66,13 @@ def test_independent_review_rejects_a_rewritten_raw_first_answer(tmp_path):
         audit_independent_readings(tmp_path)
 
 
-@pytest.mark.parametrize("scope", ["topic", "complete"])
-def test_specified_method_scenario_advertises_and_executes_ziwei_rules(scope):
-    selected = select_mcp_specs(CATALOG, scenario="onda-xingpan", tool_scope=scope)
+@pytest.mark.parametrize("family", [None, "metaphysics"])
+def test_family_advertises_and_executes_ziwei_rules(family):
+    selected = select_mcp_specs(CATALOG, family=family)
     assert "ziwei_rules" in {s.key for s in selected}
 
     async def call():
-        async with Client(
-            create_mcp_app(scenarios="onda-xingpan", tool_scope=scope)
-        ) as client:
+        async with Client(create_mcp_app(families=family)) as client:
             tools = {t.name for t in await client.list_tools()}
             assert "ziwei_rules" in tools
             result = await client.call_tool(

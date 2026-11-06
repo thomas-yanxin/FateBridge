@@ -105,7 +105,7 @@ jobs:
           uv venv --python 3.12 /tmp/fatebridge-wheel-test
           uv pip install --python /tmp/fatebridge-wheel-test/bin/python dist/*.whl
           cd /tmp
-          /tmp/fatebridge-wheel-test/bin/fatebridge doctor --mcp --scenario onda-shiye
+          /tmp/fatebridge-wheel-test/bin/fatebridge doctor --mcp --family bazi
           /tmp/fatebridge-wheel-test/bin/python - <<'PY'
           from fastapi.testclient import TestClient
           from fatebridge import __version__

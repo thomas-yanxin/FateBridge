@@ -9,7 +9,6 @@
 - 包管理统一使用 uv。源码环境：`uv sync --locked --extra dev`；命令使用 `uv run --locked --extra dev`。依赖用 `uv add` / `uv remove`，同步提交 `uv.lock`；构建用 `uv build`。
 - 先检查实际代码、共享契约、相关测试和 Git 状态，保留无关改动。确定性计算维护在领域服务，不由模型复写。
 - 修改共享计算或契约时验证 REST、MCP、CLI 一致性。测试见[开发指南](docs/development-guide.md)；本地协议、真实模型行为和部署验收分别报告。
-- 场景源在 `configs/scenarios/*.yaml` 和 `docs/scenario-routing.md`；运行 `uv run --locked --extra dev python scripts/build_scenario_manifest.py` 后运行 `--check`。
 - 按需调用合同由 `uv run --locked --extra dev python scripts/build_codex_call_contracts.py` 生成，运行 `--check` 防漂移，不手改生成文件。完整 Schema 不放回本文件。
 
 ### 代码简洁与边界
@@ -25,7 +24,7 @@
 
 ## 咨询与方法选择
 
-旧 Onda 技能已移除，不再要求读取或调用 `onda-*` 技能。按用户实际问题、指定方法、已确认资料和当前连接的工具 Schema 选择能力；场景筛选只控制工具公开范围，不定义 FateBridge 的能力上限。
+旧 Onda 技能已移除，不再要求读取或调用 `onda-*` 技能。按用户实际问题、指定方法、已确认资料和当前连接的工具 Schema 选择能力；工具目录与 family 用于发现能力，不预设固定主题的调用组合。
 
 概念问题不收个人资料，已有结果解释优先复用原 run。个人咨询先识别对象、主题、任务和实际时间范围；“算一下”“哪一年”本身不是起卦请求。单主题多体系不自动扩成人生报告。计算交给引擎，传统来源、分歧与现实建议分别说明。
 
@@ -35,7 +34,7 @@
 
 - 使用当前聊天已确认资料。独立咨询不查仓库、历史或记忆；明确要求沿用历史资料时再核对。
 - 计算前检查[硬边界](docs/interpretation/shared/safety-boundaries.md)：不提供生死寿命、灾祸断言、临床诊断治疗或医疗择时。未知出生时刻不能猜，也不套默认值或示例；必要缺项简短追问，明确不知道后停止追问同项，交付已有可答部分。
-- MCP 已连接且定义清楚时直接调用。只在工具或参数不清楚时按名称取得完整定义；本地无连接时可用 CLI。工具和场景发现不是每轮必经步骤。
+- MCP 已连接且定义清楚时直接调用。只在工具或参数不清楚时按名称取得完整定义；本地无连接时可用 CLI。工具发现不是每轮必经步骤。
 - 离线核对常用合同见[按需合同索引](docs/contracts/README.md)，只读所选工具文件。以当前连接的实际 Schema 和公开范围为准，不因文件存在而调用隐藏工具。
 - 摘要首轮按任务选择已发布 `evidence_views` 的 `fields`，设 `strict_fields=true`、`include_snapshot_text=false`；视图名不是请求参数。完整 JSON、全部时间线或完整文件首次 `fields=null`，再读取同一 run 的 `result_delivery`，不以摘要重算全文。
 - 核对 `isError`、实际时区与时间粒度；按错误字段修正，仅可重试错误才重试。更正事实重建受影响输入，沿用 `trace_id` / `parent_run_id`；解释未变结果无需重算。

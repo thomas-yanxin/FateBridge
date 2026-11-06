@@ -29,7 +29,7 @@ def spec_for(key):
 async def test_published_knowledge_query_can_resolve_an_actual_aspect_source():
     guidance = call_guidance(spec_for("knowledge_read"))
     registry = call_guidance(spec_for("knowledge_registry"))
-    async with Client(create_mcp_app(scenarios="onda-xingpan")) as client:
+    async with Client(create_mcp_app()) as client:
         catalog = await original_payload(
             client,
             await client.call_tool(

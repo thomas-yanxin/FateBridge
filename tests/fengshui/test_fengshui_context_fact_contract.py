@@ -179,7 +179,7 @@ def test_context_canonical_schema_matches_its_runtime_fact_gate(
 
 def test_actual_mcp_schema_and_runtime_agree_for_empty_and_real_context_facts():
     async def check():
-        async with Client(create_mcp_app(scenarios="onda-fengshui")) as client:
+        async with Client(create_mcp_app(families="fengshui")) as client:
             tool = next(
                 t for t in await client.list_tools() if t.name == "fengshui_assess"
             )
@@ -208,7 +208,7 @@ def test_actual_mcp_schema_and_runtime_agree_for_empty_and_real_context_facts():
 
 def test_nested_candidate_uses_the_same_schema_fact_gate():
     async def check():
-        async with Client(create_mcp_app(scenarios="onda-fengshui")) as client:
+        async with Client(create_mcp_app(families="fengshui")) as client:
             tool = next(
                 t for t in await client.list_tools() if t.name == "fengshui_assess"
             )
@@ -259,7 +259,7 @@ def test_nested_candidate_uses_the_same_schema_fact_gate():
 
 def test_method_reference_and_annual_query_need_no_placeholder_environment():
     async def check():
-        async with Client(create_mcp_app(scenarios="onda-fengshui")) as client:
+        async with Client(create_mcp_app(families="fengshui")) as client:
             tool = next(
                 t for t in await client.list_tools() if t.name == "fengshui_assess"
             )

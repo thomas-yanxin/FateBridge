@@ -84,7 +84,7 @@ def source_files(root=ROOT, profile="full", extra_files=()):
         path = root / name
         if path.is_file():
             selected.append(path)
-    for folder in ("skills", "configs", "docs", "src"):
+    for folder in ("skills", "docs", "src"):
         selected.extend(
             p
             for p in (root / folder).rglob("*")
@@ -442,9 +442,8 @@ def _without_evaluation_private_sections(text):
 def prepare_workspace(workspace, source=ROOT):
     shutil.copy2(source / "AGENTS.md", workspace / "AGENTS.md")
     shutil.copytree(source / "src", workspace / "src")
-    for name in ("skills", "configs"):
-        if (source / name).is_dir():
-            shutil.copytree(source / name, workspace / name)
+    if (source / "skills").is_dir():
+        shutil.copytree(source / "skills", workspace / "skills")
     shutil.copytree(
         source / "docs",
         workspace / "docs",
@@ -530,10 +529,6 @@ def command_for(
         "mcp_servers.fatebridge.args": ["-X", "utf8", "-m", "fatebridge.mcp_server"],
         "mcp_servers.fatebridge.env.FATEBRIDGE_MCP_FAMILIES": "",
         "mcp_servers.fatebridge.env.PYTHONPATH": str(backend / "src"),
-        "mcp_servers.fatebridge.env.FATEBRIDGE_MCP_SCENARIOS": case.get("scenario", ""),
-        "mcp_servers.fatebridge.env.FATEBRIDGE_MCP_TOOL_SCOPE": case.get(
-            "tool_scope", "complete"
-        ),
     }
     # Codex MCP servers need explicit non-default data selection. Preserve the
     # operator's backend/cache choice without forwarding credentials or the
@@ -714,29 +709,6 @@ def run_case(
     return record
 
 
-def reference_scenarios(cases):
-    """Reference servers cover the selected cases, not a hard-coded discipline."""
-    scenarios = {case.get("scenario", "") for case in cases}
-    return ",".join(sorted(scenarios)) if "" not in scenarios else ""
-
-
-def reference_tool_scope(cases):
-    """Keep a homogeneous topic batch restricted during reference capture too.
-
-    Mixed batches retain the complete reference union. Actual model execution
-    still creates a separate server with each case's declared scope.
-    """
-    scopes = {case.get("tool_scope", "complete") for case in cases}
-    if scopes - {"complete", "topic"}:
-        raise ValueError("Unknown reference tool scope")
-    if any(
-        case.get("tool_scope", "complete") == "topic" and not case.get("scenario")
-        for case in cases
-    ):
-        raise ValueError("Topic reference capture requires a scenario")
-    return "topic" if scopes == {"topic"} else "complete"
-
-
 def model_prompt(case):
     """Expose the operational tool contract, never hidden answer criteria.
 
@@ -792,8 +764,6 @@ async def prepare_references(
             "PYTHONPATH": str(source / "src"),
             "FATEBRIDGE_EVALUATION_LOG": str(output / "reference-mcp.jsonl"),
             "FATEBRIDGE_MCP_FAMILIES": "",
-            "FATEBRIDGE_MCP_SCENARIOS": reference_scenarios(cases),
-            "FATEBRIDGE_MCP_TOOL_SCOPE": reference_tool_scope(cases),
         },
         log_file=output / "reference-mcp-stderr.log",
     )
@@ -904,8 +874,7 @@ async def prepare_references(
                 {
                     "case": case["id"],
                     "reference_profile": {
-                        "scenarios": reference_scenarios(cases),
-                        "tool_scope": reference_tool_scope(cases),
+                        "tool_selection": "full_catalog",
                     },
                     "reference_status": (
                         "captured_expected_mcp_error"
@@ -973,7 +942,7 @@ def main():
         "--snapshot-profile",
         choices=("full", "runtime"),
         default="full",
-        help="runtime retains backend/data, scenario configs, optional skills, public docs and judge code; excludes past docs/validation archives",
+        help="runtime retains backend/data, optional skills, public docs and judge code; excludes past docs/validation archives",
     )
     parser.add_argument(
         "--prepare-only",

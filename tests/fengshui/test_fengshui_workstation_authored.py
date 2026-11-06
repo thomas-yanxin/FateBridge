@@ -489,7 +489,7 @@ def test_new_branches_match_rest_mcp_cli_and_strict_projection(
 
 def test_published_schema_rejects_unknown_rules_and_strict_boolean_facts():
     async def check():
-        async with Client(create_mcp_app(scenarios="onda-fengshui")) as client:
+        async with Client(create_mcp_app(families="fengshui")) as client:
             schema = next(
                 t.model_dump(by_alias=True)["inputSchema"]
                 for t in await client.list_tools()
@@ -842,7 +842,7 @@ def test_default_budget_delivery_preserves_same_run_workstation_data(
     monkeypatch.setattr(api, "RESULT_STORE", store)
 
     async def native():
-        async with Client(create_mcp_app(scenarios="onda-fengshui")) as client:
+        async with Client(create_mcp_app(families="fengshui")) as client:
             result = await client.call_tool(
                 "fengshui_assess",
                 {**activity_request(), "include_snapshot_text": False},

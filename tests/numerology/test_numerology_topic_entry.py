@@ -1,7 +1,6 @@
-"""Explicit numerology methods must work inside their declared topic surface."""
+"""Explicit numerology methods must work through the published family surface."""
 
 import asyncio
-import copy
 import json
 from pathlib import Path
 from types import SimpleNamespace
@@ -10,30 +9,12 @@ import pytest
 from fastmcp import Client
 
 from fatebridge.application.examples import evidence_views
-from fatebridge.application.scenarios import definitions, scenario_keys
 from fatebridge.mcp_server import create_mcp_app
-from fatebridge.services.tool_catalog import CATALOG
 from scripts import evaluate_agent as evaluator
 from tests.support.transports import AS_OF, SPECS, business, call_cli
 from tests.support.transports import rest as shared_rest
 
 rest = shared_rest
-
-
-@pytest.mark.parametrize("scope", ["topic", "complete"])
-def test_method_entry_adds_exactly_the_two_named_calculators(scope, monkeypatch):
-    current = scenario_keys(CATALOG, "onda-xingpan", scope=scope)
-    before = copy.deepcopy(definitions())
-    row = next(r for r in before["scenarios"] if r["id"] == "onda-xingpan")
-    row["engine_tools"] = [
-        key for key in row["engine_tools"] if key not in {"heluo", "canping"}
-    ]
-    with monkeypatch.context() as m:
-        m.setattr("fatebridge.application.scenarios.definitions", lambda: before)
-        old = scenario_keys(CATALOG, "onda-xingpan", scope=scope)
-    assert current - old == {"heluo", "canping"} and old <= current
-    if scope == "topic":
-        assert not ({"qimen", "jinkou", "astro_election", "gua_lookup"} & current)
 
 
 @pytest.mark.parametrize(
@@ -64,7 +45,7 @@ def test_method_entry_adds_exactly_the_two_named_calculators(scope, monkeypatch)
         ),
     ],
 )
-def test_actual_topic_mcp_and_rest_cli_return_the_same_method_facts(
+def test_actual_mcp_and_rest_cli_return_the_same_method_facts(
     tool, payload, view, rest, tmp_path, capsys, monkeypatch
 ):
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
@@ -94,13 +75,9 @@ def test_actual_topic_mcp_and_rest_cli_return_the_same_method_facts(
     )
 
     async def run():
-        async with Client(
-            create_mcp_app(scenarios="onda-xingpan", tool_scope="topic")
-        ) as client:
+        async with Client(create_mcp_app(families="divination")) as client:
             names = {t.name for t in await client.list_tools()}
-            assert {"heluo", "canping"} <= names and not (
-                {"qimen", "jinkou", "astro_election"} & names
-            )
+            assert {"heluo", "canping"} <= names
             return await client.call_tool(
                 tool,
                 {
@@ -147,41 +124,7 @@ def test_actual_topic_mcp_and_rest_cli_return_the_same_method_facts(
         )
 
 
-@pytest.mark.parametrize(
-    "cases,expected",
-    [
-        ([dict(scenario="onda-xingpan", tool_scope="topic")], "topic"),
-        (
-            [
-                dict(scenario="onda-xingpan", tool_scope="topic"),
-                dict(scenario="onda-zhanbu", tool_scope="topic"),
-            ],
-            "topic",
-        ),
-        ([dict(scenario="onda-xingpan")], "complete"),
-        (
-            [dict(scenario="onda-xingpan", tool_scope="topic"), dict(scenario="")],
-            "complete",
-        ),
-    ],
-)
-def test_reference_scope_matches_homogeneous_batches_and_labels_mixed_union(
-    cases, expected
-):
-    assert evaluator.reference_tool_scope(cases) == expected
-
-
-@pytest.mark.parametrize(
-    "cases", [[dict(tool_scope="bad")], [dict(tool_scope="topic", scenario="")]]
-)
-def test_invalid_topic_preparation_does_not_silently_widen_to_all_tools(cases):
-    with pytest.raises(ValueError):
-        evaluator.reference_tool_scope(cases)
-
-
-def test_reference_capture_uses_the_requested_topic_before_any_model(
-    tmp_path, monkeypatch
-):
+def test_reference_capture_labels_full_catalog_before_any_model(tmp_path, monkeypatch):
     import fastmcp
     from fastmcp.client import transports
 
@@ -213,8 +156,6 @@ def test_reference_capture_uses_the_requested_topic_before_any_model(
     monkeypatch.setattr(fastmcp, "Client", FakeClient)
     case = dict(
         id="one",
-        scenario="onda-xingpan",
-        tool_scope="topic",
         prompt="原提示",
         allowed_tools=["heluo"],
         manual_review=["隐藏标准"],
@@ -223,10 +164,8 @@ def test_reference_capture_uses_the_requested_topic_before_any_model(
     refs = asyncio.run(
         evaluator.prepare_references([case], tmp_path, tmp_path / "source")
     )
-    assert seen["env"]["FATEBRIDGE_MCP_TOOL_SCOPE"] == "topic"
-    assert refs[0]["reference_profile"] == dict(
-        scenarios="onda-xingpan", tool_scope="topic"
-    )
+    assert seen["env"]["FATEBRIDGE_MCP_FAMILIES"] == ""
+    assert refs[0]["reference_profile"] == dict(tool_selection="full_catalog")
     worksheet = json.loads((tmp_path / "review-worksheet.json").read_bytes())
     assert (
         worksheet["model_invocations"] == 0

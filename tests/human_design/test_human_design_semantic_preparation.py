@@ -13,7 +13,6 @@ from scripts.evaluate_agent import (
     grade_case,
     model_prompt,
     prepare_workspace,
-    reference_scenarios,
     source_files,
 )
 
@@ -36,9 +35,7 @@ def test_original_development_cohort_is_sealed_and_cannot_be_relabelled_blind():
 
 
 def test_profile_really_publishes_human_design():
-    specs = select_mcp_specs(
-        CATALOG, scenario=reference_scenarios(CASES), tool_scope="complete"
-    )
+    specs = select_mcp_specs(CATALOG)
     assert "human_design" in {s.tool_name for s in specs}
     assert DATASET in source_files()
 

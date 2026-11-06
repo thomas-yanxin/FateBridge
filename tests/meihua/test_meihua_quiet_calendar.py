@@ -246,8 +246,6 @@ async def test_fresh_stdio_reads_published_quiet_fields_with_corrected_labels(tm
         cwd=str(root),
         env={
             "PYTHONPATH": os.environ.get("PYTHONPATH", str(root / "src")),
-            "FATEBRIDGE_MCP_SCENARIOS": "onda-zhanbu",
-            "FATEBRIDGE_MCP_TOOL_SCOPE": "topic",
         },
         log_file=tmp_path / "stdio.log",
     )

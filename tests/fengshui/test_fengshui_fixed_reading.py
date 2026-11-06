@@ -374,7 +374,7 @@ def test_bounded_same_run_full_readback_can_be_verified_without_recalculation(
 
         from fatebridge.mcp_server import create_mcp_app
 
-        async with Client(create_mcp_app(scenarios="onda-fengshui")) as client:
+        async with Client(create_mcp_app(families="fengshui")) as client:
             result = await client.call_tool(
                 "fengshui_assess",
                 {

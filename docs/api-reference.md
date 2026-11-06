@@ -2,7 +2,7 @@
 
 正确调用一项计算，需要先确认输入要求、公开入口和结果结构。REST、MCP 与 CLI 的公共约定、请求族、路由映射及响应字段集中列在下方，供应用开发者与 Agent 维护者查询，并据此处理精度说明与错误信息。
 
-首次运行请先看[快速入门](getting-started.md)，可复制的客户端代码见[接入指南](agent-guide.md)，按日常问题选择方法见[场景路由](scenario-routing.md)。
+首次运行请先看[快速入门](getting-started.md)，可复制的客户端代码见[接入指南](agent-guide.md)，按日常问题选择方法见[工具覆盖](algorithm-coverage.md)。
 
 当前实际暴露 91 个业务 REST 路由（另含 `/health`、`/ready`、`/metrics` 三个运维端点）和 92 个 FastMCP 工具。两个数字由中央目录派生，并由 `tests/quality/test_doc_tool_counts.py` 锁定。版本之间的准确字段约束以当前服务的 `/openapi.json`、MCP `tools/list` 或 CLI `describe` 为准。
 
@@ -200,15 +200,9 @@ REST 对应 `GET /api/results/{result_id}` 和 `GET /api/results/{result_id}/pag
 
 ### 2.7 渐进发现与执行提示
 
-场景发现使用 `GET /api/scenarios?detail=summary`，按 `scenario=onda-shiyun` 读取完整 manifest；CLI 对应 `fatebridge scenarios --scenario onda-shiyun --detail full`。14 个场景从 `configs/scenarios/` 的13个独立配置、共享参考与住宅路由表生成，包括 `onda-fengshui` 咨询和 `fengshui` 基础计算两个独立入口，保留意图、主证/旁证/深调、条件和替代工具组。`required_inputs` 是配置级采集指引，每个工具的 `required_parameters` 与输入 Schema 才是调用要求；路由不是自动执行计划。
-
-`/api/tools`、CLI `discover` / `list --json` 新增 `scenario` 筛选（CLI 为 `--scenario`），支持逗号并集，与 family / q / surface 取交集。未知场景返回 422 / CLI 退出 1。嵌套 REST 与扁平 MCP/CLI 孪生工具由中央目录关联实际入口。MCP resources 新增 `fatebridge://scenarios` 摘要与 `fatebridge://scenarios/{scenario}` 完整路由；只列当前配置可调用工具，通过 `availability` 和路由组 `available=false` 明示缺失能力，不将旁证升级为主证。
-
-场景清单将直接工具和依赖区分：`direct_engine_tools` 是本入口直接文档化的工具，`resolved_engine_tools` 为依赖展开后的工具键；`dependencies` 保留 `shared_support`、`conditional_service`、`composite_topic` 的使用条件及实际 availability。完整发现另保留依赖路由的原场景与条件，不将条件服务升级为默认主证。场景过滤按依赖闭包公开工具，family 交集仍可能产生明确缺项。
+目录发现按工具名称、family、关键词与传输接口筛选。REST 使用 `/api/tools`，CLI 使用 `discover` 或 `list --json`，MCP 使用 `fatebridge://catalog/summary` 及 family／工具资源；关键词只匹配实际工具的名称、说明和分类，不扩展旧主题路由。
 
 工具的 input/full describe 和 MCP 描述可附 `evidence_views`：这是按用户任务或盘型组织的字段参考。首次调用复制匹配卡片的 `fields`，仍使用既有 `strict_fields` 和 `include_snapshot_text`；不向接口发送 `view` 或 `evidence_views`。未指定视图时使用安全的 `suggested_fields`。`fields=null` 仍表示完整结果，不受参考视图影响。
-
-`FATEBRIDGE_MCP_SCENARIOS=onda-jiankang,onda-shiyun` 可缩小 MCP 注册范围；与 family 配置取交集，省略或留空仍公开全部工具。独立的 `reproducibility` 发现字段声明时间与 seed 条件，MCP 幂等标签仍只描述环境影响。
 
 `GET /api/tools` 无参数时保留全量完整记录。可选参数：`detail=summary|full`（REST 默认 full）、`family`（逗号分隔分类）、`q`（名称/分类/描述搜索）、`tool`（精确工具名）和 `surface=rest|mcp|cli`。先请求 `?detail=summary&family=bazi`，选中工具后再请求 `?tool=bazi_birth&detail=full`。摘要不生成或返回参数及输入/输出 Schema。
 
@@ -571,7 +565,6 @@ REST 在 JSON 请求体传入这五项，MCP 使用同名参数，CLI 使用
 | `GET` | `/health` | 存活检查，返回 `{"status":"healthy"}`，不验证全部算法依赖 |
 | `GET` | `/ready` | 必需检查决定 `ready` / `not_ready`；可选西占运行时失败不一定改变状态，需检查 `checks` |
 | `GET` | `/metrics` | Prometheus 文本指标，含请求计数、耗时、就绪与鉴权配置状态 |
-| `GET` | `/api/scenarios` | 场景摘要或完整路由；支持 `scenario`、`surface` 与 `detail` |
 | `GET` | `/api/results/{result_id}` | 同次结果的交付 manifest，沿用业务鉴权 |
 | `GET` | `/api/results/{result_id}/pages` | 字符分页；`offset` 指定偏移，`path` 可选字段路径 |
 | `GET` | `/api/results/{result_id}/verified` | 先以 `expected_run_id` 核验完整保留结果，再按 `path`／`offset` 取页 |
@@ -897,8 +890,6 @@ uv run --locked --extra dev python -m fatebridge.mcp_server
 - [troubleshooting.md](troubleshooting.md)
 
 ## 咨询范围与禁区校验
-
-场景按9主题、3服务和1多主题组合组织，另有风水基础计算。机器发现返回 consultation 元数据与共享策略，细则见 [场景配置](../configs/scenarios/README.md)。
 
 生死寿命、灾祸断言、临床诊断治疗与医疗择时不提供。卜卦 category 不再接受 death、health、pregnancy，择时 topic_id 不再接受 surgery；直接服务／核心调用亦不能将这些类别静默回退为 general 或 marriage。对已知明确的禁区问法，REST／MCP／CLI 在计算前返回非重试错误 consultation_restricted，issues 保留安全路径而不回显问题。其他无效枚举仍按 validation_error 处理。调用方须在选工具前完成语义判断；有限文本检测不是完整语义安全保证。
 

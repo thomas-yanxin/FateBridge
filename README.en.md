@@ -60,7 +60,7 @@ uv sync --locked --extra dev
 uv run --locked --extra dev fatebridge doctor
 ```
 
-This README describes the development branch. For a released package, use the documentation at its [Git tag](https://github.com/thomas-yanxin/FateBridge/tags); pending changes appear in the [Changelog](CHANGELOG.md#unreleased). The Python wheel contains calculation code and rule data. The former Onda skills and plugin builder have been removed.
+This README describes the development branch. For a released package, use the documentation at its [Git tag](https://github.com/thomas-yanxin/FateBridge/tags); pending changes appear in the [Changelog](CHANGELOG.md#unreleased). The Python wheel contains calculation code and rule data. The former Onda skills, fixed scenario profiles, and plugin builder have been removed.
 
 ### Run a calculation
 
@@ -114,7 +114,7 @@ uv run --locked --extra dev python scripts/check_docs.py
 uv run --locked --extra dev python -m pytest -q tests/quality/test_documentation_integrity.py tests/quality/test_doc_tool_counts.py
 ```
 
-[Documentation maintenance](docs/development-guide.md#文档维护与验证) covers interface, scenario configuration, and generated-source synchronization. Include the version, a minimal fictional reproduction, and the actual error in bug reports. Report vulnerabilities privately under [SECURITY.md](SECURITY.md).
+[Documentation maintenance](docs/development-guide.md#文档维护与验证) covers interface and generated-contract synchronization. Include the version, a minimal fictional reproduction, and the actual error in bug reports. Report vulnerabilities privately under [SECURITY.md](SECURITY.md).
 
 ## Documentation and scope
 

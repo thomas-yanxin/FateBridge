@@ -46,9 +46,7 @@ def protocol_outputs(tmp_path_factory):
         "PYTHONPATH": str(ROOT / "src"),
         "SE_EPHE_PATH": str(folder),
         "FATEBRIDGE_SOLAR_TERM_MODEL": "auto",
-        "FATEBRIDGE_MCP_TOOL_SCOPE": "complete",
         "FATEBRIDGE_MCP_FAMILIES": "",
-        "FATEBRIDGE_MCP_SCENARIOS": "",
     }
     env.pop("FATEBRIDGE_JPL_FILE", None)
 

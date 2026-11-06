@@ -17,7 +17,6 @@ from fatebridge.utils.errors import ParameterError, validation_error_result
 class DiscoveryQuery(BaseModel):
     model_config = ConfigDict(extra="forbid")
     family: Optional[str] = None
-    scenario: Optional[str] = None
     q: Optional[str] = None
     tool: Optional[str] = None
     surface: Optional[Literal["rest", "mcp", "cli"]] = None
@@ -28,31 +27,15 @@ def select_mcp_specs(
     specs: List[ToolSpec],
     *,
     family: Optional[str] = None,
-    scenario: Optional[str] = None,
-    tool_scope: str = "complete",
 ) -> List[ToolSpec]:
     """Select an explicit MCP loading profile without changing domain contracts."""
-    if tool_scope not in {"complete", "topic"} or (
-        tool_scope == "topic" and not scenario
-    ):
-        raise ParameterError(
-            "tool_scope 使用 complete 或 topic；topic 必须指定 scenario",
-            [{"path": "tool_scope", "code": "invalid_tool_scope"}],
-        )
-    selected = select_specs(specs, family=family, scenario=scenario, surface="mcp")
-    if tool_scope == "topic":
-        from fatebridge.application.scenarios import scenario_keys
-
-        keys = scenario_keys(specs, scenario or "", scope="topic")
-        selected = [spec for spec in selected if spec.key in keys]
-    return selected
+    return select_specs(specs, family=family, surface="mcp")
 
 
 def select_specs(
     specs: List[ToolSpec],
     *,
     family: Optional[str] = None,
-    scenario: Optional[str] = None,
     q: Optional[str] = None,
     tool: Optional[str] = None,
     surface: Optional[str] = None,
@@ -60,11 +43,6 @@ def select_specs(
 ) -> List[ToolSpec]:
     """Filter declarations before materializing any expensive schemas."""
     selected = specs
-    if scenario is not None:
-        from fatebridge.application.scenarios import scenario_keys
-
-        keys = scenario_keys(specs, scenario)
-        selected = [spec for spec in selected if spec.key in keys]
     if family is not None:
         families = [part.strip() for part in family.split(",")]
         known = {spec.family for spec in specs}
@@ -102,36 +80,10 @@ def select_specs(
         selected = [spec for spec in selected if spec.tool_name in allowed_names]
     if q:
         needle = q.strip().casefold()
-        from fatebridge.application.scenarios import definitions, scenario_keys
-        from fatebridge.services.tool_catalog import CATALOG
-
-        scenario_matches: set[str] = set()
-        # Resolve the packaged dependency graph against the complete catalog,
-        # then intersect with this caller's possibly scoped declarations below.
-        # A family-limited catalog need not contain every dependency target.
-        by_key = {spec.key: spec for spec in CATALOG}
-        for record in definitions()["scenarios"]:
-            # Reuse routing vocabulary; search candidates do not replace the
-            # primary/supporting evidence roles in the scenario manifest.
-            text = " ".join(
-                [record["name"], *record["triggers"]]
-                + [row["intent"] for row in record["routing"]]
-            ).casefold()
-            if needle and needle in text:
-                keys = scenario_keys(CATALOG, record["id"])
-                labels = {
-                    by_key[key].operation_label_zh for key in keys if key in by_key
-                }
-                scenario_matches.update(
-                    spec.key
-                    for spec in specs
-                    if spec.key in keys or spec.operation_label_zh in labels
-                )
         selected = [
             spec
             for spec in selected
-            if spec.key in scenario_matches
-            or needle
+            if needle
             in " ".join(
                 (
                     spec.key,
@@ -149,7 +101,6 @@ def discover_specs(
     specs: List[ToolSpec],
     *,
     family: Optional[str] = None,
-    scenario: Optional[str] = None,
     q: Optional[str] = None,
     tool: Optional[str] = None,
     surface: Optional[str] = None,
@@ -160,7 +111,6 @@ def discover_specs(
         query = DiscoveryQuery.model_validate(
             dict(
                 family=family,
-                scenario=scenario,
                 q=q,
                 tool=tool,
                 surface=surface,

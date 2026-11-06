@@ -118,11 +118,7 @@ from fatebridge.services.tool_catalog import CATALOG  # noqa: E402
 from fatebridge.transports.mcp import register_mcp
 
 
-def create_mcp_app(
-    families: Optional[str] = None,
-    scenarios: Optional[str] = None,
-    tool_scope: str = "complete",
-) -> FastMCP:
+def create_mcp_app(families: Optional[str] = None) -> FastMCP:
     """Host-level family profiles; an omitted profile retains every MCP tool."""
     server = FastMCP(
         name="fatebridge",
@@ -130,11 +126,9 @@ def create_mcp_app(
         version=APP_VERSION,
         dereference_schemas=False,
     )
-    exposed = select_mcp_specs(
-        CATALOG, family=families, scenario=scenarios, tool_scope=tool_scope
-    )
+    exposed = select_mcp_specs(CATALOG, family=families)
     if not exposed:
-        raise ValueError("MCP 分类、场景与工具范围的交集为空")
+        raise ValueError("未找到所选分类的公开工具")
     register_mcp(
         server,
         exposed,
@@ -145,11 +139,7 @@ def create_mcp_app(
     return server
 
 
-app = create_mcp_app(
-    os.getenv("FATEBRIDGE_MCP_FAMILIES") or None,
-    os.getenv("FATEBRIDGE_MCP_SCENARIOS") or None,
-    os.getenv("FATEBRIDGE_MCP_TOOL_SCOPE") or "complete",
-)
+app = create_mcp_app(os.getenv("FATEBRIDGE_MCP_FAMILIES") or None)
 
 
 def main() -> None:

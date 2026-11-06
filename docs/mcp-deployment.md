@@ -25,7 +25,7 @@ uv tool install --python 3.12 fatebridge
 fatebridge doctor --mcp
 ```
 
-命令找不到时，执行 `uv tool update-shell` 并重开终端。doctor 的 `version` 是实际安装版本，`executable` 是该工具环境的 Python 绝对路径。wheel 包含计算代码、规则和场景数据。已发布包的文档以[对应 Git 标签](https://github.com/thomas-yanxin/FateBridge/tags)为准。
+命令找不到时，执行 `uv tool update-shell` 并重开终端。doctor 的 `version` 是实际安装版本，`executable` 是该工具环境的 Python 绝对路径。wheel 包含计算代码和规则数据。已发布包的文档以[对应 Git 标签](https://github.com/thomas-yanxin/FateBridge/tags)为准。
 
 ### 当前源码
 
@@ -57,7 +57,6 @@ tool_timeout_sec = 60
 
 [mcp_servers.fatebridge.env]
 FATEBRIDGE_MCP_FAMILIES = ""
-FATEBRIDGE_MCP_SCENARIOS = ""
 PYTHONUTF8 = "1"
 ```
 
@@ -75,7 +74,6 @@ PYTHONUTF8 = "1"
       "args": ["-m", "fatebridge.mcp_server"],
       "env": {
         "FATEBRIDGE_MCP_FAMILIES": "",
-        "FATEBRIDGE_MCP_SCENARIOS": "",
         "PYTHONUTF8": "1"
       }
     }
@@ -114,7 +112,6 @@ tool_timeout_sec = 60
 
 [mcp_servers.fatebridge.env]
 FATEBRIDGE_MCP_FAMILIES = ""
-FATEBRIDGE_MCP_SCENARIOS = ""
 PYTHONUTF8 = "1"
 ```
 
@@ -128,7 +125,6 @@ Claude Desktop 的 JSON 要双写反斜杠；Cursor 使用同样结构并在条�
       "args": ["-m", "fatebridge.mcp_server"],
       "env": {
         "FATEBRIDGE_MCP_FAMILIES": "",
-        "FATEBRIDGE_MCP_SCENARIOS": "",
         "PYTHONUTF8": "1"
       }
     }
@@ -150,23 +146,13 @@ uv run --locked --extra dev fatebridge bazi_birth `
 
 ## 工具筛选与运行环境
 
-默认不筛选工具。可在客户端的 `env` 中明确设置：
-
-`onda-*` 是保留的场景 ID，不代表仍有同名技能。14 个配置由 `configs/scenarios/` 中的13份 YAML 与[住宅基础路由](scenario-routing.md#家居风水基础计算)生成；配置来源与维护命令见[场景配置说明](../configs/scenarios/README.md)。
-
-`FATEBRIDGE_MCP_TOOL_SCOPE` 选择场景依赖范围，需当前源码环境；已发布版本按对应标签的文档。支持延迟工具加载时可保留完整目录；不支持时在选定场景下加 `FATEBRIDGE_MCP_TOOL_SCOPE=topic`。默认 `complete` 保留条件依赖，topic 只公开直接工具和知识支撑。隐藏分支在场景 `availability` 中如实标缺，不会通过通用调度工具绕过过滤；需要条件技法时切回 complete 并重启连接。未指定场景的 `topic` 配置启动失败；未知 scope 值也会拒绝启动。
+默认公开全部工具。需要较小的工具目录时，在客户端的 `env` 中设置 `FATEBRIDGE_MCP_FAMILIES`，例如 `"bazi,knowledge"` 或 `"fengshui"`；多个 family 取并集，空值保留全量，错误分类阻止启动。可用下面的命令验证独立进程：
 
 ```bash
-uv run --locked --extra dev fatebridge doctor --mcp --scenario onda-shiye --tool-scope topic
+uv run --locked --extra dev fatebridge doctor --mcp --family fengshui
 ```
 
-| 目标 | `FATEBRIDGE_MCP_FAMILIES` | `FATEBRIDGE_MCP_SCENARIOS` |
-| --- | --- | --- |
-| 全部工具 | `""` | `""` |
-| 事业咨询所需工具 | `""` | `"onda-shiye"` |
-| 仅风水工具族 | `"fengshui"` | `""` |
-
-筛选是服务端实际公开范围，两个变量取交集，错误名称或空交集会导致启动失败。可先执行 `fatebridge doctor --mcp --family fengshui --scenario ""` 验证该范围；源码用户加 `uv run --locked --extra dev`。`fatebridge scenarios` 和 `fatebridge discover --surface mcp` 可查场景与工具。限制工具只影响 MCP，不提供用户权限管理。
+`fatebridge discover --surface mcp` 按实际目录查工具，可加 `--family`、`--q` 或 `--tool`。MCP 注册筛选只影响该连接，不限制 REST／CLI 业务调用，也不提供用户权限管理。修改环境后重启连接，在新聊天中核对实际工具列表。
 
 源码 MCP 启动时读取仓库根目录 `.env`，已有进程环境优先。GUI 客户端应通过 `env` 注入设置，独立工具安装不要依赖当前工作目录的 `.env`。自定义星历目录可加 `SE_EPHE_PATH`，下载步骤与精度检查见[星历说明](ephemeris.md)。日志写 stderr，stdout 留给 stdio 协议；启动包装脚本也应遵守此约定。
 
@@ -265,7 +251,6 @@ User=fatebridge
 WorkingDirectory=/opt/FateBridge
 Environment=PYTHONUTF8=1
 Environment=FATEBRIDGE_MCP_FAMILIES=
-Environment=FATEBRIDGE_MCP_SCENARIOS=
 ExecStart=/opt/FateBridge/.venv/bin/fastmcp run /opt/FateBridge/src/fatebridge/mcp_server.py:app --transport http --host 127.0.0.1 --port 8011 --path /mcp
 Restart=on-failure
 RestartSec=5
@@ -293,7 +278,7 @@ WantedBy=multi-user.target
 | 失败现象 | 检查 |
 | --- | --- |
 | 找不到命令、模块或数据 | `command` 是否为 doctor 的实际 Python；安装目录是否移动；GUI 日志中的启动路径 |
-| 初始化失败 | doctor 的失败阶段与子进程 stderr；JSON / TOML 格式；family / scenario 配置 |
+| 初始化失败 | doctor 的失败阶段与子进程 stderr；JSON / TOML 格式；family 配置 |
 | stdio 协议解析失败 | 包装脚本是否把普通日志打印到 stdout |
 | 工具数量不符 | 服务启动环境的筛选、运行版本、是否重启了旧进程 |
 | HTTP 连接拒绝 | HTTP 进程、监听端口、SSH 隧道与客户端所在机器 |

@@ -36,11 +36,11 @@ FateBridge 的领域能力通过三条通道暴露出来：
 | 当前已有信息 | 下一步 |
 | --- | --- |
 | 工具已公开，输入 Schema 与用途明确 | 直接调用；解释同一结果无需重新发现或计算 |
-| 知道用户场景，尚未确定主证 | 读场景路由或 family 摘要，再取选中工具契约 |
+| 知道用户场景，尚未确定主证 | 读实际工具说明或 family 摘要，再取选中工具契约 |
 | 已确定工具，仅缺参数定义 | REST 单工具记录、CLI `describe --detail input` 或 MCP `fatebridge://tools/{tool}/input` |
 | 需要更细输出字段 | 单工具完整契约；不要展开无关候选 |
 
-场景发现使用 REST `/api/scenarios?detail=summary`、CLI `fatebridge scenarios` 或 MCP `fatebridge://scenarios`；`discover --scenario onda-shiye` 可缩小候选。替代工具组不要求全部调用，路由不是自动执行计划。场景过滤会展开已声明的共享／条件／组合依赖；`dependencies` 的条件仍约束何时使用，family 限制造成的缺项由 availability 明示。场景返回 consultation.kind/topics 和共享咨询策略：按本轮主题、任务、时间与深度选依据，追问复用相关视角，禁区请求在调用前停止。
+工具发现使用 REST `/api/tools`、CLI `fatebridge discover` 或 MCP `fatebridge://catalog/summary`。先按实际工具说明、family 或关键词缩小范围，再读取所选工具的合同；未返回的工具不能据此判断为引擎不支持。调用与解释按当前问题及已确认资料决定，不使用固定主题清单。
 
 咨询组织见[方法参考](interpretation/README.md)、[时间选择](interpretation/shared/timing-selection.md)与[硬边界](interpretation/shared/safety-boundaries.md)。公共接口拒绝已知明确的生死／临床请求，卜卦不公开 death/health/pregnancy，择时不公开 surgery。文本拦截不能替代调用方的跨轮语义判断。
 
@@ -95,7 +95,7 @@ MCP 默认通过标准 `tools/list` 公开全部工具。host 可设置 `FATEBRI
 
 首次取数优先查看当前工具的 `evidence_views`，按本轮任务或盘型复制其 `fields`；视图名称不是请求参数。先选好主证再调用，可避免摘要投影丢掉所需字段后另算。完整文件或全部时间线请求仍首次 `fields=null`。
 
-`FATEBRIDGE_MCP_SCENARIOS` 可按场景及其显式依赖筛选，与 family 配置取交集；隐藏工具不可调用，场景 `availability` 明示缺口。配置与发现参数见 [渐进发现](api-reference.md#27-渐进发现与执行提示)。
+`FATEBRIDGE_MCP_FAMILIES` 按实际工具分类限制 MCP 注册范围。隐藏工具不可调用；用当前连接的 `tools/list` 和目录资源核对，配置见[部署指南](mcp-deployment.md#工具筛选与运行环境)。
 
 ## 公共调用约定
 
@@ -122,7 +122,7 @@ MCP 默认通过标准 `tools/list` 公开全部工具。host 可设置 `FATEBRI
 
 MCP 模型/业务失败使用原生 `isError=true`。FastMCP 客户端默认抛出 `ToolError`；需要恢复提示时使用 `raise_on_error=False` 并读取 `structured_content`。未知工具、非法 RPC 等协议错误仍需单独处理。CLI 用退出码判定：0 成功，1 计算/模型校验失败，2 用法错误或不支持（包括未知 flag 和 argparse 类型错误）；工具结果及错误写 stdout，日志写 stderr，`list` / `--help` 返回文本。
 
-不要依赖拼错的字段或主题被忽略：未知字段和非法主题现在会失败，省略可选字段仍使用声明默认值。输出 Schema 覆盖根字段与稳定的专业嵌套事实，包括主限命中、递归子限、宫位与星曜条目、九类八字专题、宿曜双向关系，以及知识来源/覆盖信息和导出设置/分段；动态键及未声明扩展保留。业务字段可选且可空，消费时检查存在性；投影支持对象路径，数组仍整字段选择。先按 `isError` / HTTP 状态 / CLI 退出码判定成功，再按输出 Schema 消费业务数据。需要专业字段时用 `describe` / 单工具资源读取合同；完整 MCP schema 的体积更大，场景 profile 与摘要发现仍是分步发现入口。
+不要依赖拼错的字段或主题被忽略：未知字段和非法主题现在会失败，省略可选字段仍使用声明默认值。输出 Schema 覆盖根字段与稳定的专业嵌套事实，包括主限命中、递归子限、宫位与星曜条目、九类八字专题、宿曜双向关系，以及知识来源/覆盖信息和导出设置/分段；动态键及未声明扩展保留。业务字段可选且可空，消费时检查存在性；投影支持对象路径，数组仍整字段选择。先按 `isError` / HTTP 状态 / CLI 退出码判定成功，再按输出 Schema 消费业务数据。需要专业字段时用 `describe` / 单工具资源读取合同；完整 MCP schema 的体积更大，family 摘要与单工具契约用于分步发现。
 
 ### `run_metadata` 溯源层
 
@@ -393,8 +393,8 @@ fatebridge profile --systems bazi,ziwei,astro \
 
 接口连通后，Agent 还要完成一段面向人的对话：收集必要资料、选择工具、解释结果，再处理追问。接入方负责本轮问题、解释方式及边界，Schema 规定可以提交哪些参数。用一条完整的虚构对话验证这些环节；连接成功本身无法证明它们都能正常工作。
 
-1. 发现：已知 Schema 且工具公开时直接调用；有缺口时按场景 / family 获取摘要或单工具契约。
-2. 路由：按用户意图选 family，例如八字走 `bazi`、运势走 `timing`、星盘走 `astro`、术数走 `metaphysics` / `divination`。场景级取舍（谁主谁次、怎么省 token、怎么避免结论打架）见 [scenario-routing.md](scenario-routing.md)。
+1. 发现：已知 Schema 且工具公开时直接调用；有缺口时按 family 或关键词获取摘要或单工具契约。
+2. 路由：按用户意图选 family，例如八字走 `bazi`、运势走 `timing`、星盘走 `astro`、术数走 `metaphysics` / `divination`。具体方法的实现范围与限制见[工具覆盖](algorithm-coverage.md)。
 3. 取数：只核对所选计算真正需要的资料；出生时刻未知时不能猜。复现时保存时区、坐标来源、太阳时策略和分析日期。
 4. 裁剪：摘要用严格 `fields` 与快照开关；完整导出首次保留全文，`selected_sections` 仅控制所支持工具的导出文本。
 5. 判错：始终基于 `error_code` 分支；`dependency_missing` 说明环境缺西占 backend，不是入参问题。
@@ -414,6 +414,6 @@ fatebridge profile --systems bazi,ziwei,astro \
 
 - [api-reference.md](api-reference.md)：全部 REST 路由、FastMCP 工具、请求族、响应字段
 - [algorithm-coverage.md](algorithm-coverage.md)：13 family / 92 工具的算法与精度 / 依赖矩阵
-- [scenario-routing.md](scenario-routing.md)：场景到工具的路由矩阵、调用纪律、交叉印证与去重策略
+- [工具覆盖](algorithm-coverage.md)：各方法的实现范围、已知限制与验证边界
 - [getting-started.md](getting-started.md)：从零启动服务
 - [troubleshooting.md](troubleshooting.md)：依赖缺失、精度、快照导出等常见问题

@@ -45,7 +45,6 @@ from fatebridge.application.compute_limits import (
 )
 from fatebridge.application.discovery import discover_specs
 from fatebridge.application.result_delivery import RESULT_STORE
-from fatebridge.application.scenarios import discover_scenarios
 from fatebridge.core.astro import runtime as astrology_core
 from fatebridge.core.execution_context import correlate_error, safe_correlation
 from fatebridge.core.predictive import _common as astrology_predictive_core
@@ -586,7 +585,6 @@ async def verified_result_page(
 @app.get("/api/tools")
 async def list_tools(
     family: Optional[str] = None,
-    scenario: Optional[str] = None,
     q: Optional[str] = None,
     tool: Optional[str] = None,
     surface: Optional[Literal["rest", "mcp", "cli"]] = None,
@@ -604,26 +602,10 @@ async def list_tools(
         return discover_specs(
             CATALOG,
             family=family,
-            scenario=scenario,
             q=q,
             tool=tool,
             surface=surface,
             detail=detail,
-        )
-    except ParameterError as exc:
-        raise HTTPException(status_code=422, detail=exc.as_result())
-
-
-@app.get("/api/scenarios")
-async def list_scenarios(
-    scenario: Optional[str] = None,
-    surface: Optional[Literal["rest", "mcp", "cli"]] = None,
-    detail: Literal["summary", "full"] = "full",
-) -> Dict[str, Any]:
-    """Packaged scenario routing joined to the current central tool catalog."""
-    try:
-        return discover_scenarios(
-            CATALOG, scenario=scenario, surface=surface, detail=detail
         )
     except ParameterError as exc:
         raise HTTPException(status_code=422, detail=exc.as_result())

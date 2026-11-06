@@ -103,6 +103,6 @@ def test_all_nine_prospective_process_commands_keep_default_model_and_read_only_
         assert command[command.index("--sandbox") + 1] == "read-only"
         assert "--strict-config" in command
         assert "--ignore-user-config" in command
-        assert 'mcp_servers.fatebridge.env.FATEBRIDGE_MCP_TOOL_SCOPE="topic"' in command
+        assert not any("FATEBRIDGE_MCP_TOOL_SCOPE" in token for token in command)
         assert "fatebridge.validation.agent_capture" in " ".join(command)
         assert case["capture_payloads"] is True

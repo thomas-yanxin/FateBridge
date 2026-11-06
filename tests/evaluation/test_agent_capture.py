@@ -52,8 +52,7 @@ async def test_independent_stdio_logs_actual_projected_reply_and_same_run_resour
         env={
             "PYTHONPATH": str(root / "src"),
             "FATEBRIDGE_EVALUATION_LOG": str(path),
-            "FATEBRIDGE_MCP_SCENARIOS": "onda-zhanbu",
-            "FATEBRIDGE_MCP_TOOL_SCOPE": "complete",
+            "FATEBRIDGE_MCP_FAMILIES": "divination",
         },
         log_file=tmp_path / "stderr.log",
     )

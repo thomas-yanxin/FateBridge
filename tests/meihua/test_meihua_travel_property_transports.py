@@ -147,8 +147,6 @@ async def test_fresh_stdio_schema_and_actual_default_fields_accept_the_new_enum(
         cwd=str(root),
         env={
             "PYTHONPATH": os.environ.get(package_env, str(root / "src")),
-            "FATEBRIDGE_MCP_SCENARIOS": "onda-zhanbu",
-            "FATEBRIDGE_MCP_TOOL_SCOPE": "topic",
         },
         log_file=tmp_path / "stdio.log",
     )
@@ -202,8 +200,6 @@ async def test_bounded_default_projection_restores_same_run_complete_evidence(
         cwd=str(root),
         env={
             "PYTHONPATH": package,
-            "FATEBRIDGE_MCP_SCENARIOS": "onda-zhanbu",
-            "FATEBRIDGE_MCP_TOOL_SCOPE": "topic",
         },
         log_file=tmp_path / "stdio.log",
     )

@@ -48,7 +48,6 @@ from fatebridge.application.execution import (
 )
 from fatebridge.application.projection import project_fields
 from fatebridge.application.response_delivery import deliver_response
-from fatebridge.application.scenarios import discover_scenarios
 from fatebridge.application.tool_spec import ToolSpec
 from fatebridge.core.execution_context import (
     ExecutionOptions,
@@ -391,15 +390,6 @@ def build_parser(
         "discover", help="先查看目录摘要，再按工具读取完整契约（JSON）"
     )
     _add_discovery_flags(discovery)
-    scenario_parser = sub.add_parser(
-        "scenarios", help="场景到工具、主证/旁证/深调的机器路由清单"
-    )
-    scenario_parser.add_argument("--scenario", help="场景 ID，可用逗号指定多个")
-    scenario_parser.add_argument("--surface", choices=("rest", "mcp", "cli"))
-    scenario_parser.add_argument(
-        "--detail", choices=("summary", "full"), default="summary"
-    )
-
     describe_parser = sub.add_parser(
         "describe", help="输出某工具的参数 schema、可用接口与示例（JSON）"
     )
@@ -429,12 +419,6 @@ def build_parser(
     doctor = sub.add_parser("doctor", help="检查安装；--mcp 验证独立 stdio 进程")
     doctor.add_argument("--mcp", action="store_true")
     doctor.add_argument("--family", help="检查这些 MCP 分类（CSV）")
-    doctor.add_argument("--scenario", help="检查这些 MCP 场景（CSV）")
-    doctor.add_argument(
-        "--tool-scope",
-        choices=("complete", "topic"),
-        help="complete 包含条件依赖；topic 仅主题直接工具与知识支撑，需 --scenario",
-    )
 
     _add_profile_parser(sub)
 
@@ -961,7 +945,6 @@ def _unsupported_hint(spec: ToolSpec) -> str:
 
 def _add_discovery_flags(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--family", help="工具分类，可用逗号指定多个分类")
-    parser.add_argument("--scenario", help="场景 ID，可用逗号指定多个")
     parser.add_argument("--query", dest="q", help="按工具名称、分类和描述搜索")
     parser.add_argument("--tool", help="精确选择一个工具")
     parser.add_argument("--surface", choices=("rest", "mcp", "cli"))
@@ -1060,7 +1043,6 @@ def run(argv: Optional[List[str]] = None) -> int:
             catalog = discover_specs(
                 CATALOG,
                 family=args.family,
-                scenario=args.scenario,
                 q=args.q,
                 tool=args.tool,
                 surface=args.surface,
@@ -1074,19 +1056,6 @@ def run(argv: Optional[List[str]] = None) -> int:
             _print_tools({record["tool"] for record in catalog["tools"]})
         return 0
 
-    if args.command == "scenarios":
-        try:
-            manifest = discover_scenarios(
-                CATALOG,
-                scenario=args.scenario,
-                surface=args.surface,
-                detail=args.detail,
-            )
-        except ParameterError as exc:
-            return _emit_error(exc.as_result(), 1)
-        print(json.dumps(manifest, ensure_ascii=False, indent=2))
-        return 0
-
     if args.command == "describe":
         return _run_describe(getattr(args, "tool", None), args.detail)
 
@@ -1096,8 +1065,6 @@ def run(argv: Optional[List[str]] = None) -> int:
         result = diagnose(
             mcp=args.mcp,
             family=args.family,
-            scenario=args.scenario,
-            tool_scope=args.tool_scope,
         )
         print(json.dumps(result, ensure_ascii=False, indent=2))
         return 0 if result["ok"] else 1

@@ -346,7 +346,7 @@ python3 -m fatebridge.cli --no-metadata astro_chart \
 
 ## 全局调用纪律
 
-完整调用约定与场景取舍见[场景路由矩阵](../../scenario-routing.md)。本节集中列出工具调用的执行约定。
+按实际工具覆盖选择方法，完整调用约定见[接入指南](../../agent-guide.md)。本节集中列出工具调用的执行约定。
 
 - **命盘复用**：综合命理画像调一次 `analyze_destiny`（已含命盘 + 喜用 + 格局），不要再调 `bazi_birth`；只要原始四柱才单用 `bazi_birth`。同一出生信息跨八字/紫微/西占复用，不重复采集。
 - **聚合优先**：时运全景用 `timing_analysis` / `western_timing_analysis`，不连发多个单技法；只要一项才用单工具。

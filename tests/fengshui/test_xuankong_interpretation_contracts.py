@@ -182,7 +182,7 @@ def test_published_mcp_schema_exposes_the_same_opt_in_contract():
     Draft202012Validator(XuankongRequest.model_json_schema()).validate(inputs)
 
     async def check():
-        async with Client(create_mcp_app(scenarios="onda-fengshui")) as client:
+        async with Client(create_mcp_app(families="fengshui")) as client:
             schemas = {
                 t.name: t.model_dump(by_alias=True)["inputSchema"]
                 for t in await client.list_tools()
@@ -507,7 +507,7 @@ def test_guidance_optional_path_can_extend_the_real_strict_mcp_first_view():
     assert path not in fields
 
     async def call():
-        async with Client(create_mcp_app(scenarios="onda-fengshui")) as client:
+        async with Client(create_mcp_app(families="fengshui")) as client:
             result = await client.call_tool(
                 "fengshui_assess",
                 {
@@ -666,7 +666,7 @@ def test_bounded_interpretation_is_read_back_from_the_original_mcp_run(
     monkeypatch.setattr(delivery, "RESULT_STORE", store)
 
     async def call_and_read():
-        async with Client(create_mcp_app(scenarios="onda-fengshui")) as client:
+        async with Client(create_mcp_app(families="fengshui")) as client:
             result = await client.call_tool(
                 "fengshui_assess",
                 {

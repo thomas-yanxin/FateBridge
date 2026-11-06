@@ -41,7 +41,6 @@ uv run --locked --extra dev python scripts/clean_repository.py --deduplicate-sca
 uv run --locked --extra dev python -m pytest -q
 uv run --locked --extra dev python scripts/run_ci_checks.py
 uv run --locked --extra dev python scripts/check_docs.py
-uv run --locked --extra dev python scripts/build_scenario_manifest.py --check
 uv run --locked --extra dev python scripts/build_codex_call_contracts.py --check
 ```
 

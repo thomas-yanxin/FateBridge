@@ -49,7 +49,7 @@ flowchart TD
 | --- | --- | --- |
 | 工具声明 | `services/catalog/`、`services/tool_catalog.py`、`application/tool_spec.py` | 领域声明、中央装配与不依赖协议框架的工具描述 |
 | 应用编排 | `application/bindings.py`、`execution.py`、`response_delivery.py` | 请求绑定、统一执行与输出校验、投影和预算交付 |
-| 能力发现 | `application/description.py`、`discovery.py`、`scenarios.py` | 公共描述、目录筛选、场景清单；共享描述避免反向引用 |
+| 能力发现 | `application/description.py`、`discovery.py` | 公共描述与目录筛选；共享描述避免反向引用 |
 | 协议注册 | `transports/rest.py`、`transports/mcp.py` | REST/MCP 签名、注册、协议错误与输出选项 |
 | 请求模型 | `core/requests/` | 公共校验基类、领域字段、默认值与取值范围 |
 | 传输 | `api.py`、`mcp_server.py`、`cli.py` | HTTP/协议/参数处理，错误、元数据与输出包装 |
@@ -135,9 +135,9 @@ Swiss Ephemeris 存在共享 C 状态。直接调用与会修改目录的第三�
 
 `run_metadata` 在原 ID、时间、引擎与近似标志上增加版本、实际时间与重放参数。`application/execution.py` 的 `execute_tool` 包装现有 `execute_spec`，REST 由原执行器限制重计算并发并卸载到线程，MCP / CLI 共用执行层；execute_spec 保留无元数据的服务调用契约。ContextVar 隔离默认时钟，无 seed 随机六爻保留本次 seed，没有运行数据库。重放需要保存原始请求和环境，`run_id` 本身不能查询或恢复一次计算。
 
-### 场景发现
+### 工具发现
 
-`data/agent_scenarios.json` 从 `configs/scenarios/` 的 13 个独立 YAML、共享参考与场景路由文档生成，共 14 项（9 主题、3 服务、1 多主题组合及独立的 `fengshui` 基础计算路由），`application.scenarios` 将其关联到实时 ToolSpec。REST / CLI / MCP resources 共用 manifest，生产只读 JSON，不增加 YAML 运行依赖；CI 核对生成物与源资料。接口将直接工具与知识支撑、条件服务、组合主题依赖分开，生成和运行时验证依赖闭包及循环，场景筛选展开依赖后再与传输和 family 求交集。发现结果保留依赖条件、原始路由和逐项缺失，不把可调用工具当作自动执行清单。
+工具发现直接从实时 `ToolSpec` 目录生成。REST、CLI 与 MCP 资源按名称、family、关键词和接口筛选；MCP 可用 `FATEBRIDGE_MCP_FAMILIES` 限制注册范围。发现层不加载主题 YAML、生成的场景清单或预设工具依赖。
 
 ### 方法合同与数量语义
 
@@ -199,6 +199,6 @@ REST 默认监听 `0.0.0.0:8010`，可选 API Key 鉴权；CORS、运维路径�
 
 新增能力通常先实现 `core` / `analysis`，封装 service 和 request model，再追加 `ToolSpec`。常规新增工具无需手工修改三个 transport 的领域入口，但只有声明对应 surface 且 CLI 模型可表达时才会实际暴露。
 
-为新工具补 `tests/fixtures/surface_payloads.py` 的代表请求，运行领域回归与 `test_full_surface_validation.py`；涉及输出、默认值或投影时补跨端对齐证据。文档、场景配置及生成清单同步方式见 [开发指南](development-guide.md#文档维护与验证)。独立参考与 CI 运行范围也在那里统一维护。
+为新工具补 `tests/fixtures/surface_payloads.py` 的代表请求，运行领域回归与 `test_full_surface_validation.py`；涉及输出、默认值或投影时补跨端对齐证据。文档与生成合同同步方式见 [开发指南](development-guide.md#文档维护与验证)。独立参考与 CI 运行范围也在那里统一维护。
 
 玄空版本独立放在 `data/fengshui/xuankong-v1.json`，与基础规则版本分别发布。`core/fengshui/xuankong.py` 只使用历史定运及磁北宅向，按输入误差解析候选角区；合参新增的是独立层，不给年度盘添加山向星，也不按当前元运重算宅盘。详见 [来源与合同](fengshui-xuankong.md)。

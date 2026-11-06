@@ -27,9 +27,7 @@ async def stdio(payload, options, log):
         env={
             **os.environ,
             "PYTHONPATH": str(ROOT / "src"),
-            "FATEBRIDGE_MCP_TOOL_SCOPE": "complete",
             "FATEBRIDGE_MCP_FAMILIES": "",
-            "FATEBRIDGE_MCP_SCENARIOS": "",
         },
         log_file=log,
     )

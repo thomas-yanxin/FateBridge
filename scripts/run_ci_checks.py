@@ -63,7 +63,7 @@ CHECKS = (
     "astronomy/test_ephemeris_integrity.py",
     "astronomy/test_ephemeris_runtime.py",
     "astronomy/test_ephemeris_thread_paths.py",
-    "integration/test_scenario_dependency_closure.py",
+    "evaluation/test_agentic_replay.py",
     "integration/test_cli.py",
     "integration/test_api_alignment.py",
     "integration/test_full_surface_validation.py",

@@ -28,7 +28,7 @@ from scripts.evaluation.audit_gauquelin_definitions import (
 from tests.evaluation.test_gauquelin_request_guard import HOUSE_SPECS, payload
 
 
-def test_evaluation_without_skills_retains_profile_provenance_and_method_references(
+def test_evaluation_without_skills_retains_backend_and_method_references(
     tmp_path,
 ):
     source = tmp_path / "source"
@@ -38,7 +38,6 @@ def test_evaluation_without_skills_retains_profile_provenance_and_method_referen
         "pyproject.toml": "Project dependencies",
         "uv.lock": "Locked environment",
         "scripts/evaluate_agent.py": "Evaluator implementation",
-        "configs/scenarios/example.yaml": "engine_tools: [bazi_birth]",
         "docs/interpretation/example.md": "Read the actual returned evidence",
         "src/fatebridge/domain.py": "Executable backend",
     }
@@ -47,7 +46,7 @@ def test_evaluation_without_skills_retains_profile_provenance_and_method_referen
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(value)
     manifest = source_manifest(source)
-    assert "configs/scenarios/example.yaml" in manifest
+    assert "docs/interpretation/example.md" in manifest
     workspace = tmp_path / "workspace"
     workspace.mkdir()
     prepare_workspace(workspace, source)
@@ -67,7 +66,6 @@ def test_reviewer_artifacts_stay_in_snapshot_but_outside_the_model_workspace(tmp
         "skills/onda-shiye/SKILL.md": "Runtime consultation skill",
         "src/fatebridge/domain.py": "Executable backend",
         "docs/contracts/bazi_career.json": "Actual runtime contract",
-        "docs/scenario-routing.md": "Runtime routing",
         "docs/numerology-audit.md": "Public calculation and source audit",
         "docs/validation/old-answer.txt": "HIDDEN_EXPECTED_ANSWER",
         "docs/validation/nested/grade.json": "HIDDEN_GRADE",

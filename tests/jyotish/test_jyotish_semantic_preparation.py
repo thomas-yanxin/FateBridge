@@ -5,7 +5,7 @@ from pathlib import Path
 
 from fatebridge.application.discovery import select_mcp_specs
 from fatebridge.services.tool_catalog import CATALOG
-from scripts.evaluate_agent import grade_case, reference_scenarios
+from scripts.evaluate_agent import grade_case
 
 DATASET = (
     Path(__file__).parents[1] / "fixtures/agent_behavior/jyotish_semantic_cases.json"
@@ -13,29 +13,11 @@ DATASET = (
 
 
 def test_preparation_selects_the_actual_indian_tools_instead_of_only_divination():
-    cases = json.loads(DATASET.read_text())["cases"]
-    available = {
-        s.tool_name
-        for s in select_mcp_specs(
-            CATALOG, scenario=reference_scenarios(cases), tool_scope="complete"
-        )
-    }
-    assert {"astro_india_chart", "astro_vimshottari"} <= available
-    wrong = {
-        s.tool_name
-        for s in select_mcp_specs(
-            CATALOG, scenario="onda-zhanbu", tool_scope="complete"
-        )
-    }
-    assert "astro_india_chart" not in wrong
-    mixed = cases + [{"scenario": "onda-zhanbu"}]
-    selected = {
-        s.tool_name
-        for s in select_mcp_specs(
-            CATALOG, scenario=reference_scenarios(mixed), tool_scope="complete"
-        )
-    }
-    assert {"astro_india_chart", "jinkou"} <= selected
+    available = {s.tool_name for s in select_mcp_specs(CATALOG)}
+    assert {"astro_india_chart", "astro_vimshottari", "jinkou"} <= available
+    astro = {s.tool_name for s in select_mcp_specs(CATALOG, family="astro")}
+    assert {"astro_india_chart", "astro_vimshottari"} <= astro
+    assert "jinkou" not in astro
 
 
 def test_known_debugging_cases_cannot_be_relabelled_as_independent_holdouts():

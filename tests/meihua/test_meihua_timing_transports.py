@@ -91,8 +91,6 @@ def stdio(tmp_path):
             "PYTHONPATH": os.environ.get(
                 "MEIHUA_V54_EXPECTED_PACKAGE_ROOT", str(root / "src")
             ),
-            "FATEBRIDGE_MCP_SCENARIOS": "onda-zhanbu",
-            "FATEBRIDGE_MCP_TOOL_SCOPE": "topic",
         },
         log_file=tmp_path / "stdio.log",
     )

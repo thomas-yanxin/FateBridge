@@ -35,21 +35,21 @@ def invoke(capsys, *args):
     return code, json.loads(text), text
 
 
-def test_scenario_words_find_tools_and_keep_filters():
-    result = discover_specs(CATALOG, q="跳槽", surface="mcp", detail="summary")
+def test_tool_summary_search_keeps_filters():
+    result = discover_specs(CATALOG, q="事业", surface="mcp", detail="summary")
     assert "bazi_career" in {tool["tool"] for tool in result["tools"]}
-    limited = discover_specs(CATALOG, q="跳槽", family="timing", detail="summary")
-    assert limited["tools"] and all(t["family"] == "timing" for t in limited["tools"])
-    empty = discover_specs(CATALOG, q="跳槽", allowed_names=set(), detail="summary")
+    limited = discover_specs(CATALOG, q="事业", family="bazi", detail="summary")
+    assert limited["tools"] and all(t["family"] == "bazi" for t in limited["tools"])
+    empty = discover_specs(CATALOG, q="事业", allowed_names=set(), detail="summary")
     assert empty["matched_count"] == 0
     response = TestClient(app).get(
-        "/api/tools", params={"q": "跳槽", "detail": "summary"}
+        "/api/tools", params={"q": "事业", "detail": "summary"}
     )
     assert response.status_code == 200
     assert response.json()["matched_count"] > 0
-    # A caller may pass an already scoped catalog, including no scene members.
+    # A caller may pass an already scoped catalog, including no matching tool summaries.
     scoped = [spec for spec in CATALOG if spec.family == "fengshui"]
-    assert discover_specs(scoped, q="跳槽", detail="summary")["matched_count"] == 0
+    assert discover_specs(scoped, q="事业", detail="summary")["matched_count"] == 0
 
 
 def test_catalog_keys_resolve_across_describe_discovery_and_cli(capsys):
@@ -210,20 +210,20 @@ def test_profile_removes_child_snapshot_text(capsys):
     assert "snapshot_export" in result["profile"]["bazi"]
 
 
-def test_doctor_real_stdio_and_empty_intersection():
-    result = diagnose(mcp=True, family="bazi", scenario="onda-shiye")
+def test_doctor_real_stdio_and_invalid_family():
+    result = diagnose(mcp=True, family="bazi")
     assert result["ok"], result
     assert result["mcp"]["tool_count"] == result["mcp_tool_count"]
     assert result["mcp"]["smoke_tool"]
     assert Path(result["codex"]["config"]["command"]).is_absolute()
-    empty = diagnose(family="fengshui", scenario="onda-shiye")
-    assert not empty["ok"] and empty["mcp_tool_count"] == 0
+    empty = diagnose(family="missing-family")
+    assert not empty["ok"] and empty["issues"][0]["code"] == "unknown_family"
 
 
 @pytest.mark.asyncio
 async def test_doctor_keeps_the_child_startup_failure_and_stage():
     with pytest.raises(_StdioProbeError) as caught:
-        await _probe_stdio({"FATEBRIDGE_MCP_SCENARIOS": "missing-scenario"})
+        await _probe_stdio({"FATEBRIDGE_MCP_FAMILIES": "missing-family"})
     details = caught.value.details
     assert details["stage"] == "initialize"
     assert details["error_type"]
@@ -236,7 +236,7 @@ def test_doctor_returns_structured_stdio_failure(monkeypatch):
         raise _StdioProbeError("tools/list", OSError("probe failed"), "child stderr")
 
     monkeypatch.setattr("fatebridge.diagnostics._probe_stdio", fail)
-    result = diagnose(mcp=True, scenario="onda-shiye")
+    result = diagnose(mcp=True, family="bazi")
     assert not result["ok"]
     assert result["mcp"]["stage"] == "tools/list"
     assert result["mcp"]["error_type"] == "OSError"

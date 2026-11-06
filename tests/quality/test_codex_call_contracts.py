@@ -220,7 +220,7 @@ async def test_only_published_inputs_and_views_are_enough_for_real_mcp_calls(
 @pytest.mark.asyncio
 async def test_fengshui_first_views_deliver_resolvable_rule_sources():
     """A successful calculation must also leave enough evidence to cite it."""
-    async with Client(create_mcp_app(scenarios="onda-fengshui")) as client:
+    async with Client(create_mcp_app(families="fengshui")) as client:
         for spec in CATALOG:
             if spec.family != "fengshui" or not spec.mcp_name:
                 continue

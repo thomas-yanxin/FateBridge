@@ -2,7 +2,7 @@
 
 旧 Onda 的 13 个技能包、自动发现入口和插件打包已移除。本目录保存原有技术参考中的结果读取、方法范围与来源说明，不提供新的技能入口，也不代表完整的能力验收。
 
-按当前问题与实际连接的工具选择能力；完整范围查[算法覆盖](../algorithm-coverage.md)，调用要求以实时 Schema 和[按需合同](../contracts/README.md)为准。原 `onda-*` 场景 ID 作为可选工具筛选配置保留，维护源已迁入 [configs/scenarios](../../configs/scenarios/README.md)；默认不设场景筛选时公开全部 MCP 工具。
+按当前问题与实际连接的工具选择能力；完整范围查[算法覆盖](../algorithm-coverage.md)，调用要求以实时 Schema 和[按需合同](../contracts/README.md)为准。旧主题场景配置及其发现入口也已移除。MCP 默认公开全部工具，可按实际 family 限制范围。
 
 ## 按需参考
 

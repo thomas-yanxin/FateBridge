@@ -627,7 +627,7 @@ def test_default_budget_pages_reconstruct_same_run_search_without_recomputation(
     monkeypatch.setattr(api, "RESULT_STORE", store)
 
     async def native():
-        async with Client(create_mcp_app(scenarios="onda-fengshui")) as client:
+        async with Client(create_mcp_app(families="fengshui")) as client:
             result = await client.call_tool(
                 "fengshui_assess",
                 {

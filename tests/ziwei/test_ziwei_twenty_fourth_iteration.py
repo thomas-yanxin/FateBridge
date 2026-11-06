@@ -15,12 +15,10 @@ from fatebridge.validation.agent_capture import read_capture
 
 
 @pytest.mark.parametrize(
-    "scenario,scope",
-    [("onda-xingpan", "complete"), ("onda-xingpan", "topic"), ("", "complete")],
+    "family",
+    ["", "metaphysics"],
 )
-def test_capture_and_ordinary_stdio_publish_identical_contracts(
-    tmp_path, scenario, scope
-):
+def test_capture_and_ordinary_stdio_publish_identical_contracts(tmp_path, family):
     root = Path(__file__).resolve().parents[2]
 
     async def published(module, log):
@@ -30,9 +28,7 @@ def test_capture_and_ordinary_stdio_publish_identical_contracts(
             cwd=str(root),
             env={
                 "PYTHONPATH": str(root / "src"),
-                "FATEBRIDGE_MCP_FAMILIES": "",
-                "FATEBRIDGE_MCP_SCENARIOS": scenario,
-                "FATEBRIDGE_MCP_TOOL_SCOPE": scope,
+                "FATEBRIDGE_MCP_FAMILIES": family,
                 "FATEBRIDGE_EVALUATION_LOG": str(log),
             },
             log_file=tmp_path / (module + ".stderr.log"),
@@ -75,7 +71,6 @@ def test_capture_without_opt_in_fails_before_business_configuration(tmp_path):
         **os.environ,
         "PYTHONPATH": str(root / "src"),
         "FATEBRIDGE_EVALUATION_LOG": "",
-        "FATEBRIDGE_MCP_TOOL_SCOPE": "invalid-capture-must-not-build-this-app",
     }
     result = subprocess.run(
         [sys.executable, "-m", "fatebridge.validation.agent_capture"],

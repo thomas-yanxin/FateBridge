@@ -310,7 +310,7 @@ def test_first_view_can_request_context_and_policy_with_resolvable_sources(monke
 
 def test_published_mcp_schema_exposes_context_without_birth_requirements():
     async def inspect():
-        async with Client(create_mcp_app(scenarios="onda-fengshui")) as client:
+        async with Client(create_mcp_app(families="fengshui")) as client:
             tool = next(
                 t for t in await client.list_tools() if t.name == "fengshui_assess"
             )

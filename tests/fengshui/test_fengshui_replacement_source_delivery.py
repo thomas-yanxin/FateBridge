@@ -22,7 +22,7 @@ def test_default_budget_same_run_pages_preserve_source_conflicts(period, angle, 
         }
 
     async def call():
-        async with Client(create_mcp_app(scenarios="onda-fengshui")) as client:
+        async with Client(create_mcp_app(families="fengshui")) as client:
             response = await client.call_tool(
                 "fengshui_" + name,
                 {

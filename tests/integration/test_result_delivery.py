@@ -502,7 +502,7 @@ def test_result_reader_respects_mcp_tool_profiles(store):
     ref = store.put(large_payload())
 
     async def read_hidden():
-        async with Client(create_mcp_app(scenarios="onda-fengshui")) as client:
+        async with Client(create_mcp_app(families="fengshui")) as client:
             with pytest.raises(Exception, match="未在当前 MCP 配置中公开"):
                 await client.read_resource(ref["manifest_uri"])
 

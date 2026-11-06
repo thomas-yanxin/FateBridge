@@ -62,7 +62,7 @@ def test_verified_resource_cannot_read_a_tool_hidden_by_mcp_scope(stored):
     _, _, ref = stored
 
     async def read():
-        async with Client(create_mcp_app(scenarios="onda-fengshui")) as client:
+        async with Client(create_mcp_app(families="fengshui")) as client:
             with pytest.raises(Exception, match="未在当前 MCP 配置中公开"):
                 await client.read_resource(
                     f"fatebridge://results/{ref['result_id']}/verified/original-run/0"

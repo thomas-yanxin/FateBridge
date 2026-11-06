@@ -180,7 +180,7 @@ def test_actual_mcp_schema_and_strict_projection_include_only_requested_branches
     monkeypatch,
 ):
     async def inspect():
-        async with Client(create_mcp_app(scenarios="onda-fengshui")) as client:
+        async with Client(create_mcp_app(families="fengshui")) as client:
             return next(
                 t for t in await client.list_tools() if t.name == "fengshui_assess"
             ).model_dump(by_alias=True)["inputSchema"]

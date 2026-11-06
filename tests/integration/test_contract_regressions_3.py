@@ -97,9 +97,7 @@ def test_all_verified_transports_preserve_frozen_payload_without_lock_writes(
     cli = json.loads(capsys.readouterr().out)
 
     async def read():
-        async with Client(
-            create_mcp_app(scenarios="onda-xingpan", tool_scope="topic")
-        ) as client:
+        async with Client(create_mcp_app(families="divination")) as client:
             uri = f"fatebridge://results/{ref['result_id']}/verified/{run_id}/fields/{path}/0"
             return json.loads((await client.read_resource(uri))[0].text)
 

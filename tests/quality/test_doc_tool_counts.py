@@ -13,7 +13,6 @@ import pytest
 
 from fatebridge.api import app
 from fatebridge.application.description import spec_is_cli_safe
-from fatebridge.application.scenarios import definitions
 from fatebridge.services.tool_catalog import CATALOG, mcp_specs, rest_specs
 
 REPO_ROOT = Path(__file__).resolve().parents[1].parent
@@ -23,29 +22,10 @@ LIVE_MCP = len(mcp_specs())
 LIVE_FAMILIES = len({spec.family for spec in mcp_specs()})
 LIVE_CATALOG = len(CATALOG)
 LIVE_CLI = sum(spec_is_cli_safe(spec) for spec in CATALOG)
-LIVE_SCENARIOS = len(definitions()["scenarios"])
 
 # (相对路径, 人类可读标签, 抽取数字的正则, 期望的实时计数)
 # 正则用 (\d+) 捕获文档当前声称的数字；期望值取自实时目录。
 CHECKS = [
-    (
-        "docs/api-reference.md",
-        "API 场景数量",
-        r"(\d+)\s*个场景",
-        LIVE_SCENARIOS,
-    ),
-    (
-        "docs/scenario-routing.md",
-        "路由矩阵场景数量",
-        r"共\s*(\d+)\s*项",
-        LIVE_SCENARIOS,
-    ),
-    (
-        "configs/scenarios/README.md",
-        "配置说明场景数量",
-        r"共有\s*(\d+)\s*个场景",
-        LIVE_SCENARIOS,
-    ),
     ("README.md", "README REST 业务路由", r"(\d+)\s*个业务\s*REST\s*路由", LIVE_REST),
     ("README.md", "README FastMCP 工具", r"(\d+)\s*个\s*FastMCP\s*工具", LIVE_MCP),
     (

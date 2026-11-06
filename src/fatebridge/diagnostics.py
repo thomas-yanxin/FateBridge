@@ -168,33 +168,19 @@ def diagnose(
     *,
     mcp: bool = False,
     family: Optional[str] = None,
-    scenario: Optional[str] = None,
-    tool_scope: Optional[str] = None,
 ) -> Dict[str, Any]:
     if mcp:
         load_runtime_env()
     family = family if family is not None else os.getenv("FATEBRIDGE_MCP_FAMILIES", "")
-    scenario = (
-        scenario if scenario is not None else os.getenv("FATEBRIDGE_MCP_SCENARIOS", "")
-    )
-    tool_scope = (
-        tool_scope
-        if tool_scope is not None
-        else os.getenv("FATEBRIDGE_MCP_TOOL_SCOPE", "complete")
-    )
     try:
         selected = select_mcp_specs(
             CATALOG,
             family=family or None,
-            scenario=scenario or None,
-            tool_scope=tool_scope,
         )
     except ParameterError as exc:
         return {"ok": False, **exc.as_result()}
     env = {
         "FATEBRIDGE_MCP_FAMILIES": family,
-        "FATEBRIDGE_MCP_SCENARIOS": scenario,
-        "FATEBRIDGE_MCP_TOOL_SCOPE": tool_scope,
     }
     dependencies: Dict[str, Any] = {}
     for dependency in importlib.metadata.requires("fatebridge") or []:
@@ -240,7 +226,7 @@ def diagnose(
     }
     if not selected:
         output["ok"] = False
-        output["error"] = "分类与场景交集为空，请调整 --family / --scenario"
+        output["error"] = "未找到所选分类的公开工具，请调整 --family"
     elif mcp and output["ok"]:
         try:
             output["mcp"] = asyncio.run(asyncio.wait_for(_probe_stdio(env), timeout=40))
@@ -249,7 +235,7 @@ def diagnose(
             output["mcp"] = {
                 "ok": False,
                 "error_type": type(exc).__name__,
-                "hint": "检查解释器、依赖和 MCP 分类/场景；用同一绝对路径启动进程复核日志。",
+                "hint": "检查解释器、依赖和 MCP 分类；用同一绝对路径启动进程复核日志。",
             }
             if isinstance(exc, _StdioProbeError):
                 output["mcp"].update(exc.details)

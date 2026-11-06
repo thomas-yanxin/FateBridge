@@ -21,7 +21,7 @@ jobs:
       contents: read
       pull-requests: read
     outputs:
-      checks: ${{ steps.paths.outputs.code == 'true' || steps.paths.outputs.scenario == 'true' || steps.paths.outputs.reference == 'true' }}
+      checks: ${{ steps.paths.outputs.code == 'true' || steps.paths.outputs.reference == 'true' }}
     steps:
       - name: Checkout push history for path filtering
         if: github.event_name != 'pull_request'
@@ -37,10 +37,8 @@ jobs:
               - '**'
               - '!README*.md'
               - '!docs/**/*.md'
-            scenario:
-              - 'docs/scenario-routing.md'
             reference:
-              - 'docs/interpretation/shared/**'
+              - 'docs/interpretation/**'
 
   documentation:
     runs-on: ubuntu-24.04
@@ -88,7 +86,7 @@ jobs:
           uv sync --locked --extra dev
       - name: Verify installed commands and real stdio MCP
         run: |
-          uv run --locked --extra dev fatebridge doctor --mcp --scenario onda-shiye
+          uv run --locked --extra dev fatebridge doctor --mcp --family bazi
           uv run --locked --extra dev python -m pytest -q tests/integration/test_cli.py tests/integration/test_api_alignment.py -n auto --maxprocesses=4 --dist worksteal
 
   quality:
@@ -129,9 +127,8 @@ jobs:
         run: uv run --locked --extra dev isort --check-only src/fatebridge scripts tests
       - name: Run type checks
         run: uv run --locked --extra dev mypy src/fatebridge/
-      - name: Check generated scenario and call contracts
+      - name: Check generated call contracts
         run: |
-          uv run --locked --extra dev python scripts/build_scenario_manifest.py --check
           uv run --locked --extra dev python scripts/build_codex_call_contracts.py --check
 
   test:
@@ -195,7 +192,7 @@ jobs:
           fi
       - name: Verify Windows startup and independent stdio MCP
         if: runner.os == 'Windows' && matrix.shard == 0
-        run: uv run --locked --extra dev fatebridge doctor --mcp --scenario onda-shiye
+        run: uv run --locked --extra dev fatebridge doctor --mcp --family bazi
       - name: Run self-contained checks
         run: |
           if [ "$CI_RESOLUTION" = locked ]; then

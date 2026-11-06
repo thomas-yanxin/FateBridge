@@ -326,7 +326,7 @@ def test_default_mcp_budget_keeps_source_difference_facts(name):
         }
 
     async def call():
-        async with Client(create_mcp_app(scenarios="onda-fengshui")) as client:
+        async with Client(create_mcp_app(families="fengshui")) as client:
             response = await client.call_tool(
                 "fengshui_" + name,
                 {
@@ -378,7 +378,7 @@ def test_same_run_full_pages_and_independent_receipt_preserve_source_disagreemen
         }
 
     async def call():
-        async with Client(create_mcp_app(scenarios="onda-fengshui")) as client:
+        async with Client(create_mcp_app(families="fengshui")) as client:
             response = await client.call_tool(
                 "fengshui_" + name,
                 {**inputs, "fields": None, "response_char_limit": 4096},

@@ -27,7 +27,7 @@ CLI 可直接运行；REST 默认端口为 `8010`；MCP 默认通过 stdio 由�
 | 本地 stdio、远程 HTTP 与停用 | [MCP 部署](mcp-deployment.md) |
 | 工具发现、错误恢复与字段投影 | [Agent 接入](agent-guide.md) |
 | 读取和保存同次完整结果 | [完整结果交付](agent-guide.md#完整结果交付与同次导出) |
-| 按问题选择咨询场景 | [场景路由](scenario-routing.md) · [方法参考](interpretation/README.md) |
+| 按能力选择计算方法 | [工具覆盖](algorithm-coverage.md) · [方法参考](interpretation/README.md) |
 | 运行请求示例 | [示例索引](examples/README.md) |
 | 升级旧接口或解决故障 | [故障排除](troubleshooting.md) |
 | 报告安全问题 | [安全策略](../SECURITY.md) |

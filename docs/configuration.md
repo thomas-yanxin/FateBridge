@@ -21,8 +21,6 @@ cp -n .env.example .env
 | `FATEBRIDGE_API_KEYS` | 空 | REST API Key；为空关闭鉴权 |
 | `API_KEY_HEADER_NAME` | `X-API-Key` | 密钥请求头名称 |
 | `FATEBRIDGE_MCP_FAMILIES` | 空 | MCP 公开的工具分类，逗号分隔；空时保留全部工具，分类拼错阻止启动；不影响 REST / CLI |
-| `FATEBRIDGE_MCP_SCENARIOS` | 空 | MCP 场景 ID，逗号分隔；与 family 配置取交集，空时不限制，拼错阻止启动 |
-| `FATEBRIDGE_MCP_TOOL_SCOPE` | `complete` | 当前源码支持；`complete` 包含场景条件依赖，`topic` 仅保留直接工具与知识支撑且必须指定场景；见[MCP 范围](mcp-deployment.md#工具筛选与运行环境) |
 | `SE_EPHE_PATH` | 未设置 | 自定义本地星历目录，不在模板内 |
 | `FATEBRIDGE_SOLAR_TERM_MODEL` | `auto` | 当前源码在 1700–2300 年默认使用随包 DE440；严格原生 JPL 配置优先。各模式、年份和相邻边界见[太阳后端](solar-backends.md) |
 | `FATEBRIDGE_SOLAR_SPK_FILE` | 未设置 | 仅显式`spk`模式使用的外部文件，需可选`jpl`依赖；默认随包系数不读取该文件 |

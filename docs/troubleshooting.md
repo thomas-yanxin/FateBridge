@@ -26,7 +26,7 @@ uv run --locked --extra dev python -c "import sys, fatebridge; print(sys.executa
 uv run --locked --extra dev fatebridge doctor
 ```
 
-若问题只出现在 MCP host，再用相同环境运行 `fatebridge doctor --mcp --scenario onda-shiye`，将场景替换为实际范围。这会检查独立 stdio 进程；通过后仍需在 host 的新聊天确认工具已加载。REST 问题还应检查实际端口的 `/health` 与 `/ready`。
+若问题只出现在 MCP host，再用相同环境运行 `fatebridge doctor --mcp --family bazi`，将分类替换为实际范围。这会检查独立 stdio 进程；通过后仍需在 host 的新聊天确认工具已加载。REST 问题还应检查实际端口的 `/health` 与 `/ready`。
 
 下文中的 `python` / `fatebridge` 简写假设已激活正确环境；源码用户可加 `uv run --locked --extra dev` 前缀。
 
@@ -73,7 +73,7 @@ API_HOST=127.0.0.1 API_PORT=8011 python -m fatebridge.api
 
 ### MCP host 连不上
 
-先用同一安装环境执行 `fatebridge doctor --mcp`，或加 `--scenario onda-shiye` 验证所选场景；它会从无关工作目录启动独立进程。Codex 的原生配置与检查步骤见 [Codex 使用指南](codex-guide.md)。
+先用同一安装环境执行 `fatebridge doctor --mcp`，或加 `--family bazi` 验证所选分类；它会从无关工作目录启动独立进程。Codex 的原生配置与检查步骤见 [Codex 使用指南](codex-guide.md)。
 
 默认 MCP 是 stdio 进程，不创建 HTTP URL。host 配置应使用已安装本仓库的解释器绝对路径，例如 `/absolute/path/to/FateBridge/.venv/bin/python` 和参数 `-m fatebridge.mcp_server`。不要依赖 GUI host 继承 shell 的环境激活状态。确认 host 的进程日志、解释器和包路径，配置结构见 [接入指南](agent-guide.md#fastmcpagent-host)。
 
@@ -81,7 +81,7 @@ API_HOST=127.0.0.1 API_PORT=8011 python -m fatebridge.api
 
 ### 工具已连接但列表不完整
 
-查看 host 启动环境中的 `FATEBRIDGE_MCP_FAMILIES` 与 `FATEBRIDGE_MCP_SCENARIOS`，两者取交集。先用相同筛选运行 doctor，再检查当前连接的 `tools/list` 与场景 `availability`；读取单工具资源不能使隐藏工具恢复公开。扩大范围后重启连接，并在新聊天确认工具列表。
+查看 host 启动环境中的 `FATEBRIDGE_MCP_FAMILIES`。先用相同分类运行 doctor，再检查当前连接的 `tools/list`；读取单工具资源不能使隐藏工具恢复公开。扩大范围后重启连接，并在新聊天确认工具列表。
 
 ### Codex 桌面版与终端 CLI 的模型不一致
 
@@ -197,7 +197,7 @@ Python 版本和解释器路径：
 脱敏请求及相关查询参数：
 HTTP 状态 / CLI 退出码 / MCP isError：
 error_code、retryable 与 issues：
-相关配置：端口、鉴权是否开启、MCP family/scenario 范围
+相关配置：端口、鉴权是否开启、MCP family 范围
 运行凭据：run_id、trace_id（若有）
 ```
 

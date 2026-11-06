@@ -60,7 +60,7 @@ uv sync --locked --extra dev
 uv run --locked --extra dev fatebridge doctor
 ```
 
-本文对应当前开发分支。已发布包查阅[对应标签](https://github.com/thomas-yanxin/FateBridge/tags)的文档，未发布变化见 [CHANGELOG](CHANGELOG.md#unreleased)。Python wheel 包含计算代码和规则数据。旧 Onda 技能与插件打包入口已移除。
+本文对应当前开发分支。已发布包查阅[对应标签](https://github.com/thomas-yanxin/FateBridge/tags)的文档，未发布变化见 [CHANGELOG](CHANGELOG.md#unreleased)。Python wheel 包含计算代码和规则数据。旧 Onda 技能、主题场景配置与插件打包入口已移除。
 
 ### 完成第一次计算
 
@@ -114,7 +114,7 @@ uv run --locked --extra dev python scripts/check_docs.py
 uv run --locked --extra dev python -m pytest -q tests/quality/test_documentation_integrity.py tests/quality/test_doc_tool_counts.py
 ```
 
-接口、场景配置和生成源的同步要求见[文档维护与验证](docs/development-guide.md#文档维护与验证)。报告问题请附版本、虚构的最小复现和实际错误；安全问题按 [SECURITY.md](SECURITY.md) 私下报告。
+接口与生成合同的同步要求见[文档维护与验证](docs/development-guide.md#文档维护与验证)。报告问题请附版本、虚构的最小复现和实际错误；安全问题按 [SECURITY.md](SECURITY.md) 私下报告。
 
 ## 文档与使用范围
 

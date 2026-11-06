@@ -10,7 +10,6 @@ from pydantic import ConfigDict, ValidationError
 from fatebridge.application.description import describe_input_spec, resolve_spec
 from fatebridge.application.discovery import discover_specs
 from fatebridge.application.result_delivery import DEFAULT_MCP_RESPONSE_CHARS
-from fatebridge.application.scenarios import discover_scenarios
 from fatebridge.core.execution_context import (
     ExecutionOptions,
     correlate_error,
@@ -64,26 +63,6 @@ def register_discovery_resources(
             },
             ensure_ascii=False,
             separators=(",", ":"),
-        )
-
-    @app.resource("fatebridge://scenarios", mime_type="application/json")
-    def scenarios_summary() -> str:
-        """Scenario summaries limited to this host's registered tools."""
-        return json.dumps(
-            discover_scenarios(
-                catalog, surface="mcp", detail="summary", allowed_names=allowed
-            ),
-            ensure_ascii=False,
-        )
-
-    @app.resource("fatebridge://scenarios/{scenario}", mime_type="application/json")
-    def scenario_manifest(scenario: str) -> str:
-        """Evidence roles and callable tools, including explicit missing capability markers."""
-        return json.dumps(
-            discover_scenarios(
-                catalog, scenario=scenario, surface="mcp", allowed_names=allowed
-            ),
-            ensure_ascii=False,
         )
 
     from fatebridge.application.result_delivery import RESULT_STORE
