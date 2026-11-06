@@ -340,7 +340,7 @@ python3 -m fatebridge.cli --no-metadata astro_chart \
   --birth-latitude 31.23 --birth-longitude 121.47 --birth-place 上海
 ```
 
-跑不通时永远的第一步：`python3 -m fatebridge.cli describe <tool>`。
+参数不清楚时运行 `python3 -m fatebridge.cli describe <tool>`。安装、连接或依赖错误按实际报错处理，参见[故障排除](../../docs/troubleshooting.md)。
 
 ---
 

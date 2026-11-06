@@ -1,6 +1,8 @@
 # 宿曜与宿占：当前历法、规则与来源
 
-`Suzhan` 宿占与 `sukuyo_compatibility` 双人相性保留实际所选宿主历法、配宿档案与原典条文。历日宿名、天文角距与行为条文各有不同适用条件，不能互换身份。
+[文档中心](README.md) · [API 参考](api-reference.md) · [算法状态](algorithm-status.md)
+
+`suzhan` 宿占与 `sukuyo_compatibility` 双人相性保留实际所选宿主历法、配宿档案与原典条文。历日宿名、天文角距与行为条文各有不同适用条件，不能互换身份。
 
 ## 历法与配宿档案
 

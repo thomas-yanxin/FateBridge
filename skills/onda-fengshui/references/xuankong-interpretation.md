@@ -16,7 +16,7 @@
 | [Kartar Diamond：Excerpt from the Mountain Dragons and Water Dragons Case Study](https://fengshuisolutions.net/excerpt-from-the-mountain-dragons-and-water-dragons-case-study-by-kartar-diamond/) | 作者本人网站，2025-04-26 | 山星／向星是盘中角色，不能与星自身五行混淆；先核时令，再看形态与用途；作者明确不同学校有不同处理方法 |
 | [Kartar Diamond：Feng Shui Interpretation of Yin Rooms and Yang Rooms](https://fengshuisolutions.net/feng-shui-interpretation-of-yin-rooms-and-yang-rooms-by-kartar-diamond/) | 作者本人网站，2024-05-05 | 睡眠与入口等活动用途应区分；当运山星和向星分别作为睡眠、入口取用的依据。本版本只采用床和门，不扩展为所有工作桌规则；文中九运“2024–2044”的端点不用于定运 |
 | [American Feng Shui Institute：FS351—Day Selection, Class 2](https://www.amfengshui.com/wp-content/uploads/2014/09/fs351.pdf) | 出版方 PDF，2006；Larry Sang 传授、Lorraine Wilcox 撰写、Hermann Urkauf 编辑；印刷第56页／PDF第56页 | 星数与五行的对应表；不采用该节求子、疾病及吉凶断语 |
-| [Larry Sang／American Feng Shui Institute：The Principles of Feng Shui](https://www.amfengshui.com/wp-content/uploads/woocommerce_uploads/2013/12/tpofs.pdf) | 已有规则来源 E1；第三章，印刷第19–28页／PDF第36–45页；本轮已取得同散列 PDF，五行材料重点印刷23、25／PDF40、42页 | 五行生、克及泄的机械关系，不由“相生”自动推论吉利 |
+| [Larry Sang／American Feng Shui Institute：The Principles of Feng Shui](https://www.amfengshui.com/wp-content/uploads/woocommerce_uploads/2013/12/tpofs.pdf) | 已有规则来源 E1；第三章，印刷第19–28页／PDF第36–45页；原始 PDF 已保存并核对散列，五行材料重点印刷23、25／PDF40、42页 | 五行生、克及泄的机械关系，不由“相生”自动推论吉利 |
 
 第一项与现有中州网页选版相连；后两位作者／出版方提供独立核对，不代表他们的全部理论与中州派相同。实现采用明确标注来源的共同有限条件，不混入其他作者的换运、摆件、疾病或灾害结论。
 

@@ -35,7 +35,7 @@
 
 数值用JSON数值，日期和时刻按明确的ISO形式提交；布尔值、数字字符串或Unix时间戳不能冒充角度、运数及历法事实。范围内的整数值 `8.0` 仍可使用，非整数不舍入。详见风水输入类型。
 
-可运行输入按用途列于[示例索引](examples/README.md)。完整约束见 `/openapi.json`、MCP `tools/list` 和 `fatebridge describe fengshui_assess`。新 family 是 `fengshui`；不加入个人 `analyze_destiny` 或 `profile` 默认系统。[月紫白参考](../skills/onda-fengshui/references/monthly-stars.md)说明立春有效年、十二节换月、原表标签差异与原始回执核验；合参可显式选择 `monthly_stars` 或提供独立 `monthly`。
+可运行输入按用途列于[示例索引](examples/README.md)。完整约束见 `/openapi.json`、MCP `tools/list` 和 `fatebridge describe fengshui_assess`。工具分类为 `fengshui`；不加入个人 `analyze_destiny` 或 `profile` 默认系统。[月紫白参考](../skills/onda-fengshui/references/monthly-stars.md)说明立春有效年、十二节换月、原表标签差异与原始回执核验；合参可显式选择 `monthly_stars` 或提供独立 `monthly`。
 
 `fengshui_xuankong_natal` 提供中州派完整运／山／向数字盘与兼向替星；聚合时显式选择 `xuankong_natal`，与年度飞星独立。定运资料、分界候选、规则版本及独立盘例见 [玄空宅盘](fengshui-xuankong.md)。
 
@@ -106,7 +106,7 @@ async def main():
 asyncio.run(main())
 ```
 
-`--request-file` 当前由七个风水工具明确启用，接受 JSON 对象，未知字段照常报错；不是只挑出生字段的 `--subject-file`。合并优先级为模型默认值 < subject 档案 < request 文件 < 显式字段参数。嵌套字段整体替换，不做递归混合。请求文件解析失败退出2，模型校验失败退出1，合法 `partial` 退出0。
+`--request-file` 当前由八个风水工具明确启用，接受 JSON 对象，未知字段照常报错；不是只挑出生字段的 `--subject-file`。合并优先级为模型默认值 < subject 档案 < request 文件 < 显式字段参数。嵌套字段整体替换，不做递归混合。请求文件解析失败退出2，模型校验失败退出1，合法 `partial` 退出0。
 
 ## 规则与版本
 
@@ -147,7 +147,7 @@ asyncio.run(main())
 
 仅解释家庭卦名／对宫用 `household_scope=symbolic_reference`，不绑定真实方向或为此追罗盘；默认 `environmental_binding` 才关联环境方区。家庭及生肖输出的 `scope`／适用方法限定为飞星、金锁的环境象征索引，不作为八宅命卦；实际个人匹配看八宅层。
 
-无方位具体关系新增 `environmental_context.interior_relations`：以源／目标对象及明确角色检查本次有来源的厨卫、床灶、镜面、梁管和尖角关系；床位尖角规则限实体柱角，床头／灶背共墙须确认墙另一侧实际便器，旧四类粗粒度 `observations` 不自动触发更强规则。`material_facts` 另存材质、器形、颜色与明确代表物资格问题。实际提供对应输入才返回 `layout_analysis.interior_analysis/material_analysis`；关系 null 和照片均待确认，确认 false 只说明本条不成立。资格不确认摆位或 ready，作者来源、条件工程动作和镜面方法异议分列，详见[本轮有来源规则](../skills/onda-fengshui/references/sourced-interior-rules.md)。
+无方位具体关系新增 `environmental_context.interior_relations`：以源／目标对象及明确角色检查本次有来源的厨卫、床灶、镜面、梁管和尖角关系；床位尖角规则限实体柱角，床头／灶背共墙须确认墙另一侧实际便器，旧四类粗粒度 `observations` 不自动触发更强规则。`material_facts` 另存材质、器形、颜色与明确代表物资格问题。实际提供对应输入才返回 `layout_analysis.interior_analysis/material_analysis`；关系 null 和照片均待确认，确认 false 只说明本条不成立。资格不确认摆位或 ready，作者来源、条件工程动作和镜面方法异议分列，详见[室内关系与材质规则](../skills/onda-fengshui/references/sourced-interior-rules.md)。
 
 多层及独立院落还须各自确认 `floors[].floorplan_alignment_confirmed`、`center_confirmed`，并以 `uses_shared_orientation=true` 采用全宅已确认方向；全宅中心不自动成为每层中心。逐层门槛不足时不能提交关联对象的物理落宫事实。当前各层复用本次已明确声明的宅／年盘，位置按各自确认中心提供；不会自动建立每层宅运或自动立极。
 
@@ -215,7 +215,7 @@ asyncio.run(main())
 
 元素目标的 `target_method` 必须已选中，且 `object_id` 必须引用已提供布局对象。八宅还须指定 `subject_id`、`aspect`；玄空须指定运/山/向 `star_role`。候选命卦/候选宅盘只给候选方案，不能输出确认处方。灶座的凶方特殊用途不能套用普通凶星削弱。本版本优先列实际元素代表物，再列色彩替代，不要求购买、数量、重量或效果概率。
 
-方案同时返回 `cross_scope_effects`，显示加入的元素对同一对象其他已算层的生/泄/克关系；这些关系不合成一个“全宅有利”结论。`supplemental_rulesets` 和顶层 `rulesets`/`rule_trace` 保留作者、版本、原文位置和检索 SHA-256；`supplement_statuses` 区分未请求、完成、部分及年份不支持。不同作者对物件路线的分歧在 `method_disagreements` 明示。
+方案同时返回 `cross_scope_effects`，显示加入的元素对同一对象其他已算层的生/泄/克关系；这些关系不合成一个“全宅有利”结论。`supplemental_rulesets` 和顶层 `rulesets`/`rule_trace` 保留作者、版本和原文位置；检索文件的 SHA-256 由内部来源资料维护；`supplement_statuses` 区分未请求、完成、部分及年份不支持。不同作者对物件路线的分歧在 `method_disagreements` 明示。
 
 可运行示例见 [形态输入](examples/fengshui-forms.json)、[元素目标](examples/fengshui-elements.json) 和 [年度作者候选](examples/fengshui-annual-remedy.json)。来源核对、采用与排除的规则见[形态与元素规则证据](../skills/onda-fengshui/references/layout-rules.md)。
 

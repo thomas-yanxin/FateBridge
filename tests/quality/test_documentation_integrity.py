@@ -99,3 +99,32 @@ def test_current_links_to_missing_historical_files_or_anchors_still_fail(
     output = capsys.readouterr().out
     assert "missing local target" in output
     assert "missing heading anchor" in output
+
+
+def test_reference_links_and_multiline_html_keep_source_locations():
+    document = check_docs.inspect_markdown(
+        "[guide][Getting Started]\n![logo][logo]\n[logo][]\n"
+        '<a\n href="docs/start.md#setup">Start</a>\n'
+        '<img src="images/logo.png">\n'
+        '```html\n<img src="not-an-asset.png">\n```\n'
+        '[getting started]: <docs/start.md#setup> "Setup"\n'
+        "[logo]: images/logo.png\n[missing][unknown]\n"
+    )
+    assert document.links == [
+        (4, "docs/start.md#setup"),
+        (6, "images/logo.png"),
+        (1, "docs/start.md#setup"),
+        (2, "images/logo.png"),
+        (3, "images/logo.png"),
+    ]
+    assert document.errors == ["12: undefined link reference: unknown"]
+
+
+@pytest.mark.parametrize(
+    "text",
+    ['<img src="missing.png">', "[logo][asset]\n\n[asset]: missing.png"],
+)
+def test_missing_html_and_reference_assets_fail(tmp_path, monkeypatch, text):
+    monkeypatch.setattr(check_docs, "ROOT", tmp_path)
+    (tmp_path / "README.md").write_text(text, encoding="utf-8")
+    assert check_docs.main([]) == 1

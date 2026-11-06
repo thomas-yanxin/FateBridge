@@ -192,13 +192,15 @@ fatebridge bazi_birth --birth-year 1990 --birth-month 6 --birth-day 15 \
 
 MCP 默认 `response_char_limit=8192`，REST / CLI 默认 `0`（不限制）。成功结果超出非零预算时，响应包含 `result_delivery`，保留运行标识及预算内的业务字段；剩余字段从同一 run 的交付物读取，不重新计算。允许的预算为 `0` 或 `4096–65536`，错误响应不按业务字段裁剪。
 
-完整结果超过输出预算且运行环境较长时，`run_metadata.runtime` 在行内保留文件数 `ephemeris_files_count` 及 `delivery_path`。`result_delivery.deferred_fields` 明列 `run_metadata.runtime`；按该点路径读取可恢复完整运行环境及配置文件名清单，清单没有被当作空集合或静默截断。预算为0时仍返回原完整回执。首轮业务分析优先保持可读。
+行内响应可能保留全部业务字段，也可能只保留一部分。先查看 `result_delivery.deferred_fields`，再读取所需内容：
 
-业务字段仍接近预算上限时，可再把补充回执`run_metadata.provenance`、`run_metadata.determinism`留在同次交付物中，并在`deferred_fields`逐项明列，优先保留全部行内业务字段；运行标识仍行内可见。若完整业务与关键回执仍无法同时容纳，则明确分页业务字段；只有回执自身仍超出预算时，分页分支才延后这些补充回执。不能把整个`run_metadata`移出行内来伪装完整首轮交付。读取同次交付物可精确恢复原回执和业务字段，不重新计算、不缩减业务事实或提高预算；关键回执本身无法容纳时返回预算错误。
+| 响应情况 | 下一步 |
+| --- | --- |
+| 业务字段完整，部分 `run_metadata` 延后 | 按 `delivery_path` 读取运行证据 |
+| 业务字段也已延后 | 从清单读取所需字段或完整分页，再解释这些内容 |
+| `compact_reference=true` | 引用省略了部分重复定位信息，从 `manifest_uri` 取得完整清单 |
 
-交付优先级为完整回执与完整引用、完整回执与精简引用、必要时才显式延后补充回执。前一种能够容纳时立即采用，不因后备方式存在而提前移走来源或确定性说明；同次存储的原始结果不改写。
-
-当完整业务字段可以随精简引用一起落入预算时，`result_delivery.compact_reference=true` 保留同次业务字段、身份、有效期及清单URI。重复的`available_fields`、`total_bytes`、`page_chars`、`rest_manifest_path`可从清单恢复；紧预算下还可依次省略重复的首分页URI和本地文件定位。清单仍保存完整定位，不能把精简引用当作完整清单。完整引用原本可放下时仍沿用完整引用；较大业务结果继续按同次结果分页。精简引用不降低响应预算，也不删除业务事实。
+以上均读取原 run，不重新计算。预算、回执保留顺序和引用字段约定见[API 参考](api-reference.md#25-字段投影与输出体积)。
 
 需要完整 JSON、全部时间线或完整文件时，**首次调用 `fields=null`**；REST / CLI 不传字段筛选。需要完整快照时保留默认 `include_snapshot_text=true`，也不要用 `selected_sections` 缩小导出文本。保留默认预算即可。交付物保存的是投影和快照选项处理后的结果，摘要调用的文件无法恢复未选字段。
 
@@ -348,39 +350,9 @@ console.log(data.wealth_analysis);
 
 安装、客户端配置、Windows、HTTP 运行、远程接入与升级见 [MCP 部署指南](mcp-deployment.md)。本节解释本地 stdio 的基础配置及协议合同。
 
-启动：
+客户端启动命令为 `fatebridge-mcp`，GUI host 使用实际安装环境的绝对路径。可复制的 JSON／TOML 配置统一见[本地 stdio 注册](mcp-deployment.md#注册本地-stdio)。
 
-```bash
-fatebridge-mcp
-# 等价于 python -m fatebridge.mcp_server
-```
-
-将 stdio 进程注册到支持 `mcpServers` 配置的 MCP host（以下是结构示例，路径需替换为实际安装目录）：
-
-```json
-{
-  "mcpServers": {
-    "fatebridge": {
-      "command": "/absolute/path/to/FateBridge/.venv/bin/python",
-      "args": ["-m", "fatebridge.mcp_server"]
-    }
-  }
-}
-```
-
-也可直接使用安装后的脚本，GUI host 同样建议使用绝对路径：
-
-```json
-{
-  "mcpServers": {
-    "fatebridge": {
-      "command": "/absolute/path/to/FateBridge/.venv/bin/fatebridge-mcp"
-    }
-  }
-}
-```
-
-几个注意点：
+协议处理要点：
 
 - 默认使用 stdio，由 host 启动子进程；手工启动不会创建 HTTP MCP 地址。
 - 使用已安装 FateBridge 的解释器绝对路径，避免 GUI host 继承不到虚拟环境。Windows 使用 `.venv\Scripts\python.exe`。
@@ -430,7 +402,7 @@ fatebridge profile --systems bazi,ziwei,astro \
 
 ## 家居风水接入
 
-七个 `fengshui_*` 工具由同一目录发布 REST、MCP 和 CLI。独立命卦／年盘可用简单字段，组合住宅请求使用 JSON；CLI 提供 `--request-file`，文件里的未知字段也会校验。`layers` 保留八宅宅盘／逐人命盘、砂水观察和年度盘；每层带版本与来源，`coverage` 区分缺失、未请求和未实现层。`partial` 是可用的部分结果，不能按计算失败重试；也不能把候选命卦或三层叠加改写成一个总分。复制调用示例见 [家居风水](fengshui.md)。
+八个 `fengshui_*` 工具由同一目录发布 REST、MCP 和 CLI。独立命卦／年盘可用简单字段，组合住宅请求使用 JSON；CLI 提供 `--request-file`，文件里的未知字段也会校验。`layers` 保留八宅宅盘／逐人命盘、砂水观察和年度盘；每层带版本与来源，`coverage` 区分缺失、未请求和未实现层。`partial` 是可用的部分结果，不能按计算失败重试；也不能把候选命卦或三层叠加改写成一个总分。复制调用示例见 [家居风水](fengshui.md)。
 
 问布局是否要改时使用通用 `fengshui_assess` 并设 `analyze_layout=true`，将已确认对象位置／朝向放入 `placements`。只知道朝向可省略位置并取部分计算；不得把朝向替代落宫。`layout_analysis` 返回跨层位置关联、按作用域反算的匹配方位、砂水调整分类与五行关系；其状态与原始盘分开。命卦可传 `birth_date`，非立春当日不强制出生时刻。所有风水工具描述均提供首轮字段；已知合同直接调用，缺定义时按工具名检索一次。
 

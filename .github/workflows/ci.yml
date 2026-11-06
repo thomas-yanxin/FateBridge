@@ -40,6 +40,26 @@ jobs:
             scenario:
               - 'docs/scenario-routing.md'
 
+  documentation:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install uv
+        uses: astral-sh/setup-uv@v8.2.0
+        with:
+          enable-cache: true
+          cache-suffix: py3.12-locked
+          save-cache: false
+      - name: Check documentation links, examples and published tool coverage
+        run: |
+          uv run --locked --extra dev python scripts/check_docs.py
+          uv run --locked --extra dev python -m pytest -q tests/quality/test_documentation_integrity.py tests/quality/test_doc_tool_counts.py
+
   locked:
     needs: changes
     if: needs.changes.outputs.checks == 'true'
@@ -107,8 +127,6 @@ jobs:
         run: uv run --locked --extra dev isort --check-only src/fatebridge scripts tests
       - name: Run type checks
         run: uv run --locked --extra dev mypy src/fatebridge/
-      - name: Check documentation
-        run: uv run --locked --extra dev python scripts/check_docs.py
       - name: Check generated scenario and call contracts
         run: |
           uv run --locked --extra dev python scripts/build_scenario_manifest.py --check
@@ -204,18 +222,20 @@ jobs:
   ci:
     name: CI result
     if: always()
-    needs: [changes, locked, quality, test]
+    needs: [changes, documentation, locked, quality, test]
     runs-on: ubuntu-24.04
     steps:
       - name: Require every selected job to pass
         env:
           CHANGES_RESULT: ${{ needs.changes.result }}
+          DOCUMENTATION_RESULT: ${{ needs.documentation.result }}
           CHECKS_REQUIRED: ${{ needs.changes.outputs.checks }}
           LOCKED_RESULT: ${{ needs.locked.result }}
           QUALITY_RESULT: ${{ needs.quality.result }}
           TEST_RESULT: ${{ needs.test.result }}
         run: |
           test "$CHANGES_RESULT" = success
+          test "$DOCUMENTATION_RESULT" = success
           if [ "$CHECKS_REQUIRED" = true ]; then
             test "$LOCKED_RESULT" = success
             test "$QUALITY_RESULT" = success
@@ -224,7 +244,7 @@ jobs:
             test "$LOCKED_RESULT" = skipped
             test "$QUALITY_RESULT" = skipped
             test "$TEST_RESULT" = skipped
-            echo "Passive documentation only; no runtime checks required."
+            echo "Documentation checks passed; heavy runtime checks not required."
           else
             exit 1
           fi

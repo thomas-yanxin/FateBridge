@@ -69,7 +69,7 @@ def evidence_views(spec: ToolSpec) -> Optional[Dict[str, Any]]:
         views = views or {}
         views["data_files"] = {
             "fields": ["ephemeris_data_policy"],
-            "scope": "Available when ephemeris_policy=require_data_files. Read the actual observed physical models, file hashes, reference zeros and private-worker reports. Native event-internal reads, fixed-star catalogue formulae and absolute accuracy are not certified. This card does not set the input policy.",
+            "scope": "Available when ephemeris_policy=require_data_files. Read the actual observed physical models, file sources, reference zeros and private-worker reports. Native event-internal reads, fixed-star catalogue formulae and absolute accuracy are not certified. This card does not set the input policy.",
         }
     if key in {"meihua_cast", "meihua_analysis"}:
         views = views or {}

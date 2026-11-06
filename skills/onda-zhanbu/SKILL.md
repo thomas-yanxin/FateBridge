@@ -66,7 +66,11 @@ description: 用 FateBridge 围绕一个具体问题起卦或起局，呈现可�
 
 端法已确认上下卦仍用`observed_trigrams`。若明确提供原文五类物象，可用`observed_categories`，由领域代码查表：elder_person老人乾、young_person少年艮、cow牛坤、chicken鸡巽、dry_wood槁木离。须有非空subject_description、确认单一对象的布尔single_subject_confirmed=true、八方direction、from/toward/at的direction_role及hour_branch；当前聊天已明示这些事实即可据实填写，不重复追问。未知类别、普通木材或未确认枯木的落枝、群物不补分类，不猜年龄门槛。来方不换成相反行进方向；少年从南来用南离，不因向北走改坎。用先天卦序加原时支一次取爻，不用洛书宫数或默认GPS扇区。读`meihua.seed.observation_basis`或`observation_source`字段卡，按输入路径核对原句、原页、声明与实际卦图；新入口不补占者活动、外应或季令，现场与完整起占条件仍未独立核实。五类有限范围、复用原例及参数格点都不证明唯一古法或现实预测有效。详见[已报类别端法](../../docs/meihua.md#按已报物象类别起端法卦)。
 
-时间入口`meihua_analysis`仅在相应分量已确认时可选给严格整数`analysis_minute=0..59`、`analysis_second=0..59`；未知省略或null，数值计算补00，仅是名义参考，不保证未知时段内月令相同。读`civil_clock_resolution.input_components`区分已提供分量与计算补位，按摘要如实说明参考时刻；输入位数不认证现场精度，缺项不推断四舍五入、截断或误差区间，`calendar_stability=not_assessed`不能说成已验证稳定。秒数只定位实际时刻，不参与起卦取数，也不证明时钟、星历或预测精度。可保留`analysis_timezone`并给`analysis_utc_offset`核对重复钟时，不能把地区时区静默换成固定偏移。读取`analysis_context.civil_utc_offset/civil_instant_utc`及`meihua.calendar_policy.civil_clock_resolution`；未知偏移不猜，跳时或整日跳过不能靠偏移补成有效。交节比较沿用已确认实际UTC，农历日期和时支仍取原地区民用钟时。不同UTC若当地日期时支相同可以同卦，不强求卦象不同或算作独立占验。实际回拨可为一小时、半小时或所选历史记录的343秒，不能套固定时长。历史偏移只证当前tzdb记录，不证明现场钟表或秒级天文精度；消歧约定不是原典唯一时制或现实预测验收。详见[钟时消歧](../../docs/meihua.md#民用钟时地区时区与明确偏移)。
+时间入口`meihua_analysis`仅在相应分量已确认时可选给严格整数`analysis_minute=0..59`、`analysis_second=0..59`；未知省略或null，数值计算补00，仅是名义参考，不保证未知时段内月令相同。读`civil_clock_resolution.input_components`区分已提供分量与计算补位，按摘要如实说明参考时刻；输入位数不认证现场精度，缺项不推断四舍五入、截断或误差区间，`calendar_stability=not_assessed`不能说成已验证稳定。
+
+秒数只定位实际时刻，不参与起卦取数，也不证明时钟、星历或预测精度。可保留`analysis_timezone`并给`analysis_utc_offset`核对重复钟时，不能把地区时区静默换成固定偏移。读取`analysis_context.civil_utc_offset/civil_instant_utc`及`meihua.calendar_policy.civil_clock_resolution`；未知偏移不猜，跳时或整日跳过不能靠偏移补成有效。交节比较沿用已确认实际UTC，农历日期和时支仍取原地区民用钟时。
+
+不同UTC若当地日期时支相同可以同卦，不强求卦象不同或算作独立占验。实际回拨可为一小时、半小时或所选历史记录的343秒，不能套固定时长。历史偏移只证当前tzdb记录，不证明现场钟表或秒级天文精度；消歧约定不是原典唯一时制或现实预测验收。详见[钟时消歧](../../docs/meihua.md#民用钟时地区时区与明确偏移)。
 
 四声字占`text_tones`的1／2／3／4是所报平／上／去／入类别，不是现代拼音一至四声，也不能笼统认证为唯一中古音。可用`tone_reference`记录已确认音系、来源及读音层次；缺项保持未知，声明存在仍非工具独立鉴定。读取`meihua.seed.text_tone_basis`及两处证据范围，逐字类别与事实路径照录。所选「今日動靜如何」原例动静取去声，另一韵书归上声不能用来静默改原例；该句类别比较只核对所报数组，不是全历史音系认证。数组不同时说明本次没有复现该原例取音；其他文字及未给文字不借用原例认证，不自动查字、套连读变调或生成另一卦择优。详见[四声依据](../../docs/meihua.md#四声字占的音系与原例依据)。
 
@@ -80,7 +84,11 @@ description: 用 FateBridge 围绕一个具体问题起卦或起局，呈现可�
 
 人事内卦紧次与情境条件读`interpretation.stage_emphasis`或`stage_emphasis`字段卡，审计用`stage_emphasis_audit`。`matter_scenario`只接已确认的原文事项类别：`favorable_matter`为问吉事、`unfavorable_matter`为问不吉之事；未知不补，不从愿望、题篇或问题情绪推断，也不是预测出的吉凶。声明与原始输入路径随`scenario_declaration`保留，未独立核实。未给时情境字段保持null；必要卦内结构已不满足时整句适用为false，结构满足但情境未给时才为null，不从不适用反推情境。已给时`full_clause_applies`只核对所选条文前提，不能变成成败、无害或灾祸保证。用互变的紧次不是权重；互层迟速句范围未裁定，互中有生体且所报吉事情境也仍待定。生体与克体并见，吉事情境的阻节句要同时保留；三条`scenario_clauses`区分吉事无生有克、不吉事有生与无生。生助受制与旺衰仍需说明，不抵消或投票成净结果。每个候选共用所报情境但分别核对自身原体与关系；不擅选最早最迟，不推日期或概率。天时不接此参数。详见[内卦情境条件](../../docs/meihua.md#内卦的紧次与生体迟速条件)。
 
-默认字段清单与`reading`卡已包含`interpretation.seasonal_qualification`；旺衰与生克合读也可使用 `strength` 字段卡；有取数候选时用 `strength_audit` 保留各自季令与直接制约。按所选卷二《衰旺论》分列体旺逢生、体衰逢克、体衰有生三个条件，体衰受克与有生可同时成立，加重与“衰稍解”都要解释。`preferences` 的体宜旺、生体宜旺、克体宜衰不是联合必要条件，不加总打分。`原文未定`与缺节月保持待定，不写中性或弱；生助受制等仍须同看，未裁定净结果。“重遇克”不补次数阈值，未作月日合参或全书章节优先级。候选的 `strength_fact_path` 指向自己的 `casting_readings` 季令，不引用主候选强弱；天气不使用这一人事层。另读`volume3_qualification`：体旺受克的限定、体衰、体旺有生与逐角色乘旺句分列；克体且旺属于明示例外，不能引用乘旺皆吉。分读`favorable_clause_applies`与`attacker_wang_exception_applies`，克体角色即使强弱未知，吉句也为false，旺克例外本身仍可null；不以pending_strength补吉句。`matched_selected_month_conditions`不是净作用；受制、卷二条件与日气仍并列。`seasonal_qualification.summary`已带卷二、卷三来源标签并列两段所选条件，主摘要及各候选同步呈现；原卷二文字在`volume2_summary`保留；内外有生／无生及党多仍待裁定，未评估外应不等于确认外无生。不据无大害措辞保证现实安全、临床或诉讼结果。
+默认字段清单与`reading`卡已包含`interpretation.seasonal_qualification`；旺衰与生克合读也可使用 `strength` 字段卡；有取数候选时用 `strength_audit` 保留各自季令与直接制约。按所选卷二《衰旺论》分列体旺逢生、体衰逢克、体衰有生三个条件，体衰受克与有生可同时成立，加重与“衰稍解”都要解释。`preferences` 的体宜旺、生体宜旺、克体宜衰不是联合必要条件，不加总打分。`原文未定`与缺节月保持待定，不写中性或弱；生助受制等仍须同看，未裁定净结果。
+
+“重遇克”不补次数阈值，未作月日合参或全书章节优先级。候选的 `strength_fact_path` 指向自己的 `casting_readings` 季令，不引用主候选强弱；天气不使用这一人事层。另读`volume3_qualification`：体旺受克的限定、体衰、体旺有生与逐角色乘旺句分列；克体且旺属于明示例外，不能引用乘旺皆吉。分读`favorable_clause_applies`与`attacker_wang_exception_applies`，克体角色即使强弱未知，吉句也为false，旺克例外本身仍可null；不以pending_strength补吉句。
+
+`matched_selected_month_conditions`不是净作用；受制、卷二条件与日气仍并列。`seasonal_qualification.summary`已带卷二、卷三来源标签并列两段所选条件，主摘要及各候选同步呈现；原卷二文字在`volume2_summary`保留；内外有生／无生及党多仍待裁定，未评估外应不等于确认外无生。不据无大害措辞保证现实安全、临床或诉讼结果。
 
 已明确提供外应类别及描述时，可传`external_observations`并读`interpretation.external_omens`或`external`字段卡，仅用于已发布的人事分支。未知不补、无现场资料不猜；null是未采集，不是确认没有外应。原体仍取本次实际静体，各计数候选用自己的原体与路径。`raw_relation_to_body`只给符号生克，按所选卷三实物／形色条款另读`qualification`：炉火、烛火、红紫色，锐器、饰物器皿，土、瓦器，柴薪、未伐树分别解释；详细配对未覆盖就保留未知，不自动外推。勿把真生真克说成实测物理、临床或灾祸判断，不把捷迟轻重换成数值强度、现实成败或日期；当前未做内外综合。11个类别及12条配对是局部范围，12条输入上限仅软件保护。原页与用字差异随`ruleset`保留，详见[已报外应资格](../../docs/meihua.md#已报外应的实物与形色资格)。
 
@@ -102,7 +110,7 @@ description: 用 FateBridge 围绕一个具体问题起卦或起局，呈现可�
 
 天时条文同时核对`source_witnesses`：影印所选字句与固定转录有“多雨／必雨”等差异，未确认的字形和主语不凭熟悉文本补齐。震多春夏另核季节，巽多四时及兑多亦阴另核阈值和计数资格；兑阴不是已确认无雨。影印选段目读不当作独立专家或全章认证。
 
-1.6.0的秋金晴、冬坎雪、春土雨明确按固定卷二转录1441921；仅用已确认季节，乾兑或坤艮任一实际出现即可，不添多字阈值。所选文明书局冬句未见“坎之水”，春句读“坤兌”，与转录“坤艮”不同，照录来源差异，不据五行常识修字。春土雨不能随受制的坎雨一并取消，秋金晴不能随受制的离晴一并取消。取爻候选各按自身卦象核对冬坎；旧1.5.0现实检验不认证本轮新增条款。
+1.6.0的秋金晴、冬坎雪、春土雨明确按固定卷二转录1441921；仅用已确认季节，乾兑或坤艮任一实际出现即可，不添多字阈值。所选文明书局冬句未见“坎之水”，春句读“坤兌”，与转录“坤艮”不同，照录来源差异，不据五行常识修字。春土雨不能随受制的坎雨一并取消，秋金晴不能随受制的离晴一并取消。取爻候选各按自身卦象核对冬坎；旧1.5.0现实检验不认证其后新增条款。
 
 1.7.0的“离在艮上暮雨朝晴”各按实际同一重卦上离下艮核对，朝晴、暮雨保留各自 `time_scope`，并读 `time_scope_comparison`。不同朝暮不当作同窗矛盾；未定时段不当作全天，与朝暮的关系仍待核定，不自动交集、排序或裁优先级。已知起卦 `analysis_datetime` 不自动定位原文的应验日，也不补几点或日出日落；每个取爻候选使用自己的卦图和时段比较。后句“离互艮宫”仍未裁定，不据普通互卦图式猜出其含义。
 
@@ -139,7 +147,11 @@ description: 用 FateBridge 围绕一个具体问题起卦或起局，呈现可�
 
 梅花所问涉及原文阻节计日时，用`obstruction_days`字段卡读同次`interpretation.stage_emphasis.obstruction_timing`及各计数候选。只在已明示问吉事情境且本候选内卦同时生体、克体时读激活日数；不为激活规则替用户补情境。乾一兑二是原句明例，其余六卦是按类推句与卦数推得，交付时分清。重复同卦不累计，不对多个日数擅取和、最大、最小或平均；核对实际原体和制约路径。它们是原文条件日数，不是净延误天数、实际成败或完成日期；起算点与首尾日边界未定，不能按当前钟时加日。已存在的日气、月令与直接制约仍同时保留，未知、未激活和无克体分别按字段解释。详见[阻节计日](../../docs/meihua.md#生克并见时的阻节计日)。
 
-仅在当前聊天已经确认同次起卦现场事实时，两个梅花人事入口可传`response_context`及非空label、严格布尔`same_casting_episode_confirmed=true`，读`situational`字段卡。`querent_position`是来占者所在方位与参照，不借端法对象方向、行进或住址补齐；`weather/setting/human`是原文有限类别，不自动识别或猜年龄。风雨雷晴为当时实况，不是未来天气。雨与雪均配坎，但坎体宜雨只明确雨：已知雨用rain、已知雪用snow、确实未分用rain_or_snow；雪无原句精确偏好，未分者保留待定。matches_actual_body只检查体卦，完整条款读clause_applies_to_reported_conditions，不把null当false或把雪说成不利。竹林震巽、五金乾兑、土瓦坤艮都保留两卦；笑语／哭泣只列原文象，不配卦或投票抵消。逐项读本候选原体与实际五行关系；影印“體見雷”与转录“火見雷”分列，主语未裁定，不能强改生克为比和。未知现场资料省略，未给对象时旧输出保持原样；已给但类别未齐保持待定。完整静室无所闻见与已报现场事实冲突，已闻笑语与nothing_heard=true冲突，不从单一未知知觉推断其他冲突。天气占分支拒绝此人事层，不合成完整十应、现实成败、概率或日期，不追溯排除旧预测样本。详见[十应现场条件](../../docs/meihua.md#同次现场的方应天时应地理应与人事应)。
+仅在当前聊天已经确认同次起卦现场事实时，两个梅花人事入口可传`response_context`及非空label、严格布尔`same_casting_episode_confirmed=true`，读`situational`字段卡。`querent_position`是来占者所在方位与参照，不借端法对象方向、行进或住址补齐；`weather/setting/human`是原文有限类别，不自动识别或猜年龄。风雨雷晴为当时实况，不是未来天气。雨与雪均配坎，但坎体宜雨只明确雨：已知雨用rain、已知雪用snow、确实未分用rain_or_snow；雪无原句精确偏好，未分者保留待定。
+
+matches_actual_body只检查体卦，完整条款读clause_applies_to_reported_conditions，不把null当false或把雪说成不利。竹林震巽、五金乾兑、土瓦坤艮都保留两卦；笑语／哭泣只列原文象，不配卦或投票抵消。逐项读本候选原体与实际五行关系；影印“體見雷”与转录“火見雷”分列，主语未裁定，不能强改生克为比和。未知现场资料省略，未给对象时旧输出保持原样；已给但类别未齐保持待定。完整静室无所闻见与已报现场事实冲突，已闻笑语与nothing_heard=true冲突，不从单一未知知觉推断其他冲突。
+
+天气占分支拒绝此人事层，不合成完整十应、现实成败、概率或日期，不追溯排除旧预测样本。详见[十应现场条件](../../docs/meihua.md#同次现场的方应天时应地理应与人事应)。
 
 ## 其他盘局也要有可见依据
 
@@ -182,7 +194,9 @@ description: 用 FateBridge 围绕一个具体问题起卦或起局，呈现可�
 
 土逢巳读取同次`liuyao_evidence.conditional_analysis.cessation_conditions`：`position_match`只是绝位，`condition_match=false`可表示已核独立生扶下本项论生不论绝，不能解释成全部无害；未知不补成真绝。保留另有回头克和变爻月破，角色条款采用`conditional_matched/conditional_atom_values`，旧原始匹配只供回溯。独立支持及其多段依赖以`support_fact_path`核对，不能用被判断的巳支或无外部根的相生循环证明其自身已生土。化散未裁定时，综合`changed_adverse`仍可未知。[原典及资格范围](../../docs/liuyao-depth-audit.md)保持明确。
 
-巳寅申读取同次`liuyao_evidence.conditional_analysis.penalty_conditions`：`condition_match`仅指所列作用范围内三支齐备，`effect_condition_match=null`保留刑的总作用未裁定，不能据此断刑害或凶事。巳爻在寅日的`growth_conditions.condition_match=false`表示本条不再按该日长生、生扶计入，原木生火关系与长生位置仍在；申暗动资格未知时，本项也未知。别爻变支和静爻变盘支不借来补齐，伏神另读自身`reception.penalty`，不借飞神本位变支。`yin_generation_allowed`按第98页特定条款先于第10章一般回头生许可：三支齐备时，所列寅月、寅日、动寅及本位变寅不计为巳爻寅生扶；活动未定时资格未知。`back_generation_conditions.sources`的`raw_condition_match`保留一般空破门槛，`condition_match`才是综合资格，不能见原始木生火就复写为回头生已经许可。`generation_conditions.generations`的`condition_match`描述来源，`target_yin_generation_allowed`与`benefit_now`描述该目标，不能把只对巳爻的排除推广为寅爻对所有目标均失效。其他独立生扶与反制照实保留。[原典与修复范围](../../docs/liuyao-depth-audit.md)保持明确。
+巳寅申读取同次`liuyao_evidence.conditional_analysis.penalty_conditions`：`condition_match`仅指所列作用范围内三支齐备，`effect_condition_match=null`保留刑的总作用未裁定，不能据此断刑害或凶事。巳爻在寅日的`growth_conditions.condition_match=false`表示本条不再按该日长生、生扶计入，原木生火关系与长生位置仍在；申暗动资格未知时，本项也未知。别爻变支和静爻变盘支不借来补齐，伏神另读自身`reception.penalty`，不借飞神本位变支。
+
+`yin_generation_allowed`按第98页特定条款先于第10章一般回头生许可：三支齐备时，所列寅月、寅日、动寅及本位变寅不计为巳爻寅生扶；活动未定时资格未知。`back_generation_conditions.sources`的`raw_condition_match`保留一般空破门槛，`condition_match`才是综合资格，不能见原始木生火就复写为回头生已经许可。`generation_conditions.generations`的`condition_match`描述来源，`target_yin_generation_allowed`与`benefit_now`描述该目标，不能把只对巳爻的排除推广为寅爻对所有目标均失效。其他独立生扶与反制照实保留。[原典与修复范围](../../docs/liuyao-depth-audit.md)保持明确。
 
 先回答这次传统参考最值得留意什么，随即展示真实卦变或盘局依据，通常 200–300 字。一项支持推进的提示与一项需要留意的条件只有返回确实包含时才写；结果混合就把混合说清，不强迫落成“会／不会”。
 
@@ -217,7 +231,7 @@ description: 用 FateBridge 围绕一个具体问题起卦或起局，呈现可�
 
 用户明确选择家宅或屋舍占时，分别用`interpretation_topic=household/dwelling`，沿用本次实际资料或已有卦，不因问句关键词重起或自动选篇。读取`topic/topic_audit`父字段。家宅影印比利与转录比和未裁定：`source_relation_condition=null`时不能因五行相同就套家宅安稳句。屋舍保留冷退/衰退异文，不默改底本。`chapter_qualifications.household_support_reference`只列本候选四个内卦辅助角色中的实际生体；所列范围未见不等于完整内外无生，完整跨章净判断未计算。历史多凶、失盗、冷退等字句不作现实灾祸、盗窃、住宅安全或财务断言；这两个题篇不是现场风水评估或选房迁居许可。
 
-全部人事题篇的计数候选按自己的`topic_clause`解释，`traditional_judgement`须保留本候选题篇、引句及限定。一般`traditional_stage_readings`只作其来源范围的阶段参照，不替代题篇初始条款；实际动爻经文、受制、旺衰和后续层仍逐候选核对。原页、条件和验收边界见核对记录。
+全部人事题篇的计数候选按自己的`topic_clause`解释，`traditional_judgement`须保留本候选题篇、引句及限定。一般`traditional_stage_readings`只作其来源范围的阶段参照，不替代题篇初始条款；实际动爻经文、受制、旺衰和后续层仍逐候选核对。
 
 
 ### 婚姻章的两家参照

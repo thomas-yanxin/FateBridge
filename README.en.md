@@ -95,7 +95,7 @@ fatebridge describe bazi_birth --detail input
 
 For local MCP, run `fatebridge doctor --mcp` and register the absolute Python path returned as `executable`. The client manages the stdio process. After saving the configuration, verify tool visibility and a real call in a new chat. MCP and Onda skills load separately.
 
-Start REST locally with `API_HOST=127.0.0.1 fatebridge-api`. The default port is `8010`, with interactive API documentation at `/docs`. The default bind address listens on all interfaces; review [configuration](docs/getting-started.md#配置环境变量) and [security](SECURITY.md). REST API keys do not protect MCP.
+Start REST locally with `API_HOST=127.0.0.1 fatebridge-api`. The default port is `8010`, with interactive API documentation at `/docs`. The default bind address listens on all interfaces; review [configuration](docs/configuration.md) and [security](SECURITY.md). REST API keys do not protect MCP.
 
 ## Read and verify results
 
@@ -108,7 +108,7 @@ Start REST locally with `API_HOST=127.0.0.1 fatebridge-api`. The default port is
 
 The package uses a Python `src` layout. FastAPI, FastMCP, and CLI adapters call shared execution and domain services through a central `ToolSpec` catalog. See [architecture](docs/architecture.md). Dependencies are declared in [pyproject.toml](pyproject.toml), with development resolutions pinned in [uv.lock](uv.lock).
 
-Contributions to documentation, algorithms, interfaces, tests, and Onda skills are welcome. Follow [CONTRIBUTING](CONTRIBUTING.md) and select checks from the [development guide](docs/development-guide.md). Start documentation-only validation with:
+Contributions to documentation, algorithms, interfaces, tests, and Onda skills are welcome. Follow [CONTRIBUTING](CONTRIBUTING.md) and select checks from the [development guide](docs/development-guide.md). See the [documentation writing guide (Chinese)](docs/documentation-guide.md). Start documentation-only validation with:
 
 ```bash
 uv run --locked --extra dev python scripts/check_docs.py

@@ -10,7 +10,7 @@
 
 ## 实际求解与精度
 
-`boundary_resolution`、`timing.start_resolution/end_resolution` 及宅运端点分别返回 `provider`、`approximate`、`precision_scope`。`linear_1900_fallback` 是1900固定气近似；`approximate=true` 是实际分辨记录，不能因前端名称变化而漏掉。快照与 `run_metadata.engine_is_approximate` 同步反映真实回退，远离边界的可用结果不因此改成未知年份。
+`boundary_resolution`、`timing.start_resolution/end_resolution` 及宅运端点分别返回 `provider`、`approximate`、`precision_scope`。当前交点必须由所选模型实际求解；模型不可用时明确报错。旧资料中的 `linear_1900_fallback` 仅标识已退役的固定气近似，不能作为当前回退选项。
 
 `provider=swisseph` 表示使用该API求交点，不证明实际加载了完整星历文件。`ephemeris_model` 核对所报TT处太阳位置的实际返回标志，作用域在 `ephemeris_model_scope`；`swieph`、`moshier` 与API名称分开。它不是全部迭代调用的逐步日志。Moshier是数值天文模型，不能把它称为固定气回退；它会使外层运行回执标记降级，但不冒称与完整星历达到相同误差。
 
@@ -20,13 +20,13 @@
 
 需取得完整数据时用[安装配置](../../../docs/fengshui.md)。逐文件身份、实际返回模型与独立天文门槛分别验收；仅安装成功不能升级现实预测或古典断语的证据等级。
 
-最新[独立24节气比对](../../../docs/fengshui.md)覆盖1784–2204年10,104个TT交点，默认DE440原始根及输出钟时回算均在固定1秒门槛内。原421项立春及4,812项十二节协议保留，Moshier全量控制仍有1,196项失败。接近交界时，依据同次实际模型、保护原因和全部候选解释；五秒保护不表示已获绝对精度认证。TT软件相合不认证实际UTC钟时、原典日时选表或风水现实效果。
+最新[独立24节气比对](../../../docs/fengshui.md)覆盖1784–2204年10,104个TT交点，默认DE440原始根及输出钟时回算均在固定1秒门槛内。原421项立春及4,812项十二节协议保留，原版 Swiss Moshier 的历史全量控制仍有 1,196 项失败。接近交界时，依据同次实际模型、保护原因和全部候选解释；五秒保护不表示已获绝对精度认证。TT软件相合不认证实际UTC钟时、原典日时选表或风水现实效果。
 
-上述Moshier数字属于实际运行该模型的控制记录，不能赋给自动模式或其他具名模型。旧Swiss、解析、SPK及严格JPL路线也按自己的参考、范围和门槛验收。[第二十二轮边界核验](../../../docs/fengshui.md)保留当时修复范围，不追授新版模型、全本原典或现实预测成绩。
+上述Moshier数字属于实际运行该模型的控制记录，不能赋给自动模式或其他具名模型。旧Swiss、解析、SPK及严格JPL路线也按自己的参考、范围和门槛验收。[历法边界与验证](../../../docs/fengshui.md)保留当时修复范围，不追授新版模型、全本原典或现实预测成绩。
 
 ## TT、历史UT1与未来UTC
 
-TT动力学交点与民用钟时换算分别核对。每个实际天文分辨记录的 `time_basis` 保留 `root_time_scale`、`civil_policy`、`historical_ut1_convention`、`future_leap_seconds_assumed_unchanged` 和冻结闰秒表有效期。固定气回退不虚构已求得TT根。
+TT动力学交点与民用钟时换算分别核对。每个实际天文分辨记录的 `time_basis` 保留 `root_time_scale`、`civil_policy`、`historical_ut1_convention`、`future_leap_seconds_assumed_unchanged` 和冻结闰秒表有效期。未取得交点时不虚构 TT 根。
 
 按实际引擎政策，1960年前采用Swiss UT1／ΔT约定；带UTC形式的标签不表示当时已经使用UTC。1960按共享引擎的SOFA历史UTC段、1961–1971按IERS历史UTC速率／偏移段换算，1972年起按冻结闰秒表换算。超过表的有效期时，继续使用最后TAI−UTC偏移是显式假设，不是已经知道未来闰秒或实际UT1。快照分别提示历史约定与未来假设；计算完成仍不等于绝对秒级精度已经认证。
 

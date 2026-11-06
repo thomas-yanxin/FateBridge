@@ -1,5 +1,7 @@
 # 奇门遁甲：盘面、口径与验证范围
 
+[文档中心](README.md) · [API 参考](api-reference.md) · [算法状态](algorithm-status.md)
+
 本页说明时家奇门排盘，不把软件一致性、原典片段一致性与现实预测混作一个总分。当前不能宣称四项满分或权威预测认证。
 
 当前2.12.0传统规则验收保留9项未通过：4项既有印例字段差异、乙丁两项三奇入墓句读／原文优先未决、六仪击刑“六甲直符”范围解释未裁定、三诈缺项释读优先未决，以及五假人假的六合身份与层次未决。五假另四类完整组合已按声明盘层实现；人假己干候选未采纳。研究封存已修复同步删除弃权案例或改动基线后仍被接受的问题；完整研究输入绑定到逐案证据，真实评估另须核对事前独立保存的全包指纹。此前门宫关系、六仪限定、已知UTC时刻消歧、回拨交节与前瞻时间顺序修复继续保留。
@@ -66,7 +68,7 @@ uv run --locked --extra dev fatebridge qimen \
 
 继续核对发现，旧的 `dateutil.tzfile` 读取结果在纽约、柏林2038年后的夏季缺少1小时夏令时；1900年纽约、柏林、悉尼则错误沿用已废除的地方时。例如纽约2040-07-01 01:30、经度-74.006°，真太阳时应约00:30，旧读取器却约01:30，时辰从子误成丑。纽约1900-07-01 01:01还会因旧地方时偏移跨过01:00边界。这些是确定时间转换错误，不涉及预测效度。
 
-现在按[Python ZoneInfo文档](https://docs.python.org/3/library/zoneinfo.html)读取锁定依赖内的IANA TZif，避免操作系统数据库不同造成规则漂移。[IANA北美](https://data.iana.org/time-zones/tzdb/northamerica)、[欧洲](https://data.iana.org/time-zones/tzdb/europe)和[澳洲](https://data.iana.org/time-zones/tzdb/australasia)的Zone/Rule原文用于人工推导15个UTC偏移、夏令时参考及6个2040年跳时、重复时刻。原文摘录、行号与指纹保存在 `tests/fixtures/qimen_timezone_iana_v1/`。当前锁定pytz 2026.5 / IANA 2026e，结果的 `calendar_policy.timezone_rules` 公布实际版本和TZif指纹；明确固定偏移单独标记。未来日期遵循所冻结规则的外推，不能保证未来法规不变，IANA历史条目也未逐个地点实地考证。
+现在按[Python ZoneInfo文档](https://docs.python.org/3/library/zoneinfo.html)读取锁定依赖内的IANA TZif，避免操作系统数据库不同造成规则漂移。[IANA北美](https://data.iana.org/time-zones/tzdb/northamerica)、[欧洲](https://data.iana.org/time-zones/tzdb/europe)和[澳洲](https://data.iana.org/time-zones/tzdb/australasia)的Zone/Rule原文用于人工推导15个UTC偏移、夏令时参考及6个2040年跳时、重复时刻。原文摘录、行号与指纹保存在 `tests/fixtures/qimen_timezone_iana_v1/`。当前锁定pytz 2026.5 / IANA 2026e，结果的 `calendar_policy.timezone_rules` 公布实际版本与 TZif 来源名称；文件指纹由内部资料维护；明确固定偏移单独标记。未来日期遵循所冻结规则的外推，不能保证未来法规不变，IANA历史条目也未逐个地点实地考证。
 
 ### 等价时刻、明确偏移与夏令时边界
 

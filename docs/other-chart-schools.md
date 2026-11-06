@@ -1,12 +1,14 @@
 # 其他流派星盘：德国中点、子午宫表与 13 等分扇区
 
-阅读导航：[德国盘](#德国盘的实际增量) · [钟时](#显式民用平太阳与真太阳钟时) · [太阳弧](#指定目标时刻的真太阳弧与双盘) · [生时误差](#声明生时误差后的重新排盘) · [13 等分](#13-等分扇区的修复与含义) · [示例](#调用与复现) · [未决范围](#整部原典仍缺哪些核对)
+[文档中心](README.md) · [API 参考](api-reference.md) · [算法状态](algorithm-status.md)
 
-本页记录源码新增的两个明确范围。西方古典、果老星宗和[印度占星](jyotish.md)另有各自规则与验收；不能用本页的几何测试为这些体系整体认证。源码能力也不表示已发布到 PyPI。
+阅读导航：[德国盘](#德国中点盘) · [钟时](#显式民用平太阳与真太阳钟时) · [太阳弧](#指定目标时刻的真太阳弧与双盘) · [生时误差](#声明生时误差后的重新排盘) · [13 等分](#13-等分扇区的定义与边界) · [示例](#调用与复现) · [未决范围](#整部原典仍缺哪些核对)
+
+本页说明德国中点盘与自定义 13 等分扇区。西方古典、果老星宗和[印度占星](jyotish.md)另有各自规则与验收；不能用本页的几何测试为这些体系整体认证。源码能力也不表示已发布到 PyPI。
 
 Gauquelin是36个顺时针分区，十二宫公开接口拒绝其名称，不静默改成其他宫制。离线CFEPP审计保留原公布1066条及补充54条；六种具名定义分开比较，固定有折射升落法可复现粗分区，但主算法仍有13条原表差异，圆心／圆边不能由此表唯一裁定。它尚非公开排盘能力或现实预测验收。显式非法宫制不会选择默认值，Alcabitus等有效名称按当前映射处理。
 
-## 德国盘的实际增量
+## 德国中点盘
 
 `astro_germany_chart`（REST `/api/astro/germany`）和 `astro_chart` 的 `chart_variant=germany` 返回同一 `midpoint_analysis`。当前版本为 `hamburg_midpoint_geometry_v3`，作者为 FateBridge。
 
@@ -28,13 +30,13 @@ Gauquelin是36个顺时针分区，十二宫公开接口拒绝其名称，不静
 
 ### 外部轨道文件与实际来源
 
-`profile.hypothetical_element_source` 区分 `library_builtin` 与 `external_file`。后一种回显第一个可读 `seorbel.txt` 的 SHA-256 和搜索路径序号，不公开服务器目录；因素另有实际 `element_name`。文件第 1–8 项必须仍对应八个汉堡因素，接受 Vulcanus／Vulkanus 拼写，不把换序或其他自定义天体冒充 Cupido／Zeus。物理星体实际星历模型与这一轨道来源分开，`moshier` 返回标志本身无法判断假设点是否读取了外部文件。
+`profile.hypothetical_element_source` 区分 `library_builtin` 与 `external_file`。后一种回显第一个可读 `seorbel.txt` 的来源说明和搜索路径序号，不公开服务器目录；因素另有实际 `element_name`。文件第 1–8 项必须仍对应八个汉堡因素，接受 Vulcanus／Vulkanus 拼写，不把换序或其他自定义天体冒充 Cupido／Zeus。物理星体实际星历模型与这一轨道来源分开，`moshier` 返回标志本身无法判断假设点是否读取了外部文件。
 
 路径优先级遵循 [Swiss 编程手册 2.1](https://www.astro.com/swisseph/swephprg.htm)：非空 `SE_EPHE_PATH` 优先于函数显式路径，再使用项目目录或已加载库的默认搜索路径。后者在当前运行时含工作目录；没有 `.se1` 文件不等于没有外部轨道输入。此前代码可能回报“已应用显式目录”，而 C 库实际读取环境目录，现已修正为实际选择。超过当前 Swiss 2.10 接口 242 个编码字节的路径会报错，防止底层静默回到默认目录。
 
 一次因素计算前后都会读取轨道文件指纹；生时样点之间及与名义盘的来源不一致时拒绝交付混合结果。回执库存也纳入辅助文本文件并在每次回执重新散列；大型 `.se1` 的内容散列由文件大小、mtime、ctime、inode 和设备号失效缓存，不再只按目录缓存。它们是离散检查，不是连续文件不可变证明；服务运行期间仍应保持数据不变，更新后重启复核。自定义轨道文件与回执一致也不建立现实预测有效性。
 
-原生物理因素另有 `profile.physical_ephemeris_source`，依据 [Swiss 手册 2.6](https://www.astro.com/swisseph/swephprg.htm)在实际 `calc()` 后读取文件上下文：保留文件名、覆盖 TT 区间、DE 版本、SHA-256 和与打包清单是否匹配，不输出服务器目录。`by_factor` 将实际返回模型与观察到的文件上下文关联；节点、假设点和地球自转另行说明。Moshier 即使留下旧文件槽，也不归属那些 Swiss 文件；缺少查询接口或无法读取文件时明确标记来源未完全识别。文件上下文并非完整依赖图，首尾散列也不是原子读取证明。
+原生物理因素另有 `profile.physical_ephemeris_source`，依据 [Swiss 手册 2.6](https://www.astro.com/swisseph/swephprg.htm)在实际 `calc()` 后读取文件上下文：保留文件名、覆盖 TT 区间、DE 版本和与打包清单是否匹配，不输出服务器目录。`by_factor` 将实际返回模型与观察到的文件上下文关联；节点、假设点和地球自转另行说明。Moshier 即使留下旧文件槽，也不归属那些 Swiss 文件；缺少查询接口或无法读取文件时明确标记来源未完全识别。文件上下文并非完整依赖图，首尾散列也不是原子读取证明。
 
 `ephemeris_model_scope=physical_bodies` 表示盘级 `ephemeris_model`、中点层及生时样点的 `ephemeris_models` 只汇总物理天体。平交点采用 `swisseph_analytical_mean_node`，基础盘另列 `nonphysical_factor_models`；中点因素保留 `native_return_flags`。依据 [Swiss 2.10.03 的平交点入口](https://github.com/aloistr/swisseph/blob/v2.10.03/sweph.c#L859)和[解析实现](https://github.com/aloistr/swisseph/blob/v2.10.03/swemmoon.c#L1493)，这些标志可回显请求的星历类别，不证明读取了该类别的物理矢量文件。空目录真实复现：三种请求标志的平交点坐标完全相同，而返回模型位各异。过去由此把全 Moshier 物理天体误报为 `mixed`，现已修正；若只有交点近似，计算质量仍为混合精度，但物理天体模型不因此混合。实际物理后端混用仍为 `mixed`，物理天体全部采用简化轨道则为 `none`。解析理论及其拟合系数也不是独立的动力学认证。
 
@@ -148,7 +150,7 @@ v2 增加 Udo Rudolph [《ABC für Planetenbilder》出版社摘页](https://wit
 
 原载例的56′＋54°17′＋34′＝55°47′算术成立。精确有理数双向插值与不逐步舍入的延伸得到55°47.925′，只作另一舍入政策的诊断，不能据此宣称原刊算错或改写其结果。原文没有给出生钟时／时区，不补造UTC作现代星历验收。
 
-公开 `evidence_views.witte1925_table` 选择来源、覆盖、算例及 `computed_for_current_chart=false`；完整原表读取同 run 的完整结果或显式表路径。当前太阳弧仍采用原有真实太阳位移及365.25日钥匙，太阳弧元数据版本为3。数值表坐标插值不等于完整历法到太阳弧算法，闰日、亚日、跨年末列及全程舍入仍未裁定。详见原表复核。
+公开 `evidence_views.witte1925_table` 选择来源、覆盖、算例及 `computed_for_current_chart=false`；完整原表读取同 run 的完整结果或显式表路径。当前太阳弧仍采用原有真实太阳位移及365.25日钥匙，太阳弧元数据版本为3。数值表坐标插值不等于完整历法到太阳弧算法，闰日、亚日、跨年末列及全程舍入仍未裁定。复核入口见[1925原表重演](../scripts/western/replay_witte1925_table.py)。
 
 ### Witte 1924 黄道和差式日推运天顶
 
@@ -213,7 +215,7 @@ Witte 出版社的[2024 进阶课程说明](https://witte-verlag.com/?catid=49&i
 
 德国盘另有`midpoint_analysis.comparative_geometry`：按Witte1924第138–139页重建五种锚点换基与四点镜像，使用同run实际白羊点表示热带轴，并复用全部已确认生时样点。未解析参考保留null和后端形式值；锚点自身按定义指定的位置不等于物理参考已解析。原表36行在所声明舍入假设下32行相容，三条海王星行及一条太阳框架子午线行仍不协调，全部原值保留；没有采用未裁定的地球宫表或事件解释。
 
-## 13 等分扇区的修复与含义
+## 13 等分扇区的定义与边界
 
 `astro_chart13`（REST `/api/astro/chart13`）和 `astro_chart` 的 `chart_variant=chart13` 使用实际上升为起点，每区宽 `360/13` 度，区间沿黄道采用 `[start,end)`。它与另行选择的十二宫制独立，返回 `sector_profile`、13 个区间及各星的 `sector13`。
 
@@ -281,7 +283,7 @@ uv run --locked --extra dev python -m fatebridge.fetch_ephe
 uv run --locked --extra dev pytest -q tests/western/test_other_chart_historical_reference.py
 ```
 
-没有星历文件时的 Moshier 回退必须单独报告：海王星误差约 1.097″，超出预定的 1″ 门槛，不能改容许度或省略此案例。使用已核验星历文件后重跑的结果也必须保留实际模型和文件哈希；文件完整性本身不是天文精度保证。固定TT检查与共享审计中的57项出版社参考分列，但同样纳入 `numerical_subset_checks_passed`：当前 Moshier 报告返回失败，已核验 Swiss 数据报告返回通过。原典整例和现实预测仍未据此验收。
+没有星历文件时的 Moshier 回退必须单独报告：海王星误差约 1.097″，超出预定的 1″ 门槛，不能改容许度或省略此案例。数值审计报告须保留重跑时的实际模型和文件哈希；文件完整性本身不是天文精度保证。固定TT检查与共享审计中的57项出版社参考分列，但同样纳入 `numerical_subset_checks_passed`：当前 Moshier 报告返回失败，已核验 Swiss 数据报告返回通过。原典整例和现实预测仍未据此验收。
 
 指定目标时刻并保留同一虚构资料的生时误差：
 
@@ -310,7 +312,7 @@ uv run --locked --extra dev fatebridge astro_germany_chart \
   --strict-fields --no-include-snapshot-text --response-char-limit 0
 ```
 
-REST 把业务参数放请求体，`fields/strict_fields/include_snapshot_text` 放查询参数。MCP 使用同名工具；摘要从公开 `evidence_views` 复制字段，完整几何首次 `fields=null`，再读取同一 run 的 `result_delivery`。数组整体选取，不把 `planets.sector13` 当作数组字段投影。`file_path` 是结果存储包络文件，`file_payload_path=payload` 指定文件内的 JSON 路径；回执 SHA-256 对应分页拼接得到的完整业务 JSON 字节，不包含外层到期时间包络。
+REST 把业务参数放请求体，`fields/strict_fields/include_snapshot_text` 放查询参数。MCP 使用同名工具；摘要从公开 `evidence_views` 复制字段，完整几何首次 `fields=null`，再读取同一 run 的 `result_delivery`。数组整体选取，不把 `planets.sector13` 当作数组字段投影。`file_path` 是结果存储包络文件，`file_payload_path=payload` 指定文件内的 JSON 路径；需要核验存储完整性时，使用结果 ID 与原 run 调用校验读取接口；公开回执不提供 SHA-256。
 
 重新获取并核对独立原表（普通测试不联网）：
 

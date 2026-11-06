@@ -41,7 +41,7 @@ uv sync --locked --extra dev
 cp -n .env.example .env
 ```
 
-已有 `.env` 时直接编辑，避免覆盖。环境变量、加载顺序、REST 鉴权与星历配置统一见 [快速入门](getting-started.md#配置环境变量)，避免另维护一份默认值。
+已有 `.env` 时直接编辑，避免覆盖。环境变量、加载顺序、REST 鉴权与星历配置统一见 [运行配置](configuration.md)，避免另维护一份默认值。
 
 ## 项目结构概览
 
@@ -97,13 +97,13 @@ uv run --locked --extra dev python -m scripts.astronomy.prepare_reference_kernel
 
 ### CI 运行范围
 
-代码变更在 PR 与 main／master push 上保留同一组自包含检查。同一 PR 的新提交取消旧 CI；主分支每次 push 使用独立并发组，运行中与排队中的提交均不互相替换。普通 README 和 `docs/` Markdown 变更只运行路径筛选与 `CI result` 汇总，不启动重测试；`docs/scenario-routing.md` 是生成源，仍执行检查。文档 JSON、技能、工作流、源码和测试变更也保留完整检查。
+代码变更在 PR 与 main／master push 上保留同一组自包含检查。同一 PR 的新提交取消旧 CI；主分支每次 push 使用独立并发组，运行中与排队中的提交均不互相替换。普通 README 和 `docs/` Markdown 变更仍运行独立的 `documentation` 作业与 `CI result` 汇总，不启动重测试；`docs/scenario-routing.md` 是生成源，仍执行检查。文档 JSON、技能、工作流、源码和测试变更也保留完整检查。
 
 Python 3.10–3.13 最新依赖、Python 3.10 最低直接依赖及 Windows／Python 3.12 锁定依赖共六种环境，各按收集后的节点分成三片并行执行；按近期 CI 的相对耗时均衡分配，每片再使用最多四个独立 pytest 进程调度。`.github/ci-test-costs.json` 只影响分片归属，不筛掉任何测试，也不是数值验收门槛。`scripts/run_ci_checks.py` 的默认本地命令仍运行整个自包含集合；分片不改变标记排除与断言。每片上传实际节点清单，汇总验证每个环境的全部节点恰好执行一次。uv 使用 setup action 的依赖缓存，按 Python／依赖策略隔离并仅由首片写入，不缓存测试资料或虚拟环境。只有 Ubuntu 静态检查作业另缓存 Black／Mypy 的增量状态，按锁文件、工具配置与 Python 源码区分；工具仍按文件内容自行失效。
 
 云端不下载外部星历或大型独立参考。完整领域回归、数值与原典对照在本地使用原数据和固定门槛执行；云端通过不能作为这些项目的验收结论。混合测试文件中依赖本地资料的用例标记为 `local_data`，默认本地 `pytest` 不排除它们。
 
-Black、isort、mypy、通用文档与生成合同在独立 Ubuntu／Python 3.12 锁定环境作业执行一次，与测试并行。原有 Ubuntu 锁定环境的 CLI／API 和真实 stdio MCP 验证保留。`CI result` 要求所有选中作业成功且分片覆盖完整；失败、取消或意外跳过均不能通过，只有已确认的纯普通文档变更允许重作业全部跳过。
+文档链接、示例语法、工具数量与路由覆盖由独立 `documentation` 作业在每次 push／PR 中检查。Black、isort、mypy 与生成合同在 Ubuntu／Python 3.12 锁定环境的 `quality` 作业执行，与测试并行。原有 Ubuntu 锁定环境的 CLI／API 和真实 stdio MCP 验证保留。`CI result` 要求所有选中作业成功且分片覆盖完整；失败、取消或意外跳过均不能通过，只有已确认的纯普通文档变更允许重作业全部跳过。
 
 Windows Server 2022 / Python 3.12 在没有外部测试数据的锁定环境验证 stdio MCP、私有 ACL、重解析点拒绝、线程与跨进程锁、完整分页及三端合同。Windows 权限检查使用原生 ACL，不将 POSIX mode bits 当作 Windows 私有性的证明。
 
@@ -172,19 +172,7 @@ CI 仅运行[明确选择的自包含集合](#ci-运行范围)；`local_data` �
 
 ## 文档维护与验证
 
-页面职责与入口见[文档中心](README.md)，公共术语见[核心概念](concepts.md)。操作指南按执行顺序给出前提、命令和成功判据；示例使用虚构资料，参数以实际 Schema 为准。默认值和完整参数表只在所属参考中维护，专题解释实现、来源和限制；逐轮日志与测试数量不写成长期能力承诺。
-
-修改前定位信源，删除标题或入口时搜索引用并同步锚点：
-
-| 变更内容 | 权威信源 | 需要同步的文档 / 生成物 |
-| --- | --- | --- |
-| 产品定位、使用场景与组件分工 | 当前工具目录、运行入口、技能规则与分发内容 | 中英文 README、文档中心、核心概念、接入指南与技能索引 |
-| 安装、版本、入口与运行配置 | `pyproject.toml`、`__init__.py`、`utils/runtime.py`、`.env.example`、入口模块 | 快速入门与 MCP 部署指南；中英文 README 保留最小安装与计算命令，完整配置集中在部署指南；安全配置还查 `SECURITY.md` |
-| 工具、字段、端口名称、公开数量 | `services/catalog/`、请求 / 响应模型、协议注册器、实时发现记录 | API 参考、算法矩阵；受影响的 README、接入例子和技能 |
-| 选法、首轮字段、解读与来源 | 场景 `SKILL.md`、`agents/interface.yaml`、共享字段及规则数据 | 场景路由、技能资料；重建场景 manifest / 调用合同 |
-| 模块职责和数据流 | 实际导入、绑定与执行代码 | 架构说明；公开入口的替代方式集中记录到故障排除 |
-| CI、打包与发布 | `.github/workflows/`、`pyproject.toml` | 本页与贡献指南；真实结果另行报告 |
-| 可运行请求 | 当前请求模型和实际三端调用 | `docs/examples/` JSON 与示例索引；仅用虚构资料 |
+页面职责、写作要求和各类内容的维护位置见[文档写作与维护](documentation-guide.md)。先核对实际实现和来源，再修改对应页面；纯措辞调整无需补业务测试。
 
 ### 检查命令与覆盖范围
 
@@ -201,7 +189,7 @@ uv run --locked --extra dev python scripts/build_codex_call_contracts.py --check
 git diff --check
 ```
 
-`check_docs.py` 只使用标准库，默认检查根目录、`docs/` 中的当前维护文档与 `skills/` 的 Markdown 内联链接、本地标题锚点、代码围栏、JSON 代码块及示例 JSON 语法。当前引用的文件和标题必须存在；原始文献按其实际位置保留，不混入过程日志。本地 `reviews/` 始终排除。它不访问外网，不执行代码块，也不证明自然语言或接口参数正确；外部来源保留版本，按受影响内容另行核对。CI 由 `quality` 作业执行当前维护文档检查。
+`check_docs.py` 只使用标准库，默认检查根目录、`docs/` 中的当前维护文档与 `skills/` 的 Markdown 内联／引用式链接、HTML 的 `href/src`、本地标题锚点、代码围栏、JSON 代码块及示例 JSON 语法。当前引用的文件和标题必须存在；原始文献按其实际位置保留，不混入过程日志。本地 `reviews/` 始终排除。它不访问外网，不执行代码块，也不证明自然语言或接口参数正确；外部来源保留版本，按受影响内容另行核对。CI 的独立 `documentation` 作业执行文档检查；纯文档变更也必须通过。
 
 现有文档测试把计数、路由覆盖、技能与生成合同关联到实时目录；`test_skills_engine_contract.py` 还会实际执行 CLI 示例，绑定测试进程解释器。修改可运行请求时，按[示例索引](examples/README.md)选择对应工具，验证模型与实际结果；结构校验成功不能替代三端或真实模型体验。
 
@@ -226,7 +214,7 @@ uv build
 uvx --from twine twine check dist/*
 ```
 
-CI 的 `locked` 作业检查 `uv.lock`、安装环境、命令入口与真实 stdio MCP；文档和生成物检查在 `quality` 作业中执行。现有最新版依赖矩阵和最低依赖作业使用独立的 `uv pip` 环境，不受开发锁文件约束。
+CI 的 `locked` 作业检查 `uv.lock`、安装环境、命令入口与真实 stdio MCP；文档检查在 `documentation` 作业中执行，生成物检查在 `quality` 作业中执行。现有最新版依赖矩阵和最低依赖作业使用独立的 `uv pip` 环境，不受开发锁文件约束。
 
 矩阵与路径筛选见[CI 运行范围](#ci-运行范围)。最低直接依赖用 `uv pip install --system --resolution lowest-direct -e ".[dev]"` 在全新环境解析，不能仅固定 FastMCP 版本代替最低直接依赖验证。本地数值与来源检查按其实际后端、数据及适用范围报告。
 

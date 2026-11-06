@@ -1,5 +1,7 @@
 # 八字旺衰与喜用的计算范围
 
+[文档中心](README.md) · [API 参考](api-reference.md) · [算法状态](algorithm-status.md)
+
 八字本命、九专题及双人分析共用领域计算。`day_master` 的三档强弱、根的存在、结构成立条件和现实能力分别表达不同问题。规则索引没有成功概率含义。
 
 ## 当前旺衰算法
@@ -21,6 +23,14 @@ v12在此基础上采用1947年本明确记载的有限结构条件：两处本�
 `structure_profile.resolution_policy=source_conditions_before_preference_v3` 保留月令参考、从儿等条件结构、扶抑、调候与通关观察。`dominant_structure` 只接受严格的月令参考结构；未裁定成格时不发布确定的喜忌数组。部分投影保留缺项，不从缺项补造事实。
 
 读取 `formation_status`、`pending_conditions`、`conditional_elements` 和每层来源，区分已观察事实与尚未成立的方向。物理有根不证明根有足够作用，印多不证明日主承受能力，出现通关路径不证明实际流通。事业、财务、学习等专题保留当前计数和具名规则索引；不再输出退役评分分档。
+
+## 专题中的计数与结构候选
+
+事业结构与创业规则的 `score_kind=uncalibrated_rule_index` 表示未经现实校准的规则索引。`scope` 和 `score_basis` 列出范围、基准、加减与限制；`weighted_counts` 包含日支全部藏干。这些数值不测量实际能力、收入或创业成功率。
+
+事业方向的 `dominant_ten_gods` 保留最高及第三位的全部并列，`primary_career_type` 同时列出最高权重对应的标签。`formation_status=heuristic_candidate_only`、`rule_signals` 和 `unverified_conditions` 区分共现线索与尚未验证的成格条件，不因计数靠前就宣称成格。
+
+综合与九专题可用 `evidence_views.classical_routes` 的字段清单核对月令、星位节点及原典生克合路径。日期级专题的 `timing_context` 采用本地零点锚点；立春或其他交节当日的具体钟时须查相应时运结果，不能以零点代表全天。时间规则见[八字时运](bazi-timing.md)。
 
 ## 原典资料与未决范围
 

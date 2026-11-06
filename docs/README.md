@@ -21,7 +21,8 @@ CLI 可直接运行；REST 默认端口为 `8010`；MCP 默认通过 stdio 由�
 
 | 任务 | 指南 |
 | --- | --- |
-| 安装、环境变量与首次计算 | [快速入门](getting-started.md) |
+| 安装与首次计算 | [快速入门](getting-started.md) |
+| 环境变量、加载顺序与 REST 密钥 | [运行配置](configuration.md) |
 | 下载星历、校验文件与核对实际模型 | [星历数据安装](ephemeris.md) |
 | 本地 stdio、远程 HTTP、Onda 插件与停用 | [MCP 部署](mcp-deployment.md) |
 | 工具发现、错误恢复与字段投影 | [Agent 接入](agent-guide.md) |
@@ -40,7 +41,7 @@ CLI 可直接运行；REST 默认端口为 `8010`；MCP 默认通过 stdio 由�
 | 八字 | [旺衰、喜用与原典查询](bazi-assessment.md) · [时运与历法边界](bazi-timing.md) |
 | 紫微斗数 | [规则选择、时间与原典](ziwei.md) |
 | 双人配合 | [评分与解释范围](compatibility-scoring.md) |
-| 易占 | [梅花](meihua.md) · [六爻与周易](liuyao-depth-audit.md) |
+| 易占 | [梅花](meihua.md) · [六爻与周易](liuyao-depth-audit.md) · [梅花天气研究](meihua-weather-study.md) |
 | 河洛与参评 | [取数、配运与来源](numerology-audit.md) |
 | 三式与金口诀 | [奇门](qimen-depth-audit.md) · [太乙与三式](taiyi-sanshi-audit.md) · [六壬与金口诀](liuren-jinkou-audit.md) |
 | 人类图 | [计算、专业结构与原典](human-design.md) |
@@ -63,17 +64,12 @@ CLI 可直接运行；REST 默认端口为 `8010`；MCP 默认通过 stdio 由�
 | 太阳、近太阳位置及月球日速的固定队列 | [分项精度验收](precision-acceptance.md) |
 | 方法登记、误差预算、证据图与固定总体验收 | [计算证据合同](computation-evidence.md) |
 | 扩展、测试、CI、打包与发布 | [开发指南](development-guide.md) · [脚本索引](../scripts/README.md) · [测试索引](../tests/README.md) |
+| 文档分工、写作与来源维护 | [文档写作与维护](documentation-guide.md) |
 | 仓库维护与本地清理 | [仓库维护](repository-maintenance.md) |
 | 真实模型的调用与解释质量 | [Agent 行为验收](agent-evaluation.md) |
 | 外部命例评估 | [MingLi-Bench](mingli-bench-evaluation.md) |
 | 计算引用、现实预测与奇门研究绑定 | [验证方法](prediction-validation.md) |
 
-当前指南保留行为、依据和限制；独立数值与来源参考按实际测试维护，当前未决项见[算法状态](algorithm-status.md)。生成合同与场景清单由脚本维护。
+## 文档维护
 
-文档分工保持稳定：README 负责项目定位与最小体验；入门和部署负责操作步骤；API 与生成合同负责可查询约定；架构与领域专题解释实现选择。技能文件供 Agent 按需读取，不能因与专题提到同一规则就删除。新增或合并页面时同步本索引、相对引用及已有标题锚点，具体信源见[维护约定](development-guide.md#文档维护与验证)。
-
-修改文档后按[文档维护与验证](development-guide.md#文档维护与验证)检查内容、示例、链接与生成物：
-
-```bash
-uv run --locked --extra dev python scripts/check_docs.py
-```
+文档按入门、操作、参考和解释分工，写作与信源规则见[文档写作与维护](documentation-guide.md)。修改后按[开发指南](development-guide.md#文档维护与验证)检查链接、示例和生成物。文档检查不验证外部数值、原典读法或模型解释。

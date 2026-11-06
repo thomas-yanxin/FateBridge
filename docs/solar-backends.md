@@ -1,5 +1,7 @@
 # 太阳计算与可选后端
 
+[文档中心](README.md) · [API 参考](api-reference.md) · [算法状态](algorithm-status.md)
+
 `FATEBRIDGE_SOLAR_TERM_MODEL` 选择共享太阳交节模型；默认 `auto`。普通安装在适用年份使用随包 DE440 系数，无需另行下载或编译。更改此变量会影响八字、时运、六壬、数算和风水等消费方，具体路径见[架构依赖表](architecture.md#历法与星历依赖)。
 
 ## 默认模型与选择顺序
@@ -14,7 +16,7 @@
 | `spk` | `FATEBRIDGE_SOLAR_SPK_FILE` 指向外部 SPK，安装 `jpl` extra | 以所选文件、加载器和消费方支持范围为准 |
 | `aa1996` / `vsop2013` | 按下文构建并指定清单 | 各自范围、平台及来源单独核验 |
 
-选择逻辑见 [`solar_model_policy.py`](../src/fatebridge/core/solar_model_policy.py)。默认系数来自 DE440 的无损裁取，主模型、扩展年份及派生边界保留各自模型身份和来源指纹。TT 网格符合不能认证绝对 UTC、全部连续时刻或现实预测。
+选择逻辑见 [`solar_model_policy.py`](../src/fatebridge/core/solar_model_policy.py)。默认系数来自 DE440 的无损裁取，主模型、扩展年份及派生边界保留各自模型身份；来源指纹由内部资料维护。TT 网格符合不能认证绝对 UTC、全部连续时刻或现实预测。
 
 `native`／`swiss` 的环境回执只描述配置，不为生成回执加载太阳系数；纯知识文本查询不因此依赖未使用的太阳模型。实际交节计算仍校验所选来源，完整 Moshier 回退所需的轨道表或 ERFA 坐标系数缺失、损坏时仍明确失败。
 

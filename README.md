@@ -95,7 +95,7 @@ fatebridge describe bazi_birth --detail input
 
 本机 MCP 先运行 `fatebridge doctor --mcp`，用返回的 `executable` 绝对路径注册客户端。客户端管理 stdio 进程；配置保存后，在新聊天确认工具可见并试调。MCP 连接与 Onda 技能分别加载。
 
-REST 本机启动命令为 `API_HOST=127.0.0.1 fatebridge-api`。默认端口 `8010`，交互文档在 `/docs`；默认监听所有网卡，密钥配置及网络边界见[快速入门](docs/getting-started.md#配置环境变量)和[安全策略](SECURITY.md)。REST 密钥不保护 MCP。
+REST 本机启动命令为 `API_HOST=127.0.0.1 fatebridge-api`。默认端口 `8010`，交互文档在 `/docs`；默认监听所有网卡，密钥配置及网络边界见[运行配置](docs/configuration.md)和[安全策略](SECURITY.md)。REST 密钥不保护 MCP。
 
 ## 读取与核对结果
 
@@ -108,7 +108,7 @@ REST 本机启动命令为 `API_HOST=127.0.0.1 fatebridge-api`。默认端口 `8
 
 源码使用 Python `src` 布局。FastAPI、FastMCP 与 CLI 通过中央 `ToolSpec` 目录调用共享执行层和领域服务；分层与数据流见[架构说明](docs/architecture.md)。依赖声明在 [pyproject.toml](pyproject.toml)，开发解析版本由 [uv.lock](uv.lock) 固定。
 
-文档、算法、接口、测试和 Onda 技能均欢迎贡献。先按[贡献指南](CONTRIBUTING.md)准备改动，再按[开发指南](docs/development-guide.md)选择检查。纯文档改动的起始检查：
+文档、算法、接口、测试和 Onda 技能均欢迎贡献。先按[贡献指南](CONTRIBUTING.md)准备改动，再按[开发指南](docs/development-guide.md)选择检查。文档写作要求见[维护指南](docs/documentation-guide.md)。纯文档改动的起始检查：
 
 ```bash
 uv run --locked --extra dev python scripts/check_docs.py

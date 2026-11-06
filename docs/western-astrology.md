@@ -1,10 +1,34 @@
 # 西方占星的计算、原典与验证
 
-阅读导航：[输入与精度](#输入与天文精度) · [推运与返照](#推运返照与主限坐标) · [关系盘](#关系盘的时间空间与方法) · [卜卦](#卜卦月亮事件与lilly条件) · [择日](#择日的实际条件与分数回执) · [来源与日速](#参考点模型与日速来源) · [复现](#独立数值审计与复现)
+[文档中心](README.md) · [API 参考](api-reference.md) · [算法状态](algorithm-status.md)
 
 本命盘现在分别处理民用 UTC、行星运动的 TT 和地球自转的 UT1。昼夜宗派使用太阳中心的真实地平高度，整宫、象限和 MC 等宫制不能替代地平线。古典混合规则与有明确版本的原典子集分别返回。
 
-七曜日运动沿用前向一 TT 日的五点采样，地心试算不消耗范围外的 UT1；恒星黄道盘按同一 TT 计算 Lahiri 偏移，其速度差分跨越 360°／0° 时按圆周展开，避免制造虚假高速或把逆行翻成顺行。名义宫位和地平仍要求有效 UT1。有限天文对照、同库算术控制、三端回执与尚未通过的 Lilly 印刷例题分别记录，见日运动与角度环绕核验。
+七曜日运动沿用前向一 TT 日的五点采样，地心试算不消耗范围外的 UT1；恒星黄道盘按同一 TT 计算 Lahiri 偏移，其速度差分跨越 360°／0° 时按圆周展开，避免制造虚假高速或把逆行翻成顺行。名义宫位和地平仍要求有效 UT1。有限天文对照、同库算术控制、三端回执与尚未通过的 Lilly 印刷例题分别记录。
+
+<details>
+<summary>章节索引</summary>
+
+- [输入与天文精度](#输入与天文精度)
+- [太阳圆面内的位置模型](#太阳圆面内的位置模型)
+- [推运、返照与主限坐标](#推运返照与主限坐标)
+- [数值边界与显示](#数值边界与显示)
+- [关系盘的时间、空间与方法](#关系盘的时间空间与方法)
+- [宫位与四轴的独立核验](#宫位与四轴的独立核验)
+- [年小限与月段边界](#年小限与月段边界)
+- [极区天球四轴与制宫分支](#极区天球四轴与制宫分支)
+- [相位边界与瞬时入出相](#相位边界与瞬时入出相)
+- [卜卦月亮事件与Lilly条件](#卜卦月亮事件与lilly条件)
+- [恒星位置、黄道与原典标签](#恒星位置黄道与原典标签)
+- [指定版本的原典子集](#指定版本的原典子集)
+- [参考点、模型与日速来源](#参考点模型与日速来源)
+- [近太阳导数的假收敛与分段](#近太阳导数的假收敛与分段)
+- [卜卦的实际事件路径](#卜卦的实际事件路径)
+- [解释如何对应本次计算](#解释如何对应本次计算)
+- [独立数值审计与复现](#独立数值审计与复现)
+- [验证范围与未决条件](#验证范围与未决条件)
+
+</details>
 
 ## 输入与天文精度
 
@@ -12,17 +36,17 @@
 
 内部日期采用Python的前推格里高利历。卜卦可用 `question_calendar`、择日可用 `candidate_calendar` 显式选择 `julian`，默认仍为 `proleptic_gregorian`；其他出生／分析接口仍按已公布的格里历合同处理。日期先转换，再按指定时区校验和转换钟时；不按1582年或地区自动改历。夏令时跳过钟时拒绝计算，重复钟时要求明确UTC偏移，不能暗选其中一次。同一物理时刻的TT、UT1和盘面位置保持一致。
 
-`calendar_conversion` 保留原历法、原日期、原钟时及换算后的本地日期；`analysis_context.input_calendar/input_date` 同样保留原标签，`question_datetime/candidate_datetime` 为内部格里历本地钟时。儒略历1700年2月29日合法，换算为格里历3月11日；格里历同名闰日仍拒绝。输入年采用公元1月至12月编号，不推断英国旧式3月25日换年或双年份。转换超出Python公元1–9999年范围时明确拒绝。`date_label_jdn` 是日期标签的整数日编号，不能当成实际UTC／UT1／TT历元。原典钟时、地方平太阳时／视太阳时及地区改历仍须另核，见历法入口与历史例题诊断。
+`calendar_conversion` 保留原历法、原日期、原钟时及换算后的本地日期；`analysis_context.input_calendar/input_date` 同样保留原标签，`question_datetime/candidate_datetime` 为内部格里历本地钟时。儒略历1700年2月29日合法，换算为格里历3月11日；格里历同名闰日仍拒绝。输入年采用公元1月至12月编号，不推断英国旧式3月25日换年或双年份。转换超出Python公元1–9999年范围时明确拒绝。`date_label_jdn` 是日期标签的整数日编号，不能当成实际UTC／UT1／TT历元。原典钟时、地方平太阳时／视太阳时及地区改历仍须另核；可用[历史历法审计](../scripts/western/audit_western_civil_calendar.py)复核已选例题。
 
 卜卦的 `question_clock_basis`、择日的 `candidate_clock_basis` 可显式选择 `civil`、`local_mean_solar`、`local_apparent_solar`。默认 `civil` 沿用民用时区；`timezone_name` 省略／null时采用API默认 `+08:00`，回执标明 `legacy_api_default`，不能把它当成已确认地点时区。太阳时必须省略／null时区，避免重复修正。按 [USNO钟时定义](https://aa.usno.navy.mil/faq/eqtime)和[Swiss接口9.4节](https://www.astro.com/swisseph/swephprg.htm)，平太阳时为UT1加东经时差，视太阳时再加均时差（LAT−LMT）；后者按地心视太阳反解，未复原具体日晷的站心、折射或读数误差。原始JPL请求与响应、接口定义（本地 `tests/data/astro/source_materials/source-files.json`）作为来源资料保留，不作为新增观测样本。
 
-日期规范化完成后再解析声明的钟时。`clock_conversion` 与公开 `clock_input` 字段卡分别保留原钟面、钟时口径、有效民用时区、UTC命名载体及实际TT／UT1；`question_datetime/candidate_datetime` 仍是规范化后的输入钟面，须连同 `analysis_context.input_clock_basis` 解释，太阳时的 `analysis_context.timezone=null`，内部载体时区在 `chart_timezone`。1960年前的UTC命名载体承载模型UT1，不能据名称宣称当时已有原子UTC。太阳时反解复用共享引擎，未改变普通现代输入的物理时刻；钟时数值残差不认证原始分钟记录的准确度。原书未说明的钟时保持未知，不能按上升点或结局拟合。见显式事件钟时核验。
+日期规范化完成后再解析声明的钟时。`clock_conversion` 与公开 `clock_input` 字段卡分别保留原钟面、钟时口径、有效民用时区、UTC命名载体及实际TT／UT1；`question_datetime/candidate_datetime` 仍是规范化后的输入钟面，须连同 `analysis_context.input_clock_basis` 解释，太阳时的 `analysis_context.timezone=null`，内部载体时区在 `chart_timezone`。1960年前的UTC命名载体承载模型UT1，不能据名称宣称当时已有原子UTC。太阳时反解复用共享引擎，未改变普通现代输入的物理时刻；钟时数值残差不认证原始分钟记录的准确度。原书未说明的钟时保持未知，不能按上升点或结局拟合。
 
 卜卦 `question_hour_origin`、择日 `candidate_hour_origin` 独立声明小时日起点：`midnight`（默认）按午夜计0–23，`noon` 的0为同日12:00、12–23为次日00:00–11:00。[Lilly1647第30–31页](https://iiif.wellcomecollection.org/image/b30338724_0065.jp2/full/2400,/0/default.jpg)的星历表按正午起算，午后第14小时对应次日02:00。AM／PM已经换成现代24小时钟面时沿用 `midnight`。日起点与民用／LMT／LAT分开声明，依已确认原页选择，不从年代、地区或ASC拟合推断，也不把制宫表坐标当作提问钟时。
 
-太阳时反解落入UTC闰秒时，卜卦／择日保留原生TT／UT1继续计算，`converted_utc`可返回含`23:59:60`的标签。`clock_conversion.utc_representation`明确区分UTC标签、闰秒与Python datetime可表示性；不要截断、平滑、移秒或把显示限制说成星盘不可算。仍不推断原资料精度、实测EOP、完整原典或现实预测有效性。见物理时刻与闰秒核验。
+太阳时反解落入UTC闰秒时，卜卦／择日保留原生TT／UT1继续计算，`converted_utc`可返回含`23:59:60`的标签。`clock_conversion.utc_representation`明确区分UTC标签、闰秒与Python datetime可表示性；不要截断、平滑、移秒或把显示限制说成星盘不可算。仍不推断原资料精度、实测EOP、完整原典或现实预测有效性。
 
-`clock_conversion.hour_origin_conversion` 保留原历法日期、原小时标签、整数日进位和最终格里历钟面；进位完成后才验证最终日期范围，再处理时区／夏令时或太阳时。该操作是标签规范化，未计算实际持续时长或时区偏移。例如儒略历公元1年1月2日午后第12小时最终为格里历1年1月1日00:00；中间日期无法表示时，`calendar_conversion.normalized_local_datetime=null`、`normalized_date_representable=false`，原标签与日编号仍保留，最终钟面可以有效。不能据中间null否定已返回的最终钟面。验证范围及1978年元旦UT1映射至不可表示UTC闰秒的原有缺口见正午日起点核验。
+`clock_conversion.hour_origin_conversion` 保留原历法日期、原小时标签、整数日进位和最终格里历钟面；进位完成后才验证最终日期范围，再处理时区／夏令时或太阳时。该操作是标签规范化，未计算实际持续时长或时区偏移。例如儒略历公元1年1月2日午后第12小时最终为格里历1年1月1日00:00；中间日期无法表示时，`calendar_conversion.normalized_local_datetime=null`、`normalized_date_representable=false`，原标签与日编号仍保留，最终钟面可以有效。不能据中间null否定已返回的最终钟面。1978年元旦UT1映射至UTC闰秒的历史失败仍保留；当前以原生时间尺度和扩展标签交付，不要求Python datetime表示该标签。
 
 1972 年起，`TT = UTC + (TAI−UTC) + 32.184 秒`。偏移表固定自 [IERS Bulletin C 72](https://hpiers.obspm.fr/iers/bul/bulc/Leap_Second.dat)，包含来源指纹及有效期。到期以后的日期沿用最后已知闰秒，并返回 `chart_profile.future_leap_seconds_assumed_unchanged=true`。这是一项假设；未来闰秒并未被预测。1961–1971年使用[IERS历史UTC关系表](https://hpiers.obspm.fr/eoppc/bul/bulc/UTC-TAI.history)的分段偏移和日漂移，1960年使用已声明的SOFA关系；更早输入沿用Swiss Ephemeris的历史UT1／ΔT约定，仍非实测地球自转或原典钟时重建。
 
@@ -30,7 +54,7 @@
 
 跨年代位置还依赖对应的`sepl`／`semo`分段。可用现有下载器按固定清单补齐公元1–9999年的34份日月／行星分段，再用`SE_EPHE_PATH`显式选择；这不包括小行星、EOP或未来钟时认证。覆盖与位置专项在同一133个TT时刻、266组日月参考中保留补全前的49项超线和184项不可计算；补全后主机与ARM Linux均符合原0.02角秒线，最大差异约0.00217角秒。参考与数据共享DE441谱系，不是独立动力学或全历元绝对精度证明。当前参考在日月覆盖向量（本地 `tests/data/astro/ephemeris_coverage/`）、TT事件（本地 `tests/data/astro/tt_events/`）及共同框架（本地 `tests/data/astro/tt_common_frame/`）；普通本命统一来源看`chart_profile.ephemeris_model`；`planetary_models`仅在混合／近似分支出现，详细物理来源也按入口条件交付，不能请求不存在于本次结果的条件字段。共享输入中的非默认`ephemeris_policy`目前只对印占开放。
 
-独立安装版还须核对实际默认发现，不能用仓库已有历表替代安装验收。2026-10-25已将固定清单的34份分段发布到本机用户缓存；未设`SE_EPHE_PATH`的新安装进程可自动发现，常驻进程未重启。相同266组参考由补齐前6组符合原判定线、76组超线、184组不可计算，改善为266组符合；这是默认数据配置的修复，不增加独立天文样本或现实预测证据，见安装版默认历表核验。
+独立安装版须核对实际发现的数据目录，不能用仓库中的历表替代安装验收。2026-10-25 的安装版对照中，补齐固定清单的34份分段后，相同266组参考由6组符合原判定线、76组超线、184组不可计算，变为266组符合。这是该次数据配置的结果，不代表其他安装已具备这些文件，也不增加独立天文样本或现实预测证据。
 
 ```bash
 uv run --locked --extra dev python -m fatebridge.fetch_ephe --year-range 1 9999 --dest /tmp/fatebridge-western-ephe
@@ -39,9 +63,9 @@ uv run --locked --extra dev python -m scripts.western.audit_western_ephemeris_co
 
 昼夜约定为地心太阳中心、无折射、真实高度 ≥0 为昼。行星的 `above_horizon` 也取实际地平高度，缺少高度时返回未知。行星时采用日出日落分段，有自己的视圆／折射口径；两者在地平附近不能当作同一定义。极区没有适用的象限宫位时仍报错，不悄悄替换宫制。
 
-卜卦／择日的 `ut1_source=iers_c04` 使用固定版本的 IERS20 C04 最终每日合成值，覆盖 **1962-01-01 00:00 至 2026-09-19 00:00 UTC（含端点）**，共23,638日。来源经 Astropy 官方数据镜像固定提交获取，原始文件与派生包均有SHA-256；没有宣称本次从IERS服务器成功直取。`swiss_delta_t` 保持默认。日间查询先移除真实TAI−UTC（含1972年前漂移／调整），在TT上对连续UT1−TAI线性插值，闰秒不会当普通UTC秒插值。太阳时反解、恒星时与Lahiri选项沿用同一来源；没有外推、预测值或静默模型回退。覆盖外起盘返回错误；地心TT黄经事件搜索直接使用TT星历，不再因无关的试算UT1超范围而返回未知。宫位、地平与日出等仍要求对应UT1来源覆盖。这项可用性修复不提高外部位置核验成绩，见TT事件边界核验。
+卜卦／择日的 `ut1_source=iers_c04` 使用固定版本的 IERS20 C04 最终每日合成值，覆盖 **1962-01-01 00:00 至 2026-09-19 00:00 UTC（含端点）**，共23,638日。来源经 Astropy 官方数据镜像固定提交获取，原始文件与派生包均有SHA-256；没有宣称本次从IERS服务器成功直取。`swiss_delta_t` 保持默认。日间查询先移除真实TAI−UTC（含1972年前漂移／调整），在TT上对连续UT1−TAI线性插值，闰秒不会当普通UTC秒插值。太阳时反解、恒星时与Lahiri选项沿用同一来源；没有外推、预测值或静默模型回退。覆盖外起盘返回错误；地心TT黄经事件搜索直接使用TT星历，不再因无关的试算UT1超范围而返回未知。宫位、地平与日出等仍要求对应UT1来源覆盖。这项可用性修复不提高外部位置核验成绩。
 
-`clock_conversion.ut1_reference` 和 `calculation_basis.earth_rotation.ut1_reference` 返回名义历元的源日、日值、形式标准差、插值权重及指纹；公开 `ut1_input` 字段卡可整组读取。模型路径该引用为null。只应用UT1，**未应用极移、天极偏移和日内潮汐**；[IERS C04指南](https://hpiers.obspm.fr/eoppc/eop/eopc04_05/C04.guide.pdf)说明日值与完整地球定向的差别，指南版本为2009年的05C04，不能冒称本实现复现20C04的生产算法。形式标准差不是插值或瞬时物理误差界，数值守卫也不是外部精度认证。数据、参考生成器修正及残留差异见IERS UT1核验。
+`clock_conversion.ut1_reference` 和 `calculation_basis.earth_rotation.ut1_reference` 返回名义历元的源日、日值、形式标准差和插值权重；公开 `ut1_input` 字段卡可整组读取。模型路径该引用为null。只应用UT1，**未应用极移、天极偏移和日内潮汐**；[IERS C04指南](https://hpiers.obspm.fr/eoppc/eop/eopc04_05/C04.guide.pdf)说明日值与完整地球定向的差别，指南版本为2009年的05C04，不能冒称本实现复现20C04的生产算法。形式标准差不是插值或瞬时物理误差界，数值守卫也不是外部精度认证。数据与参考转换可由[IERS几何参考生成器](../scripts/western/gen_western_iers_geometry_reference.py)复核，残留差异不因改用实测日值而自动消失。
 
 ## 太阳圆面内的位置模型
 
@@ -49,7 +73,7 @@ uv run --locked --extra dev python -m scripts.western.audit_western_ephemeris_co
 
 [Swiss 官方文档附录 A](https://www.astro.com/swisseph/swisseph.htm)说明：太阳后方不可见天体的位置，采用透明太阳质量分布作连续延拓。`virtual_continuous_solar_disc_extension` 表示这种约定；前景凌日不能据投影重合误报成位于太阳后方。这不是光学遮掩、太阳边缘接触或实际可见性求解，`maximum_physical_error_arcseconds=null` 也不是零误差。
 
-固定291个天体／历元的新增 JPL 开发对照中，65组背景延拓与 JPL 视位置存在明显差异；关闭偏折可诊断这层差异，却会破坏圆面外的对照。因此默认坐标保持原样，原0.02角秒比较仍记失败，不能靠切换约定过线。来源、完整分母与工程复跑见位置模型核验。
+固定291个天体／历元的新增 JPL 开发对照中，65组背景延拓与 JPL 视位置存在明显差异；关闭偏折可诊断这层差异，却会破坏圆面外的对照。因此默认坐标保持原样，原0.02角秒比较仍记失败，不能靠切换约定过线。来源与固定队列见[太阳圆面参考生成器](../scripts/western/gen_western_solar_disc_reference.py)。
 
 ### 朔望与行星时
 
@@ -137,7 +161,7 @@ uv run --locked --extra dev python -m scripts.western.audit_western_lunations_ho
 
 各模式共用两张本命盘的七曜与跨盘相位计分，`compatibility_evidence.source_paths` 指向同次返回的本命资料与相位表。关系分数的 `compatibility_policy` 交代七曜元素／模式重叠、相位加减及三项平均，是 FateBridge 自定义启发式，未作经验校准。v2 按未舍入容许度选择最紧密24条，并保留第24条处的全部精确并列项，因此入选数可能超过24；名称或甲乙顺序不再决定舍弃哪条。只差一个浮点步长也不是并列，不设人为 epsilon。元素／模式分先舍入，再与截断到0–100的相位分取平均；均为最近整数、半数取偶。`compatibility_evidence` 保留人数分布、重叠计数、分母、入选相位在同次 `synastry_aspects` 中的索引、逐项±4、截断前后分数及平均过程；空相位的50是规则基线，不是观察到的关系质量。投影入选明细时选择整个 `selected_contacts` 数组。
 
-合成角度控制中，交换甲乙双方的分数均为63；独立边界、并列和顺序检查见关系计分审计。计算对称性不校准评分的专业解释。24条名额、所有合相一律加分及等权平均仍是粗略产品约定，尚无原典或经验依据认证。文本导出列出“自定义评分依据”；其中长数组沿用通用摘要上限并显示省略提示，逐项复算应读取同次完整JSON。
+合成角度控制中，交换甲乙双方的分数均为63；独立边界、并列和顺序检查见[关系计分审计](../scripts/western/audit_western_relationship_scoring.py)。计算对称性不校准评分的专业解释。24条名额、所有合相一律加分及等权平均仍是粗略产品约定，尚无原典或经验依据认证。文本导出列出“自定义评分依据”；其中长数组沿用通用摘要上限并显示省略提示，逐项复算应读取同次完整JSON。
 
 原典关系判断的缺口也需单独保留：[Ptolemy《Tetrabiblos》IV.7，Robbins 1940](https://penelope.uchicago.edu/Thayer/E/Roman/Texts/Ptolemy/Tetrabiblos/4B%2A.html#7)优先考察双方日、月、上升和福点的星座关系，并继续考察位置高低与其他行星的见证；它没有给出此处的七曜百分制。当前自定义评分尚未实现该章完整判断链，不能称为该章的实现，也不能将其综合分解释成关系成败概率。
 
@@ -234,7 +258,7 @@ uv run --locked --extra dev python -m scripts.western.audit_western_angular_pred
 
 `classical.orientality_policy` 及 `classical.ptolemy.orientality_policy` 交代共享东方／西方判断的范围。角差及阶段判断保留原输入的精确有理数，不设置0.0001度死区。水星阶段传到昼夜归属、`sect_placement` 和 `in_halb`；这些是给定坐标与所选传统下的条件，不能据此增加观测精度。精确合相保留未知，精确对分沿用既有东方端点约定。
 
-Lilly第114页分别讨论上行星、金水和月亮；共享几何端点约定尚未认证为这些作者／对象的完整过渡规则。黄经阶段也没有求解实际升落或偕日可见性，三项对应认证字段保持false。独立角度参考、实际后端探测、完整输出差异及原门槛保存见边界核验。
+Lilly第114页分别讨论上行星、金水和月亮；共享几何端点约定尚未认证为这些作者／对象的完整过渡规则。黄经阶段也没有求解实际升落或偕日可见性，三项对应认证字段保持false。独立角度参考、实际后端探测、完整输出差异及原门槛保存。
 
 ### Lilly本质尊贵与有向接纳
 
@@ -267,7 +291,7 @@ uv run --locked --extra dev python -m scripts.western.audit_western_lilly_recept
 
 第126–127页明确不接受“所问主星落一宫就必成”的捷径。`lilly_conditions.p126_127_dwelling` 检查实际落宫、月亮前次／下次七曜接触的方向，以及当前对应出相／入相；根区间重叠、缺失窗口、未知速度和角色重合保留未知。`named_necessary_conditions_satisfied` 只覆盖这些必要子条件，不能冒充完整传光或成事；更严格的第126页事件接纳与两造历史分离仍由 `event_paths` 分别返回。三端公开的 `lilly_orbs_houses` 严格视图同时保留来源、实际状态和未完成标志。
 
-原图与修改前反例记录封存资料、独立算术与接口验收。2024年示例窗口另外发现一处金星导数未收敛；修改前卜卦实现配合相同数值底座也复现该失败，见缺口记录。该原始失败回执保留；后续v5已恢复此窗口，详见近太阳导数续修。表格修复或协议测试本身不证明天文精度。
+原图与修改前反例记录封存资料、独立算术与接口验收。2024年示例窗口另外发现一处金星导数未收敛；修改前卜卦实现配合相同数值底座也复现该失败。该原始失败回执保留；后续v5已恢复此窗口，详见近太阳导数续修。表格修复或协议测试本身不证明天文精度。
 
 ```bash
 uv run --locked --extra dev python -m scripts.western.audit_western_lilly_orbs_houses --output /tmp/lilly-orbs-houses.json
@@ -338,7 +362,7 @@ uv run --locked --extra dev python -m scripts.western.audit_western_horary_motio
 
 恒星位置采用当前SIMBAD输入及原生视位置。预声明的协议（本地 `tests/fixtures/western-fixed-star-protocol.json`）采用1角秒线，20颗星乘6个1900–2099年TT历元，共120个位置；独立ERFA参考（本地 `tests/fixtures/western-fixed-stars-erfa.json`）共享星表输入，但不共享数值算法或地球状态。该队列检验坐标与来源关系，不认证观测绝对精度或全部年代。朴素线性岁差近似及其比较已退役，不能代替当前误差线。
 
-`chart_profile.fixed_stars` 返回星表指纹、TT、黄道、模型版本及状态。星表单独随包分发，调用不依赖可选完整 `sefstars.txt`；缓存和操作员路径在共享锁下隔离。恒星函数可返回SWIEPH请求标志，而地球状态实际回退Moshier，故保留恒星标志并另测、另列 `earth_ephemeris_model`，不由请求标志认证精度。状态为 `unavailable` 时文本明确显示“未计算”，空列表不能被解释成没有合相。
+`chart_profile.fixed_stars` 返回星表来源、TT、黄道、模型版本及状态。星表单独随包分发，调用不依赖可选完整 `sefstars.txt`；缓存和操作员路径在共享锁下隔离。恒星函数可返回SWIEPH请求标志，而地球状态实际回退Moshier，故保留恒星标志并另测、另列 `earth_ephemeris_model`，不由请求标志认证精度。状态为 `unavailable` 时文本明确显示“未计算”，空列表不能被解释成没有合相。
 
 合相按未舍入黄经分类、保留原始小数；默认1°是产品采用的传统容许度政策，不是I.9给出的参数。这里比较黄经，不比较球面角距，也不表示掩星，`star_latitude`与`conjunction_basis`显式保留这一差别。远古／远未来、双星轨道与星表协方差仍未完成独立验收。
 
@@ -411,7 +435,7 @@ uv run --locked --extra dev python -m scripts.western.audit_western_horary_motio
 
 该独立位置层使用 IAU2006/2000A 真日期黄道，日盘内坐标是不可观测光线的数学约定。`natal_chart_recomputed=false`：原 `planets`、日速、宫位、相位和解释继续属于原生盘，不能把独立位置层当作已重算的完整不透明太阳盘。其计算使用[ERFA有限源偏折](https://github.com/liberfa/erfa/blob/master/src/ld.c)与[光行差](https://github.com/liberfa/erfa/blob/master/src/ab.c)，不复用另一个点质量模型作独立预期。
 
-具名不透明模型实算全部原7070个天体／时刻，两种框架共14140次投影比较，经纬均符合未改变的0.02角秒线，经度最大约0.002493角秒；原异常点经度差约0.000371角秒。该7070点参考只覆盖太阳、月亮、水星、金星、火星、木星、土星；独立位置层另输出的天王星、海王星、冥王星没有在本轮取得同样独立位置验收。另有偏离原小时网格17分钟的九个水星 Horizons 控制点，继续使用0.02角秒线；这是问题发现后的额外检查，不能称作盲测或全历元认证。资料在 `tests/data/astro/mercury-opaque-solar`，包括原始请求、响应及来源指纹。
+具名不透明模型实算全部原7070个天体／时刻，两种框架共14140次投影比较，经纬均符合未改变的0.02角秒线，经度最大约0.002493角秒；原异常点经度差约0.000371角秒。该7070点参考只覆盖太阳、月亮、水星、金星、火星、木星、土星；独立位置层另输出的天王星、海王星、冥王星未纳入该批独立位置验收。另有偏离原小时网格17分钟的九个水星 Horizons 控制点，继续使用0.02角秒线；这是问题发现后的额外检查，不能称作盲测或全历元认证。资料在 `tests/data/astro/mercury-opaque-solar`，包括原始请求、响应及来源指纹。
 
 ```bash
 uv run --locked --extra dev python -m scripts.western.audit_western_reference_points --output /tmp/western-reference-points.json
@@ -467,7 +491,7 @@ uv run --locked --extra dev python -m scripts.western.audit_western_event_paths 
 
 ## 独立数值审计与复现
 
-固定数据来自 [NASA/JPL Horizons](https://ssd.jpl.nasa.gov/horizons/manual.html)，保留请求参数、完整响应和 SHA-256。覆盖 1900—2099 年十二个时刻、十个实际天体，共 120 组黄经／黄纬；容差在采集前固定为 2 角秒。节点、宫位、现实事件不在该外部数据集内。[Horizons 时间说明](https://ssd.jpl.nasa.gov/horizons/tutorial.html)明确未来沿用最后已知闰秒；本轮比较采用同一公开假设。
+固定数据来自 [NASA/JPL Horizons](https://ssd.jpl.nasa.gov/horizons/manual.html)，保留请求参数、完整响应和 SHA-256。覆盖 1900—2099 年十二个时刻、十个实际天体，共 120 组黄经／黄纬；容差在采集前固定为 2 角秒。节点、宫位、现实事件不在该外部数据集内。[Horizons 时间说明](https://ssd.jpl.nasa.gov/horizons/tutorial.html)明确未来沿用最后已知闰秒；该批比较采用同一公开假设。
 
 测试先发现 UTC 直接当 UT1 会使 2099 年月亮黄经误差约 15.20 角秒。修正时间尺度并保留未舍入坐标后，无外部文件的 Moshier 模型在该样本集的月亮最大黄经误差约 1.34 角秒；十天体最大黄经误差约 1.98 角秒。使用已核验文件的 Swiss 模型，十天体最大黄经误差约 0.56 角秒。这里核对的是星历位置，不是人生事件。
 

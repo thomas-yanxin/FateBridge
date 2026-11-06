@@ -1,5 +1,7 @@
 # 离线城市与行政区坐标 / Offline place catalog
 
+[文档中心](README.md) · [API 参考](api-reference.md) · [算法状态](algorithm-status.md)
+
 FateBridge 的 REST、MCP、CLI 共用 `utils/places.py`，不需要在线地理编码服务或 API Key。
 `birth_place` 可补全经度、纬度和 IANA 民用时区；显式提供的 `birth_longitude`、`birth_latitude`、`birth_timezone` 各自优先。
 

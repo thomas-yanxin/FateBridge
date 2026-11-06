@@ -1,10 +1,6 @@
 # FateBridge 快速入门
 
-想知道 FateBridge 能做什么，先看一次实际返回。安装后，用虚构资料运行一条本地计算，查看数据与运行回执，再决定如何接入应用或 AI 助手。
-
-领域计算在本地完成；自然语言对话由你选择的客户端与模型提供。
-
-第一次体验只需完成[安装](#安装)和 [CLI 调用](#选择运行方式)，无需启动服务。要接入应用或助手，可以按目标选择下面的路径。本文中的人物资料均为虚构示例。
+本页带你安装 FateBridge、完成一次本地计算，再选择 REST 或 MCP 接入。首次体验只需完成[安装](#安装)和 [CLI 调用](#选择运行方式)，无需启动服务。人物资料均为虚构示例；自然语言对话由接入客户端和模型提供。
 
 | 你的目标 | 从这里开始 |
 | --- | --- |
@@ -17,15 +13,17 @@
 
 ## 安装
 
-先确定需要哪个版本：下方 PyPI 命令安装最新已发布版本，可用 `fatebridge doctor` 确认实际版本；需要当前开发分支的场景、技能与接口范围时，选择源码安装。版本差异见 [CHANGELOG](../CHANGELOG.md#unreleased)，已发布版本的使用说明以对应 Git 标签为准。
+需要 [uv](https://docs.astral.sh/uv/getting-started/installation/) 和 Python 3.10+。当前 CI 覆盖 Python 3.10–3.13，源码默认 Python 3.12。选择一种安装方式。
 
-包管理统一使用 [uv](https://docs.astral.sh/uv/getting-started/installation/)。需要 Python 3.10+；当前 CI 覆盖 3.10–3.13，源码环境默认使用 `.python-version` 中的 Python 3.12。依赖与三个控制台入口由 `pyproject.toml` 声明。从 PyPI 安装独立命令工具：
+**使用已发布版本**：从 PyPI 安装到独立工具环境。
 
 ```bash
 uv tool install --python 3.12 fatebridge
 ```
 
-该命令会在独立工具环境中提供 `fatebridge`、`fatebridge-api` 和 `fatebridge-mcp`；命令找不到时运行 `uv tool update-shell` 并重开终端。需要将包安装到已有虚拟环境时使用 `uv pip install fatebridge`，需要复现特定发布版时加 `==<version>`。需要修改源码时使用 Git 安装；当前 `src/` 布局不能仅靠切到仓库根目录导入包：
+安装后提供 `fatebridge`、`fatebridge-api` 和 `fatebridge-mcp`。命令找不到时运行 `uv tool update-shell` 并重开终端；用 `fatebridge doctor` 确认版本。特定版本可用 `fatebridge==<version>` 安装，使用说明查阅[对应 Git 标签](https://github.com/thomas-yanxin/FateBridge/tags)。
+
+**使用当前源码**：适合开发或使用尚未发布的功能。
 
 ```bash
 git clone https://github.com/thomas-yanxin/FateBridge.git
@@ -33,21 +31,9 @@ cd FateBridge
 uv sync --locked --extra dev
 ```
 
-`uv sync --locked --extra dev` 按锁文件创建 `.venv`，以 editable 方式安装源码及开发依赖。后续源码命令使用 `uv run --locked --extra dev`，无需激活环境：
+同步后在 `.venv` 中安装源码与开发依赖。下文命令使用独立工具写法；源码用户在命令前加 `uv run --locked --extra dev`，无需激活环境。例如 `uv run --locked --extra dev fatebridge doctor`。不要仅切到仓库目录就用系统 Python 导入包。
 
-```bash
-uv run --locked --extra dev python -c "import fatebridge; print(fatebridge.__version__, fatebridge.__file__)"
-uv run --locked --extra dev fatebridge list
-uv run --locked --extra dev fatebridge describe bazi_birth --detail input
-```
-
-独立工具安装可直接使用 `fatebridge`、`fatebridge-api` 与 `fatebridge-mcp`，不会把该包加入系统 Python 环境。下文 `python -m ...` 形式须使用已安装 FateBridge 的虚拟环境解释器；独立工具用户下载星历时使用[星历数据与精度](#星历数据与精度)中的专用命令。
-
-下文 CLI 简写面向独立工具安装。源码用户统一加 `uv run --locked --extra dev`；Windows PowerShell 多行命令与 MCP 路径见[部署指南](mcp-deployment.md#windows-powershell)。开发工作流见[开发指南](development-guide.md)。
-
-安装入口为 `fatebridge`、`fatebridge-api` 和 `fatebridge-mcp`。`pyswisseph` / `kerykeion` 都是常规依赖；FateBridge 的规则、知识与场景 JSON 随包安装，外部星历文件不随 FateBridge wheel 分发，见下文。
-
-当前源码构建另附无损裁取的DE440太阳轨道系数，供默认交节计算使用，不需要可选`jpl`依赖或外部SPK文件。[默认交节审计](solar-backends.md)列出数据体积、实际模型、适用范围和完整有限验收；已安装环境仍以自己的实际模型回执为准。
+未发布差异见 [CHANGELOG](../CHANGELOG.md#unreleased)，开发流程见[开发指南](development-guide.md)。Windows 的多行命令与路径见[部署指南](mcp-deployment.md#windows-powershell)。
 
 ## 选择运行方式
 
@@ -68,41 +54,20 @@ fatebridge bazi_birth --birth-year 1990 --birth-month 5 --birth-day 15 \
   --response-char-limit 8192
 ```
 
-执行成功时，退出码为 `0`，返回 JSON 包含 `bazi_birth.day_master` 的 `stem/element/polarity` 和 `run_metadata`。较大的运行证据通过 `result_delivery` 延后交付，按[同次结果读取](agent-guide.md#完整结果交付与同次导出)展开。这表明当前安装完成了这一次八字计算；`run_metadata` 记录本次运行，字段含义见 [核心概念](concepts.md)。
+执行成功时，退出码为 `0`，`bazi_birth.day_master` 返回 `stem=庚`、`element=金`、`polarity=阳`，并附 `run_metadata`。较大的运行证据通过 `result_delivery` 延后交付，按[同次结果读取](agent-guide.md#完整结果交付与同次导出)展开。这表明当前安装完成了这一次计算；字段含义见[核心概念](concepts.md)。
+
+查看其他工具和输入格式：
+
+```bash
+fatebridge list
+fatebridge describe bazi_birth --detail input
+```
 
 CLI 不自动读取 `.env`，不需要配置 REST 密钥；如果已有进程环境配置，仍会按实际设置运行。
 
 ## 配置环境变量
 
-如果只是第一次用 CLI，可跳过本节。准备启动 REST、配置 MCP 工具范围或使用自定义星历目录时，再设置相应变量。
-
-源码安装时可选复制模板；已有 `.env` 时直接编辑，避免覆盖：
-
-```bash
-cp -n .env.example .env
-```
-
-| 变量 | 默认值 | 用途 |
-| --- | --- | --- |
-| `API_HOST` | `0.0.0.0` | REST 监听地址；仅本机使用时改成 `127.0.0.1` |
-| `API_PORT` | `8010` | REST 端口 |
-| `ALLOWED_ORIGINS` | `http://localhost:3000` | 逗号分隔的浏览器 CORS 来源 |
-| `LOG_LEVEL` | `INFO` | 日志级别 |
-| `FATEBRIDGE_API_KEYS` | 空 | REST API Key；为空关闭鉴权 |
-| `API_KEY_HEADER_NAME` | `X-API-Key` | 密钥请求头名称 |
-| `FATEBRIDGE_MCP_FAMILIES` | 空 | MCP 公开的工具分类，逗号分隔；空时保留全部工具，分类拼错阻止启动；不影响 REST / CLI |
-| `FATEBRIDGE_MCP_SCENARIOS` | 空 | MCP 场景 ID，逗号分隔；与 family 配置取交集，空时不限制，拼错阻止启动 |
-| `FATEBRIDGE_MCP_TOOL_SCOPE` | `complete` | 当前源码支持；`complete` 包含场景条件依赖，`topic` 仅保留直接工具与知识支撑且必须指定场景；见[MCP 范围](mcp-deployment.md#工具范围环境与技能) |
-| `SE_EPHE_PATH` | 未设置 | 自定义本地星历目录，不在模板内 |
-| `FATEBRIDGE_SOLAR_TERM_MODEL` | `auto` | 当前源码在 1700–2300 年默认使用随包 DE440；严格原生 JPL 配置优先。各模式、年份和相邻边界见[太阳后端](solar-backends.md) |
-| `FATEBRIDGE_SOLAR_SPK_FILE` | 未设置 | 仅显式`spk`模式使用的外部文件，需可选`jpl`依赖；默认随包系数不读取该文件 |
-| `FATEBRIDGE_HEAVY_CALC_MAX_CONCURRENCY` | `min(4, max(1, CPU 数))` | 单 REST 进程的重计算并发上限，至少为 1；不是请求速率限制 |
-
-API 和 MCP 启动时会读取源码安装目录根部的 `.env`，已经存在的进程环境变量优先。文件解析仅支持简单 `KEY=value`、包裹引号和整行注释，不执行 shell 展开。CLI 不自动加载 `.env`，需要时在启动前设置进程环境变量。wheel 安装不应依赖当前工作目录 `.env` 的自动发现，请由启动器注入环境。
-
-REST 鉴权示例：`FATEBRIDGE_API_KEYS=agent:replace-me`，请求发送 `X-API-Key: replace-me`，不是 `agent:replace-me`。也支持逗号分隔多项与单独 secret；非空配置的空条目、缺少名称/密钥或重复名称会阻止启动。修改环境后重启进程。
-
-免鉴权路径：`/health`、`/ready`、`/metrics`、`/docs`、`/redoc`、`/openapi.json`；`OPTIONS` 免检。`/api/tools` 和业务路由均需密钥。鉴权仅适用于 REST，默认 stdio MCP 与 CLI 不使用 API Key。
+首次 CLI 计算无需配置。REST 本机运行可直接使用下一节的命令；需要密钥、自定义端口、MCP 工具筛选或星历目录时，查[运行配置](configuration.md)。
 
 ## 启动 REST 并检查状态
 
@@ -110,7 +75,6 @@ REST 鉴权示例：`FATEBRIDGE_API_KEYS=agent:replace-me`，请求发送 `X-API
 
 ```bash
 API_HOST=127.0.0.1 fatebridge-api
-# 同一个入口也可用 python -m fatebridge.api
 ```
 
 在另一个终端验证：
@@ -121,7 +85,7 @@ curl http://localhost:8010/ready
 curl http://localhost:8010/metrics
 ```
 
-`/health` 返回 `{"status":"healthy"}`，仅表示服务存活。`/ready` 的必需检查决定状态，可选西占依赖缺失时仍可能返回 `ready`；要确认 `checks.western_predictive_runtime`，不能把就绪当作所有算法/星历已验证。`/metrics` 返回 Prometheus 文本，统计当前进程的请求计数、耗时和配置状态。
+`/health` 返回 `{"status":"healthy"}` 表示服务存活。`/ready` 返回各项运行条件；检查 `checks.western_predictive_runtime` 等实际状态，`ready` 不代表所有算法与星历均已验证。`/metrics` 返回当前进程的 Prometheus 指标。字段说明见[运行状态](api-reference.md#410-健康检查与能力发现)。
 
 浏览器访问 `/docs` 或 `/redoc` 查看交互文档，`/openapi.json` 提供完整请求 Schema。默认 `0.0.0.0` 会监听所有网卡，部署边界见 [安全策略](../SECURITY.md)。
 
@@ -178,7 +142,6 @@ curl -X POST http://localhost:8010/api/astro/chart \
 
 ```bash
 fatebridge-mcp
-# 等价于 python -m fatebridge.mcp_server
 ```
 
 host 应使用已安装 FateBridge 的虚拟环境解释器绝对路径，可从 `fatebridge doctor --mcp` 的 `executable` 取得。可复制的 Codex / Claude Desktop / Cursor 配置、Windows 路径、HTTP 运行、远程接入与升级步骤见 [MCP 部署指南](mcp-deployment.md)。HTTP 模式由 FastMCP runner 加载应用，REST 端口不是 MCP 地址。

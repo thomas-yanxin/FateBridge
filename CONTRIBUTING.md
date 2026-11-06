@@ -8,7 +8,7 @@
 
 ## 开始贡献
 
-先检查已有 [Issues](https://github.com/thomas-yanxin/FateBridge/issues) 和 [Pull Requests](https://github.com/thomas-yanxin/FateBridge/pulls)，避免重复工作。范围较大的新能力或接口变更先在 Issue 中说明用例、输入输出与兼容策略。文档修正可直接准备 PR。
+先检查已有 [Issues](https://github.com/thomas-yanxin/FateBridge/issues) 和 [Pull Requests](https://github.com/thomas-yanxin/FateBridge/pulls)，避免重复工作。范围较大的新能力或接口变更先在 Issue 中说明用例、输入输出与兼容策略。文档修正可直接准备 PR；页面分工与写作要求见[文档写作与维护](docs/documentation-guide.md)。
 
 外部贡献者 Fork 后创建分支；已有仓库写权限者可在自己的工作分支开发：
 

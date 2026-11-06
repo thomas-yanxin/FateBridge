@@ -11,7 +11,7 @@ description: 回答原生家庭、家庭责任、六亲与亲子相处的文化�
 
 先读短的[咨询核心](../_shared/consultation-core.md)。主题重叠或扩展时读[范围选择](../_shared/consultation-routing.md)；涉及阶段、日期或变化才读[时间选择](../_shared/timing-selection.md)。采用八字、紫微或西占解释时，分别定位[八字证据](../_shared/bazi-topic-evidence.md)、[紫微证据](../_shared/ziwei-topic-evidence.md)或[西占证据](../_shared/western-topic-evidence.md)的相关条目。参数、分页或 CLI 有缺口时再查[引擎参考](../_shared/fatebridge-engine.md#怎么调引擎)；表达细节按需查[解读参考](../_shared/onda-counsel.md)。软链接先解析真实目录，再读相对引用。
 
-资料使用当前聊天已确认内容，一次核对所选计算真正必要的缺项；不猜出生时刻，不把其他方法的缺项升级为必答。普通首轮严格字段投影、关闭快照；完整导出首次 `fields=null`，读同 run 交付。追问复用未变结果，只补所需新层。
+资料采集、摘要投影、完整交付与追问复用统一按咨询核心执行。
 
 ## 按问题选择依据
 
@@ -25,7 +25,7 @@ description: 回答原生家庭、家庭责任、六亲与亲子相处的文化�
 
 ## 读取结果与对象边界
 
-八字专项读取 `relatives_analysis`／`children_analysis` 实际规则；即使返回生育／数量等传统标签，也不作为现实预测交付。紫微宫位和西占家庭配置同样只说明所选传统视角。双人分数不是亲子关系好坏的判决，个人内部事件不能说成双方冲突。
+八字专项读取 `relatives_analysis`／`children_analysis` 实际规则；不据星宫与时间信号预测生育或子女数量。紫微宫位和西占家庭配置同样只说明所选传统视角。双人分数不是亲子关系好坏的判决，个人内部事件不能说成双方冲突。
 
 专题细问按[八字证据参考](../_shared/bazi-topic-evidence.md)读取所选专项的真实结构、位置、权重与已返回时间背景；不把传统分类或模板当现实结果。
 

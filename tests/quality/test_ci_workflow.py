@@ -1,4 +1,4 @@
-"""CI preserves coverage, skips passive docs and never cancels release commits."""
+"""CI checks docs, preserves runtime coverage and protects release commits."""
 
 import json
 import os
@@ -31,7 +31,7 @@ def test_cloud_jobs_do_not_restore_external_test_data():
 
 def test_every_environment_keeps_the_full_suite_across_three_shards():
     jobs = WORKFLOW["jobs"]
-    assert set(jobs) == {"changes", "locked", "quality", "test", "ci"}
+    assert set(jobs) == {"changes", "documentation", "locked", "quality", "test", "ci"}
     matrix = jobs["test"]["strategy"]["matrix"]
     assert matrix["shard"] == [0, 1, 2]
     assert {(e["python"], e["os"], e["resolution"]) for e in matrix["environment"]} == {
@@ -47,7 +47,13 @@ def test_every_environment_keeps_the_full_suite_across_three_shards():
         assert jobs[name]["needs"] == "changes"
         assert jobs[name]["if"] == "needs.changes.outputs.checks == 'true'"
     assert jobs["ci"]["if"] == "always()"
-    assert set(jobs["ci"]["needs"]) == {"changes", "locked", "quality", "test"}
+    assert set(jobs["ci"]["needs"]) == {
+        "changes",
+        "documentation",
+        "locked",
+        "quality",
+        "test",
+    }
 
 
 def test_pr_updates_cancel_but_main_and_master_commits_have_unique_groups():
@@ -61,6 +67,11 @@ def test_pr_updates_cancel_but_main_and_master_commits_have_unique_groups():
 
 
 def test_passive_docs_skip_heavy_jobs_but_keep_a_completed_summary():
+    documentation = WORKFLOW["jobs"]["documentation"]
+    assert "if" not in documentation
+    commands = "\n".join(step.get("run", "") for step in documentation["steps"])
+    assert "scripts/check_docs.py" in commands
+    assert "test_doc_tool_counts.py" in commands
     paths = next(
         s for s in WORKFLOW["jobs"]["changes"]["steps"] if s.get("id") == "paths"
     )
@@ -81,6 +92,9 @@ def test_passive_docs_skip_heavy_jobs_but_keep_a_completed_summary():
     [
         ("TEST_RESULT", "success"),
         ("CHANGES_RESULT", "failure"),
+        ("DOCUMENTATION_RESULT", "failure"),
+        ("DOCUMENTATION_RESULT", "cancelled"),
+        ("DOCUMENTATION_RESULT", "skipped"),
         ("LOCKED_RESULT", "failure"),
         ("QUALITY_RESULT", "failure"),
         ("TEST_RESULT", "failure"),
@@ -92,7 +106,13 @@ def test_summary_gate_requires_every_selected_job_to_succeed(failed_job, conclus
     script = WORKFLOW["jobs"]["ci"]["steps"][0]["run"]
     results = {
         name: "success"
-        for name in ("CHANGES_RESULT", "LOCKED_RESULT", "QUALITY_RESULT", "TEST_RESULT")
+        for name in (
+            "CHANGES_RESULT",
+            "DOCUMENTATION_RESULT",
+            "LOCKED_RESULT",
+            "QUALITY_RESULT",
+            "TEST_RESULT",
+        )
     }
     results.update(CHECKS_REQUIRED="true")
     results[failed_job] = conclusion
@@ -101,12 +121,21 @@ def test_summary_gate_requires_every_selected_job_to_succeed(failed_job, conclus
 
 
 @pytest.mark.parametrize(
-    "test_result",
-    ["skipped", "failure"],
+    "test_result,documentation_result",
+    [
+        ("skipped", "success"),
+        ("failure", "success"),
+        ("skipped", "failure"),
+        ("skipped", "cancelled"),
+        ("skipped", "skipped"),
+    ],
 )
-def test_docs_summary_accepts_only_the_explicit_skip_path(test_result):
+def test_docs_summary_accepts_only_the_explicit_skip_path(
+    test_result, documentation_result
+):
     results = dict(
         CHANGES_RESULT="success",
+        DOCUMENTATION_RESULT=documentation_result,
         CHECKS_REQUIRED="false",
         LOCKED_RESULT="skipped",
         QUALITY_RESULT="skipped",
@@ -114,7 +143,9 @@ def test_docs_summary_accepts_only_the_explicit_skip_path(test_result):
     )
     script = WORKFLOW["jobs"]["ci"]["steps"][0]["run"]
     result = subprocess.run(["bash", "-e", "-c", script], env={**os.environ, **results})
-    assert (result.returncode == 0) is (test_result == "skipped")
+    assert (result.returncode == 0) is (
+        test_result == "skipped" and documentation_result == "success"
+    )
 
 
 @pytest.mark.parametrize(

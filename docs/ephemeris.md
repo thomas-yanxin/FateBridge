@@ -57,7 +57,7 @@ uv run --no-project --with fatebridge python -m fatebridge.fetch_ephe \
 
 在各服务启动前设置 `SE_EPHE_PATH` 指向该目录；上面的 `export` 为 macOS / Linux 写法，Windows PowerShell 使用 `$env:SE_EPHE_PATH="C:\path\to\ephe"`。
 
-非空 `SE_EPHE_PATH` 在 Swiss 底层优先于代码传入的显式路径，回执记录实际选择。当前接口的路径总长须在 242 个编码字节内，避免底层静默回退；可以使用更短的挂载路径。德国盘的 `seorbel.txt` 可能覆盖假设点轨道，即使物理星体仍使用 Moshier；查看 `midpoint_analysis.profile.hypothetical_element_source` 的来源与散列。库的默认搜索路径还可能含当前工作目录。外部数据应在服务运行期间保持不变，更新后重启并复核实际模型及回执。
+非空 `SE_EPHE_PATH` 在 Swiss 底层优先于代码传入的显式路径，回执记录实际选择。当前接口的路径总长须在 242 个编码字节内，避免底层静默回退；可以使用更短的挂载路径。德国盘的 `seorbel.txt` 可能覆盖假设点轨道，即使物理星体仍使用 Moshier；查看 `midpoint_analysis.profile.hypothetical_element_source` 的来源说明。库的默认搜索路径还可能含当前工作目录。外部数据应在服务运行期间保持不变，更新后重启并复核实际模型及回执。
 
 需要固定版本时，将 `--with fatebridge` 改为当前服务使用的 `fatebridge==<version>`。
 
@@ -74,7 +74,7 @@ export SE_EPHE_PATH=/absolute/path/to/jpl-de441
 export FATEBRIDGE_JPL_FILE=linux_m13000p17000.441
 ```
 
-省略 `--dest` 时使用当前用户星历缓存下的 `jpl-de441/`，命令会打印实际目录。下载器从 JPL 官方地址流式下载，检查固定字节数、完整 SHA-256 和 DE441 文件头，校验后原子安装；已有不匹配文件会报错并保留。指纹来自本项目历史独立读取器核对记录，并非 NASA 发布的校验和。`--verify-only` 不联网；自定义 CA 可用 `--ca-file /absolute/path/to/ca.pem`，仍须通过 TLS 证书验证。下载不会自动切换后端，也不修改服务配置；在启动环境设置上述两个变量并重启客户端／服务后，检查实际模型及 `physical_ephemeris_source.files` 中的文件指纹。
+省略 `--dest` 时使用当前用户星历缓存下的 `jpl-de441/`，命令会打印实际目录。下载器从 JPL 官方地址流式下载，检查固定字节数、完整 SHA-256 和 DE441 文件头，校验后原子安装；已有不匹配文件会报错并保留。指纹来自本项目历史独立读取器核对记录，并非 NASA 发布的校验和。`--verify-only` 不联网；自定义 CA 可用 `--ca-file /absolute/path/to/ca.pem`，仍须通过 TLS 证书验证。下载不会自动切换后端，也不修改服务配置；在启动环境设置上述两个变量并重启客户端／服务后，检查实际模型及 `physical_ephemeris_source.files` 中的文件名、覆盖范围与 DE 版本。
 
 DE441 的长时间覆盖不代表各年代精度一致；[JPL 原论文](https://ssd.jpl.nasa.gov/doc/de440_de441.html)明确说明 DE440 在当前世纪更准确。原始文件头采用 TDB，现有原生调用入口采用 TT；文件校验不认证时标换算、视位置模型或预测效力。固定样本的误差线和仍未通过的项目见[当前算法状态](algorithm-status.md)。
 

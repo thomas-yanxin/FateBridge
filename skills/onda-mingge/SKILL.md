@@ -11,7 +11,7 @@ description: 围绕性格、天赋、做事方式、优势与限制，组织 Fat
 
 先读短的[咨询核心](../_shared/consultation-core.md)。主题重叠或扩展时读[范围选择](../_shared/consultation-routing.md)；涉及阶段、日期或变化才读[时间选择](../_shared/timing-selection.md)。采用八字、紫微或西占解释时，分别定位[八字证据](../_shared/bazi-topic-evidence.md)、[紫微证据](../_shared/ziwei-topic-evidence.md)或[西占证据](../_shared/western-topic-evidence.md)的相关条目。参数、分页或 CLI 有缺口时再查[引擎参考](../_shared/fatebridge-engine.md#怎么调引擎)；表达细节按需查[解读参考](../_shared/onda-counsel.md)。软链接先解析真实目录，再读相对引用。
 
-资料使用当前聊天已确认内容，一次核对所选计算真正必要的缺项；不猜出生时刻，不把其他方法的缺项升级为必答。普通首轮严格字段投影、关闭快照；完整导出首次 `fields=null`，读同 run 交付。追问复用未变结果，只补所需新层。
+资料采集、摘要投影、完整交付与追问复用统一按咨询核心执行。
 
 ## 按问题选择依据
 
@@ -31,7 +31,7 @@ description: 围绕性格、天赋、做事方式、优势与限制，组织 Fat
 
 指定河洛或参评数时，读取 `numerology_evidence.rule_trace/selected_texts/rulesets/unresolved_rules`，先核对取数和条文位置。参评数默认 `gu` 使用原典日支，`ming` 是显式月支变法；缺条、空条只作语料缺口。河洛 `judge.xie` 仅为基础命中，不能据此选定葉者／不葉者分支。河洛岁运可显式传 `analysis_year` 年标签；`month_index/day_index` 是原典序号，尚未桥接精确日期，不能当公历月份、农历日期或应期；按 `heluo_timing` 的实际选中卦爻与条文解释。条文、周易经文参照与现实建议分别呈现，核验范围见[河洛与参评数审计](../../docs/numerology-audit.md)。
 
-河洛年命纳甲读取 `judge.najia` 的实际六爻、正纳／借用及命中位置；不能把某个三爻卦出现就解释为其纯卦全部纳甲均命中。`deSheng` 仅为这项纳甲匹配，`deTime/deTi` 分别为继承月表／日干映射，`yuanTang.heLi` 仅为用爻与所用阴阳令同异，不据这些简化量宣布完整得势、得时、得体或顺逆时。日定式解释用 `pos`，不可用 `changed_pos` 或本命元堂替代。
+河洛年命纳甲读取 `judge.najia` 的实际六爻、正纳／借用及命中位置；不能把某个三爻卦出现就解释为其纯卦全部纳甲均命中。`deSheng` 仅为这项纳甲匹配，`deTime` 为月表匹配，`deTi` 分列年柱纳音与卦体的有向关系，完整得体仍未裁定，`yuanTang.heLi` 仅为用爻与所用阴阳令同异，不据这些简化量宣布完整得势、得时、得体或顺逆时。日定式解释用 `pos`，不可用 `changed_pos` 或本命元堂替代。
 
 ## 交付与后续
 

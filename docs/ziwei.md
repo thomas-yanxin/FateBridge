@@ -1,6 +1,8 @@
 # 紫微斗数：当前盘式、时间层与来源
 
-公开入口为 `ziwei_birth`、`ziwei_horoscope` 与 `ziwei_rule_lookup`。本命与运限保持来源和规则选择，规则查询提供具名条文、前提与未覆盖项。参数和输出字段见[按需合同](contracts/README.md)。
+[文档中心](README.md) · [API 参考](api-reference.md) · [算法状态](algorithm-status.md)
+
+公开入口为 `ziwei_birth`、`ziwei_horoscope` 与 `ziwei_rules`。本命与运限保持来源和规则选择，规则查询提供具名条文、前提与未覆盖项。参数和输出字段见[按需合同](contracts/README.md)。
 
 ## 盘式与四化
 
@@ -21,6 +23,17 @@
 运限分列大限、小限、流年、流月、流日和流时，实际落宫与目标历法地支分别表达。给定岁序小于所选局数起岁时，大限返回 `status=not_started`、起岁与原因；落宫、宫干与四化为空，映射及连接为空列表。独立 `childhood_limit` 保留具名童限，不拿童限替代正式大限。
 
 起大限当岁按所选配置计算实际宫位；大限上、下五年的限定分段保留实际前提与未决解释。流月斗君、流日及流时的共享索引按所选规则使用，相关出生月、时支和目标月日均随同次本命前置链返回。未知性别只限制需要顺逆的层，不抹去已经确定的本命事实。
+
+运限结果中，`analysis_context` 记录目标时刻，`birth_context` 保留出生校正；`target_minute`、`target_timezone` 默认分别为 0 和 `Asia/Shanghai`。宫位字段分工如下：
+
+| 字段 | 含义 |
+| --- | --- |
+| `scopes[].palace_name/natal_palace_name` | 本层命宫活动索引所临的本命宫；角色见 `scope_palace_role` |
+| `palace_map` | 本层十二宫功能与本命星位的映射 |
+| `mutagen_natal_links` | 本层四化与本命星曜、宫位的连接；`scope_palace_name` 标出本层宫位 |
+| `natal_prerequisites` | 同次运限内部使用的农历、年干、时支、命身宫、五行局及推导轨迹 |
+
+解释起大限岁数或局数来源时，可读 `evidence_views.natal_prerequisites` 的字段清单，无需另起本命计算。本命官禄不等于流年官禄，出生年干、岁序与目标层天干也不能互换。这些连接不表示全部流曜或飞宫体系已经实现。
 
 ## 当前检验与限制
 

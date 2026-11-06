@@ -170,7 +170,7 @@ CLI 不自动读取 `.env`，`SE_EPHE_PATH` 应在启动前设进程环境。GUI
 
 ### 只返回部分字段或出现 `result_delivery`
 
-先检查首次调用的 `fields`、`include_snapshot_text` 与 `selected_sections`，再检查响应预算。MCP 默认 8192 字符，超限时通过交付引用提供同一 run 的保留结果，响应仍是合法 JSON。读取 `manifest_uri`，从 `first_page_uri` 跟随 `next_uri` 拼接每页 `text`，核对 SHA-256 后解析全文。资源返回的外层 JSON 与其中的正文片段需要分别解析，不能直接解析单页片段。
+先检查首次调用的 `fields`、`include_snapshot_text` 与 `selected_sections`，再检查响应预算。MCP 默认 8192 字符，超限时通过交付引用提供同一 run 的保留结果，响应仍是合法 JSON。读取 `manifest_uri`，从 `first_page_uri` 跟随 `next_uri` 拼接每页 `text`，拼接完成后解析全文；需要存储完整性核验时使用原 run 的校验读取接口。资源返回的外层 JSON 与其中的正文片段需要分别解析，不能直接解析单页片段。
 
 交付发生在投影之后：首轮只选了摘要，文件也只有所选范围。完整导出首次使用 `fields=null`，需要快照时保留相应选项。引用过期或被容量回收后无法继续读取；不要通过重复计算声称恢复了原 run。完整操作见 [同次导出](agent-guide.md#完整结果交付与同次导出)。
 

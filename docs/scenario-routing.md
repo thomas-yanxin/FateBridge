@@ -1,5 +1,7 @@
 # FateBridge 场景路由矩阵
 
+[文档中心](README.md) · [API 参考](api-reference.md) · [算法状态](algorithm-status.md)
+
 事业方向、关系磨合、学习方式与阶段变化，需要的计算依据各不相同。场景路由将这些日常问题连接到对应的咨询入口，指导 Agent 按结构、双方互动、人生阶段和目标时段选择相关方法。
 
 机器入口为 `/api/scenarios`、CLI `scenarios` 与 MCP `fatebridge://scenarios`。现有九个主题、三个服务、一个全面画像组合入口，加独立 `fengshui` 基础计算场景，共14项。机器发现包含 consultation.kind/topics、当轮范围与共享安全／时间策略，供 Agent 选择所需工具，不会自动执行整个清单。

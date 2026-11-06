@@ -81,7 +81,7 @@ Codex 使用 `[mcp_servers.fatebridge]`；其他 host 的 `mcpServers` JSON 不�
 5. 先检查 `isError`，再读取 `structuredContent`。保存原输入与 `run_metadata`；后续调用沿用前次 `trace_id`，用前次 `run_id` 作为 `parent_run_id`。不要把同一出生资料的多次计算当成独立证据。
 6. 先回答问题，再讲清依据的传统含义与本题的联系，区分可复算计算、有来源解释和现实建议。有充分依据的选项偏向应直接说明理由与条件，避免只有“不能替你决定”。用户要求深入时再扩展已有结果；同一主题边界无需反复重述。日期、时区、地点、太阳时及精度以实际返回为准。
 
-上述精简字段适合摘要咨询。若用户要完整 JSON、全部时间线或完整文件，就要在首次调用时改用 `fields=null`，保留默认响应预算及所需快照；超限后从 `result_delivery` 读取同一 run。先裁出摘要，再重新计算，不能补回原次运行的全文。资源分页、文件提取与 SHA-256 校验见 [完整结果交付](agent-guide.md#完整结果交付与同次导出)。西占推运须显式传目标 `analysis_hour` / `analysis_minute`，并核对返回的 `analysis_context.analysis_datetime`；`as_of` 不替代目标钟时。
+上述精简字段适合摘要咨询。若用户要完整 JSON、全部时间线或完整文件，就要在首次调用时改用 `fields=null`，保留默认响应预算及所需快照；超限后从 `result_delivery` 读取同一 run。先裁出摘要，再重新计算，不能补回原次运行的全文。资源分页、文件提取与同 run 校验见 [完整结果交付](agent-guide.md#完整结果交付与同次导出)。西占推运须显式传目标 `analysis_hour` / `analysis_minute`，并核对返回的 `analysis_context.analysis_datetime`；`as_of` 不替代目标钟时。
 
 双人关系中，`summary.overall_score` 是 0–100 的规则加权分，`traditional_compatibility.score` 是加减净分，`detailed_analysis.traditional_analysis.score` 是独立摩擦维度；三处的 `score_basis` 说明口径。不能平均、视为成功概率或用一个子项等级替代整体评价。首轮建议字段保留完整依据、人物和建议，避免为了补解释再计算一遍。
 

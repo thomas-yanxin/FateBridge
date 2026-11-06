@@ -135,7 +135,7 @@
         "validation.all_three_axes_full_marks",
         "validation.prediction"
       ],
-      "purpose": "明确cycle_reference_datetime才计算首轮周期交会；保留逆行多次接触、有限搜索和缺失凯龙星数据，不按生日分期。参考输入最多6位小数秒，超限拒绝；reference_ordering以源定义连续TT核对不早于出生，微秒输入顺序不认证微秒天文精度。摘要保留文件SHA-256和DE版本，完整逐点来源索引与TT求根见证读同一run的cycle_context。交会与已观测驻点细化到函数零值或相邻TT，保留精确残差和驻点速度区间；量化可能掩盖极近峰值，完整解析交会数量仍未认证。文件身份及数值收敛不认证物理时刻精度。"
+      "purpose": "明确cycle_reference_datetime才计算首轮周期交会；保留逆行多次接触、有限搜索和缺失凯龙星数据，不按生日分期。参考输入最多6位小数秒，超限拒绝；reference_ordering以源定义连续TT核对不早于出生，微秒输入顺序不认证微秒天文精度。摘要保留文件来源和DE版本，完整逐点来源索引与TT求根见证读同一run的cycle_context。交会与已观测驻点细化到函数零值或相邻TT，保留精确残差和驻点速度区间；量化可能掩盖极近峰值，完整解析交会数量仍未认证。文件身份及数值收敛不认证物理时刻精度。"
     },
     "definition": {
       "fields": [
@@ -363,7 +363,7 @@
         "validation.all_three_axes_full_marks",
         "validation.prediction"
       ],
-      "purpose": "本命／设计根／范围及后端对照的实际原生位置文件上下文与前后身份检查；保留文件SHA、DE号、返回旗标模型、作用、TT包络与实际求值次数，解析平交点和内置Moshier单列。文件身份不是位置精度或原子读取认证，周期搜索另有来源证据；完整卡过长读取同次result_delivery。"
+      "purpose": "本命／设计根／范围及后端对照的实际原生位置文件上下文与前后身份检查；保留文件来源、DE号、返回旗标模型、作用、TT包络与实际求值次数，解析平交点和内置Moshier单列。文件身份不是位置精度或原子读取认证，周期搜索另有来源证据；完整卡过长读取同次result_delivery。"
     },
     "structure": {
       "fields": [

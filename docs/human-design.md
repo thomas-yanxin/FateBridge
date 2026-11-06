@@ -8,6 +8,19 @@
 
 公开教学来源索引（本地 `tests/data/human_design/source_materials/public-teaching-index.json`）保留出处、取得日期及具体未决范围；索引不是全文校勘。近太阳的原17时刻调查输入（本地 `tests/data/human_design/source_materials/horizons-investigation-inputs.json`）保留当时暴露的3.803758角秒天王星差异；当前同源共同框架参考另行核对，不把旧输出作为当前预期答案。
 
+<details>
+<summary>章节索引</summary>
+
+- [计算口径](#计算口径)
+- [专业结构与解释依据](#专业结构与解释依据)
+- [可选行星周期交会](#可选行星周期交会)
+- [生时范围](#生时范围)
+- [验证范围与现实预测](#验证范围与现实预测)
+- [显式视位置模型对照](#显式视位置模型对照)
+- [调用与复核](#调用与复核)
+
+</details>
+
 ## 计算口径
 
 民用输入经共享时间层转换为TT。物理天体使用[Swiss Ephemeris](https://www.astro.com/swisseph/swephprg.htm)的地心视位置、回归黄道和当日坐标；每项保留实际`return_flags`、后端和数据来源。没有数据文件时可使用明确标记的Moshier；`require_swiss_files=true`拒绝该降级。异常返回不以粗略轨道代替。
