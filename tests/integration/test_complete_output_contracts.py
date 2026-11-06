@@ -12,7 +12,6 @@ from fatebridge.application import execution
 from fatebridge.application.description import describe_spec
 from fatebridge.application.examples import example_input
 from fatebridge.core.execution_context import ExecutionOptions
-from fatebridge.core.schema_cache import contract_fingerprint
 from fatebridge.services.tool_catalog import CATALOG
 
 
@@ -32,19 +31,6 @@ def test_every_catalog_tool_declares_real_complete_business_roots():
         assert describe_spec(spec)["full_result_required_fields"] == list(
             spec.required_output_fields
         )
-
-
-def test_complete_requirements_participate_in_contract_receipt_fingerprint():
-    spec = career_spec()
-    original = contract_fingerprint(spec.request_model, spec.output_model)
-    guarded = contract_fingerprint(
-        spec.request_model, spec.output_model, spec.required_output_fields, spec.methods
-    )
-    assert original != guarded
-    result = execution.execute_tool(
-        spec, spec.request_model.model_validate(example_input(spec))
-    )
-    assert result["run_metadata"]["contract_sha256"] == guarded
 
 
 @pytest.mark.parametrize(

@@ -13,11 +13,9 @@ from fatebridge.core.fengshui.numeric_patterns import numeric_patterns
 from fatebridge.core.fengshui.xuankong import _chart, natal_rules
 from fatebridge.services.fengshui import calculate_xuankong_natal
 from fatebridge.validation.fengshui_patterns import audit_classical_patterns
-from tests.fengshui.test_fengshui_surfaces import (
-    mcp_call,
-    rest_client,
-    without_transport,
-)
+from tests.support.fengshui_transports import mcp_call
+from tests.support.mcp_result_assertions import without_transport
+from tests.support.transports import rest_client
 
 FOLDER = Path(__file__).parents[1] / "data/fengshui_patterns_v1"
 REFERENCE = json.loads((FOLDER / "reference.json").read_text())

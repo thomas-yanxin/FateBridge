@@ -13,8 +13,8 @@ from unittest.mock import patch
 
 from fatebridge.application.execution import execute_tool
 from fatebridge.core.astro import native_execution, runtime
+from fatebridge.core.public_output import same_public_value as _same_value
 from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.validation.claims import _same_value
 from fatebridge.validation.human_design import verify_human_design_reading
 
 ROOT = Path(__file__).resolve().parents[1]

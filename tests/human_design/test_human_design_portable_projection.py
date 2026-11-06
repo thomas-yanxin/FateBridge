@@ -23,7 +23,6 @@ from fatebridge.core.human_design_interval_geometry import (
     _sub,
 )
 from fatebridge.core.human_design_solar_projection import nominal_solar_projection
-from fatebridge.services.replay_metadata import digest
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
 
@@ -256,7 +255,4 @@ def test_rehashed_current_receipt_cannot_change_arithmetic_or_claim_legacy(
     elif fault == "current_contract_downgrade":
         context.pop("arithmetic_method")
         context["ruleset"]["version"] = "1.0.0"
-    value["run_metadata"]["business_output_sha256"] = digest(
-        {k: v for k, v in value.items() if k != "run_metadata"}
-    )
     assert verify_human_design_reading(value)["status"] == "rejected", fault

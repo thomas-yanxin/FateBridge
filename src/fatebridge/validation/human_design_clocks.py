@@ -18,8 +18,8 @@ from fatebridge.core.human_design_reference_clock import (
     reference_datetime,
 )
 from fatebridge.core.human_design_reference_order import validate_reference_precision
+from fatebridge.core.public_output import same_public_value as _same_value
 from fatebridge.utils.timezones import timezone_rules_metadata
-from fatebridge.validation.claims import _same_value
 
 TOLERANCE_SECONDS = 0.0002
 CONTINUOUS = "continuous_TT_interval_sample"
@@ -195,8 +195,10 @@ class ClockReplay:
         self.birth_clock = clock
         policy = payload["calculation_policy"]
         if (
-            proof["timezone_rules"]
-            != timezone_rules_metadata(proof["input"]["birth_timezone"])
+            not _same_value(
+                proof["timezone_rules"],
+                timezone_rules_metadata(proof["input"]["birth_timezone"]),
+            )
             or policy["birth_local"] != clock.local_label
             or policy["birth_timezone"] != proof["input"]["birth_timezone"]
             or policy["calendar"] != "proleptic_gregorian"

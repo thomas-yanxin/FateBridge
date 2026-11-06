@@ -14,7 +14,7 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
-from fatebridge.services.replay_metadata import digest
+from fatebridge.utils.json_digest import digest
 from fatebridge.validation.agent_capture import read_capture
 from fatebridge.validation.claims import _same_value
 from fatebridge.validation.evaluation_environment import (
@@ -65,23 +65,24 @@ def accept_delivery(
 ) -> None:
     delivery = packet["result_delivery"]
     if (
-        hashlib.sha256(text.encode()).hexdigest() != delivery["sha256"]
-        or len(text) != delivery["total_chars"]
+        len(text) != delivery["total_chars"]
         or len(text.encode()) != delivery["total_bytes"]
     ):
         raise ValueError("Observed delivery bytes changed")
     full = json.loads(text)
-    for key in ("run_id", "business_output_sha256"):
+    for key in ("run_id",):
         if not _same_value(full["run_metadata"][key], packet["run_metadata"][key]):
             raise ValueError("Delivery substituted another run")
-    source["delivered"] = full
-    if (
-        digest({k: v for k, v in full.items() if k != "run_metadata"})
-        == packet["run_metadata"]["business_output_sha256"]
+    if any(
+        not _same_value(full.get(key), value)
+        for key, value in packet.items()
+        if key not in {"run_metadata", "result_delivery"}
     ):
+        raise ValueError("Delivery differs from observed inline business facts")
+    source["delivered"] = full
+    if full_requested:
         source["complete"] = full
-    elif full_requested:
-        raise ValueError("Unprojected delivery is not a complete business result")
+    source["original_content_independently_authenticated"] = False
 
 
 def observed_sources(
@@ -99,8 +100,8 @@ def observed_sources(
             continue
         full_requested = record.get("arguments", {}).get("fields") is None
         # File reading is also observable through the original completed shell
-        # event. Accept only its printed payload with the original transport
-        # checksum, never a file opened now or a newly calculated reference.
+        # event. Accept only its printed same-run payload and declared lengths,
+        # never a file opened now or a newly calculated reference.
         filename = delivery.get("file_path")
         for event in events or []:
             item = event.get("item", {})
@@ -143,7 +144,7 @@ def observed_sources(
             if (
                 type(page.get("offset")) is not int
                 or page["offset"] != offset
-                or page.get("sha256") != delivery["sha256"]
+                or page.get("result_id") != delivery["result_id"]
                 or not isinstance(page.get("text"), str)
             ):
                 raise ValueError("Observed page identity changed")
@@ -414,7 +415,7 @@ def audit_review(
                 full_requested=records[index].get("arguments", {}).get("fields")
                 is None,
             )
-            if item["full_business_hash_verified"] is not ("complete" in bound):
+            if item["unprojected_request_result"] is not ("complete" in bound):
                 raise ValueError(
                     "Projected delivery promoted to full business verification"
                 )

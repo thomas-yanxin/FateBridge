@@ -14,7 +14,6 @@ from fatebridge.core.human_design_historical_polarity import (
     comparison_report,
     source_records,
 )
-from fatebridge.services.replay_metadata import digest
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
 from tests.support.ephemeris_case_runtime import (
@@ -185,8 +184,5 @@ def test_rehashed_forgeries_and_new_contract_omissions_are_rejected(complete, mu
         ] = "已获得完整原典认证。"
     else:
         context["nominal_changed_state_count"] = 0
-    run["run_metadata"]["business_output_sha256"] = digest(
-        {k: v for k, v in run.items() if k != "run_metadata"}
-    )
     proof = verify_human_design_reading(run)
     assert proof["status"] == "rejected", (mutation, proof)

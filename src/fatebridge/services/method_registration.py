@@ -429,7 +429,7 @@ def register_methods(spec: ToolSpec) -> tuple[MethodContract, ...]:
                 ),
                 dependencies=("validated_request",),
                 comparison_requirements=(
-                    "相同方法合同、实现/数据指纹、选项与实际计算层",
+                    "相同方法合同、实现与数据版本、选项及实际计算层",
                 ),
                 limitations=(
                     "contract_v1是登记合同版本，不冒充上游原典或数值算法版本；实际版本另列runtime_method_ids",

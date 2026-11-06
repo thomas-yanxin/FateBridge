@@ -12,7 +12,6 @@ from fatebridge.core.human_design_apparent_positions import (
     geometry,
     observed_coordinates,
 )
-from fatebridge.services.replay_metadata import digest
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
 from fatebridge.validation.human_design_apparent_positions import checked_context
@@ -66,7 +65,6 @@ def test_failed_reference_retains_observed_prefix_without_inventing_positions(
         partial = next(b for b in c["batches"] if len(b["bodies"]) < 10)
         assert [r["body"] for r in partial["bodies"]] == ["Sun", "Moon"]
         partial["bodies"].pop()
-        rehash(value)
         assert verify_human_design_reading(value)["status"] == "rejected"
     else:
         assert c["partial_physical_batch_count"] == 0
@@ -108,12 +106,6 @@ def complete():
     check = verify_human_design_reading(value)
     assert check["status"] == "verified_fixed_template_reading", check
     return value
-
-
-def rehash(value):
-    value["run_metadata"]["business_output_sha256"] = digest(
-        {k: v for k, v in value.items() if k != "run_metadata"}
-    )
 
 
 def test_bound_geometry_uses_all_physical_coordinates_without_a_native_replay(complete):
@@ -233,7 +225,6 @@ def test_rehashed_current_or_unknown_result_cannot_forge_geometry_or_scope(
         value["interpretation"]["apparent_position_context"]["basis"][0][
             "path"
         ] = "profile"
-    rehash(value)
     check = verify_human_design_reading(value)
     assert check["status"] == "rejected", (fault, check)
     assert check["apparent_position_context_status"] == "not_verified"
@@ -257,5 +248,4 @@ def test_an_old_schema_label_cannot_hide_present_new_markers(complete):
         "contract_sha256"
     ] = "168d79463454686ee3e8afb731ea2ee8d29ae906f0d9ca88c5cf364ea7daba30"
     value["apparent_position_context"]["batches"].pop()
-    rehash(value)
     assert verify_human_design_reading(value)["status"] == "rejected"

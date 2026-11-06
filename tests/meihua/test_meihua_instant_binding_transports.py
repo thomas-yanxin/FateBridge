@@ -39,15 +39,6 @@ def test_valid_declared_moments_keep_one_cross_transport_business_receipt(
     assert (
         business(response.json()) == business(cli) == business(mcp.structured_content)
     )
-    assert (
-        len(
-            {
-                v["run_metadata"]["input_sha256"]
-                for v in [response.json(), cli, mcp.structured_content]
-            }
-        )
-        == 1
-    )
     for value in [response.json(), cli, mcp.structured_content]:
         clock = value["meihua"]["calendar_policy"]["civil_clock_resolution"]
         assert (

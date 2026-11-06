@@ -12,20 +12,20 @@ import fatebridge
 
 
 @pytest.mark.parametrize("hash_seed", ["0", "1"])
-def test_public_contract_fingerprints_are_stable_across_import_orders(hash_seed):
+def test_public_contracts_are_stable_across_import_orders(hash_seed):
     source = str(Path(fatebridge.__file__).resolve().parent.parent)
     env = {**os.environ, "PYTHONPATH": source, "PYTHONHASHSEED": hash_seed}
     script = """
 import json
 from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.core.schema_cache import contract_fingerprint
+from fatebridge.core.schema_cache import model_schema
 result = {}
 for spec in CATALOG:
     if spec.family == 'fengshui':
         schema = spec.output_model.model_json_schema()
         result[spec.key] = {
             'north_reference_enum': schema['$defs']['HouseChart']['properties']['north_reference']['anyOf'][0]['enum'],
-            'contract_sha256': contract_fingerprint(spec.request_model, spec.output_model, spec.required_output_fields),
+            'input_schema': model_schema(spec.request_model), 'output_schema': model_schema(spec.output_model), 'required_output_fields': spec.required_output_fields,
         }
 print(json.dumps(result, sort_keys=True))
 """

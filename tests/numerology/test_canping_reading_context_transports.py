@@ -7,12 +7,12 @@ from pathlib import Path
 import pytest
 from jsonschema import Draft202012Validator
 
-from tests.numerology.test_heluo_poem_transports import run_three
 from tests.support.canping_output_injection import (
     inject_canping_output as return_frozen_output,
 )
 from tests.support.transports import SPECS, business
 from tests.support.transports import rest as shared_rest
+from tests.support.transports import run_three
 
 rest = shared_rest
 ROOT = Path(__file__).parents[1] / "fixtures/canping_reading_context_v1"
@@ -56,9 +56,13 @@ def test_actual_clock_condition_and_citation_identities_survive_all_adapters(
         assert context["profile_id"] == profile
         assert context["future_clock_policy"] == clock["policy"]
         assert context["timezone_spec"] == clock["zone"]
+        assert [cite["source_id"] for cite in context["source_citations"]] == list(
+            REFERENCE["books"]
+        )
         for cite in context["source_citations"]:
             original = REFERENCE["books"][cite["source_id"]]
-            assert {k: cite[k] for k in original} == original
+            published = {key: original[key] for key in ("title", "url", "edition")}
+            assert {key: cite[key] for key in published} == published
             assert cite["pdf_pages"] == REFERENCE["pdf_pages"][cite["source_id"]]
             assert (
                 cite["roles"]

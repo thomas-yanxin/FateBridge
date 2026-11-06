@@ -17,7 +17,6 @@ from fatebridge.core.human_design_source_variants import (
     source_variant_audit,
     variant_reference,
 )
-from fatebridge.services.replay_metadata import digest
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
 
@@ -231,7 +230,4 @@ def test_rehashed_forged_dispute_or_incomplete_reading_is_rejected(complete, mut
         value["interpretation"]["statements"][-1]["text"] = "原典完全一致，线义已认证。"
     else:
         value["interpretation"]["statements"].pop()
-    value["run_metadata"]["business_output_sha256"] = digest(
-        {k: v for k, v in value.items() if k != "run_metadata"}
-    )
     assert verify_human_design_reading(value)["status"] == "rejected"

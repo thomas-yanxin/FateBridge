@@ -15,7 +15,6 @@ from fatebridge.core.human_design_cycles import (
     derive_body_contacts,
 )
 from fatebridge.core.requests.human_design import HumanDesignRequest
-from fatebridge.services.replay_metadata import digest
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
 from tests.support.ephemeris_case_runtime import (
@@ -127,13 +126,6 @@ def complete():
     return value
 
 
-def rehash(value):
-    value["run_metadata"]["business_output_sha256"] = digest(
-        {k: v for k, v in value.items() if k != "run_metadata"}
-    )
-    return value
-
-
 def test_request_requires_explicit_reference():
     args = {
         k: v
@@ -226,6 +218,6 @@ def test_correct_hash_cannot_legitimize_inconsistent_origins(complete, fault):
         del value["clock_evidence"]["compare_cycle_origins"]
     elif fault == "missing_policy":
         del value["calculation_policy"]["compare_cycle_origins"]
-    proof = verify_human_design_reading(rehash(value))
+    proof = verify_human_design_reading((value))
     assert proof["status"] == "rejected"
     assert {"code": "cycle_origin_comparison_mismatch"} in proof["errors"]

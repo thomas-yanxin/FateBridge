@@ -18,11 +18,9 @@ from fatebridge.core.fengshui.timeliness import (
 from fatebridge.services.fengshui import calculate_xuankong_natal
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.fengshui_timeliness import audit_timeliness_reference
-from tests.fengshui.test_fengshui_surfaces import (
-    mcp_call,
-    rest_client,
-    without_transport,
-)
+from tests.support.fengshui_transports import mcp_call
+from tests.support.mcp_result_assertions import without_transport
+from tests.support.transports import rest_client
 
 REFERENCE = Path(__file__).parents[1] / "data/fengshui_timeliness_v1/reference.json"
 PROFILE = "wang_zhongzhou_timeliness_v1"

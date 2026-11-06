@@ -12,6 +12,7 @@ from fatebridge.core.execution_context import (
     call_clock,
     correlate_error,
 )
+from fatebridge.core.public_output import public_payload
 from fatebridge.utils.errors import (
     VALIDATION_ERROR_CODE,
     EphemerisSourceError,
@@ -106,7 +107,7 @@ def execute_tool(
         if result_is_error(spec, result):
             return correlate_error(result, controls)
         if not include_metadata:
-            return result
+            return public_payload(result)
         try:
             receipt = execution_receipt(
                 spec,
@@ -153,7 +154,7 @@ def execute_tool(
                 ),
                 controls,
             )
-        return result
+        return public_payload(result)
 
 
 class OutputContractError(RuntimeError):

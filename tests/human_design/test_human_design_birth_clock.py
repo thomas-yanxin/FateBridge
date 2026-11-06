@@ -17,7 +17,6 @@ from fatebridge.core.human_design_birth_clock import (
 )
 from fatebridge.core.human_design_cycles import reference_epoch
 from fatebridge.core.requests.human_design import HumanDesignRequest
-from fatebridge.services.replay_metadata import digest
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
 
@@ -154,7 +153,6 @@ def test_fractional_cycle_reference_is_continuous_and_replays_its_own_label():
         "missing",
         "input",
         "offset",
-        "table",
         "source",
         "authenticated",
         "utc",
@@ -175,8 +173,6 @@ def test_rehashed_inconsistent_leap_proofs_and_explanations_are_rejected(mutatio
         proof["input"]["birth_day"] = 30
     elif mutation == "offset":
         proof["tai_minus_utc_during_leap_seconds"] = 37
-    elif mutation == "table":
-        proof["source_table_sha256"] = "0" * 64
     elif mutation == "source":
         proof["source_url"] = "https://example.invalid/unverified"
     elif mutation == "authenticated":
@@ -196,9 +192,6 @@ def test_rehashed_inconsistent_leap_proofs_and_explanations_are_rejected(mutatio
     if mutation != "text":
         with pytest.raises((ValueError, KeyError)):
             verify_birth_clock(forged)
-    forged["run_metadata"]["business_output_sha256"] = digest(
-        {k: v for k, v in forged.items() if k != "run_metadata"}
-    )
     assert verify_human_design_reading(forged)["status"] == "rejected"
 
 

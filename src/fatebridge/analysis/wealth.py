@@ -163,7 +163,6 @@ class WealthAnalysis:
         dm_analysis = ElementAnalysis.analyze_day_master_strength(pillars)
         strength = dm_analysis["strength_level"]
 
-        # 统计财星五行力量
         element_counts = count_element_distribution(pillars)
         wealth_strength = round(element_counts[wealth_element], 1)
 

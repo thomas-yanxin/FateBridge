@@ -81,7 +81,6 @@ def test_same_run_two_source_claims_reject_numeric_and_source_tampering():
                         path=row["fact_path"],
                         value=row["value"],
                         run_id=meta["run_id"],
-                        business_output_sha256=meta["business_output_sha256"],
                     )
                 )
     assert len(claims) == 60

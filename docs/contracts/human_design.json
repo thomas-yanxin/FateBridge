@@ -16,7 +16,7 @@
         "rulesets",
         "validation.all_three_axes_full_marks"
       ],
-      "purpose": "2001原典正文另列的11.4金星与25.4木星、原符号保留、页码/来源散列及本盘实际使用这些附加依据的位置和全部星体路径；不将两项补充当384线全文验收。完整逐项reading读取同一run的depth_evidence.line_fixings。"
+      "purpose": "2001原典正文另列的11.4金星与25.4木星、原符号保留、页码/来源定位及本盘实际使用这些附加依据的位置和全部星体路径；不将两项补充当384线全文验收。完整逐项reading读取同一run的depth_evidence.line_fixings。"
     },
     "apparent_positions": {
       "fields": [
@@ -113,7 +113,7 @@
         "interpretation.expanded_cross_name_meaning",
         "validation.all_three_axes_full_marks"
       ],
-      "purpose": "本盘四门、完整新增官方标签比较与解释；保留原典名称、别名拒绝、原PDF及目录散列和课程冲突。原19盘与29门印刷分界的完整明细仍见原证据卡或同次完整run，不把有限192门角覆盖当作完整原典或精度认证"
+      "purpose": "本盘四门、完整新增官方标签比较与解释；保留原典名称、别名拒绝、原PDF名称及目录定位和课程冲突。原19盘与29门印刷分界的完整明细仍见原证据卡或同次完整run，不把有限192门角覆盖当作完整原典或精度认证"
     },
     "cycle_origins": {
       "fields": [
@@ -285,7 +285,7 @@
         "node_convention_comparison.personality_colors_changed",
         "validation.all_three_axes_full_marks"
       ],
-      "purpose": "按人格日地/交点的实际Color及一致对点读取官方Motivation/View类别名、来源散列和本盘局部依据；同箭头编码不保证Color类别相同。出生盘不测量现实心理、转移或分心状态，不将类别当完整PHS、384线原典或现实预测验收。完整比较和时间样本读取同一run。"
+      "purpose": "按人格日地/交点的实际Color及一致对点读取官方Motivation/View类别名、来源定位和本盘局部依据；同箭头编码不保证Color类别相同。出生盘不测量现实心理、转移或分心状态，不将类别当完整PHS、384线原典或现实预测验收。完整比较和时间样本读取同一run。"
     },
     "precision": {
       "fields": [
@@ -309,7 +309,7 @@
         "profile",
         "source_consistency.primary_transcript_diagrams"
       ],
-      "purpose": "按有序四门和角度读取两幅2008公开转录图的窄范围旁证、页码与文件指纹；保留未经校对、未认证母本和非勘误的限定，不代替2001名称或完整线义验收"
+      "purpose": "按有序四门和角度读取两幅2008公开转录图的窄范围旁证、页码与文件名称；保留未经校对、未认证母本和非勘误的限定，不代替2001名称或完整线义验收"
     },
     "profile": {
       "fields": [
@@ -680,7 +680,7 @@
   "method_contracts": [
     {
       "comparison_requirements": [
-        "相同方法合同、实现/数据指纹、选项与实际计算层"
+        "相同方法合同、实现与数据版本、选项及实际计算层"
       ],
       "dependencies": [
         "validated_request"

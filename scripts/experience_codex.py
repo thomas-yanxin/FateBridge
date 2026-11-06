@@ -143,12 +143,21 @@ async def exercise(output):
                             output / f"{key}-projected.json",
                             projected.structured_content,
                         )
-                        assert (
-                            data["run_metadata"]["business_output_sha256"]
-                            == projected.structured_content["run_metadata"][
-                                "business_output_sha256"
-                            ]
+                        from fatebridge.application.projection import project_fields
+
+                        # Compare the actual requested facts, rather than accepting a matching digest.
+                        full_business = {
+                            k: v for k, v in data.items() if k != "run_metadata"
+                        }
+                        expected = project_fields(
+                            full_business, fields, strict_fields=True
                         )
+                        actual = {
+                            k: v
+                            for k, v in projected.structured_content.items()
+                            if k != "run_metadata"
+                        }
+                        assert actual == expected
                         full_size = len(json.dumps(data, ensure_ascii=False).encode())
                         small_size = len(
                             json.dumps(
@@ -162,9 +171,6 @@ async def exercise(output):
                                 "full_bytes": full_size,
                                 "projected_bytes": small_size,
                                 "fields": fields,
-                                "business_sha256": data["run_metadata"][
-                                    "business_output_sha256"
-                                ],
                             }
                         )
                     base = example_input(records["bazi_birth"])
@@ -201,7 +207,6 @@ async def exercise(output):
                     )
                     assert not corrected.is_error
                     report["error_recovery"] = True
-    # REST matching discovery and recovery, using the same fictional input.
     with TestClient(rest_app) as rest:
         search = rest.get("/api/tools", params={"q": "跳槽", "detail": "summary"})
         assert search.status_code == 200 and search.json()["matched_count"] > 0

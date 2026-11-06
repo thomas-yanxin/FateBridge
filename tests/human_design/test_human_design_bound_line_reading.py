@@ -18,7 +18,6 @@ from fatebridge.services.human_design_line_reading import (
     LineReadingInputError,
     build_human_design_line_packet,
 )
-from fatebridge.services.replay_metadata import digest
 from fatebridge.validation.human_design_line_reading import (
     verify_human_design_line_packet,
 )
@@ -300,10 +299,6 @@ def test_unverified_original_cannot_be_used_even_after_rehash(cases, fault):
         value["activations"]["personality"][0]["line"] = 6
     else:
         value["depth_evidence"]["line_fixings"][0]["fixing_state"] = "unfixed"
-    if "run_metadata" in value:
-        value["run_metadata"]["business_output_sha256"] = digest(
-            {k: v for k, v in value.items() if k != "run_metadata"}
-        )
     with pytest.raises(LineReadingInputError):
         build_human_design_line_packet(value)
 

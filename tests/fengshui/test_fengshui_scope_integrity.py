@@ -12,12 +12,12 @@ from fatebridge.cli import run
 from fatebridge.core.fengshui.models import AssessRequest
 from fatebridge.core.fengshui.output import FengshuiOutput
 from fatebridge.services.fengshui import assess
-from tests.fengshui.test_fengshui_surfaces import (
-    rest_client,
+from tests.fixtures.fengshui import payload
+from tests.support.mcp_result_assertions import (
     same_run_projected_response,
     without_transport,
 )
-from tests.fixtures.fengshui import payload
+from tests.support.transports import rest_client
 
 PURPOSE_ROLES = [
     ("door", "door_facing"),

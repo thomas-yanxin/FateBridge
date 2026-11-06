@@ -19,7 +19,7 @@ from fatebridge.core.human_design_solar_root import (
     ROOT_SCOPE,
     SOLAR_COORDINATE_POLICY,
 )
-from fatebridge.validation.claims import _same_value
+from fatebridge.core.public_output import same_public_value as _same_value
 
 
 def verify_solar_root_context(chart: dict[str, Any]) -> dict[str, Any]:

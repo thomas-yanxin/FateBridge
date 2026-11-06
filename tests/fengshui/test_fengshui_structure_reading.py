@@ -9,7 +9,6 @@ import pytest
 from fatebridge.core.fengshui.reading import build_natal_reading
 from fatebridge.core.fengshui.xuankong import _chart, natal_rules
 from fatebridge.services.fengshui import calculate_xuankong_natal
-from fatebridge.services.replay_metadata import digest
 from fatebridge.validation.fengshui_reading import verify_fengshui_reading
 from fatebridge.validation.fengshui_structure import audit_printed_structures
 from tests.fengshui.test_fengshui_fixed_reading import executed, trusted
@@ -48,9 +47,6 @@ def test_new_run_cannot_be_downgraded_using_a_valid_legacy_template_and_rehash()
     result = executed(request(REFERENCE["charts"][0]))
     anchor = trusted(result)
     result["calculation_reading"]["version"] = "1.0.0"
-    result["run_metadata"]["business_output_sha256"] = digest(
-        {k: v for k, v in result.items() if k != "run_metadata"}
-    )
     report = verify_fengshui_reading(result, **anchor)
     assert report["status"] == "rejected"
     assert not report["numeric_structure_coverage_verified"]
@@ -243,9 +239,6 @@ def test_forged_complete_receipt_does_not_hide_new_structure_omissions(change):
     else:
         reading["version"] = "999.0.0"
     reading["text"] = "\n".join(s["text"] for s in reading["statements"])
-    result["run_metadata"]["business_output_sha256"] = digest(
-        {k: v for k, v in result.items() if k != "run_metadata"}
-    )
     report = verify_fengshui_reading(result, **trusted(result))
     assert (
         report["status"] == "rejected"

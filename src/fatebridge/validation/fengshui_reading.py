@@ -4,45 +4,37 @@ The caller must obtain the trusted identifiers independently of the submitted
 payload. This is not a signature or a certificate of physical/predictive truth.
 """
 
-import re
 from typing import Any
 
 from fatebridge.core.fengshui.host_guest import validate as validate_host_guest
 from fatebridge.core.fengshui.mutual_geometry import validate_author_geometries
 from fatebridge.core.fengshui.reading import build_natal_reading
 from fatebridge.core.fengshui.structure_integrity import validate_natal_structure
+from fatebridge.core.public_output import same_public_value as _same_value
 from fatebridge.utils.errors import FengshuiCalculationError
-from fatebridge.utils.json_digest import digest
-from fatebridge.validation.claims import _same_value
+from fatebridge.utils.json_values import same_value
 
 
 def verify_fengshui_reading(
     payload: dict[str, Any],
     *,
-    trusted_run_metadata: dict[str, Any],
+    trusted_payload: dict[str, Any],
 ) -> dict[str, Any]:
     errors = []
     metadata = payload.get("run_metadata") or {}
     if not isinstance(metadata, dict):
         metadata = {}
     body = {k: v for k, v in payload.items() if k != "run_metadata"}
-    trusted_run_id = trusted_run_metadata.get("run_id")
-    trusted_business_output_sha256 = trusted_run_metadata.get("business_output_sha256")
+    trusted_run_id = (trusted_payload.get("run_metadata") or {}).get("run_id")
     if (
         not isinstance(trusted_run_id, str)
         or not trusted_run_id
-        or not isinstance(trusted_business_output_sha256, str)
-        or re.fullmatch(r"[a-f0-9]{64}", trusted_business_output_sha256) is None
         or metadata.get("run_id") != trusted_run_id
-        or metadata.get("business_output_sha256") != trusted_business_output_sha256
-        or not _same_value(metadata, trusted_run_metadata)
+        or not same_value(metadata, trusted_payload.get("run_metadata"))
     ):
         errors.append({"code": "trusted_original_receipt_mismatch"})
-    try:
-        if digest(body) != trusted_business_output_sha256:
-            errors.append({"code": "incomplete_changed_or_projected_business_payload"})
-    except (TypeError, ValueError):
-        errors.append({"code": "non_json_business_payload"})
+    if not same_value(payload, trusted_payload):
+        errors.append({"code": "incomplete_changed_or_projected_business_payload"})
     if metadata.get("tool_name") not in {"fengshui_assess", "fengshui_xuankong_natal"}:
         errors.append({"code": "unsupported_original_tool"})
     actual = payload.get("calculation_reading")
@@ -169,5 +161,5 @@ def verify_fengshui_reading(
         "whole_book_conformity_established": False,
         "real_world_prediction_established": False,
         "authority_certified": False,
-        "scope": "只核验本版本固定释义及完整上下文与可信原始run的一致性；可信回执须从执行端独立取得，不认证任意自由文本、输入真实性、原典全本或现实效力。",
+        "scope": "只核验本版本固定释义及完整上下文与另行可信保存原结果的一致性；不认证自行提交的原结果、任意自由文本、输入真实性、原典全本或现实效力。",
     }

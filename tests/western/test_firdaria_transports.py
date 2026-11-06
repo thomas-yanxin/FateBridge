@@ -13,7 +13,7 @@ import fatebridge.api as api
 import fatebridge.mcp_server as mcp
 from fatebridge.cli import build_parser, run
 from fatebridge.services.catalog.western_timing import SPECS
-from fatebridge.services.western_timing_tools import calculate_firdaria
+from fatebridge.services.western_timing_tools import calculate_timing_tool
 from tests.fixtures.surface_payloads import western_payload
 from tests.fixtures.transports import mcp_parameters
 from tests.western.test_firdaria_reference import VECTORS
@@ -163,10 +163,6 @@ def test_all_four_combinations_reach_real_engines_on_all_surfaces(
         {k: v for k, v in output.items() if k != "run_metadata"} for output in outputs
     ]
     assert business[0] == business[1] == business[2]
-    assert (
-        len({output["run_metadata"]["business_output_sha256"] for output in outputs})
-        == 1
-    )
     for output in outputs:
         firdaria = _firdaria(output, spec)
         assert firdaria["sect"] == "night"
@@ -290,14 +286,12 @@ def test_calendar_invalid_analysis_clocks_are_rejected(monkeypatch, capsys, spec
 def test_default_firdaria_payload_matches_existing_frozen_dates_and_structure():
     snapshot = json.loads(
         (
-            Path(__file__).parents[1]
-            / "golden"
-            / "snapshots"
-            / "api_astro_timing_firdaria.json"
+            Path(__file__).parents[1] / "fixtures" / "firdaria-default-regression.json"
         ).read_text()
     )
-    implicit = calculate_firdaria(**western_payload())
-    explicit = calculate_firdaria(
+    implicit = calculate_timing_tool("firdaria", **western_payload())
+    explicit = calculate_timing_tool(
+        "firdaria",
         **western_payload(),
         firdaria_night_order="nodes_at_end",
         firdaria_year_basis="fixed_365_2425",

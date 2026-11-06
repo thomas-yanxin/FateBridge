@@ -8,9 +8,9 @@ import pytest
 from fatebridge.application.examples import evidence_views
 from fatebridge.core import canping_schedule_basis as basis
 from tests.numerology.test_canping_schedule_basis import BASE, READINGS
-from tests.numerology.test_heluo_poem_transports import run_three
 from tests.support.transports import SPECS, business
 from tests.support.transports import rest as shared_rest
+from tests.support.transports import run_three
 
 rest = shared_rest
 

@@ -81,9 +81,7 @@ def test_optional_cycle_contacts_and_compact_card_match_all_three_surfaces(
             )
             assert not card.is_error
             if "result_delivery" in card.structured_content:
-                assert card.structured_content["result_delivery"][
-                    "deferred_fields"
-                ] == ["run_metadata.runtime"]
+                await verified_inline_business(client, card.structured_content)
             assert card.structured_content["cycle_summary"] == expected["cycle_summary"]
             return result.structured_content
 
@@ -185,8 +183,7 @@ def test_published_first_view_retains_reading_and_source_discrepancy_inline(
                 },
             )
             assert not result.is_error
-            body = result.structured_content
-            assert "result_delivery" not in body
+            body = await verified_inline_business(client, result.structured_content)
             assert body["bodygraph"]["channels"]
             assert body["interpretation"]["authority_meaning"]
             assert body["interpretation"]["ephemeris_scope"]
@@ -291,7 +288,6 @@ def test_projected_contract_and_tampered_claim_rejection(rest):
         path="bodygraph.authority",
         value=complete["bodygraph"]["authority"],
         run_id=receipt["run_id"],
-        business_output_sha256=receipt["business_output_sha256"],
     )
     assert (
         verify_calculation_claims(complete, [claim])["status"]
@@ -389,11 +385,8 @@ def test_integration_group_card_and_conservation_match_all_three_surfaces(
                     "include_snapshot_text": False,
                 },
             )
-            assert (
-                not result.is_error
-                and "result_delivery" not in result.structured_content
-            )
-            return result.structured_content
+            assert not result.is_error
+            return await verified_inline_business(client, result.structured_content)
 
     actual = asyncio.run(call())
     flags = ["human_design"]
@@ -621,8 +614,7 @@ def test_definition_bridge_card_is_inline_and_identical_across_actual_surfaces(
                 },
             )
             assert not result.is_error
-            assert "result_delivery" not in result.structured_content
-            return result.structured_content
+            return await verified_inline_business(client, result.structured_content)
 
     via_mcp = asyncio.run(call())
     flags = ["human_design"]
@@ -750,8 +742,7 @@ def test_joint_uncertainty_card_and_full_witnesses_survive_actual_surfaces(
                 },
             )
             assert not result.is_error
-            assert "result_delivery" not in result.structured_content
-            return result.structured_content
+            return await verified_inline_business(client, result.structured_content)
 
     via_mcp = asyncio.run(call())
     flags = ["human_design"]
@@ -810,11 +801,8 @@ def test_full_backend_ephemeris_card_survives_actual_three_surfaces(
     async def call():
         async with Client(create_mcp_app(families="astro")) as client:
             result = await client.call_tool("human_design", params)
-            assert (
-                not result.is_error
-                and "result_delivery" not in result.structured_content
-            )
-            return result.structured_content
+            assert not result.is_error
+            return await verified_inline_business(client, result.structured_content)
 
     actual = asyncio.run(call())
     arguments = ["human_design"]
@@ -841,7 +829,6 @@ def test_full_backend_ephemeris_card_survives_actual_three_surfaces(
 @pytest.mark.parametrize("bad", ["certificate", "status", "provenance"])
 def test_fresh_hash_cannot_hide_forged_full_backend_report(monkeypatch, tmp_path, bad):
     from fatebridge.application.execution import execute_tool
-    from fatebridge.services.replay_metadata import digest
 
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
     value = execute_tool(SPEC, SPEC.request_model(**INPUT))
@@ -856,9 +843,6 @@ def test_fresh_hash_cannot_hide_forged_full_backend_report(monkeypatch, tmp_path
         report["status"] = "full_backend_compared"
     else:
         report["selected_provenance"]["tt_epochs"]["design"] += 1
-    value["run_metadata"]["business_output_sha256"] = digest(
-        {k: v for k, v in value.items() if k != "run_metadata"}
-    )
     assert verify_human_design_reading(value)["status"] == "rejected"
 
 
@@ -909,11 +893,8 @@ def test_profile_role_card_and_line_basis_survive_all_three_surfaces(
                     "include_snapshot_text": False,
                 },
             )
-            assert (
-                not result.is_error
-                and "result_delivery" not in result.structured_content
-            )
-            return result.structured_content
+            assert not result.is_error
+            return await verified_inline_business(client, result.structured_content)
 
     actual = asyncio.run(call())
     flags = ["human_design"]

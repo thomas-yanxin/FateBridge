@@ -40,11 +40,13 @@ uv run --locked --extra dev python -m pytest -q
 | 公共手算、来源读取、时间冻结和协议辅助 | [support/](support/)；实际协议夹具继续在 [fixtures/](fixtures/) |
 | 固定来源、独立期望值与反例 | [data/](data/) · [fixtures/](fixtures/) 中对应资料集 |
 
-测试模块可以复用其他模块中的已命名辅助，但导入测试函数作为辅助时应使用不以 `test_` 开头的别名，避免额外收集同一测试。合并场景文件时保留全部参数、断言、标记及故障方式，并比较完整测试节点清单。
+跨领域复用的协议调用、结果交付和独立参考放在 `support/` 或 `fixtures/`，从实际定义模块导入。同领域可以共享具名样本；复用测试函数时使用不以 `test_` 开头的别名，避免额外收集同一测试。合并场景文件时保留全部参数、断言、标记及故障方式，并比较完整测试节点清单。
 
-pytest 使用 `importlib` 导入模式，允许不同领域的同名模块一起收集。三端夹具与调用在 [support/transports.py](support/transports.py)维护；同主题的相同协议控制优先参数化，保留各请求、投影、分页、故障注入与业务断言。
+pytest 使用 `importlib` 导入模式，允许不同领域的同名模块一起收集。三端夹具、通用 REST 客户端与 `run_three` 在 [support/transports.py](support/transports.py) 维护；风水 MCP 调用与领域目录在 [support/fengshui_transports.py](support/fengshui_transports.py)。同主题的相同协议控制优先参数化，保留各请求、投影、分页、故障注入与业务断言。
 
-私有结果存储夹具和同次分页重建在 [support/result_delivery.py](support/result_delivery.py) 维护，领域测试直接导入公共辅助，避免为读取分页结果加载另一个完整测试模块。固定分析时刻的三端专项核验也复用公共协议执行器，业务公式和独立断言继续留在所属测试中。
+私有结果存储夹具和同次分页重建在 [support/result_delivery.py](support/result_delivery.py) 维护；MCP 分页与收据比较统一使用 [fixtures/mcp_result_delivery.py](fixtures/mcp_result_delivery.py)，首次响应的预算与业务可见性仍由对应断言核对。领域测试直接导入公共辅助，业务公式和独立断言继续留在所属测试中。
+
+西占角度边界的独立 Decimal 参考在 [support/western_angular_reference.py](support/western_angular_reference.py)，测试与审计命令共用它；参考不导入生产几何公式。法达默认日期的历史完整参考在 [fixtures/firdaria-default-regression.json](fixtures/firdaria-default-regression.json)，随文件记录原提交和来源散列，维护时不从当前输出重生期望值。
 
 六壬与金口诀当前锚点请求维护在 [fixtures/ren_anchors.py](fixtures/ren_anchors.py)，完整服务调用复用 [support/ren_anchors.py](support/ren_anchors.py)。原冻结资料继续保存故障构造和原始请求；现行三式请求仅去掉已退役的太乙 `accNum=0`，六壬时刻、地点、来源配置和全部故障条件保持原值。
 

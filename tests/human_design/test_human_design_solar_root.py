@@ -17,7 +17,6 @@ from fatebridge.core.human_design import (
     longitude_activation,
     solar_root_subdivisions,
 )
-from fatebridge.services.replay_metadata import digest
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
 from tests.support.ephemeris_case_runtime import native_ephemeris_files_module
@@ -197,9 +196,6 @@ def test_forged_solver_context_cannot_pass_by_rehashing_and_regenerating_rule_tr
     for trace in value["rule_trace"]:
         if trace["rule_id"] == "design_solar_arc":
             trace["result"] = {"design_utc": value["design_utc"], **s}
-    value["run_metadata"]["business_output_sha256"] = digest(
-        {k: v for k, v in value.items() if k != "run_metadata"}
-    )
     check = verify_human_design_reading(value)
     assert check["status"] == "rejected"
     assert any(

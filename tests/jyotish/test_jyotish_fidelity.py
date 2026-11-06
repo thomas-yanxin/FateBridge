@@ -184,7 +184,6 @@ def test_all_embedded_branch_claims_verify_against_the_same_original_run():
                         path=row["fact_path"],
                         value=row["value"],
                         run_id=metadata["run_id"],
-                        business_output_sha256=metadata["business_output_sha256"],
                     )
                 )
     assert claims

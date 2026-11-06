@@ -154,7 +154,7 @@ uv run --locked --extra dev fatebridge meihua_cast --casting '{"method":"observe
 
 ### 民用钟时、地区时区与明确偏移
 
-已确认分钟、秒数时，分别可选传入严格整数 `analysis_minute=0..59`、`analysis_second=0..59`。两者未知时省略或传 `null`，数值计算分别补00；这只是参考时刻，不代表事件确实发生在整点或整分。明确传0与省略可定位同一参考时刻，但保留不同的已提供分量和请求哈希。分、秒只定位钟时，不另加到年月日時起卦的取数。`60`、布尔、字符串和小数均拒绝；本接口不表达闰秒标签。
+已确认分钟、秒数时，分别可选传入严格整数 `analysis_minute=0..59`、`analysis_second=0..59`。两者未知时省略或传 `null`，数值计算分别补00；这只是参考时刻，不代表事件确实发生在整点或整分。明确传0与省略可定位同一参考时刻，但保留不同的已提供分量。分、秒只定位钟时，不另加到年月日時起卦的取数。`60`、布尔、字符串和小数均拒绝；本接口不表达闰秒标签。
 
 读取 `meihua.calendar_policy.civil_clock_resolution.input_components` 核对已提供分量、缺失项与计算补位。来源只证明本次校验请求的字段记录，不认证现场时钟精度。未知分量不自动解释成截断、四舍五入、某个误差范围或整段历法稳定；`uncertainty_interval=null`、`calendar_stability=not_assessed`。摘要明确提示季令解释仅对应该参考时刻，不能扩成整个未知时段的结论。REST、CLI与MCP保留同一规则，含旧请求默认分钟0的本地兼容情形。详见钟时输入来源审查。完整结果会从本次请求重核UTC、偏移、fold及历法比较时刻，字段筛选之前拒绝互相矛盾的记录；有效时间表示保持，详见时刻绑定审查。
 
@@ -178,7 +178,7 @@ uv run --locked --extra dev fatebridge meihua_analysis --analysis-year 2000 --an
 uv run --locked --extra dev fatebridge meihua_analysis --analysis-year 2026 --analysis-month 11 --analysis-day 1 --analysis-hour 1 --analysis-minute 30 --analysis-timezone America/New_York --analysis-utc-offset=-05:00 --fields analysis_context meihua.seed meihua.calendar_policy.civil_clock_resolution calendar_context.bazi_month_boundary --strict-fields true --response-char-limit 0
 ```
 
-`analysis_context.civil_utc_offset/civil_instant_utc`和`meihua.calendar_policy.civil_clock_resolution`保留已核对偏移、实际UTC、fold及实际时区数据库版本／TZif哈希，`rule_trace`保留消歧步骤。`fold=0/1`只用于区分重复钟时的先后，不是两个独立占验；普通UTC钟时规范为0。共享解析器此前让第二个等价候选把UTC标成1，现按[PEP495的含义](https://peps.python.org/pep-0495/)保留首个规范候选。该修复不改变UTC实际时刻或偏移。
+`analysis_context.civil_utc_offset/civil_instant_utc`和`meihua.calendar_policy.civil_clock_resolution`保留已核对偏移、实际UTC、fold及实际时区数据库版本与TZif名称，`rule_trace`保留消歧步骤。`fold=0/1`只用于区分重复钟时的先后，不是两个独立占验；普通UTC钟时规范为0。共享解析器此前让第二个等价候选把UTC标成1，现按[PEP495的含义](https://peps.python.org/pep-0495/)保留首个规范候选。该修复不改变UTC实际时刻或偏移。
 
 [IANA2026e原始规则](https://data.iana.org/time-zones/releases/tzdata2026e.tar.gz)所列上海1900年采用`+08:05:43`，与现代`+08:00`分开核对；其1900年末重复钟时的两次`23:55`相差343秒。此处验证的是所选数据库的整秒记录，不是历史现场钟表已经核实。原文件还保留`8:05:43.2`和改用标准时日期的资料不确定性，不据程序通过作秒级历史或天文精度认证。未来规则也是固定版本的延用，不保证未来立法不变。
 
@@ -204,9 +204,9 @@ uv run --locked --extra dev fatebridge meihua_analysis --analysis-year 2026 --an
 
 ### 节气时刻与官方日标签
 
-时间入口的 `meihua.calendar_policy.solar_term_date_reference` 对照四条实际返回记录：当前／下一节气，以及 `calendar_context.bazi_month_boundary` 的起、终锚点。比较统一使用固定UTC+08日期，保留原始带偏移时刻、模型、民用时约定、官方日期、原始来源指纹和事实路径。纽约等地的本地日期与参考日期不同，并不自动构成历表差异。交节月令沿用本软件已声明的季令约定，取数另沿用已声明的农历及时支约定。
+时间入口的 `meihua.calendar_policy.solar_term_date_reference` 对照四条实际返回记录：当前／下一节气，以及 `calendar_context.bazi_month_boundary` 的起、终锚点。比较统一使用固定UTC+08日期，保留原始带偏移时刻、模型、民用时约定、官方日期、原始来源名称和事实路径。纽约等地的本地日期与参考日期不同，并不自动构成历表差异。交节月令沿用本软件已声明的季令约定，取数另沿用已声明的农历及时支约定。
 
-参考数据是香港天文台1901—2100年固定年表的4800条日标签，数据版本与载入内容指纹随结果返回。它不提供可替代的精确交节时刻，`date_difference_days` 也不是时刻误差或物理置信区间。四条记录中重复出现的同一事件只计一次差异；四条路径的覆盖状态与不同事件数分别列出。
+参考数据是香港天文台1901—2100年固定年表的4800条日标签，数据版本与来源定位随结果返回。它不提供可替代的精确交节时刻，`date_difference_days` 也不是时刻误差或物理置信区间。四条记录中重复出现的同一事件只计一次差异；四条路径的覆盖状态与不同事件数分别列出。
 
 `publisher_named_near_midnight` 记录官方固定说明点名的2021年冬至、2051年春分、2083年立春、2084年春分；这是对说明内容的保留，不把已过去的年份称为未来，也不认定每次日标签相同便已解决精度问题。实际差异或点名事件会进入摘要，起卦数、交节时刻、月支及季令仍沿用本次计算。该层与三个朔日的 `label_precision` 分开，不拿节气日标签替换农历月首。
 

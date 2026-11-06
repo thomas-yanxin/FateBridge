@@ -13,8 +13,9 @@ from fatebridge.core.fengshui.models import AssessRequest
 from fatebridge.core.fengshui.output import FengshuiOutput
 from fatebridge.services.fengshui import assess
 from tests.fengshui.test_fengshui_layout import facing_only
-from tests.fengshui.test_fengshui_surfaces import rest_client, without_transport
 from tests.fixtures.fengshui import payload
+from tests.support.mcp_result_assertions import without_transport
+from tests.support.transports import rest_client
 
 
 def form_inputs(**changes):

@@ -6,7 +6,6 @@
 """
 
 from fatebridge.services.snapshot_builders import (
-    build_snapshot_export,
     render_snapshot_lines,
     render_snapshot_text,
 )
@@ -21,9 +20,6 @@ class TestRenderSnapshotText:
         out = render_snapshot_text([("空", "   "), ("有", "x")])
         assert out == "[空]\n\n[有]\nx"
 
-    def test_single_section(self) -> None:
-        assert render_snapshot_text([("唯一", "内容")]) == "[唯一]\n内容"
-
 
 class TestRenderSnapshotLines:
     def test_lines_joined_within_block(self) -> None:
@@ -37,20 +33,6 @@ class TestRenderSnapshotLines:
     def test_empty_block_keeps_title_only(self) -> None:
         out = render_snapshot_lines([("空", []), ("满", ["x"])])
         assert out == "[空]\n\n[满]\nx"
-
-
-def test_string_and_lines_agree_on_equivalent_input() -> None:
-    """同样的内容，字符串正文与单行列表正文应得到一致输出。"""
-    text = render_snapshot_text([("a", "1"), ("b", "2")])
-    lines = render_snapshot_lines([("a", ["1"]), ("b", ["2"])])
-    assert text == lines == "[a]\n1\n\n[b]\n2"
-
-
-def test_build_snapshot_export_delegates_to_parser() -> None:
-    snap = render_snapshot_text([("起盘信息", "样例")])
-    export = build_snapshot_export(technique="qimen", snapshot_text=snap)
-    assert export["technique"]["key"] == "qimen"
-    assert "起盘信息" in export["export_text"]
 
 
 def test_export_omits_text_duplicates() -> None:

@@ -17,7 +17,8 @@ from fatebridge.application.examples import (
 from fatebridge.cli import run
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
-from tests.fixtures.mcp_receipt import assert_same_run_receipt, verified_inline_business
+from tests.fixtures.mcp_receipt import verified_inline_business
+from tests.fixtures.mcp_result_delivery import assert_same_run_receipt
 
 BIRTH = dict(
     birth_year=1992,

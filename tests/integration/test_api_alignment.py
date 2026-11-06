@@ -42,7 +42,6 @@ from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.services.western_timing import (
     calculate_western_timing_analysis as service_calculate_western_timing_analysis,
 )
-from fatebridge.services.western_timing_tools import calculate_solarreturn
 from tests.fixtures.surface_payloads import western_payload
 from tests.fixtures.transports import mcp_text, rest_handler
 
@@ -557,14 +556,33 @@ def test_western_timing_catalog_preserves_service_binding():
     assert kwargs["birth_latitude"] == 31.2304
 
 
-def test_western_timing_module_catalog_preserves_service_binding():
+@pytest.mark.parametrize(
+    "tool_name",
+    [
+        "solarreturn",
+        "lunarreturn",
+        "transit",
+        "solararc",
+        "givenyear",
+        "profection",
+        "pd",
+        "pdchart",
+        "zr",
+        "firdaria",
+        "decennials",
+    ],
+)
+def test_western_timing_module_catalog_selects_requested_technique(tool_name):
     request = WesternTimingModuleRequest(
         **western_payload(),
         selected_sections=["起盘信息"],
     )
-    spec = next(spec for spec in CATALOG if spec.key == "solarreturn")
+    spec = next(spec for spec in CATALOG if spec.key == tool_name)
     service, args, kwargs = spec.bind(request)
-    assert service is calculate_solarreturn
+    result = service(*args, **kwargs)
+    assert "error" not in result
+    assert result[tool_name]
+    assert result["snapshot_export"]["selected_sections"] == ["起盘信息"]
     assert args == ()
     assert kwargs["selected_sections"] == ["起盘信息"]
     assert kwargs["analysis_day"] == 20

@@ -226,7 +226,6 @@ def test_whole_receipt_quote_cannot_omit_scale_boundaries_or_rebind_runs():
         path="qimen.calendar_policy.solar_time_adjustment",
         value=deepcopy(e),
         run_id=result["run_metadata"]["run_id"],
-        business_output_sha256=result["run_metadata"]["business_output_sha256"],
     )
     assert (
         verify_qimen_solar_time_quotes(result, [claim])["status"]

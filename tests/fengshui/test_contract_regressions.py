@@ -1,7 +1,6 @@
 """Related contract regressions with shared imports; original cases retained."""
 
 import asyncio
-import hashlib
 import json
 from copy import deepcopy
 
@@ -17,7 +16,9 @@ from fatebridge.services.fengshui import assess, calculate_xuankong_natal
 from fatebridge.validation.fengshui_reading import verify_fengshui_reading
 from tests.fengshui.test_fengshui_opposite import OPPOSITE_REFERENCE
 from tests.fengshui.test_fengshui_structure_reading import MOUNTAINS, request
-from tests.fengshui.test_fengshui_surfaces import SPECS, rest_client, without_transport
+from tests.support.fengshui_transports import SPECS
+from tests.support.mcp_result_assertions import without_transport
+from tests.support.transports import rest_client
 
 
 @pytest.mark.parametrize("tool", ["xuankong_natal", "assess"])
@@ -44,11 +45,10 @@ def test_default_budget_reads_the_same_run_and_keeps_source_difference(tool):
             manifest = json.loads(
                 (await client.read_resource(ref["manifest_uri"]))[0].text
             )
-            assert manifest["sha256"] == ref["sha256"]
+            assert manifest["total_chars"] == ref["total_chars"]
             chunks, uri, offset = [], ref["first_page_uri"], 0
             while uri is not None:
                 page = json.loads((await client.read_resource(uri))[0].text)
-                assert page["sha256"] == ref["sha256"]
                 assert page["offset"] == offset
                 chunks.append(page["text"])
                 offset += len(page["text"])
@@ -58,14 +58,13 @@ def test_default_budget_reads_the_same_run_and_keeps_source_difference(tool):
                 uri = page["next_uri"]
             raw = "".join(chunks)
             assert len(raw) == ref["total_chars"]
-            assert hashlib.sha256(raw.encode()).hexdigest() == ref["sha256"]
             original = json.loads(raw)
             assert original["run_metadata"] == manifest["run_metadata"]
             assert (
                 original["run_metadata"]["run_id"] == inline["run_metadata"]["run_id"]
             )
             checked = verify_fengshui_reading(
-                original, trusted_run_metadata=deepcopy(manifest["run_metadata"])
+                original, trusted_payload=deepcopy(original)
             )
             assert checked["status"] == "verified_served_fixed_reading"
             assert checked["host_guest_relation_count"] == 8

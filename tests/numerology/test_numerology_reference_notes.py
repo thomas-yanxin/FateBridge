@@ -8,9 +8,9 @@ import pytest
 
 from fatebridge.application.execution import execute_tool
 from fatebridge.services.knowledge import calculate_knowledge_read
-from tests.numerology.test_heluo_poem_transports import run_three
 from tests.support.transports import SPECS, business
 from tests.support.transports import rest as shared_rest
+from tests.support.transports import run_three
 
 rest = shared_rest
 F = Path(__file__).parents[1] / "fixtures/numerology_reference_notes_v1"

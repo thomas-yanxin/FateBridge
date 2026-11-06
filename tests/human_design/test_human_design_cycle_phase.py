@@ -9,7 +9,6 @@ import pytest
 
 from fatebridge.application.execution import execute_tool
 from fatebridge.core.human_design_cycles import PHASE_METHOD, derive_body_contacts
-from fatebridge.services.replay_metadata import digest
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
 
@@ -140,7 +139,4 @@ def test_forged_residual_and_precision_claims_are_rejected_even_after_rehash(
         value["cycle_summary"]["phase_arithmetic_method"] = "full_precision"
     else:
         value["cycle_summary"]["arithmetic_scope"] = "数值根已认证出生钟和物理精度。"
-    value["run_metadata"]["business_output_sha256"] = digest(
-        {k: v for k, v in value.items() if k != "run_metadata"}
-    )
     assert verify_human_design_reading(value)["status"] == "rejected"

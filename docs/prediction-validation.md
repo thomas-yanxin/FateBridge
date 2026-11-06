@@ -28,7 +28,7 @@ uv run --locked --extra dev python -m scripts.bazi.audit_bazi_classical \
 
 ## 同次结果引用核验
 
-[核验模块](../src/fatebridge/validation/claims.py)接受完整原始结果及结构化引用。先从可信调用获得完整 JSON，保留其 `run_metadata`；不要用投影结果重建摘要。示例中的 `payload` 是这次实际调用的原始字典：
+[核验模块](../src/fatebridge/validation/claims.py)接受完整原始结果及结构化引用。先从可信调用获得完整 JSON，保留其 `run_metadata`；不要用投影结果重建摘要。示例中的 `payload` 是待核对结果，`original_payload` 是调用方另行可信保存的完整原结果：
 
 ```python
 from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
@@ -38,13 +38,12 @@ claim = CalculationClaim(
     path="dayun_info.pillar",
     value=payload["dayun_info"]["pillar"],
     run_id=receipt["run_id"],
-    business_output_sha256=receipt["business_output_sha256"],
 )
-verification = verify_calculation_claims(payload, [claim])
+verification = verify_calculation_claims(payload, [claim], trusted_payload=original_payload)
 assert verification["status"] == "verified_structured_facts"
 ```
 
-换 run、修改标签或数值、把布尔值当整数、引用不存在或未计算的时间层、以投影结果冒充完整输出均不能通过。哈希核对只在可信原始回执的前提下成立，不提供数字签名，也不能认证自造回执。这一接口适合调用方核对解读所引用的事实；自由文本推论与现实建议仍需独立审核。出生范围的计算与摘要约束见[时运审计](bazi-timing.md#范围与检验)。
+换 run、修改标签或数值、把布尔值当整数、引用不存在或未计算的时间层、以投影结果冒充完整输出均不能通过。完整内容通过与 `trusted_payload` 逐值比较；未提供时只核对所供字段与 run，不认证完整原结果或自行提交的回执。这一接口适合调用方核对解读所引用的事实；自由文本推论与现实建议仍需独立审核。出生范围的计算与摘要约束见[时运审计](bazi-timing.md#范围与检验)。
 
 ## 可证伪的现实预测评估
 

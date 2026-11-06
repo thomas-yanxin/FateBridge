@@ -11,7 +11,6 @@ import pytest
 from fatebridge.application.execution import execute_tool
 from fatebridge.core.astro import native_execution, runtime
 from fatebridge.core.human_design_depth import line_fixings
-from fatebridge.services.replay_metadata import digest
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
 
@@ -239,9 +238,6 @@ def test_rehashed_missing_or_forged_source_and_donor_receipts_are_rejected(
         ]["depth_evidence"]["additional_polarity_sources"]
     else:
         raise AssertionError(bad)
-    run["run_metadata"]["business_output_sha256"] = digest(
-        {k: v for k, v in run.items() if k != "run_metadata"}
-    )
     monkeypatch.setattr(runtime, "ephemeris_call", forbidden)
     monkeypatch.setattr(native_execution, "calculate", forbidden)
     assert verify_human_design_reading(run)["status"] == "rejected"
@@ -262,9 +258,6 @@ def test_returned_catalog_and_basis_cannot_mutate_later_source_results():
 def test_forged_additional_polarity_summary_rejected(complete, monkeypatch):
     run = deepcopy(complete)
     run["depth_evidence"]["additional_polarity_summary"]["matched_recipient_count"] = 0
-    run["run_metadata"]["business_output_sha256"] = digest(
-        {k: v for k, v in run.items() if k != "run_metadata"}
-    )
     monkeypatch.setattr(runtime, "ephemeris_call", forbidden)
     monkeypatch.setattr(native_execution, "calculate", forbidden)
     assert verify_human_design_reading(run)["status"] == "rejected"

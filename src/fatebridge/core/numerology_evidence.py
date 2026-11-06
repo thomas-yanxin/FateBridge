@@ -407,7 +407,7 @@ def heluo_evidence(chart: dict, judge: dict, solar: dict, pillars: dict) -> dict
         "corpus_sha256仅标识继承语料；yaoci_collation.sha256标识实际载入字节，content_sha256锁定该版标题正文、标签与来源元数据的规范JSON身份，不受排版空白影响。每条text_provenance分别说明爻辞、注文与诗歌状态；内容身份不证明原典读法或预测有效，局部目校不能当作全书完成。"
     )
     result["interpretation_constraints"].append(
-        f"commentary_collation单独标识本版{commentary['collated_line_commentaries']}条注文单次目校层；sha256为载入字节，content_sha256锁定正文、条件标签和元数据，不能交换正文后沿用已目校身份。commentary_sections只按原文分段，applicability=null不表示不匹配。阳月、阴命、字兆等嵌套条件仍须保留。隨、蠱、臨三卦保留原印叶字，不机械改作葉；字典异体说明不选定命局叶否。诗歌未见于这些已核爻解段落，另件卷三取文查poem_collation；旧verdict标签不是底本对当前输入的条件分支裁定。"
+        f"commentary_collation单独标识本版{commentary['collated_line_commentaries']}条注文单次目校层；内部校验载入字节、正文、条件标签和元数据，不能交换正文后沿用已目校身份。commentary_sections只按原文分段，applicability=null不表示不匹配。阳月、阴命、字兆等嵌套条件仍须保留。隨、蠱、臨三卦保留原印叶字，不机械改作葉；字典异体说明不选定命局叶否。诗歌未见于这些已核爻解段落，另件卷三取文查poem_collation；旧verdict标签不是底本对当前输入的条件分支裁定。"
     )
     result["interpretation_constraints"].append(
         f"poem_collation为另件154页卷三文件的单次目校层：{'、'.join(poems['covered_hexagrams'])}共{poems['collated_line_poem_groups']}个普通爻组、{poems['collated_individual_poems']}首，未核爻组{poems['pending_line_poem_groups']}个。组数分母384不能用首数作分子；全书首数未定。poem_sections按原印次保留全部诗，序号不决定适用或吉凶，不择有利诗；屯四原题无首数且仅一首，不补其二。shige仅含本爻已核诗；inherited_shige保留旧合并文，inherited_xiang_reference的象曰具体来源未由诗诀底本核定。屯初不當進步且盤桓的否定不可省，含此章、繇來、無處而即鹿等保留所选诗诀读法，不按熟语或别部经文改写。逐首reading_notes保留原字与所指未定；訟三原题一首而实列其二、其三，原题与三首并留，计数矛盾未决；訟初嘹喨、二王事、四名懼、五末稍却及六不須懽／困來按原PDF嵌入像素作同一读者复核，前次选字及修订理由留存；懽同歡，不須懽不能释为无需畏惧；该复核没有完成独立校勘，也不自动选定个人适用或现实结果；需五亨／享仍为暂读，白羊成一楚不指定星座或月日；诗中数字不自行生成具体年龄或日期。其他爻诗仍待核；卷二与卷三PDF身份不同，版片关系、独立复核未定。"

@@ -169,8 +169,8 @@ def solar_model_environment_receipt(
     # A successful text-only lookup must not start an unused file-backed Sun
     # calculation merely to describe its configuration. Consuming calculations
     # have already validated the mode and still request the strict source.
+    configured = os.environ.get(ENVIRONMENT_NAME, "auto").strip().lower()
     if not resolve_source:
-        configured = os.environ.get(ENVIRONMENT_NAME, "auto").strip().lower()
         if (
             configured in {"auto", "de440", "spk", "aa1996", "vsop2013"}
             or configured not in MODES
@@ -210,8 +210,7 @@ def solar_model_environment_receipt(
             "observed_model_ids": models,
             "sources": receipts,
         }
-    key = solar_model_cache_key()
-    if key[0] == "swiss":
+    if configured == "swiss":
         return {
             "mode": "swiss",
             "source_selection": "required_swiss_files",
@@ -220,7 +219,7 @@ def solar_model_environment_receipt(
             "analytical_fallback_allowed": False,
             "scope": "Actual crossings must use SWIEPH and retain observed planet/Moon file contexts. This selection does not certify physical accuracy or atomic file reads.",
         }
-    if key[0] == "native":
+    if configured == "native":
         return {
             "mode": "native",
             "source_selection": "native_swiss_or_complete_moshier",
@@ -228,6 +227,7 @@ def solar_model_environment_receipt(
             "analytic_source_resolved": False,
             "scope": "Configured native selection only. Available Swiss/JPL data keep their native model; analytical fallback uses the named complete Moshier revision with its own orbit/frame receipt and no borrowed Sun flags. This configuration receipt does not prove which source a business calculation consumed or certify accuracy.",
         }
+    key = solar_model_cache_key()
     if key[1] == "native_strict_jpl":
         return {
             "mode": "auto",

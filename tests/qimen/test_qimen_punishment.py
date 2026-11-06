@@ -224,7 +224,6 @@ def test_whole_pattern_quote_cannot_erase_its_identity_or_uncertainty(changed):
     )
     claim = CalculationClaim(
         run_id=payload["run_metadata"]["run_id"],
-        business_output_sha256=payload["run_metadata"]["business_output_sha256"],
         path=f"qimen.patterns.{index}",
         value=deepcopy(pattern),
     )

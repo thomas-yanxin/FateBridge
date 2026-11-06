@@ -1,15 +1,19 @@
 """Poem groups and source-fault classification on actual local transports."""
 
-import asyncio
 import json
+from pathlib import Path
 
 import pytest
 
 from fatebridge.core import heluo_poems as hp
-from tests.support.transports import SPECS, business, call_cli, native
+from tests.support.transports import SPECS, business
 from tests.support.transports import rest as shared_rest
+from tests.support.transports import run_three
 
 rest = shared_rest
+ROOT = Path(__file__).parents[1] / "fixtures/heluo_poem_source_v1"
+SOURCE = json.loads((ROOT / "reference.json").read_bytes())
+READINGS = json.loads((ROOT / "verified-readings.json").read_bytes())
 CASES = [
     ("2000-01-21", "05:33:00", 0, 1, 2),
     ("2000-01-31", "01:33:00", 0, 2, 3),
@@ -24,41 +28,6 @@ CASES = [
 def native_source_model(monkeypatch, tmp_path):
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path / "empty-ephe"))
-
-
-def run_three(spec, payload, fields, rest, tmp_path, capsys):
-    response = rest.post(
-        spec.rest_path,
-        json=payload,
-        params=[("fields", f) for f in fields]
-        + [("strict_fields", "true"), ("response_char_limit", "0")],
-    )
-    code, cli = call_cli(
-        spec,
-        payload,
-        tmp_path,
-        capsys,
-        flags=[
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--response-char-limit",
-            "0",
-        ],
-    )
-    mcp = asyncio.run(
-        native(
-            spec,
-            {
-                **payload,
-                "fields": fields,
-                "strict_fields": True,
-                "response_char_limit": 0,
-            },
-        )
-    )
-    return response, code, cli, mcp
 
 
 @pytest.mark.parametrize("date,time,phase,line,count", CASES)
@@ -95,10 +64,17 @@ def test_six_poem_groups_have_same_text_and_distinct_source_on_rest_mcp_cli(
         assert "象曰" not in t["shige"] and t["shige"] in output["snapshot_text"]
         assert "未择用" in output["snapshot_text"]
         assert (
-            p["poem_source_pdf_sha256"]
-            == e["poem_collation"]["source_pdf_sha256"]
-            != p["commentary_source_pdf_sha256"]
+            p["poem_source_url"]
+            == e["poem_collation"]["source_url"]
+            == SOURCE["source_url"]
+            != p["commentary_source_url"]
         )
+        expected = next(entry for entry in READINGS["entries"] if entry["line"] == line)
+        assert t["poem_sections"] == [
+            dict(poem, applicability=None) for poem in expected["poems"]
+        ]
+        assert p["poem_pdf_pages"] == expected["pdf_pages"]
+        assert p["poem_corpus_id"] == e["poem_collation"]["corpus_id"]
         assert (
             e["poem_collation"]["collated_line_poem_groups"],
             e["poem_collation"]["collated_individual_poems"],
@@ -108,7 +84,7 @@ def test_six_poem_groups_have_same_text_and_distinct_source_on_rest_mcp_cli(
             for r in e["rule_trace"]
             if r["rule_id"] == "heluo_selected_line_collation_v1"
         )
-        assert trace["poem_content_sha256"] == p["poem_content_sha256"]
+        assert trace["poem_corpus_id"] == p["poem_corpus_id"]
         assert trace["selections"][phase]["poem_count"] == count
         assert trace["selections"][phase]["poem_pdf_pages"] == p["poem_pdf_pages"]
 

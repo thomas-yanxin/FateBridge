@@ -516,15 +516,17 @@ def test_resolve_runtime_engine_still_detects_engine():
     assert resolve_runtime_engine({"nothing": 1}) == run_metadata.DEFAULT_ENGINE
 
 
-def test_render_does_not_guess_tool_name_from_payload_shape():
-    from fatebridge.mcp_server import _render_protocol_response
-
-    # A payload whose shape the OLD guesser would have mapped to "chart13".
-    misleading = {"chart_profile": {"chart_type": "chart13"}}
-    rendered = _render_protocol_response(misleading, tool_name=None)
-    payload = rendered.structured_content
-    # No explicit name supplied -> a neutral marker, NOT a shape-derived guess.
-    assert payload["run_metadata"]["tool_name"] == "unknown_tool"
+@pytest.mark.parametrize("compact", [False, True])
+def test_native_response_preserves_the_tool_receipt_and_requested_json_style(compact):
+    spec = SPECS["gua_lookup"]
+    result = asyncio.run(native(spec, {"query": "111111"}, compact=compact))
+    assert not result.is_error
+    payload = result.structured_content
+    assert payload["run_metadata"]["tool_name"] == spec.run_metadata_name
+    assert payload["run_metadata"]["run_id"]
+    text = result.content[0].text
+    assert json.loads(text) == payload
+    assert ("\n" not in text) if compact else text.startswith("{\n")
 
 
 @pytest.mark.parametrize(

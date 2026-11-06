@@ -1573,7 +1573,6 @@ def test_claim_verification_does_not_substitute_a_natal_position_for_an_annual_p
             path="heluo_timing.selected_annual.pos",
             value=value,
             run_id=receipt["run_id"],
-            business_output_sha256=receipt["business_output_sha256"],
         )
 
     assert (

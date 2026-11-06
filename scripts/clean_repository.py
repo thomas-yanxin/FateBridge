@@ -65,13 +65,13 @@ def find_duplicate_scans(root: Path) -> dict[str, list[Path]]:
 def share_source_scans(root: Path, groups: dict[str, list[Path]]) -> None:
     """Store each original once; frozen corpus paths remain relative references."""
     storage = root / "tests/data/shared_sources"
-    for digest, paths in groups.items():
-        stored = [path for path in paths if path.parent == storage]
+    for paths in groups.values():
+        stored = [path for path in paths if path.is_relative_to(storage)]
         canonical = (
-            stored[0] if stored else storage / (digest + paths[0].suffix.lower())
+            stored[0] if stored else storage / paths[0].relative_to(root / "tests")
         )
         if not stored:
-            storage.mkdir(parents=True, exist_ok=True)
+            canonical.parent.mkdir(parents=True, exist_ok=True)
             os.link(paths[0], canonical)
         for path in paths:
             if path == canonical:
@@ -100,21 +100,19 @@ def find_artifacts(root: Path) -> list[Path]:
             continue
         if name == "src":
             candidates.extend(base.glob("*.egg-info"))
-        if name == "tests" and not (base / "fixtures").is_symlink():
-            candidates.append(base / "fixtures/__pycache__")
         for current, directories, files in os.walk(base, followlinks=False):
             parent = Path(current)
             directories[:] = [
-                item
-                for item in directories
-                if not (parent / item).is_symlink()
-                and not (name == "tests" and parent == base and item == "fixtures")
+                item for item in directories if not (parent / item).is_symlink()
             ]
             if "__pycache__" in directories:
                 candidates.append(parent / "__pycache__")
                 directories.remove("__pycache__")
             if ".DS_Store" in files:
                 candidates.append(parent / ".DS_Store")
+            candidates.extend(
+                parent / item for item in files if item.endswith((".pyc", ".pyo"))
+            )
     return sorted(
         path for path in set(candidates) if path.exists() and not path.is_symlink()
     )

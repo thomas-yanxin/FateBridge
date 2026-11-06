@@ -20,12 +20,12 @@ from fatebridge.core.fengshui.models import DirectionsRequest, XuankongRequest
 from fatebridge.mcp_server import app
 from fatebridge.services.fengshui import calculate_directions
 from fatebridge.validation.geomagnetic import audit_noaa_c_vectors, audit_noaa_vectors
-from tests.fengshui.test_fengshui_surfaces import (
-    mcp_call,
-    rest_client,
+from tests.support.fengshui_transports import mcp_call
+from tests.support.mcp_result_assertions import (
     same_run_projected_response,
     without_transport,
 )
+from tests.support.transports import rest_client
 
 FOLDER = Path(__file__).parents[1] / "data/fengshui_geomagnetic_v1"
 DATA = (

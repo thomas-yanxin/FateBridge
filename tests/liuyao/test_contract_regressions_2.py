@@ -12,7 +12,7 @@ from tests.liuyao.test_liuyao_model_boundary import (
     SOURCE_CASES,
     assert_comparison,
 )
-from tests.liuyao.test_liuyao_transports import assert_same_run_receipt
+from tests.support.result_delivery import assert_same_run_receipt
 from tests.support.transports import business, rest
 
 

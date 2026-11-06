@@ -54,7 +54,6 @@ def test_conjunction_age_is_exact() -> None:
     contacts = payload["contacts"]
     assert contacts[0]["body"] == "Sun"
     assert contacts[0]["age"] == 3.0
-    # The per-year timeline tags age 3 with the Sun conjunction.
     assert _point_at(payload["points"], 3)["aspect_to"] == "Sun"
 
 
@@ -64,9 +63,7 @@ def test_conjunction_recurs_each_72_year_cycle() -> None:
     assert sun_ages == [3.0, 75.0]  # 3 and 3 + 72
 
 
-# --------------------------------------------------------------------------- #
 # End-to-end through FateBridge's own engine (real Koch cast).
-# --------------------------------------------------------------------------- #
 _BIRTH = dict(
     birth_year=2000,
     birth_month=12,

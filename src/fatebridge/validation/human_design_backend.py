@@ -15,11 +15,11 @@ from fatebridge.core.human_design_mechanics import (
     longitude_activation,
     opposite_activation,
 )
+from fatebridge.core.human_design_solar_root_validation import verify_solar_root_context
 from fatebridge.core.human_design_variables import variables_from_activations
-from fatebridge.validation.claims import _same_value
+from fatebridge.core.public_output import same_public_value as _same_value
 from fatebridge.validation.human_design_joint import verify_joint_snapshot
 from fatebridge.validation.human_design_provenance import verify_activation_provenance
-from fatebridge.validation.human_design_solar_root import verify_solar_root_context
 
 
 def verify_full_backend_report(payload: dict[str, Any]) -> dict[str, Any]:

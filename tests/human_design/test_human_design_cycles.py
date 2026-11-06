@@ -14,7 +14,6 @@ from fatebridge.core import human_design_cycles as cycles
 from fatebridge.core.human_design import chart_at_tt
 from fatebridge.core.human_design_cycles import calculate_cycle_context, cycle_summary
 from fatebridge.services.human_design import calculate_human_design
-from fatebridge.services.replay_metadata import digest
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
 from fatebridge.validation.human_design_cycle_reference import independent_cycle_checks
@@ -254,9 +253,6 @@ def test_rehashing_cannot_hide_forged_cycle_search_or_age_assignment(complete_ru
         context["ruleset"]["source_catalog_sha256"] = "0" * 64
     else:
         summary["sixth_line"]["current_phase"] = "after_50th_birthday"
-    run["run_metadata"]["business_output_sha256"] = digest(
-        {k: v for k, v in run.items() if k != "run_metadata"}
-    )
     assert verify_human_design_reading(run)["status"] == "rejected"
 
 

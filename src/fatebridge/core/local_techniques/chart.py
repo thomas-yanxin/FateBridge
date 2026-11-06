@@ -1,11 +1,7 @@
-"""
-Western / local pseudo-chart substrate for the FateBridge local-techniques package.
+"""Chart construction and shared clock inputs for local divination techniques.
 
-The shared engine every local-divination builder sits on: zodiac/house tables,
-chart-object and house-ring construction, coordinate/date parsing, the
-MetaphysicsSeed bridge, and snapshot helpers. Kept free of any single
-technique's logic so the per-technique modules import from here without cycling
-back through the package facade.
+Zodiac/house tables, chart objects, house rings, coordinate/date parsing and the
+MetaphysicsSeed bridge live here; reusable text rendering lives in snapshot.
 """
 
 from __future__ import annotations
@@ -36,6 +32,7 @@ from ..astro.birth import AstroBirthInfo, build_astro_birth_info
 from ..astro.chart import build_core_chart_payload
 from ..astro.geometry import angle_fraction, combine_longitudes
 from ..calendar import BaZiCalendar
+from .snapshot import join_lines
 
 SU28_NAMES = [name.removesuffix("宿") for name in SU28]
 
@@ -79,20 +76,6 @@ def _rotate_items(items: List[Any], shift: int) -> List[Any]:
     if normalized_shift == 0:
         return list(items)
     return list(items[normalized_shift:] + items[:normalized_shift])
-
-
-def _join_lines(lines: List[str]) -> str:
-    return "\n".join(line for line in lines if line).strip()
-
-
-def _render_snapshot_text(sections: List[Tuple[str, str]]) -> str:
-    blocks: List[str] = []
-    for title, body in sections:
-        blocks.append(f"[{title}]")
-        if body:
-            blocks.append(body.strip())
-        blocks.append("")
-    return "\n".join(blocks).strip()
 
 
 def _normalize_date_text(date_text: str) -> str:
@@ -759,7 +742,7 @@ def _render_qimen_palace_sections(qimen: Dict[str, Any]) -> List[Tuple[str, str]
         sections.append(
             (
                 palace.get("name", "宫位"),
-                _join_lines(
+                join_lines(
                     [
                         f"宫卦：{palace.get('trigram', '无')}",
                         content_line,

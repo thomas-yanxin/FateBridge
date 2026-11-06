@@ -30,7 +30,8 @@ from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.birth_input import create_person_info
 from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
 from scripts.ziwei.audit_ziwei_limits import _seed
-from tests.fixtures.mcp_receipt import assert_same_run_receipt, verified_inline_business
+from tests.fixtures.mcp_receipt import verified_inline_business
+from tests.fixtures.mcp_result_delivery import assert_same_run_receipt
 
 
 def test_printed_definitions_keep_unknowns_and_derived_check_denominators():
@@ -270,7 +271,6 @@ def test_actual_run_rejects_an_invented_applied_condition():
             path="ziwei_birth.ming_textual_properties.conditional_readings.qisha.condition_match",
             value=value,
             run_id=receipt["run_id"],
-            business_output_sha256=receipt["business_output_sha256"],
         )
 
     assert (

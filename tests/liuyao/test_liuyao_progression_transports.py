@@ -6,7 +6,7 @@ import pytest
 from jsonschema import Draft202012Validator
 
 from fatebridge.cli import run as cli_run
-from tests.liuyao.test_liuyao_transports import assert_same_run_receipt
+from tests.support.result_delivery import assert_same_run_receipt
 from tests.support.transports import SPECS, business
 from tests.support.transports import rest as rest
 from tests.support.transports import surface_calls

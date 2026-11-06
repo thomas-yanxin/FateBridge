@@ -8,7 +8,7 @@
 
 本实现用独立第三方 [pygeomag 1.1.0](https://github.com/boxpet/pygeomag/releases/tag/v1.1.0)计算，固定使用仓库中核对过的NOAA系数，不读取库的默认模型，不由模型生成地磁数值。NOAA不对第三方实现背书；官方C复算与外部测试值分别核验。
 
-每次启用该分支时，核对已安装发行版版本、包自报版本，以及 `__init__.py`、`geomag.py` 的SHA-256。期望值来自 `uv.lock` 锁定、校验完整散列的上游wheel，独立清单（本地数据：`../../../tests/data/fengshui_geomagnetic_v1/implementation-reference.json`）保留wheel地址与文件散列。实际版本写入 `model.implementation`，算法源码散列与核对范围写入 `model.implementation_identity`；全局 `run_metadata.runtime.dependencies.pygeomag` 也记录版本并参与环境指纹。不能把固定的“已验证版本”文字当作实际安装版本。
+每次启用该分支时，核对已安装发行版版本、包自报版本，以及 `__init__.py`、`geomag.py` 的SHA-256。期望值来自 `uv.lock` 锁定、校验完整散列的上游wheel，独立清单（本地数据：`../../../tests/data/fengshui_geomagnetic_v1/implementation-reference.json`）保留wheel地址与文件散列。实际版本写入 `model.implementation`，源码文件名称与核对范围写入 `model.implementation_identity`；全局 `run_metadata.runtime.dependencies.pygeomag` 也记录版本。源码散列只用于内部完整性校验。不能把固定的“已验证版本”文字当作实际安装版本。
 
 版本／源码不符、依赖或发行元数据缺失、源码文件无法读取时，不输出该模型结果；三端返回既有依赖故障合同。普通方位计算不因此启用地磁分支。当前支持可读取上述源码文件的常规wheel安装；此核对是发行版元数据与磁盘源码身份，**不证明进程内对象未被修改**，也不是防篡改认证。全局环境回执按不可变部署每进程缓存；部署变更需重启，不能用它承诺热更新期间的完整复算。
 
@@ -26,7 +26,7 @@
 
 ## 验收与可解释性
 
-所有场量、换算候选、原始输入、模型系数散列、来源及限制均在同一运行返回；`rulesets` / `rule_trace`增加独立地磁条目，不伪装为古典原文规则。只投影时优先保留完整 `layers.directions.geomagnetic_reference` 与原始 `bearing`。
+所有场量、换算候选、原始输入、模型系数版本、来源及限制均在同一运行返回；`rulesets` / `rule_trace`增加独立地磁条目，不伪装为古典原文规则。只投影时优先保留完整 `layers.directions.geomagnetic_reference` 与原始 `bearing`。
 
 12组官方简表的84个主场项按发布小数位吻合。系数包100组高精度表的700项中354项超出其最后一位半单位；最大约0.000719nT。NOAA当前官方C也产生相同差异，本实现与官方C另以明确的浮点容差核对。原表差异不删除，不改容差使其通过，不把官方C吻合改名为原表逐位吻合。工程记录和复算方法见[地磁合同](../../../docs/fengshui.md)。
 

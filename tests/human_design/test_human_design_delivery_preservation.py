@@ -7,7 +7,6 @@ from unittest.mock import patch
 
 import pytest
 
-from fatebridge.services.replay_metadata import digest
 from scripts.human_design.preserve_human_design_deliveries import preserve_delivery
 
 
@@ -15,7 +14,6 @@ def packet(tmp_path: Path, *, projected=False):
     business = {"type": "fixture_structure", "positions": [1, 2, 3]}
     metadata = {
         "run_id": "synthetic-preservation-fixture",
-        "business_output_sha256": digest(business),
     }
     payload = {
         **({"type": business["type"]} if projected else business),
@@ -28,7 +26,6 @@ def packet(tmp_path: Path, *, projected=False):
         "run_metadata": metadata,
         "result_delivery": {
             "file_path": str(original),
-            "sha256": hashlib.sha256(encoded.encode()).hexdigest(),
             "total_chars": len(encoded),
             "total_bytes": len(encoded.encode()),
         },
@@ -47,7 +44,7 @@ def test_atomic_preservation_survives_original_expiry_without_native_replay(tmp_
     ):
         second = preserve_delivery(tmp_path, p, 3, full_requested=True)
     assert first == second
-    assert first["full_business_hash_verified"] is True
+    assert first["unprojected_request_result"] is True
     assert first["model_visibility_certified"] is False
 
 
@@ -81,8 +78,9 @@ def test_projection_is_preserved_without_becoming_full_business_or_full_visibili
     p, _ = packet(tmp_path, projected=True)
     r = preserve_delivery(tmp_path, p, 2, full_requested=False)
     assert (
-        r["full_business_hash_verified"] is False
+        r["unprojected_request_result"] is False
         and r["model_visibility_certified"] is False
     )
-    with pytest.raises(ValueError):
-        preserve_delivery(tmp_path, p, 2, full_requested=True)
+    # The capture must supply the original request projection; the preserved
+    # bytes alone cannot establish whether fields were omitted by that request.
+    assert r["full_result_requested"] is False

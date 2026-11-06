@@ -80,7 +80,6 @@ def test_same_run_claims_keep_both_authors_and_reject_a_replaced_count():
             path=COMPARISON + ".targets.Sun.reduced_sum",
             value=value,
             run_id=meta["run_id"],
-            business_output_sha256=meta["business_output_sha256"],
         )
     ]
     assert (

@@ -15,9 +15,9 @@ from fatebridge.core.human_design import bodygraph
 from fatebridge.core.human_design_source_context import bind_source_context
 from fatebridge.services.knowledge import calculate_knowledge_read
 from fatebridge.utils.errors import EphemerisSourceError
-from tests.numerology.test_heluo_poem_transports import run_three
 from tests.support.transports import SPECS, business
 from tests.support.transports import rest as shared_rest
+from tests.support.transports import run_three
 
 ROOT = Path(__file__).resolve().parents[2]
 rest = shared_rest

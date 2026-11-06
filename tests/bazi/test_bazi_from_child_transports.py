@@ -108,7 +108,6 @@ def test_same_run_snapshot_and_claim_verification_cannot_promote_formation(rest)
         path="bazi_birth.structure_profile.from_child_reference.formation_status",
         value="not_adjudicated",
         run_id=run["run_id"],
-        business_output_sha256=run["business_output_sha256"],
     )
     assert (
         verify_calculation_claims(result, [claim])["status"]

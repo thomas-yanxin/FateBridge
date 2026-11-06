@@ -2,11 +2,10 @@
 
 import pytest
 
-from tests.numerology.test_heluo_poem_transports import run_three
 from tests.numerology.test_numerology_birth_fold import BASE, REFERENCE
 from tests.support.transports import SPECS, business, native
 from tests.support.transports import rest as shared_rest
-from tests.support.transports import surface_calls
+from tests.support.transports import run_three, surface_calls
 
 rest = shared_rest
 

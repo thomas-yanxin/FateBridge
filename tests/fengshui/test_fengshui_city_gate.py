@@ -15,11 +15,9 @@ from fatebridge.core.fengshui.city_gate_inputs import CityGateRequest
 from fatebridge.core.fengshui.models import AssessRequest
 from fatebridge.services.fengshui import calculate_xuankong_natal
 from fatebridge.validation.fengshui import audit_city_gate_reference
-from tests.fengshui.test_fengshui_surfaces import (
-    mcp_call,
-    rest_client,
-    without_transport,
-)
+from tests.support.fengshui_transports import mcp_call
+from tests.support.mcp_result_assertions import without_transport
+from tests.support.transports import rest_client
 
 FOLDER = Path(__file__).parents[1] / "data/fengshui_city_gate_v1"
 REFERENCE = json.loads((FOLDER / "reference.json").read_text())

@@ -244,7 +244,6 @@ def test_actual_birth_three_transports_keep_the_new_textual_conflict(
             )
             page = RESULT_STORE.verified_page(
                 ref["result_id"],
-                ref["sha256"],
                 reply["run_metadata"]["run_id"],
                 path=f"ziwei_birth.rule_trace.{index}.outputs.source_comparison.targeted_rereading",
             )

@@ -96,10 +96,6 @@ class LifeDimensionAnalysis:
             for key in DIMENSION_KEYS
         }
 
-    # ------------------------------------------------------------------
-    # internal helpers
-    # ------------------------------------------------------------------
-
     @staticmethod
     def _collect_ten_god_counts(
         *,

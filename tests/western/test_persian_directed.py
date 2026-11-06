@@ -45,9 +45,7 @@ def _structured(hits: list[dict]) -> list[tuple]:
     return [(h["age"], h["promittor"], h["aspect"], h["significator"]) for h in hits]
 
 
-# --------------------------------------------------------------------------- #
 # Layer 1 — unchanged historical hit values plus independent exact chronology.
-# --------------------------------------------------------------------------- #
 def test_historical_values_and_independent_decimal_chronology() -> None:
     chart = _chart()
     # Original iteration order resolves only genuine equal, unrounded ages.
@@ -118,9 +116,7 @@ def test_dates_match_horosa_oracle() -> None:
     assert payload["hits"][1]["date"] == "1999-05-09"  # 1.21 Moon 60° JupiterVenus
 
 
-# --------------------------------------------------------------------------- #
 # Layer 2 — end-to-end through FateBridge's own engine + subset cross-check.
-# --------------------------------------------------------------------------- #
 _BIRTH_1998 = dict(
     birth_year=1998,
     birth_month=2,

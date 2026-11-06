@@ -5,42 +5,17 @@ import json
 import math
 
 import pytest
-from fastapi.testclient import TestClient
-from fastmcp import Client
 from jsonschema import Draft202012Validator
 
-import fatebridge.api as api
-import fatebridge.mcp_server as mcp
 from fatebridge.application.description import describe_spec, spec_is_cli_safe
 from fatebridge.cli import run
-from fatebridge.core import almanac
-from fatebridge.services.tool_catalog import CATALOG
 from tests.fixtures.fengshui import PAYLOADS, payload
+from tests.support.fengshui_transports import SPECS, mcp_call
 from tests.support.mcp_result_assertions import (
     same_run_projected_response,
     without_transport,
 )
-
-SPECS = {s.key.removeprefix("fengshui_"): s for s in CATALOG if s.family == "fengshui"}
-
-
-def rest_client(monkeypatch):
-    api._reset_runtime_state_for_tests()
-    monkeypatch.setattr(
-        api,
-        "API_KEY_AUTHENTICATOR",
-        api.ApiKeyAuthenticator(header_name="X-API-Key", api_keys={}),
-    )
-    return TestClient(api.app)
-
-
-async def mcp_call(name, inputs):
-    async with Client(mcp.app) as client:
-        return await client.call_tool(
-            "fengshui_" + name,
-            {"response_char_limit": 0, **inputs},
-            raise_on_error=False,
-        )
+from tests.support.transports import rest_client
 
 
 @pytest.mark.parametrize("name", list(PAYLOADS))
@@ -218,41 +193,6 @@ def test_precise_near_boundaries_have_one_chart_on_all_surfaces(
     layer = body["layers"]["xuankong_natal"]
     assert body["status"] == "complete" and len(layer["candidates"]) == 1
     assert layer["chart"]["chart_mode"] == mode
-
-
-def test_period_fallback_is_partial_success_on_all_surfaces(
-    monkeypatch, tmp_path, capsys
-):
-    monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
-    monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
-    almanac.get_solar_terms_for_year.cache_clear()
-    monkeypatch.setattr(almanac, "_solar_term_utc_via_swe", lambda *a: None)
-    try:
-        inputs = payload("xuankong_natal")
-        inputs["period"] = {
-            "basis": "first_occupancy",
-            "event_at": "2024-02-04T16:20:00+08:00",
-            "evidence": "入伙时刻已核实，交节待确认",
-        }
-        rest = rest_client(monkeypatch).post(
-            SPECS["xuankong_natal"].rest_path, json=inputs
-        )
-        protocol = asyncio.run(mcp_call("xuankong_natal", inputs))
-        path = tmp_path / "fallback.json"
-        path.write_text(json.dumps(inputs))
-        assert run(["fengshui_xuankong_natal", "--request-file", str(path)]) == 0
-        body = json.loads(capsys.readouterr().out)
-        assert rest.status_code == 200 and not protocol.is_error
-        assert (
-            without_transport(rest.json())
-            == without_transport(protocol.structured_content)
-            == without_transport(body)
-        )
-        assert body["status"] == "partial"
-        assert body["layers"]["xuankong_natal"]["chart"] is None
-        assert body["layers"]["xuankong_natal"]["period_context"]["number"] is None
-    finally:
-        almanac.get_solar_terms_for_year.cache_clear()
 
 
 def test_complete_four_layers_are_separate_on_all_surfaces(

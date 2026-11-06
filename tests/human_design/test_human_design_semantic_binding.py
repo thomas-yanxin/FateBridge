@@ -12,7 +12,7 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.services.replay_metadata import digest
+from fatebridge.utils.json_digest import digest
 from scripts.human_design.audit_human_design_semantics import (
     DATASET_SHA256,
     audit_review,
@@ -65,16 +65,13 @@ def records():
     full = {"profile": "1/3", "sample_count": 1}
     full["run_metadata"] = {
         "run_id": "same-run",
-        "business_output_sha256": digest(full),
     }
     text = json.dumps(full, ensure_ascii=False, separators=(",", ":"))
-    sha = hashlib.sha256(text.encode()).hexdigest()
     packet = {
         "profile": "1/3",
         "run_metadata": full["run_metadata"],
         "result_delivery": {
             "result_id": "observed-result",
-            "sha256": sha,
             "total_chars": len(text),
             "total_bytes": len(text.encode()),
         },
@@ -88,10 +85,10 @@ def records():
     ]
     for start, end in [(0, 20), (20, len(text))]:
         page = {
+            "result_id": "observed-result",
             "offset": start,
             "text": text[start:end],
             "next_offset": end if end < len(text) else None,
-            "sha256": sha,
         }
         rows.append(
             {
@@ -114,19 +111,17 @@ def test_only_complete_observed_same_run_pages_provide_full_business_fields():
 
 
 @pytest.mark.parametrize(
-    "mutation", ["bad_hash", "bad_offset", "bad_next", "different_page", "changed_body"]
+    "mutation", ["bad_length", "bad_offset", "bad_next", "different_page"]
 )
 def test_changed_observed_pages_are_rejected_without_recalculation(mutation):
     rows, _ = records()
     page = json.loads(rows[1]["result"]["contents"][0]["text"])
-    if mutation == "bad_hash":
-        page["sha256"] = "0" * 64
+    if mutation == "bad_length":
+        rows[0]["result"]["structured_content"]["result_delivery"]["total_bytes"] += 1
     elif mutation == "bad_offset":
         page["offset"] = 1
     elif mutation == "bad_next":
         page["next_offset"] = 19
-    elif mutation == "changed_body":
-        page["text"] = page["text"].replace('"1/3"', '"2/4"')
     elif mutation == "different_page":
         duplicate = copy.deepcopy(rows[1])
         other = {**page, "text": "changed"}
@@ -135,6 +130,13 @@ def test_changed_observed_pages_are_rejected_without_recalculation(mutation):
     rows[1]["result"]["contents"][0]["text"] = json.dumps(page)
     with pytest.raises(ValueError):
         observed_sources(rows)
+
+
+def test_capture_of_full_pages_does_not_authenticate_their_original_content():
+    rows, full = records()
+    source = observed_sources(rows)[0]
+    assert source["complete"] == full
+    assert source["original_content_independently_authenticated"] is False
 
 
 def test_typed_field_quotes_cannot_substitute_bool_or_another_run():
@@ -186,7 +188,6 @@ def test_actual_file_stdout_and_projected_deliveries_do_not_become_full_business
     text = json.dumps(projected, ensure_ascii=False, separators=(",", ":"))
     packet = rows[0]["result"]["structured_content"]
     packet["result_delivery"].update(
-        sha256=hashlib.sha256(text.encode()).hexdigest(),
         total_chars=len(text),
         total_bytes=len(text.encode()),
         file_path="/actual-delivery.json",
@@ -206,9 +207,15 @@ def test_actual_file_stdout_and_projected_deliveries_do_not_become_full_business
     assert sources[0]["delivered"] == projected
     assert "complete" not in sources[0]
     assert "delivered" not in observed_sources(rows[:1], [])[0]
+    # Capture records establish requested projection, not independent content
+    # authenticity; a false full-request declaration cannot authenticate bytes.
     rows[0]["arguments"] = {"fields": None}
-    with pytest.raises(ValueError):
-        observed_sources(rows[:1], [event])
+    assert (
+        observed_sources(rows[:1], [event])[0][
+            "original_content_independently_authenticated"
+        ]
+        is False
+    )
 
 
 def test_changed_or_wrong_file_stdout_is_never_used_as_evidence():

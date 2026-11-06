@@ -8743,7 +8743,7 @@
   "method_contracts": [
     {
       "comparison_requirements": [
-        "相同方法合同、实现/数据指纹、选项与实际计算层"
+        "相同方法合同、实现与数据版本、选项及实际计算层"
       ],
       "dependencies": [
         "validated_request"
@@ -8794,7 +8794,7 @@
     },
     {
       "comparison_requirements": [
-        "相同方法合同、实现/数据指纹、选项与实际计算层"
+        "相同方法合同、实现与数据版本、选项及实际计算层"
       ],
       "dependencies": [
         "validated_request"
@@ -8843,7 +8843,7 @@
     },
     {
       "comparison_requirements": [
-        "相同方法合同、实现/数据指纹、选项与实际计算层"
+        "相同方法合同、实现与数据版本、选项及实际计算层"
       ],
       "dependencies": [
         "validated_request"
@@ -8894,7 +8894,7 @@
     },
     {
       "comparison_requirements": [
-        "相同方法合同、实现/数据指纹、选项与实际计算层"
+        "相同方法合同、实现与数据版本、选项及实际计算层"
       ],
       "dependencies": [
         "validated_request"

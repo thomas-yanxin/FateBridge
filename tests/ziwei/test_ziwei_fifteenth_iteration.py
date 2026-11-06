@@ -22,7 +22,8 @@ from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.birth_input import create_person_info
 from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
 from scripts.ziwei.audit_ziwei_limits import _seed
-from tests.fixtures.mcp_receipt import assert_same_run_receipt, verified_inline_business
+from tests.fixtures.mcp_receipt import verified_inline_business
+from tests.fixtures.mcp_result_delivery import assert_same_run_receipt
 
 BIRTH = dict(
     birth_year=1984,
@@ -169,7 +170,6 @@ def test_same_run_null_facts_reject_invented_decade_palace_and_transformations()
             path="ziwei_horoscope.scopes.0." + path,
             value=value,
             run_id=receipt["run_id"],
-            business_output_sha256=receipt["business_output_sha256"],
         )
 
     valid = [

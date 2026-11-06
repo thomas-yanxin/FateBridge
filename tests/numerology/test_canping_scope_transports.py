@@ -6,11 +6,11 @@ import pytest
 
 from tests.numerology.test_canping_scope_rendering import REFERENCE, SPEC, _synchronize
 from tests.numerology.test_canping_scope_rendering import generated as shared_generated
-from tests.numerology.test_heluo_poem_transports import run_three
 from tests.support.canping_output_injection import (
     inject_canping_output as return_frozen_output,
 )
 from tests.support.transports import rest as shared_rest
+from tests.support.transports import run_three
 
 rest = shared_rest
 generated = shared_generated

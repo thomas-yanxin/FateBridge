@@ -77,4 +77,4 @@ uv run --locked --extra dev python -m scripts.evaluation.audit_mingli_evaluation
 
 审阅文件使用 `schema_version=1`、`reviewer_role` 和 `cases`；每例记录 `case_id`、`evaluation_layer`、`overall_status`、回答／事件／捕获日志的 SHA-256，以及 `checks`。每项保留原 `criterion_index`／`criterion`，填写 `pass`、`fail` 或 `unverified`、原文 `answer_quote` 与 Unicode 码点起止偏移 `quote_start`／`quote_end`、理由 `rationale`、本例实际证据路径 `actual_evidence_paths` 和实际 `actual_run_ids`。忠实度判据必须连接模型实际调用的 run，不能填准备阶段的 run。
 
-审计器重放原机械评分、核对捕获链、引文与文件散列、原判据和完整分母；有缺项或不通过项时不宣称整批通过。若另行归档服务器实际交付文件，`delivery-archive.json` 必须保留原路径、run、文件散列与原回执的 payload 散列，核验时仍区分已归档数据与模型实际可见字段。审计器不自动证明语义判断正确；编码助手辅助复核与外部人工专家审阅必须分别标注。
+审计器重放原机械评分、核对捕获链、引文与文件散列、原判据和完整分母；有缺项或不通过项时不宣称整批通过。若另行归档服务器实际交付文件，`delivery-archive.json` 必须保留原路径、run、文件散列及交付长度；核对归档内容与原回执中可见字段的逐值一致性，核验时仍区分已归档数据与模型实际可见字段。审计器不自动证明语义判断正确；编码助手辅助复核与外部人工专家审阅必须分别标注。

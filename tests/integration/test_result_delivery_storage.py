@@ -1,6 +1,5 @@
 """Indexed artifact delivery, bounded disk usage and process coordination."""
 
-import hashlib
 import json
 import multiprocessing
 import os
@@ -25,7 +24,7 @@ def _reconstruct(store, result_id, path=None):
         if offset is None:
             break
     text = "".join(parts)
-    assert hashlib.sha256(text.encode("utf-8")).hexdigest() == page["sha256"]
+    assert len(text) == page["total_chars"]
     return json.loads(text)
 
 
@@ -102,7 +101,7 @@ def test_repeated_pages_and_scope_do_not_load_serialize_or_hash_the_result(
         offset = 0
         while True:
             page = store.page(ref["result_id"], offset, path, allowed_tools={"probe"})
-            assert page["sha256"]
+            assert "sha256" not in page
             offset = page["next_offset"]
             if offset is None:
                 break

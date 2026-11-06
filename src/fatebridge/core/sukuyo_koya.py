@@ -126,7 +126,7 @@ def printed_reference_lines(reference: dict[str, Any]) -> list[str]:
         f"此格原图第{locator['frame']}画面{locator['page_side']}页，"
         f"自右第{locator['day_column_from_right']}日列、自上第{locator['month_slot_from_top']}月位；"
         "原印月序二月至十二月后列正月。印字不覆盖本次主宿、闰月／半日候选或三九结果。",
-        f"原图指纹{locator['image_sha256']}，来源{locator['permalink']}；"
+        f"原图来源{locator['permalink']}；"
         "本轮读录的是360个印刷正文格，旁批及红字未并入正文。序年为享保二十一年／1736，"
         "不据此认证实物印刷年或古本传承。序文两次释读有关键疑字与异读，未接纳为完整操作规则。",
         "全表两份模型读数358格相同，八月初三与三十日两格分别读亢／氐，"

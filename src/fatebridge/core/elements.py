@@ -69,12 +69,10 @@ class ElementAnalysis:
         """Count the occurrence of each element in the chart."""
         element_count: DefaultDict[Element, float] = defaultdict(float)
 
-        # Count stem elements
         for stem, branch in pillars.values():
             stem_element, _ = STEM_ELEMENTS[stem]
             element_count[stem_element] += 1
 
-            # Count main branch element
             branch_element, _ = BRANCH_ELEMENTS[branch]
             element_count[branch_element] += 1
 
@@ -275,7 +273,6 @@ class ElementAnalysis:
             },
         }
 
-        # Add warning if validation fails
         if not is_valid:
             result["warning"] = (
                 f"百分比总和异常: {result['percentage_validation']['total']}%"

@@ -243,7 +243,6 @@ def build_ziwei_chart(
         ("顺行" if daxian_forward else "逆行") if gender_known else "未定（缺少性别）"
     )
 
-    # --- Standard Zi Wei Star Placement ---
     # 1. Resolve Zi Wei star position based on Wu Xing Ju and Lunar Day
     ju_num = wuxing_ju["number"]
     # Formula: find X such that ju_num * X >= lunar_day, Y = ju_num * X - lunar_day
@@ -257,7 +256,6 @@ def build_ziwei_chart(
     # 2. Derive Tian Fu star position (mirrored from Zi Wei)
     tianfu_index = (12 - ziwei_index) % 12
 
-    # 3. Place stars
     # Zi Wei group (Counter-clockwise relative to Zi Wei)
     ziwei_group = {
         "紫微": 0,
@@ -301,7 +299,6 @@ def build_ziwei_chart(
         }
         palaces.append(palace)
 
-    # Place Zi Wei group
     for star, offset in ziwei_group.items():
         idx = (ziwei_index + offset) % 12
         # Current palaces list is ordered by ZIWEI_PALACE_SEQUENCE starting from Ming Gong
@@ -311,7 +308,6 @@ def build_ziwei_chart(
                 p["stars"].append(star)
                 break
 
-    # Place Tian Fu group
     for star, offset in tianfu_group.items():
         idx = (tianfu_index + offset) % 12
         for p in palaces:
@@ -319,7 +315,6 @@ def build_ziwei_chart(
                 p["stars"].append(star)
                 break
 
-    # 4. Place Auxiliary Stars (Fixed Rules)
     # ZIWEI_BRANCH_SEQUENCE indexing: 寅(0), 卯(1), 辰(2), 巳(3), 午(4), 未(5),
     # 申(6), 酉(7), 戌(8), 亥(9), 子(10), 丑(11)。
     # 月系（生月起）：左辅从辰顺、右弼从戌逆。

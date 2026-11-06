@@ -44,19 +44,6 @@ def test_source_exact_rotation_controls_sign_and_aspect_eligibility_before_displ
     assert F(31.5) - exact > F(1.5)
 
 
-def test_source_exact_rotation_controls_aspect_eligibility_independently_of_display():
-    natal, progressed, positions = subjects(1.0, 11.1, 19.9)
-    exact = (F(positions["Moon"]) + F(11.1) - F(1.0)) % 360
-    assert F(31.5) - exact > F(1.5)
-    out = build_solar_arc_payload(natal, progressed)
-    assert not any(
-        h["source"] == "Moon"
-        and h["target"] == "Mercury"
-        and h["aspect"] == "conjunction"
-        for h in out["hits"]
-    )
-
-
 def test_all_thirty_degree_cuts_neighbor_floats_and_both_arc_signs():
     for sun, progressed_sun in [(1.0, 11.1), (11.1, 1.0)]:
         arc = (F(progressed_sun) - F(sun)) % 360

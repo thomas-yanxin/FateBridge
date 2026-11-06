@@ -23,6 +23,7 @@ from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
 from scripts.ziwei.audit_ziwei_limits import _seed
 from tests.fixtures.mcp_receipt import verified_inline_business
+from tests.fixtures.mcp_result_delivery import assert_same_run_receipt
 
 
 def test_independent_printed_examples_are_distinct_from_derived_coverage():
@@ -279,7 +280,6 @@ def test_same_run_claim_distinguishes_unknown_full_judgment_from_true():
             path="ziwei_birth.ming_structural_conditions.records.0.full_traditional_judgment",
             value=value,
             run_id=m["run_id"],
-            business_output_sha256=m["business_output_sha256"],
         )
 
     assert (
@@ -294,8 +294,6 @@ def test_complete_conditions_and_witnesses_survive_same_run_pagination(
     profile, monkeypatch, capsys
 ):
     import hashlib
-
-    from tests.fixtures.mcp_receipt import assert_same_run_receipt
 
     api._reset_runtime_state_for_tests()
     monkeypatch.setattr(

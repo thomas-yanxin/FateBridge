@@ -133,7 +133,7 @@ def verify_birth_clock(payload: dict[str, Any]) -> None:
         ):
             raise ValueError("闰秒出生缺少冻结日历见证")
         return
-    from fatebridge.validation.claims import _same_value
+    from fatebridge.core.public_output import same_public_value as _same_value
 
     clock = resolve_birth_clock(**proof["input"])
     if (

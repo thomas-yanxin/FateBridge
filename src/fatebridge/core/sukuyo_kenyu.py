@@ -113,6 +113,6 @@ def printed_clock_reading_lines(reference: dict[str, Any]) -> list[str]:
         "并称牛宿配每日午时、遇牛越至女宿。这些来源主张未代入本次算法，尚未复原整套轮图或定闰小月优先。"
         "《大日經疏演奧鈔》T2216_.59.0058a26-27另引晝夜八時名目如何之问；"
         "其后每日轮曜说明不是该日内序列的逐时答案。"
-        f"具名印本来源{reference['source_url']}，帧17指纹{reference['images'][1]['sha256']}；"
+        f"具名印本来源{reference['source_url']}，所选帧17；"
         "它补入一种可核对的后出解释，没有认证为T1299唯一时制、现代日界或现实效力。",
     ]

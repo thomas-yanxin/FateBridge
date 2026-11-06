@@ -38,7 +38,6 @@ def reference():
                 "run_metadata": {
                     "run_id": "reference-only",
                     "tool_name": "heluo",
-                    "business_output_sha256": "0" * 64,
                 }
             },
         },
@@ -71,10 +70,9 @@ def worksheet():
     }
 
 
-def test_reference_integrity_does_not_claim_original_business_digest_recomputed():
+def test_reference_checks_do_not_claim_original_content_authentication():
     record, artifact, case = reference()
-    # A source digest is retained as an opaque identity. It is not the hash of
-    # the snapshot-less structured reply, and this check grants no semantic pass.
+    # Run identity and request checks grant no semantic acceptance.
     assert check_reference(record, artifact, case) == []
     assert check_pending_worksheet(worksheet(), CASES) == []
 
@@ -88,7 +86,6 @@ def test_reference_integrity_does_not_claim_original_business_digest_recomputed(
         ("tool", "reference_tool_identity_mismatch"),
         ("error", "reference_not_successful"),
         ("snapshot", "unexpected_snapshot_text"),
-        ("digest", "missing_original_business_identity"),
     ],
 )
 def test_tampered_reference_cannot_pass(change, expected):
@@ -105,8 +102,6 @@ def test_tampered_reference_cannot_pass(change, expected):
         artifact["is_error"] = True
     elif change == "snapshot":
         artifact["structured_content"]["snapshot_text"] = "unexpected"
-    else:
-        artifact["structured_content"]["run_metadata"].pop("business_output_sha256")
     assert expected in check_reference(record, artifact, case)
 
 

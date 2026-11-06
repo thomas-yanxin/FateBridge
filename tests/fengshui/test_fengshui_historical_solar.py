@@ -24,7 +24,8 @@ from fatebridge.core.fengshui.calendar import (
 from fatebridge.core.moshier_solar import MODEL_ID as MOSHIER_MODEL
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.utils.errors import EphemerisSourceError
-from tests.fengshui.test_fengshui_surfaces import rest_client, without_transport
+from tests.support.mcp_result_assertions import without_transport
+from tests.support.transports import rest_client
 
 ROOT = Path(__file__).parents[2]
 FOLDER = ROOT / "tests/data/fengshui_historical_solar_v1"

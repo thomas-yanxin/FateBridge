@@ -2,7 +2,6 @@
 
 import asyncio
 import copy
-import hashlib
 import json
 import os
 from pathlib import Path
@@ -14,12 +13,13 @@ from fastmcp import Client
 import fatebridge.api as api
 from fatebridge.application import result_delivery as delivery
 from fatebridge.application.examples import example_input, suggested_fields
+from fatebridge.application.response_delivery import deliver_response
 from fatebridge.cli import run
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.errors import ParameterError
 from fatebridge.utils.private_files import ensure_private_directory, open_private_file
-from tests.fixtures.mcp_receipt import assert_same_run_receipt
+from tests.fixtures.mcp_result_delivery import assert_same_run_receipt
 from tests.support.result_delivery import reconstruct, store
 
 
@@ -53,13 +53,82 @@ def test_bounded_delivery_preserves_all_values_and_original_receipt(store, compa
     # These helpers verify POSIX ownership/mode or the Windows owner-only ACL.
     ensure_private_directory(store.directory)
     os.close(open_private_file(Path(ref["file_path"]), os.O_RDONLY))
-    assert delivery.bound_response(original, 0) is original
+    assert delivery.bound_response(original, 0) == original
 
 
 def test_small_payload_is_not_rewritten_or_stored(store):
     original = {"summary": "small"}
-    assert delivery.bound_response(original, 8192) is original
+    assert delivery.bound_response(original, 8192) == original
     assert not store.directory.exists()
+
+
+@pytest.mark.parametrize("compact", [False, True])
+def test_response_delivery_stores_only_the_exact_requested_facts(store, compact):
+    original = {
+        "selected": {"kept": '中文"换行\n' * 3000, "omitted": "not selected"},
+        "unselected": "not selected",
+        "snapshot_text": "not requested",
+        "run_metadata": {"run_id": "selected-run", "tool_name": "gua_lookup"},
+    }
+    before = copy.deepcopy(original)
+    result = deliver_response(
+        original,
+        fields=["selected.kept", "snapshot_text"],
+        strict_fields=True,
+        include_snapshot_text=False,
+        response_char_limit=4096,
+        compact=compact,
+    )
+    text = json.dumps(
+        result,
+        ensure_ascii=False,
+        **({"separators": (",", ":")} if compact else {"indent": 2}),
+    )
+    assert len(text) <= 4096
+    assert result["run_metadata"] == before["run_metadata"]
+    reference = result["result_delivery"]
+    assert reference["deferred_fields"] == ["selected"]
+    assert reconstruct(store, reference["result_id"]) == {
+        "selected": {"kept": before["selected"]["kept"]},
+        "run_metadata": before["run_metadata"],
+    }
+    assert original == before
+
+
+def test_response_delivery_keeps_errors_out_of_projection_and_storage(store):
+    original = {
+        "error": "unavailable" * 1000,
+        "error_code": "source_unavailable",
+        "retryable": False,
+        "issues": [{"path": "source", "code": "missing"}],
+        "trace_id": "request-trace",
+    }
+    result = deliver_response(
+        original,
+        fields=["missing"],
+        strict_fields=True,
+        response_char_limit=4096,
+        failed=True,
+    )
+    assert result == original
+    assert not store.directory.exists()
+
+
+def test_invalid_strict_projection_does_not_publish_a_result(store):
+    original = large_payload()
+    before = copy.deepcopy(original)
+    with pytest.raises(ParameterError) as caught:
+        deliver_response(
+            original,
+            fields=["time_lords.missing"],
+            strict_fields=True,
+            response_char_limit=4096,
+        )
+    assert caught.value.issues == [
+        {"path": "time_lords.missing", "code": "unknown_projection_path"}
+    ]
+    assert not store.directory.exists()
+    assert original == before
 
 
 @pytest.mark.parametrize("compact", [False, True])
@@ -102,12 +171,8 @@ def test_supplementary_receipt_details_do_not_displace_complete_business(store):
         "run_metadata": {
             "run_id": "same-run",
             "tool_name": "taiyi",
-            "business_output_sha256": "b" * 64,
-            "input_sha256": "c" * 64,
-            "contract_sha256": "d" * 64,
             "runtime": {
-                "environment_sha256": "e" * 64,
-                "ephemeris": {"files": {"data.se1": "a" * 64}, "sha256": "f" * 64},
+                "ephemeris": {"files": ["data.se1"]},
                 "details": "runtime" * 100,
             },
             "provenance": {"source": ["source" * 150]},
@@ -124,7 +189,7 @@ def test_supplementary_receipt_details_do_not_displace_complete_business(store):
         "run_metadata.provenance",
         "run_metadata.determinism",
     ]
-    assert result["run_metadata"]["business_output_sha256"] == "b" * 64
+    assert "business_output_sha256" not in result["run_metadata"]
     assert result["run_metadata"]["runtime"]["ephemeris_files_count"] == 1
     restored = copy.deepcopy(result["run_metadata"])
     for path in ref["deferred_fields"]:
@@ -135,10 +200,8 @@ def test_supplementary_receipt_details_do_not_displace_complete_business(store):
 
 
 def test_receipt_fields_stay_inline_when_the_full_reference_fits(store):
-    files = {f"reference-{i}.se1": "a" * 64 for i in range(120)}
-    inventory_hash = hashlib.sha256(
-        json.dumps(files, sort_keys=True, separators=(",", ":")).encode()
-    ).hexdigest()
+    files = [f"reference-{i}-{'source_' * 12}.se1" for i in range(120)]
+
     original = {
         "analysis": {"facts": ["actual calculation"]},
         "run_metadata": {
@@ -147,8 +210,7 @@ def test_receipt_fields_stay_inline_when_the_full_reference_fits(store):
             "provenance": {"source": "keep this exact source"},
             "determinism": {"scope": "keep this exact scope"},
             "runtime": {
-                "environment_sha256": "b" * 64,
-                "ephemeris": {"files": files, "sha256": inventory_hash},
+                "ephemeris": {"files": files},
             },
         },
     }
@@ -166,12 +228,8 @@ def test_receipt_fields_stay_inline_when_the_full_reference_fits(store):
 
 
 def test_duplicate_locators_do_not_displace_complete_business_facts(store):
-    files = {f"reference-{i}.se1": "a" * 64 for i in range(120)}
-    digest = hashlib.sha256(
-        json.dumps(
-            files, ensure_ascii=False, sort_keys=True, separators=(",", ":")
-        ).encode()
-    ).hexdigest()
+    files = [f"reference-{i}-{'source_' * 12}.se1" for i in range(120)]
+
     original = {
         "analysis_context": {"clock": "one run"},
         "ziwei_birth": {"all_facts": ""},
@@ -180,8 +238,7 @@ def test_duplicate_locators_do_not_displace_complete_business_facts(store):
             "tool_name": "ziwei_birth",
             "provenance": {"record": "p" * 500},
             "runtime": {
-                "environment_sha256": "b" * 64,
-                "ephemeris": {"files": files, "sha256": digest},
+                "ephemeris": {"files": files},
             },
         },
     }
@@ -201,7 +258,7 @@ def test_duplicate_locators_do_not_displace_complete_business_facts(store):
     assert shaped["ziwei_birth"] == original["ziwei_birth"]
     assert shaped["analysis_context"] == original["analysis_context"]
     manifest = store.manifest(ref["result_id"])
-    assert manifest["sha256"] == ref["sha256"]
+    assert manifest["total_chars"] == ref["total_chars"]
     omitted = ("available_fields", "total_bytes", "page_chars", "rest_manifest_path")
     assert all(k not in ref and k in manifest for k in omitted)
     assert ref["file_path"] == manifest["file_path"]
@@ -233,10 +290,10 @@ def test_manifest_locator_preserves_sources_before_deferring_receipt_facts(
             "provenance": {"source": "source" * 120},
             "determinism": {"scope": "same exact implementation"},
             "runtime": {
-                "environment_sha256": "e" * 64,
                 "ephemeris": {
-                    "files": {str(i): "a" * 64 for i in range(100)},
-                    "sha256": "f" * 64,
+                    "files": [
+                        f"reference-{i}-{'source_' * 12}.se1" for i in range(100)
+                    ],
                 },
             },
         },
@@ -276,7 +333,7 @@ def test_manifest_locator_preserves_sources_before_deferring_receipt_facts(
         shaped["run_metadata"]["determinism"] == before["run_metadata"]["determinism"]
     )
     manifest = store.manifest(ref["result_id"])
-    assert manifest["sha256"] == ref["sha256"]
+    assert manifest["total_chars"] == ref["total_chars"]
     assert Path(manifest["file_path"]).exists()
     assert (
         json.loads(Path(manifest["file_path"]).read_text())[
@@ -396,16 +453,11 @@ def test_real_western_exact_time_and_delivery_match_all_transports(
             assert (
                 len(restored["ephemeris"]["files"]) == runtime["ephemeris_files_count"]
             )
-            assert (
-                restored["ephemeris"]["sha256"] == runtime["ephemeris_inventory_sha256"]
-            )
             inline_metadata["runtime"] = restored
         evidence = inline_metadata.get("calculation_evidence")
         if evidence and "delivery_path" in evidence:
             restored = reconstruct(store, ref["result_id"], evidence["delivery_path"])
-            from fatebridge.utils.json_digest import digest
-
-            assert digest(restored) == evidence["sha256"]
+            assert restored["coverage"] == evidence["coverage"]
             inline_metadata["calculation_evidence"] = restored
         assert original["run_metadata"] == inline_metadata
         full.append({k: v for k, v in original.items() if k != "run_metadata"})

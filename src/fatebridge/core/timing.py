@@ -458,14 +458,12 @@ class TimingAnalysis:
         else:
             direction = -1  # 逆行
 
-        # 获取月柱干支的索引
         month_stem_index = HEAVENLY_STEMS.index(month_pillar_stem)
         month_branch_index = EARTHLY_BRANCHES.index(month_pillar_branch)
 
         dayun_sequence = []
 
         for period_index in range(periods):
-            # 计算当前大运的干支索引
             current_stem_index = (
                 month_stem_index + direction * (period_index + 1)
             ) % 10
@@ -528,7 +526,6 @@ class TimingAnalysis:
         liunian_stem = HEAVENLY_STEMS[stem_index]
         liunian_branch = EARTHLY_BRANCHES[branch_index]
 
-        # 获取天干五行
         stem_element, stem_polarity = STEM_ELEMENTS[liunian_stem]
 
         return {
@@ -872,7 +869,6 @@ class TimingAnalysis:
         Returns:
             流月详细分析结果
         """
-        # 获取基础流月信息
         if liuyue_info is None:
             liuyue_info = TimingAnalysis.calculate_liuyue(
                 target_year,
@@ -882,24 +878,19 @@ class TimingAnalysis:
                 target_date=target_date,
             )
 
-        # 获取日主
         if day_stem is None:
             day_stem = birth_pillars["day"][0]
 
-        # 分析流月天干与日主的十神关系
         stem_shishen = get_shishen(day_stem, liuyue_info["stem"])
 
-        # 分析流月与命局的冲合关系
         branch_relations = TimingAnalysis._collect_branch_relations(
             liuyue_info["branch"], birth_pillars, "流月"
         )
 
-        # 分析吉凶趋势
         fortune_analysis = TimingAnalysis._analyze_liuyue_fortune(
             stem_shishen, branch_relations, liuyue_info, scope_label="本月"
         )
 
-        # 生成运势建议
         suggestions = TimingAnalysis._generate_liuyue_suggestions(
             stem_shishen, branch_relations, fortune_analysis, scope_label="本月"
         )

@@ -19,7 +19,6 @@ from fatebridge.core.human_design_circuitry import (
 )
 from fatebridge.core.human_design_evidence import circuitry_reading, source_reference
 from fatebridge.core.human_design_mechanics import CHANNELS
-from fatebridge.services.replay_metadata import digest
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
 from tests.support.ephemeris_context import moshier_ephemeris
@@ -307,7 +306,4 @@ def test_rehashed_group_claims_must_match_actual_structure(integrated_run, bad):
         result["interpretation"][
             "circuitry_meaning"
         ] = "整合通道不属于任何群，因此从个体群全部扣除。"
-    result["run_metadata"]["business_output_sha256"] = digest(
-        {k: v for k, v in result.items() if k != "run_metadata"}
-    )
     assert verify_human_design_reading(result)["status"] == "rejected"

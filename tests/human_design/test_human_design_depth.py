@@ -20,7 +20,6 @@ from fatebridge.core.human_design_depth import (
 )
 from fatebridge.core.human_design_evidence import source_activation_impacts
 from fatebridge.core.human_design_time import sun_at_tt, utc_from_tt
-from fatebridge.services.replay_metadata import digest
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
 
@@ -372,9 +371,6 @@ def test_false_reading_or_internally_inconsistent_calculation_cannot_pass_even_a
         changed["variables"]["subdivision_accuracy_certified"] = True
     else:
         changed["activations"]["personality"][0]["gate"] = 1
-    changed["run_metadata"]["business_output_sha256"] = digest(
-        {k: v for k, v in changed.items() if k != "run_metadata"}
-    )
     assert verify_human_design_reading(changed)["status"] == "rejected"
 
 

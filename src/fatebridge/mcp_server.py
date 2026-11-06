@@ -36,24 +36,19 @@ Provides Chinese metaphysics and offline astrology functionality via FastMCP:
 
 import logging
 import os
-from typing import Any, Dict, Optional
+from typing import Optional
 
 from fastmcp import FastMCP
 from fastmcp.tools import ToolResult
 
 from fatebridge import __version__ as APP_VERSION
+from fatebridge.application.response_delivery import deliver_response
+from fatebridge.application.result_delivery import DEFAULT_MCP_RESPONSE_CHARS
+from fatebridge.application.tool_spec import ServiceResult
 from fatebridge.mcp_transport import protocol_result
-from fatebridge.services.run_metadata import attach_run_metadata
 from fatebridge.utils.errors import error_response_payload
-from fatebridge.utils.formatting import (
-    _prepare_json_response_payload,
-    format_json_response,
-)
+from fatebridge.utils.formatting import format_json_response
 from fatebridge.utils.runtime import get_log_level, load_runtime_env
-
-# ============================================================================
-# Logging Setup
-# ============================================================================
 
 load_runtime_env()
 
@@ -62,10 +57,6 @@ logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 )
 
-
-# =============================================================================
-# FastMCP 应用配置
-# =============================================================================
 
 _MCP_INSTRUCTIONS = (
     "FateBridge 提供本地计算，助手按当前问题选择工具并解释实际结果。"
@@ -83,42 +74,32 @@ _MCP_INSTRUCTIONS = (
 )
 
 
-def _tool_response_payload(
-    data: Dict[str, Any],
+def _render_protocol_response(
+    data: ServiceResult,
     *,
     compact: bool = True,
     include_snapshot_text: bool = True,
-    fields: Optional[list] = None,
+    fields: Optional[list[str]] = None,
     strict_fields: bool = False,
-    tool_name: Optional[str] = None,
-) -> Dict[str, Any]:
-    # tool_name is supplied by the catalog registrar (spec.run_metadata_name);
-    # the neutral fallback only guards a stray non-catalog caller.
-    payload = attach_run_metadata(data, tool_name=tool_name or "unknown_tool")
-    # Project AFTER run_metadata is attached so provenance survives a field
-    # selection (project_fields always keeps run_metadata).
-    payload = project_fields(payload, fields, strict_fields=strict_fields)
-    return _prepare_json_response_payload(
-        payload,
+    response_char_limit: int = DEFAULT_MCP_RESPONSE_CHARS,
+) -> ToolResult:
+    payload = deliver_response(
+        data,
+        fields=fields,
+        strict_fields=strict_fields,
         include_snapshot_text=include_snapshot_text,
+        response_char_limit=response_char_limit,
+        compact=compact,
     )
-
-
-def _render_protocol_response(data: Dict[str, Any], **flags: Any) -> ToolResult:
-    from fatebridge.application.result_delivery import bound_response
-
-    limit = flags.pop("response_char_limit", 8192)
-    payload = _tool_response_payload(data, **flags)
-    payload = bound_response(payload, limit, compact=flags.get("compact", True))
     return protocol_result(
         payload,
         failed=False,
-        text=format_json_response(payload, compact=flags.get("compact", True)),
+        text=format_json_response(payload, compact=compact),
     )
 
 
 def _render_protocol_error(
-    data: Dict[str, Any], operation: str, *, compact: bool = True
+    data: ServiceResult, operation: str, *, compact: bool = True
 ) -> ToolResult:
     payload = error_response_payload(data, operation)
     return protocol_result(
@@ -126,13 +107,10 @@ def _render_protocol_error(
     )
 
 
-# ============================================================================
 # Tool registration — every tool is declared once in the central catalog and
 # auto-registered here. To add a tool, edit fatebridge/services/tool_catalog.py.
-# ============================================================================
 
 from fatebridge.application.discovery import select_mcp_specs
-from fatebridge.application.projection import project_fields
 from fatebridge.mcp_transport import (  # noqa: E402
     register_discovery_resources,
 )

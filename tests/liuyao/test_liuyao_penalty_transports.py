@@ -3,7 +3,7 @@
 import pytest
 
 from tests.liuyao.test_liuyao_clash_transports import all_surfaces
-from tests.liuyao.test_liuyao_transports import assert_same_run_receipt
+from tests.support.result_delivery import assert_same_run_receipt
 
 
 @pytest.mark.parametrize(

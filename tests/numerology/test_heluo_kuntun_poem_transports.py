@@ -1,15 +1,22 @@
 """Actual local REST/MCP/CLI selection of the twelve new source groups."""
 
 import json
+from pathlib import Path
 
 import pytest
 
 from fatebridge.core import heluo_poems as hp
-from tests.numerology.test_heluo_poem_transports import run_three
 from tests.support.transports import SPECS, business
 from tests.support.transports import rest as shared_rest
+from tests.support.transports import run_three
 
 rest = shared_rest
+REFERENCE = json.loads(
+    (
+        Path(__file__).parents[1]
+        / "fixtures/heluo_kuntun_poems_v1/verified-readings-v2.json"
+    ).read_bytes()
+)
 CASES = [
     ("2000-01-28", "05:33:00", 0, "坤為地", 1, 2),
     ("2000-01-09", "21:33:00", 1, "坤為地", 2, 2),
@@ -68,7 +75,17 @@ def test_twelve_group_selections_and_clock_sources_match_all_three_transports(
         )
         assert e["birth_clock"]["calculation_wall_clock"] == date + " " + time
         assert e["birth_clock"]["mode"] == "civil"
-        assert p["poem_content_sha256"] == hp.CONTENT_SHA256
+        expected = next(
+            entry
+            for entry in REFERENCE["entries"]
+            if (entry["hexagram"], entry["line"]) == (gua, line)
+        )
+        assert p["poem_source_url"] == REFERENCE["source_url"]
+        assert p["poem_pdf_pages"] == expected["pdf_pages"]
+        assert t["poem_sections"] == [
+            dict(poem, applicability=None) for poem in expected["poems"]
+        ]
+        assert p["poem_corpus_id"] == e["poem_collation"]["corpus_id"]
         assert (
             e["poem_collation"]["collated_line_poem_groups"],
             e["poem_collation"]["collated_individual_poems"],
@@ -78,6 +95,7 @@ def test_twelve_group_selections_and_clock_sources_match_all_three_transports(
             for r in e["rule_trace"]
             if r["rule_id"] == "heluo_selected_line_collation_v1"
         )
+        assert trace["poem_corpus_id"] == p["poem_corpus_id"]
         assert trace["selections"][phase]["poem_count"] == count
         if gua == "水雷屯" and line == 1:
             assert t["poem_sections"][0]["text"].startswith("不當進步且盤桓")

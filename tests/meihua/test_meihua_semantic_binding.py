@@ -3,7 +3,6 @@
 import ast
 import asyncio
 import copy
-import hashlib
 import inspect
 import json
 import subprocess
@@ -14,7 +13,7 @@ import pytest
 from fastmcp import Client
 from fastmcp.client.transports import StdioTransport
 
-from fatebridge.services.replay_metadata import digest
+from fatebridge.utils.json_digest import digest
 from fatebridge.validation.agent_capture import CaptureJournal
 from fatebridge.validation.meihua_semantic_binding import (
     PROMPT_BUILDER_AST_SHA256,
@@ -54,7 +53,7 @@ def journal(path, rows):
 def packet(run="actual-run", **business):
     return {
         **business,
-        "run_metadata": {"run_id": run, "business_output_sha256": digest(business)},
+        "run_metadata": {"run_id": run},
     }
 
 
@@ -379,12 +378,10 @@ def test_answer_bytes_and_capture_chain_are_pinned(answer_capture):
 def resource_rows(*, field=False):
     complete = packet(value={"known": None})
     text = json.dumps(complete["value"] if field else complete, ensure_ascii=False)
-    sha = hashlib.sha256(text.encode()).hexdigest()
     projected = {
         "run_metadata": complete["run_metadata"],
         "result_delivery": {
             "result_id": "same-result",
-            "sha256": sha,
             "total_chars": len(text),
             "total_bytes": len(text.encode()),
             "result_file": "/never/open/this/file",
@@ -393,10 +390,11 @@ def resource_rows(*, field=False):
     rows = [call(projected)]
     for start, end in [(0, 5), (5, len(text))]:
         page = {
+            "result_id": "same-result",
             "offset": start,
+            "total_chars": len(text),
             "text": text[start:end],
             "next_offset": end if end < len(text) else None,
-            "sha256": sha,
         }
         tail = f"fields/value/{start}" if field else f"pages/{start}"
         if field:
@@ -429,7 +427,7 @@ def test_completed_actual_pages_only_supply_observed_child_values(tmp_path, fiel
 
 
 @pytest.mark.parametrize(
-    "mutation", ["offset", "chain", "hash", "run", "length", "uri"]
+    "mutation", ["offset", "chain", "total_chars", "run", "length", "uri"]
 )
 def test_page_substitutions_fail_closed(mutation):
     rows = resource_rows()
@@ -438,8 +436,8 @@ def test_page_substitutions_fail_closed(mutation):
         page["offset"] = 6
     elif mutation == "chain":
         page["next_offset"] = 5
-    elif mutation == "hash":
-        page["sha256"] = "0" * 64
+    elif mutation == "total_chars":
+        page["total_chars"] = len(page["text"])
     elif mutation == "run":
         page["text"] = page["text"].replace("actual-run", "forged-run")
     elif mutation == "length":
@@ -483,36 +481,32 @@ def test_protocol_and_fastmcp_resource_serializations_are_both_observed_not_inve
 
 @pytest.mark.parametrize("field", [False, True])
 @pytest.mark.parametrize(
-    "mutation", [None, "uri_run", "uri_sha", "run", "sha", "repeated"]
+    "mutation", [None, "uri_run", "uri_result", "run", "method", "repeated"]
 )
 def test_verified_resources_bind_original_receipt_and_actual_verification(
     field, mutation
 ):
     rows = resource_rows(field=field)
-    sha = rows[0]["result"]["structured_content"]["result_delivery"]["sha256"]
     for row in rows[1:]:
         tail = row["uri"].split("same-result/", 1)[1]
         tail = tail.removeprefix("pages/")
-        row["uri"] = (
-            f"fatebridge://results/same-result/verified/actual-run/{sha}/{tail}"
-        )
+        row["uri"] = f"fatebridge://results/same-result/verified/actual-run/{tail}"
         page = json.loads(row["result"]["contents"][0]["text"])
         page.update(result_id="same-result", path="value" if field else None)
         page["verification"] = {
-            "method": "retained_payload_sha256_v1",
+            "method": "retained_payload_integrity_v2",
             "scope": "entire_retained_payload",
-            "payload_sha256": sha,
             "run_id": "actual-run",
             "calculation_repeated": False,
         }
         if mutation == "uri_run":
             row["uri"] = row["uri"].replace("actual-run", "another-run")
-        elif mutation == "uri_sha":
-            row["uri"] = row["uri"].replace(sha, "0" * 64)
+        elif mutation == "uri_result":
+            page["result_id"] = "another-result"
         elif mutation == "run":
             page["verification"]["run_id"] = "another-run"
-        elif mutation == "sha":
-            page["verification"]["payload_sha256"] = "0" * 64
+        elif mutation == "method":
+            page["verification"]["method"] = "unverified"
         elif mutation == "repeated":
             page["verification"]["calculation_repeated"] = 0
         row["result"]["contents"][0]["text"] = json.dumps(page)
@@ -560,7 +554,7 @@ async def test_actual_local_stdio_projection_and_field_resources_bind_without_mo
         run = value["run_metadata"]["run_id"]
         for route in [
             "fields/meihua.body_trigram/0",
-            f"verified/{run}/{delivery['sha256']}/fields/meihua.use_trigram/0",
+            f"verified/{run}/fields/meihua.use_trigram/0",
         ]:
             uri = f"fatebridge://results/{delivery['result_id']}/{route}"
             while uri:

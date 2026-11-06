@@ -28,7 +28,7 @@ from fatebridge.services.metaphysics import (
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.birth_input import create_person_info
 from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
-from tests.fixtures.mcp_receipt import assert_same_run_receipt
+from tests.fixtures.mcp_result_delivery import assert_same_run_receipt
 
 # Match the existing calendar-audit file's precise legacy-API filters; other
 # warnings still surface. This does not suppress conversion errors or defects.
@@ -430,7 +430,6 @@ def test_same_run_claim_rejects_hko_as_the_actual_prefix_implementation():
             path="ziwei_birth.calendar_basis.date_conversion_provenance.lookups.placement.implementation_provider",
             value=value,
             run_id=m["run_id"],
-            business_output_sha256=m["business_output_sha256"],
         )
 
     assert (

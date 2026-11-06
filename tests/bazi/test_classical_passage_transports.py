@@ -83,6 +83,7 @@ def test_passage_view_matches_rest_native_mcp_and_cli(
             "run_metadata.runtime",
             "run_metadata.provenance",
             "run_metadata.determinism",
+            "run_metadata.calculation_evidence",
         }
         restored = reconstruct(store, reference["result_id"])
         assert business(restored) == business(result)
@@ -110,10 +111,11 @@ def test_passage_view_matches_rest_native_mcp_and_cli(
         path=prefix + ".summary.effective_passage",
         value="not_adjudicated",
         run_id=metadata["run_id"],
-        business_output_sha256=metadata["business_output_sha256"],
     )
-    # A projected view cannot certify the digest of its complete original run.
-    assert verify_calculation_claims(result, [claim])["status"] == "rejected"
+    # Quotation checking alone cannot authenticate the complete original.
+    quoted = verify_calculation_claims(result, [claim])
+    assert quoted["status"] == "verified_structured_facts"
+    assert quoted["original_payload_compared"] is False
     complete = rest.post(
         spec.rest_path, json=PAYLOAD, params={"response_char_limit": 0}
     ).json()
@@ -121,7 +123,6 @@ def test_passage_view_matches_rest_native_mcp_and_cli(
     claim = claim.model_copy(
         update={
             "run_id": receipt["run_id"],
-            "business_output_sha256": receipt["business_output_sha256"],
         }
     )
     assert (

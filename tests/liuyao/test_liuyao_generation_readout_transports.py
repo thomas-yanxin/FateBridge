@@ -12,7 +12,7 @@ from tests.liuyao.test_liuyao_generation_readout import (
     CASES,
     assert_returned_gate_readout,
 )
-from tests.liuyao.test_liuyao_transports import assert_same_run_receipt
+from tests.support.result_delivery import assert_same_run_receipt
 from tests.support.transports import SPECS, business, native, surface_calls
 
 

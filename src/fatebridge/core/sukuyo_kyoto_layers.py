@@ -173,7 +173,7 @@ def layered_reading_lines(reference: dict[str, Any]) -> list[str]:
     image = reference["expected_legacy"]
     lines = [
         f"京都后期字层跟进仍据同一第{image['canvas_index_one_based']}帧原图，"
-        f"指纹{image['image_sha256']}，原尺寸"
+        "原尺寸"
         f"{reference['image_dimensions'][0]}×{reference['image_dimensions'][1]}；"
         "以下为各记录时点的模型工作读，不冒称本次请求重新看图或独立人工验收。",
         "十二月初一、十五、三十日三个例题与后段被改数字是不同字位；"

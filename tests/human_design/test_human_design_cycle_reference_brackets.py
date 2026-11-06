@@ -10,7 +10,6 @@ import pytest
 
 from fatebridge.core import human_design_cycles as cycles
 from fatebridge.core.human_design_reference_order import reference_ordering
-from fatebridge.services.replay_metadata import digest
 from fatebridge.validation.human_design import verify_human_design_reading
 from tests.support.human_design_current import complete_run
 
@@ -115,9 +114,6 @@ def test_fresh_hash_cannot_hide_wrong_order_or_downgrade(complete, mutation):
         value["cycle_context"]["ruleset"]["version"] = "unsupported"
         if mutation == "old_version_unknown_contract":
             value["run_metadata"]["contract_sha256"] = "0" * 64
-    value["run_metadata"]["business_output_sha256"] = digest(
-        {k: v for k, v in value.items() if k != "run_metadata"}
-    )
     result = verify_human_design_reading(value)
     assert result["status"] == "rejected"
     if mutation in {"old_version", "old_version_unknown_contract"}:

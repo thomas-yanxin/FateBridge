@@ -1,7 +1,6 @@
 """Exercise actual REST, native in-process MCP and CLI for the same inputs."""
 
 import asyncio
-import hashlib
 import json
 
 import pytest
@@ -13,7 +12,7 @@ from fatebridge.application.examples import example_input, suggested_fields
 from fatebridge.cli import run
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.utils.json_digest import digest as evidence_digest
+from tests.fixtures.mcp_result_delivery import assert_same_run_receipt
 
 
 async def _same_run_payload(client, result, *, require_business_inline=False):
@@ -34,7 +33,6 @@ async def _same_run_payload(client, result, *, require_business_inline=False):
     if uri is None:
         manifest = json.loads((await client.read_resource(ref["manifest_uri"]))[0].text)
         assert manifest["result_id"] == ref["result_id"]
-        assert manifest["sha256"] == ref["sha256"]
         assert manifest["run_metadata"]["run_id"] == first["run_metadata"]["run_id"]
         uri = manifest["first_page_uri"]
     while uri:
@@ -42,47 +40,13 @@ async def _same_run_payload(client, result, *, require_business_inline=False):
         parts.append(page["text"])
         uri = page["next_uri"]
     raw = "".join(parts)
-    assert hashlib.sha256(raw.encode()).hexdigest() == ref["sha256"]
+    assert len(raw) == ref["total_chars"]
     original = json.loads(raw)
     receipt = first["run_metadata"]
     full_receipt = original["run_metadata"]
-    restored_receipt = dict(receipt)
-    for path in ref["deferred_fields"]:
-        if not path.startswith("run_metadata."):
-            continue
-        assert path in {
-            "run_metadata.runtime",
-            "run_metadata.provenance",
-            "run_metadata.determinism",
-            "run_metadata.calculation_evidence",
-        }
-        key = path.removeprefix("run_metadata.")
-        if key == "calculation_evidence":
-            assert receipt[key] == {
-                "delivery_path": path,
-                "sha256": evidence_digest(full_receipt[key]),
-                "coverage": full_receipt[key].get("coverage"),
-            }
-        elif key == "runtime":
-            summary, runtime = receipt[key], full_receipt[key]
-            assert summary["delivery_path"] == path
-            files = runtime["ephemeris"]["files"]
-            file_digest = hashlib.sha256(
-                json.dumps(
-                    files, ensure_ascii=False, sort_keys=True, separators=(",", ":")
-                ).encode()
-            ).hexdigest()
-            assert summary["ephemeris_files_count"] == len(files)
-            assert (
-                summary["ephemeris_inventory_sha256"]
-                == runtime["ephemeris"]["sha256"]
-                == file_digest
-            )
-            assert summary["environment_sha256"] == runtime["environment_sha256"]
-        else:
-            assert key not in receipt
-        restored_receipt[key] = full_receipt[key]
-    assert restored_receipt == full_receipt
+    assert_same_run_receipt(
+        receipt, full_receipt, deferred_fields=ref["deferred_fields"]
+    )
     if require_business_inline:
         assert "run_metadata" not in ref["deferred_fields"]
         business_deferred = {
@@ -92,15 +56,14 @@ async def _same_run_payload(client, result, *, require_business_inline=False):
         for key in set(original) & set(first) - {"run_metadata"}:
             assert first[key] == original[key]
         if business_deferred:
-            # The successor receipt contract keeps identities and hashes
-            # inline. Paging is permitted only if even a lower bound with
+            # Paging is permitted only if even a lower bound with
             # every optional locator/supplement removed exceeds8192.
             essential = {
                 k: v
                 for k, v in receipt.items()
                 if k not in {"provenance", "determinism"}
             }
-            minimal_ref = {k: ref[k] for k in ("result_id", "sha256", "manifest_uri")}
+            minimal_ref = {k: ref[k] for k in ("result_id", "manifest_uri")}
             floor = {
                 **original,
                 "run_metadata": essential,
@@ -112,9 +75,6 @@ async def _same_run_payload(client, result, *, require_business_inline=False):
         for key in (
             "run_id",
             "trace_id",
-            "input_sha256",
-            "contract_sha256",
-            "business_output_sha256",
         ):
             assert receipt[key] == full_receipt[key]
     return original

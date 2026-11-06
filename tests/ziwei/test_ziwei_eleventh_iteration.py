@@ -18,7 +18,8 @@ from fatebridge.core.ziwei_auxiliary import attach_natal_cycles
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
 from scripts.ziwei.audit_ziwei_limits import _seed
-from tests.fixtures.mcp_receipt import assert_same_run_receipt, verified_inline_business
+from tests.fixtures.mcp_receipt import verified_inline_business
+from tests.fixtures.mcp_result_delivery import assert_same_run_receipt
 
 
 def test_independent_cycles_keep_real_software_differences_and_unresolved_slots():

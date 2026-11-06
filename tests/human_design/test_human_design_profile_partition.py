@@ -19,7 +19,6 @@ from fatebridge.core.human_design_profile_partition import (
     profile_partition_report,
     source_facts,
 )
-from fatebridge.services.replay_metadata import digest
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
 
@@ -152,12 +151,6 @@ def complete():
     return value
 
 
-def rehash(value):
-    value["run_metadata"]["business_output_sha256"] = digest(
-        {k: v for k, v in value.items() if k != "run_metadata"}
-    )
-
-
 def test_complete_new_context_is_field_bound_without_native_recalculation(complete):
     with patch(
         "fatebridge.core.astro.runtime.ephemeris_call",
@@ -221,5 +214,4 @@ def test_rehashed_partition_tampering_is_rejected(complete, mutation):
                 for r in value[key]
                 if all(r.get(k) != METHOD for k in ("id", "rule_id", "ruleset_id"))
             ]
-    rehash(value)
     assert verify_human_design_reading(value)["status"] == "rejected"

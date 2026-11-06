@@ -51,8 +51,8 @@ def later_reading_lines(reference: dict[str, Any]) -> list[str]:
     lines = [
         "善通寺后续校读与既有首录分层保留，旧转录片段不是已统一定字。",
         "善通寺第33帧后续已取得原尺寸图"
-        f"{colophon['image_dimensions'][0]}×{colophon['image_dimensions'][1]}，"
-        f"指纹{colophon['image_sha256']}；旧预览和取得失败不回写。",
+        f"{colophon['image_dimensions'][0]}×{colophon['image_dimensions'][1]}；"
+        "旧预览和取得失败不回写。",
         f"题记长栏工作读{colophon['long_column_working']}；"
         f"另栏署记{colophon['separate_signature_working']}分别保留，"
         "未补写讫日数，未据版面唯一决定抄者、校者关系。",

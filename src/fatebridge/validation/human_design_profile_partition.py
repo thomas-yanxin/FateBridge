@@ -5,7 +5,7 @@ from typing import Any
 from fatebridge.core.human_design_profile_partition import (
     profile_partition_report,
 )
-from fatebridge.validation.claims import _same_value
+from fatebridge.core.public_output import same_public_value as _same_value
 
 
 def checked_profile_partition(payload: dict[str, Any]) -> dict[str, Any]:

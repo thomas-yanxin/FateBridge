@@ -8,7 +8,7 @@ from fatebridge.core.human_design_sensitivity import (
     METHOD,
     assess_birth_interval,
 )
-from fatebridge.validation.claims import _same_value
+from fatebridge.core.public_output import same_public_value as _same_value
 
 
 def verify_sampled_interval(payload: dict[str, Any]) -> dict[str, Any]:

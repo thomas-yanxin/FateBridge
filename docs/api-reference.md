@@ -82,7 +82,7 @@ REST OpenAPI、MCP `tools/list`、`/api/tools` 和 CLI `describe` 发布中央�
 
 ### 2.2 快照协议
 
-完整计算另有中央目录声明的 `required_output_fields`，通过发现记录的 `full_result_required_fields` 公开，并参与 `contract_sha256`。这些必需业务根缺失、为null或仅为空对象时，共享执行返回 `internal_error`；不可用应保留明确状态。Schema中的 `x-fatebridge-full-result` 另声明嵌套必要事实，可配合集合基数、唯一身份与必要成员。字段投影在完整验证之后执行，仍可合法省略对象字段；该规则不要求所有可选事实存在。领域错误包络也须符合 `ErrorEnvelope`，缺错误事实或错误码／retryable 的异常结果归为内部错误，保留有效trace／parent。
+完整计算另有中央目录声明的 `required_output_fields`，通过发现记录的 `full_result_required_fields` 公开，，完整验证后再生成公开结果。这些必需业务根缺失、为null或仅为空对象时，共享执行返回 `internal_error`；不可用应保留明确状态。Schema中的 `x-fatebridge-full-result` 另声明嵌套必要事实，可配合集合基数、唯一身份与必要成员。字段投影在完整验证之后执行，仍可合法省略对象字段；该规则不要求所有可选事实存在。领域错误包络也须符合 `ErrorEnvelope`，缺错误事实或错误码／retryable 的异常结果归为内部错误，保留有效trace／parent。
 
 事业结构与创业规则索引的 `score_kind=uncalibrated_rule_index`、`scope`、`score_basis` 明确所选规则的范围和基准／加减／限制；`weighted_counts`包含日支全部藏干，分数及十神信号不测量实际能力、收入或创业成功率。
 
@@ -181,21 +181,21 @@ REST OpenAPI、MCP `tools/list`、`/api/tools` 和 CLI `describe` 发布中央�
 
 `strict_fields=true` 遇到任何无效路径会整体失败：REST 422、MCP `isError=true`、CLI 退出 1，共享 `validation_error` / `retryable=false` / `issues`，其中 `path` 表示请求的输出路径。计算领域错误优先返回，不会被投影错误覆盖。校验发生在计算后，投影控制返回体积，不减少计算工作。
 
-超出字符预算的成功结果不会切断 JSON。响应保留运行标识、散列与预算内业务字段，新增 `result_delivery` 明示原结果的 SHA-256、大小、待读取字段、引用及过期时间。MCP 默认8192以适应聊天宿主；REST/CLI 默认0保留历史完整交付。0或4096–65536为合法预算，程序客户端可设0保存全文；聊天不应通过取消预算重新制造大响应。
+超出字符预算的成功结果不会切断 JSON。响应保留运行标识与预算内业务字段，新增 `result_delivery` 明示原结果的大小、待读取字段、引用及过期时间。MCP 默认8192以适应聊天宿主；REST/CLI 默认0保留历史完整交付。0或4096–65536为合法预算，程序客户端可设0保存全文；聊天不应通过取消预算重新制造大响应。
 
-完整结果超过输出预算且运行环境较长时，`run_metadata.runtime` 只在行内保留环境散列、清单散列 `ephemeris_inventory_sha256`、文件数 `ephemeris_files_count` 及 `delivery_path`。`result_delivery.deferred_fields` 明列 `run_metadata.runtime`；按该点路径读取可恢复完整运行环境及每个文件散列，清单没有被当作空集合或静默截断。预算为0时仍返回原完整回执。首轮业务分析优先保持可读。
+完整结果超过输出预算且运行环境较长时，`run_metadata.runtime` 在行内保留文件数 `ephemeris_files_count` 及 `delivery_path`。`result_delivery.deferred_fields` 明列 `run_metadata.runtime`；按该点路径读取可恢复完整运行环境及配置文件名清单，清单没有被当作空集合或静默截断。预算为0时仍返回原完整回执。首轮业务分析优先保持可读。
 
-业务字段仍接近预算上限时，可再把补充回执`run_metadata.provenance`、`run_metadata.determinism`留在同次交付物中，并在`deferred_fields`逐项明列。只有在此举能保留全部业务字段时才采用；运行标识、输入／契约／业务散列及环境指纹仍行内可见。读取对应点路径可精确恢复原回执，不重新计算、不缩减业务事实或提高预算。
+业务字段仍接近预算上限时，可再把补充回执`run_metadata.provenance`、`run_metadata.determinism`留在同次交付物中，并在`deferred_fields`逐项明列。只有在此举能保留全部业务字段时才采用；运行标识仍行内可见。读取对应点路径可精确恢复原回执，不重新计算、不缩减业务事实或提高预算。
 
-完整结果是同一 run 的不可变交付物，不是按出生输入命中的计算缓存。MCP 读取 `manifest_uri` 后按 `fatebridge://results/{result_id}/fields/{path}/{offset}` 取得所需点路径；字段读取另支持数组数字索引。完整文档为 `first_page_uri`，每页 `text` 至多2048字符，按 `next_offset` 拼接并核对 `sha256`。每页包装本身是完整 JSON，但文档片段不能单独当全文解析。读取不重新计算、不改变原 run／trace 和原回执。
+完整结果是同一 run 的不可变交付物，不是按出生输入命中的计算缓存。MCP 读取 `manifest_uri` 后按 `fatebridge://results/{result_id}/fields/{path}/{offset}` 取得所需点路径；字段读取另支持数组数字索引。完整文档为 `first_page_uri`，每页 `text` 至多2048字符，按 `next_offset` 拼接。每页包装本身是完整 JSON，但文档片段不能单独当全文解析。读取不重新计算、不改变原 run／trace 和原回执。
 
 保留的是字段投影与快照选项处理后的结果。需要全部业务 JSON 或完整时间线时，首次调用用 `fields=null`（REST / CLI 不传字段筛选），保留默认响应预算；需要快照文本时也保留 `include_snapshot_text=true`。先投影摘要后，交付文件无法恢复未选字段。分页读取和本地校验示例见 [完整结果交付](agent-guide.md#完整结果交付与同次导出)。
 
-REST 对应 `GET /api/results/{result_id}` 和 `GET /api/results/{result_id}/pages?path=analysis_context.analysis_datetime&offset=0`，沿用 API 鉴权。CLI 也可据 `file_path` 读取本机交付物，按 `file_payload_path`（当前为 `payload`）取出完整原结果，以 `ensure_ascii=false` 和紧凑分隔符序列化后核对响应的 SHA-256；外层记录的文件散列并非该散列。临时目录仅当前系统用户可读，引用约一小时过期，清理按读取／新交付触发，容量最多约64MiB并可回收旧结果；引用失效有明确错误，不以新结果冒充旧 run。MCP 配置隐藏的工具，其结果也不可通过资源读取。
+REST 对应 `GET /api/results/{result_id}` 和 `GET /api/results/{result_id}/pages?path=analysis_context.analysis_datetime&offset=0`，沿用 API 鉴权。CLI 也可据 `file_path` 读取本机交付物，按 `file_payload_path`（当前为 `payload`）取出完整原结果。需要核验时使用下述读取接口，由服务检查内部存储完整性。临时目录仅当前系统用户可读，引用约一小时过期，清理按读取／新交付触发，容量最多约64MiB并可回收旧结果；引用失效有明确错误，不以新结果冒充旧 run。MCP 配置隐藏的工具，其结果也不可通过资源读取。
 
 精简引用可省略重复的首分页URI及本地文件定位，以保留行内业务和来源事实；此时从`manifest_uri`对应的同次清单恢复定位。清单本身与原交付物保持完整，响应预算不变。
 
-确定性校验读取使用`GET /api/results/{result_id}/verified?expected_sha256=原散列&expected_run_id=原run`，另可传`path`和`offset`。CLI对应`fatebridge result-read RESULT_ID --sha256 ORIGINAL_SHA256 --run-id ORIGINAL_RUN_ID [--path FIELD_PATH] [--offset 0]`；MCP资源为`fatebridge://results/{result_id}/verified/{run_id}/{sha256}/{offset}`及`.../verified/{run_id}/{sha256}/fields/{path}/{offset}`。它们先对完整保留payload执行原序列化SHA-256和run一致性检查，再从同一内存对象选页，均不重算；错散列、错run、损坏内容或失效引用明确失败，MCP仍限制原工具公开范围。`verification.payload_sha256`是整包核验，外层`sha256`是所选字段文档核验；`text/next_offset`的分页含义不变。它不是业务计算工具，不计入领域工具数量。核验一次需读取完整payload，按需选择字段和页，不能用核验成功代替业务内容已读。
+核验读取使用 `GET /api/results/{result_id}/verified?expected_run_id=原run`，另可传 `path` 和 `offset`。CLI 对应 `fatebridge result-read RESULT_ID --run-id ORIGINAL_RUN_ID [--path FIELD_PATH] [--offset 0]`；MCP 资源为 `fatebridge://results/{result_id}/verified/{run_id}/{offset}` 及 `.../verified/{run_id}/fields/{path}/{offset}`。服务以私有清单核验完整保留内容与原 run，再从同一内存对象选页，不重算。错 run、内容损坏或失效引用明确失败，MCP 仍限制原工具公开范围。`verification.run_id`、`scope` 和 `calculation_repeated=false` 说明核验对象与范围；公开响应不携带内容摘要。此检查针对服务内存储完整性，不能作为独立的原内容认证或业务计算正确性证明，也不能代替读取业务内容。
 
 校验读取支持只读沙箱：只检查已发布的私有目录和文件，不创建临时探测文件、锁文件或索引，不删除过期结果；写入和回收仍由原锁保护。并发回收可能返回不可用，不一致的载荷与清单不能获核验。CLI可用`--directory 原交付文件所在私有目录`指定已有目录；默认按结果ID查找既有临时存储，若同ID匹配多个目录则报`result_directory_ambiguous`，不会靠散列挑选副本。指定目录不创建目录、不改变原保留期限。
 
@@ -234,18 +234,18 @@ REST 查询参数与 MCP 参数支持 `as_of`、`trace_id`、`parent_run_id`；C
 
 标识仅接受 1–128 字符的字母、数字、`_ . : -`。控制项非法为三端校验失败，不回显值；有效 trace / parent 标识传播到成功元数据和模型、领域、投影失败包络。失败可含顶层 `trace_id` / `parent_run_id`；CLI 参数语法错误仍退出 2，框架非法 RPC 与未知工具不属于该包络。
 
-原有六个基础元数据字段保持，新增字段在输出 Schema 中为可选：
+`run_metadata` 使用格式版本 `2.0`，保留运行、关联、生成时间与实际引擎，以及以下信息：
 
-- `metadata_schema_version=1.0`、`package_version`、`contract_sha256`：格式、包版本和工具输入/输出模型合同指纹。
-- `input_sha256`：模型默认值/别名归一化请求摘要，包含真太阳时开关与出生分钟的显式状态；省略分钟与显式00分因输入回执不同而区分。未知秒数的省略与null语义相同。不保存原出生档案。嵌套与扁平合同的输入摘要不承诺相同。
-- `business_output_sha256`：投影和快照删减前完整业务 JSON 的摘要，排除 run_metadata；不能直接对部分响应验算。`duration_ms` 测量绑定、服务与业务变换，不含指纹、队列、投影和网络时间。
+- `metadata_schema_version`、`package_version`、`duration_ms`：回执格式、包版本和计算耗时。
 - `effective_time`、`determinism`、`replay`：本次固定瞬间、读取时区、缺省时间字段、随机性及实际重放参数。
-- `runtime`：Python / 平台 / 计算依赖版本、包内实现与 JSON 数据指纹、配置 `.se1` 库存内容指纹。只返回相对文件名；库存不证明实际使用某文件，实际模型保留在 provenance 与业务结果。
-- `provenance`、`warnings`：允许列表内的规则/历法/星历口径与标准警告，包括 `current_time_frozen`、`random_seed_generated`、`approximate_engine`，投影后仍保留。
+- `runtime`：Python、平台、计算依赖版本及配置的星历相对文件名；库存不证明实际使用某文件，实际模型保留在 `provenance` 与业务结果。
+- `provenance`、`warnings`：规则、历法、星历口径及标准警告，包括 `current_time_frozen`、`random_seed_generated`、`approximate_engine`。
+
+业务输出、公开 Schema、快照和结果交付均不提供哈希或指纹字段；规则、来源文件与存储内容的内部完整性校验先于公开交付。来源标题、作者、版本、URL、页码、原始分歧与未知项继续保留。
 
 六爻 method=coin 且缺有效手动输入与 seed 时，共享执行层生成本次 seed，仍为随机起卦，返回 `replay.overrides.seed`。手动优先级沿用引擎判定；已有 seed、手动或时间起卦不生成 seed。将原输入与 overrides 合并，再使用 replay.as_of 调用任一入口，可在相同环境重放业务结果；运行 ID、生成时间、耗时及“本次生成 seed”标志仍变化。
 
-实现、内置数据与配置星历指纹按进程缓存；升级或原地修改后须重启。完整复现要求另存原始请求和 receipt，保持实现、合同、规则数据、依赖、平台、时区数据库与星历配置一致。receipt 不是环境锁文件，不能证明版本相同的第三方安装内容未被修改；跨平台浮点仍可能微差。没有数据库、按 ID 查询或服务器保存出生档案。
+实现、内置数据与部分配置按进程缓存；升级或原地修改后须重启。完整复现要求另存原始请求和 receipt，保持实现、合同、规则数据、依赖、平台、时区数据库与星历配置一致。receipt 不是环境锁文件，不能证明版本相同的第三方安装内容未被修改；跨平台浮点仍可能微差。没有数据库、按 ID 查询或服务器保存出生档案。
 
 CLI profile 沿用批量入口，子工具共用 as_of / trace，parent_run_id 指向 profile 根 run_id；`--no-metadata` 关闭根与子元数据。它仍不是 REST/MCP 的复合业务工具。
 
@@ -366,7 +366,7 @@ CLI profile 沿用批量入口，子工具共用 as_of / trace，parent_run_id �
 | `POST` | `/api/compatibility` | 双人配合分析 |
 | `POST` | `/api/compatibility/sukuyo` | 宿曜双人相性分析（三九の秘法，二十七宿） |
 
-`bazi_source_compare` 只接收明确给出的 `year_pillar`、`month_pillar`、`day_pillar`、`hour_pillar`，各为天干地支两字。先按当前模型计算，再核对所有同柱登记编释；`current_calculation` 与 `source_comparison.records` 分开返回。 经过图版修订的条目另附 `input_reading_revision`，保留原录文、校读依据与来源定位；`registered_document_scope` 说明引用的登记文档仍是原始转录。未知标签不会因输入修订而自动补定。 `editorial_annotation_provenance`另标记原登记编辑说明的文件、字段位置和散列；补回的说明保存在`annotation_basis`与`retained_context`，不冒称原典逐字引文或新的强弱裁定。相符、差异、未裁定和未收录各自保留，不重建历史生日，也不改写强弱。首轮字段视图为 `source_strength`，详见原典材料与核对范围（参见对应当前专题及实际Schema）。
+`bazi_source_compare` 只接收明确给出的 `year_pillar`、`month_pillar`、`day_pillar`、`hour_pillar`，各为天干地支两字。先按当前模型计算，再核对所有同柱登记编释；`current_calculation` 与 `source_comparison.records` 分开返回。 经过图版修订的条目另附 `input_reading_revision`，保留原录文、校读依据与来源定位；`registered_document_scope` 说明引用的登记文档仍是原始转录。未知标签不会因输入修订而自动补定。 `editorial_annotation_provenance`另标记原登记编辑说明的文件与字段位置；补回的说明保存在`annotation_basis`与`retained_context`，不冒称原典逐字引文或新的强弱裁定。相符、差异、未裁定和未收录各自保留，不重建历史生日，也不改写强弱。首轮字段视图为 `source_strength`，详见原典材料与核对范围（参见对应当前专题及实际Schema）。
 
 #### 4.1.1 八字九大专项维度
 
@@ -498,7 +498,7 @@ CLI profile 沿用批量入口，子工具共用 as_of / trace，parent_run_id �
 
 六壬规则集1.6.0增加 `liureng.emptiness_evidence`，按《探原》论空亡分列十二位 `sky_xun_kong/earth_xun_kong`、日干寄宫地盘例外 `earth_stem_house_exception`、三种权威角色 `role_conditions/sky_authority_roles` 及占时本空。局部例外不改原旬空两支或三传本空、坐空；每位 `effective_empty` 与整体 `comprehensive_judgement` 均为null，Schema拒绝改成布尔裁定。年命例外、真空半空、填实冲实及综合优先级尚未裁定。六壬起课与行年的 `describe` 发布 `evidence_views.emptiness_evidence.fields`，复制其中字段进行严格投影；金口诀附带六壬盘与三式内嵌六壬也返回本层，不能用于替代金口诀四位空亡规则。见空亡分层验收。
 
-`calendar_policy.solar_term_dependencies[*].published_date_reference` 给出每项实际交气的香港天文台刊载日期、计算的固定UTC+08日期及来源URL／散列。`status=date_match/date_mismatch/outside_published_range` 分别表示日期相符、不符与超出1901—2100资料范围；范围外的 `published_date/dates_equal` 为null。`instant_accuracy_certified` 仅允许布尔false，逐日表不验证交气秒数。完整执行先核对五个依赖的同次名与瞬间及完整对照对象，再投影；三工具的 `published_term_dates` 视图复制其 `fields` 使用。依赖数组须整体读取，不能把视图名或数组内部路径当请求参数。固定UTC+08是对照约定，不替代输入IANA时区、真太阳钟或历史时制。原数值不因日期冲突改写，见第四十二轮验收。
+`calendar_policy.solar_term_dependencies[*].published_date_reference` 给出每项实际交气的香港天文台刊载日期、计算的固定UTC+08日期及来源URL。`status=date_match/date_mismatch/outside_published_range` 分别表示日期相符、不符与超出1901—2100资料范围；范围外的 `published_date/dates_equal` 为null。`instant_accuracy_certified` 仅允许布尔false，逐日表不验证交气秒数。完整执行先核对五个依赖的同次名与瞬间及完整对照对象，再投影；三工具的 `published_term_dates` 视图复制其 `fields` 使用。依赖数组须整体读取，不能把视图名或数组内部路径当请求参数。固定UTC+08是对照约定，不替代输入IANA时区、真太阳钟或历史时制。原数值不因日期冲突改写，见第四十二轮验收。
 
 金口诀1.10.0的 `jinkou.branch_stars` 返回所选七项历法目标、锚点类别、三位本支相同位置、天赦完整日序比较及原页。`yima_anchor=month_building_branch`；当前节月名义月序与三个月分季的约定明确，不能借月将、日支驿马或土旺月五态替换。`comprehensive_effect`仅为null、完整认证仅为布尔false。完整执行校验同次四柱、四位和唯一轨迹后才投影；公开 `branch_stars` 视图带四柱及完整四位数组，不以视图名充参数。见第四十四轮验收。
 
@@ -506,11 +506,11 @@ CLI profile 沿用批量入口，子工具共用 as_of / trace，parent_run_id �
 
 六壬1.8.0返回 `liureng.transmission_progression`：三传支序、模十二步长、连茹／间断及 `sequence_direction`。`branch_xun_kong` 是初中末支神本空；`raw_branch_empty_conditional_reading/direction` 明确限定在支神本空适用假设下，综合 `effective_direction/comprehensive_judgement` 只允许null。完整执行核对同次三传、日干支和唯一轨迹后才允许投影；省略上下文的局部投影不冒充完整验证。起课／行年公开 `transmission_progression` 视图，金口诀附盘公开 `liuren_transmission_progression`，金口诀本课不借此改四位或定用。见原页与验收。
 
-三工具另支持 `analysis_utc_offset`，与 `analysis_timezone` 联合核对当地民用钟，格式为 `±HH:MM` 或 `±HH:MM:SS`。例如哈瓦那 `2021-11-07 00:30` 出现两次：`America/Havana` 配 `-04:00` 选择第一次，配 `-05:00` 选择第二次。偏移必须符合该命名时区当时的规则；省略偏移的重复时刻、不存在的跳钟时刻及错误偏移均拒绝。指定后 `calendar_policy.civil_clock_resolution` 返回实际UTC瞬间、偏移、`fold`、是否重复及所用TZif版本和散列。真太阳钟的 `corrected_clock` 是不带时区的取用标签，实际瞬间另见 `civil_instant_utc`。三端示例与验收范围见重复民用钟验收。CLI负偏移建议写成 `--analysis-utc-offset=-05:00`。
+三工具另支持 `analysis_utc_offset`，与 `analysis_timezone` 联合核对当地民用钟，格式为 `±HH:MM` 或 `±HH:MM:SS`。例如哈瓦那 `2021-11-07 00:30` 出现两次：`America/Havana` 配 `-04:00` 选择第一次，配 `-05:00` 选择第二次。偏移必须符合该命名时区当时的规则；省略偏移的重复时刻、不存在的跳钟时刻及错误偏移均拒绝。指定后 `calendar_policy.civil_clock_resolution` 返回实际UTC瞬间、偏移、`fold`、是否重复及所用TZif版本。真太阳钟的 `corrected_clock` 是不带时区的取用标签，实际瞬间另见 `civil_instant_utc`。三端示例与验收范围见重复民用钟验收。CLI负偏移建议写成 `--analysis-utc-offset=-05:00`。
 
 金口诀 `patterns` 登记六十四课钤，返回实际结构命中、条件、书影页码和未决条目；58条已评估、6条未判，不表示64课原例均符合。`patterns.evaluations` 另列全部64条，`matched=true/false/null` 分别表示命中、所选定义下未命中、疑义未判，对应 `status=matched/not_matched/unresolved_definition`；`evaluation_counts` 分列数量，未判不计作不成立或验收通过。只投影该列表可请求 `fields=["jinkou.patterns.evaluations"]`，设 `strict_fields=true`；完整记录超过响应限额时按同一run的 `result_delivery` 读取，不能用重算替代。`use_evidence` 分列阴阳用位的受克、空破与无克从旺条件，`comprehensive_position` 尚为 null；不会自行改掉阴阳用位来凑一个综合结论。
 
-金口诀规则集1.5.1将 `use_evidence.comprehensive_position` 的Schema限定为null，非空的综合结论会在投影前作为输出错误拒绝。`internal_strength.source_evidence` 明确旺衰取自网上转录十二例的归纳规则，另列京本天乙例末位“木／水”的未决文本差异及书影散列；不是十二例书影全部符合认证。`use_evidence.source_evidence` 给出无克从旺的PDF18／页脚17及阴阳取用PDF45–46，综合优先次序仍未裁定。日下完整五态和完整原典认证字段只允许false，不能用true冒充已裁定。快照保留同一文本依据，见书影校勘与合同验收。
+金口诀规则集1.5.1将 `use_evidence.comprehensive_position` 的Schema限定为null，非空的综合结论会在投影前作为输出错误拒绝。`internal_strength.source_evidence` 明确旺衰取自网上转录十二例的归纳规则，另列京本天乙例末位“木／水”的未决文本差异及书影位置；不是十二例书影全部符合认证。`use_evidence.source_evidence` 给出无克从旺的PDF18／页脚17及阴阳取用PDF45–46，综合优先次序仍未裁定。日下完整五态和完整原典认证字段只允许false，不能用true冒充已裁定。快照保留同一文本依据，见书影校勘与合同验收。
 
 六壬与金口诀的 `calendar_policy` 发布民用输入、日时取用钟、23:00子初换日及日柱归属日期、实际交气提供者。真太阳钟用于日时柱，年/月柱及月将据民用瞬间；提供者状态不代表全部历法域精度认证。天文求解失败不使用线性节气回退起课，返回503 `dependency_missing`。五个 `solar_term_dependencies` 逐项公布TT求解、民用转换方法、冻结闰秒表到期日和未来末值假设。共享节气 `datetime` 字符串保留小数秒，可用 `datetime.fromisoformat` 解析；时区仍见响应上下文，小数位不代表微秒物理精度。按各依赖的 `provider/ephemeris_model/solar_model_details` 区分原生Swiss与具名解析模型，后者不借用原生返回选项。第三十五轮完整分钟比较在原生／解析路径分别仍有21／22项未通过；原200年队列7项节气日期差异未重评，不能据TT有限对照或农历表补充宣布全历法通过。见部署模型验收及历史第七轮验收。
 
@@ -584,7 +584,7 @@ REST 在 JSON 请求体传入这五项，MCP 使用同名参数，CLI 使用
 
 近太阳速率的v5计算在`longitude_motion.complete_position_derivatives`返回多层差分、方向检查及适用时的`source_branch_motion`；这些是数值方法证据，不能当作物理误差界。成功事件历史的`unavailable_reason`、`unavailable_code`、`failed_sample`明确为`null`，可由`reference_points`严格视图读取。对照与未通过项见源模型核验。
 
-本命、希腊盘、印度盘及卜卦公开 `solar_position_model` 字段卡，读取标称历元的 `apparent_position_policy`；原生推运盘也在 `calculation_basis` 携带此回执。其中 `bodies` 保留未偏折有限视线的前景／后景几何、原生太阳质量模型及未核定的物理误差；未知版本／后端不计算该几何。事件历史的同名字段仅描述提问历元，不能外推整个窗口。`virtual_native_solar_disc_extension` 表示原生模型的虚拟视位置。v2 回执的 `source_model_regularity` 保留质量表来源哈希，并明确未认证太阳轴线处的连续性及质量表节点处的唯一导数；未知原生版本时该字段为 `null`。这些是源码模型的适用限制，不能替代实际可观测位置的精度证明。它不改变已有坐标、日速和原有失败比较；见位置模型与三端核验及太阳轴线独立复核。
+本命、希腊盘、印度盘及卜卦公开 `solar_position_model` 字段卡，读取标称历元的 `apparent_position_policy`；原生推运盘也在 `calculation_basis` 携带此回执。其中 `bodies` 保留未偏折有限视线的前景／后景几何、原生太阳质量模型及未核定的物理误差；未知版本／后端不计算该几何。事件历史的同名字段仅描述提问历元，不能外推整个窗口。`virtual_native_solar_disc_extension` 表示原生模型的虚拟视位置。v2 回执的 `source_model_regularity` 保留质量表来源与版本，并明确未认证太阳轴线处的连续性及质量表节点处的唯一导数；未知原生版本时该字段为 `null`。这些是源码模型的适用限制，不能替代实际可观测位置的精度证明。它不改变已有坐标、日速和原有失败比较；见位置模型与三端核验及太阳轴线独立复核。
 
 卜卦另发布 `lilly_fortitudes` 字段卡，读取 `horary.fortitudes.summary` 及其模型／缺项。每颗星有第115页完整41行的独立回执；`applied_conditions` 给出实际满足的条款，深入核对可请求如 `horary.fortitudes.planets.Sun.rows`。日运动取五个原生采样点展开的一完整TT日位移，瞬时方向另列；恒星采用所声明历元的视位置，印刷度数只用于历史对照。`literal_table_balance` 不等于原典完整判断，任一必需行未知时为 `null`。原书例题复现仍为3/7，未改权重配平，见全表与例题核验。
 
@@ -965,6 +965,6 @@ uv run --locked --extra dev python -m fatebridge.mcp_server
 
 子女专项保留命主视角的星／宫与传统关系，不提供数量预测字段；时间信号不提供备孕、添丁或生育建议。孩子本人分析需使用孩子资料。普通星盘已移除死亡点计算及输出，剩余阿拉伯点不用于生死解释。
 
-卜卦 `astro_horary` 与择日 `astro_election` 增加 `ut1_source`：默认 `swiss_delta_t`；`iers_c04` 仅使用固定1962-01-01 00:00至2026-09-19 00:00 UTC的IERS20 C04日值，不外推或自动回退。`clock_conversion.ut1_reference` 与盘面 `calculation_basis.earth_rotation.ut1_reference` 保留源区间／指纹／插值方式；模型路径为null。REST、MCP、CLI共享同一请求合同。只校正UT1，完整EOP和瞬时物理误差未认证。地心TT黄经事件搜索不需要试算时刻的UT1，可跨C04边界；宫位、地平及日出等仍要求对应UT1来源覆盖。见IERS UT1核验。
+卜卦 `astro_horary` 与择日 `astro_election` 增加 `ut1_source`：默认 `swiss_delta_t`；`iers_c04` 仅使用固定1962-01-01 00:00至2026-09-19 00:00 UTC的IERS20 C04日值，不外推或自动回退。`clock_conversion.ut1_reference` 与盘面 `calculation_basis.earth_rotation.ut1_reference` 保留源区间及插值方式；模型路径为null。REST、MCP、CLI共享同一请求合同。只校正UT1，完整EOP和瞬时物理误差未认证。地心TT黄经事件搜索不需要试算时刻的UT1，可跨C04边界；宫位、地平及日出等仍要求对应UT1来源覆盖。见IERS UT1核验。
 
 关系盘Marks的公开字段卡主层为 `marks_chart_pair`，读取 `marks_charts.inner/outer`；`chart`仍是内方个人盘别名。安全联合投影保留 `marks_charts` 根，非Marks模式返回空对象，不增加计算。两种请求形式共享这些响应字段；按需合同见[astro_relative_chart](contracts/astro_relative_chart.json)。

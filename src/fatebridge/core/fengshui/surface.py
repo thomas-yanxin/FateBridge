@@ -3,7 +3,6 @@
 import json
 from copy import deepcopy
 from functools import lru_cache
-from hashlib import sha256
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, cast
 
@@ -267,19 +266,7 @@ def evaluate_surfaces(req: "AssessRequest") -> Dict[str, Any]:
                         )
                     )
                 )
-                action_id = (
-                    "surface-"
-                    + sha256(
-                        json.dumps(
-                            [
-                                surface.object_id,
-                                entry["rule_id"],
-                                item.object_id if item else None,
-                            ],
-                            ensure_ascii=False,
-                        ).encode("utf-8")
-                    ).hexdigest()[:16]
-                )
+                action_id = f"surface-{len(all_actions) + len(options)}"
                 action_pending: List[Dict[str, Any]] = []
 
                 def need(path: str, reason: str) -> None:

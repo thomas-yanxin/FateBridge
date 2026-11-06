@@ -7,8 +7,7 @@ import pytest
 
 from tests.evaluation import test_agentic_nested_outputs as adapters
 from tests.liuyao.test_liuyao_clash_transports import all_surfaces
-from tests.liuyao.test_liuyao_transports import assert_same_run_receipt
-from tests.support.result_delivery import reconstruct
+from tests.support.result_delivery import assert_same_run_receipt, reconstruct
 
 rest = adapters.rest
 BASE = Path(__file__).parents[1] / "fixtures/liuyao_quote_collation_v43"

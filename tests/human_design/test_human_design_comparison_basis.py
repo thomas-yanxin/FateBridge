@@ -17,10 +17,9 @@ from fatebridge.core.human_design_root_interpretations import (
     SCOPE,
     root_interpretations,
 )
-from fatebridge.services.replay_metadata import digest
+from fatebridge.core.human_design_solar_root_validation import verify_solar_root_context
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
-from fatebridge.validation.human_design_solar_root import verify_solar_root_context
 
 ROOT = Path(__file__).resolve().parents[2]
 PLAN_PATH = ROOT / "tests/fixtures/human-design-comparison-basis-plan.json"
@@ -171,7 +170,7 @@ def test_rehashed_detached_comparison_is_rejected_without_native(
     actual_public, kind, target
 ):
     run = deepcopy(actual_public)
-    original_digest = digest({k: v for k, v in run.items() if k != "run_metadata"})
+    original = deepcopy(run)
     row = family(run)["candidates"][1]
     interpretation = row["interpretation_from_selected"]
     value = row if target == "outer" else interpretation
@@ -202,10 +201,7 @@ def test_rehashed_detached_comparison_is_rejected_without_native(
             basis["candidate_time_relation"] = (
                 "later" if basis["candidate_time_relation"] == "earlier" else "earlier"
             )
-    run["run_metadata"]["business_output_sha256"] = digest(
-        {k: v for k, v in run.items() if k != "run_metadata"}
-    )
-    assert run["run_metadata"]["business_output_sha256"] != original_digest
+    assert run != original
     with (
         patch.object(runtime, "ephemeris_call", forbidden),
         patch.object(native_execution, "calculate", forbidden),

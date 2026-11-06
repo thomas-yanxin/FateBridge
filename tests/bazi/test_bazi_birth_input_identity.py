@@ -26,14 +26,7 @@ def test_mcp_omitted_and_explicit_zero_minute_have_distinct_input_identity():
         "second",
     ]
     assert leaf(explicit, receipt_path(spec))["omitted_components"] == ["second"]
-    assert (
-        omitted["run_metadata"]["input_sha256"]
-        != explicit["run_metadata"]["input_sha256"]
-    )
-    assert (
-        omitted["run_metadata"]["business_output_sha256"]
-        != explicit["run_metadata"]["business_output_sha256"]
-    )
+    assert leaf(omitted, receipt_path(spec)) != leaf(explicit, receipt_path(spec))
 
 
 rest = _shared_rest
@@ -81,8 +74,7 @@ def test_original_input_replay_and_identity_agree_across_actual_surfaces(
         leaf(d, receipt_path(spec)) == leaf(first, receipt_path(spec))
         for d in all_values
     )
-    assert len({d["run_metadata"]["input_sha256"] for d in all_values}) == 1
-    assert len({d["run_metadata"]["business_output_sha256"] for d in all_values}) == 1
+    assert all(d["run_metadata"]["replay"] == replay for d in all_values)
 
 
 def test_null_second_and_omitted_second_keep_the_same_unknown_input_identity():
@@ -96,4 +88,4 @@ def test_null_second_and_omitted_second_keep_the_same_unknown_input_identity():
         native(spec, {**payload, "birth_second": None}, **opts)
     ).structured_content
     assert leaf(a, receipt_path(spec)) == leaf(b, receipt_path(spec))
-    assert a["run_metadata"]["input_sha256"] == b["run_metadata"]["input_sha256"]
+    assert a["run_metadata"]["replay"] == b["run_metadata"]["replay"]

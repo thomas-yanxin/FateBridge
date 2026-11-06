@@ -15,7 +15,7 @@ from pathlib import Path
 
 from fatebridge.core.astro.aspects import _match_cross_aspect
 from fatebridge.core.classical_western import _aspect_is_applying, _aspect_phase
-from tests.western.test_western_angular_predicates import (
+from tests.support.western_angular_reference import (
     ANGLES,
     reference_match,
     reference_phase,

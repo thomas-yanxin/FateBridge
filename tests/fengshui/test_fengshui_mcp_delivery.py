@@ -8,7 +8,7 @@ from types import SimpleNamespace
 import pytest
 
 from fatebridge.application.result_delivery import ResultStore
-from tests.fengshui.test_fengshui_surfaces import same_run_projected_response
+from tests.support.mcp_result_assertions import same_run_projected_response
 
 
 def fixture(tmp_path, corruption=None):
@@ -18,12 +18,15 @@ def fixture(tmp_path, corruption=None):
         "run_metadata": {
             "run_id": "same-original-run",
             "tool_name": "fengshui_directions",
-            "runtime": {"ephemeris": {"files": {}, "sha256": "original"}},
+            "runtime": {"ephemeris": {"files": []}},
         },
     }
     ref = store.put(original)
     body = deepcopy(original)
-    body["run_metadata"]["runtime"] = {"delivery_path": "run_metadata.runtime"}
+    body["run_metadata"]["runtime"] = {
+        "delivery_path": "run_metadata.runtime",
+        "ephemeris_files_count": 0,
+    }
     body["result_delivery"] = {**ref, "deferred_fields": ["run_metadata.runtime"]}
     if corruption == "missing_business":
         body.pop("layers")
@@ -65,5 +68,5 @@ def test_delivery_metadata_cannot_hide_corrupt_or_missing_evidence(
     tmp_path, corruption
 ):
     reader, response, _ = fixture(tmp_path, corruption)
-    with pytest.raises(AssertionError):
+    with pytest.raises((AssertionError, json.JSONDecodeError)):
         asyncio.run(same_run_projected_response(reader, response))

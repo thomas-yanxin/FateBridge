@@ -150,7 +150,6 @@ def receipt():
         path="qimen.stem_context.hour_branch_tomb",
         value=deepcopy(payload["qimen"]["stem_context"]["hour_branch_tomb"]),
         run_id=payload["run_metadata"]["run_id"],
-        business_output_sha256=payload["run_metadata"]["business_output_sha256"],
     )
     return payload, claim
 

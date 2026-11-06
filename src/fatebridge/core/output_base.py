@@ -2,7 +2,18 @@
 
 from typing import Annotated, TypeVar
 
-from pydantic import BaseModel, ConfigDict, Field, ValidationInfo, model_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    GetJsonSchemaHandler,
+    ValidationInfo,
+    model_validator,
+)
+from pydantic.json_schema import JsonSchemaValue
+from pydantic_core import CoreSchema
+
+from fatebridge.core.public_output import is_integrity_field
 
 T = TypeVar("T")
 FullFact = Annotated[
@@ -23,6 +34,23 @@ class PartialOutput(BaseModel):
     """
 
     model_config = ConfigDict(extra="allow", strict=True, defer_build=True)
+
+    @classmethod
+    def __get_pydantic_json_schema__(
+        cls, core_schema: CoreSchema, handler: GetJsonSchemaHandler
+    ) -> JsonSchemaValue:
+        schema = handler.resolve_ref_schema(handler(core_schema))
+        properties = schema.get("properties", {})
+        schema["properties"] = {
+            name: value
+            for name, value in properties.items()
+            if not is_integrity_field(name)
+        }
+        if "required" in schema:
+            schema["required"] = [
+                name for name in schema["required"] if not is_integrity_field(name)
+            ]
+        return schema
 
     @model_validator(mode="after")
     def require_complete_facts(self, info: ValidationInfo) -> "PartialOutput":

@@ -71,7 +71,7 @@ v12历史钟制：只有原记录明确为LMT/LAT才选择对应birth_clock_basi
 
 ## 星历来源与生时网格
 
-v16的`india.profile.physical_ephemeris_source`按物理星体与坐标帧记录后端和观察到的文件身份；例如`by_factor.ecliptic_Sun`。Rahu／Ketu的分析或派生模型仍单独读取，不能借其返回标志认证物理数据文件。`atomic_file_read_proven=false / accuracy_certified=false`保留，文件指纹不是天文精度或预测证书。
+v16的`india.profile.physical_ephemeris_source`按物理星体与坐标帧记录后端和观察到的文件身份；例如`by_factor.ecliptic_Sun`。Rahu／Ketu的分析或派生模型仍单独读取，不能借其返回标志认证物理数据文件。`atomic_file_read_proven=false / accuracy_certified=false`保留，文件标识不是天文精度或预测证书。
 
 生时范围的`source_comparison`保留完整网格的来源引用及可比较来源。新增运动帧只在实际可用点比较，其年代窗口缺项仍单独解释；观察数不是概率。若实际返回`ephemeris_source_inconsistent`及`runtime.ephemeris_data/model_changed`等原因，应说明计算来源不可比较并先修复数据覆盖，不能描述为用户未提供生时、删掉相应样本、补成零或继续解释被拒绝的网格。名义盘、太阳事件的独立来源范围仍分别核对；本轮未证明完整文件读取集合、原典或现实预测满分。
 
@@ -83,9 +83,9 @@ v17在`clock_context.source_comparison`回显原钟面重算、原始太阳来�
 
 实际原因为`position_motion_not_converged`时，是运动差分没有满足内部收敛线；不能自动解释为出生资料不足、文件缺失或人生事件不确定。补齐文件不保证解除数值收敛错误，应保留被拒绝状态并转工程核查。冻结验收快照中2400年连接处的两个建盘入口限制是预期失败，未计为准确度通过；其他已独立返回的有效层仍按其证据范围解释。
 
-Delta-T／UT1来源仍有已复现的缺口：旧外部表或固定值设置可能影响上升，当前物理星历指纹及complete状态不能排除这种运行时历史。若已确认有这类设置或可复现异常，应由工程入口核对新进程与实际时间来源，再从原始资料复算；不能让咨询用户补生时、改钟时或把差异解释为吉凶。普通新线程在本轮macOS与Linux绑定表现不同，不作为跨平台修复保证。调查和未接入的防护原型见Delta-T状态调查。
+Delta-T／UT1来源仍有已复现的缺口：旧外部表或固定值设置可能影响上升，当前物理星历来源及complete状态不能排除这种运行时历史。若已确认有这类设置或可复现异常，应由工程入口核对新进程与实际时间来源，再从原始资料复算；不能让咨询用户补生时、改钟时或把差异解释为吉凶。普通新线程在本轮macOS与Linux绑定表现不同，不作为跨平台修复保证。调查和未接入的防护原型见Delta-T状态调查。
 
-完整原生上下文：v18的`india.profile.native_execution_context`说明本次计算使用新exec进程及辅助时间文件的首末指纹范围。它解决共享进程的旧Delta-T／固定值污染；不是测得UT1、辅助表数值正确或现实预测有效的证明。当前选中的外部表仍会影响结果，不能把隔离等同于自动纠正运行者输入的表。参见修复审计。
+完整原生上下文：v18的`india.profile.native_execution_context`说明本次计算使用新exec进程及辅助时间文件的首末完整性核对范围。它解决共享进程的旧Delta-T／固定值污染；不是测得UT1、辅助表数值正确或现实预测有效的证明。当前选中的外部表仍会影响结果，不能把隔离等同于自动纠正运行者输入的表。参见修复审计。
 
 v19可选太阳时显示使用记录时刻的共享TT／模型UT1与太阳时角，读取`clock_context.solar_display_context`核对实际来源。其`solar_wall_datetime`不带时区，`physical_instant_shifted=false`；不能将墙钟标签再作民用时间重排，不能把微秒格式当作出生资料或实测地球自转精度。SDK旧派生标签可以重算，已确认的记录钟时与物理UTC保持不变。
 

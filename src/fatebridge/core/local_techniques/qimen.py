@@ -17,10 +17,9 @@ from fatebridge.utils.solar_time_provenance import solar_time_evidence_lines
 
 from .chart import (
     _build_qimen_palace_overview_lines,
-    _join_lines,
     _render_qimen_palace_sections,
-    _render_snapshot_text,
 )
+from .snapshot import join_lines, render_snapshot_text
 
 QIMEN_NINE_GRID_LAYOUT = (
     ("巽四宫", "离九宫", "坤二宫"),
@@ -267,7 +266,7 @@ def build_qimen_snapshot_text(*, seed: MetaphysicsSeed, qimen: Dict[str, Any]) -
     sections = [
         (
             "起盘信息",
-            _join_lines(
+            join_lines(
                 [
                     f"农历：{(seed.calendar_context.get('lunar_calendar') or {}).get('display') or '无'}",
                     f"起局时间：{seed.corrected_datetime:%Y-%m-%d %H:%M:%S}（{'真太阳时' if seed.applied_true_solar else '钟表时间'}）",
@@ -279,7 +278,7 @@ def build_qimen_snapshot_text(*, seed: MetaphysicsSeed, qimen: Dict[str, Any]) -
         ),
         (
             "盘型",
-            _join_lines(
+            join_lines(
                 [
                     f"当前节气：{(seed.calendar_context.get('current_solar_term') or {}).get('name', '无')}",
                     f"下个节气：{(seed.calendar_context.get('next_solar_term') or {}).get('name', '无')}",
@@ -295,7 +294,7 @@ def build_qimen_snapshot_text(*, seed: MetaphysicsSeed, qimen: Dict[str, Any]) -
         ),
         (
             "盘面要素",
-            _join_lines(
+            join_lines(
                 [
                     (
                         f"值符：{zhifu.get('star', '无')}在{zhifu.get('palace', '无')}"
@@ -315,7 +314,7 @@ def build_qimen_snapshot_text(*, seed: MetaphysicsSeed, qimen: Dict[str, Any]) -
         ),
         (
             "奇门演卦",
-            _join_lines(
+            join_lines(
                 [
                     "来源范围：软件派生层，未作原典认证",
                     f"伏使卦：{(qimen.get('fushi_hexagram') or {}).get('name', '无')} / {(qimen.get('fushi_hexagram') or {}).get('binary_code', '无')}",
@@ -326,7 +325,7 @@ def build_qimen_snapshot_text(*, seed: MetaphysicsSeed, qimen: Dict[str, Any]) -
         ),
         (
             "规则依据",
-            _join_lines(
+            join_lines(
                 [
                     "来源：明·程道生《遁甲演义》，四库全书本在线转录及所列影印选页；卷四十八局值符值使宫数含2项分歧，全书未校勘。",
                     f"固定版本：{(qimen.get('rulesets') or [{}])[0].get('source', '无')}",
@@ -338,11 +337,11 @@ def build_qimen_snapshot_text(*, seed: MetaphysicsSeed, qimen: Dict[str, Any]) -
                 ]
             ),
         ),
-        ("八宫详解", _join_lines(_build_qimen_palace_overview_lines(qimen)) or "无"),
-        ("九宫方盘", _join_lines(_build_qimen_nine_grid_lines(qimen)) or "无"),
+        ("八宫详解", join_lines(_build_qimen_palace_overview_lines(qimen)) or "无"),
+        ("九宫方盘", join_lines(_build_qimen_nine_grid_lines(qimen)) or "无"),
         *_render_qimen_palace_sections(qimen),
     ]
-    return _render_snapshot_text(sections)
+    return render_snapshot_text(sections)
 
 
 def build_qimen_with_options(

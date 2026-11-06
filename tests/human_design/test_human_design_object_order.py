@@ -12,7 +12,6 @@ from fatebridge.core.astro import native_execution, runtime
 from fatebridge.core.human_design import longitude_activation
 from fatebridge.core.human_design_depth import line_fixings
 from fatebridge.core.human_design_source_variants import line_variant_impact
-from fatebridge.services.replay_metadata import digest
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
 from tests.human_design.test_human_design_publisher import current as current
@@ -88,21 +87,14 @@ def test_source_29_disagreement_lists_are_independent_of_side_object_order():
 
 @pytest.mark.parametrize("order", ["sorted", "reversed"])
 @pytest.mark.parametrize("index", range(16))
-def test_all_frozen_publisher_runs_keep_hash_and_full_reading_when_maps_reorder(
+def test_all_frozen_publisher_runs_keep_facts_and_full_reading_when_maps_reorder(
     index, order, current  # noqa: F811 - pytest fixture dependency
 ):
     RUNS, _ = current
     original = RUNS[index]["run"]
     reordered = permute(original, order)
-    # No rehash, array sorting, rounding or source edits are permitted here.
-    assert (
-        reordered["run_metadata"]["business_output_sha256"]
-        == original["run_metadata"]["business_output_sha256"]
-    )
-    assert (
-        digest({k: v for k, v in reordered.items() if k != "run_metadata"})
-        == original["run_metadata"]["business_output_sha256"]
-    )
+    # Object-key order does not change facts; array order remains significant.
+    assert reordered == original
     assert (
         reordered["activations"]["personality"]
         == original["activations"]["personality"]
@@ -155,9 +147,7 @@ def test_rehashed_array_or_value_changes_still_reject_after_map_sorting(
     else:
         records[0]["reading"] = "Complete original line meaning accepted"
     run = permute(run, "sorted")
-    actual = digest({k: v for k, v in run.items() if k != "run_metadata"})
-    assert actual != source["run_metadata"]["business_output_sha256"]
-    run["run_metadata"]["business_output_sha256"] = actual
+    assert run != source
     with (
         patch.object(runtime, "ephemeris_call", forbidden),
         patch.object(native_execution, "calculate", forbidden),

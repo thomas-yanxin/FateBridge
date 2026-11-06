@@ -12,9 +12,9 @@ from fatebridge.core.heluo import build_snapshot_text, yao_text
 from fatebridge.core.heluo_timing import selected_timing_snapshot
 from fatebridge.services.knowledge import calculate_knowledge_read
 from fatebridge.services.tool_catalog import CATALOG
-from tests.numerology.test_heluo_poem_transports import run_three
 from tests.support.transports import business
 from tests.support.transports import rest as shared_rest
+from tests.support.transports import run_three
 
 F = Path(__file__).parents[1] / "fixtures/heluo_shike21_bi8_v1"
 L = json.loads((F / "reviewed-literals-v2.json").read_bytes())

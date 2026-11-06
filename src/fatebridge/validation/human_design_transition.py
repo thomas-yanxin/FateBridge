@@ -16,7 +16,7 @@ from fatebridge.core.human_design_transition import (
     dependency_projection,
     refinement_summary,
 )
-from fatebridge.validation.claims import _same_value
+from fatebridge.core.public_output import same_public_value as _same_value
 
 
 def verify_transition_trace(

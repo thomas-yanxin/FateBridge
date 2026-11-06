@@ -16,6 +16,8 @@
 
 选择逻辑见 [`solar_model_policy.py`](../src/fatebridge/core/solar_model_policy.py)。默认系数来自 DE440 的无损裁取，主模型、扩展年份及派生边界保留各自模型身份和来源指纹。TT 网格符合不能认证绝对 UTC、全部连续时刻或现实预测。
 
+`native`／`swiss` 的环境回执只描述配置，不为生成回执加载太阳系数；纯知识文本查询不因此依赖未使用的太阳模型。实际交节计算仍校验所选来源，完整 Moshier 回退所需的轨道表或 ERFA 坐标系数缺失、损坏时仍明确失败。
+
 外部数据准备见[星历安装](ephemeris.md)，固定有限队列及仍未通过项见[分项精度验收](precision-acceptance.md)。需要可选模型时先完成[源码环境准备](development-guide.md#环境准备)；SPK／视位置对照所需依赖可用 `uv sync --locked --extra dev --extra jpl` 安装，后续命令也保留这两个 extra。
 
 ## 严格 Swiss 文件模式

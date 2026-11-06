@@ -10,7 +10,7 @@ import pytest
 from fatebridge.core import almanac, spk_solar
 from fatebridge.core.local_techniques.sixyao import build_sixyao_result
 from tests.liuyao.test_liuyao_clash_transports import all_surfaces
-from tests.liuyao.test_liuyao_transports import assert_same_run_receipt
+from tests.support.result_delivery import assert_same_run_receipt
 from tests.support.transports import SPECS, business, native, rest, surface_calls
 
 MODEL = "fatebridge_jpl_spk_solar_v1"

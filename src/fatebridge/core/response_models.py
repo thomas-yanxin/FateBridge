@@ -63,7 +63,6 @@ class ResultDelivery(PartialOutput):
     compact_reference: Optional[bool] = None
     mode: Optional[str] = None
     result_id: Optional[str] = None
-    sha256: Optional[str] = None
     total_chars: Optional[int] = None
     total_bytes: Optional[int] = None
     expires_at: Optional[float] = None
@@ -112,9 +111,6 @@ class RunMetadata(PartialOutput):
     parent_run_id: Optional[str] = None
     metadata_schema_version: Optional[str] = None
     package_version: Optional[str] = None
-    contract_sha256: Optional[str] = None
-    input_sha256: Optional[str] = None
-    business_output_sha256: Optional[str] = None
     duration_ms: Optional[float] = Field(default=None, ge=0)
     effective_time: Optional[EffectiveTime] = None
     determinism: Optional[Determinism] = None

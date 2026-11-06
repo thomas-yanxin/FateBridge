@@ -204,7 +204,6 @@ def test_actual_receipt_does_not_accept_textual_huacai_as_natal_huake():
             path=f"ziwei_birth.symbolic_properties.records.{i}.natal_mutagen",
             value=value,
             run_id=receipt["run_id"],
-            business_output_sha256=receipt["business_output_sha256"],
         )
 
     assert rows[i]["natal_mutagen"] == "化科"

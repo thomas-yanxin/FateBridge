@@ -56,11 +56,6 @@ from fatebridge.utils.errors import (
     validation_error_result,
 )
 
-# ============================================================================
-# Setup
-# ============================================================================
-
-# Configure logging
 logging.basicConfig(
     level=getattr(logging, get_log_level(), logging.INFO),
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -75,9 +70,6 @@ app = FastAPI(
     responses={422: {"model": ErrorEnvelope}},
 )
 
-# ============================================================================
-# CORS Configuration - FIXED SECURITY ISSUE
-# ============================================================================
 
 # Get allowed origins from environment variable, default to localhost for development
 ALLOWED_ORIGINS = parse_allowed_origins()
@@ -477,16 +469,6 @@ async def _execute_service(
     return attach_run_metadata(result, tool_name=tool_name or "unknown_tool")
 
 
-# ============================================================================
-# Request/Response Models
-# ============================================================================
-
-
-# ============================================================================
-# API Endpoints
-# ============================================================================
-
-
 @app.get("/health")
 async def health_check() -> dict:
     """Health check endpoint for monitoring."""
@@ -515,16 +497,9 @@ async def metrics_endpoint() -> PlainTextResponse:
     )
 
 
-# ============================================================================
-# Main
-# ============================================================================
-
-
-# ============================================================================
 # Catalog-driven REST registration. Every business POST route is declared once
 # in fatebridge/services/tool_catalog.py and mounted here. To add a route, edit
 # the catalog — not this file.
-# ============================================================================
 
 from fatebridge.services.tool_catalog import (  # noqa: E402
     CATALOG,
@@ -591,7 +566,6 @@ async def result_page(
 @app.get("/api/results/{result_id}/verified")
 async def verified_result_page(
     result_id: str,
-    expected_sha256: str = Query(pattern=r"^[0-9a-f]{64}$"),
     expected_run_id: str = Query(pattern=r"^[A-Za-z0-9_-]{1,128}$"),
     offset: int = Query(default=0, ge=0),
     path: Optional[str] = Query(default=None, max_length=1000),
@@ -601,7 +575,6 @@ async def verified_result_page(
         return await run_in_threadpool(
             RESULT_STORE.verified_page,
             result_id,
-            expected_sha256,
             expected_run_id,
             offset,
             path,

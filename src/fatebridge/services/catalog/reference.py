@@ -33,7 +33,6 @@ calculate_knowledge_registry = lazy_service(
 )
 
 SPECS: List[ToolSpec] = [
-    # --- Export / Knowledge ------------------------------------------------
     ToolSpec(
         key="export_registry",
         bind=raw_invoke(calculate_export_registry),

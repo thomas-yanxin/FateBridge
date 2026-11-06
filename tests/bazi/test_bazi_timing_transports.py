@@ -179,7 +179,6 @@ def test_declared_birth_range_and_fact_receipt_agree_on_three_surfaces(
             path="birth_time_sensitivity.sample_count",
             value=3,
             run_id=metadata["run_id"],
-            business_output_sha256=metadata["business_output_sha256"],
         )
         assert (
             verify_calculation_claims(output, [claim])["status"]

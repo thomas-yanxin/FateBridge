@@ -35,9 +35,6 @@ def _separation(a: float, b: float) -> float:
     return min(delta, 360.0 - delta)
 
 
-# --------------------------------------------------------------------------- #
-# 恒星推运 (vedicprog) — pure builder invariants.
-# --------------------------------------------------------------------------- #
 def test_vedic_progression_reports_real_aspects() -> None:
     natal = {"Sun": 10.0, "Moon": 200.0}
     progressed = {
@@ -79,9 +76,6 @@ def test_vedicprog_end_to_end_is_sidereal() -> None:
     assert result["vedic_progression"]["zodiac"] == "sidereal"
 
 
-# --------------------------------------------------------------------------- #
-# 赤纬推运 (jaynesprog) — pure builder invariants.
-# --------------------------------------------------------------------------- #
 def test_declination_parallel_and_contraparallel() -> None:
     progressed = {"Sun": 20.0, "Mars": -15.0}
     natal = {"Moon": 20.4, "Venus": 15.2}
@@ -91,7 +85,6 @@ def test_declination_parallel_and_contraparallel() -> None:
     assert ("Sun", "Moon", "parallel") in pairs
     # Mars(-15.0) vs Venus(+15.2): opposite sign, |sum|=0.2 ≤ 0.5 → contraparallel.
     assert ("Mars", "Venus", "contraparallel") in pairs
-    # Each reported pair genuinely satisfies its declination relation.
     for p in payload["parallels"]:
         if p["kind"] == "parallel":
             assert abs(p["progressed_declination"] - p["natal_declination"]) <= 0.5

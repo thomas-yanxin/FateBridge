@@ -92,7 +92,6 @@ class TimingEffectsAnalysis:
         )
         new_distribution = ElementAnalysis.convert_to_percentage(combined_counts)
 
-        # 计算变化
         element_changes = {}
         for element in Element:
             element_name = element.value
@@ -184,7 +183,6 @@ class TimingEffectsAnalysis:
         month_stem = birth_pillars["month"][0]
         month_branch = birth_pillars["month"][1]
 
-        # 计算起运年龄
         timeline = TimingAnalysis.calculate_dayun_timeline(
             birth_date, gender, (month_stem, month_branch), timezone_name
         )
@@ -356,7 +354,6 @@ class TimingEffectsAnalysis:
         Returns:
             流月影响分析
         """
-        # 获取流月信息
         if liuyue_info is None:
             liuyue_info = TimingAnalysis.calculate_liuyue(
                 target_year,
@@ -366,7 +363,6 @@ class TimingEffectsAnalysis:
                 target_date=target_date,
             )
 
-        # 使用新的详细分析功能
         detailed_analysis = TimingAnalysis.analyze_liuyue_detailed(
             birth_pillars,
             target_year,
@@ -518,7 +514,6 @@ class TimingEffectsAnalysis:
             "combination_effects": {},
         }
 
-        # 添加流年分析
         if include_liunian:
             if liunian_analysis is None:
                 liunian_analysis = TimingEffectsAnalysis.analyze_liunian_effects(
@@ -531,7 +526,6 @@ class TimingEffectsAnalysis:
                 )
             result["liunian_analysis"] = liunian_analysis
 
-            # 分析流月与流年的组合效应
             liuyue_branch = liuyue_analysis["liuyue_info"]["branch"]
             liunian_branch = liunian_analysis["liunian_info"]["branch"]
 
@@ -543,7 +537,6 @@ class TimingEffectsAnalysis:
         # 大运组合分析需要性别+出生日期等额外输入，本入口未提供这些参数，
         # 故不在此层伪造。需要大运联动时由上层 analyze_dayun_effects 负责。
 
-        # 生成综合总结
         result["comprehensive_summary"] = (
             TimingEffectsAnalysis._generate_comprehensive_liuyue_summary(result)
         )
@@ -671,7 +664,6 @@ class TimingEffectsAnalysis:
         if analysis_date is None:
             analysis_date = current_local_datetime(timezone_name)
 
-        # 计算当前年龄
         explicit_age = current_age is not None
         if current_age is None:
             current_age = analysis_date.year - birth_date.year

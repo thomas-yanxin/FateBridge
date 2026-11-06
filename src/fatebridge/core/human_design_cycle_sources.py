@@ -110,7 +110,7 @@ class CycleSourceTrace:
                 raise EphemerisSourceError("changed_during")
         except OSError as error:
             raise EphemerisSourceError("unavailable_during") from error
-        identity = f"{'jpl' if jpl else 'se1'}:{slot}:{digest}"
+        identity = f"{'jpl' if jpl else 'se1'}:{slot}:{path.name}"
         previous_digest = self._names.get((slot, path.name))
         if previous_digest is not None and previous_digest != digest:
             raise EphemerisSourceError("changed_across")
@@ -223,7 +223,6 @@ def cycle_source_summary(source: dict[str, Any]) -> dict[str, Any]:
                 key: row[key]
                 for key in (
                     "filename",
-                    "sha256",
                     "de_number",
                     "matches_packaged_manifest",
                 )

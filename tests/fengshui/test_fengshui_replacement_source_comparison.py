@@ -17,7 +17,8 @@ from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.fengshui import calculate_xuankong_natal
 from fatebridge.validation.fengshui_reading import verify_fengshui_reading
 from tests.fengshui.test_fengshui_source_comparison import request
-from tests.fengshui.test_fengshui_surfaces import rest_client, without_transport
+from tests.support.mcp_result_assertions import without_transport
+from tests.support.transports import rest_client
 
 ROOT = Path(__file__).parents[2]
 

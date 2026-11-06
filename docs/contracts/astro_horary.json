@@ -232,7 +232,7 @@
         "horary.calculation_basis.julian_day_tt",
         "horary.calculation_basis.julian_day_ut1"
       ],
-      "purpose": "核对明确选择的模型或IERS20 C04 UT1来源、固定覆盖期、源文件指纹、插值区间与未应用修正；盘面与地平计算仍要求覆盖内UT1；地心TT黄经事件不外推UT1即可跨边界搜索，未取得瞬时观测误差或现实预测证据。"
+      "purpose": "核对明确选择的模型或IERS20 C04 UT1来源、固定覆盖期、源文件名称与版本、插值区间与未应用修正；盘面与地平计算仍要求覆盖内UT1；地心TT黄经事件不外推UT1即可跨边界搜索，未取得瞬时观测误差或现实预测证据。"
     }
   },
   "first_view": {
@@ -640,7 +640,7 @@
   "method_contracts": [
     {
       "comparison_requirements": [
-        "相同方法合同、实现/数据指纹、选项与实际计算层"
+        "相同方法合同、实现与数据版本、选项及实际计算层"
       ],
       "dependencies": [
         "validated_request"

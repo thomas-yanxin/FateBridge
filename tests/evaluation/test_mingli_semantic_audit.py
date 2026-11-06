@@ -294,15 +294,16 @@ def test_archived_payload_must_match_actual_delivery_even_after_file_hash_is_upd
     capture_path = target / "mcp-calls.jsonl"
     row = json.loads(capture_path.read_text())
     original_payload = copy.deepcopy(row["result"]["structured_content"])
-    payload_hash = hashlib.sha256(
-        json.dumps(original_payload, ensure_ascii=False, separators=(",", ":")).encode()
-    ).hexdigest()
+    payload_text = json.dumps(
+        original_payload, ensure_ascii=False, separators=(",", ":")
+    )
     original_path = tmp_path / "original-delivery.json"
     delivery = {
         "mode": "paged",
         "file_path": str(original_path),
         "file_payload_path": "payload",
-        "sha256": payload_hash,
+        "total_bytes": len(payload_text.encode()),
+        "total_chars": len(payload_text),
     }
     row["result"]["structured_content"]["result_delivery"] = delivery
     # All records here are synthetic. Regenerate their valid local chain so the
@@ -339,7 +340,6 @@ def test_archived_payload_must_match_actual_delivery_even_after_file_hash_is_upd
                     "archived_file": "delivered-files/1.json",
                     "run_id": original_payload["run_metadata"]["run_id"],
                     "file_sha256": digest(archive),
-                    "advertised_payload_sha256": payload_hash,
                     "file_payload_path": "payload",
                 }
             ]
@@ -357,7 +357,7 @@ def test_archived_payload_must_match_actual_delivery_even_after_file_hash_is_upd
         manifest,
         lambda document: document["entries"][0].update(file_sha256=digest(archive)),
     )
-    with pytest.raises(ValueError, match="Archive payload hash differs"):
+    with pytest.raises(ValueError, match="Archive payload differs"):
         audit(run, [review])
 
 
@@ -367,7 +367,8 @@ def test_script_cli_audits_only_synthetic_saved_artifacts(tmp_path):
     result = subprocess.run(
         [
             sys.executable,
-            str(ROOT / "scripts/evaluation/audit_mingli_evaluation.py"),
+            "-m",
+            "scripts.evaluation.audit_mingli_evaluation",
             "--run",
             str(run),
             "--review",

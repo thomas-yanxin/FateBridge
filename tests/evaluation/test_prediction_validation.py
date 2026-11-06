@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 import pytest
 from pydantic import ValidationError
 
-from fatebridge.services.replay_metadata import digest
+from fatebridge.utils.json_digest import digest
 from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
 from fatebridge.validation.predictions import (
     Forecast,
@@ -230,7 +230,6 @@ def calculation():
         **body,
         "run_metadata": {
             "run_id": "original-run",
-            "business_output_sha256": digest(body),
         },
     }
 
@@ -241,7 +240,6 @@ def claim(payload, path="dayun.pillar", value="乙酉", **changes):
             "path": path,
             "value": value,
             "run_id": payload["run_metadata"]["run_id"],
-            "business_output_sha256": payload["run_metadata"]["business_output_sha256"],
             **changes,
         }
     )
@@ -278,7 +276,10 @@ def test_edited_projected_and_different_run_payloads_fail_closed():
         {"run_metadata": p["run_metadata"], "dayun": p["dayun"]},
         {**deepcopy(p), "score": 100},
     ):
-        assert verify_calculation_claims(changed, [c])["status"] == "rejected"
+        assert (
+            verify_calculation_claims(changed, [c], trusted_payload=p)["status"]
+            == "rejected"
+        )
     assert (
         verify_calculation_claims(p, [claim(p, run_id="other-run")])["status"]
         == "rejected"

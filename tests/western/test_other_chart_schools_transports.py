@@ -319,7 +319,7 @@ def test_specialized_facts_across_three_real_surfaces(
             "hypothetical_element_source"
         ]
         assert element_source["status"] == "external_file"
-        assert element_source["sha256"] == expected_element_source_hash
+        assert "sha256" not in element_source
         assert str(tmp_path) not in json.dumps(element_source)
         hypotheses = [
             row
@@ -497,7 +497,7 @@ def test_full_geometry_delivery_is_the_same_run_and_hashes_exact_bytes(
             break
         offset = page["next_offset"]
     content = "".join(chunks)
-    assert hashlib.sha256(content.encode()).hexdigest() == receipt["sha256"]
+    assert len(content) == receipt["total_chars"]
     complete = json.loads(content)
     assert (
         json.loads(Path(receipt["file_path"]).read_bytes())[

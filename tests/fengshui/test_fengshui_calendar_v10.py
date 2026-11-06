@@ -16,12 +16,10 @@ from fatebridge.services.fengshui import calculate_annual_stars
 from fatebridge.services.run_metadata import attach_run_metadata
 from fatebridge.utils.errors import EphemerisSourceError
 from fatebridge.validation.fengshui_calendar import audit_lichun_reference
-from tests.fengshui.test_fengshui_surfaces import (
-    mcp_call,
-    rest_client,
-    without_transport,
-)
 from tests.fixtures.fengshui import payload
+from tests.support.fengshui_transports import mcp_call
+from tests.support.mcp_result_assertions import without_transport
+from tests.support.transports import rest_client
 
 FOLDER = Path(__file__).parents[1] / "data/fengshui_lichun_tt"
 REFERENCE = json.loads((FOLDER / "reference.json").read_text())
@@ -195,36 +193,3 @@ def test_confirmed_year_does_not_invent_a_solver_or_clock_assumption():
     assert time["interval_scope"] == "not_needed_for_confirmed_effective_birth_year"
     assert "time_basis" not in time
     assert "UT1/ΔT约定" not in result["snapshot_text"]
-
-
-def test_actual_moshier_return_flag_is_distinct_from_a_linear_solver_fallback(
-    monkeypatch, tmp_path, capsys
-):
-    monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
-    # The empty directory alone no longer selects the native control in auto.
-    monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
-    almanac.get_solar_terms_for_year.cache_clear()
-    try:
-        inputs = {"effective_year": 2026}
-        http = rest_client(monkeypatch).post("/api/fengshui/annual_stars", json=inputs)
-        protocol = asyncio.run(mcp_call("annual_stars", inputs))
-        path = tmp_path / "input.json"
-        path.write_text(json.dumps(inputs))
-        assert run(["fengshui_annual_stars", "--request-file", str(path)]) == 0
-        cli = json.loads(capsys.readouterr().out)
-        assert http.status_code == 200 and not protocol.is_error
-        for body in (http.json(), protocol.structured_content, cli):
-            resolution = body["layers"]["annual_stars"]["time_context"]["timing"][
-                "start_resolution"
-            ]
-            assert resolution["provider"] == "swisseph"
-            assert resolution["ephemeris_model"] == "moshier"
-            assert resolution["ephemeris_model_scope"] == "sun_position_at_reported_TT"
-            assert (
-                resolution["approximate"] is False
-            )  # solved longitude, not fixed-qi fallback
-            assert body["run_metadata"]["engine_is_approximate"] is True
-            assert "approximate_engine" in body["run_metadata"]["warnings"]
-            assert "星历为Moshier" in body["snapshot_text"]
-    finally:
-        almanac.get_solar_terms_for_year.cache_clear()

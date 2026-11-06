@@ -8,7 +8,6 @@ import pytest
 from fatebridge.core.requests.divination import SuZhanRequest
 from fatebridge.core.sukuyo import calendar_mansion, day_evidence, rulesets
 from fatebridge.core.sukuyo_clothing import clothing_reference
-from fatebridge.services.replay_metadata import digest
 from fatebridge.validation.sukuyo import (
     required_quote_paths,
     verify_sukuyo_context_claims,
@@ -169,7 +168,6 @@ def test_complete_context_rejects_the_previous_missing_candidate_day_loophole():
     result["run_metadata"] = {
         "tool_name": "suzhan",
         "run_id": "synthetic-domain-branch-context",
-        "business_output_sha256": digest(result),
     }
     assert len(result["sukuyo"]["candidate_days"]) == 3
     claims = quotes(result, "activity")

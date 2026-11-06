@@ -1,19 +1,15 @@
-"""Native calculations cannot consume or name an unrelated analytic profile."""
-
-import json
-from pathlib import Path
+"""Selected solar sources are required; configuration-only receipts do not load them."""
 
 import pytest
 
 from fatebridge.core import almanac, analytic_solar, solar_model_policy
 from fatebridge.core import solar_term_runtime as runtime
 from fatebridge.utils.errors import EphemerisSourceError
-from tests.numerology.test_heluo_poem_transports import run_three
 from tests.support.transports import SPECS, business
 from tests.support.transports import rest as shared_rest
+from tests.support.transports import run_three
 
 rest = shared_rest
-F = Path(__file__).parents[1] / "fixtures/numerology_native_dependency_v1"
 
 
 @pytest.fixture(autouse=True)
@@ -30,7 +26,7 @@ def native_empty_source(monkeypatch, tmp_path):
 
 
 def poison_analytic_profile(monkeypatch, tmp_path, fault):
-    package = tmp_path / "unrelated-analytic-package"
+    package = tmp_path / "analytic-package"
     package.mkdir()
     if fault == "malformed":
         path = package / "data/astronomy/analytic-solar-v1.json"
@@ -40,41 +36,32 @@ def poison_analytic_profile(monkeypatch, tmp_path, fault):
     monkeypatch.setattr(analytic_solar, "files", lambda _: package)
 
 
-def test_pre_edit_reference_identifies_the_actual_source_contradiction():
-    reference = json.loads((F / "reference.json").read_bytes())
-    assert reference["before_policy"]["model_id"] == "fatebridge_analytic_solar_v1"
-    assert reference["before_observed_models"] == ["moshier"]
-    assert reference["before_observed_retflags"] == [4]
-    assert reference["new_physical_observations"] == 0
-
-
 @pytest.mark.parametrize("fault", ["missing", "malformed"])
 @pytest.mark.parametrize("year", [1799, 2026, 2201])
-def test_real_native_year_grid_does_not_read_unrelated_coefficients(
+def test_selected_complete_moshier_year_grid_requires_its_frame_source(
     year, fault, monkeypatch, tmp_path
 ):
-    expected = [t.as_dict() for t in almanac.get_solar_terms_for_year(year, "UTC")]
+    terms = almanac.get_solar_terms_for_year(year, "UTC")
+    assert len(terms) == 24
+    assert all(
+        term.ephemeris_model == "fatebridge_complete_moshier_solar_v1"
+        and term.ephemeris_retflags == ()
+        and term.solar_model_details["native_moshier_relabelled"] is False
+        and term.solar_model_details["accuracy_certified"] is False
+        for term in terms
+    )
     poison_analytic_profile(monkeypatch, tmp_path, fault)
     almanac.get_solar_terms_for_year.cache_clear()
-    actual = almanac.get_solar_terms_for_year(year, "UTC")
-    assert [t.as_dict() for t in actual] == expected
-    assert len(actual) == 24
-    assert all(
-        t.ephemeris_model == "moshier" and t.ephemeris_retflags == (4,) for t in actual
-    )
-    assert all(t.solar_model_details["accuracy_certified"] is False for t in actual)
-    assert analytic_solar.profile.cache_info().misses == 0
+    with pytest.raises(EphemerisSourceError) as failure:
+        almanac.get_solar_terms_for_year(year, "UTC")
+    assert failure.value.reason == "solar_analytic_invalid"
 
 
 @pytest.mark.parametrize("fault", ["missing", "malformed"])
-def test_native_cache_and_policy_do_not_load_or_name_analytic_source(
+def test_native_configuration_receipt_does_not_resolve_unused_coefficients(
     fault, monkeypatch, tmp_path
 ):
-    key = solar_model_policy.solar_model_cache_key(year=2026)
-    cached = almanac.get_solar_terms_for_year(2026, "UTC")
     poison_analytic_profile(monkeypatch, tmp_path, fault)
-    assert solar_model_policy.solar_model_cache_key(year=2026) == key
-    assert almanac.get_solar_terms_for_year(2026, "UTC") is cached
     for resolve in [False, True]:
         receipt = solar_model_policy.solar_model_environment_receipt(
             resolve_source=resolve
@@ -126,26 +113,15 @@ def test_native_configuration_cannot_certify_an_incompatible_observed_de440():
         )
 
 
-@pytest.mark.parametrize("tool", ["heluo", "canping", "knowledge_read"])
+@pytest.mark.parametrize("tool", ["knowledge_read"])
 @pytest.mark.parametrize("fault", ["missing", "malformed"])
 def test_unused_source_fault_does_not_block_actual_three_adapters(
     tool, fault, monkeypatch, rest, tmp_path, capsys
 ):
     poison_analytic_profile(monkeypatch, tmp_path, fault)
-    payload = (
-        dict(domain="heluo", key="乾為天:1")
-        if tool == "knowledge_read"
-        else dict(
-            date="2000-05-15",
-            time="09:00",
-            zone="UTC",
-            gender="男",
-            use_true_solar_time=False,
-        )
-    )
-    fields = ["title"] if tool == "knowledge_read" else ["analysis_type"]
+    payload = dict(domain="heluo", key="乾為天:1")
     response, code, cli, mcp = run_three(
-        SPECS[tool], payload, fields, rest, tmp_path, capsys
+        SPECS[tool], payload, ["title"], rest, tmp_path, capsys
     )
     assert response.status_code == 200 and code == 0 and not mcp.is_error
     assert (
@@ -158,3 +134,27 @@ def test_unused_source_fault_does_not_block_actual_three_adapters(
         )
         assert "model_id" not in policy and "loaded_coefficient_sha256" not in policy
     assert analytic_solar.profile.cache_info().misses == 0
+
+
+@pytest.mark.parametrize("tool", ["heluo", "canping"])
+@pytest.mark.parametrize("fault", ["missing", "malformed"])
+def test_selected_frame_fault_blocks_actual_calendar_transports(
+    tool, fault, monkeypatch, rest, tmp_path, capsys
+):
+    poison_analytic_profile(monkeypatch, tmp_path, fault)
+    payload = dict(
+        date="2000-05-15",
+        time="09:00",
+        zone="UTC",
+        gender="男",
+        use_true_solar_time=False,
+    )
+    response, code, cli, mcp = run_three(
+        SPECS[tool], payload, ["analysis_type"], rest, tmp_path, capsys
+    )
+    assert response.status_code == 503 and code == 1 and mcp.is_error
+    for result in [response.json(), cli, mcp.structured_content]:
+        assert result["error_code"] == "ephemeris_source_inconsistent"
+        assert result["issues"] == [
+            {"path": "runtime.ephemeris_data", "code": "solar_analytic_invalid"}
+        ]

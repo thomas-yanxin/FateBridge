@@ -8,8 +8,8 @@ import pytest
 from fatebridge.application.execution import execute_tool
 from fatebridge.core import human_design_precision as precision
 from fatebridge.core.human_design_node_comparisons import reconstruct_node_reference
-from fatebridge.services.replay_metadata import digest
 from fatebridge.services.tool_catalog import CATALOG
+from fatebridge.utils.json_digest import digest
 from fatebridge.validation.human_design import verify_human_design_reading
 from fatebridge.validation.human_design_comparisons import (
     verify_node_comparison_reports,
@@ -156,9 +156,6 @@ def test_all_rehashed_false_diagnostic_reports_are_rejected(complete, kind):
         with pytest.raises(ValueError):
             digest({k: v for k, v in forged.items() if k != "run_metadata"})
         return
-    forged["run_metadata"]["business_output_sha256"] = digest(
-        {k: v for k, v in forged.items() if k != "run_metadata"}
-    )
     assert verify_human_design_reading(forged)["status"] == "rejected", kind
 
 

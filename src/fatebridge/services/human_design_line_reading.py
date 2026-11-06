@@ -44,8 +44,6 @@ def build_human_design_line_packet(source_result: dict) -> dict:
                     _canonical(source_result)
                 ).hexdigest(),
                 "run_id": identity["run_id"],
-                "business_output_sha256": identity["business_output_sha256"],
-                "contract_sha256": identity["contract_sha256"],
             },
             "original_result": deepcopy(source_result),
             "source_calculation_verification": verification,

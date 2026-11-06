@@ -15,7 +15,6 @@ from fatebridge.core.human_design import chart_at
 from fatebridge.core.human_design_reference_order import civil_jd, reference_ordering
 from fatebridge.core.requests.human_design import HumanDesignRequest
 from fatebridge.services.human_design import calculate_human_design
-from fatebridge.services.replay_metadata import digest
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
 
@@ -170,8 +169,5 @@ def test_fresh_hash_cannot_hide_malformed_ordering(full_run, monkeypatch, bad):
         value["clock_evidence"]["cycle_reference_datetime"] = head + (
             "1Z" if "." in head else ".0000001Z"
         )
-    value["run_metadata"]["business_output_sha256"] = digest(
-        {k: v for k, v in value.items() if k != "run_metadata"}
-    )
     monkeypatch.setattr(runtime, "ephemeris_call", forbidden_native)
     assert verify_human_design_reading(value)["status"] == "rejected"

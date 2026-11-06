@@ -1,6 +1,5 @@
 """Independent literal month tables and trusted same-run fixed position text."""
 
-import re
 from typing import Any
 
 from fatebridge.core.fengshui.models import MonthlyRequest
@@ -11,9 +10,9 @@ from fatebridge.core.fengshui.monthly import (
 )
 from fatebridge.core.fengshui.monthly_integrity import validate_monthly_layer
 from fatebridge.core.fengshui.monthly_time import JIE
+from fatebridge.core.public_output import same_public_value as _same_value
 from fatebridge.utils.errors import FengshuiCalculationError
-from fatebridge.utils.json_digest import digest
-from fatebridge.validation.claims import _same_value
+from fatebridge.utils.json_values import same_value
 
 
 def audit_monthly_reference(reference: dict[str, Any]) -> dict[str, Any]:
@@ -74,29 +73,22 @@ def audit_monthly_reference(reference: dict[str, Any]) -> dict[str, Any]:
 
 
 def verify_monthly_reading(
-    payload: dict[str, Any], *, trusted_run_metadata: dict[str, Any]
+    payload: dict[str, Any], *, trusted_payload: dict[str, Any]
 ) -> dict[str, Any]:
     """Verify complete delivered text against independently retained receipt."""
     errors = []
     metadata = payload.get("run_metadata") or {}
-    expected_digest = trusted_run_metadata.get("business_output_sha256")
+    trusted_metadata = trusted_payload.get("run_metadata") or {}
     if (
         not isinstance(metadata, dict)
-        or not isinstance(trusted_run_metadata.get("run_id"), str)
-        or not trusted_run_metadata.get("run_id")
-        or not isinstance(expected_digest, str)
-        or re.fullmatch(r"[a-f0-9]{64}", expected_digest) is None
-        or not _same_value(metadata, trusted_run_metadata)
+        or not isinstance(trusted_metadata.get("run_id"), str)
+        or not trusted_metadata.get("run_id")
+        or metadata.get("run_id") != trusted_metadata["run_id"]
+        or not same_value(metadata, trusted_metadata)
     ):
         errors.append("trusted_original_receipt_mismatch")
-    try:
-        if (
-            digest({k: v for k, v in payload.items() if k != "run_metadata"})
-            != expected_digest
-        ):
-            errors.append("incomplete_changed_or_projected_business_payload")
-    except (TypeError, ValueError):
-        errors.append("non_json_business_payload")
+    if not same_value(payload, trusted_payload):
+        errors.append("incomplete_changed_or_projected_business_payload")
     if not isinstance(metadata, dict) or metadata.get("tool_name") not in {
         "fengshui_monthly_stars",
         "fengshui_assess",

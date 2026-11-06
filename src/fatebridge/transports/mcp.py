@@ -109,8 +109,6 @@ def register_mcp(
 
     registered = []
     for spec in specs:
-        if spec.mcp_name is None and spec.key is None:
-            continue
         protocol_fn = _make_mcp_fn(
             spec,
             render_response=render_response,
@@ -307,7 +305,6 @@ def _make_mcp_fn(
                 include_snapshot_text=include_snapshot_text,
                 fields=fields,
                 strict_fields=strict_fields,
-                tool_name=spec.run_metadata_name,
                 response_char_limit=response_char_limit,
             )
         except ParameterError as exc:

@@ -37,12 +37,12 @@ from tests.support.transports import (
     rest,
     surface_calls,
 )
+from tests.support.western_angular_reference import reference_phase
 from tests.western.test_house_selection_contract import CODE_SPECS, HOUSE_SPECS, inputs
 from tests.western.test_other_chart_schools_transports import (
     test_specialized_facts_across_three_real_surfaces as check_surfaces,
 )
 from tests.western.test_western_accuracy import BIRTH
-from tests.western.test_western_angular_predicates import reference_phase
 from tests.western.test_western_election import CANDIDATE
 from tests.western.test_western_horary import QUESTION
 

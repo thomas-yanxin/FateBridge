@@ -11,7 +11,6 @@ import pytest
 from fatebridge.application.execution import execute_tool
 from fatebridge.core import human_design_cycles as cycles
 from fatebridge.core.astro import native_execution, runtime
-from fatebridge.services.replay_metadata import digest
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
 
@@ -198,9 +197,6 @@ def test_preregistered_station_and_contact_forgeries_rejected_after_rehash(
         run["cycle_context"]["bodies"][1]["contacts"].pop(1)
     else:
         raise AssertionError(bad)
-    run["run_metadata"]["business_output_sha256"] = digest(
-        {k: v for k, v in run.items() if k != "run_metadata"}
-    )
     monkeypatch.setattr(runtime, "ephemeris_call", forbidden)
     monkeypatch.setattr(native_execution, "calculate", forbidden)
     assert verify_human_design_reading(run)["status"] == "rejected"

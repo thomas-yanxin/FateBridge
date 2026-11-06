@@ -10,7 +10,7 @@ from fatebridge.core.human_design_precision import (
     node_backend_base,
     node_backend_report,
 )
-from fatebridge.validation.claims import _same_value
+from fatebridge.core.public_output import same_public_value as _same_value
 
 
 def verify_node_comparison_reports(payload: dict[str, Any]) -> dict[str, Any]:

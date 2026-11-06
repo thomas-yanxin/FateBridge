@@ -20,8 +20,9 @@ from tests.fengshui.test_fengshui_supplements import (
     annual_inputs,
     form_inputs,
 )
-from tests.fengshui.test_fengshui_surfaces import rest_client, without_transport
 from tests.fengshui.test_fengshui_surfaces_authored import surface_input
+from tests.support.mcp_result_assertions import without_transport
+from tests.support.transports import rest_client
 
 
 def progress(inputs):

@@ -48,7 +48,7 @@ flowchart TD
 | 层 | 主要路径 | 职责 |
 | --- | --- | --- |
 | 工具声明 | `services/catalog/`、`services/tool_catalog.py`、`application/tool_spec.py` | 领域声明、中央装配与不依赖协议框架的工具描述 |
-| 应用编排 | `application/bindings.py`、`execution.py`、`projection.py` | 请求绑定、统一执行与输出校验、字段投影 |
+| 应用编排 | `application/bindings.py`、`execution.py`、`response_delivery.py` | 请求绑定、统一执行与输出校验、投影和预算交付 |
 | 能力发现 | `application/description.py`、`discovery.py`、`scenarios.py` | 公共描述、目录筛选、场景清单；共享描述避免反向引用 |
 | 协议注册 | `transports/rest.py`、`transports/mcp.py` | REST/MCP 签名、注册、协议错误与输出选项 |
 | 请求模型 | `core/requests/` | 公共校验基类、领域字段、默认值与取值范围 |
@@ -72,6 +72,7 @@ sequenceDiagram
     participant C as Client
     participant R as REST handler
     participant E as application/execution.py
+    participant D as application/response_delivery.py
     participant B as ToolSpec.bind
     participant S as services/bazi.py
     C->>R: POST /api/cn/bazi/birth
@@ -85,7 +86,8 @@ sequenceDiagram
     S-->>E: 业务结果与快照
     E->>E: 输出校验与 run_metadata
     E-->>R: 完整结果
-    R->>R: 字段投影与响应预算处理
+    R->>D: 字段投影、快照选项与响应预算
+    D-->>R: 交付响应
     R-->>C: JSON 响应
 ```
 
@@ -99,13 +101,13 @@ sequenceDiagram
 
 支持双层快照的服务生成可读的 `snapshot_text` 与 `snapshot_export`，使用 `parse_export_content` 或共享快照构造器；部分工具只有文本或结构化数据，覆盖见 [算法矩阵](algorithm-coverage.md#4-快照协议覆盖)。`selected_sections` 只筛选导出文本，完整业务数据与原快照仍在。显式选择没有命中时导出为空，不回退全文。
 
-成功业务输出由共享模型验证，但不经模型重写，保留原有字段与数值。共享执行层附加 `run_metadata`，传输层随后执行 `fields` 投影，再按选项去掉顶层 `snapshot_text`。MCP 通过 `mcp_transport.py` 返回 structuredContent、JSON text 和原生 isError；REST 返回 JSON 对象，CLI 写 stdout 并用退出码表达失败。MCP 前置 middleware 将模型错误转换为安全的统一字段提示，避免框架回显提交内容。完整选项见 [API 参考](api-reference.md#25-字段投影与输出体积)。
+成功业务输出由共享模型验证，保留原有字段与数值。共享执行层附加 `run_metadata` 后，`application/response_delivery.py` 统一执行字段投影、顶层 `snapshot_text` 选项和响应预算；三端只负责参数绑定、序列化与错误表达。错误结果保留完整包络，不做字段投影或分页。MCP 返回 structuredContent、JSON text 和原生 isError；REST 返回 JSON 对象，CLI 写 stdout 并用退出码表达失败。MCP 前置 middleware 将模型错误转换为安全的统一字段提示，避免框架回显提交内容。完整选项见 [API 参考](api-reference.md#25-字段投影与输出体积)。
 
 ### 合同缓存
 
-`core/schema_cache.py` 缓存默认验证 Schema 和合同 SHA-256：按实际模型类、core schema 身份及完整结果必需根声明区分，每类缓存最多 256 条；模型 `model_rebuild()` 后自动使用新版本，公开 Schema 返回深拷贝。
+`core/schema_cache.py` 缓存公开 Schema：按实际模型类、core schema 身份及完整结果必需根声明区分，每类缓存最多 256 条；模型 `model_rebuild()` 后自动使用新版本，公开 Schema 返回深拷贝。
 
-动态修改模型配置、Schema hook 或嵌套模型而未重建根模型时，需要调用 `clear_contract_caches()`。业务输入、输出、调用时间和 execution receipt 仍逐次生成。输出在领域返回后、receipt 附加后分别校验；完整执行必须包含非null且不只是空对象的 `ToolSpec.required_output_fields`。共享 `PartialOutput` 根据完整执行上下文递归核验Schema中的 `FullFact`／`PresentFact`、集合唯一性及必要成员；这些声明和空对象政策均参与合同指纹。公共投影验证仍允许省略对象字段，合法空列表按各领域合同保留。异常错误包络按内部输出错误处理。REST 不再重复第三次校验同一完整结果。
+动态修改模型配置、Schema hook 或嵌套模型而未重建根模型时，需要调用 `clear_contract_caches()`。业务输入、输出、调用时间和 execution receipt 仍逐次生成。输出在领域返回后、receipt 附加后分别校验；完整执行必须包含非null且不只是空对象的 `ToolSpec.required_output_fields`。共享 `PartialOutput` 根据完整执行上下文递归核验Schema中的 `FullFact`／`PresentFact`、集合唯一性及必要成员；完整执行仍核对这些声明与空对象政策。公共投影验证仍允许省略对象字段，合法空列表按各领域合同保留。异常错误包络按内部输出错误处理。REST 不再重复第三次校验同一完整结果。
 
 ### 大结果交付
 
@@ -131,7 +133,7 @@ Swiss Ephemeris 存在共享 C 状态。直接调用与会修改目录的第三�
 
 ### 执行回执与重放
 
-`run_metadata` 在原 ID、时间、引擎与近似标志上增加版本、合同/输入/业务摘要、环境指纹、实际时间与重放参数。`application/execution.py` 的 `execute_tool` 包装现有 `execute_spec`，REST 由原执行器限制重计算并发并卸载到线程，MCP / CLI 共用执行层；execute_spec 保留无元数据的服务调用契约。ContextVar 隔离默认时钟，无 seed 随机六爻保留本次 seed，没有运行数据库。重放需要保存原始请求和环境，`run_id` 本身不能查询或恢复一次计算。
+`run_metadata` 在原 ID、时间、引擎与近似标志上增加版本、实际时间与重放参数。`application/execution.py` 的 `execute_tool` 包装现有 `execute_spec`，REST 由原执行器限制重计算并发并卸载到线程，MCP / CLI 共用执行层；execute_spec 保留无元数据的服务调用契约。ContextVar 隔离默认时钟，无 seed 随机六爻保留本次 seed，没有运行数据库。重放需要保存原始请求和环境，`run_id` 本身不能查询或恢复一次计算。
 
 ### 场景发现
 
@@ -139,7 +141,7 @@ Swiss Ephemeris 存在共享 C 状态。直接调用与会修改目录的第三�
 
 ### 方法合同与数量语义
 
-`core/method_contracts.py`与`services/method_registration.py`维护领域方法合同。当前92个工具登记65个共享领域方法；人格入口明确排除。完整发现返回`method_contracts/method_registration`，摘要返回`method_ids`；合同进入重放指纹，运行时实际策略版本与见证路径另记入`run_metadata.calculation_evidence`。
+`core/method_contracts.py`与`services/method_registration.py`维护领域方法合同。当前92个工具登记65个共享领域方法；人格入口明确排除。完整发现返回`method_contracts/method_registration`，摘要返回`method_ids`；运行时实际策略版本与见证路径另记入`run_metadata.calculation_evidence`。
 
 共享证据层绑定全部业务根、输入提供状态和环境，解析已有领域账本中的具名依赖，检查DAG闭合并支持保守失效传播。误差预算区分已知界、声明范围、未量化和不适用；没有传播依据时不生成输出误差界。声明依赖、包含与规则输入见证分开，未决语义依赖保持显式，详见[计算证据合同](computation-evidence.md)。完整业务覆盖不等于全部细粒度因果关系或连续稳定性已被证明。
 
@@ -154,6 +156,8 @@ Swiss Ephemeris 存在共享 C 状态。直接调用与会修改目录的第三�
 | 星盘 | `core/astro/` 按出生、几何、星历、宫位、盘面与关系盘拆分；公共星座、庙旺和界表位于 `core/astrology_tables.py` |
 | 请求模型 | `core/requests/base.py` 管理未知字段和日期校验；`birth.py` 管理出生基类，领域模块直接导入所需类型 |
 | 工具声明 | `services/catalog/` 各领域拥有 `SPECS`、绑定和延迟服务代理；不反向导入中央装配器或提前加载计算引擎 |
+| 西占单项时运 | `services/western_timing_tools.calculate_timing_tool` 承担共同执行；目录通过绑定参数选择技法，标签与公开入口仍由各条 `ToolSpec` 声明 |
+| 本地技法快照 | `core/local_techniques/snapshot.py` 提供共享文本原语；纯四卦组合不为渲染文本加载星盘计算入口 |
 | 输入与展示 | `utils/birth_input.py`、`solar_time.py`、`formatting.py`、`elements.py` 各自承担单一公共职责 |
 | 领域共享定义 | 河洛卦关系、人类图 mechanics、六壬约定、金口诀表与太乙几何由各领域的定义模块维护；计算入口和规则消费者共同依赖定义模块 |
 | 人类图知识 | `human_design_line_catalogue.py` 维护基础目录，版本化读者依赖基础目录；`human_design_knowledge.py` 负责版本分派 |

@@ -12,7 +12,7 @@
     "qi_phases": "judge.qi_phases分别给出先后天正反元气、化工的上下体／互体位置及得失；旧聚合字段仅为并集。反化工春分至夏至按所核两版本同时保留离、巽。土用约定、乙亥例乾化工冲突与气虚制化仍待核；命中不自动裁定葉否或现实吉凶。 yuanqi_opposition按出生年干支核对正反候选，再逐阶段计算无正而有反前提；正反同时出现不匹配该式。上下体／两互体为具名范围，direct_only_condition_match只作另一范围的比较；不能借另一阶段的元气补本阶段。rescue_match为null，节气浅深、气虚和尅制未定，不据此自动裁定反中有救或葉否。 solar_term.boundary_context按原民用年选共享节气窗口，保存当前节气、最近至点及下一四立的真实来源和绝对时刻，并与calendar_context核对。二数时令也用同一民用年上下文；相邻年求根不授权越界公开年份。TT参考与历史／未来UTC、原典日期桥接分开，不能因来源字段或数值分辨率就称全历法已验。",
     "seasonal_numbers": "judge.seasonal_numbers分别给出正数比较、至弱太过、十一数式及六个时令窗口。重叠全部保留；numeric_band_match只判断绝对数段，得中为null未量化，不能把25/30或不在窗口推成综合吉凶。",
     "source_clock": "岁运year_context绑定实际cycleYear与出生年柱，不能拿公历出生年或另一干支年替代。source_clock列卷一百刻式：寅申巳亥各九刻，其余八刻。时支循环原点及一刻七分的分制未由所核段确立；等长时辰假设推得18分一刻只是数式相合条件，不能选它凑原典符合。physical_clock_applied与calendar_mapping_complete均false；不可把源刻序换成当前出生钟面、实际日卦日期或预测应期。 六日进一支的branch_shift_projection保留八／九刻不等长，六十块总365源日是支初相对推演；不用选18分制，仍不解决日内添分、任意刻内转移或节月实日。 jiehou_evidence把节卦与候卦分开：按本次节气名选四正卦爻，现代节气间隔不用15／90日替代。原列72标签有爻名差异；连续爻序与首卦轮满六日两种具名模型分别对照原例及节候表，吻合程度不同而不暗选。原印、卦形、推演分别解释，selected_hou及huagong_assessment保持null，不推出实际日卦或吉凶。",
-    "text_collation": "乾坤屯蒙需讼师比小畜履六十条注文单次目校，commentary_sections按原文分段但applicability=null；旧文另存inherited_detail。不能借judge.xie选葉否或把歲運段用作本命断语；龍妾、掌無權、正即、無舊、女人為女人等本印本文字保留，初读撤回不计作继承错录。师六三commentary_cross_references仅核有条件引升三的单爻变，applicability=null且不改后天盘；比六二不混入全卦纳甲条件，该条件仍在month_affinity与najia。小畜九三未另印不葉者，实际三段与condition_labels_not_separately_printed不表示条件false；葉者段不等于吉类。小畜初引巽初与正式后天巽四同卦异爻，不能换爻辞；履上變為引兌不自动换卦。字兆和數凶者等嵌套条件未求值，不映射现代姓名或现实结果。诗歌不见于已核的这些爻解段落，来源待核，旧verdict摘要标签未获底本认证。标题与注文各有载入字节sha256和锁定该版文字／标签／元数据的content_sha256；JSON排版变化可以保留内容身份，但换正文或交换分支不得沿用已校身份。内容身份不证明读法、全书符合或预测有效。来源缺失／损坏是不可重试内部来源故障，不归咎用户出生参数。",
+    "text_collation": "乾坤屯蒙需讼师比小畜履六十条注文单次目校，commentary_sections按原文分段但applicability=null；旧文另存inherited_detail。不能借judge.xie选葉否或把歲運段用作本命断语；龍妾、掌無權、正即、無舊、女人為女人等本印本文字保留，初读撤回不计作继承错录。师六三commentary_cross_references仅核有条件引升三的单爻变，applicability=null且不改后天盘；比六二不混入全卦纳甲条件，该条件仍在month_affinity与najia。小畜九三未另印不葉者，实际三段与condition_labels_not_separately_printed不表示条件false；葉者段不等于吉类。小畜初引巽初与正式后天巽四同卦异爻，不能换爻辞；履上變為引兌不自动换卦。字兆和數凶者等嵌套条件未求值，不映射现代姓名或现实结果。诗歌不见于已核的这些爻解段落，来源待核，旧verdict摘要标签未获底本认证。标题与注文分别在内部核对该版文字、标签、元数据与载入字节；JSON排版变化可以保留内容身份，但换正文或交换分支不得沿用已校身份。内容身份不证明读法、全书符合或预测有效。来源缺失／损坏是不可重试内部来源故障，不归咎用户出生参数。",
     "timing": "heluo_timing按影印页规则给出流年、月卦与日卦定式；analysis_year为年标签，month_index/day_index为原典序号，不能当公历年月日或精确应期；不指定年时不自动取当前年。",
     "validation": "原典部分核验、语料未全量校勘、现实预测未验证；周易参照不替代河洛注文。",
     "yuantang": "用yuantang视图核对chart.yuantang_derivation的实际性别、时组、逐位序列、至点半年和换卦。counterfactuals仅比较阴阳令敏感性，实际选择以half_year.value为准；不能据反事实改算出生盘。half_year.value或heLi为null时不补成阴令或异类。公开日期工具按出生绝对瞬间确定半年，不用整个子月或午月猜。"
@@ -431,7 +431,7 @@
   "method_contracts": [
     {
       "comparison_requirements": [
-        "相同方法合同、实现/数据指纹、选项与实际计算层"
+        "相同方法合同、实现与数据版本、选项及实际计算层"
       ],
       "dependencies": [
         "validated_request"

@@ -12,7 +12,6 @@ from fatebridge.application.execution import execute_tool
 from fatebridge.core.astro import runtime
 from fatebridge.core.human_design_natal_sources import NatalSourceTrace
 from fatebridge.services.human_design import calculate_human_design
-from fatebridge.services.replay_metadata import digest
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
 from fatebridge.validation.human_design_natal_sources import verify_natal_sources
@@ -152,9 +151,6 @@ def test_rehashed_source_metadata_cannot_claim_more_than_observed(complete, kind
         context["unresolved_slots"] = [True]
     else:
         s["has_unidentified_sources"] = True
-    p["run_metadata"]["business_output_sha256"] = digest(
-        {k: v for k, v in p.items() if k != "run_metadata"}
-    )
     assert verify_natal_sources(p)["errors"], kind
     assert verify_human_design_reading(p)["status"] == "rejected", kind
 

@@ -18,7 +18,6 @@ from fatebridge.services.human_design_context_lines import (
     build_human_design_context_packet,
 )
 from fatebridge.services.human_design_line_reading import LineReadingInputError
-from fatebridge.services.replay_metadata import digest
 from fatebridge.validation.human_design_context_lines import (
     verify_human_design_context_packet,
 )
@@ -322,9 +321,6 @@ def test_external_original_and_bad_original_are_rejected(cases, packets):
     )
     source = deepcopy(cases[NAMES[0]])
     source["depth_evidence"]["line_fixings"][0]["fixing_state"] = "invented"
-    source["run_metadata"]["business_output_sha256"] = digest(
-        {k: v for k, v in source.items() if k != "run_metadata"}
-    )
     with pytest.raises(LineReadingInputError):
         build_human_design_context_packet(source)
     with pytest.raises(LineReadingInputError):

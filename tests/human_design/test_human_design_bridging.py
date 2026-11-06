@@ -13,7 +13,6 @@ import pytest
 from fatebridge.application.execution import execute_tool
 from fatebridge.core.human_design import bodygraph
 from fatebridge.core.human_design_bridging import definition_bridging
-from fatebridge.services.replay_metadata import digest
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
 
@@ -210,9 +209,6 @@ def test_rehashed_false_bridge_and_its_description_are_rejected(tamper):
         changed["interpretation"][
             "definition_structure"
         ] = "加一个门就能连接整盘，原盘会变为单一定义。"
-    changed["run_metadata"]["business_output_sha256"] = digest(
-        {k: v for k, v in changed.items() if k != "run_metadata"}
-    )
     check = verify_human_design_reading(changed)
     assert check["status"] == "rejected"
     assert any(

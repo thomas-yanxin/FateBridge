@@ -142,7 +142,7 @@ uv run --locked --extra dev mypy src/fatebridge/
 
 ### 只改 transport 行为，不改算法
 
-如果只是调整某一端的绑定（例如自定义 REST 绑定、CLI 不支持嵌套模型时的降级提示），改动应集中在 `src/fatebridge/transports/rest.py` / `transports/mcp.py` 的注册器，或 `services/catalog/` 的相应绑定处，并补充：
+调整某一端的参数绑定时，修改 `src/fatebridge/transports/rest.py` / `transports/mcp.py` 的注册器，或 `services/catalog/` 的相应绑定。共同的字段投影、快照选项和预算交付在 `application/response_delivery.py` 维护，JSON 格式化只负责序列化。按影响范围补充：
 
 - request model 验证用例；
 - `tests/integration/test_full_surface_validation.py` 覆盖的三端 parity。
@@ -162,7 +162,7 @@ uv run --locked --extra dev mypy src/fatebridge/
 
 ## 测试策略
 
-测试从已安装的 `src` 包导入，使用 pytest 的 `importlib` 模式；根 `conftest.py` 排除原始资料目录，测试不各自修改 `sys.path`。协议辅助在 `tests/support/transports.py`，代表请求和原生客户端辅助在 `tests/fixtures/`。`test_runtime_contracts.py`、`test_request_catalog_isolation.py` 分别核对运行时隔离和新进程目录加载。
+测试从已安装的 `src` 包导入，使用 pytest 的 `importlib` 模式；根 `conftest.py` 排除原始资料目录，测试不各自修改 `sys.path`。通用协议调用在 `tests/support/transports.py`，风水协议辅助在 `tests/support/fengshui_transports.py`，代表请求和原生客户端辅助在 `tests/fixtures/`；领域测试直接依赖这些定义，避免通过另一领域的测试文件间接加载。共享辅助与独立参考的入口见[测试索引](../tests/README.md)。`test_runtime_contracts.py`、`test_request_catalog_isolation.py` 分别核对运行时隔离和新进程目录加载。
 
 共享计算或合同变化需核对 REST、MCP、CLI 的当前未舍入事实、错误和严格投影。独立期望值来自手算、外部数值或指定原典，并注明坐标系、时标、后端、日期范围、容差及未裁定项；复制生产公式、三端相同和 Schema 合法均不能单独证明计算正确。
 
@@ -207,7 +207,7 @@ git diff --check
 
 `docs/contracts/` 的逐工具 JSON 与索引由 `scripts/build_codex_call_contracts.py` 从实际 MCP 输入 Schema 和共享首轮字段生成，不能手改生成文件。根 `AGENTS.md` 不嵌入这些大合同。接口或首轮字段变化后先运行生成器，再用 `--check` 核对。场景矩阵或技能接口变化后同样重新生成 `data/agent_scenarios.json`，其中包含源文件散列，纯文案变更也可能需要同步生成物。
 
-完整执行的必需业务根在 `core/response_models.py` 声明；嵌套必需事实使用 `FullFact[T]` 或 `PresentFact[T]`，由完整执行上下文递归核验，规则纳入合同指纹。公开投影允许缺少兄弟字段与合法 null，投影读取不启用完整执行上下文。不能为接收错误输出而放宽声明；相关验证从 `test_complete_output_contracts.py`、`test_algorithm_review_repairs.py` 和对应领域测试开始。
+完整执行的必需业务根在 `core/response_models.py` 声明；嵌套必需事实使用 `FullFact[T]` 或 `PresentFact[T]`，由完整执行上下文递归核验，规则在完整执行时核对。公开投影允许缺少兄弟字段与合法 null，投影读取不启用完整执行上下文。不能为接收错误输出而放宽声明；相关验证从 `test_complete_output_contracts.py`、`test_algorithm_review_repairs.py` 和对应领域测试开始。
 
 ### 最低同步面
 
@@ -259,7 +259,7 @@ uv run --locked --extra dev python scripts/sync_github_release.py \
 
 ## 常用入口
 
-重放与默认时间的实现约束见[架构说明](architecture.md#执行回执与重放)。新增读取默认时间的实现使用 `execution_context.current_datetime`，随机实现返回可固定的有效参数；三端共用 `execute_tool` 生成回执。实现或数据原地变化后重启进程，使进程内缓存的指纹与实现一致。
+重放与默认时间的实现约束见[架构说明](architecture.md#执行回执与重放)。新增读取默认时间的实现使用 `execution_context.current_datetime`，随机实现返回可固定的有效参数；三端共用 `execute_tool` 生成回执。实现或数据原地变化后重启进程，使进程内缓存与实现一致。
 
 - 交互接口文档：`http://localhost:8010/docs`
 - 架构说明：[architecture.md](architecture.md)

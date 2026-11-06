@@ -47,6 +47,7 @@ from fatebridge.application.execution import (
     result_is_error,
 )
 from fatebridge.application.projection import project_fields
+from fatebridge.application.response_delivery import deliver_response
 from fatebridge.application.scenarios import discover_scenarios
 from fatebridge.application.tool_spec import ToolSpec
 from fatebridge.core.execution_context import (
@@ -413,12 +414,9 @@ def build_parser(
     )
 
     result_reader = sub.add_parser(
-        "result-read", help="核对原 run 的完整 payload 散列，再读取一页或点路径；不重算"
+        "result-read", help="核对原 run 与存储完整性，再读取一页或点路径；不重算"
     )
     result_reader.add_argument("result_id")
-    result_reader.add_argument(
-        "--sha256", required=True, help="原 result_delivery.sha256"
-    )
     result_reader.add_argument("--run-id", required=True, help="原 run_metadata.run_id")
     result_reader.add_argument(
         "--path", help="对象或数组数字索引点路径；省略读取全文分页"
@@ -588,7 +586,6 @@ def _load_subject_file(path: str) -> Dict[str, Any]:
     elif suffix == ".json":
         data = _parse_json_subject(text, path)
     else:
-        # Unknown extension: try strict JSON first, then fall back to YAML.
         try:
             data = json.loads(text)
         except json.JSONDecodeError:
@@ -645,8 +642,6 @@ def _preload_request(argv: Optional[List[str]]) -> Optional[Dict[str, Any]]:
         raise ValueError("request-file 顶层必须是 JSON 对象")
     return data
 
-
-# --- profile: run several charts for one subject in a single invocation ------
 
 DEFAULT_PROFILE_SYSTEMS = "bazi,ziwei,astro"
 
@@ -1053,7 +1048,7 @@ def run(argv: Optional[List[str]] = None) -> int:
                 else RESULT_STORE
             )
             page = store.verified_page(
-                args.result_id, args.sha256, args.run_id, args.offset, args.path
+                args.result_id, args.run_id, args.offset, args.path
             )
         except ParameterError as exc:
             return _emit_error(exc.as_result(), 1)
@@ -1126,7 +1121,6 @@ def run(argv: Optional[List[str]] = None) -> int:
             2,
         )
 
-    # Build the request model from only the flags the user actually provided.
     field_names = set(spec.request_model.model_fields)
     provided = {
         k: v for k, v in vars(args).items() if k in field_names and v is not None
@@ -1172,45 +1166,22 @@ def run(argv: Optional[List[str]] = None) -> int:
 
     is_error = result_is_error(spec, result)
 
-    # Project to requested top-level fields (token budgeting). Never trim an
-    # error payload — that would drop the `error` key the caller needs.
-    if not is_error and getattr(args, "fields", None):
-        try:
-            result = project_fields(
-                result, args.fields, strict_fields=args.strict_fields
-            )
-        except ParameterError as exc:
-            return _emit_error(correlate_error(exc.as_result(), options), 1)
-
-    # Output shaping, mirroring REST/MCP. ``--include-snapshot-text`` defaults to
-    # None -> fall back to the spec's own default, preserving today's behavior
-    # (snapshot kept, pretty-printed). Error payloads carry no snapshot_text, so
-    # the flag is a no-op for them; --compact still applies uniformly.
     include_snapshot_text = getattr(args, "include_snapshot_text", None)
     if include_snapshot_text is None:
         include_snapshot_text = spec.include_snapshot_text
-    from fatebridge.application.result_delivery import bound_response
-    from fatebridge.utils.formatting import _prepare_json_response_payload
-
-    result = _prepare_json_response_payload(
-        result, include_snapshot_text=include_snapshot_text
-    )
-    if not is_error:
-        try:
-            result = bound_response(
-                result,
-                getattr(args, "response_char_limit", 0),
-                compact=getattr(args, "compact", False),
-            )
-        except ParameterError as exc:
-            return _emit_error(correlate_error(exc.as_result(), options), 1)
-    print(
-        format_json_response(
+    try:
+        result = deliver_response(
             result,
-            compact=getattr(args, "compact", False),
+            fields=args.fields,
+            strict_fields=args.strict_fields,
             include_snapshot_text=include_snapshot_text,
+            response_char_limit=args.response_char_limit,
+            compact=args.compact,
+            failed=is_error,
         )
-    )
+    except ParameterError as exc:
+        return _emit_error(correlate_error(exc.as_result(), options), 1)
+    print(format_json_response(result, compact=args.compact))
     return 1 if is_error else 0
 
 

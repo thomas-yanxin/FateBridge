@@ -11,9 +11,9 @@ import pytest
 from fatebridge.application import result_delivery as delivery
 from fatebridge.cli import run
 from fatebridge.utils.errors import ParameterError
-from tests.integration.test_readonly_result_verification import (
-    PAYLOADS,
-    REFERENCE,
+from tests.support.result_delivery import (
+    RESULT_CASES,
+    RESULT_PAYLOADS,
     block_writes,
     forbidden,
 )
@@ -28,15 +28,13 @@ def default_store(tmp_path, monkeypatch):
     monkeypatch.delenv("TMP", raising=False)
     monkeypatch.setattr(tempfile, "tempdir", None)
     store = delivery.ResultStore()
-    payload = copy.deepcopy(PAYLOADS[REFERENCE["cases"][0]["id"]])
+    payload = copy.deepcopy(RESULT_PAYLOADS[RESULT_CASES[0]["id"]])
     ref = store.put(payload)
     return store, payload, ref
 
 
 def verify(store, payload, ref):
-    return store.verified_page(
-        ref["result_id"], ref["sha256"], payload["run_metadata"]["run_id"]
-    )
+    return store.verified_page(ref["result_id"], payload["run_metadata"]["run_id"])
 
 
 def test_default_reader_finds_original_without_temp_probe_or_existing_lock(
@@ -48,7 +46,7 @@ def test_default_reader_finds_original_without_temp_probe_or_existing_lock(
     with monkeypatch.context() as blocked:
         block_writes(blocked)
         page = verify(delivery.ResultStore(), payload, ref)
-    assert page["verification"]["payload_sha256"] == ref["sha256"]
+    assert page["verification"]["scope"] == "entire_retained_payload"
     assert not (store.directory / ".lock").exists()
 
 
@@ -86,8 +84,6 @@ def test_duplicate_id_is_rejected_without_selecting_by_digest_and_explicit_cli_w
                 [
                     "result-read",
                     ref["result_id"],
-                    "--sha256",
-                    ref["sha256"],
                     "--run-id",
                     payload["run_metadata"]["run_id"],
                     "--directory",
@@ -153,4 +149,4 @@ def test_pruning_between_metadata_and_payload_read_does_not_certify_a_missing_re
 def test_default_reader_rejects_invalid_id_before_discovery(result_id, monkeypatch):
     monkeypatch.setattr(delivery, "result_directory_candidates", forbidden)
     with pytest.raises(ParameterError, match="无效结果引用"):
-        delivery.ResultStore().verified_page(result_id, "0" * 64, "original-run")
+        delivery.ResultStore().verified_page(result_id, "original-run")

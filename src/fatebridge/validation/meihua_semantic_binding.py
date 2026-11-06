@@ -14,6 +14,7 @@ from pathlib import Path
 from typing import Any
 
 from fatebridge.utils.json_digest import digest
+from fatebridge.utils.json_values import same_value as _same
 from fatebridge.validation.agent_capture import read_capture
 
 POLICY = "meihua_observed_evidence_binding_v1"
@@ -45,10 +46,6 @@ def portable_ast_sha(node: ast.AST) -> str:
             tuple(name for name in child._fields if getattr(child, name, None) != []),
         )
     return hashlib.sha256(ast.dump(node, include_attributes=False).encode()).hexdigest()
-
-
-def _same(a: Any, b: Any) -> bool:
-    return digest(a) == digest(b)
 
 
 def _path(root: Path, name: str) -> Path:
@@ -268,8 +265,6 @@ def audit_preparation(
             not isinstance(metadata["run_id"], str)
             or not metadata["run_id"]
             or metadata["run_id"] != reference["run_id"]
-            or digest({k: v for k, v in packet.items() if k != "run_metadata"})
-            != metadata["business_output_sha256"]
         ):
             raise ValueError("Reference run or complete business result changed")
         run_ids.append(metadata["run_id"])
@@ -310,14 +305,14 @@ def audit_preparation(
     }
 
 
-def _stitch(pages: list[dict[str, Any]], expected_sha: str) -> str | None:
+def _stitch(pages: list[dict[str, Any]], expected_result_id: str) -> str | None:
     indexed: dict[int, dict[str, Any]] = {}
     for page in pages:
         page_offset = page["offset"]
         if (
             type(page_offset) is not int
             or page_offset < 0
-            or page["sha256"] != expected_sha
+            or page["result_id"] != expected_result_id
             or not isinstance(page["text"], str)
         ):
             raise ValueError("Observed page identity changed")
@@ -340,8 +335,8 @@ def _stitch(pages: list[dict[str, Any]], expected_sha: str) -> str | None:
     if offset is not None:
         return None
     text = "".join(parts)
-    if hashlib.sha256(text.encode()).hexdigest() != expected_sha:
-        raise ValueError("Complete observed page text differs from its checksum")
+    if any(len(text) != page["total_chars"] for page in pages):
+        raise ValueError("Complete observed page text differs from its declared length")
     return text
 
 
@@ -375,10 +370,10 @@ def observed_sources(records: list[dict[str, Any]]) -> dict[int, dict[str, Any]]
             tail = item["uri"][len(prefix) :]
             verified = tail.startswith("verified/")
             if verified:
-                parts = tail.split("/", 3)
-                if len(parts) != 4 or parts[1] != run or parts[2] != delivery["sha256"]:
+                parts = tail.split("/", 2)
+                if len(parts) != 3 or parts[1] != run:
                     raise ValueError("Verified URI differs from the original receipt")
-                tail = parts[3]
+                tail = parts[2]
                 if not tail.startswith("fields/"):
                     tail = "pages/" + tail
             if not (tail.startswith("pages/") or tail.startswith("fields/")):
@@ -399,10 +394,9 @@ def observed_sources(records: list[dict[str, Any]]) -> dict[int, dict[str, Any]]
             if verified:
                 verification = page["verification"]
                 if (
-                    verification["method"] != "retained_payload_sha256_v1"
+                    verification["method"] != "retained_payload_integrity_v2"
                     or verification["scope"] != "entire_retained_payload"
                     or verification["run_id"] != run
-                    or verification["payload_sha256"] != delivery["sha256"]
                     or verification["calculation_repeated"] is not False
                     or page["result_id"] != delivery["result_id"]
                 ):
@@ -424,7 +418,7 @@ def observed_sources(records: list[dict[str, Any]]) -> dict[int, dict[str, Any]]
             if not offset.isdecimal() or int(offset) != page["offset"]:
                 raise ValueError("Observed resource URI and offset disagree")
             destination.append(page)
-        text = _stitch(whole, delivery["sha256"])
+        text = _stitch(whole, delivery["result_id"])
         if text is not None:
             if (
                 len(text) != delivery["total_chars"]
@@ -433,21 +427,18 @@ def observed_sources(records: list[dict[str, Any]]) -> dict[int, dict[str, Any]]
                 raise ValueError("Observed complete delivery length changed")
             complete = json.loads(text)
             # A budgeted first receipt can defer runtime/provenance metadata.
-            # Its delivery checksum commits to the complete original receipt;
-            # these two mandatory identities must still match the first reply.
+            # The original run must match; captured lengths and run identity
+            # do not independently authenticate original content.
             if any(
                 not _same(complete["run_metadata"][key], packet["run_metadata"][key])
-                for key in ("run_id", "business_output_sha256")
+                for key in ("run_id",)
             ):
                 raise ValueError("Observed complete delivery substituted another run")
             source["delivered"] = complete
-            if (
-                digest({k: v for k, v in complete.items() if k != "run_metadata"})
-                == complete["run_metadata"]["business_output_sha256"]
-            ):
+            if record.get("arguments", {}).get("fields") is None:
                 source["complete"] = complete
         for path, pages in fields.items():
-            text = _stitch(pages, pages[0]["sha256"])
+            text = _stitch(pages, delivery["result_id"])
             if text is not None:
                 source["fields"][path] = json.loads(text)
     return sources

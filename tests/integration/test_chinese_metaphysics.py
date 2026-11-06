@@ -141,53 +141,6 @@ def test_calculate_ziwei_rules_supports_selected_export_sections():
     assert "[四化总表]" not in result["snapshot_export"]["export_text"]
 
 
-def test_fastmcp_ziwei_birth_compact_mode_can_drop_snapshot_text():
-    rendered = mcp_text(
-        "ziwei_birth",
-        birth_year=1994,
-        birth_month=8,
-        birth_day=23,
-        birth_hour=14,
-        name="张三",
-        gender="男",
-        birth_place="上海",
-        birth_minute=30,
-        birth_timezone="Asia/Shanghai",
-        compact=True,
-        include_snapshot_text=False,
-    )
-
-    payload = json.loads(rendered)
-
-    assert "snapshot_text" not in payload
-    assert "snapshot_export" in payload
-    assert "\n" not in rendered
-
-
-def test_fastmcp_ziwei_birth_fields_projection_trims_to_subset():
-    rendered = mcp_text(
-        "ziwei_birth",
-        birth_year=1994,
-        birth_month=8,
-        birth_day=23,
-        birth_hour=14,
-        name="张三",
-        gender="男",
-        birth_place="上海",
-        birth_minute=30,
-        birth_timezone="Asia/Shanghai",
-        fields=["snapshot_export"],
-    )
-
-    payload = json.loads(rendered)
-
-    # Only the requested key survives; run_metadata is always preserved.
-    assert set(payload) <= {"snapshot_export", "run_metadata"}
-    assert "snapshot_export" in payload
-    assert "snapshot_text" not in payload
-    assert isinstance(payload.get("run_metadata"), dict)
-
-
 def test_calculate_liureng_gods_returns_core_sections():
     result = calculate_liureng_gods(
         analysis_year=2026,

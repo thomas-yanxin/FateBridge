@@ -16,10 +16,9 @@ from fatebridge.core.human_design_root_bodies import (
     derive_root_body_assessment,
     root_body_summary,
 )
-from fatebridge.services.replay_metadata import digest
+from fatebridge.core.human_design_solar_root_validation import verify_solar_root_context
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
-from fatebridge.validation.human_design_solar_root import verify_solar_root_context
 
 ROOT = Path(__file__).resolve().parents[2]
 PLAN_PATH = ROOT / "tests/fixtures/human-design-root-body-plan.json"
@@ -32,13 +31,6 @@ SPEC = next(s for s in CATALOG if s.key == "human_design")
 
 def forbidden(*args, **kwargs):
     raise AssertionError("Verification called a native producer")
-
-
-def rehash(run):
-    run["run_metadata"]["business_output_sha256"] = digest(
-        {k: v for k, v in run.items() if k != "run_metadata"}
-    )
-    return run
 
 
 @pytest.mark.parametrize("mode", PLAN["required_modes"])
@@ -149,7 +141,7 @@ def test_all_preregistered_rehashed_corruptions_fail(complete, monkeypatch, bad)
             ]["evaluations"][0]["jd_tt"] += 0.01
     monkeypatch.setattr(runtime, "ephemeris_call", forbidden)
     monkeypatch.setattr(native_execution, "calculate", forbidden)
-    assert verify_human_design_reading(rehash(run))["status"] == "rejected"
+    assert verify_human_design_reading((run))["status"] == "rejected"
 
 
 def test_derived_bodies_and_selected_epoch_are_exact_and_replayable(complete):
@@ -225,7 +217,7 @@ def test_missing_new_role_cannot_be_hidden_by_rebuilding_source_summary(
     run["ephemeris_source_summary"] = natal_source_summary(source)
     monkeypatch.setattr(runtime, "ephemeris_call", forbidden)
     monkeypatch.setattr(native_execution, "calculate", forbidden)
-    check = verify_human_design_reading(rehash(run))
+    check = verify_human_design_reading((run))
     assert check["status"] == "rejected"
     assert any(
         e["code"] == "natal_file_context_or_policy_mismatch" for e in check["errors"]

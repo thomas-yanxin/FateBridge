@@ -63,7 +63,6 @@ calculate_nongli_time = lazy_service(
 )
 
 SPECS: List[ToolSpec] = [
-    # --- Timing ------------------------------------------------------------
     ToolSpec(
         key="timing_analysis",
         bind=person_invoke(calculate_comprehensive_timing),

@@ -21,8 +21,8 @@ from .chart import (
     _build_local_chart_response,
     _normalize_date_text,
     _normalize_time_text,
-    _render_snapshot_text,
 )
+from .snapshot import render_snapshot_text
 
 
 def _quote_question(question: str) -> str:
@@ -330,6 +330,6 @@ def build_otherbu_result(
         "chart": base_chart,
         "question": question,
         **evidence,
-        "snapshot_text": _render_snapshot_text(snapshot),
+        "snapshot_text": render_snapshot_text(snapshot),
         "summary": f"星骰符号：{normalized_planet} / {normalized_sign} / 第{normalized_house + 1}宫。{interpretation['summary']}",
     }

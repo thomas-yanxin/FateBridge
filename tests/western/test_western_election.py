@@ -17,9 +17,7 @@ from fatebridge.services.western_election import calculate_election
 VALID_VERDICTS = {"auspicious", "workable", "marginal", "avoid"}
 
 
-# ---------------------------------------------------------------------------
 # Pure scoring primitives (exact, environment-independent).
-# ---------------------------------------------------------------------------
 
 
 def test_dignity_table():
@@ -35,7 +33,7 @@ def test_dignity_table():
 
 
 def test_verdict_hard_block_overrides_score():
-    verdict, _ = _verdict(95, True, "结婚")  # high score but a red line present
+    verdict, _ = _verdict(95, True, "结婚")
     assert verdict == "avoid"
 
 
@@ -63,10 +61,6 @@ def test_topic_master_covers_allowed_consultation_topics():
         assert TOPIC_MASTER[topic]["significator"]
         assert 1 <= TOPIC_MASTER[topic]["house"] <= 12
 
-
-# ---------------------------------------------------------------------------
-# Service-level structural facts.
-# ---------------------------------------------------------------------------
 
 CANDIDATE = dict(
     candidate_year=2025,
@@ -100,7 +94,6 @@ def test_election_envelope_has_snapshot_and_factors():
     result = calculate_election(**CANDIDATE, topic_id="contract")
     assert result["snapshot_text"]
     assert isinstance(result["election"]["factors"], list)
-    # every factor carries polarity + signed weight + hard flag
     for factor in result["election"]["factors"]:
         assert factor["polarity"] in {"favorable", "adverse", "neutral"}
         assert isinstance(factor["weight"], int)

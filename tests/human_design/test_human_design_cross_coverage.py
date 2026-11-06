@@ -15,7 +15,7 @@ from fatebridge.core.human_design_cross_coverage import (
     expanded_cross_evidence,
 )
 from fatebridge.core.human_design_source_variants import source_variant_audit
-from fatebridge.services.replay_metadata import digest
+from fatebridge.core.public_output import public_payload
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
 from fatebridge.validation.human_design_official import official_chart_checks
@@ -107,7 +107,8 @@ def test_every_new_official_case_has_complete_source_bound_reading():
         run = execute_tool(SPEC, SPEC.request_model(**case["birth_input"]))
         proof = run["source_consistency"]["expanded_cross_name_comparison"]
         assert case["id"] in {r["case_id"] for r in proof["observations"]}
-        assert all(r["pdf_sha256"] for r in proof["observations"])
+        assert proof["source_url"] == cross_coverage_reference()["source"]["url"]
+        assert all(r["display_name"] and r["gates"] for r in proof["observations"])
         assert proof["primary_2001_name"] == run["incarnation_cross"]["name"]
         check = verify_human_design_reading(run)
         assert check["status"] == "verified_fixed_template_reading", (case["id"], check)
@@ -142,12 +143,9 @@ def test_course_list_conflict_is_retained_without_overwriting_the_actual_quartet
     case = next(c for c in REFERENCE["cases"] if c["id"] == "cross-left-16")
     run = execute_tool(SPEC, SPEC.request_model(**case["birth_input"]))
     assert run["incarnation_cross"]["gates"] == [16, 9, 63, 64]
-    assert (
-        run["source_consistency"]["expanded_cross_name_comparison"][
-            "course_list_disagreement"
-        ]
-        == course
-    )
+    assert run["source_consistency"]["expanded_cross_name_comparison"][
+        "course_list_disagreement"
+    ] == public_payload(course)
     assert "16/6" in run["interpretation"]["expanded_cross_name_meaning"]
     assert "16/9" in run["interpretation"]["expanded_cross_name_meaning"]
 
@@ -211,7 +209,4 @@ def test_rehashed_forged_modern_labels_and_source_conflicts_are_rejected(mutatio
         forged["source_summary"]["version"] = "publisher-certified"
     else:
         forged["source_summary"]["author"] = "Official original producer"
-    forged["run_metadata"]["business_output_sha256"] = digest(
-        {k: v for k, v in forged.items() if k != "run_metadata"}
-    )
     assert verify_human_design_reading(forged)["status"] == "rejected"

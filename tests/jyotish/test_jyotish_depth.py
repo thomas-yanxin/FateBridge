@@ -288,7 +288,6 @@ def test_new_topic_facts_verify_against_the_original_calculation_receipt():
             path=f["fact_path"],
             value=f["fact"],
             run_id=receipt["run_id"],
-            business_output_sha256=receipt["business_output_sha256"],
         )
         for topic in body["india"]["topic_evidence"].values()
         for f in topic["factors"]

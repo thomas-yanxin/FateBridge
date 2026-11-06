@@ -7,7 +7,6 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.services.replay_metadata import digest
 from fatebridge.validation.agent_capture import CaptureJournal
 
 SPEC = importlib.util.spec_from_file_location(
@@ -30,12 +29,10 @@ def cohort(tmp_path):
         **body,
         "run_metadata": {
             "run_id": "actual-run",
-            "business_output_sha256": digest(body),
         },
     }
     raw = json.dumps(full, ensure_ascii=False, separators=(",", ":"))
     delivery = {
-        "sha256": MODULE.sha256(raw.encode()).hexdigest(),
         "total_chars": len(raw),
         "total_bytes": len(raw.encode()),
     }
@@ -90,7 +87,7 @@ def cohort(tmp_path):
                         "journal_index": 1,
                         "file": "delivery-1.json",
                         "file_sha256": MODULE.file_digest(folder / "delivery-1.json"),
-                        "complete_business_hash_verified": True,
+                        "unprojected_request_result": True,
                     }
                 ],
                 "units": [
@@ -120,7 +117,7 @@ def cohort(tmp_path):
 def test_integrity_pass_does_not_promote_manual_review_or_erase_first_failure(cohort):
     root, _ = cohort
     result = MODULE.audit(root, root / "review.json")
-    assert result["complete_business_hashes_verified"] == 1
+    assert result["unprojected_request_results"] == 1
     assert result["automatic_semantic_acceptance"] is False
     assert result["independent_external_review"] == "not_completed"
 
@@ -144,7 +141,7 @@ def test_integrity_pass_does_not_promote_manual_review_or_erase_first_failure(co
         (lambda c: c["manual_criteria"][0].update(unit_indices=[1]), "outside"),
         (
             lambda c: c["preserved_deliveries"][0].update(
-                complete_business_hash_verified=False
+                unprojected_request_result=False
             ),
             "Projected delivery",
         ),

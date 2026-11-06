@@ -22,8 +22,9 @@ from fatebridge.services.fengshui import (
 )
 from fatebridge.services.run_metadata import attach_run_metadata
 from tests.fengshui.test_fengshui_geomagnetic import FOLDER, inputs
-from tests.fengshui.test_fengshui_surfaces import mcp_call, rest_client
 from tests.fixtures.fengshui import payload
+from tests.support.fengshui_transports import mcp_call
+from tests.support.transports import rest_client
 
 
 def test_installed_algorithm_identity_matches_independently_pinned_wheel():
@@ -118,7 +119,7 @@ def test_mismatch_is_a_correlated_dependency_fault_on_rest_mcp_cli(
         assert "layers" not in body
 
 
-def test_deployment_fingerprint_includes_observed_pygeomag_version(monkeypatch):
+def test_runtime_receipt_includes_observed_pygeomag_version(monkeypatch):
     original = replay_metadata.version
     replay_metadata.environment_receipt.cache_clear()
     try:
@@ -131,9 +132,8 @@ def test_deployment_fingerprint_includes_observed_pygeomag_version(monkeypatch):
         )
         replay_metadata.environment_receipt.cache_clear()
         after = replay_metadata.environment_receipt()
-        assert after["implementation_sha256"] == before["implementation_sha256"]
-        assert after["bundled_data_sha256"] == before["bundled_data_sha256"]
-        assert after["environment_sha256"] != before["environment_sha256"]
+        assert after["dependencies"]["pygeomag"] == "9.9.9"
+        assert after != before
     finally:
         replay_metadata.environment_receipt.cache_clear()
 

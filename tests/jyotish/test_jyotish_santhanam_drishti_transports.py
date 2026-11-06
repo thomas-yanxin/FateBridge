@@ -75,7 +75,6 @@ def test_real_run_claim_cannot_promote_the_alternative_to_applied_source():
         path=path,
         value=False,
         run_id=metadata["run_id"],
-        business_output_sha256=metadata["business_output_sha256"],
     )
     assert (
         verify_calculation_claims(body, [claim])["status"]

@@ -51,7 +51,6 @@ def calculate_compatibility_analysis(
     analysis1 = build_destiny_payload(context1)
     analysis2 = build_destiny_payload(context2)
 
-    # 使用高级合盘分析
     advanced_analysis = AdvancedCompatibility.analyze_comprehensive_compatibility(
         analysis1, analysis2, rel_type
     )
@@ -63,12 +62,10 @@ def calculate_compatibility_analysis(
         pillars1, pillars2
     )
 
-    # 五行关系分析
     element1 = analysis1["day_master"]["element"]
     element2 = analysis2["day_master"]["element"]
     element_relationship = get_element_relationship(element1, element2)
 
-    # 优化的JSON输出格式
     result: Dict[str, Any] = {
         "summary": {
             "overall_score": advanced_analysis["overall_score"],

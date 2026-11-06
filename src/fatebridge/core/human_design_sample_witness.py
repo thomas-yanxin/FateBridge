@@ -240,7 +240,7 @@ def unpack_sample_witnesses(
                 **cross_identifier(quartet[0], angle),
             },
         }
-        from fatebridge.validation.human_design_solar_root import (
+        from fatebridge.core.human_design_solar_root_validation import (
             verify_solar_root_context,
         )
 

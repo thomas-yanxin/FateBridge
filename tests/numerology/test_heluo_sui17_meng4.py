@@ -11,11 +11,12 @@ from jsonschema import Draft202012Validator
 from fatebridge.core import heluo_poems as hp
 from fatebridge.core import heluo_texts as ht
 from fatebridge.core.heluo import _tiaowen, yao_text
+from fatebridge.core.public_output import same_public_value
 from fatebridge.utils.errors import NumerologySourceError
-from tests.numerology.test_heluo_poem_transports import run_three
 from tests.support.heluo_source_facts import HEADER_COUNT, PENDING_COUNT
 from tests.support.transports import SPECS, business
 from tests.support.transports import rest as shared_rest
+from tests.support.transports import run_three
 
 rest = shared_rest
 F = Path(__file__).parents[1] / "fixtures/heluo_sui17_meng4_v1"
@@ -251,7 +252,7 @@ def test_actual_selected_text_and_conditions_match_all_three_adapters(
             case["line"],
         )
         expected = yao_text(case["hexagram"], case["line"])
-        assert selected["text"] == expected
+        assert same_public_value(selected["text"], expected)
         assert expected["detail"] in out["snapshot_text"]
         if case["hexagram"] == "山水蒙":
             assert expected["shige"] in out["snapshot_text"]

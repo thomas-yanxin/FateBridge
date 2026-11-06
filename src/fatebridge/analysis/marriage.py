@@ -137,33 +137,26 @@ class MarriageAnalysis:
             }
         is_male = normalized_gender == "male"
 
-        # 1. 配偶星分析
         spouse_star = MarriageAnalysis._analyze_spouse_star(pillars, day_stem, is_male)
 
-        # 2. 配偶宫分析
         spouse_palace = MarriageAnalysis._analyze_spouse_palace(
             pillars, day_branch, day_stem
         )
 
-        # 3. 婚姻质量评估
         marriage_quality = MarriageAnalysis._assess_marriage_quality(
             pillars, day_stem, day_branch, is_male
         )
 
-        # 4. 婚姻神煞
         marriage_shensha = MarriageAnalysis._check_marriage_shensha(pillars)
 
-        # 5. 婚期推断
         marriage_timing = MarriageAnalysis._predict_marriage_timing(
             pillars, day_stem, day_branch, is_male, dayun_pillar, liunian_pillar
         )
 
-        # 6. 风险提示
         risk_factors = MarriageAnalysis._identify_risk_factors(
             pillars, day_stem, day_branch, is_male
         )
 
-        # 7. 综合建议
         suggestions = MarriageAnalysis._generate_suggestions(
             spouse_star,
             spouse_palace,
@@ -291,13 +284,11 @@ class MarriageAnalysis:
         stability = "稳定"
         stability_notes: List[str] = []
 
-        # 检查日支是否逢冲
         for clash_pair in SIX_CLASH:
             if day_branch in clash_pair:
                 other_branch = (
                     clash_pair[1] if clash_pair[0] == day_branch else clash_pair[0]
                 )
-                # 检查其他柱是否有冲
                 for p_name, (_, b) in pillars.items():
                     if p_name != "day" and b == other_branch:
                         stability = "不稳（日支逢冲）"

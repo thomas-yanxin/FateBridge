@@ -15,11 +15,9 @@ from fatebridge.core.fengshui.output import FengshuiOutput
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.fengshui import assess
 from tests.fengshui.test_fengshui_material_facts import material_request
-from tests.fengshui.test_fengshui_surfaces import (
-    mcp_call,
-    rest_client,
-    without_transport,
-)
+from tests.support.fengshui_transports import mcp_call
+from tests.support.mcp_result_assertions import without_transport
+from tests.support.transports import rest_client
 
 
 def relation_request(present=True, basis="user_confirmed"):

@@ -113,7 +113,7 @@ def classify_gate_context(
 
 
 def _context(value: dict[str, Any], path: str) -> dict[str, Any]:
-    from fatebridge.validation.claims import _same_value
+    from fatebridge.utils.json_values import same_value as _same_value
 
     sides = value["activations"]
     context = classify_gate_context(

@@ -925,13 +925,10 @@ def calculate_bazi_birth(
     }
 
 
-# =============================================================================
 # 八字专项分析服务（财运 / 健康 / 子女 / 学业）
-#
 # 每个服务从出生信息构建四柱，调用对应分析模块，返回统一结构：
 #   {"analysis_type": ..., "<dim>_analysis": {...}}
 # 同时支撑 FastAPI 端点与 FastMCP 工具，避免重复构盘逻辑。
-# =============================================================================
 
 
 def _parse_pillar_str(
@@ -1099,7 +1096,6 @@ def _run_bazi_dimension_analysis(
             dayun_pillar=dayun,
             liunian_pillar=liunian,
         )
-        # The analyzer returns a dict, and both timing branches supply context.
         analysis = {
             **analysis,
             "calendar_context": birth_context.birth_calendar_context,

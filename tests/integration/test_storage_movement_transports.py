@@ -60,7 +60,6 @@ def test_storage_receipt_and_explanation_match_on_rest_mcp_cli(surface_calls):
         path="bazi_birth.day_master.assessment.relations.0.storage_effect.earth_energy_bonus",
         value=0.0,
         run_id=receipt["run_id"],
-        business_output_sha256=receipt["business_output_sha256"],
     )
     assert (
         verify_calculation_claims(result, [claim])["status"]

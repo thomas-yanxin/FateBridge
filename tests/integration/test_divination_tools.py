@@ -10,6 +10,7 @@ from fatebridge.core.local_techniques.chart import (
     _normalize_time_text,
 )
 from fatebridge.core.local_techniques.sixyao import build_sixyao_result
+from fatebridge.core.public_output import public_payload
 from fatebridge.services.divination import (
     calculate_gua_lookup,
     calculate_gua_meiyi,
@@ -220,29 +221,6 @@ def test_calculate_gua_meiyi_supports_selected_export_sections():
     assert "[批量结果]" in result["snapshot_export"]["export_text"]
     assert "[查询概览]" not in result["snapshot_export"]["export_text"]
     assert "[来源]" not in result["snapshot_export"]["export_text"]
-
-
-def test_fastmcp_sanshiunited_compact_mode_can_drop_snapshot_text():
-    rendered = mcp_text(
-        "sanshiunited",
-        date="2028-04-06",
-        time="09:33:00",
-        zone="+08:00",
-        lat="31n13",
-        lon="121e28",
-        qimen_options={"layout": "direct"},
-        taiyi_options={},
-        liureng_yue="申",
-        liureng_is_diurnal=False,
-        compact=True,
-        include_snapshot_text=False,
-    )
-
-    payload = json.loads(rendered)
-
-    assert "snapshot_text" not in payload
-    assert "snapshot_export" in payload
-    assert "\n" not in rendered
 
 
 def test_calculate_meihua_analysis_returns_expected_hexagram_chain():
@@ -642,11 +620,13 @@ def test_suzhan_uses_shared_local_chart_runtime(mansion_method, surface_calls):
         business(response.json())
         == business(cli)
         == business(protocol.structured_content)
-        == {
-            "params": {"su28Method": suzhan_result["params"]["su28Method"]},
-            "chart": suzhan_result["chart"],
-            "astronomy": suzhan_result["astronomy"],
-        }
+        == public_payload(
+            {
+                "params": {"su28Method": suzhan_result["params"]["su28Method"]},
+                "chart": suzhan_result["chart"],
+                "astronomy": suzhan_result["astronomy"],
+            }
+        )
     )
 
 

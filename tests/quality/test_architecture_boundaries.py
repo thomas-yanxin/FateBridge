@@ -59,7 +59,12 @@ def matches(module, prefixes):
 
 
 def test_domain_and_shared_utilities_do_not_depend_on_outer_layers(dependency_graph):
-    forbidden = (*ADAPTERS, "fatebridge.application", "fatebridge.services")
+    forbidden = (
+        *ADAPTERS,
+        "fatebridge.application",
+        "fatebridge.services",
+        "fatebridge.validation",
+    )
     violations = []
     for module, imports in dependency_graph.items():
         if matches(

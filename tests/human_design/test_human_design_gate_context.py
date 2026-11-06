@@ -15,7 +15,6 @@ from fatebridge.core.human_design_gate_context import (
     gate_context_report,
     source_records,
 )
-from fatebridge.services.replay_metadata import digest
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
 
@@ -212,9 +211,6 @@ def test_current_or_unknown_contract_cannot_drop_extension_after_rehash(
         ]
     if fault == "unknown_contract":
         value["run_metadata"]["contract_sha256"] = "0" * 64
-    value["run_metadata"]["business_output_sha256"] = digest(
-        {k: v for k, v in value.items() if k != "run_metadata"}
-    )
     check = verify_human_design_reading(value)
     assert check["status"] == "rejected", check
     assert check["gate_activation_context_status"] == "not_verified"
@@ -276,7 +272,4 @@ def test_rehashing_does_not_accept_false_states_sources_or_cross_witness_explana
         ] = "所有激活门都已定义、无休眠，原典与现实有效性全部认证。"
     else:
         report["scope"] = "physically_certified_empirical_neutrino_mechanism"
-    value["run_metadata"]["business_output_sha256"] = digest(
-        {k: v for k, v in value.items() if k != "run_metadata"}
-    )
     assert verify_human_design_reading(value)["status"] == "rejected"

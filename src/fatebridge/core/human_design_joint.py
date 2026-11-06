@@ -15,6 +15,7 @@ from fatebridge.core.human_design_circuitry import circuitry_summary
 from fatebridge.core.human_design_depth import depth_evidence
 from fatebridge.core.human_design_profile import profile_evidence
 from fatebridge.core.human_design_variables import variables_from_activations
+from fatebridge.core.public_output import same_public_value
 
 SIDES = ("personality", "design")
 VARIABLE_BODIES = {"Sun", "Earth", "NorthNode", "SouthNode"}
@@ -166,14 +167,16 @@ def joint_changes(
                 "fixing_state_changed": a["fixing_state"] != b["fixing_state"],
             }
             for a, b in zip(before_fixings, after_fixings)
-            if a != b
+            if not same_public_value(a, b)
         ],
         "variable_tones_changed": [
             a["tone"] for a in before_snapshot["variables"]["arrows"]
         ]
         != [a["tone"] for a in after_snapshot["variables"]["arrows"]],
-        "personality_colors_changed": before_snapshot["variables"]["personality_colors"]
-        != after_snapshot["variables"]["personality_colors"],
+        "personality_colors_changed": not same_public_value(
+            before_snapshot["variables"]["personality_colors"],
+            after_snapshot["variables"]["personality_colors"],
+        ),
     }
     changes["joint_evidence_summary"] = {
         **{
@@ -256,8 +259,10 @@ def joint_evidence_summary(
         ),
         "bridge_families_changed": first_bridge is not None,
         "line_fixing_evidence_changed": any(
-            row["value"]["depth_evidence"]["line_fixings"]
-            != nominal["depth_evidence"]["line_fixings"]
+            not same_public_value(
+                row["value"]["depth_evidence"]["line_fixings"],
+                nominal["depth_evidence"]["line_fixings"],
+            )
             for row in variants
         ),
         "variable_tones_changed": any(

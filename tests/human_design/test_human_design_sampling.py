@@ -8,7 +8,6 @@ import pytest
 
 from fatebridge.application.execution import execute_tool
 from fatebridge.core.astro import runtime
-from fatebridge.services.replay_metadata import digest
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
 from fatebridge.validation.human_design_sampling import verify_sampled_interval
@@ -26,13 +25,6 @@ def complete():
         return execute_tool(SPEC, SPEC.request_model(**PLAN["birth_input"]))
 
 
-def rehash(value):
-    value["run_metadata"]["business_output_sha256"] = digest(
-        {k: v for k, v in value.items() if k != "run_metadata"}
-    )
-    return value
-
-
 def set_path(value, path, replacement):
     target = value
     parts = path.split(".")
@@ -47,7 +39,7 @@ def set_path(value, path, replacement):
 def test_every_original_rehashed_contradiction_is_rejected(complete, case):
     changed = deepcopy(complete)
     set_path(changed, case["path"], case["replacement"])
-    rehash(changed)
+    (changed)
     assert verify_sampled_interval(changed)["errors"]
     checked = verify_human_design_reading(changed)
     assert checked["status"] == "rejected", checked
@@ -129,11 +121,11 @@ def test_native_replay_and_derived_reading_reject_tampering(complete, kind):
     if kind == "native_nan":
         # NaN cannot have a canonical JSON receipt, even before replay.
         with pytest.raises(ValueError):
-            rehash(p)
+            (p)
         assert verify_sampled_interval(p)["errors"]
         checked = verify_human_design_reading(p)
     else:
-        checked = verify_human_design_reading(rehash(p))
+        checked = verify_human_design_reading((p))
     assert checked["status"] == "rejected", checked
 
 

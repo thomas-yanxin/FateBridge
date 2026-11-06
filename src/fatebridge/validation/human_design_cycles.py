@@ -17,7 +17,7 @@ from fatebridge.core.human_design_cycles import (
     summary_conventions,
 )
 from fatebridge.core.human_design_reference_order import reference_ordering
-from fatebridge.validation.claims import _same_value
+from fatebridge.core.public_output import same_public_value as _same_value
 from fatebridge.validation.human_design_clocks import ClockReplay, verify_clock_records
 from fatebridge.validation.human_design_cycle_sources import verify_cycle_sources
 
@@ -36,7 +36,7 @@ def verify_cycle_context(
             summary_format = context.get("summary_format")
             if summary_format not in (None, SUMMARY_FORMAT):
                 raise ValueError("Unknown cycle summary format")
-            if context["ruleset"] != cycle_ruleset():
+            if not _same_value(context["ruleset"], cycle_ruleset()):
                 raise ValueError("Unknown cycle numerical ruleset")
             birth = payload["time_scales"]["personality"]["jd_tt"]
             replay = (

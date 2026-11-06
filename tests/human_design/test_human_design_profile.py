@@ -14,7 +14,6 @@ from fatebridge.core.human_design_profile import (
     profile_reading,
     profile_reference,
 )
-from fatebridge.services.replay_metadata import digest
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
 from fatebridge.validation.human_design_profile import public_profile_checks
@@ -242,9 +241,6 @@ def test_rehashed_role_or_cycle_assertions_cannot_override_actual_chart(
         role["ruleset"]["version"] = "1.10.0"
     else:
         run["interpretation"]["profile_meaning"] = "30岁生日后人生角色自动变为3/3。"
-    run["run_metadata"]["business_output_sha256"] = digest(
-        {k: v for k, v in run.items() if k != "run_metadata"}
-    )
     assert verify_human_design_reading(run)["status"] == "rejected"
 
 

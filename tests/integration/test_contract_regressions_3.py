@@ -15,9 +15,9 @@ from fatebridge.application.examples import suggested_fields
 from fatebridge.cli import run
 from fatebridge.core.astro import native_execution as execution
 from fatebridge.mcp_server import create_mcp_app
-from tests.integration.test_readonly_result_verification import (
-    PAYLOADS,
-    REFERENCE,
+from tests.support.result_delivery import (
+    RESULT_CASES,
+    RESULT_PAYLOADS,
     forbidden,
 )
 from tests.support.transports import SPECS, business, call_cli, inputs, native, rest
@@ -58,8 +58,8 @@ def test_size_optimization_does_not_allow_nonfinite_json(invalid):
 def test_all_verified_transports_preserve_frozen_payload_without_lock_writes(
     tool, tmp_path, monkeypatch, capsys
 ):
-    case = next(c for c in REFERENCE["cases"] if c["tool"] == tool)
-    payload = PAYLOADS[case["id"]]
+    case = next(c for c in RESULT_CASES if c["tool"] == tool)
+    payload = RESULT_PAYLOADS[case["id"]]
     store = delivery.ResultStore(tmp_path / "private")
     ref = store.put(payload)
     monkeypatch.setattr(delivery, "RESULT_STORE", store)
@@ -76,7 +76,6 @@ def test_all_verified_transports_preserve_frozen_payload_without_lock_writes(
     response = TestClient(api.app).get(
         f"/api/results/{ref['result_id']}/verified",
         params={
-            "expected_sha256": ref["sha256"],
             "expected_run_id": run_id,
             "path": path,
         },
@@ -87,8 +86,6 @@ def test_all_verified_transports_preserve_frozen_payload_without_lock_writes(
             [
                 "result-read",
                 ref["result_id"],
-                "--sha256",
-                ref["sha256"],
                 "--run-id",
                 run_id,
                 "--path",
@@ -103,7 +100,7 @@ def test_all_verified_transports_preserve_frozen_payload_without_lock_writes(
         async with Client(
             create_mcp_app(scenarios="onda-xingpan", tool_scope="topic")
         ) as client:
-            uri = f"fatebridge://results/{ref['result_id']}/verified/{run_id}/{ref['sha256']}/fields/{path}/0"
+            uri = f"fatebridge://results/{ref['result_id']}/verified/{run_id}/fields/{path}/0"
             return json.loads((await client.read_resource(uri))[0].text)
 
     native = asyncio.run(read())
@@ -111,7 +108,7 @@ def test_all_verified_transports_preserve_frozen_payload_without_lock_writes(
         native
         == cli
         == response.json()
-        == store.verified_page(ref["result_id"], ref["sha256"], run_id, path=path)
+        == store.verified_page(ref["result_id"], run_id, path=path)
     )
 
 

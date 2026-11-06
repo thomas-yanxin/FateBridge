@@ -6,7 +6,7 @@ from typing import Any
 from fatebridge.core.astro.profiles import ANALYTICAL_MEAN_NODE_MODEL
 from fatebridge.core.human_design_mechanics import BODY_IDS
 from fatebridge.core.human_design_provenance import position_flag_model
-from fatebridge.validation.claims import _same_value
+from fatebridge.core.public_output import same_public_value as _same_value
 
 SIDES = ("personality", "design")
 NODES = {"NorthNode", "SouthNode"}

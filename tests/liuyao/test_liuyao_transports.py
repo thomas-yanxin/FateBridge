@@ -8,56 +8,10 @@ from jsonschema import Draft202012Validator
 
 from fatebridge.cli import run as cli_run
 from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
+from tests.support.result_delivery import assert_same_run_receipt
 from tests.support.transports import SPECS, business, native
 from tests.support.transports import rest as rest
 from tests.support.transports import surface_calls
-
-
-def assert_same_run_receipt(store, shaped, original):
-    """Restore an explicitly deferred runtime before comparing exact receipts."""
-    from tests.support.result_delivery import reconstruct
-
-    inline = dict(shaped["run_metadata"])
-    evidence = inline.get("calculation_evidence")
-    if isinstance(evidence, dict) and "delivery_path" in evidence:
-        from fatebridge.utils.json_digest import digest
-
-        path = evidence["delivery_path"]
-        assert path == "run_metadata.calculation_evidence"
-        assert path in shaped["result_delivery"]["deferred_fields"]
-        restored_evidence = reconstruct(
-            store, shaped["result_delivery"]["result_id"], path
-        )
-        assert digest(restored_evidence) == evidence["sha256"]
-        assert restored_evidence["coverage"] == evidence["coverage"]
-        inline["calculation_evidence"] = restored_evidence
-    runtime = inline["runtime"]
-    if "delivery_path" in runtime:
-        assert runtime["delivery_path"] == "run_metadata.runtime"
-        assert runtime["delivery_path"] in shaped["result_delivery"]["deferred_fields"]
-        restored = reconstruct(
-            store, shaped["result_delivery"]["result_id"], runtime["delivery_path"]
-        )
-        assert len(restored["ephemeris"]["files"]) == runtime["ephemeris_files_count"]
-        assert restored["ephemeris"]["sha256"] == runtime["ephemeris_inventory_sha256"]
-        if "environment_sha256" in runtime:
-            assert restored["environment_sha256"] == runtime["environment_sha256"]
-        inline["runtime"] = restored
-    elif "files_delivery_path" in runtime.get("ephemeris", {}):
-        # The pinned earlier shared contract deferred just the inventory.
-        ephemeris = runtime["ephemeris"]
-        path = ephemeris["files_delivery_path"]
-        assert path == "run_metadata.runtime.ephemeris.files"
-        assert path in shaped["result_delivery"]["deferred_fields"]
-        files = reconstruct(store, shaped["result_delivery"]["result_id"], path)
-        assert len(files) == ephemeris["files_count"]
-        full_ephemeris = {
-            k: v
-            for k, v in ephemeris.items()
-            if k not in ("files_delivery_path", "files_count")
-        }
-        inline["runtime"] = {**runtime, "ephemeris": {**full_ephemeris, "files": files}}
-    assert original["run_metadata"] == inline
 
 
 @pytest.mark.parametrize(
@@ -191,7 +145,6 @@ def test_same_run_condition_quotes_cannot_be_replaced_with_outcome_claims(rest):
             path=path,
             value=value,
             run_id=receipt["run_id"],
-            business_output_sha256=receipt["business_output_sha256"],
         )
 
     path = "liuyao_evidence.conditional_analysis.focus.roles.3.role"

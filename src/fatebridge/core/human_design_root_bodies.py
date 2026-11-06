@@ -21,7 +21,7 @@ from fatebridge.core.human_design_native_positions import (
 )
 from fatebridge.core.human_design_root_interpretations import root_interpretations
 from fatebridge.core.human_design_variables import variables_from_activations
-from fatebridge.validation.claims import _same_value
+from fatebridge.utils.json_values import same_value as _same_value
 
 METHOD = "human_design_actual_design_root_endpoint_bodies_v1"
 ROLE = "root_bracket_activation"

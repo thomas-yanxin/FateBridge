@@ -149,7 +149,6 @@ def receipt():
         path=f"qimen.patterns.{index}",
         value=deepcopy(payload["qimen"]["patterns"][index]),
         run_id=payload["run_metadata"]["run_id"],
-        business_output_sha256=payload["run_metadata"]["business_output_sha256"],
     )
     return payload, claim
 

@@ -232,7 +232,6 @@ def test_same_run_claims_reject_the_former_marker_on_the_new_source():
             path="ziwei_birth.sihua.化忌",
             value=value,
             run_id=receipt["run_id"],
-            business_output_sha256=receipt["business_output_sha256"],
         )
 
     assert (

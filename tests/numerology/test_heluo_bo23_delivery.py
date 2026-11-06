@@ -11,7 +11,6 @@ from fatebridge.core.heluo import yao_text
 from fatebridge.core.numerology_knowledge import _catalogue, _source
 from fatebridge.services.knowledge import calculate_knowledge_read
 from fatebridge.services.tool_catalog import CATALOG
-from tests.numerology.test_heluo_poem_transports import run_three
 from tests.support.heluo_source_facts import (
     CATALOGUE_VERSION,
     HEADER_COUNT,
@@ -19,6 +18,7 @@ from tests.support.heluo_source_facts import (
 )
 from tests.support.transports import business
 from tests.support.transports import rest as shared_rest
+from tests.support.transports import run_three
 
 rest = shared_rest
 W = Path(__file__).parents[1] / "fixtures/heluo_bo23_v1"

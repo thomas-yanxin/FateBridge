@@ -9,7 +9,6 @@ from hashlib import sha256
 from pathlib import Path
 from typing import Any
 
-from fatebridge.services.replay_metadata import digest
 from fatebridge.validation.agent_capture import read_capture
 
 
@@ -95,20 +94,17 @@ def audit(run_dir: Path, review_path: Path) -> dict[str, Any]:
             payload = json.loads(path.read_text())["payload"]
             encoded = json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
             if (
-                sha256(encoded.encode()).hexdigest() != delivery["sha256"]
-                or len(encoded) != delivery["total_chars"]
+                len(encoded) != delivery["total_chars"]
                 or len(encoded.encode()) != delivery["total_bytes"]
                 or payload["run_metadata"]["run_id"]
                 != projected["run_metadata"]["run_id"]
-                or payload["run_metadata"]["business_output_sha256"]
-                != projected["run_metadata"]["business_output_sha256"]
             ):
                 raise ValueError("Delivery is not the actual same-run payload")
-            body = {k: v for k, v in payload.items() if k != "run_metadata"}
             verified = (
-                digest(body) == projected["run_metadata"]["business_output_sha256"]
+                records[item["journal_index"]].get("arguments", {}).get("fields")
+                is None
             )
-            if verified is not item["complete_business_hash_verified"]:
+            if verified is not item["unprojected_request_result"]:
                 raise ValueError(
                     "Projected delivery promoted to complete business result"
                 )
@@ -153,7 +149,7 @@ def audit(run_dir: Path, review_path: Path) -> dict[str, Any]:
         "executed_cases": len(completed),
         "actual_tool_receipts": receipt_count,
         "quotation_units": unit_count,
-        "complete_business_hashes_verified": full_business_count,
+        "unprojected_request_results": full_business_count,
         "manual_criterion_status_counts": dict(statuses),
         "quotation_and_same_run_index_verified": True,
         "automatic_semantic_acceptance": False,

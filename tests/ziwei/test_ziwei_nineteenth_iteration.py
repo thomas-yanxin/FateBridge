@@ -29,7 +29,8 @@ from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
 from scripts.ziwei.audit_ziwei_limits import _seed
 from scripts.ziwei.ziwei_conditional_inputs import synthetic_birth_clock
-from tests.fixtures.mcp_receipt import assert_same_run_receipt, verified_inline_business
+from tests.fixtures.mcp_receipt import verified_inline_business
+from tests.fixtures.mcp_result_delivery import assert_same_run_receipt
 
 
 def test_original_text_and_conditional_coverage_are_separate():
@@ -317,7 +318,6 @@ def test_same_run_claim_verifier_preserves_unresolved_half_year():
             path="ziwei_horoscope.ming_limit_subperiods.xiaoxian.half",
             value=value,
             run_id=m["run_id"],
-            business_output_sha256=m["business_output_sha256"],
         )
 
     assert (

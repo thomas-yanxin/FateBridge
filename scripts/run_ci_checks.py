@@ -21,6 +21,8 @@ CHECKS = (
     "integration/test_mcp_receipt.py",
     "integration/test_result_delivery.py",
     "integration/test_result_delivery_storage.py",
+    "integration/test_public_output.py",
+    "integration/test_verified_result_readers.py",
     "integration/test_life_dimensions.py",
     "integration/test_algorithm_review_repairs.py",
     "integration/test_compute_limits.py",

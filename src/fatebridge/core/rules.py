@@ -163,7 +163,6 @@ class BaZiRules:
             "six_harmony": [],
         }
 
-        # Check triple harmony and half harmony
         for triple_harmony_set in BaZiRules.TRIPLE_HARMONY:
             found_branches_in_set = [
                 branch for branch in triple_harmony_set if branch in all_branches
@@ -203,7 +202,6 @@ class BaZiRules:
                         }
                     )
 
-        # Check six harmony
         for six_harmony_pair in BaZiRules.SIX_HARMONY:
             if all(branch in all_branches for branch in six_harmony_pair):
                 harmony_patterns["six_harmony"].append(list(six_harmony_pair))
@@ -222,17 +220,14 @@ class BaZiRules:
             "punishments": [],  # Unified list for all punishments
         }
 
-        # Check six clash
         for six_clash_pair in BaZiRules.SIX_CLASH:
             if all(branch in all_branches for branch in six_clash_pair):
                 clash_patterns["six_clash"].append(list(six_clash_pair))
 
-        # Check six harm
         for six_harm_pair in BaZiRules.SIX_HARM:
             if all(branch in all_branches for branch in six_harm_pair):
                 clash_patterns["six_harm"].append(list(six_harm_pair))
 
-        # Check punishments
         # 1. Triple Punishments (寅巳申, 丑戌未)
         for punishment_set in BaZiRules.TRIPLE_PUNISHMENT:
             if len(punishment_set) == 3:
@@ -394,7 +389,6 @@ class BaZiRules:
                     related_stem,
                 ) in BaZiRules.ARCH_COMBINATIONS:
                     if (b1 == start and b2 == end) or (b1 == end and b2 == start):
-                        # Found an arch pair
                         entry = {
                             "branches": [b1, b2],
                             "pillars": [p1, p2],
@@ -519,7 +513,6 @@ class BaZiRules:
         stems = {k: v[0] for k, v in pillars.items()}
         branches = {k: v[1] for k, v in pillars.items()}
 
-        # Check all pairs
         for i in range(len(pillar_names)):
             for j in range(i + 1, len(pillar_names)):
                 p1, p2 = pillar_names[i], pillar_names[j]
@@ -573,7 +566,6 @@ class BaZiRules:
 
         patterns: Dict[str, Any] = {}
 
-        # Check for special day pillar patterns
         day_stem, day_branch = pillars["day"]
 
         # 日贵格 (Noble Day Pattern)
@@ -584,7 +576,6 @@ class BaZiRules:
         if day_pillar in noble_days:
             patterns["noble_day"] = True
 
-            # 添加昼夜区分
             if birth_hour is not None:
                 # 昼贵：癸卯、丁亥（白天6-18时）
                 # 夜贵：癸巳、丁酉（夜晚18-6时）
@@ -602,7 +593,6 @@ class BaZiRules:
         if f"{day_stem}{day_branch}" in kui_gang_days:
             patterns["kui_gang"] = True
 
-        # Check stem patterns
         # 四同 (Four Same)
         for stem in HEAVENLY_STEMS:
             if stems.count(stem) == 4:
@@ -620,8 +610,6 @@ class BaZiRules:
         if len(set(branches)) == 1:
             patterns["branch_unity"] = branches[0]
 
-        # Check for Four Horses, Cardinals, Treasuries
-        # 1. Analyze individual branch attributes (per pillar)
         branch_attributes = {}
         for pillar_name, (_, branch) in pillars.items():
             attr_data = {"branch": branch}
@@ -639,19 +627,16 @@ class BaZiRules:
 
         patterns["branch_attributes"] = branch_attributes
 
-        # 2. Count occurrences and check for patterns
         horses_count = sum(1 for b in branches if b in BaZiRules.FOUR_HORSES)
         cardinals_count = sum(1 for b in branches if b in BaZiRules.FOUR_CARDINALS)
         treasuries_count = sum(1 for b in branches if b in BaZiRules.FOUR_TREASURIES)
 
-        # Store counts
         patterns["counts"] = {
             "horses": horses_count,
             "cardinals": cardinals_count,
             "treasuries": treasuries_count,
         }
 
-        # Initialize defaults
         patterns["four_horses_complete"] = False
         patterns["many_horses"] = False
         patterns["all_horses"] = False
@@ -1640,10 +1625,8 @@ class BaZiRules:
         branches1 = [(pk, pillars1[pk][1]) for pk in pillar_keys if pk in pillars1]
         branches2 = [(pk, pillars2[pk][1]) for pk in pillar_keys if pk in pillars2]
 
-        # Check harmony between charts
         for pk1, b1 in branches1:
             for pk2, b2 in branches2:
-                # Check six harmony
                 for harmony_pair in BaZiRules.SIX_HARMONY:
                     if (b1, b2) in [harmony_pair, harmony_pair[::-1]]:
                         compatibility["harmony_score"] += 2
@@ -1651,7 +1634,6 @@ class BaZiRules:
                             f"一方{pillar_labels[pk1]}支{b1} × 二方{pillar_labels[pk2]}支{b2}：六合"
                         )
 
-                # Check six clash
                 for clash_pair in BaZiRules.SIX_CLASH:
                     if (b1, b2) in [clash_pair, clash_pair[::-1]]:
                         compatibility["clash_score"] += 2
@@ -1735,12 +1717,10 @@ class BaZiRules:
                     f"日支{day_branch1}与{day_branch2}六冲(重要)"
                 )
 
-        # Calculate overall score
         compatibility["overall_score"] = (
             compatibility["harmony_score"] - compatibility["clash_score"]
         )
 
-        # Determine compatibility level
         if compatibility["overall_score"] >= 8:
             compatibility["level"] = "非常匹配"
         elif compatibility["overall_score"] >= 4:

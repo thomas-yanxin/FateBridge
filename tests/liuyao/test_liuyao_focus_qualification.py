@@ -9,7 +9,7 @@ from jsonschema import Draft202012Validator
 
 from fatebridge.core.local_techniques.sixyao import build_sixyao_result
 from tests.liuyao.test_liuyao_clash_transports import all_surfaces
-from tests.liuyao.test_liuyao_transports import assert_same_run_receipt
+from tests.support.result_delivery import assert_same_run_receipt
 from tests.support.transports import SPECS, business, rest, surface_calls
 
 REFERENCE = Path(__file__).parents[1] / "fixtures/liuyao_focus_v25"

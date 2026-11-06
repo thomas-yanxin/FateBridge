@@ -19,8 +19,7 @@ SPECS = {spec.key: spec for spec in CATALOG}
 AS_OF = "2026-10-12T02:00:00Z"
 
 
-@pytest.fixture
-def rest(monkeypatch):
+def rest_client(monkeypatch):
     api._reset_runtime_state_for_tests()
     monkeypatch.setattr(
         api,
@@ -28,6 +27,11 @@ def rest(monkeypatch):
         api.ApiKeyAuthenticator(header_name="X-API-Key", api_keys={}),
     )
     return TestClient(api.app)
+
+
+@pytest.fixture
+def rest(monkeypatch):
+    return rest_client(monkeypatch)
 
 
 def inputs(spec):
@@ -69,6 +73,41 @@ async def native(spec, payload, **flags):
             {**payload, "as_of": AS_OF, "response_char_limit": 0, **flags},
             raise_on_error=False,
         )
+
+
+def run_three(spec, payload, fields, rest, tmp_path, capsys):
+    response = rest.post(
+        spec.rest_path,
+        json=payload,
+        params=[("fields", f) for f in fields]
+        + [("strict_fields", "true"), ("response_char_limit", "0")],
+    )
+    code, cli = call_cli(
+        spec,
+        payload,
+        tmp_path,
+        capsys,
+        flags=[
+            "--fields",
+            *fields,
+            "--strict-fields",
+            "true",
+            "--response-char-limit",
+            "0",
+        ],
+    )
+    mcp = asyncio.run(
+        native(
+            spec,
+            {
+                **payload,
+                "fields": fields,
+                "strict_fields": True,
+                "response_char_limit": 0,
+            },
+        )
+    )
+    return response, code, cli, mcp
 
 
 def business(payload):

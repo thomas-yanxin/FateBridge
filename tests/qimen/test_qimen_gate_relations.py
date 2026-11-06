@@ -253,7 +253,6 @@ def test_whole_quote_rejects_direction_reversal_or_auspicious_rebranding(change)
         path=f"qimen.patterns.{index}",
         value=deepcopy(pattern),
         run_id=payload["run_metadata"]["run_id"],
-        business_output_sha256=payload["run_metadata"]["business_output_sha256"],
     )
     assert (
         verify_qimen_pattern_quotes(payload, [claim])["status"]

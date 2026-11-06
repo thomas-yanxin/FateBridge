@@ -13,7 +13,8 @@ from pydantic import ValidationError
 from fatebridge.cli import run
 from fatebridge.core.fengshui.models import AssessRequest, Placement
 from fatebridge.services.fengshui import assess
-from tests.fengshui.test_fengshui_surfaces import rest_client, without_transport
+from tests.support.mcp_result_assertions import without_transport
+from tests.support.transports import rest_client
 
 RESIDENTS = [
     {"subject_id": "a", "effective_birth_year": 1990, "gender_convention": "male"},

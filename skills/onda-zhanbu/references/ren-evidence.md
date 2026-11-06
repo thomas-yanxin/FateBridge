@@ -144,6 +144,6 @@
 
 引用已有结果时保留同一 `run_id` 和完整业务散列；完整内容读取同 run 的 `result_delivery`，不为取得更多字段重起一课。需要机器核对的结构化事实，可按[同次引用核验](../../../docs/prediction-validation.md#同次结果引用核验)检查路径和值；核验通过不证明自由文本推论或现实预测正确。
 
-`result_delivery` 的全文是本次请求保留下来的 payload。首次用了摘要 `fields` 时，即使读完交付文件并核对其交付散列，也只能称“本次投影结果全文”，不能称“完整业务结果”。完整业务交付须首次 `fields=null`，再核对同次 `run_metadata.business_output_sha256`；交付散列与业务散列的核对对象不同。只需解释摘要时继续使用已有投影，不为改称完整而重算。
+`result_delivery` 的全文是本次请求实际保留的payload。摘要 `fields` 调用即使读完交付物，也只能称本次投影结果全文。完整业务须首次 `fields=null`，再读取同次交付，不通过重算或拼接不同run改称完整。
 
 程序的 `classical_acceptance_passed=false` 和 `real_world_efficacy=not_tested` 要按实际范围说明，不把课例回归当现实命中率。传统提示对应哪些现实条件、如何观察及何时复盘应另说清。来源疑文、影印页及专项验收见[六壬与金口诀审计](../../../docs/liuren-jinkou-audit.md)。

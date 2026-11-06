@@ -57,7 +57,6 @@ calculate_ziwei_rules = lazy_service(
 )
 
 SPECS: List[ToolSpec] = [
-    # --- Metaphysics -------------------------------------------------------
     ToolSpec(
         key="ziwei_birth",
         bind=person_invoke(calculate_ziwei_birth, also_pass=("birth_utc_offset",)),

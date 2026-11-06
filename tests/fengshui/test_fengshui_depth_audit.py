@@ -22,11 +22,9 @@ from fatebridge.services.fengshui import (
 from fatebridge.utils.errors import EphemerisSourceError
 from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
 from fatebridge.validation.fengshui import audit_classical_reference
-from tests.fengshui.test_fengshui_surfaces import (
-    mcp_call,
-    rest_client,
-    without_transport,
-)
+from tests.support.fengshui_transports import mcp_call
+from tests.support.mcp_result_assertions import without_transport
+from tests.support.transports import rest_client
 
 REFERENCE = json.loads(
     (
@@ -280,7 +278,6 @@ def test_new_structure_and_timing_match_all_three_transports(
             "traditional_label"
         ],
         run_id=metadata["run_id"],
-        business_output_sha256=metadata["business_output_sha256"],
     )
     assert (
         verify_calculation_claims(result, [claim])["status"]

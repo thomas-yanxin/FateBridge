@@ -15,7 +15,7 @@ from fatebridge.mcp_server import create_mcp_app
 from fatebridge.utils.errors import FengshuiCalculationError
 from fatebridge.validation.fengshui_reading import verify_fengshui_reading
 from tests.fengshui.test_fengshui_source_comparison import request
-from tests.fengshui.test_fengshui_surfaces import rest_client
+from tests.support.transports import rest_client
 
 
 def corrupt(result, fault):
@@ -138,7 +138,6 @@ def test_actual_public_transports_reject_false_derived_claims(
 
 
 def test_a_current_rehashed_receipt_cannot_certify_a_false_sum():
-    from fatebridge.services.replay_metadata import digest
     from tests.fengshui.test_fengshui_fixed_reading import executed, trusted
 
     payload = executed(
@@ -151,9 +150,6 @@ def test_a_current_rehashed_receipt_cannot_certify_a_false_sum():
     )
     chart = payload["layers"]["xuankong_natal"]["candidates"][0]
     chart["structure"]["combination_of_ten"][0]["palace_sums"]["C"] = 999
-    payload["run_metadata"]["business_output_sha256"] = digest(
-        {key: value for key, value in payload.items() if key != "run_metadata"}
-    )
     report = verify_fengshui_reading(payload, **trusted(payload))
     assert report["status"] == "rejected"
     assert {row["code"] for row in report["errors"]} >= {

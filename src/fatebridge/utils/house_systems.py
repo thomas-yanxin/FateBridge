@@ -58,7 +58,6 @@ _HOUSE_SYSTEM_ALIASES: Dict[str, str] = {
     "placidian": "P",
     "普拉西德": "P",
     "普拉西迪斯": "P",
-    # Koch
     "koch": "K",
     "koh": "K",
     "柯赫": "K",
@@ -71,7 +70,6 @@ _HOUSE_SYSTEM_ALIASES: Dict[str, str] = {
     "equal sign": "A",
     "等宫": "A",
     "等分制": "A",
-    # Whole sign
     "whole": "W",
     "wholesign": "W",
     "whole-sign": "W",
@@ -79,40 +77,31 @@ _HOUSE_SYSTEM_ALIASES: Dict[str, str] = {
     "whole signs": "W",
     "整宫": "W",
     "整宫制": "W",
-    # Regiomontanus
     "regiomontanus": "R",
     "regio": "R",
     "雷乔蒙塔努斯": "R",
-    # Campanus
     "campanus": "C",
     "坎帕努斯": "C",
-    # Porphyry / Porphyrius
     "porphyry": "O",
     "porphyrius": "O",
     "波菲利": "O",
-    # Alcabitius
     "alcabitus": "B",
     "alcabitius": "B",
     "alchabitius": "B",
     "alchabitus": "B",
     "阿卡比特斯": "B",
-    # Morinus
     "morinus": "M",
     "莫里努斯": "M",
-    # Topocentric / Polich-Page
     "topocentric": "T",
     "polich": "T",
     "polichpage": "T",
     "polich-page": "T",
     "polich page": "T",
-    # Horizontal / Azimuthal
     "horizontal": "H",
     "azimuthal": "H",
-    # Axial rotation / Meridian
     "axial": "X",
     "meridian": "X",
     "axial rotation": "X",
-    # Vehlow Equal
     "vehlow": "V",
     "vehlowequal": "V",
     "vehlow equal": "V",
@@ -122,7 +111,6 @@ _HOUSE_SYSTEM_ALIASES: Dict[str, str] = {
     "天顶为第10宫宫头的等宫制": "D",
     # Sripati (core chart code 7) — was missing, so "sripati" fell back to P
     "sripati": "S",
-    # APC / Krusinski
     "apc": "Y",
     "krusinski": "U",
 }

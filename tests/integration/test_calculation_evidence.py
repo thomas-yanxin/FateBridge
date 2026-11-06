@@ -330,13 +330,16 @@ def test_evidence_and_unknown_error_budget_are_equal_on_real_transports(
         for r in (response.json(), local, protocol.structured_content)
     ]
     assert evidence[0] == evidence[1] == evidence[2]
-    graph = EvidenceGraph.model_validate(evidence[0]["graph"])
-    environment_node = next(n for n in graph.nodes if n.kind == "environment")
-    for value in (response.json(), local, protocol.structured_content):
-        runtime = value["run_metadata"]["runtime"]
-        assert environment_node.value_sha256 == digest(runtime)
-        assert environment_node.value_sha256 != runtime["environment_sha256"]
-    assert graph.unresolved_rule_dependencies
+    graph = evidence[0]["graph"]
+    node_ids = {node["node_id"] for node in graph["nodes"]}
+    assert "environment:runtime" in node_ids
+    assert len(node_ids) == len(graph["nodes"])
+    assert all(
+        edge["source"] in node_ids and edge["target"] in node_ids
+        for edge in graph["edges"]
+    )
+    assert graph["unresolved_rule_dependencies"]
+    assert all("value_sha256" not in node for node in graph["nodes"])
     assert evidence[0]["error_budget"]["output_error_bounds"] is None
 
 
@@ -374,10 +377,8 @@ def test_large_evidence_remains_available_in_same_run(monkeypatch, tmp_path):
         pieces.append(restored["text"])
     evidence = json.loads("".join(pieces))
     assert evidence == result["run_metadata"]["calculation_evidence"]
-    assert digest(evidence) == bounded["run_metadata"]["calculation_evidence"]["sha256"]
     assert (
-        result["run_metadata"]["calculation_evidence"]["graph"][
-            "business_output_sha256"
-        ]
-        == result["run_metadata"]["business_output_sha256"]
+        evidence["coverage"]
+        == bounded["run_metadata"]["calculation_evidence"]["coverage"]
     )
+    assert "business_output_sha256" not in evidence["graph"]

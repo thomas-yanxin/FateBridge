@@ -1,7 +1,6 @@
 """Expanded source names and conflicts agree across the three real protocols."""
 
 import asyncio
-import hashlib
 import json
 
 import pytest
@@ -16,6 +15,7 @@ from fatebridge.core.astro import runtime
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
+from tests.fixtures.mcp_result_delivery import assert_same_run_receipt
 
 SPEC = next(s for s in CATALOG if s.key == "human_design")
 INPUT = dict(
@@ -80,10 +80,9 @@ def test_expanded_source_and_complete_reading_match_actual_three_surfaces(
                 == expected["interpretation"]["expanded_cross_name_meaning"]
             )
             if "result_delivery" in card.structured_content:
-                # The published delivery contract can defer only runtime
-                # metadata while every requested business fact stays inline.
+                # Only declared supplementary receipt fields may be deferred;
+                # every requested business fact stays inline.
                 reference = card.structured_content["result_delivery"]
-                assert reference["deferred_fields"] == ["run_metadata.runtime"]
                 parts = []
                 offset = 0
 
@@ -103,12 +102,13 @@ def test_expanded_source_and_complete_reading_match_actual_three_surfaces(
                         parts.append(page["text"])
                         offset = page["next_offset"]
                 text = "".join(parts)
-                assert (
-                    hashlib.sha256(text.encode()).hexdigest()
-                    == reference["sha256"]
-                    == page["sha256"]
-                )
+                assert len(text) == reference["total_chars"]
                 restored = json.loads(text)
+                assert_same_run_receipt(
+                    card.structured_content["run_metadata"],
+                    restored["run_metadata"],
+                    deferred_fields=reference["deferred_fields"],
+                )
                 assert (
                     restored["run_metadata"]["run_id"]
                     == card.structured_content["run_metadata"]["run_id"]

@@ -99,7 +99,6 @@ def test_public_root_qualification_receipt_text_and_claims_match_on_all_transpor
         path="bazi_birth.structure_profile.evidence_chain.strength_context.root_qualifications.1.qualified_for_structural_rule",
         value=True,
         run_id=receipt["run_id"],
-        business_output_sha256=receipt["business_output_sha256"],
     )
     assert (
         verify_calculation_claims(result, [claim])["status"]

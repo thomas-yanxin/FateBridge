@@ -43,11 +43,11 @@ ZIWEI_BRANCH_SEQUENCE = [
 
 # 五行 (Five Elements)
 class Element(Enum):
-    WOOD = "木"  # 木
-    FIRE = "火"  # 火
-    EARTH = "土"  # 土
-    METAL = "金"  # 金
-    WATER = "水"  # 水
+    WOOD = "木"
+    FIRE = "火"
+    EARTH = "土"
+    METAL = "金"
+    WATER = "水"
 
 
 # 阴阳 (Yin Yang)
@@ -165,25 +165,21 @@ def get_ten_god(day_stem: str, other_stem: str) -> TenGod:
         else:
             return TenGod.ROB_WEALTH
     elif GENERATION_CYCLE[day_element] == other_element:
-        # Day stem generates other stem
         if day_polarity == other_polarity:
             return TenGod.FOOD_GOD
         else:
             return TenGod.HURT_OFFICER
     elif DESTRUCTION_CYCLE[day_element] == other_element:
-        # Day stem destroys other stem
         if day_polarity == other_polarity:
             return TenGod.PARTIAL_WEALTH
         else:
             return TenGod.POSITIVE_WEALTH
     elif DESTRUCTION_CYCLE[other_element] == day_element:
-        # Other stem destroys day stem
         if day_polarity == other_polarity:
             return TenGod.SEVEN_KILLER
         else:
             return TenGod.POSITIVE_OFFICER
     elif GENERATION_CYCLE[other_element] == day_element:
-        # Other stem generates day stem
         if day_polarity == other_polarity:
             return TenGod.PARTIAL_SEAL
         else:
@@ -229,94 +225,64 @@ def get_hour_branch(hour: int) -> str:
 
 # 纳音表 (Nayin Table) - 六十甲子纳音
 NAYIN_TABLE = {
-    # 甲子乙丑海中金
     ("甲", "子"): "海中金",
     ("乙", "丑"): "海中金",
-    # 丙寅丁卯炉中火
     ("丙", "寅"): "炉中火",
     ("丁", "卯"): "炉中火",
-    # 戊辰己巳大林木
     ("戊", "辰"): "大林木",
     ("己", "巳"): "大林木",
-    # 庚午辛未路旁土
     ("庚", "午"): "路旁土",
     ("辛", "未"): "路旁土",
-    # 壬申癸酉剑锋金
     ("壬", "申"): "剑锋金",
     ("癸", "酉"): "剑锋金",
-    # 甲戌乙亥山头火
     ("甲", "戌"): "山头火",
     ("乙", "亥"): "山头火",
-    # 丙子丁丑涧下水
     ("丙", "子"): "涧下水",
     ("丁", "丑"): "涧下水",
-    # 戊寅己卯城墙土
     ("戊", "寅"): "城墙土",
     ("己", "卯"): "城墙土",
-    # 庚辰辛巳白蜡金
     ("庚", "辰"): "白蜡金",
     ("辛", "巳"): "白蜡金",
-    # 壬午癸未杨柳木
     ("壬", "午"): "杨柳木",
     ("癸", "未"): "杨柳木",
-    # 甲申乙酉泉中水
     ("甲", "申"): "泉中水",
     ("乙", "酉"): "泉中水",
-    # 丙戌丁亥屋上土
     ("丙", "戌"): "屋上土",
     ("丁", "亥"): "屋上土",
-    # 戊子己丑霹雳火
     ("戊", "子"): "霹雳火",
     ("己", "丑"): "霹雳火",
-    # 庚寅辛卯松柏木
     ("庚", "寅"): "松柏木",
     ("辛", "卯"): "松柏木",
-    # 壬辰癸巳长流水
     ("壬", "辰"): "长流水",
     ("癸", "巳"): "长流水",
-    # 甲午乙未沙中金
     ("甲", "午"): "沙中金",
     ("乙", "未"): "沙中金",
-    # 丙申丁酉山下火
     ("丙", "申"): "山下火",
     ("丁", "酉"): "山下火",
-    # 戊戌己亥平地木
     ("戊", "戌"): "平地木",
     ("己", "亥"): "平地木",
-    # 庚子辛丑壁上土
     ("庚", "子"): "壁上土",
     ("辛", "丑"): "壁上土",
-    # 壬寅癸卯金箔金
     ("壬", "寅"): "金箔金",
     ("癸", "卯"): "金箔金",
-    # 甲辰乙巳覆灯火
     ("甲", "辰"): "覆灯火",
     ("乙", "巳"): "覆灯火",
-    # 丙午丁未天河水
     ("丙", "午"): "天河水",
     ("丁", "未"): "天河水",
-    # 戊申己酉大驿土
     ("戊", "申"): "大驿土",
     ("己", "酉"): "大驿土",
-    # 庚戌辛亥钗钏金
     ("庚", "戌"): "钗钏金",
     ("辛", "亥"): "钗钏金",
-    # 壬子癸丑桑柘木
     ("壬", "子"): "桑柘木",
     ("癸", "丑"): "桑柘木",
-    # 甲寅乙卯大溪水
     ("甲", "寅"): "大溪水",
     ("乙", "卯"): "大溪水",
-    # 丙辰丁巳沙中土
     ("丙", "辰"): "沙中土",
     ("丁", "巳"): "沙中土",
-    # 戊午己未天上火
     ("戊", "午"): "天上火",
     ("己", "未"): "天上火",
-    # 庚申辛酉石榴木
     ("庚", "申"): "石榴木",
     ("辛", "酉"): "石榴木",
-    # 壬戌癸亥大海水
     ("壬", "戌"): "大海水",
     ("癸", "亥"): "大海水",
 }

@@ -7,6 +7,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
+from fatebridge.core.public_output import public_value
 from fatebridge.utils.errors import FengshuiCalculationError
 
 DATA_SHA256 = "11e5b866a930baebe2dc4c6145e6bc2c9d4c3ecff994e83ea63b7f984beb7659"
@@ -111,7 +112,6 @@ def validate_mutual_geometry(
         for key, expected in {
             "rule_id": "wang_zhongzhou_timeliness_v1.diagram_overlap",
             "source_ids": ["WZT1"],
-            "source_data_sha256": DATA_SHA256,
             "star_number": number,
             "current_period_number": current,
             "printed_period_numbers": members,
@@ -189,12 +189,11 @@ def validate_author_geometries(
         )
         if modern:
             _require(
-                profile["geometry_provenance"]["loaded_data_sha256"] == DATA_SHA256
-            )
-            _require(
                 all(
-                    profile["geometry_provenance"]["source_diagrams"][layout]
-                    == _facts()[layout]
+                    public_value(
+                        profile["geometry_provenance"]["source_diagrams"][layout]
+                    )
+                    == public_value(_facts()[layout])
                     for layout in ("earlier_heaven", "later_heaven")
                 )
             )

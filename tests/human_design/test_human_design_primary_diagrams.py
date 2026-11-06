@@ -14,7 +14,6 @@ from fatebridge.core.human_design_primary_diagrams import (
     primary_diagram_evidence,
 )
 from fatebridge.core.human_design_source_variants import source_variant_audit
-from fatebridge.services.replay_metadata import digest
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
 from scripts.human_design.check_human_design_primary_diagrams import (
@@ -29,13 +28,6 @@ PLAN = json.loads(PLAN_PATH.read_text())
 COHORT = json.loads(
     (ROOT / "tests/fixtures/human-design-official-cross-charts.json").read_text()
 )
-
-
-def rehash(value):
-    value["run_metadata"]["business_output_sha256"] = digest(
-        {k: v for k, v in value.items() if k != "run_metadata"}
-    )
-    return value
 
 
 def test_preregistered_diagrams_pages_and_all_original_failures_remain():
@@ -168,7 +160,7 @@ def test_all_rehashed_diagram_and_qualification_mutations_are_rejected(complete,
         value["interpretation"]["statements"].pop()
     else:
         raise AssertionError(case)
-    assert verify_human_design_reading(rehash(value))["status"] == "rejected"
+    assert verify_human_design_reading((value))["status"] == "rejected"
 
 
 def test_evidence_cannot_mutate_the_cached_source_catalog(complete):

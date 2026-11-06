@@ -89,9 +89,7 @@ def test_project_fields_dotted_prunes_into_subtree():
         _nested_payload(),
         ["bazi_birth.day_master", "bazi_birth.favorable_elements"],
     )
-    # Top level keeps only the requested parent + run_metadata.
     assert set(out) == {"bazi_birth", "run_metadata"}
-    # The parent is pruned to exactly the requested sub-keys (heavy ten_gods/shensha dropped).
     assert set(out["bazi_birth"]) == {"day_master", "favorable_elements"}
     assert out["bazi_birth"]["day_master"] == {"stem": "壬", "strength": "弱"}
 
@@ -104,7 +102,6 @@ def test_project_fields_mixes_dotted_and_top_level():
 
 
 def test_project_fields_whole_parent_overrides_dotted_regardless_of_order():
-    # Asking for the whole parent AND a sub-path => keep the whole parent.
     payload = _nested_payload()
     a = project_fields(payload, ["bazi_birth", "bazi_birth.day_master"])
     b = project_fields(payload, ["bazi_birth.day_master", "bazi_birth"])
@@ -120,7 +117,6 @@ def test_project_fields_unknown_subkey_keeps_legacy_shape_and_warns():
 
 
 def test_project_fields_dotted_into_scalar_keeps_scalar():
-    # A sub-path under a non-dict value just keeps that value (lenient, no crash).
     out = project_fields(_nested_payload(), ["snapshot_text.foo"])
     assert out["snapshot_text"] == "[起盘信息]..."
     assert out["projection_warnings"] == [
@@ -180,7 +176,7 @@ def test_invalid_input_result_shape_mirrors_rest_400():
 
 
 def test_mcp_fn_renders_valueerror_as_clean_error():
-    # M2: a ValueError raised during binding/validation must render via
+    # A ValueError raised during binding/validation must render via
     # render_error, not bubble a raw exception out of the MCP tool.
     def _raising_bind(req):
         raise ValueError("bad input")

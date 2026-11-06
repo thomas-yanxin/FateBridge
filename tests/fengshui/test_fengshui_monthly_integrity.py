@@ -16,7 +16,8 @@ from fatebridge.services import fengshui as service
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.errors import FengshuiCalculationError
 from fatebridge.validation.fengshui_monthly import verify_monthly_reading
-from tests.fengshui.test_fengshui_surfaces import mcp_call, rest_client
+from tests.support.fengshui_transports import mcp_call
+from tests.support.transports import rest_client
 
 
 def inputs():
@@ -175,8 +176,6 @@ def test_service_seal_rejects_post_domain_faults_on_all_protocols(
 def test_missing_month_does_not_receive_numeric_coverage():
     spec = next(s for s in CATALOG if s.key == "fengshui_monthly_stars")
     result = execute_tool(spec, spec.request_model.model_validate({}))
-    checked = verify_monthly_reading(
-        result, trusted_run_metadata=deepcopy(result["run_metadata"])
-    )
+    checked = verify_monthly_reading(result, trusted_payload=deepcopy(result))
     assert checked["status"] == "verified_served_fixed_monthly_reading"
     assert checked["derived_monthly_numeric_consistency_verified"] is False

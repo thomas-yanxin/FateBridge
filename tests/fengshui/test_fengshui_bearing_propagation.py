@@ -18,11 +18,9 @@ from fatebridge.services.fengshui import (
     calculate_bazhai,
     calculate_xuankong_natal,
 )
-from tests.fengshui.test_fengshui_surfaces import (
-    mcp_call,
-    rest_client,
-    without_transport,
-)
+from tests.support.fengshui_transports import mcp_call
+from tests.support.mcp_result_assertions import without_transport
+from tests.support.transports import rest_client
 
 # Authored compass facts, independent of the production sector iterator.
 DIVIDERS = [

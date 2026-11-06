@@ -1,7 +1,6 @@
 """Known printed disagreements must reach every relevant computed candidate."""
 
 import asyncio
-import hashlib
 import json
 from copy import deepcopy
 from pathlib import Path
@@ -16,11 +15,16 @@ from fatebridge.core.fengshui.xuankong import xuankong_natal
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.fengshui import calculate_xuankong_natal
 from fatebridge.validation.fengshui_reading import verify_fengshui_reading
-from tests.fengshui.test_fengshui_surfaces import (
-    rest_client,
+from tests.fixtures.mcp_result_delivery import read_full_result
+from tests.support.mcp_result_assertions import (
     same_run_projected_response,
     without_transport,
 )
+from tests.support.result_delivery import (
+    assert_same_run_receipt as assert_stored_result,
+)
+from tests.support.result_delivery import store
+from tests.support.transports import rest_client
 
 
 def request(period=7, facing=60, **extra):
@@ -354,7 +358,9 @@ def test_default_mcp_budget_keeps_source_difference_facts(name):
 
 
 @pytest.mark.parametrize("name", ["xuankong_natal", "assess"])
-def test_same_run_full_pages_and_independent_receipt_preserve_source_disagreement(name):
+def test_same_run_full_pages_and_independent_receipt_preserve_source_disagreement(
+    name, store
+):
     inputs = request(
         interpretation={
             "current_period_number": 9,
@@ -379,34 +385,25 @@ def test_same_run_full_pages_and_independent_receipt_preserve_source_disagreemen
             )
             assert not response.is_error and len(response.content[0].text) <= 4096
             ref = response.structured_content["result_delivery"]
-            manifest = json.loads(
-                (await client.read_resource(ref["manifest_uri"]))[0].text
-            )
-            parts = []
-            uri = ref["first_page_uri"]
-            offset = 0
-            while uri:
-                page = json.loads((await client.read_resource(uri))[0].text)
-                assert page["offset"] == offset and page["sha256"] == ref["sha256"]
-                parts.append(page["text"])
-                offset += len(page["text"])
-                assert page["next_offset"] == (
-                    offset if offset < ref["total_chars"] else None
-                )
-                uri = page["next_uri"]
-            raw = "".join(parts)
-            assert len(raw) == ref["total_chars"]
-            assert (
-                hashlib.sha256(raw.encode()).hexdigest()
-                == ref["sha256"]
-                == manifest["sha256"]
-            )
-            return json.loads(raw), deepcopy(manifest["run_metadata"])
+            original = await read_full_result(client, response.structured_content)
+            trusted = store.get(ref["result_id"])
+            assert_stored_result(store, response.structured_content, trusted)
+            return original, trusted
 
     original, trusted = asyncio.run(call())
-    assert original["run_metadata"] == trusted
+    assert original == trusted
+    assert original["run_metadata"] == trusted["run_metadata"]
+    natal = original["layers"]["xuankong_natal"]
+    assert natal["chart"]["palaces"]["E"]["mountain_star_number"] == 2
     assert (
-        verify_fengshui_reading(original, trusted_run_metadata=trusted)["status"]
+        natal["source_comparison"]["candidates"][0]["diagram"]["source_palaces"]["E"][
+            "mountain"
+        ]
+        == 5
+    )
+    assert "原图5、计算2" in original["calculation_reading"]["text"]
+    assert (
+        verify_fengshui_reading(original, trusted_payload=trusted)["status"]
         == "verified_served_fixed_reading"
     )
     changed = deepcopy(original)
@@ -414,6 +411,6 @@ def test_same_run_full_pages_and_independent_receipt_preserve_source_disagreemen
         "diagram"
     ]["source_palaces"]["E"]["mountain"] = 2
     assert (
-        verify_fengshui_reading(changed, trusted_run_metadata=trusted)["status"]
+        verify_fengshui_reading(changed, trusted_payload=trusted)["status"]
         == "rejected"
     )

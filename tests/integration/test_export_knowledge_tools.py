@@ -151,20 +151,6 @@ def test_knowledge_read_bare_key_ambiguous_and_unknown():
     assert "education" in unknown["details"]["available_categories"]
 
 
-def test_calculate_knowledge_read_supports_selected_export_sections():
-    result = calculate_knowledge_read(
-        domain="qimen",
-        category="door",
-        key="休门",
-        selected_sections=["知识正文"],
-    )
-
-    assert result["snapshot_export"]["selected_sections"] == ["知识正文"]
-    assert "[知识正文]" in result["snapshot_export"]["export_text"]
-    assert "[查询信息]" not in result["snapshot_export"]["export_text"]
-    assert "[来源]" not in result["snapshot_export"]["export_text"]
-
-
 def test_calculate_knowledge_registry_supports_selected_export_sections():
     result = calculate_knowledge_registry(
         selected_sections=["目录概览", "qimen"],

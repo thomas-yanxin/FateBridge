@@ -20,7 +20,7 @@ from fatebridge.core.output_jinkou_interactions import JinkouPositionInteraction
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.metaphysics import calculate_jinkou_analysis
 from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
-from tests.fixtures.mcp_receipt import assert_same_run_receipt
+from tests.fixtures.mcp_result_delivery import assert_same_run_receipt
 from tests.support.transports import AS_OF, SPECS, business, rest, surface_calls
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -348,7 +348,6 @@ def test_selected_four_position_section_and_same_run_claims_are_faithful(surface
         path="jinkou.position_interactions.has_any_control",
         value=True,
         run_id=receipt["run_id"],
-        business_output_sha256=receipt["business_output_sha256"],
     )
     assert (
         verify_calculation_claims(cli, [claim])["status"] == "verified_structured_facts"

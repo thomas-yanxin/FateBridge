@@ -3,7 +3,7 @@
 import pytest
 from jsonschema import Draft202012Validator
 
-from tests.liuyao.test_liuyao_transports import assert_same_run_receipt
+from tests.support.result_delivery import assert_same_run_receipt
 from tests.support.transports import SPECS, business, surface_calls
 
 

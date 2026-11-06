@@ -88,7 +88,6 @@ def test_full_snapshot_same_run_claims_and_invalid_array_projection(rest):
         path="bazi_birth.structure_profile.evidence_chain.strength_context.clash_comparison.events.0.powers.0.raw_budget",
         value=a["clash_comparison"]["events"][0]["powers"][0]["raw_budget"],
         run_id=meta["run_id"],
-        business_output_sha256=meta["business_output_sha256"],
     )
     assert (
         verify_calculation_claims(result, [claim])["status"]

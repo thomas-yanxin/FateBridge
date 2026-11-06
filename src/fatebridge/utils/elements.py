@@ -21,7 +21,6 @@ def get_element_relationship(element1: str, element2: str) -> Dict[str, str]:
     """
     from fatebridge.utils.data import DESTRUCTION_CYCLE, GENERATION_CYCLE, Element
 
-    # 找到对应的Element枚举
     element1_enum = None
     element2_enum = None
 
@@ -31,7 +30,6 @@ def get_element_relationship(element1: str, element2: str) -> Dict[str, str]:
         if element_enum.value == element2:
             element2_enum = element_enum
 
-    # Check for None values before using
     if element1_enum is None or element2_enum is None:
         logger.warning(f"Invalid element reference: {element1} or {element2}")
         return {

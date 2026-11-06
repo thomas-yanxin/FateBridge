@@ -207,11 +207,11 @@ uv run --locked --extra dev python -m scripts.western.audit_western_polar_geomet
 
 [Robbins 1940 I.24](https://penelope.uchicago.edu/Thayer/E/Roman/Texts/Ptolemy/Tetrabiblos/1B%2A.html#24)的接近／离开概念是此处明确限定的参考；该章还区分合相的黄纬条件、相位射线及其他效力条件。`ptolemy_latitude_condition` 现单列合相黄纬同侧／异侧／缺项；相位射线标为无需该项。使用共享闭半球约定，位于黄道上的天体可与任一侧共享半球，此零点约定明确保留。判定直接比较符号，避免极小异号纬度相乘下溢成零；未知纬度不补零。此条件不改变现代黄经相位列表，也不独自建立完整的托勒密入相；未来成相、停滞反转及全部效力条件仍待验收。结构化状态经过本地 REST、原生 MCP、CLI 的完整输出与严格投影核对；实际模型的自由解释仍需单独检验。
 
-`astro_chart`、`astro_chart13`、`astro_hellen`、`astro_india`、`astro_germany` 发布 `aspect_motion` 证据视图，将星体、相位、格局与适用限制一起读取；使用时把视图的 `fields` 复制到请求，视图名称本身不是请求参数。独立算术、公开端口一致性、模型解释和安装包分别验证。
+`astro_chart`、`astro_chart13`、`astro_hellen`、`astro_india`、`astro_germany` 发布 `aspect_motion` 证据视图，将星体、相位、格局与适用限制一起读取；使用时把视图的 `fields` 复制到请求，视图名称本身不是请求参数。测试与审计共用 [独立 Decimal 参考](../tests/support/western_angular_reference.py)，保留原精度、半径与输入。独立算术、公开端口一致性、模型解释和安装包分别验证。
 
 ```bash
 uv run --locked --extra dev pytest -q tests/western/test_western_angular_predicates.py tests/western/test_contract_regressions.py
-PYTHONPATH=src:. uv run --locked --extra dev python -m scripts.western.audit_western_angular_predicates --output /tmp/western-angular-audit.json
+uv run --locked --extra dev python -m scripts.western.audit_western_angular_predicates --output /tmp/western-angular-audit.json
 ```
 
 ## 卜卦月亮事件与Lilly条件
@@ -463,7 +463,7 @@ uv run --locked --extra dev python -m scripts.western.audit_western_event_paths 
 统计解释保留全部并列首位，不按字母顺序挑“最强”；宫位和星座本体计数同时排除南、北交点。MC象征读取MC自身星座，不借用上升星座的气质。相位说明使用“偏离精确角度最小”，并逐类报告命中条数；几何距离和条数均不换算整体强弱。导出与JSON的符号来源保持一致。
 
 
-宿主可用完整原始结果、同一 `run_id` 与 `business_output_sha256`，通过 `validation.claims.verify_calculation_claims` 核对结构化引用。缺失字段、错误值、不同回执或事后改动不得通过。字段路径和哈希只支持核查原始事实，不自动证明自由文本的语义忠实，也不替代真实模型对话验收。
+宿主可用另行可信保存的完整原结果与同一 `run_id`，通过 `validation.claims.verify_calculation_claims` 核对结构化引用。缺失字段、错误值、不同回执或事后改动不得通过。字段路径与逐值比较只支持核查所供事实，不自动证明自由文本的语义忠实，也不替代真实模型对话验收。
 
 ## 独立数值审计与复现
 

@@ -1,7 +1,6 @@
 """Verified original-result reads must not require filesystem writes."""
 
 import copy
-import gzip
 import json
 import os
 import subprocess
@@ -16,66 +15,52 @@ from fatebridge.diagnostics import resolve_codex_cli
 from fatebridge.utils.errors import ParameterError
 
 ROOT = Path(__file__).resolve().parents[2]
-FIX = ROOT / "tests/fixtures/numerology_readonly_verification_v1"
-REFERENCE = json.loads((FIX / "reference.json").read_text())
-PAYLOADS = {
-    row["id"]: row["payload"]
-    for row in json.loads(gzip.decompress((FIX / "payloads.json.gz").read_bytes()))
-}
-
-
-def forbidden(*args, **kwargs):
-    raise AssertionError("A verified read attempted a write or writable-temp discovery")
-
-
-def block_writes(monkeypatch):
-    original_open = os.open
-
-    def read_open(path, flags, *args, **kwargs):
-        if flags & (os.O_WRONLY | os.O_RDWR | os.O_CREAT | os.O_TRUNC | os.O_APPEND):
-            forbidden()
-        return original_open(path, flags, *args, **kwargs)
-
-    monkeypatch.setattr(os, "open", read_open)
-    monkeypatch.setattr(Path, "mkdir", forbidden)
-    monkeypatch.setattr(Path, "unlink", forbidden)
-    monkeypatch.setattr(Path, "chmod", forbidden)
-    monkeypatch.setattr(tempfile, "gettempdir", forbidden)
+from tests.support.result_delivery import (
+    RESULT_CASES,
+    RESULT_PAYLOADS,
+    block_writes,
+    forbidden,
+)
 
 
 @pytest.fixture
 def stored(tmp_path):
     store = delivery.ResultStore(tmp_path / "private")
-    payload = copy.deepcopy(PAYLOADS[REFERENCE["cases"][0]["id"]])
+    payload = copy.deepcopy(RESULT_PAYLOADS[RESULT_CASES[0]["id"]])
     return store, payload, store.put(payload)
 
 
-@pytest.mark.parametrize("case", REFERENCE["cases"], ids=lambda c: c["id"])
-def test_all19_frozen_actual_payload_pages_are_unchanged_without_writes(
+@pytest.mark.parametrize("case", RESULT_CASES, ids=lambda c: c["id"])
+def test_original_pages_and_field_documents_are_unchanged_without_writes(
     case, tmp_path, monkeypatch
 ):
     store = delivery.ResultStore(tmp_path / "private")
-    payload = PAYLOADS[case["id"]]
+    payload = RESULT_PAYLOADS[case["id"]]
     ref = store.put(payload)
-    assert ref["sha256"] == case["payload_sha256"]
     before = {p.name: p.read_bytes() for p in store.directory.iterdir()}
+    values = {
+        None: payload,
+        "input_normalized": payload["input_normalized"],
+        "numerology_evidence.birth_clock": payload["numerology_evidence"][
+            "birth_clock"
+        ],
+        "canping_timing.first_period": payload["canping_timing"]["first_period"],
+        "canping_timing.first_period.2": 0,
+    }
     with monkeypatch.context() as blocked:
         block_writes(blocked)
-        for expected in case["expected"]:
-            if "page" not in expected:
-                with pytest.raises(ParameterError):
-                    store.verified_page(
-                        ref["result_id"],
-                        ref["sha256"],
-                        case["run_id"],
-                        path=expected["path"],
-                    )
-                continue
-            actual = store.verified_page(
-                ref["result_id"], ref["sha256"], case["run_id"], path=expected["path"]
-            )
-            frozen = {**expected["page"], "result_id": ref["result_id"]}
-            assert actual == frozen
+        for path, value in values.items():
+            expected = json.dumps(value, ensure_ascii=False, separators=(",", ":"))
+            for offset in (0, 1, min(2048, len(expected)), len(expected)):
+                actual = store.verified_page(
+                    ref["result_id"], case["run_id"], offset, path
+                )
+                assert actual["text"] == expected[offset : offset + delivery.PAGE_CHARS]
+                assert actual["total_chars"] == len(expected)
+                assert actual["verification"]["run_id"] == case["run_id"]
+                assert actual["verification"]["calculation_repeated"] is False
+        with pytest.raises(ParameterError):
+            store.verified_page(ref["result_id"], case["run_id"], path="missing")
     assert {p.name: p.read_bytes() for p in store.directory.iterdir()} == before
 
 
@@ -93,7 +78,7 @@ def test_missing_explicit_store_read_never_creates_a_cache_directory(
     with monkeypatch.context() as blocked:
         block_writes(blocked)
         with pytest.raises(ParameterError):
-            store.verified_page("a" * 48, "0" * 64, "original-run")
+            store.verified_page("a" * 48, "original-run")
     assert not store.directory.exists()
 
 
@@ -104,10 +89,13 @@ def test_readonly_verification_keeps_all_original_rejections(
     fault, stored, monkeypatch
 ):
     store, payload, ref = stored
-    digest, run = ref["sha256"], payload["run_metadata"]["run_id"]
+    run = payload["run_metadata"]["run_id"]
     args = {}
     if fault == "digest":
-        digest = "0" * 64
+        path = Path(ref["file_path"]).with_suffix(".meta")
+        metadata = json.loads(path.read_text())
+        metadata["sha256"] = "0" * 64
+        path.write_text(json.dumps(metadata))
     elif fault == "run":
         run = "another-run"
     elif fault == "scope":
@@ -128,7 +116,7 @@ def test_readonly_verification_keeps_all_original_rejections(
     with monkeypatch.context() as blocked:
         block_writes(blocked)
         with pytest.raises(ValueError if fault == "scope" else ParameterError):
-            store.verified_page(ref["result_id"], digest, run, **args)
+            store.verified_page(ref["result_id"], run, **args)
     assert {p.name: p.read_bytes() for p in store.directory.iterdir()} == before
 
 
@@ -142,7 +130,7 @@ def test_existing_cli_contract_works_in_actual_readonly_sandbox(tmp_path):
         os.environ["TMPDIR"] = str(task_temp)
         tempfile.tempdir = None
         store = delivery.ResultStore()
-        payload = PAYLOADS[REFERENCE["cases"][0]["id"]]
+        payload = RESULT_PAYLOADS[RESULT_CASES[0]["id"]]
         ref = store.put(payload)
     finally:
         tempfile.tempdir = old_temp
@@ -172,8 +160,6 @@ def test_existing_cli_contract_works_in_actual_readonly_sandbox(tmp_path):
         probe,
         "result-read",
         ref["result_id"],
-        "--sha256",
-        ref["sha256"],
         "--run-id",
         payload["run_metadata"]["run_id"],
         "--path",
@@ -189,6 +175,6 @@ def test_existing_cli_contract_works_in_actual_readonly_sandbox(tmp_path):
     )
     assert result.returncode == 0, result.stderr
     page = json.loads(result.stdout)
-    assert page["verification"]["payload_sha256"] == ref["sha256"]
+    assert page["verification"]["scope"] == "entire_retained_payload"
     assert page["verification"]["run_id"] == payload["run_metadata"]["run_id"]
     assert not Path(probe).exists()

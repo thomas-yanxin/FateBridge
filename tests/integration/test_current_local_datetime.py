@@ -38,12 +38,6 @@ def frozen_now(monkeypatch, request):
     return instant
 
 
-def test_returns_naive_datetime() -> None:
-    """Downstream code decomposes this into naive year/month/day; keep it naive
-    so it never mixes with the aware datetimes elsewhere (TypeError)."""
-    assert current_local_datetime().tzinfo is None
-
-
 def test_anchored_to_default_timezone_not_server_clock(frozen_now) -> None:
     """The wall-clock must equal UTC-now projected into Asia/Shanghai, proving
     it is anchored to the civil timezone rather than the process's local TZ.

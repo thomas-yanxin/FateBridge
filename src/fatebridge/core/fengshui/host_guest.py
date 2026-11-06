@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any, cast
 
 from fatebridge.core.hexagram_relations import ELEMENT_CONTROLS, ELEMENT_GENERATES
+from fatebridge.core.public_output import same_public_value as _same
 from fatebridge.utils.errors import FengshuiCalculationError
 
 DATA_SHA256 = "476bbec41149a8ade4e47586618a18e3091d65513e0cb02eb9063267e0470449"
@@ -213,16 +214,6 @@ def analyze(natal: dict[str, Any]) -> dict[str, Any]:
         "site_eligibility_established": False,
         "overall_auspiciousness": "not_produced",
     }
-
-
-def _same(a: Any, b: Any) -> bool:
-    if type(a) is not type(b):
-        return False
-    if isinstance(a, dict):
-        return a.keys() == b.keys() and all(_same(a[k], b[k]) for k in a)
-    if isinstance(a, list):
-        return len(a) == len(b) and all(_same(x, y) for x, y in zip(a, b))
-    return bool(a == b)
 
 
 def validate(

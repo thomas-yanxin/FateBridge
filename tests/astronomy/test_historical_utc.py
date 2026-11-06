@@ -150,7 +150,9 @@ def test_corrected_historical_tt_is_used_for_the_actual_moon_calculation(monkeyp
     chart = chart_at(moment)
     # The nominal birth/design pair remains first. Later Moon calls must be
     # exactly the published root-candidate epochs, each observed once.
-    from fatebridge.validation.human_design_solar_root import verify_solar_root_context
+    from fatebridge.core.human_design_solar_root_validation import (
+        verify_solar_root_context,
+    )
 
     assert len(moon_epochs[:2]) == 2
     precision = chart["design_solver"]["numerical_precision"]

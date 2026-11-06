@@ -7,7 +7,6 @@ import pytest
 
 from fatebridge.application.execution import execute_tool
 from fatebridge.core.human_design_depth import line_fixings
-from fatebridge.services.replay_metadata import digest
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
 from fatebridge.validation.human_design_fixing import fixing_marker_checks
@@ -189,8 +188,5 @@ def test_forged_fixing_mechanism_cannot_pass_even_after_rehash(complete, tamper)
         depth["line_fixings"].pop()
     else:
         depth["fixing_summary"]["complete_line_meanings_accepted"] = True
-    value["run_metadata"]["business_output_sha256"] = digest(
-        {k: v for k, v in value.items() if k != "run_metadata"}
-    )
     check = verify_human_design_reading(value)
     assert check["status"] == "rejected", check

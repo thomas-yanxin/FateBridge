@@ -128,7 +128,7 @@ uv run --locked --extra dev python -m fatebridge.cli otherbu \
 
 缺少原生库时返回 `dependency_missing`；原生初始化异常也返回明确错误。即使整宫制原本支持离线近似，显式选择JPL后也不以这种近似代替请求的天象。只读取三枚骰面时仍不需要天象或JPL文件。
 
-JPL模式的 `chart.params.chart_profile.physical_ephemeris_source` 返回实际文件SHA-256、DE版本及头部区间。原生文件槽对JPL返回零区间和零版本，因此这些信息由直接访问文件头读取，不能用零值或文件名猜测。大文件采用分块散列以控制内存；每次天象计算仍有完整文件读取成本。JPL文件不属于现有 `.se1` 指纹清单，`matches_packaged_manifest=false` 不应改写为已获官方校验和认证。测试所附J2000文件只是明确声明的三个连续记录，不能当作完整安装。
+JPL模式的 `chart.params.chart_profile.physical_ephemeris_source` 返回实际文件名、DE版本及头部区间。原生文件槽对JPL返回零区间和零版本，因此这些信息由直接访问文件头读取，不能用零值或文件名猜测。大文件采用分块散列以控制内存；每次天象计算仍有完整文件读取成本。JPL文件不属于现有 `.se1` 内部完整性清单，`matches_packaged_manifest=false` 不应改写为已获官方校验和认证。测试所附J2000文件只是明确声明的三个连续记录，不能当作完整安装。
 
 相同冻结协议也可直接比较原始JPL路径：
 

@@ -12,10 +12,8 @@ from fatebridge.application.execution import execute_tool
 from fatebridge.application.tool_spec import ToolSpec
 from fatebridge.core.schema_cache import (
     clear_contract_caches,
-    contract_fingerprint,
     model_schema,
 )
-from fatebridge.services.replay_metadata import digest
 
 
 @pytest.fixture(autouse=True)
@@ -25,49 +23,22 @@ def clean_caches():
     clear_contract_caches()
 
 
-def test_contract_hash_matches_uncached_wire_schema_and_isolates_public_copies():
+def test_schema_cache_isolates_public_copies():
     class Request(BaseModel):
         value: int
 
     class Output(BaseModel):
         items: list[Request]
 
-    expected = digest(
-        {"input": Request.model_json_schema(), "output": Output.model_json_schema()}
-    )
-    assert contract_fingerprint(Request, Output) == expected
     snapshot = model_schema(Output)
     snapshot["$defs"]["Request"]["properties"]["value"]["type"] = "string"
     assert model_schema(Output) == Output.model_json_schema()
-    assert contract_fingerprint(Request, Output) == expected
 
 
 def test_same_name_models_and_output_overrides_have_independent_contracts():
     integer = create_model("SameName", value=(int, ...))
     string = create_model("SameName", value=(str, ...))
     assert model_schema(integer) != model_schema(string)
-    assert contract_fingerprint(integer, integer) != contract_fingerprint(
-        integer, string
-    )
-    assert contract_fingerprint(integer, None) == digest(
-        {"input": integer.model_json_schema(), "output": None}
-    )
-
-
-def test_registered_method_semantics_are_part_of_replay_contract_identity():
-    from dataclasses import replace
-
-    from fatebridge.core.method_contracts import LIFE_DIMENSION_INDEX
-
-    class Request(BaseModel):
-        value: int
-
-    current = contract_fingerprint(Request, None, methods=(LIFE_DIMENSION_INDEX,))
-    changed = replace(
-        LIFE_DIMENSION_INDEX, comparison_requirements=("different layers",)
-    )
-    assert current != contract_fingerprint(Request, None, methods=(changed,))
-    assert current != contract_fingerprint(Request, None)
 
 
 def test_concurrent_cold_calls_generate_one_schema_per_model():
@@ -84,24 +55,24 @@ def test_concurrent_cold_calls_generate_one_schema_per_model():
 
     def read():
         barrier.wait(timeout=5)
-        return model_schema(Counted), contract_fingerprint(Counted, Counted)
+        return model_schema(Counted)
 
     with ThreadPoolExecutor(max_workers=8) as pool:
         results = list(pool.map(lambda _: read(), range(8)))
     assert Counted.calls == 1
     assert all(result == results[0] for result in results)
-    assert results[0][0] is not results[1][0]
+    assert results[0] is not results[1]
 
 
 def test_model_rebuild_invalidates_contract_revision():
     class Mutable(BaseModel):
         value: int
 
-    before = contract_fingerprint(Mutable, None)
+    before = model_schema(Mutable)
     Mutable.model_fields["value"].annotation = str
     Mutable.model_rebuild(force=True)
     assert model_schema(Mutable)["properties"]["value"]["type"] == "string"
-    assert contract_fingerprint(Mutable, None) != before
+    assert model_schema(Mutable) != before
 
 
 def test_failed_generation_is_not_cached_and_schema_hooks_can_be_invalidated():
@@ -117,13 +88,13 @@ def test_failed_generation_is_not_cached_and_schema_hooks_can_be_invalidated():
             return {**super().model_json_schema(**kwargs), "title": cls.label}
 
     with pytest.raises(ValueError, match="schema generation failed"):
-        contract_fingerprint(Hooked, None)
+        model_schema(Hooked)
     Hooked.fail = False
-    before = contract_fingerprint(Hooked, None)
+    before = model_schema(Hooked)
     Hooked.label = "second"
     clear_contract_caches()
     assert model_schema(Hooked)["title"] == "second"
-    assert contract_fingerprint(Hooked, None) != before
+    assert model_schema(Hooked) != before
 
 
 def test_user_inputs_results_and_receipts_still_execute_per_call():
@@ -153,8 +124,7 @@ def test_user_inputs_results_and_receipts_still_execute_per_call():
     assert seen == [2, 3]
     assert first["doubled"] == 4 and second["doubled"] == 6
     left, right = first["run_metadata"], second["run_metadata"]
-    assert left["contract_sha256"] == right["contract_sha256"]
-    for field in ("input_sha256", "business_output_sha256", "run_id", "trace_id"):
+    for field in ("run_id", "trace_id"):
         assert left[field] != right[field]
 
 

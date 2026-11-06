@@ -12,15 +12,12 @@ import json
 import re
 from collections import Counter
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
+from fatebridge.utils.json_values import same_value
 from fatebridge.validation.agent_capture import read_capture
 from fatebridge.validation.external_evaluation import load_frozen_selection
-
-if TYPE_CHECKING or __package__:
-    from scripts.evaluate_agent import grade_case, observations
-else:
-    from evaluate_agent import grade_case, observations
+from scripts.evaluate_agent import grade_case, observations
 
 
 def digest(path: Path) -> str:
@@ -38,20 +35,20 @@ def validate_delivery_archive(target: Path, captured: list[dict[str, Any]]) -> N
         delivery = result.get("result_delivery") or {}
         if delivery.get("file_path"):
             deliveries[str(Path(delivery["file_path"]).resolve())] = (
-                result.get("run_metadata", {}).get("run_id"),
+                result,
                 delivery,
             )
     for entry in json.loads(manifest.read_text())["entries"]:
         original = str(Path(entry["original_path"]).resolve())
         if original not in deliveries:
             raise ValueError("Archive was not delivered by this actual run")
-        run_id, delivery = deliveries[original]
+        inline, delivery = deliveries[original]
+        run_id = inline.get("run_metadata", {}).get("run_id")
         path = (target / entry["archived_file"]).resolve()
         if not path.is_relative_to(target) or not path.is_file():
             raise ValueError("Archive file escapes this actual case")
         if (
             entry["run_id"] != run_id
-            or entry["advertised_payload_sha256"] != delivery["sha256"]
             or entry["file_payload_path"] != delivery["file_payload_path"]
             or entry["file_sha256"] != digest(path)
         ):
@@ -61,8 +58,17 @@ def validate_delivery_archive(target: Path, captured: list[dict[str, Any]]) -> N
         encoded = json.dumps(
             payload, ensure_ascii=False, separators=(",", ":")
         ).encode()
-        if hashlib.sha256(encoded).hexdigest() != delivery["sha256"]:
-            raise ValueError("Archive payload hash differs from actual delivery")
+        if (
+            len(encoded) != delivery["total_bytes"]
+            or len(encoded.decode()) != delivery["total_chars"]
+            or payload.get("run_metadata", {}).get("run_id") != run_id
+            or any(
+                not same_value(payload.get(key), value)
+                for key, value in inline.items()
+                if key not in {"run_metadata", "result_delivery"}
+            )
+        ):
+            raise ValueError("Archive payload differs from observed delivery")
 
 
 def audit(
@@ -233,6 +239,7 @@ def audit(
         ),
         "scope": "Evidence/quote/completeness audit of declared semantic decisions; not automatic language correctness, external human expert acceptance or predictive validity.",
         "model_invocations_by_auditor": 0,
+        "archive_original_content_independently_authenticated": False,
         "real_world_prediction": "not_tested",
     }
 

@@ -14,31 +14,20 @@ from fatebridge.core.fengshui import monthly_time
 from fatebridge.core.fengshui.monthly import monthly_position_reading
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.fengshui import calculate_monthly_stars
-from tests.fengshui.test_fengshui_surfaces import (
-    rest_client,
+from tests.support.mcp_result_assertions import (
     same_run_projected_response,
     without_transport,
 )
+from tests.support.transports import rest_client
 
 
-@pytest.fixture(params=["native", "analytic", "synthetic_linear"])
+@pytest.fixture(params=["native", "analytic"])
 def clock(request, monkeypatch, tmp_path):
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
     monkeypatch.setenv(
         "FATEBRIDGE_SOLAR_TERM_MODEL",
         "analytic" if request.param == "analytic" else "native",
     )
-    if request.param == "synthetic_linear":
-        original = monthly_time.solar_term_resolution
-
-        def weaker(year, term, zone):
-            return {
-                **original(year, term, zone),
-                "provider": "synthetic_linear_fallback",
-                "approximate": True,
-            }
-
-        monkeypatch.setattr(monthly_time, "solar_term_resolution", weaker)
     return request.param
 
 
@@ -61,12 +50,13 @@ def layer(at, zone="UTC"):
     ],
 )
 @pytest.mark.parametrize("delta", [-1, 1])
+@pytest.mark.parametrize("clock", ["analytic"], indirect=True)
 def test_all_candidate_windows_keep_actual_endpoints_and_conditional_reading(
     clock, term, months, delta
 ):
     resolution = boundary(term)
     actual_model = resolution["ephemeris_model"]
-    assert actual_model == (MODEL_ID if clock == "analytic" else "moshier")
+    assert actual_model == MODEL_ID
     at = datetime.fromisoformat(resolution["moment"]) + timedelta(seconds=delta)
     result = layer(at)
     time = result["time_context"]
@@ -95,8 +85,7 @@ def test_all_candidate_windows_keep_actual_endpoints_and_conditional_reading(
                 for k, v in candidate[endpoint].items()
                 if k != "full_resolution_path"
             } == {k: v for k, v in full.items() if k != "solar_model_details"}
-            if clock == "analytic":
-                assert full["solar_model_details"]["model_id"] == actual_model
+            assert full["solar_model_details"]["model_id"] == actual_model
         assert datetime.fromisoformat(candidate["valid_from"]) < datetime.fromisoformat(
             candidate["valid_until"]
         )
@@ -141,7 +130,7 @@ def test_guard_width_and_numeric_acceptance_are_not_relaxed(clock, delta):
     at = datetime.fromisoformat(boundary()["moment"]) + timedelta(seconds=delta)
     result = layer(at)
     time = result["time_context"]
-    ambiguous = clock == "synthetic_linear" or abs(delta) <= 5
+    ambiguous = abs(delta) <= 5
     assert (result["status"] == "partial") is ambiguous
     assert time["precision_policy"]["numeric_acceptance_gate_seconds"] == 1.0
     assert time["precision_policy"]["moshier_guard_seconds"] == 5

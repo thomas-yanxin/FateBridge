@@ -165,11 +165,6 @@ def _envelope(
     }
 
 
-# ---------------------------------------------------------------------------
-# 1. 调波盘 (astro_harmonic).
-# ---------------------------------------------------------------------------
-
-
 def calculate_harmonic_chart(
     *,
     harmonic: int = 9,
@@ -213,11 +208,6 @@ def calculate_harmonic_chart(
         )
     except Exception as exc:
         return handle_calculation_error(exc, label)
-
-
-# ---------------------------------------------------------------------------
-# 2. 行星年龄 (astro_planetary_ages).
-# ---------------------------------------------------------------------------
 
 
 def calculate_planetary_ages(
@@ -282,11 +272,6 @@ def calculate_planetary_ages(
         return handle_calculation_error(exc, label)
 
 
-# ---------------------------------------------------------------------------
-# 3. 三分主星推运 (astro_triplicity_rulers).
-# ---------------------------------------------------------------------------
-
-
 def calculate_triplicity_rulers(
     *,
     lifespan: float = 75.0,
@@ -349,11 +334,6 @@ def calculate_triplicity_rulers(
         return handle_calculation_error(exc, label)
 
 
-# ---------------------------------------------------------------------------
-# 4. 月相推运 (astro_lunation_phase).
-# ---------------------------------------------------------------------------
-
-
 def calculate_lunation_phase(
     *,
     max_age_years: float = 90.0,
@@ -413,11 +393,6 @@ def calculate_lunation_phase(
         return handle_calculation_error(exc, label)
 
 
-# ---------------------------------------------------------------------------
-# 5. 界推运 / 分配法 (astro_distributions).
-# ---------------------------------------------------------------------------
-
-
 def calculate_distributions(
     *,
     time_key: str = "Ptolemy",
@@ -474,11 +449,6 @@ def calculate_distributions(
         )
     except Exception as exc:
         return handle_calculation_error(exc, label)
-
-
-# ---------------------------------------------------------------------------
-# 6. Balbillus 129年系统 (astro_balbillus).
-# ---------------------------------------------------------------------------
 
 
 def calculate_balbillus(
@@ -543,11 +513,6 @@ def calculate_balbillus(
         return handle_calculation_error(exc, label)
 
 
-# ---------------------------------------------------------------------------
-# 7. 数字相位推运 (astro_keypoints).
-# ---------------------------------------------------------------------------
-
-
 def calculate_keypoints(
     *,
     release_mode: str = "soul",
@@ -601,11 +566,6 @@ def calculate_keypoints(
         )
     except Exception as exc:
         return handle_calculation_error(exc, label)
-
-
-# ---------------------------------------------------------------------------
-# 8. 129年系统 (astro_yearsystem129).
-# ---------------------------------------------------------------------------
 
 
 def calculate_yearsystem129(
@@ -664,11 +624,6 @@ def calculate_yearsystem129(
         )
     except Exception as exc:
         return handle_calculation_error(exc, label)
-
-
-# ---------------------------------------------------------------------------
-# 9. 行星弧方向 (astro_planetaryarc).
-# ---------------------------------------------------------------------------
 
 
 def calculate_planetary_arc(

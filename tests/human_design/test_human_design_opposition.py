@@ -29,7 +29,6 @@ from fatebridge.core.human_design_mechanics import GATE_ORDER
 from fatebridge.core.human_design_precision import compare_node_backends
 from fatebridge.core.human_design_sensitivity import assess_birth_interval
 from fatebridge.mcp_server import create_mcp_app
-from fatebridge.services.replay_metadata import digest
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
 
@@ -161,9 +160,6 @@ def test_complete_run_and_fixed_reading_use_exact_source_before_display(
         a for a in forged["activations"]["personality"] if a["body"] == "Earth"
     )
     earth.update(longitude_activation(earth["longitude"]))
-    forged["run_metadata"]["business_output_sha256"] = digest(
-        {k: v for k, v in forged.items() if k != "run_metadata"}
-    )
     assert verify_human_design_reading(forged)["status"] == "rejected"
 
 
@@ -269,9 +265,6 @@ def test_fresh_hash_cannot_rebind_a_derived_activation(
     else:
         side["Moon"]["derived_from"] = "Sun"
         side["Moon"]["derivation_source_longitude"] = side["Sun"]["longitude"]
-    payload["run_metadata"]["business_output_sha256"] = digest(
-        {k: v for k, v in payload.items() if k != "run_metadata"}
-    )
     assert verify_human_design_reading(payload)["status"] == "rejected"
 
 

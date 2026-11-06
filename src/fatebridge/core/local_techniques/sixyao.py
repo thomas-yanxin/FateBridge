@@ -23,12 +23,11 @@ from ..liuyao_evidence import build_liuyao_evidence
 from ..liuyao_penalty import penalty_explanation
 from ..zhouyi import moving_text_evidence
 from .chart import (
-    _join_lines,
     _normalize_date_text,
     _normalize_time_text,
-    _render_snapshot_text,
     parse_local_datetime,
 )
+from .snapshot import join_lines, render_snapshot_text
 
 SIX_YAO_GODS = ["青龙", "朱雀", "勾陈", "腾蛇", "白虎", "玄武"]
 
@@ -1110,11 +1109,11 @@ def _build_sixyao_snapshot_text(
             )
     condition_lines.append(fanfu["scope"])
 
-    return _render_snapshot_text(
+    return render_snapshot_text(
         [
             (
                 "起盘信息",
-                _join_lines(
+                join_lines(
                     [
                         f"日期：{input_normalized['date']} {input_normalized['time']}",
                         f"时区：{input_normalized['zone']}",
@@ -1126,18 +1125,18 @@ def _build_sixyao_snapshot_text(
             ),
             (
                 "卦象",
-                _join_lines(
+                join_lines(
                     [
                         f"本卦：{current_payload.get('name', input_normalized['gua_code'])}",
                         f"之卦：{changed_payload.get('name', input_normalized['changed_code'])}",
                     ]
                 ),
             ),
-            ("六爻与动爻", _join_lines(line_texts) or "暂无爻线数据"),
-            ("卦辞与断语", _join_lines(judge_lines) or "无"),
+            ("六爻与动爻", join_lines(line_texts) or "暂无爻线数据"),
+            ("卦辞与断语", join_lines(judge_lines) or "无"),
             (
                 "原典动爻",
-                _join_lines(
+                join_lines(
                     [
                         *[
                             f"{v['label']}：{v['text']}"
@@ -1150,7 +1149,7 @@ def _build_sixyao_snapshot_text(
             ),
             (
                 "专业关系依据",
-                _join_lines(
+                join_lines(
                     [
                         f"月建：{evidence['calendar_conventions']['month_branch']}；日辰：{evidence['calendar_conventions']['day_ganzhi']}；旬空：{''.join(evidence['calendar_conventions']['xunkong'])}",
                         evidence["conformance_scope"],
@@ -1159,7 +1158,7 @@ def _build_sixyao_snapshot_text(
                     ]
                 ),
             ),
-            ("取用与条件证据", _join_lines(condition_lines)),
+            ("取用与条件证据", join_lines(condition_lines)),
         ]
     )
 

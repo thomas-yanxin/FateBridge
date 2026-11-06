@@ -13,7 +13,6 @@ from fatebridge.core.meihua_trigram_symbols import (
     trigram_symbols_ruleset,
 )
 from fatebridge.services.meihua import calculate_meihua_cast
-from fatebridge.services.replay_metadata import digest
 
 ROOT = Path(__file__).resolve().parents[2]
 FIXTURE = ROOT / "tests/fixtures/meihua_trigram_symbols_v1"

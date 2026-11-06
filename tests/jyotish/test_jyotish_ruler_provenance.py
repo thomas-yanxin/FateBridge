@@ -261,7 +261,6 @@ def test_upstream_input_claims_verify_against_the_same_original_run(hour):
             path=row["fact_path"],
             value=row["value"],
             run_id=metadata["run_id"],
-            business_output_sha256=metadata["business_output_sha256"],
         )
         for f in motion_factors(body["india"])
         for row in f["calculation_context"]["method_context"]["input_claims"]

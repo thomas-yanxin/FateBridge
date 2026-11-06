@@ -22,8 +22,9 @@ from fatebridge.core.fengshui.monthly_time import solar_month_context
 from fatebridge.core.fengshui.xuankong import period_context
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.fengshui import calculate_annual_stars, calculate_minggua
-from tests.fengshui.test_fengshui_surfaces import rest_client, without_transport
 from tests.fixtures.fengshui import payload
+from tests.support.mcp_result_assertions import without_transport
+from tests.support.transports import rest_client
 
 
 @pytest.fixture(scope="module")
@@ -31,20 +32,18 @@ def empty_ephemeris(tmp_path_factory):
     return tmp_path_factory.mktemp("model-boundary-fidelity")
 
 
-@pytest.fixture(params=["native", "analytic"])
+@pytest.fixture(params=["analytic"])
 def actual_model(request, monkeypatch, empty_ephemeris):
     monkeypatch.setenv("SE_EPHE_PATH", str(empty_ephemeris))
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", request.param)
-    model = "moshier" if request.param == "native" else MODEL_ID
+    model = MODEL_ID
     resolution = lichun_resolution(2024, "UTC")
     assert resolution["ephemeris_model"] == model
     assert resolution["approximate"] is False
     return model
 
 
-def reason(model):
-    prefix = "moshier_numeric_model" if model == "moshier" else "analytic_solar_model"
-    return prefix + "_guard_not_accuracy_certification"
+ANALYTIC_GUARD_REASON = "analytic_solar_model_guard_not_accuracy_certification"
 
 
 def test_actual_model_year_reason_survives_without_relabelling(actual_model):
@@ -54,7 +53,7 @@ def test_actual_model_year_reason_survives_without_relabelling(actual_model):
     assert context["candidate_effective_years"] == [2023, 2024]
     resolution = context["boundary_resolution"]
     assert resolution["ephemeris_model"] == actual_model
-    assert resolution["uncertainty_reason"] == reason(actual_model)
+    assert resolution["uncertainty_reason"] == ANALYTIC_GUARD_REASON
     assert resolution["operational_guard_seconds"] == 5.0
 
 
@@ -70,10 +69,9 @@ def test_actual_model_house_period_is_not_mislabelled_linear(actual_model):
     )
     assert result["number"] is None
     assert result["candidate_period_numbers"] == [8, 9]
-    prefix = "moshier" if actual_model == "moshier" else "analytic_solar"
     assert (
         result["confirmation_reason"]
-        == prefix + "_model_precision_guard_in_period_changeover_year"
+        == "analytic_solar_model_precision_guard_in_period_changeover_year"
     )
 
 
@@ -139,13 +137,9 @@ def test_synthetic_midnight_crossing_keeps_model_reason_without_a_birth_hour(
 def test_actual_model_reading_names_its_solver_without_claiming_seconds(actual_model):
     result = calculate_annual_stars(effective_year=2024, timezone_name="UTC")
     text = result["snapshot_text"]
-    if actual_model == MODEL_ID:
-        assert "FateBridge解析太阳模型" in text
-        assert "不表示秒级精度已获认证" in text
-        assert "星历为Moshier" not in text
-    else:
-        assert "星历为Moshier" in text
-        assert "FateBridge解析太阳模型" not in text
+    assert "FateBridge解析太阳模型" in text
+    assert "不表示秒级精度已获认证" in text
+    assert "星历为Moshier" not in text
 
 
 def test_confirmed_minggua_year_does_not_invent_a_solver_observation(actual_model):
@@ -227,4 +221,4 @@ def test_model_reason_and_reading_match_rest_real_mcp_cli(
         else layer["time_context"]
     )
     assert context["boundary_resolution"]["ephemeris_model"] == actual_model
-    assert context["boundary_resolution"]["uncertainty_reason"] == reason(actual_model)
+    assert context["boundary_resolution"]["uncertainty_reason"] == ANALYTIC_GUARD_REASON

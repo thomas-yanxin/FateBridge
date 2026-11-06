@@ -9,10 +9,7 @@ from __future__ import annotations
 from typing import Any, Dict, List, Optional
 
 from ..divination import BAGUA_BY_NAME, HEXAGRAM_NAMES, lookup_hexagram_by_code
-from .chart import (
-    _join_lines,
-    _render_snapshot_text,
-)
+from .snapshot import join_lines, render_snapshot_text
 
 
 def _bagua(name: str) -> Dict[str, Any]:
@@ -105,21 +102,21 @@ def _build_tongshefa_snapshot(model: Dict[str, Any]) -> str:
             f"右{'阳' if model['baseRight']['lines'][index] == 1 else '阴'} / "
             f"{'不变' if model['baseLeft']['lines'][index] == model['baseRight']['lines'][index] else '已变'}"
         )
-    return _render_snapshot_text(
+    return render_snapshot_text(
         [
             (
                 "本卦",
-                _join_lines(
+                join_lines(
                     [
                         f"左卦：{model['baseLeft']['name']}（上卦{model['baseLeft']['upper']['name']} / 下卦{model['baseLeft']['lower']['name']}）",
                         f"右卦：{model['baseRight']['name']}（上卦{model['baseRight']['upper']['name']} / 下卦{model['baseRight']['lower']['name']}）",
                     ]
                 ),
             ),
-            ("六爻", _join_lines(rows)),
+            ("六爻", join_lines(rows)),
             (
                 "潜藏",
-                _join_lines(
+                join_lines(
                     [
                         f"左潜藏：{model['mutualLeft']['name']}",
                         f"右潜藏：{model['mutualRight']['name']}",
@@ -128,7 +125,7 @@ def _build_tongshefa_snapshot(model: Dict[str, Any]) -> str:
             ),
             (
                 "亲和",
-                _join_lines(
+                join_lines(
                     [
                         f"左亲和：{model['oppositeLeft']['name']}",
                         f"右亲和：{model['oppositeRight']['name']}",

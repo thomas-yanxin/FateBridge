@@ -18,7 +18,6 @@ from fatebridge.core.human_design_transition import (
     dependency_projection,
 )
 from fatebridge.core.human_design_variables import variables_from_activations
-from fatebridge.services.replay_metadata import digest
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
 from fatebridge.validation.human_design_joint import verify_joint_snapshot
@@ -298,9 +297,6 @@ def test_rehashed_false_color_labels_states_and_projection_witnesses_rejected(
         run["interpretation"]["personality_color_meaning"] = "本次已测量你处于转移状态"
     else:
         raise AssertionError(bad)
-    run["run_metadata"]["business_output_sha256"] = digest(
-        {k: v for k, v in run.items() if k != "run_metadata"}
-    )
     monkeypatch.setattr(runtime, "ephemeris_call", forbidden)
     monkeypatch.setattr(native_execution, "calculate", forbidden)
     assert verify_human_design_reading(run)["status"] == "rejected"

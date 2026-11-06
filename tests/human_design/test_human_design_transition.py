@@ -17,7 +17,6 @@ from fatebridge.core.human_design_transition import (
     dependency_projection,
     refine_joint_transitions,
 )
-from fatebridge.services.replay_metadata import digest
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
 from fatebridge.validation.human_design_transition import verify_transition_trace
@@ -241,9 +240,6 @@ def test_fresh_hash_does_not_accept_forged_finite_refinement_evidence(full_run, 
         report["summary"]["unresolved_multiple_dependency_brackets"] = 1
     else:
         report["nodes"][0]["outcome"] = "proven_continuous_stability"
-    value["run_metadata"]["business_output_sha256"] = digest(
-        {k: v for k, v in value.items() if k != "run_metadata"}
-    )
     assert verify_human_design_reading(value)["status"] == "rejected"
 
 
@@ -257,9 +253,6 @@ def test_unassessed_interval_cannot_acquire_a_refinement_claim():
     value["time_sensitivity"]["joint_transition_refinement_summary"] = {
         "status": "stable"
     }
-    value["run_metadata"]["business_output_sha256"] = digest(
-        {k: v for k, v in value.items() if k != "run_metadata"}
-    )
     assert verify_human_design_reading(value)["status"] == "rejected"
 
 

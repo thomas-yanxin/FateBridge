@@ -65,7 +65,6 @@ def test_full_bureau_roots_and_text_are_same_run_facts_on_rest_native_mcp_cli(
         path="bazi_birth.day_master.assessment.hidden_stem_ledger.0.remaining_mass",
         value=a["hidden_stem_ledger"][0]["remaining_mass"],
         run_id=metadata["run_id"],
-        business_output_sha256=metadata["business_output_sha256"],
     )
     assert (
         verify_calculation_claims(result, [claim])["status"]

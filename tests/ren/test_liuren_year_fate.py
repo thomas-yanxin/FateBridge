@@ -263,7 +263,6 @@ def test_same_run_claims_do_not_substitute_natal_stem_for_upper_dun_stem(rest):
         path="runyear.year_fate.natal.upper_ganzhi",
         value=item["upper_ganzhi"],
         run_id=receipt["run_id"],
-        business_output_sha256=receipt["business_output_sha256"],
     )
     assert (
         verify_calculation_claims(body, [claim])["status"]

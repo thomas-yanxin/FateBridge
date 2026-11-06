@@ -45,11 +45,6 @@ def normalize_gender(gender: object) -> Literal["男", "女", "未知"]:
     return "未知"
 
 
-# ============================================================================
-# Data Models
-# ============================================================================
-
-
 class _BirthClockComponents(TypedDict, total=False):
     birth_minute: int
     birth_second: int
@@ -121,11 +116,6 @@ class PersonInfo(BaseModel):
         ):
             raise ValueError("birth_second需要显式提供birth_minute；不能替未知分钟填0")
         return self
-
-
-# ============================================================================
-# Helper Functions
-# ============================================================================
 
 
 def create_person_info(

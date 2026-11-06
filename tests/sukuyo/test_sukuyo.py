@@ -263,7 +263,6 @@ def test_same_run_claim_checker_rejects_invented_mansion_and_reversed_relation()
             path=path,
             value=value,
             run_id=receipt["run_id"],
-            business_output_sha256=receipt["business_output_sha256"],
         )
 
     valid = [

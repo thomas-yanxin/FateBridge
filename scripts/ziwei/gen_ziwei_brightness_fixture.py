@@ -24,10 +24,8 @@ from __future__ import annotations
 import json
 import pathlib
 
-# ---------------------------------------------------------------------------
 # Authoritative data — second transcription from iztro src/data/stars.ts
 # STARS_INFO[*].brightness, 寅-indexed, romanized
-# ---------------------------------------------------------------------------
 
 ROMAJI_TO_CHINESE = {
     "miao": "庙",

@@ -13,10 +13,10 @@ from fatebridge.core import heluo_texts as ht
 from fatebridge.core.heluo import _tiaowen, yao_text
 from fatebridge.core.local_techniques.heluo import build_heluo_result
 from fatebridge.services.knowledge import calculate_knowledge_read
-from tests.numerology.test_heluo_poem_transports import run_three
 from tests.support.heluo_source_facts import HEADER_COUNT, PENDING_COUNT
 from tests.support.transports import SPECS, business
 from tests.support.transports import rest as shared_rest
+from tests.support.transports import run_three
 
 F = Path(__file__).parents[1] / "fixtures/heluo_gu18_xu5_v1"
 READINGS = json.loads((F / "accepted-readings.json").read_bytes())

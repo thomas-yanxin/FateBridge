@@ -9,7 +9,6 @@ import pytest
 
 from fatebridge.application.execution import execute_tool
 from fatebridge.core.human_design_apparent_positions import build_context
-from fatebridge.services.replay_metadata import digest
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
 
@@ -111,9 +110,6 @@ def test_current_or_unknown_contract_cannot_rehash_a_wrong_origin_or_remove_it(
         r["basis"].pop()
         if mutation == "unknown_drop_all":
             run["run_metadata"]["contract_sha256"] = "0" * 64
-    run["run_metadata"]["business_output_sha256"] = digest(
-        {k: v for k, v in run.items() if k != "run_metadata"}
-    )
     assert verify_human_design_reading(run)["status"] == "rejected"
 
 

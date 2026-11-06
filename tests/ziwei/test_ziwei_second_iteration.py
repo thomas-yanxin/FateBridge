@@ -219,7 +219,6 @@ def test_real_calculation_receipt_rejects_natal_scope_confusion_and_changed_sour
             path=path,
             value=value,
             run_id=receipt["run_id"],
-            business_output_sha256=receipt["business_output_sha256"],
         )
 
     assert links[link_index]["natal_palace_name"] == "官禄宫"
@@ -230,4 +229,9 @@ def test_real_calculation_receipt_rejects_natal_scope_confusion_and_changed_sour
     assert verify_calculation_claims(payload, [claim("官禄宫")])["status"] == "rejected"
     changed = deepcopy(payload)
     changed["ziwei_horoscope"]["ruleset"]["brightness_rule"] = "invented_perfect_table"
-    assert verify_calculation_claims(changed, [claim("夫妻宫")])["status"] == "rejected"
+    assert (
+        verify_calculation_claims(changed, [claim("夫妻宫")], trusted_payload=payload)[
+            "status"
+        ]
+        == "rejected"
+    )

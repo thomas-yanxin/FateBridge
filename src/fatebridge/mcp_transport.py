@@ -5,10 +5,11 @@ from typing import Any, Dict, List, Optional, cast
 
 from fastmcp.server.middleware import Middleware, MiddlewareContext
 from fastmcp.tools import ToolResult
-from pydantic import ConfigDict, Field, ValidationError
+from pydantic import ConfigDict, ValidationError
 
 from fatebridge.application.description import describe_input_spec, resolve_spec
 from fatebridge.application.discovery import discover_specs
+from fatebridge.application.result_delivery import DEFAULT_MCP_RESPONSE_CHARS
 from fatebridge.application.scenarios import discover_scenarios
 from fatebridge.core.execution_context import (
     ExecutionOptions,
@@ -119,31 +120,29 @@ def register_discovery_resources(
         )
 
     @app.resource(
-        "fatebridge://results/{result_id}/verified/{run_id}/{sha256}/{offset}",
+        "fatebridge://results/{result_id}/verified/{run_id}/{offset}",
         mime_type="application/json",
     )
-    def verified_result_page(
-        result_id: str, run_id: str, sha256: str, offset: int
-    ) -> str:
+    def verified_result_page(result_id: str, run_id: str, offset: int) -> str:
         """Verify the entire original payload before reading one page."""
         return json.dumps(
             RESULT_STORE.verified_page(
-                result_id, sha256, run_id, offset, allowed_tools=allowed_receipts
+                result_id, run_id, offset, allowed_tools=allowed_receipts
             ),
             ensure_ascii=False,
         )
 
     @app.resource(
-        "fatebridge://results/{result_id}/verified/{run_id}/{sha256}/fields/{path}/{offset}",
+        "fatebridge://results/{result_id}/verified/{run_id}/fields/{path}/{offset}",
         mime_type="application/json",
     )
     def verified_result_field_page(
-        result_id: str, run_id: str, sha256: str, path: str, offset: int
+        result_id: str, run_id: str, path: str, offset: int
     ) -> str:
         """Verify the full payload and select a field from those same bytes."""
         return json.dumps(
             RESULT_STORE.verified_page(
-                result_id, sha256, run_id, offset, path, allowed_tools=allowed_receipts
+                result_id, run_id, offset, path, allowed_tools=allowed_receipts
             ),
             ensure_ascii=False,
         )
@@ -165,7 +164,7 @@ class OutputFlags(ExecutionOptions):
     include_snapshot_text: bool = True
     fields: Optional[List[str]] = None
     strict_fields: bool = False
-    response_char_limit: ResponseCharLimit = Field(default=8192)
+    response_char_limit: ResponseCharLimit = DEFAULT_MCP_RESPONSE_CHARS
 
 
 class InputValidationMiddleware(Middleware):

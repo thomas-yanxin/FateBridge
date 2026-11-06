@@ -93,7 +93,6 @@ def test_explanation_references_can_be_checked_against_the_original_receipt(rest
                     path=path,
                     value=value,
                     run_id=metadata["run_id"],
-                    business_output_sha256=metadata["business_output_sha256"],
                 )
             )
     assert (
@@ -106,7 +105,6 @@ def test_explanation_references_can_be_checked_against_the_original_receipt(rest
             path="predicted_success_probability",
             value=1.0,
             run_id=metadata["run_id"],
-            business_output_sha256=metadata["business_output_sha256"],
         )
     )
     assert verify_calculation_claims(result, claims)["status"] == "rejected"

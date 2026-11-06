@@ -1,7 +1,6 @@
 """Published motion evidence and source failures across REST, MCP and CLI."""
 
 import asyncio
-import hashlib
 import json
 from fractions import Fraction
 from pathlib import Path
@@ -61,7 +60,7 @@ async def invoke(inputs, fields):
             parts.append(page["text"])
             uri = page["next_uri"]
         text = "".join(parts)
-        assert hashlib.sha256(text.encode()).hexdigest() == ref["sha256"]
+        assert len(text) == ref["total_chars"]
         full = json.loads(text)
         assert full["run_metadata"]["run_id"] == first["run_metadata"]["run_id"]
         return full

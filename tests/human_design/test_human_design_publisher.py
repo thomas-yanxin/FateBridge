@@ -11,7 +11,6 @@ from unittest.mock import patch
 import pytest
 
 from fatebridge.core.astro import native_execution, runtime
-from fatebridge.services.replay_metadata import digest
 from fatebridge.validation.human_design import verify_human_design_reading
 from fatebridge.validation.human_design_publisher import (
     publisher_natal_checks,
@@ -215,9 +214,6 @@ def test_incomplete_or_rehashed_repaired_cases_never_gain_source_acceptance(
         ] = "All source facts accepted"
     for row in rows:
         run = row["run"]
-        run["run_metadata"]["business_output_sha256"] = digest(
-            {k: v for k, v in run.items() if k != "run_metadata"}
-        )
     with (
         patch.object(runtime, "ephemeris_call", forbidden),
         patch.object(native_execution, "calculate", forbidden),

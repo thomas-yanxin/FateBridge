@@ -11,11 +11,9 @@ from fatebridge.cli import run
 from fatebridge.core.fengshui.xuankong import _selectors
 from fatebridge.services.fengshui import calculate_xuankong_natal
 from tests.fengshui.test_fengshui_depth_audit import natal as natal_request
-from tests.fengshui.test_fengshui_surfaces import (
-    mcp_call,
-    rest_client,
-    without_transport,
-)
+from tests.support.fengshui_transports import mcp_call
+from tests.support.mcp_result_assertions import without_transport
+from tests.support.transports import rest_client
 
 
 def natal(angle, radius=0):

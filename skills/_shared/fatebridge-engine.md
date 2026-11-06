@@ -22,15 +22,15 @@
 
 接收调用或资源结果时，先核对实际返回形状：可能是 JSON 字符串、文本 `content` 或 `structuredContent`，不能固定假设存在 `contents[0]` 或 `structuredContent.run_metadata`。有截断标记的 JSON 片段不能解析成完整合同；改读所选工具的实际定义或更小的资源，勿反复解析同一片段。字段选择先用已核对的顶层业务字段，需要细节再展开，不为首轮遍历整个 `$defs`。
 
-MCP 默认响应字符预算为8192；超限返回 `result_delivery`，原结果没有被截断，仍由同一 run 保留。先读其 `manifest_uri`，按所需字段的资源取值；点路径支持对象和数组数字索引，资源模板为 `fatebridge://results/{result_id}/fields/{path}/{offset}`，首 offset 为0。每页是完整 JSON 包装，其中 `text` 是文档片段；需要完整字段时按 `next_offset` 拼接并核对 `sha256`，不把单页当全文解析，不重新计算。先取窄字段，不一次打印重组后的大对象。引用约一小时过期，也可能因容量回收失效；失效须如实说明。
+MCP 默认响应字符预算为8192；超限返回 `result_delivery`，原结果没有被截断，仍由同一 run 保留。先读其 `manifest_uri`，按所需字段的资源取值；点路径支持对象和数组数字索引，资源模板为 `fatebridge://results/{result_id}/fields/{path}/{offset}`，首 offset 为0。每页是完整 JSON 包装，其中 `text` 是文档片段；需要完整字段时按 `next_offset` 拼接，不把单页当全文解析，不重新计算。先取窄字段，不一次打印重组后的大对象。引用约一小时过期，也可能因容量回收失效；失效须如实说明。
 
-需要校验同run长结果时，优先使用确定性校验读取：资源模板为 `fatebridge://results/{result_id}/verified/{run_id}/{sha256}/fields/{path}/{offset}`，全文模板省去 `fields/{path}/`。三个身份参数必须来自原回执，offset从0起；接口先核对**完整保留payload**的散列和原run，再从同一读取对象选页。客户端不能读资源时，使用已安装环境的CLI：`fatebridge result-read RESULT_ID --sha256 ORIGINAL_SHA256 --run-id ORIGINAL_RUN_ID --path FIELD_PATH --offset 0`；源码环境可用`PYTHONPATH=src python -m fatebridge.cli result-read ...`，沿用已有依赖环境，不为咨询安装依赖。校验失败须停止使用该结果，不重新计算冒充旧run。
+需要校验同run长结果时，优先使用确定性校验读取：资源模板为 `fatebridge://results/{result_id}/verified/{run_id}/fields/{path}/{offset}`，全文模板省去 `fields/{path}/`。结果ID和run ID必须来自原回执，offset从0起；接口先核对**完整保留payload**的内部存储完整性和原run，再从同一读取对象选页。客户端不能读资源时，使用已安装环境的CLI：`fatebridge result-read RESULT_ID --run-id ORIGINAL_RUN_ID --path FIELD_PATH --offset 0`；源码环境可用`PYTHONPATH=src python -m fatebridge.cli result-read ...`，沿用已有依赖环境，不为咨询安装依赖。校验失败须停止使用该结果，不重新计算冒充旧run。
 
-返回的`verification.payload_sha256/run_id`是完整保留结果的核验，`sha256`是本次所选字段文档的散列。`text`仍至多2048字符，需要完整字段时继续`next_offset`，直到null；不能因完整payload核验成功就声称已读全部业务事实。没有`result_delivery`的小响应不需要虚构结果引用。自己读本地记录时仍须采用下述精确序列化，不能用外层文件散列或`sort_keys=True`替代。
+返回的 `verification.run_id`、`scope` 与 `calculation_repeated=false` 说明本次核验对象；不公开哈希或指纹。`text` 仍至多2048字符，需要完整字段时继续 `next_offset` 直到 null；核验通过不表示已经读取全部业务事实。没有 `result_delivery` 的小响应无需虚构结果引用。
 
 REST/CLI 默认继续完整交付，可显式设置 `response_char_limit` / `--response-char-limit` 获得同一限量合同。MCP 的 `response_char_limit=0` 仅供可保存完整 JSON 的程序客户端；聊天咨询不要用它规避分页，否则宿主仍可能截断。
 
-用户要求保存本机完整文件时，可读取 `file_path` 指向的私有临时记录，按 `file_payload_path`（当前为 `payload`）取出原结果，以 `ensure_ascii=False,separators=(",", ":")` 序列化后核对 `sha256` 并保存。外层记录还含过期时间，其文件散列不等于原结果散列；不把外层记录交付为完整计算结果。保存后的用户文件独立于临时引用保留。
+用户要求保存本机完整文件时，可读取 `file_path` 指向的私有临时记录，按 `file_payload_path`（当前为 `payload`）取出原结果，保存原结果。需要核验时使用同run引擎读取接口；直接读取文件不执行存储核验。外层记录还含过期时间；不把外层记录交付为完整计算结果。保存后的用户文件独立于临时引用保留。
 
 本地 CLI 示例须使用已安装 FateBridge 的虚拟环境。在仓库中按以下方式准备；这属于安装／开发任务，已连接的普通咨询无需运行：
 
@@ -382,4 +382,4 @@ python3 -m fatebridge.cli --no-metadata fengshui_annual_stars --effective-year 2
 fatebridge fengshui_assess --request-file docs/examples/fengshui-home.json --compact
 ```
 
-太乙 `calculation_mode=day` 明确采用金钥匙积日法，见 [日计依据](../../docs/taiyi-sanshi-audit.md)。先设day再取 `daily_calendar` / `daily_essences`，零时日界不可套时计23时子初；天时和太乙数宫位未知、正文/课式异数需忠实解释。返回分页时读同一run载荷及哈希，不凭被延后字段作否定。
+太乙 `calculation_mode=day` 明确采用金钥匙积日法，见 [日计依据](../../docs/taiyi-sanshi-audit.md)。先设day再取 `daily_calendar` / `daily_essences`，零时日界不可套时计23时子初；天时和太乙数宫位未知、正文/课式异数需忠实解释。返回分页时校验读取同一run载荷，不凭被延后字段作否定。

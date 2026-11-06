@@ -287,7 +287,6 @@ def test_whole_pattern_quote_preserves_exact_condition_and_scope(day, hour, expe
     claim = CalculationClaim.model_validate(
         {
             "run_id": result["run_metadata"]["run_id"],
-            "business_output_sha256": result["run_metadata"]["business_output_sha256"],
             "path": path,
             "value": pattern,
         }

@@ -108,7 +108,6 @@ SPECS: List[ToolSpec] = [
         mcp_name="human_design",
         include_snapshot_text=False,
     ),
-    # --- Astrology charts --------------------------------------------------
     ToolSpec(
         key="astro_chart",
         bind=_astro_chart_bind,

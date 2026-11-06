@@ -301,7 +301,6 @@ def test_same_run_quote_cannot_delete_partial_limits_or_shared_fact_markers():
         path=f"qimen.patterns.{index}",
         value=deepcopy(payload["qimen"]["patterns"][index]),
         run_id=payload["run_metadata"]["run_id"],
-        business_output_sha256=payload["run_metadata"]["business_output_sha256"],
     )
     assert (
         verify_qimen_pattern_quotes(payload, [claim])["status"]

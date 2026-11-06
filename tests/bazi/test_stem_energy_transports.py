@@ -61,7 +61,6 @@ def test_same_run_stem_energy_receipt_text_and_claims_across_transports(surface_
         path=path,
         value=receipt["ledger"][0]["energy"],
         run_id=run["run_id"],
-        business_output_sha256=run["business_output_sha256"],
     )
     assert (
         verify_calculation_claims(result, [claim])["status"]

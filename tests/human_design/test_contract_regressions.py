@@ -2,7 +2,6 @@
 
 import asyncio
 import copy
-import hashlib
 import json
 import math
 from datetime import datetime, timezone
@@ -40,10 +39,10 @@ def test_duplicate_page_locator_never_displaces_complete_receipt_provenance(
                 "record": "p" * 500,
             },
             "runtime": {
-                "environment_sha256": "b" * 64,
                 "ephemeris": {
-                    "files": {f"reference-{i}.se1": "a" * 64 for i in range(120)},
-                    "sha256": "c" * 64,
+                    "files": [
+                        f"reference-{i}-{'source_' * 12}.se1" for i in range(120)
+                    ],
                 },
             },
         },
@@ -69,7 +68,7 @@ def test_duplicate_page_locator_never_displaces_complete_receipt_provenance(
     assert "first_page_uri" not in ref
     manifest = store.manifest(ref["result_id"])
     assert manifest["first_page_uri"] == ref["manifest_uri"] + "/pages/0"
-    assert ref["sha256"] == manifest["sha256"]
+    assert ref["total_chars"] == manifest["total_chars"]
     assert store.get(ref["result_id"]) == before == original
     file_record = json.loads(open(ref["file_path"]).read())
     assert file_record[ref["file_payload_path"]] == original
@@ -196,11 +195,7 @@ def test_same_run_pages_forbid_private_dispatch_as_well_as_parent_native_calls(
                     parts.append(page["text"])
                     offset = page["next_offset"]
                 text = "".join(parts)
-                assert (
-                    hashlib.sha256(text.encode()).hexdigest()
-                    == reference["sha256"]
-                    == page["sha256"]
-                )
+                assert len(text) == reference["total_chars"]
                 original = json.loads(text)
                 assert (
                     original["run_metadata"]["run_id"]

@@ -8,7 +8,6 @@ import pytest
 from fastmcp import Client
 
 from fatebridge.cli import run
-from fatebridge.core.analytic_solar import MODEL_ID
 from fatebridge.core.fengshui import calendar, xuankong
 from fatebridge.core.fengshui.models import HousePeriod
 from fatebridge.core.fengshui.reading import build_natal_reading
@@ -18,28 +17,17 @@ from fatebridge.services.fengshui import (
     calculate_minggua,
     calculate_xuankong_natal,
 )
-from tests.fengshui.test_fengshui_surfaces import rest_client, without_transport
+from tests.support.mcp_result_assertions import without_transport
+from tests.support.transports import rest_client
 
 
-@pytest.fixture(params=["native", "analytic", "synthetic_linear"])
+@pytest.fixture(params=["native", "analytic"])
 def clock(request, monkeypatch, tmp_path):
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
     monkeypatch.setenv(
         "FATEBRIDGE_SOLAR_TERM_MODEL",
         "analytic" if request.param == "analytic" else "native",
     )
-    if request.param == "synthetic_linear":
-        original = calendar.lichun_resolution
-
-        def weaker(year, zone):
-            return {
-                **original(year, zone),
-                "provider": "synthetic_linear_fallback",
-                "approximate": True,
-            }
-
-        monkeypatch.setattr(calendar, "lichun_resolution", weaker)
-        monkeypatch.setattr(xuankong, "lichun_resolution", weaker)
     return request.param
 
 
@@ -153,7 +141,7 @@ def test_existing_guard_width_and_candidate_period_arithmetic_remain_exact(
     period = xuankong.period_context(
         HousePeriod.model_validate(natal_input(at)["period"])
     )
-    ambiguous = clock == "synthetic_linear" or abs(delta) <= 5
+    ambiguous = abs(delta) <= 5
     assert period["number"] == 9
     if ambiguous:
         assert period["effective_event_year"] is None

@@ -14,7 +14,6 @@ from fatebridge.core.human_design_sensitivity import (
     assess_birth_interval,
     compare_charts,
 )
-from fatebridge.services.replay_metadata import digest
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
 from fatebridge.validation.human_design_joint import verify_joint_snapshot
@@ -237,9 +236,6 @@ def test_fresh_hash_does_not_certify_corrupted_joint_context(complete_joint_run,
         value["node_backend_comparison"]["joint_evidence_summary"][
             "minimum_bridge_sets_changed"
         ] = True
-    value["run_metadata"]["business_output_sha256"] = digest(
-        {k: v for k, v in value.items() if k != "run_metadata"}
-    )
     assert verify_human_design_reading(value)["status"] == "rejected"
 
 

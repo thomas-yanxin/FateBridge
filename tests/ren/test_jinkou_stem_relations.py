@@ -25,7 +25,7 @@ from fatebridge.core.output_jinkou_stems import JinkouStemRelations
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.metaphysics import calculate_jinkou_analysis
 from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
-from tests.fixtures.mcp_receipt import assert_same_run_receipt
+from tests.fixtures.mcp_result_delivery import assert_same_run_receipt
 from tests.support.transports import AS_OF, SPECS, business, rest, surface_calls
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -426,7 +426,6 @@ def test_section_export_and_receipt_do_not_replace_壬_with_intrinsic_丙(surfac
         path="jinkou.stem_relations.god.dun_stem",
         value="壬",
         run_id=receipt["run_id"],
-        business_output_sha256=receipt["business_output_sha256"],
     )
     assert (
         verify_calculation_claims(cli, [claim])["status"] == "verified_structured_facts"

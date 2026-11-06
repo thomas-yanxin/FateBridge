@@ -35,9 +35,8 @@ from fatebridge.services.western_lifespan import (
     calculate_triplicity_rulers,
     calculate_yearsystem129,
 )
-from fatebridge.services.western_timing_tools import calculate_solararc
+from fatebridge.services.western_timing_tools import calculate_timing_tool
 
-# A fixed birth used across the service-level tests.
 BIRTH = dict(
     name="测试者",
     birth_year=1995,
@@ -64,9 +63,7 @@ def _point(absolute_degree: float, sign: str = "Aries", **extra) -> dict:
     }
 
 
-# ---------------------------------------------------------------------------
 # Pure-builder math (exact values).
-# ---------------------------------------------------------------------------
 
 
 def test_harmonic_multiplies_longitude_mod_360():
@@ -350,15 +347,13 @@ def test_planetary_arc_with_sun_source_equals_solar_arc():
     """planetaryarc(arc_source=Sun) must reproduce FateBridge's own solar arc."""
     common = dict(analysis_year=2025, analysis_month=4, analysis_day=6)
     pa = calculate_planetary_arc(**BIRTH, arc_source="Sun", **common)
-    sa = calculate_solararc(**BIRTH, **common)
+    sa = calculate_timing_tool("solararc", **BIRTH, **common)
     assert (
         abs(pa["planetary_arc"]["arc_degrees"] - sa["solararc"]["arc_degrees"]) < 1e-6
     )
 
 
-# ---------------------------------------------------------------------------
 # Service envelope contract.
-# ---------------------------------------------------------------------------
 
 
 def test_services_return_envelope_with_snapshot_and_no_error():

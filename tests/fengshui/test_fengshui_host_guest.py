@@ -22,11 +22,9 @@ from fatebridge.validation.fengshui_host_guest import (
     load_host_guest_reference,
 )
 from fatebridge.validation.fengshui_reading import verify_fengshui_reading
-from tests.fengshui.test_fengshui_surfaces import (
-    mcp_call,
-    rest_client,
-    without_transport,
-)
+from tests.support.fengshui_transports import mcp_call
+from tests.support.mcp_result_assertions import without_transport
+from tests.support.transports import rest_client
 
 SOURCE = Path(__file__).parents[1] / "data/fengshui_host_guest_v1"
 
@@ -126,9 +124,7 @@ def test_axis_pair_and_period_pair_stay_visible_when_only_one_matches_a_clause()
     assert comparison["matched"] is False
     assert comparison["basis_determined_from_clause_alone"] is False
     assert comparison["comparison_basis"] == "axis_pair_as_defined_p453_p910"
-    check = verify_fengshui_reading(
-        result, trusted_run_metadata=deepcopy(result["run_metadata"])
-    )
+    check = verify_fengshui_reading(result, trusted_payload=deepcopy(result))
     assert check["status"] == "verified_served_fixed_reading"
     assert check["host_guest_coverage_verified"] is True
     assert check["host_guest_relation_count"] == 8
@@ -383,8 +379,8 @@ def test_offline_guard_rejects_an_actual_fault_run_with_its_genuine_served_recei
             disabled.setattr(module, "validate_host_guest", lambda *a, **k: {})
         result = executed(inputs())
         assert "run_metadata" in result
-        receipt = deepcopy(result["run_metadata"])
-    checked = verify_fengshui_reading(result, trusted_run_metadata=receipt)
+        receipt = deepcopy(result)
+    checked = verify_fengshui_reading(result, trusted_payload=result)
     assert checked["status"] == "rejected"
     assert {e["code"] for e in checked["errors"]} >= {"host_guest_inconsistent"}
     assert checked["host_guest_coverage_verified"] is False

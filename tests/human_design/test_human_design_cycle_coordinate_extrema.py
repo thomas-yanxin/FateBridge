@@ -9,7 +9,6 @@ from unittest.mock import patch
 import pytest
 
 from fatebridge.core import human_design_cycles as cycles
-from fatebridge.services.replay_metadata import digest
 from fatebridge.validation.human_design import verify_human_design_reading
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -167,9 +166,6 @@ def test_rehashed_packet_cannot_forge_extremum_or_direction_evidence(after, faul
         ] = None
     else:
         row["contacts"].remove(event)
-    value["run_metadata"]["business_output_sha256"] = digest(
-        {k: v for k, v in value.items() if k != "run_metadata"}
-    )
     with patch(
         "fatebridge.core.astro.runtime.ephemeris_call",
         side_effect=AssertionError("Verifier invoked a native producer"),

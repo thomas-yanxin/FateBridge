@@ -10,7 +10,7 @@ from jsonschema import Draft202012Validator
 
 from tests.liuyao.test_liuyao_clash_transports import all_surfaces
 from tests.liuyao.test_liuyao_roles import classical
-from tests.liuyao.test_liuyao_transports import assert_same_run_receipt
+from tests.support.result_delivery import assert_same_run_receipt
 from tests.support.transports import SPECS, business, surface_calls
 
 BASE = Path(__file__).parents[1] / "fixtures/liuyao_explanation_v30"

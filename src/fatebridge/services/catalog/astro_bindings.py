@@ -7,14 +7,12 @@ from typing import Any, Callable, Dict, Tuple
 from fatebridge.application.bindings import lazy_service, resolve_service
 from fatebridge.core.requests.western_policy import service_inputs
 
-# ---------------------------------------------------------------------------
 # Service callables are bound LAZILY: each name below is a proxy that imports
 # its service module on first invocation. The catalog itself stays cheap to
 # import (it is pure metadata), and a session only loads the engines for the
 # tools it actually calls — e.g. a bazi+ziwei session never pays the ~120ms
 # kerykeion import that the western modules pull in. The spec definitions below
 # reference these names exactly as if they were directly imported.
-# ---------------------------------------------------------------------------
 calculate_core_chart_analysis = lazy_service(
     "fatebridge.services.astrology", "calculate_core_chart_analysis"
 )

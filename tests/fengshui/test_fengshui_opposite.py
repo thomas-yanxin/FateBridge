@@ -12,16 +12,13 @@ from fatebridge.core.fengshui.opposite import opposite_star_comparison
 from fatebridge.core.fengshui.reading import build_natal_reading
 from fatebridge.core.fengshui.xuankong import _chart
 from fatebridge.services.fengshui import calculate_xuankong_natal
-from fatebridge.services.replay_metadata import digest
 from fatebridge.validation.fengshui_opposite import audit_opposite_reference
 from fatebridge.validation.fengshui_reading import verify_fengshui_reading
 from tests.fengshui.test_fengshui_fixed_reading import executed, trusted
 from tests.fengshui.test_fengshui_structure_reading import MOUNTAINS, REFERENCE, request
-from tests.fengshui.test_fengshui_surfaces import (
-    mcp_call,
-    rest_client,
-    without_transport,
-)
+from tests.support.fengshui_transports import mcp_call
+from tests.support.mcp_result_assertions import without_transport
+from tests.support.transports import rest_client
 
 FIXTURES = Path(__file__).parents[1] / "data"
 OPPOSITE_REFERENCE = json.loads(
@@ -255,9 +252,6 @@ def test_new_semantic_or_context_corruption_is_rejected_even_with_synthetic_trus
             "text"
         ] += "保证现实旺财"
     reading["text"] = "\n".join(s["text"] for s in reading["statements"])
-    result["run_metadata"]["business_output_sha256"] = digest(
-        {k: v for k, v in result.items() if k != "run_metadata"}
-    )
     assert verify_fengshui_reading(result, **trusted(result))["status"] == "rejected"
 
 
@@ -266,9 +260,6 @@ def test_new_run_downgrade_to_previous_valid_renderer_cannot_replace_original_re
     anchor = trusted(result)
     result["calculation_reading"]["version"] = "1.1.0"
     assert result["calculation_reading"]["status"] == "rendered"
-    result["run_metadata"]["business_output_sha256"] = digest(
-        {k: v for k, v in result.items() if k != "run_metadata"}
-    )
     assert verify_fengshui_reading(result, **anchor)["status"] == "rejected"
 
 

@@ -7,11 +7,9 @@ import pytest
 
 from fatebridge.cli import run
 from fatebridge.services.fengshui import assess, calculate_bazhai
-from tests.fengshui.test_fengshui_surfaces import (
-    mcp_call,
-    rest_client,
-    without_transport,
-)
+from tests.support.fengshui_transports import mcp_call
+from tests.support.mcp_result_assertions import without_transport
+from tests.support.transports import rest_client
 
 EVIDENCE = (
     "star",

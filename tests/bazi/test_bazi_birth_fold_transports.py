@@ -88,13 +88,6 @@ def test_input_identity_distinguishes_actual_instants_and_replays_same_selection
         )
         assert response.status_code == 200, response.text
         outputs.append(response.json())
-    assert (
-        outputs[0]["run_metadata"]["input_sha256"]
-        != outputs[1]["run_metadata"]["input_sha256"]
-    )
-    assert (
-        outputs[0]["run_metadata"]["input_sha256"]
-        == outputs[2]["run_metadata"]["input_sha256"]
-    )
+    assert business(outputs[0]) != business(outputs[1])
     assert business(outputs[0]) == business(outputs[2])
     assert outputs[0]["run_metadata"]["run_id"] != outputs[2]["run_metadata"]["run_id"]

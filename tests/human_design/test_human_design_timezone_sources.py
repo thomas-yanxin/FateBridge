@@ -12,6 +12,7 @@ from fastmcp import Client
 import fatebridge.api as api
 from fatebridge.application.execution import execute_tool
 from fatebridge.cli import run
+from fatebridge.core.public_output import public_payload
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services import human_design
 from fatebridge.services.tool_catalog import CATALOG
@@ -130,6 +131,8 @@ def test_valid_named_zone_still_has_a_complete_verified_reading():
     assert value["birth_utc"] == "1980-07-01T16:00:00+00:00"
     with timezones.pytz.open_resource(PARAMS["birth_timezone"]) as stream:
         expected = hashlib.sha256(stream.read()).hexdigest()
-    assert value["clock_evidence"]["timezone_rules"]["tzif_sha256"] == expected
+    raw = timezones.timezone_rules_metadata(PARAMS["birth_timezone"])
+    assert raw["tzif_sha256"] == expected
+    assert value["clock_evidence"]["timezone_rules"] == public_payload(raw)
     check = verify_human_design_reading(value)
     assert check["status"] == "verified_fixed_template_reading", check

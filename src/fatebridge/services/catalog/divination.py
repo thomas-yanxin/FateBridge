@@ -81,7 +81,6 @@ calculate_tongshefa_analysis = lazy_service(
 )
 
 SPECS: List[ToolSpec] = [
-    # --- Divination --------------------------------------------------------
     ToolSpec(
         key="gua_lookup",
         bind=raw_invoke(calculate_gua_lookup),

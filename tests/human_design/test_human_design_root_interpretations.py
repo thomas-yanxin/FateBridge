@@ -10,7 +10,6 @@ from fatebridge.application.execution import execute_tool
 from fatebridge.core.astro import native_execution, runtime
 from fatebridge.core.human_design_depth import fixing_reading
 from fatebridge.core.human_design_root_interpretations import root_interpretations
-from fatebridge.services.replay_metadata import digest
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
 
@@ -168,9 +167,6 @@ def test_every_preregistered_rehashed_corruption_rejected(complete, bad, monkeyp
         proof(ref)["candidates"][0]["line_fixings_sha256"] = "0" * 64
     else:
         raise AssertionError(bad)
-    run["run_metadata"]["business_output_sha256"] = digest(
-        {k: v for k, v in run.items() if k != "run_metadata"}
-    )
     monkeypatch.setattr(runtime, "ephemeris_call", forbidden)
     monkeypatch.setattr(native_execution, "calculate", forbidden)
     assert verify_human_design_reading(run)["status"] == "rejected"

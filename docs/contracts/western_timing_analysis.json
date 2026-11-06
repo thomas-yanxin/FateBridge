@@ -1,7 +1,7 @@
 {
   "call_guidance": {
     "complete_export": "用户要求完整JSON、全部时间线或完整文件时，首次fields=null，保留默认响应预算，再读取result_delivery；first_view仅用于摘要咨询，不能先投影摘要再补算全文。",
-    "delivery": "MCP默认8192字符，完整结果超限返回result_delivery。用其manifest_uri按所需字段或分页读取同一run；完整JSON重组核对sha256，不重新计算，不解析截断片段。",
+    "delivery": "MCP默认8192字符，完整结果超限返回result_delivery。用其manifest_uri按所需字段或分页读取同一run；完整JSON重组并核对原run，不重新计算，不解析截断片段。",
     "evidence": "首次按问题选择evidence_views.stage/annual/short_term/career的fields；事业兼阶段与目标时段用career，结合本命职业配置筛选相关hits。默认与其他视图不强制展开全部方法；fields=null仍表示全量。",
     "target_clock": "analysis_hour/minute 是目标钟时，按 birth_timezone；显式0有效。省略分别沿用出生小时/分钟，仅兼容日期级调用。return_timezone转换同一时刻。"
   },
@@ -488,7 +488,7 @@
   "method_contracts": [
     {
       "comparison_requirements": [
-        "相同方法合同、实现/数据指纹、选项与实际计算层"
+        "相同方法合同、实现与数据版本、选项及实际计算层"
       ],
       "dependencies": [
         "validated_request"
@@ -539,7 +539,7 @@
     },
     {
       "comparison_requirements": [
-        "相同方法合同、实现/数据指纹、选项与实际计算层"
+        "相同方法合同、实现与数据版本、选项及实际计算层"
       ],
       "dependencies": [
         "validated_request"
@@ -590,7 +590,7 @@
     },
     {
       "comparison_requirements": [
-        "相同方法合同、实现/数据指纹、选项与实际计算层"
+        "相同方法合同、实现与数据版本、选项及实际计算层"
       ],
       "dependencies": [
         "validated_request"
@@ -641,7 +641,7 @@
     },
     {
       "comparison_requirements": [
-        "相同方法合同、实现/数据指纹、选项与实际计算层"
+        "相同方法合同、实现与数据版本、选项及实际计算层"
       ],
       "dependencies": [
         "validated_request"
@@ -692,7 +692,7 @@
     },
     {
       "comparison_requirements": [
-        "相同方法合同、实现/数据指纹、选项与实际计算层"
+        "相同方法合同、实现与数据版本、选项及实际计算层"
       ],
       "dependencies": [
         "validated_request"
@@ -743,7 +743,7 @@
     },
     {
       "comparison_requirements": [
-        "相同方法合同、实现/数据指纹、选项与实际计算层"
+        "相同方法合同、实现与数据版本、选项及实际计算层"
       ],
       "dependencies": [
         "validated_request"
@@ -794,7 +794,7 @@
     },
     {
       "comparison_requirements": [
-        "相同方法合同、实现/数据指纹、选项与实际计算层"
+        "相同方法合同、实现与数据版本、选项及实际计算层"
       ],
       "dependencies": [
         "validated_request"
@@ -845,7 +845,7 @@
     },
     {
       "comparison_requirements": [
-        "相同方法合同、实现/数据指纹、选项与实际计算层"
+        "相同方法合同、实现与数据版本、选项及实际计算层"
       ],
       "dependencies": [
         "validated_request"
@@ -896,7 +896,7 @@
     },
     {
       "comparison_requirements": [
-        "相同方法合同、实现/数据指纹、选项与实际计算层"
+        "相同方法合同、实现与数据版本、选项及实际计算层"
       ],
       "dependencies": [
         "validated_request"
@@ -947,7 +947,7 @@
     },
     {
       "comparison_requirements": [
-        "相同方法合同、实现/数据指纹、选项与实际计算层"
+        "相同方法合同、实现与数据版本、选项及实际计算层"
       ],
       "dependencies": [
         "validated_request"
@@ -998,7 +998,7 @@
     },
     {
       "comparison_requirements": [
-        "相同方法合同、实现/数据指纹、选项与实际计算层"
+        "相同方法合同、实现与数据版本、选项及实际计算层"
       ],
       "dependencies": [
         "validated_request"

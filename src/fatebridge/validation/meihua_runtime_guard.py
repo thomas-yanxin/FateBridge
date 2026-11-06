@@ -3,9 +3,62 @@
 from __future__ import annotations
 
 import hashlib
+from functools import lru_cache
 from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 from typing import Any
+
+from fatebridge.core.ephemeris_paths import ephemeris_search_directories
+from fatebridge.utils.json_digest import digest
+
+
+@lru_cache(maxsize=64)
+def _large_ephemeris_digest(filename: str, signature: tuple[int, ...]) -> str:
+    path = Path(filename)
+    hasher = hashlib.sha256()
+    with path.open("rb") as handle:
+        for piece in iter(lambda: handle.read(1024 * 1024), b""):
+            hasher.update(piece)
+    if _stat_signature(path) != signature:
+        raise ValueError("Ephemeris file changed while its inventory was hashed")
+    return hasher.hexdigest()
+
+
+def _stat_signature(path: Path) -> tuple[int, ...]:
+    stat = path.stat()
+    return (stat.st_size, stat.st_mtime_ns, stat.st_ctime_ns, stat.st_ino, stat.st_dev)
+
+
+def _ephemeris_inventory(directory: str | None) -> dict[str, Any]:
+    files: dict[str, str] = {}
+    if directory:
+        for index, root in enumerate(ephemeris_search_directories(directory)):
+            for path in sorted(root.glob("*.se1")):
+                if path.is_file():
+                    files[f"{index}/{path.name}"] = _large_ephemeris_digest(
+                        str(path.resolve()), _stat_signature(path)
+                    )
+            for name in (
+                "seorbel.txt",
+                "sefstars.txt",
+                "seleapsec.txt",
+                "seasnam.txt",
+                "swe_deltat.txt",
+                "sedeltat.txt",
+            ):
+                path = root / name
+                if path.is_file():
+                    # Small source files can immediately change a calculation
+                    # at the same directory. Never cache solely by path/stat.
+                    files[f"{index}/{name}"] = hashlib.sha256(
+                        path.read_bytes()
+                    ).hexdigest()
+    return {
+        "scope": "effective_se1_and_auxiliary_inventory; actual models/sources are reported separately",
+        "freshness": "Auxiliary text bytes hashed each receipt; large se1 hashes cached by size/mtime/ctime/inode/device, not a continuous immutability proof",
+        "files": files,
+        "sha256": digest(files),
+    }
 
 
 def capture_calendar_runtime() -> dict[str, Any]:
@@ -15,12 +68,6 @@ def capture_calendar_runtime() -> dict[str, Any]:
     from fatebridge.core.jpl_ephemeris import configured_jpl_file
     from fatebridge.core.solar_model_policy import solar_model_environment_receipt
     from fatebridge.core.solar_term_runtime import loaded_clock_profile_key
-    from fatebridge.services.replay_metadata import (
-        _ephemeris_inventory,
-        _large_ephemeris_digest,
-        _stat_signature,
-        digest,
-    )
 
     selected = ephemeris_runtime.effective_ephemeris_search_path()
     solar = solar_model_environment_receipt()

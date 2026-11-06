@@ -90,7 +90,7 @@ class PhysicalEphemerisTrace:
                         unidentified = True
                         continue
                     prefix = "jpl" if model == "jpl" else "se1"
-                    identity = f"{prefix}:{slot}:{digest}"
+                    identity = f"{prefix}:{slot}:{path.name}"
                     expected = (
                         self._manifest.get(path.name) if model == "swieph" else None
                     )

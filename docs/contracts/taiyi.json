@@ -1,7 +1,7 @@
 {
   "call_guidance": {
     "annual_cycles": "年计long_cycles分别用卷五积年：三基285011、五福/大游13331、小游/四神等3361，均锚724年；直符原表与正文不一致时同时展示，不用八将积数或现代地区替换原典分野。",
-    "civil_clock": "独立太乙可选analysis_utc_offset与analysis_timezone联合核对明确民用偏移，保留命名时区并选择回拨中的一次；缺失仍拒绝重复钟时，跳时/整日缺口或不符偏移不回退。clock_basis视图保留calendar_rules/summary的civil_clock_resolution及真实UTC、fold、运行时区规则指纹。真太阳钟只是计算标签，不能再当民用钟排除。三式已有time含ISO偏移表示实际瞬间再转zone，语义与联合钟表标签核对不同。",
+    "civil_clock": "独立太乙可选analysis_utc_offset与analysis_timezone联合核对明确民用偏移，保留命名时区并选择回拨中的一次；缺失仍拒绝重复钟时，跳时/整日缺口或不符偏移不回退。clock_basis视图保留calendar_rules/summary的civil_clock_resolution及真实UTC、fold、运行时区规则版本。真太阳钟只是计算标签，不能再当民用钟排除。三式已有time含ISO偏移表示实际瞬间再转zone，语义与联合钟表标签核对不同。",
     "conditions": "五将/门具问题读取conditions视图（合参taiyi_conditions）；全部阻断按同次patterns路径解释。年/月计以实际门盘合取；时计三门未评估/null不能改成满足。即使两层满足也不推出实际成败。",
     "count_sources": "核count_source_assessment时分开当前二目/算数、所选原表字面、书影校读和源位置重算。三者不互相覆盖；两算相符不认证目位或全盘相符，原表差异仍未裁定。适用于年/月/日/时计循环核心。",
     "daily": "calculation_mode=day明确选金钥匙冬至前甲子积日；合参置taiyi_options。按所选钟面零时换日，不乘十二；同日甲子纳入是现代约定，不能套用时计720时相位不变。日计专用daily_calendar/daily_essences视图需先设day，保留十精未知、正文与课式异数，全年十神不当作十精。 天时按十二支通则计算，有年度第10数亥及金镜/统宗补证；日44例坤与实际酉并列为差异，不能将源文坤写成实际计算值。太乙数只给局序，四宫语义仍未知。",
@@ -14,7 +14,7 @@
     "historical_year": "year_profile仅用于year：jinjing_year_historical_table_v1选381—385晋历主表；jinjing_year_qiliang_table_v1选501—505齐梁史历表，保留502闰四月及未决闰五月／六月候选。两者各62个月1831日、范围外拒绝；默认现代农历保持，不自动按日期选配置。historical_year_calendar视图保留同次日期、原儒略历与推算公历、作者版本及未裁定范围；历表不是王氏同元古历或其他两术古历，年栏不裁定逐日改元。",
     "hour_profiles": "hour_profile仅用于hour；默认jinjing_hour_solstice_v1是现代至点置一。key_hour_winter_jiazi_v1按金钥匙冬至前甲子连续积时，calendar_rules.hour_origin保存同盘日期、完整积时和现代23时子初约定。合参放在taiyi_options。不可把只求太乙宫的甲己捷数代替完整积时，也不宣称古历复原。",
     "monthly": "仅month可选month_profile。省略保留金镜六纪节月；key_month_tianzheng_jie_v1按金钥匙完年乘十二、加天地二正与本月名义序，仍按现代节月边界。full积月及1504截数分别返回，不先约360求240门周。KEY直门加定计目，原门段684/184/死4与本盘原例相位695/215/惊5并列，三门主体未裁定。独立历表若显示农历月与节月不符须明示，不按吉凶改选方法。 独立历表的朔月比较是一项假设；source_calendar_basis=not_adjudicated时，不能声称原书已证实采用朔月。",
-    "paged_first_view": "先核对result_delivery.deferred_fields：若仅run_metadata.runtime延后，业务依据已内联，可据所选字段解读，环境复核再读取同run完整runtime。若业务字段延后，须沿first_page_uri/next_uri读回同run投影载荷并核对sha256后解释该字段；不能当作不存在或重算全文替代。",
+    "paged_first_view": "先核对result_delivery.deferred_fields：若仅run_metadata.runtime延后，业务依据已内联，可据所选字段解读，环境复核再读取同run完整runtime。若业务字段延后，须沿first_page_uri/next_uri读回同run投影载荷并核对原run后解释该字段；不能当作不存在或重算全文替代。",
     "scope": "calculation_mode支持year/month/day/hour，默认year。月计按所选节月起元，日计按金钥匙冬至前甲子积日，时计按所选至点或完整积时配置；核对实际calendar_rules及配置，现代天文与钟面适配不等于完整古历复原。玄命未实现。",
     "year_calendar": "年计核对year_calendar视图（合参taiyi_year_calendar）：civil_lunar_calendar保留输入钟表日期实际换算的年月日及本次来源；historical_calendar保留明确所选历史历表。analysis_context.lunar_display仅为校正钟面上下文，真太阳时跨日时不能替代年计日期。未单列conversion_source不补造逐日权威认证；岁首工程约定与原典裁定仍分开。"
   },
@@ -610,7 +610,7 @@
   "method_contracts": [
     {
       "comparison_requirements": [
-        "相同方法合同、实现/数据指纹、选项与实际计算层"
+        "相同方法合同、实现与数据版本、选项及实际计算层"
       ],
       "dependencies": [
         "validated_request"

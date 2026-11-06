@@ -1,7 +1,6 @@
 """Large runtime inventories remain lossless without crowding out the analysis."""
 
 import copy
-import hashlib
 import json
 
 import pytest
@@ -9,7 +8,7 @@ import pytest
 from fatebridge.application import result_delivery as delivery
 from fatebridge.application.examples import suggested_fields
 from fatebridge.services import replay_metadata
-from tests.fixtures.mcp_receipt import assert_same_run_receipt
+from tests.fixtures.mcp_result_delivery import assert_same_run_receipt
 from tests.support.result_delivery import reconstruct, store
 from tests.support.transports import SPECS, inputs, rest, surface_calls
 
@@ -19,14 +18,10 @@ PATH = "run_metadata.runtime"
 def inventory():
     # Transport fixture only; these are not claimed to be installed ephemeris
     # files or reference observations for any astronomical accuracy metric.
-    files = {
-        f"0/test_{n:03d}.se1": hashlib.sha256(str(n).encode()).hexdigest()
-        for n in range(100)
-    }
+    files = [f"0/reference_{n:03d}_{'source_' * 12}.se1" for n in range(100)]
     return {
         "scope": "synthetic delivery fixture, no source or accuracy claim",
         "files": files,
-        "sha256": replay_metadata.digest(files),
     }
 
 
@@ -47,7 +42,7 @@ def test_large_inventory_keeps_business_and_exact_receipt_in_same_run(store, com
     assert result["analysis"] == original["analysis"]
     assert result["run_metadata"]["run_id"] == "original"
     projected = result["run_metadata"]["runtime"]
-    assert projected["ephemeris_inventory_sha256"] == source["sha256"]
+    assert "ephemeris_inventory_sha256" not in projected
     assert projected["ephemeris_files_count"] == 100
     assert projected["delivery_path"] == PATH
     assert "ephemeris" not in projected  # Never masquerade as an empty inventory.
@@ -58,7 +53,7 @@ def test_large_inventory_keeps_business_and_exact_receipt_in_same_run(store, com
         == original["run_metadata"]["runtime"]
     )
     assert reconstruct(store, ref["result_id"]) == original == before
-    assert delivery.bound_response(original, 0) is original
+    assert delivery.bound_response(original, 0) == original
 
 
 def test_semicolon_directory_inventory_is_equal_across_transports(

@@ -26,12 +26,10 @@ from fatebridge.services.fengshui import (
 )
 from fatebridge.utils.timezones import parse_timezone_name
 from fatebridge.validation.fengshui import audit_bazhai_depth
-from tests.fengshui.test_fengshui_surfaces import (
-    mcp_call,
-    rest_client,
-    without_transport,
-)
 from tests.fixtures.fengshui import payload
+from tests.support.fengshui_transports import mcp_call
+from tests.support.mcp_result_assertions import without_transport
+from tests.support.transports import rest_client
 
 FOLDER = Path(__file__).parents[1] / "data/fengshui_classical_v2"
 CHANGES = json.loads((FOLDER / "you-nian-origin.json").read_text())

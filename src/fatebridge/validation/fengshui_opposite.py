@@ -3,7 +3,7 @@
 from typing import Any
 
 from fatebridge.core.fengshui.xuankong import _chart, natal_rules
-from fatebridge.validation.claims import _same_value
+from fatebridge.utils.json_values import same_value as _same_value
 
 
 def audit_opposite_reference(

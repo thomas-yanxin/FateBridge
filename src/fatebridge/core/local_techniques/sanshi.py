@@ -31,11 +31,9 @@ from .chart import (
     _build_metaphysics_analysis_context,
     _build_metaphysics_seed,
     _build_qimen_palace_overview_lines,
-    _join_lines,
     _normalize_date_text,
     _normalize_time_text,
     _render_qimen_palace_sections,
-    _render_snapshot_text,
 )
 from .qimen import (
     _qimen_stem_context_lines,
@@ -43,6 +41,7 @@ from .qimen import (
     _render_qimen_source_disagreements,
     build_qimen_with_options,
 )
+from .snapshot import join_lines, render_snapshot_text
 
 
 def _build_taiyi_with_options(
@@ -150,7 +149,7 @@ def _build_sanshi_snapshot_text(
     sections = [
         (
             "起盘信息",
-            _join_lines(
+            join_lines(
                 [
                     (
                         "时间上下文农历：未扩展；太乙历史历表日期见太乙规则依据（仅太乙年计使用）。"
@@ -175,7 +174,7 @@ def _build_sanshi_snapshot_text(
         ),
         (
             "概览",
-            _join_lines(
+            join_lines(
                 [
                     f"盘型：{qimen.get('dun_type', '无')}{qimen.get('ju_number', '无')}局",
                     f"旬首：{qimen.get('xun_head', '无')}",
@@ -194,7 +193,7 @@ def _build_sanshi_snapshot_text(
         ),
         (
             "太乙",
-            _join_lines(
+            join_lines(
                 [
                     taiyi.get("style_label", "无"),
                     taiyi.get("accumulation_label", "无"),
@@ -210,7 +209,7 @@ def _build_sanshi_snapshot_text(
                 ]
             ),
         ),
-        ("太乙十六宫", _join_lines(taiyi_mark_lines) or "无"),
+        ("太乙十六宫", join_lines(taiyi_mark_lines) or "无"),
         ("太乙中宫", "、".join(taiyi["center_marks"]["markers"]) or "无星标"),
         ("太乙规则依据", evidence_text(taiyi)),
         ("太乙年运十神", long_cycle_text(taiyi.get("long_cycles"))),
@@ -222,7 +221,7 @@ def _build_sanshi_snapshot_text(
         ),
         (
             "神煞",
-            _join_lines(
+            join_lines(
                 [
                     f"月将：{month_general.get('branch', '无')}({month_general.get('name', '无')})",
                     f"布盘：{liureng.get('board_order', '无')}",
@@ -233,23 +232,23 @@ def _build_sanshi_snapshot_text(
                 ]
             ),
         ),
-        ("大六壬", _join_lines(liureng_four_lesson_lines) or "无"),
+        ("大六壬", join_lines(liureng_four_lesson_lines) or "无"),
         (
             "六壬大格",
-            _join_lines(
+            join_lines(
                 [
                     big_pattern.get("name", "无"),
                     f"依据：{big_pattern.get('basis', '无')}",
                 ]
             ),
         ),
-        ("六壬小局", _join_lines(liureng_transmission_lines) or "无"),
-        ("六壬参考", _join_lines(liureng.get("overview", [])) or "无"),
-        ("六壬概览", _join_lines(liureng.get("overview", [])) or "无"),
-        ("八宫详解", _join_lines(palace_lines) or "无"),
+        ("六壬小局", join_lines(liureng_transmission_lines) or "无"),
+        ("六壬参考", join_lines(liureng.get("overview", [])) or "无"),
+        ("六壬概览", join_lines(liureng.get("overview", [])) or "无"),
+        ("八宫详解", join_lines(palace_lines) or "无"),
         *_render_qimen_palace_sections(qimen),
     ]
-    return _render_snapshot_text(sections)
+    return render_snapshot_text(sections)
 
 
 def build_sanshiunited_result(

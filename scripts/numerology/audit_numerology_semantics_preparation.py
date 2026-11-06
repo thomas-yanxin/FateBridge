@@ -57,15 +57,8 @@ def check_reference(
         failures.append("reference_run_identity_mismatch")
     if metadata.get("tool_name") != case["reference_request"]["tool"]:
         failures.append("reference_tool_identity_mismatch")
-    # The business digest precedes projection/snapshot removal. It must not be
-    # recomputed from this snapshot-less response and falsely called verified.
     if body.get("snapshot_text") is not None:
         failures.append("unexpected_snapshot_text")
-    if (
-        not isinstance(metadata.get("business_output_sha256"), str)
-        or len(metadata["business_output_sha256"]) != 64
-    ):
-        failures.append("missing_original_business_identity")
     return failures
 
 

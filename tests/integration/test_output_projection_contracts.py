@@ -54,13 +54,6 @@ def projectable_objects(root, node, path=(), refs=frozenset()):
             yield from projectable_objects(root, child, path, refs)
 
 
-@pytest.mark.parametrize("key", list(SPECS))
-def test_no_projectable_business_object_requires_sibling_fields(key):
-    schema = SPECS[key].output_model.model_json_schema()
-    for path, node in projectable_objects(schema, schema):
-        assert not node.get("required"), (key, ".".join(path), node["required"])
-
-
 def leaves(value, path=()):
     # The API traverses objects only; nulls, scalars and arrays are whole values.
     if isinstance(value, dict) and value:

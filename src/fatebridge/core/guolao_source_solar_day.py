@@ -163,7 +163,7 @@ class NamedSourceSolarDay:
             else:
                 result = self.fold_model.sunrise(
                     relative,
-                    origin_reference=f"{self.origin_definition_url};midnight_transfer_reconstruction;data={self.policy_data_sha256}",
+                    origin_reference=f"{self.origin_definition_url};midnight_transfer_reconstruction",
                     table_profile=self.table_profile,
                     solar_side=side["selected_side"],
                     basis="dadu_source_table",

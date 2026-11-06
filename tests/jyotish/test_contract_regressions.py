@@ -305,7 +305,6 @@ def test_same_run_exact_fraction_claims_reject_numeric_coercion():
             path=f"vimshottari.time_quantization.source_mansion_fraction_exact.{key}",
             value=fraction[key],
             run_id=meta["run_id"],
-            business_output_sha256=meta["business_output_sha256"],
         )
         for key in ["numerator", "denominator"]
     ]
@@ -425,7 +424,6 @@ def test_saved_full_nested_result_pages_and_claims_do_not_recompute(
             path=f"vimshottari.subdivisions.current_levels.{i}.{field}",
             value=row[field],
             run_id=meta["run_id"],
-            business_output_sha256=meta["business_output_sha256"],
         )
         for i, row in enumerate(full["vimshottari"]["subdivisions"]["current_levels"])
         for field in ["lord", "start", "end"]
@@ -731,7 +729,6 @@ def test_same_run_pinda_claims_retain_integer_null_and_reject_tampering():
                     path=f"india.ashtakavarga.charts.D1.reduction_analysis.targets.{planet}.{field}",
                     value=row[field],
                     run_id=meta["run_id"],
-                    business_output_sha256=meta["business_output_sha256"],
                 )
             )
     assert len(claims) == 21

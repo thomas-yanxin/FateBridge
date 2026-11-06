@@ -12,7 +12,7 @@ from fatebridge.core.human_design_cycles import (
     CycleUnavailable,
     derive_body_contacts,
 )
-from fatebridge.validation.claims import _same_value
+from fatebridge.core.public_output import same_public_value as _same_value
 from fatebridge.validation.human_design_clocks import ClockReplay
 from fatebridge.validation.human_design_cycle_sources import verify_cycle_sources
 

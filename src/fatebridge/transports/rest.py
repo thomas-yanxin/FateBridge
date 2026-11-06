@@ -8,8 +8,7 @@ from typing import Annotated, Any, Callable, List, Optional
 from pydantic import BeforeValidator, ValidationError
 
 from fatebridge.application.execution import execute_tool, result_is_error
-from fatebridge.application.projection import project_fields
-from fatebridge.application.result_delivery import bound_response
+from fatebridge.application.response_delivery import deliver_response
 from fatebridge.application.tool_spec import ToolSpec
 from fatebridge.core.execution_context import (
     ExecutionOptions,
@@ -147,17 +146,14 @@ def make_rest_handler(
                 error_is_fatal=spec.error_is_fatal,
                 options=options,
             )
-            # Mirror the MCP/CLI path (see _render_protocol_response): only reshape
-            # successful payloads so a transform keyed on a domain field can
-            # never corrupt an error envelope.
-            # Project AFTER run_metadata is attached (execute_service did it) so
-            # provenance survives a selection; then drop snapshot_text if opted
-            # out. Order matches MCP's _render_protocol_response.
-            if not result_is_error(spec, result):
-                result = project_fields(result, fields, strict_fields=strict_fields)
-            if not include_snapshot_text and "snapshot_text" in result:
-                result = {k: v for k, v in result.items() if k != "snapshot_text"}
-            return bound_response(result, response_char_limit)
+            return deliver_response(
+                result,
+                fields=fields,
+                strict_fields=strict_fields,
+                include_snapshot_text=include_snapshot_text,
+                response_char_limit=response_char_limit,
+                failed=result_is_error(spec, result),
+            )
         except ValidationError as exc:
             raise http_exception(status_code=422, detail=validation_error_result(exc))
         except ParameterError as exc:

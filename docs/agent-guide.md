@@ -11,7 +11,7 @@ FateBridge 提供计算能力，自然语言咨询可搭配 Onda 技能选择方
 | 选择 REST、MCP 或 CLI | [按通道接入](#按通道接入) |
 | 根据用户问题选择工具 | [自助发现](#自助发现别硬编码工具列表) |
 | 处理失败、快照和字段投影 | [公共调用约定](#公共调用约定) |
-| 保存完整 JSON 和校验散列 | [完整结果交付与同次导出](#完整结果交付与同次导出) |
+| 保存与核验完整 JSON | [完整结果交付与同次导出](#完整结果交付与同次导出) |
 | 收集出生资料和时间条件 | [出生信息](#出生信息一次说清) |
 | 实现咨询 Agent 或风水集成 | [Agent 接入建议](#agent-接入建议) · [家居风水接入](#家居风水接入) |
 
@@ -190,23 +190,23 @@ fatebridge bazi_birth --birth-year 1990 --birth-month 6 --birth-day 15 \
 
 ## 完整结果交付与同次导出
 
-MCP 默认 `response_char_limit=8192`，REST / CLI 默认 `0`（不限制）。成功结果超出非零预算时，响应包含 `result_delivery`，保留运行标识、散列及预算内的业务字段；剩余字段从同一 run 的交付物读取，不重新计算。允许的预算为 `0` 或 `4096–65536`，错误响应不按业务字段裁剪。
+MCP 默认 `response_char_limit=8192`，REST / CLI 默认 `0`（不限制）。成功结果超出非零预算时，响应包含 `result_delivery`，保留运行标识及预算内的业务字段；剩余字段从同一 run 的交付物读取，不重新计算。允许的预算为 `0` 或 `4096–65536`，错误响应不按业务字段裁剪。
 
-完整结果超过输出预算且运行环境较长时，`run_metadata.runtime` 只在行内保留环境散列、清单散列 `ephemeris_inventory_sha256`、文件数 `ephemeris_files_count` 及 `delivery_path`。`result_delivery.deferred_fields` 明列 `run_metadata.runtime`；按该点路径读取可恢复完整运行环境及每个文件散列，清单没有被当作空集合或静默截断。预算为0时仍返回原完整回执。首轮业务分析优先保持可读。
+完整结果超过输出预算且运行环境较长时，`run_metadata.runtime` 在行内保留文件数 `ephemeris_files_count` 及 `delivery_path`。`result_delivery.deferred_fields` 明列 `run_metadata.runtime`；按该点路径读取可恢复完整运行环境及配置文件名清单，清单没有被当作空集合或静默截断。预算为0时仍返回原完整回执。首轮业务分析优先保持可读。
 
-业务字段仍接近预算上限时，可再把补充回执`run_metadata.provenance`、`run_metadata.determinism`留在同次交付物中，并在`deferred_fields`逐项明列，优先保留全部行内业务字段；运行标识、输入／契约／业务散列及环境指纹仍行内可见。若完整业务与关键回执仍无法同时容纳，则明确分页业务字段；只有回执自身仍超出预算时，分页分支才延后这些补充回执。不能把整个`run_metadata`移出行内来伪装完整首轮交付。读取同次交付物可精确恢复原回执和业务字段，不重新计算、不缩减业务事实或提高预算；关键回执本身无法容纳时返回预算错误。
+业务字段仍接近预算上限时，可再把补充回执`run_metadata.provenance`、`run_metadata.determinism`留在同次交付物中，并在`deferred_fields`逐项明列，优先保留全部行内业务字段；运行标识仍行内可见。若完整业务与关键回执仍无法同时容纳，则明确分页业务字段；只有回执自身仍超出预算时，分页分支才延后这些补充回执。不能把整个`run_metadata`移出行内来伪装完整首轮交付。读取同次交付物可精确恢复原回执和业务字段，不重新计算、不缩减业务事实或提高预算；关键回执本身无法容纳时返回预算错误。
 
 交付优先级为完整回执与完整引用、完整回执与精简引用、必要时才显式延后补充回执。前一种能够容纳时立即采用，不因后备方式存在而提前移走来源或确定性说明；同次存储的原始结果不改写。
 
-当完整业务字段可以随精简引用一起落入预算时，`result_delivery.compact_reference=true` 保留同次业务字段、身份、散列、有效期及清单URI。重复的`available_fields`、`total_bytes`、`page_chars`、`rest_manifest_path`可从清单恢复；紧预算下还可依次省略重复的首分页URI和本地文件定位。清单仍保存完整定位，不能把精简引用当作完整清单。完整引用原本可放下时仍沿用完整引用；较大业务结果继续按同次结果分页。精简引用不降低响应预算，也不删除业务事实。
+当完整业务字段可以随精简引用一起落入预算时，`result_delivery.compact_reference=true` 保留同次业务字段、身份、有效期及清单URI。重复的`available_fields`、`total_bytes`、`page_chars`、`rest_manifest_path`可从清单恢复；紧预算下还可依次省略重复的首分页URI和本地文件定位。清单仍保存完整定位，不能把精简引用当作完整清单。完整引用原本可放下时仍沿用完整引用；较大业务结果继续按同次结果分页。精简引用不降低响应预算，也不删除业务事实。
 
 需要完整 JSON、全部时间线或完整文件时，**首次调用 `fields=null`**；REST / CLI 不传字段筛选。需要完整快照时保留默认 `include_snapshot_text=true`，也不要用 `selected_sections` 缩小导出文本。保留默认预算即可。交付物保存的是投影和快照选项处理后的结果，摘要调用的文件无法恢复未选字段。
 
 MCP 读取顺序：
 
-1. 读取 `result_delivery.manifest_uri`，确认结果范围、大小、SHA-256 和有效期。
+1. 读取 `result_delivery.manifest_uri`，确认结果范围、大小和有效期。
 2. 全量读取从清单中的 `first_page_uri` 开始；每页资源内容是 JSON 包装，解析后提取其 `text`，依次跟随 `next_uri`（或 `next_offset`），直到下一页为 null。单页 `text` 至多 2048 字符，可能从 JSON 字符串中间截开，不能逐页当成完整业务 JSON 解析。
-3. 将全部 `text` 按序直接拼接，以 UTF-8 编码核对 `result_delivery.sha256`，通过后再解析全文或保存。只需解释某一字段时可使用 `fatebridge://results/{result_id}/fields/{path}/{offset}`；该读取支持数组数字索引，与计算时的 `fields` 投影规则不同。
+3. 将全部 `text` 按序直接拼接，再解析全文或保存；需要核验时使用下述同 run 读取接口。只需解释某一字段时可使用 `fatebridge://results/{result_id}/fields/{path}/{offset}`；该读取支持数组数字索引，与计算时的 `fields` 投影规则不同。
 
 同机程序可直接读取返回的 `file_path`，取 `file_payload_path`（当前为 `payload`）指向的业务对象。例如先保存一次使用虚构资料的 CLI 响应：
 
@@ -220,7 +220,6 @@ fatebridge bazi_career --birth-year 1990 --birth-month 5 --birth-day 15 \
 下面在安装FateBridge的同一Python环境中将 `reply.json` 导出为 `full-result.json`，同时处理未超限的普通响应；精简引用省略文件定位时只查询本机清单，不重新计算：
 
 ```python
-import hashlib
 import json
 from pathlib import Path
 
@@ -237,14 +236,12 @@ if delivery:
 else:
     payload = reply
 raw = json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
-if delivery and hashlib.sha256(raw).hexdigest() != delivery["sha256"]:
-    raise ValueError("完整结果 SHA-256 不匹配")
 Path("full-result.json").write_bytes(raw)
 ```
 
-散列对象是保留的完整响应，包括其中的 `run_metadata`，不是外层临时记录文件或缩略响应。HTTP 客户端使用 `GET /api/results/{result_id}` 和 `/api/results/{result_id}/pages?offset=0`；选择字段时另加 `path` 查询参数，鉴权与业务接口一致。
+公开响应不提供哈希或指纹；直接读取文件不会执行存储完整性检查。HTTP 客户端使用 `GET /api/results/{result_id}` 和 `/api/results/{result_id}/pages?offset=0`；选择字段时另加 `path` 查询参数，鉴权与业务接口一致。
 
-也可以让确定性读取接口执行散列与run校验，再取所需页。下面沿用上例的`reply.json`，读取同一结果的`analysis_context`，不重算：
+也可以让确定性读取接口执行存储完整性与 run 校验，再取所需页。下面沿用上例的`reply.json`，读取同一结果的`analysis_context`，不重算：
 
 ```python
 import json
@@ -257,16 +254,16 @@ offset = 0
 while offset is not None:
     page = json.loads(subprocess.check_output([
         "fatebridge", "result-read", ref["result_id"],
-        "--sha256", ref["sha256"], "--run-id", reply["run_metadata"]["run_id"],
+        "--run-id", reply["run_metadata"]["run_id"],
         "--path", "analysis_context", "--offset", str(offset),
     ], text=True))
     print(page["text"], end="")
     offset = page["next_offset"]
 ```
 
-每次调用先只读核对完整payload，再从同一内存对象返回至多2048字符的所选文档片段。`verification.payload_sha256/run_id`绑定完整原结果，`sha256`绑定所选文档；核验成功不表示助手已读全部业务字段。REST入口为`/api/results/{result_id}/verified`，必传`expected_sha256`、`expected_run_id`；MCP校验资源模板及约束见[交付合同](api-reference.md#25-字段投影与输出体积)。原资源和手工校验方式继续可用。错run、错散列、损坏和失效不能得到成功核验。
+每次调用先只读核对完整 payload 与原 run，再从同一内存对象返回至多2048字符的所选文档片段。`verification.run_id`、`scope` 与 `calculation_repeated=false` 说明核验对象和范围；核验成功不表示助手已读全部业务字段。REST 入口为 `/api/results/{result_id}/verified`，必传 `expected_run_id`；MCP 模板见[交付合同](api-reference.md#25-字段投影与输出体积)。服务检查私有清单与内容的一致性；公开响应不提供用于独立认证原内容的摘要。错 run、损坏和失效不能得到成功核验。
 
-`result-read`可在只读沙箱中读取已有结果，不依赖可写临时目录或锁文件。若原缓存位于自定义位置，或读写进程的临时目录环境不同，使用`--directory 原交付文件所在私有目录`；同ID匹配多个缓存目录时也须明确原目录，不能尝试不同副本凑出匹配散列。过期或被并发回收的引用仍不可用，目录参数不延长保留期限。源码环境使用已有依赖环境的Python和正确的源码路径；临时评测工作目录未必包含`.venv`。
+`result-read`可在只读沙箱中读取已有结果，不依赖可写临时目录或锁文件。若原缓存位于自定义位置，或读写进程的临时目录环境不同，使用`--directory 原交付文件所在私有目录`；同ID匹配多个缓存目录时也须明确原目录，不能依次尝试副本来猜测原目录。过期或被并发回收的引用仍不可用，目录参数不延长保留期限。源码环境使用已有依赖环境的Python和正确的源码路径；临时评测工作目录未必包含`.venv`。
 
 引用约一小时过期，也可能因容量回收提前失效；长期留存须及时保存完整结果及原输入。`file_path` 指向运行 FateBridge 的机器，远程客户端应读取资源或 HTTP 分页。引用失效或字段未被首轮保留时，应说明本次交付范围，不能把新一次计算冒充旧结果。`parent_run_id` 仅关联调用，不自动继承输入事实。
 

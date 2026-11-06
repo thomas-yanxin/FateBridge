@@ -25,7 +25,8 @@ from fatebridge.validation.fengshui_mutual_geometry import (
     load_mutual_geometry_reference,
 )
 from fatebridge.validation.fengshui_reading import verify_fengshui_reading
-from tests.fengshui.test_fengshui_surfaces import mcp_call, rest_client
+from tests.support.fengshui_transports import mcp_call
+from tests.support.transports import rest_client
 
 SOURCE = Path(__file__).parents[1] / "data/fengshui_mutual_geometry_v1"
 
@@ -165,9 +166,7 @@ def test_served_reading_coverage_is_bound_to_the_actual_available_derivation(
     current, derived, five, unknown
 ):
     result = executed(inputs(current))
-    checked = verify_fengshui_reading(
-        result, trusted_run_metadata=deepcopy(result["run_metadata"])
-    )
+    checked = verify_fengshui_reading(result, trusted_payload=deepcopy(result))
     assert checked["status"] == "verified_served_fixed_reading"
     assert checked["author_geometry_record_count"] == 18
     assert checked["author_geometry_derived_record_count"] == derived

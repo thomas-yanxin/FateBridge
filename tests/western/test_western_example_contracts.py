@@ -2,7 +2,6 @@
 
 import asyncio
 import copy
-import hashlib
 import json
 from dataclasses import replace
 
@@ -15,7 +14,7 @@ from fatebridge.application.examples import example_input
 from fatebridge.cli import run as cli_run
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
-from tests.fixtures.mcp_result_delivery import first_page_uri
+from tests.fixtures.mcp_result_delivery import read_full_result
 from tests.support.transports import rest
 
 KEYS = [
@@ -128,49 +127,33 @@ def assert_requested_path(value, field):
         current = current[key]
 
 
-async def read_complete(client, result):
-    value = result.structured_content
-    if "result_delivery" not in value:
-        return value
-    reference = value["result_delivery"]
-    uri = await first_page_uri(client, reference)
-    pieces = []
-    while uri:
-        page = json.loads((await client.read_resource(uri))[0].text)
-        pieces.append(page["text"])
-        uri = page["next_uri"]
-    raw = "".join(pieces)
-    assert hashlib.sha256(raw.encode()).hexdigest() == reference["sha256"]
-    complete = json.loads(raw)
-    assert complete["run_metadata"]["run_id"] == value["run_metadata"]["run_id"]
-    return complete
-
-
 @pytest.mark.parametrize(
-    "changed", ["result_id", "sha256", "first_page_uri", "total_chars"]
+    "changed", ["result_id", "run_id", "first_page_uri", "total_chars"]
 )
 def test_compact_readback_rejects_a_different_result_or_document(changed):
     from types import SimpleNamespace
 
     reference = {
+        "mode": "paged",
         "result_id": "fixture-result",
-        "sha256": "a" * 64,
         "total_chars": 2,
         "manifest_uri": "fatebridge://results/fixture-result",
         "compact_reference": True,
     }
     manifest = {
         "result_id": reference["result_id"],
-        "sha256": reference["sha256"],
+        "run_metadata": {"run_id": "original-run"},
         "total_chars": 2,
         "first_page_uri": "fatebridge://results/fixture-result/pages/0",
     }
-    manifest[changed] = {
-        "result_id": "different",
-        "sha256": "b" * 64,
-        "first_page_uri": "fatebridge://results/different/pages/0",
-        "total_chars": 3,
-    }[changed]
+    if changed == "run_id":
+        manifest["run_metadata"]["run_id"] = "different-run"
+    else:
+        manifest[changed] = {
+            "result_id": "different",
+            "first_page_uri": "fatebridge://results/different/pages/0",
+            "total_chars": 3,
+        }[changed]
 
     class Client:
         async def read_resource(self, uri):
@@ -178,7 +161,15 @@ def test_compact_readback_rejects_a_different_result_or_document(changed):
             return [SimpleNamespace(text=json.dumps(manifest))]
 
     with pytest.raises(AssertionError):
-        asyncio.run(first_page_uri(Client(), reference))
+        asyncio.run(
+            read_full_result(
+                Client(),
+                {
+                    "run_metadata": {"run_id": "original-run"},
+                    "result_delivery": reference,
+                },
+            )
+        )
 
 
 @pytest.mark.parametrize("key", KEYS)
@@ -221,7 +212,9 @@ def test_public_descriptor_drives_each_available_adapter_without_private_input_d
                     spec.tool_name, params, raise_on_error=False
                 )
                 assert not result.is_error
-                values.append(("mcp", await read_complete(client, result)))
+                values.append(
+                    ("mcp", await read_full_result(client, result.structured_content))
+                )
             return record, values
 
     record, values = asyncio.run(public_call())

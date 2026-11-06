@@ -419,7 +419,6 @@ def test_claim_receipt_rejects_a_changed_auxiliary_branch(rest):
         path=f"liureng.auxiliary_stars.stars.{index}.branch",
         value=actual,
         run_id=receipt["run_id"],
-        business_output_sha256=receipt["business_output_sha256"],
     )
     assert (
         verify_calculation_claims(body, [claim])["status"]

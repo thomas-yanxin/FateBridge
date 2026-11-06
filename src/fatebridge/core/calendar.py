@@ -72,10 +72,8 @@ class BaZiCalendar:
     @classmethod
     def calculate_year_pillar(cls, year: int) -> Tuple[str, str]:
         """Calculate the year pillar (年柱) for a given year."""
-        # Calculate offset from base year
         year_offset = year - cls.BASE_YEAR
 
-        # Calculate indices
         stem_index = cls.get_stem_branch_index(0, year_offset, 10)  # 甲 is index 0
         branch_index = cls.get_stem_branch_index(0, year_offset, 12)  # 子 is index 0
 
@@ -101,11 +99,9 @@ class BaZiCalendar:
             "丑",
         ].index(month_branch)
 
-        # Calculate heavenly stem based on year stem
         year_stem, _ = cls.calculate_year_pillar(year)
         year_stem_index = HEAVENLY_STEMS.index(year_stem)
 
-        # Month stem calculation based on year stem
         # 甲己年丙作首，乙庚年戊为头，丙辛年庚上起，丁壬年壬位流，戊癸年甲好求
         month_stem_base_mapping = {
             0: 2,  # 甲年 -> 丙寅月开始 (丙 is index 2)
@@ -176,7 +172,6 @@ class BaZiCalendar:
         该默认与 ``get_four_pillars`` 保持一致；如果调用方自行维护了
         翻日逻辑，可显式传入 ``apply_late_zi_rollover=False``。
         """
-        # Get the earthly branch for the hour
         hour_branch = get_hour_branch(hour)
 
         effective_year, effective_month, effective_day = (
@@ -185,7 +180,6 @@ class BaZiCalendar:
             else (year, month, day)
         )
 
-        # Calculate heavenly stem based on day stem
         day_stem, _ = cls.calculate_day_pillar(
             effective_year,
             effective_month,
@@ -194,7 +188,6 @@ class BaZiCalendar:
         )
         day_stem_index = HEAVENLY_STEMS.index(day_stem)
 
-        # Hour stem calculation based on day stem
         # 甲己还加甲，乙庚丙作初，丙辛从戊起，丁壬庚子居，戊癸何方发，壬子是真途
         hour_stem_base_mapping = {
             0: 0,  # 甲日 -> 甲子时开始
@@ -211,10 +204,8 @@ class BaZiCalendar:
 
         base_stem_index = hour_stem_base_mapping[day_stem_index]
 
-        # Get hour branch index to calculate offset
         hour_branch_index = EARTHLY_BRANCHES.index(hour_branch)
 
-        # Calculate hour stem
         hour_stem_index = (base_stem_index + hour_branch_index) % 10
         hour_stem = HEAVENLY_STEMS[hour_stem_index]
 

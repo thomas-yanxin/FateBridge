@@ -38,6 +38,9 @@ def test_preview_is_read_only_and_apply_preserves_evidence(repository):
             "scripts/__pycache__/old.pyc",
             "tests/__pycache__/old.pyc",
             "tests/fixtures/__pycache__/surface_payloads.pyc",
+            "tests/fixtures/reference/__pycache__/retired.pyc",
+            "tests/fixtures/reference/orphan.pyc",
+            "tests/fixtures/reference/.DS_Store",
             "ci-selection.json",
             "cache-status.txt",
             "pytest-results.xml",
@@ -137,7 +140,8 @@ def test_duplicate_scans_preserve_frozen_paths_bytes_and_manifest(repository):
     assert clean_repository.main(["--deduplicate-scans", "--apply"]) == 0
     assert first.is_symlink() and second.is_symlink()
     assert first.resolve() == second.resolve()
-    assert first.resolve().parent == repository / "tests/data/shared_sources"
+    assert first.resolve().is_relative_to(repository / "tests/data/shared_sources")
+    assert first.resolve().name == "source.pdf"
     assert all(
         p.read_text() == "original bytes" for p in (first, second, manifest, record)
     )

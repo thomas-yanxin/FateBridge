@@ -1,7 +1,8 @@
 """Strict bounded first views and original same-run MCP resource proofs."""
 
-import hashlib
 import json
+
+from tests.fixtures.mcp_result_delivery import read_full_result
 
 
 def without_transport(result):
@@ -25,29 +26,7 @@ async def same_run_projected_response(client, result):
     assert ref["mode"] == "paged"
     assert ref["deferred_fields"]
     assert all(path.startswith("run_metadata.") for path in ref["deferred_fields"])
-    manifest = json.loads((await client.read_resource(ref["manifest_uri"]))[0].text)
-    assert manifest["sha256"] == ref["sha256"]
-    assert manifest["run_metadata"]["run_id"] == body["run_metadata"]["run_id"]
-    uri, offset, chunks = manifest["first_page_uri"], 0, []
-    while uri is not None:
-        assert uri == f"fatebridge://results/{ref['result_id']}/pages/{offset}"
-        page = json.loads((await client.read_resource(uri))[0].text)
-        assert page["result_id"] == ref["result_id"]
-        assert page["sha256"] == ref["sha256"]
-        assert page["total_chars"] == ref["total_chars"]
-        assert page["offset"] == offset
-        assert page["text"]
-        chunks.append(page["text"])
-        expected_offset = offset + len(page["text"])
-        assert page["next_offset"] == (
-            expected_offset if expected_offset < ref["total_chars"] else None
-        )
-        offset, uri = expected_offset, page["next_uri"]
-    text = "".join(chunks)
-    assert len(text) == ref["total_chars"]
-    assert hashlib.sha256(text.encode("utf-8")).hexdigest() == ref["sha256"]
-    original = json.loads(text)
-    assert original["run_metadata"] == manifest["run_metadata"]
+    original = await read_full_result(client, body)
     inline_business = {
         k: v for k, v in body.items() if k not in {"run_metadata", "result_delivery"}
     }

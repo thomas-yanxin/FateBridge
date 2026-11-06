@@ -12,7 +12,6 @@ import pytest
 from fatebridge.application.execution import execute_tool
 from fatebridge.core.astro import native_execution, runtime
 from fatebridge.services.human_design import calculate_human_design
-from fatebridge.services.replay_metadata import digest
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
 from fatebridge.validation.human_design_execution import verify_native_context
@@ -225,8 +224,5 @@ def test_rehashed_context_cannot_invent_boundaries_or_auxiliary_identity(
         c["compressed_file_endpoint_policy"][
             "scope"
         ] = "Full positional accuracy proved."
-    p["run_metadata"]["business_output_sha256"] = digest(
-        {k: v for k, v in p.items() if k != "run_metadata"}
-    )
     assert verify_native_context(p)["errors"]
     assert verify_human_design_reading(p)["status"] == "rejected"

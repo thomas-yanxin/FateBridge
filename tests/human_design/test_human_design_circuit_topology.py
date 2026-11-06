@@ -12,7 +12,6 @@ from fatebridge.core.human_design import bodygraph
 from fatebridge.core.human_design_circuit_topology import topology_reference
 from fatebridge.core.human_design_evidence import reference_table_audit
 from fatebridge.core.human_design_references import clear_reference_cache
-from fatebridge.services.replay_metadata import digest
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
 
@@ -222,7 +221,4 @@ def test_forged_completion_and_source_certification_rejected_even_after_rehash(
         ][0]["printed_motor_names"] = ["Sacral", "Solar Plexus"]
     else:
         completion["source_revision"] = "Publisher corrected edition"
-    value["run_metadata"]["business_output_sha256"] = digest(
-        {k: v for k, v in value.items() if k != "run_metadata"}
-    )
     assert verify_human_design_reading(value)["status"] == "rejected"

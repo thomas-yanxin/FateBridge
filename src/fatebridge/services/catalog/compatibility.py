@@ -14,7 +14,6 @@ calculate_compatibility_analysis = lazy_service(
 )
 
 SPECS: List[ToolSpec] = [
-    # --- Compatibility -----------------------------------------------------
     ToolSpec(
         key="two_person_compatibility",
         bind=pair_invoke(calculate_compatibility_analysis),

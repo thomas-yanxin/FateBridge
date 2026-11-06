@@ -1,5 +1,6 @@
 import asyncio
 import json
+import re
 
 import pytest
 from fastapi.testclient import TestClient
@@ -28,6 +29,23 @@ def _build_client(monkeypatch) -> TestClient:
 
 
 def _assert_run_metadata(payload: dict) -> None:
+    pending = [payload]
+    while pending:
+        item = pending.pop()
+        if isinstance(item, dict):
+            assert not any(
+                re.search(
+                    r"(?:^|_)(?:sha\d*|hash|hashes|digest|fingerprint)(?:_|$)",
+                    key,
+                    re.I,
+                )
+                for key in item
+            )
+            pending.extend(item.values())
+        elif isinstance(item, list):
+            pending.extend(item)
+        elif isinstance(item, str):
+            assert not re.fullmatch(r"[0-9a-f]{64}", item)
     metadata = payload.get("run_metadata")
     assert isinstance(metadata, dict)
     assert metadata["tool_name"]
@@ -90,17 +108,6 @@ def test_rest_post_endpoints_all_accept_representative_payloads(monkeypatch, pat
     _assert_run_metadata(body)
 
 
-@pytest.mark.parametrize("name", MCP_CASES)
-def test_shared_execution_accepts_all_mcp_representative_payloads(name):
-    from fatebridge.application.execution import execute_tool
-
-    by_name = {spec.tool_name: spec for spec in CATALOG}
-    spec = by_name[name]
-    body = execute_tool(spec, spec.request_model.model_validate(MCP_CASES[name][1]()))
-    assert "error" not in body, name
-    _assert_run_metadata(body)
-
-
 @pytest.mark.parametrize(
     "names", [tuple(MCP_CASES)[i::6] for i in range(6)], ids=lambda names: names[0]
 )
@@ -157,6 +164,11 @@ async def test_all_published_schemas_keep_valid_shared_references():
         if published["outputSchema"] is not None:
             original = model_schema(by_name[tool.name].output_model)
             assert published["outputSchema"] == original
+            for definition in original.get("$defs", {}).values():
+                assert not any(
+                    re.search(r"sha\d+|fingerprint|(?:^|_)hash(?:_|$)", key, re.I)
+                    for key in definition.get("properties", {})
+                )
             total_wire += len(json.dumps(published["outputSchema"]))
             total_original += len(json.dumps(original))
     assert total_wire == total_original

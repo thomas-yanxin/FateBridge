@@ -12,7 +12,6 @@ from fatebridge.core.human_design import positions_at_tt
 from fatebridge.core.human_design_precision import compare_node_backends
 from fatebridge.core.human_design_provenance import position_flag_model
 from fatebridge.core.human_design_time import sun_at_tt
-from fatebridge.services.replay_metadata import digest
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
 from fatebridge.validation.human_design_provenance import verify_selected_provenance
@@ -32,9 +31,6 @@ def complete_run():
 
 
 def reseal(value):
-    value["run_metadata"]["business_output_sha256"] = digest(
-        {k: v for k, v in value.items() if k != "run_metadata"}
-    )
     return value
 
 

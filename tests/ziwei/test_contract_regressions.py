@@ -141,7 +141,6 @@ def test_hypothetical_ming_tianxiang_ji_cannot_be_cited_as_actual_mutagen():
             path=path,
             value=value,
             run_id=receipt["run_id"],
-            business_output_sha256=receipt["business_output_sha256"],
         )
 
     assert (

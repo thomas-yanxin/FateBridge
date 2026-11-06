@@ -16,7 +16,7 @@ from fatebridge.cli import run
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.errors import ParameterError
-from tests.fixtures.mcp_receipt import assert_same_run_receipt
+from tests.fixtures.mcp_result_delivery import assert_same_run_receipt
 from tests.support.result_delivery import reconstruct, store  # noqa: F401
 from tests.support.transports import rest
 
@@ -52,7 +52,7 @@ def test_current_germany_result_keeps_receipt_and_same_run_facts(
     result = delivery.bound_response(original, limit, compact=compact)
     assert original == before
     if not limit:
-        assert result is original
+        assert result == original
         return
     assert len(delivery._json(result, compact)) <= limit
     if "result_delivery" not in result:

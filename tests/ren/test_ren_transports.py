@@ -65,7 +65,7 @@ def test_source_annotation_disagreement_survives_all_three_transports(surface_ca
         note = classification["source_note"]
         assert note["annotation"] == "重审"
         assert note["original_pdf_page"] == 49
-        assert len(note["source_sha256"]) == 64
+        assert "source_sha256" not in note
 
 
 @pytest.mark.parametrize("key", ["liureng_gods", "liureng_runyear", "jinkou"])
@@ -208,7 +208,6 @@ def test_corrected_facts_survive_each_transport_and_field_projection(
             path="jinkou.overview.guishen.name",
             value="太阴",
             run_id=receipt["run_id"],
-            business_output_sha256=receipt["business_output_sha256"],
         )
         assert (
             verify_calculation_claims(original, [claim])["status"]
@@ -218,13 +217,17 @@ def test_corrected_facts_survive_each_transport_and_field_projection(
         assert verify_calculation_claims(original, [false])["status"] == "rejected"
         changed = deepcopy(original)
         changed["jinkou"]["overview"]["guishen"]["name"] = "玄武"
-        assert verify_calculation_claims(changed, [false])["status"] == "rejected"
+        assert (
+            verify_calculation_claims(changed, [false], trusted_payload=original)[
+                "status"
+            ]
+            == "rejected"
+        )
         internal = original["jinkou"]["internal_strength"]
         power_claim = CalculationClaim(
             path="jinkou.internal_strength.powers.贵神",
             value=internal["powers"]["贵神"],
             run_id=receipt["run_id"],
-            business_output_sha256=receipt["business_output_sha256"],
         )
         assert (
             verify_calculation_claims(original, [power_claim])["status"]
@@ -253,7 +256,6 @@ def test_corrected_facts_survive_each_transport_and_field_projection(
             path="jinkou.combinations.trines.0.transformation_confirmed",
             value=None,
             run_id=receipt["run_id"],
-            business_output_sha256=receipt["business_output_sha256"],
         )
         assert (
             verify_calculation_claims(original, [unknown_transformation])["status"]
@@ -269,7 +271,6 @@ def test_corrected_facts_survive_each_transport_and_field_projection(
             path="jinkou.patterns.evaluations.51.matched",
             value=None,
             run_id=receipt["run_id"],
-            business_output_sha256=receipt["business_output_sha256"],
         )
         assert (
             verify_calculation_claims(original, [undecided_pattern])["status"]

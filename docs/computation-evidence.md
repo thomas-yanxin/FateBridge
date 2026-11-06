@@ -6,7 +6,7 @@
 
 `services/method_registration.py`按实际领域计算登记65个共享方法，覆盖当前92个目录工具；`bazi_personality`明确排除。新增工具没有登记会在目录装配时失败。出生公共计算、各时运层、数算与卦象、各中式盘、西占各推运/事件、印占、人类图、风水以及知识/导出分别登记。人类图可选太阳点质量模型有独立方法、前提及输出范围。
 
-完整发现返回`method_contracts`和`method_registration`，摘要返回`method_ids`。合同包括实际实现路径、维护来源、输出范围、数量类型、单位、前提、选项字段、依赖、误差源及比较条件，并进入`contract_sha256`。`contract_v1`是登记合同的版本，不能冒充上游算法或原典版本。
+完整发现返回`method_contracts`和`method_registration`，摘要返回`method_ids`。合同包括实际实现路径、维护来源、输出范围、数量类型、单位、前提、选项字段、依赖、误差源及比较条件。`contract_v1`是登记合同的版本，不能冒充上游算法或原典版本。
 
 每次执行还在`run_metadata.calculation_evidence.runtime_method_registry`登记实际返回的`method_id/ruleset_id/resolution_policy`及见证路径。它与公开领域登记分开：实际出现不代表验证通过；没有版本的事实也不自动补为最新版。`method_contract_coverage=declared_subset`保留此边界，不承诺全部内部子函数或所有流派都已独立认证。
 
@@ -43,7 +43,7 @@
 
 规则ID按最近可唯一识别的容器绑定，重复或不明确的身份保留未决，不选第一个。图检查节点唯一、引用闭合、边不重复和无循环。`affected_nodes`返回更正后的保守重算集合，`shared_input_origins`显示结论共享的原始事实，不据多方法一致增加独立置信度。
 
-所有业务根均被子树散列覆盖；这与完整因果读集的证明不同。`resolved_rule_dependencies`和`unresolved_rule_dependencies`分别交付，`semantic_dependency_proof_complete=false`明确保留尚未完成的细粒度语义证明。完整图没有删掉未知边，也没有把一个领域方法节点包装成所有内部因果关系均已证明。
+执行图覆盖全部业务根；完整因果读集仍需独立证明。`resolved_rule_dependencies`和`unresolved_rule_dependencies`分别交付，`semantic_dependency_proof_complete=false`明确保留尚未完成的细粒度语义证明。完整图没有删掉未知边，也没有把一个领域方法节点包装成所有内部因果关系均已证明。
 
 `verified_output_relations`绑定每个具名关系的全部操作数及输出JSON Pointer和摘要，复核时重建关系，不能仅靠篡改后重算摘要蒙混通过。太乙完整起终宫环路还核对每个经过位置及加数，不只核对总和。`source_conflict_certificates`将同次公式结果与原表字面值绑定，保留两边、有限候选和未裁定的来源优先级。它们证明所记录约束不能同时成立，并不裁定原书误刻或优先采用通则。
 
@@ -53,7 +53,7 @@ MCP在入口复用已校验请求，避免框架填默认值后再次建模而�
 
 ## 大图与同次读取
 
-图和误差账本随原完整run保存。响应预算不足时，`run_metadata.calculation_evidence`保留摘要、散列与`delivery_path`，完整内容列入`result_delivery.deferred_fields`。使用同run的字段分页读取，路径为`run_metadata.calculation_evidence`；不重算原结果。业务首轮预算及完整源事实的要求保持原值，恢复后仍须核对原artifact散列和完整回执。
+图和误差账本随原完整run保存。响应预算不足时，`run_metadata.calculation_evidence`保留摘要与`delivery_path`，完整内容列入`result_delivery.deferred_fields`。使用同run的字段分页读取，路径为`run_metadata.calculation_evidence`；不重算原结果。业务首轮预算及完整源事实的要求保持原值，恢复后仍须核对原run与完整回执，内容完整性由私有存储核验。
 
 ## 固定总体的专业验收
 

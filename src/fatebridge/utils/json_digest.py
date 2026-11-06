@@ -1,4 +1,4 @@
-"""Stable JSON fingerprints shared by domain facts, contracts and receipts."""
+"""Canonical JSON digests for internal integrity and research commitments."""
 
 import hashlib
 import json

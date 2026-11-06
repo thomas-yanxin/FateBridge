@@ -12,7 +12,6 @@ from fatebridge.core.astro import native_execution, runtime
 from fatebridge.core.human_design_sample_witness import unpack_sample_witnesses
 from fatebridge.core.human_design_sensitivity import assess_birth_interval
 from fatebridge.services.human_design import calculate_human_design
-from fatebridge.services.replay_metadata import digest
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
 from fatebridge.validation.human_design_clocks import verify_clock_records
@@ -20,13 +19,6 @@ from fatebridge.validation.human_design_clocks import verify_clock_records
 ROOT = Path(__file__).resolve().parents[2]
 SPEC = next(s for s in CATALOG if s.key == "human_design")
 PROBES = json.loads((ROOT / "tests/data/human_design/clock-probes.json").read_text())
-
-
-def rehash(value):
-    value["run_metadata"]["business_output_sha256"] = digest(
-        {k: v for k, v in value.items() if k != "run_metadata"}
-    )
-    return value
 
 
 def set_path(value, path, replacement):
@@ -54,7 +46,7 @@ def complete():
 def test_all_nine_original_rehashed_ordinary_clock_probes(complete, case):
     value = deepcopy(complete)
     set_path(value, case["path"], case["replacement"])
-    assert verify_human_design_reading(rehash(value))["status"] == "rejected"
+    assert verify_human_design_reading((value))["status"] == "rejected"
 
 
 def test_original_nonnominal_UT1_failure_with_entire_interval_rebuilt(complete):
@@ -78,7 +70,7 @@ def test_original_nonnominal_UT1_failure_with_entire_interval_rebuilt(complete):
     )
     assert value["time_scales"] == complete["time_scales"]
     assert value["activations"] == complete["activations"]
-    assert verify_human_design_reading(rehash(value))["status"] == "rejected"
+    assert verify_human_design_reading((value))["status"] == "rejected"
 
 
 MUTATIONS = [
@@ -137,7 +129,7 @@ def mutate(value, case):
 def test_design_reference_and_observation_contradictions(complete, case):
     value = deepcopy(complete)
     mutate(value, case)
-    assert verify_human_design_reading(rehash(value))["status"] == "rejected", case
+    assert verify_human_design_reading((value))["status"] == "rejected", case
 
 
 def test_complete_interval_replay_uses_no_native_or_private_worker_calls(
@@ -239,7 +231,7 @@ def test_cycle_clock_contradictions_after_rehash(cycle_run, case):
             event["future_leap_seconds_assumed_unchanged"] = not event[
                 "future_leap_seconds_assumed_unchanged"
             ]
-    assert verify_human_design_reading(rehash(value))["status"] == "rejected"
+    assert verify_human_design_reading((value))["status"] == "rejected"
 
 
 def test_execution_receipt_fields_are_not_misread_as_business_clock_charts(complete):
@@ -255,4 +247,4 @@ def test_execution_receipt_fields_are_not_misread_as_business_clock_charts(compl
         == "verified_fixed_template_reading"
     )
     value["time_scales"]["personality"]["jd_tt"] += 1
-    assert verify_human_design_reading(rehash(value))["status"] == "rejected"
+    assert verify_human_design_reading((value))["status"] == "rejected"

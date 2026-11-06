@@ -1,11 +1,9 @@
 """Portable, privacy-conscious execution receipts for the shared registrar."""
 
-import hashlib
 import os
 import platform
 from functools import lru_cache
 from importlib.metadata import PackageNotFoundError, version
-from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel
@@ -14,25 +12,16 @@ from fatebridge import __version__
 from fatebridge.core.ephemeris_paths import ephemeris_search_directories
 from fatebridge.core.evidence_graph import execution_evidence
 from fatebridge.core.execution_context import CallClock, ExecutionOptions
+from fatebridge.core.public_output import public_payload
 from fatebridge.core.reproducibility import BAZI_ANALYSIS_CLOCK_TOOLS
-from fatebridge.core.schema_cache import contract_fingerprint
 from fatebridge.utils.json_digest import digest
 
-METADATA_SCHEMA_VERSION = "1.0"
-
-
-def _file_digests(root: Path, pattern: str) -> Dict[str, str]:
-    return {
-        str(path.relative_to(root)): hashlib.sha256(path.read_bytes()).hexdigest()
-        for path in sorted(root.rglob(pattern))
-        if path.is_file()
-    }
+METADATA_SCHEMA_VERSION = "2.0"
 
 
 @lru_cache(maxsize=1)
 def environment_receipt() -> Dict[str, Any]:
     """Snapshot immutable deployment inputs once per process, without Git calls."""
-    root = Path(__file__).resolve().parents[1]
     dependencies: Dict[str, Optional[str]] = {}
     for package in (
         "pydantic",
@@ -52,66 +41,37 @@ def environment_receipt() -> Dict[str, Any]:
         "python": platform.python_version(),
         "platform": platform.system() + "-" + platform.machine(),
         "dependencies": dependencies,
-        "implementation_sha256": digest(_file_digests(root, "*.py")),
-        "bundled_data_sha256": digest(_file_digests(root / "data", "*.json")),
     }
-    return {**receipt, "environment_sha256": digest(receipt)}
+    return receipt
 
 
 def ephemeris_inventory() -> Dict[str, Any]:
-    """Fingerprint configured file inventory, not a claim about files actually used."""
+    """List configured relative filenames; actual models are reported separately."""
     from fatebridge.core import ephemeris_runtime
 
-    directory = ephemeris_runtime.effective_ephemeris_search_path()
-    return _ephemeris_inventory(directory)
-
-
-@lru_cache(maxsize=64)
-def _large_ephemeris_digest(filename: str, signature: tuple[int, ...]) -> str:
-    path = Path(filename)
-    hasher = hashlib.sha256()
-    with path.open("rb") as handle:
-        for piece in iter(lambda: handle.read(1024 * 1024), b""):
-            hasher.update(piece)
-    if _stat_signature(path) != signature:
-        raise ValueError("Ephemeris file changed while its inventory was hashed")
-    return hasher.hexdigest()
-
-
-def _stat_signature(path: Path) -> tuple[int, ...]:
-    stat = path.stat()
-    return (stat.st_size, stat.st_mtime_ns, stat.st_ctime_ns, stat.st_ino, stat.st_dev)
-
-
-def _ephemeris_inventory(directory: Optional[str]) -> Dict[str, Any]:
-    files: Dict[str, str] = {}
-    if directory:
-        for index, root in enumerate(ephemeris_search_directories(directory)):
-            for path in sorted(root.glob("*.se1")):
-                if path.is_file():
-                    files[f"{index}/{path.name}"] = _large_ephemeris_digest(
-                        str(path.resolve()), _stat_signature(path)
-                    )
-            for name in (
-                "seorbel.txt",
-                "sefstars.txt",
-                "seleapsec.txt",
-                "seasnam.txt",
-                "swe_deltat.txt",
-                "sedeltat.txt",
+    files = []
+    for index, root in enumerate(
+        ephemeris_search_directories(
+            ephemeris_runtime.effective_ephemeris_search_path()
+        )
+    ):
+        for path in sorted(root.iterdir()) if root.is_dir() else ():
+            if path.is_file() and (
+                path.suffix == ".se1"
+                or path.name
+                in {
+                    "seorbel.txt",
+                    "sefstars.txt",
+                    "seleapsec.txt",
+                    "seasnam.txt",
+                    "swe_deltat.txt",
+                    "sedeltat.txt",
+                }
             ):
-                path = root / name
-                if path.is_file():
-                    # Small source files can immediately change a calculation
-                    # at the same directory. Never cache solely by path/stat.
-                    files[f"{index}/{name}"] = hashlib.sha256(
-                        path.read_bytes()
-                    ).hexdigest()
+                files.append(f"{index}/{path.name}")
     return {
-        "scope": "effective_se1_and_auxiliary_inventory; actual models/sources are reported separately",
-        "freshness": "Auxiliary text bytes hashed each receipt; large se1 hashes cached by size/mtime/ctime/inode/device, not a continuous immutability proof",
+        "scope": "configured_filenames; actual models/sources are reported separately",
         "files": files,
-        "sha256": digest(files),
     }
 
 
@@ -245,13 +205,6 @@ def execution_receipt(
         "ephemeris": ephemeris_inventory(),
         "solar_term_policy": solar_policy_receipt,
     }
-    environment["environment_sha256"] = digest(
-        {
-            key: value
-            for key, value in environment.items()
-            if key != "environment_sha256"
-        }
-    )
     time_defaults = [
         field for field in policy.current_time_fields if inputs.get(field) is None
     ]
@@ -270,14 +223,6 @@ def execution_receipt(
     return {
         "metadata_schema_version": METADATA_SCHEMA_VERSION,
         "package_version": __version__,
-        "contract_sha256": contract_fingerprint(
-            spec.request_model,
-            spec.output_model,
-            spec.required_output_fields,
-            spec.methods,
-        ),
-        "input_sha256": input_digest,
-        "business_output_sha256": digest(body),
         "duration_ms": round(elapsed_ms, 3),
         "effective_time": {"as_of": as_of, "clock_timezones": sorted(clock.reads)},
         "determinism": {
@@ -296,7 +241,7 @@ def execution_receipt(
                 "calculation_evidence": execution_evidence(
                     spec.methods,
                     inputs,
-                    body,
+                    public_payload(body),
                     input_digest,
                     frozenset(supplied_paths),
                     frozenset({"seed"}) if generated_seed else frozenset(),

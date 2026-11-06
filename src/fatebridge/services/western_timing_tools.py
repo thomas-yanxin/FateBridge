@@ -331,7 +331,7 @@ def _build_sections(
     raise ValueError(f"Unsupported section kind: {section_kind}")
 
 
-def _calculate_tool(
+def calculate_timing_tool(
     tool_name: str,
     *,
     selected_sections: Optional[list[str]] = None,
@@ -374,69 +374,3 @@ def _calculate_tool(
         }
     except Exception as exc:
         return handle_calculation_error(exc, spec["analysis_type"])
-
-
-def calculate_solarreturn(
-    *, selected_sections: Optional[list[str]] = None, **kwargs: Any
-) -> Dict[str, Any]:
-    return _calculate_tool("solarreturn", selected_sections=selected_sections, **kwargs)
-
-
-def calculate_lunarreturn(
-    *, selected_sections: Optional[list[str]] = None, **kwargs: Any
-) -> Dict[str, Any]:
-    return _calculate_tool("lunarreturn", selected_sections=selected_sections, **kwargs)
-
-
-def calculate_transit(
-    *, selected_sections: Optional[list[str]] = None, **kwargs: Any
-) -> Dict[str, Any]:
-    return _calculate_tool("transit", selected_sections=selected_sections, **kwargs)
-
-
-def calculate_solararc(
-    *, selected_sections: Optional[list[str]] = None, **kwargs: Any
-) -> Dict[str, Any]:
-    return _calculate_tool("solararc", selected_sections=selected_sections, **kwargs)
-
-
-def calculate_givenyear(
-    *, selected_sections: Optional[list[str]] = None, **kwargs: Any
-) -> Dict[str, Any]:
-    return _calculate_tool("givenyear", selected_sections=selected_sections, **kwargs)
-
-
-def calculate_profection(
-    *, selected_sections: Optional[list[str]] = None, **kwargs: Any
-) -> Dict[str, Any]:
-    return _calculate_tool("profection", selected_sections=selected_sections, **kwargs)
-
-
-def calculate_pd(
-    *, selected_sections: Optional[list[str]] = None, **kwargs: Any
-) -> Dict[str, Any]:
-    return _calculate_tool("pd", selected_sections=selected_sections, **kwargs)
-
-
-def calculate_pdchart(
-    *, selected_sections: Optional[list[str]] = None, **kwargs: Any
-) -> Dict[str, Any]:
-    return _calculate_tool("pdchart", selected_sections=selected_sections, **kwargs)
-
-
-def calculate_zr(
-    *, selected_sections: Optional[list[str]] = None, **kwargs: Any
-) -> Dict[str, Any]:
-    return _calculate_tool("zr", selected_sections=selected_sections, **kwargs)
-
-
-def calculate_firdaria(
-    *, selected_sections: Optional[list[str]] = None, **kwargs: Any
-) -> Dict[str, Any]:
-    return _calculate_tool("firdaria", selected_sections=selected_sections, **kwargs)
-
-
-def calculate_decennials(
-    *, selected_sections: Optional[list[str]] = None, **kwargs: Any
-) -> Dict[str, Any]:
-    return _calculate_tool("decennials", selected_sections=selected_sections, **kwargs)

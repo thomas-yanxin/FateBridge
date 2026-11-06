@@ -5,7 +5,7 @@
     "actor_purpose_social_scope": "forming_friendship是明确结交交友，不限首次相识，social_gathering是聚会，不互相推断。personal_departure本人启程不证明private_journey因私；下卷日曜远行另须royal_or_official_traveler与long_distance_journey同时明确，出差或使节任务不证明身份，上卷不同范围继续保留。conflicted只表示匹配证据兼有宜与忌，须说明动作、卷别和出处，不能自动断成同条件原文矛盾；原生文本中的本次适用条件也须一起解释。",
     "astronomy": "默认equatorial_research28仅为已声明现代距星研究口径；天文宿与农历本命宿分别读取。",
     "calendar_profile": "默认t1299_fullmoon27直接采用T1299下卷十五日望宿逆顺法及生日加十三的含首位算法，两法互核；NAOJ朔日表仅作独立交叉核验。",
-    "calendar_reference": "读取calendar_reference的日期来源类别、数据指纹、支持范围及资料差异。2015起是出版方参考推算，不能说成已核对逐年神宫原刊；固定UTC+09不是历史日本地方时。旧月度候选仍拒绝接入，新后端来自完整逐日事实；文档到2033与LOD到2031的差异继续保留，范围外不能换中国历补齐。",
+    "calendar_reference": "读取calendar_reference的日期来源类别、版本与支持范围及资料差异。2015起是出版方参考推算，不能说成已核对逐年神宫原刊；固定UTC+09不是历史日本地方时。旧月度候选仍拒绝接入，新后端来自完整逐日事实；文档到2033与LOD到2031的差异继续保留，范围外不能换中国历补齐。",
     "clock": "calendar_day.clock_doctrine保留平明起曜、昼夜各八时及未列明的逐时曜神序列；time_restrictions含下卷逐日日名证言。clock_evaluation_status=not_computed时不能按民用0/12点或西方24行星时给出原典精确时段；原文自称万不失一不是实证验收。 comparative_time_systems分别保留T1509从旦至旦及一日夜三十时、T2087正文六时与行内注昼三夜三及居俗昼四夜四；三十时不等于现代三十小时，T2087居俗八时不覆盖T1299昼八夜八，不证明旦=平明、现代钟时、太阳高度或桧尾半日。",
     "clock_text_position": "clock_doctrine与special_day_evidence的textual_position_reference共指下卷一组段落移位：248字特殊日段和93字平明八时段由0398注15、0399注16互指，邻注0398注14另删前文一字一。∞为位置转换，不等于替字、删段、八改六、上卷火水曜位交换或T2465规则次序。两条注是一组异文，不算两份独立明本；所示不是完整明刻本重建，不改变主表、事项或钟时。古代日界、桧尾半日及闰月补配优先级仍未建立。",
     "clothing": "activity=clothing区分裁缝tailoring_garments、制作making_garments、修理repairing_garments、穿着wearing_garments和穿新衣wearing_new_garments；裁缝可归制作，新衣穿着可归穿着，反向不推。royal_wearer仅为明确王者身份，衣事不代表购衣。clothing_reference保留主文十四宿及余并失补集、明本井→并及余并失→并大吉，不补并为井、不将明本未列宿补成同样慎用；口诀和上卷裁衣原句未进入宜忌汇总，不能把汇总列宜说成全部文献一致或现实无风险。完整候选共同的专章表项可单独成立，未定宿名仍保持未定；候选不穷尽时不据单个候选定宜。",
@@ -28,7 +28,7 @@
     "shogonji_daily_annotations": "若返回manuscript_daily_annotations，逐分支解释本日是原始旁注所在日还是作者建议移置日；两条らうさく原在六月21／八月5，作者建议20／3，位移分别−1／−2。假名原读、狼藉汉字候选、作者意见与本次计算分开；不能当作T1299羅刹观测或统一换日误差。暦林問答集1811目录印本61章狼藉、62章羅刹分列；64章三宝仪式限制与支干吉前提属于该书，未替换T1299。馬場所据天理本及校改、NDL生年表头与未核月法、现用CBETA2026.R2固定提交及头部日期非发行年、逐字未检出不等所有传本无文均须保留。仅两条旁注四个相关日付，未独立校原卷，无半日钟时，不裁决古代日界、闰小月次序或现实效力；范围外未返回不等原卷无注。",
     "shogonji_month_headers": "若返回manuscript_month_header，须解释该月首的原读、规范化候选、疑字／错位／未见朱注及非初一限制。荘厳寺37个月首来自1992研究作者转写，27条清晰、2条带限定、8处所选栏未见注；1092仅为月长合计，不能算逐日宿曜校勘或现实样本。1346／1347七月张注与Hinoo前半星不同，但朱注无半日钟时，不能判定规则胜负；1346闰九月两重建同氐，没有裁决次序的区分力。1345正文五行为纳音，非七曜。不能用渡边敏夫正文概表补缺注或据同名宿认证古代日界。 首年1345是作者归属；附录岁首字面康永二年与作者康永四年归属不同，同栏乙酉保留，未独立核原卷或认定刊误。四月朱印在一、二日之间，作者第232页说明3判断应属初一；这与宿注假名字形疑读分开解释。",
     "six_palaces": "six_palace_reference按已确认natal_mansion本身计一，交付命/事/意/聚/同/克六个本命相对位置；未给本命则status=natal_mansion_required。不得由日宿、星期、六类相性或十二宫足表补出本命，也不得把这些位置直接当已判定七曜凌犯、六害期间或现实灾祸；读取seven_luminary_transits_evaluated和三九参断evaluated。",
-    "source_capture": "规则JSON的source_bundle_sha256与原文source_sha256分别核对；Hinoo的active_primary_evidence指向downloaded_primary_edition，交付SAT完整HTML响应指纹、选定原段及五条校记。旧cached_primary_excerpt是历史记录，其摘录哈希不等于完整响应或抄本哈希；旧末句句号与下载原文闭引号的差异明示。SAT原/甲本不合成唯一正文；完整HTML不等于字图全部取得、影印或独立学术校勘，半日钟时与规则次序仍未定。",
+    "source_capture": "来源文件在内部校验；公开结果保留书目、版本与位置。Hinoo的active_primary_evidence指向downloaded_primary_edition，交付SAT响应来源、选定原段及五条校记。旧cached_primary_excerpt是历史记录，摘录不等于完整响应或抄本；旧末句句号与下载原文闭引号的差异明示。SAT原/甲本不合成唯一正文；完整HTML不等于字图全部取得、影印或独立学术校勘，半日钟时与规则次序仍未定。",
     "special_days": "special_day_labels仍采用上卷大正主表；special_day_evidence分别交付上下卷大正和所载明本校记表，明本仅作同底本重建，不代入主表或确定事项。冒/底未归并胃/氐；下卷标签完整性为false时不能把未匹配当无此特殊日。religious_learning才匹配甘露学道/经法，不泛化为一般学习或考试。下卷月与宿合仅作历日宿名查文献，physical_lunar_conjunction_evaluated=false时不能称已观察到物理月亮合宿。unresolved_source_rules_present及conditional_rules须一并解释，不能只摘宜条。 direct_printed_comparisons另列1897年脇田文绍缩刷本下卷的直接印本参考：金刚峰土曜尾、月曜女等与大正分别保留，不能归入明本校记重建；木曜罗刹宿字未定，巨/亢仅为未接纳字形候选，不补氐或亢，不据空标签断无此特殊日。仅20项宿字已识别，尚无完整21宿字转录、全本校勘或独立人工验收。 上卷明本金刚峰火曜昴来自正文水曜经水=火校记重建，水曜壁来自正文火曜经火=水重建；这是曜位互换，不是昴/壁宿字改变，也不扩为下卷或印本同样变曜。",
     "taibai_direction_reference": "taibai_direction_reference按实际入月日查T1299下卷太白八方／地下／天上表，使用calendar.lunar_day，不能以公历日、tithi、桧尾补配宿序或实测金星替代。明本校记删去初十／二十／三十天上行，缺文不等于无太白或已获行动允许；其他行正南等措辞按原字保留。顺行／逆行与行路相对关系尚未核定，movement_alignment_evaluated=false、applied_to_activity_assessment=false；不是天文逆行或GPS方位角，不能用于覆盖既有宜忌。未知日期分支及原典时钟未定仍保留。",
     "textual_half": "Hinoo短月补配的first_half/second_half必须明确给定；已知民用钟时不自动转换。闰月与补配规则次序未明时保留现代重建候选，不擅取唯一。",
@@ -218,7 +218,7 @@
         "rulesets.calendar",
         "input_normalized"
       ],
-      "purpose": "核对望宿表捕获指纹、缺日分支及Hinoo直接下载原段、校记与历史缓存差异"
+      "purpose": "核对望宿表捕获来源、缺日分支及Hinoo直接下载原段、校记与历史缓存差异"
     },
     "special_days": {
       "fields": [
@@ -630,7 +630,7 @@
   "method_contracts": [
     {
       "comparison_requirements": [
-        "相同方法合同、实现/数据指纹、选项与实际计算层"
+        "相同方法合同、实现与数据版本、选项及实际计算层"
       ],
       "dependencies": [
         "validated_request"

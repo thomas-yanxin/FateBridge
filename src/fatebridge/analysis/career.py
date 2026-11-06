@@ -198,31 +198,24 @@ class CareerAnalysis:
         day_stem = pillars["day"][0]
         day_element = STEM_ELEMENTS[day_stem][0]
 
-        # 1. 主导十神分析
         dominant_god_analysis = CareerAnalysis._analyze_dominant_ten_gods(
             pillars, day_stem
         )
 
-        # 2. 适合行业分析
         industry_analysis = CareerAnalysis._analyze_industries(
             pillars, day_stem, day_element
         )
 
-        # 3. 事业格局
         career_structure = CareerAnalysis._analyze_career_structure(pillars, day_stem)
 
-        # 4. 创业 vs 打工倾向
         entrepreneurship = CareerAnalysis._analyze_entrepreneurship(pillars, day_stem)
 
-        # 5. 事业时机
         career_timing = CareerAnalysis._analyze_career_timing(
             pillars, day_stem, dayun_pillar, liunian_pillar
         )
 
-        # 6. 贵人方位
         noble_direction = CareerAnalysis._analyze_noble_direction(pillars, day_element)
 
-        # 7. 综合建议
         suggestions = CareerAnalysis._generate_suggestions(
             dominant_god_analysis, industry_analysis, career_structure, entrepreneurship
         )
@@ -250,7 +243,6 @@ class CareerAnalysis:
         # 排除日干自身，保留日支全部藏干；与共享十神证据同口径。
         god_counts = count_ten_gods(pillars, day_stem, skip_day_pillar=False)
 
-        # 排序取前三
         sorted_gods = sorted(god_counts.items(), key=lambda x: x[1], reverse=True)
         positive = [(god, count) for god, count in sorted_gods if count > 0]
         cutoff = positive[min(2, len(positive) - 1)][1] if positive else 0
@@ -311,7 +303,6 @@ class CareerAnalysis:
         day_element: Element,
     ) -> Dict[str, Any]:
         """分析适合的行业方向。"""
-        # 统计命局五行分布
         element_counts = count_element_distribution(pillars)
 
         # 喜用神五行
@@ -471,7 +462,6 @@ class CareerAnalysis:
         notes: List[str] = []
         rule_signals: List[Dict[str, Any]] = []
 
-        # 统计十神
         god_counts: Dict[str, float] = {}
         for e in iter_pillar_gods(pillars, day_stem, skip_day_pillar=False):
             key = e.ten_god.value

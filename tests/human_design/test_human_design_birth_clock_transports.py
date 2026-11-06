@@ -14,6 +14,7 @@ from fatebridge.cli import run
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
+from tests.fixtures.mcp_receipt import verified_inline_business
 
 SPEC = next(s for s in CATALOG if s.key == "human_design")
 
@@ -64,9 +65,8 @@ def test_confirmed_leap_birth_and_card_match_all_three_protocols(
                     "response_char_limit": 8192,
                 },
             )
-            assert (
-                not card.is_error and "result_delivery" not in card.structured_content
-            )
+            assert not card.is_error
+            await verified_inline_business(client, card.structured_content)
             assert (
                 card.structured_content["birth_clock_evidence"]
                 == expected["birth_clock_evidence"]

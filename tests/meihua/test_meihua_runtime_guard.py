@@ -35,9 +35,12 @@ def environment(monkeypatch, tmp_path):
 
 @pytest.mark.parametrize("name", ["swe_deltat.txt", "sedeltat.txt"])
 def test_deltat_inventory_changes_for_same_size_same_mtime_bytes(environment, name):
-    from fatebridge.services.replay_metadata import ephemeris_inventory
+    from fatebridge.validation.meihua_runtime_guard import _ephemeris_inventory
 
-    directory, _ = environment
+    def ephemeris_inventory():
+        return _ephemeris_inventory(state["path"])
+
+    directory, state = environment
     p = directory / name
     p.write_text("2026 100.0\n")
     stamp = p.stat()
@@ -53,7 +56,7 @@ def test_deltat_inventory_changes_for_same_size_same_mtime_bytes(environment, na
 def test_inventory_covers_native_semicolon_search_paths(
     tmp_path, monkeypatch, separator
 ):
-    from fatebridge.services.replay_metadata import _ephemeris_inventory
+    from fatebridge.validation.meihua_runtime_guard import _ephemeris_inventory
 
     a, b = tmp_path / "first", tmp_path / "second"
     a.mkdir()

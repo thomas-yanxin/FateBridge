@@ -33,11 +33,6 @@ def test_all16_component_states_keep_same_values_and_provenance(case, surface_ca
     )
     for value in [response.json(), cli, mcp.structured_content]:
         assert_clock_input(value, case, "bound_request_model_fields_set")
-    assert (
-        response.json()["run_metadata"]["input_sha256"]
-        == cli["run_metadata"]["input_sha256"]
-        == mcp.structured_content["run_metadata"]["input_sha256"]
-    )
 
 
 @pytest.mark.parametrize("minute", [True, 60, 1.5, "1"])

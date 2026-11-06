@@ -10,7 +10,6 @@ import pytest
 
 from fatebridge.application.execution import execute_tool
 from fatebridge.core.human_design import bodygraph
-from fatebridge.services.replay_metadata import digest
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
 from fatebridge.validation.human_design_official import (
@@ -152,9 +151,6 @@ def test_forged_path_or_priority_cannot_pass_even_with_a_new_business_hash(tampe
         run["bodygraph"].pop("classification_evidence")
     else:
         run["interpretation"]["authority_structure"] = "仅由21-45直接通道形成。"
-    run["run_metadata"]["business_output_sha256"] = digest(
-        {k: v for k, v in run.items() if k != "run_metadata"}
-    )
     check = verify_human_design_reading(run)
     assert check["status"] == "rejected"
     if tamper != "text":

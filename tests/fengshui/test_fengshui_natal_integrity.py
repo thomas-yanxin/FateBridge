@@ -16,7 +16,7 @@ from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services import fengshui
 from fatebridge.utils.errors import FengshuiCalculationError, handle_calculation_error
 from tests.fengshui.test_fengshui_source_comparison import request
-from tests.fengshui.test_fengshui_surfaces import rest_client
+from tests.support.transports import rest_client
 
 
 def corrupt(chart, fault):

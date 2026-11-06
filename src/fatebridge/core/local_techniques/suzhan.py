@@ -19,14 +19,13 @@ from fatebridge.utils.places import DEFAULT_BIRTH_TIMEZONE
 from .chart import (
     _build_birth_info,
     _build_local_chart_response,
-    _join_lines,
     _normalize_date_text,
     _normalize_mode,
     _normalize_time_text,
-    _render_snapshot_text,
     _split_degree,
     _su28_position,
 )
+from .snapshot import join_lines, render_snapshot_text
 
 
 def _build_suzhan_snapshot_text(
@@ -58,7 +57,7 @@ def _build_suzhan_snapshot_text(
     )
     astronomy = response.get("astronomy") or {}
     epoch_text = (
-        _join_lines(
+        join_lines(
             [
                 f"物理时刻参考标签（UTC记法）：{astronomy['utc_datetime']}",
                 "UTC标签与当地输入表示同一时刻；年编号跨界不改写出生输入。",
@@ -75,7 +74,7 @@ def _build_suzhan_snapshot_text(
     phase_text = "现代月日黄经差未计算；此模式未取得所需同次天文坐标。"
     if phase:
         tithi = phase["modern_tithi"]
-        phase_text = _join_lines(
+        phase_text = join_lines(
             [
                 f"同次TT月日视黄经差：{phase['elongation_degrees']}现代度；"
                 f"现代12度角距tithi第{tithi['index']}段（{tithi['half_zh']}分{tithi['half_tithi_index']}）。",
@@ -133,11 +132,11 @@ def _build_suzhan_snapshot_text(
             house_lines.append(f"星曜：{item.get('id')} {star_text}".strip())
         house_lines.append("")
 
-    return _render_snapshot_text(
+    return render_snapshot_text(
         [
             (
                 "起盘信息",
-                _join_lines(
+                join_lines(
                     [
                         f"日期：{input_normalized['date']} {input_normalized['time']}",
                         f"时区：{input_normalized['zone']}",
@@ -163,7 +162,7 @@ def _build_suzhan_snapshot_text(
                     )
                 )
                 + epoch_text
-                + (_join_lines(house_lines) or "无"),
+                + (join_lines(house_lines) or "无"),
             ),
             (
                 "现代月日黄经差参考",
@@ -283,11 +282,11 @@ def build_suzhan_result(
             "su28Method": "not_computed_birth_time_unknown",
             "su28AstronomicalAccuracy": "not_computed",
         }
-        snapshot = _render_snapshot_text(
+        snapshot = render_snapshot_text(
             [
                 (
                     "起盘信息",
-                    _join_lines(
+                    join_lines(
                         [
                             f"日期：{input_normalized['date']}",
                             "钟时：未知，未补造出生时刻。",

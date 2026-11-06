@@ -41,34 +41,34 @@
 
 ## 核验原始运行
 
-核验函数为 `fatebridge.validation.fengshui_reading.verify_fengshui_reading`。必须从可信执行端独立保管同次运行的完整 `run_metadata`，通过 `trusted_run_metadata` 传入；不要在被核验的文件中重新计算散列后把它当可信回执。
+核验函数为 `fatebridge.validation.fengshui_reading.verify_fengshui_reading`。必须从可信执行端独立保管同次运行的完整原结果，通过 `trusted_payload` 传入；被核验文件自身不能充当另行保管的原结果。
 
 ```python
 from fatebridge.validation.fengshui_reading import verify_fengshui_reading
 
 report = verify_fengshui_reading(
     original_full_response,
-    trusted_run_metadata=separately_retained_run_metadata,
+    trusted_payload=separately_retained_original_response,
 )
 ```
 
-它核对整份原始业务结果散列、全部回执字段、精确文字、目标路径、上下文原值、候选与段落覆盖。漏掉不利数字条件、删除另一半候选、换用新run、修改引文或追加确定预测均不能通过。压缩后的行内回执须先从同次运行的可信 manifest 恢复完整回执；不把缩略回执当完整环境，也不重算来替代原run。
+它核对整份原结果的逐值一致性、全部回执字段、精确文字、目标路径、上下文原值、候选与段落覆盖。漏掉不利数字条件、删除另一半候选、换用新run、修改引文或追加确定预测均不能通过。压缩后的行内回执须先从同次运行的可信 manifest 恢复完整回执；不把缩略回执当完整环境，也不重算来替代原run。
 
-校验器按原响应的已知释义版本核验，保留1.0.0与1.1.0原有文本合同。1.0.0不追授一般数式覆盖；1.1.0可核验原16段数式，但不追授对宫覆盖；1.2.0核验通过且确有宅盘候选时，才返回 `opposite_palace_coverage_verified=true`，并以 `opposite_palace_chart_count`记录候选数。一般数式仍以 `numeric_structure_coverage_verified`／`numeric_structure_chart_count`分开记录；缺历史盘或未知版本均不能得到相应覆盖信用。版本不是排盘请求参数；新服务输出1.2.0。修改版本、删新段落并重算待验文件的散列，不能替代独立保管的原始回执。核验旧run读取完整原响应，不用新算法重算旧请求冒充原运行。
+校验器核验当前固定释义1.2.0，不提供旧版文本兼容层。核验通过且确有宅盘候选时，才返回 `opposite_palace_coverage_verified=true`，并以 `opposite_palace_chart_count`记录候选数。一般数式以 `numeric_structure_coverage_verified`／`numeric_structure_chart_count`分开记录；缺历史盘或未知版本均不能得到相应覆盖信用。版本不是排盘请求参数。修改版本或删新段落，不能替代独立保管的原始结果；旧run的原始证据保留，不用新算法重算旧请求冒充原运行。
 
 需要核验时，首次保留完整业务结果：`fields=null`，`include_snapshot_text=true`。默认预算分页可用，但需读取同一 `result_delivery` 的完整结果。首轮已投影或删除的原始字段不能凭释义补回；缺完整业务数据时核验拒绝，而不是重新计算后冒充原run。
 
-回执相符与数式成立须分别检查。1.1.0／1.2.0的数式覆盖现在还要求派生结构与原三盘一致，涵盖逐宫求和、全局合取、父母组、地盘参照、历史运盘重叠和有限局名；1.2.0另查八个有向空间对宫及独立中宫。矛盾时增加 `numeric_structure_inconsistent` 并拒绝，`derived_numeric_consistency_verified=false`，不能因释义忠于错误派生值而取得覆盖信用。正常且有候选时该标记为true；1.0.0不追授数式检查，也不要求旧1.1.0包含后来新增的对宫分支。原始响应、实际原文和回执不改写，这仍不是任意自由文本、所选规则原典正确性或预测效力的认证。
+原结果相符与数式成立须分别检查。数式覆盖要求派生结构与原三盘一致，涵盖逐宫求和、全局合取、父母组、地盘参照、历史运盘重叠、有限局名，以及八个有向空间对宫和独立中宫。矛盾时增加 `numeric_structure_inconsistent` 并拒绝，`derived_numeric_consistency_verified=false`，不能因释义忠于错误派生值而取得覆盖信用。正常且有候选时该标记为true。原始响应与实际原文不改写，这仍不是任意自由文本、所选规则原典正确性或预测效力的认证。
 
 仓库审计命令：
 
 ```bash
 uv run --locked --extra dev python -m scripts.fengshui.audit_fengshui_reading \
   --payload original-full-response.json \
-  --trusted-receipt separately-retained-run-metadata.json
+  --trusted-payload separately-retained-original-response.json
 ```
 
-`--payload` 也接受同次结果存储文件的 `payload` 对象包装。退出0只表示 `verified_served_fixed_reading`；不重新计算或独立证明底层算式正确，也不认证任意自由改写、输入事实真实性、原典全本或现实预测，报告中的相关标记始终为false。回执来源的真实性仍由调用方负责；散列比较不是数字签名。
+`--payload` 也接受同次结果存储文件的 `payload` 对象包装。退出0只表示 `verified_served_fixed_reading`；不重新计算或独立证明底层算式正确，也不认证任意自由改写、输入事实真实性、原典全本或现实预测，报告中的相关标记始终为false。回执来源的真实性仍由调用方负责；逐值一致性不认证自行提交的原结果。
 
 咨询可以引用这些计算依据，再分开给传统含义和现实建议。额外自由生成的段落不能借用固定释义的核验状态，新增现实建议也不能冒称来自某个星数或作者原句。
 
@@ -82,7 +82,7 @@ uv run --locked --extra dev python -m scripts.fengshui.audit_fengshui_reading \
 
 显式选择 `shen_2011_host_guest_v1@1.0.0` 后，固定释义1.2.0增加每候选八段盘层关系和两段原文对照，见[主客来源及差异](../../../docs/fengshui.md)。独立校验先核原三盘、方向、主客角色、实际星数、五行定义及固定比较基准，再核回执与模板；同五行换星数和逐例换比较对象也不能通过。错误记录 `host_guest_inconsistent`，不会因为正文忠于错误数据而获得覆盖。
 
-`host_guest_relation_count`为实际核对关系数，`host_guest_coverage_verified`还要求1.2.0的关系文本完整。`host_guest_literal_source_matches`、`host_guest_literal_source_differences`、`host_guest_ambiguous_source_roles`单列原文槽状态；出现真实来源差异并不等同内部计算错误，前者完整保留后仍可交付，不能因此把全书符合标为true。旧响应不含该层时计数为零，旧1.0／1.1不追授新文本覆盖。
+`host_guest_relation_count`为实际核对关系数，`host_guest_coverage_verified`还要求1.2.0的关系文本完整。`host_guest_literal_source_matches`、`host_guest_literal_source_differences`、`host_guest_ambiguous_source_roles`单列原文槽状态；出现真实来源差异并不等同内部计算错误，前者完整保留后仍可交付，不能因此把全书符合标为true。旧响应不含该层时计数为零，旧版文本不在当前校验范围内。
 
 ## 新运行的原书数表分支
 

@@ -1,6 +1,5 @@
 """Adapter between measured scenes and the existing shared domain algorithms."""
 
-import hashlib
 import json
 from dataclasses import dataclass
 
@@ -215,12 +214,7 @@ def prepare_spatial_request(
                 relationships.append(
                     EntryBarrier(
                         ruleset_id="afsi_entry_barrier_v1",
-                        relation_id="spatial:"
-                        + hashlib.sha256(
-                            json.dumps(
-                                [seat.desk_id, barrier.object_id], ensure_ascii=False
-                            ).encode()
-                        ).hexdigest(),
+                        relation_id=f"spatial:{len(relationships)}",
                         entrance_id=entry.object_id,
                         desk_id=seat.desk_id,
                         barrier_id=barrier.object_id,

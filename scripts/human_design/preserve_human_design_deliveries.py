@@ -61,7 +61,7 @@ def preserve_delivery(
         "journal_index": index,
         "file": target.name,
         "file_sha256": hashlib.sha256(raw).hexdigest(),
-        "full_business_hash_verified": "complete" in binding,
+        "unprojected_request_result": "complete" in binding,
         "full_result_requested": full_requested,
         "model_visibility_certified": False,
     }

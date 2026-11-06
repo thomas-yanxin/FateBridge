@@ -192,7 +192,6 @@ def _read_chain(reply):
     while True:
         page = RESULT_STORE.verified_page(
             ref["result_id"],
-            ref["sha256"],
             reply["run_metadata"]["run_id"],
             offset=offset,
             path="ziwei_horoscope.natal_prerequisites",

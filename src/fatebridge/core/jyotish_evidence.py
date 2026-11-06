@@ -113,7 +113,6 @@ def strength_context(
         "nature_context": ("moon_options", "mercury_options", "mercury_status"),
         "source_witness": (
             "status",
-            "sha256",
             "complete_single_original_accepted",
         ),
         "solar_context": (

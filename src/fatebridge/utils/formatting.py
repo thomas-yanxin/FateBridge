@@ -1,10 +1,8 @@
-"""Shared response text, pillar representation and JSON/error formatting."""
+"""Shared response text, pillar representation and JSON formatting."""
 
 import json
 from datetime import datetime
 from typing import Any, Dict, Optional, Tuple
-
-from fatebridge.utils.errors import error_response_payload
 
 
 def format_birth_datetime_display(
@@ -57,61 +55,20 @@ def create_pillar_dict(
     }
 
 
-def _prepare_json_response_payload(
-    data: Dict[str, Any],
-    *,
-    include_snapshot_text: bool,
-) -> Dict[str, Any]:
-    if include_snapshot_text or "snapshot_text" not in data:
-        return data
-
-    payload = dict(data)
-    payload.pop("snapshot_text", None)
-    return payload
-
-
 def format_json_response(
     data: Dict[str, Any],
     *,
     compact: bool = True,
-    include_snapshot_text: bool = True,
 ) -> str:
     """统一的JSON格式化函数
 
     Args:
         data: 要格式化的数据字典
         compact: 是否输出紧凑 JSON
-        include_snapshot_text: 是否保留 snapshot_text 字段
 
     Returns:
         格式化的JSON字符串
     """
-    payload = _prepare_json_response_payload(
-        data,
-        include_snapshot_text=include_snapshot_text,
-    )
     if compact:
-        return json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
-    return json.dumps(payload, ensure_ascii=False, indent=2)
-
-
-def format_error_response(
-    data: Dict[str, Any],
-    operation: str,
-    *,
-    compact: bool = True,
-) -> str:
-    """格式化错误响应
-
-    Args:
-        data: 包含错误信息的字典
-        operation: 操作名称
-
-    Returns:
-        格式化的错误信息字符串
-    """
-    if "error" in data:
-        return format_json_response(
-            error_response_payload(data, operation), compact=compact
-        )
-    return ""
+        return json.dumps(data, ensure_ascii=False, separators=(",", ":"))
+    return json.dumps(data, ensure_ascii=False, indent=2)

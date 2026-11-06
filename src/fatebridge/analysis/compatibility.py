@@ -88,7 +88,6 @@ class AdvancedCompatibility:
             "summary": "",
         }
 
-        # 提取四柱信息
         pillars1 = {
             k: (v["stem"], v["branch"]) for k, v in analysis1["four_pillars"].items()
         }
@@ -96,45 +95,34 @@ class AdvancedCompatibility:
             k: (v["stem"], v["branch"]) for k, v in analysis2["four_pillars"].items()
         }
 
-        # 定义各维度权重（总计100%）
         weights = AdvancedCompatibility._get_dimension_weights(relationship_type)
 
-        # 各项权重统一读取上方关系类型表，避免注释中的固定百分比误导。
-        # 1. 五行平衡分析
         element_analysis = AdvancedCompatibility._analyze_element_balance(
             analysis1, analysis2
         )
         result["detailed_analysis"]["element_balance"] = element_analysis
 
-        # 2. 喜用神互助分析
         favorable_analysis = AdvancedCompatibility._analyze_favorable_synergy(
             analysis1, analysis2
         )
         result["detailed_analysis"]["favorable_synergy"] = favorable_analysis
 
-        # 3. 十神关系分析
         ten_gods_analysis = AdvancedCompatibility._analyze_ten_gods_relationship(
             analysis1, analysis2, relationship_type
         )
         result["detailed_analysis"]["ten_gods_relationship"] = ten_gods_analysis
 
-        # 4. 格局配合分析
         pattern_analysis = AdvancedCompatibility._analyze_pattern_synergy(
             analysis1, analysis2
         )
         result["detailed_analysis"]["pattern_synergy"] = pattern_analysis
 
-        # 5. 传统刑冲克害分析
-        # 使用新的规则计算传统分析分数
-        # 由于calculate_compatibility_score可能还没有更新，我们手动计算
         traditional_score = 50.0  # 基础分
         details = []
 
-        # 提取地支
         branches1 = [branch for _, branch in pillars1.values()]
         branches2 = [branch for _, branch in pillars2.values()]
 
-        # 检查六冲
         for b1 in branches1:
             for b2 in branches2:
                 for clash_pair in BaZiRules.SIX_CLASH:
@@ -142,7 +130,6 @@ class AdvancedCompatibility:
                         traditional_score -= 2
                         details.append(f"{b1}与{b2}六冲")
 
-        # 检查六害
         for b1 in branches1:
             for b2 in branches2:
                 for harm_pair in BaZiRules.SIX_HARM:
@@ -150,7 +137,6 @@ class AdvancedCompatibility:
                         traditional_score -= 2
                         details.append(f"{b1}与{b2}六害")
 
-        # 检查三刑
         # 这是一个合盘（cross-chart）三刑检查：只有当三刑所需的地支
         # 至少在两人命盘中各贡献一支时才算“合盘构成”，
         # 避免某一方自身已具三刑时被重复记入合盘惩罚分。
@@ -175,8 +161,6 @@ class AdvancedCompatibility:
         traditional_analysis = {
             # traditional_deviation 是相对于 50 分基准的偏移量 (-/+)，
             # normalized_score 则是 clip 到 [0, 100] 的传统分析项权重分。
-            # 旧字段 "overall_score" 命名会与外层结果里的全局 overall_score
-            # 混淆，按语义改名。
             "traditional_deviation": (traditional_score - 50) / 10,
             "normalized_score": normalized_traditional_score,
             "details": details,
@@ -269,13 +253,11 @@ class AdvancedCompatibility:
             )
         )
 
-        # 6. 根据关系类型调整分析重点
         relationship_adjustment = AdvancedCompatibility._adjust_for_relationship_type(
             relationship_type
         )
         result["recommendations"].extend(relationship_adjustment["recommendations"])
 
-        # 7. 生成综合评价
         result = AdvancedCompatibility._generate_comprehensive_summary(result)
 
         return result

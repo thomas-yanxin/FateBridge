@@ -105,6 +105,6 @@ def test_same_grid_calculation_has_distinct_input_precision_identity(spec, case,
         results.append(response.json())
     assert results[0]["birth_time_sensitivity"] == results[1]["birth_time_sensitivity"]
     assert (
-        results[0]["run_metadata"]["input_sha256"]
-        != results[1]["run_metadata"]["input_sha256"]
+        results[0]["calendar_context"]["birth_time_input"]
+        != results[1]["calendar_context"]["birth_time_input"]
     )

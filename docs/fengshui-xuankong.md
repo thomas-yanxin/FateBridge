@@ -58,7 +58,7 @@ MCP `fengshui_xuankong_natal` 的参数就是上面 JSON 对象。认证设置�
 
 事件有效年与宅运分别读取：立春保护区内 `effective_event_year=null`，候选年和暂取年单列；若全部候选年同运，宅盘仍可complete而年份保持待确认。跨运时无唯一宅盘，`timing.candidate_period_intervals` 保留候选历史运区间，见字段与示例。
 
-公开1800–2199事件年所需的完整运区间端点可落在1784–2204。风水层在原打包模型范围外，按既定选择启用独立[历史DE440轨道扩展](fengshui.md)，逐端点保留实际模型及资料散列；公开输入范围不扩大。选定模型无法求根时返回错误；边界候选保护不替代1秒TT验收。
+公开1800–2199事件年所需的完整运区间端点可落在1784–2204。风水层在原打包模型范围外，按既定选择启用独立[历史DE440轨道扩展](fengshui.md)，逐端点保留实际模型及资料版本；公开输入范围不扩大。选定模型无法求根时返回错误；边界候选保护不替代1秒TT验收。
 
 宅向误差在 `house.bearing_uncertainty_degrees` 提供，玄空上限为7.5°。同一测量在合参八宅层也保留支持坐卦，参见[共享误差与布局候选](../skills/onda-fengshui/references/house-bearing-uncertainty.md)。
 
@@ -177,7 +177,7 @@ MCP 使用同一文件中的 JSON 调用 `fengshui_assess`。读取字段、状�
 
 已有 `interpretation` 请求默认在顶层返回 `calculation_reading`，可用 `"include_calculation_reading": false` 关闭。每句保留精确目标路径与父候选、历史宅运、评价运、条件和来源，已请求的王氏时令、固定零正及城门分别解释；非当令、照片、未知和未覆盖不互相混用。
 
-校验器要求完整原始响应及从可信执行端独立保管的同次完整回执，核对业务散列、回执、文字和上下文。它不验证任意模型改写或现实预测。字段、分页回读与命令见[固定释义参考](../skills/onda-fengshui/references/calculation-reading.md)。
+校验器要求完整原始响应及从可信执行端独立保管的同次完整原结果，逐值核对业务事实、回执、文字和上下文。它不验证任意模型改写或现实预测。字段、分页回读与命令见[固定释义参考](../skills/onda-fengshui/references/calculation-reading.md)。
 
 ## 逐候选的原书数表证据
 

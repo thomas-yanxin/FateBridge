@@ -20,7 +20,6 @@ from fatebridge.core.human_design_cycles import (
     cycle_summary,
     summary_conventions,
 )
-from fatebridge.services.replay_metadata import digest
 from fatebridge.validation.human_design import verify_human_design_reading
 from tests.support.human_design_current import complete_run
 
@@ -49,9 +48,6 @@ def rich_current_run(mode="files", *, card=False):
     context.pop("summary_format", None)
     context.pop("summary_conventions", None)
     result["cycle_summary"] = _cycle_summary_facts(context, result["profile"])
-    result["run_metadata"]["business_output_sha256"] = digest(
-        {k: v for k, v in result.items() if k != "run_metadata"}
-    )
     if card:
         card = {
             k: result[k]
@@ -79,9 +75,6 @@ def converted(value):
         context["source_evidence"], context["reference_ordering"]
     )
     p["cycle_summary"] = cycle_summary(context, p["profile"])
-    p["run_metadata"]["business_output_sha256"] = digest(
-        {k: v for k, v in p.items() if k != "run_metadata"}
-    )
     return p
 
 
@@ -225,9 +218,6 @@ def test_rehashed_full_result_cannot_forge_compact_facts(fault):
         p["cycle_context"].pop("summary_format")
     else:
         p["cycle_context"]["summary_format"] = "unknown"
-    p["run_metadata"]["business_output_sha256"] = digest(
-        {k: v for k, v in p.items() if k != "run_metadata"}
-    )
     assert verify_human_design_reading(p)["status"] == "rejected"
 
 

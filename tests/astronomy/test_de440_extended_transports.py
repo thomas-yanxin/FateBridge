@@ -8,8 +8,7 @@ from fatebridge.application import result_delivery as delivery
 from tests.astronomy.test_de440_extended import BASE, NEW, OLD, refuse_profile
 from tests.evaluation import test_agentic_nested_outputs as adapters
 from tests.liuyao.test_liuyao_clash_transports import all_surfaces
-from tests.liuyao.test_liuyao_transports import assert_same_run_receipt
-from tests.support.result_delivery import reconstruct
+from tests.support.result_delivery import assert_same_run_receipt, reconstruct
 from tests.support.transports import AS_OF, SPECS
 
 rest = adapters.rest

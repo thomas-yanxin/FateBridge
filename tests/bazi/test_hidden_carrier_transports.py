@@ -138,7 +138,6 @@ def test_snapshot_uses_same_receipt_and_full_cover_claim_is_rejected(rest):
         path="bazi_birth.structure_profile.evidence_chain.natal_hidden_carriers.pillars.1.targets.0.covering_candidate_if_target_desired",
         value=False,
         run_id=run["run_id"],
-        business_output_sha256=run["business_output_sha256"],
     )
     assert (
         verify_calculation_claims(result, [claim])["status"]

@@ -12,6 +12,9 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Any, Dict, Iterator, Optional, Tuple
 
+from pydantic import JsonValue
+
+from fatebridge.core.public_output import public_payload
 from fatebridge.utils.errors import ParameterError
 from fatebridge.utils.private_files import (
     default_result_directory,
@@ -233,7 +236,7 @@ class ResultStore:
         encoded = text.encode("utf-8")
         prefix = ('{"expires_at":' + _json(expires_at) + ',"payload":').encode()
         metadata = {
-            "format": 1,
+            "format": 2,
             "expires_at": expires_at,
             "body_offset": len(prefix),
             "total_chars": len(text),
@@ -286,7 +289,7 @@ class ResultStore:
             else published_directory / f"{result_id}.meta"
         )
         metadata = self._read_json(sidecar)
-        if metadata.get("format") != 1:
+        if metadata.get("format") != 2:
             raise _invalid("结果引用格式不受支持", "result_id", "result_unavailable")
         self._check_expiry(
             result_id, metadata, remove_expired=published_directory is None
@@ -304,6 +307,7 @@ class ResultStore:
         return metadata
 
     def put(self, payload: Dict[str, Any]) -> Dict[str, Any]:
+        payload = public_payload(payload)
         result_id = secrets.token_hex(24)
         expires_at = time.time() + RETENTION_SECONDS
         with self._locked():
@@ -311,7 +315,6 @@ class ResultStore:
         return {
             "mode": "paged",
             "result_id": result_id,
-            "sha256": metadata["sha256"],
             "total_chars": metadata["total_chars"],
             "total_bytes": metadata["total_bytes"],
             "expires_at": expires_at,
@@ -333,7 +336,6 @@ class ResultStore:
     def verified_page(
         self,
         result_id: str,
-        expected_sha256: str,
         expected_run_id: str,
         offset: int = 0,
         path: Optional[str] = None,
@@ -342,17 +344,14 @@ class ResultStore:
     ) -> Dict[str, Any]:
         """Verify the entire retained payload, then read a bounded part of it.
 
-        The caller supplies the digest and original run ID from its receipt.
+        The caller supplies the original run ID from its receipt. The stored
+        checksum stays private and detects corruption against the manifest.
         Verification and selection use one immutable payload snapshot, without
         recalculation or trusting a field-sidecar digest. Concurrent pruning may
         make a result unavailable; mismatched snapshots never gain verification.
         This does not attest that a consumer has
         read every page or understood the returned business facts.
         """
-        if not re.fullmatch(r"[0-9a-f]{64}", expected_sha256):
-            raise _invalid(
-                "需要原回执的完整 SHA-256", "expected_sha256", "invalid_digest"
-            )
         if not re.fullmatch(r"[A-Za-z0-9_-]{1,128}", expected_run_id):
             raise _invalid("需要原回执的 run_id", "expected_run_id", "invalid_run_id")
         if offset < 0:
@@ -366,9 +365,9 @@ class ResultStore:
         payload = self._record(result_id, published_directory=directory)["payload"]
         encoded = _json(payload).encode("utf-8")
         actual_digest = hashlib.sha256(encoded).hexdigest()
-        if actual_digest != expected_sha256 or actual_digest != metadata["sha256"]:
+        if actual_digest != metadata["sha256"]:
             raise _invalid(
-                "原结果散列核验失败", "expected_sha256", "result_digest_mismatch"
+                "原结果完整性核验失败", "result_id", "result_digest_mismatch"
             )
         run = payload.get("run_metadata") or {}
         if not isinstance(run, dict) or run.get("run_id") != expected_run_id:
@@ -410,12 +409,10 @@ class ResultStore:
             "offset": offset,
             "next_offset": end if end < len(text) else None,
             "total_chars": len(text),
-            "sha256": hashlib.sha256(text.encode("utf-8")).hexdigest(),
             "text": text[offset:end],
             "verification": {
-                "method": "retained_payload_sha256_v1",
+                "method": "retained_payload_integrity_v2",
                 "scope": "entire_retained_payload",
-                "payload_sha256": actual_digest,
                 "run_id": run["run_id"],
                 "tool_name": run.get("tool_name"),
                 "serialization": 'UTF-8 json.dumps(ensure_ascii=False,separators=(",",":")); insertion order',
@@ -435,7 +432,6 @@ class ResultStore:
             "run_metadata": metadata["run_metadata"],
             "file_path": str(self._path(result_id)),
             "rest_manifest_path": f"/api/results/{result_id}",
-            "sha256": metadata["sha256"],
             "first_page_uri": f"fatebridge://results/{result_id}/pages/0",
             "total_chars": metadata["total_chars"],
             "total_bytes": metadata["total_bytes"],
@@ -451,7 +447,7 @@ class ResultStore:
             ],
             "note": (
                 "按所需点路径读取字段，也支持数组数字索引；分页 text 是 JSON 文档片段，"
-                "完整读取需按 next_offset 拼接并核对 sha256，不要把单页当全文解析。"
+                "完整读取需按 next_offset 拼接；核验读取同时检查原 run 与存储完整性。"
             ),
         }
 
@@ -581,7 +577,6 @@ class ResultStore:
                 f"{uri_base}/{next_offset}" if next_offset is not None else None
             ),
             "total_chars": total,
-            "sha256": metadata["sha256"],
             "text": text,
         }
 
@@ -598,6 +593,7 @@ def bound_response(
     payload: Dict[str, Any], response_char_limit: int = 0, *, compact: bool = True
 ) -> Dict[str, Any]:
     """Return either an intact payload or an explicit lossless delivery envelope."""
+    payload = public_payload(payload)
     if response_char_limit == 0:
         return payload
     if not 4096 <= response_char_limit <= 65536:
@@ -617,14 +613,11 @@ def bound_response(
     if isinstance(metadata, dict):
         evidence = metadata.get("calculation_evidence")
         if isinstance(evidence, dict) and len(_json(evidence, compact)) > 512:
-            from fatebridge.utils.json_digest import digest
-
             path = "run_metadata.calculation_evidence"
             metadata = {
                 **metadata,
                 "calculation_evidence": {
                     "delivery_path": path,
-                    "sha256": digest(evidence),
                     "coverage": evidence.get("coverage"),
                 },
             }
@@ -635,17 +628,14 @@ def bound_response(
         if (
             isinstance(runtime, dict)
             and isinstance(ephemeris, dict)
-            and isinstance(files, dict)
+            and isinstance(files, list)
             and len(_json(runtime, compact)) > 512
         ):
             path = "run_metadata.runtime"
-            runtime_summary = {
+            runtime_summary: dict[str, JsonValue] = {
                 "delivery_path": path,
                 "ephemeris_files_count": len(files),
-                "ephemeris_inventory_sha256": ephemeris.get("sha256"),
             }
-            if "environment_sha256" in runtime:
-                runtime_summary["environment_sha256"] = runtime["environment_sha256"]
             metadata = {**metadata, "runtime": runtime_summary}
             deferred_metadata.append(path)
     output: Dict[str, Any] = {
@@ -656,7 +646,7 @@ def bound_response(
     delivery["deferred_fields"] = [*fields, *deferred_metadata]
     # Optional duplicate reference details need not displace a complete
     # first business response. They remain available in this SAME manifest;
-    # identity, hashes, expiry and page URIs remain inline. Large business
+    # identity, expiry and page URIs remain inline. Large business
     # results retain the full existing reference and normal pagination.
     if deferred_metadata and isinstance(metadata, dict):
         complete_with_full_reference = {
@@ -691,7 +681,7 @@ def bound_response(
             return complete_business
         # The first-page URI repeats the manifest URI plus '/pages/0'. Before
         # deferring any receipt facts, let the same manifest supply this one
-        # duplicate locator. Its result ID, hash, expiry and file access remain
+        # duplicate locator. Its result ID, expiry and file access remain
         # inline, and the immutable artifact still retains the complete receipt.
         manifest_page_reference = dict(compact_reference)
         manifest_page_reference.pop("first_page_uri", None)
@@ -704,7 +694,7 @@ def bound_response(
         # Local file locators also duplicate the same immutable manifest. A
         # longer provenance list should not displace source facts while these
         # optional duplicate locators still occupy the response budget. Keep
-        # the manifest URI, result identity/hash, expiry and total characters;
+        # the manifest URI, result identity, expiry and total characters;
         # the manifest retains the exact file path and payload key.
         manifest_only_reference = dict(manifest_page_reference)
         manifest_only_reference.pop("file_path", None)
@@ -716,8 +706,7 @@ def bound_response(
         if len(_json(complete_with_manifest_locator, compact)) <= response_char_limit:
             return complete_with_manifest_locator
         # A larger analysis can still fit when supplementary receipt details
-        # stay in the same immutable artifact. Keep identities, content hashes
-        # and the runtime inventory fingerprint inline; never remove facts or
+        # stay in the same immutable artifact. Keep run identities and the runtime inventory count inline; never remove facts or
         # manufacture a smaller original receipt to make the budget pass.
         receipt = dict(metadata)
         receipt_paths = list(deferred_metadata)
@@ -738,7 +727,7 @@ def bound_response(
                 return candidate
         # If complete business plus the essential receipt cannot fit, keep
         # the receipt and explicitly page business from the same artifact.
-        # Never hide identities/hashes or the runtime fingerprint behind a
+        # Never hide run identities behind a
         # root run_metadata reference merely to keep more business inline.
         # For paging, retain supplementary receipt details whenever they fit;
         # defer those details only if the receipt itself exceeds the budget.
@@ -770,15 +759,16 @@ def bound_response(
             continue
         candidate = dict(output)
         candidate[key] = payload[key]
-        candidate["result_delivery"] = {
+        next_delivery = {
             **delivery,
             "deferred_fields": [
                 name for name in delivery["deferred_fields"] if name != key
             ],
         }
+        candidate["result_delivery"] = next_delivery
         if len(_json(candidate, compact)) <= response_char_limit:
             output = candidate
-            delivery = output["result_delivery"]
+            delivery = next_delivery
     # A projected first_view is already the caller's current-period card.
     # When one large child prevents that whole card from fitting, retain its
     # other exact children and declare each deferred child separately. The

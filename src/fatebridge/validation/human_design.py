@@ -17,11 +17,14 @@ from fatebridge.core.human_design_mechanics import (
     opposite_activation,
 )
 from fatebridge.core.human_design_references import coherent_human_design_references
+from fatebridge.core.human_design_solar_root_validation import verify_solar_root_context
 from fatebridge.core.human_design_variables import variables_from_activations
+from fatebridge.core.public_output import public_payload
+from fatebridge.core.public_output import same_public_value as _same_value
 from fatebridge.utils.errors import EphemerisSourceError
+from fatebridge.utils.json_values import same_value
 from fatebridge.validation.claims import (
     CalculationClaim,
-    _same_value,
     verify_calculation_claims,
 )
 from fatebridge.validation.human_design_apparent_positions import (
@@ -44,7 +47,6 @@ from fatebridge.validation.human_design_profile_partition import (
 )
 from fatebridge.validation.human_design_provenance import verify_selected_provenance
 from fatebridge.validation.human_design_sampling import verify_sampled_interval
-from fatebridge.validation.human_design_solar_root import verify_solar_root_context
 
 
 def verify_human_design_reading(payload: dict[str, Any]) -> dict[str, Any]:
@@ -65,6 +67,13 @@ def verify_human_design_reading(payload: dict[str, Any]) -> dict[str, Any]:
 
 def _verify_human_design_reading(payload: dict[str, Any]) -> dict[str, Any]:
     errors: list[dict[str, str]] = []
+    metadata = payload.get("run_metadata")
+    if (
+        isinstance(metadata, dict)
+        and metadata.get("metadata_schema_version") == "2.0"
+        and not same_value(payload, public_payload(payload))
+    ):
+        errors.append({"code": "internal_integrity_fields_not_public"})
     checked = 0
     checked_snapshots = 0
     checked_provenance = 0
@@ -127,7 +136,6 @@ def _verify_human_design_reading(payload: dict[str, Any]) -> dict[str, Any]:
                 path=basis["path"],
                 value=basis["value"],
                 run_id=receipt["run_id"],
-                business_output_sha256=receipt["business_output_sha256"],
             )
             for statement in statements
             for basis in statement["basis"]
@@ -143,7 +151,6 @@ def _verify_human_design_reading(payload: dict[str, Any]) -> dict[str, Any]:
                 path=b["path"],
                 value=b["value"],
                 run_id=receipt["run_id"],
-                business_output_sha256=receipt["business_output_sha256"],
             )
             for b in context_bindings
         )
@@ -152,7 +159,6 @@ def _verify_human_design_reading(payload: dict[str, Any]) -> dict[str, Any]:
                 path=b["path"],
                 value=b["value"],
                 run_id=receipt["run_id"],
-                business_output_sha256=receipt["business_output_sha256"],
             )
             for b in actual_interpretation["apparent_position_context"]["basis"]
         )
@@ -161,7 +167,6 @@ def _verify_human_design_reading(payload: dict[str, Any]) -> dict[str, Any]:
                 path=b["path"],
                 value=b["value"],
                 run_id=receipt["run_id"],
-                business_output_sha256=receipt["business_output_sha256"],
             )
             for b in (
                 payload["profile_partition_context"]["basis"]

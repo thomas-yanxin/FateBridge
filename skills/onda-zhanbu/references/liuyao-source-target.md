@@ -16,6 +16,6 @@
 
 当前合同若提供 `generation_conditions.focus.source_condition_match/source_status/source_condition_path`，它们与同一位置的生源记录相连，可和原有 `target_reception_condition/target_status` 一起读取。`source_explanation/target_explanation` 分别转述这两项实际资格；摘要会明确写出已核向外生扶受阻，不能再省略成只有“另有克制、全局待审”。字段尚未提供的旧版本继续读原 `sources`，缺少新字段不等于资格为假。该焦点对象仅适用已明确的可见本爻；变爻、伏神或日月主体返回空时，转读其对应条件，不借原爻焦点代替。
 
-遇 `result_delivery`，先使用原回执直接给出的 `manifest_uri`、字段资源或 `file_path`；不能遍历临时目录后按修改时间挑“最新结果”。本地读取时核对原 `run_id`，将外层记录的 `payload` 以 `ensure_ascii=False,separators=(",", ":")` 序列化，验证完整payload的原 `sha256`，再提取实际需要的字段。外层文件散列和选出字段的散列不能替代完整payload核验；不重新调用计算来取全文。完整读取方法见[引擎交付](../../_shared/fatebridge-engine.md)。
+遇 `result_delivery`，先使用原回执直接给出的 `manifest_uri`、字段资源或 `file_path`；不能遍历临时目录后按修改时间挑“最新结果”。需要核验时使用同run引擎读取接口，传入原结果ID和run ID，由内部清单核对存储完整性；再提取实际所需字段，不重算取全文。完整读取方法见[引擎交付](../../_shared/fatebridge-engine.md)。
 
 交付用日常语言说清这些已读事实。字段检查是取证方法，不要求把整份Schema贴给用户；总效力未裁定继续保留，不把局部门槛匹配改写为现实成败。

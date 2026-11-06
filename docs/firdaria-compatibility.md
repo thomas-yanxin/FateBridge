@@ -17,7 +17,7 @@
 
 两项可独立选择，夜盘顺序选项不改变日盘顺序。它们在共用的 `WesternTimingRequest` 家族中公开，顺序和年长算法只用于综合时运中的法达层及独立法达工具；其他独立技法忽略这两项。公历模式还按 `ZoneInfo` 解释本次出生／分析民用钟时：若与旧解析的未来夏令时偏移不同，综合工具的其他技法也按同一修正后的瞬间计算，保持本次查询的钟时一致，技法自身算法不变。默认模式的时区路径不变。非法枚举在三端均被公开请求模型拒绝。
 
-默认组合（包括显式传入两个默认值）不增加业务字段，以保留已有完整结果、快照和业务哈希。任一选项非默认时，法达对象增加 `calculation_options`，记录 `night_order/year_basis/subperiod_basis/timezone`。公历周年模式的每段大运还增加 `nominal_start_age/nominal_end_age`，大小运均增加 `start_display/end_display`；精确 `start/end` 始终参与计算。`analysis_context.age_years` 是其他西占技法共用的固定年年龄，不随法达口径改变；法达周年边界以 `nominal_*_age` 为准。
+默认组合（包括显式传入两个默认值）不增加业务字段，以保留已有完整结果与快照的业务内容。任一选项非默认时，法达对象增加 `calculation_options`，记录 `night_order/year_basis/subperiod_basis/timezone`。公历周年模式的每段大运还增加 `nominal_start_age/nominal_end_age`，大小运均增加 `start_display/end_display`；精确 `start/end` 始终参与计算。`analysis_context.age_years` 是其他西占技法共用的固定年年龄，不随法达口径改变；法达周年边界以 `nominal_*_age` 为准。
 
 REST 请求体与 MCP `firdaria` 参数使用相同字段，例如（地点明确为测试假设）：
 

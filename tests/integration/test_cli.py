@@ -36,10 +36,8 @@ def test_missing_required_flag_emits_json_on_stdout(capsys):
 
 def test_result_is_error_honors_error_is_fatal():
     base = next(s for s in CATALOG if s.rest_path == "/api/cn/bazi/wealth")
-    # Default: "error" key marks an error.
     assert result_is_error(base, {"error": "x"}) is True
     assert result_is_error(base, {"ok": 1}) is False
-    # error_is_fatal override is honored uniformly (the contract REST already used).
     lenient = ToolSpec(
         key="t",
         bind=base.bind,
@@ -101,7 +99,6 @@ def test_cli_fields_projection_trims_payload(capsys):
     out = capsys.readouterr().out
     payload = json.loads(out)
     assert code == 0
-    # Only the requested key survives; run_metadata is always preserved.
     assert set(payload) <= {"analysis_type", "run_metadata"}
     assert payload["analysis_type"] == "八字正缘桃花分析"
     assert "romance_analysis" not in payload
@@ -128,7 +125,6 @@ def test_cli_fields_dotted_subpath_prunes_block(capsys):
     out = capsys.readouterr().out
     payload = json.loads(out)
     assert code == 0
-    # The heavy bazi_birth block is pruned to just the requested sub-key.
     assert set(payload) <= {"bazi_birth", "run_metadata"}
     assert set(payload["bazi_birth"]) == {"day_master"}
     assert "element" in payload["bazi_birth"]["day_master"]
@@ -153,13 +149,11 @@ def test_describe_flat_tool_emits_schema_and_example(capsys):
     assert info["tool"] == "bazi_wealth"
     assert info["surfaces"]["cli"] is True
     assert info["surfaces"]["rest_path"] == "/api/cn/bazi/wealth"
-    # birth_year is a required int parameter with a flag and description.
     by = next(p for p in info["parameters"] if p["name"] == "birth_year")
     assert by["required"] is True
     assert by["type"] == "int"
     assert by["flag"] == "--birth-year"
     assert by["description"]
-    # A runnable example is offered for CLI-safe tools.
     assert info["cli_example"].startswith("fatebridge bazi_wealth")
     assert "--birth-year" in info["cli_example"]
 
@@ -217,7 +211,7 @@ def test_cli_validation_error_returns_nonzero(capsys):
 
 
 def test_cli_invalid_input_renders_clean_error_shape(capsys):
-    # M2: bad input renders the same generic, structured error shape REST/MCP
+    # Bad input renders the same generic, structured error shape REST/MCP
     # use (status_code 400, validation_error) instead of a raw exception string.
     code = run(
         [
@@ -253,11 +247,9 @@ def _bool_flag_parser():
 
 
 def test_bool_flag_accepts_bare_negated_and_explicit_values():
-    # Bare switch, the stdlib --no- negation, and explicit true/false (both
-    # space-separated and =value) all resolve to the right boolean.
     parser = _bool_flag_parser()
-    assert parser.parse_args([]).flag is False  # default when absent
-    assert parser.parse_args(["--flag"]).flag is True  # bare switch
+    assert parser.parse_args([]).flag is False
+    assert parser.parse_args(["--flag"]).flag is True
     assert parser.parse_args(["--flag", "true"]).flag is True
     assert parser.parse_args(["--flag", "false"]).flag is False
     assert parser.parse_args(["--flag=false"]).flag is False
@@ -266,8 +258,6 @@ def test_bool_flag_accepts_bare_negated_and_explicit_values():
 
 
 def test_cli_bool_flag_explicit_value_runs(capsys):
-    # The exact form the original feedback tried (`--flag true`) now works
-    # instead of dying with `unrecognized arguments: true`.
     code = run(
         [
             "bazi_birth",
@@ -398,7 +388,6 @@ def test_cli_flag_overrides_subject_file(tmp_path, capsys):
             }
         ),
     )
-    # Explicit --birth-year must win over the file's 1988.
     code = run(["bazi_birth", "--subject-file", subject, "--birth-year", "1990"])
     payload = json.loads(capsys.readouterr().out)
     assert code == 0
@@ -486,7 +475,6 @@ def test_profile_runs_default_three_systems(tmp_path, capsys):
     assert payload["analysis_type"] == "综合命盘"
     assert payload["systems"] == ["bazi", "ziwei", "astro"]
     chart = payload["profile"]
-    # Each system carried its full result, computed from the shared subject.
     hour = chart["bazi"]["bazi_birth"]["four_pillars"]["hour"]
     assert hour["stem"] + hour["branch"] == "庚辰"
     # ziwei ran from the shared subject; the exact 命宫 value is owned by the

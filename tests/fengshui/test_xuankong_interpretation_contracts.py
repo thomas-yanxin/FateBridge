@@ -1,7 +1,6 @@
 """Opt-in natal interpretation preserves calculations and public transports."""
 
 import asyncio
-import hashlib
 import json
 from copy import deepcopy
 
@@ -23,13 +22,14 @@ from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services import replay_metadata
 from fatebridge.services.fengshui import assess, calculate_xuankong_natal
 from fatebridge.services.tool_catalog import CATALOG
-from tests.fengshui.test_fengshui_surfaces import (
-    mcp_call,
-    rest_client,
-    without_transport,
-)
 from tests.fixtures.fengshui import payload
-from tests.fixtures.mcp_receipt import assert_same_run_receipt
+from tests.fixtures.mcp_result_delivery import assert_same_run_receipt, read_full_result
+from tests.support.fengshui_transports import mcp_call
+from tests.support.mcp_result_assertions import without_transport
+from tests.support.result_delivery import (
+    assert_same_run_receipt as assert_stored_result,
+)
+from tests.support.transports import rest_client
 
 
 def interpretation_input():
@@ -644,19 +644,15 @@ def test_strict_nested_projection_matches_all_transports(monkeypatch, tmp_path, 
 def test_bounded_interpretation_is_read_back_from_the_original_mcp_run(
     monkeypatch, tmp_path, inventory_count, policy_padding
 ):
-    # Delivery fixtures only: neither these file names nor hashes are claimed
-    # to be real ephemeris files or astronomical acceptance observations.
-    files = {
-        f"fixture/{i}.se1": hashlib.sha256(str(i).encode()).hexdigest()
-        for i in range(inventory_count)
-    }
+    # Delivery fixtures only: these names are not real ephemeris observations.
+    files = [f"fixture/{i}.se1" for i in range(inventory_count)]
     monkeypatch.setattr(
         replay_metadata, "environment_receipt", lambda: {"fixture_only": True}
     )
     monkeypatch.setattr(
         replay_metadata,
         "ephemeris_inventory",
-        lambda: {"files": files, "sha256": replay_metadata.digest(files)},
+        lambda: {"files": files},
     )
     # An empty inventory does not imply small runtime metadata: a model policy
     # can be large on its own. Pin both dimensions explicitly in these fixtures.
@@ -701,21 +697,19 @@ def test_bounded_interpretation_is_read_back_from_the_original_mcp_run(
                 json.dumps(runtime, ensure_ascii=False, separators=(",", ":"))
             )
             assert (runtime_chars > 512) is bool(inventory_count or policy_padding)
-            assert_same_run_receipt(shaped["run_metadata"], manifest["run_metadata"])
-            parts = []
-            offset = 0
-            while True:
-                uri = f"fatebridge://results/{ref['result_id']}/pages/{offset}"
-                page = json.loads((await client.read_resource(uri))[0].text)
-                parts.append(page["text"])
-                offset = page["next_offset"]
-                if offset is None:
-                    break
-            raw = "".join(parts)
-            assert hashlib.sha256(raw.encode()).hexdigest() == page["sha256"]
-            full = json.loads(raw)
+            assert_same_run_receipt(
+                shaped["run_metadata"],
+                manifest["run_metadata"],
+                deferred_fields=ref["deferred_fields"],
+            )
+            full = await read_full_result(client, shaped)
             assert full["run_metadata"] == manifest["run_metadata"]
-            assert_same_run_receipt(shaped["run_metadata"], full["run_metadata"])
+            assert_same_run_receipt(
+                shaped["run_metadata"],
+                full["run_metadata"],
+                deferred_fields=ref["deferred_fields"],
+            )
+            assert_stored_result(store, shaped, full)
             assert full["layers"]["xuankong_natal"]["interpretation"]
             return full
 

@@ -12,7 +12,7 @@ from fatebridge.core.human_design_joint import (
     joint_evidence_summary,
 )
 from fatebridge.core.human_design_mechanics import GATE_ORDER, VALID_PROFILES, bodygraph
-from fatebridge.validation.claims import _same_value
+from fatebridge.core.public_output import same_public_value as _same_value
 from fatebridge.validation.human_design_transition import verify_transition_trace
 
 

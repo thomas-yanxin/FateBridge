@@ -40,7 +40,6 @@ def receipt():
         path=f"qimen.patterns.{index}",
         value=deepcopy(p),
         run_id=payload["run_metadata"]["run_id"],
-        business_output_sha256=payload["run_metadata"]["business_output_sha256"],
     )
     return payload, claim
 
@@ -121,7 +120,6 @@ def test_new_head_dependent_quote_cannot_hide_or_replace_hour_xun_binding():
         path=f"qimen.patterns.{index}",
         value=deepcopy(pattern),
         run_id=payload["run_metadata"]["run_id"],
-        business_output_sha256=payload["run_metadata"]["business_output_sha256"],
     )
     assert (
         verify_qimen_pattern_quotes(payload, [claim])["status"]
@@ -172,7 +170,6 @@ def test_literal_day_identity_cannot_be_replaced_by_hour_head_in_a_quote():
         path=f"qimen.patterns.{index}",
         value=deepcopy(pattern),
         run_id=payload["run_metadata"]["run_id"],
-        business_output_sha256=payload["run_metadata"]["business_output_sha256"],
     )
     assert (
         verify_qimen_pattern_quotes(payload, [claim])["status"]

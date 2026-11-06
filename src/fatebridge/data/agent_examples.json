@@ -1456,7 +1456,7 @@
       "seasonal_numbers": "judge.seasonal_numbers分别给出正数比较、至弱太过、十一数式及六个时令窗口。重叠全部保留；numeric_band_match只判断绝对数段，得中为null未量化，不能把25/30或不在窗口推成综合吉凶。",
       "timing": "heluo_timing按影印页规则给出流年、月卦与日卦定式；analysis_year为年标签，month_index/day_index为原典序号，不能当公历年月日或精确应期；不指定年时不自动取当前年。",
       "validation": "原典部分核验、语料未全量校勘、现实预测未验证；周易参照不替代河洛注文。",
-      "text_collation": "乾坤屯蒙需讼师比小畜履六十条注文单次目校，commentary_sections按原文分段但applicability=null；旧文另存inherited_detail。不能借judge.xie选葉否或把歲運段用作本命断语；龍妾、掌無權、正即、無舊、女人為女人等本印本文字保留，初读撤回不计作继承错录。师六三commentary_cross_references仅核有条件引升三的单爻变，applicability=null且不改后天盘；比六二不混入全卦纳甲条件，该条件仍在month_affinity与najia。小畜九三未另印不葉者，实际三段与condition_labels_not_separately_printed不表示条件false；葉者段不等于吉类。小畜初引巽初与正式后天巽四同卦异爻，不能换爻辞；履上變為引兌不自动换卦。字兆和數凶者等嵌套条件未求值，不映射现代姓名或现实结果。诗歌不见于已核的这些爻解段落，来源待核，旧verdict摘要标签未获底本认证。标题与注文各有载入字节sha256和锁定该版文字／标签／元数据的content_sha256；JSON排版变化可以保留内容身份，但换正文或交换分支不得沿用已校身份。内容身份不证明读法、全书符合或预测有效。来源缺失／损坏是不可重试内部来源故障，不归咎用户出生参数。",
+      "text_collation": "乾坤屯蒙需讼师比小畜履六十条注文单次目校，commentary_sections按原文分段但applicability=null；旧文另存inherited_detail。不能借judge.xie选葉否或把歲運段用作本命断语；龍妾、掌無權、正即、無舊、女人為女人等本印本文字保留，初读撤回不计作继承错录。师六三commentary_cross_references仅核有条件引升三的单爻变，applicability=null且不改后天盘；比六二不混入全卦纳甲条件，该条件仍在month_affinity与najia。小畜九三未另印不葉者，实际三段与condition_labels_not_separately_printed不表示条件false；葉者段不等于吉类。小畜初引巽初与正式后天巽四同卦异爻，不能换爻辞；履上變為引兌不自动换卦。字兆和數凶者等嵌套条件未求值，不映射现代姓名或现实结果。诗歌不见于已核的这些爻解段落，来源待核，旧verdict摘要标签未获底本认证。标题与注文分别在内部核对该版文字、标签、元数据与载入字节；JSON排版变化可以保留内容身份，但换正文或交换分支不得沿用已校身份。内容身份不证明读法、全书符合或预测有效。来源缺失／损坏是不可重试内部来源故障，不归咎用户出生参数。",
       "yuantang": "用yuantang视图核对chart.yuantang_derivation的实际性别、时组、逐位序列、至点半年和换卦。counterfactuals仅比较阴阳令敏感性，实际选择以half_year.value为准；不能据反事实改算出生盘。half_year.value或heLi为null时不补成阴令或异类。公开日期工具按出生绝对瞬间确定半年，不用整个子月或午月猜。",
       "pillar_links": "pillar_links视图核numerology_evidence.pillar_links的实际年柱起月干、所用日柱起时干、原句起头与顺行步数。立春前不用公历年干，晚子及太阳钟跨日不用未换日日干替代。干序衔接匹配不证明原典月界、日界、历史钟制或全历法准确；原书个别形式算例含衔接冲突，不能据数算可复现当真实出生盘。",
       "source_clock": "岁运year_context绑定实际cycleYear与出生年柱，不能拿公历出生年或另一干支年替代。source_clock列卷一百刻式：寅申巳亥各九刻，其余八刻。时支循环原点及一刻七分的分制未由所核段确立；等长时辰假设推得18分一刻只是数式相合条件，不能选它凑原典符合。physical_clock_applied与calendar_mapping_complete均false；不可把源刻序换成当前出生钟面、实际日卦日期或预测应期。 六日进一支的branch_shift_projection保留八／九刻不等长，六十块总365源日是支初相对推演；不用选18分制，仍不解决日内添分、任意刻内转移或节月实日。 jiehou_evidence把节卦与候卦分开：按本次节气名选四正卦爻，现代节气间隔不用15／90日替代。原列72标签有爻名差异；连续爻序与首卦轮满六日两种具名模型分别对照原例及节候表，吻合程度不同而不暗选。原印、卦形、推演分别解释，selected_hou及huagong_assessment保持null，不推出实际日卦或吉凶。"
@@ -1480,7 +1480,7 @@
       "gates": "年/月按预先所选王法核三门；李法四盘及定计目门盘另列比较。默认至点时计的门盘/定计仍未算；明确选key_hour_winter_jiazi_v1可算完整积时、时支合神、定计和阴阳四门，但三门主体未决仍为null。各配置不按结果择优，不借奇门门盘补齐。",
       "hour_profiles": "hour_profile仅用于hour；默认jinjing_hour_solstice_v1是现代至点置一。key_hour_winter_jiazi_v1按金钥匙冬至前甲子连续积时，calendar_rules.hour_origin保存同盘日期、完整积时和现代23时子初约定。合参放在taiyi_options。不可把只求太乙宫的甲己捷数代替完整积时，也不宣称古历复原。",
       "daily": "calculation_mode=day明确选金钥匙冬至前甲子积日；合参置taiyi_options。按所选钟面零时换日，不乘十二；同日甲子纳入是现代约定，不能套用时计720时相位不变。日计专用daily_calendar/daily_essences视图需先设day，保留十精未知、正文与课式异数，全年十神不当作十精。 天时按十二支通则计算，有年度第10数亥及金镜/统宗补证；日44例坤与实际酉并列为差异，不能将源文坤写成实际计算值。太乙数只给局序，四宫语义仍未知。",
-      "paged_first_view": "先核对result_delivery.deferred_fields：若仅run_metadata.runtime延后，业务依据已内联，可据所选字段解读，环境复核再读取同run完整runtime。若业务字段延后，须沿first_page_uri/next_uri读回同run投影载荷并核对sha256后解释该字段；不能当作不存在或重算全文替代。",
+      "paged_first_view": "先核对result_delivery.deferred_fields：若仅run_metadata.runtime延后，业务依据已内联，可据所选字段解读，环境复核再读取同run完整runtime。若业务字段延后，须沿first_page_uri/next_uri读回同run投影载荷并核对原run后解释该字段；不能当作不存在或重算全文替代。",
       "historical_dates": "输入日期统一为推算公历；儒略历日期须先明确转换。calendar_rules.historical_date_reference只对选定金钥匙课例返回独立历表日期、原积数及实际积数，逐项核对匹配，不代表完整古历、全盘原典符合或应验。固定现代时区及代表钟面须明示，不能把未知古例时地补造成事实。",
       "monthly": "仅month可选month_profile。省略保留金镜六纪节月；key_month_tianzheng_jie_v1按金钥匙完年乘十二、加天地二正与本月名义序，仍按现代节月边界。full积月及1504截数分别返回，不先约360求240门周。KEY直门加定计目，原门段684/184/死4与本盘原例相位695/215/惊5并列，三门主体未裁定。独立历表若显示农历月与节月不符须明示，不按吉凶改选方法。 独立历表的朔月比较是一项假设；source_calendar_basis=not_adjudicated时，不能声称原书已证实采用朔月。",
       "enclosures": "提挟读取enclosures（合参taiyi_enclosures）：李法太乙与一将夹正宫、同方大小二将短弧夹太乙或对方目将分层。间神按原位读取，不并八门扇区，几何命中不认证完整挟闭。pattern_paths指向同盘各自记录；二将完整记录在enclosure_assessment.two_general_enclosure.patterns，旧全局patterns保持；完整挟闭、四郭固杜未评估，未命中不代替不存在，不套用现实胜负断语。",
@@ -1488,7 +1488,7 @@
       "count_sources": "核count_source_assessment时分开当前二目/算数、所选原表字面、书影校读和源位置重算。三者不互相覆盖；两算相符不认证目位或全盘相符，原表差异仍未裁定。适用于年/月/日/时计循环核心。",
       "elemental_relations": "读取elemental_guan_assessment以核二目纳音所选十六神五行片段。天目/地目按原文语境与文昌主、始击客对应，不套六十甲子日柱纳音；空间关和五将合取不由本项覆盖。",
       "year_calendar": "年计核对year_calendar视图（合参taiyi_year_calendar）：civil_lunar_calendar保留输入钟表日期实际换算的年月日及本次来源；historical_calendar保留明确所选历史历表。analysis_context.lunar_display仅为校正钟面上下文，真太阳时跨日时不能替代年计日期。未单列conversion_source不补造逐日权威认证；岁首工程约定与原典裁定仍分开。",
-      "civil_clock": "独立太乙可选analysis_utc_offset与analysis_timezone联合核对明确民用偏移，保留命名时区并选择回拨中的一次；缺失仍拒绝重复钟时，跳时/整日缺口或不符偏移不回退。clock_basis视图保留calendar_rules/summary的civil_clock_resolution及真实UTC、fold、运行时区规则指纹。真太阳钟只是计算标签，不能再当民用钟排除。三式已有time含ISO偏移表示实际瞬间再转zone，语义与联合钟表标签核对不同。"
+      "civil_clock": "独立太乙可选analysis_utc_offset与analysis_timezone联合核对明确民用偏移，保留命名时区并选择回拨中的一次；缺失仍拒绝重复钟时，跳时/整日缺口或不符偏移不回退。clock_basis视图保留calendar_rules/summary的civil_clock_resolution及真实UTC、fold、运行时区规则版本。真太阳钟只是计算标签，不能再当民用钟排除。三式已有time含ISO偏移表示实际瞬间再转zone，语义与联合钟表标签核对不同。"
     },
     "sanshiunited": {
       "scope": "按synthesis.time_scopes解释年/月/日/时计；palace_correspondences按真实方位联接五将与星门神，太乙宫数不可直接套奇门宫数。",
@@ -1501,7 +1501,7 @@
       "qimen_stem_scope": "合参首读保留日/时取用、甲日是否自动替代和来源。岁干、月朔、时干支入墓细节仍在同盘qimen.stem_context，按主题续读；首读未选这些字段不等于格局不存在。",
       "qimen_profiles": "首读保留已选八神、九星旺相、三奇入墓配置的id、书名、来源及异文说明；具体顺序、旺相映射和未采用候选按同次qimen.rule_profiles续读。配置说明不能代替实际宫位事实，未读取不视为不存在。",
       "daily": "calculation_mode=day明确选金钥匙冬至前甲子积日；合参置taiyi_options。按所选钟面零时换日，不乘十二；同日甲子纳入是现代约定，不能套用时计720时相位不变。日计专用daily_calendar/daily_essences视图需先设day，保留十精未知、正文与课式异数，全年十神不当作十精。 天时按十二支通则计算，有年度第10数亥及金镜/统宗补证；日44例坤与实际酉并列为差异，不能将源文坤写成实际计算值。太乙数只给局序，四宫语义仍未知。",
-      "paged_first_view": "先核对result_delivery.deferred_fields：若仅run_metadata.runtime延后，业务依据已内联，可据所选字段解读，环境复核再读取同run完整runtime。若业务字段延后，须沿first_page_uri/next_uri读回同run投影载荷并核对sha256后解释该字段；不能当作不存在或重算全文替代。",
+      "paged_first_view": "先核对result_delivery.deferred_fields：若仅run_metadata.runtime延后，业务依据已内联，可据所选字段解读，环境复核再读取同run完整runtime。若业务字段延后，须沿first_page_uri/next_uri读回同run投影载荷并核对原run后解释该字段；不能当作不存在或重算全文替代。",
       "historical_dates": "输入日期统一为推算公历；儒略历日期须先明确转换。calendar_rules.historical_date_reference只对选定金钥匙课例返回独立历表日期、原积数及实际积数，逐项核对匹配，不代表完整古历、全盘原典符合或应验。固定现代时区及代表钟面须明示，不能把未知古例时地补造成事实。",
       "monthly": "仅month可选month_profile。省略保留金镜六纪节月；key_month_tianzheng_jie_v1按金钥匙完年乘十二、加天地二正与本月名义序，仍按现代节月边界。full积月及1504截数分别返回，不先约360求240门周。KEY直门加定计目，原门段684/184/死4与本盘原例相位695/215/惊5并列，三门主体未裁定。独立历表若显示农历月与节月不符须明示，不按吉凶改选方法。 独立历表的朔月比较是一项假设；source_calendar_basis=not_adjudicated时，不能声称原书已证实采用朔月。",
       "enclosures": "提挟读取enclosures（合参taiyi_enclosures）：李法太乙与一将夹正宫、同方大小二将短弧夹太乙或对方目将分层。间神按原位读取，不并八门扇区，几何命中不认证完整挟闭。pattern_paths指向同盘各自记录；二将完整记录在enclosure_assessment.two_general_enclosure.patterns，旧全局patterns保持；完整挟闭、四郭固杜未评估，未命中不代替不存在，不套用现实胜负断语。",
@@ -1548,7 +1548,7 @@
     },
     "western_timing_analysis": {
       "target_clock": "analysis_hour/minute 是目标钟时，按 birth_timezone；显式0有效。省略分别沿用出生小时/分钟，仅兼容日期级调用。return_timezone转换同一时刻。",
-      "delivery": "MCP默认8192字符，完整结果超限返回result_delivery。用其manifest_uri按所需字段或分页读取同一run；完整JSON重组核对sha256，不重新计算，不解析截断片段。",
+      "delivery": "MCP默认8192字符，完整结果超限返回result_delivery。用其manifest_uri按所需字段或分页读取同一run；完整JSON重组并核对原run，不重新计算，不解析截断片段。",
       "complete_export": "用户要求完整JSON、全部时间线或完整文件时，首次fields=null，保留默认响应预算，再读取result_delivery；first_view仅用于摘要咨询，不能先投影摘要再补算全文。",
       "evidence": "首次按问题选择evidence_views.stage/annual/short_term/career的fields；事业兼阶段与目标时段用career，结合本命职业配置筛选相关hits。默认与其他视图不强制展开全部方法；fields=null仍表示全量。"
     },
@@ -1689,7 +1689,7 @@
       "two_factor": "Native v3 dials include two_factor_contacts over 22 factors. A=B is a folded relation: read aspect_degrees, full-circle separation_degrees and signed_orb; factor_offset_degrees is the oriented A-B offset modulo 360, not a midpoint-axis offset. Never call every folded hit a conjunction. unique_two_factor_pair_count deduplicates unordered pairs across dials and is not independent prediction evidence. No source keywords are invented for these contacts.",
       "birth_seconds": "Pass birth_second only from an actually recorded clock or an explicitly identified historical clock conversion. Omission represents the start of the supplied minute, not evidence of exact seconds. Seconds propagate to UTC/TT/UT1, birth-time samples and optional directions; no outcome-driven rectification. Generic astro_chart admits recorded seconds for germany/chart13/india_chart; use the current published variant schema for its other clock options.",
       "clock_basis": "Use birth_clock_basis=civil for a recorded civil zone clock. Only an explicitly identified historical LMT/LAT record may select local_mean_solar/local_apparent_solar, with birth_timezone omitted and use_true_solar_time=false. These are input labels, not extra accuracy switches. Read actual person_info.clock_conversion (Germany under base_chart): input label, modeled physical UTC/UT1/TT, longitude, Sun/EOT where used, source/model and numerical residual. The UTC-named carrier before1960 is historical UT1, not atomic UTC. Never infer an ambiguous OZ basis or choose one by fitting positions/outcomes; a small numerical residual does not certify record precision or measured Earth rotation.",
-      "physical_ephemeris": "Read midpoint_analysis.profile.physical_ephemeris_source for actual per-factor models and observed se1 context hashes/ranges/DE headers. Files, hypothetical orbit elements and Earth rotation are distinct. Birth-time samples reject changing per-factor models, same-name file contents or DE editions; acquire complete verified segments instead of dropping samples or silently downgrading. File identity is not accuracy certification, and NASA/Swiss may share DE441 dynamics. Source failures expose error_code=ephemeris_source_inconsistent, a named code in issues entries whose path is runtime.ephemeris_data, and retryable=false. This is runtime data, not changed birth information or an automatically retryable missing-package error. Complete the same interval data and reload before retrying. The base chart separately reports base_chart.chart_profile.physical_ephemeris_source. Its explicit orbital fallback may differ from the valid native midpoint layer; explain each layer from its own actual source and retain partial valid results. Ecliptic/equatorial states share one managed configuration; coordinate-source mismatches are errors, not reasons to silently use approximate orbits. ephemeris_model_scope=physical_bodies excludes the analytical mean node from physical model summaries; read nonphysical_factor_models and the node model swisseph_analytical_mean_node separately. Midpoint native_return_flags can echo the requested model and do not prove a vector-file source. A failed node still affects engine precision. Explicit strict JPL selection also governs the native Hamburg loop and fixed-star Earth observer; a limited kernel subset test does not certify full epoch coverage.",
+      "physical_ephemeris": "Read midpoint_analysis.profile.physical_ephemeris_source for actual per-factor models and observed se1 file names, ranges and DE headers. Files, hypothetical orbit elements and Earth rotation are distinct. Birth-time samples reject changing per-factor models, same-name file contents or DE editions; acquire complete verified segments instead of dropping samples or silently downgrading. File identity is not accuracy certification, and NASA/Swiss may share DE441 dynamics. Source failures expose error_code=ephemeris_source_inconsistent, a named code in issues entries whose path is runtime.ephemeris_data, and retryable=false. This is runtime data, not changed birth information or an automatically retryable missing-package error. Complete the same interval data and reload before retrying. The base chart separately reports base_chart.chart_profile.physical_ephemeris_source. Its explicit orbital fallback may differ from the valid native midpoint layer; explain each layer from its own actual source and retain partial valid results. Ecliptic/equatorial states share one managed configuration; coordinate-source mismatches are errors, not reasons to silently use approximate orbits. ephemeris_model_scope=physical_bodies excludes the analytical mean node from physical model summaries; read nonphysical_factor_models and the node model swisseph_analytical_mean_node separately. Midpoint native_return_flags can echo the requested model and do not prove a vector-file source. A failed node still affects engine precision. Explicit strict JPL selection also governs the native Hamburg loop and fixed-star Earth observer; a limited kernel subset test does not certify full epoch coverage.",
       "meridian_houses": "meridian_houses is the selected Witte 1923 p.34 natal RA-divided cusp construction (Swiss X), not an equal-ecliptic house system. Cusp1 is the equatorial ascendant; physical Ascendant/Midheaven factors and base_chart houses are retained. Read the actual native angle TT, true obliquity, apparent Lahiri offset and same-run cusp samples. Native angle TT follows houses_ex UT1+deltat_ex and is recorded separately from shared TT; their difference is not a measured birth-clock error. The child factor_placement applies full ecliptic longitude/latitude to RA sectors; read its own source scope, factor counts and sample summary. Full progression time key, complete original interpretation and predictive efficacy remain unaccepted.",
       "progression_key": {
         "purpose": "核对实际太阳弧年长钥匙及其与Witte1923推运常数原刊的关系。只在给定analysis_datetime时读取该层。",
@@ -1719,7 +1719,7 @@
       "birth_time_uncertainty": "Pass user-confirmed birth_time_uncertainty_minutes (0..120), then read time_sensitivity. None is unknown, not exact. Samples vary recorded UTC before optional solar correction. Do not use event outcomes to choose a birth time, or report sample frequencies as confidence probabilities.",
       "birth_seconds": "Pass birth_second only from an actually recorded clock or an explicitly identified historical clock conversion. Omission represents the start of the supplied minute, not evidence of exact seconds. Seconds propagate to UTC/TT/UT1, birth-time samples and optional directions; no outcome-driven rectification. Generic astro_chart admits recorded seconds for germany/chart13/india_chart; use the current published variant schema for its other clock options.",
       "clock_basis": "Use birth_clock_basis=civil for a recorded civil zone clock. Only an explicitly identified historical LMT/LAT record may select local_mean_solar/local_apparent_solar, with birth_timezone omitted and use_true_solar_time=false. These are input labels, not extra accuracy switches. Read actual person_info.clock_conversion (Germany under base_chart): input label, modeled physical UTC/UT1/TT, longitude, Sun/EOT where used, source/model and numerical residual. The UTC-named carrier before1960 is historical UT1, not atomic UTC. Never infer an ambiguous OZ basis or choose one by fitting positions/outcomes; a small numerical residual does not certify record precision or measured Earth rotation.",
-      "physical_ephemeris": "Read chart_profile.physical_ephemeris_source for the actual nominal physical-body models, observed file hashes, ranges and DE headers; the analytical node is separate. Read time_sensitivity.physical_ephemeris_sources and each sample index for the grid. Nominal and sampled source cohorts are checked together, so a changing model or data edition cannot be interpreted as pure birth-time sensitivity. Source failures are error_code=ephemeris_source_inconsistent with named issues at runtime.ephemeris_data and retryable=false. Repair the runtime data, retain the original interval and repeat; source hashes are not accuracy certification or proof of atomic reads. ephemeris_model_scope=physical_bodies excludes the analytical mean node from physical model summaries; read nonphysical_factor_models and the node model swisseph_analytical_mean_node separately. Midpoint native_return_flags can echo the requested model and do not prove a vector-file source. A failed node still affects engine precision. Explicit strict JPL selection also governs the native Hamburg loop and fixed-star Earth observer; a limited kernel subset test does not certify full epoch coverage.",
+      "physical_ephemeris": "Read chart_profile.physical_ephemeris_source for the actual nominal physical-body models, observed file names, ranges and DE headers; the analytical node is separate. Read time_sensitivity.physical_ephemeris_sources and each sample index for the grid. Nominal and sampled source cohorts are checked together, so a changing model or data edition cannot be interpreted as pure birth-time sensitivity. Source failures are error_code=ephemeris_source_inconsistent with named issues at runtime.ephemeris_data and retryable=false. Repair the runtime data, retain the original interval and repeat; source identities are not accuracy certification or proof of atomic reads. ephemeris_model_scope=physical_bodies excludes the analytical mean node from physical model summaries; read nonphysical_factor_models and the node model swisseph_analytical_mean_node separately. Midpoint native_return_flags can echo the requested model and do not prove a vector-file source. A failed node still affects engine precision. Explicit strict JPL selection also governs the native Hamburg loop and fixed-star Earth observer; a limited kernel subset test does not certify full epoch coverage.",
       "reference_angle_qualification": "When sector_profile.status=underdetermined_ascendant, no unique ASC-relative13-sector assignment exists: planets.sector13 and profile.anchor_longitude are null, thirteen_sectors is empty. backend_convention_* fields preserve replay values only. A null sector_by_sample is unknown, not a sector or absent condition; preserve every sample and computed_sample_count/unresolved_sample_count. Do not summarize known samples as full-interval stability or a probability. Ill-conditioned but resolved intersections and geographic-pole conventions retain their explicit angle_definition.",
       "house_roles": "Keep the selected base-chart12-house system separate from native reference-angle extraction, Meridian cusps and the custom13-sector partition. In the current numeric policy hsys1 is Alcabitus (SwissB), never Equal. Read actual chart_profile.house_system/house_system_code/house_system_label_zh; do not label a whole chart from a backend reference-angle call. reference_angle_model.house_code=E with cusp_output_used=false records only ASC/MC/ARMC extraction; samples carry their own model, and Germany solar-arc profile reuses the natal model. meridian_houses.profile.house_code=X identifies the separate RA cusp construction. fatebridge_equal13_v1 is the custom partition, independent of the selected12-house system. Unrecorded roles remain unknown; these labels do not establish original-text or predictive validity."
     },
@@ -1743,8 +1743,8 @@
       "candidates": "candidate_relation_analysis为已列候选的条件组合，未代入primary；完整性标志限于所声明重建口径，排列不是排名。主关系为null时不得从某一行挑选确定相性。",
       "palace_reference": "palace_reference仅按历日宿名查T1299上卷27宿四足/十二宫九足表；textual_pada是显式查表条件，不表示已排得出生足位。宫序不等星图House，太阳/太阴分不等昼夜生盘；不得据此断本命宫、现代月亮黄经或合成宫位相性。",
       "date_uncertainty": "未知出生时刻不补0点或中午。出生时区日期由date_support完整映射到所选UTC+08或UTC+09参考历日，calendar_candidates逐支保留农历、闰月/Hinoo候选，candidate_relation_analysis列日期来源。不能把某一候选或区间长度当主结果/概率；被整天跳过的当地日期应核对。完整候选若同宿，可只确定宿和关系，唯一历日和出生时刻仍未定；范围外分支使候选不穷尽。",
-      "source_capture": "规则JSON的source_bundle_sha256与原文source_sha256分别核对；Hinoo的active_primary_evidence指向downloaded_primary_edition，交付SAT完整HTML响应指纹、选定原段及五条校记。旧cached_primary_excerpt是历史记录，其摘录哈希不等于完整响应或抄本哈希；旧末句句号与下载原文闭引号的差异明示。SAT原/甲本不合成唯一正文；完整HTML不等于字图全部取得、影印或独立学术校勘，半日钟时与规则次序仍未定。",
-      "calendar_reference": "读取calendar_reference的日期来源类别、数据指纹、支持范围及资料差异。2015起是出版方参考推算，不能说成已核对逐年神宫原刊；固定UTC+09不是历史日本地方时。旧月度候选仍拒绝接入，新后端来自完整逐日事实；文档到2033与LOD到2031的差异继续保留，范围外不能换中国历补齐。",
+      "source_capture": "来源文件在内部校验；公开结果保留书目、版本与位置。Hinoo的active_primary_evidence指向downloaded_primary_edition，交付SAT响应来源、选定原段及五条校记。旧cached_primary_excerpt是历史记录，摘录不等于完整响应或抄本；旧末句句号与下载原文闭引号的差异明示。SAT原/甲本不合成唯一正文；完整HTML不等于字图全部取得、影印或独立学术校勘，半日钟时与规则次序仍未定。",
+      "calendar_reference": "读取calendar_reference的日期来源类别、版本与支持范围及资料差异。2015起是出版方参考推算，不能说成已核对逐年神宫原刊；固定UTC+09不是历史日本地方时。旧月度候选仍拒绝接入，新后端来自完整逐日事实；文档到2033与LOD到2031的差异继续保留，范围外不能换中国历补齐。",
       "historical_reference": "显式calendar_basis=japanese_naoj_historical_utc09使用NAOJ冻结月首参考，前推公历0001-01-01至1872-12-31、固定UTC+09；不因地点或古代出生年自动选择。阴历年0只作来源上下文，非公元0年输入。453阴历年及以前为儀鳳暦平朔回推；454起亦为具历史校正的参考，不能称当时颁历、观测或地方钟时已证明。",
       "historical_source_variants": "NAOJ与HuTime1001.1完整月首对照保留210个分歧日期；calendar_reference.cross_source_comparison的control_fields未代入主结果，二者部分共用文献来源。即使配宿相同也须保留月/日/闰标志不同，不能称全历史历法一致。1872年旧历十二月只存两天；1873-01-01不延续旧历，不自动切现代日本参考。",
       "lower_date_boundary": "固定时差的公元1年边界以完整区间代数保留0000-12-31来源分支及UTC端点；这是天文年编号的计算标签，不能说成已支持公元0年出生或历史UTC实测。读取epoch秒及范围外分支，未知钟时不补造。",
@@ -1770,10 +1770,10 @@
       "verse_abbreviation": "calendar_day.verse_abbreviation_resolution保留原典一夜字面及0393c26夹注：一夜指十一夜。下卷直接依注，上卷同偈与平行散文互证；不能把省文当初一夜限制或未决冲突。prose_verse_time_variant只是字面差别，语义冲突另看prose_verse_time_semantic_conflict；钟时未计算的限制仍保留。",
       "travel_directions": "directional_travel交付下卷行动禁闭法的日宿/方向证言；northbound_journey、eastbound_journey、southbound_journey、westbound_journey只填已确认方向，不由GPS、出生地、目的地或角度推定。纵吉时亦不可行的原注不能被吉时抵销；壁宿南行在逐宿章与此章有相反证言，须同时呈现。明本吉/凶等校记不能覆盖当前所选大正主文，互字未定不猜成氐。宫序仅本段标签，不是上卷足表宫序或个人本命宫。",
       "special_days": "special_day_labels仍采用上卷大正主表；special_day_evidence分别交付上下卷大正和所载明本校记表，明本仅作同底本重建，不代入主表或确定事项。冒/底未归并胃/氐；下卷标签完整性为false时不能把未匹配当无此特殊日。religious_learning才匹配甘露学道/经法，不泛化为一般学习或考试。下卷月与宿合仅作历日宿名查文献，physical_lunar_conjunction_evaluated=false时不能称已观察到物理月亮合宿。unresolved_source_rules_present及conditional_rules须一并解释，不能只摘宜条。 direct_printed_comparisons另列1897年脇田文绍缩刷本下卷的直接印本参考：金刚峰土曜尾、月曜女等与大正分别保留，不能归入明本校记重建；木曜罗刹宿字未定，巨/亢仅为未接纳字形候选，不补氐或亢，不据空标签断无此特殊日。仅20项宿字已识别，尚无完整21宿字转录、全本校勘或独立人工验收。 上卷明本金刚峰火曜昴来自正文水曜经水=火校记重建，水曜壁来自正文火曜经火=水重建；这是曜位互换，不是昴/壁宿字改变，也不扩为下卷或印本同样变曜。",
-      "source_capture": "规则JSON的source_bundle_sha256与原文source_sha256分别核对；Hinoo的active_primary_evidence指向downloaded_primary_edition，交付SAT完整HTML响应指纹、选定原段及五条校记。旧cached_primary_excerpt是历史记录，其摘录哈希不等于完整响应或抄本哈希；旧末句句号与下载原文闭引号的差异明示。SAT原/甲本不合成唯一正文；完整HTML不等于字图全部取得、影印或独立学术校勘，半日钟时与规则次序仍未定。",
+      "source_capture": "来源文件在内部校验；公开结果保留书目、版本与位置。Hinoo的active_primary_evidence指向downloaded_primary_edition，交付SAT响应来源、选定原段及五条校记。旧cached_primary_excerpt是历史记录，摘录不等于完整响应或抄本；旧末句句号与下载原文闭引号的差异明示。SAT原/甲本不合成唯一正文；完整HTML不等于字图全部取得、影印或独立学术校勘，半日钟时与规则次序仍未定。",
       "personal_day_witnesses": "有本命宿时读取personal_day.source_day_evidence，分别引用上卷、下卷和又一说；未说明距离不能套远行条文，personal_departure是启程，long_distance_traveler_entering_residence是远行人入宅，不限定回自己家，互不代推。荣日启请法要用monastic_dharma_request，须明确出家人身份和请教行为；religious_learning不反向推出身份。下卷长行历优先句保留，不擅自删除冲突证据或输出综合吉日。",
       "actor_purpose_social_scope": "forming_friendship是明确结交交友，不限首次相识，social_gathering是聚会，不互相推断。personal_departure本人启程不证明private_journey因私；下卷日曜远行另须royal_or_official_traveler与long_distance_journey同时明确，出差或使节任务不证明身份，上卷不同范围继续保留。conflicted只表示匹配证据兼有宜与忌，须说明动作、卷别和出处，不能自动断成同条件原文矛盾；原生文本中的本次适用条件也须一起解释。",
-      "calendar_reference": "读取calendar_reference的日期来源类别、数据指纹、支持范围及资料差异。2015起是出版方参考推算，不能说成已核对逐年神宫原刊；固定UTC+09不是历史日本地方时。旧月度候选仍拒绝接入，新后端来自完整逐日事实；文档到2033与LOD到2031的差异继续保留，范围外不能换中国历补齐。",
+      "calendar_reference": "读取calendar_reference的日期来源类别、版本与支持范围及资料差异。2015起是出版方参考推算，不能说成已核对逐年神宫原刊；固定UTC+09不是历史日本地方时。旧月度候选仍拒绝接入，新后端来自完整逐日事实；文档到2033与LOD到2031的差异继续保留，范围外不能换中国历补齐。",
       "six_palaces": "six_palace_reference按已确认natal_mansion本身计一，交付命/事/意/聚/同/克六个本命相对位置；未给本命则status=natal_mansion_required。不得由日宿、星期、六类相性或十二宫足表补出本命，也不得把这些位置直接当已判定七曜凌犯、六害期间或现实灾祸；读取seven_luminary_transits_evaluated和三九参断evaluated。",
       "historical_reference": "显式calendar_basis=japanese_naoj_historical_utc09使用NAOJ冻结月首参考，前推公历0001-01-01至1872-12-31、固定UTC+09；不因地点或古代出生年自动选择。阴历年0只作来源上下文，非公元0年输入。453阴历年及以前为儀鳳暦平朔回推；454起亦为具历史校正的参考，不能称当时颁历、观测或地方钟时已证明。",
       "historical_source_variants": "NAOJ与HuTime1001.1完整月首对照保留210个分歧日期；calendar_reference.cross_source_comparison的control_fields未代入主结果，二者部分共用文献来源。即使配宿相同也须保留月/日/闰标志不同，不能称全历史历法一致。1872年旧历十二月只存两天；1873-01-01不延续旧历，不自动切现代日本参考。",
@@ -6175,7 +6175,7 @@
         ]
       },
       "source_capture": {
-        "purpose": "核对望宿表捕获指纹、缺日分支及Hinoo直接下载原段、校记与历史缓存差异",
+        "purpose": "核对望宿表捕获来源、缺日分支及Hinoo直接下载原段、校记与历史缓存差异",
         "fields": [
           "sukuyo.calendar.profile_calculation",
           "sukuyo.calendar.candidate_su27s",
@@ -6857,7 +6857,6 @@
           "jinkou.rows",
           "jinkou.relations.si_jue",
           "jinkou.relations.source_url",
-          "jinkou.relations.source_sha256",
           "jinkou.ruleset"
         ]
       },
@@ -7212,7 +7211,7 @@
           "rulesets",
           "validation.all_three_axes_full_marks"
         ],
-        "purpose": "2001原典正文另列的11.4金星与25.4木星、原符号保留、页码/来源散列及本盘实际使用这些附加依据的位置和全部星体路径；不将两项补充当384线全文验收。完整逐项reading读取同一run的depth_evidence.line_fixings。"
+        "purpose": "2001原典正文另列的11.4金星与25.4木星、原符号保留、页码/来源定位及本盘实际使用这些附加依据的位置和全部星体路径；不将两项补充当384线全文验收。完整逐项reading读取同一run的depth_evidence.line_fixings。"
       },
       "fixing": {
         "fields": [
@@ -7276,7 +7275,7 @@
           "interpretation.expanded_cross_name_meaning",
           "validation.all_three_axes_full_marks"
         ],
-        "purpose": "本盘四门、完整新增官方标签比较与解释；保留原典名称、别名拒绝、原PDF及目录散列和课程冲突。原19盘与29门印刷分界的完整明细仍见原证据卡或同次完整run，不把有限192门角覆盖当作完整原典或精度认证"
+        "purpose": "本盘四门、完整新增官方标签比较与解释；保留原典名称、别名拒绝、原PDF名称及目录定位和课程冲突。原19盘与29门印刷分界的完整明细仍见原证据卡或同次完整run，不把有限192门角覆盖当作完整原典或精度认证"
       },
       "primary_diagrams": {
         "fields": [
@@ -7284,7 +7283,7 @@
           "profile",
           "source_consistency.primary_transcript_diagrams"
         ],
-        "purpose": "按有序四门和角度读取两幅2008公开转录图的窄范围旁证、页码与文件指纹；保留未经校对、未认证母本和非勘误的限定，不代替2001名称或完整线义验收"
+        "purpose": "按有序四门和角度读取两幅2008公开转录图的窄范围旁证、页码与文件名称；保留未经校对、未认证母本和非勘误的限定，不代替2001名称或完整线义验收"
       },
       "birth_interval": {
         "fields": [
@@ -7324,7 +7323,7 @@
           "node_convention_comparison.personality_colors_changed",
           "validation.all_three_axes_full_marks"
         ],
-        "purpose": "按人格日地/交点的实际Color及一致对点读取官方Motivation/View类别名、来源散列和本盘局部依据；同箭头编码不保证Color类别相同。出生盘不测量现实心理、转移或分心状态，不将类别当完整PHS、384线原典或现实预测验收。完整比较和时间样本读取同一run。"
+        "purpose": "按人格日地/交点的实际Color及一致对点读取官方Motivation/View类别名、来源定位和本盘局部依据；同箭头编码不保证Color类别相同。出生盘不测量现实心理、转移或分心状态，不将类别当完整PHS、384线原典或现实预测验收。完整比较和时间样本读取同一run。"
       },
       "gate_context": {
         "fields": [
@@ -8806,7 +8805,7 @@
         ]
       },
       "ut1_input": {
-        "purpose": "核对明确选择的模型或IERS20 C04 UT1来源、固定覆盖期、源文件指纹、插值区间与未应用修正；盘面与地平计算仍要求覆盖内UT1；地心TT黄经事件不外推UT1即可跨边界搜索，未取得瞬时观测误差或现实预测证据。",
+        "purpose": "核对明确选择的模型或IERS20 C04 UT1来源、固定覆盖期、源文件名称与版本、插值区间与未应用修正；盘面与地平计算仍要求覆盖内UT1；地心TT黄经事件不外推UT1即可跨边界搜索，未取得瞬时观测误差或现实预测证据。",
         "fields": [
           "analysis_context",
           "clock_conversion",
@@ -8896,7 +8895,7 @@
         ]
       },
       "ut1_input": {
-        "purpose": "核对明确选择的模型或IERS20 C04 UT1来源、固定覆盖期、源文件指纹、插值区间与未应用修正；盘面与地平计算仍要求覆盖内UT1；地心TT黄经事件不外推UT1即可跨边界搜索，未取得瞬时观测误差或现实预测证据。",
+        "purpose": "核对明确选择的模型或IERS20 C04 UT1来源、固定覆盖期、源文件名称与版本、插值区间与未应用修正；盘面与地平计算仍要求覆盖内UT1；地心TT黄经事件不外推UT1即可跨边界搜索，未取得瞬时观测误差或现实预测证据。",
         "fields": [
           "analysis_context",
           "clock_conversion",

@@ -23,7 +23,8 @@ from fatebridge.core.requests.western_timing import (
 )
 from fatebridge.services.catalog.western_timing import SPECS
 from fatebridge.services.western_timing import calculate_western_timing_analysis
-from fatebridge.services.western_timing_tools import calculate_transit
+from fatebridge.services.western_timing_tools import calculate_timing_tool
+from tests.fixtures.mcp_result_delivery import read_full_result
 from tests.fixtures.transports import mcp_parameters
 
 BIRTH = {
@@ -168,7 +169,7 @@ def _all_transports(monkeypatch, capsys, tool, path, payload):
 
     async def native_call():
         async with Client(mcp.app) as client:
-            return await client.call_tool(
+            result = await client.call_tool(
                 tool,
                 {
                     **payload,
@@ -179,13 +180,15 @@ def _all_transports(monkeypatch, capsys, tool, path, payload):
                 },
                 raise_on_error=False,
             )
+            inline = json.loads(result.content[0].text)
+            assert inline == result.structured_content
+            return result, await read_full_result(client, inline)
 
-    protocol = asyncio.run(native_call())
-    assert json.loads(protocol.content[0].text) == protocol.structured_content
+    protocol, complete = asyncio.run(native_call())
     capsys.readouterr()
     exit_code = run(_cli_arguments(tool, payload))
     cli_payload = json.loads(capsys.readouterr().out)
-    return response, protocol, exit_code, cli_payload
+    return response, protocol, exit_code, cli_payload, complete
 
 
 @pytest.mark.parametrize("spec", SPECS, ids=lambda spec: spec.key)
@@ -193,7 +196,7 @@ def test_exact_clock_reaches_every_timing_engine_through_all_transports(
     monkeypatch, capsys, spec
 ):
     payload = {**BIRTH, **DATE, "analysis_hour": 12, "analysis_minute": 7}
-    response, protocol, code, cli_payload = _all_transports(
+    response, protocol, code, cli_payload, complete = _all_transports(
         monkeypatch, capsys, spec.tool_name, spec.rest_path, payload
     )
     assert response.status_code == 200 and not protocol.is_error and code == 0
@@ -206,13 +209,10 @@ def test_exact_clock_reaches_every_timing_engine_through_all_transports(
             output["run_metadata"]["determinism"]["current_time_fields_defaulted"] == []
         )
     business = [
-        {k: v for k, v in output.items() if k != "run_metadata"} for output in outputs
+        {k: v for k, v in output.items() if k != "run_metadata"}
+        for output in [response.json(), complete, cli_payload]
     ]
     assert business[0] == business[1] == business[2]
-    assert (
-        len({output["run_metadata"]["business_output_sha256"] for output in outputs})
-        == 1
-    )
 
 
 @pytest.mark.parametrize("spec", [SPECS[0], SPECS[3]], ids=lambda spec: spec.key)
@@ -229,7 +229,7 @@ def test_invalid_clock_is_rejected_consistently(
     monkeypatch, capsys, spec, field, value, code
 ):
     payload = {**BIRTH, **DATE, **{field: value}}
-    response, protocol, exit_code, cli_payload = _all_transports(
+    response, protocol, exit_code, cli_payload, _ = _all_transports(
         monkeypatch, capsys, spec.tool_name, spec.rest_path, payload
     )
     assert response.status_code == 422 and protocol.is_error and exit_code == 1
@@ -240,12 +240,16 @@ def test_invalid_clock_is_rejected_consistently(
 
 def test_exact_clock_changes_computed_transit_and_matches_standalone():
     kwargs = {**BIRTH, **DATE}
-    legacy = calculate_transit(**kwargs)
+    legacy = calculate_timing_tool("transit", **kwargs)
     noon = calculate_western_timing_analysis(
         **kwargs, analysis_hour=12, analysis_minute=0
     )
-    standalone = calculate_transit(**kwargs, analysis_hour=12, analysis_minute=0)
-    later = calculate_transit(**kwargs, analysis_hour=12, analysis_minute=37)
+    standalone = calculate_timing_tool(
+        "transit", **kwargs, analysis_hour=12, analysis_minute=0
+    )
+    later = calculate_timing_tool(
+        "transit", **kwargs, analysis_hour=12, analysis_minute=37
+    )
     assert noon["analysis_context"]["analysis_datetime"] == "2026-10-14T12:00:00+08:00"
     assert noon["transits"]["current_transit"] == standalone["transit"]
     assert noon["natal_reference"]["sun"] == legacy["natal_reference"]["sun"]
@@ -264,7 +268,8 @@ def test_exact_clock_changes_computed_transit_and_matches_standalone():
 
 
 def test_target_clock_keeps_the_instant_when_return_location_changes():
-    result = calculate_transit(
+    result = calculate_timing_tool(
+        "transit",
         **BIRTH,
         **DATE,
         analysis_hour=0,

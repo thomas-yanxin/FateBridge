@@ -11,7 +11,7 @@ from fatebridge.core.human_design_natal_sources import (
     natal_source_summary,
 )
 from fatebridge.core.human_design_provenance import position_flag_model
-from fatebridge.validation.claims import _same_value
+from fatebridge.core.public_output import same_public_value as _same_value
 from fatebridge.validation.human_design_source_files import verify_source_files
 
 

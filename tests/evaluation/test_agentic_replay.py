@@ -29,7 +29,6 @@ from fatebridge.application.scenarios import (
 from fatebridge.application.tool_spec import ToolSpec
 from fatebridge.core.execution_context import ExecutionOptions, current_datetime
 from fatebridge.core.reproducibility import ReproducibilityPolicy
-from fatebridge.services.replay_metadata import digest
 from fatebridge.services.tool_catalog import CATALOG
 from scripts.build_scenario_manifest import build_manifest
 from tests.fixtures.surface_payloads import REST_POST_CASES
@@ -254,12 +253,9 @@ def test_fixed_clock_replay_and_metadata_match_three_transports(
         assert metadata["effective_time"]["as_of"] == AS_OF
         assert metadata["determinism"]["uses_current_time"]
         assert metadata["duration_ms"] >= 0
-        assert metadata["business_output_sha256"] == digest(business(payload))
+        assert metadata["metadata_schema_version"] == "2.0"
         Draft202012Validator(spec.output_model.model_json_schema()).validate(payload)
     for key in (
-        "input_sha256",
-        "contract_sha256",
-        "business_output_sha256",
         "runtime",
         "replay",
     ):
@@ -309,7 +305,7 @@ def test_random_coin_receipt_can_be_replayed_in_rest_mcp_and_cli(rest):
     assert replay.status_code == 200 and not protocol.is_error and code == 0
     for payload in [replay.json(), protocol.structured_content, output]:
         assert business(payload) == business(initial.json())
-        assert payload["run_metadata"]["input_sha256"] == receipt["input_sha256"]
+        assert payload["run_metadata"]["replay"] == receipt["replay"]
         assert not payload["run_metadata"]["determinism"]["seed_generated"]
 
 
@@ -381,7 +377,7 @@ def test_pinned_partial_date_uses_existing_month_clamping_and_timezone_rules(res
     assert result["run_metadata"]["effective_time"]["as_of"] == "2024-01-30T16:00:00Z"
 
 
-def test_ephemeris_inventory_has_content_fingerprints_without_server_paths(
+def test_ephemeris_inventory_lists_filenames_without_server_paths(
     monkeypatch, tmp_path
 ):
     from fatebridge.core import ephemeris_runtime
@@ -393,11 +389,10 @@ def test_ephemeris_inventory_has_content_fingerprints_without_server_paths(
         ephemeris_runtime, "configured_ephemeris_path", lambda: str(tmp_path)
     )
     inventory = replay_metadata.ephemeris_inventory()
-    assert len(inventory["files"]["0/test.se1"]) == 64
+    assert inventory["files"] == ["0/test.se1"]
     assert str(tmp_path) not in json.dumps(inventory)
-    old = inventory["sha256"]
-    data.write_bytes(b"changed-ephemeris")
-    assert replay_metadata.ephemeris_inventory()["sha256"] != old
+    data.unlink()
+    assert replay_metadata.ephemeris_inventory()["files"] == []
 
 
 def test_rule_versions_and_actual_time_policy_survive_projection(rest):
@@ -476,10 +471,7 @@ def test_projection_and_no_metadata_keep_business_output_compatible(rest):
         },
     ).json()
     assert projected["bazi_birth"]["day_master"] == full["bazi_birth"]["day_master"]
-    assert (
-        projected["run_metadata"]["business_output_sha256"]
-        == full["run_metadata"]["business_output_sha256"]
-    )
+    assert projected["run_metadata"]["provenance"] == full["run_metadata"]["provenance"]
     code, output = cli("bazi_birth", BIRTH, CONTROLS)
     args = [sys.executable, "-m", "fatebridge.cli", "--no-metadata", "bazi_birth"]
     for key, value in {**BIRTH, **CONTROLS}.items():
@@ -541,7 +533,7 @@ def test_clocks_are_isolated_between_threads_and_reset_after_error():
     assert current_datetime(timezone.utc).year not in {2000, 2030}
 
 
-def test_metadata_fingerprint_and_privacy(rest):
+def test_metadata_versions_and_privacy(rest):
     first = rest.post(
         "/api/cn/bazi/birth",
         json={**BIRTH, "name": "PrivateIdentityMarker"},
@@ -549,14 +541,14 @@ def test_metadata_fingerprint_and_privacy(rest):
     ).json()["run_metadata"]
     assert "PrivateIdentityMarker" not in json.dumps(first)
     assert first["runtime"]["package_version"] == first["package_version"]
-    for key in ("implementation_sha256", "bundled_data_sha256", "environment_sha256"):
-        assert len(first["runtime"][key]) == 64
+    assert "implementation_sha256" not in first["runtime"]
+    assert "environment_sha256" not in first["runtime"]
     second = rest.post(
         "/api/cn/bazi/birth",
         json={**BIRTH, "name": "DifferentIdentityMarker"},
         params=CONTROLS,
     ).json()["run_metadata"]
-    assert second["input_sha256"] != first["input_sha256"]
+    assert second["run_id"] != first["run_id"]
     assert second["runtime"] == first["runtime"]
 
 

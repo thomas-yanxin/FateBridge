@@ -227,7 +227,6 @@ def quotes(result, focus):
                 path=path,
                 value=value,
                 run_id=receipt["run_id"],
-                business_output_sha256=receipt["business_output_sha256"],
             )
         )
     return out
@@ -250,7 +249,6 @@ def test_context_checker_rejects_cherry_picked_true_marriage_clause():
         path=f"sukuyo.activity_assessment.matched_rules.{good[0]}",
         value=good[1],
         run_id=receipt["run_id"],
-        business_output_sha256=receipt["business_output_sha256"],
     )
     assert (
         verify_calculation_claims(result, [partial])["status"]

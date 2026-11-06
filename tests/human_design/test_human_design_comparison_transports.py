@@ -1,7 +1,6 @@
 """Native node witnesses and explanations survive projection and real paging."""
 
 import asyncio
-import hashlib
 import json
 
 import pytest
@@ -17,6 +16,7 @@ from fatebridge.core.astro import runtime
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
+from tests.fixtures.mcp_receipt import verified_inline_business
 
 SPEC = next(s for s in CATALOG if s.key == "human_design")
 INPUT = dict(
@@ -77,11 +77,7 @@ def test_nodes_card_and_full_three_surface_readings_match_with_lossless_paging(
                         parts.append(page["text"])
                         offset = page["next_offset"]
                 text = "".join(parts)
-                assert (
-                    hashlib.sha256(text.encode()).hexdigest()
-                    == page["sha256"]
-                    == reference["sha256"]
-                )
+                assert len(text) == reference["total_chars"]
                 original = json.loads(text)
                 assert (
                     original["run_metadata"]["run_id"]
@@ -123,9 +119,7 @@ def test_nodes_card_and_full_three_surface_readings_match_with_lossless_paging(
                 == expected["node_convention_comparison"]["changed_activations"]
             )
             if "result_delivery" in card.structured_content:
-                assert card.structured_content["result_delivery"][
-                    "deferred_fields"
-                ] == ["run_metadata.runtime"]
+                await verified_inline_business(client, card.structured_content)
                 original_card = await restore(card.structured_content)
                 for key in (
                     "node_convention_comparison",

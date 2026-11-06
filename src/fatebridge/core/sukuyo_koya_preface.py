@@ -110,7 +110,7 @@ def preface_reading_lines(reference: dict[str, Any]) -> list[str]:
         "同条補入記另录806年正月二日丁卯密日、807年正月三日壬辰蜜日和808年二月七日蜜日；"
         "807年唐历正月四日仅为原文准拟，应当之说未验证。唐元和元年十二月小尽与夹注本国大月分层保留；"
         "記日、两古本说明和我大师录之推断分别保留，未把它们归给2013年编者或认证为当时原笔。",
-        f"翻刻PDF指纹{reference['pdf_sha256']}，来源{reference['source_url']}；"
+        f"翻刻PDF来源{reference['source_url']}；"
         "这些记日不确定平明钟时、逐时曜序、半日映射或现实效力。",
     ]
     lines.append(

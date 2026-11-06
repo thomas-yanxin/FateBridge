@@ -19,7 +19,6 @@ from fatebridge.core.astro import native_execution, runtime
 from fatebridge.core.human_design import solar_root_subdivisions
 from fatebridge.core.human_design_solar_root import SOLAR_COORDINATE_POLICY
 from fatebridge.core.human_design_time import sun_at_tt
-from fatebridge.services.replay_metadata import digest
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
 from tests.support.ephemeris_case_runtime import (
@@ -241,9 +240,6 @@ def test_rehashed_sub_tolerance_solar_contradictions_cannot_pass(complete, kind)
     for trace in run["rule_trace"]:
         if trace["rule_id"] == "design_solar_arc":
             trace["result"] = {"design_utc": run["design_utc"], **s}
-    run["run_metadata"]["business_output_sha256"] = digest(
-        {k: v for k, v in run.items() if k != "run_metadata"}
-    )
     with (
         patch.object(runtime, "ephemeris_call", forbidden),
         patch.object(native_execution, "calculate", forbidden),
@@ -257,7 +253,9 @@ def test_all_three_platform_controls_keep_actual_whole_numeric_candidates(
     tt, mode, monkeypatch
 ):
     from fatebridge.core.human_design import chart_at_tt
-    from fatebridge.validation.human_design_solar_root import verify_solar_root_context
+    from fatebridge.core.human_design_solar_root_validation import (
+        verify_solar_root_context,
+    )
 
     monkeypatch.setenv("SE_EPHE_PATH", str(ROOT / "ephe"))
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
@@ -320,7 +318,9 @@ def actual_family():
 def test_local_curve_and_complete_candidate_contradictions_reject_without_native(
     actual_family, kind
 ):
-    from fatebridge.validation.human_design_solar_root import verify_solar_root_context
+    from fatebridge.core.human_design_solar_root_validation import (
+        verify_solar_root_context,
+    )
 
     c = deepcopy(actual_family)
     w = c["design_solver"]["numerical_precision"]

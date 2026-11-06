@@ -5,7 +5,6 @@ from copy import deepcopy
 import pytest
 
 from fatebridge.core.human_design_cycles import origin_source_evidence
-from fatebridge.services.replay_metadata import digest
 from fatebridge.validation.human_design import verify_human_design_reading
 from tests.support.human_design_current import complete_run
 
@@ -45,9 +44,9 @@ def test_explicit_birth_wording_and_personality_epoch_binding_are_separate(compl
                 in evidence["epoch_binding_basis"]
             )
             assert evidence["source"]["heading"] == "Uranus Opposition"
-            assert (
-                evidence["source"]["quote_sha256"]
-                == "646ed48912a1ab4e834c38c210067699b6f403c6e7178ff626ee2272787852b8"
+            assert evidence["source"]["quote"] == (
+                "Technically, the Uranus opposition occurs when the transiting Uranus "
+                "reaches a point exactly opposite its position at birth."
             )
         else:
             assert evidence["source_origin"] is None and evidence["source"] is None
@@ -72,7 +71,7 @@ def test_explicit_birth_wording_and_personality_epoch_binding_are_separate(compl
         "false_legacy",
     ],
 )
-def test_rehashed_source_and_priority_forgeries_are_rejected(complete, mutation):
+def test_source_and_priority_forgeries_are_rejected(complete, mutation):
     run = deepcopy(complete)
     context = run["cycle_context"]
     if mutation == "unknown_version":
@@ -88,12 +87,9 @@ def test_rehashed_source_and_priority_forgeries_are_rejected(complete, mutation)
         elif mutation == "first_contact":
             target["contact_priority"] = "first_contact_is_authoritative"
         elif mutation == "forged_source":
-            target["source"]["quote_sha256"] = "0" * 64
+            target["source"]["quote"] = "The design epoch is the origin."
         else:
             del context["bodies"][1]["origin_source_evidence"]
-    run["run_metadata"]["business_output_sha256"] = digest(
-        {k: v for k, v in run.items() if k != "run_metadata"}
-    )
     result = verify_human_design_reading(run)
     assert result["status"] == "rejected"
     if mutation in {"unknown_version", "false_legacy"}:

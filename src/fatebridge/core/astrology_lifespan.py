@@ -46,9 +46,7 @@ from fatebridge.core.predictive._common import (
     sign_label,
 )
 
-# ---------------------------------------------------------------------------
 # Fixed classical tables.
-# ---------------------------------------------------------------------------
 
 # Ptolemy's seven ages of man (Tetrabiblos IV.10). Each entry is the *start* age
 # of the band in years; the band runs until the next entry's start (Saturn runs
@@ -139,9 +137,7 @@ DISTRIBUTION_TIME_KEY_RATES: Dict[str, float] = {
 }
 
 
-# ---------------------------------------------------------------------------
 # Small geometry helpers.
-# ---------------------------------------------------------------------------
 
 
 def _wrap360(degree: float) -> float:
@@ -191,9 +187,7 @@ def _planet_condition(
     }
 
 
-# ---------------------------------------------------------------------------
 # 1. 调波盘 (harmonic chart).
-# ---------------------------------------------------------------------------
 
 
 def build_harmonic_payload(
@@ -257,9 +251,7 @@ def build_harmonic_payload(
     }
 
 
-# ---------------------------------------------------------------------------
 # 2. 行星年龄 (Ptolemy's seven ages).
-# ---------------------------------------------------------------------------
 
 
 def build_planetary_ages_payload(
@@ -311,9 +303,7 @@ def build_planetary_ages_payload(
     }
 
 
-# ---------------------------------------------------------------------------
 # 3. 三分主星推运 (triplicity rulers of the sect light).
-# ---------------------------------------------------------------------------
 
 
 def build_triplicity_rulers_payload(
@@ -398,9 +388,7 @@ def build_triplicity_rulers_payload(
     }
 
 
-# ---------------------------------------------------------------------------
 # 4. 月相推运 (progressed lunation phase).
-# ---------------------------------------------------------------------------
 
 
 def _phase_for_elongation(elongation: float) -> tuple[str, str]:
@@ -460,9 +448,7 @@ def build_lunation_phase_payload(
     }
 
 
-# ---------------------------------------------------------------------------
 # 5. 界推运 / 分配法 (distributions through the Egyptian bounds).
-# ---------------------------------------------------------------------------
 
 
 def _bound_segments_from(
@@ -561,9 +547,7 @@ def build_distributions_payload(
     }
 
 
-# ---------------------------------------------------------------------------
 # 6. Balbillus 129年系统 (旺距削减主限).
-# ---------------------------------------------------------------------------
 
 # Seven-planet "small years" of the Balbillus 129-year system (Σ = 129).
 BALBILLUS_SMALL_YEARS: Dict[str, int] = {
@@ -728,9 +712,7 @@ def build_balbillus_payload(
     }
 
 
-# ---------------------------------------------------------------------------
 # 7. 数字相位推运 (120年关键点 / keypoints).
-# ---------------------------------------------------------------------------
 
 # Seven-planet period numbers for the keypoints (数字相位) technique.
 KEYPOINTS_PERIOD_NUMBERS: Dict[str, int] = {
@@ -842,9 +824,7 @@ def build_keypoints_payload(
     }
 
 
-# ---------------------------------------------------------------------------
 # 8. 129年系统 (yearsystem129).
-# ---------------------------------------------------------------------------
 # Shares Balbillus' seven "small years" (Σ = 129) but, unlike Balbillus, each
 # planet rules its FULL small-year — there is no exaltation-distance reduction.
 # The period order reuses Balbillus' verified zodiacal sequence (planets by natal
@@ -907,9 +887,7 @@ def build_yearsystem129_payload(
     }
 
 
-# ---------------------------------------------------------------------------
 # 9. 行星弧方向 (planetaryarc).
-# ---------------------------------------------------------------------------
 
 
 def build_planetary_arc_payload(
@@ -959,9 +937,7 @@ def build_planetary_arc_payload(
     }
 
 
-# ---------------------------------------------------------------------------
 # 10. 波斯向运 (Persian Directed).
-# ---------------------------------------------------------------------------
 
 # 向运星 (promittors): only the seven classical planets advance.
 PERSIAN_MOVERS = ["Sun", "Moon", "Mercury", "Venus", "Mars", "Jupiter", "Saturn"]
@@ -1052,9 +1028,7 @@ def build_persian_directed_payload(
     }
 
 
-# ---------------------------------------------------------------------------
 # 11. 年龄推进点 (Age Point / Huber).
-# ---------------------------------------------------------------------------
 
 # Huber 年龄推进点 traverses the 12 Koch houses from the Ascendant, 6 years per
 # house, returning to the Ascendant after a full 72-year cycle (12 × 6).
@@ -1167,9 +1141,7 @@ def build_age_point_payload(
     }
 
 
-# ---------------------------------------------------------------------------
 # 12. 恒星推运 (Vedic sidereal secondary progression).
-# ---------------------------------------------------------------------------
 
 
 def build_vedic_progression_payload(
@@ -1209,9 +1181,7 @@ def build_vedic_progression_payload(
     }
 
 
-# ---------------------------------------------------------------------------
 # 13. 赤纬推运 (Jayne declination progression).
-# ---------------------------------------------------------------------------
 
 
 def build_jaynes_declination_payload(

@@ -15,14 +15,11 @@ from fatebridge.application.execution import execute_tool
 from fatebridge.cli import run
 from fatebridge.core.fengshui.reading import build_natal_reading
 from fatebridge.services.fengshui import calculate_xuankong_natal
-from fatebridge.services.replay_metadata import digest
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.fengshui_reading import verify_fengshui_reading
-from tests.fengshui.test_fengshui_surfaces import (
-    mcp_call,
-    rest_client,
-    without_transport,
-)
+from tests.support.fengshui_transports import mcp_call
+from tests.support.mcp_result_assertions import without_transport
+from tests.support.transports import rest_client
 
 
 def inputs(current=8, angle=0, forms=None, half=None):
@@ -61,7 +58,7 @@ def executed(req=None, tool="xuankong_natal"):
 
 
 def trusted(payload):
-    return {"trusted_run_metadata": deepcopy(payload["run_metadata"])}
+    return {"trusted_payload": deepcopy(payload)}
 
 
 def test_reading_defaults_on_with_selected_interpretation_and_can_be_disabled():
@@ -216,9 +213,6 @@ def test_verifier_requires_complete_original_payload_and_independent_trusted_rec
     )
     changed = deepcopy(result)
     changed["calculation_reading"]["text"] += "必定旺财，成功率100%"
-    changed["run_metadata"]["business_output_sha256"] = digest(
-        {k: v for k, v in changed.items() if k != "run_metadata"}
-    )
     assert verify_fengshui_reading(changed, **anchor)["status"] == "rejected"
     projected = {
         "calculation_reading": result["calculation_reading"],
@@ -291,9 +285,6 @@ def test_even_a_trusted_malformed_reading_cannot_pass_template_or_coverage_check
         reading["uncovered_layers"] = []
     # This test supplies a synthetic trusted receipt for the wrong response to
     # check semantic/coverage rejection separately from the outer hash guard.
-    result["run_metadata"]["business_output_sha256"] = digest(
-        {k: v for k, v in result.items() if k != "run_metadata"}
-    )
     report = verify_fengshui_reading(result, **trusted(result))
     assert report["status"] == "rejected"
     assert {e["code"] for e in report["errors"]} == {
@@ -398,7 +389,6 @@ def test_bounded_same_run_full_readback_can_be_verified_without_recalculation(
             manifest = json.loads(
                 (await client.read_resource(ref["manifest_uri"]))[0].text
             )
-            anchor = {"trusted_run_metadata": manifest["run_metadata"]}
             uri = ref["first_page_uri"]
             raw = ""
             while uri:
@@ -406,6 +396,7 @@ def test_bounded_same_run_full_readback_can_be_verified_without_recalculation(
                 raw += page["text"]
                 uri = page["next_uri"]
             full = json.loads(raw)
+            anchor = {"trusted_payload": deepcopy(full)}
             assert (
                 verify_fengshui_reading(full, **anchor)["status"]
                 == "verified_served_fixed_reading"
@@ -420,14 +411,14 @@ def test_separately_saved_receipt_and_audit_command_detect_changes(tmp_path):
     payload = tmp_path / "payload.json"
     receipt = tmp_path / "receipt.json"
     payload.write_text(json.dumps(result))
-    receipt.write_text(json.dumps(result["run_metadata"]))
+    receipt.write_text(json.dumps(result))
     script = Path(__file__).parents[2] / "scripts/fengshui/audit_fengshui_reading.py"
     command = [
         sys.executable,
         str(script),
         "--payload",
         str(payload),
-        "--trusted-receipt",
+        "--trusted-payload",
         str(receipt),
     ]
     valid = subprocess.run(command, capture_output=True, text=True)

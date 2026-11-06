@@ -30,7 +30,7 @@ T投影的 `fatebridge_topocentric_zero_ecliptic_latitude_v1` 按实际纬度求
 
 核对私有原生上下文时，预检原点看 `preflight_reference_origin`，目标实际原点看 `coordinate_reference_origin`，不能将二者互换。模型探测坐标丢弃后重置缓存，不作为新增物理观测；站心标志可能覆盖请求中的日心／质心位，来源资格按实际返回标志核查。`coordinate_is_defined_zero=true` 是原生参考恒等式，不是测得的太阳／地球位置，不能从零向量推断其物理矢量文件已被读取。详见参考原点与预检核验。
 
-西占请求可显式传 `ephemeris_policy=require_data_files`；本命、关系盘、推运、卜卦和择日的已观测物理坐标及太阳钟／抽样调用均拒绝解析或轨道回退，默认 `auto` 保留实际可用模型。严格请求成功后，可取 `evidence_views.data_files` 的 `fields` 读取 `ephemeris_data_policy`；视图本身不会设置输入政策。核对实际模型、文件散列、零向量和私有进程回执，不能把调用次数当成独立天文或现实观测。组件原有的局部 `auto` 参数保留，其上仍受本次严格准入约束。日出／日落仅探测查询与返回时刻，原生求解内部读取尚未完全可见；恒星目录公式、虚星轨道、解析交点和地球自转另列，不据此认证绝对精度、整部原典或预测能力。果老暂不支持该西占选项，印占沿用其既有政策。完整范围见请求来源政策核验。
+西占请求可显式传 `ephemeris_policy=require_data_files`；本命、关系盘、推运、卜卦和择日的已观测物理坐标及太阳钟／抽样调用均拒绝解析或轨道回退，默认 `auto` 保留实际可用模型。严格请求成功后，可取 `evidence_views.data_files` 的 `fields` 读取 `ephemeris_data_policy`；视图本身不会设置输入政策。核对实际模型、文件名称与版本、零向量和私有进程回执，不能把调用次数当成独立天文或现实观测。组件原有的局部 `auto` 参数保留，其上仍受本次严格准入约束。日出／日落仅探测查询与返回时刻，原生求解内部读取尚未完全可见；恒星目录公式、虚星轨道、解析交点和地球自转另列，不据此认证绝对精度、整部原典或预测能力。果老暂不支持该西占选项，印占沿用其既有政策。完整范围见请求来源政策核验。
 
 首次调用前按问题在工具公开的输出合同中选择下列业务字段；普通摘要仍严格投影、关闭快照。工具公开的 `evidence_views.classical_detail/fixed_stars/planetary_hours` 是对应按需字段卡，复制其中 `fields`，卡名不是请求参数。下表路径是解读索引，不是新增输入参数。先复用已保留的同 run 结果；投影曾排除某层时不能靠分页补回，也不能在用户要求不重算后另排一张盘。
 
@@ -41,10 +41,10 @@ T投影的 `fatebridge_topocentric_zero_ecliptic_latitude_v1` 按实际纬度求
 | “命主力主为何是这颗星？”“与上升守护星一样吗？” | `classical.almuten_figuris.winner/totals/points`、`classical.topic_almutens`、`classical.planets` | 命主力主是本工具对实际纳入点的尊贵加权汇总；逐点贡献和缺少的点都要保留。它与上升守护星、某宫宫头力主是不同规则，不把最高分星当成整个人的唯一性格 |
 | 用户问产前朔望／为何参与命主力主 | `classical.syzygy`、`classical.almuten_figuris.points` | 核对实际返回的朔望类型、`julian_day`、经度及参与情况，再说明所选传统怎样使用它。`null` 表示本次未提供这一层，不猜朔望，不因此否定已完整的其他点 |
 
-朔望的`ephemeris_source`描述整次搜索及显示调用，出生历元的`chart_profile.planetary_models`不能替代它。`models_stable=false`时须说明搜索或显示发生星历模型切换；有效结果仍保留，但不声称来源一致、根附近连续性已证或残差等于天文精度。调用次数、文件散列和模型名称均不是独立观测或原典验收。来源完整性错误不能解释为“没有出生前朔望”。
+朔望的`ephemeris_source`描述整次搜索及显示调用，出生历元的`chart_profile.planetary_models`不能替代它。`models_stable=false`时须说明搜索或显示发生星历模型切换；有效结果仍保留，但不声称来源一致、根附近连续性已证或残差等于天文精度。调用次数、文件名称和模型名称均不是独立观测或原典验收。来源完整性错误不能解释为“没有出生前朔望”。
 
 朔望的日期表示另读`utc_representation`。`datetime_representable=false`只限制Python日期载体；实际返回的TT／UT1、经度和总主星参与点仍应解释。扩展标签中的天文年0对应纪元前1年，不是公元1年，也不扩大出生输入范围。`event_datetime_utc`是标签字符串，可能含扩展年份或闰秒；历史调整时也可能没有唯一民用标签。1960年前UTC命名的历史载体按模型UT1读取，不冒充原子UTC；日期显示限制不等于没有朔望。
-| 明确问恒星合某星／角度 | `fixed_stars`、该点实际落点及 `chart_profile.fixed_stars` | 先核对实际 `status/model_id/catalogue_sha256/julian_day_tt/longitude_frame/orb_limit/earth_ephemeris_model`，再逐条读 `star/cn/point/orb/star_longitude/star_latitude/nature_components`。当前生产层以20颗SIMBAD ICRS星表观测量传播自行、视差与径向速度，再计算本次地心视位置；不能说成仅用固定黄经线性岁差推进。合相只比较同黄道黄经，黄纬不参与命中，因此不是球面近合、掩星或赤纬平行。`status=unavailable`的空表表示未计算，`computed`的空表表示本次目录／容许度内无命中；均不代表完整天空。最紧一条未必最贴主题，不把传统星性当灾祸事件 |
+| 明确问恒星合某星／角度 | `fixed_stars`、该点实际落点及 `chart_profile.fixed_stars` | 先核对实际 `status/model_id/julian_day_tt/longitude_frame/orb_limit/earth_ephemeris_model`，再逐条读 `star/cn/point/orb/star_longitude/star_latitude/nature_components`。当前生产层以20颗SIMBAD ICRS星表观测量传播自行、视差与径向速度，再计算本次地心视位置；不能说成仅用固定黄经线性岁差推进。合相只比较同黄道黄经，黄纬不参与命中，因此不是球面近合、掩星或赤纬平行。`status=unavailable`的空表表示未计算，`computed`的空表表示本次目录／容许度内无命中；均不代表完整天空。最紧一条未必最贴主题，不把传统星性当灾祸事件 |
 | 明确问出生行星日／行星时 | `planetary_hours`、`person_info` | 读 `is_day/day_ruler/hour_ruler/hour_number`，这是按出生地日出日落划分的不等时辰。缺星历或极昼夜可能为 `null`；不改用民用整点凑一颗主星，也不把出生行星时说成未来活动的吉时 |
 
 对资源、关系等普通问题，只有这层能补独立信息时才取。气质／身体部位的传统对应不作为诊断或器官状态；不因某星、恒星或点位带有传统凶名就预告灾祸。
@@ -161,7 +161,7 @@ Lahiri 的交付日速跟随实际恒星黄道零点的运动，不能复制热�
 
 公开十二宫请求尚未提供 Gauquelin 的36分区技法。已识别的 `G`／Gauquelin 名称现在会在请求校验时报 `unsupported_house_system`，不再回落普通宫制；说明及三端取证见输入保护核验。不要通过改传 Placidus 绕过拒绝，也不能与 Witte 十二个赤经子午宫混称。历史 CFEPP 离线复算的1053条原分区一致是计算比较，不是职业预测命中；13条主算法差异、897条未完成独立钟时核对及无前瞻验证状态须保留。需要这部分依据时读历史分区审计，不自行补出生秒数、折射或完整原典验收。
 
-卜卦／择日可按明确需求选 `ut1_source=iers_c04`；默认仍为 `swiss_delta_t`。先读 `ut1_input` 字段卡中的 `clock_conversion.ut1_reference` 与盘面 `calculation_basis.earth_rotation`：固定日值覆盖1962-01-01 00:00至2026-09-19 00:00 UTC，需要UT1的起盘、宫位及地平时刻超出范围会拒绝；地心TT黄经事件不需要试算时刻的UT1，可在不外推UT1的情况下跨边界搜索。按实际事件 `status` 解释可用性，不能仅因事件超出C04边界就说它未知；真实失败仍不能当无相位／空亡。已发布日值与日间线性插值分开；只应用UT1，极移、CIP偏移、日内潮汐未应用，形式标准差不能说成精确置信界。来源指纹和数值通过不证明原始出生钟时准确、原典完整或现实预测有效。模型路径引用为null，不能据此说工具失败。
+卜卦／择日可按明确需求选 `ut1_source=iers_c04`；默认仍为 `swiss_delta_t`。先读 `ut1_input` 字段卡中的 `clock_conversion.ut1_reference` 与盘面 `calculation_basis.earth_rotation`：固定日值覆盖1962-01-01 00:00至2026-09-19 00:00 UTC，需要UT1的起盘、宫位及地平时刻超出范围会拒绝；地心TT黄经事件不需要试算时刻的UT1，可在不外推UT1的情况下跨边界搜索。按实际事件 `status` 解释可用性，不能仅因事件超出C04边界就说它未知；真实失败仍不能当无相位／空亡。已发布日值与日间线性插值分开；只应用UT1，极移、CIP偏移、日内潮汐未应用，形式标准差不能说成精确置信界。来源标识和数值通过不证明原始出生钟时准确、原典完整或现实预测有效。模型路径引用为null，不能据此说工具失败。
 
 
 宫制选择按实际返回的 canonical 字母和名称解释。`Alcabitus`／`Alcabitius` 均取B，`Whole Signs`取W，`Axial Rotation`取X，Swiss等宫字母E等价规范为A；I与i保留为不同Sunshine模型。未知／空白名字、布尔值和浮点编号现在报参数错误，不再默认成另一宫制。`hsys`为0..8共用编号，仍须遵守各技法额外限制；省略参数的既有默认值保留。收到`invalid_house_system`或`invalid_house_code`时修正该选择，不把错误解释为命盘结论，也不改传P后沿用用户原来的流派名称。源码与数值反例见宫制选择核验。
@@ -174,6 +174,6 @@ Lahiri 的交付日速跟随实际恒星黄道零点的运动，不能复制热�
 
 核对历史盘的自转来源时，读取 `earth_rotation.tt_argument_policy`。v3自定义校正与共享时钟采用相同的TT政策；1960年前的默认历史UT1路径、1960年后的现有SWIEPH关系与明确选择的C04分别回显。旧适配器重推TT的差额仅描述其自转公式参数不一致，不能说出生钟时或所有星位错移同样秒数。原生区间内未启用自定义校正时回显原生内部路径；方法修复不认证历史钟时、实测UT1或绝对精度。细目见自转TT核验。
 
-核对明确启用的西占民用钟真太阳时重置时，读取 `person_info.true_solar.time_reference`（德国盘在 `base_chart.person_info`）。`western_solar_rebase_coherent_tt_ut1_v2` 使用记录时刻的主TT太阳赤经与选定UT1上的既定GAST，保留实际太阳来源和自转模型；不要把该记录时刻的太阳当成重置后盘面时刻的太阳。旧 `western_solar_rebase_ut1_v1` 是原生 `time_equ` 规约，原96点及0.0002秒门槛仍保留；新旧数值不一致不应改写旧结果为通过。来源指纹、同一模型的独立实现比较和精确回放都不认证绝对精度、历史钟面识别或现实预测。未启用校正、明确LMT／LAT和印度／果老路径不由此改口径。详见太阳钟一致性核验。
+核对明确启用的西占民用钟真太阳时重置时，读取 `person_info.true_solar.time_reference`（德国盘在 `base_chart.person_info`）。`western_solar_rebase_coherent_tt_ut1_v2` 使用记录时刻的主TT太阳赤经与选定UT1上的既定GAST，保留实际太阳来源和自转模型；不要把该记录时刻的太阳当成重置后盘面时刻的太阳。旧 `western_solar_rebase_ut1_v1` 是原生 `time_equ` 规约，原96点及0.0002秒门槛仍保留；新旧数值不一致不应改写旧结果为通过。来源标识、同一模型的独立实现比较和精确回放都不认证绝对精度、历史钟面识别或现实预测。未启用校正、明确LMT／LAT和印度／果老路径不由此改口径。详见太阳钟一致性核验。
 
 明确启用西占民用钟太阳时重置时，再核 `time_reference.rebase_arithmetic`。`frozen_recorded_utc_offset_v1` 表示把既定校正量按原记录的UTC偏移相加，保留 `recorded_local_datetime/recorded_utc_offset_seconds/recorded_utc` 与 `rebased_solar_clock_datetime/rebased_utc/rebase_utc_shift_seconds`。重置后的固定偏移太阳钟标签不是该IANA地名在那一钟面上的合法民用钟时，不能再次按夏令时、重复时段或跳日规则选偏移。明确UTC起点的生时样点可穿越重复时段；原始出生钟面有歧义时仍需明确偏移，不猜fold。此重置仍是既定合成钟移政策，记录UTC样点跨规则切换时，校正量本身可能不连续；不能把结果称连续物理时轴、历史LAT逆解或预测概率。见偏移切换核验。

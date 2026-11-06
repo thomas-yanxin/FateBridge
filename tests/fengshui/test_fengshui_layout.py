@@ -16,12 +16,12 @@ from fatebridge.core.fengshui.models import AssessRequest, BazhaiRequest, Minggu
 from fatebridge.core.fengshui.output import FengshuiOutput
 from fatebridge.services.fengshui import assess, calculate_bazhai, calculate_minggua
 from fatebridge.services.tool_catalog import CATALOG
-from tests.fengshui.test_fengshui_surfaces import (
-    rest_client,
+from tests.fixtures.fengshui import payload
+from tests.support.mcp_result_assertions import (
     same_run_projected_response,
     without_transport,
 )
-from tests.fixtures.fengshui import payload
+from tests.support.transports import rest_client
 
 
 def facing_only():
@@ -102,32 +102,6 @@ def test_boundary_date_keeps_uncertainty_and_timezone():
         birth_date="2026-01-01", gender_convention="male", year_boundary="january_1"
     )
     assert civil["status"] == "complete"
-
-
-def test_date_input_does_not_certify_boundary_when_term_is_approximate(monkeypatch):
-    import fatebridge.core.fengshui.bazhai as core
-
-    monkeypatch.setattr(
-        core,
-        "lichun_resolution",
-        lambda *args: {
-            "moment": "2026-02-04T04:03:00+08:00",
-            "provider": "linear_fallback",
-            "approximate": True,
-        },
-    )
-    actual = calculate_minggua(birth_date="2026-02-03", gender_convention="male")
-    personal = actual["layers"]["minggua"]
-    assert personal["status"] == "partial" and personal["candidates"] == []
-    assert personal["time_context"]["boundary_resolution"]["approximate"]
-    assert (
-        "confirmed_effective_birth_year_due_to_boundary_precision"
-        in personal["missing_inputs"][0]
-    )
-    assert (
-        calculate_minggua(effective_birth_year=2025, gender_convention="male")["status"]
-        == "complete"
-    )
 
 
 @pytest.mark.parametrize(

@@ -1,14 +1,14 @@
 """Verify structured quotations against the complete original calculation.
 
-This is a fact-checking primitive for hosts, not a semantic free-text grader.
-Projection, a different run or changed business data must never pass silently.
+This checks typed quotations, not free-text semantics. A separately trusted
+original additionally enables exact comparison of the complete payload.
 """
 
 from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field, JsonValue
 
-from fatebridge.utils.json_digest import digest
+from fatebridge.utils.json_values import same_value as _same_value
 
 
 class CalculationClaim(BaseModel):
@@ -16,41 +16,25 @@ class CalculationClaim(BaseModel):
     path: str = Field(min_length=1)
     value: JsonValue
     run_id: str = Field(min_length=1)
-    business_output_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
-
-
-def _same_value(left: Any, right: Any) -> bool:
-    if type(left) is not type(right):
-        return False
-    if isinstance(left, dict):
-        return left.keys() == right.keys() and all(
-            _same_value(left[k], right[k]) for k in left
-        )
-    if isinstance(left, list):
-        return len(left) == len(right) and all(
-            _same_value(a, b) for a, b in zip(left, right)
-        )
-    return bool(left == right)
 
 
 def verify_calculation_claims(
-    payload: dict[str, Any], claims: list[CalculationClaim]
+    payload: dict[str, Any],
+    claims: list[CalculationClaim],
+    *,
+    trusted_payload: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Require original business bytes/values and exact run-scoped field values."""
+    """Check typed quotations; optionally compare the separately retained original."""
     metadata = payload.get("run_metadata", {})
     body = {k: v for k, v in payload.items() if k != "run_metadata"}
-    expected = metadata.get("business_output_sha256")
     errors: list[dict[str, Any]] = []
-    if not isinstance(expected, str) or expected != digest(body):
+    if trusted_payload is not None and not _same_value(payload, trusted_payload):
         errors.append({"code": "incomplete_or_changed_business_payload"})
     if not metadata.get("run_id"):
         errors.append({"code": "missing_original_run_id"})
     for index, claim in enumerate(claims):
         error = None
-        if (
-            claim.run_id != metadata.get("run_id")
-            or claim.business_output_sha256 != expected
-        ):
+        if claim.run_id != metadata.get("run_id"):
             error = "different_calculation_receipt"
         else:
             actual: Any = body
@@ -69,9 +53,10 @@ def verify_calculation_claims(
         if error:
             errors.append({"claim_index": index, "path": claim.path, "code": error})
     return {
-        "method_id": "same_run_calculation_claims_v1",
+        "method_id": "same_run_calculation_claims_v2",
         "status": "rejected" if errors or not claims else "verified_structured_facts",
         "checked_claim_count": len(claims),
         "errors": errors,
-        "scope": "只核验同run完整结果中的结构化字段引用；不证明自由文本语义忠实、原典成立、外部真实性或现实预测有效。哈希须与可信原始回执核对，不能把自造回执当认证。",
+        "original_payload_compared": trusted_payload is not None,
+        "scope": "只核验所供结果中具名run的结构化字段引用；完整原结果身份仅在调用方另行提供可信原结果时逐值比较。不能认证自行提交的结果、自由文本语义、原典成立、外部真实性或现实预测。",
     }

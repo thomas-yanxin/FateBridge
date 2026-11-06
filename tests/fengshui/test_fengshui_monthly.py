@@ -20,17 +20,14 @@ from fatebridge.core.fengshui.models import MonthlyRequest
 from fatebridge.core.fengshui.monthly import monthly_position_reading
 from fatebridge.core.fengshui.monthly_time import solar_month_context
 from fatebridge.services.fengshui import assess, calculate_monthly_stars
-from fatebridge.services.replay_metadata import digest
 from fatebridge.utils.errors import EphemerisSourceError
 from fatebridge.validation.fengshui_monthly import (
     audit_monthly_reference,
     verify_monthly_reading,
 )
-from tests.fengshui.test_fengshui_surfaces import (
-    mcp_call,
-    rest_client,
-    without_transport,
-)
+from tests.support.fengshui_transports import mcp_call
+from tests.support.mcp_result_assertions import without_transport
+from tests.support.transports import rest_client
 
 FOLDER = Path(__file__).parents[1] / "data/fengshui_monthly_v1"
 REFERENCE = json.loads((FOLDER / "reference.json").read_text())
@@ -457,40 +454,29 @@ def test_rest_mcp_cli_projection_and_trusted_monthly_receipts(
     cli = json.loads(capsys.readouterr().out)
     assert without_transport(rest) == without_transport(mcp) == without_transport(cli)
     for body in [rest, mcp, cli]:
-        anchor = deepcopy(body["run_metadata"])
-        checked = verify_monthly_reading(body, trusted_run_metadata=anchor)
+        anchor = deepcopy(body)
+        checked = verify_monthly_reading(body, trusted_payload=anchor)
         assert checked["status"] == "verified_served_fixed_monthly_reading", checked
         assert checked["monthly_position_coverage_verified"]
         bad = deepcopy(body)
         bad["layers"]["monthly_stars"]["position_reading"][
             "text"
         ] += " guaranteed fortune"
-        bad["run_metadata"]["business_output_sha256"] = digest(
-            {k: v for k, v in bad.items() if k != "run_metadata"}
-        )
         assert (
-            verify_monthly_reading(bad, trusted_run_metadata=anchor)["status"]
-            == "rejected"
+            verify_monthly_reading(bad, trusted_payload=anchor)["status"] == "rejected"
         )
         wrong = deepcopy(body)
         wrong["layers"]["monthly_stars"]["position_reading"]["statements"][1][
             "target_path"
         ] = "layers.monthly_stars.palaces.N"
         # A synthetic trusted receipt isolates semantic/coverage checks, not authentication.
-        wrong["run_metadata"]["business_output_sha256"] = digest(
-            {k: v for k, v in wrong.items() if k != "run_metadata"}
-        )
         assert (
-            verify_monthly_reading(
-                wrong, trusted_run_metadata=deepcopy(wrong["run_metadata"])
-            )["status"]
+            verify_monthly_reading(wrong, trusted_payload=deepcopy(wrong))["status"]
             == "rejected"
         )
     with rest_client(monkeypatch) as client:
         partial = client.post("/api/fengshui/monthly_stars", json={}).json()
-    checked = verify_monthly_reading(
-        partial, trusted_run_metadata=deepcopy(partial["run_metadata"])
-    )
+    checked = verify_monthly_reading(partial, trusted_payload=deepcopy(partial))
     assert (
         checked["status"] == "verified_served_fixed_monthly_reading"
         and not checked["monthly_position_coverage_verified"]

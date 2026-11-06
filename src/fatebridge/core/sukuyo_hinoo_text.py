@@ -37,9 +37,8 @@ def hinoo_source_lines(source: dict[str, Any]) -> list[str]:
     downloaded = source.get("downloaded_primary_edition")
     if downloaded and source["active_primary_evidence"] == "downloaded_primary_edition":
         lines.append(
-            "本次活动证据为SAT完整HTML响应，指纹"
-            f"{downloaded['publisher_html_response_sha256']}；"
-            "历史缓存摘录分别保留，摘录哈希不代表完整响应或抄本。"
+            "本次活动证据为SAT完整HTML响应；历史缓存摘录分别保留，"
+            "摘录不代表完整响应或抄本。"
         )
         lines.append(
             "SAT见证注：" + _plain(downloaded["edition_witness_note_html"]) + "。"
@@ -104,8 +103,7 @@ def hinoo_source_lines(source: dict[str, Any]) -> list[str]:
             lines.append(
                 f"补充直接见证：{witness['holding_institution']}"
                 f"{witness['call_number']}《{witness['title']}》，"
-                f"{witness['catalogue_url']}；所用第{witness['canvas_one_based']}帧，"
-                f"原图指纹{witness['image_sha256']}，来源包指纹{witness['source_bundle_sha256']}。"
+                f"{witness['catalogue_url']}；所用第{witness['canvas_one_based']}帧。"
             )
             if witness.get("later_reading_followup"):
                 lines.append(

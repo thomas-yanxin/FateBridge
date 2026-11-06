@@ -70,14 +70,14 @@ def test_omission_null_and_known_zero_have_honest_replay_identity():
     args = CASES[0]["arguments"]
     variants = [{}, {"analysis_minute": None}, {"analysis_minute": 0}]
     rows = [execute_tool(SPEC, MeihuaAnalysisRequest(**args, **v)) for v in variants]
-    assert (
-        rows[0]["run_metadata"]["input_sha256"]
-        == rows[1]["run_metadata"]["input_sha256"]
-    )
-    assert (
-        rows[0]["run_metadata"]["input_sha256"]
-        != rows[2]["run_metadata"]["input_sha256"]
-    )
+    precision = [
+        row["meihua"]["calendar_policy"]["civil_clock_resolution"][
+            "clock_label_precision"
+        ]
+        for row in rows
+    ]
+    assert precision[0] == precision[1]
+    assert precision[0] != precision[2]
     assert rows[0]["meihua"]["seed"] == rows[2]["meihua"]["seed"]
     assert (
         rows[0]["analysis_context"]["civil_instant_utc"]

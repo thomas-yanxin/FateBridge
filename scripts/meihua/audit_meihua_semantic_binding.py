@@ -5,7 +5,7 @@ import argparse
 import json
 from pathlib import Path
 
-from fatebridge.services.replay_metadata import digest
+from fatebridge.utils.json_digest import digest
 from fatebridge.validation.meihua_semantic_binding import (
     audit_preparation,
     bind_answer_fields,

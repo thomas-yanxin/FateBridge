@@ -170,7 +170,7 @@ description: 用 FateBridge 围绕一个具体问题起卦或起局，呈现可�
 
 向外生扶另读同次 `liuyao_evidence.conditional_analysis.generation_conditions`：`condition_match` 是生源资格，`target_reception_condition` 是受生爻当前空破无根门槛，`benefit_now` 是两者在所列条件下的合取，均不是现实成功判断。原爻得本位变爻回头生，可以保留其向外生扶条件，同时保留日月克制，不等于整体旺相无伤；变爻仍不能跨位直生他爻。受生爻旬空未填、月破待审或月破日克无独立根时，不以收到生扶就认定有效。原始元忌谓词保留，综合 `conditional_atom_values`、生扶边与伏神生源读取同次资格；静爻混合动卦的未覆盖分支不补为绝对不能生。
 
-讨论某爻当前可用、月破值日或本位回头关系时，按[来源与目标分读](references/liuyao-source-target.md)同时说明与问题相关的来源资格、目标承受和具体作用；不能只说“有扶但全局未决”而漏掉已核资格或已核阻碍。长结果补读仍绑定原回执与完整payload散列，不按临时文件的新旧顺序猜本次结果。
+讨论某爻当前可用、月破值日或本位回头关系时，按[来源与目标分读](references/liuyao-source-target.md)同时说明与问题相关的来源资格、目标承受和具体作用；不能只说“有扶但全局未决”而漏掉已核资格或已核阻碍。长结果补读仍绑定原run与完整payload，不按临时文件的新旧顺序猜本次结果。
 
 本位回头生读取同次 `liuyao_evidence.conditional_analysis.back_generation_conditions`，强弱、生扶与克制共用其空破、冲空事实；`control_conditions` 的 `source_back_generation_condition/back_generation_source_path/source_rescue_used` 标明使用依据。回头生可支持日月反制下的克静条件，但不删除 `source_calendar_oppositions`，也不把 `source_calendar_supported=false` 解释为整体无力。`source_rescue_used=true` 不是全部解救或最终受伤判定，仍读本条 `condition_match/status`、原爻空破合绊及多动制化。暗动可借已匹配的实际回头生扶源，不能借静爻变盘同位支；变爻的日月关系保留，匹配门槛不等于变爻已全局无伤。
 
@@ -192,7 +192,7 @@ description: 用 FateBridge 围绕一个具体问题起卦或起局，呈现可�
 
 六爻的 `fields` 必须写完整路径，表格中 `/` 分隔的子项不能当成单个路径。三合细读可用 `fields=["liuyao_evidence.conditional_analysis.three_harmony","liuyao_evidence.calendar_conventions"]`，配合 `strict_fields=true`、`include_snapshot_text=false`。`conditional_analysis.three_harmony` 或顶层 `calendar_conventions` 都不是合法路径。保持默认响应预算，让超长回复进入 `result_delivery`；不要用 `response_char_limit=0` 把长回复交给宿主截断。一次成功回复已经包含所需事实时，直接使用该回复；补读已有 `result_delivery` 的字段或分页使用原 `result_id`，不能为了换 `fields` 重新调用 `sixyao`，即使沿用了 `trace_id/parent_run_id`，它仍是另一次计算。
 
-首轮被裁掉的字段不能靠分页恢复。已有 `result_delivery` 时读同 run 的所需字段／分页；用户要求完整 JSON 或完整文件时，首次 `fields=null`、保留默认响应预算，核对业务 payload 的 SHA-256，不另起一卦补交付。
+首轮被裁掉的字段不能靠分页恢复。已有 `result_delivery` 时读同 run 的所需字段／分页；用户要求完整 JSON 或完整文件时，首次 `fields=null`、保留默认响应预算，经引擎校验读取原 run，不另起一卦补交付。
 
 ## 可复核示例
 

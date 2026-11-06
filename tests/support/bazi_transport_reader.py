@@ -1,7 +1,6 @@
 """Read advertised same-run locators; a file locator is optional, never guessed."""
 
 import gzip
-import hashlib
 import json
 from pathlib import Path
 
@@ -17,7 +16,7 @@ def save_json(path, value):
 
 def verify_identity(reference, metadata, manifest):
     assert manifest["result_id"] == reference["result_id"]
-    assert manifest["sha256"] == reference["sha256"]
+    assert manifest["total_chars"] == reference["total_chars"]
     assert manifest["run_metadata"]["run_id"] == metadata["run_id"]
 
 
@@ -35,7 +34,7 @@ def file_payload(value, manifest, folder, name):
     wrapper = json.loads(raw)
     payload = wrapper[locator["file_payload_path"]]
     encoded = json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode()
-    assert hashlib.sha256(encoded).hexdigest() == reference["sha256"]
+    assert len(encoded) == reference["total_bytes"]
     assert payload["run_metadata"]["run_id"] == value["run_metadata"]["run_id"]
     return payload
 
@@ -71,8 +70,6 @@ def cli_payload(value, folder, capsys):
             [
                 "result-read",
                 reference["result_id"],
-                "--sha256",
-                reference["sha256"],
                 "--run-id",
                 value["run_metadata"]["run_id"],
                 "--offset",
@@ -84,7 +81,7 @@ def cli_payload(value, folder, capsys):
         (folder / ("cli-page-" + str(offset) + "-stderr.txt")).write_text(captured.err)
         assert code == 0
         page = json.loads(captured.out)
-        assert page["verification"]["payload_sha256"] == reference["sha256"]
+        assert page["verification"]["scope"] == "entire_retained_payload"
         assert page["verification"]["run_id"] == value["run_metadata"]["run_id"]
         assert page["verification"]["calculation_repeated"] is False
         pages.append(page["text"])
@@ -93,7 +90,7 @@ def cli_payload(value, folder, capsys):
         assert page["next_offset"] > offset
         offset = page["next_offset"]
     raw = "".join(pages).encode()
-    assert hashlib.sha256(raw).hexdigest() == reference["sha256"]
+    assert len(raw) == reference["total_bytes"]
     (folder / "cli-same-run-pages.json.gz").write_bytes(gzip.compress(raw, mtime=0))
     payload = json.loads(raw)
     assert payload["run_metadata"]["run_id"] == value["run_metadata"]["run_id"]

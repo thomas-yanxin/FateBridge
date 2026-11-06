@@ -14,7 +14,6 @@ from fatebridge.core import human_design_cycle_sources as sources
 from fatebridge.core import human_design_cycles as cycles
 from fatebridge.core.astro import runtime
 from fatebridge.core.human_design import chart_at_tt
-from fatebridge.services.replay_metadata import digest
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.errors import EphemerisSourceError
 from fatebridge.validation.human_design import verify_human_design_reading
@@ -226,9 +225,6 @@ def test_rehashing_cannot_certify_or_detach_source_contexts(source_run, tamper):
             source["contexts"][0]["status"] = "file_contexts_observed"
     else:
         source["contexts"].append(deepcopy(source["contexts"][0]))
-    run["run_metadata"]["business_output_sha256"] = digest(
-        {k: v for k, v in run.items() if k != "run_metadata"}
-    )
     assert verify_human_design_reading(run)["status"] == "rejected"
 
 

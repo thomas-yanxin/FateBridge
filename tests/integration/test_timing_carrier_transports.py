@@ -57,7 +57,6 @@ def test_same_calculated_carrier_and_text_on_rest_mcp_cli(surface_calls):
         path="interaction_analysis.pillar_carriers.0.own_hidden_root_present",
         value=False,
         run_id=run["run_id"],
-        business_output_sha256=run["business_output_sha256"],
     )
     assert (
         verify_calculation_claims(result, [claim])["status"]

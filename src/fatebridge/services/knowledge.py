@@ -164,7 +164,6 @@ def _build_knowledge_snapshot_text(entry: Dict[str, Any]) -> str:
             source_lines.append(f"归属范围：{reference.get('support_scope')}")
         for reference in curation.get("implementation_refs") or []:
             source_lines.append(f"实现：{reference.get('source_path')}")
-            source_lines.append(f"实现散列：{reference.get('source_sha256')}")
             source_lines.append(f"实现说明范围：{reference.get('support_scope')}")
 
     if provenance.get("reference_policy_id") == "numerology_source_reference_v1":
@@ -177,16 +176,12 @@ def _build_knowledge_snapshot_text(entry: Dict[str, Any]) -> str:
             )
             if record.get("source_url"):
                 source_lines.append(f"来源网址：{record['source_url']}")
-            source_lines.append(f"实际载入字节散列：{record.get('loaded_file_sha256')}")
-            source_lines.append(
-                f"所核内容身份：{record.get('canonical_content_sha256')}"
-            )
 
     if provenance.get("reference_policy_id") == "human_design_line_reference_v1":
         source_lines.append(f"参考范围：{provenance.get('scope')}")
         for record in provenance.get("source_records") or []:
             source_lines.append(
-                f"来源对象：{record.get('key')}；状态：{record.get('review_status')}；实际载入散列：{record.get('loaded_file_sha256')}"
+                f"来源对象：{record.get('key')}；状态：{record.get('review_status')}"
             )
             if record.get("source_url"):
                 source_lines.append(f"来源网址：{record['source_url']}")

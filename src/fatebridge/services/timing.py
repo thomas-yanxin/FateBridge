@@ -142,7 +142,6 @@ def calculate_comprehensive_timing(
     )
     current_age = timing_result["current_age"]
 
-    # 构建最终结果结构
     result: Dict[str, Any] = {
         "analysis_type": "综合时运分析",
         "personal_info": {
@@ -169,7 +168,6 @@ def calculate_comprehensive_timing(
         },
     }
 
-    # 大运分析
     dayun_analysis = timing_result["dayun_analysis"]
     if "dayun_info" in dayun_analysis:
         dayun_info = dayun_analysis["dayun_info"]
@@ -204,7 +202,6 @@ def calculate_comprehensive_timing(
         }
     result["dayun_analysis"]["timing_context"] = dayun_analysis["timing_context"]
 
-    # 流年分析
     liunian_analysis = timing_result["liunian_analysis"]
     liunian_info = liunian_analysis["liunian_info"]
     liunian_section: Dict[str, Any] = {
@@ -219,7 +216,6 @@ def calculate_comprehensive_timing(
         )
     result["liunian_analysis"] = liunian_section
 
-    # 流月分析
     liuyue_analysis = timing_result["liuyue_analysis"]
     liuyue_info = liuyue_analysis["liuyue_info"]
     result["liuyue_analysis"] = {
@@ -229,7 +225,6 @@ def calculate_comprehensive_timing(
         "summary": liuyue_analysis["summary"],
     }
 
-    # 流日分析
     liuri_analysis = timing_result["liuri_analysis"]
     liuri_info = liuri_analysis["liuri_info"]
     result["liuri_analysis"] = {
@@ -239,7 +234,6 @@ def calculate_comprehensive_timing(
         "summary": liuri_analysis["summary"],
     }
 
-    # 流时分析
     liushi_analysis = timing_result["liushi_analysis"]
     liushi_info = liushi_analysis["liushi_info"]
     result["liushi_analysis"] = {
@@ -250,7 +244,6 @@ def calculate_comprehensive_timing(
         "summary": liushi_analysis["summary"],
     }
 
-    # 综合影响
     combined_effects = timing_result["combined_effects"]
     result["combined_effects"] = serialize_element_effects(combined_effects)
     result["interaction_analysis"] = timing_result["interaction_analysis"]
@@ -262,7 +255,6 @@ def calculate_comprehensive_timing(
             analysis_age=analysis_age,
         )
 
-    # 综合总结
     result["comprehensive_summary"] = timing_result["comprehensive_summary"]
     result["snapshot_text"] = _build_comprehensive_timing_snapshot_text(
         person_name=person.name,

@@ -1,13 +1,12 @@
 """Validate declared native context boundaries, not native execution authenticity."""
 
 import math
-import re
 from copy import deepcopy
 from typing import Any
 
 from fatebridge.core.compressed_ephemeris import endpoint_context_evidence
 from fatebridge.core.human_design_context import CONTEXT_LIFETIME, CONTEXT_SCOPE
-from fatebridge.validation.claims import _same_value
+from fatebridge.core.public_output import same_public_value as _same_value
 
 
 def _json_values(value: Any) -> None:
@@ -89,8 +88,8 @@ def verify_native_context(payload: dict[str, Any]) -> dict[str, Any]:
             keys = []
             names = ("swe_deltat.txt", "sedeltat.txt", "seleapsec.txt")
             for row in rows:
-                index, name, size, digest = (
-                    row[k] for k in ("search_index", "filename", "bytes", "sha256")
+                index, name, size = (
+                    row[k] for k in ("search_index", "filename", "bytes")
                 )
                 if (
                     type(index) is not int
@@ -98,8 +97,6 @@ def verify_native_context(payload: dict[str, Any]) -> dict[str, Any]:
                     or name not in names
                     or type(size) is not int
                     or size < 0
-                    or type(digest) is not str
-                    or not re.fullmatch("[0-9a-f]{64}", digest)
                 ):
                     raise ValueError("Malformed auxiliary file identity")
                 if not _same_value(
@@ -108,7 +105,6 @@ def verify_native_context(payload: dict[str, Any]) -> dict[str, Any]:
                         "search_index": index,
                         "filename": name,
                         "bytes": size,
-                        "sha256": digest,
                     },
                 ):
                     raise ValueError("Unexpected auxiliary file claims")

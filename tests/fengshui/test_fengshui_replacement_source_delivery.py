@@ -7,7 +7,7 @@ from fastmcp import Client
 
 from fatebridge.mcp_server import create_mcp_app
 from tests.fengshui.test_fengshui_source_comparison import request
-from tests.fengshui.test_fengshui_surfaces import same_run_projected_response
+from tests.support.mcp_result_assertions import same_run_projected_response
 
 
 @pytest.mark.parametrize("period,angle", [(5, 174), (9, 39), (5, 175.5)])

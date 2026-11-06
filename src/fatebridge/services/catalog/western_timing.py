@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, List
+from typing import List
 
 from fatebridge.application.bindings import lazy_service, raw_invoke
 from fatebridge.application.tool_spec import ToolSpec
@@ -16,61 +16,15 @@ calculate_western_timing_analysis = lazy_service(
 )
 
 
-calculate_decennials = lazy_service(
-    "fatebridge.services.western_timing_tools", "calculate_decennials"
+calculate_timing_tool = lazy_service(
+    "fatebridge.services.western_timing_tools", "calculate_timing_tool"
 )
 
 
-calculate_firdaria = lazy_service(
-    "fatebridge.services.western_timing_tools", "calculate_firdaria"
-)
-
-
-calculate_givenyear = lazy_service(
-    "fatebridge.services.western_timing_tools", "calculate_givenyear"
-)
-
-
-calculate_lunarreturn = lazy_service(
-    "fatebridge.services.western_timing_tools", "calculate_lunarreturn"
-)
-
-
-calculate_pd = lazy_service("fatebridge.services.western_timing_tools", "calculate_pd")
-
-
-calculate_pdchart = lazy_service(
-    "fatebridge.services.western_timing_tools", "calculate_pdchart"
-)
-
-
-calculate_profection = lazy_service(
-    "fatebridge.services.western_timing_tools", "calculate_profection"
-)
-
-
-calculate_solararc = lazy_service(
-    "fatebridge.services.western_timing_tools", "calculate_solararc"
-)
-
-
-calculate_solarreturn = lazy_service(
-    "fatebridge.services.western_timing_tools", "calculate_solarreturn"
-)
-
-
-calculate_transit = lazy_service(
-    "fatebridge.services.western_timing_tools", "calculate_transit"
-)
-
-
-calculate_zr = lazy_service("fatebridge.services.western_timing_tools", "calculate_zr")
-
-
-def _western_module_spec(name: str, service: Any, label: str) -> ToolSpec:
+def _western_module_spec(name: str, label: str) -> ToolSpec:
     return ToolSpec(
         key=name,
-        bind=raw_invoke(service),
+        bind=raw_invoke(calculate_timing_tool, fixed={"tool_name": name}),
         request_model=WesternTimingModuleRequest,
         summary=(
             f"{label}：西占行运的单项技法，读取本命盘+目标时刻只算这一种。"
@@ -101,16 +55,15 @@ SPECS: List[ToolSpec] = [
         rest_path="/api/astro/timing",
         mcp_name="western_timing_analysis",
     ),
-    # --- Western timing modules -------------------------------------------
-    _western_module_spec("solarreturn", calculate_solarreturn, "西占太阳返照"),
-    _western_module_spec("lunarreturn", calculate_lunarreturn, "西占月亮返照"),
-    _western_module_spec("transit", calculate_transit, "西占行运盘"),
-    _western_module_spec("solararc", calculate_solararc, "西占太阳弧"),
-    _western_module_spec("givenyear", calculate_givenyear, "西占指定年盘"),
-    _western_module_spec("profection", calculate_profection, "西占年小限"),
-    _western_module_spec("pd", calculate_pd, "西占主限"),
-    _western_module_spec("pdchart", calculate_pdchart, "西占主限法盘"),
-    _western_module_spec("zr", calculate_zr, "西占黄道释放"),
-    _western_module_spec("firdaria", calculate_firdaria, "西占法达星限"),
-    _western_module_spec("decennials", calculate_decennials, "西占十年星限"),
+    _western_module_spec("solarreturn", "西占太阳返照"),
+    _western_module_spec("lunarreturn", "西占月亮返照"),
+    _western_module_spec("transit", "西占行运盘"),
+    _western_module_spec("solararc", "西占太阳弧"),
+    _western_module_spec("givenyear", "西占指定年盘"),
+    _western_module_spec("profection", "西占年小限"),
+    _western_module_spec("pd", "西占主限"),
+    _western_module_spec("pdchart", "西占主限法盘"),
+    _western_module_spec("zr", "西占黄道释放"),
+    _western_module_spec("firdaria", "西占法达星限"),
+    _western_module_spec("decennials", "西占十年星限"),
 ]

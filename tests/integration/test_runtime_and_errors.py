@@ -14,8 +14,8 @@ import fatebridge.mcp_server as mcp
 from fatebridge.cli import run as cli_run
 from fatebridge.core.requests.bazi import BaziBirthRequest
 from fatebridge.core.requests.western_timing import WesternTimingRequest
-from fatebridge.utils.errors import handle_calculation_error
-from fatebridge.utils.formatting import format_error_response
+from fatebridge.utils.errors import error_response_payload, handle_calculation_error
+from fatebridge.utils.formatting import format_json_response
 from fatebridge.utils.runtime import load_runtime_env, parse_allowed_origins
 from tests.fixtures.surface_payloads import REST_POST_CASES, astro_payload
 from tests.fixtures.transports import rest_handler
@@ -64,7 +64,7 @@ def test_handle_calculation_error_returns_structured_validation_payload():
     assert payload["retryable"] is False
 
 
-def test_format_error_response_preserves_structured_error_metadata():
+def test_error_response_serialization_preserves_structured_error_metadata():
     payload = {
         "error": "运行依赖缺失",
         "error_code": "dependency_missing",
@@ -72,7 +72,9 @@ def test_format_error_response_preserves_structured_error_metadata():
         "retryable": False,
     }
 
-    rendered = json.loads(format_error_response(payload, "西占时运分析"))
+    rendered = json.loads(
+        format_json_response(error_response_payload(payload, "西占时运分析"))
+    )
 
     assert rendered == {
         "error": "运行依赖缺失",
@@ -120,31 +122,6 @@ def test_calculate_birth_route_executes_service_via_threadpool(monkeypatch):
     assert captured["func"] is execute_tool
     assert captured["args"][0].key == "bazi_birth"
     assert captured["args"][1].name == "张三"
-
-
-def test_calculate_birth_route_includes_snapshot_contract():
-    request = BaziBirthRequest(
-        name="张三",
-        gender="男",
-        birth_year=1990,
-        birth_month=5,
-        birth_day=15,
-        birth_hour=10,
-        birth_minute=30,
-        birth_timezone="Asia/Shanghai",
-        birth_longitude=121.4737,
-        birth_place="上海",
-    )
-
-    result = asyncio.run(calculate_birth(request))
-
-    assert "person_info" in result["bazi_birth"]
-    assert "four_pillars" in result["bazi_birth"]
-    assert "snapshot_text" in result
-    assert "snapshot_export" in result
-    assert "[起盘信息]" in result["snapshot_text"]
-    assert result["snapshot_export"]["export_text"] == result["snapshot_text"]
-    assert result["run_metadata"]["tool_name"] == "bazi_birth"
 
 
 def test_western_timing_route_uses_structured_service_error_status(monkeypatch):

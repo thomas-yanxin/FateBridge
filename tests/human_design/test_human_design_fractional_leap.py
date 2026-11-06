@@ -8,7 +8,6 @@ from pathlib import Path
 import pytest
 
 from fatebridge.application.execution import execute_tool
-from fatebridge.services.replay_metadata import digest
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
 
@@ -98,7 +97,4 @@ def test_fresh_hash_does_not_hide_input_display_alias_or_calendar_changes(
         value["birth_clock_evidence"][
             "following_utc_midnight"
         ] = "2017-01-01T00:00:00.999999+00:00"
-    value["run_metadata"]["business_output_sha256"] = digest(
-        {k: v for k, v in value.items() if k != "run_metadata"}
-    )
     assert verify_human_design_reading(value)["status"] == "rejected"

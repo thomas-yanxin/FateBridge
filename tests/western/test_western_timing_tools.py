@@ -1,35 +1,25 @@
 import pytest
 
 from fatebridge.core.predictive import western_timing as astrology_predictive
-from fatebridge.services.western_timing_tools import (
-    calculate_decennials,
-    calculate_firdaria,
-    calculate_givenyear,
-    calculate_lunarreturn,
-    calculate_pd,
-    calculate_pdchart,
-    calculate_profection,
-    calculate_solararc,
-    calculate_solarreturn,
-    calculate_transit,
-    calculate_zr,
-)
+from fatebridge.services.western_timing_tools import calculate_timing_tool
 from tests.fixtures.surface_payloads import western_payload
 
 
 def test_western_return_and_direction_tools_generate_snapshots():
-    solarreturn_result = calculate_solarreturn(
+    solarreturn_result = calculate_timing_tool(
+        "solarreturn",
         **western_payload(),
         selected_sections=["起盘信息", "星盘信息"],
     )
-    lunarreturn_result = calculate_lunarreturn(**western_payload())
-    transit_result = calculate_transit(
+    lunarreturn_result = calculate_timing_tool("lunarreturn", **western_payload())
+    transit_result = calculate_timing_tool(
+        "transit",
         **western_payload(),
         selected_sections=["起盘信息", "相位"],
     )
-    solararc_result = calculate_solararc(**western_payload())
-    givenyear_result = calculate_givenyear(**western_payload())
-    profection_result = calculate_profection(**western_payload())
+    solararc_result = calculate_timing_tool("solararc", **western_payload())
+    givenyear_result = calculate_timing_tool("givenyear", **western_payload())
+    profection_result = calculate_timing_tool("profection", **western_payload())
 
     assert solarreturn_result["analysis_type"] == "西占太阳返照"
     assert solarreturn_result["solarreturn"]["return_datetime"].startswith(
@@ -105,7 +95,7 @@ def test_solarreturn_skips_unrelated_predictive_modules(monkeypatch):
         _unexpected_primary_directions,
     )
 
-    result = calculate_solarreturn(**western_payload())
+    result = calculate_timing_tool("solarreturn", **western_payload())
 
     assert "error" not in result
     assert result["analysis_type"] == "西占太阳返照"
@@ -113,17 +103,19 @@ def test_solarreturn_skips_unrelated_predictive_modules(monkeypatch):
 
 
 def test_primary_direction_and_time_lord_tools_support_selected_sections():
-    pd_result = calculate_pd(
+    pd_result = calculate_timing_tool(
+        "pd",
         **western_payload(),
         selected_sections=["出生时间", "主/界限法设置", "主/界限法表格"],
     )
-    pdchart_result = calculate_pdchart(**western_payload())
-    zr_result = calculate_zr(
+    pdchart_result = calculate_timing_tool("pdchart", **western_payload())
+    zr_result = calculate_timing_tool(
+        "zr",
         **western_payload(),
         selected_sections=["起盘信息", "基于X点推运"],
     )
-    firdaria_result = calculate_firdaria(**western_payload())
-    decennials_result = calculate_decennials(**western_payload())
+    firdaria_result = calculate_timing_tool("firdaria", **western_payload())
+    decennials_result = calculate_timing_tool("decennials", **western_payload())
 
     assert pd_result["analysis_type"] == "西占主限"
     assert pd_result["pd"]["method"] == "astroapp_alchabitius"
@@ -179,7 +171,7 @@ def test_decennials_payload_is_bounded_for_agent_consumption():
     current_level only its immediate children. Guard the bound."""
     import json
 
-    result = calculate_decennials(**western_payload())
+    result = calculate_timing_tool("decennials", **western_payload())
     payload = result["decennials"]
 
     # Whole tool response must stay comfortably agent-readable.

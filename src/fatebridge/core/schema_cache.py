@@ -3,13 +3,10 @@
 from copy import deepcopy
 from functools import lru_cache
 from threading import RLock
-from typing import Optional, Tuple, Type
+from typing import Type
 
 from pydantic import BaseModel
 from pydantic.json_schema import JsonSchemaValue
-
-from fatebridge.core.method_contracts import MethodContract
-from fatebridge.utils.json_digest import digest
 
 _LOCK = RLock()
 
@@ -51,49 +48,6 @@ def model_schema(model: Type[BaseModel]) -> JsonSchemaValue:
         return deepcopy(_schema(model, _revision(model)))
 
 
-@lru_cache(maxsize=256)
-def _fingerprint(
-    request_model: Type[BaseModel],
-    request_revision: _SchemaRevision,
-    output_model: Optional[Type[BaseModel]],
-    output_revision: Optional[_SchemaRevision],
-    required_output_fields: Tuple[str, ...],
-    methods: Tuple[MethodContract, ...],
-) -> str:
-    output_schema = None
-    if output_model is not None:
-        assert output_revision is not None
-        output_schema = _schema(output_model, output_revision)
-    contract: dict[str, object] = {
-        "input": _schema(request_model, request_revision),
-        "output": output_schema,
-    }
-    if required_output_fields:
-        contract["full_result_required_fields"] = list(required_output_fields)
-        contract["full_result_empty_object_policy"] = "reject_required_roots"
-    if methods:
-        contract["methods"] = [method.as_manifest() for method in methods]
-    return digest(contract)
-
-
-def contract_fingerprint(
-    request_model: Type[BaseModel],
-    output_model: Optional[Type[BaseModel]],
-    required_output_fields: Tuple[str, ...] = (),
-    methods: Tuple[MethodContract, ...] = (),
-) -> str:
-    """Hash model contracts and any complete-result requirements independently."""
-    with _LOCK:
-        return _fingerprint(
-            request_model,
-            _revision(request_model),
-            output_model,
-            _revision(output_model) if output_model else None,
-            required_output_fields,
-            methods,
-        )
-
-
 def clear_contract_caches() -> None:
     """Explicitly invalidate contracts after changing model configuration/hooks.
 
@@ -103,4 +57,3 @@ def clear_contract_caches() -> None:
     """
     with _LOCK:
         _schema.cache_clear()
-        _fingerprint.cache_clear()

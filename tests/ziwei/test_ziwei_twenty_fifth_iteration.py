@@ -223,7 +223,6 @@ def _verified_conditions(reply):
     while True:
         page = RESULT_STORE.verified_page(
             delivery["result_id"],
-            delivery["sha256"],
             reply["run_metadata"]["run_id"],
             offset=offset,
             path="ziwei_birth.ming_structural_conditions",

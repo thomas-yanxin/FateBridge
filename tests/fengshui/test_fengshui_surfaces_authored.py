@@ -19,11 +19,11 @@ from fatebridge.core.fengshui.surface_inputs import SurfaceZone
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.fengshui import assess
 from fatebridge.services.tool_catalog import CATALOG
-from tests.fengshui.test_fengshui_surfaces import (
-    rest_client,
+from tests.support.mcp_result_assertions import (
     same_run_projected_response,
     without_transport,
 )
+from tests.support.transports import rest_client
 
 
 def surface_input(goal="abundance", zone="near_right", basis="user_confirmed"):

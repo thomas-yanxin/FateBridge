@@ -131,7 +131,7 @@ Santhanam第26章与27.19现另有未施用来源字段，记录译文／注解�
 
 拒绝不存在或有歧义的 DST 钟时；重复时刻可用明确 UTC 偏移消歧。经纬度或城市解析范围由现有出生工具处理。
 
-民用钟时转换到 UTC 后，1972 年起使用随包冻结的 IERS TAI−UTC 表取得 TT，再由 Swiss Delta-T 模型估计 UT1。不能把 UTC 数字直接视作 UT1，也不让远期日期悄悄切换输入语义。`india.profile.time_scale_context` 回显来源指纹、表的到期日和 `future_leap_seconds_assumed_unchanged`；过期后沿用最后偏移是明确假设。1961–1971年改用[IERS历史UTC偏移／日漂移表](https://hpiers.obspm.fr/eoppc/bul/bulc/UTC-TAI.history)，1960年另用[IAU SOFA](https://www.iausofa.org/2023-10-11c)的标准关系；1960年前保留 UT1 输入假设并返回 `julian_day_utc=null`。1960年也回显UTC的实际来源，不认证出生钟或地方授时实现。可选的太阳钟时重定位会改变计算时刻，不能理解为同一物理时刻的另一种显示。
+民用钟时转换到 UTC 后，1972 年起使用随包冻结的 IERS TAI−UTC 表取得 TT，再由 Swiss Delta-T 模型估计 UT1。不能把 UTC 数字直接视作 UT1，也不让远期日期悄悄切换输入语义。`india.profile.time_scale_context` 回显来源名称、表的到期日和 `future_leap_seconds_assumed_unchanged`；过期后沿用最后偏移是明确假设。1961–1971年改用[IERS历史UTC偏移／日漂移表](https://hpiers.obspm.fr/eoppc/bul/bulc/UTC-TAI.history)，1960年另用[IAU SOFA](https://www.iausofa.org/2023-10-11c)的标准关系；1960年前保留 UT1 输入假设并返回 `julian_day_utc=null`。1960年也回显UTC的实际来源，不认证出生钟或地方授时实现。可选的太阳钟时重定位会改变计算时刻，不能理解为同一物理时刻的另一种显示。
 
 `birth_time_uncertainty_minutes` 仅填用户确认的正负范围，最大 120 分钟。未给范围标记 `not_assessed`，不默认精确；给定范围按 UTC 区间最多 30 秒网格比较上升和九曜在各分盘的星座／宫位，输出实际变体，并记录 D1 度数区间／Baladi／顺逆行变体及 Uchcha Bala、Sthana 五分量与总量的抽样范围。`no_change_on_sample_grid` 仅表示抽样未见变化，不保证区间内没有边界。达沙复用同一完整网格比较目标时刻的主运／次运，`stage_variants` 保留全部抽样组合及对应生时下的宫位、宫主和D1条件；不能把名义盘上下文套到其他候选。`sample_segments` 保留不连续出现的区段，`adjacent_stage_change_brackets` 只夹定相邻样本间的变化，不声称精确边界。`period_boundary_ranges` 和度数范围是样本最小最大值，不是置信区间；跨零度时数值范围可能很宽。`requested_sample_count/evaluated_sample_count/omitted_samples` 针对完整网格，目标早于候选出生的每个点均显式略过；另列去重后的实际时刻数量。旧 `samples` 保留端点与中心子集，其计数另列 `endpoint_subset_*`。顶层 `natal_ruler_context` 明确只对应名义生时。地点误差未纳入该敏感性分析。
 
