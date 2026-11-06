@@ -348,7 +348,7 @@ def test_large_evidence_remains_available_in_same_run(monkeypatch, tmp_path):
     from fatebridge.application.projection import project_fields
     from fatebridge.application.result_delivery import ResultStore, bound_response
 
-    monkeypatch.setattr(delivery, "RESULT_STORE", ResultStore(tmp_path))
+    monkeypatch.setattr(delivery, "RESULT_STORE", ResultStore(tmp_path / "private"))
     spec = next(s for s in CATALOG if s.key == "qimen")
     request = spec.request_model.model_validate(REST_POST_CASES[spec.rest_path]())
     result = execute_tool(spec, request)
