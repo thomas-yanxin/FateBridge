@@ -24,7 +24,6 @@ def verify_fengshui_reading(
     metadata = payload.get("run_metadata") or {}
     if not isinstance(metadata, dict):
         metadata = {}
-    body = {k: v for k, v in payload.items() if k != "run_metadata"}
     trusted_run_id = (trusted_payload.get("run_metadata") or {}).get("run_id")
     if (
         not isinstance(trusted_run_id, str)

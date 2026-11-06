@@ -134,24 +134,6 @@ def audit() -> dict[str, Any]:
                 )
             )
     boards, failures, differences = [], [], []
-    core_keys = [
-        "month_general",
-        "board_style",
-        "board_style_detail",
-        "classification",
-        "board_order",
-        "guiren_order",
-        "kongwang",
-        "xun_head",
-        "month_building_element",
-        "life_stages",
-        "auxiliary_stars",
-        "emptiness_evidence",
-        "three_transmissions",
-        "transmission_relations",
-        "twelve_board",
-        "meta",
-    ]
     stems = "甲乙丙丁戊己庚辛壬癸"
     count = 0
     for i in range(60):

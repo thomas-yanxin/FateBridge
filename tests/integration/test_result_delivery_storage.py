@@ -292,14 +292,22 @@ def test_oversize_attempt_does_not_evict_an_existing_deliverable(tmp_path, monke
     assert _reconstruct(store, ref["result_id"]) == {"text": "keep this run"}
 
 
-@pytest.mark.parametrize("suffix", ["meta", "idx"])
-def test_corrupt_metadata_or_page_indexes_fail_explicitly(tmp_path, suffix):
+@pytest.mark.parametrize(
+    "damage", ["negative_offset", "invalid_digest", "missing_digest", "invalid_index"]
+)
+def test_corrupt_metadata_or_page_indexes_fail_explicitly(tmp_path, damage):
     store = delivery.ResultStore(tmp_path / "results")
     ref = store.put({"text": "private" * 1000})
+    suffix = "idx" if damage == "invalid_index" else "meta"
     target = store.directory / f"{ref['result_id']}.{suffix}"
-    if suffix == "meta":
+    if damage != "invalid_index":
         metadata = json.loads(target.read_text(encoding="utf-8"))
-        metadata["body_offset"] = -1
+        if damage == "negative_offset":
+            metadata["body_offset"] = -1
+        elif damage == "invalid_digest":
+            metadata["sha256"] = "invalid"
+        else:
+            del metadata["sha256"]
         target.write_text(json.dumps(metadata), encoding="utf-8")
     else:
         target.write_bytes(

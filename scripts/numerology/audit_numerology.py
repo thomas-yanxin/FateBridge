@@ -47,7 +47,6 @@ from fatebridge.core.heluo_months import MONTH_BRANCHES, month_affinity
 from fatebridge.core.heluo_najia import annotate_positions
 from fatebridge.core.heluo_najia import collation_summary as najia_collation_summary
 from fatebridge.core.heluo_poems import collation_summary as poem_collation_summary
-from fatebridge.core.heluo_poems import poems_for_line
 from fatebridge.core.heluo_seasonal import seasonal_number_evidence
 from fatebridge.core.heluo_structure import body_structure
 from fatebridge.core.heluo_texts import (
@@ -57,7 +56,6 @@ from fatebridge.core.heluo_texts import (
 )
 from fatebridge.core.heluo_timing import (
     SOURCE_SHA256,
-    SOURCE_URL,
     annual_sequence,
     daily_template,
     monthly_sequence,
@@ -78,12 +76,6 @@ from fatebridge.core.song_clock import (
 )
 from fatebridge.core.song_qi import source_qi_sequence, source_term_remainder
 from fatebridge.utils.timezones import parse_timezone_name
-from scripts.numerology.audit_canping_extended_projection import (
-    audit as canping_extended_projection_checks,
-)
-from scripts.numerology.audit_canping_projection import (
-    audit as canping_projection_checks,
-)
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -2122,7 +2114,6 @@ def shibi_commentary_checks() -> dict:
 
 def xiaochuli_commentary_checks() -> dict:
     """Native text, absent label and same-name/different-line reference checks."""
-    from fatebridge.core import heluo_texts as ht
 
     root = ROOT / "tests/fixtures/heluo_xiaochuli_v1"
     draft = json.loads((root / "reference.json").read_text())
@@ -2204,7 +2195,6 @@ def xiaochuli_commentary_checks() -> dict:
 
 def taipi_commentary_checks() -> dict:
     """Same-printing text coverage and conditional parents; no branch verdict."""
-    from fatebridge.core import heluo_texts as ht
 
     root = ROOT / "tests/fixtures/heluo_taipi_v1"
     draft = json.loads((root / "reference.json").read_text())
@@ -4624,8 +4614,6 @@ def month_source_profile_checks() -> dict:
 
 def sui17_meng4_source_checks() -> dict:
     """Reproduce the selected printings without certifying uncertain glyphs."""
-    from fatebridge.core import heluo_poems as hp
-    from fatebridge.core import heluo_texts as ht
     from fatebridge.services.knowledge import calculate_knowledge_read
 
     root = ROOT / "tests/fixtures/heluo_sui17_meng4_v1"

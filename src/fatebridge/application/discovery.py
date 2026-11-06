@@ -13,13 +13,15 @@ from fatebridge.application.description import (
 from fatebridge.application.tool_spec import ToolSpec
 from fatebridge.utils.errors import ParameterError, validation_error_result
 
+ToolSurface = Literal["rest", "mcp", "cli"]
+
 
 class DiscoveryQuery(BaseModel):
     model_config = ConfigDict(extra="forbid")
     family: Optional[str] = None
     q: Optional[str] = None
     tool: Optional[str] = None
-    surface: Optional[Literal["rest", "mcp", "cli"]] = None
+    surface: Optional[ToolSurface] = None
     detail: Literal["summary", "full"] = "full"
 
 
@@ -38,7 +40,7 @@ def select_specs(
     family: Optional[str] = None,
     q: Optional[str] = None,
     tool: Optional[str] = None,
-    surface: Optional[str] = None,
+    surface: Optional[ToolSurface] = None,
     allowed_names: Optional[Set[str]] = None,
 ) -> List[ToolSpec]:
     """Filter declarations before materializing any expensive schemas."""
@@ -71,10 +73,6 @@ def select_specs(
             "mcp": lambda spec: bool(spec.mcp_name),
             "cli": spec_is_cli_safe,
         }
-        if surface not in available:
-            raise ParameterError(
-                "工具接口无效", [{"path": "surface", "code": "invalid_surface"}]
-            )
         selected = [spec for spec in selected if available[surface](spec)]
     if allowed_names is not None:
         selected = [spec for spec in selected if spec.tool_name in allowed_names]

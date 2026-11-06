@@ -99,6 +99,7 @@ docs/reviews/
 !/tests/fixtures/**/
 !/tests/fixtures/*.py
 # Preserve small source commitments and collation beside their local raw corpora.
+!/tests/fixtures/meihua_situational_v1/source-files.json
 !/tests/fixtures/taiyi_dangshi_noble_v40/freeze-original.json
 !/tests/fixtures/taiyi_dangshi_case_v41/freeze-original.json
 !/tests/fixtures/taiyi_dangshi_case_v41/collation.json

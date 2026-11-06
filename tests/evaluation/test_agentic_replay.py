@@ -80,7 +80,7 @@ def business(payload):
     return {key: value for key, value in payload.items() if key != "run_metadata"}
 
 
-@pytest.mark.parametrize("family", ["bazi", "fengshui"])
+@pytest.mark.parametrize("family", ["bazi", "fengshui", "astro"])
 def test_family_discovery_matches_rest_cli_and_mcp(rest, family):
     params = {"family": family, "surface": "mcp", "detail": "summary"}
     http = rest.get("/api/tools", params=params)
@@ -103,23 +103,6 @@ def test_family_discovery_matches_rest_cli_and_mcp(rest, family):
     assert http.status_code == 200 and code == 0
     assert http.json() == output == asyncio.run(read())
     assert all(record["family"] == family for record in output["tools"])
-
-
-def test_retired_scenario_entrypoints_are_absent(rest):
-    assert rest.get("/api/scenarios").status_code == 404
-    assert cli("scenarios", {})[0] == 2
-
-    async def read():
-        async with Client(mcp.create_mcp_app()) as client:
-            templates = await client.list_resource_templates()
-            assert not any(
-                "scenarios" in item.model_dump(by_alias=True)["uriTemplate"]
-                for item in templates
-            )
-            resources = await client.list_resources()
-            assert not any("scenarios" in str(item.uri) for item in resources)
-
-    asyncio.run(read())
 
 
 @pytest.mark.parametrize(

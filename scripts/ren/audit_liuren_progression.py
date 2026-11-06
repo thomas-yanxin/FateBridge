@@ -95,7 +95,6 @@ def audit() -> dict[str, Any]:
     ] + [Path(__file__).resolve()]
     before = {str(p.relative_to(ROOT)): sha(p) for p in paths}
     ref = reference()
-    from fatebridge.core.metaphysics.jinkou import build_jinkou_board
     from fatebridge.core.metaphysics.liureng import build_liureng_board
     from fatebridge.core.metaphysics.liureng_progression import transmission_progression
     from fatebridge.core.output_chinese import Liuren

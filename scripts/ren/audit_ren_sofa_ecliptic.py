@@ -10,10 +10,8 @@ from __future__ import annotations
 import argparse
 import hashlib
 import importlib.util
-import io
 import json
 import math
-import zipfile
 from datetime import datetime
 from pathlib import Path
 from typing import Any

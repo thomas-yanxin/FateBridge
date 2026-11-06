@@ -197,7 +197,6 @@ def candidate_rate(row, protocol, model, trace):
 
 
 def audit(args):
-    root = Path(__file__).resolve().parents[2]
     q = validate(args.protocol, args.reference, args.material, args.seal)
     protocol = json.loads(args.protocol.read_text())
     raw = json.loads(args.reference.read_text())

@@ -1,7 +1,6 @@
 """Independent literal angular-strength rules; no FateBridge or Swiss imports."""
 
 import argparse
-import datetime
 import hashlib
 import json
 import math

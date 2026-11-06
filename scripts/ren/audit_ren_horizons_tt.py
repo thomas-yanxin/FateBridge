@@ -12,7 +12,6 @@ import json
 import math
 import os
 import shlex
-import zipfile
 from collections.abc import Callable
 from datetime import datetime, timedelta, timezone
 from fractions import Fraction

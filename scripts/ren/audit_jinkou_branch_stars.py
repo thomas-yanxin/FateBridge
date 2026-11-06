@@ -70,7 +70,6 @@ def audit() -> dict[str, Any]:
     from fatebridge.core.metaphysics.jinkou_branch_stars import branch_stars
     from fatebridge.core.output_jinkou_branch_stars import (
         JinkouBranchStars,
-        require_complete_branch_stars,
     )
 
     errors = []

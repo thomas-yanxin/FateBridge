@@ -60,7 +60,7 @@ uv sync --locked --extra dev
 uv run --locked --extra dev fatebridge doctor
 ```
 
-This README describes the development branch. For a released package, use the documentation at its [Git tag](https://github.com/thomas-yanxin/FateBridge/tags); pending changes appear in the [Changelog](CHANGELOG.md#unreleased). The Python wheel contains calculation code and rule data. The former Onda skills, fixed scenario profiles, and plugin builder have been removed.
+This README describes the development branch. For a released package, use the documentation at its [Git tag](https://github.com/thomas-yanxin/FateBridge/tags); pending changes appear in the [Changelog](CHANGELOG.md#unreleased). The Python wheel contains calculation code and rule data. Method scope and result-reading guidance are in the [method references](docs/interpretation/README.md).
 
 ### Run a calculation
 

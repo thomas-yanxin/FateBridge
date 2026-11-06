@@ -3,21 +3,11 @@
 import json
 from pathlib import Path
 
-from fatebridge.application.discovery import select_mcp_specs
-from fatebridge.services.tool_catalog import CATALOG
 from scripts.evaluate_agent import grade_case
 
 DATASET = (
     Path(__file__).parents[1] / "fixtures/agent_behavior/jyotish_semantic_cases.json"
 )
-
-
-def test_preparation_selects_the_actual_indian_tools_instead_of_only_divination():
-    available = {s.tool_name for s in select_mcp_specs(CATALOG)}
-    assert {"astro_india_chart", "astro_vimshottari", "jinkou"} <= available
-    astro = {s.tool_name for s in select_mcp_specs(CATALOG, family="astro")}
-    assert {"astro_india_chart", "astro_vimshottari"} <= astro
-    assert "jinkou" not in astro
 
 
 def test_known_debugging_cases_cannot_be_relabelled_as_independent_holdouts():

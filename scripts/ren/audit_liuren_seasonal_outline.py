@@ -7,7 +7,6 @@ judgments remain unadjudicated. Symbolic boards are not civil calendar evidence.
 from __future__ import annotations
 
 import argparse
-import gzip
 import hashlib
 import itertools
 import json

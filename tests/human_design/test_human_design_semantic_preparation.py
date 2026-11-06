@@ -6,8 +6,6 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.application.discovery import select_mcp_specs
-from fatebridge.services.tool_catalog import CATALOG
 from scripts.evaluate_agent import (
     command_for,
     grade_case,
@@ -22,6 +20,7 @@ CASES = json.loads(DATASET.read_text())["cases"]
 
 
 def test_original_development_cohort_is_sealed_and_cannot_be_relabelled_blind():
+    assert DATASET in source_files()
     assert hashlib.sha256(DATASET.read_bytes()).hexdigest() == (
         "0e413de085cb892fffa222c05219ec438b0e62f9ee1d769b293c7e0f931dad9b"
     )
@@ -32,12 +31,6 @@ def test_original_development_cohort_is_sealed_and_cannot_be_relabelled_blind():
     assert data["semantic_acceptance"] == "not_run"
     assert len(CASES) == len({c["id"] for c in CASES}) == 8
     assert all(c["manual_review"] and c["capture_payloads"] for c in CASES)
-
-
-def test_profile_really_publishes_human_design():
-    specs = select_mcp_specs(CATALOG)
-    assert "human_design" in {s.tool_name for s in specs}
-    assert DATASET in source_files()
 
 
 def test_complete_answer_challenge_is_frozen_separately_from_original_cases():

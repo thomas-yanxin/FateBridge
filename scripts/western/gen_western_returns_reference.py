@@ -142,7 +142,6 @@ def collect(planet, body, lookback, step):
         ]
         rows, record = fetch(body, times=guesses)
         recordings.append(record)
-        lookup = {moment: lon for moment, lon in rows}
         for item, guess in zip(pending, guesses):
             # Horizons rounds requested timestamps to milliseconds in its table.
             when, lon = min(rows, key=lambda row: abs((row[0] - guess).total_seconds()))

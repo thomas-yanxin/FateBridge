@@ -263,13 +263,9 @@ class ResultStore:
 
     @staticmethod
     def _validate_index_metadata(metadata: Dict[str, Any]) -> None:
-        if (
-            any(
-                type(metadata.get(key)) is not int or metadata[key] < 0
-                for key in ("body_offset", "total_chars", "total_bytes")
-            )
-            or not isinstance(metadata.get("sha256"), str)
-            or not re.fullmatch(r"[0-9a-f]{64}", metadata["sha256"])
+        if any(
+            type(metadata.get(key)) is not int or metadata[key] < 0
+            for key in ("body_offset", "total_chars", "total_bytes")
         ):
             raise _invalid("结果引用已损坏", "result_id", "result_unavailable")
 
@@ -296,7 +292,9 @@ class ResultStore:
         )
         self._validate_index_metadata(metadata)
         if (
-            not isinstance(metadata.get("available_fields"), list)
+            not isinstance(metadata.get("sha256"), str)
+            or not re.fullmatch(r"[0-9a-f]{64}", metadata["sha256"])
+            or not isinstance(metadata.get("available_fields"), list)
             or not all(isinstance(name, str) for name in metadata["available_fields"])
             or not (
                 metadata.get("run_metadata") is None
@@ -347,7 +345,7 @@ class ResultStore:
         The caller supplies the original run ID from its receipt. The stored
         checksum stays private and detects corruption against the manifest.
         Verification and selection use one immutable payload snapshot, without
-        recalculation or trusting a field-sidecar digest. Concurrent pruning may
+        recalculation. Field indexes only locate pages. Concurrent pruning may
         make a result unavailable; mismatched snapshots never gain verification.
         This does not attest that a consumer has
         read every page or understood the returned business facts.
@@ -487,12 +485,10 @@ class ResultStore:
             else:
                 raise _invalid("结果字段路径不存在", "path", "unknown_result_path")
         text = _json(value)
-        encoded = text.encode("utf-8")
         field = {
             "body_offset": byte_offset,
             "total_chars": len(text),
-            "total_bytes": len(encoded),
-            "sha256": hashlib.sha256(encoded).hexdigest(),
+            "total_bytes": len(text.encode("utf-8")),
         }
         files = {
             self._path(result_id, suffix + ".idx"): self._index(text),

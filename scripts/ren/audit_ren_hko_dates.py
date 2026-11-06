@@ -10,7 +10,7 @@ import argparse
 import hashlib
 import json
 import os
-from datetime import datetime, timedelta, timezone
+from datetime import timedelta, timezone
 from pathlib import Path
 from typing import Any
 
