@@ -12,7 +12,7 @@ from collections import Counter
 from pathlib import Path
 from typing import Any, Iterable
 
-SUITE_ID = "mingli-bench-v1"
+SUITE_ID = "mingli-bench-v2"
 DATASET_KIND = "public_competition"
 SPLITS = ("development", "holdout")
 LAYERS = ("input_quality", "interpretation_fidelity", "consultation_boundary")

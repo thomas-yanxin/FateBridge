@@ -1,6 +1,5 @@
 """Operational tool restrictions must be visible while grading remains frozen."""
 
-import json
 from pathlib import Path
 
 from scripts.evaluate_agent import command_for, grade_case, model_prompt
@@ -24,14 +23,17 @@ def test_prompt_exposes_allowed_tools_without_answer_or_hidden_rubric():
 
 
 def test_original_failed_comprehensive_call_still_fails_the_same_tool_gates():
-    cases = json.loads(
-        (ROOT / "tests/fixtures/agent_behavior/bazi_semantic_cases_v1.json").read_text()
-    )["cases"]
-    case = cases[0]
+    case = {
+        "prompt": "解释这次八字结果",
+        "allowed_tools": ["bazi_birth"],
+        "required_any": [["bazi_birth"]],
+        "arguments": {"bazi_birth": {"birth_hour": 10}},
+        "manual_review": [],
+    }
     assert "bazi_birth" in model_prompt(case)
     failed = grade_case(
         case,
-        [event("analyze_destiny", case["reference_request"]["arguments"])],
+        [event("analyze_destiny", {"birth_hour": 10})],
         "actual answer",
         0,
     )

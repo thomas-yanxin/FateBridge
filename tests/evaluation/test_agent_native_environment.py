@@ -27,7 +27,6 @@ from fatebridge.validation.evaluation_environment import (
 ROOT = Path(__file__).resolve().parents[2]
 CASE = {
     "id": "native_data_case",
-    "scenario": "onda-xingpan",
     "tool_scope": "complete",
     "capture_payloads": True,
     "prompt": "虚构工程核对。",

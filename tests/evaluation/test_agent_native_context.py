@@ -21,7 +21,6 @@ from fatebridge.validation.evaluation_environment import (
     load_selection,
     verify_stage_selection,
 )
-from scripts.human_design import preserve_human_design_deliveries as wrapper
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -169,43 +168,6 @@ def test_missing_native_directory_stops_cli_before_model_lookup(tmp_path, monkey
     assert not (tmp_path / "out").exists()
 
 
-def test_unavailable_context_stops_preserver_before_any_model_process(
-    tmp_path, monkeypatch
-):
-    source = tmp_path / "source"
-    source.mkdir()
-    raw = context_bytes(capture_selection({"SE_EPHE_PATH": "ephe"}), tmp_path / "lost")
-    sha = hashlib.sha256(raw).hexdigest()
-    (tmp_path / "native-environment.json").write_bytes(raw)
-    (tmp_path / "preparation.json").write_text(
-        json.dumps({"native_environment_sha256": sha})
-    )
-    (tmp_path / "proposed-execution.json").write_text(
-        json.dumps(
-            {
-                "command": [
-                    sys.executable,
-                    str(source / "scripts/evaluate_agent.py"),
-                    "--native-environment",
-                    str(tmp_path / "native-environment.json"),
-                    "--native-environment-sha256",
-                    sha,
-                ],
-                "cwd": str(source),
-                "environment": {},
-            }
-        )
-    )
-
-    def forbidden(*args, **kwargs):
-        raise AssertionError("Lost native working directory reached Popen")
-
-    monkeypatch.setattr(wrapper.subprocess, "Popen", forbidden)
-    with pytest.raises(ValueError, match="unavailable"):
-        wrapper.launch(tmp_path)
-    assert not (tmp_path / "model-process.json").exists()
-
-
 @pytest.mark.asyncio
 @pytest.mark.parametrize("path_mode", ["relative", "path_list", "empty"])
 async def test_actual_reference_and_model_workspaces_keep_requested_file_resolution(
@@ -248,7 +210,6 @@ async def test_actual_reference_and_model_workspaces_keep_requested_file_resolut
     monkeypatch.setenv("SE_EPHE_PATH", "/unrelated/later/path")
     case = {
         "id": "one",
-        "scenario": "onda-xingpan",
         "tool_scope": "complete",
         "capture_payloads": True,
         "prompt": "虚构工程配置核对。",
@@ -341,7 +302,7 @@ async def test_anchored_non_capture_server_uses_frozen_absolute_entry(tmp_path):
             "not-executed",
             ROOT,
             tmp_path,
-            {"scenario": "onda-xingpan"},
+            {},
             native_selection=capture_selection({}),
             native_working_directory=origin,
         )

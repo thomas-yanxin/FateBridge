@@ -11,9 +11,8 @@ Event = dict[str, Any]
 Grade = dict[str, Any]
 
 ROOT: Path
-CASES: Path
 EVALUATION_DOCS_EXCLUDED: set[str]
-GRADING_POLICY: Literal["observed_calls_and_declared_errors_v2"]
+GRADING_POLICY: Literal["observed_tool_contracts_v3"]
 
 def source_files(
     root: Path = ..., profile: str = ..., extra_files: tuple[str, ...] = ...
@@ -42,7 +41,6 @@ def grade_case(
 def _same_argument_path(
     arguments: dict[str, Any], path: str, expected: Any
 ) -> bool: ...
-def _without_evaluation_private_sections(text: str) -> str: ...
 def prepare_workspace(workspace: Path, source: Path = ...) -> None: ...
 def prepare_case_workspace(workspace: Path, source: Path, case: Case) -> None: ...
 def command_for(

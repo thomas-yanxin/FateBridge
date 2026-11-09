@@ -62,7 +62,7 @@ def make_run(tmp_path, *, case_count=1, executed_count=None):
         )
     document = {
         "schema_version": 1,
-        "suite_id": "mingli-bench-v1",
+        "suite_id": "mingli-bench-v2",
         "dataset_kind": "public_competition",
         "split": "development",
         "selection_kind": "frozen_single_split",

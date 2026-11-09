@@ -174,45 +174,17 @@ def test_reference_capture_labels_full_catalog_before_any_model(tmp_path, monkey
     assert "隐藏标准" not in (tmp_path / "model-prompts/one.txt").read_text()
 
 
-def test_nine_diagnostics_keep_all_input_requirements_outside_the_prompt():
-    import hashlib
-
-    root = Path(__file__).parents[1] / "fixtures"
-    dataset = root / "agent_behavior/numerology_semantic_cases_v1.json"
-    d = json.loads(dataset.read_bytes())
-    p = json.loads((root / "numerology_semantics_v1/protocol.json").read_bytes())
-    assert len(d["cases"]) == p["case_count"] == 9
-    assert (
-        sum(len(c["manual_review"]) for c in d["cases"]) == p["criterion_count"] == 45
-    )
-    assert len({c["id"] for c in d["cases"]}) == 9
-    assert p["dataset_sha256"] == hashlib.sha256(dataset.read_bytes()).hexdigest()
-    assert (
-        p["model_invocations_at_freeze"] == 0 and p["semantic_acceptance"] == "not_run"
-    )
-    for c in d["cases"]:
-        assert c["tool_scope"] == "topic" and c["scenario"] == "onda-xingpan"
-        assert all(text not in evaluator.model_prompt(c) for text in c["manual_review"])
-        assert c["argument_paths"] == {
-            c["reference_request"]["tool"]: {"use_true_solar_time": False}
-        }
-
-
 def test_hidden_rubric_paths_are_excluded_from_model_workspace(tmp_path):
     source = tmp_path / "source"
     source.mkdir()
     (source / "AGENTS.md").write_text("工程和咨询规则\n")
-    (source / "skills/onda-xingpan").mkdir(parents=True)
-    (source / "skills/onda-xingpan/SKILL.md").write_text("公开技能")
     (source / "src").mkdir()
     (source / "src/runtime.py").write_text("pass\n")
     (source / "docs/validation").mkdir(parents=True)
     (source / "docs/validation/hidden.md").write_text("隐藏判据")
     (source / "docs/public.md").write_text("公开接口")
-    (source / "tests/fixtures/agent_behavior").mkdir(parents=True)
-    (
-        source / "tests/fixtures/agent_behavior/numerology_semantic_cases_v1.json"
-    ).write_text("隐藏案例")
+    (source / "tests/fixtures/evaluation").mkdir(parents=True)
+    (source / "tests/fixtures/evaluation/cases.json").write_text("隐藏案例")
     work = tmp_path / "work"
     work.mkdir()
     evaluator.prepare_workspace(work, source)

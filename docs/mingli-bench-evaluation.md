@@ -2,7 +2,7 @@
 
 本套件检查 FateBridge 面对外部公开命例时的输入质量、解释忠实度和咨询边界。原始比赛选择题及答案作为来源材料保存；人生经历答案不作为上述三层评估的真值，也不进入运行时知识或受测模型工作目录。
 
-来源固定为 [DestinyLinker/MingLi-Bench](https://github.com/DestinyLinker/MingLi-Bench/tree/b7433280fd86d7a7c27debbc47d0303c218f0bfd) 的提交 `b7433280fd86d7a7c27debbc47d0303c218f0bfd`。原材料和清洗产物（本地数据：`../tests/fixtures/mingli_bench_v1/`）标记为 `public_competition`，与既有虚构八字语义用例分开维护。保留上游 MIT 版权及完整许可；原比赛素材授权链、当事人经历及主办方原件尚未独立核验，不能将仓库声明升级成已验证的现实事实。
+来源固定为 [DestinyLinker/MingLi-Bench](https://github.com/DestinyLinker/MingLi-Bench/tree/b7433280fd86d7a7c27debbc47d0303c218f0bfd) 的提交 `b7433280fd86d7a7c27debbc47d0303c218f0bfd`。当前适配器版本为 `mingli-bench-v2`，使用实际工具合同评分。原材料和清洗产物（本地数据：`../tests/fixtures/mingli_bench_v2/`）标记为 `public_competition`，与虚构测试资料分开维护。保留上游 MIT 版权及完整许可；原比赛素材授权链、当事人经历及主办方原件尚未独立核验，不能将仓库声明升级成已验证的现实事实。
 
 原题共 160 道，涉及 32 个命例、2022—2025 年各 40 题。原始答案字母只核对录入一致性，不据此奖励疾病、死亡、灾祸、生育或其他缺少证据的人生判断。分类检查题干和全部选项，不按上游“健康／婚姻／家庭”等单标签决定可用性。
 

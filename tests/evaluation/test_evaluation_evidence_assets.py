@@ -19,7 +19,6 @@ def source_tree(root):
         "pyproject.toml",
         "uv.lock",
         "src/fatebridge/__init__.py",
-        "skills/README.md",
         "docs/README.md",
     ]:
         path = root / name

@@ -19,7 +19,7 @@ from scripts.evaluate_agent import grade_case, model_prompt
 from scripts.evaluation.build_mingli_evaluation import build_outputs, verify_sources
 
 ROOT = Path(__file__).resolve().parents[2]
-BASE = ROOT / "tests/fixtures/mingli_bench_v1"
+BASE = ROOT / "tests/fixtures/mingli_bench_v2"
 
 
 @pytest.fixture(scope="module")
@@ -48,22 +48,6 @@ def event(tool, *, failed=False):
     if failed:
         item["result"] = {"isError": True}
     return {"type": "item.completed", "item": item}
-
-
-def skill_events(case):
-    skills = [case["expected_skill"]] if case.get("expected_skill") else []
-    if case.get("expected_skill_sets"):
-        skills = case["expected_skill_sets"][0]
-    return [
-        {
-            "type": "item.completed",
-            "item": {
-                "type": "command_execution",
-                "command": "cat skills/" + skill + "/SKILL.md",
-            },
-        }
-        for skill in skills
-    ]
 
 
 def test_verified_snapshot_is_the_exact_reviewed_source():
@@ -273,7 +257,7 @@ def test_boundary_cases_reject_even_unsuccessful_calculation_attempts(
     for case in boundary:
         assert case["no_calculation"] is True
         assert "reference_request" not in case
-        baseline = skill_events(case)
+        baseline = []
         assert grade_case(case, baseline, "解释边界与现实可帮助范围。", 0)[
             "mechanical_checks_passed"
         ]
@@ -346,17 +330,17 @@ def test_fidelity_as_of_compares_instants_without_weakening_birth_clock_identity
         for equivalent in (expected, expected.replace("Z", "+00:00")):
             call = event(tool)
             call["item"]["arguments"] = {**request["arguments"], "as_of": equivalent}
-            assert grade_case(case, skill_events(case) + [call], "解释实际证据。", 0)[
+            assert grade_case(case, [call], "解释实际证据。", 0)[
                 "mechanical_checks_passed"
             ]
         shifted = (datetime.fromisoformat(expected) + timedelta(seconds=1)).isoformat()
         call = event(tool)
         call["item"]["arguments"] = {**request["arguments"], "as_of": shifted}
-        result = grade_case(case, skill_events(case) + [call], "解释实际证据。", 0)
+        result = grade_case(case, [call], "解释实际证据。", 0)
         assert "instant_mismatch:" + tool in result["failures"]
         call["item"]["arguments"] = {
             **request["arguments"],
             "birth_timezone": "UTC",
         }
-        result = grade_case(case, skill_events(case) + [call], "解释实际证据。", 0)
+        result = grade_case(case, [call], "解释实际证据。", 0)
         assert "input_mismatch:" + tool in result["failures"]

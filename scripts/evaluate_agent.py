@@ -36,7 +36,6 @@ from fatebridge.validation.evaluation_environment import (
 )
 
 ROOT = Path(__file__).resolve().parents[1]
-CASES = ROOT / "tests/fixtures/agent_behavior/cases.json"
 
 
 def source_files(root=ROOT, profile="full", extra_files=()):
@@ -46,45 +45,13 @@ def source_files(root=ROOT, profile="full", extra_files=()):
     for name in (
         "scripts/evaluate_agent.py",
         "scripts/evaluate_agent.pyi",
-        "tests/evaluation/test_agent_evaluation.py",
-        "tests/evaluation/test_contract_regressions.py",
-        "tests/evaluation/test_agent_expected_errors.py",
-        "tests/evaluation/test_agent_capture.py",
-        "tests/evaluation/test_agent_tool_contract.py",
-        "tests/bazi/test_bazi_focus_precision.py",
-        "tests/fixtures/agent_behavior/cases.json",
-        "tests/fixtures/agent_behavior/other_chart_cases.json",
-        "tests/fixtures/agent_behavior/meihua_semantic_cases.json",
-        "tests/fixtures/agent_behavior/ren_semantic_cases.json",
-        "tests/fixtures/agent_behavior/taiyi_semantic_cases_v1.json",
-        "tests/fixtures/agent_behavior/ren_semantic_refresh_cases_v1.json",
-        "tests/ren/test_ren_semantic_refresh_preparation.py",
-        "scripts/ren/audit_ren_semantic_refresh.py",
-        "tests/fixtures/agent_behavior/jyotish_semantic_cases.json",
-        "tests/fixtures/agent_behavior/human_design_semantic_cases_v1.json",
-        "tests/fixtures/agent_behavior/human_design_complete_case_v3.json",
-        "tests/human_design/test_human_design_semantic_preparation.py",
-        "tests/human_design/test_human_design_semantic_binding.py",
-        "tests/human_design/test_human_design_evaluation_runtime.py",
-        "tests/evaluation/test_agent_native_environment.py",
-        "tests/evaluation/test_agent_native_context.py",
-        "tests/evaluation/test_agent_solar_environment.py",
-        "tests/human_design/test_human_design_native_launch.py",
-        "scripts/human_design/preserve_human_design_deliveries.py",
-        "scripts/human_design/audit_human_design_semantics.py",
-        "tests/fixtures/agent_behavior/bazi_semantic_cases_v1.json",
-        "tests/fixtures/agent_behavior/western_semantic_cases_v1.json",
-        "tests/western/test_western_semantic_preparation.py",
-        "tests/evaluation/test_external_evaluation.py",
-        "tests/evaluation/test_mingli_corpus.py",
-        "tests/evaluation/test_mingli_semantic_audit.py",
         "scripts/evaluation/build_mingli_evaluation.py",
         "scripts/evaluation/audit_mingli_evaluation.py",
     ):
         path = root / name
         if path.is_file():
             selected.append(path)
-    for folder in ("skills", "docs", "src"):
+    for folder in ("docs", "src"):
         selected.extend(
             p
             for p in (root / folder).rglob("*")
@@ -112,15 +79,7 @@ def source_manifest(root=ROOT, profile="full", extra_files=()):
 
 def freeze_source(target, root=ROOT, profile="full", extra_files=()):
     """Freeze one batch's instructions and executable backend, including dirty work."""
-    manifest = (
-        source_manifest(root, profile, extra_files)
-        if extra_files
-        else (
-            source_manifest(root)
-            if profile == "full"
-            else source_manifest(root, profile)
-        )
-    )
+    manifest = source_manifest(root, profile, extra_files)
     # Keep one file in memory, not all historical validation/source archives.
     # Before/copy/after hashes retain the same fail-closed consistency rule.
     for name, expected in manifest.items():
@@ -132,24 +91,8 @@ def freeze_source(target, root=ROOT, profile="full", extra_files=()):
         destination = target / name
         destination.parent.mkdir(parents=True, exist_ok=True)
         destination.write_bytes(data)
-    after = (
-        source_manifest(root, profile, extra_files)
-        if extra_files
-        else (
-            source_manifest(root)
-            if profile == "full"
-            else source_manifest(root, profile)
-        )
-    )
-    frozen = (
-        source_manifest(target, profile, extra_files)
-        if extra_files
-        else (
-            source_manifest(target)
-            if profile == "full"
-            else source_manifest(target, profile)
-        )
-    )
+    after = source_manifest(root, profile, extra_files)
+    frozen = source_manifest(target, profile, extra_files)
     if after != manifest or frozen != manifest:
         raise RuntimeError("Source changed while snapshotting; retry the evaluation")
     return manifest
@@ -314,19 +257,6 @@ def grade_case(case, events, final, returncode, captured_tool_records=None):
         failures.append("out_of_scope_tool")
     if "allowed_tools" in case and names - set(case["allowed_tools"]):
         failures.append("out_of_scope_tool")
-    skill_sets = case.get("expected_skill_sets") or (
-        [[case["expected_skill"]]] if case.get("expected_skill") else []
-    )
-    if skill_sets and not any(
-        all(
-            any(skill in cmd and "SKILL.md" in cmd for cmd in commands)
-            for skill in group
-        )
-        for group in skill_sets
-    ):
-        failures.append(
-            "skill_not_observed:" + "|".join("+".join(group) for group in skill_sets)
-        )
     for name, expected in case.get("arguments", {}).items():
         selected = [c for c in own if c["tool"] == name]
         if not selected or any(
@@ -392,7 +322,7 @@ def grade_case(case, events, final, returncode, captured_tool_records=None):
 
 
 # These ids describe predeclared case contracts, never model outcomes.
-GRADING_POLICY = "observed_calls_and_declared_errors_v2"
+GRADING_POLICY = "observed_tool_contracts_v3"
 
 
 def _same_argument_path(arguments, path, expected):
@@ -411,57 +341,19 @@ EVALUATION_DOCS_EXCLUDED = {
     "validation",
     "reviews",
     "agent-evaluation.md",
-    "numerology-semantics-preparation.md",
     "liuren-jinkou-audit.md",
-    "meihua-semantics-evaluation.md",
-    "bazi-semantics-evaluation.md",
-    "bazi-grader-policy-audit.md",
-    "taiyi-semantics-evaluation.md",
-    "western-semantics-evaluation.md",
-    "human-design-semantics-evaluation.md",
     "mingli-bench-evaluation.md",
 }
-
-
-def _without_evaluation_private_sections(text):
-    """Remove explicit reviewer-only spans, preserving ordinary source prose."""
-    start = "<!-- agent-evaluation-private:start -->"
-    end = "<!-- agent-evaluation-private:end -->"
-    parts = text.split(start)
-    if end in parts[0]:
-        raise ValueError("Unbalanced evaluation-private document markers")
-    visible = [parts[0]]
-    for part in parts[1:]:
-        if part.count(end) != 1:
-            raise ValueError("Unbalanced evaluation-private document markers")
-        _, public = part.split(end, 1)
-        visible.append(public)
-    return "".join(visible)
 
 
 def prepare_workspace(workspace, source=ROOT):
     shutil.copy2(source / "AGENTS.md", workspace / "AGENTS.md")
     shutil.copytree(source / "src", workspace / "src")
-    if (source / "skills").is_dir():
-        shutil.copytree(source / "skills", workspace / "skills")
     shutil.copytree(
         source / "docs",
         workspace / "docs",
         ignore=lambda _directory, names: set(names) & EVALUATION_DOCS_EXCLUDED,
     )
-    for path in (workspace / "docs").rglob("*.md"):
-        original = path.read_text(encoding="utf-8")
-        visible = _without_evaluation_private_sections(original)
-        if visible != original:
-            path.write_text(visible, encoding="utf-8")
-    entries = workspace / ".agents/skills"
-    entries.mkdir(parents=True)
-    for skill in (workspace / "skills").glob("*"):
-        if not (skill / "SKILL.md").is_file():
-            continue
-        (entries / skill.name).symlink_to(
-            Path("../../skills") / skill.name, target_is_directory=True
-        )
     with (workspace / "AGENTS.md").open("a", encoding="utf-8") as handle:
         handle.write(
             "\n## 验收环境\n"
@@ -517,8 +409,6 @@ def command_for(
         "apps",
         "--disable",
         "plugins",
-        "--disable",
-        "skill_mcp_dependency_install",
     ]
     # Ignore unrelated configured connectors; authentication stays in CODEX_HOME.
     settings = {
@@ -942,7 +832,7 @@ def main():
         "--snapshot-profile",
         choices=("full", "runtime"),
         default="full",
-        help="runtime retains backend/data, optional skills, public docs and judge code; excludes past docs/validation archives",
+        help="runtime retains backend/data, public docs and judge code; excludes past docs/validation archives",
     )
     parser.add_argument(
         "--prepare-only",
@@ -988,7 +878,7 @@ def main():
                 load_frozen_selection(args.cases_file, split, args.cases)
                 if args.cases_file
                 else load_external_suite(
-                    ROOT / "tests/fixtures/mingli_bench_v1", split, args.cases
+                    ROOT / "tests/fixtures/mingli_bench_v2", split, args.cases
                 )
             )
         except (OSError, ValueError, KeyError, TypeError) as error:
@@ -1000,9 +890,11 @@ def main():
     else:
         if args.split:
             parser.error("--split requires --external-suite")
-        dataset_bytes = (args.cases_file or CASES).read_bytes()
+        if args.cases_file is None:
+            parser.error("--cases-file is required unless --external-suite is used")
+        dataset_bytes = args.cases_file.read_bytes()
         document = json.loads(dataset_bytes)
-        if document.get("suite_id") == "mingli-bench-v1":
+        if document.get("suite_id") in ("mingli-bench-v1", "mingli-bench-v2"):
             parser.error("MingLi data requires --external-suite mingli-bench")
         cases = document["cases"]
         known = {case["id"] for case in cases}
@@ -1011,6 +903,10 @@ def main():
         if args.cases and not set(args.cases) <= known:
             parser.error("Unknown case; available: " + ", ".join(sorted(known)))
         cases = [c for c in cases if not args.cases or c["id"] in args.cases]
+    if any({"expected_skill", "expected_skill_sets"} & case.keys() for case in cases):
+        parser.error(
+            "Cases with retired skill requirements need their original evaluator"
+        )
     from fatebridge.diagnostics import resolve_codex_cli
 
     cli = None if args.prepare_only else args.codex or resolve_codex_cli()["path"]
@@ -1029,14 +925,8 @@ def main():
         cases = external["cases"]
     source = output / "source"
     extra_files = evidence_source_files(cases, ROOT)
-    manifest = (
-        freeze_source(source, profile=args.snapshot_profile, extra_files=extra_files)
-        if extra_files
-        else (
-            freeze_source(source)
-            if args.snapshot_profile == "full"
-            else freeze_source(source, profile=args.snapshot_profile)
-        )
+    manifest = freeze_source(
+        source, profile=args.snapshot_profile, extra_files=extra_files
     )
     (output / "source-manifest.json").write_text(
         json.dumps(manifest, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
@@ -1048,15 +938,7 @@ def main():
                 cases, output, source, native_selection, native_working_directory
             )
         )
-        frozen_manifest = (
-            source_manifest(source, args.snapshot_profile, extra_files)
-            if extra_files
-            else (
-                source_manifest(source)
-                if args.snapshot_profile == "full"
-                else source_manifest(source, profile=args.snapshot_profile)
-            )
-        )
+        frozen_manifest = source_manifest(source, args.snapshot_profile, extra_files)
         if frozen_manifest != manifest:
             raise RuntimeError("Frozen source changed during reference preparation")
         command = [

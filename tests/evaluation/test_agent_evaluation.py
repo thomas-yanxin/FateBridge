@@ -4,11 +4,13 @@ import json
 import sys
 from pathlib import Path
 
+import pytest
+
 from scripts.evaluate_agent import (
-    CASES,
     command_for,
     freeze_source,
     grade_case,
+    main,
     source_manifest,
 )
 
@@ -59,29 +61,24 @@ def test_full_export_requires_unprojected_first_call_and_confirmed_inputs():
     ]
 
 
-def test_cases_cover_positive_negative_missing_and_complete_requests():
-    records = json.loads(CASES.read_text())["cases"]
-    assert len({c["id"] for c in records}) == len(records)
-    assert any(c.get("required_any") for c in records)
-    assert any(c.get("no_calculation") for c in records)
-    assert any(c.get("full_export") for c in records)
-    assert all(c["prompt"] and c["manual_review"] for c in records)
-    command = command_for("codex", Path("/workspace"), Path("/output"), records[0])
+def test_model_command_uses_isolated_backend_and_cli_default_model():
+    command = command_for("codex", Path("/workspace"), Path("/output"), {})
     assert "--ignore-user-config" in command
     assert command[command.index("--sandbox") + 1] == "read-only"
     assert "--model" not in command
     assert 'mcp_servers.fatebridge.env.PYTHONPATH="/workspace/src"' in command
 
 
-def test_evaluation_freezes_backend_and_yaml_as_well_as_instructions(tmp_path):
+def test_evaluation_freezes_backend_and_judge_as_well_as_instructions(tmp_path):
     source = tmp_path / "source"
     source.mkdir()
     for name in ("AGENTS.md", "pyproject.toml", "uv.lock"):
         (source / name).write_text(name)
     for name in (
-        "skills/example/agents/openai.yaml",
         "src/fatebridge/example.py",
         "scripts/evaluate_agent.py",
+        "scripts/evaluation/build_mingli_evaluation.py",
+        "scripts/evaluation/audit_mingli_evaluation.py",
     ):
         path = source / name
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -91,9 +88,10 @@ def test_evaluation_freezes_backend_and_yaml_as_well_as_instructions(tmp_path):
     (source / "src/fatebridge/example.py").write_text("changed")
     assert source_manifest(frozen) == manifest
     assert source_manifest(source) != manifest
-    assert manifest["skills/example/agents/openai.yaml"]
     (source / "scripts/evaluate_agent.py").write_text("changed judge")
     assert (frozen / "scripts/evaluate_agent.py").read_text() == "original"
+    assert (frozen / "scripts/evaluation/build_mingli_evaluation.py").is_file()
+    assert (frozen / "scripts/evaluation/audit_mingli_evaluation.py").is_file()
     assert source_manifest(frozen) == manifest
 
 
@@ -106,33 +104,6 @@ def test_completed_transport_does_not_hide_protocol_errors_and_recovery():
         in grade_case(case, [failed], "answer", 0)["failures"]
     )
     assert grade_case(case, [failed, event("astro_india_chart")], "answer", 0)[
-        "mechanical_checks_passed"
-    ]
-
-
-def test_skill_routes_allow_complete_alternatives_but_not_partial_compositions():
-    case = {
-        "expected_skill_sets": [["onda-zige"], ["onda-shiye", "onda-xueye"]],
-        "manual_review": [],
-    }
-
-    def read(*skills):
-        return [
-            {
-                "type": "item.completed",
-                "item": {
-                    "type": "command_execution",
-                    "command": "cat "
-                    + " ".join(f"skills/{s}/SKILL.md" for s in skills),
-                },
-            }
-        ]
-
-    assert grade_case(case, read("onda-zige"), "answer", 0)["mechanical_checks_passed"]
-    assert grade_case(case, read("onda-shiye", "onda-xueye"), "answer", 0)[
-        "mechanical_checks_passed"
-    ]
-    assert not grade_case(case, read("onda-shiye"), "answer", 0)[
         "mechanical_checks_passed"
     ]
 
@@ -227,16 +198,44 @@ def test_capture_is_only_enabled_for_opted_in_evaluation_cases():
     )
 
 
-def test_meihua_cohort_retains_all_selected_cases_and_pending_semantic_requirements():
-    path = (
-        Path(__file__).parents[1] / "fixtures/agent_behavior/meihua_semantic_cases.json"
+@pytest.mark.parametrize(
+    "dataset_fields, case_fields, error",
+    [
+        ({"suite_id": "mingli-bench-v1"}, {}, "requires --external-suite"),
+        ({"suite_id": "mingli-bench-v2"}, {}, "requires --external-suite"),
+        ({}, {"expected_skill": "onda-shiye"}, "need their original evaluator"),
+        (
+            {},
+            {"expected_skill_sets": [["onda-shiye"]]},
+            "need their original evaluator",
+        ),
+    ],
+)
+def test_current_runner_rejects_cases_with_incompatible_grading_requirements(
+    tmp_path, monkeypatch, capsys, dataset_fields, case_fields, error
+):
+    dataset = tmp_path / "cases.json"
+    dataset.write_text(
+        json.dumps({**dataset_fields, "cases": [{"id": "one", **case_fields}]})
     )
-    cases = json.loads(path.read_text())["cases"]
-    assert len(cases) == len({c["id"] for c in cases}) == 10
-    assert sum(len(c["manual_review"]) for c in cases) == 30
-    assert sum("reference_request" in c for c in cases) == 9
-    assert sum(c.get("no_calculation", False) for c in cases) == 1
-    assert all(c["capture_payloads"] and c["scenario"] == "onda-zhanbu" for c in cases)
+    output = tmp_path / "prepared"
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "evaluate_agent",
+            "--prepare-only",
+            "--cases-file",
+            str(dataset),
+            "--output",
+            str(output),
+        ],
+    )
+    with pytest.raises(SystemExit) as failure:
+        main()
+    assert failure.value.code == 2
+    assert error in capsys.readouterr().err
+    assert not output.exists()
 
 
 def test_prepare_only_does_not_launch_a_model_or_need_cli_configuration(
@@ -255,8 +254,8 @@ def test_prepare_only_does_not_launch_a_model_or_need_cli_configuration(
         )
     )
     output = tmp_path / "prepared"
-    monkeypatch.setattr(evaluator, "freeze_source", lambda target: {})
-    monkeypatch.setattr(evaluator, "source_manifest", lambda source: {})
+    monkeypatch.setattr(evaluator, "freeze_source", lambda target, **kwargs: {})
+    monkeypatch.setattr(evaluator, "source_manifest", lambda source, *args: {})
 
     async def prepare(
         cases, target, source, native_selection, native_working_directory
@@ -321,7 +320,7 @@ def test_execution_failure_preserves_selected_case_denominator(tmp_path, monkeyp
         )
     )
     output = tmp_path / "model-run"
-    monkeypatch.setattr(evaluator, "freeze_source", lambda target: {})
+    monkeypatch.setattr(evaluator, "freeze_source", lambda target, **kwargs: {})
     monkeypatch.setattr(
         evaluator.subprocess, "check_output", lambda *args, **kwargs: "test-cli"
     )

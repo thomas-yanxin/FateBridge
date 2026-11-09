@@ -62,7 +62,7 @@ def make_suite(root: Path):
             )
     files = {
         "cases.json": {
-            "suite_id": "mingli-bench-v1",
+            "suite_id": "mingli-bench-v2",
             "dataset_kind": "public_competition",
             "cases": cases,
         },
@@ -77,7 +77,7 @@ def make_suite(root: Path):
         (root / name).write_bytes(json_bytes(value))
     (root / "source.txt").write_text("UPSTREAM_RAW_INCLUDES_HOLDOUT_ANSWER")
     manifest = {
-        "suite_id": "mingli-bench-v1",
+        "suite_id": "mingli-bench-v2",
         "dataset_kind": "public_competition",
         "schema_version": 1,
         "source_commit": "a" * 40,
@@ -211,12 +211,11 @@ def test_model_workspace_excludes_corpus_answers_and_evaluation_docs(tmp_path):
     source = tmp_path / "source"
     for name, text in {
         "AGENTS.md": "runtime instructions",
-        "skills/onda-shiye/SKILL.md": "runtime skill",
         "src/fatebridge/example.py": "runtime code",
         "docs/runtime.md": "runtime guide",
         "docs/mingli-bench-evaluation.md": "HIDDEN_NEW_RUBRIC",
         "docs/validation/report.json": "HIDDEN_PAST_REPORT",
-        "tests/fixtures/mingli_bench_v1/cases.json": "HIDDEN_CASES_AND_ANSWERS",
+        "tests/fixtures/mingli_bench_v2/cases.json": "HIDDEN_CASES_AND_ANSWERS",
     }.items():
         path = source / name
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -330,10 +329,10 @@ def test_external_prepare_only_and_replay_remain_sealed_without_models(
     root = tmp_path / "root"
     fixture = root / "tests/fixtures"
     fixture.mkdir(parents=True)
-    make_suite(fixture / "mingli_bench_v1")
+    make_suite(fixture / "mingli_bench_v2")
     monkeypatch.setattr(evaluator, "ROOT", root)
-    monkeypatch.setattr(evaluator, "freeze_source", lambda target: {})
-    monkeypatch.setattr(evaluator, "source_manifest", lambda source: {})
+    monkeypatch.setattr(evaluator, "freeze_source", lambda target, **kwargs: {})
+    monkeypatch.setattr(evaluator, "source_manifest", lambda source, *args: {})
 
     async def prepare(
         cases, output, source, native_selection, native_working_directory
@@ -392,5 +391,5 @@ def test_external_prepare_only_and_replay_remain_sealed_without_models(
             str(tmp_path / "reprepared"),
         ],
     )
-    (fixture / "mingli_bench_v1/cases.json").write_text("mutable source is now corrupt")
+    (fixture / "mingli_bench_v2/cases.json").write_text("mutable source is now corrupt")
     assert evaluator.main() == 0

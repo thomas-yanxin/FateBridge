@@ -160,20 +160,19 @@ def test_runtime_workspace_excludes_new_judge_document_but_keeps_live_guides(tmp
     (source / "AGENTS.md").write_text("rules")
     for name in (
         "src/example.py",
-        "skills/onda-zhanbu/SKILL.md",
         "docs/taiyi-shiji.md",
-        "docs/taiyi-semantics-evaluation.md",
+        "docs/agent-evaluation.md",
     ):
         file = source / name
         file.parent.mkdir(parents=True, exist_ok=True)
         file.write_text(
-            "runtime" if "semantics-evaluation" not in name else "HIDDEN RUBRIC"
+            "runtime" if "agent-evaluation" not in name else "HIDDEN RUBRIC"
         )
     workspace = tmp_path / "workspace"
     workspace.mkdir()
     prepare_workspace(workspace, source)
     assert (workspace / "docs/taiyi-shiji.md").exists()
-    assert not (workspace / "docs/taiyi-semantics-evaluation.md").exists()
+    assert not (workspace / "docs/agent-evaluation.md").exists()
     assert not (workspace / "tests").exists()
 
 
@@ -190,7 +189,6 @@ def test_expected_error_reference_is_saved_and_next_real_stdio_case_continues(tm
         {
             **CASE,
             "id": "refused",
-            "scenario": "onda-zhanbu",
             "prompt": "fictional",
             "reference_request": {
                 "tool": "taiyi",
@@ -202,7 +200,6 @@ def test_expected_error_reference_is_saved_and_next_real_stdio_case_continues(tm
         },
         {
             "id": "valid",
-            "scenario": "onda-zhanbu",
             "prompt": "fictional",
             "manual_review": ["pending"],
             "reference_request": {"tool": "taiyi", "arguments": args},
@@ -224,23 +221,6 @@ def test_expected_error_reference_is_saved_and_next_real_stdio_case_continues(tm
     )
 
 
-def test_new_cohort_keeps_all_thirteen_cases_and_fifty_two_pending_criteria():
-    path = (
-        Path(__file__).parents[1]
-        / "fixtures/agent_behavior/taiyi_semantic_cases_v1.json"
-    )
-    cases = json.loads(path.read_text())["cases"]
-    assert len(cases) == len({c["id"] for c in cases}) == 13
-    assert sum(len(c["manual_review"]) for c in cases) == 52
-    assert all(c["capture_payloads"] and c["scenario"] == "onda-zhanbu" for c in cases)
-    assert sum(bool(c.get("expected_tool_errors")) for c in cases) == 1
-    assert sum(bool(c.get("full_export")) for c in cases) == 1
-    assert {c["reference_request"]["tool"] for c in cases} == {"taiyi", "sanshiunited"}
-    for case in cases:
-        prompt = model_prompt(case)
-        assert not any(criterion in prompt for criterion in case["manual_review"])
-
-
 def test_streamed_snapshot_rejects_source_changes_after_copy(tmp_path, monkeypatch):
     import scripts.evaluate_agent as evaluator
 
@@ -251,12 +231,12 @@ def test_streamed_snapshot_rejects_source_changes_after_copy(tmp_path, monkeypat
     original = evaluator.source_manifest
     calls = 0
 
-    def manifests(root):
+    def manifests(root, *args):
         nonlocal calls
         calls += 1
         if calls == 2:
             (source / "AGENTS.md").write_text("concurrent change")
-        return original(root)
+        return original(root, *args)
 
     monkeypatch.setattr(evaluator, "source_manifest", manifests)
     frozen = tmp_path / "frozen"
@@ -279,11 +259,9 @@ def test_explicit_runtime_snapshot_keeps_execution_and_judge_inputs_not_past_arc
         "uv.lock",
         "src/fatebridge/engine.py",
         "src/fatebridge/data/rules.json",
-        "skills/onda-zhanbu/SKILL.md",
         "docs/contracts/taiyi.json",
         "docs/taiyi-shiji.md",
         "scripts/evaluate_agent.py",
-        "tests/evaluation/test_agent_expected_errors.py",
         "docs/validation/past/model-raw/source/src/past.py",
     ]
     for name in paths:
