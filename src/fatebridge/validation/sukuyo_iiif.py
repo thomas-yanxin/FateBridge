@@ -5,7 +5,7 @@ from __future__ import annotations
 from copy import deepcopy
 from typing import Any
 
-from fatebridge.validation.sukuyo_engineering import Artifact, _ArtifactReader
+from fatebridge.validation.sukuyo_artifacts import Artifact, read_artifact
 
 CONTEXTS = {
     "http://iiif.io/api/presentation/2/context.json": 2,
@@ -84,7 +84,7 @@ def inspect_iiif_manifest(artifact: Artifact) -> dict[str, Any]:
     pages, Choice/list bodies and unsupported structural forms fail explicitly.
     Other source fields remain available in the complete bound manifest.
     """
-    binding = _ArtifactReader().bind(artifact)
+    binding, _ = read_artifact(artifact)
     data = _object(binding["value"])
     version = _version(data)
     id_key = "@id" if version == 2 else "id"

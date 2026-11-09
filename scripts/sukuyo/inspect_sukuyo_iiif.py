@@ -8,7 +8,7 @@ import os
 import tempfile
 from pathlib import Path
 
-from fatebridge.validation.sukuyo_engineering import Artifact
+from fatebridge.validation.sukuyo_artifacts import Artifact
 from fatebridge.validation.sukuyo_iiif import inspect_iiif_manifest
 
 

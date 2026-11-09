@@ -36,11 +36,10 @@ from fatebridge.validation.evaluation_environment import (
 )
 
 ROOT = Path(__file__).resolve().parents[1]
+_LOCAL_DOC_DIRS = {"validation", "reviews", "plans", "superpowers"}
 
 
-def source_files(root=ROOT, profile="full", extra_files=()):
-    if profile not in {"full", "runtime"}:
-        raise ValueError("Unknown evaluation source snapshot profile")
+def source_files(root=ROOT, *, extra_files=()):
     selected = [root / name for name in ("AGENTS.md", "pyproject.toml", "uv.lock")]
     for name in (
         "scripts/evaluate_agent.py",
@@ -51,18 +50,21 @@ def source_files(root=ROOT, profile="full", extra_files=()):
         path = root / name
         if path.is_file():
             selected.append(path)
-    for folder in ("docs", "src"):
-        selected.extend(
-            p
-            for p in (root / folder).rglob("*")
-            if p.is_file()
-            and "__pycache__" not in p.parts
-            and p.suffix != ".pyc"
-            and p.name != ".DS_Store"
-            and not (
-                profile == "runtime" and p.is_relative_to(root / "docs/validation")
+    docs = root / "docs"
+    for folder in (docs, root / "src"):
+        for current, directories, files in os.walk(folder):
+            directory = Path(current)
+            excluded = {"__pycache__"}
+            if directory == docs:
+                excluded.update(_LOCAL_DOC_DIRS)
+            directories[:] = [name for name in directories if name not in excluded]
+            selected.extend(
+                directory / name
+                for name in files
+                if not name.endswith((".pyc", ".pyo", ".log"))
+                and name != ".DS_Store"
+                and (directory / name).is_file()
             )
-        )
     for relative in extra_files:
         path = resolve_source(root, relative)
         if path not in selected:
@@ -70,17 +72,16 @@ def source_files(root=ROOT, profile="full", extra_files=()):
     return sorted(selected)
 
 
-def source_manifest(root=ROOT, profile="full", extra_files=()):
+def source_manifest(root=ROOT, *, extra_files=()):
     return {
         str(path.relative_to(root)): hashlib.sha256(path.read_bytes()).hexdigest()
-        for path in source_files(root, profile, extra_files)
+        for path in source_files(root, extra_files=extra_files)
     }
 
 
-def freeze_source(target, root=ROOT, profile="full", extra_files=()):
+def freeze_source(target, root=ROOT, *, extra_files=()):
     """Freeze one batch's instructions and executable backend, including dirty work."""
-    manifest = source_manifest(root, profile, extra_files)
-    # Keep one file in memory, not all historical validation/source archives.
+    manifest = source_manifest(root, extra_files=extra_files)
     # Before/copy/after hashes retain the same fail-closed consistency rule.
     for name, expected in manifest.items():
         data = (root / name).read_bytes()
@@ -91,8 +92,8 @@ def freeze_source(target, root=ROOT, profile="full", extra_files=()):
         destination = target / name
         destination.parent.mkdir(parents=True, exist_ok=True)
         destination.write_bytes(data)
-    after = source_manifest(root, profile, extra_files)
-    frozen = source_manifest(target, profile, extra_files)
+    after = source_manifest(root, extra_files=extra_files)
+    frozen = source_manifest(target, extra_files=extra_files)
     if after != manifest or frozen != manifest:
         raise RuntimeError("Source changed while snapshotting; retry the evaluation")
     return manifest
@@ -334,12 +335,8 @@ def _same_argument_path(arguments, path, expected):
     return value == expected and isinstance(value, bool) == isinstance(expected, bool)
 
 
-# Keep runtime documentation, but do not hand the examinee past grades, answer
-# transcripts or evaluator descriptions. The full snapshot still retains these
-# materials for the reviewer; only the model workspace excludes them.
-EVALUATION_DOCS_EXCLUDED = {
-    "validation",
-    "reviews",
+# Keep evaluator descriptions in the source snapshot for the reviewer only.
+EVALUATION_DOCS_EXCLUDED = _LOCAL_DOC_DIRS | {
     "agent-evaluation.md",
     "liuren-jinkou-audit.md",
     "mingli-bench-evaluation.md",
@@ -829,12 +826,6 @@ def main():
         help="Required exact SHA-256 of --native-environment",
     )
     parser.add_argument(
-        "--snapshot-profile",
-        choices=("full", "runtime"),
-        default="full",
-        help="runtime retains backend/data, public docs and judge code; excludes past docs/validation archives",
-    )
-    parser.add_argument(
         "--prepare-only",
         action="store_true",
         help="Freeze inputs, hidden criteria and real MCP references; never start a model",
@@ -925,9 +916,7 @@ def main():
         cases = external["cases"]
     source = output / "source"
     extra_files = evidence_source_files(cases, ROOT)
-    manifest = freeze_source(
-        source, profile=args.snapshot_profile, extra_files=extra_files
-    )
+    manifest = freeze_source(source, extra_files=extra_files)
     (output / "source-manifest.json").write_text(
         json.dumps(manifest, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
@@ -938,7 +927,7 @@ def main():
                 cases, output, source, native_selection, native_working_directory
             )
         )
-        frozen_manifest = source_manifest(source, args.snapshot_profile, extra_files)
+        frozen_manifest = source_manifest(source, extra_files=extra_files)
         if frozen_manifest != manifest:
             raise RuntimeError("Frozen source changed during reference preparation")
         command = [
@@ -966,8 +955,6 @@ def main():
             command.extend(["--codex", args.codex])
         if args.model:
             command.extend(["--model", args.model])
-        if args.snapshot_profile != "full":
-            command.extend(["--snapshot-profile", args.snapshot_profile])
         proposal = {
             "command": command,
             "cwd": str(source),
@@ -984,7 +971,6 @@ def main():
             "semantic_acceptance": "not_run",
             "real_world_observations": 0,
             "dataset_sha256": hashlib.sha256(dataset_bytes).hexdigest(),
-            "source_snapshot_profile": args.snapshot_profile,
             "native_environment_sha256": native_sha256,
             "source_manifest_sha256": hashlib.sha256(
                 (output / "source-manifest.json").read_bytes()
@@ -1015,7 +1001,6 @@ def main():
         "cli_version": subprocess.check_output([cli, "--version"], text=True).strip(),
         "model": args.model or "CLI default (unrelated user config ignored)",
         "dataset_sha256": hashlib.sha256(dataset_bytes).hexdigest(),
-        "source_snapshot_profile": args.snapshot_profile,
         "native_environment_sha256": native_sha256,
         "source_sha256": hashlib.sha256(
             json.dumps(manifest, sort_keys=True, separators=(",", ":")).encode()

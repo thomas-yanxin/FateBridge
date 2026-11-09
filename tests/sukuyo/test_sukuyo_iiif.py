@@ -9,7 +9,7 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.validation.sukuyo_engineering import Artifact
+from fatebridge.validation.sukuyo_artifacts import Artifact
 from fatebridge.validation.sukuyo_iiif import inspect_iiif_manifest
 
 FIXTURES = Path(__file__).parents[1] / "data/sukuyo-iiif-manifests-v1"

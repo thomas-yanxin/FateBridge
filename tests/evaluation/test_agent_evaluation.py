@@ -255,7 +255,7 @@ def test_prepare_only_does_not_launch_a_model_or_need_cli_configuration(
     )
     output = tmp_path / "prepared"
     monkeypatch.setattr(evaluator, "freeze_source", lambda target, **kwargs: {})
-    monkeypatch.setattr(evaluator, "source_manifest", lambda source, *args: {})
+    monkeypatch.setattr(evaluator, "source_manifest", lambda source, **kwargs: {})
 
     async def prepare(
         cases, target, source, native_selection, native_working_directory

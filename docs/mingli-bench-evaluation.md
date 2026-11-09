@@ -41,7 +41,7 @@ uv run --locked --extra dev python -m scripts.evaluation.build_mingli_evaluation
 ```bash
 uv run --locked --extra dev python scripts/evaluate_agent.py \
   --external-suite mingli-bench --split development \
-  --prepare-only --snapshot-profile runtime \
+  --prepare-only \
   --output /tmp/fatebridge-mingli-development-preparation
 ```
 
@@ -50,7 +50,6 @@ uv run --locked --extra dev python scripts/evaluate_agent.py \
 ```bash
 uv run --locked --extra dev python scripts/evaluate_agent.py \
   --external-suite mingli-bench --split development \
-  --snapshot-profile runtime \
   --output /tmp/fatebridge-mingli-development-run
 ```
 

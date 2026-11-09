@@ -55,12 +55,10 @@ def test_explicit_evidence_is_frozen_and_each_workspace_gets_only_its_case(tmp_p
     first, second = case(source), case(source, "two")
     extras = evidence_source_files([first, second], source)
     frozen = tmp_path / "frozen"
-    manifest = evaluator.freeze_source(
-        frozen, source, profile="runtime", extra_files=extras
-    )
+    manifest = evaluator.freeze_source(frozen, source, extra_files=extras)
     assert set(extras) <= set(manifest)
     assert "tests/fixtures/rubric.json" not in manifest
-    assert evaluator.source_manifest(frozen, "runtime", extras) == manifest
+    assert evaluator.source_manifest(frozen, extra_files=extras) == manifest
     for item in [first, second]:
         workspace = tmp_path / item["id"]
         workspace.mkdir()

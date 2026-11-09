@@ -332,7 +332,7 @@ def test_external_prepare_only_and_replay_remain_sealed_without_models(
     make_suite(fixture / "mingli_bench_v2")
     monkeypatch.setattr(evaluator, "ROOT", root)
     monkeypatch.setattr(evaluator, "freeze_source", lambda target, **kwargs: {})
-    monkeypatch.setattr(evaluator, "source_manifest", lambda source, *args: {})
+    monkeypatch.setattr(evaluator, "source_manifest", lambda source, **kwargs: {})
 
     async def prepare(
         cases, output, source, native_selection, native_working_directory

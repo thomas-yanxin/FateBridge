@@ -12,7 +12,7 @@ import tempfile
 from pathlib import Path
 
 from fatebridge.validation import sukuyo_manuscript_calendar as audit
-from fatebridge.validation.sukuyo_engineering import Artifact, _ArtifactReader
+from fatebridge.validation.sukuyo_artifacts import Artifact, read_artifact
 
 
 def _publish_output(path: Path, raw: bytes) -> None:
@@ -41,8 +41,7 @@ def main() -> int:
     parser.add_argument("--output", type=Path)
     args = parser.parse_args()
     try:
-        reader = _ArtifactReader()
-        binding = reader.bind_utf8_file(
+        binding, input_bytes = read_artifact(
             Artifact(args.input, args.input_sha256, args.input_version)
         )
         rows = binding["value"]["literal_records"]["suspected_leap_insertions"]
@@ -50,7 +49,11 @@ def main() -> int:
             rows, evaluate_conditional_adjacency=args.evaluate_conditional_adjacency
         )
         result = {
-            "input_binding": binding,
+            "input_binding": {
+                **binding,
+                "bytes": len(input_bytes),
+                "raw_utf8_file_text": input_bytes.decode("utf-8"),
+            },
             "audit_module_sha256": hashlib.sha256(
                 Path(audit.__file__).read_bytes()
             ).hexdigest(),

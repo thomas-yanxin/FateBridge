@@ -22,7 +22,7 @@ uv run --locked --extra dev python scripts/evaluate_agent.py --prepare-only \
 
 每批冻结 `AGENTS.md`、方法参考、接口合同、后端源码与运行器；每例从同一快照创建独立临时项目。真实 stdio MCP 使用当前解释器和冻结源码的 `PYTHONPATH`，保留已选择的星历配置与原工作目录。模型使用只读沙箱，忽略用户连接配置，并禁用 Apps 和插件。宿主指令仍可能参与，运行日志应保留相应警告。
 
-模型工作目录不包含评测说明、历史报告或测试目录。任务可用 `evidence_files` 明确指定只读证据及其目标路径；评分标准留在工作目录之外。`--snapshot-profile runtime` 额外排除本地历史报告，所选证据仍按声明冻结。
+源码快照排除本地历史报告、工作草稿、日志和缓存。任务可用 `evidence_files` 明确指定只读证据及其目标路径，所选证据仍按声明冻结。评分标准留在模型工作目录之外。
 
 [MingLi-Bench 外部评估](mingli-bench-evaluation.md)提供有固定来源的输入质量、解释忠实度和咨询边界任务，默认只加载开发集，留出集按命例独立选择。原比赛人生答案不作为这三层的评分真值。
 

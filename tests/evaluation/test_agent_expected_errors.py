@@ -231,12 +231,12 @@ def test_streamed_snapshot_rejects_source_changes_after_copy(tmp_path, monkeypat
     original = evaluator.source_manifest
     calls = 0
 
-    def manifests(root, *args):
+    def manifests(root, **kwargs):
         nonlocal calls
         calls += 1
         if calls == 2:
             (source / "AGENTS.md").write_text("concurrent change")
-        return original(root, *args)
+        return original(root, **kwargs)
 
     monkeypatch.setattr(evaluator, "source_manifest", manifests)
     frozen = tmp_path / "frozen"
@@ -246,7 +246,7 @@ def test_streamed_snapshot_rejects_source_changes_after_copy(tmp_path, monkeypat
     assert (source / "AGENTS.md").read_text() == "concurrent change"
 
 
-def test_explicit_runtime_snapshot_keeps_execution_and_judge_inputs_not_past_archives(
+def test_snapshot_keeps_execution_and_judge_inputs_and_excludes_local_artifacts(
     tmp_path,
 ):
     from scripts.evaluate_agent import freeze_source, source_manifest
@@ -262,14 +262,24 @@ def test_explicit_runtime_snapshot_keeps_execution_and_judge_inputs_not_past_arc
         "docs/contracts/taiyi.json",
         "docs/taiyi-shiji.md",
         "scripts/evaluate_agent.py",
-        "docs/validation/past/model-raw/source/src/past.py",
     ]
-    for name in paths:
+    local_paths = [
+        "docs/validation/past/model-raw/source/src/past.py",
+        "docs/reviews/old-answer.md",
+        "docs/plans/draft.md",
+        "docs/superpowers/plan.md",
+        "src/fatebridge/run.log",
+        "src/fatebridge/__pycache__/engine.pyc",
+    ]
+    for name in paths + local_paths:
         path = source / name
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(name)
-    manifest = freeze_source(tmp_path / "runtime", source, "runtime")
-    assert set(manifest) == set(paths[:-1])
-    assert source_manifest(tmp_path / "runtime") == manifest
-    assert set(freeze_source(tmp_path / "full", source)) == set(paths)
-    assert (source / paths[-1]).exists()
+    frozen = tmp_path / "frozen"
+    manifest = freeze_source(frozen, source)
+    assert set(manifest) == set(paths)
+    assert source_manifest(frozen) == manifest
+    assert all(
+        (source / name).exists() and not (frozen / name).exists()
+        for name in local_paths
+    )
