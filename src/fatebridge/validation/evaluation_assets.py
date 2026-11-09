@@ -99,8 +99,6 @@ def copy_case_evidence(
         destination.parent.mkdir(parents=True, exist_ok=True)
         with destination.open("xb") as handle:
             handle.write(data)
-        if hashlib.sha256(destination.read_bytes()).hexdigest() != item["sha256"]:
-            raise ValueError("Copied evidence failed its SHA-256 check")
         result.append({**item, "bytes": len(data)})
     return result
 

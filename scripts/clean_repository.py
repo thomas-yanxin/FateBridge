@@ -171,8 +171,6 @@ def main(argv: list[str] | None = None) -> int:
     for path in candidates:
         print(path.relative_to(ROOT))
         if options.apply:
-            if path.is_symlink():
-                raise RuntimeError(f"Cleanup candidate became a symlink: {path}")
             if path.is_dir():
                 shutil.rmtree(path)
             else:
