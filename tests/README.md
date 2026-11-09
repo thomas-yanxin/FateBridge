@@ -27,7 +27,7 @@ uv run --locked --extra dev python -m pytest -q
 | 范围 | 目录 |
 | --- | --- |
 | 请求、执行、输出、交付、CLI／REST／MCP 和其他公共合同 | [integration/](integration/) |
-| 架构、文档、技能、CI、仓库与发布检查 | [quality/](quality/) |
+| 架构、文档、CI、仓库与发布检查 | [quality/](quality/) |
 | 真实模型运行器、解释引用、外部评估和预测研究协议 | [evaluation/](evaluation/) |
 | 八字与时运、双人评分 | [bazi/](bazi/) · [compatibility/](compatibility/) |
 | 物理星历、历法、时间尺度与太阳模型 | [astronomy/](astronomy/) |

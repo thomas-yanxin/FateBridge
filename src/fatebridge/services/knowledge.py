@@ -58,15 +58,11 @@ def _build_knowledge_registry_snapshot_text(
 
     sections: List[tuple[str, List[str]]] = [("目录概览", overview_lines)]
     for item in domains:
-        if not isinstance(item, dict):
-            continue
         category_lines = [
             f"域：{item.get('domain', '未知')}",
             f"分类数：{len(item.get('categories') or [])}",
         ]
         for category in item.get("categories") or []:
-            if not isinstance(category, dict):
-                continue
             supports = "/".join(category.get("supports") or []) or "无"
             keys = (
                 "、".join(category.get("keys") or category.get("keys_sample") or [])

@@ -156,7 +156,7 @@ uv run --locked --extra dev fatebridge doctor --mcp --family fengshui
 
 源码 MCP 启动时读取仓库根目录 `.env`，已有进程环境优先。GUI 客户端应通过 `env` 注入设置，独立工具安装不要依赖当前工作目录的 `.env`。自定义星历目录可加 `SE_EPHE_PATH`，下载步骤与精度检查见[星历说明](ephemeris.md)。日志写 stderr，stdout 留给 stdio 协议；启动包装脚本也应遵守此约定。
 
-旧 Onda 技能已移除。Codex 使用本仓库作为项目时读取 `AGENTS.md`；其他客户端按自身机制使用工具说明。参考文档可按需读取，不需要安装技能包。
+Codex 使用本仓库作为项目时读取 `AGENTS.md`；其他客户端按自身机制使用工具说明，方法参考位于 `docs/interpretation/`。
 
 ## HTTP 与远程部署
 

@@ -1,4 +1,4 @@
-"""Catalogue lookup shared by skill contract tests."""
+"""Catalogue lookup shared by public contract tests."""
 
 from fatebridge.application.description import spec_is_cli_safe
 from fatebridge.application.tool_spec import ToolSpec

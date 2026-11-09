@@ -198,7 +198,7 @@ SCHEMA_LEAVES = [
     ),
     ("bazi_marriage", "marriage_analysis.timing_context.dayun_age", "number"),
     ("sukuyo_compatibility", "person1_to_person2.offset", "integer"),
-    ("sukuyo_compatibility", "person1.moon_longitude", "number"),
+    ("sukuyo_compatibility", "person1.calendar.lunar_day", "integer"),
     (
         "knowledge_registry",
         "domains.[].provenance.coverage.categories.[].count",
@@ -380,9 +380,8 @@ def test_reference_responses_do_not_expose_cached_coverage(key):
 @pytest.mark.parametrize("key", [key for key, _ in PROJECTIONS])
 def test_extensions_and_original_numeric_types_survive_validation(key):
     spec = SPECS[key]
-    payload = business(
-        execution.execute_tool(spec, spec.request_model.model_validate(inputs(spec)))
-    )
+    request = spec.request_model.model_validate(inputs(spec))
+    payload = execution.execute_spec(spec, request)
 
     # Dynamic maps have typed values, so add extensions to model objects, not
     # to arbitrary dictionary namespaces (a new key there needs a valid value).

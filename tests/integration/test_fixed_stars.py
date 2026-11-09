@@ -33,7 +33,7 @@ def test_catalogue_is_well_formed():
     for star, data in FIXED_STARS.items():
         assert data["nature"]  # at least one Ptolemaic nature (traditional attr)
         assert data["cn"]  # traditional Chinese name
-        # No interpretive prose in the engine — that's the skills layer's job.
+        # The engine returns positions; the assistant provides interpretation.
         assert "gloss" not in data
 
 

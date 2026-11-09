@@ -786,7 +786,7 @@ def build_classical_patterns(
     ``node_longitude``; their blocks stay empty when the inputs are absent.
 
     Only structural configurations are emitted — *which* planets, *what* relation.
-    What a configuration signifies is the skills layer's job, not the engine's.
+    Interpretation belongs to the assistant; the engine reports structure.
     """
     trad = [p for p in planet_positions if p["id"] in TRADITIONAL_PLANETS]
     by_id = {p["id"]: p for p in trad}

@@ -1,7 +1,6 @@
 """New profiles and evidence must work through REST, native MCP and CLI."""
 
 import asyncio
-import hashlib
 import json
 
 import pytest
@@ -18,7 +17,7 @@ from fatebridge.cli import run
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
 from tests.fixtures.mcp_receipt import verified_inline_business
-from tests.fixtures.mcp_result_delivery import assert_same_run_receipt
+from tests.fixtures.mcp_result_delivery import read_full_result
 
 BIRTH = dict(
     birth_year=1992,
@@ -213,20 +212,8 @@ def test_default_mcp_budget_preserves_full_palace_evidence_in_the_same_run():
                 },
             )
             assert not result.is_error
-            reference = result.structured_content["result_delivery"]
-            pieces, uri = [], reference["first_page_uri"]
-            while uri:
-                page = json.loads((await client.read_resource(uri))[0].text)
-                pieces.append(page["text"])
-                uri = page["next_uri"]
-            text = "".join(pieces)
-            assert hashlib.sha256(text.encode()).hexdigest() == reference["sha256"]
-            complete = json.loads(text)
-            assert_same_run_receipt(
-                result.structured_content["run_metadata"],
-                complete["run_metadata"],
-                deferred_fields=reference["deferred_fields"],
-            )
+            assert "result_delivery" in result.structured_content
+            complete = await read_full_result(client, result.structured_content)
             assert len(complete["ziwei_horoscope"]["scopes"]) == 6
             assert all(
                 len(s["palace_map"]) == 12
@@ -255,22 +242,7 @@ def test_source_views_deliver_real_facts_or_verified_same_run_pages(view):
             )
             assert not result.is_error
             payload = result.structured_content
-            if "result_delivery" in payload:
-                reference = payload["result_delivery"]
-                text = ""
-                uri = f"fatebridge://results/{reference['result_id']}/pages/0"
-                while uri:
-                    page = json.loads((await client.read_resource(uri))[0].text)
-                    text += page["text"]
-                    uri = page["next_uri"]
-                assert hashlib.sha256(text.encode()).hexdigest() == reference["sha256"]
-                complete = json.loads(text)
-                assert_same_run_receipt(
-                    payload["run_metadata"],
-                    complete["run_metadata"],
-                    deferred_fields=reference["deferred_fields"],
-                )
-                payload = complete
+            payload = await read_full_result(client, payload)
             if view == "symbolism":
                 evidence = payload["ziwei_birth"]["symbolic_properties"]
                 assert len(evidence["records"]) == 16

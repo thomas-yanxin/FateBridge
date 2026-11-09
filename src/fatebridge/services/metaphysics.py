@@ -1344,27 +1344,14 @@ def _build_ziwei_horoscope_snapshot_text(
 
 
 def _build_ziwei_rules_snapshot_text(payload: Dict[str, Any]) -> str:
-    rule_catalogue = (
-        payload.get("rule_catalogue", {}) if isinstance(payload, dict) else {}
-    )
-    focused_rules = (
-        payload.get("focused_rules", {}) if isinstance(payload, dict) else {}
-    )
-    palace_sequence = "、".join(rule_catalogue.get("palace_sequence", []) or []) or "无"
+    rule_catalogue = payload["rule_catalogue"]
+    focused_rules = payload["focused_rules"]
+    palace_sequence = "、".join(rule_catalogue["palace_sequence"])
     sihua_lines = [
-        f"{stem}："
-        + "；".join(
-            f"{label}={star}"
-            for label, star in (mapping.items() if isinstance(mapping, dict) else [])
-        )
-        for stem, mapping in (
-            rule_catalogue.get("sihua_by_year_stem", {}) or {}
-        ).items()
-        if isinstance(mapping, dict)
+        f"{stem}：" + "；".join(f"{label}={star}" for label, star in mapping.items())
+        for stem, mapping in rule_catalogue["sihua_by_year_stem"].items()
     ]
-    focused_sihua = (
-        focused_rules.get("sihua", {}) if isinstance(focused_rules, dict) else {}
-    )
+    focused_sihua = focused_rules["sihua"] if focused_rules is not None else {}
     sections = [
         (
             "规则概览",

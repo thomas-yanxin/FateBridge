@@ -1765,7 +1765,7 @@ def calculate_relative_chart_analysis(
         relationship_focus=relationship_focus,
         davison_variant=davison_variant,
     )
-    if isinstance(payload, dict) and "error" not in payload:
+    if "error" not in payload:
         # Allowlist the relationship-facing summary; the raw inner/outer/
         # composite charts and the directional aspect/midpoint dumps stay in
         # the structured payload only (they would flood the snapshot).
