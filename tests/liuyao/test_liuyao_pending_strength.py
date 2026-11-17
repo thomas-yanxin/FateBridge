@@ -130,3 +130,32 @@ def test_pending_support_qualification_matches_real_transports(
     expected = business(response.json())
     assert expected == business(cli) == business(protocol.structured_content)
     check(expected, source, target, bucket, matched)
+
+
+def test_pending_dark_movement_reaches_void_conditions_on_all_surfaces(surface_calls):
+    payload = {**payload_for("2025-02-26", "011010", "111010"), "focus_line": 2}
+    prefix = "liuyao_evidence.conditional_analysis"
+    fields = [f"{prefix}.classical_assessment.lines", f"{prefix}.void_conditions.focus"]
+    controls = dict(fields=fields, strict_fields=True, response_char_limit=0)
+    http, protocol, code, cli = surface_calls(
+        SPECS["sixyao"],
+        payload,
+        params=controls,
+        options=controls,
+        flags=("--fields", *fields, "--strict-fields", "--response-char-limit", "0"),
+    )
+    assert http.status_code == 200 and code == 0 and not protocol.is_error
+    body = business(http.json())
+    assert body == business(cli) == business(protocol.structured_content)
+    result = body["liuyao_evidence"]["conditional_analysis"]
+    strength = result["classical_assessment"]["lines"][1]["strength"]
+    assert any(
+        s.get("position") == 4 and s["activity_pending"]
+        for s in strength["pending_supports"]
+    )
+    rule = next(
+        c
+        for c in result["void_conditions"]["focus"]["not_empty_conditions"]
+        if c["rule_id"] == "moving_generate"
+    )
+    assert rule["matched"] is None and rule["status"] == "unresolved"

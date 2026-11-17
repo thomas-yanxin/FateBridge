@@ -67,18 +67,19 @@ def mean_longitudes(jd_tt: float) -> dict[str, float]:
 
     SOFA's planetary fundamental-argument notes permit that substitution.
     This function enforces the narrower validated application window.
+    Keep the derived solar antipode exact until its final float is rendered.
     """
     if not admitted(jd_tt):
         raise ValueError("Simon mean profile admitted only for1900-2050 TT")
     t = (Fraction(jd_tt) - 2451545) / 365250
-    result = {}
+    result: dict[str, Fraction] = {}
     for planet, values in LONGITUDE_COEFFICIENTS.items():
         power_sum = Fraction(0)
         for coefficient in reversed(values[1:]):
             power_sum = (power_sum + Fraction(coefficient)) * t
-        result[planet] = float((Fraction(values[0]) + power_sum / 3600) % 360)
+        result[planet] = (Fraction(values[0]) + power_sum / 3600) % 360
     result["Sun"] = (result["Earth"] + 180) % 360
-    return result
+    return {planet: float(longitude) for planet, longitude in result.items()}
 
 
 def icrs_to_j2000_ecliptic(xyz: tuple[float, ...]) -> tuple[float, float, float]:

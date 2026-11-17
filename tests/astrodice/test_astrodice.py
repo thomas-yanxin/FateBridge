@@ -255,9 +255,9 @@ def test_sky_is_invariant_for_equivalent_offsets_and_changes_with_seconds():
     )["references"],
     ids=lambda r: r["body"],
 )
-@pytest.mark.parametrize("file_free", [False, True], ids=["configured", "moshier"])
+@pytest.mark.parametrize("file_free", [False, True], ids=["configured", "empty_path"])
 def test_optional_sky_positions_against_frozen_nasa_jpl_horizons(reference, file_free):
-    from tests.support.ephemeris_context import moshier_ephemeris
+    from tests.support.ephemeris_context import empty_ephemeris_path
 
     fixture = json.loads(
         (Path(__file__).parents[1] / "fixtures/jyotish-horizons.json").read_text()
@@ -267,7 +267,7 @@ def test_optional_sky_positions_against_frozen_nasa_jpl_horizons(reference, file
         == reference["response_sha256"]
     )
 
-    with moshier_ephemeris() if file_free else nullcontext():
+    with empty_ephemeris_path() if file_free else nullcontext():
         for row in reference["rows"]:
             moment = datetime.fromisoformat(row["utc"])
             result = build_otherbu_result(

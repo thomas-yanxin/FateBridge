@@ -131,7 +131,10 @@ def test_strict_projection_preserves_actual_source_and_supplement_on_three_trans
     value = business(http.json())
     assert value == business(protocol.structured_content) == business(cli)
     assert "rendered_text" not in value and "snapshot_text" not in value
-    assert value["provenance"]["supplements"][0]["sha256"] == digest(BUNDLE)
+    supplement = value["provenance"]["supplements"][0]
+    assert supplement["id"] == "fatebridge_bazi_foundations_v1"
+    assert supplement["version"] == 2
+    assert supplement["source_file"] == "data/knowledge/bazi-foundations.json"
     assert (
         value["provenance"]["entry_curation"]["source_refs"][0]["revision_id"] == 761691
     )

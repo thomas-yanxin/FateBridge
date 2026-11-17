@@ -10,7 +10,13 @@ Restart the calculation process after updating an installed distribution.
 from functools import lru_cache
 from importlib.metadata import PackageNotFoundError
 from pathlib import Path
-from typing import Any, Callable
+from typing import Callable
+
+
+@lru_cache(maxsize=16)
+def _native_path(filename: str) -> Path:
+    """Reuse an immutable path value, never its mutable filesystem status."""
+    return Path(filename)
 
 
 def _read(resolver: Callable[[str], str]) -> str:
@@ -32,7 +38,7 @@ def _installed_version(
     return _read(resolver)
 
 
-def binding_distribution_version(native: Any, resolver: Callable[[str], str]) -> str:
+def binding_distribution_version(native: object, resolver: Callable[[str], str]) -> str:
     try:
         hash(resolver)
     except TypeError:
@@ -41,7 +47,9 @@ def binding_distribution_version(native: Any, resolver: Callable[[str], str]) ->
     if not filename:
         return _read(resolver)
     try:
-        stat = Path(filename).stat()
+        stat = (
+            _native_path(filename) if type(filename) is str else Path(filename)
+        ).stat()
     except (OSError, TypeError, ValueError):
         return _read(resolver)
     return _installed_version(

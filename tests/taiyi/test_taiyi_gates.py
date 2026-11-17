@@ -21,6 +21,7 @@ from fatebridge.core.metaphysics.taiyi_year import (
 from fatebridge.core.output_taiyi_gates import TaiyiGates
 from fatebridge.services.metaphysics import calculate_taiyi_analysis
 from scripts.taiyi.audit_taiyi_gates import CORPUS, audit, worked_board
+from tests.support.reference_data import resolve as _resolve
 
 CASES = json.loads((CORPUS / "worked-cases.json").read_text())["cases"]
 
@@ -139,12 +140,6 @@ def test_same_month_core_does_not_mean_same_gate_counter():
     assert boards[0]["gates"]["counter"]["duty_gate"] == "伤"
     assert boards[1]["gates"]["counter"]["duty_gate"] == "惊"
     assert boards[1]["gates"]["counter"]["accumulation"] == 695
-
-
-def _resolve(root, path):
-    for key in path.split("."):
-        root = root[int(key)] if isinstance(root, list) else root[key]
-    return root
 
 
 @pytest.mark.parametrize("mode", ["year", "month", "hour"])

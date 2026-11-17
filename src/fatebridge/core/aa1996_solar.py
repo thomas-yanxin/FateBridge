@@ -10,6 +10,7 @@ import os
 import platform
 import tempfile
 from copy import deepcopy
+from datetime import date
 from functools import lru_cache
 from pathlib import Path
 from threading import RLock
@@ -190,9 +191,7 @@ class _Source:
             raise EphemerisSourceError("solar_aa1996_changed") from error
 
     def longitude(self, jd_tt: float) -> tuple[float, int]:
-        low, high = self.profile["working_jd_tt"]
-        if not low <= jd_tt <= high:
-            raise EphemerisSourceError("solar_aa1996_range")
+        """Evaluate a TT point already qualified by the calling boundary."""
         values = (ctypes.c_double * 6)()
         error = ctypes.create_string_buffer(1024)
         flags = self.library.fatebridge_aa1996_solar(jd_tt, values, error)
@@ -224,6 +223,7 @@ class _Source:
             software_input_years=list(self.profile["software_input_years"]),
             qualified_solar_term_years=list(self.profile["qualified_solar_term_years"]),
             working_jd_tt=list(self.profile["working_jd_tt"]),
+            derived_lichun_scope=deepcopy(self.profile["derived_lichun_scope"]),
             native_moshier_relabelled=False,
             accuracy_certified=False,
             source_identity_scope="Locally built and actually loaded binary/profile identity; not upstream signature, atomic external-file immutability or all-epoch physical/civil accuracy",
@@ -279,6 +279,9 @@ def solar_longitudes_tt(jd_tts: list[float]) -> dict[str, Any]:
         raise ValueError("AA1996 observations require finite numeric TT points")
     with _LOCK:
         source = _selected()
+        low, high = source.profile["working_jd_tt"]
+        if not all(low <= value <= high for value in jd_tts):
+            raise EphemerisSourceError("solar_aa1996_range")
         observed = [source.longitude(float(value)) for value in jd_tts]
         source.check_unchanged()
         return dict(
@@ -294,6 +297,7 @@ def longitude_crossing_tt(
     high: float,
     *,
     expected_source_key: tuple[Any, ...] | None = None,
+    projection_year: int | None = None,
 ) -> dict[str, Any]:
     if not all(_finite(value) for value in [target, low, high]) or low >= high:
         raise ValueError(
@@ -303,6 +307,20 @@ def longitude_crossing_tt(
         source = _selected()
         if expected_source_key is not None and source.key() != expected_source_key:
             raise EphemerisSourceError("solar_configuration_changed")
+        scope = source.profile["derived_lichun_scope"]
+        if projection_year is not None:
+            if type(projection_year) is not int or target != scope["target_degrees"]:
+                raise ValueError("AA1996 projection context requires a Lichun year")
+            first = date(projection_year, 2, 1).toordinal() + 1721424.5
+            last = date(projection_year, 2, 12).toordinal() + 1721424.5
+            if not first <= low < high <= last:
+                raise ValueError("AA1996 projection bracket must belong to its year")
+        working_low, working_high = source.profile["working_jd_tt"]
+        if not working_low <= low < high <= working_high and not (
+            projection_year is not None
+            and scope["years"][0] <= projection_year <= scope["years"][1]
+        ):
+            raise EphemerisSourceError("solar_aa1996_range")
         observed_flags = set()
 
         def residual(epoch: float) -> float:

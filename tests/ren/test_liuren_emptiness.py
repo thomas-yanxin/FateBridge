@@ -12,7 +12,10 @@ from jsonschema import Draft202012Validator
 from pydantic import ValidationError
 
 import fatebridge.application.execution as execution
-from fatebridge.core.metaphysics.liureng_emptiness import emptiness_evidence
+from fatebridge.core.metaphysics.liureng_emptiness import (
+    apply_year_fate_emptiness,
+    emptiness_evidence,
+)
 from fatebridge.core.output_liuren_emptiness import LiurenEmptinessEvidence
 from tests.fixtures.ren_anchors import ANCHOR_PAYLOADS as PAYLOADS
 from tests.support.ren_anchors import anchor_output as raw
@@ -153,8 +156,28 @@ def test_empty_scope_is_same_on_rest_mcp_cli(key, project, surface_calls):
         board = body["liureng"]
         evidence = board["emptiness_evidence"]
         assert len(evidence["rows"]) == 12 and len(evidence["role_conditions"]) == 3
-        assert board["ruleset"]["version"] == "1.16.0"
+        assert board["ruleset"]["version"] == "1.16.1"
         by_sky = {r["sky_branch"]: r for r in evidence["rows"]}
+        by_earth = {r["earth_branch"]: r for r in evidence["rows"]}
+        if key == "liureng_runyear":
+            # 乙丑日旬空戌亥，本命、行年同书地盘戌；戌上神是未。
+            assert evidence["year_fate_earth_branches"] == {
+                "natal": "戌",
+                "annual": "戌",
+            }
+            assert by_earth["戌"]["sky_branch"] == "未"
+            assert by_earth["戌"]["earth_year_fate_roles"] == ["natal", "annual"]
+            assert by_earth["戌"]["earth_xun_kong"] is True
+            assert by_earth["戌"]["earth_year_fate_xunkong_exception"] is True
+            assert by_earth["戌"]["earth_xunkong_after_seat_and_year_fate"] is False
+            assert by_earth["亥"]["earth_xunkong_after_seat_and_year_fate"] is True
+            assert by_sky["戌"]["sky_xun_kong"] is True
+            assert by_sky["戌"]["earth_year_fate_xunkong_exception"] is False
+        else:
+            assert evidence["year_fate_earth_branches"] == {
+                "natal": None,
+                "annual": None,
+            }
         for p in ("initial", "middle", "final"):
             transmission = board["three_transmissions"][p]
             row = by_sky[transmission["branch"]]
@@ -164,7 +187,8 @@ def test_empty_scope_is_same_on_rest_mcp_cli(key, project, surface_calls):
 
 
 @pytest.mark.parametrize(
-    "kind", ["base_empty", "seat", "role", "same_day", "effective", "delete"]
+    "kind",
+    ["base_empty", "seat", "role", "role_exception", "same_day", "effective", "delete"],
 )
 @pytest.mark.parametrize("project", [False, True])
 def test_bad_empty_explanation_facts_fail_before_projection(
@@ -184,6 +208,9 @@ def test_bad_empty_explanation_facts_fail_before_projection(
         e["role_conditions"][0]["branch"] = next(
             b for b in AUDIT.BRANCHES if b != e["year_branch"]
         )
+    elif kind == "role_exception":
+        r = e["rows"][0]
+        r["sky_authority_xunkong_exception"] = not r["sky_authority_xunkong_exception"]
     elif kind == "same_day":
         c = AUDIT.context(REFERENCE["synthetic_cases"][1])
         e.update(emptiness_evidence(**c))
@@ -241,11 +268,43 @@ def test_partial_projection_remains_partial_but_full_output_requires_evidence(fi
 def test_projected_unknown_verdict_cannot_become_false():
     v = {
         "comprehensive_judgement": None,
-        "nianming_status": "not_adjudicated_in_this_excerpt",
+        "nianming_status": "inputs_not_available",
     }
     assert LiurenEmptinessEvidence.model_validate(v).model_dump(exclude_unset=True) == v
     with pytest.raises(ValidationError):
         LiurenEmptinessEvidence.model_validate({"comprehensive_judgement": False})
+
+
+def test_known_natal_exempts_its_seat_even_when_annual_is_missing():
+    spec = SPECS["liureng_runyear"]
+    payload = {
+        **PAYLOADS["liureng_runyear"],
+        "gender": "未知",
+        "selected_sections": ["空亡分层条件"],
+    }
+    fn, args, kw = spec.bind(spec.request_model.model_validate(payload))
+    result = fn(*args, **kw)
+    evidence = result["liureng"]["emptiness_evidence"]
+    assert evidence["year_fate_earth_branches"] == {"natal": "戌", "annual": None}
+    by_earth = {r["earth_branch"]: r for r in evidence["rows"]}
+    assert by_earth["戌"]["earth_xunkong_after_seat_and_year_fate"] is False
+    assert by_earth["亥"]["earth_year_fate_xunkong_exception"] is None
+    assert by_earth["亥"]["earth_xunkong_after_seat_and_year_fate"] is None
+    assert by_earth["未"]["earth_xunkong_after_seat_and_year_fate"] is False
+    assert "本命书地盘戌；本空，依年命条不作空论" in result["snapshot_text"]
+
+
+def test_internally_consistent_empty_rules_cannot_replace_same_run_year_fate():
+    spec = SPECS["liureng_runyear"]
+    fn, args, kw = spec.bind(
+        spec.request_model.model_validate(PAYLOADS["liureng_runyear"])
+    )
+    result = fn(*args, **kw)
+    evidence = result["liureng"]["emptiness_evidence"]
+    apply_year_fate_emptiness(evidence, natal="亥", annual="戌")
+    LiurenEmptinessEvidence.model_validate(evidence)
+    with pytest.raises(execution.OutputContractError):
+        execution.validate_output(spec, result)
 
 
 def test_new_empty_scope_has_default_and_selected_snapshot_export():

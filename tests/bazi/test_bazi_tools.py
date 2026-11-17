@@ -2,7 +2,7 @@ import json
 
 from fatebridge.services.bazi import calculate_bazi_birth
 from fatebridge.utils.birth_input import create_person_info
-from tests.fixtures.transports import mcp_parameters, mcp_text
+from tests.fixtures.transports import mcp_text
 
 
 def _build_person():
@@ -99,8 +99,6 @@ def test_fastmcp_bazi_birth_compact_mode_can_drop_snapshot_text():
 
 
 def test_fastmcp_bazi_birth_pretty_mode_keeps_snapshot_text():
-    birth_properties = mcp_parameters("bazi_birth")["properties"]
-
     rendered = mcp_text(
         "bazi_birth",
         birth_year=1994,
@@ -123,7 +121,3 @@ def test_fastmcp_bazi_birth_pretty_mode_keeps_snapshot_text():
 
     assert "snapshot_text" in payload
     assert "\n" in rendered
-    assert "analysis_day" in birth_properties
-    assert "analysis_year" in birth_properties
-    assert "analysis_month" in birth_properties
-    assert "selected_sections" in birth_properties

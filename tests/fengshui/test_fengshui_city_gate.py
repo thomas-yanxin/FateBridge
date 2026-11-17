@@ -283,11 +283,15 @@ def test_invalid_explicit_inputs_match_runtime_and_published_schema(patch):
 
 
 @pytest.mark.parametrize("tool", ["xuankong_natal", "assess"])
-def test_city_gate_matches_rest_mcp_cli(monkeypatch, tmp_path, capsys, tool):
+@pytest.mark.parametrize("period", [1, 2])
+def test_city_gate_matches_rest_mcp_cli(monkeypatch, tmp_path, capsys, tool, period):
     data = request(
-        observations=[
-            observation(encircling_form_present=True, sole_opening_with_water=True)
-        ]
+        period=period,
+        observations=(
+            [observation(encircling_form_present=True, sole_opening_with_water=True)]
+            if period == 2
+            else None
+        ),
     )
     if tool == "assess":
         data = {"methods": ["xuankong_natal"], "xuankong": data}
@@ -303,6 +307,10 @@ def test_city_gate_matches_rest_mcp_cli(monkeypatch, tmp_path, capsys, tool):
         == without_transport(protocol.structured_content)
         == without_transport(cli)
     )
+    candidates = cli["layers"]["xuankong_natal"]["city_gate_analysis"]["candidates"]
+    zi = next(g for g in candidates[0]["gates"] if g["mountain"]["name"] == "子")
+    assert zi["form_assessment"]["condition_match"] is (True if period == 2 else None)
+    assert zi["combined_condition_match"] is (period == 2)
 
 
 def test_real_mcp_strict_projection_preserves_branch_and_provenance():

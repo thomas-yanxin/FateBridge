@@ -129,6 +129,22 @@ def _qimen_stem_context_lines(qimen: Dict[str, Any]) -> List[str]:
     context = qimen.get("stem_context")
     if not context:
         return []
+
+    def candidate_lines(stem: Dict[str, Any]) -> List[str]:
+        labels = {
+            "hidden_day_stem": "伏干",
+            "flying_day_stem": "飞干",
+            "year_stem_block": "岁格",
+            "lunar_month_start_block": "月朔格",
+        }
+        statuses = {True: "全部命中", False: "均未命中", None: "候选有分歧"}
+        return [
+            f"{labels[rule]}所列候选：{statuses[row['matched_across_candidates']]}；"
+            f"共同命中{'、'.join(row['all_candidate_palaces']) or '无'}，"
+            f"候选命中范围{'、'.join(row['any_candidate_palaces']) or '无'}。"
+            for rule, row in stem.get("candidate_outcomes", {}).items()
+        ]
+
     day = context["day"]
     if day["status"] == "literal_stem_resolved":
         day_line = f"日干取用：{day['ganzhi']}，直取{day['effective_stem']}"
@@ -144,6 +160,7 @@ def _qimen_stem_context_lines(qimen: Dict[str, Any]) -> List[str]:
             qimen.get("calendar_policy", {}).get("solar_time_adjustment", {})
         ),
         day_line,
+        *candidate_lines(day),
         f"时干取用：{hour['ganzhi']}，实际用干{hour['effective_stem']}",
     ]
     resolution = qimen.get("calendar_policy", {}).get("civil_clock_resolution")
@@ -174,6 +191,7 @@ def _qimen_stem_context_lines(qimen: Dict[str, Any]) -> List[str]:
         else:
             detail = "历法锚点不可用，不猜取用干"
         lines.append(f"{label}取用：{detail}")
+        lines.extend(candidate_lines(anchor))
     temporal = context.get("hour_branch_tomb")
     tomb_profile = qimen.get("rule_profiles", {}).get("wonder_tomb")
     punishment_profile = qimen.get("rule_profiles", {}).get("six_instrument_punishment")
@@ -185,7 +203,15 @@ def _qimen_stem_context_lines(qimen: Dict[str, Any]) -> List[str]:
         )
         for palace in qimen["palaces"]:
             context = palace.get("evidence", {}).get("five_jia", {})
-            if context.get("human_jia", {}).get("unadopted_ji_stem_candidate_observed"):
+            human = context.get("human_jia", {})
+            if (
+                "printed_clause_match" in human
+                and human["printed_clause_match"] is None
+            ):
+                lines.append(
+                    f"人假必要门位：{palace['name']}为惊门，该宫仍待核六合身份与层次；无惊门的宫排除本条。"
+                )
+            if human.get("unadopted_ji_stem_candidate_observed"):
                 lines.append(
                     f"{palace['name']}人假候选：惊门、天盘己、九天同宫；跨段己为六合的候选未采纳，不命名人假或判断吉凶"
                 )
@@ -328,7 +354,14 @@ def build_qimen_snapshot_text(*, seed: MetaphysicsSeed, qimen: Dict[str, Any]) -
             join_lines(
                 [
                     "来源：明·程道生《遁甲演义》，四库全书本在线转录及所列影印选页；卷四十八局值符值使宫数含2项分歧，全书未校勘。",
-                    f"固定版本：{(qimen.get('rulesets') or [{}])[0].get('source', '无')}",
+                    f"全书导航：{(qimen.get('rulesets') or [{}])[0].get('source', '无')}",
+                    "逐卷固定转录："
+                    + "；".join(
+                        f"卷{entry['volume']}：{entry['source']}"
+                        for entry in (qimen.get("rulesets") or [{}])[0].get(
+                            "volume_sources", []
+                        )
+                    ),
                     qimen["rule_profiles"]["god"]["variant_note"],
                     qimen["rule_profiles"]["season"]["variant_note"],
                     "对应规则只在其覆盖范围内成立；传统规则匹配不等于现实事件预测。",

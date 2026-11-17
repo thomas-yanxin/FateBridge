@@ -153,7 +153,7 @@ def test_moshier_probe_contract_failures_remain_errors(
         if operation == "calc":
             state, flags = value
             if problem == "frame":
-                return state, flags | e.swe.FLG_TRUEPOS
+                return state, flags ^ e.swe.FLG_TRUEPOS
             if problem == "model":
                 return state, (flags & ~e.swe.FLG_MOSEPH) | e.swe.FLG_SWIEPH
             return (math.nan, *state[1:]), flags
@@ -177,23 +177,18 @@ def test_nonconvergence_stays_explicit_and_does_not_copy_native_rate(
 ):
     jd = 2451545.0
     coordinates = native_longitude(jd, "Moon")
-    original = runtime.ephemeris_call
+    original = motion.reduced_longitude
 
-    def singular(operation, *args, **kwargs):
-        value = original(operation, *args, **kwargs)
-        if operation == "calc":
-            state, flags = value
-            changed = list(state)
-            x = args[0] - jd
-            changed[0] = coordinates[0] + (x * math.log(abs(x)) if x else 0)
-            return changed, flags
-        return value
+    def singular(body, epoch, **kwargs):
+        longitude, receipt = original(body, epoch, **kwargs)
+        x = epoch - jd
+        return coordinates[0] + (x * math.log(abs(x)) if x else 0), receipt
 
-    monkeypatch.setattr(runtime, "ephemeris_call", singular)
+    monkeypatch.setattr(motion, "reduced_longitude", singular)
     rate, policy = motion.complete_moshier_longitude_rate("Moon", jd, coordinates)
     assert rate is None and policy["status"] == "not_applied"
     assert policy["reason"] == "position_motion_not_converged"
-    assert len(policy["attempts"]) == 2
+    assert len(policy["attempts"]) == 4
     assert all(row["status"] == "not_converged" for row in policy["attempts"])
 
 

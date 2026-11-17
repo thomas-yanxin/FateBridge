@@ -24,6 +24,7 @@ from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.metaphysics import calculate_taiyi_analysis
 from fatebridge.services.tool_catalog import CATALOG
 from scripts.taiyi.audit_taiyi_enclosures import CORPUS, audit
+from tests.support.reference_data import resolve
 from tests.taiyi.test_taiyi_transports import _same_run_payload
 
 
@@ -92,12 +93,6 @@ def test_no_long_arc_opposite_endpoint_center_or_same_palace_is_manufactured(end
         "guest_vice_general": 5,
     }
     assert principal_enclosures(core) == []
-
-
-def resolve(root, path):
-    for key in path.split("."):
-        root = root[int(key)] if isinstance(root, list) else root[key]
-    return root
 
 
 def transport_payload(key, year):

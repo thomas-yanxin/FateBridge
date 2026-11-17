@@ -207,6 +207,12 @@ def assert_current_assessment_arithmetic(values, assessment):
     }
     for name in ("support", "weaken", "share"):
         assert receipt[name + "_exact"] == str(expected[name])
+    assert assessment["support_strength"] == float(expected["support"])
+    assert assessment["weaken_strength"] == float(expected["weaken"])
+    assert assessment["support_share"] == float(expected["share"])
+    assert assessment["support_weaken_ratio"] == (
+        float(expected["support"] / expected["weaken"]) if expected["weaken"] else None
+    )
     assert receipt["numerical_label"] == expected["numerical_grade"]
     for element, value in expected["energies"].items():
         assert isclose(

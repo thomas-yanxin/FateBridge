@@ -187,7 +187,9 @@ def test_no_hinoo_profile_means_no_hidden_leap_policy_change():
 
 
 def test_calendrical_profile_cannot_move_the_physical_sky():
-    args = dict(date="2024-08-04", time="09:00:00", zone="+08:00")
+    args = dict(
+        lat="31n13", lon="121e28", date="2024-08-04", time="09:00:00", zone="+08:00"
+    )
     base = calculate_suzhan_analysis(**args)
     first = calculate_suzhan_analysis(
         **args, calendar_profile="hinoo_t1299_host27", calendar_day_part="first_half"
@@ -204,6 +206,8 @@ def test_calendrical_profile_cannot_move_the_physical_sky():
         (
             SuZhanRequest,
             {
+                "lat": "31n13",
+                "lon": "121e28",
                 "date": "2024-08-04",
                 "time": "09:00:00",
                 "calendar_day_part": "first_half",

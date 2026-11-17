@@ -1,8 +1,7 @@
-"""Phase 1 tests for the western classical layer.
+"""Regressions for the selected mixed classical tables and conditions.
 
-No closed byte-oracle (horosa computes this in its backend), so correctness is
-pinned by (1) parity with the authoritative reference tables horosa ships in
-`data/dignities.js`, and (2) classical invariants / ground truths.
+The historical horosa literals below check the recorded port. They are not an
+independent authority for every author's rules or all numerical inputs.
 """
 
 from __future__ import annotations
@@ -66,6 +65,19 @@ _HOROSA_SCORE = {
     "detriment": -5,
     "fall": -4,
 }
+
+
+def test_returned_symbol_labels_cannot_change_later_results():
+    from fatebridge.core.classical_western import SIGN_BODY_PARTS, melothesia
+
+    original = SIGN_BODY_PARTS["Aries"].copy()
+    result = melothesia("Aries", 15.0)
+    try:
+        result["body_parts"].clear()
+        assert SIGN_BODY_PARTS["Aries"] == original
+        assert melothesia("Aries", 15.0)["body_parts"] == original
+    finally:
+        SIGN_BODY_PARTS["Aries"][:] = original
 
 
 def test_faces_table_parity_with_horosa():

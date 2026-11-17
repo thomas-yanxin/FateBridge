@@ -3,27 +3,35 @@
 from __future__ import annotations
 
 import math
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
+from fatebridge.core.astro.ephemeris import _swisseph_planet_state
 from fatebridge.core.astro.geometry import native_lahiri_ayanamsha
-from fatebridge.core.astro.time_scales import datetime_from_tt, ephemeris_time
+from fatebridge.core.astro.physical_epoch import PhysicalEpoch
+from fatebridge.core.astro.time_scales import ephemeris_time
 from fatebridge.core.ephemeris_runtime import (
-    ephemeris_call,
     preserve_ephemeris_path,
     swe,
 )
 
 from ._common import build_subject, point_to_dict
+from .native_chart import NativeSubject
 
 
 def _longitude_tt(
     body_id: int, julian_day_tt: float, *, sidereal: bool = False
 ) -> float:
-    coordinates, flag = ephemeris_call("calc", julian_day_tt, body_id, swe.FLG_SWIEPH)
-    if flag < 0:
+    # The solver validates Sun/Moon once. Use the same coordinate owner and
+    # native flags as natal/final charts: a one-ULP mismatch can skip a cycle.
+    state = _swisseph_planet_state(
+        "Sun" if body_id == swe.SUN else "Moon",
+        julian_day_tt=julian_day_tt,
+        correct_motion=False,
+    )
+    if state is None:
         raise ValueError("Return search ephemeris failed")
-    longitude = float(coordinates[0])
+    longitude = state[0]["longitude"]
     if sidereal:
         longitude -= native_lahiri_ayanamsha(julian_day_tt=julian_day_tt)
     return longitude % 360
@@ -87,7 +95,7 @@ def governing_return_tt(
 
 @preserve_ephemeris_path()
 def build_return_payload(
-    natal_subject: Any,
+    natal_subject: NativeSubject,
     *,
     analysis_datetime: datetime,
     return_longitude: float,
@@ -108,10 +116,16 @@ def build_return_payload(
         target = float(getattr(natal_subject, planet).abs_pos)
         sidereal = natal_subject.zodiac_type == "Sidereal"
         solved = governing_return_tt(body_id, target, times.jd_tt, sidereal=sidereal)
-        moment = datetime_from_tt(solved)
+        if solved == times.jd_tt:
+            # This known civil input is a witness of the exact same TT point.
+            # Inverting a rounded JD could otherwise display a future label.
+            moment = analysis_datetime.astimezone(timezone.utc)
+            epoch = PhysicalEpoch(times, moment.isoformat(), moment, False)
+        else:
+            epoch = PhysicalEpoch.from_tt(solved)
         chart = build_subject(
             name=f"{natal_subject.name}-{key}",
-            local_datetime=moment,
+            physical_epoch=epoch,
             longitude=return_longitude,
             latitude=return_latitude,
             timezone_name=return_timezone,
@@ -121,7 +135,7 @@ def build_return_payload(
         actual = float(getattr(chart, planet).abs_pos)
         payload[key] = {
             "return_datetime": chart.iso_formatted_local_datetime,
-            "return_datetime_utc": moment.isoformat(),
+            "return_datetime_utc": epoch.utc_label,
             "sun": point_to_dict("Sun", chart.sun),
             "moon": point_to_dict("Moon", chart.moon),
             "ascendant": point_to_dict("Ascendant", chart.ascendant),

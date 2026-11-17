@@ -13,10 +13,10 @@ import erfa
 import pytest
 
 from fatebridge.core.almanac import get_solar_terms_for_year
+from fatebridge.core.de441_solar import MODEL_ID as DE441_MODEL
+from fatebridge.core.de441_solar import solar_longitude as de441_longitude
 from fatebridge.core.liuyao_calendar_models import SCOPE, month_model_comparison
 from fatebridge.core.local_techniques.sixyao import build_sixyao_result
-from fatebridge.core.moshier_solar import MODEL_ID as COMPLETE_MOSHIER_MODEL
-from fatebridge.core.moshier_solar import solar_longitude as complete_moshier_longitude
 from tests.support.solar_source_facts import HKO_TERM_LONGITUDES
 
 CASES = json.loads(
@@ -31,9 +31,10 @@ SOURCE = json.loads(
 SOURCE_CASES = {row["id"]: row for row in SOURCE["cases"]}
 
 ROOT = "liuyao_evidence.calendar_conventions.month_model_comparison"
+pytestmark = pytest.mark.usefixtures("analytic_environment")
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture
 def analytic_environment(monkeypatch, tmp_path_factory):
     empty = tmp_path_factory.getbasetemp() / "model-boundary-empty-ephe"
     empty.mkdir(exist_ok=True)
@@ -59,7 +60,7 @@ def assert_comparison(result, case):
         value["month_changed"]
         is source["current_month_changed_between_completed_paths"]
     )
-    assert value["native_models"] == [COMPLETE_MOSHIER_MODEL]
+    assert value["native_models"] == [DE441_MODEL]
     assert value["selected_models"] == ["fatebridge_analytic_solar_v1"]
     assert value["missing_native_probes"] == []
     assert value["status"] == (
@@ -74,8 +75,8 @@ def assert_comparison(result, case):
         high = record["julian_day_tt"]
         low = math.nextafter(high, -math.inf)
         target = HKO_TERM_LONGITUDES[record["name"]]
-        assert math.remainder(complete_moshier_longitude(low) - target, 360) < 0
-        assert math.remainder(complete_moshier_longitude(high) - target, 360) >= 0
+        assert math.remainder(de441_longitude(low) - target, 360) < 0
+        assert math.remainder(de441_longitude(high) - target, 360) >= 0
     active = value["active_boundary_differences"]
     assert len(active) == int(source["current_month_changed_between_completed_paths"])
     if active:
@@ -84,13 +85,13 @@ def assert_comparison(result, case):
         assert fact["native"]["role"] == "completed_native_choice_probe"
         assert fact["native"]["native_retflags"] == []
         for record in (fact["selected"], fact["native"]):
-            if record["ephemeris_model"] != COMPLETE_MOSHIER_MODEL:
+            if record["ephemeris_model"] != DE441_MODEL:
                 continue
             hi = record["julian_day_tt"]
             lo = math.nextafter(hi, -math.inf)
             target = HKO_TERM_LONGITUDES[fact["name"]]
-            left = complete_moshier_longitude(lo)
-            right = complete_moshier_longitude(hi)
+            left = de441_longitude(lo)
+            right = de441_longitude(hi)
             assert math.remainder(left - target, 360) < 0
             assert math.remainder(right - target, 360) >= 0
         assert fact["selected_has_passed"] is not fact["native_has_passed"]
@@ -135,7 +136,7 @@ def test_explicit_native_does_not_start_an_alternate_analytic_calculation(monkey
     )
     assert (
         result["calendar_context"]["current_solar_term"]["ephemeris_model"]
-        == COMPLETE_MOSHIER_MODEL
+        == DE441_MODEL
     )
 
 

@@ -258,7 +258,11 @@ def qualify_hidden_reception(
                 qualified_matched=(
                     True if True in values else None if None in values else False
                 ),
-                qualification_status="metal_si_growth_replaces_calendar_strike",
+                qualification_status=(
+                    "day_value_excludes_month_only_opposition"
+                    if month_exception
+                    else "metal_si_growth_replaces_calendar_strike"
+                ),
                 qualification_source_path=path,
             )
         if fg is True:
@@ -437,6 +441,5 @@ def qualify_hidden_reception(
             stage_ruleset_id=h["stage_conditions"]["ruleset_id"],
             stage_unknown_is_relevant=h["stage_conditions"]["has_relevant_unknown"],
             adjudication="listed_reception_conditions_not_final_emergence",
-            scope=PROFILE["scope"]
-            + " 阶段缺项依stage_conditions逐项关联；已核位置不被缺项抹去，与本次承受无关的飞神阶段未知不否定独立已核支持。",
+            scope="列出的当前受生与引拔门槛。日月冲克与生扶并存、飞伏强弱竞争、动爻克伏及墓绝位冲突保留未知。飞生使用飞神本身来源资格；阶段取值见stage_conditions，当前门槛不等于完整出伏或吉凶。",
         )

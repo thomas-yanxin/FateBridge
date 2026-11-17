@@ -1,14 +1,9 @@
-"""Western classical-astrology primitives (Hellenistic / medieval).
+"""Shared primitives for the mixed classical chart and bounded consumers.
 
-Shared by the ``astro_chart.classical`` layer and the horary engine. Includes
-planetary condition, rulership, lots, relational patterns and fixed stars.
-Dignity tables come from :mod:`fatebridge.core.astrology_tables`.
-
-Reference data ported verbatim from horosa `data/dignities.js` (Egyptian terms,
-Dorothean triplicity, Chaldean faces, Lilly scores); derivation logic follows
-the standard classical definitions those tables cite (Ptolemy / Lilly /
-Dorotheus). There is no closed byte-oracle, so correctness is pinned by
-table-parity + classical invariants (see tests).
+Dignities combine Egyptian bounds, Dorothean triplicity, Chaldean faces and
+Lilly weights. This selected combination does not reproduce every rule of one
+author. Shared zodiac tables live in :mod:`fatebridge.core.astrology_tables`;
+physical fixed-star positions have their own owner and source receipts.
 """
 
 from __future__ import annotations
@@ -151,7 +146,7 @@ def triplicity_members(sign: str) -> List[str]:
 
 
 def triplicity_ruler(sign: str, is_day: Optional[bool]) -> Optional[str]:
-    """The sect triplicity ruler (Lilly scores the in-sect ruler +3)."""
+    """The first Dorothean triplicity ruler for a known chart sect."""
     rulers = DOROTHEAN_TRIPLICITY.get(ELEMENT_BY_SIGN.get(sign, ""))
     if not rulers or is_day is None:
         return None
@@ -328,8 +323,11 @@ def in_halb(
     above_horizon: Optional[bool],
     orientality_value: Optional[str],
 ) -> Optional[bool]:
-    """Rejoicing by halb: an of-sect planet on its preferred side of the horizon
-    (diurnal above by day / nocturnal below by day, and vice-versa)."""
+    """The selected of-sect and hemisphere predicate, without sign gender.
+
+    Matching sect is required; day planets are above by day and night planets
+    above by night. Missing sect, planetary sect or horizon stays unknown.
+    """
     own = planet_sect(planet, orientality_value)
     if own is None or chart_sect is None or above_horizon is None:
         return None
@@ -426,8 +424,8 @@ def almuten_of(sign: str, degree_in_sign: float, is_day: bool) -> Dict[str, Any]
     """Almuten of a degree: the planet with the most weighted essential dignity.
 
     Sums the 5 dignity weights (5/4/3/2/1) each planet earns over the point;
-    the winner is the strongest ruler. Ties resolve to the heavier dignity then
-    the traditional Chaldean order (slowest first) for determinism.
+    the winner has the highest total. Ties resolve by the selected Chaldean
+    order (slowest first), without an additional dignity-rank tie-break.
     """
     lords = dignity_lords_at(sign, degree_in_sign, is_day)
     totals: Dict[str, int] = {}
@@ -1192,8 +1190,6 @@ _NINTH_PART_START = {
     "Air": "Libra",
     "Water": "Cancer",
 }
-# 30° / 9 = 3°20′ per ninth-part.
-_NINTH_PART_ARC = 30.0 / 9.0
 
 
 def ninth_part(sign: str, degree_in_sign: float) -> Optional[str]:
@@ -1202,11 +1198,15 @@ def ninth_part(sign: str, degree_in_sign: float) -> Optional[str]:
     Each sign splits into nine 3°20′ parts; the first opens on the cardinal sign
     of the placement's triplicity and successive parts advance one sign
     zodiacally. ``None`` for a non-zodiacal sign.
+
+    This is the mapping in Rao (2000), section 6.2.9, not a certification of
+    Hellenistic usage. Compare the supplied angle exactly: float division by
+    30/9 can put 10° and 20° in the preceding part.
     """
     start = _NINTH_PART_START.get(ELEMENT_BY_SIGN.get(sign, ""))
     if start is None:
         return None
-    step = int((degree_in_sign % 30.0) // _NINTH_PART_ARC)
+    step = int((angle_fraction(degree_in_sign) % 30) * 9 // 30)
     return SIGNS[(_SIGN_INDEX[start] + step) % 12]
 
 
@@ -1222,7 +1222,7 @@ def _degree_position(degree_in_sign: float) -> str:
 def melothesia(sign: str, degree_in_sign: float) -> Dict[str, Any]:
     """Body parts governed by the sign + the early/middle/late degree band."""
     return {
-        "body_parts": SIGN_BODY_PARTS.get(sign, []),
+        "body_parts": SIGN_BODY_PARTS.get(sign, []).copy(),
         "position": _degree_position(degree_in_sign),
     }
 
@@ -1278,10 +1278,9 @@ def build_planet_classical(
 ) -> Dict[str, Any]:
     """The per-planet ``classical`` entry surfaced on the chart payload.
 
-    ``longitude_speed`` / ``declination`` come from the equatorial ephemeris and
-    drive the ``retrograde`` / ``out_of_bounds`` accidental flags; both are
-    ``None`` on the offline approximate engine, where direction and declination
-    are unknowable rather than zero.
+    Ecliptic longitude speed drives ``retrograde``; equatorial declination and
+    the same-frame obliquity drive ``out_of_bounds``. Missing inputs remain
+    unknown rather than becoming zero.
     """
     # Whole-sign, Vehlow and MC-anchored house numbers do not encode which
     # side of the physical horizon the planet occupies. Unknown stays unknown.

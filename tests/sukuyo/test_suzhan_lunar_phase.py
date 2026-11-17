@@ -195,7 +195,12 @@ def test_reference_rows_cannot_be_replaced_while_retaining_source_identity(
 @pytest.mark.parametrize("mode", [0, 1])
 def test_full_chart_keeps_calendar_naming_separate_from_physical_tithi(mode):
     result = build_suzhan_result(
-        date="2026-10-24", time="05:30:00", zone="+08:00", szchart=mode
+        lat="31n13",
+        lon="121e28",
+        date="2026-10-24",
+        time="05:30:00",
+        zone="+08:00",
+        szchart=mode,
     )
     sky = result["astronomy"]
     phase = sky["lunar_phase_reference"]
@@ -218,7 +223,12 @@ def test_full_chart_keeps_calendar_naming_separate_from_physical_tithi(mode):
 )
 def test_non_astronomical_modes_do_not_manufacture_phase_coordinates(options):
     result = build_suzhan_result(
-        date="2026-10-24", time="05:30:00", zone="+08:00", **options
+        lat="31n13",
+        lon="121e28",
+        date="2026-10-24",
+        time="05:30:00",
+        zone="+08:00",
+        **options,
     )
     assert result["astronomy"] is None
     assert "现代月日黄经差未计算" in result["snapshot_text"]
@@ -232,6 +242,13 @@ def test_actual_strict_deep_fields_agree_across_rest_native_mcp_and_cli(
         monkeypatch,
         capsys,
         "suzhan",
-        {"date": "2026-10-24", "time": "05:30:00", "zone": "+08:00", "szchart": mode},
+        {
+            "lat": "31n13",
+            "lon": "121e28",
+            "date": "2026-10-24",
+            "time": "05:30:00",
+            "zone": "+08:00",
+            "szchart": mode,
+        },
         ["astronomy.lunar_phase_reference", "sukuyo.calendar", "validation"],
     )

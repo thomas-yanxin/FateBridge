@@ -162,4 +162,8 @@ def test_defeated_other_generator_does_not_cancel_month_supported_static_flying(
     assert raw["matched"] is True and raw["qualified_matched"] is True
     assert h["reception"]["flying_generation"]["condition_match"] is True
     assert result["generation_conditions"]["sources"][1]["condition_match"] is None
-    assert h["reception"]["condition_match"] is None  # Fire table gap remains.
+    stage = h["stage_conditions"]["hidden_tomb_cessation"]
+    day = next(q for q in stage["queries"] if q["location"] == "day")
+    assert day["known_stage"] == "帝旺"
+    assert stage["condition_match"] is False
+    assert h["reception"]["condition_match"] is True

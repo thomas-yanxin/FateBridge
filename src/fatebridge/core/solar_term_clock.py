@@ -3,8 +3,13 @@
 from datetime import datetime
 from typing import Any, Dict
 
-from fatebridge.core.astro.time_scales import datetime_from_tt_point, ephemeris_time
+from fatebridge.core.astro.time_scales import (
+    ephemeris_time,
+    utc_calendar_from_tt,
+    utc_clock,
+)
 from fatebridge.core.astro.tt_epoch import TTInstant
+from fatebridge.utils.civil_time import UTCCalendar
 from fatebridge.utils.errors import EphemerisSourceError
 
 
@@ -22,10 +27,10 @@ class SolarTermClockError(EphemerisSourceError):
         return result
 
 
-def native_solar_root_datetime(jd_tt: float) -> datetime:
+def native_solar_root_calendar(jd_tt: float) -> UTCCalendar:
     """Keep IEEE point intent and distinguish a clock failure from no root."""
     try:
-        return datetime_from_tt_point(TTInstant.from_float(jd_tt))
+        return utc_calendar_from_tt(TTInstant.from_float(jd_tt))
     except EphemerisSourceError:
         raise
     except (ValueError, OverflowError) as error:
@@ -34,15 +39,24 @@ def native_solar_root_datetime(jd_tt: float) -> datetime:
         raise SolarTermClockError("solar_root_clock_unavailable") from error
 
 
-def native_solar_root_time_policy(moment: datetime) -> Dict[str, Any]:
-    """Qualify a native civil label under the actual configured clock policy.
+def native_solar_root_datetime(jd_tt: float) -> datetime:
+    """Require the selected root's UTC label to fit Python datetime."""
+    moment = native_solar_root_calendar(jd_tt).as_datetime()
+    if moment is None:
+        raise SolarTermClockError("solar_root_civil_unrepresentable")
+    return moment
+
+
+def native_solar_root_time_policy(moment: datetime | UTCCalendar) -> Dict[str, Any]:
+    """Qualify the selected root's civil clock without requiring unrelated UT1.
 
     A Gregorian UTC-shaped label before atomic UTC represents modeled UT1;
     a future label can depend on an expired leap-second table. Neither is a
     measured civil UTC claim, even when its TT root is numerically precise.
     """
     try:
-        clock = ephemeris_time(moment)
+        atomic = utc_clock(moment)
+        clock = ephemeris_time(moment) if atomic.jd_tt is None else atomic
     except EphemerisSourceError:
         raise
     except (ValueError, OverflowError) as error:

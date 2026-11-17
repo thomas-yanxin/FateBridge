@@ -35,6 +35,7 @@ from fatebridge.core.qimen_profiles import (
     star_season_state,
 )
 from fatebridge.core.qimen_punishment import palace_punishment
+from fatebridge.core.qimen_sources import SCAN_SOURCE, YANYI_FULL_VIEW, YANYI_VOLUMES
 from fatebridge.core.qimen_stem_context import build_stem_context
 from fatebridge.core.qimen_three_deceptions import build_three_deceptions
 from fatebridge.core.qimen_time_conditions import build_hour_branch_tomb
@@ -42,9 +43,8 @@ from fatebridge.core.qimen_tombs import palace_wonder_tombs
 from fatebridge.core.solar_model_policy import solar_context_input_years
 from fatebridge.utils.timezones import timezone_rules_metadata
 
-SOURCE = "https://zh.wikisource.org/w/index.php?oldid=625946"
+SOURCE = YANYI_VOLUMES[2]
 RULESET_ID = "qimen_rotating_kun2_v2"
-SCAN_SOURCE = "https://ourartnet.com/King_James/Hushulei/047.pdf"
 STAR_ELEMENTS = {
     "天蓬": "水",
     "天任": "土",
@@ -217,7 +217,12 @@ def enrich_qimen_evidence(
             "title": "时家转盘，天禽及中干寄坤二",
             "author": "FateBridge contributors",
             "classical_author": "明·程道生",
-            "source": SOURCE,
+            "source": YANYI_FULL_VIEW,
+            "source_revision_scope": "individual_volume_revisions",
+            "volume_sources": [
+                {"volume": volume, "source": source}
+                for volume, source in YANYI_VOLUMES.items()
+            ],
             "source_kind": "online_transcription_with_selected_scan_comparison",
             "scan_collation": {
                 "source": SCAN_SOURCE,
@@ -367,10 +372,10 @@ def enrich_qimen_evidence(
             else "solar_term_instant_and_futou_day"
         ),
     }
-    trace = [
+    trace: list[dict[str, object]] = [
         {
             "rule_id": "leaders",
-            "source": SOURCE,
+            "source": YANYI_VOLUMES[1],
             "section": "卷一·时家奇门／烟波钓叟赋",
             "inputs": {
                 "day_ganzhi": board["day_ganzhi"],
@@ -392,7 +397,7 @@ def enrich_qimen_evidence(
     trace.append(
         {
             "rule_id": "ju_resolution",
-            "source": SOURCE,
+            "source": YANYI_VOLUMES[1],
             "section": "卷一·超神接气置闰诀；拆补为另列现代约定",
             "inputs": {
                 "day_ganzhi": board["day_ganzhi"],
@@ -402,10 +407,28 @@ def enrich_qimen_evidence(
             "outputs": board.get("ju_decision", {}),
         }
     )
+    if "ju_decision" in board:
+        trace.append(
+            {
+                "rule_id": "ju_table",
+                "source": SCAN_SOURCE,
+                "section": "卷四·阴阳二遁十八局图题",
+                "source_scan_pages": list(range(63, 72)),
+                "inputs": {"ju_term": board["ju_term"], "yuan": board["yuan"]},
+                "outputs": {
+                    "dun_type": board["dun_type"],
+                    "ju_number": board["ju_number"],
+                },
+                "evidence_paths": ["qimen.dun_type", "qimen.ju_number"],
+            }
+        )
     trace.append(
         {
             "rule_id": "chapter_profiles",
-            "source": SOURCE,
+            "source": YANYI_FULL_VIEW,
+            "sources": list(
+                dict.fromkeys(profile["source"] for profile in profiles.values())
+            ),
             "section": f"{profiles['god']['section']}；{profiles['season']['section']}；{profiles['wonder_tomb']['section']}；{profiles['six_instrument_punishment']['section']}；{profiles['door_palace_relation']['section']}",
             "inputs": {
                 "god_profile": board["god_profile"],
@@ -462,6 +485,7 @@ def enrich_qimen_evidence(
             ),
             "star_season_profile": board["season_profile"],
             "star_season_source_section": profiles["season"]["section"],
+            "star_season_source": profiles["season"]["source"],
             "star_season_relation": star_season_relation(
                 STAR_ELEMENTS[palace["star"]], month_element
             ),
@@ -473,7 +497,17 @@ def enrich_qimen_evidence(
         trace.append(
             {
                 "rule_id": "palace_relations",
-                "source": SOURCE,
+                "source": YANYI_FULL_VIEW,
+                "sources": list(
+                    dict.fromkeys(
+                        [
+                            YANYI_VOLUMES[1],
+                            YANYI_VOLUMES[2],
+                            profiles["season"]["source"],
+                            evidence["god_interpretation"]["source"],
+                        ]
+                    )
+                ),
                 "section": f"门宫关系：卷一·烟波钓叟赋及卷二·门迫宫迫；九星旺衰：{profiles['season']['section']}；神义：{evidence['god_interpretation']['section']}；六仪击刑：{profiles['six_instrument_punishment']['section']}",
                 "evidence_paths": [
                     path + ".door",

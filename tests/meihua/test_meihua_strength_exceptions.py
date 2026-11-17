@@ -14,6 +14,7 @@ from fatebridge.core.meihua_strength_exceptions import (
     strength_exception_ruleset,
 )
 from fatebridge.services.meihua import calculate_meihua_cast
+from tests.support.reference_data import resolve
 from tests.support.transports import SPECS, business, rest, surface_calls
 
 FIXTURE = Path(__file__).parents[1] / "fixtures/meihua_strength_exceptions_v1"
@@ -25,12 +26,6 @@ ROLE_TRUTH = json.loads((FIXTURE / "role-prerequisites.json").read_text())["rows
 BY_GEOMETRY = {(c["code"], c["line"]): [] for c in GEOMETRIES}
 for row in EXPECTED:
     BY_GEOMETRY[row["code"], row["line"]].append(row)
-
-
-def resolve(out, path):
-    for part in path.split("."):
-        out = out[int(part)] if isinstance(out, list) else out[part]
-    return out
 
 
 def test_source_profile_and_references_remain_the_preedit_selected_reading():

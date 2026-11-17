@@ -33,12 +33,9 @@ from fatebridge.core.sukuyo_profiles import (
     select_profile,
 )
 from fatebridge.core.sukuyo_profiles import source_bundle as profile_sources
-from fatebridge.core.sukuyo_relations import RELATION_TEMPLATE as RELATION_TEMPLATE
 from fatebridge.core.sukuyo_relations import (
     SU27_ORDER,
-    SU28_NAMES,
     TEXT_URL,
-    normalize_mansion,
     relation_between_su27,
 )
 from fatebridge.utils.timezones import (
@@ -645,26 +642,6 @@ def _date_uncertain_calendar(
         result["resolution_reason"] = "local_date_spans_japanese_reference_dates"
         result["profile_calculation"]["resolution_reason"] = result["resolution_reason"]
     return result
-
-
-def su28_to_su27(name: str, longitude: Optional[float] = None) -> str:
-    """Validate a shared name, refusing the former invented 牛 midpoint rule."""
-    name = normalize_mansion(name)
-    if name not in SU28_NAMES:
-        raise ValueError(f"未知宿名：{name!r}")
-    if name == "牛":
-        raise ValueError("牛宿不能凭黄经映射成二十七宿；请按农历月日重新计算")
-    return name
-
-
-def sukuyo_relation(
-    self_su: str,
-    other_su: str,
-    self_longitude: Optional[float] = None,
-    other_longitude: Optional[float] = None,
-) -> Dict[str, Any]:
-    """Name-level helper. Longitudes never determine natal 宿."""
-    return relation_between_su27(su28_to_su27(self_su), su28_to_su27(other_su))
 
 
 def candidate_relation_analysis(

@@ -24,10 +24,21 @@ def audit() -> dict:
             failures.append(
                 {"kind": "extended_projection_reference_identity", "file": n}
             )
-    data = ROOT / "src/fatebridge/data/astronomy"
-    for n, h in protocol["preserve_existing_profiles"].items():
-        if hashlib.sha256((data / n).read_bytes()).hexdigest() != h:
-            failures.append({"kind": "existing_profile_changed", "file": n})
+    sources = [
+        de440_solar.source_receipt(profile)
+        for profile in (
+            de440_solar.EXTENDED_MODEL_ID,
+            de440_solar.CANPING_EXTENDED_MODEL_ID,
+        )
+    ]
+    for source in sources:
+        if source["source_kernel_sha256"] != protocol["source_kernel"]["sha256"]:
+            failures.append(
+                {
+                    "kind": "projection_source_kernel_changed",
+                    "model": source["model_id"],
+                }
+            )
     if list(DE440_SOFTWARE_YEARS) != protocol["public_input_years_preserved"]:
         failures.append({"kind": "public_range_changed_without_requalification"})
     refs = json.loads((folder / "reference.json").read_bytes())
@@ -113,6 +124,7 @@ def audit() -> dict:
     return {
         "checks_passed": not failures,
         "failures": failures,
+        "selected_sources": sources,
         "comparison_mode": "explicit_de440_control; caller environment restored",
         "replayed_frozen_tt_queries": len(roots),
         "replayed_frozen_state_queries": len(state_errors),

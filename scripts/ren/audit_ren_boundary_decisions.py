@@ -17,9 +17,13 @@ from datetime import date, datetime
 from pathlib import Path
 from typing import Any
 
+from scripts.ren.ren_boundary_reference import (
+    REFERENCE_PATH,
+    load_ren_boundary_reference,
+)
+
 ROOT = Path(__file__).resolve().parents[2]
-FIXTURE = ROOT / "tests/fixtures/ren_boundary_decisions_v1"
-FREEZE_SHA = "1d69d52ba83fbf9f9338946166102bc5744c0a1f5f7e64167eb7e82ce33a8680"
+FIXTURE = REFERENCE_PATH.parent
 BRANCHES = "子丑寅卯辰巳午未申酉戌亥"
 STEMS = "甲乙丙丁戊己庚辛壬癸"
 
@@ -33,40 +37,18 @@ def sha(path: Path) -> str:
 
 
 def reference(fixture: Path = FIXTURE) -> dict[str, Any]:
-    if sha(fixture / "freeze.json") != FREEZE_SHA:
-        raise ValueError("Frozen Ren boundary protocol manifest changed")
-    manifest = json.loads((fixture / "freeze.json").read_text())
-    if set(manifest["files"]) != {"protocol.json"} or {
-        p.name for p in fixture.iterdir()
-    } != {"protocol.json", "freeze.json"}:
-        raise ValueError("Frozen Ren boundary protocol inventory changed")
-    if sha(fixture / "protocol.json") != manifest["files"]["protocol.json"]:
-        raise ValueError("Frozen Ren boundary protocol changed")
-    protocol: dict[str, Any] = json.loads((fixture / "protocol.json").read_text())
-    for name, checksum in protocol["reference_checksums"].items():
-        if sha(ROOT / name) != checksum:
-            raise ValueError(f"Frozen Ren boundary source changed: {name}")
-    roots = json.loads(
-        (ROOT / "tests/data/bazi_all_terms_v1/reference.json").read_text()
-    )["rows"]
-    probes = json.loads(
-        (ROOT / "tests/data/bazi_boundary_decisions_v1/probes.json").read_text()
-    )["rows"]
-    if len(roots) != 4872 or len(probes) != 9744:
-        raise ValueError("Full Ren boundary denominators required")
-    if (
-        len({(v["year"], v["name"]) for v in roots}) != 4872
-        or len({v["id"] for v in probes}) != 9744
-    ):
-        raise ValueError("Duplicated Ren boundary rows")
-    if [v["jd_tt"] for v in roots] != sorted(v["jd_tt"] for v in roots):
-        raise ValueError("Independent roots must remain ordered")
-    for year in range(1899, 2102):
-        terms = [v for v in roots if v["year"] == year]
-        points = [v for v in probes if v["year"] == year]
-        if len(terms) != 24 or len(points) != 48:
-            raise ValueError("All terms and both minute sides required per year")
-    return dict(protocol=protocol, roots=roots, probes=probes)
+    ref = load_ren_boundary_reference(fixture / "reference.json.gz")
+    return dict(
+        protocol=ref.packet.boundary_protocol.model_dump(mode="json"),
+        roots=[r.model_dump() for r in ref.solar.rows if 1899 <= r.year <= 2101],
+        probes=[row.model_dump(mode="json") for row in ref.minutes.rows],
+        calendar=ref.calendar.model_dump(mode="json"),
+        rules=ref.rules.model_dump(mode="json"),
+        reference_source=ref.source_summary,
+        protocol_sha256=hashlib.sha256(
+            ref.packet.boundary_protocol.model_dump_json().encode()
+        ).hexdigest(),
+    )
 
 
 def source_map() -> dict[str, str]:
@@ -180,6 +162,14 @@ def expectations(
 def audit(profile: str, ephe_dir: Path, kernel: Path | None) -> dict[str, Any]:
     ref = reference()
     protocol, roots, probes = ref["protocol"], ref["roots"], ref["probes"]
+    cal, rules = ref["calendar"], ref["rules"]
+    manifest_path = ROOT / "tests/data/ziwei_independent/calendar_manifest.json"
+    if (
+        sha(manifest_path)
+        != cal["references"]["tests/fixtures/ziwei_independent/calendar_manifest.json"]
+    ):
+        raise ValueError("Original HKO annual manifest changed")
+    manifest = json.loads(manifest_path.read_text())
     selected = protocol["arms"][profile]
     if not ephe_dir.is_dir() or (
         selected["directory"] == "explicit_empty" and any(ephe_dir.iterdir())
@@ -206,21 +196,12 @@ def audit(profile: str, ephe_dir: Path, kernel: Path | None) -> dict[str, Any]:
     from fatebridge.core.metaphysics.ren_calendar import require_ren_calendar
     from fatebridge.services.metaphysics import _build_analysis_seed
 
-    cal = json.loads(
-        (ROOT / "tests/fixtures/ren_calendar_v1/reference.json").read_text()
-    )
-    rules = json.loads(
-        (ROOT / "tests/fixtures/ren_classical_v1/rules.json").read_text()
-    )
     spec = importlib.util.spec_from_file_location(
         "hko_original_parser", ROOT / "scripts/ren/audit_ren_calendar.py"
     )
     assert spec and spec.loader
     old = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(old)
-    manifest = json.loads(
-        (ROOT / "tests/data/ziwei_independent/calendar_manifest.json").read_text()
-    )
     hko = {}
     lunar_state = (1900, 11, False)
     for src in manifest["sources"]:
@@ -363,7 +344,8 @@ def audit(profile: str, ephe_dir: Path, kernel: Path | None) -> dict[str, Any]:
     return dict(
         profile=profile,
         selected=selected,
-        protocol_sha256=sha(FIXTURE / "protocol.json"),
+        protocol_sha256=ref["protocol_sha256"],
+        reference_source=ref["reference_source"],
         root_count=len(root_rows),
         root_failures=[v for v in root_rows if not v["within_original_one_second"]],
         identity_failures=[v for v in root_rows if not v["identity_matches"]],

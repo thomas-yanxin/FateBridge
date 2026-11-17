@@ -18,6 +18,7 @@ from fatebridge.core.jyotish_balas import (
     directional_strength,
     natural_strength,
 )
+from fatebridge.core.jyotish_evidence import strength_context, strength_text
 from tests.fixtures.surface_payloads import astro_payload
 
 FIXTURES = Path(__file__).parents[1] / "fixtures"
@@ -135,6 +136,25 @@ def test_conditional_nature_results_keep_negative_values_and_unknown_separate_fr
     zero = aspect_strength(dict.fromkeys(PLANETS, 0.0))
     assert zero["summary"] == dict.fromkeys(PLANETS, 0.0)
     assert len(zero["scenarios"]) == 4
+
+
+def test_drik_rounding_cannot_turn_distinct_nature_sums_into_consensus():
+    target = math.nextafter(30.0, math.inf)
+    chart = dict.fromkeys(PLANETS, target)
+    chart.update(Mercury=0.0, Jupiter=210.0)
+    result = aspect_strength(chart)
+    assert result["matrix"]["Mercury"]["Sun"] > 0
+    assert {r["summary"]["Sun"] for r in result["scenarios"].values()} == {15.0}
+    assert result["summary"]["Sun"] is None
+    assert "Sun" in result["conditional_targets"]
+    context = strength_context("drik_bala", "Sun", result)
+    assert context["value_status"] == "conditional_results"
+    assert "未舍入值有差异" in strength_text(context)
+
+    chart["Sun"] = 30.0
+    result = aspect_strength(chart)
+    assert result["matrix"]["Mercury"]["Sun"] == 0
+    assert result["summary"]["Sun"] == 15.0
 
 
 @pytest.mark.parametrize(

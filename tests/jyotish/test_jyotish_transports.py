@@ -1,7 +1,6 @@
 """Public Indian schemas, real REST/native MCP/CLI calls and same-run delivery."""
 
 import asyncio
-import hashlib
 import json
 from itertools import product
 
@@ -15,9 +14,12 @@ from fatebridge.application.execution import execute_tool
 from fatebridge.cli import run
 from fatebridge.core.execution_context import ExecutionOptions
 from fatebridge.core.jyotish import YEAR_DAYS
+from fatebridge.core.jyotish_strength import SOURCE as STRENGTH_SOURCE
+from fatebridge.core.public_output import same_public_value
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
 from tests.fixtures.surface_payloads import astro_payload
+from tests.support.result_delivery import assert_same_run_receipt
 
 SPECS = {s.key: s for s in CATALOG}
 AS_OF = "2026-10-22T12:00:00+08:00"
@@ -311,9 +313,10 @@ def test_future_time_context_and_identified_author_rules_across_surfaces(
         s for s in body["india"]["rulesets"] if s["id"] == condition["source_id"]
     )
     assert (
-        source["sha256"]
+        STRENGTH_SOURCE["sha256"]
         == "13609f1af89541e070c798b8c70c6bfd74a8b9a71a71388913bf898e9f9ddf3f"
     )
+    assert same_public_value(source, STRENGTH_SOURCE)
     assert {r["rule_id"] for r in body["india"]["rule_trace"]} >= {
         "jyotish.time_scales.v2",
         "jyotish.santhanam_solar_orb.v1",
@@ -501,8 +504,9 @@ def test_full_timeline_uses_same_run_pagination_and_hash(monkeypatch, tmp_path):
             break
         offset = page["next_offset"]
     text = "".join(chunks)
-    assert hashlib.sha256(text.encode()).hexdigest() == ref["sha256"]
+    assert len(text) == ref["total_chars"]
     full = json.loads(text)
+    assert_same_run_receipt(store, shaped, full)
     assert full["run_metadata"]["run_id"] == shaped["run_metadata"]["run_id"]
     assert len(full["vimshottari"]["timeline"]) == 9
     assert sum(len(p["antardashas"]) for p in full["vimshottari"]["timeline"]) == 81

@@ -14,7 +14,7 @@ def lazy_service(module: str, name: str) -> Callable[..., ServiceResult]:
     """Return a proxy that imports ``module`` and resolves ``name`` on first call.
 
     Lets the tool catalog declare a tool's service without importing the
-    (sometimes heavy — e.g. the kerykeion-backed western modules) service module
+    service module
     until that tool is actually invoked. The proxy carries an ``__fb_lazy__``
     marker so binders can resolve the real function before scheduling execution.
     """

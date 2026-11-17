@@ -1,21 +1,373 @@
 """Declared source-day endpoints, same-sky root brackets and native scopes."""
 
 import copy
-import importlib.util
+import gzip
+import hashlib
+import json
+import shutil
 from fractions import Fraction as F
 from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
 
-from fatebridge.core import guolao
+from fatebridge.core import ephemeris_runtime as native_runtime
 from fatebridge.core import guolao_anchor_days as days
 from fatebridge.core.astro.birth import build_astro_birth_info
+from fatebridge.core.astro.iers_ut1 import use_ut1_source
 from fatebridge.core.guolao import build_chart, reading
 from fatebridge.core.guolao_classical import life_branch
 from fatebridge.core.requests.astrology import AstroChartPolyRequest, AstroGuolaoRequest
+from fatebridge.services.astrology import calculate_core_chart_analysis
+from tests.support.ephemeris_context import empty_ephemeris_path
 
 FIXTURE = Path(__file__).parents[1] / "fixtures/guolao-anchor-days-v1"
+FLINT_DATA = Path(__file__).parents[1] / "data/guolao/solar_day_flint_v1"
+FLINT_BYTES = (FLINT_DATA / "reference.json.gz").read_bytes()
+assert (
+    hashlib.sha256(FLINT_BYTES).hexdigest()
+    == json.loads((FLINT_DATA / "provenance.json").read_text())["reference_sha256"]
+)
+FLINT_REFERENCE = json.loads(gzip.decompress(FLINT_BYTES))
+MODEL_DATA = Path(__file__).parents[1] / "data/guolao/selected_day_models_v1"
+MODEL_BYTES = (MODEL_DATA / "reference.json.gz").read_bytes()
+MODEL_PROVENANCE = json.loads((MODEL_DATA / "provenance.json").read_text())
+assert hashlib.sha256(MODEL_BYTES).hexdigest() == MODEL_PROVENANCE["reference_sha256"]
+MODEL_REFERENCE = json.loads(gzip.decompress(MODEL_BYTES))
+
+
+@pytest.fixture
+def selected_day_model(request, tmp_path, monkeypatch):
+    model = request.param
+    previous = native_runtime.configured_ephemeris_path()
+    root = Path(__file__).resolve().parents[2]
+    directory = root / "ephe" if model == "swieph" else tmp_path
+    if model != "moshier":
+        for source in MODEL_PROVENANCE["source_assets"].values():
+            relative = Path(source["copy"])
+            if relative.parts[1] != model:
+                continue
+            original = (
+                root / "ephe" / relative.name
+                if model == "swieph"
+                else MODEL_DATA.parent / relative.name
+            )
+            assert hashlib.sha256(original.read_bytes()).hexdigest() == source["sha256"]
+            if model == "jpl":
+                shutil.copyfile(original, directory / relative.name)
+    try:
+        with monkeypatch.context() as change:
+            change.setenv("SE_EPHE_PATH", str(directory))
+            change.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
+            if model == "jpl":
+                change.setenv("FATEBRIDGE_JPL_FILE", "guolao-de441-j2000.eph")
+            else:
+                change.delenv("FATEBRIDGE_JPL_FILE", raising=False)
+            native_runtime.swe.close()
+            native_runtime.configure_ephemeris_path(str(directory))
+            yield model
+    finally:
+        native_runtime.swe.close()
+        native_runtime.configure_ephemeris_path(previous or "")
+
+
+@pytest.mark.parametrize(
+    "row,selected_day_model",
+    [
+        pytest.param(
+            row,
+            row["case"]["model"],
+            id=row["case"]["id"],
+            marks=pytest.mark.local_data if row["case"]["model"] != "moshier" else [],
+        )
+        for row in MODEL_REFERENCE["rows"]
+    ],
+    indirect=["selected_day_model"],
+)
+def test_selected_sun_and_clock_models_match_independent_day_roots(
+    row, selected_day_model
+):
+    case = row["case"]
+    assert selected_day_model == case["model"]
+    angular_gate = F(
+        str(MODEL_REFERENCE["criteria"]["same_explicit_TT_UT1_coordinate_arcseconds"])
+    )
+    clock_gate = F(
+        str(MODEL_REFERENCE["criteria"]["clock_and_independent_C04_conversion_seconds"])
+    )
+    physical = None
+    with use_ut1_source(case["clock"]):
+        for policy in days.POLICIES[1:]:
+            result = calculate_core_chart_analysis(
+                **case["birth"],
+                birth_latitude=40,
+                name="虚构选定时标与星历日界测试",
+                use_true_solar_time=case["birth"]["birth_clock_basis"] == "civil",
+                zodiacal=case["zodiacal"],
+                chart_variant="guolao_chart",
+                guolao_seasonal_anchor_policy=policy,
+            )
+            assert "error" not in result, result
+            profile = result["guolao"]["profile"]
+            assert profile["julian_day_tt"] == row["common_julian_day_tt"]
+            assert profile["julian_day_ut1"] == row["common_julian_day_ut1"]
+            assert (
+                abs(
+                    F(profile["julian_day_tt"])
+                    - F(row["independent_birth_julian_day_tt_exact"])
+                )
+                * 86400
+                <= clock_gate
+            )
+            assert (
+                profile["ephemeris_provenance"]["by_body"]["Sun"]["ecliptic_model"]
+                == case["model"]
+            )
+            clock = profile["apparent_solar_clock"]
+            assert clock["earth_rotation_basis"] == "supplied_same_instant_ut1"
+            for key, refkey in [
+                ("sun_apparent_right_ascension", "sun_apparent_right_ascension_exact"),
+                (
+                    "greenwich_apparent_sidereal_degrees",
+                    "greenwich_apparent_sidereal_degrees_exact",
+                ),
+            ]:
+                error = (
+                    abs(
+                        (F(clock[key]) - F(row["birth_reference"][refkey]) + 180) % 360
+                        - 180
+                    )
+                    * 3600
+                )
+                assert error <= angular_gate
+            assert (
+                abs(
+                    F(clock["equation_of_time_seconds"])
+                    - F(row["birth_reference"]["equation_of_time_seconds_exact"])
+                )
+                <= clock_gate
+            )
+            facts = {
+                key: result[key]
+                for key in ["planets", "angles", "houses", "person_info"]
+            }
+            if physical is None:
+                physical = facts
+            else:
+                assert physical == facts
+            evidence = result["guolao"]["life_palace"]["seasonal_anchor_evidence"]
+            assert [evidence["anchor_branch"]] == row["expected_policy_candidates"][
+                policy
+            ]
+            assert evidence["same_birth_source_cohort_checked"] is True
+            assert evidence["actual_sun_model"] == case["model"]
+            assert (
+                F(evidence["full_search_UT1_window_exact"][1])
+                - F(evidence["full_search_UT1_window_exact"][0])
+                == 3
+            )
+            for actual, reference in zip(
+                evidence["day_edge_brackets"], row["reference_day_edges"]
+            ):
+                lower, upper = [
+                    F(actual[side]["julian_day_ut1_exact"])
+                    for side in ["lower", "upper"]
+                ]
+                ref_lower, ref_upper = [
+                    F(reference[side]["julian_day_ut1_exact"])
+                    for side in ["lower", "upper"]
+                ]
+                assert max(lower, ref_lower) < min(upper, ref_upper)
+                assert (upper - lower) * 86400 <= F(1, 1000)
+                target = actual["target_solar_label_ordinal"]
+                assert target == reference["target_solar_label_ordinal"]
+                assert (
+                    F(actual["lower"]["apparent_solar_label_serial_exact"])
+                    < target
+                    <= F(actual["upper"]["apparent_solar_label_serial_exact"])
+                )
+            assert evidence["physical_time_accuracy_certified"] is False
+            assert evidence["winter_day_inclusion_adjudicated"] is False
+
+
+@pytest.mark.parametrize(
+    "case,selected_day_model",
+    [
+        pytest.param(
+            case,
+            case["model"],
+            id=case["id"],
+            marks=pytest.mark.local_data if case["model"] != "moshier" else [],
+        )
+        for case in MODEL_REFERENCE["negative_cases"]
+    ],
+    indirect=["selected_day_model"],
+)
+def test_actual_c04_day_window_never_extrapolates_or_shrinks(case, selected_day_model):
+    assert selected_day_model == case["model"]
+    with use_ut1_source(case["clock"]):
+        for policy in days.POLICIES[1:]:
+            result = calculate_core_chart_analysis(
+                **case["birth"],
+                birth_latitude=40,
+                name="虚构固定日界窗越界测试",
+                use_true_solar_time=True,
+                chart_variant="guolao_chart",
+                guolao_seasonal_anchor_policy=policy,
+            )
+            assert "error" in result, result
+            assert "no prediction, extrapolation or Swiss fallback" in result["error"]
+
+
+def test_declared_whole_day_policies_match_independent_event_day_relations():
+    for row in FLINT_REFERENCE["day_rows"]:
+        for include, key in [
+            (False, "expected_exclusive"),
+            (True, "expected_inclusive"),
+        ]:
+            assert (
+                days.anchor_from_day_longitudes(
+                    F(*row["start"]),
+                    F(*row["end"]),
+                    include_winter_day=include,
+                )
+                == row[key]
+            ), (row["id"], key)
+
+
+def test_root_brackets_contain_independent_flint_roots_and_keep_original_rejections():
+    for row in FLINT_REFERENCE["root_rows"]:
+        origin = float.fromhex(row["origin"])
+        serial = F(row["ordinal"]) + F(*row["phase"])
+        a, b, c = map(F, row["coefficients"])
+
+        def evaluate(at):
+            x = F(at) - F(origin)
+            return dict(
+                julian_day_ut1_exact=str(F(at)),
+                apparent_solar_label_serial_exact=str(
+                    serial + a * x + b * x * x + c * x * x * x
+                ),
+            )
+
+        roots, grid = days._day_brackets(origin, serial, evaluate)
+        assert len(grid) == 13 and F(grid[-1]) - F(grid[0]) == 3, row["id"]
+        for actual, reference in zip(roots, row["reference_roots"]):
+            lower = F(actual["lower"]["julian_day_ut1_exact"])
+            upper = F(actual["upper"]["julian_day_ut1_exact"])
+            assert (
+                lower
+                < F(reference["lower_ut1_exact"])
+                <= F(reference["upper_ut1_exact"])
+                <= upper
+            ), row["id"]
+            assert (upper - lower) * 86400 <= F(1, 1000), row["id"]
+            assert actual["target_solar_label_ordinal"] == reference["target"]
+        assert (
+            F(roots[0]["upper"]["julian_day_ut1_exact"])
+            < F(origin)
+            < F(roots[1]["lower"]["julian_day_ut1_exact"])
+        ), row["id"]
+    for row in FLINT_REFERENCE["rejection_rows"]:
+        origin = float.fromhex(row["origin"])
+        serial = F(730120) + F(*row["phase"])
+        a, b, c = map(F, row["coefficients"])
+
+        def evaluate(at):
+            x = F(at) - F(origin)
+            return dict(
+                julian_day_ut1_exact=str(F(at)),
+                apparent_solar_label_serial_exact=str(
+                    serial + a * x + b * x * x + c * x * x * x
+                ),
+            )
+
+        with pytest.raises(ValueError, match=row["error"]):
+            days._day_brackets(origin, serial, evaluate)
+
+
+@pytest.mark.parametrize(
+    "case", FLINT_REFERENCE["physical_rows"], ids=lambda case: case["input"]["id"]
+)
+def test_actual_solar_days_match_original_author_and_official_sofa_root_intervals(case):
+    kwargs = {key: value for key, value in case["input"].items() if key != "id"}
+    with empty_ephemeris_path():
+        for policy in days.POLICIES[1:]:
+            result = calculate_core_chart_analysis(
+                **kwargs,
+                birth_latitude=40,
+                name="虚构太阳日数值边界测试",
+                use_true_solar_time=kwargs["birth_clock_basis"] == "civil",
+                chart_variant="guolao_chart",
+                guolao_seasonal_anchor_policy=policy,
+            )
+            assert "error" not in result, result
+            profile = result["guolao"]["profile"]
+            assert profile["julian_day_ut1"] == case["julian_day_ut1"]
+            assert profile["julian_day_tt"] == case["julian_day_tt"]
+            clock = profile["apparent_solar_clock"]
+            reference_clock = case["birth_clock_reference"]
+            for key, reference_key in [
+                ("sun_apparent_right_ascension", "sun_apparent_right_ascension_exact"),
+                (
+                    "greenwich_apparent_sidereal_degrees",
+                    "greenwich_apparent_sidereal_degrees_exact",
+                ),
+            ]:
+                error = (
+                    abs(
+                        (F(clock[key]) - F(reference_clock[reference_key]) + 180) % 360
+                        - 180
+                    )
+                    * 3600
+                )
+                assert error <= F(str(FLINT_REFERENCE["physical_gate_arcseconds"]))
+            assert abs(
+                F(clock["equation_of_time_seconds"])
+                - F(reference_clock["equation_of_time_seconds_exact"])
+            ) <= F(str(FLINT_REFERENCE["physical_clock_gate_seconds"]))
+            evidence = result["guolao"]["life_palace"]["seasonal_anchor_evidence"]
+            assert [evidence["anchor_branch"]] == case["expected_policy_candidates"][
+                policy
+            ]
+            assert evidence["same_birth_source_cohort_checked"] is True
+            assert evidence["actual_sun_model"] == "moshier"
+            assert (
+                F(evidence["full_search_UT1_window_exact"][1])
+                - F(evidence["full_search_UT1_window_exact"][0])
+                == 3
+            )
+            for actual, reference in zip(
+                evidence["day_edge_brackets"], case["reference_day_edges"]
+            ):
+                lower, upper = [
+                    F(actual[side]["julian_day_ut1_exact"])
+                    for side in ["lower", "upper"]
+                ]
+                ref_lower, ref_upper = [
+                    F(reference[side]["julian_day_ut1_exact"])
+                    for side in ["lower", "upper"]
+                ]
+                assert max(lower, ref_lower) < min(upper, ref_upper)
+                assert (upper - lower) * 86400 <= F(1, 1000)
+                assert (
+                    actual["target_solar_label_ordinal"]
+                    == reference["target_solar_label_ordinal"]
+                )
+                target = actual["target_solar_label_ordinal"]
+                assert (
+                    F(actual["lower"]["apparent_solar_label_serial_exact"])
+                    < target
+                    <= F(actual["upper"]["apparent_solar_label_serial_exact"])
+                )
+            for flag in [
+                "UTC_day_edge_labels_assigned",
+                "historical_local_day_boundary_accepted",
+                "source_sunrise_geometry_adjudicated",
+                "winter_day_inclusion_adjudicated",
+                "physical_time_accuracy_certified",
+            ]:
+                assert evidence[flag] is False
 
 
 def birth(**updates):

@@ -161,7 +161,7 @@ class WealthAnalysis:
         from ..core.elements import ElementAnalysis
 
         dm_analysis = ElementAnalysis.analyze_day_master_strength(pillars)
-        strength = dm_analysis["strength_level"]
+        strength = dm_analysis["engineering_index"]["strength_level"]
 
         element_counts = count_element_distribution(pillars)
         wealth_strength = round(element_counts[wealth_element], 1)
@@ -213,6 +213,7 @@ class WealthAnalysis:
 
         return {
             "day_master_strength": strength,
+            "engineering_index": dm_analysis["engineering_index"],
             "wealth_strength": wealth_strength,
             "pattern": f"模型{strength}／财元素计权{wealth_strength:g}（未裁定格局）",
             "formation_status": "not_adjudicated",

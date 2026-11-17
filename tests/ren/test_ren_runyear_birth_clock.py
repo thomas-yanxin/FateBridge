@@ -1,12 +1,15 @@
 """Fictional frozen instants, independent birth resolution and three surfaces."""
 
+import hashlib
 import importlib.util
 import json
 import shutil
 from pathlib import Path
 
 import pytest
+import pytz
 
+from fatebridge.core.public_output import same_public_value
 from tests.support.transports import SPECS, business, rest, surface_calls
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -83,6 +86,17 @@ def test_birth_instants_chronology_and_failures_agree_across_transports(
         return
     assert http.status_code == 200 and code == 0 and not protocol.is_error
     assert business(bodies[0]) == business(bodies[1]) == business(bodies[2])
+    internal = AUDIT.calculate(case["input"])["runyear"]["birth_civil_clock"]
+    if case["input"]["birth_timezone"] in REFERENCE["zones"]:
+        # The frozen TZIF independently validates the expected instant, while
+        # the receipt must identify the bytes used by the current engine.
+        with pytz.open_resource(case["input"]["birth_timezone"]) as source:
+            assert (
+                internal["timezone_rules"]["tzif_sha256"]
+                == hashlib.sha256(source.read()).hexdigest()
+            )
+        assert internal["timezone_rules"]["package_version"] == pytz.__version__
+        assert internal["timezone_rules"]["iana_version"] == pytz.OLSON_VERSION
     for body in bodies:
         runyear = body["runyear"]
         clock = runyear["birth_civil_clock"]
@@ -98,10 +112,7 @@ def test_birth_instants_chronology_and_failures_agree_across_transports(
             and runyear["ganzhi"] == expected["ganzhi"]
         )
         assert clock["method"] == "validated_birth_civil_clock"
-        if case["input"]["birth_timezone"] in REFERENCE["zones"]:
-            assert clock["timezone_rules"]["tzif_sha256"] == AUDIT.sha(
-                AUDIT.CORPUS / "tzif" / case["input"]["birth_timezone"]
-            )
+        assert same_public_value(clock["timezone_rules"], internal["timezone_rules"])
         if not project:
             assert expected["birth_instant_utc"] in body["snapshot_text"]
             assert "出生时间未做太阳钟偏移" in body["snapshot_text"]

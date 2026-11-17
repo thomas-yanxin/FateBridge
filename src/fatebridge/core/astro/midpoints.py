@@ -361,10 +361,14 @@ def _native_factors(
             birth.longitude,
             reference_house_code,
             reference_house_flags,
+            _julian_day_tt=jd_tt,
         )
         angle_definition = geographic_pole_angle_definition(birth.latitude) or (
             native_ecliptic_horizon_angle_definition(
-                julian_day_ut1=jd_ut1, latitude=birth.latitude, armc=float(angles[2])
+                julian_day_ut1=jd_ut1,
+                julian_day_tt=jd_tt,
+                latitude=birth.latitude,
+                armc=float(angles[2]),
             )
         )
         # Aries Point is the tropical equinox, including in a sidereal display.

@@ -50,6 +50,10 @@ def test_verified_quote_carries_conditions_and_keeps_semantic_scope_limited(rece
     assert report["status"] == "verified_structured_pattern_quotes"
     assert not report["free_text_semantics_validated"]
     assert not report["real_world_efficacy_validated"]
+    assert not report["original_payload_compared"]
+    original = verify_qimen_pattern_quotes(payload, [claim], trusted_payload=payload)
+    assert original["status"] == "verified_structured_pattern_quotes"
+    assert original["original_payload_compared"]
 
 
 @pytest.mark.parametrize(
@@ -83,13 +87,21 @@ def test_quote_cannot_hide_conditions_or_use_a_different_receipt(receipt, mutati
     assert report["errors"]
 
 
-def test_projected_or_modified_original_payload_is_rejected(receipt):
+def test_projected_or_modified_payload_is_rejected_against_trusted_original(receipt):
     payload, claim = receipt
     projected = {"qimen": payload["qimen"], "run_metadata": payload["run_metadata"]}
-    assert verify_qimen_pattern_quotes(projected, [claim])["status"] == "rejected"
+    assert (
+        verify_qimen_pattern_quotes(projected, [claim], trusted_payload=payload)[
+            "status"
+        ]
+        == "rejected"
+    )
     changed = deepcopy(payload)
     changed["qimen"]["assessment"]["authority_certified"] = True
-    assert verify_qimen_pattern_quotes(changed, [claim])["status"] == "rejected"
+    assert (
+        verify_qimen_pattern_quotes(changed, [claim], trusted_payload=payload)["status"]
+        == "rejected"
+    )
 
 
 def test_new_head_dependent_quote_cannot_hide_or_replace_hour_xun_binding():

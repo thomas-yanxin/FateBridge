@@ -6,12 +6,13 @@ import pytest
 
 from fatebridge.core.astro import ephemeris, runtime
 from fatebridge.core.astro.geometry import combine_longitudes
+from fatebridge.core.astro.orbits import MEAN_NODE_MODEL, ORBITAL_MODEL
 from fatebridge.core.astro.reference import PLANET_SEQUENCE
 from fatebridge.core.local_techniques.otherbu import build_otherbu_result
 
 FACES = {"planet": "Jupiter", "sign": "Aries", "house": 0}
 SKY = {"date": "2024-03-20", "time": "06:30", "zone": "UTC", "lat": 51.5, "lon": 0}
-APPROXIMATE = "fatebridge_approximate_orbital_model"
+APPROXIMATE = ORBITAL_MODEL
 
 
 @pytest.mark.skipif(
@@ -21,28 +22,23 @@ APPROXIMATE = "fatebridge_approximate_orbital_model"
     "year,month", list(product((1900, 1950, 2000, 2026, 2050, 2099), (1, 7)))
 )
 def test_pluto_fallback_is_geocentric_against_independent_moshier(year, month):
-    """Bounded 0.05-degree regression, not a full-range accuracy certificate.
-
-    Schlyter section 14 returns heliocentric coordinates and explicitly requires
-    the section 11 Earth-centred conversion. The native reference uses geometric
-    mean-equinox-of-date coordinates, matching that low-precision convention.
-    """
-    from fatebridge.core.astro.orbits import _planet_state, _sun_state
+    """Same twelve dates, stricter 60-arcsecond apparent-position control."""
+    from fatebridge.core.astro.orbits import ApproximateEphemeris
 
     with runtime.preserve_ephemeris_path():
         jd = runtime.swe.julday(year, month, 1, 12)
+        tt = jd + runtime.ephemeris_call("deltat_ex", jd, runtime.swe.FLG_MOSEPH)
         reference, flags = runtime.ephemeris_call(
-            "calc_ut",
-            jd,
+            "calc",
+            tt,
             runtime.swe.PLUTO,
-            runtime.swe.FLG_MOSEPH | runtime.swe.FLG_TRUEPOS | runtime.swe.FLG_NONUT,
+            runtime.swe.FLG_MOSEPH,
         )
     assert flags & runtime.swe.FLG_MOSEPH
-    d = jd - 2451543.5
-    actual = _planet_state("Pluto", d, _sun_state(d))
+    actual = ApproximateEphemeris(jd, tt).state("Pluto")
     longitude_error = (actual["longitude"] - reference[0] + 180) % 360 - 180
-    assert abs(longitude_error) < 0.05
-    assert abs(actual["latitude"] - reference[1]) < 0.05
+    assert abs(longitude_error) <= 60 / 3600
+    assert abs(actual["latitude"] - reference[1]) <= 60 / 3600
 
 
 @pytest.mark.parametrize(
@@ -73,7 +69,7 @@ def test_single_failure_preserves_every_other_native_longitude(
         assert actual["South Node"] == expected["South Node"]
     profile = partial["chart"]["params"]["chart_profile"]
     assert profile["engine_precision"] == "mixed_precision_runtime_model"
-    assert profile["engine_backend"] == "swisseph_api_with_approximate_orbits"
+    assert profile["engine_backend"] == "swisseph_api_with_analytic_fallback"
     # A failed analytical node changes computation quality, but does not mix
     # the physical planets' vector ephemerides. Keep both claims testable.
     expected_model = (
@@ -84,7 +80,9 @@ def test_single_failure_preserves_every_other_native_longitude(
     assert profile["ephemeris_model"] == expected_model
     assert profile["orbital_fallback"]["approximate_planets"] == [failed_planet]
     models = profile["planetary_models"]
-    assert models[failed_planet] == APPROXIMATE
+    assert models[failed_planet] == (
+        MEAN_NODE_MODEL if failed_planet == "North Node" else APPROXIMATE
+    )
     assert all(models[name] != APPROXIMATE for name in models if name != failed_planet)
     assert profile["orbital_fallback"]["note_zh"] in partial["snapshot_text"]
     if zodiacal:
@@ -133,9 +131,9 @@ def test_all_failures_return_explicit_per_body_approximation_without_claiming_na
     result = build_otherbu_result(**FACES, **SKY, hsys=0)
     profile = result["chart"]["params"]["chart_profile"]
     assert profile["engine_precision"] == "approximate_orbital_model"
-    assert profile["engine_backend"] == APPROXIMATE
-    assert profile["ephemeris_model"] == "none"
-    assert set(profile["planetary_models"].values()) == {APPROXIMATE}
+    assert profile["engine_backend"] == "fatebridge_analytic_ephemerides"
+    assert profile["ephemeris_model"] == APPROXIMATE
+    assert set(profile["planetary_models"].values()) == {APPROXIMATE, MEAN_NODE_MODEL}
     assert profile["orbital_fallback"]["approximate_planets"] == list(PLANET_SEQUENCE)
     assert len(result["chart"]["chart"]["objects"]) == 13
 
@@ -144,11 +142,9 @@ def test_no_runtime_uses_the_same_declared_approximation(monkeypatch):
     monkeypatch.setattr(runtime, "swe", None)
     result = build_otherbu_result(**FACES, **SKY, hsys=0)
     profile = result["chart"]["params"]["chart_profile"]
-    assert set(profile["planetary_models"].values()) == {APPROXIMATE}
-    assert (
-        profile["orbital_fallback"]["time_argument"]
-        == "UT1_day_number_ignoring_TT_difference"
-    )
+    assert set(profile["planetary_models"].values()) == {APPROXIMATE, MEAN_NODE_MODEL}
+    assert profile["orbital_fallback"]["time_argument"] == "TT"
+    assert profile["orbital_fallback"]["tt_source"] == "chart_tt"
 
 
 def test_fully_native_sky_has_no_orbital_fallback_claim():

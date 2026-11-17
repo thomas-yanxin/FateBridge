@@ -3,16 +3,12 @@
 import json
 from pathlib import Path
 
+from tests.support.reference_data import resolve
+
 FOLDER = Path(__file__).parents[1] / "fixtures/meihua_households_v1"
 PROFILE = json.loads((FOLDER / "profile.json").read_bytes())
 CASES = json.loads((FOLDER / "cases768.json").read_bytes())
 EXPECTED = {(r["topic"], r["code"], r["line"]): r for r in CASES}
-
-
-def resolve(value, path):
-    for key in path.split("."):
-        value = value[int(key)] if isinstance(value, list) else value[key]
-    return value
 
 
 def assert_candidate_chapter_summary(row):

@@ -19,9 +19,16 @@ def apply_quote_errata(
     if hashlib.sha256(freeze_path.read_bytes()).hexdigest() != FREEZE_SHA256:
         raise ValueError("Frozen same-edition quotation manifest changed")
     freeze = json.loads(freeze_path.read_text(encoding="utf-8"))
+    # The fixture archive shares this one byte-identical scan with v21.
+    shared_page = (
+        root.resolve()
+        / "tests/data/shared_sources/fixtures/liuyao_penalty_precedence_v21/pdf-98.png"
+    )
     for name, expected in freeze["files_sha256"].items():
         path = (reference / name).resolve()
-        if not path.is_relative_to(reference.resolve()):
+        if not path.is_relative_to(reference.resolve()) and not (
+            name == "scans/pdf-098.png" and path == shared_page
+        ):
             raise ValueError("Quotation material escaped its fixture directory")
         if hashlib.sha256(path.read_bytes()).hexdigest() != expected:
             raise ValueError(f"Frozen same-edition quotation material changed: {name}")

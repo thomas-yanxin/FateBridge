@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 
 from fatebridge.application.examples import suggested_fields
+from fatebridge.core.public_output import same_public_value
 from tests.bazi.test_bazi_source_comparison_transports import (
     SPEC,
     business,
@@ -57,7 +58,9 @@ def test_all_six_revised_records_and_provenance_on_all_surfaces(
         record = next(
             r for r in comp["records"] if r["reference_id"] == patch["reference_id"]
         )
-        assert {k: v for k, v in record.items() if k != "comparison"} == patch
+        assert same_public_value(
+            {k: v for k, v in record.items() if k != "comparison"}, patch
+        )
         assert record["comparison"] == "unadjudicated"
         assert (
             record["input_reading_evidence"]["source_strength_label_assigned"] is False

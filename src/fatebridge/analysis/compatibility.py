@@ -13,9 +13,13 @@ from typing import Any, Dict, List
 from ..core.method_contracts import COMPATIBILITY_INDEX
 from ..core.rules import BaZiRules
 from ..utils.data import (
+    BRANCH_CLASH_PAIRS,
+    BRANCH_HARM_PAIRS,
     BRANCH_HIDDEN_STEMS,
+    BRANCH_PUNISHMENT_GROUPS,
     DESTRUCTION_CYCLE,
     GENERATION_CYCLE,
+    STEM_ELEMENTS,
     Element,
     TenGod,
     get_ten_god,
@@ -125,14 +129,14 @@ class AdvancedCompatibility:
 
         for b1 in branches1:
             for b2 in branches2:
-                for clash_pair in BaZiRules.SIX_CLASH:
+                for clash_pair in BRANCH_CLASH_PAIRS:
                     if (b1, b2) in [clash_pair, clash_pair[::-1]]:
                         traditional_score -= 2
                         details.append(f"{b1}与{b2}六冲")
 
         for b1 in branches1:
             for b2 in branches2:
-                for harm_pair in BaZiRules.SIX_HARM:
+                for harm_pair in BRANCH_HARM_PAIRS:
                     if (b1, b2) in [harm_pair, harm_pair[::-1]]:
                         traditional_score -= 2
                         details.append(f"{b1}与{b2}六害")
@@ -142,7 +146,7 @@ class AdvancedCompatibility:
         # 避免某一方自身已具三刑时被重复记入合盘惩罚分。
         branches1_set = set(branches1)
         branches2_set = set(branches2)
-        for punishment_set in BaZiRules.TRIPLE_PUNISHMENT:
+        for punishment_set in BRANCH_PUNISHMENT_GROUPS:
             if len(punishment_set) != 3:
                 continue
             required = set(punishment_set)
@@ -188,10 +192,13 @@ class AdvancedCompatibility:
             day_master = natal.get("day_master", {})
             day_master = day_master if isinstance(day_master, dict) else {}
             assessment = day_master.get("assessment", {}) or {}
-            profile = natal.get("structure_profile", {}) or {}
+            source_profile = natal.get("structure_profile", {}) or {}
+            profile = source_profile.get("engineering_reference", {})
             input_methods[label] = {
                 "strength_method_id": assessment.get("method_id", "unversioned"),
-                "strength": day_master.get("strength"),
+                "strength": day_master.get("engineering_index", {}).get(
+                    "strength_level"
+                ),
                 "strength_status": assessment.get("status", "not_provided"),
                 "useful_resolution_policy": profile.get(
                     "resolution_policy", "unversioned"
@@ -199,12 +206,22 @@ class AdvancedCompatibility:
                 "useful_assessment_status": profile.get(
                     "assessment_status", "not_provided"
                 ),
+                "strength_basis": "uncalibrated_strength_policy_index",
+                "preference_basis": "conditional_engineering_preference",
+                "source_force_status": day_master.get("classical_adjudication", {}).get(
+                    "status", "not_provided"
+                ),
+                "source_preference_status": source_profile.get(
+                    "assessment_status", "not_provided"
+                ),
             }
         result["scoring"] = {
             "method_id": COMPATIBILITY_METHOD,
             "score_kind": "uncalibrated_rule_index",
-            "evidence_policy": "explicit_preference_and_unresolved_events_v1",
+            "evidence_policy": "explicit_preference_and_unresolved_events_v2",
             "dependency_policy": "shared_natal_inputs_not_independent_evidence_v1",
+            "source_adjudication_used": False,
+            "preference_basis": "conditional_engineering_preference",
             "dimension_dependencies": {
                 "element_balance": [
                     "both_natal_pillars",
@@ -217,7 +234,7 @@ class AdvancedCompatibility:
                     "both_element_distribution",
                     "both_structure_profile",
                 ],
-                "ten_gods_relationship": ["both_natal_pillars"],
+                "ten_gods_relationship": ["both_natal_pillars", "both_preferences"],
                 "pattern_synergy": ["both_natal_pillars", "both_structure_profile"],
                 "traditional_analysis": ["both_natal_pillars"],
             },
@@ -331,8 +348,12 @@ class AdvancedCompatibility:
         person2_elements = analysis2.get("element_distribution", {})
         person1_day_master = analysis1.get("day_master", {}) or {}
         person2_day_master = analysis2.get("day_master", {}) or {}
-        person1_strength = person1_day_master.get("strength")
-        person2_strength = person2_day_master.get("strength")
+        person1_strength = person1_day_master.get("engineering_index", {}).get(
+            "strength_level"
+        )
+        person2_strength = person2_day_master.get("engineering_index", {}).get(
+            "strength_level"
+        )
         person1_element = person1_day_master.get("element", "")
         person2_element = person2_day_master.get("element", "")
 
@@ -356,14 +377,14 @@ class AdvancedCompatibility:
 
             # 被克不一定扣分：克的吉凶取决于格局取用，而非五行关系本身。
             # 与 BaZiRules._classify_combined_event 的口径一致，按双方喜用判定。
-            profile1 = analysis1.get("structure_profile", {}) or {}
-            profile2 = analysis2.get("structure_profile", {}) or {}
-            person1_useful = set(
-                profile1.get("useful_elements", analysis1.get("favorable_elements", []))
+            profile1 = (analysis1.get("structure_profile", {}) or {}).get(
+                "engineering_reference", {}
             )
-            person2_useful = set(
-                profile2.get("useful_elements", analysis2.get("favorable_elements", []))
+            profile2 = (analysis2.get("structure_profile", {}) or {}).get(
+                "engineering_reference", {}
             )
+            person1_useful = set(profile1.get("useful_elements", []))
+            person2_useful = set(profile2.get("useful_elements", []))
 
             def _apply_day_master_control(
                 controller_label: str,
@@ -375,9 +396,8 @@ class AdvancedCompatibility:
             ) -> None:
                 """controller_element 克 controlled_element 时的条件化打分。
 
-                有情之克的两种来源：
-                - 被克方格局正需此制（控方五行属被克方喜用，如羊刃驾杀需官杀）；
-                - 被克方之气正是控方喜用（财为我克），克之为取用。
+                工程参考集合两种计分条件：被克方参考元素含控制元素，
+                或控制方参考元素含被克元素；不据此裁定原典有情之克。
                 扣分须命中明确回避项；条件项、中性与未知分别保留。
                 """
                 needed_by_controlled = controller_element in controlled_useful
@@ -409,24 +429,24 @@ class AdvancedCompatibility:
                 if needed_by_controlled and wealth_for_controller:
                     analysis["details"].append(
                         f"{controller_element}克{controlled_element}："
-                        f"{controlled_label}格局正需此制，且{controlled_element}又是"
-                        f"{controller_label}的喜用，属双向有情之克"
+                        f"{controlled_label}工程参考含控制元素，且{controlled_element}又在"
+                        f"{controller_label}工程参考中，命中双向集合条件"
                     )
                     analysis["score"] += 10
                     analysis["balance_type"] = "相克有情"
                 elif needed_by_controlled:
                     analysis["details"].append(
                         f"{controller_element}克{controlled_element}："
-                        f"{controlled_label}格局正需{controller_element}之制（如官杀为用），"
-                        f"被克反成助力"
+                        f"{controlled_label}工程参考包含{controller_element}，"
+                        f"按既定控制项计分"
                     )
                     analysis["score"] += 5
                     analysis["balance_type"] = "相克有情"
                 elif wealth_for_controller:
                     analysis["details"].append(
                         f"{controller_element}克{controlled_element}："
-                        f"{controlled_element}是{controller_label}的喜用，"
-                        f"{controller_label}克之为有用之财"
+                        f"{controlled_element}在{controller_label}工程参考集合中，"
+                        f"按既定控制项计分"
                     )
                     analysis["score"] += 5
                     analysis["balance_type"] = "相克有情"
@@ -448,7 +468,7 @@ class AdvancedCompatibility:
 
             if person1_element == person2_element:
                 analysis["details"].append(
-                    f"两人日主同为{person1_element}，更容易理解彼此的表达方式"
+                    f"两人日主元素同为{person1_element}，按工程同类项计分"
                 )
                 analysis["score"] += 12
                 analysis["balance_type"] = "同类互助"
@@ -458,7 +478,7 @@ class AdvancedCompatibility:
                 and GENERATION_CYCLE[person1_element_enum] == person2_element_enum
             ):
                 analysis["details"].append(
-                    f"{person1_element}生{person2_element}，第一人更容易助推第二人的状态"
+                    f"{person1_element}生{person2_element}，按工程相生项计分"
                 )
                 analysis["score"] += 18
                 analysis["balance_type"] = "相生互助"
@@ -471,7 +491,7 @@ class AdvancedCompatibility:
                 and GENERATION_CYCLE[person2_element_enum] == person1_element_enum
             ):
                 analysis["details"].append(
-                    f"{person2_element}生{person1_element}，第二人更容易助推第一人的状态"
+                    f"{person2_element}生{person1_element}，按工程相生项计分"
                 )
                 analysis["score"] += 18
                 analysis["balance_type"] = "相生互助"
@@ -514,14 +534,16 @@ class AdvancedCompatibility:
         if (person1_strength == "强" and person2_strength == "弱") or (
             person1_strength == "弱" and person2_strength == "强"
         ):
-            analysis["details"].append("两人强弱互补，关系中更容易形成制衡")
+            analysis["details"].append(
+                "两人工程政策档一强一弱，按既定互补项计分；未裁定原典力量或关系效果"
+            )
             analysis["score"] += 12
         elif person1_strength == person2_strength == "中和":
-            analysis["details"].append("两人都较为中和，基础相处面更稳定")
+            analysis["details"].append("两人工程政策档均为中和，按既定同档项计分")
             analysis["score"] += 8
         elif person1_strength == person2_strength and person1_strength in {"强", "弱"}:
             analysis["details"].append(
-                f"两人都偏{person1_strength}，需要额外关注平衡问题"
+                f"两人工程政策档同为{person1_strength}，按既定同档规则计分"
             )
             analysis["score"] -= 4
 
@@ -570,14 +592,14 @@ class AdvancedCompatibility:
             "risk_reasons": [],
         }
 
-        profile1 = analysis1.get("structure_profile", {}) or {}
-        profile2 = analysis2.get("structure_profile", {}) or {}
-        person1_favorable_elements = set(
-            profile1.get("useful_elements", analysis1.get("favorable_elements", []))
+        profile1 = (analysis1.get("structure_profile", {}) or {}).get(
+            "engineering_reference", {}
         )
-        person2_favorable_elements = set(
-            profile2.get("useful_elements", analysis2.get("favorable_elements", []))
+        profile2 = (analysis2.get("structure_profile", {}) or {}).get(
+            "engineering_reference", {}
         )
+        person1_favorable_elements = set(profile1.get("useful_elements", []))
+        person2_favorable_elements = set(profile2.get("useful_elements", []))
         person1_avoid_elements = set(profile1.get("avoid_elements", []))
         person2_avoid_elements = set(profile2.get("avoid_elements", []))
         person1_distribution = analysis1.get("element_distribution", {})
@@ -593,15 +615,13 @@ class AdvancedCompatibility:
                 share = source_distribution.get(element, 0.0)
                 if share >= 24:
                     delta = 10
-                    description = f"{source_label}{element}占比高，能明显补到{target_label}的可用之气"
+                    description = f"{source_label}{element}结构占比达到24%，命中{target_label}工程参考元素集合"
                 elif share >= 16:
                     delta = 7
-                    description = (
-                        f"{source_label}{element}较旺，对{target_label}有稳定补益"
-                    )
+                    description = f"{source_label}{element}结构占比达到16%，命中{target_label}工程参考元素集合"
                 elif share >= 10:
                     delta = 4
-                    description = f"{source_label}{element}具备一定承接力，对{target_label}略有帮助"
+                    description = f"{source_label}{element}结构占比达到10%，命中{target_label}工程参考元素集合"
                 else:
                     continue
 
@@ -630,7 +650,7 @@ class AdvancedCompatibility:
         )
         if common_favorable_elements:
             delta = min(12, len(common_favorable_elements) * 4)
-            common_text = f"共同喜用五行：{', '.join(sorted(common_favorable_elements))}，目标更容易同频"
+            common_text = f"工程共同参考五行：{', '.join(sorted(common_favorable_elements))}，按既定交集规则计入指数；原典喜忌与现实关系另审"
             analysis["score"] += delta
             analysis["details"].append(common_text)
             analysis["score_basis"].append(f"{common_text}(+{delta})")
@@ -643,11 +663,11 @@ class AdvancedCompatibility:
             analysis["useful_ten_gods_support"].append(
                 {
                     "common_ten_gods": sorted(common_useful_ten_gods),
-                    "description": "双方在可用十神上存在交集，格局取向更容易对齐。",
+                    "description": "双方工程参考十神集合存在交集，按既定规则计入指数。",
                 }
             )
             analysis["score_basis"].append(
-                f"共同可用十神：{', '.join(sorted(common_useful_ten_gods))}(+{delta})"
+                f"工程共同参考十神：{', '.join(sorted(common_useful_ten_gods))}(+{delta})"
             )
             analysis["score"] += delta
 
@@ -669,7 +689,7 @@ class AdvancedCompatibility:
         if not person1_favorable_elements or not person2_favorable_elements:
             analysis["assessment_status"] = "partial"
             analysis["details"].append(
-                "至少一方尚无已选喜用；未判定部分不视为无冲突或互助"
+                "至少一方工程参考尚无已选方向；缺项不视为无冲突或互助，原典喜忌另列状态"
             )
 
         if not analysis["supportive_patterns"]:
@@ -717,6 +737,10 @@ class AdvancedCompatibility:
         """分析十神关系，重点看对方是否提供本命格局所需十神。"""
         analysis: Dict[str, Any] = {
             "score": 65.0,
+            "assessment_status": "calculated",
+            "score_kind": "uncalibrated_rule_index",
+            "source_adjudication_used": False,
+            "preference_evidence": [],
             "details": [],
             "relationship_dynamics": [],
             "compatibility_aspects": [],
@@ -741,6 +765,7 @@ class AdvancedCompatibility:
             day_master2 = day_master2_dict if day_master2_dict else ""
 
         if not day_master1 or not day_master2:
+            analysis["assessment_status"] = "partial"
             analysis["details"].append("无法获取日主信息，无法分析十神关系")
             return analysis
 
@@ -751,10 +776,18 @@ class AdvancedCompatibility:
             analysis2, day_master1, "第二人对第一人"
         )
 
-        profile1 = analysis1.get("structure_profile", {}) or {}
-        profile2 = analysis2.get("structure_profile", {}) or {}
+        profile1 = (analysis1.get("structure_profile", {}) or {}).get(
+            "engineering_reference", {}
+        )
+        profile2 = (analysis2.get("structure_profile", {}) or {}).get(
+            "engineering_reference", {}
+        )
         useful_ten_gods1 = set(profile1.get("useful_ten_gods", []))
         useful_ten_gods2 = set(profile2.get("useful_ten_gods", []))
+        targets = {
+            "第一人": (analysis1, profile1),
+            "第二人": (analysis2, profile2),
+        }
 
         relationship_bias = {
             RelationshipType.MARRIAGE: {"正财": 2, "偏财": 1, "正官": 2, "七杀": 1},
@@ -777,16 +810,51 @@ class AdvancedCompatibility:
             cross_gods: Dict[str, Any],
             target_useful_ten_gods: set[str],
         ) -> None:
+            target, profile = targets[target_label]
+            ten_god_elements = {
+                row["ten_god"]: STEM_ELEMENTS[row["stem"]][0].value
+                for row in cross_gods["source_breakdown"]
+            }
             for ten_god, raw_count in cross_gods.get("ten_gods_count", {}).items():
                 count = float(raw_count)
                 if count <= 0:
                     continue
+                element = ten_god_elements[ten_god]
+                state = (
+                    "useful"
+                    if ten_god in target_useful_ten_gods
+                    else next(
+                        (
+                            state
+                            for state in ("avoid", "conditional", "neutral")
+                            if element in profile.get(state + "_elements", [])
+                        ),
+                        "unknown",
+                    )
+                )
+                analysis["preference_evidence"].append(
+                    {
+                        "provider": provider_label,
+                        "target": target_label,
+                        "ten_god": ten_god,
+                        "element": element,
+                        "engineering_state": state,
+                        "source_force_status": target.get("structure_profile", {})
+                        .get("classical_adjudication", {})
+                        .get("status", "not_supplied"),
+                        "source_preference_status": target.get(
+                            "structure_profile", {}
+                        ).get("assessment_status", "not_supplied"),
+                    }
+                )
+                if state in {"conditional", "unknown"}:
+                    analysis["assessment_status"] = "partial"
 
                 if ten_god in target_useful_ten_gods:
                     delta = int(min(12, round(count * 5))) + relationship_bias[
                         relationship_type
                     ].get(ten_god, 0)
-                    description = f"{provider_label}命局提供{ten_god}，正好契合{target_label}当前格局所需"
+                    description = f"{provider_label}出现{ten_god}，与{target_label}工程参考十神集合相交"
                     analysis["score"] += delta
                     analysis["details"].append(description)
                     analysis["score_basis"].append(f"{description}(+{delta})")
@@ -870,7 +938,7 @@ class AdvancedCompatibility:
         common_useful_ten_gods = useful_ten_gods1 & useful_ten_gods2
         if common_useful_ten_gods:
             description = (
-                f"双方共同认可能用的十神为：{', '.join(sorted(common_useful_ten_gods))}"
+                f"双方工程参考十神交集为：{', '.join(sorted(common_useful_ten_gods))}"
             )
             delta = min(10, len(common_useful_ten_gods) * 3)
             analysis["relationship_dynamics"].append(description)
@@ -882,7 +950,11 @@ class AdvancedCompatibility:
             analysis["details"].append(
                 "跨人十神没有形成特别鲜明的格局承接，更多看五行与合盘事件"
             )
-        if not analysis["risk_reasons"]:
+        if analysis["assessment_status"] == "partial":
+            analysis["details"].append(
+                "实际十神输入涉及条件或缺失的工程方向；既定加减项保留为工程索引，不据此裁定原典取用或现实关系风险"
+            )
+        elif not analysis["risk_reasons"]:
             analysis["risk_reasons"].append("未见明显的十神级高风险冲突")
 
         analysis["score"] = min(100.0, max(0.0, analysis["score"]))
@@ -984,8 +1056,18 @@ class AdvancedCompatibility:
             "risk_patterns": [],
         }
 
-        profile1 = analysis1.get("structure_profile", {}) or {}
-        profile2 = analysis2.get("structure_profile", {}) or {}
+        source1 = analysis1.get("structure_profile", {}) or {}
+        source2 = analysis2.get("structure_profile", {}) or {}
+        profile1 = {
+            "dominant_structure": source1.get("dominant_structure", {}),
+            "recognized_structures": source1.get("recognized_structures", []),
+            **source1.get("engineering_reference", {}),
+        }
+        profile2 = {
+            "dominant_structure": source2.get("dominant_structure", {}),
+            "recognized_structures": source2.get("recognized_structures", []),
+            **source2.get("engineering_reference", {}),
+        }
         pillars1 = {
             key: (value["stem"], value["branch"])
             for key, value in analysis1.get("four_pillars", {}).items()
@@ -1140,14 +1222,22 @@ class AdvancedCompatibility:
                 f"规则索引{overall_score:g}；存在未裁定分项，须连同取用条件与实际互动阅读"
             )
         elif overall_score >= 82:
-            result["summary"] = "非常匹配，各方面都很协调，是理想的组合"
+            result["summary"] = (
+                "工程规则索引位于82分以上档；原典裁定与现实关系效果未由该指数验证"
+            )
         elif overall_score >= 70:
-            result["summary"] = "比较匹配，大部分方面都很好，小部分需要磨合"
+            result["summary"] = (
+                "工程规则索引位于70–82分档；原典裁定与现实关系效果未由该指数验证"
+            )
         elif overall_score >= 58:
-            result["summary"] = "一般匹配，有优势也有挑战，需要相互理解"
+            result["summary"] = (
+                "工程规则索引位于58–70分档；原典裁定与现实关系效果未由该指数验证"
+            )
         elif overall_score >= 45:
-            result["summary"] = "需要努力，存在一些挑战，但通过努力可以改善"
+            result["summary"] = (
+                "工程规则索引位于45–58分档；不能据此判断关系结果或所需行动"
+            )
         else:
-            result["summary"] = "匹配度较低，需要慎重考虑或寻求专业指导"
+            result["summary"] = "工程规则索引低于45分；不能据此决定是否建立或维持关系"
 
         return result

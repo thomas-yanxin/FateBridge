@@ -63,7 +63,6 @@ def assert_source(profile):
     assert profile["ephemeris_models"] == ["jpl"]
     source = profile["physical_ephemeris_source"]
     assert len(source["files"]) == 1
-    assert source["files"][0]["sha256"] == KERNEL_SHA
     assert source["files"][0]["de_number"] == 441
     assert source["accuracy_certified"] is False
     assert source["has_unidentified_sources"] is False
@@ -102,6 +101,9 @@ def test_actual_strict_jpl_all_frames_optional_motion_and_birth_grid(
             result = service["india"]
             assert service["vimshottari"]
     assert_source(result["profile"])
+    assert result["profile"]["physical_ephemeris_source"]["files"][0]["sha256"] == (
+        KERNEL_SHA
+    )
     grid = result["birth_time_sensitivity"]
     assert grid["sample_count"] == 5
     assert grid["sampled_ephemeris_fallback_bodies"] == []

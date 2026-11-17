@@ -133,7 +133,15 @@ def test_real_sunrise_one_second_later_is_first_hour_of_current_day(date, ruler)
     jd = ephemeris_time(
         datetime.fromisoformat(date).replace(tzinfo=timezone.utc)
     ).jd_ut1
-    rise = classical._sun_event(jd, 0, 51.5, True)
+    from fatebridge.core.astro.solar_events import next_solar_event
+
+    rise = next_solar_event(
+        jd,
+        longitude=0,
+        latitude=51.5,
+        rising=True,
+        definition="apparent_topocentric_center",
+    ).julian_day_ut1
     result = classical._planetary_hours(rise + 1 / 86400, 0, 51.5, "UTC")
     assert result["hour_number"] == 1
     assert result["is_day"] is True
@@ -157,14 +165,16 @@ def test_hour_cycle_matches_bounded_dio_primary_text(ruler, next_day):
 def test_unequal_hour_internal_boundaries_are_half_open(monkeypatch, is_day, hour):
     dawn = _julian_day(datetime(2026, 4, 15, 6, tzinfo=timezone.utc))
     # Synthetic consecutive events isolate the definition of a temporal hour
-    # from rise_trans's own root tolerance, including one floating-point step.
+    # from the physical solar root solver, including one floating-point step.
     dusk = dawn + 0.6
+    from tests.support.solar_events import fixed_crossings
+
     rises = (dawn, dawn + 1)
-    sets = (dawn - 0.4, dusk) if is_day else (dusk, dusk + 1)
+    sets = (dawn - 0.4, dusk, dusk + 1)
     monkeypatch.setattr(
         classical,
-        "_bracket_sun_event",
-        lambda *args, rising: rises if rising else sets,
+        "solar_crossings_in_window",
+        fixed_crossings(rises, sets),
     )
     start, end = (dawn, dusk) if is_day else (dusk, dawn + 1)
     boundary = start + (end - start) * hour / 12
@@ -187,10 +197,12 @@ def test_planetary_day_weekday_uses_civil_utc_not_ut1_calendar(monkeypatch):
     dawn = ephemeris_time(dawn_utc).jd_ut1
     assert datetime_from_ut1(dawn).weekday() == 0
     assert swe.revjul(dawn)[2] == 4
+    from tests.support.solar_events import fixed_crossings
+
     monkeypatch.setattr(
         classical,
-        "_bracket_sun_event",
-        lambda *args, rising: (dawn, dawn + 1) if rising else (dawn - 0.5, dawn + 0.5),
+        "solar_crossings_in_window",
+        fixed_crossings((dawn, dawn + 1), (dawn - 0.5, dawn + 0.5)),
     )
     result = classical._planetary_hours(dawn + 1 / 86400, 0, 0, "UTC")
     assert result["day_ruler"] == "Moon"

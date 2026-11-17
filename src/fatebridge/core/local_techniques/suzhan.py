@@ -31,9 +31,9 @@ from .snapshot import join_lines, render_snapshot_text
 def _build_suzhan_snapshot_text(
     input_normalized: Dict[str, Any], response: Dict[str, Any]
 ) -> str:
-    chart = response.get("chart", {}) if isinstance(response, dict) else {}
-    houses = chart.get("houses") if isinstance(chart, dict) else []
-    objects = chart.get("objects") if isinstance(chart, dict) else []
+    chart = response.get("chart") or {}
+    houses = chart.get("houses") or []
+    objects = chart.get("objects") or []
     params = response.get("params") or {}
     longitude = params.get("birthLongitude")
     latitude = params.get("birthLatitude")
@@ -45,16 +45,6 @@ def _build_suzhan_snapshot_text(
         longitude = input_normalized.get("lon", "未提供")
     if latitude is None:
         latitude = input_normalized.get("lat", "未提供")
-    missing_coordinates = any(
-        input_normalized.get(gps_key) is None
-        and input_normalized.get(legacy_key) in (None, "")
-        for gps_key, legacy_key in (("gpsLon", "lon"), ("gpsLat", "lat"))
-    )
-    coordinate_note = (
-        "未提供的经纬度分量沿用默认坐标；宫位按这些参数计算，不能视为已确认地点。"
-        if missing_coordinates
-        else ""
-    )
     astronomy = response.get("astronomy") or {}
     epoch_text = (
         join_lines(
@@ -92,17 +82,19 @@ def _build_suzhan_snapshot_text(
         and validation.get("authority_certified") is False
         else ""
     )
+    house_groups = [
+        (
+            f"宫位：{house['id']}",
+            [item for item in objects if item.get("house") == house["id"]],
+        )
+        for house in houses
+    ]
+    unassigned = [item for item in objects if item.get("house") is None]
+    if unassigned:
+        house_groups.append(("参考宫位未定；以下星曜未分配落宫", unassigned))
     house_lines: List[str] = []
-    for house in houses or []:
-        if not isinstance(house, dict):
-            continue
-        house_id = house.get("id", "House")
-        house_lines.append(f"宫位：{house_id}")
-        in_house = [
-            item
-            for item in objects or []
-            if isinstance(item, dict) and item.get("house") == house_id
-        ]
+    for heading, in_house in house_groups:
+        house_lines.append(heading)
         if not in_house:
             house_lines.append("星曜：无")
             house_lines.append("")
@@ -141,11 +133,16 @@ def _build_suzhan_snapshot_text(
                         f"日期：{input_normalized['date']} {input_normalized['time']}",
                         f"时区：{input_normalized['zone']}",
                         f"经纬度：{longitude} {latitude}",
-                        coordinate_note,
                         prediction_note,
                         f"外盘：{input_normalized.get('szchart', 0)}",
                         f"盘型：{input_normalized.get('szshape', 0)}",
-                        f"宫制：{((response.get('params') or {}).get('houseSystemResolved') or 'equal')}",
+                        f"宫制：{((response.get('params') or {}).get('houseSystemResolved') or '未提供')}",
+                        ((params.get("angleDefinition") or {}).get("note_zh") or ""),
+                        (
+                            (params.get("housePositionProjection") or {}).get("note_zh")
+                            or ""
+                        ),
+                        params.get("houseGeometryNote") or "",
                         f"黄道：{((response.get('params') or {}).get('zodiacLabelZh') or (response.get('params') or {}).get('zodiacMode') or 'tropical')}",
                     ]
                 ),
@@ -172,6 +169,16 @@ def _build_suzhan_snapshot_text(
                 "历日二十七宿",
                 (response.get("sukuyo") or {}).get("reading_text")
                 or str(response.get("sukuyo", {})),
+            ),
+            *(
+                [
+                    (
+                        "星图来源与适用范围",
+                        join_lines(validation["chart_source"]["limitations"]),
+                    )
+                ]
+                if "chart_source" in validation
+                else []
             ),
         ]
     )
@@ -204,6 +211,13 @@ def build_suzhan_result(
 ) -> Dict[str, Any]:
     if time is not None and not time.strip():
         raise ValueError("钟时须为已知时间；未知请省略或用null，空字符串不能代替未知。")
+    if time is not None and (
+        (gps_lat is None and (lat is None or not str(lat).strip()))
+        or (gps_lon is None and (lon is None or not str(lon).strip()))
+    ):
+        raise ValueError(
+            "已知钟时的宿占星图须明确完整经纬度；请提供lat/lon或gps_lat/gps_lon，不能使用默认地点。"
+        )
     if mansion_method not in {"equatorial_research28", "legacy_equal28"}:
         raise ValueError("mansion_method仅支持equatorial_research28或legacy_equal28")
     normalized_szchart = 1 if _normalize_mode(szchart, default=0) else 0
@@ -382,6 +396,19 @@ def build_suzhan_result(
         "real_world_prediction": "not_established",
         "authority_certified": False,
     }
+    if "validation" in response:
+        validation["chart_source"] = response["validation"]
+    if (
+        response["params"].get("houseGeometryStatus")
+        == "unavailable_selected_reference"
+    ):
+        validation["calculation_layers"] = {
+            "calendar": response["sukuyo"]["calendar"]["status"],
+            "chart": "computed",
+            "astronomy": "computed" if astronomy is not None else "not_computed",
+            "house_geometry": "unavailable_selected_reference",
+            "planet_positions": "computed",
+        }
     snapshot_text = _build_suzhan_snapshot_text(
         input_normalized,
         {**response, "astronomy": astronomy, "validation": validation},
@@ -393,7 +420,10 @@ def build_suzhan_result(
         "chart": chart,
         "sukuyo": response["sukuyo"],
         "astronomy": astronomy,
-        "rulesets": rulesets(calendar_profile, calendar_basis),
+        "rulesets": {
+            **rulesets(calendar_profile, calendar_basis),
+            **({"chart": response["rulesets"]} if "rulesets" in response else {}),
+        },
         "validation": validation,
         "snapshot_text": snapshot_text,
         "summary": f"历日宿{response['sukuyo']['day_mansion'] or '未定（见历法档案候选）'}；已生成星图。"
@@ -403,5 +433,11 @@ def build_suzhan_result(
             else (
                 "未计算天文宿位。" if not include_su28 else "旧二十八等分标签仅为示意。"
             )
+        )
+        + (
+            "所选参考宫位不可用，星体数据已保留。"
+            if response["params"].get("houseGeometryStatus")
+            == "unavailable_selected_reference"
+            else ""
         ),
     }

@@ -25,6 +25,29 @@ REFERENCE = json.loads((FIXTURES / "western-fixed-stars-erfa.json").read_text())
 PROTOCOL = json.loads((FIXTURES / "western-fixed-star-protocol.json").read_text())
 
 
+def test_returned_nature_labels_cannot_change_later_results():
+    positions = {
+        "Algol": {
+            "longitude": 0.0,
+            "latitude": 0.0,
+            "source_url": "urn:fatebridge:test:label-ownership",
+            "identifier": "synthetic-label-probe",
+        }
+    }
+    points = {"probe": 0.0}
+    original = FIXED_STARS["Algol"]["nature"].copy()
+    result = fixed_stars.conjunction_hits(points, positions, FIXED_STARS)
+    try:
+        result[0]["nature"].clear()
+        assert FIXED_STARS["Algol"]["nature"] == original
+        assert (
+            fixed_stars.conjunction_hits(points, positions, FIXED_STARS)[0]["nature"]
+            == original
+        )
+    finally:
+        FIXED_STARS["Algol"]["nature"][:] = original
+
+
 def test_reference_inputs_have_not_been_replaced_with_runtime_answers():
     assert (
         hashlib.sha256((fixed_stars.DATA / "sources.json").read_bytes()).hexdigest()

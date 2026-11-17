@@ -14,7 +14,6 @@ from scripts.jyotish.audit_jyotish_santhanam_drishti import (
     build_report,
     commentary_values,
     given_benefic_drik_readings,
-    ordinary,
     speculum_rows,
     verse_values,
 )

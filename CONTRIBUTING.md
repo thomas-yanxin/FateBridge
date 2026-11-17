@@ -39,11 +39,9 @@ uv run --locked --extra dev fatebridge doctor
 
 ## 修改约束
 
-- 工具定义位于 `services/catalog/`，由 `services/tool_catalog.py` 有序装配为唯一 `CATALOG`；请求模型位于 `core/requests/`。领域逻辑放在 `core` / `analysis` / `services`，不要在 transport 内复制算法。
-- 输入归一化、星历共享状态、快照导出复用现有公共实现。接口或默认值变化要检查 REST / MCP / CLI 的差异。
-- 算法修复提供有依据的边界／回归用例，保留独立参考的来源、期望值和门槛；不能从生产输出重新冻结答案来替代正确性验证。
-- 文档职责与同步范围见 [文档维护与验证](docs/development-guide.md#文档维护与验证)。接口修改应同步工具合同与代表请求。
-- Python 代码遵循现有格式与类型约定；提交中保留无关工作，不进行顺带的大面积改写。
+持久工程约束统一维护在 [AGENTS.md](AGENTS.md)；工具定义、请求模型、共享计算和 REST／MCP／CLI 的同步要求见[开发指南](docs/development-guide.md)。文档职责见[文档维护与验证](docs/development-guide.md#文档维护与验证)。
+
+算法修复提供有依据的边界／回归用例，保留独立参考的来源、期望值和门槛；不能从生产输出重新冻结答案来替代正确性验证。修改前检查工作区，保留无关改动。
 
 ## 提交前验证
 

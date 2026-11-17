@@ -1,0 +1,23 @@
+{
+  "frozen_utc": "2026-11-12T03:13:20.074149+00:00",
+  "hypothesis": "Guolao positions derives\u8a08 longitude/RA by rounded floating addition before cyclic reduction, then body_placement classifies the rounded derivative. A source value immediately below30degrees can become210degrees and cross a palace or mansion boundary. Confirm with independent exact source-angle arithmetic before editing.",
+  "inputs": {
+    "source_longitudes": 36,
+    "source_right_ascensions": 84,
+    "boundary_cases": 12096,
+    "random_cases": 256,
+    "total_cases": 12352,
+    "input_sha256": "14d9a8d6c395403d53cde41a55672f19b4e09e593855ae2999bc729e425693c7",
+    "seed": 2026111206
+  },
+  "meaning": "Given finite source longitude/RA components; not paired physical ephemeris or birth samples.0/23.75degree shifts include ordinary coordinate controls;180/near360andrandom shifts are algebraic stress controls,not claimed native Lahiri values.28declared integer RA boundaries are synthetic,not the physical anchor catalogue.",
+  "reference": "Pinnedpython-flint0.9.0/FLINT3.6.0exact fmpq arithmetic,noFateBridgeimports. Normalize and classify exact antipodes before final display rounding. Independent quotient/remainder IEEEencoder for scalar targets, notFraction.__float__.",
+  "acceptance": "Zero raw cyclic longitude/RA correctly-rounded binary64 differences; zero exact-source palace/mansion ownership differences. Existing deliberate zodiac/mansion offset delivery clamping is separate, not redefined as nearest-scalar accuracy. All oldsource/physics/classical/prediction gates retained. Raw failures/cases preserved; no epsilon or filtered outputs.",
+  "producer_probe": "Execute actual unmodified AST assignment to extra[\u8a08] from frozen core.guolao.positions, then actual body_placement. This is an observed mathematical leaf pipeline, not an authenticated native/public-worker invocation. Later validate full producer and actualREST/CLI/freshstdioMCP and package if fixing.",
+  "source_sha256": {
+    "src/fatebridge/core/guolao.py": "083ac131a3676a8f0ff32281448a7624d44c788c7fd0a685407dd5215a0aff53",
+    "src/fatebridge/core/guolao_timing.py": "5d17446a47ff753baba67eee39f9c2f251b1d0d83d2a36cc56f339d6d073e8d1",
+    "src/fatebridge/core/output_guolao.py": "5ff92467f2aebdc0d900d34272333bbc2c7698232df6da2c199f0523e410350f"
+  },
+  "global_goal": "active_unfinished"
+}

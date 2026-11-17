@@ -163,6 +163,29 @@ class PhysicalEpoch:
 
     @classmethod
     @runtime.preserve_ephemeris_path()
+    def from_tt(cls, jd_tt: float) -> PhysicalEpoch:
+        """Retain a solved TT point; its civil label never becomes a new epoch."""
+        label, moment, leap = utc_from_tt(jd_tt)
+        last = leap_table()["entries"][-1]
+        expiry_tt = float(
+            Fraction(_julian_day(datetime.fromisoformat(leap_table()["expires_at"])))
+            + (Fraction(last["tai_minus_utc_seconds"]) + Fraction(4023, 125)) / 86400
+        )
+        scales = EphemerisTime(
+            _julian_day(moment) if moment is not None else None,
+            ut1_from_tt(jd_tt),
+            jd_tt,
+            (
+                "primary_TT_IERS20_C04_UT1_frozen_UTC_display"
+                if active_ut1.get() is not None
+                else "primary_TT_swiss_delta_t_UT1_frozen_UTC_display"
+            ),
+            jd_tt >= expiry_tt,
+        )
+        return cls(scales, label, moment, leap)
+
+    @classmethod
+    @runtime.preserve_ephemeris_path()
     def from_ut1(cls, jd_ut1: float) -> PhysicalEpoch:
         if runtime.swe is None:
             raise ImportError("Swiss Ephemeris is required for UT1 conversion")

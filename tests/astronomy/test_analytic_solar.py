@@ -8,6 +8,7 @@ from pathlib import Path
 import pytest
 
 from fatebridge.core import analytic_solar as solar
+from fatebridge.core.astro.reference_frames import precession_angles
 
 PRIMARY = Path(__file__).parents[1] / "data/solar/erfa-2.0.1"
 
@@ -44,7 +45,7 @@ def test_published_nutation_and_precession_angles_keep_radian_units():
     assert solar.nutation(2400000.5, 53736) == pytest.approx(
         [-0.9632552291148362783e-5, 0.4063197106621159367e-4], abs=1e-13, rel=0
     )
-    actual = solar.precession_angles(2400000.5, 50123.9999)
+    actual = precession_angles(2400000.5, 50123.9999)
     expected = [
         -0.2243387670997995690e-5,
         0.4091014602391312808,

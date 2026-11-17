@@ -1,4 +1,4 @@
-"""Select a real Moshier model for current tests and restore caller state."""
+"""Select an empty native search path and restore caller configuration."""
 
 import os
 from contextlib import contextmanager
@@ -28,21 +28,25 @@ def _clear_ephemeris_dependent_caches() -> None:
 
 
 @contextmanager
-def moshier_ephemeris() -> Generator[None, None, None]:
-    """Force Moshier despite repo-local data, restoring shared state on exit."""
+def empty_ephemeris_path() -> Generator[None, None, None]:
+    """Use an empty SE_EPHE_PATH and native solar policy, restoring both on exit.
+
+    Direct native calls can fall back to Moshier; the calendar solar owner can
+    instead select bundled DE441. Explicit JPL selection is preserved. Model
+    names must come from each result, not from this configuration context."""
     from fatebridge.core import ephemeris_runtime as runtime
 
-    with TemporaryDirectory(prefix="fatebridge-moshier-") as empty_directory:
+    with TemporaryDirectory(prefix="fatebridge-empty-ephemeris-") as empty_directory:
         with runtime._EPHEMERIS_LOCK:
             previous_env = os.environ.get("SE_EPHE_PATH")
             previous_solar_model = os.environ.get("FATEBRIDGE_SOLAR_TERM_MODEL")
-            previous_path = runtime.configured_ephemeris_path()
+            runtime.configured_ephemeris_path()
             previous_configured = runtime._configured_path
         try:
             with runtime._EPHEMERIS_LOCK:
                 os.environ["SE_EPHE_PATH"] = empty_directory
-                # Auto may choose an analytic Sun even when a direct Swiss
-                # probe falls back to Moshier. Pin the actual term solver too.
+                # Pin the native selection policy; its solar fallback may use
+                # bundled DE441 even when direct Swiss calls return Moshier.
                 os.environ["FATEBRIDGE_SOLAR_TERM_MODEL"] = "native"
                 runtime.configure_ephemeris_path(empty_directory)
                 _clear_ephemeris_dependent_caches()

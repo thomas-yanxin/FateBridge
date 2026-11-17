@@ -13,6 +13,7 @@ from fatebridge.core.meihua_lost_property import (
 )
 from fatebridge.core.requests.meihua import MeihuaInterpretationOptions
 from fatebridge.services.meihua import calculate_meihua_cast
+from tests.support.reference_data import resolve
 
 FIXTURE = Path(__file__).parents[1] / "fixtures/meihua_lost_property_v1"
 PROFILE = json.loads((FIXTURE / "profile.json").read_text())
@@ -25,12 +26,6 @@ def calculate(code="111111", line=1, **kwargs):
         interpretation_topic="lost_property",
         **kwargs,
     )
-
-
-def resolve(result, path):
-    for key in path.split("."):
-        result = result[int(key)] if isinstance(result, list) else result[key]
-    return result
 
 
 def test_source_freeze_precedes_implementation_and_retains_all_raw_witnesses():

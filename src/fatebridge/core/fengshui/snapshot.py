@@ -8,7 +8,7 @@ from fatebridge.core.de440_solar import (
     HISTORICAL_MODEL_ID,
 )
 from fatebridge.core.de440_solar import MODEL_ID as DE440_SOLAR_MODEL
-from fatebridge.core.moshier_solar import MODEL_ID as COMPLETE_MOSHIER_SOLAR_MODEL
+from fatebridge.core.de441_solar import MODEL_ID as DE441_SOLAR_MODEL
 from fatebridge.core.vsop2013_solar import MODEL_ID as VSOP2013_SOLAR_MODEL
 
 from .host_guest import statements as host_guest_statements
@@ -43,14 +43,12 @@ def _calendar_cautions(layer: Dict[str, Any]) -> List[str]:
     """Render actual clock policies without changing year or natal results."""
     stack: List[Any] = [layer]
     historical = future = moshier = analytic = guarded_de440 = aa1996 = False
-    vsop2013 = complete_moshier = False
+    vsop2013 = de441 = False
     while stack:
         current = stack.pop()
         if isinstance(current, dict):
             moshier |= current.get("ephemeris_model") == "moshier"
-            complete_moshier |= (
-                current.get("ephemeris_model") == COMPLETE_MOSHIER_SOLAR_MODEL
-            )
+            de441 |= current.get("ephemeris_model") == DE441_SOLAR_MODEL
             analytic |= current.get("ephemeris_model") == ANALYTIC_SOLAR_MODEL
             aa1996 |= current.get("ephemeris_model") == AA1996_SOLAR_MODEL
             vsop2013 |= current.get("ephemeris_model") == VSOP2013_SOLAR_MODEL
@@ -74,9 +72,9 @@ def _calendar_cautions(layer: Dict[str, Any]) -> List[str]:
     lines = []
     if moshier:
         lines.append("交节所报TT处星历为Moshier；该配置完整范围尚未通过1秒实现验收。")
-    if complete_moshier:
+    if de441:
         lines.append(
-            "交节采用完整Moshier太阳修订；逐边界保留1996年级数与完整月球依赖，有限TT验收不认证全部时刻或绝对UTC。"
+            "交节采用内置DE441同源地球与太阳视位置；逐边界保留实际系数、时标及参考系，有限TT验收不认证全部时刻或绝对UTC。"
         )
     if vsop2013:
         lines.append(
@@ -527,7 +525,9 @@ def sections(result: Dict[str, Any]) -> List[Tuple[str, List[str]]]:
                     for a in finding["action_options"]
                 )
         if "workstation_analysis" in layout:
-            lines.append("WOFS非BTB桌面摆放仅作者参考，未启用摆放规则。")
+            lines.append(
+                "工位审查附带的WOFS资料仅作作者参考；实测桌面规则按本次显式选择独立计算。"
+            )
         measured = layout.get("workstation_layout_analysis")
         if measured is not None:
             geometry = measured["geometry"]

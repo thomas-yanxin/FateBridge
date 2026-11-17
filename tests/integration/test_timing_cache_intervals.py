@@ -13,6 +13,7 @@ from fatebridge.core.almanac import (
 )
 from fatebridge.core.calendar import BaZiCalendar
 from fatebridge.core.timing import TimingAnalysis
+from fatebridge.utils.civil_time import ZonedCalendar
 
 
 def _mutate_all_containers(value):
@@ -124,8 +125,12 @@ def test_month_context_and_dayun_use_physical_solar_intervals(
     monkeypatch, start, end, current, since_hours, until_hours
 ):
     zone = "America/New_York"
-    start_term = SolarTerm("惊蛰", localize_datetime(start, zone), "start", "甲子")
-    end_term = SolarTerm("清明", localize_datetime(end, zone), "end", "乙丑")
+    start_term = SolarTerm(
+        "惊蛰", ZonedCalendar.from_datetime(localize_datetime(start, zone))
+    )
+    end_term = SolarTerm(
+        "清明", ZonedCalendar.from_datetime(localize_datetime(end, zone))
+    )
     boundaries = lambda *args: (start_term, end_term, "卯", 1)
     monkeypatch.setattr(almanac, "get_bazi_month_boundaries", boundaries)
     monkeypatch.setattr(timing, "get_bazi_month_boundaries", boundaries)

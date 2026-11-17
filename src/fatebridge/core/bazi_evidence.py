@@ -11,6 +11,7 @@ from copy import deepcopy
 from itertools import combinations
 from typing import Any, Dict, List, Mapping, Optional, Tuple
 
+from fatebridge.core.bazi_root_context import hidden_roots
 from fatebridge.core.bureau_season import build_bureau_season_reference
 from fatebridge.core.classical import (
     determine_monthly_structure,
@@ -49,6 +50,7 @@ from fatebridge.utils.data import (
     BRANCH_THREE_PUNISHMENTS,
     BRANCH_TRIPLE_COMBINATIONS,
     DESTRUCTION_CYCLE,
+    STEM_COMBINATIONS,
     STEM_ELEMENTS,
     TenGod,
     get_ten_god,
@@ -90,23 +92,6 @@ RULESETS = [
 ]
 
 
-def _roots(stem: str, pillars: Pillars) -> List[Dict[str, Any]]:
-    from fatebridge.utils.data import BRANCH_HIDDEN_STEMS
-
-    return [
-        {
-            "pillar": name,
-            "branch": pillars[name][1],
-            "stem": hidden,
-            "hidden_rank": rank,
-            "kind": "same_stem" if hidden == stem else "same_element",
-        }
-        for name in ORDER
-        for rank, hidden in enumerate(BRANCH_HIDDEN_STEMS[pillars[name][1]])
-        if STEM_ELEMENTS[hidden][0] == STEM_ELEMENTS[stem][0]
-    ]
-
-
 def _growth_roots(stem: str, pillars: Pillars) -> List[Dict[str, Any]]:
     return [
         {
@@ -135,9 +120,10 @@ def _pair_relations(left: str, right: str, pillars: Pillars) -> List[Dict[str, A
         kinds.append(("branch", "自刑"))
     if {a[1], b[1]} == {"子", "卯"}:
         kinds.append(("branch", "子卯刑"))
-    if frozenset((a[0], b[0])) in {
-        frozenset(pair) for pair in ("甲己", "乙庚", "丙辛", "丁壬", "戊癸")
-    }:
+    if any(
+        (a[0], b[0]) in ((first, second), (second, first))
+        for first, second, _ in STEM_COMBINATIONS
+    ):
         kinds.append(("stem", "天干五合"))
     return [
         {
@@ -190,6 +176,8 @@ def build_natal_evidence(
     assessment = supplied.get("assessment", {})
     strength = {
         "strength_level": supplied.get("strength_level"),
+        "engineering_index": supplied.get("engineering_index"),
+        "classical_adjudication": supplied.get("classical_adjudication"),
         "method_id": assessment.get("method_id"),
         "status": assessment.get("status"),
         "requires_special_structure_review": assessment.get(
@@ -219,7 +207,7 @@ def build_natal_evidence(
                 "branch": entry.branch,
                 "location": entry.location,
                 "evidence_id": star_id(entry.pillar, entry.location, entry.char),
-                "roots": _roots(entry.char, pillars),
+                "roots": hidden_roots(entry.char, pillars),
                 "growth_phase_roots": _growth_roots(entry.char, pillars),
             }
         )
@@ -229,7 +217,7 @@ def build_natal_evidence(
             "stem": pillars[name][0],
             "ten_god": get_ten_god(day, pillars[name][0]).value,
             "is_day_master": name == "day",
-            "roots": _roots(pillars[name][0], pillars),
+            "roots": hidden_roots(pillars[name][0], pillars),
             "life_stages": {
                 n: twelve_life_stage(pillars[name][0], pillars[n][1]) for n in ORDER
             },
@@ -297,7 +285,12 @@ def build_natal_evidence(
         "candidate_selection": build_candidate_selection(pillars, monthly),
         "from_child_reference": build_from_child_reference(pillars),
         "natal_hidden_carriers": build_natal_hidden_carriers(pillars),
-        "force_components": build_force_components(pillars, assessment, gods),
+        "force_components": build_force_components(
+            pillars,
+            assessment,
+            gods,
+            classical_adjudication=supplied.get("classical_adjudication"),
+        ),
         "classical_passage": passage,
         "classical_passage_relations": build_passage_relation_context(
             passage, assessment, pillars=pillars

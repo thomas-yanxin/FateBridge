@@ -122,6 +122,7 @@ class _DeferredModel(BaseModel):
                             getattr(self, prefix + "minute", 0),
                             getattr(self, prefix + "calendar", "proleptic_gregorian"),
                             "noon",
+                            second=getattr(self, prefix + "second", 0),
                         )
                     except (ValueError, TypeError):
                         raise PydanticCustomError(

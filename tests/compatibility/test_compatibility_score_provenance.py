@@ -9,6 +9,7 @@ import pytest
 
 from fatebridge.analysis.compatibility import AdvancedCompatibility, RelationshipType
 from fatebridge.application.examples import example_input
+from fatebridge.application.execution import OutputContractError, validate_output
 from fatebridge.services.birth_context import build_birth_computation_context
 from fatebridge.services.birth_payload import build_destiny_payload
 from fatebridge.services.tool_catalog import CATALOG
@@ -23,6 +24,10 @@ from tests.support.compatibility_reference import (
     source_condition_reference_dimensions,
     source_condition_reference_total,
 )
+from tests.support.transports import business, projected_outputs
+from tests.support.transports import rest as _rest_fixture
+
+rest = _rest_fixture
 
 
 def literal_analyses():
@@ -58,6 +63,18 @@ def literal_analyses():
                 },
             }
         )
+        result = results[-1]
+        result["day_master"]["engineering_index"] = {
+            "method_id": CURRENT_STRENGTH_METHOD_ID,
+            "quantity_kind": "uncalibrated_strength_policy_index",
+            "strength_level": profile["strength"],
+            "source_adjudication_used": False,
+        }
+        result["structure_profile"]["engineering_reference"] = {
+            **result["structure_profile"],
+            "quantity_kind": "conditional_engineering_preference",
+            "source_adjudication_used": False,
+        }
     return results
 
 
@@ -109,7 +126,12 @@ def test_production_inputs_explain_the_new_strength_instead_of_retuning_weights(
         assert analysis["element_distribution"] == pytest.approx(
             REFERENCE["persons"][index]["distribution"], abs=0.11
         )
-        profile = analysis["structure_profile"]
+        source_profile = analysis["structure_profile"]
+        assert source_profile["assessment_status"] == "not_adjudicated"
+        assert (
+            source_profile["useful_elements"] == source_profile["avoid_elements"] == []
+        )
+        profile = source_profile["engineering_reference"]
         expected = expected_profiles[index]
         assert analysis["day_master"]["strength"] == expected["strength"]
         assert set(profile["useful_elements"]) == set(expected["useful"])
@@ -194,7 +216,7 @@ def test_production_inputs_explain_the_new_strength_instead_of_retuning_weights(
 def test_explicit_unadjudicated_inputs_match_the_independent_conditional_ledger(kind):
     analyses = deepcopy(literal_analyses())
     first = SOURCE_CONDITION_REFERENCE["source_premises"]["first"]
-    analyses[0]["structure_profile"].update(
+    analyses[0]["structure_profile"]["engineering_reference"].update(
         useful_elements=first["useful"],
         avoid_elements=first["avoid"],
         conditional_elements=first["conditional"],
@@ -231,7 +253,8 @@ def test_public_service_receipt_matches_independent_reference(kind):
     assert "error" not in result
     first_profile = result["person_info"]["person1"]["preference_assessment"]
     assert first_profile["useful_elements"] == first_profile["avoid_elements"] == []
-    assert set(first_profile["conditional_elements"]) == {"火", "土", "水"}
+    assert first_profile["assessment_status"] == "not_adjudicated"
+    assert set(first_profile["conditional_elements"]) == {"木", "火", "土", "金", "水"}
     assert_source_condition_score_reference(
         result["summary"], result["detailed_analysis"], kind.value
     )
@@ -251,6 +274,162 @@ def test_missing_method_is_not_mislabeled_as_current_version():
     assert all(
         item["strength_method_id"] == "unversioned"
         for item in result["scoring"]["input_methods"].values()
+    )
+
+
+def test_engineering_score_cannot_consume_public_source_labels_or_preferences():
+    original = literal_analyses()
+    changed = deepcopy(original)
+    for analysis in changed:
+        analysis["day_master"]["strength"] = "来源另审"
+        analysis["day_master"]["classical_adjudication"] = {
+            "status": "not_adjudicated",
+            "body_strength": None,
+        }
+        analysis["structure_profile"].update(
+            assessment_status="not_adjudicated",
+            useful_elements=[],
+            avoid_elements=[],
+            useful_ten_gods=[],
+            conditional_elements=["木", "火", "土", "金", "水"],
+        )
+    before = AdvancedCompatibility.analyze_comprehensive_compatibility(*original)
+    after = AdvancedCompatibility.analyze_comprehensive_compatibility(*changed)
+    assert before["overall_score"] == after["overall_score"]
+    assert before["scoring"]["dimensions"] == after["scoring"]["dimensions"]
+    assert after["scoring"]["source_adjudication_used"] is False
+
+
+@pytest.mark.parametrize("state", ["conditional", "unknown", "neutral", "avoid"])
+def test_ten_god_input_states_preserve_the_fixed_index_and_known_empty_preferences(
+    state,
+):
+    analyses = literal_analyses()
+    for analysis in analyses:
+        analysis["four_pillars"] = {
+            name: {"stem": stem, "branch": branch}
+            for name, stem, branch in (
+                ("year", "庚", "申"),
+                ("month", "庚", "申"),
+                ("day", "甲", "寅"),
+                ("hour", "庚", "申"),
+            )
+        }
+        analysis["day_master"]["stem"] = "甲"
+        profile = analysis["structure_profile"]
+        profile["assessment_status"] = "not_adjudicated"
+        profile["classical_adjudication"] = {"status": "not_adjudicated"}
+        profile["engineering_reference"].update(
+            useful_elements=[],
+            avoid_elements=["木", "火", "土", "金", "水"] if state == "avoid" else [],
+            conditional_elements=(
+                ["木", "火", "土", "金", "水"] if state == "conditional" else []
+            ),
+            neutral_elements=(
+                ["木", "火", "土", "金", "水"] if state == "neutral" else []
+            ),
+            useful_ten_gods=[],
+        )
+    result = AdvancedCompatibility._analyze_ten_gods_relationship(
+        *analyses, RelationshipType.GENERAL
+    )
+    # Two actual officer-rule deductions: the new state receipt never retunes them.
+    assert result["score"] == 65 - 2 - 2 == 61
+    assert result["score_kind"] == "uncalibrated_rule_index"
+    assert result["source_adjudication_used"] is False
+    assert result["assessment_status"] == (
+        "partial" if state in {"conditional", "unknown"} else "calculated"
+    )
+    assert {row["engineering_state"] for row in result["preference_evidence"]} == {
+        state
+    }
+    assert {row["source_force_status"] for row in result["preference_evidence"]} == {
+        "not_adjudicated"
+    }
+    assert {
+        row["source_preference_status"] for row in result["preference_evidence"]
+    } == {"not_adjudicated"}
+    if state in {"conditional", "unknown"}:
+        assert "未见明显的十神级高风险冲突" not in result["risk_reasons"]
+        assert any("工程索引" in text for text in result["details"])
+
+
+def test_ten_god_missing_upstream_and_actual_business_rule_risk_remain_separate():
+    analyses = literal_analyses()
+    for analysis in analyses:
+        analysis["structure_profile"].pop("engineering_reference")
+        analysis["four_pillars"]["year"] = {"stem": "乙", "branch": "卯"}
+        analysis["day_master"]["stem"] = "甲"
+    result = AdvancedCompatibility._analyze_ten_gods_relationship(
+        *analyses, RelationshipType.BUSINESS
+    )
+    assert result["assessment_status"] == "partial"
+    assert {row["engineering_state"] for row in result["preference_evidence"]} == {
+        "unknown"
+    }
+    assert any("劫财" in text for text in result["risk_reasons"])
+    assert any("(-5)" in text and "劫财" in text for text in result["score_basis"])
+
+
+def test_ten_god_partial_state_and_evidence_match_rest_native_mcp_cli(
+    rest, tmp_path, capsys
+):
+    spec = next(s for s in CATALOG if s.key == "two_person_compatibility")
+    results = projected_outputs(
+        spec,
+        example_input(spec),
+        [
+            "summary.overall_score",
+            "summary.scoring.status",
+            "summary.scoring.unresolved_dimensions",
+            "detailed_analysis.ten_gods_relationship",
+        ],
+        rest,
+        tmp_path,
+        capsys,
+        include_snapshot_text=False,
+    )
+    assert business(results[0]) == business(results[1]) == business(results[2])
+    for result in results:
+        assert result["summary"]["overall_score"] == 72.7
+        scoring = result["summary"]["scoring"]
+        assert scoring["status"] == "partial"
+        assert "ten_gods_relationship" in scoring["unresolved_dimensions"]
+        ten_gods = result["detailed_analysis"]["ten_gods_relationship"]
+        assert ten_gods["score"] == 90
+        assert ten_gods["assessment_status"] == "partial"
+        assert ten_gods["preference_evidence"]
+
+
+def test_complete_ten_god_contract_requires_status_and_preserves_projected_reads():
+    from fatebridge.core.output_compatibility import TenGodRelationshipDimension
+
+    spec = next(s for s in CATALOG if s.key == "two_person_compatibility")
+    request = spec.request_model(**example_input(spec))
+    service, args, kwargs = spec.bind(request)
+    result = service(*args, **kwargs)
+    validate_output(spec, result, request=request)
+    assert result["summary"]["scoring"]["evidence_policy"] == (
+        "explicit_preference_and_unresolved_events_v2"
+    )
+    for field in ("assessment_status", "score_kind", "preference_evidence"):
+        changed = deepcopy(result)
+        changed["detailed_analysis"]["ten_gods_relationship"].pop(field)
+        with pytest.raises(OutputContractError):
+            validate_output(spec, changed, request=request)
+    changed = deepcopy(result)
+    changed["detailed_analysis"]["ten_gods_relationship"][
+        "assessment_status"
+    ] = "calculated"
+    with pytest.raises(OutputContractError):
+        validate_output(spec, changed, request=request)
+    assert (
+        TenGodRelationshipDimension.model_validate(
+            {"preference_evidence": [{"engineering_state": "neutral"}]}
+        )
+        .preference_evidence[0]
+        .engineering_state
+        == "neutral"
     )
 
 

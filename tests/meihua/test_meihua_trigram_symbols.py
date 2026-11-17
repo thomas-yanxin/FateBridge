@@ -13,6 +13,7 @@ from fatebridge.core.meihua_trigram_symbols import (
     trigram_symbols_ruleset,
 )
 from fatebridge.services.meihua import calculate_meihua_cast
+from tests.support.reference_data import resolve
 
 ROOT = Path(__file__).resolve().parents[2]
 FIXTURE = ROOT / "tests/fixtures/meihua_trigram_symbols_v1"
@@ -24,12 +25,6 @@ def calculate(code="010111", line=4, **kwargs):
         casting={"method": "existing", "hexagram_code": code, "moving_line": line},
         **kwargs,
     )
-
-
-def resolve(result, path):
-    for key in path.split("."):
-        result = result[int(key)] if isinstance(result, list) else result[key]
-    return result
 
 
 def test_source_profile_is_exactly_the_preimplementation_visual_reference():

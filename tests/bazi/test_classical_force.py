@@ -66,7 +66,15 @@ def test_body_and_seal_roots_are_distinct_in_the_explicit_source_counterexample(
         profile["engineering_composition"]["body_seal_energy_relation"]
         == "seal_greater"
     )
-    assert set(profile["classical_adjudication"].values()) == {"not_adjudicated"}
+    adjudication = profile["classical_adjudication"]
+    assert adjudication["status"] == "not_adjudicated"
+    assert adjudication["body_strength"] is None
+    assert adjudication["seal_weight"] is None
+    assert adjudication["body_seal_relation"] is None
+    assert adjudication["ordinary_fuyi_applicable"] is None
+    assert adjudication["observed_body_root_positions"] == ["hour"]
+    assert adjudication["observed_seal_root_positions"] == ["year", "month", "hour"]
+    assert adjudication == model["classical_adjudication"]
     # Every quantity reuses the same calculation; no second evaluation or score.
     energies = model["assessment"]["effective_elements"]
     assert {
@@ -88,6 +96,48 @@ def test_missing_assessment_is_unknown_and_never_recomputed(monkeypatch):
     assert profile["engineering_composition"]["body_within_support_share"] is None
     assert all(c["engineering_energy"] is None for c in profile["components"].values())
     assert profile["components"]["seal"]["physical_hidden_roots"]
+
+
+def test_engineering_policy_changes_do_not_adjudicate_source_force(monkeypatch):
+    from dataclasses import replace
+
+    from fatebridge.core import source_annotations, strength
+
+    def forbidden():
+        raise AssertionError("A source grade must not be looked up as a calculation")
+
+    monkeypatch.setattr(source_annotations, "_index", forbidden)
+    pillars = chart("己巳 癸酉 癸未 庚申")
+    original = ElementAnalysis.comprehensive_analysis(pillars)
+    assert original["day_master"]["engineering_index"]["strength_level"] == "强"
+    assert original["engineering_favorable_elements"] == ["木", "土", "火"]
+    monkeypatch.setattr(
+        strength,
+        "DEFAULT_POLICY",
+        replace(strength.DEFAULT_POLICY, weak_share=0.98, strong_share=0.99),
+    )
+    alternative = ElementAnalysis.comprehensive_analysis(pillars)
+    assert alternative["day_master"]["engineering_index"]["strength_level"] == "弱"
+    assert alternative["engineering_favorable_elements"] == ["水", "金"]
+    assert (
+        original["day_master"]["classical_adjudication"]
+        == alternative["day_master"]["classical_adjudication"]
+    )
+    for result in (original, alternative):
+        assert result["favorable_elements"] == []
+        assert result["favorable_elements_status"] == "not_adjudicated"
+
+
+def test_source_body_grade_alone_does_not_establish_the_fuyi_route():
+    result = ElementAnalysis.analyze_day_master_strength(chart("己巳 癸酉 癸未 庚申"))
+    result["classical_adjudication"].update(status="adjudicated", body_strength="强")
+    assert ElementAnalysis.get_favorable_elements(result) == []
+    result["classical_adjudication"]["ordinary_fuyi_applicable"] = True
+    assert [e.value for e in ElementAnalysis.get_favorable_elements(result)] == [
+        "木",
+        "土",
+        "火",
+    ]
 
 
 @pytest.mark.parametrize(

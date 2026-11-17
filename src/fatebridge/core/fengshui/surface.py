@@ -6,7 +6,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, cast
 
-from .surface_inputs import SurfaceItem
+from .surface_inputs import PLANT_REPRESENTATIONS, SurfaceItem
 
 if TYPE_CHECKING:
     from .models import AssessRequest
@@ -199,6 +199,11 @@ def evaluate_surfaces(req: "AssessRequest") -> Dict[str, Any]:
                     "representation": observed_item.representation,
                     "observation_basis": observed_item.observation_basis,
                     "evidence": observed_item.evidence,
+                    "healthy": (
+                        observed_item.healthy.model_dump(mode="json")
+                        if observed_item.healthy is not None
+                        else None
+                    ),
                     "status": (
                         "sourced_option_available"
                         if matches
@@ -229,6 +234,22 @@ def evaluate_surfaces(req: "AssessRequest") -> Dict[str, Any]:
                     and item.zone_observation_basis != "image_observed"
                 )
                 blocks = []
+                needs_botanical_condition = bool(
+                    PLANT_REPRESENTATIONS.intersection(entry["representations"])
+                )
+                condition = item.healthy if item is not None else None
+                application_conditions_met = (
+                    True
+                    if not needs_botanical_condition
+                    else (
+                        condition.value
+                        if condition is not None
+                        and condition.observation_basis != "image_observed"
+                        else None
+                    )
+                )
+                if application_conditions_met is False:
+                    blocks.append("representation_condition_not_met")
                 if constraint:
                     if entry["zone"] in constraint.unavailable_zones:
                         blocks.append("target_zone_unavailable")
@@ -262,7 +283,11 @@ def evaluate_surfaces(req: "AssessRequest") -> Dict[str, Any]:
                         "candidate_only"
                         if candidate
                         else (
-                            "ready" if permission and feasible else "conditional_option"
+                            "ready"
+                            if permission
+                            and feasible
+                            and application_conditions_met is True
+                            else "conditional_option"
                         )
                     )
                 )
@@ -282,6 +307,15 @@ def evaluate_surfaces(req: "AssessRequest") -> Dict[str, Any]:
                     )
 
                 if status != "blocked":
+                    if application_conditions_met is None:
+                        need(
+                            (
+                                f"surface_layouts.{surface.object_id}.items.{item.object_id}.healthy"
+                                if item is not None
+                                else f"surface_layouts.{surface.object_id}.items"
+                            ),
+                            "confirm_botanical_health_or_freshness",
+                        )
                     if surface.observation_basis == "image_observed":
                         need(
                             f"surface_layouts.{surface.object_id}.observation_basis",
@@ -317,6 +351,7 @@ def evaluate_surfaces(req: "AssessRequest") -> Dict[str, Any]:
                             else "place_item" if item else "consider_representation"
                         ),
                         "status": status,
+                        "application_conditions_met": application_conditions_met,
                         "from_zone": item.zone if item else None,
                         "from_zone_basis": (
                             item.zone_observation_basis if item else None

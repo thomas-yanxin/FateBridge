@@ -1,0 +1,103 @@
+{
+  "groups": [
+    {
+      "group": "fude",
+      "palaces": [
+        "福德",
+        "妻妾"
+      ],
+      "months": 4,
+      "days": 12,
+      "duration_years": "11",
+      "annual_rate": "27207/10000"
+    },
+    {
+      "group": "qianyi",
+      "palaces": [
+        "迁移"
+      ],
+      "months": 3,
+      "days": 6,
+      "duration_years": "8",
+      "annual_rate": "15/4"
+    },
+    {
+      "group": "jie",
+      "palaces": [
+        "疾厄"
+      ],
+      "months": 2,
+      "days": 24,
+      "duration_years": "7",
+      "annual_rate": "857/200"
+    },
+    {
+      "group": "nupu",
+      "palaces": [
+        "奴仆",
+        "男女",
+        "田宅"
+      ],
+      "months": 1,
+      "days": 24,
+      "duration_years": "9/2",
+      "annual_rate": "33003/5000"
+    },
+    {
+      "group": "xiangmao",
+      "palaces": [
+        "相貌"
+      ],
+      "months": 4,
+      "days": 0,
+      "duration_years": "10",
+      "annual_rate": "3"
+    },
+    {
+      "group": "guanlu",
+      "palaces": [
+        "官禄"
+      ],
+      "months": 6,
+      "days": 0,
+      "duration_years": "15",
+      "annual_rate": "2"
+    },
+    {
+      "group": "xiongdi",
+      "palaces": [
+        "兄弟",
+        "财帛"
+      ],
+      "months": 2,
+      "days": 0,
+      "duration_years": "5",
+      "annual_rate": "6"
+    }
+  ],
+  "source": "NLC3150p35selected printed clauses andp36additional same-witness reading",
+  "source_pdf_sha256": "2766952041ab8a829dedcc0404a24dd7c22d0b31d3f549cb66752d42d58c315c",
+  "additional_reading_sha256": "4e01c1674c37a56cb50922813934a4019c8f7ae34388e9af6d7227c9747a1fd8",
+  "nominal_calendar": {
+    "months_per_year": 12,
+    "days_per_month": 30,
+    "source": "Explicit local nominal model; not a physical or civil calendar"
+  },
+  "samples": {
+    "integer_days": "All0..30*days_per_degree inclusive for each7group",
+    "integer_expected_rows": 21787,
+    "epsilon": "1/100000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "fractional_offsets": [
+      "1/3",
+      "2/7"
+    ],
+    "fractional_policy": "Include both sides of every monthly-formula and literal start/end boundary when within the local range, plus both offsets within each formula cell; exact-rational deduplication.",
+    "date_only_stress": [
+      "1/100000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000/7"
+    ]
+  },
+  "criterion": "Exact equality, zero tolerance; keep formula and literal outputs separate and retain all original contradictions.",
+  "oracle": "python-flint0.9.0 fmpq, standalone process with no FateBridge/production data imports.",
+  "visibility": "Published formulae and prior selected examples were already known; this is not blind expert/source adjudication."
+}

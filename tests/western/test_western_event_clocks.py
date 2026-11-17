@@ -266,10 +266,13 @@ def test_solar_planetary_weekday_uses_local_opening_sunrise_date(monkeypatch, ba
     rise = _julian_day(datetime(1999, 12, 31, 20, tzinfo=timezone.utc))
     setting = rise + 0.5
 
-    def bracket(at, longitude, latitude, *, rising):
-        return (rise, rise + 1) if rising else (setting - 1, setting)
+    from tests.support.solar_events import fixed_crossings
 
-    monkeypatch.setattr(classical, "_bracket_sun_event", bracket)
+    monkeypatch.setattr(
+        classical,
+        "solar_crossings_in_window",
+        fixed_crossings((rise, rise + 1), (setting - 1, setting)),
+    )
     civil = classical._planetary_hours(rise + 0.1, 150, 40, "UTC")
     solar = classical._planetary_hours(
         rise + 0.1, 150, 40, "UTC", weekday_clock_basis=basis

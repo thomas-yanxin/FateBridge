@@ -138,7 +138,7 @@
         "liureng.day_placement_patterns",
         "liureng.ruleset"
       ],
-      "purpose": "探原干加支／支加干的十条生克比和条件，按日干本五行与日支计算；归合、求合两条未知保留。附带六壬盘不替代金口诀本课规则，不据课名推断他人意图或现实成败。"
+      "purpose": "探原干加支／支加干的十条生克比和条件，按日干本五行与日支计算；归合、求合缺加临时排除，加临成立但合式未裁时仍未知。附带六壬盘不替代金口诀本课规则，不据课名推断他人意图或现实成败。"
     },
     "monthly_key_calendar": {
       "fields": [
@@ -731,7 +731,8 @@
       ],
       "method_id": "fatebridge.sanshi_correspondence.contract_v1",
       "output_paths": [
-        "subresults"
+        "subresults",
+        "synthesis"
       ],
       "prerequisites": [
         "请求Schema及领域前提必须成立；条件分支以本次实际回执为准"
@@ -774,7 +775,8 @@
       ],
       "method_id": "fatebridge.liuren_course_and_transmissions.contract_v1",
       "output_paths": [
-        "subresults"
+        "subresults",
+        "synthesis"
       ],
       "prerequisites": [
         "请求Schema及领域前提必须成立；条件分支以本次实际回执为准"
@@ -817,7 +819,8 @@
       ],
       "method_id": "fatebridge.qimen_rotating_board.contract_v1",
       "output_paths": [
-        "subresults"
+        "subresults",
+        "synthesis"
       ],
       "prerequisites": [
         "请求Schema及领域前提必须成立；条件分支以本次实际回执为准"
@@ -860,7 +863,8 @@
       ],
       "method_id": "fatebridge.taiyi_four_counts.contract_v1",
       "output_paths": [
-        "subresults"
+        "subresults",
+        "synthesis"
       ],
       "prerequisites": [
         "请求Schema及领域前提必须成立；条件分支以本次实际回执为准"

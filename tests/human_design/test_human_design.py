@@ -372,10 +372,10 @@ def test_returned_source_evidence_cannot_mutate_later_runs():
 def test_moshier_is_explicit_and_can_be_refused(monkeypatch, tmp_path):
     from fatebridge.application.execution import execute_tool
     from fatebridge.services.tool_catalog import CATALOG
-    from tests.support.ephemeris_context import moshier_ephemeris
+    from tests.support.ephemeris_context import empty_ephemeris_path
 
     spec = next(s for s in CATALOG if s.key == "human_design")
-    with moshier_ephemeris():
+    with empty_ephemeris_path():
         result = execute_tool(spec, HumanDesignRequest(**INPUT))
         assert result["calculation_policy"]["ephemeris_model"] == "moshier"
         assert result["run_metadata"]["engine_is_approximate"] is True

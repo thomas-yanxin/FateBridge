@@ -28,6 +28,7 @@ def controlled_model(monkeypatch, tmp_path):
     monkeypatch.delenv("FATEBRIDGE_SOLAR_SPK_FILE", raising=False)
     caches = [
         de440._profile,
+        de440._coefficient_data,
         solar._root,
         solar._extended_root,
         almanac.get_solar_terms_for_year,
@@ -49,12 +50,10 @@ def event(year):
     )
 
 
-def test_frozen_original_references_and_all_preexisting_profile_bytes_preserved():
+def test_frozen_original_references_and_source_identity_are_preserved():
     freeze = json.loads((ROOT / "freeze.json").read_bytes())
     for name, expected in freeze["files"].items():
         assert hashlib.sha256((ROOT / name).read_bytes()).hexdigest() == expected
-    for name, expected in P["preserve_existing_profiles"].items():
-        assert hashlib.sha256((DATA / name).read_bytes()).hexdigest() == expected
     assert de440.CANPING_EXTENDED_MODEL_ID == NEW
     assert (
         de440.source_receipt(NEW)["source_kernel_sha256"]
@@ -177,12 +176,13 @@ def test_selected_corrupt_profile_fails_without_native_fallback(
     folder.mkdir(parents=True)
     for name in [
         "de440-solar-canping-extended-v1.json",
-        "de440-solar-canping-extended-v1.bin.gz",
+        "de440-solar-record-atlas-v1.json",
+        "de440-solar-record-atlas-v1.bin.gz",
         "geocentric-tdb-v1.json",
     ]:
         (folder / name).write_bytes((DATA / name).read_bytes())
     metadata = folder / "de440-solar-canping-extended-v1.json"
-    binary = folder / "de440-solar-canping-extended-v1.bin.gz"
+    binary = folder / "de440-solar-record-atlas-v1.bin.gz"
     manifest = json.loads(metadata.read_bytes())
     if fault == "missing":
         binary.unlink()

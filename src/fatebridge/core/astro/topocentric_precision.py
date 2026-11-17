@@ -14,6 +14,7 @@ from fractions import Fraction
 from typing import Any
 
 from mpmath import mp  # type: ignore[import-untyped]
+from mpmath.libmp import to_rational  # type: ignore[import-untyped]
 
 from fatebridge.core.astro.horizon_precision import (
     CONVERGENCE_DEGREES,
@@ -36,6 +37,7 @@ class TopocentricPosition:
     working_digits: tuple[int, int]
     action: str
     branch: dict[str, Any]
+    phase_degrees_working: Fraction
 
 
 def _solve(
@@ -266,4 +268,5 @@ def checked_topocentric_position(
         (low_digits, digits),
         action,
         branch,
+        Fraction(*to_rational(high["phase"]._mpf_)),
     )

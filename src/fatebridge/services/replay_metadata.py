@@ -25,12 +25,11 @@ def environment_receipt() -> Dict[str, Any]:
     dependencies: Dict[str, Optional[str]] = {}
     for package in (
         "pydantic",
-        "kerykeion",
         "pyswisseph",
         "lunardate",
         "python-dateutil",
         "pytz",
-        "pygeomag",
+        "mpmath",
     ):
         try:
             dependencies[package] = version(package)

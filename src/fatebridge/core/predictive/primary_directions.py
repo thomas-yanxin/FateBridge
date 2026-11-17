@@ -7,9 +7,11 @@ from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional
 
 from fatebridge.core.astro.birth import AstroBirthInfo
+from fatebridge.core.astro.earth_attitude import earth_attitude
 from fatebridge.core.astro.geometry import normalize_angle
 from fatebridge.core.astro.reference import TRADITIONAL_PLANETS
-from fatebridge.core.astro.time_scales import ephemeris_time
+from fatebridge.core.astro.reference_frames import rotate_spherical
+from fatebridge.core.astro.time_scales import ephemeris_time, tt_from_ut1
 from fatebridge.core.ephemeris_runtime import ephemeris_call, swe
 
 from ._common import (
@@ -88,10 +90,6 @@ def primary_direction_method_label(method_name: str) -> str:
     return PRIMARY_DIRECTION_METHOD_LABELS.get(method_name, method_name)
 
 
-def primary_direction_time_key_rate(time_key: str) -> float:
-    return PRIMARY_DIRECTION_TIME_KEY_RATES.get(time_key, 1.0)
-
-
 def primary_direction_coordinate_meta(
     pd_method: str,
 ) -> tuple[str, str]:
@@ -141,12 +139,13 @@ def build_primary_direction_equatorial_context(
     times = ephemeris_time(birth_info.require_utc_datetime)
     if times.jd_tt is None:
         raise ImportError("Swiss Ephemeris is required for equatorial directions")
-    obliquity = ephemeris_call("calc", times.jd_tt, swe.ECL_NUT)[0][0]
-    armc = (ephemeris_call("sidtime", times.jd_ut1) * 15 + birth_info.longitude) % 360
+    attitude = earth_attitude(swe, times.jd_ut1, julian_day_tt=times.jd_tt)
+    armc = (attitude.house_sidereal_degrees + birth_info.longitude) % 360
     return {
         "julian_day": times.jd_ut1,
         "julian_day_tt": float(times.jd_tt),
-        "obliquity": float(obliquity),
+        "obliquity": attitude.reduction.house_obliquity,
+        "longitude_origin": attitude.reduction.house_longitude_origin,
         "armc": float(armc),
     }
 
@@ -155,9 +154,10 @@ def project_absolute_degree_to_equatorial(
     absolute_degree: float,
     *,
     obliquity: float,
+    longitude_origin: float = 0.0,
 ) -> tuple[float, float]:
     right_ascension, declination, _ = swe.cotrans(
-        (normalize_angle(absolute_degree), 0.0, 1.0),
+        (normalize_angle(absolute_degree - longitude_origin), 0.0, 1.0),
         -obliquity,
     )
     return float(right_ascension), float(declination)
@@ -171,17 +171,24 @@ def point_equatorial_position(
     obliquity: float,
     armc: float,
     julian_day_tt: Optional[float] = None,
+    longitude_origin: float = 0.0,
 ) -> tuple[float, float]:
     if point_name in SWISSEPH_PLANET_IDS:
+        tt = tt_from_ut1(julian_day) if julian_day_tt is None else julian_day_tt
         equatorial, retflag = ephemeris_call(
-            "calc" if julian_day_tt is not None else "calc_ut",
-            julian_day_tt if julian_day_tt is not None else julian_day,
+            "calc",
+            tt,
             SWISSEPH_PLANET_IDS[point_name],
             swe.FLG_SWIEPH | swe.FLG_SPEED | swe.FLG_EQUATORIAL,
         )
         if retflag < 0:
             raise ValueError("Primary direction equatorial ephemeris failed")
-        return float(equatorial[0]), float(equatorial[1])
+        attitude = earth_attitude(swe, julian_day, julian_day_tt=tt)
+        return rotate_spherical(
+            attitude.reduction.native_to_house,
+            float(equatorial[0]),
+            float(equatorial[1]),
+        )
     # MC is on the ecliptic, not on the equator: its RA is ARMC but its
     # declination is generally nonzero. Preserve the physical chart point.
     offset = getattr(natal_subject, "calculation_basis", {}).get(
@@ -190,6 +197,7 @@ def point_equatorial_position(
     return project_absolute_degree_to_equatorial(
         point_absolute_position(natal_subject, point_name) + offset,
         obliquity=obliquity,
+        longitude_origin=longitude_origin,
     )
 
 
@@ -199,12 +207,15 @@ def project_equatorial_to_ecliptic(
     *,
     obliquity: float,
     zodiac_offset: float = 0.0,
+    longitude_origin: float = 0.0,
 ) -> tuple[float, float]:
     longitude, latitude, _ = swe.cotrans(
         (normalize_angle(right_ascension), declination, 1.0),
         obliquity,
     )
-    return normalize_angle(float(longitude) - zodiac_offset), float(latitude)
+    return normalize_angle(float(longitude) + longitude_origin - zodiac_offset), float(
+        latitude
+    )
 
 
 def build_reprojected_primary_direction_chart_layers(
@@ -232,12 +243,14 @@ def build_reprojected_primary_direction_chart_layers(
             julian_day=julian_day,
             julian_day_tt=equatorial_context["julian_day_tt"],
             obliquity=obliquity,
+            longitude_origin=equatorial_context["longitude_origin"],
             armc=armc,
         )
         longitude, _latitude = project_equatorial_to_ecliptic(
             right_ascension + arc_degrees,
             declination,
             obliquity=obliquity,
+            longitude_origin=equatorial_context["longitude_origin"],
             zodiac_offset=natal_subject.calculation_basis["ayanamsha_degrees"],
         )
         directed_points[point_name] = longitude_to_point_dict(point_name, longitude)
@@ -248,11 +261,13 @@ def build_reprojected_primary_direction_chart_layers(
             float(payload.get("longitude", payload["absolute_degree"]))
             + natal_subject.calculation_basis["ayanamsha_degrees"],
             obliquity=obliquity,
+            longitude_origin=equatorial_context["longitude_origin"],
         )
         longitude, _latitude = project_equatorial_to_ecliptic(
             right_ascension + arc_degrees,
             declination,
             obliquity=obliquity,
+            longitude_origin=equatorial_context["longitude_origin"],
             zodiac_offset=natal_subject.calculation_basis["ayanamsha_degrees"],
         )
         directed_lots[lot_key] = build_lot_point_dict(
@@ -356,6 +371,7 @@ def build_reprojected_mundane_primary_direction_chart_layers(
             julian_day=julian_day,
             julian_day_tt=equatorial_context["julian_day_tt"],
             obliquity=obliquity,
+            longitude_origin=equatorial_context["longitude_origin"],
             armc=armc,
         )
         semiarc = semiarc_degrees_for_declination(birth_info.latitude, declination)
@@ -374,6 +390,7 @@ def build_reprojected_mundane_primary_direction_chart_layers(
             directed_right_ascension,
             declination,
             obliquity=obliquity,
+            longitude_origin=equatorial_context["longitude_origin"],
             zodiac_offset=natal_subject.calculation_basis["ayanamsha_degrees"],
         )
         directed_points[point_name] = longitude_to_point_dict(point_name, longitude)
@@ -385,6 +402,7 @@ def build_reprojected_mundane_primary_direction_chart_layers(
             julian_day=julian_day,
             julian_day_tt=equatorial_context["julian_day_tt"],
             obliquity=obliquity,
+            longitude_origin=equatorial_context["longitude_origin"],
             armc=armc,
         )
         semiarc = semiarc_degrees_for_declination(birth_info.latitude, declination)
@@ -398,6 +416,7 @@ def build_reprojected_mundane_primary_direction_chart_layers(
             directed_right_ascension,
             declination,
             obliquity=obliquity,
+            longitude_origin=equatorial_context["longitude_origin"],
             zodiac_offset=natal_subject.calculation_basis["ayanamsha_degrees"],
         )
         directed_points[point_name] = longitude_to_point_dict(point_name, longitude)
@@ -408,6 +427,7 @@ def build_reprojected_mundane_primary_direction_chart_layers(
             float(payload.get("longitude", payload["absolute_degree"]))
             + natal_subject.calculation_basis["ayanamsha_degrees"],
             obliquity=obliquity,
+            longitude_origin=equatorial_context["longitude_origin"],
         )
         semiarc = semiarc_degrees_for_declination(birth_info.latitude, declination)
         natal_hour_angle = normalize_signed_angle(armc - right_ascension)
@@ -425,6 +445,7 @@ def build_reprojected_mundane_primary_direction_chart_layers(
             directed_right_ascension,
             declination,
             obliquity=obliquity,
+            longitude_origin=equatorial_context["longitude_origin"],
             zodiac_offset=natal_subject.calculation_basis["ayanamsha_degrees"],
         )
         directed_lots[lot_key] = build_lot_point_dict(
@@ -476,8 +497,8 @@ def build_primary_direction_coordinate_entry(
         "label": item_label,
         "coordinate_system": coordinate_system,
         "coordinate_label": coordinate_label,
-        "coordinate_degrees": round(normalized_coordinate, 4),
-        "arc_applied_degrees": round(arc_applied_degrees, 4),
+        "coordinate_degrees": normalized_coordinate,
+        "arc_applied_degrees": arc_applied_degrees,
     }
     if coordinate_system == "mundane_semiarc":
         quadrant = quadrant_for_mundane_coordinate(normalized_coordinate)
@@ -485,7 +506,7 @@ def build_primary_direction_coordinate_entry(
             {
                 "quadrant": quadrant,
                 "quadrant_label": PRIMARY_DIRECTION_QUADRANT_LABELS[quadrant],
-                "phase_within_quadrant_degrees": round(normalized_coordinate % 90.0, 4),
+                "phase_within_quadrant_degrees": normalized_coordinate % 90.0,
             }
         )
     return entry
@@ -593,15 +614,8 @@ def build_primary_direction_hit_coordinate_context(
         "promissor_current": promissor_current,
         "significator_natal": significator_natal,
         "aspect_target": aspect_target,
-        "current_orb_degrees": round(current_orb, 4),
+        "current_orb_degrees": current_orb,
     }
-
-
-def primary_direction_arc_applied_degrees(hit: Dict[str, Any]) -> float:
-    arc_degrees = float(hit.get("arc_degrees", 0.0))
-    if hit.get("direction_mode") == "converse":
-        return -arc_degrees
-    return arc_degrees
 
 
 def primary_direction_timing_phase(relative_years: float) -> tuple[str, str]:
@@ -753,6 +767,7 @@ def extract_primary_direction_coordinate_payload(
                 julian_day=julian_day,
                 julian_day_tt=equatorial_context["julian_day_tt"],
                 obliquity=obliquity,
+                longitude_origin=equatorial_context["longitude_origin"],
                 armc=armc,
             )
             coordinate_map[point_name] = right_ascension
@@ -769,6 +784,7 @@ def extract_primary_direction_coordinate_payload(
                 float(payload.get("longitude", payload["absolute_degree"]))
                 + natal_subject.calculation_basis["ayanamsha_degrees"],
                 obliquity=obliquity,
+                longitude_origin=equatorial_context["longitude_origin"],
             )
             coordinate_map[point_name] = right_ascension
             diagnostics[point_name] = {
@@ -807,6 +823,7 @@ def extract_primary_direction_coordinate_payload(
             julian_day=julian_day,
             julian_day_tt=equatorial_context["julian_day_tt"],
             obliquity=obliquity,
+            longitude_origin=equatorial_context["longitude_origin"],
             armc=armc,
         )
         semiarc = semiarc_degrees_for_declination(birth_info.latitude, declination)
@@ -829,6 +846,7 @@ def extract_primary_direction_coordinate_payload(
             julian_day=julian_day,
             julian_day_tt=equatorial_context["julian_day_tt"],
             obliquity=obliquity,
+            longitude_origin=equatorial_context["longitude_origin"],
             armc=armc,
         )
         semiarc = semiarc_degrees_for_declination(birth_info.latitude, declination)
@@ -857,6 +875,7 @@ def extract_primary_direction_coordinate_payload(
             float(payload.get("longitude", payload["absolute_degree"]))
             + natal_subject.calculation_basis["ayanamsha_degrees"],
             obliquity=obliquity,
+            longitude_origin=equatorial_context["longitude_origin"],
         )
         semiarc = semiarc_degrees_for_declination(birth_info.latitude, declination)
         hour_angle = normalize_signed_angle(armc - right_ascension)
@@ -1042,7 +1061,8 @@ def build_primary_directions_payload(
     current_window_size: int = 12,
 ) -> Dict[str, Any]:
     age_years = calculate_age_years(birth_info, analysis_datetime)
-    time_key_rate = primary_direction_time_key_rate(pd_time_key)
+    birth_utc = birth_info.require_utc_datetime
+    time_key_rate = PRIMARY_DIRECTION_TIME_KEY_RATES[pd_time_key]
     coordinate_system, coordinate_label = primary_direction_coordinate_meta(pd_method)
     aspects = normalize_primary_direction_aspects(pd_aspects)
     coordinate_payload = extract_primary_direction_coordinate_payload(
@@ -1079,7 +1099,7 @@ def build_primary_directions_payload(
                         arc = (promissor_longitude - target_longitude) % 360.0
                     else:
                         arc = (target_longitude - promissor_longitude) % 360.0
-                    event_age_years = arc / time_key_rate if time_key_rate else 0.0
+                    event_age_years = arc / time_key_rate
                     if event_age_years <= 0.05 or event_age_years > max_age_years:
                         continue
                     dedupe_key = (
@@ -1091,20 +1111,18 @@ def build_primary_directions_payload(
                     if dedupe_key in seen_hits:
                         continue
                     seen_hits.add(dedupe_key)
-                    event_datetime = birth_info.local_datetime + timedelta(
-                        days=event_age_years * TROPICAL_YEAR_DAYS
-                    )
-                    relative_years = round(event_age_years - age_years, 4)
+                    # Event labels and ages share the same nominal UTC-duration axis.
+                    event_datetime = (
+                        birth_utc + timedelta(days=event_age_years * TROPICAL_YEAR_DAYS)
+                    ).astimezone(birth_info.local_datetime.tzinfo)
+                    relative_years = event_age_years - age_years
                     timing_phase, timing_phase_label = primary_direction_timing_phase(
                         relative_years
                     )
-                    arc_applied_degrees = round(
-                        (-arc if pd_type == 1 else arc),
-                        4,
-                    )
+                    arc_applied_degrees = -arc if pd_type == 1 else arc
                     timeline.append(
                         {
-                            "arc_degrees": round(arc, 4),
+                            "arc_degrees": arc,
                             "arc_applied_degrees": arc_applied_degrees,
                             "promissor": promissor,
                             "promissor_label": planet_label(promissor),
@@ -1113,13 +1131,10 @@ def build_primary_directions_payload(
                             "aspect": aspect_key,
                             "aspect_label": aspect_label_text,
                             "aspect_degree": aspect_degree,
-                            "aspect_variant_degrees": round(variant, 4),
-                            "event_age_years": round(event_age_years, 4),
-                            # Truncate to whole seconds: the directed arc is an
-                            # approximation, so sub-second precision is noise that
-                            # jitters at the microsecond level between ephemeris
-                            # dependency micro-versions and would break the golden
-                            # byte-lock without carrying any real signal.
+                            "aspect_variant_degrees": variant,
+                            "event_age_years": event_age_years,
+                            # The event label uses whole seconds. Geometry and
+                            # classification retain the original age and arc.
                             "event_datetime": event_datetime.replace(
                                 microsecond=0
                             ).isoformat(),
@@ -1128,16 +1143,11 @@ def build_primary_directions_payload(
                             "coordinate_system": coordinate_system,
                             "coordinate_label": coordinate_label,
                             "relative_years_from_current": relative_years,
-                            "relative_arc_from_current": round(
-                                arc_applied_degrees - current_arc,
-                                4,
-                            ),
+                            "relative_arc_from_current": arc_applied_degrees
+                            - current_arc,
                             "timing_phase": timing_phase,
                             "timing_phase_label": timing_phase_label,
-                            "distance_from_current_years": round(
-                                abs(relative_years),
-                                4,
-                            ),
+                            "distance_from_current_years": abs(relative_years),
                         }
                     )
 
@@ -1157,7 +1167,7 @@ def build_primary_directions_payload(
             coordinate_label=coordinate_label,
             natal_coordinate_points=coordinate_rings["points"],
             natal_coordinate_lots=coordinate_rings["lots"],
-            arc_applied_degrees=primary_direction_arc_applied_degrees(item),
+            arc_applied_degrees=item["arc_applied_degrees"],
         )
         for item in timeline
     ]
@@ -1272,9 +1282,9 @@ def build_primary_directions_payload(
         "current_coordinate_lots": current_coordinate_rings["lots"],
         "promissors": PRIMARY_DIRECTION_PROMISSORS,
         "aspects": aspects,
-        "current_age_years": round(age_years, 4),
-        "current_arc_degrees": round(current_arc, 4),
-        "current_arc_absolute_degrees": round(abs(current_arc), 4),
+        "current_age_years": age_years,
+        "current_arc_degrees": current_arc,
+        "current_arc_absolute_degrees": abs(current_arc),
         "current_window": current_window,
         "past_window": past_window,
         "future_window": future_window,
@@ -1353,8 +1363,8 @@ def build_primary_direction_chart_payload(
         "direction_mode_label": "逆推" if pd_type == 1 else "顺推",
         "coordinate_system": coordinate_system,
         "coordinate_label": coordinate_label,
-        "current_arc_degrees": round(current_arc_degrees, 4),
-        "current_arc_absolute_degrees": round(abs(current_arc_degrees), 4),
+        "current_arc_degrees": current_arc_degrees,
+        "current_arc_absolute_degrees": abs(current_arc_degrees),
         "show_pd_bounds": show_pd_bounds,
         "approximation": approximation,
         "approximation_label": approximation_label,

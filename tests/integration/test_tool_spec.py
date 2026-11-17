@@ -167,7 +167,7 @@ def test_execute_spec_preserves_domain_result_and_error():
 
 
 def test_invalid_input_result_shape_mirrors_rest_400():
-    spec = _spec(lambda: {}, rest_error_label="八字参数")
+    spec = _spec(lambda: {}, operation_label_zh="八字")
     out = invalid_input_result(spec)
     assert out["error"] == "无效的八字参数"
     assert out["status_code"] == 400

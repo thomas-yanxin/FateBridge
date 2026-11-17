@@ -191,9 +191,7 @@ def analyze_city_gate(
                     "combined_condition_match": (
                         None
                         if ambiguous
-                        or form.get("candidate_only")
-                        or form["condition_match"] is None
-                        else bool(numeric_match and form["condition_match"])
+                        else _conjunction([numeric_match, form["condition_match"]])
                     ),
                     "rule_id": "shen_city_gate_v1.same_yuan_reverse_flight",
                     "source_ids": ["G1", "G2"],

@@ -2,8 +2,9 @@
 
 from pydantic import BaseModel
 
-from fatebridge.core.human_design_line_catalogue import DOMAIN, POLICY_ID, _canonical
+from fatebridge.core.human_design_line_catalogue import DOMAIN, POLICY_ID
 from fatebridge.utils.errors import EphemerisSourceError
+from fatebridge.utils.json_digest import canonical_bytes
 
 
 def require_human_design_reference_binding(
@@ -11,8 +12,9 @@ def require_human_design_reference_binding(
 ) -> None:
     if request is None or key not in {"knowledge_read", "knowledge_registry"}:
         return
-    domain = getattr(request, "domain", None)
-    selected = domain.strip() if isinstance(domain, str) else domain
+    data = request.model_dump()
+    domain = data["domain"]
+    selected = domain.strip() if domain is not None else None
     active = (
         selected == DOMAIN
         or result.get("domain") == DOMAIN
@@ -39,12 +41,13 @@ def require_human_design_reference_binding(
         if key == "knowledge_read"
         else calculate_knowledge_registry
     )
-    expected = service(**request.model_dump())
+    expected = service(**data)
     try:
-        if "error" in expected or any(
-            field not in result or _canonical(result[field]) != _canonical(value)
+        matches = "error" not in expected and all(
+            field in result and canonical_bytes(result[field]) == canonical_bytes(value)
             for field, value in expected.items()
-        ):
-            raise ValueError("Human Design reference differs from query or source")
-    except (KeyError, TypeError, ValueError) as exc:
+        )
+    except (TypeError, ValueError) as exc:
         raise EphemerisSourceError("human_design_reference_changed") from exc
+    if not matches:
+        raise EphemerisSourceError("human_design_reference_changed")

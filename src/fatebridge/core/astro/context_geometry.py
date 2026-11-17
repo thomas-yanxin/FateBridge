@@ -16,7 +16,10 @@ from fatebridge.core.astro.geometry import (
     combine_longitudes,
     normalize_angle,
 )
-from fatebridge.core.astro.house_positions import EclipticHouseProjection
+from fatebridge.core.astro.house_positions import (
+    EclipticHouseProjection,
+    HouseCoordinate,
+)
 from fatebridge.core.astro.house_projection_precision import RC_PLANE_PROJECTION_METHOD
 from fatebridge.core.astro.native_motion import context_motion
 from fatebridge.core.astro.parts import _build_houses
@@ -41,6 +44,7 @@ def build_context_geometry(
     fortune_method: str = "sect_reversing",
     zodiac_longitudes: Optional[Dict[str, float]] = None,
     house_projection: Optional[EclipticHouseProjection] = None,
+    house_coordinates: Optional[Dict[str, HouseCoordinate]] = None,
     planetary_models: Optional[Dict[str, str]] = None,
     motion_rates: Optional[Dict[str, Optional[float]]] = None,
     motion_states: Optional[Dict[str, Dict[str, float]]] = None,
@@ -103,9 +107,12 @@ def build_context_geometry(
         }
     if fortune is not None:
         longitudes["Pars Fortuna"] = fortune
-    projected_positions: Dict[str, float] = {}
+    projected_positions: Dict[str, HouseCoordinate] = {}
     if house_projection is not None:
         for name, lon in longitudes.items():
+            if house_coordinates is not None and name in house_coordinates:
+                projected_positions[name] = house_coordinates[name]
+                continue
             exact_tropical_longitude = None
             if name in states:
                 tropical_longitude = states[name]["longitude"]
@@ -118,7 +125,7 @@ def build_context_geometry(
                 ) % 360
             else:
                 tropical_longitude = combine_longitudes(lon, ayanamsha)
-            projected_positions[name] = house_projection.position(
+            projected_positions[name] = house_projection.coordinate(
                 tropical_longitude, exact_longitude=exact_tropical_longitude
             )
     houses = _build_houses(
@@ -154,7 +161,7 @@ def build_context_geometry(
                 "lon": lon,
                 "signlon": lon % 30.0,
                 "sign": _sign_name(lon),
-                "house": f"House{int(projected_positions[name]) if house_projection is not None else _house_for_longitude(partition_longitudes.get(name, lon), ascendant, house_system, house_cusps=house_cusps)}",
+                "house": f"House{int(projected_positions[name].position) if house_projection is not None else _house_for_longitude(partition_longitudes.get(name, lon), ascendant, house_system, house_cusps=house_cusps)}",
                 **(
                     {
                         "motion": context_motion(
@@ -175,7 +182,12 @@ def build_context_geometry(
                     else {}
                 ),
                 **(
-                    {"ecliptic_house_position": projected_positions[name]}
+                    {
+                        "ecliptic_house_position": projected_positions[name].position,
+                        "ecliptic_house_phase_degrees_ratio": str(
+                            projected_positions[name].phase_degrees
+                        ),
+                    }
                     if house_projection is not None
                     else {}
                 ),

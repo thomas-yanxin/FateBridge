@@ -9,7 +9,11 @@ from fatebridge.validation.claims import CalculationClaim, verify_calculation_cl
 from tests.support.bazi_strength_reference_v3 import (
     assert_current_assessment_arithmetic,
 )
-from tests.support.transports import SPECS, business, surface_calls
+from tests.support.transports import SPECS, business
+from tests.support.transports import rest as _shared_rest
+from tests.support.transports import surface_calls
+
+rest = _shared_rest
 
 PAYLOAD = {
     "name": "虚构阳长生根回归",

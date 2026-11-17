@@ -14,6 +14,8 @@ from fatebridge.cli import run as cli_run
 from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
 from tests.support.heluo_source_facts import (
     COMMENTARY_RULESET_ID,
+    CURRENT_COMMENTARIES,
+    CURRENT_HEADERS,
     HEADER_COUNT,
     PENDING_COUNT,
 )
@@ -149,10 +151,6 @@ def test_heluo_month_najia_separate_facts_on_three_surfaces(
 def test_heluo_najia_sources_and_printed_order_issue_on_three_surfaces(
     date, time, phase_index, gua, matches, basis, page, minimal, rest, tmp_path, capsys
 ):
-    import hashlib
-
-    from fatebridge.core.heluo_najia import COLLATION_PATH
-
     spec = SPECS["heluo"]
     payload = {**INPUT, "date": date, "time": time, "gender": "男"}
     fields = (
@@ -204,10 +202,8 @@ def test_heluo_najia_sources_and_printed_order_issue_on_three_surfaces(
                 summary["direct_assignment_observations"] == 78
                 and summary["borrowed_assignment_observations"] == 18
             )
-            assert (
-                summary["sha256"]
-                == hashlib.sha256(COLLATION_PATH.read_bytes()).hexdigest()
-            )
+            assert summary["ruleset_id"] == "heluo_wenming_najia_sources_v1"
+            assert summary["source_url"] == CURRENT_COMMENTARIES["source_url"]
             assert (
                 summary["unquantified_timing_najia_clauses"][0]["month_numbers"] is None
             )
@@ -926,10 +922,15 @@ def test_canping_numbered_source_columns_and_missing_text_on_three_surfaces(
             if t["rule_id"] == "canping_text_selection_v1"
         )
         assert trace["selectionShun"] == selected
-        assert trace["collation_sha256"] == evidence["canping_text_collation"]["sha256"]
         assert (
-            trace["comparison_witness_sha256"]
-            == evidence["canping_text_collation"]["comparison_witness"]["sha256"]
+            trace["collation_id"]
+            == evidence["canping_text_collation"]["corpus_id"]
+            == "canping_najda_selected_cells_v1"
+        )
+        assert (
+            trace["comparison_witness_id"]
+            == evidence["canping_text_collation"]["comparison_witness"]["corpus_id"]
+            == "canping_wenming_nlc43061_selected_v1"
         )
         assert "[参评选条与来源]" in output["snapshot_text"]
 
@@ -1007,7 +1008,11 @@ def test_source_commentary_and_unselected_branches_on_three_surfaces(
             for t in evidence["rule_trace"]
             if t["rule_id"] == "heluo_selected_line_collation_v1"
         )
-        assert trace["commentary_sha256"] == evidence["commentary_collation"]["sha256"]
+        assert (
+            trace["commentary_corpus_id"]
+            == evidence["commentary_collation"]["corpus_id"]
+            == CURRENT_COMMENTARIES["corpus_id"]
+        )
         assert trace["selections"][phase]["commentary_pdf_pages"] == pages
 
 
@@ -2072,7 +2077,11 @@ def test_earth_readings_and_review_completion_across_surfaces(
             for t in evidence["rule_trace"]
             if t["rule_id"] == "canping_text_selection_v1"
         )
-        assert trace["collation_sha256"] == summary["sha256"]
+        assert (
+            trace["collation_id"]
+            == summary["corpus_id"]
+            == "canping_najda_selected_cells_v1"
+        )
         assert any(
             "目读覆盖完成不等于疑读消除" in c
             for c in evidence["interpretation_constraints"]
@@ -2239,7 +2248,11 @@ def test_native_water_rereadings_keep_prior_uncertainty_across_surfaces(
             for t in evidence["rule_trace"]
             if t["rule_id"] == "canping_text_selection_v1"
         )
-        assert trace["collation_sha256"] == summary["sha256"]
+        assert (
+            trace["collation_id"]
+            == summary["corpus_id"]
+            == "canping_najda_selected_cells_v1"
+        )
         assert any(
             "目读覆盖完成不等于疑读消除" in c
             for c in evidence["interpretation_constraints"]
@@ -2338,7 +2351,11 @@ def test_native_fire_rereadings_keep_separate_witnesses_across_surfaces(
             for t in evidence["rule_trace"]
             if t["rule_id"] == "canping_text_selection_v1"
         )
-        assert trace["collation_sha256"] == summary["sha256"]
+        assert (
+            trace["collation_id"]
+            == summary["corpus_id"]
+            == "canping_najda_selected_cells_v1"
+        )
 
 
 @pytest.mark.parametrize(
@@ -2441,7 +2458,11 @@ def test_native_wood_rereadings_keep_all_three_batches_across_surfaces(
             for t in evidence["rule_trace"]
             if t["rule_id"] == "canping_text_selection_v1"
         )
-        assert trace["collation_sha256"] == summary["sha256"]
+        assert (
+            trace["collation_id"]
+            == summary["corpus_id"]
+            == "canping_najda_selected_cells_v1"
+        )
 
 
 @pytest.mark.parametrize(
@@ -2553,7 +2574,11 @@ def test_native_gold_rereadings_keep_all_four_batches_across_surfaces(
             for t in evidence["rule_trace"]
             if t["rule_id"] == "canping_text_selection_v1"
         )
-        assert trace["collation_sha256"] == summary["sha256"]
+        assert (
+            trace["collation_id"]
+            == summary["corpus_id"]
+            == "canping_najda_selected_cells_v1"
+        )
 
 
 @pytest.mark.parametrize(
@@ -2695,7 +2720,11 @@ def test_native_earth_rereadings_and_unchanged_comparison_across_surfaces(
             for t in evidence["rule_trace"]
             if t["rule_id"] == "canping_text_selection_v1"
         )
-        assert trace["collation_sha256"] == summary["sha256"]
+        assert (
+            trace["collation_id"]
+            == summary["corpus_id"]
+            == "canping_najda_selected_cells_v1"
+        )
 
 
 @pytest.mark.parametrize(
@@ -3077,9 +3106,10 @@ def test_tunmeng_source_commentary_and_unselected_conditions_on_three_surfaces(
                 if t["rule_id"] == "heluo_selected_line_collation_v1"
             )
             assert (
-                trace["commentary_sha256"]
-                == e["commentary_collation"]["sha256"]
-                == text["text_provenance"]["commentary_sha256"]
+                trace["commentary_corpus_id"]
+                == e["commentary_collation"]["corpus_id"]
+                == text["text_provenance"]["commentary_corpus_id"]
+                == CURRENT_COMMENTARIES["corpus_id"]
             )
             assert trace["selections"][phase]["corpus_key"] == selected["corpus_key"]
             assert (
@@ -3495,11 +3525,6 @@ def test_heluo_jiehou_source_or_context_fault_on_three_surfaces(
 def test_heluo_xusong_commentary_and_content_identity_on_three_surfaces(
     texts_only, date, time, phase, gua, line, excerpt, rest, tmp_path, capsys
 ):
-    from fatebridge.core.heluo_texts import (
-        COMMENTARY_CONTENT_SHA256,
-        HEADER_CONTENT_SHA256,
-    )
-
     spec = SPECS["heluo"]
     payload = dict(
         date=date, time=time, zone="+08:00", gender="男", use_true_solar_time=False
@@ -3526,11 +3551,29 @@ def test_heluo_xusong_commentary_and_content_identity_on_three_surfaces(
         t = selected["text"]
         p = t["text_provenance"]
         assert (selected["hexagram"], selected["line"]) == (gua, line)
-        assert (
-            excerpt in t["detail"]
-            and p["commentary_content_sha256"] == COMMENTARY_CONTENT_SHA256
+        expected = next(
+            row
+            for row in CURRENT_COMMENTARIES["entries"]
+            if (row["hexagram"], row["line"]) == (gua, line)
         )
-        assert p["header_content_sha256"] == HEADER_CONTENT_SHA256
+        header = next(
+            row
+            for row in CURRENT_HEADERS["entries"]
+            if (row["hexagram"], row["line"]) == (gua, line)
+        )
+        assert excerpt in t["detail"]
+        assert t["detail"] == "".join(s["text"] for s in expected["sections"])
+        assert t["commentary_sections"] == [
+            dict(section, applicability=None) for section in expected["sections"]
+        ]
+        assert p["commentary_corpus_id"] == CURRENT_COMMENTARIES["corpus_id"]
+        assert p["commentary_pdf_pages"] == expected["pdf_pages"]
+        assert p["commentary_source_url"] == CURRENT_COMMENTARIES["source_url"]
+        assert t["yaoci"] == header["yaoci"]
+        assert p["corpus_id"] == CURRENT_HEADERS["corpus_id"]
+        assert p["source_url"] == (
+            f"{CURRENT_HEADERS['source_url']}#page={header['pdf_page']}"
+        )
         assert all(s["applicability"] is None for s in t["commentary_sections"])
         assert t["commentary_branch_selection"]["selected_section_ids"] == []
         if not texts_only:
@@ -3539,21 +3582,27 @@ def test_heluo_xusong_commentary_and_content_identity_on_three_surfaces(
                 e["commentary_collation"]["pending_line_commentaries"],
             ) == (HEADER_COUNT, PENDING_COUNT)
             assert (
-                e["commentary_collation"]["content_sha256"] == COMMENTARY_CONTENT_SHA256
+                e["commentary_collation"]["corpus_id"]
+                == CURRENT_COMMENTARIES["corpus_id"]
             )
             trace = next(
                 v["facts"]
                 for v in e["rule_trace"]
                 if v["rule_id"] == "heluo_selected_line_collation_v1"
             )
-            assert trace["commentary_content_sha256"] == COMMENTARY_CONTENT_SHA256
-            assert trace["header_content_sha256"] == HEADER_CONTENT_SHA256
+            assert trace["commentary_corpus_id"] == CURRENT_COMMENTARIES["corpus_id"]
+            assert trace["selections"][phase]["corpus_key"] == selected["corpus_key"]
+            assert (
+                trace["selections"][phase]["commentary_pdf_pages"]
+                == expected["pdf_pages"]
+            )
             rule = next(
                 v for v in e["rulesets"] if v["ruleset_id"] == COMMENTARY_RULESET_ID
             )
             assert (
                 f"{HEADER_COUNT}条" in rule["source_title"]
-                and rule["source_content_sha256"] == COMMENTARY_CONTENT_SHA256
+                and rule["source_url"]
+                == CURRENT_COMMENTARIES["source_url"] + "#page=119"
             )
             assert t["detail"] in out["snapshot_text"]
 
@@ -3667,7 +3716,7 @@ def test_heluo_nonempty_source_tamper_is_rejected_on_three_surfaces(
 def test_heluo_yuanqi_missing_original_premise_on_three_surfaces(
     date, time, expected, direct, phases_only, rest, tmp_path, capsys
 ):
-    from fatebridge.core.heluo_opposition import CONTENT_SHA256, RULESET_ID
+    from fatebridge.core.heluo_opposition import RULESET_ID
 
     spec = SPECS["heluo"]
     payload = dict(
@@ -3705,7 +3754,9 @@ def test_heluo_yuanqi_missing_original_premise_on_three_surfaces(
             for c in p["conditions"]
         )
         if not phases_only:
-            assert opposition["content_sha256"] == CONTENT_SHA256
+            assert opposition["ruleset_id"] == RULESET_ID
+            assert opposition["source_url"] == CURRENT_COMMENTARIES["source_url"]
+            assert opposition["source_pdf_pages"] == [32, 33, 34, 35]
             assert opposition["full_rescue_assessment"] is False
             trace = next(
                 t
@@ -3715,7 +3766,8 @@ def test_heluo_yuanqi_missing_original_premise_on_three_surfaces(
             assert trace["facts"] == opposition
             assert any(
                 r["ruleset_id"] == RULESET_ID
-                and r["source_content_sha256"] == CONTENT_SHA256
+                and r["source_url"] == opposition["source_url"] + "#page=33"
+                and r["version"] == opposition["version"]
                 for r in out["numerology_evidence"]["rulesets"]
             )
             assert "[元气相反·无正而有反前提]" in out["snapshot_text"]

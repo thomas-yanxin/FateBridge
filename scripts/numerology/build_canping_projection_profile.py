@@ -1,7 +1,7 @@
 """Extract original DE440 position records for the frozen120-year projection.
 
-No runtime calculator or event reference is imported. The existing solar
-profiles and civil clock coefficients must remain byte-identical.
+No runtime calculator or event reference is imported. The output is a staging
+selection; the shared archive builder verifies the exact logical source words.
 """
 
 from __future__ import annotations
@@ -16,7 +16,6 @@ from pathlib import Path
 from typing import Any, Literal
 
 ROOT = Path(__file__).resolve().parents[2]
-DESTINATION = ROOT / "src/fatebridge/data/astronomy"
 
 
 def encoded(value: Any) -> bytes:
@@ -49,9 +48,6 @@ def build(
         raise ValueError(
             "Preserve the full predeclared horizon and pinned original kernel"
         )
-    for name, digest in p["preserve_existing_profiles"].items():
-        if hashlib.sha256((DESTINATION / name).read_bytes()).hexdigest() != digest:
-            raise ValueError("An existing solar profile changed: " + name)
     low, high = [
         (date(y, 1, 1).toordinal() + 1721424.5 - 2451545.0) * 86400
         for y in p["record_padding_years"]
@@ -158,14 +154,16 @@ def build(
 def main() -> int:
     parser = argparse.ArgumentParser(__doc__)
     parser.add_argument("--kernel", type=Path, required=True)
+    parser.add_argument("--output", type=Path, required=True)
     parser.add_argument(
         "--profile", choices=["original", "extended"], default="original"
     )
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args()
     raw, m = build(args.kernel, args.profile)
-    binary = DESTINATION / m["file"]
-    metadata = DESTINATION / (m["file"].replace(".bin.gz", ".json"))
+    args.output.mkdir(parents=True, exist_ok=True)
+    binary = args.output / m["file"]
+    metadata = args.output / (m["file"].replace(".bin.gz", ".json"))
     if args.check:
         packed = binary.read_bytes()
         m["compressed_sha256"] = hashlib.sha256(packed).hexdigest()

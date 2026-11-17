@@ -2,6 +2,7 @@
   "call_guidance": {
     "calendar_input": "Date labels use the explicit question_calendar/candidate_calendar, default proleptic Gregorian. Read calendar_conversion and analysis_context.input_calendar/input_date before explaining normalized datetimes. Julian dates use CE Jan1 years; do not infer regional reforms, March25 years or historical LMT/LAT. With explicit noon hour origin, retain raw calendar labels and read clock_conversion.hour_origin_conversion for the final canonical wall date; validate range after nominal day carry.",
     "clock_input": "Use explicit question_clock_basis only from confirmed clock evidence: civil / local_mean_solar / local_apparent_solar. Solar bases must omit/null timezone_name; civil omission preserves the legacy +08:00 default, not evidence of a known zone. Read clock_conversion with calendar_conversion: first normalize date labels, then resolve the declared clock to TT/UT1. Geocentric LAT is not a topocentric sundial reconstruction. Before1960 UTC-named carriers denote UT1 model labels. Never infer an original clock from ASC fit or outcome; numerical residual is not record accuracy.",
+    "clock_seconds": "Use question_second only for confirmed whole-second labels0..59; omitted defaults to0. Do not invent unknown seconds. calendar_conversion.input_clock and clock_conversion.hour_origin_conversion.input_clock preserve the second through date/noon normalization; input_granularity=second describes supported labels, not historical accuracy. Fractional seconds and directly supplied second60 are unsupported; solar inversion can still return a separately identified UTC leap-second label without truncation.",
     "hour_origin": "Use question_hour_origin=noon only for confirmed noon-based clock-hour labels such as Lilly1647 pp30-31 ephemeris tables. Default midnight preserves modern labels. Noon0=same-date12:00; noon12..23=next-date00:00..11:00. Read clock_conversion.hour_origin_conversion, raw calendar date/clock, and canonical question_datetime together. Calendar-normalized_local_datetime is a raw hour label and can be null for an unrepresentable intermediate date rescued by the carry; final wall time is separate. This is not physical elapsed duration, a timezone/EOT/JD offset, a house-table coordinate, a regional reform or proof of LMT/LAT. Do not infer the author's convention from a fitted chart. Apply declared hour origin before civil zone/DST validation or solar-clock inversion.",
     "interpretation_boundary": "Use horary.verdict, reasoning and rule_profile with the actual moon.motion_basis. Never turn candidate=true, same_ruler, instantaneous applying or the legacy heuristic_verdict into a verified source judgement or event probability.",
     "physical_epoch": "太阳时反解的有效时刻可能落在UTC闰秒。converted_utc可含23:59:60；按clock_conversion.utc_representation区分标签与datetime可表示性，计算使用原生TT/UT1。不能把不能解析datetime说成计算失败，也不能将秒60截断、平滑或移到次日；数值标签精度不代表实测钟时精度。",
@@ -29,7 +30,7 @@
         "horary.calculation_basis.julian_day_tt",
         "horary.calculation_basis.julian_day_ut1"
       ],
-      "purpose": "核对已确认的民用／地方平太阳／地心视太阳钟时、历法转换次序及同一物理TT/UT1；未知原书钟时不拟合，数值残差不充当史料精度。"
+      "purpose": "核对已确认的整秒钟面、民用／地方平太阳／地心视太阳时、历法与正午进位及同一物理TT/UT1；省略秒沿用0不代表记录精度，不拟合未知原书钟时。"
     },
     "data_files": {
       "fields": [
@@ -428,6 +429,13 @@
         "description": "Month the question was asked (1-12)",
         "maximum": 12,
         "minimum": 1,
+        "type": "integer"
+      },
+      "question_second": {
+        "default": 0,
+        "description": "Confirmed whole second of the question clock label (0-59); omitted defaults to0. Fractional seconds and second60 are unsupported. Input resolution does not certify the original record's accuracy.",
+        "maximum": 59,
+        "minimum": 0,
         "type": "integer"
       },
       "question_year": {

@@ -8,9 +8,8 @@ from pathlib import Path
 import pytest
 
 from fatebridge.core.astro.aspects import _build_aspects
-from fatebridge.core.astro.geometry import normalize_angle
 from fatebridge.core.astro.parts import _build_houses, _build_planet_record
-from fatebridge.core.classical_western import build_planet_classical
+from fatebridge.core.classical_western import build_planet_classical, ninth_part
 from fatebridge.core.predictive._common import longitude_to_point_dict
 from fatebridge.core.ptolemy import build_ptolemy_layer, sign_relationship
 from fatebridge.services.astrology import (
@@ -50,6 +49,9 @@ PRIMARY = json.loads(
         / "fixtures/western-ptolemy-sign-relations-robbins-1940.json"
     ).read_text()
 )
+NINTH_PART_SOURCE = json.loads(
+    (Path(__file__).parents[1] / "fixtures/western-ninth-part-pvr2000.json").read_text()
+)
 
 
 @pytest.mark.parametrize("index", range(12))
@@ -84,6 +86,39 @@ def test_term_lord_is_not_changed_by_rounding_before_classification():
         chart_sect="day",
     )
     assert conditions["essential"]["bound_lord"] == "Jupiter"
+
+
+@pytest.mark.parametrize("group", NINTH_PART_SOURCE["sign_groups"])
+def test_ninth_parts_follow_source_intervals_at_every_boundary_and_neighbor(group):
+    # Literal arcsecond edges and sign rows from Rao2000 §6.2.9 are an
+    # independent interval oracle, including the nonrepresentable thirds.
+    edges = NINTH_PART_SOURCE["interval_edges_arcseconds"]
+    for boundary in edges:
+        nearest = boundary / 3600.0
+        for degree in (
+            math.nextafter(nearest, -math.inf),
+            nearest,
+            math.nextafter(nearest, math.inf),
+        ):
+            if not 0 <= degree < 30:
+                continue
+            numerator, denominator = degree.as_integer_ratio()
+            expected = next(
+                destination
+                for left, right, destination in zip(
+                    edges, edges[1:], group["destinations"]
+                )
+                if left * denominator <= numerator * 3600 < right * denominator
+            )
+            for sign in group["signs"]:
+                assert ninth_part(sign, degree) == expected, (sign, degree.hex())
+
+
+@pytest.mark.parametrize("example", NINTH_PART_SOURCE["published_examples"])
+def test_ninth_part_published_examples(example):
+    assert (
+        ninth_part(example["sign"], example["degree_in_sign"]) == example["destination"]
+    )
 
 
 @pytest.mark.parametrize(

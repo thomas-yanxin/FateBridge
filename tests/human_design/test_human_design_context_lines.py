@@ -12,12 +12,12 @@ from pathlib import Path
 import pytest
 
 from fatebridge.core.human_design_depth import line_fixings
-from fatebridge.core.human_design_line_catalogue import _canonical
 from fatebridge.core.human_design_source_variants import line_variant_impact
 from fatebridge.services.human_design_context_lines import (
     build_human_design_context_packet,
 )
 from fatebridge.services.human_design_line_reading import LineReadingInputError
+from fatebridge.utils.json_digest import canonical_bytes
 from fatebridge.validation.human_design_context_lines import (
     verify_human_design_context_packet,
 )
@@ -113,7 +113,7 @@ def test_every_context_and_all_raw_coordinates_are_retained(name, cases, packets
     )
     for c in contexts:
         chart = c["chart"]
-        assert c["chart_sha256"] == hashlib.sha256(_canonical(chart)).hexdigest()
+        assert c["chart_sha256"] == hashlib.sha256(canonical_bytes(chart)).hexdigest()
         assert all(
             len(chart["activations"][s]) == 13 for s in ("personality", "design")
         )
@@ -306,7 +306,7 @@ def test_every_forged_context_or_explanation_is_rejected(cases, packets, fault):
     elif fault == "omit_unavailable":
         packet["unassembled_contexts"] = []
     # Keep a locally updated chart digest: a hash is not semantic validation.
-    c["chart_sha256"] = hashlib.sha256(_canonical(c["chart"])).hexdigest()
+    c["chart_sha256"] = hashlib.sha256(canonical_bytes(c["chart"])).hexdigest()
     receipt = verify_human_design_context_packet(packet, cases[name])
     assert receipt["status"] == "rejected" and receipt["errors"]
     assert receipt["checked_activation_context_bindings"] == 0

@@ -71,7 +71,14 @@ def expected_facts(case: dict[str, Any], reading: dict[str, Any]) -> dict[str, A
                     if c["definition_adjudicated"]
                     else None
                 ),
-                "matched": row["matched"],
+                # The frozen fixture records the relation as unresolved. A
+                # missing placement independently rules out the full clause.
+                "matched": (
+                    False
+                    if not c["definition_adjudicated"]
+                    and not case["placements"][c["placement"]]
+                    else row["matched"]
+                ),
             }
             for c, row in zip(reading["clauses"], case["evaluations"], strict=True)
         ],

@@ -11,6 +11,8 @@ import pytest
 from pydantic import ValidationError
 
 from fatebridge.core.almanac import get_solar_terms_for_year, is_calculated_solar_term
+from fatebridge.core.de441_solar import MODEL_ID as DE441_MODEL
+from fatebridge.core.de441_solar import PROVIDER as DE441_PROVIDER
 from fatebridge.core.heluo import calculate, judge, solar_term
 from fatebridge.core.heluo_seasonal import (
     SOURCE_SHA256,
@@ -20,7 +22,8 @@ from fatebridge.core.heluo_seasonal import (
 )
 from fatebridge.core.output_numerology import HeluoSeasonalNumbers
 from fatebridge.services.divination import calculate_heluo_analysis
-from tests.support.ephemeris_context import moshier_ephemeris as golden_ephemeris
+from fatebridge.utils.civil_time import ZonedCalendar
+from tests.support.ephemeris_context import empty_ephemeris_path
 
 ROOT = Path(__file__).parents[1] / "fixtures/numerology_nlc_v1"
 REF = json.loads((ROOT / "seasonal-reference.json").read_text())
@@ -60,13 +63,17 @@ def test_original_six_windows_keep_their_gaps_and_overlaps(case):
     assert not result["complete_assessment"]
 
 
-@pytest.mark.parametrize("model_context", ["runtime", "native_moshier"])
+@pytest.mark.parametrize("model_context", ["runtime", "empty_native_path"])
 def test_independent_hko_minutes_bracket_every_start_and_end_in_three_years(
     model_context,
 ):
     # Retain the external minutes and transition probes. A provider's name is
     # provenance, not the accuracy oracle; match it to the actual solved term.
-    context = golden_ephemeris() if model_context == "native_moshier" else nullcontext()
+    context = (
+        empty_ephemeris_path()
+        if model_context == "empty_native_path"
+        else nullcontext()
+    )
     with context:
         reference = json.loads(
             (ROOT.parent / "calendar_hko_v1/reference.json").read_text()
@@ -112,8 +119,9 @@ def test_independent_hko_minutes_bracket_every_start_and_end_in_three_years(
                             assert (
                                 window[edge + "_provider"] == actual.resolution_provider
                             )
-                            if model_context == "native_moshier":
-                                assert actual.resolution_provider == "swisseph"
+                            if model_context == "empty_native_path":
+                                assert actual.resolution_provider == DE441_PROVIDER
+                                assert actual.ephemeris_model == DE441_MODEL
                     assert values == ([False, True] if starting else [True, False])
                     observed.add((rule["id"], boundary, case["year"]))
         assert len(observed) == 36  # Reused external term brackets, not new horoscopes.
@@ -290,7 +298,9 @@ def test_hko_check_still_rejects_a_two_minute_error_with_valid_provider(monkeypa
 
     def shifted(year, zone):
         return [
-            replace(t, moment=t.moment + timedelta(minutes=2))
+            replace(
+                t, calendar=ZonedCalendar.from_datetime(t.moment + timedelta(minutes=2))
+            )
             for t in original(year, zone)
         ]
 

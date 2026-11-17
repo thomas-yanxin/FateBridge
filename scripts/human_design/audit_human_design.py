@@ -567,17 +567,6 @@ def astronomy_checks() -> dict:
     }
 
 
-def live_model_requirement_status(check: dict) -> str:
-    if check["status"] == "not_run":
-        return "not_run"
-    if not check["targets"][-1]["original_mechanical_checks_passed"] or check[
-        "reviewer_decisions"
-    ].get("fail", 0):
-        return "failed"
-    # Passing a finite development cohort never closes the original full scope.
-    return "incomplete"
-
-
 def build_report() -> dict:
     from fatebridge.validation.human_design_arithmetic import (
         check_opposition_arithmetic,
@@ -603,6 +592,7 @@ def build_report() -> dict:
 
     checks = [
         report["physical_astronomy"]["selected"],
+        report["node_astronomy"]["selected"],
         *[
             report[k]
             for k in (
@@ -611,7 +601,6 @@ def build_report() -> dict:
                 "solar_root_resolution",
                 "historical_utc",
                 "confirmed_leap_labels",
-                "node_astronomy",
             )
         ],
     ]

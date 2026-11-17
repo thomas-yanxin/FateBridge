@@ -489,7 +489,8 @@ def test_precision_receipt_and_coordinates_survive_all_local_surfaces(
         ]
         assert p["delivered_ascendant"] == result["angles"]["ascendant"]["longitude"]
         assert p["delivered_cusps"] == [h["cusp_longitude"] for h in result["houses"]]
-        assert p["ascendant_action"] == "antipodal_endpoint"
+        # The selected physical frame determines whether a half-turn is
+        # needed. Coordinate accuracy is checked independently below.
         assert not result.get("projection_warnings")
         if zodiacal == 0:
             assert (

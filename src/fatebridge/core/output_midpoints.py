@@ -865,6 +865,7 @@ class MeridianHouseProfile(PartialOutput):
     swisseph_version: Optional[str] = None
     house_flags: Optional[int] = None
     obliquity_return_flags: Optional[int] = None
+    obliquity_model: Optional[str] = None
     geographic_latitude: Optional[float] = None
     geographic_longitude: Optional[float] = None
     construction: Optional[str] = None
@@ -877,6 +878,7 @@ class MeridianHouseProfile(PartialOutput):
     angle_time_policy: Optional[str] = None
     armc: Optional[float] = None
     true_obliquity: Optional[float] = None
+    source_ecliptic_longitude_origin: Optional[float] = None
     ayanamsha_apparent: Optional[float] = None
     first_cusp_definition: Optional[str] = None
     tenth_cusp_definition: Optional[str] = None

@@ -69,13 +69,18 @@ def _relative_house_layout(
             raise ValueError(
                 f"原生Lahiri {house_system_info['key']}宫头计算失败，不能冒用热带宫头"
             ) from error
-    ayanamsha = _ayanamsha(julian_day) if zodiacal_info["sidereal"] else None
+    ayanamsha = (
+        _ayanamsha(julian_day, julian_day_tt=times.jd_tt)
+        if zodiacal_info["sidereal"]
+        else None
+    )
 
     if runtime.swe is None or house_system_info["key"] in {"whole_sign", "equal"}:
         native_angles = _swisseph_angles(
             julian_day,
             birth_info.longitude,
             birth_info.latitude,
+            julian_day_tt=times.jd_tt,
         )
         angle_state = native_angles or _angles(
             julian_day, birth_info.longitude, birth_info.latitude
@@ -115,6 +120,7 @@ def _relative_house_layout(
             "midheaven": midheaven,
             "house_cusps": house_cusps,
             "ayanamsha": ayanamsha,
+            "ayanamsha_includes_nutation": ayanamsha is not None,
             "angle_method": "swisseph" if native_angles else "approximate_angles",
             **({"house_axis_convention": convention} if convention else {}),
             **(
@@ -132,9 +138,11 @@ def _relative_house_layout(
                 birth_info.latitude,
                 birth_info.longitude,
                 house_system_info["swisseph_code"],
+                _julian_day_tt=times.jd_tt,
             )
             cusps, ascmc, house_axis_convention = canonical_house_geometry(
                 julian_day_ut1=julian_day,
+                julian_day_tt=times.jd_tt,
                 latitude=birth_info.latitude,
                 longitude=birth_info.longitude,
                 house_code=house_system_info["swisseph_code"],
@@ -143,6 +151,7 @@ def _relative_house_layout(
             )
             definition = native_ecliptic_horizon_angle_definition(
                 julian_day_ut1=julian_day,
+                julian_day_tt=times.jd_tt,
                 latitude=birth_info.latitude,
                 armc=float(ascmc[2]),
             )

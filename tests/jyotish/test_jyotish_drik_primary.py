@@ -11,6 +11,7 @@ import pytest
 from fatebridge.core.jyotish_balas import PLANETS, aspect_strength
 from fatebridge.core.jyotish_evidence import strength_context
 from fatebridge.core.output_jyotish import ConditionalDrik
+from fatebridge.core.public_output import same_public_value
 from scripts.jyotish.audit_jyotish_drik_primary import build_report
 from tests.fixtures.surface_payloads import astro_payload
 from tests.jyotish.test_jyotish_sources import data18, restore_runtime  # noqa: F401
@@ -111,10 +112,12 @@ def test_primary_witness_survives_strict_projection_on_three_surfaces(
         ],
     )
     drik = result["india"]["strengths"]["drik_bala"]
+    witness = aspect_strength(dict.fromkeys(PLANETS, 0.0))["source_witness"]
     assert (
-        drik["source_witness"]["sha256"]
+        witness["sha256"]
         == "727c8063f64816a0c1c7f6bc577c249629854e980bf860bf4cfd8de16ec9bab2"
     )
+    assert same_public_value(drik["source_witness"], witness)
     assert drik["source_witness"]["complete_single_original_accepted"] is False
     assert len(drik["source_reading_conflicts"]) == 3
     assert (

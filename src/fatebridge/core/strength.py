@@ -5,9 +5,11 @@ is claimed to be a classical constant or a calibrated probability.
 """
 
 from dataclasses import asdict, dataclass, replace
+from fractions import Fraction
 from itertools import combinations
-from typing import Any, Dict, Optional, Tuple, TypedDict
+from typing import Any, Dict, Literal, Optional, Tuple, TypedDict
 
+from fatebridge.core.bazi_branch_facts import classify_triple_members
 from fatebridge.core.clash_comparison import build_clash_comparison
 from fatebridge.core.classical_roots import SOURCE as ROOT_SOURCE
 from fatebridge.core.classical_roots import classify_classical_root
@@ -22,6 +24,7 @@ from fatebridge.core.punishment_resolution import (
     completed_combination_positions,
     punishment_is_resolved,
 )
+from fatebridge.core.root_budget import initial_hidden_budgets
 from fatebridge.core.stem_effects import evaluate_stem_effects
 from fatebridge.core.stem_order_review import build_stem_order_review
 from fatebridge.core.storage_movement import SOURCE as STORAGE_SOURCE
@@ -32,7 +35,6 @@ from ..utils.data import (
     BRANCH_COMBINATION_ELEMENT,
     BRANCH_CONFLICTS,
     BRANCH_ELEMENTS,
-    BRANCH_HIDDEN_STEMS,
     BRANCH_SEASONAL_COMBINATIONS,
     BRANCH_SELF_PUNISHMENTS,
     BRANCH_THREE_PUNISHMENTS,
@@ -41,15 +43,24 @@ from ..utils.data import (
     DESTRUCTION_CYCLE,
     GENERATION_CYCLE,
     STEM_ELEMENTS,
-    TRIPLE_COMBINATION_PEAK,
     Element,
 )
 
 POSITIONS = ("year", "month", "day", "hour")
 STRENGTH_METHOD_ID = "season_root_revelation_relations_v12"
 STRUCTURAL_PRIORITY_METHOD_ID = "source_root_capacity_priority_v3"
-# Descending geometric rank, normalized to one branch budget; no double 本气 count.
-SHARES = {1: (1.0,), 2: (2 / 3, 1 / 3), 3: (4 / 7, 2 / 7, 1 / 7)}
+
+
+class EngineeringStrengthIndex(TypedDict):
+    method_id: str
+    quantity_kind: Literal["uncalibrated_strength_policy_index"]
+    strength_level: Literal["强", "中和", "弱"]
+    numerical_strength_level: Literal["强", "中和", "弱"]
+    support_share: float
+    source_adjudication_used: Literal[False]
+    scope: str
+
+
 PHASE_FACTORS = {"旺": 2.0, "相": 1.5, "休": 1.0, "囚": 0.75, "死": 0.5}
 STEM_PAIRS = {
     frozenset(pair): Element(element)
@@ -206,23 +217,28 @@ def _evaluate(
         for e in Element
     }
     visible = {stem for stem, _ in pillars.values()}
+    branch_budget = Fraction(str(policy.branch_budget))
+    month_multiplier = Fraction(str(policy.month_multiplier))
+    initial_budgets = initial_hidden_budgets(
+        branches,
+        {
+            name: branch_budget * (month_multiplier if name == "month" else 1)
+            for name in names
+        },
+    )
     # Each token has one identity; revelation activates but never duplicates a root.
     tokens: Dict[str, list[_Token]] = {
         name: [
             {
                 "stem": stem,
-                "element": STEM_ELEMENTS[stem][0],
-                "mass": policy.branch_budget
-                * share
-                * (policy.month_multiplier if name == "month" else 1),
+                "element": element,
+                "mass": float(mass),
                 "revealed": stem in visible,
                 "origin": "hidden_stem",
             }
-            for stem, share in zip(
-                BRANCH_HIDDEN_STEMS[branch], SHARES[len(BRANCH_HIDDEN_STEMS[branch])]
-            )
+            for stem, element, mass in initial_budgets[name]
         ]
-        for name, branch in branches.items()
+        for name in names
     }
     initial_day_root_mass = {
         name: sum(t["mass"] for t in tokens[name] if t["element"] == day_element)
@@ -352,22 +368,25 @@ def _evaluate(
         # Compare initial physical hidden budgets, before interaction losses.
         # The month multiplier is included; seasonal energy and stem activation
         # are applied later and do not participate in this adopted proxy.
-        powers = []
-        for element in (e1, e2):
-            powers.append(
-                sum(
-                    t["mass"]
-                    for ts in tokens.values()
-                    for t in ts
-                    if t["element"] == element
-                )
+        exact_powers = [
+            sum(
+                (
+                    mass
+                    for entries in initial_budgets.values()
+                    for _, token_element, mass in entries
+                    if token_element == element
+                ),
+                Fraction(0),
             )
-        if e1 == e2 or abs(powers[0] - powers[1]) < 1e-9:
+            for element in (e1, e2)
+        ]
+        powers = [float(power) for power in exact_powers]
+        if e1 == e2 or abs(exact_powers[0] - exact_powers[1]) < Fraction(1, 10**9):
             multipliers = (policy.clash_equal, policy.clash_equal)
         else:
             multipliers = (
                 (policy.clash_winner, policy.clash_loser)
-                if powers[0] > powers[1]
+                if exact_powers[0] > exact_powers[1]
                 else (policy.clash_loser, policy.clash_winner)
             )
         # Non-stacking across repeat clashes: retain the strongest damage per position.
@@ -471,10 +490,11 @@ def _evaluate(
     # rather than selecting one partner solely by iteration order.
     half_candidates: list[Tuple[Tuple[str, str], Element]] = []
     for group, bureau in BRANCH_TRIPLE_COMBINATIONS.items():
-        peak = TRIPLE_COMBINATION_PEAK[group]
         for pair in combinations(names, 2):
-            bs = {branches[n] for n in pair}
-            if len(bs) != 2 or peak not in bs or not bs < set(group):
+            if (
+                classify_triple_members(group, (branches[n] for n in pair))
+                != "peak_pair"
+            ):
                 continue
             if not any(n in claimed or n in clashed for n in pair):
                 half_candidates.append((pair, BUREAU_ELEMENT[bureau]))
@@ -724,6 +744,9 @@ def _evaluate(
         pillars, phases, PHASE_FACTORS, asdict(policy), events, float_numerical_label
     )
     numerical_label = threshold_arithmetic["numerical_label"]
+    support = float(Fraction(threshold_arithmetic["support_exact"]))
+    weaken = float(Fraction(threshold_arithmetic["weaken_exact"]))
+    share = float(Fraction(threshold_arithmetic["share_exact"]))
     # The independently evaluated root rule is not gated by the weighted
     # proxy that it can override. Its roots, season and load guard remain
     # explicit; no coefficient is fitted to a reference chart.
@@ -862,8 +885,9 @@ def _evaluate(
         "root_qualifications": root_qualifications,
         "branch_budgets": {
             name: {
-                "initial": policy.branch_budget
-                * (policy.month_multiplier if name == "month" else 1),
+                "initial": float(
+                    branch_budget * (month_multiplier if name == "month" else 1)
+                ),
                 "remaining": sum(t["mass"] for t in tokens[name]),
             }
             for name in names
@@ -948,6 +972,8 @@ def assess_strength(
         }
     )
     special_review = result["threshold_arithmetic"]["requires_special_structure_review"]
+    support_exact = Fraction(result["threshold_arithmetic"]["support_exact"])
+    weaken_exact = Fraction(result["threshold_arithmetic"]["weaken_exact"])
     result.update(
         {
             "method_id": STRENGTH_METHOD_ID,
@@ -959,9 +985,7 @@ def assess_strength(
             "seasonal_factors": dict(PHASE_FACTORS),
             "seasonal_phases": dict(phases),
             "support_weaken_ratio": (
-                result["support_strength"] / result["weaken_strength"]
-                if result["weaken_strength"]
-                else None
+                float(support_exact / weaken_exact) if weaken_exact else None
             ),
             "sensitivity": {
                 "candidate_strengths": labels,
@@ -989,4 +1013,17 @@ def assess_strength(
             ],
         }
     )
+    engineering_index: EngineeringStrengthIndex = {
+        "method_id": STRENGTH_METHOD_ID,
+        "quantity_kind": "uncalibrated_strength_policy_index",
+        "strength_level": result["strength_level"],
+        "numerical_strength_level": result["threshold_arithmetic"]["numerical_label"],
+        "support_share": result["support_share"],
+        "source_adjudication_used": False,
+        "scope": (
+            "既定预算与结构覆盖政策的工程索引；数值档单列。"
+            "结构覆盖仍使用工程根保留门槛，不等于原典力量裁定或现实概率。"
+        ),
+    }
+    result["engineering_index"] = engineering_index
     return result

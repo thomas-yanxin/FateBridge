@@ -14,13 +14,15 @@ from fatebridge.core.astro.continuous_lahiri import (
 )
 from fatebridge.core.astro.continuous_lahiri import METHOD_ID as FRAME_METHOD_ID
 from fatebridge.core.astro.continuous_lahiri import (
-    cross,
     decode_native_fixed_reception_state,
-    dot,
     project_state,
 )
 from fatebridge.core.astro.lunar_motion import SOURCE_VERSION
 from fatebridge.core.astro.lunar_observer import FIXED_FRAME_ID, METHOD_ID
+from fatebridge.core.astro.reference_frames import (
+    cross,
+    dot,
+)
 from fatebridge.utils.errors import EphemerisSourceError
 
 SOURCE_STATE_METHOD_ID = "continuous_lahiri_lunar_source_state_v1"

@@ -3,14 +3,17 @@
 import asyncio
 import hashlib
 import json
+import math
 from concurrent.futures import ThreadPoolExecutor
 from copy import deepcopy
 from datetime import date
+from decimal import Decimal
 from pathlib import Path
 
 import pytest
 from fastmcp import Client
 from jsonschema import Draft202012Validator, FormatChecker
+from mpmath import mp
 from pydantic import ValidationError
 
 from fatebridge.cli import run
@@ -66,18 +69,107 @@ def test_all_independent_official_vectors_remain_auditable_at_their_literal_prec
     assert all(r["component"] not in ("d", "i") for r in large["disagreements"])
 
 
-def test_current_noaa_c_agreement_and_guard_against_missing_or_corrupt_vectors():
+def test_original_noaa_c_constant_discrepancies_and_reference_corruption_guards():
     reference = json.loads((FOLDER / "NOAA_C_100_main_field_values.json").read_text())
     raw = (FOLDER / "NOAA_100_test_values.txt").read_text()
     audit = audit_noaa_c_vectors(reference, raw)
     assert audit["rows"] == 100 and audit["comparisons"] == 700
-    assert audit["official_c_implementation_agreement"]
+    # Original unmodified C uses a rounded semiminor axis. Retain this separate
+    # 100-row gate and its discrepancies after the exact-WGS84 repair.
+    assert not audit["official_c_implementation_agreement"]
+    assert len(audit["disagreements"]) == 340
     changed = deepcopy(reference)
     changed["vectors"][0]["field"]["x"] += 1
-    assert not audit_noaa_c_vectors(changed, raw)["official_c_implementation_agreement"]
+    corrupt = audit_noaa_c_vectors(changed, raw)
+    assert any(
+        row["row"] == 1
+        and row["component"] == "x"
+        and row["absolute_difference"] > 0.99
+        for row in corrupt["disagreements"]
+    )
     changed["vectors"].pop()
     with pytest.raises(ValueError):
         audit_noaa_c_vectors(changed, raw)
+
+
+@pytest.mark.parametrize(
+    "source_row,field",
+    [
+        (23, "north_component_nt"),
+        (24, "east_component_nt"),
+        (25, "down_component_nt"),
+        (29, "total_intensity_nt"),
+        (30, "horizontal_intensity_nt"),
+        (31, "declination_degrees_east"),
+        (32, "inclination_degrees_down"),
+    ],
+)
+def test_primary_report_table3b_main_fields_at_their_printed_precision(
+    source_row, field
+):
+    reference = json.loads(
+        (
+            Path(__file__).parents[1] / "fixtures/fengshui-wmm2025-report-table3b.json"
+        ).read_text()
+    )
+    source = reference["table3a_input"]
+    result = calculate(
+        latitude=float(source["latitude"]),
+        longitude=float(source["longitude_public_equivalent"]),
+        height_km_wgs84=float(source["height_km_wgs84"]),
+        decimal_year=float(source["decimal_year"]),
+    )["field"][field]
+    printed = reference["rows"][source_row - 1]
+    assert printed["row"] == source_row
+    if printed["unit"] == "rad":
+        result = math.radians(result)
+    expected = Decimal(printed["value"])
+    half_last_place = Decimal(1).scaleb(expected.as_tuple().exponent) / 2
+    assert abs(Decimal.from_float(result) - expected) <= half_last_place
+
+
+def test_all_frozen_wgs84_cohorts_match_independent_rodrigues_binary64_rounding():
+    reference = json.loads(
+        (
+            Path(__file__).parents[1] / "fixtures/fengshui-wmm-wgs84-reference-v1.json"
+        ).read_text()
+    )
+    assert reference["reference_precisions"] == [80, 120]
+    assert reference["coefficient_sha256"] == (
+        "dfa8597825af4e0b87ff4198a5b4fb661b3c49f4cd090cd0164e0259b075582f"
+    )
+    assert [len(c["inputs"]) for c in reference["cohorts"]] == [100, 12, 2388, 64]
+    fields = (
+        "north_component_nt",
+        "east_component_nt",
+        "down_component_nt",
+        "horizontal_intensity_nt",
+        "total_intensity_nt",
+        "inclination_degrees_down",
+        "declination_degrees_east",
+    )
+    for cohort in reference["cohorts"]:
+        assert len(cohort["inputs"]) == len(cohort["expected"])
+        for raw, expected in zip(cohort["inputs"], cohort["expected"]):
+            year, height, latitude, longitude = map(float, raw)
+            result = calculate(
+                latitude=latitude,
+                longitude=(longitude + 180) % 360 - 180,
+                height_km_wgs84=height,
+                decimal_year=year,
+            )
+            assert result["field"] == dict(zip(fields, map(float, expected))), (
+                cohort["cohort"],
+                raw,
+            )
+
+
+def test_field_arithmetic_does_not_depend_on_process_global_precision():
+    expected = calculate()["field"]
+    with mp.workdps(7):
+        assert calculate()["field"] == expected
+    with mp.workdps(90):
+        assert calculate()["field"] == expected
 
 
 def test_missing_components_and_nonfinite_references_cannot_pass_numeric_acceptance():
@@ -376,4 +468,11 @@ def test_strict_evidence_business_projection_fits_real_default_mcp_budget():
         ]["north_reference"]
         == "magnetic"
     )
-    assert len(body["rulesets"][-1]["sources"]) == 5
+    assert {source["source_id"] for source in body["rulesets"][-1]["sources"]} == {
+        "GM1",
+        "GM2",
+        "GM3",
+        "GM5",
+        "GM6",
+        "GM7",
+    }

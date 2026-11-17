@@ -10,16 +10,11 @@ import pytest
 from fatebridge.core.meihua_obstruction_days import build_obstruction_timing
 from fatebridge.services.divination import calculate_meihua_analysis
 from fatebridge.services.meihua import calculate_meihua_cast
+from tests.support.reference_data import resolve as at
 
 FIXTURE = Path(__file__).parents[1] / "fixtures/meihua_obstruction_days_v1"
 CASES = json.loads((FIXTURE / "expected384.json").read_bytes())["cases"]
 MANUAL = json.loads((FIXTURE / "candidate-manual.json").read_bytes())
-
-
-def at(value, path):
-    for part in path.split("."):
-        value = value[int(part)] if isinstance(value, list) else value[part]
-    return value
 
 
 def layer(out):

@@ -9,8 +9,6 @@ import pytest
 from pydantic import ValidationError
 
 from fatebridge.core.canping import (
-    _lookup,
-    _tiaowen,
     _verses,
     build_snapshot_text,
     calculate,
@@ -22,6 +20,7 @@ from fatebridge.core.canping_texts import (
     COLLATION_PATH,
     _loaded,
     collation_summary,
+    inherited_corpus,
     lookup_record,
 )
 from fatebridge.core.requests.divination import CanpingRequest
@@ -56,7 +55,6 @@ def test_thirteen_literal_source_cells_use_the_actual_number_and_column(
         if kind == "female" and row["number"] == 2335
         else "source_cell_visually_collated"
     )
-    assert _lookup(row["element"], row["number"], kind) == text
 
 
 def test_original_thirteen_witnesses_remain_with_expanded_global_scope():
@@ -79,7 +77,7 @@ def test_original_thirteen_witnesses_remain_with_expanded_global_scope():
 
 def test_two_wrong_keys_are_corrected_without_editing_the_inherited_corpus():
     for element, wrong, right in (("火", 3838, 2838), ("土", 3372, 3373)):
-        raw = _tiaowen()["parts"][element]
+        raw = inherited_corpus()["parts"][element]
         assert str(wrong) in raw and str(right) not in raw
         selected = lookup_record(element, right, "male")
         assert selected["selection"]["inherited_number"] == wrong
@@ -153,7 +151,7 @@ def test_unreachable_special_verse_is_not_a_cross_column_fallback(element):
         for k in ("numShun", "numNi")
     }
     assert 2869 not in reachable
-    assert _tiaowen()["special"]["2869"]["text"]  # retained archival input
+    assert inherited_corpus()["special"]["2869"]["text"]  # retained archival input
 
 
 def test_unspecified_raw_gender_keeps_numbers_without_selecting_male_text():
@@ -201,7 +199,7 @@ def test_shared_luck_column_does_not_depend_on_unselected_natal_gender():
 
 
 def test_selection_and_summary_cannot_mutate_loaded_source_data():
-    before = copy.deepcopy(_tiaowen())
+    before = inherited_corpus()
     selected = lookup_record("火", 2838, "male")
     selected["selection"]["reading_notes"].append("污染")
     selected["text"] = "污染"
@@ -209,7 +207,7 @@ def test_selection_and_summary_cannot_mutate_loaded_source_data():
     summary["column_rule_pdf_pages"].append(999)
     assert 999 not in collation_summary()["column_rule_pdf_pages"]
     assert "污染" not in str(lookup_record("火", 2838, "male"))
-    assert _tiaowen() == before
+    assert inherited_corpus() == before
 
 
 def test_loaded_hash_identifies_cached_content_after_a_file_replacement(tmp_path):

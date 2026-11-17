@@ -1,13 +1,11 @@
 """Explicit data-file admission covers complete Western requests and samples."""
 
 import copy
-import hashlib
 import json
 import os
 import subprocess
 import sys
 from concurrent.futures import ThreadPoolExecutor
-from pathlib import Path
 
 import pytest
 
@@ -15,7 +13,6 @@ from fatebridge.application.execution import execute_spec
 from fatebridge.core import ephemeris_runtime as runtime
 from fatebridge.core.astro import native_execution
 from fatebridge.core.astro.birth import build_astro_birth_info
-from fatebridge.core.astro.physical_sources import PhysicalEphemerisTrace
 from fatebridge.core.astro.source_session import source_session
 from fatebridge.core.compressed_ephemeris import audit_compressed_endpoints
 from fatebridge.core.physical_ephemeris_policy import (

@@ -221,7 +221,7 @@ def _build_chart_from_positions(
         "house_system": house_system,
         "tradition": False,
         "engine_precision": "approximate_orbital_model",
-        "engine_backend": "fatebridge_approximate_orbital_model",
+        "engine_backend": "derived_midpoint_geometry",
     }
     if engine_profile:
         chart_profile.update(engine_profile)

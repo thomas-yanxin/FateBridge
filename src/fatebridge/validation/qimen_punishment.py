@@ -7,7 +7,11 @@ from pathlib import Path
 from typing import Any
 
 from fatebridge.core.metaphysics.common import MetaphysicsSeed
-from fatebridge.core.metaphysics.qimen import _qimen_build_palaces, _qimen_zhifu_zhishi
+from fatebridge.core.metaphysics.qimen import (
+    _qimen_build_palaces,
+    _qimen_pan_earth,
+    _qimen_zhifu_zhishi,
+)
 from fatebridge.core.qimen_evidence import enrich_qimen_evidence
 from fatebridge.core.qimen_punishment import describe_punishment, palace_punishment
 
@@ -87,12 +91,11 @@ def audit_punishment(directory: Path) -> dict[str, Any]:
     examples = []
     for case in ref["examples"]:
         ju = f'{case["dun"]}{"一二三四五六七八九"[case["ju"]-1]}局上元'
-        leader = _qimen_zhifu_zhishi(case["hour"], ju, dun_type=case["dun"])
+        earth = _qimen_pan_earth(ju)
+        leader = _qimen_zhifu_zhishi(case["hour"], earth, dun_type=case["dun"])
         palaces = _qimen_build_palaces(
-            time_ganzhi=case["hour"],
-            ju_text=ju,
-            dun_type=case["dun"],
-            current_term="冬至",
+            earth=earth,
+            leader=leader,
         )
         # This is symbolic source-input verification. The scaffold supplies
         # unrelated calendar fields, not a reconstructed historical date.

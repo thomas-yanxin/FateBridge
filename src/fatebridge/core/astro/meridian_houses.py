@@ -12,6 +12,7 @@ from fractions import Fraction
 from typing import Any, Dict, Mapping, Sequence
 
 from fatebridge.core.astro import runtime
+from fatebridge.core.astro.earth_attitude import earth_attitude
 from fatebridge.core.astro.meridian_placement import placement_sample_summaries
 
 RULESET = "witte1923_natal_meridian_house_geometry_v1"
@@ -56,12 +57,7 @@ def native_meridian_houses(
     sidereal: bool,
     physical_angles: Sequence[float],
 ) -> Dict[str, Any]:
-    """Use X cusps in their native house-angle frame, retaining both TT epochs.
-
-    houses_ex derives its obliquity epoch with deltat_ex(UT1, house_flags).
-    Repeating exactly that choice keeps the replay inputs in the same frame;
-    substituting the shared TT or a mean ayanamsha can be inconsistent.
-    """
+    """Use X cusps in the shared physical house equator at the supplied TT."""
     swe = runtime.swe
     if swe is None:
         raise ValueError("Native meridian houses require Swiss Ephemeris")
@@ -81,14 +77,16 @@ def native_meridian_houses(
         if sidereal:
             swe.set_sid_mode(swe.SIDM_LAHIRI, 0.0, 0.0)
         cusps, angles = runtime.ephemeris_call(
-            "houses_ex", julian_day_ut1, latitude, longitude, b"X", flags
+            "houses_ex",
+            julian_day_ut1,
+            latitude,
+            longitude,
+            b"X",
+            flags,
+            _julian_day_tt=julian_day_tt,
         )
-        angle_tt = julian_day_ut1 + float(
-            runtime.ephemeris_call("deltat_ex", julian_day_ut1, flags)
-        )
-        ecliptic, retflag = runtime.ephemeris_call("calc", angle_tt, swe.ECL_NUT, 0)
-        if retflag < 0 or not math.isfinite(ecliptic[0]) or not 0 <= ecliptic[0] < 90:
-            raise ValueError("Native meridian houses have no valid obliquity")
+        attitude = earth_attitude(swe, julian_day_ut1, julian_day_tt=julian_day_tt)
+        angle_tt = attitude.equator.jd_tt
         offset = 0.0
         if sidereal:
             ayanflag, offset = runtime.ephemeris_call(
@@ -120,19 +118,20 @@ def native_meridian_houses(
             "house_code": "X",
             "swisseph_version": str(swe.version),
             "house_flags": int(flags),
-            "obliquity_return_flags": int(retflag),
+            "obliquity_model": "physical_equator_intersection_with_source_ecliptic",
             "geographic_latitude": latitude,
             "geographic_longitude": longitude,
             "construction": "Twelve equal 30-degree right-ascension divisions starting at the upper meridian; ecliptic intersections are generally unequal in longitude",
             "zodiac": "sidereal_lahiri" if sidereal else "tropical",
-            "right_ascension_frame": "true equator/equinox of native house-angle model; unchanged by zodiac display",
+            "right_ascension_frame": "physical equator with source-ecliptic intersection origin; unchanged by zodiac display",
             "julian_day_ut1": julian_day_ut1,
             "shared_julian_day_tt": julian_day_tt,
             "native_angle_julian_day_tt": angle_tt,
             "native_angle_minus_shared_tt_seconds": (angle_tt - julian_day_tt) * 86400,
-            "angle_time_policy": "houses_ex uses UT1+deltat_ex(UT1, house_flags); obliquity and apparent Lahiri offset replayed at that exact native epoch",
+            "angle_time_policy": "explicit shared TT and UT1 for house geometry and apparent Lahiri origin",
             "armc": float(angles[2]) % 360,
-            "true_obliquity": float(ecliptic[0]),
+            "true_obliquity": attitude.reduction.house_obliquity,
+            "source_ecliptic_longitude_origin": attitude.reduction.house_longitude_origin,
             "ayanamsha_apparent": float(offset),
             "first_cusp_definition": "equatorial_ascendant",
             "tenth_cusp_definition": "upper_meridian_ecliptic_intersection",

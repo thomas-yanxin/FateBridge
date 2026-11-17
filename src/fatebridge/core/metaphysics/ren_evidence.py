@@ -3,6 +3,7 @@
 from typing import Any, Dict
 
 from fatebridge.core.metaphysics.ren_sources import (
+    JINGWEI_SOURCE,
     JINKOU_SOURCE,
     LIUREN_SOURCE,
     TANYUAN_SCAN_SHA256,
@@ -95,7 +96,7 @@ def ruleset_metadata(
             "京本行年换岁边界及己亥行年见甲人元所指课干未裁定，未认证综合喜用"
         )
     else:
-        result["version"] = "1.16.0"
+        result["version"] = "1.16.1"
         from .ren_gods import TANYUAN_TRANSCRIPTION
 
         result["conventions"][
@@ -124,9 +125,11 @@ def ruleset_metadata(
                 "guiren_scope"
             ] = "仅采用探原日贵人歌、夜贵人歌及贵人旋转；非整书配置"
         else:
+            result["source_urls"].append(JINGWEI_SOURCE)
+            result["source_title"] = "六壬经纬·贵神 / " + result["source_title"]
             result["conventions"][
                 "guiren_scope"
-            ] = "既有甲戊庚牛羊等表；与探原遵协纪辨方的十干表分开"
+            ] = "仅采用六壬经纬所选书影贵神条的昼夜起点与顺逆；与探原遵协纪辨方的十干表分开，非整书配置"
         result["source_title"] += "与德禄马定位"
         result["source_title"] += "、三传神将生克与局体"
         result["source_title"] += "、空亡分层条件"
@@ -176,7 +179,7 @@ def ruleset_metadata(
         ] = "依探原印刷配对并列六合、六冲、六害、六破和双向刑，保留寅亥破合、巳申刑合；首课用寄宫支比较空间关系，不替代日干五行或九宗门，不以合独断成局"
         result["conventions"][
             "emptiness_evidence"
-        ] = "探原论空亡的天盘本空、地盘落底空、日干寄宫地盘例外及太岁月建月将角色分别列条件；不取消原旬空两支或三传本空、坐空，不裁综合有效空亡，年命、真空半空与填实冲实仍未定"
+        ] = "探原论空亡分列天盘本空、地盘落底空、日干寄宫地盘例外及太岁月建月将的本支填实例外；不取消原旬空两支或三传本空、坐空，不裁综合有效空亡，年命、调整后真半与其他填实冲实仍未定"
         result["conventions"][
             "transmission_relations"
         ] = "探原论三传的内外战、初末生墓、递克、朝日朝枝与旬空结构单列；天将固有五行、支神本五行及三合名义局体分层，未作完整合化、救制或吉凶应期裁断"

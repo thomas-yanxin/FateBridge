@@ -214,19 +214,6 @@ class AstroRelativePartyRequest(AstroBirthRequest):
         description="Use apparent solar time for this party; defaults to civil time",
     )
 
-    # AstroBirthRequest defaults birth_timezone to "UTC", which silently treats
-    # an eastern wall-clock time as UTC and rotates the chart. Mirror the core
-    # AstroChartRequest fix: default to None so the engine infers the zone from
-    # birth_place and only falls back to UTC when no place is recognized.
-    birth_timezone: Optional[str] = Field(  # type: ignore[assignment]
-        default=None,
-        description=(
-            "Birth timezone (IANA name or UTC offset). Optional: when omitted, "
-            "FateBridge may resolve it from a supported birth_place; otherwise "
-            "the civil timezone is required. Coordinates alone are insufficient."
-        ),
-    )
-
 
 class AstroRelativeRequest(WesternEphemerisRequest):
     """Request model for relative / synastry chart generation."""

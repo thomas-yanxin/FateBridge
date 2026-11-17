@@ -41,11 +41,19 @@ def assert_quotes(body):
     ]:
         expected = next(e for e in ERRATA if e["artifact"] == artifact)
         detail = conditional[key]
-        assert detail["ruleset_version"] == expected["new_ruleset_version"]
+        version = (
+            "literal_ruleset_version" if key == "stage_knowledge" else "ruleset_version"
+        )
+        assert detail[version] == expected["new_ruleset_version"]
         clause = next(c for c in detail["clauses"] if c["id"] == expected["clause_id"])
         assert clause["quote"] == expected["new_quote"]
         assert clause["quotation_revision"] == expected["revision"]
-    assert conditional["stage_knowledge"]["missing_stages"]["火"] == ["帝旺", "绝"]
+    knowledge = conditional["stage_knowledge"]
+    assert knowledge["literal_source_stages"]["火"] == {"寅": "长生", "戌": "墓"}
+    assert knowledge["fire_cycle_derivation"]["derived_positions"] == {
+        "午": "帝旺",
+        "亥": "绝",
+    }
 
 
 def test_revised_quotes_survive_strict_projection_on_three_local_adapters(

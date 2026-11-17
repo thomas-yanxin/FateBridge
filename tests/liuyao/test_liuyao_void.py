@@ -94,6 +94,25 @@ def test_first_chart_does_not_invent_the_second_cast_or_source_outcome():
     assert void["focus"]["is_permanently_void"] is None
 
 
+def test_excluded_yin_day_support_cannot_clear_the_si_line_void():
+    result = classical(
+        dict(
+            base_code="000010",
+            changed_code="000010",
+            month="辰",
+            day_ganzhi="壬寅",
+            focus_line=2,
+        )
+    )
+    focus = result["void_conditions"]["focus"]
+    day = next(
+        c for c in focus["not_empty_conditions"] if c["rule_id"] == "day_generate"
+    )
+    assert focus["branch"] == "巳" and focus["is_xunkong"] is True
+    assert day["matched"] is True and day["qualified_matched"] is False
+    assert focus["is_true_void"] is None and focus["is_permanently_void"] is None
+
+
 def test_back_controlled_source_is_not_counted_as_moving_help_for_hidden_fire():
     # Dachu to Tai: upper Gen's line 6 Yin changes to Kun's You metal.
     # Hidden Wu fire at line 2 has a real flying Yin; only the moving Yin

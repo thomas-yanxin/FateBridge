@@ -14,6 +14,7 @@ from fractions import Fraction
 from typing import Any
 
 from mpmath import mp  # type: ignore[import-untyped]
+from mpmath.libmp import to_rational  # type: ignore[import-untyped]
 
 from fatebridge.core.astro.horizon_precision import (
     CONVERGENCE_DEGREES,
@@ -33,6 +34,7 @@ class HousePlanePosition:
     phase_degrees_decimal: str
     working_digits: tuple[int, int]
     action: str
+    phase_degrees_working: Fraction
 
 
 def _phase(
@@ -108,6 +110,7 @@ def checked_house_plane_position(
     if reported_phase == 360:
         reported_phase = math.nextafter(360.0, 0.0)
     decimal_phase = ctx.nstr(shifted, 100)
+    working_phase = Fraction(*to_rational(shifted._mpf_))
     if math.isfinite(native_position) and 1 <= native_position < 13:
         error = abs(((ctx.mpf(native_position) - 1) * 30 - shifted + 180) % 360 - 180)
         if int(native_position) == house and error <= ctx.mpf(
@@ -120,6 +123,7 @@ def checked_house_plane_position(
                 decimal_phase,
                 (low_digits, digits),
                 "native_coordinate_retained",
+                working_phase,
             )
     value = float(shifted / 30 + 1)
     # Retain the exact half-open house when binary64 rounds up to its boundary.
@@ -136,4 +140,5 @@ def checked_house_plane_position(
         decimal_phase,
         (low_digits, digits),
         "scalar_plane_recomputed",
+        working_phase,
     )

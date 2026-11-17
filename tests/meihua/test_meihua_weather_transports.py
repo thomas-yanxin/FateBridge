@@ -1,7 +1,6 @@
 """The dedicated weather branch and its source evidence survive all surfaces."""
 
 import asyncio
-import hashlib
 import json
 
 import pytest
@@ -10,6 +9,7 @@ from jsonschema import Draft202012Validator
 
 from fatebridge.application.examples import suggested_fields
 from fatebridge.mcp_server import create_mcp_app
+from tests.fixtures.mcp_result_delivery import read_full_result
 from tests.meihua.test_meihua_transports import INPUT
 from tests.meihua.test_meihua_weather_cast_variants import CASES as VARIANT_CASES
 from tests.meihua.test_meihua_weather_cast_variants import resolve
@@ -268,22 +268,9 @@ def test_large_candidate_card_remains_readable_from_same_run_without_recalculati
             )
             assert not reply.is_error
             data = reply.structured_content
-            ref = data["result_delivery"]
-            manifest = json.loads(
-                (await client.read_resource(ref["manifest_uri"]))[0].text
-            )
-            assert manifest["run_metadata"]["run_id"] == data["run_metadata"]["run_id"]
-            uri = f"fatebridge://results/{ref['result_id']}/fields/interpretation.weather.casting_variants/0"
-            parts = []
-            while uri:
-                page = json.loads((await client.read_resource(uri))[0].text)
-                assert page["result_id"] == ref["result_id"]
-                assert page["path"] == "interpretation.weather.casting_variants"
-                parts.append(page["text"])
-                uri = page["next_uri"]
-            full_text = "".join(parts)
-            assert hashlib.sha256(full_text.encode()).hexdigest() == page["sha256"]
-            variants = json.loads(full_text)
+            assert "result_delivery" in data
+            restored = await read_full_result(client, data)
+            variants = restored["interpretation"]["weather"]["casting_variants"]
             assert len(variants) == 2
             rows = {v["line_sum_basis"]: v for v in variants}
             assert "summer_li_without_kan" not in rows["raw_counts"]["matched_rule_ids"]

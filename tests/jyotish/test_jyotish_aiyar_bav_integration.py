@@ -9,7 +9,7 @@ from fatebridge.core.jyotish import build_india, topic_evidence
 from fatebridge.core.jyotish_aiyar_ashtakavarga import RULE, SOURCE, calculate
 from fatebridge.core.output_jyotish import JyotishIndia
 from tests.fixtures.surface_payloads import astro_payload
-from tests.jyotish.test_jyotish_ashtakavarga import resolve
+from tests.support.reference_data import resolve
 
 
 @pytest.fixture(scope="module")

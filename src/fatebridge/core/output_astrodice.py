@@ -243,6 +243,9 @@ class DiceMotionPolicy(PartialOutput):
 class DiceLongitudeMotion(PartialOutput):
     longitude_speed: Optional[float] = None
     native_longitude_speed: Optional[float] = None
+    model_longitude_speed: Optional[float] = None
+    sidereal_origin_correction: Optional[float] = None
+    source_url: Optional[str] = None
     light_time_correction: Optional[float] = None
     spatial_aberration_correction: Optional[float] = None
     lunar_source_remainder_correction: Optional[float] = None
@@ -250,7 +253,9 @@ class DiceLongitudeMotion(PartialOutput):
     rotation_correction: Optional[float] = None
     position_derivative_correction: Optional[float] = None
     method_id: Optional[str] = None
-    correction_status: Optional[Literal["applied", "partial", "native_only"]] = None
+    correction_status: Optional[
+        Literal["applied", "partial", "native_only", "approximate_model"]
+    ] = None
     unit: Optional[Literal["degree_per_day"]] = None
     direction: Optional[
         Literal["direct", "retrograde", "zero_instantaneous_rate", "not_computed"]

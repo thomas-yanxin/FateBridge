@@ -94,6 +94,8 @@ def test_invalid_pada_is_rejected_without_coercion_by_domain_and_public_requests
 
 def test_reference_pada_does_not_change_calendar_sanjiu_activities_or_sky():
     kwargs = dict(
+        lat="31n13",
+        lon="121e28",
         date="2025-03-04",
         time="12:00:00",
         zone="+08:00",

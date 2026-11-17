@@ -135,17 +135,59 @@ def verify_solar_root_context(chart: dict[str, Any]) -> dict[str, Any]:
             or not 0 <= s["bracket_width_seconds"] <= 0.0002
         ):
             raise ValueError("Wrong selected root")
+        observed = w["local_solar_lattice"]
+        initial_lo, initial_hi = (
+            observed["initial_lower_jd_tt"],
+            observed["initial_upper_jd_tt"],
+        )
+        if any(
+            type(tt) is not float
+            or not math.isfinite(tt)
+            or not birth - 110 < tt < birth - 70
+            for tt in (initial_lo, initial_hi)
+        ) or not (
+            initial_lo == initial_hi
+            or math.nextafter(initial_lo, math.inf) == initial_hi
+        ):
+            raise ValueError("Not an initial adjacent bracket or zero")
+        lattice = derive_lattice(
+            p,
+            initial_lo,
+            initial_hi,
+            [
+                {k: row[k] for k in ("jd_tt", "sun_longitude")}
+                for row in observed["samples"]
+            ],
+        )
+        initial_residuals = [
+            (Fraction(p) - Fraction(row["sun_longitude"])) % 360 - 88
+            for row in lattice["samples"]
+            if row["jd_tt"] in (initial_lo, initial_hi)
+        ]
+        if not (
+            initial_residuals == [0]
+            if initial_lo == initial_hi
+            else initial_residuals[0] > 0 > initial_residuals[1]
+        ):
+            raise ValueError("Initial contact lacks a forward bracket or zero")
+        contact = lattice["preferred_numeric_contact"]
+        if contact is None:
+            raise ValueError("No observed forward contact")
+        if any(
+            not _same_value(
+                {k: w[key][k] for k in ("jd_tt", "sun_longitude", "exact_residual")},
+                lattice["samples"][index],
+            )
+            for key, index in (
+                ("lower", contact["lower_index"]),
+                ("upper", contact["upper_index"]),
+                ("selected", contact["selected_index"]),
+            )
+        ):
+            raise ValueError("Not the preferred observed forward contact")
         fixed = {
             "sun_coordinate_policy": SOLAR_COORDINATE_POLICY,
-            "local_solar_lattice": derive_lattice(
-                p,
-                lo,
-                hi,
-                [
-                    {k: row[k] for k in ("jd_tt", "sun_longitude")}
-                    for row in w["local_solar_lattice"]["samples"]
-                ],
-            ),
+            "local_solar_lattice": lattice,
             "local_root_family": derive_family(
                 s,
                 chart["activations"]["personality"],
@@ -181,7 +223,7 @@ def verify_solar_root_context(chart: dict[str, Any]) -> dict[str, Any]:
                     "physical_backend_policy", "auto"
                 ),
             ),
-            "method_id": "human_design_adjacent_float_solar_root_v1",
+            "method_id": "human_design_observed_contact_solar_root_v2",
             "selection_policy": ROOT_POLICY,
             "termination": (
                 "observed_exact_function_zero"

@@ -44,11 +44,11 @@ from fatebridge.application.compute_limits import (
     MAX_CONCURRENCY as HEAVY_CALC_MAX_CONCURRENCY,
 )
 from fatebridge.application.discovery import discover_specs
+from fatebridge.application.execution import result_is_error
 from fatebridge.application.result_delivery import RESULT_STORE
 from fatebridge.core.astro import runtime as astrology_core
 from fatebridge.core.execution_context import correlate_error, safe_correlation
 from fatebridge.core.predictive import _common as astrology_predictive_core
-from fatebridge.services.run_metadata import attach_run_metadata
 from fatebridge.utils.errors import (
     ErrorEnvelope,
     ParameterError,
@@ -245,8 +245,6 @@ REQUEST_METRICS = RuntimeMetrics()
 
 
 def _build_readiness_payload() -> Dict[str, Any]:
-    from importlib.util import find_spec
-
     western_swisseph_available = astrology_predictive_core.swe is not None
     checks: Dict[str, Dict[str, Any]] = {
         "core_api": {
@@ -264,7 +262,6 @@ def _build_readiness_payload() -> Dict[str, Any]:
             "ok": western_swisseph_available,
             "required": False,
             "swisseph_available": astrology_predictive_core.swe is not None,
-            "kerykeion_available": find_spec("kerykeion") is not None,
             "engine_backend": "fatebridge_swisseph_native",
         },
         "api_key_auth": {
@@ -447,8 +444,6 @@ def _get_heavy_calc_semaphore() -> asyncio.Semaphore:
 async def _execute_service(
     service: Callable[..., Dict[str, Any]],
     *args: Any,
-    error_is_fatal: Optional[Callable[[Dict[str, Any]], bool]] = None,
-    tool_name: Optional[str] = None,
     cpu_bound: bool = False,
     **kwargs: Any,
 ) -> Dict[str, Any]:
@@ -457,15 +452,12 @@ async def _execute_service(
             result = await run_in_threadpool(service, *args, **kwargs)
     else:
         result = await run_in_threadpool(service, *args, **kwargs)
-    fatal_error = error_is_fatal(result) if error_is_fatal else "error" in result
-    if fatal_error:
+    if result_is_error(result):
         raise HTTPException(
             status_code=int(result.get("status_code", 500)),
             detail=_build_error_detail(result),
         )
-    # tool_name is supplied by the catalog registrar (spec.run_metadata_name);
-    # the neutral fallback only guards a stray non-catalog caller.
-    return attach_run_metadata(result, tool_name=tool_name or "unknown_tool")
+    return result
 
 
 @app.get("/health")

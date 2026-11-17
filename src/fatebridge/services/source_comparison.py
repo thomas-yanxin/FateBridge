@@ -38,6 +38,8 @@ def calculate_bazi_source_compare(
         },
         "current_calculation": {
             "strength_level": current["strength_level"],
+            "engineering_index": current["engineering_index"],
+            "classical_adjudication": current["classical_adjudication"],
             "method_id": current["assessment"]["method_id"],
             "assessment": current["assessment"],
             "energy_provenance": build_energy_provenance(
@@ -49,5 +51,6 @@ def calculate_bazi_source_compare(
             "calculation_overridden": False,
         },
         "source_comparison": comparison,
-        "summary": annotation_comparison_summary(comparison),
+        "summary": annotation_comparison_summary(comparison)
+        + " 比较等级为工程政策标签；原典力量另见classical_adjudication，未裁定不以工程档回填。",
     }

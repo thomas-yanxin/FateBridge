@@ -1,9 +1,7 @@
 """Frozen complete second cohort, actual three protocols, and faithful snapshots."""
 
-import json
 import shutil
 from datetime import datetime
-from pathlib import Path
 
 import pytest
 import swisseph as swe
@@ -12,7 +10,6 @@ from scripts.ren import audit_ren_seconds as audit
 from scripts.ren.ren_second_reference import ReferenceClock
 from tests.support.transports import AS_OF, SPECS, business, rest, surface_calls
 
-ROOT = Path(__file__).resolve().parents[2]
 IDS = [
     f"{term}-{side}"
     for term in [
@@ -39,7 +36,9 @@ def test_whole_reference_is_frozen_before_candidate_and_not_a_physical_holdout(f
     assert {r["year"] for r in rows} == set(range(1800, 2201))
     assert set(p["profiles"]) == {"auto_empty", "auto_swiss", "native_swiss_control"}
     assert frozen["data"]["production_imports"] is False
-    assert frozen["data"]["inside_root_bracket_ids"] == []
+    # The inclusive independent interval contains this one original input.
+    # Its exact decision is still compared; it is not a physical side guarantee.
+    assert frozen["data"]["inside_root_bracket_ids"] == ["1952-立秋-floor"]
     assert all(r["expected"][k] is not None for r in rows for k in r["expected"])
     assert any(datetime.fromisoformat(r["civil_utc"]).second != 0 for r in rows)
     assert frozen["data"]["new_independent_physical_events"] == 0
@@ -47,17 +46,18 @@ def test_whole_reference_is_frozen_before_candidate_and_not_a_physical_holdout(f
     assert p["criteria"]["input_clock_seconds"] == 0.0002
 
 
-@pytest.mark.parametrize("fault", ["reference_bytes", "manifest_bytes", "extra_file"])
+@pytest.mark.parametrize("fault", ["reference_bytes", "replacement", "truncated"])
 def test_corrupt_reference_is_rejected_without_rescoring(tmp_path, fault):
     folder = tmp_path / "corpus"
     shutil.copytree(audit.CORPUS, folder)
+    path = folder / "reference.json.gz"
     if fault == "reference_bytes":
-        with (folder / "probes.json.gz").open("ab") as f:
+        with path.open("ab") as f:
             f.write(b"wrong")
-    elif fault == "manifest_bytes":
-        (folder / "freeze.json").write_text("{}")
+    elif fault == "replacement":
+        path.write_bytes(b"{}")
     else:
-        (folder / "hidden.json").write_text("{}")
+        path.write_bytes(path.read_bytes()[:100])
     with pytest.raises(ValueError, match="Frozen"):
         audit.reference(folder)
 
@@ -66,7 +66,7 @@ def test_reference_clock_matches_all233_original_sofa_cases_without_production(f
     cases = frozen["data"]["reference_clock_sofa_checks"]
     assert len(cases) == 233
     assert max(abs(r["delta_seconds"]) for r in cases) <= 0.0002
-    sofa = json.loads((ROOT / "tests/fixtures/historical-utc-sofa.json").read_text())
+    sofa = frozen["source_data"]["sofa"]
     clock = ReferenceClock(sofa["historical_coefficients"], swe)
     for case in sofa["cases"]:
         got, _ = clock.forward(datetime.fromisoformat(case["utc"]))

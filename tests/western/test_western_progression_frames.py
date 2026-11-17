@@ -4,7 +4,7 @@ Direct Swiss calls check coordinate/time plumbing, not independent ephemeris
 accuracy or the empirical validity of symbolic progression techniques.
 """
 
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 
 import pytest
 
@@ -33,6 +33,8 @@ BIRTH_INPUTS = dict(
 )
 BIRTH = datetime(1972, 7, 1, tzinfo=timezone.utc)
 TARGET = datetime(2002, 7, 1, tzinfo=timezone.utc)
+# FLINT 3.6.0: 946684800000000 µs / (36524219/100000), nearest µs.
+PROGRESSED = datetime(1972, 7, 30, 23, 58, 57, 147239, tzinfo=timezone.utc)
 
 
 def native_coordinates(body, moment, *, sidereal=False, equatorial=False):
@@ -68,15 +70,21 @@ def test_declinations_use_the_civil_instants_tt_instead_of_treating_utc_as_ut1(m
 def test_vedic_natal_reference_and_progressed_positions_share_native_lahiri():
     result = calculate_vedicprog(**BIRTH_INPUTS, zodiac_type="Tropic")
     assert "error" not in result, result
-    age = (TARGET - BIRTH).total_seconds() / (365.2425 * 86400)
-    progressed = BIRTH + timedelta(days=age)
+    assert (
+        datetime.fromisoformat(result["vedic_progression"]["progressed_datetime"])
+        == PROGRESSED
+    )
+    assert (
+        result["vedic_progression"]["calculation_options"]["year_basis"]
+        == "fixed_365_24219_nominal_days"
+    )
     for body, planet in (
         ("sun", swe.SUN),
         ("moon", swe.MOON),
         ("mercury", swe.MERCURY),
     ):
         expected_natal = native_coordinates(planet, BIRTH, sidereal=True)[0]
-        expected_progressed = native_coordinates(planet, progressed, sidereal=True)[0]
+        expected_progressed = native_coordinates(planet, PROGRESSED, sidereal=True)[0]
         assert result["natal_reference"][body]["absolute_degree"] == pytest.approx(
             expected_natal, abs=1e-8
         )
@@ -131,6 +139,9 @@ def test_correct_progression_frames_reach_rest_mcp_cli(tool, surface_calls):
     outputs = [http.json(), cli, protocol.structured_content]
     assert business(outputs[0]) == business(outputs[1]) == business(outputs[2])
     for result in outputs:
+        assert datetime.fromisoformat(result[key]["progressed_datetime"]) == PROGRESSED
+        assert result[key]["calculation_options"]["year_key_numerator"] == 36524219
+        assert result[key]["calculation_options"]["year_key_denominator"] == 100000
         if key == "vedic_progression":
             expected = native_coordinates(swe.MOON, BIRTH, sidereal=True)[0]
             assert result["natal_reference"]["moon"][
@@ -139,8 +150,6 @@ def test_correct_progression_frames_reach_rest_mcp_cli(tool, surface_calls):
             assert result["analysis_context"]["zodiac_type"] == "Sidereal"
         else:
             assert result[key]["parallels"]
-            age = (TARGET - BIRTH).total_seconds() / (365.2425 * 86400)
-            progressed = BIRTH + timedelta(days=age)
             for row in result[key]["parallels"]:
                 natal_body = getattr(swe, row["natal"].upper())
                 progressed_body = getattr(swe, row["progressed"].upper())
@@ -148,7 +157,7 @@ def test_correct_progression_frames_reach_rest_mcp_cli(tool, surface_calls):
                     natal_body, BIRTH, equatorial=True
                 )[1]
                 progressed_declination = native_coordinates(
-                    progressed_body, progressed, equatorial=True
+                    progressed_body, PROGRESSED, equatorial=True
                 )[1]
                 assert row["natal_declination"] == round(natal_declination, 4)
                 assert row["progressed_declination"] == round(progressed_declination, 4)

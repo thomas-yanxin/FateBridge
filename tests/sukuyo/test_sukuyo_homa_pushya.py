@@ -159,6 +159,8 @@ def test_actual_rest_native_mcp_cli_keep_physical_witness_and_existing_candidate
         capsys,
         "suzhan",
         {
+            "lat": "31n13",
+            "lon": "121e28",
             "date": date,
             "time": "04:30:00",
             "zone": "+08:00",

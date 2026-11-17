@@ -1,0 +1,514 @@
+{
+  "profile_id": "qimen_yanyi_siku_vol4_ju_captions_v1",
+  "source_title": "欽定四庫全書·遁甲演義卷四·十八局圖題",
+  "source_url": "https://ourartnet.com/King_James/Hushulei/047.pdf",
+  "source_excerpt_sha256": "dc818c650afcf5ed32f7894cd7493a3dbebd7649975f1cef55150133ae3a787c",
+  "annotation_method": "Visual reading by AI assistant of all18 crop images, right-to-left vertical captions; expanded literal 上/中/下 to 元. No program table used as expected output. Source-aware and not blind; existing images reused. No dated full-board or prediction validation.",
+  "authority_scope": "Literal captions from selected third-party-hosted Siku scan pages63–71. Not authenticated library copy, full-book collation, dated full-board acceptance or prediction validation.",
+  "diagrams": [
+    {
+      "pdf_page": 63,
+      "half": "upper",
+      "dun": "阳遁",
+      "ju_number": 1,
+      "uses": [
+        {
+          "term": "冬至",
+          "yuan": "上元",
+          "raw_label": "冬至上"
+        },
+        {
+          "term": "惊蛰",
+          "yuan": "上元",
+          "raw_label": "驚蟄上"
+        },
+        {
+          "term": "清明",
+          "yuan": "中元",
+          "raw_label": "清明中"
+        },
+        {
+          "term": "立夏",
+          "yuan": "中元",
+          "raw_label": "立夏中"
+        }
+      ]
+    },
+    {
+      "pdf_page": 63,
+      "half": "lower",
+      "dun": "阳遁",
+      "ju_number": 2,
+      "uses": [
+        {
+          "term": "小寒",
+          "yuan": "上元",
+          "raw_label": "小寒上"
+        },
+        {
+          "term": "立春",
+          "yuan": "下元",
+          "raw_label": "立春下"
+        },
+        {
+          "term": "谷雨",
+          "yuan": "中元",
+          "raw_label": "穀雨中"
+        },
+        {
+          "term": "小满",
+          "yuan": "中元",
+          "raw_label": "小滿中"
+        }
+      ]
+    },
+    {
+      "pdf_page": 64,
+      "half": "upper",
+      "dun": "阳遁",
+      "ju_number": 3,
+      "uses": [
+        {
+          "term": "大寒",
+          "yuan": "上元",
+          "raw_label": "大寒上"
+        },
+        {
+          "term": "春分",
+          "yuan": "上元",
+          "raw_label": "春分上"
+        },
+        {
+          "term": "雨水",
+          "yuan": "下元",
+          "raw_label": "雨水下"
+        },
+        {
+          "term": "芒种",
+          "yuan": "中元",
+          "raw_label": "芒種中"
+        }
+      ]
+    },
+    {
+      "pdf_page": 64,
+      "half": "lower",
+      "dun": "阳遁",
+      "ju_number": 4,
+      "uses": [
+        {
+          "term": "冬至",
+          "yuan": "下元",
+          "raw_label": "冬至下"
+        },
+        {
+          "term": "惊蛰",
+          "yuan": "下元",
+          "raw_label": "驚蟄下"
+        },
+        {
+          "term": "清明",
+          "yuan": "上元",
+          "raw_label": "清明上"
+        },
+        {
+          "term": "立夏",
+          "yuan": "上元",
+          "raw_label": "立夏上"
+        }
+      ]
+    },
+    {
+      "pdf_page": 65,
+      "half": "upper",
+      "dun": "阳遁",
+      "ju_number": 5,
+      "uses": [
+        {
+          "term": "小寒",
+          "yuan": "下元",
+          "raw_label": "小寒下"
+        },
+        {
+          "term": "立春",
+          "yuan": "中元",
+          "raw_label": "立春中"
+        },
+        {
+          "term": "谷雨",
+          "yuan": "上元",
+          "raw_label": "穀雨上"
+        },
+        {
+          "term": "小满",
+          "yuan": "上元",
+          "raw_label": "小滿上"
+        }
+      ]
+    },
+    {
+      "pdf_page": 65,
+      "half": "lower",
+      "dun": "阳遁",
+      "ju_number": 6,
+      "uses": [
+        {
+          "term": "大寒",
+          "yuan": "下元",
+          "raw_label": "大寒下"
+        },
+        {
+          "term": "雨水",
+          "yuan": "中元",
+          "raw_label": "雨水中"
+        },
+        {
+          "term": "春分",
+          "yuan": "下元",
+          "raw_label": "春分下"
+        },
+        {
+          "term": "芒种",
+          "yuan": "上元",
+          "raw_label": "芒種上"
+        }
+      ]
+    },
+    {
+      "pdf_page": 66,
+      "half": "upper",
+      "dun": "阳遁",
+      "ju_number": 7,
+      "uses": [
+        {
+          "term": "冬至",
+          "yuan": "中元",
+          "raw_label": "冬至中"
+        },
+        {
+          "term": "惊蛰",
+          "yuan": "中元",
+          "raw_label": "驚蟄中"
+        },
+        {
+          "term": "清明",
+          "yuan": "下元",
+          "raw_label": "清明下"
+        },
+        {
+          "term": "立夏",
+          "yuan": "下元",
+          "raw_label": "立夏下"
+        }
+      ]
+    },
+    {
+      "pdf_page": 66,
+      "half": "lower",
+      "dun": "阳遁",
+      "ju_number": 8,
+      "uses": [
+        {
+          "term": "小寒",
+          "yuan": "中元",
+          "raw_label": "小寒中"
+        },
+        {
+          "term": "立春",
+          "yuan": "上元",
+          "raw_label": "立春上"
+        },
+        {
+          "term": "谷雨",
+          "yuan": "下元",
+          "raw_label": "穀雨下"
+        },
+        {
+          "term": "小满",
+          "yuan": "下元",
+          "raw_label": "小滿下"
+        }
+      ]
+    },
+    {
+      "pdf_page": 67,
+      "half": "upper",
+      "dun": "阳遁",
+      "ju_number": 9,
+      "uses": [
+        {
+          "term": "大寒",
+          "yuan": "中元",
+          "raw_label": "大寒中"
+        },
+        {
+          "term": "雨水",
+          "yuan": "上元",
+          "raw_label": "雨水上"
+        },
+        {
+          "term": "春分",
+          "yuan": "中元",
+          "raw_label": "春分中"
+        },
+        {
+          "term": "芒种",
+          "yuan": "下元",
+          "raw_label": "芒種下"
+        }
+      ]
+    },
+    {
+      "pdf_page": 67,
+      "half": "lower",
+      "dun": "阴遁",
+      "ju_number": 9,
+      "uses": [
+        {
+          "term": "夏至",
+          "yuan": "上元",
+          "raw_label": "夏至上"
+        },
+        {
+          "term": "白露",
+          "yuan": "上元",
+          "raw_label": "白露上"
+        },
+        {
+          "term": "寒露",
+          "yuan": "中元",
+          "raw_label": "寒露中"
+        },
+        {
+          "term": "立冬",
+          "yuan": "中元",
+          "raw_label": "立冬中"
+        }
+      ]
+    },
+    {
+      "pdf_page": 68,
+      "half": "upper",
+      "dun": "阴遁",
+      "ju_number": 8,
+      "uses": [
+        {
+          "term": "小暑",
+          "yuan": "上元",
+          "raw_label": "小暑上"
+        },
+        {
+          "term": "立秋",
+          "yuan": "下元",
+          "raw_label": "立秋下"
+        },
+        {
+          "term": "霜降",
+          "yuan": "中元",
+          "raw_label": "霜降中"
+        },
+        {
+          "term": "小雪",
+          "yuan": "中元",
+          "raw_label": "小雪中"
+        }
+      ]
+    },
+    {
+      "pdf_page": 68,
+      "half": "lower",
+      "dun": "阴遁",
+      "ju_number": 7,
+      "uses": [
+        {
+          "term": "大暑",
+          "yuan": "上元",
+          "raw_label": "大暑上"
+        },
+        {
+          "term": "处暑",
+          "yuan": "下元",
+          "raw_label": "處暑下"
+        },
+        {
+          "term": "秋分",
+          "yuan": "上元",
+          "raw_label": "秋分上"
+        },
+        {
+          "term": "大雪",
+          "yuan": "中元",
+          "raw_label": "大雪中"
+        }
+      ]
+    },
+    {
+      "pdf_page": 69,
+      "half": "upper",
+      "dun": "阴遁",
+      "ju_number": 6,
+      "uses": [
+        {
+          "term": "夏至",
+          "yuan": "下元",
+          "raw_label": "夏至下"
+        },
+        {
+          "term": "白露",
+          "yuan": "下元",
+          "raw_label": "白露下"
+        },
+        {
+          "term": "寒露",
+          "yuan": "上元",
+          "raw_label": "寒露上"
+        },
+        {
+          "term": "立冬",
+          "yuan": "上元",
+          "raw_label": "立冬上"
+        }
+      ]
+    },
+    {
+      "pdf_page": 69,
+      "half": "lower",
+      "dun": "阴遁",
+      "ju_number": 5,
+      "uses": [
+        {
+          "term": "小暑",
+          "yuan": "下元",
+          "raw_label": "小暑下"
+        },
+        {
+          "term": "立秋",
+          "yuan": "中元",
+          "raw_label": "立秋中"
+        },
+        {
+          "term": "霜降",
+          "yuan": "上元",
+          "raw_label": "霜降上"
+        },
+        {
+          "term": "小雪",
+          "yuan": "上元",
+          "raw_label": "小雪上"
+        }
+      ]
+    },
+    {
+      "pdf_page": 70,
+      "half": "upper",
+      "dun": "阴遁",
+      "ju_number": 4,
+      "uses": [
+        {
+          "term": "大暑",
+          "yuan": "下元",
+          "raw_label": "大暑下"
+        },
+        {
+          "term": "处暑",
+          "yuan": "中元",
+          "raw_label": "處暑中"
+        },
+        {
+          "term": "秋分",
+          "yuan": "下元",
+          "raw_label": "秋分下"
+        },
+        {
+          "term": "大雪",
+          "yuan": "上元",
+          "raw_label": "大雪上"
+        }
+      ]
+    },
+    {
+      "pdf_page": 70,
+      "half": "lower",
+      "dun": "阴遁",
+      "ju_number": 3,
+      "uses": [
+        {
+          "term": "夏至",
+          "yuan": "中元",
+          "raw_label": "夏至中"
+        },
+        {
+          "term": "白露",
+          "yuan": "中元",
+          "raw_label": "白露中"
+        },
+        {
+          "term": "寒露",
+          "yuan": "下元",
+          "raw_label": "寒露下"
+        },
+        {
+          "term": "立冬",
+          "yuan": "下元",
+          "raw_label": "立冬下"
+        }
+      ]
+    },
+    {
+      "pdf_page": 71,
+      "half": "upper",
+      "dun": "阴遁",
+      "ju_number": 2,
+      "uses": [
+        {
+          "term": "小暑",
+          "yuan": "中元",
+          "raw_label": "小暑中"
+        },
+        {
+          "term": "立秋",
+          "yuan": "上元",
+          "raw_label": "立秋上"
+        },
+        {
+          "term": "霜降",
+          "yuan": "下元",
+          "raw_label": "霜降下"
+        },
+        {
+          "term": "小雪",
+          "yuan": "下元",
+          "raw_label": "小雪下"
+        }
+      ]
+    },
+    {
+      "pdf_page": 71,
+      "half": "lower",
+      "dun": "阴遁",
+      "ju_number": 1,
+      "uses": [
+        {
+          "term": "大暑",
+          "yuan": "中元",
+          "raw_label": "大暑中"
+        },
+        {
+          "term": "处暑",
+          "yuan": "上元",
+          "raw_label": "處暑上"
+        },
+        {
+          "term": "秋分",
+          "yuan": "中元",
+          "raw_label": "秋分中"
+        },
+        {
+          "term": "大雪",
+          "yuan": "下元",
+          "raw_label": "大雪下"
+        }
+      ]
+    }
+  ]
+}

@@ -5,7 +5,7 @@ import copy
 import gzip
 import hashlib
 import json
-from datetime import date, datetime, timedelta, timezone
+from datetime import date, timedelta
 from pathlib import Path
 
 import pytest

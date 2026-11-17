@@ -1,6 +1,7 @@
 """Full literal-table integrity and source gaps that rate-only queries cannot show."""
 
 import copy
+import gzip
 import hashlib
 import json
 from fractions import Fraction as F
@@ -14,6 +15,12 @@ from fatebridge.core.guolao_ruler_calendar import ruler_calendar_scale
 from fatebridge.validation.guolao_ruler_printed_table import audit_printed_limit_table
 
 FIXTURE = Path(__file__).parents[1] / "fixtures/guolao-ruler-printed-table-v1"
+REFERENCE_DATA = Path(__file__).parents[1] / "data/guolao/ruler_flint_v1"
+MANIFEST = json.loads((REFERENCE_DATA / "manifest.json").read_text())
+BLOB = (REFERENCE_DATA / "reference.json.gz").read_bytes()
+assert hashlib.sha256(BLOB).hexdigest() == MANIFEST["files"]["reference.json.gz"]
+RULER_REFERENCE = json.loads(gzip.decompress(BLOB))
+RULER_INPUTS = json.loads((REFERENCE_DATA / "arithmetic-inputs.json").read_text())
 
 
 def test_complete_literal_reading_and_original_scan_freeze_precede_numeric_comparison():
@@ -214,3 +221,126 @@ def test_overlap_keeps_both_cells_without_selecting_one_or_using_formula():
 def test_civil_year_or_untyped_date_not_coerced_into_the_table(date):
     with pytest.raises((TypeError, ValueError)):
         core.load_printed_limit_table(core.PROFILE).lookup("jie", date)
+
+
+@pytest.mark.parametrize(
+    "group", RULER_INPUTS["groups"], ids=lambda group: group["group"]
+)
+def test_every_frozen_nominal_day_and_subday_matches_independent_rational_targets(
+    group,
+):
+    scale = ruler_calendar_scale(group["palaces"][0])
+    table = core.load_printed_limit_table(core.PROFILE)
+    for row in RULER_REFERENCE["rows"]:
+        if row["group"] != group["group"]:
+            continue
+        label = row["nominal_source_date"]
+        days = F(row["elapsed_nominal_days_exact"])
+        degrees = F(row["formula_degrees_exact"])
+        date = Date(
+            label["ordinal_year"],
+            label["month"],
+            label["day"],
+            F(label["fraction_of_nominal_day_exact"]),
+        )
+        assert Date.from_elapsed_days(days).as_dict() == label
+        assert date.elapsed_days == days
+        assert scale.days_from_degrees(degrees) == days
+        assert scale.degrees_from_days(days) == degrees
+        position = scale.position(date)
+        assert position["nominal_source_date"] == label
+        assert position["limit_scale_degrees_exact"] == row["formula_degrees_exact"]
+        assert (
+            position["printed_annual_rate_scale_degrees_exact"]
+            == row["printed_annual_degrees_exact"]
+        )
+        assert (
+            position["month_day_minus_printed_annual_degrees_exact"]
+            == row["monthday_minus_printed_annual_exact"]
+        )
+        assert position["cell"] == row["formula_cell"]
+        assert position["status"] == row["formula_status"]
+        assert scale.at_degrees(degrees) == position
+        literal = table.lookup(group["group"], date)
+        assert [cell["column"] for cell in literal["matching_cells"]] == row[
+            "literal_matching_cells"
+        ]
+        assert literal["selected_cell"] == row["literal_selected_cell"]
+        assert literal["status"] == row["literal_status"]
+        assert literal["formula_fallback_used"] is False
+
+
+@pytest.mark.parametrize(
+    "group", RULER_INPUTS["groups"], ids=lambda group: group["group"]
+)
+def test_all_literal_and_formula_endpoints_match_independently_parsed_source(group):
+    scale = ruler_calendar_scale(group["palaces"][0])
+    table = core.load_printed_limit_table(core.PROFILE)
+    comparison = {
+        (cell["group"], cell["column"]): cell
+        for cell in audit_printed_limit_table()["comparisons"]
+    }
+    for row in RULER_REFERENCE["cell_rows"]:
+        if row["group"] != group["group"]:
+            continue
+        literal = table.cell(row["group"], row["column"])["cell"]
+        assert literal["normalized_literal_text"] == row["literal_text"]
+        assert literal["start_nominal_days_exact"] == row["literal_start_exact"]
+        assert (
+            literal["end_exclusive_nominal_days_exact"]
+            == row["literal_end_exclusive_exact"]
+        )
+        assert literal["explicit_start_year_marker"] == row["explicit_start_year"]
+        assert literal["explicit_last_day_year_marker"] == row["explicit_last_year"]
+        formula = scale.cell_interval(row["column"])
+        assert (
+            formula["interval_start_nominal_days_exact"] == row["formula_start_exact"]
+        )
+        assert (
+            formula["interval_end_nominal_days_exact"]
+            == row["formula_end_exclusive_exact"]
+        )
+        assert formula["start_nominal_source_date"] == row["formula_start_label"]
+        assert formula["last_included_nominal_day"] == row["formula_last_label"]
+        assert (
+            formula["end_exclusive_nominal_source_date"]
+            == row["formula_end_exclusive_label"]
+        )
+        delta = comparison[row["group"], row["column"]]
+        assert (
+            delta["literal_minus_formula_start_nominal_days_exact"]
+            == row["literal_minus_formula_start_exact"]
+        )
+        assert (
+            delta["literal_minus_formula_end_exclusive_nominal_days_exact"]
+            == row["literal_minus_formula_end_exact"]
+        )
+    expected = next(
+        row for row in RULER_REFERENCE["audits"] if row["group"] == group["group"]
+    )
+    audit = scale.audit()
+    assert (
+        audit["month_day_degrees_per_nominal_year_exact"]
+        == expected["monthday_annual_rate_exact"]
+    )
+    assert audit["annual_and_month_day_rates_agree"] == expected["annual_rate_agrees"]
+    assert (
+        audit["printed_annual_full_limit_degrees_exact"]
+        == expected["printed_full_limit_degrees_exact"]
+    )
+    assert (
+        audit["printed_annual_full_limit_minus_30_exact"]
+        == expected["printed_full_limit_minus30_exact"]
+    )
+    assert (
+        audit["month_day_full_limit_minus_source_duration_days_exact"]
+        == expected["monthday_limit_minus_source_duration_days_exact"]
+    )
+
+
+@pytest.mark.parametrize("row", RULER_REFERENCE["date_only_stress"])
+def test_independent_extreme_date_labels_preserve_exact_subdays_and_large_integers(row):
+    elapsed = F(row["elapsed_nominal_days_exact"])
+    date = Date.from_elapsed_days(elapsed)
+    assert date.as_dict() == row["nominal_source_date"]
+    assert date.elapsed_days == elapsed

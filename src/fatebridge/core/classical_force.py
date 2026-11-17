@@ -10,7 +10,7 @@ from __future__ import annotations
 from copy import deepcopy
 from fractions import Fraction
 from math import isfinite
-from typing import Any, Mapping, Tuple
+from typing import Any, Literal, Mapping, Tuple, TypedDict
 
 from fatebridge.core.classical_roots import SOURCE as ROOT_SOURCE
 from fatebridge.core.classical_roots import classify_classical_root
@@ -25,9 +25,10 @@ from fatebridge.utils.data import (
 )
 
 ORDER = ("year", "month", "day", "hour")
+SOURCE_ID = "ziping_body_seal_distinction_v1"
 SOURCE = {
     **ROOT_SOURCE,
-    "id": "ziping_body_seal_distinction_v1",
+    "id": SOURCE_ID,
     "title": "秘本子平真诠·论印绶（身重印轻与身轻印重）",
     "pdf_pages": [73, 74],
     "printed_pages": [64, 65],
@@ -39,6 +40,68 @@ GODS = {
     "wealth": ("正财", "偏财"),
     "officer_killer": ("正官", "七杀"),
 }
+
+
+class SourceForceAdjudication(TypedDict):
+    method_id: Literal["classical_force_conditions_v1"]
+    status: Literal["not_adjudicated", "conditional", "adjudicated"]
+    body_strength: Literal["强", "中和", "弱"] | None
+    seal_weight: Literal["重", "轻"] | None
+    body_seal_relation: Literal["身重印轻", "身轻印重"] | None
+    ordinary_fuyi_applicable: bool | None
+    observed_body_root_positions: list[str]
+    observed_seal_root_positions: list[str]
+    source_refs: list[str]
+    pending_conditions: list[str]
+    scope: str
+
+
+def _unresolved_force(
+    body_roots: list[str], seal_roots: list[str]
+) -> SourceForceAdjudication:
+    return {
+        "method_id": "classical_force_conditions_v1",
+        "status": "not_adjudicated",
+        "body_strength": None,
+        "seal_weight": None,
+        "body_seal_relation": None,
+        "ordinary_fuyi_applicable": None,
+        "observed_body_root_positions": body_roots,
+        "observed_seal_root_positions": seal_roots,
+        "source_refs": [ROOT_SOURCE["id"], SOURCE_ID],
+        "pending_conditions": [
+            "effective_body_and_seal_force",
+            "relative_output_wealth_officer_force",
+            "root_interference_and_mediation",
+            "seasonal_development",
+            "ordinary_fuyi_route",
+        ],
+        "scope": (
+            "根位仅表示实际藏干同五行存在，不裁定有效根力；"
+            "身、印、食财官相对力量及扶抑适用条件仍待核。"
+            "工程预算或结构覆盖不回填原典结论；未读取命例标签作为判定。"
+        ),
+    }
+
+
+def adjudicate_classical_force(
+    pillars: Mapping[str, Tuple[str, str]],
+) -> SourceForceAdjudication:
+    """Observe literal roots; keep unestablished force premises unresolved."""
+    body = STEM_ELEMENTS[pillars["day"][0]][0]
+    seal = next(e for e, child in GENERATION_CYCLE.items() if child == body)
+    positions = {
+        element: [
+            position
+            for position in ORDER
+            if any(
+                STEM_ELEMENTS[stem][0] == element
+                for stem in BRANCH_HIDDEN_STEMS[pillars[position][1]]
+            )
+        ]
+        for element in (body, seal)
+    }
+    return _unresolved_force(positions[body], positions[seal])
 
 
 def _source_roots_by_stem(
@@ -97,6 +160,8 @@ def build_force_components(
     pillars: Mapping[str, Tuple[str, str]],
     assessment: Mapping[str, Any],
     stars: Mapping[str, list[dict[str, Any]]],
+    *,
+    classical_adjudication: SourceForceAdjudication | None = None,
 ) -> dict[str, Any]:
     """Keep physical root facts and engineering energies in separate fields."""
     body = STEM_ELEMENTS[pillars["day"][0]][0]
@@ -238,11 +303,22 @@ def build_force_components(
             ),
             "quantity_kind": "uncalibrated_engineering_energy",
         },
-        "classical_adjudication": {
-            "body_strength": "not_adjudicated",
-            "seal_weight": "not_adjudicated",
-            "body_seal_relation": "not_adjudicated",
-        },
+        "classical_adjudication": (
+            classical_adjudication
+            if classical_adjudication is not None
+            else _unresolved_force(
+                list(
+                    dict.fromkeys(
+                        r["pillar"] for r in components["body"]["physical_hidden_roots"]
+                    )
+                ),
+                list(
+                    dict.fromkeys(
+                        r["pillar"] for r in components["seal"]["physical_hidden_roots"]
+                    )
+                ),
+            )
+        ),
         "scope": "原典区分身与印的力量；本表分别列事实与现有工程能量，不由身印总量判身重印重，不把身轻等同印轻或把印重等同身强。",
         "limitations": [
             "engineering_energy保留六位展示值；身印比较优先用同次完整energies_exact，comparison_basis另标。原浮点比较与占比保留，ratio_basis不改；旧回执依现有未取整或展示值比较，不补算缺失分量。精确预算相等不等于原典身印力量相等。",

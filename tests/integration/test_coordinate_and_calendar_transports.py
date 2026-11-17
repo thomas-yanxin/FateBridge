@@ -23,6 +23,9 @@ def invoke(tool, inputs, monkeypatch, capsys):
     response = TestClient(api.app).post(spec.rest_path, json=inputs)
     args = [tool, "--response-char-limit", "0"]
     for key, value in inputs.items():
+        if value is None:
+            # CLI optional flags represent JSON null by omission.
+            continue
         if isinstance(value, list):
             args.extend(["--" + key.replace("_", "-"), *map(str, value)])
             continue
@@ -60,6 +63,8 @@ def test_zero_gps_coordinates_drive_the_actual_chart_on_every_transport(
             "date": "2026-10-20",
             "time": "12:00",
             "zone": "UTC",
+            "lat": "ignored because GPS is supplied",
+            "lon": "ignored because GPS is supplied",
             "gps_lat": 0,
             "gps_lon": 0,
         },
@@ -71,6 +76,74 @@ def test_zero_gps_coordinates_drive_the_actual_chart_on_every_transport(
         assert output["params"]["birthLatitude"] == output["params"]["gpsLat"] == 0
         assert output["params"]["birthLongitude"] == output["params"]["gpsLon"] == 0
     assert outputs[0]["chart"] == outputs[1]["chart"] == outputs[2]["chart"]
+
+
+@pytest.mark.parametrize(
+    "coordinates",
+    [
+        {},
+        {"lat": "31n13"},
+        {"lon": "121e28"},
+        {"lat": None, "lon": None},
+        {"lat": "", "lon": "121e28"},
+        {"lat": "31n13", "lon": " "},
+        {"gps_lat": 0},
+        {"gps_lon": 0},
+    ],
+)
+def test_timed_suzhan_requires_both_confirmed_coordinate_components(
+    monkeypatch, capsys, coordinates
+):
+    response, code, protocol, outputs = invoke(
+        "suzhan",
+        {"date": "2026-10-20", "time": "12:00", "zone": "UTC", **coordinates},
+        monkeypatch,
+        capsys,
+    )
+    assert response.status_code == 400 and code == 1 and protocol.is_error
+    for output in outputs:
+        assert output["error_code"] == "validation_error"
+        assert "完整经纬度" in output["error"]
+        assert "run_metadata" not in output
+
+
+@pytest.mark.parametrize(
+    "coordinates",
+    [{"lat": "0", "gps_lon": 0}, {"gps_lat": 0, "lon": "0"}],
+)
+def test_timed_suzhan_accepts_mixed_explicit_coordinate_sources(
+    monkeypatch, capsys, coordinates
+):
+    response, code, protocol, outputs = invoke(
+        "suzhan",
+        {"date": "2026-10-20", "time": "12:00", "zone": "UTC", **coordinates},
+        monkeypatch,
+        capsys,
+    )
+    assert response.status_code == 200 and code == 0 and not protocol.is_error
+    assert outputs[0]["chart"] == outputs[1]["chart"] == outputs[2]["chart"]
+    assert all(
+        output["params"]["birthLatitude"] == output["params"]["birthLongitude"] == 0
+        for output in outputs
+    )
+
+
+@pytest.mark.parametrize("unknown_time", [{}, {"time": None, "lat": None, "lon": None}])
+def test_untimed_suzhan_keeps_date_only_mode_without_coordinates(
+    monkeypatch, capsys, unknown_time
+):
+    response, code, protocol, outputs = invoke(
+        "suzhan",
+        {"date": "2026-10-20", "zone": "UTC", **unknown_time},
+        monkeypatch,
+        capsys,
+    )
+    assert response.status_code == 200 and code == 0 and not protocol.is_error
+    for output in outputs:
+        assert output["chart"] is output["astronomy"] is None
+        assert output["params"]["calculationMode"] == "calendar_date_only"
+        assert output["params"]["birthTimeImputed"] is False
+        assert output["params"]["coordinatesApplied"] is False
 
 
 @pytest.mark.parametrize(

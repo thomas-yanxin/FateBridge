@@ -767,15 +767,15 @@ def design_time_reading(chart: Dict[str, Any]) -> str:
                 if family["any_activation_subdivision_change"]
                 else "这些候选的门至Base细分与主盘相同。"
             )
-            + "原选根保持；这些数值候选不是物理误差区间或多个真实时刻。"
+            + "主盘采用已观测正到负括区及零点中的最小残差选根；这些数值候选不是物理误差区间或多个真实时刻。"
         )
     return (
-        f"设计时刻从最终数值端点中选择太阳弧绝对残差最小者；本次TT区间宽度{solver['bracket_width_seconds']:.9f}秒。"
+        f"设计时刻从本次已观测的正到负太阳括区及零点中选择绝对精确残差最小者，同残差取较早TT；所选括区宽度{solver['bracket_width_seconds']:.9f}秒。"
         + status
         + "。"
         + body_text
         + root_interpretation_reading(bodies["endpoint_interpretations"])
-        + "当前主盘保留原选根规则；候选整盘各自读取，不拼接端点。观测到函数零值也不等于物理时刻误差为零，端点一致不证明连续区间稳定、出生记录或天文精度。"
+        + "有限邻点不保证未观测区域的最优根；候选整盘各自读取，不拼接端点。观测到函数零值也不等于物理时刻误差为零，端点一致不证明连续区间稳定、出生记录或天文精度。"
     )
 
 

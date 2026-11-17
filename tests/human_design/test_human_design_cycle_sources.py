@@ -17,7 +17,7 @@ from fatebridge.core.human_design import chart_at_tt
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.errors import EphemerisSourceError
 from fatebridge.validation.human_design import verify_human_design_reading
-from tests.support.ephemeris_context import moshier_ephemeris
+from tests.support.ephemeris_context import empty_ephemeris_path
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -160,7 +160,7 @@ def source_run(request):
         cycle_reference_datetime="2029-07-01T00:00:00Z",
     )
     if request.param:
-        with moshier_ephemeris():
+        with empty_ephemeris_path():
             return execute_tool(spec, spec.request_model(**data))
     return execute_tool(spec, spec.request_model(**data))
 
@@ -173,7 +173,8 @@ def test_full_source_context_indices_replay_all_evaluations_without_private_path
         == "verified_fixed_template_reading"
     )
     source = source_run["cycle_context"]["source_evidence"]
-    assert source["endpoint_file_hashes_checked"] is True
+    assert source["configuration_checked"] is True
+    assert "endpoint_file_hashes_checked" not in source
     assert str(ROOT) not in str(source)
     for body in source_run["cycle_context"]["bodies"]:
         assert len(body["evaluation_source_context_indices"]) == len(

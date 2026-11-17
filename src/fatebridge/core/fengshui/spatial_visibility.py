@@ -5,16 +5,15 @@ display with its convex shadow cone. No point/ray sampling is used: a narrow
 obstruction between the display's corners still contributes its projected area.
 """
 
-from itertools import combinations
-from math import sqrt
+from fractions import Fraction
+from math import lcm
 
-from shapely.geometry import LineString, Polygon, box
+from shapely.geometry import Polygon, box
 from shapely.ops import unary_union
 
+from .spatial_angles import _sin_cos_degrees, angular_offset, compose_degrees
 from .spatial_geometry import (
     AREA_EPSILON,
-    _sin_cos_degrees,
-    angular_delta,
     heading,
     rectangle_xy,
     transform_point,
@@ -35,52 +34,83 @@ def _shadow(
     distance: float,
     display: Polygon,
 ) -> Polygon:
-    planar = Polygon(
-        [
-            (
-                (x - eye.x) * right[0] + (y - eye.y) * right[1],
-                (x - eye.x) * forward[0] + (y - eye.y) * forward[1],
-            )
-            for x, y in list(footprint.exterior.coords)[:-1]
-        ]
-    )
-    xmin, _, xmax, _ = planar.bounds
-    clipped = planar.intersection(box(xmin, 0, xmax, distance))
-    if clipped.is_empty:
-        return Polygon()
-    if isinstance(clipped, Polygon):
-        coordinates = list(clipped.exterior.coords)[:-1]
-    elif isinstance(clipped, LineString):
-        coordinates = list(clipped.coords)
-    else:
-        # Convex polygon/closed-slab intersection is convex and connected.
-        return Polygon()
-    if max(depth for _, depth in coordinates) <= 0:
-        return Polygon()
-    vertices = [
-        (u, z - eye_height, depth) for u, depth in coordinates for z in (bottom, top)
+    """Clip the exact prism cone; its silhouette planes contain prism edges.
+
+    A magnitude tolerance can merge distinct faces of a thin prism and then
+    remove the wrong half of the display. Keep side predicates and clipping
+    rational; only the resulting planar coordinates return to binary64.
+    """
+    eye_x, eye_y = Fraction(eye.x), Fraction(eye.y)
+    right_x, right_y = map(Fraction, right)
+    forward_x, forward_y = map(Fraction, forward)
+    clipped = [
+        (
+            (Fraction(x) - eye_x) * right_x + (Fraction(y) - eye_y) * right_y,
+            (Fraction(x) - eye_x) * forward_x + (Fraction(y) - eye_y) * forward_y,
+        )
+        for x, y in list(footprint.exterior.coords)[:-1]
     ]
-    polygon = list(display.exterior.coords)[:-1]
-    for left, right_vertex in combinations(vertices, 2):
+    depth = Fraction(distance)
+    for boundary, direction in ((Fraction(0), 1), (depth, -1)):
+        result: list[tuple[Fraction, Fraction]] = []
+        for start, end in zip(clipped, clipped[1:] + clipped[:1]):
+            before = direction * (start[1] - boundary)
+            after = direction * (end[1] - boundary)
+            if before >= 0:
+                result.append(start)
+            if (before >= 0) != (after >= 0):
+                fraction = before / (before - after)
+                result.append(
+                    (
+                        start[0] + fraction * (end[0] - start[0]),
+                        start[1] + fraction * (end[1] - start[1]),
+                    )
+                )
+        clipped = list(dict.fromkeys(result))
+    if len(clipped) < 2 or max(d for _, d in clipped) <= 0:
+        return Polygon()
+    low, high = Fraction(bottom) - Fraction(eye_height), Fraction(top) - Fraction(
+        eye_height
+    )
+    vertices = [(u, z, d) for u, d in clipped for z in (low, high)]
+    # One positive common scale preserves the cone and makes all side tests
+    # integer determinants, without repeated rational arithmetic per edge.
+    scale = lcm(*(value.denominator for point in vertices for value in point))
+    rays = [
+        (
+            u.numerator * (scale // u.denominator),
+            z.numerator * (scale // z.denominator),
+            d.numerator * (scale // d.denominator),
+        )
+        for u, z, d in vertices
+    ]
+    lower, upper = rays[::2], rays[1::2]
+    edges = list(zip(lower, upper))
+    for layer in (lower, upper):
+        edges.extend(zip(layer, layer[1:] + layer[:1]))
+    polygon = [
+        (Fraction(x), Fraction(y)) for x, y in list(display.exterior.coords)[:-1]
+    ]
+    for left, right_vertex in edges:
         a = left[1] * right_vertex[2] - left[2] * right_vertex[1]
         b = left[2] * right_vertex[0] - left[0] * right_vertex[2]
         c = left[0] * right_vertex[1] - left[1] * right_vertex[0]
-        length = sqrt(a * a + b * b + c * c)
-        if length == 0:
+        if a == b == c == 0:
             continue
-        a, b, c = a / length, b / length, c / length
-        values = [a * u + b * z + c * depth for u, z, depth in vertices]
-        # A supporting plane contains every prism ray on the same side.
-        if min(values) >= -1e-10:
+        values = [a * u + b * z + c * d for u, z, d in rays]
+        if not any(values):
+            # All rays lie in one plane through the eye: zero projected area.
+            return Polygon()
+        if min(values) >= 0:
             pass
-        elif max(values) <= 1e-10:
+        elif max(values) <= 0:
             a, b, c = -a, -b, -c
         else:
             continue
         result = []
         for start, end in zip(polygon, polygon[1:] + polygon[:1]):
-            before = a * start[0] + b * start[1] + c * distance
-            after = a * end[0] + b * end[1] + c * distance
+            before = a * start[0] + b * start[1] + c * depth
+            after = a * end[0] + b * end[1] + c * depth
             if before >= 0:
                 result.append(start)
             if (before >= 0) != (after >= 0):
@@ -94,7 +124,7 @@ def _shadow(
         polygon = result
         if len(polygon) < 3:
             return Polygon()
-    return Polygon(polygon)
+    return Polygon([(float(x), float(y)) for x, y in polygon])
 
 
 def evaluate_screens(
@@ -133,7 +163,7 @@ def evaluate_screens(
             )
             item_frame = transform_rectangle(item.footprint, desk.footprint)
             center = transform_point(screen.center, item_frame)
-            normal = item_frame.rotation_degrees + screen.front_degrees
+            normal = compose_degrees(item_frame.rotation_degrees, screen.front_degrees)
             sine, cosine = _sin_cos_degrees(normal)
             right, forward = (cosine, -sine), (-sine, -cosine)
             depth = (center.x - observer.position.x) * forward[0] + (
@@ -148,10 +178,13 @@ def evaluate_screens(
                 for sign in (-1, 1)
             ]
             in_view = all(
-                abs(
-                    angular_delta(
-                        heading(observer.position, endpoint),
-                        observer.plan_facing_degrees,
+                (bearing := heading(observer.position, endpoint)) is not None
+                and abs(
+                    angular_offset(
+                        bearing,
+                        compose_degrees(
+                            desk.footprint.rotation_degrees, seat.facing_offset_degrees
+                        ),
                     )
                 )
                 <= seat.view_half_angle_degrees

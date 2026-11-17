@@ -1,8 +1,162 @@
+import json
+from datetime import datetime, timedelta, timezone
+from fractions import Fraction
+from pathlib import Path
+from zoneinfo import ZoneInfo
+
 import pytest
 
 from fatebridge.core.predictive import western_timing as astrology_predictive
+from fatebridge.core.predictive._common import build_predictive_birth_info
+from fatebridge.core.predictive.decennials import (
+    _DecennialInterval,
+    build_decennials_payload,
+)
+from fatebridge.core.predictive.native_chart import NativePoint, NativeSubject
 from fatebridge.services.western_timing_tools import calculate_timing_tool
 from tests.fixtures.surface_payloads import western_payload
+
+DECENNIAL_REFERENCE = json.loads(
+    (Path(__file__).parents[1] / "fixtures/decennials-reference.json").read_text()
+)
+
+
+def _decennial_subject(profile) -> NativeSubject:
+    names = ["Saturn", "Jupiter", "Mars", "Sun", "Venus", "Mercury", "Moon"]
+    return NativeSubject(
+        name="explicit-synthetic-decennial-operand",
+        lng=0,
+        lat=40,
+        tz_str="UTC",
+        iso_formatted_utc_datetime=None,
+        iso_formatted_local_datetime=None,
+        julian_day=2451545.0,
+        julian_day_tt=2451545.0,
+        houses_system_identifier="P",
+        zodiac_type="Tropic",
+        sidereal_mode=None,
+        is_diurnal=profile["day"],
+        calculation_basis={},
+        points={
+            name.lower(): NativePoint(
+                name=name,
+                abs_pos=position,
+                position=position % 30,
+                sign="Ari",
+                sign_num=int(position // 30),
+                house="First_House",
+            )
+            for name, position in zip(names, profile["positions"])
+        },
+    )
+
+
+def _assert_decennial_reference(actual, expected):
+    if expected is None:
+        assert actual is None
+        return
+    assert actual is not None
+    for key, value in expected.items():
+        if key in {"start", "end"}:
+            moment = datetime.fromisoformat(actual[key])
+            assert moment.astimezone(timezone.utc) == datetime.fromisoformat(
+                value["UTC"]
+            )
+            assert (
+                moment.replace(tzinfo=None).isoformat(timespec="microseconds")
+                == value["local_plain"]
+            )
+            assert moment.utcoffset().total_seconds() == value["offset_seconds"]
+        elif key == "sublevel":
+            assert len(actual[key]) == len(value)
+            for child, reference in zip(actual[key], value):
+                _assert_decennial_reference(child, reference)
+        else:
+            assert actual[key] == value
+
+
+@pytest.mark.parametrize(
+    "case", DECENNIAL_REFERENCE["coefficients"], ids=lambda c: c["id"]
+)
+@pytest.mark.parametrize("calendar_scale", [Fraction(1), Fraction(487, 480)])
+def test_decennial_exact_subdivision_matches_flint(case, calendar_scale):
+    parent = _DecennialInterval(
+        "reference",
+        case["level"] - 1,
+        case["parent_lord"],
+        Fraction(*case["parent_start"]),
+        Fraction(*case["parent_end"]),
+    )
+    birth = datetime(2000, 1, 1, tzinfo=timezone.utc)
+    children = parent.children(case["order"])
+    for index, child in enumerate(children):
+        assert child.start_minutes == Fraction(*case["bounds"][index])
+        assert child.end_minutes == Fraction(*case["bounds"][index + 1])
+        output = child.payload(birth, timezone.utc, birth, calendar_scale)
+        expected_offsets = case[
+            "UTC_microseconds" if calendar_scale == 1 else "UTC_microseconds_365_25"
+        ]
+        for key, offset in (("start", index), ("end", index + 1)):
+            assert datetime.fromisoformat(output[key]) == birth + timedelta(
+                microseconds=expected_offsets[offset]
+            )
+    assert children[-1].end_minutes == parent.end_minutes
+
+
+@pytest.mark.parametrize(
+    "case",
+    DECENNIAL_REFERENCE["clocks"] + DECENNIAL_REFERENCE["boundaries"],
+    ids=lambda c: c["id"],
+)
+def test_decennial_clock_and_current_path_match_temporal(case):
+    local = datetime.fromisoformat(case["local"])
+    birth = build_predictive_birth_info(
+        birth_year=local.year,
+        birth_month=local.month,
+        birth_day=local.day,
+        birth_hour=local.hour,
+        birth_minute=local.minute,
+        birth_timezone=case["zone"],
+        birth_longitude=0,
+        birth_latitude=40,
+    )
+    subject = _decennial_subject(case["profile"])
+    target = datetime.fromisoformat(case["analysis_UTC"])
+    output = build_decennials_payload(birth, subject, analysis_datetime=target)
+    assert output == build_decennials_payload(
+        birth,
+        subject,
+        analysis_datetime=target.astimezone(ZoneInfo("America/New_York")),
+    )
+    assert output["base_order"] == case["base_order"]
+    assert output["calculation_options"]["time_basis"] == "UTC_nominal_elapsed_days"
+    for key in ("current_level_1", "current_level_2", "current_level_3"):
+        _assert_decennial_reference(output[key], case[key])
+    if "timeline" in case:
+        for actual, expected in zip(output["timeline"], case["timeline"]):
+            _assert_decennial_reference(actual, expected)
+
+
+def test_decennial_unverified_candidate_cannot_execute():
+    birth = build_predictive_birth_info(
+        birth_year=2000,
+        birth_month=1,
+        birth_day=1,
+        birth_hour=12,
+        birth_timezone="UTC",
+        birth_longitude=0,
+        birth_latitude=40,
+    )
+    subject = _decennial_subject(
+        {"day": True, "positions": [0, 30, 60, 90, 120, 150, 180]}
+    )
+    with pytest.raises(ValueError, match="Unverified decennial day method"):
+        build_decennials_payload(
+            birth,
+            subject,
+            analysis_datetime=birth.require_utc_datetime,
+            day_method="hephaistio",
+        )
 
 
 def test_western_return_and_direction_tools_generate_snapshots():
@@ -151,16 +305,6 @@ def test_primary_direction_and_time_lord_tools_support_selected_sections():
     assert decennials_result["analysis_type"] == "西占十年星限"
     assert decennials_result["decennials"]["current_level_1"]["planet"] == "Moon"
     assert decennials_result["snapshot_export"]["technique"]["key"] == "decennials"
-
-
-def _count_decennial_nodes(node) -> int:
-    """Total nodes in a decennial subtree (node + all descendants)."""
-    if not node:
-        return 0
-    total = 1
-    for child in node.get("sublevel", []) or []:
-        total += _count_decennial_nodes(child)
-    return total
 
 
 def test_decennials_payload_is_bounded_for_agent_consumption():

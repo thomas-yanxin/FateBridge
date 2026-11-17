@@ -6,7 +6,7 @@
 
 ## 选择与准备数据
 
-计算能运行，还需要知道它实际用了什么数据。`swisseph` 可导入，只能证明运行时可用。缺少相应 `.se1` 文件时，它可能使用内置 Moshier 模型；没有运行时的核心星盘则使用 FateBridge 轨道近似。显式复杂宫制与西占推运缺 backend 时会报错。
+计算能运行，还需要知道它实际用了什么数据。`swisseph` 可导入，只能证明运行时可用。缺少相应 `.se1` 文件时，它可能使用内置 Moshier 模型；原生不可用的核心星盘天体采用带明确时标／来源说明的[有界DE441同源地球、月球与行星及具名光路回退](western-astrology.md#离线轨道近似的来源与差距)。月球源明确由TT转换到地心TDB，同源地球／太阳原网格状态在本地TT延迟上求光锥；逐体定义见`orbital_fallback.factor_light_time_methods`。缺少原生库的恒星盘用完整均Lahiri原点加77项章动，日速使用同一原点的解析TT导数，与轨道共用TT选择。其他源和显示日速保留各自声明的TT约定；仍有已知年代和精度限制。显式复杂宫制与西占推运缺 backend 时会报错。
 
 ### Swiss 分段文件
 
@@ -79,3 +79,11 @@ export FATEBRIDGE_JPL_FILE=linux_m13000p17000.441
 DE441 的长时间覆盖不代表各年代精度一致；[JPL 原论文](https://ssd.jpl.nasa.gov/doc/de440_de441.html)明确说明 DE440 在当前世纪更准确。原始文件头采用 TDB，现有原生调用入口采用 TT；文件校验不认证时标换算、视位置模型或预测效力。固定样本的误差线和仍未通过的项目见[当前算法状态](algorithm-status.md)。
 
 需要连续 DE441 系数子集时，按[精确月球来源](precision-acceptance.md#使用精确月球来源)准备；该路径与完整文件下载分别校验。太阳交节默认使用随包 DE440，模型选择、数据身份及年份边界见[太阳后端](solar-backends.md)。
+
+## 连续冥王星源与共享太阳系数
+
+离线冥王星使用随包的原始DE441冥王星系统质心／太阳多项式，先在同一TDB历元相减为日心位置，再按声明框架接入现有观测者。运行不依赖原生星历库、网络或参考点缓存。模型的源、时标、框架与实际五点TT日速方法由共享提供者交付，精度范围见[分项验收](precision-acceptance.md)。
+
+太阳的五个DE440逻辑模型共用`de440-solar-record-atlas-v1`，每个模型保留原记录选择、系数字节、适用年份和源身份；相同记录只存一次。两个数据所有者共用可逆的记录字节通道压缩，没有降低系数位数、拟合修正或改变太阳计算。源码中的元数据身份及解压后原始系数身份在加载边界核对。
+
+维护者重建时，先用以下提取器的`--output`写入仓库外的同一个暂存目录：`astronomy/build_de440_solar_profile.py`、`fengshui/build_fengshui_historical_solar.py`、`astronomy/build_de440_extended_profile.py`、`numerology/build_canping_projection_profile.py`的`original`与`extended`。提取器读取其声明的原始DE440源；后续运行[共享档案生成器](../scripts/astronomy/build_coefficient_archives.py)，同时提供连续DE441源及其下载清单。最终以`--check`核对分发档案。独立参考数据不写回运行时系数；原NASA数据和ERFA的作者、版本与条件见[NOTICE](../NOTICE)。

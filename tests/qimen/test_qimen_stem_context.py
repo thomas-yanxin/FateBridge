@@ -63,6 +63,11 @@ def test_unresolved_day_jia_keeps_both_candidates_without_selecting_the_match(
     assert hour["candidate_matches"]["hidden_day_stem"] == ["坤二宫"]
     assert day["status"] == "unresolved_jia_identity"
     assert day["effective_stem"] is None and day["adopted_candidate"] is None
+    assert day["candidate_outcomes"]["hidden_day_stem"] == {
+        "matched_across_candidates": None,
+        "all_candidate_palaces": [],
+        "any_candidate_palaces": ["坤二宫"],
+    }
     assert not any(c["adopted"] for c in day["candidates"])
     assert not any(p["rule_id"] in DAY_RULES for p in board["patterns"])
     assert "均未采纳" in _qimen_stem_context_lines(board)[0]
@@ -82,6 +87,12 @@ def test_equal_jia_candidates_do_not_certify_their_policy(monkeypatch):
     assert all(c["effective_stem"] == "戊" for c in day["candidates"])
     assert day["status"] == "unresolved_jia_identity"
     assert day["adopted_candidate"] is None
+    assert day["candidate_outcomes"]["hidden_day_stem"] == {
+        "matched_across_candidates": True,
+        "all_candidate_palaces": ["坤二宫"],
+        "any_candidate_palaces": ["坤二宫"],
+    }
+    assert not any(p["rule_id"] in DAY_RULES for p in board["patterns"])
 
 
 def test_hour_block_alias_does_not_set_whole_board_fuyin(monkeypatch):
@@ -102,11 +113,10 @@ def test_source_claim_geng_leader_has_hour_block_in_all_ten_hours(dun, number):
     text = f'{dun}{"一二三四五六七八九"[number-1]}局上元'
     for index in range(20, 30):
         hour = sexagenary_text(index)
-        leader = engine._qimen_zhifu_zhishi(hour, text, dun_type=dun)
+        earth = engine._qimen_pan_earth(text)
+        leader = engine._qimen_zhifu_zhishi(hour, earth, dun_type=dun)
         assert leader["zhifu_heaven_stem"] == "庚"
-        palaces = engine._qimen_build_palaces(
-            time_ganzhi=hour, ju_text=text, dun_type=dun, current_term="冬至"
-        )
+        palaces = engine._qimen_build_palaces(earth=earth, leader=leader)
         context, patterns = build_stem_context(
             {"palaces": palaces, "day_ganzhi": "甲子", "time_ganzhi": hour},
             leader=leader,

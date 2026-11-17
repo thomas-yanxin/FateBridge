@@ -83,7 +83,17 @@ def test_missing_explicit_store_read_never_creates_a_cache_directory(
 
 
 @pytest.mark.parametrize(
-    "fault", ["digest", "run", "scope", "payload", "metadata", "expired"]
+    "fault",
+    [
+        "digest",
+        "run",
+        "scope",
+        "payload",
+        "metadata",
+        "expired",
+        "receipt_span",
+        "receipt_identity",
+    ],
 )
 def test_readonly_verification_keeps_all_original_rejections(
     fault, stored, monkeypatch
@@ -109,6 +119,14 @@ def test_readonly_verification_keeps_all_original_rejections(
         path = Path(ref["file_path"]).with_suffix(".meta")
         metadata = json.loads(path.read_text())
         metadata["total_chars"] += 1
+        path.write_text(json.dumps(metadata, ensure_ascii=False))
+    elif fault in {"receipt_span", "receipt_identity"}:
+        path = Path(ref["file_path"]).with_suffix(".meta")
+        metadata = json.loads(path.read_text())
+        if fault == "receipt_span":
+            metadata["receipt_offset"] += 1
+        else:
+            metadata["tool_name"] = "another-tool"
         path.write_text(json.dumps(metadata, ensure_ascii=False))
     elif fault == "expired":
         monkeypatch.setattr(delivery.time, "time", lambda: ref["expires_at"] + 1)

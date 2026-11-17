@@ -3,14 +3,19 @@
 from copy import deepcopy
 
 import pytest
+from jsonschema import Draft202012Validator
+from jsonschema import ValidationError as SchemaError
 from pydantic import ValidationError
 
+from fatebridge.application.execution import OutputContractError, validate_output
 from fatebridge.core.metaphysics.sanshi_correspondences import (
     PHYSICAL,
     palace_correspondences,
 )
 from fatebridge.core.output_sanshi import SanshiSynthesis
 from fatebridge.services.divination import calculate_sanshiunited_analysis
+from fatebridge.services.tool_catalog import CATALOG
+from tests.support.reference_data import resolve
 
 
 @pytest.fixture(scope="module")
@@ -22,12 +27,6 @@ def result():
         use_true_solar_time=False,
         taiyi_options={"calculation_mode": "hour"},
     )
-
-
-def resolve(root, path):
-    for key in path.split("."):
-        root = root[int(key)] if isinstance(root, list) else root[key]
-    return root
 
 
 def test_every_join_fact_reads_the_same_actual_boards(result):
@@ -120,6 +119,54 @@ def test_public_join_contract_rejects_numerical_facts_as_strings():
         SanshiSynthesis.model_validate(
             {"palace_correspondences": {"entries": [{"taiyi_number": "1"}]}}
         )
+
+
+@pytest.mark.parametrize(
+    "synthesis",
+    [
+        {"palace_correspondences": {"entries": [{"taiyi_number": "1"}]}},
+        {"independent_evidence_count": True},
+        {"source_profiles": {"qimen": [{"unresolved_count": "1"}]}},
+        {"time_scopes": {"taiyi": 1}},
+    ],
+)
+def test_catalog_root_checks_synthesis_instead_of_accepting_an_untyped_extension(
+    synthesis,
+):
+    spec = next(spec for spec in CATALOG if spec.key == "sanshiunited")
+    with pytest.raises(ValidationError):
+        spec.output_model.model_validate({"synthesis": synthesis})
+    with pytest.raises(SchemaError):
+        Draft202012Validator(spec.output_model.model_json_schema()).validate(
+            {"synthesis": synthesis}
+        )
+
+
+@pytest.mark.parametrize("failure", ["missing", "null", "empty"])
+def test_complete_execution_keeps_the_computed_synthesis_root(result, failure):
+    spec = next(spec for spec in CATALOG if spec.key == "sanshiunited")
+    validate_output(spec, result)
+    broken = deepcopy(result)
+    if failure == "missing":
+        broken.pop("synthesis")
+    else:
+        broken["synthesis"] = None if failure == "null" else {}
+    with pytest.raises(OutputContractError, match="必需业务事实"):
+        validate_output(spec, broken)
+
+
+@pytest.mark.parametrize(
+    "projected",
+    [
+        {"synthesis": {"independent_evidence_count": None}},
+        {"synthesis": {"status": "parallel_boards_without_validated_joint_prediction"}},
+        {"synthesis": None},
+    ],
+)
+def test_synthesis_projection_retains_unknown_facts_and_omitted_siblings(projected):
+    spec = next(spec for spec in CATALOG if spec.key == "sanshiunited")
+    spec.output_model.model_validate(projected)
+    Draft202012Validator(spec.output_model.model_json_schema()).validate(projected)
 
 
 def test_source_profiles_resolve_in_the_current_default_year_calculation():

@@ -1,16 +1,24 @@
-from datetime import datetime, timedelta
+import json
+from dataclasses import replace
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
 
 import pytest
 
 from fatebridge.core.ephemeris_runtime import swe
+from fatebridge.core.predictive import profections, progressions, transit
 from fatebridge.core.predictive._common import (
+    TIMING_POINT_NAMES,
+    TRANSIT_POINT_NAMES,
     build_lot_payloads,
     build_natal_subject,
     build_predictive_birth_info,
     calculate_age_years_int,
     normalize_angle,
+    point_attribute_name,
 )
 from fatebridge.core.predictive._common import swe as predictive_swe
+from fatebridge.core.predictive.native_chart import NativePoint, NativeSubject
 from fatebridge.core.predictive.primary_directions import (
     build_primary_direction_equatorial_context,
     point_equatorial_position,
@@ -24,6 +32,254 @@ from fatebridge.core.predictive.zodiacal_releasing import (
 from fatebridge.services.astrology import calculate_core_chart_analysis
 from fatebridge.services.western_timing import calculate_western_timing_analysis
 from fatebridge.utils.timezones import parse_timezone_name
+
+PREDICTIVE_TIME_REFERENCE = json.loads(
+    (Path(__file__).parents[1] / "fixtures/predictive-time-reference.json").read_text()
+)
+TRANSIT_EXACT_ORB_REFERENCE = json.loads(
+    (
+        Path(__file__).parents[1] / "fixtures/transit-exact-orb-reference.json"
+    ).read_text()
+)
+
+
+@pytest.fixture
+def predictive_clock_operands() -> NativeSubject:
+    """Explicit scalar operands for clock tests; no independent sky assertion."""
+    return NativeSubject(
+        name="synthetic-clock-operands",
+        lng=0,
+        lat=40,
+        tz_str="UTC",
+        iso_formatted_utc_datetime=None,
+        iso_formatted_local_datetime=None,
+        julian_day=2451545,
+        julian_day_tt=2451545,
+        houses_system_identifier="P",
+        zodiac_type="Tropic",
+        sidereal_mode=None,
+        is_diurnal=True,
+        calculation_basis={},
+        points={
+            point_attribute_name(name): NativePoint(
+                name=name,
+                abs_pos=0,
+                position=0,
+                sign="Ari",
+                sign_num=0,
+                house="First_House",
+            )
+            for name in TIMING_POINT_NAMES
+        },
+    )
+
+
+@pytest.mark.parametrize(
+    "case", TRANSIT_EXACT_ORB_REFERENCE["cases"], ids=lambda c: c["id"]
+)
+def test_transit_exact_hits_match_flint_supplied_angles(
+    case, predictive_clock_operands, monkeypatch
+):
+    """FLINT membership over supplied angles, with only chart casting adapted."""
+    subjects = []
+    for sun, other in [
+        (case["target_longitude"], 90.75),
+        (case["source_longitude"], 181.2),
+    ]:
+        points = {}
+        for name in TRANSIT_POINT_NAMES:
+            degree = sun if name == "Sun" else other
+            points[point_attribute_name(name)] = replace(
+                predictive_clock_operands.sun,
+                name=name,
+                abs_pos=degree,
+                position=degree % 30,
+                sign="Ari" if name == "Sun" else "Can" if other < 180 else "Lib",
+                sign_num=int(degree // 30),
+                house=(
+                    "First_House"
+                    if name == "Sun"
+                    else "Fourth_House" if other < 180 else "Seventh_House"
+                ),
+            )
+        subjects.append(replace(predictive_clock_operands, points=points))
+    natal, current = subjects
+    monkeypatch.setattr(transit, "build_subject", lambda **parameters: current)
+    birth = build_predictive_birth_info(
+        birth_year=2000,
+        birth_month=1,
+        birth_day=1,
+        birth_hour=12,
+        birth_timezone="UTC",
+        birth_longitude=0,
+        birth_latitude=40,
+    )
+    result = transit.build_transit_payload(
+        birth,
+        natal,
+        analysis_datetime=datetime(2026, 11, 13, tzinfo=timezone.utc),
+        transit_longitude=0,
+        transit_latitude=40,
+        transit_timezone="UTC",
+        orb_limit=case["orb_limit"],
+    )
+    sun_hits = [
+        row for row in result["exact_hits"] if row["source"] == row["target"] == "Sun"
+    ]
+    assert bool(sun_hits) is case["expected_exact_membership"]
+    assert result["exact_orb_limit"] == case["exact_orb_limit"]
+    assert result["orb_limit"] == case["orb_limit"]
+    if sun_hits:
+        assert sun_hits[0]["orb"] == case["delivered_orb"]
+
+
+def _assert_predictive_reference_clock(moment: datetime, reference):
+    assert moment.astimezone(timezone.utc) == datetime.fromisoformat(reference["UTC"])
+    assert (
+        moment.replace(tzinfo=None).isoformat(timespec="microseconds")
+        == reference["local_plain"]
+    )
+    assert moment.utcoffset().total_seconds() == reference["offset_seconds"]
+
+
+@pytest.mark.parametrize(
+    "case", PREDICTIVE_TIME_REFERENCE["profection_clocks"], ids=lambda c: c["id"]
+)
+def test_profection_anniversary_and_months_match_temporal(
+    case, predictive_clock_operands
+):
+    row = case["birth"]
+    local = datetime.fromisoformat(row["local"])
+    info = build_predictive_birth_info(
+        birth_year=local.year,
+        birth_month=local.month,
+        birth_day=local.day,
+        birth_hour=local.hour,
+        birth_minute=local.minute,
+        birth_timezone=row["zone"],
+        birth_longitude=0,
+        birth_latitude=40,
+    )
+    target = datetime.fromisoformat(case["analysis_UTC"])
+    zone = parse_timezone_name(row["zone"])
+    output = profections.build_annual_profection_payload(
+        info, predictive_clock_operands, analysis_datetime=target
+    )
+    assert output == profections.build_annual_profection_payload(
+        info, predictive_clock_operands, analysis_datetime=target.astimezone(zone)
+    )
+    assert calculate_age_years_int(info, target) == case["age"]
+    assert calculate_age_years_int(info, target.astimezone(zone)) == case["age"]
+    assert output["age_years"] == case["age"]
+    assert output["calculation_options"]["anniversary_clock_policy"] == "compatible"
+    start = datetime.fromisoformat(output["year_start"]).astimezone(zone)
+    end = datetime.fromisoformat(output["year_end"]).astimezone(zone)
+    expected = case["expected_window"]
+    _assert_predictive_reference_clock(start, expected["start"])
+    _assert_predictive_reference_clock(end, expected["end"])
+    timeline = profections.build_monthly_profections_payload(
+        annual_house=output["activated_house"],
+        asc_sign="Aries",
+        year_start=start,
+        year_end=end,
+        analysis_datetime=target,
+    )
+    assert [m["month_index"] for m in timeline if m["active"]] == [
+        case["month_index"] + 1
+    ]
+    for index, month in enumerate(timeline):
+        _assert_predictive_reference_clock(
+            datetime.fromisoformat(month["start"]), expected["month_bounds"][index]
+        )
+        _assert_predictive_reference_clock(
+            datetime.fromisoformat(month["end"]), expected["month_bounds"][index + 1]
+        )
+    assert output["monthly_house"] == (case["age"] + case["month_index"]) % 12 + 1
+
+
+@pytest.mark.parametrize(
+    "case", PREDICTIVE_TIME_REFERENCE["progression_clocks"], ids=lambda c: c["id"]
+)
+def test_secondary_progression_fixed_key_matches_flint(
+    case, predictive_clock_operands, monkeypatch
+):
+    observed = []
+
+    def capture_subject(**parameters):
+        observed.append(parameters["local_datetime"])
+        return predictive_clock_operands
+
+    monkeypatch.setattr(progressions, "build_subject", capture_subject)
+    info = build_predictive_birth_info(
+        birth_year=1900,
+        birth_month=1,
+        birth_day=1,
+        birth_hour=12,
+        birth_timezone="UTC",
+        birth_longitude=0,
+        birth_latitude=40,
+    )
+    target = info.require_utc_datetime + timedelta(
+        microseconds=case["elapsed_microseconds"]
+    )
+    result = progressions.build_secondary_progression_payload(
+        info, predictive_clock_operands, analysis_datetime=target
+    )
+    expected = info.require_utc_datetime + timedelta(
+        microseconds=case["V2_progressed_microseconds"]
+    )
+    assert observed == [expected]
+    assert datetime.fromisoformat(result["progressed_datetime"]) == expected
+    options = result["calculation_options"]
+    assert options["year_key_numerator"] == 36524219
+    assert options["year_key_denominator"] == 100000
+    assert options["house_method"] == "quotidian_at_progressed_UTC"
+
+
+@pytest.mark.parametrize(
+    "case", PREDICTIVE_TIME_REFERENCE["profection_clocks"], ids=lambda c: c["id"]
+)
+def test_given_year_preserves_anniversary_interval_in_return_zone(
+    case, predictive_clock_operands, monkeypatch
+):
+    monkeypatch.setattr(
+        profections, "build_subject", lambda **parameters: predictive_clock_operands
+    )
+    row = case["birth"]
+    local = datetime.fromisoformat(row["local"])
+    info = build_predictive_birth_info(
+        birth_year=local.year,
+        birth_month=local.month,
+        birth_day=local.day,
+        birth_hour=local.hour,
+        birth_minute=local.minute,
+        birth_timezone=row["zone"],
+        birth_longitude=0,
+        birth_latitude=40,
+    )
+    target = datetime.fromisoformat(case["analysis_UTC"])
+    annual = profections.build_annual_profection_payload(
+        info, predictive_clock_operands, analysis_datetime=target
+    )
+    result = profections.build_given_year_payload(
+        info,
+        predictive_clock_operands,
+        analysis_datetime=target,
+        annual_profection=annual,
+        return_longitude=139.69,
+        return_latitude=35.68,
+        return_timezone="Asia/Tokyo",
+    )
+    expected = case["expected_window"]
+    assert datetime.fromisoformat(result["year_start"]).astimezone(
+        timezone.utc
+    ) == datetime.fromisoformat(expected["start"]["UTC"])
+    assert datetime.fromisoformat(result["year_end"]).astimezone(
+        timezone.utc
+    ) == datetime.fromisoformat(expected["end"]["UTC"])
+    assert [m["month_index"] for m in result["monthly_profections"] if m["active"]] == [
+        case["month_index"] + 1
+    ]
 
 
 def _governing_returns_for(analysis_month, analysis_day):
@@ -995,7 +1251,7 @@ def test_zodiacal_releasing_loosing_of_bond_jumps_after_full_cycle():
         start_sign="Aquarius",
         period_start=start,
         period_end=start + timedelta(days=30 * 360),
-        root_sign="Aquarius",
+        fortune_sign="Aquarius",
         parent_sign="Aquarius",
         level=2,
         analysis_datetime=start,
@@ -1024,10 +1280,9 @@ def test_zodiacal_releasing_loosing_of_bond_jumps_after_full_cycle():
     assert loosing_flags[12] is True
 
 
-def test_zodiacal_releasing_from_spirit_starts_at_spirit_sign_when_lots_coincide():
-    # When the Lots of Spirit and Fortune fall in the same sign, releasing from
-    # Spirit must still begin at Spirit's OWN sign (the two lots may share a
-    # sign — there is no rule that bumps Spirit to the next one).
+def test_zodiacal_releasing_shifts_spirit_when_lots_coincide():
+    # Brennan/Schaim episode192: same-sign lots shift Spirit forward one sign;
+    # Fortune remains the angular reference and natal lots are not relocated.
     from fatebridge.core.predictive._common import (
         build_lot_payloads,
         build_natal_subject,
@@ -1057,7 +1312,56 @@ def test_zodiacal_releasing_from_spirit_starts_at_spirit_sign_when_lots_coincide
         birth_info,
         subject,
         analysis_datetime=datetime(
-            2025, 1, 1, 12, tzinfo=parse_timezone_name("Asia/Shanghai")
+            2030, 1, 1, 12, tzinfo=parse_timezone_name("Asia/Shanghai")
         ),
     )
-    assert payload["spirit"]["release_start_sign"] == lots["lot_of_spirit"]["sign"]
+    # Independent Kerykeion6.0.5 natal factory confirms both natal lots in Libra.
+    assert lots["lot_of_spirit"]["sign"] == "Libra"
+    assert payload["spirit"]["lot"]["sign"] == "Libra"
+    assert payload["spirit"]["release_start_sign"] == "Scorpio"
+    assert payload["fortune"]["release_start_sign"] == "Libra"
+    assert payload["spirit"]["angular_reference_sign"] == "Libra"
+    assert payload["spirit"]["start_sign_adjusted"] is True
+    assert payload["fortune"]["start_sign_adjusted"] is False
+    # Brennan2019 handout: Gemini L3 is1 month20days=50days, Cancer62.5days.
+    # duration_value names a full nominal sign period; a parent may clip its end.
+    periods = {row["sign"]: row for row in payload["spirit"]["level_3_timeline"]}
+    assert periods["Gemini"]["duration_value"] == 50
+    assert periods["Cancer"]["duration_value"] == 62.5
+
+
+def test_zodiacal_releasing_active_boundary_uses_elapsed_days_across_dst():
+    from datetime import timezone
+
+    from fatebridge.core.predictive._common import build_natal_subject
+    from fatebridge.core.predictive.zodiacal_releasing import (
+        build_zodiacal_releasing_payload,
+    )
+
+    birth = build_predictive_birth_info(
+        birth_year=1990,
+        birth_month=5,
+        birth_day=17,
+        birth_hour=15,
+        birth_minute=30,
+        birth_timezone="Asia/Shanghai",
+        birth_longitude=121.4737,
+        birth_latitude=31.2304,
+    )
+    subject = build_natal_subject(birth)
+    # Independent UTC arithmetic: birth06:30UTC +20x360 days = this boundary.
+    # Natal China DST is +09:00; the boundary is +08:00, hence14:30 civil.
+    boundary = datetime(2010, 2, 1, 6, 30, tzinfo=timezone.utc)
+    for moment, expected_sign in [
+        (boundary - timedelta(microseconds=1), "Gemini"),
+        (boundary, "Cancer"),
+    ]:
+        track = build_zodiacal_releasing_payload(
+            birth, subject, analysis_datetime=moment
+        )["fortune"]
+        assert track["level_1_timeline"][0]["end"] == "2010-02-01T14:30:00+08:00"
+        assert track["current_level_1"]["sign"] == expected_sign
+        for level in (1, 2, 3):
+            current = track[f"current_level_{level}"]
+            assert datetime.fromisoformat(current["start"]) <= moment
+            assert moment < datetime.fromisoformat(current["end"])

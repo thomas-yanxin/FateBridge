@@ -9,18 +9,13 @@ from pathlib import Path
 import pytest
 
 from tests.jyotish.test_jyotish_transports import call_surfaces
+from tests.support.reference_data import resolve
 
 ROOT = Path(__file__).resolve().parents[2]
 CASES = json.loads(
     (ROOT / "tests/fixtures/jyotish-mean-date-api-reference.json").read_text()
 )["cases"]
 WEEK = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"]
-
-
-def resolve(body, path):
-    for part in path.split("."):
-        body = body[int(part)] if isinstance(body, list) else body[part]
-    return body
 
 
 @pytest.mark.parametrize("key", ["astro_india", "astro_chart", "astro_vimshottari"])
@@ -85,7 +80,14 @@ def test_calendar_and_theme_values_follow_actual_returned_UT1_on_three_surfaces(
                     basis["inputs"][component]
                     == kala["components"][component]["summary"][planet]
                 )
-            values = list(basis["inputs"].values())
+            values = [
+                (
+                    Fraction(basis["exact_paksha_virupa"])
+                    if key == "paksha_bala"
+                    else value
+                )
+                for key, value in basis["inputs"].items()
+            ]
             expected_total = (
                 None
                 if None in values

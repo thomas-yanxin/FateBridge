@@ -1,4 +1,4 @@
-"""Apparent solar hour from this chart's Sun RA and modeled UT1 rotation.
+"""Apparent solar hour from this chart's Sun RA and supplied UT1 rotation.
 
 USNO: apparent solar time = 12h + the apparent Sun's local hour angle.
 No UTC-as-UT1 equation-of-time call, timezone rebasing, or new physical instant.
@@ -102,7 +102,7 @@ def apparent_solar_clock(
         "greenwich_apparent_sidereal_degrees": greenwich_apparent_sidereal_degrees,
         "longitude": longitude,
         "solar_reference": "geocentric_apparent_sun_true_equator_equinox_of_date",
-        "earth_rotation_basis": "shared_estimated_ut1_not_measured_dut1",
+        "earth_rotation_basis": "supplied_same_instant_ut1",
         "physical_time_accuracy_certified": False,
         "changes_physical_instant": False,
         "classical_clock_mapping_accepted": False,

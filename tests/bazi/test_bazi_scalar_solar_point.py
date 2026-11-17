@@ -28,6 +28,10 @@ def sealed(path):
 @pytest.mark.parametrize("spk", [False, True])
 def test_entire_known_oracle_through_each_scalar_model_caller(spk, monkeypatch):
     oracle = sealed(ROOT / "tests/data/bazi_tt_utc_exact_v1/oracle.json.gz")
+    primary = json.loads(
+        (ROOT / "tests/fixtures/historical-utc-domain-reference-v1.json").read_text()
+    )
+    rescued = {row["id"]: row for row in primary["atomic_rescued_ordinary_rows"]}
     provider = spk_solar if spk else analytic_solar
     seen = 0
     for row in oracle["rows"]:
@@ -44,9 +48,14 @@ def test_entire_known_oracle_through_each_scalar_model_caller(spk, monkeypatch):
             }
 
         monkeypatch.setattr(provider, "longitude_crossing_tt", solver)
-        if row["status"] == "normal":
+        if row["status"] == "normal" or row["id"] in rescued:
             civil, receipt = almanac._solar_term_utc_via_analytic(2000, 0, {}, spk=spk)
-            assert civil.isoformat() == row["expected_datetime_utc"], row["id"]
+            expected = (
+                rescued[row["id"]]["expected_UTC"]
+                if row["id"] in rescued
+                else row["expected_datetime_utc"]
+            )
+            assert civil.isoformat() == expected, row["id"]
             details = receipt["solar_model_details"]
             assert details["selected_crossing_jd_tt"] == jd
             assert (

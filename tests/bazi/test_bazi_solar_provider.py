@@ -1,13 +1,14 @@
 """Availability guards are regressions, not independent celestial accuracy data."""
 
 from dataclasses import replace
-from datetime import datetime
+from datetime import datetime, timezone
 
 import pytest
 
 from fatebridge.core import almanac, timing
 from fatebridge.core.calendar import BaZiCalendar
 from fatebridge.core.timing import TimingAnalysis
+from fatebridge.utils.civil_time import ZonedCalendar
 from fatebridge.utils.errors import EphemerisSourceError
 from tests.bazi.test_bazi_year_contract import TOPICS
 from tests.support.transports import SPECS, inputs, native
@@ -73,7 +74,11 @@ def test_missing_native_crossings_are_rejected_on_all_three_surfaces(
 
 @pytest.mark.parametrize("provider", ["linear_1900_fallback", "unknown", ""])
 def test_unknown_provenance_is_not_promoted_to_a_calculated_term(provider):
-    term = almanac.SolarTerm("立春", datetime(2026, 2, 4), "20260204", "", provider)
+    term = almanac.SolarTerm(
+        "立春",
+        ZonedCalendar.from_datetime(datetime(2026, 2, 4, tzinfo=timezone.utc)),
+        provider,
+    )
     with pytest.raises(RuntimeError, match="swisseph"):
         almanac.require_calculated_solar_term(term)
 

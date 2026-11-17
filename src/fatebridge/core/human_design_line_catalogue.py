@@ -17,6 +17,7 @@ from fatebridge.core.human_design_references import (
 )
 from fatebridge.core.knowledge_store import ToolValidationError
 from fatebridge.utils.errors import EphemerisSourceError
+from fatebridge.utils.json_digest import canonical_bytes
 
 DOMAIN = "human_design"
 
@@ -73,16 +74,6 @@ def _scope(data: dict) -> str:
         "须核对同run实际gate/line、fixing_state及触发依据，不以角色通用线主题代替具体爻义。"
         "来源条件未穷尽核对，未记录不表示无条件。出版母本与完整384线未认证，现实效力未检验。"
     )
-
-
-def _canonical(value: Any) -> bytes:
-    return json.dumps(
-        value,
-        sort_keys=True,
-        ensure_ascii=False,
-        separators=(",", ":"),
-        allow_nan=False,
-    ).encode()
 
 
 def _object(pairs: list[tuple[str, Any]]) -> dict:
@@ -241,7 +232,9 @@ def _provenance(data: dict, snapshot: dict[Path, bytes]) -> dict:
         "domain": DOMAIN,
         "reference_policy_id": POLICY_ID,
         "source_catalogue_version": data["version"],
-        "source_catalogue_content_sha256": hashlib.sha256(_canonical(data)).hexdigest(),
+        "source_catalogue_content_sha256": hashlib.sha256(
+            canonical_bytes(data)
+        ).hexdigest(),
         "reference_only": True,
         "personal_applicability_assessed": False,
         "whole_books_collated": False,

@@ -13,10 +13,12 @@ from fractions import Fraction
 from typing import Any, Dict, Tuple
 
 from fatebridge.core.astro import runtime
+from fatebridge.core.astro.earth_attitude import earth_attitude
 from fatebridge.core.astro.iers_ut1 import active_ut1
 from fatebridge.core.astro.julian_day import _julian_day
 from fatebridge.core.astro.native_coordinates import require_spherical_coordinates
 from fatebridge.core.astro.physical_epoch import PhysicalEpoch
+from fatebridge.core.astro.reference_frames import rotate_spherical
 from fatebridge.core.astro.solar_sources import SunSourceCohort, sun_source
 from fatebridge.core.astro.source_session import (
     coherent_ephemeris_sources,
@@ -59,7 +61,9 @@ def _sun_clock(
 ) -> Dict[str, Any]:
     """EOT from apparent solar hour angle, evaluated in the shared TT policy.
 
-    Equivalent to the documented Swiss time_equ hour-angle expression. Use
+    Uses the documented Swiss time_equ hour-angle expression in the selected
+    physical equator. Transport the source solar ray before subtracting RA.
+    Use
     calc(TT) explicitly: calc_ut's internal Delta T may differ from the civil
     forward policy in historical epochs. No observed Earth-orientation data
     are invented by this model calculation.
@@ -73,14 +77,18 @@ def _sun_clock(
     coords, flag = runtime.ephemeris_call(
         "calc", jd_tt, swe.SUN, swe.FLG_SWIEPH | swe.FLG_EQUATORIAL
     )
-    ra, _, _ = require_spherical_coordinates(coords, flag, native=swe, equatorial=True)
+    ra, dec, _ = require_spherical_coordinates(
+        coords, flag, native=swe, equatorial=True
+    )
+    attitude = earth_attitude(swe, jd_ut1, julian_day_tt=jd_tt)
+    ra, _ = rotate_spherical(attitude.reduction.native_to_target, ra, dec)
     model = runtime.ephemeris_model_from_retflag(flag)
     session = current_source_session()
     assert session is not None
     session.check()
     row = session.trace.observe("equatorial_Sun", model)
     physical_source = sun_source(session.trace.snapshot(), row)
-    sidereal_hours = runtime.ephemeris_call("sidtime", jd_ut1)
+    sidereal_hours = runtime.ephemeris_call("sidtime", jd_ut1, _julian_day_tt=jd_tt)
     try:
         gast = float(sidereal_hours) * 15
     except (TypeError, ValueError, OverflowError) as error:
@@ -99,6 +107,7 @@ def _sun_clock(
         "greenwich_apparent_sidereal_degrees": gast,
         "solar_ephemeris_model": model,
         "solar_reference": "geocentric_apparent_sun",
+        "equatorial_frame": "selected_physical_equator_and_equinox_of_date",
         "sidereal_time_model": rotation["sidereal_time_model"],
         "earth_rotation_policy_id": rotation["policy_id"],
         "_physical_source": physical_source,

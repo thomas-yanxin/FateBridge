@@ -13,6 +13,7 @@ from ...utils.data import EARTHLY_BRANCHES
 from .common import GUI_REN_SEQUENCE
 from .liureng_life_stages import life_stage_cycle
 from .ren_gods import GuirenProfile, noble_start
+from .ren_sources import JINGWEI_SCAN_SHA256, JINGWEI_SOURCE
 
 PROFILES: tuple[GuirenProfile, ...] = ("liuren_common_v1", "tanyuan_xieji_v1")
 BASIS = {
@@ -48,8 +49,8 @@ BASIS = {
             "id": "gugong_gugong-419",
             "source_title": "毛志道《六壬经纬》",
             "edition": "故宫珍本丛刊419所收六壬经纬，目录标雍正刊本",
-            "source_url": "https://upload.wikimedia.org/wikipedia/commons/9/94/GGZBCK419_%E5%BE%A1%E5%AE%9A%E5%8D%9C%E7%AD%AE%E7%B2%BE%E8%98%8A_%E5%85%AD%E5%A3%AC%E7%B6%93%E7%B7%AF_%E5%85%AD%E5%A3%AC%E7%B2%B9%E8%A8%80_%E5%85%AD%E5%A3%AC%E9%A1%9E%E8%81%9A.pdf",
-            "source_sha256": "5bc1538f57153f26f1498061820d26ca016b5075cdaeabaadfe0f0ef3b077378",
+            "source_url": JINGWEI_SOURCE,
+            "source_sha256": JINGWEI_SCAN_SHA256,
             "original_pdf_pages": [10, 11, 53, 54, 55, 65, 66],
         },
     ],

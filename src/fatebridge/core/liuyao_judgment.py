@@ -758,7 +758,7 @@ def build_conditional_analysis(
         row.pop(MOVING_SI_KEY, None)
     return {
         "ruleset_id": "zengshan_conditional_v2",
-        "ruleset_version": "2.21.2" if moving_si_applicable else "2.20.0",
+        "ruleset_version": "2.21.4" if moving_si_applicable else "2.20.2",
         "month_break_conditions": build_month_break_conditions(
             lines, assessment, month, day, focus["selected"], hidden_conditions
         ),

@@ -162,6 +162,8 @@ def test_new_facts_do_not_imply_each_other_or_departure():
     ]:
         request = SuZhanRequest.model_validate(
             {
+                "lat": "31n13",
+                "lon": "121e28",
                 "date": "2025-03-03",
                 "time": "12:00:00",
                 "activity": activity,
@@ -172,6 +174,8 @@ def test_new_facts_do_not_imply_each_other_or_departure():
         with pytest.raises(ValueError):
             SuZhanRequest.model_validate(
                 {
+                    "lat": "31n13",
+                    "lon": "121e28",
                     "date": "2025-03-03",
                     "time": "12:00:00",
                     "activity": "commerce",
@@ -197,6 +201,8 @@ def test_action_facts_do_not_change_calendar_chart_or_physical_sky():
 
     results = [
         calculate_suzhan_analysis(
+            lat="31n13",
+            lon="121e28",
             date="2025-03-03",
             time="12:00:00",
             zone="+08:00",

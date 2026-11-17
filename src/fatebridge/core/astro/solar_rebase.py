@@ -73,6 +73,7 @@ def solar_rebase_adjustment(
             "greenwich_apparent_sidereal_degrees"
         ],
         "solar_ephemeris_model": sun["solar_ephemeris_model"],
+        "equatorial_frame": sun["equatorial_frame"],
         "solar_ephemeris_source": sun["_physical_source"],
         "sidereal_time_model": sun["sidereal_time_model"],
         "earth_rotation_policy_id": sun["earth_rotation_policy_id"],

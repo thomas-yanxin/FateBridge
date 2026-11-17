@@ -34,12 +34,6 @@ def load():
     return geometry, counting, reading, templates
 
 
-def path_get(value, path):
-    for key in path.split("."):
-        value = value[int(key)] if isinstance(value, list) else value[key]
-    return value
-
-
 def expected_summary(case, reading, templates):
     role = case.get("selected_role", "body" if case["topic"] == "travel" else "use")
     values = {

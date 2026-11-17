@@ -5,6 +5,7 @@ from datetime import datetime, timedelta, timezone
 import pytest
 
 from fatebridge.core import almanac, solar_model_policy, vsop2013_solar
+from fatebridge.utils.civil_time import ZonedCalendar
 from fatebridge.utils.errors import EphemerisSourceError
 
 
@@ -94,9 +95,7 @@ def test_calculated_predicate_requires_distinct_model_and_source_fields(fault):
         details["model_id"] = "moshier"
     term = almanac.SolarTerm(
         name="立春",
-        moment=datetime(2026, 2, 4, tzinfo=timezone.utc),
-        date_key="20260204",
-        day_ganzhi="己酉",
+        calendar=ZonedCalendar.from_datetime(datetime(2026, 2, 4, tzinfo=timezone.utc)),
         resolution_provider="vsop2013",
         ephemeris_model=vsop2013_solar.MODEL_ID,
         ephemeris_retflags=(260,) if fault == "native_flags" else (),

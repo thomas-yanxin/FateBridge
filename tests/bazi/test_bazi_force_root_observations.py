@@ -38,7 +38,17 @@ def test_ma_body_hidden_water_is_not_replaced_by_a_yang_growth_or_seal_root():
     assert seal["hour"]["kind"] == "lu_root"
     # Known source/model disagreement is deliberately unchanged.
     assert force["engineering_composition"]["strength_level"] == "强"
-    assert set(force["classical_adjudication"].values()) == {"not_adjudicated"}
+    adjudication = force["classical_adjudication"]
+    assert adjudication["status"] == "not_adjudicated"
+    assert all(
+        adjudication[field] is None
+        for field in (
+            "body_strength",
+            "seal_weight",
+            "body_seal_relation",
+            "ordinary_fuyi_applicable",
+        )
+    )
 
 
 def test_mao_clashed_growth_root_is_retained_without_claiming_its_remaining_force():

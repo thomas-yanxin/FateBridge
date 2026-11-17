@@ -33,7 +33,7 @@ def root_qualification_snapshot_lines(assessment: Mapping[str, Any]) -> list[str
             f"{seat}（{LABELS[row['kind']]}，实际藏干根保留{retention}，{inclusion}）"
         )
     return [
-        f"结构判级：{assessment['strength_level']}；数值原判：{decision['numerical_label']}；"
+        f"工程结构政策档：{assessment['strength_level']}；数值原判：{decision['numerical_label']}；"
         f"本次依据：{rules.get(decision['rule'], decision['rule'])}。",
         "结构根核对："
         + ("；".join(details) if details else "本次无符合资格的根")

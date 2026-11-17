@@ -1,8 +1,8 @@
-# 法达版本兼容参考与验收约定
+# 法达计算口径与验收约定
 
 法达为人生阶段类问题提供一种传统占星分期依据。夜盘顺序与年长口径的选择会影响分期日期；比较结果时，需要同时核对时区、时间边界与版本。下方列出可选口径、来源及验收约定，供调用者选参和维护者检查兼容性。
 
-独立 `firdaria` 与综合 `western_timing_analysis` 共用两项选择；默认组合保持既有结果。
+独立 `firdaria` 与综合 `western_timing_analysis` 共用两项选择。固定年现按UTC名义经过时长计算；旧地方钟结果与当前结果须区分，不承诺夏令时场景的旧日期保持不变。
 
 [文档中心](README.md) · [算法覆盖](algorithm-coverage.md) · [API 参考](api-reference.md)
 
@@ -13,11 +13,11 @@
 | 参数 | 可选值 | 默认值 |
 | --- | --- | --- |
 | `firdaria_night_order` | `nodes_at_end`（夜盘水星后接交点）、`nodes_after_mars`（夜盘火星后接交点） | `nodes_at_end` |
-| `firdaria_year_basis` | `fixed_365_2425`（原本地时间固定年加法）、`calendar_anniversary`（公历周年、UTC 七等分） | `fixed_365_2425` |
+| `firdaria_year_basis` | `fixed_365_2425`（UTC固定名义日）、`calendar_anniversary`（公历周年、UTC七等分） | `fixed_365_2425` |
 
-两项可独立选择，夜盘顺序选项不改变日盘顺序。它们在共用的 `WesternTimingRequest` 家族中公开，顺序和年长算法只用于综合时运中的法达层及独立法达工具；其他独立技法忽略这两项。公历模式还按 `ZoneInfo` 解释本次出生／分析民用钟时：若与旧解析的未来夏令时偏移不同，综合工具的其他技法也按同一修正后的瞬间计算，保持本次查询的钟时一致，技法自身算法不变。默认模式的时区路径不变。非法枚举在三端均被公开请求模型拒绝。
+两项可独立选择，夜盘顺序选项不改变日盘顺序。它们在共用的 `WesternTimingRequest` 家族中公开，顺序和年长算法只用于综合时运中的法达层及独立法达工具；其他独立技法忽略这两项。出生与分析时区由共有边界解释，公历模式另校验生成周年钟时。非法枚举在三端均被公开请求模型拒绝。
 
-默认组合（包括显式传入两个默认值）不增加业务字段，以保留已有完整结果与快照的业务内容。任一选项非默认时，法达对象增加 `calculation_options`，记录 `night_order/year_basis/subperiod_basis/timezone`。公历周年模式的每段大运还增加 `nominal_start_age/nominal_end_age`，大小运均增加 `start_display/end_display`；精确 `start/end` 始终参与计算。`analysis_context.age_years` 是其他西占技法共用的固定年年龄，不随法达口径改变；法达周年边界以 `nominal_*_age` 为准。
+所有新结果均在法达对象内返回 `calculation_options`，记录 `night_order/year_basis/subperiod_basis/timezone`；两种年长的子限均为 `utc_elapsed`。公历周年模式的每段大运还增加 `nominal_start_age/nominal_end_age`，大小运均增加 `start_display/end_display`；精确 `start/end` 始终参与计算。`analysis_context.age_years` 是其他西占技法共用的固定年年龄，不随法达口径改变；法达周年边界以 `nominal_*_age` 为准。
 
 REST 请求体与 MCP `firdaria` 参数使用相同字段，例如（地点明确为测试假设）：
 
@@ -52,29 +52,31 @@ uv run --locked --extra dev fatebridge firdaria \
 综合命令替换为 `western_timing_analysis`，字段路径相应为 `time_lords.firdaria.*`。`return_timezone` 仍属于返照／行运地点，不改变法达边界或法达展示时区；法达始终按出生时区输出，调用方可转换精确瞬间用于其他时区显示。运行中的 Desktop MCP 连接可能缓存旧 Schema，更新源代码后需重载连接再使用新参数。
 ## 两套口径
 
-| 项目 | `fatebridge_firdaria_legacy_v1` | `user_reference_calendar_bonatti_v1` |
+| 项目 | `fixed_365_2425`（当前固定年） | `calendar_anniversary`（公历周年） |
 | --- | --- | --- |
-| 状态 | 生产默认组合 | 生产可选组合；夜盘选 `nodes_after_mars`，年长选 `calendar_anniversary` |
-| 日盘顺序 | 日、金、水、月、土、木、火、北交、南交 | 相同 |
-| 夜盘顺序 | 月、土、木、火、日、金、水、北交、南交 | 月、土、木、火、北交、南交、日、金、水 |
-| 年长 | 固定每年 365.2425 天 | 大运边界为原始出生钟时的公历周年 |
-| 大运推进 | 从上一段结束继续加固定日数 | 从原始出生日期按累计名义年龄独立求周年 |
-| 小运 | 大运年数 / 7，连续加固定日数 | 将大运两端对应的 UTC 历时七等分，独立计算各边界 |
+| 状态 | 默认年长，可独立选择两种夜盘顺序 | 可选年长，可独立选择两种夜盘顺序 |
+| 年长 | 每年31556952名义秒，即365.2425个86400秒日 | 大运边界为原始出生钟时的公历周年 |
+| 大运推进 | 在UTC连续累加固定时长，出生区只用于显示 | 从原始出生日期按累计名义年龄独立求周年 |
+| 小运 | 主运实际UTC时长等分为七段 | 将大运两端对应的UTC历时七等分，独立计算各边界 |
 | 序列重复 | 每 75 个固定年重复 | 每累计 75 个公历年重复 |
 | 显示 | ISO 8601，保留实际计算出的秒／微秒及偏移 | `start/end` 保留微秒；`start_display/end_display` 截到分钟，不四舍五入 |
 
-这里的 `legacy` 只表示既有行为标签，不表示它是弃用接口。365.2425 是当前常量的数值，不能因为变量名为 `TROPICAL_YEAR_DAYS` 就宣称它是逐年求解的真实回归年或太阳返照。
+原夹具中的 `fatebridge_firdaria_legacy_v1` 和 `user_reference_calendar_bonatti_v1` 保留为历史参考标签，不是接口参数，也不认证第三方产品。当前固定年已经修订时间轴；365.2425是声明的模型常量，不能因为变量名为 `TROPICAL_YEAR_DAYS` 就宣称它是逐年求解的真实回归年或太阳返照，也不处理闰秒。
 
 固定年长也可能采用 365.25 等其他约定，但本参考不将它们与这两套口径混用。
 
 ## 来源与工程补充
 
-参考来稿未提供作者、版本或可核验的第三方实现，仅作为示例与兼容测试材料，不认证第三方产品的实际算法。
+最初来稿未提供作者、版本或可核验的第三方实现，继续作为原输入资料保存；新增原典、软件和独立时间参考分别记录，不能把来稿标签当作权威来源。
 
 - 来稿提供：九段年限、日夜顺序、七等分小运、交点不分小运、两个分钟显示示例。
 - [Öner Döşer《Astrological Prediction》节选，第 38–40 页](https://bendykes.com/wp-content/uploads/2016/08/ap-extract.pdf)：列出总计 75 年的九段及七等分规则，采用夜盘交点位于火星之后的版本。
 - [Steven Birchfield《Firdar》，2020 修订，第 2–6 页及附表](https://birchfieldastrology.com/wp-content/uploads/2020/07/firdar_revision-02-2020-07-13.pdf)：引述 Abu Maʿshār 的夜盘水星后接交点规则，并讨论通常归于 Bonatti 的另一种理解。因此本文用 `bonatti` 作版本标签，不将历史归属争议写成已无争议的事实。
-- 本项目新增的工程选择：时区处理、UTC 七等分、闰日回退、原始出生锚点、微秒量化、分钟截断及边界归属。这些不冒充来稿已说明或第三方产品已经实现的规则。
+- 本项目的工程选择：固定UTC名义日、时区处理、UTC七等分、闰日回退、原始出生锚点、微秒量化、分钟截断及边界归属。这些不冒充来稿已说明或第三方产品已经实现的规则。
+
+Birchfield三个附表有16处水星／金星位置与正文规则及Döşer图7冲突，字面表与冲突记录保留在[固定参考](../tests/fixtures/firdaria-reference.json)，未据此改动子星顺序。`nodes_after_mars`是Bonatti名下的解释分支，不认证其为唯一古法。
+
+[Morinus所选提交](https://github.com/shin10567/Morinus-Source-Codes/blob/bbe3ebe1bb5b9a7d62cb6662ff413e61522cc6c6/firdaria.py)用于公历模式的日期级对照，原模块实际执行，只适配输出词汇。它不接收出生钟时，所选版本的闰日出生会报错，不能认证亚日精度或本命天文。[Cosmic Patterns公开示例](https://www.astrosoftware.com/Firdaria.htm)的无交点版本只在首70年与所选顺序可比；其日粒度表在固定UTC年轴、UTC日期解释下相合，但未公布确切年常量和显示时区，不能由此推定内部设置或秒级符合。实际Temporal参考则独立核对所声明的名义时间模型，不认证物理计时或传统预测。
 
 来源只支撑传统算法与版本沿革，不证明现实预测效力。
 
@@ -102,16 +104,16 @@ uv run --locked --extra dev fatebridge firdaria \
 
 ### 默认固定年模式的可观测行为
 
-出生钟时按 `birth_timezone` 解析，未传时区时沿用地点推断及共享构造器回退行为。分析钟时也按出生时区解释；验收始终显式提供时区和分析钟时，不依赖系统现在、出生小时的默认回填或未知地点。
+出生与分析钟时按共有边界解析，分析钟时以出生时区解释；验收始终显式提供时区和分析钟时，不依赖系统现在、出生小时的默认回填或未知地点。
 
-默认固定年模式的时间线从带时区的 `birth_info.local_datetime` 出发，直接做本地 `timedelta` 加法并输出 `isoformat()`，没有先统一到 UTC。在 IANA 时区跨夏令时时，墙上钟时加法与真实 UTC 历时可能相差一小时；不能宣称当前算法对所有 IANA 时区均采用恒定 UTC 秒数。当前接口也没有法达专用的出生 `fold` 消歧参数。
+默认固定年模式从已确认出生UTC瞬间出发，按固定名义秒数推进，最后转换到出生区显示。旧地方钟加法会随夏令时或时区改制改变实际时长，现已修订。例如1990年上海夏令时出生的后续固定年边界与旧快照相差一小时；旧值作为反例保留，不继续保护。当前接口没有法达专用的出生 `fold` 消歧参数。
 
 ### 参考版本的新增约定
 
 1. 测试将两个原文例子明确实例化为 `Asia/Shanghai`，这只是时区测试条件，不代表已知出生地点。也接受显式固定 UTC 偏移；固定偏移不自动获得某城市的历史夏令时规则。
-2. 公历模式的 IANA 钟时使用标准库 `ZoneInfo`，按运行环境时区数据库及其未来延续规则解释，也覆盖 2038 年后的夏令时；未来法律变化仍可能需要更新时区数据库。出生、分析钟时或所生成的周年边界若处于不存在的时间（春季跳时）或重复的时间（秋季回拨），生产公历周年模式返回 `validation_error`，不猜偏移。错误会指出钟时角色，周年边界还会指出名义年龄。接口尚无端点单独消歧入口；需要确认有效钟时或改用已确认的固定偏移，后者将对整个时间线采用固定偏移，并非仅消歧一个端点。该限制只在公历周年模式生效，固定年模式保留原有行为。
+2. IANA钟时按运行环境时区数据库及其未来延续规则解释；未来法律变化仍可能需要更新时区数据库。公历模式还校验所生成的周年钟时，拒绝不存在或重复的时间，错误指出钟时角色及名义年龄。接口尚无端点单独消歧入口；需要确认有效钟时或使用已确认的固定偏移，后者将对整个时间线采用固定偏移，并非仅消歧一个端点。固定年模式不生成地方周年边界。
 3. 先在出生时区建立大运周年端点，再转 UTC 求差与七等分，最后转换回显示时区。更换显示时区只改变显示，不改变边界瞬间或当前主星。
-4. 内部判断用带时区的完整瞬间，公历周年模式统一转 UTC 比较，不能用去掉偏移的字符串或展示到分钟后的时间进行比较。公历周年模式不接受分析时刻早于出生时刻。
+4. 两种模式内部均统一转UTC比较，不能用去掉偏移的字符串或展示到分钟后的时间进行比较。公历周年模式不接受分析时刻早于出生时刻。
 
 ## 公历周年、闰日与等分
 
@@ -150,20 +152,20 @@ k = 0..7，量化单位为微秒
 
 ## 验证范围
 
-固定输入和期望值在 `tests/fixtures/firdaria-reference.json`（本地数据：`../tests/fixtures/firdaria-reference.json`），核心执行入口为 [`tests/western/test_firdaria_reference.py`](../tests/western/test_firdaria_reference.py)，三端入口为 [`tests/western/test_firdaria_transports.py`](../tests/western/test_firdaria_transports.py)。独立数学参考保留，用同一批固定期望值核对实际生产代码。
+固定输入、来源身份和独立期望值在[固定参考](../tests/fixtures/firdaria-reference.json)，核心入口为 [`tests/western/test_firdaria_reference.py`](../tests/western/test_firdaria_reference.py)，三端入口为 [`tests/western/test_firdaria_transports.py`](../tests/western/test_firdaria_transports.py)。原来稿、实际Temporal、未改动的Morinus日期与文献字面分歧分列保存，不从当前生产输出重建期望值。
 
 | 类别 | 验收内容 | 实际被测对象 |
 | --- | --- | --- |
 | 序列 | 两套夜盘九段年龄；日盘九段；每段七星小运；交点无小运 | 生产核心全部四种组合；三端实际日／夜盘调用 |
 | 示例 | 两个原文分钟结果、精确微秒、大运结束及当前版本差异 | 独立参考数学、生产核心、REST / MCP / CLI |
 | 闰日 | 非闰年回退、后续闰年恢复、2100 世纪年、75 年锚点 | 独立参考数学与生产周年函数；固定年生产结果另测 |
-| 时区 | 夏令时跨越的 UTC 七等分、显示时区转换、固定偏移与地区时区区别 | 独立参考数学与生产核心；当前本地加法另作行为记录 |
+| 时区 | 固定UTC名义日、周年UTC七等分、显示转换、固定偏移与地区时区区别 | 独立时间参考与生产核心；旧本地加法保留为历史反例 |
 | 歧义 | IANA 出生／分析／周年端点的重复和不存在钟时不自动猜测 | 生产核心及三端错误回执 |
 | 边界与取整 | 秒数跨分钟、各段连续、微秒精度、边界归下一段、交点为空、75 年重启 | 两套分别验证；参考小运不留尾差 |
 
 ```bash
 uv sync --locked --extra dev
-uv run --locked --extra dev pytest -q tests/western/test_firdaria_reference.py tests/western/test_firdaria_transports.py
+uv run --locked --extra dev python -m pytest -q tests/western/test_firdaria_reference.py tests/western/test_firdaria_transports.py
 ```
 
-生产核心没有依赖测试内的参考函数。通过这些用例表示本地生产路径和三端协议通过验收，不表示已部署到其他环境或已核验第三方产品。返回时间线仍最多 12 段，`current_major/current_sub` 独立覆盖查询时刻。默认法达完整时间线与已有冻结数据比对，不重写黄金基线。
+生产核心没有依赖测试内的参考函数。通过只限实际运行的模型、样本与环境，不表示所有第三方产品、原典、物理精度或现实预测通过。返回时间线最多12段，`current_major/current_sub`独立覆盖查询时刻。旧默认快照的出处和原失败保留，当前默认的完整时间线由实际Temporal独立参考核对。

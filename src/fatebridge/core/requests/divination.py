@@ -67,10 +67,12 @@ class MeihuaAnalysisRequest(MeihuaInterpretationOptions):
 class GuaLookupRequest(_DeferredModel):
     """Request model for trigram/hexagram lookup."""
 
-    query: str = Field(description="Hexagram/trigram name or binary code")
+    query: str = Field(
+        description="Trigram or hexagram name (source short name or common full name, simplified/traditional forms), or a 3/6-bit code from bottom to top. In auto mode the eight pure trigram names select trigrams; use hexagram for their six-line identities."
+    )
     lookup_mode: str = Field(
         default="auto",
-        description="Lookup mode: auto, hexagram, or trigram",
+        description="Lookup mode: auto, hexagram, or trigram. auto keeps the eight pure names as trigrams; hexagram explicitly selects their six-line figures.",
     )
     selected_sections: List[str] = Field(
         default_factory=list,
@@ -81,7 +83,9 @@ class GuaLookupRequest(_DeferredModel):
 class GuaMeiyiRequest(_DeferredModel):
     """Request model for batch Meiyi hexagram meanings."""
 
-    name: List[str] = Field(description="Trigram or hexagram names/codes")
+    name: List[str] = Field(
+        description="Trigram/hexagram names or 3/6-bit codes; source short names and simplified/traditional forms are supported. The eight pure names select trigrams in batch auto mode; use a full name or six-bit code for their hexagrams."
+    )
     selected_sections: List[str] = Field(
         default_factory=list,
         description="Optional snapshot section titles for filtered export payload",
@@ -262,12 +266,16 @@ class SuZhanRequest(_DeferredModel):
     )
     time: Optional[str] = Field(
         default=None,
-        description="已确认的当地钟时；未知时省略或null，保留历法日期／半日候选，不计算星图、宫位或瞬时天文宿位，不补00:00或示例钟时。空字符串无效。",
+        description="已确认的当地钟时；已知时须同时提供完整经纬度以计算星图。未知时省略或null，保留历法日期／半日候选，不计算星图、宫位或瞬时天文宿位，不补00:00或示例钟时。空字符串无效。",
     )
     zone: Optional[str] = Field(default="+08:00", description="Timezone spec")
-    lat: Optional[str] = Field(default="31n13", description="Latitude text or decimal")
+    lat: Optional[str] = Field(
+        default=None,
+        description="已知钟时须明确纬度；文本或十进制度，gps_lat优先；未知钟时不用于历法层",
+    )
     lon: Optional[str] = Field(
-        default="121e28", description="Longitude text or decimal"
+        default=None,
+        description="已知钟时须明确经度；文本或十进制度，gps_lon优先；未知钟时不用于历法层",
     )
     gps_lat: Optional[float] = Field(default=None, description="GPS latitude")
     gps_lon: Optional[float] = Field(default=None, description="GPS longitude")

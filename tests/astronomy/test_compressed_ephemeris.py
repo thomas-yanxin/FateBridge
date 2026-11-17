@@ -1,5 +1,6 @@
 """Endpoint selection must retain the exact request and reject bad sources."""
 
+from copy import deepcopy
 from types import SimpleNamespace
 
 import pytest
@@ -7,6 +8,78 @@ import pytest
 from fatebridge.core import compressed_ephemeris as c
 from fatebridge.core import ephemeris_runtime
 from fatebridge.utils.errors import EphemerisSourceError
+from tests.support.ephemeris_case_runtime import (
+    native_ephemeris_files as native_ephemeris_files,
+)
+
+
+@pytest.mark.local_data
+@pytest.mark.parametrize("restore_newer_moon", [False, True])
+def test_actual_overlapping_moon_profiles_remain_explicit_without_external_reset(
+    native_ephemeris_files, monkeypatch, restore_newer_moon
+):
+    native = ephemeris_runtime.swe
+    birth = 2378496.5
+    flags = (
+        native.FLG_SWIEPH
+        | native.FLG_SPEED
+        | native.FLG_TRUEPOS
+        | native.FLG_XYZ
+        | native.FLG_EQUATORIAL
+        | native.FLG_J2000
+        | native.FLG_ICRS
+    )
+    ephemeris_runtime.ephemeris_call("calc", birth, native.SUN, 258)
+    cold = deepcopy(c.coordinate_context_evidence())
+    assert cold["selected_windows"][1]["filename"] == "semo_18.se1"
+    # Header-selected anchors force each real file; no coordinate residual
+    # chooses the source and neither anchor substitutes for the requested TT.
+    before = cold["selected_windows"][1]["start_jd_tt"] - 1
+    ephemeris_runtime.ephemeris_call("calc", before, native.MOON, flags)
+    older_end = native.get_current_file_data(1)[2]
+    if restore_newer_moon:
+        ephemeris_runtime.ephemeris_call("calc", older_end + 1, native.MOON, flags)
+
+    def unexpected_reset(*args):
+        raise AssertionError("External solar reconstruction reset native configuration")
+
+    with monkeypatch.context() as patch:
+        patch.setattr(native, "set_ephe_path", unexpected_reset)
+        first = ephemeris_runtime.ephemeris_call("calc", birth, native.SUN, 258)
+        first_context = deepcopy(c.coordinate_context_evidence())
+        second = ephemeris_runtime.ephemeris_call("calc", birth, native.SUN, 258)
+        second_context = deepcopy(c.coordinate_context_evidence())
+    assert first == second
+    assert first_context["selected_windows"] == second_context["selected_windows"]
+    assert first_context["selected_windows"][0]["filename"] == "sepl_12.se1"
+    assert first_context["selected_windows"][1]["filename"] == (
+        "semo_18.se1" if restore_newer_moon else "semo_12.se1"
+    )
+    assert first_context["physical_jd_tt"] == birth
+    assert first_context["physical_instant_shifted"] is False
+    assert first_context["private_native_cache_reset"] is False
+
+
+@pytest.mark.local_data
+def test_owned_solar_source_restores_its_profile_after_off_epoch_history(
+    native_ephemeris_files,
+):
+    native = ephemeris_runtime.swe
+    birth = 2378496.5
+    with c.audit_compressed_endpoints():
+        first = ephemeris_runtime.ephemeris_call("calc", birth, native.SUN, 258)
+        original = deepcopy(c.coordinate_context_evidence())
+        ephemeris_runtime.ephemeris_call("calc", birth - 90, native.MOON, 258)
+        second = ephemeris_runtime.ephemeris_call("calc", birth, native.SUN, 258)
+        restored = deepcopy(c.coordinate_context_evidence())
+    assert first == second
+    assert original["selected_windows"] == restored["selected_windows"]
+    assert (
+        original["solar_light_path"]["states"] == restored["solar_light_path"]["states"]
+    )
+    assert original["physical_jd_tt"] == restored["physical_jd_tt"] == birth
+    assert original["private_native_cache_reset"] is True
+    assert restored["private_native_cache_reset"] is True
 
 
 def fixture(monkeypatch, *, endpoint=True, mode="good"):

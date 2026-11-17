@@ -9,7 +9,7 @@ from unittest.mock import patch
 
 import pytest
 
-from fatebridge.application.result_delivery import _json, bound_response
+from fatebridge.application.result_delivery import bound_response
 from fatebridge.core.human_design_cycle_summary import (
     FORMAT,
     compact_cycle_summary,
@@ -20,18 +20,33 @@ from fatebridge.core.human_design_cycles import (
     cycle_summary,
     summary_conventions,
 )
+from fatebridge.core.public_output import public_payload
+from fatebridge.utils.formatting import format_json_response
 from fatebridge.validation.human_design import verify_human_design_reading
 from tests.support.human_design_current import complete_run
 
 ROOT = Path(__file__).resolve().parents[2]
 
 
+def complete_internal_run(**request):
+    internal = {}
+
+    def capture(payload):
+        internal.update(deepcopy(payload))
+        return public_payload(payload)
+
+    # Private helpers consume the same run before public hash removal.
+    with patch("fatebridge.application.execution.public_payload", capture):
+        complete_run(**request)
+    return internal
+
+
 @lru_cache(maxsize=2)
-def current_cycle_run(mode):
+def current_internal_cycle_run(mode):
     with tempfile.TemporaryDirectory() as empty, pytest.MonkeyPatch.context() as env:
         env.setenv("SE_EPHE_PATH", str(ROOT / "ephe") if mode == "files" else empty)
         env.delenv("FATEBRIDGE_JPL_FILE", raising=False)
-        return complete_run(
+        return complete_internal_run(
             birth_year=1980,
             birth_month=1,
             birth_day=1,
@@ -43,7 +58,7 @@ def current_cycle_run(mode):
 
 
 def rich_current_run(mode="files", *, card=False):
-    result = deepcopy(current_cycle_run(mode))
+    result = deepcopy(current_internal_cycle_run(mode))
     context = result["cycle_context"]
     context.pop("summary_format", None)
     context.pop("summary_conventions", None)
@@ -85,7 +100,7 @@ def test_current_card_keeps_business_facts_within8192(mode):
     rich = p["cycle_summary"]
     p["cycle_summary"] = compact_cycle_summary(rich)
     result = bound_response(p, 8192)
-    assert len(_json(result)) <= 8192
+    assert len(format_json_response(result)) <= 8192
     assert result["cycle_summary"] == p["cycle_summary"]
     if "result_delivery" in result:
         assert all(
@@ -101,13 +116,13 @@ def test_current_card_keeps_business_facts_within8192(mode):
 
 @pytest.mark.parametrize("mode", ["files", "empty"])
 def test_current_full_format_verifies_and_preserves_rich_contact_facts(mode):
-    current = deepcopy(current_cycle_run(mode))
+    current = deepcopy(current_internal_cycle_run(mode))
     with patch(
         "fatebridge.core.astro.runtime.ephemeris_call",
         side_effect=AssertionError("native verifier call"),
     ):
         assert (
-            verify_human_design_reading(current)["status"]
+            verify_human_design_reading(public_payload(current))["status"]
             == "verified_fixed_template_reading"
         )
     rich_context = deepcopy(current["cycle_context"])
@@ -140,7 +155,7 @@ def test_real_native_speed_and_segment_disagreement_survives_compaction():
             Path(__file__).parents[1] / "data/human_design/regression-inputs.json"
         ).read_text()
     )
-    run = complete_run(**inputs["cycle_coordinate_extrema"])
+    run = complete_internal_run(**inputs["cycle_coordinate_extrema"])
     context = deepcopy(run["cycle_context"])
     context.pop("summary_format", None)
     rich = _cycle_summary_facts(context, run["profile"])
@@ -197,8 +212,9 @@ def test_decoder_rejects_missing_or_forged_conventions(fault):
         "unknown_format",
     ],
 )
-def test_rehashed_full_result_cannot_forge_compact_facts(fault):
-    p = converted(rich_current_run())
+def test_public_full_result_rejects_forged_compact_facts(fault):
+    p = public_payload(converted(rich_current_run()))
+    assert verify_human_design_reading(p)["status"] == "verified_fixed_template_reading"
     s = p["cycle_summary"]
     if fault == "default_status":
         s["contact_defaults"]["utc_label_status"] = "physically_certified"

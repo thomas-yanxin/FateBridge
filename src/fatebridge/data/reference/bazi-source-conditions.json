@@ -709,6 +709,78 @@
         "new_independent_validation_credit": 0,
         "calculation_effect": "none"
       }
+    },
+    {
+      "reference_ids": [
+        "parallel_shunju_fanju_v5_followup:DTCW1947-SJ05"
+      ],
+      "review": {
+        "review_id": "bounded-force-source-conditions:DTCW1947-SJ05",
+        "case_id": "DTCW1947-SJ05",
+        "pillars": [
+          "甲午",
+          "丁丑",
+          "甲午",
+          "丙寅"
+        ],
+        "review_kind": "same_developer_primary_image_reading",
+        "claim_shape": "contextual_semantic_mapping_needs_expert_adjudication",
+        "source_pdf_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
+        "source_pdf_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+        "excerpt_kind": "developer_transcription_for_scope",
+        "relative_timing_statements": [],
+        "independent_expert_review": "not_completed",
+        "effective_force_adjudication": "not_adjudicated",
+        "effective_passage_adjudication": "not_adjudicated",
+        "strength_annotation_assigned_or_regraded": false,
+        "new_independent_validation_credit": 0,
+        "calculation_effect": "none",
+        "source_page_anchors": [
+          {
+            "pdf_page": 393,
+            "image_sha256": "a5c53c49b87665b800045df1172ec72069790f3aee882aa9b0d3a6241e0daa5d"
+          }
+        ],
+        "reading_excerpt": "甲木生於季冬，火虛而幸通根有焰，格取從兒，木雖進氣，又逢祿比幫身，所謂從兒不論身強弱，非身弱論也。",
+        "body_seal_conditions": "原文先说火虚而幸通根有焰，随后另说木进气及禄比帮身，不能把火虚当甲木身弱。旧retained_anchor末句“火虛是食傷，不是甲木身弱”为登记编释，不是本页原句。非身弱论也紧承从儿不论身强弱，须区分论法适用条件与身力排除；本次不把它改判为身强、中和，也不撤掉原禁止弱约束或抹去工程弱的旧失败。",
+        "passage_conditions": "从儿成格及食伤生财力量仍待裁定；月丁、时丙、两午与寅中丙的存在不等于实际有效火力。任注明确木有禄比仍可论从儿，不能先以普通弱档替代路线资格；邻页392与394的成气、根气和财星条件不能删去。"
+      }
+    },
+    {
+      "reference_ids": [
+        "complete_qingqi_zhuoqi_v1:DTCW1947-QQ-02"
+      ],
+      "review": {
+        "review_id": "bounded-force-source-conditions:DTCW1947-QQ-02",
+        "case_id": "DTCW1947-QQ-02",
+        "pillars": [
+          "甲子",
+          "丙寅",
+          "己亥",
+          "辛未"
+        ],
+        "review_kind": "same_developer_primary_image_reading",
+        "claim_shape": "contextual_semantic_mapping_needs_expert_adjudication",
+        "source_pdf_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
+        "source_pdf_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+        "excerpt_kind": "developer_transcription_for_scope",
+        "relative_timing_statements": [],
+        "independent_expert_review": "not_completed",
+        "effective_force_adjudication": "not_adjudicated",
+        "effective_passage_adjudication": "not_adjudicated",
+        "strength_annotation_assigned_or_regraded": false,
+        "new_independent_validation_credit": 0,
+        "calculation_effect": "none",
+        "source_page_anchors": [
+          {
+            "pdf_page": 238,
+            "image_sha256": "f973580c1aafa8cfcf8502f50731a0bee3706f7322b197a95e208551f065bbc1"
+          }
+        ],
+        "reading_excerpt": "春土坐亥，財官太旺，最喜獨印逢生，財藏生官，則印綬之元神愈旺，氣貫生時，而日主之氣不薄，更妙連珠生化。",
+        "body_seal_conditions": "日主之气不薄的对象明确是己土；财官太旺与独印逢生、印绶元神愈旺、气贯生时是同一段前提。保留气不薄不唯一决定强或中和的未知标签，也保留旧禁止弱约束与工程弱的差异；原文没有给工程支持占比阈值，不把工程数值改名为原典身力。",
+        "passage_conditions": "原文主张连续生化而非把财官一概作耗克；应逐一核财、官、印、身的位置、根与承接，不凭五行齐见或任意相生路径宣布通关。气贯生时属于本段力量措辞，不据此重建出生瞬间、节气日数或新增司令结论。"
+      }
     }
   ],
   "scope": "当前登记的开发者原典条件校读；有效力量、通关和现实效度未裁定。"

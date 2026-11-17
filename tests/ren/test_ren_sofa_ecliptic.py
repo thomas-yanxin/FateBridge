@@ -76,9 +76,9 @@ def test_frozen_reference_inventory_is_complete(tmp_path, change):
 
 
 def test_fallback_model_is_reported_without_relabelling_it_swiss():
-    from tests.support.ephemeris_context import moshier_ephemeris as golden_ephemeris
+    from tests.support.ephemeris_context import empty_ephemeris_path
 
-    with golden_ephemeris():
+    with empty_ephemeris_path():
         result = AUDIT.audit()
     assert {r["actual_model"] for r in result["comparisons"]} == {"moshier"}
     assert result["selected_alignment_checks_passed"]

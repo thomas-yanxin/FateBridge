@@ -43,6 +43,15 @@ LUNAR_CASES = {
         ).read_text()
     )["cases"]
 }
+SOURCE_DOMAINS = {
+    row["id"]: row
+    for row in json.loads(
+        (
+            Path(__file__).parents[1]
+            / "fixtures/historical-utc-domain-reference-v1.json"
+        ).read_text()
+    )["guolao_original_adjustment_source_domain"]["rows"]
+}
 
 
 def epoch_for(case):
@@ -50,21 +59,40 @@ def epoch_for(case):
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
-def test_published_nonzero_UTC_adjustments_keep_Jie_but_not_invent_lunar_dates(
+def test_published_UTC_adjustments_keep_Jie_and_source_qualified_lunar_dates(
     fixed_moshier, case
 ):
     epoch = epoch_for(case)
-    assert epoch.utc_label is None and epoch.utc_datetime is None
+    expected_utc = SOURCE_DOMAINS[case["id"]]["UTC"]
+    if expected_utc is None:
+        assert epoch.utc_label is None and epoch.utc_datetime is None
+    else:
+        assert (
+            abs(
+                (
+                    datetime.fromisoformat(epoch.utc_label)
+                    - datetime.fromisoformat(expected_utc)
+                ).total_seconds()
+            )
+            < 0.0002
+        )
     assert abs(epoch.time.jd_tt - case["jd_tt"]) * 86400 <= 0.0002
     jie = module.native_month_context(epoch, "jie_month")
     assert jie["status"] == "available"
-    assert jie["instant_utc"] is None and jie["calendar_datetime"] is None
+    assert jie["instant_utc"] == epoch.utc_label
     assert jie["month_number"] == case["expected_month"]
     assert jie["month_branch"] == case["expected_branch"]
-    assert jie["term_search_year"] == int(case["id"][:4])
-    assert jie["term_search_year_basis"] == (
-        "primary_TT_Gregorian_year_selects_candidates_only"
-    )
+    if expected_utc is None:
+        assert jie["calendar_datetime"] is None
+        assert jie["term_search_year"] == int(case["id"][:4])
+        assert jie["term_search_year_basis"] == (
+            "primary_TT_Gregorian_year_selects_candidates_only"
+        )
+    else:
+        assert (
+            datetime.fromisoformat(jie["calendar_datetime"]).date().isoformat()
+            == case["id"]
+        )
     assert jie["comparison_basis"] == "primary_TT_not_a_datetime_surrogate"
     assert jie["next_boundary"]["name"] == case["next_term"]
     # HKO's day-resolution tables note historical HK summer time. The
@@ -80,8 +108,15 @@ def test_published_nonzero_UTC_adjustments_keep_Jie_but_not_invent_lunar_dates(
     assert lunar["month_number"] == expected["month"]
     assert lunar["lunar_day"] == expected["day"]
     assert lunar["lunar_year"] == expected["year"]
-    assert lunar["calendar_date"] == case["id"]
-    assert lunar["instant_utc"] is None and lunar["calendar_datetime"] is None
+    if expected_utc is None:
+        assert lunar["calendar_date"] == case["id"]
+        assert lunar["instant_utc"] is None and lunar["calendar_datetime"] is None
+    else:
+        assert lunar["instant_utc"] == epoch.utc_label
+        assert (
+            datetime.fromisoformat(lunar["calendar_datetime"]).date().isoformat()
+            == case["id"]
+        )
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
@@ -101,7 +136,7 @@ def test_TT_search_is_half_open_at_actual_shared_Jie_boundaries(
     found = module.native_month_context(probe, "jie_month")
     expected = case["expected_month"] if side < 0 else case["expected_month"] % 12 + 1
     assert found["month_number"] == expected
-    assert found["instant_utc"] is None and found["calendar_datetime"] is None
+    assert found["instant_utc"] == epoch.utc_label
 
 
 def test_unverified_shared_boundary_is_not_converted_to_optional_unavailability(
@@ -196,5 +231,21 @@ def test_gap_and_overlap_full_results_match_REST_MCP_CLI(
     assert values[0] == values[1] == values[2]
     birth = values[0]["guolao"]["timing"]["month_limit"]["birth_month"]
     assert birth["month_number"] == case["expected_month"]
-    assert birth["instant_utc"] is None and birth["calendar_datetime"] is None
-    assert "没有唯一UTC标签" in values[0]["interpretation"]["input_clock"]
+    expected_utc = SOURCE_DOMAINS[case["id"]]["UTC"]
+    if expected_utc is None:
+        assert birth["instant_utc"] is None and birth["calendar_datetime"] is None
+        assert "没有唯一UTC标签" in values[0]["interpretation"]["input_clock"]
+    else:
+        assert (
+            abs(
+                (
+                    datetime.fromisoformat(birth["instant_utc"])
+                    - datetime.fromisoformat(expected_utc)
+                ).total_seconds()
+            )
+            < 0.0002
+        )
+        assert (
+            datetime.fromisoformat(birth["calendar_datetime"]).date().isoformat()
+            == case["id"]
+        )

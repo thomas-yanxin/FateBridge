@@ -2,6 +2,7 @@
 
 import asyncio
 import json
+import math
 from fractions import Fraction
 
 import pytest
@@ -29,7 +30,12 @@ INPUT = dict(
 
 
 @pytest.mark.parametrize(
-    "synthetic", [False, pytest.param(True, marks=pytest.mark.native_engine_fault)]
+    "synthetic",
+    [
+        False,
+        pytest.param(True, marks=pytest.mark.native_engine_fault),
+        pytest.param("plateau", marks=pytest.mark.native_engine_fault),
+    ],
 )
 @pytest.mark.parametrize("empty_files", [False, True])
 def test_full_solar_root_witness_and_precision_card_on_actual_three_surfaces(
@@ -45,14 +51,16 @@ def test_full_solar_root_witness_and_precision_card_on_actual_three_surfaces(
 
         def oracle(operation, *args, **kwargs):
             if operation == "calc" and args[1] == runtime.swe.SUN:
+                origin = Fraction(131328125, 1000000)
+                rate = Fraction(1) if synthetic == "plateau" else Fraction(51, 50)
                 lon = float(
-                    (
-                        Fraction(131328125, 1000000)
-                        + Fraction(51, 50) * (Fraction(args[0]) - Fraction(birth))
-                    )
-                    % 360
+                    (origin + rate * (Fraction(args[0]) - Fraction(birth))) % 360
                 )
-                return (lon, 0, 1, 1.02, 0, 0), args[2]
+                if synthetic == "plateau" and abs(
+                    Fraction(args[0]) - Fraction(birth - 88)
+                ) <= 3 * Fraction(math.ulp(birth - 88)):
+                    lon = float((origin - 88) % 360)
+                return (lon, 0, 1, float(rate), 0, 0), args[2]
             return original(operation, *args, **kwargs)
 
         monkeypatch.setattr(runtime, "ephemeris_call", oracle)
@@ -103,13 +111,20 @@ def test_full_solar_root_witness_and_precision_card_on_actual_three_surfaces(
         check = verify_human_design_reading(value)
         assert check["status"] == "verified_fixed_template_reading", check
         w = value["design_solver"]["numerical_precision"]
-        if synthetic:
+        if synthetic is True:
             assert w["observed_solar_changed_levels"]
             assert (
                 w["solar_subdivision_status"]
                 == "observed_variation_at_final_numeric_bracket"
             )
             assert "差异" in value["interpretation"]["design_time_precision_meaning"]
+        elif synthetic == "plateau":
+            lattice = w["local_solar_lattice"]
+            assert lattice["selection_changed_by_lattice"] is True
+            assert len(lattice["observed_exact_zero_indices"]) == 7
+            assert w["selected"]["jd_tt"] < lattice["initial_lower_jd_tt"]
+            assert w["lower"] == w["upper"] == w["selected"]
+            assert w["selected"]["exact_residual"]["numerator"] == "0"
         assert w["physical_time_accuracy_certified"] is False
         value.pop("run_metadata")
     assert expected == native == cli

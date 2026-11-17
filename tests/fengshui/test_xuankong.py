@@ -148,8 +148,12 @@ def test_confirmed_sitting_trigram_constrains_cross_palace_candidates(i):
 
 
 @pytest.mark.parametrize("failure", ["unavailable", "per_term_failure"])
-def test_changeover_event_rejects_an_unavailable_native_crossing(monkeypatch, failure):
-    monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
+def test_changeover_event_rejects_a_missing_strict_source_or_failed_solver(
+    monkeypatch, failure
+):
+    monkeypatch.setenv(
+        "FATEBRIDGE_SOLAR_TERM_MODEL", "swiss" if failure == "unavailable" else "native"
+    )
     almanac.get_solar_terms_for_year.cache_clear()
     if failure == "unavailable":
         monkeypatch.setattr(almanac, "swe", None)
@@ -157,17 +161,50 @@ def test_changeover_event_rejects_an_unavailable_native_crossing(monkeypatch, fa
         monkeypatch.setattr(almanac, "_solar_term_utc_via_swe", lambda *a: None)
     try:
         inputs = payload("xuankong_natal")
+        for event in (
+            {"event_at": "2024-02-04T16:20:00+08:00"},
+            {"effective_event_year": 2024},
+        ):
+            inputs["period"] = {
+                "basis": "first_occupancy",
+                "evidence": "confirmed event; selected strict source or solver unavailable",
+                **event,
+            }
+            with pytest.raises(EphemerisSourceError) as rejected:
+                calculate_xuankong_natal(**inputs)
+            assert rejected.value.reason == (
+                "solar_swiss_files_required"
+                if failure == "unavailable"
+                else "solar_native_unavailable"
+            )
+    finally:
+        almanac.get_solar_terms_for_year.cache_clear()
+
+
+def test_changeover_event_retains_named_bundled_source_without_swiss(monkeypatch):
+    monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
+    monkeypatch.setattr(almanac, "swe", None)
+    almanac.get_solar_terms_for_year.cache_clear()
+    try:
+        inputs = payload("xuankong_natal")
         inputs["period"] = {
             "basis": "first_occupancy",
             "event_at": "2024-02-04T16:20:00+08:00",
-            "evidence": "confirmed event time; selected provider unavailable",
+            "evidence": "synthetic confirmed event before the fixed Li Chun reference",
         }
-        with pytest.raises(EphemerisSourceError, match="no linear approximation"):
-            calculate_xuankong_natal(**inputs)
+        period = calculate_xuankong_natal(**inputs)["layers"]["xuankong_natal"][
+            "period_context"
+        ]
+        assert period["effective_event_year"] == 2023 and period["number"] == 8
+        resolution = period["event_time_context"]["timing"]["end_resolution"]
+        assert resolution["provider"] == "jpl_de441"
+        assert resolution["ephemeris_model"] == "fatebridge_de441_solar_v1"
         inputs["period"].pop("event_at")
         inputs["period"]["effective_event_year"] = 2024
-        with pytest.raises(EphemerisSourceError, match="no linear approximation"):
-            calculate_xuankong_natal(**inputs)
+        period = calculate_xuankong_natal(**inputs)["layers"]["xuankong_natal"][
+            "period_context"
+        ]
+        assert period["effective_event_year"] == 2024 and period["number"] == 9
     finally:
         almanac.get_solar_terms_for_year.cache_clear()
 

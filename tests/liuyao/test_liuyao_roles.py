@@ -270,7 +270,7 @@ def test_chou_co_motion_is_not_confused_with_yuan_co_motion():
     assert result["role_effects"]["chains"] == []
 
 
-def test_fire_stage_gap_is_unknown_instead_of_absence_or_another_school_table():
+def test_fire_stage_is_looked_up_in_the_four_stage_cycle_for_yuan():
     case = {
         "base_code": "111111",
         "changed_code": "111111",
@@ -278,7 +278,13 @@ def test_fire_stage_gap_is_unknown_instead_of_absence_or_another_school_table():
         "day_ganzhi": "甲子",
         "focus_line": 3,
     }
-    assert condition(classical(case), 4, "yuan_support_3")["matched"] is None
+    assert condition(classical(case), 4, "yuan_support_3")["matched"] is False
+    assert (
+        condition(classical({**case, "day_ganzhi": "庚午"}), 4, "yuan_support_3")[
+            "matched"
+        ]
+        is True
+    )
     assert (
         condition(classical({**case, "day_ganzhi": "庚寅"}), 4, "yuan_support_3")[
             "matched"

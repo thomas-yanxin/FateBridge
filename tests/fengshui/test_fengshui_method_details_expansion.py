@@ -197,7 +197,7 @@ def test_expansion_does_not_change_calculation_or_add_sourced_advice():
     expanded = assess(scene="home", methods=["annual_stars"], effective_year=2026)
     assert raw["layers"] == expanded["layers"]
     assert expanded["method_details"]["status"] == "reference_only"
-    assert expanded["method_details"]["ruleset"]["version"] == "1.1.0"
+    assert expanded["method_details"]["ruleset"]["version"] == "1.1.1"
     for record in walk_records(expanded["method_details"]):
         assert "success_probability" not in record
         assert "recommended_placement" not in record

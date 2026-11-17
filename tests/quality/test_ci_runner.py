@@ -7,8 +7,6 @@ import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-import pytest
-
 
 def test_repository_helpers_precede_dependency_tests_module(tmp_path):
     (tmp_path / "tests.py").write_text(

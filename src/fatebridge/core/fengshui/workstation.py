@@ -1,10 +1,13 @@
 """Bounded activity references and explicit entry/barrier relationships."""
 
-from typing import Any, Dict, List
+from typing import TYPE_CHECKING, Any, Dict, List
 
 from .directions import rule_data
 from .natal_interpretation import _ordered_relationship
 from .workstation_sources import desktop_reference, provenance
+
+if TYPE_CHECKING:
+    from .models import AssessRequest
 
 
 def _pending(
@@ -15,7 +18,7 @@ def _pending(
     )
 
 
-def analyze_workstation(req: Any, layers: Dict[str, Any]) -> Dict[str, Any]:
+def analyze_workstation(req: "AssessRequest", layers: Dict[str, Any]) -> Dict[str, Any]:
     review = req.workstation_review
     findings: List[Dict[str, Any]] = []
     missing: List[str] = []

@@ -26,7 +26,7 @@ from fatebridge.utils.json_values import same_value as _same_value
 METHOD = "human_design_actual_design_root_endpoint_bodies_v1"
 ROLE = "root_bracket_activation"
 LEVELS = ("gate", "line", "color", "tone", "base")
-SCOPE = "固定当前人格激活，分别推导最终数值根实际1或2个二进制TT端点的13项设计激活、结构和Variable；所选设计位置复用原始主盘，另一端点实际计算。不把两端当作物理误差界，不认证连续区间稳定、出生钟、原生执行或现实预测；候选整盘各自推导，不能拼接。主盘仍按原太阳弧最小残差规则选择。"
+SCOPE = "固定当前人格激活，分别推导最终数值根实际1或2个二进制TT端点的13项设计激活、结构和Variable；所选设计位置复用原始主盘，另一端点实际计算。不把两端当作物理误差界，不认证连续区间稳定、出生钟、原生执行或现实预测；候选整盘各自推导，不能拼接。主盘按有限观测的正到负太阳括区及零点的最小精确残差选择，同残差取较早TT。"
 
 
 def _structure(

@@ -17,6 +17,7 @@ from functools import lru_cache
 from importlib.resources import files
 from typing import Any, Dict, Sequence, Tuple
 
+from fatebridge.core.astro.reference_frames import precession_angles, rotate
 from fatebridge.utils.errors import EphemerisSourceError
 
 Vector = Tuple[float, float, float]
@@ -147,55 +148,6 @@ def nutation(date1: float, date2: float = 0.0) -> Tuple[float, float]:
     return dp * AS2R / 1e7 - 0.000135 * AS2R, de * AS2R / 1e7 + 0.000388 * AS2R
 
 
-def _polynomial(t: float, coefficients: Sequence[float]) -> float:
-    value = 0.0
-    for coefficient in reversed(coefficients):
-        value = value * t + coefficient
-    return value * AS2R
-
-
-def precession_angles(date1: float, date2: float = 0.0) -> Tuple[float, ...]:
-    t = _epoch(date1, date2, 36525.0)
-    return tuple(
-        _polynomial(t, coefficients)
-        for coefficients in [
-            [-0.052928, 10.556378, 0.4932044, -0.00031238, -0.000002788, 0.0000000260],
-            [
-                84381.412819,
-                -46.811016,
-                0.0511268,
-                0.00053289,
-                -0.000000440,
-                -0.0000000176,
-            ],
-            [
-                -0.041775,
-                5038.481484,
-                1.5584175,
-                -0.00018522,
-                -0.000026452,
-                -0.0000000148,
-            ],
-            [
-                84381.406,
-                -46.836769,
-                -0.0001831,
-                0.00200340,
-                -0.000000576,
-                -0.0000000434,
-            ],
-        ]
-    )
-
-
-def _rotate(vector: Vector, axis: str, angle: float) -> Vector:
-    x, y, z = vector
-    co, si = math.cos(angle), math.sin(angle)
-    if axis == "x":
-        return x, co * y + si * z, -si * y + co * z
-    return co * x + si * y, -si * x + co * y, z
-
-
 def apparent_ecliptic(vector: Vector, date1: float, date2: float = 0.0) -> Vector:
     """BCRS/ICRS vector to true ecliptic/equinox of date (radians internally)."""
     gamma, phi, psi, epsilon = precession_angles(date1, date2)
@@ -207,7 +159,7 @@ def apparent_ecliptic(vector: Vector, date1: float, date2: float = 0.0) -> Vecto
         ("x", -epsilon - deps),
         ("x", epsilon + deps),
     ]:
-        vector = _rotate(vector, axis, angle)
+        vector = rotate(vector, axis, angle)
     return vector
 
 

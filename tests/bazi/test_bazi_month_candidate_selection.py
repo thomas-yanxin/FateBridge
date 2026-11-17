@@ -255,7 +255,7 @@ def test_arbitrary_legacy_priority_cannot_choose_the_source_path_or_promote_usef
     ]:
         assert before[field] == after[field]
     assert before["useful_elements"] == before["avoid_elements"] == []
-    assert set(before["conditional_elements"]) == {"木", "火", "土", "金"}
+    assert set(before["conditional_elements"]) == {"木", "火", "土", "金", "水"}
 
 
 def test_contract_rejects_unearned_force_formation_and_path_selection_but_allows_projection():
@@ -354,5 +354,6 @@ def test_published_candidate_views_are_same_on_actual_rest_native_mcp_and_cli(
             selection["chosen_path_id"] is None
             and selection["adjudication_status"] == "not_adjudicated"
         )
-        assert selection["source"]["source_sha256"] == REFERENCE["source_sha256"]
+        assert selection["source"]["url"] == REFERENCE["source_url"]
+        assert selection["source"]["id"] == "ziping_month_path_conditions_v1"
         assert selection["method_id"] == "month_path_conditions_v4"

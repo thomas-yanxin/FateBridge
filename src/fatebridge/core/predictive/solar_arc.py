@@ -13,11 +13,14 @@ from ._common import (
     longitude_to_point_dict,
     point_absolute_position,
 )
+from .progressions import ProgressionCalculationOptions
 
 
 def build_solar_arc_payload(
     natal_subject: Any,
     progressed_subject: Any,
+    *,
+    progression_options: ProgressionCalculationOptions | None = None,
 ) -> Dict[str, Any]:
     natal_longitudes = extract_reference_longitudes(natal_subject)
     arc_degrees = (
@@ -32,7 +35,14 @@ def build_solar_arc_payload(
         target_longitudes=natal_longitudes,
         orb_limit=1.5,
     )
+    calculation_options: dict[str, object] = {
+        "arc_method": "true_progressed_Sun_ecliptic_longitude",
+        "angle_method": "rigid_natal_longitude_rotation",
+    }
+    if progression_options is not None:
+        calculation_options["progression"] = progression_options
     return {
+        "calculation_options": calculation_options,
         "arc_degrees": round(float(arc_degrees), 4),
         "sun": longitude_to_point_dict("Sun", longitude_float(directed_points["Sun"])),
         "moon": longitude_to_point_dict(

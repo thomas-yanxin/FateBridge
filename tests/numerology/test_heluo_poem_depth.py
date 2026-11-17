@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 
 from fatebridge.core import heluo_poems as hp
-from fatebridge.core.heluo import _tiaowen, build_snapshot_text, yao_text
+from fatebridge.core.heluo import _tiaowen, yao_text
 from fatebridge.core.heluo_texts import SOURCE_PDF_SHA256
 from fatebridge.core.heluo_timing import _selected_text
 from fatebridge.utils.errors import NumerologySourceError

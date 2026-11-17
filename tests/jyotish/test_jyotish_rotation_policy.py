@@ -8,8 +8,8 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from fatebridge.core import astro_models as rotation
 from fatebridge.core import ephemeris_runtime as e
+from fatebridge.core.astro import earth_attitude as attitude
 from fatebridge.core.astro.birth import build_astro_birth_info
 from fatebridge.core.astro.iers_ut1 import use_ut1_source
 from fatebridge.core.jyotish import positions
@@ -53,7 +53,7 @@ def test_explicit_c04_reaches_actual_private_worker_and_literal_epoch(row):
     assert abs(result["julian_day_tt"] - row["expected_jd_tt"]) * 86400 <= 0.0002
     assert abs(result["julian_day_ut"] - row["expected_jd_ut1"]) * 86400 <= 0.0002
     policy = result["earth_rotation"]
-    assert policy["policy_id"] == "fatebridge_standard_rotation_v3"
+    assert policy["policy_id"] == "fatebridge_physical_earth_attitude_v6"
     assert policy["measured_eop_applied"] is True
     assert policy["tt_argument_policy"] == "selected_IERS_C04_UT1_to_TT"
     assert policy["model_epoch_jd_tt"] == result["julian_day_tt"]
@@ -91,7 +91,7 @@ def test_default_worker_after_c04_does_not_inherit_its_source():
     assert "ut1_reference" not in normal["earth_rotation"]
     assert (
         normal["earth_rotation"]["tt_argument_policy"]
-        == "native_internal_sidereal_time_argument"
+        == "shared_default_DeltaT_minus1_before1960_SWIEPH_from1960"
     )
     assert normal["time_scale_context"]["houses_timescale"] == "UT1_model_estimate"
     assert normal["julian_day_tt"] == selected["julian_day_tt"]
@@ -111,35 +111,35 @@ def test_rotation_tt_observation_is_bound_to_the_reported_point(
     monkeypatch, year, source
 ):
     e.configure_ephemeris_path(str(ROOT / "ephe"))
-    actual = rotation._rotation_tt
+    actual = attitude.physical_equator
     observed = []
 
-    def tracked(module, ut1):
-        tt = actual(module, ut1)
-        observed.append((ut1, tt))
-        return tt
+    def tracked(module, ut1, *, julian_day_tt=None):
+        equator = actual(module, ut1, julian_day_tt=julian_day_tt)
+        observed.append((ut1, equator.jd_tt))
+        return equator
 
-    monkeypatch.setattr(rotation, "_rotation_tt", tracked)
+    monkeypatch.setattr(attitude, "physical_equator", tracked)
     with use_ut1_source(source):
         result = positions(
             subject(f"{year:04d}-03-20T12:00:00+00:00"),
             ephemeris_policy="require_data_files",
         )
     policy = result["earth_rotation"]
-    if year == 2024:
-        assert policy["implementation"] == "native_public_API"
-        assert policy["tt_argument_policy"] == "native_internal_sidereal_time_argument"
-    else:
-        assert any(
-            abs(ut - result["julian_day_ut"]) * 86400 <= 0.0002
-            and abs(tt - result["julian_day_tt"]) * 86400 <= 0.0002
-            for ut, tt in observed
-        )
-        assert policy["tt_argument_policy"] == (
-            "selected_IERS_C04_UT1_to_TT"
-            if source == "iers_c04"
-            else "shared_default_DeltaT_minus1_before1960_SWIEPH_from1960"
-        )
+    assert (
+        policy["implementation"]
+        == "explicit_source_frame_reduction_and_physical_earth_attitude"
+    )
+    assert any(
+        abs(ut - result["julian_day_ut"]) * 86400 <= 0.0002
+        and abs(tt - result["julian_day_tt"]) * 86400 <= 0.0002
+        for ut, tt in observed
+    )
+    assert policy["tt_argument_policy"] == (
+        "selected_IERS_C04_UT1_to_TT"
+        if source == "iers_c04"
+        else "shared_default_DeltaT_minus1_before1960_SWIEPH_from1960"
+    )
 
 
 @pytest.mark.parametrize(

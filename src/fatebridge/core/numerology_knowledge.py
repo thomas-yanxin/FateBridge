@@ -11,6 +11,7 @@ from typing import Any, NoReturn
 
 from fatebridge.core.knowledge_store import ToolValidationError
 from fatebridge.utils.errors import NumerologySourceError
+from fatebridge.utils.json_digest import canonical_bytes
 
 DOMAINS = ("heluo", "canping")
 DATA_ROOT = Path(__file__).resolve().parents[1] / "data"
@@ -25,16 +26,6 @@ SCOPE = (
     "本次实际取法、栏目及条款角色仍须核对同run计算回执；"
     "继承文本、疑读与待核关系保留，不能据目录授予全书或现实预测认证。"
 )
-
-
-def canonical_bytes(value: Any) -> bytes:
-    return json.dumps(
-        value,
-        ensure_ascii=False,
-        sort_keys=True,
-        separators=(",", ":"),
-        allow_nan=False,
-    ).encode()
 
 
 def _heluo_reference_notes(record: dict[str, Any]) -> list[str]:

@@ -90,10 +90,6 @@ def compare_charts(
     }
 
 
-def _structure(chart: dict[str, Any]) -> dict[str, Any]:
-    return JointSnapshotCache().snapshot(chart)
-
-
 def _witness(chart: dict[str, Any]) -> dict[str, Any]:
     scale = chart["time_scales"]["personality"]
     return {

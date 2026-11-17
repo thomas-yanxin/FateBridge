@@ -1,27 +1,20 @@
 """Keep the actual first row available without inventing a dated legacy period."""
 
-import ast
 import json
 from copy import deepcopy
 from pathlib import Path
 
 import pytest
-from dateutil.relativedelta import relativedelta
-from dateutil.tz import resolve_imaginary
 from pydantic import ValidationError
 
 from fatebridge.application.examples import evidence_views
 from fatebridge.application.projection import project_fields
 from fatebridge.core import almanac
-from fatebridge.core.astro.time_scales import datetime_from_tt_point
-from fatebridge.core.astro.tt_epoch import TTInstant
 from fatebridge.core.canping_schedule_validation import require_schedule_binding
-from fatebridge.core.ephemeris_runtime import ephemeris_call, swe
 from fatebridge.core.local_techniques.canping import build_canping_result
 from fatebridge.core.output_chinese import CanpingTiming
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.errors import NumerologySourceError
-from fatebridge.utils.timezones import parse_timezone_name
 
 REFERENCES = json.loads(
     (Path(__file__).parents[1] / "data/canping/first_row_inputs.json").read_bytes()

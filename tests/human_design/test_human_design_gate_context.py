@@ -15,6 +15,7 @@ from fatebridge.core.human_design_gate_context import (
     gate_context_report,
     source_records,
 )
+from fatebridge.core.public_output import same_public_value
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
 
@@ -182,7 +183,7 @@ def test_json_object_sorting_never_changes_complete_context_verification(complet
     check = verify_human_design_reading(sorted_value)
     assert check["status"] == "verified_fixed_template_reading", check
     report = sorted_value["gate_activation_context"]
-    assert gate_context_report(sorted_value) == report
+    assert same_public_value(gate_context_report(sorted_value), report)
 
 
 @pytest.mark.parametrize(

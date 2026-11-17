@@ -224,6 +224,8 @@ def test_native_preserves_missing_natal_layers_and_empty_directional_coverage(
     from fatebridge.services.divination import calculate_suzhan_analysis
 
     result = calculate_suzhan_analysis(
+        lat="31n13",
+        lon="121e28",
         date=civil,
         time="12:00:00",
         zone="+08:00",

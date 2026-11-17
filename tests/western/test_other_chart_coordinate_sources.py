@@ -1,25 +1,21 @@
 """Real coordinate-source coherence, nominal equal13 and public provenance."""
 
-import asyncio
 import json
 import threading
 
 import pytest
-from fastapi.testclient import TestClient
-from fastmcp import Client
 from jsonschema import Draft202012Validator
 
-import fatebridge.api as api
 import fatebridge.core.astro.chart as charts
 import fatebridge.services.astrology as service
-from fatebridge.cli import run
 from fatebridge.core import ephemeris_runtime as e
 from fatebridge.core.astro import ephemeris, runtime
 from fatebridge.core.astro.birth import build_astro_birth_info
 from fatebridge.core.astro.midpoints import PHYSICAL_BODIES
-from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.errors import EphemerisSourceError
+from tests.support.transports import rest as rest
+from tests.support.transports import surface_calls as surface_calls
 from tests.western.test_other_chart_solar_sources import files as files
 from tests.western.test_other_chart_solar_sources import (
     restore_configuration as restore_configuration,
@@ -211,7 +207,8 @@ def test_explicit_base_fallback_does_not_discard_native_midpoint_layer(
     base = result["base_chart"]["chart_profile"]["physical_ephemeris_source"]
     native = result["midpoint_analysis"]["profile"]["physical_ephemeris_source"]
     assert (
-        base["by_factor"]["Neptune"]["model"] == "fatebridge_approximate_orbital_model"
+        base["by_factor"]["Neptune"]["model"]
+        == "bounded_de441_earth_moon_planetary_fallback_v9"
     )
     assert base["by_factor"]["Neptune"]["file_ids"] == []
     assert native["by_factor"]["Neptune"]["model"] == "swieph"
@@ -228,7 +225,7 @@ def test_explicit_base_fallback_does_not_discard_native_midpoint_layer(
     ],
 )
 def test_nominal_source_and_metadata_across_three_surfaces(
-    files, tmp_path, monkeypatch, capsys, key, variant
+    files, tmp_path, monkeypatch, key, variant, surface_calls
 ):
     _, directory = files
     empty = tmp_path / "empty"
@@ -248,48 +245,6 @@ def test_nominal_source_and_metadata_across_three_surfaces(
         response_char_limit=0,
         as_of="2026-10-22T00:00:00Z",
     )
-    api._reset_runtime_state_for_tests()
-    monkeypatch.setattr(
-        api,
-        "API_KEY_AUTHENTICATOR",
-        api.ApiKeyAuthenticator(header_name="X-API-Key", api_keys={}),
-    )
-    request = tmp_path / "request.json"
-    request.write_text(json.dumps(payload))
-
-    def surfaces():
-        params = [("fields", path)] + [
-            (k, str(v).lower() if isinstance(v, bool) else str(v))
-            for k, v in options.items()
-            if k != "fields"
-        ]
-        rest = TestClient(api.app).post(spec.rest_path, json=payload, params=params)
-
-        async def mcp():
-            async with Client(create_mcp_app()) as client:
-                return await client.call_tool(
-                    spec.tool_name, {**payload, **options}, raise_on_error=False
-                )
-
-        protocol = asyncio.run(mcp())
-        capsys.readouterr()
-        code = run(
-            [
-                spec.tool_name,
-                "--subject-file",
-                str(request),
-                "--fields",
-                path,
-                "--strict-fields",
-                "--no-include-snapshot-text",
-                "--response-char-limit",
-                "0",
-                "--as-of",
-                options["as_of"],
-            ]
-        )
-        cli = json.loads(capsys.readouterr().out)
-        return rest, protocol, code, cli
 
     if not germany:
         actual = service.build_core_chart_payload
@@ -302,7 +257,9 @@ def test_nominal_source_and_metadata_across_three_surfaces(
 
         with monkeypatch.context() as patch:
             patch.setattr(service, "build_core_chart_payload", change_after_nominal)
-            rest, protocol, code, cli = surfaces()
+            rest, protocol, code, cli = surface_calls(
+                spec, payload, projection=options, cli_first=False
+            )
             assert rest.status_code == 503 and protocol.is_error and code == 1
             for error in (rest.json(), json.loads(protocol.content[0].text), cli):
                 assert error["issues"] == [
@@ -317,7 +274,9 @@ def test_nominal_source_and_metadata_across_three_surfaces(
                 )
                 assert str(directory) not in json.dumps(error)
     e.configure_ephemeris_path(str(directory))
-    rest, protocol, code, cli = surfaces()
+    rest, protocol, code, cli = surface_calls(
+        spec, payload, projection=options, cli_first=False
+    )
     assert rest.status_code == 200 and not protocol.is_error and code == 0
     sources = []
     for body in (rest.json(), protocol.structured_content, cli):

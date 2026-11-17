@@ -11,13 +11,13 @@ from pathlib import Path
 import pytest
 
 from fatebridge.core import human_design_knowledge as knowledge
-from fatebridge.core.human_design_line_catalogue import _canonical
 from fatebridge.core.human_design_line_reading import _condition
 from fatebridge.core.human_design_mechanics import CHANNELS
 from fatebridge.services.human_design_line_reading import (
     LineReadingInputError,
     build_human_design_line_packet,
 )
+from fatebridge.utils.json_digest import canonical_bytes
 from fatebridge.validation.human_design_line_reading import (
     verify_human_design_line_packet,
 )
@@ -259,7 +259,7 @@ def test_every_forged_packet_field_is_rejected_even_with_extra_rehash_claims(
     # Keep the separately bound source digest correct. A reading fault must be
     # rejected for its own field, not masked by an intentionally invalid hash.
     packet["source_identity"]["original_result_sha256"] = hashlib.sha256(
-        _canonical(packet["original_result"])
+        canonical_bytes(packet["original_result"])
     ).hexdigest()
     assert packet["source_identity"] == packets[key]["source_identity"]
     check = verify_human_design_line_packet(packet, cases[key])

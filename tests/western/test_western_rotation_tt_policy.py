@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core import astro_models as rotation
+from fatebridge.core.astro import earth_attitude as rotation
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.iers_ut1 import c04_table, use_ut1_source
 from tests.support.reference_data import verify_source_files
@@ -23,16 +23,15 @@ def test_native_policy_controls_are_sealed_and_not_independent_observations():
 
 
 @pytest.mark.parametrize("row", PROTOCOL["cases"], ids=lambda r: r["id"])
-def test_rotation_nutation_uses_the_physical_clock_tt(row, monkeypatch):
-    actual = runtime.swe.calc
+def test_rotation_attitude_uses_the_physical_clock_tt(row, monkeypatch):
+    actual = rotation.iau_equatorial_frame
     tt_arguments = []
 
-    def observed(tt, body, *args, **kwargs):
-        if body == runtime.swe.ECL_NUT:
-            tt_arguments.append(tt)
-        return actual(tt, body, *args, **kwargs)
+    def observed(tt):
+        tt_arguments.append(tt)
+        return actual(tt)
 
-    monkeypatch.setattr(runtime.swe, "calc", observed)
+    monkeypatch.setattr(rotation, "iau_equatorial_frame", observed)
     with use_ut1_source("swiss_delta_t"):
         rotation._standard_correction(runtime.swe, row["ut1"])
     assert len(tt_arguments) == 1
@@ -46,7 +45,9 @@ def test_rotation_nutation_uses_the_physical_clock_tt(row, monkeypatch):
 def test_model_choice_and_phase_anchor_follow_the_same_tt(row, monkeypatch):
     # Return the argument itself so branch choice cannot hide behind a tiny
     # difference between the two sidereal formulae.
-    monkeypatch.setattr(rotation, "_standard_correction", lambda module, ut1: ut1)
+    monkeypatch.setattr(
+        rotation, "_standard_correction", lambda module, ut1, **kwargs: ut1
+    )
     with use_ut1_source("swiss_delta_t"):
         actual = rotation._correction(runtime.swe, row["ut1"])
     expected = (
@@ -60,15 +61,14 @@ def test_model_choice_and_phase_anchor_follow_the_same_tt(row, monkeypatch):
 def test_selected_c04_supplies_its_own_tt_without_a_default_delta_t(monkeypatch):
     table = c04_table()
     sample = table.samples[-1]
-    actual = runtime.swe.calc
+    actual = rotation.iau_equatorial_frame
     arguments = []
 
-    def observed(tt, body, *args, **kwargs):
-        if body == runtime.swe.ECL_NUT:
-            arguments.append(tt)
-        return actual(tt, body, *args, **kwargs)
+    def observed(tt):
+        arguments.append(tt)
+        return actual(tt)
 
-    monkeypatch.setattr(runtime.swe, "calc", observed)
+    monkeypatch.setattr(rotation, "iau_equatorial_frame", observed)
     with use_ut1_source("iers_c04"):
         rotation._standard_correction(runtime.swe, sample.ut1)
     assert arguments == [sample.tt]

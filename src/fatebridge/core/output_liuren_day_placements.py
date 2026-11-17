@@ -34,9 +34,16 @@ class DayPlacementRule(PartialOutput):
     relation_matches: StrictBool | None = None
     matched: StrictBool | None = None
 
+    @model_validator(mode="after")
+    def unresolved_harmony_requires_placement(self) -> DayPlacementRule:
+        if self.definition_adjudicated is False and "matched" in self.model_fields_set:
+            if self.matched is not (False if self.placement_matches is False else None):
+                raise ValueError("合式未裁时，仅在缺少加临前提时排除")
+        return self
+
 
 class LiurenDayPlacements(PartialOutput):
-    ruleset_id: Literal["tanyuan_day_placements_v1"] | None = None
+    ruleset_id: Literal["tanyuan_day_placements_v2"] | None = None
     source_title: str | None = None
     source_url: str | None = None
     source_sha256: str | None = None

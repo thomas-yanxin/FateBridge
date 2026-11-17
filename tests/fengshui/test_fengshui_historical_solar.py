@@ -15,13 +15,13 @@ from fatebridge.cli import run
 from fatebridge.core import de440_solar
 from fatebridge.core import ephemeris_runtime as runtime
 from fatebridge.core.astro.time_scales import ephemeris_time
+from fatebridge.core.de441_solar import MODEL_ID as MOSHIER_MODEL
 from fatebridge.core.fengshui import historical_solar
 from fatebridge.core.fengshui.calendar import (
     boundary_uncertainty_reason,
     lichun,
     lichun_resolution,
 )
-from fatebridge.core.moshier_solar import MODEL_ID as MOSHIER_MODEL
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.utils.errors import EphemerisSourceError
 from tests.support.mcp_result_assertions import without_transport
@@ -64,9 +64,7 @@ def test_all_original_state_rows_and_predeclared_tolerances():
         ) <= (PROTOCOL["state_sampling"]["velocity_tolerance_km_per_day"])
 
 
-def test_original_profile_bytes_and_overlapping_states_are_unchanged():
-    for name, expected in PROTOCOL["preserve_base_profile"]["files"].items():
-        assert hashlib.sha256((DATA / name).read_bytes()).hexdigest() == expected
+def test_overlapping_original_profile_states_are_unchanged():
     rows = json.loads(gzip.decompress((FOLDER / "states.json.gz").read_bytes()))["rows"]
     checked = 0
     for row in rows:
@@ -100,8 +98,8 @@ def test_both_selected_packaged_modes_identify_the_actual_historical_source(
     assert details["selected_civil_year"] == year
     assert details["software_solar_term_years"] == [1784, 2204]
     assert details["source_kernel_sha256"] == PROTOCOL["source_kernel"]["sha256"]
-    assert details["coefficient_manifest_sha256"] == (
-        "d7cf5e3ee5bda32b54bbbf087dedff62d0c4f7ea64824e64ccfe572fe879bda0"
+    assert details["coefficient_sha256"] == (
+        "c98f944353434ac9f8c65989837d3196f09a8cb41ecbaecae0f853e0861e5d31"
     )
     root = datetime.fromisoformat(result["moment"])
     assert lichun(year, "Asia/Shanghai") == root
@@ -198,15 +196,16 @@ def test_corrupt_historical_data_fail_without_a_native_fallback(
     folder.mkdir(parents=True)
     for name in (
         "de440-solar-historical-v1.json",
-        "de440-solar-historical-v1.bin.gz",
+        "de440-solar-record-atlas-v1.json",
+        "de440-solar-record-atlas-v1.bin.gz",
         "geocentric-tdb-v1.json",
     ):
         shutil.copyfile(DATA / name, folder / name)
     metadata = folder / "de440-solar-historical-v1.json"
     if fault == "missing":
-        (folder / "de440-solar-historical-v1.bin.gz").unlink()
+        (folder / "de440-solar-record-atlas-v1.bin.gz").unlink()
     elif fault == "bytes":
-        (folder / "de440-solar-historical-v1.bin.gz").write_bytes(b"invalid")
+        (folder / "de440-solar-record-atlas-v1.bin.gz").write_bytes(b"invalid")
     else:
         info = json.loads(metadata.read_text())
         info["tdb_coefficient_sha256" if fault == "tdb_identity" else "model_id"] = (
@@ -214,6 +213,7 @@ def test_corrupt_historical_data_fail_without_a_native_fallback(
         )
         metadata.write_text(json.dumps(info))
     de440_solar._profile.cache_clear()
+    de440_solar._coefficient_data.cache_clear()
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "auto")
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
     try:
@@ -222,6 +222,7 @@ def test_corrupt_historical_data_fail_without_a_native_fallback(
             lichun_resolution(1785, "UTC")
     finally:
         de440_solar._profile.cache_clear()
+        de440_solar._coefficient_data.cache_clear()
 
 
 @pytest.mark.parametrize("year,expected_period", [(1800, 6), (2199, 8)])

@@ -885,7 +885,7 @@ def _run_profile(
             result = invalid_input_result(spec)
         except Exception as exc:  # noqa: BLE001 - surface, don't abort the batch
             result = handle_calculation_error(exc, "综合命盘")
-        if result_is_error(spec, result):
+        if result_is_error(result):
             any_error = True
         profile[token] = result
 
@@ -906,7 +906,7 @@ def _run_profile(
         # Keep failures visible even when projecting an unrelated successful leg.
         for token, spec in resolved:
             leg = profile[token]
-            if result_is_error(spec, leg):
+            if result_is_error(leg):
                 output.setdefault("profile", {})[token] = leg
             elif token in output.get("profile", {}) and "run_metadata" in leg:
                 output["profile"][token]["run_metadata"] = leg["run_metadata"]
@@ -1131,7 +1131,7 @@ def run(argv: Optional[List[str]] = None) -> int:
     except Exception as exc:  # noqa: BLE001 - unexpected internal failure
         return _emit_error(handle_calculation_error(exc, spec.operation_label_zh), 1)
 
-    is_error = result_is_error(spec, result)
+    is_error = result_is_error(result)
 
     include_snapshot_text = getattr(args, "include_snapshot_text", None)
     if include_snapshot_text is None:

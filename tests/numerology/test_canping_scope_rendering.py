@@ -13,6 +13,7 @@ from fatebridge.application.projection import project_fields
 from fatebridge.core import canping_schedule_basis as basis
 from fatebridge.core.local_techniques.canping import build_canping_result
 from fatebridge.core.output_canping_schedule import CanpingScheduleBasis
+from fatebridge.core.public_output import public_payload
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.errors import NumerologySourceError
 
@@ -35,6 +36,17 @@ def test_runtime_and_published_schema_match_predeclared_reader_contract(case):
     before = deepcopy(value)
     schema = CanpingScheduleBasis.model_json_schema()
     Draft202012Validator.check_schema(schema)
+    if case["id"] == "unregistered_receipt_text_sha256":
+        # Private integrity is validated before public delivery removes it.
+        assert case["must_accept"] is False
+        with pytest.raises(ValidationError):
+            CanpingScheduleBasis.model_validate(value)
+        published = public_payload(value)
+        assert published == {"scope_rendering": {}}
+        Draft202012Validator(schema).validate(published)
+        CanpingScheduleBasis.model_validate(published)
+        assert value == before
+        return
     assert (not list(Draft202012Validator(schema).iter_errors(value))) == case[
         "must_accept"
     ]

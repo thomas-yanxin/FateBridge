@@ -17,7 +17,7 @@ from fatebridge.core.human_design_sensitivity import (
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
 from fatebridge.validation.human_design_joint import verify_joint_snapshot
-from tests.support.ephemeris_context import moshier_ephemeris
+from tests.support.ephemeris_context import empty_ephemeris_path
 
 ROOT = Path(__file__).resolve().parents[2]
 CASE = json.loads(
@@ -27,7 +27,7 @@ SPEC = next(s for s in CATALOG if s.key == "human_design")
 
 
 def endpoint(side):
-    with moshier_ephemeris():
+    with empty_ephemeris_path():
         return chart_at_tt(CASE["endpoint_jd_tt"][side], backend="moshier")
 
 
@@ -49,7 +49,7 @@ def test_current_endpoint_charts_keep_distinct_minimum_bridge_families():
 
 
 def test_actual_interval_keeps_coherent_joint_evidence_and_replayable_witnesses():
-    with moshier_ephemeris():
+    with empty_ephemeris_path():
         from fatebridge.core.human_design import chart_at
 
         nominal = chart_at(datetime.fromisoformat(CASE["nominal_birth_utc"]))
@@ -184,7 +184,7 @@ def test_snapshot_corruption_is_rejected_without_a_position_oracle(bad):
 
 @pytest.fixture(scope="module")
 def complete_joint_run():
-    with moshier_ephemeris():
+    with empty_ephemeris_path():
         return execute_tool(SPEC, SPEC.request_model(**CASE["birth_input"]))
 
 

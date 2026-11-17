@@ -14,7 +14,6 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[2]
 FIXTURE = ROOT / "tests/data/bazi_de440_default_v1"
-DESTINATION = ROOT / "src/fatebridge/data/astronomy"
 MODEL_ID = "fatebridge_de440_solar_v1"
 NUMBER = r"[-+]?(?:\d+\.?(?:\d*)?|\.\d+)(?:[eE][-+]?\d+)?"
 
@@ -143,13 +142,15 @@ def build(kernel_path: Path) -> tuple[bytes, dict[str, Any], bytes]:
 def main() -> int:
     parser = argparse.ArgumentParser(__doc__)
     parser.add_argument("--kernel", required=True, type=Path)
+    parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--check", action="store_true")
     parser.add_argument("--update-metadata", action="store_true")
     args = parser.parse_args()
     raw, manifest, tdb = build(args.kernel)
-    binary = DESTINATION / manifest["file"]
-    metadata = DESTINATION / "de440-solar-v1.json"
-    tdb_path = DESTINATION / "geocentric-tdb-v1.json"
+    args.output.mkdir(parents=True, exist_ok=True)
+    binary = args.output / manifest["file"]
+    metadata = args.output / "de440-solar-v1.json"
+    tdb_path = args.output / "geocentric-tdb-v1.json"
     if args.check or args.update_metadata:
         packed = binary.read_bytes()
         manifest["compressed_sha256"] = hashlib.sha256(packed).hexdigest()

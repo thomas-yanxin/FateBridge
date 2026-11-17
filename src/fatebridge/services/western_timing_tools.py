@@ -4,7 +4,6 @@ Standalone western predictive timing tool surfaces for FateBridge.
 
 from __future__ import annotations
 
-import json
 from typing import Any, Dict, Optional
 
 from fatebridge.core.export_parser import parse_export_content
@@ -15,6 +14,7 @@ from fatebridge.services.western_timing import (
     calculate_western_timing_module_analysis,
 )
 from fatebridge.utils.errors import handle_calculation_error
+from fatebridge.utils.formatting import format_json_response
 
 TOOL_SPECS: dict[str, dict[str, Any]] = {
     "solarreturn": {
@@ -97,10 +97,6 @@ TOOL_SPECS: dict[str, dict[str, Any]] = {
 }
 
 
-def _json_block(payload: Any) -> str:
-    return json.dumps(payload, ensure_ascii=False, indent=2, default=str)
-
-
 def _extract_path(payload: Dict[str, Any], path: tuple[str, ...]) -> Dict[str, Any]:
     current: Any = payload
     for key in path:
@@ -159,53 +155,58 @@ def _build_sections(
 
     if section_kind == "chart":
         return [
-            ("起盘信息", _json_block(context)),
+            ("起盘信息", format_json_response(context, compact=False)),
             (
                 "星盘信息",
-                _json_block(
-                    {
-                        "natal_reference": natal_reference,
-                        "module": payload,
-                    }
+                format_json_response(
+                    {"natal_reference": natal_reference, "module": payload},
+                    compact=False,
                 ),
             ),
-            ("相位", _json_block(_build_aspect_summary(label, result, payload))),
+            (
+                "相位",
+                format_json_response(
+                    _build_aspect_summary(label, result, payload), compact=False
+                ),
+            ),
         ]
 
     if section_kind == "transit":
         return [
-            ("起盘信息", _json_block(context)),
+            ("起盘信息", format_json_response(context, compact=False)),
             (
                 "星盘信息",
-                _json_block(
+                format_json_response(
                     {
                         "natal_reference": natal_reference,
                         "transit_reference": payload.get("transit_reference"),
                         "house_emphasis": payload.get("house_emphasis"),
                         "location": payload.get("location"),
-                    }
+                    },
+                    compact=False,
                 ),
             ),
             (
                 "相位",
-                _json_block(
+                format_json_response(
                     {
                         "summary": result.get("summary"),
                         "orb_limit": payload.get("orb_limit"),
                         "top_hits": payload.get("hits"),
                         "exact_hits": payload.get("exact_hits"),
-                    }
+                    },
+                    compact=False,
                 ),
             ),
         ]
 
     if section_kind == "pd":
         return [
-            ("出生时间", _json_block(context)),
-            ("星盘信息", _json_block(natal_reference)),
+            ("出生时间", format_json_response(context, compact=False)),
+            ("星盘信息", format_json_response(natal_reference, compact=False)),
             (
                 "主/界限法设置",
-                _json_block(
+                format_json_response(
                     {
                         "method": payload.get("method"),
                         "method_label": payload.get("method_label"),
@@ -221,12 +222,13 @@ def _build_sections(
                         "coordinate_precision": payload.get("coordinate_precision"),
                         "coordinate_backend": payload.get("coordinate_backend"),
                         "aspects": payload.get("aspects"),
-                    }
+                    },
+                    compact=False,
                 ),
             ),
             (
                 "主/界限法表格",
-                _json_block(
+                format_json_response(
                     {
                         "current_arc_degrees": payload.get("current_arc_degrees"),
                         "current_window": payload.get("current_window"),
@@ -234,18 +236,19 @@ def _build_sections(
                         "future_window": payload.get("future_window"),
                         "exact_window": payload.get("exact_window"),
                         "timeline": payload.get("timeline"),
-                    }
+                    },
+                    compact=False,
                 ),
             ),
         ]
 
     if section_kind == "pdchart":
         return [
-            ("出生时间", _json_block(context)),
-            ("星盘信息", _json_block(natal_reference)),
+            ("出生时间", format_json_response(context, compact=False)),
+            ("星盘信息", format_json_response(natal_reference, compact=False)),
             (
                 "主限法盘设置",
-                _json_block(
+                format_json_response(
                     {
                         "method": payload.get("method"),
                         "method_label": payload.get("method_label"),
@@ -261,12 +264,13 @@ def _build_sections(
                         "coordinate_precision": payload.get("coordinate_precision"),
                         "coordinate_backend": payload.get("coordinate_backend"),
                         "show_pd_bounds": payload.get("show_pd_bounds"),
-                    }
+                    },
+                    compact=False,
                 ),
             ),
             (
                 "主限法盘说明",
-                _json_block(
+                format_json_response(
                     {
                         "current_arc_degrees": payload.get("current_arc_degrees"),
                         "bounds_overlay": payload.get("bounds_overlay"),
@@ -274,31 +278,33 @@ def _build_sections(
                         "directed_lots": payload.get("directed_lots"),
                         "sign_changes": payload.get("sign_changes"),
                         "exact_hits": payload.get("exact_hits"),
-                    }
+                    },
+                    compact=False,
                 ),
             ),
         ]
 
     if section_kind == "zr":
         return [
-            ("起盘信息", _json_block(context)),
+            ("起盘信息", format_json_response(context, compact=False)),
             (
                 "星盘信息",
-                _json_block(
+                format_json_response(
                     {
                         "sect": natal_reference.get("sect"),
                         "lots": natal_reference.get("lots"),
-                    }
+                    },
+                    compact=False,
                 ),
             ),
-            ("基于X点推运", _json_block(payload)),
+            ("基于X点推运", format_json_response(payload, compact=False)),
         ]
 
     if section_kind == "firdaria":
         return [
-            ("出生时间", _json_block(context)),
-            ("星盘信息", _json_block(natal_reference)),
-            ("法达星限表格", _json_block(payload)),
+            ("出生时间", format_json_response(context, compact=False)),
+            ("星盘信息", format_json_response(natal_reference, compact=False)),
+            ("法达星限表格", format_json_response(payload, compact=False)),
         ]
 
     if section_kind == "decennials":
@@ -311,21 +317,22 @@ def _build_sections(
             if key not in {"longitude_motion", "apparent_position_policy"}
         }
         return [
-            ("起盘信息", _json_block(context)),
-            ("星盘信息", _json_block(display_reference)),
+            ("起盘信息", format_json_response(context, compact=False)),
+            ("星盘信息", format_json_response(display_reference, compact=False)),
             (
                 "十年大运设置",
-                _json_block(
+                format_json_response(
                     {
                         "resolved_start_planet": payload.get("resolved_start_planet"),
                         "resolved_start_planet_label": payload.get(
                             "resolved_start_planet_label"
                         ),
                         "base_order": payload.get("base_order"),
-                    }
+                    },
+                    compact=False,
                 ),
             ),
-            ("基于X起运", _json_block(payload)),
+            ("基于X起运", format_json_response(payload, compact=False)),
         ]
 
     raise ValueError(f"Unsupported section kind: {section_kind}")

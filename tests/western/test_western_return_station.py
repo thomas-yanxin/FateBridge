@@ -39,7 +39,7 @@ def test_real_jupiter_two_return_roots_in_one_daily_cell_match_independent_de421
 def synthetic_clock(monkeypatch):
     origin = datetime(2000, 1, 1, tzinfo=timezone.utc)
     monkeypatch.setattr(
-        astrology_events, "_jd_to_utc", lambda jd: origin + timedelta(days=jd)
+        astrology_events, "datetime_from_tt", lambda jd: origin + timedelta(days=jd)
     )
     monkeypatch.setattr(
         astrology_events,

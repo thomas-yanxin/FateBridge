@@ -153,9 +153,9 @@ Lahiri 的交付日速跟随实际恒星黄道零点的运动，不能复制热�
 
 按实际 `worked_example` 说明原载56′＋54°17′＋34′＝55°47′成立；不逐步舍入的55°47.925′是另一数值政策，不是已验收原法，也不能将差值加到用户盘面。完整历法／闰日／亚日／跨年和舍入规则未裁定，实际365.25日钥匙保持原值。依据见[1925原表重演](../../../scripts/western/replay_witte1925_table.py)。未知格、局部数值检查和现实预测的验收状态分别保留。
 
+## 闰秒标签与可计算性
 
-太阳时反解落入UTC闰秒时，卜卦／择日保留原生TT／UT1继续计算，`converted_utc`可返回含`23:59:60`的标签。`clock_conversion.utc_representation`明确区分UTC标签、闰秒与Python datetime可表示性；不要截断、平滑、移秒或把显示限制说成星盘不可算。仍不推断原资料精度、实测EOP、完整原典或现实预测有效性。
-
+卜卦／择日返回含`23:59:60`的`converted_utc`时，结合`clock_conversion.utc_representation`解释UTC标签与Python datetime的显示差异；沿用原生TT／UT1计算结果，不截断或移动闰秒。技术口径和验收边界见[输入与天文精度](../../western-astrology.md#输入与天文精度)。
 
 ## Gauquelin 分区的当前范围
 

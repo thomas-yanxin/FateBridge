@@ -16,9 +16,9 @@ from fatebridge.core.astro import ephemeris
 from fatebridge.core.astro.birth import build_astro_birth_info
 from fatebridge.core.astro.chart import build_core_chart_payload
 from fatebridge.core.astro.midpoints import PHYSICAL_BODIES, _native_factors
+from fatebridge.core.astro.orbits import ORBITAL_MODEL
 from fatebridge.core.astro.profiles import (
     ANALYTICAL_MEAN_NODE_MODEL,
-    APPROXIMATE_ORBIT_MODEL,
     native_factor_model,
     physical_ephemeris_summary,
 )
@@ -98,14 +98,10 @@ def test_physical_summary_still_preserves_real_mixing_and_failed_bodies():
         == "mixed"
     )
     assert (
-        physical_ephemeris_summary(
-            {**node, "Sun": "jpl", "Moon": APPROXIMATE_ORBIT_MODEL}
-        )
+        physical_ephemeris_summary({**node, "Sun": "jpl", "Moon": ORBITAL_MODEL})
         == "mixed"
     )
-    assert (
-        physical_ephemeris_summary({**node, "Sun": APPROXIMATE_ORBIT_MODEL}) == "none"
-    )
+    assert physical_ephemeris_summary({**node, "Sun": ORBITAL_MODEL}) == ORBITAL_MODEL
 
 
 def test_native_node_does_not_claim_a_physical_ephemeris_for_approximate_planets(
@@ -121,11 +117,10 @@ def test_native_node_does_not_claim_a_physical_ephemeris_for_approximate_planets
         "chart_profile"
     ]
     assert profile["engine_precision"] == "mixed_precision_runtime_model"
-    assert profile["ephemeris_model"] == "none"
+    assert profile["ephemeris_model"] == ORBITAL_MODEL
     assert profile["planetary_models"]["North Node"] == ANALYTICAL_MEAN_NODE_MODEL
     assert all(
-        profile["planetary_models"][name] == APPROXIMATE_ORBIT_MODEL
-        for name in PHYSICAL_BODIES
+        profile["planetary_models"][name] == ORBITAL_MODEL for name in PHYSICAL_BODIES
     )
 
 

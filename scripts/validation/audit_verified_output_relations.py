@@ -4,7 +4,7 @@ import argparse
 import json
 from pathlib import Path
 
-from fatebridge.core.metaphysics.qimen import _qimen_zhifu_zhishi
+from fatebridge.core.metaphysics.qimen import _qimen_pan_earth, _qimen_zhifu_zhishi
 from fatebridge.core.metaphysics.taiyi_source_alignment import count_source_assessment
 from fatebridge.core.metaphysics.taiyi_year import cyclic_core
 from fatebridge.core.qimen_evidence import _source_disagreements
@@ -46,8 +46,9 @@ def main() -> int:
                     "甲乙丙丁戊己庚辛壬癸"[i % 10] + "子丑寅卯辰巳午未申酉戌亥"[i % 12]
                 )
                 ju_text = f'{"阴" if yin else "阳"}遁{"一二三四五六七八九"[ju-1]}局上元'
+                earth = _qimen_pan_earth(ju_text)
                 leader = _qimen_zhifu_zhishi(
-                    hour, ju_text, dun_type="阴" if yin else "阳"
+                    hour, earth, dun_type="阴遁" if yin else "阳遁"
                 )
                 board = {
                     "ju_text": ju_text,

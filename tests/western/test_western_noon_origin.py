@@ -44,7 +44,7 @@ def test_p31_printed_hour_mappings(row):
     )
     assert wall == datetime(2000, 1, 1 + row["day_carry"], row["normalized_hour"])
     assert origin["day_carry"] == row["day_carry"]
-    assert calendar["input_clock"] == {"hour": row["hour"], "minute": 0}
+    assert calendar["input_clock"] == {"hour": row["hour"], "minute": 0, "second": 0}
     assert origin["source_pages"] == [30, 31]
     assert not origin["physical_duration_applied"]
     assert not origin["source_clock_identification_performed"]

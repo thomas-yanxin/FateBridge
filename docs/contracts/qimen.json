@@ -23,6 +23,14 @@
         "qimen.engine"
       ],
       "when": "读相关宫位与方位；局号不能代替九宫；不把盘面当现实结果保证"
+    },
+    "stem_candidates": {
+      "fields": [
+        "four_pillars",
+        "qimen.stem_context",
+        "qimen.source_disagreements"
+      ],
+      "when": "核对伏干、飞干、岁格或月朔格：候选的共同结果与仍有分歧的宫位分别读取，不把候选当正式格局"
     }
   },
   "first_view": {

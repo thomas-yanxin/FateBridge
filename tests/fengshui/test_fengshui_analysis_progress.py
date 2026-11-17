@@ -88,7 +88,7 @@ def test_same_desk_identity_is_valid_for_independent_surface_and_form():
 
 
 def test_calculation_can_finish_before_action_permission_and_space_are_known():
-    inputs = surface_input()
+    inputs = surface_input(healthy=True)
     constraints = inputs["surface_constraints"][0]
     del constraints["can_move_items"]
     del constraints["feasible_zones"]
@@ -267,7 +267,7 @@ def test_user_uncertain_representation_has_a_machine_readable_confirmation_reaso
 
 
 def test_action_states_follow_permission_without_changing_calculated_rule():
-    inputs = surface_input()
+    inputs = surface_input(healthy=True)
     ready, ready_progress = progress(inputs)
     constraints = inputs["surface_constraints"][0]
     del constraints["can_move_items"]
@@ -296,7 +296,7 @@ def test_action_states_follow_permission_without_changing_calculated_rule():
 
 
 def test_retention_does_not_ask_for_movement_permission():
-    inputs = surface_input(zone="far_left")
+    inputs = surface_input(zone="far_left", healthy=True)
     inputs["surface_constraints"] = []
     result, review = progress(inputs)
     action = result["layout_analysis"]["surface_analysis"]["findings"][0][
@@ -309,7 +309,7 @@ def test_retention_does_not_ask_for_movement_permission():
 
 
 def test_optional_representation_does_not_turn_into_a_required_assessment_task():
-    inputs = surface_input(goal="career")
+    inputs = surface_input(goal="career", healthy=True)
     del inputs["surface_constraints"][0]["can_add_items"]
     _, review = progress(inputs)
     assert review["assessment_complete"]

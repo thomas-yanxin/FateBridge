@@ -85,7 +85,9 @@ def test_all_42_physical_ra_dec_positions_against_external_jpl(monkeypatch):
 
 
 def test_default_sky_mansion_is_not_the_calendrical_natal_mansion():
-    r = calculate_suzhan_analysis(date="2025-03-04", time="12:00:00", zone="+08:00")
+    r = calculate_suzhan_analysis(
+        lat="31n13", lon="121e28", date="2025-03-04", time="12:00:00", zone="+08:00"
+    )
     moon = next(p for p in r["chart"]["objects"] if p["id"] == "Moon")
     assert r["sukuyo"]["day_mansion"] == "毕"
     assert moon["su28"] == "娄" and r["astronomy"]["coordinate_frame"].startswith(
@@ -147,7 +149,13 @@ def test_declared_boundaries_use_exact_half_open_intervals():
 
 
 def test_mansion_snapshot_can_display_more_than_30_degrees():
-    payload = {"date": "2025-03-04", "time": "12:00:00", "zone": "+08:00"}
+    payload = {
+        "lat": "31n13",
+        "lon": "121e28",
+        "date": "2025-03-04",
+        "time": "12:00:00",
+        "zone": "+08:00",
+    }
     result = {
         "chart": {
             "houses": [{"id": "House1"}],
@@ -169,7 +177,11 @@ def test_mansion_snapshot_can_display_more_than_30_degrees():
 
 def test_legacy_diagram_requires_explicit_method_and_remains_labelled():
     r = calculate_suzhan_analysis(
-        date="2025-03-04", time="12:00:00", mansion_method="legacy_equal28"
+        lat="31n13",
+        lon="121e28",
+        date="2025-03-04",
+        time="12:00:00",
+        mansion_method="legacy_equal28",
     )
     assert r["astronomy"] is None
     assert r["params"]["su28Method"] == "legacy_equal_ecliptic28_illustration"
@@ -178,7 +190,9 @@ def test_legacy_diagram_requires_explicit_method_and_remains_labelled():
 
 def test_missing_physical_engine_does_not_fabricate_equal_sky_mansions(monkeypatch):
     monkeypatch.setattr(runtime, "swe", None)
-    r = calculate_suzhan_analysis(date="2025-03-04", time="12:00:00")
+    r = calculate_suzhan_analysis(
+        lat="31n13", lon="121e28", date="2025-03-04", time="12:00:00"
+    )
     assert r["error_code"] == "dependency_missing" and "astronomy" not in r
 
 

@@ -1,6 +1,5 @@
 """Text-count witnesses and declared arithmetic never choose a winning cast."""
 
-import hashlib
 import json
 from pathlib import Path
 
@@ -10,6 +9,7 @@ from pydantic import ValidationError
 from fatebridge.core.meihua_casting import cast_explicit_meihua
 from fatebridge.core.requests.meihua import MeihuaCastRequest
 from fatebridge.services.meihua import calculate_meihua_cast
+from fatebridge.validation.meihua_scans import read_frozen_artifact
 from tests.support.transports import SPECS, business, rest, surface_calls
 
 REFERENCE = Path(__file__).parents[1] / "fixtures/meihua_text_count_v1"
@@ -30,9 +30,7 @@ def test_six_hand_probes_and_selected_source_bytes_are_preserved():
     assert manifest["precedes_implementation"]
     for group in ["files", "references"]:
         for name, digest in manifest[group].items():
-            path = (REFERENCE / name).resolve()
-            assert path.is_relative_to(REFERENCE.parent.resolve())
-            assert hashlib.sha256(path.read_bytes()).hexdigest() == digest
+            read_frozen_artifact(REFERENCE, name, digest, root=REFERENCE.parent)
     assert len(CASES) == 6
 
 

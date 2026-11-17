@@ -14,6 +14,14 @@
         "summary"
       ],
       "when": "读取逐爻纳支、世应、原典动爻及月令动静条件；focus_line/focus_kinship为明确取用前提，日级候选不等于事件应期"
+    },
+    "void_conditions": {
+      "fields": [
+        "current_hexagram",
+        "liuyao_evidence.conditional_analysis.void_conditions.focus",
+        "liuyao_evidence.conditional_analysis.penalty_conditions.focus"
+      ],
+      "when": "查所选用爻原旬空、空亡条件及寅日生扶资格；未选用爻则保留空焦点，不代选"
     }
   },
   "first_view": {

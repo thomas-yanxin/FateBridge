@@ -79,7 +79,18 @@ def test_all518_apparent_input_states_and_original14_gate_scope(record_property)
         assert value["complete_apparent_rate_certified"] is False
         assert value["physical_TT_clock_mapping_certified"] is False
         assert value["J2000_returned_flags"] == bound["returned_flags"]
-        assert value["source_context"] == bound["source_context"]
+        context = value["source_context"]
+        assert context["model"] == bound["source_context"]["model"]
+        assert context["status"] == bound["source_context"]["status"]
+        # Current IDs name files; the frozen input still commits their bytes.
+        source_files = {file["id"]: file for file in trace.snapshot()["files"]}
+        observed = [source_files[identity] for identity in context["file_ids"]]
+        assert context["file_ids"] == sorted(
+            f"se1:{file['slot']}:{file['filename']}" for file in observed
+        )
+        assert bound["source_context"]["file_ids"] == sorted(
+            f"se1:{file['slot']}:{file['sha256']}" for file in observed
+        )
         assert value["native_J2000_state"] == pytest.approx(
             bound["inertial_values"],
             rel=0,

@@ -13,23 +13,25 @@ from fatebridge.core.metaphysics.common import ELEMENT_CONTROLS, ELEMENT_GENERAT
 from fatebridge.core.qimen_five_jia import describe_five_jia
 from fatebridge.core.qimen_gate_relations import describe_gate_relations
 from fatebridge.core.qimen_punishment import describe_punishment
+from fatebridge.core.qimen_sources import SCAN_SOURCE, YANYI_VOLUMES
 from fatebridge.core.qimen_three_deceptions import describe_three_deceptions
 from fatebridge.core.qimen_tombs import describe_wonder_tombs
 
-SOURCE = "https://zh.wikisource.org/w/index.php?oldid=625946"
-SCAN_SOURCE = "https://ourartnet.com/King_James/Hushulei/047.pdf"
+SOURCE = YANYI_VOLUMES[3]
 DEFAULT_GOD_PROFILE = "yanyi_text"
 DEFAULT_SEASON_PROFILE = "yanyi_vol1_verse"
 GOD_PROFILES: dict[str, dict[str, Any]] = {
     "yanyi_text": {
         "title": "卷三正文八神",
         "section": "卷三·天乙直符吉凶神说",
+        "source": YANYI_VOLUMES[3],
         "scan_pages": [48, 49],
         "sequence": ["值符", "螣蛇", "太阴", "六合", "白虎", "玄武", "九地", "九天"],
     },
     "yanyi_diagrams": {
         "title": "卷四圆图八神",
         "section": "卷四·阴阳二遁圆图",
+        "source": YANYI_VOLUMES[4],
         "scan_pages": [63, 65, 67, 69],
         "sequence": ["值符", "螣蛇", "太阴", "六合", "勾陈", "朱雀", "九地", "九天"],
     },
@@ -38,6 +40,7 @@ SEASON_PROFILES: dict[str, dict[str, Any]] = {
     "yanyi_vol1_verse": {
         "title": "卷一烟波钓叟赋九星旺相",
         "section": "卷一·烟波钓叟赋",
+        "source": YANYI_VOLUMES[1],
         "scan_pages": [7],
         "states_by_relation": {
             "same_element": "相",
@@ -50,6 +53,7 @@ SEASON_PROFILES: dict[str, dict[str, Any]] = {
     "yanyi_vol3_table": {
         "title": "卷三九星旺相休囚表",
         "section": "卷三·九星旺相休囚表",
+        "source": YANYI_VOLUMES[3],
         "scan_pages": [38],
         "states_by_relation": {
             "same_element": "旺",
@@ -62,6 +66,7 @@ SEASON_PROFILES: dict[str, dict[str, Any]] = {
     "yanyi_vol3_prose": {
         "title": "卷三九星旺衰正文",
         "section": "卷三·九星所属及旺衰正文",
+        "source": YANYI_VOLUMES[3],
         "scan_pages": [37, 38],
         "states_by_relation": {
             "same_element": "旺",
@@ -117,7 +122,6 @@ def describe_profiles(god_profile: str, season_profile: str) -> dict[str, Any]:
     ]:
         result[name] = {
             "id": key,
-            "source": SOURCE,
             "scan_source": SCAN_SOURCE,
             **deepcopy(profiles[key]),
             "selection_policy": "explicit_input_or_fixed_default; never_selected_by_outcome",
@@ -164,6 +168,7 @@ def god_evidence(god: str) -> dict[str, Any]:
             "interpretation_status": "name_only_not_equated",
             "traditional_role": "本次仅按卷四圆图排出此名称，未将同序位白虎或玄武的卷三解释移植过来。",
             "section": "卷四·阴阳二遁圆图",
+            "source": YANYI_VOLUMES[4],
             "scan_pages": [63, 65, 67, 69],
         }
     result = {

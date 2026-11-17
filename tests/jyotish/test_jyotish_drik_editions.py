@@ -11,10 +11,8 @@ from pathlib import Path
 import pytest
 
 from scripts.jyotish.audit_jyotish_drik_editions import (
-    PLANETS,
     build_report,
     compare_native,
-    given_inputs,
     parts_from_clauses,
     value_from_clauses,
 )

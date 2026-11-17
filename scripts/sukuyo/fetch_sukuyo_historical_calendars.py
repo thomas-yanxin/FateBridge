@@ -14,6 +14,7 @@ import hashlib
 import io
 import json
 import time
+import urllib.error
 import urllib.parse
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor
@@ -138,7 +139,7 @@ def acquire(directory: Path, job: tuple[str, str, dict[str, str]]) -> dict[str, 
                     json.dumps(metadata, ensure_ascii=False, indent=2) + "\n"
                 )
                 break
-            except Exception as error:
+            except (urllib.error.URLError, TimeoutError) as error:
                 if attempt == 2:
                     raise RuntimeError(
                         f"Capture failed after three attempts: {name}"

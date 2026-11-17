@@ -6,7 +6,7 @@ import pytest
 from fastapi import HTTPException
 
 from fatebridge.core.requests.astrology import (
-    AstroChartRequest,
+    AstroChartPolyRequest,
     AstroRelativePartyRequest,
     AstroRelativeRequest,
 )
@@ -260,7 +260,7 @@ PARITY_CASES = [
     ),
     (
         "chart",
-        lambda: AstroChartRequest(
+        lambda: AstroChartPolyRequest(
             **_build_astro_birth_payload("张三", "男", "上海"),
         ),
         calculate_astro_chart,
@@ -589,7 +589,7 @@ def test_western_timing_module_catalog_selects_requested_technique(tool_name):
 
 
 def test_astro_chart_catalog_preserves_service_binding():
-    request = AstroChartRequest(
+    request = AstroChartPolyRequest(
         **_build_astro_birth_payload("张三", "男", "上海"),
     )
     spec = next(spec for spec in CATALOG if spec.key == "astro_chart")

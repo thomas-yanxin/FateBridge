@@ -95,8 +95,16 @@ def test_hosted_stems_keep_roles_and_one_name_per_palace():
 def test_human_jia_remains_unknown_even_when_a_candidate_matches(stems):
     c = five_jia_context("艮", stems, "惊门", "九天")
     assert c["human_jia"]["adopted_match"] is None and not c["named_matches"]
+    assert c["human_jia"]["printed_clause_match"] is None
     assert c["human_jia"]["unadopted_ji_stem_candidate_observed"] == ("己" in stems)
     assert not c["human_jia"]["candidate_failure_proves_absence"]
+
+
+def test_non_jing_palace_rules_out_the_printed_human_jia_clause():
+    c = five_jia_context("艮", ["己"], "开门", "九天")
+    assert c["human_jia"]["printed_clause_match"] is False
+    assert c["human_jia"]["adopted_match"] is None
+    assert not c["named_matches"]
 
 
 @pytest.mark.parametrize(
@@ -423,5 +431,11 @@ def test_five_jia_evidence_and_limits_survive_all_real_transports(
     assert q["rule_profiles"]["five_jia"]["human_jia"]["adopted_match"] is None
     assert not q["assessment"]["authority_certified"]
     assert "人假六合身份" in bodies[0]["snapshot_text"]
+    assert "人假必要门位" in bodies[0]["snapshot_text"]
     for palace in q["palaces"]:
         assert ("five_jia" in palace["evidence"]) == (palace["trigram"] != "中")
+        if palace["trigram"] != "中":
+            h = palace["evidence"]["five_jia"]["human_jia"]
+            assert h["printed_clause_match"] is (
+                None if palace["door"] == "惊门" else False
+            )

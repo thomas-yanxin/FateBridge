@@ -745,6 +745,10 @@ def _build_snapshot_text(
             "格局调候",
             "\n".join(
                 classical_snapshot_lines(classical_overview)
+                + [
+                    f"原典力量与全局喜忌状态：{(structure_profile or {}).get('assessment_status', 'not_supplied')}；"
+                    "工程政策档另列，未裁定时不由工程分类补成原典结论。"
+                ]
                 + complete_bureau_snapshot_lines(strength_assessment or {})
                 + root_qualification_snapshot_lines(strength_assessment or {})
                 + stem_energy_snapshot_lines(strength_assessment or {})
@@ -911,6 +915,10 @@ def calculate_bazi_birth(
             "day_master": base_analysis["day_master"],
             "element_distribution": base_analysis["element_distribution"],
             "favorable_elements": base_analysis["favorable_elements"],
+            "favorable_elements_status": base_analysis["favorable_elements_status"],
+            "engineering_favorable_elements": base_analysis[
+                "engineering_favorable_elements"
+            ],
             "structure_profile": base_analysis["structure_profile"],
             "ten_gods": base_analysis["ten_gods"],
             "patterns": base_analysis["patterns"],
@@ -1198,61 +1206,61 @@ calculate_bazi_marriage = _make_bazi_dimension_service(
     analyzer=MarriageAnalysis.analyze_marriage,
     analysis_type="八字婚姻分析",
     result_key="marriage_analysis",
-    doc="八字婚姻分析：配偶星、配偶宫、婚姻质量、婚期与婚姻风险。",
+    doc="八字婚姻分析：配偶星、配偶宫、盘内婚恋信号与固定规则指数。",
 )
 
 calculate_bazi_career = _make_bazi_dimension_service(
     analyzer=CareerAnalysis.analyze_career,
     analysis_type="八字事业分析",
     result_key="career_analysis",
-    doc="八字事业分析：适合行业、事业格局、创业倾向与事业时机。",
+    doc="八字事业分析：十神结构、行业文化类比与固定规则指数。",
 )
 
 calculate_bazi_wealth = _make_bazi_dimension_service(
     analyzer=WealthAnalysis.analyze_wealth,
     analysis_type="八字财运分析",
     result_key="wealth_analysis",
-    doc="八字财运分析：财星定位、财富格局、墓库财、求财方式与财运时机。",
+    doc="八字财运分析：财星、墓库对应及盘内财务象义。",
 )
 
 calculate_bazi_health = _make_bazi_dimension_service(
     analyzer=HealthAnalysis.analyze_health,
     analysis_type="八字健康分析",
     result_key="health_analysis",
-    doc="八字健康分析：体质、脏腑强弱、易患疾病与健康风险时机。",
+    doc="八字健康分析：五行寒暖与脏腑文化对应，不作健康判断。",
 )
 
 calculate_bazi_children = _make_bazi_dimension_service(
     analyzer=ChildrenAnalysis.analyze_children,
     analysis_type="八字子女分析",
     result_key="children_analysis",
-    doc="八字子女分析：子女星、子女宫、缘分厚薄与生育时机。",
+    doc="八字子女分析：子女星、时柱与亲子关系象义。",
 )
 
 calculate_bazi_education = _make_bazi_dimension_service(
     analyzer=EducationAnalysis.analyze_education,
     analysis_type="八字学业分析",
     result_key="education_analysis",
-    doc="八字学业分析：印星食伤、学历层次、文昌、学科方向与考试时机。",
+    doc="八字学业分析：学习十神、文昌与固定规则指数。",
 )
 
 calculate_bazi_personality = _make_bazi_dimension_service(
     analyzer=PersonalityAnalysis.analyze_personality,
     analysis_type="八字性格分析",
     result_key="personality_analysis",
-    doc="八字性格分析：日主心性、主导十神、刚柔内外向与优劣势。",
+    doc="八字性格分析：日主五行、十神计数与自省类比。",
 )
 
 calculate_bazi_relatives = _make_bazi_dimension_service(
     analyzer=RelativesAnalysis.analyze_relatives,
     analysis_type="八字六亲分析",
     result_key="relatives_analysis",
-    doc="八字六亲分析：父母星、兄弟姐妹星、六亲宫位与贵人助力。",
+    doc="八字六亲分析：六亲星位、宫位关系与盘内计数。",
 )
 
 calculate_bazi_romance = _make_bazi_dimension_service(
     analyzer=RomanceAnalysis.analyze_romance,
     analysis_type="八字正缘桃花分析",
     result_key="romance_analysis",
-    doc="八字正缘桃花分析：桃花咸池、红鸾天喜、异性缘星与正缘时机。",
+    doc="八字正缘桃花分析：桃花咸池、红鸾天喜与时间柱命中。",
 )

@@ -65,7 +65,7 @@ def test_offline_equal_mc_is_mc_anchored_not_ascendant(monkeypatch):
 
     profile = chart["chart_profile"]
     assert profile["house_system"] == "equal_mc"
-    assert profile["engine_backend"] == "fatebridge_approximate_orbital_model"
+    assert profile["engine_backend"] == "fatebridge_analytic_ephemerides"
 
     ascendant = chart["angles"]["ascendant"]["longitude"]
     midheaven = chart["angles"]["midheaven"]["longitude"]

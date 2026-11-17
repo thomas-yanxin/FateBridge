@@ -6,9 +6,9 @@ import hashlib
 from copy import deepcopy
 
 from fatebridge.core import human_design_knowledge as knowledge
-from fatebridge.core.human_design_line_catalogue import _canonical
 from fatebridge.core.human_design_line_reading import METHOD, _compose
 from fatebridge.core.human_design_references import coherent_human_design_references
+from fatebridge.utils.json_digest import canonical_bytes
 from fatebridge.validation.human_design import verify_human_design_reading
 
 
@@ -41,7 +41,7 @@ def build_human_design_line_packet(source_result: dict) -> dict:
             "packet_version": 1,
             "source_identity": {
                 "original_result_sha256": hashlib.sha256(
-                    _canonical(source_result)
+                    canonical_bytes(source_result)
                 ).hexdigest(),
                 "run_id": identity["run_id"],
             },

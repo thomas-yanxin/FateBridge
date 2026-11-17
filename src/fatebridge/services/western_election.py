@@ -7,7 +7,6 @@ scorer in :mod:`fatebridge.core.astrology_election`.
 
 from __future__ import annotations
 
-import json
 from typing import Any, Dict, Optional
 
 from fatebridge.core.astro.iers_ut1 import use_ut1_source
@@ -18,11 +17,8 @@ from fatebridge.services.snapshot_builders import (
     render_snapshot_text as _render_snapshot_text,
 )
 from fatebridge.utils.errors import handle_calculation_error
+from fatebridge.utils.formatting import format_json_response
 from fatebridge.utils.house_systems import house_system_fields, normalize_house_system
-
-
-def _json_block(value: Any) -> str:
-    return json.dumps(value, ensure_ascii=False, indent=2, default=str)
 
 
 def calculate_election(
@@ -32,6 +28,7 @@ def calculate_election(
     candidate_day: int,
     candidate_hour: int,
     candidate_minute: int = 0,
+    candidate_second: int = 0,
     timezone_name: Optional[str] = None,
     longitude: float,
     latitude: float,
@@ -60,6 +57,7 @@ def calculate_election(
                     candidate_minute,
                     candidate_calendar,
                     candidate_hour_origin,
+                    second=candidate_second,
                 )
             )
             subject, clock_conversion = build_event_subject(
@@ -105,12 +103,18 @@ def calculate_election(
                 f"{score_text} — {payload['recommendation']}"
             )
             sections = [
-                ("起盘信息", _json_block(context)),
-                ("历法日期换算", _json_block(calendar_conversion)),
-                ("钟时与物理时刻", _json_block(clock_conversion)),
+                ("起盘信息", format_json_response(context, compact=False)),
+                (
+                    "历法日期换算",
+                    format_json_response(calendar_conversion, compact=False),
+                ),
+                (
+                    "钟时与物理时刻",
+                    format_json_response(clock_conversion, compact=False),
+                ),
                 (
                     "评分与裁断",
-                    _json_block(
+                    format_json_response(
                         {
                             "score": payload["score"],
                             "score_bounds": payload["score_bounds"],
@@ -126,11 +130,16 @@ def calculate_election(
                             "axes": payload["axes"],
                             "calculation_basis": payload["calculation_basis"],
                             "solar_condition_policy": payload["solar_condition_policy"],
-                        }
+                            "marriage_significators": payload["marriage_significators"],
+                        },
+                        compact=False,
                     ),
                 ),
-                ("吉凶因子", _json_block(payload["factors"])),
-                ("未核算因子", _json_block(payload["unresolved_factors"])),
+                ("吉凶因子", format_json_response(payload["factors"], compact=False)),
+                (
+                    "未核算因子",
+                    format_json_response(payload["unresolved_factors"], compact=False),
+                ),
             ]
             return {
                 "analysis_type": "西占择日",

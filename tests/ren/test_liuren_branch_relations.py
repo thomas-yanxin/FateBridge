@@ -17,6 +17,7 @@ from fatebridge.core.metaphysics.liureng_branch_relations import (
     branch_relations,
 )
 from fatebridge.core.output_liuren_branches import LiurenBranchRelations, rebuild
+from fatebridge.core.public_output import same_public_value
 from scripts.ren.audit_liuren_branch_relations import CORPUS, FACTS, audit, reference
 from scripts.ren.audit_ren_classical import make_seed
 from tests.fixtures.ren_anchors import ANCHOR_PAYLOADS as PAYLOADS
@@ -360,6 +361,13 @@ def test_current_automatic_de440_policy_delivers_the_same_source_facts(
 
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "auto")
     spec = SPECS[key]
+    fn, args, kwargs = spec.bind(spec.request_model.model_validate(PAYLOADS[key]))
+    dependencies = fn(*args, **kwargs)["liureng"]["calendar_policy"][
+        "solar_term_dependencies"
+    ]
+    for term in dependencies:
+        details = term["solar_model_details"]
+        assert details["source_kernel_sha256"] != details["coefficient_sha256"]
     fields = [
         "liureng.branch_relations",
         "liureng.calendar_policy.solar_term_dependencies",
@@ -376,6 +384,9 @@ def test_current_automatic_de440_policy_delivers_the_same_source_facts(
     assert business(values[0]) == business(values[1]) == business(values[2])
     for value in values:
         board = value["liureng"]
+        assert same_public_value(
+            board["calendar_policy"]["solar_term_dependencies"], dependencies
+        )
         for row in board["branch_relations"]["rows"]:
             assert row["facts"] == expected(
                 REF, row["left_branch"], row["right_branch"]
@@ -385,5 +396,4 @@ def test_current_automatic_de440_policy_delivers_the_same_source_facts(
             assert term["ephemeris_model"] == "fatebridge_de440_solar_v1"
             assert term["ephemeris_retflags"] == []
             details = term["solar_model_details"]
-            assert details["source_kernel_sha256"] != details["coefficient_sha256"]
             assert details["accuracy_certified"] is False

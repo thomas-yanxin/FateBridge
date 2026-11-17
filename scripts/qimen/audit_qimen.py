@@ -24,6 +24,7 @@ from fatebridge.core.metaphysics.qimen import (
     _qimen_build_ju_text,
     _qimen_build_palaces,
     _qimen_build_yinyangdun_map,
+    _qimen_pan_earth,
     _qimen_resolve_zhirun_meta,
     _qimen_zhifu_zhishi,
 )
@@ -420,12 +421,11 @@ def audit() -> dict[str, Any]:
         for case in classical[group]:
             counts["classical_excerpt_examples"] += 1
             ju = f'{case["dun"]}{"一二三四五六七八九"[case["ju"]-1]}局上元'
-            leader = _qimen_zhifu_zhishi(case["hour"], ju, dun_type=case["dun"])
+            earth = _qimen_pan_earth(ju)
+            leader = _qimen_zhifu_zhishi(case["hour"], earth, dun_type=case["dun"])
             palaces = _qimen_build_palaces(
-                time_ganzhi=case["hour"],
-                ju_text=ju,
-                dun_type=case["dun"],
-                current_term="冬至",
+                earth=earth,
+                leader=leader,
             )
             by_gua = {p["trigram"]: p for p in palaces}
             if group == "leader_examples":
@@ -488,9 +488,9 @@ def audit() -> dict[str, Any]:
             ju = f'{dun}{"一二三四五六七八九"[ju_number-1]}局上元'
             for i in range(60):
                 hour = stems[i % 10] + branches[i % 12]
-                palaces = _qimen_build_palaces(
-                    time_ganzhi=hour, ju_text=ju, dun_type=dun, current_term="冬至"
-                )
+                earth = _qimen_pan_earth(ju)
+                leader = _qimen_zhifu_zhishi(hour, earth, dun_type=dun)
+                palaces = _qimen_build_palaces(earth=earth, leader=leader)
                 outer = [p for p in palaces if p["trigram"] != "中"]
                 counts["structural_boards"] += 1
                 ok = (

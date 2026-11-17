@@ -16,6 +16,7 @@ from typing import Any, Dict, List
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.ephemeris_integrity import load_ephemeris_manifest
 from fatebridge.core.astro.native_identity import binding_distribution_version
+from fatebridge.core.astro.orbits import ORBITAL_MODEL
 from fatebridge.core.ephemeris_runtime import configured_ephemeris_path
 from fatebridge.core.jpl_ephemeris import configured_jpl_file, jpl_header
 from fatebridge.utils.errors import EphemerisSourceError
@@ -62,7 +63,12 @@ class PhysicalEphemerisTrace:
         if configured_jpl_file() != self._jpl_name:
             raise EphemerisSourceError("physical_configuration_changed")
         ids = []
-        status = "library_builtin" if model == "moshier" else "identity_unavailable"
+        if model == "moshier":
+            status = "library_builtin"
+        elif model == ORBITAL_MODEL:
+            status = "packaged_analytic_model"
+        else:
+            status = "identity_unavailable"
         unidentified = False
         getter = getattr(runtime.swe, "get_current_file_data", None)
         # Analytical fallback can leave old Swiss slots populated. Do not

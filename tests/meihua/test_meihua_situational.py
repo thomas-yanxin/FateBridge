@@ -14,6 +14,7 @@ from fatebridge.core.requests.meihua import MeihuaCastRequest
 from fatebridge.core.requests.meihua_situational import MeihuaResponseContext
 from fatebridge.services.divination import calculate_meihua_analysis
 from fatebridge.services.meihua import calculate_meihua_cast
+from tests.support.reference_data import resolve as at_path
 
 FIXTURE = Path(__file__).parents[1] / "fixtures/meihua_situational_v1"
 REF = json.loads((FIXTURE / "expected-lookup.json").read_bytes())
@@ -41,12 +42,6 @@ def context(family, category):
 
 def normalized(value):
     return MeihuaResponseContext.model_validate(value).model_dump(mode="json")
-
-
-def at_path(value, path):
-    for part in path.split("."):
-        value = value[int(part)] if isinstance(value, list) else value[part]
-    return value
 
 
 def test_frozen_literals_and_precode_correction_are_not_production_expectations():

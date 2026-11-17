@@ -12,14 +12,15 @@ import pytest
 from pydantic import ValidationError
 
 from fatebridge.core import almanac
-from fatebridge.core.astro.time_scales import datetime_from_tt_point
+from fatebridge.core.astro.time_scales import datetime_from_tt
 from fatebridge.core.astro.tt_epoch import TTInstant
 from fatebridge.core.metaphysics import ren_calendar
 from fatebridge.core.output_chinese import RenTermDependency
+from fatebridge.utils.civil_time import ZonedCalendar
 from fatebridge.utils.errors import EphemerisSourceError
 from tests.ren.test_ren_anchors import assert_broken_on_three_ports
 from tests.ren.test_ren_transports import PAYLOAD
-from tests.support.transports import SPECS, business, native, rest, surface_calls
+from tests.support.transports import SPECS, business, rest, surface_calls
 
 ROOT = Path(__file__).resolve().parents[2]
 CORPUS = ROOT / "tests/fixtures/ren_term_point_v1"
@@ -49,7 +50,7 @@ def test_independent_decimal_reference(row):
         if len(parts) == 1
         else TTInstant.from_parts(*parts)
     )
-    assert datetime_from_tt_point(point).isoformat() == row["expected_utc"]
+    assert datetime_from_tt(point).isoformat() == row["expected_utc"]
 
 
 @pytest.fixture(params=["native", "analytic", "de440", "spk"])
@@ -70,7 +71,10 @@ def actual_term(request, monkeypatch):
 def corrupt(term, fault):
     details = copy.deepcopy(term.solar_model_details)
     if fault == "civil_plus_second":
-        return replace(term, moment=term.moment + timedelta(seconds=1))
+        return replace(
+            term,
+            calendar=ZonedCalendar.from_datetime(term.moment + timedelta(seconds=1)),
+        )
     if fault == "missing_details":
         return replace(term, solar_model_details=None)
     if fault == "selected_plus_day":
@@ -137,7 +141,9 @@ def test_actual_valid_receipt_and_same_instant_other_offset(actual_term):
     ren_calendar.require_ren_solar_term(
         replace(
             actual_term,
-            moment=actual_term.moment.astimezone(timezone(timedelta(hours=-4))),
+            calendar=ZonedCalendar.from_datetime(
+                actual_term.moment.astimezone(timezone(timedelta(hours=-4)))
+            ),
         )
     )
     RenTermDependency.model_validate(

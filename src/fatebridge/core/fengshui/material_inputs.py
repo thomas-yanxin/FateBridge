@@ -27,6 +27,7 @@ Shape = Literal[
 Colour = Literal[
     "green",
     "red",
+    "tan",
     "brown",
     "beige",
     "yellow",
@@ -96,9 +97,10 @@ class MaterialShapeFact(_DeferredModel):
                     raise ValueError("施用观察须与独立确认的实际材质一致")
             if (
                 self.application.proportionate_to_space is not None
-                and self.material not in {"metal", "water"}
+                and self.material
+                not in {"metal", "water", "stone", "ceramic", "living_plant"}
             ):
-                raise ValueError("本版尺度条件仅用于金属/水体")
+                raise ValueError("尺度条件仅用于已登记的实际代表物材质")
             healthy = self.application.plant_healthy
             if (
                 healthy

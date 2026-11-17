@@ -3,7 +3,6 @@
 import csv
 import hashlib
 import io
-import json
 import re
 from datetime import date, timedelta
 from pathlib import Path

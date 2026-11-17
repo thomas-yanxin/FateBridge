@@ -9,6 +9,7 @@ from typing import Any
 
 from .liuyao_activity import activity_condition
 from .liuyao_month_break import month_opposition_applies
+from .liuyao_penalty import INTERNAL_KEY, qualify_yin_generation
 from .liuyao_relations import ELEMENTS, branch_facts, element_relation, xunkong
 
 PROFILE: dict[str, Any] = json.loads(
@@ -47,27 +48,36 @@ def build_void_conditions(
         }
 
     rows = []
+    activity_by_position = {
+        r["position"]: activity_condition(r, conditions[r["position"] - 1])
+        for r in lines
+    }
     for line in lines:
         p, branch = line["position"], line["branch"]
         c, a = conditions[p - 1], assessment["lines"][p - 1]["strength"]
-        active = activity_condition(line, c)
+        active = activity_by_position[p]
         facts = branch_facts(branch, month, day, void)
         changed_void = line["changed_branch"] in void if line["change"] else None
-        moving_positions = {
-            r["position"]
-            for r in lines
-            if r["change"]
-            or conditions[r["position"] - 1]["activity"]
-            in ("暗动条件匹配", "冲空条件匹配")
-        }
         support = any(
-            s["location"] == "visible" and s["position"] in moving_positions
+            s["location"] == "visible" and activity_by_position[s["position"]] is True
             for s in a["supports"]
         )
         pending = any(
-            s["location"] == "visible" and s["position"] in moving_positions
+            s["location"] == "visible"
+            and activity_by_position[s["position"]] is not False
             for s in a["pending_supports"]
         )
+        day_generate = rule(
+            "day_generate",
+            "日建生扶不为空",
+            element_relation(ELEMENTS[day], line["element"]) in ("生爻", "比和"),
+        )
+        penalty = c[INTERNAL_KEY]
+        if penalty["day_yin_growth_applicable"]:
+            day_generate["qualified_matched"] = qualify_yin_generation(
+                day_generate["matched"], day, penalty
+            )
+            day_generate["qualification_source_path"] = penalty["source_path"]
         positive = [
             rule(
                 "supported", "旺不为空；仅使用同次明确有根生扶裁定", a["is_supported"]
@@ -79,11 +89,7 @@ def build_void_conditions(
                 facts["is_xunkong"] and facts["is_day_clash"],
                 67,
             ),
-            rule(
-                "day_generate",
-                "日建生扶不为空",
-                element_relation(ELEMENTS[day], line["element"]) in ("生爻", "比和"),
-            ),
+            day_generate,
             rule(
                 "moving_generate",
                 "有实际可用动爻生扶不为空；回头克来源不能算普通生扶",
@@ -127,13 +133,15 @@ def build_void_conditions(
             ),
         ]
         negative[0]["qualified_matched"] = month_opposition_applies(branch, month, day)
-        positives = any(r["matched"] is True for r in positive)
-        negatives = any(
-            r.get("qualified_matched", r["matched"]) is True for r in negative
+        positives = any(
+            r.get("qualified_matched", r["matched"]) is True for r in positive
+        )
+        possible_negatives = any(
+            r.get("qualified_matched", r["matched"]) is not False for r in negative
         )
         if not facts["is_xunkong"]:
             status, truth = "not_in_xunkong", False
-        elif positives and not negatives:
+        elif positives and not possible_negatives:
             status, truth = "not_final_void_pending_use", False
         else:
             status, truth = "conflicting_or_unresolved_conditions", None

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Mapping, Optional
 
 from fatebridge.core.astro.birth import AstroBirthInfo
 from fatebridge.utils.house_systems import house_system_fields
@@ -81,17 +81,20 @@ def _build_western_timing_analysis_context(
 
 def _build_western_timing_module_summary(
     technique: str,
-    payload: Dict[str, Any],
+    payload: Mapping[str, Any],
     *,
     analysis_datetime: datetime,
 ) -> str:
     prefix = analysis_datetime.strftime("%Y-%m-%d")
 
-    if technique == "solarreturn":
-        return f"{prefix} 西占太阳返照：返照发生于 {payload['return_datetime']}。"
-
-    if technique == "lunarreturn":
-        return f"{prefix} 西占月亮返照：返照发生于 {payload['return_datetime']}。"
+    if technique in {"solarreturn", "lunarreturn"}:
+        body = "太阳" if technique == "solarreturn" else "月亮"
+        event_label = (
+            payload["return_datetime"]
+            or payload["return_datetime_utc"]
+            or f"TT JD {payload['solver']['julian_day_tt']}"
+        )
+        return f"{prefix} 西占{body}返照：返照发生于 {event_label}。"
 
     if technique == "transit":
         top_hit = payload["hits"][0] if payload.get("hits") else None
@@ -256,6 +259,7 @@ def build_western_timing_module_payload(
         solar_arc_payload = build_solar_arc_payload(
             natal_subject,
             progression_payload["subject"],
+            progression_options=progression_payload["calculation_options"],
         )
         result["directions"] = {"solar_arc": solar_arc_payload}
         result["summary"] = _build_western_timing_module_summary(
@@ -466,7 +470,11 @@ def build_western_timing_payload(
         zodiac_type=zodiac_type,
     )
     progressed_subject = progression_payload.pop("subject")
-    solar_arc_payload = build_solar_arc_payload(natal_subject, progressed_subject)
+    solar_arc_payload = build_solar_arc_payload(
+        natal_subject,
+        progressed_subject,
+        progression_options=progression_payload["calculation_options"],
+    )
     primary_directions_payload = build_primary_directions_payload(
         birth_info,
         natal_subject,
@@ -545,6 +553,7 @@ def build_western_timing_payload(
     )
 
     age_years = calculate_age_years(birth_info, analysis_datetime)
+    firdaria_current = firdaria_payload["current_major"]
     zr_spirit_current = zodiacal_releasing_payload["spirit"]["current_level_1"]
     transit_top_hit = transit_payload["hits"][0] if transit_payload["hits"] else None
     summary = (
@@ -558,9 +567,9 @@ def build_western_timing_payload(
         f"指定年盘上升 {given_year_payload['ascendant']['sign_label']}，"
         f"年小限落第{profection_payload['activated_house']}宫"
         f"{profection_payload['activated_sign_label']}，"
-        f"法达 {firdaria_payload['current_major']['planet_label']}"
+        f"法达 {firdaria_current['planet_label'] if firdaria_current else '未知'}"
         f"/{(firdaria_payload['current_sub'] or {}).get('planet_label', '无小运')}，"
-        f"Spirit 黄道释放 L1 {zr_spirit_current['sign_label']}，"
+        f"Spirit 黄道释放 L1 {zr_spirit_current['sign_label'] if zr_spirit_current else '未知'}，"
         f"太阳弧 {solar_arc_payload['arc_degrees']:.2f}°，"
         f"行运太阳 {transit_payload['sun']['sign_label']}"
         + (

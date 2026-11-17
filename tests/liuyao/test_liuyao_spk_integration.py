@@ -87,7 +87,9 @@ def test_shared_sign_boundary_failure_is_corrected_by_actual_spk(
         metadata = output["run_metadata"]
         assert MODEL in metadata["provenance"]["ephemeris_model"]
         policy = metadata["runtime"]["solar_term_policy"]
-        assert policy["model_id"] == MODEL and policy["kernel_sha256"] == SHA
+        assert policy["model_id"] == MODEL
+        assert policy["kernel_filename"] == selected_spk.name
+        assert "kernel_sha256" not in policy
         assert policy["accuracy_certified"] is False
         if project:
             assert "calendar_context" not in output
@@ -96,7 +98,10 @@ def test_shared_sign_boundary_failure_is_corrected_by_actual_spk(
             assert boundary["branch"] == "亥"
             for key in ["start_term", "next_term"]:
                 assert boundary[key]["ephemeris_model"] == MODEL
-                assert boundary[key]["solar_model_details"]["kernel_sha256"] == SHA
+                details = boundary[key]["solar_model_details"]
+                assert details["kernel_filename"] == selected_spk.name
+                assert details["spk_frame_id"] == 1
+                assert "kernel_sha256" not in details
             assert (
                 "month_model_comparison"
                 not in output["liuyao_evidence"]["calendar_conventions"]
@@ -120,10 +125,10 @@ def test_spk_same_run_original_payload_hash(
         assert (
             original["liuyao_evidence"]["calendar_conventions"]["month_branch"] == "亥"
         )
-        assert (
-            original["run_metadata"]["runtime"]["solar_term_policy"]["kernel_sha256"]
-            == SHA
-        )
+        policy = original["run_metadata"]["runtime"]["solar_term_policy"]
+        assert policy["kernel_filename"] == selected_spk.name
+        assert "kernel_sha256" not in policy
+        assert spk_solar.source_receipt()["kernel_sha256"] == SHA
         originals.append(business(original))
     assert originals[0] == originals[1] == originals[2]
 

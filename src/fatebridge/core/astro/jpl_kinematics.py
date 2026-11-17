@@ -1,6 +1,7 @@
 """Analytic p/v/a of the selected direct-access DE441 source polynomial.
 
-The numerical argument is the native caller's day, without a TT/TDB conversion.
+The caller supplies the source day, without an internal TT/TDB conversion.
+Exact rational days preserve fractions below a full Julian-day float's ULP.
 Source words, the selected record and the fixed frame are separately checked;
 this is neither an observational error bound nor an atomic read-set proof.
 """
@@ -64,7 +65,7 @@ def _signature(stat: os.stat_result) -> tuple:
 
 
 def source_kinematics(
-    path: Path, epoch: float, body: str
+    path: Path, epoch: float | Fraction, body: str
 ) -> Tuple[Vector, Dict[str, Any]]:
     """Read the actual selected record; never reuse a process-global file cache."""
     if (
@@ -137,11 +138,13 @@ def source_kinematics(
         ):
             raise EphemerisSourceError("jpl_kinematics_invalid")
         width = step / parts
-        subcell = min(int((epoch - values[0]) // width), parts - 1)
+        subcell = min(
+            int((Fraction(epoch) - Fraction(values[0])) // Fraction(width)), parts - 1
+        )
         if not 0 <= subcell < parts or not values[0] <= epoch <= values[1]:
             raise EphemerisSourceError("jpl_kinematics_outside_source")
         low = values[0] + subcell * width
-        x = 2 * (epoch - low) / width - 1
+        x = float(2 * (Fraction(epoch) - Fraction(low)) / Fraction(width) - 1)
         axes = []
         for axis in range(3):
             first = offset - 1 + (subcell * 3 + axis) * count
@@ -167,7 +170,7 @@ def source_kinematics(
     return state, {
         "method_id": METHOD_ID,
         "filename": path.name,
-        "epoch_native_argument_day": epoch,
+        "epoch_native_argument_day": float(epoch),
         "header_sha256": hashlib.sha256(raw_header).hexdigest(),
         "record_sha256": hashlib.sha256(raw).hexdigest(),
         "record_index": index,

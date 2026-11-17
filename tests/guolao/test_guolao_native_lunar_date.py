@@ -26,7 +26,7 @@ from fatebridge.services.astrology import calculate_core_chart_analysis
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.errors import EphemerisSourceError
 from tests.guolao.test_guolao_native_frames import fixed_moshier  # noqa:F401
-from tests.guolao.test_guolao_native_jie_month import epoch_for
+from tests.guolao.test_guolao_native_jie_month import SOURCE_DOMAINS, epoch_for
 
 REFERENCE = json.loads(
     (
@@ -86,11 +86,23 @@ def test_exact_midnight_half_open_contract_searches_adjacent_hint_dates(case, si
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
-def test_native_lunar_lookup_matches_HKO_and_does_not_assign_a_clock_label(
+def test_native_lunar_lookup_matches_HKO_with_source_qualified_clock_labels(
     fixed_moshier, case
 ):
     epoch = epoch_for(case)
-    assert epoch.utc_label is None and epoch.utc_datetime is None
+    expected_utc = SOURCE_DOMAINS[case["id"]]["UTC"]
+    if expected_utc is None:
+        assert epoch.utc_label is None and epoch.utc_datetime is None
+    else:
+        assert (
+            abs(
+                (
+                    datetime.fromisoformat(epoch.utc_label)
+                    - datetime.fromisoformat(expected_utc)
+                ).total_seconds()
+            )
+            < 0.0002
+        )
     actual = module.native_month_context(epoch, "chinese_lunar_utc8")
     expected = case["expected_lunar"]
     assert actual["status"] == "available"
@@ -98,11 +110,18 @@ def test_native_lunar_lookup_matches_HKO_and_does_not_assign_a_clock_label(
     assert actual["lunar_year"] == expected["year"]
     assert actual["lunar_day"] == expected["day"]
     assert actual["is_leap_month"] is expected["is_leap_month"]
-    assert actual["calendar_date"] == case["id"]
-    assert actual["instant_utc"] is None and actual["calendar_datetime"] is None
-    assert actual["calendar_date_evidence"]["primary_julian_day_tt_exact"] == str(
-        Fraction(epoch.time.jd_tt)
-    )
+    if expected_utc is None:
+        assert actual["calendar_date"] == case["id"]
+        assert actual["instant_utc"] is None and actual["calendar_datetime"] is None
+        assert actual["calendar_date_evidence"]["primary_julian_day_tt_exact"] == str(
+            Fraction(epoch.time.jd_tt)
+        )
+    else:
+        assert actual["instant_utc"] == epoch.utc_label
+        assert (
+            datetime.fromisoformat(actual["calendar_datetime"]).date().isoformat()
+            == case["id"]
+        )
 
 
 @pytest.mark.parametrize(
@@ -201,8 +220,6 @@ def test_lunar_gap_overlap_and_transition_match_all_three_surfaces(
     fields = [
         "guolao.timing.month_limit.birth_month." + key
         for key in [
-            "calendar_date",
-            "calendar_date_evidence",
             "calendar_datetime",
             "instant_utc",
             "month_number",
@@ -211,6 +228,11 @@ def test_lunar_gap_overlap_and_transition_match_all_three_surfaces(
             "is_leap_month",
         ]
     ]
+    if SOURCE_DOMAINS[case["id"]]["UTC"] is None:
+        fields += [
+            "guolao.timing.month_limit.birth_month." + key
+            for key in ["calendar_date", "calendar_date_evidence"]
+        ]
     if projected:
         options.update(fields=fields, strict_fields=True)
     spec = next(s for s in CATALOG if s.key == tool)
@@ -270,18 +292,35 @@ def test_lunar_gap_overlap_and_transition_match_all_three_surfaces(
     assert values[0] == values[1] == values[2]
     actual = values[0]["guolao"]["timing"]["month_limit"]["birth_month"]
     expected = case["expected_lunar"]
-    assert actual["calendar_date"] == case["id"]
+    expected_utc = SOURCE_DOMAINS[case["id"]]["UTC"]
+    if expected_utc is None:
+        assert actual["calendar_date"] == case["id"]
+        assert actual["instant_utc"] is None and actual["calendar_datetime"] is None
+    else:
+        assert (
+            abs(
+                (
+                    datetime.fromisoformat(actual["instant_utc"])
+                    - datetime.fromisoformat(expected_utc)
+                ).total_seconds()
+            )
+            < 0.0002
+        )
+        assert (
+            datetime.fromisoformat(actual["calendar_datetime"]).date().isoformat()
+            == case["id"]
+        )
     assert actual["month_number"] == expected["month"]
     assert (
         actual["lunar_year"] == expected["year"]
         and actual["lunar_day"] == expected["day"]
     )
-    assert actual["instant_utc"] is None and actual["calendar_datetime"] is None
     if not projected:
         assert (
             values[0]["guolao"]["timing"]["month_limit"]["status"] == "research_partial"
         )
-        assert "没有唯一UTC标签" in values[0]["interpretation"]["input_clock"]
+        if expected_utc is None:
+            assert "没有唯一UTC标签" in values[0]["interpretation"]["input_clock"]
         assert (
             "不能据此判断晋升或岗位变动" in values[0]["interpretation"]["month_limit"]
         )

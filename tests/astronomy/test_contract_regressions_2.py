@@ -10,6 +10,7 @@ from jsonschema import Draft202012Validator
 import fatebridge.services.bazi as bazi
 from fatebridge.core import almanac, solar_model_policy
 from fatebridge.core.analytic_solar import MODEL_ID
+from fatebridge.core.de441_solar import MODEL_ID as DE441_MODEL
 from fatebridge.utils.birth_input import create_person_info
 from fatebridge.utils.solar_time import (
     SOLAR_TIME_STRATEGY_APPARENT,
@@ -79,7 +80,9 @@ def test_named_solar_model_in_ren_calendar_all_transports(
             assert term["provider"] == "fatebridge_analytic"
             assert term["ephemeris_model"] == MODEL_ID
             assert term["ephemeris_retflags"] == []
-            assert term["solar_model_details"]["native_choice_probe_model"] == "moshier"
+            assert (
+                term["solar_model_details"]["native_choice_probe_model"] == DE441_MODEL
+            )
             assert term["solar_model_details"]["accuracy_certified"] is False
             assert term["solver_time_scale"] == "TT"
         assert body["run_metadata"]["engine_is_approximate"] is True
@@ -171,7 +174,7 @@ def test_named_analytic_solar_source_matches_three_protocols(
         assert term["resolution_provider"] == "fatebridge_analytic"
         assert term["ephemeris_model"] == MODEL_ID
         details = term["solar_model_details"]
-        assert details["native_choice_probe_model"] == "moshier"
+        assert details["native_choice_probe_model"] == DE441_MODEL
         assert details["accuracy_certified"] is False
         assert details["root_time_scale"] == "TT"
         assert details["civil_time_method"]
@@ -184,7 +187,8 @@ def test_named_analytic_solar_source_matches_three_protocols(
 
 
 @pytest.mark.parametrize(
-    "mode,expected", [("auto", "fatebridge_de440_solar_v1"), ("native", "moshier")]
+    "mode,expected",
+    [("auto", "fatebridge_de440_solar_v1"), ("native", DE441_MODEL)],
 )
 def test_captured_year_source_is_not_reselected_by_a_transient_environment_read(
     mode, expected, monkeypatch, tmp_path

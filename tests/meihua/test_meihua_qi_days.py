@@ -10,6 +10,7 @@ import pytest
 from fatebridge.core.meihua_qi_days import _reading, qi_day_atom_ruleset
 from fatebridge.services.divination import calculate_meihua_analysis
 from fatebridge.services.meihua import calculate_meihua_cast
+from tests.support.reference_data import resolve
 
 FIXTURE = Path(__file__).parents[1] / "fixtures/meihua_qi_days_v1"
 PROFILE = json.loads((FIXTURE / "profile.json").read_text())
@@ -18,12 +19,6 @@ TRUTH = {
     (r["trigram"], r["day_branch"]): r["literal_named_day_branch_atom_met"]
     for r in json.loads((FIXTURE / "day-atoms96.json").read_text())
 }
-
-
-def resolve(result, path):
-    for key in path.split("."):
-        result = result[int(key)] if isinstance(result, list) else result[key]
-    return result
 
 
 def calculate(case, topic, branch):

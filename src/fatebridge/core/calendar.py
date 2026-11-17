@@ -3,18 +3,17 @@ Calendar conversion utilities for BaZi calculations.
 Converts Gregorian dates to Chinese sexagenary cycle (干支).
 """
 
-from datetime import date, datetime, timedelta
+from datetime import datetime
 from functools import lru_cache
 from typing import Any, Dict, Optional, Tuple
 
-from ..utils.civil_clock import utc_instant
+from ..utils.civil_time import ZonedCalendar, gregorian_date_parts, gregorian_ordinal
 from ..utils.data import (
     EARTHLY_BRANCHES,
     HEAVENLY_STEMS,
     get_hour_branch,
 )
 from .almanac import (
-    DAY_GANZHI_STRATEGY_STANDARD,
     DEFAULT_TIMEZONE,
     get_bazi_month_context,
     get_bazi_year,
@@ -33,12 +32,11 @@ def resolve_bazi_effective_date(
 
     传入参数是一个公历 civil 日期 + 时辰小时（0-23）。返回用于 BaZi 日/时柱
     计算的有效公历日期。对于 0-22 时，返回值就是原日期；对于 23 时，返回值是
-    原日期 + 1 天。该函数不处理月/年跨界特殊情况，依赖 datetime.date
-    的日期算术正确跨月跨年。
+    原日期 + 1 天。通过格里高利日序处理跨月跨年，末年晚子时仍可取得
+    下一日的干支。
     """
     if hour >= LATE_ZI_HOUR:
-        shifted = date(year, month, day) + timedelta(days=1)
-        return shifted.year, shifted.month, shifted.day
+        return gregorian_date_parts(gregorian_ordinal(year, month, day) + 1)
     return year, month, day
 
 
@@ -132,7 +130,6 @@ class BaZiCalendar:
         *,
         hour: Optional[int] = None,
         apply_late_zi_rollover: bool = True,
-        strategy: str = DAY_GANZHI_STRATEGY_STANDARD,
     ) -> Tuple[str, str]:
         """Calculate the day pillar (日柱) for a given date.
 
@@ -151,7 +148,7 @@ class BaZiCalendar:
         """
         if hour is not None and apply_late_zi_rollover:
             year, month, day = resolve_bazi_effective_date(year, month, day, hour)
-        day_ganzhi = get_day_ganzhi(year, month, day, strategy=strategy)
+        day_ganzhi = get_day_ganzhi(year, month, day)
         return day_ganzhi[0], day_ganzhi[1]
 
     @classmethod
@@ -162,7 +159,6 @@ class BaZiCalendar:
         day: int,
         hour: int,
         *,
-        day_pillar_strategy: str = DAY_GANZHI_STRATEGY_STANDARD,
         apply_late_zi_rollover: bool = True,
     ) -> Tuple[str, str]:
         """Calculate the hour pillar (时柱) for a given datetime.
@@ -184,7 +180,6 @@ class BaZiCalendar:
             effective_year,
             effective_month,
             effective_day,
-            strategy=day_pillar_strategy,
         )
         day_stem_index = HEAVENLY_STEMS.index(day_stem)
 
@@ -216,9 +211,8 @@ class BaZiCalendar:
     def _get_four_pillars_cached(
         cls,
         local_birth_datetime: datetime,
-        civil_datetime: datetime,
+        civil_calendar: ZonedCalendar,
         timezone_name: str,
-        day_pillar_strategy: str,
         _solar_environment: Tuple[Any, ...] = (),
     ) -> Tuple[Tuple[str, str], Tuple[str, str], Tuple[str, str], Tuple[str, str]]:
         """Cache a day/hour wall label plus a distinct physical civil instant.
@@ -231,6 +225,7 @@ class BaZiCalendar:
         day = local_birth_datetime.day
         hour = local_birth_datetime.hour
 
+        civil_datetime = civil_calendar.require_datetime()
         bazi_year = get_bazi_year(civil_datetime, timezone_name)
         month_context = get_bazi_month_context(civil_datetime, timezone_name)
         month_branch = str(month_context["branch"])
@@ -248,14 +243,12 @@ class BaZiCalendar:
                 effective_year,
                 effective_month,
                 effective_day,
-                strategy=day_pillar_strategy,
             ),
             cls.calculate_hour_pillar(
                 year,
                 month,
                 day,
                 hour,
-                day_pillar_strategy=day_pillar_strategy,
             ),
         )
 
@@ -265,7 +258,6 @@ class BaZiCalendar:
         birth_datetime: datetime,
         timezone_name: str = DEFAULT_TIMEZONE,
         *,
-        day_pillar_strategy: str = DAY_GANZHI_STRATEGY_STANDARD,
         civil_datetime: Optional[datetime] = None,
     ) -> Dict[str, Tuple[str, str]]:
         """
@@ -283,11 +275,10 @@ class BaZiCalendar:
         year_pillar, month_pillar, day_pillar, hour_pillar = (
             cls._get_four_pillars_cached(
                 local_birth_datetime.replace(tzinfo=None, fold=0),
-                utc_instant(
+                ZonedCalendar.from_datetime(
                     localize_datetime(civil_datetime or birth_datetime, timezone_name)
                 ),
                 timezone_name,
-                day_pillar_strategy,
                 get_solar_term_environment_key(
                     year=localize_datetime(
                         civil_datetime or birth_datetime, timezone_name

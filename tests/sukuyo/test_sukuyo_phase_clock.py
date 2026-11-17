@@ -170,7 +170,14 @@ def test_phase_and_time_reference_across_actual_rest_native_mcp_cli(
         monkeypatch,
         capsys,
         "suzhan",
-        {"date": date, "time": "05:30:00", "zone": "+08:00", **kwargs},
+        {
+            "lat": "31n13",
+            "lon": "121e28",
+            "date": date,
+            "time": "05:30:00",
+            "zone": "+08:00",
+            **kwargs,
+        },
         [
             "sukuyo.calendar_day.clock_doctrine.phase_and_time_reference",
             "sukuyo.calendar",

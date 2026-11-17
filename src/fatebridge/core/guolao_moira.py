@@ -6,9 +6,9 @@ in isolated-Moon counting, or missing nobles wrapped into valid sign indices).
 Day/night and winter must be supplied explicitly. Native callers provide
 source-selected discrete palace indices and god positions.
 
-The purple-cloud point remains a fit to four horosa software fixtures. It is
-NOT an astronomical body or a calibration to the Tohoku printed edition, whose
-volume 1 states an approximately 29-year revolution rather than this fit's 28.
+The purple-cloud point follows the pinned Horosa pcLon mean-point formula.
+It is not an astronomical body or a calibration to the Tohoku printed edition,
+whose volume1 states an approximately29-year revolution rather than this28.
 Native Guolao supplies the collated Lu Wei god table from core.guolao_classical.
 """
 
@@ -16,7 +16,11 @@ from __future__ import annotations
 
 from typing import Any, Dict, List
 
-PATTERN_MODEL_ID = "moira_compatibility_conditions_v2"
+PATTERN_MODEL_ID = "moira_conditions_with_seasonal_moon_v3"
+MOIRA_MOON_RULES_SOURCE = (
+    "https://github.com/Horace-Maxwell/Moira_APP_MacOS_ARM/"
+    "blob/9bb126fd84997aa26fed6e91b4bdf438fceb0e38/moira_s.prop"
+)
 
 # --- 数据表（verbatim from guolaoMoira.js / SZConst.js）-----------------------
 
@@ -59,20 +63,25 @@ _OVERCOMING = {
     "计": "木",
 }
 
-# 步紫气（紫炁/木余）—— 七政四余「四余」之一，无 swisseph 天体对应。以 horosa 后端 4 张
-# 七政四余盘 fixture（1985-03-21 / 1998 / 2026，chart_guolao·1998_predictive·liureng·traditional）
-# 作最小二乘线性标定：周期 ≈ 27.9994 年（软件拟合，非原典历元），4 点残差 < 1e-5°。
-# 锚点取 horosa chart_guolao fixture（1985-03-21 10:00 +08，JD_UT 2446145.5833）。横向移植故
-# 直接锚定 horosa 值（紫炁为均行虚点，黄经随时间严格线性）。
-_PURPLE_CLOUDS_ANCHOR_JD = 2446145.583333333
-_PURPLE_CLOUDS_ANCHOR_LON = 358.66910331920116
-_PURPLE_CLOUDS_RATE_DEG_PER_DAY = 0.035201691530618556
+# Horosa flatlib/ephem/tools.py::pcLon at this frozen revision. This is a
+# software-defined mean point; no fit to output fixtures or classical epoch.
+PURPLE_CLOUDS_SOURCE_COMMIT = "10fb75de980bb0a6e0d1f50c7ee93cc97a88d7de"
+PURPLE_CLOUDS_SOURCE_URL = (
+    "https://github.com/Horace-Maxwell/Horosa-Web-App-comprehensively-improved-MacOS/"
+    f"blob/{PURPLE_CLOUDS_SOURCE_COMMIT}/Horosa-Web/flatlib-ctrad2/flatlib/ephem/tools.py"
+)
+PURPLE_CLOUDS_MODEL_ID = "horosa_mean_purple_clouds_10fb75de_v1"
+PURPLE_CLOUDS_EPOCH_JD = 2451543.5
+PURPLE_CLOUDS_EPOCH_LONGITUDE = 188.6849
+PURPLE_CLOUDS_PERIOD_DAYS = 10226.78132
+PURPLE_CLOUDS_RATE_DEG_PER_DAY = 360.0 / PURPLE_CLOUDS_PERIOD_DAYS
 
 
 def purple_clouds_longitude(julian_day: float) -> float:
-    """紫炁（木余）黄经（度，0–360）。horosa 标定的线性步紫气，见上方常量注释。"""
-    lon = _PURPLE_CLOUDS_ANCHOR_LON + _PURPLE_CLOUDS_RATE_DEG_PER_DAY * (
-        julian_day - _PURPLE_CLOUDS_ANCHOR_JD
+    """紫炁均行虚点黄经，沿用具名Horosa公式，不代表原典历元校准。"""
+    lon = (
+        PURPLE_CLOUDS_EPOCH_LONGITUDE
+        + 360 * (julian_day - PURPLE_CLOUDS_EPOCH_JD) / PURPLE_CLOUDS_PERIOD_DAYS
     )
     return lon % 360.0
 
@@ -140,13 +149,14 @@ def _add(
     rule_id: str,
     inputs: Dict[str, Any],
     granularity: str = "palace_index",
+    source: str = "moira_s.prop-local",
 ) -> None:
     patterns.append(
         {
             "name": name,
             "level": level,
             "score": score,
-            "source": "moira_s.prop-local",
+            "source": source,
             "dsl": dsl,
             "detail": detail,
             "rule_id": rule_id,
@@ -240,7 +250,7 @@ def _rulership_inputs(signof: _Resolver, subject: str) -> Dict[str, Any]:
 
 
 def calculate(facts: Dict[str, Any]) -> List[Dict[str, Any]]:
-    """buildLocalMoiraPatterns 的 Python 端口。
+    """离散宫位兼容子集；月曜分支沿用具名Moira原程序的季节覆盖规则。
 
     ``facts`` 形如::
 
@@ -255,6 +265,7 @@ def calculate(facts: Dict[str, Any]) -> List[Dict[str, Any]]:
         }
 
     ``god_signidx`` 由调用者提供明确的来源起例；缺失时相应神煞格局不评。
+    月曜独居格须有完整十一曜、昼夜及季节；缺项只跳过依赖它的规则。
 
     保留兼容格局名、等级及排序（good 在前、bad 在后），附实际条件证据；
     不宣称新增证据结构与旧JS逐字段相同，也不以兼容测试认证原典或预测效力。
@@ -312,7 +323,8 @@ def calculate(facts: Dict[str, Any]) -> List[Dict[str, Any]]:
                 },
             )
 
-    # 孤月独明（喜）：夜生月曜独居一方。
+    # Moira1.50Final: the winter-night 寒月单行 rule rejects 孤月独明.
+    # Select the effective seasonal rule, rather than emitting both verdicts.
     if moon >= 0:
         same_moon = sum(
             1 for cn in _MOIRA_PLANET_ORDER if planet_signidx.get(cn, -1) == moon
@@ -320,23 +332,50 @@ def calculate(facts: Dict[str, Any]) -> List[Dict[str, Any]]:
         complete = all(
             0 <= planet_signidx.get(cn, -1) < 12 for cn in _MOIRA_PLANET_ORDER
         )
-        if is_day is False and complete and same_moon == 1:
+        if (
+            complete
+            and same_moon == 1
+            and is_day is not None
+            and is_winter is not None
+            and (is_winter or not is_day)
+        ):
+            if is_winter:
+                name = "寒月单行"
+                detail = "Moira1.50Final条件：冬令月曜独居一宫，昼喜夜忌；冬夜覆盖普通孤月独明。"
+                if is_day:
+                    level = "good"
+                    expression = "?冬 & ?{孤月} & ?昼"
+                    rule_id = "moira_cold_moon_alone_day_v1"
+                else:
+                    level = "bad"
+                    expression = "?冬 & ?{孤月} & ?夜 ~ {孤月独明}"
+                    rule_id = "moira_cold_moon_alone_night_v1"
+            else:
+                name = "孤月独明"
+                level = "good"
+                detail = (
+                    "Moira1.50Final条件：非冬令、夜生，月在十一曜位置中单独居一宫。"
+                )
+                expression = "?{孤月} & ?夜 & !?冬"
+                rule_id = "moira_moon_alone_night_nonwinter_v3"
             _add(
                 patterns,
-                "孤月独明",
-                "good",
+                name,
+                level,
                 "2.3.0",
-                "政余喜格：夜生，月在本次十一曜位置中单独居一宫。",
-                "?{孤月} & ?夜",
-                rule_id="moira_moon_alone_in_one_palace_at_night_v2",
+                detail,
+                expression,
+                rule_id=rule_id,
                 inputs={
                     "is_day": is_day,
+                    "is_winter": is_winter,
                     "moon_palace_index": moon,
                     "eleven_positions": {
                         cn: planet_signidx[cn] for cn in _MOIRA_PLANET_ORDER
                     },
                     "same_palace_count": same_moon,
                 },
+                source=MOIRA_MOON_RULES_SOURCE,
             )
 
     # 日月拱官（喜）：日月分拱官禄。
@@ -482,10 +521,7 @@ def calculate(facts: Dict[str, Any]) -> List[Dict[str, Any]]:
             inputs={"node_index": north_node, "apogee_index": dark_moon},
         )
 
-    def _level_rank(level: str) -> int:
-        return 0 if level == "good" else (1 if level == "bad" else 2)
-
-    patterns.sort(key=lambda p: _level_rank(p["level"]))
+    patterns.sort(key=lambda pattern: pattern["level"] != "good")
     return patterns
 
 

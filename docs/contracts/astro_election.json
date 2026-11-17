@@ -3,6 +3,7 @@
     "calendar_input": "Date labels use the explicit question_calendar/candidate_calendar, default proleptic Gregorian. Read calendar_conversion and analysis_context.input_calendar/input_date before explaining normalized datetimes. Julian dates use CE Jan1 years; do not infer regional reforms, March25 years or historical LMT/LAT. With explicit noon hour origin, retain raw calendar labels and read clock_conversion.hour_origin_conversion for the final canonical wall date; validate range after nominal day carry.",
     "candidate_inputs": "Use the recorded candidate instant, timezone and coordinates; this is not an interval-wide optimum search.",
     "clock_input": "Use explicit candidate_clock_basis only from confirmed clock evidence: civil / local_mean_solar / local_apparent_solar. Solar bases must omit/null timezone_name; civil omission preserves the legacy +08:00 default, not evidence of a known zone. Read clock_conversion with calendar_conversion: first normalize date labels, then resolve the declared clock to TT/UT1. Geocentric LAT is not a topocentric sundial reconstruction. Before1960 UTC-named carriers denote UT1 model labels. Never infer an original clock from ASC fit or outcome; numerical residual is not record accuracy.",
+    "clock_seconds": "Use candidate_second only for confirmed whole-second labels0..59; omitted defaults to0. Do not invent unknown seconds. calendar_conversion.input_clock and clock_conversion.hour_origin_conversion.input_clock preserve the second through date/noon normalization; input_granularity=second describes supported labels, not historical accuracy. Fractional seconds and directly supplied second60 are unsupported; solar inversion can still return a separately identified UTC leap-second label without truncation.",
     "evidence_boundary": "Read calculation_conditions together: native lunar events, physical axes, solar policy, factors, nullable score and unresolved contributions.",
     "hour_origin": "Use candidate_hour_origin=noon only for confirmed noon-based clock-hour labels such as Lilly1647 pp30-31 ephemeris tables. Default midnight preserves modern labels. Noon0=same-date12:00; noon12..23=next-date00:00..11:00. Read clock_conversion.hour_origin_conversion, raw calendar date/clock, and canonical candidate_datetime together. Calendar-normalized_local_datetime is a raw hour label and can be null for an unrepresentable intermediate date rescued by the carry; final wall time is separate. This is not physical elapsed duration, a timezone/EOT/JD offset, a house-table coordinate, a regional reform or proof of LMT/LAT. Do not infer the author's convention from a fitted chart. Apply declared hour origin before civil zone/DST validation or solar-clock inversion.",
     "incomplete_score": "A null score is incomplete, not zero; score_bounds cover only declared unknown weights, not confidence or outcome probability.",
@@ -17,6 +18,7 @@
         "election.calculation_basis",
         "election.planets",
         "election.axes",
+        "election.marriage_significators",
         "election.moon",
         "election.ascendant",
         "election.solar_condition_policy",
@@ -30,7 +32,7 @@
         "election.verdict",
         "election.recommendation"
       ],
-      "purpose": "Native TT lunar events and named physical axes, not house-cusp substitutes. Keep nullable score/hard status and fixed-policy bounds with unknown factor reasons. Solar states use selected Lilly1647 p113 definitions; old score weights/bands remain uncalibrated product policy, not full source judgement or outcome probability.",
+      "purpose": "Read native TT lunar events, named physical axes, nullable score/hard status and unresolved ranges. For marriage, also read the separately sourced p175 house rulers, natural/lunar roles and finite event history with selected-method, geometry and contact-order qualification; they add no score and do not establish complete judgement. Solar states retain the selected Lilly1647 p113 definitions; weights/bands remain uncalibrated product policy.",
       "when": "按明确候选时刻核对择日的原生月亮事件、太阳状态、物理ASC/MC、已知因子与未核算项；完整分数缺失时先读范围及原因。"
     },
     "calendar_input": {
@@ -54,7 +56,7 @@
         "election.calculation_basis.julian_day_tt",
         "election.calculation_basis.julian_day_ut1"
       ],
-      "purpose": "核对已确认的民用／地方平太阳／地心视太阳钟时、历法转换次序及同一物理TT/UT1；未知原书钟时不拟合，数值残差不充当史料精度。"
+      "purpose": "核对已确认的整秒钟面、民用／地方平太阳／地心视太阳时、历法与正午进位及同一物理TT/UT1；省略秒沿用0不代表记录精度，不拟合未知原书钟时。"
     },
     "data_files": {
       "fields": [
@@ -185,6 +187,13 @@
         "description": "Month of the candidate moment (1-12)",
         "maximum": 12,
         "minimum": 1,
+        "type": "integer"
+      },
+      "candidate_second": {
+        "default": 0,
+        "description": "Confirmed whole second of the candidate clock label (0-59); omitted defaults to0. Fractional seconds and second60 are unsupported. Input resolution does not certify the original record's accuracy.",
+        "maximum": 59,
+        "minimum": 0,
         "type": "integer"
       },
       "candidate_year": {

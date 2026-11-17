@@ -13,15 +13,12 @@ import fatebridge.api as api
 from fatebridge.application.examples import suggested_fields
 from fatebridge.cli import run
 from fatebridge.core.metaphysics.taiyi_month import (
-    DEFAULT_MONTH_PROFILE,
     jinjing_month_origin,
 )
 from fatebridge.mcp_server import create_mcp_app
-from fatebridge.services.metaphysics import calculate_taiyi_analysis
 from fatebridge.services.tool_catalog import CATALOG
 from scripts.taiyi.audit_taiyi_lunation_chain import (
     CORPUS,
-    ROOT,
     audit,
     serial_lunations,
     verify_sources,

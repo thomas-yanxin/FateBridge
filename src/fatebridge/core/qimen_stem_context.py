@@ -7,7 +7,26 @@ never selected by a desired pattern or a known outcome.
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, TypedDict
+
+
+class CandidateOutcome(TypedDict):
+    matched_across_candidates: bool | None
+    all_candidate_palaces: list[str]
+    any_candidate_palaces: list[str]
+
+
+def compare_candidate_palaces(matches: list[list[str]]) -> CandidateOutcome:
+    """Compare the supplied policies without adopting a stem or a source."""
+    return {
+        "matched_across_candidates": (
+            True if all(matches) else None if any(matches) else False
+        ),
+        "all_candidate_palaces": [
+            name for name in matches[0] if all(name in row for row in matches[1:])
+        ],
+        "any_candidate_palaces": list(dict.fromkeys(p for row in matches for p in row)),
+    }
 
 
 def build_stem_context(
@@ -57,6 +76,12 @@ def build_stem_context(
             "status": "unresolved_jia_identity",
             "effective_stem": None,
             "candidates": candidates,
+            "candidate_outcomes": {
+                rule: compare_candidate_palaces(
+                    [c["candidate_matches"][rule] for c in candidates]
+                )
+                for rule in ("hidden_day_stem", "flying_day_stem")
+            },
             "adopted_candidate": None,
             "note": "所核原例对日甲及宫数有差异；仅比较日甲本身藏仪与时旬藏仪候选，不据匹配结果自动选法，也不据未正式输出格局判定不存在。",
         }

@@ -94,7 +94,7 @@ def test_natal_point_receipt_tracks_actual_models(case, monkeypatch, tmp_path):
     if mode == "controlled_saturn_approximation":
         assert "近似参考点：Saturn" in p["note_zh"]
         assert result["chart_profile"]["planetary_models"]["Saturn"] == (
-            "fatebridge_approximate_orbital_model"
+            "bounded_de441_earth_moon_planetary_fallback_v9"
         )
     else:
         assert result["chart_profile"]["ephemeris_model"] == mode

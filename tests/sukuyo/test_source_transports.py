@@ -10,6 +10,8 @@ from tests.sukuyo.test_sukuyo_transports import (
 @pytest.mark.parametrize("part", [None, "first_half", "second_half"])
 def test_conditional_mansion_days_across_all_surfaces(monkeypatch, capsys, part):
     payload = {
+        "lat": "31n13",
+        "lon": "121e28",
         "date": "2024-08-04",
         "time": "09:00:00",
         "zone": "+08:00",
@@ -43,6 +45,8 @@ def test_whole_day_lists_across_actual_transports(monkeypatch, capsys, date):
         capsys,
         "suzhan",
         {
+            "lat": "31n13",
+            "lon": "121e28",
             "date": date,
             "time": "06:30:00",
             "zone": "+08:00",
@@ -73,6 +77,8 @@ def test_critical_source_context_across_rest_mcp_cli(
     monkeypatch, capsys, part, date, reference
 ):
     payload = {
+        "lat": "31n13",
+        "lon": "121e28",
         "date": date,
         "time": "12:00:00",
         "zone": "+08:00",
@@ -146,6 +152,8 @@ def test_sukuyo_lingbi_reference_across_actual_transports(
         capsys,
         "suzhan",
         {
+            "lat": "31n13",
+            "lon": "121e28",
             "date": date,
             "time": "06:30:00",
             "zone": zone,
@@ -169,6 +177,8 @@ def test_sukuyo_pair_comparison_across_actual_transports(monkeypatch, capsys, da
         capsys,
         "suzhan",
         {
+            "lat": "31n13",
+            "lon": "121e28",
             "date": date,
             "time": "06:30:00",
             "zone": "+08:00",
@@ -195,6 +205,8 @@ def test_sukuyo_printed_clock_across_actual_transports(
         capsys,
         "suzhan",
         {
+            "lat": "31n13",
+            "lon": "121e28",
             "date": date,
             "time": "12:00:00",
             "zone": zone,
@@ -218,6 +230,8 @@ def test_sukuyo_enpo_reference_across_actual_transports(monkeypatch, capsys, dat
         capsys,
         "suzhan",
         {
+            "lat": "31n13",
+            "lon": "121e28",
             "date": date,
             "time": "06:30:00",
             "zone": "+08:00",
@@ -238,6 +252,8 @@ def test_local_surfaces_keep_old_capture_new_followup_and_half_condition(
     monkeypatch, capsys, part
 ):
     payload = {
+        "lat": "31n13",
+        "lon": "121e28",
         "date": "1903-06-25",
         "time": "12:00:00",
         "zone": "+08:00",
@@ -268,6 +284,8 @@ def test_quotation_comparison_across_actual_transports(monkeypatch, capsys, date
         capsys,
         "suzhan",
         {
+            "lat": "31n13",
+            "lon": "121e28",
             "date": date,
             "time": "12:00:00",
             "zone": "+08:00",
@@ -291,6 +309,8 @@ def test_research_direction_reference_across_actual_transports(
         capsys,
         "suzhan",
         {
+            "lat": "31n13",
+            "lon": "121e28",
             "date": date,
             "time": "12:00:00",
             "zone": "+08:00",
@@ -308,6 +328,8 @@ def test_research_direction_reference_across_actual_transports(
 def test_printed_collation_across_actual_transports(monkeypatch, capsys, date):
     suffix = "calendar_day.clock_doctrine.source_specific_time_calibration.daybreak_source_comparison.T2217_printed_collation"
     payload = {
+        "lat": "31n13",
+        "lon": "121e28",
         "date": date,
         "time": "12:00:00",
         "zone": "+08:00",
@@ -324,6 +346,8 @@ def test_zhidu_context_across_actual_transports(monkeypatch, capsys, date):
         capsys,
         "suzhan",
         {
+            "lat": "31n13",
+            "lon": "121e28",
             "date": date,
             "time": "12:00:00",
             "zone": "+08:00",

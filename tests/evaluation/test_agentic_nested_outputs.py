@@ -11,7 +11,6 @@ from jsonschema import Draft202012Validator
 from jsonschema import ValidationError as SchemaError
 from pydantic import ValidationError
 
-import fatebridge.api as api
 import fatebridge.application.execution as execution
 import fatebridge.mcp_server as mcp
 from fatebridge.cli import run as cli_run
@@ -33,7 +32,7 @@ from tests.support.transports import (
 @pytest.mark.parametrize("key", list(SPECS))
 def test_current_unrounded_business_validates_without_mutation(key, current_business):
     spec = SPECS[key]
-    payload = current_business[key]
+    payload = current_business(key)
     before = copy.deepcopy(payload)
     spec.output_model.model_validate(payload, context={"full_result": True})
     Draft202012Validator(spec.output_model.model_json_schema()).validate(payload)
@@ -427,6 +426,8 @@ def test_retired_astro_input_is_rejected_on_all_surfaces(
     assert protocol.is_error
     assert code != 0 and "error" in output
     assert retired not in spec.request_model.model_json_schema()["properties"]
+    for output in (http.json(), protocol.structured_content, output):
+        assert any(issue["code"] == "extra_forbidden" for issue in output["issues"])
 
 
 @pytest.mark.parametrize(

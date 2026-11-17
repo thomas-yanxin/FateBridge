@@ -35,7 +35,7 @@ TOPIC_BLOCKS: dict[str, dict[str, str]] = {
         "career_structure": "score score_kind scope formation_status rule_signals unverified_conditions interpretation_scope score_basis level notes",
         "entrepreneurship": "score weighted_counts partial_star_weight normal_star_weight score_kind scope formation_status rule_signals unverified_conditions score_basis tendency notes",
         "career_timing": "timing_signals",
-        "noble_direction": "favorable_directions conditional_elements reference_scope mapping_status",
+        "noble_direction": "favorable_directions preference_status conditional_elements reference_scope mapping_status",
     },
     "wealth": {
         "wealth_stars": "positions zheng_wealth_weight pian_wealth_weight total_weight visibility",
@@ -62,7 +62,7 @@ TOPIC_BLOCKS: dict[str, dict[str, str]] = {
         "study_stars": "seal_weight food_hurt_weight officer_weight wealth_weight",
         "education_level": "score score_kind assessment_status score_basis tier notes",
         "wenchang": "wenchang_branch hit_pillars has_wenchang note",
-        "subject_orientation": "inclination favorable_fields conditional_elements reference_scope assessment_status",
+        "subject_orientation": "inclination favorable_fields preference_status conditional_elements reference_scope assessment_status",
         "exam_timing": "timing_signals assessment_status",
     },
     "personality": {
@@ -177,7 +177,6 @@ def _force(value: Any) -> None:
         "method_id source components source_root_observations engineering_composition classical_adjudication scope limitations",
     )
     _keys(f["source"], "id title url")
-    _keys(f["classical_adjudication"], "body_strength seal_weight body_seal_relation")
     composition = _keys(
         f["engineering_composition"],
         "status ratio_basis strength_method_id strength_level support_share body_within_support_share body_seal_energy_relation quantity_kind",
@@ -310,7 +309,7 @@ def _evidence(value: Any, *, topic: str | None) -> None:
     )
     _keys(
         e["strength_context"],
-        "strength_level method_id status root_effect_policy root_qualifications stem_energy_accounting clash_comparison storage_movement_effects",
+        "strength_level engineering_index classical_adjudication method_id status root_effect_policy root_qualifications stem_energy_accounting clash_comparison storage_movement_effects",
     )
     _force(e["force_components"])
     _passage(e["classical_passage"])
@@ -393,16 +392,34 @@ def require_complete_bazi_anchors(key: str, result: dict[str, Any]) -> None:
         pillars = _keys(r["four_pillars"], "year month day hour")
         for name in POSITIONS:
             _keys(pillars[name], "stem branch")
-        dm = _keys(r["day_master"], "stem element polarity strength assessment")
+        dm = _keys(
+            r["day_master"],
+            "stem element polarity strength engineering_index classical_adjudication assessment",
+        )
         _keys(
             dm["assessment"],
-            "method_id status strength_level hidden_stem_ledger effective_elements_unrounded stem_energy_accounting relations month_command",
+            "method_id status strength_level engineering_index hidden_stem_ledger effective_elements_unrounded stem_energy_accounting relations month_command",
         )
+        if (
+            not (
+                dm["strength"]
+                == dm["engineering_index"]["strength_level"]
+                == dm["assessment"]["strength_level"]
+            )
+            or dm["engineering_index"] != dm["assessment"]["engineering_index"]
+        ):
+            raise ValueError("日主工程索引必须与同次assessment的政策档及原索引一致")
         profile = _keys(
             r["structure_profile"],
-            "resolution_policy dominant_structure candidate_selection from_child_reference evidence_chain",
+            "resolution_policy assessment_status engineering_reference engineering_harmony_effects harmony_effects harmony_effects_status classical_adjudication dominant_structure candidate_selection from_child_reference evidence_chain",
         )
         _evidence(profile["evidence_chain"], topic=None)
+        if not (
+            dm["classical_adjudication"]
+            == profile["classical_adjudication"]
+            == profile["evidence_chain"]["strength_context"]["classical_adjudication"]
+        ):
+            raise ValueError("日主、取用与证据必须复用同次原典力量裁定")
     else:
         topic = key.removeprefix("bazi_")
         r = _keys(

@@ -118,32 +118,6 @@ def test_stable_vector_identities_retain_exact_small_separations():
         assert service.norm(service.cross(q, e)) > 0
 
 
-def test_checked_frame_rotation_preserves_a_known_proper_rotation():
-    service = reduction()
-    axes = [[Decimal(int(i == j)) for i in range(3)] for j in range(3)]
-    turned = [axes[1], [-v for v in axes[0]], axes[2]]
-    value, error = service.rotate(
-        [Decimal(2), Decimal(3), Decimal(5)], list(zip(axes, turned))
-    )
-    assert value == [Decimal(-3), Decimal(2), Decimal(5)]
-    assert error == 0
-
-
-@pytest.mark.parametrize("fault", ["singular", "reflected", "sheared"])
-def test_bad_frame_basis_never_authorizes_a_rate(fault):
-    service = reduction()
-    axes = [[Decimal(int(i == j)) for i in range(3)] for j in range(3)]
-    fixed, shown = axes, [row[:] for row in axes]
-    if fault == "singular":
-        fixed = [axes[0], axes[0], axes[2]]
-    elif fault == "reflected":
-        shown[0] = [-v for v in shown[0]]
-    else:
-        shown[1][0] = Decimal(1)
-    with pytest.raises(EphemerisSourceError):
-        service.rotate(axes[0], list(zip(fixed, shown)))
-
-
 def setup_source():
     swe = runtime.swe
     epoch = 2451673.659770648

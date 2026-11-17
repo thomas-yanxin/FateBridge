@@ -11,6 +11,7 @@ from typing import Any, Callable
 from .liuyao_activity import activity_candidate, activity_condition
 from .liuyao_month_break import month_opposition_applies
 from .liuyao_relations import ELEMENTS, branch_facts, element_relation, xunkong
+from .liuyao_stages import PHASES
 
 SCAN: dict[str, Any] = json.loads(
     files("fatebridge.data")
@@ -28,10 +29,6 @@ def scan_profile() -> dict[str, Any]:
     return deepcopy(SCAN)
 
 
-def _active(row: dict[str, Any], condition: dict[str, Any]) -> bool:
-    return activity_candidate(row, condition)
-
-
 def build_three_harmony(
     *,
     lines: list[dict[str, Any]],
@@ -42,7 +39,10 @@ def build_three_harmony(
     focus: dict[str, Any] | None,
     stages: dict[str, dict[str, str]],
 ) -> dict[str, Any]:
-    active = {r["position"]: _active(r, conditions[r["position"] - 1]) for r in lines}
+    active = {
+        r["position"]: activity_candidate(r, conditions[r["position"] - 1])
+        for r in lines
+    }
     day, void = day_ganzhi[1], xunkong(day_ganzhi)
     candidates: list[dict[str, Any]] = []
 
@@ -278,7 +278,7 @@ def build_hidden_conditions(
     generation_conditions: dict[str, Any] | None = None,
 ) -> list[dict[str, Any]]:
     day, void = day_ganzhi[1], xunkong(day_ganzhi)
-    moving = [r for r in lines if _active(r, conditions[r["position"] - 1])]
+    moving = [r for r in lines if activity_candidate(r, conditions[r["position"] - 1])]
     calendar = [
         {"location": "month", "branch": month},
         {"location": "day", "branch": day},
@@ -382,6 +382,10 @@ def build_hidden_conditions(
             for loc, b in (("month", month), ("day", day), ("flying", fly))
             if stages[ELEMENTS[branch]].get(b) in ("墓", "绝")
         ]
+        stage_gaps = {
+            e: [p for p in PHASES if p not in stages[e].values()]
+            for e in dict.fromkeys((ELEMENTS[branch], ELEMENTS[fly]))
+        }
         weak_flying = []
         if fly_facts["is_xunkong"]:
             weak_flying.append("旬空")
@@ -489,11 +493,11 @@ def build_hidden_conditions(
             condition(
                 "hidden_tomb_cessation",
                 "伏神墓绝于日月飞爻",
-                bool(hidden_tombs) if ELEMENTS[branch] != "火" else None,
+                None if stage_gaps[ELEMENTS[branch]] else bool(hidden_tombs),
                 hidden_tombs,
                 (
                     "table_gap_or_relation"
-                    if ELEMENTS[branch] == "火"
+                    if stage_gaps[ELEMENTS[branch]]
                     else "position_relation_only"
                 ),
                 "墓绝位关系不直接等于入墓真绝",
@@ -515,11 +519,11 @@ def build_hidden_conditions(
                 "flying_monthly_strength": flying_monthly,
                 "supporting_conditions": supports,
                 "obstructing_conditions": obstructions,
-                "table_gaps": (
-                    ["火的帝旺、绝四位表未完成校勘"]
-                    if ELEMENTS[branch] == "火" or ELEMENTS[fly] == "火"
-                    else []
-                ),
+                "table_gaps": [
+                    f"{e}四位表缺{'、'.join(gaps)}"
+                    for e, gaps in stage_gaps.items()
+                    if gaps
+                ],
                 "adjudication": "requires_total_strength_and_interaction_resolution",
                 "source_url": scan_url(110),
                 "scope": "六项支持、五项阻碍分别取证；不以数量相减断能否出伏，也不把有支持条件直接作吉断。",

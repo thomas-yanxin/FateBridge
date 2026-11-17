@@ -13,6 +13,7 @@ from fatebridge.core.metaphysics.liureng_life_stages import (
     build_life_stages,
     life_stage_cycle,
 )
+from fatebridge.core.public_output import same_public_value
 from tests.evaluation.test_agentic_nested_outputs import (
     test_nested_fact_faults_are_internal_failures_on_all_surfaces as reject_fault,
 )
@@ -156,13 +157,16 @@ def test_actual_stages_and_corrected_snapshot_across_three_transports(
     assert http.status_code == 200 and code == 0 and not protocol.is_error
     bodies = [http.json(), cli, protocol.structured_content]
     assert business(bodies[0]) == business(bodies[1]) == business(bodies[2])
+    fn, args, kwargs = spec.bind(spec.request_model.model_validate(payload))
+    expected = fn(*args, **kwargs)["liureng"]["life_stages"]
+    assert expected["source_sha256"] == REFERENCE["source_sha256"]
     for body in bodies:
         spec.output_model.model_validate(body)
         board = body["liureng"]
         life = board["life_stages"]
         assert life["day_stem"] == "己" and life["direction"] == "逆"
         assert life["changsheng_branch"] == "酉" and life["tomb_branch"] == "丑"
-        assert life["source_sha256"] == REFERENCE["source_sha256"]
+        assert same_public_value(life, expected)
         assert board["month_building_element"] == "土"
         for label in ("initial", "middle", "final"):
             t = board["three_transmissions"][label]

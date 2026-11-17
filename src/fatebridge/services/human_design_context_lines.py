@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from collections import Counter
 from copy import deepcopy
-from hashlib import sha256
 
 from fatebridge.core import human_design_knowledge as knowledge
 from fatebridge.core.human_design_context_lines import (
@@ -13,14 +12,10 @@ from fatebridge.core.human_design_context_lines import (
     subdivision_changes,
     unavailable_contexts,
 )
-from fatebridge.core.human_design_line_catalogue import _canonical
 from fatebridge.core.human_design_line_reading import _compose
 from fatebridge.core.human_design_references import coherent_human_design_references
 from fatebridge.services.human_design_line_reading import build_human_design_line_packet
-
-
-def _digest(value: object) -> str:
-    return sha256(_canonical(value)).hexdigest()
+from fatebridge.utils.json_digest import digest
 
 
 def build_human_design_context_packet(
@@ -121,7 +116,7 @@ def build_human_design_context_packet(
                 dependencies["reference_catalogue_content_sha256"] = provenance[
                     "source_catalogue_content_sha256"
                 ]
-            group_id = _digest(dependencies)
+            group_id = digest(dependencies)
             if group_id not in groups:
                 # Compose from the dependency projection itself: fine subdivisions
                 # cannot silently affect a supposedly shared reading.
@@ -199,7 +194,7 @@ def build_human_design_context_packet(
             context.update(
                 context_index=len(contexts),
                 line_reading_group_id=group_id,
-                chart_sha256=_digest(chart),
+                chart_sha256=digest(chart),
                 subdivision_changes_from_nominal=subdivision_changes(source, chart),
             )
             contexts.append(context)

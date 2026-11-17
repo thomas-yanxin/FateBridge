@@ -5,27 +5,37 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
+
 from fatebridge.core import guolao_moira
+from tests.support.transports import SPECS, business, rest, surface_calls
 
 _FIXTURE = Path(__file__).resolve().parents[1] / "data/guolao/moira_palace_inputs.json"
-_CASES = json.loads(_FIXTURE.read_text(encoding="utf-8"))
 
 
-def test_oracle_fixture_is_nonempty():
-    assert _CASES, "guolaoMoira oracle fixture must contain cases"
+@pytest.fixture(scope="module")
+def moira_cases():
+    return json.loads(_FIXTURE.read_text(encoding="utf-8"))
 
 
-def test_good_patterns_sort_before_bad():
+@pytest.mark.local_data
+def test_oracle_fixture_is_nonempty(moira_cases):
+    assert moira_cases, "guolaoMoira oracle fixture must contain cases"
+
+
+@pytest.mark.local_data
+def test_good_patterns_sort_before_bad(moira_cases):
     """build order: good first, bad after (matches JS level sort)."""
-    for case in _CASES:
+    for case in moira_cases:
         patterns = guolao_moira.calculate(case["facts"])
         ranks = [0 if p["level"] == "good" else 1 for p in patterns]
         assert ranks == sorted(ranks), case["label"]
 
 
-def test_god_dependent_patterns_inert_without_gods():
+@pytest.mark.local_data
+def test_god_dependent_patterns_inert_without_gods(moira_cases):
     """日月拱贵人 / 命登岁驾 stay inert when 神煞 positions are absent (oracle cases)."""
-    for case in _CASES:
+    for case in moira_cases:
         names = {p["name"] for p in guolao_moira.calculate(case["facts"])}
         assert "日月拱贵人" not in names
         assert "命登岁驾" not in names
@@ -46,6 +56,19 @@ def test_purple_clouds_matches_horosa_fixtures():
         assert (
             abs(delta) < 0.01
         ), f"jd={jd}: 紫炁 {got} vs horosa {expected} (Δ={delta})"
+
+
+def test_purple_clouds_matches_pinned_horosa_source_controls():
+    # Actual pcLon execution at10fb75de, kept independently of FateBridge.
+    # https://github.com/Horace-Maxwell/Horosa-Web-App-comprehensively-improved-MacOS/blob/10fb75de980bb0a6e0d1f50c7ee93cc97a88d7de/Horosa-Web/flatlib-ctrad2/flatlib/ephem/tools.py
+    controls = [
+        (1721425.5, 47.29638140791576),
+        (2415020.5, 343.0135251475258),
+        (2451544.5, 188.7201016913959),
+        (5373449.5, 84.71819983005116),
+    ]
+    for jd, expected in controls:
+        assert guolao_moira.purple_clouds_longitude(jd) == expected
 
 
 def test_si_yu_sign_index_matches_horosa_chart():
@@ -85,14 +108,121 @@ def test_gu_yue_du_ming_counts_purple_clouds():
     }
     # 月独居（炁不在月宫）→ 点亮
     alone = guolao_moira.calculate(
-        {"asc_lon": 75, "planet_signidx": {**base, "炁": 4}, "is_day": False}
+        {
+            "asc_lon": 75,
+            "planet_signidx": {**base, "炁": 4},
+            "is_day": False,
+            "is_winter": False,
+        }
     )
     assert any(p["name"] == "孤月独明" for p in alone)
     # 炁与月同宫(5) → 月不再独居 → 不点亮
     with_qi = guolao_moira.calculate(
-        {"asc_lon": 75, "planet_signidx": {**base, "炁": 5}, "is_day": False}
+        {
+            "asc_lon": 75,
+            "planet_signidx": {**base, "炁": 5},
+            "is_day": False,
+            "is_winter": False,
+        }
     )
     assert not any(p["name"] == "孤月独明" for p in with_qi)
+
+
+@pytest.mark.parametrize(
+    "day,winter,expected",
+    [
+        (False, False, [("孤月独明", "good")]),
+        (False, True, [("寒月单行", "bad")]),
+        (True, False, []),
+        (True, True, [("寒月单行", "good")]),
+        (None, True, []),
+        (False, None, []),
+    ],
+)
+def test_moon_solitude_matches_original_moira_seasonal_rules(day, winter, expected):
+    # Executed unmodified Moira1.50Final RuleEntry/RuleParse and three original
+    # moon rules at9bb126fd. Its winter-night rule rejects the generic good one.
+    planets = dict(zip("日月金木水火土计罗炁孛", range(11)))
+    patterns = guolao_moira.calculate(
+        {
+            "planet_signidx": planets,
+            "life_sign_idx": 0,
+            "god_signidx": {"岁驾": 0},
+            "is_day": day,
+            "is_winter": winter,
+        }
+    )
+    levels = [p["level"] != "good" for p in patterns]
+    assert levels == sorted(levels)
+    assert any(p["name"] == "命登岁驾" for p in patterns)
+    moon = [p for p in patterns if p["name"] in {"孤月独明", "寒月单行"}]
+    assert [(p["name"], p["level"]) for p in moon] == expected
+    for pattern in moon:
+        assert pattern["source"].endswith(
+            "9bb126fd84997aa26fed6e91b4bdf438fceb0e38/moira_s.prop"
+        )
+        assert pattern["evidence"]["inputs"]["is_winter"] is winter
+
+
+@pytest.mark.parametrize("tool", ["astro_guolao", "astro_chart"])
+@pytest.mark.parametrize("hour,level", [(0, "bad"), (12, "good")])
+def test_cold_moon_rule_reaches_all_three_transports(tool, hour, level, surface_calls):
+    # Synthetic J2000 date, selected after confirming all11positions and the
+    # actual solar conditions. This checks source rule composition/delivery,
+    # not independent absolute astronomy or prediction efficacy.
+    inputs = {
+        "birth_year": 2000,
+        "birth_month": 1,
+        "birth_day": 1,
+        "birth_hour": hour,
+        "birth_minute": 0,
+        "birth_timezone": "UTC",
+        "birth_longitude": 0,
+        "birth_latitude": 51.5,
+    }
+    if tool == "astro_chart":
+        inputs["chart_variant"] = "guolao_chart"
+    fields = [
+        "guolao.moira_patterns",
+        "guolao.conditions",
+        "guolao.profile.pattern_model_id",
+        "guolao.rule_trace",
+    ]
+    response, protocol, code, cli = surface_calls(
+        SPECS[tool],
+        inputs,
+        params=[("fields", f) for f in fields]
+        + [
+            ("strict_fields", "true"),
+            ("include_snapshot_text", "false"),
+        ],
+        options={
+            "fields": fields,
+            "strict_fields": True,
+            "include_snapshot_text": False,
+        },
+        flags=["--fields", *fields],
+    )
+    assert response.status_code == 200, response.text
+    assert code == 0 and not protocol.is_error
+    outputs = [response.json(), protocol.structured_content, cli]
+    assert business(outputs[0]) == business(outputs[1]) == business(outputs[2])
+    result = outputs[0]["guolao"]
+    assert result["conditions"]["season"] == "冬"
+    assert result["conditions"]["is_day"] == (hour == 12)
+    patterns = result["moira_patterns"]
+    moon = [p for p in patterns if p["name"] in {"孤月独明", "寒月单行"}]
+    assert [(p["name"], p["level"]) for p in moon] == [("寒月单行", level)]
+    assert not moon[0]["classical_acceptance"]
+    trace = next(
+        t
+        for t in result["rule_trace"]
+        if t["rule_id"] == "moira_conditions_with_seasonal_moon_v3"
+    )
+    witness = next(
+        p for p in trace["outputs"]["matched_patterns"] if p["name"] == "寒月单行"
+    )
+    assert witness["source"] == moon[0]["source"]
 
 
 def test_god_patterns_fire_when_positions_supplied():
@@ -115,10 +245,11 @@ def test_god_patterns_fire_when_positions_supplied():
     assert any(p["name"] == "日月拱贵人" for p in gongguiren)
 
 
-def test_section_text_format():
+@pytest.mark.local_data
+def test_section_text_format(moira_cases):
     """build_section_text mirrors runGuolaoMoira: 喜格/忌格 lines, 名（detail）；-joined."""
     # multi-fire case is index 0
-    patterns = guolao_moira.calculate(_CASES[0]["facts"])
+    patterns = guolao_moira.calculate(moira_cases[0]["facts"])
     text = guolao_moira.build_section_text(patterns)
     lines = text.split("\n")
     assert lines[0].startswith("喜格：")

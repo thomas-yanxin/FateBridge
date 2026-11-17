@@ -7,7 +7,6 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core import heluo
 from fatebridge.core import heluo_texts as ht
 from fatebridge.core.heluo import _tiaowen, transform_houtian, yao_text
 from fatebridge.core.heluo_timing import _selected_text

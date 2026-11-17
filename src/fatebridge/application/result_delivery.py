@@ -16,6 +16,7 @@ from pydantic import JsonValue
 
 from fatebridge.core.public_output import public_payload
 from fatebridge.utils.errors import ParameterError
+from fatebridge.utils.formatting import format_json_response
 from fatebridge.utils.private_files import (
     default_result_directory,
     ensure_private_directory,
@@ -40,21 +41,13 @@ def _invalid(message: str, path: str, code: str) -> ParameterError:
     return ParameterError(message, [{"path": path, "code": code}])
 
 
-def _json(value: Any, compact: bool = True) -> str:
-    return json.dumps(
-        value,
-        ensure_ascii=False,
-        **({"separators": (",", ":")} if compact else {"indent": 2}),
-    )
-
-
 class ResultStore:
     """Private, process-safe immutable artifacts with indexed character pages.
 
     The JSON record exposes its result at ``file_payload_path=payload``.
-    Small sidecars hold receipts and UTF-8 byte positions at character boundaries;
-    pages never deserialize or hash the complete result. Field sidecars point into
-    that same JSON record, rather than copying or caching personal result bodies.
+    Small sidecars hold run identities and UTF-8 byte positions. Ordinary pages
+    never deserialize or hash the complete result or receipt. Field and receipt
+    spans point into the same JSON record, without copying personal result bodies.
     """
 
     def __init__(self, directory: Optional[Path] = None) -> None:
@@ -232,23 +225,41 @@ class ResultStore:
     def _store_main(
         self, result_id: str, payload: Dict[str, Any], expires_at: float
     ) -> Dict[str, Any]:
-        text = _json(payload)
+        text = format_json_response(payload)
         encoded = text.encode("utf-8")
-        prefix = ('{"expires_at":' + _json(expires_at) + ',"payload":').encode()
+        prefix = (
+            '{"expires_at":' + format_json_response(expires_at) + ',"payload":'
+        ).encode()
+        run = payload.get("run_metadata") or {}
+        receipt_offset = None
+        receipt_bytes = 0
+        offset = len(prefix) + 1
+        for key, value in payload.items():
+            offset += len(format_json_response(key).encode("utf-8")) + 1
+            if key == "run_metadata":
+                receipt_offset = offset
+                receipt_bytes = len(format_json_response(value).encode("utf-8"))
+                break
+            offset += len(format_json_response(value).encode("utf-8")) + 1
         metadata = {
-            "format": 2,
+            "format": 3,
             "expires_at": expires_at,
             "body_offset": len(prefix),
             "total_chars": len(text),
             "total_bytes": len(encoded),
             "sha256": hashlib.sha256(encoded).hexdigest(),
-            "run_metadata": payload.get("run_metadata"),
+            "run_id": run.get("run_id"),
+            "tool_name": run.get("tool_name"),
+            "receipt_offset": receipt_offset,
+            "receipt_bytes": receipt_bytes,
             "available_fields": list(payload),
         }
         files = {
             self._path(result_id, "idx"): self._index(text),
             self._path(result_id): prefix + encoded + b"}",
-            self._path(result_id, "meta"): _json(metadata).encode("utf-8"),
+            self._path(result_id, "meta"): format_json_response(metadata).encode(
+                "utf-8"
+            ),
         }
         if sum(map(len, files.values())) > MAX_STORED_BYTES:
             raise _invalid(
@@ -285,7 +296,7 @@ class ResultStore:
             else published_directory / f"{result_id}.meta"
         )
         metadata = self._read_json(sidecar)
-        if metadata.get("format") != 2:
+        if metadata.get("format") != 3:
             raise _invalid("结果引用格式不受支持", "result_id", "result_unavailable")
         self._check_expiry(
             result_id, metadata, remove_expired=published_directory is None
@@ -296,13 +307,56 @@ class ResultStore:
             or not re.fullmatch(r"[0-9a-f]{64}", metadata["sha256"])
             or not isinstance(metadata.get("available_fields"), list)
             or not all(isinstance(name, str) for name in metadata["available_fields"])
-            or not (
-                metadata.get("run_metadata") is None
-                or isinstance(metadata["run_metadata"], dict)
+            or any(
+                key not in metadata
+                or not (metadata[key] is None or isinstance(metadata[key], str))
+                for key in ("run_id", "tool_name")
+            )
+            or type(metadata.get("receipt_bytes")) is not int
+            or "receipt_offset" not in metadata
+            or metadata["receipt_bytes"] < 0
+            or (
+                metadata.get("receipt_offset") is None
+                and metadata["receipt_bytes"] != 0
+            )
+            or (
+                metadata.get("receipt_offset") is not None
+                and (
+                    type(metadata["receipt_offset"]) is not int
+                    or metadata["receipt_offset"] < metadata["body_offset"]
+                    or metadata["receipt_bytes"] == 0
+                    or metadata["receipt_offset"] + metadata["receipt_bytes"]
+                    > metadata["body_offset"] + metadata["total_bytes"]
+                )
             )
         ):
             raise _invalid("结果引用已损坏", "result_id", "result_unavailable")
         return metadata
+
+    def _receipt(
+        self,
+        result_id: str,
+        offset: int | None,
+        size: int,
+    ) -> dict[str, JsonValue] | None:
+        if offset is None:
+            return None
+        path = self._path(result_id)
+        try:
+            fd = open_private_file(path, os.O_RDONLY)
+            with os.fdopen(fd, "rb") as handle:
+                handle.seek(offset)
+                encoded = handle.read(size)
+            if len(encoded) != size:
+                raise ValueError("Incomplete result receipt")
+            run: object = json.loads(encoded)
+        except (OSError, ValueError, RuntimeError):
+            raise _invalid(
+                "结果引用已损坏", "result_id", "result_unavailable"
+            ) from None
+        if run is None or isinstance(run, dict):
+            return run
+        raise _invalid("结果引用已损坏", "result_id", "result_unavailable")
 
     def put(self, payload: Dict[str, Any]) -> Dict[str, Any]:
         payload = public_payload(payload)
@@ -361,7 +415,7 @@ class ResultStore:
         if allowed_tools is not None:
             self._check_scope(metadata, allowed_tools)
         payload = self._record(result_id, published_directory=directory)["payload"]
-        encoded = _json(payload).encode("utf-8")
+        encoded = format_json_response(payload).encode("utf-8")
         actual_digest = hashlib.sha256(encoded).hexdigest()
         if actual_digest != metadata["sha256"]:
             raise _invalid(
@@ -372,8 +426,17 @@ class ResultStore:
             raise _invalid(
                 "结果不属于指定原 run", "expected_run_id", "result_run_mismatch"
             )
+        receipt_start = metadata["receipt_offset"]
+        receipt_matches = receipt_start is not None and encoded[
+            receipt_start
+            - metadata["body_offset"] : receipt_start
+            - metadata["body_offset"]
+            + metadata["receipt_bytes"]
+        ] == format_json_response(run).encode("utf-8")
         if (
-            run != metadata["run_metadata"]
+            run.get("run_id") != metadata["run_id"]
+            or run.get("tool_name") != metadata["tool_name"]
+            or not receipt_matches
             or metadata["total_bytes"] != len(encoded)
             or metadata["total_chars"] != len(encoded.decode("utf-8"))
             or metadata["available_fields"] != list(payload)
@@ -382,7 +445,7 @@ class ResultStore:
                 "结果与交付清单不一致", "result_id", "result_metadata_mismatch"
             )
         if allowed_tools is not None:
-            self._check_scope({"run_metadata": run}, allowed_tools)
+            self._check_scope(run, allowed_tools)
         value: Any = payload
         if path is not None:
             for part in path.split("."):
@@ -397,7 +460,7 @@ class ResultStore:
                     value = value[int(part)]
                 else:
                     raise _invalid("结果字段路径不存在", "path", "unknown_result_path")
-        text = _json(value)
+        text = format_json_response(value)
         if offset > len(text):
             raise _invalid("分页 offset 超出结果长度", "offset", "invalid_offset")
         end = min(offset + PAGE_CHARS, len(text))
@@ -425,9 +488,12 @@ class ResultStore:
             metadata = self._metadata(result_id)
             if allowed_tools is not None:
                 self._check_scope(metadata, allowed_tools)
+            run = self._receipt(
+                result_id, metadata["receipt_offset"], metadata["receipt_bytes"]
+            )
         return {
             "result_id": result_id,
-            "run_metadata": metadata["run_metadata"],
+            "run_metadata": run,
             "file_path": str(self._path(result_id)),
             "rest_manifest_path": f"/api/results/{result_id}",
             "first_page_uri": f"fatebridge://results/{result_id}/pages/0",
@@ -467,11 +533,13 @@ class ResultStore:
             byte_offset += 1  # opening object/array delimiter
             if isinstance(value, dict) and part in value:
                 for key, sibling in value.items():
-                    byte_offset += len(_json(key).encode("utf-8")) + 1
+                    byte_offset += len(format_json_response(key).encode("utf-8")) + 1
                     if key == part:
                         value = sibling
                         break
-                    byte_offset += len(_json(sibling).encode("utf-8")) + 1
+                    byte_offset += (
+                        len(format_json_response(sibling).encode("utf-8")) + 1
+                    )
             elif (
                 isinstance(value, list)
                 and part.isdecimal()
@@ -480,11 +548,13 @@ class ResultStore:
             ):
                 index = int(part)
                 for sibling in value[:index]:
-                    byte_offset += len(_json(sibling).encode("utf-8")) + 1
+                    byte_offset += (
+                        len(format_json_response(sibling).encode("utf-8")) + 1
+                    )
                 value = value[index]
             else:
                 raise _invalid("结果字段路径不存在", "path", "unknown_result_path")
-        text = _json(value)
+        text = format_json_response(value)
         field = {
             "body_offset": byte_offset,
             "total_chars": len(text),
@@ -492,7 +562,7 @@ class ResultStore:
         }
         files = {
             self._path(result_id, suffix + ".idx"): self._index(text),
-            sidecar: _json(field).encode("utf-8"),
+            sidecar: format_json_response(field).encode("utf-8"),
         }
         replaced = sum(path.stat().st_size for path in files if path.exists())
         self._prune(sum(map(len, files.values())) - replaced, keep_id=result_id)
@@ -578,7 +648,7 @@ class ResultStore:
 
     @staticmethod
     def _check_scope(metadata: Dict[str, Any], allowed_tools: set[str]) -> None:
-        if (metadata.get("run_metadata") or {}).get("tool_name") not in allowed_tools:
+        if metadata.get("tool_name") not in allowed_tools:
             raise ValueError("结果所属工具未在当前 MCP 配置中公开")
 
 
@@ -598,7 +668,7 @@ def bound_response(
             "response_char_limit",
             "invalid_response_limit",
         )
-    if len(_json(payload, compact)) <= response_char_limit:
+    if len(format_json_response(payload, compact=compact)) <= response_char_limit:
         return payload
     delivery = RESULT_STORE.put(payload)
     metadata = payload.get("run_metadata")
@@ -608,7 +678,10 @@ def bound_response(
     # the already-stored SAME run, without mutating the original receipt.
     if isinstance(metadata, dict):
         evidence = metadata.get("calculation_evidence")
-        if isinstance(evidence, dict) and len(_json(evidence, compact)) > 512:
+        if (
+            isinstance(evidence, dict)
+            and len(format_json_response(evidence, compact=compact)) > 512
+        ):
             path = "run_metadata.calculation_evidence"
             metadata = {
                 **metadata,
@@ -625,7 +698,7 @@ def bound_response(
             isinstance(runtime, dict)
             and isinstance(ephemeris, dict)
             and isinstance(files, list)
-            and len(_json(runtime, compact)) > 512
+            and len(format_json_response(runtime, compact=compact)) > 512
         ):
             path = "run_metadata.runtime"
             runtime_summary: dict[str, JsonValue] = {
@@ -671,9 +744,15 @@ def bound_response(
         }
         # Preserve the entire receipt whenever it fits. Supplementary fields
         # must not be deferred merely because that fallback is available.
-        if len(_json(complete_with_full_reference, compact)) <= response_char_limit:
+        if (
+            len(format_json_response(complete_with_full_reference, compact=compact))
+            <= response_char_limit
+        ):
             return complete_with_full_reference
-        if len(_json(complete_business, compact)) <= response_char_limit:
+        if (
+            len(format_json_response(complete_business, compact=compact))
+            <= response_char_limit
+        ):
             return complete_business
         # The first-page URI repeats the manifest URI plus '/pages/0'. Before
         # deferring any receipt facts, let the same manifest supply this one
@@ -685,7 +764,10 @@ def bound_response(
             **complete_business,
             "result_delivery": manifest_page_reference,
         }
-        if len(_json(complete_without_page_locator, compact)) <= response_char_limit:
+        if (
+            len(format_json_response(complete_without_page_locator, compact=compact))
+            <= response_char_limit
+        ):
             return complete_without_page_locator
         # Local file locators also duplicate the same immutable manifest. A
         # longer provenance list should not displace source facts while these
@@ -699,7 +781,10 @@ def bound_response(
             **complete_business,
             "result_delivery": manifest_only_reference,
         }
-        if len(_json(complete_with_manifest_locator, compact)) <= response_char_limit:
+        if (
+            len(format_json_response(complete_with_manifest_locator, compact=compact))
+            <= response_char_limit
+        ):
             return complete_with_manifest_locator
         # A larger analysis can still fit when supplementary receipt details
         # stay in the same immutable artifact. Keep run identities and the runtime inventory count inline; never remove facts or
@@ -719,7 +804,10 @@ def bound_response(
                     "deferred_fields": list(receipt_paths),
                 },
             }
-            if len(_json(candidate, compact)) <= response_char_limit:
+            if (
+                len(format_json_response(candidate, compact=compact))
+                <= response_char_limit
+            ):
                 return candidate
         # If complete business plus the essential receipt cannot fit, keep
         # the receipt and explicitly page business from the same artifact.
@@ -727,7 +815,7 @@ def bound_response(
         # root run_metadata reference merely to keep more business inline.
         # For paging, retain supplementary receipt details whenever they fit;
         # defer those details only if the receipt itself exceeds the budget.
-        if len(_json(output, compact)) > response_char_limit:
+        if len(format_json_response(output, compact=compact)) > response_char_limit:
             receipt = dict(metadata)
             for key in ("provenance", "determinism"):
                 if key not in receipt:
@@ -741,9 +829,12 @@ def bound_response(
                     ],
                 }
                 output = {"run_metadata": receipt, "result_delivery": delivery}
-                if len(_json(output, compact)) <= response_char_limit:
+                if (
+                    len(format_json_response(output, compact=compact))
+                    <= response_char_limit
+                ):
                     break
-    if len(_json(output, compact)) > response_char_limit:
+    if len(format_json_response(output, compact=compact)) > response_char_limit:
         raise _invalid(
             "回执超过响应预算，请增大 response_char_limit",
             "response_char_limit",
@@ -762,7 +853,7 @@ def bound_response(
             ],
         }
         candidate["result_delivery"] = next_delivery
-        if len(_json(candidate, compact)) <= response_char_limit:
+        if len(format_json_response(candidate, compact=compact)) <= response_char_limit:
             output = candidate
             delivery = next_delivery
     # A projected first_view is already the caller's current-period card.
@@ -797,7 +888,10 @@ def bound_response(
                 key: {"first_view": trial},
                 "result_delivery": {**view_delivery, "deferred_fields": deferred},
             }
-            if len(_json(candidate, compact)) <= response_char_limit:
+            if (
+                len(format_json_response(candidate, compact=compact))
+                <= response_char_limit
+            ):
                 selected = trial
                 output = candidate
     return output

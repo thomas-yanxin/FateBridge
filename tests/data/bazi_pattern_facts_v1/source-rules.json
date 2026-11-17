@@ -1,0 +1,155 @@
+{
+  "curation_kind": "Same developer reading of primary public-domain text and selected scan pages; not independent expert adjudication",
+  "source_revisions": {
+    "sanming_vol02": 761691,
+    "sanming_vol03": 657369,
+    "sanming_vol06": 657375
+  },
+  "branch_groups": {
+    "四生": [
+      "寅",
+      "申",
+      "巳",
+      "亥"
+    ],
+    "四正": [
+      "子",
+      "午",
+      "卯",
+      "酉"
+    ],
+    "四库": [
+      "辰",
+      "戌",
+      "丑",
+      "未"
+    ]
+  },
+  "noble_days": {
+    "丁亥": "day",
+    "癸卯": "day",
+    "丁酉": "night",
+    "癸巳": "night"
+  },
+  "kui_gang_days": [
+    "庚辰",
+    "庚戌",
+    "壬辰",
+    "戊戌"
+  ],
+  "lu_stem_pairs": [
+    [
+      "寅",
+      "午",
+      "甲",
+      "己"
+    ],
+    [
+      "子",
+      "巳",
+      "癸",
+      "戊"
+    ],
+    [
+      "巳",
+      "酉",
+      "丙",
+      "辛"
+    ],
+    [
+      "卯",
+      "申",
+      "乙",
+      "庚"
+    ],
+    [
+      "午",
+      "亥",
+      "丁",
+      "壬"
+    ]
+  ],
+  "arch_lu_gui": [
+    {
+      "kind": "拱禄",
+      "day": "癸亥",
+      "hour": "癸丑",
+      "target": "子"
+    },
+    {
+      "kind": "拱禄",
+      "day": "癸丑",
+      "hour": "癸亥",
+      "target": "子"
+    },
+    {
+      "kind": "拱禄",
+      "day": "丁巳",
+      "hour": "丁未",
+      "target": "午"
+    },
+    {
+      "kind": "拱禄",
+      "day": "己未",
+      "hour": "己巳",
+      "target": "午"
+    },
+    {
+      "kind": "拱禄",
+      "day": "戊辰",
+      "hour": "戊午",
+      "target": "巳"
+    },
+    {
+      "kind": "拱贵",
+      "day": "甲申",
+      "hour": "甲戌",
+      "target": "酉"
+    },
+    {
+      "kind": "拱贵",
+      "day": "乙未",
+      "hour": "乙酉",
+      "target": "申"
+    },
+    {
+      "kind": "拱贵",
+      "day": "甲寅",
+      "hour": "甲子",
+      "target": "丑"
+    },
+    {
+      "kind": "拱贵",
+      "day": "戊申",
+      "hour": "戊午",
+      "target": "未"
+    },
+    {
+      "kind": "拱贵",
+      "day": "辛丑",
+      "hour": "辛卯",
+      "target": "寅"
+    }
+  ],
+  "arch_scan_pages_viewed": [
+    304,
+    305
+  ],
+  "curation_notes": [
+    "Ten explicit day/hour pairs are structural references, not proof of fulfilled formation.",
+    "Digital transcription writes 巳未 in the fourth lu pair; viewed scan304 lower panel reads 己未己巳. Preserve the raw variant; do not silently call the digital source exact.",
+    "The source also requires month-command support, force and exclusions. Only the visible filling prerequisite is adjudicated here; the other requirements remain open.",
+    "Do not infer a unique void-frame from the generic 空亡 wording: The listed 癸亥-day/癸丑-hour arch-to子 and 甲寅-day/甲子-hour arch-to丑 both conflict with a mechanical day-void-target exclusion; 癸丑-day itself has寅卯void and is not that counterexample.",
+    "The vol03 noble chapter explicitly discusses competing seasonal and day/night doctrines; fixed civil6–18 remains a labeled implementation convention.",
+    "The five lu-position pairs are narrower than all hidden-stem intersections, and differ from the selected independent engine's three-pair dark table. Do not merge definitions into a universal dark-pair set.",
+    "The name 四库 is the current term corresponding to the source's 四墓 category; membership is retained without adopting adjacent predictions."
+  ],
+  "stem_combination_candidate_elements": {
+    "甲己": "土",
+    "乙庚": "金",
+    "丙辛": "水",
+    "丁壬": "木",
+    "戊癸": "火"
+  },
+  "stem_combination_source": "沈孝瞻《秘本子平真诠》PDF17–21，已保留原扫描与前期审查；只列五合之候选化神，不据字面裁成化。"
+}

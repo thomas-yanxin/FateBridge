@@ -22,9 +22,9 @@ CASES = [
     ),
     (
         "孤月独明",
-        {"planet_signidx": ALONE, "is_day": False},
-        {"planet_signidx": {**ALONE, "炁": 1}, "is_day": False},
-        {"moon_palace_index": 1, "same_palace_count": 1},
+        {"planet_signidx": ALONE, "is_day": False, "is_winter": False},
+        {"planet_signidx": {**ALONE, "炁": 1}, "is_day": False, "is_winter": False},
+        {"moon_palace_index": 1, "same_palace_count": 1, "is_winter": False},
     ),
     (
         "日月拱官",
@@ -100,7 +100,10 @@ def test_each_current_predicate_has_actual_operands_and_changes_with_its_counter
     assert positive == original
     pattern = next(p for p in patterns if p["name"] == name)
     assert name not in {p["name"] for p in m.calculate(negative)}
-    assert pattern["rule_id"].endswith("_v2")
+    if name == "孤月独明":
+        assert pattern["rule_id"] == "moira_moon_alone_night_nonwinter_v3"
+    else:
+        assert pattern["rule_id"].endswith("_v2")
     evidence = pattern["evidence"]
     assert evidence["model_id"] == m.PATTERN_MODEL_ID
     assert evidence["condition_satisfied"]

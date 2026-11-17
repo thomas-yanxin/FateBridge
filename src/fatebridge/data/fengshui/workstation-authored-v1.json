@@ -1,5 +1,5 @@
 {
-  "bundle_version": "1.0.0",
+  "bundle_version": "1.1.0",
   "sources": {
     "K0": {
       "title": "The Feng Shui Approach to the Same Room, Different Function",
@@ -130,8 +130,9 @@
       "kind": "publisher_book_pdf",
       "scope": "实际材料／色彩、流动水和活植物条件。",
       "source_version": {
-        "edition": "not_independently_verified",
-        "pdf_metadata_creation_year": "2004_not_used_as_publication_year"
+        "edition": "Sixth Edition",
+        "published": "July 2004",
+        "verification": "publisher colophon, PDF p.3 (one-based), directly read"
       },
       "locator": "印刷23、25；当前219页PDF40、42，均从1计；两个页面图像已查看",
       "retrieved_at": "2026-10-15",
@@ -185,7 +186,7 @@
     },
     "afsi_application_conditions_v1": {
       "ruleset_id": "afsi_application_conditions_v1",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "method": "authored_workstation_review",
       "source_ids": [
         "A2",
@@ -336,7 +337,7 @@
         "A2"
       ],
       "predicate": "proportionate_to_space",
-      "scope": "独立事实；定性尺度不产生数值阈值"
+      "scope": "印刷29页的通用定性尺度条件；用于本模块登记的金属、水、石材、陶瓷和活植物，不计算剂量或足量"
     },
     "afsi_application_conditions_v1.plant_healthy": {
       "source_ids": [

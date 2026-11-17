@@ -1,0 +1,9 @@
+# Point-pair directions and closed segments
+
+Frozen synthetic binary64 point inputs; original coordinates are subtracted as exact rational values. CGAL 6.2.1 with its exact Boost rational kernel supplies direction ordering and closed `Segment_2.has_on` predicates. Boost 1.90 `cpp_dec_float<120>` inverse tangents are independently cross-checked against direct 1,000-digit mpmath 1.3.0 `atan2`, with no FateBridge import. The reference retains 32,014 nonzero vectors, four undefined coincident controls, 5,120 segment controls and 28 complete public synthetic requests. Duplicate original overflow cases are retained without extra algorithm credit.
+
+Original gates: periodic error at most 2e-12 degrees, relative residual error at most 1e-80 about an exact axis/diagonal, identical discrete cells/closed view wedges and correctly rounded final float presentation. The four undefined directions are qualification controls, not numerical successes. Observers on the opening do not establish positive-width perspective visibility; the screen endpoint control remains physically infeasible. Public input, permissions and physical facts are preserved.
+
+Criteria SHA-256: `f36be5af87b34347bdf1cc879c58d75a37aa7ebe13cba31a6ac0ab8808892986`. Full input/source/compiler/reference and before/after interface evidence: `/Users/thomas/.codex/artifacts/fatebridge-spatial-heading-20261112/`. These finite mathematical checks do not establish every real-angle predicate, all scene logic, traditional efficacy or SOTA.
+
+Primary sources: [CGAL Direction_2](https://doc.cgal.org/latest/Kernel_23/classCGAL_1_1Direction__2.html), [CGAL Segment_2](https://doc.cgal.org/latest/Kernel_23/classCGAL_1_1Segment__2.html), [Boost decimal backend](https://www.boost.org/doc/libs/latest/libs/multiprecision/doc/html/boost_multiprecision/tut/floats/cpp_dec_float.html). Actual library versions are pinned by the external evidence and fixture metadata.

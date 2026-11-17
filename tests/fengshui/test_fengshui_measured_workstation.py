@@ -13,10 +13,8 @@ from pydantic import ValidationError
 from fatebridge.cli import run
 from fatebridge.core.fengshui.models import AssessRequest
 from fatebridge.core.fengshui.output import FengshuiOutput
-from fatebridge.core.fengshui.spatial_geometry import direction_support
-from fatebridge.core.fengshui.spatial_inputs import SpatialScene
+from fatebridge.core.fengshui.spatial_angles import direction_support
 from fatebridge.core.fengshui.spatial_layout import prepare_spatial_request
-from fatebridge.core.fengshui.spatial_scene import evaluate_geometry
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.fengshui import assess
 from tests.support.fengshui_transports import mcp_call

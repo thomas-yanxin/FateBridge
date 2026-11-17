@@ -132,7 +132,7 @@ def test_all_seven_physical_bodies_and_frames_use_selected_kernel(
         "罗": "mean_lunar_node",
         "孛": "mean_lunar_apogee",
         "计": "opposite_mean_lunar_node",
-        "炁": "horosa_linear_fit_not_classical_calibrated",
+        "炁": "horosa_mean_purple_clouds_10fb75de_v1",
     }
     assert not proof["absolute_astronomical_accuracy_certified"]
 
@@ -239,6 +239,7 @@ def test_strict_source_provenance_agrees_across_rest_mcp_cli(
     fields = [
         "guolao.profile.ephemeris_provenance",
         "guolao.profile.longitude_motion",
+        "guolao.purple_model_audit",
         "guolao.bodies",
         "guolao.timing",
     ]
@@ -299,6 +300,20 @@ def test_strict_source_provenance_agrees_across_rest_mcp_cli(
     assert bodies[0] == bodies[1] == bodies[2]
     for body in bodies:
         Draft202012Validator(spec.output_model.model_json_schema()).validate(body)
+        purple = body["guolao"]["purple_model_audit"]
+        assert purple["model_in_use"] == "horosa_mean_purple_clouds_10fb75de_v1"
+        assert purple["period_days"] == 10226.78132
+        assert purple["epoch_jd"] == 2451543.5
+        assert purple["epoch_longitude"] == 188.6849
+        assert purple["software_source_function"] == "pcLon"
+        assert (
+            purple["software_source_commit"]
+            == "10fb75de980bb0a6e0d1f50c7ee93cc97a88d7de"
+        )
+        assert not purple["fixture_fitting_used"]
+        assert "fitted_period_days" not in purple
+        assert purple["modern_epoch_calibration_status"] == "unresolved"
+        assert not purple["historical_period_used_as_modern_longitude"]
         proof = body["guolao"]["profile"]["ephemeris_provenance"]
         assert proof["physical_backend_policy"] == "strict_jpl"
         assert proof["fixed_star_observer_ephemeris_model"] == "jpl"
@@ -314,6 +329,10 @@ def test_strict_source_provenance_agrees_across_rest_mcp_cli(
                     == "tropical_ecliptic_of_date"
                 )
         if target:
+            assert (
+                body["guolao"]["timing"]["profile"]["purple_model"]
+                == purple["model_in_use"]
+            )
             assert body["guolao"]["timing"]["profile"]["ephemeris_provenance"] == proof
             target_motion = body["guolao"]["timing"]["profile"]["longitude_motion"]
             assert target_motion["reference_frame"] == motion["reference_frame"]

@@ -11,6 +11,7 @@ import pytest
 from fatebridge.core.almanac import SolarTerm
 from fatebridge.services.timing_uncertainty import analyze_birth_time_range
 from fatebridge.utils.birth_input import PersonInfo
+from fatebridge.utils.civil_time import ZonedCalendar
 from fatebridge.utils.solar_time import normalize_birth_time
 
 REFERENCE = (
@@ -81,9 +82,7 @@ def test_apparent_clock_probes_both_event_orders_and_preserves_overlapping_brack
     def term(name, at):
         return SolarTerm(
             name,
-            at,
-            at.date().isoformat(),
-            "甲子",
+            ZonedCalendar.from_datetime(at),
             resolution_provider="swisseph",
             ephemeris_model="synthetic_control",
         )

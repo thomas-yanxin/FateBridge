@@ -6,7 +6,7 @@ from typing import List, Literal, Optional
 from pydantic import Field, model_validator
 
 from fatebridge.core.energy_provenance import ROLES
-from fatebridge.core.output_base import PartialOutput
+from fatebridge.core.output_base import FullFact, PartialOutput, PresentFact
 from fatebridge.core.output_classical_roots import ClassicalRoot
 from fatebridge.core.output_energy_provenance import EnergyProvenance, bind_part, close
 from fatebridge.core.output_root_ledger import HiddenStemLedgerEntry
@@ -116,10 +116,46 @@ class EngineeringForceComposition(PartialOutput):
         return self
 
 
+class EngineeringStrengthIndex(PartialOutput):
+    method_id: FullFact[Optional[str]] = None
+    quantity_kind: FullFact[Optional[Literal["uncalibrated_strength_policy_index"]]] = (
+        None
+    )
+    strength_level: FullFact[Optional[Literal["强", "中和", "弱"]]] = None
+    numerical_strength_level: FullFact[Optional[Literal["强", "中和", "弱"]]] = None
+    support_share: FullFact[Optional[float]] = Field(default=None, ge=0, le=1)
+    source_adjudication_used: FullFact[Optional[Literal[False]]] = None
+    scope: FullFact[Optional[str]] = None
+
+
 class ClassicalForceAdjudication(PartialOutput):
-    body_strength: Optional[Literal["not_adjudicated"]] = None
-    seal_weight: Optional[Literal["not_adjudicated"]] = None
-    body_seal_relation: Optional[Literal["not_adjudicated"]] = None
+    method_id: FullFact[Optional[Literal["classical_force_conditions_v1"]]] = None
+    status: FullFact[
+        Optional[Literal["not_adjudicated", "conditional", "adjudicated"]]
+    ] = None
+    body_strength: PresentFact[Optional[Literal["强", "中和", "弱"]]] = None
+    seal_weight: PresentFact[Optional[Literal["重", "轻"]]] = None
+    body_seal_relation: PresentFact[Optional[str]] = None
+    ordinary_fuyi_applicable: PresentFact[Optional[bool]] = None
+    observed_body_root_positions: FullFact[Optional[List[str]]] = None
+    observed_seal_root_positions: FullFact[Optional[List[str]]] = None
+    source_refs: FullFact[Optional[List[str]]] = None
+    pending_conditions: FullFact[Optional[List[str]]] = None
+    scope: FullFact[Optional[str]] = None
+
+    @model_validator(mode="after")
+    def unresolved_has_no_force_grade(self) -> "ClassicalForceAdjudication":
+        if self.status == "not_adjudicated" and any(
+            value is not None
+            for value in (
+                self.body_strength,
+                self.seal_weight,
+                self.body_seal_relation,
+                self.ordinary_fuyi_applicable,
+            )
+        ):
+            raise ValueError("原典力量未裁定时不能交付强弱、身印关系或普通扶抑适用结论")
+        return self
 
 
 class ForceStemRootObservation(PartialOutput):
@@ -146,7 +182,7 @@ class ClassicalForceComponents(PartialOutput):
     energy_provenance: Optional[EnergyProvenance] = None
     source_root_observations: Optional[ForceSourceRootObservations] = None
     engineering_composition: Optional[EngineeringForceComposition] = None
-    classical_adjudication: Optional[ClassicalForceAdjudication] = None
+    classical_adjudication: FullFact[Optional[ClassicalForceAdjudication]] = None
     scope: Optional[str] = None
     limitations: Optional[List[str]] = None
 

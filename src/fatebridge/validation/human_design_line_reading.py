@@ -4,13 +4,13 @@ from __future__ import annotations
 
 from copy import deepcopy
 
-from fatebridge.core.human_design_line_catalogue import _canonical
 from fatebridge.core.human_design_line_reading import METHOD
 from fatebridge.services.human_design_line_reading import (
     LineReadingInputError,
     build_human_design_line_packet,
 )
 from fatebridge.utils.errors import EphemerisSourceError
+from fatebridge.utils.json_digest import canonical_bytes
 
 
 def verify_human_design_line_packet(packet: dict, trusted_source_result: dict) -> dict:
@@ -20,9 +20,9 @@ def verify_human_design_line_packet(packet: dict, trusted_source_result: dict) -
     original_matches = False
     try:
         expected = build_human_design_line_packet(trusted_source_result)
-        original_matches = _canonical(packet.get("original_result")) == _canonical(
-            trusted_source_result
-        )
+        original_matches = canonical_bytes(
+            packet.get("original_result")
+        ) == canonical_bytes(trusted_source_result)
         if not original_matches:
             errors.append(
                 {"code": "external_original_run_mismatch", "path": "original_result"}
@@ -30,7 +30,7 @@ def verify_human_design_line_packet(packet: dict, trusted_source_result: dict) -
         for key in sorted(expected.keys() | packet.keys()):
             if key not in expected:
                 errors.append({"code": "unbound_packet_field", "path": key})
-            elif key not in packet or _canonical(packet[key]) != _canonical(
+            elif key not in packet or canonical_bytes(packet[key]) != canonical_bytes(
                 expected[key]
             ):
                 errors.append({"code": "source_bound_packet_mismatch", "path": key})

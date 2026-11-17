@@ -9,6 +9,40 @@ from pathlib import Path
 from typing import Any
 
 
+def read_frozen_artifact(
+    directory: Path,
+    filename: str,
+    expected_sha256: str,
+    *,
+    root: Path | None = None,
+) -> bytes:
+    """Read one frozen artifact, retaining registered shared scans after deduplication."""
+    boundary = directory.resolve() if root is None else root.resolve()
+    path = (directory / filename).resolve()
+    shared = directory.resolve().parents[1] / "data/shared_sources"
+    registered = {
+        shared
+        / "fixtures/meihua_closure_v1/sources/nlc-1925.pdf": (
+            "nlc-1925.pdf",
+            "af608094ab11ae209eae91a9365565e7c9cff604aac3da5e753e04d1cc4598c0",
+        ),
+        shared
+        / "data/ziwei_independent/calendar_1900_sources_v1/tam/sources/tam-1900.pdf": (
+            "tam-1900.pdf",
+            "e6bc3affa9264fd377e5b91d50047d2c99fa5a9f44fc6f15f9f7e956dc10f649",
+        ),
+    }
+    if not path.is_relative_to(boundary) and registered.get(path) != (
+        Path(filename).name,
+        expected_sha256,
+    ):
+        raise ValueError("Reference path escapes its frozen bundle")
+    content = path.read_bytes()
+    if hashlib.sha256(content).hexdigest() != expected_sha256:
+        raise ValueError(f"Frozen artifact changed: {filename}")
+    return content
+
+
 def reference_bundle(directory: Path) -> dict[str, Any]:
     manifest = json.loads((directory / "manifest.json").read_text(encoding="utf-8"))
     required = {
@@ -23,11 +57,7 @@ def reference_bundle(directory: Path) -> dict[str, Any]:
     if {r["file"] for r in manifest["artifacts"]} != required:
         raise ValueError("The selected scan corpus must retain every frozen artifact")
     for record in manifest["artifacts"]:
-        path = (directory / record["file"]).resolve()
-        if not path.is_relative_to(directory.resolve()):
-            raise ValueError("Scan reference escapes its frozen bundle")
-        if hashlib.sha256(path.read_bytes()).hexdigest() != record["sha256"]:
-            raise ValueError(f"Frozen scan reference changed: {record['file']}")
+        read_frozen_artifact(directory, record["file"], record["sha256"])
     return manifest  # type: ignore[no-any-return]
 
 

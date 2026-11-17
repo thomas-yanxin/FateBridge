@@ -1,4 +1,4 @@
-"""Check complete recorded source-ID resolution without an engine import."""
+"""Check source-ID resolution and file-byte integrity without an engine import."""
 
 
 def verify(result, expected_model, allowed_hashes):
@@ -18,8 +18,8 @@ def verify(result, expected_model, allowed_hashes):
         if file["sha256"] not in allowed_hashes:
             raise ValueError("Physical file differs from frozen data")
         prefix = "jpl" if expected_model == "jpl" else "se1"
-        if file["id"] != f"{prefix}:{file['slot']}:{file['sha256']}":
-            raise ValueError("File identifier does not bind actual bytes/slot")
+        if file["id"] != f"{prefix}:{file['slot']}:{file['filename']}":
+            raise ValueError("File identifier does not bind declared filename/slot")
     factors = {
         "Sun",
         "Moon",

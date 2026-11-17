@@ -79,16 +79,12 @@ def require_meihua_clock_binding(result: dict[str, Any], request: BaseModel) -> 
     if set(receipt) != set(expected):
         raise ValueError("梅花钟时输入记录的版本或字段范围不符")
     for name, value in expected.items():
-        if (
-            name not in receipt
-            or type(receipt[name]) is not type(value)
-            or receipt[name] != value
-        ):
+        if type(receipt[name]) is not type(value) or receipt[name] != value:
             raise ValueError("梅花钟时输入记录与本次请求不符：" + name)
     if any(type(v) is not int for v in receipt["calculation_defaults"].values()):
         raise ValueError("计算补位必须为整数00")
     nominal = parse_meihua_clock_label(clock["local_datetime"])
-    values = [getattr(request, "analysis_" + n, None) for n in COMPONENTS]
+    values = [getattr(request, "analysis_" + n) for n in COMPONENTS]
     wanted = [v if v is not None else 0 for v in values]
     if [getattr(nominal, n) for n in COMPONENTS] != wanted:
         raise ValueError("梅花名义钟时与本次请求的计算分量不符")
@@ -173,7 +169,7 @@ def require_meihua_instant_binding(result: dict[str, Any], request: BaseModel) -
     astronomy or lunar rules. These are nominal UTC-label differences; datetime
     omits leap seconds, so this is not a TAI/TT elapsed-time certificate.
     """
-    values: list[Any] = [getattr(request, "analysis_" + n, None) for n in COMPONENTS]
+    values: list[Any] = [getattr(request, "analysis_" + n) for n in COMPONENTS]
     wall = datetime(
         values[0],
         values[1],
@@ -182,8 +178,8 @@ def require_meihua_instant_binding(result: dict[str, Any], request: BaseModel) -
         values[4] if values[4] is not None else 0,
         values[5] if values[5] is not None else 0,
     )
-    zone = getattr(request, "analysis_timezone", None) or DEFAULT_BIRTH_TIMEZONE
-    offset = getattr(request, "analysis_utc_offset", None)
+    zone = getattr(request, "analysis_timezone") or DEFAULT_BIRTH_TIMEZONE
+    offset = getattr(request, "analysis_utc_offset")
     local = resolve_civil_clock(wall, zone, offset)
     actual_utc = utc_instant(local)
     resolved_offset = local.utcoffset()

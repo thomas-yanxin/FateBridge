@@ -11,9 +11,7 @@ from fatebridge.cli import run
 from fatebridge.core.analytic_solar import MODEL_ID
 from fatebridge.core.fengshui import bazhai as bazhai_module
 from fatebridge.core.fengshui.calendar import (
-    boundary_candidate_dates,
     boundary_model_policy,
-    boundary_uncertainty_reason,
     lichun_resolution,
     year_context,
 )

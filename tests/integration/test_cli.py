@@ -5,7 +5,6 @@ import json
 import pytest
 
 from fatebridge.application.execution import result_is_error
-from fatebridge.application.tool_spec import ToolSpec
 from fatebridge.cli import run
 from fatebridge.services.tool_catalog import CATALOG
 
@@ -34,20 +33,9 @@ def test_missing_required_flag_emits_json_on_stdout(capsys):
     assert "birth" in payload["error"]
 
 
-def test_result_is_error_honors_error_is_fatal():
-    base = next(s for s in CATALOG if s.rest_path == "/api/cn/bazi/wealth")
-    assert result_is_error(base, {"error": "x"}) is True
-    assert result_is_error(base, {"ok": 1}) is False
-    lenient = ToolSpec(
-        key="t",
-        bind=base.bind,
-        request_model=base.request_model,
-        summary="t",
-        operation_label_zh="t",
-        family="t",
-        error_is_fatal=lambda r: False,
-    )
-    assert result_is_error(lenient, {"error": "non-fatal"}) is False
+def test_result_is_error_uses_shared_envelope():
+    assert result_is_error({"error": "x"}) is True
+    assert result_is_error({"ok": 1}) is False
 
 
 def test_cli_runs_bazi_dimension(capsys):
@@ -278,9 +266,7 @@ def test_cli_bool_flag_explicit_value_runs(capsys):
     out = capsys.readouterr().out
     payload = json.loads(out)
     assert code == 0
-    assert not result_is_error(
-        next(s for s in CATALOG if (s.mcp_name or s.key) == "bazi_birth"), payload
-    )
+    assert not result_is_error(payload)
 
 
 def test_cli_astro_chart_accepts_gender_flag(capsys):

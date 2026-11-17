@@ -26,6 +26,7 @@ from fatebridge.core.astro.physical_sources import (
     PhysicalEphemerisTrace,
     assert_physical_configuration,
 )
+from fatebridge.core.astro.polynomial_stencils import polynomial_weights
 from fatebridge.core.astro.reference import PLANET_SWISSEPH_IDS
 from fatebridge.core.astro.retarded_epoch import stabilized_longitude_sample
 from fatebridge.core.astro.solar_decimal import (
@@ -35,6 +36,7 @@ from fatebridge.core.astro.solar_decimal import METHOD_ID as DECIMAL_REDUCTION_I
 from fatebridge.core.astro.solar_decimal import (
     PRECISION,
     PROFILE_SHA256,
+    ReductionReceipt,
     reduced_longitude,
 )
 from fatebridge.core.astro.solar_motion_branch import solar_interpolation_branch
@@ -43,12 +45,11 @@ from fatebridge.utils.errors import EphemerisSourceError
 
 METHOD_ID = "fatebridge_complete_position_derivative_v8"
 TARGETS = frozenset({"Sun", "Mercury", "Venus", "Mars"})
-# Binary fractions give exactly represented equal TT offsets even at AD9999.
+# Binary step candidates; observed native operands handle rounded whole-JD sums.
 STEPS_DAYS = (0.125, 0.0625)
 REFINEMENT_STEPS_DAYS = tuple(2.0**-k for k in range(5, 12))
 OFFSETS = (-3, -2, -1, 1, 2, 3)
 WEIGHTS = (-1, 9, -45, 45, -9, 1)
-ONE_SIDED_WEIGHTS = (6.0, -7.5, 20 / 3, -3.75, 1.2, -1 / 6)
 CONVERGENCE_LINE_ARCSEC_PER_DAY = 0.0002
 
 
@@ -67,40 +68,22 @@ class AuxiliaryPositionModelChange(EphemerisSourceError):
         self.actual_model = actual
 
 
-def _local_polynomial_weights() -> Tuple[float, ...]:
-    """Exact degree-six least-squares derivative on 25 symmetric nodes.
-
-    Odd columns x,x^3,x^5 suffice by symmetry. These coefficients depend only
-    on the node geometry, never on native samples or reference rates.
-    """
-    nodes = [Fraction(i, 4) for i in range(-12, 13)]
-    powers = (1, 3, 5)
-    matrix = [
-        [Fraction(sum(x ** (i + j) for x in nodes)) for j in powers]
-        + [Fraction(int(i == 1))]
-        for i in powers
-    ]
-    for j in range(3):
-        pivot = matrix[j][j]
-        matrix[j] = [Fraction(v / pivot) for v in matrix[j]]
-        for k in range(3):
-            if k != j:
-                factor = matrix[k][j]
-                matrix[k] = [
-                    Fraction(v - factor * w) for v, w in zip(matrix[k], matrix[j])
-                ]
-    coefficients = [row[-1] for row in matrix]
-    return tuple(
-        float(sum(c * x**i for c, i in zip(coefficients, powers))) for x in nodes
-    )
-
-
 LOCAL_NODES = tuple(i / 4 for i in range(-12, 13))
-LOCAL_WEIGHTS = _local_polynomial_weights()
+LOCAL_WEIGHTS = tuple(
+    float(w)
+    for w in polynomial_weights(
+        tuple(Fraction(i, 4) for i in range(-12, 13)),
+        tuple(Fraction(i == 1) for i in range(7)),
+    )
+)
 
 
 def local_polynomial_stencil(
-    values: Sequence[float], center: float, step: float
+    values: Sequence[float],
+    center: float,
+    step: float,
+    *,
+    abscissas_days: Optional[Sequence[float]] = None,
 ) -> float:
     """Redundant local derivative on the same total radius 3*step."""
     if (
@@ -114,10 +97,20 @@ def local_polynomial_stencil(
     differences = [math.remainder(v - center, 360) for v in values]
     if any(abs(v) >= 90 for v in differences):
         raise EphemerisSourceError("coordinate_motion_unavailable")
+    if abscissas_days is not None and tuple(abscissas_days) != tuple(
+        x * step for x in LOCAL_NODES
+    ):
+        return _sampled_derivative(differences, abscissas_days, step, 6)
     return math.fsum(w * v for w, v in zip(LOCAL_WEIGHTS, differences)) / step
 
 
-def longitude_stencil(values: Sequence[float], center: float, step: float) -> float:
+def longitude_stencil(
+    values: Sequence[float],
+    center: float,
+    step: float,
+    *,
+    abscissas_days: Optional[Sequence[float]] = None,
+) -> float:
     """Sixth-order derivative of locally unwrapped longitude, in degrees/day."""
     if (
         len(values) != 6
@@ -131,42 +124,55 @@ def longitude_stencil(values: Sequence[float], center: float, step: float) -> fl
     # The local branch must be unambiguous; no inference across half a circle.
     if any(abs(v) >= 90 for v in differences):
         raise EphemerisSourceError("coordinate_motion_unavailable")
+    if abscissas_days is not None and tuple(abscissas_days) != tuple(
+        x * step for x in OFFSETS
+    ):
+        # The center is already observed. Include its zero difference so an
+        # asymmetric rounded grid still reproduces degree6, rather than
+        # relying on symmetric cancellation of the sixth-degree term.
+        return _sampled_derivative((*differences, 0.0), (*abscissas_days, 0.0), step, 6)
     return math.fsum(w * v for w, v in zip(WEIGHTS, differences)) / (60 * step)
 
 
-def _one_sided_weights(count: int) -> Tuple[Tuple[float, ...], Tuple[float, ...]]:
-    """Degree-six LS derivative at zero on a fixed [0,6] node geometry.
-
-    Normal equations are solved exactly over rationals. The coefficients
-    depend only on node geometry, never on a planet, epoch or expected rate.
-    """
-    nodes = tuple(Fraction(6 * i, count - 1) for i in range(count))
-    powers = range(7)
-    matrix = [
-        [sum((x ** (i + j) for x in nodes), Fraction(0)) for j in powers]
-        + [Fraction(int(i == 1))]
-        for i in powers
-    ]
-    for j in powers:
-        pivot = matrix[j][j]
-        matrix[j] = [Fraction(v / pivot) for v in matrix[j]]
-        for k in powers:
-            if k != j:
-                factor = matrix[k][j]
-                matrix[k] = [v - factor * w for v, w in zip(matrix[k], matrix[j])]
-    coefficients = [row[-1] for row in matrix]
-    weights = tuple(
-        float(sum(c * x**i for i, c in enumerate(coefficients))) for x in nodes
+def _sampled_derivative(
+    differences: Sequence[float],
+    abscissas_days: Sequence[float],
+    step: float,
+    degree: int,
+) -> float:
+    """Use the actual native operands when a whole-JD sum rounds a node."""
+    weights = polynomial_weights(
+        tuple(Fraction(x) / Fraction(step) for x in abscissas_days),
+        tuple(Fraction(i == 1) for i in range(degree + 1)),
     )
-    return tuple(float(x) for x in nodes), weights
+    return math.fsum(float(w) * v for w, v in zip(weights, differences)) / step
 
 
-DIRECTIONAL_POLYNOMIALS = {count: _one_sided_weights(count) for count in (13, 25)}
+DIRECTIONAL_NODES = {
+    count: tuple(Fraction(6 * i, count - 1) for i in range(count)) for count in (13, 25)
+}
+DIRECTIONAL_POLYNOMIALS = {
+    count: (
+        tuple(float(x) for x in nodes),
+        tuple(
+            float(w)
+            for w in polynomial_weights(
+                nodes, tuple(Fraction(i == 1) for i in range(7))
+            )
+        ),
+    )
+    for count, nodes in DIRECTIONAL_NODES.items()
+}
 DIRECTIONAL_GUARD_ID = "degree6_parent_step_one_sided_ls13_ls25_joint_range_v1"
 
 
 def one_sided_polynomial_stencil(
-    values: Sequence[float], center: float, step: float, direction: int
+    values: Sequence[float],
+    center: float,
+    step: float,
+    direction: int,
+    *,
+    abscissas_days: Optional[Sequence[float]] = None,
 ) -> float:
     if len(values) not in DIRECTIONAL_POLYNOMIALS or direction not in {-1, 1}:
         raise EphemerisSourceError("coordinate_motion_unavailable")
@@ -180,6 +186,10 @@ def one_sided_polynomial_stencil(
     differences = [math.remainder(v - center, 360) for v in values]
     if any(abs(v) >= 90 for v in differences):
         raise EphemerisSourceError("coordinate_motion_unavailable")
+    if abscissas_days is not None and tuple(abscissas_days) != tuple(
+        direction * x * step for x in DIRECTIONAL_POLYNOMIALS[len(values)][0]
+    ):
+        return _sampled_derivative(differences, abscissas_days, step, 6)
     weights = DIRECTIONAL_POLYNOMIALS[len(values)][1]
     return math.fsum(w * v for w, v in zip(weights, differences)) / (direction * step)
 
@@ -716,7 +726,7 @@ def complete_position_rate(
             and planet in {"Mercury", "Venus", "Mars"}
             and center_source.get("file_ids")
         ):
-            decimal_samples: Dict[float, Tuple[float, Dict[str, Any]]] = {}
+            decimal_samples: Dict[float, Tuple[float, ReductionReceipt]] = {}
 
             def decimal_sample(delta: float) -> float:
                 if delta not in decimal_samples:

@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import gzip
+import hashlib
 import json
 from datetime import datetime
 from pathlib import Path
@@ -11,8 +13,10 @@ from fastapi.testclient import TestClient
 
 from fatebridge.api import app
 from fatebridge.core.almanac import get_lunar_context
+from fatebridge.core.metaphysics import common
 from fatebridge.core.metaphysics.common import MetaphysicsSeed
-from fatebridge.core.metaphysics.liureng import build_liureng_board
+from fatebridge.core.metaphysics.liureng import build_liureng_board, twelve_god_layout
+from fatebridge.core.metaphysics.ren_gods import noble_start
 from fatebridge.services.metaphysics import (
     _build_analysis_seed,
     _build_person_seed,
@@ -245,3 +249,111 @@ def test_ziwei_horoscope_rejects_unavailable_target_lunar_calendar():
     )
     assert result["status_code"] == 400
     assert "农历" in result["error"]
+
+
+@pytest.fixture(scope="module")
+def primitive_reference():
+    folder = Path(__file__).parents[1] / "data/metaphysics_primitives_reference_v1"
+    raw = gzip.decompress((folder / "reference.json.gz").read_bytes())
+    assert (
+        hashlib.sha256(raw).hexdigest()
+        == (folder / "reference.json.sha256").read_text().strip()
+    )
+    return json.loads(raw)
+
+
+def test_shared_primitives_keep_all_pinned_formal_reference_states(primitive_reference):
+    reference = primitive_reference
+    assert len(reference["cycles"]) == 60
+    for row in reference["cycles"]:
+        text = row["text"]
+        assert common.sexagenary_text(row["index"]) == text
+        assert common.sexagenary_index_for(text) == row["index"]
+        assert common.ganzhi_text((text[0], text[1])) == text
+        assert common.xun_head_for_ganzhi(text) == row["xun"]
+        assert common.kongwang_for_ganzhi(text) == row["kongwang"] + "空"
+    assert len(reference["stem_elements"]) == 10
+    assert len(reference["branch_elements"]) == 12
+    for stem, element in reference["stem_elements"].items():
+        assert common.stem_element_text(stem) == element
+    for branch, element in reference["branch_elements"].items():
+        assert common.branch_element_text(branch) == element
+    assert len(reference["relations"]) == len(reference["seasonal_states"]) == 25
+    for row in reference["relations"]:
+        assert common.liuqin_against_day(row["left"], row["right"]) == row["expected"]
+    for row in reference["seasonal_states"]:
+        assert (
+            common.status_against_anchor(row["anchor"], row["target"])
+            == row["expected"]
+        )
+    ten_to_kin = {
+        "比肩": "兄弟",
+        "劫财": "兄弟",
+        "食神": "子孙",
+        "伤官": "子孙",
+        "正财": "妻财",
+        "偏财": "妻财",
+        "正官": "官鬼",
+        "七杀": "官鬼",
+        "正印": "父母",
+        "偏印": "父母",
+    }
+    assert len(reference["ten_gods"]) == 100
+    for row in reference["ten_gods"]:
+        assert (
+            common.liuqin_against_day(
+                common.stem_element_text(row["day"]),
+                common.stem_element_text(row["target"]),
+            )
+            == ten_to_kin[row["ten_god"]]
+        )
+    assert len(reference["branch_relations"]) == 144
+    for row in reference["branch_relations"]:
+        assert (common.SIX_HARMONY_BRANCHES[row["left"]] == row["right"]) is row[
+            "harmony"
+        ]
+        assert (common.SIX_CLASH_BRANCHES[row["left"]] == row["right"]) is row["clash"]
+    assert len(reference["rotations"]) == 24
+    for row in reference["rotations"]:
+        assert (
+            common.rotate_sequence(
+                "子丑寅卯辰巳午未申酉戌亥", row["start"], row["reverse"]
+            )
+            == row["sequence"]
+        )
+    assert len(reference["noble_starts"]) == 40
+    for row in reference["noble_starts"]:
+        assert (
+            noble_start(row["stem"], row["diurnal"], row["profile"]) == row["expected"]
+        )
+    assert len(reference["numerals"]) == 72
+    for row in reference["numerals"]:
+        assert common.chinese_numeral(row["value"]) == row["expected"]
+
+
+def test_tanyuan_all_explicit_diurnal_layouts_keep_pinned_Go_reference(
+    primitive_reference,
+):
+    reference = primitive_reference
+    assert reference["metadata"]["layouts_profile"] == "tanyuan_xieji_v1"
+    assert len(reference["layouts"]) == 2880
+    assert (
+        len(
+            {
+                (r["stem"], r["general"], r["hour"], r["diurnal"])
+                for r in reference["layouts"]
+            }
+        )
+        == 2880
+    )
+    for row in reference["layouts"]:
+        assert (
+            twelve_god_layout(
+                hour_branch=row["hour"],
+                month_general_branch=row["general"],
+                day_stem=row["stem"],
+                is_diurnal=row["diurnal"],
+                guiren_profile="tanyuan_xieji_v1",
+            )
+            == row["expected"]
+        )

@@ -191,7 +191,7 @@ def test_public_otherbu_exact_node_antipode_through_three_transports(
 
     def controlled(*args, **kwargs):
         result = original(*args, **kwargs)
-        result[0]["North Node"]["longitude"] = source
+        result.states["North Node"]["longitude"] = source
         return result
 
     monkeypatch.setattr(core_chart, "_build_planet_states", controlled)

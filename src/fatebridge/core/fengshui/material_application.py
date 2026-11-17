@@ -13,7 +13,9 @@ def analyze_application(
     keys = {
         "water": ("water_clean", "water_moving", "proportionate_to_space"),
         "metal": ("metal_exposed", "proportionate_to_space"),
-        "living_plant": ("plant_healthy",),
+        "living_plant": ("plant_healthy", "proportionate_to_space"),
+        "stone": ("proportionate_to_space",),
+        "ceramic": ("proportionate_to_space",),
     }.get(fact.material, ())
     checks = []
     pending = []

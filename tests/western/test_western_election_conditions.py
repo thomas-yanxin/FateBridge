@@ -71,6 +71,23 @@ def event_result(voc=False):
     }
 
 
+@pytest.fixture(autouse=True)
+def isolate_synthetic_history(monkeypatch):
+    native = election.native_planetary_events
+
+    def history(subject):
+        if isinstance(subject, SimpleNamespace):
+            return {
+                "status": "unavailable",
+                "constant_velocity_projection": False,
+                "events": [],
+                "unavailable_reason": "Synthetic score controls are not physical charts",
+            }
+        return native(subject)
+
+    monkeypatch.setattr(election, "native_planetary_events", history)
+
+
 @pytest.fixture
 def known_motion(monkeypatch):
     monkeypatch.setattr(
@@ -292,7 +309,9 @@ def test_horary_named_ascendant_ruler_and_unrounded_strictures(monkeypatch):
     result = horary.build_horary_payload(subject, category="general")
     assert result["ascendant"]["degree"] == math.nextafter(30.0, 0)
     strict = {s["code"] for s in result["radicality"]["strictures"]}
-    assert "ascendant_too_late" in strict and "ascendant_too_early" not in strict
+    gate = result["radicality"]["ascendant_degree_gate"]
+    assert gate["late"] is True and gate["early"] is False
+    assert "C02" in strict and "C01" not in strict
     subject.ascendant.abs_pos = 31.0
     assert (
         horary.build_horary_payload(subject, category="general")["significators"][

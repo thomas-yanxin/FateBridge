@@ -64,7 +64,9 @@ def test_production_binding_has_closed_form_fraction_without_display_rounding():
         abs=1e-13,
     )
     assert result["method_id"] == "season_root_revelation_relations_v12"
-    assert result["strength_level"] == "中和"  # no unaccepted conversion promotion
+    # This test checks numerical binding arithmetic. The separate root-policy
+    # override (already strong before this change) is covered in structural_priority.
+    assert result["threshold_arithmetic"]["numerical_label"] == "中和"
     assert "stem_effects" not in result
     assert all(
         r["physical_element"] == r["effective_element"] for r in receipt["ledger"]

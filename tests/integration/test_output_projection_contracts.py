@@ -16,12 +16,29 @@ import fatebridge.mcp_server as mcp
 from fatebridge.application.projection import project_fields
 from fatebridge.cli import run
 from fatebridge.core.fengshui.output import Ruleset
+from fatebridge.core.response_models import (
+    CHART_TOOL_FIELDS,
+    CHINESE_TOOL_FIELDS,
+    REFERENCE_TOOL_FIELDS,
+)
 from fatebridge.services.tool_catalog import CATALOG
 from tests.fixtures.fengshui import PAYLOADS, payload
 from tests.support.current_outputs import current_business
 
 SPECS = {spec.key: spec for spec in CATALOG}
 AS_OF = "2026-10-12T02:00:00Z"
+
+
+def test_tool_specific_nested_contracts_are_published_at_the_catalog_root():
+    for spec in CATALOG:
+        for declarations in (
+            CHINESE_TOOL_FIELDS,
+            CHART_TOOL_FIELDS,
+            REFERENCE_TOOL_FIELDS,
+        ):
+            assert set(declarations.get(spec.key, {})) <= set(
+                spec.output_model.model_fields
+            ), spec.key
 
 
 def projectable_objects(root, node, path=(), refs=frozenset()):
@@ -72,7 +89,7 @@ def test_every_current_leaf_projection_validates_without_rewriting_facts(
     key, current_business
 ):
     spec = SPECS[key]
-    result = copy.deepcopy(current_business[key])
+    result = copy.deepcopy(current_business(key))
     before = copy.deepcopy(result)
     spec.output_model.model_validate(result)
     validator = Draft202012Validator(spec.output_model.model_json_schema())

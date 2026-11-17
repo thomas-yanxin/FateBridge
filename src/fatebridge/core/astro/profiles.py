@@ -16,7 +16,6 @@ from fatebridge.core.astro.reference import (
 from fatebridge.utils.house_systems import InvalidHouseSystemError, house_system_fields
 
 ANALYTICAL_MEAN_NODE_MODEL = "swisseph_analytical_mean_node"
-APPROXIMATE_ORBIT_MODEL = "fatebridge_approximate_orbital_model"
 
 
 def native_factor_model(body_id: int, returned_flags: int) -> str:
@@ -33,7 +32,7 @@ def native_factor_model(body_id: int, returned_flags: int) -> str:
 def physical_ephemeris_summary(models: Mapping[str, str]) -> str:
     """Summarize physical bodies, keeping reference points and quality apart."""
     physical = {model for name, model in models.items() if name not in NODE_BODIES}
-    if not physical or physical == {APPROXIMATE_ORBIT_MODEL}:
+    if not physical:
         return "none"
     if len(physical) == 1:
         return next(iter(physical))
@@ -67,7 +66,7 @@ def _derive_engine_profile(
         elif engine_precision == "mixed_precision_runtime_model":
             engine_backend = "mixed_runtime_backends"
         else:
-            engine_backend = "fatebridge_approximate_orbital_model"
+            engine_backend = "unspecified_approximation"
     elif len(backends) == 1:
         engine_backend = next(iter(backends))
     else:
@@ -139,7 +138,7 @@ def _resolve_core_chart_house_system(
 ) -> Dict[str, Any]:
     if hsys in (None, ""):
         default_house_system = CORE_CHART_DEFAULT_HOUSE_SYSTEMS[chart_variant]
-        # "equal" and "whole_sign" are Kerykeion-native and need no swisseph code.
+        # These defaults use the local house layout without a Swiss house code.
         if default_house_system in ("whole_sign", "equal"):
             return {
                 "value": None,

@@ -1,7 +1,7 @@
 """Extract original DE440 records for the predeclared Feng Shui protocol span.
 
 Research dependency: jplephem2.24. No FateBridge calculation or event table is
-imported. The existing default data profile is never replaced.
+imported. Output is a staging selection for the shared coefficient archive.
 """
 
 from __future__ import annotations
@@ -17,7 +17,6 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[2]
 FIXTURE = ROOT / "tests/data/fengshui_historical_solar_v1"
-DATA = ROOT / "src/fatebridge/data/astronomy"
 
 
 def encoded(value: Any) -> bytes:
@@ -37,9 +36,6 @@ def build(kernel_path: Path) -> tuple[bytes, dict[str, Any], bytes]:
         != hashlib.sha256(kernel_path.read_bytes()).hexdigest()
     ):
         raise ValueError("Keep the predeclared full protocol and pinned DE440 kernel")
-    for name, digest in protocol["preserve_base_profile"]["files"].items():
-        if hashlib.sha256((DATA / name).read_bytes()).hexdigest() != digest:
-            raise ValueError("The original data profile must remain byte-identical")
     low, high = [
         (date(year, 1, 1).toordinal() + 1721424.5 - 2451545.0) * 86400
         for year in protocol["record_padding_years"]
@@ -158,12 +154,14 @@ def build(kernel_path: Path) -> tuple[bytes, dict[str, Any], bytes]:
 def main() -> int:
     parser = argparse.ArgumentParser(__doc__)
     parser.add_argument("--kernel", type=Path, required=True)
+    parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args()
     raw, manifest, states = build(args.kernel)
-    binary = DATA / manifest["file"]
+    args.output.mkdir(parents=True, exist_ok=True)
+    binary = args.output / manifest["file"]
     metadata = binary.with_name("de440-solar-historical-v1.json")
-    expected = FIXTURE / "states.json.gz"
+    expected = args.output / "de440-solar-historical-v1-states.json.gz"
     if args.check:
         packed = binary.read_bytes()
         if (

@@ -7,6 +7,7 @@ Mercury's unadjudicated association rule is kept as conditional branches.
 from __future__ import annotations
 
 import math
+from collections.abc import Mapping
 from fractions import Fraction
 from typing import Any
 
@@ -22,6 +23,27 @@ NATURAL_RANKS = dict(
 ASPECT_METHOD = "raman_113_120_additive_specials"
 
 
+def strength_branch_summary(
+    branches: Mapping[str, Mapping[str, Fraction | float | None]],
+) -> dict[str, float | None]:
+    """Compare the given branch operands before converting to display values."""
+    summary: dict[str, float | None] = {}
+    for p in PLANETS:
+        values = {row[p] for row in branches.values()}
+        value = next(iter(values)) if len(values) == 1 else None
+        summary[p] = float(value) if value is not None else None
+    return summary
+
+
+def strength_branch_display(
+    branches: Mapping[str, Mapping[str, Fraction | float | None]],
+) -> dict[str, dict[str, float | None]]:
+    return {
+        name: {p: float(v) if v is not None else None for p, v in row.items()}
+        for name, row in branches.items()
+    }
+
+
 def directed_angle(aspector: float, aspected: float) -> Fraction:
     """Exact binary input ratio prevents subtraction from changing cusp side."""
     a, ad = longitude_ratio(aspector)
@@ -29,17 +51,12 @@ def directed_angle(aspector: float, aspected: float) -> Fraction:
     return (Fraction(b, bd) - Fraction(a, ad)) % 360
 
 
-def aspect_value(
-    aspector: str, aspector_longitude: float, aspected_longitude: float
-) -> dict[str, float]:
+def _aspect_virupas(aspector: str, angle: Fraction) -> tuple[Fraction, int]:
     """Raman sections113-115: directed base plus literal special additions.
 
     The book does not adjudicate each endpoint. Use right-hand half-open
     intervals consistently and report that convention; do not hide jumps.
     """
-    if aspector not in PLANETS:
-        raise ValueError("Quantitative aspects cover the seven physical grahas only")
-    angle = directed_angle(aspector_longitude, aspected_longitude)
     if angle < 30 or angle >= 300:
         base = Fraction(0)
     elif angle < 60:
@@ -61,6 +78,16 @@ def aspect_value(
         extra = 30
     elif aspector == "Saturn" and (60 <= angle < 90 or 270 <= angle < 300):
         extra = 45
+    return base, extra
+
+
+def aspect_value(
+    aspector: str, aspector_longitude: float, aspected_longitude: float
+) -> dict[str, float]:
+    if aspector not in PLANETS:
+        raise ValueError("Quantitative aspects cover the seven physical grahas only")
+    angle = directed_angle(aspector_longitude, aspected_longitude)
+    base, extra = _aspect_virupas(aspector, angle)
     return {
         "directed_angle": float(angle),
         "ordinary_virupa": float(base),
@@ -173,14 +200,20 @@ def moon_nature_readings(elongation: Fraction) -> dict[str, Any]:
 
 
 def aspect_strength(longitudes: dict[str, float]) -> dict[str, Any]:
-    matrix = {
-        p: {q: aspect_value(p, longitudes[p], longitudes[q])["value"] for q in PLANETS}
-        for p in PLANETS
-    }
+    exact_matrix: dict[str, dict[str, Fraction]] = {}
+    for p in PLANETS:
+        row = {}
+        for q in PLANETS:
+            base, extra = _aspect_virupas(
+                p, directed_angle(longitudes[p], longitudes[q])
+            )
+            row[q] = base + extra
+        exact_matrix[p] = row
     elongation = directed_angle(longitudes["Sun"], longitudes["Moon"])
     nature_readings = moon_nature_readings(elongation)
     moon_options = nature_readings["options"]
     scenarios: dict[str, Any] = {}
+    totals: dict[str, dict[str, Fraction]] = {}
     for moon_nature in moon_options:
         for mercury_nature in ("benefic", "malefic"):
             natures = {
@@ -194,20 +227,25 @@ def aspect_strength(longitudes: dict[str, float]) -> dict[str, Any]:
             }
             contributions = {
                 target: {
-                    p: matrix[p][target] / 4 * (1 if natures[p] == "benefic" else -1)
+                    p: exact_matrix[p][target]
+                    / 4
+                    * (1 if natures[p] == "benefic" else -1)
                     for p in PLANETS
                 }
                 for target in PLANETS
             }
-            scenarios[f"moon_{moon_nature}__mercury_{mercury_nature}"] = {
+            sums = {p: sum(contributions[p].values(), Fraction()) for p in PLANETS}
+            name = f"moon_{moon_nature}__mercury_{mercury_nature}"
+            totals[name] = sums
+            scenarios[name] = {
                 "natures": natures,
-                "summary": {p: sum(contributions[p].values()) for p in PLANETS},
-                "contributions": contributions,
+                "summary": {p: float(total) for p, total in sums.items()},
+                "contributions": {
+                    target: {p: float(value) for p, value in values.items()}
+                    for target, values in contributions.items()
+                },
             }
-    summary: dict[str, float | None] = {}
-    for p in PLANETS:
-        values = {s["summary"][p] for s in scenarios.values()}
-        summary[p] = next(iter(values)) if len(values) == 1 else None
+    summary = strength_branch_summary(totals)
     pending = [p for p, value in summary.items() if value is None]
     return {
         "status": (
@@ -246,8 +284,11 @@ def aspect_strength(longitudes: dict[str, float]) -> dict[str, Any]:
         "summary": summary,
         "conditional_targets": pending,
         "scenarios": scenarios,
-        "matrix": matrix,
+        "matrix": {
+            p: {q: float(v) for q, v in row.items()} for p, row in exact_matrix.items()
+        },
         "nature_context": {
+            "summary_consensus_policy": "Compare exact signed sums of the given binary longitudes before converting display values to floats.",
             "moon_directed_elongation": float(elongation),
             "moon_options": moon_options,
             "moon_rule": "Union of Raman117-118 waxing/waning and Raman53 eighth-day window readings; unresolved differences and endpoint bands retain both natures",

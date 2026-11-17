@@ -5,7 +5,8 @@ import hashlib
 import json
 from pathlib import Path
 
-from fatebridge.core.heluo import MONTH_GUA, _gua_tables, calculate, gua_lines
+from fatebridge.core.heluo import MONTH_GUA, calculate
+from fatebridge.core.heluo_hexagrams import _gua_tables, gua_lines
 from fatebridge.core.heluo_months import MONTH_BRANCHES, month_affinity
 
 ROOT = Path(__file__).resolve().parents[2]

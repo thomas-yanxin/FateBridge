@@ -11,6 +11,7 @@ from pydantic import ValidationError
 
 import fatebridge.application.execution as execution
 from fatebridge.core.output_jinkou_breaks import JinkouBranchBreaks
+from fatebridge.core.public_output import same_public_value
 from scripts.ren.audit_jinkou_break_witnesses import CORPUS, audit, reference
 from tests.ren.test_jinkou_branch_breaks import PAYLOAD, SPEC, course, raw
 from tests.support.transports import AS_OF, business, rest, surface_calls
@@ -103,8 +104,8 @@ def test_three_ports_preserve_both_witnesses_in_all_courses(project, surface_cal
     )
     for body in (http.json(), cli, protocol.structured_content):
         for role in ("primary", "natal_course", "year_fate"):
-            assert (
-                course(body, role)["branch_breaks"]["witness_evidence"] == reference()
+            assert same_public_value(
+                course(body, role)["branch_breaks"]["witness_evidence"], reference()
             )
 
 

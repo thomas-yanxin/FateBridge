@@ -20,6 +20,8 @@ from fatebridge.core.almanac import (
 )
 from fatebridge.core.metaphysics.common import MetaphysicsSeed, sexagenary_text
 
+from .qimen_stem_context import compare_candidate_palaces
+
 
 def resolve_calendar_stems(seed: MetaphysicsSeed) -> dict[str, Any]:
     civil = localize_datetime(seed.input_datetime, seed.timezone)
@@ -143,37 +145,60 @@ def match_calendar_stems(
             if "庚" in p["heaven_stems"] and stem in p["earth_stems"]
         ]
 
+    def jia_candidates(ganzhi: str, role: str) -> list[dict[str, Any]]:
+        return [
+            {
+                "policy": policy,
+                "xun_head": xun_head,
+                "effective_stem": stem,
+                "candidate_matches": matching(stem),
+                "adopted": False,
+            }
+            for policy, xun_head, stem in (
+                (
+                    f"{role}_jia_own_six_instrument",
+                    ganzhi,
+                    QIMEN_FUHEAD_HEAVEN_STEM[ganzhi],
+                ),
+                (
+                    "current_hour_xun_six_instrument",
+                    leader["xun_head"],
+                    leader["zhifu_heaven_stem"],
+                ),
+            )
+        ]
+
     result = []
     for role, rule_id, name in [
         ("year", "year_stem_block", "岁格"),
         ("lunar_month_start", "lunar_month_start_block", "月朔格"),
     ]:
         context = contexts[role]
+        match_lists: list[list[str]] = []
         if context["status"] == "unresolved_jia_identity":
-            context["candidates"] = [
-                {
-                    "policy": f"{role}_jia_own_six_instrument",
-                    "xun_head": context["ganzhi"],
-                    "effective_stem": QIMEN_FUHEAD_HEAVEN_STEM[context["ganzhi"]],
-                },
-                {
-                    "policy": "current_hour_xun_six_instrument",
-                    "xun_head": leader["xun_head"],
-                    "effective_stem": leader["zhifu_heaven_stem"],
-                },
-            ]
-            for candidate in context["candidates"]:
-                candidate.update(
-                    {
-                        "candidate_matches": matching(candidate["effective_stem"]),
-                        "adopted": False,
-                    }
-                )
-        for candidate in context.get("boundary_candidates", []):
+            context["candidates"] = jia_candidates(context["ganzhi"], role)
+            match_lists = [c["candidate_matches"] for c in context["candidates"]]
+        boundary_candidates = context.get("boundary_candidates", [])
+        for candidate in boundary_candidates:
             stem = candidate["literal_stem"]
-            candidate["candidate_matches"] = matching(stem) if stem != "甲" else None
+            matches = matching(stem) if stem != "甲" else None
+            candidate["candidate_matches"] = matches
             candidate["jia_identity_resolved"] = stem != "甲"
             candidate["adopted"] = False
+            if (
+                context["status"] == "unresolved_year_boundary"
+                and len(boundary_candidates) == 2
+            ):
+                if matches is None:
+                    alternatives = jia_candidates(candidate["ganzhi"], role)
+                    candidate["jia_candidates"] = alternatives
+                    match_lists.extend(c["candidate_matches"] for c in alternatives)
+                else:
+                    match_lists.append(matches)
+        if match_lists:
+            context["candidate_outcomes"] = {
+                rule_id: compare_candidate_palaces(match_lists)
+            }
         if context["status"] != "literal_stem_resolved":
             continue
         stem = context["effective_stem"]

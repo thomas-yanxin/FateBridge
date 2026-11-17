@@ -11,6 +11,7 @@ from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
 from scripts import build_codex_call_contracts as builder
 from tests.fixtures.mcp_result_delivery import read_full_result
+from tests.support.result_delivery import store
 
 
 @pytest.fixture(scope="module")
@@ -103,7 +104,7 @@ def test_published_contract_keeps_required_time_and_solar_flag_constraints(
 
 @pytest.mark.asyncio
 async def test_published_stage_view_retains_actual_period_boundaries(
-    published_contracts,
+    published_contracts, store
 ):
     """A on-demand contract must support stage reading without rediscovery."""
     record = next(
@@ -132,7 +133,7 @@ async def test_published_stage_view_retains_actual_period_boundaries(
 @pytest.mark.asyncio
 @pytest.mark.local_data
 async def test_only_published_inputs_and_views_are_enough_for_real_mcp_calls(
-    published_contracts,
+    published_contracts, store
 ):
     from tests.support.compatibility_reference import (
         assert_source_condition_score_reference,
@@ -180,22 +181,30 @@ async def test_only_published_inputs_and_views_are_enough_for_real_mcp_calls(
                     "食伤生财": 10,
                     "财官双美": 8,
                 }
-                # v4/v5 root qualification makes this particular model label
-                # 强: the unchanged +5 branch and cap apply, 98 -> 95.
+                # The engineering policy's 强 branch adds 5; this is an
+                # uncalibrated rule index, not a classical force judgment.
                 assert career["career_structure"]["score"] == min(
                     95, 60 + 15 + 10 + 8 + 5
                 )
-                assert any(
-                    "日主强旺" in note for note in career["career_structure"]["notes"]
-                )
+                structure = career["career_structure"]
+                assert structure["engineering_index"]["strength_level"] == "强"
+                assert structure["score_kind"] == "uncalibrated_rule_index"
+                assert structure["formation_status"] == "heuristic_candidate_only"
                 assert "timing_context" in payload["career_analysis"]
             elif record["tool"] == "two_person_compatibility":
-                # This live source case has no first-person preference decision;
-                # the original full-profile literal ledger is a different input.
+                # The source-force policy has no adjudicated preference here.
+                # The score ledger retains its separate engineering reference.
                 first = payload["person_info"]["person1"]["preference_assessment"]
                 assert first["useful_elements"] == first["avoid_elements"] == []
-                assert set(first["conditional_elements"]) == {"火", "土", "水"}
-                assert set(first["neutral_elements"]) == {"木", "金"}
+                assert first["assessment_status"] == "not_adjudicated"
+                assert set(first["conditional_elements"]) == {
+                    "木",
+                    "火",
+                    "土",
+                    "金",
+                    "水",
+                }
+                assert first["neutral_elements"] == []
                 assert_source_condition_score_reference(
                     payload["summary"], payload["detailed_analysis"]
                 )

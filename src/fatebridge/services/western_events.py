@@ -9,9 +9,8 @@ then read the sky at that instant. Moment-solving lives in
 
 from __future__ import annotations
 
-import json
 from datetime import timezone
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Literal, Optional
 
 from fatebridge.core.astrology_events import (
     CARDINAL_INGRESS_LABELS,
@@ -23,7 +22,6 @@ from fatebridge.core.astrology_events import (
 )
 from fatebridge.core.predictive._common import (
     build_analysis_datetime,
-    build_natal_subject,
     build_predictive_birth_info,
     build_subject,
     extract_reference_points,
@@ -34,13 +32,9 @@ from fatebridge.services.snapshot_builders import (
     render_snapshot_text as _render_snapshot_text,
 )
 from fatebridge.utils.errors import handle_calculation_error
+from fatebridge.utils.formatting import format_json_response
 from fatebridge.utils.house_systems import house_system_fields, normalize_house_system
 from fatebridge.utils.timezones import parse_timezone_name
-
-
-def _json_block(value: Any) -> str:
-    return json.dumps(value, ensure_ascii=False, indent=2, default=str)
-
 
 # ---------------------------------------------------------------------------
 # 世俗入宫盘 (astro_mundane).
@@ -50,7 +44,7 @@ def _json_block(value: Any) -> str:
 def calculate_mundane(
     *,
     year: int,
-    ingress_term: str = "春分",
+    ingress_term: Literal["春分", "夏至", "秋分", "冬至"] = "春分",
     longitude: float,
     latitude: float,
     timezone_name: str = "+08:00",
@@ -61,8 +55,6 @@ def calculate_mundane(
     """在某年某节气（春分/夏至/秋分/冬至）的精确入宫时刻排世俗盘。"""
     label = "世俗入宫盘"
     try:
-        if ingress_term not in CARDINAL_INGRESSES:
-            ingress_term = "春分"
         house_system = normalize_house_system(house_system)
         ingress_utc = find_cardinal_ingress_utc(year, ingress_term)
         local_tz = parse_timezone_name(timezone_name)
@@ -114,8 +106,8 @@ def calculate_mundane(
             f"上升 {points['ascendant']['sign_label']}。"
         )
         sections = [
-            ("起盘信息", _json_block(context)),
-            ("入宫盘星与角", _json_block(payload)),
+            ("起盘信息", format_json_response(context, compact=False)),
+            ("入宫盘星与角", format_json_response(payload, compact=False)),
         ]
         return {
             "analysis_type": "西占世俗入宫盘",
@@ -159,11 +151,6 @@ def calculate_extrareturns(
             name=birth_kwargs.get("name"),
             birth_place=birth_kwargs.get("birth_place"),
         )
-        # build the natal subject so the tool also fails fast if the backend is absent
-        build_natal_subject(
-            birth_info, house_system=house_system, zodiac_type=zodiac_type
-        )
-
         analysis_local = build_analysis_datetime(
             birth_info,
             analysis_year=analysis_year,
@@ -243,8 +230,8 @@ def calculate_extrareturns(
             for item in returns
         )
         sections = [
-            ("起盘信息", _json_block(context)),
-            ("返照时刻", _json_block(returns)),
+            ("起盘信息", format_json_response(context, compact=False)),
+            ("返照时刻", format_json_response(returns, compact=False)),
         ]
         return {
             "analysis_type": "西占多重回归",

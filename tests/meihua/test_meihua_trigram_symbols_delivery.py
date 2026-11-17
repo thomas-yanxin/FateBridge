@@ -1,6 +1,5 @@
 """All public casting shapes and bounded same-run delivery; no model calls."""
 
-import hashlib
 import json
 import os
 import sys
@@ -12,8 +11,10 @@ from fastmcp.client.transports import StdioTransport
 from pydantic import TypeAdapter
 
 import fatebridge
+from fatebridge.core.public_output import same_public_value
 from fatebridge.core.requests.meihua import MeihuaCasting
 from fatebridge.services.meihua import calculate_meihua_cast
+from tests.fixtures.mcp_result_delivery import read_full_result
 
 METHODS = [
     {"method": "existing", "hexagram_code": "010111", "moving_line": 4},
@@ -132,33 +133,8 @@ async def test_bounded_stdio_read_restores_complete_same_run_field(tmp_path):
         )
         assert not reply.is_error
         result = reply.structured_content
-        delivery = result["result_delivery"]
-        run = result["run_metadata"]["run_id"]
-        uri = f"fatebridge://results/{delivery['result_id']}/verified/{run}/{delivery['sha256']}/fields/{FIELD}/0"
-        fragments = []
-        offset = 0
-        checksum = None
-        while uri:
-            reply = await client.read_resource(uri)
-            page = json.loads(reply[0].text)
-            assert (
-                page["offset"] == offset and page["result_id"] == delivery["result_id"]
-            )
-            assert page["path"] == FIELD
-            assert page["verification"]["run_id"] == run
-            assert page["verification"]["payload_sha256"] == delivery["sha256"]
-            assert page["verification"]["calculation_repeated"] is False
-            checksum = page["sha256"] if checksum is None else checksum
-            assert checksum == page["sha256"]
-            fragments.append(page["text"])
-            offset += len(page["text"])
-            following = page["next_offset"]
-            assert following is None or following == offset
-            uri = (
-                uri.rsplit("/", 1)[0] + "/" + str(following)
-                if following is not None
-                else None
-            )
-    text = "".join(fragments)
-    assert hashlib.sha256(text.encode()).hexdigest() == checksum
-    assert json.loads(text) == expected
+        assert "result_delivery" in result
+        restored = await read_full_result(client, result)
+        assert same_public_value(
+            restored["interpretation"][FIELD.split(".")[1]], expected
+        )

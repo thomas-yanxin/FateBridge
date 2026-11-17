@@ -35,6 +35,21 @@ def swiss_environment(monkeypatch, tmp_path):
         almanac.get_solar_terms_for_year.cache_clear()
 
 
+def test_strict_missing_files_does_not_resolve_the_unused_bundled_source(
+    swiss_environment, monkeypatch
+):
+    from fatebridge.core import de441_solar
+
+    def unused():
+        raise AssertionError("Strict Swiss must not load bundled DE441")
+
+    monkeypatch.setattr(de441_solar, "model_details", unused)
+    monkeypatch.setattr(de441_solar, "solar_longitude", lambda epoch: unused())
+    with pytest.raises(EphemerisSourceError) as failure:
+        almanac.get_solar_terms_for_year(2000, "UTC")
+    assert failure.value.reason == "solar_swiss_files_required"
+
+
 def test_swiss_does_not_load_unrelated_coefficients(swiss_environment, monkeypatch):
     def unused():
         raise AssertionError("Swiss mode must not resolve analytic coefficients")
@@ -108,7 +123,7 @@ def test_same96_references_with_original_native_failures_retained(
                     term.ephemeris_model
                     == {
                         "swiss": "swieph",
-                        "native": "fatebridge_complete_moshier_solar_v1",
+                        "native": "fatebridge_de441_solar_v1",
                         "auto": "fatebridge_de440_solar_v1",
                     }[mode]
                 )

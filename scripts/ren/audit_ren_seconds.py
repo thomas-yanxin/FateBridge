@@ -12,9 +12,14 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+from scripts.ren.ren_boundary_reference import (
+    REFERENCE_PATH,
+    REFERENCE_SHA256,
+    load_ren_boundary_reference,
+)
+
 ROOT = Path(__file__).resolve().parents[2]
-CORPUS = ROOT / "tests/data/ren/second_boundary_inputs"
-FREEZE_SHA = "9593cb737bca892c8884ff5901c3a774449cdd0a6fed08fc742f7df6cc16bc35"
+CORPUS = REFERENCE_PATH.parent
 
 
 def sha(p: Path) -> str:
@@ -22,32 +27,17 @@ def sha(p: Path) -> str:
 
 
 def reference(corpus: Path = CORPUS) -> dict[str, Any]:
-    if sha(corpus / "freeze.json") != FREEZE_SHA:
-        raise ValueError("Frozen second-reference manifest changed")
-    freeze = json.loads((corpus / "freeze.json").read_text())
-    if {p.name for p in corpus.iterdir()} != {
-        "freeze.json",
-        "protocol.json",
-        "probes.json.gz",
-    }:
-        raise ValueError("Frozen second-reference inventory changed")
-    if any(sha(corpus / n) != h for n, h in freeze["files"].items()):
-        raise ValueError("Frozen second-reference payload changed")
-    protocol = json.loads((corpus / "protocol.json").read_text())
-    for n, h in protocol["reference_pins"].items():
-        if sha(ROOT / n) != h:
-            raise ValueError("Pinned independent source changed: " + n)
-    data = json.loads(gzip.decompress((corpus / "probes.json.gz").read_bytes()))
-    rows = data["rows"]
-    if (
-        data["protocol_sha256"] != sha(corpus / "protocol.json")
-        or len(rows) != 19248
-        or len({r["id"] for r in rows}) != 19248
-    ):
-        raise ValueError("The entire19248-input cohort is required")
-    if any(sum(r["year"] == y for r in rows) != 48 for y in range(1800, 2201)):
-        raise ValueError("Every input year needs all48 second labels")
-    return dict(protocol=protocol, data=data)
+    ref = load_ren_boundary_reference(corpus / "reference.json.gz")
+    return dict(
+        protocol=ref.packet.second_protocol.model_dump(mode="json"),
+        data=ref.packet.seconds.model_dump(mode="json"),
+        roots=[r.model_dump() for r in ref.solar.rows if 1800 <= r.year <= 2200],
+        source_data=dict(sofa=ref.sofa.model_dump(mode="json")),
+        reference_source=ref.source_summary,
+        protocol_sha256=hashlib.sha256(
+            ref.packet.second_protocol.model_dump_json().encode()
+        ).hexdigest(),
+    )
 
 
 def source_map() -> dict[str, str]:
@@ -61,7 +51,8 @@ def source_map() -> dict[str, str]:
         for n in [
             "scripts/ren/audit_ren_seconds.py",
             "scripts/ren/ren_second_reference.py",
-            "scripts/ren/collect_ren_second_probes.py",
+            "scripts/ren/build_ren_boundary_reference.py",
+            "scripts/ren/ren_boundary_reference.py",
             "pyproject.toml",
             "uv.lock",
         ]
@@ -163,9 +154,7 @@ def audit(profile: str, ephe: Path, details: Path) -> dict[str, Any]:
     from fatebridge.core.astro.time_scales import ephemeris_time
 
     assert Path(almanac.__file__).resolve() == ROOT / "src/fatebridge/core/almanac.py"
-    roots = json.loads(
-        (ROOT / "tests/data/solar/liuyao_de440_tt1800_2200.json").read_text()
-    )["rows"]
+    roots = ref["roots"]
     by_year = {y: [r for r in roots if r["year"] == y] for y in range(1800, 2201)}
     probes = {y: [r for r in data["rows"] if r["year"] == y] for y in range(1800, 2201)}
     counts: dict[str, Counter[str]] = {
@@ -294,8 +283,9 @@ def audit(profile: str, ephe: Path, details: Path) -> dict[str, Any]:
     )
     return dict(
         profile=profile,
-        protocol_sha256=sha(CORPUS / "protocol.json"),
-        reference_freeze_sha256=FREEZE_SHA,
+        protocol_sha256=ref["protocol_sha256"],
+        reference_packet_sha256=REFERENCE_SHA256,
+        reference_source=ref["reference_source"],
         details_file=details.name,
         details_sha256=sha(details),
         root_count=root_count,

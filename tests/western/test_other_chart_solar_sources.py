@@ -1,6 +1,5 @@
 """Real Sun-source races, progressed coverage and public source contracts."""
 
-import asyncio
 import json
 import math
 import os
@@ -10,12 +9,8 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import pytest
-from fastapi.testclient import TestClient
-from fastmcp import Client
 from jsonschema import Draft202012Validator
 
-import fatebridge.api as api
-from fatebridge.cli import run
 from fatebridge.core import ephemeris_runtime as e
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.birth import build_astro_birth_info
@@ -29,10 +24,11 @@ from fatebridge.core.astro.sensitivity import enrich_specialty_sensitivity
 from fatebridge.core.astro.solar_arc import enrich_solar_arc, solar_arc_state
 from fatebridge.core.astro.solar_ephemeris import SolarEphemerisBatch
 from fatebridge.core.astro.time_scales import datetime_from_tt, ephemeris_time
-from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.astrology import calculate_germany_chart_analysis
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.errors import EphemerisSourceError
+from tests.support.transports import rest as rest
+from tests.support.transports import surface_calls as surface_calls
 
 pytestmark = pytest.mark.skipif(e.swe is None, reason="Swiss Ephemeris required")
 
@@ -283,7 +279,7 @@ def test_nonfinite_sun_epoch_is_rejected(jd):
     "key,variant", [("astro_germany", None), ("astro_chart", "germany")]
 )
 def test_progressed_boundary_error_and_same_complete_grid_across_surfaces(
-    files, monkeypatch, tmp_path, capsys, key, variant
+    files, monkeypatch, key, variant, surface_calls
 ):
     source, directory = files
     payload = edge_input(directory)
@@ -299,50 +295,10 @@ def test_progressed_boundary_error_and_same_complete_grid_across_surfaces(
         response_char_limit=0,
         as_of="2026-10-22T00:00:00Z",
     )
-    api._reset_runtime_state_for_tests()
-    monkeypatch.setattr(
-        api,
-        "API_KEY_AUTHENTICATOR",
-        api.ApiKeyAuthenticator(header_name="X-API-Key", api_keys={}),
+
+    rest, protocol, code, cli = surface_calls(
+        spec, payload, projection=options, cli_first=False
     )
-    request = tmp_path / "request.json"
-    request.write_text(json.dumps(payload))
-
-    def surfaces():
-        params = [("fields", path)] + [
-            (k, str(v).lower() if isinstance(v, bool) else str(v))
-            for k, v in options.items()
-            if k != "fields"
-        ]
-        rest = TestClient(api.app).post(spec.rest_path, json=payload, params=params)
-
-        async def mcp():
-            async with Client(create_mcp_app()) as client:
-                return await client.call_tool(
-                    spec.tool_name, {**payload, **options}, raise_on_error=False
-                )
-
-        protocol = asyncio.run(mcp())
-        capsys.readouterr()
-        code = run(
-            [
-                spec.tool_name,
-                "--subject-file",
-                str(request),
-                "--fields",
-                path,
-                "--strict-fields",
-                "--no-include-snapshot-text",
-                "--response-char-limit",
-                "0",
-                "--as-of",
-                options["as_of"],
-            ]
-        )
-        cli = json.loads(capsys.readouterr().out)
-        return rest, protocol, code, cli
-
-    rest, protocol, code, cli = surfaces()
     assert rest.status_code == 503 and protocol.is_error and code == 1
     for error in (rest.json(), json.loads(protocol.content[0].text), cli):
         assert error["error_code"] == "ephemeris_source_inconsistent"
@@ -353,7 +309,9 @@ def test_progressed_boundary_error_and_same_complete_grid_across_surfaces(
     for name in ("sepl_24.se1", "semo_24.se1"):
         shutil.copy2(source / name, directory / name)
     e.configure_ephemeris_path(str(directory))
-    rest, protocol, code, cli = surfaces()
+    rest, protocol, code, cli = surface_calls(
+        spec, payload, projection=options, cli_first=False
+    )
     assert rest.status_code == 200 and not protocol.is_error and code == 0
     solar = [
         body["midpoint_analysis"]["solar_arc_analysis"]

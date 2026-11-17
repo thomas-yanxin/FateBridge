@@ -9,8 +9,6 @@ from fatebridge.core import ephemeris_runtime as e
 from fatebridge.core.local_techniques.otherbu import build_otherbu_result
 from scripts.astrodice.verify_astrodice_source_receipt import verify
 
-RUN = Path("tests/data/astrodice/reference_sets/study-motion-text")
-
 
 @pytest.mark.parametrize("frame", [0, 1])
 def test_actual_swiss_context_exposes_resolvable_source_receipt(monkeypatch, frame):

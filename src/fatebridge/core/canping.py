@@ -1,21 +1,15 @@
-"""邵子参评数 / 金锁银匙 (canping) — 原生离线计算。
+"""金锁银匙起数、命宫顺排与相对干支年序。
 
-This is a native Python port of horosa's ``canpingLocal.js`` (邵子参评数 /
-金锁银匙). canping is a "原生·非 kentang" technique: unlike qimen/taiyi/jinkou
-(computed by a backend and only formatted), canping is computed entirely
-in-process. The four pillars come from FateBridge's own calendar engine; this
-module does the 金锁银匙 起数 + 条文查表. The inherited implementation has
-been corrected against the specified volume-six examples; historical port
-snapshots are regression evidence rather than an independent correctness oracle.
+gu取数采用卷六所选规则，ming保留具名月支变法。条文资料由
+canping_texts提供；这里的命宫运序不建立民用时刻区间，实际配运由
+canping_timing处理。历史移植快照不作独立准确性参考。
 """
 
 from __future__ import annotations
 
-from functools import lru_cache
 from typing import Any, Dict, List, Optional, Tuple
 
 from fatebridge.core.canping_texts import (
-    inherited_corpus,
     lookup_record,
     pair_resolution,
     selection_snapshot,
@@ -84,11 +78,6 @@ _GANS: Tuple[str, ...] = (
 )
 
 
-@lru_cache(maxsize=1)
-def _tiaowen() -> Dict[str, Any]:
-    return inherited_corpus()
-
-
 def nayin_element(year_gz: str) -> str:
     """年干支 → 纳音五行（金/木/水/火/土）。
 
@@ -155,10 +144,6 @@ def compute_number(day_branch: str, hour_branch: str, element: str) -> Dict[str,
         "numShun": base + shun * 100,
         "numNi": base + ni * 100,
     }
-
-
-def _lookup(element: str, number: int, kind: str) -> str:
-    return str(lookup_record(element, number, kind)["text"])
 
 
 def _verses(element: str, info: Dict[str, int], kind: Optional[str]) -> Dict[str, Any]:

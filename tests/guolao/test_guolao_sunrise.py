@@ -13,7 +13,6 @@ from fatebridge.core import guolao_sunrise as subject
 from fatebridge.core.guolao_lunar_phases import assign_source_phase_day
 from fatebridge.validation.guolao_sunrise import (
     audit_sunrise_tables,
-    chinese_integer,
     parse_cell,
     parse_digital_table,
 )

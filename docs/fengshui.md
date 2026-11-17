@@ -181,6 +181,7 @@ asyncio.run(main())
 - `element_relationships`：分别计算每个已关联星五行的生、同、泄、克与被克关系。复用共享五行图；例如火由木生、泄到土、被水克。星五行不是住户喜用神，这些关系不证明具体物件、颜色或材质有化煞效果。
 - `layout_analysis.status`：本次布局关联计算的完成状态；独立于顶层原始盘 `status`。年盘已算完而对象位置未知时，原始盘可以 `complete`，布局关联保持 `partial`。
 - `layout_analysis.analysis_progress` 与 `coverage.analysis_progress`：保留原 status，另分计算完整性、所选规则审查及候选动作可执行性。已确认没有独立规则的物件可结束审查；属性 unknown 或照片候选仍需事实确认。可选新增不变成必做任务，blocked 不再追其执行条件，方向关系未验证搬转可行性时不返回 ready。计数单位与 pending_confirmations 的用途随结果明确，不能把输出确认路径当请求参数。
+- 月星可完成中性落宫计算，但尚未覆盖用途吉凶或动作处方，因此汇总保留 `rule_coverage_status=limited`；没有候选动作时 `action_readiness=not_evaluated`。这不改变月星数值、计算完整性或已有规则的解释。
 - 普通解释独立读取 `analysis_progress.interpretation_status`：`available` 有确认判断或参考可解释，`conditional` 有实际候选观察可条件式解释，`scope_only` 仅说明已知覆盖限制，`insufficient_evidence` 尚无事实依据。partial、候选或动作未 ready 不阻塞已有依据。`follow_up.conclusion_candidates` 是按当前问题择要追问的候选，`execution_only` 只约束动作落实；不把二者拼成必补清单。未实现能力直接说明，不继续索取无法补足能力的资料。
 - `follow_up` 两类列表引用同一结果中 `pending_confirmations.path`，不重复确认记录，也不是新输入参数。一个路径同时用于事实判断与动作时只列在结论候选中；具体理由及动作范围仍查原确认记录。
 
@@ -264,6 +265,8 @@ uv run --locked --extra dev fatebridge fengshui_assess --request-file home.json 
 快照包含实际方向、命卦、砂水观察、年星、差异和来源。风水请求不接受 `selected_sections`；`snapshot_export` 记录本次实际生成的分层 section，进一步裁剪用 `fields`。
 
 ## 验证与维护
+
+工位作者审查附带的WOFS资料是参考；`workstation_layout.scene.desktops[].ruleset_ids` 显式选择的实测桌面规则另行计算。两者可同时出现，文字快照按各自作用域说明，不把参考项的 `placement_rules_enabled=false` 解释为整个请求未启用该作者版本。
 
 ```bash
 uv run --locked --extra dev pytest -q tests/fengshui/test_fengshui.py tests/fengshui/test_fengshui_surfaces.py

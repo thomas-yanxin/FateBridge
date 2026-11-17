@@ -6,10 +6,11 @@
 
 ## 来源与方法
 
-`desktop_bagua_btb_v1@1.0.0` 是现代 BTB 作者方法，与八宅、年度紫白及玄空宅盘独立。须显式选版本，矩形桌面均分三行三列，坐者使用的桌沿为近侧；远左不等于东南，不能触发年星或改变个人朝向判断。
+`desktop_bagua_btb_v1@1.1.0` 是现代 BTB 作者方法，与八宅、年度紫白及玄空宅盘独立。须显式选版本，矩形桌面均分三行三列，坐者使用的桌沿为近侧；远左不等于东南，不能触发年星或改变个人朝向判断。
 
 - [Anjie Cho的八卦地图](https://www.anjiecho.com/holistic-spaces-blog/2014/4/28/feng-shui-101-the-bagua-map)明确桌面分区与远左丰盛区。
-- [Anjie Cho的事业文章](https://www.anjiecho.com/holistic-spaces-blog/attract-abundance-in-your-career-with-feng-shui)明确远左盆栽/鲜花枝候选及使用者侧窗条件。
+- [Anjie Cho的事业文章](https://www.anjiecho.com/holistic-spaces-blog/attract-abundance-in-your-career-with-feng-shui)明确远左盆栽、新鲜剪枝或鲜花候选，以及换水和更换枯萎枝花的维护条件。
+- [Anjie Cho的植物文章](https://www.anjiecho.com/holistic-spaces-blog/best-feng-shui-plants)要求已有或新添植物健康且得到照料；实现保留这一状态条件，不引入叶形禁忌或效果承诺。
 - [Tori McBrien的事业文章](https://www.ifsguild.org/nine-tips-to-support-your-career/)明确坐者桌沿定位、近中事业区及深色/水景象征；实现选不新增实际水装置的图案或用品。
 
 原始页面获取时间、SHA-256 和字节数记录在 [`desktop-bagua-v1.json`](../../../src/fatebridge/data/fengshui/desktop-bagua-v1.json)。只采用分区、目标、代表物和条件，不采纳健康、财富或事业结果承诺。
@@ -20,7 +21,9 @@ AFSI《The Principles of Feng Shui》本次重新获取的PDF散列与原记录�
 
 ## 合同
 
-`surface_layouts` 保存边界、近沿、用户目标与物件。`representation` 须有依据，支持活植物、鲜花、水景图、深色用品；手机、饮料瓶、玩偶不按名称自动归为火、水、土。属性尚不确定用 `unknown`，已确认不属于这些代表物用 `other`；照片用 `image_observed`，尚不能作为确认无规则的依据。
+`surface_layouts` 保存边界、近沿、用户目标与物件。`representation` 须有依据，支持活植物、鲜花、新鲜剪枝（`fresh_cut_branches`）、水景图、深色用品；手机、饮料瓶、玩偶不按名称自动归为火、水、土。属性尚不确定用 `unknown`，已确认不属于这些代表物用 `other`；照片用 `image_observed`，尚不能作为确认无规则的依据。
+
+植物、鲜花及剪枝另用 `healthy` 保存健康或新鲜状态，结构与实测桌面相同：`value`、`observation_basis`、`evidence` 分别表示状态、观察依据及说明。省略或未知状态不会阻止位置解释，但相应动作保持待确认；照片状态仍是候选。确认状态不符合条件时，动作返回 `blocked`，不把已算出的位置改判为无规则。
 
 桌面近沿是坐者使用的一边。九格坐标以坐者为准：
 
@@ -40,8 +43,8 @@ AFSI《The Principles of Feng Shui》本次重新获取的PDF散列与原记录�
 
 | 返回状态 | 如何解释 |
 | --- | --- |
-| `ready` | 物件、边界、许可及区域可行性已确认；执行时仍须维护条件 |
-| `conditional_option` | 许可或可行性待确认，可以先说明条件依据 |
+| `ready` | 物件、边界、许可、区域可行性及适用的植物状态已确认；执行时仍须维护条件 |
+| `conditional_option` | 许可、可行性或植物状态待确认，可以先说明条件依据 |
 | `candidate_only` | 保留照片候选，先核对影响结论的事实 |
 | `blocked` | 相应动作受限；不能改成无来源的次吉位置 |
 | `no_independent_placement_rule` | 没有该物件的独立摆放规则；不能称为已算出吉位 |
@@ -54,7 +57,7 @@ AFSI《The Principles of Feng Shui》本次重新获取的PDF散列与原记录�
 
 ### 确认事项与审查结束
 
-各桌面动作增加 `action_id`、`optional`、`pending_confirmations`。确认项的`required_for`为`assessment/action/optional_action`，`path`为输入或输出确认锚点，不是新增请求参数。此元数据不扩展物理建模：ready仍是已有边界/属性、许可和区级可行性的确认，规则文本中的植物状态、操作维护条件仍需执行时复核；不同物件的尺寸/容量和非桌面搬转可行性没有新增输入。
+各桌面动作增加 `action_id`、`optional`、`pending_confirmations` 及 `application_conditions_met`。后者分别用 `true`、`false`、`null` 表示适用状态条件满足、不满足、待确认。确认项的`required_for`为`assessment/action/optional_action`，`path`为输入或输出确认锚点，不是新增请求参数。ready 包含已有边界/属性、许可、区级可行性及植物状态的确认，操作和持续维护条件仍须执行时复核；不同物件的尺寸/容量和非桌面搬转可行性没有新增输入。
 
 ## 咨询闭环
 

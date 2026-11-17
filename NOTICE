@@ -7,6 +7,19 @@ This product is licensed under the Apache License, Version 2.0 (see LICENSE).
 Third-party components
 ------------------------------------------------------------------------------
 
+Mean lunar node numerical model parameters
+  Source model: Moshier adjusted lunar mean elements and the published
+  DE431-derived mean-node correction, Swiss Ephemeris 2.10.03.
+  Source numerical tables and formulas:
+  https://github.com/astrorigin/swisseph/blob/696bda432298d482d27e67a0cf1238920301a7dd/swemmoon.c
+  Method description: https://www.astro.com/swisseph/swisseph.htm, section 2.2.1.
+  data/astronomy/mean-lunar-node-v1.json records the source identity and
+  transcription of the numerical parameters. FateBridge evaluates the
+  algebraically combined mean-node polynomial and published secular table;
+  it does not introduce a new fit or copy the upstream C implementation.
+  This is a defined theoretical mean point, not a JPL mean-node record or
+  an observational-accuracy certificate. No provider endorsement is implied.
+
 ------------------------------------------------------------------------------
 Offline place catalog
 ------------------------------------------------------------------------------
@@ -144,9 +157,9 @@ World Magnetic Model 2025
   Frozen WMM2025 coefficients in data/fengshui/geomagnetic-wmm2025-v1.json
   and NOAA reference fixtures retain their source-byte hashes. NOAA WMM
   US Government material is public domain and is not subject to copyright
-  protection. The separately installed pygeomag 1.1.0 port is MIT-licensed:
-  https://github.com/boxpet/pygeomag/blob/v1.1.0/LICENSE
-  Neither NOAA, BGS nor that port's authors endorse FateBridge. Geomagnetic
+  protection. FateBridge evaluates the documented degree12 potential with
+  exact WGS84 inverse flattening and the existing mpmath dependency.
+  Neither NOAA nor BGS endorse FateBridge. Geomagnetic
   model reference checks do not certify on-site bearings or Feng Shui predictions.
 
 Japanese calendar candidate research fixtures
@@ -255,18 +268,18 @@ Packaged DE440 solar coefficient derivative (2026-10-23)
 
 Historical Feng Shui solar coefficient derivative (2026-10-23)
   Producer of the derivative: FateBridge project contributors, FateBridge project.
-  de440-solar-historical-v1.json and de440-solar-historical-v1.bin.gz retain
+  de440-solar-historical-v1.json selects shared source records retaining
   original Earth, EMB and Sun record bytes from the same pinned DE440 kernel
   identified above. Records include padding for the predeclared 1784..2204
-  historical-period protocol. This separately named product does not replace
-  the default coefficient files or contain reference event-time answers.
+  historical-period protocol. This separately named logical selection keeps
+  the default selection intact and contains no reference event-time answers.
   Source comments remain an archive of provenance, not attribution of this
   derivative to NASA/JPL. The same geocentric ERFA TT/TDB terms and full ERFA
   conditions apply. No provider endorsement or absolute accuracy is implied.
 
 Canping complete-horizon solar coefficient derivative (2026-10-23)
   Producer of the derivative: FateBridge project contributors, FateBridge project.
-  de440-solar-canping-v1.json and de440-solar-canping-v1.bin.gz retain
+  de440-solar-canping-v1.json selects shared source records retaining
   original Earth, EMB and Sun record bytes from the same pinned DE440 kernel
   identified above, padded over 2200..2323 for the predeclared 2201..2320
   Lichun projection protocol. They do not extend the public model-year policy
@@ -284,15 +297,65 @@ Hong Kong Observatory published solar-term dates
 
 Canping additional complete-horizon coefficient derivative (2026-10-26)
   Producer of the derivative: FateBridge project contributors, FateBridge project.
-  de440-solar-canping-extended-v1.json and its .bin.gz retain original Earth,
+  de440-solar-canping-extended-v1.json selects original Earth,
   EMB and Sun record bytes from the same pinned DE440 kernel identified above,
   padded over 2300..2423 for bounded Lichun events in 2301..2420. The existing
   extended coefficient product supplies the separately qualified 1699 event.
-  This additional product preserves all older coefficient files, does not
+  This additional product preserves all older logical coefficient selections, does not
   enlarge the standalone public year-grid policy, and contains no reference
   event-time answers. The source comments, producer attribution and complete
   ERFA conditions described above apply. It is a separately named third-party
   derivative without provider endorsement or civil UTC/physical certification.
+
+Shared lossless DE440 coefficient storage (2026-11-10)
+  de440-solar-record-atlas-v1.bin.gz stores the union of the five original
+  solar source-record selections. Identical overlapping records are stored
+  once; reversible byte channels precede gzip. Every selected coefficient
+  byte, local polynomial grid and logical selection SHA-256 is unchanged.
+  The five per-profile JSON files retain their individual model domains.
+  This storage derivative is produced by FateBridge project contributors;
+  the original JPL/NASA and ERFA attribution and conditions above apply.
+
+Continuous bounded-quantum DE441 planetary derivative (2026-11-11)
+  Producer: FateBridge project contributors, FateBridge project.
+  Original orbit data: DE441, Ryan S. Park, William M. Folkner,
+  James G. Williams and Dale H. Boggs, JPL/NASA (AJ 161:105, 2021).
+  Source: https://ssd.jpl.nasa.gov/ftp/eph/planets/Linux/de441/linux_m13000p17000.441
+  Paper: https://doi.org/10.3847/1538-3881/abd414
+  de441-planetary-0001-9999-v3 retains all selected original coefficient
+  slots, axes, subintervals and coverage for the planetary-system barycenters,
+  Earth-Moon barycenter, geocentric Moon and barycentric Sun. Earth equals
+  EMB-Moon/(1+EMRAT), and barycentric Moon equals Earth+geocentric Moon,
+  using the original source EMRAT. All receiver/target states share this source.
+  Original binary64 coefficients are rounded to nearest-even integer
+  multiples of fixed binary quanta in km: Mercury2^-24; Venus/Mars/Sun2^-22;
+  EMB2^-23; geocentricMoon2^-25; Jupiter/Saturn/Uranus/Neptune/Pluto2^-20.
+  Original coefficient bits are not preserved; small nonzero coefficients
+  may round to zero. Basis slot counts do not assert equal highest nonzero
+  polynomial degree after quantization.
+  The manifest gives exact per-axis representation bounds N*q/2 for position,
+  q/width*sum(k^2,k=0..N-1) for velocity per TDB day, based on:
+  https://dlmf.nist.gov/18.5.E1
+  https://dlmf.nist.gov/18.9.E21
+  Bounds propagate through the stated EMRAT combinations and add for
+  differences. They exclude evaluator rounding, source physics, time
+  conversion, optical mapping and output frame; they are not physical
+  millimeter precision claims.
+  Fourteen source-time chunks of up to8192original records use reversible
+  byte-channel/gzip storage. Chunking changes neither source words nor
+  physics/date coverage. The runtime caches at most two coefficient arrays.
+  Selection, bounded fixed-point representation and storage are FateBridge
+  modifications. This separately named product replaces earlier single-Pluto
+  and outer-only derivatives; it is not an unmodified NASA kernel, reference
+  state table, fitted correction or provider endorsement.
+  TT-tagged lookup uses the geocentric ERFA TDB-TT terms described above.
+  Source TDB velocity supplies observer aberration; displayed longitude
+  motion uses the local analytic TT derivative of source p/v/a, the full
+  geocentric time ratio, implicit light cone, bending, Lorentz mapping and
+  display rotation. Source derivatives use the selected original polynomial
+  cell, without asserting global differentiability across source records. Fixed
+  ICRF-to-mean-J2000 bias is evaluated from ERFA2.0.1 eraBp06 at J2000.
+  The complete ERFA conditions are in data/astronomy/erfa-license.txt.
 
 ------------------------------------------------------------------------------
 IERS 20 C04 UT1 daily series (UT1 component only)
@@ -353,3 +416,44 @@ BaZi foundations glossary source context
   paraphrases, not verbatim classical quotations. Current program conventions
   are attributed separately to implementation files. This does not claim scan
   collation, independent expert acceptance or real-world predictive validity.
+
+Finite-source fallback optics
+-----------------------------
+The effective solar mass profile in
+fatebridge/data/astronomy/swiss-solar-deflection-2.10.json, GM and nominal
+angular radius reproduce the pinned Swiss Ephemeris 2.10.03 source:
+https://github.com/astrorigin/swisseph/blob/696bda432298d482d27e67a0cf1238920301a7dd/sweph.c
+The original source-code comment attributes its mass distribution to Michael
+Stix, The Sun, p.47 and a doubled classical photon treatment in sun_model.c.
+That original book and edition have not been independently collated here.
+
+Finite-source vector bending and Lorentz aberration independently implement
+the formulas described by ERFA 2.0.1 eraLd/eraAb, based on Klioner (2003) and
+Urban & Seidelmann (2013). The ERFA conditions described above apply.
+https://github.com/liberfa/erfa/blob/v2.0.1/src/ld.c
+https://github.com/liberfa/erfa/blob/v2.0.1/src/ab.c
+The positive 1e-11 deflection denominator limiter is an explicit formal
+extension at the centre of a transparent solar profile. Inside-disk values are
+not transmitted observable light. This is separate from the named opaque-Sun
+model; neither formula agreement nor source fidelity certifies physical
+all-epoch precision, TT/TDB conversion, or real-world predictive validity.
+
+Shared geocentric dynamical-time mapping
+---------------------------------------
+The complete787-term geocentric Fairhead TDB-TT model derives from the
+fixed ERFA2.0.1 coefficients and shares its mathematical kernel with DE440
+solar calculations. Loading these time coefficients does not load DE440 orbit
+files. The complete ERFA conditions described above apply. Source-equation
+and compiler-rounding controls remain separate from physical-clock accuracy.
+The retired VSOP87B/E and ELP/MPP02 fallback implementations, coefficients,
+original source provenance and failed comparisons are retained in the audit
+archives; those obsolete parameter files are no longer runtime dependencies.
+
+Analytic TT fallback motion and stable finite-source bending (2026-11-11)
+  FateBridge project contributors derive the complete local TT chain from
+  the same declared source and optical parameter curve. The normalized-unit
+  identity q.(q+e)=||q+e||^2/2 reduces cancellation in the ERFA-derived
+  finite-source denominator. This changes floating rounding and does not
+  claim binary identity with ERFA. The pinned Swiss mass/GM/radius and
+  positive limiter are unchanged; branch crossings may have no unique
+  local motion. ERFA conditions and the original references above apply.

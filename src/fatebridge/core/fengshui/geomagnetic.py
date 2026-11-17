@@ -1,34 +1,73 @@
 """Frozen WMM2025 reference; original directional facts remain unchanged."""
 
-import hashlib
-import json
 import math
 from copy import deepcopy
 from functools import lru_cache
-from importlib.metadata import version
 from pathlib import Path
-from typing import Any, Dict, Literal, Optional, cast
+from typing import Literal, Optional
+
+from pydantic import JsonValue, TypeAdapter
+from typing_extensions import TypedDict
+
+from fatebridge.core.geomagnetic_field import (
+    IMPLEMENTATION_ID,
+    WmmCoefficient,
+    wmm2025_field,
+)
 
 from .directions import bearing_context
 from .geomagnetic_inputs import GeomagneticReference
 
 
+class _GeomagneticRuleset(TypedDict):
+    ruleset_id: str
+    version: str
+    method: str
+    source_ids: list[str]
+    scope: str
+    conventions: list[str]
+
+
+class _GeomagneticOrigin(TypedDict):
+    coefficient_sha256: str
+
+
+class _GeomagneticData(TypedDict):
+    ruleset: _GeomagneticRuleset
+    sources: dict[str, dict[str, JsonValue]]
+    model_header: tuple[float, str, str]
+    degree: Literal[12]
+    coefficients: tuple[WmmCoefficient, ...]
+    origin: _GeomagneticOrigin
+
+
+class GeomagneticResult(TypedDict):
+    calculation_status: Literal["complete"]
+    ruleset: dict[str, JsonValue]
+    input: dict[str, JsonValue]
+    model: dict[str, JsonValue]
+    field: dict[str, float]
+    heading_context: dict[str, JsonValue]
+    uncertainty: dict[str, JsonValue]
+    conversion: dict[str, JsonValue]
+    limitations: list[str]
+
+
 @lru_cache(maxsize=1)
-def _bundle() -> Dict[str, Any]:
-    return cast(
-        Dict[str, Any],
-        json.loads(
-            (
-                Path(__file__).parents[2] / "data/fengshui/geomagnetic-wmm2025-v1.json"
-            ).read_text(encoding="utf-8")
-        ),
-    )
+def _bundle() -> _GeomagneticData:
+    path = Path(__file__).parents[2] / "data/fengshui/geomagnetic-wmm2025-v1.json"
+    return TypeAdapter(_GeomagneticData).validate_json(path.read_bytes())
 
 
-def geomagnetic_provenance() -> Dict[str, Any]:
+def geomagnetic_provenance() -> dict[str, JsonValue]:
     data = _bundle()
     return {
-        **deepcopy(data["ruleset"]),
+        "ruleset_id": data["ruleset"]["ruleset_id"],
+        "version": data["ruleset"]["version"],
+        "method": data["ruleset"]["method"],
+        "source_ids": list(data["ruleset"]["source_ids"]),
+        "scope": data["ruleset"]["scope"],
+        "conventions": list(data["ruleset"]["conventions"]),
         "sources": [
             dict(source_id=k, **deepcopy(data["sources"][k]))
             for k in data["ruleset"]["source_ids"]
@@ -44,64 +83,18 @@ def field_zone(horizontal_nt: float) -> str:
     )
 
 
-def _implementation() -> tuple[Any, Dict[str, Any]]:
-    """Check the pinned wheel's source identity, not loaded-memory integrity.
-
-    Import only on this optional branch. A missing or incompatible deployment
-    is a dependency fault (ImportError), never a rejection of the user's input.
-    Do not cache this check: each returned identity describes the files read
-    for this calculation, while the deployment receipt is process-scoped.
-    """
-    import pygeomag  # type: ignore[import-untyped]
-    from pygeomag import geomag  # type: ignore[import-untyped]
-
-    reference = _bundle()["implementation_reference"]
-    installed = version(reference["distribution"])
-    if (
-        installed != reference["version"]
-        or getattr(pygeomag, "__version__", None) != installed
-    ):
-        raise ImportError("WMM2025 requires the validated pygeomag distribution")
-    observed = {}
-    try:
-        for name, module in (
-            ("pygeomag/__init__.py", pygeomag),
-            ("pygeomag/geomag.py", geomag),
-        ):
-            observed[name] = hashlib.sha256(
-                Path(module.__file__).read_bytes()
-            ).hexdigest()
-    except (OSError, TypeError) as exc:
-        raise ImportError("Cannot verify the validated pygeomag source files") from exc
-    if observed != reference["source_files"] or pygeomag.GeoMag is not geomag.GeoMag:
-        raise ImportError("WMM2025 pygeomag source differs from the validated wheel")
-    return geomag.GeoMag, {
-        "distribution_version": installed,
-        "source_sha256": observed["pygeomag/geomag.py"],
-        "validated_wheel_match": True,
-        "scope": "source_files_not_loaded_memory",
-    }
-
-
 def geomagnetic_reference(
     req: GeomagneticReference,
     bearing_degrees: Optional[float] = None,
     north_reference: Optional[Literal["magnetic", "true"]] = None,
-) -> Dict[str, Any]:
+) -> GeomagneticResult:
     data = _bundle()
-    GeoMag, implementation = _implementation()
-    # GeoMag maintains internal work arrays. A fresh instance per request avoids
-    # sharing mutable calculation state between concurrent REST/MCP calls.
-    model = GeoMag(
-        coefficients_data=(tuple(data["model_header"]), data["coefficients"])
-    )
-    value = model.calculate(
-        glat=req.latitude,
-        glon=req.longitude,
-        alt=req.height_km_wgs84,
-        time=req.year_value(),
-        allow_date_outside_lifespan=False,
-        raise_in_warning_zone=False,
+    value = wmm2025_field(
+        req.latitude,
+        req.longitude,
+        req.height_km_wgs84,
+        req.year_value(),
+        data["coefficients"],
     )
     field = {
         "declination_degrees_east": value.d,
@@ -119,7 +112,7 @@ def geomagnetic_reference(
         if pole
         else "magnetic_blackout" if zone == "blackout" else None
     )
-    conversion: Dict[str, Any] = {
+    conversion: dict[str, JsonValue] = {
         "status": "unavailable" if unavailable else "not_requested",
         "unavailable_reason": unavailable,
         "candidate": None,
@@ -144,8 +137,10 @@ def geomagnetic_reference(
         # Keep this branch's identity without duplicating large source blocks,
         # so a strict evidence projection fits the default response budget.
         "ruleset": {
-            key: deepcopy(data["ruleset"][key])
-            for key in ("ruleset_id", "version", "method", "source_ids")
+            "ruleset_id": data["ruleset"]["ruleset_id"],
+            "version": data["ruleset"]["version"],
+            "method": data["ruleset"]["method"],
+            "source_ids": list(data["ruleset"]["source_ids"]),
         },
         "input": {
             **req.model_dump(mode="json"),
@@ -162,18 +157,21 @@ def geomagnetic_reference(
             "epoch": data["model_header"][0],
             "coefficient_header_release": data["model_header"][2],
             "degree": data["degree"],
-            "implementation": "pygeomag==" + implementation["distribution_version"],
+            "implementation": IMPLEMENTATION_ID,
             "implementation_identity": {
-                key: value
-                for key, value in implementation.items()
-                if key != "distribution_version"
+                "ellipsoid": "WGS84",
+                "geodetic_conversion": "WGS84 exact inverse flattening",
+                "semimajor_axis_metres": 6378137.0,
+                "inverse_flattening": "298.257223563",
+                "degree": 12,
+                "arithmetic_decimal_digits": 50,
             },
             "coefficient_sha256": data["origin"]["coefficient_sha256"],
             "supported_decimal_year": {
                 "from_inclusive": 2025.0,
                 "until_exclusive": 2030.0,
             },
-            "numerical_reference_precision": "12 vectors at 0.1nT/0.01deg; not six-decimal nT",
+            "numerical_reference_precision": "WGS84 source arithmetic at 1e-7nT/1e-9deg on fixed reference cohorts; not physical accuracy",
         },
         "field": field,
         "heading_context": {

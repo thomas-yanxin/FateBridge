@@ -10,6 +10,7 @@ import pytest
 from fatebridge.core.meihua_traveler import traveler_qualifications, traveler_ruleset
 from fatebridge.core.requests.meihua import MeihuaInterpretationOptions
 from fatebridge.services.meihua import calculate_meihua_cast
+from tests.support.reference_data import resolve
 
 FIXTURE = Path(__file__).parents[1] / "fixtures/meihua_traveler_v1"
 PROFILE = json.loads((FIXTURE / "profile.json").read_text())
@@ -22,12 +23,6 @@ def calculate(code, line, branch=None):
         interpretation_topic="traveler",
         season_month_branch=branch,
     )
-
-
-def resolve(result, path):
-    for key in path.split("."):
-        result = result[int(key)] if isinstance(result, list) else result[key]
-    return result
 
 
 def test_frozen_source_and_reference_error_are_both_retained():

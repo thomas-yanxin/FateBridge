@@ -415,6 +415,8 @@
       "date": "2025-03-04",
       "time": "12:00:00",
       "zone": "+08:00",
+      "lat": "31n13",
+      "lon": "121e28",
       "natal_mansion": "奎",
       "activity": "marriage"
     },
@@ -669,6 +671,8 @@
       "day_master.element",
       "day_master.polarity",
       "day_master.strength",
+      "day_master.engineering_index",
+      "day_master.classical_adjudication",
       "day_master.assessment.method_id",
       "day_master.assessment.status",
       "day_master.assessment.support_share",
@@ -1757,7 +1761,7 @@
       "scope": "sukuyo宿主默认chinese_hko_utc08；可明确选择japanese_hutime_1002_1_utc09的HuTime逐日参考，1872-02-09至2031-01-22、固定UTC+09。与出生时区、calendar_profile和天文模型分别保留，不称唐历、完整天保历或历史地方时已复原。",
       "leap_month": "默认档案unresolved保留同名月候选且不保证穷尽；repeat_month为明确约定。可选hinoo_t1299_host27在所选宿主历法上应用T2465闰月复用及小月补配，不称历史旧历复原。",
       "interpretation": "引用同run计算字段与版本、原典位置；未知或partial不补造宿名、距离、概率或结论。",
-      "astronomy": "默认equatorial_research28仅为已声明现代距星研究口径；天文宿与农历本命宿分别读取。",
+      "astronomy": "已知钟时须同时明确完整经纬度才能计算星图，GPS分量优先且0°有效；缺项报错，不填默认地点。默认equatorial_research28仅为已声明现代距星研究口径；天文宿与农历本命宿分别读取。",
       "activity": "逐层读取matched_rules、conditional_rules、source_excerpts及detail_match。普通出行不擅加远行限定；远行向外国须同时有long_distance_journey和journey_abroad。买卖、经营、借入、出借、索债分别核对，不能把所有资金行为当同一事项。",
       "calendar_profile": "默认t1299_fullmoon27直接采用T1299下卷十五日望宿逆顺法及生日加十三的含首位算法，两法互核；NAOJ朔日表仅作独立交叉核验。",
       "textual_half": "Hinoo短月补配的first_half/second_half必须明确给定；已知民用钟时不自动转换。闰月与补配规则次序未明时保留现代重建候选，不擅取唯一。",
@@ -1781,7 +1785,7 @@
       "taibai_direction_reference": "taibai_direction_reference按实际入月日查T1299下卷太白八方／地下／天上表，使用calendar.lunar_day，不能以公历日、tithi、桧尾补配宿序或实测金星替代。明本校记删去初十／二十／三十天上行，缺文不等于无太白或已获行动允许；其他行正南等措辞按原字保留。顺行／逆行与行路相对关系尚未核定，movement_alignment_evaluated=false、applied_to_activity_assessment=false；不是天文逆行或GPS方位角，不能用于覆盖既有宜忌。未知日期分支及原典时钟未定仍保留。",
       "historical_day_ganzhi": "NAOJ历史参考的day_ganzhi_reference由原始日干支锚点和民用日数递推，日界固定UTC+09午夜；不代表八字日柱、古代地方日界或平明已验收。保留source_anchor和elapsed_civil_days；编年史日期对照仅覆盖明确列出的月与日，不能推广成全部历史颁历认证。",
       "clothing": "activity=clothing区分裁缝tailoring_garments、制作making_garments、修理repairing_garments、穿着wearing_garments和穿新衣wearing_new_garments；裁缝可归制作，新衣穿着可归穿着，反向不推。royal_wearer仅为明确王者身份，衣事不代表购衣。clothing_reference保留主文十四宿及余并失补集、明本井→并及余并失→并大吉，不补并为井、不将明本未列宿补成同样慎用；口诀和上卷裁衣原句未进入宜忌汇总，不能把汇总列宜说成全部文献一致或现实无风险。完整候选共同的专章表项可单独成立，未定宿名仍保持未定；候选不穷尽时不据单个候选定宜。",
-      "complete_day_branches": "同run引用核验v4要求sukuyo.candidate_days；无跨日期分支时为空数组，有分支时必须完整保留各日证据。公开suzhan可省略time或给null，直接保留未知时刻日期集合；chart与astronomy为null且validation.calculation_layers说明未计算，不填示例或默认钟时。已知钟时继续计算完整星图。衣事须另保留clothing_reference，通用activity引用也不能省略；只引用一条宜文或一支候选不能通过。",
+      "complete_day_branches": "同run引用核验v4要求sukuyo.candidate_days；无跨日期分支时为空数组，有分支时必须完整保留各日证据。公开suzhan可省略time或给null，直接保留未知时刻日期集合；chart与astronomy为null且validation.calculation_layers说明未计算，不填示例或默认钟时。已知钟时须同时明确完整经纬度才计算星图，不填默认地点。衣事须另保留clothing_reference，通用activity引用也不能省略；只引用一条宜文或一支候选不能通过。",
       "documentary_layers": "calendar_day.japanese_selected_reference是善通寺109-5具名正文对照：13个日号与T1299一般吉日名单在9/10/16/24/25有差异，不覆盖classifications或事项；unlisted不是忌。未释旁注不补入，实物年代及T2465见证身份未核定。840年八日曜序是一组相关日序，不能作日内分时或八个新增独立验证。source_passages按出版方TEI区分正文和行内注，夹注作者身份未独立核定；方向章夹注与壁宿正文反向证言均须保留，不裁定优先权。古代日界、前后半、闰月补配次序仍未解决。 善通寺正文另有四日夜、八日昼、十一日夜、十五日昼、十八日夜、二十二日昼、二十五日夜、二十九日昼八条条件，必须与13日名单和840年逐日曜序分别保留；当前入月日不在八条内也不能把整个来源层省掉。未换算现代钟时，未代入事项；不得把T1299的日中后通用自动用于善通寺。解释实际输入时须呈现已确认activity_details，勿用上位学习类别代替宗教学法，勿把effective_activity_details的推导父类当成原始输入。",
       "clock_text_position": "clock_doctrine与special_day_evidence的textual_position_reference共指下卷一组段落移位：248字特殊日段和93字平明八时段由0398注15、0399注16互指，邻注0398注14另删前文一字一。∞为位置转换，不等于替字、删段、八改六、上卷火水曜位交换或T2465规则次序。两条注是一组异文，不算两份独立明本；所示不是完整明刻本重建，不改变主表、事项或钟时。古代日界、桧尾半日及闰月补配优先级仍未建立。",
       "historical_clock_arithmetic": "clock_doctrine.historical_clock_arithmetic是相马等NAOJ2019研究的所选具注历时刻算术，不是本次日期的时刻复原或T1299原典。时点50刻/日、6分/刻、25分/辰，初为0、时正12.5分、4刻1分到下一辰边界；不等于古代换日。昼夜长度100刻、宣明历100刻84分、延喜式48刻一基数分别保留，不能混算或推出桧尾半日。英文摘要half koku与正文/表3分半的单位差别保留；日文摘要的半没有明定单位，不自行补刻。半分/半刻的144/864秒只是名义24小时单位比，非实际UTC/民用时。40组42读数保留6组8条非零残差及两组双读，不把它们调平、删除或计作42个独立历史观察。通日是省没日的360日平气轴，末段18是名义差；不直接加公历冬至、改用定气或混入滅日。论文对几何太阳中心过地平无大气差的定义是对所选记录的推断，未复现其物理比较，不能给T1299平明设0度或自动套现代上缘日出。研究的日出入记录只对应所记季节日；延喜式期间值与具注历单日值分开，未插值成当前日期。 交付全部conditional_rules的实质条文和慎用／宜用含义，以及每条尚缺条件或读法未校定、未计入汇总的原因；不能把下卷罗刹不宜举百事缩成冒／底字未识别，也不能反过来确定本日罗刹或事项宜忌。calendar_day_part若已显式给出，应交付前／后半及其声明身份；古代钟时映射未定不等于该输入未知。",
@@ -1893,7 +1897,8 @@
       "clock_input": "Use explicit question_clock_basis only from confirmed clock evidence: civil / local_mean_solar / local_apparent_solar. Solar bases must omit/null timezone_name; civil omission preserves the legacy +08:00 default, not evidence of a known zone. Read clock_conversion with calendar_conversion: first normalize date labels, then resolve the declared clock to TT/UT1. Geocentric LAT is not a topocentric sundial reconstruction. Before1960 UTC-named carriers denote UT1 model labels. Never infer an original clock from ASC fit or outcome; numerical residual is not record accuracy.",
       "hour_origin": "Use question_hour_origin=noon only for confirmed noon-based clock-hour labels such as Lilly1647 pp30-31 ephemeris tables. Default midnight preserves modern labels. Noon0=same-date12:00; noon12..23=next-date00:00..11:00. Read clock_conversion.hour_origin_conversion, raw calendar date/clock, and canonical question_datetime together. Calendar-normalized_local_datetime is a raw hour label and can be null for an unrepresentable intermediate date rescued by the carry; final wall time is separate. This is not physical elapsed duration, a timezone/EOT/JD offset, a house-table coordinate, a regional reform or proof of LMT/LAT. Do not infer the author's convention from a fitted chart. Apply declared hour origin before civil zone/DST validation or solar-clock inversion.",
       "physical_epoch": "太阳时反解的有效时刻可能落在UTC闰秒。converted_utc可含23:59:60；按clock_conversion.utc_representation区分标签与datetime可表示性，计算使用原生TT/UT1。不能把不能解析datetime说成计算失败，也不能将秒60截断、平滑或移到次日；数值标签精度不代表实测钟时精度。",
-      "ut1_source": "ut1_source默认swiss_delta_t；显式iers_c04使用固定IERS20 C04每日实测合成UT1，仅覆盖1962-01-01 00:00至2026-09-19 00:00 UTC，需要UT1的时刻超范围拒绝；地心TT黄经事件搜索不需要在试算时刻取得UT1，不因C04边界自动变成未知。读取clock_conversion.ut1_reference与calculation_basis.earth_rotation，区分已发布日值和TT上连续UT1-TAI线性插值。只应用UT1，未应用极移、CIP偏移或日内潮汐，形式标准差不是瞬时物理误差界；不得声称完整EOP、史料钟时精度或预测效力。"
+      "ut1_source": "ut1_source默认swiss_delta_t；显式iers_c04使用固定IERS20 C04每日实测合成UT1，仅覆盖1962-01-01 00:00至2026-09-19 00:00 UTC，需要UT1的时刻超范围拒绝；地心TT黄经事件搜索不需要在试算时刻取得UT1，不因C04边界自动变成未知。读取clock_conversion.ut1_reference与calculation_basis.earth_rotation，区分已发布日值和TT上连续UT1-TAI线性插值。只应用UT1，未应用极移、CIP偏移或日内潮汐，形式标准差不是瞬时物理误差界；不得声称完整EOP、史料钟时精度或预测效力。",
+      "clock_seconds": "Use question_second only for confirmed whole-second labels0..59; omitted defaults to0. Do not invent unknown seconds. calendar_conversion.input_clock and clock_conversion.hour_origin_conversion.input_clock preserve the second through date/noon normalization; input_granularity=second describes supported labels, not historical accuracy. Fractional seconds and directly supplied second60 are unsupported; solar inversion can still return a separately identified UTC leap-second label without truncation."
     },
     "ziwei_rules": {
       "sihua_source": "sihua_source=rule_profile沿用基础配置；仅在明确指定明刊四化时选naj_ming_v1。三工具同选项，组合版本含+sihua.naj-ming-v1，sihua_source_url专指四化，classical_source仍是基础配置来源。庚日武同相会实际改本命标记及各层按干查表；不因此更改安星、亮度、岁序，也不认证古典运限复用或整书。"
@@ -1907,7 +1912,8 @@
       "clock_input": "Use explicit candidate_clock_basis only from confirmed clock evidence: civil / local_mean_solar / local_apparent_solar. Solar bases must omit/null timezone_name; civil omission preserves the legacy +08:00 default, not evidence of a known zone. Read clock_conversion with calendar_conversion: first normalize date labels, then resolve the declared clock to TT/UT1. Geocentric LAT is not a topocentric sundial reconstruction. Before1960 UTC-named carriers denote UT1 model labels. Never infer an original clock from ASC fit or outcome; numerical residual is not record accuracy.",
       "hour_origin": "Use candidate_hour_origin=noon only for confirmed noon-based clock-hour labels such as Lilly1647 pp30-31 ephemeris tables. Default midnight preserves modern labels. Noon0=same-date12:00; noon12..23=next-date00:00..11:00. Read clock_conversion.hour_origin_conversion, raw calendar date/clock, and canonical candidate_datetime together. Calendar-normalized_local_datetime is a raw hour label and can be null for an unrepresentable intermediate date rescued by the carry; final wall time is separate. This is not physical elapsed duration, a timezone/EOT/JD offset, a house-table coordinate, a regional reform or proof of LMT/LAT. Do not infer the author's convention from a fitted chart. Apply declared hour origin before civil zone/DST validation or solar-clock inversion.",
       "physical_epoch": "太阳时反解的有效时刻可能落在UTC闰秒。converted_utc可含23:59:60；按clock_conversion.utc_representation区分标签与datetime可表示性，计算使用原生TT/UT1。不能把不能解析datetime说成计算失败，也不能将秒60截断、平滑或移到次日；数值标签精度不代表实测钟时精度。",
-      "ut1_source": "ut1_source默认swiss_delta_t；显式iers_c04使用固定IERS20 C04每日实测合成UT1，仅覆盖1962-01-01 00:00至2026-09-19 00:00 UTC，需要UT1的时刻超范围拒绝；地心TT黄经事件搜索不需要在试算时刻取得UT1，不因C04边界自动变成未知。读取clock_conversion.ut1_reference与calculation_basis.earth_rotation，区分已发布日值和TT上连续UT1-TAI线性插值。只应用UT1，未应用极移、CIP偏移或日内潮汐，形式标准差不是瞬时物理误差界；不得声称完整EOP、史料钟时精度或预测效力。"
+      "ut1_source": "ut1_source默认swiss_delta_t；显式iers_c04使用固定IERS20 C04每日实测合成UT1，仅覆盖1962-01-01 00:00至2026-09-19 00:00 UTC，需要UT1的时刻超范围拒绝；地心TT黄经事件搜索不需要在试算时刻取得UT1，不因C04边界自动变成未知。读取clock_conversion.ut1_reference与calculation_basis.earth_rotation，区分已发布日值和TT上连续UT1-TAI线性插值。只应用UT1，未应用极移、CIP偏移或日内潮汐，形式标准差不是瞬时物理误差界；不得声称完整EOP、史料钟时精度或预测效力。",
+      "clock_seconds": "Use candidate_second only for confirmed whole-second labels0..59; omitted defaults to0. Do not invent unknown seconds. calendar_conversion.input_clock and clock_conversion.hour_origin_conversion.input_clock preserve the second through date/noon normalization; input_granularity=second describes supported labels, not historical accuracy. Fractional seconds and directly supplied second60 are unsupported; solar inversion can still return a separately identified UTC leap-second label without truncation."
     },
     "liureng_gods": {
       "transmission_progression_scope": "探原PDF110–111三传连茹／间断：sequence_direction只指支序；raw_branch_empty_conditional_*仅在支神本空适用假设下释读，不把坐空或天将天空替代本空。effective_direction和comprehensive_judgement仍未裁定，不从进退字样推成败、概率或应期。",
@@ -1932,7 +1938,13 @@
     "bazi_source_compare": {
       "input_scope": "Only confirmedliteral4pillars, no birthdate/gender/timezone needed or inferred. Do not substitute examples.",
       "source_scope": "Exactexposedreference retrieval and currentmodel comparison, all known/unknown/conflictingrecords retained.",
-      "interpretation": "Keepcomputedgrade and sourceannotations distinct; never use matchingannotation to overwrite calculation or claim fullbook/realityvalidation. Calendarformula conflicts are literalinput observations, not a repairedbirthday."
+      "interpretation": "当前strength_level是工程政策档；engineering_index分列工程政策档与纯数值档，classical_adjudication只交付原典力量已核结论或明确未决。保留原标签、17组历史分歧及全部集合约束，不以unknown计通过，不查命例标签回填计算。未决也不表示已判无喜用或互助。"
+    },
+    "analyze_destiny": {
+      "force_adjudication": "工程指数与原典力量分别读取；classical_adjudication.status=not_adjudicated及null不能回填工程强弱。favorable_elements为空须同读favorable_elements_status，不解释为已判无喜用。engineer参考集合只用于已声明工程索引，不认证原典取用或现实概率。"
+    },
+    "bazi_birth": {
+      "force_adjudication": "工程指数与原典力量分别读取；classical_adjudication.status=not_adjudicated及null不能回填工程强弱。favorable_elements为空须同读favorable_elements_status，不解释为已判无喜用。engineer参考集合只用于已声明工程索引，不认证原典取用或现实概率。"
     }
   },
   "evidence_views": {
@@ -2913,7 +2925,7 @@
         ]
       },
       "liuren_day_placement_patterns": {
-        "purpose": "探原干加支／支加干的十条生克比和条件，按日干本五行与日支计算；归合、求合两条未知保留。附带六壬盘不替代金口诀本课规则，不据课名推断他人意图或现实成败。",
+        "purpose": "探原干加支／支加干的十条生克比和条件，按日干本五行与日支计算；归合、求合缺加临时排除，加临成立但合式未裁时仍未知。附带六壬盘不替代金口诀本课规则，不据课名推断他人意图或现实成败。",
         "fields": [
           "four_pillars",
           "liureng.day_placement_patterns",
@@ -3172,6 +3184,14 @@
           "qimen.assessment",
           "qimen.engine"
         ]
+      },
+      "stem_candidates": {
+        "when": "核对伏干、飞干、岁格或月朔格：候选的共同结果与仍有分歧的宫位分别读取，不把候选当正式格局",
+        "fields": [
+          "four_pillars",
+          "qimen.stem_context",
+          "qimen.source_disagreements"
+        ]
       }
     },
     "sixyao": {
@@ -3188,6 +3208,14 @@
           "liuyao_evidence",
           "classical_text_evidence",
           "summary"
+        ]
+      },
+      "void_conditions": {
+        "when": "查所选用爻原旬空、空亡条件及寅日生扶资格；未选用爻则保留空焦点，不代选",
+        "fields": [
+          "current_hexagram",
+          "liuyao_evidence.conditional_analysis.void_conditions.focus",
+          "liuyao_evidence.conditional_analysis.penalty_conditions.focus"
         ]
       }
     },
@@ -6626,7 +6654,7 @@
         ]
       },
       "emptiness_evidence": {
-        "purpose": "探原论空亡的天盘本空、地盘落底空、日干寄宫地盘例外与太岁月建月将角色；综合有效空亡、年命和填实冲实未裁定。",
+        "purpose": "探原论空亡的天盘本空、地盘落底空、日干寄宫地盘例外与太岁月建月将的本支填实；此入口没有年命输入。综合有效空亡及其他填实冲实尚未裁定。",
         "fields": [
           "four_pillars",
           "liureng.month_general",
@@ -6689,7 +6717,7 @@
         ]
       },
       "day_placement_patterns": {
-        "purpose": "探原干加支／支加干的十条生克比和条件，按日干本五行与日支计算；归合、求合两条未知保留。附带六壬盘不替代金口诀本课规则，不据课名推断他人意图或现实成败。",
+        "purpose": "探原干加支／支加干的十条生克比和条件，按日干本五行与日支计算；归合、求合缺加临时排除，加临成立但合式未裁时仍未知。附带六壬盘不替代金口诀本课规则，不据课名推断他人意图或现实成败。",
         "fields": [
           "four_pillars",
           "liureng.day_placement_patterns",
@@ -6738,7 +6766,7 @@
         ]
       },
       "emptiness_evidence": {
-        "purpose": "探原论空亡的天盘本空、地盘落底空、日干寄宫地盘例外与太岁月建月将角色；综合有效空亡、年命和填实冲实未裁定。",
+        "purpose": "探原论空亡的天盘本空、地盘落底空、日干寄宫及同课本命行年填实；本命、行年均书地盘，上神本空另读。综合有效空亡及其他填实冲实尚未裁定。",
         "fields": [
           "four_pillars",
           "liureng.month_general",
@@ -6802,7 +6830,7 @@
         ]
       },
       "day_placement_patterns": {
-        "purpose": "探原干加支／支加干的十条生克比和条件，按日干本五行与日支计算；归合、求合两条未知保留。附带六壬盘不替代金口诀本课规则，不据课名推断他人意图或现实成败。",
+        "purpose": "探原干加支／支加干的十条生克比和条件，按日干本五行与日支计算；归合、求合缺加临时排除，加临成立但合式未裁时仍未知。附带六壬盘不替代金口诀本课规则，不据课名推断他人意图或现实成败。",
         "fields": [
           "four_pillars",
           "liureng.day_placement_patterns",
@@ -6931,7 +6959,7 @@
         "purpose": "京本次客法所选本命另课：只用已确认本命支或明确出生年支作派生地分，复用本次日时月将与昼夜选择，保留原主课；与行年课分列，不以派生方位冒充观测，不判现实应验。"
       },
       "liuren_day_placement_patterns": {
-        "purpose": "探原干加支／支加干的十条生克比和条件，按日干本五行与日支计算；归合、求合两条未知保留。附带六壬盘不替代金口诀本课规则，不据课名推断他人意图或现实成败。",
+        "purpose": "探原干加支／支加干的十条生克比和条件，按日干本五行与日支计算；归合、求合缺加临时排除，加临成立但合式未裁时仍未知。附带六壬盘不替代金口诀本课规则，不据课名推断他人意图或现实成败。",
         "fields": [
           "four_pillars",
           "liureng.day_placement_patterns",
@@ -7126,7 +7154,7 @@
           "validation.all_three_axes_full_marks",
           "validation.prediction"
         ],
-        "purpose": "实际设计数值根的1或2个TT端点、13激活与完整解释依赖摘要；求根和实际太阳统一坐标旗标并逐位绑定。有限太阳邻点若出现多组数值括区/零值，local_root_family_summary另列各候选实际整盘；主盘仍按原括区选根，不为数值噪声换根。完整端点与额外候选见同一run的design_solver.numerical_precision，不拼接候选，不把邻点唯一性、候选相同或不同当物理误差界及连续稳定认证。"
+        "purpose": "实际设计数值根的1或2个TT端点、13激活与完整解释依赖摘要；求根和实际太阳统一坐标旗标并逐位绑定。主盘在已观测正到负括区及精确零点中按绝对精确残差、较早TT选根；local_root_family_summary另列全部多接触候选的实际整盘。初始括区、完整邻点、最终端点与候选见同一run的design_solver.numerical_precision；不拼接候选，不将有限最优性、候选异同当作全域最优、物理误差界或连续稳定认证。"
       },
       "precision": {
         "fields": [
@@ -7808,6 +7836,17 @@
           "bazi_birth.structure_profile.evidence_chain.month_command.intra_month_duty.status",
           "bazi_birth.structure_profile.evidence_chain.classical_passage.summary"
         ]
+      },
+      "force_adjudication": {
+        "label": "工程旺衰与原典力量分开核对",
+        "fields": [
+          "bazi_birth.day_master.engineering_index",
+          "bazi_birth.day_master.classical_adjudication",
+          "bazi_birth.favorable_elements",
+          "bazi_birth.favorable_elements_status",
+          "bazi_birth.structure_profile.assessment_status"
+        ],
+        "purpose": "保留未校准工程档及独立的原典未决；物理根位不证明有效根力，空来源喜用不作否定结论。"
       }
     },
     "analyze_destiny": {
@@ -7995,6 +8034,17 @@
           "structure_profile.evidence_chain.month_command.intra_month_duty.status",
           "structure_profile.evidence_chain.classical_passage.summary"
         ]
+      },
+      "force_adjudication": {
+        "label": "工程旺衰与原典力量分开核对",
+        "fields": [
+          "day_master.engineering_index",
+          "day_master.classical_adjudication",
+          "favorable_elements",
+          "favorable_elements_status",
+          "structure_profile.assessment_status"
+        ],
+        "purpose": "保留未校准工程档及独立的原典未决；物理根位不证明有效根力，空来源喜用不作否定结论。"
       }
     },
     "meihua_cast": {
@@ -8772,7 +8822,7 @@
         ]
       },
       "clock_input": {
-        "purpose": "核对已确认的民用／地方平太阳／地心视太阳钟时、历法转换次序及同一物理TT/UT1；未知原书钟时不拟合，数值残差不充当史料精度。",
+        "purpose": "核对已确认的整秒钟面、民用／地方平太阳／地心视太阳时、历法与正午进位及同一物理TT/UT1；省略秒沿用0不代表记录精度，不拟合未知原书钟时。",
         "fields": [
           "analysis_context",
           "calendar_conversion",
@@ -8834,6 +8884,7 @@
           "election.calculation_basis",
           "election.planets",
           "election.axes",
+          "election.marriage_significators",
           "election.moon",
           "election.ascendant",
           "election.solar_condition_policy",
@@ -8847,7 +8898,7 @@
           "election.verdict",
           "election.recommendation"
         ],
-        "purpose": "Native TT lunar events and named physical axes, not house-cusp substitutes. Keep nullable score/hard status and fixed-policy bounds with unknown factor reasons. Solar states use selected Lilly1647 p113 definitions; old score weights/bands remain uncalibrated product policy, not full source judgement or outcome probability."
+        "purpose": "Read native TT lunar events, named physical axes, nullable score/hard status and unresolved ranges. For marriage, also read the separately sourced p175 house rulers, natural/lunar roles and finite event history with selected-method, geometry and contact-order qualification; they add no score and do not establish complete judgement. Solar states retain the selected Lilly1647 p113 definitions; weights/bands remain uncalibrated product policy."
       },
       "calendar_input": {
         "purpose": "核对显式儒略历／延伸格里历日期、转换后的本地钟时与实际TT/UT1；不推断地区改历、旧式年份或历史钟时，不把日期换算当原图复现。",
@@ -8862,7 +8913,7 @@
         ]
       },
       "clock_input": {
-        "purpose": "核对已确认的民用／地方平太阳／地心视太阳钟时、历法转换次序及同一物理TT/UT1；未知原书钟时不拟合，数值残差不充当史料精度。",
+        "purpose": "核对已确认的整秒钟面、民用／地方平太阳／地心视太阳时、历法与正午进位及同一物理TT/UT1；省略秒沿用0不代表记录精度，不拟合未知原书钟时。",
         "fields": [
           "analysis_context",
           "calendar_conversion",
@@ -8982,10 +9033,12 @@
           "four_pillars",
           "input_context",
           "current_calculation.strength_level",
+          "current_calculation.engineering_index",
+          "current_calculation.classical_adjudication",
           "source_comparison",
           "summary"
         ],
-        "purpose": "读取当前计算、全部同柱记录及差异或未知；不是原典或预测准确率"
+        "purpose": "保留原工程政策档、全部同柱来源记录和旧分歧；原典裁定未知另列，不改原标签、不以未决计通过。"
       },
       "source_conditions": {
         "fields": [

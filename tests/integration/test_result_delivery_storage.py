@@ -1,3 +1,5 @@
+from fatebridge.utils.formatting import format_json_response
+
 """Indexed artifact delivery, bounded disk usage and process coordination."""
 
 import json
@@ -28,8 +30,10 @@ def _reconstruct(store, result_id, path=None):
     return json.loads(text)
 
 
+@pytest.mark.parametrize("receipt_position", ["first", "middle", "last"])
 def test_indexed_utf8_pages_and_nested_fields_preserve_exact_canonical_document(
     tmp_path,
+    receipt_position,
 ):
     store = delivery.ResultStore(tmp_path / "results")
     original = {
@@ -37,7 +41,13 @@ def test_indexed_utf8_pages_and_nested_fields_preserve_exact_canonical_document(
         "中文": [{"text": "🌳上海\t\n" * 1200}, None, True, 1.5],
         "run_metadata": {"run_id": "fixed", "tool_name": "probe"},
     }
+    if receipt_position != "last":
+        receipt = original.pop("run_metadata")
+        items = list(original.items())
+        items.insert(0 if receipt_position == "first" else 1, ("run_metadata", receipt))
+        original = dict(items)
     ref = store.put(original)
+    assert store.manifest(ref["result_id"])["run_metadata"] == original["run_metadata"]
     assert (
         json.loads(Path(ref["file_path"]).read_text(encoding="utf-8"))["payload"]
         == original
@@ -51,13 +61,13 @@ def test_indexed_utf8_pages_and_nested_fields_preserve_exact_canonical_document(
         ("earlier", original["earlier"]),
     ]:
         assert _reconstruct(store, ref["result_id"], path) == value
-        text = delivery._json(value)
+        text = format_json_response(value)
         for offset in [0, 1, min(2047, len(text)), len(text)]:
             assert (
                 store.page(ref["result_id"], offset, path)["text"]
                 == text[offset : offset + delivery.PAGE_CHARS]
             )
-    text = delivery._json(original)
+    text = format_json_response(original)
     for offset in [1, 2047, 2048, 2049, len(text)]:
         assert (
             store.page(ref["result_id"], offset)["text"]
@@ -82,7 +92,7 @@ def test_repeated_pages_and_scope_do_not_load_serialize_or_hash_the_result(
         raise AssertionError("A page cannot repeat whole-result work")
 
     monkeypatch.setattr(store, "_record", unexpected)
-    monkeypatch.setattr(delivery, "_json", unexpected)
+    monkeypatch.setattr(delivery, "format_json_response", unexpected)
     original_hash = delivery.hashlib.sha256
 
     def only_small_path_hash(data):
@@ -132,11 +142,21 @@ class _CountingReader:
         return value
 
 
+@pytest.mark.parametrize("dense_receipt", [False, True])
 def test_full_export_reads_linear_bytes_instead_of_whole_document_per_page(
-    tmp_path, monkeypatch
+    tmp_path, monkeypatch, dense_receipt
 ):
     store = delivery.ResultStore(tmp_path / "results")
-    refs = [store.put({"blob": "中文abc" * size}) for size in [10000, 40000]]
+    refs = []
+    for size in [10000, 40000]:
+        payload = {"blob": "中文abc" * size}
+        if dense_receipt:
+            payload["run_metadata"] = {
+                "run_id": "original",
+                "tool_name": "probe",
+                "calculation_evidence": {"text": "Receipt✓🌳" * size},
+            }
+        refs.append(store.put(payload))
     counts = [0]
     fdopen = os.fdopen
     monkeypatch.setattr(
@@ -293,7 +313,16 @@ def test_oversize_attempt_does_not_evict_an_existing_deliverable(tmp_path, monke
 
 
 @pytest.mark.parametrize(
-    "damage", ["negative_offset", "invalid_digest", "missing_digest", "invalid_index"]
+    "damage",
+    [
+        "negative_offset",
+        "invalid_digest",
+        "missing_digest",
+        "invalid_index",
+        "receipt_offset",
+        "receipt_size",
+        "missing_receipt_offset",
+    ],
 )
 def test_corrupt_metadata_or_page_indexes_fail_explicitly(tmp_path, damage):
     store = delivery.ResultStore(tmp_path / "results")
@@ -306,6 +335,12 @@ def test_corrupt_metadata_or_page_indexes_fail_explicitly(tmp_path, damage):
             metadata["body_offset"] = -1
         elif damage == "invalid_digest":
             metadata["sha256"] = "invalid"
+        elif damage == "receipt_offset":
+            metadata["receipt_offset"] = -1
+        elif damage == "receipt_size":
+            metadata["receipt_bytes"] = 1
+        elif damage == "missing_receipt_offset":
+            del metadata["receipt_offset"]
         else:
             del metadata["sha256"]
         target.write_text(json.dumps(metadata), encoding="utf-8")

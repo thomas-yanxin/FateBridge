@@ -3,6 +3,10 @@
 import math
 from typing import Any, Dict, Optional, Sequence
 
+from fatebridge.core.astro.orbits import (
+    FALLBACK_MODELS,
+    fallback_factor_source,
+)
 from fatebridge.utils.errors import EphemerisSourceError
 
 
@@ -68,6 +72,21 @@ def context_motion(
         "basis": basis,
         "source_model": model,
     }
+    if model in FALLBACK_MODELS and rate is not None:
+        source = fallback_factor_source("North Node" if name == "South Node" else name)
+        result.update(
+            method_id=source["method_id"],
+            correction_status="approximate_model",
+            source_url=source["source_url"],
+        )
+        if provenance is not None:
+            result["model_longitude_speed"] = provenance.get(
+                "longitude_speed_tropical", rate
+            )
+            if "longitude_speed_sidereal_origin_correction" in provenance:
+                result["sidereal_origin_correction"] = provenance[
+                    "longitude_speed_sidereal_origin_correction"
+                ]
     if (
         provenance is not None
         and "longitude_speed_native" in provenance

@@ -203,7 +203,16 @@ def test_all_selected_calendar_reproductions_and_eleven_entries_actual_transport
         == first["exact_root_masses"]
     )
     assert strength == first["expected_grade"]
-    assert set(force.values()) == {"not_adjudicated"}
+    assert force["status"] == "not_adjudicated"
+    assert all(
+        force[field] is None
+        for field in (
+            "body_strength",
+            "seal_weight",
+            "body_seal_relation",
+            "ordinary_fuyi_applicable",
+        )
+    )
     assert (
         duty == "not_adjudicated" and passage["effective_passage"] == "not_adjudicated"
     )

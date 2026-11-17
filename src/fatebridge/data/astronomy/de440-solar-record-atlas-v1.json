@@ -1,0 +1,45 @@
+{
+  "model_id": "lossless_de440_solar_record_atlas_v1",
+  "storage": "record_byte_channels_gzip_v1",
+  "file": "de440-solar-record-atlas-v1.bin.gz",
+  "uncompressed_bytes": 32478064,
+  "uncompressed_sha256": "19eead6e2990075e3bcc6f95a4e6d3e59aa308725bf9d246bed47472e1eb0f66",
+  "compressed_sha256": "1f2e21ee0601bf4abaa557b21196d51fb01442a3293bc5b680da140d2f75610b",
+  "segments": [
+    {
+      "center": 0,
+      "target": 3,
+      "initial_seconds_from_j2000_tdb": -10035576000.0,
+      "interval_seconds": 1382400.0,
+      "record_size_doubles": 41,
+      "record_count": 16916,
+      "offset_bytes": 0,
+      "bytes": 5548448,
+      "sha256": "f7e309a78159c09ddc58105b18729eb6f44f2328f66c0a8f2cc301bf5c99c43d"
+    },
+    {
+      "center": 0,
+      "target": 10,
+      "initial_seconds_from_j2000_tdb": -10035576000.0,
+      "interval_seconds": 1382400.0,
+      "record_size_doubles": 35,
+      "record_count": 16916,
+      "offset_bytes": 5548448,
+      "bytes": 4736480,
+      "sha256": "18faa326cee2ed4d9ccc8d7b3fe1f47261ae24f659d312adaa764d303821c2c8"
+    },
+    {
+      "center": 3,
+      "target": 399,
+      "initial_seconds_from_j2000_tdb": -10035230400.0,
+      "interval_seconds": 345600.0,
+      "record_size_doubles": 41,
+      "record_count": 67662,
+      "offset_bytes": 10284928,
+      "bytes": 22193136,
+      "sha256": "a6813e3d3cad551f2355590a1f44dc1f63ec9b0580f2f6b6bf16c3e00a428b59"
+    }
+  ],
+  "coefficient_values_or_record_domains_changed": false,
+  "profile_views": "Five established logical model selections retain their original selected coefficient bytes and individual time domains; only physical storage overlaps are shared."
+}

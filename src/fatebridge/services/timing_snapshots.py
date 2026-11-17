@@ -666,7 +666,7 @@ def _build_comprehensive_timing_snapshot_text(
 
     source_lines = [
         "来源：FateBridge 离线综合时运分析",
-        "引用：fatebridge.analysis.timing_effects / comprehensive_timing_analysis",
+        "引用：fatebridge.services.timing_state / build_current_timing_state",
     ]
     impact_lines.extend(timing_carrier_snapshot_lines(interaction_analysis or {}))
     if interaction_analysis and "root_context" in interaction_analysis:

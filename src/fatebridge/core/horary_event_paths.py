@@ -11,6 +11,11 @@ from typing import Any, Callable
 
 from fatebridge.core.classical_western import LIGHT_WEIGHT_ORDER
 from fatebridge.core.lilly import KINDS, reception
+from fatebridge.core.planetary_event_order import (
+    PlanetaryEventRecord,
+    event_involves,
+    ordered_contact,
+)
 
 
 def _condition(
@@ -66,55 +71,12 @@ def evaluate_event_paths(
         e for e in events if e["kind"] == "contact" and e.get("topology") == "crossing"
     ]
 
-    def related(event: dict[str, Any], a: str, b: str | None = None) -> bool:
-        return a in event["bodies"] and (b is None or b in event["bodies"])
-
-    def first_for(
-        a: str, b: str | None = None, *, past: bool = False
-    ) -> tuple[dict[str, Any] | None, bool | None]:
-        side = "past" if past else "future"
-        rows = [e for e in contacts if e["epoch_relation"] == side and related(e, a, b)]
-        if not rows:
-            return None, None
-        row = rows[-1] if past else rows[0]
-        bracket = row["root_bracket_tt"]
-        obstacles = [
-            e
-            for e in events
-            if e["kind"] == "contact"
-            and e is not row
-            and related(e, a, b)
-            and e["root_bracket_tt"][0] <= bracket[1]
-            and bracket[0] <= e["root_bracket_tt"][1]
-        ]
-        if (
-            any(
-                e["epoch_relation"] == "question_boundary" and related(e, a, b)
-                for e in events
-                if e["kind"] == "contact"
-            )
-            or obstacles
-            or any(
-                e["kind"] == "contact"
-                and e.get("topology") != "crossing"
-                and e["epoch_relation"] == side
-                and related(e, a, b)
-                and (
-                    e["root_bracket_tt"][1] >= bracket[0]
-                    if past
-                    else e["root_bracket_tt"][0] <= bracket[1]
-                )
-                for e in events
-            )
-            or any(a in u["bodies"] for u in history.get("unresolved_intervals", []))
-        ):
-            return row, None
-        return row, True
+    unresolved_intervals = history.get("unresolved_intervals", [])
 
     def receipt(
         receiver: str,
         guest: str,
-        event: dict[str, Any],
+        event: PlanetaryEventRecord,
         allowed: tuple[str, ...] = KINDS,
     ) -> dict[str, Any]:
         central = reception(
@@ -172,8 +134,12 @@ def evaluate_event_paths(
             }
         )
 
-    prior, prior_order = first_for(querent, quesited, past=True)
-    future, future_order = first_for(querent, quesited)
+    prior, prior_order = ordered_contact(
+        events, unresolved_intervals, querent, quesited, past=True
+    )
+    future, future_order = ordered_contact(
+        events, unresolved_intervals, querent, quesited
+    )
     direct = phase(states[querent], states[quesited])
     transitions = [
         e
@@ -218,9 +184,24 @@ def evaluate_event_paths(
                     and e["root_bracket_tt"][0] <= event["root_bracket_tt"][1]
                     for e in events
                 )
-                if not recipient_reversal_may_precede and (
-                    future is None
-                    or event["root_bracket_tt"][1] < future["root_bracket_tt"][0]
+                # Unclassified tangencies and continuous exact intervals can
+                # also precede the reversal. Filtering them out of ordinary
+                # crossings does not establish "before first contact".
+                principal_contact_may_precede = any(
+                    e["kind"] == "contact"
+                    and event_involves(e, querent, quesited)
+                    and e["epoch_relation"] in {"future", "question_boundary"}
+                    and e["root_bracket_tt"][0] <= event["root_bracket_tt"][1]
+                    for e in events
+                ) or any(
+                    event_involves(interval, querent, quesited)
+                    and interval["interval_tt"][1] >= history["question_julian_day_tt"]
+                    and interval["interval_tt"][0] <= event["root_bracket_tt"][1]
+                    for interval in history.get("unresolved_intervals", [])
+                )
+                if (
+                    not recipient_reversal_may_precede
+                    and not principal_contact_may_precede
                 ):
                     result["refranation_patterns"].append(
                         {
@@ -241,11 +222,11 @@ def evaluate_event_paths(
                 ):
                     continue
                 for a in intervention:
-                    if not related(a, third, applicant):
+                    if not event_involves(a, third, applicant):
                         continue
                     for b in intervention:
                         if (
-                            related(b, third, recipient)
+                            event_involves(b, third, recipient)
                             and a["aspect"] == b["aspect"]
                             and a["root_bracket_tt"][1] < b["root_bracket_tt"][0]
                             and b["root_bracket_tt"][1] < future["root_bracket_tt"][0]
@@ -326,11 +307,19 @@ def evaluate_event_paths(
     for carrier in LIGHT_WEIGHT_ORDER:
         if carrier in {querent, quesited}:
             continue
-        latest, latest_order = first_for(carrier, past=True)
-        earliest, earliest_order = first_for(carrier)
+        latest, latest_order = ordered_contact(
+            events, unresolved_intervals, carrier, past=True
+        )
+        earliest, earliest_order = ordered_contact(
+            events, unresolved_intervals, carrier
+        )
         for source, target in ((querent, quesited), (quesited, querent)):
-            last, last_order = first_for(carrier, source, past=True)
-            following, following_order = first_for(carrier, target)
+            last, last_order = ordered_contact(
+                events, unresolved_intervals, carrier, source, past=True
+            )
+            following, following_order = ordered_contact(
+                events, unresolved_intervals, carrier, target
+            )
             if last is None or following is None or latest is None or earliest is None:
                 continue
             if (
@@ -434,8 +423,8 @@ def evaluate_event_paths(
             collector
         ) >= min(LIGHT_WEIGHT_ORDER.index(p) for p in (querent, quesited)):
             continue
-        a, order_a = first_for(querent, collector)
-        b, order_b = first_for(quesited, collector)
+        a, order_a = ordered_contact(events, unresolved_intervals, querent, collector)
+        b, order_b = ordered_contact(events, unresolved_intervals, quesited, collector)
         if a is None or b is None:
             continue
         receipts = [receipt(querent, collector, a), receipt(quesited, collector, b)]

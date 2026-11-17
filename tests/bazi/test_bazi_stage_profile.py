@@ -12,6 +12,7 @@ from fatebridge.application.examples import suggested_fields
 from fatebridge.core.classical_roots import classify_classical_root
 from fatebridge.core.classical_stages import life_stage_profile, twelve_life_stage
 from fatebridge.core.output_stage_profile import LifeStageProfile
+from fatebridge.core.public_output import same_public_value
 from tests.support.transports import SPECS, business, call_cli, native
 from tests.support.transports import rest as _rest_fixture
 
@@ -168,7 +169,7 @@ def test_profile_view_preserves_whole_root_receipts_on_public_transports(
         assert business(response.json()) == business(result)
     spec.output_model.model_validate(result)
     root = at(result, fields[0].removesuffix(".life_stage_profile"))
-    assert root["life_stage_profile"] == life_stage_profile()
+    assert same_public_value(root["life_stage_profile"], life_stage_profile())
     assert len(root["roots"]) == 4
     assert root["global_strength_status"] == "not_adjudicated"
     before = copy.deepcopy(result)

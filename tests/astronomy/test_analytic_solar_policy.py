@@ -1,20 +1,21 @@
 """The better Sun model is explicit; native controls and strict failures survive."""
 
 from dataclasses import replace
-from datetime import datetime
+from datetime import datetime, timezone
 
 import pytest
 
 from fatebridge.core import almanac
 from fatebridge.core.analytic_solar import MODEL_ID
 from fatebridge.core.de440_solar import MODEL_ID as DE440_MODEL_ID
+from fatebridge.core.de441_solar import MODEL_ID as DE441_MODEL
+from fatebridge.core.de441_solar import PROVIDER as DE441_PROVIDER
 from fatebridge.core.ephemeris_runtime import (
     configure_ephemeris_path,
     configured_ephemeris_path,
 )
-from fatebridge.core.moshier_solar import MODEL_ID as COMPLETE_MOSHIER_MODEL
-from fatebridge.core.moshier_solar import PROVIDER as COMPLETE_MOSHIER_PROVIDER
 from fatebridge.core.solar_model_policy import analytic_selected, solar_model_policy
+from fatebridge.utils.civil_time import ZonedCalendar
 from fatebridge.utils.errors import EphemerisSourceError
 
 
@@ -49,14 +50,14 @@ def test_default_empty_directory_uses_named_model_and_native_control_remains(
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
     native = almanac.get_solar_terms_for_year(2026, "UTC")
     assert all(
-        t.resolution_provider == COMPLETE_MOSHIER_PROVIDER
-        and t.ephemeris_model == COMPLETE_MOSHIER_MODEL
+        t.resolution_provider == DE441_PROVIDER and t.ephemeris_model == DE441_MODEL
         for t in native
     )
-    assert native is not enhanced
     assert any(a.moment != b.moment for a, b in zip(enhanced, native))
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "auto")
-    assert almanac.get_solar_terms_for_year(2026, "UTC") is enhanced
+    cache_hits = almanac.get_solar_terms_for_year.cache_info().hits
+    assert almanac.get_solar_terms_for_year(2026, "UTC") == enhanced
+    assert almanac.get_solar_terms_for_year.cache_info().hits == cache_hits + 1
 
 
 @pytest.mark.parametrize("native_model", ["swieph", "jpl"])
@@ -70,7 +71,10 @@ def test_unknown_modes_and_forged_analytic_provenance_are_rejected(monkeypatch):
     with pytest.raises(ValueError, match="must be"):
         solar_model_policy()
     term = almanac.SolarTerm(
-        "立春", datetime(2026, 2, 4), "20260204", "", "fatebridge_analytic", MODEL_ID
+        "立春",
+        ZonedCalendar.from_datetime(datetime(2026, 2, 4, tzinfo=timezone.utc)),
+        "fatebridge_analytic",
+        MODEL_ID,
     )
     with pytest.raises(RuntimeError, match="具名"):
         almanac.require_calculated_solar_term(term)
@@ -102,7 +106,7 @@ def test_receipt_policy_is_live_even_when_deployment_fingerprints_are_cached(
     second = solar_model_environment_receipt()
     assert first["mode"] == "auto" and second["mode"] == "native"
     assert len(first["frame_coefficient_sha256"]) == 64
-    assert second["source_selection"] == "native_swiss_or_complete_moshier"
+    assert second["source_selection"] == "native_swiss_or_bundled_de441"
     assert second["source_resolution"] == "configuration_only"
     assert second["analytic_source_resolved"] is False
     assert "model_id" not in second and "loaded_coefficient_sha256" not in second
@@ -128,10 +132,7 @@ def test_explicit_analytic_control_preserves_the_original_source(
     for term in terms:
         assert term.resolution_provider == "fatebridge_analytic"
         assert term.ephemeris_model == MODEL_ID
-        assert (
-            term.solar_model_details["native_choice_probe_model"]
-            == COMPLETE_MOSHIER_MODEL
-        )
+        assert term.solar_model_details["native_choice_probe_model"] == DE441_MODEL
         assert term.solar_model_details["native_choice_probe_retflags"] == []
 
 

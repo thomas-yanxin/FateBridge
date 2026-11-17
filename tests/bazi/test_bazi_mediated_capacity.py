@@ -26,8 +26,8 @@ def test_new_source_conditions_survive_rest_native_mcp_and_cli(key, surface_call
     value = http.json()
     curation = value["provenance"]["entry_curation"]
     assert (
-        curation["source_refs"][0]["source_sha256"]
-        == "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803"
+        curation["source_refs"][0]["source_url"]
+        == "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf"
     )
     assert (
         curation["review_status"]

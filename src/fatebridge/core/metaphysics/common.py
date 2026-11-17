@@ -19,7 +19,9 @@ from ...utils.data import (
     BRANCH_CONFLICTS,
     BRANCH_ELEMENTS,
     BRANCH_HARMS,
+    DESTRUCTION_CYCLE,
     EARTHLY_BRANCHES,
+    GENERATION_CYCLE,
     HEAVENLY_STEMS,
     STEM_ELEMENTS,
 )
@@ -30,19 +32,10 @@ SEXAGENARY_CYCLE = [
 SEXAGENARY_INDEX = {value: index for index, value in enumerate(SEXAGENARY_CYCLE)}
 
 ELEMENT_GENERATES = {
-    "木": "火",
-    "火": "土",
-    "土": "金",
-    "金": "水",
-    "水": "木",
+    source.value: target.value for source, target in GENERATION_CYCLE.items()
 }
-
 ELEMENT_CONTROLS = {
-    "木": "土",
-    "火": "金",
-    "土": "水",
-    "金": "木",
-    "水": "火",
+    source.value: target.value for source, target in DESTRUCTION_CYCLE.items()
 }
 
 XUN_HEADS = ("甲子", "甲戌", "甲申", "甲午", "甲辰", "甲寅")
@@ -106,9 +99,6 @@ LIURENG_GUIREN_NIGHT = {
 }
 
 
-GUI_REN_REVERSED_STARTS = {"巳", "午", "未", "申", "酉"}
-
-
 GUI_REN_SEQUENCE = [
     "贵人",
     "螣蛇",
@@ -142,13 +132,10 @@ class MetaphysicsSeed:
 def require_lunar_month_day(
     seed: "MetaphysicsSeed", technique: str
 ) -> Tuple[Dict[str, Any], int, int]:
-    """Return ``(lunar_context, lunar_month, lunar_day)`` or raise loudly.
+    """Read the computed lunar context and month/day for Zi Wei consumers.
 
-    紫微 / 太乙 等技法以农历月日定盘。当离线农历换算不可用时
-    (公历超出 1900–2100 支持区间，或缺少 lunardate)，``lunar_calendar``
-    为 None，旧代码用 ``int(lunar.get("month") or 1)`` 静默回退到正月初一，
-    算出一张看似正常却整体错位的盘。这里改为显式拒绝并透传原因，让调用方
-    的 ``handle_calculation_error`` 返回 400 而不是悄悄给出错误结果。
+    The calendar provider owns conversion and coverage. Missing context
+    raises with its existing source reason; no lunar month or day is inferred.
     """
     lunar = seed.calendar_context.get("lunar_calendar")
     if not lunar or lunar.get("month") is None or lunar.get("day") is None:

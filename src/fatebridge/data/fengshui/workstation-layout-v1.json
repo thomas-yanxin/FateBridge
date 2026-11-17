@@ -1,5 +1,5 @@
 {
-  "bundle_version": "1.1.0",
+  "bundle_version": "1.2.0",
   "sources": {
     "SP1": {
       "title": "Shapely User Manual",
@@ -64,7 +64,7 @@
   "rulesets": {
     "workstation_layout_v1": {
       "ruleset_id": "workstation_layout_v1",
-      "version": "1.1.0",
+      "version": "1.2.0",
       "method": "measured_workstation_geometry",
       "source_ids": [
         "SP1",

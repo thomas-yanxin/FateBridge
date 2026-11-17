@@ -1,27 +1,29 @@
 {
-  "bundle_version": "1.1.0",
+  "bundle_version": "1.1.1",
   "sources": {
     "F1": {
       "url": "https://www.ifsguild.org/the-feng-shui-command-position/",
-      "retrieved_at": "2026-10-14",
-      "retrieved_sha256": "84a6dc87fcb912e508aa6a3c912080936ca2ed6b0e799b7613480ba90c67103f",
-      "retrieved_bytes": 200605,
+      "retrieved_at": "2026-11-17",
+      "retrieved_sha256": "8f28d966a3a5058234805867c9c096ef600591af1749403c67fa2f54aefcc78f",
+      "retrieved_bytes": 191694,
       "retrieved_format": "raw_html",
       "title": "Tori McBrien: The Feng Shui Command Position, IFSG",
       "kind": "authored_teaching",
       "source_version": "2025-04-02; Black Sect author, not all-school classical consensus",
-      "scope": "床桌灶的使用者可见入口、避开入口直线；镜面为有条件补视野方案，不采纳心理或运势效力断语"
+      "scope": "床桌灶的使用者可见入口、避开入口直线；床可核对稳固床头支撑，镜面为有条件补视野方案；不采纳心理或运势效力断语",
+      "locator": "What is the Command Position?; Practical Applications: bedroom/headboard and mirrors"
     },
     "F2": {
       "url": "https://www.clearspaceliving.com/blog/feng-shui-command-position/",
-      "retrieved_at": "2026-10-14",
-      "retrieved_sha256": "c93b1466a3b04a79071894f368b7a36b73f80a0f46355d740d06bd356e2cbd80",
-      "retrieved_bytes": 357671,
+      "retrieved_at": "2026-11-17",
+      "retrieved_sha256": "a2b837988d514ac8e0ca7dfb83aa4dcfb9718a524475bfb501c5441f62b8cbc5",
+      "retrieved_bytes": 363545,
       "retrieved_format": "raw_html",
       "title": "Karen Kingston: The feng shui command position",
       "kind": "authored_teaching",
       "source_version": "2025-04-09 authored article",
-      "scope": "床与桌的实体背靠、入口视野；没有给出背靠距离的通用数值阈值"
+      "scope": "床与桌的实体背靠、入口视野；没有给出背靠距离的通用数值阈值",
+      "locator": "The three main criteria; the bed/desk application paragraph"
     },
     "E1": {
       "url": "https://www.amfengshui.com/wp-content/uploads/woocommerce_uploads/2013/12/tpofs.pdf",
@@ -31,10 +33,10 @@
       "retrieved_format": "raw_pdf",
       "title": "Larry Sang / American Feng Shui Institute: The Principles of Feng Shui",
       "kind": "author_published_book",
-      "source_version": "publisher PDF, Chapter 3, printed pp.19-28; PDF pp.36-45 (one-based)",
-      "scope": "五行生/克/泄、代表物与色彩；木代表物用活植物，处理木家具不作为该版本木调节物；实际元素优先于颜色",
-      "locator": "Printed pp.23,25 / PDF pp.40,42 (one-based), directly verified page images",
-      "verification_note": "2026-10-15 direct HTTP retrieved 4418704 bytes; SHA-256 unchanged; page locators verified"
+      "source_version": "Sixth Edition July 2004, Chapter 3, printed pp.19-28; PDF pp.36-45 (one-based)",
+      "scope": "五行生/克/泄、代表物与色彩；木代表物用活植物，水代表物须清洁且流动，处理木家具不作为该版本木调节物；实际元素优先于颜色",
+      "locator": "Printed pp.19-23,25 / PDF pp.36-40,42 (one-based), directly verified page images",
+      "verification_note": "原HTTP快照4418704 bytes及SHA-256保留；2026-11-17复核同一文件版次、五行循环与代表物页图"
     },
     "E2": {
       "url": "https://adelinapang.com/wp-content/uploads/2025/09/@2026-Horoscope-Forecast-Fengshui-Guide-by-Adelina-Pang-1.pdf",
@@ -44,8 +46,9 @@
       "retrieved_format": "raw_pdf",
       "title": "Adelina Pang: 2026 Horoscope Forecast & Fengshui Guide",
       "kind": "author_published_annual_guide",
-      "source_version": "2026 edition, PDF pages 35,37",
-      "scope": "仅2026年南宫5和西北宫2的金元素候选与避火；不采纳其他星、健康断语或盐水配方；第39页南/西南错位不纳入"
+      "source_version": "2026 edition, PDF pp.35-38 (one-based)",
+      "scope": "仅2026年南宫5和西北宫2的金元素候选与避火；不采纳其他星、健康断语或盐水配方；PDF第40页南/西南错位不纳入",
+      "locator": "PDF pp.35-36: South 5; pp.37-38: Northwest 2; p.40: excluded South/Southwest conflict (all one-based)"
     },
     "E3": {
       "url": "https://www.masterseanchan.com/blog/what-feng-shui-cure-really-is/",
@@ -81,7 +84,7 @@
   },
   "rulesets": {
     "indoor_command_authored_v1": {
-      "version": "1.1.0",
+      "version": "1.1.1",
       "method": "indoor_forms",
       "source_ids": [
         "F1",
@@ -99,7 +102,7 @@
       ]
     },
     "afsi_element_balance_v1": {
-      "version": "1.0.0",
+      "version": "1.0.1",
       "method": "element_adjustment",
       "source_ids": [
         "E1",
@@ -114,7 +117,7 @@
       ]
     },
     "pang_2026_annual_v1": {
-      "version": "1.0.0",
+      "version": "1.0.1",
       "method": "annual_element_remedy",
       "source_ids": [
         "E1",
@@ -167,6 +170,7 @@
       ],
       "rule_id": "indoor_command_authored_v1.solid_backing",
       "source_ids": [
+        "F1",
         "F2"
       ],
       "adjustment": "优先比较有实体背靠的位置；床可核对稳固床头支撑，不能以帘布等同实体背靠"
@@ -240,7 +244,7 @@
         "石质器物"
       ],
       "colours": [
-        "棕褐色",
+        "浅棕褐色（tan）",
         "米色",
         "黄色"
       ],
@@ -260,7 +264,7 @@
     },
     "水": {
       "objects": [
-        "清洁水体"
+        "清洁、流动的水体"
       ],
       "colours": [
         "蓝色",

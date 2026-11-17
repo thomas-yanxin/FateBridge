@@ -9,15 +9,16 @@ from types import ModuleType
 
 import pytest
 
-from fatebridge.core import astro_models
 from fatebridge.core import ephemeris_runtime as runtime
+from fatebridge.core.astro import classical
 from fatebridge.core.astro.birth import build_astro_birth_info
 from fatebridge.core.astro.chart import build_core_chart_payload
+from fatebridge.core.astro.earth_attitude import earth_attitude
+from fatebridge.core.astro.solar_events import next_solar_event, solar_observation
 from fatebridge.core.astro.time_scales import ephemeris_time
 from fatebridge.core.astro_models import (
     MODERN_HALF_WINDOW_DAYS,
     MODERN_REFERENCE_JD_TT,
-    _correction,
     _fundamental_arguments,
     earth_rotation_policy,
     iers2010_gast,
@@ -82,18 +83,38 @@ def test_future_native_houses_match_reference_and_keep_supplied_location():
 def test_frame_rotation_uses_only_public_python_interfaces_and_does_not_relocate_input():
     module = ModuleType("windows_shaped_swiss")
     module.FLG_SWIEPH = 2
+    module.FLG_SIDEREAL = 65536
+    module.FLG_RADIANS = 8192
     module.ECL_NUT = -1
     module.deltat_ex = lambda *args: 70 / 86400
     module.calc = lambda *args: ((23.44, 23.439, 0.001, 0.001), 2)
     module.sidtime = lambda jd: 10.0
     calls = []
-    module.houses_ex = lambda *args, **kwargs: calls.append((args, kwargs)) or "result"
+    module.houses_ex = lambda *args, **kwargs: pytest.fail(
+        "house kernel must receive the selected pose"
+    )
+    module.houses_armc = lambda *args: calls.append(args) or (
+        tuple(float(i * 30) for i in range(12)),
+        (0.0,) * 8,
+    )
     inputs = (2470162.5, 20.0, 179.999, b"R")
-    result = native_rotation_call(module, "houses_ex", inputs, {})
-    delta = _correction(module, inputs[0])
-    assert result == "result" and inputs[2] == 179.999
-    assert calls[0][0][0:2] == inputs[0:2]
-    assert abs((calls[0][0][2] - (inputs[2] + delta) + 180) % 360 - 180) < 1e-12
+    result = native_rotation_call(
+        module, "houses_ex", inputs, {}, calculate=module.calc
+    )
+    attitude = earth_attitude(module, inputs[0])
+    assert len(result[0]) == 12 and len(result[1]) == 8
+    assert inputs == (2470162.5, 20.0, 179.999, b"R")
+    assert calls[0][1] == inputs[1]
+    assert calls[0][2] == attitude.reduction.house_obliquity
+    assert calls[0][3] == b"R"
+    assert (
+        abs(
+            math.remainder(
+                calls[0][0] - attitude.house_sidereal_degrees - inputs[2], 360
+            )
+        )
+        < 1e-12
+    )
     assert not hasattr(module, "swe_set_astro_models")
 
 
@@ -130,13 +151,8 @@ def test_parallel_native_workers_agree_without_private_model_exports():
     assert max(values) == min(values)
 
 
-def test_failed_event_refinement_cannot_return_unconverged_time_and_restores_observer(
-    monkeypatch,
-):
-    module = ModuleType("nonconverging_public_backend")
-    module.BIT_HINDU_RISING = 896
-    module.BIT_DISC_CENTER = 256
-    module.BIT_NO_REFRACTION = 512
+def test_raw_native_event_call_keeps_its_source_convention():
+    module = ModuleType("native_event_source")
     count = []
     restored = []
     module.set_topo = lambda *site: restored.append(site)
@@ -146,18 +162,23 @@ def test_failed_event_refinement_cannot_return_unconverged_time_and_restores_obs
         return 0, (2470162.5 + len(count),)
 
     module.rise_trans = event
-    monkeypatch.setattr(astro_models, "_correction", lambda module, jd: jd % 2)
     site = (121.4737, 31.23, 25.0)
-    with pytest.raises(RuntimeError, match="did not converge"):
-        native_rotation_call(module, "rise_trans", (2470162.5, 0, 1, site), {})
-    assert len(count) == 6 and restored == [site]
+    args = (2470162.5, 0, 1, site)
+
+    def unexpected_sun(*args):
+        pytest.fail("Raw native event calls must not enter the physical Sun provider")
+
+    assert native_rotation_call(
+        module, "rise_trans", args, {}, calculate=unexpected_sun
+    ) == (0, (2470163.5,))
+    assert count == [args] and restored == []
 
 
 def test_approximate_angles_do_not_claim_the_native_rotation_policy(monkeypatch):
     def fail(*args, **kwargs):
         raise RuntimeError("deliberate native failure")
 
-    monkeypatch.setattr(runtime.swe, "houses_ex", fail)
+    monkeypatch.setattr(runtime.swe, "houses_armc", fail)
     result = build_core_chart_payload(
         build_astro_birth_info(**BIRTH), "chart", hsys=0, zodiacal=0
     )
@@ -173,25 +194,27 @@ def test_approximate_angles_do_not_claim_the_native_rotation_policy(monkeypatch)
         "2099-09-23T00:00:00+00:00",
     ],
 )
-def test_refracted_sunrise_is_a_fixed_point_of_the_public_geometry(date):
+def test_refracted_sunrise_has_an_adjacent_physical_altitude_bracket(date):
     time = ephemeris_time(datetime.fromisoformat(date))
-    site = (0.0, 51.5, 0.0)
-    args = (
+    event = next_solar_event(
         time.jd_ut1,
-        runtime.swe.SUN,
-        runtime.swe.CALC_RISE | runtime.swe.BIT_DISC_CENTER,
-        site,
-        1013.25,
-        0.0,
-        runtime.swe.FLG_SWIEPH,
+        longitude=0.0,
+        latitude=51.5,
+        rising=True,
+        definition="apparent_topocentric_center",
     )
-    code, events = runtime.ephemeris_call("rise_trans", *args)
-    assert code == 0
-    event = events[0]
-    correction = _correction(runtime.swe, event)
-    native_site = ((site[0] + correction + 180) % 360 - 180, *site[1:])
-    try:
-        native_code, check = runtime.swe.rise_trans(*args[:3], native_site, *args[4:])
-        assert native_code == 0 and abs(check[0] - event) * 86400 <= 0.001
-    finally:
-        runtime.swe.set_topo(*site)
+    assert event is not None
+    lower, upper = event.bracket_ut1
+    assert lower == upper or math.nextafter(lower, math.inf) == upper
+    heights = [
+        solar_observation(
+            t, longitude=0, latitude=51.5, height=0, definition=event.definition
+        ).altitude_degrees
+        for t in (lower, upper)
+    ]
+    assert heights[0] <= event.geometric_horizon_degrees <= heights[1]
+    result = classical._planetary_hours(
+        event.julian_day_ut1 + 1 / 86400, 0, 51.5, "UTC"
+    )
+    assert result["arc_start_jd_ut1"] == event.julian_day_ut1
+    assert result["hour_number"] == 1

@@ -9,13 +9,15 @@ from fatebridge.core.astro import runtime
 from fatebridge.core.astro.clock_observation import observer
 from fatebridge.core.local_techniques.suzhan import build_suzhan_result
 from fatebridge.services.divination import calculate_suzhan_analysis
-from fatebridge.utils.civil_time import utc_calendar, utc_ordering_key
+from fatebridge.utils.civil_time import ZonedCalendar, utc_calendar, utc_ordering_key
 from tests.sukuyo.test_sukuyo_transports import (
     test_calendar_and_relations_across_all_real_transports as run_transport_check,
 )
 
 BASIS = "japanese_naoj_historical_utc09"
 PAYLOAD = dict(
+    lat="31n13",
+    lon="121e28",
     date="0001-01-01",
     time="00:19:00",
     zone="Asia/Tokyo",
@@ -47,7 +49,10 @@ def test_both_full_chart_modes_preserve_the_unrepresentable_utc_epoch(mode):
     )
     assert "TT儒略日" in result["snapshot_text"]
     assert "同一时刻；年编号跨界不改写出生输入" in result["snapshot_text"]
-    assert "不能视为已确认地点" in result["snapshot_text"]
+    assert (
+        f"经纬度：{result['params']['birthLongitude']} {result['params']['birthLatitude']}"
+        in result["snapshot_text"]
+    )
     assert "未建立现实预测效力；未获权威认证" in result["snapshot_text"]
     # An independent direct call checks the time normalization and seven
     # coordinates against the same declared native numerical engine. It is
@@ -88,7 +93,9 @@ def test_exact_host_boundary_and_previous_second_are_not_clipped(mode):
 def test_clock_validation_still_rejects_folds_and_gaps(clock):
     day = "2025-11-02" if clock == "01:30:00" else "2025-03-09"
     with pytest.raises(ValueError):
-        build_suzhan_result(date=day, time=clock, zone="America/New_York")
+        build_suzhan_result(
+            lat="31n13", lon="121e28", date=day, time=clock, zone="America/New_York"
+        )
 
 
 def test_clock_trace_labels_the_normalized_utc_instead_of_the_local_carrier():
@@ -120,7 +127,7 @@ def test_year_pillar_comparison_keeps_exact_instants_without_datetime_utc(monkey
     offset = timezone(timedelta(hours=9, minutes=18, seconds=59))
     boundary = datetime(1, 1, 1, 0, 19, tzinfo=offset)
     term = almanac.SolarTerm(
-        "立春", boundary, "0001-01-01", "", resolution_provider="swiss"
+        "立春", ZonedCalendar.from_datetime(boundary), resolution_provider="swiss"
     )
     monkeypatch.setattr(almanac, "get_solar_terms_for_year", lambda *a: [term])
     monkeypatch.setattr(almanac, "require_calculated_solar_term", lambda *a: None)

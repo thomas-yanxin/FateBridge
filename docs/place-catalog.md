@@ -32,7 +32,7 @@ FateBridge 的 REST、MCP、CLI 共用 `utils/places.py`，不需要在线地理
 - GeoNames 使用 [WGS84](https://www.geonames.org/about.html)，部分行政点本身存在小数位较少、中心选取较粗的情况。台湾城市优先使用同一行政区内同名居民点的坐标；其他单位保留行政代表点。
 - AreaCity 发布的是高德 **GCJ-02** 中心坐标。本项目在导入时使用迭代逆变换产生近似 WGS84，标记 `coordinate_system=WGS84_approx`，保留 `source_coordinates` 原值。存储六位小数表示数值格式，**不承诺米级测绘精度**；逆变换的数值收敛也不是地理误差保证。
 - 大陆民用时区统一使用 `Asia/Shanghai`；新疆也遵循此输入约定。若原始记录使用当地其他计时方式，应显式说明时区。香港、澳门、台湾分别使用 `Asia/Hong_Kong`、`Asia/Macau`、`Asia/Taipei`。
-- 系统或 dateutil 自带时区库缺少新 IANA 名称时，回退读取依赖 `pytz>=2025.2` 的 TZif 数据；例如 `America/Coyhaique` 也能在旧系统上解析，仍保留原有夏令时重叠/跳过检查。
+- 命名时区统一由标准库ZoneInfo读取依赖 `pytz>=2026.6` 的TZif数据，锁定版本包含IANA2026f；不按操作系统或dateutil库的可用性切换规则。例如 `America/Coyhaique` 也能在旧系统上解析，仍保留重复／不存在钟时校验。版本更新及有限对照见[历法边界核对](calendar-boundary-audit.md)。
 - 真太阳时经度每相差 1°，经度校正约相差 4 分钟。临近时辰/日期边界、需要更准确星盘地点时，应传实际出生位置的 WGS84 经度和纬度，不能把城市代表点当作具体出生地点。
 
 ## 地名与同名处理

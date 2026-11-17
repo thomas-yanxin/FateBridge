@@ -1,6 +1,11 @@
 import pytest
 
 from fatebridge.analysis.compatibility import AdvancedCompatibility
+from fatebridge.core.bazi_branch_facts import (
+    check_clash_patterns,
+    check_harmony_patterns,
+)
+from fatebridge.core.bazi_pattern_facts import analyze_special_patterns
 from fatebridge.core.elements import ElementAnalysis
 from fatebridge.core.rules import BaZiRules
 from fatebridge.services.calculation import calculate_destiny_analysis
@@ -17,7 +22,7 @@ def _build_minimal_analysis(
     recognized_structures: list[dict] | None = None,
     element_distribution: dict[str, float] | None = None,
 ):
-    return {
+    result = {
         "four_pillars": {
             "year": {"stem": "甲", "branch": "申"},
             "month": {"stem": "丙", "branch": "子"},
@@ -44,7 +49,7 @@ def _build_minimal_analysis(
             "special": {
                 "recognized_structures": recognized_structures or [],
                 "metadata": {
-                    "counts": {"horses": 2},
+                    "branch_groups": {"四生": {"count": 2}},
                     "branch_attributes": {},
                 },
             },
@@ -65,6 +70,17 @@ def _build_minimal_analysis(
             "harmony_effects": [],
         },
     }
+    result["day_master"]["engineering_index"] = {
+        "quantity_kind": "uncalibrated_strength_policy_index",
+        "strength_level": "中和",
+        "source_adjudication_used": False,
+    }
+    result["structure_profile"]["engineering_reference"] = {
+        **result["structure_profile"],
+        "quantity_kind": "conditional_engineering_preference",
+        "source_adjudication_used": False,
+    }
+    return result
 
 
 def test_build_structure_profile_detects_yang_ren_jia_sha():
@@ -79,9 +95,9 @@ def test_build_structure_profile_detects_yang_ren_jia_sha():
     structure_profile = BaZiRules.build_structure_profile(
         pillars=pillars,
         element_analysis=element_analysis,
-        harmony_patterns=BaZiRules.check_harmony_patterns(pillars),
-        clash_patterns=BaZiRules.check_clash_patterns(pillars),
-        special_patterns=BaZiRules.analyze_special_patterns(pillars),
+        harmony_patterns=check_harmony_patterns(pillars),
+        clash_patterns=check_clash_patterns(pillars),
+        special_patterns=analyze_special_patterns(pillars),
     )
 
     assert structure_profile["dominant_structure"]["label"] == "月刃格"
@@ -106,9 +122,9 @@ def test_analyze_harmony_effects_returns_structured_event_payload():
     structure_profile = BaZiRules.build_structure_profile(
         pillars=pillars,
         element_analysis=element_analysis,
-        harmony_patterns=BaZiRules.check_harmony_patterns(pillars),
-        clash_patterns=BaZiRules.check_clash_patterns(pillars),
-        special_patterns=BaZiRules.analyze_special_patterns(pillars),
+        harmony_patterns=check_harmony_patterns(pillars),
+        clash_patterns=check_clash_patterns(pillars),
+        special_patterns=analyze_special_patterns(pillars),
     )
 
     events = BaZiRules.analyze_harmony_effects(pillars, structure_profile)
@@ -250,6 +266,12 @@ def test_favorable_synergy_bidirectional_label_uses_actual_support_directions(
         expected_directions = set()
         expected_basis_deltas = [8, 6]
 
+    for person in (first, second):
+        person["structure_profile"]["engineering_reference"] = {
+            **person["structure_profile"],
+            "quantity_kind": "conditional_engineering_preference",
+            "source_adjudication_used": False,
+        }
     result = AdvancedCompatibility._analyze_favorable_synergy(first, second)
     assert result["score"] == 74.0
     assert result["synergy_level"] == (
@@ -312,8 +334,8 @@ def test_current_favorable_synergy_uses_versioned_scores_and_three_surface_parit
     assert synergy["synergy_level"] == "协同较好"
     assert synergy["assessment_status"] == "partial"
     assert synergy["score_basis"] == [
-        "第一人土较旺，对第二人有稳定补益(+7)",
-        "第一人金占比高，能明显补到第二人的可用之气(+10)",
+        "第一人土结构占比达到16%，命中第二人工程参考元素集合(+7)",
+        "第一人金结构占比达到24%，命中第二人工程参考元素集合(+10)",
     ]
     assert [item["element"] for item in synergy["supportive_patterns"]] == ["土", "金"]
     assert {
@@ -454,9 +476,10 @@ def test_comprehensive_summary_reads_normalized_score_key():
 
 
 def test_compatibility_score_rewards_three_harmony_and_penalises_harm() -> None:
-    """``BaZiRules.calculate_compatibility_score`` previously only scored 六合
-    and 六冲. Three-harmony, half-harmony, 六害 and 三刑 are now included so
-    the traditional_compatibility block reflects classical jipan matching."""
+    """Selected nominal branch rules retain positive and negative contributions.
+
+    These engineering weights do not certify classical formation or real matching.
+    """
     from fatebridge.core.rules import BaZiRules
 
     # 一方: 申子辰 水三合 分散在三柱; 二方: 亥子丑 混合 (主要对冲六合已有)
@@ -468,10 +491,10 @@ def test_compatibility_score_rewards_three_harmony_and_penalises_harm() -> None:
     }
     # 对方也有自己部分同组支, 跨盘凑成 三合
     pillars_partial = {
-        "year": ("戊", "申"),  # 跨盘与前者 辰 凑 半合
+        "year": ("戊", "申"),  # 跨盘与前者子形成所选含中神半合
         "month": ("己", "子"),
         "day": ("庚", "午"),  # 日支 六冲 前者的子
-        "hour": ("辛", "未"),  # 前者日支辰 与 未 六害
+        "hour": ("辛", "未"),  # 与前者子为六害；辰未不是六害
     }
     result = BaZiRules.calculate_compatibility_score(
         pillars_full_triple, pillars_partial

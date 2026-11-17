@@ -10,12 +10,11 @@ from __future__ import annotations
 import re
 from datetime import datetime
 from functools import lru_cache
-from typing import Any, Dict, Iterable, List, Optional, Tuple
+from typing import Any, Dict, Iterable, List, Literal, Mapping, Optional, Tuple
 
 from fatebridge.core.metaphysics.qimen_calendar_tables import QIMEN_FUHEAD_HEAVEN_STEM
 
 from ..almanac import (
-    DAY_GANZHI_STRATEGY_STANDARD,
     _solar_terms_for_context_year,
     get_jieqi_year_grid,
     localize_datetime,
@@ -37,25 +36,6 @@ from .common import (
     sexagenary_text,
     xun_head_for_ganzhi,
 )
-
-QIMEN_SAN_YUAN_FU_TOU = (
-    "甲子",
-    "甲午",
-    "甲寅",
-    "甲申",
-    "甲辰",
-    "甲戌",
-    "己卯",
-    "己酉",
-    "己巳",
-    "己亥",
-    "己丑",
-    "己未",
-)
-
-
-QIMEN_SAN_YUAN_FU_TOU_SET = set(QIMEN_SAN_YUAN_FU_TOU)
-
 
 QIMEN_PALACES: List[Dict[str, Any]] = [
     {"index": 1, "label": "坎一宫", "trigram": "坎"},
@@ -234,11 +214,8 @@ QIMEN_EARTH_PLATE_YANG = tuple("戊己庚辛壬癸丁丙乙")
 
 def qimen_futou_for_ganzhi(text: str) -> str:
     cycle_index = sexagenary_index_for(text)
-    for offset in range(60):
-        candidate = sexagenary_text(cycle_index - offset)
-        if candidate in QIMEN_SAN_YUAN_FU_TOU_SET:
-            return candidate
-    return xun_head_for_ganzhi(text)
+    # Every Jia/Ji day begins one five-day block of the sixty-day cycle.
+    return sexagenary_text(cycle_index - cycle_index % 5)
 
 
 def _qimen_new_list(values: Iterable[str], start_value: str) -> List[str]:
@@ -480,14 +457,12 @@ def _qimen_effective_ganzhi(seed: MetaphysicsSeed) -> Tuple[str, str]:
             local_datetime.day,
             local_datetime.hour,
         ),
-        strategy=DAY_GANZHI_STRATEGY_STANDARD,
     )
     hour_pillar = BaZiCalendar.calculate_hour_pillar(
         local_datetime.year,
         local_datetime.month,
         local_datetime.day,
         local_datetime.hour,
-        day_pillar_strategy=DAY_GANZHI_STRATEGY_STANDARD,
     )
     return ganzhi_text(day_pillar), ganzhi_text(hour_pillar)
 
@@ -574,10 +549,9 @@ def _qimen_parse_meta(ju_text: str) -> Dict[str, str]:
 
 def _qimen_zhifu_zhishi(
     time_ganzhi: str,
-    ju_text: str,
+    earth: Mapping[str, str],
     *,
-    dun_type: str,
-    current_term: Optional[str] = None,
+    dun_type: Literal["阳遁", "阴遁"],
 ) -> Dict[str, str]:
     """Derive leaders from the actual earth plate, not a parallel lookup table.
 
@@ -585,8 +559,6 @@ def _qimen_zhifu_zhishi(
     counts the elapsed hours of the xun through nine numeric palaces. Only
     after that count is the centre hosted in 坤. The native 天禽 identity stays.
     """
-    meta = _qimen_parse_meta(ju_text)
-    earth = _qimen_pan_earth(ju_text)
     reverse = {stem: palace for palace, stem in earth.items()}
     head = xun_head_for_ganzhi(time_ganzhi)
     hidden = QIMEN_FUHEAD_HEAVEN_STEM[head]
@@ -598,7 +570,7 @@ def _qimen_zhifu_zhishi(
     stem = hidden if time_ganzhi[0] == "甲" else time_ganzhi[0]
     raw_star_gong = reverse[stem]
     elapsed = sexagenary_index_for(time_ganzhi) % 10
-    step = -1 if meta["yy"] == "阴" else 1
+    step = -1 if dun_type == "阴遁" else 1
     raw_door_gong = QIMEN_GUA_SEQUENCE[
         (QIMEN_GUA_SEQUENCE.index(origin) + step * elapsed) % 9
     ]
@@ -612,7 +584,7 @@ def _qimen_zhifu_zhishi(
         "door": door,
         "door_gong": "坤" if raw_door_gong == "中" else raw_door_gong,
         "raw_door_gong": raw_door_gong,
-        "dun_type": meta["yy"],
+        "dun_type": dun_type[0],
     }
 
 
@@ -636,17 +608,10 @@ def _qimen_rotation_origins(leader: Dict[str, str]) -> Dict[str, str]:
 
 def _qimen_build_palaces(
     *,
-    time_ganzhi: str,
-    ju_text: str,
-    dun_type: str,
-    current_term: str,
+    earth: Mapping[str, str],
+    leader: Dict[str, str],
     god_profile: str = DEFAULT_GOD_PROFILE,
 ) -> List[Dict[str, Any]]:
-    validate_profiles(god_profile, DEFAULT_SEASON_PROFILE)
-    earth = _qimen_pan_earth(ju_text)
-    leader = _qimen_zhifu_zhishi(
-        time_ganzhi, ju_text, dun_type=dun_type, current_term=current_term
-    )
     origins = _qimen_rotation_origins(leader)
     ring = QIMEN_CLOCKWISE_GUA_SEQUENCE
     door_source = QIMEN_DOOR_TO_TRIGRAM[QIMEN_DOOR_DISPLAY[leader["door"]]]
@@ -737,23 +702,17 @@ def build_qimen_board(
     else:
         raise ValueError(f"不支持的奇门定局法：{ju_method!r}")
     current_term = ju_meta["current_term"]
-    dun_type = ju_meta["dun_type"]
+    dun_type: Literal["阳遁", "阴遁"] = ju_meta["dun_type"]
     yuan = ju_meta["yuan"]
     ju_number = ju_meta["ju_number"]
     ju_text = _qimen_build_ju_text(dun_type, ju_number, yuan)
-    zfzs = _qimen_zhifu_zhishi(
-        time_ganzhi,
-        ju_text,
-        dun_type=dun_type,
-        current_term=current_term,
-    )
+    earth = _qimen_pan_earth(ju_text)
+    zfzs = _qimen_zhifu_zhishi(time_ganzhi, earth, dun_type=dun_type)
     xun_head = xun_head_for_ganzhi(time_ganzhi)
     kongwang = kongwang_for_ganzhi(time_ganzhi)
     palaces = _qimen_build_palaces(
-        time_ganzhi=time_ganzhi,
-        ju_text=ju_text,
-        dun_type=dun_type,
-        current_term=current_term,
+        earth=earth,
+        leader=zfzs,
         god_profile=god_profile,
     )
 

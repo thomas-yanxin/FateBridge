@@ -17,6 +17,12 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[2]
 CORPUS = ROOT / "tests/fixtures/ren_calendar_v1"
+HKO_MANIFEST = ROOT / "tests/data/ziwei_independent/calendar_manifest.json"
+RELOCATED_REFERENCES = {
+    "tests/fixtures/ziwei_independent/calendar_manifest.json": HKO_MANIFEST,
+    "tests/fixtures/fengshui_calendar_v1/24SolarTerms_2024.xml": ROOT
+    / "tests/data/fengshui_calendar_v1/24SolarTerms_2024.xml",
+}
 BRANCHES = "子丑寅卯辰巳午未申酉戌亥"
 STEMS = "甲乙丙丁戊己庚辛壬癸"
 MONTH_BRANCHES = "寅卯辰巳午未申酉戌亥子丑"
@@ -59,7 +65,9 @@ def reference(corpus: Path = CORPUS) -> dict[str, Any]:
             raise ValueError(f"Frozen Ren calendar reference changed: {name}")
     ref = json.loads((corpus / "reference.json").read_text())
     for name, checksum in ref["references"].items():
-        if sha(ROOT / name) != checksum:
+        # The frozen source identifier survives its physical relocation.
+        source = RELOCATED_REFERENCES.get(name, ROOT / name)
+        if sha(source) != checksum:
             raise ValueError(f"Referenced calendar manifest changed: {name}")
     return ref
 
@@ -137,9 +145,7 @@ def audit(years: list[int] | None = None, *, progress: bool = True) -> dict[str,
     requested = set(years or range(1901, 2101))
     if not requested or not requested <= set(range(1901, 2101)):
         raise ValueError("HKO years must be 1901..2100")
-    manifest = json.loads(
-        (ROOT / "tests/data/ziwei_independent/calendar_manifest.json").read_text()
-    )
+    manifest = json.loads(HKO_MANIFEST.read_text())
     if [s["year"] for s in manifest["sources"]] != list(range(1901, 2101)):
         raise ValueError("The source cohort must retain all 200 HKO years")
     implementation = {name: sha(ROOT / name) for name in IMPLEMENTATION}

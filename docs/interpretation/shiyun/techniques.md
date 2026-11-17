@@ -8,7 +8,7 @@
 
 | 所问任务／选用条件 | 工具与业务根 | 新增依据、输入及复用 |
 | --- | --- | --- |
-| 当前人生阶段、何时换段 | `firdaria` → `firdaria.current_major/current_sub`；需邻段取 `firdaria.timeline` | 主分运实际起止、昼夜顺序与年长口径。首次沿用工具的法达首轮字段；`calculation_options` 只在非默认夜盘顺序或年长口径下返回，不能无条件加入严格投影。用户确实选择变体时可取完整 `firdaria` 根并核对实际选项；不为获取该字段改变算法版本。使用已确认出生资料和目标日期；已有主／分运不重算，追问只读同 run 的相邻条目 |
+| 当前人生阶段、何时换段 | `firdaria` → `firdaria.current_major/current_sub`；需邻段取 `firdaria.timeline` | 主分运实际起止、昼夜顺序与年长口径。首次沿用工具已发布的法达首轮字段；新结果始终带 `calculation_options`，需要核对口径时读取该字段或完整 `firdaria` 根，不为获取回执改变算法版本。旧 run 缺少回执时保留其原版本依据，不能套用现行UTC固定年。使用已确认出生资料和目标日期；已有主／分运不重算，追问只读同 run 的相邻条目 |
 | 目标生日年度重点／按月细分 | `profection` → `profection`；相应单项实际返回的月限字段按合同 | 年龄对应的激活宫、星座与年主，不等同公历全年。用相关本命配置解释年主；已有聚合小限复用，不为增加方法数另算 |
 | 返照时点、返回时刻和角度 | `solarreturn` → `solarreturn`；`lunarreturn` → `lunarreturn` | 确需年度／月度返照参考才用；目标日期、实际返照地点与时区按合同。业务根读 `return_datetime/ascendant/medium_coeli/sun/moon`，返照地点独立读 `analysis_context.return_location`，不能拼成 `solarreturn.location` 或 `lunarreturn.location`。当前返回不是完整12宫与全部行星相位，不据此编完整返照盘 |
 | 指定时点的行运联系 | `transit` → `transit` | 读 `analysis_datetime/orb_limit/hits/exact_hits` 及命中两端、相位、容许度；需目标钟时和已确认位置。筛选列表不是全年事件表；行运自身 house 不当本命叠宫 |
@@ -34,7 +34,7 @@
 | 想看指定日期的某行星弧 | `astro_planetaryarc`：`arc_source/orb/analysis_year/month/day`；读 `analysis_context.analysis_datetime`、`planetary_arc.arc_source/arc_degrees/positions/hits` | 所选源星的二次推运弧施于整盘，再对本命取相位；不同源星不等于太阳弧。同日期追问读保留 hits，改日期才需补目标计算 |
 | 点名波斯向运 | `astro_persiandirected`：`max_age_years`；读 `persian_directed.rate_deg_per_year/hits/hit_count` | 符号1°／年的推移，对本命星体与宫头命中，当前最多保留按年龄排序前120条；未出现不证明没有后段命中。返回 date 是该符号模型日期，不是事情发生日；不补小行星／中点／阿拉伯点的未覆盖命中 |
 | 点名 Huber 年龄点 | `astro_agepoint`：`max_age_years`；读 `age_point.years_per_house/cycle_years/points/contacts` 与 `analysis_context` | 实际强制 Koch 宫、每宫6年、72年一周；继承的 house_system 不改变本方法。年龄点接触是符号进程，不把72年当寿命，也不由宫位推疾病 |
-| 点名恒星黄道二次推运 | `astro_vedicprog`：`orb/analysis_year/month/day`；读 `analysis_context.analysis_datetime/ayanamsha`、`vedic_progression.zodiac/positions/hits` | 本实现用 FateBridge 的 Lahiri 式偏移，`vedic_progression.positions` 为恒星黄道，`analysis_context.zodiac_type` 是 `Sidereal` 而分支 `zodiac` 是 `sidereal`；当前顶层 `natal_reference` 仍来自热带基准，不冒充恒星本命落点。不是完整吠陀达沙或分盘。按实际点位与命中解释，不能因工具名就称已覆盖印度全部时间技法 |
+| 点名恒星黄道二次推运 | `astro_vedicprog`：`orb/analysis_year/month/day`；读 `analysis_context.analysis_datetime/ayanamsha`、`vedic_progression.progressed_datetime/calculation_options/zodiac/positions/hits` | 本命参照与推运位置均来自共享原生 Lahiri 恒星黄道；`analysis_context.zodiac_type` 是 `Sidereal`，分支 `zodiac` 是 `sidereal`。实际推运时刻及固定年键随结果返回。不是完整吠陀达沙或分盘。按实际点位与命中解释，不能因工具名就称已覆盖印度全部时间技法 |
 | 点名赤纬推运／平行相 | `astro_jaynesprog`：`orb/analysis_year/month/day`；读 `analysis_context.analysis_datetime`、`jaynes_declination.parallels` | 逐条读 natal/progressed、赤纬、kind、orb；这与黄经合相不同。空表只限制此容许度内的赤纬命中，不否定其他阶段依据 |
 
 ## 交付和追问复用

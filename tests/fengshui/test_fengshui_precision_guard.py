@@ -6,11 +6,11 @@ from pathlib import Path
 
 import pytest
 
+from fatebridge.core.de441_solar import MODEL_ID as DE441_SOLAR_MODEL
 from fatebridge.core.fengshui.bazhai import minggua
 from fatebridge.core.fengshui.calendar import lichun_resolution, solar_term_resolution
 from fatebridge.core.fengshui.models import HousePeriod, MingguaRequest
 from fatebridge.core.fengshui.xuankong import period_context
-from fatebridge.core.moshier_solar import MODEL_ID as COMPLETE_MOSHIER_SOLAR_MODEL
 from fatebridge.services.fengshui import calculate_annual_stars, calculate_monthly_stars
 
 FOLDER = Path(__file__).parents[1] / "data/fengshui_monthly_v1"
@@ -32,20 +32,20 @@ TERMS = [
 
 
 @pytest.fixture
-def actual_moshier(monkeypatch, tmp_path):
+def native_without_files(monkeypatch, tmp_path):
     # Request the native control explicitly: auto may select another model
     # when files are absent. Never relabel that result as Moshier.
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
     assert (
         solar_term_resolution(2026, "立春", "UTC")["ephemeris_model"]
-        == COMPLETE_MOSHIER_SOLAR_MODEL
+        == DE441_SOLAR_MODEL
     )
 
 
 @pytest.mark.parametrize("term", TERMS)
 def test_every_jie_keeps_both_candidates_inside_the_guard_and_computes_beyond_it(
-    actual_moshier, term
+    native_without_files, term
 ):
     resolution = solar_term_resolution(2026, term, "UTC")
     root = datetime.fromisoformat(resolution["moment"])
@@ -59,7 +59,7 @@ def test_every_jie_keeps_both_candidates_inside_the_guard_and_computes_beyond_it
         assert time["solar_month_number"] is None
         assert all(
             r["uncertainty_reason"]
-            == "complete_moshier_solar_model_guard_not_accuracy_certification"
+            == "de441_solar_model_guard_not_accuracy_certification"
             for r in time["uncertain_boundary_resolutions"]
         )
         assert time["precision_policy"]["numeric_acceptance_gate_seconds"] == 1.0
@@ -71,7 +71,7 @@ def test_every_jie_keeps_both_candidates_inside_the_guard_and_computes_beyond_it
 
 
 def test_reference_counterexample_is_preserved_without_a_false_unique_month(
-    actual_moshier,
+    native_without_files,
 ):
     result = calculate_monthly_stars(**REGRESSION["input"])["layers"]["monthly_stars"]
     expected = REGRESSION["expected_under_frozen_reference_clock_policy"]
@@ -85,7 +85,7 @@ def test_reference_counterexample_is_preserved_without_a_false_unique_month(
 
 
 def test_year_star_minggua_and_twenty_year_changeover_share_the_same_guard(
-    actual_moshier,
+    native_without_files,
 ):
     root = datetime.fromisoformat(lichun_resolution(2024, "UTC")["moment"])
     annual = calculate_annual_stars(query_at=root, timezone_name="UTC")["layers"][
@@ -108,7 +108,7 @@ def test_year_star_minggua_and_twenty_year_changeover_share_the_same_guard(
     assert period["number"] is None and period["candidate_period_numbers"] == [8, 9]
     assert (
         period["confirmation_reason"]
-        == "complete_moshier_solar_model_precision_guard_in_period_changeover_year"
+        == "de441_solar_model_precision_guard_in_period_changeover_year"
     )
     other = datetime.fromisoformat(lichun_resolution(2025, "UTC")["moment"])
     same = period_context(
@@ -122,7 +122,9 @@ def test_year_star_minggua_and_twenty_year_changeover_share_the_same_guard(
     assert same["number"] == 9 and same["resolution_status"] == "resolved"
 
 
-def test_explicit_confirmations_are_not_overruled_by_a_weaker_clock(actual_moshier):
+def test_explicit_confirmations_keep_their_operational_boundary_policy(
+    native_without_files,
+):
     annual = calculate_annual_stars(effective_year=2024)["layers"]["annual_stars"]
     assert annual["status"] == "complete" and annual["effective_year"] == 2024
     personal = minggua(

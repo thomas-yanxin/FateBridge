@@ -8,7 +8,6 @@ from __future__ import annotations
 
 from typing import Any, Dict, Optional
 
-from fatebridge.core.almanac import DAY_GANZHI_STRATEGY_STANDARD
 from fatebridge.core.metaphysics.common import MetaphysicsSeed
 from fatebridge.core.metaphysics.liureng import build_liureng_board
 from fatebridge.core.metaphysics.ren_calendar import require_ren_calendar
@@ -131,11 +130,9 @@ def _build_sanshi_snapshot_text(
         if isinstance(lesson, dict)
     ]
     liureng_transmission_lines = []
-    transmissions = (
-        liureng.get("three_transmissions", {}) if isinstance(liureng, dict) else {}
-    )
+    transmissions = liureng["three_transmissions"]
     for label, title in (("initial", "初传"), ("middle", "中传"), ("final", "末传")):
-        item = transmissions.get(label, {}) if isinstance(transmissions, dict) else {}
+        item = transmissions[label]
         liureng_transmission_lines.append(
             f"{title}：{item.get('branch', '无')} / {item.get('relation', '无')} / {item.get('god', '无')}"
         )
@@ -143,9 +140,7 @@ def _build_sanshi_snapshot_text(
         (item for item in liureng.get("patterns", []) or [] if isinstance(item, dict)),
         {},
     )
-    month_general = (
-        liureng.get("month_general", {}) if isinstance(liureng, dict) else {}
-    )
+    month_general = liureng["month_general"]
     sections = [
         (
             "起盘信息",
@@ -301,7 +296,6 @@ def build_sanshiunited_result(
         gps_lat=gps_lat,
         gps_lon=gps_lon,
         use_true_solar_time=bool(use_true_solar_time),
-        day_pillar_strategy=DAY_GANZHI_STRATEGY_STANDARD,
     )
     qimen = build_qimen_with_options(qimen_seed, qimen_options)
     taiyi = _build_taiyi_with_options(seed, taiyi_options)

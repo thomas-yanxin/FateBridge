@@ -1,6 +1,5 @@
 """A finite mathematical scope must not replace unresolved classical gates."""
 
-import ast
 import copy
 import json
 import shutil

@@ -12,7 +12,7 @@ from __future__ import annotations
 from typing import Any, Dict, List, Optional, Tuple, TypedDict
 
 from fatebridge.core.almanac import get_lunar_context, localize_datetime
-from fatebridge.core.metaphysics.ren_sources import TANYUAN_SOURCE
+from fatebridge.core.metaphysics.ren_sources import JINGWEI_SOURCE, TANYUAN_SOURCE
 from fatebridge.utils.birth_input import normalize_gender
 
 from ...utils.data import EARTHLY_BRANCHES, HEAVENLY_STEMS
@@ -222,9 +222,8 @@ def _liureng_upper_lower_relation(upper_branch: str, lower_branch: str) -> str:
         return "下贼上"
     if ELEMENT_GENERATES[upper_element] == lower_element:
         return "上生下"
-    if ELEMENT_GENERATES[lower_element] == upper_element:
-        return "下生上"
-    return "平"
+    # The five-element cycle leaves only lower-generates-upper at this point.
+    return "下生上"
 
 
 def derive_selection(day_ganzhi: str, sky_to_earth: Dict[str, str]) -> Dict[str, Any]:
@@ -525,12 +524,12 @@ def build_liureng_board(
                 "source_url": (
                     TANYUAN_TRANSCRIPTION
                     if guiren_profile == "tanyuan_xieji_v1"
-                    else None
+                    else JINGWEI_SOURCE
                 ),
                 "source_section": (
                     "日贵人歌 / 夜贵人歌"
                     if guiren_profile == "tanyuan_xieji_v1"
-                    else "所选通行昼夜表"
+                    else "六壬经纬·卷之一·贵神（故宫珍本丛刊419 PDF10–11）"
                 ),
                 "result": {
                     "profile": guiren_profile,

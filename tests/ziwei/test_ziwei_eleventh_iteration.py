@@ -1,7 +1,6 @@
 """Direction invariants remain known without inventing missing gender."""
 
 import asyncio
-import hashlib
 import json
 import shutil
 
@@ -19,7 +18,6 @@ from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
 from scripts.ziwei.audit_ziwei_limits import _seed
 from tests.fixtures.mcp_receipt import verified_inline_business
-from tests.fixtures.mcp_result_delivery import assert_same_run_receipt
 
 
 def test_independent_cycles_keep_real_software_differences_and_unresolved_slots():
@@ -225,36 +223,3 @@ def test_metadata_reference_helper_never_allows_business_deferral():
                 None, {"result_delivery": {"deferred_fields": ["ziwei_birth"]}}
             )
         )
-
-
-@pytest.mark.parametrize(
-    "field", ["run_id", "environment_sha256", "ephemeris_inventory_sha256"]
-)
-def test_receipt_compaction_cannot_hide_changed_identity_or_fingerprints(field):
-    files = {"0/test.se1": "a" * 64}
-    digest = hashlib.sha256(
-        json.dumps(files, sort_keys=True, separators=(",", ":")).encode()
-    ).hexdigest()
-    full = {
-        "run_id": "same",
-        "runtime": {
-            "environment_sha256": "environment",
-            "ephemeris": {"sha256": digest, "files": files},
-        },
-    }
-    inline = {
-        "run_id": "same",
-        "runtime": {
-            "delivery_path": "run_metadata.runtime",
-            "environment_sha256": "environment",
-            "ephemeris_inventory_sha256": digest,
-            "ephemeris_files_count": 1,
-        },
-    }
-    assert_same_run_receipt(inline, full)
-    if field == "run_id":
-        inline[field] = "changed"
-    else:
-        inline["runtime"][field] = "changed"
-    with pytest.raises(AssertionError):
-        assert_same_run_receipt(inline, full)

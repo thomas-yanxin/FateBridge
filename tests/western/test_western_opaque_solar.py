@@ -12,7 +12,6 @@ import math
 import os
 from datetime import datetime
 from decimal import Decimal, localcontext
-from fractions import Fraction
 from pathlib import Path
 
 import pytest
@@ -183,6 +182,45 @@ def test_nine_offgrid_horizons_holdout_epochs_keep_original_numerical_line():
         assert position["solar_disc_intercepted"] == (row[4].strip() == "o")
 
 
+@pytest.mark.local_data
+@pytest.mark.parametrize("body,target", [("Uranus", 7), ("Neptune", 8), ("Pluto", 9)])
+def test_outer_system_positions_against_two_year_daily_horizons_reference(body, target):
+    directory = DATA.parent / "outer-opaque-solar"
+    raw_provenance = (directory / "provenance.json").read_bytes()
+    assert hashlib.sha256(raw_provenance).hexdigest() == (
+        "19daea4b930d27abd5a310c2fe8c578f020718fa615e506fe77aac210d9cb098"
+    )
+    provenance = json.loads(raw_provenance)
+    assert hashlib.sha256((directory / "protocol.json").read_bytes()).hexdigest() == (
+        provenance["protocol_sha256"]
+    )
+    filename = body.lower() + "-response.json"
+    raw = (directory / filename).read_bytes()
+    assert hashlib.sha256(raw).hexdigest() == provenance["files"][filename]
+    response = json.loads(raw)
+    assert "error" not in response
+    text = response["result"]
+    assert f"({target})" in text.split("Target body name:", 1)[1].splitlines()[0]
+    assert "(399)" in text.split("Center body name:", 1)[1].splitlines()[0]
+    assert "Date__(TT)" in text and "ICRF-a-app" in text
+    rows = list(
+        csv.reader(io.StringIO(text.split("$$SOE\n", 1)[1].split("$$EOE", 1)[0]))
+    )
+    assert len(rows) == 732
+    epochs = []
+    for row in rows:
+        label = datetime.strptime(row[0].strip(), "%Y-%b-%d %H:%M:%S.%f")
+        tt = 2440587.5 + (label - datetime(1970, 1, 1)).total_seconds() / 86400
+        epochs.append(tt)
+        actual = opaque_solar.opaque_solar_positions(tt, [body])
+        assert actual["ephemeris_reference_points"]["system_barycenters"] == [body]
+        state = actual["positions"][0]
+        expected = unit(float(row[5]), float(row[6]))
+        assert separation(state["apparent_icrs_unit_direction"], expected) <= 0.02
+    assert epochs[-1] - epochs[0] == 731
+    assert all(b - a == 1 for a, b in zip(epochs, epochs[1:]))
+
+
 @pytest.mark.parametrize(
     "height",
     [
@@ -214,91 +252,6 @@ def test_finite_ray_does_not_occult_a_foreground_target_or_a_sun_behind_observer
     assert not opaque_solar.opaque_solar_intersection(
         [1.0, 0.0, 0.0], [2.0, 0.0, 0.0], [0.0, 0.0, 0.0]
     )
-
-
-@pytest.mark.parametrize(
-    "observation", [0.0, -12345.0, 2451545.0, 2460398.8333333335, 1e8]
-)
-def test_stationary_source_selects_exact_rational_first_post_light_cone(observation):
-    # The constant one-AU source gives an independent exact root. These are
-    # mathematical TT carriers, not claimed observed dates or source accuracy.
-    exact = Fraction(observation) - Fraction(149597870700, 299792458 * 86400)
-    expected = float(exact)
-    if Fraction(expected) < exact:
-        expected = math.nextafter(expected, math.inf)
-    solved, count, proof = opaque_solar._retarded_state(
-        observation, [0.0, 0.0, 0.0], lambda at: ((1.0, 0.0, 0.0, 0.0, 0.0, 0.0), 0)
-    )
-    assert solved.epoch == expected
-    assert Fraction(proof["lower_jd_tt"]) < exact <= Fraction(proof["upper_jd_tt"])
-    assert math.nextafter(proof["lower_jd_tt"], math.inf) == proof["upper_jd_tt"]
-    assert proof["lower_residual_seconds"] < 0 < proof["upper_residual_seconds"]
-    assert 1 <= count <= 20
-
-
-def test_subluminal_linear_source_has_certified_adjacent_root_not_cycle_acceptance():
-    observation = 2460398.8333333335
-    lower = observation - 0.01
-    upper = math.nextafter(lower, math.inf)
-    midpoint = (Fraction(lower) + Fraction(upper)) / 2
-    c = Fraction(299792458 * 86400, 149597870700)
-    velocity = c / 100
-
-    def source(at):
-        # Independent linear trajectory whose unrounded root is the midpoint.
-        distance = float(
-            c * (Fraction(observation) - midpoint)
-            + velocity * (Fraction(at) - midpoint)
-        )
-        return (distance, 0.0, 0.0, float(velocity), 0.0, 0.0), 0
-
-    solved, count, proof = opaque_solar._retarded_state(
-        observation, [0.0, 0.0, 0.0], source
-    )
-    assert solved.epoch == upper
-    assert proof["lower_jd_tt"] == lower and proof["upper_jd_tt"] == upper
-    with localcontext() as context:
-        context.prec = 100
-        speed = Decimal(299792458) * Decimal(86400) / Decimal(149597870700)
-        for epoch, sign in [(lower, -1), (upper, 1)]:
-            values, _ = source(epoch)
-            residual = (
-                Decimal(epoch) - Decimal(observation) + Decimal(values[0]) / speed
-            ) * Decimal(86400)
-            assert residual * sign > 0
-    assert 1 <= count <= 20
-
-
-def test_exact_light_cone_root_is_distinguished_from_an_adjacent_bracket():
-    solved, count, proof = opaque_solar._retarded_state(
-        2451545.0, [0.0, 0.0, 0.0], lambda at: ((0.0, 0.0, 0.0, 0.0, 0.0, 0.0), 0)
-    )
-    assert solved.epoch == 2451545.0 and count == 1
-    assert proof["exact_root"] and proof["bracket_width_seconds"] == 0
-    assert proof["lower_residual_seconds"] == proof["upper_residual_seconds"] == 0
-
-
-def test_unbracketed_source_still_fails_after_the_original_twenty_steps():
-    observation = 2451545.0
-    calls = []
-
-    def no_light_cone(at):
-        # A numerical source violating the subluminal prerequisite: F stays
-        # positive. Its endless proposals must never become a computed place.
-        calls.append(at)
-        return (
-            opaque_solar.LIGHT_SPEED_AU_DAY * (observation - at) + 1.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-        ), 0
-
-    with pytest.raises(EphemerisSourceError) as failure:
-        opaque_solar._retarded_state(observation, [0.0, 0.0, 0.0], no_light_cone)
-    assert failure.value.reason == "opaque_solar_light_time_not_stabilized"
-    assert len(calls) == 20
 
 
 @pytest.mark.local_data

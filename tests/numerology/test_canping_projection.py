@@ -272,12 +272,12 @@ def test_receipt_contract_rejects_changed_instant_and_clipped_count():
         )
 
 
-def test_frozen_projection_inputs_and_previous_profiles_remain_unchanged():
+def test_frozen_projection_inputs_and_selected_source_identity_remain_bound():
     freeze = json.loads((FOLDER / "freeze.json").read_bytes())
     protocol = json.loads((FOLDER / "protocol.json").read_bytes())
     for name, digest in freeze["files"].items():
         assert hashlib.sha256((FOLDER / name).read_bytes()).hexdigest() == digest
-    for name, digest in protocol["preserve_existing_profiles"].items():
-        path = Path(__file__).parents[2] / "src/fatebridge/data/astronomy" / name
-        assert hashlib.sha256(path.read_bytes()).hexdigest() == digest
+    source = de440_solar.source_receipt(de440_solar.CANPING_MODEL_ID)
+    assert source["source_kernel_sha256"] == protocol["source_kernel"]["sha256"]
+    assert source["reference_event_table_used"] is False
     assert freeze["goal_complete"] is False

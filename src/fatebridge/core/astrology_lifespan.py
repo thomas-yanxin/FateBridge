@@ -569,14 +569,9 @@ BALBILLUS_EXALTATION: Dict[str, float] = {
     "Venus": 357.0,  # Pisces 27°
     "Mercury": 165.0,  # Virgo 15°
 }
-# Empirical reduction fit (nearest mode only): d = a·ecl + b. Sun/Moon/Mars use
-# a tuned linear map of the nearest ecliptic distance; the other four are the
-# raw nearest distance (a = 1, b = 0). Mirrors the Horosa reference exactly.
-BALBILLUS_REDUCTION_FIT: Dict[str, tuple[float, float]] = {
-    "Sun": (0.9431, 19.47),
-    "Moon": (0.9592, 14.76),
-    "Mars": (0.9268, 24.39),
-}
+# CCAG VIII.4 p237.16-22 assigns complete small years at exaltation and a
+# degree-distance reduction. Keep the declared continuous-angle reading; do
+# not fit planet-specific offsets to another program.
 BALBILLUS_PLANET_ORDER = [
     "Sun",
     "Moon",
@@ -605,10 +600,6 @@ def _balbillus_period_years(
     if longitude is None:
         return float(small_year)
     distance = _balbillus_distance(longitude, BALBILLUS_EXALTATION[planet], mode)
-    fit = BALBILLUS_REDUCTION_FIT.get(planet)
-    if fit is not None and mode == "nearest":
-        distance = fit[0] * distance + fit[1]
-    distance = max(0.0, min(360.0, distance))
     return small_year * (1.0 - distance / 360.0)
 
 
@@ -634,10 +625,9 @@ def build_balbillus_payload(
     max_age_years: float = 120.0,
 ) -> Dict[str, Any]:
     """
-    Build the Balbillus 129-year time-lord table. Each planet's major period is
-    its small-year shortened by how far its natal longitude sits from its
-    exaltation; periods run in zodiacal order from ``start_planet`` and each is
-    sub-divided (one level, the month-scale handover) by the same order.
+    Build the selected Balbillus time-lord reading. Reduce each small year by
+    its distance from exaltation, and subdivide that parent in 129 small-year
+    shares. The natal zodiacal sequence is a conditional reading of the text.
     """
     if mode not in BALBILLUS_MODES:
         mode = "nearest"
@@ -662,22 +652,15 @@ def build_balbillus_payload(
         duration = _balbillus_period_years(planet, longitudes[planet], mode)
         if duration <= 0:
             break
-        # One level of sub-periods: month-scale (parent order rotated to parent).
+        # CCAG VIII.4 p237.23-p238.2: divide this parent's years into 129
+        # shares, allotting each child its unmodified small-year weight.
+        # The parent receives its own share first, then the following stars.
         sub_order = order[order.index(planet) :] + order[: order.index(planet)]
         parent_end = cursor + duration
         sub_periods: List[Dict[str, Any]] = []
         sub_cursor = cursor
-        for index, sub_planet in enumerate(sub_order):
-            if index == len(sub_order) - 1:
-                sub_duration = max(0.0, parent_end - sub_cursor)
-            else:
-                sub_duration = (
-                    _balbillus_period_years(sub_planet, longitudes[sub_planet], mode)
-                    / 12.0
-                )
-                sub_duration = min(sub_duration, parent_end - sub_cursor)
-            if sub_duration <= 0:
-                break
+        for sub_planet in sub_order:
+            sub_duration = duration * BALBILLUS_SMALL_YEARS[sub_planet] / 129.0
             sub_periods.append(
                 {
                     "planet": sub_planet,
@@ -706,6 +689,27 @@ def build_balbillus_payload(
         "start_planet_label": planet_label(start_planet),
         "mode": mode,
         "mode_label": BALBILLUS_MODES[mode],
+        "reduction_model": {
+            "method_id": "balbillus_continuous_proportional_v3",
+            "formula": "small_years * (1 - distance_degrees / 360)",
+            "subperiod_formula": "parent_period * child_small_years / 129",
+            "degree_basis": "continuous_ecliptic_longitude",
+            "fitted_offsets_used": False,
+            "source": {
+                "title": "CCAG VIII.4, Balbillus excerpts, pp.237-238",
+                "attribution": "Balbillus, transmitted by Palchus; catalogue P. Boudreaux, edition and appendix F. Cumont",
+                "edition_year": 1921,
+                "publisher": "Mauritius Lamertin, Brussels",
+                "url": "https://archive.org/download/ccagtome-08-part-3/CCAGTome08Part4.pdf",
+                "printed_pages": [237, 238],
+                "sha256": "b8f58c89f50a917cdba299a7554e70bedfce39db10878c18a207f885cc45bf70",
+                "critical_apparatus": "p237 note24 corrects manuscript 119 to 129 total shares and 119 to 19 Sun shares; compare the small-year list at lines18-19",
+            },
+            "source_scope": "selected critical-edition small years and129 subperiod shares; continuous degrees,360-day reduction and zodiacal sequence are conditional readings, not whole-procedure certification",
+            "sequence_model": "natal_longitude_order_conditional_reading",
+            "subperiod_model": "parent_period_times_child_small_years_over_129",
+            "whole_procedure_certified": False,
+        },
         "max_age_years": max_age_years,
         "zodiacal_order": order,
         "periods": periods,

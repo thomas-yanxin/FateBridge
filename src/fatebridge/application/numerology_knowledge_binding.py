@@ -2,8 +2,9 @@
 
 from pydantic import BaseModel
 
-from fatebridge.core.numerology_knowledge import DOMAINS, canonical_bytes
+from fatebridge.core.numerology_knowledge import DOMAINS
 from fatebridge.utils.errors import NumerologySourceError
+from fatebridge.utils.json_digest import canonical_bytes
 
 
 def require_reference_binding(
@@ -11,8 +12,9 @@ def require_reference_binding(
 ) -> None:
     if request is None or key not in {"knowledge_read", "knowledge_registry"}:
         return
-    domain = getattr(request, "domain", None)
-    selected = domain.strip() if isinstance(domain, str) else domain
+    data = request.model_dump()
+    domain = data["domain"]
+    selected = domain.strip() if domain is not None else None
     active = selected in DOMAINS or result.get("domain") in DOMAINS
     if key == "knowledge_registry":
         active = (
@@ -35,17 +37,15 @@ def require_reference_binding(
         if key == "knowledge_read"
         else calculate_knowledge_registry
     )
-    expected = service(**request.model_dump())
+    expected = service(**data)
     try:
-        if "error" in expected or any(
-            field not in result
-            or canonical_bytes(result[field]) != canonical_bytes(value)
+        matches = "error" not in expected and all(
+            field in result and canonical_bytes(result[field]) == canonical_bytes(value)
             for field, value in expected.items()
-        ):
-            raise ValueError(
-                "Reference facts/citation differ from original query and pinned sources"
-            )
-    except (KeyError, TypeError, ValueError) as exc:
+        )
+    except (TypeError, ValueError) as exc:
         raise NumerologySourceError(
             "runtime_numerology_knowledge_binding_conflict"
         ) from exc
+    if not matches:
+        raise NumerologySourceError("runtime_numerology_knowledge_binding_conflict")

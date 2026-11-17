@@ -3,8 +3,10 @@ FateBridge 择日 (electional astrology) engine.
 
 Electional astrology evaluates whether a *candidate moment* is auspicious for
 beginning a chosen undertaking. Unlike horary (which answers a question), the
-chart is cast for the time being judged, and the topic (``topic_id``) selects
-which house + significator matter and which strictures are red lines.
+chart is cast for the time being judged. The topic (``topic_id``) selects the
+natural significator and Mercury policy. Its associated house number is
+descriptive metadata. A separate marriage receipt identifies source house
+rulers and natural/lunar roles; complete source judgement remains unaccepted.
 
 The engine applies an explicitly uncalibrated product scoring policy to
 geometric/traditional conditions. This is not a complete original-text method.
@@ -13,9 +15,10 @@ geometric/traditional conditions. This is not a complete original-text method.
   of course, combust the Sun, waxing vs waning, the Via Combusta — plus malefics
   (Mars/Saturn) or benefics (Venus/Jupiter) on the angles, a retrograde Mercury,
   and the dignity of the Ascendant ruler.
-* **Topic factors**: the house of the matter and its natural significator should
-  be sound; some topics make a factor a hard red line (e.g. Mercury retrograde
-  for contracts).
+* **Topic factors**: sign-level major dignity and retrogradation of the natural
+  significator; some topics make Mercury retrograde a hard red line under the
+  declared scoring policy. Complete house-ruler and election doctrine remain
+  unimplemented and unaccepted.
 
 Output is a 0–100 score, a verdict band, and the itemised factors with polarity
 and weight so an agent can explain *why*. This is pure geometry + classical
@@ -40,7 +43,9 @@ from fatebridge.core.astro.geometry import (
 )
 from fatebridge.core.astrology_tables import EXALTATION_SIGNS, RULER_BY_SIGN, SIGNS
 from fatebridge.core.classical_western import combustion_state, solar_condition_policy
+from fatebridge.core.horary_events import native_planetary_events
 from fatebridge.core.horary_motion import native_lunar_contacts
+from fatebridge.core.planetary_event_order import ordered_contact
 from fatebridge.core.predictive._common import (
     planet_label,
     point_absolute_position,
@@ -200,9 +205,10 @@ def build_election_payload(subject: Any, *, topic_id: str) -> Dict[str, Any]:
     unresolved: List[Dict[str, Any]] = []
 
     # --- The Moon: the soul of any election --------------------------------
+    native_epoch = getattr(subject, "julian_day_tt", None)
     motion = (
         native_lunar_contacts(subject)
-        if getattr(subject, "julian_day_tt", None) is not None
+        if native_epoch is not None
         else {
             "status": "unavailable",
             "method_id": "native_tt_lunar_contacts_before_ingress_v1",
@@ -500,7 +506,135 @@ def build_election_payload(subject: Any, *, topic_id: str) -> Dict[str, Any]:
             "solar_rule": "Lilly1647 p113 selected longitude definitions, printed10-degree contradiction retained",
             "phase_weight_policy": "Legacy+8 on[0,180),-6 on[180,360); exact new/full separately labeled; not full election doctrine",
         },
+        "marriage_significators": None,
     }
+    if topic_id == "marriage":
+        house_code = getattr(subject, "houses_system_identifier", None)
+        zodiac = getattr(subject, "zodiac_type", None)
+        source_method = house_code == "R" and zodiac in {"Tropic", "Tropical"}
+        houses = []
+        parties = []
+        history = None
+        if source_method:
+            for house, point, role, longitude in [
+                (1, "Ascendant", "first_source_party", asc_lon),
+                (
+                    7,
+                    "Descendant",
+                    "second_source_party",
+                    (
+                        None
+                        if asc_lon is None
+                        else longitude_float(Fraction(asc_lon) + 180)
+                    ),
+                ),
+                (10, "Midheaven", "between_parties", mc_lon),
+                (
+                    4,
+                    "Imum_Coeli",
+                    "conclusion",
+                    longitude_float(Fraction(mc_lon) + 180),
+                ),
+            ]:
+                sign = (
+                    None if longitude is None else SIGNS[int(Fraction(longitude) // 30)]
+                )
+                ruler = None if sign is None else RULER_BY_SIGN[sign]
+                houses.append(
+                    {
+                        "house": house,
+                        "reference_point": point,
+                        "role_in_source": role,
+                        "longitude": longitude,
+                        "sign": sign,
+                        "ruler": ruler,
+                        "ruler_state": (
+                            None
+                            if ruler is None
+                            else {
+                                **views[ruler],
+                                "house": (
+                                    None
+                                    if unresolved_houses(subject)
+                                    else views[ruler]["house"]
+                                ),
+                            }
+                        ),
+                    }
+                )
+            if native_epoch is not None:
+                history = native_planetary_events(subject)
+            else:
+                history = {
+                    "status": "unavailable",
+                    "constant_velocity_projection": False,
+                    "events": [],
+                    "unavailable_reason": "No native TT chart epoch; no civil time or linear substitute was guessed",
+                }
+            for role, natural, past in [
+                ("first_source_party", "Sun", True),
+                ("second_source_party", "Venus", False),
+            ]:
+                contact, order = (
+                    ordered_contact(
+                        history["events"],
+                        history.get("unresolved_intervals", []),
+                        "Moon",
+                        past=past,
+                    )
+                    if history["status"] == "computed"
+                    and history["constant_velocity_projection"] is False
+                    else (None, None)
+                )
+                parties.append(
+                    {
+                        "role_in_source": role,
+                        "natural_significator": natural,
+                        "lunar_contact_role": (
+                            "last_separating_contact"
+                            if past
+                            else "next_applying_contact"
+                        ),
+                        "lunar_significator": (
+                            next(p for p in contact["bodies"] if p != "Moon")
+                            if contact is not None and order is True
+                            else None
+                        ),
+                        "contact_order_established": order,
+                        "contact": contact,
+                    }
+                )
+        payload["marriage_significators"] = {
+            "method_id": "ramesey_1653_p175_marriage_significators_v2",
+            "status": (
+                "not_assessed_for_selected_method"
+                if not source_method
+                else (
+                    "partial_reference_geometry"
+                    if unresolved_reference
+                    else (
+                        "computed_source_facts"
+                        if all(p["contact_order_established"] is True for p in parties)
+                        else "partial_lunar_history"
+                    )
+                )
+            ),
+            "author": "William Ramesey",
+            "edition": "Astrologia Restaurata, London1653, BookIII, SectionVIII, ChapterI",
+            "source_url": "https://github.com/textcreationpartnership/A57689/blob/0ca635de78458d674e5969ec9a51b79f1e432c0b/A57689.xml",
+            "source_pages": [175],
+            "facsimile_url": "https://qhpastrology.co.uk/wp-content/uploads/Ramesey-William-1653-Astrology-Restored.pdf",
+            "facsimile_pdf_pages": [111],
+            "source_basis": "Selected p175 roles read in the 1653-title facsimile and EEBO-TCP transcription, cross-checked against the separate Wellcome 1654 copy; the 1653 scan's institutional witness and independent expert collation remain unverified",
+            "house_system": house_code,
+            "zodiac_type": zodiac,
+            "houses": houses,
+            "parties": parties,
+            "event_history": history,
+            "score_contribution": 0,
+            "scope": "Four angular-house rulers, natural Sun/Venus roles and the Moon's adjacent physical contacts in the declared Regiomontanus tropical framework. Source party roles do not identify real people. Lunar roles require established order within the disclosed finite event history; missing or ambiguous contacts remain unknown. Ruler state reuses the sign-only major summary. Complete fortification, reception, transfer, radix conditions and source judgement remain unaccepted. No added product weight or outcome judgement.",
+            "full_original_text_acceptance": False,
+        }
     if unresolved_reference:
         angular_codes = {
             f"{kind}_on_angle_{p.lower()}"

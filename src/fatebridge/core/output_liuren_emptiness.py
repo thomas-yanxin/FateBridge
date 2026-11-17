@@ -18,6 +18,10 @@ class LiurenEmptyRow(PartialOutput):
     earth_is_day_stem_house: StrictBool
     earth_stem_house_exception: StrictBool
     sky_authority_roles: List[AuthorityRole]
+    sky_authority_xunkong_exception: StrictBool
+    earth_year_fate_roles: Optional[List[Literal["natal", "annual"]]] = None
+    earth_year_fate_xunkong_exception: Optional[StrictBool] = None
+    earth_xunkong_after_seat_and_year_fate: Optional[StrictBool] = None
     effective_empty: None = None
 
     @model_validator(mode="after")
@@ -33,14 +37,21 @@ class LiurenEmptyRole(PartialOutput):
     role: AuthorityRole
     branch: Branch
     branch_xun_kong: StrictBool
+    xunkong_exception_applies: StrictBool
+
+
+class LiurenYearFateEarthBranches(PartialOutput):
+    natal: Optional[Branch] = None
+    annual: Optional[Branch] = None
 
 
 class LiurenEmptinessEvidence(PartialOutput):
-    ruleset_id: Optional[Literal["liuren_tanyuan_empty_scope_v1"]] = None
+    ruleset_id: Optional[Literal["liuren_tanyuan_empty_scope_v3"]] = None
     source_url: Optional[str] = None
     source_sha256: Optional[str] = None
     source_title: Optional[str] = None
     original_pdf_pages: Optional[List[int]] = None
+    year_fate_placement_pdf_pages: Optional[List[int]] = None
     day_ganzhi: Optional[str] = None
     xun_head: Optional[str] = None
     empty_branches: Optional[List[Branch]] = None
@@ -52,9 +63,12 @@ class LiurenEmptinessEvidence(PartialOutput):
     hour_branch_xun_kong: Optional[StrictBool] = None
     role_conditions: Optional[List[LiurenEmptyRole]] = None
     rows: Optional[List[LiurenEmptyRow]] = None
-    nianming_status: Optional[Literal["not_adjudicated_in_this_excerpt"]] = None
+    year_fate_earth_branches: Optional[LiurenYearFateEarthBranches] = None
+    nianming_status: Optional[
+        Literal["calculated", "partial", "inputs_not_available"]
+    ] = None
     seasonal_true_half_empty_status: Optional[Literal["not_adjudicated"]] = None
-    filling_clashing_status: Optional[Literal["not_adjudicated"]] = None
+    filling_clashing_status: Optional[Literal["role_exceptions_only"]] = None
     comprehensive_judgement: None = None
     complete_classical_conformance: Optional[Literal[False]] = None
     scope: Optional[str] = None
@@ -68,7 +82,10 @@ class LiurenEmptinessEvidence(PartialOutput):
             kongwang_for_ganzhi,
             xun_head_for_ganzhi,
         )
-        from .metaphysics.liureng_emptiness import emptiness_evidence
+        from .metaphysics.liureng_emptiness import (
+            apply_year_fate_emptiness,
+            emptiness_evidence,
+        )
         from .metaphysics.liureng_transmissions import STEM_HOUSES
 
         if self.rows is not None and [r.earth_branch for r in self.rows] != list(
@@ -145,6 +162,25 @@ class LiurenEmptinessEvidence(PartialOutput):
                 hour_branch=self.hour_branch,
                 sky_by_earth={r.earth_branch: r.sky_branch for r in self.rows or []},
             )
+            placements = self.year_fate_earth_branches
+            if (
+                placements is not None
+                and {"natal", "annual"} <= placements.model_fields_set
+            ):
+                apply_year_fate_emptiness(
+                    expected, natal=placements.natal, annual=placements.annual
+                )
+            else:
+                # A projection can select rows without selecting the two placement inputs.
+                for key in ("year_fate_earth_branches", "nianming_status"):
+                    expected.pop(key)
+                for row in expected["rows"]:
+                    for key in (
+                        "earth_year_fate_roles",
+                        "earth_year_fate_xunkong_exception",
+                        "earth_xunkong_after_seat_and_year_fate",
+                    ):
+                        row.pop(key)
             compare_present_empty(self.model_dump(exclude_unset=True), expected)
         return self
 
@@ -163,8 +199,13 @@ def compare_present_empty(actual: Any, expected: Any) -> None:
         raise ValueError("六壬空亡依据与本课四柱、月将或天地盘不一致")
 
 
-def require_complete_emptiness(board: dict[str, Any]) -> None:
-    from .metaphysics.liureng_emptiness import emptiness_evidence
+def require_complete_emptiness(
+    board: dict[str, Any], *, natal: str | None = None, annual: str | None = None
+) -> None:
+    from .metaphysics.liureng_emptiness import (
+        apply_year_fate_emptiness,
+        emptiness_evidence,
+    )
 
     evidence = board.get("emptiness_evidence")
     required = (
@@ -185,5 +226,7 @@ def require_complete_emptiness(board: dict[str, Any]) -> None:
         hour_branch=evidence["hour_branch"],
         sky_by_earth={r["earth_branch"]: r["sky_branch"] for r in evidence["rows"]},
     )
+    if natal is not None or annual is not None:
+        apply_year_fate_emptiness(expected, natal=natal, annual=annual)
     if evidence != expected:
         raise ValueError("完整六壬输出的空亡依据缺项或与计算条件不一致")

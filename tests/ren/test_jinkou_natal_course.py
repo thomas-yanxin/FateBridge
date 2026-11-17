@@ -8,6 +8,7 @@ from functools import lru_cache
 import pytest
 
 import fatebridge.application.execution as execution
+from fatebridge.core.public_output import same_public_value
 from scripts.ren.audit_jinkou_natal_course import CORPUS, observe, reference
 from scripts.ren.audit_ren_classical import observe_jinkou
 from tests.support.transports import AS_OF, SPECS, rest, surface_calls
@@ -154,7 +155,9 @@ def test_three_ports_deliver_full_separate_natal_course(project, surface_calls):
     )
     assert http.status_code == 200 and not mcp.is_error and code == 0
     for body in [http.json(), mcp.structured_content, cli]:
-        assert body["jinkou"]["natal_course"] == output()["jinkou"]["natal_course"]
+        assert same_public_value(
+            body["jinkou"]["natal_course"], output()["jinkou"]["natal_course"]
+        )
         assert body["jinkou"]["overview"]["di_fen"] == "酉"
     if not project:
         assert "[京本本命另课]" in http.json()["snapshot_text"]

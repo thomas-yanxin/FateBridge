@@ -52,7 +52,7 @@ def test_unspecified_selection_stays_unspecified_and_secrets_are_not_forwarded(
 @pytest.mark.parametrize(
     "mode,parent_after_build,expected",
     [
-        ("native", "auto", "fatebridge_complete_moshier_solar_v1"),
+        ("native", "auto", "fatebridge_de441_solar_v1"),
         ("auto", "native", "fatebridge_de440_solar_v1"),
     ],
 )
@@ -127,7 +127,7 @@ async def test_actual_mcp_uses_the_constructed_configuration(
             details = record["solar_model_details"]
             assert details["model_id"] == expected
             assert record["resolution_provider"] == (
-                "fatebridge_moshier" if mode == "native" else "jpl_de440"
+                "jpl_de441" if mode == "native" else "jpl_de440"
             )
             assert "ephemeris_retflags" not in record
             assert details["accuracy_certified"] is False

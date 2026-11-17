@@ -4,12 +4,13 @@ from datetime import datetime
 
 import pytest
 
-from fatebridge.analysis.timing_effects import TimingEffectsAnalysis
 from fatebridge.core.classical import determine_monthly_structure
+from fatebridge.services.birth_context import build_birth_computation_context
 from fatebridge.services.timing import (
     calculate_comprehensive_timing,
     calculate_dayun_analysis,
 )
+from fatebridge.services.timing_state import build_current_timing_state
 from fatebridge.utils.birth_input import create_person_info
 
 
@@ -188,16 +189,19 @@ def test_utc_sampling_keeps_both_clocks_in_a_dst_fold():
     assert sensitive["birth_at_range"]["end"].endswith("-05:00")
 
 
-def test_low_level_comprehensive_keeps_independent_layers_without_gender():
-    result = TimingEffectsAnalysis.comprehensive_timing_analysis(
-        {
-            "year": ("庚", "辰"),
-            "month": ("庚", "辰"),
-            "day": ("己", "未"),
-            "hour": ("甲", "子"),
-        },
-        datetime(2000, 5, 1),
-        None,
+def test_current_timing_state_keeps_independent_layers_without_gender():
+    person = create_person_info(
+        2000, 5, 1, 0, birth_minute=0, gender=None, use_true_solar_time=False
+    )
+    context = build_birth_computation_context(person)
+    assert context.birth_pillars == {
+        "year": ("庚", "辰"),
+        "month": ("庚", "辰"),
+        "day": ("己", "未"),
+        "hour": ("甲", "子"),
+    }
+    result = build_current_timing_state(
+        context,
         analysis_date=datetime(2028, 1, 20, 12),
     )
     assert result["dayun_analysis"]["status"] == "unavailable_missing_gender"

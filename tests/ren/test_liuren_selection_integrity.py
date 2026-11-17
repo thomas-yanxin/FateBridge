@@ -12,6 +12,7 @@ from pydantic import ValidationError
 
 import fatebridge.application.execution as execution
 from fatebridge.core.output_chinese import Liuren
+from fatebridge.core.public_output import same_public_value
 from tests.support.transports import AS_OF, REST_POST_CASES, SPECS, rest, surface_calls
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -157,7 +158,9 @@ def test_valid_four_entry_points_preserve_all_nine_method_evidence(
             "rule_trace",
             "meta",
         ]:
-            assert body["liureng"][name] == output(key)["liureng"][name]
+            assert same_public_value(
+                body["liureng"][name], output(key)["liureng"][name]
+            )
 
 
 def test_partial_facts_keep_absent_context_absent_but_bind_available_context():

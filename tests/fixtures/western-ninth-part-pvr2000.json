@@ -1,0 +1,114 @@
+{
+  "source": {
+    "author": "P.V.R. Narasimha Rao",
+    "title": "Vedic Astrology: An Integrated Approach",
+    "edition": "First published 2000; author PDF includes 2010 update",
+    "url": "https://www.vedicastrologer.org/articles/vedic_astro_textbook.pdf",
+    "section": "6.2.9 Navamsa Chart (D-9), Example 16",
+    "printed_page": 55,
+    "pdf_page": 67,
+    "sha256": "1cafa828f34764ed5e85816882df2e8f0bc014c5c57ccdb27169416e117fd4db"
+  },
+  "qualification": "Source rule applies to the named Parashari nine-part mapping, including its reuse in the western classical layer. It does not certify historical Hellenistic attribution, physical positions or prediction. Half-open membership is the declared numeric endpoint policy.",
+  "interval_edges_arcseconds": [
+    0,
+    12000,
+    24000,
+    36000,
+    48000,
+    60000,
+    72000,
+    84000,
+    96000,
+    108000
+  ],
+  "sign_groups": [
+    {
+      "signs": [
+        "Aries",
+        "Leo",
+        "Sagittarius"
+      ],
+      "destinations": [
+        "Aries",
+        "Taurus",
+        "Gemini",
+        "Cancer",
+        "Leo",
+        "Virgo",
+        "Libra",
+        "Scorpio",
+        "Sagittarius"
+      ]
+    },
+    {
+      "signs": [
+        "Taurus",
+        "Virgo",
+        "Capricorn"
+      ],
+      "destinations": [
+        "Capricorn",
+        "Aquarius",
+        "Pisces",
+        "Aries",
+        "Taurus",
+        "Gemini",
+        "Cancer",
+        "Leo",
+        "Virgo"
+      ]
+    },
+    {
+      "signs": [
+        "Gemini",
+        "Libra",
+        "Aquarius"
+      ],
+      "destinations": [
+        "Libra",
+        "Scorpio",
+        "Sagittarius",
+        "Capricorn",
+        "Aquarius",
+        "Pisces",
+        "Aries",
+        "Taurus",
+        "Gemini"
+      ]
+    },
+    {
+      "signs": [
+        "Cancer",
+        "Scorpio",
+        "Pisces"
+      ],
+      "destinations": [
+        "Cancer",
+        "Leo",
+        "Virgo",
+        "Libra",
+        "Scorpio",
+        "Sagittarius",
+        "Capricorn",
+        "Aquarius",
+        "Pisces"
+      ]
+    }
+  ],
+  "published_examples": [
+    {
+      "planet": "Mercury",
+      "sign": "Gemini",
+      "degree_in_sign": 11,
+      "destination": "Capricorn"
+    },
+    {
+      "planet": "Jupiter",
+      "sign": "Scorpio",
+      "degree_in_sign": 19,
+      "destination": "Sagittarius"
+    }
+  ],
+  "endpoint_policy": "start inclusive, end exclusive; supplied binary64 values are kept exact, without epsilon or degree rounding"
+}

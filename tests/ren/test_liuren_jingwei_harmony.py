@@ -56,7 +56,13 @@ def test_full_original_cohort_stays_unchanged():
     result = audit()
     assert result["engineering_guard_passed"] is True
     assert len(result["rows"]) == 720 and result["failures"] == []
-    assert all(row["actual"] == [None, None] for row in result["rows"])
+    assert all(row["actual"] == row["original_expected"] for row in result["rows"])
+    assert (
+        sum(value is None for row in result["rows"] for value in row["actual"]) == 120
+    )
+    assert (
+        sum(value is False for row in result["rows"] for value in row["actual"]) == 1320
+    )
     assert result["classical_conformance"] == "not_completed"
     assert result["calendar_validation"] == "not_reassessed"
     assert result["free_text_fidelity"] == "not_reassessed"
@@ -72,6 +78,7 @@ def test_audit_detects_turning_unknown_into_candidate_answer(monkeypatch, invent
     def substituted(*args):
         value = copy.deepcopy(actual(*args))
         for row in value["evaluations"][-2:]:
+            row["relation_matches"] = invented
             row["matched"] = invented
         return value
 

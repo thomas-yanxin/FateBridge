@@ -8,9 +8,11 @@ from decimal import Decimal, localcontext
 import pytest
 
 from fatebridge.core.astro import geometry
+from fatebridge.core.astro.house_axes import canonical_house_geometry
 from fatebridge.core.astrology_lifespan import (
     _house_containing,
     build_age_point_payload,
+    build_balbillus_payload,
     build_harmonic_payload,
     build_persian_directed_payload,
 )
@@ -26,7 +28,95 @@ from fatebridge.core.predictive.profections import (
 from fatebridge.core.predictive.returns import _longitude_tt
 from fatebridge.utils.errors import EphemerisSourceError
 from fatebridge.utils.timezones import parse_timezone_name
+from tests.support.horizon_reference import horizon_vector_reference
 from tests.support.transports import SPECS, business, native, rest, surface_calls
+
+
+@pytest.mark.parametrize(
+    "planet,exaltation,years",
+    [
+        ("Sun", 19.0, 19),
+        ("Moon", 33.0, 25),
+        ("Saturn", 201.0, 30),
+        ("Jupiter", 105.0, 12),
+        ("Mars", 298.0, 15),
+        ("Venus", 357.0, 8),
+        ("Mercury", 165.0, 20),
+    ],
+)
+@pytest.mark.parametrize("distance,fraction", [(0, 1), (180, 0.5)])
+def test_balbillus_matches_source_exaltation_and_129_subperiod_shares(
+    planet, exaltation, years, distance, fraction
+):
+    # Independent literal controls for the selected continuous-angle reading:
+    # CCAG VIII.4 (1921), p237.16-28 and p238.1-2:
+    # https://archive.org/download/ccagtome-08-part-3/CCAGTome08Part4.pdf
+    # Full small years at exaltation, half at the opposite degree. The former
+    # planet-specific fit violated both conditions for Sun, Moon and Mars.
+    natal = {
+        name.lower(): {"absolute_degree": longitude}
+        for name, longitude in (
+            ("Sun", 19.0),
+            ("Moon", 33.0),
+            ("Saturn", 201.0),
+            ("Jupiter", 105.0),
+            ("Mars", 298.0),
+            ("Venus", 357.0),
+            ("Mercury", 165.0),
+        )
+    }
+    natal[planet.lower()]["absolute_degree"] = (exaltation + distance) % 360
+    result = build_balbillus_payload(natal, start_planet=planet, mode="nearest")
+    first = result["periods"][0]
+    assert first["planet"] == planet
+    assert first["duration_years"] == years * fraction
+    # The critical edition corrects the manuscript total119 to129 and Sun119
+    # to19 in note24. Each parent gives its own period these seven proportions;
+    # no child's separately reduced duration or final filler enters this rule.
+    source_years = {
+        "Sun": 19,
+        "Moon": 25,
+        "Saturn": 30,
+        "Jupiter": 12,
+        "Mars": 15,
+        "Venus": 8,
+        "Mercury": 20,
+    }
+    assert len(first["sub_periods"]) == 7
+    assert first["sub_periods"][0]["planet"] == planet
+    for child in first["sub_periods"]:
+        assert child["duration_years"] == round(
+            years * fraction * source_years[child["planet"]] / 129, 4
+        )
+    assert result["reduction_model"]["fitted_offsets_used"] is False
+    assert not result["reduction_model"]["whole_procedure_certified"]
+
+
+@pytest.mark.parametrize("code", [b"A", b"E"])
+def test_equal_house_aliases_match_independent_polar_vector(code):
+    # The 100-digit vector oracle uses the actual reported angle model.
+    # A new rotation model can cross this grazing endpoint: the frozen v4
+    # ARMC is checked separately, without binding this public path to it.
+    # Swiss documents A/E as the same method, with cusp 1 at the Ascendant:
+    # https://www.astro.com/swisseph/swephprg.htm
+    jd_ut1, latitude, longitude = 2415020.5208333335, -89.0, -105.40281632765013
+    with preserve_ephemeris_path():
+        cusps, axes = ephemeris_call("houses_ex", jd_ut1, latitude, longitude, code)
+        cusps, axes, receipt = canonical_house_geometry(
+            julian_day_ut1=jd_ut1,
+            latitude=latitude,
+            longitude=longitude,
+            house_code=code,
+            native_cusps=cusps,
+            native_angles=axes,
+        )
+    precision = receipt["eastern_direction_precision"]
+    expected_asc = horizon_vector_reference(
+        latitude, axes[2], precision["true_obliquity"]
+    )["ascendant"]
+    assert abs(math.remainder(axes[0] - expected_asc, 360)) * 3600 <= 1
+    for index, cusp in enumerate(cusps):
+        assert abs(math.remainder(cusp - (expected_asc + index * 30), 360)) * 3600 <= 1
 
 
 @pytest.mark.parametrize("zone", ["UTC", "America/New_York", "Australia/Lord_Howe"])
@@ -238,6 +328,66 @@ def test_persian_hit_limit_keeps_the_first_actual_age_with_equal_display_labels(
         ("astro_harmonic", "harmonic_chart", {"harmonic": 7}),
         ("astro_agepoint", "age_point", {"max_age_years": 72}),
         ("astro_persiandirected", "persian_directed", {"max_age_years": 90}),
+        (
+            "astro_balbillus",
+            "balbillus",
+            {"mode": "nearest", "max_age_years": 30},
+        ),
+        (
+            "astro_balbillus",
+            "balbillus",
+            {"mode": "forward", "max_age_years": 30},
+        ),
+        ("zr", "zr", {"analysis_year": 2030, "analysis_month": 1, "analysis_day": 1}),
+        (
+            "zr",
+            "zr",
+            {
+                "birth_year": 1995,
+                "birth_month": 7,
+                "birth_day": 27,
+                "birth_hour": 12,
+                "birth_minute": 0,
+                "birth_longitude": 116.4,
+                "birth_latitude": 39.9,
+                "analysis_year": 2030,
+                "analysis_month": 1,
+                "analysis_day": 1,
+            },
+        ),
+        (
+            "zr",
+            "zr",
+            {
+                "birth_year": 1990,
+                "birth_month": 5,
+                "birth_day": 17,
+                "birth_hour": 15,
+                "birth_minute": 30,
+                "birth_longitude": 121.4737,
+                "birth_latitude": 31.2304,
+                "analysis_year": 2030,
+                "analysis_month": 1,
+                "analysis_day": 1,
+            },
+        ),
+        (
+            "zr",
+            "zr",
+            {
+                "birth_year": 1984,
+                "birth_month": 1,
+                "birth_day": 15,
+                "birth_hour": 6,
+                "birth_minute": 30,
+                "birth_timezone": "Australia/Sydney",
+                "birth_longitude": 151.2093,
+                "birth_latitude": -33.8688,
+                "analysis_year": 2030,
+                "analysis_month": 1,
+                "analysis_day": 1,
+            },
+        ),
     ],
 )
 def test_derived_calculations_reach_all_three_transports(
@@ -274,6 +424,87 @@ def test_derived_calculations_reach_all_three_transports(
     outputs = [http.json(), cli, protocol.structured_content]
     assert business(outputs[0]) == business(outputs[1]) == business(outputs[2])
     assert field in outputs[0]
+    if field == "balbillus":
+        calculation = outputs[0][field]
+        assert calculation["mode"] == options["mode"]
+        assert calculation["reduction_model"]["method_id"] == (
+            "balbillus_continuous_proportional_v3"
+        )
+        assert not calculation["reduction_model"]["fitted_offsets_used"]
+        assert not calculation["reduction_model"]["whole_procedure_certified"]
+    if field == "zr":
+        # Independent Kerykeion6.0.5 natal factories agree on Can/Leo and
+        # Lib/Lib. Brennan/Schaim episode192 fixes Fortune as angular reference
+        # and shifts only same-sign Spirit. Kerykeion's missing shift and its
+        # tropical-year convention are not used as the historical rule oracle.
+        calculation = outputs[0][field]
+        spirit = calculation["spirit"]
+        fortune, natal_spirit, origin, peaks, relative, phase = {
+            1995: (
+                "Libra",
+                "Libra",
+                "Scorpio",
+                ["Libra", "Capricorn", "Aries", "Cancer"],
+                2,
+                "succedent",
+            ),
+            2000: (
+                "Cancer",
+                "Leo",
+                "Leo",
+                ["Cancer", "Libra", "Capricorn", "Aries"],
+                2,
+                "succedent",
+            ),
+            1990: (
+                "Gemini",
+                "Capricorn",
+                "Capricorn",
+                ["Gemini", "Virgo", "Sagittarius", "Pisces"],
+                8,
+                "succedent",
+            ),
+            1984: (
+                "Gemini",
+                "Virgo",
+                "Virgo",
+                ["Gemini", "Virgo", "Sagittarius", "Pisces"],
+                4,
+                "angular",
+            ),
+        }[inputs["birth_year"]]
+        assert spirit["lot"]["sign"] == natal_spirit
+        assert spirit["release_start_sign"] == origin
+        assert spirit["angular_reference_sign"] == fortune
+        assert [row["sign"] for row in spirit["peak_signs"]] == peaks
+        first = spirit["level_1_timeline"][0]
+        assert first["sign"] == origin
+        assert first["relative_sign_index"] == relative
+        assert first["phase"] == phase
+        assert first["is_peak_period"] == (phase == "angular")
+        # Published 20x360days from the physical birth instant. A civil-time
+        # addition used to add an hour when the historical DST offset changed.
+        source_boundary = {
+            1990: "2010-02-01T14:30:00+08:00",
+            1984: "2003-10-02T05:30:00+10:00",
+        }.get(inputs["birth_year"])
+        if source_boundary is not None:
+            assert (
+                calculation["fortune"]["level_1_timeline"][0]["end"] == source_boundary
+            )
+        basis = calculation["calculation_basis"]
+        assert basis["year_days"] == 360.0
+        assert basis["interval_time_basis"] == "elapsed_utc_days"
+        assert basis["published_levels"] == [1, 2, 3]
+        assert not basis["whole_procedure_certified"]
+        for track in (calculation["fortune"], calculation["spirit"]):
+            for period in track["level_3_timeline"]:
+                assert period["duration_unit"] == "days"
+                elapsed = (
+                    datetime.fromisoformat(period["end"])
+                    - datetime.fromisoformat(period["start"])
+                ) / timedelta(days=1)
+                assert 0 < elapsed <= period["duration_value"]
 
 
 @pytest.mark.parametrize("failure", ["exception", "negative_flags", "nonfinite"])

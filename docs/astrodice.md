@@ -93,7 +93,9 @@ curl -sS -X POST \
 
 `lunarNodeModel=mean_node_and_its_opposite` 表示平北交点及其对点，不把它写成真交点。落宫方法和交点模型均需连同天象输出保留。
 
-`chart.params.ephemerisReferencePoints` 保留天象坐标的参考点。按[Swiss Ephemeris §2.4](https://www.astro.com/swisseph/swisseph.htm)，有卫星的原生行星位置采用系统质心；日月及无卫星的水星、金星为本体中心。本工具没有请求巨行星的 `CENTER_BODY` 修正，不能将系统质心写成本体中心。字段分别列出 `body_centers/system_barycenters/theoretical_points/approximate_points/unresolved_points/derived_points`，部分天体回退时按实际模型归类，近似位置不继承原生参考点的声明。快照同步呈现同一说明；这不改变既有数值或骰面解释，也不认证每个位置的绝对准确度。
+本地适配层还以统一的精确工作几何处理正反宫序及显式整宫／等宫覆盖，保留 `equal_mc` 等实际模型键。非分区原生投影翻转使用已有工作相位，不使用浮点展示值或十进制摘要重新判宫。极点轴约定与来源限制照实交付，固定数学、选择器和三端案例的范围见[本地宫位工作几何核对](local-chart-geometry-audit.md)。
+
+`chart.params.ephemerisReferencePoints` 保留天象坐标的参考点。按[Swiss Ephemeris §2.4](https://www.astro.com/swisseph/swisseph.htm)，有卫星的原生行星位置采用系统质心；日月及无卫星的水星、金星为本体中心。本工具没有请求巨行星的 `CENTER_BODY` 修正，不能将系统质心写成本体中心。字段分别列出 `body_centers/system_barycenters/theoretical_points/approximate_points/unresolved_points/derived_points`，部分天体回退时按实际模型归类，连续DE441冥王星由实际源确认系统质心，其余近似位置不继承原生参考点的声明。快照同步呈现同一说明；这不改变既有数值或骰面解释，也不认证每个位置的绝对准确度。
 
 已发布的 `astronomical_context` 视图同时读取实际输入、完整独立天象与计算依据；视图名不是请求参数，应将其 `fields` 传入调用。它保留默认 `symbolic` 首轮的用途。若天象业务字段分页延后，通过结果核验入口读取同一run的完整投影载荷后再解读，不把未读取当作不存在，也不重算来代替取回。
 
@@ -158,7 +160,7 @@ uv run --locked --extra dev python -m scripts.astrodice.audit_astrodice_kernel \
 
 附加天象保留 `chart.chart.objects[].motion` 中未经舍入的 `longitude_speed`（度/日）、`direction`、`reference_frame`、`basis` 和 `source_model`，以及修正前的 `native_longitude_speed`、实际应用的 `light_time_correction` 与 `rotation_correction`。最终日速是原生值与返回修正项之和。热带与Lahiri分别使用对应原生参考系，不能只平移经度却复用热带速度。原生接口缺少请求的 `FLG_SPEED` 或返回非有限日速时，以 `coordinate_motion_unavailable` 原因拒绝本次天象，不把缺值、NaN或未计算的零值解释成顺行。
 
-`direct/retrograde` 根据最终未经舍入日速的正负判定；恰为零时返回 `zero_instantaneous_rate`，它没有定位一次留站事件。南交点是北交点黄经加180°，继承其同参考系日速；福点缺少上升点导数，返回 `not_computed`，不只用月亮减太阳日速拼出完整福点运动。近似轨道路径未提供导数的星体及其依赖点也保留未知。`chart.params.motionPolicy` 列出实际未计算点和范围，快照读取同一日速字段。依据是[Swiss程序手册§3.3.3、§3.4、§12.2](https://www.astro.com/swisseph/swephprg.htm)的速度选项、六分量返回值及原生恒星黄道接口。
+`direct/retrograde` 根据最终未经舍入日速的正负判定；恰为零时返回 `zero_instantaneous_rate`，它没有定位一次留站事件。南交点是北交点黄经加180°，继承其同参考系日速；福点缺少上升点导数，返回 `not_computed`，不只用月亮减太阳日速拼出完整福点运动。回退天体现在保留独立模型的数值导数，`correction_status=approximate_model`、`method_id`、`source_url`与`model_longitude_speed`分别说明来源和原模型速度，不能记成原生速度；Lahiri回退另列`sidereal_origin_correction`。平均交点的解析TT导数与物理天体五点TT导数分开，福点仍未知。古代／远期及外部速度超线见[回退模型验收](western-astrology.md#离线轨道近似的来源与差距)。`chart.params.motionPolicy` 列出实际未计算点和范围，快照读取同一日速字段。依据是[Swiss程序手册§3.3.3、§3.4、§12.2](https://www.astro.com/swisseph/swephprg.htm)的速度选项、六分量返回值及原生恒星黄道接口。
 
 `chart.params.chart_profile.longitude_motion` 记录源码推导的方法、版本、适用状态及物理来源。针对已检查的原生2.10.03／绑定2.10.3.2，月球JPL与Swiss物理后端增加所采用光行时定义的链式导数，并经光行差位置变换的雅可比传播；热带日速另补最终黄道转动中的章动黄赤交角导数项，Lahiri的NONUT路径不加此项。这些项来自位置算法的求导，不按参考残差拟合。未验证版本或不支持的月球后端保留原生值并明确标记；参与修正的来源、坐标标志或位置重现不一致时拒绝计算。位置及骰面规则保持原算法。
 
@@ -213,9 +215,9 @@ uv run --locked --extra dev python -m scripts.astrodice.audit_astrodice_apparent
   --output /tmp/astrodice-apparent-motion.json
 ```
 
-天体原生计算失败时，仅该天体回退到轨道近似，其他成功的原生位置继续保留；旧实现会因一颗失败而丢弃整盘原生结果。出现回退时，`chart.params.chart_profile.planetary_models` 逐颗保留模型，`orbital_fallback.approximate_planets` 列出近似天体，核心摘要和快照同时说明。混合盘标为 `mixed_precision_runtime_model` / `swisseph_api_with_approximate_orbits`；恒星黄道下，成功天体继续用原生Lahiri接口，回退天体采用已声明的黄道偏移近似，`sidereal_planetary_methods` 逐颗区分两者。
+天体原生计算失败时，仅该天体回退到轨道近似，其他成功的原生位置继续保留；旧实现会因一颗失败而丢弃整盘原生结果。出现回退时，`chart.params.chart_profile.planetary_models` 逐颗保留模型，`orbital_fallback.approximate_planets` 列出近似天体，核心摘要和快照同时说明。混合盘标为 `mixed_precision_runtime_model` / `swisseph_api_with_analytic_fallback`；恒星黄道下，成功天体继续用原生Lahiri接口，回退天体采用已声明的黄道偏移近似，`sidereal_planetary_methods` 逐颗区分两者。
 
-轨道近似保留原有UT日数、忽略TT差异的约定，不能当成原生星历或远期精度认证。[Schlyter方法说明](https://stjarnhimlen.se/comp/ppcomp.html)明确列出这类简化及远期局限；FateBridge的具体近似实现以返回的 `source_path` 为准，不将教程的误差说明认证为本实现保证。回退信息的 `candidate_files` 是候选行星／月球分段清单，不是文件完整性或已加载模型检查。
+物理回退采用Astronomy Engine的TT位置和已声明的近似光行时／光行差模型；平均交点另采用Moshier平根数及已发布DE431修正，按TT求解析日速。`factor_source_versions`、`factor_source_urls`和`factor_longitude_motion_methods`分别保留实际来源；理论平均交点不因改用Python实现而变成物理天体。修正表真正折点保留位置，仅将无唯一导数的运动列为未知。范围、原失败和数值门槛见[共享回退验收](western-astrology.md#离线轨道近似的来源与差距)。回退信息的 `candidate_files` 是候选行星／月球分段清单，不是文件完整性或已加载模型检查。
 
 成功天体的模型标签取自原生返回标志。平交点不是实体行星；[Swiss文档§2.2.1](https://www.astro.com/swisseph/swisseph.htm)说明平交点使用另行构建的月球理论模型，JPL星历本身不提供平交点。因此平北交点返回 `swieph` 标志，并不证明它读取了某份 `.se1` 文件，也不能用这个标志认证节点的独立天文准确度。
 

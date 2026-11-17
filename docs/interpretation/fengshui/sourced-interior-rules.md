@@ -64,7 +64,9 @@ IR5 与旧工位尖角观察另保留 WOFS／Joey Yap 的作者分歧：后者�
 
 ## 器形参考与代表物资格
 
-器形的五行对应属于署名教学参考；它不自动证明该物件能作某元素的调节物。材料／颜色资格使用 `sourced_material_representation_v1@1.0.0` 并保留条件和异议。例如 [Larry Sang／AFSI《The Principles of Feng Shui》](https://www.amfengshui.com/wp-content/uploads/woocommerce_uploads/2013/12/tpofs.pdf)第三章印刷第 19–28 页／PDF 第 36–45 页的既有规则以健康活植物作木代表物，处理木家具不作为该版本的木调节物；不能因木椅呈柱形或涂绿色就消除这一材料限制。原始 PDF 已保存并核对散列，材料重点定位为印刷23、25／PDF40、42页。附加施用条件、目标绑定和 AFSI／Diamond 的柜内金属异议见[工位作者规则](workstation-authored.md)；资格不认证剂量或摆放位置。
+器形的五行对应属于署名教学参考；它不自动证明该物件能作某元素的调节物。材料／颜色资格使用 `sourced_material_representation_v1@1.0.1` 并保留条件和异议。例如 [Larry Sang／AFSI《The Principles of Feng Shui》](https://www.amfengshui.com/wp-content/uploads/woocommerce_uploads/2013/12/tpofs.pdf)第六版（2004年7月）第三章印刷第 19–28 页／PDF 第 36–45 页的既有规则以健康活植物作木代表物，处理木家具不作为该版本的木调节物；不能因木椅呈柱形或涂绿色就消除这一材料限制。原始 PDF 已保存并核对散列，材料重点定位为印刷23、25／PDF40、42页。附加施用条件、目标绑定和 AFSI／Diamond 的柜内金属异议见[工位作者规则](workstation-authored.md)；资格不认证剂量或摆放位置。
+
+印刷23页的土类颜色分别是 `tan`、`beige`、`yellow`，本版按原词核对。`tan` 与宽泛的 `brown` 分别记录；只确认 `brown` 不足以确认 `tan`，因此不自动给出 AFSI 颜色匹配。FSI 网页另有棕色分类，但本规则只取其器形参考，不能借该网页补写 AFSI 的颜色。未登记颜色继续保留实际观察，不强配元素。
 
 [Feng Shui Institute《The Five Elements – Wu Xing》](https://www.feng-shui-institute.org/Feng_Shui/fiveelements.html)的 Water／Wood／Fire／Earth／Metal Energy 段落提供本版器形参考：
 
@@ -108,7 +110,9 @@ IR5 与旧工位尖角观察另保留 WOFS／Joey Yap 的作者分歧：后者�
 
 ## 与方法细节的区别
 
-`method_details` 的 `expert_fengshui_methods_v1@1.1.0` 继续是 `reference_only`。先读 `mapping_boundaries`，再按结果所在体系查表：
+`method_details` 的 `expert_fengshui_methods_v1@1.1.1` 继续是 `reference_only`。先读 `mapping_boundaries`，再按结果所在体系查表：
+
+古典人物与静物按所引段落读取。《梅花易数》离卦地理段的“炉冶场所”不缩成静物“炉”，兑卦“口舌”也不类推成所有“有口之器”；灶具、照明与开口容器仍在项目署名的现代观察提示中。艮卦门阙、守门角色及巽卦工匠分别标明《说卦》出处，不冒充《梅花易数》人物或静物的原词。当前《说卦》使用具名Wikisource转录，仍未认证印刷底本。
 
 | 路径 | 实际用途与边界 |
 | --- | --- |

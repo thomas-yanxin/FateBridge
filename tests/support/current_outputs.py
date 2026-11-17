@@ -1,19 +1,26 @@
 """Exercise every current tool for schema and field-projection checks."""
 
+from collections.abc import Callable
+from functools import cache
+
 import pytest
 
 from fatebridge.application.execution import execute_tool, result_is_error
+from fatebridge.application.tool_spec import ServiceResult
 from fatebridge.core.execution_context import ExecutionOptions
 from fatebridge.services.tool_catalog import CATALOG
 from tests.fixtures.surface_payloads import MCP_CASES, REST_POST_CASES
-from tests.support.ephemeris_context import moshier_ephemeris
+from tests.support.ephemeris_context import empty_ephemeris_path
 
 
 @pytest.fixture(scope="session")
-def current_business():
-    outputs = {}
-    with moshier_ephemeris():
-        for spec in CATALOG:
+def current_business() -> Callable[[str], ServiceResult]:
+    specs = {spec.key: spec for spec in CATALOG}
+
+    @cache
+    def calculate(key: str) -> ServiceResult:
+        spec = specs[key]
+        with empty_ephemeris_path():
             factory = (
                 REST_POST_CASES[spec.rest_path]
                 if spec.rest_path
@@ -26,6 +33,7 @@ def current_business():
                 options=ExecutionOptions(as_of="2026-10-12T02:00:00Z"),
                 include_metadata=False,
             )
-            assert not result_is_error(spec, result), (spec.key, result)
-            outputs[spec.key] = result
-    return outputs
+            assert not result_is_error(result), (spec.key, result)
+        return result
+
+    return calculate

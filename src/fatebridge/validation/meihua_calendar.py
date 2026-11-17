@@ -12,6 +12,7 @@ from fatebridge.validation.meihua_runtime_guard import (
     capture_calendar_runtime,
     verify_calendar_runtime,
 )
+from fatebridge.validation.meihua_scans import read_frozen_artifact
 from fatebridge.validation.meihua_source_guard import (
     capture_package_sources,
     verify_package_sources,
@@ -95,11 +96,7 @@ def reference_bundle(directory: Path) -> tuple[dict[str, Any], list[dict[str, An
     if {r["file"] for r in manifest["artifacts"]} != required:
         raise ValueError("The primary bundle must retain source, cells and landmarks")
     for record in manifest["artifacts"]:
-        path = (directory / record["file"]).resolve()
-        if not path.is_relative_to(directory.resolve()):
-            raise ValueError("Reference path escapes its frozen bundle")
-        if hashlib.sha256(path.read_bytes()).hexdigest() != record["sha256"]:
-            raise ValueError(f"Frozen primary reference changed: {record['file']}")
+        read_frozen_artifact(directory, record["file"], record["sha256"])
     cells = json.loads((directory / "cells.json").read_text(encoding="utf-8"))["cells"]
     landmarks = json.loads((directory / "landmarks.json").read_text(encoding="utf-8"))
     labels = {c["date"]: c["printed_label"] for c in cells}

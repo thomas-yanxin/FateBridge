@@ -8,7 +8,6 @@ from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional
 
 from fatebridge.core.almanac import (
-    DAY_GANZHI_STRATEGY_STANDARD,
     GAN,
     build_calendar_context,
     get_lunar_context,
@@ -33,6 +32,7 @@ from fatebridge.core.metaphysics.liureng import (
     build_liureng_board,
     build_liureng_runyear,
 )
+from fatebridge.core.metaphysics.liureng_emptiness import apply_year_fate_emptiness
 from fatebridge.core.metaphysics.liureng_god_yin import add_year_fate_membership
 from fatebridge.core.metaphysics.liureng_year_fate import build_year_fate
 from fatebridge.core.metaphysics.ren_calendar import (
@@ -97,7 +97,6 @@ def _build_analysis_seed(
     # 吃默认→降级为钟表时间（time_algorithm 字段透出「直接时间」即为提示）。
     use_true_solar_time: bool = False,
     true_solar_explicit: bool = True,
-    day_pillar_strategy: str = DAY_GANZHI_STRATEGY_STANDARD,
 ) -> MetaphysicsSeed:
     timezone_name = analysis_timezone or DEFAULT_BIRTH_TIMEZONE
     input_datetime = datetime(
@@ -143,8 +142,6 @@ def _build_analysis_seed(
         corrected_datetime = input_datetime.replace(tzinfo=None) + timedelta(
             minutes=total_correction_minutes
         )
-        if analysis_utc_offset is not None:
-            corrected_datetime = localize_datetime(corrected_datetime, timezone_name)
         solar_adjustment_evidence = solar_time_receipt(
             civil_instant=resolved_clock,
             corrected_label=corrected_datetime,
@@ -156,7 +153,6 @@ def _build_analysis_seed(
     pillars = BaZiCalendar.get_four_pillars(
         corrected_datetime,
         timezone_name=timezone_name,
-        day_pillar_strategy=day_pillar_strategy,
         civil_datetime=input_datetime,
     )
     calendar_context = build_calendar_context(
@@ -194,7 +190,6 @@ def _build_person_seed(
     pillars = BaZiCalendar.get_four_pillars(
         corrected_datetime,
         timezone_name=normalized_birth_time.timezone,
-        day_pillar_strategy=DAY_GANZHI_STRATEGY_STANDARD,
         civil_datetime=normalized_birth_time.input_datetime,
     )
     calendar_context = build_calendar_context(
@@ -256,7 +251,6 @@ def _build_taiyi_snapshot_text(
     mark_lines = [
         f"{item.get('palace', '宫位')}：{'、'.join(item.get('markers', []) or []) or '无'}"
         for item in taiyi.get("palace_marks", []) or []
-        if isinstance(item, dict)
     ]
     sections = [
         (
@@ -370,12 +364,8 @@ def _build_liureng_snapshot_text(
     runyear: Optional[Dict[str, Any]] = None,
 ) -> str:
     lunar_calendar = seed.calendar_context.get("lunar_calendar") or {}
-    month_general = (
-        liureng.get("month_general", {}) if isinstance(liureng, dict) else {}
-    )
-    transmissions = (
-        liureng.get("three_transmissions", {}) if isinstance(liureng, dict) else {}
-    )
+    month_general = liureng["month_general"]
+    transmissions = liureng["three_transmissions"]
     auxiliary = liureng["auxiliary_stars"]
     auxiliary_lines: Dict[str, List[str]] = {
         "day_stem": [],
@@ -400,7 +390,6 @@ def _build_liureng_snapshot_text(
     pattern_lines = [
         f"{item.get('name', '无')}：{item.get('basis', '无')}"
         for item in liureng.get("patterns", []) or []
-        if isinstance(item, dict)
     ]
     board_lines = [
         (
@@ -409,12 +398,9 @@ def _build_liureng_snapshot_text(
             f"贵神{item.get('god', '无')}"
         )
         for item in liureng.get("twelve_board", []) or []
-        if isinstance(item, dict)
     ]
     lesson_lines = []
     for lesson in liureng.get("four_lessons", []) or []:
-        if not isinstance(lesson, dict):
-            continue
         lesson_lines.append(
             (
                 f"第{lesson.get('index', 0)}课：{lesson.get('text', '无')}；"
@@ -510,6 +496,7 @@ def _build_liureng_snapshot_text(
         "角色条件："
         + "；".join(
             f"{r['role']}{r['branch']}本空{r['branch_xun_kong']}"
+            + ("，命中本支填实例外" if r["xunkong_exception_applies"] else "")
             for r in empty["role_conditions"]
         ),
     ]
@@ -517,7 +504,20 @@ def _build_liureng_snapshot_text(
         r = empty_by_sky[transmissions[position]["branch"]]
         empty_lines.append(
             f"{label}天盘{r['sky_branch']}本空{r['sky_xun_kong']}；地盘{r['earth_branch']}落底本空{r['earth_xun_kong']}；"
-            f"日干寄宫地盘例外{r['earth_stem_house_exception']}；天盘角色{'、'.join(r['sky_authority_roles']) or '无所列角色'}；综合有效空亡未裁定"
+            f"日干寄宫地盘例外{r['earth_stem_house_exception']}；天盘角色{'、'.join(r['sky_authority_roles']) or '无所列角色'}；"
+            f"天盘角色填实例外{'命中' if r['sky_authority_xunkong_exception'] else '未命中'}；综合有效空亡未裁定"
+        )
+    for role, branch in empty["year_fate_earth_branches"].items():
+        if branch is None:
+            continue
+        row = next(r for r in empty["rows"] if r["earth_branch"] == branch)
+        empty_lines.append(
+            f"{'本命' if role == 'natal' else '行年'}书地盘{branch}；"
+            + (
+                "本空，依年命条不作空论"
+                if row["earth_year_fate_xunkong_exception"]
+                else "本支不空"
+            )
         )
     empty_lines.append(empty["scope"])
     runyear_lines = ["无"]
@@ -804,16 +804,12 @@ def _build_jinkou_snapshot_text(
     jinkou: Dict[str, Any],
 ) -> str:
     lunar_calendar = seed.calendar_context.get("lunar_calendar") or {}
-    overview = jinkou.get("overview", {}) if isinstance(jinkou, dict) else {}
-    yuejiang = overview.get("yuejiang", {}) if isinstance(overview, dict) else {}
-    month_general = (
-        overview.get("month_general", {}) if isinstance(overview, dict) else {}
-    )
-    guishen = overview.get("guishen", {}) if isinstance(overview, dict) else {}
+    overview = jinkou["overview"]
+    yuejiang = overview["yuejiang"]
+    month_general = overview["month_general"]
+    guishen = overview["guishen"]
     row_lines = []
     for row in jinkou.get("rows", []) or []:
-        if not isinstance(row, dict):
-            continue
         row_lines.append(
             (
                 f"{row.get('label', '四位')}：{row.get('content', '无')}；"
@@ -862,7 +858,6 @@ def _build_jinkou_snapshot_text(
     shensha_lines = [
         f"{item.get('label', '神煞')}：{item.get('value', '无')}"
         for item in jinkou.get("shensha", []) or []
-        if isinstance(item, dict)
     ]
     natal = jinkou.get("natal_course")
     natal_lines = []
@@ -1137,17 +1132,11 @@ def _build_ziwei_snapshot_text(
     ziwei_birth: Dict[str, Any],
 ) -> str:
     lunar_calendar = seed.calendar_context.get("lunar_calendar") or {}
-    ming_gong = (
-        ziwei_birth.get("ming_gong", {}) if isinstance(ziwei_birth, dict) else {}
-    )
-    shen_gong = (
-        ziwei_birth.get("shen_gong", {}) if isinstance(ziwei_birth, dict) else {}
-    )
-    sihua = ziwei_birth.get("sihua", {}) if isinstance(ziwei_birth, dict) else {}
+    ming_gong = ziwei_birth["ming_gong"]
+    shen_gong = ziwei_birth["shen_gong"]
+    sihua = ziwei_birth["sihua"]
     palace_lines = []
     for palace in ziwei_birth.get("palaces", []) or []:
-        if not isinstance(palace, dict):
-            continue
         star_text = (
             "、".join(
                 (
@@ -1732,6 +1721,11 @@ def calculate_liureng_runyear(
         runyear_reason=runyear.get("reason"),
     )
     add_year_fate_membership(liureng, runyear["year_fate"])
+    apply_year_fate_emptiness(
+        liureng["emptiness_evidence"],
+        natal=runyear["year_fate"]["natal"]["earth_branch"],
+        annual=runyear["year_fate"]["annual"]["earth_branch"],
+    )
     snapshot_text = _build_liureng_snapshot_text(
         seed=seed,
         liureng=liureng,
@@ -1781,7 +1775,6 @@ def calculate_qimen_analysis(
         analysis_longitude=analysis_longitude,
         use_true_solar_time=use_true_solar_time,
         true_solar_explicit=true_solar_explicit,
-        day_pillar_strategy=DAY_GANZHI_STRATEGY_STANDARD,
     )
     qimen = build_qimen_with_options(seed, qimen_options)
     qimen["engine"] = "fatebridge-offline"

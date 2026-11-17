@@ -13,12 +13,14 @@ from typing import Any, Callable
 
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.birth import AstroBirthInfo
+from fatebridge.core.astro.earth_attitude import earth_attitude
 from fatebridge.core.astro.native_coordinates import require_spherical_coordinates
 from fatebridge.core.astro.native_motion import require_longitude_speed
 from fatebridge.core.astro.physical_sources import (
     PhysicalEphemerisTrace,
     PhysicalSourceCohort,
 )
+from fatebridge.core.astro.reference_frames import rotate_spherical
 from fatebridge.core.astro.time_scales import tt_from_ut1
 from fatebridge.core.ephemeris_runtime import configured_ephemeris_path
 from fatebridge.core.guolao_birth_clock import apparent_clock_required
@@ -181,9 +183,11 @@ def apparent_solar_day_anchor(
                 eq, eqflag = runtime.ephemeris_call(
                     "calc", tt, swe.SUN, flags | swe.FLG_EQUATORIAL
                 )
-                ra, _, _ = require_spherical_coordinates(
+                ra, dec, _ = require_spherical_coordinates(
                     eq, eqflag, native=swe, equatorial=True
                 )
+                attitude = earth_attitude(swe, at, julian_day_tt=tt)
+                ra, _ = rotate_spherical(attitude.reduction.native_to_target, ra, dec)
                 eqmodel = runtime.ephemeris_model_from_retflag(eqflag)
                 sources.observe("Sun", eqmodel)
                 if model != expected_sun_model or eqmodel != expected_sun_model:
@@ -194,7 +198,10 @@ def apparent_solar_day_anchor(
                 source_cohort.add(current_source)
                 if not 0 < pos[3] < 2:
                     raise ValueError("太阳未按声明速率前行")
-                gast = float(runtime.ephemeris_call("sidtime", at) * 15) % 360
+                gast = (
+                    float(runtime.ephemeris_call("sidtime", at, _julian_day_tt=tt) * 15)
+                    % 360
+                )
                 # The civil reference is only the shared helper's ordinal
                 # anchor. No correction relative to this placeholder is used
                 # or exposed as an epoch-specific civil correction.

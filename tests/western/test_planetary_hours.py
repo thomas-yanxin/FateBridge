@@ -1,7 +1,7 @@
 """Phase 3b (part 1) tests: planetary hours (行星时).
 
-The sunrise→sunset / sunset→sunrise arc division runs on swisseph's
-``rise_trans`` (works on the Moshier model, so it's available everywhere). Pure
+The sunrise→sunset / sunset→sunrise arc division uses
+the physical solar horizon solver (Moshier fallback in its supported range). Pure
 hour-sequence chaining is tested directly; the arc geometry + weekday ruler are
 pinned against the Dec-2000 natal chart (a Sunday → Sun day-ruler, 4th day hour
 → Moon).
@@ -22,7 +22,7 @@ from fatebridge.services.astrology import calculate_core_chart_analysis
 
 _SWE_AVAILABLE = swe is not None
 _requires_swe = pytest.mark.skipif(
-    not _SWE_AVAILABLE, reason="swisseph 不可用：行星时需要 rise_trans"
+    not _SWE_AVAILABLE, reason="swisseph 不可用：行星时需要太阳视位置"
 )
 
 _NATAL = dict(

@@ -14,11 +14,7 @@ Two parity goldens, both produced by horosa's own `heluoLocal.js` / `runHeluo`:
 from __future__ import annotations
 
 from fatebridge.core.heluo import (
-    build_snapshot_text,
     calculate,
-    da_yun,
-    judge,
-    solar_term_huagong,
 )
 from fatebridge.services.divination import calculate_heluo_analysis
 

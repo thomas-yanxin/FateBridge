@@ -10,6 +10,7 @@ from pathlib import Path
 import pytest
 
 from fatebridge.core import almanac, de440_solar, solar_model_policy
+from fatebridge.core.de441_solar import MODEL_ID as DE441_MODEL
 from fatebridge.utils.errors import EphemerisSourceError
 
 BASE = Path(__file__).parents[1] / "fixtures/de440_extended_v42"
@@ -23,6 +24,7 @@ REFERENCE = json.loads((BASE / "reference-points.json").read_text())
 def controlled_source(monkeypatch, tmp_path):
     original = de440_solar._profile
     original.cache_clear()
+    de440_solar._coefficient_data.cache_clear()
     almanac.get_solar_terms_for_year.cache_clear()
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "auto")
@@ -30,6 +32,7 @@ def controlled_source(monkeypatch, tmp_path):
         monkeypatch.delenv(name, raising=False)
     yield
     original.cache_clear()
+    de440_solar._coefficient_data.cache_clear()
     almanac.get_solar_terms_for_year.cache_clear()
 
 
@@ -42,12 +45,6 @@ def refuse_profile(monkeypatch, wanted):
         return original(profile_id)
 
     monkeypatch.setattr(de440_solar, "_profile", load)
-
-
-def test_original_profiles_retain_their_exact_frozen_bytes():
-    manifest = json.loads((BASE / "freeze.json").read_text())
-    for filename, expected in manifest["old_profile_sha256"].items():
-        assert hashlib.sha256((DATA / filename).read_bytes()).hexdigest() == expected
 
 
 def test_new_receipt_preserves_source_identity_and_qualification_scope():
@@ -100,7 +97,7 @@ def test_unselected_extension_does_not_become_a_native_year_dependency(
     refuse_profile(monkeypatch, NEW)
     assert {
         t.ephemeris_model for t in almanac.get_solar_terms_for_year(year, "UTC")
-    } == {"moshier"}
+    } == {DE441_MODEL}
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "de440")
     with pytest.raises(ValueError, match="1700..2300"):
         almanac.get_solar_terms_for_year(year, "UTC")
@@ -180,12 +177,13 @@ def test_invalid_selected_extension_fails_closed(fault, tmp_path, monkeypatch):
     folder.mkdir(parents=True)
     for name in [
         "de440-solar-extended-v1.json",
-        "de440-solar-extended-v1.bin.gz",
+        "de440-solar-record-atlas-v1.json",
+        "de440-solar-record-atlas-v1.bin.gz",
         "geocentric-tdb-v1.json",
     ]:
         shutil.copyfile(DATA / name, folder / name)
     metadata = folder / "de440-solar-extended-v1.json"
-    binary = folder / "de440-solar-extended-v1.bin.gz"
+    binary = folder / "de440-solar-record-atlas-v1.bin.gz"
     manifest = json.loads(metadata.read_text())
     if fault == "missing":
         binary.unlink()

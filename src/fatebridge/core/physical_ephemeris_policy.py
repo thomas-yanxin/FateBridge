@@ -1,8 +1,9 @@
 """Request-scoped admission of observed physical ephemeris sources.
 
-This is a file-source policy, not a positional-accuracy certificate. Native
-event solvers expose no complete read set; their query/result Sun probes are
-reported separately from the solver's unobservable internal evaluations.
+This is a file-source policy, not a positional-accuracy certificate. Published
+solar-event consumers observe every evaluation of their physical domain solver.
+Raw native SDK event solvers retain separate endpoint probes; these probes
+cannot certify the native solver's unobservable internal evaluations.
 """
 
 from __future__ import annotations

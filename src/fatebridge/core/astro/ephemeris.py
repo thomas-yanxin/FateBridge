@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import math
+from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Tuple
 
 from fatebridge.core.astro import runtime
@@ -17,7 +18,11 @@ from fatebridge.core.astro.lunar_source_window import (
 )
 from fatebridge.core.astro.native_coordinates import require_spherical_coordinates
 from fatebridge.core.astro.native_motion import require_longitude_speed
-from fatebridge.core.astro.orbits import _planet_state, _sun_state
+from fatebridge.core.astro.orbits import (
+    MEAN_NODE_MODEL,
+    ORBITAL_MODEL,
+    ApproximateEphemeris,
+)
 from fatebridge.core.astro.physical_sources import (
     PhysicalEphemerisTrace,
     assert_physical_configuration,
@@ -40,23 +45,34 @@ def _swisseph_angles(
     julian_day: float,
     longitude: float,
     latitude: float,
+    *,
+    julian_day_tt: float | None = None,
 ) -> Optional[Dict[str, Any]]:
     if runtime.swe is None:
         return None
     try:
         with runtime.preserve_ephemeris_path():
             _, ascmc = runtime.ephemeris_call(
-                "houses_ex", julian_day, latitude, longitude, b"E"
+                "houses_ex",
+                julian_day,
+                latitude,
+                longitude,
+                b"E",
+                _julian_day_tt=julian_day_tt,
             )
             ascmc, convention = canonical_house_axes(
                 julian_day_ut1=julian_day,
+                julian_day_tt=julian_day_tt,
                 latitude=latitude,
                 longitude=longitude,
                 house_code=b"E",
                 native_angles=ascmc,
             )
             definition = native_ecliptic_horizon_angle_definition(
-                julian_day_ut1=julian_day, latitude=latitude, armc=float(ascmc[2])
+                julian_day_ut1=julian_day,
+                julian_day_tt=julian_day_tt,
+                latitude=latitude,
+                armc=float(ascmc[2]),
             )
     except EphemerisSourceError:
         raise
@@ -230,15 +246,25 @@ def _swisseph_planet_state(
         return state, native_factor_model(PLANET_SWISSEPH_IDS[planet], flag)
 
 
+@dataclass(frozen=True)
+class PlanetStateBatch:
+    states: Dict[str, Dict[str, float]]
+    precision: str
+    backend: str
+    physical_model: str
+    models: Dict[str, str]
+    fallback: ApproximateEphemeris | None
+
+
 def _build_planet_states(
     chart_variant: str,
     julian_day: float,
-    day_number: float,
     *,
     julian_day_tt: Optional[float] = None,
     source_trace: Optional[PhysicalEphemerisTrace] = None,
     motion_metadata: Optional[Dict[str, Any]] = None,
-) -> Tuple[Dict[str, Dict[str, float]], str, str, str, Dict[str, str]]:
+) -> PlanetStateBatch:
+    """Build one batch; a caller-supplied trace keeps its outer endpoint owner."""
     if configured_jpl_file() is not None and runtime.swe is None:
         raise ImportError(
             "Swiss Ephemeris is required for explicitly selected JPL mode"
@@ -247,7 +273,7 @@ def _build_planet_states(
     ephemeris_states: Dict[str, Dict[str, float]] = {}
     models: Dict[str, str] = {}
     native_count = 0
-    sun_state = None
+    fallback = None
     trace = source_trace if source_trace is not None else PhysicalEphemerisTrace()
     with runtime.preserve_ephemeris_path():
         selected = configured_ephemeris_path()
@@ -265,27 +291,30 @@ def _build_planet_states(
                 models[planet] = model
                 native_count += 1
             else:
-                # A failed body must not discard successful native coordinates of
-                # other bodies. Preserve the inherited UT-based approximation's
-                # epoch convention; do not mix its solar vector with a native Sun.
-                if sun_state is None:
-                    sun_state = _sun_state(day_number)
-                ephemeris_states[planet] = _planet_state(planet, day_number, sun_state)
-                models[planet] = "fatebridge_approximate_orbital_model"
+                # Keep successful native bodies and the requested TT. The
+                # fallback has its own coherent Earth/Sun/frame calculation.
+                if fallback is None:
+                    fallback = ApproximateEphemeris(julian_day, julian_day_tt)
+                ephemeris_states[planet] = fallback.state(planet)
+                models[planet] = (
+                    MEAN_NODE_MODEL if planet == "North Node" else ORBITAL_MODEL
+                )
                 if planet not in {"North Node", "South Node"}:
                     trace.observe(planet, models[planet])
             assert_physical_configuration(selected)
-        trace.finish()
+        if source_trace is None:
+            trace.finish()
 
     if native_count == len(planet_names):
-        return (
+        return PlanetStateBatch(
             ephemeris_states,
             "ephemeris_runtime_model",
             "swisseph_api",
             physical_ephemeris_summary(models),
             models,
+            None,
         )
-    return (
+    return PlanetStateBatch(
         ephemeris_states,
         (
             "mixed_precision_runtime_model"
@@ -293,10 +322,11 @@ def _build_planet_states(
             else "approximate_orbital_model"
         ),
         (
-            "swisseph_api_with_approximate_orbits"
+            "swisseph_api_with_analytic_fallback"
             if native_count
-            else "fatebridge_approximate_orbital_model"
+            else "fatebridge_analytic_ephemerides"
         ),
         physical_ephemeris_summary(models),
         models,
+        fallback,
     )

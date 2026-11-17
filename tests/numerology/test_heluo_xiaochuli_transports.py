@@ -8,7 +8,12 @@ import pytest
 from jsonschema import Draft202012Validator
 
 from fatebridge.core import heluo_texts as ht
-from tests.support.heluo_source_facts import HEADER_COUNT, PENDING_COUNT
+from tests.support.heluo_source_facts import (
+    CURRENT_COMMENTARIES,
+    CURRENT_HEADERS,
+    HEADER_COUNT,
+    PENDING_COUNT,
+)
 from tests.support.transports import SPECS, business, call_cli, native
 from tests.support.transports import rest as shared_rest
 
@@ -84,6 +89,16 @@ def test_xiaochuli_printed_scopes_agree_on_rest_mcp_cli(
     assert response.status_code == 200 and code == 0 and not mcp.is_error
     outputs = [response.json(), cli, mcp.structured_content]
     assert business(outputs[0]) == business(outputs[1]) == business(outputs[2])
+    expected = next(
+        row
+        for row in CURRENT_COMMENTARIES["entries"]
+        if (row["hexagram"], row["line"]) == (gua, line)
+    )
+    header = next(
+        row
+        for row in CURRENT_HEADERS["entries"]
+        if (row["hexagram"], row["line"]) == (gua, line)
+    )
     for output in outputs:
         spec.output_model.model_validate(output)
         Draft202012Validator(spec.output_model.model_json_schema()).validate(output)
@@ -94,9 +109,17 @@ def test_xiaochuli_printed_scopes_agree_on_rest_mcp_cli(
         assert (selected["hexagram"], selected["line"]) == (gua, line) and excerpt in t[
             "detail"
         ]
-        assert (
-            p["commentary_content_sha256"] == ht.COMMENTARY_CONTENT_SHA256
-            and p["header_content_sha256"] == ht.HEADER_CONTENT_SHA256
+        assert t["detail"] == "".join(s["text"] for s in expected["sections"])
+        assert t["commentary_sections"] == [
+            dict(section, applicability=None) for section in expected["sections"]
+        ]
+        assert p["commentary_corpus_id"] == CURRENT_COMMENTARIES["corpus_id"]
+        assert p["commentary_pdf_pages"] == expected["pdf_pages"]
+        assert p["commentary_source_url"] == CURRENT_COMMENTARIES["source_url"]
+        assert t["yaoci"] == header["yaoci"]
+        assert p["corpus_id"] == CURRENT_HEADERS["corpus_id"]
+        assert p["source_url"] == (
+            f"{CURRENT_HEADERS['source_url']}#page={header['pdf_page']}"
         )
         assert all(s["applicability"] is None for s in t["commentary_sections"])
         assert t["commentary_branch_selection"]["selected_section_ids"] == []
@@ -138,9 +161,11 @@ def test_xiaochuli_printed_scopes_agree_on_rest_mcp_cli(
                 for r in e["rule_trace"]
                 if r["rule_id"] == "heluo_selected_line_collation_v1"
             )
+            assert trace["commentary_corpus_id"] == p["commentary_corpus_id"]
+            assert trace["selections"][phase]["corpus_key"] == selected["corpus_key"]
             assert (
-                trace["header_content_sha256"] == p["header_content_sha256"]
-                and trace["commentary_content_sha256"] == p["commentary_content_sha256"]
+                trace["selections"][phase]["commentary_pdf_pages"]
+                == expected["pdf_pages"]
             )
             assert t["detail"] in output["snapshot_text"]
 

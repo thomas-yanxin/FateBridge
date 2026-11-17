@@ -11,7 +11,6 @@ import pytest
 from fatebridge import fetch_ephe
 from fatebridge.core.astro.ephemeris_integrity import (
     load_ephemeris_manifest,
-    verify_ephemeris_bytes,
 )
 from tests.fixtures.ephemeris_manifest import manifest_for_payloads
 
@@ -24,10 +23,12 @@ def test_windows_style_checkout_preserves_lahiri_source_bytes(tmp_path):
     repository = tmp_path / "repository"
     repository.mkdir()
     source = "src/fatebridge/core/astro/continuous_lahiri.py"
+    shared_source = "src/fatebridge/core/astro/reference_frames.py"
     coefficients = "src/fatebridge/data/astronomy/lahiri-frame-v1.json"
     paths = (
         ".gitattributes",
         source,
+        shared_source,
         coefficients,
         "src/fatebridge/data/sukuyo_dayan_reference_LICENSE.txt",
     )
@@ -59,7 +60,7 @@ def test_windows_style_checkout_preserves_lahiri_source_bytes(tmp_path):
         check=True,
         capture_output=True,
     )
-    for name in (coefficients, source, paths[-1]):
+    for name in (coefficients, source, shared_source, paths[-1]):
         assert (checkout / name).read_bytes() == (root / name).read_bytes(), name
     result = subprocess.run(
         [

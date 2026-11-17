@@ -22,8 +22,7 @@ from tests.support.transports import rest as _shared_rest
 
 @pytest.fixture
 def preserve_provider(monkeypatch):
-    # These original controls still assert the actual native Moshier path.
-    # The newer auto and explicit SPK paths have separate tests and identities.
+    # Native selection retains Swiss files or uses the named bundled DE441 source.
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
     env = os.environ.get("SE_EPHE_PATH")
     previous = runtime.configured_ephemeris_path()
@@ -91,7 +90,7 @@ def test_all_three_derived_caches_follow_an_injected_environment_epoch(monkeypat
         clear_solar_caches()
 
 
-def test_real_file_to_moshier_switch_never_keeps_old_pillars_or_windows(
+def test_real_file_to_bundled_source_switch_keeps_matching_pillars_and_windows(
     preserve_provider,
 ):
     folder = Path(
@@ -102,16 +101,15 @@ def test_real_file_to_moshier_switch_never_keeps_old_pillars_or_windows(
     )
     if not (folder / "sepl_18.se1").exists():
         pytest.skip(
-            "Optional Swiss files absent; synthetic epoch and Moshier transport checks still run"
+            "Optional Swiss files absent; synthetic epoch and bundled-source transport checks still run"
         )
-    birth = datetime(1904, 1, 6, 17, 37)
-    # This minute straddles the two configured model results. It is a
-    # consistency counterexample, not an independent correctness oracle.
+    # Keep the original minute, now before both selected roots, and a fixed
+    # microsecond between them. These are consistency controls, not accuracy oracles.
     with TemporaryDirectory(prefix="bazi-model-switch-") as empty:
-        for path, model, branch, start in [
-            (folder, "swieph", "子", "大雪"),
-            (empty, "moshier", "丑", "小寒"),
-            (folder, "swieph", "子", "大雪"),
+        for path, model, boundary_branch, boundary_start in [
+            (folder, "swieph", "丑", "小寒"),
+            (empty, "fatebridge_de441_solar_v1", "子", "大雪"),
+            (folder, "swieph", "丑", "小寒"),
         ]:
             select_provider(path)  # Intentionally no cache clearing here.
             term = next(
@@ -120,31 +118,39 @@ def test_real_file_to_moshier_switch_never_keeps_old_pillars_or_windows(
                 if t.name == "小寒"
             )
             assert term.ephemeris_model == model
-            assert BaZiCalendar.get_four_pillars(birth, "UTC")["month"][1] == branch
-            assert almanac.get_bazi_month_context(birth, "UTC")["branch"] == branch
-            assert (
-                TimingAnalysis.calculate_liuyue(1904, 1, 6, "UTC", birth)["branch"]
-                == branch
-            )
-            assert (
-                TimingAnalysis.calculate_liuri(birth, "UTC")["solar_term_window"][
-                    "start_term"
-                ]["name"]
-                == start
-            )
+            for birth, branch, start in [
+                (datetime(1904, 1, 6, 17, 37), "子", "大雪"),
+                (
+                    datetime(1904, 1, 6, 17, 37, 1, 212232),
+                    boundary_branch,
+                    boundary_start,
+                ),
+            ]:
+                assert BaZiCalendar.get_four_pillars(birth, "UTC")["month"][1] == branch
+                assert almanac.get_bazi_month_context(birth, "UTC")["branch"] == branch
+                assert (
+                    TimingAnalysis.calculate_liuyue(1904, 1, 6, "UTC", birth)["branch"]
+                    == branch
+                )
+                assert (
+                    TimingAnalysis.calculate_liuri(birth, "UTC")["solar_term_window"][
+                        "start_term"
+                    ]["name"]
+                    == start
+                )
 
 
 rest = _shared_rest
 
 
 @pytest.mark.parametrize("topic", TOPICS)
-def test_all_ten_calendar_views_publish_actual_model_and_downgrade_on_three_surfaces(
+def test_all_ten_calendar_views_publish_actual_bundled_model_on_three_surfaces(
     topic, preserve_provider, rest, tmp_path, capsys
 ):
     spec = SPECS["bazi_" + topic]
     payload = {**inputs(spec), "use_true_solar_time": False}
     fields = suggested_fields(spec, view="calendar_basis")
-    with TemporaryDirectory(prefix="bazi-moshier-view-") as empty:
+    with TemporaryDirectory(prefix="bazi-bundled-view-") as empty:
         select_provider(empty)
         response = rest.post(
             spec.rest_path,
@@ -189,8 +195,10 @@ def test_all_ten_calendar_views_publish_actual_model_and_downgrade_on_three_surf
             context["bazi_month_boundary"]["start_term"],
             context["bazi_month_boundary"]["next_term"],
         ]:
-            assert term["resolution_provider"] == "swisseph"
-            assert term["ephemeris_model"] == "moshier"
+            assert term["resolution_provider"] == "jpl_de441"
+            assert term["ephemeris_model"] == "fatebridge_de441_solar_v1"
         assert result["run_metadata"]["engine_is_approximate"] is True
         assert "approximate_engine" in result["run_metadata"]["warnings"]
-        assert result["run_metadata"]["provenance"]["ephemeris_model"] == ["moshier"]
+        assert result["run_metadata"]["provenance"]["ephemeris_model"] == [
+            "fatebridge_de441_solar_v1"
+        ]

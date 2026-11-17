@@ -6,9 +6,6 @@ from fatebridge.core import sukuyo_zentsuji_later as later
 from fatebridge.core.sukuyo import calendar_mansion, day_evidence
 from fatebridge.core.sukuyo_hinoo_critical import ZENTSUJI_SOURCE
 from fatebridge.core.sukuyo_sources import LoadedSource, load_source
-from tests.sukuyo.test_sukuyo_transports import (
-    test_calendar_and_relations_across_all_real_transports as run_transport_check,
-)
 
 
 def reference():

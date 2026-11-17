@@ -78,6 +78,10 @@ _DOWNGRADED_EPHEMERIS_MODELS = frozenset(
         "mixed",
         "fatebridge_analytic_solar_v1",
         "fatebridge_complete_moshier_solar_v1",
+        "fatebridge_complete_moshier_solar_v2",
+        # Bounded source representation and finite qualification remain
+        # explicit; changing the solar model must not silently promote status.
+        "fatebridge_de441_solar_v1",
     }
 )
 

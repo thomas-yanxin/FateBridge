@@ -75,14 +75,15 @@ def test_packaged_profile_corruption_is_a_source_error(monkeypatch, tmp_path, fa
     folder.mkdir(parents=True)
     for name in [
         "de440-solar-v1.json",
-        "de440-solar-v1.bin.gz",
+        "de440-solar-record-atlas-v1.json",
+        "de440-solar-record-atlas-v1.bin.gz",
         "geocentric-tdb-v1.json",
     ]:
         shutil.copyfile(DATA / name, folder / name)
     if fault == "missing":
-        (folder / "de440-solar-v1.bin.gz").unlink()
+        (folder / "de440-solar-record-atlas-v1.bin.gz").unlink()
     elif fault == "bytes":
-        path = folder / "de440-solar-v1.bin.gz"
+        path = folder / "de440-solar-record-atlas-v1.bin.gz"
         raw = bytearray(path.read_bytes())
         raw[len(raw) // 2] ^= 1
         path.write_bytes(raw)
@@ -97,6 +98,7 @@ def test_packaged_profile_corruption_is_a_source_error(monkeypatch, tmp_path, fa
         data["fairhead_terms"][0][0] = float("nan")
         path.write_text(json.dumps(data))
     de440_solar._profile.cache_clear()
+    de440_solar._coefficient_data.cache_clear()
     with monkeypatch.context() as context:
         context.setattr(de440_solar, "files", lambda _: tmp_path)
         try:
@@ -104,6 +106,7 @@ def test_packaged_profile_corruption_is_a_source_error(monkeypatch, tmp_path, fa
                 de440_solar.source_receipt()
         finally:
             de440_solar._profile.cache_clear()
+            de440_solar._coefficient_data.cache_clear()
 
 
 def test_out_of_coverage_and_nonfinite_points_do_not_receive_an_approximation():

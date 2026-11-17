@@ -224,6 +224,8 @@ def test_new_reference_survives_rest_fresh_native_mcp_and_cli(
         capsys,
         "suzhan",
         {
+            "lat": "31n13",
+            "lon": "121e28",
             "date": civil,
             "time": "12:00:00",
             "zone": "+09:00",

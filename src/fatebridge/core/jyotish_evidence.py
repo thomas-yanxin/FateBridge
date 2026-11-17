@@ -56,7 +56,7 @@ def strength_context(
     if len(values) != len(scenarios):
         status = "partially_computed" if values else "unavailable"
         expected = None
-    elif len(set(values)) > 1:
+    elif len(set(values)) > 1 or planet in component.get("conditional_targets", ()):
         status, expected = "conditional_results", None
     else:
         status, expected = "computed_consensus", values[0]
@@ -290,7 +290,10 @@ def strength_text(context: dict[str, Any]) -> str:
         return f"该宫主本项在本次已计算分支中一致为{value:.6g} Virupa。"
     if status == "conditional_results":
         values = sorted({r["value"] for r in context["scenarios"]})
-        text = "、".join(f"{v:.6g}" for v in values)
+        shown = list(dict.fromkeys(f"{v:.6g}" for v in values))
+        if len(shown) == 1:
+            return f"该宫主本项{total}个条件分支均已计算，显示值同为{shown[0]} Virupa；未舍入值有差异，故不发布共同值。"
+        text = "、".join(shown)
         return f"该宫主本项{total}个条件分支均已计算，取值为{text} Virupa；摘要null表示条件未裁定，不能当作零或缺项。"
     if status == "partially_computed":
         return f"该宫主本项仅{computed}/{total}个条件分支取得数值，其余缺项保留；不能只挑已计算或较高分支作结论。"

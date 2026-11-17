@@ -10,7 +10,6 @@ from pydantic import ValidationError
 
 from fatebridge.core.meihua_day_qi import civil_day_qi_context, day_qi_ruleset
 from fatebridge.core.requests.meihua import MeihuaCastRequest
-from fatebridge.services.divination import calculate_meihua_analysis
 from fatebridge.services.meihua import calculate_meihua_cast
 
 FIXTURE = Path(__file__).parents[1] / "fixtures/meihua_day_qi_v1"

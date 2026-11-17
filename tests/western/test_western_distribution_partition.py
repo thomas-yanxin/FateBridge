@@ -14,6 +14,7 @@ from fatebridge.core.astrology_lifespan import (
     _bound_segments_from,
     build_distributions_payload,
 )
+from fatebridge.core.predictive._common import resolve_egyptian_bound
 from tests.support.transports import SPECS, business, rest, surface_calls
 
 ASCENDANT = 3.038038378856752
@@ -149,3 +150,22 @@ def test_correct_bound_sequence_reaches_rest_mcp_cli(time_key, surface_calls):
         assert aries[3]["start_age_years"] == round(
             (20 - value["natal_reference"]["ascendant"]["absolute_degree"]) / rate, 3
         )
+
+
+@pytest.mark.parametrize("degree", [-1.0, 30.0, math.inf, -math.inf, math.nan])
+def test_invalid_bound_coordinate_cannot_become_a_plausible_lord(degree):
+    with pytest.raises(ValueError):
+        resolve_egyptian_bound("Aries", degree)
+
+
+@pytest.mark.parametrize(
+    "degree,lord",
+    [
+        (0.0, "Jupiter"),
+        (math.nextafter(6.0, 0.0), "Jupiter"),
+        (6.0, "Venus"),
+        (math.nextafter(30.0, 0.0), "Saturn"),
+    ],
+)
+def test_bound_membership_retains_half_open_coordinates(degree, lord):
+    assert resolve_egyptian_bound("Aries", degree)["bound_lord"] == lord

@@ -59,6 +59,17 @@ def current_chart(side):
     return chart
 
 
+@pytest.fixture(scope="module")
+def current_reference_chart():
+    # Keep the frozen coordinates for the arithmetic tests. Verification of a
+    # complete reference now also requires the actual adjacent-root witness.
+    return chart_at_tt(
+        CASE["selected"]["time_scales"]["personality"]["jd_tt"],
+        "true",
+        backend="moshier",
+    )
+
+
 @pytest.mark.parametrize("side", ["selected", "reference"])
 def test_current_backend_adapter_preserves_every_frozen_activation_field(side):
     chart = current_chart(side)
@@ -102,7 +113,10 @@ def test_independent_reference_keeps_predeclared_epochs_targets_roots_and_source
         hashlib.sha256((ROOT / REFERENCE["plan_path"]).read_bytes()).hexdigest()
         == REFERENCE["plan_sha256"]
     )
-    source = ROOT / "scripts/human_design/gen_human_design_astronomy_reference.py"
+    source = (
+        ROOT
+        / "tests/data/human_design_reference_generators_v1/gen_human_design_astronomy_reference.py"
+    )
     assert (
         hashlib.sha256(source.read_bytes()).hexdigest() == REFERENCE["generator_sha256"]
     )
@@ -148,7 +162,8 @@ def test_horizons_raw_tt_anchors_crosscheck_the_independent_pipeline():
         reference["generator_sha256"]
         == hashlib.sha256(
             (
-                ROOT / "scripts/human_design/gen_human_design_astronomy_horizons.py"
+                ROOT
+                / "tests/data/human_design_reference_generators_v1/gen_human_design_astronomy_horizons.py"
             ).read_bytes()
         ).hexdigest()
     )
@@ -201,7 +216,9 @@ def test_fixed_independent_reference_keeps_moshier_position_and_line_failures():
         assert selected["status"] == "bounded_independent_physical_checks_passed"
 
 
-def test_full_backend_reference_recomputes_own_root_and_every_activation(monkeypatch):
+def test_full_backend_reference_recomputes_own_root_and_every_activation(
+    monkeypatch, current_reference_chart
+):
     selected, alternate = current_chart("selected"), current_chart("reference")
     original = copy.deepcopy(selected)
     calls = []
@@ -236,7 +253,9 @@ def test_full_backend_reference_recomputes_own_root_and_every_activation(monkeyp
     payload = {
         **selected,
         "calculation_policy": {"node_mode": "true"},
-        "ephemeris_backend_comparison": report,
+        "ephemeris_backend_comparison": full_backend_report(
+            selected, copy.deepcopy(current_reference_chart), "true"
+        ),
     }
     assert verify_full_backend_report(payload)["errors"] == []
 
@@ -252,12 +271,16 @@ def test_full_backend_reference_recomputes_own_root_and_every_activation(monkeyp
         "reference_native_flag",
         "reference_birth",
         "reference_graph",
+        "missing_root_witness",
         "summary",
         "status",
     ],
 )
-def test_full_backend_local_verifier_rejects_forged_context(bad):
-    selected, alternate = current_chart("selected"), current_chart("reference")
+def test_full_backend_local_verifier_rejects_forged_context(
+    bad, current_reference_chart
+):
+    selected = current_chart("selected")
+    alternate = copy.deepcopy(current_reference_chart)
     report = full_backend_report(selected, alternate, "true")
     assert (
         verify_full_backend_report(
@@ -289,6 +312,8 @@ def test_full_backend_local_verifier_rejects_forged_context(bad):
         alternate["time_scales"]["personality"]["jd_tt"] += 1
     elif bad == "reference_graph":
         alternate["bodygraph"]["channels"].pop()
+    elif bad == "missing_root_witness":
+        alternate["design_solver"].pop("numerical_precision")
     elif bad == "summary":
         report["joint_evidence_summary"]["line_fixing_change_count"] += 1
     else:
@@ -349,9 +374,9 @@ def test_reference_backend_requires_actual_return_flags(monkeypatch):
 
 
 def test_analytic_mean_node_flag_cannot_turn_moshier_into_file_comparison():
-    from tests.support.ephemeris_context import moshier_ephemeris
+    from tests.support.ephemeris_context import empty_ephemeris_path
 
-    with moshier_ephemeris():
+    with empty_ephemeris_path():
         chart = chart_at_tt(2451545, "mean")
         report = compare_full_backends(chart, "mean")
     north = next(

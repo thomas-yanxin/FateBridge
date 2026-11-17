@@ -7,6 +7,7 @@ from pathlib import Path
 
 import pytest
 
+from fatebridge.core.public_output import same_public_value
 from tests.evaluation.test_agentic_nested_outputs import (
     test_nested_fact_faults_are_internal_failures_on_all_surfaces as reject_fault,
 )
@@ -81,6 +82,9 @@ def test_actual_witness_and_correct_locator_on_all_surfaces(project, surface_cal
     assert http.status_code == 200 and code == 0 and not protocol.is_error
     bodies = [http.json(), cli, protocol.structured_content]
     assert business(bodies[0]) == business(bodies[1]) == business(bodies[2])
+    fn, args, kwargs = spec.bind(spec.request_model.model_validate(payload))
+    expected = fn(*args, **kwargs)["jinkou"]["internal_strength"]["source_evidence"]
+    assert expected["scan_source_sha256"] == AUDIT.reference()["source_sha256"]
     for body in bodies:
         spec.output_model.model_validate(body)
         board = body["jinkou"]
@@ -91,7 +95,7 @@ def test_actual_witness_and_correct_locator_on_all_surfaces(project, surface_cal
         )
         assert evidence["daily_five_states_adjudicated"] is False
         assert evidence["complete_classical_acceptance"] is False
-        assert evidence["scan_source_sha256"] == AUDIT.reference()["source_sha256"]
+        assert same_public_value(evidence, expected)
         assert board["use_evidence"]["source_evidence"]["no_control_pdf_page"] == 18
         assert board["use_evidence"]["source_evidence"]["no_control_footer_page"] == 17
         assert board["use_evidence"]["comprehensive_position"] is None

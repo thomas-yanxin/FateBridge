@@ -2,7 +2,6 @@
 
 import asyncio
 import copy
-import hashlib
 import json
 
 import pytest
@@ -28,6 +27,7 @@ from tests.jyotish.test_jyotish_clock_sources import arguments
 from tests.jyotish.test_jyotish_fidelity import CUSP
 from tests.jyotish.test_jyotish_sources import data18, restore_runtime
 from tests.jyotish.test_jyotish_transports import AS_OF, SPECS, call_surfaces
+from tests.support.result_delivery import assert_same_run_receipt
 
 
 @pytest.mark.parametrize("key", ["astro_india", "astro_vimshottari"])
@@ -414,8 +414,10 @@ def test_saved_full_nested_result_pages_and_claims_do_not_recompute(
             break
         offset = item["next_offset"]
     text = "".join(chunks)
-    assert hashlib.sha256(text.encode()).hexdigest() == ref["sha256"]
+    assert len(text) == ref["total_chars"]
     full = json.loads(text)
+    assert_same_run_receipt(store, shaped, full)
+    trusted = store.get(ref["result_id"])
     meta = full["run_metadata"]
     assert meta["run_id"] == shaped["run_metadata"]["run_id"]
     assert len(full["vimshottari"]["subdivisions"]["current_levels"]) == 6
@@ -429,17 +431,22 @@ def test_saved_full_nested_result_pages_and_claims_do_not_recompute(
         for field in ["lord", "start", "end"]
     ]
     assert (
-        verify_calculation_claims(full, claims)["status"] == "verified_structured_facts"
+        verify_calculation_claims(full, claims, trusted_payload=trusted)["status"]
+        == "verified_structured_facts"
     )
     incomplete = copy.deepcopy(full)
     assert "snapshot_text" in incomplete
     del incomplete["snapshot_text"]
-    rejected = verify_calculation_claims(incomplete, claims)
+    rejected = verify_calculation_claims(incomplete, claims, trusted_payload=trusted)
     assert rejected["status"] == "rejected"
+    assert rejected["original_payload_compared"] is True
     assert {"code": "incomplete_or_changed_business_payload"} in rejected["errors"]
     bad = copy.deepcopy(claims)
     bad[-1].value = "2000-01-01T00:00:00+00:00"
-    assert verify_calculation_claims(full, bad)["status"] == "rejected"
+    assert (
+        verify_calculation_claims(full, bad, trusted_payload=trusted)["status"]
+        == "rejected"
+    )
 
 
 @pytest.mark.parametrize("key", ["astro_india", "astro_vimshottari", "astro_chart"])

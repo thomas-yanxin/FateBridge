@@ -18,7 +18,6 @@ from fatebridge.core import (
 )
 from fatebridge.core.astro.time_scales import (
     datetime_from_tt,
-    datetime_from_tt_point,
     ephemeris_time,
 )
 from fatebridge.core.astro.tt_epoch import TTInstant
@@ -29,6 +28,7 @@ from fatebridge.core.solar_model_policy import (
     VSOP2013_SOFTWARE_YEARS,
     solar_model_policy,
 )
+from fatebridge.utils.civil_time import ZonedCalendar
 from fatebridge.utils.errors import EphemerisSourceError
 from fatebridge.utils.timezones import parse_timezone_name
 
@@ -69,7 +69,7 @@ def _extended_event(
 ) -> dict[str, Any]:
     key = _source_key(mode, profile)
     root = deepcopy(_extended_root(year, profile, key))
-    moment = datetime_from_tt_point(TTInstant.from_parts(*root["tt_parts"])).astimezone(
+    moment = datetime_from_tt(TTInstant.from_parts(*root["tt_parts"])).astimezone(
         parse_timezone_name(zone)
     )
     clock = ephemeris_time(moment)
@@ -104,9 +104,7 @@ def _extended_event(
     }
     term = almanac.SolarTerm(
         name="立春",
-        moment=moment,
-        date_key=moment.strftime("%Y%m%d"),
-        day_ganzhi=almanac.get_day_ganzhi(moment.year, moment.month, moment.day),
+        calendar=ZonedCalendar.from_datetime(moment),
         resolution_provider="jpl_de440",
         ephemeris_model=profile,
         ephemeris_library_version="fatebridge.canping_solar/extended_projection_1.0.0",
@@ -133,7 +131,7 @@ def _root(year: int, mode: str, profile: str, identity: tuple) -> dict[str, Any]
         )
     if mode == "aa1996":
         return aa1996_solar.longitude_crossing_tt(
-            315.0, low, high, expected_source_key=identity
+            315.0, low, high, expected_source_key=identity, projection_year=year
         )
     if mode == "analytic":
         return analytic_solar.longitude_crossing_tt(315.0, low, high)
@@ -199,13 +197,15 @@ def projection_boundary(
             if year not in {low_year - 1, high_year + 1}:
                 raise EphemerisSourceError("solar_swiss_range")
             terms = almanac._solar_terms_for_context_year(
-                year, zone, low_year if year < low_year else high_year
+                year, zone, low_year if year < low_year else high_year, term_index=2
             )
             selection = "bounded_derived_lichun_event"
         else:
-            terms = almanac.get_solar_terms_for_year(year, zone)
+            terms = almanac._solar_terms_for_context_year(
+                year, zone, year, term_index=2
+            )
             selection = "ordinary_public_year_grid"
-        term = next(t for t in terms if t.name == "立春")
+        term = terms[0]
         almanac.require_calculated_solar_term(term)
     else:
         if (
@@ -230,7 +230,7 @@ def projection_boundary(
         key = _source_key(mode, profile)
         root = deepcopy(_root(year, mode, profile, key))
         moment = (
-            datetime_from_tt_point(TTInstant.from_float(root["jd_tt"]))
+            datetime_from_tt(TTInstant.from_float(root["jd_tt"]))
             if mode == "vsop2013"
             else datetime_from_tt(root["jd_tt"])
         ).astimezone(parse_timezone_name(zone))
@@ -263,9 +263,7 @@ def projection_boundary(
         }
         term = almanac.SolarTerm(
             name="立春",
-            moment=moment,
-            date_key=moment.strftime("%Y%m%d"),
-            day_ganzhi=almanac.get_day_ganzhi(moment.year, moment.month, moment.day),
+            calendar=ZonedCalendar.from_datetime(moment),
             resolution_provider=(
                 "vsop2013"
                 if mode == "vsop2013"

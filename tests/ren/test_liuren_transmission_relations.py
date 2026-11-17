@@ -159,7 +159,7 @@ def test_four_families_deliver_same_source_layers_on_three_ports(
         Draft202012Validator(spec.output_model.model_json_schema()).validate(body)
         board = body["liureng"]
         e = board["transmission_relations"]
-        assert board["ruleset"]["version"] == "1.16.0"
+        assert board["ruleset"]["version"] == "1.16.1"
         assert len(e["rows"]) == 3 and len(e["rules"]) == 9 and len(e["trines"]) == 4
         assert (
             e["comprehensive_judgement"] is None

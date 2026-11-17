@@ -1,6 +1,5 @@
 """Frozen dirty-parent controls cross the real private execution boundary."""
 
-import hashlib
 import json
 import subprocess
 import sys
@@ -152,9 +151,6 @@ def test_current_auxiliary_file_is_used_instead_of_stale_parent_table(
             "search_index": 0,
             "filename": filename,
             "bytes": (tmp_path / "current" / filename).stat().st_size,
-            "sha256": hashlib.sha256(
-                (tmp_path / "current" / filename).read_bytes()
-            ).hexdigest(),
         }
     ]
     # Retain 1900 as the historical-model control; add the applicable 1960 UT1 case.

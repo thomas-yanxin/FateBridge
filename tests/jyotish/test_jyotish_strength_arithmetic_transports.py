@@ -6,6 +6,7 @@ from fractions import Fraction
 import pytest
 
 from tests.jyotish.test_jyotish_transports import call_surfaces
+from tests.support.reference_data import resolve
 
 PEAKS = {
     "Sun": 10,
@@ -24,12 +25,6 @@ def decimal_value(longitude, point, shift=0):
         left = Decimal.from_float(float(longitude))
         right = (Decimal.from_float(float(point)) + shift) % 360
         return float(min(abs(left - right + turn * 360) for turn in [-1, 0, 1]) / 3)
-
-
-def resolve(body, path):
-    for part in path.split("."):
-        body = body[int(part)] if isinstance(body, list) else body[part]
-    return body
 
 
 @pytest.mark.parametrize("key", ["astro_india", "astro_chart", "astro_vimshottari"])
@@ -128,7 +123,14 @@ def test_actual_returned_angles_strengths_grid_and_prose_on_three_surfaces(
                 basis["inputs"]["sthana_bala"]
                 == strengths["sthana_bala"]["summary"][planet]["total_virupa"]
             )
-            values = list(basis["inputs"].values())
+            values = [
+                (
+                    Fraction(basis["exact_paksha_virupa"])
+                    if key == "paksha_bala"
+                    else value
+                )
+                for key, value in basis["inputs"].items()
+            ]
             assert basis["total_virupa"] == (
                 None
                 if None in values

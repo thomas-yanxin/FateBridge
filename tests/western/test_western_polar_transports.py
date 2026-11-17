@@ -4,6 +4,7 @@ import pytest
 from jsonschema import Draft202012Validator
 
 from tests.support.transports import SPECS, business, rest, surface_calls
+from tests.western.test_western_horizon_precision import EXPECTED, PUBLIC
 from tests.western.test_western_house_reference import separation
 from tests.western.test_western_polar_axes import POLAR_BIRTH
 
@@ -112,6 +113,49 @@ def test_predictive_axis_convention_is_strictly_projectable(surface_calls):
     for layer in ["natal_reference", "transit"]:
         note = local[layer]["calculation_basis"]["house_axis_convention"]
         assert note["meridian_branch_separation_degrees"] == pytest.approx(180)
+
+
+@pytest.mark.parametrize("house_system", ["A", "E", "equal"])
+@pytest.mark.parametrize("zodiac", ["Tropic", "Sidereal"])
+def test_equal_house_aliases_preserve_checked_cusps_and_planet_houses(
+    house_system, zodiac, surface_calls
+):
+    case = PUBLIC[0]
+    payload = {
+        **POLAR_BIRTH,
+        "birth_longitude": case["longitude"],
+        "birth_latitude": case["latitude"],
+        "house_system": house_system,
+        "zodiac_type": zodiac,
+        "analysis_year": 1900,
+        "analysis_month": 1,
+        "analysis_day": 1,
+        "analysis_hour": 0,
+        "analysis_minute": 30,
+    }
+    response, protocol, code, local = surface_calls(SPECS["transit"], payload)
+    assert response.status_code == 200 and code == 0 and not protocol.is_error
+    outputs = [response.json(), local, protocol.structured_content]
+    assert business(outputs[0]) == business(outputs[1]) == business(outputs[2])
+    for result in outputs:
+        for layer in ("natal_reference", "transit"):
+            chart = result[layer]
+            basis = chart["calculation_basis"]
+            expected_asc = (
+                EXPECTED[case["id"]]["ascendant"] - basis["ayanamsha_degrees"]
+            ) % 360
+            asc = chart["ascendant"]["longitude"]
+            assert separation(asc, expected_asc) <= 1
+            precision = basis["house_axis_convention"]["eastern_direction_precision"]
+            cusps = precision["delivered_cusps"]
+            assert len(cusps) == 12
+            for index, cusp in enumerate(cusps):
+                assert separation(cusp, (expected_asc + index * 30) % 360) <= 1
+            assert precision["corrected_cusps"] == list(range(1, 13))
+            assert (
+                chart["sun"]["house"]
+                == int((chart["sun"]["longitude"] - expected_asc) % 360 // 30) + 1
+            )
 
 
 @pytest.mark.parametrize(

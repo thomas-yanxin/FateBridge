@@ -4,8 +4,8 @@ from datetime import date
 from typing import Any, Dict, List, Optional, Tuple
 
 from fatebridge.core.aa1996_solar import MODEL_ID as AA1996_SOLAR_MODEL
+from fatebridge.core.de441_solar import MODEL_ID as DE441_SOLAR_MODEL
 from fatebridge.core.divination import BAGUA_BY_NAME
-from fatebridge.core.moshier_solar import MODEL_ID as COMPLETE_MOSHIER_SOLAR_MODEL
 from fatebridge.core.vsop2013_solar import MODEL_ID as VSOP2013_SOLAR_MODEL
 
 from .bazhai_interpretation import palace_star_relationship, you_nian_trace
@@ -130,8 +130,8 @@ def minggua(req: MingguaRequest, subject_id: str = "occupant") -> Dict[str, Any]
                     "moshier"
                     if policy["ephemeris_model"] == "moshier"
                     else (
-                        "complete_moshier_solar"
-                        if policy["ephemeris_model"] == COMPLETE_MOSHIER_SOLAR_MODEL
+                        "de441_solar"
+                        if policy["ephemeris_model"] == DE441_SOLAR_MODEL
                         else (
                             "vsop2013_solar"
                             if policy["ephemeris_model"] == VSOP2013_SOLAR_MODEL

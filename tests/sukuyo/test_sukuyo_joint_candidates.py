@@ -1,6 +1,8 @@
 """Shared rule uncertainty must not be mistaken for independent birth inputs."""
 
+import json
 from copy import deepcopy
+from pathlib import Path
 
 import pytest
 
@@ -314,13 +316,30 @@ def test_native_joint_reading_identifies_actual_modern_calendar_backend_and_sour
 
 
 def test_native_joint_source_explains_active_sat_capture_and_five_apparatus_notes():
-    text = pair()["summary"]
+    result = pair()
+    text = result["summary"]
+    original = json.loads(
+        (
+            Path(__file__).parents[1] / "data/sukuyo-t2465-downloaded-primary.json"
+        ).read_text()
+    )
+    capture = result["rulesets"]["calendar"]["hinoo_addendum"][
+        "downloaded_primary_edition"
+    ]
+    assert capture["source_url"] == original["source_url"]
+    assert (
+        capture["retrieved_at_response_header_utc"]
+        == original["retrieved_at_response_header_utc"]
+    )
+    assert (
+        capture["publisher_html_response_bytes"]
+        == original["publisher_html_response_bytes"]
+    )
     for necessary in (
         "实慧《桧尾口诀》",
         "T2465_.78.0030c13-21",
         "T2465_.78.0030c21-26",
         "SAT完整HTML",
-        "74c63f5151c2b8c3ac554f7a0acae0776e5247e740a712834e1b600a065050e6",
         "历史缓存",
         "建久六年",
         "寶暦十一年",

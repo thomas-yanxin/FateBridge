@@ -7,8 +7,6 @@ import pytest
 from scripts.astrodice.astrodice_swe_coefficients import PackedFile, crc32_msb, evaluate
 from scripts.astrodice.verify_astrodice_swe_coefficients import reflected_crc
 
-RUN = Path("tests/data/astrodice/reference_sets/study-compressed-tail")
-
 
 def test_crc_matches_independent_known_bzip2_vector():
     assert crc32_msb(b"123456789") == reflected_crc(b"123456789") == 0xFC891918

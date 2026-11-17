@@ -16,9 +16,11 @@ from fatebridge.core.human_design_solar_lattice import (
     lattice_times,
 )
 
-ROOT_POLICY = "minimum_absolute_exact_residual_then_earlier_TT"
+ROOT_POLICY = (
+    "minimum_absolute_exact_residual_over_observed_forward_contacts_then_earlier_TT"
+)
 SOLAR_COORDINATE_POLICY = "same_apparent_ecliptic_date_SPEED_flags_as_activations_v1"
-ROOT_SCOPE = "最终二进制TT端点与求根太阳函数的数值见证；不认证物理时刻精度、出生钟、连续坐标误差界或其他天体在根区间中的细分稳定性。"
+ROOT_SCOPE = "初始括区及其有限邻点中按精确残差、较早TT选择正到负括区或零点，保留最终二进制TT端点见证；不认证未观测区域的最优性、物理时刻精度、出生钟、连续坐标误差界或其他天体在根区间中的细分稳定性。"
 
 
 def solar_residual(birth_sun: float, design_sun: float) -> Fraction:
@@ -55,7 +57,6 @@ def solve_solar_root(birth_tt: float, sun: Callable[[float], float]) -> dict[str
             lo = mid
         else:
             hi = mid
-    selected = min((lo, hi), key=lambda tt: (abs(evaluate(tt)[1]), tt))
 
     def row(tt: float) -> dict[str, Any]:
         longitude, residual = evaluate(tt)
@@ -79,6 +80,12 @@ def solve_solar_root(birth_tt: float, sun: Callable[[float], float]) -> dict[str
             for tt in lattice_times(lo, hi)
         ],
     )
+    contact = lattice["preferred_numeric_contact"]
+    # The initial forward bracket or exact zero is always among these contacts.
+    assert contact is not None
+    lo = lattice["samples"][contact["lower_index"]]["jd_tt"]
+    hi = lattice["samples"][contact["upper_index"]]["jd_tt"]
+    selected = lattice["samples"][contact["selected_index"]]["jd_tt"]
 
     return {
         "design_jd_tt": selected,
@@ -86,7 +93,7 @@ def solve_solar_root(birth_tt: float, sun: Callable[[float], float]) -> dict[str
         "bracket_width_seconds": (hi - lo) * 86400,
         "iterations": iterations,
         "numerical_precision": {
-            "method_id": "human_design_adjacent_float_solar_root_v1",
+            "method_id": "human_design_observed_contact_solar_root_v2",
             "local_solar_lattice": lattice,
             "local_solar_lattice_summary": lattice_summary(lattice),
             "birth_sun_longitude": birth_sun,

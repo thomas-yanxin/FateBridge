@@ -92,7 +92,7 @@ def test_calculate_birth_route_executes_service_via_threadpool(monkeypatch):
         captured["func"] = func
         captured["args"] = args
         captured["kwargs"] = kwargs
-        return {"status": "ok"}
+        return func(*args, **kwargs)
 
     monkeypatch.setattr(api_module, "run_in_threadpool", fake_run_in_threadpool)
 
@@ -111,7 +111,7 @@ def test_calculate_birth_route_executes_service_via_threadpool(monkeypatch):
 
     result = asyncio.run(calculate_birth(request))
 
-    assert result["status"] == "ok"
+    assert result["analysis_type"] == "八字命盘"
     assert result["run_metadata"]["tool_name"] == "bazi_birth"
     assert result["run_metadata"]["engine"] == "fatebridge-offline"
     assert result["run_metadata"]["run_id"]

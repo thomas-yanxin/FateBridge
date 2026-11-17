@@ -35,7 +35,7 @@ def test_explicit_lmt_native_and_periods_equal_the_known_civil_instant():
 
 import hashlib
 import json
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 from pathlib import Path
 
 import pytest

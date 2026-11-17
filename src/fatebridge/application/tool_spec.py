@@ -49,8 +49,6 @@ class ToolSpec:
     mcp_name: Optional[str] = None
     cpu_bound: bool = False
     include_snapshot_text: bool = True
-    error_is_fatal: Optional[Callable[[ServiceResult], bool]] = None
-    rest_error_label: Optional[str] = None
     metadata_name: Optional[str] = None
     output_model: Optional[Type[BaseModel]] = None
     # Complete service results are validated before projection. Public output

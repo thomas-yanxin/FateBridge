@@ -2,9 +2,10 @@
 
 from typing import Any
 
+from fatebridge.core.qimen_sources import YANYI_VOLUMES
 from fatebridge.core.qimen_three_deceptions import GODS
 
-SOURCE = "https://zh.wikisource.org/w/index.php?oldid=625940"
+SOURCE = YANYI_VOLUMES[2]
 PROFILE_ID = "yanyi_vol2_five_jia_four_triples_human_unresolved_v1"
 DEFINITIONS = [
     ("heaven_jia", "天假", "景门", "乙丙丁", "九天"),
@@ -36,6 +37,8 @@ def describe_five_jia() -> dict[str, Any]:
             "rule_id": "human_jia",
             "name": "人假",
             "printed_clause": "若惊门合六合下临九天宫名曰人假",
+            "required_door": "惊门",
+            "printed_clause_match_scope": "无惊门的宫不满足所引条文；见惊门仍须裁定六合身份及盘层。",
             "status": "unresolved_liuhe_identity_and_layer",
             "adopted_match": None,
             "literal_eight_gods_reading": "六合与九天不能同时作为同一宫单一八神层的神；这不证明人假不存在",
@@ -107,6 +110,7 @@ def five_jia_context(
         "human_jia": {
             "status": "unresolved_liuhe_identity_and_layer",
             "adopted_match": None,
+            "printed_clause_match": None if door == "惊门" else False,
             "unadopted_ji_stem_candidate_observed": "己" in heaven_stems
             and door == "惊门"
             and god == "九天",

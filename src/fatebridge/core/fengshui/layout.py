@@ -58,6 +58,7 @@ def _summarize_layout_progress(
     progress_counts = dict(supported=0, confirmed_unsupported=0, unknown=0)
     progress_actions: List[Dict[str, Any]] = []
     progress_pending: List[Dict[str, Any]] = []
+    limited = supplements["annual_remedies"]["status"] == "unsupported_year"
     constraints = {c.object_id: c for c in req.layout_constraints}
     surface = supplements.get("surface_analysis")
     if surface is not None:
@@ -282,7 +283,6 @@ def _summarize_layout_progress(
             )
             progress_actions.append({"status": action_status, "optional": True})
             progress_pending.extend(action_pending)
-    limited = supplements["annual_remedies"]["status"] == "unsupported_year"
     if environmental_context is not None:
         for state, count in environmental_context["rule_coverage_counts"].items():
             progress_counts[state] += count
@@ -777,7 +777,7 @@ def analyze_layout(req: AssessRequest, layers: Dict[str, Any]) -> Dict[str, Any]
     if req.environmental_context is not None:
         if req.environmental_context.interior_relations:
             extra_reviews["interior_analysis"] = analyze_interior_relations(
-                req.environmental_context, req.layout_constraints
+                req.environmental_context.interior_relations, req.layout_constraints
             )
         if req.environmental_context.material_facts:
             extra_reviews["material_analysis"] = analyze_material_facts(

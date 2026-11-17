@@ -162,9 +162,16 @@ def test_cached_primary_passage_hash_is_explicitly_not_a_full_source_hash():
     assert "12:00" in " ".join(cached["reading_notes"])
 
 
-def test_public_schema_declares_captured_profile_and_host_fingerprints():
+def test_public_schema_keeps_source_citations_without_internal_fingerprints():
     for key in ["suzhan", "sukuyo_compatibility"]:
         spec = next(s for s in CATALOG if s.key == key)
         defs = spec.output_model.model_json_schema()["$defs"]
-        assert "source_bundle_sha256" in defs["SukuyoCalendarProfile"]["properties"]
-        assert "source_bundle_sha256" in defs["SukuyoFullmoonCalculation"]["properties"]
+        assert "source_bundle_sha256" not in defs["SukuyoCalendarProfile"]["properties"]
+        host_properties = defs["SukuyoFullmoonCalculation"]["properties"]
+        assert "source_bundle_sha256" not in host_properties
+        assert {
+            "ruleset_id",
+            "source_url",
+            "direct_locator",
+            "shortcut_locator",
+        } <= set(host_properties)

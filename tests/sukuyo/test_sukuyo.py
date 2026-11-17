@@ -10,14 +10,15 @@ import pytest
 
 from fatebridge.core.sukuyo import (
     MONTH_STARTS,
-    RELATION_TEMPLATE,
     SU27_ORDER,
     calendar_mansion,
     day_evidence,
     lunar_mansion,
+)
+from fatebridge.core.sukuyo_relations import (
+    RELATION_TEMPLATE,
+    normalize_mansion,
     relation_between_su27,
-    su28_to_su27,
-    sukuyo_relation,
 )
 from fatebridge.services.divination import (
     calculate_sukuyo_compatibility,
@@ -58,16 +59,10 @@ def test_all_729_directed_relations_and_reverse_pairs():
             assert forward["sequence_group"] == forward["offset"] // 9 + 1
 
 
-@pytest.mark.parametrize("longitude", [None, 104, 114, float("nan")])
-def test_niu_cannot_be_assigned_by_an_invented_longitude_rule(longitude):
-    with pytest.raises(ValueError, match="农历月日"):
-        su28_to_su27("牛", longitude)
-
-
 def test_shared_names_and_traditional_aliases():
-    assert su28_to_su27("胃") == "胃"
-    assert su28_to_su27("畢") == "毕"
-    assert sukuyo_relation("斗", "胃")["relation"] == "親"
+    assert normalize_mansion("胃") == "胃"
+    assert normalize_mansion("畢") == "毕"
+    assert relation_between_su27("斗", "胃")["relation"] == "親"
     with pytest.raises(ValueError):
         relation_between_su27("牛", "胃")
 
@@ -193,7 +188,9 @@ def test_published_calendar_corrections_change_the_mansion_input(civil, expected
 
 
 def test_suzhan_exposes_calendar_evidence_and_default_equatorial_research_model():
-    r = calculate_suzhan_analysis(date="2025-03-04", time="12:00:00", zone="+08:00")
+    r = calculate_suzhan_analysis(
+        lat="31n13", lon="121e28", date="2025-03-04", time="12:00:00", zone="+08:00"
+    )
     assert r["sukuyo"]["day_mansion"] == "毕"
     assert r["sukuyo"]["nature"] == "安重"
     assert r["sukuyo"]["weekday"]["luminary"] == "火"
@@ -237,7 +234,11 @@ def test_personal_sanjiu_day_preserves_upper_lower_ye_conflict():
     assert "皆吉祥" in r["personal_day"]["upper_volume"]["meaning"]
     assert "不成就" in r["personal_day"]["lower_volume_variant"]["meaning"]
     r = calculate_suzhan_analysis(
-        date="2025-03-04", time="12:00:00", natal_mansion="女"
+        lat="31n13",
+        lon="121e28",
+        date="2025-03-04",
+        time="12:00:00",
+        natal_mansion="女",
     )
     assert r["sukuyo"]["personal_day"]["textual_conflict"] is True
 
@@ -294,7 +295,12 @@ def test_suzhan_guolao_mode_loads_bundled_stars_with_operator_ephemeris_env(
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
     ephemeris_runtime.configure_ephemeris_path(str(tmp_path))
     result = calculate_suzhan_analysis(
-        date="2025-03-04", time="12:00:00", zone="+08:00", szchart=1
+        lat="31n13",
+        lon="121e28",
+        date="2025-03-04",
+        time="12:00:00",
+        zone="+08:00",
+        szchart=1,
     )
     assert "error" not in result, result
     assert result["chart"]["ok"] is True

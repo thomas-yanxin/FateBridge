@@ -16,7 +16,11 @@ from typing import Any, Callable
 
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.ephemeris import _swisseph_planet_state
-from fatebridge.core.astro.geometry import native_lahiri_ayanamsha, normalize_angle
+from fatebridge.core.astro.geometry import (
+    Angle,
+    native_lahiri_ayanamsha,
+    normalize_angle,
+)
 from fatebridge.core.astro.physical_epoch import utc_from_tt
 from fatebridge.core.astro.physical_sources import (
     PhysicalEphemerisTrace,
@@ -33,7 +37,7 @@ Sampler = Callable[[str, float], State]
 Bracket = tuple[float, float]
 
 
-def _step(a: float, b: float) -> Fraction:
+def _step(a: Angle, b: Angle) -> Fraction:
     return (Fraction(b) - Fraction(a) + 180) % 360 - 180
 
 
@@ -141,7 +145,7 @@ def solve_planetary_events(
     def crossings(
         a: float,
         b: float,
-        longitude: Callable[[float], float],
+        longitude: Callable[[float], Angle],
         rate: Callable[[float], float],
         rays: tuple[int, ...],
         kind: str,
@@ -217,8 +221,15 @@ def solve_planetary_events(
             )
         for first, second in itertools.combinations(bodies, 2):
 
-            def relative_longitude(t: float, p: str = first, q: str = second) -> float:
-                return (sample(p, t)["longitude"] - sample(q, t)["longitude"]) % 360
+            def relative_longitude(
+                t: float, p: str = first, q: str = second
+            ) -> Fraction:
+                # Preserve the supplied coordinates through subtraction and
+                # wrapping; a rounded relative angle can invent an exact root.
+                return (
+                    Fraction(sample(p, t)["longitude"])
+                    - Fraction(sample(q, t)["longitude"])
+                ) % 360
 
             def relative_rate(t: float, p: str = first, q: str = second) -> float:
                 return sample(p, t)["speed"] - sample(q, t)["speed"]
@@ -256,7 +267,8 @@ def native_planetary_events(subject: Any) -> dict[str, Any]:
     selected = configured_ephemeris_path()
     trace = PhysicalEphemerisTrace()
     models: dict[str, str] = {}
-    motion_contexts: dict[float, dict[str, Any]] = {}
+    question_tt = getattr(subject, "julian_day_tt", None)
+    question_motion: dict[str, Any] = {}
     failed_sample: dict[str, Any] = {}
     question_states: dict[str, State] = {}
     sidereal = getattr(subject, "zodiac_type", None) == "Sidereal"
@@ -273,7 +285,9 @@ def native_planetary_events(subject: Any) -> dict[str, Any]:
                 planet,
                 julian_day_tt=at,
                 source_trace=trace,
-                motion_metadata=motion_contexts.setdefault(at, {}),
+                # Only the question-epoch policy is published. Search samples
+                # retain their corrected states, without retaining every policy.
+                motion_metadata=question_motion if at == question_tt else None,
             )
         except EphemerisSourceError as error:
             if error.reason == "position_motion_not_converged":
@@ -316,7 +330,7 @@ def native_planetary_events(subject: Any) -> dict[str, Any]:
             raise ValueError(
                 "Native question zodiac frame is unavailable or unsupported"
             )
-        at = getattr(subject, "julian_day_tt", None)
+        at = question_tt
         if at is None:
             raise ValueError("Native question TT is unavailable")
         for planet in BODIES:
@@ -333,7 +347,7 @@ def native_planetary_events(subject: Any) -> dict[str, Any]:
         result["physical_ephemeris_source"] = trace.finish()
         result["ephemeris_reference_points"] = ephemeris_reference_points(models, [])
         result["longitude_motion"] = {
-            **motion_contexts[at],
+            **question_motion,
             "display_frame": (
                 "sidereal_lahiri" if sidereal else "tropical_true_ecliptic_of_date"
             ),
@@ -364,7 +378,7 @@ def native_planetary_events(subject: Any) -> dict[str, Any]:
             "question_states": question_states,
             "physical_ephemeris_source": trace.finish(),
             "ephemeris_reference_points": ephemeris_reference_points(models, []),
-            "longitude_motion": motion_contexts.get(at, {}) if at is not None else {},
+            "longitude_motion": question_motion,
             "unavailable_reason": str(error),
             "unavailable_code": error.reason,
             "failed_sample": failed_sample,

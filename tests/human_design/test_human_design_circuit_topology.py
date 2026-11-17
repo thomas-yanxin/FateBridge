@@ -1,7 +1,6 @@
 """Direct source observations, all-channel completion and reading fidelity."""
 
 import hashlib
-import json
 from copy import deepcopy
 from pathlib import Path
 

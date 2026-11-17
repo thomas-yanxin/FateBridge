@@ -15,8 +15,6 @@ from fatebridge.core.astro import runtime
 from fatebridge.core.astro.continuous_lahiri import (
     COEFFICIENT_SHA256,
     METHOD_ID,
-    cross,
-    dot,
     project_state,
 )
 from fatebridge.core.astro.lunar_motion import SOURCE_VERSION
@@ -24,6 +22,10 @@ from fatebridge.core.astro.motion_source_window import observed_windows
 from fatebridge.core.astro.native_identity import binding_distribution_version
 from fatebridge.core.astro.physical_sources import PhysicalEphemerisTrace
 from fatebridge.core.astro.reference import PLANET_SWISSEPH_IDS
+from fatebridge.core.astro.reference_frames import (
+    cross,
+    dot,
+)
 from fatebridge.core.ephemeris_runtime import (
     configured_ephemeris_path,
     configured_jpl_file,

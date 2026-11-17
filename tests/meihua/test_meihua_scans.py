@@ -1,5 +1,6 @@
 """Missing classical object-count method, raw hours and visible ambiguity."""
 
+import hashlib
 import json
 import shutil
 from pathlib import Path
@@ -9,7 +10,11 @@ from pydantic import ValidationError
 
 from fatebridge.core.requests.meihua import MeihuaCastRequest
 from fatebridge.services.meihua import calculate_meihua_cast
-from fatebridge.validation.meihua_scans import audit_scanned_rules, reference_bundle
+from fatebridge.validation.meihua_scans import (
+    audit_scanned_rules,
+    read_frozen_artifact,
+    reference_bundle,
+)
 
 REFERENCES = Path(__file__).parents[1] / "fixtures/meihua_scan_v1"
 CASES = json.loads((REFERENCES / "object-count-cases.json").read_text())["cases"]
@@ -142,5 +147,64 @@ def test_changed_scan_or_manual_expected_answer_invalidates_the_frozen_bundle(tm
     shutil.copytree(REFERENCES, target)
     p = target / "object-count-cases.json"
     p.write_text(p.read_text() + " ")
-    with pytest.raises(ValueError, match="Frozen scan reference changed"):
+    with pytest.raises(ValueError, match="Frozen artifact changed"):
         reference_bundle(target)
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        None,
+        "outside",
+        "other_shared_scan",
+        "other_registered_scan",
+        "changed",
+        "rehashed",
+        "redirected",
+    ],
+)
+def test_shared_scan_reader_keeps_canonical_path_and_original_bytes(tmp_path, mutation):
+    target = tmp_path / "tests/fixtures/meihua_scan_v1"
+    scan = target / "sources/nlc-1925.pdf"
+    scan.parent.mkdir(parents=True)
+    original = (REFERENCES / "sources/nlc-1925.pdf").read_bytes()
+    digest = "af608094ab11ae209eae91a9365565e7c9cff604aac3da5e753e04d1cc4598c0"
+    shared = (
+        tmp_path
+        / "tests/data/shared_sources/fixtures/meihua_closure_v1/sources/nlc-1925.pdf"
+    )
+    shared.parent.mkdir(parents=True)
+    shared.write_bytes(original)
+    destination = shared
+    if mutation == "other_registered_scan":
+        destination = (
+            tmp_path
+            / "tests/data/shared_sources/data/ziwei_independent/calendar_1900_sources_v1/tam/sources/tam-1900.pdf"
+        )
+        destination.parent.mkdir(parents=True)
+        destination.write_bytes(
+            (REFERENCES.parent / "meihua_calendar_v2/sources/tam-1900.pdf").read_bytes()
+        )
+        digest = hashlib.sha256(destination.read_bytes()).hexdigest()
+    elif mutation in {"outside", "other_shared_scan", "redirected"}:
+        other = (
+            shared.with_name("unregistered.pdf")
+            if mutation == "other_shared_scan"
+            else tmp_path / "outside.pdf"
+        )
+        other.write_bytes(original)
+        if mutation == "redirected":
+            shared.unlink()
+            shared.symlink_to(other)
+        else:
+            destination = other
+    elif mutation in {"changed", "rehashed"}:
+        shared.write_bytes(original + b"changed")
+        if mutation == "rehashed":
+            digest = hashlib.sha256(shared.read_bytes()).hexdigest()
+    scan.symlink_to(destination)
+    if mutation is None:
+        assert read_frozen_artifact(target, "sources/nlc-1925.pdf", digest) == original
+    else:
+        with pytest.raises(ValueError, match="escapes|Frozen artifact changed"):
+            read_frozen_artifact(target, "sources/nlc-1925.pdf", digest)

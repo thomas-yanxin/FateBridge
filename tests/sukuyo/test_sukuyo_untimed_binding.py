@@ -60,7 +60,9 @@ def test_rejects_invalid_date_only_layer_before_projection(untimed, fault):
 def test_correct_unknown_layers_validate_and_known_clock_still_requires_chart(untimed):
     request, result = untimed
     validate_output(SPEC, result, request=request)
-    request = request.model_copy(update={"time": "09:00:00"})
+    request = request.model_copy(
+        update={"time": "09:00:00", "lat": "31n13", "lon": "121e28"}
+    )
     known = build_suzhan_result(**request.model_dump())
     validate_output(SPEC, known, request=request)
     known["chart"] = None
@@ -71,7 +73,9 @@ def test_correct_unknown_layers_validate_and_known_clock_still_requires_chart(un
 @pytest.fixture(scope="module")
 def timed(untimed):
     request, _ = untimed
-    request = request.model_copy(update={"time": "09:00:00"})
+    request = request.model_copy(
+        update={"time": "09:00:00", "lat": "31n13", "lon": "121e28"}
+    )
     return request, build_suzhan_result(**request.model_dump())
 
 

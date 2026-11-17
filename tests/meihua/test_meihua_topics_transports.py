@@ -1,7 +1,5 @@
 """Topic-specific source facts, strict projections and same-run paging on all surfaces."""
 
-import hashlib
-import json
 import sys
 from pathlib import Path
 
@@ -10,9 +8,11 @@ from fastmcp import Client
 from fastmcp.client.transports import StdioTransport
 
 from fatebridge.application.examples import suggested_fields
+from fatebridge.core.public_output import same_public_value
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.divination import calculate_meihua_analysis
 from fatebridge.services.meihua import calculate_meihua_cast
+from tests.fixtures.mcp_result_delivery import read_full_result
 from tests.support.transports import SPECS, call_cli, rest
 
 FIELD = "interpretation.topic_reading"
@@ -400,7 +400,9 @@ async def test_topic_facts_and_candidates_agree_on_three_transports(
     assert code == 0
     for output in [response.json(), reply.structured_content, cli]:
         for field in ["topic_reading", "casting_readings", "day_qi"]:
-            assert output["interpretation"][field] == domain["interpretation"][field]
+            assert same_public_value(
+                output["interpretation"][field], domain["interpretation"][field]
+            )
         assert output["summary"] == domain["summary"]
 
 
@@ -431,9 +433,9 @@ async def test_fresh_stdio_schemas_and_published_topic_cards(group, tmp_path):
                     raise_on_error=False,
                 )
                 assert not reply.is_error
-                assert (
-                    reply.structured_content["interpretation"]["topic_reading"]
-                    == calculate(tool, arguments)["interpretation"]["topic_reading"]
+                assert same_public_value(
+                    reply.structured_content["interpretation"]["topic_reading"],
+                    calculate(tool, arguments)["interpretation"]["topic_reading"],
                 )
 
 
@@ -461,36 +463,14 @@ async def test_4096_topic_projection_restores_full_field_and_same_run_candidates
         )
         assert not reply.is_error
         output = reply.structured_content
-        delivery = output["result_delivery"]
-        run = output["run_metadata"]["run_id"]
+        assert "result_delivery" in output
+        restored = await read_full_result(client, output)
         for field in [
             FIELD,
             "interpretation.casting_readings",
             "interpretation.day_qi",
         ]:
-            uri = f"fatebridge://results/{delivery['result_id']}/verified/{run}/{delivery['sha256']}/fields/{field}/0"
-            chunks = []
-            checksum = None
-            offset = 0
-            while uri:
-                page = json.loads((await client.read_resource(uri))[0].text)
-                assert page["path"] == field and page["offset"] == offset
-                assert (
-                    page["verification"]["run_id"] == run
-                    and page["verification"]["payload_sha256"] == delivery["sha256"]
-                )
-                assert page["verification"]["calculation_repeated"] is False
-                checksum = page["sha256"] if checksum is None else checksum
-                assert checksum == page["sha256"]
-                chunks.append(page["text"])
-                offset += len(page["text"])
-                following = page["next_offset"]
-                assert following is None or following == offset
-                uri = (
-                    uri.rsplit("/", 1)[0] + "/" + str(following)
-                    if following is not None
-                    else None
-                )
-            raw = "".join(chunks)
-            assert hashlib.sha256(raw.encode()).hexdigest() == checksum
-            assert json.loads(raw) == expected["interpretation"][field.split(".")[1]]
+            assert same_public_value(
+                restored["interpretation"][field.split(".")[1]],
+                expected["interpretation"][field.split(".")[1]],
+            )

@@ -3,17 +3,13 @@
 import json
 from pathlib import Path
 
+from tests.support.reference_data import resolve
+
 FOLDER = Path(__file__).parents[1] / "fixtures/meihua_dining_v1"
 PROFILE = json.loads((FOLDER / "profile.json").read_bytes())
 GEOMETRY = json.loads((FOLDER / "geometry384-expected.json").read_bytes())
 EXPECTED = {(r["code"], r["line"]): r for r in GEOMETRY}
 CASES = json.loads((FOLDER / "cases4992.json").read_bytes())
-
-
-def resolve(value, path):
-    for key in path.split("."):
-        value = value[int(key)] if isinstance(value, list) else value[key]
-    return value
 
 
 def validate_layer(result, cast, layer, clause, prefix, line):

@@ -54,12 +54,16 @@ def civil_datetime(
     hour: int,
     minute: int,
     calendar: str = "proleptic_gregorian",
+    *,
+    second: int = 0,
 ) -> tuple[datetime, dict[str, Any]]:
     """Preserve the supplied wall clock; timezone is applied by the chart builder."""
     converted = gregorian_date(year, month, day, calendar)
-    if any(type(v) is not int for v in (hour, minute)):
+    if any(type(v) is not int for v in (hour, minute, second)):
         raise ValueError("Civil clock parts must be integers")
-    moment = datetime(converted.year, converted.month, converted.day, hour, minute)
+    moment = datetime(
+        converted.year, converted.month, converted.day, hour, minute, second
+    )
     return moment, _calendar_conversion_receipt(
         year,
         month,
@@ -69,6 +73,7 @@ def civil_datetime(
         calendar,
         converted.toordinal() + GREGORIAN_ORDINAL_TO_JDN,
         moment,
+        second=second,
     )
 
 
@@ -81,6 +86,8 @@ def _calendar_conversion_receipt(
     calendar: str,
     jdn: int,
     normalized_label: datetime | None,
+    *,
+    second: int = 0,
 ) -> dict[str, Any]:
     """Date stage only; a raw hour label may still need origin normalization."""
     try:
@@ -91,7 +98,7 @@ def _calendar_conversion_receipt(
         "method_id": "explicit_ce_civil_calendar_integer_v1",
         "input_calendar": calendar,
         "input_date": {"year": year, "month": month, "day": day},
-        "input_clock": {"hour": hour, "minute": minute},
+        "input_clock": {"hour": hour, "minute": minute, "second": second},
         "normalized_calendar": "proleptic_gregorian",
         "normalized_local_datetime": (
             normalized_label.isoformat() if normalized_label else None

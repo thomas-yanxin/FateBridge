@@ -119,3 +119,66 @@ def test_no_recipient_station_or_a_strictly_later_one_preserves_selected_pattern
     assert len(result["refranation_patterns"]) == 1
     assert result["refranation_patterns"][0]["applicant"] == "Mars"
     assert result["full_original_text_acceptance"] is False
+
+
+@pytest.mark.parametrize("reverse_roles", [False, True])
+@pytest.mark.parametrize("unresolved_kind", ["tangent", "continuous"])
+@pytest.mark.parametrize(
+    "location", ["past", "question", "before", "touching", "after"]
+)
+@pytest.mark.parametrize("principal_pair", [False, True])
+def test_unresolved_principal_contact_must_be_after_the_refranation_station(
+    controlled_history, reverse_roles, unresolved_kind, location, principal_pair
+):
+    history, states = controlled_history
+    station = history["events"][0]
+    epoch = history["question_julian_day_tt"]
+    if location == "past":
+        left, right = epoch - 2, epoch - 1
+    elif location == "question":
+        left, right = epoch, math.nextafter(epoch, math.inf)
+    elif location == "before":
+        left = right = epoch + 1
+    elif location == "touching":
+        left = station["root_bracket_tt"][1]
+        right = math.nextafter(left, math.inf)
+    else:
+        left = right = math.nextafter(station["root_bracket_tt"][1], math.inf)
+    actors = ["Mars", "Saturn"] if principal_pair else ["Mercury", "Venus"]
+    if unresolved_kind == "continuous":
+        history["unresolved_intervals"] = [
+            dict(
+                kind="continuous_exact_contact",
+                bodies=actors,
+                interval_tt=[left, right],
+            )
+        ]
+    else:
+        history["events"].append(
+            dict(
+                kind="contact",
+                bodies=actors,
+                root_bracket_tt=[left, right],
+                julian_day_tt=(left + right) / 2,
+                epoch_relation=(
+                    "past"
+                    if location == "past"
+                    else "question_boundary" if location == "question" else "future"
+                ),
+                topology="relative_station_contact_unresolved",
+                aspect="conjunction",
+            )
+        )
+        history["events"].sort(key=lambda event: event["julian_day_tt"])
+    roles = ("Saturn", "Mars") if reverse_roles else ("Mars", "Saturn")
+    result = evaluate_event_paths(history, *roles, "day", states, _applying_aspect)
+    blocked = principal_pair and location in {"question", "before", "touching"}
+    assert len(result["refranation_patterns"]) == (0 if blocked else 1)
+    direct = next(path for path in result["paths"] if path["mode"] == "direct")
+    condition = next(
+        c
+        for c in direct["conditions"]
+        if c["code"] == "no_selected_refranation_pattern"
+    )
+    assert condition["passed"] is (None if blocked else False)
+    assert result["full_original_text_acceptance"] is False

@@ -3,7 +3,6 @@
 import asyncio
 import json
 from itertools import product
-from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
@@ -283,12 +282,7 @@ def test_calendar_invalid_analysis_clocks_are_rejected(monkeypatch, capsys, spec
         assert "分析钟时" in output["error"]
 
 
-def test_default_firdaria_payload_matches_existing_frozen_dates_and_structure():
-    snapshot = json.loads(
-        (
-            Path(__file__).parents[1] / "fixtures" / "firdaria-default-regression.json"
-        ).read_text()
-    )
+def test_default_firdaria_payload_matches_independent_utc_clock_and_declares_basis():
     implicit = calculate_timing_tool("firdaria", **western_payload())
     explicit = calculate_timing_tool(
         "firdaria",
@@ -296,8 +290,9 @@ def test_default_firdaria_payload_matches_existing_frozen_dates_and_structure():
         firdaria_night_order="nodes_at_end",
         firdaria_year_basis="fixed_365_2425",
     )
-    # No ephemeris float comparison: these are full time-lord payloads only.
-    assert implicit["firdaria"] == explicit["firdaria"] == snapshot["firdaria"]
+    # Actual Temporal computes the clocks; the old fixture supplies labels only.
+    expected = VECTORS["third_party"]["default_reference"]["firdaria"]
+    assert implicit["firdaria"] == explicit["firdaria"] == expected
 
 
 @pytest.mark.parametrize("spec", TOOLS, ids=lambda spec: spec.key)

@@ -1,7 +1,6 @@
 """Solar event enumeration must not drop a second rise in one UT1 date."""
 
 import json
-import math
 from pathlib import Path
 
 import pytest
@@ -9,6 +8,7 @@ import pytest
 from fatebridge.core.astro.birth import build_astro_birth_info
 from fatebridge.core.jyotish import build_india
 from fatebridge.core.jyotish_kala import solar_packet
+from tests.support.solar_events import fixed_crossings, solar_event
 
 REFERENCE = json.loads(
     (
@@ -51,169 +51,144 @@ def test_complete_event_list_against_independent_de421_skyfield_altitude_scan(ca
         )
 
 
-def mock_rise_calls(monkeypatch, solver):
-    """Replace event roots only; keep other managed calls and their spies."""
-    from fatebridge.core.astro import runtime
-
-    managed = runtime.ephemeris_call
-
-    def dispatch(name, *args, **kwargs):
-        if name == "rise_trans":
-            return solver(name, *args, **kwargs)
-        return managed(name, *args, **kwargs)
-
-    monkeypatch.setattr(runtime, "ephemeris_call", dispatch)
-
-
-def fake_solver(monkeypatch, rises, sets):
-    from fatebridge.core.astro import runtime
-
-    def next_event(name, cursor, body, flags, *args):
-        assert name == "rise_trans" and body == runtime.swe.SUN
-        sequence = rises if flags & runtime.swe.CALC_RISE else sets
-        event = next((t for t in sequence if t >= cursor), START + 9)
-        return 0, (event,)
-
-    mock_rise_calls(monkeypatch, next_event)
-    managed = runtime.ephemeris_call
-
-    def event_model(operation, *args, **kwargs):
-        # Enumeration consumes this managed seam. Fabricated native flags must
-        # not masquerade as real planet/Moon file coverage below that seam.
-        if operation == "calc_ut":
-            return (0.0,) * 6, runtime.swe.FLG_SWIEPH
-        return managed(operation, *args, **kwargs)
-
-    monkeypatch.setattr(runtime, "ephemeris_call", event_model)
-
-
 def test_second_event_and_exact_window_edges_without_shifting_returned_times(
     monkeypatch,
 ):
+    from fatebridge.core import jyotish_kala
+
     rises = [START, START + 0.999, START + 2.5, START + 8]
     sets = [START + 0.3, START + 1.2]
-    fake_solver(monkeypatch, rises, sets)
+    monkeypatch.setattr(
+        jyotish_kala, "solar_crossings_in_window", fixed_crossings(rises, sets)
+    )
     packet = solar_packet(START + 3.5, 0, 0, "auto")
-    pairs = [(e["kind"], e["julian_day_ut1"]) for e in packet["events"]]
-    assert pairs == sorted(
+    assert [(e["kind"], e["julian_day_ut1"]) for e in packet["events"]] == sorted(
         [("rise", t) for t in rises[:-1]] + [("set", t) for t in sets],
         key=lambda row: row[1],
     )
-    assert packet["enumeration"]["post_event_search_advance_seconds"] == 1
-    assert packet["fallback_event_count"] == 0
+    assert packet["enumeration"]["partition_hours"] == 24
+    assert all(
+        e["julian_day_tt"] == e["julian_day_ut1"] + 70 / 86400 for e in packet["events"]
+    )
 
 
 def test_polar_no_event_does_not_stop_later_daily_searches(monkeypatch):
-    from fatebridge.core.astro import runtime
+    from fatebridge.core import jyotish_kala
 
-    fake_solver(monkeypatch, [START + 1.3], [START + 1.7])
-    real = runtime.ephemeris_call
+    calls = []
+    real = fixed_crossings([START + 1.3], [START + 1.7])
 
-    def no_first_day(name, cursor, *args):
-        return (-2, (0.0,)) if cursor < START + 1 else real(name, cursor, *args)
+    def crossings(start, end, **kwargs):
+        calls.append((start, end))
+        return real(start, end, **kwargs)
 
-    mock_rise_calls(monkeypatch, no_first_day)
+    monkeypatch.setattr(jyotish_kala, "solar_crossings_in_window", crossings)
     packet = solar_packet(START + 3.5, 0, 80, "auto")
-    assert len(packet["no_event_searches"]) == 2
+    assert calls == [(START + day, START + day + 1) for day in range(8)]
+    assert len(packet["no_event_searches"]) == 14
     assert [e["julian_day_ut1"] for e in packet["events"]] == [START + 1.3, START + 1.7]
 
 
-def test_second_same_day_event_has_its_own_strict_backend_check(monkeypatch):
-    from fatebridge.core.astro import runtime
+def test_domain_strict_policy_failure_is_preserved(monkeypatch):
+    from fatebridge.core import jyotish_kala
 
-    fake_solver(monkeypatch, [START + 0.1, START + 0.9], [])
-    checked = []
+    failure = ValueError("require_data_files rejects event source")
 
-    def second_event_falls_back(jd, *args):
-        checked.append(jd)
-        model = runtime.swe.FLG_SWIEPH if jd == START + 0.1 else runtime.swe.FLG_MOSEPH
-        return (0.0,) * 6, model
+    def fail(start, end, **kwargs):
+        assert kwargs["ephemeris_policy"] == "require_data_files"
+        raise failure
 
-    managed = runtime.ephemeris_call
-
-    def checked_event(operation, *args, **kwargs):
-        if operation == "calc_ut":
-            return second_event_falls_back(*args)
-        return managed(operation, *args, **kwargs)
-
-    monkeypatch.setattr(runtime, "ephemeris_call", checked_event)
-    with pytest.raises(ValueError, match="require_data_files"):
+    monkeypatch.setattr(jyotish_kala, "solar_crossings_in_window", fail)
+    with pytest.raises(ValueError) as raised:
         solar_packet(START + 3.5, 0, 0, "require_data_files")
-    # Every enumerated event is checked independently at the managed boundary.
-    assert checked == [START + 0.1, START + 0.9]
+    assert raised.value is failure
 
 
-def test_automatic_backend_counts_include_second_same_day_event(monkeypatch):
-    from fatebridge.core.astro import runtime
-
-    fake_solver(monkeypatch, [START + 0.1, START + 0.9], [])
-    managed = runtime.ephemeris_call
-
-    def event_model(operation, *args, **kwargs):
-        if operation == "calc_ut":
-            model = (
-                runtime.swe.FLG_SWIEPH
-                if args[0] == START + 0.1
-                else runtime.swe.FLG_MOSEPH
-            )
-            return (0.0,) * 6, model
-        return managed(operation, *args, **kwargs)
-
-    monkeypatch.setattr(runtime, "ephemeris_call", event_model)
-    packet = solar_packet(START + 3.5, 0, 0, "auto")
-    assert packet["fallback_event_count"] == 1
-    assert packet["ephemeris_models"] == ["moshier", "swieph"]
-
-
-@pytest.mark.parametrize(
-    "result,value", [(-1, START), (1, START), (0, math.nan), (0, math.inf)]
-)
-def test_invalid_event_return_codes_or_values_are_not_admitted(
-    monkeypatch, result, value
+def test_actual_event_sources_are_retained_without_a_second_probe(
+    monkeypatch,
 ):
-    mock_rise_calls(monkeypatch, lambda *args: (result, (value,)))
-    with pytest.raises(ValueError, match="could not compute"):
-        solar_packet(START + 3.5, 0, 0, "auto")
+    from fatebridge.core import jyotish_kala
 
-
-def test_nonadvancing_solver_is_an_error_instead_of_a_duplicate_event(monkeypatch):
-    fake_solver(monkeypatch, [], [])
-    mock_rise_calls(monkeypatch, lambda *args: (0, (START,)))
-    with pytest.raises(ValueError, match="did not advance"):
-        solar_packet(START + 3.5, 0, 0, "auto")
-
-
-def test_pathological_backend_cannot_silently_truncate_or_loop_forever(monkeypatch):
-    fake_solver(monkeypatch, [], [])
-    mock_rise_calls(
-        monkeypatch,
-        lambda name, cursor, *args: (0, (cursor + 2 / 86400,)),
-    )
-    with pytest.raises(ValueError, match="enumeration limit exceeded"):
-        solar_packet(START + 3.5, 0, 0, "auto")
-
-
-def test_repeat_guard_survives_a_ut1_day_boundary(monkeypatch):
-    from fatebridge.core.astro import runtime
-
-    fake_solver(monkeypatch, [], [])
-    before_midnight = START + 1 - 0.25 / 86400
-    rounded_duplicate = START + 1 + 0.001 / 86400
-
-    def root_rounds_across_midnight(name, cursor, body, flags, *args):
-        if flags & runtime.swe.CALC_SET:
-            return 0, (START + 9,)
-        # Repeated searches can round one root to opposite sides of a date
-        # cut. The anti-repeat cursor must span that cut.
-        if cursor <= before_midnight:
-            return 0, (before_midnight,)
-        if cursor <= rounded_duplicate:
-            return 0, (rounded_duplicate,)
-        return 0, (START + 2.5 if cursor <= START + 2.5 else START + 9,)
-
-    mock_rise_calls(monkeypatch, root_rounds_across_midnight)
-    packet = solar_packet(START + 3.5, 0, 0, "auto")
-    assert [e["julian_day_ut1"] for e in packet["events"]] == [
-        before_midnight,
-        START + 2.5,
+    monkeypatch.setattr(jyotish_kala, "tt_from_ut1", lambda ut1: ut1 + 64 / 86400)
+    events = [
+        solar_event(START + 0.1, rising=True),
+        solar_event(START + 1.1, rising=True, model="moshier"),
     ]
+    monkeypatch.setattr(
+        jyotish_kala,
+        "solar_crossings_in_window",
+        lambda start, end, **kwargs: [
+            e for e in events if start <= e.julian_day_ut1 <= end
+        ],
+    )
+    monkeypatch.setattr(
+        jyotish_kala.runtime,
+        "ephemeris_call",
+        lambda *args, **kwargs: pytest.fail(
+            "Consume the event's verified source and TT"
+        ),
+    )
+    packet = solar_packet(START + 3.5, 0, 0, "auto")
+    assert packet["ephemeris_models"] == ["moshier", "swieph"]
+    assert set(packet["ephemeris_sources"]) == {"moshier", "swieph"}
+
+
+def test_solver_failure_cannot_masquerade_as_a_polar_no_event(monkeypatch):
+    from fatebridge.core import jyotish_kala
+
+    failure = RuntimeError("Solar crossing did not converge")
+
+    def fail(*args, **kwargs):
+        raise failure
+
+    monkeypatch.setattr(jyotish_kala, "solar_crossings_in_window", fail)
+    with pytest.raises(RuntimeError) as raised:
+        solar_packet(START + 3.5, 0, 0, "auto")
+    assert raised.value is failure
+
+
+def test_subsecond_arc_across_day_boundary_is_not_erased_by_a_repeat_cursor(
+    monkeypatch,
+):
+    from fatebridge.core import jyotish_kala
+
+    first = START + 1 - 0.25 / 86400
+    setting = START + 1
+    second = START + 1 + 0.001 / 86400
+    monkeypatch.setattr(
+        jyotish_kala,
+        "solar_crossings_in_window",
+        fixed_crossings([first, second], [setting]),
+    )
+    packet = solar_packet(START + 3.5, 0, 0, "auto")
+    assert [(e["kind"], e["julian_day_ut1"]) for e in packet["events"]] == [
+        ("rise", first),
+        ("set", setting),
+        ("rise", second),
+    ]
+
+
+@pytest.mark.parametrize("fraction_of_ulp", [-0.25, 0.0, 0.25])
+def test_physical_root_bracket_has_one_owner_at_a_daily_partition(
+    monkeypatch, fraction_of_ulp
+):
+    """An analytic linear height isolates ownership from ephemeris accuracy."""
+    import math
+
+    from fatebridge.core.astro import solar_events
+
+    boundary = START + 1
+    step = math.ulp(boundary)
+
+    def observe(ut1, *, definition, **kwargs):
+        altitude = (ut1 - boundary) - fraction_of_ulp * step
+        return solar_events.SolarObservation(
+            ut1, ut1 + 70 / 86400, altitude, (1.0, 0.0, 0.0), "swieph", 2, definition
+        )
+
+    monkeypatch.setattr(solar_events, "solar_observation", observe)
+    packet = solar_packet(boundary + 2.5, 0, 0, "auto")
+    assert len(packet["events"]) == 1
+    expected = math.nextafter(boundary, -math.inf) if fraction_of_ulp < 0 else boundary
+    assert packet["events"][0]["julian_day_ut1"] == expected
+    assert packet["events"][0]["kind"] == "rise"

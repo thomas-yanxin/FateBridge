@@ -251,7 +251,9 @@ def build_current_timing_state(
             combined_timing_pillars,
             strength_baseline=StrengthProjectionBaseline(
                 method_id=natal_assessment["method_id"],
-                strength_level=natal_assessment["strength_level"],
+                strength_level=birth_context.element_analysis["day_master"][
+                    "engineering_index"
+                ]["strength_level"],
                 numerical_label=natal_assessment["threshold_arithmetic"][
                     "numerical_label"
                 ],

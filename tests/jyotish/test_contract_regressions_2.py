@@ -59,20 +59,16 @@ def test_profile_rotation_point_and_meridian_project_across_all_surfaces(
     )
     profile = result["india"]["profile"]
     policy = profile["earth_rotation"]
-    assert policy["policy_id"] == "fatebridge_standard_rotation_v3"
+    assert policy["policy_id"] == "fatebridge_physical_earth_attitude_v6"
     assert policy["model_epoch_jd_tt"] == profile["julian_day_tt"]
     assert policy["model_epoch_jd_ut1"] == profile["julian_day_ut"]
     assert policy["measured_eop_applied"] is False
     assert 0 <= profile["local_apparent_sidereal_meridian_degrees"] < 360
-    if year == 2024:
-        assert policy["tt_argument_policy"] == "native_internal_sidereal_time_argument"
-        assert policy["sidereal_time_model"] == "Swiss_native"
-    else:
-        assert (
-            policy["tt_argument_policy"]
-            == "shared_default_DeltaT_minus1_before1960_SWIEPH_from1960"
-        )
-        assert policy["sidereal_time_model"] == "IERS2010_expression_Swiss_nutation"
+    assert (
+        policy["tt_argument_policy"]
+        == "shared_default_DeltaT_minus1_before1960_SWIEPH_from1960"
+    )
+    assert policy["sidereal_time_model"] == "IAU2006_2000A_CIO"
 
 
 @pytest.mark.parametrize("key", ["astro_india", "astro_chart"])
@@ -287,9 +283,9 @@ def test_second_rise_in_one_ut1_date_on_three_real_surfaces(monkeypatch, capsys,
     assert kala["components"]["dina_bala"]["ruler"] == "Mars"
     assert kala["components"]["hora_bala"]["ruler"] == "Mars"
     assert kala["components"]["tribhaga_bala"]["ruler"] == "Mercury"
-    assert kala["solar_events"]["enumeration"]["post_event_search_advance_seconds"] == 1
+    assert kala["solar_events"]["enumeration"]["partition_hours"] == 24
     assert any(
-        r["rule_id"] == "jyotish.solar_event_enumeration.v1"
+        r["rule_id"] == "jyotish.solar_event_enumeration.v2"
         for r in result["india"]["rule_trace"]
     )
 
@@ -506,7 +502,12 @@ def test_source_grid_boundary_errors_and_complete_files_across_surfaces(
     # Chart derivatives and the native birth grid must both retain an actual
     # missing-file model transition. Restoring coverage must compute the same
     # original birth epoch; a neighbor cannot substitute for this assertion.
-    reason = "model_changed"
+    # The narrower Vimshottari entry now reaches the shared solar-coordinate
+    # window before the full chart's native-motion check. Preserve that more
+    # specific source error on all three transports, rather than its old site.
+    reason = (
+        "coordinate_model_changed" if key == "astro_vimshottari" else "model_changed"
+    )
     for error in [rest.json(), json.loads(mcp.content[0].text), cli]:
         assert error["error_code"] == "ephemeris_source_inconsistent"
         assert error["issues"] == [{"path": "runtime.ephemeris_data", "code": reason}]

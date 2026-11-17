@@ -9,6 +9,7 @@ from fatebridge.core.hidden_carriers import (
     describe_hidden_targets,
     hidden_carrier_snapshot_lines,
 )
+from fatebridge.core.public_output import same_public_value
 from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
 from tests.bazi.test_bazi_timing_transports import INPUT as TIMING_INPUT
 from tests.bazi.test_bazi_year_contract import TOPICS
@@ -101,11 +102,14 @@ def test_published_hidden_target_view_on_available_protocols(
         assert {r["node_id"] for r in value} == set(principal_by_id)
         for row in value:
             # Common metadata and the existing pillar reconstruct every fact.
-            assert {
-                **reference,
-                "pillar": row["pillar"],
-                "targets": row["targets"],
-            } == describe_hidden_targets(*row["pillar"])
+            assert same_public_value(
+                {
+                    **reference,
+                    "pillar": row["pillar"],
+                    "targets": row["targets"],
+                },
+                describe_hidden_targets(*row["pillar"]),
+            )
             assert principal_by_id[row["node_id"]]["pillar"] == row["pillar"]
             assert (
                 principal_by_id[row["node_id"]]["effective_force_status"]

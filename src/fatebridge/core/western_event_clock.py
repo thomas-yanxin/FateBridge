@@ -74,8 +74,8 @@ def build_event_subject(
         raise ValueError("Unknown event clock basis")
     if local_datetime.tzinfo is not None:
         raise ValueError("Event input must be a naive wall-clock label")
-    if local_datetime.second or local_datetime.microsecond:
-        raise ValueError("Event clock input supports minute labels")
+    if local_datetime.microsecond:
+        raise ValueError("Event clock input supports whole-second labels")
     if clock_basis in SOLAR_BASES and timezone_name is not None:
         raise ValueError(
             "Solar event clock must omit timezone_name; no civil zone is applied"
@@ -116,7 +116,7 @@ def build_event_subject(
         )
         if solar is not None:
             # Native chart must use the very same physical axis as inversion.
-            assert expected_time is not None
+            assert expected_time is not None and expected_time.jd_tt is not None
             if (
                 abs(subject.julian_day - solar["julian_day_ut1"]) * 86400 > 0.0002
                 or abs(subject.julian_day_tt - expected_time.jd_tt) * 86400 > 0.0002
@@ -128,7 +128,7 @@ def build_event_subject(
             "method_id": METHOD,
             "input_clock_basis": clock_basis,
             "input_wall_datetime": local_datetime.isoformat(),
-            "input_granularity": "minute",
+            "input_granularity": "second",
             "input_timezone": timezone_name,
             "effective_civil_timezone": civil_zone,
             "timezone_selection_source": (
@@ -152,5 +152,5 @@ def build_event_subject(
             "input_clock_accuracy_certified": False,
             "solar_conversion": solar,
             "clock_chart_source_comparison": comparison,
-            "scope": "Normalized Gregorian minute labels; explicit civil/LMT/geocentric LAT convention. Before 1960 the UTC-named carrier denotes modeled UT1 labels, not atomic UTC. Numerical resolution does not establish original record accuracy. No regional clock, original author's convention, measured EOP or event outcome inferred.",
+            "scope": "Normalized Gregorian whole-second labels; omitted second defaults to0. Explicit civil/LMT/geocentric LAT convention. Before 1960 the UTC-named carrier denotes modeled UT1 labels, not atomic UTC. Numerical resolution does not establish original record accuracy. No regional clock, original author's convention, measured EOP or event outcome inferred.",
         }

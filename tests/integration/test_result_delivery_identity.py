@@ -1,3 +1,5 @@
+from fatebridge.utils.formatting import format_json_response
+
 """Essential receipt facts remain inline even when business needs paging."""
 
 import copy
@@ -54,7 +56,7 @@ def test_current_germany_result_keeps_receipt_and_same_run_facts(
     if not limit:
         assert result == original
         return
-    assert len(delivery._json(result, compact)) <= limit
+    assert len(format_json_response(result, compact=compact)) <= limit
     if "result_delivery" not in result:
         assert result == before
         return
@@ -76,7 +78,7 @@ def test_current_germany_result_keeps_receipt_and_same_run_facts(
     }
     assert omitted == deferred_business
     business = {k: v for k, v in before.items() if k != "run_metadata"}
-    if len(delivery._json(business, compact)) > limit:
+    if len(format_json_response(business, compact=compact)) > limit:
         assert omitted
 
 
@@ -148,7 +150,7 @@ def test_real_germany_receipt_and_same_run_fields_across_all_transports(
     cli = json.loads(capsys.readouterr().out)
     values = []
     for surface, value in [("rest", response.json()), ("mcp", protocol), ("cli", cli)]:
-        assert len(delivery._json(value)) <= limit
+        assert len(format_json_response(value)) <= limit
         reference = value["result_delivery"]
         full = reconstruct(store, reference["result_id"])
         assert_same_run_receipt(

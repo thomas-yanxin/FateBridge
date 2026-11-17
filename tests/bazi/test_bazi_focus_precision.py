@@ -13,6 +13,7 @@ from fatebridge.core.calendar import BaZiCalendar
 from fatebridge.core.classical_force import build_force_components
 from fatebridge.core.elements import ElementAnalysis
 from fatebridge.core.output_classical_force import ClassicalForceComponents
+from fatebridge.utils.civil_time import ZonedCalendar
 
 
 def chart(text):
@@ -41,7 +42,18 @@ def test_actual_case_body_seal_ratio_uses_unrounded_input_and_preserves_display(
     } == assessment["effective_elements"]
     assert parts["body"]["engineering_energy"] != float(body)
     assert assessment == before and assessment["strength_level"] == "弱"
-    assert set(force["classical_adjudication"].values()) == {"not_adjudicated"}
+    classical = force["classical_adjudication"]
+    assert classical["status"] == "not_adjudicated"
+    assert all(
+        classical[key] is None
+        for key in (
+            "body_strength",
+            "seal_weight",
+            "body_seal_relation",
+            "ordinary_fuyi_applicable",
+        )
+    )
+    assert classical["pending_conditions"]
     ClassicalForceComponents.model_validate(force)
 
 
@@ -103,7 +115,7 @@ def test_monthly_elapsed_seconds_use_physical_time_across_dst(monkeypatch):
     end = datetime(2024, 4, 4, tzinfo=zone)
 
     def term(name, moment):
-        return almanac.SolarTerm(name, moment, "", "")
+        return almanac.SolarTerm(name, ZonedCalendar.from_datetime(moment))
 
     monkeypatch.setattr(
         almanac,

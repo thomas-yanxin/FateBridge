@@ -6,6 +6,7 @@ import json
 import os
 from dataclasses import replace
 from datetime import datetime, timedelta, timezone
+from fractions import Fraction
 from pathlib import Path
 
 import pytest
@@ -17,7 +18,8 @@ import fatebridge.api as api
 from fatebridge.cli import run
 from fatebridge.core import guolao
 from fatebridge.core.astro.birth import build_astro_birth_info
-from fatebridge.core.astro.birth_clock import resolve_solar_birth_clock
+from fatebridge.core.astro.birth_clock import _sun_clock
+from fatebridge.core.guolao_clock import apparent_solar_clock
 from fatebridge.core.requests.astrology import (
     AstroChartPolyRequest,
     AstroGuolaoRequest,
@@ -26,6 +28,7 @@ from fatebridge.core.requests.astrology import (
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services import astrology
 from fatebridge.services.tool_catalog import CATALOG
+from fatebridge.utils.errors import EphemerisSourceError
 from tests.guolao.test_guolao_native_frames import fixed_moshier  # noqa:F401
 
 FIXTURE = Path(__file__).parents[1] / "fixtures/guolao-solar-input-integration-v1"
@@ -55,12 +58,67 @@ CASES = [
 SOLAR_REFERENCE = json.loads(
     (FIXTURE.parent / "jyotish-solar-input-reference.json").read_text()
 )
+FRAME_DATA = Path(__file__).parents[1] / "data/guolao/solar_input_frames_v1"
+FRAME_BYTES = (FRAME_DATA / "reference.json").read_bytes()
+FRAME_PROVENANCE = json.loads((FRAME_DATA / "provenance.json").read_text())
+assert hashlib.sha256(FRAME_BYTES).hexdigest() == FRAME_PROVENANCE["reference_sha256"]
+FRAME_REFERENCE = json.loads(FRAME_BYTES)
 
 
 def chart(args, **extra):
     return astrology.calculate_core_chart_analysis(
         **args, chart_variant="guolao_chart", **extra
     )
+
+
+@pytest.mark.parametrize("row", FRAME_REFERENCE["rows"], ids=lambda row: row["id"])
+def test_given_tt_ut1_solar_frame_and_clock_match_original_swiss_sofa_reference(
+    fixed_moshier, row
+):
+    actual = _sun_clock(row["julian_day_ut1"], _julian_day_tt=row["julian_day_tt"])
+    for field, expected in [
+        ("sun_apparent_right_ascension_degrees", row["physical_ra_degrees"]),
+        ("greenwich_apparent_sidereal_degrees", row["gast_degrees"]),
+    ]:
+        difference = abs((actual[field] - expected + 180) % 360 - 180) * 3600
+        assert difference <= FRAME_REFERENCE["gate_arcseconds"]
+    assert (
+        abs(
+            float(
+                Fraction(actual["equation_of_time_seconds"])
+                - Fraction(row["equation_of_time_seconds_exact"])
+            )
+        )
+        <= FRAME_REFERENCE["clock_gate_seconds"]
+    )
+    clock = apparent_solar_clock(
+        julian_day_ut1=row["julian_day_ut1"],
+        sun_right_ascension=actual["sun_apparent_right_ascension_degrees"],
+        greenwich_apparent_sidereal_degrees=actual[
+            "greenwich_apparent_sidereal_degrees"
+        ],
+        longitude=row["longitude"],
+        civil_datetime=datetime(2000, 1, 1, tzinfo=timezone.utc),
+    )
+    phase_difference = (
+        Fraction(clock["apparent_day_fraction_exact"])
+        - Fraction(row["apparent_day_fraction_exact"])
+        + Fraction(1, 2)
+    ) % 1 - Fraction(1, 2)
+    assert abs(float(phase_difference)) * 86400 <= FRAME_REFERENCE["clock_gate_seconds"]
+
+
+def test_lat_clock_rejects_native_ra_substituted_for_its_physical_frame_ray(
+    fixed_moshier,
+):
+    birth = build_astro_birth_info(**CASES[1], birth_clock_basis="local_apparent_solar")
+    raw = guolao.positions(birth)
+    assert guolao.solar_input_context(birth, raw) is not None
+    native_ra = raw["states"]["Sun"]["right_ascension"]
+    assert raw["solar_clock"]["sun_apparent_right_ascension"] != native_ra
+    raw["solar_clock"]["sun_apparent_right_ascension"] = native_ra
+    with pytest.raises(EphemerisSourceError, match="Birth-clock conversion"):
+        guolao.solar_input_context(birth, raw)
 
 
 def test_prechange_reference_and_sdk_wrong_hour_are_retained():

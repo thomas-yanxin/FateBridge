@@ -25,7 +25,8 @@ from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
 from scripts.taiyi.audit_taiyi_elemental_relations import audit
 from scripts.taiyi.build_taiyi_elemental_relations import CORPUS, source_data
-from tests.taiyi.test_taiyi_enclosures import resolve, transport_payload
+from tests.support.reference_data import resolve
+from tests.taiyi.test_taiyi_enclosures import transport_payload
 from tests.taiyi.test_taiyi_transports import _same_run_payload
 
 DATA = source_data()

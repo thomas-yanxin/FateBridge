@@ -3,16 +3,12 @@
 import json
 from pathlib import Path
 
+from tests.support.reference_data import resolve
+
 FOLDER = Path(__file__).parents[1] / "fixtures/meihua_marriage_v1"
 PROFILE = json.loads((FOLDER / "profile.json").read_bytes())
 CASES = json.loads((FOLDER / "cases4992.json").read_bytes())
 EXPECTED = {(r["code"], r["line"], r["month"]): r for r in CASES}
-
-
-def resolve(value, path):
-    for key in path.split("."):
-        value = value[int(key)] if isinstance(value, list) else value[key]
-    return value
 
 
 def check_layer(result, cast, layer, clause, prefix, line, month):

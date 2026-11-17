@@ -15,6 +15,9 @@ from fatebridge.services.metaphysics import (
     calculate_liureng_gods,
 )
 from tests.ren.test_ren_transports import PAYLOAD
+from tests.support.ephemeris_case_runtime import (
+    native_ephemeris_files as native_ephemeris_files,
+)
 from tests.support.transports import SPECS, native, rest, surface_calls
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -59,7 +62,11 @@ def test_failed_astronomical_terms_never_publish_a_fallback_board_in_any_transpo
     http, protocol, code, cli = surface_calls(spec, payload)
     assert http.status_code == 503 and code != 0 and protocol.is_error
     for body in (http.json(), cli, protocol.structured_content):
-        assert body["error_code"] == "dependency_missing"
+        assert body["error_code"] == "ephemeris_source_inconsistent"
+        assert body["retryable"] is False
+        assert body["issues"] == [
+            {"path": "runtime.ephemeris_data", "code": "solar_native_unavailable"}
+        ]
         assert "liureng" not in body and "jinkou" not in body
 
 
@@ -67,7 +74,7 @@ def test_failed_astronomical_terms_never_publish_a_fallback_board_in_any_transpo
     "mode,provider", [("native", "swisseph"), ("de440", "jpl_de440")]
 )
 def test_real_rainwater_case_uses_new_month_general_and_observed_dependencies(
-    mode, provider, monkeypatch
+    mode, provider, monkeypatch, native_ephemeris_files
 ):
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", mode)
     kwargs = dict(
@@ -204,7 +211,9 @@ def test_every_hour_stem_group_matches_the_frozen_hko_table():
 
 
 @pytest.mark.parametrize("mode", ["native", "de440"])
-def test_independent_2026_cohort_retains_date_precision_limits(mode, monkeypatch):
+def test_independent_2026_cohort_retains_date_precision_limits(
+    mode, monkeypatch, native_ephemeris_files
+):
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", mode)
     report = AUDIT.audit([2026], progress=False)
     assert report["totals"]["civil_dates"] == 365

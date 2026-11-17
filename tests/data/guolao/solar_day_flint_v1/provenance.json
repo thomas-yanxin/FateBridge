@@ -1,0 +1,77 @@
+{
+  "schema": "guolao_solar_day_reference_provenance_v1",
+  "reference_sha256": "350c7ef8d693d3a8b54d53727a43036e492012a445225c08b5436f163b7ca06a",
+  "uncompressed_sha256": "3671383e36cfac3be15ab84172846be257b3fb3402074b7053898c919368ab62",
+  "archive": "/Users/thomas/.codex/artifacts/fatebridge-celestial-frame-20261114/guolao-solar-day-boundaries-v1",
+  "archive_sha256": {
+    "prepare_exact_inputs.py": "741e7fe8509f5bfa4429d8ad78562486114b0c233ec68ebe4132f879fffa72b3",
+    "exact-inputs.json": "6f93156af42b8b0184f661e757899cd52a632a5abdcca2b15358dce86a13ace6",
+    "generate_exact_reference.py": "5d9d8ed6e62f8724e46c38e63302fbb73d1dcf2b9c3778f8fe60f32a5fd30d59",
+    "exact-reference-v2.json.gz": "be1357705d3b7486688881ab3c8ae1c0389a0bac4d737551f0cdb7d28912fd7b",
+    "exact-comparison.json": "ce4d9fb1a0d62c738c099eb014d186cdc6876ba23b354f5f683fc003f8e9b206",
+    "exact-comparison-v2.json": "b7d64f13a7624711d447e47550698013a520a9724db3198db105074a4b8f3db4",
+    "physical-case-plan-v2.json": "80e67082bb677427490461821a619f3f887a1245c9b5b5a7f662ed159523d2a8",
+    "capture_physical_inputs.py": "e5a730f28e7e71bcd9213e32d5d04c2f4d6328f1af4b16299ff5a29ec9de11c7",
+    "physical-common-inputs.json": "ece5fd61c00e7ebd92ec45401fe1452ff1e2a442cbb5c5d83802635e871babda",
+    "generate_physical_reference.py": "4247f5b9cd45b980ad57e883c013346d4e03a7c4421dc0dd1a32634c53f4b1bd",
+    "physical-reference.json": "9126556104038a760dd6372d8362382dc18f36197767e7f087e2bf71e4f9a9b5",
+    "physical-comparison.json": "9af059b0b2c4424d5e743dadc32cd0d008057584385be9331c7731bff8022bbf"
+  },
+  "independent_process_imported_production": false,
+  "python_flint": "0.9.0",
+  "reference_python": "3.12.13",
+  "sofa": {
+    "release": "2023-10-11",
+    "url": "https://www.iausofa.org/2023-10-11c",
+    "binary_sha256": "9ddce56b0b203b9ebdb3b28f1a498963593b38469581ff245738fdccf5315743"
+  },
+  "author_swiss": {
+    "version": "2.10.03",
+    "commit": "175e1fcb3108bcd5c0d146c803f51dcf23508012",
+    "url": "https://github.com/aloistr/swisseph/tree/175e1fcb3108bcd5c0d146c803f51dcf23508012",
+    "unmodified_original_source": true
+  },
+  "library_hashes": {
+    "author-swiss-build.json": "6966d288b74e27358ec527fef13704ba1695a13aa1b4e5d39c82095652992dcc",
+    "author-contract-build.json": "7e23c5409dd08529e10eb82e5a710832c30609653953192a9288b0df64895797",
+    "sofa-build.json": "18045adb90ae97e08b5e6eeadd7da511947a65332896772b8a0166776579e347",
+    "observer-reference-build-contract.json": "10bfbfb06915ca78875dcb81ef9ace9272ed8eb977e2bb0817cf28ac1abab545",
+    "observer_reference.c": "2e97a6c8c3568c2d0440c22a5ab9b074089d73e927b5dd1985966337efc6dc5d",
+    "libauthor_swiss_2_10_03_contract.dylib": "be00582baf530da43f13914bb71b5eea5f7126843b9357896a7ba980753a0669",
+    "libofficial_sofa.dylib": "9ddce56b0b203b9ebdb3b28f1a498963593b38469581ff245738fdccf5315743",
+    "libobserver_reference_contract.dylib": "71aaee47cf5d64ea17336a54c3aa4d18769f769fbf82a0c5f2dfe40d41ffc4e8",
+    "generate_guolao_clock_reference.py": "6bdc372dbf11add9c63c5230304fdc6eef36bbe253093f6b7f4ed291b270c6d2"
+  },
+  "primary_solar_time_definition": "https://aa.usno.navy.mil/faq/eqtime",
+  "printed_source": {
+    "catalogue": "https://touda.tohoku.ac.jp/collection/en/database/library/10020000001141",
+    "repository_image": "tests/fixtures/guolao-small-limit-v1/tohoku-1141-image9.jpg",
+    "sha256": "13963392ec5369a3f65f40d991d39aa329dfe4e135d8ca41bbda15cade62cd5d",
+    "same_witness_assistant_reread": true,
+    "independent_expert_collation": false
+  },
+  "oracle_revision": "Exact analytic linear roots replace straddling reference intervals; original v1 reference and 24 comparison failures retained. Inputs and gates unchanged.",
+  "controls": {
+    "exact_clock": 1280,
+    "day_endpoint_pairs": 420,
+    "declared_day_policy_outputs": 840,
+    "synthetic_monotone_roots": 60,
+    "negative_roots": 4,
+    "actual_chart_descriptors": 20,
+    "actual_chart_policy_calls": 40,
+    "distinct_birth_TT_UT1_pairs": 12,
+    "reference_day_edge_records": 40,
+    "distinct_physical_root_brackets_by_UT1": 32,
+    "two_policy_root_comparison_records": 80
+  },
+  "acceptance": {
+    "shared_native_and_standard_ancestry_disclosed": true,
+    "independent_observations": false,
+    "physical_time_accuracy_certified": false,
+    "historical_local_day_boundary_accepted": false,
+    "source_winter_inclusion_adjudicated": false,
+    "actual_sunrise_geometry_adjudicated": false,
+    "predictive_validation": false,
+    "global_SOTA": false
+  }
+}

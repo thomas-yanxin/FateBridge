@@ -9,7 +9,6 @@ import pytest
 
 from fatebridge.cli import run
 from fatebridge.core.fengshui.opposite import opposite_star_comparison
-from fatebridge.core.fengshui.reading import build_natal_reading
 from fatebridge.core.fengshui.xuankong import _chart
 from fatebridge.services.fengshui import calculate_xuankong_natal
 from fatebridge.validation.fengshui_opposite import audit_opposite_reference

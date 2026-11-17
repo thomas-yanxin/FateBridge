@@ -2,6 +2,7 @@
 
 import asyncio
 import csv
+import gzip
 import hashlib
 import io
 import json
@@ -26,7 +27,34 @@ from tests.guolao.test_guolao_depth import chart
 FIXTURE = Path(__file__).parents[1] / "fixtures/guolao-apparent-clock-v1"
 REFERENCE = json.loads((FIXTURE / "reference.json").read_text())
 CASE = REFERENCE["boundary_case"]
+FRAME_REFERENCE = json.loads(
+    gzip.decompress(
+        (
+            Path(__file__).parents[1] / "data/solar_horizon_v1/reference.json.gz"
+        ).read_bytes()
+    )
+)["guolao_clock"]
 AS_OF = "2026-10-22T12:00:00+08:00"
+
+
+def test_solar_clock_exact_phase_day_branch_and_display_match_frozen_flint_sofa():
+    fixture = Path(__file__).parents[1] / "data/guolao/solar_day_flint_v1"
+    raw = (fixture / "reference.json.gz").read_bytes()
+    provenance = json.loads((fixture / "provenance.json").read_text())
+    assert hashlib.sha256(raw).hexdigest() == provenance["reference_sha256"]
+    reference = json.loads(gzip.decompress(raw))
+    for row in reference["clock_rows"]:
+        *wall, offset = row["civil"]
+        actual = apparent_solar_clock(
+            julian_day_ut1=float.fromhex(row["ut1"]),
+            sun_right_ascension=float.fromhex(row["ra"]),
+            greenwich_apparent_sidereal_degrees=float.fromhex(row["gast"]),
+            longitude=float.fromhex(row["east"]),
+            civil_datetime=datetime(*wall, tzinfo=timezone(timedelta(minutes=offset))),
+        )
+        for key, expected in row["expected"].items():
+            value = actual[key[:-4]].hex() if key.endswith("_hex") else actual[key]
+            assert value == expected, (row["id"], key, value, expected)
 
 
 def source_rows(filename):
@@ -72,12 +100,24 @@ def test_solar_clock_against_independent_jpl_ra_and_greenwich_sidereal_time(inde
     assert clock["birth_hour_branch"] == REFERENCE["external_hour_angle_branch"] == "丑"
     assert result["guolao"]["life_palace"]["branch"] == "辰"
     assert not clock["physical_time_accuracy_certified"]
+    # Raw body coordinates retain their source equator. Solar time uses the
+    # selected physical equator paired with GAST. Compare both to the original
+    # C/SOFA common-epoch controls, retaining every JPL assertion above.
+    assert FRAME_REFERENCE["production_imported"] is False
+    expected = FRAME_REFERENCE["rows"][index]
+    assert result["guolao"]["profile"]["julian_day_tt"] == expected["julian_day_tt"]
+    assert clock["julian_day_ut1"] == expected["julian_day_ut1"]
+    body = next(b for b in result["guolao"]["bodies"] if b["id"] == "Sun")
     assert (
-        clock["sun_apparent_right_ascension"]
-        == next(b for b in result["guolao"]["bodies"] if b["id"] == "Sun")[
-            "right_ascension"
-        ]
+        abs(body["right_ascension"] - expected["source_ra_degrees"]) * 3600
+        <= FRAME_REFERENCE["gate_arcseconds"]
     )
+    assert (
+        abs(clock["sun_apparent_right_ascension"] - expected["physical_ra_degrees"])
+        * 3600
+        <= FRAME_REFERENCE["gate_arcseconds"]
+    )
+    assert clock["equatorial_frame"] == "selected_physical_equator_and_equinox_of_date"
     assert clock["julian_day_ut1"] == result["guolao"]["profile"]["julian_day_ut1"]
 
 

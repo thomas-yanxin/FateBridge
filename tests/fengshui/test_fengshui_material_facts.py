@@ -1,6 +1,8 @@
 """Material symbolism is not a universal taboo, chart need, or feasible action."""
 
+import json
 from copy import deepcopy
+from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
@@ -12,6 +14,12 @@ from fatebridge.core.fengshui.materials import (
     material_reference,
 )
 from fatebridge.services.fengshui import assess
+
+AFSI_COLOURS = json.loads(
+    (
+        Path(__file__).parents[1] / "fixtures/fengshui-material-colours-afsi-2004.json"
+    ).read_text(encoding="utf-8")
+)["colours"]
 
 
 def fact(**values):
@@ -216,3 +224,76 @@ def test_material_reference_is_isolated_and_has_source_version_and_locations():
             and source["source_version"]
             and source["locator"]
         )
+
+
+@pytest.mark.parametrize("source_colour", AFSI_COLOURS, ids=lambda row: row["colour"])
+@pytest.mark.parametrize(
+    "requested_use",
+    ["wood_remedy", "fire_remedy", "earth_remedy", "metal_remedy", "water_remedy"],
+)
+def test_afsi_published_palette_against_each_requested_element(
+    source_colour, requested_use
+):
+    finding = analyze_material_facts(
+        [
+            MaterialShapeFact.model_validate(
+                fact(
+                    material=None,
+                    colour=source_colour["colour"],
+                    element_use=requested_use,
+                )
+            )
+        ]
+    )["findings"][0]
+    assert finding["colour_reference"] == source_colour["element"]
+    assert finding["colour_eligibility"] == (
+        "colour_substitute_match"
+        if source_colour["element_use"] == requested_use
+        else "no_matching_colour_substitute"
+    )
+    assert finding["source_ids"] == ["M_AFSI"]
+    assert finding["material_eligibility"] == "not_provided"
+    assert finding["placement_suitability"] == "not_assessed"
+    assert not finding["action_required"]
+
+
+def test_afsi_reference_keeps_the_complete_published_colour_vocabulary():
+    assert material_reference()["colours"] == {
+        row["colour"]: row["element"] for row in AFSI_COLOURS
+    }
+
+
+def test_broad_brown_observation_does_not_establish_published_tan():
+    finding = analyze_material_facts(
+        [
+            MaterialShapeFact.model_validate(
+                fact(material=None, colour="brown", element_use="earth_remedy")
+            )
+        ]
+    )["findings"][0]
+    assert finding["colour"] == "brown"
+    assert finding["colour_reference"] is None
+    assert finding["colour_eligibility"] == "no_matching_colour_substitute"
+    assert finding["finding"] == "not_determined_from_supplied_attributes"
+
+
+def test_published_tan_in_a_photo_keeps_candidate_status():
+    result = analyze_material_facts(
+        [
+            MaterialShapeFact.model_validate(
+                fact(
+                    material=None,
+                    colour="tan",
+                    element_use="earth_remedy",
+                    observation_basis="image_observed",
+                )
+            )
+        ]
+    )
+    finding = result["findings"][0]
+    assert result["status"] == "partial"
+    assert finding["colour_reference"] == "土"
+    assert finding["colour_eligibility"] == "colour_substitute_match"
+    assert finding["candidate_only"]
+    assert finding["finding"] == "needs_confirmation"
+    assert finding["placement_suitability"] == "not_assessed"

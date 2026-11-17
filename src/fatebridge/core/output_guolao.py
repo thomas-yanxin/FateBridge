@@ -1,6 +1,6 @@
 """Projection-compatible public evidence contracts for the Guolao research model."""
 
-from typing import Any, Optional
+from typing import Any, Literal, Optional
 
 from fatebridge.core.output_base import PartialOutput
 
@@ -36,6 +36,9 @@ class GuolaoBody(PartialOutput):
     declination: Optional[float] = None
     zodiac_longitude: Optional[float] = None
     model: Optional[str] = None
+    derived_from: Optional[Literal["罗"]] = None
+    derivation_source_longitude: Optional[float] = None
+    derivation_source_right_ascension: Optional[float] = None
     palace_branch: Optional[str] = None
     palace_lord: Optional[str] = None
     mansion: Optional[GuolaoMansion] = None
@@ -105,6 +108,7 @@ class GuolaoApparentSolarClock(PartialOutput):
     total_correction_seconds: Optional[float] = None
     julian_day_ut1: Optional[float] = None
     sun_apparent_right_ascension: Optional[float] = None
+    equatorial_frame: Optional[str] = None
     greenwich_apparent_sidereal_degrees: Optional[float] = None
     longitude: Optional[float] = None
     solar_reference: Optional[str] = None
@@ -227,7 +231,13 @@ class GuolaoGodPositions(PartialOutput):
 
 class GuolaoPurpleModelAudit(PartialOutput):
     model_in_use: Optional[str] = None
-    fitted_period_days: Optional[float] = None
+    period_days: Optional[float] = None
+    epoch_jd: Optional[float] = None
+    epoch_longitude: Optional[float] = None
+    software_source_url: Optional[str] = None
+    software_source_commit: Optional[str] = None
+    software_source_function: Optional[str] = None
+    fixture_fitting_used: Optional[bool] = None
     source_id: Optional[str] = None
     source_epoch_description: Optional[str] = None
     source_validation_status: Optional[str] = None

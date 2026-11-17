@@ -1,3 +1,5 @@
+from fatebridge.utils.formatting import format_json_response
+
 """Large runtime inventories remain lossless without crowding out the analysis."""
 
 import copy
@@ -38,7 +40,7 @@ def test_large_inventory_keeps_business_and_exact_receipt_in_same_run(store, com
     }
     before = copy.deepcopy(original)
     result = delivery.bound_response(original, 4096, compact=compact)
-    assert len(delivery._json(result, compact)) <= 4096
+    assert len(format_json_response(result, compact=compact)) <= 4096
     assert result["analysis"] == original["analysis"]
     assert result["run_metadata"]["run_id"] == "original"
     projected = result["run_metadata"]["runtime"]

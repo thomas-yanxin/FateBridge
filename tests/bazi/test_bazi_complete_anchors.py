@@ -40,23 +40,24 @@ TOOLS = tuple(
 
 @lru_cache(maxsize=1)
 def baseline():
-    from fatebridge.core.execution_context import ExecutionOptions
+    from fatebridge.core.execution_context import call_clock
 
     rows = json.loads((ROOT / "tests/data/bazi/anchor-inputs.json").read_text())
-    return {
-        "rows": [
-            {
-                **row,
-                "result": execution.execute_tool(
-                    SPECS[row["tool"]],
-                    SPECS[row["tool"]].request_model(**row["arguments"]),
-                    options=ExecutionOptions(as_of=AS_OF),
-                    include_metadata=False,
-                ),
-            }
-            for row in rows
-        ]
-    }
+    # These are internal full-output guard inputs. Public delivery removes
+    # integrity fields after validation; its transport checks remain below.
+    with call_clock(AS_OF):
+        return {
+            "rows": [
+                {
+                    **row,
+                    "result": execution.execute_spec(
+                        SPECS[row["tool"]],
+                        SPECS[row["tool"]].request_model(**row["arguments"]),
+                    ),
+                }
+                for row in rows
+            ]
+        }
 
 
 @pytest.mark.parametrize("tool", TOOLS)

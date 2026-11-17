@@ -112,7 +112,7 @@ class AstroBalbillusRequest(AstroLifespanRequest):
     )
     mode: Literal["nearest", "forward"] = Field(
         default="nearest",
-        description="Exaltation-distance mode: 'nearest' (with reduction fit) or 'forward'",
+        description="Continuous exaltation-distance reading: nearest angular distance or forward from exaltation to natal longitude; proportional small-year reduction without fitted offsets. Historical degree conventions and the complete procedure remain unadjudicated.",
     )
     max_age_years: float = Field(
         default=120.0,

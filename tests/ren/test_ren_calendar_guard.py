@@ -10,6 +10,8 @@ import pytest
 from fatebridge.core import almanac
 from fatebridge.core.calendar import BaZiCalendar
 from fatebridge.core.de440_solar import MODEL_ID
+from fatebridge.core.de441_solar import MODEL_ID as DE441_MODEL_ID
+from fatebridge.core.de441_solar import PROVIDER as DE441_PROVIDER
 from fatebridge.core.ephemeris_runtime import (
     configure_ephemeris_path,
     configured_ephemeris_path,
@@ -149,11 +151,17 @@ def test_guard_cache_never_authorizes_a_public_outside_year(
         almanac.get_solar_terms_for_year(outside, "UTC")
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "auto")
     standalone = almanac.get_solar_terms_for_year(outside, "UTC")
-    assert all(x.resolution_provider == "swisseph" for x in standalone)
+    assert len(standalone) == 24
+    assert all(
+        x.resolution_provider == DE441_PROVIDER and x.ephemeris_model == DE441_MODEL_ID
+        for x in standalone
+    )
     guarded = almanac._term_window(datetime(origin, 7, 1, tzinfo=timezone.utc), "UTC")
     guard = [x for x in guarded if x.moment.year == outside]
     assert len(guard) == 24 and all(x.resolution_provider == "jpl_de440" for x in guard)
-    assert almanac.get_solar_terms_for_year(outside, "UTC") is standalone
+    cache_hits = almanac.get_solar_terms_for_year.cache_info().hits
+    assert almanac.get_solar_terms_for_year(outside, "UTC") == standalone
+    assert almanac.get_solar_terms_for_year.cache_info().hits == cache_hits + 1
 
 
 def test_guard_source_failure_does_not_fall_back_to_native(
@@ -193,7 +201,7 @@ def test_bazi_year_month_and_native_control_remain_explicit(
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
     current, following = almanac.get_adjacent_solar_terms(moment, "UTC")
     assert all(
-        t.resolution_provider == "swisseph" and t.ephemeris_model == "moshier"
+        t.resolution_provider == DE441_PROVIDER and t.ephemeris_model == DE441_MODEL_ID
         for t in [current, following]
     )
 

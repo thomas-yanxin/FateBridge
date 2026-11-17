@@ -116,4 +116,4 @@ def test_lunar_conversion_exposes_its_finite_source_on_all_transports(
         lunar = result["lunar_calendar"]
         assert (lunar["year"], lunar["month"], lunar["day"]) == expected
         assert lunar["conversion_source"]["publisher"] == "香港天文台"
-        assert lunar["conversion_source"]["raw_sha256"]
+        assert lunar["conversion_source"]["method_id"] == "hko_2100_month_starts_v1"

@@ -65,7 +65,12 @@ def test_long_catalogue_plus_operator_path_keeps_coordinates_and_configuration(
     try:
         ephemeris_runtime.configure_ephemeris_path(str(operator))
         baseline = calculate_suzhan_analysis(
-            date="2025-03-04", time="12:00:00", zone="+08:00", szchart=1
+            lat="31n13",
+            lon="121e28",
+            date="2025-03-04",
+            time="12:00:00",
+            zone="+08:00",
+            szchart=1,
         )
         assert "error" not in baseline, baseline
         monkeypatch.setattr(guolao, "DATA", catalogue)
@@ -79,7 +84,12 @@ def test_long_catalogue_plus_operator_path_keeps_coordinates_and_configuration(
                 operator.resolve(),
             ]
         actual = calculate_suzhan_analysis(
-            date="2025-03-04", time="12:00:00", zone="+08:00", szchart=1
+            lat="31n13",
+            lon="121e28",
+            date="2025-03-04",
+            time="12:00:00",
+            zone="+08:00",
+            szchart=1,
         )
         assert "error" not in actual, actual
         assert actual["astronomy"] == baseline["astronomy"]
@@ -115,7 +125,12 @@ def test_literal_catalogue_separator_is_not_a_native_search_list(
     for name in ["sefstars.txt", "sources.json"]:
         shutil.copy2(guolao.DATA / name, catalogue / name)
     baseline = calculate_suzhan_analysis(
-        date="2025-03-04", time="12:00:00", zone="+08:00", szchart=1
+        lat="31n13",
+        lon="121e28",
+        date="2025-03-04",
+        time="12:00:00",
+        zone="+08:00",
+        szchart=1,
     )
     assert "error" not in baseline, baseline
     monkeypatch.setattr(guolao, "DATA", catalogue)
@@ -123,7 +138,12 @@ def test_literal_catalogue_separator_is_not_a_native_search_list(
     configured = ephemeris_runtime.configured_ephemeris_path()
     environment = os.environ.get("SE_EPHE_PATH")
     actual = calculate_suzhan_analysis(
-        date="2025-03-04", time="12:00:00", zone="+08:00", szchart=1
+        lat="31n13",
+        lon="121e28",
+        date="2025-03-04",
+        time="12:00:00",
+        zone="+08:00",
+        szchart=1,
     )
     assert "error" not in actual, actual
     assert actual["chart"] == baseline["chart"]
@@ -204,7 +224,9 @@ def test_blank_clock_is_invalid_rather_than_imputed_or_accepted_as_unknown(clock
 
 @pytest.mark.parametrize("clock", ["not-time", "25:00:00", "12:00:60"])
 def test_invalid_known_clock_is_not_downgraded_to_date_only(clock):
-    result = calculate_suzhan_analysis(date="2024-08-04", time=clock, zone="+08:00")
+    result = calculate_suzhan_analysis(
+        lat="31n13", lon="121e28", date="2024-08-04", time=clock, zone="+08:00"
+    )
     assert "error" in result
 
 
@@ -438,6 +460,8 @@ def test_null_clock_rest_and_native_mcp_equal_cli_omission(monkeypatch, capsys):
         (
             "suzhan",
             {
+                "lat": "31n13",
+                "lon": "121e28",
                 "date": "1903-06-25",
                 "time": "12:00:00",
                 "zone": "+08:00",
@@ -607,7 +631,13 @@ def test_standalone_source_reference_across_all_real_transports(
         monkeypatch,
         capsys,
         "suzhan",
-        {"date": date, "time": "04:30:00", "zone": "+08:00"},
+        {
+            "lat": "31n13",
+            "lon": "121e28",
+            "date": date,
+            "time": "04:30:00",
+            "zone": "+08:00",
+        },
         [
             "sukuyo.calendar_day.clock_doctrine.commentarial_boundary_reference.standalone_xuanying_reference",
             "sukuyo.calendar",

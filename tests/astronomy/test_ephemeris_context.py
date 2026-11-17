@@ -7,7 +7,9 @@ import pytest
 
 from fatebridge.core import ephemeris_runtime as runtime
 from fatebridge.core.almanac import get_solar_terms_for_year
-from tests.support.ephemeris_context import moshier_ephemeris
+from fatebridge.core.de441_solar import MODEL_ID as DE441_MODEL
+from fatebridge.core.de441_solar import PROVIDER as DE441_PROVIDER
+from tests.support.ephemeris_context import empty_ephemeris_path
 
 
 @pytest.mark.parametrize("caller_policy", [None, "analytic"])
@@ -30,7 +32,7 @@ def test_moshier_model_and_caller_state_are_isolated(monkeypatch, caller_policy,
     with (
         pytest.raises(RuntimeError, match="fixture failure") if fail else nullcontext()
     ):
-        with moshier_ephemeris():
+        with empty_ephemeris_path():
             assert cached.cache_info().currsize == 0
             _, flags = runtime.ephemeris_call(
                 "calc_ut", 2451545.0, swe.SUN, swe.FLG_SWIEPH
@@ -46,3 +48,16 @@ def test_moshier_model_and_caller_state_are_isolated(monkeypatch, caller_policy,
     assert os.environ.get("FATEBRIDGE_SOLAR_TERM_MODEL") == caller_policy
     assert get_solar_terms_for_year.cache_info().currsize == 0
     assert cached.cache_info().currsize == 0
+
+
+def test_empty_path_does_not_make_calendar_solar_terms_moshier(monkeypatch):
+    swe = pytest.importorskip("swisseph")
+    monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
+    with empty_ephemeris_path():
+        _, flags = runtime.ephemeris_call(
+            "calc", 2451545.0, swe.SUN, swe.FLG_SWIEPH | swe.FLG_SPEED
+        )
+        terms = get_solar_terms_for_year(2026, "UTC")
+        assert runtime.ephemeris_model_from_retflag(flags) == "moshier"
+        assert {term.resolution_provider for term in terms} == {DE441_PROVIDER}
+        assert {term.ephemeris_model for term in terms} == {DE441_MODEL}

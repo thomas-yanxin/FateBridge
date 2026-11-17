@@ -5,7 +5,7 @@ import hashlib
 import json
 import xml.etree.ElementTree as ET
 from copy import deepcopy
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 from pathlib import Path
 from types import SimpleNamespace
 from zoneinfo import ZoneInfo
@@ -15,7 +15,8 @@ from jsonschema import Draft202012Validator
 from pydantic import ValidationError
 
 from fatebridge.cli import run
-from fatebridge.core import almanac
+from fatebridge.core import almanac, de441_solar, ephemeris_runtime
+from fatebridge.core.astro import runtime
 from fatebridge.core.fengshui.models import MonthlyRequest
 from fatebridge.core.fengshui.monthly import monthly_position_reading
 from fatebridge.core.fengshui.monthly_time import solar_month_context
@@ -301,22 +302,66 @@ def test_actual_instants_control_a_repeated_wall_clock_boundary(monkeypatch):
     assert first["solar_month_number"] == 9 and second["solar_month_number"] == 10
 
 
-def test_missing_native_crossings_cannot_supply_month_boundaries(monkeypatch, request):
+@pytest.mark.parametrize("source_available", [True, False])
+def test_month_boundaries_require_real_crossings_and_support_bundled_de441(
+    monkeypatch, request, source_available
+):
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
-    monkeypatch.setattr(almanac, "swe", None)
+    for owner in (almanac, ephemeris_runtime, runtime):
+        monkeypatch.setattr(owner, "swe", None)
     almanac.get_solar_terms_for_year.cache_clear()
     request.addfinalizer(almanac.get_solar_terms_for_year.cache_clear)
-    for _, official in OFFICIAL:
-        if official.year == 2026:
+    calls = []
+    if not source_available:
+
+        def unavailable(jd_tt):
+            calls.append(jd_tt)
+            raise EphemerisSourceError("solar_native_unavailable")
+
+        monkeypatch.setattr(de441_solar, "solar_longitude", unavailable)
+    contexts = []
+    for term, official in OFFICIAL:
+        if official.year != 2026:
+            continue
+        if source_available:
+            # Published minutes are rounded. The existing fixed reference
+            # protocol checks membership one minute after each official jie.
+            result = layer(query_at=(official + timedelta(minutes=1)).isoformat())
+            context = result["time_context"]
+            assert context["effective_solar_year"] == 2026 - int(term == "小寒")
+            assert context["solar_month_number"] == (
+                12 if term == "小寒" else TERMS.index(term)
+            )
+            contexts.append(context)
+        else:
             with pytest.raises(EphemerisSourceError, match="no linear approximation"):
                 calculate_monthly_stars(query_at=official.isoformat())
     for inputs in (
         {"query_at": "2026-10-20T12:00:00+08:00"},
         {"effective_solar_year": 2026, "solar_month_number": 9},
     ):
-        with pytest.raises(EphemerisSourceError, match="no linear approximation"):
-            calculate_monthly_stars(**inputs)
+        if source_available:
+            contexts.append(layer(**inputs)["time_context"])
+        else:
+            with pytest.raises(EphemerisSourceError, match="no linear approximation"):
+                calculate_monthly_stars(**inputs)
+    if source_available:
+        assert len(contexts) == 14
+        for context in contexts:
+            for side in ("start_resolution", "end_resolution"):
+                resolution = context["timing"][side]
+                assert resolution["provider"] == "jpl_de441"
+                assert resolution["ephemeris_model"] == "fatebridge_de441_solar_v1"
+                assert resolution["approximate"] is False
+                details = resolution["solar_model_details"]
+                assert details["model_id"] == "fatebridge_de441_solar_v1"
+                assert details["native_moshier_relabelled"] is False
+                assert details["reference_values_used_at_runtime"] is False
+        assert contexts[-2]["valid_from"] == contexts[-1]["valid_from"]
+        assert contexts[-2]["valid_until"] == contexts[-1]["valid_until"]
+    else:
+        assert calls  # A real crossing dependency failed; no month was guessed.
 
 
 @pytest.mark.parametrize(

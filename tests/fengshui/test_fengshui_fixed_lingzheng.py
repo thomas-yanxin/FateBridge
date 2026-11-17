@@ -14,7 +14,6 @@ from fatebridge.cli import run
 from fatebridge.core.fengshui.lingzheng import analyze_fixed_lingzheng
 from fatebridge.core.fengshui.lingzheng_inputs import (
     FixedLingzhengRequest,
-    LingzhengObservation,
 )
 from fatebridge.core.fengshui.models import XuankongInterpretationRequest
 from fatebridge.services.fengshui import calculate_xuankong_natal

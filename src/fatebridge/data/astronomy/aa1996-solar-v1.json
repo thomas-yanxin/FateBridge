@@ -1,6 +1,6 @@
 {
   "model_id": "fatebridge_moshier_aa1996_solar_v1",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "abi_version": 1,
   "calculation_recipe_id": "swiss_2.10.03_aa1996_emb_complete_moon_v1",
   "calculation_source_sha256": "a2aa7646b58e9b3cea5101a7efbf6a3e434dd745b6ad12795132347b5c370593",
@@ -63,9 +63,17 @@
     2526419.5
   ],
   "reference": "https://moshier.net/",
-  "scope": "Named modified Moshier Sun model; v1.1 qualifies all24terms1784..2204 for internal period endpoints,while standalone input years remain1800..2200. Same calculation source as v1.0; not all-epoch physical/civil accuracy or stock native Moshier certification.",
+  "scope": "Named modified Moshier Sun model; all24terms1784..2204 remain qualified. v1.2 separately qualifies only315degree Lichun events2205..2320 for the existing120yearCanping horizon. Ordinary working TT and standalone1800..2200input years unchanged. Same calculation source as v1.0; original19future all-term failures remain. Not all-epoch physical/civil accuracy or stock native Moshier certification.",
   "qualified_solar_term_years": [
     1784,
     2204
-  ]
+  ],
+  "derived_lichun_scope": {
+    "years": [
+      2205,
+      2320
+    ],
+    "target_degrees": 315.0,
+    "purpose": "Complete existing120yearCanping horizon for1800..2200inputs; only year-bound February1..12TT brackets. Frozen independent2905row evidence retained including19failures outside this preexisting315degree consumer; not a full annual-grid extension."
+  }
 }

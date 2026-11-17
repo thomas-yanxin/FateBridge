@@ -13,6 +13,7 @@ from pathlib import Path
 import pytest
 
 from fatebridge.core.astro import ephemeris, runtime
+from fatebridge.core.astro.geometry import native_lahiri_ayanamsha
 from fatebridge.core.astro.native_motion import context_motion, require_longitude_speed
 from fatebridge.core.astro.reference import PLANET_SWISSEPH_IDS
 from fatebridge.core.astro.time_scales import ephemeris_time
@@ -173,7 +174,7 @@ def test_context_retains_native_rate_and_explicit_corrections_without_changing_d
 
 @pytest.mark.parametrize("failed", ["Saturn", "North Node"])
 @pytest.mark.parametrize("zodiacal", [0, 1])
-def test_approximate_orbit_without_derivative_remains_unknown(
+def test_approximate_motion_has_its_own_method_and_display_frame(
     failed, zodiacal, monkeypatch
 ):
     original = ephemeris._swisseph_planet_state
@@ -184,9 +185,7 @@ def test_approximate_orbit_without_derivative_remains_unknown(
     )
     result = build_otherbu_result(**FACES, **SKY, zodiacal=zodiacal)
     points = {o["id"]: o for o in result["chart"]["chart"]["objects"]}
-    missing = {failed, "Pars Fortuna"} | (
-        {"South Node"} if failed == "North Node" else set()
-    )
+    missing = {"Pars Fortuna"}
     assert (
         set(result["chart"]["params"]["motionPolicy"]["uncomputed_points"]) == missing
     )
@@ -194,6 +193,22 @@ def test_approximate_orbit_without_derivative_remains_unknown(
         assert points[name]["motion"]["longitude_speed"] is None
         assert points[name]["motion"]["direction"] == "not_computed"
     assert points["Moon"]["motion"]["direction"] == "direct"
+    approximate = {failed} | ({"South Node"} if failed == "North Node" else set())
+    tt = result["chart"]["params"]["chart_profile"]["julian_day_tt"]
+    origin_rate = (
+        native_lahiri_ayanamsha(julian_day_tt=tt + 0.001)
+        - native_lahiri_ayanamsha(julian_day_tt=tt - 0.001)
+    ) / 0.002
+    for name in approximate:
+        motion = points[name]["motion"]
+        assert math.isfinite(motion["longitude_speed"])
+        assert motion["correction_status"] == "approximate_model"
+        assert "native_longitude_speed" not in motion
+        if zodiacal:
+            assert abs(motion["sidereal_origin_correction"] + origin_rate) < 1e-8
+            assert motion["longitude_speed"] == pytest.approx(
+                motion["model_longitude_speed"] - origin_rate, abs=1e-8
+            )
 
 
 def test_frozen_velocity_protocol_and_reference_identity():

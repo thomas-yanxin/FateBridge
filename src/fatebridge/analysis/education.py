@@ -222,6 +222,7 @@ class EducationAnalysis:
         return {
             "inclination": inclination,
             "favorable_fields": fields,
+            "preference_status": profile["assessment_status"],
             "conditional_elements": profile["conditional_elements"],
             "reference_scope": profile["resolution_policy"],
             "assessment_status": "modern_analogy_not_aptitude_measurement",

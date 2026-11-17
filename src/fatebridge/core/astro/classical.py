@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import math
 from bisect import bisect_right
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -20,6 +19,15 @@ from fatebridge.core.astro.native_coordinates import (
 )
 from fatebridge.core.astro.native_motion import require_longitude_speed
 from fatebridge.core.astro.physical_epoch import utc_from_tt, utc_representation
+from fatebridge.core.astro.solar_events import (
+    SOLAR_EVENT_MODEL,
+    solar_crossings_in_window,
+)
+from fatebridge.core.astro.solar_observer import (
+    SOLAR_SOURCE_POLICY,
+    select_solar_source,
+    solar_source_reference,
+)
 from fatebridge.core.astro.syzygy_sources import SyzygySourceTrace
 from fatebridge.core.astro.time_scales import (
     datetime_from_ut1,
@@ -183,59 +191,6 @@ def _prenatal_syzygy(
     return None
 
 
-def _sun_event(
-    julian_day: float, longitude: float, latitude: float, rising: bool
-) -> Optional[float]:
-    """Julian day of the next sunrise (``rising``) or sunset after ``julian_day``.
-
-    ``None`` when swisseph reports no event (polar day/night) or a soft failure.
-    This legacy convention is apparent solar centre with refraction at sea
-    level, 1013.25 hPa and 0 Celsius. It differs from the geometric sect horizon
-    and the conventional upper-limb sunrise published in public almanacs.
-    """
-    flag = (
-        runtime.swe.CALC_RISE if rising else runtime.swe.CALC_SET
-    ) | runtime.swe.BIT_DISC_CENTER
-    try:
-        retflag, times = runtime.ephemeris_call(
-            "rise_trans",
-            julian_day,
-            runtime.swe.SUN,
-            flag,
-            (longitude, latitude, 0.0),
-            1013.25,
-            0.0,
-        )
-    except EphemerisSourceError:
-        raise
-    except Exception as error:  # pragma: no cover - defensive
-        runtime._log_swe_runtime_failure("rise_trans", error)
-        return None
-    if retflag < 0:
-        return None
-    event = float(times[0])
-    return event if math.isfinite(event) else None
-
-
-def _bracket_sun_event(
-    julian_day: float, longitude: float, latitude: float, rising: bool
-) -> Optional[Tuple[float, float]]:
-    """Consecutive events bracketing the instant; a solar day is not fixed 24h."""
-    query = julian_day - 2.0
-    previous = None
-    for _ in range(8):
-        event = _sun_event(query, longitude, latitude, rising)
-        if event is None or event < query or event > julian_day + 2.0:
-            return None
-        if event > julian_day:
-            return (previous, event) if previous is not None else None
-        previous = event
-        # Consecutive risings (or settings) cannot occur within half a rotation.
-        # Advance past this occurrence without a boundary-sized epsilon.
-        query = event + 0.5
-    return None
-
-
 def _planetary_hours(
     julian_day: float,
     longitude: float,
@@ -260,17 +215,37 @@ def _planetary_hours(
         return None
     from fatebridge.core.classical_western import planetary_hour_sequence
 
-    rises = _bracket_sun_event(julian_day, longitude, latitude, rising=True)
-    sets = _bracket_sun_event(julian_day, longitude, latitude, rising=False)
-    if rises is None or sets is None:
+    source = select_solar_source(
+        tt_from_ut1(julian_day - 2), tt_from_ut1(julian_day + 2)
+    )
+    events = sorted(
+        (
+            event
+            for day in range(-2, 2)
+            for event in solar_crossings_in_window(
+                julian_day + day,
+                julian_day + day + 1,
+                longitude=longitude,
+                latitude=latitude,
+                definition="apparent_topocentric_center",
+                source=source,
+            )
+            if event.julian_day_ut1 < julian_day + day + 1
+        ),
+        key=lambda event: event.julian_day_ut1,
+    )
+    before = [event for event in events if event.julian_day_ut1 <= julian_day]
+    after = [event for event in events if event.julian_day_ut1 > julian_day]
+    opening_rises = [event for event in before if event.rising]
+    if not before or not after or not opening_rises:
         return None
-    prev_rise, next_rise = rises
-    prev_set, next_set = sets
-    is_day = prev_rise > prev_set
-    if is_day:
-        arc_start, arc_end = prev_rise, next_set
-    else:
-        arc_start, arc_end = prev_set, next_rise
+    previous, following = before[-1], after[0]
+    if previous.rising == following.rising:
+        raise RuntimeError("Solar crossing sequence has consecutive equal directions")
+    opening_rise = opening_rises[-1]
+    prev_rise = opening_rise.julian_day_ut1
+    is_day = previous.rising
+    arc_start, arc_end = previous.julian_day_ut1, following.julian_day_ut1
     arc_length = arc_end - arc_start
     if not arc_start <= julian_day < arc_end or arc_length <= 0:
         return None
@@ -309,6 +284,13 @@ def _planetary_hours(
     sequence = planetary_hour_sequence(day_ruler)
     sequence_index = index if is_day else index + 12
     hour_ruler = sequence[sequence_index] if sequence else None
+    models = sorted(
+        {
+            previous.ephemeris_model,
+            following.ephemeris_model,
+            opening_rise.ephemeris_model,
+        }
+    )
     return {
         "is_day": is_day,
         "day_ruler": day_ruler,
@@ -323,6 +305,14 @@ def _planetary_hours(
         "arc_end_jd_ut1": arc_end,
         "rule_id": "unequal_hours_chaldean_sunrise_weekday_v1",
         "sunrise_convention": "apparent_solar_center_sea_level_1013.25hPa_0C",
+        "event_model": SOLAR_EVENT_MODEL,
+        "ephemeris_models": models,
+        "ephemeris_sources": {
+            model: solar_source_reference(model, str(runtime.swe.version))
+            for model in models
+        },
+        "ephemeris_source_policy": SOLAR_SOURCE_POLICY,
+        "equatorial_frame": "selected_physical_equator_and_equinox_of_date",
         "time_scale": "UT1_arcs_TT_to_frozen_civil_UTC",
         "sequence_source": "Cassius Dio, Roman History 37.19, Loeb 1914",
         "sequence_source_url": "https://penelope.uchicago.edu/Thayer/E/Roman/Texts/Cassius_Dio/37%2A.html#19",

@@ -35,7 +35,7 @@ RULES = (
 
 def placement_metadata() -> dict[str, Any]:
     return dict(
-        ruleset_id="tanyuan_day_placements_v1",
+        ruleset_id="tanyuan_day_placements_v2",
         source_title="大六壬探原·论日干日枝、课体纲要",
         source_url=TANYUAN_SOURCE,
         source_sha256=TANYUAN_SCAN_SHA256,
@@ -48,11 +48,7 @@ def placement_metadata() -> dict[str, Any]:
                 placement=p,
                 relation=r,
                 definition_adjudicated=r != "harmony_unadjudicated",
-                **(
-                    {"relation_matches": None, "matched": None}
-                    if r == "harmony_unadjudicated"
-                    else {}
-                ),
+                **({"relation_matches": None} if r == "harmony_unadjudicated" else {}),
             )
             for i, n, c, p, r in RULES
         ],
@@ -64,7 +60,7 @@ def placement_metadata() -> dict[str, Any]:
         scope=(
             CONVENTION
             + "。干为我、支为彼是本书关系释读，不据名称判断他人意图、婚姻角色、现实成败或事件应期。"
-            "原目录第五题曾保留损／欺异读，本层选书影欺我，不回写旧校勘。合干、合支的投影定义仍未裁，未知不作未命中。"
+            "原目录第五题曾保留损／欺异读，本层选书影欺我，不回写旧校勘。归合、求合不具备各自的加临时直接不命中；具备加临时，合干、合支的定义仍待裁。"
         ),
     )
 
@@ -110,7 +106,7 @@ def day_placement_patterns(
         row["placement_matches"] = placements[row["placement"]]
         if row["definition_adjudicated"]:
             row["relation_matches"] = relations[row["relation"]]
-            row["matched"] = row["placement_matches"] and row["relation_matches"]
+        row["matched"] = row["placement_matches"] and row["relation_matches"]
     result.update(
         day_ganzhi=day_ganzhi,
         day_stem_house=house,

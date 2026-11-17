@@ -981,7 +981,7 @@ class SnapshotExport(PartialOutput):
 REFERENCE_TOOL_FIELDS: Dict[str, Dict[str, Any]] = {
     "suzhan": {"sukuyo": SukuyoDay, "astronomy": SuzhanAstronomy},
     "sukuyo_compatibility": {
-        "calendar_basis": str,
+        "su27_basis": str,
         "status": str,
         "person1": SukuyoPerson,
         "person2": SukuyoPerson,

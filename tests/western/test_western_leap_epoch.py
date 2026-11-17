@@ -10,6 +10,7 @@ from pathlib import Path
 import pytest
 import swisseph as swe
 
+from fatebridge.core.astro import runtime
 from fatebridge.core.astro.birth_clock import (
     resolve_solar_birth_clock,
     resolve_solar_epoch,
@@ -122,7 +123,16 @@ def test_original_failed_ut1_reaches_real_native_tt_ut1_and_geometry(basis):
         <= 0.0002
     )
     sun, _ = swe.calc(subject.julian_day_tt, swe.SUN, swe.FLG_SWIEPH | swe.FLG_SPEED)
-    _, axes = swe.houses_ex(subject.julian_day, 40, lon, b"R")
+    # The managed call uses the declared IERS rotation at this TT/UT1;
+    # raw houses_ex uses Swiss's own Earth-rotation convention.
+    _, axes = runtime.ephemeris_call(
+        "houses_ex",
+        subject.julian_day,
+        40,
+        lon,
+        b"R",
+        _julian_day_tt=subject.julian_day_tt,
+    )
     assert abs(subject.sun.abs_pos - sun[0]) < 1e-10
     assert abs(subject.first_house.abs_pos - axes[0]) < 1e-10
     assert determine_sect(subject) == ("day" if subject.is_diurnal else "night")

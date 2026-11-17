@@ -1,6 +1,5 @@
 """The same rounded JD cannot stand for two different boundary intentions."""
 
-import gzip
 import json
 from datetime import datetime, timedelta, timezone
 from fractions import Fraction
@@ -8,31 +7,16 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.astro.historical_utc import HistoricalUTCAdjustment
 from fatebridge.core.astro.time_scales import datetime_from_tt, leap_table
 from fatebridge.core.astro.tt_epoch import TTInstant
-
-ROOT = Path(__file__).resolve().parents[2]
-ORACLE = json.loads(
-    gzip.decompress(
-        (ROOT / "tests/data/bazi_tt_utc_exact_v1/oracle.json.gz").read_bytes()
-    )
+from tests.support.ephemeris_case_runtime import (
+    native_ephemeris_files as native_ephemeris_files,
 )
 
-
-def test_explicit_float_points_preserve_all_original_adjudicated_answers():
-    normal = rejected = 0
-    for row in ORACLE["rows"]:
-        point = TTInstant.from_float(row["jd_tt"])
-        if row["status"] == "normal":
-            actual = datetime_from_tt(point)
-            assert actual.isoformat() == row["expected_datetime_utc"], row["id"]
-            normal += 1
-        elif row["status"] == "unrepresentable_utc_label":
-            with pytest.raises(ValueError, match="UTC leap second not representable"):
-                datetime_from_tt(point)
-            rejected += 1
-    assert (normal, rejected) == (3930, 243)
+ROOT = Path(__file__).resolve().parents[2]
+PRIMARY = json.loads(
+    (ROOT / "tests/fixtures/historical-utc-domain-reference-v1.json").read_text()
+)
 
 
 def test_all_atomic_policy_starts_retain_the_original_utc_midnight_losslessly():
@@ -58,9 +42,13 @@ def test_twopart_input_is_not_silently_added_at_large_jd():
     )
 
 
-def test_pre_atomic_policy_parts_cannot_silently_lose_their_precision():
-    with pytest.raises(HistoricalUTCAdjustment, match="exact two-part TT"):
-        datetime_from_tt(TTInstant.from_parts(2430000.5, 0.001))
+@pytest.mark.usefixtures("native_ephemeris_files")
+def test_pre_atomic_parts_keep_the_existing_exact_entry_precision():
+    for row in PRIMARY["preUTC_native_reference"]["rows"]:
+        actual = datetime_from_tt(TTInstant.from_parts(*row["TT_parts"]))
+        assert actual.isoformat() == row["prior_exact_entry_UTC"]
+        native = datetime.fromisoformat(row["native_UTC_carrier"])
+        assert abs((actual - native).total_seconds()) <= 0.0002
 
 
 def test_naive_utc_and_floating_atomic_offset_are_not_invented_or_rounded():

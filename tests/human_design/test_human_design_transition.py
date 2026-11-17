@@ -20,7 +20,7 @@ from fatebridge.core.human_design_transition import (
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
 from fatebridge.validation.human_design_transition import verify_transition_trace
-from tests.support.ephemeris_context import moshier_ephemeris
+from tests.support.ephemeris_context import empty_ephemeris_path
 
 ROOT = Path(__file__).resolve().parents[2]
 CASE = json.loads((ROOT / "tests/data/human_design/transition-inputs.json").read_text())
@@ -38,7 +38,7 @@ INPUT = dict(
 
 
 def test_actual_ten_second_alias_retains_the_missing_coherent_state_with_one_extra_chart():
-    with moshier_ephemeris():
+    with empty_ephemeris_path():
         nominal = chart_at(MOMENT)
         result = assess_birth_interval(nominal, 1, "true")
         missed = chart_at_tt(CASE["missed_witness_tt"], backend="moshier")
@@ -83,7 +83,7 @@ def synthetic(first=4.0, second=4.25, *, same_source=False, reversal=False):
     origin = 2450000.5
     calls = []
     cache = {}
-    with moshier_ephemeris():
+    with empty_ephemeris_path():
         scaffold = chart_at(MOMENT)
 
     def at(jd):
@@ -183,7 +183,7 @@ def test_unobserved_reversal_does_not_become_a_stability_certificate():
 
 @pytest.fixture(scope="module")
 def full_run():
-    with moshier_ephemeris():
+    with empty_ephemeris_path():
         result = execute_tool(SPEC, SPEC.request_model(**INPUT))
     assert (
         verify_human_design_reading(result)["status"]
@@ -244,7 +244,7 @@ def test_fresh_hash_does_not_accept_forged_finite_refinement_evidence(full_run, 
 
 
 def test_unassessed_interval_cannot_acquire_a_refinement_claim():
-    with moshier_ephemeris():
+    with empty_ephemeris_path():
         value = execute_tool(
             SPEC, SPEC.request_model(**{**INPUT, "birth_time_uncertainty_minutes": 0})
         )
@@ -264,7 +264,7 @@ def test_audit_rejects_a_degraded_checker_that_drops_the_missed_state(monkeypatc
         == "observed_transition_regression_passed"
     )
     original = audit.assess_birth_interval
-    with moshier_ephemeris():
+    with empty_ephemeris_path():
         witness = chart_at_tt(CASE["missed_witness_tt"], backend="moshier")
     missed = JointSnapshotCache().key(witness)
 

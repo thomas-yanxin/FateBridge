@@ -94,7 +94,7 @@ def test_exact_reference_basis_and_complete_result_agree_in_rest_mcp_cli(
         assert proof["status"] == "verified_fixed_template_reading", proof
         identity = proof["native_execution_policy"]
         assert identity["matches_current_declared_policy"] is True
-        assert identity["historical_declared_policy_verified"] is False
+        assert identity["native_execution_authenticated"] is False
         assert (
             payload["cycle_summary"]["reference_contact_ordering"][
                 "physical_accuracy_certified"

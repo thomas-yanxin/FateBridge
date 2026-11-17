@@ -5,17 +5,20 @@ import hashlib
 import json
 import os
 import shutil
+from collections import Counter
 from pathlib import Path
 
 import pytest
 
 from fatebridge.core import ephemeris_runtime as e
+from fatebridge.core.astro import ephemeris, physical_sources
 from fatebridge.core.astro.birth import build_astro_birth_info
 from fatebridge.core.astro.ephemeris_integrity import (
     load_ephemeris_manifest,
     verify_ephemeris_bytes,
 )
 from fatebridge.core.astro.midpoints import PHYSICAL_BODIES, _native_factors
+from fatebridge.core.astro.orbits import ORBITAL_MODEL, ApproximateEphemeris
 from fatebridge.core.astro.physical_sources import (
     PhysicalEphemerisTrace,
     PhysicalSourceCohort,
@@ -23,6 +26,8 @@ from fatebridge.core.astro.physical_sources import (
 from fatebridge.core.astro.sensitivity import time_sensitivity
 from fatebridge.core.astro.time_scales import datetime_from_tt
 from fatebridge.utils.errors import EphemerisSourceError
+from tests.support.transports import rest as rest
+from tests.support.transports import surface_calls as surface_calls
 
 pytestmark = pytest.mark.skipif(e.swe is None, reason="Swiss Ephemeris required")
 
@@ -127,19 +132,28 @@ def test_actual_se1_headers_hashes_and_factor_references(ephemeris_files):
     assert source["accuracy_certified"] is False
 
 
-def test_analytical_fallback_never_claims_stale_file_contexts(ephemeris_files):
+@pytest.mark.parametrize(
+    "model,status",
+    [("moshier", "library_builtin"), (ORBITAL_MODEL, "packaged_analytic_model")],
+)
+def test_analytical_fallback_never_claims_stale_file_contexts(
+    ephemeris_files, model, status
+):
     _, directory = ephemeris_files
     e.configure_ephemeris_path(str(directory))
     e.ephemeris_call("calc", 2451545.0, e.swe.SUN, e.swe.FLG_SWIEPH)
     assert e.swe.get_current_file_data(0)[0]
-    e.ephemeris_call("calc", 2451545.0, e.swe.NEPTUNE, e.swe.FLG_MOSEPH)
+    if model == "moshier":
+        e.ephemeris_call("calc", 2451545.0, e.swe.NEPTUNE, e.swe.FLG_MOSEPH)
+    else:
+        ApproximateEphemeris(2451545.0, 2451545.0).state("Neptune")
     trace = PhysicalEphemerisTrace()
-    trace.observe("Neptune", "moshier")
+    trace.observe("Neptune", model)
     result = trace.finish()
     assert result["files"] == []
     assert result["by_factor"]["Neptune"] == {
-        "model": "moshier",
-        "status": "library_builtin",
+        "model": model,
+        "status": status,
         "file_ids": [],
     }
 
@@ -299,16 +313,8 @@ def test_nominal_and_sampled_models_must_also_agree(monkeypatch):
     ],
 )
 def test_partial_data_error_and_complete_interval_across_three_surfaces(
-    ephemeris_files, monkeypatch, tmp_path, capsys, key, variant
+    ephemeris_files, monkeypatch, key, variant, surface_calls
 ):
-    import asyncio
-
-    from fastapi.testclient import TestClient
-    from fastmcp import Client
-
-    import fatebridge.api as api
-    from fatebridge.cli import run
-    from fatebridge.mcp_server import create_mcp_app
     from fatebridge.services.tool_catalog import CATALOG
 
     source, directory = ephemeris_files
@@ -342,50 +348,10 @@ def test_partial_data_error_and_complete_interval_across_three_surfaces(
         "response_char_limit": 0,
         "as_of": "2026-10-22T00:00:00Z",
     }
-    api._reset_runtime_state_for_tests()
-    monkeypatch.setattr(
-        api,
-        "API_KEY_AUTHENTICATOR",
-        api.ApiKeyAuthenticator(header_name="X-API-Key", api_keys={}),
+
+    rest, protocol, code, cli = surface_calls(
+        spec, payload, projection=options, cli_first=False
     )
-    request = tmp_path / "coverage-request.json"
-    request.write_text(json.dumps(payload))
-
-    def surfaces():
-        params = [("fields", path)] + [
-            (k, str(v).lower() if isinstance(v, bool) else str(v))
-            for k, v in options.items()
-            if k != "fields"
-        ]
-        rest = TestClient(api.app).post(spec.rest_path, json=payload, params=params)
-
-        async def mcp():
-            async with Client(create_mcp_app()) as client:
-                return await client.call_tool(
-                    spec.tool_name, {**payload, **options}, raise_on_error=False
-                )
-
-        protocol = asyncio.run(mcp())
-        capsys.readouterr()
-        code = run(
-            [
-                spec.tool_name,
-                "--subject-file",
-                str(request),
-                "--fields",
-                path,
-                "--strict-fields",
-                "--no-include-snapshot-text",
-                "--response-char-limit",
-                "0",
-                "--as-of",
-                options["as_of"],
-            ]
-        )
-        cli = json.loads(capsys.readouterr().out)
-        return rest, protocol, code, cli
-
-    rest, protocol, code, cli = surfaces()
     assert rest.status_code == 503 and protocol.is_error and code == 1
     for error in (rest.json(), json.loads(protocol.content[0].text), cli):
         assert error["error_code"] == "ephemeris_source_inconsistent"
@@ -399,7 +365,9 @@ def test_partial_data_error_and_complete_interval_across_three_surfaces(
     for name in ("sepl_24.se1", "semo_24.se1"):
         shutil.copy2(source / name, directory / name)
     e.configure_ephemeris_path(str(directory))
-    rest, protocol, code, cli = surfaces()
+    rest, protocol, code, cli = surface_calls(
+        spec, payload, projection=options, cli_first=False
+    )
     assert rest.status_code == 200 and not protocol.is_error and code == 0
     bodies = [rest.json(), protocol.structured_content, cli]
     sensitivities = []
@@ -410,3 +378,49 @@ def test_partial_data_error_and_complete_interval_across_three_surfaces(
     assert sensitivities[0] == sensitivities[1] == sensitivities[2]
     assert sensitivities[0]["sample_count"] == 5
     assert sensitivities[0]["represented_radius_seconds"] == 60
+
+
+@pytest.mark.parametrize("borrowed", [False, True])
+def test_actual_batch_hashes_once_at_identity_and_once_at_its_owner_endpoint(
+    ephemeris_files, monkeypatch, borrowed
+):
+    _, directory = ephemeris_files
+    e.configure_ephemeris_path(str(directory))
+    original = physical_sources._file_digest
+    reads = Counter()
+
+    def measured(path):
+        reads[path.name] += 1
+        return original(path)
+
+    monkeypatch.setattr(physical_sources, "_file_digest", measured)
+    trace = PhysicalEphemerisTrace() if borrowed else None
+    batch = ephemeris._build_planet_states(
+        "chart", 2460389.77, julian_day_tt=2460389.771, source_trace=trace
+    )
+    assert batch.fallback is None
+    assert set(reads) == {"sepl_18.se1", "semo_18.se1"}
+    if trace is not None:
+        # The caller still has work to do; only it owns final verification.
+        assert set(reads.values()) == {1}
+        source = trace.finish()
+        assert set(source["by_factor"]) == set(PHYSICAL_BODIES)
+    assert set(reads.values()) == {2}
+
+
+def test_borrowed_batch_owner_still_rejects_changed_file_before_delivery(
+    ephemeris_files,
+):
+    _, directory = ephemeris_files
+    e.configure_ephemeris_path(str(directory))
+    trace = PhysicalEphemerisTrace()
+    batch = ephemeris._build_planet_states(
+        "chart", 2460389.77, julian_day_tt=2460389.771, source_trace=trace
+    )
+    assert batch.fallback is None
+    # Mutate only this fixture's writable copy, after the borrowed batch returns.
+    path = directory / "sepl_18.se1"
+    path.write_bytes(path.read_bytes() + b"changed-before-final-owner-delivery")
+    with pytest.raises(EphemerisSourceError) as caught:
+        trace.finish()
+    assert caught.value.reason == "changed_during"

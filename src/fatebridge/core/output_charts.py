@@ -14,6 +14,7 @@ from fatebridge.core.output_clock_labels import WesternUTCRepresentation
 from fatebridge.core.output_ephemeris import (
     ApparentPositionPolicy as ApparentPositionPolicy,
 )
+from fatebridge.core.output_ephemeris import SolarEphemerisReference
 from fatebridge.core.output_ephemeris import SolarPositionBody as SolarPositionBody
 from fatebridge.core.output_guolao import (
     GuolaoMansion,
@@ -164,6 +165,11 @@ class PlanetaryHours(PartialOutput):
     arc_end_jd_ut1: Optional[float] = None
     rule_id: Optional[str] = None
     sunrise_convention: Optional[str] = None
+    event_model: Optional[str] = None
+    ephemeris_models: Optional[List[str]] = None
+    ephemeris_sources: Optional[Dict[str, SolarEphemerisReference]] = None
+    ephemeris_source_policy: Optional[str] = None
+    equatorial_frame: Optional[str] = None
     time_scale: Optional[str] = None
     sequence_source: Optional[str] = None
     sequence_source_url: Optional[str] = None
@@ -221,12 +227,16 @@ class HouseProjectionPrecision(PartialOutput):
 class HousePositionProjection(PartialOutput):
     method: Optional[str] = None
     library_version: Optional[str] = None
+    factor_source_versions: Optional[Dict[str, str]] = None
+    factor_source_urls: Optional[Dict[str, str]] = None
     reason: Optional[str] = None
     armc: Optional[float] = None
     geographic_latitude: Optional[float] = None
     true_obliquity: Optional[float] = None
     house_code: Optional[str] = None
     input_frame: Optional[str] = None
+    backend_longitude_origin: Optional[float] = None
+    backend_frame: Optional[str] = None
     input_ecliptic_latitude: Optional[float] = None
     source_url: Optional[str] = None
     source_section: Optional[str] = None
@@ -280,8 +290,22 @@ class OrbitalFallback(PartialOutput):
     time_argument: Optional[str] = None
     source_path: Optional[str] = None
     method_reference_url: Optional[str] = None
+    factor_time_arguments: Optional[Dict[str, str]] = None
+    julian_day_tt: Optional[float] = None
+    tt_source: Optional[str] = None
+    library: Optional[str] = None
+    library_version: Optional[str] = None
+    additional_source_urls: Optional[List[str]] = None
+    position_convention: Optional[str] = None
+    longitude_motion_method: Optional[str] = None
+    factor_longitude_motion_methods: Optional[Dict[str, str]] = None
+    uncomputed_motion_reasons: Optional[Dict[str, str]] = None
+    longitude_motion_origin_rate_degrees_per_day: Optional[float] = None
+    accuracy_certified: Optional[bool] = None
     note_zh: Optional[str] = None
     candidate_file_year: Optional[int] = None
+    candidate_file_utc_calendar_year: Optional[int] = None
+    candidate_file_plan_basis: Optional[str] = None
     candidate_files: Optional[List[str]] = Field(
         default=None,
         description="Candidate planet/Moon data segments for the requested CE year, including adjacent-year boundaries. This list is not a file-integrity or loaded-model check.",
@@ -299,6 +323,7 @@ class EasternDirectionPrecision(PartialOutput):
     eastern_selector: Optional[str] = None
     intersection_normal_norm: Optional[float] = None
     tropical_model_ascendant: Optional[float] = None
+    model_longitude_origin: Optional[float] = None
     input_precision_scope: Optional[str] = None
     maximum_physical_error_arcseconds: Optional[float] = None
     source_url: Optional[str] = None
@@ -1229,6 +1254,7 @@ class BirthClockConversion(PartialOutput):
     solar_ephemeris_models_observed: Optional[List[str]] = None
     solar_model_call_count: Optional[int] = None
     solar_reference: Optional[str] = None
+    equatorial_frame: Optional[str] = None
     sidereal_time_model: Optional[str] = None
     earth_rotation_policy_id: Optional[str] = None
     target_julian_day_ut1: Optional[float] = None
@@ -1266,6 +1292,7 @@ class WesternSolarTimeReference(PartialOutput):
         default=None, allow_inf_nan=False
     )
     solar_ephemeris_model: Optional[str] = None
+    equatorial_frame: Optional[str] = None
     solar_ephemeris_source: Optional[dict[str, Any]] = None
     sidereal_time_model: Optional[str] = None
     earth_rotation_policy_id: Optional[str] = None

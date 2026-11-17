@@ -93,7 +93,7 @@ curl http://localhost:8010/health
 uv run --locked --extra dev python -m scripts.astronomy.prepare_reference_kernel
 ```
 
-测试与格式工具均使用锁定的 dev extra。缺依赖先修复环境，不将收集成功、跳过或三端相同当作计算正确。数值测试显式选择实际模型；`tests/support/ephemeris_context.py` 管理 Moshier 环境与缓存恢复，`tests/support/output_facts.py` 比较完整未舍入事实，只排除执行回执。需要固定执行时刻时传入带时区的 `as_of`。
+测试与格式工具均使用锁定的 dev extra。缺依赖先修复环境，不将收集成功、跳过或三端相同当作计算正确。数值测试按实际回执核对模型；`tests/support/ephemeris_context.py` 的 `empty_ephemeris_path()` 固定空原生搜索路径和 `native` 太阳选择策略，并恢复配置与缓存。直接原生计算可返回 Moshier，交节仍可选用捆绑 DE441；上下文名称不能代表所有结果的来源。`tests/support/output_facts.py` 比较完整未舍入事实，只排除执行回执。需要固定执行时刻时传入带时区的 `as_of`。
 
 ### CI 运行范围
 
@@ -102,6 +102,8 @@ uv run --locked --extra dev python -m scripts.astronomy.prepare_reference_kernel
 Python 3.10–3.13 最新依赖、Python 3.10 最低直接依赖及 Windows／Python 3.12 锁定依赖共六种环境，各按收集后的节点分成三片并行执行；按近期 CI 的相对耗时均衡分配，每片再使用最多四个独立 pytest 进程调度。`.github/ci-test-costs.json` 只影响分片归属，不筛掉任何测试，也不是数值验收门槛。`scripts/run_ci_checks.py` 的默认本地命令仍运行整个自包含集合；分片不改变标记排除与断言。每片上传实际节点清单，汇总验证每个环境的全部节点恰好执行一次。uv 使用 setup action 的依赖缓存，按 Python／依赖策略隔离并仅由首片写入，不缓存测试资料或虚拟环境。只有 Ubuntu 静态检查作业另缓存 Black／Mypy 的增量状态，按锁文件、工具配置与 Python 源码区分；工具仍按文件内容自行失效。
 
 云端不下载外部星历或大型独立参考。完整领域回归、数值与原典对照在本地使用原数据和固定门槛执行；云端通过不能作为这些项目的验收结论。混合测试文件中依赖本地资料的用例标记为 `local_data`，默认本地 `pytest` 不排除它们。
+
+完整目录的空星历输出按工具逐项参数化验证，同时检查完整 Pydantic／JSON Schema 和事实未被改写。共享输出按需构造并缓存，单个图式的合同检查不预先计算无关工具。
 
 文档链接、示例语法、工具数量与路由覆盖由独立 `documentation` 作业在每次 push／PR 中检查。Black、isort、mypy 与生成合同在 Ubuntu／Python 3.12 锁定环境的 `quality` 作业执行，与测试并行。原有 Ubuntu 锁定环境的 CLI／API 和真实 stdio MCP 验证保留。`CI result` 要求所有选中作业成功且分片覆盖完整；失败、取消或意外跳过均不能通过，只有已确认的纯普通文档变更允许重作业全部跳过。
 

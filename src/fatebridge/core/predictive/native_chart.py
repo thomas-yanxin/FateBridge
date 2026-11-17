@@ -42,6 +42,7 @@ from fatebridge.core.ephemeris_runtime import (
     configured_ephemeris_path,
     ephemeris_call,
     preserve_ephemeris_path,
+    swe,
 )
 from fatebridge.utils.timezones import parse_timezone_name, validate_local_clock
 
@@ -157,15 +158,21 @@ def build_native_subject(
     # Fail if a requested quadrant system is undefined; never clamp latitude.
     try:
         cusps, angles = ephemeris_call(
-            "houses_ex", times.jd_ut1, latitude, longitude, code.encode("ascii")
+            "houses_ex",
+            times.jd_ut1,
+            latitude,
+            longitude,
+            code.encode("ascii"),
+            _julian_day_tt=times.jd_tt,
         )
-    except Exception as error:
+    except swe.Error as error:
         raise ValueError(
             f"Cannot compute {code} houses at the supplied latitude "
             f"({type(error).__name__}); no substitute house system was used"
         ) from error
     cusps, angles, house_axis_convention = canonical_house_geometry(
         julian_day_ut1=times.jd_ut1,
+        julian_day_tt=times.jd_tt,
         latitude=latitude,
         longitude=longitude,
         house_code=code.encode("ascii"),
@@ -174,6 +181,7 @@ def build_native_subject(
     )
     angle_definition = native_ecliptic_horizon_angle_definition(
         julian_day_ut1=times.jd_ut1,
+        julian_day_tt=times.jd_tt,
         latitude=latitude,
         armc=float(angles[2]),
     )

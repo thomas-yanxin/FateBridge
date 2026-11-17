@@ -15,6 +15,8 @@ from typing import Any, Dict, Optional, Sequence, Tuple
 
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.angle_definitions import INTERSECTION_RESOLUTION_GUARD
+from fatebridge.core.astro.earth_attitude import earth_attitude
+from fatebridge.core.astro.geometry import combine_longitudes
 from fatebridge.core.astro.horizon_precision import (
     CONVERGENCE_DEGREES,
     METHOD_ID,
@@ -27,7 +29,10 @@ from fatebridge.utils.errors import EphemerisSourceError
 
 
 def _precision_geometry(
-    julian_day_ut1: float, latitude: float, common: Sequence[float]
+    julian_day_ut1: float,
+    latitude: float,
+    common: Sequence[float],
+    julian_day_tt: float | None = None,
 ) -> tuple[HorizonGeometry, dict[str, Any]] | None:
     if not isinstance(runtime.swe, ModuleType) or abs(latitude) == 90:
         return None
@@ -42,17 +47,11 @@ def _precision_geometry(
     if min(gap, 180 - gap) > 1.0 and abs(a) > SELECTOR_WORK_GATE:
         return None
     try:
-        auxiliary_tt = julian_day_ut1 + float(
-            runtime.ephemeris_call("deltat_ex", julian_day_ut1, 0)
+        attitude = earth_attitude(
+            runtime.swe, julian_day_ut1, julian_day_tt=julian_day_tt
         )
-        if not math.isfinite(auxiliary_tt):
-            raise EphemerisSourceError("horizon_direction_model_unavailable")
-        coordinates, returned = runtime.ephemeris_call(
-            "calc", auxiliary_tt, runtime.swe.ECL_NUT, 0
-        )
-        if returned < 0 or not math.isfinite(coordinates[0]):
-            raise EphemerisSourceError("horizon_direction_model_unavailable")
-        eps = float(coordinates[0])
+        auxiliary_tt = attitude.equator.jd_tt
+        eps = attitude.reduction.house_obliquity
     except EphemerisSourceError:
         raise
     except Exception as error:
@@ -87,7 +86,10 @@ def _precision_geometry(
         "house_auxiliary_tt": auxiliary_tt,
         "eastern_selector": model.eastern_selector,
         "intersection_normal_norm": model.intersection_norm,
-        "tropical_model_ascendant": model.tropical_ascendant,
+        "tropical_model_ascendant": combine_longitudes(
+            model.tropical_ascendant, attitude.reduction.house_longitude_origin
+        ),
+        "model_longitude_origin": attitude.reduction.house_longitude_origin,
         "input_precision_scope": "exact_supplied_binary64_native_house_angle_parameters",
         "maximum_physical_error_arcseconds": None,
         "source_url": "https://aa.usno.navy.mil/faq/alt_az",
@@ -103,6 +105,7 @@ def _canonical_house_axes(
     house_code: bytes,
     native_angles: Sequence[float],
     flags: int = 0,
+    julian_day_tt: float | None = None,
 ) -> tuple[
     tuple[float, ...], dict[str, Any] | None, HorizonGeometry | None, Sequence[float]
 ]:
@@ -112,9 +115,15 @@ def _canonical_house_axes(
     else:
         with runtime.preserve_ephemeris_path():
             _, physical = runtime.ephemeris_call(
-                "houses_ex", julian_day_ut1, latitude, longitude, b"E", flags
+                "houses_ex",
+                julian_day_ut1,
+                latitude,
+                longitude,
+                b"E",
+                flags,
+                _julian_day_tt=julian_day_tt,
             )
-    precision = _precision_geometry(julian_day_ut1, latitude, physical)
+    precision = _precision_geometry(julian_day_ut1, latitude, physical, julian_day_tt)
     model = precision[0] if precision else None
     corrected = float(physical[0])
     if precision:
@@ -193,6 +202,7 @@ def canonical_house_axes(
     house_code: bytes,
     native_angles: Sequence[float],
     flags: int = 0,
+    julian_day_tt: float | None = None,
 ) -> Tuple[Tuple[float, ...], Optional[Dict[str, Any]]]:
     public, receipt, _, _ = _canonical_house_axes(
         julian_day_ut1=julian_day_ut1,
@@ -201,6 +211,7 @@ def canonical_house_axes(
         house_code=house_code,
         native_angles=native_angles,
         flags=flags,
+        julian_day_tt=julian_day_tt,
     )
     return public, receipt
 
@@ -214,6 +225,7 @@ def canonical_house_geometry(
     native_cusps: Sequence[float],
     native_angles: Sequence[float],
     flags: int = 0,
+    julian_day_tt: float | None = None,
 ) -> tuple[tuple[float, ...], tuple[float, ...], dict[str, Any] | None]:
     public, receipt, model, common = _canonical_house_axes(
         julian_day_ut1=julian_day_ut1,
@@ -222,6 +234,7 @@ def canonical_house_geometry(
         house_code=house_code,
         native_angles=native_angles,
         flags=flags,
+        julian_day_tt=julian_day_tt,
     )
     cusps = tuple(native_cusps)
     if model is None or receipt is None:
@@ -245,7 +258,8 @@ def canonical_house_geometry(
             for index, (old, new) in enumerate(zip(native_cusps, cusps))
             if old != new
         ]
-    elif house_code in (b"E", b"V"):
+    elif house_code in (b"A", b"E", b"V"):
+        # Swiss A/E are the same Ascendant-anchored equal house method.
         repaired, action = aligned_longitude(
             float(native_angles[0]),
             float(common[1]),
@@ -253,8 +267,6 @@ def canonical_house_geometry(
         )
         if action != "native_coordinate_retained":
             shift = repaired - float(native_angles[0])
-            from fatebridge.core.astro.geometry import combine_longitudes
-
             cusps = tuple(combine_longitudes(float(v), shift) for v in cusps)
             changed = list(range(1, 13))
     elif house_code == b"P":
@@ -280,8 +292,8 @@ def canonical_house_geometry(
         "placidus_horizon_endpoints1_7_checked_intermediate_native_time_fraction_cusps_retained"
         if house_code == b"P"
         else (
-            "spatial_R_C_or_equal_E_V_W_endpoint_correction"
-            if house_code in (b"R", b"C", b"E", b"V", b"W")
+            "spatial_R_C_or_equal_A_E_V_W_endpoint_correction"
+            if house_code in (b"R", b"C", b"A", b"E", b"V", b"W")
             else "other_native_house_cusps_retained_not_requalified"
         )
     )

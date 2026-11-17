@@ -82,7 +82,9 @@ def test_new_source_cannot_silently_turn_original_nulls_into_an_answer(monkeypat
 
     def wrong(*args):
         value = copy.deepcopy(original(*args))
-        value["evaluations"][-2]["matched"] = False
+        unresolved = next(row for row in value["evaluations"] if row["id"] == "D11")
+        unresolved["relation_matches"] = False
+        unresolved["matched"] = False
         return value
 
     monkeypatch.setattr(production, "day_placement_patterns", wrong)

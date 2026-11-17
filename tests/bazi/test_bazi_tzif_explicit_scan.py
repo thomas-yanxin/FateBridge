@@ -56,28 +56,42 @@ def test_day_and_nine_day_events_equal_complete_original_scans(record):
     )
 
 
-def test_index_is_complete_for_every_registered_explicit_transition():
+def test_index_is_complete_for_every_registered_explicit_transition(monkeypatch):
+    # The reference describes these frozen bytes, not a later installed IANA revision.
+    monkeypatch.setattr(
+        timezones,
+        "_timezone_bytes",
+        lambda key: (STUDY / "all-declared-tzif" / key).read_bytes(),
+    )
+    timezones._parse_timezone_name_cached.cache_clear()
     epoch = datetime(1970, 1, 1, tzinfo=timezone.utc)
     checked = 0
-    for key, record in REFERENCE["tables"].items():
-        values = record["transition_seconds"]
-        if not values:
-            continue
-        zone = timezones.parse_timezone_name(key)
-        # No intermediate cache parsing: even near cache capacity the exact
-        # loaded object is kept. Each candidate is checked on both sides.
-        for value in values:
-            try:
-                at = epoch + timedelta(seconds=value)
-                before = at - timedelta(microseconds=1)
-            except OverflowError:
+    try:
+        for key, record in REFERENCE["tables"].items():
+            assert (
+                hashlib.sha256(timezones._timezone_bytes(key)).hexdigest()
+                == record["tzif_sha256"]
+            )
+            values = record["transition_seconds"]
+            if not values:
                 continue
-            candidates = timezones.timezone_transition_candidates(zone, before, at)
-            assert candidates == (at,), (key, value)
-            assert before.astimezone(zone).utcoffset() is not None
-            assert at.astimezone(zone).utcoffset() is not None
-            checked += 1
-    assert checked > 30000
+            zone = timezones.parse_timezone_name(key)
+            # No intermediate cache parsing: even near cache capacity the exact
+            # loaded object is kept. Each candidate is checked on both sides.
+            for value in values:
+                try:
+                    at = epoch + timedelta(seconds=value)
+                    before = at - timedelta(microseconds=1)
+                except OverflowError:
+                    continue
+                candidates = timezones.timezone_transition_candidates(zone, before, at)
+                assert candidates == (at,), (key, value)
+                assert before.astimezone(zone).utcoffset() is not None
+                assert at.astimezone(zone).utcoffset() is not None
+                checked += 1
+        assert checked > 30000
+    finally:
+        timezones._parse_timezone_name_cached.cache_clear()
 
 
 def test_bounds_and_loaded_object_identity_never_infer_footer_or_foreign_data():

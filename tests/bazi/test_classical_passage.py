@@ -46,7 +46,14 @@ def test_source_four_clashes_have_two_positioned_branch_intermediaries():
         if n["pillar"] == "hour" and n["plane"] == "hidden"
     } == {"丁", "己"}
     assert result["summary"]["calculation_effect"] == "none"
-    assert assessment == before and assessment["strength_level"] == "弱"
+    assert assessment == before
+    assert assessment["threshold_arithmetic"]["numerical_label"] == "弱"
+    # PDF199 explicitly says 日主弱中變旺 for this ordered source chart.
+    assert (
+        assessment["structural_decision"]["rule"]
+        == "aligned_four_branch_generation_and_time_lu"
+    )
+    assert assessment["strength_level"] == "强"
     assert (
         build_passage_evidence(dict(reversed(list(pillars.items()))), assessment)
         == result

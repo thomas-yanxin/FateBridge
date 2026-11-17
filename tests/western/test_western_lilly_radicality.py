@@ -12,7 +12,7 @@ import pytest
 from pydantic import ValidationError
 
 import fatebridge.core.lilly_radicality_inputs as clock
-from fatebridge.core.astro.classical import _sun_event
+from fatebridge.core.astro.solar_events import next_solar_event
 from fatebridge.core.astro.time_scales import datetime_from_ut1, ephemeris_time
 from fatebridge.core.ephemeris_runtime import (
     configure_ephemeris_path,
@@ -20,7 +20,6 @@ from fatebridge.core.ephemeris_runtime import (
 )
 from fatebridge.core.lilly_radicality import (
     evaluate_radicality,
-    hour_affinity,
     normalize_context,
 )
 from fatebridge.core.output_western import HoraryRadicality
@@ -356,7 +355,13 @@ def test_clock_unavailable_and_configuration_changes_remain_explicit(
 
 def test_actual_apparent_sunrise_day_and_geometric_sect_keep_distinct_boundaries():
     jd = ephemeris_time(datetime(2024, 6, 1, tzinfo=timezone.utc)).jd_ut1
-    rise = _sun_event(jd, 0, 51.5, True)
+    rise = next_solar_event(
+        jd,
+        longitude=0,
+        latitude=51.5,
+        rising=True,
+        definition="apparent_topocentric_center",
+    ).julian_day_ut1
     subject = build_native_subject(
         name="fictional horizon control",
         local_datetime=datetime_from_ut1(rise + 1 / 86400),

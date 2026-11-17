@@ -10,7 +10,9 @@ import pytest
 from fatebridge.core import ephemeris_runtime as runtime
 from fatebridge.core.predictive import _common, returns
 from fatebridge.core.predictive.transit import build_transit_payload
+from fatebridge.utils.errors import EphemerisSourceError
 from fatebridge.utils.timezones import parse_timezone_name
+from tests.support.transports import SPECS, inputs, rest, surface_calls
 
 
 def _birth_info():
@@ -23,6 +25,52 @@ def _birth_info():
         birth_longitude=116.4,
         birth_latitude=39.9,
     )
+
+
+@pytest.mark.parametrize(
+    "analysis_year,has_firdaria",
+    [(1989, False), (2500, True)],
+)
+def test_timing_aggregate_preserves_results_without_an_active_releasing_period(
+    analysis_year, has_firdaria
+):
+    from fatebridge.services.western_timing import calculate_western_timing_analysis
+    from tests.support.ephemeris_context import empty_ephemeris_path
+
+    with empty_ephemeris_path():
+        result = calculate_western_timing_analysis(
+            birth_year=1990,
+            birth_month=5,
+            birth_day=17,
+            birth_hour=15,
+            birth_minute=30,
+            birth_timezone="UTC",
+            birth_longitude=0.0,
+            birth_latitude=40.0,
+            analysis_year=analysis_year,
+            analysis_month=5,
+            analysis_day=20,
+            analysis_hour=12,
+            analysis_minute=0,
+            house_system="W",
+        )
+    assert "error" not in result
+    assert (
+        result["time_lords"]["zodiacal_releasing"]["spirit"]["current_level_1"] is None
+    )
+    assert (
+        result["time_lords"]["firdaria"]["current_major"] is not None
+    ) == has_firdaria
+    assert "Spirit 黄道释放 L1 未知" in result["summary"]
+    assert (
+        result["natal_reference"]["calculation_basis"]["ephemeris_model"] == "moshier"
+    )
+    assert result["returns"]["solar_return"]["solver"]["event_not_after_analysis"]
+    assert result["returns"]["lunar_return"]["solver"]["event_not_after_analysis"]
+    assert result["transits"]["current_transit"]["analysis_datetime"].startswith(
+        str(analysis_year)
+    )
+    assert result["directions"]["secondary_progression"]["sun"]["absolute_degree"] >= 0
 
 
 def test_partial_analysis_date_preserves_every_supplied_field(monkeypatch):
@@ -205,7 +253,7 @@ def test_concurrent_direct_call_waits_for_third_party_path_restoration(
         assert future.result(timeout=2) == (env_path or "/operator/ephe")
 
 
-def test_real_kerykeion_does_not_change_subsequent_core_precision(monkeypatch):
+def test_predictive_chart_does_not_change_subsequent_core_precision(monkeypatch):
     from fatebridge.core.astro.chart import build_core_chart_payload
 
     pytest.importorskip("swisseph")
@@ -224,3 +272,38 @@ def test_real_kerykeion_does_not_change_subsequent_core_precision(monkeypatch):
     assert paths[-1] == (original_path or "")
     after = build_core_chart_payload(_birth_info(), "chart")
     assert before == after
+
+
+@pytest.mark.parametrize(
+    "failure",
+    [EphemerisSourceError("model_changed"), RuntimeError("unexpected house failure")],
+)
+def test_native_house_failure_preserves_source_and_programming_errors(
+    monkeypatch, failure
+):
+    from fatebridge.core.predictive import native_chart
+
+    def fail(*args, **kwargs):
+        raise failure
+
+    monkeypatch.setattr(native_chart, "ephemeris_call", fail)
+    with pytest.raises(type(failure)) as caught:
+        _common.build_natal_subject(_birth_info())
+    assert caught.value is failure
+
+
+@pytest.mark.native_engine_fault
+def test_predictive_house_source_error_reaches_rest_mcp_cli(monkeypatch, surface_calls):
+    from fatebridge.core.predictive import native_chart
+
+    def fail(*args, **kwargs):
+        raise EphemerisSourceError("model_changed")
+
+    monkeypatch.setattr(native_chart, "ephemeris_call", fail)
+    spec = SPECS["transit"]
+    http, protocol, code, local = surface_calls(spec, inputs(spec))
+    assert http.status_code == 503 and protocol.is_error and code != 0
+    for output in (http.json(), protocol.structured_content, local):
+        assert output["error_code"] == "ephemeris_source_inconsistent"
+        assert output["issues"][0]["code"] == "model_changed"
+        assert output["retryable"] is False

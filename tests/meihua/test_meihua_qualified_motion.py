@@ -7,11 +7,8 @@ import pytest
 from fatebridge.application.execution import execute_spec
 from fatebridge.services.meihua import calculate_meihua_cast
 from fatebridge.services.tool_catalog import CATALOG
-from tests.support.meihua_qualified_motion_reference import (
-    expected_summary,
-    load,
-    path_get,
-)
+from tests.support.meihua_qualified_motion_reference import expected_summary, load
+from tests.support.reference_data import resolve as path_get
 
 GEOMETRY, COUNTING, READING, TEMPLATES = load()
 SPEC = next(s for s in CATALOG if s.key == "meihua_cast")

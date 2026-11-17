@@ -1,6 +1,5 @@
 """Independent exact geometry, actual-role fidelity and complete-run replay."""
 
-import ast
 import copy
 import hashlib
 import json
@@ -19,6 +18,7 @@ from fatebridge.core.human_design_profile_partition import (
     profile_partition_report,
     source_facts,
 )
+from fatebridge.core.public_output import same_public_value
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
 
@@ -161,7 +161,9 @@ def test_complete_new_context_is_field_bound_without_native_recalculation(comple
         result["profile_partition_context_status"]
         == "verified_nominal_role_and_exact_solar_arc_partition"
     )
-    assert complete["profile_partition_context"] == profile_partition_report(complete)
+    assert same_public_value(
+        complete["profile_partition_context"], profile_partition_report(complete)
+    )
     assert complete["interpretation"]["profile_partition_context"] == context_reading(
         complete["profile_partition_context"]
     )

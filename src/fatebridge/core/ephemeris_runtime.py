@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import os
 from contextlib import contextmanager
+from functools import partial
 from pathlib import Path
 from threading import RLock, local
 from typing import Any, Iterator, Optional
@@ -137,11 +138,11 @@ def lock_ephemeris_configuration() -> Iterator[None]:
 
 @contextmanager
 def preserve_ephemeris_path() -> Iterator[None]:
-    """Isolate third-party configuration changes from FateBridge calculations.
+    """Isolate temporary native configuration changes from other calculations.
 
-    Kerykeion changes the shared Swiss Ephemeris data path. Hold the same lock
-    used by direct ephemeris calls until its calculation and path restoration
-    finish, including when the third-party call raises.
+    Hold the same lock used by direct calls while native workers or catalogue
+    readers change the Swiss Ephemeris path, and restore the selected path on
+    both success and failure.
     """
     global _LAST_APPLIED_PATH
     with _EPHEMERIS_LOCK:
@@ -186,6 +187,10 @@ def ephemeris_call(operation: str, *args: Any, **kwargs: Any) -> Any:
             _THREAD_STATE.signature = signature
             _LAST_APPLIED_PATH = signature
         jpl = configured_jpl_file()
+        invoke = partial(
+            native_rotation_call,
+            calculate=lambda tt, body, flags: ephemeris_call("calc", tt, body, flags),
+        )
         if jpl is None:
             return observe(
                 compressed_endpoint_call(
@@ -193,7 +198,7 @@ def ephemeris_call(operation: str, *args: Any, **kwargs: Any) -> Any:
                     operation,
                     args,
                     kwargs,
-                    native_rotation_call,
+                    invoke,
                     configured_path=configured_ephemeris_path,
                 )
             )
@@ -201,7 +206,7 @@ def ephemeris_call(operation: str, *args: Any, **kwargs: Any) -> Any:
             args, kwargs, strict_result = prepare_jpl_call(
                 swe, jpl, operation, args, kwargs
             )
-            result = native_rotation_call(swe, operation, args, kwargs)
+            result = invoke(swe, operation, args, kwargs)
         except EphemerisSourceError:
             raise
         except Exception as error:

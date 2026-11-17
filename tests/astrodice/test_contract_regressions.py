@@ -345,7 +345,7 @@ def test_known_boundary_retains_both_native_states_and_auxiliary_source_scope(fr
 
 
 @pytest.mark.parametrize(
-    "model", ["jpl", "moseph", "fatebridge_approximate_orbital_model"]
+    "model", ["jpl", "moseph", "bounded_de441_earth_moon_planetary_fallback_v9"]
 )
 def test_other_kernels_do_not_claim_a_compressed_context_fix(model):
     policy = window.prime_lunar_source_window(

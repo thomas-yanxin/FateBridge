@@ -1,0 +1,33 @@
+{
+  "reference_sha256": "bb5f8ec191146b950c00c529fd0ed2320125324d714f71dddb2257b1ff9b5623",
+  "archive": "/Users/thomas/.codex/artifacts/fatebridge-celestial-frame-20261114/guolao-selected-day-models-v1",
+  "archive_files_sha256": {
+    "c04_reference.py": "e6fa71be0bd5b1c088dea6a39aadf5e83eb6bc25e3e728e1ac1167abe08d15f1",
+    "generate_c04_controls.py": "1aa8de5eef0035493dea2787a6cb03e637356b61a56d057d2ab8ca53625fa42f",
+    "c04-control-inputs.json": "020a649aa51d36b2cddfbbd849e8bba7e37a5142a3527decfee4ae2e9eeb012d",
+    "c04-reference.json.gz": "bb5f8ec191146b950c00c529fd0ed2320125324d714f71dddb2257b1ff9b5623",
+    "c04-comparison.json": "d479cb0617eef3e69e7c7402675450b4e37a44c0b2b738c46812810c7e0cfa10"
+  },
+  "production_imported_by_reference": false,
+  "source_sha256": "2f451f2b9faf42dc32f7368888980c92c3e773957019963c5d22df9ac20c8c82",
+  "source_bundle": "sources.zip",
+  "source_witness": "Same pinned IERS20 C04 daily series and its actual header; not latest EOP, a new observer or a new physical measurement.",
+  "atomic_offsets": "Official SOFA 2023-10-11 iauDat, iauCal2jd",
+  "arithmetic": "python-flint 0.9.0 exact source decimals, rational interpolation and closed-form inverse; independent integer IEEE nearest-even encoder",
+  "interpolation": "UT1-TAI linear on TT; pre1972 drift/adjustments and leap steps removed through SOFA actual TAI-UTC",
+  "controls": {
+    "published_daily_anchors": 23638,
+    "adjacent_intervals": 23637,
+    "each_interval_fraction_inputs": [
+      "1/4",
+      "1/2",
+      "3/4"
+    ],
+    "interior_queries": 70911,
+    "gate_seconds": 0.0002
+  },
+  "formal_errors_not_promoted_to_bounds": true,
+  "new_instantaneous_EOP_observations": 0,
+  "development_reference_not_blind": true,
+  "absolute_physical_accuracy_or_prediction_certified": false
+}

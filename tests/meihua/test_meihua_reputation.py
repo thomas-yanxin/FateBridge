@@ -10,18 +10,13 @@ from fatebridge.core.meihua_reputation import reputation_ruleset
 from fatebridge.core.requests.meihua import MeihuaInterpretationOptions
 from fatebridge.services.divination import calculate_meihua_analysis
 from fatebridge.services.meihua import calculate_meihua_cast
+from tests.support.reference_data import resolve
 
 FIXTURE = Path(__file__).parents[1] / "fixtures/meihua_reputation_v1"
 PROFILE = json.loads((FIXTURE / "profile.json").read_text())
 GEOMETRY = json.loads((FIXTURE / "geometry384.json").read_text())
 CONDITIONS = json.loads((FIXTURE / "contexts.json").read_text())
 LITERAL = json.loads((FIXTURE / "literal-candidates.json").read_text())
-
-
-def resolve(result, path):
-    for key in path.split("."):
-        result = result[int(key)] if isinstance(result, list) else result[key]
-    return result
 
 
 def test_frozen_source_precedes_implementation_and_profile_is_detached():

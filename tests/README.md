@@ -42,11 +42,19 @@ uv run --locked --extra dev python -m pytest -q
 
 跨领域复用的协议调用、结果交付和独立参考放在 `support/` 或 `fixtures/`，从实际定义模块导入。同领域可以共享具名样本；复用测试函数时使用不以 `test_` 开头的别名，避免额外收集同一测试。合并场景文件时保留全部参数、断言、标记及故障方式，并比较完整测试节点清单。
 
+[当前业务输出](support/current_outputs.py)按工具计算并在同一测试进程缓存；图式与投影用例只取实际使用的结果。空星历环境下的完整目录由 [逐工具输出检查](evaluation/test_agentic_nested_outputs.py)显式参数化覆盖，CI 同时核对完整 Pydantic／JSON Schema 与事实未被改写，不依赖某个图式夹具顺带计算整目录。
+
+打包太阳交节的完整TT队列使用[自包含独立参考](data/solar_tt_de440_v1/README.md)，由 `scripts/astronomy/solar_term_reference.py` 在边界读取一次并提供有类型的记录。`astronomy/test_solar_term_reference.py` 覆盖1700—2300的全部年网格及两个上下文年、两条TT路径、来源改写拒绝和范围隔离。参考生成需要独立Skyfield环境与完整DE440；普通回归只读已固定资料，不下载内核，也不调用生产算法生成答案。
+
+原生节气求根的 `astronomy/test_solar_term_runtime.py` 进入自包含CI，21项控制覆盖缓存、双向搜索、无关缺档前缀、实际根区间混源拒绝与求精期间文件变化。这些符号控制只验证求根与来源边界；真实1800年交点另与独立Swiss SDK及原始文件回执比较，不把控制数量算成天文精度证据。
+
+六壬秒级和分钟传播读取[自包含边界参考](data/ren_boundary_sources_v1/README.md)。`ren/test_ren_reference.py`进入自包含CI，核对完整队列、生成来源、旧身份差异的历史记录、改写拒绝、区间不确定及独立目录读取；只需两个当前读取模块和两个资料包。`ren/test_ren_seconds.py`与`ren/test_ren_boundary_decisions.py`继续验证实际领域和三端结果，所需外部SPK／原生星历依各用例条件准备。旧原始数值与失败保留，不从生产输出重生期望值。
+
 pytest 使用 `importlib` 导入模式，允许不同领域的同名模块一起收集。三端夹具、通用 REST 客户端与 `run_three` 在 [support/transports.py](support/transports.py) 维护；风水 MCP 调用与领域目录在 [support/fengshui_transports.py](support/fengshui_transports.py)。同主题的相同协议控制优先参数化，保留各请求、投影、分页、故障注入与业务断言。
 
 私有结果存储夹具和同次分页重建在 [support/result_delivery.py](support/result_delivery.py) 维护；MCP 分页与收据比较统一使用 [fixtures/mcp_result_delivery.py](fixtures/mcp_result_delivery.py)，首次响应的预算与业务可见性仍由对应断言核对。领域测试直接导入公共辅助，业务公式和独立断言继续留在所属测试中。
 
-西占角度边界的独立 Decimal 参考在 [support/western_angular_reference.py](support/western_angular_reference.py)，测试与审计命令共用它；参考不导入生产几何公式。法达默认日期的历史完整参考保存在本地 `tests/fixtures/firdaria-default-regression.json`，随文件记录原提交和来源散列，维护时不从当前输出重生期望值。
+西占角度边界的独立 Decimal 参考在 [support/western_angular_reference.py](support/western_angular_reference.py)，测试与审计命令共用它；参考不导入生产几何公式。法达的现行参考在 [fixtures/firdaria-reference.json](fixtures/firdaria-reference.json)，分别记录原输入资料、固定提交的 Morinus 日期、实际 Temporal 的精确名义钟时及文献字面分歧。旧地方钟快照的提交与散列保留为来源身份；其夏令时偏移不再作为正确时轴，不从当前生产输出重生期望值。
 
 六壬与金口诀当前锚点请求维护在 [fixtures/ren_anchors.py](fixtures/ren_anchors.py)，完整服务调用复用 [support/ren_anchors.py](support/ren_anchors.py)。原冻结资料继续保存故障构造和原始请求；现行三式请求仅去掉已退役的太乙 `accNum=0`，六壬时刻、地点、来源配置和全部故障条件保持原值。
 
@@ -56,4 +64,8 @@ pytest 使用 `importlib` 导入模式，允许不同领域的同名模块一起
 
 原典字面冲突、数值超差和未裁定结果本身也需要回归：测试通过可能只证明这些失败被诚实保留。不得从当前计算输出重新生成期望值、删反例或把固定来源检查改成跳过。当前算法限制见[算法状态](../docs/algorithm-status.md)，验证方法见[计算与预测验收](../docs/prediction-validation.md)。
 
+人类图冻结参考所记录的五份原生成器保存在 `tests/data/human_design_reference_generators_v1/`，从提交 `008b293447e5c8920a26ed782199e166aab46ae3` 的父提交中逐字恢复，并逐份核对原参考中的 SHA-256。它们只供来源校验及核读，不是在该目录运行的维护入口；现行生成器仍在 `scripts/human_design/`。目录迁移仅改变了维护脚本定位仓库根的层级，不能把现行脚本散列冒充原生成时的散列。原 JSON、计划、观测、失败及门槛均保留；这些 JSON 和星历仍是另备的本地资料，不因此进入自包含 CI。
+
 梅花天气研究的机械、农历、节气与条件容量核验共用一个脚本入口；其输出文件保护按四种检查和全部原始故障参数化验证。符号可达性直接运行 `meihua/test_meihua_weather_reachability.py`，保留完整288组取数、1440组解释与午时失败，不再重复启动只写同一报告的专用进程。
+
+公共日期框架的 `astronomy/test_reference_frames.py` 读取独立ERFA／Swiss数值参考。`astronomy/test_de441_solar.py` 对独立原始JPL／CALCEPH／Skyfield的完整14905项检查正向黄经，并对上一修订全部16／21项失败的并集及1200补充交点实际调用年表求根，沿用原门槛。旧Moshier专属算术测试随无调用方实现退役，原失败与来源仍保留；有限通过不是全时域或SOTA认证。

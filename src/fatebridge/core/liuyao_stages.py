@@ -1,4 +1,4 @@
-"""Evaluate partial phase mappings without inventing uncollated positions."""
+"""Compute the four stages used by 增删卜易, keeping the literal table separate."""
 
 from __future__ import annotations
 
@@ -15,7 +15,16 @@ PROFILE: dict[str, Any] = json.loads(
     .read_text(encoding="utf-8")
 )
 PHASES = ("长生", "帝旺", "墓", "绝")
+RULESET_ID = "zengshan_four_stage_cycle_v16"
+RULESET_VERSION = "16.0.0"
+FIRE_CYCLE_SOURCE = "https://www.shidianguji.com/zh/book/NA06416/chapter/1m7f91uq9we1f"
+PHASE_OFFSETS = dict(zip(PHASES, (0, 4, 8, 9)))
 STAGES: dict[str, dict[str, str]] = deepcopy(PROFILE["known_stages"])
+_fire_start = BRANCHES.index(next(b for b, p in STAGES["火"].items() if p == "长生"))
+STAGES["火"] = {
+    BRANCHES[(_fire_start + offset) % len(BRANCHES)]: phase
+    for phase, offset in PHASE_OFFSETS.items()
+}
 
 
 def query_stage(
@@ -58,23 +67,41 @@ def query_stage(
 
 def stage_knowledge() -> dict[str, Any]:
     return dict(
-        ruleset_id=PROFILE["ruleset_id"],
-        ruleset_version=PROFILE["ruleset_version"],
+        ruleset_id=RULESET_ID,
+        ruleset_version=RULESET_VERSION,
+        literal_ruleset_version=PROFILE["ruleset_version"],
         source_url=PROFILE["source"]["url"] + "#page=97",
         source_sha256=PROFILE["source"]["sha256"],
+        literal_source_stages=deepcopy(PROFILE["known_stages"]),
+        fire_cycle_derivation={
+            "source_url": FIRE_CYCLE_SOURCE,
+            "source_section": "易冒·卷四·長生章第三十一",
+            "stage_order_url": PROFILE["source"]["url"] + "#page=96",
+            "start_branch": BRANCHES[_fire_start],
+            "branch_direction": "forward",
+            "offsets_from_growth": PHASE_OFFSETS.copy(),
+            "derived_positions": {
+                b: p
+                for b, p in STAGES["火"].items()
+                if b not in PROFILE["known_stages"]["火"]
+            },
+        },
         known_stages=deepcopy(STAGES),
         missing_stages={
             e: [p for p in PHASES if p not in table.values()]
             for e, table in STAGES.items()
         },
         clauses=deepcopy(PROFILE["clauses"]),
-        interpretation=deepcopy(PROFILE["interpretation"]),
+        interpretation={
+            "query_model": "同一五行一支一阶段；四位之外的地支不命中这四项。火由寅长生顺推，推得午帝旺、亥绝，并复核原文戌墓。",
+            "aggregation": PROFILE["interpretation"]["aggregation"],
+        },
         raw_table_unchanged=True,
         table_complete=all(
             all(p in table.values() for p in PHASES) for table in STAGES.values()
         ),
         adjudication="phase_positions_not_efficacy",
-        scope=PROFILE["scope"],
+        scope="金木水土四位沿用底本；火的原文直证与顺推位置分列。完整只指生旺墓绝四位，不据位置判实际入墓、真绝或现实成败。",
     )
 
 
@@ -137,8 +164,8 @@ def attach_hidden_stage_conditions(
             pressure and flying["condition_match"] is None
         )
         h["stage_conditions"] = dict(
-            ruleset_id=PROFILE["ruleset_id"],
-            ruleset_version=PROFILE["ruleset_version"],
+            ruleset_id=RULESET_ID,
+            ruleset_version=RULESET_VERSION,
             source_url=PROFILE["source"]["url"] + "#page=101",
             source_sha256=PROFILE["source"]["sha256"],
             source_path=root,
@@ -152,7 +179,7 @@ def attach_hidden_stage_conditions(
                 else []
             ),
             adjudication="phase_positions_not_actual_entry_or_emergence",
-            scope="已知位置与缺表分开；一个已核墓绝位置不被其他未知位置抹掉。飞神不能克伏时，其墓绝缺项仅作附加支持诊断，不删除独立已核的伏神生扶。涉及克伏的缺项仍待审；不据位置判真墓真绝。",
+            scope="按五行生旺墓绝四位核对月、日及飞伏位置；不据位置判真墓真绝。",
         )
         raw = next(
             c

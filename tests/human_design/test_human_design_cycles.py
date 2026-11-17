@@ -18,7 +18,7 @@ from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
 from fatebridge.validation.human_design_cycle_reference import independent_cycle_checks
 from tests.support.ephemeris_case_runtime import native_ephemeris_files
-from tests.support.ephemeris_context import moshier_ephemeris
+from tests.support.ephemeris_context import empty_ephemeris_path
 
 ROOT = Path(__file__).resolve().parents[2]
 SPEC = next(s for s in CATALOG if s.key == "human_design")
@@ -97,7 +97,7 @@ def test_omission_never_reads_now_or_runs_the_cycle_sampler(monkeypatch):
 
 
 def test_empty_installation_preserves_planets_and_reports_missing_chiron():
-    with moshier_ephemeris():
+    with empty_ephemeris_path():
         result = calculate_human_design(
             **INPUT, cycle_reference_datetime="2029-07-01T00:00:00Z"
         )
@@ -195,7 +195,7 @@ def test_large_cycle_result_pages_reconstruct_the_same_run_without_recalculation
         if offset is None:
             break
     text = "".join(parts)
-    assert hashlib.sha256(text.encode()).hexdigest() == page["sha256"]
+    assert "sha256" not in page
     reconstructed = json.loads(text)
     assert reconstructed == complete_run
     assert (
@@ -260,7 +260,10 @@ def test_independent_plan_sources_and_generator_do_not_import_the_engine():
     plan = json.loads(
         (ROOT / "tests/fixtures/human-design-cycles-plan.json").read_text()
     )
-    source = ROOT / "scripts/human_design/gen_human_design_cycles_reference.py"
+    source = (
+        ROOT
+        / "tests/data/human_design_reference_generators_v1/gen_human_design_cycles_reference.py"
+    )
     ref = json.loads(
         (ROOT / "tests/fixtures/human-design-cycles-reference.json").read_text()
     )
@@ -307,7 +310,8 @@ def test_chiron_spk_adapter_is_checked_against_six_frozen_horizons_positions():
         fixture["generator_sha256"]
         == hashlib.sha256(
             (
-                ROOT / "scripts/human_design/check_human_design_cycle_horizons.py"
+                ROOT
+                / "tests/data/human_design_reference_generators_v1/check_human_design_cycle_horizons.py"
             ).read_bytes()
         ).hexdigest()
     )

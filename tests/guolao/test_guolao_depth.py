@@ -305,6 +305,8 @@ def test_missing_dependencies_cannot_fire_legacy_patterns():
     }
     assert "孤月独明" not in {p["name"] for p in guolao_moira.calculate(incomplete)}
     incomplete["planet_signidx"]["炁"] = 11
+    assert "孤月独明" not in {p["name"] for p in guolao_moira.calculate(incomplete)}
+    incomplete["is_winter"] = False
     assert "孤月独明" in {p["name"] for p in guolao_moira.calculate(incomplete)}
     assert not guolao_moira.calculate(
         {"asc_lon": None, "planet_signidx": {"水": 3, "金": 3}}
@@ -359,21 +361,24 @@ def test_parallel_workers_have_identical_physical_results():
     assert all(r == expected for r in results)
 
 
-def test_other_catalogue_and_operator_environment_survive_guolao(monkeypatch):
-    import kerykeion
-
-    directory = Path(kerykeion.__file__).parent / "sweph"
+def test_other_catalogue_and_operator_environment_survive_guolao(monkeypatch, tmp_path):
+    directory = tmp_path
+    source = (
+        Path(__file__).parents[2] / "src/fatebridge/data/western_stars/sefstars.txt"
+    )
+    (directory / "sefstars.txt").write_bytes(source.read_bytes())
     monkeypatch.setenv("SE_EPHE_PATH", str(directory))
     swe = runtime.swe
     with runtime.preserve_ephemeris_path():
         try:
             swe.close()
             swe.set_ephe_path(str(directory))
-            before = swe.fixstar2("Spica", 2451545.0)[0]
+            # Spica's frozen SIMBAD key requires this catalogue, not a native alias.
+            before = swe.fixstar2("FBW12", 2451545.0)[0]
             result = chart()
             assert "error" not in result, result
             assert os.environ["SE_EPHE_PATH"] == str(directory)
-            after = swe.fixstar2("Spica", 2451545.0)[0]
+            after = swe.fixstar2("FBW12", 2451545.0)[0]
             assert after == before
             assert len(result["guolao"]["mansion_boundaries"]) == 28
         finally:

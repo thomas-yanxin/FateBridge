@@ -4,12 +4,9 @@ from datetime import timezone
 
 import pytest
 
-from fatebridge.application.execution import execute_tool
 from fatebridge.application.meihua_clock_binding import (
     _clock_datetime,
-    require_meihua_clock_binding,
 )
-from fatebridge.core.requests.divination import MeihuaAnalysisRequest
 from fatebridge.services.tool_catalog import CATALOG
 from tests.support.meihua_fractional_binding_reference import load
 

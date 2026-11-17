@@ -49,7 +49,7 @@ class WesternTimingRequest(AstroBirthRequest, WesternEphemerisRequest):
     firdaria_year_basis: Literal["fixed_365_2425", "calendar_anniversary"] = Field(
         default="fixed_365_2425",
         description=(
-            "Firdaria year basis: fixed_365_2425 (existing local-wall arithmetic) "
+            "Firdaria year basis: fixed_365_2425 (fixed 86400-second days on UTC elapsed time) "
             "or calendar_anniversary (original-birth anniversaries, Feb 29 clamps "
             "to Feb 28 then restores; UTC elapsed subperiods). Calendar mode rejects "
             "ambiguous/nonexistent birth, analysis and generated anniversary clocks."

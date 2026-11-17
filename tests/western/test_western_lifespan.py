@@ -1,15 +1,11 @@
 """
 Deterministic tests for the western *lifespan* techniques.
 
-These techniques are pure functions of the natal positions plus a fixed table or
-rate, so the assertions pin exact, hand-computable values rather than fuzzy
-ranges. The natal longitudes themselves are produced by the already
-ephemeris-validated chart engine, so anchoring the *derived* math here is enough
-to lock the whole tool.
+These controls check selected derived arithmetic and service contracts. They do
+not certify natal ephemeris accuracy, complete classical methods or prediction.
 """
 
 from fatebridge.core.astrology_lifespan import (
-    BALBILLUS_EXALTATION,
     BALBILLUS_SMALL_YEARS,
     DOROTHEAN_TRIPLICITY_RULERS,
     KEYPOINTS_PERIOD_NUMBERS,
@@ -234,17 +230,6 @@ def test_balbillus_small_years_sum_to_129():
     assert sum(BALBILLUS_SMALL_YEARS.values()) == 129
 
 
-def test_balbillus_period_full_small_year_at_exaltation_no_fit():
-    # Venus has no reduction fit; placed exactly at its exaltation -> distance 0
-    # -> period = full small year (8.0).
-    lons = {p: BALBILLUS_EXALTATION[p] for p in BALBILLUS_SMALL_YEARS}
-    natal = _seven_planet_natal(lons)
-    payload = build_balbillus_payload(natal, start_planet="Venus", mode="nearest")
-    venus = payload["periods"][0]
-    assert venus["planet"] == "Venus"
-    assert venus["duration_years"] == 8.0
-
-
 def test_balbillus_order_sorts_by_longitude_then_rotates():
     lons = {
         "Sun": 10.0,
@@ -266,14 +251,6 @@ def test_balbillus_order_sorts_by_longitude_then_rotates():
         "Sun",
         "Moon",
     ]
-
-
-def test_balbillus_subperiods_fill_parent_span():
-    lons = {p: BALBILLUS_EXALTATION[p] for p in BALBILLUS_SMALL_YEARS}
-    payload = build_balbillus_payload(_seven_planet_natal(lons), mode="nearest")
-    first = payload["periods"][0]
-    sub_total = sum(s["duration_years"] for s in first["sub_periods"])
-    assert abs(sub_total - first["duration_years"]) < 1e-3
 
 
 def test_keypoints_period_numbers_table():

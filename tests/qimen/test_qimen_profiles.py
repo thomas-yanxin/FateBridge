@@ -8,7 +8,11 @@ from pathlib import Path
 import pytest
 
 from fatebridge.core.local_techniques.qimen import build_qimen_with_options
-from fatebridge.core.metaphysics.qimen import _qimen_build_palaces
+from fatebridge.core.metaphysics.qimen import (
+    _qimen_build_palaces,
+    _qimen_pan_earth,
+    _qimen_zhifu_zhishi,
+)
 from fatebridge.core.qimen_profiles import (
     GOD_PROFILES,
     SEASON_PROFILES,
@@ -37,11 +41,11 @@ def test_frozen_chapter_audit_keeps_coverage_separate_from_whole_book():
 
 @pytest.mark.parametrize("case", REFERENCE["god_diagrams"], ids=lambda c: c["id"])
 def test_four_scanned_god_circles_including_both_centre_hosts(case):
+    earth = _qimen_pan_earth(f'{case["dun"]}{"一二三四五六七八九"[case["ju"]-1]}局上元')
+    leader = _qimen_zhifu_zhishi(case["hour"], earth, dun_type=case["dun"])
     palaces = _qimen_build_palaces(
-        time_ganzhi=case["hour"],
-        ju_text=f'{case["dun"]}{"一二三四五六七八九"[case["ju"]-1]}局上元',
-        dun_type=case["dun"],
-        current_term="冬至",
+        earth=earth,
+        leader=leader,
         god_profile="yanyi_diagrams",
     )
     assert {p["trigram"]: p["god"] for p in palaces if p["trigram"] != "中"} == case[
@@ -59,12 +63,9 @@ def test_label_profile_preserves_every_star_door_stem_and_slot_in_1080_boards(
         hour = (
             "甲乙丙丁戊己庚辛壬癸"[index % 10] + "子丑寅卯辰巳午未申酉戌亥"[index % 12]
         )
-        args = dict(
-            time_ganzhi=hour,
-            ju_text=f'{dun}{"一二三四五六七八九"[number-1]}局上元',
-            dun_type=dun,
-            current_term="冬至",
-        )
+        earth = _qimen_pan_earth(f'{dun}{"一二三四五六七八九"[number-1]}局上元')
+        leader = _qimen_zhifu_zhishi(hour, earth, dun_type=dun)
+        args = dict(earth=earth, leader=leader)
         text = _qimen_build_palaces(**args, god_profile="yanyi_text")
         diagrams = _qimen_build_palaces(**args, god_profile="yanyi_diagrams")
         for before, after in zip(text, diagrams):

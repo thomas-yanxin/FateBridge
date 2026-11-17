@@ -11,6 +11,7 @@ from pydantic import ValidationError
 
 import fatebridge.application.execution as execution
 from fatebridge.core.output_chinese import JinkouCourse, JinkouQiEvidence
+from fatebridge.core.public_output import same_public_value
 from scripts.ren.audit_jinkou_qi_fidelity import CORPUS, audit, reference
 from tests.ren.test_jinkou_branch_breaks import PAYLOAD, SPEC, course, raw
 from tests.support.transports import AS_OF, business, rest, surface_calls
@@ -185,8 +186,8 @@ def test_valid_unchanged_qi_is_preserved_across_three_ports(project, surface_cal
     )
     for body in (http.json(), cli, protocol.structured_content):
         for role in ("primary", "natal_course", "year_fate"):
-            assert (
-                course(body, role)["qi_evidence"] == course(raw(), role)["qi_evidence"]
+            assert same_public_value(
+                course(body, role)["qi_evidence"], course(raw(), role)["qi_evidence"]
             )
 
 

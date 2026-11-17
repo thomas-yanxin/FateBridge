@@ -4,6 +4,8 @@ import gzip
 import json
 from pathlib import Path
 
+from tests.support.reference_data import resolve
+
 FIXTURES = Path(__file__).parents[1] / "fixtures"
 
 
@@ -31,12 +33,6 @@ VERSES = {
     r["raw_text"]: r for r in read("meihua_text_variants_v1/reference.json")["rows"]
 }
 TEMPLATE = read("meihua_text_variants_v1/template-source.json")
-
-
-def resolve(value, path):
-    for key in path.split("."):
-        value = value[int(key)] if isinstance(value, list) else value[key]
-    return value
 
 
 def assert_current_components(result):

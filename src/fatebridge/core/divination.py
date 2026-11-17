@@ -8,7 +8,8 @@ depending on an external runtime.
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Tuple
+from functools import lru_cache
+from typing import Any, Dict, List, Tuple, TypedDict
 
 from fatebridge.core.hexagram_relations import (
     ELEMENT_CONTROLS,
@@ -18,14 +19,23 @@ from fatebridge.core.hexagram_relations import (
 
 from ..utils.data import EARTHLY_BRANCHES
 from .gua_meanings import (
-    HEXAGRAM_INTERPRETATIONS,
     caution_phrase,
     get_hexagram_meaning,
     get_trigram_meaning,
 )
 from .zhouyi import classical_hexagram
 
-BAGUA_BY_NAME: Dict[str, Dict[str, Any]] = {
+
+class TrigramDefinition(TypedDict):
+    name: str
+    nature: str
+    element: str
+    lines: List[int]
+    symbol: str
+    keywords: str
+
+
+BAGUA_BY_NAME: Dict[str, TrigramDefinition] = {
     "乾": {
         "name": "乾",
         "nature": "天",
@@ -377,8 +387,8 @@ BODY_USE_LINE_ADJUSTMENTS = {
 }
 
 
-def _enrich_trigram(trigram: Dict[str, Any]) -> Dict[str, Any]:
-    enriched = dict(trigram)
+def _enrich_trigram(trigram: TrigramDefinition) -> Dict[str, Any]:
+    enriched = {**trigram, "lines": list(trigram["lines"])}
     enriched.update(get_trigram_meaning(trigram["name"]))
     return enriched
 
@@ -508,7 +518,7 @@ def _bagua_from_lines(lines: List[int]) -> Dict[str, Any]:
     for item in BAGUA_BY_NAME.values():
         if ",".join(str(bit) for bit in item["lines"]) == target:
             return _enrich_trigram(item)
-    return _enrich_trigram(BAGUA_BY_NAME["乾"])
+    raise ValueError("未匹配到八卦爻序列")
 
 
 def _bagua_from_number(number: int) -> Dict[str, Any]:
@@ -552,8 +562,8 @@ def build_opposite_hexagram(hexagram: Dict[str, Any]) -> Dict[str, Any]:
 
 def build_inverted_hexagram(hexagram: Dict[str, Any]) -> Dict[str, Any]:
     """综卦（倒颠卦）: 将原卦初爻与上爻、二爻与五爻、三爻与四爻对换 —
-    即整卦 180° 倒读。当卦为"错自身"时（如乾/坤/颐/大过/中孚/小过/坎/离），
-    返回的综卦即原卦。"""
+    即整卦 180° 倒读。乾/坤/颐/大过/中孚/小过/坎/离倒读后不变，
+    其综卦即原卦。"""
     inverted_lines = list(reversed(hexagram["lines"]))
     lower = _bagua_from_lines(inverted_lines[:3])
     upper = _bagua_from_lines(inverted_lines[3:])
@@ -867,30 +877,50 @@ def lookup_trigram_by_code(code: str) -> Dict[str, Any]:
     return trigram
 
 
+def _gua_name_key(name: str) -> str:
+    return (
+        name.strip().replace("卦", "").translate(str.maketrans("兌離恆無", "兑离恒无"))
+    )
+
+
+@lru_cache(maxsize=1)
+def _hexagram_name_index() -> Tuple[Dict[str, Tuple[str, str]], Dict[int, str]]:
+    """Derive exact aliases from existing diagrams and attributed chapter names."""
+    index: Dict[str, Tuple[str, str]] = {}
+    variants = {"澤": "泽", "風": "风", "為": "为"}
+    for (upper_name, lower_name), full_name in HEXAGRAM_NAMES.items():
+        upper, lower = BAGUA_BY_NAME[upper_name], BAGUA_BY_NAME[lower_name]
+        code = "".join(str(bit) for bit in [*lower["lines"], *upper["lines"]])
+        source_name: object = classical_hexagram(code)["name"]
+        if not isinstance(source_name, str):
+            raise RuntimeError("周易资料中的卦名必须为字符串")
+        short_name = full_name[0] if upper_name == lower_name else full_name[2:]
+        variants.update(zip(source_name, short_name))
+        for alias in (full_name, short_name):
+            index[_gua_name_key(alias)] = (upper_name, lower_name)
+    return index, {ord(source): target for source, target in variants.items()}
+
+
 def lookup_hexagram_by_name(name: str) -> Dict[str, Any]:
-    normalized = (name or "").strip().replace("卦", "")
-    candidates = {item.replace("卦", ""): item for item in HEXAGRAM_INTERPRETATIONS}
-    if normalized not in candidates:
+    index, variants = _hexagram_name_index()
+    pair = index.get(_gua_name_key(name).translate(variants))
+    if pair is None:
         raise ValueError(f"未识别的六十四卦名称：{name}")
-    target = candidates[normalized]
-    for (upper_name, lower_name), hexagram_name in HEXAGRAM_NAMES.items():
-        if hexagram_name == target:
-            hexagram = build_hexagram(upper_name, lower_name)
-            hexagram["meaning_source_kind"] = "modern_editorial_summary"
-            hexagram["classical"] = classical_hexagram(hexagram["binary_code"])
-            hexagram["code"] = hexagram["binary_code"]
-            hexagram["summary"] = (
-                f"{hexagram['name']}：{hexagram.get('theme', '卦意聚焦待补充')}。"
-                f"{hexagram.get('judgement', '')}"
-                f"{hexagram.get('guidance', '')}"
-                f"宜{hexagram.get('favorable', '顺势推进')}，忌{caution_phrase(hexagram.get('caution', '失衡冒进'))}。"
-            )
-            return hexagram
-    raise ValueError(f"未能定位卦名对应的结构：{name}")
+    hexagram = build_hexagram(*pair)
+    hexagram["meaning_source_kind"] = "modern_editorial_summary"
+    hexagram["classical"] = classical_hexagram(hexagram["binary_code"])
+    hexagram["code"] = hexagram["binary_code"]
+    hexagram["summary"] = (
+        f"{hexagram['name']}：{hexagram.get('theme', '卦意聚焦待补充')}。"
+        f"{hexagram.get('judgement', '')}"
+        f"{hexagram.get('guidance', '')}"
+        f"宜{hexagram.get('favorable', '顺势推进')}，忌{caution_phrase(hexagram.get('caution', '失衡冒进'))}。"
+    )
+    return hexagram
 
 
 def lookup_trigram_by_name(name: str) -> Dict[str, Any]:
-    normalized = (name or "").strip().replace("卦", "")
+    normalized = _gua_name_key(name)
     if normalized not in BAGUA_BY_NAME:
         raise ValueError(f"未识别的八卦名称：{name}")
     trigram = _enrich_trigram(BAGUA_BY_NAME[normalized])
@@ -912,37 +942,24 @@ def lookup_gua(query: str, lookup_mode: str = "auto") -> Dict[str, Any]:
     if not query_text:
         raise ValueError("query 不能为空。")
 
-    if normalized_mode in {"auto", "hexagram"}:
-        if len("".join(ch for ch in query_text if ch in {"0", "1"})) == 6:
-            result = lookup_hexagram_by_code(query_text)
-            result["lookup_type"] = "hexagram"
-            result["matched_query"] = query_text
-            return result
-        if (
-            normalized_mode == "hexagram"
-            or query_text.replace("卦", "") not in BAGUA_BY_NAME
-        ):
-            try:
-                result = lookup_hexagram_by_name(query_text)
-                result["lookup_type"] = "hexagram"
-                result["matched_query"] = query_text
-                return result
-            except ValueError:
-                if normalized_mode == "hexagram":
-                    raise
-
-    if normalized_mode in {"auto", "trigram"}:
-        if len("".join(ch for ch in query_text if ch in {"0", "1"})) == 3:
-            result = lookup_trigram_by_code(query_text)
-            result["lookup_type"] = "trigram"
-            result["matched_query"] = query_text
-            return result
+    binary_digits = sum(ch in {"0", "1"} for ch in query_text)
+    if normalized_mode in {"auto", "hexagram"} and binary_digits == 6:
+        result = lookup_hexagram_by_code(query_text)
+        lookup_type = "hexagram"
+    elif normalized_mode in {"auto", "trigram"} and binary_digits == 3:
+        result = lookup_trigram_by_code(query_text)
+        lookup_type = "trigram"
+    elif normalized_mode == "trigram" or (
+        normalized_mode == "auto" and _gua_name_key(query_text) in BAGUA_BY_NAME
+    ):
         result = lookup_trigram_by_name(query_text)
-        result["lookup_type"] = "trigram"
-        result["matched_query"] = query_text
-        return result
-
-    raise ValueError(f"未找到可匹配的卦象：{query}")
+        lookup_type = "trigram"
+    else:
+        result = lookup_hexagram_by_name(query_text)
+        lookup_type = "hexagram"
+    result["lookup_type"] = lookup_type
+    result["matched_query"] = query_text
+    return result
 
 
 def compose_meihua_hexagram(

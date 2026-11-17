@@ -1,7 +1,7 @@
 {
   "call_guidance": {
     "input_scope": "Only confirmedliteral4pillars, no birthdate/gender/timezone needed or inferred. Do not substitute examples.",
-    "interpretation": "Keepcomputedgrade and sourceannotations distinct; never use matchingannotation to overwrite calculation or claim fullbook/realityvalidation. Calendarformula conflicts are literalinput observations, not a repairedbirthday.",
+    "interpretation": "当前strength_level是工程政策档；engineering_index分列工程政策档与纯数值档，classical_adjudication只交付原典力量已核结论或明确未决。保留原标签、17组历史分歧及全部集合约束，不以unknown计通过，不查命例标签回填计算。未决也不表示已判无喜用或互助。",
     "source_scope": "Exactexposedreference retrieval and currentmodel comparison, all known/unknown/conflictingrecords retained."
   },
   "evidence_views": {
@@ -40,11 +40,13 @@
         "four_pillars",
         "input_context",
         "current_calculation.strength_level",
+        "current_calculation.engineering_index",
+        "current_calculation.classical_adjudication",
         "source_comparison",
         "summary"
       ],
       "label": "字面四柱与强弱编释核对",
-      "purpose": "读取当前计算、全部同柱记录及差异或未知；不是原典或预测准确率"
+      "purpose": "保留原工程政策档、全部同柱来源记录和旧分歧；原典裁定未知另列，不改原标签、不以未决计通过。"
     }
   },
   "first_view": {

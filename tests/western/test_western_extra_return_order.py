@@ -115,7 +115,7 @@ def test_scan_keeps_an_exact_root_on_a_shared_cell_boundary(monkeypatch, speed):
         lambda jd, body, **kwargs: ((120 + speed * (jd - 1)) % 360, speed, 0, ()),
     )
     monkeypatch.setattr(
-        astrology_events, "_jd_to_utc", lambda jd: origin + timedelta(days=jd)
+        astrology_events, "datetime_from_tt", lambda jd: origin + timedelta(days=jd)
     )
     monkeypatch.setattr(
         astrology_events,
@@ -137,7 +137,7 @@ def test_scan_distinguishes_a_true_zero_degree_crossing_from_the_antipodal_jump(
         lambda jd, body, **kwargs: ((359 + jd) % 360, 1.0, 0, ()),
     )
     monkeypatch.setattr(
-        astrology_events, "_jd_to_utc", lambda jd: origin + timedelta(days=jd)
+        astrology_events, "datetime_from_tt", lambda jd: origin + timedelta(days=jd)
     )
     monkeypatch.setattr(
         astrology_events,
@@ -156,7 +156,7 @@ def test_scan_keeps_the_final_fractional_cell(monkeypatch):
         lambda jd, body, **kwargs: (120 + jd - 1.125, 1.0, 0, ()),
     )
     monkeypatch.setattr(
-        astrology_events, "_jd_to_utc", lambda jd: origin + timedelta(days=jd)
+        astrology_events, "datetime_from_tt", lambda jd: origin + timedelta(days=jd)
     )
     monkeypatch.setattr(
         astrology_events,
@@ -167,9 +167,10 @@ def test_scan_keeps_the_final_fractional_cell(monkeypatch):
     assert roots == [origin + timedelta(days=1.125)]
 
 
+@pytest.mark.parametrize("latitude", [0, 80])
 @pytest.mark.parametrize("zodiac, expected_day", [("Tropic", 24), ("Sidereal", 25)])
 def test_nearest_return_and_zodiac_agree_across_rest_mcp_cli(
-    zodiac, expected_day, surface_calls
+    zodiac, expected_day, latitude, surface_calls
 ):
     spec = SPECS["astro_extrareturns"]
     inputs = dict(
@@ -180,7 +181,7 @@ def test_nearest_return_and_zodiac_agree_across_rest_mcp_cli(
         birth_minute=30,
         birth_timezone="UTC",
         birth_longitude=0,
-        birth_latitude=0,
+        birth_latitude=latitude,
         analysis_year=2002,
         analysis_month=1,
         analysis_day=12,

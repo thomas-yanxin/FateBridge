@@ -1,20 +1,29 @@
 """Evaluate measured scenes. Observations are compiled only from stated geometry."""
 
+from fractions import Fraction
 from itertools import combinations
-from math import asin, degrees, hypot
+from math import hypot, nextafter
 from typing import Literal
 
 from shapely.geometry import LineString, Polygon, box
 
 from .layout_inputs import FormObservation
+from .spatial_angles import (
+    DIRECTIONS,
+    Angle,
+    CompassDirection,
+    angular_radius,
+    compose_degrees,
+    direction_support,
+)
 from .spatial_geometry import (
     AREA_EPSILON,
-    DIRECTIONS,
-    angular_delta,
+    GeometryRectangle,
     corner_points_at,
-    direction_support,
     entrance_visible,
+    footprint_direction_support,
     heading,
+    point_on_segment,
     point_xy,
     polygon_xy,
     ray_xy,
@@ -26,7 +35,6 @@ from .spatial_geometry import (
     transform_rectangle,
 )
 from .spatial_inputs import (
-    CompassDirection,
     PlanPoint,
     PlanPose,
     PlanRectangle,
@@ -107,27 +115,47 @@ def location_support(scene: SpatialScene, anchor: PlanPoint) -> list[CompassDire
     compass = scene.compass
     if compass is None:
         return []
-    distance = hypot(
-        anchor.x - compass.sector_origin.x, anchor.y - compass.sector_origin.y
+    dx, dy = (
+        Fraction(anchor.x) - Fraction(compass.sector_origin.x),
+        Fraction(anchor.y) - Fraction(compass.sector_origin.y),
     )
-    if distance <= scene.coordinate_uncertainty_m:
+    distance_squared = dx * dx + dy * dy
+    if distance_squared <= Fraction(scene.coordinate_uncertainty_m) ** 2:
         return []
+    bearing = heading(compass.sector_origin, anchor)
+    assert bearing is not None
     radius = min(
-        180,
-        compass.uncertainty_degrees
-        + degrees(asin(scene.coordinate_uncertainty_m / distance)),
+        Fraction(180),
+        Fraction(compass.uncertainty_degrees)
+        + angular_radius(scene.coordinate_uncertainty_m, distance_squared),
     )
     return direction_support(
-        heading(compass.sector_origin, anchor) + compass.y_axis_bearing_degrees, radius
+        compose_degrees(bearing, compass.y_axis_bearing_degrees),
+        radius,
     )
 
 
 def relative_opening_positions(
-    observer: PlanPoint, facing: float, segment: PlanSegment
+    observer: PlanPoint, facing: Angle, segment: PlanSegment
 ) -> list[RelativePosition]:
-    start, end = heading(observer, segment.start), heading(observer, segment.end)
-    width = angular_delta(end, start)
-    cells = direction_support(start + width / 2 - facing, abs(width) / 2)
+    bearings = [
+        bearing
+        for endpoint in (segment.start, segment.end)
+        if (bearing := heading(observer, endpoint)) is not None
+    ]
+    if point_on_segment(observer, segment):
+        supported = {
+            cell
+            for bearing in bearings
+            for cell in direction_support(compose_degrees(bearing, -facing), 0)
+        }
+        cells = [cell for cell in DIRECTIONS if cell in supported]
+    else:
+        start, end = bearings
+        width = compose_degrees(end, -start, 180) - 180
+        cells = direction_support(
+            compose_degrees(start, width / 2, -facing), abs(width) / 2
+        )
     positions: tuple[RelativePosition, ...] = (
         "front",
         "front_right",
@@ -280,24 +308,14 @@ def evaluate_geometry(scene: SpatialScene) -> EvaluatedGeometry:
                         zones.append(f"{prefix}_{suffix}")
             directions = []
             if scene.compass:
-                distance = hypot(item.footprint.center.x, item.footprint.center.y)
-                radius = (
-                    hypot(item.footprint.width_m, item.footprint.depth_m) / 2
-                    + scene.coordinate_uncertainty_m
-                )
-                directions = (
-                    list(DIRECTIONS)
-                    if distance <= radius
-                    else direction_support(
-                        heading(PlanPoint(x=0, y=0), item.footprint.center)
-                        + desk.footprint.rotation_degrees
-                        + scene.compass.y_axis_bearing_degrees,
-                        min(
-                            180,
-                            scene.compass.uncertainty_degrees
-                            + degrees(asin(radius / distance)),
-                        ),
-                    )
+                directions = footprint_direction_support(
+                    shape,
+                    compose_degrees(
+                        desk.footprint.rotation_degrees,
+                        scene.compass.y_axis_bearing_degrees,
+                    ),
+                    scene.coordinate_uncertainty_m,
+                    scene.compass.uncertainty_degrees,
                 )
             desktop_placements.append(
                 DesktopPlacement(
@@ -338,9 +356,11 @@ def evaluate_geometry(scene: SpatialScene) -> EvaluatedGeometry:
     for seat in scene.seats:
         desk = bodies[seat.desk_id]
         position = transform_point(seat.offset, desk.footprint)
-        facing = (desk.footprint.rotation_degrees + seat.facing_offset_degrees) % 360
+        facing = compose_degrees(
+            desk.footprint.rotation_degrees, seat.facing_offset_degrees
+        )
         user = rectangle_xy(
-            PlanRectangle(
+            GeometryRectangle(
                 center=position,
                 width_m=seat.body_width_m,
                 depth_m=seat.body_depth_m,
@@ -439,7 +459,10 @@ def evaluate_geometry(scene: SpatialScene) -> EvaluatedGeometry:
         for passage in scene.passages:
             # Extend only beyond the declared end; side traffic is not a clash.
             end = passage.centerline.end
-            extended = ray_xy(end, heading(passage.centerline.start, end), reach)
+            bearing = heading(passage.centerline.start, end)
+            if bearing is None:
+                continue
+            extended = ray_xy(end, bearing, reach)
             passage_direct |= (
                 extended.buffer(passage.width_m / 2, cap_style="flat")
                 .intersection(user)
@@ -542,13 +565,10 @@ def evaluate_geometry(scene: SpatialScene) -> EvaluatedGeometry:
         if scene.compass:
             compass = scene.compass
             anchor = position if seat.sector_anchor == "seat" else desk.footprint.center
-            distance = hypot(
-                anchor.x - compass.sector_origin.x, anchor.y - compass.sector_origin.y
-            )
-            if distance <= scene.coordinate_uncertainty_m:
+            locations = location_support(scene, anchor)
+            if not locations:
                 binding = "at_sector_origin"
             else:
-                locations = location_support(scene, anchor)
                 binding = (
                     "confirmed"
                     if (
@@ -563,14 +583,18 @@ def evaluate_geometry(scene: SpatialScene) -> EvaluatedGeometry:
                     )
                 )
             facings = direction_support(
-                facing + compass.y_axis_bearing_degrees, compass.uncertainty_degrees
+                compose_degrees(facing, compass.y_axis_bearing_degrees),
+                compass.uncertainty_degrees,
             )
+        published_facing = float(facing)
+        if published_facing == 360:
+            published_facing = nextafter(360.0, 0.0)
         seats.append(
             SeatGeometry(
                 desk_id=seat.desk_id,
                 subject_ids=seat.subject_ids,
                 position=position,
-                plan_facing_degrees=facing,
+                plan_facing_degrees=published_facing,
                 sector_anchor=seat.sector_anchor,
                 location_directions=locations,
                 facing_directions=facings,

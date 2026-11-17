@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any, Callable
 
 from fatebridge.core.lilly_orbs import SOURCE_URL
+from fatebridge.core.planetary_event_order import ordered_contact
 
 _HOUSE_ORDER = (1, 10, 7, 4, 11, 5, 9, 3, 2, 8, 6, 12)
 _HOUSE_POINTS = {
@@ -65,47 +66,6 @@ def _all(values: list[bool | None]) -> bool | None:
     return False if False in values else None if None in values else True
 
 
-def _nearest_lunar_contact(
-    history: dict[str, Any], *, past: bool
-) -> tuple[dict[str, Any] | None, bool | None]:
-    """Order only nonoverlapping crossing brackets in the declared window."""
-    side = "past" if past else "future"
-    events = [
-        e
-        for e in history.get("events", [])
-        if e["kind"] == "contact" and "Moon" in e["bodies"]
-    ]
-    rows = [
-        e
-        for e in events
-        if e.get("topology") == "crossing" and e["epoch_relation"] == side
-    ]
-    if not rows:
-        return None, None
-    row = (max if past else min)(rows, key=lambda e: e["root_bracket_tt"][0])
-    lo, hi = row["root_bracket_tt"]
-    if (
-        any(e["epoch_relation"] == "question_boundary" for e in events)
-        or any(
-            e is not row
-            and e["root_bracket_tt"][0] <= hi
-            and lo <= e["root_bracket_tt"][1]
-            for e in events
-        )
-        or any(
-            e.get("topology") != "crossing"
-            and e["epoch_relation"] == side
-            and (
-                e["root_bracket_tt"][1] >= lo if past else e["root_bracket_tt"][0] <= hi
-            )
-            for e in events
-        )
-        or any("Moon" in u["bodies"] for u in history.get("unresolved_intervals", []))
-    ):
-        return row, None
-    return row, True
-
-
 def dwelling_clause(
     states: dict[str, dict[str, Any]],
     querent: str,
@@ -130,8 +90,10 @@ def dwelling_clause(
         and history.get("constant_velocity_projection") is False
     )
     if available and distinct:
-        prior, prior_order = _nearest_lunar_contact(history, past=True)
-        following, following_order = _nearest_lunar_contact(history, past=False)
+        events = history.get("events", [])
+        unresolved = history.get("unresolved_intervals", [])
+        prior, prior_order = ordered_contact(events, unresolved, "Moon", past=True)
+        following, following_order = ordered_contact(events, unresolved, "Moon")
         last_source = (
             None
             if prior_order is not True or prior is None
@@ -148,6 +110,7 @@ def dwelling_clause(
             None
             if source_phase is None
             or prior is None
+            or prior_order is not True
             or source_phase["phase"] == "unavailable"
             else source_phase["phase"] == "separating"
             and source_phase["aspect"] == prior["aspect"]
@@ -156,6 +119,7 @@ def dwelling_clause(
             None
             if target_phase is None
             or following is None
+            or following_order is not True
             or target_phase["phase"] == "unavailable"
             else target_phase["phase"] == "applying"
             and target_phase["aspect"] == following["aspect"]

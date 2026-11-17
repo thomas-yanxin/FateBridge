@@ -122,12 +122,12 @@ def test_actual_model_reference_points_and_snapshot_agree(
     assert basis["system_barycenters"] == [
         p
         for p in ["Mars", "Jupiter", "Saturn", "Uranus", "Neptune", "Pluto"]
-        if p != failed_body
+        if p != failed_body or p == "Pluto"
     ]
-    assert basis["theoretical_points"] == (
-        [] if failed_body == "North Node" else ["North Node"]
+    assert basis["theoretical_points"] == ["North Node"]
+    assert basis["approximate_points"] == (
+        [failed_body] if failed_body not in {None, "North Node", "Pluto"} else []
     )
-    assert basis["approximate_points"] == ([failed_body] if failed_body else [])
     assert basis["derived_points"] == ["South Node", "Pars Fortuna"]
     assert basis["unresolved_points"] == []
     assert basis["note_zh"] in result["snapshot_text"]
@@ -162,8 +162,8 @@ def test_declared_mean_node_theory_is_theoretical_and_cannot_label_a_body():
 def test_all_approximate_points_are_not_described_as_native_centers():
     result = ephemeris_reference_points(
         {
-            "Sun": "fatebridge_approximate_orbital_model",
-            "Jupiter": "fatebridge_approximate_orbital_model",
+            "Sun": "bounded_de441_earth_moon_planetary_fallback_v9",
+            "Jupiter": "bounded_de441_earth_moon_planetary_fallback_v9",
         },
         ["Pars Fortuna"],
     )

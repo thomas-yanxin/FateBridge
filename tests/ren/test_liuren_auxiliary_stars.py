@@ -15,6 +15,7 @@ from fatebridge.application.examples import evidence_views
 from fatebridge.core.metaphysics.liureng import build_liureng_board
 from fatebridge.core.metaphysics.liureng_auxiliary_stars import build_auxiliary_stars
 from fatebridge.core.output_liuren_auxiliary import LiurenAuxiliaryStars
+from fatebridge.core.public_output import same_public_value
 from tests.ren.test_ren_classical_depth import AUDIT as REN
 from tests.ren.test_ren_transports import PAYLOAD
 from tests.support.transports import AS_OF, SPECS, business, inputs, rest, surface_calls
@@ -203,14 +204,15 @@ def test_actual_auxiliary_facts_agree_on_rest_mcp_cli(key, project, surface_call
     assert http.status_code == 200 and not protocol.is_error and code == 0
     bodies = [http.json(), protocol.structured_content, cli]
     assert business(bodies[0]) == business(bodies[1]) == business(bodies[2])
+    fn, args, kwargs = spec.bind(spec.request_model.model_validate(payload))
+    expected = fn(*args, **kwargs)["liureng"]["auxiliary_stars"]
+    assert expected["source_sha256"] == REFERENCE["source_sha256"]
     for body in bodies:
         spec.output_model.model_validate(body)
         b = body["liureng"]
         aux = b["auxiliary_stars"]
-        assert (
-            len(aux["stars"]) == 7
-            and aux["source_sha256"] == REFERENCE["source_sha256"]
-        )
+        assert len(aux["stars"]) == 7
+        assert same_public_value(aux, expected)
         assert (
             aux["day_ganzhi"]
             == body["four_pillars"]["day"]["stem"]

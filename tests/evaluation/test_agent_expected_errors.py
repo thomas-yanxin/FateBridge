@@ -2,7 +2,6 @@
 
 import asyncio
 import json
-from pathlib import Path
 
 import pytest
 
@@ -11,7 +10,6 @@ from scripts.evaluate_agent import (
     error_response,
     grade_case,
     matches_expected_error,
-    model_prompt,
     prepare_references,
     prepare_workspace,
 )

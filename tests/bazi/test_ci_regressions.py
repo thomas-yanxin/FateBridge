@@ -8,6 +8,7 @@ import pytest
 from pydantic import ValidationError
 
 from fatebridge.analysis.compatibility import AdvancedCompatibility, RelationshipType
+from fatebridge.analysis.health import HealthAnalysis
 from fatebridge.analysis.marriage import MarriageAnalysis
 from fatebridge.core.bazi_evidence import build_natal_evidence
 from fatebridge.core.elements import ElementAnalysis
@@ -48,8 +49,12 @@ def test_favorable_conflict_explanation_reconciles_with_actual_deduction(
     reverse, count
 ):
     selected = ["木", "火", "土"][:count]
-    first = {"structure_profile": {"useful_elements": selected}}
-    second = {"structure_profile": {"avoid_elements": selected}}
+    first = {
+        "structure_profile": {"engineering_reference": {"useful_elements": selected}}
+    }
+    second = {
+        "structure_profile": {"engineering_reference": {"avoid_elements": selected}}
+    }
     if reverse:
         first, second = second, first
     result = AdvancedCompatibility._analyze_favorable_synergy(first, second)
@@ -70,7 +75,7 @@ def test_shared_ten_god_bonus_is_included_in_the_public_score_explanation(
     selected = ["正印", "偏印", "食神", "伤官"][:count]
     person = {
         "day_master": {"stem": "甲"},
-        "structure_profile": {"useful_ten_gods": selected},
+        "structure_profile": {"engineering_reference": {"useful_ten_gods": selected}},
     }
     result = (
         AdvancedCompatibility._analyze_favorable_synergy(person, person)
@@ -245,9 +250,7 @@ def test_current_punishment_contract_and_retired_method_rejection(
 )
 def test_all_twelve_branches_match_hand_counted_weights(branch, expected):
     actual = count_element_distribution({"day": ("甲", branch)})
-    assert {element.value: value for element, value in actual.items()} == pytest.approx(
-        expected, rel=0, abs=1e-12
-    )
+    assert {element.value: value for element, value in actual.items()} == expected
 
 
 def test_four_pillars_match_hand_counted_weights():
@@ -259,9 +262,13 @@ def test_four_pillars_match_hand_counted_weights():
     }
     actual = count_element_distribution(pillars)
     # Three metal stems, one wood stem; 午 has 丁/己 and 巳 has 丙/庚/戊.
-    assert {element.value: value for element, value in actual.items()} == pytest.approx(
-        {"木": 1, "火": 3.2, "土": 1.2, "金": 3.6, "水": 0}, rel=0, abs=1e-12
-    )
+    assert {element.value: value for element, value in actual.items()} == {
+        "木": 1,
+        "火": 3.2,
+        "土": 1.2,
+        "金": 3.6,
+        "水": 0,
+    }
 
 
 @pytest.mark.parametrize(
@@ -281,10 +288,37 @@ def test_four_pillars_match_hand_counted_weights():
 )
 def test_all_ten_stems_match_hand_counted_weights(stem, expected):
     actual = count_element_distribution({"day": (stem, "子")})
-    assert {element.value: value for element, value in actual.items()} == pytest.approx(
-        expected, rel=0, abs=1e-12
-    )
+    assert {element.value: value for element, value in actual.items()} == expected
 
 
 def test_empty_input_includes_every_element_zero_initialised():
     assert count_element_distribution({}) == {element: 0.0 for element in Element}
+
+
+@pytest.mark.parametrize(
+    "chart,element,status,climate,warm,cold",
+    [
+        (["丁卯", "己卯", "辛卯", "辛亥"], "木", "盘内偏多", "寒暖均衡", 2.0, 2.8),
+        (["甲子", "辛巳", "辛卯", "癸卯"], "土", "盘内偏少", "偏寒湿", 1.1, 4.1),
+        (["丙寅", "戊寅", "庚寅", "戊申"], "水", "盘内偏少", "偏燥热", 5.1, 2.1),
+    ],
+)
+def test_cultural_element_weight_thresholds_include_exact_boundary(
+    chart, element, status, climate, warm, cold
+):
+    # Exact rational controls under the declared 1, 1/2, 3/10 policy:
+    # 2.7 equals 1.8 times mean 1.5; 4.1-1.1 and 5.1-2.1 both equal 3.
+    # These are cultural weight labels, not clinical constitution assessments.
+    pillars = dict(zip(("year", "month", "day", "hour"), map(tuple, chart)))
+    result = HealthAnalysis.analyze_health(pillars)
+    findings = result["organ_analysis"]["findings"]
+    assert (
+        next(row["status"] for row in findings if row["element"] == element) == status
+    )
+    constitution = result["constitution"]
+    assert constitution["climate"] == climate
+    assert (constitution["warm_strength"], constitution["cold_strength"]) == (
+        warm,
+        cold,
+    )
+    assert result["is_medical_assessment"] is False

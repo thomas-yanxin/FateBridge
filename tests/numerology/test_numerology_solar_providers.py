@@ -1,14 +1,17 @@
 """Consumed source identity and bounded AA1996 events, without relabelling stock."""
 
+import gzip
 import hashlib
 import json
 import shutil
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from pathlib import Path
 
 import pytest
+import swisseph as swe
 
 from fatebridge.core import aa1996_solar, almanac
+from fatebridge.core.de441_solar import MODEL_ID as DE441_MODEL
 from fatebridge.core.local_techniques.canping import build_canping_result
 from fatebridge.core.local_techniques.heluo import build_heluo_result
 from fatebridge.fetch_aa1996 import build
@@ -81,8 +84,14 @@ def assert_actual_source(result, family, mode):
     assert trace["accuracy_certified"] is False
     if mode == "aa1996":
         assert all(
-            p["model_metadata"]["binary_sha256"]
-            == p["model_metadata"]["loaded_image_sha256"]
+            p["model_metadata"]["native_core_version"]
+            == p["model_metadata"]["sources"]["swiss"]["core_version"]
+            for p in profiles
+        )
+        assert all(
+            p["model_metadata"]["abi_version"] == 1
+            and p["model_metadata"]["native_moshier_relabelled"] is False
+            and p["model_metadata"]["accuracy_certified"] is False
             for p in profiles
         )
         assert all(p["ephemeris_model"] != "moshier" for p in profiles)
@@ -97,7 +106,32 @@ def test_actual_model_source_replaces_unconditional_jpl_attribution(
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", mode)
     fn = build_heluo_result if family == "heluo" else build_canping_result
     out = fn(**REFERENCE["valid_input"])
-    assert_actual_source(out, family, mode)
+    trace = assert_actual_source(out, family, mode)
+    if mode == "aa1996":
+        # Native builders retain the private byte identity; public delivery
+        # exposes the same model/version/source facts without these fields.
+        assert all(
+            p["model_metadata"]["binary_sha256"]
+            == p["model_metadata"]["loaded_image_sha256"]
+            for p in trace["source_profiles"]
+        )
+
+
+def test_aa1996_single_lichun_matches_all_full_year_fields_and_projection(
+    monkeypatch, solar_provider_environment
+):
+    from fatebridge.core.canping_solar import projection_boundary
+
+    monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "aa1996")
+    full = almanac.get_solar_terms_for_year(2000, "UTC")
+    selected = almanac._solar_terms_for_context_year(2000, "UTC", 2000, term_index=2)
+    assert len(full) == 24 and len(selected) == 1 and selected[0].name == "立春"
+    assert selected[0].as_dict() == full[2].as_dict()
+    boundary = projection_boundary(
+        2000, "UTC", origin_civil_year=2000, origin_bazi_year=2000, horizon=120
+    )
+    assert boundary["selection"] == "ordinary_public_year_grid"
+    assert boundary["record"] == full[2].as_dict()
 
 
 def test_aa1996_keeps_all_original96_tt_rows_with_stock_control_retained(
@@ -125,12 +159,39 @@ def test_aa1996_keeps_all_original96_tt_rows_with_stock_control_retained(
                         * 86400
                     )
                     assert term.ephemeris_model == (
-                        "moshier" if mode == "native" else aa1996_solar.MODEL_ID
+                        DE441_MODEL if mode == "native" else aa1996_solar.MODEL_ID
                     )
         assert set(rows) == set(lookup)
         results[mode] = rows
-    # A failure of the stock provider is preserved as negative evidence.
-    assert sum(e > 1.0 for e in results["native"].values()) == 12
+
+    # Native now selects the complete model. Keep a real, explicit stock
+    # control rather than attributing its original failures to that revision.
+    def stock_residual(tt, longitude):
+        coordinates, flags = swe.calc(tt, swe.SUN, swe.FLG_MOSEPH | swe.FLG_SPEED)
+        assert flags == swe.FLG_MOSEPH | swe.FLG_SPEED
+        return (coordinates[0] - longitude + 180) % 360 - 180
+
+    stock_errors = []
+    for row in expected:
+        lower, upper = row["jd_tt"] - 600 / 86400, row["jd_tt"] + 600 / 86400
+        assert stock_residual(lower, row["longitude"]) < 0
+        assert stock_residual(upper, row["longitude"]) > 0
+        while True:
+            middle = lower + (upper - lower) / 2
+            if middle in (lower, upper):
+                break
+            if stock_residual(middle, row["longitude"]) < 0:
+                lower = middle
+            else:
+                upper = middle
+        crossing = min(
+            (lower, upper), key=lambda tt: abs(stock_residual(tt, row["longitude"]))
+        )
+        stock_errors.append(abs(crossing - row["jd_tt"]) * 86400)
+    assert sum(error > 1.0 for error in stock_errors) == 12
+    assert (
+        max(results["native"].values()) <= REFERENCE["original_root_tolerance_seconds"]
+    )
     assert (
         max(results["aa1996"].values()) <= REFERENCE["original_root_tolerance_seconds"]
     )
@@ -152,20 +213,122 @@ def test_aa1996_birth_at_lower_public_year_keeps_complete_existing_horizon(
     expected = next(r for r in original if r["year"] == 1799 and r["index"] == 2)
     actual = boundaries[0]["record"]["solar_model_details"]["selected_crossing_jd_tt"]
     assert abs(actual - expected["jd_tt"]) * 86400 <= 1.0
-    assert_actual_source(out, "canping", "aa1996")
+    trace = assert_actual_source(out, "canping", "aa1996")
+    assert all(
+        p["model_metadata"]["binary_sha256"]
+        == p["model_metadata"]["loaded_image_sha256"]
+        for p in trace["source_profiles"]
+    )
     with pytest.raises(ValueError, match="1800..2200"):
         almanac.get_solar_terms_for_year(1799, "UTC")
 
 
-def test_unavailable_aa1996_projection_is_runtime503_without_partial_horizon(
-    monkeypatch, solar_provider_environment
+@pytest.mark.parametrize("method", ["bazi_appendix_v1", "bazi_continuous_v1"])
+def test_aa1996_upper_birth_year_keeps_complete_existing_horizon_and_source(
+    method, monkeypatch, solar_provider_environment
 ):
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "aa1996")
-    with pytest.raises(EphemerisSourceError) as caught:
-        build_canping_result(**{**REFERENCE["valid_input"], "date": "2200-05-15"})
-    assert caught.value.reason == "solar_aa1996_range"
-    assert caught.value.as_result()["status_code"] == 503
-    assert caught.value.as_result()["retryable"] is False
+    out = build_canping_result(
+        **{
+            **REFERENCE["valid_input"],
+            "date": "2200-05-15",
+            "dayun_method": method,
+        }
+    )
+    assert len(out["liunian_series"]["rows"]) == 120
+    boundaries = out["liunian_series"]["year_boundaries"]
+    assert [r["year"] for r in boundaries] == list(range(2200, 2321))
+    assert {r["record"]["ephemeris_model"] for r in boundaries} == {
+        aa1996_solar.MODEL_ID
+    }
+    trace = assert_actual_source(out, "canping", "aa1996")
+    for profile in trace["source_profiles"]:
+        metadata = profile["model_metadata"]
+        assert metadata["version"] == "1.2.0"
+        assert metadata["working_jd_tt"] == [2372652.5, 2526419.5]
+        assert metadata["qualified_solar_term_years"] == [1784, 2204]
+        assert metadata["derived_lichun_scope"]["years"] == [2205, 2320]
+        assert metadata["derived_lichun_scope"]["target_degrees"] == 315.0
+
+
+def test_aa1996_derived_lichun_matches_all116_independent_roots_without_regrading(
+    monkeypatch, solar_provider_environment
+):
+    from fatebridge.core.canping_solar import projection_boundary
+
+    folder = Path(__file__).parents[1] / "data/solar/aa1996-projection"
+    manifest = json.loads((folder / "manifest.json").read_bytes())
+    raw = (folder / manifest["reference_file"]).read_bytes()
+    assert hashlib.sha256(raw).hexdigest() == manifest["reference_sha256"]
+    data = json.loads(gzip.decompress(raw))
+    cases, reference = data["frozen_cases"], data["reference"]
+    assert reference["production_imports"] is False
+    assert len(cases) == len(reference["rows"]) == manifest["cases"] == 2905
+    assert {(r["year"], r["longitude"]) for r in cases} == {
+        (year, (285 + 15 * index) % 360)
+        for year in range(2200, 2321)
+        for index in range(24)
+    } | {(1799, 315)}
+    assert data["original_protocol"]["tolerance_seconds_tt"] == 1.0
+    original = data["original_comparison"]
+    assert original["failures"] == len(data["original_failed_rows"]) == 19
+    assert original["maximum_absolute_residual_seconds_tt"] == 1.2738615274429321
+    assert sum(not r["within_original_one_second_gate"] for r in original["rows"]) == 19
+    monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "aa1996")
+    errors = []
+    for case, expected in zip(cases, reference["rows"], strict=True):
+        if case["year"] < 2205 or case["longitude"] != 315:
+            continue
+        boundary = projection_boundary(
+            case["year"],
+            "UTC",
+            origin_civil_year=2200,
+            origin_bazi_year=2200,
+            horizon=120,
+        )
+        assert boundary["selection"] == "bounded_derived_lichun_event"
+        details = boundary["record"]["solar_model_details"]
+        assert details["internal_observed_retflags"] == [260]
+        assert details["root_bracket_seconds"] <= 0.0002
+        errors.append(
+            abs(details["selected_crossing_jd_tt"] - expected["jd_tt"]) * 86400
+        )
+    assert len(errors) == manifest["derived_events"] == 116
+    assert max(errors) <= manifest["original_gate_seconds_tt"] == 1.0
+
+
+@pytest.mark.parametrize("year", [2205, 2320, 2321])
+def test_aa1996_derived_permission_does_not_expand_ordinary_observations_or_roots(
+    year, solar_provider_environment
+):
+    low = date(year, 2, 1).toordinal() + 1721424.5
+    high = date(year, 2, 12).toordinal() + 1721424.5
+    for invoke in (
+        lambda: aa1996_solar.solar_longitudes_tt([low]),
+        lambda: aa1996_solar.longitude_crossing_tt(315.0, low, high),
+    ):
+        with pytest.raises(EphemerisSourceError) as caught:
+            invoke()
+        assert caught.value.reason == "solar_aa1996_range"
+        assert caught.value.as_result()["status_code"] == 503
+        assert caught.value.as_result()["retryable"] is False
+    if year == 2321:
+        with pytest.raises(EphemerisSourceError) as caught:
+            aa1996_solar.longitude_crossing_tt(315.0, low, high, projection_year=year)
+        assert caught.value.reason == "solar_aa1996_range"
+
+
+@pytest.mark.parametrize(
+    "target,year,offset",
+    [(300.0, 2205, 0), (315.0, 2206, 0), (315.0, 2205, -1), (315.0, True, 0)],
+)
+def test_aa1996_derived_permission_requires_the_actual_lichun_year_and_window(
+    target, year, offset, solar_provider_environment
+):
+    low = date(2205, 2, 1).toordinal() + 1721424.5 + offset
+    high = date(2205, 2, 12).toordinal() + 1721424.5
+    with pytest.raises(ValueError, match="AA1996 projection"):
+        aa1996_solar.longitude_crossing_tt(target, low, high, projection_year=year)
 
 
 def test_unknown_and_mixed_sources_are_not_relabelled_as_jpl():

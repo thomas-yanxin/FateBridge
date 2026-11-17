@@ -161,6 +161,7 @@ def audit() -> dict[str, Any]:
                         role=name,
                         branch=branch,
                         branch_xun_kong=branch in expected_empty,
+                        xunkong_exception_applies=branch in expected_empty,
                     )
                 for i, z in enumerate(v["rows"]):
                     earth, sky = BRANCHES[i], BRANCHES[(i + shift) % 12]
@@ -173,6 +174,10 @@ def audit() -> dict[str, Any]:
                     ok = ok and z["sky_authority_roles"] == [
                         name for name, branch in roles if branch == sky
                     ]
+                    ok = ok and z["sky_authority_xunkong_exception"] is (
+                        sky in expected_empty
+                        and any(branch == sky for _, branch in roles)
+                    )
                     ok = ok and z["effective_empty"] is None
                 ok = (
                     ok
@@ -201,7 +206,7 @@ def audit() -> dict[str, Any]:
         synthetic_row_comparisons=matrix_count * 12,
         synthetic_role_comparisons=matrix_count * 3,
         synthetic_matrix_failures=matrix_failures,
-        matrix_scope="Base sky/earth xun membership, three explicit roles, hour membership and retained unknown verdicts. The matrix does not independently certify all ten stem houses or resolve seasonal empty conditions.",
+        matrix_scope="Base sky/earth xun membership, three explicit role exceptions, hour membership and retained unknown verdicts. The matrix does not independently certify all ten stem houses or resolve seasonal empty conditions.",
         engineering_checks_passed=passed,
         new_independent_astronomical_events=0,
         new_historical_events=0,

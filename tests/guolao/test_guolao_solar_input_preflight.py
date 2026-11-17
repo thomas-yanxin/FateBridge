@@ -6,7 +6,6 @@ alongside the separately declared Guolao input convention, not a complete port.
 
 import asyncio
 import csv
-import importlib.util
 import io
 import json
 import math

@@ -2,11 +2,13 @@
 
 Swiss general documentation 2.4 distinguishes planetary system barycenters
 from centers of body. No CENTER_BODY flag is requested by the sky engine.
-Approximate or unidentified models must not inherit a native point claim.
+The continuous DE441 Pluto source independently identifies that system's
+barycenter. Other approximate or unidentified sources keep their own limits.
 """
 
 from typing import Any, Dict, List
 
+from fatebridge.core.astro.orbits import FALLBACK_MODELS, MEAN_NODE_MODEL, ORBITAL_MODEL
 from fatebridge.core.astro.profiles import ANALYTICAL_MEAN_NODE_MODEL
 
 BODY_CENTERS = frozenset({"Sun", "Moon", "Mercury", "Venus"})
@@ -27,10 +29,15 @@ def ephemeris_reference_points(
         "unresolved_points": [],
     }
     for name, model in planetary_models.items():
-        if model == "fatebridge_approximate_orbital_model":
-            key = "approximate_points"
-        elif name == "North Node" and model == ANALYTICAL_MEAN_NODE_MODEL:
+        if name == "North Node" and model in {
+            ANALYTICAL_MEAN_NODE_MODEL,
+            MEAN_NODE_MODEL,
+        }:
             key = "theoretical_points"
+        elif model == ORBITAL_MODEL and name == "Pluto":
+            key = "system_barycenters"
+        elif model in FALLBACK_MODELS:
+            key = "approximate_points"
         elif model not in NATIVE_MODELS:
             key = "unresolved_points"
         elif name in BODY_CENTERS:
@@ -45,7 +52,7 @@ def ephemeris_reference_points(
     notes = []
     if groups["system_barycenters"]:
         notes.append(
-            "原生系统质心："
+            "已确认系统质心："
             + "、".join(groups["system_barycenters"])
             + "；未应用这些行星的本体中心修正。"
         )

@@ -131,12 +131,10 @@ def test_actual_reference_points_project_across_three_transports(
     assert response.status_code == 200, response.text
     expected = response.json()
     basis = expected["chart"]["params"]["ephemerisReferencePoints"]
-    assert basis["approximate_points"] == ([failed_body] if failed_body else [])
+    assert basis["approximate_points"] == []
     assert basis["center_body_correction_applied"] is False
-    assert ("Pluto" in basis["system_barycenters"]) is (failed_body != "Pluto")
-    assert basis["theoretical_points"] == (
-        [] if failed_body == "North Node" else ["North Node"]
-    )
+    assert "Pluto" in basis["system_barycenters"]
+    assert basis["theoretical_points"] == ["North Node"]
     Draft202012Validator(SPEC.output_model.model_json_schema()).validate(expected)
 
     async def invoke():
@@ -278,9 +276,13 @@ def test_one_failed_body_and_its_model_project_across_three_transports(
     profile = expected["chart"]["params"]["chart_profile"]
     assert profile["orbital_fallback"]["approximate_planets"] == ["Pluto"]
     assert (
-        profile["planetary_models"]["Pluto"] == "fatebridge_approximate_orbital_model"
+        profile["planetary_models"]["Pluto"]
+        == "bounded_de441_earth_moon_planetary_fallback_v9"
     )
-    assert profile["planetary_models"]["Sun"] != "fatebridge_approximate_orbital_model"
+    assert (
+        profile["planetary_models"]["Sun"]
+        != "bounded_de441_earth_moon_planetary_fallback_v9"
+    )
     assert expected["run_metadata"]["engine_is_approximate"] is True
     Draft202012Validator(SPEC.output_model.model_json_schema()).validate(expected)
 
@@ -681,12 +683,12 @@ def test_rotation_phase_policy_and_angles_project_across_three_transports(
     assert response.status_code == 200, response.text
     expected = response.json()
     policy = expected["chart"]["params"]["chart_profile"]["earth_rotation"]
-    assert policy["policy_id"] == "fatebridge_standard_rotation_v3"
+    assert policy["policy_id"] == "fatebridge_physical_earth_attitude_v6"
     assert policy["tt_argument_policy"] == (
         "shared_default_DeltaT_minus1_before1960_SWIEPH_from1960"
     )
     if date.startswith("2050"):
-        assert policy["sidereal_time_model"] == "IERS2010_expression_Swiss_nutation"
+        assert policy["sidereal_time_model"] == "IAU2006_2000A_CIO"
         assert policy["longterm_phase_alignment"] is None
     else:
         assert (

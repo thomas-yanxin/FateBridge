@@ -182,9 +182,9 @@ def test_observed_source_drift_prevents_a_pass(monkeypatch):
 
 
 def test_requested_swieph_fallback_is_reported_as_actual_moshier():
-    from tests.support.ephemeris_context import moshier_ephemeris as golden_ephemeris
+    from tests.support.ephemeris_context import empty_ephemeris_path
 
-    with golden_ephemeris():
+    with empty_ephemeris_path():
         report = AUDIT.audit()
     assert {r["actual_model"] for r in report["comparisons"]} == {"moshier"}
     assert report["selected_inertial_comparison_passed"]

@@ -132,10 +132,9 @@ def test_head_pattern_identity_and_uniqueness_across_1080_structural_boards(dun,
     text = f'{dun}{"一二三四五六七八九"[ju-1]}局上元'
     for i in range(60):
         hour = sexagenary_text(i)
-        leader = engine._qimen_zhifu_zhishi(hour, text, dun_type=dun)
-        palaces = engine._qimen_build_palaces(
-            time_ganzhi=hour, ju_text=text, dun_type=dun, current_term="冬至"
-        )
+        earth = engine._qimen_pan_earth(text)
+        leader = engine._qimen_zhifu_zhishi(hour, earth, dun_type=dun)
+        palaces = engine._qimen_build_palaces(earth=earth, leader=leader)
         patterns = build_combinations(
             {"palaces": palaces, "time_ganzhi": hour},
             leader=leader,

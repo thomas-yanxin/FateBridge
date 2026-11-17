@@ -10,6 +10,8 @@ from tests.numerology.test_numerology_solar_providers import (
     REFERENCE,
     TRACE_ID,
     assert_actual_source,
+    solar_aa1996_build,
+    solar_provider_environment,
 )
 from tests.support.transports import SPECS, business, call_cli, native
 from tests.support.transports import rest as shared_rest
@@ -95,8 +97,11 @@ def test_source_only_projection_keeps_actual_source_identity(
             "https://moshier.net/"
         }
         assert all(
-            p["model_metadata"]["binary_sha256"]
-            == p["model_metadata"]["loaded_image_sha256"]
+            p["model_metadata"]["native_core_version"]
+            == p["model_metadata"]["sources"]["swiss"]["core_version"]
+            and p["model_metadata"]["abi_version"] == 1
+            and p["model_metadata"]["native_moshier_relabelled"] is False
+            and p["model_metadata"]["accuracy_certified"] is False
             for p in facts["source_profiles"]
         )
 

@@ -1,7 +1,6 @@
 """Actual date-table sources, complete finite coverage, and unresolved clock policy."""
 
 import asyncio
-import hashlib
 import json
 import shutil
 from datetime import date
@@ -28,7 +27,7 @@ from fatebridge.services.metaphysics import (
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.birth_input import create_person_info
 from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
-from tests.fixtures.mcp_result_delivery import assert_same_run_receipt
+from tests.fixtures.mcp_result_delivery import read_full_result
 
 # Match the existing calendar-audit file's precise legacy-API filters; other
 # warnings still surface. This does not suppress conversion errors or defects.
@@ -316,23 +315,7 @@ def test_source_view_and_actual_provider_match_rest_native_mcp_cli(
             assert not result.is_error
             p = result.structured_content
             assert len(json.dumps(p, ensure_ascii=False, separators=(",", ":"))) <= 8192
-            if "result_delivery" not in p:
-                return p
-            ref = p["result_delivery"]
-            uri = ref["first_page_uri"]
-            raw = ""
-            while uri:
-                page = json.loads((await client.read_resource(uri))[0].text)
-                raw += page["text"]
-                uri = page["next_uri"]
-            assert hashlib.sha256(raw.encode()).hexdigest() == ref["sha256"]
-            full = json.loads(raw)
-            assert_same_run_receipt(
-                p["run_metadata"],
-                full["run_metadata"],
-                deferred_fields=ref["deferred_fields"],
-            )
-            return full
+            return await read_full_result(client, p)
 
     native = asyncio.run(call())
     args = [tool]

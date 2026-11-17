@@ -76,7 +76,10 @@ def test_all_244_fixed_native_lattice_roots_in_a_fresh_process():
         else "tests/fixtures/human-design-solar-speed-lattice.json"
     )
     ref = json.loads(path.read_text())
-    gen = ROOT / "scripts/human_design/build_human_design_solar_speed_reference.py"
+    gen = (
+        ROOT
+        / "tests/data/human_design_reference_generators_v1/build_human_design_solar_speed_reference.py"
+    )
     assert hashlib.sha256(gen.read_bytes()).hexdigest() == ref["generator_sha256"]
     assert len(ref["cases"]) == 244
     tree = ast.parse(gen.read_text())
@@ -107,19 +110,34 @@ def test_all_244_fixed_native_lattice_roots_in_a_fresh_process():
             capture_output=True,
             timeout=120,
         )
-        assert probe.returncode == 1, probe.stdout + probe.stderr
         report = json.loads(target.read_text())
-    expected_strict = {
-        "status": "failed",
+    assert report["reference_binding"]["frozen_content_bound"] is True
+    assert report["unavailable_case_count"] == 0
+    rows = report["cases"]
+    assert [(row["label"], row["backend"]) for row in rows] == [
+        (case["label"], case["backend"]) for case in ref["cases"]
+    ]
+    for row, case in zip(rows, ref["cases"], strict=True):
+        assert row["status"] == "compared"
+        assert row["reference_selected_jd_tt"] == case["selected_jd_tt"]
+        # The original strict predicate is epoch AND the actual solar value.
+        # Same-epoch sample equality supplies the latter; it is not a tolerance.
+        assert row["strict_root_equal"] is (
+            row["current_selected_jd_tt"] == case["selected_jd_tt"]
+            and row["local_checks"]["reference_selected_sun_exact_at_same_TT"]
+        )
+    failed = sum(not row["strict_root_equal"] for row in rows)
+    local_passed = sum(all(row["local_checks"].values()) for row in rows)
+    assert report["strict_selected_root_conformance"] == {
+        "status": "failed" if failed else "passed",
         "total": 244,
-        "passed": 243 if sys.platform == "linux" else 242,
-        "failed": 1 if sys.platform == "linux" else 2,
+        "passed": 244 - failed,
+        "failed": failed,
     }
-    assert report["strict_selected_root_conformance"] == expected_strict
-    assert report["strict_selected_root_conformance"]["status"] == "failed"
-    assert report["strict_selected_root_conformance"]["total"] == 244
-    assert report["strict_selected_root_conformance"]["failed"] > 0
-    assert report["bounded_numeric_conformance_passed"] is False
+    assert report["actual_local_witness_checks_passed"] == local_passed
+    passed = failed == 0 and local_passed == 244
+    assert report["bounded_numeric_conformance_passed"] is passed
+    assert probe.returncode == (0 if passed else 1), probe.stdout + probe.stderr
 
 
 @pytest.mark.parametrize("backend", PLAN["backends"])
@@ -307,6 +325,10 @@ def actual_family():
         "sample_sun",
         "fake_monotonicity",
         "bracket_missing",
+        "initial_TT",
+        "initial_nonadjacent",
+        "preferred_contact",
+        "selection_changed",
         "candidate_missing",
         "candidate_sun",
         "candidate_snapshot",
@@ -334,6 +356,18 @@ def test_local_curve_and_complete_candidate_contradictions_reject_without_native
         lattice["continuous_monotonicity_certified"] = True
     elif kind == "bracket_missing":
         lattice["observed_sign_brackets"].pop()
+    elif kind == "initial_TT":
+        lattice["initial_lower_jd_tt"] = float("nan")
+    elif kind == "initial_nonadjacent":
+        lattice["initial_lower_jd_tt"] = math.nextafter(
+            lattice["initial_lower_jd_tt"], -math.inf
+        )
+    elif kind == "preferred_contact":
+        lattice["preferred_numeric_contact"]["selected_index"] = -1
+    elif kind == "selection_changed":
+        lattice["selection_changed_by_lattice"] = not lattice[
+            "selection_changed_by_lattice"
+        ]
     elif kind == "candidate_missing":
         family["candidates"].pop()
     elif kind == "candidate_sun":

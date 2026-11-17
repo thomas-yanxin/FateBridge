@@ -42,11 +42,20 @@ def test_same_wall_fold_cache_keeps_both_independent_month_expectations(order):
 
 def test_all_declared_fold_projections_keep_source_precision_and_denominators():
     report = AUDIT.audit()
-    assert report["comparison_count"] == report["matched_count"] == 54
+    assert report["comparison_count"] == report["calculation_matched_count"] == 54
+    assert report["current_clock_matched_count"] == 54
+    assert report["matched_count"] == 30
+    assert len(report["failures"]) == 24
+    assert {row["clock_resolution"]["timezone"] for row in report["failures"]} == {
+        "America/Havana",
+        "America/Campo_Grande",
+        "America/Cuiaba",
+    }
     assert report["unique_astronomical_minute_count"] == 5
     assert report["middle_term_zone_projection_count"] == 7
     assert report["source_minute_edge_uncertainty"] == ["F04"]
-    assert report["selected_clock_checks_passed"]
+    assert report["selected_clock_checks_passed"] is False
+    assert report["selected_current_clock_checks_passed"]
     assert report["full_supported_calendar_domain_certified"] is False
     assert report["classical_acceptance_passed"] is False
     assert report["goal_complete"] is False

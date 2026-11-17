@@ -65,6 +65,15 @@ def test_both_orders_of_lichun_and_lunar_new_year_keep_year_candidates_unselecte
     assert len({c["ganzhi"] for c in year["boundary_candidates"]}) == 2
     assert all(not c["adopted"] for c in year["boundary_candidates"])
     assert not any(p["rule_id"] == "year_stem_block" for p in q["patterns"])
+    outcome = year["candidate_outcomes"]["year_stem_block"]
+    if date.startswith("2025"):
+        assert outcome["matched_across_candidates"] is False
+        jia = next(c for c in year["boundary_candidates"] if c["literal_stem"] == "甲")
+        assert {c["effective_stem"] for c in jia["jia_candidates"]} == {"壬", "戊"}
+        assert not any(c["adopted"] for c in jia["jia_candidates"])
+    else:
+        assert outcome["matched_across_candidates"] is None
+        assert outcome["any_candidate_palaces"] == ["兑七宫"]
     assert "年界待核" in "\n".join(_qimen_stem_context_lines(q))
 
 
@@ -143,6 +152,10 @@ def test_no_calendar_guess_outside_table_support():
     q = calculate(datetime(1800, 6, 1, 12))["qimen"]
     assert all(
         q["stem_context"][role]["status"] == "calendar_anchor_unavailable"
+        for role in ("year", "lunar_month_start")
+    )
+    assert all(
+        "candidate_outcomes" not in q["stem_context"][role]
         for role in ("year", "lunar_month_start")
     )
     assert not any(

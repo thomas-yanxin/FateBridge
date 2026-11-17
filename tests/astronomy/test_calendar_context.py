@@ -1,12 +1,17 @@
-from datetime import datetime, timedelta
+import json
+from datetime import date, datetime, timedelta
+from pathlib import Path
 
 import pytest
 
 import fatebridge.services.bazi as bazi
 from fatebridge.core.almanac import (
-    DAY_GANZHI_STRATEGY_REFERENCE_OFFSET,
     build_calendar_context,
+    get_adjacent_solar_terms,
+    get_bazi_month_boundaries,
     get_bazi_month_context,
+    get_bazi_year,
+    get_day_ganzhi,
     get_solar_terms_for_year,
 )
 from fatebridge.core.calendar import BaZiCalendar
@@ -14,6 +19,35 @@ from fatebridge.core.timing import TimingAnalysis
 from fatebridge.services.calculation import calculate_destiny_analysis
 from fatebridge.services.timing import calculate_comprehensive_timing
 from fatebridge.utils.birth_input import create_person_info
+
+DAY_REFERENCE = json.loads(
+    (Path(__file__).parents[1] / "data/bazi_day_cycle_v1.json").read_text()
+)
+
+
+def test_civil_day_epoch_at_pinned_year_and_leap_boundaries():
+    for text, lunar_python, sxtwl in DAY_REFERENCE["day_rows"]:
+        day = date.fromisoformat(text)
+        assert get_day_ganzhi(day.year, day.month, day.day) == lunar_python == sxtwl
+
+
+def test_all_24_hours_at_pinned_calendar_boundaries():
+    for text, hour, (expected_day, expected_hour) in DAY_REFERENCE["day_hour_rows"]:
+        day = date.fromisoformat(text)
+        assert (
+            "".join(
+                BaZiCalendar.calculate_day_pillar(
+                    day.year, day.month, day.day, hour=hour
+                )
+            )
+            == expected_day
+        )
+        assert (
+            "".join(
+                BaZiCalendar.calculate_hour_pillar(day.year, day.month, day.day, hour)
+            )
+            == expected_hour
+        )
 
 
 def test_lichun_boundary_updates_bazi_year_and_month():
@@ -39,6 +73,32 @@ def test_lichun_boundary_updates_bazi_year_and_month():
     assert get_bazi_month_context(after, "Asia/Shanghai")["branch"] == "寅"
 
 
+@pytest.mark.parametrize("zone", ["UTC", "Asia/Shanghai", "America/New_York"])
+@pytest.mark.parametrize("route", ["year", "adjacent", "month"])
+def test_returned_solar_provenance_cannot_poison_later_boundaries(
+    zone: str, route: str, request: pytest.FixtureRequest
+):
+    get_solar_terms_for_year.cache_clear()
+    request.addfinalizer(get_solar_terms_for_year.cache_clear)
+    term = get_solar_terms_for_year(2024, zone)[2]
+    pristine = term.as_dict()
+    moment = term.moment + timedelta(seconds=1)
+    if route == "year":
+        returned = get_solar_terms_for_year(2024, zone)[2]
+    elif route == "adjacent":
+        returned = get_adjacent_solar_terms(moment, zone)[0]
+    else:
+        returned = get_bazi_month_boundaries(moment, zone)[0]
+    assert returned.name == "立春"
+    assert returned.solar_model_details is not None
+    returned.solar_model_details["model_id"] = "caller-local-change"
+    returned.solar_model_details["root_bracket_tt"].append(-1)
+
+    assert get_solar_terms_for_year(2024, zone)[2].as_dict() == pristine
+    assert get_bazi_year(moment, zone) == 2024
+    assert get_bazi_month_context(moment, zone)["branch"] == "寅"
+
+
 def test_dayun_start_details_use_jieqi_boundary():
     birth = datetime(2028, 4, 6, 9, 33)
 
@@ -61,17 +121,19 @@ def test_dayun_start_details_use_jieqi_boundary():
     assert details["start_age_rounded"] == 10
 
 
-def test_reference_offset_day_pillars_match_reference_snapshot():
+def test_day_pillars_use_the_civil_epoch_in_both_independent_calendars():
+    # Pinned lunar-python 1645ad3 and sxtwl_cpp f78cd5e agree. The original
+    # unsupported offset snapshot and its 丁酉/辛亥 result are retained in the
+    # audit evidence; a global eleven-day shift is not a calendar convention.
     pillars = BaZiCalendar.get_four_pillars(
         datetime(2026, 4, 4, 21, 12, 6),
         timezone_name="Asia/Shanghai",
-        day_pillar_strategy=DAY_GANZHI_STRATEGY_REFERENCE_OFFSET,
     )
 
     assert pillars["year"] == ("丙", "午")
     assert pillars["month"] == ("辛", "卯")
-    assert pillars["day"] == ("丁", "酉")
-    assert pillars["hour"] == ("辛", "亥")
+    assert pillars["day"] == ("戊", "申")
+    assert pillars["hour"] == ("癸", "亥")
 
 
 def test_destiny_analysis_exposes_lunar_and_meihua_context():

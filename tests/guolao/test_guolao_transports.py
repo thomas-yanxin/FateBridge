@@ -1,7 +1,6 @@
 """Real REST, native MCP, CLI and complete same-run delivery for Guolao."""
 
 import asyncio
-import hashlib
 import json
 
 import pytest
@@ -15,6 +14,7 @@ from fatebridge.cli import run
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
 from tests.fixtures.surface_payloads import astro_payload
+from tests.support.result_delivery import assert_same_run_receipt
 
 SPEC = next(s for s in CATALOG if s.key == "astro_guolao")
 AS_OF = "2026-10-22T12:00:00+08:00"
@@ -191,8 +191,9 @@ def test_complete_result_delivery_reads_same_run_without_recalculation(
             break
         offset = body["next_offset"]
     raw = "".join(chunks)
-    assert hashlib.sha256(raw.encode()).hexdigest() == ref["sha256"]
+    assert len(raw) == ref["total_chars"]
     full = json.loads(raw)
+    assert_same_run_receipt(store, shaped, full)
     assert full["run_metadata"]["run_id"] == shaped["run_metadata"]["run_id"]
     assert len(full["guolao"]["bodies"]) == 11
     if target is not None:

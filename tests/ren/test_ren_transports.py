@@ -10,6 +10,9 @@ from jsonschema import Draft202012Validator
 
 from fatebridge.application.examples import evidence_views, example_input
 from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
+from tests.support.ephemeris_case_runtime import (
+    native_ephemeris_files as native_ephemeris_files,
+)
 from tests.support.transports import (
     SPECS,
     business,
@@ -34,7 +37,7 @@ PAYLOAD = dict(
 
 
 @pytest.fixture(autouse=True)
-def native_solar_control(monkeypatch):
+def native_solar_control(monkeypatch, native_ephemeris_files):
     # This module asserts actual Swiss native flags; keep its model premise
     # explicit as the application's automatic solar policy evolves.
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")

@@ -38,13 +38,13 @@ def poison_analytic_profile(monkeypatch, tmp_path, fault):
 
 @pytest.mark.parametrize("fault", ["missing", "malformed"])
 @pytest.mark.parametrize("year", [1799, 2026, 2201])
-def test_selected_complete_moshier_year_grid_requires_its_frame_source(
+def test_selected_de441_year_grid_requires_its_frame_source(
     year, fault, monkeypatch, tmp_path
 ):
     terms = almanac.get_solar_terms_for_year(year, "UTC")
     assert len(terms) == 24
     assert all(
-        term.ephemeris_model == "fatebridge_complete_moshier_solar_v1"
+        term.ephemeris_model == "fatebridge_de441_solar_v1"
         and term.ephemeris_retflags == ()
         and term.solar_model_details["native_moshier_relabelled"] is False
         and term.solar_model_details["accuracy_certified"] is False

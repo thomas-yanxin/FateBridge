@@ -848,7 +848,7 @@
                                 }
                               ],
                               "default": null,
-                              "description": "署名作者的定性尺度核对；不是引擎算出的剂量/重量阈值"
+                              "description": "AFSI已登记实际代表物的定性尺度核对，须有独立观察；不是引擎算出的剂量/重量阈值"
                             },
                             "ruleset_id": {
                               "const": "afsi_application_conditions_v1",
@@ -974,6 +974,7 @@
                           "enum": [
                             "green",
                             "red",
+                            "tan",
                             "brown",
                             "beige",
                             "yellow",
@@ -2959,7 +2960,7 @@
                                       }
                                     ],
                                     "default": null,
-                                    "description": "署名作者的定性尺度核对；不是引擎算出的剂量/重量阈值"
+                                    "description": "AFSI已登记实际代表物的定性尺度核对，须有独立观察；不是引擎算出的剂量/重量阈值"
                                   },
                                   "ruleset_id": {
                                     "const": "afsi_application_conditions_v1",
@@ -3085,6 +3086,7 @@
                                 "enum": [
                                   "green",
                                   "red",
+                                  "tan",
                                   "brown",
                                   "beige",
                                   "yellow",
@@ -5408,6 +5410,50 @@
                     "minLength": 1,
                     "type": "string"
                   },
+                  "healthy": {
+                    "anyOf": [
+                      {
+                        "additionalProperties": false,
+                        "properties": {
+                          "evidence": {
+                            "maxLength": 1000,
+                            "minLength": 1,
+                            "pattern": "\\S",
+                            "type": "string"
+                          },
+                          "observation_basis": {
+                            "enum": [
+                              "measured",
+                              "user_confirmed",
+                              "image_observed"
+                            ],
+                            "type": "string"
+                          },
+                          "value": {
+                            "anyOf": [
+                              {
+                                "type": "boolean"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        },
+                        "required": [
+                          "value",
+                          "observation_basis",
+                          "evidence"
+                        ],
+                        "type": "object"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "description": "植物健康或鲜花/新鲜剪枝状态的独立事实；已知身份、位置或移动许可不能代替状态核对"
+                  },
                   "label": {
                     "maxLength": 100,
                     "minLength": 1,
@@ -5431,6 +5477,7 @@
                     "enum": [
                       "living_plant",
                       "fresh_flowers",
+                      "fresh_cut_branches",
                       "water_image",
                       "dark_accessory",
                       "other",
@@ -5949,7 +5996,7 @@
                                   }
                                 ],
                                 "default": null,
-                                "description": "植物/鲜花状态的独立事实；位置与活植物身份不证明状态良好"
+                                "description": "植物/鲜花/剪枝状态的独立事实；位置与活植物身份不证明状态良好"
                               },
                               "height_m": {
                                 "exclusiveMinimum": 0,
@@ -5965,13 +6012,14 @@
                                 "enum": [
                                   "living_plant",
                                   "fresh_flowers",
-                                  "lamp",
-                                  "smooth_crystal_ball",
-                                  "metal_office_equipment",
+                                  "fresh_cut_branches",
                                   "water_image",
                                   "dark_accessory",
                                   "other",
-                                  "unknown"
+                                  "unknown",
+                                  "lamp",
+                                  "smooth_crystal_ball",
+                                  "metal_office_equipment"
                                 ],
                                 "type": "string"
                               },

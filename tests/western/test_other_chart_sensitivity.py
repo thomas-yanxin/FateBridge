@@ -1,7 +1,7 @@
 """Birth-time counterexamples and independent replay of sensitivity outputs."""
 
 import math
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 
 import pytest
 from pydantic import ValidationError

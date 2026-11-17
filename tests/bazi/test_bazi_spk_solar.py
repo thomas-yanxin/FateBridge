@@ -9,7 +9,7 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core import almanac, ephemeris_runtime, spk_solar
+from fatebridge.core import almanac, de441_solar, ephemeris_runtime, spk_solar
 from fatebridge.core.calendar import BaZiCalendar
 from fatebridge.utils.errors import EphemerisSourceError
 from tests.bazi.test_bazi_year_contract import TOPICS
@@ -55,7 +55,7 @@ def test_spk_is_explicit_and_cannot_relabel_a_native_control(selected_spk, monke
         assert term.solar_model_details["accuracy_certified"] is False
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
     assert all(
-        t.ephemeris_model == "moshier"
+        t.ephemeris_model == de441_solar.MODEL_ID
         for t in almanac.get_solar_terms_for_year(2022, "UTC")
     )
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "auto")
@@ -64,7 +64,9 @@ def test_spk_is_explicit_and_cannot_relabel_a_native_control(selected_spk, monke
         for t in almanac.get_solar_terms_for_year(2022, "UTC")
     )
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "spk")
-    assert almanac.get_solar_terms_for_year(2022, "UTC") is first
+    cache_hits = almanac.get_solar_terms_for_year.cache_info().hits
+    assert almanac.get_solar_terms_for_year(2022, "UTC") == first
+    assert almanac.get_solar_terms_for_year.cache_info().hits == cache_hits + 1
 
 
 def test_all_four_known_analytic_month_minute_counterexamples_are_corrected(
@@ -239,11 +241,15 @@ def test_all_ten_bazi_calendar_views_return_actual_spk_on_three_protocols(
     for result in [http.json(), mcp.structured_content, cli]:
         term = result[key]["calendar_context"]["current_solar_term"]
         assert term["resolution_provider"] == "jpl_spk"
-        assert term["solar_model_details"]["kernel_sha256"] == KERNEL_SHA
+        details = term["solar_model_details"]
+        assert details["kernel_filename"] == KERNEL.name
+        assert details["spk_frame_id"] == 1
+        assert "kernel_sha256" not in details
         assert (
             spk_solar.MODEL_ID
             in result["run_metadata"]["provenance"]["ephemeris_model"]
         )
+    assert spk_solar.source_receipt()["kernel_sha256"] == KERNEL_SHA
 
 
 @pytest.mark.parametrize(

@@ -6,12 +6,12 @@ This sidecar never applies a relation, transfers a budget or recalculates force.
 from itertools import combinations
 from typing import Any, Mapping, Sequence
 
+from fatebridge.core.bazi_branch_facts import classify_triple_members
 from fatebridge.utils.data import (
     BRANCH_COMBINATION_ELEMENT,
     BRANCH_SEASONAL_COMBINATIONS,
     BRANCH_TRIPLE_COMBINATIONS,
     BUREAU_ELEMENT,
-    TRIPLE_COMBINATION_PEAK,
 )
 
 ORDER = ("year", "month", "day", "hour")
@@ -80,10 +80,11 @@ def geometric_candidates(branches: Mapping[str, str]) -> list[dict[str, Any]]:
         if target is not None:
             add("六合", target.value, pair)
     for group, bureau in BRANCH_TRIPLE_COMBINATIONS.items():
-        peak = TRIPLE_COMBINATION_PEAK[group]
         for pair in combinations(ORDER, 2):
-            observed = {branches[p] for p in pair}
-            if len(observed) == 2 and peak in observed and observed < set(group):
+            if (
+                classify_triple_members(group, (branches[p] for p in pair))
+                == "peak_pair"
+            ):
                 add("半合", BUREAU_ELEMENT[bureau].value, pair)
     return specs
 

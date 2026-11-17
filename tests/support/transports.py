@@ -52,6 +52,7 @@ def call_cli(spec, payload, tmp_path, capsys, flags=()):
     subject.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
     prefix = ["--no-metadata"] if "--no-metadata" in flags else []
     flags = [flag for flag in flags if flag != "--no-metadata"]
+    capsys.readouterr()
     code = cli_run(
         [
             *prefix,

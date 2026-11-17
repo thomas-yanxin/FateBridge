@@ -91,3 +91,23 @@ def test_frozen_independent_de440_references_are_complete():
     values = AUDIT.reference()
     assert len(values) == 4872
     assert (1899, "小寒") in values and (2101, "冬至") in values
+
+
+@pytest.mark.parametrize("present", [False, True])
+def test_legacy_status_never_claims_missing_or_unverified_provenance(
+    present, tmp_path, monkeypatch
+):
+    monkeypatch.setattr(AUDIT, "ROOT", tmp_path)
+    target = tmp_path / "tests/data/bazi_all_terms_v1/provenance.json"
+    if present:
+        target.parent.mkdir(parents=True)
+        target.write_text("{}")
+    status = AUDIT.legacy_source_status()
+    assert len(status) == 5
+    missing = next(
+        row
+        for row in status
+        if Path(row["source_identifier"]).name == "provenance.json"
+    )
+    assert missing["current_identity_matches"] is False
+    assert missing["current_sha256"] == (AUDIT.sha(target) if present else None)

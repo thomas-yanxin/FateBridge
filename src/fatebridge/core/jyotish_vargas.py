@@ -3,6 +3,7 @@
 D30 in the selected BPHS table has five unequal ranges. That table assigns
 signs, not a unique degree inside them, so no invented D30 longitude is returned.
 Equal-division coordinates are a declared linear display convention.
+Exact components stay rational until each public float is rendered.
 """
 
 from __future__ import annotations
@@ -30,24 +31,23 @@ RASI_LORDS = [
 
 
 def longitude_ratio(longitude: float | Fraction) -> tuple[int, int]:
-    if not math.isfinite(longitude):
-        raise ValueError("经度必须为有限数。")
-    n, d = (
-        longitude.as_integer_ratio()
-        if isinstance(longitude, Fraction)
-        else float(longitude).as_integer_ratio()
-    )
+    if isinstance(longitude, Fraction):
+        n, d = longitude.as_integer_ratio()
+    else:
+        if not math.isfinite(longitude):
+            raise ValueError("经度必须为有限数。")
+        n, d = float(longitude).as_integer_ratio()
     return n % (360 * d), d
 
 
-def varga_coordinates(
+def _varga_components(
     longitude: float | Fraction, division: int
-) -> tuple[int, Optional[float]]:
-    """Return zodiac sign index and transformed degree, or None for D30."""
+) -> tuple[int, Optional[Fraction]]:
+    """One exact sign assignment and within-sign coordinate for every consumer."""
     n, d = longitude_ratio(longitude)
     sign, degree_numerator = divmod(n, 30 * d)
     if division == 1:
-        return sign, min(degree_numerator / d, math.nextafter(30.0, 0.0))
+        return sign, Fraction(degree_numerator, d)
     if division == 30:
         bounds, destinations = (
             ([5, 10, 18, 25, 30], [0, 10, 8, 2, 6])
@@ -73,15 +73,25 @@ def varga_coordinates(
         destination = (sign + (0 if sign % 2 == 0 else 8) + part) % 12
     else:  # D12
         destination = (sign + part) % 12
-    return destination, min(remainder / d, math.nextafter(30.0, 0.0))
+    return destination, Fraction(remainder, d)
+
+
+def varga_coordinates(
+    longitude: float | Fraction, division: int
+) -> tuple[int, Optional[float]]:
+    """Return zodiac sign index and transformed degree, or None for D30."""
+    sign, degree = _varga_components(longitude, division)
+    return sign, (
+        None if degree is None else min(float(degree), math.nextafter(30.0, 0.0))
+    )
 
 
 def varga_sign(longitude: float | Fraction, division: int) -> int:
-    return varga_coordinates(longitude, division)[0]
+    return _varga_components(longitude, division)[0]
 
 
 def varga_longitude(longitude: float | Fraction, division: int) -> float:
-    sign, degree = varga_coordinates(longitude, division)
+    sign, degree = _varga_components(longitude, division)
     if degree is None:
         raise ValueError("D30 仅分配星座；所选原典未规定唯一的盘内度数。")
-    return min(sign * 30.0 + degree, math.nextafter((sign + 1) * 30.0, -math.inf))
+    return min(float(sign * 30 + degree), math.nextafter((sign + 1) * 30.0, -math.inf))

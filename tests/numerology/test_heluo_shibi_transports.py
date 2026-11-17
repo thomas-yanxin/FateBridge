@@ -9,7 +9,11 @@ import pytest
 from jsonschema import Draft202012Validator
 
 from fatebridge.core import heluo_texts as ht
-from tests.support.heluo_source_facts import HEADER_COUNT, PENDING_COUNT
+from tests.support.heluo_source_facts import (
+    CURRENT_COMMENTARIES,
+    HEADER_COUNT,
+    PENDING_COUNT,
+)
 from tests.support.transports import SPECS, business, call_cli, native
 from tests.support.transports import rest as shared_rest
 
@@ -86,6 +90,11 @@ def test_shibi_selection_and_source_scope_agree_on_three_surfaces(
     assert response.status_code == 200 and code == 0 and not mcp.is_error
     outputs = [response.json(), cli, mcp.structured_content]
     assert business(outputs[0]) == business(outputs[1]) == business(outputs[2])
+    expected = next(
+        entry
+        for entry in CURRENT_COMMENTARIES["entries"]
+        if (entry["hexagram"], entry["line"]) == (gua, line)
+    )
     for output in outputs:
         spec.output_model.model_validate(output)
         Draft202012Validator(spec.output_model.model_json_schema()).validate(output)
@@ -95,9 +104,17 @@ def test_shibi_selection_and_source_scope_agree_on_three_surfaces(
         assert (selected["hexagram"], selected["line"]) == (gua, line)
         assert excerpt in t["detail"]
         assert (
-            t["text_provenance"]["commentary_content_sha256"]
-            == ht.COMMENTARY_CONTENT_SHA256
+            t["text_provenance"]["commentary_corpus_id"]
+            == CURRENT_COMMENTARIES["corpus_id"]
         )
+        assert t["text_provenance"]["commentary_pdf_pages"] == expected["pdf_pages"]
+        assert (
+            t["text_provenance"]["commentary_source_url"]
+            == CURRENT_COMMENTARIES["source_url"]
+        )
+        assert t["commentary_sections"] == [
+            dict(section, applicability=None) for section in expected["sections"]
+        ]
         assert all(s["applicability"] is None for s in t["commentary_sections"])
         assert t["commentary_branch_selection"]["selected_section_ids"] == []
         if gua == "地水師" and line == 3:
@@ -132,8 +149,8 @@ def test_shibi_selection_and_source_scope_agree_on_three_surfaces(
                 if row["rule_id"] == "heluo_selected_line_collation_v1"
             )
             assert (
-                trace["commentary_content_sha256"]
-                == t["text_provenance"]["commentary_content_sha256"]
+                trace["commentary_corpus_id"]
+                == t["text_provenance"]["commentary_corpus_id"]
             )
             assert t["detail"] in output["snapshot_text"]
 

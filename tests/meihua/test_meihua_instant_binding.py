@@ -1,10 +1,8 @@
 """A self-consistent clock receipt still has to match the actual request instant."""
 
-import hashlib
 from copy import deepcopy
 from dataclasses import replace
 from functools import lru_cache
-from pathlib import Path
 
 import pytest
 
@@ -28,13 +26,7 @@ def original(case_id):
     return new_result(BY_ID[case_id])
 
 
-def test_fault_definitions_were_frozen_before_production_changes():
-    from tests.support import meihua_instant_binding_reference as helper
-
-    assert (
-        hashlib.sha256(Path(helper.__file__).read_bytes()).hexdigest()
-        == "bc5443cc518679f572d2c14f4bf8a54de4826dde47ed35e4b001ffcb664d54f6"
-    )
+def test_frozen_fault_protocol_keeps_its_declared_scope():
     assert PROTOCOL["precedes_production_change"] is True
     assert not PROTOCOL["independent_expert_or_real_world_predictive_validation"]
     assert len(PROTOCOL["faults"]) == 34

@@ -21,7 +21,7 @@ from fatebridge.core.human_design_evidence import circuitry_reading, source_refe
 from fatebridge.core.human_design_mechanics import CHANNELS
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
-from tests.support.ephemeris_context import moshier_ephemeris
+from tests.support.ephemeris_context import empty_ephemeris_path
 
 
 @pytest.mark.parametrize("row", circuit_reference()["coupled_channels"])
@@ -273,7 +273,7 @@ def integrated_run():
         )
     )
     spec = next(s for s in CATALOG if s.key == "human_design")
-    with moshier_ephemeris():
+    with empty_ephemeris_path():
         result = execute_tool(spec, spec.request_model(**case["birth_input"]))
     assert result["bodygraph"]["circuitry"]["integration"]["completed_channel_ids"]
     assert (

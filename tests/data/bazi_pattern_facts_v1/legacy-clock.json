@@ -1,0 +1,505 @@
+{
+  "role": "Frozen pre-change implementation reference, not independent day/night evidence",
+  "cases": [
+    {
+      "day": "丁亥",
+      "hour": null,
+      "matches": null
+    },
+    {
+      "day": "丁亥",
+      "hour": 0,
+      "matches": false
+    },
+    {
+      "day": "丁亥",
+      "hour": 1,
+      "matches": false
+    },
+    {
+      "day": "丁亥",
+      "hour": 2,
+      "matches": false
+    },
+    {
+      "day": "丁亥",
+      "hour": 3,
+      "matches": false
+    },
+    {
+      "day": "丁亥",
+      "hour": 4,
+      "matches": false
+    },
+    {
+      "day": "丁亥",
+      "hour": 5,
+      "matches": false
+    },
+    {
+      "day": "丁亥",
+      "hour": 6,
+      "matches": true
+    },
+    {
+      "day": "丁亥",
+      "hour": 7,
+      "matches": true
+    },
+    {
+      "day": "丁亥",
+      "hour": 8,
+      "matches": true
+    },
+    {
+      "day": "丁亥",
+      "hour": 9,
+      "matches": true
+    },
+    {
+      "day": "丁亥",
+      "hour": 10,
+      "matches": true
+    },
+    {
+      "day": "丁亥",
+      "hour": 11,
+      "matches": true
+    },
+    {
+      "day": "丁亥",
+      "hour": 12,
+      "matches": true
+    },
+    {
+      "day": "丁亥",
+      "hour": 13,
+      "matches": true
+    },
+    {
+      "day": "丁亥",
+      "hour": 14,
+      "matches": true
+    },
+    {
+      "day": "丁亥",
+      "hour": 15,
+      "matches": true
+    },
+    {
+      "day": "丁亥",
+      "hour": 16,
+      "matches": true
+    },
+    {
+      "day": "丁亥",
+      "hour": 17,
+      "matches": true
+    },
+    {
+      "day": "丁亥",
+      "hour": 18,
+      "matches": false
+    },
+    {
+      "day": "丁亥",
+      "hour": 19,
+      "matches": false
+    },
+    {
+      "day": "丁亥",
+      "hour": 20,
+      "matches": false
+    },
+    {
+      "day": "丁亥",
+      "hour": 21,
+      "matches": false
+    },
+    {
+      "day": "丁亥",
+      "hour": 22,
+      "matches": false
+    },
+    {
+      "day": "丁亥",
+      "hour": 23,
+      "matches": false
+    },
+    {
+      "day": "癸巳",
+      "hour": null,
+      "matches": null
+    },
+    {
+      "day": "癸巳",
+      "hour": 0,
+      "matches": true
+    },
+    {
+      "day": "癸巳",
+      "hour": 1,
+      "matches": true
+    },
+    {
+      "day": "癸巳",
+      "hour": 2,
+      "matches": true
+    },
+    {
+      "day": "癸巳",
+      "hour": 3,
+      "matches": true
+    },
+    {
+      "day": "癸巳",
+      "hour": 4,
+      "matches": true
+    },
+    {
+      "day": "癸巳",
+      "hour": 5,
+      "matches": true
+    },
+    {
+      "day": "癸巳",
+      "hour": 6,
+      "matches": false
+    },
+    {
+      "day": "癸巳",
+      "hour": 7,
+      "matches": false
+    },
+    {
+      "day": "癸巳",
+      "hour": 8,
+      "matches": false
+    },
+    {
+      "day": "癸巳",
+      "hour": 9,
+      "matches": false
+    },
+    {
+      "day": "癸巳",
+      "hour": 10,
+      "matches": false
+    },
+    {
+      "day": "癸巳",
+      "hour": 11,
+      "matches": false
+    },
+    {
+      "day": "癸巳",
+      "hour": 12,
+      "matches": false
+    },
+    {
+      "day": "癸巳",
+      "hour": 13,
+      "matches": false
+    },
+    {
+      "day": "癸巳",
+      "hour": 14,
+      "matches": false
+    },
+    {
+      "day": "癸巳",
+      "hour": 15,
+      "matches": false
+    },
+    {
+      "day": "癸巳",
+      "hour": 16,
+      "matches": false
+    },
+    {
+      "day": "癸巳",
+      "hour": 17,
+      "matches": false
+    },
+    {
+      "day": "癸巳",
+      "hour": 18,
+      "matches": true
+    },
+    {
+      "day": "癸巳",
+      "hour": 19,
+      "matches": true
+    },
+    {
+      "day": "癸巳",
+      "hour": 20,
+      "matches": true
+    },
+    {
+      "day": "癸巳",
+      "hour": 21,
+      "matches": true
+    },
+    {
+      "day": "癸巳",
+      "hour": 22,
+      "matches": true
+    },
+    {
+      "day": "癸巳",
+      "hour": 23,
+      "matches": true
+    },
+    {
+      "day": "丁酉",
+      "hour": null,
+      "matches": null
+    },
+    {
+      "day": "丁酉",
+      "hour": 0,
+      "matches": true
+    },
+    {
+      "day": "丁酉",
+      "hour": 1,
+      "matches": true
+    },
+    {
+      "day": "丁酉",
+      "hour": 2,
+      "matches": true
+    },
+    {
+      "day": "丁酉",
+      "hour": 3,
+      "matches": true
+    },
+    {
+      "day": "丁酉",
+      "hour": 4,
+      "matches": true
+    },
+    {
+      "day": "丁酉",
+      "hour": 5,
+      "matches": true
+    },
+    {
+      "day": "丁酉",
+      "hour": 6,
+      "matches": false
+    },
+    {
+      "day": "丁酉",
+      "hour": 7,
+      "matches": false
+    },
+    {
+      "day": "丁酉",
+      "hour": 8,
+      "matches": false
+    },
+    {
+      "day": "丁酉",
+      "hour": 9,
+      "matches": false
+    },
+    {
+      "day": "丁酉",
+      "hour": 10,
+      "matches": false
+    },
+    {
+      "day": "丁酉",
+      "hour": 11,
+      "matches": false
+    },
+    {
+      "day": "丁酉",
+      "hour": 12,
+      "matches": false
+    },
+    {
+      "day": "丁酉",
+      "hour": 13,
+      "matches": false
+    },
+    {
+      "day": "丁酉",
+      "hour": 14,
+      "matches": false
+    },
+    {
+      "day": "丁酉",
+      "hour": 15,
+      "matches": false
+    },
+    {
+      "day": "丁酉",
+      "hour": 16,
+      "matches": false
+    },
+    {
+      "day": "丁酉",
+      "hour": 17,
+      "matches": false
+    },
+    {
+      "day": "丁酉",
+      "hour": 18,
+      "matches": true
+    },
+    {
+      "day": "丁酉",
+      "hour": 19,
+      "matches": true
+    },
+    {
+      "day": "丁酉",
+      "hour": 20,
+      "matches": true
+    },
+    {
+      "day": "丁酉",
+      "hour": 21,
+      "matches": true
+    },
+    {
+      "day": "丁酉",
+      "hour": 22,
+      "matches": true
+    },
+    {
+      "day": "丁酉",
+      "hour": 23,
+      "matches": true
+    },
+    {
+      "day": "癸卯",
+      "hour": null,
+      "matches": null
+    },
+    {
+      "day": "癸卯",
+      "hour": 0,
+      "matches": false
+    },
+    {
+      "day": "癸卯",
+      "hour": 1,
+      "matches": false
+    },
+    {
+      "day": "癸卯",
+      "hour": 2,
+      "matches": false
+    },
+    {
+      "day": "癸卯",
+      "hour": 3,
+      "matches": false
+    },
+    {
+      "day": "癸卯",
+      "hour": 4,
+      "matches": false
+    },
+    {
+      "day": "癸卯",
+      "hour": 5,
+      "matches": false
+    },
+    {
+      "day": "癸卯",
+      "hour": 6,
+      "matches": true
+    },
+    {
+      "day": "癸卯",
+      "hour": 7,
+      "matches": true
+    },
+    {
+      "day": "癸卯",
+      "hour": 8,
+      "matches": true
+    },
+    {
+      "day": "癸卯",
+      "hour": 9,
+      "matches": true
+    },
+    {
+      "day": "癸卯",
+      "hour": 10,
+      "matches": true
+    },
+    {
+      "day": "癸卯",
+      "hour": 11,
+      "matches": true
+    },
+    {
+      "day": "癸卯",
+      "hour": 12,
+      "matches": true
+    },
+    {
+      "day": "癸卯",
+      "hour": 13,
+      "matches": true
+    },
+    {
+      "day": "癸卯",
+      "hour": 14,
+      "matches": true
+    },
+    {
+      "day": "癸卯",
+      "hour": 15,
+      "matches": true
+    },
+    {
+      "day": "癸卯",
+      "hour": 16,
+      "matches": true
+    },
+    {
+      "day": "癸卯",
+      "hour": 17,
+      "matches": true
+    },
+    {
+      "day": "癸卯",
+      "hour": 18,
+      "matches": false
+    },
+    {
+      "day": "癸卯",
+      "hour": 19,
+      "matches": false
+    },
+    {
+      "day": "癸卯",
+      "hour": 20,
+      "matches": false
+    },
+    {
+      "day": "癸卯",
+      "hour": 21,
+      "matches": false
+    },
+    {
+      "day": "癸卯",
+      "hour": 22,
+      "matches": false
+    },
+    {
+      "day": "癸卯",
+      "hour": 23,
+      "matches": false
+    }
+  ]
+}

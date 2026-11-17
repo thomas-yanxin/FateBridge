@@ -1049,20 +1049,24 @@ class HeluoStructureRecord(PartialOutput):
     def coherent_operator(self) -> "HeluoStructureRecord":
         from fatebridge.core.heluo_structure import OPERATORS, _name
 
+        arities = [
+            len(value)
+            for value in (self.original_positions, self.lines)
+            if value is not None
+        ]
+        if self.arity is not None:
+            arities.append(self.arity)
         if self.kind is not None:
             expected = dict(OPERATORS)[self.kind]
-            if self.arity is not None and self.arity != len(expected):
-                raise ValueError("卦体结构的三爻体与六爻卦不能混用。")
+            arities.append(len(expected))
             if self.original_positions is not None and self.original_positions != list(
                 expected
             ):
                 raise ValueError("卦体结构须保留实际取爻次序。")
-        if self.lines is not None:
-            if len(self.lines) not in (3, 6) or (
-                self.arity is not None and len(self.lines) != self.arity
-            ):
-                raise ValueError("卦体结构爻数不一致。")
-            if self.name is not None and _name(self.lines) != self.name:
+        if any(arity not in (3, 6) for arity in arities) or len(set(arities)) > 1:
+            raise ValueError("卦体结构的种类、爻数、原位与爻形不能混用三爻或六爻。")
+        if self.lines is not None and self.name is not None:
+            if _name(self.lines) != self.name:
                 raise ValueError("卦体结构名称与爻形不一致。")
         return self
 

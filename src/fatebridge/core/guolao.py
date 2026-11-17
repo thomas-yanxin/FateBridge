@@ -22,6 +22,7 @@ from fatebridge.core import guolao_classical, guolao_moira
 from fatebridge.core.almanac import get_bazi_year
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.birth import AstroBirthInfo, require_resolved_birth_timezone
+from fatebridge.core.astro.earth_attitude import earth_attitude
 from fatebridge.core.astro.geometry import _degree_in_sign, _sign_name, _week_ruler
 from fatebridge.core.astro.longitude_motion import corrected_longitude_motion
 from fatebridge.core.astro.native_coordinates import (
@@ -35,6 +36,7 @@ from fatebridge.core.astro.profiles import (
     _resolve_core_chart_house_system,
     _resolve_core_chart_zodiacal_mode,
 )
+from fatebridge.core.astro.reference_frames import Matrix, rotate_spherical
 from fatebridge.core.astro.source_session import coherent_ephemeris_sources
 from fatebridge.core.astrology_tables import (
     ELEMENT_BY_SIGN,
@@ -106,7 +108,7 @@ def relation(target: str, other: str) -> str:
 
 
 def mansion_at(
-    right_ascension: float, boundaries: list[dict[str, Any]]
+    right_ascension: float | Fraction, boundaries: list[dict[str, Any]]
 ) -> dict[str, Any]:
     """Half-open intervals on actual RA, sorted anew at the requested epoch.
 
@@ -292,10 +294,17 @@ def positions(
             }
         extra["计"] = {
             **extra["罗"],
-            "longitude": (extra["罗"]["longitude"] + 180) % 360,
-            "right_ascension": (extra["罗"]["right_ascension"] + 180) % 360,
+            "longitude": float((Fraction(extra["罗"]["longitude"]) + 180) % 360)
+            % 360.0,
+            "right_ascension": float(
+                (Fraction(extra["罗"]["right_ascension"]) + 180) % 360
+            )
+            % 360.0,
             "latitude": -extra["罗"]["latitude"],
             "model": "opposite_mean_lunar_node",
+            "derived_from": "罗",
+            "derivation_source_longitude": extra["罗"]["longitude"],
+            "derivation_source_right_ascension": extra["罗"]["right_ascension"],
         }
         purple = guolao_moira.purple_clouds_longitude(ut)
         obliquity, obliquity_flag = runtime.ephemeris_call("calc", tt, swe.ECL_NUT)
@@ -312,8 +321,8 @@ def positions(
             "longitude": purple,
             "latitude": 0.0,
             "right_ascension": purple_ra,
-            "longitude_speed": guolao_moira._PURPLE_CLOUDS_RATE_DEG_PER_DAY,
-            "model": "horosa_linear_fit_not_classical_calibrated",
+            "longitude_speed": guolao_moira.PURPLE_CLOUDS_RATE_DEG_PER_DAY,
+            "model": guolao_moira.PURPLE_CLOUDS_MODEL_ID,
         }
         asc = mc = asc_ra = altitude = None
         cusps = ()
@@ -326,19 +335,31 @@ def positions(
                 0,
                 0,
                 (states["Sun"]["right_ascension"], states["Sun"]["declination"], 1),
+                _julian_day_tt=tt,
             )
             require_altitude(altitude)
         solar_clock = None
+        solar_clock_native_to_physical: Matrix | None = None
         if observer_geometry and apparent_clock_required(birth):
+            attitude = earth_attitude(swe, ut, julian_day_tt=tt)
+            solar_clock_native_to_physical = attitude.reduction.native_to_target
+            solar_ra, _ = rotate_spherical(
+                solar_clock_native_to_physical,
+                states["Sun"]["right_ascension"],
+                states["Sun"]["declination"],
+            )
             solar_clock = apparent_solar_clock(
                 julian_day_ut1=ut,
-                sun_right_ascension=states["Sun"]["right_ascension"],
+                sun_right_ascension=solar_ra,
                 greenwich_apparent_sidereal_degrees=runtime.ephemeris_call(
-                    "sidtime", ut
+                    "sidtime", ut, _julian_day_tt=tt
                 )
                 * 15,
                 longitude=birth.longitude,
                 civil_datetime=birth.local_datetime,
+            )
+            solar_clock["equatorial_frame"] = (
+                "selected_physical_equator_and_equinox_of_date"
             )
             if native is not None:
                 solar_clock.update(
@@ -446,6 +467,7 @@ def positions(
         "future_leap_seconds_assumed_unchanged": times.future_leap_seconds_assumed_unchanged,
         "solar_altitude": altitude,
         "solar_clock": solar_clock,
+        "_solar_clock_native_to_physical": solar_clock_native_to_physical,
         "models": sorted(models),
         "longitude_motion": motion_metadata,
         "ephemeris_provenance": {
@@ -477,12 +499,21 @@ def body_placement(
 ) -> dict[str, Any]:
     """The same declared palace/mansion mapping for natal and target skies."""
     chinese = CN.get(name, name)
+    source_longitude = Fraction(state["longitude"])
+    right_ascension = Fraction(state["right_ascension"])
+    if state.get("derived_from") == "罗":
+        # The displayed antipode can round across a palace or mansion edge.
+        # Preserve the exact native source through both discrete decisions.
+        source_longitude = (Fraction(state["derivation_source_longitude"]) + 180) % 360
+        right_ascension = (
+            Fraction(state["derivation_source_right_ascension"]) + 180
+        ) % 360
     # Compare the exact supplied doubles before rounding the rotated value.
     # A tiny negative remainder otherwise rounds to 360 and indexes palace 12.
-    exact = (Fraction(state["longitude"]) - Fraction(ayanamsha)) % 360
+    exact = (source_longitude - Fraction(ayanamsha)) % 360
     index = int(exact // 30)
     longitude = min(float(exact), math.nextafter(float(30 * (index + 1)), -math.inf))
-    mansion = mansion_at(state["right_ascension"], boundaries)
+    mansion = mansion_at(right_ascension, boundaries)
     lord = PALACE_LORDS[index]
     return {
         "id": name,
@@ -747,7 +778,7 @@ def build_chart(
     trace.append(
         {
             "rule_id": guolao_moira.PATTERN_MODEL_ID,
-            "source_id": "moira_s.prop-local",
+            "source_id": "moira_software_conditions",
             "inputs": {
                 "life_sign_idx": life_idx,
                 "planet_signidx": signs,
@@ -760,6 +791,7 @@ def build_chart(
                     {
                         "name": p["name"],
                         "rule_id": p["rule_id"],
+                        "source": p["source"],
                         "evidence": p["evidence"],
                     }
                     for p in patterns
@@ -797,7 +829,7 @@ def build_chart(
         "安命顺数与二至例外已按底本转录；太阳宫仍为所选现代30度黄道，钟时与交节端点为明示研究约定",
         "原典命度、晨昏度法尚未重建；命度/命宿留空，不以ASC替代",
         "现代赤经距星宿界不等同底本宿界；未将古度按比例强制归一化",
-        "紫气仍为horosa拟合；已找到古今律历考的历元策数与周积舍入问题，但未校准现代黄经，不能只改周期或强制归一化",
+        "紫气采用具名Horosa均行虚点公式；已找到古今律历考的历元策数与周积舍入问题，但未校准原典现代黄经，不能只改周期或强制归一化",
         "天乙/玉堂与岁驾已按底本校勘；年干支暂用八字立春换年，其他神煞尚未逐项校勘",
         "可选目标时刻仅提供原页小限逆数及当时十一曜研究位置；洞微大限、童限和完整流年判断尚未实现",
         "无独立前瞻现实样本，现实预测效力尚未验证",
@@ -817,8 +849,14 @@ def build_chart(
         "god_sign_index": gods,
         "god_positions": god_positions,
         "purple_model_audit": {
-            "model_in_use": "horosa_linear_fit_not_classical_calibrated",
-            "fitted_period_days": 360 / guolao_moira._PURPLE_CLOUDS_RATE_DEG_PER_DAY,
+            "model_in_use": guolao_moira.PURPLE_CLOUDS_MODEL_ID,
+            "period_days": guolao_moira.PURPLE_CLOUDS_PERIOD_DAYS,
+            "epoch_jd": guolao_moira.PURPLE_CLOUDS_EPOCH_JD,
+            "epoch_longitude": guolao_moira.PURPLE_CLOUDS_EPOCH_LONGITUDE,
+            "software_source_url": guolao_moira.PURPLE_CLOUDS_SOURCE_URL,
+            "software_source_commit": guolao_moira.PURPLE_CLOUDS_SOURCE_COMMIT,
+            "software_source_function": "pcLon",
+            "fixture_fitting_used": False,
             "source_id": "xing_yunlu_gujinlvlikao_58",
             "source_epoch_description": "至元辛巳天正冬至（1280年末），以箕初为周行原点；非现代UTC历元",
             "source_validation_status": "selected_facsimile_pages_and_28_purple_intervals_collated_modern_epoch_unresolved",
@@ -938,7 +976,7 @@ def build_chart(
                 "id": solar_clock["method_id"],
                 "title": "USNO Equation of Time: apparent solar time from local hour angle",
                 "source_url": solar_clock["source_url"],
-                "verified_subset": "复用同次地心视太阳赤经与估算UT1视恒星角；两处独立JPL参照，不认证实测亚秒精度或原典钟时政策",
+                "verified_subset": "复用同次地心视太阳赤经与所选UT1视恒星角；两处独立JPL参照，不认证实测亚秒精度或原典钟时政策",
             }
         )
 

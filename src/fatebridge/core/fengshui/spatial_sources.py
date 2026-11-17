@@ -6,7 +6,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict
 
-from .spatial_inputs import CompassDirection
+from .spatial_angles import CompassDirection
 
 
 class RegisteredSource(BaseModel):

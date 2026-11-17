@@ -1,7 +1,5 @@
 """Three transports and bounded same-run delivery of the exact timing reference."""
 
-import hashlib
-import json
 import os
 import sys
 from pathlib import Path
@@ -11,9 +9,11 @@ from fastmcp import Client
 from fastmcp.client.transports import StdioTransport
 
 from fatebridge.application.examples import suggested_fields
+from fatebridge.core.public_output import same_public_value
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.divination import calculate_meihua_analysis
 from fatebridge.services.meihua import calculate_meihua_cast
+from tests.fixtures.mcp_result_delivery import read_full_result
 from tests.support.transports import SPECS, call_cli, rest
 
 FIELD = "interpretation.motion_context"
@@ -151,7 +151,7 @@ async def test_exact_fraction_source_context_agrees_on_three_transports(
     )
     assert code == 0
     for out in [response.json(), reply.structured_content, cli]:
-        assert out["interpretation"]["motion_context"] == expected
+        assert same_public_value(out["interpretation"]["motion_context"], expected)
         assert out["meihua"]["seed"] == domain["meihua"]["seed"]
         assert out["summary"] == domain["summary"]
     assert FIELD in suggested_fields(SPECS[tool], view="motion")
@@ -179,7 +179,9 @@ async def test_fresh_stdio_existing_request_schema_and_motion_card_deliver_compo
             )
             assert not reply.is_error
             context = reply.structured_content["interpretation"]["motion_context"]
-            assert context == calculate(tool, args)["interpretation"]["motion_context"]
+            assert same_public_value(
+                context, calculate(tool, args)["interpretation"]["motion_context"]
+            )
             if nominal is not None:
                 assert context["postheaven_count_reference"]["time_unit"] is None
 
@@ -206,31 +208,11 @@ async def test_4096_delivery_restores_same_run_complete_source_and_exact_count(
         output = reply.structured_content
         if "result_delivery" not in output:
             assert nominal is None
-            assert output["interpretation"]["motion_context"] == expected
-            return
-        delivery = output["result_delivery"]
-        run = output["run_metadata"]["run_id"]
-        uri = f"fatebridge://results/{delivery['result_id']}/verified/{run}/{delivery['sha256']}/fields/{FIELD}/0"
-        pieces = []
-        checksum = None
-        offset = 0
-        while uri:
-            page = json.loads((await client.read_resource(uri))[0].text)
-            assert page["offset"] == offset and page["path"] == FIELD
-            assert page["verification"]["run_id"] == run
-            assert page["verification"]["payload_sha256"] == delivery["sha256"]
-            assert page["verification"]["calculation_repeated"] is False
-            checksum = page["sha256"] if checksum is None else checksum
-            assert page["sha256"] == checksum
-            pieces.append(page["text"])
-            offset += len(page["text"])
-            following = page["next_offset"]
-            assert following is None or following == offset
-            uri = (
-                uri.rsplit("/", 1)[0] + "/" + str(following)
-                if following is not None
-                else None
+            assert same_public_value(
+                output["interpretation"]["motion_context"], expected
             )
-        raw = "".join(pieces)
-        assert hashlib.sha256(raw.encode()).hexdigest() == checksum
-        assert json.loads(raw) == expected
+            return
+        restored = await read_full_result(client, output)
+        assert same_public_value(
+            restored["interpretation"][FIELD.split(".")[1]], expected
+        )

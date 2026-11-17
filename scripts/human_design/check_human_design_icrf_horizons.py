@@ -109,7 +109,7 @@ def separation(a: dict[str, float], b: dict[str, float]) -> float:
 def rotation(
     tt: float, mean_obliquity: float, nutation_longitude: float
 ) -> list[list[float]]:
-    from fatebridge.core.astro.continuous_lahiri import ecliptic_rotation, precession
+    from fatebridge.core.astro.reference_frames import ecliptic_rotation, precession
 
     p, _ = precession(tt)
     e, _ = ecliptic_rotation(math.radians(mean_obliquity))

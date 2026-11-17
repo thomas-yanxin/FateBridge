@@ -24,7 +24,7 @@ from tests.support.transports import (
 from tests.western.test_western_accuracy import BIRTH
 from tests.western.test_western_horary import QUESTION
 from tests.western.test_western_natal_reference_points import INPUT
-from tests.western.test_western_origin_preflight import selected
+from tests.western.test_western_origin_preflight import directories, selected
 from tests.western.test_western_source_errors import inject
 
 
@@ -270,7 +270,7 @@ def test_policy_evidence_view_projects_the_same_receipt_on_all_adapters(
 @pytest.mark.parametrize(
     "year,expected",
     [
-        (2099, "IERS2010_expression_Swiss_nutation"),
+        (2099, "IAU2006_2000A_CIO"),
         (2300, "Swiss_longterm_with_boundary_phase_alignment"),
     ],
 )
@@ -332,14 +332,14 @@ def test_epoch_policy_and_limits_on_real_rest_mcp_cli(year, expected, surface_ca
 def test_historical_clock_policy_reaches_actual_rest_mcp_cli(
     year, zodiacal, monkeypatch, surface_calls
 ):
-    actual = rotation.iers2010_gast
+    actual = rotation.frame_gast
     arguments = []
 
     def observed(ut1, tt, *args):
         arguments.append((ut1, tt))
         return actual(ut1, tt, *args)
 
-    monkeypatch.setattr(rotation, "iers2010_gast", observed)
+    monkeypatch.setattr(rotation, "frame_gast", observed)
     spec = SPECS["astro_chart"]
     inputs = dict(
         birth_year=year,
@@ -372,25 +372,20 @@ def test_historical_clock_policy_reaches_actual_rest_mcp_cli(
         spec.output_model.model_validate(value)
         profile = value["chart_profile"]
         policy = profile["earth_rotation"]
-        assert policy["policy_id"] == "fatebridge_standard_rotation_v3"
-        if year == 1800:
-            assert policy["tt_argument_policy"] == (
-                "shared_default_DeltaT_minus1_before1960_SWIEPH_from1960"
-            )
-            assert any(
-                abs(u - profile["julian_day_ut1"]) * 86400 <= 0.0002
-                and abs(t - profile["julian_day_tt"]) * 86400 <= 0.0002
-                for u, t in arguments
-            )
-        else:
-            assert (
-                policy["tt_argument_policy"] == "native_internal_sidereal_time_argument"
-            )
-    if year == 1800:
-        assert arguments
-        for ut1, tt in arguments:
-            expected = ut1 + runtime.swe.deltat_ex(ut1, -1)
-            assert abs(expected - tt) * 86400 <= 0.0002
+        assert policy["policy_id"] == "fatebridge_physical_earth_attitude_v6"
+        assert policy["tt_argument_policy"] == (
+            "shared_default_DeltaT_minus1_before1960_SWIEPH_from1960"
+        )
+        assert any(
+            abs(u - profile["julian_day_ut1"]) * 86400 <= 0.0002
+            and abs(t - profile["julian_day_tt"]) * 86400 <= 0.0002
+            for u, t in arguments
+        )
+    assert arguments
+    for ut1, tt in arguments:
+        flag = -1 if ut1 < 2436934.5 else runtime.swe.FLG_SWIEPH
+        expected = ut1 + runtime.swe.deltat_ex(ut1, flag)
+        assert abs(expected - tt) * 86400 <= 0.0002
 
 
 def test_restored_swiss_history_and_v5_receipts_survive_strict_three_protocols(

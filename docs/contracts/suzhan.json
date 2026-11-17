@@ -3,13 +3,13 @@
     "activity": "逐层读取matched_rules、conditional_rules、source_excerpts及detail_match。普通出行不擅加远行限定；远行向外国须同时有long_distance_journey和journey_abroad。买卖、经营、借入、出借、索债分别核对，不能把所有资金行为当同一事项。",
     "activity_details": "只填当前聊天已确认事实；purchase为购入，business_operation为明确经营，collecting_debt为索取债款。any_of为任选其一，all_of为全部具备；未满足或文本读法未校定的条款不进入汇总。未匹配不代表事实已被否定，不为得到有利结果补条件。",
     "actor_purpose_social_scope": "forming_friendship是明确结交交友，不限首次相识，social_gathering是聚会，不互相推断。personal_departure本人启程不证明private_journey因私；下卷日曜远行另须royal_or_official_traveler与long_distance_journey同时明确，出差或使节任务不证明身份，上卷不同范围继续保留。conflicted只表示匹配证据兼有宜与忌，须说明动作、卷别和出处，不能自动断成同条件原文矛盾；原生文本中的本次适用条件也须一起解释。",
-    "astronomy": "默认equatorial_research28仅为已声明现代距星研究口径；天文宿与农历本命宿分别读取。",
+    "astronomy": "已知钟时须同时明确完整经纬度才能计算星图，GPS分量优先且0°有效；缺项报错，不填默认地点。默认equatorial_research28仅为已声明现代距星研究口径；天文宿与农历本命宿分别读取。",
     "calendar_profile": "默认t1299_fullmoon27直接采用T1299下卷十五日望宿逆顺法及生日加十三的含首位算法，两法互核；NAOJ朔日表仅作独立交叉核验。",
     "calendar_reference": "读取calendar_reference的日期来源类别、版本与支持范围及资料差异。2015起是出版方参考推算，不能说成已核对逐年神宫原刊；固定UTC+09不是历史日本地方时。旧月度候选仍拒绝接入，新后端来自完整逐日事实；文档到2033与LOD到2031的差异继续保留，范围外不能换中国历补齐。",
     "clock": "calendar_day.clock_doctrine保留平明起曜、昼夜各八时及未列明的逐时曜神序列；time_restrictions含下卷逐日日名证言。clock_evaluation_status=not_computed时不能按民用0/12点或西方24行星时给出原典精确时段；原文自称万不失一不是实证验收。 comparative_time_systems分别保留T1509从旦至旦及一日夜三十时、T2087正文六时与行内注昼三夜三及居俗昼四夜四；三十时不等于现代三十小时，T2087居俗八时不覆盖T1299昼八夜八，不证明旦=平明、现代钟时、太阳高度或桧尾半日。",
     "clock_text_position": "clock_doctrine与special_day_evidence的textual_position_reference共指下卷一组段落移位：248字特殊日段和93字平明八时段由0398注15、0399注16互指，邻注0398注14另删前文一字一。∞为位置转换，不等于替字、删段、八改六、上卷火水曜位交换或T2465规则次序。两条注是一组异文，不算两份独立明本；所示不是完整明刻本重建，不改变主表、事项或钟时。古代日界、桧尾半日及闰月补配优先级仍未建立。",
     "clothing": "activity=clothing区分裁缝tailoring_garments、制作making_garments、修理repairing_garments、穿着wearing_garments和穿新衣wearing_new_garments；裁缝可归制作，新衣穿着可归穿着，反向不推。royal_wearer仅为明确王者身份，衣事不代表购衣。clothing_reference保留主文十四宿及余并失补集、明本井→并及余并失→并大吉，不补并为井、不将明本未列宿补成同样慎用；口诀和上卷裁衣原句未进入宜忌汇总，不能把汇总列宜说成全部文献一致或现实无风险。完整候选共同的专章表项可单独成立，未定宿名仍保持未定；候选不穷尽时不据单个候选定宜。",
-    "complete_day_branches": "同run引用核验v4要求sukuyo.candidate_days；无跨日期分支时为空数组，有分支时必须完整保留各日证据。公开suzhan可省略time或给null，直接保留未知时刻日期集合；chart与astronomy为null且validation.calculation_layers说明未计算，不填示例或默认钟时。已知钟时继续计算完整星图。衣事须另保留clothing_reference，通用activity引用也不能省略；只引用一条宜文或一支候选不能通过。",
+    "complete_day_branches": "同run引用核验v4要求sukuyo.candidate_days；无跨日期分支时为空数组，有分支时必须完整保留各日证据。公开suzhan可省略time或给null，直接保留未知时刻日期集合；chart与astronomy为null且validation.calculation_layers说明未计算，不填示例或默认钟时。已知钟时须同时明确完整经纬度才计算星图，不填默认地点。衣事须另保留clothing_reference，通用activity引用也不能省略；只引用一条宜文或一支候选不能通过。",
     "conditional_mansion_days": "单一参考历日仍有未定宿时读取sukuyo.candidate_mansion_days，保留每支半日／现代重建支持、个人三九见证和事项条件；applied_to_primary=false。主宿与顶层事项不由候选回填。candidate_days仍为跨日期分支，各日期子项保留自身候选宿证据。候选完整性false不改为已穷尽；钟时不自动判半。",
     "conjunction": "conjunction_doctrine仅按历日宿名给出六、十二、九宿的文献分组，末九成员为宿序推得；applied_to_physical_moon=false时不得称已修正月亮宿界、角距或过宿钟时。",
     "detail_hierarchy": "activity_details保留已确认事实，effective_activity_details和detail_inferences明示行为子类归入父类；购入金宝/牲畜、田地购入/出售及骑乘学习可归入买/卖/技能。分类不推出路程、付款方式、现金流或开始时间。repaying_debt是偿还债款；classical_text_study/teaching_classics/debate_learning/religious_learning分别限研读经典/教授经典/学习论辩/宗教学法，不把经书任意限为宗教典籍；water_journey/diplomatic_mission限水路/使节任务。",
@@ -479,8 +479,8 @@
             "type": "null"
           }
         ],
-        "default": "31n13",
-        "description": "Latitude text or decimal"
+        "default": null,
+        "description": "已知钟时须明确纬度；文本或十进制度，gps_lat优先；未知钟时不用于历法层"
       },
       "leap_month_policy": {
         "default": "unresolved",
@@ -500,8 +500,8 @@
             "type": "null"
           }
         ],
-        "default": "121e28",
-        "description": "Longitude text or decimal"
+        "default": null,
+        "description": "已知钟时须明确经度；文本或十进制度，gps_lon优先；未知钟时不用于历法层"
       },
       "mansion_method": {
         "default": "equatorial_research28",
@@ -590,7 +590,7 @@
           }
         ],
         "default": null,
-        "description": "已确认的当地钟时；未知时省略或null，保留历法日期／半日候选，不计算星图、宫位或瞬时天文宿位，不补00:00或示例钟时。空字符串无效。"
+        "description": "已确认的当地钟时；已知时须同时提供完整经纬度以计算星图。未知时省略或null，保留历法日期／半日候选，不计算星图、宫位或瞬时天文宿位，不补00:00或示例钟时。空字符串无效。"
       },
       "trace_id": {
         "anyOf": [

@@ -1,5 +1,5 @@
 {
-  "bundle_version": "1.0.0",
+  "bundle_version": "1.0.1",
   "sources": {
     "M_AFSI": {
       "url": "https://www.amfengshui.com/wp-content/uploads/woocommerce_uploads/2013/12/tpofs.pdf",
@@ -9,11 +9,11 @@
       "retrieved_format": "raw_pdf",
       "title": "Larry Sang / American Feng Shui Institute: The Principles of Feng Shui",
       "kind": "author_published_book",
-      "source_version": "publisher PDF, Chapter 3, printed pp.19-28; PDF pp.36-45 (one-based)",
+      "source_version": "Sixth Edition, July 2004, publisher PDF, Chapter 3, printed pp.19-28; PDF pp.36-45 (one-based)",
       "scope": "五行生/克/泄、代表物与色彩；木代表物用活植物，处理木家具不作为该版本木调节物；实际元素优先于颜色",
       "locator": "Printed pp.23,25 / PDF pp.40,42 (one-based), directly verified page images",
       "refresh_note": "2026-10-15 direct HTTP refresh succeeded after earlier 403; original bytes and hash match",
-      "verification_note": "2026-10-15 direct HTTP retrieved 4418704 bytes; SHA-256 unchanged; page locators verified"
+      "verification_note": "2026-10-15 direct HTTP retrieved 4418704 bytes; 2026-11-17 identical publisher PDF and printed pp.23,25 rechecked; colour tan retained without broad brown normalization"
     },
     "M_FSI": {
       "url": "https://www.feng-shui-institute.org/Feng_Shui/fiveelements.html",
@@ -30,7 +30,7 @@
   },
   "ruleset": {
     "ruleset_id": "sourced_material_representation_v1",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "method": "material_and_shape_reference",
     "source_ids": [
       "M_AFSI",
@@ -41,6 +41,7 @@
       "材质、器形、颜色分别确认，不相互证明",
       "器形不等于尖角指向人的几何关系",
       "AFSI实际代表物与颜色替代分开；FSI形状对应不自动当AFSI调节物",
+      "颜色按AFSI印刷23页原词登记；tan单列，不由宽泛的brown推定tan",
       "木家具排除只针对AFSI木代表物，不是木家具普遍不吉"
     ]
   },
@@ -101,7 +102,7 @@
   "colours": {
     "green": "木",
     "red": "火",
-    "brown": "土",
+    "tan": "土",
     "beige": "土",
     "yellow": "土",
     "white": "金",
@@ -112,7 +113,7 @@
   "limitations": [
     "本结果不计算或推断房屋/人需要补哪一种元素，element_use只重述用户明确提出的代表物问题",
     "任何资格结果都不表示摆放有利、能够抵消其他方法或可以立即执行",
-    "玻璃、塑料、混合材料及未登记器形不强配；其他作者分类不得静默混入本AFSI版本",
+    "玻璃、塑料、混合材料及未登记器形、颜色不强配；其他作者分类不得静默混入本AFSI版本",
     "FSI的器形参考与AFSI的材料/颜色策略分别保留，不合成为一致处方",
     "材质或形状本身不构成普遍禁忌；镜面与尖角实际朝向关系另按有来源关系规则审查"
   ]

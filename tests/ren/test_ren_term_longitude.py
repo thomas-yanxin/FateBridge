@@ -12,15 +12,19 @@ import pytest
 from pydantic import ValidationError
 
 from fatebridge.core import almanac
-from fatebridge.core.astro.time_scales import datetime_from_tt_point
+from fatebridge.core.astro.time_scales import datetime_from_tt
 from fatebridge.core.astro.tt_epoch import TTInstant
 from fatebridge.core.metaphysics import ren_calendar
 from fatebridge.core.metaphysics.hko_term_dates import published_date_reference
 from fatebridge.core.output_chinese import RenTermDependency
+from fatebridge.utils.civil_time import ZonedCalendar
 from fatebridge.utils.errors import EphemerisSourceError
 from tests.ren.test_ren_anchors import assert_broken_on_three_ports
 from tests.ren.test_ren_term_point import payload_for
-from tests.support.transports import SPECS, native, rest, surface_calls
+from tests.support.ephemeris_case_runtime import (
+    native_ephemeris_files as native_ephemeris_files,
+)
+from tests.support.transports import SPECS, rest, surface_calls
 
 ROOT = Path(__file__).resolve().parents[2]
 CORPUS = ROOT / "tests/fixtures/ren_term_longitude_v1"
@@ -113,7 +117,11 @@ def coherent_shift(term, *, wide=False):
             d["root_bracket_tt"][1] - d["root_bracket_tt"][0]
         ) * 86400
         point = TTInstant.from_float(d["selected_crossing_jd_tt"])
-    return replace(term, moment=datetime_from_tt_point(point), solar_model_details=d)
+    return replace(
+        term,
+        calendar=ZonedCalendar.from_datetime(datetime_from_tt(point)),
+        solar_model_details=d,
+    )
 
 
 @pytest.mark.parametrize(
@@ -168,12 +176,12 @@ def test_false_name_with_coherent_official_date_receipt_is_not_enough(actual_ter
         RenTermDependency.model_validate(bad)
 
 
-def test_native_moshier_receipt_uses_moshier_when_swiss_files_are_available(
+def test_bundled_de441_receipt_keeps_its_source_when_swiss_files_become_available(
     monkeypatch, tmp_path
 ):
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
     term = term_for("native", monkeypatch)
-    from fatebridge.core.moshier_solar import MODEL_ID
+    from fatebridge.core.de441_solar import MODEL_ID
 
     assert term.ephemeris_model == MODEL_ID
     monkeypatch.setenv("SE_EPHE_PATH", str(ROOT / "ephe"))
@@ -203,7 +211,9 @@ def test_sparse_outputs_remain_unverified_not_invented():
     )
 
 
-def test_native_returned_model_must_match_the_declared_observation(monkeypatch):
+def test_native_returned_model_must_match_the_declared_observation(
+    monkeypatch, native_ephemeris_files
+):
     from fatebridge.core.metaphysics import ren_term_longitude as angular
 
     term = term_for("native", monkeypatch)
@@ -215,7 +225,9 @@ def test_native_returned_model_must_match_the_declared_observation(monkeypatch):
         ren_calendar.require_ren_solar_term(term)
 
 
-def test_native_source_cannot_claim_physical_certification(monkeypatch):
+def test_native_source_cannot_claim_physical_certification(
+    monkeypatch, native_ephemeris_files
+):
     term = term_for("native", monkeypatch)
     d = {**term.solar_model_details, "accuracy_certified": True}
     with pytest.raises(EphemerisSourceError):

@@ -1,4 +1,3 @@
-import json
 from fractions import Fraction
 
 import pytest
@@ -28,7 +27,7 @@ from tests.support.transports import SPECS, business, rest, surface_calls
 def _expected_offline_engine() -> tuple[str, str]:
     if swe is not None:
         return ("ephemeris_runtime_model", "swisseph_api")
-    return ("approximate_orbital_model", "fatebridge_approximate_orbital_model")
+    return ("approximate_orbital_model", "fatebridge_analytic_ephemerides")
 
 
 def _house_id_for_longitude(houses, longitude):
@@ -580,9 +579,7 @@ def test_suzhan_uses_shared_local_chart_runtime(mansion_method, surface_calls):
         longitude = Fraction(source["longitude"]) % 360
         sector = int(longitude * 28 / 360)
         assert local_sun["su28_degree"] == float(longitude - sector * Fraction(360, 28))
-        assert local_sun["su28_degree"] != float(
-            Fraction(local_sun["lon"]) - sector * Fraction(360, 28)
-        )
+        assert local_sun["lon"] == source["longitude"]
         # This original failing clock is a counterexample to equating RA
         # mansion degrees with the legacy equal-ecliptic-band coordinates.
         assert suzhan_sun["su28"] != local_sun["su28"]
@@ -718,7 +715,7 @@ def test_calculate_suzhan_analysis_supports_offline_house_system_and_zodiacal_mo
         if item["id"] == "Sun"
     )
 
-    assert tropical_equal_result["params"]["houseSystemResolved"] == "equal"
+    assert tropical_equal_result["params"]["houseSystemResolved"] == "equal_mc"
     assert tropical_equal_result["params"]["zodiacMode"] == "tropical"
     assert sidereal_whole_result["params"]["houseSystemResolved"] == "whole_sign"
     assert sidereal_whole_result["params"]["zodiacMode"] == "sidereal"
@@ -888,7 +885,7 @@ def test_calculate_otherbu_analysis_supports_offline_house_system_and_zodiacal_m
         if item["id"] == "Sun"
     )
 
-    assert tropical_equal_result["chart"]["params"]["houseSystemResolved"] == "equal"
+    assert tropical_equal_result["chart"]["params"]["houseSystemResolved"] == "equal_mc"
     assert tropical_equal_result["chart"]["params"]["zodiacMode"] == "tropical"
     assert (
         sidereal_whole_result["chart"]["params"]["houseSystemResolved"] == "whole_sign"

@@ -10,6 +10,7 @@ class VoidRule(PartialOutput):
     condition: Optional[str] = None
     matched: Optional[bool] = None
     qualified_matched: Optional[bool] = None
+    qualification_source_path: Optional[str] = None
     status: Optional[str] = None
     source_url: Optional[str] = None
 

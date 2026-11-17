@@ -2,7 +2,8 @@
 
 import pytest
 
-from fatebridge.core.jyotish_balas import verify_drik_evidence
+from fatebridge.core.jyotish_balas import PLANETS, aspect_strength
+from fatebridge.core.public_output import public_payload
 from tests.fixtures.surface_payloads import astro_payload
 from tests.jyotish.test_jyotish_transports import call_surfaces
 
@@ -25,7 +26,12 @@ def test_same_run_D1_and_all_Drik_branches_survive_three_surfaces(
     )
     india = body["india"]
     drik = india["strengths"]["drik_bala"]
-    verify_drik_evidence(drik, india["charts"]["D1"])
+    longitudes = {
+        row["id"]: row["longitude"]
+        for row in india["charts"]["D1"]["planets"]
+        if row["id"] in PLANETS
+    }
+    assert drik == public_payload(aspect_strength(longitudes))
     assert drik["source_witness"]["complete_single_original_accepted"] is False
     assert drik["nature_context"]["mercury_options"] == ["benefic", "malefic"]
     for topic in india["topic_evidence"].values():

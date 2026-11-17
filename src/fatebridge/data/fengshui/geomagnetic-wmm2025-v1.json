@@ -1,21 +1,22 @@
 {
   "ruleset": {
     "ruleset_id": "geomagnetic_wmm2025_v1",
-    "version": "1.0.1",
+    "version": "1.1.0",
     "method": "geophysical_heading_reference",
     "source_ids": [
       "GM1",
       "GM2",
       "GM3",
-      "GM4",
-      "GM5"
+      "GM5",
+      "GM6",
+      "GM7"
     ],
     "scope": "WMM2025 main field/heading; no site/effect validation",
     "conventions": [
       "WGS84 ellipsoid km; east-positive D; T=M+D modulo360",
       "Explicit time in[2025,2030); original bearing/house retained",
       "Surface one-sigma model error is not a site error bound",
-      "Pinned NOAA/pygeomag; coarse/C checks distinct from unresolved table differences"
+      "Exact WGS84 inverse flattening;50-digit potential-gradient evaluation; unchanged official-table and original-C gates retained separately"
     ]
   },
   "sources": {
@@ -37,17 +38,23 @@
       "kind": "independent_official_numeric_reference",
       "scope": "12 main-field vectors; excludes rates/grid variation"
     },
-    "GM4": {
-      "title": "pygeomag1.1.0",
-      "url": "https://github.com/boxpet/pygeomag/releases/tag/v1.1.0",
-      "kind": "third_party_implementation",
-      "scope": "MIT legacy C port; not NOAA-endorsed"
-    },
     "GM5": {
       "title": "NOAA current WMM2025 C release",
       "url": "https://www.ngdc.noaa.gov/geomag/WMM/data/WMM2025/wmm2025_Linux.zip",
       "kind": "official_reference_implementation",
       "scope": "Unmodified C; ellipsoid heights;100 inputs"
+    },
+    "GM6": {
+      "title": "NOAA/BGS WMM2025 technical report",
+      "url": "https://doi.org/10.25923/prbc-s316",
+      "kind": "official_model_definition",
+      "scope": "Equations3,5,7-12,17,19; report reciprocal WGS84 flattening; printed formula differences recorded separately"
+    },
+    "GM7": {
+      "title": "NIST DLMF associated Legendre recurrence and Rodrigues formulas",
+      "url": "https://dlmf.nist.gov/14.10.E3",
+      "kind": "mathematical_reference",
+      "scope": "Schmidt normalization of degree recurrence; analytic latitude derivative and positive-order P/cos factorization"
     }
   },
   "model_header": [
@@ -792,17 +799,6 @@
     "member": "WMM2025COF/WMM2025.COF",
     "coefficient_sha256": "dfa8597825af4e0b87ff4198a5b4fb661b3c49f4cd090cd0164e0259b075582f",
     "retrieved_utc": "2026-10-21",
-    "notice": "NOAA WMM US Government data and original code are public domain; pygeomag is a separate MIT-licensed port."
-  },
-  "implementation_reference": {
-    "distribution": "pygeomag",
-    "version": "1.1.0",
-    "wheel_url": "https://files.pythonhosted.org/packages/65/af/4416ce7b7f2b924d32ae8834d6b76bde02980fca7619fbb26d171140c5b8/pygeomag-1.1.0-py3-none-any.whl",
-    "wheel_sha256": "b08fc5de7ca545721e511f62a342d415a4d76e695fec28ef9ef255e994e6727b",
-    "source_files": {
-      "pygeomag/__init__.py": "a8e09c6f04ea4511b10fe2571c26797751cee41ed87f30da0096027a03e6042e",
-      "pygeomag/geomag.py": "eabace31bc38edd426cd2cc613ade7b970b6239c69f85fabaa3e0de324f1f30b"
-    },
-    "scope": "installed_source_files_and_distribution_metadata_not_loaded_memory_attestation"
+    "notice": "NOAA WMM US Government model data and original C code are public domain."
   }
 }

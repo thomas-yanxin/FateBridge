@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 
 from fatebridge.application.examples import suggested_fields
+from fatebridge.core.public_output import same_public_value
 from tests.bazi.test_bazi_source_comparison_transports import (
     SPEC,
     business,
@@ -70,9 +71,9 @@ def test_editorial_notes_and_original_failures_full_and_projected_on_all_surface
                 == row["retained_context"]
                 == patch["annotation_basis"]
             )
-            assert (
-                row["editorial_annotation_provenance"]
-                == patch["editorial_annotation_provenance"]
+            assert same_public_value(
+                row["editorial_annotation_provenance"],
+                patch["editorial_annotation_provenance"],
             )
             assert (
                 row["retained_strength_annotation"]

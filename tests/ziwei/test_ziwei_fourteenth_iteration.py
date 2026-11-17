@@ -1,7 +1,6 @@
 """Printed meanings keep their conditions, source layers, and actual chart links."""
 
 import asyncio
-import hashlib
 import json
 import shutil
 from copy import deepcopy
@@ -31,7 +30,7 @@ from fatebridge.utils.birth_input import create_person_info
 from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
 from scripts.ziwei.audit_ziwei_limits import _seed
 from tests.fixtures.mcp_receipt import verified_inline_business
-from tests.fixtures.mcp_result_delivery import assert_same_run_receipt
+from tests.fixtures.mcp_result_delivery import assert_same_run_receipt, read_full_result
 
 
 def test_printed_definitions_keep_unknowns_and_derived_check_denominators():
@@ -329,24 +328,7 @@ def test_sources_and_conditions_survive_three_surfaces_with_verified_same_run_pa
                 return await verified_inline_business(client, r.structured_content)
             payload = r.structured_content
             assert len(json.dumps(payload, ensure_ascii=False)) <= 8192
-            if "result_delivery" not in payload:
-                return payload
-            ref = payload["result_delivery"]
-            uri = ref["first_page_uri"]
-            pieces = []
-            while uri:
-                page = json.loads((await client.read_resource(uri))[0].text)
-                pieces.append(page["text"])
-                uri = page["next_uri"]
-            raw = "".join(pieces)
-            assert hashlib.sha256(raw.encode()).hexdigest() == ref["sha256"]
-            full = json.loads(raw)
-            assert_same_run_receipt(
-                payload["run_metadata"],
-                full["run_metadata"],
-                deferred_fields=ref["deferred_fields"],
-            )
-            return full
+            return await read_full_result(client, payload)
 
     native = asyncio.run(call())
     args = ["ziwei_birth"]
@@ -468,13 +450,27 @@ def test_complete_default_reading_survives_the_same_budget_on_three_surfaces(
                 )
                 assert q.status_code == 200, q.text
                 page = q.json()
+                assert page["result_id"] == ref["result_id"]
+                assert page["offset"] == offset
+                assert page["total_chars"] == ref["total_chars"]
+                assert page["text"]
                 chunks.append(page["text"])
+                expected_next = offset + len(page["text"])
+                assert page["next_offset"] == (
+                    expected_next if expected_next < ref["total_chars"] else None
+                )
                 offset = page["next_offset"]
                 if offset is None:
                     break
             text = "".join(chunks)
-            assert hashlib.sha256(text.encode()).hexdigest() == ref["sha256"]
+            assert len(text) == ref["total_chars"]
+            manifest_response = client.get(f"/api/results/{ref['result_id']}")
+            assert manifest_response.status_code == 200, manifest_response.text
+            manifest = manifest_response.json()
+            assert manifest["result_id"] == ref["result_id"]
+            assert manifest["total_chars"] == len(text)
             full = json.loads(text)
+            assert full["run_metadata"] == manifest["run_metadata"]
             assert_same_run_receipt(
                 p["run_metadata"],
                 full["run_metadata"],

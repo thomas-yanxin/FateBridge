@@ -50,7 +50,7 @@ def test_empty_preferences_do_not_become_penalty_support_or_definite_match(
     def empty_preferences(context):
         payload = deepcopy(build_payload(context))
         profile = payload["structure_profile"]
-        profile.update(
+        preferences = dict(
             useful_elements=[],
             avoid_elements=[],
             conditional_elements=[],
@@ -60,6 +60,8 @@ def test_empty_preferences_do_not_become_penalty_support_or_definite_match(
             useful_ten_gods=[],
             assessment_status="partial",
         )
+        profile.update(preferences)
+        profile["engineering_reference"].update(preferences)
         payload["favorable_elements"] = []
         return payload
 

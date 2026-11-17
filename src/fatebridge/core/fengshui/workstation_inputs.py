@@ -104,7 +104,7 @@ class MaterialApplication(_DeferredModel):
     metal_exposed: Optional[ObservedCondition] = None
     proportionate_to_space: Optional[ObservedCondition] = Field(
         default=None,
-        description="署名作者的定性尺度核对；不是引擎算出的剂量/重量阈值",
+        description="AFSI已登记实际代表物的定性尺度核对，须有独立观察；不是引擎算出的剂量/重量阈值",
     )
     plant_healthy: Optional[ObservedCondition] = None
 

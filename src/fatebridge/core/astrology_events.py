@@ -11,8 +11,8 @@ them:
 * **多重回归 (extra returns)** — the instants a slow body (Saturn / Jupiter /
   lunar node) returns to its natal longitude, around an analysis date.
 
-This module owns only the swisseph root-finding (it imports nothing from
-kerykeion). Casting the chart at a solved moment and rendering output is the
+This module owns the swisseph root-finding. Casting the chart at a solved
+moment and rendering output is the
 service layer's job, mirroring the rest of the western tools.
 """
 
@@ -103,10 +103,6 @@ def _planet_longitude(jd: float, planet_id: int, *, sidereal: bool = False) -> f
     return _planet_motion(jd, planet_id, sidereal=sidereal)[0]
 
 
-def _jd_to_utc(jd: float) -> datetime:
-    return datetime_from_tt(jd)
-
-
 def _wrapped_diff(longitude: float, target: float) -> float:
     """Signed residual in [-180,180], retaining small nonzero root offsets."""
     return math.remainder(longitude - target, 360.0)
@@ -190,7 +186,7 @@ def _longitude_crossings_utc(
                         high = mid
                 # Preserve the post-crossing side through civil-time quantization.
                 for _ in range(8):
-                    moment = _jd_to_utc(high)
+                    moment = datetime_from_tt(high)
                     recovered = _julian_day(moment)
                     value = _wrapped_diff(
                         same_source(recovered)[0],

@@ -2,7 +2,17 @@
 
 from typing import Any, Dict
 
+from fatebridge.core.bazi_branch_facts import (
+    check_clash_patterns,
+    check_harmony_patterns,
+)
 from fatebridge.core.bazi_evidence import build_natal_evidence
+from fatebridge.core.bazi_pattern_facts import (
+    analyze_special_patterns,
+    check_hidden_patterns,
+    check_pillar_pair_patterns,
+    check_pillar_patterns,
+)
 from fatebridge.core.rules import BaZiRules
 from fatebridge.services.birth_context import BirthComputationContext
 from fatebridge.utils.formatting import (
@@ -23,13 +33,13 @@ def build_destiny_payload(context: BirthComputationContext) -> Dict[str, Any]:
         or corrected_birth_datetime.minute != 0
     )
 
-    harmony_patterns = BaZiRules.check_harmony_patterns(context.birth_pillars)
-    clash_patterns = BaZiRules.check_clash_patterns(context.birth_pillars)
+    harmony_patterns = check_harmony_patterns(context.birth_pillars)
+    clash_patterns = check_clash_patterns(context.birth_pillars)
     stem_patterns = BaZiRules.check_stem_patterns(context.birth_pillars)
-    hidden_patterns = BaZiRules.check_hidden_patterns(context.birth_pillars)
-    pillar_patterns = BaZiRules.check_pillar_patterns(context.birth_pillars)
-    fu_yin_fan_yin = BaZiRules.check_fu_yin_fan_yin(context.birth_pillars)
-    special_pattern_metadata = BaZiRules.analyze_special_patterns(
+    hidden_patterns = check_hidden_patterns(context.birth_pillars)
+    pillar_patterns = check_pillar_patterns(context.birth_pillars)
+    pillar_pair_patterns = check_pillar_pair_patterns(context.birth_pillars)
+    special_pattern_metadata = analyze_special_patterns(
         context.birth_pillars,
         corrected_birth_datetime.hour,
     )
@@ -73,19 +83,31 @@ def build_destiny_payload(context: BirthComputationContext) -> Dict[str, Any]:
             "stem": context.birth_pillars["day"][0],
             "element": context.element_analysis["day_master"]["day_element"],
             "polarity": context.element_analysis["day_master"]["day_polarity"],
-            "strength": context.element_analysis["day_master"]["strength_level"],
+            "strength": context.element_analysis["day_master"]["engineering_index"][
+                "strength_level"
+            ],
+            "engineering_index": context.element_analysis["day_master"][
+                "engineering_index"
+            ],
+            "classical_adjudication": context.element_analysis["day_master"][
+                "classical_adjudication"
+            ],
             "assessment": context.element_analysis["day_master"]["assessment"],
         },
         "element_distribution": context.element_analysis["day_master"][
             "element_distribution"
         ],
-        "element_distribution_basis": context.element_analysis["day_master"].get(
+        "element_distribution_basis": context.element_analysis["day_master"][
             "element_distribution_basis"
-        ),
-        "element_seasonal_phase": context.element_analysis["day_master"].get(
+        ],
+        "element_seasonal_phase": context.element_analysis["day_master"][
             "element_seasonal_phase"
-        ),
-        "favorable_elements": structure_profile.get("useful_elements", []),
+        ],
+        "favorable_elements": structure_profile["useful_elements"],
+        "favorable_elements_status": structure_profile["assessment_status"],
+        "engineering_favorable_elements": context.element_analysis[
+            "engineering_favorable_elements"
+        ],
         "ten_gods": context.element_analysis["ten_gods"],
         "structure_profile": structure_profile,
         "patterns": {
@@ -94,7 +116,7 @@ def build_destiny_payload(context: BirthComputationContext) -> Dict[str, Any]:
             "stems": stem_patterns,
             "hidden": hidden_patterns,
             "pillar_relationships": pillar_patterns,
-            "fu_yin_fan_yin": fu_yin_fan_yin,
+            "pillar_pair_relationships": pillar_pair_patterns,
             "special": special_patterns,
         },
         "calendar_context": context.birth_calendar_context,

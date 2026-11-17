@@ -205,7 +205,9 @@ def test_zero_arc_direction_restores_original_chart(zodiac, builder):
 
 @pytest.mark.parametrize("term", ["春分", "夏至", "秋分", "冬至"])
 def test_cardinal_ingress_against_hong_kong_observatory(term):
-    reference = json.loads((FIXTURES / "bazi-timing-hko-2026.json").read_text())
+    reference = json.loads(
+        (Path(__file__).parents[1] / "data/bazi-timing-hko-2026.json").read_text()
+    )
     expected = next(c["at"] for c in reference["cases"] if c["term"] == term)
     actual = find_cardinal_ingress_utc(2026, term)
     assert (

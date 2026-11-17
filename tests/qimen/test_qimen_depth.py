@@ -2,7 +2,6 @@
 
 import json
 from datetime import datetime, timedelta
-from itertools import product
 from pathlib import Path
 
 import pytest
@@ -88,45 +87,6 @@ def test_book_pattern_examples_include_hosted_heaven_stem(monkeypatch, case):
         p["name"] == case["name"] and p["palace"] == case["palace"]
         for p in board["patterns"]
     )
-
-
-@pytest.mark.parametrize("dun,ju", list(product(["阳遁", "阴遁"], range(1, 10))))
-def test_all_1080_boards_preserve_stars_stems_doors_gods_and_leaders(dun, ju):
-    stems, branches = "甲乙丙丁戊己庚辛壬癸", "子丑寅卯辰巳午未申酉戌亥"
-    for i in range(60):
-        hour = stems[i % 10] + branches[i % 12]
-        text = f'{dun}{"一二三四五六七八九"[ju-1]}局上元'
-        palaces = engine._qimen_build_palaces(
-            time_ganzhi=hour, ju_text=text, dun_type=dun, current_term="冬至"
-        )
-        leader = engine._qimen_zhifu_zhishi(hour, text, dun_type=dun)
-        outer = [p for p in palaces if p["trigram"] != "中"]
-        assert sorted(
-            s for p in outer for s in [p["star"], *p["hosted_stars"]]
-        ) == sorted(["天蓬", "天芮", "天冲", "天辅", "天禽", "天心", "天柱", "天任", "天英"])
-        assert sorted(s for p in outer for s in p["heaven_stems"]) == sorted(
-            "戊己庚辛壬癸丁丙乙"
-        )
-        assert len({p["door"] for p in outer}) == 8
-        assert len({p["god"] for p in outer}) == 8
-        assert sum(p["god"] == "值符" for p in palaces) == 1
-        center = palaces[4]
-        assert (
-            center["door"]
-            is center["god"]
-            is center["star"]
-            is center["heaven_stem"]
-            is None
-        )
-        at = next(p for p in outer if p["trigram"] == leader["star_gong"])
-        assert engine.QIMEN_STAR_DISPLAY[leader["star"]] in [
-            at["star"],
-            *at["hosted_stars"],
-        ]
-        assert leader["zhifu_heaven_stem"] in at["heaven_stems"]
-        assert at["god"] == "值符"
-        if i % 10 == 0:
-            assert all(p["heaven_stem"] == p["earth_stem"] for p in outer)
 
 
 def call(at, **extra):

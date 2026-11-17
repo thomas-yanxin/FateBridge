@@ -296,7 +296,7 @@ def _make_mcp_fn(
                 spec.operation_label_zh,
                 compact=compact,
             )
-        if result_is_error(spec, result):
+        if result_is_error(result):
             return render_error(result, spec.operation_label_zh, compact=compact)
         try:
             return render_response(

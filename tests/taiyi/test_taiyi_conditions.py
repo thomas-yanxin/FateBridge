@@ -17,6 +17,7 @@ from fatebridge.core.metaphysics.taiyi_year import (
 from fatebridge.core.output_taiyi_conditions import TaiyiConditionAssessment
 from fatebridge.services.metaphysics import calculate_taiyi_analysis
 from scripts.taiyi.audit_taiyi_historical import audit
+from tests.support.reference_data import resolve
 
 CORPUS = Path(__file__).parents[1] / "fixtures/taiyi_jinjing_v4"
 TRUTH = json.loads((CORPUS / "predicate-cases.json").read_text())["cases"]
@@ -98,12 +99,6 @@ def test_passing_five_clauses_does_not_erase_other_relations_or_certify_gates():
     assert result["five_generals"]["conditions_satisfied"] is True
     assert result["menju_jiangfa"] is None
     assert "三门条件未定" in result["summary"]
-
-
-def resolve(root, path):
-    for key in path.split("."):
-        root = root[int(key)] if isinstance(root, list) else root[key]
-    return root
 
 
 @pytest.mark.parametrize("mode", ["year", "month", "hour"])

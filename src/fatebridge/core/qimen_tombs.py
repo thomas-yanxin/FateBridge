@@ -7,7 +7,9 @@ to choose after observing an outcome. Only the latter drives formal matches.
 
 from typing import Any
 
-SOURCE = "https://zh.wikisource.org/w/index.php?oldid=625946"
+from fatebridge.core.qimen_sources import YANYI_VOLUMES
+
+SOURCE = YANYI_VOLUMES[2]
 PROFILE_ID = "yanyi_vol2_wangzhang_tombs_v1"
 SELECTED_TOMBS = {"乙": "坤", "丙": "乾", "丁": "艮"}
 LITERAL_PROSE_CANDIDATE = {"乙": "乾", "丙": "乾", "丁": "乾"}

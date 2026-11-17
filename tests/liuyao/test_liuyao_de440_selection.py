@@ -4,7 +4,7 @@ from datetime import datetime
 
 import pytest
 
-from fatebridge.core import almanac, calendar, de440_solar, timing
+from fatebridge.core import almanac, calendar, de440_solar, de441_solar, timing
 from fatebridge.core.local_techniques.sixyao import build_sixyao_result
 from fatebridge.utils.errors import EphemerisSourceError
 from tests.liuyao.test_liuyao_clash_transports import all_surfaces
@@ -47,11 +47,14 @@ def test_whole_year_native_path_does_not_resolve_unused_de440(year, monkeypatch)
     before = almanac.get_solar_terms_for_year(year, "UTC")
     assert [t.as_dict() for t in before] == [t.as_dict() for t in native]
     monkeypatch.setattr(de440_solar, "_profile", unavailable)
-    assert almanac.get_solar_terms_for_year(year, "UTC") is before
+    cache_hits = almanac.get_solar_terms_for_year.cache_info().hits
+    assert almanac.get_solar_terms_for_year(year, "UTC") == before
+    assert almanac.get_solar_terms_for_year.cache_info().hits == cache_hits + 1
     almanac.get_solar_terms_for_year.cache_clear()
     after = almanac.get_solar_terms_for_year(year, "UTC")
     assert [t.as_dict() for t in after] == [t.as_dict() for t in native]
-    assert {t.ephemeris_model for t in after} == {"moshier"}
+    assert {t.ephemeris_model for t in after} == {de441_solar.MODEL_ID}
+    assert {t.resolution_provider for t in after} == {de441_solar.PROVIDER}
 
 
 @pytest.mark.parametrize("year", [1799, 1800, 2200, 2201])
@@ -145,7 +148,6 @@ def test_selected_source_corruption_still_fails_and_explicit_range_still_refuses
 def test_selected_default_fault_is_structured_on_three_protocols(
     monkeypatch, surface_calls
 ):
-    import asyncio
 
     from tests.support.transports import SPECS, call_cli, native
 

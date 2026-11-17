@@ -19,18 +19,13 @@ from fatebridge.core.jyotish_ashtakavarga import (
 )
 from fatebridge.core.output_jyotish import JyotishIndia
 from tests.fixtures.surface_payloads import astro_payload
+from tests.support.reference_data import resolve
 
 FIXTURES = Path(__file__).parents[1] / "fixtures"
 PRIMARY_BYTES = (FIXTURES / "jyotish-ashtakavarga-primary.json").read_bytes()
 ORACLE_BYTES = (FIXTURES / "jyotish-ashtakavarga-oracle.json").read_bytes()
 PRIMARY = json.loads(PRIMARY_BYTES)
 ORACLE = json.loads(ORACLE_BYTES)
-
-
-def resolve(body, path):
-    for part in path.split("."):
-        body = body[int(part)] if isinstance(body, list) else body[part]
-    return body
 
 
 def test_preimplementation_references_and_all_768_literal_cells_are_unchanged():

@@ -13,6 +13,9 @@ from fatebridge.core.metaphysics import ren_calendar
 from fatebridge.services.metaphysics import _build_analysis_seed
 from fatebridge.utils.errors import EphemerisSourceError
 from tests.ren.test_ren_transports import PAYLOAD
+from tests.support.ephemeris_case_runtime import (
+    native_ephemeris_files as native_ephemeris_files,
+)
 from tests.support.transports import SPECS, native, rest, surface_calls
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -142,14 +145,20 @@ def test_selected_packaged_solver_failure_cannot_publish_linear_boundary(
     http, mcp, code, cli = surface_calls(spec, payload, cli_first=False)
     assert http.status_code == 503 and mcp.is_error and code != 0
     for body in (http.json(), mcp.structured_content, cli):
-        assert body["error_code"] == "dependency_missing"
+        assert body["error_code"] == "ephemeris_source_inconsistent"
+        assert body["retryable"] is False
+        assert body["issues"] == [
+            {"path": "runtime.ephemeris_data", "code": "solar_native_unavailable"}
+        ]
         assert "jinkou" not in body and "liureng" not in body
 
 
 @pytest.mark.parametrize(
     "model,flags", [("swieph", (4,)), ("moshier", (2,)), ("jpl", (2,))]
 )
-def test_native_model_must_agree_with_its_own_return_flags(model, flags, monkeypatch):
+def test_native_model_must_agree_with_its_own_return_flags(
+    model, flags, monkeypatch, native_ephemeris_files
+):
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
     term = almanac.get_solar_terms_for_year(2026, "UTC")[0]
     with pytest.raises(RuntimeError, match="模型回执"):

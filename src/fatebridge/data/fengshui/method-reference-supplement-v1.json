@@ -1,15 +1,19 @@
 {
-  "bundle_version": "1.0.0",
+  "bundle_version": "1.0.1",
   "status": "reference_only",
   "sources": {
     "MEIHUA_TRIGRAM_SYMBOLS": {
       "title": "《梅花易数》卷一：八卦万物属类（跨文本本卦象意参考）",
-      "url": "https://zh.wikisource.org/w/index.php?title=梅花易數/卷一&oldid=2690596",
+      "url": "https://zh.wikisource.org/w/index.php?title=%E6%A2%85%E8%8A%B1%E6%98%93%E6%95%B8%2F%E5%8D%B7%E4%B8%80&oldid=2690596",
       "kind": "cross_text_primary_symbol_transcription",
       "scope": "只摘人物与静物词类；不是房屋风水、职业预测或物件占验算法；不导入先天卦数、起卦、体用、季节占断和现代行业映射",
       "source_version": "Wikisource oldid=2690596，最后编辑2026-04-09；古籍公开转录，印本未校勘",
       "locator": "象数易理篇之二/三：八卦万物属类，各卦人物、静物段",
-      "retrieved_at": "2026-10-15"
+      "retrieved_at": "2026-11-17",
+      "retrieved_sha256": "e47c85855c6b5f09305f09c9fbb432f2f129a22b3b30f09385da4f0734a685b3",
+      "retrieved_bytes": 130112,
+      "retrieved_format": "raw_html",
+      "verification_note": "按同一title及oldid正确编码后取得原固定版本；原400请求保留。只取人物与静物，离卦地理段的炉冶场所不缩作便携炉具，兑卦口舌不类推出所有有口之器。"
     },
     "SHEN_VOLUME2_REFERENCE": {
       "title": "《沈氏玄空学》卷二：论四十八局、论上山下水到山到向、论三星五吉",
@@ -223,7 +227,7 @@
         "竹木",
         "工巧之器"
       ],
-      "locator": "象数易理篇之二八卦万物属类；巽卦人物、静物",
+      "locator": "梅花巽卦人物、静物；工匠另据《说卦》第十一章巽为工，不当作梅花人物原词",
       "status": "reference_only",
       "reference_kind": "cross_text_trigram_symbol_reference",
       "source_ids": [
@@ -277,8 +281,7 @@
       ],
       "object_symbols": [
         "金器",
-        "乐器",
-        "有口之器"
+        "乐器"
       ],
       "locator": "象数易理篇之二八卦万物属类；兑卦人物、静物",
       "status": "reference_only",
@@ -306,7 +309,7 @@
         "土石",
         "门阙"
       ],
-      "locator": "象数易理篇之二八卦万物属类；艮卦静物",
+      "locator": "梅花艮卦静物的土石；门阙与古代守门角色另据《说卦》第十一章艮为门阙、为阍寺",
       "status": "reference_only",
       "reference_kind": "cross_text_trigram_symbol_reference",
       "source_ids": [
@@ -331,7 +334,6 @@
       ],
       "object_symbols": [
         "文书",
-        "炉",
         "甲胄"
       ],
       "locator": "象数易理篇之二八卦万物属类；离卦人物、静物",
@@ -704,8 +706,7 @@
       ],
       "classical_objects": [
         "金器",
-        "乐器",
-        "有口之器"
+        "乐器"
       ],
       "modern_observation_candidates": [
         "金属器皿",
@@ -749,6 +750,7 @@
       "status": "observation_candidates_only",
       "source_ids": [
         "MEIHUA_TRIGRAM_SYMBOLS",
+        "SHUOGUA_PRIMARY",
         "FATEBRIDGE_OBSERVATION_REFERENCE"
       ],
       "classical_scope": "cross_text_object_nouns_only",
@@ -762,8 +764,7 @@
         "离"
       ],
       "classical_objects": [
-        "文书",
-        "炉"
+        "文书"
       ],
       "modern_observation_candidates": [
         "书籍文件",

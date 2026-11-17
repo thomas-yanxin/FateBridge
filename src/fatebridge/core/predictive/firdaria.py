@@ -53,7 +53,7 @@ FIRDARIA_NIGHT_NODES_AFTER_MARS_SEQUENCE = [
 def normalize_calendar_firdaria_birth(birth_info: AstroBirthInfo) -> AstroBirthInfo:
     """Use IANA recurrence rules beyond TZif's last explicit DST transition.
 
-    Keep this opt-in: legacy arithmetic must retain its original timezone object.
+    Fixed-duration periods use UTC and need the original zone only for display.
     Fixed-offset spellings are already normalized by the shared birth builder.
     """
     try:
@@ -224,21 +224,12 @@ def build_firdaria_for_sect(
         result = _build_fixed_year_payload(
             birth_info, sequence, sect, analysis_datetime
         )
-    # Preserve default payloads, including exported snapshots and business hashes.
-    if (firdaria_night_order, firdaria_year_basis) != (
-        "nodes_at_end",
-        "fixed_365_2425",
-    ):
-        result["calculation_options"] = {
-            "night_order": firdaria_night_order,
-            "year_basis": firdaria_year_basis,
-            "subperiod_basis": (
-                "utc_elapsed"
-                if firdaria_year_basis == "calendar_anniversary"
-                else "local_wall_time"
-            ),
-            "timezone": birth_info.timezone,
-        }
+    result["calculation_options"] = {
+        "night_order": firdaria_night_order,
+        "year_basis": firdaria_year_basis,
+        "subperiod_basis": "utc_elapsed",
+        "timezone": birth_info.timezone,
+    }
     return result
 
 
@@ -248,23 +239,26 @@ def _build_fixed_year_payload(
     sect: str,
     analysis_datetime: datetime,
 ) -> Dict[str, Any]:
-    """Existing local-wall arithmetic, retained byte-for-byte for default calls."""
+    """Fixed nominal days on UTC elapsed time, displayed in the birth timezone."""
     sub_planet_order = [planet for planet, _ in sequence if "Node" not in planet]
 
     timeline = []
-    cursor = birth_info.local_datetime
+    cursor = birth_info.require_utc_datetime
+    target = analysis_datetime.astimezone(timezone.utc)
+    display_timezone = birth_info.local_datetime.tzinfo
+    horizon = target + timedelta(days=90 * TROPICAL_YEAR_DAYS)
     current_major = None
     current_sub = None
 
-    while cursor <= analysis_datetime + timedelta(days=90 * TROPICAL_YEAR_DAYS):
+    while cursor <= horizon:
         for planet, years in sequence:
             start = cursor
             end = start + timedelta(days=years * TROPICAL_YEAR_DAYS)
             main_period: Dict[str, Any] = {
                 "planet": planet,
                 "planet_label": planet_label(planet),
-                "start": start.isoformat(),
-                "end": end.isoformat(),
+                "start": start.astimezone(display_timezone).isoformat(),
+                "end": end.astimezone(display_timezone).isoformat(),
                 "years": years,
                 "subperiods": [],
             }
@@ -274,29 +268,27 @@ def _build_fixed_year_payload(
                     sub_planet_order[sub_planet_order.index(planet) :]
                     + sub_planet_order[: sub_planet_order.index(planet)]
                 )
-                sub_years = years / 7.0
+                sub_duration = (end - start) / 7
                 sub_cursor = start
                 for sub_planet in order:
-                    sub_end = sub_cursor + timedelta(
-                        days=sub_years * TROPICAL_YEAR_DAYS
-                    )
+                    sub_end = sub_cursor + sub_duration
                     sub_period = {
                         "planet": sub_planet,
                         "planet_label": planet_label(sub_planet),
-                        "start": sub_cursor.isoformat(),
-                        "end": sub_end.isoformat(),
+                        "start": sub_cursor.astimezone(display_timezone).isoformat(),
+                        "end": sub_end.astimezone(display_timezone).isoformat(),
                     }
                     main_period["subperiods"].append(sub_period)
-                    if sub_cursor <= analysis_datetime < sub_end:
+                    if sub_cursor <= target < sub_end:
                         current_sub = sub_period
                     sub_cursor = sub_end
 
-            if start <= analysis_datetime < end:
+            if start <= target < end:
                 current_major = main_period
 
             timeline.append(main_period)
             cursor = end
-            if cursor > analysis_datetime + timedelta(days=90 * TROPICAL_YEAR_DAYS):
+            if cursor > horizon:
                 break
         else:
             continue

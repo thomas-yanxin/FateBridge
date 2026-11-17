@@ -135,7 +135,7 @@ from fatebridge.core.output_taiyi_oppositions import TaiyiOppositionAssessment
 from fatebridge.core.output_taiyi_shiji import TaiyiShijiDerivation
 from fatebridge.core.output_taiyi_source_alignment import TaiyiSourceAlignment
 from fatebridge.core.output_taiyi_year_calendar import TaiyiHistoricalYearCalendar
-from fatebridge.utils.civil_clock import parse_iso_datetime
+from fatebridge.utils.civil_time import ZonedCalendar
 
 Object = Dict[str, JsonValue]
 
@@ -232,21 +232,15 @@ class SolarTerm(PartialOutput):
         if self.datetime_with_offset is None:
             return self
         text = self.datetime_with_offset
-        clock = parse_iso_datetime(text[:-1] + "+00:00" if text.endswith("Z") else text)
-        offset = clock.utcoffset()
-        if offset is None:
-            raise ValueError("节气datetime_with_offset必须包含明确UTC偏移")
+        clock = ZonedCalendar.from_isoformat(text)
+        offset = clock.offset
         if (
             self.utc_offset_seconds is not None
             and offset.total_seconds() != self.utc_offset_seconds
         ):
             raise ValueError("节气时间字符串与utc_offset_seconds不一致")
         if self.datetime is not None:
-            text = self.datetime
-            legacy = parse_iso_datetime(
-                text[:-1] + "+00:00" if text.endswith("Z") else text
-            )
-            if legacy.replace(tzinfo=None) != clock.replace(tzinfo=None):
+            if not clock.matches_wall_label(self.datetime):
                 raise ValueError("节气旧钟面标签与带偏移时间不一致")
         return self
 
@@ -2969,6 +2963,10 @@ class LocalHouse(PartialOutput):
 class LocalObject(PartialOutput):
     house: Optional[str] = None
     ecliptic_house_position: Optional[float] = None
+    ecliptic_house_phase_degrees_ratio: Optional[str] = Field(
+        default=None,
+        description="原生宫位模型的工作相位（有理数文本，现代度）；保留细微边界供反向分宫，不代表物理精度或唯一性获证",
+    )
     id: Optional[str] = None
     lon: Optional[float] = None
     sign: Optional[str] = None

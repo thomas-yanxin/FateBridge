@@ -1,7 +1,6 @@
 """Book conventions cannot be selected to improve an audit score."""
 
 import copy
-import json
 import shutil
 
 import pytest
@@ -9,7 +8,6 @@ import pytest
 from scripts.taiyi.audit_taiyi_wujing_facsimile import audit as native_audit
 from scripts.taiyi.audit_taiyi_wujing_names import (
     CORPUS,
-    ROOT,
     audit,
     compare,
     resolve_name,

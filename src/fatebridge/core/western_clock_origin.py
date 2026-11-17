@@ -28,6 +28,8 @@ def event_wall_datetime(
     minute: int,
     calendar: str = "proleptic_gregorian",
     hour_origin: str = "midnight",
+    *,
+    second: int = 0,
 ) -> tuple[datetime, dict[str, Any], dict[str, Any]]:
     """Normalize an explicitly selected hour index to a midnight-based label.
 
@@ -37,10 +39,10 @@ def event_wall_datetime(
     """
     if hour_origin not in {"midnight", "noon"}:
         raise ValueError("Unknown hour origin; select midnight or noon explicitly")
-    if any(type(v) is not int for v in (hour, minute)):
+    if any(type(v) is not int for v in (hour, minute, second)):
         raise ValueError("Hour-origin clock parts must be integers")
-    if not 0 <= hour <= 23 or not 0 <= minute <= 59:
-        raise ValueError("Hour-origin labels require hour0..23 and minute0..59")
+    if not 0 <= hour <= 23 or not 0 <= minute <= 59 or not 0 <= second <= 59:
+        raise ValueError("Hour-origin labels require hour0..23 and minute/second0..59")
     jdn = civil_date_jdn(year, month, day, calendar)
     noon = hour_origin == "noon"
     carry = int(noon and hour >= 12)
@@ -53,14 +55,21 @@ def event_wall_datetime(
         )
     final_date = date.fromordinal(final_ordinal)
     wall = datetime(
-        final_date.year, final_date.month, final_date.day, normalized_hour, minute
+        final_date.year,
+        final_date.month,
+        final_date.day,
+        normalized_hour,
+        minute,
+        second,
     )
     raw_label = None
     if 1 <= raw_ordinal <= date.max.toordinal():
         raw_date = date.fromordinal(raw_ordinal)
-        raw_label = datetime(raw_date.year, raw_date.month, raw_date.day, hour, minute)
+        raw_label = datetime(
+            raw_date.year, raw_date.month, raw_date.day, hour, minute, second
+        )
     calendar_receipt = _calendar_conversion_receipt(
-        year, month, day, hour, minute, calendar, jdn, raw_label
+        year, month, day, hour, minute, calendar, jdn, raw_label, second=second
     )
     return (
         wall,
@@ -70,7 +79,7 @@ def event_wall_datetime(
             "input_hour_origin": hour_origin,
             "input_calendar": calendar,
             "input_date": {"year": year, "month": month, "day": day},
-            "input_clock": {"hour": hour, "minute": minute},
+            "input_clock": {"hour": hour, "minute": minute, "second": second},
             "source_date_label_jdn": jdn,
             "source_date_gregorian_representable": raw_label is not None,
             "calendar_normalized_label": raw_label.isoformat() if raw_label else None,

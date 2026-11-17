@@ -67,7 +67,8 @@ def test_source_reverse_small_limit_is_connected_to_explicit_year(
     assert len(g["rule_trace"]) == 16
     assert (
         sum(
-            t["rule_id"] == "moira_compatibility_conditions_v2" for t in g["rule_trace"]
+            t["rule_id"] == "moira_conditions_with_seasonal_moon_v3"
+            for t in g["rule_trace"]
         )
         == 1
     )
@@ -172,7 +173,7 @@ def test_no_target_is_not_the_present_and_target_does_not_mutate_natal(monkeypat
     assert len(natal["guolao"]["rule_trace"]) == 15
     assert (
         sum(
-            t["rule_id"] == "moira_compatibility_conditions_v2"
+            t["rule_id"] == "moira_conditions_with_seasonal_moon_v3"
             for t in natal["guolao"]["rule_trace"]
         )
         == 1

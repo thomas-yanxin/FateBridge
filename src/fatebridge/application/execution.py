@@ -13,6 +13,10 @@ from fatebridge.core.execution_context import (
     correlate_error,
 )
 from fatebridge.core.public_output import public_payload
+from fatebridge.core.response_models import (
+    CHART_VARIANT_TOOL_KEYS,
+    required_output_fields_for,
+)
 from fatebridge.utils.errors import (
     VALIDATION_ERROR_CODE,
     EphemerisSourceError,
@@ -44,7 +48,7 @@ def execute_spec(spec: ToolSpec, request: BaseModel) -> ServiceResult:
         ):
             service, args, kwargs = spec.bind(request)
             result = service(*args, **kwargs)
-        if policy is not None and not result_is_error(spec, result):
+        if policy is not None and not result_is_error(result):
             result = {**result, "ephemeris_data_policy": policy.receipt()}
     except EphemerisSourceError as error:
         if mode == "auto":
@@ -104,7 +108,7 @@ def execute_tool(
                 handle_calculation_error(exc, spec.operation_label_zh), controls
             )
         elapsed_ms = (perf_counter() - started) * 1000
-        if result_is_error(spec, result):
+        if result_is_error(result):
             return correlate_error(result, controls)
         if not include_metadata:
             return public_payload(result)
@@ -136,6 +140,7 @@ def execute_tool(
                         "knowledge_read",
                         "knowledge_registry",
                         "suzhan",
+                        "astro_chart",
                     }
                     else None
                 ),
@@ -164,7 +169,7 @@ class OutputContractError(RuntimeError):
 def validate_output(
     spec: ToolSpec, result: ServiceResult, *, request: Optional[BaseModel] = None
 ) -> None:
-    if result_is_error(spec, result):
+    if result_is_error(result):
         try:
             ErrorEnvelope.model_validate(result, strict=True)
         except ValidationError as exc:
@@ -221,6 +226,34 @@ def validate_output(
             spec.output_model.model_validate(result, context={"full_result": True})
         except ValidationError as exc:
             raise OutputContractError("工具输出不符合公开契约") from exc
+    if spec.key in CHART_VARIANT_TOOL_KEYS.values():
+        actual_variant = result["chart_profile"]["chart_type"]
+        if spec.key == "astro_chart":
+            if request is not None:
+                from fatebridge.core.requests.astrology import AstroChartPolyRequest
+
+                assert isinstance(request, AstroChartPolyRequest)
+                expected_variant = request.chart_variant
+            else:
+                expected_variant = actual_variant
+            if expected_variant not in CHART_VARIANT_TOOL_KEYS:
+                raise OutputContractError("聚合星盘输出包含未支持的盘型")
+            extra_roots = set(
+                required_output_fields_for(CHART_VARIANT_TOOL_KEYS[expected_variant])
+            ) - set(spec.required_output_fields)
+            if any(
+                field not in result or result[field] is None or result[field] == {}
+                for field in extra_roots
+            ):
+                raise OutputContractError("完整聚合星盘缺少所选盘型的必需业务事实")
+        else:
+            expected_variant = next(
+                variant
+                for variant, owner in CHART_VARIANT_TOOL_KEYS.items()
+                if owner == spec.key
+            )
+        if actual_variant != expected_variant:
+            raise OutputContractError("星盘输出盘型与本次请求不符")
     from fatebridge.core.output_bazi_anchors import require_complete_bazi_anchors
 
     try:
@@ -247,14 +280,8 @@ def validate_output(
                 raise OutputContractError("完整六壬金口诀结果与本次请求不符") from exc
 
 
-def result_is_error(spec: ToolSpec, result: ServiceResult) -> bool:
-    """Classify a service result as an error, honoring spec.error_is_fatal.
-
-    Mirrors the REST transport's logic so every surface (REST/MCP/CLI) treats
-    failures identically.
-    """
-    if spec.error_is_fatal is not None:
-        return bool(spec.error_is_fatal(result))
+def result_is_error(result: ServiceResult) -> bool:
+    """Classify the shared error envelope identically on REST, MCP and CLI."""
     return "error" in result
 
 
@@ -276,7 +303,7 @@ def invalid_input_result(spec: ToolSpec) -> ServiceResult:
     hand-written domain message that is safe and useful to surface. Branch on
     ``error_code``, not on message text.
     """
-    label = spec.rest_error_label or f"{spec.operation_label_zh}参数"
+    label = f"{spec.operation_label_zh}参数"
     return {
         "error": f"无效的{label}",
         "error_code": VALIDATION_ERROR_CODE,

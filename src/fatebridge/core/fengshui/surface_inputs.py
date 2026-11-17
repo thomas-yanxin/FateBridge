@@ -5,6 +5,7 @@ from typing import List, Literal, Optional
 from pydantic import ConfigDict, Field, StrictBool, model_validator
 
 from .numeric_inputs import FengshuiInput as _DeferredModel
+from .workstation_inputs import ObservedCondition
 
 SurfaceZone = Literal[
     "near_left",
@@ -18,8 +19,17 @@ SurfaceZone = Literal[
     "far_right",
 ]
 Representation = Literal[
-    "living_plant", "fresh_flowers", "water_image", "dark_accessory", "other", "unknown"
+    "living_plant",
+    "fresh_flowers",
+    "fresh_cut_branches",
+    "water_image",
+    "dark_accessory",
+    "other",
+    "unknown",
 ]
+PLANT_REPRESENTATIONS = frozenset(
+    {"living_plant", "fresh_flowers", "fresh_cut_branches"}
+)
 
 
 class SurfaceItem(_DeferredModel):
@@ -59,6 +69,10 @@ class SurfaceItem(_DeferredModel):
     )
     observation_basis: Literal["measured", "user_confirmed", "image_observed"]
     evidence: str = Field(min_length=1, max_length=1000)
+    healthy: Optional[ObservedCondition] = Field(
+        default=None,
+        description="植物健康或鲜花/新鲜剪枝状态的独立事实；已知身份、位置或移动许可不能代替状态核对",
+    )
 
     @model_validator(mode="after")
     def meaningful_evidence(self) -> "SurfaceItem":
@@ -66,6 +80,11 @@ class SurfaceItem(_DeferredModel):
             raise ValueError("物件名称与观察依据不能空白")
         if (self.zone is None) != (self.zone_observation_basis is None):
             raise ValueError("zone与zone_observation_basis必须成对，未知位置两者省略")
+        if (
+            self.healthy is not None
+            and self.representation not in PLANT_REPRESENTATIONS
+        ):
+            raise ValueError("植物/鲜花/剪枝状态条件不能套到其他物件")
         return self
 
 

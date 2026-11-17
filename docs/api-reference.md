@@ -84,6 +84,21 @@ REST OpenAPI、MCP `tools/list`、`/api/tools` 和 CLI `describe` 发布中央�
 
 完整计算另有中央目录声明的 `required_output_fields`，通过发现记录的 `full_result_required_fields` 公开，完整验证后再生成公开结果。这些必需业务根缺失、为null或仅为空对象时，共享执行返回 `internal_error`；不可用应保留明确状态。Schema中的 `x-fatebridge-full-result` 另声明嵌套必要事实，可配合集合基数、唯一身份与必要成员。字段投影在完整验证之后执行，仍可合法省略对象字段；该规则不要求所有可选事实存在。领域错误包络也须符合 `ErrorEnvelope`，缺错误事实或错误码／retryable 的异常结果归为内部错误，保留有效trace／parent。
 
+`sanshiunited` 的完整结果须同时保留 `subresults` 与 `synthesis`。后者的宫位对应、来源资料、有限事实和未知状态由已有嵌套模型校验；单工具的类型声明直接进入公开根 Schema。该合同不增加联合预测规则，也不认证三套方法彼此独立或现实有效。
+
+聚合 `astro_chart` 根据原请求的 `chart_variant` 核对完整结果。所有分支须有 `planets` 和 `chart_profile`；各分支还须有下表中的业务根。发现记录的 `full_result_required_fields_by_variant` 从对应专用入口的要求派生，须与通用 `full_result_required_fields` 合并读取。
+
+| `chart_variant` | 额外必需业务根 | 结果 `chart_profile.chart_type` |
+| --- | --- | --- |
+| `chart` | 无 | `chart` |
+| `chart13` | `thirteen_sectors` | `chart13` |
+| `hellen_chart` | `hellenistic` | `hellen_chart` |
+| `guolao_chart` | `guolao` | `guolao_chart` |
+| `india_chart` | `india` | `india_chart` |
+| `germany` | `base_chart`、`midpoints` | `germany` |
+
+聚合 Schema 复用专用入口的领域类型，并在有关根字段以 `x-fatebridge-full-result-required-for-chart-variants` 列出适用盘型。该扩展是完整执行的发现元数据，不是标准 JSON Schema 的 `required`，也不要求合法投影包含所有业务根。完整结果的盘型须与原请求一致，专用入口须与其固定盘型一致；缺根、类型错误或错盘型均属于服务输出错误，不能通过投影绕过。此约束不证明同盘型内的出生输入绑定、数值精度或传统解释已全部验收；逐项记录见[聚合星盘合同核对](chart-variant-contract-audit.md)。
+
 领域结果中的规则索引、候选结构和缺失状态按各自专题解释：[八字](bazi-assessment.md)、[紫微](ziwei.md)、[风水](fengshui.md#分层结果与覆盖状态)。快照只呈现同次计算，不改变这些字段的适用范围。
 
 很多工具返回下面两层快照字段：
@@ -194,7 +209,7 @@ REST 对应 `GET /api/results/{result_id}` 和 `GET /api/results/{result_id}/pag
 ### 2.6 精度与依赖
 
 - 核心占星盘优先使用本地 `swisseph`，缺失时会回退到 FateBridge 内置近似模型
-- 西占推运不走近似回退；缺少 `kerykeion` / Swiss Ephemeris 时会直接报错
+- 西占推运不走近似回退；缺少 Swiss Ephemeris 时会直接报错
 - `swisseph` 可导入不代表已加载 `.se1` 数据；实际模型检查 `chart_profile.ephemeris_model` 和 `run_metadata.engine_is_approximate`
 - 完整说明见 [algorithm-coverage.md](algorithm-coverage.md)，数据配置见 [星历数据安装](ephemeris.md)
 
@@ -317,7 +332,7 @@ CLI profile 沿用批量入口，子工具共用 as_of / trace，parent_run_id �
 | `firdaria_year_basis` | string | `fixed_365_2425`（默认）或 `calendar_anniversary`；只影响法达日期计算 |
 | `selected_sections` | string[] | 仅独立 timing tools 支持 |
 
-两项法达参数可独立组合，同时适用于综合时运和独立 `firdaria`，REST / MCP 同名，CLI 使用 `--firdaria-night-order` / `--firdaria-year-basis`。公历周年的闰日、UTC 七等分、时区异常拒绝及分钟展示规则见[法达计算约定](firdaria-compatibility.md#参数与调用)。默认组合保留现有返回结构，非默认组合在法达对象内增加 `calculation_options` 回执。
+两项法达参数可独立组合，同时适用于综合时运和独立 `firdaria`，REST / MCP 同名，CLI 使用 `--firdaria-night-order` / `--firdaria-year-basis`。固定年使用UTC名义经过时长，公历模式使用原生日周年边界；详情见[法达计算约定](firdaria-compatibility.md#参数与调用)。所有新结果均返回 `calculation_options`，声明实际夜盘顺序、年长、子限时间基准与显示时区。旧地方钟固定年结果不作为当前日期基线。
 
 完整非法分析日期返回 `validation_error`；只给部分年月日时逐字段补齐默认值，部分日期补齐时可约束到月底。目标日期与钟时按 `birth_timezone` 解释，`return_timezone` 用于转换同一时刻。指定某日某时应同时传齐五项 `analysis_*`，核对聚合结果的 `analysis_context.analysis_datetime`；`as_of` 不替代目标钟时。复现计算还应保留出生时区与返照/行运地点。
 
@@ -334,6 +349,8 @@ CLI profile 沿用批量入口，子工具共用 as_of / trace，parent_run_id �
 | `lat` / `lon` | 文本化地理提示 |
 | `gps_lat` / `gps_lon` | REST / MCP 使用同一字段名，CLI 使用 `--gps-lat` / `--gps-lon` |
 | `selected_sections` | 快照导出裁剪 |
+
+`suzhan` 的 `time` 可省略或为null，此时仅计算日期与历法候选，不需要坐标；已知钟时则须明确完整经纬度，`lat`／`lon` 或对应GPS分量均可，GPS优先且0°有效。缺少任一分量返回输入错误，不填默认地点。
 
 ### 3.5 双人关系请求
 
@@ -439,6 +456,8 @@ CLI profile 沿用批量入口，子工具共用 as_of / trace，parent_run_id �
 
 梅花的输入方法、体用条件、题篇、现场外应和天气分支见[梅花专题](meihua.md)。`evidence_views` 提供各任务的字段清单，调用时传所选 `fields`，不传视图名。天气研究的固定向量、负结果与可达评分上限在[研究部分](meihua.md#天时占与固定天气研究)分别报告。
 
+六爻 `void_conditions` 字段视图返回所选用爻的原旬空、空亡条件与三支资格。日建生扶的 `matched` 是原始关系；若有 `qualified_matched`，它才决定本条能否计入，`null` 仍待审。未选用爻时焦点为 `null`。
+
 ### 4.5 中国术数独立盘
 
 | 方法 | 路径 | 说明 |
@@ -455,7 +474,7 @@ CLI profile 沿用批量入口，子工具共用 as_of / trace，parent_run_id �
 | 输入或结果 | 说明与专题 |
 | --- | --- |
 | 紫微盘式、四化与宫位身份 | 三个工具共用 `rule_profile`；本命和运限字段按[紫微专题](ziwei.md)区分 |
-| 奇门 `qimen_options` | 所选置闰／拆补、贵人和规则前提见[奇门专题](qimen-depth-audit.md) |
+| 奇门 `qimen_options` | 所选置闰／拆补、贵人和规则前提见[奇门专题](qimen-depth-audit.md)。`stem_candidates` 字段视图区分各所列候选都命中、都未命中及分歧，并返回共同及可能宫位。 |
 | 太乙 `year_profile` | 历史年计可选 `jinjing_year_historical_table_v1`（381–385）或 `jinjing_year_qiliang_table_v1`（501–505），只用于年计；三式放入 `taiyi_options`。历制分歧见[太乙专题](taiyi-sanshi-audit.md) |
 | 六壬／金口诀输入与层次 | `analysis_second`、昼夜贵人、地分、本命和行年条件见[输入与来源](liuren-jinkou-audit.md#输入与来源)及[字段索引](liuren-jinkou-audit.md#输入与字段索引) |
 | 历法提供者与交节 | 实际模型、时标、刊载日期对照及既有超差见[历法验证](liuren-jinkou-audit.md#交气时间尺度与边界序列化) |
@@ -505,7 +524,15 @@ REST 在 JSON 请求体传入这五项，MCP 使用同名参数，CLI 使用
 `analysis_context.analysis_datetime`，行运地点的时刻见聚合结果的
 `transits.current_transit.analysis_datetime` 或独立工具的 `transit.analysis_datetime`。
 
+返照结果的`solver.julian_day_tt`也是最终盘`calculation_basis.julian_day_tt`的位置时刻；UTC／本地标签只作表示。等于分析TT时沿用已知分析输入见证，插入UTC秒可返回`:60`标签；无法表示的本地标签保留空值。行运另返回`exact_orb_limit`：`exact_hits`采用该紧密阈值和原始角度，普通命中与紧密命中分别最多展示24／12项。`house_emphasis`统计行运盘自身宫位。详见[返照根与行运分档](western-astrology.md#返照根与行运分档)。
+
 `profection`、`givenyear` 和综合推运的月小限采用周年区间的 UTC 时长十二等分；2 月 29 日出生者在平年采用 2 月 28 日，闰年恢复原生日。年区间、月段端点和活动月序共用该口径，见[年小限与月段边界](western-astrology.md#年小限与月段边界)。
+
+`profection`另返回`age_years`、`year_start/year_end`和`calculation_options`；生成周年采用compatible规则，名义周年年序与跳日后的显示年份分开。综合推运的`secondary_progression.calculation_options`及太阳弧的`calculation_options.progression`声明365.24219日固定年键分子／分母、UTC换算与舍入；其他年键和轴宫方法不混称同法，见[具名时间模型](western-astrology.md#周年与次限的具名时间模型)。
+
+`astro_vedicprog`、`astro_planetaryarc`与`astro_jaynesprog`的结果分支均返回实际`progressed_datetime`；恒星／赤纬次限在`calculation_options`声明同一固定年键，行星弧在`progression_options`声明取弧所用的次限模型。赤纬次限不声明未执行的宫位计算。
+
+`decennials`及综合推运的十年星限保留`start_offset_exact_minutes`／`end_offset_exact_minutes`有理数偏移，整数分钟偏移仅供显示。真实`start/end`从出生UTC锚一次舍入到微秒后转出生区；实际模型见`calculation_options`，方法范围见[十年星限精确时轴](western-astrology.md#十年星限比例重建与精确时轴)。
 
 ### 4.8 事件占星（事件盘）
 
@@ -527,6 +554,7 @@ REST 在 JSON 请求体传入这五项，MCP 使用同名参数，CLI 使用
 | `question_calendar`／`candidate_calendar` | 默认 `proleptic_gregorian`，可显式选 `julian`；[历法与钟时](western-astrology.md#输入与天文精度) |
 | `question_clock_basis`／`candidate_clock_basis` | `civil`、`local_mean_solar` 或 `local_apparent_solar`；太阳时模式省略／null 时区，避免重复修正 |
 | `question_hour_origin`／`candidate_hour_origin` | `midnight` 默认；`noon` 为正午起算的原始小时标签；与钟时基准分别声明 |
+| `question_second`／`candidate_second` | 已确认的整秒 `0..59`，省略沿用 `0`；经历法与正午进位保留，拒绝小数秒和直接输入的秒 `60`。输入分辨率不证明原记录准确度 |
 | `ut1_source` | 默认 `swiss_delta_t`；`iers_c04` 仅覆盖固定来源区间，不外推或静默回退 |
 | 卜卦 `orb_profile` | `lilly_1647_p107_first` 默认，或 `lilly_1647_p107_second`；[两列容许度与宫位](western-astrology.md#lilly两列容许度实际落宫与居宫条款) |
 | 卜卦 `radicality_context` | 严格嵌套对象，只提交已确认条件；[判断前审查](western-astrology.md#lilly判断前审查与资料未知) |
@@ -879,7 +907,6 @@ uv run --locked --extra dev python -m fatebridge.mcp_server
 
 优先检查本地是否具备：
 
-- `kerykeion`
 - Swiss Ephemeris 运行时
 
 ## 9. 进一步阅读

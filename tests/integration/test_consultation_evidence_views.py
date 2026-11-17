@@ -1,6 +1,5 @@
 """Task-level evidence: published views must retain the method users requested."""
 
-import hashlib
 import json
 import shlex
 
@@ -19,6 +18,7 @@ from fatebridge.application.examples import (
 )
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
+from tests.fixtures.mcp_result_delivery import read_full_result
 
 
 def spec_for(key):
@@ -64,24 +64,8 @@ async def test_published_knowledge_query_can_resolve_an_actual_aspect_source():
 
 
 async def original_payload(client, result):
-    """Read the original run's pages, never calculate again to fill missing data."""
     assert not result.is_error, result
-    payload = result.structured_content
-    if "result_delivery" not in payload:
-        return payload
-    delivery = payload["result_delivery"]
-    uri = delivery["first_page_uri"]
-    fragments = []
-    while uri:
-        page = json.loads((await client.read_resource(uri))[0].text)
-        assert page["result_id"] == delivery["result_id"]
-        fragments.append(page["text"])
-        uri = page["next_uri"]
-    serialized = "".join(fragments)
-    assert hashlib.sha256(serialized.encode()).hexdigest() == delivery["sha256"]
-    restored = json.loads(serialized)
-    assert restored["run_metadata"]["run_id"] == payload["run_metadata"]["run_id"]
-    return restored
+    return await read_full_result(client, result.structured_content)
 
 
 async def call_view(client, key, view=None, **overrides):

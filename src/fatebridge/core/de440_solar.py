@@ -7,7 +7,6 @@ Runtime data are original position coefficients, never event-time references.
 
 from __future__ import annotations
 
-import gzip
 import hashlib
 import json
 import math
@@ -17,7 +16,7 @@ from copy import deepcopy
 from dataclasses import dataclass
 from functools import lru_cache
 from importlib.resources import files
-from typing import Any
+from typing import Any, TypedDict
 
 from fatebridge.core.analytic_solar import (
     C_AU_DAY,
@@ -25,22 +24,28 @@ from fatebridge.core.analytic_solar import (
     apparent_ecliptic,
 )
 from fatebridge.core.analytic_solar import profile as frame_profile
+from fatebridge.core.astro.coefficient_storage import RecordBlock, unpack_records
+from fatebridge.core.astro.tdb import COEFFICIENT_SHA256 as TDB_SHA256
+from fatebridge.core.astro.tdb import Parameters as TDBParameters
+from fatebridge.core.astro.tdb import fairhead_state
 from fatebridge.utils.errors import EphemerisSourceError
 
 MODEL_ID = "fatebridge_de440_solar_v1"
 HISTORICAL_MODEL_ID = "fatebridge_de440_solar_historical_v1"
 EXTENDED_MODEL_ID = "fatebridge_de440_solar_extended_v1"
-EXTENDED_MANIFEST_CONTENT_SHA256 = (
-    "885b46b0dac74bd2a84f1c8f14fcfac1e53850309a97ccfa6b69b77f9e00b901"
-)
 CANPING_MODEL_ID = "fatebridge_de440_solar_canping_v1"
 CANPING_EXTENDED_MODEL_ID = "fatebridge_de440_solar_canping_extended_v1"
-CANPING_EXTENDED_MANIFEST_CONTENT_SHA256 = (
-    "b623f9be436c65453dccc8edfabcadcdb4444823a7074ad4b73c1b97cf64c574"
+ATLAS_BASENAME = "de440-solar-record-atlas-v1"
+ATLAS_MANIFEST_SHA256 = (
+    "b05993b79f7dc4cd695f36ee9e3a92d0306052e4d410d4d25c09f05ab8dd9183"
 )
-CANPING_MANIFEST_CONTENT_SHA256 = (
-    "21a6750e9701a9934cdd20435a0792c598a3aeb55f8ba52eb57019a4239dae41"
-)
+_MANIFEST_SHA256 = {
+    "fatebridge_de440_solar_canping_extended_v1": "077ac65e3134162e7f76a4275fbe1b3f4a5c72a9b7686e97c5f85eb197ad687d",
+    "fatebridge_de440_solar_canping_v1": "a74949e48aadcdcd7af99c6f128acd12aa5713d4f3df68fd6299e1ce48b40c4b",
+    "fatebridge_de440_solar_extended_v1": "eb5d7bba7902142702f209183d057e15180a994bc792e6ab6ad40a4586bd03f5",
+    "fatebridge_de440_solar_historical_v1": "e073acaf81593b21078706a9efe95073efebc2e42712c384788fa6f14e7d9e95",
+    "fatebridge_de440_solar_v1": "2bdda66ee61ca065401888629dd4434df6ccc535fdfe20f0c68b3c5a56752145",
+}
 _PROFILE_FILES = {
     MODEL_ID: "de440-solar-v1",
     HISTORICAL_MODEL_ID: "de440-solar-historical-v1",
@@ -52,12 +57,73 @@ AU_KM = 149597870.7
 Vector = tuple[float, float, float]
 
 
+class RecordSegment(TypedDict):
+    center: int
+    target: int
+    initial_seconds_from_j2000_tdb: float
+    interval_seconds: float
+    record_size_doubles: int
+    record_count: int
+    offset_bytes: int
+    bytes: int
+    sha256: str
+
+
+class SolarManifest(TypedDict):
+    model_id: str
+    version: str
+    source: dict[str, str]
+    storage: str
+    file: str
+    compressed_sha256: str
+    uncompressed_sha256: str
+    uncompressed_bytes: int
+    tdb_coefficient_sha256: str
+    segments: list[RecordSegment]
+    derived_product_producer: dict[str, str | bool]
+    software_solar_term_years: list[int]
+    public_auto_and_de440_input_years: list[int]
+    projection_origin_civil_years: list[int]
+
+
+class _AtlasManifest(TypedDict):
+    file: str
+    compressed_sha256: str
+    uncompressed_sha256: str
+    segments: list[RecordSegment]
+
+
+@lru_cache(maxsize=1)
+def _coefficient_data() -> bytes:
+    folder = files("fatebridge").joinpath("data/astronomy")
+    try:
+        metadata = folder.joinpath(ATLAS_BASENAME + ".json").read_bytes()
+        if hashlib.sha256(metadata).hexdigest() != ATLAS_MANIFEST_SHA256:
+            raise ValueError("DE440 source record atlas identity changed")
+        manifest: _AtlasManifest = json.loads(metadata)
+        packed = folder.joinpath(manifest["file"]).read_bytes()
+        if hashlib.sha256(packed).hexdigest() != manifest["compressed_sha256"]:
+            raise ValueError("DE440 source record archive changed")
+        data = unpack_records(
+            packed,
+            [
+                RecordBlock(s["record_count"], s["record_size_doubles"] * 8)
+                for s in manifest["segments"]
+            ],
+        )
+        if hashlib.sha256(data).hexdigest() != manifest["uncompressed_sha256"]:
+            raise ValueError("DE440 source coefficient words changed")
+    except (OSError, ValueError, EOFError, zlib.error) as error:
+        raise EphemerisSourceError("solar_de440_invalid") from error
+    return data
+
+
 @dataclass(frozen=True)
 class _Profile:
-    manifest: dict[str, Any]
+    manifest: SolarManifest
     data: bytes
     manifest_sha256: str
-    tdb: dict[str, Any]
+    tdb: TDBParameters
     tdb_sha256: str
 
 
@@ -67,129 +133,21 @@ def _profile(profile_id: str = MODEL_ID) -> _Profile:
     try:
         basename = _PROFILE_FILES[profile_id]
         metadata = folder.joinpath(basename + ".json").read_bytes()
-        manifest = json.loads(metadata)
-        packed = folder.joinpath(basename + ".bin.gz").read_bytes()
+        if hashlib.sha256(metadata).hexdigest() != _MANIFEST_SHA256[profile_id]:
+            raise ValueError("DE440 selected profile identity changed")
+        manifest: SolarManifest = json.loads(metadata)
         tdb_raw = folder.joinpath("geocentric-tdb-v1.json").read_bytes()
-        data, tdb = gzip.decompress(packed), json.loads(tdb_raw)
-        if (
-            manifest["model_id"] != profile_id
-            or manifest["compressed_sha256"] != hashlib.sha256(packed).hexdigest()
-            or manifest["uncompressed_sha256"] != hashlib.sha256(data).hexdigest()
-            or manifest["uncompressed_bytes"] != len(data)
-            or tdb["model_id"] != "fatebridge_geocentric_erfa_dtdb_v1"
-            or not isinstance(tdb["fairhead_terms"], list)
-            or len(tdb["fairhead_terms"]) != 787
-            or any(
-                not isinstance(row, list)
-                or len(row) != 3
-                or any(type(v) not in (int, float) or not math.isfinite(v) for v in row)
-                for row in tdb["fairhead_terms"]
-            )
-            or len(manifest["segments"]) != 3
-            or (
-                profile_id == EXTENDED_MODEL_ID
-                and (
-                    hashlib.sha256(
-                        json.dumps(
-                            manifest,
-                            ensure_ascii=False,
-                            sort_keys=True,
-                            separators=(",", ":"),
-                            allow_nan=False,
-                        ).encode()
-                    ).hexdigest()
-                    != EXTENDED_MANIFEST_CONTENT_SHA256
-                    or manifest["software_solar_term_years"] != [1684, 2304]
-                    or manifest["public_auto_and_de440_input_years"] != [1700, 2300]
-                    or manifest["tdb_coefficient_sha256"]
-                    != hashlib.sha256(tdb_raw).hexdigest()
-                )
-            )
-            or (
-                profile_id == CANPING_MODEL_ID
-                and (
-                    hashlib.sha256(
-                        json.dumps(
-                            manifest,
-                            ensure_ascii=False,
-                            sort_keys=True,
-                            separators=(",", ":"),
-                            allow_nan=False,
-                        ).encode()
-                    ).hexdigest()
-                    != CANPING_MANIFEST_CONTENT_SHA256
-                    or manifest["software_solar_term_years"] != [2201, 2320]
-                    or manifest["projection_origin_civil_years"] != [1800, 2200]
-                    or manifest["maximum_projection_horizon_years"] != 120
-                    or manifest["admitted_projection_events"] != ["立春"]
-                    or manifest["tdb_coefficient_sha256"]
-                    != hashlib.sha256(tdb_raw).hexdigest()
-                )
-            )
-            or (
-                profile_id == CANPING_EXTENDED_MODEL_ID
-                and (
-                    hashlib.sha256(
-                        json.dumps(
-                            manifest,
-                            ensure_ascii=False,
-                            sort_keys=True,
-                            separators=(",", ":"),
-                            allow_nan=False,
-                        ).encode()
-                    ).hexdigest()
-                    != CANPING_EXTENDED_MANIFEST_CONTENT_SHA256
-                    or manifest["software_solar_term_years"] != [2301, 2420]
-                    or manifest["projection_origin_civil_years"] != [2201, 2300]
-                    or manifest["maximum_projection_horizon_years"] != 120
-                    or manifest["admitted_projection_events"] != ["立春"]
-                    or manifest["tdb_coefficient_sha256"]
-                    != hashlib.sha256(tdb_raw).hexdigest()
-                )
-            )
-            or (
-                profile_id == HISTORICAL_MODEL_ID
-                and (
-                    manifest["software_solar_term_years"] != [1784, 2204]
-                    or manifest["tdb_coefficient_sha256"]
-                    != hashlib.sha256(tdb_raw).hexdigest()
-                )
-            )
-        ):
-            raise ValueError("Invalid coefficient identity")
-        pairs = set()
-        offset = 0
-        for s in manifest["segments"]:
-            pairs.add((s["center"], s["target"]))
-            size, count = s["record_size_doubles"], s["record_count"]
-            if (
-                s["frame"] != 1
-                or s["data_type"] != 2
-                or type(size) is not int
-                or (size - 2) % 3
-                or size < 8
-                or type(count) is not int
-                or count <= 0
-                or s["offset_bytes"] != offset
-                or s["bytes"] != size * count * 8
-                or not math.isfinite(s["initial_seconds_from_j2000_tdb"])
-                or not math.isfinite(s["interval_seconds"])
-                or s["interval_seconds"] <= 0
-                or hashlib.sha256(data[offset : offset + s["bytes"]]).hexdigest()
-                != s["sha256"]
-            ):
-                raise ValueError("Invalid coefficient record layout")
-            offset += s["bytes"]
-        if pairs != {(0, 3), (3, 399), (0, 10)} or offset != len(data):
-            raise ValueError("Incomplete Earth/EMB/Sun coverage")
-    except (OSError, ValueError, KeyError, TypeError, EOFError, zlib.error) as error:
+        if hashlib.sha256(tdb_raw).hexdigest() != TDB_SHA256:
+            raise ValueError("Geocentric TDB source terms changed")
+        tdb: TDBParameters = json.loads(tdb_raw)
+    except (OSError, ValueError, KeyError) as error:
         raise EphemerisSourceError("solar_de440_invalid") from error
     return _Profile(
         manifest,
-        data,
+        _coefficient_data(),
         hashlib.sha256(metadata).hexdigest(),
         tdb,
-        hashlib.sha256(tdb_raw).hexdigest(),
+        TDB_SHA256,
     )
 
 
@@ -212,24 +170,8 @@ def geocentric_tdb_minus_tt_relative(
     """Same Fairhead series with its relative epoch supplied directly."""
     if not math.isfinite(days_from_j2000):
         raise ValueError("TT relative epoch must be finite")
-    t = days_from_j2000 / 365250.0
     rows = _selected_profile(profile_id).tdb["fairhead_terms"]
-    sums = []
-    for low, high in [(0, 474), (474, 679), (679, 764), (764, 784), (784, 787)]:
-        value = 0.0
-        for a, f, phase in reversed(rows[low:high]):
-            value += a * math.sin(f * t + phase)
-        sums.append(value)
-    w0, w1, w2, w3, w4 = sums
-    fairhead = t * (t * (t * (t * w4 + w3) + w2) + w1) + w0
-    masses = (
-        0.00065e-6 * math.sin(6069.776754 * t + 4.021194)
-        + 0.00033e-6 * math.sin(213.299095 * t + 5.543132)
-        - 0.00196e-6 * math.sin(6208.294251 * t + 5.696701)
-        - 0.00173e-6 * math.sin(74.781599 * t + 2.435900)
-        + 0.03638e-6 * t * t
-    )
-    return fairhead + masses
+    return fairhead_state(days_from_j2000, rows).seconds
 
 
 def state(

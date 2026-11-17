@@ -17,6 +17,7 @@ from fatebridge.core.human_design_root_bodies import (
     root_body_summary,
 )
 from fatebridge.core.human_design_solar_root_validation import verify_solar_root_context
+from fatebridge.core.public_output import same_public_value
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
 
@@ -156,7 +157,7 @@ def test_derived_bodies_and_selected_epoch_are_exact_and_replayable(complete):
         proof["evaluations"],
         require_swiss_files=False,
     )
-    assert rebuilt == proof
+    assert same_public_value(rebuilt, proof)
     selected = proof["evaluations"][proof["selected_evaluation_index"]]
     assert selected["native_positions"] == pack_native_positions(
         chart["activations"]["design"]

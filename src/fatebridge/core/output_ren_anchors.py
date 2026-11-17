@@ -461,6 +461,7 @@ def require_complete_ren_anchors(
 
         require_complete_god_yin(obj)
         yin_roles = _get(obj, "god_yin", "year_fate_uppers")
+        natal_earth = annual_earth = None
         if key == "liureng_runyear":
             for role in ("natal", "annual"):
                 placement = _get(result, "runyear", "year_fate", role)
@@ -468,6 +469,10 @@ def require_complete_ren_anchors(
                     raise ValueError("完整类神阴神须保留同次年命上神及可空年命事实")
                 if yin_roles[role] != placement["sky_branch"]:
                     raise ValueError("完整类神阴神不能替换同次年命上神")
+            natal_earth = _get(result, "runyear", "year_fate", "natal", "earth_branch")
+            annual_earth = _get(
+                result, "runyear", "year_fate", "annual", "earth_branch"
+            )
         elif yin_roles != {"natal": None, "annual": None}:
             raise ValueError("未提供六壬年命计算的入口不能给阴神编造年命上神")
         from .output_liuren_seasonal import require_complete_seasonal
@@ -493,7 +498,7 @@ def require_complete_ren_anchors(
         require_complete_cross_harmony(obj)
         require_complete_progression(obj)
         require_complete_branch_relations(obj)
-        require_complete_emptiness(obj)
+        require_complete_emptiness(obj, natal=natal_earth, annual=annual_earth)
         require(
             obj,
             (

@@ -108,6 +108,10 @@ def calculate_compatibility_analysis(
                 "birth_datetime": analysis1["person_info"]["birth_datetime"],
                 "day_master": f"{analysis1['day_master']['stem']}({analysis1['day_master']['element']})",
                 "strength": analysis1["day_master"]["strength"],
+                "engineering_index": analysis1["day_master"]["engineering_index"],
+                "classical_adjudication": analysis1["day_master"][
+                    "classical_adjudication"
+                ],
                 "favorable_elements": analysis1.get("favorable_elements", []),
                 "preference_assessment": {
                     key: analysis1["structure_profile"][key]
@@ -126,6 +130,10 @@ def calculate_compatibility_analysis(
                 "birth_datetime": analysis2["person_info"]["birth_datetime"],
                 "day_master": f"{analysis2['day_master']['stem']}({analysis2['day_master']['element']})",
                 "strength": analysis2["day_master"]["strength"],
+                "engineering_index": analysis2["day_master"]["engineering_index"],
+                "classical_adjudication": analysis2["day_master"][
+                    "classical_adjudication"
+                ],
                 "favorable_elements": analysis2.get("favorable_elements", []),
                 "preference_assessment": {
                     key: analysis2["structure_profile"][key]

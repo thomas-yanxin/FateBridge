@@ -1,17 +1,15 @@
 #!/usr/bin/env python3
 """
-时运分析模块 - 大运、流年、流月计算
+八字时间柱、节令边界与盘内关系。
 
-本模块提供八字时运分析的核心功能：
-1. 大运计算 - 10年一个周期的运势变化
-2. 流年计算 - 每年的运势影响
-3. 流月计算 - 每月的运势变化
+大运使用所声明的起运换算和民用历时间轴；流年、月、日、时共用
+历法所有者。十神、六合与六冲是盘内结构，不能据此量化现实吉凶。
 """
 
 import math
 from calendar import isleap
 from copy import deepcopy
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from functools import lru_cache
 from typing import Any, Dict, List, Optional, Tuple, cast
 
@@ -19,6 +17,7 @@ from dateutil.relativedelta import relativedelta
 from dateutil.tz import resolve_imaginary
 
 from fatebridge.utils.birth_input import normalize_gender
+from fatebridge.utils.civil_time import ZonedCalendar
 from fatebridge.utils.timezones import validate_local_clock
 
 from ..utils.data import (
@@ -33,6 +32,8 @@ from ..utils.data import (
 from .almanac import (
     BAZI_MONTH_START_TERMS,
     DEFAULT_TIMEZONE,
+    _solar_term_source_year,
+    _solar_terms_for_context_year,
     elapsed_days_between,
     get_bazi_month_boundaries,
     get_bazi_month_context,
@@ -60,18 +61,12 @@ def _copy_timing_info(info: Dict) -> Dict:
 
 @lru_cache(maxsize=2048)
 def _calculate_liuyue_cached(
-    target_year: int,
-    target_month: int,
-    target_day: int,
+    target_clock: ZonedCalendar,
     timezone_name: str,
-    target_date: Optional[datetime],
     _solar_environment: Tuple[Any, ...] = (),
 ) -> Dict:
     """Cache deterministic liuyue calculations for repeated timing analysis."""
-    effective_target_date = target_date or datetime(
-        target_year, target_month, target_day
-    )
-    local_target_date = localize_datetime(effective_target_date, timezone_name)
+    local_target_date = target_clock.require_datetime()
     bazi_year = get_bazi_year(local_target_date, timezone_name)
     month_context = get_bazi_month_context(local_target_date, timezone_name)
     liuyue_stem, liuyue_branch = BaZiCalendar.calculate_month_pillar_by_branch(
@@ -81,8 +76,8 @@ def _calculate_liuyue_cached(
     stem_element, stem_polarity = STEM_ELEMENTS[liuyue_stem]
 
     return {
-        "year": target_year,
-        "month": target_month,
+        "year": local_target_date.year,
+        "month": local_target_date.month,
         "day": local_target_date.day,
         "analysis_datetime": local_target_date.strftime("%Y-%m-%d %H:%M:%S"),
         "bazi_year": bazi_year,
@@ -103,25 +98,23 @@ def _calculate_liuyue_cached(
 
 @lru_cache(maxsize=4096)
 def _calculate_liushi_cached(
-    target_hour_dt: datetime,
-    timezone_name: str,
+    civil_date: date,
+    civil_hour: int,
 ) -> Dict:
-    """Cache deterministic liushi calculations. target_hour_dt must be truncated to the hour."""
-    local_dt = localize_datetime(target_hour_dt, timezone_name)
+    """Cache the civil date/hour rule without constructing a nominal instant."""
     liushi_stem, liushi_branch = BaZiCalendar.calculate_hour_pillar(
-        local_dt.year,
-        local_dt.month,
-        local_dt.day,
-        local_dt.hour,
+        civil_date.year,
+        civil_date.month,
+        civil_date.day,
+        civil_hour,
     )
     stem_element, stem_polarity = STEM_ELEMENTS[liushi_stem]
 
     return {
-        "year": local_dt.year,
-        "month": local_dt.month,
-        "day": local_dt.day,
-        "hour": local_dt.hour,
-        "analysis_datetime": local_dt.strftime("%Y-%m-%d %H:%M:%S"),
+        "year": civil_date.year,
+        "month": civil_date.month,
+        "day": civil_date.day,
+        "hour": civil_hour,
         "stem": liushi_stem,
         "branch": liushi_branch,
         "pillar": f"{liushi_stem}{liushi_branch}",
@@ -134,7 +127,7 @@ def _calculate_liushi_cached(
 
 @lru_cache(maxsize=4096)
 def _calculate_liuri_cached(
-    target_date: datetime,
+    target_clock: ZonedCalendar,
     timezone_name: str,
     _solar_environment: Tuple[Any, ...] = (),
 ) -> Dict:
@@ -145,7 +138,7 @@ def _calculate_liuri_cached(
     ``calculate_day_pillar`` so the rollover is handled atomically with the
     pillar calculation and cannot be forgotten again.
     """
-    local_target_date = localize_datetime(target_date, timezone_name)
+    local_target_date = target_clock.require_datetime()
     liuri_stem, liuri_branch = BaZiCalendar.calculate_day_pillar(
         local_target_date.year,
         local_target_date.month,
@@ -203,25 +196,12 @@ DEFAULT_DAYUN_PERIODS = 12
 
 class TimingAnalysis:
     """
-    时运分析工具类，负责计算和分析八字中的时间运势变化
+    八字时间层计算与关系说明。
 
-    该类提供了完整的时运分析功能，包括：
-    - 大运计算：10年一个周期的长期运势变化
-    - 流年计算：每年的运势影响和变化
-    - 流月计算：每月的短期运势波动
-    - 起运年龄：根据出生时间和性别计算开始行运的年龄
-    - 运势组合：分析大运、流年、流月与原局的相互作用
-
-    计算原理：
-    - 大运：根据月柱和性别确定顺逆行方向
-    - 流年：基于年份的天干地支循环
-    - 流月：基于月份的天干地支组合
-    - 起运：考虑性别、年干阴阳和节气因素
-
-    注意事项：
-    - 男命阳年、女命阴年为顺行大运
-    - 男命阴年、女命阳年为逆行大运
-    - 起运年龄通常在1-10岁之间
+    已确认性别和年干阴阳决定大运顺逆，出生至相邻节令按三日一年
+    换算，再按360日年、30日月的声明口径建立民用历时间轴。流年以
+    立春、流月以十二节分界；流日和流时使用共同的23:00换日规则。
+    单个时间柱的十神与冲合保留上下文缺项，不输出独立吉凶分。
     """
 
     @staticmethod
@@ -234,7 +214,7 @@ class TimingAnalysis:
         计算起运细节，按节令边界而不是固定月中日。
 
         Returns:
-            包含顺逆行方向、参考节令和精确起运岁数的字典
+            包含顺逆行方向、参考节令及所声明换算口径的起运岁数。
         """
         local_birth_date = localize_datetime(birth_date, timezone_name)
         bazi_year = get_bazi_year(local_birth_date, timezone_name)
@@ -257,7 +237,7 @@ class TimingAnalysis:
             local_birth_date, timezone_name
         )
         target_term = next_term if forward_direction else start_term
-        delta_days = abs(elapsed_days_between(local_birth_date, target_term.moment))
+        delta_days = abs(elapsed_days_between(local_birth_date, target_term.calendar))
         start_age_unrounded = delta_days / 3
         start_age_precise = round(start_age_unrounded, 2)
 
@@ -501,7 +481,7 @@ class TimingAnalysis:
 
         Args:
             target_year: 目标年份（公历 / civil year）。当同时提供 ``moment`` 时，
-                该参数只作为 fallback；``moment`` 所在的立春 BaZi 年优先。
+                直接使用 ``moment`` 所在的立春 BaZi 年，不读取该参数。
             moment: 可选的具体日期-时间。若给出，该方法会用 ``get_bazi_year``
                 以立春为分界解析真正的 BaZi 年，从而避免 1 月 / 早 2 月的流年
                 误差。生产调用强烈建议传入 ``moment``。
@@ -557,23 +537,15 @@ class TimingAnalysis:
         Returns:
             流月信息
         """
+        local_target_date = localize_datetime(
+            target_date or datetime(target_year, target_month, target_day),
+            timezone_name,
+        )
         return _copy_timing_info(
             _calculate_liuyue_cached(
-                target_year,
-                target_month,
-                target_day,
+                ZonedCalendar.from_datetime(local_target_date),
                 timezone_name,
-                (
-                    target_date.astimezone(timezone.utc)
-                    if target_date is not None and target_date.utcoffset() is not None
-                    else target_date
-                ),
-                get_solar_term_environment_key(
-                    year=localize_datetime(
-                        target_date or datetime(target_year, target_month, target_day),
-                        timezone_name,
-                    ).year
-                ),
+                get_solar_term_environment_key(year=local_target_date.year),
             )
         )
 
@@ -616,11 +588,12 @@ class TimingAnalysis:
             for term in get_solar_terms_for_year(target_year, timezone_name)
             if term.name in BAZI_MONTH_START_TERMS
         ]
-        next_year_terms = [
-            term
-            for term in get_solar_terms_for_year(target_year + 1, timezone_name)
-            if term.name in BAZI_MONTH_START_TERMS
-        ]
+        next_year_terms = _solar_terms_for_context_year(
+            target_year + 1,
+            timezone_name,
+            _solar_term_source_year(target_year + 1, target_year),
+            term_index=0,
+        )
 
         timeline: List[Dict] = []
 
@@ -648,12 +621,16 @@ class TimingAnalysis:
                     "order": index + 1,
                     "analysis_anchor": anchor.strftime("%Y-%m-%d %H:%M:%S"),
                     "gregorian_window": {
-                        "start": start_term.moment.replace(tzinfo=None).isoformat(
-                            sep=" "
+                        "start": start_term.calendar.isoformat(
+                            sep=" ", include_offset=False
                         ),
-                        "end": next_term.moment.replace(tzinfo=None).isoformat(sep=" "),
+                        "end": next_term.calendar.isoformat(
+                            sep=" ", include_offset=False
+                        ),
                         "days": round(
-                            elapsed_days_between(start_term.moment, next_term.moment),
+                            elapsed_days_between(
+                                start_term.calendar, next_term.calendar
+                            ),
                             4,
                         ),
                     },
@@ -673,17 +650,12 @@ class TimingAnalysis:
         """
         计算指定时点的流日干支。
         """
+        local_target_date = localize_datetime(target_date, timezone_name)
         return _copy_timing_info(
             _calculate_liuri_cached(
-                (
-                    target_date.astimezone(timezone.utc)
-                    if target_date.utcoffset() is not None
-                    else target_date
-                ),
+                ZonedCalendar.from_datetime(local_target_date),
                 timezone_name,
-                get_solar_term_environment_key(
-                    year=localize_datetime(target_date, timezone_name).year
-                ),
+                get_solar_term_environment_key(year=local_target_date.year),
             )
         )
 
@@ -695,15 +667,16 @@ class TimingAnalysis:
         """
         计算指定时刻的流时干支。
 
-        target_datetime 会被截断到小时粒度以命中缓存；
-        分钟/秒级偏差不影响时柱归属。
+        按有效本地日期和小时缓存时柱，另交付实际查询时刻。
         """
-        # Truncate the target's local wall clock. Truncating a UTC (or other
-        # source-zone) input first shifts the hour in fractional-offset zones,
-        # potentially crossing a shichen or the 23:00 day-pillar boundary.
         local_dt = localize_datetime(target_datetime, timezone_name)
-        hour_dt = local_dt.replace(minute=0, second=0, microsecond=0)
-        return _copy_timing_info(_calculate_liushi_cached(hour_dt, timezone_name))
+        # A valid local query can follow a partial-hour gap whose nominal
+        # xx:00 does not exist. The pillar needs civil fields, not that instant.
+        result = _copy_timing_info(
+            _calculate_liushi_cached(local_dt.date(), local_dt.hour)
+        )
+        result["analysis_datetime"] = local_dt.strftime("%Y-%m-%d %H:%M:%S")
+        return result
 
     @staticmethod
     def analyze_liushi_detailed(

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import math
 from importlib.metadata import version
-from typing import Any, Dict, Optional, Sequence, Tuple, Union
+from typing import Any, Dict, Optional, Sequence, Tuple
 
 from fatebridge.core.astro import moshier_motion, runtime
 from fatebridge.core.astro.lunar_motion import (
@@ -18,9 +18,7 @@ from fatebridge.core.astro.sidereal_origin_motion import traditional_lahiri_orig
 from fatebridge.utils.errors import EphemerisSourceError
 
 METHOD_ID = "fatebridge_apparent_longitude_motion_v4"
-LunarAdjustment = Union[
-    Tuple[float, str, float], Tuple[float, str, float, Optional[float]]
-]
+LunarAdjustment = Tuple[float, str, float, Optional[float]]
 NUTATION_STEP_DAYS = 0.0001  # NUT_SPEED_INTV in the inspected native source.
 
 
@@ -126,11 +124,7 @@ def corrected_longitude_motion(
     source_remainder: Optional[float] = None
     if planet == "Moon":
         if lunar_adjustment is not None:
-            if len(lunar_adjustment) == 4:
-                light, source_model, spatial, source_remainder = lunar_adjustment
-            else:
-                # Legacy internal triples explicitly carry the prior terms.
-                light, source_model, spatial = lunar_adjustment
+            light, source_model, spatial, source_remainder = lunar_adjustment
             if source_model != model:
                 raise EphemerisSourceError("coordinate_model_changed")
             if not all(math.isfinite(value) for value in (light, spatial)):

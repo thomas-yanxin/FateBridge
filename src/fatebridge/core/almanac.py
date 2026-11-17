@@ -10,8 +10,8 @@ from __future__ import annotations
 import logging
 import math
 from copy import deepcopy
-from dataclasses import dataclass, field
-from datetime import date, datetime, timezone
+from dataclasses import dataclass, field, replace
+from datetime import date, datetime
 from functools import lru_cache
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -20,8 +20,13 @@ try:
 except ImportError:  # pragma: no cover - exercised only in misconfigured envs
     LunarDate = None
 
-from ..utils.civil_clock import utc_instant
-from ..utils.civil_time import utc_ordering_key
+from ..utils.civil_time import (
+    UTCCalendar,
+    ZonedCalendar,
+    gregorian_ordinal,
+    utc_calendar,
+    utc_ordering_key,
+)
 from ..utils.errors import EphemerisSourceError
 from ..utils.timezones import parse_timezone_name
 from .divination import derive_meihua_hexagram
@@ -48,8 +53,6 @@ SOLAR_TERM_LONGITUDES = tuple((285 + 15 * i) % 360 for i in range(24))
 
 
 DEFAULT_TIMEZONE = "Asia/Shanghai"
-DAY_GANZHI_STRATEGY_STANDARD = "standard"
-DAY_GANZHI_STRATEGY_REFERENCE_OFFSET = "reference_offset"
 
 SOLAR_TERM_NAMES = [
     "小寒",
@@ -211,24 +214,41 @@ def _lunar_date_from_solar(solar_date: date) -> _LunarDateValue:
     raise ValueError("农历日期超出当年月份表")
 
 
-DAY_GANZHI_JDN_OFFSETS = {
-    DAY_GANZHI_STRATEGY_STANDARD: 49,
-    DAY_GANZHI_STRATEGY_REFERENCE_OFFSET: 38,
-}
+DAY_GANZHI_JDN_OFFSET = 49
 
 
 @dataclass(frozen=True)
 class SolarTerm:
     name: str
-    moment: datetime
-    date_key: str
-    day_ganzhi: str
+    calendar: ZonedCalendar
     # Retflags/library details remain internal; public records expose provider/model.
     resolution_provider: str = "unknown"
     ephemeris_model: str = "unknown"
     ephemeris_retflags: Tuple[int, ...] = ()
     ephemeris_library_version: Optional[str] = None
     solar_model_details: Optional[Dict[str, Any]] = field(default=None, hash=False)
+
+    @property
+    def moment(self) -> datetime:
+        """A datetime adapter for consumers whose civil range is representable."""
+        return self.calendar.require_datetime()
+
+    @property
+    def utc_key(self) -> Tuple[int, int]:
+        return self.calendar.utc.ordinal, self.calendar.utc.microseconds_of_day
+
+    @property
+    def date_key(self) -> str:
+        moment = self.calendar.as_datetime()
+        if moment is not None:
+            return moment.strftime("%Y%m%d")
+        year, month, day = self.calendar.local_parts[:3]
+        label = f"{year:04d}" if 0 <= year <= 9999 else f"{year:+07d}"
+        return f"{label}{month:02d}{day:02d}"
+
+    @property
+    def day_ganzhi(self) -> str:
+        return get_day_ganzhi(*self.calendar.local_parts[:3])
 
     def as_dict(self) -> Dict[str, Any]:
         result: Dict[str, Any] = {
@@ -237,33 +257,27 @@ class SolarTerm:
             # down/up to an integral second can change which term an input at
             # that displayed second belongs to. Fractions are numerical solver
             # resolution, not an independent physical-accuracy certificate.
-            "datetime": self.moment.replace(tzinfo=None).isoformat(sep=" "),
+            "datetime": self.calendar.isoformat(sep=" ", include_offset=False),
             "date_key": self.date_key,
             "day_ganzhi": self.day_ganzhi,
             "resolution_provider": self.resolution_provider,
             "ephemeris_model": self.ephemeris_model,
         }
-        offset = self.moment.utcoffset()
-        if offset is not None:
-            # A wall label alone cannot distinguish the two occurrences of a
-            # repeated hour. Keep the legacy label, and preserve the actual
-            # supplied civil instant without consulting the host timezone.
-            result.update(
-                datetime_with_offset=self.moment.isoformat(),
-                utc_offset_seconds=offset.total_seconds(),
-                fold=self.moment.fold,
-                timezone=getattr(self.moment.tzinfo, "key", None)
-                or getattr(self.moment.tzinfo, "zone", None)
-                or self.moment.tzname(),
-            )
+        # An offset preserves repeated hours and extended-year boundary labels.
+        result.update(
+            datetime_with_offset=self.calendar.isoformat(),
+            utc_offset_seconds=self.calendar.offset.total_seconds(),
+            fold=self.calendar.fold,
+            timezone=self.calendar.timezone_label,
+        )
         if self.solar_model_details is not None:
             result["solar_model_details"] = deepcopy(self.solar_model_details)
         return result
 
 
 def is_calculated_solar_term(term: SolarTerm) -> bool:
-    if term.resolution_provider == "fatebridge_moshier":
-        from .moshier_solar import MODEL_ID, model_details
+    if term.resolution_provider == "jpl_de441":
+        from .de441_solar import MODEL_ID, model_details
 
         details = term.solar_model_details or {}
         return (
@@ -346,14 +360,26 @@ def localize_datetime(moment: datetime, timezone_name: Optional[str]) -> datetim
     tzinfo = parse_timezone_name(timezone_name or DEFAULT_TIMEZONE)
     if moment.tzinfo is None:
         return moment.replace(tzinfo=tzinfo)
-    if moment.tzinfo == tzinfo:
-        # Equal fixed-offset objects need not be identical. astimezone would
-        # otherwise visit an unrepresentable UTC year even for no conversion.
-        return moment.replace(tzinfo=tzinfo)
-    return moment.astimezone(tzinfo)
+    return ZonedCalendar(utc_calendar(moment), tzinfo).require_datetime()
 
 
-def elapsed_days_between(start: datetime, end: datetime) -> float:
+def elapsed_seconds_between(
+    start: datetime | ZonedCalendar, end: datetime | ZonedCalendar
+) -> float:
+    """Nominal UTC-label seconds, including auxiliary Gregorian labels."""
+    first = start.utc if isinstance(start, ZonedCalendar) else utc_calendar(start)
+    last = end.utc if isinstance(end, ZonedCalendar) else utc_calendar(end)
+    micros = (
+        (last.ordinal - first.ordinal) * 86400000000
+        + last.microseconds_of_day
+        - first.microseconds_of_day
+    )
+    return micros / 1000000
+
+
+def elapsed_days_between(
+    start: datetime | ZonedCalendar, end: datetime | ZonedCalendar
+) -> float:
     """Nominal UTC-label days between aware instants, accounting for DST.
 
     Python subtracts wall clocks when two datetimes share the same tzinfo.
@@ -361,11 +387,7 @@ def elapsed_days_between(start: datetime, end: datetime) -> float:
     seconds per day. Python datetime omits leap seconds: this engineering
     calendar policy does not compute uniform TAI/TT elapsed SI seconds.
     """
-    if start.utcoffset() is None or end.utcoffset() is None:
-        raise ValueError("Elapsed solar-term durations require aware datetimes.")
-    return (
-        end.astimezone(timezone.utc) - start.astimezone(timezone.utc)
-    ).total_seconds() / 86400
+    return elapsed_seconds_between(start, end) / 86400
 
 
 def current_local_datetime(timezone_name: Optional[str] = None) -> datetime:
@@ -398,72 +420,97 @@ def get_day_ganzhi(
     year: int,
     month: int,
     day: int,
-    *,
-    strategy: str = DAY_GANZHI_STRATEGY_STANDARD,
 ) -> str:
-    if strategy not in DAY_GANZHI_JDN_OFFSETS:
-        raise ValueError(f"Unsupported day ganzhi strategy: {strategy}")
-
-    index = (
-        _julian_day_number(year, month, day) + DAY_GANZHI_JDN_OFFSETS[strategy]
-    ) % 60
+    """Gregorian civil-day cycle; 2000-01-07 is 甲子, without hour rollover."""
+    index = (_julian_day_number(year, month, day) + DAY_GANZHI_JDN_OFFSET) % 60
     return f"{GAN[index % 10]}{ZHI[index % 12]}"
 
 
 def _solar_term_utc_via_swe(
     year: int,
     target_longitude: float,
-    anchor_utc: datetime,
+    anchor_utc: UTCCalendar,
     provenance: Optional[Dict[str, Any]] = None,
-) -> Optional[datetime]:
+) -> Optional[UTCCalendar]:
     """Resolve a TT solar-longitude crossing, then label its civil instant.
     ``target_longitude`` near ``anchor_utc``.
 
     The anchor is used to disambiguate which yearly crossing to return
-    (so 冬至 for civil year 2024 is Dec 2024 rather than Dec 2023). We
-    scan a ±30-day window around the calendar-month anchor; the
-    Sun moves ~1°/day so a crossing is guaranteed in that window.
+    (so 冬至 for civil year 2024 is Dec 2024 rather than Dec 2023). Search
+    up to 30 days from the calendar-month anchor toward the target longitude.
+    Files for an unused prefix before that bracket are not required.
 
-    Return None if swisseph is unavailable or no crossing is found. The caller
-    must reject the unavailable crossing.
+    Optional native data select the source; they are not a prerequisite for
+    the bundled DE441 Sun. Strict Swiss/JPL selection cannot use that fallback.
+    Return None if no crossing is found; the caller rejects that result.
     """
-    if swe is None:
-        return None
-
-    from .astro.time_scales import ephemeris_time
+    from .astro.time_scales import ephemeris_time, utc_clock
+    from .jpl_ephemeris import configured_jpl_file
     from .native_solar_source import (
         native_solar_file_context,
         prime_swiss_solar_context,
     )
+    from .solar_model_policy import solar_model_policy
     from .solar_term_clock import (
-        native_solar_root_datetime,
+        SolarTermClockError,
+        native_solar_root_calendar,
         native_solar_root_time_policy,
     )
 
+    require_swiss = solar_model_policy() == "swiss"
+    strict_jpl = configured_jpl_file() is not None
+    if swe is None and (require_swiss or strict_jpl):
+        return None
     models: set[str] = set()
     retflags: set[int] = set()
+    refining = False
     refinement_context: Optional[Dict[str, Any]] = None
 
     def sun_longitude(jd: float) -> float:
         # Planetary dynamics use TT. A UTC wall-clock JD is not UT1, and an
         # UT1 root cannot be labelled UTC with revjul().
-        result, flags = ephemeris_call("calc", jd, swe.SUN, swe.FLG_SWIEPH)
-        model = ephemeris_model_from_retflag(flags)
-        if model not in {"swieph", "moshier", "jpl"} or not math.isfinite(result[0]):
-            raise RuntimeError(
-                "Solar position has no valid ephemeris model or longitude"
-            )
-        if model == "moshier":
-            from .moshier_solar import MODEL_ID, solar_longitude
+        native_result = None
+        if swe is not None:
+            try:
+                native_result = ephemeris_call("calc", jd, swe.SUN, swe.FLG_SWIEPH)
+            except swe.Error as error:
+                # Outside the native analytical interval, a missing .se1 file
+                # raises instead of returning MOSEPH. Recover only that public
+                # missing-file error, never a corrupt file or strict source.
+                message = str(error)
+                if (
+                    require_swiss
+                    or strict_jpl
+                    or not message.startswith("swisseph.calc: SwissEph file '")
+                    or ".se1' not found in PATH " not in message
+                ):
+                    raise
+        if native_result is None:
+            model = "unavailable"
+        else:
+            result, flags = native_result
+            model = ephemeris_model_from_retflag(flags)
+            if model not in {"swieph", "moshier", "jpl"} or not math.isfinite(
+                result[0]
+            ):
+                raise RuntimeError(
+                    "Solar position has no valid ephemeris model or longitude"
+                )
+        if model in {"unavailable", "moshier"}:
+            if require_swiss:
+                raise EphemerisSourceError("solar_swiss_files_required")
+            from .de441_solar import MODEL_ID, solar_longitude
 
             longitude = solar_longitude(jd)
             model = MODEL_ID
         else:
             longitude = float(result[0] % 360.0)
-        models.add(model)
-        retflags.add(flags)
-        if len(models) != 1:
-            raise RuntimeError("Solar crossing mixed different ephemeris models")
+        if refining:
+            models.add(model)
+            if native_result is not None and model in {"swieph", "jpl"}:
+                retflags.add(flags)
+            if len(models) != 1:
+                raise RuntimeError("Solar crossing mixed different ephemeris models")
         if (
             refinement_context is not None
             and native_solar_file_context(swe) != refinement_context
@@ -471,46 +518,53 @@ def _solar_term_utc_via_swe(
             raise EphemerisSourceError("solar_configuration_changed")
         return longitude
 
-    # Coarse scan at ~daily resolution to find a sign change of
-    # wrapped(longitude - target). Bisect within the bracket.
+    # Find a daily bracket in the target direction from the monthly anchor.
     def wrapped_diff(jd: float) -> float:
         return math.remainder(sun_longitude(jd) - target_longitude, 360.0)
 
     try:
-        anchor_jd = ephemeris_time(anchor_utc).jd_tt
+        anchor_jd = utc_clock(anchor_utc).jd_tt
         if anchor_jd is None:
-            return None
-        jd_start = anchor_jd - 30.0
-        jd_end = anchor_jd + 30.0
-        previous_jd = jd_start
+            anchor_jd = ephemeris_time(anchor_utc).jd_tt
+        if anchor_jd is None:
+            raise SolarTermClockError("solar_root_clock_unavailable")
+        previous_jd = anchor_jd
         previous_diff = wrapped_diff(previous_jd)
-        step = 1.0  # one day
-        if previous_diff == 0.0:
-            # Retain a crossing exactly at the scan's first sample. Sun
-            # longitude increases through it; the previous day brackets it.
-            previous_jd -= step
-            previous_diff = wrapped_diff(previous_jd)
-        jd = previous_jd + step
+        step = -1.0 if previous_diff >= 0.0 else 1.0
         crossing: Optional[Tuple[float, float]] = None
-        while jd <= jd_end:
+        for offset in range(1, 31):
+            jd = anchor_jd + offset * step
             current_diff = wrapped_diff(jd)
-            # A valid crossing goes from negative to non-negative while both
-            # samples are near target (exclude the opposite-side wrap).
-            if (
-                previous_diff < 0.0
-                and current_diff >= 0.0
-                and current_diff - previous_diff < 90.0
-            ):
-                crossing = (previous_jd, jd)
+            if step < 0.0:
+                low, high = jd, previous_jd
+                left, right = current_diff, previous_diff
+            else:
+                low, high = previous_jd, jd
+                left, right = previous_diff, current_diff
+            # An exact root on the backward limit still needs its earlier
+            # side, as did an exact first sample in the original full scan.
+            if step < 0.0 and current_diff == 0.0:
+                crossing = (jd - 1.0, jd)
+                break
+            # Both directions must produce the same forward crossing bracket,
+            # excluding a sign change across the opposite-side angular wrap.
+            if left < 0.0 <= right and right - left < 90.0:
+                crossing = (low, high)
                 break
             previous_jd, previous_diff = jd, current_diff
-            jd += step
 
         if crossing is None:
             return None
 
         low, high = crossing
-        # A +/-30-day search can retain an earlier .se1 file through its
+        # Coarse samples may use another model near a file boundary.
+        # Only the consumed root bracket and refinement may
+        # establish the returned model/flags. Recheck both ends before pinning.
+        refining = True
+        left, right = wrapped_diff(low), wrapped_diff(high)
+        if not left < 0 <= right or right - left >= 90:
+            raise RuntimeError("Selected source does not bracket the solar crossing")
+        # A coarse search can retain an earlier .se1 file through its
         # overlap with the nominal file. Pin one same-epoch source before
         # refinement, then recheck the bracket under that source. The public
         # Ren interval and its adjacent guard years fit the built-in preflight.
@@ -541,14 +595,14 @@ def _solar_term_utc_via_swe(
         # The adjacent lower float is still before the numerical crossing.
         # A rounded midpoint can choose it and publish a pre-crossing boundary.
         resolved_jd = high
-        moment = native_solar_root_datetime(resolved_jd)
+        moment = native_solar_root_calendar(resolved_jd)
         if provenance is not None:
             provenance.update(
                 ephemeris_model=next(iter(models)),
                 ephemeris_retflags=tuple(sorted(retflags)),
                 ephemeris_library_version=str(getattr(swe, "version", "unknown")),
                 resolved_jd_tt=resolved_jd,
-                resolved_datetime_utc=moment.astimezone(timezone.utc).isoformat(),
+                resolved_datetime_utc=moment.isoformat(),
                 solar_model_details={
                     "model_id": NATIVE_SOLAR_ROOT_MODEL_ID,
                     "ephemeris_model": next(iter(models)),
@@ -563,7 +617,7 @@ def _solar_term_utc_via_swe(
                     "root_selection_policy": "first_post_crossing_tt_float",
                     "numerical_epoch_representation": "explicit_ieee_float_tt_point",
                     "scalar_jd_scope": "exact_value_of_selected_ieee_float",
-                    "civil_time_method": "datetime_from_tt_point",
+                    "civil_time_method": "utc_calendar_from_tt",
                     **native_solar_root_time_policy(moment),
                     "accuracy_certified": False,
                     "numerical_resolution_is_physical_accuracy": False,
@@ -573,17 +627,19 @@ def _solar_term_utc_via_swe(
                 provenance["solar_model_details"][
                     "native_source_context"
                 ] = refinement_context
-            from .moshier_solar import MODEL_ID, PROVIDER, model_details
+            from .de441_solar import MODEL_ID, PROVIDER, model_details
 
             if models == {MODEL_ID}:
                 # These are composed positions, not a stock native Sun. Keep
                 # the model identity separate from native category flags.
                 provenance.update(
                     resolution_provider=PROVIDER,
+                    ephemeris_library_version=None,
                     ephemeris_retflags=(),
                 )
                 provenance["solar_model_details"].update(model_details())
                 provenance["solar_model_details"].pop("ephemeris_retflags")
+                provenance["solar_model_details"].pop("ephemeris_library_version")
         return moment
     except EphemerisSourceError:
         # A selected strict source must not silently become a linear year.
@@ -598,9 +654,9 @@ def _solar_term_utc_via_swe(
         return None
 
 
-def _solar_term_search_anchor_utc(year: int, term_index: int) -> datetime:
+def _solar_term_search_anchor_utc(year: int, term_index: int) -> UTCCalendar:
     """Choose a calendar month for the ±30-day native root search only."""
-    return datetime(year, term_index // 2 + 1, 15, tzinfo=timezone.utc)
+    return UTCCalendar(gregorian_ordinal(year, term_index // 2 + 1, 15), 0)
 
 
 def _solar_term_utc_via_analytic(
@@ -616,15 +672,16 @@ def _solar_term_utc_via_analytic(
     expected_vsop2013_key: Optional[Tuple[Any, ...]] = None,
     aa1996: bool = False,
     expected_aa1996_key: Optional[Tuple[Any, ...]] = None,
-) -> Tuple[datetime, Dict[str, Any]]:
+) -> Tuple[UTCCalendar, Dict[str, Any]]:
     from .analytic_solar import longitude_crossing_tt
-    from .astro.time_scales import datetime_from_tt_point, ephemeris_time
+    from .astro.time_scales import utc_calendar_from_tt
     from .astro.tt_epoch import TTInstant
+    from .solar_term_clock import native_solar_root_time_policy
 
     month = term_index // 2 + 1
     low_day, high_day = (1, 12) if term_index % 2 == 0 else (12, 28)
-    low = date(year, month, low_day).toordinal() + 1721424.5
-    high = date(year, month, high_day).toordinal() + 1721424.5
+    low = gregorian_ordinal(year, month, low_day) + 1721424.5
+    high = gregorian_ordinal(year, month, high_day) + 1721424.5
     if sum((spk, de440, aa1996, vsop2013)) > 1:
         raise ValueError("A solar crossing requires one selected orbit source")
     if vsop2013:
@@ -675,11 +732,11 @@ def _solar_term_utc_via_analytic(
         )
     selected_parts = result.get("tt_parts")
     if selected_parts is not None:
-        civil = datetime_from_tt_point(TTInstant.from_parts(*selected_parts))
+        civil = utc_calendar_from_tt(TTInstant.from_parts(*selected_parts))
     else:
         # A numerical root is an IEEE point, not a rounded UTC-label encoding.
-        civil = datetime_from_tt_point(TTInstant.from_float(result["jd_tt"]))
-    clock = ephemeris_time(civil)
+        civil = utc_calendar_from_tt(TTInstant.from_float(result["jd_tt"]))
+    clock_policy = native_solar_root_time_policy(civil)
     details = {
         **result["model"],
         "root_bracket_tt": (
@@ -727,9 +784,11 @@ def _solar_term_utc_via_analytic(
             else None
         ),
         "numerical_resolution_is_physical_accuracy": False,
-        "civil_time_method": clock.method,
-        "historical_ut1_convention": clock.method == "pre_1972_swiss_UT1_delta_t",
-        "future_leap_seconds_assumed_unchanged": clock.future_leap_seconds_assumed_unchanged,
+        "civil_time_method": clock_policy["civil_time_policy"],
+        "historical_ut1_convention": clock_policy["historical_ut1_convention"],
+        "future_leap_seconds_assumed_unchanged": clock_policy[
+            "future_leap_seconds_assumed_unchanged"
+        ],
     }
     if selected_parts is not None:
         details.update(
@@ -775,11 +834,17 @@ def get_solar_terms_for_year(
     year: int, timezone_name: str = DEFAULT_TIMEZONE
 ) -> Tuple[SolarTerm, ...]:
     """Cache a year only within the same selected data-file environment."""
+    if not 1 <= year <= 9999:
+        raise ValueError("Solar year grids require a civil year from1 through9999")
     return _solar_terms_for_context_year(year, timezone_name, year)
 
 
 def _solar_terms_for_context_year(
-    year: int, timezone_name: str, context_year: int
+    year: int,
+    timezone_name: str,
+    context_year: int,
+    *,
+    term_index: Optional[int] = None,
 ) -> Tuple[SolarTerm, ...]:
     # An in-range input needs neighbouring boundaries even at the two ends
     # of the software range. Select their model from that input's year, while
@@ -795,13 +860,16 @@ def _solar_terms_for_context_year(
         context = solar_term_cache_context(swe, year=context_year)
         try:
             terms = _get_solar_terms_for_year_cached(
-                year, timezone_name, context, context_year
+                year, timezone_name, context, context_year, term_index=term_index
             )
         except _SolarTermEnvironmentChanged:
             _get_solar_terms_for_year_cached.cache_clear()
             continue
         if solar_term_cache_context(swe, year=context_year) == context:
-            return terms
+            return tuple(
+                replace(term, solar_model_details=deepcopy(term.solar_model_details))
+                for term in terms
+            )
         # A concurrent installer changed the files while the year was
         # computed. Discard it rather than reuse a potentially mixed year.
         _get_solar_terms_for_year_cached.cache_clear()
@@ -810,7 +878,12 @@ def _solar_terms_for_context_year(
 
 @lru_cache(maxsize=128)
 def _get_solar_terms_for_year_cached(
-    year: int, timezone_name: str, _context: Tuple[Any, ...], context_year: int
+    year: int,
+    timezone_name: str,
+    _context: Tuple[Any, ...],
+    context_year: int,
+    *,
+    term_index: Optional[int] = None,
 ) -> Tuple[SolarTerm, ...]:
     # Lock the numerical work, not cache hits: restoring the Swiss path on
     # every hit would unnecessarily flush native ephemeris caches.
@@ -818,7 +891,7 @@ def _get_solar_terms_for_year_cached(
         if solar_term_cache_context(swe, year=context_year) != _context:
             raise _SolarTermEnvironmentChanged()
         terms = _calculate_solar_terms_for_year(
-            year, timezone_name, context_year=context_year
+            year, timezone_name, context_year=context_year, term_index=term_index
         )
         if solar_term_cache_context(swe, year=context_year) != _context:
             raise _SolarTermEnvironmentChanged()
@@ -828,22 +901,26 @@ def _get_solar_terms_for_year_cached(
 
 
 def _calculate_solar_terms_for_year(
-    year: int, timezone_name: str, *, context_year: Optional[int] = None
+    year: int,
+    timezone_name: str,
+    *,
+    context_year: Optional[int] = None,
+    term_index: Optional[int] = None,
 ) -> Tuple[SolarTerm, ...]:
     tzinfo = parse_timezone_name(timezone_name or DEFAULT_TIMEZONE)
     terms: List[SolarTerm] = []
     model_year = year if context_year is None else context_year
     context = solar_term_cache_context(swe, year=model_year)
 
-    using_swe = swe is not None
-    for index, (term_name, target_longitude) in enumerate(
-        zip(SOLAR_TERM_NAMES, SOLAR_TERM_LONGITUDES)
-    ):
+    indices = range(len(SOLAR_TERM_NAMES)) if term_index is None else (term_index,)
+    for index in indices:
+        term_name = SOLAR_TERM_NAMES[index]
+        target_longitude = SOLAR_TERM_LONGITUDES[index]
         # A calendar anchor identifies the intended year/month; only a solved
         # longitude crossing may become a returned solar term.
         anchor_utc = _solar_term_search_anchor_utc(year, index)
 
-        utc_moment: Optional[datetime] = None
+        utc_moment: Optional[UTCCalendar] = None
         provenance: Dict[str, Any] = {}
         from .de440_solar import EXTENDED_MODEL_ID
         from .de440_solar import MODEL_ID as DE440_MODEL_ID
@@ -880,7 +957,7 @@ def _calculate_solar_terms_for_year(
             utc_moment, provenance = _solar_term_utc_via_analytic(
                 year, index, {}, spk=True, expected_spk_key=context[-1][2]
             )
-        elif using_swe:
+        else:
             utc_moment = _solar_term_utc_via_swe(
                 year, float(target_longitude), anchor_utc, provenance
             )
@@ -938,15 +1015,10 @@ def _calculate_solar_terms_for_year(
         if utc_moment is None:
             raise EphemerisSourceError("solar_native_unavailable")
 
-        local_moment = utc_moment.astimezone(tzinfo)
         terms.append(
             SolarTerm(
                 name=term_name,
-                moment=local_moment,
-                date_key=local_moment.strftime("%Y%m%d"),
-                day_ganzhi=get_day_ganzhi(
-                    local_moment.year, local_moment.month, local_moment.day
-                ),
+                calendar=ZonedCalendar(utc_moment, tzinfo),
                 resolution_provider=provider,
                 ephemeris_model=provenance.get("ephemeris_model", "unknown"),
                 ephemeris_retflags=provenance.get("ephemeris_retflags", ()),
@@ -968,6 +1040,18 @@ for _cache_attribute in ("cache_clear", "cache_info", "cache_parameters"):
     )
 
 
+def _solar_term_source_year(year: int, context_year: int) -> int:
+    """Preserve a neighbor's own profile unless it needs the boundary allowance."""
+    from .solar_model_policy import solar_context_input_years
+
+    low, high = solar_context_input_years(context_year)
+    return (
+        context_year
+        if low <= context_year <= high and not low <= year <= high
+        else year
+    )
+
+
 def get_solar_term_environment_key(*, year: Optional[int] = None) -> Tuple[Any, ...]:
     """Bind derived BaZi caches to the same environment as solar-term roots.
 
@@ -976,16 +1060,11 @@ def get_solar_term_environment_key(*, year: Optional[int] = None) -> Tuple[Any, 
     """
     if year is None:
         return solar_term_cache_context(swe)
-    from .solar_model_policy import solar_context_input_years
-
-    low, high = solar_context_input_years(year)
     # Month boundaries read adjacent years too. Their selected source must
     # stay in the derived-cache identity even when the input year is outside.
     contexts = []
     for candidate in range(year - 1, year + 2):
-        source_year = (
-            year if low <= year <= high and not low <= candidate <= high else candidate
-        )
+        source_year = _solar_term_source_year(candidate, year)
         context = solar_term_cache_context(swe, year=source_year)
         if context not in contexts:
             contexts.append(context)
@@ -1001,19 +1080,44 @@ def get_jieqi_year_grid(
 
 
 def _term_window(moment: datetime, timezone_name: str) -> List[SolarTerm]:
-    local_moment = localize_datetime(moment, timezone_name)
-    from .solar_model_policy import solar_context_input_years
+    """Three complete annual cycles for consumers evaluating seasonal windows."""
+    local_year = localize_datetime(moment, timezone_name).year
+    window = [
+        term
+        for year in (local_year - 1, local_year, local_year + 1)
+        for term in _solar_terms_for_context_year(
+            year, timezone_name, _solar_term_source_year(year, local_year)
+        )
+    ]
+    return sorted(window, key=lambda item: item.utc_key)
 
-    low, high = solar_context_input_years(local_moment.year)
-    window: List[SolarTerm] = []
-    for year in (local_moment.year - 1, local_moment.year, local_moment.year + 1):
-        if low <= local_moment.year <= high and not low <= year <= high:
-            window.extend(
-                _solar_terms_for_context_year(year, timezone_name, local_moment.year)
+
+def _adjacent_term_window(moment: datetime, timezone_name: str) -> List[SolarTerm]:
+    """Bracket a local instant and Jie month without unrelated annual cycles."""
+    local_moment = localize_datetime(moment, timezone_name)
+    year = local_moment.year
+    window = list(get_solar_terms_for_year(year, timezone_name))
+    by_name = {term.name: term for term in window}
+    key = utc_ordering_key(local_moment)
+    # The current year already brackets ordinary dates. Only the December /
+    # January endpoints can need adjacent-year boundaries; never solve two
+    # unrelated full grids, especially at the civil-year representation ends.
+    if key < by_name["小寒"].utc_key:
+        neighbor, indices = year - 1, (22, 23)
+    elif key >= by_name["大雪"].utc_key:
+        neighbor, indices = year + 1, (0, 1)
+    else:
+        return window
+    for index in indices:
+        window.extend(
+            _solar_terms_for_context_year(
+                neighbor,
+                timezone_name,
+                _solar_term_source_year(neighbor, year),
+                term_index=index,
             )
-        else:
-            window.extend(get_solar_terms_for_year(year, timezone_name))
-    return sorted(window, key=lambda item: utc_instant(item.moment))
+        )
+    return sorted(window, key=lambda item: item.utc_key)
 
 
 def get_adjacent_solar_terms(
@@ -1023,8 +1127,8 @@ def get_adjacent_solar_terms(
     previous = None
     upcoming = None
 
-    for term in _term_window(local_moment, timezone_name):
-        if utc_instant(term.moment) <= utc_instant(local_moment):
+    for term in _adjacent_term_window(local_moment, timezone_name):
+        if term.utc_key <= utc_ordering_key(local_moment):
             previous = term
             continue
         upcoming = term
@@ -1046,7 +1150,7 @@ def get_bazi_year(moment: datetime, timezone_name: str = DEFAULT_TIMEZONE) -> in
     require_calculated_solar_term(li_chun)
     return (
         local_moment.year
-        if utc_ordering_key(local_moment) >= utc_ordering_key(li_chun.moment)
+        if utc_ordering_key(local_moment) >= li_chun.utc_key
         else local_moment.year - 1
     )
 
@@ -1064,19 +1168,19 @@ def get_bazi_month_context(
         "month_index": month_index,
         "comparison_datetime": local_moment.isoformat(),
         "elapsed_basis": "utc_instant_seconds",
-        "elapsed_seconds_since_start": (
-            utc_instant(local_moment) - utc_instant(current_boundary.moment)
-        ).total_seconds(),
-        "elapsed_seconds_until_next": (
-            utc_instant(next_boundary.moment) - utc_instant(local_moment)
-        ).total_seconds(),
+        "elapsed_seconds_since_start": elapsed_seconds_between(
+            current_boundary.calendar, local_moment
+        ),
+        "elapsed_seconds_until_next": elapsed_seconds_between(
+            local_moment, next_boundary.calendar
+        ),
         "start_term": current_boundary.as_dict(),
         "next_term": next_boundary.as_dict(),
         "days_since_start": round(
-            elapsed_days_between(current_boundary.moment, local_moment), 4
+            elapsed_days_between(current_boundary.calendar, local_moment), 4
         ),
         "days_until_next": round(
-            elapsed_days_between(local_moment, next_boundary.moment), 4
+            elapsed_days_between(local_moment, next_boundary.calendar), 4
         ),
     }
 
@@ -1087,14 +1191,14 @@ def get_bazi_month_boundaries(
     local_moment = localize_datetime(moment, timezone_name)
     candidates = [
         term
-        for term in _term_window(local_moment, timezone_name)
+        for term in _adjacent_term_window(local_moment, timezone_name)
         if term.name in BAZI_MONTH_START_TERMS
     ]
 
     current_boundary = None
     next_boundary = None
     for term in candidates:
-        if utc_instant(term.moment) <= utc_instant(local_moment):
+        if term.utc_key <= utc_ordering_key(local_moment):
             current_boundary = term
             continue
         next_boundary = term
@@ -1169,7 +1273,7 @@ def get_lunar_context(
 
     seasonal_moment = localize_datetime(civil_datetime or moment, timezone_name)
     previous_term, next_term = get_adjacent_solar_terms(seasonal_moment, timezone_name)
-    days_since_term = (seasonal_moment.date() - previous_term.moment.date()).days
+    days_since_term = seasonal_moment.toordinal() - previous_term.calendar.local_ordinal
 
     context: Dict[str, object] = {
         "solar_datetime": local_moment.replace(tzinfo=None).isoformat(sep=" "),
@@ -1191,7 +1295,7 @@ def get_lunar_context(
         "previous_jieqi": previous_term.as_dict(),
         "next_jieqi": next_term.as_dict(),
         "days_until_next_jieqi": round(
-            elapsed_days_between(seasonal_moment, next_term.moment), 4
+            elapsed_days_between(seasonal_moment, next_term.calendar), 4
         ),
     }
 
@@ -1251,12 +1355,12 @@ def build_calendar_context(
         "next_solar_term": next_term.as_dict(),
         "solar_term_delta": {
             "days_since_current": round(
-                elapsed_days_between(previous_term.moment, seasonal_moment), 4
+                elapsed_days_between(previous_term.calendar, seasonal_moment), 4
             ),
             "days_until_next": round(
-                elapsed_days_between(seasonal_moment, next_term.moment), 4
+                elapsed_days_between(seasonal_moment, next_term.calendar), 4
             ),
-            "description": f"{previous_term.name}后第{(seasonal_moment.date() - previous_term.moment.date()).days}天",
+            "description": f"{previous_term.name}后第{seasonal_moment.toordinal() - previous_term.calendar.local_ordinal}天",
         },
         "bazi_month_boundary": month_context,
         "lunar_calendar": lunar_context,

@@ -1,7 +1,6 @@
 """A failed optional reference house system cannot erase a valid Guolao sky."""
 
 import asyncio
-import hashlib
 import json
 import math
 from datetime import datetime
@@ -17,6 +16,7 @@ from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.astrology import calculate_core_chart_analysis
 from fatebridge.services.tool_catalog import CATALOG
 from tests.fixtures.surface_payloads import astro_payload
+from tests.support.result_delivery import assert_same_run_receipt
 
 SPEC = next(spec for spec in CATALOG if spec.key == "astro_guolao")
 
@@ -88,10 +88,16 @@ def test_real_polar_placidus_error_retains_core_and_independent_angles(
 def test_exact_geographic_poles_have_no_assigned_rising_point_or_houses(
     latitude, zodiacal, monkeypatch
 ):
-    def no_house_call(*args, **kwargs):
-        pytest.fail("A geographic pole must not get a limiting ASC or arbitrary houses")
+    original = runtime.ephemeris_call
 
-    monkeypatch.setattr(runtime.swe, "houses_ex", no_house_call)
+    def no_house_call(operation, *args, **kwargs):
+        if operation == "houses_ex":
+            pytest.fail(
+                "A geographic pole must not get a limiting ASC or arbitrary houses"
+            )
+        return original(operation, *args, **kwargs)
+
+    monkeypatch.setattr(runtime, "ephemeris_call", no_house_call)
     result = chart(birth_latitude=latitude, zodiacal=zodiacal)
     assert "error" not in result
     assert len(result["guolao"]["bodies"]) == 11
@@ -117,14 +123,19 @@ def test_target_sky_and_small_limit_are_independent_of_reference_house_availabil
 
 
 def test_invalid_cusps_are_not_unwrapped_or_replaced(monkeypatch):
-    original = runtime.swe.houses_ex
+    original = runtime.ephemeris_call
+    injected = []
 
-    def invalid(*args, **kwargs):
-        cusps, angles = original(*args, **kwargs)
-        return ((0.0,) * 12, angles) if args[3] == b"P" else (cusps, angles)
+    def invalid(operation, *args, **kwargs):
+        result = original(operation, *args, **kwargs)
+        if operation == "houses_ex" and args[3] == b"P":
+            injected.append(True)
+            return (0.0,) * 12, result[1]
+        return result
 
-    monkeypatch.setattr(runtime.swe, "houses_ex", invalid)
+    monkeypatch.setattr(runtime, "ephemeris_call", invalid)
     result = chart(birth_latitude=31.22)
+    assert injected
     assert "error" not in result
     assert result["houses"] == []
     assert (
@@ -144,7 +155,14 @@ def test_essential_or_unexpected_errors_are_not_hidden_as_optional_geometry(
         raise RuntimeError("injected essential computation failure")
 
     if operation == "unexpected_house_bug":
-        monkeypatch.setattr(runtime.swe, "houses_ex", fail)
+        original = runtime.ephemeris_call
+
+        def failed_house(operation, *args, **kwargs):
+            if operation == "houses_ex":
+                fail()
+            return original(operation, *args, **kwargs)
+
+        monkeypatch.setattr(runtime, "ephemeris_call", failed_house)
     elif operation == "azalt":
         monkeypatch.setattr(
             runtime.swe, "azalt", lambda *args: (0.0, float("nan"), float("nan"))
@@ -237,17 +255,22 @@ def test_partial_reference_geometry_across_native_mcp_rest_cli_and_projection(
 
 
 def test_sidereal_only_house_error_preserves_selected_angles_and_core(monkeypatch):
-    original = runtime.swe.houses_ex
+    original = runtime.ephemeris_call
+    injected = []
     expected = chart(birth_latitude=31.22, zodiacal=1, hsys=1)
 
-    def fail_sidereal(*args, **kwargs):
+    def fail_sidereal(operation, *args, **kwargs):
+        if operation != "houses_ex":
+            return original(operation, *args, **kwargs)
         flags = kwargs.get("flags", args[4] if len(args) > 4 else 0)
         if args[3] == b"P" and flags & runtime.swe.FLG_SIDEREAL:
+            injected.append(True)
             raise runtime.swe.Error("injected sidereal house unavailability")
-        return original(*args, **kwargs)
+        return original(operation, *args, **kwargs)
 
-    monkeypatch.setattr(runtime.swe, "houses_ex", fail_sidereal)
+    monkeypatch.setattr(runtime, "ephemeris_call", fail_sidereal)
     actual = chart(birth_latitude=31.22, zodiacal=1)
+    assert injected
     assert "error" not in actual
     assert actual["guolao"]["bodies"] == expected["guolao"]["bodies"]
     assert actual["angles"] == expected["angles"]
@@ -295,8 +318,9 @@ def test_partial_geometry_complete_delivery_reuses_the_same_run(monkeypatch, tmp
             break
         offset = body["next_offset"]
     raw = "".join(chunks)
-    assert hashlib.sha256(raw.encode()).hexdigest() == ref["sha256"]
+    assert len(raw) == ref["total_chars"]
     full = json.loads(raw)
+    assert_same_run_receipt(store, shaped, full)
     assert full["run_metadata"]["run_id"] == shaped["run_metadata"]["run_id"]
     assert len(full["guolao"]["bodies"]) == 11
     assert full["guolao"]["profile"]["reference_geometry"]["status"] == "partial"

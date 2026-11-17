@@ -38,10 +38,42 @@ class CompatibilityDimension(PartialOutput):
     balance_type: Optional[str] = None
 
 
+class TenGodPreferenceObservation(PartialOutput):
+    provider: FullFact[Optional[str]] = None
+    target: FullFact[Optional[str]] = None
+    ten_god: FullFact[Optional[str]] = None
+    element: FullFact[Optional[str]] = None
+    engineering_state: FullFact[
+        Optional[Literal["useful", "avoid", "conditional", "neutral", "unknown"]]
+    ] = None
+    source_force_status: FullFact[Optional[str]] = None
+    source_preference_status: FullFact[Optional[str]] = None
+
+
+class TenGodRelationshipDimension(CompatibilityDimension):
+    assessment_status: FullFact[Optional[Literal["calculated", "partial"]]] = None
+    score_kind: FullFact[Optional[Literal["uncalibrated_rule_index"]]] = None
+    source_adjudication_used: FullFact[Optional[Literal[False]]] = None
+    preference_evidence: FullFact[Optional[List[TenGodPreferenceObservation]]] = None
+
+    @model_validator(mode="after")
+    def unresolved_preference_status(self) -> "TenGodRelationshipDimension":
+        if (
+            self.assessment_status == "calculated"
+            and self.preference_evidence is not None
+        ):
+            if any(
+                row.engineering_state in {"conditional", "unknown"}
+                for row in self.preference_evidence
+            ):
+                raise ValueError("十神输入取用仍有条件或缺失时不能交付完整裁定状态")
+        return self
+
+
 class CompatibilityDetails(PartialOutput):
     element_balance: FullFact[Optional[CompatibilityDimension]] = None
     favorable_synergy: FullFact[Optional[CompatibilityDimension]] = None
-    ten_gods_relationship: FullFact[Optional[CompatibilityDimension]] = None
+    ten_gods_relationship: FullFact[Optional[TenGodRelationshipDimension]] = None
     pattern_synergy: FullFact[Optional[CompatibilityDimension]] = None
     traditional_analysis: FullFact[Optional[CompatibilityDimension]] = None
 
@@ -57,6 +89,10 @@ class CompatibilityScoring(PartialOutput):
     score_kind: FullFact[Optional[Literal["uncalibrated_rule_index"]]] = None
     evidence_policy: FullFact[Optional[str]] = None
     dependency_policy: FullFact[Optional[str]] = None
+    source_adjudication_used: FullFact[Optional[Literal[False]]] = None
+    preference_basis: FullFact[
+        Optional[Literal["conditional_engineering_preference"]]
+    ] = None
     dimension_dependencies: FullFact[Optional[Dict[str, List[str]]]] = None
     status: FullFact[Optional[Literal["calculated", "partial"]]] = None
     unresolved_dimensions: FullFact[Optional[List[str]]] = None

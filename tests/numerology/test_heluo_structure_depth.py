@@ -3,6 +3,7 @@
 import hashlib
 import json
 from copy import deepcopy
+from itertools import combinations, product
 from pathlib import Path
 
 import pytest
@@ -12,7 +13,11 @@ import fatebridge.core.heluo_structure as structure
 from fatebridge.core.heluo import gua_lines, judge
 from fatebridge.core.heluo_hexagrams import _gua_tables
 from fatebridge.core.local_techniques.heluo import build_heluo_result
-from fatebridge.core.output_numerology import HeluoBodyStructure, HeluoStructurePhase
+from fatebridge.core.output_numerology import (
+    HeluoBodyStructure,
+    HeluoStructurePhase,
+    HeluoStructureRecord,
+)
 from fatebridge.utils.errors import NumerologySourceError
 from tests.numerology.test_heluo_month_depth import chart_for
 from tests.numerology.test_heluo_najia_depth import PILLARS
@@ -164,6 +169,40 @@ def test_projection_does_not_invent_missing_line_facts():
         {"phases": [{"phase": "hou", "whole_reversal": {"name": "雷澤歸妹"}}]}
     )
     assert output.phases[0].input_lines is None
+
+
+@pytest.mark.parametrize(
+    "value",
+    [
+        {"kind": "lower", "lines": [1] * 6},
+        {"kind": "reverse_then_third_to_top", "lines": [1] * 3},
+        {"arity": 6, "original_positions": [1, 2, 3]},
+        {"original_positions": [1, 2, 3], "lines": [1] * 6},
+        {"original_positions": [1, 2]},
+        {"arity": 3, "original_positions": [1, 2, 4, 5, 6, 3]},
+    ],
+)
+def test_known_structure_arity_cannot_be_hidden_by_omitting_redundant_fields(value):
+    with pytest.raises(ValidationError):
+        HeluoStructureRecord.model_validate(value)
+
+
+def test_all_binary_structure_records_preserve_every_nonempty_field_subset():
+    # The frozen source positions define the eight operators. The 64 binary
+    # inputs are finite derived cases, not additional classical examples.
+    for bits in product((0, 1), repeat=6):
+        for shape in REFERENCE["source_case"]["bodies"]:
+            value = {
+                "kind": shape["kind"],
+                "arity": shape["arity"],
+                "original_positions": shape["positions"],
+                "lines": [bits[p - 1] for p in shape["positions"]],
+            }
+            for size in range(1, len(value) + 1):
+                for fields in combinations(value, size):
+                    partial = {field: value[field] for field in fields}
+                    actual = HeluoStructureRecord.model_validate(partial)
+                    assert actual.model_dump(exclude_unset=True) == partial
 
 
 def test_audit_rejects_complement_that_would_pass_jian_alone(monkeypatch):

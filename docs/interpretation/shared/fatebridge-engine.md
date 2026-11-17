@@ -195,7 +195,7 @@ python3 -m fatebridge.cli --no-metadata bazi_birth <出生参数> \
 `as_of` 只冻结缺省日期的当前时钟；`return_timezone` 转换同一时刻到分析地点，
 不替代输入时区。REST 请求体、MCP 参数与 CLI 开关语义一致。
 
-核心星盘优先使用 `swisseph`；缺包时可回退内置轨道近似，显式复杂宫制除外。西占推运/事件/生命周期缺 backend 时直接报错，不能按近似结果解读。`swisseph` 可导入仍可能使用 Moshier 模型，检查 `chart_profile.ephemeris_model` 与 `run_metadata.engine_is_approximate`。`pyswisseph` / `kerykeion` 是常规依赖，星历数据另行获取，见 [快速入门](../../getting-started.md#星历数据与精度)。
+核心星盘优先使用 `swisseph`；缺包时可回退内置轨道近似，显式复杂宫制除外。西占推运/事件/生命周期缺 backend 时直接报错，不能按近似结果解读。`swisseph` 可导入仍可能使用 Moshier 模型，检查 `chart_profile.ephemeris_model` 与 `run_metadata.engine_is_approximate`。`pyswisseph` 是常规依赖，星历数据另行获取，见 [快速入门](../../getting-started.md#星历数据与精度)。
 
 ---
 

@@ -1,3 +1,5 @@
+from fatebridge.utils.formatting import format_json_response
+
 """Large responses stay bounded while the original run remains fully readable."""
 
 import asyncio
@@ -38,7 +40,7 @@ def large_payload():
 def test_bounded_delivery_preserves_all_values_and_original_receipt(store, compact):
     original = large_payload()
     shaped = delivery.bound_response(original, 8192, compact=compact)
-    assert len(delivery._json(shaped, compact)) <= 8192
+    assert len(format_json_response(shaped, compact=compact)) <= 8192
     assert shaped["summary"] == original["summary"]
     assert shaped["analysis_context"] == original["analysis_context"]
     assert shaped["run_metadata"] == original["run_metadata"]
@@ -147,7 +149,7 @@ def test_current_cards_keep_facts_and_restore_every_deferred_child(store, compac
     original["run_metadata"] = {"run_id": "same-run", "tool_name": "timing_analysis"}
     before = copy.deepcopy(original)
     result = delivery.bound_response(original, 4096, compact=compact)
-    assert len(delivery._json(result, compact)) <= 4096
+    assert len(format_json_response(result, compact=compact)) <= 4096
     ref = result["result_delivery"]
     assert set(ref["deferred_fields"]) == {
         "left.first_view.source_details",
@@ -181,7 +183,7 @@ def test_supplementary_receipt_details_do_not_displace_complete_business(store):
     }
     before = copy.deepcopy(original)
     result = delivery.bound_response(original, 8192)
-    assert len(delivery._json(result)) <= 8192
+    assert len(format_json_response(result)) <= 8192
     assert result["analysis"] == original["analysis"]
     ref = result["result_delivery"]
     assert ref["deferred_fields"] == [
@@ -247,14 +249,14 @@ def test_duplicate_locators_do_not_displace_complete_business_facts(store):
     prototype = delivery.bound_response(original, 8192)
     assert prototype["result_delivery"]["deferred_fields"] == ["run_metadata.runtime"]
     original["ziwei_birth"]["all_facts"] = "中" * (
-        8192 + 50 - len(delivery._json(prototype))
+        8192 + 50 - len(format_json_response(prototype))
     )
     before = copy.deepcopy(original)
     shaped = delivery.bound_response(original, 8192)
     ref = shaped["result_delivery"]
     assert ref["compact_reference"] is True
     assert ref["deferred_fields"] == ["run_metadata.runtime"]
-    assert len(delivery._json(shaped)) <= 8192
+    assert len(format_json_response(shaped)) <= 8192
     assert shaped["ziwei_birth"] == original["ziwei_birth"]
     assert shaped["analysis_context"] == original["analysis_context"]
     manifest = store.manifest(ref["result_id"])
@@ -269,7 +271,9 @@ def test_duplicate_locators_do_not_displace_complete_business_facts(store):
     }
     restored_full_reference.pop("compact_reference")
     assert (
-        len(delivery._json({**shaped, "result_delivery": restored_full_reference}))
+        len(
+            format_json_response({**shaped, "result_delivery": restored_full_reference})
+        )
         > 8192
     )
     full = reconstruct(store, ref["result_id"])
@@ -318,11 +322,13 @@ def test_manifest_locator_preserves_sources_before_deferring_receipt_facts(
     minimal = {**prototype, "result_delivery": reference}
     # Size only synthetic text from real locator overhead, never alter a real
     # business result or the requested budget to manufacture a passing case.
-    original["analysis"]["facts"] = "中" * (limit - len(delivery._json(minimal)) - 12)
+    original["analysis"]["facts"] = "中" * (
+        limit - len(format_json_response(minimal)) - 12
+    )
     before = copy.deepcopy(original)
     shaped = delivery.bound_response(original, limit)
     ref = shaped["result_delivery"]
-    assert len(delivery._json(shaped)) <= limit
+    assert len(format_json_response(shaped)) <= limit
     assert ref["deferred_fields"] == ["run_metadata.runtime"]
     assert "file_path" not in ref and "file_payload_path" not in ref
     assert "first_page_uri" not in ref

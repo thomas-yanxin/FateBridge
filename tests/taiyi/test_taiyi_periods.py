@@ -17,6 +17,7 @@ from fatebridge.services.metaphysics import (
     _build_analysis_seed,
     calculate_taiyi_analysis,
 )
+from fatebridge.utils.civil_time import ZonedCalendar
 from scripts.taiyi.audit_taiyi_classical import (
     DEPTH_CORPUS,
     audit_yin,
@@ -248,7 +249,12 @@ def test_solstice_switch_compares_instants_at_second_resolution(monkeypatch):
     # Synthetic anchor isolates the boundary operator; official tests above
     # only certify minute-scale agreement, not the solver's second accuracy.
     real = next(t for t in get_solar_terms_for_year(2026, "UTC") if t.name == "夏至")
-    anchor = replace(real, moment=datetime(2026, 6, 21, 8, 24, 31, tzinfo=timezone.utc))
+    anchor = replace(
+        real,
+        calendar=ZonedCalendar.from_datetime(
+            datetime(2026, 6, 21, 8, 24, 31, tzinfo=timezone.utc)
+        ),
+    )
     previous = next(
         t for t in get_solar_terms_for_year(2025, "UTC") if t.name == "冬至"
     )

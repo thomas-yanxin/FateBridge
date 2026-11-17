@@ -9,7 +9,11 @@ from pathlib import Path
 from typing import Any
 
 from fatebridge.core.metaphysics.common import MetaphysicsSeed
-from fatebridge.core.metaphysics.qimen import _qimen_build_palaces, _qimen_zhifu_zhishi
+from fatebridge.core.metaphysics.qimen import (
+    _qimen_build_palaces,
+    _qimen_pan_earth,
+    _qimen_zhifu_zhishi,
+)
 from fatebridge.core.qimen_evidence import STEM_PATTERNS, enrich_qimen_evidence
 from fatebridge.core.qimen_profiles import GOD_PROFILES, star_season_state
 from fatebridge.validation.claims import CalculationClaim
@@ -51,12 +55,11 @@ def audit_day_stem_collation(directory: Path) -> dict[str, Any]:
     rows: list[dict[str, Any]] = []
     for case in cases:
         ju = f'{case["dun"]}{"一二三四五六七八九"[case["ju"]-1]}局上元'
-        leader = _qimen_zhifu_zhishi(case["hour"], ju, dun_type=case["dun"])
+        earth = _qimen_pan_earth(ju)
+        leader = _qimen_zhifu_zhishi(case["hour"], earth, dun_type=case["dun"])
         palaces = _qimen_build_palaces(
-            time_ganzhi=case["hour"],
-            ju_text=ju,
-            dun_type=case["dun"],
-            current_term="冬至",
+            earth=earth,
+            leader=leader,
         )
         at = datetime(2026, 1, 1, 12)
         seed = MetaphysicsSeed(
@@ -216,12 +219,11 @@ def audit_head_dependent_examples(directory: Path) -> dict[str, Any]:
     matched = 0
     for case in cases:
         ju = f'{case["dun"]}{"一二三四五六七八九"[case["ju"]-1]}局上元'
-        leader = _qimen_zhifu_zhishi(case["hour"], ju, dun_type=case["dun"])
+        earth = _qimen_pan_earth(ju)
+        leader = _qimen_zhifu_zhishi(case["hour"], earth, dun_type=case["dun"])
         palaces = _qimen_build_palaces(
-            time_ganzhi=case["hour"],
-            ju_text=ju,
-            dun_type=case["dun"],
-            current_term="冬至",
+            earth=earth,
+            leader=leader,
         )
         moment = datetime(2026, 1, 1, 12)
         seed = MetaphysicsSeed(
@@ -358,11 +360,11 @@ def audit_chapter_profiles(directory: Path) -> dict[str, Any]:
         if set(case["gods"]) != set("坎艮震巽离坤兑乾"):
             raise ValueError("奇门四幅圆图须各保留完整八宫")
         ju = f'{case["dun"]}{"一二三四五六七八九"[case["ju"]-1]}局上元'
+        earth = _qimen_pan_earth(ju)
+        leader = _qimen_zhifu_zhishi(case["hour"], earth, dun_type=case["dun"])
         palaces = _qimen_build_palaces(
-            time_ganzhi=case["hour"],
-            ju_text=ju,
-            dun_type=case["dun"],
-            current_term="冬至",
+            earth=earth,
+            leader=leader,
             god_profile="yanyi_diagrams",
         )
         compare(
@@ -492,7 +494,8 @@ def audit_numeric_tables(directory: Path) -> dict[str, Any]:
                     "甲乙丙丁戊己庚辛壬癸"[index % 10]
                     + "子丑寅卯辰巳午未申酉戌亥"[index % 12]
                 )
-                leader = _qimen_zhifu_zhishi(hour, ju, dun_type=table["dun"])
+                earth = _qimen_pan_earth(ju)
+                leader = _qimen_zhifu_zhishi(hour, earth, dun_type=table["dun"])
                 expected = {
                     "raw_star_gong": pair[0],
                     "raw_door_gong": pair[1],
@@ -570,14 +573,13 @@ def audit_scan_examples(directory: Path) -> dict[str, Any]:
     rows = []
     for case in manifest["cases"]:
         ju = f'{case["dun"]}{"一二三四五六七八九"[case["ju"]-1]}局上元'
-        leader = _qimen_zhifu_zhishi(case["hour"], ju, dun_type=case["dun"])
+        earth = _qimen_pan_earth(ju)
+        leader = _qimen_zhifu_zhishi(case["hour"], earth, dun_type=case["dun"])
         palaces = {
             p["trigram"]: p
             for p in _qimen_build_palaces(
-                time_ganzhi=case["hour"],
-                ju_text=ju,
-                dun_type=case["dun"],
-                current_term="冬至",
+                earth=earth,
+                leader=leader,
             )
         }
         discrepancies = []
@@ -623,18 +625,22 @@ def audit_scan_examples(directory: Path) -> dict[str, Any]:
 
 
 def verify_qimen_pattern_quotes(
-    payload: dict[str, Any], claims: list["CalculationClaim"]
+    payload: dict[str, Any],
+    claims: list["CalculationClaim"],
+    *,
+    trusted_payload: dict[str, object] | None = None,
 ) -> dict[str, Any]:
     """Verify whole same-run pattern quotations, including adverse qualifications.
 
-    This rejects cherry-picked subfields as a pattern quotation. It does not
-    grade surrounding natural language or authenticate a self-created receipt.
+    This rejects cherry-picked subfields as a pattern quotation. A separately
+    retained trusted result additionally permits complete-payload comparison.
+    It does not grade natural language or authenticate a self-created receipt.
     """
     import re
 
     from fatebridge.validation.claims import verify_calculation_claims
 
-    report = verify_calculation_claims(payload, claims)
+    report = verify_calculation_claims(payload, claims, trusted_payload=trusted_payload)
     errors = list(report["errors"])
     for index, claim in enumerate(claims):
         if not re.fullmatch(r"qimen\.patterns\.(0|[1-9][0-9]*)", claim.path):
@@ -648,7 +654,8 @@ def verify_qimen_pattern_quotes(
         ),
         "checked_claim_count": len(claims),
         "errors": errors,
+        "original_payload_compared": report["original_payload_compared"],
         "free_text_semantics_validated": False,
         "real_world_efficacy_validated": False,
-        "scope": "只核同run完整盘局的整条格局引用，包括附加条件、冲突与来源；不证明自由文本解释、原典一致性或现实预测效力。原始回执必须另从可信执行端核对。",
+        "scope": "只核所供结果同run的整条格局引用，包括附加条件、冲突与来源；仅另行提供可信原结果时核对整体是否完整或改动。不证明自由文本解释、原典一致性或现实预测效力，不能认证自行提交的回执。",
     }

@@ -20,6 +20,7 @@ from fatebridge.core.timing_interactions import analyze_timing_interactions
 from fatebridge.services.birth_context import build_birth_computation_context
 from fatebridge.services.timing_state import build_current_timing_state
 from fatebridge.utils.birth_input import create_person_info
+from fatebridge.utils.civil_time import ZonedCalendar
 
 NATAL = {
     "year": ("甲", "子"),
@@ -32,8 +33,8 @@ NATAL = {
 def fixed_jie(monkeypatch, birth, elapsed):
     """Freeze a physical jie interval; expected calendar offsets are hand-set."""
     aware = localize_datetime(birth, "Asia/Shanghai")
-    previous = SolarTerm("立夏", aware - timedelta(days=1), "20000430", "戊午")
-    following = SolarTerm("芒种", aware + elapsed, "20000506", "甲子")
+    previous = SolarTerm("立夏", ZonedCalendar.from_datetime(aware - timedelta(days=1)))
+    following = SolarTerm("芒种", ZonedCalendar.from_datetime(aware + elapsed))
     monkeypatch.setattr(
         timing,
         "get_bazi_month_boundaries",
@@ -140,11 +141,11 @@ def test_all_shared_date_consumers_select_new_dayun_before_next_birthday(monkeyp
     assert override["dayun_analysis"]["dayun_info"]["period"] == 1
 
 
-def test_comprehensive_low_level_year_uses_lichun_not_civil_january():
-    result = TimingEffectsAnalysis.comprehensive_timing_analysis(
-        NATAL, datetime(2000, 5, 1), "男", analysis_date=datetime(2026, 1, 20)
+def test_shared_point_year_uses_lichun_not_civil_january():
+    result = TimingEffectsAnalysis.analyze_liunian_effects(
+        NATAL, 2026, moment=datetime(2026, 1, 20), timezone_name="Asia/Shanghai"
     )
-    assert result["liunian_analysis"]["liunian_info"]["pillar"] == "乙巳"
+    assert result["liunian_info"]["pillar"] == "乙巳"
 
 
 @pytest.mark.parametrize("god", ["正印", "七杀", "食神", "伤官", "正财", "偏财"])

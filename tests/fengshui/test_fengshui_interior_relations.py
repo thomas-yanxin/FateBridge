@@ -18,6 +18,7 @@ from fatebridge.core.fengshui.interior_rules import (
     analyze_interior_relations,
     interior_relation_provenance,
 )
+from fatebridge.core.fengshui.models import LayoutConstraint
 
 KINDS = list(get_args(InteriorRelationKind))
 
@@ -38,9 +39,7 @@ def relation(kind="mirror_faces_bed", present=True, basis="user_confirmed", **kw
 
 
 def analyze(relations, constraints=()):
-    return analyze_interior_relations(
-        SimpleNamespace(interior_relations=relations), constraints
-    )
+    return analyze_interior_relations(relations, constraints)
 
 
 @pytest.mark.parametrize("kind", KINDS)
@@ -130,7 +129,12 @@ def test_photo_absence_or_unknown_does_not_create_a_conditional_caution(present)
 
 def test_photo_conditional_suggestions_respect_both_endpoints_action_constraints():
     constraints = [
-        SimpleNamespace(object_id=object_id, can_relocate=False, can_rotate=False)
+        LayoutConstraint(
+            object_id=object_id,
+            can_relocate=False,
+            can_rotate=False,
+            evidence="两个端点的动作均已明确禁止",
+        )
         for object_id in ["source", "target"]
     ]
     finding = analyze([relation(basis="image_observed")], constraints)["findings"][0]
@@ -266,7 +270,14 @@ def test_bed_above_stove_requires_known_vertical_order_only_when_asserted(
 def test_mirror_actions_have_independent_permissions_and_no_ready_state():
     result = analyze(
         [relation()],
-        [SimpleNamespace(object_id="source", can_relocate=False, can_rotate=True)],
+        [
+            LayoutConstraint(
+                object_id="source",
+                can_relocate=False,
+                can_rotate=True,
+                evidence="镜面只能转向，不能搬动",
+            )
+        ],
     )
     actions = {item["operation"]: item for item in result["action_options"]}
     assert actions["location"]["status"] == "blocked"
@@ -283,7 +294,14 @@ def test_mirror_actions_have_independent_permissions_and_no_ready_state():
 
 def test_all_actions_blocked_stop_action_questions_and_do_not_move_structural_sources():
     fact = relation("exposed_beam_above_bed")
-    result = analyze([fact], [SimpleNamespace(object_id="target", can_relocate=False)])
+    result = analyze(
+        [fact],
+        [
+            LayoutConstraint(
+                object_id="target", can_relocate=False, evidence="目标物不可搬动"
+            )
+        ],
+    )
     assert result["findings"][0]["action_status"] == "blocked"
     assert result["action_options"][0]["object_id"] == "target"
     assert result["action_options"][0]["pending_confirmations"] == []
@@ -302,8 +320,12 @@ def test_vertical_alternatives_do_not_share_permission_between_bed_and_stove():
     result = analyze(
         [relation("bed_above_stove")],
         [
-            SimpleNamespace(object_id="source", can_relocate=True),
-            SimpleNamespace(object_id="target", can_relocate=False),
+            LayoutConstraint(
+                object_id="source", can_relocate=True, evidence="床可搬动"
+            ),
+            LayoutConstraint(
+                object_id="target", can_relocate=False, evidence="灶不可搬动"
+            ),
         ],
     )
     assert [(a["object_id"], a["status"]) for a in result["action_options"]] == [
@@ -343,15 +365,9 @@ def test_source_versions_and_mirror_disagreement_are_preserved_and_not_auto_sele
     assert interior_relation_provenance() == original
 
 
-def test_empty_scope_does_not_claim_assessment_and_dictionary_context_is_supported():
-    assert analyze_interior_relations(None, [])["status"] == "not_requested"
+def test_empty_scope_does_not_claim_assessment():
+    assert analyze_interior_relations([], [])["status"] == "not_requested"
     assert analyze([])["rulesets"] == []
-    result = analyze_interior_relations({"relations": [relation().model_dump()]}, [])
-    assert result["status"] == "complete"
-    assert (
-        result["action_options"][0]["pending_confirmations"][0]
-        == "layout_constraints.source.can_relocate"
-    )
 
 
 def test_provenance_sources_meet_output_contract_and_keep_citable_locators():

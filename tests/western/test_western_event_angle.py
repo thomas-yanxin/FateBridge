@@ -1,10 +1,13 @@
 """Unresolved native ASC is not a physical ruler or a known score input."""
 
 import json
+import sys
 from datetime import datetime
+from fractions import Fraction
 from pathlib import Path
 from types import SimpleNamespace
 
+import mpmath as mp
 import pytest
 
 from fatebridge.core.astrology_election import build_election_payload
@@ -15,6 +18,15 @@ from tests.support.reference_data import verify_source_files
 
 FIXTURE = Path(__file__).parents[1] / "data/astro/event_angle"
 REFERENCE = json.loads((FIXTURE / "reference.json").read_text())
+SELECTED_FRAME_NULL_CASES = [
+    {
+        "id": f"selected-frame-null-{index}-{hemisphere}",
+        "utc": instant,
+        "selected_frame_null": hemisphere,
+    }
+    for index, instant in enumerate(sorted({row["utc"] for row in REFERENCE["rows"]}))
+    for hemisphere in ("north", "south")
+]
 
 
 def test_geometry_reference_precedes_candidate_and_retains_all_conditions():
@@ -23,27 +35,88 @@ def test_geometry_reference_precedes_candidate_and_retains_all_conditions():
     assert not REFERENCE["fatebridge_imported"]
 
 
-@pytest.mark.parametrize("row", REFERENCE["rows"], ids=lambda r: r["id"])
+@pytest.mark.parametrize(
+    "row", REFERENCE["rows"] + SELECTED_FRAME_NULL_CASES, ids=lambda r: r["id"]
+)
 @pytest.mark.parametrize("house", ["R", "E", "W"])
 @pytest.mark.parametrize("zodiac", ["Tropic", "Sidereal"])
-def test_native_subject_qualifies_the_actual_angle_model(row, house, zodiac):
+def test_native_subject_qualifies_the_selected_physical_angle_model(row, house, zodiac):
+    from fatebridge.core.astro import runtime
+    from fatebridge.core.astro.earth_attitude import earth_attitude
+    from fatebridge.core.astro.time_scales import ephemeris_time
+
+    moment = datetime.fromisoformat(row["utc"])
+    if hemisphere := row.get("selected_frame_null"):
+        clock = ephemeris_time(moment)
+        selected = earth_attitude(runtime.swe, clock.jd_ut1, julian_day_tt=clock.jd_tt)
+        latitude = (1 if hemisphere == "north" else -1) * (
+            90 - selected.reduction.house_obliquity
+        )
+        target_armc = 270 if hemisphere == "north" else 90
+        longitude = float(
+            (Fraction(target_armc) - Fraction(selected.house_sidereal_degrees) + 180)
+            % 360
+            - 180
+        )
+    else:
+        latitude, longitude = row["latitude"], row["longitude"]
     subject = build_native_subject(
         name="Synthetic geometry fixture",
-        local_datetime=datetime.fromisoformat(row["utc"]),
-        longitude=row["longitude"],
-        latitude=row["latitude"],
+        local_datetime=moment,
+        longitude=longitude,
+        latitude=latitude,
         timezone_name="UTC",
         house_system=house,
         zodiac_type=zodiac,
     )
+    # The frozen inputs approach the OLD native frame's degeneracy. The
+    # managed equator has a different pole/origin, so reuse their coordinates,
+    # not their old frame's boolean. The physical frame itself has separate
+    # official SOFA and original house-kernel controls.
+    attitude = earth_attitude(
+        runtime.swe, subject.julian_day, julian_day_tt=subject.julian_day_tt
+    )
+    armc = float(
+        (Fraction(attitude.house_sidereal_degrees) + Fraction(longitude)) % 360
+    )
+    obliquity = attitude.reduction.house_obliquity
+    with mp.workdps(100):
+        phi, theta, eps = (
+            mp.mpf(value) * mp.pi / 180 for value in (latitude, armc, obliquity)
+        )
+        zenith = (
+            mp.cos(phi) * mp.cos(theta),
+            mp.cos(phi) * mp.sin(theta),
+            mp.sin(phi),
+        )
+        pole = (mp.mpf(0), -mp.sin(eps), mp.cos(eps))
+        cross = (
+            zenith[1] * pole[2] - zenith[2] * pole[1],
+            zenith[2] * pole[0] - zenith[0] * pole[2],
+            zenith[0] * pole[1] - zenith[1] * pole[0],
+        )
+        norm = mp.sqrt(mp.fsum(value * value for value in cross))
+        resolution_guard = mp.mpf(64) * mp.mpf(2) ** -52
+        condition_threshold = mp.sqrt(mp.mpf(2) ** -52)
+    if row.get("selected_frame_null"):
+        assert norm <= resolution_guard
     definition = subject.calculation_basis.get("angle_definition")
-    if row["expected_status"] == "normal":
+    if norm > condition_threshold:
         assert definition is None
     else:
         assert definition is not None
+        resolved = norm > resolution_guard
+        assert definition["geometric_ascendant_resolved"] is bool(resolved)
+        assert definition["geometry_inputs"]["armc"] == armc
+        assert definition["geometry_inputs"]["obliquity"] == obliquity
         assert (
-            definition["geometric_ascendant_resolved"]
-            == row["expected_ascendant_resolved"]
+            abs(definition["conditioning"]["intersection_normal_norm"] - float(norm))
+            <= 64 * sys.float_info.epsilon
+        )
+        assert definition["status"] == (
+            "ecliptic_horizon_ill_conditioned"
+            if resolved
+            else "ecliptic_horizon_numerically_unresolved"
         )
         assert definition["midheaven_restricted_by_this_condition"] is False
     assert subject.sun.abs_pos is not None and subject.medium_coeli.abs_pos is not None

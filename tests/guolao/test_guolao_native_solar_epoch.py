@@ -17,12 +17,7 @@ from fatebridge.cli import run
 from fatebridge.core import guolao
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.birth import NativeSolarBirthInfo, build_astro_birth_info
-from fatebridge.core.astro.birth_clock import (
-    resolve_solar_birth_clock,
-    resolve_solar_epoch,
-)
 from fatebridge.core.astro.physical_epoch import PhysicalEpoch, utc_from_tt
-from fatebridge.core.guolao_epoch import native_utc8_clock
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.astrology import calculate_core_chart_analysis
 from fatebridge.services.tool_catalog import CATALOG

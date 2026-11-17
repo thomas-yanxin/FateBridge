@@ -51,15 +51,16 @@
 
 ### 材料施用条件
 
-`material_facts` 保留原属性与 `element_use`。需要附加检查时提供 `application`，显式 `ruleset_id=afsi_application_conditions_v1`：
+`material_facts` 保留原属性与 `element_use`。需要附加检查时提供 `application`，显式 `ruleset_id=afsi_application_conditions_v1`，当前版本为`1.1.0`：
 
 | 实际材料 | 本版检查 |
 | --- | --- |
 | water | `water_clean`、`water_moving`、`proportionate_to_space` |
 | metal | `metal_exposed`、`proportionate_to_space` |
-| living_plant | `plant_healthy`；原有 `plant_alive` 仍独立 |
+| living_plant | `plant_healthy`、`proportionate_to_space`；原有 `plant_alive` 仍独立 |
+| stone、ceramic | `proportionate_to_space` |
 
-各项同样用独立 value/observation_basis/evidence。不允许给水体填 `metal_exposed` 等不对应观察。`proportionate_to_space` 是来源中的定性人工核对，不是引擎算出的足量标准。颜色、器形和材料不能互证；复合物件继续保留独立属性，不相加成为分数。
+各项同样用独立 value/observation_basis/evidence。不允许给水体填 `metal_exposed` 等不对应观察。[Janice Sugita／AFSI教材](https://www.amfengshui.com/wp-content/uploads/2014/09/fs227.pdf)印刷29页／PDF33页的尺度建议适用于代表物，`proportionate_to_space` 因此覆盖上述全部五类实际材料；它是定性人工核对，不是引擎算出的足量标准。缺项保持待确认，不能用“没有登记检查”得到`conditions_reviewed`。不将书中水量的5%例子改成统一面积公式。颜色、器形和材料不能互证；复合物件继续保留独立属性，不相加成为分数。
 
 `application_analysis` 分开返回初步资格、各作者条件、`target_binding`、未评估维度。材料资格尚未知时为 `needs_material_confirmation`，不提前索取施用条件。缺条件为 `needs_confirmation`；确认不符合可结束该项施用结论，不为凑齐清单追其余条件。全部条件确认只到 `conditions_reviewed`；剂量、实际位置、摆放利弊及现实效力仍未评估，不产生 `ready`。
 

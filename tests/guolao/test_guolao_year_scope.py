@@ -16,6 +16,7 @@ from fatebridge.core import calendar as calendar_module
 from fatebridge.core import guolao, guolao_monthly, guolao_timing
 from fatebridge.core.astro.birth import build_astro_birth_info
 from fatebridge.mcp_server import create_mcp_app
+from fatebridge.utils.civil_time import ZonedCalendar
 from tests.fixtures.surface_payloads import astro_payload
 from tests.guolao.test_guolao_depth import chart
 
@@ -107,9 +108,9 @@ def test_year_only_does_not_accept_linear_or_unknown_lichun_boundaries(
             return (
                 almanac.SolarTerm(
                     "立春",
-                    datetime(year, 2, 4, tzinfo=timezone.utc),
-                    "",
-                    "",
+                    ZonedCalendar.from_datetime(
+                        datetime(year, 2, 4, tzinfo=timezone.utc)
+                    ),
                     resolution_provider="linear_1900_fallback",
                 ),
             )
@@ -161,24 +162,30 @@ def test_natal_year_around_independently_published_hko_minute_uses_physical_cloc
 
 
 @pytest.mark.parametrize("basis", ["jie_month", "chinese_lunar_utc8"])
-def test_optional_unavailable_month_does_not_remove_valid_year_core_or_target_sky(
+def test_early_optional_month_keeps_valid_year_core_and_available_jie(
     basis,
 ):
     result = chart(**EARLY, analysis_datetime=TARGET, guolao_month_basis=basis)
     assert "guolao" in result, result
     timing = result["guolao"]["timing"]
     monthly = timing["month_limit"]
-    assert monthly["status"] == "unassigned_calendar_unavailable"
-    assert monthly["branch"] is None
     assert len(timing["transit_bodies"]) == 11
     assert timing["small_limit"]["branch"] is not None
     if basis == "jie_month":
-        assert (
-            monthly["birth_month"]["unavailable_reason"]
-            == "jie_neighbour_calendar_year_outside_datetime_range"
-        )
-        assert "节月换算范围" in result["interpretation"]["month_limit"]
+        assert monthly["status"] == "research_partial"
+        assert monthly["branch"] == "辰"
+        assert monthly["birth_month"]["month_number"] == 11
+        assert monthly["birth_month"]["month_branch"] == "子"
+        assert monthly["birth_month"]["start_boundary"][
+            "datetime_with_offset"
+        ].startswith("0000-")
+        assert monthly["target_month"]["month_number"] == 4
+        assert monthly["calendar_mapping_classical_acceptance"] is False
+        assert "节令月序" in result["interpretation"]["month_limit"]
         assert "农历" not in result["interpretation"]["month_limit"]
+    else:
+        assert monthly["status"] == "unassigned_calendar_unavailable"
+        assert monthly["branch"] is None
 
 
 @pytest.mark.parametrize("basis", ["jie_month", "chinese_lunar_utc8"])
@@ -250,7 +257,7 @@ def test_early_native_and_partial_month_roundtrip_real_rest_mcp_cli(
             [
                 "guolao.timing.month_limit.status",
                 "guolao.timing.month_limit.branch",
-                "guolao.timing.month_limit.birth_month.unavailable_reason",
+                "guolao.timing.month_limit.birth_month.month_number",
             ]
             if leaf
             else ["guolao.timing.month_limit"]
@@ -308,6 +315,10 @@ def test_early_native_and_partial_month_roundtrip_real_rest_mcp_cli(
     assert g["god_positions"]["year_stem"] == "庚"
     assert g["life_palace"]["birth_clock"] is None
     assert not g["validation"]["classical_acceptance_passed"]
-    if basis:
+    if basis == "jie_month":
+        assert g["timing"]["month_limit"]["status"] == "research_partial"
+        assert g["timing"]["month_limit"]["branch"] == "辰"
+        assert g["timing"]["month_limit"]["birth_month"]["month_number"] == 11
+    elif basis:
         assert g["timing"]["month_limit"]["status"] == "unassigned_calendar_unavailable"
         assert g["timing"]["month_limit"]["branch"] is None

@@ -12,110 +12,102 @@ from fractions import Fraction
 from typing import Any
 
 from fatebridge.core.astro import runtime
-from fatebridge.core.ephemeris_runtime import configured_ephemeris_path
-from fatebridge.core.jyotish_balas import PLANETS, directed_angle, moon_nature_readings
+from fatebridge.core.astro.solar_events import (
+    SOLAR_EVENT_MODEL,
+    solar_crossings_in_window,
+)
+from fatebridge.core.astro.solar_observer import (
+    SOLAR_SOURCE_POLICY,
+    NativeSolarSource,
+    select_solar_source,
+    solar_source_reference,
+)
+from fatebridge.core.astro.time_scales import tt_from_ut1
+from fatebridge.core.jyotish_balas import (
+    PLANETS,
+    directed_angle,
+    moon_nature_readings,
+    strength_branch_display,
+    strength_branch_summary,
+)
 from fatebridge.core.jyotish_mean import model_balas
 from fatebridge.core.jyotish_strength import SOURCE_ID
-from fatebridge.core.jyotish_war import war_bala
+from fatebridge.core.jyotish_war import war_bala_result
 
 WEEK = ("Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn")
 HORA_ORDER = ("Sun", "Venus", "Mercury", "Moon", "Saturn", "Jupiter", "Mars")
 STAR_PLANETS = ("Mars", "Mercury", "Jupiter", "Venus", "Saturn")
-SOLAR_EVENT_ADVANCE_DAYS = 1 / 86400
 
 
 def solar_packet(
     jd_ut1: float, longitude: float, latitude: float, policy: str
 ) -> dict[str, Any]:
-    """Enumerate the supporting window, including two events in one UT1 day.
-
-    The solver returns the next event, not every event on a calendar date.
-    After each event advance the search by one second to avoid returning the
-    same numerical root. This changes the search cursor, never the event time.
-    Daily seeds remain necessary after a polar no-event result.
-    """
+    """Keep all crossings in each supporting day, without post-event cursors."""
     start = math.floor(jd_ut1 - 0.5) + 0.5 - 3
     end = start + 8
     events: dict[tuple[str, float], dict[str, Any]] = {}
-    resume: dict[str, float] = {}
     no_events = []
-    swe = runtime.swe
     with runtime.preserve_ephemeris_path():
-        swe.set_ephe_path(configured_ephemeris_path() or "")
+        source = select_solar_source(
+            tt_from_ut1(start),
+            tt_from_ut1(end),
+            require_data_files=policy == "require_data_files",
+        )
         for day in range(8):
-            for kind, flag in (("rise", swe.CALC_RISE), ("set", swe.CALC_SET)):
-                cursor = max(start + day, resume.get(kind, start))
-                day_end = start + day + 1
-                for _ in range(32):
-                    result, times = runtime.ephemeris_call(
-                        "rise_trans",
-                        cursor,
-                        swe.SUN,
-                        flag | swe.BIT_HINDU_RISING,
-                        (longitude, latitude, 0.0),
-                        0.0,
-                        0.0,
-                        swe.FLG_SWIEPH,
-                    )
-                    if result == -2:
-                        no_events.append({"search_jd_ut1": cursor, "kind": kind})
-                        break
-                    if result != 0 or not math.isfinite(times[0]):
-                        raise ValueError(
-                            "Swiss Ephemeris could not compute the supporting solar event"
-                        )
-                    event = float(times[0])
-                    if event < cursor:
-                        raise ValueError(
-                            "Supporting solar event search did not advance"
-                        )
-                    if event >= day_end:
-                        break
-                    _, retflag = runtime.ephemeris_call(
-                        "calc_ut", event, swe.SUN, swe.FLG_SWIEPH
-                    )
-                    if retflag < 0:
-                        raise ValueError(
-                            "Swiss Ephemeris could not validate the supporting Sun ephemeris"
-                        )
-                    model = runtime.ephemeris_model_from_retflag(retflag)
-                    if policy == "require_data_files" and model not in {
-                        "swieph",
-                        "jpl",
-                    }:
-                        raise ValueError(
-                            "require_data_files rejects Sun analytical fallback at supporting rise/set events"
-                        )
-                    events[(kind, event)] = {
-                        "kind": kind,
-                        "julian_day_ut1": event,
-                        "ephemeris_model": model,
-                    }
-                    cursor = event + SOLAR_EVENT_ADVANCE_DAYS
-                    resume[kind] = cursor
-                    if cursor >= day_end:
-                        break
-                else:
-                    raise ValueError(
-                        "Supporting solar event enumeration limit exceeded"
-                    )
+            day_start = start + day
+            day_end = day_start + 1
+            solved = solar_crossings_in_window(
+                day_start,
+                day_end,
+                longitude=longitude,
+                latitude=latitude,
+                definition="hindu_geometric_center",
+                source=source,
+                ephemeris_policy=(
+                    "require_data_files" if policy == "require_data_files" else "auto"
+                ),
+            )
+            daily_events = [event for event in solved if event.julian_day_ut1 < day_end]
+            for event in daily_events:
+                kind = "rise" if event.rising else "set"
+                events[(kind, event.julian_day_ut1)] = {
+                    "kind": kind,
+                    "julian_day_ut1": event.julian_day_ut1,
+                    "julian_day_tt": event.julian_day_tt,
+                    "ephemeris_model": event.ephemeris_model,
+                }
+            for kind in ("rise", "set"):
+                if not any(event.rising == (kind == "rise") for event in daily_events):
+                    no_events.append({"search_jd_ut1": day_start, "kind": kind})
     rows = sorted(events.values(), key=lambda item: item["julian_day_ut1"])
+    models = {row["ephemeris_model"] for row in rows}
+    if not models:
+        models.add(
+            source.value
+            if not isinstance(source, NativeSolarSource)
+            else runtime.ephemeris_model_from_retflag(source.requested_flags)
+        )
     return {
         "events": rows,
         "ephemeris_policy": policy,
-        "ephemeris_models": sorted({row["ephemeris_model"] for row in rows}),
-        "fallback_event_count": sum(
-            row["ephemeris_model"] not in {"swieph", "jpl"} for row in rows
-        ),
+        "ephemeris_models": sorted(models),
+        "ephemeris_sources": {
+            model: solar_source_reference(model, str(runtime.swe.version))
+            for model in sorted(models)
+        },
+        "ephemeris_source_policy": SOLAR_SOURCE_POLICY,
         "no_event_searches": no_events,
         "search_start_jd_ut1": start,
         "search_end_jd_ut1": end,
         "enumeration": {
-            "method": "daily_seeds_then_all_successive_events_before_each_day_end",
-            "post_event_search_advance_seconds": 1.0,
-            "scope": "One-second anti-repeat search cursor for same-kind solar events; returned event timestamps are unshifted. Not observational precision or a continuous proof for arbitrary bodies.",
+            "method": "all_directed_crossings_in_half_open_daily_windows",
+            "partition_hours": 24,
+            "scope": "Complete resolved crossing sequence per declared daily window; no fixed same-kind cursor or timestamp shift. Not observational precision or a continuous proof of arbitrarily small tangent arcs.",
         },
         "definition": "Swiss BIT_HINDU_RISING: geocentric solar centre, no refraction, solar ecliptic latitude ignored, zero horizon altitude",
+        "event_model": SOLAR_EVENT_MODEL,
+        "equatorial_frame": "selected_physical_equator_and_equinox_of_date",
+        "search_window_hours": 192,
         "scope": "UT1 event coordinates, not UTC timestamps; finite supporting window, no invented polar sunrise",
     }
 
@@ -253,13 +245,15 @@ def solar_parts(
 
 
 def nathonnatha(meridian: float, sun_ra: float) -> dict[str, float]:
+    """Render both source formulas from the same unrounded meridian arc."""
     arc = directed_angle(sun_ra, meridian)
-    day_value = float(60 - min(arc, 360 - arc) / 3)
+    night = min(arc, 360 - arc) / 3
+    day_value, night_value = float(60 - night), float(night)
     return {
         p: (
             60.0
             if p == "Mercury"
-            else day_value if p in {"Sun", "Jupiter", "Venus"} else 60 - day_value
+            else day_value if p in {"Sun", "Jupiter", "Venus"} else night_value
         )
         for p in PLANETS
     }
@@ -278,8 +272,14 @@ def ayana_values(declinations: dict[str, float]) -> dict[str, float]:
 
 
 def paksha_scenarios(longitudes: dict[str, float]) -> dict[str, Any]:
+    return _paksha_results(longitudes)[0]
+
+
+def _paksha_results(
+    longitudes: dict[str, float],
+) -> tuple[dict[str, Any], dict[str, dict[str, Fraction]]]:
     elongation = directed_angle(longitudes["Sun"], longitudes["Moon"])
-    benefic = float(min(elongation, 360 - elongation) / 3)
+    benefic = min(elongation, 360 - elongation) / 3
     options = moon_nature_readings(elongation)
     scenarios = {}
     for moon in options["options"]:
@@ -291,21 +291,15 @@ def paksha_scenarios(longitudes: dict[str, float]) -> dict[str, Any]:
             values["Mercury"] = benefic if mercury == "benefic" else 60 - benefic
             values["Moon"] = 2 * (benefic if moon == "benefic" else 60 - benefic)
             scenarios[f"moon_{moon}__mercury_{mercury}"] = values
-    return {
-        "scenarios": scenarios,
-        "benefic_value": benefic,
-        "malefic_value": 60 - benefic,
+    result = {
+        "summary": strength_branch_summary(scenarios),
+        "scenarios": strength_branch_display(scenarios),
+        "benefic_value": float(benefic),
+        "malefic_value": float(60 - benefic),
         "moon_readings": options,
         "scope": "Santhanam27.10-11 grouping and doubled Moon; conflicting nature readings retained, not a physical illumination percentage",
     }
-
-
-def consensus(scenarios: dict[str, dict[str, Any]]) -> dict[str, float | None]:
-    result = {}
-    for p in PLANETS:
-        values = {branch[p] for branch in scenarios.values()}
-        result[p] = next(iter(values)) if len(values) == 1 else None
-    return result
+    return result, scenarios
 
 
 def temporal_balas(
@@ -334,7 +328,7 @@ def temporal_balas(
     )
     declinations = {p: raw["equatorial"][p]["declination"] for p in PLANETS}
     ayana = ayana_values(declinations)
-    paksha = paksha_scenarios(raw["longitudes"])
+    paksha, exact_paksha = _paksha_results(raw["longitudes"])
     tribhaga = one_lord(parts["tribhaga_lord"], 60)
     tribhaga["Jupiter"] = 60.0
     components: dict[str, Any] = {
@@ -342,7 +336,7 @@ def temporal_balas(
             "summary": natha,
             "rule": "27.8-9 apparent solar meridian, not civil clock",
         },
-        "paksha_bala": {"summary": consensus(paksha["scenarios"]), **paksha},
+        "paksha_bala": paksha,
         "tribhaga_bala": {
             "summary": tribhaga,
             "ruler": parts["tribhaga_lord"],
@@ -374,28 +368,32 @@ def temporal_balas(
             ],
         },
     }
-    components["yuddha_bala"] = war_bala(
-        raw["longitudes"], components, paksha["scenarios"], sthana, dig
+    components["yuddha_bala"], exact_war = war_bala_result(
+        raw["longitudes"], components, exact_paksha, sthana, dig
     )
-    scenarios: dict[str, dict[str, Any]] = {}
-    for name, lunar in paksha["scenarios"].items():
-        values = {}
+    scenarios: dict[str, dict[str, Fraction | None]] = {}
+    for name, lunar in exact_paksha.items():
+        values: dict[str, Fraction | None] = {}
         for p in PLANETS:
             inputs = [
                 (
                     lunar[p]
                     if key == "paksha_bala"
                     else (
-                        part["scenarios"][name][p]
+                        exact_war[name][p]
                         if key == "yuddha_bala"
                         else part["summary"][p]
                     )
                 )
                 for key, part in components.items()
             ]
-            values[p] = None if any(v is None for v in inputs) else sum(inputs)
+            values[p] = (
+                None
+                if None in inputs
+                else sum((Fraction(v) for v in inputs if v is not None), Fraction())
+            )
         scenarios[name] = values
-    summary = consensus(scenarios)
+    summary = strength_branch_summary(scenarios)
     missing = [
         name
         for name, part in components.items()
@@ -420,8 +418,9 @@ def temporal_balas(
             )
             for p in PLANETS
         }
-        for name, lunar in paksha["scenarios"].items()
+        for name, lunar in exact_paksha.items()
     }
+    motion_summary = strength_branch_summary(lunar_motion)
     return {
         "kala_bala": {
             "temporal_scope": "natal birth instant; not analysis_year/as_of transits or future-year rulership",
@@ -431,8 +430,14 @@ def temporal_balas(
             "source_id": SOURCE_ID,
             "source_section": "27.8-17 printed268-283; conditional war formula separately Raman76-77",
             "summary": summary,
+            "conditional_targets": [
+                p
+                for p in PLANETS
+                if summary[p] is None
+                and all(row[p] is not None for row in scenarios.values())
+            ],
             "components": components,
-            "scenarios": scenarios,
+            "scenarios": strength_branch_display(scenarios),
             "missing_components": missing,
             "calendar_context": {
                 **calendar,
@@ -448,7 +453,7 @@ def temporal_balas(
             "rule_ids": [
                 "jyotish.kala_components.v1",
                 "jyotish.solar_component_dependencies.v1",
-                "jyotish.solar_event_enumeration.v1",
+                "jyotish.solar_event_enumeration.v2",
                 "jyotish.yuddha_raman_76_77.v1",
             ],
             "interpretation_scope": "Traditional temporal components under declared readings, not empirical probability. Partial/conditional values cannot certify complete Shadbala or full classical acceptance.",
@@ -465,8 +470,14 @@ def temporal_balas(
             "unit": "virupa",
             "source_id": SOURCE_ID,
             "source_section": "27.18 printed284 luminaries;27.24-25 printed285 angular formula; five-star mean model declared separately",
-            "summary": consensus(lunar_motion),
-            "scenarios": lunar_motion,
+            "summary": motion_summary,
+            "conditional_targets": [
+                p
+                for p in PLANETS
+                if motion_summary[p] is None
+                and all(row[p] is not None for row in lunar_motion.values())
+            ],
+            "scenarios": strength_branch_display(lunar_motion),
             "model_context": motion_model["model_context"],
             "missing_planets": [
                 p for p in STAR_PLANETS if motion_model["summary"][p] is None

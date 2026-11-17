@@ -248,7 +248,16 @@ def test_all_twelve_months_eleven_entries_actual_transports_and_scope_controls(
             value = value[part]
         values.append(value)
     climate, force, duty, passage = values
-    assert set(force.values()) == {"not_adjudicated"} and duty == "not_adjudicated"
+    assert force["status"] == "not_adjudicated" and duty == "not_adjudicated"
+    assert all(
+        force[field] is None
+        for field in (
+            "body_strength",
+            "seal_weight",
+            "body_seal_relation",
+            "ordinary_fuyi_applicable",
+        )
+    )
     assert passage["effective_passage"] == "not_adjudicated"
     assert climate["chart_adjudication_status"] == "not_performed"
     if case["kind"] == "bing":

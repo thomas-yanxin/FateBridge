@@ -1,7 +1,6 @@
 """Frozen Ren boundary cohorts, clock attribution and actual protocol parity."""
 
 import asyncio
-import json
 import shutil
 from datetime import datetime
 
@@ -42,24 +41,23 @@ def test_protocol_keeps_full_denominators_and_original_acceptance_rules(frozen):
     assert protocol["model_processes"] == 0
 
 
-@pytest.mark.parametrize("change", ["inventory", "protocol", "manifest"])
+@pytest.mark.parametrize("change", ["replacement", "bytes", "truncated"])
 def test_audit_refuses_modified_frozen_protocol_before_computation(change, tmp_path):
     target = tmp_path / "fixture"
     shutil.copytree(FIXTURE, target)
-    if change == "inventory":
-        (target / "extra.json").write_text("{}")
-    elif change == "protocol":
-        (target / "protocol.json").write_text("{}")
+    path = target / "reference.json.gz"
+    if change == "replacement":
+        path.write_bytes(b"{}")
+    elif change == "bytes":
+        path.write_bytes(path.read_bytes() + b"changed")
     else:
-        (target / "freeze.json").write_text("{}")
+        path.write_bytes(path.read_bytes()[:100])
     with pytest.raises(ValueError, match="changed"):
         reference(target)
 
 
 def test_term_year_month_and_zhongqi_changes_are_distinct(frozen):
-    calendar = json.loads(
-        (ROOT / "tests/fixtures/ren_calendar_v1/reference.json").read_text()
-    )
+    calendar = frozen["calendar"]
     roots = frozen["roots"]
     general_map = frozen["protocol"]["reference_maps"]["general_by_last_term"]
     changes = dict(term=0, year=0, month=0, general=0)
@@ -161,12 +159,7 @@ def test_ren_boundary_facts_and_clock_attribution_agree_on_three_protocols(
     try:
         probe = next(v for v in frozen["probes"] if v["id"] == identifier)
         moment = datetime.fromisoformat(probe["civil_utc"])
-        cal = json.loads(
-            (ROOT / "tests/fixtures/ren_calendar_v1/reference.json").read_text()
-        )
-        rules = json.loads(
-            (ROOT / "tests/fixtures/ren_classical_v1/rules.json").read_text()
-        )
+        cal, rules = frozen["calendar"], frozen["rules"]
         expected = expectations(
             expected_state(
                 frozen["roots"], ephemeris_time(moment).jd_tt, cal["month_starts"]
@@ -243,10 +236,8 @@ def test_ren_boundary_facts_and_clock_attribution_agree_on_three_protocols(
             for dep in policy["solar_term_dependencies"]:
                 assert dep["provider"] == ("jpl_spk" if mode == "spk" else "swisseph")
                 if mode == "spk":
-                    assert (
-                        dep["solar_model_details"]["kernel_sha256"]
-                        == frozen["protocol"]["kernel_sha256"]
-                    )
+                    assert dep["solar_model_details"]["kernel_filename"] == kernel.name
+                    assert dep["solar_model_details"]["kernel_type"] == "DAF/SPK_type2"
                     assert dep["ephemeris_retflags"] == []
                 elif moment.year == 1960:
                     assert dep["civil_time_method"].startswith("SOFA_1960")

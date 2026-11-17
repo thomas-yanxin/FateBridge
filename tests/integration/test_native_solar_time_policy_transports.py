@@ -41,8 +41,8 @@ async def stdio(payload, options, log):
     "year,method,historical,future",
     [
         (1700, "pre_1972_swiss_UT1_delta_t", True, False),
-        (1972, "IERS_UTC_to_TT_swiss_delta_t_to_UT1", False, False),
-        (2300, "IERS_UTC_to_TT_swiss_delta_t_to_UT1", False, True),
+        (1972, "IERS_UTC_to_TT", False, False),
+        (2300, "IERS_UTC_to_TT", False, True),
     ],
 )
 @pytest.mark.parametrize("project", [False, True])
@@ -81,12 +81,12 @@ def test_actual_three_protocol_native_policy(
             calendar["bazi_month_boundary"]["next_term"],
         ]:
             details = term["solar_model_details"]
-            assert term["resolution_provider"] == "fatebridge_moshier"
+            assert term["resolution_provider"] == "jpl_de441"
             assert (
                 term["ephemeris_model"]
                 == details["model_id"]
                 == details["ephemeris_model"]
-                == "fatebridge_complete_moshier_solar_v1"
+                == "fatebridge_de441_solar_v1"
             )
             assert "ephemeris_retflags" not in term
             assert "ephemeris_retflags" not in details

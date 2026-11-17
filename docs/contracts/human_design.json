@@ -353,7 +353,7 @@
         "validation.all_three_axes_full_marks",
         "validation.prediction"
       ],
-      "purpose": "实际设计数值根的1或2个TT端点、13激活与完整解释依赖摘要；求根和实际太阳统一坐标旗标并逐位绑定。有限太阳邻点若出现多组数值括区/零值，local_root_family_summary另列各候选实际整盘；主盘仍按原括区选根，不为数值噪声换根。完整端点与额外候选见同一run的design_solver.numerical_precision，不拼接候选，不把邻点唯一性、候选相同或不同当物理误差界及连续稳定认证。"
+      "purpose": "实际设计数值根的1或2个TT端点、13激活与完整解释依赖摘要；求根和实际太阳统一坐标旗标并逐位绑定。主盘在已观测正到负括区及精确零点中按绝对精确残差、较早TT选根；local_root_family_summary另列全部多接触候选的实际整盘。初始括区、完整邻点、最终端点与候选见同一run的design_solver.numerical_precision；不拼接候选，不将有限最优性、候选异同当作全域最优、物理误差界或连续稳定认证。"
     },
     "source_files": {
       "fields": [

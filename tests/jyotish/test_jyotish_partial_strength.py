@@ -252,11 +252,23 @@ def test_actual_1977_origin_pair_magnitude_reaches_three_surfaces_without_a_verd
     assert war["summary"]["Mars"] is war["summary"]["Venus"] is None
     for branch in war["evidence"].values():
         inputs = branch["prewar_basis"]
-        left = sum((Fraction(v) for v in inputs["Mars"]["inputs"].values()), Fraction())
-        right = sum(
-            (Fraction(v) for v in inputs["Venus"]["inputs"].values()), Fraction()
-        )
+        totals = []
+        for p in ("Mars", "Venus"):
+            basis = inputs[p]
+            paksha = Fraction(basis["exact_paksha_virupa"])
+            assert float(paksha) == basis["inputs"]["paksha_bala"]
+            totals.append(
+                paksha
+                + sum(
+                    (
+                        Fraction(v)
+                        for key, v in basis["inputs"].items()
+                        if key != "paksha_bala"
+                    ),
+                    Fraction(),
+                )
+            )
         assert branch["pairs"][0]["amount_virupa"] == float(
-            abs(left - right) / Fraction("7.2")
+            abs(totals[0] - totals[1]) / Fraction("7.2")
         )
     assert india["strengths"]["shadbala_assessment"]["total_virupa"] is None

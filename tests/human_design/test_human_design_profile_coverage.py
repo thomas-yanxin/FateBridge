@@ -1,9 +1,7 @@
 """The new bounded cohort must retain missing strata and literal failures."""
 
 import hashlib
-import importlib.util
 import json
-import sys
 from copy import deepcopy
 from fractions import Fraction
 from pathlib import Path
@@ -12,29 +10,15 @@ import pytest
 
 from fatebridge.validation.human_design import verify_human_design_reading
 from fatebridge.validation.human_design_official import official_chart_checks
+from scripts.human_design import (
+    build_human_design_profile_coverage as profile_coverage_builder,
+)
 
 ROOT = Path(__file__).resolve().parents[2]
-SCRIPTS = ROOT / "scripts"
 EVIDENCE = ROOT / "tests/data/human_design/profile_observations"
 PLAN_PATH = ROOT / "tests/fixtures/human-design-profile-coverage-plan.json"
 PLAN = json.loads(PLAN_PATH.read_text())
 COHORT = json.loads((EVIDENCE / "cohort.json").read_text())
-
-
-def builder_module():
-    # The builder's dependencies parse source PDFs only; no engine import is
-    # used to manufacture official expected activations or labels.
-    sys.path.insert(0, str(SCRIPTS))
-    try:
-        spec = importlib.util.spec_from_file_location(
-            "profile_coverage_builder",
-            SCRIPTS / "build_human_design_profile_coverage.py",
-        )
-        module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(module)
-        return module
-    finally:
-        sys.path.remove(str(SCRIPTS))
 
 
 def test_all768_inputs_are_frozen_disjoint_and_not_official_expected_values():
@@ -103,7 +87,9 @@ def test_rational_profile_intervals_cover_the_gate_without_gaps_or_overlap():
 
 def test_source_only_builder_reproduces_all24_without_hiding744_missing_rows():
     assert (
-        builder_module().build(EVIDENCE / "observations.jsonl", EVIDENCE / "pdfs")
+        profile_coverage_builder.build(
+            EVIDENCE / "observations.jsonl", EVIDENCE / "pdfs"
+        )
         == COHORT
     )
     assert COHORT["collection_status"] == "incomplete"
@@ -116,7 +102,7 @@ def test_source_only_builder_reproduces_all24_without_hiding744_missing_rows():
 
 def test_complete_mode_rejects_the_passing_subset():
     with pytest.raises(ValueError, match="744 planned rows missing"):
-        builder_module().build(
+        profile_coverage_builder.build(
             EVIDENCE / "observations.jsonl", EVIDENCE / "pdfs", require_complete=True
         )
 
@@ -158,7 +144,7 @@ def test_builder_rejects_source_binding_corruption_without_replacing_cases(
     observation = tmp_path / "mutated.jsonl"
     observation.write_text("\n".join(json.dumps(r) for r in rows) + "\n")
     with pytest.raises(ValueError):
-        builder_module().build(observation, EVIDENCE / "pdfs")
+        profile_coverage_builder.build(observation, EVIDENCE / "pdfs")
 
 
 def test_all624_gate_lines24_mechanics_and18_literal_failures_are_retained():

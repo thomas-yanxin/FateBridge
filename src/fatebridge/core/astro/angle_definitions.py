@@ -13,6 +13,7 @@ import sys
 from typing import Any, Dict, Optional
 
 from fatebridge.core.astro import runtime
+from fatebridge.core.astro.earth_attitude import earth_attitude
 
 # R is the length of the horizon normal projected onto the ecliptic plane.
 # Normalizing the intersection amplifies perturbations by roughly 1/R. Below
@@ -99,16 +100,16 @@ def ecliptic_horizon_angle_definition(
 
 
 def native_ecliptic_horizon_angle_definition(
-    *, julian_day_ut1: float, latitude: float, armc: float
+    *,
+    julian_day_ut1: float,
+    latitude: float,
+    armc: float,
+    julian_day_tt: float | None = None,
 ) -> Optional[Dict[str, Any]]:
-    """Use the same true obliquity and UT1 argument as houses_ex, not an offset.
+    """Use the managed house equator and its exact selected epoch.
 
-    |A| alone lower-bounds R, so most charts need no extra native call.
-    houses_ex internally uses jd_ut1 + deltat_ex(jd_ut1, house_flags). For
-    our flags=0/SIDEREAL both use the no-ephemeris-bit Delta T convention.
-    calc_ut defaults its ephemeris bit to SWIEPH, which can select a different
-    tidal acceleration for ancient dates. Do not substitute it here. A sidereal
-    zodiac does not rotate the physical horizon or equatorial ascmc[2].
+    |A| alone lower-bounds R, so ordinary charts need no extra reduction.
+    The longitude origin does not change the intersection's conditioning.
     """
     if abs(math.cos(math.radians(latitude)) * math.cos(math.radians(armc))) > (
         INTERSECTION_CONDITION_THRESHOLD
@@ -116,16 +117,11 @@ def native_ecliptic_horizon_angle_definition(
         return None
     if runtime.swe is None:
         raise ValueError("Native angle conditioning requires Swiss Ephemeris")
-    delta_t = float(runtime.ephemeris_call("deltat_ex", julian_day_ut1, 0))
-    ecliptic, flags = runtime.ephemeris_call(
-        "calc", julian_day_ut1 + delta_t, runtime.swe.ECL_NUT, 0
-    )
-    if flags < 0:
-        raise ValueError("Native angle conditioning has no valid obliquity")
+    attitude = earth_attitude(runtime.swe, julian_day_ut1, julian_day_tt=julian_day_tt)
     return ecliptic_horizon_angle_definition(
         latitude=latitude,
         armc=armc,
-        obliquity=float(ecliptic[0]),
+        obliquity=attitude.reduction.house_obliquity,
         angle_method="swisseph",
     )
 

@@ -12,6 +12,8 @@ from pydantic import ValidationError
 
 from fatebridge.core import almanac
 from fatebridge.core import heluo_solar_context as source
+from fatebridge.core.de441_solar import MODEL_ID as DE441_MODEL
+from fatebridge.core.de441_solar import PROVIDER as DE441_PROVIDER
 from fatebridge.core.ephemeris_runtime import (
     configure_ephemeris_path,
     configured_ephemeris_path,
@@ -78,9 +80,11 @@ def test_endpoint_local_year_not_utc_year_and_exact_consumed_boundaries(
                 "auto": "jpl_de440",
                 "de440": "jpl_de440",
                 "analytic": "fatebridge_analytic",
-                "native": "swisseph",
+                "native": DE441_PROVIDER,
             }[mode]
         )
+        if mode == "native":
+            assert row["record"]["ephemeris_model"] == DE441_MODEL
     HeluoSolarTermEvidence.model_validate(actual)
 
 

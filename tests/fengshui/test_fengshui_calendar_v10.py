@@ -11,10 +11,10 @@ import pytest
 from fatebridge.cli import run
 from fatebridge.core import almanac
 from fatebridge.core.astro.time_scales import leap_table
+from fatebridge.core.de441_solar import MODEL_ID as DE441_MODEL
 from fatebridge.core.fengshui.calendar import lichun_resolution
 from fatebridge.services.fengshui import calculate_annual_stars
 from fatebridge.services.run_metadata import attach_run_metadata
-from fatebridge.utils.errors import EphemerisSourceError
 from fatebridge.validation.fengshui_calendar import audit_lichun_reference
 from tests.fixtures.fengshui import payload
 from tests.support.fengshui_transports import mcp_call
@@ -83,21 +83,25 @@ def test_one_changed_reference_row_is_reported_as_a_failed_comparison():
     assert not audit["comparisons"][0]["within_tolerance"]
 
 
-@pytest.fixture(params=["missing_dependency", "solver_failure"])
-def unavailable_native(monkeypatch, request):
-    # These faults target Swiss, not the independent packaged DE440 model.
-    # Keep the default model's numerical audit above unmodified.
-    monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
-    if request.param == "missing_dependency":
+@pytest.fixture(params=["missing_strict_dependency", "solver_failure"])
+def unavailable_source(monkeypatch, request):
+    # Strict Swiss requires its actual dependency. Optional native selection
+    # can instead use the named bundled DE441 path, tested separately below.
+    strict = request.param == "missing_strict_dependency"
+    monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "swiss" if strict else "native")
+    if strict:
         monkeypatch.setattr(almanac, "swe", None)
     else:
         monkeypatch.setattr(almanac, "_solar_term_utc_via_swe", lambda *args: None)
     almanac.get_solar_terms_for_year.cache_clear()
-    yield
+    yield "solar_swiss_files_required" if strict else "solar_native_unavailable"
     almanac.get_solar_terms_for_year.cache_clear()
 
 
-def test_real_fallback_never_passes_independent_numeric_acceptance(unavailable_native):
+@pytest.mark.parametrize("unavailable_source", ["solver_failure"], indirect=True)
+def test_failed_solver_cannot_pass_the_complete_independent_reference(
+    unavailable_source,
+):
     audit = audit_lichun_reference(REFERENCE)
     assert audit["rows"] == audit["failed_count"] == 421
     assert audit["matched"] == 0 and not audit["all_scoped_tt_checks_passed"]
@@ -107,7 +111,7 @@ def test_real_fallback_never_passes_independent_numeric_acceptance(unavailable_n
 
 @pytest.mark.parametrize("name", ["annual_stars", "minggua", "xuankong_natal"])
 def test_unavailable_native_crossing_is_rejected_on_every_public_surface(
-    unavailable_native, monkeypatch, tmp_path, capsys, name
+    unavailable_source, monkeypatch, tmp_path, capsys, name
 ):
     inputs = (
         {"effective_year": 2026}
@@ -131,8 +135,67 @@ def test_unavailable_native_crossing_is_rejected_on_every_public_surface(
     for body in (http.json(), protocol.structured_content, cli):
         assert body["error_code"] == "ephemeris_source_inconsistent"
         assert body["retryable"] is False
-        assert body["issues"][0]["code"] == "solar_native_unavailable"
+        assert body["issues"][0]["code"] == unavailable_source
         assert "layers" not in body
+
+
+def test_optional_native_without_swiss_retains_the_original_independent_gate(
+    monkeypatch,
+):
+    monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
+    monkeypatch.setattr(almanac, "swe", None)
+    almanac.get_solar_terms_for_year.cache_clear()
+    try:
+        audit = audit_lichun_reference(REFERENCE)
+        assert audit["rows"] == audit["matched"] == 421
+        assert audit["failed_count"] == 0 and audit["all_scoped_tt_checks_passed"]
+        assert audit["tolerance_seconds"] == 1.0
+        for comparison in audit["comparisons"]:
+            resolution = comparison["resolution"]
+            assert resolution["provider"] == "jpl_de441"
+            assert resolution["ephemeris_model"] == DE441_MODEL
+            details = resolution["solar_model_details"]
+            assert details["native_moshier_relabelled"] is False
+            assert details["accuracy_certified"] is False
+            assert "ephemeris_retflags" not in details
+    finally:
+        almanac.get_solar_terms_for_year.cache_clear()
+
+
+@pytest.mark.parametrize("name", ["annual_stars", "minggua", "xuankong_natal"])
+def test_named_bundled_source_remains_available_across_public_surfaces(
+    monkeypatch, tmp_path, capsys, name
+):
+    monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
+    monkeypatch.setattr(almanac, "swe", None)
+    almanac.get_solar_terms_for_year.cache_clear()
+    inputs = (
+        {"effective_year": 2026}
+        if name == "annual_stars"
+        else {"birth_date": "2000-07-01", "gender_convention": "male"}
+    )
+    if name == "xuankong_natal":
+        inputs = payload(name)
+        inputs["period"] = {
+            "basis": "construction_completion",
+            "effective_event_year": 2004,
+            "evidence": "synthetic explicit historical event",
+        }
+    try:
+        http = rest_client(monkeypatch).post("/api/fengshui/" + name, json=inputs)
+        protocol = asyncio.run(mcp_call(name, inputs))
+        path = tmp_path / "request.json"
+        path.write_text(json.dumps(inputs))
+        code = run(["fengshui_" + name, "--request-file", str(path)])
+        cli = json.loads(capsys.readouterr().out)
+        assert http.status_code == 200 and code == 0 and not protocol.is_error
+        assert (
+            without_transport(http.json())
+            == without_transport(protocol.structured_content)
+            == without_transport(cli)
+        )
+    finally:
+        almanac.get_solar_terms_for_year.cache_clear()
 
 
 @pytest.mark.parametrize(

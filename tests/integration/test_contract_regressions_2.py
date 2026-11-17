@@ -443,10 +443,10 @@ def test_mixed_pair_catalogue_across_three_surfaces(
     "year,method,historical,future",
     [
         (1700, "pre_1972_swiss_UT1_delta_t", True, False),
-        (1965, "IERS_1961_1971_UTC_drift_to_TT_swiss_delta_t_to_UT1", False, False),
-        (1972, "IERS_UTC_to_TT_swiss_delta_t_to_UT1", False, False),
-        (2000, "IERS_UTC_to_TT_swiss_delta_t_to_UT1", False, False),
-        (2300, "IERS_UTC_to_TT_swiss_delta_t_to_UT1", False, True),
+        (1965, "IERS_1961_1971_UTC_drift_to_TT", False, False),
+        (1972, "IERS_UTC_to_TT", False, False),
+        (2000, "IERS_UTC_to_TT", False, False),
+        (2300, "IERS_UTC_to_TT", False, True),
     ],
 )
 def test_actual_native_calendar_carries_each_clock_policy(
@@ -461,12 +461,12 @@ def test_actual_native_calendar_carries_each_clock_policy(
         details = term.as_dict()["solar_model_details"]
         # Native file fallback now solves the named complete revision, not
         # the stock Swiss Sun. Its identity must not borrow native Sun flags.
-        assert term.resolution_provider == "fatebridge_moshier"
+        assert term.resolution_provider == "jpl_de441"
         assert (
             term.ephemeris_model
             == details["model_id"]
             == details["ephemeris_model"]
-            == "fatebridge_complete_moshier_solar_v1"
+            == "fatebridge_de441_solar_v1"
         )
         assert term.ephemeris_retflags == ()
         assert "ephemeris_retflags" not in details
@@ -476,7 +476,7 @@ def test_actual_native_calendar_carries_each_clock_policy(
         assert details["future_leap_seconds_assumed_unchanged"] is future
         assert details["accuracy_certified"] is False
         assert details["root_time_scale"] == "TT"
-        assert details["civil_time_method"] == "datetime_from_tt_point"
+        assert details["civil_time_method"] == "utc_calendar_from_tt"
         assert details["numerical_resolution_is_physical_accuracy"] is False
 
 
@@ -494,23 +494,30 @@ def test_policy_failure_on_selected_root_cannot_become_linear(
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
 
+    calls = []
+
     def fail(*args):
+        calls.append(args)
         raise error
 
-    monkeypatch.setattr(solar_term_clock, "ephemeris_time", fail)
+    monkeypatch.setattr(solar_term_clock, "utc_clock", fail)
     with pytest.raises(solar_term_clock.SolarTermClockError) as caught:
         almanac.get_solar_terms_for_year(2000, "UTC")
     assert caught.value.reason == reason
+    assert calls
     assert "private" not in str(caught.value.as_result())
 
 
 def test_original_policy_source_error_is_preserved(monkeypatch):
     error = EphemerisSourceError("solar_spk_changed")
 
+    calls = []
+
     def fail(*args):
+        calls.append(args)
         raise error
 
-    monkeypatch.setattr(solar_term_clock, "ephemeris_time", fail)
+    monkeypatch.setattr(solar_term_clock, "utc_clock", fail)
     from datetime import datetime, timezone
 
     with pytest.raises(EphemerisSourceError) as caught:
@@ -518,6 +525,7 @@ def test_original_policy_source_error_is_preserved(monkeypatch):
             datetime(2000, 1, 1, tzinfo=timezone.utc)
         )
     assert caught.value is error
+    assert len(calls) == 1
 
 
 @pytest.mark.parametrize(

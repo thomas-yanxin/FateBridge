@@ -302,6 +302,41 @@ def test_dwelling_retains_unknown_lunar_histories_and_numerical_ambiguity(ambigu
     assert result["full_judgement_accepted"] is False
 
 
+@pytest.mark.parametrize("past", [False, True])
+@pytest.mark.parametrize("extra_first", [False, True])
+@pytest.mark.parametrize("other_ray", ["sextile", "square", "trine"])
+@pytest.mark.parametrize("occupied", [1, 10, None])
+def test_unordered_contacts_do_not_turn_a_historical_ray_into_a_definite_failure(
+    past, extra_first, other_ray, occupied
+):
+    states, history = dwelling_inputs()
+    states["Mars"]["occupied_house"] = occupied
+    for event, delta in zip(history["events"], [-1, 1]):
+        at = 2451545.0 + delta
+        event["root_bracket_tt"] = [at, math.nextafter(at, math.inf)]
+    index = 0 if past else 1
+    extra = deepcopy(history["events"][index])
+    extra["bodies"] = ["Moon", "Jupiter"]
+    extra["aspect"] = other_ray
+    history["events"].insert(index if extra_first else index + 1, extra)
+    result = clause(states, history)
+    field = (
+        "moon_separating_from_prior_source_ray_now"
+        if past
+        else "moon_applying_to_next_recipient_ray_now"
+    )
+    assert result[field] is None
+    assert result["lunar_sequence_subconditions_satisfied"] is None
+    assert result["named_necessary_conditions_satisfied"] is (
+        False if occupied == 10 else None
+    )
+    # The current pair phases remain known. The qualification above belongs
+    # specifically to linking those phases with an ordered historical contact.
+    assert _applying_aspect(states["Moon"], states["Mars"])["phase"] == "separating"
+    assert _applying_aspect(states["Moon"], states["Venus"])["phase"] == "applying"
+    assert result["full_judgement_accepted"] is False
+
+
 def test_dwelling_role_collisions_and_unknown_occupancy_are_explicit():
     states, history = dwelling_inputs()
     for a, b in [("Mars", "Mars"), ("Moon", "Mars"), ("Venus", "Moon")]:

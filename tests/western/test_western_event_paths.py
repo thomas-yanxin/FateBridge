@@ -4,6 +4,8 @@ import hashlib
 import json
 import math
 from copy import deepcopy
+from decimal import Decimal, localcontext
+from fractions import Fraction
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -132,6 +134,36 @@ def test_lilly_refranation_is_a_real_reversal_before_contact_not_a_speed_extrapo
     assert pattern["station"]["direction"] == -1
 
 
+def test_principal_tangent_before_reversal_keeps_refranation_unknown():
+    # The relative longitude is -(t-1/16)^2. It touches conjunction at
+    # t=1/16 while both planets remain prograde; Mercury reverses at t=9/16.
+    # Treating only crossing roots as contacts would invent "reversal before
+    # conjunction". The unclassified tangent must retain unknown judgement.
+    history, states = synthetic(
+        {"Mercury": 15 - 0.0625**2, "Saturn": 15},
+        {"Mercury": 1.125, "Saturn": 1.0},
+        acceleration={"Mercury": -2},
+        past=0.1,
+        future=1,
+    )
+    contacts = [
+        e
+        for e in history["events"]
+        if e["kind"] == "contact" and set(e["bodies"]) == {"Mercury", "Saturn"}
+    ]
+    assert len(contacts) == 1
+    assert contacts[0]["julian_day_tt"] == 2451545.0625
+    assert contacts[0]["topology"] == "relative_station_contact_unresolved"
+    result = paths(history, states, "Mercury", "Saturn")
+    assert not result["refranation_patterns"]
+    condition = next(
+        c
+        for c in result["paths"][0]["conditions"]
+        if c["code"] == "no_selected_refranation_pattern"
+    )
+    assert condition["passed"] is None
+
+
 def test_a_station_exactly_on_a_scan_boundary_is_not_lost():
     def sample(p, t):
         return (
@@ -164,6 +196,68 @@ def test_two_contacts_inside_one_cell_are_split_at_relative_speed_reversal():
         [0.0625 - math.sqrt(0.001), 0.0625 + math.sqrt(0.001)], abs=1e-11
     )
     assert [e["direction"] for e in contacts] == [1, -1]
+
+
+@pytest.mark.parametrize("ray", [0, 60, 90, 120, 180, 240, 270, 300])
+@pytest.mark.parametrize("direction", [-1, 1])
+@pytest.mark.parametrize("speed", [2**-20, 1.0])
+@pytest.mark.parametrize("origin", [0.1, 123.456789])
+@pytest.mark.parametrize("epoch", [0.0, 2451545.0])
+def test_contact_root_brackets_retain_supplied_longitude_residual(
+    ray, direction, speed, origin, epoch
+):
+    nominal_root = epoch + 0.0625
+
+    def sample(planet, at):
+        # This supplies controlled binary64 coordinates. Fraction constructs
+        # the input trajectory; the independent check below uses Decimal.
+        longitude = (
+            float(
+                (
+                    Fraction(origin)
+                    + ray
+                    + direction
+                    * Fraction(speed)
+                    * (Fraction(at) - Fraction(nominal_root))
+                )
+                % 360
+            )
+            if planet == "Mercury"
+            else origin
+        )
+        return dict(
+            longitude=longitude,
+            speed=direction * speed if planet == "Mercury" else 0.0,
+        )
+
+    history = solve_planetary_events(
+        epoch,
+        sample,
+        past_days=0,
+        future_days=0.125,
+        bodies=("Mercury", "Saturn"),
+    )
+    contacts = [e for e in history["events"] if e["kind"] == "contact"]
+    assert len(contacts) == 1
+    event = contacts[0]
+    assert event["ray_degrees"] == ray and event["direction"] == direction
+    left, right = event["root_bracket_tt"]
+    assert left == right or math.nextafter(left, math.inf) == right
+    with localcontext() as context:
+        context.prec = 100
+        residuals = []
+        for at in (left, right):
+            residual = (
+                Decimal.from_float(sample("Mercury", at)["longitude"])
+                - Decimal.from_float(origin)
+                - ray
+            )
+            while residual < -180:
+                residual += 360
+            while residual >= 180:
+                residual -= 360
+            residuals.append(residual)
+    assert 0 in residuals or (residuals[0] < 0) != (residuals[1] < 0)
 
 
 def test_tangent_contact_and_continuous_exact_contact_are_not_ordinary_crossings():
@@ -271,6 +365,56 @@ def test_absence_and_native_failure_are_unknown_not_a_negative_full_judgement():
         native_planetary_events(SimpleNamespace(julian_day_tt=2451545.0))["status"]
         == "unavailable"
     )
+
+
+def test_event_search_releases_unpublished_policies_and_keeps_question_receipts(
+    monkeypatch,
+):
+    import gc
+    import weakref
+
+    from fatebridge.core import horary_events as events
+
+    class Policy:
+        pass
+
+    at = 2451545.0
+    observed = []
+
+    def state(planet, *, julian_day_tt, motion_metadata, source_trace):
+        metadata = motion_metadata if motion_metadata is not None else {}
+        policy = Policy()
+        metadata.setdefault("sample_policies", {})[planet] = policy
+        observed.append((julian_day_tt, weakref.ref(policy)))
+        return {
+            "longitude": 42.0 + (julian_day_tt - at) / 10,
+            "latitude": 0.0,
+            "longitude_speed": 0.1,
+        }, "moshier"
+
+    def search(epoch, sample):
+        for step in range(1, 9):
+            for planet in events.BODIES:
+                value = sample(planet, epoch + step / 8)
+                assert value["speed"] == 0.1
+                assert value["longitude"] == 42.0 + step / 80
+        gc.collect()
+        assert all(ref() is None for epoch, ref in observed if epoch != at)
+        return {
+            "question_states": {p: sample(p, epoch) for p in events.BODIES},
+            "events": [],
+        }
+
+    monkeypatch.setattr(events, "_swisseph_planet_state", state)
+    monkeypatch.setattr(events, "solve_planetary_events", search)
+    result = events.native_planetary_events(
+        SimpleNamespace(julian_day_tt=at, zodiac_type="Tropic")
+    )
+    gc.collect()
+    assert len(observed) == 9 * len(events.BODIES)
+    assert sum(ref() is not None for _, ref in observed) == len(events.BODIES)
+    assert set(result["longitude_motion"]["sample_policies"]) == set(events.BODIES)
+    assert set(result["question_states"]) == set(events.BODIES)
 
 
 @pytest.mark.parametrize("invalid", [math.inf, math.nan])

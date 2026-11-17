@@ -67,6 +67,10 @@ _KEY_LABELS: Dict[str, str] = {
     # 八字核心结构键：未覆盖时会以英文原文漏进中文快照（_label 回退到原 key）。
     "day_master": "日主",
     "day_master_strength": "日主强弱",
+    "engineering_index": "工程旺衰指数",
+    "classical_adjudication": "原典力量裁定",
+    "engineering_reference": "工程参考方向",
+    "favorable_elements_status": "喜忌裁定状态",
     "favorable_elements": "喜用神",
     "unfavorable_elements": "忌神",
     "ten_gods": "十神",

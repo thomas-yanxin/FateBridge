@@ -74,8 +74,17 @@ def test_authored_chart_and_title_with_explicit_book_profile(index):
     # Preserve the literal disagreement, even when the explicit alias explains it.
     assert (actual == expected) is (index < 5)
     assert case["printed_title"] in title_names(board)
-    unresolved = board["day_placement_patterns"]["evaluations"][-2:]
-    assert [r["matched"] for r in unresolved] == [None, None]
+    unresolved = {
+        row["id"]: row
+        for row in board["day_placement_patterns"]["evaluations"]
+        if row["id"] in {"D11", "D12"}
+    }
+    assert set(unresolved) == {"D11", "D12"}
+    for row in unresolved.values():
+        assert row["definition_adjudicated"] is False
+        assert row["relation_matches"] is None
+        assert row["matched"] is (None if row["placement_matches"] else False)
+    assert board["day_placement_patterns"]["complete_classical_conformance"] is False
     if case["id"] == "C03":
         assert "D08" in board["day_placement_patterns"]["matched_ids"]
 

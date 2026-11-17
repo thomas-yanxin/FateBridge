@@ -11,6 +11,9 @@ from tests.evaluation.test_agentic_nested_outputs import (
     test_nested_fact_faults_are_internal_failures_on_all_surfaces as reject_fault,
 )
 from tests.ren.test_ren_transports import PAYLOAD
+from tests.support.ephemeris_case_runtime import (
+    native_ephemeris_files as native_ephemeris_files,
+)
 from tests.support.transports import SPECS, business, native, rest, surface_calls
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -112,7 +115,9 @@ def test_opposite_side_wrap_and_unbracketed_probes_cannot_become_crossings():
 
 
 @pytest.mark.parametrize("flags", [(), (32770,), (34,), (18,)])
-def test_unverified_geometry_cannot_receive_the_default_definition(flags, monkeypatch):
+def test_unverified_geometry_cannot_receive_the_default_definition(
+    flags, monkeypatch, native_ephemeris_files
+):
     from fatebridge.core.metaphysics import ren_calendar
     from fatebridge.services.metaphysics import _build_analysis_seed
 
@@ -142,7 +147,7 @@ def test_unverified_geometry_cannot_receive_the_default_definition(flags, monkey
 @pytest.mark.parametrize("project", [False, True])
 @pytest.mark.parametrize("mode", ["native", "de440"])
 def test_actual_coordinate_definition_survives_all_surfaces(
-    key, project, mode, monkeypatch, surface_calls
+    key, project, mode, monkeypatch, surface_calls, native_ephemeris_files
 ):
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", mode)
     spec = SPECS[key]

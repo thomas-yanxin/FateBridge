@@ -35,7 +35,6 @@ from fatebridge.core.lilly_house_assignment import assign_from_cusps, subject_cu
 from fatebridge.core.lilly_houses import house_condition
 from fatebridge.core.lilly_orbs import (
     DEFAULT_ORB_PROFILE,
-    full_orbs,
     orb_receipt,
     pair_radius,
 )
@@ -66,10 +65,6 @@ PTOLEMAIC_ASPECTS: List[Tuple[str, str, float]] = [
     ("trine", "拱", 120.0),
     ("opposition", "冲", 180.0),
 ]
-
-# Historical public symbol retained for compatibility; these are FULL orbs,
-# not moieties. Request-local profile selection never mutates this alias.
-PLANET_MOIETIES: Dict[str, float] = full_orbs()
 
 # Question topic → quesited house (whole derived-house logic kept simple: the
 # turned house is not modelled; the radical house of the matter is used).
@@ -266,9 +261,10 @@ def _moon_void_of_course(
     orb_profile: str = DEFAULT_ORB_PROFILE,
 ) -> Dict[str, Any]:
     """
-    The Moon is void of course if it completes no applying Ptolemaic aspect to a
-    traditional planet before leaving its current sign. Returns the next aspect
-    (if any) so the service can explain the judgment.
+    Report the declared strict-future longitude-contact query before ingress.
+
+    Keep its physical events and current orb context separate from the source's
+    unresolved application/orb variants. Missing motion remains unknown.
     """
     others = {state["planet"]: state for state in other_states}
     if physical_motion is None:
@@ -310,8 +306,10 @@ def build_horary_payload(
     clock_basis: str = "civil",
 ) -> Dict[str, Any]:
     """
-    Judge a horary chart for ``category``. Returns significators, radicality
-    strictures, the perfection finding, and an overall verdict with reasoning.
+    Build chart facts, bounded events and source-specific conditional findings.
+
+    The instantaneous research proxy remains separate from the incomplete full
+    Lilly judgement.
     """
     if category not in HOUSE_BY_CATEGORY:
         raise ValueError("不支持的卜卦类别；生死与临床判断不开放")
@@ -385,9 +383,7 @@ def build_horary_payload(
         orb_profile=orb_profile,
     )
 
-    heuristic_verdict, heuristic_reasoning = _verdict(
-        perfection, moon_voc, strictures, category
-    )
+    heuristic_verdict, heuristic_reasoning = _verdict(perfection, moon_voc, strictures)
     # A present-tense aspect is not proof of a future or a full Lilly judgement.
     perfection["heuristic_perfection_signal"] = perfection["perfects"]
     perfection["candidate"] = (
@@ -736,7 +732,7 @@ def _judge_perfection(
             return {
                 "perfects": True,
                 "mode": "translation",
-                "mode_label": f"{state['planet_label']}当前黄经一端出相、一端入相（真实先后未验）",
+                "mode_label": f"{state['planet_label']}当前黄经一端出相、一端入相（完整传光条件另列）",
                 "carrier": state["planet"],
                 "carrier_label": state["planet_label"],
                 "receptions": receptions,
@@ -802,9 +798,8 @@ def _verdict(
     perfection: Dict[str, Any],
     moon_voc: Dict[str, Any],
     strictures: List[Dict[str, Any]],
-    category: str,
 ) -> Tuple[str, str]:
-    """Boil the findings down to a verdict + a human-readable reasoning line."""
+    """Classify the preserved instantaneous research proxy for comparison."""
     stricture_codes = {
         s["code"] for s in strictures if s.get("exception_satisfied") is not True
     }
@@ -853,6 +848,5 @@ def _verdict(
 __all__ = [
     "HOUSE_BY_CATEGORY",
     "CATEGORY_LABELS_ZH",
-    "PLANET_MOIETIES",
     "build_horary_payload",
 ]

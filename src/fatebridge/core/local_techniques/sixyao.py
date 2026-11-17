@@ -1073,6 +1073,14 @@ def _build_sixyao_snapshot_text(
         condition_lines.append(
             f"{label}{void_focus['branch']}：{vacancy}；空亡条件状态{void_focus['classification']}"
         )
+        for rule in void_focus["not_empty_conditions"]:
+            if rule.get("qualification_source_path"):
+                qualified = {True: "可计入", False: "排除", None: "待审"}[
+                    rule["qualified_matched"]
+                ]
+                condition_lines.append(f"寅日对巳的生扶经三支条件校核：{qualified}。")
+            if rule["rule_id"] == "moving_generate" and rule["matched"] is None:
+                condition_lines.append("本爻动爻生扶资格待审，空亡层保留该项未知。")
         if void_focus["changed_is_xunkong"] is not None:
             condition_lines.append(
                 "本位变支"

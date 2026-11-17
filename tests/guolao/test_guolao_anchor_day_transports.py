@@ -1,7 +1,6 @@
 """Real REST, native MCP and CLI parity for the new source-day policies."""
 
 import asyncio
-import hashlib
 import json
 
 import pytest
@@ -14,6 +13,7 @@ from fatebridge.core.guolao_anchor_days import DAY_RULESET, POLICIES
 from fatebridge.core.requests.astrology import AstroChartPolyRequest, AstroGuolaoRequest
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
+from tests.support.result_delivery import assert_same_run_receipt
 
 AS_OF = "2026-10-23T12:00:00+08:00"
 
@@ -206,8 +206,9 @@ def test_day_edge_evidence_survives_complete_same_run_delivery(monkeypatch, tmp_
             break
         offset = page["next_offset"]
     raw = "".join(chunks)
-    assert hashlib.sha256(raw.encode()).hexdigest() == ref["sha256"]
+    assert len(raw) == ref["total_chars"]
     full = json.loads(raw)
+    assert_same_run_receipt(store, body, full)
     assert full["run_metadata"]["run_id"] == body["run_metadata"]["run_id"]
     evidence = full["guolao"]["life_palace"]["seasonal_anchor_evidence"]
     assert evidence["policy"] == POLICIES[2]

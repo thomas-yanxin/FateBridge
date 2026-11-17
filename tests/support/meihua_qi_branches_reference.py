@@ -3,6 +3,8 @@
 import json
 from pathlib import Path
 
+from tests.support.reference_data import resolve
+
 FOLDER = Path(__file__).parents[1] / "fixtures/meihua_qi_branches_v1"
 PROFILE = json.loads((FOLDER / "profile.json").read_bytes())
 GEOMETRY = {
@@ -14,12 +16,6 @@ TRUTH = {
     for r in json.loads((FOLDER / "unit-atoms384.json").read_bytes())
 }
 UNITS = ("year", "month", "day", "hour")
-
-
-def resolve(value, path):
-    for key in path.split("."):
-        value = value[int(key)] if isinstance(value, list) else value[key]
-    return value
 
 
 def validate_branch_node(

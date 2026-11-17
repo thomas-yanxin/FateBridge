@@ -129,9 +129,11 @@ def assert_source_condition_score_reference(
         source_condition_reference_total(kind),
     )
     assert summary["status"] == summary["scoring"]["status"] == "partial"
+    # Preserve the frozen arithmetic ledger and its historical status list.
+    # Current status propagation additionally retains unresolved ten-god inputs.
     assert set(summary["scoring"]["unresolved_dimensions"]) == set(
         SOURCE_CONDITION_REFERENCE["unresolved_dimensions"]
-    )
+    ) | {"ten_gods_relationship"}
     assert "未裁定" in summary["compatibility_level"]
     if detailed_analysis is not None:
         balance = detailed_analysis["element_balance"]
@@ -144,12 +146,24 @@ def assert_source_condition_score_reference(
         assert favorable["assessment_status"] == "partial"
         assert favorable["score_evidence"]["base_score_is_support_evidence"] is False
         assert favorable["useful_ten_gods_support"] == []
+        ten_gods = detailed_analysis["ten_gods_relationship"]
+        assert ten_gods["assessment_status"] == "partial"
+        assert ten_gods["score_kind"] == "uncalibrated_rule_index"
+        assert ten_gods["source_adjudication_used"] is False
+        assert any(
+            row["engineering_state"] == "conditional"
+            for row in ten_gods["preference_evidence"]
+        )
         pattern = detailed_analysis["pattern_synergy"]
         assert pattern["assessment_status"] == "partial"
         assert pattern["supportive_patterns"] == pattern["risk_patterns"] == []
-        assert {row["label"] for row in pattern["unresolved_patterns"]} == set(
-            SOURCE_CONDITION_REFERENCE["unresolved_harmonies"]
-        )
+        # The historical ledger above retains its two end-pair labels. Current
+        # peak-required membership excludes 申辰 and 巳丑 from half-harmonies;
+        # arithmetic terms and weights are unchanged, including the71.5 total.
+        assert {row["label"] for row in pattern["unresolved_patterns"]} == {
+            "寅午半合火局",
+            "巳申六合",
+        }
         assert {row["label"] for row in pattern["tension_patterns"]} == set(
             SOURCE_CONDITION_REFERENCE["tension_events"]
         )

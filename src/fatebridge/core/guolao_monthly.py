@@ -12,7 +12,7 @@ from fatebridge.core.almanac import get_bazi_month_context, get_lunar_context
 from fatebridge.core.astro.physical_epoch import PhysicalEpoch
 from fatebridge.core.guolao_classical import month_limit_branch
 from fatebridge.core.guolao_epoch import native_month_context
-from fatebridge.utils.civil_time import utc_calendar
+from fatebridge.utils.civil_time import ZonedCalendar, utc_calendar
 
 MonthBasis = Literal["jie_month", "chinese_lunar_utc8"]
 BASES = {"jie_month", "chinese_lunar_utc8"}
@@ -35,14 +35,10 @@ def month_context(
         "calendar_datetime": None,
         "timezone": "UTC+08:00",
     }
-    # An optional monthly layer must not invalidate a valid physical instant
-    # merely because its UTC+08 label or neighbouring calendar years cannot
-    # be represented. Numerical/provider failures retain their strict errors.
-    try:
-        clocks["calendar_datetime"] = moment.astimezone(
-            timezone(timedelta(hours=8))
-        ).isoformat()
-    except OverflowError:
+    # Only an actually unrepresentable UTC+08 label makes this layer
+    # unavailable. A valid local label may have UTC in year0 or10000.
+    calendar = ZonedCalendar(utc_calendar(moment), timezone(timedelta(hours=8)))
+    if calendar.as_datetime() is None:
         return {
             **clocks,
             "status": "outside_datetime_calendar_range",
@@ -50,17 +46,9 @@ def month_context(
             "is_leap_month": None,
             "unavailable_reason": "fixed_utc8_label_outside_datetime_range",
         }
+    clocks["calendar_datetime"] = calendar.isoformat()
     if basis == "jie_month":
-        try:
-            context = get_bazi_month_context(moment, MONTH_TIMEZONE)
-        except OverflowError:
-            return {
-                **clocks,
-                "status": "outside_datetime_calendar_range",
-                "month_number": None,
-                "is_leap_month": None,
-                "unavailable_reason": "jie_neighbour_calendar_year_outside_datetime_range",
-            }
+        context = get_bazi_month_context(moment, MONTH_TIMEZONE)
         index = context["month_index"]
         if type(index) is not int or not 0 <= index < 12:
             raise ValueError("节月换算未给出有效月序，不能据此分配月限")

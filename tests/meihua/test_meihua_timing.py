@@ -14,6 +14,7 @@ from fatebridge.core.meihua_timing import (
 )
 from fatebridge.services.divination import calculate_meihua_analysis
 from fatebridge.services.meihua import calculate_meihua_cast
+from tests.support.reference_data import resolve
 
 FIXTURE = Path(__file__).parents[1] / "fixtures/meihua_timing_v1"
 CASES = json.loads((FIXTURE / "arithmetic3072.json").read_text())
@@ -23,12 +24,6 @@ CATEGORIES = json.loads(
         Path(__file__).parents[1] / "fixtures/meihua_observed_categories_v1/cases.json"
     ).read_text()
 )["cases"]
-
-
-def resolve(result, path):
-    for key in path.split("."):
-        result = result[int(key)] if isinstance(result, list) else result[key]
-    return result
 
 
 def reference(result):

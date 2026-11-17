@@ -12,6 +12,7 @@ from pydantic import ValidationError
 
 import fatebridge.application.execution as execution
 from fatebridge.core.output_chinese import JinkouQiEvidence
+from fatebridge.core.public_output import same_public_value
 from scripts.ren.audit_ren_classical import observe_jinkou
 from tests.support.transports import AS_OF, REST_POST_CASES, SPECS, rest, surface_calls
 
@@ -143,10 +144,12 @@ def test_actual_three_ports_keep_the_same_main_and_annual_month_evidence(
     )
     assert http.status_code == 200 and not protocol.is_error and code == 0
     for body in (http.json(), protocol.structured_content, cli):
-        assert body["jinkou"]["qi_evidence"] == output()["jinkou"]["qi_evidence"]
-        assert (
-            body["jinkou"]["year_fate"]["course"]["qi_evidence"]
-            == output()["jinkou"]["year_fate"]["course"]["qi_evidence"]
+        assert same_public_value(
+            body["jinkou"]["qi_evidence"], output()["jinkou"]["qi_evidence"]
+        )
+        assert same_public_value(
+            body["jinkou"]["year_fate"]["course"]["qi_evidence"],
+            output()["jinkou"]["year_fate"]["course"]["qi_evidence"],
         )
 
 

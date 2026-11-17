@@ -9,10 +9,7 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from fatebridge.validation.jyotish_study import reveal_and_evaluate, seal_forecasts
 from fatebridge.validation.predictions import (
-    Forecast,
-    Outcome,
     StudyPlan,
     digest,
     evaluate_study,

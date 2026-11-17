@@ -99,7 +99,7 @@ def test_current_profile_and_version_conditions_agree_on_three_surfaces(
         business(protocol.structured_content) == business(cli) == business(http.json())
     )
     profile = cli["bazi_birth"]["structure_profile"]
-    assert profile["resolution_policy"] == "source_conditions_before_preference_v3"
+    assert profile["resolution_policy"] == "source_force_before_preference_v4"
     assert profile["dominant_structure"]["key"] == "selected_month_reference"
     assert profile["dominant_structure"]["formation_status"] == "not_adjudicated"
     for key in ("useful_elements", "avoid_elements", "useful_ten_gods"):

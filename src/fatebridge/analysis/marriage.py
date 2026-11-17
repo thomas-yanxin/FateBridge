@@ -18,13 +18,20 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional, Tuple
 
+from ..core.bazi_star_tables import (
+    HONG_LUAN_TARGETS,
+    PEACH_BLOSSOM_TARGETS,
+    TIAN_XI_TARGETS,
+)
 from ..utils.data import (
+    BRANCH_CLASH_PAIRS,
     BRANCH_ELEMENTS,
     BRANCH_HIDDEN_STEMS,
     DESTRUCTION_CYCLE,
     GENERATION_CYCLE,
     STEM_ELEMENTS,
     TenGod,
+    check_branch_combination,
     get_ten_god,
     iter_pillar_gods,
     normalize_gender,
@@ -54,26 +61,6 @@ BRANCH_APPEARANCE = {
     "金": "骨架分明、轮廓清晰",
     "水": "面色偏黑或偏白、灵动有神",
 }
-
-# 地支六合主感情和谐
-SIX_HARMONY = {
-    frozenset(("子", "丑")): "土",
-    frozenset(("寅", "亥")): "木",
-    frozenset(("卯", "戌")): "火",
-    frozenset(("辰", "酉")): "金",
-    frozenset(("巳", "申")): "水",
-    frozenset(("午", "未")): "土",
-}
-
-# 地支六冲主感情冲突
-SIX_CLASH = [
-    ("子", "午"),
-    ("丑", "未"),
-    ("寅", "申"),
-    ("卯", "酉"),
-    ("辰", "戌"),
-    ("巳", "亥"),
-]
 
 
 class MarriageAnalysis:
@@ -284,7 +271,7 @@ class MarriageAnalysis:
         stability = "稳定"
         stability_notes: List[str] = []
 
-        for clash_pair in SIX_CLASH:
+        for clash_pair in BRANCH_CLASH_PAIRS:
             if day_branch in clash_pair:
                 other_branch = (
                     clash_pair[1] if clash_pair[0] == day_branch else clash_pair[0]
@@ -366,7 +353,7 @@ class MarriageAnalysis:
         # 3. 检查地支六合（日支参与）
         all_branches = [pillars[p][1] for p in ["year", "month", "day", "hour"]]
         for i, b in enumerate(all_branches):
-            if b != day_branch and frozenset((day_branch, b)) in SIX_HARMONY:
+            if check_branch_combination(day_branch, b):
                 p_name = ["year", "month", "day", "hour"][i]
                 if p_name in ["month", "hour"]:
                     score += 6
@@ -428,41 +415,13 @@ class MarriageAnalysis:
         """检查婚姻相关神煞。"""
         year_branch = pillars["year"][1]
         day_branch = pillars["day"][1]
+        branches = {branch for _, branch in pillars.values()}
         entries: List[Dict[str, str]] = []
 
-        # 红鸾天喜已在 shensha 模块中，这里做婚姻专用解读
-        hong_luan_map = {
-            "子": "卯",
-            "丑": "寅",
-            "寅": "丑",
-            "卯": "子",
-            "辰": "亥",
-            "巳": "戌",
-            "午": "酉",
-            "未": "申",
-            "申": "未",
-            "酉": "午",
-            "戌": "巳",
-            "亥": "辰",
-        }
-        tian_xi_map = {
-            "子": "酉",
-            "丑": "申",
-            "寅": "未",
-            "卯": "午",
-            "辰": "巳",
-            "巳": "辰",
-            "午": "卯",
-            "未": "寅",
-            "申": "丑",
-            "酉": "子",
-            "戌": "亥",
-            "亥": "戌",
-        }
-
-        hl = hong_luan_map.get(year_branch)
-        tx = tian_xi_map.get(year_branch)
-        if hl and hl in {b for _, b in pillars.values()}:
+        # 共享目标表；本入口仍按年支查红鸾、天喜。
+        hl = HONG_LUAN_TARGETS[year_branch]
+        tx = TIAN_XI_TARGETS[year_branch]
+        if hl in branches:
             entries.append(
                 {
                     "name": "红鸾",
@@ -470,7 +429,7 @@ class MarriageAnalysis:
                     "meaning": f"红鸾在{hl}，主婚恋喜事",
                 }
             )
-        if tx and tx in {b for _, b in pillars.values()}:
+        if tx in branches:
             entries.append(
                 {
                     "name": "天喜",
@@ -480,22 +439,10 @@ class MarriageAnalysis:
             )
 
         # 咸池（桃花）
-        peach_map = {
-            "申": "酉",
-            "子": "酉",
-            "辰": "酉",
-            "寅": "卯",
-            "午": "卯",
-            "戌": "卯",
-            "亥": "子",
-            "卯": "子",
-            "未": "子",
-            "巳": "午",
-            "酉": "午",
-            "丑": "午",
-        }
-        peach = peach_map.get(day_branch)
-        if peach and peach in {b for _, b in pillars.values()}:
+        peach = next(
+            target for group, target in PEACH_BLOSSOM_TARGETS if day_branch in group
+        )
+        if peach in branches:
             entries.append(
                 {
                     "name": "咸池（桃花）",
@@ -535,7 +482,7 @@ class MarriageAnalysis:
         }
         gc = gu_chen_map.get(day_branch)
         gs = gua_su_map.get(day_branch)
-        if gc and gc in {b for _, b in pillars.values()}:
+        if gc and gc in branches:
             entries.append(
                 {
                     "name": "孤辰",
@@ -543,7 +490,7 @@ class MarriageAnalysis:
                     "meaning": f"孤辰在{gc}，主性格独立，婚姻较晚",
                 }
             )
-        if gs and gs in {b for _, b in pillars.values()}:
+        if gs and gs in branches:
             entries.append(
                 {
                     "name": "寡宿",
@@ -586,10 +533,7 @@ class MarriageAnalysis:
                 timing_signals.append(f"大运{d_stem}{d_branch}见官星，有婚恋机会")
 
             # 日支逢合（确保两个地支不同且构成六合）
-            if (
-                d_branch != day_branch
-                and frozenset((day_branch, d_branch)) in SIX_HARMONY
-            ):
+            if check_branch_combination(day_branch, d_branch):
                 timing_signals.append(
                     f"大运支{d_branch}与日支{day_branch}六合，婚姻宫被引动"
                 )
@@ -606,46 +550,15 @@ class MarriageAnalysis:
                 timing_signals.append(f"流年{l_stem}{l_branch}见官星，当年有婚恋机遇")
 
             # 流年支与日支合（确保两个地支不同且构成六合）
-            if (
-                l_branch != day_branch
-                and frozenset((day_branch, l_branch)) in SIX_HARMONY
-            ):
+            if check_branch_combination(day_branch, l_branch):
                 timing_signals.append(
                     f"流年支{l_branch}与日支{day_branch}六合，婚姻宫被引动"
                 )
 
             # 红鸾天喜流年
-            hong_luan_map = {
-                "子": "卯",
-                "丑": "寅",
-                "寅": "丑",
-                "卯": "子",
-                "辰": "亥",
-                "巳": "戌",
-                "午": "酉",
-                "未": "申",
-                "申": "未",
-                "酉": "午",
-                "戌": "巳",
-                "亥": "辰",
-            }
-            tian_xi_map = {
-                "子": "酉",
-                "丑": "申",
-                "寅": "未",
-                "卯": "午",
-                "辰": "巳",
-                "巳": "辰",
-                "午": "卯",
-                "未": "寅",
-                "申": "丑",
-                "酉": "子",
-                "戌": "亥",
-                "亥": "戌",
-            }
             year_branch = pillars["year"][1]
-            hl = hong_luan_map.get(year_branch)
-            tx = tian_xi_map.get(year_branch)
+            hl = HONG_LUAN_TARGETS[year_branch]
+            tx = TIAN_XI_TARGETS[year_branch]
             if l_branch == hl:
                 timing_signals.append(f"流年{l_branch}为红鸾到位，主婚恋喜事")
             if l_branch == tx:
@@ -693,7 +606,7 @@ class MarriageAnalysis:
         risks: List[Dict[str, str]] = []
 
         # 1. 日支逢冲
-        for clash_pair in SIX_CLASH:
+        for clash_pair in BRANCH_CLASH_PAIRS:
             if day_branch in clash_pair:
                 other = clash_pair[1] if clash_pair[0] == day_branch else clash_pair[0]
                 for p_name, (_, b) in pillars.items():

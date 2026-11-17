@@ -6,6 +6,10 @@ from typing import Any, Dict, List, Union, get_args, get_origin
 from pydantic import BaseModel
 
 from fatebridge.application.tool_spec import ToolSpec
+from fatebridge.core.response_models import (
+    CHART_VARIANT_TOOL_KEYS,
+    required_output_fields_for,
+)
 from fatebridge.core.schema_cache import model_schema
 
 
@@ -135,6 +139,16 @@ def _describe_contract(
             "version_semantics": "contract_v1 is a registration contract; actual algorithm versions are recorded separately",
         },
         "full_result_required_fields": list(spec.required_output_fields),
+        **(
+            {
+                "full_result_required_fields_by_variant": {
+                    variant: list(required_output_fields_for(owner))
+                    for variant, owner in CHART_VARIANT_TOOL_KEYS.items()
+                }
+            }
+            if spec.key == "astro_chart"
+            else {}
+        ),
         "full_result_empty_object_policy": "reject_required_roots",
         "execution": {
             "cpu_bound": spec.cpu_bound,

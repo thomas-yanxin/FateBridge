@@ -4,6 +4,7 @@ The full combinatorial checks are correctness properties, never independent
 evidence that any real-world event can be predicted.
 """
 
+import gzip
 import hashlib
 import json
 import re
@@ -36,11 +37,33 @@ FIXTURES = Path(__file__).parents[1] / "fixtures"
 SOURCE = json.loads((FIXTURES / "zhouyi-wikisource.json").read_text())
 CORPUS = build(SOURCE)
 ZENGSHAN = json.loads((FIXTURES / "liuyao-zengshan-sources.json").read_text())
+CHART_REFERENCE_DIR = FIXTURES.parent / "data/liuyao_chart_v1"
+CHART_REFERENCE = json.loads(
+    gzip.decompress((CHART_REFERENCE_DIR / "reference.json.gz").read_bytes())
+)
+SCAN_TABLES = json.loads((CHART_REFERENCE_DIR / "scan-tables.json").read_text())
+CHART_PAIRS = {
+    (row["current_code"], row["changed_code"]): row for row in CHART_REFERENCE["rows"]
+}
 CODES = ["".join(bits) for bits in product("01", repeat=6)]
 INPUT = {"date": "2026-10-22", "time": "12:00:00", "zone": "Asia/Shanghai"}
 
 
 def test_frozen_sources_and_packaged_corpus_are_reproducible():
+    reference_source = json.loads((CHART_REFERENCE_DIR / "source.json").read_text())
+    reference_bytes = (CHART_REFERENCE_DIR / "reference.json.gz").read_bytes()
+    assert (
+        hashlib.sha256(reference_bytes).hexdigest()
+        == reference_source["compressed_sha256"]
+    )
+    assert hashlib.sha256(gzip.decompress(reference_bytes)).hexdigest() == (
+        reference_source["reference_sha256"]
+    )
+    assert CHART_REFERENCE["source"]["commit"] == reference_source["commit"]
+    assert set(CHART_PAIRS) == set(product(CODES, repeat=2))
+    assert {tuple(row["coins"]) for row in CHART_REFERENCE["rows"]} == set(
+        product((6, 7, 8, 9), repeat=6)
+    )
     for record in [
         SOURCE["index"],
         *SOURCE["chapters"],
@@ -93,9 +116,29 @@ def test_all_palaces_and_shiying_match_independent_published_table():
             assert abs(info["shi_line"] - info["ying_line"]) == 3
             checked.add(code)
     assert checked == set(CODES)
+    # A second reference joins the actual scan's trigram names and diagrams;
+    # it does not use our corpus builder to turn a hexagram name into a code.
+    checked_from_scan = set()
+    for palace in SCAN_TABLES["palaces"]:
+        for index, (upper, lower) in enumerate(palace["upper_lower"]):
+            code = SCAN_TABLES["trigrams"][lower] + SCAN_TABLES["trigrams"][upper]
+            info, _ = _build_sixyao_enrichment(code, code, "甲")
+            assert info["current_palace"] == palace["palace"]
+            assert info["current_palace_element"] == palace["element"]
+            assert info["shi_line"] == SCAN_TABLES["subject_positions"][index]
+            assert abs(info["shi_line"] - info["ying_line"]) == 3
+            checked_from_scan.add(code)
+    assert checked_from_scan == set(CODES)
 
 
 def test_nazhi_of_all_64_hexagrams_matches_frozen_chapter_four():
+    for upper, lower in product(SCAN_TABLES["trigrams"], repeat=2):
+        code = SCAN_TABLES["trigrams"][lower] + SCAN_TABLES["trigrams"][upper]
+        _, lines = _build_sixyao_enrichment(code, code, "甲")
+        assert "".join(line["branch"] for line in lines) == (
+            SCAN_TABLES["pure_branches"][lower]["branches"][:3]
+            + SCAN_TABLES["pure_branches"][upper]["branches"][3:]
+        )
     raw = next(p["wikitext"] for p in ZENGSHAN["chapters"] if p["title"].endswith("/4"))
     rows = re.findall(r"\* (.)在內：([^。]+)。.在外[：；]([^。]+)。", raw)
     assert len(rows) == 8
@@ -342,8 +385,14 @@ def test_need_to_song_matches_zengshan_chapter_seven_without_static_transformati
 
 
 def test_every_coin_configuration_has_exact_base_changed_and_moving_lines():
-    for tosses in product((6, 7, 8, 9), repeat=6):
+    for reference in CHART_REFERENCE["rows"]:
+        tosses = reference["coins"]
         lines, _ = _coin_lines_and_meta(list(tosses))
+        assert _derive_gua_code(lines) == reference["current_code"]
+        assert _derive_changed_code(lines) == reference["changed_code"]
+        assert [i + 1 for i, line in enumerate(lines) if line["change"]] == (
+            reference["moving_lines"]
+        )
         assert _derive_gua_code(lines) == "".join(str(n % 2) for n in tosses)
         assert _derive_changed_code(lines) == "".join(
             "1" if n in (6, 7) else "0" for n in tosses
@@ -357,6 +406,22 @@ def test_all_4096_base_changed_pairs_keep_static_lines_untransformed():
             result = build_sixyao_result(
                 **INPUT, gua_code=current, changed_code=changed
             )
+            reference = CHART_PAIRS[current, changed]
+            info = result["hexagram_info"]
+            for actual_key, expected_key in (
+                ("current_palace", "palace"),
+                ("current_palace_element", "palace_element"),
+                ("changed_palace", "changed_palace"),
+                ("changed_palace_element", "changed_palace_element"),
+            ):
+                assert info[actual_key] == reference[expected_key]
+            for line, foreign in zip(result["lines"], reference["lines"], strict=True):
+                keys = ["branch", "element", "liuqin", "shi_ying"]
+                if line["change"]:
+                    keys.extend(["changed_branch", "changed_liuqin"])
+                assert {key: line[key] for key in keys} == {
+                    key: foreign[key] for key in keys
+                }
             expected = [i + 1 for i in range(6) if current[i] != changed[i]]
             assert result["moving_lines"] == expected
             fanfu = result["liuyao_evidence"]["fanfu"]
@@ -433,6 +498,12 @@ def test_six_gods_for_all_ten_stems_match_independent_source_table():
     for stem, column in zip("甲乙丙丁戊己庚辛壬癸", [0, 0, 1, 1, 2, 3, 4, 4, 5, 5]):
         _, lines = _build_sixyao_enrichment("111111", "111111", stem)
         assert [line["liushen"] for line in lines] == [row[column] for row in groups]
+    assert {
+        (row["code"], row["day_stem"]) for row in CHART_REFERENCE["spirit_rows"]
+    } == set(product(CODES, "甲乙丙丁戊己庚辛壬癸"))
+    for row in CHART_REFERENCE["spirit_rows"]:
+        _, lines = _build_sixyao_enrichment(row["code"], row["code"], row["day_stem"])
+        assert [line["liushen"] for line in lines] == row["spirits"]
 
 
 @pytest.mark.parametrize(

@@ -109,7 +109,7 @@ def test_public_indian_chart_layers_share_the_same_controlled_boundary_coordinat
         assert value["india"]["nakshatras"]["Moon"]["name"] == "Rohini"
 
 
-def test_public_legacy_equal28_keeps_source_membership_when_display_longitudes_tie(
+def test_public_legacy_equal28_preserves_raw_boundary_coordinates_and_membership(
     monkeypatch, surface_calls
 ):
     original = local_chart.build_core_chart_payload
@@ -148,12 +148,11 @@ def test_public_legacy_equal28_keeps_source_membership_when_display_longitudes_t
     for result in values:
         points = {row["id"]: row for row in result["chart"]["objects"]}
         assert result["params"]["su28Method"] == "legacy_equal_ecliptic28_illustration"
-        assert (
-            points["Sun"]["lon"]
-            == points["Moon"]["lon"]
-            == points["Mercury"]["lon"]
-            == 90
-        )
+        assert {name: points[name]["lon"] for name in ("Sun", "Moon", "Mercury")} == {
+            "Sun": 90.0,
+            "Moon": before,
+            "Mercury": after,
+        }
         assert points["Sun"]["su28"] == points["Mercury"]["su28"] == "斗"
         assert points["Sun"]["su28_degree"] == 0
         assert points["Mercury"]["su28_degree"] > 0

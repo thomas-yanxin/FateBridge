@@ -1,48 +1,23 @@
-"""Check current complete Moshier roots against unchanged DE440 TT reference.
+"""Check actual bundled-DE441 calendar roots against an independent reference.
 
 This reports the actual one-second gate, including failures. Shared DE440
 lineage is not an independent physical observation or civil-time validation.
 """
 
 import argparse
+import gzip
+import hashlib
 import json
 import math
 import os
-from datetime import datetime, timezone
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import TypedDict
 
 from fatebridge.core import almanac
-from fatebridge.core.moshier_solar import MODEL_ID, PROVIDER
+from fatebridge.core.de441_solar import MODEL_ID, PROVIDER
 
 ROOT = Path(__file__).resolve().parents[2]
-NAMES = (
-    "小寒",
-    "大寒",
-    "立春",
-    "雨水",
-    "惊蛰",
-    "春分",
-    "清明",
-    "谷雨",
-    "立夏",
-    "小满",
-    "芒种",
-    "夏至",
-    "小暑",
-    "大暑",
-    "立秋",
-    "处暑",
-    "白露",
-    "秋分",
-    "寒露",
-    "霜降",
-    "立冬",
-    "小雪",
-    "大雪",
-    "冬至",
-)
 
 
 class RootComparison(TypedDict):
@@ -57,6 +32,8 @@ class RootComparison(TypedDict):
 
 
 class ModelAudit(TypedDict):
+    reference_sha256: str
+    model: str
     rows: list[RootComparison]
     failed_ids: list[list[int]]
     tolerance_seconds: float
@@ -66,12 +43,21 @@ class ModelAudit(TypedDict):
     retained_stock_moshier_failed_ids: list[list[int]]
 
 
-def audit() -> ModelAudit:
-    reference = json.loads((ROOT / "tests/data/solar/de440-guard-tt.json").read_text())
+def audit(reference_path: Path | None = None) -> ModelAudit:
+    path = reference_path or ROOT / "tests/data/solar/de440-guard-tt.json"
+    raw = path.read_bytes()
+    reference = json.loads(gzip.decompress(raw) if path.suffix == ".gz" else raw)
     expected = {(r["year"], r["index"]): r for r in reference["rows"]}
-    assert len(expected) == len(reference["rows"]) == 96
-    assert reference["production_imports"] is False
-    assert reference["tolerance_seconds"] == 1.0
+    assert len(expected) == len(reference["rows"])
+    if reference_path is None:
+        assert len(expected) == 96
+    assert (
+        reference.get("production_imports", reference.get("production_imported"))
+        is False
+    )
+    assert (
+        reference.get("tolerance_seconds", reference.get("TT_tolerance_seconds")) == 1.0
+    )
     observed: dict[tuple[int, int], RootComparison] = {}
     stock_rows: list[RootComparison] = []
     variables = ("FATEBRIDGE_JPL_FILE", "FATEBRIDGE_SOLAR_TERM_MODEL", "SE_EPHE_PATH")
@@ -81,11 +67,11 @@ def audit() -> ModelAudit:
             os.environ.pop("FATEBRIDGE_JPL_FILE", None)
             os.environ["FATEBRIDGE_SOLAR_TERM_MODEL"] = "native"
             os.environ["SE_EPHE_PATH"] = empty
-            for origin in (1800, 2200):
-                for term in almanac._term_window(
-                    datetime(origin, 6, 1, tzinfo=timezone.utc), "UTC"
+            for year in sorted({year for year, _ in expected}):
+                for index, term in enumerate(
+                    almanac.get_solar_terms_for_year(year, "UTC")
                 ):
-                    key = (term.moment.year, NAMES.index(term.name))
+                    key = (year, index)
                     if key not in expected:
                         continue
                     assert term.resolution_provider == PROVIDER
@@ -148,6 +134,8 @@ def audit() -> ModelAudit:
         [row["year"], row["index"]] for row in rows if not row["within_tolerance"]
     ]
     return ModelAudit(
+        reference_sha256=hashlib.sha256(raw).hexdigest(),
+        model=MODEL_ID,
         rows=rows,
         failed_ids=failures,
         tolerance_seconds=1.0,
@@ -163,8 +151,9 @@ def audit() -> ModelAudit:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--reference", type=Path)
     args = parser.parse_args()
-    result = audit()
+    result = audit(args.reference)
     args.output.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n")
     print(
         json.dumps(
@@ -172,6 +161,9 @@ def main() -> int:
                 "count": len(result["rows"]),
                 "over_one_second": len(result["failed_ids"]),
                 "gate_passed": result["gate_passed"],
+                "maximum_error_seconds": max(
+                    abs(r["error_seconds"]) for r in result["rows"]
+                ),
                 "retained_stock_moshier_over_one_second": len(
                     result["retained_stock_moshier_failed_ids"]
                 ),

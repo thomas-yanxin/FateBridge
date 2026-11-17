@@ -8,8 +8,7 @@ from pathlib import Path
 import pytest
 
 from fatebridge.core import heluo_texts as ht
-from fatebridge.core.heluo import _tiaowen, yao_text
-from fatebridge.core.heluo_timing import _selected_text
+from fatebridge.core.heluo import yao_text
 from fatebridge.core.local_techniques.heluo import build_heluo_result
 from fatebridge.utils.errors import NumerologySourceError
 from tests.support.heluo_source_facts import (

@@ -121,23 +121,32 @@ BRANCH_HIDDEN_STEMS = {
 }
 
 
+def count_element_distribution_units(
+    pillars: Mapping[str, Tuple[str, str]],
+) -> Dict[Element, int]:
+    """Count the project's structural weights in exact tenths.
+
+    A visible stem contributes 10 units, the branch element 5, and each hidden
+    stem 3. This is the shared career/health/wealth counting policy, not a
+    calibrated measure of classical force. Integer units keep thresholds exact.
+    """
+    counts: Dict[Element, int] = {e: 0 for e in Element}
+    for stem, branch in pillars.values():
+        counts[STEM_ELEMENTS[stem][0]] += 10
+        counts[BRANCH_ELEMENTS[branch][0]] += 5
+        for hidden in BRANCH_HIDDEN_STEMS[branch]:
+            counts[STEM_ELEMENTS[hidden][0]] += 3
+    return counts
+
+
 def count_element_distribution(
     pillars: Mapping[str, Tuple[str, str]],
 ) -> Dict[Element, float]:
-    """Weighted five-element tally over a pillar map.
-
-    Standard 命局五行 weighting, identical across the career/health/wealth
-    analyses it was extracted from: visible stem = 1.0, branch = 0.5, each
-    hidden stem of the branch = 0.3. Returns a dict with every Element present
-    (zero-initialised) so callers can index any element without a KeyError.
-    """
-    counts: Dict[Element, float] = {e: 0.0 for e in Element}
-    for stem, branch in pillars.values():
-        counts[STEM_ELEMENTS[stem][0]] += 1.0
-        counts[BRANCH_ELEMENTS[branch][0]] += 0.5
-        for hidden in BRANCH_HIDDEN_STEMS.get(branch, []):
-            counts[STEM_ELEMENTS[hidden][0]] += 0.3
-    return counts
+    """Convert the exact structural tally to its declared decimal weights."""
+    return {
+        element: units / 10
+        for element, units in count_element_distribution_units(pillars).items()
+    }
 
 
 # 十神 (Ten Gods) - relationships between day stem and other stems
@@ -239,8 +248,8 @@ NAYIN_TABLE = {
     ("乙", "亥"): "山头火",
     ("丙", "子"): "涧下水",
     ("丁", "丑"): "涧下水",
-    ("戊", "寅"): "城墙土",
-    ("己", "卯"): "城墙土",
+    ("戊", "寅"): "城头土",
+    ("己", "卯"): "城头土",
     ("庚", "辰"): "白蜡金",
     ("辛", "巳"): "白蜡金",
     ("壬", "午"): "杨柳木",
@@ -293,36 +302,42 @@ def get_nayin(stem: str, branch: str) -> str:
     return NAYIN_TABLE.get((stem, branch), "未知纳音")
 
 
-# 地支六冲关系
+# 地支字面配对与双向查表共用一个所有者；配对不裁定实际效力。
+BRANCH_CLASH_PAIRS = (
+    ("子", "午"),
+    ("丑", "未"),
+    ("寅", "申"),
+    ("卯", "酉"),
+    ("辰", "戌"),
+    ("巳", "亥"),
+)
 BRANCH_CONFLICTS = {
-    "子": "午",
-    "午": "子",  # 子午冲
-    "丑": "未",
-    "未": "丑",  # 丑未冲
-    "寅": "申",
-    "申": "寅",  # 寅申冲
-    "卯": "酉",
-    "酉": "卯",  # 卯酉冲
-    "辰": "戌",
-    "戌": "辰",  # 辰戌冲
-    "巳": "亥",
-    "亥": "巳",  # 巳亥冲
+    left: right for a, b in BRANCH_CLASH_PAIRS for left, right in ((a, b), (b, a))
 }
 
+# 天干五合的字面配对及候选化神；配对不等于已成化。
+STEM_COMBINATIONS = (
+    ("甲", "己", "土"),
+    ("乙", "庚", "金"),
+    ("丙", "辛", "水"),
+    ("丁", "壬", "木"),
+    ("戊", "癸", "火"),
+)
+
+# 所选四冲口径，区别于五行相克及第三方的其他天干冲表。
+STEM_FOUR_CLASHES = (("甲", "庚"), ("乙", "辛"), ("丙", "壬"), ("丁", "癸"))
+
 # 地支六合关系
+BRANCH_HARMONY_PAIRS = (
+    ("子", "丑"),
+    ("寅", "亥"),
+    ("卯", "戌"),
+    ("辰", "酉"),
+    ("巳", "申"),
+    ("午", "未"),
+)
 BRANCH_COMBINATIONS = {
-    "子": "丑",
-    "丑": "子",  # 子丑合土
-    "寅": "亥",
-    "亥": "寅",  # 寅亥合木
-    "卯": "戌",
-    "戌": "卯",  # 卯戌合火
-    "辰": "酉",
-    "酉": "辰",  # 辰酉合金
-    "巳": "申",
-    "申": "巳",  # 巳申合水
-    "午": "未",
-    "未": "午",  # 午未合土
+    left: right for a, b in BRANCH_HARMONY_PAIRS for left, right in ((a, b), (b, a))
 }
 
 # 地支三合关系
@@ -334,23 +349,20 @@ BRANCH_TRIPLE_COMBINATIONS = {
 }
 
 # 地支六害关系（穿）
+BRANCH_HARM_PAIRS = (
+    ("子", "未"),
+    ("丑", "午"),
+    ("寅", "巳"),
+    ("卯", "辰"),
+    ("申", "亥"),
+    ("酉", "戌"),
+)
 BRANCH_HARMS = {
-    "子": "未",
-    "未": "子",  # 子未害
-    "丑": "午",
-    "午": "丑",  # 丑午害
-    "寅": "巳",
-    "巳": "寅",  # 寅巳害
-    "卯": "辰",
-    "辰": "卯",  # 卯辰害
-    "申": "亥",
-    "亥": "申",  # 申亥害
-    "酉": "戌",
-    "戌": "酉",  # 酉戌害
+    left: right for a, b in BRANCH_HARM_PAIRS for left, right in ((a, b), (b, a))
 }
 
-# 地支三刑关系。每组互刑：
-#   寅巳申（无恩之刑）、丑戌未（恃势之刑）、子卯（无礼之刑，互刑）
+# 地支刑组的字面成员；有向刑链由下方目标表给出。
+# 所选章同时保留无恩／恃势的另一套名称，不由名称判定实际效力。
 BRANCH_THREE_PUNISHMENTS = (
     ("寅", "巳", "申"),
     ("丑", "戌", "未"),
@@ -358,8 +370,17 @@ BRANCH_THREE_PUNISHMENTS = (
 )
 # 自刑地支（同支重见为刑）
 BRANCH_SELF_PUNISHMENTS = frozenset({"辰", "午", "酉", "亥"})
+BRANCH_PUNISHMENT_TARGETS = {
+    branch: group[(index + 1) % len(group)]
+    for group in BRANCH_THREE_PUNISHMENTS
+    for index, branch in enumerate(group)
+}
+BRANCH_PUNISHMENT_TARGETS.update({branch: branch for branch in BRANCH_SELF_PUNISHMENTS})
+BRANCH_PUNISHMENT_GROUPS = BRANCH_THREE_PUNISHMENTS + tuple(
+    (branch,) for branch in EARTHLY_BRANCHES if branch in BRANCH_SELF_PUNISHMENTS
+)
 
-# 地支三会方局（同方位三支聚气，力量最强）
+# 地支三会方局的字面成员（同方位三支）；实际力量与成化另核。
 BRANCH_SEASONAL_COMBINATIONS = {
     "寅卯辰": "木局",  # 东方木
     "巳午未": "火局",  # 南方火
@@ -375,9 +396,13 @@ BUREAU_ELEMENT = {
     "金局": Element.METAL,
     "土局": Element.EARTH,
 }
+BRANCH_TRIPLE_ELEMENTS = {
+    tuple(group): BUREAU_ELEMENT[bureau]
+    for group, bureau in BRANCH_TRIPLE_COMBINATIONS.items()
+}
 
-# 六合化气：地支对（frozenset）→ 化神五行。
-# 午未合化土沿用本仓 BRANCH_COMBINATIONS 注释的既定取向（午未合土）。
+# 六合候选化神；字面配对不代表已成化。
+# 午未的候选五行沿用本仓既定取向土；实际是否合化不由此表裁定。
 BRANCH_COMBINATION_ELEMENT = {
     frozenset({"子", "丑"}): Element.EARTH,
     frozenset({"寅", "亥"}): Element.WOOD,
@@ -387,7 +412,7 @@ BRANCH_COMBINATION_ELEMENT = {
     frozenset({"午", "未"}): Element.EARTH,
 }
 
-# 三合局旺神（中神）。半合须含旺神方成立：旺+生 或 旺+库。
+# 三合局旺神（中神）；本项目的半合成员口径含旺神，非完整成化条件。
 TRIPLE_COMBINATION_PEAK = {
     "申子辰": "子",
     "亥卯未": "卯",
@@ -478,7 +503,7 @@ def iter_pillar_gods(
     Args:
         pillars: 四柱 ``{label: (stem, branch)}``，须含 ``"day"`` 柱。
         day_stem: 日主天干（取十神的基准）。
-        skip_day_pillar: True 则跳过整个日柱（career / marriage）；
+        skip_day_pillar: True 则跳过整个日柱的明干和藏干；
             False（默认）跳过日干本身但仍计入日支藏干。
         stem_weight / hidden_weight: 天干 / 地支藏干的计权，默认 1.0 / 0.5。
     """

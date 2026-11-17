@@ -19,3 +19,9 @@ def verify_source_files(directory: Path) -> None:
     """Bind current independent data bytes; no implementation or archived output files."""
     for name, expected in read(directory / "source-files.json")["files"].items():
         assert sha(directory / name) == expected, name
+
+
+def resolve(value, path):
+    for key in path.split("."):
+        value = value[int(key)] if isinstance(value, list) else value[key]
+    return value

@@ -9,7 +9,7 @@ from pydantic import ValidationError
 import fatebridge.analysis.personality as personality_module
 from fatebridge.analysis.personality import PersonalityAnalysis
 from fatebridge.analysis.wealth import WealthAnalysis
-from fatebridge.core.bazi_root_context import wealth_rule_context
+from fatebridge.core.bazi_root_context import hidden_roots, wealth_rule_context
 from fatebridge.core.classical_roots import build_classical_root_profile
 from fatebridge.utils.data import TenGod
 from fatebridge.validation.predictions import StudyPlan, evaluate_study
@@ -18,6 +18,29 @@ from tests.evaluation.test_prediction_validation import AS_OF, forecast, outcome
 
 def pillars(values):
     return dict(zip(("year", "month", "day", "hour"), map(tuple, values)))
+
+
+def test_shared_hidden_root_positions_match_the_external_column_matrix():
+    reference = json.loads(
+        (
+            Path(__file__).parents[1] / "data/bazi_pillar_facts_v1/reference.json"
+        ).read_text()
+    )
+    positions = ("year", "month", "day", "hour")
+    for literal, column in reference["column_matrix"].items():
+        chart = dict(reversed([(name, tuple(literal)) for name in positions]))
+        assert hidden_roots(literal[0], chart) == [
+            {
+                "pillar": name,
+                "branch": literal[1],
+                "stem": row["stem"],
+                "hidden_rank": row["hidden_rank"],
+                "kind": "same_stem" if row["stem"] == literal[0] else "same_element",
+            }
+            for name in positions
+            for row in column["hidden_relations"]
+            if row["relation"] == "same_element"
+        ]
 
 
 @pytest.mark.parametrize(
@@ -110,12 +133,43 @@ def test_personality_ties_are_all_retained_without_arbitrary_primary(monkeypatch
     monkeypatch.setattr(
         personality_module, "count_ten_gods", lambda *a: {god: 1.0 for god in TenGod}
     )
-    result = PersonalityAnalysis._dominant_traits(
-        pillars(["甲子", "丙寅", "戊辰", "壬戌"]), "戊"
+    full_result = PersonalityAnalysis.analyze_personality(
+        pillars(["甲子", "丙寅", "戊辰", "壬戌"])
     )
+    result = full_result["dominant_traits"]
     assert len(result["top_gods"]) == 10
     assert set(result["tied_primary_gods"]) == {god.value for god in TenGod}
     assert result["primary"].startswith("并列：")
+    assert len(set(full_result["strengths"])) == 11
+
+
+@pytest.mark.parametrize(
+    "chart,expected_primary",
+    [
+        (["甲子", "丙寅", "甲子", "壬戌"], {"比肩", "食神"}),
+        (["甲子", "甲子", "甲子", "壬戌"], {"比肩"}),
+        (
+            ["甲子", "丙戌", "甲子", "壬戌"],
+            {"比肩", "食神", "伤官", "偏财", "正官", "正印", "偏印"},
+        ),
+    ],
+)
+def test_personality_strengths_retain_joint_primary_and_exclude_lower_ranks(
+    chart, expected_primary
+):
+    # Formal pillar fixtures, not claims about possible birth dates. These
+    # literal identities follow the pinned 6tail/lunar-python 1645ad3 tables
+    # under the declared non-day-stem=1, each-hidden-stem=1/2 policy.
+    result = PersonalityAnalysis.analyze_personality(pillars(chart))
+    dominant = result["dominant_traits"]
+    assert set(dominant["tied_primary_gods"]) == expected_primary
+    included = {
+        item["ten_god"]
+        for item in dominant["top_gods"]
+        if item["traits"] in result["strengths"]
+    }
+    assert included == expected_primary
+    assert len(result["strengths"]) == 1 + len(expected_primary)
 
 
 @pytest.mark.parametrize(

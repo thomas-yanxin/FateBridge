@@ -6,8 +6,8 @@
 
 双人综合分使用 `compatibility_weighted_rules_v3`，将五项规则索引按关系类型加权。`score_kind=uncalibrated_rule_index` 表示未校准的内部指标；它不是现实关系的成功概率，其他关系技法不适用这套权重。
 
-个人层取用使用`source_conditions_before_preference_v3`，先核对来源条件，再确定可用的喜用与回避项，
-详见[八字判定](bazi-assessment.md)。独立手算账本列出固定输入、逐条加减、封顶及关系权重，
+评分显式消费个人层的 `engineering_index` 和 `structure_profile.engineering_reference`，保留既有工程旺衰与 v3 方向消解政策；没有因原典尚未裁定而改变原分数。全局来源方向另由 `source_force_before_preference_v4` 交付，当前 `not_adjudicated` 不等于没有喜用或互助。
+详见[八字判定](bazi-assessment.md)。独立手算账本列出固定工程前提、逐条加减、封顶及关系权重，
 不以旧算法输出或源码哈希作为正确答案。
 
 首次接入先按 [API 参考](api-reference.md) 提供两人的已确认资料；关系类型未指定时使用 `general`。读取结果时依次核对[分项权重](#分项权重与舍入)、[计算回执](#计算回执)和[解释范围](#解释范围)。
@@ -28,6 +28,14 @@
 独立传统净分 `traditional_compatibility` 不加入综合分，
 与上表中的传统分析维度分开读取。
 
+## 地支成员口径与兼容分数
+
+本命关系、力量账本、候选清单、双人事件及基础兼容计分共用 `peak_member_required_for_half_v1`：三字齐、含中神两字、缺中神端支、成员不足四种状态分别记录。申辰、亥未、寅戌、巳丑属于此口径的缺中神端支，不再在双人事件或基础净分中冒作半合。三字齐也不自动认证成化，实际来源喜忌与力量仍按原层核验。
+
+基础净分保留逐个跨人柱对的六合2分、半合3分等原权重；这次修复资格判断，没有校准权重。全部144个同支成盘的有序支对中，只移除了四类端支两个方向各48分的误加奖励，其他净分和全部冲害项相同；这些是纯符号软件检查，不是有效出生盘或现实关系效果。既有未裁定示例的综合分71.5及全部算术项不变，只清除错误半合名称，原冻结账本仍保留。
+
+固定第三方的12项半合字典与本项目8对口径存在范围差异；该字典未被其主CLI使用，不能据此声称执行了该工具的12对半合算法。另执行其原始虚拱和三合循环，保留补入虚拟支后新增报告的结果。参见[地支参考与来源分歧](../tests/data/bazi_branch_facts_v1/README.md)；这些比较不认证双人权重、完整古法或预测效度。
+
 分项在 `summary.scoring.dimensions` 中使用下列键名，便于对照原始结果：
 
 | 中文分项 | 字段键 |
@@ -44,7 +52,7 @@
 
 - `method_id`：关系加权规则版本。
 - `evidence_policy/status/unresolved_dimensions`：取用证据政策、完整程度和未裁定分项；`partial` 时摘要只陈述规则索引及条件，不生成确定匹配等级。
-- `input_methods.person1/person2`：旺衰模型、分类、状态及喜用解析策略。
+- `input_methods.person1/person2`：工程旺衰模型、工程分类与方向解析策略；另列来源裁定状态。
   无版本信息的输入标为 `unversioned`。
 - `dimensions`：每项实际使用的 `score/weight/weighted_score`。
 - `dependency_policy/dimension_dependencies`：分项共享的出生、强弱、分布及取用依据；不是五份独立证据，不能据分项数量增加置信度。
@@ -57,15 +65,17 @@
 
 完整结果还核验五个具名分项、权重和为1、逐项乘积、未舍入总和、最终舍入及摘要状态。发现接口中的方法合同登记适用前提与比较范围，供调用方核对实际方法版本。该校验验证账本一致性，不证明权重具有实证效度。
 
+证据政策 `explicit_preference_and_unresolved_events_v2` 在十神分项另列 `preference_evidence`，逐条保留实际跨人十神的工程方向及目标方原典状态。命中的工程方向为 `conditional/unknown` 时，该维度为 `partial`，并进入总回执的未裁定维度；已知中性且喜用为空不因此变为未知。原典尚未裁定本身不改变工程状态或原分数；既定官杀、劫财等加减项仍是工程规则索引，不能据此补作传统取用或现实关系风险结论。
+
 旺衰与喜用的计算范围见[八字判定说明](bazi-assessment.md)。
-`strength_status=rule_based` 不代表喜用层已无条件成立；
-喜用层仍单独记录 `useful_assessment_status=conditional`。
+`strength_status=rule_based` 只描述工程政策结果，不代表来源喜用已经成立；
+来源喜用层单独记录 `not_adjudicated`，工程条件层与来源状态分别读取。
 条件项和未列为喜的元素不能自动作为忌避。
 
 ## 解释范围
 
 格局协同会消费合并事件中的个人内部事件，综合分因此不等同于纯跨人互动分。
-单方喜用命中只保留该方参考；另一方效力未定时列为未决。逐人 `person_info.*.preference_assessment` 保留已选喜用、回避、条件和中性，日主相克另列 `control_evidence`；不能据此断言另一方现实中承压。
+单方工程方向命中只保留该方参考；另一方工程效力未定时列为未决。逐人 `person_info.*.preference_assessment` 区分来源状态与工程喜用、回避、条件和中性，日主相克另列 `control_evidence`；不能据此断言原典喜忌已定或另一方现实中承压。
 模型版本、固定命例符合度或参数稳定性均不证明现实预测效力。
 
 实现位于 [`analysis/compatibility.py`](../src/fatebridge/analysis/compatibility.py)。追查总分变化时，先看变化来自哪一项 `weighted_score`，再核对该项的输入与规则；只比较最终分数无法区分模型升级和关系权重变化。

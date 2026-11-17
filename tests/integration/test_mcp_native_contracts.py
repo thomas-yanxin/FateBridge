@@ -7,7 +7,7 @@ from typing import Any
 import pytest
 from fastmcp import Client, FastMCP
 from fastmcp.exceptions import ToolError
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, Field
 
 from fatebridge.application.bindings import pair_invoke
 from fatebridge.application.tool_spec import ToolSpec

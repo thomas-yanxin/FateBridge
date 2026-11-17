@@ -5,7 +5,7 @@ from typing import Any, Dict, List, Literal, Optional
 
 from pydantic import Field, model_validator
 
-from fatebridge.core.output_base import PartialOutput
+from fatebridge.core.output_base import FullFact, PartialOutput, PresentFact
 from fatebridge.core.output_branch_candidates import (
     physical_branch_mapping,
     validate_punishment_resolution,
@@ -16,7 +16,11 @@ from fatebridge.core.output_candidate_selection import (
     MonthStructureReference,
 )
 from fatebridge.core.output_clash_comparison import ClashComparison
-from fatebridge.core.output_classical_force import ClassicalForceComponents
+from fatebridge.core.output_classical_force import (
+    ClassicalForceAdjudication,
+    ClassicalForceComponents,
+    EngineeringStrengthIndex,
+)
 from fatebridge.core.output_classical_passage import ClassicalPassage
 from fatebridge.core.output_classical_roots import ClassicalRootProfile
 from fatebridge.core.output_classical_routes import ClassicalRoutes
@@ -67,6 +71,8 @@ class StarEvidence(PartialOutput):
 
 class StrengthContext(PartialOutput):
     strength_level: Optional[str] = None
+    engineering_index: FullFact[Optional[EngineeringStrengthIndex]] = None
+    classical_adjudication: FullFact[Optional[ClassicalForceAdjudication]] = None
     method_id: Optional[str] = None
     status: Optional[str] = None
     requires_special_structure_review: Optional[bool] = None
@@ -77,6 +83,31 @@ class StrengthContext(PartialOutput):
     stem_energy_accounting: Optional[StemEnergyAccounting] = None
     clash_comparison: Optional[ClashComparison] = None
     threshold_arithmetic: Optional[StrengthThresholdArithmetic] = None
+
+    @model_validator(mode="after")
+    def coherent_engineering_index(self) -> "StrengthContext":
+        index = self.engineering_index
+        if index is None:
+            return self
+        if (
+            self.method_id is not None
+            and index.method_id is not None
+            and self.method_id != index.method_id
+        ) or (
+            self.strength_level is not None
+            and index.strength_level is not None
+            and self.strength_level != index.strength_level
+        ):
+            raise ValueError("工程索引与同次旺衰政策结果不符")
+        if (
+            self.threshold_arithmetic is not None
+            and self.threshold_arithmetic.numerical_label is not None
+            and index.numerical_strength_level is not None
+            and self.threshold_arithmetic.numerical_label
+            != index.numerical_strength_level
+        ):
+            raise ValueError("工程索引数值档与同次精确账本不符")
+        return self
 
     @model_validator(mode="after")
     def coherent_review_flag(self) -> "StrengthContext":
@@ -304,6 +335,13 @@ class BaziEvidenceChain(PartialOutput):
         context, force = self.strength_context, self.force_components
         if context is None or force is None:
             return self
+        left, right = context.classical_adjudication, force.classical_adjudication
+        if left is not None and right is not None:
+            for name in left.model_fields_set & right.model_fields_set:
+                if getattr(left, name) != getattr(right, name):
+                    raise ValueError(
+                        "原典力量裁定须来自同次日主结果，不得在证据层另行改判"
+                    )
         if force.energy_provenance is not None:
             bind_assessment(
                 force.energy_provenance, context.model_dump(exclude_unset=True)
@@ -360,10 +398,62 @@ class BaziEvidenceChain(PartialOutput):
         return self
 
 
-class EvidenceStructureProfile(PartialOutput):
-    resolution_policy: Optional[Literal["source_conditions_before_preference_v3"]] = (
+class EngineeringPreferenceReference(PartialOutput):
+    resolution_policy: FullFact[
+        Optional[Literal["source_conditions_before_preference_v3"]]
+    ] = None
+    assessment_status: FullFact[Optional[Literal["conditional"]]] = None
+    quantity_kind: FullFact[Optional[Literal["conditional_engineering_preference"]]] = (
         None
     )
+    source_adjudication_used: FullFact[Optional[Literal[False]]] = None
+    useful_elements: FullFact[Optional[List[str]]] = None
+    avoid_elements: FullFact[Optional[List[str]]] = None
+    conditional_elements: FullFact[Optional[List[str]]] = None
+    neutral_elements: FullFact[Optional[List[str]]] = None
+    useful_ten_gods: FullFact[Optional[List[str]]] = None
+    scope: FullFact[Optional[str]] = None
+
+
+class HarmonyEffect(PartialOutput):
+    type: FullFact[Optional[str]] = None
+    label: FullFact[Optional[str]] = None
+    branches: FullFact[Optional[List[str]]] = None
+    result_element: PresentFact[Optional[str]] = None
+    strengthens: FullFact[Optional[List[str]]] = None
+    consumes: FullFact[Optional[List[str]]] = None
+    impact_on_day_master: FullFact[Optional[str]] = None
+    impact_on_structure: FullFact[Optional[str]] = None
+    classification: FullFact[
+        Optional[Literal["supportive", "risk", "neutral", "tension"]]
+    ] = None
+
+
+class EvidenceStructureProfile(PartialOutput):
+    resolution_policy: Optional[Literal["source_force_before_preference_v4"]] = None
+    assessment_status: FullFact[Optional[Literal["not_adjudicated", "conditional"]]] = (
+        None
+    )
+    classical_adjudication: FullFact[Optional[ClassicalForceAdjudication]] = None
+    engineering_reference: FullFact[Optional[EngineeringPreferenceReference]] = None
+    harmony_effects_status: FullFact[
+        Optional[Literal["not_adjudicated", "conditional"]]
+    ] = None
+    harmony_effects: FullFact[Optional[List[HarmonyEffect]]] = None
+    engineering_harmony_effects: FullFact[Optional[List[HarmonyEffect]]] = None
+    useful_elements: FullFact[Optional[List[str]]] = None
+    avoid_elements: FullFact[Optional[List[str]]] = None
+    conditional_elements: FullFact[Optional[List[str]]] = None
+    neutral_elements: FullFact[Optional[List[str]]] = None
+
+    @model_validator(mode="after")
+    def unknown_force_does_not_select_preferences(self) -> "EvidenceStructureProfile":
+        if self.assessment_status == "not_adjudicated" and (
+            self.useful_elements or self.avoid_elements or self.neutral_elements
+        ):
+            raise ValueError("来源喜忌未裁定时，工程参考不能回填已选喜忌或中性结论")
+        return self
+
     dominant_structure: Optional[MonthStructureReference] = None
     candidate_selection: Optional[CandidateSelection] = None
     from_child_reference: Optional[FromChildReference] = None

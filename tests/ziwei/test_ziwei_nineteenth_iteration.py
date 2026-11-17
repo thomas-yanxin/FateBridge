@@ -1,7 +1,6 @@
 """Conditional temporal splits retain unresolved calendar and encounter semantics."""
 
 import asyncio
-import hashlib
 import json
 import shutil
 from copy import deepcopy
@@ -30,7 +29,7 @@ from fatebridge.validation.claims import CalculationClaim, verify_calculation_cl
 from scripts.ziwei.audit_ziwei_limits import _seed
 from scripts.ziwei.ziwei_conditional_inputs import synthetic_birth_clock
 from tests.fixtures.mcp_receipt import verified_inline_business
-from tests.fixtures.mcp_result_delivery import assert_same_run_receipt
+from tests.fixtures.mcp_result_delivery import read_full_result
 
 
 def test_original_text_and_conditional_coverage_are_separate():
@@ -248,22 +247,7 @@ def test_limit_views_match_rest_native_mcp_cli_and_same_run_pages(
             assert len(json.dumps(p, ensure_ascii=False, separators=(",", ":"))) <= 8192
             if not detail:
                 return await verified_inline_business(client, p)
-            if "result_delivery" not in p:
-                return p
-            ref = p["result_delivery"]
-            uri, raw = ref["first_page_uri"], ""
-            while uri:
-                page = json.loads((await client.read_resource(uri))[0].text)
-                raw += page["text"]
-                uri = page["next_uri"]
-            assert hashlib.sha256(raw.encode()).hexdigest() == ref["sha256"]
-            full = json.loads(raw)
-            assert_same_run_receipt(
-                p["run_metadata"],
-                full["run_metadata"],
-                deferred_fields=ref["deferred_fields"],
-            )
-            return full
+            return await read_full_result(client, p)
 
     native = asyncio.run(call())
     args = ["ziwei_horoscope"]

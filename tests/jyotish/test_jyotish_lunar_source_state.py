@@ -13,7 +13,12 @@ from fatebridge.core import ephemeris_runtime as e
 from fatebridge.core.astro import continuous_lahiri as frame
 from fatebridge.core.astro import jyotish_continuous_state as continuous
 from fatebridge.core.astro import jyotish_lunar_source_state as source_state
-from fatebridge.core.astro import lunar_motion, lunar_observer, runtime
+from fatebridge.core.astro import (
+    lunar_motion,
+    lunar_observer,
+    reference_frames,
+    runtime,
+)
 from fatebridge.core.astro.physical_sources import PhysicalEphemerisTrace
 from fatebridge.core.compressed_ephemeris import audit_compressed_endpoints
 from fatebridge.core.jyotish import positions
@@ -216,10 +221,12 @@ def test_mutation_detection_preserves_cases_below_the_frozen_line(record_propert
         )
         no_observer = frame.decode_native_fixed_reception_state(tt, p, no_observer_v)
         basis = frame.frame_state(tt)
-        basis_term = frame.mv(
-            frame.transpose(basis["mean_frame_derivative_per_TT_day"]), p
+        basis_term = reference_frames.mv(
+            reference_frames.transpose(basis["mean_frame_derivative_per_TT_day"]), p
         )
-        bad_v = frame.add(decoded["velocity_per_native_argument_day"], basis_term)
+        bad_v = reference_frames.add(
+            decoded["velocity_per_native_argument_day"], basis_term
+        )
         unit = frame.project_state(
             tt,
             decoded["position"],
@@ -257,13 +264,15 @@ def test_mutation_detection_preserves_cases_below_the_frozen_line(record_propert
                 actual_counts[key] += error(uniform) > 1e-12
                 expected_counts[key] += mutants["uniform_clock_velocity_error"] > 1e-12
         if tt == 2451545.0:
-            smooth = frame.mv(frame.transpose(basis["mean_frame"]), p)
+            smooth = reference_frames.mv(
+                reference_frames.transpose(basis["mean_frame"]), p
+            )
             decoded_p = decoded["position"]
             angle = (
                 math.degrees(
                     math.atan2(
-                        math.hypot(*frame.cross(decoded_p, smooth)),
-                        frame.dot(decoded_p, smooth),
+                        math.hypot(*reference_frames.cross(decoded_p, smooth)),
+                        reference_frames.dot(decoded_p, smooth),
                     )
                 )
                 * 3600

@@ -1,7 +1,6 @@
 """Daily/intrinsic/branch distinctions and same-run faithful delivery."""
 
 import copy
-import hashlib
 import importlib.util
 import json
 import shutil
@@ -25,7 +24,7 @@ from fatebridge.core.output_jinkou_stems import JinkouStemRelations
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.metaphysics import calculate_jinkou_analysis
 from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
-from tests.fixtures.mcp_result_delivery import assert_same_run_receipt
+from tests.fixtures.mcp_result_delivery import read_full_result
 from tests.support.transports import AS_OF, SPECS, business, rest, surface_calls
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -454,21 +453,9 @@ async def test_published_first_view_reads_all_stem_evidence_from_one_run():
         assert not response.is_error
         inline = response.structured_content
         reference = inline["result_delivery"]
-        pieces = []
-        uri = reference["first_page_uri"]
-        while uri:
-            page = json.loads((await client.read_resource(uri))[0].text)
-            pieces.append(page["text"])
-            uri = page["next_uri"]
-    text = "".join(pieces)
-    assert (
-        len(pieces) > 1
-        and hashlib.sha256(text.encode()).hexdigest() == reference["sha256"]
-    )
-    complete = json.loads(text)
-    assert_same_run_receipt(
-        inline["run_metadata"],
-        complete["run_metadata"],
-        deferred_fields=reference["deferred_fields"],
-    )
+        first = json.loads(
+            (await client.read_resource(reference["first_page_uri"]))[0].text
+        )
+        assert first["next_uri"] is not None
+        complete = await read_full_result(client, inline)
     assert complete["jinkou"]["stem_relations"]["relation"] == "将干克神干"

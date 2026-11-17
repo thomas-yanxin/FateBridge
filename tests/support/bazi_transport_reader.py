@@ -33,8 +33,8 @@ def file_payload(value, manifest, folder, name):
     )
     wrapper = json.loads(raw)
     payload = wrapper[locator["file_payload_path"]]
-    encoded = json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode()
-    assert len(encoded) == reference["total_bytes"]
+    text = json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
+    assert len(text) == reference["total_chars"]
     assert payload["run_metadata"]["run_id"] == value["run_metadata"]["run_id"]
     return payload
 
@@ -89,8 +89,9 @@ def cli_payload(value, folder, capsys):
             break
         assert page["next_offset"] > offset
         offset = page["next_offset"]
-    raw = "".join(pages).encode()
-    assert len(raw) == reference["total_bytes"]
+    text = "".join(pages)
+    assert len(text) == reference["total_chars"]
+    raw = text.encode()
     (folder / "cli-same-run-pages.json.gz").write_bytes(gzip.compress(raw, mtime=0))
     payload = json.loads(raw)
     assert payload["run_metadata"]["run_id"] == value["run_metadata"]["run_id"]

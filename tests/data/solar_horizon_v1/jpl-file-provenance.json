@@ -1,0 +1,309 @@
+{
+  "summary": {
+    "rows": 24,
+    "unique_physics": 24,
+    "source_clock_failures": 0,
+    "events": 32,
+    "reference_sha256": "e1a69e8fc0c793c7212b12a53b6cd5f8389b2a797d0099796600219b6c493e3e",
+    "seconds": 2.563011666003149
+  },
+  "production_imported": false,
+  "generator_source": "\"\"\"All frozen solar inputs through original JPL/CALCEPH/SOFA, no Fate import.\"\"\"\nimport ctypes as C\nfrom datetime import date\nfrom fractions import Fraction\nimport gzip\nimport hashlib\nfrom importlib.metadata import version\nimport json\nimport math\nfrom pathlib import Path\nimport sys\nimport time\n\nimport numpy as np\nfrom scipy.optimize import brentq, minimize_scalar\n\nassert not any(name.startswith('fatebridge') for name in sys.modules)\nbase=Path(__file__).parent\nplan=json.loads((base/'solar-file-j2000-original-reference-plan.json').read_text())\noutput=base/'solar-file-j2000-original-reference-reference.jsonl'\nassert not output.exists(), 'Inspect the existing job/receipt; do not restart over partial evidence.'\nlib_path=base/'calceph-build/src/libcalceph.2.1.1.dylib'\ncal=C.CDLL(str(lib_path));sofa=C.CDLL(str(base/'libofficial_sofa.dylib'))\nauthor=C.CDLL(str(base/'libauthor_swiss_2_10_03_contract.dylib'))\ngeometry=C.CDLL(str(base/'libsolar_reference_geometry_all_epochs.dylib'))\nDP=C.POINTER(C.c_double)\ncal.calceph_open.argtypes=[C.c_char_p];cal.calceph_open.restype=C.c_void_p\ncal.calceph_close.argtypes=[C.c_void_p];cal.calceph_close.restype=None\ncal.calceph_compute_unit.argtypes=[C.c_void_p,C.c_double,C.c_double,C.c_int,C.c_int,C.c_int,DP]\ncal.calceph_compute_unit.restype=C.c_int\ncal.calceph_getversion_str.argtypes=[C.c_char_p];cal.calceph_getversion_str.restype=None\ncal.calceph_getfileversion.argtypes=[C.c_void_p,C.c_char_p];cal.calceph_getfileversion.restype=C.c_int\ncal.calceph_gettimescale.argtypes=[C.c_void_p];cal.calceph_gettimescale.restype=C.c_int\nv=C.create_string_buffer(1024);cal.calceph_getversion_str(v);assert v.value==b'5.0.1'\nkernel_paths={\n    'DE440':base/'original-de440.bsp',\n    'DE441':Path(json.loads((base/'original-de441-cache-receipt.json').read_text())['path']),\n}\ndescriptors={};kernel_versions={}\nfor name,path in kernel_paths.items():\n    descriptor=cal.calceph_open(str(path).encode());assert descriptor\n    fv=C.create_string_buffer(1024);version_status=cal.calceph_getfileversion(descriptor,fv)\n    if name=='DE441':assert version_status==1 and fv.value==b'DE441',(name,version_status,fv.value)\n    # SPK need not carry this optional INPOP/JPL-header version field. Its\n    # original download receipt and full-file hash identify the DE440 input.\n    else:assert version_status in (0,1)\n    assert cal.calceph_gettimescale(descriptor)==1\n    descriptors[name]=descriptor;kernel_versions[name]=dict(status=version_status,value=fv.value.decode() if version_status else None)\nsofa.iauDtdb.argtypes=[C.c_double]*6;sofa.iauDtdb.restype=C.c_double\nsofa.iauAb.argtypes=[DP,DP,C.c_double,C.c_double,DP];sofa.iauAb.restype=None\nsofa.iauDat.argtypes=[C.c_int,C.c_int,C.c_int,C.c_double,DP];sofa.iauDat.restype=C.c_int\nauthor.swe_set_ephe_path.argtypes=[C.c_char_p]\nauthor.swe_deltat_ex.argtypes=[C.c_double,C.c_int,C.c_char_p];author.swe_deltat_ex.restype=C.c_double\nauthor.swe_refrac_extended.argtypes=[C.c_double]*5+[C.c_int,DP];author.swe_refrac_extended.restype=C.c_double\ngeometry.fb_reference_receiver.argtypes=[C.c_double]*5+[DP];geometry.fb_reference_receiver.restype=C.c_int\ngeometry.fb_reduce_reference_direction.argtypes=[C.c_double]*3+[C.c_int,DP,DP,DP]\ngeometry.fb_reduce_reference_direction.restype=C.c_int\nauthor.swe_set_jpl_file.argtypes=[C.c_char_p];author.swe_set_jpl_file.restype=None\nauthor.swe_set_ephe_path(str(kernel_paths['DE441'].parent).encode());author.swe_set_jpl_file(kernel_paths['DE441'].name.encode())\nthreshold=author.swe_refrac_extended(0.,0.,1013.25,0.,.0065,1,(C.c_double*4)())\nc04_path=base/'root-clock-inputs/iers-c04-ut1-v1.json.gz'\nc04=json.loads(gzip.decompress(c04_path.read_bytes()));c04_u=[];c04_t=[];dat_warnings=[]\nfor mjd,dut1,sigma in c04['records']:\n    day=date.fromordinal(mjd+678576);offset=C.c_double()\n    status=sofa.iauDat(day.year,day.month,day.day,0.,C.byref(offset));assert status in (0,1)\n    if status:dat_warnings.append(mjd)\n    civil=mjd+2400000.5;c04_u.append(civil+float(dut1)/86400);c04_t.append(civil+(offset.value+32.184)/86400)\n\n\nclass ClockUnavailable(Exception):\n    pass\n\n\ndef clock(ut1,policy):\n    if policy=='c04':\n        if not c04_u[0]<=ut1<=c04_u[-1]:raise ClockUnavailable(ut1)\n        return float(np.interp(ut1,c04_u,c04_t))\n    flag=-1 if ut1<2436934.5 else 1\n    delta=author.swe_deltat_ex(ut1,flag,C.create_string_buffer(256))\n    assert math.isfinite(delta)\n    return ut1+delta\n\n\ndef original_state(descriptor,body,whole,fraction):\n    values=np.full(6,np.nan)\n    # CALCEPH_UNIT_KM(2) | CALCEPH_UNIT_DAY(4): SPK has no AU constant;\n    # use explicit physical units, then the exact IAU 2012 AU in km.\n    status=cal.calceph_compute_unit(descriptor,2451545.+whole,float(fraction),body,12,6,values.ctypes.data_as(DP))\n    if not status or not np.isfinite(values).all():raise RuntimeError(('original source unavailable',body,whole,fraction))\n    values/=149597870.7\n    return values[:3],values[3:]\n\n\nstart_tt=date(1700,1,1).toordinal()+1721424.5\nend_tt=date(2301,1,1).toordinal()+1721424.5\nfamilies={family:json.loads((base/f'solar-event-{family}-cases.json').read_text()) for family in plan['families']}\nexpected_counts=plan['input_counts'];assert all(len(families[k])==n for k,n in expected_counts.items())\nresults=[];cache={};started=time.perf_counter();unique_calls=0\nstream=output.open('x')\nfor family,cases in families.items():\n    for index,case in enumerate(cases):\n        query=case['query_ut1'];end=query+26/24\n        key=(query,case['longitude'],case['latitude'],case['definition'],case['clock'],case['no_data'])\n        cached=key in cache\n        if not cached:\n            unique_calls+=1\n            author.swe_set_ephe_path(str(kernel_paths['DE441'].parent).encode())\n            try:\n                first_tt,last_tt=clock(query,case['clock']),clock(end,case['clock'])\n            except ClockUnavailable:\n                cache[key]=dict(status='clock_unavailable',roots=[],evaluations=0)\n            else:\n                name='DE441'\n                descriptor=descriptors[name];horizon=threshold if case['definition'] else 0.;samples={}\n\n                def at(delta):\n                    ut1=float(query+float(delta))\n                    if ut1 not in samples:\n                        tt=clock(ut1,case['clock']);relative=tt-2451545.;whole=math.floor(relative)\n                        fraction=relative-whole+sofa.iauDtdb(2451545.,relative,0.,0.,0.,0.)/86400\n                        pv=np.full(34,np.nan)\n                        status=geometry.fb_reference_receiver(tt,ut1,case['longitude'],case['latitude'],0.,pv.ctypes.data_as(DP));assert status==0,(status,tt)\n                        earth,velocity=original_state(descriptor,3,whole,fraction)\n                        receiver=earth+(pv[:3] if case['definition'] else 0.)\n                        speed=velocity+(pv[3:6] if case['definition'] else 0.)\n                        current_sun,_=original_state(descriptor,11,whole,fraction)\n                        solar_distance=float(np.linalg.norm(current_sun-receiver));delay=0.\n                        for iterations in range(12):\n                            emitted,_=original_state(descriptor,11,whole,fraction-delay)\n                            ray=emitted-receiver;distance=float(np.linalg.norm(ray));new_delay=distance/173.14463267424034\n                            if new_delay==delay or abs(new_delay-delay)<1e-16:break\n                            delay=new_delay\n                        else:raise RuntimeError('Original JPL light cone did not converge')\n                        unit=ray/distance;beta=speed/173.14463267424034;apparent=np.full(3,np.nan)\n                        sofa.iauAb(unit.ctypes.data_as(DP),beta.ctypes.data_as(DP),solar_distance,math.sqrt(1-float(beta@beta)),apparent.ctypes.data_as(DP))\n                        result=np.full(4,np.nan)\n                        status=geometry.fb_reduce_reference_direction(tt,case['longitude'],case['latitude'],case['definition'],pv.ctypes.data_as(DP),apparent.ctypes.data_as(DP),result.ctypes.data_as(DP));assert status==0,status\n                        samples[ut1]=(float(result[3]-horizon),tt)\n                    return samples[ut1][0]\n\n                grid=[i/1440 for i in range(1561)];values=[at(point) for point in grid]\n                brackets=[];extrema=[]\n                for j in range(1,len(grid)-1):\n                    a,b,c=values[j-1:j+2]\n                    if b>a and b>=c:sign=-1\n                    elif b<a and b<=c:sign=1\n                    else:continue\n                    brackets.append((grid[j-1],grid[j+1],sign))\n                brackets.extend((a,b,sign) for a,b in [(0.,2/1440),(26/24-2/1440,26/24)] for sign in (-1,1))\n                for lower,upper,sign in brackets:\n                    centre=(lower+upper)/2\n                    solved=minimize_scalar(lambda q:sign*at(centre+q),bounds=(lower-centre,upper-centre),method='bounded',options={'xatol':1e-12,'maxiter':150})\n                    assert solved.success\n                    point=centre+float(solved.x);grid.append(point)\n                    extrema.append(dict(ut1=float(query+point),kind='maximum' if sign<0 else 'minimum',residual_degrees=at(point)))\n                grid=sorted(set(grid));events=[]\n                for lower,upper in zip(grid,grid[1:]):\n                    fa,fb=at(lower),at(upper);rising,setting=fa<0<=fb,fa>0>=fb\n                    if not(rising or setting):continue\n                    root,info=brentq(at,lower,upper,xtol=5e-15,rtol=4*np.finfo(float).eps,maxiter=150,full_output=True);assert info.converged\n                    ut1=float(query+root)\n                    if events and abs(ut1-events[-1]['ut1'])*86400<.0001:continue\n                    events.append(dict(ut1=ut1,tt=samples[ut1][1],kind='rise' if rising else 'set',residual_degrees=at(root)))\n                cache[key]=dict(status='ok',source=name,roots=events,extrema=extrema,evaluations=len(samples))\n        row=dict(family=family,case=index,input=case,reference=cache[key],reused_identical_physics=cached)\n        results.append(row);stream.write(json.dumps(row,separators=(',',':'))+'\\n');stream.flush()\n        if len(results)%50==0:\n            progress=dict(rows=len(results),unique_physics=unique_calls,source_clock_failures=sum(r['reference']['status']!='ok' for r in results),seconds=time.perf_counter()-started)\n            (base/'solar-file-j2000-original-reference-progress.json').write_text(json.dumps(progress,indent=2)+'\\n');print(json.dumps(progress),flush=True)\nstream.close()\nassert len(results)==24\nreport=dict(plan=plan,production_imported=False,rows=results,\n            clock=dict(c04_sha256=hashlib.sha256(c04_path.read_bytes()).hexdigest(),sofa_dat_warning_mjds=dat_warnings),\n            provenance=dict(calceph_version=v.value.decode(),kernel_versions=kernel_versions,\n                kernel_receipts={name:json.loads((base/file).read_text()) for name,file in [('DE440','de440-download.json'),('DE441','original-de441-cache-receipt.json')]},\n                source_lineage=json.loads((base/'de441-source-lineage-check.json').read_text()),\n                hashes={name:hashlib.sha256((base/name).read_bytes()).hexdigest() for name in ['generate_file_j2000_solar_reference.py','solar_reference_geometry_all_epochs.c','libsolar_reference_geometry_all_epochs.dylib','libofficial_sofa.dylib','libauthor_swiss_2_10_03_contract.dylib','calceph-build/src/libcalceph.2.1.1.dylib']}),\n            scope=plan['scope'])\nsplit_epoch_states=[]\nfor fraction in [Fraction(0),*(Fraction(sign,2**power) for power in (40,35,32) for sign in (-1,1)),Fraction(1,8),Fraction(1,8)-Fraction(1,2**40),Fraction(1,8)+Fraction(1,2**40)]:\n    for body,target_number in [('Earth',3),('Moon',10),('Sun',11)]:\n        position,velocity=original_state(descriptors['DE441'],target_number,0,float(fraction))\n        split_epoch_states.append(dict(jd0=2451545,tdb_fraction=[fraction.numerator,fraction.denominator],body=body,position_au=position.tolist(),velocity_au_day=velocity.tolist()))\nreport['split_epoch_states']=split_epoch_states\nreport['split_epoch_gates']=dict(position_metres=.0001,velocity_mps=1e-8)\ntarget=base/'solar-file-j2000-original-reference-reference.json.gz';target.write_bytes(gzip.compress(json.dumps(report,separators=(',',':')).encode(),mtime=0))\nsummary=dict(rows=len(results),unique_physics=unique_calls,source_clock_failures=sum(r['reference']['status']!='ok' for r in results),events=sum(len(r['reference']['roots']) for r in results),reference_sha256=hashlib.sha256(target.read_bytes()).hexdigest(),seconds=time.perf_counter()-started)\n(base/'solar-file-j2000-original-reference-summary.json').write_text(json.dumps(summary,indent=2)+'\\n');print(json.dumps(summary),flush=True)\nfor descriptor in descriptors.values():cal.calceph_close(descriptor)\n",
+  "fixture_lineage": {
+    "fixture": "/Users/thomas/.codex/artifacts/fatebridge-celestial-frame-20261114/worktree/tests/data/astrodice/tables/de441-j2000.eph",
+    "fixture_sha256": "5e298b899542373c2f5814c8397cdea5a4627d1e4f5f6d1a89a11810955441cf",
+    "source_sha256": "476096486def4e41bfceb29aa27f50784da0bce318902bcf7b88caad058cd4da",
+    "source_record_index": 171210,
+    "source_jd_bounds": [
+      2451504.5,
+      2451600.5
+    ],
+    "coefficient_bytes": 24432,
+    "coefficients_identical": true,
+    "original_coefficient_sha256": "aad48ba04c6e291a00399cbdbf0b3fe9065a5c9ed532a00747a3b49baa3a1c3f",
+    "constants_identical": true,
+    "scope": "Every coefficient byte of the existing partial fixture matches the fresh original cached DE441. The partial wrapper/header bounds are not a complete original kernel."
+  },
+  "before_split_epoch_control": {
+    "rows": [
+      {
+        "body": "Earth",
+        "tdb_fraction": [
+          0,
+          1
+        ],
+        "position_error_metres": 0.0,
+        "velocity_error_mps": 6.100338046419979e-12
+      },
+      {
+        "body": "Moon",
+        "tdb_fraction": [
+          0,
+          1
+        ],
+        "position_error_metres": 1.8569091163290978e-05,
+        "velocity_error_mps": 8.39531393016266e-13
+      },
+      {
+        "body": "Sun",
+        "tdb_fraction": [
+          0,
+          1
+        ],
+        "position_error_metres": 0.0,
+        "velocity_error_mps": 2.0740870071448263e-15
+      },
+      {
+        "body": "Earth",
+        "tdb_fraction": [
+          -1,
+          1099511627776
+        ],
+        "position_error_metres": 0.002381307664504605,
+        "velocity_error_mps": 4.837111497159069e-10
+      },
+      {
+        "body": "Moon",
+        "tdb_fraction": [
+          -1,
+          1099511627776
+        ],
+        "position_error_metres": 0.002339193306770199,
+        "velocity_error_mps": 4.1512683935217704e-10
+      },
+      {
+        "body": "Sun",
+        "tdb_fraction": [
+          -1,
+          1099511627776
+        ],
+        "position_error_metres": 1.237894547614322e-06,
+        "velocity_error_mps": 1.9290124234758157e-14
+      },
+      {
+        "body": "Earth",
+        "tdb_fraction": [
+          1,
+          1099511627776
+        ],
+        "position_error_metres": 0.002381901266725963,
+        "velocity_error_mps": 4.836003978385313e-10
+      },
+      {
+        "body": "Moon",
+        "tdb_fraction": [
+          1,
+          1099511627776
+        ],
+        "position_error_metres": 0.0023446667215599073,
+        "velocity_error_mps": 4.131649500989591e-10
+      },
+      {
+        "body": "Sun",
+        "tdb_fraction": [
+          1,
+          1099511627776
+        ],
+        "position_error_metres": 1.2631388354600179e-06,
+        "velocity_error_mps": 1.6199137375355083e-14
+      },
+      {
+        "body": "Earth",
+        "tdb_fraction": [
+          -1,
+          34359738368
+        ],
+        "position_error_metres": 0.07615340045686056,
+        "velocity_error_mps": 1.54619255725664e-08
+      },
+      {
+        "body": "Moon",
+        "tdb_fraction": [
+          -1,
+          34359738368
+        ],
+        "position_error_metres": 0.0749271352454519,
+        "velocity_error_mps": 1.3202065857112235e-08
+      },
+      {
+        "body": "Sun",
+        "tdb_fraction": [
+          -1,
+          34359738368
+        ],
+        "position_error_metres": 3.992348603798892e-05,
+        "velocity_error_mps": 5.882898355283375e-13
+      },
+      {
+        "body": "Earth",
+        "tdb_fraction": [
+          1,
+          34359738368
+        ],
+        "position_error_metres": 0.07615675687783038,
+        "velocity_error_mps": 1.546304447248573e-08
+      },
+      {
+        "body": "Moon",
+        "tdb_fraction": [
+          1,
+          34359738368
+        ],
+        "position_error_metres": 0.07492763398043656,
+        "velocity_error_mps": 1.319957838537389e-08
+      },
+      {
+        "body": "Sun",
+        "tdb_fraction": [
+          1,
+          34359738368
+        ],
+        "position_error_metres": 3.979397635560809e-05,
+        "velocity_error_mps": 5.862901394628322e-13
+      },
+      {
+        "body": "Earth",
+        "tdb_fraction": [
+          -1,
+          4294967296
+        ],
+        "position_error_metres": 0.6092353453674563,
+        "velocity_error_mps": 1.2370299239930904e-07
+      },
+      {
+        "body": "Moon",
+        "tdb_fraction": [
+          -1,
+          4294967296
+        ],
+        "position_error_metres": 0.599397077472693,
+        "velocity_error_mps": 1.0559894234669062e-07
+      },
+      {
+        "body": "Sun",
+        "tdb_fraction": [
+          -1,
+          4294967296
+        ],
+        "position_error_metres": 0.000318858985741412,
+        "velocity_error_mps": 4.702173044448588e-12
+      },
+      {
+        "body": "Earth",
+        "tdb_fraction": [
+          1,
+          4294967296
+        ],
+        "position_error_metres": 0.6092359433183145,
+        "velocity_error_mps": 1.237029061988078e-07
+      },
+      {
+        "body": "Moon",
+        "tdb_fraction": [
+          1,
+          4294967296
+        ],
+        "position_error_metres": 0.5994016356117227,
+        "velocity_error_mps": 1.0559645551748774e-07
+      },
+      {
+        "body": "Sun",
+        "tdb_fraction": [
+          1,
+          4294967296
+        ],
+        "position_error_metres": 0.0003187773813367639,
+        "velocity_error_mps": 4.701228583852479e-12
+      },
+      {
+        "body": "Earth",
+        "tdb_fraction": [
+          1,
+          8
+        ],
+        "position_error_metres": 0.0,
+        "velocity_error_mps": 6.0189190172983194e-12
+      },
+      {
+        "body": "Moon",
+        "tdb_fraction": [
+          1,
+          8
+        ],
+        "position_error_metres": 0.0,
+        "velocity_error_mps": 1.2020260262210032e-11
+      },
+      {
+        "body": "Sun",
+        "tdb_fraction": [
+          1,
+          8
+        ],
+        "position_error_metres": 0.0,
+        "velocity_error_mps": 0.0
+      },
+      {
+        "body": "Earth",
+        "tdb_fraction": [
+          137438953471,
+          1099511627776
+        ],
+        "position_error_metres": 0.0023744959856362006,
+        "velocity_error_mps": 4.853050622852819e-10
+      },
+      {
+        "body": "Moon",
+        "tdb_fraction": [
+          137438953471,
+          1099511627776
+        ],
+        "position_error_metres": 0.0023367598418750028,
+        "velocity_error_mps": 4.1277155572517354e-10
+      },
+      {
+        "body": "Sun",
+        "tdb_fraction": [
+          137438953471,
+          1099511627776
+        ],
+        "position_error_metres": 1.4795288777198999e-06,
+        "velocity_error_mps": 1.716612444772198e-14
+      },
+      {
+        "body": "Earth",
+        "tdb_fraction": [
+          137438953473,
+          1099511627776
+        ],
+        "position_error_metres": 0.0023772244498397165,
+        "velocity_error_mps": 4.817647808276423e-10
+      },
+      {
+        "body": "Moon",
+        "tdb_fraction": [
+          137438953473,
+          1099511627776
+        ],
+        "position_error_metres": 0.0023431257417536456,
+        "velocity_error_mps": 4.057930373216229e-10
+      },
+      {
+        "body": "Sun",
+        "tdb_fraction": [
+          137438953473,
+          1099511627776
+        ],
+        "position_error_metres": 1.1875682793791223e-06,
+        "velocity_error_mps": 1.839108282023924e-14
+      }
+    ],
+    "failed_rows": 18,
+    "maximum_position_error_metres": 0.6092359433183145,
+    "gates": {
+      "position_metres": 0.0001,
+      "velocity_mps": 1e-08
+    },
+    "scope": "Before integration: exact rational input was not supported by the declared float-only API. Independent raw CALCEPH source-epoch arithmetic control, not physical accuracy certification."
+  },
+  "scope": "Additional24 maintained J2000 file windows and30 exact split-epoch source controls. Full original192 polar and10288 automatic cohorts remain separate and unchanged."
+}

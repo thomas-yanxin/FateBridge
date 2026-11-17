@@ -12,8 +12,10 @@ from fastmcp import Client
 from fastmcp.client.transports import StdioTransport
 
 from fatebridge.core.meihua_observation import _seed_calendar_values
+from fatebridge.core.public_output import same_public_value
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.meihua import calculate_meihua_cast
+from tests.support.reference_data import resolve as at_path
 from tests.support.transports import SPECS, call_cli, rest
 
 FOLDER = Path(__file__).parents[1] / "fixtures/meihua_quiet_calendar_v74"
@@ -34,12 +36,6 @@ TOPICS = [
     "travel",
     "meeting",
 ]
-
-
-def at_path(value, path):
-    for part in path.split("."):
-        value = value[int(part)] if isinstance(value, list) else value[part]
-    return value
 
 
 def check_labels(out, case):
@@ -231,9 +227,13 @@ async def test_rest_native_mcp_and_cli_preserve_the_actual_nested_fact_paths(
     assert code == 0
     for out in [response.json(), reply.structured_content, cli]:
         check_labels(out, CASES[-1])
-        assert out["interpretation"] == {
-            k: expected["interpretation"][k] for k in ["observation_context", "day_qi"]
-        }
+        assert same_public_value(
+            out["interpretation"],
+            {
+                k: expected["interpretation"][k]
+                for k in ["observation_context", "day_qi"]
+            },
+        )
         assert out["summary"] == expected["summary"]
 
 

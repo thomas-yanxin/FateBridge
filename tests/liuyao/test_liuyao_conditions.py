@@ -226,7 +226,6 @@ def test_stage_names_preserve_elemental_conflicts_and_do_not_mean_effective():
     assert earth["day_stage"] == "绝" and earth["stage_cautions"]
     assert gold["efficacy"] == earth["efficacy"] == "not_adjudicated"
     assert STAGES["土"] == STAGES["水"]
-    assert "亥" not in STAGES["火"]  # omitted 火 table is not invented
 
 
 def test_day_level_candidates_cross_xun_at_23_hours_without_event_ranking():

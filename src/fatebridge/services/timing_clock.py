@@ -1,10 +1,11 @@
 """Choose a real current instant or the declared partial-date convention once."""
 
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Any, Dict, Optional
 
 from fatebridge.core.execution_context import current_datetime
+from fatebridge.utils.civil_time import utc_calendar
 from fatebridge.utils.timezones import parse_timezone_name, validate_local_clock
 
 DATE_FIELDS = (
@@ -112,7 +113,7 @@ def resolve_analysis_moment(
         "method_id": METHOD_ID,
         "basis": basis,
         "analysis_datetime": aware.isoformat(),
-        "utc_datetime": aware.astimezone(timezone.utc).isoformat(),
+        "utc_datetime": utc_calendar(aware).isoformat(),
         "timezone": timezone_name,
         "fold": aware.fold,
         "precision": precision,

@@ -46,7 +46,7 @@
       },
       "lookup_mode": {
         "default": "auto",
-        "description": "Lookup mode: auto, hexagram, or trigram",
+        "description": "Lookup mode: auto, hexagram, or trigram. auto keeps the eight pure names as trigrams; hexagram explicitly selects their six-line figures.",
         "type": "string"
       },
       "parent_run_id": {
@@ -62,7 +62,7 @@
         "description": "Parent call's run_id; correlation only, no stored execution lookup"
       },
       "query": {
-        "description": "Hexagram/trigram name or binary code",
+        "description": "Trigram or hexagram name (source short name or common full name, simplified/traditional forms), or a 3/6-bit code from bottom to top. In auto mode the eight pure trigram names select trigrams; use hexagram for their six-line identities.",
         "type": "string"
       },
       "response_char_limit": {

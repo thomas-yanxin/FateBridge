@@ -1,11 +1,8 @@
-"""Full-domain correctness locks for the classical layer.
+"""Finite invariants and exact-arithmetic regressions for the mixed layer.
 
-These encode conclusions cross-checked against horosa's own readable formulas
-(`data/dignities.js`, `lifespanEngine.js` computeAlmuten, `data/lots.js`):
-- almuten winner (incl. tiebreak) matched horosa at all 360°×day/night points;
-- Arabic-lot longitudes use an independent exact-decimal arithmetic oracle.
-They are platform-invariant (strings / integers / exact arithmetic), so they
-hold on every CI Python version without touching goldens.
+The almuten checks cover a tenth-degree grid and one recorded horosa tie;
+they do not execute that independent program. The lot check compares exact
+arithmetic over supplied doubles and retains the selected formula table.
 """
 
 from __future__ import annotations

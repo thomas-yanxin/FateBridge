@@ -23,7 +23,8 @@ from fatebridge.utils.errors import EphemerisSourceError
 def collect_fortitude_inputs(subject: Any) -> dict[str, Any]:
     """Forward one TT day, with five native positions and one selected source.
 
-    The daily-displacement magnitude and instantaneous direction are separate.
+    The signed daily displacement and instantaneous direction are separate;
+    the fortitude ledger compares its magnitude with the printed mean motion.
     Historical text's 24h is operationalized as86400TT seconds, not an invented
     printed instantaneous rate or a modern mean fitted to an example.
     """
@@ -37,7 +38,7 @@ def collect_fortitude_inputs(subject: Any) -> dict[str, Any]:
         "node_model": "mean_north_lunar_node_if_supplied_by_native_subject",
         "star_longitudes": {},
         "star_position_policy": "dated_native_apparent_positions",
-        "daily_motion_policy": "Magnitude of unwrapped native forward oneTT-day longitude displacement at offsets0,1/4,1/2,3/4,1; instantaneous direction separate; not a physical error bound",
+        "daily_motion_policy": "Signed unwrapped native forward oneTT-day longitude displacement at offsets0,1/4,1/2,3/4,1; the fortitude ledger compares its magnitude with the printed mean motion; instantaneous direction separate; not a physical error bound",
         "day_interval_tt": None,
         "longitude_frame": None,
         "physical_ephemeris_source": None,

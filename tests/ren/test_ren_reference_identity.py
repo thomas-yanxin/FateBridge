@@ -36,7 +36,7 @@ CONFIGS = {row["id"]: row for row in PROTOCOL["corpora"]}
 def audit_module(config):
     # The optional root permits an actual red run with the frozen earlier code.
     source_root = Path(os.environ.get("REN_REFERENCE_AUDIT_SOURCE", ROOT))
-    path = source_root / config["script"]
+    path = source_root / "scripts/ren" / Path(config["script"]).name
     spec = importlib.util.spec_from_file_location(
         "identity_probe_" + config["id"], path
     )

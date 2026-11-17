@@ -1,0 +1,48 @@
+{
+  "scope": "Nominal UTC-duration and timezone arithmetic only. Frozen actual FateBridge sky operands isolate the clock conversion and do not receive independent celestial/source/predictive acceptance. Unused physical runtime metadata is excluded; full operands and HTTP records remain in the external phase archive.",
+  "selection": "48 already exposed development cases;8 explicit zones,3time keys,2directions,Tropic/static-axis method. Not an independent validation cohort or new sample denominator.",
+  "reference_implementation": {
+    "node": "22.22.2",
+    "icu": "78.2",
+    "tz": "2025c",
+    "temporal": "0.5.1",
+    "jsbi": "4.3.2"
+  },
+  "archives": [
+    {
+      "name": "@js-temporal/polyfill",
+      "version": "0.5.1",
+      "archive_bytes": 723054,
+      "sha256": "c99a4da5678a55a33dfd30c977852dfac9bbe7b8bac73999f1858c167be6b3e3",
+      "integrity": "sha512-hloP58zRVCRSpgDxmqCWJNlizAlUgJFqG2ypq79DCvyv9tHjRYMDOcPFjzfl/A1/YxDvRCZz8wvZvmapQnKwFQ==",
+      "dependencies": {
+        "jsbi": "^4.3.0"
+      },
+      "url": "https://registry.npmjs.org/@js-temporal/polyfill/-/polyfill-0.5.1.tgz"
+    },
+    {
+      "name": "jsbi",
+      "version": "4.3.2",
+      "archive_bytes": 127038,
+      "sha256": "131d13488f0f400a0770eaca495749cddef34d315f7aeb248fc501f7538b378e",
+      "integrity": "sha512-9fqMSQbhJykSeii05nxKl4m6Eqn2P6rOlYiS+C5Dr/HPIU/7yZxu5qzbs40tgaFORiw2Amd0mirjxatXYMkIew==",
+      "dependencies": {},
+      "url": "https://registry.npmjs.org/jsbi/-/jsbi-4.3.2.tgz"
+    }
+  ],
+  "clock_acceptance": {
+    "birth_instant": "Exact epoch-microsecond equality for each independently resolved explicit input",
+    "event_instant": "Returned second-only event label must lie no more than1.00001seconds before and no more than0.00001seconds after the independently computed event instant. The10microsecond allowance is fixed for existing float-duration representation; it is not a physical accuracy line.",
+    "local_fields_and_offset": "Returned local fields and UTC offset equal the reference label for the same displayed event instant; no nonexistent/fabricated local label or stale offset",
+    "raw_model_preservation": "Except the event_datetime label, retain event identities, ages, arcs, coordinate data, windows, sources and existing display limits exactly. Reference inputs and gates unchanged after fixes.",
+    "zero_offset_controls": "UTC and fixed+08:00 verify unchanged label behavior. Historic/daylight controls expose one-hour,half-hour,quarter-hour,seconds-offset and date-line changes."
+  },
+  "year_definition": "Existing365.2425 nominal86400-second days per model year; exact reference coefficient146097/400, not a measured tropical year",
+  "source_files": {
+    "src/fatebridge/core/predictive/native_chart.py": "79fcc60e7101b80ae19d49a2fb5750dd86a8e446897af8ea67b45f3620e41440",
+    "src/fatebridge/core/astro/birth.py": "f8d1b1afa396c574439f9c593e3000019c62c9a648a1b5d1c9eeb813e155e89d"
+  },
+  "reference_before_sha256": "edec7341e9b7e0714c69d77fadc10553ac6ec0f03379d95677405a1988ed38fd",
+  "before_native_operands_verified_equal": true,
+  "offset_export": "Numeric Temporal.ZonedDateTime.offsetNanoseconds/1e9 from portable-temporal-offsets.json.gz. Human toString offset text is rounded to minutes; the first six portable failures and their original data remain in the external archive."
+}

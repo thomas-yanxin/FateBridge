@@ -142,7 +142,7 @@ def test_lat_inversion_matches_independent_apparent_hour_angle(date, longitude):
     assert receipt["sidereal_time_model"] == (
         "Swiss_longterm_with_boundary_phase_alignment"
         if date[0] < 1800
-        else "Swiss_native"
+        else "IAU2006_2000A_CIO"
     )
 
 

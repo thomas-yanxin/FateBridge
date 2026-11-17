@@ -212,7 +212,7 @@ def validate_reference(protocol, reference):
 
 def audit(protocol, reference, *, production_order=False):
     from fatebridge.core.astro import continuous_lahiri as frame
-    from fatebridge.core.astro import ephemeris, runtime
+    from fatebridge.core.astro import ephemeris, reference_frames, runtime
     from fatebridge.core.astro.physical_sources import PhysicalEphemerisTrace
     from scripts.astrodice.astrodice_lunar_pipeline import BIAS
     from scripts.astrodice.audit_astrodice_apparent import direction_derivative
@@ -300,9 +300,11 @@ def audit(protocol, reference, *, production_order=False):
         )
         # The decoder supplies dynamical J2000. The original Horizons directions
         # are ICRF; invert the inspected, constant IAU2006 native frame bias.
-        inverse_bias = frame.transpose(BIAS)
-        position = frame.mv(inverse_bias, decoded["position"])
-        velocity = frame.mv(inverse_bias, decoded["velocity_per_native_argument_day"])
+        inverse_bias = reference_frames.transpose(BIAS)
+        position = reference_frames.mv(inverse_bias, decoded["position"])
+        velocity = reference_frames.mv(
+            inverse_bias, decoded["velocity_per_native_argument_day"]
+        )
         result.update(
             current_fixed_source_rate_error_arcsec_per_day=math.degrees(
                 math.dist(

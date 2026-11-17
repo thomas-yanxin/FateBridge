@@ -32,7 +32,7 @@ def arguments(row):
 
 
 @pytest.mark.parametrize("row", PLAN["reviews"], ids=lambda r: r["review"]["case_id"])
-def test_all19_real_conditions_and_old_annotations_agree_across_surfaces(
+def test_all_registered_conditions_and_old_annotations_agree_across_surfaces(
     row, surface_calls
 ):
     args = arguments(row)
@@ -74,7 +74,7 @@ def test_all19_real_conditions_and_old_annotations_agree_across_surfaces(
 def test_contradictory_registered_conditions_cannot_hide_behind_unrelated_projection(
     fault, monkeypatch, tmp_path, surface_calls
 ):
-    row = PLAN["reviews"][-1]
+    row = next(r for r in PLAN["reviews"] if r["review"]["case_id"] == "ML-02")
     args = arguments(row)
     payload = calculate_bazi_source_compare(*row["review"]["pillars"])
     record = next(

@@ -24,13 +24,8 @@ from fatebridge.core.output_chinese import Taiyi
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.metaphysics import calculate_taiyi_analysis
 from fatebridge.services.tool_catalog import CATALOG
-from scripts.taiyi.audit_taiyi_year_calendar import (
-    CORPUS,
-    audit,
-    julian_jdn,
-    public_case,
-)
-from tests.taiyi.test_taiyi_enclosures import resolve
+from scripts.taiyi.audit_taiyi_year_calendar import CORPUS, audit, public_case
+from tests.support.reference_data import resolve
 from tests.taiyi.test_taiyi_periods import seed_at
 from tests.taiyi.test_taiyi_transports import _same_run_payload
 

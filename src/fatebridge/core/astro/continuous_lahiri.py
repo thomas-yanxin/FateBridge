@@ -4,147 +4,87 @@ The complete state transform is R @ (gamma*v) + Rprime @ x. Its frame term
 uses TT regardless of the separately declared vector-velocity scale. Native
 orbital/aberration speeds and physical TT/TDB conversion need their own
 qualification. No isolated J2000 identity shortcut is used here.
+
+The pole coefficients use Vondrak, Capitaine & Wallace (2011/2012), as in
+ERFA2.0.1 ltp/ltpecl/ltpequ. The separate scalar obliquity and Lahiri anchor
+follow the inspected Swiss2.10.03 convention; scalar and coupled-vector
+ecliptics are distinct approximations, not interchangeable reference frames.
+Sources: https://doi.org/10.1051/0004-6361/201117274
+https://doi.org/10.1051/0004-6361/201117274e
+https://github.com/liberfa/erfa/tree/v2.0.1/src
+https://github.com/astrorigin/swisseph/blob/696bda432298d482d27e67a0cf1238920301a7dd/swephlib.c
 """
 
 from __future__ import annotations
 
-import hashlib
-import json
 import math
 from functools import lru_cache
-from pathlib import Path
-from typing import Any, Dict, Sequence, Tuple
+from typing import Sequence, Tuple, TypedDict
 
-Vector = Tuple[float, ...]
-Matrix = Tuple[Vector, ...]
+from fatebridge.core.astro.nutation import nutation
+from fatebridge.core.astro.reference_frames import (
+    COEFFICIENT_SHA256,
+    DATA,
+    Matrix,
+    Vector,
+    add,
+    dot,
+    ecliptic_rotation,
+    madd,
+    mean_ecliptic_frame,
+    mm,
+    mv,
+    pair,
+    pmat76,
+    precession,
+    transpose,
+)
+
+
+class FrameState(TypedDict):
+    epoch_jd_tt: float
+    mean_frame: Matrix
+    mean_frame_derivative_per_TT_day: Matrix
+    frame: Matrix
+    frame_derivative_per_TT_day: Matrix
+    mean_omega: Matrix
+    omega: Matrix
+    origin_degrees: float
+    origin_rate_degrees_per_TT_day: float
+    model_id: str
+    coefficient_sha256: str
+
+
+class SphericalState(TypedDict):
+    longitude_degrees: float | None
+    latitude_degrees: float
+    radius: float
+    longitude_rate_degrees_per_day: float | None
+    latitude_rate_degrees_per_day: float | None
+    radial_rate_per_day: float
+
+
+class ProjectedState(TypedDict):
+    model_id: str
+    coefficient_sha256: str
+    epoch_jd_tt: float
+    vector_rate_scale: float
+    position: list[float]
+    velocity_per_TT_day: list[float]
+    frame_motion_per_TT_day: list[float]
+    scaled_input_velocity_term_per_TT_day: list[float]
+    spherical: SphericalState
+
+
+class FixedReceptionState(TypedDict):
+    position: list[float]
+    velocity_per_native_argument_day: list[float]
+    input_frame_held_fixed: bool
+    native_input_precession_identity_shortcut: bool
+
+
 METHOD_ID = "fatebridge_continuous_scalar_lahiri_frame_v1"
-COEFFICIENT_SHA256 = "577c38bf4db44728523e126ac8a50b899fe761d666a1253c0c6e9788bbf68791"
-_COEFFICIENT_BYTES = (
-    Path(__file__).resolve().parents[2] / "data/astronomy/lahiri-frame-v1.json"
-).read_bytes()
-if hashlib.sha256(_COEFFICIENT_BYTES).hexdigest() != COEFFICIENT_SHA256:
-    raise RuntimeError("Lahiri frame coefficients differ from the declared source")
-DATA = json.loads(_COEFFICIENT_BYTES)
-AS2R = math.pi / 648000.0
 DEG = 180.0 / math.pi
-
-
-def dot(a: Sequence[float], b: Sequence[float]) -> float:
-    return math.fsum(x * y for x, y in zip(a, b))
-
-
-def cross(a: Sequence[float], b: Sequence[float]) -> Vector:
-    return (
-        a[1] * b[2] - a[2] * b[1],
-        a[2] * b[0] - a[0] * b[2],
-        a[0] * b[1] - a[1] * b[0],
-    )
-
-
-def add(a: Sequence[float], b: Sequence[float]) -> Vector:
-    return tuple(x + y for x, y in zip(a, b))
-
-
-def transpose(a: Sequence[Sequence[float]]) -> Matrix:
-    return tuple(zip(*a))
-
-
-def mv(a: Sequence[Sequence[float]], v: Sequence[float]) -> Vector:
-    return tuple(dot(row, v) for row in a)
-
-
-def mm(a: Sequence[Sequence[float]], b: Sequence[Sequence[float]]) -> Matrix:
-    columns = transpose(b)
-    return tuple(tuple(dot(row, column) for column in columns) for row in a)
-
-
-def madd(a: Sequence[Sequence[float]], b: Sequence[Sequence[float]]) -> Matrix:
-    return tuple(add(x, y) for x, y in zip(a, b))
-
-
-def pair(tt: float, polynomial: str, periodic: str) -> Tuple[Vector, Vector]:
-    century = (tt - 2451545.0) / 36525.0
-    poly = DATA["native_tables"][polynomial]
-    terms = DATA["native_tables"][periodic]
-    values = []
-    derivatives = []
-    for axis in range(2):
-        value_terms = [
-            float(row[axis]) * century**power for power, row in enumerate(poly)
-        ]
-        derivative_terms = [
-            power * float(row[axis]) * century ** (power - 1)
-            for power, row in enumerate(poly)
-            if power
-        ]
-        for period, cosine, sine in zip(terms[0], terms[1 + axis], terms[3 + axis]):
-            frequency = 2.0 * math.pi / float(period)
-            angle = frequency * century
-            c, s = math.cos(angle), math.sin(angle)
-            cv, sv = float(cosine), float(sine)
-            value_terms.append(cv * c + sv * s)
-            derivative_terms.append(frequency * (-cv * s + sv * c))
-        values.append(math.fsum(value_terms) * AS2R)
-        derivatives.append(math.fsum(derivative_terms) * AS2R / 36525.0)
-    return tuple(values), tuple(derivatives)
-
-
-def precession(tt: float) -> Tuple[Matrix, Matrix]:
-    (p, q), (pd, qd) = pair(tt, "pqpol", "pqper")
-    eps0 = 84381.406 * AS2R
-    ce, se = math.cos(eps0), math.sin(eps0)
-    z = math.sqrt(1.0 - p * p - q * q)
-    zd = -(p * pd + q * qd) / z
-    ecliptic = (p, -q * ce - z * se, -q * se + z * ce)
-    ecliptic_d = (pd, -qd * ce - zd * se, -qd * se + zd * ce)
-    (x, y), (xd, yd) = pair(tt, "xypol", "xyper")
-    z = math.sqrt(1.0 - x * x - y * y)
-    zd = -(x * xd + y * yd) / z
-    equator = (x, y, z)
-    equator_d = (xd, yd, zd)
-    raw = cross(equator, ecliptic)
-    raw_d = add(cross(equator_d, ecliptic), cross(equator, ecliptic_d))
-    radius = math.sqrt(dot(raw, raw))
-    equinox = tuple(v / radius for v in raw)
-    radial = dot(equinox, raw_d)
-    equinox_d = tuple((d - v * radial) / radius for d, v in zip(raw_d, equinox))
-    middle = cross(equator, equinox)
-    middle_d = add(cross(equator_d, equinox), cross(equator, equinox_d))
-    return (equinox, middle, equator), (equinox_d, middle_d, equator_d)
-
-
-def ecliptic_rotation(epsilon: float, epsilon_d: float = 0.0) -> Tuple[Matrix, Matrix]:
-    c, s = math.cos(epsilon), math.sin(epsilon)
-    return (
-        ((1.0, 0.0, 0.0), (0.0, c, s), (0.0, -s, c)),
-        (
-            (0.0, 0.0, 0.0),
-            (0.0, -s * epsilon_d, c * epsilon_d),
-            (0.0, -c * epsilon_d, -s * epsilon_d),
-        ),
-    )
-
-
-def pmat76(tt: float) -> Matrix:
-    century = (tt - 2451545.0) / 36525.0
-    angles = {
-        name: math.fsum(float(c) * century**i for i, c in enumerate(terms)) * AS2R
-        for name, terms in DATA["IAU1976_angles_arcsec_coefficients"].items()
-    }
-    Z, z, theta = angles["zeta"], angles["z"], angles["theta"]
-    cZ, sZ, cz, sz, cT, sT = (
-        math.cos(Z),
-        math.sin(Z),
-        math.cos(z),
-        math.sin(z),
-        math.cos(theta),
-        math.sin(theta),
-    )
-    return (
-        (cZ * cT * cz - sZ * sz, -sZ * cT * cz - cZ * sz, -sT * cz),
-        (cZ * cT * sz + sZ * cz, -sZ * cT * sz + cZ * cz, -sT * sz),
-        (cZ * sT, -sZ * sT, cT),
-    )
 
 
 @lru_cache(maxsize=1)
@@ -158,18 +98,7 @@ def anchor() -> Tuple[Matrix, float]:
     return mm(rotation, matrix), initial - math.atan2(correction[1], correction[0])
 
 
-def frame_state(tt: float) -> Dict[str, Any]:
-    if (
-        isinstance(tt, bool)
-        or not math.isfinite(tt)
-        or not 1721425.5 <= tt <= 5373485.5
-    ):
-        raise ValueError("TT epoch outside the declared continuous-frame domain")
-    matrix, matrix_d = precession(tt)
-    values, derivatives = pair(tt, "pepol", "peper")
-    rotation, rotation_d = ecliptic_rotation(values[1], derivatives[1])
-    mean = mm(rotation, matrix)
-    mean_d = madd(mm(rotation_d, matrix), mm(rotation, matrix_d))
+def _mean_origin(matrix: Matrix, matrix_d: Matrix) -> Tuple[float, float]:
     anchor_matrix, constant = anchor()
     # P.T @ e1 is the first row of P. Anchor terms are fixed in TT.
     basis = mv(anchor_matrix, matrix[0])
@@ -178,6 +107,32 @@ def frame_state(tt: float) -> Dict[str, Any]:
     xd, yd = basis_d[:2]
     origin = constant - math.atan2(y, x)
     origin_d = -(x * yd - y * xd) / (x * x + y * y)
+    return origin, origin_d
+
+
+def apparent_lahiri_origin(tt: float) -> Tuple[float, float]:
+    """Complete apparent offset and analytic rate, in degrees and degrees/TT day.
+
+    Reuse the continuous mean origin, then add the complete 77-term nutation.
+    Unlike the qualified auxiliary frame's input domain, evaluation also
+    accepts the adjacent TT years required by civil-date and rate stencils.
+    This is the declared parameter model, not physical clock certification.
+    """
+    origin, origin_d = _mean_origin(*precession(tt))
+    dpsi, _, dpsi_d, _ = nutation(tt)
+    return (origin * DEG + dpsi) % 360.0, origin_d * DEG + dpsi_d
+
+
+def frame_state(tt: float) -> FrameState:
+    if (
+        isinstance(tt, bool)
+        or not math.isfinite(tt)
+        or not 1721425.5 <= tt <= 5373485.5
+    ):
+        raise ValueError("TT epoch outside the declared continuous-frame domain")
+    matrix, matrix_d = precession(tt)
+    mean, mean_d = mean_ecliptic_frame(tt)
+    origin, origin_d = _mean_origin(matrix, matrix_d)
     c, s = math.cos(origin), math.sin(origin)
     sidereal = ((c, s, 0.0), (-s, c, 0.0), (0.0, 0.0, 1.0))
     sidereal_d = (
@@ -213,7 +168,7 @@ def _vector(values: Sequence[float]) -> Vector:
 
 def spherical_state(
     position: Sequence[float], velocity: Sequence[float]
-) -> Dict[str, Any]:
+) -> SphericalState:
     """Spherical position and derivative in the supplied distance/day units.
 
     Longitude is undefined at a pole. Latitude has no two-sided derivative
@@ -255,7 +210,7 @@ def project_state(
     velocity: Sequence[float],
     *,
     vector_rate_scale: float,
-) -> Dict[str, Any]:
+) -> ProjectedState:
     """Reframe a state with an explicitly supplied input-velocity scale.
 
     The caller owns the meaning and provenance of the input velocity and
@@ -289,7 +244,7 @@ def project_state(
 
 def decode_native_fixed_reception_state(
     julian_day_tt: float, position: Sequence[float], velocity: Sequence[float]
-) -> Dict[str, Any]:
+) -> FixedReceptionState:
     """Decode a held native reception basis; do not differentiate its epoch.
 
     The inspected swi_trop_ra2sid_lon skips precession at exactly J2000.

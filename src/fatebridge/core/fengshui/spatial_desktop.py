@@ -5,17 +5,19 @@ from pathlib import Path
 
 from pydantic import BaseModel
 
+from .spatial_angles import angular_delta, compose_degrees
 from .spatial_geometry import (
-    angular_delta,
+    GeometryFrame,
     inverse_point,
     rectangle_xy,
     transform_rectangle,
 )
-from .spatial_inputs import PlanPoint, PlanPose, SpatialScene
+from .spatial_inputs import PlanPoint, SpatialScene
 from .spatial_outputs import EvaluatedGeometry
 from .spatial_reasoning import RuleComparison
 from .spatial_sources import RegisteredRuleset, desktop_compass_rules
 from .surface import surface_provenance
+from .surface_inputs import PLANT_REPRESENTATIONS
 
 
 class BaguaEntry(BaseModel):
@@ -64,8 +66,12 @@ def desktop_rule_comparisons(
         if seat is not None and any(
             item.representation == "metal_office_equipment" for item in desktop.items
         ):
-            observer = PlanPose(
-                center=seat.position, rotation_degrees=seat.plan_facing_degrees
+            observer = GeometryFrame(
+                center=seat.position,
+                rotation_degrees=compose_degrees(
+                    desk.footprint.rotation_degrees,
+                    uses[desktop.desk_id].facing_offset_degrees,
+                ),
             )
             for item in desktop.items:
                 world = rectangle_xy(
@@ -201,7 +207,7 @@ def desktop_rule_comparisons(
                     )
                 for record in records:
                     if record.status != "not_covered":
-                        if item.representation in {"living_plant", "fresh_flowers"}:
+                        if item.representation in PLANT_REPRESENTATIONS:
                             record.application_conditions_met = (
                                 item.healthy.value
                                 if item.healthy

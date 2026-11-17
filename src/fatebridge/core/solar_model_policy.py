@@ -1,4 +1,4 @@
-"""Explicit Sun selection, with a named complete Moshier analytical revision."""
+"""Explicit Sun selection, with a bundled DE441 fallback."""
 
 from __future__ import annotations
 
@@ -70,12 +70,19 @@ def solar_context_input_years(year: int) -> tuple[int, int]:
     This is a per-context scope, not the union of all public model ranges.
     Existing input profiles retain their established neighboring-year behavior.
     """
-    if solar_model_policy() == "vsop2013":
+    mode = solar_model_policy()
+    if mode == "vsop2013":
         return VSOP2013_SOFTWARE_YEARS
+    if mode == "native":
+        return (1, 9999)
     if not VALIDATED_SOFTWARE_YEARS[0] <= year <= VALIDATED_SOFTWARE_YEARS[
         1
     ] and de440_selected(year):
         return DE440_SOFTWARE_YEARS
+    if mode == "auto" and not (
+        VALIDATED_SOFTWARE_YEARS[0] <= year <= VALIDATED_SOFTWARE_YEARS[1]
+    ):
+        return (1, 9999)
     return VALIDATED_SOFTWARE_YEARS
 
 
@@ -92,16 +99,22 @@ def solar_model_cache_key(*, year: int | None = None) -> Tuple[Any, ...]:
             raise ValueError("Explicit Swiss solar mode currently covers1800..2200")
         if mode == "swiss":
             return mode, "native_swiss_runtime"
-        from .moshier_solar import MODEL_ID as COMPLETE_MOSHIER_MODEL
-        from .moshier_solar import model_details as complete_moshier_details
+        from .jpl_ephemeris import configured_jpl_file
 
-        details = complete_moshier_details()
+        if configured_jpl_file() is not None:
+            return mode, "native_strict_jpl"
+        from .de441_solar import MODEL_ID as DE441_MODEL
+        from .de441_solar import model_details as de441_details
+
+        details = de441_details()
         return (
             mode,
             "native_swiss_runtime",
-            COMPLETE_MOSHIER_MODEL,
+            DE441_MODEL,
             details["coefficient_sha256"],
             details["frame_coefficient_sha256"],
+            details["nutation_coefficient_sha256"],
+            details["tdb_coefficient_sha256"],
         )
     if mode == "auto":
         from .jpl_ephemeris import configured_jpl_file
@@ -111,16 +124,18 @@ def solar_model_cache_key(*, year: int | None = None) -> Tuple[Any, ...]:
     if year is not None and mode in {"auto", "de440"} and not de440_selected(year):
         # Only the requested model's source is a dependency of this year.
         # Explicit de440 has already rejected an out-of-range year above.
-        from .moshier_solar import MODEL_ID as COMPLETE_MOSHIER_MODEL
-        from .moshier_solar import model_details as complete_moshier_details
+        from .de441_solar import MODEL_ID as DE441_MODEL
+        from .de441_solar import model_details as de441_details
 
-        details = complete_moshier_details()
+        details = de441_details()
         return (
             mode,
             "native_outside_packaged_years",
-            COMPLETE_MOSHIER_MODEL,
+            DE441_MODEL,
             details["coefficient_sha256"],
             details["frame_coefficient_sha256"],
+            details["nutation_coefficient_sha256"],
+            details["tdb_coefficient_sha256"],
         )
     if mode == "vsop2013":
         if (
@@ -166,6 +181,8 @@ def solar_model_cache_key(*, year: int | None = None) -> Tuple[Any, ...]:
 def solar_model_environment_receipt(
     *, resolve_source: bool = True, observed_de440_models: list[str] | None = None
 ) -> Dict[str, Any]:
+    from .jpl_ephemeris import configured_jpl_file
+
     # A successful text-only lookup must not start an unused file-backed Sun
     # calculation merely to describe its configuration. Consuming calculations
     # have already validated the mode and still request the strict source.
@@ -219,19 +236,20 @@ def solar_model_environment_receipt(
             "analytical_fallback_allowed": False,
             "scope": "Actual crossings must use SWIEPH and retain observed planet/Moon file contexts. This selection does not certify physical accuracy or atomic file reads.",
         }
-    if configured == "native":
+    if configured == "native" and configured_jpl_file() is None:
         return {
             "mode": "native",
-            "source_selection": "native_swiss_or_complete_moshier",
+            "source_selection": "native_swiss_or_bundled_de441",
             "source_resolution": "configuration_only",
             "analytic_source_resolved": False,
-            "scope": "Configured native selection only. Available Swiss/JPL data keep their native model; analytical fallback uses the named complete Moshier revision with its own orbit/frame receipt and no borrowed Sun flags. This configuration receipt does not prove which source a business calculation consumed or certify accuracy.",
+            "scope": "Configured native selection only. Available Swiss/JPL data keep their native model; fallback uses the bundled named DE441 source and shared light-cone/frame reduction, with no borrowed native Sun flags. This configuration receipt does not prove which source a business calculation consumed or certify accuracy.",
         }
     key = solar_model_cache_key()
     if key[1] == "native_strict_jpl":
         return {
-            "mode": "auto",
+            "mode": key[0],
             "source_selection": "strict_native_jpl",
+            "source_resolution": "configuration_only",
             "packaged_source_resolved": False,
             "scope": "Strict native JPL overrides the packaged default. Actual availability and consumption are validated by the native calculation and reported in its boundaries.",
         }

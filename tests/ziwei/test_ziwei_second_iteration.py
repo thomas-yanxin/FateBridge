@@ -3,6 +3,7 @@
 import hashlib
 import json
 from copy import deepcopy
+from pathlib import Path
 
 import pytest
 
@@ -29,11 +30,21 @@ pytestmark = [
 ]
 
 
-def test_complete_natal_corpus_preserves_all_cases_and_fields():
-    result = audit_natal()
-    assert result["case_count"] == 1080
-    assert result["star_records_checked"] == 71280
-    assert result["cycle_cells_checked"] == 25920
+@pytest.mark.parametrize(
+    "fixtures,case_count",
+    [
+        (FIXTURES, 1080),
+        (FIXTURES / "natal_factor_grid_v1", 13936),
+    ],
+    ids=["original", "factor-grid"],
+)
+def test_complete_natal_corpus_preserves_all_cases_and_fields(
+    fixtures: Path, case_count: int
+):
+    result = audit_natal(fixtures)
+    assert result["case_count"] == case_count
+    assert result["star_records_checked"] == case_count * 66
+    assert result["cycle_cells_checked"] == case_count * 24
     assert result["year_stem_coverage"] == 10
     assert result["year_branch_coverage"] == result["hour_branch_coverage"] == 12
     assert not result["differences"]

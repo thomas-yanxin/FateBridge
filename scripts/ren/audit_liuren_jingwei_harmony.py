@@ -68,7 +68,7 @@ def audit() -> dict[str, Any]:
         preserved = len(unknowns) == 2 and all(
             row["definition_adjudicated"] is False
             and row["relation_matches"] is None
-            and row["matched"] is None
+            and row["matched"] is (None if row["placement_matches"] else False)
             for row in unknowns
         )
         row = dict(

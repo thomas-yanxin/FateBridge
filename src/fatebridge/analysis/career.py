@@ -339,6 +339,7 @@ class CareerAnalysis:
 
         return {
             "favorable_elements": [e.value for e in favorable],
+            "preference_status": profile["assessment_status"],
             "conditional_elements": profile["conditional_elements"],
             "reference_scope": profile["resolution_policy"],
             "mapping_status": "modern_analogy_not_classical_or_aptitude_validation",
@@ -421,10 +422,12 @@ class CareerAnalysis:
         from ..core.elements import ElementAnalysis
 
         dm_analysis = ElementAnalysis.analyze_day_master_strength(pillars)
-        strength = dm_analysis["strength_level"]
+        strength = dm_analysis["engineering_index"]["strength_level"]
         if strength == "强":
             score += 5
-            notes.append("日主强旺，按本规则提高事业格局评分，不等于实际承压能力")
+            notes.append(
+                "工程旺衰政策档为强，按本规则提高事业格局评分，不等于实际承压能力"
+            )
         elif strength == "弱":
             score -= 5
             notes.append("日主偏弱，按本规则降低事业格局评分，不据此判断个人能力")
@@ -436,6 +439,7 @@ class CareerAnalysis:
             "score_kind": "uncalibrated_rule_index",
             "scope": "individual_natal_career_structure",
             "formation_status": "heuristic_candidate_only",
+            "engineering_index": dm_analysis["engineering_index"],
             "rule_signals": rule_signals,
             "unverified_conditions": [
                 "月令取格",
@@ -616,6 +620,7 @@ class CareerAnalysis:
 
         return {
             "favorable_directions": directions,
+            "preference_status": profile["assessment_status"],
             "conditional_elements": profile["conditional_elements"],
             "reference_scope": profile["resolution_policy"],
             "mapping_status": "modern_analogy_not_classical_or_aptitude_validation",

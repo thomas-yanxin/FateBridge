@@ -7,7 +7,8 @@ MetaphysicsSeed bridge live here; reusable text rendering lives in snapshot.
 from __future__ import annotations
 
 import math
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
+from fractions import Fraction
 from typing import Any, Dict, List, Optional, Tuple
 
 from fatebridge.core.astro.reference import SU28
@@ -24,14 +25,18 @@ from fatebridge.utils.solar_time_provenance import solar_time_receipt
 from fatebridge.utils.timezones import validate_local_clock
 
 from ..almanac import (
-    DAY_GANZHI_STRATEGY_STANDARD,
     build_calendar_context,
     localize_datetime,
 )
 from ..astro.birth import AstroBirthInfo, build_astro_birth_info
 from ..astro.chart import build_core_chart_payload
-from ..astro.geometry import angle_fraction, combine_longitudes
+from ..astro.geometry import (
+    _sign_name,
+    angle_fraction,
+    longitude_float,
+)
 from ..calendar import BaZiCalendar
+from .house_geometry import HouseGeometry, HouseRecord
 from .snapshot import join_lines
 
 SU28_NAMES = [name.removesuffix("宿") for name in SU28]
@@ -67,15 +72,6 @@ SANSHI_REFERENCES = [
     "外部有助，内部更要对齐。",
     "此局贵在先定边界后发力。",
 ]
-
-
-def _rotate_items(items: List[Any], shift: int) -> List[Any]:
-    if not items:
-        return []
-    normalized_shift = shift % len(items)
-    if normalized_shift == 0:
-        return list(items)
-    return list(items[normalized_shift:] + items[:normalized_shift])
 
 
 def _normalize_date_text(date_text: str) -> str:
@@ -129,17 +125,7 @@ def parse_local_datetime(
     return localize_datetime(moment, timezone_name or DEFAULT_BIRTH_TIMEZONE)
 
 
-def _julian_day(moment: datetime) -> float:
-    utc_moment = moment.astimezone(timezone.utc) if moment.tzinfo else moment
-    timestamp = utc_moment.timestamp()
-    return timestamp / 86400.0 + 2440587.5
-
-
-def _sign_name(longitude: float) -> str:
-    return ZODIAC_SIGNS[int(longitude // 30) % 12]
-
-
-def _su28_position(longitude: float) -> Tuple[str, float]:
+def _su28_position(longitude: float | Fraction) -> Tuple[str, float]:
     index, remainder = divmod((angle_fraction(longitude) % 360) * 28, 360)
     degree = min(float(remainder / 28), math.nextafter(360 / 28, 0.0))
     return SU28_NAMES[int(index)], degree
@@ -216,79 +202,14 @@ def _normalize_mode(value: Any, default: int = 0) -> int:
         return default
 
 
-def _house_step(shape_mode: int) -> float:
-    return -30.0 if shape_mode % 2 else 30.0
-
-
-def _display_house_system_name(house_system: Any) -> Optional[str]:
-    name = str(house_system or "").strip()
-    if not name:
-        return None
-    if name == "equal_mc":
-        return "equal"
-    return name
-
-
 def _build_house_ring(
     house1_longitude: float,
     *,
-    step_degrees: float = 30.0,
-) -> List[Dict[str, Any]]:
-    houses: List[Dict[str, Any]] = []
-    for index in range(12):
-        longitude = round((house1_longitude + index * step_degrees) % 360.0, 4)
-        sign = _sign_name(longitude)
-        houses.append(
-            {
-                "id": f"House{index + 1}",
-                "lon": longitude,
-                "sign": sign,
-                "sign_zh": ZODIAC_SIGN_CN.get(sign),
-            }
-        )
-    return houses
-
-
-def _reindex_houses(source_houses: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    houses: List[Dict[str, Any]] = []
-    for index, item in enumerate(source_houses, start=1):
-        longitude = round(float(item.get("lon", 0.0)), 4)
-        sign = item.get("sign") or _sign_name(longitude)
-        houses.append(
-            {
-                "id": f"House{index}",
-                "lon": longitude,
-                "sign": sign,
-                "sign_zh": item.get("sign_zh") or ZODIAC_SIGN_CN.get(sign),
-            }
-        )
-    return houses
-
-
-def _reverse_houses(source_houses: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    if not source_houses:
-        return []
-    return _reindex_houses([source_houses[0], *reversed(source_houses[1:])])
-
-
-def _house_direction(houses: List[Dict[str, Any]]) -> str:
-    if len(houses) < 2:
-        return "forward"
-
-    forward_steps = 0
-    reverse_steps = 0
-    for index, house in enumerate(houses):
-        current = float(house.get("lon", 0.0))
-        next_longitude = float(houses[(index + 1) % len(houses)].get("lon", 0.0))
-        delta = (next_longitude - current) % 360.0
-        if delta == 0:
-            continue
-        if delta <= 180.0:
-            forward_steps += 1
-        else:
-            reverse_steps += 1
-
-    return "reverse" if reverse_steps > forward_steps else "forward"
+    reverse: bool = False,
+) -> list[HouseRecord]:
+    return HouseGeometry.equal(house1_longitude, reverse=reverse).records(
+        ZODIAC_SIGN_CN
+    )
 
 
 def _build_houses(
@@ -297,61 +218,76 @@ def _build_houses(
     house_start_mode: int = 1,
     shape_mode: int = 0,
     preserve_core_cusps: bool = False,
-) -> Tuple[List[Dict[str, Any]], float, float]:
-    ascendant = round(float(core_payload["angles"]["ascendant"]["longitude"]), 4)
+) -> tuple[list[HouseRecord], HouseGeometry | None]:
     base_houses = _adapt_chart_houses(core_payload)
-    if preserve_core_cusps and house_start_mode != 2 and base_houses:
-        houses = _reindex_houses(base_houses)
-        if shape_mode % 2:
-            houses = _reverse_houses(houses)
-        house_direction = _house_direction(houses)
-        house_step = -30.0 if house_direction == "reverse" else 30.0
-        house1_longitude = houses[0]["lon"]
-        return houses, house1_longitude, house_step
-
+    reverse = bool(shape_mode % 2)
+    anchor: int | Fraction
     if house_start_mode == 2:
-        house1_longitude = round(float(int(ascendant // 30) * 30), 4)
-    else:
-        house1_longitude = base_houses[0]["lon"] if base_houses else ascendant
-
-    house_step = _house_step(shape_mode)
-    houses = _build_house_ring(house1_longitude, step_degrees=house_step)
-    return houses, house1_longitude, house_step
-
-
-def _adapt_chart_houses(core_payload: Dict[str, Any]) -> List[Dict[str, Any]]:
-    houses: List[Dict[str, Any]] = []
-    for item in core_payload.get("houses", []):
-        if not isinstance(item, dict):
-            continue
-        houses.append(
-            {
-                "id": f"House{item.get('house')}",
-                "lon": round(float(item.get("cusp_longitude", 0.0)), 4),
-                "sign": item.get("sign"),
-                "sign_zh": item.get("sign_zh"),
-            }
+        ascendant = core_payload["angles"]["ascendant"]["longitude"]
+        if ascendant is None:
+            return [], None
+        anchor = (angle_fraction(ascendant) // 30) * 30
+    elif not base_houses:
+        return [], None
+    elif preserve_core_cusps:
+        if reverse:
+            base_houses = [base_houses[0], *reversed(base_houses[1:])]
+        geometry = HouseGeometry(
+            tuple(angle_fraction(house["lon"]) for house in base_houses),
+            reverse=reverse,
+            projected=(core_payload.get("chart_profile") or {}).get(
+                "house_position_projection"
+            )
+            is not None,
         )
-    return houses
+        houses = geometry.records(ZODIAC_SIGN_CN)
+        for house, source in zip(houses, base_houses):
+            house["sign_zh"] = source["sign_zh"]
+        return houses, geometry
+    else:
+        anchor = angle_fraction(base_houses[0]["lon"])
+    geometry = HouseGeometry.equal(anchor, reverse=reverse)
+    return geometry.records(ZODIAC_SIGN_CN), geometry
+
+
+def _adapt_chart_houses(core_payload: Dict[str, Any]) -> list[HouseRecord]:
+    return [
+        {
+            "id": f"House{item['house']}",
+            "lon": item["cusp_longitude"],
+            "sign": item["sign"],
+            "sign_zh": item["sign_zh"],
+        }
+        for item in core_payload["houses"]
+    ]
 
 
 def _build_point_object(
     *,
     point_id: str,
-    longitude: float,
-    houses: List[Dict[str, Any]],
+    longitude: float | Fraction,
+    geometry: HouseGeometry | None,
     include_su28: bool,
+    projected_phase: Fraction | None = None,
 ) -> Dict[str, Any]:
-    sign = _sign_name(longitude)
+    phase = angle_fraction(longitude) % 360
+    delivered = longitude_float(phase)
+    sign = _sign_name(delivered)
     payload = {
         "id": point_id,
-        "house": _house_id_for_houses(longitude, houses),
+        "house": (
+            f"House{geometry.house(phase, projected_phase=projected_phase)}"
+            if geometry is not None
+            else None
+        ),
         "sign": sign,
-        "signlon": round(longitude % 30.0, 4),
-        "lon": round(longitude, 4),
+        "signlon": longitude_float(phase % 30),
+        "lon": delivered,
     }
+    if projected_phase is not None:
+        payload["ecliptic_house_phase_degrees_ratio"] = str(projected_phase)
     if include_su28:
-        payload["su28"], payload["su28_degree"] = _su28_position(longitude)
+        payload["su28"], payload["su28_degree"] = _su28_position(phase)
     return payload
 
 
@@ -360,52 +296,70 @@ def _adapt_chart_objects(
     *,
     tradition: bool,
     include_su28: bool,
-    houses: List[Dict[str, Any]],
+    geometry: HouseGeometry | None,
     preserve_core_houses: bool = False,
 ) -> List[Dict[str, Any]]:
     objects: List[Dict[str, Any]] = []
-    for item in core_payload.get("planets", []):
-        if not isinstance(item, dict):
-            continue
-        point_id = str(item.get("id") or "")
+    projected = geometry is not None and geometry.projected
+    context_points = {
+        item["id"]: item
+        for item in (core_payload.get("context_geometry") or {}).get("objects", [])
+    }
+    for item in core_payload["planets"]:
+        point_id = item["id"]
         if tradition and point_id in OUTER_PLANETS:
             continue
-        source_longitude = float(item.get("longitude", 0.0))
-        longitude = round(source_longitude, 4)
-        # The core assigns houses before formatting longitudes/cusps. Repeating
-        # that comparison on four-decimal display values can cross a cusp.
-        house_id = (
-            f"House{item['house']}"
-            if preserve_core_houses
-            else _house_id_for_houses(longitude, houses)
+        source_longitude = float(item["longitude"])
+        phase_text = (
+            context_points[point_id]["ecliptic_house_phase_degrees_ratio"]
+            if projected
+            else None
         )
+        projected_phase = Fraction(phase_text) if phase_text is not None else None
+        # An unchanged native layout retains the core classification. A changed
+        # layout uses original coordinates or the core's working projection.
+        house_id: str | None
+        if geometry is None:
+            house_id = None
+        elif preserve_core_houses:
+            house_id = f"House{item['house']}"
+        else:
+            house_id = f"House{geometry.house(source_longitude, projected_phase=projected_phase)}"
         payload: Dict[str, Any] = {
             "id": point_id,
             "house": house_id,
             "sign": item.get("sign"),
-            "signlon": round(float(item.get("degree_in_sign", 0.0)), 4),
-            "lon": longitude,
+            "signlon": float(item["degree_in_sign"]),
+            "lon": source_longitude,
         }
+        if projected_phase is not None:
+            payload["ecliptic_house_phase_degrees_ratio"] = str(projected_phase)
         if include_su28:
             payload["su28"], payload["su28_degree"] = _su28_position(source_longitude)
         objects.append(payload)
 
-    north_node = next(
-        (item for item in objects if item.get("id") == "North Node"), None
-    )
+    north_node = next((item for item in objects if item["id"] == "North Node"), None)
     if north_node is not None:
         source_node = next(
             item["longitude"]
             for item in core_payload["planets"]
             if item["id"] == "North Node"
         )
-        south_node_longitude = combine_longitudes(float(source_node), 180.0)
+        south_node_longitude = (angle_fraction(source_node) + 180) % 360
+        phase_text = (
+            context_points["South Node"]["ecliptic_house_phase_degrees_ratio"]
+            if projected
+            else None
+        )
         objects.append(
             _build_point_object(
                 point_id="South Node",
                 longitude=south_node_longitude,
-                houses=houses,
+                geometry=geometry,
                 include_su28=include_su28,
+                projected_phase=(
+                    Fraction(phase_text) if phase_text is not None else None
+                ),
             )
         )
 
@@ -413,12 +367,20 @@ def _adapt_chart_objects(
     # First cusp != ASC for whole-sign/equal-MC/Vehlow; a Sun in H1 can be day.
     fortune = ((core_payload.get("classical") or {}).get("lots") or {}).get("fortune")
     if fortune is not None:
+        phase_text = (
+            context_points["Pars Fortuna"]["ecliptic_house_phase_degrees_ratio"]
+            if projected
+            else None
+        )
         objects.append(
             _build_point_object(
                 point_id="Pars Fortuna",
                 longitude=float(fortune["longitude"]),
-                houses=houses,
+                geometry=geometry,
                 include_su28=include_su28,
+                projected_phase=(
+                    Fraction(phase_text) if phase_text is not None else None
+                ),
             )
         )
 
@@ -456,15 +418,6 @@ def _build_local_chart_response(
         gps_lat=gps_lat,
         gps_lon=gps_lon,
     )
-    geometry_options: Dict[str, Any] = (
-        {
-            "include_context_geometry": True,
-            "include_physical_source": True,
-            "context_fortune_method": context_fortune_method,
-        }
-        if preserve_context_geometry
-        else {}
-    )
     resolved_hsys = None
     if chart_variant == "chart" and (hsys is not None or zodiacal is not None):
         resolved_hsys = 8 if hsys is None else int(hsys)
@@ -476,13 +429,21 @@ def _build_local_chart_response(
             chart_variant,
             hsys=resolved_hsys,
             zodiacal=resolved_zodiacal,
-            **geometry_options,
+            include_context_geometry=preserve_context_geometry
+            or chart_variant == "chart",
+            include_physical_source=preserve_context_geometry,
+            context_fortune_method=context_fortune_method,
         )
     else:
         core_payload = build_core_chart_payload(
-            birth_info, chart_variant, **geometry_options
+            birth_info,
+            chart_variant,
+            include_context_geometry=preserve_context_geometry
+            or chart_variant == "chart",
+            include_physical_source=preserve_context_geometry,
+            context_fortune_method=context_fortune_method,
         )
-    houses, house1_longitude, house_step_degrees = _build_houses(
+    houses, house_geometry = _build_houses(
         core_payload,
         house_start_mode=house_start_mode,
         shape_mode=shape_mode,
@@ -492,7 +453,7 @@ def _build_local_chart_response(
         core_payload,
         tradition=tradition,
         include_su28=include_su28,
-        houses=houses,
+        geometry=house_geometry,
         preserve_core_houses=allow_extended_hsys
         and house_start_mode != 2
         and not shape_mode % 2,
@@ -523,11 +484,7 @@ def _build_local_chart_response(
         "birthLongitude": round(longitude, 4),
         "tradition": tradition,
         "chartVariant": chart_variant,
-        "houseStartModeApplied": house_start_mode,
-        "houseOrientation": "reverse" if house_step_degrees < 0 else "forward",
-        "houseSystemResolved": _display_house_system_name(
-            (core_payload.get("chart_profile") or {}).get("house_system")
-        ),
+        "houseSystemResolved": core_payload["chart_profile"]["house_system"],
         "zodiacMode": (core_payload.get("chart_profile") or {}).get("zodiac"),
         "enginePrecision": (core_payload.get("chart_profile") or {}).get(
             "engine_precision"
@@ -536,6 +493,52 @@ def _build_local_chart_response(
             "engine_backend"
         ),
     }
+    if house_geometry is not None:
+        params.update(
+            {
+                "houseStartModeApplied": house_start_mode,
+                "houseOrientation": (
+                    (
+                        "reverse_native_projection"
+                        if house_geometry.reverse
+                        else "native_nonprograde_cusps"
+                    )
+                    if house_geometry.projected
+                    else ("reverse" if house_geometry.reverse else "forward")
+                ),
+                "coordinatePolicy": "unrounded_source_and_exact_house_intermediates",
+                "houseAssignmentBasis": (
+                    "original_working_projection_phase"
+                    if house_geometry.projected
+                    else "original_working_cusp_intervals"
+                ),
+                "houseGeometryModel": (
+                    "native_projection_phase"
+                    if house_geometry.projected
+                    else (
+                        "native_cusp_partition"
+                        if allow_extended_hsys and house_start_mode != 2
+                        else (
+                            "whole_sign_from_original_ascendant"
+                            if house_start_mode == 2
+                            else "equal_from_original_first_cusp"
+                        )
+                    )
+                ),
+            }
+        )
+    else:
+        params.update(
+            {
+                "houseStartModeApplied": None,
+                "houseOrientation": None,
+                "coordinatePolicy": "unrounded_source_and_exact_house_intermediates",
+                "houseAssignmentBasis": "not_assigned_source_house_geometry_unavailable",
+                "houseGeometryModel": "unavailable_selected_reference",
+                "houseGeometryStatus": "unavailable_selected_reference",
+                "houseGeometryNote": "所选参考宫位几何不可用；宫头与落宫留空，可用星体数据已保留。",
+            }
+        )
     if resolved_hsys is not None:
         params["hsys"] = resolved_hsys
     if resolved_hsys is not None:
@@ -548,11 +551,19 @@ def _build_local_chart_response(
         params["ayanamsha"] = ayanamsha
     if extra_params:
         params.update(extra_params)
+    angle_definition = core_payload["chart_profile"].get("angle_definition")
+    if angle_definition is not None:
+        params["angleDefinition"] = angle_definition
+    if house_geometry is not None and house_geometry.projected:
+        projection = core_payload["context_geometry"]["house_position_projection"]
+        params["housePositionMethod"] = projection["method"]
+        params["housePositionProjection"] = projection
     if include_calculation_metadata:
         params["chart_profile"] = dict(core_payload.get("chart_profile") or {})
         params["calculationTimeLocal"] = birth_info.local_datetime.isoformat()
         params["calculationTimeUtc"] = birth_info.utc_isoformat
-        params["houseAssignmentBasis"] = "core_geometry_before_display_rounding"
+        if house_geometry is not None:
+            params["houseAssignmentBasis"] = "core_geometry_before_display_rounding"
         params["auxiliaryPointSources"] = {
             "Pars Fortuna": "core.classical.lots.fortune"
         }
@@ -576,7 +587,7 @@ def _build_local_chart_response(
                 params["housePositionProjection"] = projection
                 params["houseOrientation"] = "native_nonprograde_cusps"
             params["lunarNodeModel"] = "mean_node_and_its_opposite"
-    return {
+    response: dict[str, object] = {
         "params": params,
         "chart": {
             "ok": True,
@@ -586,39 +597,16 @@ def _build_local_chart_response(
                 geometry["angles"]
                 if geometry is not None
                 else {
-                    "ascendant": round(
-                        float(core_payload["angles"]["ascendant"]["longitude"]), 4
-                    ),
-                    "midheaven": round(
-                        float(core_payload["angles"]["midheaven"]["longitude"]), 4
-                    ),
+                    "ascendant": core_payload["angles"]["ascendant"]["longitude"],
+                    "midheaven": core_payload["angles"]["midheaven"]["longitude"],
                 }
             ),
         },
     }
-
-
-def _house_id_for_houses(longitude: float, houses: List[Dict[str, Any]]) -> str:
-    if not houses:
-        return "House1"
-
-    ring_direction = _house_direction(houses)
-    normalized_longitude = float(longitude) % 360.0
-    for index, house in enumerate(houses):
-        current = float(house.get("lon", 0.0)) % 360.0
-        next_longitude = (
-            float(houses[(index + 1) % len(houses)].get("lon", 0.0)) % 360.0
-        )
-        if ring_direction == "reverse":
-            span = (current - next_longitude) % 360.0 or 360.0
-            distance = (current - normalized_longitude) % 360.0
-        else:
-            span = (next_longitude - current) % 360.0 or 360.0
-            distance = (normalized_longitude - current) % 360.0
-        if distance < span or abs(distance) < 1e-9:
-            return str(house.get("id") or f"House{index + 1}")
-
-    return str(houses[0].get("id") or "House1")
+    if chart_variant == "guolao_chart":
+        response["rulesets"] = core_payload["guolao"]["rulesets"]
+        response["validation"] = core_payload["guolao"]["validation"]
+    return response
 
 
 def _build_metaphysics_seed(
@@ -631,7 +619,6 @@ def _build_metaphysics_seed(
     gps_lat: Optional[float] = None,
     gps_lon: Optional[float] = None,
     use_true_solar_time: bool = False,
-    day_pillar_strategy: str = DAY_GANZHI_STRATEGY_STANDARD,
 ) -> MetaphysicsSeed:
     timezone_value = timezone_name or DEFAULT_BIRTH_TIMEZONE
     input_datetime_naive = parse_iso_datetime(
@@ -667,10 +654,10 @@ def _build_metaphysics_seed(
         # ISO input can carry a different UTC offset. Adding to that original
         # clock and then converting zones can cross DST a second time, making
         # equivalent inputs differ by an hour (and even a day/hour pillar).
-        corrected_datetime = localize_datetime(
-            input_datetime.replace(tzinfo=None)
-            + timedelta(minutes=total_correction_minutes),
-            timezone_value,
+        # Keep this derived wall label naive. Attaching an IANA zone turns an
+        # imaginary DST-gap label into an instant that consumers normalize.
+        corrected_datetime = input_datetime.replace(tzinfo=None) + timedelta(
+            minutes=total_correction_minutes
         )
         solar_adjustment_evidence = solar_time_receipt(
             civil_instant=input_datetime,
@@ -683,7 +670,6 @@ def _build_metaphysics_seed(
     pillars = BaZiCalendar.get_four_pillars(
         corrected_datetime,
         timezone_name=timezone_value,
-        day_pillar_strategy=day_pillar_strategy,
         civil_datetime=input_datetime,
     )
     calendar_context = build_calendar_context(

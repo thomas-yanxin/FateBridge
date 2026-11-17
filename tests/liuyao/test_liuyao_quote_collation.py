@@ -47,12 +47,16 @@ def test_the_three_original_failures_and_all_material_hashes_are_retained():
 
 
 def test_quotation_repairs_do_not_invent_the_missing_fire_positions():
-    from fatebridge.core.liuyao_stages import STAGES, stage_knowledge
+    from fatebridge.core.liuyao_stages import PROFILE, stage_knowledge
 
-    assert STAGES["火"] == {"寅": "长生", "戌": "墓"}
     knowledge = stage_knowledge()
-    assert knowledge["missing_stages"]["火"] == ["帝旺", "绝"]
-    assert knowledge["table_complete"] is False
+    assert knowledge["literal_source_stages"] == PROFILE["known_stages"]
+    assert knowledge["literal_source_stages"]["火"] == {"寅": "长生", "戌": "墓"}
+    assert knowledge["raw_table_unchanged"] is True
+    assert knowledge["fire_cycle_derivation"]["derived_positions"] == {
+        "午": "帝旺",
+        "亥": "绝",
+    }
     assert knowledge["adjudication"] == "phase_positions_not_efficacy"
 
 

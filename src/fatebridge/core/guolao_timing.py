@@ -7,7 +7,7 @@ from datetime import datetime, timedelta, timezone
 from fractions import Fraction
 from typing import Any
 
-from fatebridge.core import guolao, guolao_classical
+from fatebridge.core import guolao, guolao_classical, guolao_moira
 from fatebridge.core.almanac import get_bazi_year
 from fatebridge.core.astro.birth import (
     AstroBirthInfo,
@@ -186,7 +186,7 @@ def enrich_guolao_timing(
             "position_basis": "geocentric_apparent_target_sky_not_symbolic_direction",
             "observer_geometry": "not_computed_no_target_location_required",
             "mansion_basis": "modern_equatorial_research_anchors_v1",
-            "purple_model": "horosa_linear_fit_not_classical_calibrated",
+            "purple_model": guolao_moira.PURPLE_CLOUDS_MODEL_ID,
         },
         "limitations": [
             "小限逆数条文已核对；立春换年及现代安命输入仍为明示研究约定",

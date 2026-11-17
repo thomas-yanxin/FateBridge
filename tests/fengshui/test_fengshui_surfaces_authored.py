@@ -26,8 +26,10 @@ from tests.support.mcp_result_assertions import (
 from tests.support.transports import rest_client
 
 
-def surface_input(goal="abundance", zone="near_right", basis="user_confirmed"):
-    return {
+def surface_input(
+    goal="abundance", zone="near_right", basis="user_confirmed", healthy=None
+):
+    inputs = {
         "methods": [],
         "surface_layouts": [
             {
@@ -61,6 +63,13 @@ def surface_input(goal="abundance", zone="near_right", basis="user_confirmed"):
             }
         ],
     }
+    if healthy is not None:
+        inputs["surface_layouts"][0]["items"][0]["healthy"] = {
+            "value": healthy,
+            "observation_basis": "user_confirmed",
+            "evidence": "独立核对植物/鲜花状态，不从身份或位置推定",
+        }
+    return inputs
 
 
 def surface_result(inputs):
@@ -82,13 +91,13 @@ def surface_result(inputs):
     ],
 )
 def test_published_seated_far_left_rule_from_every_start_zone(zone):
-    result = surface_result(surface_input(zone=zone))
+    result = surface_result(surface_input(zone=zone, healthy=True))
     option = result["findings"][0]["action_options"][0]
     # Independent expectation from Cho's explicitly seated desk instruction.
     assert option["to_zone"] == "far_left"
     assert option["action"] == ("retain_item" if zone == "far_left" else "place_item")
     assert option["status"] == "ready"
-    assert option["source_ids"] == ["D1", "D2"]
+    assert option["source_ids"] == ["D1", "D2", "D4"]
     assert not option["changes_compass_result"]
 
 
@@ -111,7 +120,7 @@ def test_source_candidate_cannot_override_constraint(change, reason):
 
 
 def test_locked_item_already_in_supported_zone_does_not_require_movement():
-    inputs = surface_input(zone="far_left")
+    inputs = surface_input(zone="far_left", healthy=True)
     inputs["surface_constraints"][0].update(
         can_move_items=False, locked_item_ids=["specimen"]
     )

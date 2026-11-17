@@ -309,7 +309,7 @@ def test_germany_chart_returns_midpoint_payload():
         "ephemeris_runtime_model" if swe is not None else "approximate_orbital_model"
     )
     expected_backend = (
-        "swisseph_api" if swe is not None else "fatebridge_approximate_orbital_model"
+        "swisseph_api" if swe is not None else "fatebridge_analytic_ephemerides"
     )
 
     assert result["chart_profile"]["engine_precision"] == expected_precision
@@ -413,7 +413,7 @@ def test_relative_derived_layers_inherit_runtime_precision_from_sources():
         "ephemeris_runtime_model" if swe is not None else "approximate_orbital_model"
     )
     expected_backend = (
-        "swisseph_api" if swe is not None else "fatebridge_approximate_orbital_model"
+        "swisseph_api" if swe is not None else "fatebridge_analytic_ephemerides"
     )
     outer_payload = {
         **astro_payload(),
@@ -490,16 +490,6 @@ def test_relative_derived_layers_inherit_runtime_precision_from_sources():
         marks_result["chart"]["chart_profile"]["engine_precision"] == expected_precision
     )
     assert marks_result["chart"]["chart_profile"]["engine_backend"] == expected_backend
-
-
-def test_relative_chart_rejects_retired_relationship_mode():
-    parties = {
-        "inner": AstroRelativePartyRequest(**astro_payload()),
-        "outer": AstroRelativePartyRequest(**astro_payload()),
-    }
-    with pytest.raises(ValidationError) as caught:
-        AstroRelativeRequest(**parties, relationship_mode="synastry")
-    assert caught.value.errors()[0]["type"] == "extra_forbidden"
 
 
 def test_relative_chart_modern_lowercase_synastry_maps_to_influence_mode():

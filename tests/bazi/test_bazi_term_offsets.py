@@ -13,7 +13,9 @@ from pydantic import ValidationError
 import fatebridge.application.execution as execution
 from fatebridge.core.almanac import SolarTerm, get_solar_terms_for_year
 from fatebridge.core.analytic_solar import MODEL_ID
+from fatebridge.core.de441_solar import MODEL_ID as DE441_MODEL
 from fatebridge.core.output_chinese import SolarTerm as OutputTerm
+from fatebridge.utils.civil_time import ZonedCalendar
 from tests.bazi.test_bazi_year_contract import TOPICS
 from tests.support.transports import AS_OF, SPECS, business
 from tests.support.transports import rest as _shared_rest
@@ -35,7 +37,7 @@ def test_actual_offsets_are_never_rounded_to_hours_or_minutes(seconds):
     moment = datetime(
         1921, 6, 21, 23, 35, 35, 727999, tzinfo=timezone(timedelta(seconds=seconds))
     )
-    value = SolarTerm("夏至", moment, "19210621", "").as_dict()
+    value = SolarTerm("夏至", ZonedCalendar.from_datetime(moment)).as_dict()
     assert value["utc_offset_seconds"] == seconds
     assert value["datetime"] == "1921-06-21 23:35:35.727999"
     assert datetime.fromisoformat(value["datetime_with_offset"]) == moment
@@ -43,11 +45,11 @@ def test_actual_offsets_are_never_rounded_to_hours_or_minutes(seconds):
     OutputTerm.model_validate(value)
 
 
-def test_naive_legacy_inputs_do_not_acquire_the_host_timezone():
-    value = SolarTerm("夏至", datetime(1921, 6, 21, 23, 35), "19210621", "").as_dict()
-    assert not set(NEW_FIELDS).intersection(value)
-    OutputTerm.model_validate(value)
-    OutputTerm.model_validate({"datetime": value["datetime"]})
+def test_physical_terms_require_a_zone_while_partial_output_stays_partial():
+    naive = datetime(1921, 6, 21, 23, 35)
+    with pytest.raises(ValueError, match="aware"):
+        ZonedCalendar.from_datetime(naive)
+    OutputTerm.model_validate({"datetime": naive.isoformat(sep=" ")})
     OutputTerm.model_validate(
         {"fold": 1}
     )  # Strict leaf projection may omit its siblings.
@@ -220,7 +222,7 @@ def test_all_ten_bazi_tools_preserve_fold_on_rest_native_mcp_cli(
             term["resolution_provider"] == "fatebridge_analytic"
             and term["ephemeris_model"] == MODEL_ID
         )
-        assert term["solar_model_details"]["native_choice_probe_model"] == "moshier"
+        assert term["solar_model_details"]["native_choice_probe_model"] == DE441_MODEL
         assert term["solar_model_details"]["accuracy_certified"] is False
         assert value["run_metadata"]["engine_is_approximate"] is True
         assert not value.get("projection_warnings")

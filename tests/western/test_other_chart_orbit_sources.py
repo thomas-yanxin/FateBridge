@@ -116,7 +116,7 @@ def test_same_directory_orbit_edits_update_positions_and_receipt_without_cache_r
     source = write_orbits(tmp_path)
     e.configure_ephemeris_path(str(tmp_path))
     before = _native_factors(_birth(), False)
-    receipt = ephemeris_inventory()
+    inventory_before = ephemeris_inventory()
     stat = source.stat()
     write_orbits(tmp_path, cupido_anomaly="164.7409")
     os.utime(source, ns=(stat.st_atime_ns, stat.st_mtime_ns))
@@ -128,7 +128,12 @@ def test_same_directory_orbit_edits_update_positions_and_receipt_without_cache_r
         before["hypothetical_element_source"]["sha256"]
         != after["hypothetical_element_source"]["sha256"]
     )
-    assert receipt["sha256"] != ephemeris_inventory()["sha256"]
+    assert (
+        after["hypothetical_element_source"]["sha256"]
+        == hashlib.sha256(source.read_bytes()).hexdigest()
+    )
+    # The inventory lists filenames; source-specific content identity is above.
+    assert inventory_before == ephemeris_inventory()
     assert "0/seorbel.txt" in ephemeris_inventory()["files"]
 
 

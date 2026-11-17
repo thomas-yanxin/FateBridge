@@ -3,6 +3,7 @@
 import copy
 import json
 from dataclasses import replace
+from fractions import Fraction
 from pathlib import Path
 
 import pytest
@@ -39,14 +40,37 @@ def test_tender_wood_counterexample_discloses_physical_proxy_and_current_arithme
     assert row["positions"] == ["month", "day"] and row["distance"] == 1
     wood, metal = row["powers"]
     # Hand arithmetic: 木=寅甲16/7+辰乙4/7; 金=丑辛2/7+申庚8/7.
-    assert wood["raw_budget"] == pytest.approx(20 / 7)
-    assert metal["raw_budget"] == pytest.approx(10 / 7)
+    assert wood["raw_budget"] == float(Fraction(20, 7))
+    assert metal["raw_budget"] == float(Fraction(10, 7))
     assert row["applied_root_retention"] == {"month": 0.9, "day": 0.5}
     assert trace["resource_stage"] == "before_interactions"
     assert "indirect_generation" in trace["not_included_factors"]
     assert "thermal_receiving_capacity" in trace["not_included_factors"]
     assert trace["classical_effective_force"] == "not_adjudicated"
     ClashComparison.model_validate(trace)
+
+
+@pytest.mark.parametrize(
+    "text,expected,checks",
+    [
+        ("甲子 丁丑 戊子 丙午", {"水": "36/7", "火": "4/3"}, 4),
+        ("甲子 丁丑 辛卯 己酉", {"木": "2", "金": "18/7"}, 2),
+    ],
+)
+def test_initial_clash_budgets_are_rounded_once_after_exact_sum(text, expected, checks):
+    # Literal controls from geometric hidden shares: visible stems do not
+    # enter this proxy, and all natal positions contribute to each element.
+    trace = model(text)["clash_comparison"]
+    powers = [
+        power
+        for event in trace["events"]
+        if event["calculation_branch"] == "initial_hidden_budget"
+        for power in event["powers"]
+    ]
+    assert len(powers) == checks
+    assert {power["element"] for power in powers} == set(expected)
+    for power in powers:
+        assert power["raw_budget"] == float(Fraction(expected[power["element"]]))
 
 
 def test_trace_and_snapshot_reuse_the_same_receipt_and_do_not_recompute():

@@ -6,7 +6,6 @@ import json
 import math
 import random
 from decimal import localcontext
-from pathlib import Path
 
 import pytest
 
@@ -280,14 +279,3 @@ def test_invalid_thresholds_are_rejected_even_for_empty_inputs(radius):
     ):
         with pytest.raises(ValueError):
             call()
-
-
-def test_protocol_is_present_and_explicitly_preserves_the_historical_failure():
-    data = json.loads(
-        (
-            Path(__file__).parents[1]
-            / "fixtures/western-angular-predicates-protocol.json"
-        ).read_text()
-    )
-    assert data["protocol_id"] == "western_angular_predicates_decimal_v1"
-    assert Path(data["preserved_failure"]).is_file()

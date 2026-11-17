@@ -11,11 +11,16 @@ import pytest
 from fatebridge.core.almanac import get_lunar_context
 from fatebridge.core.calendar import BaZiCalendar
 from fatebridge.core.divination import (
+    BAGUA_BY_NAME,
+    _bagua_from_lines,
     build_changed_hexagram,
     build_hexagram,
     build_meihua_interpretation,
     build_mutual_hexagram,
     derive_meihua_hexagram,
+    lookup_gua,
+    lookup_trigram_by_code,
+    lookup_trigram_by_name,
 )
 from fatebridge.core.meihua import build_meihua_evidence, meihua_ruleset
 from fatebridge.services.divination import calculate_meihua_analysis
@@ -117,6 +122,78 @@ def test_all_64_diagrams_and_all_384_single_line_changes(upper, lower):
     # The generic mathematical operator is separate from Mei Hua's special
     # rule for pure Qian/Kun; these are not 384 historical validation cases.
     assert build_mutual_hexagram(base)["binary_code"] == expected[1:4] + expected[2:5]
+
+
+@pytest.mark.parametrize("name", DIAGRAMS)
+@pytest.mark.parametrize("route", ["name", "code", "hexagram"])
+def test_returned_trigram_lines_cannot_change_basis_or_later_results(
+    name, route, monkeypatch
+):
+    expected = [int(bit) for bit in DIAGRAMS[name]]
+    # Restore a fresh basis list on teardown even if the regression returns it.
+    monkeypatch.setitem(BAGUA_BY_NAME[name], "lines", list(expected))
+    if route == "hexagram":
+        first = build_hexagram("乾", name)
+        first["lower"]["lines"][0] ^= 1
+        second = build_hexagram("乾", name)
+        assert first["upper"]["lines"] == [1, 1, 1]
+        assert second["binary_code"] == DIAGRAMS[name] + DIAGRAMS["乾"]
+        assert second["lower"]["lines"] == expected
+    else:
+        lookup = lookup_trigram_by_name if route == "name" else lookup_trigram_by_code
+        query = name if route == "name" else DIAGRAMS[name]
+        first = lookup(query)
+        first["lines"][0] ^= 1
+        second = lookup(query)
+        assert second["name"] == name
+        assert second["lines"] == expected
+    assert BAGUA_BY_NAME[name]["lines"] == expected
+
+
+@pytest.mark.parametrize(
+    "query,mode,kind,code,number",
+    [
+        ("乾", "hexagram", "hexagram", "111111", 1),
+        ("乾", "auto", "trigram", "111", None),
+        ("兌", "auto", "trigram", "110", None),
+        ("兌", "trigram", "trigram", "110", None),
+        ("兌", "hexagram", "hexagram", "110110", 58),
+        ("臨", "hexagram", "hexagram", "110000", 19),
+        ("临", "auto", "hexagram", "110000", 19),
+        ("天澤履", "auto", "hexagram", "110111", 10),
+        ("雷風恆", "hexagram", "hexagram", "011100", 32),
+        ("無妄", "auto", "hexagram", "100111", 25),
+        ("天雷無妄", "hexagram", "hexagram", "100111", 25),
+        ("天山遯", "hexagram", "hexagram", "001111", 33),
+        (" 兌卦 ", "auto", "trigram", "110", None),
+        (" 臨卦 ", "hexagram", "hexagram", "110000", 19),
+    ],
+)
+def test_published_short_names_and_script_forms_respect_explicit_mode(
+    query, mode, kind, code, number
+):
+    result = lookup_gua(query, mode)
+    assert result["lookup_type"] == kind
+    assert result["code"] == code
+    if kind == "hexagram":
+        assert result["classical"]["number"] == number
+    assert result["matched_query"] == query.strip()
+
+
+@pytest.mark.parametrize(
+    "query,mode",
+    [("人", "hexagram"), ("畜", "auto"), ("臨近", "auto"), ("天澤履", "trigram")],
+)
+def test_name_lookup_does_not_guess_partial_names_or_override_requested_mode(
+    query, mode
+):
+    with pytest.raises(ValueError):
+        lookup_gua(query, mode)
+
+
+def test_unrecognized_trigram_lines_never_substitute_qian():
+    with pytest.raises(ValueError, match="八卦爻序列"):
+        _bagua_from_lines([0, 2, 0])
 
 
 @pytest.mark.parametrize(

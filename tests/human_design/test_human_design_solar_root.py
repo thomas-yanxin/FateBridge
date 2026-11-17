@@ -1,7 +1,11 @@
 """Closest representable solar roots and honest boundary-resolution witnesses."""
 
+import gzip
+import hashlib
+import json
 import math
 import os
+import struct
 import subprocess
 import sys
 from copy import deepcopy
@@ -17,6 +21,8 @@ from fatebridge.core.human_design import (
     longitude_activation,
     solar_root_subdivisions,
 )
+from fatebridge.core.human_design_solar_lattice import derive_lattice
+from fatebridge.core.human_design_solar_root import solve_solar_root
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
 from tests.support.ephemeris_case_runtime import native_ephemeris_files_module
@@ -31,6 +37,70 @@ INPUT = dict(
     birth_minute=0,
     birth_timezone="UTC",
 )
+
+
+def test_all_frozen_nonmonotone_finite_contacts_choose_the_exact_reference():
+    data = ROOT / "tests/data/human_design_finite_contacts_v1"
+    manifest = json.loads((data / "manifest.json").read_text())
+    compressed = (data / manifest["reference"]).read_bytes()
+    assert hashlib.sha256(compressed).hexdigest() == manifest["compressed_sha256"]
+    raw = gzip.decompress(compressed)
+    assert hashlib.sha256(raw).hexdigest() == manifest["sha256"]
+    assert (
+        hashlib.sha256((data / "build_reference.py").read_bytes()).hexdigest()
+        == manifest["generator_sha256"]
+    )
+
+    def bits(value):
+        return struct.unpack(">Q", struct.pack(">d", value))[0]
+
+    def number(index):
+        return struct.unpack(">d", struct.pack(">Q", index))[0]
+
+    functions = windows = 0
+    for line in raw.splitlines():
+        case = json.loads(line)
+        birth, origin, pattern = case["birth_tt"], case["origin"], case["pattern"]
+        center = birth - 88
+        base = bits(center)
+
+        def sun(tt):
+            offset = bits(tt) - base
+            if -3 <= offset <= 3:
+                return origin - pattern[offset + 3] * math.ulp(origin)
+            return float((Fraction(origin) + Fraction(tt) - Fraction(center)) % 360)
+
+        for window in case["windows"]:
+            lo, hi = (number(base + i) for i in window["initial"])
+            times = [number(i) for i in range(bits(lo) - 4, bits(hi) + 5)]
+            lattice = derive_lattice(
+                sun(birth),
+                lo,
+                hi,
+                [{"jd_tt": tt, "sun_longitude": sun(tt)} for tt in times],
+            )
+            contact = lattice["preferred_numeric_contact"]
+            assert contact is not None
+            assert [
+                bits(times[contact[key]]) - base
+                for key in ("lower_index", "upper_index", "selected_index")
+            ] == window["preferred"], case
+            windows += 1
+        witness = solve_solar_root(birth, sun)["numerical_precision"]
+        initial = [
+            bits(witness["local_solar_lattice"][key]) - base
+            for key in ("initial_lower_jd_tt", "initial_upper_jd_tt")
+        ]
+        expected = next(
+            w["preferred"] for w in case["windows"] if w["initial"] == initial
+        )
+        assert [
+            bits(witness[key]["jd_tt"]) - base for key in ("lower", "upper", "selected")
+        ] == expected, case
+        assert witness["physical_time_accuracy_certified"] is False
+        functions += 1
+    assert functions == manifest["functions"] == 13122
+    assert windows == manifest["initial_windows"] == 48114
 
 
 @pytest.mark.parametrize("birth", [2451545.0, 2451545.123456789])

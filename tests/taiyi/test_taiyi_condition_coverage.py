@@ -26,7 +26,8 @@ from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.metaphysics import calculate_taiyi_analysis
 from fatebridge.services.tool_catalog import CATALOG
 from scripts.taiyi.audit_taiyi_condition_coverage import CORPUS, audit
-from tests.taiyi.test_taiyi_enclosures import resolve, transport_payload
+from tests.support.reference_data import resolve
+from tests.taiyi.test_taiyi_enclosures import transport_payload
 from tests.taiyi.test_taiyi_transports import _same_run_payload
 
 TRUTH = json.loads((CORPUS / "truth-table.json").read_text())

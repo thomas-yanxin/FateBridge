@@ -8,6 +8,7 @@ import pytest
 
 from fatebridge.core import ephemeris_runtime as e
 from fatebridge.core import guolao
+from fatebridge.core.astro.moshier_motion import METHOD_ID as MOSHIER_MOTION_METHOD_ID
 from scripts.guolao.audit_guolao_motion import evaluate, load_reference, main
 from tests.western import test_other_chart_physical_sources as shared_sources
 
@@ -63,8 +64,7 @@ def test_moshier_uses_own_position_derivative_without_swiss_light_time(
         == "unsupported_physical_model"
     )
     assert all(
-        value["status"] == "applied"
-        and value["method_id"] == "fatebridge_moshier_apparent_position_derivative_v1"
+        value["status"] == "applied" and value["method_id"] == MOSHIER_MOTION_METHOD_ID
         for value in raw["longitude_motion"]["complete_position_derivatives"].values()
     )
 

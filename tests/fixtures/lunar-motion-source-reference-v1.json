@@ -1,0 +1,687 @@
+{
+  "retained_source_files_sha256": {
+    "tests/fixtures/elp-mpp02-source-reference-v1.json": "8b6da438e274a9d5fb2729a2a251ceb41525e318652394d241d543beb4e419dc",
+    "tests/fixtures/vsop87-source-increments-v1.json": "e89af15437664ac88263a87f2f6f1be74fbdf5d3a216067305a9aebc8aed5bdd"
+  },
+  "qualification": "Exact retained native apparent references and numericalcounterexamples; sourcephysicalmodels may change, inputs/gates do not.",
+  "rate_regressions": [
+    {
+      "jd_tt": 2384385.0001924136,
+      "cohort": "original",
+      "position": {
+        "longitude": 174.04749739395496,
+        "latitude": 5.053112916378352,
+        "declination": 7.003342599180655
+      },
+      "longitude_speed": 15.15207028066925,
+      "previous_error_arcsec_day": 1.1107073873951379
+    },
+    {
+      "jd_tt": 2384963.000195458,
+      "cohort": "original",
+      "position": {
+        "longitude": 229.8068280270004,
+        "latitude": -0.0219554971264024,
+        "declination": -17.728942327432243
+      },
+      "longitude_speed": 14.447528191048539,
+      "previous_error_arcsec_day": 1.1458968165833028
+    },
+    {
+      "jd_tt": 2386636.0001855423,
+      "cohort": "original",
+      "position": {
+        "longitude": 304.2509969156731,
+        "latitude": -1.6568392398395027,
+        "declination": -20.824895347630033
+      },
+      "longitude_speed": 12.698042256800335,
+      "previous_error_arcsec_day": 1.2250664653400634
+    },
+    {
+      "jd_tt": 2387915.000160224,
+      "cohort": "original",
+      "position": {
+        "longitude": 250.88184233122985,
+        "latitude": -0.19219273918841856,
+        "declination": -22.287036156489926
+      },
+      "longitude_speed": 14.20430723800088,
+      "previous_error_arcsec_day": 1.6439820670612448
+    },
+    {
+      "jd_tt": 2392237.0000925763,
+      "cohort": "original",
+      "position": {
+        "longitude": 311.8142871271375,
+        "latitude": -4.830003351537493,
+        "declination": -21.896496700332783
+      },
+      "longitude_speed": 15.31314790146728,
+      "previous_error_arcsec_day": 1.0336463972748788
+    },
+    {
+      "jd_tt": 2394855.000093667,
+      "cohort": "original",
+      "position": {
+        "longitude": 250.7554563090703,
+        "latitude": 0.469008355367914,
+        "declination": -21.612009286232276
+      },
+      "longitude_speed": 14.610925485313686,
+      "previous_error_arcsec_day": 1.1755141355230592
+    },
+    {
+      "jd_tt": 2396528.0001064963,
+      "cohort": "original",
+      "position": {
+        "longitude": 325.20939234969774,
+        "latitude": 1.1968991652560823,
+        "declination": -11.999793008693818
+      },
+      "longitude_speed": 12.601462231200127,
+      "previous_error_arcsec_day": 1.2316288857007862
+    },
+    {
+      "jd_tt": 2397197.0001134947,
+      "cohort": "original",
+      "position": {
+        "longitude": 145.29685879775258,
+        "latitude": 1.8266863137657605,
+        "declination": 14.818405322974677
+      },
+      "longitude_speed": 15.01494581278647,
+      "previous_error_arcsec_day": 1.2721686475458682
+    },
+    {
+      "jd_tt": 2397777.000118816,
+      "cohort": "original",
+      "position": {
+        "longitude": 233.54538023198867,
+        "latitude": 3.091947122094846,
+        "declination": -15.67876393451062
+      },
+      "longitude_speed": 14.982574406490556,
+      "previous_error_arcsec_day": 1.381006230760562
+    },
+    {
+      "jd_tt": 2400060.000107645,
+      "cohort": "original",
+      "position": {
+        "longitude": 65.78154394149055,
+        "latitude": 5.167043087355267,
+        "declination": 26.372572245742518
+      },
+      "longitude_speed": 14.566603093304309,
+      "previous_error_arcsec_day": 1.024221975289663
+    },
+    {
+      "jd_tt": 2406207.9999829577,
+      "cohort": "original",
+      "position": {
+        "longitude": 82.65423415046263,
+        "latitude": 4.962737232073033,
+        "declination": 28.20876993038374
+      },
+      "longitude_speed": 15.11873573321824,
+      "previous_error_arcsec_day": 1.06694477679099
+    },
+    {
+      "jd_tt": 2406237.999982535,
+      "cohort": "original",
+      "position": {
+        "longitude": 120.95383840988215,
+        "latitude": 4.504491894273928,
+        "declination": 24.353942558449685
+      },
+      "longitude_speed": 14.691537584577693,
+      "previous_error_arcsec_day": 1.6175436132925824
+    },
+    {
+      "jd_tt": 2407089.9999711066,
+      "cohort": "original",
+      "position": {
+        "longitude": 180.76872133398075,
+        "latitude": -3.2937447010374035,
+        "declination": -3.327233611313725
+      },
+      "longitude_speed": 15.033179016254532,
+      "previous_error_arcsec_day": 1.1060963127818013
+    },
+    {
+      "jd_tt": 2407668.9999639066,
+      "cohort": "original",
+      "position": {
+        "longitude": 253.77474239089008,
+        "latitude": -2.7945472440987436,
+        "declination": -25.24293359272319
+      },
+      "longitude_speed": 15.120585099078573,
+      "previous_error_arcsec_day": 1.3821359054567495
+    },
+    {
+      "jd_tt": 2408491.999954821,
+      "cohort": "original",
+      "position": {
+        "longitude": 289.6960837472713,
+        "latitude": 3.5132572357950544,
+        "declination": -18.529884554674183
+      },
+      "longitude_speed": 14.758992551764058,
+      "previous_error_arcsec_day": 1.708180458310693
+    },
+    {
+      "jd_tt": 2409952.999950793,
+      "cohort": "original",
+      "position": {
+        "longitude": 100.89704795017157,
+        "latitude": -4.788803164258537,
+        "declination": 18.230896577649073
+      },
+      "longitude_speed": 14.736998259483514,
+      "previous_error_arcsec_day": 1.0558839660788522
+    },
+    {
+      "jd_tt": 2410255.9999523493,
+      "cohort": "original",
+      "position": {
+        "longitude": 137.0209144060496,
+        "latitude": -1.1695280616508812,
+        "declination": 14.627271285991862
+      },
+      "longitude_speed": 14.20618509113929,
+      "previous_error_arcsec_day": 1.003373983361655
+    },
+    {
+      "jd_tt": 2414029.9999502907,
+      "cohort": "original",
+      "position": {
+        "longitude": 180.8340313580126,
+        "latitude": -3.7676960547440626,
+        "declination": -3.7878966547963078
+      },
+      "longitude_speed": 14.804800774757965,
+      "previous_error_arcsec_day": 1.3098466614323456
+    },
+    {
+      "jd_tt": 2416099.000023298,
+      "cohort": "original",
+      "position": {
+        "longitude": 87.49395197467655,
+        "latitude": -4.559315608685797,
+        "declination": 18.867045664739532
+      },
+      "longitude_speed": 15.34673363512577,
+      "previous_error_arcsec_day": 1.128818549891264
+    },
+    {
+      "jd_tt": 2416708.0000511426,
+      "cohort": "original",
+      "position": {
+        "longitude": 197.40838515762368,
+        "latitude": 2.526828197726749,
+        "declination": -4.501933827600201
+      },
+      "longitude_speed": 14.418619394120569,
+      "previous_error_arcsec_day": 1.072799708050809
+    },
+    {
+      "jd_tt": 2416951.000061677,
+      "cohort": "original",
+      "position": {
+        "longitude": 148.0815521676943,
+        "latitude": -0.9238653518380738,
+        "declination": 11.278316591383284
+      },
+      "longitude_speed": 14.310215646730148,
+      "previous_error_arcsec_day": 1.1834450096181115
+    },
+    {
+      "jd_tt": 2425169.000281268,
+      "cohort": "original",
+      "position": {
+        "longitude": 84.91347692629247,
+        "latitude": 0.38975123392627575,
+        "declination": 23.740783819272508
+      },
+      "longitude_speed": 13.906249540299598,
+      "previous_error_arcsec_day": 1.8131913873254746
+    },
+    {
+      "jd_tt": 2425992.0002826764,
+      "cohort": "original",
+      "position": {
+        "longitude": 122.80846868440447,
+        "latitude": 4.983727245623366,
+        "declination": 24.38758894790542
+      },
+      "longitude_speed": 15.375712822985696,
+      "previous_error_arcsec_day": 1.5907279875214897
+    },
+    {
+      "jd_tt": 2426600.0002823314,
+      "cohort": "original",
+      "position": {
+        "longitude": 218.15753579829763,
+        "latitude": -2.8633277415926743,
+        "declination": -16.941306496398838
+      },
+      "longitude_speed": 14.593399602947937,
+      "previous_error_arcsec_day": 1.110552273930665
+    },
+    {
+      "jd_tt": 2428061.0002790433,
+      "cohort": "original",
+      "position": {
+        "longitude": 29.283129157648784,
+        "latitude": 5.001425906770478,
+        "declination": 15.895047436525578
+      },
+      "longitude_speed": 14.736129887563958,
+      "previous_error_arcsec_day": 1.186484873869631
+    },
+    {
+      "jd_tt": 2428243.000278639,
+      "cohort": "original",
+      "position": {
+        "longitude": 254.8056984720034,
+        "latitude": -2.0990423997947474,
+        "declination": -24.66760001775157
+      },
+      "longitude_speed": 12.446012020205782,
+      "previous_error_arcsec_day": 1.105710581865793
+    },
+    {
+      "jd_tt": 2430344.0002930965,
+      "cohort": "original",
+      "position": {
+        "longitude": 221.7299336357641,
+        "latitude": 4.065048963169126,
+        "declination": -11.485339650635671
+      },
+      "longitude_speed": 14.853981603582156,
+      "previous_error_arcsec_day": 1.0821256356074116
+    },
+    {
+      "jd_tt": 2433782.0003410326,
+      "cohort": "original",
+      "position": {
+        "longitude": 158.59053116551394,
+        "latitude": 0.7017491060772371,
+        "declination": 9.002481739937915
+      },
+      "longitude_speed": 12.799691233057095,
+      "previous_error_arcsec_day": 1.0325381424557634
+    },
+    {
+      "jd_tt": 2435062.0003588903,
+      "cohort": "original",
+      "position": {
+        "longitude": 119.40597135636952,
+        "latitude": -2.02297857904613,
+        "declination": 18.301234573060917
+      },
+      "longitude_speed": 13.629459106991249,
+      "previous_error_arcsec_day": 1.0466866993354529
+    },
+    {
+      "jd_tt": 2435885.000367323,
+      "cohort": "original",
+      "position": {
+        "longitude": 158.12351129250175,
+        "latitude": -4.851238604943063,
+        "declination": 4.0208977880783525
+      },
+      "longitude_speed": 15.282624826485385,
+      "previous_error_arcsec_day": 1.3583508854296156
+    },
+    {
+      "jd_tt": 2437953.000397729,
+      "cohort": "original",
+      "position": {
+        "longitude": 49.66592989248057,
+        "latitude": -4.872883707154377,
+        "declination": 12.957709189880541
+      },
+      "longitude_speed": 14.876482951376246,
+      "previous_error_arcsec_day": 1.3466946201390328
+    },
+    {
+      "jd_tt": 2442275.000522107,
+      "cohort": "original",
+      "position": {
+        "longitude": 109.70447812157705,
+        "latitude": -2.719367673349101,
+        "declination": 19.303732322855566
+      },
+      "longitude_speed": 14.932453189812023,
+      "previous_error_arcsec_day": 1.1072497470387077
+    },
+    {
+      "jd_tt": 2445746.0006234786,
+      "cohort": "original",
+      "position": {
+        "longitude": 124.27054122192894,
+        "latitude": 3.9235271084774967,
+        "declination": 23.002012318354698
+      },
+      "longitude_speed": 15.02037183307093,
+      "previous_error_arcsec_day": 2.230518394836878
+    },
+    {
+      "jd_tt": 2445775.000624046,
+      "cohort": "original",
+      "position": {
+        "longitude": 147.60922233001114,
+        "latitude": 4.907118611888079,
+        "declination": 16.906523763562475
+      },
+      "longitude_speed": 15.152431724862936,
+      "previous_error_arcsec_day": 1.8881565324633698
+    },
+    {
+      "jd_tt": 2447846.000657147,
+      "cohort": "original",
+      "position": {
+        "longitude": 84.6530755847091,
+        "latitude": 4.16152893223139,
+        "declination": 27.49245634338064
+      },
+      "longitude_speed": 14.584657335593931,
+      "previous_error_arcsec_day": 1.3918200062356334
+    },
+    {
+      "jd_tt": 2448000.50066036,
+      "cohort": "original",
+      "position": {
+        "longitude": 306.95232201572696,
+        "latitude": -0.5521707778560349,
+        "declination": -19.07128247820702
+      },
+      "longitude_speed": 12.815467372003772,
+      "previous_error_arcsec_day": 1.1665586606589784
+    },
+    {
+      "jd_tt": 2451314.000736283,
+      "cohort": "original",
+      "position": {
+        "longitude": 54.1733705774219,
+        "latitude": -4.967054434232497,
+        "declination": 13.995152645771858
+      },
+      "longitude_speed": 15.334908222354809,
+      "previous_error_arcsec_day": 1.1610686151207972
+    },
+    {
+      "jd_tt": 2454786.0007608505,
+      "cohort": "original",
+      "position": {
+        "longitude": 85.08679492887586,
+        "latitude": 3.7166369886141206,
+        "declination": 27.062557742131585
+      },
+      "longitude_speed": 15.01960510046878,
+      "previous_error_arcsec_day": 1.8353703193028537
+    },
+    {
+      "jd_tt": 2455455.0007667853,
+      "cohort": "original",
+      "position": {
+        "longitude": 265.5550835597692,
+        "latitude": -1.179740068521187,
+        "declination": -24.542766940796948
+      },
+      "longitude_speed": 12.61758984070885,
+      "previous_error_arcsec_day": 1.0519713339341763
+    },
+    {
+      "jd_tt": 2455636.000768272,
+      "cohort": "original",
+      "position": {
+        "longitude": 115.58721404394277,
+        "latitude": -2.2891610512132,
+        "declination": 18.772634848845467
+      },
+      "longitude_speed": 13.951703994365399,
+      "previous_error_arcsec_day": 1.0558336553856407
+    },
+    {
+      "jd_tt": 2455667.000768539,
+      "cohort": "original",
+      "position": {
+        "longitude": 168.06967592742635,
+        "latitude": -5.028978193713677,
+        "declination": 0.08485234902932688
+      },
+      "longitude_speed": 14.988861207249116,
+      "previous_error_arcsec_day": 1.2571098743350717
+    },
+    {
+      "jd_tt": 2456854.000780909,
+      "cohort": "original",
+      "position": {
+        "longitude": 335.7817615704392,
+        "latitude": 3.736915782367974,
+        "declination": -5.91188963705824
+      },
+      "longitude_speed": 14.810926660641618,
+      "previous_error_arcsec_day": 1.0928458453896894
+    },
+    {
+      "jd_tt": 2457128.000784329,
+      "cohort": "original",
+      "position": {
+        "longitude": 339.6394310768327,
+        "latitude": 2.672748127851662,
+        "declination": -5.476493122448117
+      },
+      "longitude_speed": 14.707372859591555,
+      "previous_error_arcsec_day": 1.0580737378539595
+    },
+    {
+      "jd_tt": 2461146.0007970594,
+      "cohort": "original",
+      "position": {
+        "longitude": 358.7937647752712,
+        "latitude": 1.8182986567757295,
+        "declination": 1.1885566759913497
+      },
+      "longitude_speed": 13.998443578078462,
+      "previous_error_arcsec_day": 1.0475917366669307
+    },
+    {
+      "jd_tt": 2462425.0008012205,
+      "cohort": "original",
+      "position": {
+        "longitude": 304.92640229657513,
+        "latitude": 3.0470338479402983,
+        "declination": -16.0723531382957
+      },
+      "longitude_speed": 12.89744181142633,
+      "previous_error_arcsec_day": 1.259744221897563
+    },
+    {
+      "jd_tt": 2464068.000813984,
+      "cohort": "original",
+      "position": {
+        "longitude": 339.8263877182801,
+        "latitude": 2.0692559284126553,
+        "declination": -5.965083546766416
+      },
+      "longitude_speed": 14.206224349701321,
+      "previous_error_arcsec_day": 1.3322632503310672
+    },
+    {
+      "jd_tt": 2467599.0008433727,
+      "cohort": "original",
+      "position": {
+        "longitude": 71.41251694546644,
+        "latitude": 4.854950893925111,
+        "declination": 26.954067089652487
+      },
+      "longitude_speed": 15.342442255480057,
+      "previous_error_arcsec_day": 1.4465376655415696
+    },
+    {
+      "jd_tt": 2473109.000895084,
+      "cohort": "original",
+      "position": {
+        "longitude": 314.16736329784686,
+        "latitude": -4.782194328282181,
+        "declination": -21.146389692450768
+      },
+      "longitude_speed": 15.163449897769729,
+      "previous_error_arcsec_day": 1.0013217698201515
+    },
+    {
+      "jd_tt": 2473960.0009037573,
+      "cohort": "original",
+      "position": {
+        "longitude": 0.4336755604035501,
+        "latitude": -1.701313648810558,
+        "declination": -1.3885078588760493
+      },
+      "longitude_speed": 14.046728853074224,
+      "previous_error_arcsec_day": 1.9040292478678111
+    },
+    {
+      "jd_tt": 2475240.0009171697,
+      "cohort": "original",
+      "position": {
+        "longitude": 320.0094615511628,
+        "latitude": 0.8947545228236938,
+        "declination": -13.957758244334093
+      },
+      "longitude_speed": 12.460704385311299,
+      "previous_error_arcsec_day": 1.197478168246846
+    },
+    {
+      "jd_tt": 2477492.000941868,
+      "cohort": "original",
+      "position": {
+        "longitude": 106.74025658106156,
+        "latitude": -4.985194006367391,
+        "declination": 17.43128457646213
+      },
+      "longitude_speed": 15.300841181822852,
+      "previous_error_arcsec_day": 1.2401251647986555
+    },
+    {
+      "jd_tt": 2478678.0009554583,
+      "cohort": "original",
+      "position": {
+        "longitude": 258.4036565839142,
+        "latitude": 3.871737717178793,
+        "declination": -19.06478267107251
+      },
+      "longitude_speed": 14.568740874911395,
+      "previous_error_arcsec_day": 1.0105627754320778
+    },
+    {
+      "jd_tt": 2479257.000962243,
+      "cohort": "original",
+      "position": {
+        "longitude": 326.95475469869075,
+        "latitude": -3.9979839382746,
+        "declination": -16.275984696623098
+      },
+      "longitude_speed": 13.906014221911533,
+      "previous_error_arcsec_day": 1.055207635829447
+    },
+    {
+      "jd_tt": 2483002.0010085893,
+      "cohort": "original",
+      "position": {
+        "longitude": 349.5310820894038,
+        "latitude": 5.040220263915013,
+        "declination": 0.49553141186870164
+      },
+      "longitude_speed": 15.214995983166329,
+      "previous_error_arcsec_day": 1.0571440341799132
+    },
+    {
+      "jd_tt": 2483030.001008952,
+      "cohort": "original",
+      "position": {
+        "longitude": 357.7106914248243,
+        "latitude": 4.921710704713139,
+        "declination": 3.6061911879313997
+      },
+      "longitude_speed": 15.354070238638212,
+      "previous_error_arcsec_day": 1.4679616063517642
+    },
+    {
+      "jd_tt": 2483853.001019735,
+      "cohort": "original",
+      "position": {
+        "longitude": 35.327177130097354,
+        "latitude": 0.036682137053390206,
+        "declination": 13.324872758507635
+      },
+      "longitude_speed": 14.33470391713326,
+      "previous_error_arcsec_day": 1.3416212094362834
+    },
+    {
+      "jd_tt": 2486531.0010563596,
+      "cohort": "original",
+      "position": {
+        "longitude": 52.225114246478086,
+        "latitude": -1.647334552737647,
+        "declination": 16.723810763359058
+      },
+      "longitude_speed": 14.881508488375891,
+      "previous_error_arcsec_day": 1.4579359530841884
+    },
+    {
+      "jd_tt": 2487354.0010681,
+      "cohort": "original",
+      "position": {
+        "longitude": 88.13667667344436,
+        "latitude": 4.293021018101725,
+        "declination": 27.708072301698667
+      },
+      "longitude_speed": 15.076493369524732,
+      "previous_error_arcsec_day": 1.4107732812362883
+    },
+    {
+      "jd_tt": 2393091.017959563,
+      "cohort": "prior_modern",
+      "position": {
+        "longitude": 42.6274356036613,
+        "latitude": 4.470605997693219,
+        "declination": 19.896281816079455
+      },
+      "longitude_speed": 14.869210140162211,
+      "previous_error_arcsec_day": 1.0636684628572368
+    },
+    {
+      "jd_tt": 2473358.909124623,
+      "cohort": "prior_modern",
+      "position": {
+        "longitude": 9.233766695767862,
+        "latitude": -3.2421391836610485,
+        "declination": 0.6772411047469916
+      },
+      "longitude_speed": 15.218565776125999,
+      "previous_error_arcsec_day": 1.0454728063301388
+    }
+  ],
+  "apparent_position_gate_arcsec": 120.0,
+  "longitude_speed_gate_arcsec_day": 1.0,
+  "fine_rate_failures": [
+    2383291.608359877,
+    2385155.7147242734,
+    2387125.614334692,
+    2394234.912090336,
+    2394757.9419841794,
+    2397093.4691117867,
+    2403961.3284208374,
+    2409952.999950793,
+    2413561.19475803
+  ],
+  "fine_rate_steps_TT_days": [
+    0.0005,
+    0.001
+  ],
+  "fine_rate_gate_deg_TT_day": 5e-06
+}

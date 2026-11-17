@@ -1,6 +1,5 @@
 """Third-round primary-source and context-omission counterexamples."""
 
-import hashlib
 import json
 from copy import deepcopy
 from pathlib import Path
@@ -21,6 +20,7 @@ from fatebridge.validation.sukuyo import (
     required_quote_paths,
     verify_sukuyo_context_claims,
 )
+from tests.fixtures.mcp_result_delivery import read_full_result
 
 FIXTURE = json.loads(
     (Path(__file__).parents[1] / "data/sukuyo-t1299-calendar-primary.json").read_text()
@@ -199,6 +199,8 @@ def payload(tool="suzhan", **changes):
     spec = next(s for s in CATALOG if s.key == tool)
     params = (
         {
+            "lat": "31n13",
+            "lon": "121e28",
             "date": "2025-03-04",
             "time": "12:00:00",
             "zone": "+08:00",
@@ -268,7 +270,7 @@ def test_context_checker_rejects_cherry_picked_true_marriage_clause():
     )
 
 
-def test_context_checker_requires_both_directions_and_original_unprojected_run():
+def test_context_checker_requires_both_directions_and_complete_structured_context():
     result = payload("sukuyo_compatibility")
     claims = quotes(result, "compatibility")
     assert (
@@ -286,6 +288,14 @@ def test_context_checker_requires_both_directions_and_original_unprojected_run()
     assert (
         verify_sukuyo_context_claims(
             {k: v for k, v in result.items() if k != "snapshot_text"},
+            claims,
+            focus="compatibility",
+        )["status"]
+        == "verified_context_complete_quotes"
+    )
+    assert (
+        verify_sukuyo_context_claims(
+            {k: v for k, v in result.items() if k != "candidate_relation_analysis"},
             claims,
             focus="compatibility",
         )["status"]
@@ -396,6 +406,8 @@ async def test_default_mcp_budget_preserves_the_full_original_context_without_re
         result = await client.call_tool(
             "suzhan",
             {
+                "lat": "31n13",
+                "lon": "121e28",
                 "date": "2025-03-04",
                 "time": "12:00:00",
                 "zone": "+08:00",
@@ -414,54 +426,9 @@ async def test_default_mcp_budget_preserves_the_full_original_context_without_re
             pytest.fail("resource reads must reuse the same calculation")
 
         monkeypatch.setattr(divination, "build_suzhan_result", must_not_recalculate)
-        manifest = json.loads((await client.read_resource(ref["manifest_uri"]))[0].text)
-        assert manifest["run_metadata"]["run_id"] == shaped["run_metadata"]["run_id"]
-
-        async def read_json_pages(base_uri):
-            parts = []
-            offset = 0
-            while True:
-                page = json.loads(
-                    (await client.read_resource(f"{base_uri}/{offset}"))[0].text
-                )
-                parts.append(page["text"])
-                offset = page["next_offset"]
-                if offset is None:
-                    break
-            text = "".join(parts)
-            assert hashlib.sha256(text.encode()).hexdigest() == page["sha256"]
-            return json.loads(text)
-
-        original = await read_json_pages(
-            f"fatebridge://results/{ref['result_id']}/pages"
-        )
-        assert original["run_metadata"] == manifest["run_metadata"]
-        inline_metadata = deepcopy(shaped["run_metadata"])
-        runtime = inline_metadata["runtime"]
-        if "delivery_path" in runtime:
-            assert runtime["delivery_path"] == "run_metadata.runtime"
-            assert runtime["delivery_path"] in ref["deferred_fields"]
-            restored = await read_json_pages(
-                f"fatebridge://results/{ref['result_id']}/fields/{runtime['delivery_path']}"
-            )
-            assert restored == original["run_metadata"]["runtime"]
-            assert (
-                len(restored["ephemeris"]["files"]) == runtime["ephemeris_files_count"]
-            )
-            assert (
-                restored["ephemeris"]["sha256"] == runtime["ephemeris_inventory_sha256"]
-            )
-            assert restored["environment_sha256"] == runtime["environment_sha256"]
-            inline_metadata["runtime"] = restored
-        evidence = inline_metadata.get("calculation_evidence")
-        if evidence and "delivery_path" in evidence:
-            path = evidence["delivery_path"]
-            assert path == "run_metadata.calculation_evidence"
-            assert path in ref["deferred_fields"]
-            inline_metadata["calculation_evidence"] = await read_json_pages(
-                f"fatebridge://results/{ref['result_id']}/fields/{path}"
-            )
-        assert original["run_metadata"] == inline_metadata
+        assert ref["mode"] == "paged"
+        # Shared reader checks every offset, length, manifest and same-run receipt.
+        original = await read_full_result(client, shaped)
         assert (
             original["sukuyo"]["calendar_day"]["clock_evaluation_status"]
             == "not_computed"

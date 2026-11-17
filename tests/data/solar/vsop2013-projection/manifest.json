@@ -1,0 +1,49 @@
+{
+  "source_kind": "independent_generated_DE440_same_frame_TT_reference",
+  "source_kernel_sha256": "a4ce9bf9b3282becc9f4b2ac3cebe03a2ae7599981aabd7265fd8482fff7c4b5",
+  "source_kernel_url": "https://ssd.jpl.nasa.gov/ftp/eph/planets/bsp/de440.bsp",
+  "original_input_years": [
+    1700,
+    2300
+  ],
+  "original_full_term_years": [
+    1684,
+    2304
+  ],
+  "derived_lichun_years": [
+    2305,
+    2420
+  ],
+  "gate_seconds_tt": 1.0,
+  "maximum_numerical_bracket_seconds": 0.0002,
+  "references": [
+    {
+      "file": "reference-14904.json.gz",
+      "sha256": "fe6defebbe9e10fb2a990d6c70f099c89141091dac84a0b5d730835a7d60fa99",
+      "rows": 14904
+    },
+    {
+      "file": "reference-lichun-116.json",
+      "sha256": "c5b5fa686d66f582bf681f512b29e118c69b1bc8ef5b9e23c266aafbe0bcedb7",
+      "rows": 116
+    }
+  ],
+  "original_data_development_exposed_not_blind": true,
+  "new_independent_physical_observations": 0,
+  "native96_reference": "tests/data/solar/de440-guard-tt.json",
+  "native96_original_gate": {
+    "passed": 84,
+    "failed": 12,
+    "seconds": 1,
+    "regraded": false
+  },
+  "original_profile_refusal_inputs": [
+    "changed_working_range",
+    "changed_embedded_series",
+    "changed_upstream_coefficients",
+    "changed_calculation_graph",
+    "duplicate_source_key",
+    "boolean_abi"
+  ],
+  "scope": "All14904 original TT references and all116 derived Lichun references retained byte-for-byte. No former model outputs, replay equality, whole-source seal, native binary or qualification claim is retained."
+}

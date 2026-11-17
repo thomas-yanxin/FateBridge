@@ -7,7 +7,7 @@ from fatebridge.core import almanac
 from fatebridge.core.aa1996_solar import MODEL_ID as AA1996_SOLAR_MODEL
 from fatebridge.core.analytic_solar import MODEL_ID as ANALYTIC_SOLAR_MODEL
 from fatebridge.core.de440_solar import MODEL_ID as DE440_SOLAR_MODEL
-from fatebridge.core.moshier_solar import MODEL_ID as COMPLETE_MOSHIER_SOLAR_MODEL
+from fatebridge.core.de441_solar import MODEL_ID as DE441_SOLAR_MODEL
 from fatebridge.core.vsop2013_solar import MODEL_ID as VSOP2013_SOLAR_MODEL
 from fatebridge.utils.timezones import parse_timezone_name
 
@@ -17,7 +17,7 @@ from .historical_solar import historical_solar_resolution
 MOSHIER_BOUNDARY_GUARD_SECONDS = 5.0
 _MODEL_GUARD_REASONS = {
     "moshier": "moshier_numeric_model_guard_not_accuracy_certification",
-    COMPLETE_MOSHIER_SOLAR_MODEL: "complete_moshier_solar_model_guard_not_accuracy_certification",
+    DE441_SOLAR_MODEL: "de441_solar_model_guard_not_accuracy_certification",
     AA1996_SOLAR_MODEL: "aa1996_solar_model_guard_not_accuracy_certification",
     VSOP2013_SOLAR_MODEL: "vsop2013_solar_model_guard_not_accuracy_certification",
     ANALYTIC_SOLAR_MODEL: "analytic_solar_model_guard_not_accuracy_certification",

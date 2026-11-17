@@ -16,6 +16,7 @@ from dateutil import tz
 
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.birth import AstroBirthInfo
+from fatebridge.core.astro.earth_attitude import earth_attitude
 from fatebridge.core.astro.geometry import combine_longitudes
 from fatebridge.core.astro.historical_utc import historical_utc_source
 from fatebridge.core.astro.jyotish_continuous_state import continuous_state_evidence
@@ -25,6 +26,7 @@ from fatebridge.core.astro.jyotish_lunar_source_state import (
 from fatebridge.core.astro.native_execution import context_evidence
 from fatebridge.core.astro.profiles import native_factor_model
 from fatebridge.core.astro.reference import NAKSHATRAS
+from fatebridge.core.astro.reference_frames import rotate_spherical
 from fatebridge.core.astro.sidereal_origin_motion import traditional_lahiri_origin_wrap
 from fatebridge.core.astro.solar_position import apparent_position_policy
 from fatebridge.core.astro.source_session import current_source_session
@@ -303,6 +305,7 @@ def positions(
             )
         swe.set_sid_mode(swe.SIDM_LAHIRI, 0.0, 0.0)
         flags = swe.FLG_SWIEPH | swe.FLG_SIDEREAL | swe.FLG_SPEED
+        attitude = earth_attitude(swe, jd, julian_day_tt=jd_tt)
         ayan, ayanamsha = runtime.ephemeris_call(
             "get_ayanamsa_ex", jd_tt, swe.FLG_SWIEPH
         )
@@ -409,17 +412,30 @@ def positions(
                         f"{planet} 赤道坐标实际使用 {eq_model}；require_data_files 禁止星历降级。"
                     )
                 models.add(eq_model)
+                right_ascension, declination = rotate_spherical(
+                    attitude.reduction.native_to_target, float(eq[0]), float(eq[1])
+                )
                 equatorial[planet] = {
-                    "right_ascension": float(eq[0]) % 360.0,
-                    "declination": float(eq[1]),
+                    "right_ascension": right_ascension,
+                    "declination": declination,
                     "ephemeris_model": eq_model,
                 }
         _, angles = runtime.ephemeris_call(
-            "houses_ex", jd, birth.latitude, birth.longitude, b"W", swe.FLG_SIDEREAL
+            "houses_ex",
+            jd,
+            birth.latitude,
+            birth.longitude,
+            b"W",
+            swe.FLG_SIDEREAL,
+            _julian_day_tt=jd_tt,
         )
         ascendant = float(angles[0]) % 360.0
         local_meridian = (
-            float(runtime.ephemeris_call("sidtime", jd) * 15 + birth.longitude) % 360.0
+            float(
+                runtime.ephemeris_call("sidtime", jd, _julian_day_tt=jd_tt) * 15
+                + birth.longitude
+            )
+            % 360.0
         )
         rotation_policy = earth_rotation_policy(jd_tt, jd)
         # The optional motion coordinates belong to this same TT/source
@@ -777,7 +793,7 @@ def rule_trace() -> List[Dict[str, Any]]:
                 "27.12 day/night thirds and27.13 sunrise-to-sunrise; independent availability checks are a FateBridge implementation choice",
             ),
             (
-                "jyotish.solar_event_enumeration.v1",
+                "jyotish.solar_event_enumeration.v2",
                 STRENGTH_SOURCE_ID,
                 "27.12-13 need chronological solar events; successive next-event searches within each UT1 date are a FateBridge implementation, not a new classical rule",
             ),
@@ -1646,7 +1662,7 @@ def build_india(
                 "five_sthana_bala_components_under_declared_saptavargaja_reading",
                 "independently_selected_drekkana_source_and_retained_summary_conflict",
                 "independent_sunrise_day_and_active_arc_component_availability",
-                "successive_solar_event_enumeration_within_each_UT1_date",
+                "all_directed_solar_crossings_within_each_UT1_date",
                 "dig_bala_actual_cardinal_angles",
                 "naisargika_exact_sevenths",
                 "Raman_quantitative_drishti_and_conditional_planetary_drik_bala",

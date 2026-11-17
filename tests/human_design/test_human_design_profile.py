@@ -14,10 +14,12 @@ from fatebridge.core.human_design_profile import (
     profile_reading,
     profile_reference,
 )
+from fatebridge.core.public_output import public_payload
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
 from fatebridge.validation.human_design_profile import public_profile_checks
-from tests.support.ephemeris_context import moshier_ephemeris
+from tests.support.ephemeris_context import empty_ephemeris_path
+from tests.support.reference_data import resolve
 
 ROOT = Path(__file__).resolve().parents[2]
 REFERENCE = json.loads(
@@ -54,12 +56,6 @@ def paired(profile, angle=None):
     if angle:
         chart["incarnation_cross"] = {"angle": angle}
     return chart
-
-
-def resolve(payload, path):
-    for part in path.split("."):
-        payload = payload[int(part)] if isinstance(payload, list) else payload[part]
-    return payload
 
 
 @pytest.mark.parametrize("fact", REFERENCE["profiles"], ids=lambda r: r["profile"])
@@ -162,7 +158,7 @@ def test_ordinary_activation_six_and_return_teaching_never_assign_current_age_ph
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
 def test_every_official_profile_replays_in_real_run_and_joint_snapshots(case):
-    with moshier_ephemeris():
+    with empty_ephemeris_path():
         run = execute_tool(SPEC, SPEC.request_model(**case["birth_input"]))
     assert run["profile_evidence"]["status"] == "computed"
     assert run["profile_evidence"]["profile"] == case["properties"]["Profile"]
@@ -182,7 +178,7 @@ def test_every_official_profile_replays_in_real_run_and_joint_snapshots(case):
             for fact in row["basis"]:
                 assert resolve(snap, fact["path"]) == fact["value"]
     assert (
-        JointSnapshotCache().snapshot(run)["profile_evidence"]
+        public_payload(JointSnapshotCache().snapshot(run)["profile_evidence"])
         == run["profile_evidence"]
     )
 
@@ -190,7 +186,7 @@ def test_every_official_profile_replays_in_real_run_and_joint_snapshots(case):
 @pytest.fixture(scope="module")
 def real_sixth_profile_run():
     case = next(c for c in CASES if "6" in c["properties"]["Profile"])
-    with moshier_ephemeris():
+    with empty_ephemeris_path():
         return execute_tool(SPEC, SPEC.request_model(**case["birth_input"]))
 
 

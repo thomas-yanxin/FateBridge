@@ -112,6 +112,13 @@ class AstroHoraryRequest(WesternEphemerisRequest):
     question_minute: int = Field(
         default=0, ge=0, le=59, description="Minute the question was asked"
     )
+    question_second: int = Field(
+        default=0,
+        ge=0,
+        le=59,
+        strict=True,
+        description="Confirmed whole second of the question clock label (0-59); omitted defaults to0. Fractional seconds and second60 are unsupported. Input resolution does not certify the original record's accuracy.",
+    )
     question_clock_basis: Literal[
         "civil", "local_mean_solar", "local_apparent_solar"
     ] = Field(
@@ -203,6 +210,13 @@ class AstroElectionRequest(WesternEphemerisRequest):
     )
     candidate_minute: int = Field(
         default=0, ge=0, le=59, description="Minute of the candidate moment"
+    )
+    candidate_second: int = Field(
+        default=0,
+        ge=0,
+        le=59,
+        strict=True,
+        description="Confirmed whole second of the candidate clock label (0-59); omitted defaults to0. Fractional seconds and second60 are unsupported. Input resolution does not certify the original record's accuracy.",
     )
     candidate_clock_basis: Literal[
         "civil", "local_mean_solar", "local_apparent_solar"

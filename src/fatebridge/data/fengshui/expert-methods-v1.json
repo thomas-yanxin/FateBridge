@@ -1,5 +1,5 @@
 {
-  "bundle_version": "1.1.0",
+  "bundle_version": "1.1.1",
   "sources": {
     "EXPERT_20261015": {
       "title": "用户提供的专家交流要求（2026-10-15，九项）",
@@ -12,12 +12,16 @@
     },
     "SHUOGUA_PRIMARY": {
       "title": "《周易·说卦传》古典文本转录",
-      "url": "https://www.eee-learning.com/book/eee67",
+      "url": "https://zh.wikisource.org/zh-hant/易傳/說卦",
       "kind": "primary_text_transcription",
       "scope": "后天方位、八卦家庭角色、古典物象；不是现代职业预测表或家具摆位处方",
-      "source_version": "易学网2011-05-22文本；2026-10-15核对，印本未校勘",
-      "locator": "后天方位段；乾天称父至兑三索得女段；乾为天至兑为泽八卦物象段",
-      "retrieved_at": "2026-10-15"
+      "source_version": "Wikisource《易传/说卦》oldid=2614055，最后编辑2025-11-09；印本未校勘",
+      "locator": "第五章后天方位；第十章八卦家庭角色；第十一章八卦物象，艮为门阙、阍寺及巽为工分别读取",
+      "retrieved_at": "2026-11-17",
+      "retrieved_sha256": "64d8eb934207a3a5f68653f0a68ca446fc65fe8d2e5fb721ad99a593ef0e9d6a",
+      "retrieved_bytes": 68478,
+      "retrieved_format": "raw_html",
+      "verification_note": "原登记易学网页本次返回403，改用上述具名转录；不是原网页字节相同或印刷底本认证。"
     },
     "ZHOUYI_ZHENGYI_PRIMARY": {
       "title": "《周易正义》说卦卷九之十一转录",
@@ -67,7 +71,7 @@
   },
   "ruleset": {
     "ruleset_id": "expert_fengshui_methods_v1",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "method": "fengshui_method_reference",
     "source_ids": [
       "EXPERT_20261015",

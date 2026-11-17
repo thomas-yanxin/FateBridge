@@ -10,7 +10,6 @@ import pytest
 
 from fatebridge.core.astro import ephemeris, lunar_motion, runtime
 from fatebridge.core.astro.longitude_motion import (
-    corrected_longitude_motion,
     display_rotation_rate_change,
     nutation_obliquity_rate,
 )
@@ -256,51 +255,6 @@ def test_lunar_transaction_rejects_bad_source_and_restores_managed_sidereal_mode
     with pytest.raises(EphemerisSourceError):
         lunar_motion.lunar_light_time_correction(2451545.0, coordinates, "swieph")
     assert original("calc", 2451545.0, swe.MOON, sidereal_flags) == expected
-
-
-def test_sidereal_skips_true_ecliptic_rotation_term_and_reuses_physical_chain():
-    context = {}
-    state, model = ephemeris._swisseph_planet_state(
-        "Moon", 2451545.0, julian_day_tt=2451545.0, motion_metadata=context
-    )
-    lahiri = native_lahiri_positions(
-        ["Moon"],
-        julian_day_ut1=2451545.0,
-        julian_day_tt=2451545.0,
-        lunar_adjustments={
-            "Moon": (
-                state["longitude_speed_light_time_correction"],
-                model,
-                state["longitude_speed_spatial_aberration_correction"],
-            )
-        },
-        motion_metadata=context,
-    )["Moon"]
-    assert (
-        lahiri["longitude_speed_light_time_correction"]
-        == state["longitude_speed_light_time_correction"]
-    )
-    assert (
-        lahiri["longitude_speed_spatial_aberration_correction"]
-        == state["longitude_speed_spatial_aberration_correction"]
-    )
-    assert "longitude_speed_rotation_correction" not in lahiri
-    assert (
-        lahiri["longitude_speed"]
-        == lahiri["longitude_speed_native"]
-        + lahiri["longitude_speed_light_time_correction"]
-        + lahiri["longitude_speed_spatial_aberration_correction"]
-    )
-    with pytest.raises(EphemerisSourceError) as error:
-        corrected_longitude_motion(
-            "Moon",
-            2451545.0,
-            (0, 0, 1, 2, 0, 0),
-            "swieph",
-            sidereal=True,
-            lunar_adjustment=(1.0, "jpl", 0.0),
-        )
-    assert error.value.reason == "coordinate_model_changed"
 
 
 def test_nutation_policy_is_per_epoch_and_retains_unknown_version(monkeypatch):

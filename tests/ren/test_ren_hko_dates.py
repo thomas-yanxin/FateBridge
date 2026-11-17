@@ -18,6 +18,7 @@ from fatebridge.core.output_ren_term_dates import (
     RenPublishedDateReference,
     require_complete_published_dates,
 )
+from fatebridge.core.public_output import same_public_value
 from scripts.astronomy.build_hko_term_dates import build, encoded
 from scripts.ren.audit_ren_hko_dates import CORPUS, reference
 from tests.support.transports import SPECS, business, native, rest, surface_calls
@@ -251,7 +252,10 @@ def test_old_seven_date_disagreements_survive_all_three_protocols(
         and r["status"] == "date_mismatch"
         and r["instant_accuracy_certified"] is False
     )
-    require_complete_published_dates(http.json()[prefix]["calendar_policy"])
+    fn, args, kwargs = s.bind(s.request_model.model_validate(p))
+    internal = fn(*args, **kwargs)[prefix]["calendar_policy"]
+    require_complete_published_dates(internal)
+    assert same_public_value(terms, internal["solar_term_dependencies"])
 
 
 def test_runyear_snapshot_shows_same_dependency_conflict_and_reference_scope():

@@ -73,7 +73,12 @@ def main() -> None:
             os.environ["SE_EPHE_PATH"] = str(operator_directory)
             ephemeris_runtime.configure_ephemeris_path(str(operator_directory))
             long_path_result = calculate_suzhan_analysis(
-                date="2025-03-04", time="12:00:00", zone="+08:00", szchart=1
+                lat="31n13",
+                lon="121e28",
+                date="2025-03-04",
+                time="12:00:00",
+                zone="+08:00",
+                szchart=1,
             )
             assert "error" not in long_path_result, long_path_result
             assert len(long_path_result["astronomy"]["boundaries"]) == 28
@@ -89,7 +94,12 @@ def main() -> None:
             shutil.copy2(guolao.DATA / name, separator_catalogue / name)
         with patch.object(guolao, "DATA", separator_catalogue):
             separator_result = calculate_suzhan_analysis(
-                date="2025-03-04", time="12:00:00", zone="+08:00", szchart=1
+                lat="31n13",
+                lon="121e28",
+                date="2025-03-04",
+                time="12:00:00",
+                zone="+08:00",
+                szchart=1,
             )
             assert "error" not in separator_result, separator_result
             assert separator_result["chart"] == long_path_result["chart"]
@@ -264,6 +274,8 @@ def main() -> None:
         assert len(repeated_japanese["calendar_candidates"]) == 3
         skies = [
             calculate_suzhan_analysis(
+                lat="31n13",
+                lon="121e28",
                 date="2017-06-24",
                 time="12:00:00",
                 zone="+09:00",
@@ -350,6 +362,8 @@ def main() -> None:
         assert "candidate_relation_analysis" in required_quote_paths("compatibility")
         results = [
             calculate_suzhan_analysis(
+                lat="31n13",
+                lon="121e28",
                 date="2024-08-04",
                 time="09:00:00",
                 zone="+08:00",
@@ -398,7 +412,12 @@ def main() -> None:
         ]
         assert not critical["complete_critical_edition_accepted"]
         natal_positions = calculate_suzhan_analysis(
-            date="2025-03-04", time="12:00:00", zone="+08:00", natal_mansion="婁"
+            lat="31n13",
+            lon="121e28",
+            date="2025-03-04",
+            time="12:00:00",
+            zone="+08:00",
+            natal_mansion="婁",
         )["sukuyo"]["six_palace_reference"]
         assert {r["name"]: r["mansion"] for r in natal_positions["members"]} == {
             "命": "娄",
@@ -437,6 +456,8 @@ def main() -> None:
         report["native_hinoo_branch_and_manuscript_reading"] = "passed"
         activity_results = [
             calculate_suzhan_analysis(
+                lat="31n13",
+                lon="121e28",
                 date="2025-03-04",
                 time="12:00:00",
                 zone="+08:00",
@@ -460,6 +481,8 @@ def main() -> None:
         assert not doctrine["applied_to_physical_moon"]
         conjunction_results = [
             calculate_suzhan_analysis(
+                lat="31n13",
+                lon="121e28",
                 date="2025-03-13",
                 time="12:00:00",
                 zone="+08:00",
@@ -504,11 +527,13 @@ def main() -> None:
             ("2025-02-26", "正文火曜，校记重建水曜"),
         ]:
             result = calculate_suzhan_analysis(
-                date=civil, time="12:00:00", zone="+08:00"
+                lat="31n13", lon="121e28", date=civil, time="12:00:00", zone="+08:00"
             )
             assert correction in result["sukuyo"]["reading_text"]
         report["native_weekday_origin_and_comparative_time_units"] = "passed"
         directed = calculate_suzhan_analysis(
+            lat="31n13",
+            lon="121e28",
             date="2025-03-13",
             time="12:00:00",
             zone="+08:00",
@@ -524,6 +549,8 @@ def main() -> None:
             north["assessment"] == "caution" and north["auspicious_time_cannot_release"]
         )
         wall = calculate_suzhan_analysis(
+            lat="31n13",
+            lon="121e28",
             date="2025-01-30",
             time="12:00:00",
             zone="+08:00",
@@ -600,6 +627,8 @@ def main() -> None:
         report["special_day_selected_host_weekday_boundary"] = "passed_three_bases"
         report["native_input_instant_and_host_reference_date"] = "passed_three_bases"
         learning = calculate_suzhan_analysis(
+            lat="31n13",
+            lon="121e28",
             date="2025-04-15",
             time="12:00:00",
             zone="+08:00",
@@ -611,6 +640,8 @@ def main() -> None:
             "t1299_special_lower_ganlu_learning_v1",
         } <= {r["rule_id"] for r in learning["activity_assessment"]["matched_rules"]}
         opposed = calculate_suzhan_analysis(
+            lat="31n13",
+            lon="121e28",
             date="2025-03-04",
             time="12:00:00",
             zone="+08:00",
@@ -624,6 +655,8 @@ def main() -> None:
         assert opposed["activity_assessment"]["evidence_status"] == "conflicted"
         assert opposed["lower_methods"]["weekday"]["luminary"] == "火"
         generic_personal = calculate_suzhan_analysis(
+            lat="31n13",
+            lon="121e28",
             date="2025-03-04",
             time="12:00:00",
             zone="+08:00",
@@ -636,6 +669,8 @@ def main() -> None:
             if r["layer"] == "sanjiu"
         ]
         residence_entry = calculate_suzhan_analysis(
+            lat="31n13",
+            lon="121e28",
             date="2025-03-04",
             time="12:00:00",
             zone="+08:00",
@@ -652,6 +687,8 @@ def main() -> None:
             "priority_clause_applied_to_aggregate"
         ]
         inherited = calculate_suzhan_analysis(
+            lat="31n13",
+            lon="121e28",
             date="2025-03-04",
             time="12:00:00",
             zone="+08:00",
@@ -663,6 +700,8 @@ def main() -> None:
             "purchase",
         ]
         clothes = calculate_suzhan_analysis(
+            lat="31n13",
+            lon="121e28",
             date="2025-02-11",
             time="12:00:00",
             zone="+08:00",

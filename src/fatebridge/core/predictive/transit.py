@@ -16,11 +16,12 @@ from ._common import (
     extract_named_longitudes,
     extract_named_points,
 )
+from .native_chart import NativeSubject
 
 
 def build_transit_payload(
     birth_info: AstroBirthInfo,
-    natal_subject: Any,
+    natal_subject: NativeSubject,
     *,
     analysis_datetime: datetime,
     transit_longitude: float,
@@ -42,11 +43,11 @@ def build_transit_payload(
     )
     transit_reference = extract_named_points(transit_subject, TRANSIT_POINT_NAMES)
     natal_reference = extract_named_points(natal_subject, TRANSIT_POINT_NAMES)
+    source_longitudes = extract_named_longitudes(transit_subject, TRANSIT_POINT_NAMES)
+    target_longitudes = extract_named_longitudes(natal_subject, TRANSIT_POINT_NAMES)
     hits = collect_aspect_hits(
-        source_longitudes=extract_named_longitudes(
-            transit_subject, TRANSIT_POINT_NAMES
-        ),
-        target_longitudes=extract_named_longitudes(natal_subject, TRANSIT_POINT_NAMES),
+        source_longitudes=source_longitudes,
+        target_longitudes=target_longitudes,
         orb_limit=orb_limit,
     )
     house_counter = Counter(
@@ -64,7 +65,12 @@ def build_transit_payload(
             house_counter.items(), key=lambda item: (-item[1], item[0])
         )
     ]
-    exact_hits = [item for item in hits if float(item.get("orb", 99.0)) <= 0.3][:12]
+    exact_orb_limit = min(orb_limit, 0.3)
+    exact_hits = collect_aspect_hits(
+        source_longitudes=source_longitudes,
+        target_longitudes=target_longitudes,
+        orb_limit=exact_orb_limit,
+    )[:12]
     return {
         "calculation_basis": transit_subject.calculation_basis,
         "analysis_datetime": analysis_local.isoformat(),
@@ -74,6 +80,7 @@ def build_transit_payload(
             "timezone": transit_timezone,
         },
         "orb_limit": orb_limit,
+        "exact_orb_limit": exact_orb_limit,
         "sun": transit_reference["sun"],
         "moon": transit_reference["moon"],
         "ascendant": transit_reference["ascendant"],

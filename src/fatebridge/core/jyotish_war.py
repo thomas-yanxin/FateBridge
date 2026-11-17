@@ -11,7 +11,12 @@ from fractions import Fraction
 from itertools import combinations
 from typing import Any
 
-from fatebridge.core.jyotish_balas import PLANETS, directed_angle
+from fatebridge.core.jyotish_balas import (
+    PLANETS,
+    directed_angle,
+    strength_branch_display,
+    strength_branch_summary,
+)
 
 STARS = ("Mars", "Mercury", "Jupiter", "Venus", "Saturn")
 BIMBA = {
@@ -41,24 +46,16 @@ SOURCE = {
 }
 
 
-def finite(value: Any) -> Fraction | None:
+def finite(value: object) -> Fraction | None:
     if value is None:
         return None
     if (
         isinstance(value, bool)
-        or not isinstance(value, (int, float))
+        or not isinstance(value, (int, float, Fraction))
         or not math.isfinite(value)
     ):
         raise ValueError("War strength inputs must be finite numbers or missing")
     return Fraction(value)
-
-
-def consensus(scenarios: dict[str, dict[str, Any]]) -> dict[str, float | None]:
-    result = {}
-    for p in PLANETS:
-        values = {row[p] for row in scenarios.values()}
-        result[p] = next(iter(values)) if len(values) == 1 else None
-    return result
 
 
 def war_bala(
@@ -68,6 +65,16 @@ def war_bala(
     sthana: dict[str, Any] | None,
     dig: dict[str, Any] | None,
 ) -> dict[str, Any]:
+    return war_bala_result(longitudes, components, paksha, sthana, dig)[0]
+
+
+def war_bala_result(
+    longitudes: dict[str, float],
+    components: dict[str, Any],
+    paksha: dict[str, dict[str, Any]],
+    sthana: dict[str, Any] | None,
+    dig: dict[str, Any] | None,
+) -> tuple[dict[str, Any], dict[str, dict[str, Fraction | None]]]:
     """Pair contributions use the same Paksha branch as the final Kala sum.
 
     Multiple neighbours, equal longitudes and the longitude-origin cut keep
@@ -115,10 +122,10 @@ def war_bala(
             pair.update(
                 status="simultaneous_multi_planet_war_unadjudicated", winner=None
             )
-    scenarios: dict[str, dict[str, Any]] = {}
+    scenarios: dict[str, dict[str, Fraction | None]] = {}
     evidence: dict[str, Any] = {}
     for name, lunar in paksha.items():
-        values: dict[str, float | None] = dict.fromkeys(PLANETS, 0.0)
+        values: dict[str, Fraction | None] = dict.fromkeys(PLANETS, Fraction())
         basis = {}
         exact_totals: dict[str, Fraction | None] = {}
         for p in STARS:
@@ -144,7 +151,13 @@ def war_bala(
             if total is not None and not math.isfinite(float(total)):
                 raise ValueError("Prewar strength exceeds finite numerical range")
             basis[p] = {
-                "inputs": inputs,
+                "inputs": {
+                    k: float(v) if isinstance(v, Fraction) else v
+                    for k, v in inputs.items()
+                },
+                "exact_paksha_virupa": (
+                    str(lunar[p]) if isinstance(lunar[p], Fraction) else None
+                ),
                 "missing_inputs": [k for k, v in inputs.items() if v is None],
                 "total_virupa": float(total) if total is not None else None,
             }
@@ -163,8 +176,8 @@ def war_bala(
             ):
                 # The magnitude does not depend on the unresolved winner.
                 # Multiple simultaneous wars still lack a registered pair rule.
-                amount = float(abs(left - right) / denominator)
-                if not math.isfinite(amount):
+                amount = abs(left - right) / denominator
+                if not math.isfinite(float(amount)):
                     raise ValueError("War amount exceeds finite numerical range")
             if winner is not None and amount is not None:
                 loser = b if winner == a else a
@@ -178,19 +191,19 @@ def war_bala(
                     **pair,
                     "status": state,
                     "fixed_disc_difference_arcseconds": float(denominator),
-                    "amount_virupa": amount,
+                    "amount_virupa": float(amount) if amount is not None else None,
                 }
             )
         scenarios[name] = values
         evidence[name] = {"prewar_basis": basis, "pairs": pair_results}
-    summary = consensus(scenarios)
-    return {
+    summary = strength_branch_summary(scenarios)
+    result = {
         "source_id": SOURCE["id"],
         "source_section": "76-77 printed60-61/PDF65-66; full section takes precedence over abbreviated summary107",
         "method": "raman_76_77_on_declared_upstream_balas",
         "unit": "signed virupa",
         "summary": summary,
-        "scenarios": scenarios,
+        "scenarios": strength_branch_display(scenarios),
         "candidates": candidates,
         "pairs": pairs,
         "evidence": evidence,
@@ -226,3 +239,4 @@ def war_bala(
         ],
         "interpretation_scope": "Traditional component under declared mixed upstream readings. Signed values are not victory in life, event probabilities, complete Shadbala or empirical prediction evidence. No arbitrary60 cap or invented zero for unresolved participants.",
     }
+    return result, scenarios

@@ -13,7 +13,6 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core import ephemeris_runtime as e
 from fatebridge.core.astro.birth import build_astro_birth_info
 from fatebridge.core.astro.source_session import source_session
 from fatebridge.core.jyotish import build_india, positions

@@ -1,16 +1,15 @@
 """
 性格心性分析模块
 
-基于八字命理的性格分析，综合以下经典技法：
+按本项目词典提供五行、十神的传统象义与现代自省类比：
 - 日主五行定基本心性（木仁、火礼、土信、金义、水智）
 - 十神定性格倾向（主导十神决定行为风格）
-- 日主强弱与阴阳定刚柔、内外向
-- 格局清浊定心性层次
+- 工程旺衰分类与日干阴阳分别陈述，不测量人格
 
 核心分析维度：
 1. 日主五行基本心性
 2. 主导十神性格特征
-3. 强弱阴阳（刚柔/内外向）
+3. 工程旺衰分类与日干阴阳
 4. 性格优势与短板
 5. 调适建议
 """
@@ -149,7 +148,7 @@ class PersonalityAnalysis:
         from ..core.elements import ElementAnalysis
 
         dm = ElementAnalysis.analyze_day_master_strength(pillars)
-        strength = dm["strength_level"]
+        strength = dm["engineering_index"]["strength_level"]
         notes: List[str] = []
         notes.append(
             f"日主在本工程扶抑模型中归为{strength}；这不是内外向、自信或依赖性的测量"
@@ -158,6 +157,7 @@ class PersonalityAnalysis:
         notes.append(f"日干阴阳查表为{yin_yang}；不据此判刚柔、行为或性别特质")
         return {
             "strength": strength,
+            "engineering_index": dm["engineering_index"],
             "polarity": "阳" if day_polarity == Polarity.YANG else "阴",
             "notes": notes,
         }
@@ -168,8 +168,11 @@ class PersonalityAnalysis:
     ) -> Tuple[List[str], List[str]]:
         strengths = [core["traits"]]
         weaknesses = [core["shortcoming"]]
-        if dominant["top_gods"]:
-            strengths.append(dominant["top_gods"][0]["traits"])
+        strengths.extend(
+            item["traits"]
+            for item in dominant["top_gods"]
+            if item["ten_god"] in dominant["tied_primary_gods"]
+        )
         return strengths, weaknesses
 
     @staticmethod

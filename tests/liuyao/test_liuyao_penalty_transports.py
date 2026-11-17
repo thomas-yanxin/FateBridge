@@ -4,6 +4,7 @@ import pytest
 
 from tests.liuyao.test_liuyao_clash_transports import all_surfaces
 from tests.support.result_delivery import assert_same_run_receipt
+from tests.support.transports import rest
 
 
 @pytest.mark.parametrize(
@@ -30,6 +31,7 @@ def test_scoped_triad_and_day_growth(
             root + ".penalty_conditions",
             root + ".growth_conditions",
             root + ".classical_assessment",
+            root + ".void_conditions.focus.not_empty_conditions",
         ],
         rest,
         tmp_path,
@@ -41,6 +43,12 @@ def test_scoped_triad_and_day_growth(
         assert penalty.get("day_yin_growth_allowed") is growth
         assert result["growth_conditions"]["focus"].get("condition_match") is growth
         assert result["growth_conditions"]["focus"]["position_match"] is True
+        void = result["void_conditions"]["focus"]
+        day_rule = next(
+            c for c in void["not_empty_conditions"] if c["rule_id"] == "day_generate"
+        )
+        assert day_rule["matched"] is True and day_rule["qualified_matched"] is growth
+        assert day_rule["qualification_source_path"] == penalty["source_path"]
         if presence is not False:
             assert penalty.get("effect_condition_match") is None
             assert (

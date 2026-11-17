@@ -8,7 +8,7 @@ import pytest
 
 from fatebridge.core.almanac import get_solar_terms_for_year
 from fatebridge.core.astro.time_scales import (
-    datetime_from_tt_point,
+    datetime_from_tt,
     ephemeris_time,
     leap_table,
 )
@@ -135,7 +135,7 @@ def test_default_calendar_keeps_all24terms_across_each_clock_regime(year):
         details = term.solar_model_details
         assert details is not None
         point = TTInstant.from_parts(*details["selected_crossing_tt_parts"])
-        assert datetime_from_tt_point(point) == term.moment
+        assert datetime_from_tt(point) == term.moment
         assert (
             abs(ephemeris_time(term.moment).jd_tt - point.as_float()) * 86400 <= 0.0002
         )

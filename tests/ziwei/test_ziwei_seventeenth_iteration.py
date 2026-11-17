@@ -3,7 +3,6 @@
 import asyncio
 import json
 import shutil
-from datetime import datetime
 
 import pytest
 from fastapi.testclient import TestClient

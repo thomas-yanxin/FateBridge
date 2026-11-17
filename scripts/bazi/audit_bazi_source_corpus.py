@@ -84,6 +84,8 @@ def audit() -> dict[str, Any]:
             raise ValueError(result["error"])
         current = result["current_calculation"]
         expected = record["retained_strength_annotation"]
+        adjudication = current["classical_adjudication"]
+        source_grade = adjudication["body_strength"]
         row = {
             "group": record["group"],
             "id": record["case_id"],
@@ -94,6 +96,15 @@ def audit() -> dict[str, Any]:
                 None if expected is None else current["strength_level"] == expected
             ),
             "assessment": current["assessment"],
+            "engineering_index": current["engineering_index"],
+            "classical_adjudication": adjudication,
+            "classical_matches": (
+                source_grade == expected
+                if expected is not None
+                and adjudication["status"] == "adjudicated"
+                and source_grade is not None
+                else None
+            ),
         }
         rows.append(row)
         lookup[record["reference_id"]] = row
@@ -144,6 +155,21 @@ def audit() -> dict[str, Any]:
             {"pillars": list(p), "source_observations": observations}
             for p, observations in disagreements.items()
         ],
+        "engineering_comparison_basis": "unchanged_policy_grade_vs_retained_source_annotation",
+        "classical_grade_comparison": {
+            "known_source_records": sum(
+                r["expected_strength"] is not None for r in rows
+            ),
+            "compared_records": sum(r["classical_matches"] is not None for r in rows),
+            "matching_records": sum(r["classical_matches"] is True for r in rows),
+            "mismatching_records": sum(r["classical_matches"] is False for r in rows),
+            "unadjudicated_records": sum(
+                r["expected_strength"] is not None and r["classical_matches"] is None
+                for r in rows
+            ),
+            "unadjudicated_is_a_pass": False,
+            "scope": "工程旧分歧分母保留；原典未知独立记为未验收，不从样例期望回填裁定。",
+        },
         "local_and_negative_claims": claims,
         "bounded_strength_constraints": constraints,
         "bounded_strength_constraint_violations": [

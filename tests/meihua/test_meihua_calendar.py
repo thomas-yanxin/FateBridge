@@ -1,6 +1,7 @@
 """Primary 1900 table, leap-month edges and protected audit denominator."""
 
 import copy
+import hashlib
 import json
 import shutil
 from datetime import date
@@ -81,8 +82,57 @@ def test_changed_primary_material_cannot_silently_become_a_new_oracle(tmp_path):
     shutil.copytree(REFERENCES, target)
     p = target / "cells.json"
     p.write_text(p.read_text() + " ")
-    with pytest.raises(ValueError, match="Frozen primary reference changed"):
+    with pytest.raises(ValueError, match="Frozen artifact changed"):
         reference_bundle(target)
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    [None, "outside", "other_shared_scan", "changed", "rehashed", "redirected"],
+)
+def test_only_registered_shared_original_is_allowed_outside_bundle(tmp_path, mutation):
+    target = tmp_path / "tests/fixtures/meihua_calendar_v2"
+    shutil.copytree(REFERENCES, target)
+    scan = target / "sources/tam-1900.pdf"
+    original = scan.read_bytes()
+    shared = (
+        tmp_path
+        / "tests/data/shared_sources/data/ziwei_independent/calendar_1900_sources_v1/tam/sources/tam-1900.pdf"
+    )
+    shared.parent.mkdir(parents=True)
+    shared.write_bytes(original)
+    destination = shared
+    if mutation in {"outside", "other_shared_scan", "redirected"}:
+        other = (
+            tmp_path / "outside.pdf"
+            if mutation != "other_shared_scan"
+            else shared.with_name("unregistered.pdf")
+        )
+        other.write_bytes(original)
+        if mutation == "redirected":
+            shared.unlink()
+            shared.symlink_to(other)
+        else:
+            destination = other
+    elif mutation in {"changed", "rehashed"}:
+        shared.write_bytes(original + b"changed")
+        if mutation == "rehashed":
+            path = target / "sources.json"
+            manifest = json.loads(path.read_text())
+            next(
+                r for r in manifest["artifacts"] if r["file"] == "sources/tam-1900.pdf"
+            )["sha256"] = hashlib.sha256(shared.read_bytes()).hexdigest()
+            path.write_text(json.dumps(manifest))
+    scan.unlink()
+    scan.symlink_to(destination)
+    if mutation is None:
+        _, rows = reference_bundle(target)
+        assert len(rows) == 365
+        assert rows[0]["date"] == date(1900, 1, 1)
+        assert rows[-1]["date"] == date(1900, 12, 31)
+    else:
+        with pytest.raises(ValueError, match="escapes|Frozen artifact changed"):
+            reference_bundle(target)
 
 
 def test_audit_cannot_get_perfect_agreement_by_shrinking_supported_dates(monkeypatch):

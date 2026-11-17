@@ -303,7 +303,7 @@
       },
       "firdaria_year_basis": {
         "default": "fixed_365_2425",
-        "description": "Firdaria year basis: fixed_365_2425 (existing local-wall arithmetic) or calendar_anniversary (original-birth anniversaries, Feb 29 clamps to Feb 28 then restores; UTC elapsed subperiods). Calendar mode rejects ambiguous/nonexistent birth, analysis and generated anniversary clocks.",
+        "description": "Firdaria year basis: fixed_365_2425 (fixed 86400-second days on UTC elapsed time) or calendar_anniversary (original-birth anniversaries, Feb 29 clamps to Feb 28 then restores; UTC elapsed subperiods). Calendar mode rejects ambiguous/nonexistent birth, analysis and generated anniversary clocks.",
         "enum": [
           "fixed_365_2425",
           "calendar_anniversary"

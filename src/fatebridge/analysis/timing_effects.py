@@ -9,19 +9,18 @@
 4. 吉凶趋势判断
 """
 
-from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional
+from datetime import datetime
+from typing import Any, Dict, List, Mapping, Optional
 
 from ..core.almanac import (
     DEFAULT_TIMEZONE,
-    current_local_datetime,
     elapsed_days_between,
     localize_datetime,
 )
 from ..core.elements import ElementAnalysis
 from ..core.timing import TimingAnalysis
-from ..core.timing_interactions import analyze_timing_interactions
 from ..utils.birth_input import normalize_gender
+from ..utils.civil_time import utc_ordering_key
 from ..utils.data import BRANCH_ELEMENTS, BRANCH_HIDDEN_STEMS, STEM_ELEMENTS, Element
 
 
@@ -29,26 +28,15 @@ class TimingEffectsAnalysis:
     """时运影响分析类"""
 
     @staticmethod
-    def _normalize_element_counts(
-        element_counts: Optional[Dict[Element, float]],
+    def _count_timing_pillar_elements(
+        timing_pillars: Mapping[str, Mapping[str, str]],
     ) -> Dict[Element, float]:
-        return {
-            element: float((element_counts or {}).get(element, 0.0))
-            for element in Element
-        }
-
-    @staticmethod
-    def _count_timing_pillar_elements(timing_pillars: Dict) -> Dict[Element, float]:
         """Count timing-pillar elements using the same weighting as chart counts."""
         element_counts = {element: 0.0 for element in Element}
 
         for timing_info in timing_pillars.values():
-            if not isinstance(timing_info, dict):
-                continue
-            stem = timing_info.get("stem")
-            branch = timing_info.get("branch")
-            if not stem or not branch:
-                continue
+            stem = timing_info["stem"]
+            branch = timing_info["branch"]
 
             stem_element, _ = STEM_ELEMENTS[stem]
             branch_element, _ = BRANCH_ELEMENTS[branch]
@@ -77,9 +65,12 @@ class TimingEffectsAnalysis:
         Returns:
             五行力量变化分析
         """
-        raw_original_counts = TimingEffectsAnalysis._normalize_element_counts(
-            original_element_counts or ElementAnalysis.count_elements(original_pillars)
+        source_counts = original_element_counts or ElementAnalysis.count_elements(
+            original_pillars
         )
+        raw_original_counts = {
+            element: float(source_counts.get(element, 0.0)) for element in Element
+        }
         timing_element_counts = TimingEffectsAnalysis._count_timing_pillar_elements(
             timing_pillars
         )
@@ -197,17 +188,17 @@ class TimingEffectsAnalysis:
         context = {"selection_basis": selection_basis, "timeline": timeline}
         if analysis_moment is not None:
             moment = localize_datetime(analysis_moment, timezone_name)
-            instant = moment.astimezone(timezone.utc)
+            instant = utc_ordering_key(moment)
             context["analysis_at"] = moment.isoformat()
             start_at = datetime.fromisoformat(timeline["start_at"])
-            before_start = instant < start_at.astimezone(timezone.utc)
+            before_start = instant < utc_ordering_key(start_at)
             period_index = next(
                 (
                     index
                     for index, item in enumerate(sequence)
-                    if datetime.fromisoformat(item["start_at"]).astimezone(timezone.utc)
+                    if utc_ordering_key(datetime.fromisoformat(item["start_at"]))
                     <= instant
-                    < datetime.fromisoformat(item["end_at"]).astimezone(timezone.utc)
+                    < utc_ordering_key(datetime.fromisoformat(item["end_at"]))
                 ),
                 len(sequence),
             )
@@ -635,145 +626,6 @@ class TimingEffectsAnalysis:
                 )
 
         return "，".join(summary_parts) + "。"
-
-    @staticmethod
-    def comprehensive_timing_analysis(
-        birth_pillars: Dict,
-        birth_date: datetime,
-        gender: Optional[str],
-        analysis_date: Optional[datetime] = None,
-        timezone_name: str = DEFAULT_TIMEZONE,
-        original_element_counts: Optional[Dict[Element, float]] = None,
-        current_age: Optional[int] = None,
-        liuyue_info: Optional[Dict] = None,
-        liuri_info: Optional[Dict] = None,
-        liushi_info: Optional[Dict] = None,
-    ) -> Dict:
-        """
-        综合时运分析
-
-        Args:
-            birth_pillars: 出生四柱
-            birth_date: 出生日期
-            gender: 性别
-            analysis_date: 分析日期，默认为当前日期
-
-        Returns:
-            综合时运分析结果
-        """
-        if analysis_date is None:
-            analysis_date = current_local_datetime(timezone_name)
-
-        explicit_age = current_age is not None
-        if current_age is None:
-            current_age = analysis_date.year - birth_date.year
-            if analysis_date.month < birth_date.month or (
-                analysis_date.month == birth_date.month
-                and analysis_date.day < birth_date.day
-            ):
-                current_age -= 1
-
-        # 大运分析
-        dayun_analysis = TimingEffectsAnalysis.analyze_dayun_effects(
-            birth_pillars,
-            birth_date,
-            gender,
-            current_age,
-            timezone_name=timezone_name,
-            original_element_counts=original_element_counts,
-            analysis_moment=None if explicit_age else analysis_date,
-            allow_missing_gender=True,
-        )
-
-        # 流年分析
-        liunian_analysis = TimingEffectsAnalysis.analyze_liunian_effects(
-            birth_pillars,
-            analysis_date.year,
-            original_element_counts=original_element_counts,
-            moment=analysis_date,
-            timezone_name=timezone_name,
-        )
-
-        # 流月分析
-        liuyue_analysis = TimingEffectsAnalysis.analyze_liuyue_effects(
-            birth_pillars,
-            analysis_date.year,
-            analysis_date.month,
-            target_day=analysis_date.day,
-            timezone_name=timezone_name,
-            target_date=analysis_date,
-            liuyue_info=liuyue_info,
-            original_element_counts=original_element_counts,
-        )
-        liuri_analysis = TimingEffectsAnalysis.analyze_liuri_effects(
-            birth_pillars,
-            analysis_date,
-            timezone_name=timezone_name,
-            liuri_info=liuri_info,
-            original_element_counts=original_element_counts,
-        )
-
-        liushi_analysis = TimingEffectsAnalysis.analyze_liushi_effects(
-            birth_pillars,
-            analysis_date,
-            timezone_name=timezone_name,
-            liushi_info=liushi_info,
-            original_element_counts=original_element_counts,
-        )
-
-        # 综合分析
-        combined_timing_pillars = {}
-        if "dayun_info" in dayun_analysis:
-            combined_timing_pillars["dayun"] = {
-                "stem": dayun_analysis["dayun_info"]["stem"],
-                "branch": dayun_analysis["dayun_info"]["branch"],
-            }
-
-        combined_timing_pillars["liunian"] = {
-            "stem": liunian_analysis["liunian_info"]["stem"],
-            "branch": liunian_analysis["liunian_info"]["branch"],
-        }
-
-        combined_timing_pillars["liuyue"] = {
-            "stem": liuyue_analysis["liuyue_info"]["stem"],
-            "branch": liuyue_analysis["liuyue_info"]["branch"],
-        }
-        combined_timing_pillars["liuri"] = {
-            "stem": liuri_analysis["liuri_info"]["stem"],
-            "branch": liuri_analysis["liuri_info"]["branch"],
-        }
-        combined_timing_pillars["liushi"] = {
-            "stem": liushi_analysis["liushi_info"]["stem"],
-            "branch": liushi_analysis["liushi_info"]["branch"],
-        }
-
-        combined_effects = TimingEffectsAnalysis.analyze_element_strength_changes(
-            birth_pillars,
-            combined_timing_pillars,
-            original_element_counts=original_element_counts,
-        )
-
-        return {
-            "analysis_date": analysis_date.strftime("%Y-%m-%d %H:%M"),
-            "current_age": current_age,
-            "dayun_analysis": dayun_analysis,
-            "liunian_analysis": liunian_analysis,
-            "liuyue_analysis": liuyue_analysis,
-            "liuri_analysis": liuri_analysis,
-            "liushi_analysis": liushi_analysis,
-            "combined_effects": combined_effects,
-            "interaction_analysis": analyze_timing_interactions(
-                birth_pillars, combined_timing_pillars
-            ),
-            "comprehensive_summary": TimingEffectsAnalysis._generate_comprehensive_summary(
-                dayun_analysis,
-                liunian_analysis,
-                liuyue_analysis,
-                liuri_analysis,
-                combined_effects,
-                liushi_analysis=liushi_analysis,
-            ),
-        }
 
     @staticmethod
     def _generate_comprehensive_summary(

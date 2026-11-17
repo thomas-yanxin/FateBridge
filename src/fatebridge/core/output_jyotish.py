@@ -9,6 +9,7 @@ from fatebridge.core.output_ephemeris import (
     ApparentPositionPolicy,
     NativeCoordinateContext,
     NativeExecutionContext,
+    SolarEphemerisReference,
     SolarPositionBody,
 )
 from fatebridge.core.output_rotation import EarthRotationPolicy
@@ -178,7 +179,43 @@ class ConditionalDrik(BalaComponent):
     alternative_source_witnesses: Optional[Dict[str, Object]] = None
 
 
+class SupportingSolarEvent(PartialOutput):
+    kind: Optional[str] = None
+    julian_day_ut1: Optional[float] = None
+    julian_day_tt: Optional[float] = None
+    ephemeris_model: Optional[str] = None
+
+
+class SolarNoEventSearch(PartialOutput):
+    search_jd_ut1: Optional[float] = None
+    kind: Optional[str] = None
+
+
+class SolarEventEnumeration(PartialOutput):
+    method: Optional[str] = None
+    partition_hours: Optional[float] = None
+    scope: Optional[str] = None
+
+
+class SupportingSolarEvents(PartialOutput):
+    events: Optional[List[SupportingSolarEvent]] = None
+    ephemeris_policy: Optional[str] = None
+    ephemeris_models: Optional[List[str]] = None
+    ephemeris_sources: Optional[Dict[str, SolarEphemerisReference]] = None
+    ephemeris_source_policy: Optional[str] = None
+    no_event_searches: Optional[List[SolarNoEventSearch]] = None
+    search_start_jd_ut1: Optional[float] = None
+    search_end_jd_ut1: Optional[float] = None
+    enumeration: Optional[SolarEventEnumeration] = None
+    definition: Optional[str] = None
+    event_model: Optional[str] = None
+    equatorial_frame: Optional[str] = None
+    search_window_hours: Optional[float] = None
+    scope: Optional[str] = None
+
+
 class TemporalBala(BalaComponent):
+    conditional_targets: Optional[List[str]] = None
     model_context: Optional[Object] = None
     temporal_scope: Optional[str] = None
     components: Optional[Dict[str, Object]] = None
@@ -187,7 +224,7 @@ class TemporalBala(BalaComponent):
     missing_planets: Optional[List[str]] = None
     calendar_context: Optional[Object] = None
     solar_context: Optional[Object] = None
-    solar_events: Optional[Object] = None
+    solar_events: Optional[SupportingSolarEvents] = None
     source_disagreements: Optional[List[str]] = None
 
 

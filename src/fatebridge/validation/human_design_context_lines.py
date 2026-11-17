@@ -3,12 +3,12 @@
 from copy import deepcopy
 
 from fatebridge.core.human_design_context_lines import METHOD
-from fatebridge.core.human_design_line_catalogue import _canonical
 from fatebridge.services.human_design_context_lines import (
     build_human_design_context_packet,
 )
 from fatebridge.services.human_design_line_reading import LineReadingInputError
 from fatebridge.utils.errors import EphemerisSourceError
+from fatebridge.utils.json_digest import canonical_bytes
 
 
 def verify_human_design_context_packet(
@@ -21,9 +21,9 @@ def verify_human_design_context_packet(
         expected = build_human_design_context_packet(
             source, reference_category=reference_category
         )
-        matches = _canonical(
+        matches = canonical_bytes(
             packet.get("nominal_packet_v1", {}).get("original_result")
-        ) == _canonical(source)
+        ) == canonical_bytes(source)
         if not matches:
             errors.append(
                 {
@@ -34,7 +34,7 @@ def verify_human_design_context_packet(
         for key in sorted(expected.keys() | packet.keys()):
             if key not in expected:
                 errors.append({"code": "unbound_packet_field", "path": key})
-            elif key not in packet or _canonical(packet[key]) != _canonical(
+            elif key not in packet or canonical_bytes(packet[key]) != canonical_bytes(
                 expected[key]
             ):
                 errors.append(

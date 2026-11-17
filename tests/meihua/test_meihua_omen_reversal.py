@@ -12,6 +12,7 @@ from fatebridge.core.meihua_omen_reversal import _reading
 from fatebridge.core.requests.meihua import MeihuaCastRequest
 from fatebridge.services.divination import calculate_meihua_analysis
 from fatebridge.services.meihua import calculate_meihua_cast
+from tests.support.reference_data import resolve as at
 
 FIXTURE = Path(__file__).parents[1] / "fixtures/meihua_omen_reversal_v1"
 REF = json.loads((FIXTURE / "expected-cases.json").read_bytes())
@@ -26,12 +27,6 @@ TOPICS = [
     "meeting",
 ]
 KINDS = ["gold_silver_treasure", "weapon"]
-
-
-def at(value, path):
-    for part in path.split("."):
-        value = value[int(part)] if isinstance(value, list) else value[part]
-    return value
 
 
 def cast(body):

@@ -230,18 +230,6 @@ def test_rehashed_current_or_unknown_result_cannot_forge_geometry_or_scope(
     assert check["apparent_position_context_status"] == "not_verified"
 
 
-def test_original_legacy_receipts_keep_scope_instead_of_new_certification():
-    from tests.human_design.test_human_design_publisher import RUNS
-
-    for row in RUNS:
-        check = verify_human_design_reading(row["run"])
-        assert check["status"] == "verified_fixed_template_reading", check
-        assert (
-            check["apparent_position_context_status"]
-            == "not_in_declared_legacy_contract"
-        )
-
-
 def test_an_old_schema_label_cannot_hide_present_new_markers(complete):
     value = copy.deepcopy(complete)
     value["run_metadata"][

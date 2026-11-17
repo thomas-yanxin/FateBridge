@@ -6,7 +6,8 @@ from itertools import product
 from pydantic import JsonValue, TypeAdapter
 
 from .models import AssessRequest
-from .spatial_geometry import angular_delta, movement_distance, transform_point
+from .spatial_angles import angular_delta, compose_degrees
+from .spatial_geometry import movement_distance, transform_point
 from .spatial_inputs import PlanPose
 from .spatial_layout import (
     SceneAssessment,
@@ -108,9 +109,14 @@ def search_measured_layouts(
                         "can_rotate",
                         permission.can_rotate if permission is not None else None,
                         angular_delta(
-                            old_desk.rotation_degrees + item.footprint.rotation_degrees,
-                            new_desk.rotation_degrees
-                            + after_item.footprint.rotation_degrees,
+                            compose_degrees(
+                                old_desk.rotation_degrees,
+                                item.footprint.rotation_degrees,
+                            ),
+                            compose_degrees(
+                                new_desk.rotation_degrees,
+                                after_item.footprint.rotation_degrees,
+                            ),
                         )
                         != 0,
                     ),

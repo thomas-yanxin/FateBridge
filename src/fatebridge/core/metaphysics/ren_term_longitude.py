@@ -12,7 +12,7 @@ from .. import (
     aa1996_solar,
     analytic_solar,
     de440_solar,
-    moshier_solar,
+    de441_solar,
     spk_solar,
     vsop2013_solar,
 )
@@ -169,15 +169,12 @@ def validate_term_longitude(
     """
     if name is not None and name not in TARGETS:
         raise _fail()
-    if any(
-        value is None
-        for value in (name, provider, model, flags, library_version, details)
-    ):
+    if any(value is None for value in (name, provider, model, flags, details)):
         if complete:
             raise _fail()
         return None
     assert name is not None and model is not None and flags is not None
-    assert library_version is not None and details is not None
+    assert details is not None
     representation = details.get("numerical_epoch_representation")
     bracket_key = (
         "root_bracket_tt_parts"
@@ -196,21 +193,25 @@ def validate_term_longitude(
         points = _bracket(details, name)
         target = TARGETS[name]
         if provider == "swisseph":
+            if library_version is None:
+                if complete:
+                    raise _fail()
+                return None
             values = _native(points, model, flags, library_version, details, complete)
-        elif provider == moshier_solar.PROVIDER:
+        elif provider == de441_solar.PROVIDER:
             if (
-                model != moshier_solar.MODEL_ID
+                model != de441_solar.MODEL_ID
                 or flags
                 or any(len(p) != 1 for p in points)
             ):
                 raise _fail()
-            expected = moshier_solar.model_details()
+            expected = de441_solar.model_details()
             expected.update(
                 root_selection_policy="first_post_crossing_tt_float",
                 selected_crossing_jd_tt=points[1][0],
             )
             _source(details, expected, complete)
-            values = [moshier_solar.solar_longitude(p[0]) for p in points]
+            values = [de441_solar.solar_longitude(p[0]) for p in points]
         elif provider == "fatebridge_analytic":
             if (
                 model != analytic_solar.MODEL_ID

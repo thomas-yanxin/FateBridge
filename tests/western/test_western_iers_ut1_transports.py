@@ -159,7 +159,9 @@ def test_invalid_source_on_real_protocols(source, surface_calls):
 
 
 def test_closed_source_edge_preserves_nominal_facts_and_computes_tt_lunar_events(
-    rest,  # noqa: F811 - pytest fixture dependency tmp_path, capsys
+    rest,  # noqa: F811 - pytest fixture dependency
+    tmp_path,
+    capsys,
 ):
     args = dict(
         candidate_year=2026,

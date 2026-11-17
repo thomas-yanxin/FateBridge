@@ -8,10 +8,10 @@ facts use the same nested contracts in validation and transport discovery.
 
 from typing import Any, Dict, List, Optional, Union
 
-from pydantic import Field, JsonValue, create_model
+from pydantic import BaseModel, Field, JsonValue, create_model
 
 from fatebridge.core.output_astrodice import ASTRODICE_FIELDS
-from fatebridge.core.output_base import PartialOutput
+from fatebridge.core.output_base import FullFact, PartialOutput
 from fatebridge.core.output_bazi import BAZI_FIELDS
 from fatebridge.core.output_bazi_evidence import EvidenceStructureProfile
 from fatebridge.core.output_charts import (
@@ -26,6 +26,10 @@ from fatebridge.core.output_chinese import (
     CalendarContext,
     FourPillars,
     PersonInfo,
+)
+from fatebridge.core.output_classical_force import (
+    ClassicalForceAdjudication,
+    EngineeringStrengthIndex,
 )
 from fatebridge.core.output_classical_roots import ClassicalOverview
 from fatebridge.core.output_compatibility import (
@@ -51,12 +55,24 @@ from fatebridge.core.output_timing import (
 from fatebridge.core.output_western import (
     WESTERN_FIELDS,
     HoraryMotionBasis,
+    PlanetaryEvent,
+    PlanetaryEventHistory,
     WesternCalculationBasis,
 )
 from fatebridge.core.output_western_policy import WesternDataPolicy
 from fatebridge.utils.errors import ValidationIssue
 
 Object = Dict[str, JsonValue]
+
+# The aggregate tool publishes and validates the existing variant owners.
+CHART_VARIANT_TOOL_KEYS: dict[str, str] = {
+    "chart": "astro_chart",
+    "chart13": "astro_chart13",
+    "hellen_chart": "astro_hellen",
+    "guolao_chart": "astro_guolao",
+    "india_chart": "astro_india",
+    "germany": "astro_germany",
+}
 
 
 class ResultDelivery(PartialOutput):
@@ -125,7 +141,12 @@ class DayMaster(PartialOutput):
     stem: Optional[str] = None
     element: Optional[str] = None
     polarity: Optional[str] = None
-    strength: Optional[str] = None
+    strength: Optional[str] = Field(
+        default=None,
+        description="既有工程旺衰政策档；完整依据见engineering_index，不是classical_adjudication的原典力量结论",
+    )
+    engineering_index: FullFact[Optional[EngineeringStrengthIndex]] = None
+    classical_adjudication: FullFact[Optional[ClassicalForceAdjudication]] = None
     assessment: Optional[Object] = None
 
 
@@ -135,6 +156,8 @@ class BaziBirth(PartialOutput):
     day_master: Optional[DayMaster] = None
     four_pillars: Optional[FourPillars] = None
     favorable_elements: Optional[List[JsonValue]] = None
+    favorable_elements_status: FullFact[Optional[str]] = None
+    engineering_favorable_elements: FullFact[Optional[List[str]]] = None
     element_distribution: Optional[Object] = None
     person_info: Optional[PersonInfo] = None
     calendar_context: Optional[CalendarContext] = None
@@ -219,6 +242,45 @@ class ElectionScoringPolicy(PartialOutput):
     phase_weight_policy: Optional[str] = None
 
 
+class ElectionHouseSignificator(PartialOutput):
+    house: Optional[int] = None
+    reference_point: Optional[str] = None
+    role_in_source: Optional[str] = None
+    longitude: Optional[float] = None
+    sign: Optional[str] = None
+    ruler: Optional[str] = None
+    ruler_state: Optional[ElectionPlanet] = None
+
+
+class ElectionMarriageParty(PartialOutput):
+    role_in_source: Optional[str] = None
+    natural_significator: Optional[str] = None
+    lunar_contact_role: Optional[str] = None
+    lunar_significator: Optional[str] = None
+    contact_order_established: Optional[bool] = None
+    contact: Optional[PlanetaryEvent] = None
+
+
+class ElectionMarriageSignificators(PartialOutput):
+    method_id: Optional[str] = None
+    status: Optional[str] = None
+    author: Optional[str] = None
+    edition: Optional[str] = None
+    source_url: Optional[str] = None
+    source_pages: Optional[List[int]] = None
+    facsimile_url: Optional[str] = None
+    facsimile_pdf_pages: Optional[List[int]] = None
+    source_basis: Optional[str] = None
+    house_system: Optional[str] = None
+    zodiac_type: Optional[str] = None
+    houses: Optional[List[ElectionHouseSignificator]] = None
+    parties: Optional[List[ElectionMarriageParty]] = None
+    event_history: Optional[PlanetaryEventHistory] = None
+    score_contribution: Optional[int] = None
+    scope: Optional[str] = None
+    full_original_text_acceptance: Optional[bool] = None
+
+
 class Election(PartialOutput):
     reference_geometry: Optional[Dict[str, Any]] = None
     backend_convention: Optional[Dict[str, Any]] = None
@@ -237,6 +299,7 @@ class Election(PartialOutput):
     scoring_policy: Optional[ElectionScoringPolicy] = None
     unresolved_factors: Optional[List[ElectionUnresolvedFactor]] = None
     dignity_scope: Optional[str] = None
+    marriage_significators: Optional[ElectionMarriageSignificators] = None
     topic_id: Optional[str] = None
     topic_label: Optional[str] = None
     topic_house: Optional[int] = None
@@ -247,7 +310,7 @@ class Election(PartialOutput):
     factors: Optional[List[ElectionFactor]] = None
 
 
-def output_model_for(key: str, *, western_data_policy: bool = False) -> Any:
+def output_model_for(key: str, *, western_data_policy: bool = False) -> type[BaseModel]:
     """Build each catalog's public schema from explicit root-field contracts."""
     if key not in _TOOL_FIELDS:
         raise KeyError(f"Missing output contract for tool {key}")
@@ -258,22 +321,7 @@ def output_model_for(key: str, *, western_data_policy: bool = False) -> Any:
     }
     if western_data_policy:
         fields["ephemeris_data_policy"] = (Optional[WesternDataPolicy], None)
-    overrides = {
-        **CHINESE_FIELDS,
-        **WESTERN_FIELDS,
-        **CHART_FIELDS,
-        **BAZI_FIELDS,
-        "bazi_birth": BaziBirth,
-        "day_master": DayMaster,
-        "structure_profile": EvidenceStructureProfile,
-        "planets": List[ChartPlanet],
-        "election": Election,
-        "vimshottari": Vimshottari,
-        "interaction_analysis": TimingInteractions,
-        "analysis_reference": AnalysisReference,
-        "birth_time_sensitivity": BirthTimeSensitivity,
-        "life_dimensions": LifeDimensionScores,
-        "life_dimensions_assessment": LifeDimensionAssessment,
+    tool_fields = {
         **CHINESE_TOOL_FIELDS.get(key, {}),
         **CHART_TOOL_FIELDS.get(key, {}),
         **REFERENCE_TOOL_FIELDS.get(key, {}),
@@ -298,29 +346,62 @@ def output_model_for(key: str, *, western_data_policy: bool = False) -> Any:
             else {}
         ),
     }
-    for field in _TOOL_FIELDS[key].split():
+    overrides = {
+        **CHINESE_FIELDS,
+        **WESTERN_FIELDS,
+        **CHART_FIELDS,
+        **BAZI_FIELDS,
+        "bazi_birth": BaziBirth,
+        "day_master": DayMaster,
+        "structure_profile": EvidenceStructureProfile,
+        "planets": List[ChartPlanet],
+        "election": Election,
+        "vimshottari": Vimshottari,
+        "interaction_analysis": TimingInteractions,
+        "analysis_reference": AnalysisReference,
+        "birth_time_sensitivity": BirthTimeSensitivity,
+        "life_dimensions": LifeDimensionScores,
+        "life_dimensions_assessment": LifeDimensionAssessment,
+        **tool_fields,
+    }
+    root_fields = dict.fromkeys([*_TOOL_FIELDS[key].split(), *tool_fields])
+    if key == "astro_chart":
+        for variant_key in CHART_VARIANT_TOOL_KEYS.values():
+            root_fields.update(dict.fromkeys(_TOOL_FIELDS[variant_key].split()))
+    for field in root_fields:
         annotation = overrides.get(field, _FIELD_TYPES.get(field, Object))
+        metadata: dict[str, JsonValue] = {}
+        if field == "planets":
+            metadata.update(
+                {
+                    "x-fatebridge-full-result-unique-by": "id",
+                    "x-fatebridge-full-result-identities": [
+                        "Sun",
+                        "Moon",
+                        "Mercury",
+                        "Venus",
+                        "Mars",
+                        "Jupiter",
+                        "Saturn",
+                    ],
+                }
+            )
+        if key == "astro_chart":
+            variants: list[JsonValue] = [
+                variant
+                for variant, owner in CHART_VARIANT_TOOL_KEYS.items()
+                if field in required_output_fields_for(owner)
+            ]
+            if variants:
+                metadata["x-fatebridge-full-result-required-for-chart-variants"] = (
+                    variants
+                )
         fields[field] = (
             Optional[annotation],
-            (
-                Field(
-                    default=None,
-                    min_length=7,
-                    json_schema_extra={
-                        "x-fatebridge-full-result-unique-by": "id",
-                        "x-fatebridge-full-result-identities": [
-                            "Sun",
-                            "Moon",
-                            "Mercury",
-                            "Venus",
-                            "Mars",
-                            "Jupiter",
-                            "Saturn",
-                        ],
-                    },
-                )
-                if field == "planets"
-                else None
+            Field(
+                default=None,
+                min_length=7 if field == "planets" else None,
+                json_schema_extra=metadata or None,
             ),
         )
     name = "".join(part.title() for part in key.split("_")) + "Output"
@@ -368,6 +449,8 @@ _FIELD_TYPES: Dict[str, Any] = {
     "engine": str,
     "export_text": str,
     "favorable_elements": List[JsonValue],
+    "favorable_elements_status": str,
+    "engineering_favorable_elements": List[str],
     "fixed_stars": List[JsonValue],
     "house": int,
     "houses": List[JsonValue],
@@ -555,7 +638,7 @@ _REQUIRED_OUTPUT_FIELDS = {
     "suzhan": "analysis_type input_normalized params rulesets sukuyo validation summary",
     "sukuyo_compatibility": "person1 person2 rulesets status",
     "otherbu": "planet sign house",
-    "sanshiunited": "subresults",
+    "sanshiunited": "subresults synthesis",
     "ziwei_birth": "ziwei_birth",
     "ziwei_horoscope": "ziwei_horoscope",
     "ziwei_rules": "rule_catalogue",

@@ -3,7 +3,7 @@
 import hashlib
 import json
 import math
-from datetime import date, datetime, timezone
+from datetime import date, datetime
 from fractions import Fraction
 from pathlib import Path
 
@@ -12,6 +12,7 @@ import pytest
 from fatebridge.core.astro.birth import build_astro_birth_info
 from fatebridge.core.jyotish import build_india, positions
 from fatebridge.core.jyotish_balas import PLANETS, moon_nature_readings
+from fatebridge.core.jyotish_evidence import strength_context
 from fatebridge.core.jyotish_kala import (
     ahargana_lords,
     ayana_values,
@@ -95,6 +96,48 @@ def test_paksha_folds_longitude_wrap_and_keeps_nature_scenarios(sun, moon, expec
             if key.startswith("moon_benefic__")
             else result["malefic_value"]
         )
+
+
+def test_rounded_paksha_tie_stays_conditional_through_war_kala_and_luminary_motion():
+    # A small positive Sun longitude puts the directed angle just below 90°.
+    # The five stars only have one qualifying war pair, Mars and Mercury.
+    raw = {
+        "longitudes": dict(
+            zip(PLANETS, (2.0**-51, 90.0, 120.0, 120.25, 180.0, 240.0, 300.0))
+        ),
+        "julian_day_ut": 2451545.0,
+        "local_apparent_sidereal_meridian": 0.0,
+        "equatorial": {
+            p: {"declination": 0.0, "right_ascension": 0.0} for p in PLANETS
+        },
+    }
+    data = temporal_balas(
+        raw,
+        packet(),
+        0.0,
+        sthana={"summary": {p: {"total_virupa": 0.0} for p in PLANETS}},
+        dig={"summary": dict.fromkeys(PLANETS, 0.0)},
+    )
+    kala, motion = data["kala_bala"], data["cheshta_bala"]
+    paksha, war = (kala["components"][name] for name in ("paksha_bala", "yuddha_bala"))
+    assert war["pairs"][0]["winner"] == "Mars"
+    for component, planet in (
+        (paksha, "Moon"),
+        (paksha, "Mercury"),
+        (war, "Mars"),
+        (kala, "Moon"),
+        (motion, "Moon"),
+    ):
+        assert len({row[planet] for row in component["scenarios"].values()}) == 1
+        assert component["summary"][planet] is None
+    assert (
+        strength_context("kala_bala", "Moon", kala)["value_status"]
+        == "conditional_results"
+    )
+    assert (
+        strength_context("cheshta_bala", "Moon", motion)["value_status"]
+        == "conditional_results"
+    )
 
 
 @pytest.mark.parametrize("elongation,expected", PRIMARY["moon_nature_options"])
@@ -298,7 +341,11 @@ def test_war_candidates_are_local_and_do_not_fabricate_zero_amounts():
 def test_strict_policy_checks_supporting_sun_events(monkeypatch, tmp_path):
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
     auto = solar_packet(2451545.0, 0, 0, "auto")
-    assert auto["fallback_event_count"] > 0
+    assert auto["ephemeris_models"] == ["fatebridge_solar_horizon_de440_v1"]
+    assert (
+        auto["ephemeris_sources"]["fatebridge_solar_horizon_de440_v1"]["source_version"]
+        == "DE440 (2020; published 2021)"
+    )
     with pytest.raises(ValueError, match="require_data_files"):
         solar_packet(2451545.0, 0, 0, "require_data_files")
 

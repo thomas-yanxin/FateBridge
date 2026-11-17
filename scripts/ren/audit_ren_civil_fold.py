@@ -13,6 +13,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+import pytz
+
 ROOT = Path(__file__).resolve().parents[2]
 CORPUS = ROOT / "tests/fixtures/ren_civil_fold_v1"
 IMPLEMENTATION = (
@@ -125,12 +127,19 @@ def audit() -> dict[str, Any]:
                     expected_tzif = sha(
                         CORPUS / (case["zone"].replace("/", "_") + ".tzif")
                     )
-                    matched = (
+                    clock_matched = (
                         resolution["instant_utc"] == probe["instant_utc"]
                         and resolution["fold"] == probe["fold"]
                         and resolution["resolved_utc_offset"] == probe["offset"]
                         and resolution["was_ambiguous"] is True
-                        and resolution["timezone_rules"]["tzif_sha256"] == expected_tzif
+                    )
+                    rules = resolution["timezone_rules"]
+                    with pytz.open_resource(case["zone"]) as source:
+                        active_tzif = hashlib.sha256(source.read()).hexdigest()
+                    active_receipt_matched = (
+                        rules["tzif_sha256"] == active_tzif
+                        and rules["package_version"] == pytz.__version__
+                        and rules["iana_version"] == pytz.OLSON_VERSION
                     )
                     general = (
                         board["overview"]["month_general"]
@@ -140,8 +149,8 @@ def audit() -> dict[str, Any]:
                     if case["id"] == "H01":
                         month = result["four_pillars"]["month"]
                         actual = [month["stem"], month["branch"]]
-                        matched = (
-                            matched
+                        clock_matched = (
+                            clock_matched
                             and actual == probe["month_pillar"]
                             and general["branch"] == havana_general
                         )
@@ -149,7 +158,7 @@ def audit() -> dict[str, Any]:
                     else:
                         actual = general["branch"]
                         target = probe["month_general"]
-                        matched = matched and actual == target
+                        clock_matched = clock_matched and actual == target
                     comparisons.append(
                         dict(
                             **base,
@@ -158,7 +167,14 @@ def audit() -> dict[str, Any]:
                             actual=actual,
                             actual_month_general=general["branch"],
                             clock_resolution=resolution,
-                            matched=matched,
+                            calculation_matched=clock_matched,
+                            active_timezone_receipt_matched=active_receipt_matched,
+                            frozen_tzif_sha256=expected_tzif,
+                            active_tzif_sha256=active_tzif,
+                            current_clock_matched=clock_matched
+                            and active_receipt_matched,
+                            matched=clock_matched
+                            and rules["tzif_sha256"] == expected_tzif,
                         )
                     )
     unchanged = before == {name: sha(ROOT / name) for name in IMPLEMENTATION}
@@ -167,6 +183,12 @@ def audit() -> dict[str, Any]:
         "comparisons": comparisons,
         "comparison_count": len(comparisons),
         "matched_count": sum(c["matched"] is True for c in comparisons),
+        "calculation_matched_count": sum(
+            c.get("calculation_matched") is True for c in comparisons
+        ),
+        "current_clock_matched_count": sum(
+            c.get("current_clock_matched") is True for c in comparisons
+        ),
         "failures": [c for c in comparisons if c["matched"] is not True],
         "unique_astronomical_minute_count": 5,
         "new_independent_astronomical_observations": 0,
@@ -177,6 +199,9 @@ def audit() -> dict[str, Any]:
         "reference_sha256": sha(CORPUS / "freeze.json"),
         "selected_clock_checks_passed": unchanged
         and all(c["matched"] is True for c in comparisons),
+        "selected_current_clock_checks_passed": unchanged
+        and all(c.get("current_clock_matched") is True for c in comparisons),
+        "clock_matching_scope": "Current clock values and active timezone receipts are reported separately; the original frozen-TZIF identity gate and its failures remain unchanged.",
         "full_supported_calendar_domain_certified": False,
         "classical_acceptance_passed": False,
         "goal_complete": False,

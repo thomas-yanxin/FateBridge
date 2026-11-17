@@ -8,6 +8,7 @@ from fatebridge.core.astro.time_scales import datetime_from_tt, ephemeris_time
 from fatebridge.core.astro.utc_policy import leap_table
 from fatebridge.core.jpl_ephemeris import configured_jpl_file
 from fatebridge.core.solar_model_policy import solar_model_policy
+from fatebridge.utils.civil_time import ZonedCalendar
 from fatebridge.utils.errors import EphemerisSourceError
 from fatebridge.utils.timezones import parse_timezone_name
 
@@ -122,7 +123,7 @@ def _aa1996_resolution(year: int, term_name: str, timezone_name: str) -> dict[st
     if not unchanged:
         raise EphemerisSourceError("solar_configuration_changed")
     return {
-        "moment": moment.astimezone(parse_timezone_name(timezone_name)).isoformat(),
+        "moment": ZonedCalendar(moment, parse_timezone_name(timezone_name)).isoformat(),
         "provider": "moshier_aa1996",
         "approximate": False,
         "precision_scope": "engine_computed_not_independently_certified_to_seconds",

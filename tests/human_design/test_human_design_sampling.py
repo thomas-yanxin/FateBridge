@@ -119,13 +119,8 @@ def test_native_replay_and_derived_reading_reject_tampering(complete, kind):
     else:
         report["status"] = "not_assessed"
     if kind == "native_nan":
-        # NaN cannot have a canonical JSON receipt, even before replay.
-        with pytest.raises(ValueError):
-            (p)
         assert verify_sampled_interval(p)["errors"]
-        checked = verify_human_design_reading(p)
-    else:
-        checked = verify_human_design_reading((p))
+    checked = verify_human_design_reading(p)
     assert checked["status"] == "rejected", checked
 
 

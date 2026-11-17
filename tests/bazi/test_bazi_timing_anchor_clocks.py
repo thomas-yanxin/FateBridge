@@ -7,6 +7,7 @@ import pytest
 import fatebridge.core.timing as timing
 from fatebridge.core.almanac import SolarTerm
 from fatebridge.core.timing import TimingAnalysis
+from fatebridge.utils.civil_time import ZonedCalendar
 from fatebridge.utils.timezones import parse_timezone_name, validate_local_clock
 from tests.support.transports import SPECS, business
 from tests.support.transports import rest as _shared_rest
@@ -61,8 +62,8 @@ def test_timeline_window_does_not_floor_a_fractional_computed_boundary(monkeypat
     first = datetime(2028, 1, 6, 3, 54, 38, 700247, tzinfo=zone)
     second = datetime(2028, 2, 4, 15, 30, 0, 123456, tzinfo=zone)
     terms = [
-        SolarTerm("小寒", first, "20280106", day_ganzhi=""),
-        SolarTerm("立春", second, "20280204", day_ganzhi=""),
+        SolarTerm("小寒", ZonedCalendar.from_datetime(first)),
+        SolarTerm("立春", ZonedCalendar.from_datetime(second)),
     ]
 
     def source(year, timezone_name):
@@ -72,9 +73,7 @@ def test_timeline_window_does_not_floor_a_fractional_computed_boundary(monkeypat
             else [
                 SolarTerm(
                     "小寒",
-                    datetime(2029, 1, 5, 1, tzinfo=zone),
-                    "20290105",
-                    day_ganzhi="",
+                    ZonedCalendar.from_datetime(datetime(2029, 1, 5, 1, tzinfo=zone)),
                 )
             ]
         )

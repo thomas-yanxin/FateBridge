@@ -2,13 +2,12 @@
 
 from __future__ import annotations
 
-import hashlib
-import json
 from collections.abc import Iterable
 from copy import deepcopy
 from typing import Any
 
 from fatebridge.utils.errors import NumerologySourceError
+from fatebridge.utils.json_digest import canonical_bytes, digest
 
 TRACE_ID = "numerology_consumed_solar_sources_v1"
 NATIVE_DOCUMENTATION_URL = "https://www.astro.com/swisseph/swephprg.htm"
@@ -32,6 +31,7 @@ _MODEL_KEYS = frozenset(
         "working_jd_tt",
         "software_input_years",
         "qualified_solar_term_years",
+        "derived_lichun_scope",
         "native_moshier_relabelled",
         "accuracy_certified",
         "internal_observed_retflags",
@@ -42,19 +42,9 @@ _MODEL_KEYS = frozenset(
 )
 
 
-def _canonical(value: Any) -> str:
-    return json.dumps(
-        value,
-        ensure_ascii=False,
-        sort_keys=True,
-        separators=(",", ":"),
-        allow_nan=False,
-    )
-
-
 def solar_source_profiles(boundaries: Iterable[dict[str, Any]]) -> dict[str, Any]:
     """Deduplicate recorded identities; a documentation URL is not a file hash."""
-    profiles: dict[str, dict[str, Any]] = {}
+    profiles: dict[bytes, dict[str, Any]] = {}
     try:
         for boundary in boundaries:
             record = boundary["record"]
@@ -100,7 +90,7 @@ def solar_source_profiles(boundaries: Iterable[dict[str, Any]]) -> dict[str, Any
                 source_url_basis=basis,
                 model_metadata=metadata,
             )
-            key = _canonical(profile)
+            key = canonical_bytes(profile)
             if key not in profiles:
                 profiles[key] = {**profile, "boundary_count": 0}
             profiles[key]["boundary_count"] += 1
@@ -110,9 +100,7 @@ def solar_source_profiles(boundaries: Iterable[dict[str, Any]]) -> dict[str, Any
         return dict(
             boundary_count=sum(p["boundary_count"] for p in values),
             source_profiles=values,
-            source_profiles_sha256=hashlib.sha256(
-                _canonical(values).encode()
-            ).hexdigest(),
+            source_profiles_sha256=digest(values),
             source_url=next(iter(urls)) if available and len(urls) == 1 else None,
             mixed_source_urls=len(urls) > 1,
             all_source_urls_available=available,

@@ -61,7 +61,7 @@ def _get(payload: Dict[str, Any], path: str) -> Any:
     return value
 
 
-def _boolean(value: Any) -> str:
+def _boolean(value: object) -> str:
     if value is True:
         return "符合"
     if value is False:
@@ -71,7 +71,7 @@ def _boolean(value: Any) -> str:
     raise ValueError("不支持非布尔条件")
 
 
-def _period(value: Any) -> str:
+def _period(value: object) -> str:
     if value is None:
         return "未确认"
     if type(value) is not int or value not in range(1, 10):
@@ -87,7 +87,7 @@ def _condition_text(condition: Dict[str, Any]) -> str:
         "river_water_present": "外部河流",
     }
 
-    def observed(value: Any) -> str:
+    def observed(value: object) -> str:
         if value is True:
             return "存在"
         if value is False:
@@ -273,9 +273,7 @@ def build_natal_reading(payload: Dict[str, Any]) -> Dict[str, Any]:
         registered = {r["ruleset_id"]: r for r in payload["rulesets"]}
 
         def require(key: str, record: Dict[str, Any] | None = None) -> None:
-            expected = VERSIONS[key]
-            allowed = (expected,) if isinstance(expected, str) else expected
-            if registered[key]["version"] not in allowed:
+            if registered[key]["version"] != VERSIONS[key]:
                 raise ValueError("未支持的规则版本")
             if record is not None and any(
                 (
@@ -470,7 +468,7 @@ def build_natal_reading(payload: Dict[str, Any]) -> Dict[str, Any]:
                         f"{ir}.candidates.{ci}.placement_findings.{pi}",
                     )
             host_guest = interpretation.get("host_guest_analysis")
-            if host_guest is not None and "1.2.0" == READING_VERSION:
+            if host_guest is not None:
                 require("shen_2011_host_guest_v1", host_guest["ruleset"])
                 hr = ir + ".host_guest_analysis"
                 add(
@@ -580,7 +578,7 @@ def build_natal_reading(payload: Dict[str, Any]) -> Dict[str, Any]:
                     )
         return {
             "format_id": FORMAT,
-            "version": "1.2.0",
+            "version": READING_VERSION,
             "status": "rendered",
             "covered_layers": ["xuankong_natal"],
             "uncovered_layers": [
@@ -613,7 +611,7 @@ def build_natal_reading(payload: Dict[str, Any]) -> Dict[str, Any]:
     ) as exc:
         return {
             "format_id": FORMAT,
-            "version": "1.2.0",
+            "version": READING_VERSION,
             "status": "unsupported_context",
             "basis": {},
             "statements": [],

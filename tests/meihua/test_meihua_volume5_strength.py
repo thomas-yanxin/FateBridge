@@ -12,17 +12,12 @@ from fatebridge.core.meihua_volume5_strength import (
 )
 from fatebridge.services.meihua import calculate_meihua_cast
 from tests.support.meihua_volume5_strength_reference import FOLDER, load
+from tests.support.reference_data import resolve
 
 CELLS, EXPECTED = load()
 BY_GEOMETRY = {}
 for row in EXPECTED:
     BY_GEOMETRY.setdefault((row["code"], row["line"]), []).append(row)
-
-
-def resolve(value, path):
-    for part in path.split("."):
-        value = value[int(part)] if isinstance(value, list) else value[part]
-    return value
 
 
 def digest(value):

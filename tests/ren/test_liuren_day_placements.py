@@ -37,15 +37,21 @@ def sky(rotation):
 
 
 def test_complete_independent_reference_keeps_all_twelve_headings():
+    excluded, pending = 0, 0
     for case in DATA["contexts"]:
         value = day_placement_patterns(case["day_ganzhi"], case["sky_by_earth"])
         expected = expected_facts(case, DATA["reading"])
         assert {k: value[k] for k in expected} == expected
         assert len(value["evaluations"]) == 12
         assert value["evaluated_count"] == 10 and value["unresolved_count"] == 2
-        assert [r["matched"] for r in value["evaluations"][-2:]] == [None, None]
+        for row in value["evaluations"][-2:]:
+            assert row["relation_matches"] is None
+            assert row["matched"] is not True
+            excluded += row["matched"] is False
+            pending += row["matched"] is None
         LiurenDayPlacements.model_validate(value)
     assert len(DATA["contexts"]) == 720
+    assert (excluded, pending) == (1320, 120)
 
 
 @pytest.mark.parametrize(
@@ -194,7 +200,7 @@ def original_results():
         "trace",
         "duplicate",
         "old_version",
-        "unknown_false",
+        "wrong_harmony_status",
         "numeric_bool",
     ],
 )
@@ -222,8 +228,9 @@ def test_full_output_binds_evidence_to_actual_board_and_one_trace(
         board["rule_trace"].remove(trace)
     elif fault == "duplicate":
         board["rule_trace"].append(copy.deepcopy(trace))
-    elif fault == "unknown_false":
-        evidence["evaluations"][10]["matched"] = False
+    elif fault == "wrong_harmony_status":
+        row = evidence["evaluations"][10]
+        row["matched"] = False if row["placement_matches"] else None
     else:
         evidence["placements"]["stem_over_branch"] = int(
             evidence["placements"]["stem_over_branch"]
@@ -276,6 +283,8 @@ def test_real_rest_mcp_cli_return_same_new_facts(key, project, surface_calls):
             "D11",
             "D12",
         ]
+        for row in value["evaluations"][-2:]:
+            assert row["matched"] is (None if row["placement_matches"] else False)
 
 
 @pytest.mark.parametrize("project", [False, True])

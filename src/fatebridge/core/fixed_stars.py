@@ -196,7 +196,7 @@ def conjunction_hits(
                         "orb": float(separation),
                         "star_longitude": longitude,
                         "star_latitude": star["latitude"],
-                        "nature": labels[name]["nature"],
+                        "nature": labels[name]["nature"].copy(),
                         "nature_components": attribution["components"],
                         "nature_source_region": attribution["region"],
                         "nature_source_url": NATURE_SOURCE,

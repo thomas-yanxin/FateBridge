@@ -4,6 +4,7 @@ import asyncio
 import hashlib
 import json
 import shutil
+from copy import deepcopy
 from datetime import date, timedelta
 
 import pytest
@@ -36,7 +37,7 @@ from scripts.taiyi.audit_taiyi_qiliang_calendar import (
     public_case,
     verify_sources,
 )
-from tests.taiyi.test_taiyi_enclosures import resolve
+from tests.support.reference_data import resolve
 from tests.taiyi.test_taiyi_transports import _same_run_payload
 
 
@@ -275,7 +276,7 @@ def test_mutating_mcp_evidence_cannot_change_the_next_sanshi_response():
             evidence = first.structured_content["taiyi"]["calendar_rules"][
                 "historical_calendar"
             ]
-            source_digest = evidence["source_data_sha256"]
+            original = deepcopy(evidence)
             evidence["source_disagreements"][0]["alternative_hypotheses"][0][
                 "leap_month"
             ] = 99
@@ -292,7 +293,7 @@ def test_mutating_mcp_evidence_cannot_change_the_next_sanshi_response():
             actual = second.structured_content["taiyi"]["calendar_rules"][
                 "historical_calendar"
             ]
-            assert actual["source_data_sha256"] == source_digest
+            assert actual == original
             assert [
                 h["leap_month"]
                 for h in actual["source_disagreements"][0]["alternative_hypotheses"]

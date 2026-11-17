@@ -21,6 +21,7 @@ from fatebridge.core.predictive.native_chart import (
 )
 from fatebridge.services.astrology import calculate_core_chart_analysis
 from fatebridge.utils.errors import EphemerisSourceError
+from tests.support.horizon_reference import horizon_vector_reference
 
 FIXTURE = Path(__file__).parents[1] / "data/astro/horizon_precision"
 INPUTS = json.loads((FIXTURE / "inputs.json").read_text())
@@ -48,6 +49,17 @@ def test_reference_and_unfiltered_plan_are_frozen():
     } == {"armc": 132, "public": 216, "original": 126}
     assert REFERENCE["tolerance_arcseconds"] == 1.0
     assert len(EXPECTED) == len(INPUTS["cases"]) == 474
+    # Qualify the reusable independent vector oracle against every unchanged
+    # frozen input before using it with the current public rotation model.
+    for case in INPUTS["cases"]:
+        actual = horizon_vector_reference(
+            case["latitude"], case["armc"], case["obliquity"]
+        )
+        frozen = EXPECTED[case["id"]]
+        assert separation(actual["ascendant"], frozen["ascendant"]) <= 1
+        for code in ("R", "C"):
+            for value, reference in zip(actual["cusps"][code], frozen["cusps"][code]):
+                assert separation(value, reference) <= 1
 
 
 @pytest.mark.parametrize("case", INPUTS["cases"], ids=lambda c: c["id"])
@@ -64,7 +76,7 @@ def test_scalar_construction_matches_independent_vector_intersections(case):
 
 
 @pytest.mark.parametrize("case", PUBLIC, ids=lambda c: c["id"])
-@pytest.mark.parametrize("code", [b"E", b"V", b"W", b"R", b"C"])
+@pytest.mark.parametrize("code", [b"A", b"E", b"V", b"W", b"R", b"C"])
 @pytest.mark.parametrize("sidereal", [False, True])
 def test_registered_house_provider_all_locations_and_frames(case, code, sidereal):
     flags = runtime.swe.FLG_SIDEREAL if sidereal else 0
@@ -112,7 +124,10 @@ def test_registered_house_provider_all_locations_and_frames(case, code, sidereal
             flags,
         )
         offset = (tropical[1] - framed[1]) % 360
-    expected = EXPECTED[case["id"]]
+    precision = receipt["eastern_direction_precision"]
+    expected = horizon_vector_reference(
+        precision["geographic_latitude"], precision["armc"], precision["true_obliquity"]
+    )
     assert separation(asc, (expected["ascendant"] - offset) % 360) <= 1
     if code in (b"R", b"C"):
         for actual, value in zip(cusps, expected["cusps"][code.decode()]):
@@ -129,16 +144,13 @@ def test_registered_house_provider_all_locations_and_frames(case, code, sidereal
     assert precision["delivered_ascendant"] == asc
     assert list(cusps) == precision["delivered_cusps"]
     assert precision["maximum_physical_error_arcseconds"] is None
-    if (
-        not sidereal
-        and separation(case["native_ascendant"], expected["ascendant"]) <= 1
-    ):
-        assert asc == case["native_ascendant"]
+    if not sidereal and precision["ascendant_action"] == "native_coordinate_retained":
+        assert asc == precision["native_common_ascendant"]
 
 
 @pytest.mark.parametrize("case", PUBLIC[::18], ids=lambda c: c["id"])
 @pytest.mark.parametrize("zodiac", ["Tropic", "Sidereal"])
-@pytest.mark.parametrize("code", ["E", "V", "W", "R", "C"])
+@pytest.mark.parametrize("code", ["A", "E", "V", "W", "R", "C"])
 def test_predictive_subject_receipt_is_in_delivered_frame(case, zodiac, code):
     result = build_native_subject(
         name="numerical control",
@@ -150,14 +162,15 @@ def test_predictive_subject_receipt_is_in_delivered_frame(case, zodiac, code):
         house_system=code,
     )
     offset = result.calculation_basis["ayanamsha_degrees"]
-    assert (
-        separation(
-            result.ascendant.abs_pos, (EXPECTED[case["id"]]["ascendant"] - offset) % 360
-        )
-        <= 1
-    )
     receipt = result.calculation_basis["house_axis_convention"]
     precision = receipt["eastern_direction_precision"]
+    expected = horizon_vector_reference(
+        precision["geographic_latitude"], precision["armc"], precision["true_obliquity"]
+    )
+    assert (
+        separation(result.ascendant.abs_pos, (expected["ascendant"] - offset) % 360)
+        <= 1
+    )
     assert (
         precision["delivered_ascendant"]
         == result.ascendant.abs_pos

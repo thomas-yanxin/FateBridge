@@ -16,6 +16,7 @@ from fatebridge.core.ephemeris_runtime import (
     configured_ephemeris_path,
 )
 from fatebridge.core.solar_term_runtime import solar_term_cache_context
+from fatebridge.utils.civil_time import UTCCalendar, utc_calendar
 from fatebridge.utils.errors import EphemerisSourceError
 from tests.liuyao.test_liuyao_clash_transports import all_surfaces
 from tests.support.transports import SPECS, native
@@ -54,7 +55,9 @@ def symbolic(monkeypatch, observation):
                 ephemeris_retflags=(1,) if os.getenv("FATEBRIDGE_JPL_FILE") else (2,),
                 ephemeris_library_version="synthetic-cache-test",
             )
-        return anchor + timedelta(seconds=seconds)
+        return UTCCalendar(
+            anchor.ordinal, anchor.microseconds_of_day + seconds * 1_000_000
+        )
 
     monkeypatch.setattr(almanac, "_solar_term_utc_via_swe", solve)
     return calls
@@ -102,7 +105,9 @@ def test_switching_selectors_recalculates_and_restoring_reuses_same_context(
     monkeypatch.setenv("FATEBRIDGE_JPL_FILE", "synthetic-b.eph")
     b = almanac.get_solar_terms_for_year(2026, "UTC")
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE")
-    assert almanac.get_solar_terms_for_year(2026, "UTC") is before
+    cache_hits = almanac.get_solar_terms_for_year.cache_info().hits
+    assert almanac.get_solar_terms_for_year(2026, "UTC") == before
+    assert almanac.get_solar_terms_for_year.cache_info().hits == cache_hits + 1
     assert len(calls) == 72
     assert (a[0].moment - before[0].moment).total_seconds() == 1
     assert (b[0].moment - a[0].moment).total_seconds() == 8
@@ -146,8 +151,10 @@ def test_observed_selector_change_discards_partial_year(monkeypatch):
     terms = almanac.get_solar_terms_for_year(2026, "UTC")
     assert len(calls) > 24
     assert all(
-        t.moment
-        == almanac._solar_term_search_anchor_utc(2026, i) + timedelta(seconds=1)
+        t.calendar.utc
+        == UTCCalendar(
+            almanac._solar_term_search_anchor_utc(2026, i).ordinal, 1_000_000
+        )
         for i, t in enumerate(terms)
     )
 
@@ -201,7 +208,6 @@ def test_real_future_roots_keep_tt_and_relabel_utc_when_loaded_profile_changes(
     old_tt = [time_scales.ephemeris_time(t.moment).jd_tt for t in before]
     add_fictional_future_leap(table)
     after = almanac.get_solar_terms_for_year(2028, "UTC")
-    assert after is not before
     for old, new, tt in zip(before, after, old_tt):
         assert abs((new.moment - old.moment).total_seconds() + 1) < 0.0002
         assert abs((time_scales.ephemeris_time(new.moment).jd_tt - tt) * 86400) < 0.0002
@@ -257,11 +263,13 @@ def test_synthetic_source_switch_changes_public_year_month(
                 ephemeris_library_version="synthetic-cache-test",
             )
         if longitude == 315:
-            return datetime(
-                year,
-                2,
-                5 if os.getenv("FATEBRIDGE_JPL_FILE") else 4,
-                tzinfo=timezone.utc,
+            return utc_calendar(
+                datetime(
+                    year,
+                    2,
+                    5 if os.getenv("FATEBRIDGE_JPL_FILE") else 4,
+                    tzinfo=timezone.utc,
+                )
             )
         return anchor
 

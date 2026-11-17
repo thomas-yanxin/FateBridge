@@ -1,0 +1,3468 @@
+{
+  "reference_sha256": "32929055174078aae27f6482605953cd26fcb345209584a24b54a15cccf2b964",
+  "production_imported": false,
+  "plan": {
+    "created_utc": "2026-11-14T10:10:12.155308+00:00",
+    "inputs": "All96 frozen Moshier polar construction windows, unchanged locations, clocks, horizon definitions and26h windows; includes both hemispheres, seasons and3 years.",
+    "reference": "Fresh original NASA DE440 SPK, jplephem2.23 original polynomials and derivatives, official SOFA2023-10-11 receiver and aberration; original Swiss source-frame geometry only for Hindu zero-latitude projection.",
+    "time": "Same original declared UT1->TT model; reference uses geocentric SOFA TDB(TT), two-part source time and a fixed-reception Sun light cone.",
+    "metrics": [
+      "Complete ordered event counts and directions against actual current FateBridge source calls.",
+      "Retain1ms comparison line and every root/count difference; different dynamical sources are recorded explicitly.",
+      "Independent Skyfield1.53 DE440 geocentric apparent direction controls at every24 original critical constructions.",
+      "No physical or continuous-domain certification from software agreement."
+    ],
+    "unchanged": [
+      "Original C/SOFA benchmark and all failures.",
+      "Production code.",
+      "All original reference input rows and gates."
+    ],
+    "numerical_reference": "Independent1minute mesh with local extrema and SciPy Brent brackets; all construction inputs fixed before this comparison. Raw body coefficients are not from FateBridge."
+  },
+  "kernel": {
+    "url": "https://ssd.jpl.nasa.gov/ftp/eph/planets/bsp/de440.bsp",
+    "downloaded_utc": "2026-11-14T10:02:53.859854+00:00",
+    "command": [
+      "/usr/bin/curl",
+      "--fail",
+      "--location",
+      "--silent",
+      "--show-error",
+      "--dump-header",
+      "/Users/thomas/.codex/artifacts/fatebridge-celestial-frame-20261114/de440-download.headers",
+      "--output",
+      "/Users/thomas/.codex/artifacts/fatebridge-celestial-frame-20261114/original-de440.bsp",
+      "https://ssd.jpl.nasa.gov/ftp/eph/planets/bsp/de440.bsp"
+    ],
+    "exit_code": 0,
+    "stderr": "",
+    "bytes": 119799808,
+    "sha256": "a4ce9bf9b3282becc9f4b2ac3cebe03a2ae7599981aabd7265fd8482fff7c4b5",
+    "matches_existing_local_kernel": true
+  },
+  "geometry_build": {
+    "command": [
+      "/opt/homebrew/opt/llvm/bin/clang",
+      "-O2",
+      "-ffp-contract=off",
+      "-fno-fast-math",
+      "-isysroot",
+      "/Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk",
+      "-B/Library/Developer/CommandLineTools/usr/bin/",
+      "-I",
+      "/Users/thomas/.codex/artifacts/fatebridge-celestial-frame-20261114/official-sofa/sofa/20231011/c/src",
+      "-I",
+      "/Users/thomas/.codex/artifacts/fatebridge-celestial-frame-20261114/author-swiss-2.10.03",
+      "-dynamiclib",
+      "/Users/thomas/.codex/artifacts/fatebridge-celestial-frame-20261114/de440_solar_reference_geometry.c",
+      "-L",
+      "/Users/thomas/.codex/artifacts/fatebridge-celestial-frame-20261114",
+      "-lofficial_sofa",
+      "-lauthor_swiss_2_10_03_contract",
+      "-Wl,-rpath,/Users/thomas/.codex/artifacts/fatebridge-celestial-frame-20261114",
+      "-o",
+      "/Users/thomas/.codex/artifacts/fatebridge-celestial-frame-20261114/libde440_solar_reference_geometry.dylib"
+    ],
+    "exit_code": 0,
+    "original_sources_modified": false,
+    "source_sha256": "26d09b339770d72d458a63c595c3935ae77f7969d8fd25fbaab79a9d54671bf0",
+    "reason": "Pure SOFA receiver removes an unrelated Swiss Sun query; initial two reference attempts failed before producing output, with a native file/cache error. No failure waived or reference points removed.",
+    "library_sha256": "14da144883424c5dc6b8fcf18d74abd3b973bf17d81b774900dad100596414a5"
+  },
+  "generator_sources": {
+    "generate_de440_polar_reference.py": "\"\"\"Fresh original JPL/SOFA fixed-clock control, with no FateBridge import.\"\"\"\nimport ctypes as C\nimport gzip\nimport hashlib\nfrom importlib.metadata import version\nimport json\nimport math\nfrom pathlib import Path\nimport sys\nimport time\n\nimport numpy as np\nfrom jplephem.spk import SPK\nfrom scipy.optimize import brentq, minimize_scalar\nfrom skyfield.api import load, load_file\n\nassert not any(name.startswith('fatebridge') for name in sys.modules)\nbase=Path(__file__).parent\nplan=json.loads((base/'de440-polar-observation-plan.json').read_text())\nkernel_path=base/'original-de440.bsp'\ndownload=json.loads((base/'de440-download.json').read_text())\nassert hashlib.sha256(kernel_path.read_bytes()).hexdigest()==download['sha256']\nkernel=SPK.open(kernel_path)\nsky=load_file(str(kernel_path));ts=load.timescale(builtin=True)\nsofa=C.CDLL(str(base/'libofficial_sofa.dylib'))\nauthor=C.CDLL(str(base/'libauthor_swiss_2_10_03_contract.dylib'))\ngeometry=C.CDLL(str(base/'libde440_solar_reference_geometry.dylib'))\nDP=C.POINTER(C.c_double)\nsofa.iauDtdb.argtypes=[C.c_double]*6;sofa.iauDtdb.restype=C.c_double\nsofa.iauAb.argtypes=[DP,DP,C.c_double,C.c_double,DP];sofa.iauAb.restype=None\ngeometry.fb_de440_receiver.argtypes=[C.c_double]*5+[DP]\ngeometry.fb_de440_receiver.restype=C.c_int\ngeometry.fb_de440_reduce_direction.argtypes=[C.c_double]*3+[C.c_int,DP,DP,DP]\ngeometry.fb_de440_reduce_direction.restype=C.c_int\nauthor.swe_deltat_ex.argtypes=[C.c_double,C.c_int,C.c_char_p];author.swe_deltat_ex.restype=C.c_double\nauthor.swe_set_ephe_path.argtypes=[C.c_char_p];author.swe_set_ephe_path(b'/Users/thomas/Desktop/FateBridge/ephe')\nauthor.swe_calc.argtypes=[C.c_double,C.c_int,C.c_int,DP,C.c_char_p];author.swe_calc.restype=C.c_int\nauthor.swe_refrac_extended.argtypes=[C.c_double]*5+[C.c_int,DP];author.swe_refrac_extended.restype=C.c_double\nthreshold=author.swe_refrac_extended(0.,0.,1013.25,0.,.0065,1,(C.c_double*4)())\nAU_KM=149597870.7;LIGHT_AU_DAY=173.14463267424034\n\n\ndef apparent_sun(tt,receiver_position,receiver_velocity):\n    \"\"\"Fixed receiver, two-part native TDB source and one official aberration.\"\"\"\n    offset=tt-2451545.+sofa.iauDtdb(2451545.,tt-2451545.,0.,0.,0.,0.)/86400\n    emb=np.asarray(kernel[0,3].compute_and_differentiate(2451545.,offset))\n    earth=np.asarray(kernel[3,399].compute_and_differentiate(2451545.,offset))+emb\n    reception=earth[0]/AU_KM+receiver_position\n    velocity=earth[1]/AU_KM+receiver_velocity\n    sun_now=kernel[0,10].compute(2451545.,offset)/AU_KM\n    solar_distance=float(np.linalg.norm(sun_now-reception))\n    delay=0.\n    for iterations in range(12):\n        emitted=kernel[0,10].compute(2451545.,offset-delay)/AU_KM\n        ray=emitted-reception;distance=float(np.linalg.norm(ray))\n        new_delay=distance/LIGHT_AU_DAY\n        if new_delay==delay or abs(new_delay-delay)<1e-16:break\n        delay=new_delay\n    else:raise RuntimeError('JPL source light cone did not converge')\n    direction=ray/distance;beta=velocity/LIGHT_AU_DAY;result=np.full(3,np.nan)\n    sofa.iauAb(direction.ctypes.data_as(DP),beta.ctypes.data_as(DP),solar_distance,\n               math.sqrt(1-float(beta@beta)),result.ctypes.data_as(DP))\n    return result,offset,iterations+1\n\n\nold=json.loads(gzip.decompress((base/'solar-event-polar-cluster-reference.json.gz').read_bytes()))\ncases=json.loads((base/'solar-event-polar-cluster-cases.json').read_text())\ncontrols=[]\nfor index,construction in enumerate(old['constructions']):\n    if construction['source_flags']!=4:continue\n    ut1=construction['critical_time_ut1'];tt=ut1+author.swe_deltat_ex(ut1,2,C.create_string_buffer(256))\n    own,offset,iterations=apparent_sun(tt,np.zeros(3),np.zeros(3))\n    other=sky['earth'].at(ts.tdb_jd(2451545.,offset)).observe(sky['sun']).apparent().position.au\n    other=other/np.linalg.norm(other)\n    error=math.atan2(float(np.linalg.norm(np.cross(own,other))),float(own@other))*180/math.pi*3600\n    controls.append(dict(construction=index,tt=tt,tdb_days_from_j2000=offset,\n                         reference_icrs=own.tolist(),skyfield_icrs=other.tolist(),\n                         separation_arcseconds=error,light_cone_iterations=iterations))\nrows=[];started=time.perf_counter()\nfor case,expected in zip(cases,old['rows'],strict=True):\n    if case['source_flags']!=4:continue\n    query=case['query_ut1'];horizon=threshold if case['definition'] else 0.;cache={}\n\n    def at(delta):\n        ut1=float(query+float(delta))\n        if ut1 not in cache:\n            tt=ut1+author.swe_deltat_ex(ut1,2,C.create_string_buffer(256))\n            pv=np.full(34,np.nan)\n            status=geometry.fb_de440_receiver(tt,ut1,case['longitude'],case['latitude'],0.,pv.ctypes.data_as(DP))\n            assert status==0,(status,ut1,tt)\n            position=pv[:3] if case['definition'] else np.zeros(3)\n            velocity=pv[3:6] if case['definition'] else np.zeros(3)\n            ray,offset,iterations=apparent_sun(tt,position,velocity)\n            result=np.full(4,np.nan)\n            status=geometry.fb_de440_reduce_direction(tt,case['longitude'],case['latitude'],case['definition'],\n                                                     pv.ctypes.data_as(DP),ray.ctypes.data_as(DP),result.ctypes.data_as(DP))\n            assert status==0,status\n            cache[ut1]=(float(result[3]-horizon),tt,iterations)\n        return cache[ut1][0]\n\n    grid=[i/1440 for i in range(1561)];values=[at(x) for x in grid];extrema=[]\n    for j in range(1,len(grid)-1):\n        a,b,c=values[j-1:j+2]\n        if b>a and b>=c:sign=-1\n        elif b<a and b<=c:sign=1\n        else:continue\n        centre=grid[j]\n        solved=minimize_scalar(lambda q:sign*at(centre+q),bounds=(grid[j-1]-centre,grid[j+1]-centre),method='bounded',options={'xatol':1e-12,'maxiter':150})\n        assert solved.success\n        point=centre+float(solved.x);grid.append(point)\n        extrema.append(dict(ut1=float(query+point),kind='maximum' if sign<0 else 'minimum',residual_degrees=at(point)))\n    grid=sorted(set(grid));events=[]\n    for a,b in zip(grid,grid[1:]):\n        fa,fb=at(a),at(b);rising,setting=fa<0<=fb,fa>0>=fb\n        if not(rising or setting):continue\n        root,info=brentq(at,a,b,xtol=5e-15,rtol=4*np.finfo(float).eps,maxiter=150,full_output=True)\n        assert info.converged\n        ut1=float(query+root)\n        if events and abs(ut1-events[-1]['ut1'])*86400<.0001:continue\n        events.append(dict(ut1=ut1,tt=cache[ut1][1],kind='rise' if rising else 'set',residual_degrees=at(root)))\n    rows.append(dict(case=expected['case'],input=case,status='ok',actual_source='original_JPL_DE440',roots=events,\n                     extrema=extrema,evaluations=len(cache),maximum_light_cone_iterations=max(v[2] for v in cache.values())))\n    if len(rows)%16==0:print(json.dumps(dict(windows=len(rows),seconds=time.perf_counter()-started)),flush=True)\nsummary=dict(windows=len(rows),roots=sum(len(r['roots']) for r in rows),skyfield_controls=len(controls),\n             maximum_skyfield_direction_difference_arcseconds=max(r['separation_arcseconds'] for r in controls),\n             seconds=time.perf_counter()-started)\nreport=dict(plan=plan,production_imported=False,kernel_receipt='de440-download.json',kernel_sha256=download['sha256'],\n            packages={name:version(name) for name in ['jplephem','skyfield','numpy','scipy']},\n            summary=summary,geocentric_direction_controls=controls,rows=rows,\n            provenance={name:hashlib.sha256((base/name).read_bytes()).hexdigest() for name in [\n                'libofficial_sofa.dylib','libauthor_swiss_2_10_03_contract.dylib',\n                'de440_solar_reference_geometry.c','libde440_solar_reference_geometry.dylib','generate_de440_polar_reference.py']},\n            scope='Independent source/optical comparison at identical declared clocks and conventions. No observed EOP, atmospheric, continuous-domain or SOTA certificate.')\npath=base/'de440-polar-observation-reference.json.gz'\npath.write_bytes(gzip.compress(json.dumps(report,separators=(',',':')).encode(),mtime=0))\nsummary['reference_sha256']=hashlib.sha256(path.read_bytes()).hexdigest()\n(base/'de440-polar-observation-summary.json').write_text(json.dumps(summary,indent=2)+'\\n')\nprint(json.dumps(summary),flush=True)\nkernel.close();sky.close()\n",
+    "de440_solar_reference_geometry.c": "/* Experimental reference geometry around original Swiss/SOFA primitives.\n * No ephemeris coordinates are taken from Swiss here. Hindu beta=0 retains\n * the controlled native source plane, after independent JPL apparent optics.\n */\n#include <math.h>\n#include \"sofa.h\"\n#include \"swephexp.h\"\n#include \"swephlib.h\"\n\nint fb_de440_receiver(double tt, double ut1, double lon, double lat, double height,\n                      double *out) {\n    double n[3][3],c2i[3][3],pv[2][3],position[3],velocity[3],theta,gast;int i,j;\n    iauPnm06a(tt,0,n);iauC2i06a(tt,0,c2i);theta=iauEra00(ut1,0);\n    iauPvtob(lon*M_PI/180,lat*M_PI/180,height,0,0,0,theta,pv);\n    iauTrxp(c2i,pv[0],position);iauTrxp(c2i,pv[1],velocity);\n    gast=iauGst06(ut1,0,tt,0,n);\n    for(i=0;i<34;++i)out[i]=0;\n    for(i=0;i<3;++i) {\n        out[i]=position[i]/149597870700.;out[3+i]=velocity[i]*86400/149597870700.;\n        for(j=0;j<3;++j)out[21+3*i+j]=n[i][j];\n    }\n    out[30]=iauAnp(gast)*180/M_PI;\n    return 0;\n}\n\nint fb_de440_reduce_direction(double tt, double lon, double lat, int definition,\n                              const double *observer, const double *apparent,\n                              double *out) {\n    double frame[3][3],pb[3][3],nut[3][3],p[3][3],angles[6],equ[3],icrs[3],target[3];\n    double lambda,epsilon,local,phi,east,north,up; int i,j; char error[256]={0};\n    for(i=0;i<3;++i) for(j=0;j<3;++j) frame[i][j]=observer[21+3*i+j];\n    if(definition==0) {\n        if(swe_calc(tt,SE_ECL_NUT,SEFLG_MOSEPH,angles,error)<0) return -1;\n        for(j=0;j<3;++j) {\n            double v[6]={0,0,0,0,0,0};v[j]=1;\n            swi_bias(v,tt,SEFLG_MOSEPH,0);swi_precess(v,tt,SEFLG_MOSEPH,-1);\n            for(i=0;i<3;++i)pb[i][j]=v[i];\n        }\n        iauNumat(angles[1]*M_PI/180,angles[2]*M_PI/180,angles[3]*M_PI/180,nut);\n        iauRxr(nut,pb,p);iauRxp(p,(double *)apparent,equ);\n        epsilon=angles[0]*M_PI/180;\n        lambda=atan2(equ[1]*cos(epsilon)+equ[2]*sin(epsilon),equ[0]);\n        equ[0]=cos(lambda);equ[1]=sin(lambda)*cos(epsilon);equ[2]=sin(lambda)*sin(epsilon);\n        iauTrxp(p,equ,icrs);iauRxp(frame,icrs,target);\n    } else {\n        iauRxp(frame,(double *)apparent,target);\n    }\n    local=(observer[30]+lon)*M_PI/180;phi=lat*M_PI/180;\n    east=-sin(local)*target[0]+cos(local)*target[1];\n    north=-sin(phi)*cos(local)*target[0]-sin(phi)*sin(local)*target[1]+cos(phi)*target[2];\n    up=cos(phi)*cos(local)*target[0]+cos(phi)*sin(local)*target[1]+sin(phi)*target[2];\n    for(i=0;i<3;++i)out[i]=target[i];\n    out[3]=atan2(up,hypot(east,north))*180/M_PI;\n    return 0;\n}\n",
+    "generate_de440_polar_reference.first-attempt.py": "\"\"\"Fresh original JPL/SOFA fixed-clock control, with no FateBridge import.\"\"\"\nimport ctypes as C\nimport gzip\nimport hashlib\nfrom importlib.metadata import version\nimport json\nimport math\nfrom pathlib import Path\nimport sys\nimport time\n\nimport numpy as np\nfrom jplephem.spk import SPK\nfrom scipy.optimize import brentq, minimize_scalar\nfrom skyfield.api import load, load_file\n\nassert not any(name.startswith('fatebridge') for name in sys.modules)\nbase=Path(__file__).parent\nplan=json.loads((base/'de440-polar-observation-plan.json').read_text())\nkernel_path=base/'original-de440.bsp'\ndownload=json.loads((base/'de440-download.json').read_text())\nassert hashlib.sha256(kernel_path.read_bytes()).hexdigest()==download['sha256']\nkernel=SPK.open(kernel_path)\nsky=load_file(str(kernel_path));ts=load.timescale(builtin=True)\nsofa=C.CDLL(str(base/'libofficial_sofa.dylib'))\nauthor=C.CDLL(str(base/'libauthor_swiss_2_10_03_contract.dylib'))\nobserver=C.CDLL(str(base/'libobserver_reference_contract.dylib'))\ngeometry=C.CDLL(str(base/'libde440_solar_reference_geometry.dylib'))\nDP=C.POINTER(C.c_double)\nsofa.iauDtdb.argtypes=[C.c_double]*6;sofa.iauDtdb.restype=C.c_double\nsofa.iauAb.argtypes=[DP,DP,C.c_double,C.c_double,DP];sofa.iauAb.restype=None\nobserver.fb_observer_reference.argtypes=[C.c_double]*5+[DP]\nobserver.fb_observer_reference.restype=C.c_int\ngeometry.fb_de440_reduce_direction.argtypes=[C.c_double]*3+[C.c_int,DP,DP,DP]\ngeometry.fb_de440_reduce_direction.restype=C.c_int\nauthor.swe_deltat_ex.argtypes=[C.c_double,C.c_int,C.c_char_p];author.swe_deltat_ex.restype=C.c_double\nauthor.swe_set_ephe_path.argtypes=[C.c_char_p];author.swe_set_ephe_path(b'/Users/thomas/Desktop/FateBridge/ephe')\nauthor.swe_refrac_extended.argtypes=[C.c_double]*5+[C.c_int,DP];author.swe_refrac_extended.restype=C.c_double\nthreshold=author.swe_refrac_extended(0.,0.,1013.25,0.,.0065,1,(C.c_double*4)())\nAU_KM=149597870.7;LIGHT_AU_DAY=173.14463267424034\n\n\ndef apparent_sun(tt,receiver_position,receiver_velocity):\n    \"\"\"Fixed receiver, two-part native TDB source and one official aberration.\"\"\"\n    offset=tt-2451545.+sofa.iauDtdb(2451545.,tt-2451545.,0.,0.,0.,0.)/86400\n    emb=np.asarray(kernel[0,3].compute_and_differentiate(2451545.,offset))\n    earth=np.asarray(kernel[3,399].compute_and_differentiate(2451545.,offset))+emb\n    reception=earth[0]/AU_KM+receiver_position\n    velocity=earth[1]/AU_KM+receiver_velocity\n    sun_now=kernel[0,10].compute(2451545.,offset)/AU_KM\n    solar_distance=float(np.linalg.norm(sun_now-reception))\n    delay=0.\n    for iterations in range(12):\n        emitted=kernel[0,10].compute(2451545.,offset-delay)/AU_KM\n        ray=emitted-reception;distance=float(np.linalg.norm(ray))\n        new_delay=distance/LIGHT_AU_DAY\n        if new_delay==delay or abs(new_delay-delay)<1e-16:break\n        delay=new_delay\n    else:raise RuntimeError('JPL source light cone did not converge')\n    direction=ray/distance;beta=velocity/LIGHT_AU_DAY;result=np.full(3,np.nan)\n    sofa.iauAb(direction.ctypes.data_as(DP),beta.ctypes.data_as(DP),solar_distance,\n               math.sqrt(1-float(beta@beta)),result.ctypes.data_as(DP))\n    return result,offset,iterations+1\n\n\nold=json.loads(gzip.decompress((base/'solar-event-polar-cluster-reference.json.gz').read_bytes()))\ncases=json.loads((base/'solar-event-polar-cluster-cases.json').read_text())\ncontrols=[]\nfor index,construction in enumerate(old['constructions']):\n    if construction['source_flags']!=4:continue\n    ut1=construction['critical_time_ut1'];tt=ut1+author.swe_deltat_ex(ut1,2,C.create_string_buffer(256))\n    own,offset,iterations=apparent_sun(tt,np.zeros(3),np.zeros(3))\n    other=sky['earth'].at(ts.tdb_jd(2451545.,offset)).observe(sky['sun']).apparent().position.au\n    other=other/np.linalg.norm(other)\n    error=math.atan2(float(np.linalg.norm(np.cross(own,other))),float(own@other))*180/math.pi*3600\n    controls.append(dict(construction=index,tt=tt,tdb_days_from_j2000=offset,\n                         reference_icrs=own.tolist(),skyfield_icrs=other.tolist(),\n                         separation_arcseconds=error,light_cone_iterations=iterations))\nrows=[];started=time.perf_counter()\nfor case,expected in zip(cases,old['rows'],strict=True):\n    if case['source_flags']!=4:continue\n    query=case['query_ut1'];horizon=threshold if case['definition'] else 0.;cache={}\n\n    def at(delta):\n        ut1=float(query+float(delta))\n        if ut1 not in cache:\n            tt=ut1+author.swe_deltat_ex(ut1,2,C.create_string_buffer(256))\n            pv=np.full(34,np.nan)\n            status=observer.fb_observer_reference(tt,ut1,case['longitude'],case['latitude'],0.,pv.ctypes.data_as(DP))\n            assert status==0,status\n            position=pv[:3] if case['definition'] else np.zeros(3)\n            velocity=pv[3:6] if case['definition'] else np.zeros(3)\n            ray,offset,iterations=apparent_sun(tt,position,velocity)\n            result=np.full(4,np.nan)\n            status=geometry.fb_de440_reduce_direction(tt,case['longitude'],case['latitude'],case['definition'],\n                                                     pv.ctypes.data_as(DP),ray.ctypes.data_as(DP),result.ctypes.data_as(DP))\n            assert status==0,status\n            cache[ut1]=(float(result[3]-horizon),tt,iterations)\n        return cache[ut1][0]\n\n    grid=[i/1440 for i in range(1561)];values=[at(x) for x in grid];extrema=[]\n    for j in range(1,len(grid)-1):\n        a,b,c=values[j-1:j+2]\n        if b>a and b>=c:sign=-1\n        elif b<a and b<=c:sign=1\n        else:continue\n        centre=grid[j]\n        solved=minimize_scalar(lambda q:sign*at(centre+q),bounds=(grid[j-1]-centre,grid[j+1]-centre),method='bounded',options={'xatol':1e-12,'maxiter':150})\n        assert solved.success\n        point=centre+float(solved.x);grid.append(point)\n        extrema.append(dict(ut1=float(query+point),kind='maximum' if sign<0 else 'minimum',residual_degrees=at(point)))\n    grid=sorted(set(grid));events=[]\n    for a,b in zip(grid,grid[1:]):\n        fa,fb=at(a),at(b);rising,setting=fa<0<=fb,fa>0>=fb\n        if not(rising or setting):continue\n        root,info=brentq(at,a,b,xtol=5e-15,rtol=4*np.finfo(float).eps,maxiter=150,full_output=True)\n        assert info.converged\n        ut1=float(query+root)\n        if events and abs(ut1-events[-1]['ut1'])*86400<.0001:continue\n        events.append(dict(ut1=ut1,tt=cache[ut1][1],kind='rise' if rising else 'set',residual_degrees=at(root)))\n    rows.append(dict(case=expected['case'],input=case,status='ok',actual_source='original_JPL_DE440',roots=events,\n                     extrema=extrema,evaluations=len(cache),maximum_light_cone_iterations=max(v[2] for v in cache.values())))\n    if len(rows)%16==0:print(json.dumps(dict(windows=len(rows),seconds=time.perf_counter()-started)),flush=True)\nsummary=dict(windows=len(rows),roots=sum(len(r['roots']) for r in rows),skyfield_controls=len(controls),\n             maximum_skyfield_direction_difference_arcseconds=max(r['separation_arcseconds'] for r in controls),\n             seconds=time.perf_counter()-started)\nreport=dict(plan=plan,production_imported=False,kernel_receipt='de440-download.json',kernel_sha256=download['sha256'],\n            packages={name:version(name) for name in ['jplephem','skyfield','numpy','scipy']},\n            summary=summary,geocentric_direction_controls=controls,rows=rows,\n            provenance={name:hashlib.sha256((base/name).read_bytes()).hexdigest() for name in [\n                'libofficial_sofa.dylib','libobserver_reference_contract.dylib','libauthor_swiss_2_10_03_contract.dylib',\n                'de440_solar_reference_geometry.c','libde440_solar_reference_geometry.dylib','generate_de440_polar_reference.py']},\n            scope='Independent source/optical comparison at identical declared clocks and conventions. No observed EOP, atmospheric, continuous-domain or SOTA certificate.')\npath=base/'de440-polar-observation-reference.json.gz'\npath.write_bytes(gzip.compress(json.dumps(report,separators=(',',':')).encode(),mtime=0))\nsummary['reference_sha256']=hashlib.sha256(path.read_bytes()).hexdigest()\n(base/'de440-polar-observation-summary.json').write_text(json.dumps(summary,indent=2)+'\\n')\nprint(json.dumps(summary),flush=True)\nkernel.close();sky.close()\n",
+    "generate_de440_polar_reference.second-attempt.py": "\"\"\"Fresh original JPL/SOFA fixed-clock control, with no FateBridge import.\"\"\"\nimport ctypes as C\nimport gzip\nimport hashlib\nfrom importlib.metadata import version\nimport json\nimport math\nfrom pathlib import Path\nimport sys\nimport time\n\nimport numpy as np\nfrom jplephem.spk import SPK\nfrom scipy.optimize import brentq, minimize_scalar\nfrom skyfield.api import load, load_file\n\nassert not any(name.startswith('fatebridge') for name in sys.modules)\nbase=Path(__file__).parent\nplan=json.loads((base/'de440-polar-observation-plan.json').read_text())\nkernel_path=base/'original-de440.bsp'\ndownload=json.loads((base/'de440-download.json').read_text())\nassert hashlib.sha256(kernel_path.read_bytes()).hexdigest()==download['sha256']\nkernel=SPK.open(kernel_path)\nsky=load_file(str(kernel_path));ts=load.timescale(builtin=True)\nsofa=C.CDLL(str(base/'libofficial_sofa.dylib'))\nauthor=C.CDLL(str(base/'libauthor_swiss_2_10_03_contract.dylib'))\nobserver=C.CDLL(str(base/'libobserver_reference_contract.dylib'))\ngeometry=C.CDLL(str(base/'libde440_solar_reference_geometry.dylib'))\nDP=C.POINTER(C.c_double)\nsofa.iauDtdb.argtypes=[C.c_double]*6;sofa.iauDtdb.restype=C.c_double\nsofa.iauAb.argtypes=[DP,DP,C.c_double,C.c_double,DP];sofa.iauAb.restype=None\nobserver.fb_observer_reference.argtypes=[C.c_double]*5+[DP]\nobserver.fb_observer_reference.restype=C.c_int\ngeometry.fb_de440_reduce_direction.argtypes=[C.c_double]*3+[C.c_int,DP,DP,DP]\ngeometry.fb_de440_reduce_direction.restype=C.c_int\nauthor.swe_deltat_ex.argtypes=[C.c_double,C.c_int,C.c_char_p];author.swe_deltat_ex.restype=C.c_double\nauthor.swe_set_ephe_path.argtypes=[C.c_char_p];author.swe_set_ephe_path(b'/Users/thomas/Desktop/FateBridge/ephe')\nauthor.swe_calc.argtypes=[C.c_double,C.c_int,C.c_int,DP,C.c_char_p];author.swe_calc.restype=C.c_int\nauthor.swe_refrac_extended.argtypes=[C.c_double]*5+[C.c_int,DP];author.swe_refrac_extended.restype=C.c_double\nthreshold=author.swe_refrac_extended(0.,0.,1013.25,0.,.0065,1,(C.c_double*4)())\nAU_KM=149597870.7;LIGHT_AU_DAY=173.14463267424034\n\n\ndef apparent_sun(tt,receiver_position,receiver_velocity):\n    \"\"\"Fixed receiver, two-part native TDB source and one official aberration.\"\"\"\n    offset=tt-2451545.+sofa.iauDtdb(2451545.,tt-2451545.,0.,0.,0.,0.)/86400\n    emb=np.asarray(kernel[0,3].compute_and_differentiate(2451545.,offset))\n    earth=np.asarray(kernel[3,399].compute_and_differentiate(2451545.,offset))+emb\n    reception=earth[0]/AU_KM+receiver_position\n    velocity=earth[1]/AU_KM+receiver_velocity\n    sun_now=kernel[0,10].compute(2451545.,offset)/AU_KM\n    solar_distance=float(np.linalg.norm(sun_now-reception))\n    delay=0.\n    for iterations in range(12):\n        emitted=kernel[0,10].compute(2451545.,offset-delay)/AU_KM\n        ray=emitted-reception;distance=float(np.linalg.norm(ray))\n        new_delay=distance/LIGHT_AU_DAY\n        if new_delay==delay or abs(new_delay-delay)<1e-16:break\n        delay=new_delay\n    else:raise RuntimeError('JPL source light cone did not converge')\n    direction=ray/distance;beta=velocity/LIGHT_AU_DAY;result=np.full(3,np.nan)\n    sofa.iauAb(direction.ctypes.data_as(DP),beta.ctypes.data_as(DP),solar_distance,\n               math.sqrt(1-float(beta@beta)),result.ctypes.data_as(DP))\n    return result,offset,iterations+1\n\n\nold=json.loads(gzip.decompress((base/'solar-event-polar-cluster-reference.json.gz').read_bytes()))\ncases=json.loads((base/'solar-event-polar-cluster-cases.json').read_text())\ncontrols=[]\nfor index,construction in enumerate(old['constructions']):\n    if construction['source_flags']!=4:continue\n    ut1=construction['critical_time_ut1'];tt=ut1+author.swe_deltat_ex(ut1,2,C.create_string_buffer(256))\n    own,offset,iterations=apparent_sun(tt,np.zeros(3),np.zeros(3))\n    other=sky['earth'].at(ts.tdb_jd(2451545.,offset)).observe(sky['sun']).apparent().position.au\n    other=other/np.linalg.norm(other)\n    error=math.atan2(float(np.linalg.norm(np.cross(own,other))),float(own@other))*180/math.pi*3600\n    controls.append(dict(construction=index,tt=tt,tdb_days_from_j2000=offset,\n                         reference_icrs=own.tolist(),skyfield_icrs=other.tolist(),\n                         separation_arcseconds=error,light_cone_iterations=iterations))\nrows=[];started=time.perf_counter()\nfor case,expected in zip(cases,old['rows'],strict=True):\n    if case['source_flags']!=4:continue\n    query=case['query_ut1'];horizon=threshold if case['definition'] else 0.;cache={}\n\n    def at(delta):\n        ut1=float(query+float(delta))\n        if ut1 not in cache:\n            tt=ut1+author.swe_deltat_ex(ut1,2,C.create_string_buffer(256))\n            pv=np.full(34,np.nan)\n            status=observer.fb_observer_reference(tt,ut1,case['longitude'],case['latitude'],0.,pv.ctypes.data_as(DP))\n            if status!=0:\n                native_values=(C.c_double*6)();native_error=C.create_string_buffer(256)\n                native_status=author.swe_calc(tt,0,2|2048,native_values,native_error)\n                raise RuntimeError(dict(case=expected['case'],ut1=ut1,tt=tt,observer_status=status,native_status=native_status,native_error=native_error.value.decode()))\n            position=pv[:3] if case['definition'] else np.zeros(3)\n            velocity=pv[3:6] if case['definition'] else np.zeros(3)\n            ray,offset,iterations=apparent_sun(tt,position,velocity)\n            result=np.full(4,np.nan)\n            status=geometry.fb_de440_reduce_direction(tt,case['longitude'],case['latitude'],case['definition'],\n                                                     pv.ctypes.data_as(DP),ray.ctypes.data_as(DP),result.ctypes.data_as(DP))\n            assert status==0,status\n            cache[ut1]=(float(result[3]-horizon),tt,iterations)\n        return cache[ut1][0]\n\n    grid=[i/1440 for i in range(1561)];values=[at(x) for x in grid];extrema=[]\n    for j in range(1,len(grid)-1):\n        a,b,c=values[j-1:j+2]\n        if b>a and b>=c:sign=-1\n        elif b<a and b<=c:sign=1\n        else:continue\n        centre=grid[j]\n        solved=minimize_scalar(lambda q:sign*at(centre+q),bounds=(grid[j-1]-centre,grid[j+1]-centre),method='bounded',options={'xatol':1e-12,'maxiter':150})\n        assert solved.success\n        point=centre+float(solved.x);grid.append(point)\n        extrema.append(dict(ut1=float(query+point),kind='maximum' if sign<0 else 'minimum',residual_degrees=at(point)))\n    grid=sorted(set(grid));events=[]\n    for a,b in zip(grid,grid[1:]):\n        fa,fb=at(a),at(b);rising,setting=fa<0<=fb,fa>0>=fb\n        if not(rising or setting):continue\n        root,info=brentq(at,a,b,xtol=5e-15,rtol=4*np.finfo(float).eps,maxiter=150,full_output=True)\n        assert info.converged\n        ut1=float(query+root)\n        if events and abs(ut1-events[-1]['ut1'])*86400<.0001:continue\n        events.append(dict(ut1=ut1,tt=cache[ut1][1],kind='rise' if rising else 'set',residual_degrees=at(root)))\n    rows.append(dict(case=expected['case'],input=case,status='ok',actual_source='original_JPL_DE440',roots=events,\n                     extrema=extrema,evaluations=len(cache),maximum_light_cone_iterations=max(v[2] for v in cache.values())))\n    if len(rows)%16==0:print(json.dumps(dict(windows=len(rows),seconds=time.perf_counter()-started)),flush=True)\nsummary=dict(windows=len(rows),roots=sum(len(r['roots']) for r in rows),skyfield_controls=len(controls),\n             maximum_skyfield_direction_difference_arcseconds=max(r['separation_arcseconds'] for r in controls),\n             seconds=time.perf_counter()-started)\nreport=dict(plan=plan,production_imported=False,kernel_receipt='de440-download.json',kernel_sha256=download['sha256'],\n            packages={name:version(name) for name in ['jplephem','skyfield','numpy','scipy']},\n            summary=summary,geocentric_direction_controls=controls,rows=rows,\n            provenance={name:hashlib.sha256((base/name).read_bytes()).hexdigest() for name in [\n                'libofficial_sofa.dylib','libobserver_reference_contract.dylib','libauthor_swiss_2_10_03_contract.dylib',\n                'de440_solar_reference_geometry.c','libde440_solar_reference_geometry.dylib','generate_de440_polar_reference.py']},\n            scope='Independent source/optical comparison at identical declared clocks and conventions. No observed EOP, atmospheric, continuous-domain or SOTA certificate.')\npath=base/'de440-polar-observation-reference.json.gz'\npath.write_bytes(gzip.compress(json.dumps(report,separators=(',',':')).encode(),mtime=0))\nsummary['reference_sha256']=hashlib.sha256(path.read_bytes()).hexdigest()\n(base/'de440-polar-observation-summary.json').write_text(json.dumps(summary,indent=2)+'\\n')\nprint(json.dumps(summary),flush=True)\nkernel.close();sky.close()\n",
+    "diagnose_native_solar_source_cache.py": "\"\"\"Original-C call-order controls; file bytes are observed, never changed.\"\"\"\nimport ctypes as C\nimport hashlib\nimport json\nfrom pathlib import Path\nimport sys\n\nassert not any(name.startswith('fatebridge') for name in sys.modules)\nbase=Path(__file__).parent\nlibrary_path=base/'libauthor_swiss_2_10_03_contract.dylib'\nlibrary=C.CDLL(str(library_path));DP=C.POINTER(C.c_double)\nlibrary.swe_calc.argtypes=[C.c_double,C.c_int,C.c_int,DP,C.c_char_p]\nlibrary.swe_calc.restype=C.c_int\nlibrary.swe_set_ephe_path.argtypes=[C.c_char_p]\nlibrary.swe_deltat_ex.argtypes=[C.c_double,C.c_int,C.c_char_p]\nlibrary.swe_deltat_ex.restype=C.c_double\nfile=Path('/Users/thomas/Desktop/FateBridge/ephe/semo_18.se1')\nbefore=hashlib.sha256(file.read_bytes()).hexdigest()\ncase=json.loads((base/'solar-event-polar-cluster-cases.json').read_text())[8]\nresults={}\nfor profile in ['sun_only','sun_then_moshier_ecl_nut','moshier_sun_preflight_then_sun_then_ecl_nut']:\n    library.swe_set_ephe_path(b'/Users/thomas/Desktop/FateBridge/ephe')\n    records=[]\n    for index in range(32):\n        ut1=case['query_ut1']+index/1440\n        tt=ut1+library.swe_deltat_ex(ut1,2,C.create_string_buffer(256))\n        record=dict(index=index,ut1=ut1,tt=tt,calls=[])\n        calls=([(0,4)] if profile.startswith('moshier_sun') else [])+[(0,2|2048)]\n        if profile!='sun_only':calls.append((-1,4))\n        for body,flags in calls:\n            values=(C.c_double*6)();error=C.create_string_buffer(256)\n            returned=library.swe_calc(tt,body,flags,values,error)\n            record['calls'].append(dict(body=body,requested=flags,returned=returned,\n                                        error=error.value.decode(),coordinates=list(values)))\n        records.append(record)\n    results[profile]=dict(native_errors=sum(c['returned']<0 for r in records for c in r['calls']),records=records)\nafter=hashlib.sha256(file.read_bytes()).hexdigest()\nassert before==after\noutput=dict(production_imported=False,original_sources_modified=False,\n             library_sha256=hashlib.sha256(library_path.read_bytes()).hexdigest(),\n             source_script_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),\n             file_sha256_before=before,file_sha256_after=after,results=results,\n             scope='Original C call-order diagnosis. The damaged(4) message is not evidence of a changed file; bytes remain identical. No production error was waived.')\n(base/'native-solar-ecl-nut-cache-diagnosis.json').write_text(json.dumps(output,indent=2)+'\\n')\nprint(json.dumps({k:v['native_errors'] for k,v in results.items()}),flush=True)\n"
+  },
+  "first_attempt_failure": "Traceback (most recent call last):\n  File \"/Users/thomas/.codex/artifacts/fatebridge-celestial-frame-20261114/generate_de440_polar_reference.py\", line 101, in <module>\n    grid=[i/1440 for i in range(1561)];values=[at(x) for x in grid];extrema=[]\n                                               ^^^^^\n  File \"/Users/thomas/.codex/artifacts/fatebridge-celestial-frame-20261114/generate_de440_polar_reference.py\", line 90, in at\n    assert status==0,status\n           ^^^^^^^^^\nAssertionError: -1\n",
+  "second_attempt_failure": "Traceback (most recent call last):\n  File \"/Users/thomas/.codex/artifacts/fatebridge-celestial-frame-20261114/generate_de440_polar_reference.py\", line 105, in <module>\n    grid=[i/1440 for i in range(1561)];values=[at(x) for x in grid];extrema=[]\n                                               ^^^^^\n  File \"/Users/thomas/.codex/artifacts/fatebridge-celestial-frame-20261114/generate_de440_polar_reference.py\", line 94, in at\n    raise RuntimeError(dict(case=expected['case'],ut1=ut1,tt=tt,observer_status=status,native_status=native_status,native_error=native_error.value.decode()))\nRuntimeError: {'case': 8, 'ut1': 2451623.691864198, 'tt': 2451623.692603689, 'observer_status': -1, 'native_status': -1, 'native_error': 'Ephemeris file /Users/thomas/Desktop/FateBridge/ephe/semo_18.se1 is damaged (4).'}\n",
+  "native_cache_control": {
+    "production_imported": false,
+    "original_sources_modified": false,
+    "library_sha256": "be00582baf530da43f13914bb71b5eea5f7126843b9357896a7ba980753a0669",
+    "source_script_sha256": "e048678d5bd89e9f09a2ef0baa5a20ddadcdcd01458497fedcf26fce1683566e",
+    "file_sha256_before": "1ca07bd67c24374d77226180c20a4f9996cba013697894810518e7eb582ca4f7",
+    "file_sha256_after": "1ca07bd67c24374d77226180c20a4f9996cba013697894810518e7eb582ca4f7",
+    "results": {
+      "sun_only": {
+        "native_errors": 0,
+        "records": [
+          {
+            "index": 0,
+            "ut1": 2451623.6911697537,
+            "tt": 2451623.6919092447,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.8861088975131,
+                  -0.049304118535386264,
+                  0.9959261149304898,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 1,
+            "ut1": 2451623.691864198,
+            "tt": 2451623.692603689,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.8867416400759,
+                  -0.04902979149412566,
+                  0.9959263090596575,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 2,
+            "ut1": 2451623.6925586425,
+            "tt": 2451623.6932981336,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.887374382387,
+                  -0.04875546455752397,
+                  0.9959265031900627,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 3,
+            "ut1": 2451623.693253087,
+            "tt": 2451623.693992578,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.8880071244468,
+                  -0.048481137725458215,
+                  0.9959266973216991,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 4,
+            "ut1": 2451623.6939475313,
+            "tt": 2451623.6946870224,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.888639866255,
+                  -0.04820681099808912,
+                  0.9959268914545727,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 5,
+            "ut1": 2451623.6946419757,
+            "tt": 2451623.6953814668,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.88927260781196,
+                  -0.04793248437531763,
+                  0.9959270855886777,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 6,
+            "ut1": 2451623.6953364206,
+            "tt": 2451623.6960759116,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.8899053495417,
+                  -0.047658157673372364,
+                  0.9959272797241496,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 7,
+            "ut1": 2451623.696030865,
+            "tt": 2451623.696770356,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.8905380905958,
+                  -0.04738383126011376,
+                  0.9959274738607263,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 8,
+            "ut1": 2451623.6967253094,
+            "tt": 2451623.6974648004,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.8911708313987,
+                  -0.04710950495153861,
+                  0.9959276679985332,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 9,
+            "ut1": 2451623.6974197538,
+            "tt": 2451623.698159245,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.8918035719503,
+                  -0.046835178747821636,
+                  0.9959278621375779,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 10,
+            "ut1": 2451623.698114198,
+            "tt": 2451623.6988536892,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.8924363122508,
+                  -0.04656085264885363,
+                  0.9959280562778539,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 11,
+            "ut1": 2451623.6988086426,
+            "tt": 2451623.6995481336,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.89306905229995,
+                  -0.04628652665482055,
+                  0.9959282504193658,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 12,
+            "ut1": 2451623.699503087,
+            "tt": 2451623.700242578,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.8937017920979,
+                  -0.04601220076566884,
+                  0.995928444562112,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 13,
+            "ut1": 2451623.7001975314,
+            "tt": 2451623.7009370225,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.8943345316449,
+                  -0.04573787498135533,
+                  0.9959286387060897,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 14,
+            "ut1": 2451623.700891976,
+            "tt": 2451623.701631467,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.89496727094075,
+                  -0.045463549302057066,
+                  0.995928832851304,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 15,
+            "ut1": 2451623.70158642,
+            "tt": 2451623.7023259113,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.8956000099857,
+                  -0.045189223727667316,
+                  0.995929026997749,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 16,
+            "ut1": 2451623.7022808646,
+            "tt": 2451623.7030203557,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.8962327487794,
+                  -0.04491489825836166,
+                  0.9959292211454305,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 17,
+            "ut1": 2451623.7029753095,
+            "tt": 2451623.7037148005,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.8968654877465,
+                  -0.04464057271013514,
+                  0.9959294152944763,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 18,
+            "ut1": 2451623.703669754,
+            "tt": 2451623.704409245,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.8974982260386,
+                  -0.04436624745084794,
+                  0.9959296094446226,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 19,
+            "ut1": 2451623.7043641983,
+            "tt": 2451623.7051036893,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.89813096407954,
+                  -0.04409192229674375,
+                  0.9959298035960057,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 20,
+            "ut1": 2451623.7050586427,
+            "tt": 2451623.7057981337,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.8987637018698,
+                  -0.043817597247696224,
+                  0.9959299977486196,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 21,
+            "ut1": 2451623.705753087,
+            "tt": 2451623.706492578,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.89939643940914,
+                  -0.04354327230387168,
+                  0.9959301919024696,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 22,
+            "ut1": 2451623.7064475315,
+            "tt": 2451623.7071870225,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.90002917669767,
+                  -0.043268947465243186,
+                  0.9959303860575531,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 23,
+            "ut1": 2451623.707141976,
+            "tt": 2451623.707881467,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.9006619137356,
+                  -0.04299462273176525,
+                  0.9959305802138677,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 24,
+            "ut1": 2451623.7078364203,
+            "tt": 2451623.7085759114,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.90129465052263,
+                  -0.04272029810361234,
+                  0.9959307743714186,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 25,
+            "ut1": 2451623.7085308647,
+            "tt": 2451623.7092703558,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.9019273870592,
+                  -0.042445973580663494,
+                  0.9959309685301995,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 26,
+            "ut1": 2451623.709225309,
+            "tt": 2451623.7099648,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.902560123345,
+                  -0.0421716491631097,
+                  0.995931162690217,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 27,
+            "ut1": 2451623.7099197535,
+            "tt": 2451623.7106592446,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.90319285938006,
+                  -0.04189732485089908,
+                  0.9959313568514678,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 28,
+            "ut1": 2451623.710614198,
+            "tt": 2451623.711353689,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.90382559516485,
+                  -0.04162300064398929,
+                  0.9959315510139491,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 29,
+            "ut1": 2451623.7113086428,
+            "tt": 2451623.712048134,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.9044583311231,
+                  -0.04134867635860662,
+                  0.9959317451777965,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 30,
+            "ut1": 2451623.712003087,
+            "tt": 2451623.7127425782,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.9050910664069,
+                  -0.041074352362537744,
+                  0.9959319393427445,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 31,
+            "ut1": 2451623.7126975316,
+            "tt": 2451623.7134370226,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.90572380144,
+                  -0.040800028472018496,
+                  0.9959321335089284,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "sun_then_moshier_ecl_nut": {
+        "native_errors": 24,
+        "records": [
+          {
+            "index": 0,
+            "ut1": 2451623.6911697537,
+            "tt": 2451623.6919092447,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.8861088975131,
+                  -0.049304118535386264,
+                  0.9959261149304898,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.43813883646164,
+                  23.439251414089874,
+                  -0.00408517452552478,
+                  -0.001112577628234375,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 1,
+            "ut1": 2451623.691864198,
+            "tt": 2451623.692603689,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": -1,
+                "error": "Ephemeris file /Users/thomas/Desktop/FateBridge/ephe/sepl_18.se1 is damaged (4).",
+                "coordinates": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.438138839260986,
+                  23.439251413842513,
+                  -0.004085203715902241,
+                  -0.0011125745815251506,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 2,
+            "ut1": 2451623.6925586425,
+            "tt": 2451623.6932981336,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": -1,
+                "error": "Ephemeris file /Users/thomas/Desktop/FateBridge/ephe/semo_18.se1 is damaged (4).",
+                "coordinates": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.438138842057484,
+                  23.43925141359515,
+                  -0.004085232907333726,
+                  -0.001112571537664451,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 3,
+            "ut1": 2451623.693253087,
+            "tt": 2451623.693992578,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": -1,
+                "error": "Ephemeris file /Users/thomas/Desktop/FateBridge/ephe/sepl_18.se1 is damaged (4).",
+                "coordinates": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.43813884485114,
+                  23.43925141334779,
+                  -0.004085262099817024,
+                  -0.0011125684966523035,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 4,
+            "ut1": 2451623.6939475313,
+            "tt": 2451623.6946870224,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.888639866255,
+                  -0.04820681099808912,
+                  0.9959268914545727,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.438138847641937,
+                  23.439251413100425,
+                  -0.0040852912933499515,
+                  -0.0011125654584887342,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 5,
+            "ut1": 2451623.6946419757,
+            "tt": 2451623.6953814668,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": -1,
+                "error": "Ephemeris file /Users/thomas/Desktop/FateBridge/ephe/sepl_18.se1 is damaged (4).",
+                "coordinates": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.438138850429898,
+                  23.439251412853068,
+                  -0.004085320487930312,
+                  -0.0011125624231737693,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 6,
+            "ut1": 2451623.6953364206,
+            "tt": 2451623.6960759116,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": -1,
+                "error": "Ephemeris file /Users/thomas/Desktop/FateBridge/ephe/semo_18.se1 is damaged (4).",
+                "coordinates": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.438138853215005,
+                  23.439251412605707,
+                  -0.004085349683575496,
+                  -0.0011125593907054042,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 7,
+            "ut1": 2451623.696030865,
+            "tt": 2451623.696770356,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": -1,
+                "error": "Ephemeris file /Users/thomas/Desktop/FateBridge/ephe/sepl_18.se1 is damaged (4).",
+                "coordinates": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.43813885599726,
+                  23.439251412358345,
+                  -0.004085378880244157,
+                  -0.001112556361087728,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 8,
+            "ut1": 2451623.6967253094,
+            "tt": 2451623.6974648004,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.8911708313987,
+                  -0.04710950495153861,
+                  0.9959276679985332,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.43813885877667,
+                  23.439251412110988,
+                  -0.004085408077953675,
+                  -0.0011125533343187336,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 9,
+            "ut1": 2451623.6974197538,
+            "tt": 2451623.698159245,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": -1,
+                "error": "Ephemeris file /Users/thomas/Desktop/FateBridge/ephe/sepl_18.se1 is damaged (4).",
+                "coordinates": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.43813886155322,
+                  23.43925141186362,
+                  -0.004085437276701862,
+                  -0.0011125503103984458,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 10,
+            "ut1": 2451623.698114198,
+            "tt": 2451623.6988536892,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": -1,
+                "error": "Ephemeris file /Users/thomas/Desktop/FateBridge/ephe/semo_18.se1 is damaged (4).",
+                "coordinates": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.438138864326937,
+                  23.43925141161626,
+                  -0.0040854664764865285,
+                  -0.0011125472893268884,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 11,
+            "ut1": 2451623.6988086426,
+            "tt": 2451623.6995481336,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": -1,
+                "error": "Ephemeris file /Users/thomas/Desktop/FateBridge/ephe/sepl_18.se1 is damaged (4).",
+                "coordinates": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.4381388670978,
+                  23.4392514113689,
+                  -0.004085495677305485,
+                  -0.001112544271104086,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 12,
+            "ut1": 2451623.699503087,
+            "tt": 2451623.700242578,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.8937017920979,
+                  -0.04601220076566884,
+                  0.995928444562112,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.438138869865814,
+                  23.439251411121543,
+                  -0.004085524879156528,
+                  -0.0011125412557300642,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 13,
+            "ut1": 2451623.7001975314,
+            "tt": 2451623.7009370225,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": -1,
+                "error": "Ephemeris file /Users/thomas/Desktop/FateBridge/ephe/sepl_18.se1 is damaged (4).",
+                "coordinates": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.43813887263097,
+                  23.439251410874174,
+                  -0.004085554082037478,
+                  -0.0011125382432048434,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 14,
+            "ut1": 2451623.700891976,
+            "tt": 2451623.701631467,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": -1,
+                "error": "Ephemeris file /Users/thomas/Desktop/FateBridge/ephe/semo_18.se1 is damaged (4).",
+                "coordinates": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.43813887539329,
+                  23.439251410626817,
+                  -0.004085583285946139,
+                  -0.0011125352335284485,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 15,
+            "ut1": 2451623.70158642,
+            "tt": 2451623.7023259113,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": -1,
+                "error": "Ephemeris file /Users/thomas/Desktop/FateBridge/ephe/sepl_18.se1 is damaged (4).",
+                "coordinates": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.438138878152756,
+                  23.439251410379455,
+                  -0.004085612490880323,
+                  -0.0011125322267009023,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 16,
+            "ut1": 2451623.7022808646,
+            "tt": 2451623.7030203557,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.8962327487794,
+                  -0.04491489825836166,
+                  0.9959292211454305,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.438138880909367,
+                  23.43925141013209,
+                  -0.0040856416968378375,
+                  -0.0011125292227222273,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 17,
+            "ut1": 2451623.7029753095,
+            "tt": 2451623.7037148005,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": -1,
+                "error": "Ephemeris file /Users/thomas/Desktop/FateBridge/ephe/sepl_18.se1 is damaged (4).",
+                "coordinates": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.438138883663143,
+                  23.439251409884733,
+                  -0.004085670903836081,
+                  -0.0011125262215904356,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 18,
+            "ut1": 2451623.703669754,
+            "tt": 2451623.704409245,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": -1,
+                "error": "Ephemeris file /Users/thomas/Desktop/FateBridge/ephe/semo_18.se1 is damaged (4).",
+                "coordinates": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.438138886414063,
+                  23.43925140963737,
+                  -0.004085700111833684,
+                  -0.0011125232233095718,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 19,
+            "ut1": 2451623.7043641983,
+            "tt": 2451623.7051036893,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": -1,
+                "error": "Ephemeris file /Users/thomas/Desktop/FateBridge/ephe/sepl_18.se1 is damaged (4).",
+                "coordinates": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.43813888916214,
+                  23.439251409390014,
+                  -0.0040857293208480545,
+                  -0.001112520227877644,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 20,
+            "ut1": 2451623.7050586427,
+            "tt": 2451623.7057981337,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.8987637018698,
+                  -0.043817597247696224,
+                  0.9959299977486196,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.43813889190735,
+                  23.439251409142646,
+                  -0.0040857585308769805,
+                  -0.0011125172352946765,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 21,
+            "ut1": 2451623.705753087,
+            "tt": 2451623.706492578,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": -1,
+                "error": "Ephemeris file /Users/thomas/Desktop/FateBridge/ephe/sepl_18.se1 is damaged (4).",
+                "coordinates": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.43813889464973,
+                  23.439251408895288,
+                  -0.004085787741918296,
+                  -0.0011125142455606868,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 22,
+            "ut1": 2451623.7064475315,
+            "tt": 2451623.7071870225,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": -1,
+                "error": "Ephemeris file /Users/thomas/Desktop/FateBridge/ephe/semo_18.se1 is damaged (4).",
+                "coordinates": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.43813889738925,
+                  23.439251408647927,
+                  -0.004085816953969796,
+                  -0.0011125112586756972,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 23,
+            "ut1": 2451623.707141976,
+            "tt": 2451623.707881467,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": -1,
+                "error": "Ephemeris file /Users/thomas/Desktop/FateBridge/ephe/sepl_18.se1 is damaged (4).",
+                "coordinates": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.438138900125924,
+                  23.439251408400562,
+                  -0.00408584616702929,
+                  -0.0011125082746397286,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 24,
+            "ut1": 2451623.7078364203,
+            "tt": 2451623.7085759114,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.90129465052263,
+                  -0.04272029810361234,
+                  0.9959307743714186,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.43813890285975,
+                  23.4392514081532,
+                  -0.004085875381094596,
+                  -0.0011125052934527993,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 25,
+            "ut1": 2451623.7085308647,
+            "tt": 2451623.7092703558,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": -1,
+                "error": "Ephemeris file /Users/thomas/Desktop/FateBridge/ephe/sepl_18.se1 is damaged (4).",
+                "coordinates": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.438138905590726,
+                  23.439251407905843,
+                  -0.004085904596163513,
+                  -0.0011125023151149296,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 26,
+            "ut1": 2451623.709225309,
+            "tt": 2451623.7099648,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": -1,
+                "error": "Ephemeris file /Users/thomas/Desktop/FateBridge/ephe/semo_18.se1 is damaged (4).",
+                "coordinates": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.438138908318862,
+                  23.439251407658485,
+                  -0.004085933812233865,
+                  -0.0011124993396261383,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 27,
+            "ut1": 2451623.7099197535,
+            "tt": 2451623.7106592446,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": -1,
+                "error": "Ephemeris file /Users/thomas/Desktop/FateBridge/ephe/sepl_18.se1 is damaged (4).",
+                "coordinates": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.43813891104413,
+                  23.439251407411117,
+                  -0.004085963029303454,
+                  -0.0011124963669864455,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 28,
+            "ut1": 2451623.710614198,
+            "tt": 2451623.711353689,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.90382559516485,
+                  -0.04162300064398929,
+                  0.9959315510139491,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.43813891376656,
+                  23.43925140716376,
+                  -0.004085992247370094,
+                  -0.0011124933971958688,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 29,
+            "ut1": 2451623.7113086428,
+            "tt": 2451623.712048134,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": -1,
+                "error": "Ephemeris file /Users/thomas/Desktop/FateBridge/ephe/sepl_18.se1 is damaged (4).",
+                "coordinates": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.438138916486146,
+                  23.439251406916398,
+                  -0.004086021466451185,
+                  -0.0011124904302524383,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 30,
+            "ut1": 2451623.712003087,
+            "tt": 2451623.7127425782,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": -1,
+                "error": "Ephemeris file /Users/thomas/Desktop/FateBridge/ephe/semo_18.se1 is damaged (4).",
+                "coordinates": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.438138919202878,
+                  23.439251406669037,
+                  -0.0040860506865053525,
+                  -0.001112487466160151,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 31,
+            "ut1": 2451623.7126975316,
+            "tt": 2451623.7134370226,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": -1,
+                "error": "Ephemeris file /Users/thomas/Desktop/FateBridge/ephe/sepl_18.se1 is damaged (4).",
+                "coordinates": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.438138921916757,
+                  23.439251406421672,
+                  -0.004086079907550002,
+                  -0.0011124845049170352,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "moshier_sun_preflight_then_sun_then_ecl_nut": {
+        "native_errors": 0,
+        "records": [
+          {
+            "index": 0,
+            "ut1": 2451623.6911697537,
+            "tt": 2451623.6919092447,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  359.87588131465566,
+                  6.217898123716938e-05,
+                  0.9959261719552268,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.8861088975131,
+                  -0.049304118535386264,
+                  0.9959261149304898,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.43813883646164,
+                  23.439251414089874,
+                  -0.00408517452552478,
+                  -0.001112577628234375,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 1,
+            "ut1": 2451623.691864198,
+            "tt": 2451623.692603689,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  359.8765709656985,
+                  6.219238420386656e-05,
+                  0.9959263660866314,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.8867416400759,
+                  -0.04902979149412566,
+                  0.9959263090596575,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.438138839260986,
+                  23.439251413842513,
+                  -0.004085203715902241,
+                  -0.0011125745815251506,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 2,
+            "ut1": 2451623.6925586425,
+            "tt": 2451623.6932981336,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  359.8772606164773,
+                  6.220578363138867e-05,
+                  0.9959265602192686,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.887374382387,
+                  -0.04875546455752397,
+                  0.9959265031900627,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.438138842057484,
+                  23.43925141359515,
+                  -0.004085232907333726,
+                  -0.001112571537664451,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 3,
+            "ut1": 2451623.693253087,
+            "tt": 2451623.693992578,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  359.8779502669831,
+                  6.221917952831406e-05,
+                  0.9959267543531392,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.8880071244468,
+                  -0.048481137725458215,
+                  0.9959266973216991,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.43813884485114,
+                  23.43925141334779,
+                  -0.004085262099817024,
+                  -0.0011125684966523035,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 4,
+            "ut1": 2451623.6939475313,
+            "tt": 2451623.6946870224,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  359.87863991722764,
+                  6.223257187755824e-05,
+                  0.9959269484882421,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.888639866255,
+                  -0.04820681099808912,
+                  0.9959268914545727,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.438138847641937,
+                  23.439251413100425,
+                  -0.0040852912933499515,
+                  -0.0011125654584887342,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 5,
+            "ut1": 2451623.6946419757,
+            "tt": 2451623.6953814668,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  359.87932956715315,
+                  6.22459606795694e-05,
+                  0.995927142624578,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.88927260781196,
+                  -0.04793248437531763,
+                  0.9959270855886777,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.438138850429898,
+                  23.439251412853068,
+                  -0.004085320487930312,
+                  -0.0011125624231737693,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 6,
+            "ut1": 2451623.6953364206,
+            "tt": 2451623.6960759116,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  359.88001921733303,
+                  6.225934596126002e-05,
+                  0.9959273367622767,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.8899053495417,
+                  -0.047658157673372364,
+                  0.9959272797241496,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.438138853215005,
+                  23.439251412605707,
+                  -0.004085349683575496,
+                  -0.0011125593907054042,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 7,
+            "ut1": 2451623.696030865,
+            "tt": 2451623.696770356,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  359.8807088667711,
+                  6.227272767750163e-05,
+                  0.9959275309010781,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.8905380905958,
+                  -0.04738383126011376,
+                  0.9959274738607263,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.43813885599726,
+                  23.439251412358345,
+                  -0.004085378880244157,
+                  -0.001112556361087728,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 8,
+            "ut1": 2451623.6967253094,
+            "tt": 2451623.6974648004,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  359.88139851592837,
+                  6.22861058629155e-05,
+                  0.9959277250411118,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.8911708313987,
+                  -0.04710950495153861,
+                  0.9959276679985332,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.43813885877667,
+                  23.439251412110988,
+                  -0.004085408077953675,
+                  -0.0011125533343187336,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 9,
+            "ut1": 2451623.6974197538,
+            "tt": 2451623.698159245,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  359.88208816482154,
+                  6.229948051119326e-05,
+                  0.9959279191823783,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.8918035719503,
+                  -0.046835178747821636,
+                  0.9959278621375779,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.43813886155322,
+                  23.43925141186362,
+                  -0.004085437276701862,
+                  -0.0011125503103984458,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 10,
+            "ut1": 2451623.698114198,
+            "tt": 2451623.6988536892,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  359.8827778134438,
+                  6.231285161398068e-05,
+                  0.9959281133248774,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.8924363122508,
+                  -0.04656085264885363,
+                  0.9959280562778539,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.438138864326937,
+                  23.43925141161626,
+                  -0.0040854664764865285,
+                  -0.0011125472893268884,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 11,
+            "ut1": 2451623.6988086426,
+            "tt": 2451623.6995481336,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  359.88346746178854,
+                  6.232621918089361e-05,
+                  0.9959283074686089,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.89306905229995,
+                  -0.04628652665482055,
+                  0.9959282504193658,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.4381388670978,
+                  23.4392514113689,
+                  -0.004085495677305485,
+                  -0.001112544271104086,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 12,
+            "ut1": 2451623.699503087,
+            "tt": 2451623.700242578,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  359.8841571098592,
+                  6.233958318880327e-05,
+                  0.9959285016135729,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.8937017920979,
+                  -0.04601220076566884,
+                  0.995928444562112,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.438138869865814,
+                  23.439251411121543,
+                  -0.004085524879156528,
+                  -0.0011125412557300642,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 13,
+            "ut1": 2451623.7001975314,
+            "tt": 2451623.7009370225,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  359.8848467576846,
+                  6.235294366561202e-05,
+                  0.9959286957597699,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.8943345316449,
+                  -0.04573787498135533,
+                  0.9959286387060897,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.43813887263097,
+                  23.439251410874174,
+                  -0.004085554082037478,
+                  -0.0011125382432048434,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 14,
+            "ut1": 2451623.700891976,
+            "tt": 2451623.701631467,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  359.88553640521246,
+                  6.23663005991703e-05,
+                  0.9959288899071982,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.89496727094075,
+                  -0.045463549302057066,
+                  0.995928832851304,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.43813887539329,
+                  23.439251410626817,
+                  -0.004085583285946139,
+                  -0.0011125352335284485,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 15,
+            "ut1": 2451623.70158642,
+            "tt": 2451623.7023259113,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  359.8862260524673,
+                  6.237965399046093e-05,
+                  0.9959290840558597,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.8956000099857,
+                  -0.045189223727667316,
+                  0.995929026997749,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.438138878152756,
+                  23.439251410379455,
+                  -0.004085612490880323,
+                  -0.0011125322267009023,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 16,
+            "ut1": 2451623.7022808646,
+            "tt": 2451623.7030203557,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  359.8869156994713,
+                  6.239300384195049e-05,
+                  0.9959292782057528,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.8962327487794,
+                  -0.04491489825836166,
+                  0.9959292211454305,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.438138880909367,
+                  23.43925141013209,
+                  -0.0040856416968378375,
+                  -0.0011125292227222273,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 17,
+            "ut1": 2451623.7029753095,
+            "tt": 2451623.7037148005,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  359.88760534666653,
+                  6.240635015607067e-05,
+                  0.9959294723570089,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.8968654877465,
+                  -0.04464057271013514,
+                  0.9959294152944763,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.438138883663143,
+                  23.439251409884733,
+                  -0.004085670903836081,
+                  -0.0011125262215904356,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 18,
+            "ut1": 2451623.703669754,
+            "tt": 2451623.704409245,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  359.8882949931483,
+                  6.241969291740812e-05,
+                  0.995929666509367,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.8974982260386,
+                  -0.04436624745084794,
+                  0.9959296094446226,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.438138886414063,
+                  23.43925140963737,
+                  -0.004085700111833684,
+                  -0.0011125232233095718,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 19,
+            "ut1": 2451623.7043641983,
+            "tt": 2451623.7051036893,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  359.8889846393221,
+                  6.243303213101584e-05,
+                  0.995929860662957,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.89813096407954,
+                  -0.04409192229674375,
+                  0.9959298035960057,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.43813888916214,
+                  23.439251409390014,
+                  -0.0040857293208480545,
+                  -0.001112520227877644,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 20,
+            "ut1": 2451623.7050586427,
+            "tt": 2451623.7057981337,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  359.88967428524955,
+                  6.244636781520232e-05,
+                  0.9959300548177794,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.8987637018698,
+                  -0.043817597247696224,
+                  0.9959299977486196,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.43813889190735,
+                  23.439251409142646,
+                  -0.0040857585308769805,
+                  -0.0011125172352946765,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 21,
+            "ut1": 2451623.705753087,
+            "tt": 2451623.706492578,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  359.8903639308941,
+                  6.245969993322323e-05,
+                  0.9959302489738339,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.89939643940914,
+                  -0.04354327230387168,
+                  0.9959301919024696,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.43813889464973,
+                  23.439251408895288,
+                  -0.004085787741918296,
+                  -0.0011125142455606868,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 22,
+            "ut1": 2451623.7064475315,
+            "tt": 2451623.7071870225,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  359.8910535762747,
+                  6.247302852342646e-05,
+                  0.9959304431311201,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.90002917669767,
+                  -0.043268947465243186,
+                  0.9959303860575531,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.43813889738925,
+                  23.439251408647927,
+                  -0.004085816953969796,
+                  -0.0011125112586756972,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 23,
+            "ut1": 2451623.707141976,
+            "tt": 2451623.707881467,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  359.89174322138365,
+                  6.248635356230801e-05,
+                  0.9959306372896389,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.9006619137356,
+                  -0.04299462273176525,
+                  0.9959305802138677,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.438138900125924,
+                  23.439251408400562,
+                  -0.00408584616702929,
+                  -0.0011125082746397286,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 24,
+            "ut1": 2451623.7078364203,
+            "tt": 2451623.7085759114,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  359.89243286622605,
+                  6.249967506142068e-05,
+                  0.9959308314493893,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.90129465052263,
+                  -0.04272029810361234,
+                  0.9959307743714186,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.43813890285975,
+                  23.4392514081532,
+                  -0.004085875381094596,
+                  -0.0011125052934527993,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 25,
+            "ut1": 2451623.7085308647,
+            "tt": 2451623.7092703558,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  359.8931225107899,
+                  6.251299301178025e-05,
+                  0.9959310256103716,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.9019273870592,
+                  -0.042445973580663494,
+                  0.9959309685301995,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.438138905590726,
+                  23.439251407905843,
+                  -0.004085904596163513,
+                  -0.0011125023151149296,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 26,
+            "ut1": 2451623.709225309,
+            "tt": 2451623.7099648,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  359.89381215509826,
+                  6.252630742176437e-05,
+                  0.9959312197725858,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.902560123345,
+                  -0.0421716491631097,
+                  0.995931162690217,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.438138908318862,
+                  23.439251407658485,
+                  -0.004085933812233865,
+                  -0.0011124993396261383,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 27,
+            "ut1": 2451623.7099197535,
+            "tt": 2451623.7106592446,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  359.89450179912836,
+                  6.253961826531924e-05,
+                  0.9959314139360324,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.90319285938006,
+                  -0.04189732485089908,
+                  0.9959313568514678,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.43813891104413,
+                  23.439251407411117,
+                  -0.004085963029303454,
+                  -0.0011124963669864455,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 28,
+            "ut1": 2451623.710614198,
+            "tt": 2451623.711353689,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  359.8951914428899,
+                  6.255292557731513e-05,
+                  0.9959316081007106,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.90382559516485,
+                  -0.04162300064398929,
+                  0.9959315510139491,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.43813891376656,
+                  23.43925140716376,
+                  -0.004085992247370094,
+                  -0.0011124933971958688,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 29,
+            "ut1": 2451623.7113086428,
+            "tt": 2451623.712048134,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  359.8958810868539,
+                  6.256622936736448e-05,
+                  0.99593180226675,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.9044583311231,
+                  -0.04134867635860662,
+                  0.9959317451777965,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.438138916486146,
+                  23.439251406916398,
+                  -0.004086021466451185,
+                  -0.0011124904302524383,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 30,
+            "ut1": 2451623.712003087,
+            "tt": 2451623.7127425782,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  359.8965707300615,
+                  6.257952957674324e-05,
+                  0.9959319964338916,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.9050910664069,
+                  -0.041074352362537744,
+                  0.9959319393427445,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.438138919202878,
+                  23.439251406669037,
+                  -0.0040860506865053525,
+                  -0.001112487466160151,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          },
+          {
+            "index": 31,
+            "ut1": 2451623.7126975316,
+            "tt": 2451623.7134370226,
+            "calls": [
+              {
+                "body": 0,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  359.897260373001,
+                  6.259282625019687e-05,
+                  0.995932190602265,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": 0,
+                "requested": 2050,
+                "returned": 2050,
+                "error": "",
+                "coordinates": [
+                  359.90572380144,
+                  -0.040800028472018496,
+                  0.9959321335089284,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              },
+              {
+                "body": -1,
+                "requested": 4,
+                "returned": 4,
+                "error": "",
+                "coordinates": [
+                  23.438138921916757,
+                  23.439251406421672,
+                  -0.004086079907550002,
+                  -0.0011124845049170352,
+                  0.0,
+                  0.0
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "scope": "Original C call-order diagnosis. The damaged(4) message is not evidence of a changed file; bytes remain identical. No production error was waived."
+  },
+  "scope": "All96 original polar locations/times and both definitions. Original JPL coefficients, official SOFA, independent jplephem and Skyfield controls. Shared-source model/numerical agreement is not observational or all-domain certification."
+}

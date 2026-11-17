@@ -59,7 +59,6 @@ def initial_limit(point: QianyuanSourceDays) -> dict[str, Any]:
     """Exact source-duration arithmetic; no civil date or modern birth mapping."""
     if not isinstance(point, QianyuanSourceDays):
         raise TypeError("须提供具名QianyuanSourceDays，不接收无单位Fraction或天文角度")
-    point.__post_init__()
     source = _source()
     additional = point.value / Fraction(source["source_days_per_source_year"])
     total = Fraction(source["base_source_years"]) + additional

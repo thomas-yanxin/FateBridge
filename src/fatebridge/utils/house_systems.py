@@ -188,7 +188,7 @@ def house_system_fields(house_system: object, default: str = "P") -> HouseSystem
     }
 
 
-# Valid single-letter codes per kerykeion.schemas.kr_literals.HousesSystemIdentifier
+# Swiss Ephemeris single-letter house identifiers.
 _VALID_HOUSE_SYSTEM_CODES = frozenset(
     {
         "A",

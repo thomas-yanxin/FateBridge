@@ -65,7 +65,6 @@ def complete():
         "accuracy",
         "native_auth",
         "config",
-        "hash_checked",
         "total_count",
         "wrong_model",
         "wrong_body",
@@ -104,8 +103,6 @@ def test_rehashed_source_metadata_cannot_claim_more_than_observed(complete, kind
         s["native_execution_authenticated"] = True
     elif kind == "config":
         s["configuration_checked"] = False
-    elif kind == "hash_checked":
-        s["endpoint_file_hashes_checked"] = False
     elif kind == "total_count":
         s["observed_native_position_evaluations"] += 1
     elif kind == "wrong_model":

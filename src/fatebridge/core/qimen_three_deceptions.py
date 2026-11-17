@@ -2,7 +2,9 @@
 
 from typing import Any
 
-SOURCE = "https://zh.wikisource.org/w/index.php?oldid=625940"
+from fatebridge.core.qimen_sources import YANYI_VOLUMES
+
+SOURCE = YANYI_VOLUMES[2]
 PROFILE_ID = "yanyi_vol2_three_deceptions_full_triples_v1"
 DEFINITIONS = {
     "太阴": ("true_deception", "真诈"),

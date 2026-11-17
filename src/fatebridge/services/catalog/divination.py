@@ -85,7 +85,7 @@ SPECS: List[ToolSpec] = [
         key="gua_lookup",
         bind=raw_invoke(calculate_gua_lookup),
         request_model=GuaLookupRequest,
-        summary="卦象查询：传单个卦名或卦码，返回该卦的六十四卦义理；要一次查多卦用 gua_meiyi。",
+        summary="卦象查询：传单个八卦或六十四卦名、卦码，返回结构与现代卦义；六十四卦另附《周易》经文。批量查询用 gua_meiyi。",
         operation_label_zh="卦象查询",
         family="divination",
         rest_path="/api/divination/gua",
@@ -207,7 +207,7 @@ SPECS: List[ToolSpec] = [
         bind=raw_invoke(calculate_suzhan_analysis),
         request_model=SuZhanRequest,
         summary=(
-            "宿占：农历二十七宿、七曜及T1299事项条文；钟时可未知，保留历法候选；星图和天文28宿需已知钟时，默认采用现代视赤经不等宽研究宿界；"
+            "宿占：农历二十七宿、七曜及T1299事项条文；钟时可未知，保留历法候选；星图和天文28宿需已知钟时及完整经纬度，默认采用现代视赤经不等宽研究宿界；"
             "解读已有占星骰面用 otherbu，中式起卦用 sixyao 或 meihua_analysis。"
         ),
         operation_label_zh="宿占",

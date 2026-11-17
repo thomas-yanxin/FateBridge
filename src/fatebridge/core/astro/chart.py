@@ -16,6 +16,7 @@ from fatebridge.core.astro.classical import (
     _planetary_hours,
     _sect,
 )
+from fatebridge.core.astro.continuous_lahiri import apparent_lahiri_origin
 from fatebridge.core.astro.ephemeris import (
     _build_planet_states,
     _planet_set,
@@ -26,12 +27,13 @@ from fatebridge.core.astro.geometry import (
     _sign_name,
     combine_longitudes,
     is_prograde_house_partition,
+    native_lahiri_ayanamsha,
 )
 from fatebridge.core.astro.horizon import populate_horizon
 from fatebridge.core.astro.house_positions import build_ecliptic_house_projection
-from fatebridge.core.astro.julian_day import _julian_day
 from fatebridge.core.astro.layout import _relative_house_layout
 from fatebridge.core.astro.midpoints import build_midpoint_analysis
+from fatebridge.core.astro.orbits import FALLBACK_MODELS
 from fatebridge.core.astro.parts import (
     _balance,
     _build_houses,
@@ -57,7 +59,7 @@ from fatebridge.core.astro.reference import (
 from fatebridge.core.astro.reference_points import ephemeris_reference_points
 from fatebridge.core.astro.seven_planets import seven_planet_view
 from fatebridge.core.astro.solar_position import apparent_position_policy
-from fatebridge.core.astro.time_scales import ephemeris_time
+from fatebridge.core.astro.time_scales import ephemeris_time, fallback_julian_day_tt
 from fatebridge.core.astro.zodiac import native_lahiri_positions
 from fatebridge.core.astro_models import earth_rotation_policy
 from fatebridge.core.astrology_tables import RULER_BY_SIGN as RULER_BY_SIGN
@@ -131,7 +133,6 @@ def _build_core_chart_payload(
         )
     times = ephemeris_time(birth_info.physical_datetime)
     julian_day = times.jd_ut1
-    day_number = julian_day - 2451543.5
     house_system_info = _resolve_core_chart_house_system(
         hsys,
         chart_variant=chart_variant,
@@ -154,20 +155,18 @@ def _build_core_chart_payload(
     )
     physical_trace = PhysicalEphemerisTrace()
     motion_metadata: Dict[str, Any] = {}
-    (
-        planet_states,
-        engine_precision,
-        engine_backend,
-        ephemeris_model,
-        planetary_models,
-    ) = _build_planet_states(
+    batch = _build_planet_states(
         chart_variant,
         julian_day,
-        day_number,
         julian_day_tt=times.jd_tt,
         source_trace=physical_trace,
         motion_metadata=motion_metadata,
     )
+    planet_states = batch.states
+    engine_precision = batch.precision
+    engine_backend = batch.backend
+    ephemeris_model = batch.physical_model
+    planetary_models = batch.models
     horizon_method = populate_horizon(
         planet_states, julian_day, birth_info.longitude, birth_info.latitude
     )
@@ -179,9 +178,7 @@ def _build_core_chart_payload(
         engine_backend = "swisseph_api_with_approximate_geometry"
     chart_sect = _sect(planet_states["Sun"]["altitude"])
     native_planets = [
-        name
-        for name, model in planetary_models.items()
-        if model != "fatebridge_approximate_orbital_model"
+        name for name, model in planetary_models.items() if model not in FALLBACK_MODELS
     ]
     approximate_planets = [
         name for name in planetary_models if name not in native_planets
@@ -230,6 +227,40 @@ def _build_core_chart_payload(
         if zodiac_states is not None
         else planet_states
     )
+    fallback_origin_rate = 0.0
+    if sidereal and approximate_planets:
+        if runtime.swe is not None:
+            assert times.jd_tt is not None
+            offsets = [
+                (
+                    native_lahiri_ayanamsha(
+                        julian_day, julian_day_tt=times.jd_tt + step * 0.01
+                    )
+                    - ayanamsha
+                    + 180.0
+                )
+                % 360.0
+                - 180.0
+                for step in (-2, -1, 1, 2)
+            ]
+            fallback_origin_rate = (
+                offsets[0] - 8 * offsets[1] + 8 * offsets[2] - offsets[3]
+            ) / 0.12
+        else:
+            fallback_origin_rate = apparent_lahiri_origin(
+                fallback_julian_day_tt(times.jd_ut1, times.jd_tt)
+            )[1]
+        interpretation_states = dict(interpretation_states)
+        for name in approximate_planets:
+            state = interpretation_states[name]
+            if "longitude_speed" not in state:
+                continue
+            interpretation_states[name] = {
+                **state,
+                "longitude_speed_tropical": state["longitude_speed"],
+                "longitude_speed_sidereal_origin_correction": -fallback_origin_rate,
+                "longitude_speed": state["longitude_speed"] - fallback_origin_rate,
+            }
     house_projection = (
         build_ecliptic_house_projection(
             julian_day_ut1=times.jd_ut1,
@@ -240,6 +271,14 @@ def _build_core_chart_payload(
         )
         if not is_prograde_house_partition(layout["house_cusps"])
         else None
+    )
+    projected_coordinates = (
+        {
+            planet: house_projection.coordinate(planet_states[planet]["longitude"])
+            for planet in _planet_set(chart_variant)
+        }
+        if house_projection is not None
+        else {}
     )
     planets = [
         _build_planet_record(
@@ -260,7 +299,7 @@ def _build_core_chart_payload(
                 else None
             ),
             projected_house_position=(
-                house_projection.position(planet_states[planet]["longitude"])
+                projected_coordinates[planet].position
                 if house_projection is not None
                 else None
             ),
@@ -439,12 +478,12 @@ def _build_core_chart_payload(
         ]
         result["summary"].append(layout["house_axis_convention"]["note_zh"])
     if approximate_planets:
+        assert batch.fallback is not None
         result["chart_profile"]["planetary_models"] = planetary_models
         result["chart_profile"]["orbital_fallback"] = {
-            "approximate_planets": approximate_planets,
-            "time_argument": "UT1_day_number_ignoring_TT_difference",
-            "source_path": "src/fatebridge/core/astro/orbits.py",
-            "method_reference_url": "https://stjarnhimlen.se/comp/ppcomp.html",
+            **batch.fallback.provenance(approximate_planets),
+            "longitude_motion_origin_rate_degrees_per_day": fallback_origin_rate,
+            "accuracy_certified": False,
             # Planning takes a public civil year and already includes both
             # neighbours. At a UTC label in year0/10000, the unchanged local
             # year and its neighbours cover that boundary without clipping
@@ -456,12 +495,26 @@ def _build_core_chart_payload(
                 ephemeris_files_for_years([birth_info.local_datetime.year])
             ),
             "note_zh": (
-                "部分天体的原生星历不可用，已保留其他天体的原生位置；"
-                "所列近似天体使用UT日数轨道近似，未计TT差异，远期外推误差未认证。"
-                "使用近似位置的派生计算也继承其误差。"
-                if native_planets
-                else "天体位置使用UT日数轨道近似，未计TT差异，远期外推误差未认证。"
-                "使用近似位置的派生计算也继承其误差。"
+                (
+                    "部分天体的原生星历不可用，已保留其他天体的原生位置。"
+                    if native_planets
+                    else "原生星历不可用。"
+                )
+                + "物理天体回退使用完整VSOP87B几何源和Astronomy Engine的光行时、光行差近似；"
+                "月球采用该库的Brown几何位置，冥王星采用其引力积分；统一使用长周期Vondrak标量黄道和77项章动，不含完整相对论修正。"
+                "北交点若回退，采用Moshier平根数及已发布DE431修正的TT解析平均交点；"
+                "这是理论平滑点，不是JPL直接提供的观测位置。"
+                "物理天体在古代和远期仍有已知超线；派生计算继承对应模型限制。"
+                + (
+                    "平均交点修正模型在此折点没有唯一瞬时日速，相关运动判断保留未知。"
+                    if batch.fallback.uncomputed_motion_reasons
+                    else ""
+                )
+                + (
+                    "缺少原生时标时，TT采用该库的Espenak–Meeus模型估计，非观测钟时。"
+                    if times.jd_tt is None
+                    else ""
+                )
             ),
         }
         result["summary"].append(
@@ -531,6 +584,7 @@ def _build_core_chart_payload(
                 else None
             ),
             house_projection=house_projection,
+            house_coordinates=projected_coordinates,
             planetary_models=planetary_models,
             motion_rates={
                 name: state.get("longitude_speed")
@@ -625,10 +679,12 @@ def build_midpoint_payload(
     else:
         from fatebridge.core.astro.geometry import _ayanamsha
 
-        jd = _julian_day(birth_info.physical_datetime)
-        raw_states, _, _, _, _ = _build_planet_states("chart", jd, jd - 2451543.5)
+        times = ephemeris_time(birth_info.physical_datetime)
+        raw_states = _build_planet_states(
+            "chart", times.jd_ut1, julian_day_tt=times.jd_tt
+        ).states
         ayan = (
-            _ayanamsha(jd)
+            _ayanamsha(times.jd_ut1, julian_day_tt=times.jd_tt)
             if base_chart["chart_profile"]["zodiac"] == "sidereal"
             else 0.0
         )

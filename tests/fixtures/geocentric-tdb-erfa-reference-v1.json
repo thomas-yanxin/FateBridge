@@ -1,0 +1,202 @@
+{
+  "retained_source_files_sha256": {
+    "tests/fixtures/elp-mpp02-source-reference-v1.json": "8b6da438e274a9d5fb2729a2a251ceb41525e318652394d241d543beb4e419dc",
+    "tests/fixtures/vsop87-source-increments-v1.json": "e89af15437664ac88263a87f2f6f1be74fbdf5d3a216067305a9aebc8aed5bdd"
+  },
+  "qualification": "Original ERFA C controls with uncontracted arithmetic; original compiled differences retained in eachrow.",
+  "rows": [
+    {
+      "tt_days": 0.0,
+      "tdb_minus_tt_seconds": -9.930719894379447e-05,
+      "uncontracted_original_C_seconds": -9.930719894379447e-05,
+      "original_installed_reference_gate_passed": true
+    },
+    {
+      "tt_days": 123.456,
+      "tdb_minus_tt_seconds": 0.0014330167893132273,
+      "uncontracted_original_C_seconds": 0.0014330167893132273,
+      "original_installed_reference_gate_passed": true
+    },
+    {
+      "tt_days": -36525.0,
+      "tdb_minus_tt_seconds": -3.33217401016821e-05,
+      "uncontracted_original_C_seconds": -3.3321740101873485e-05,
+      "original_installed_reference_gate_passed": false
+    },
+    {
+      "tt_days": 36525.0,
+      "tdb_minus_tt_seconds": -7.561525671869707e-05,
+      "uncontracted_original_C_seconds": -7.561525671869761e-05,
+      "original_installed_reference_gate_passed": true
+    },
+    {
+      "tt_days": -730119.5,
+      "tdb_minus_tt_seconds": 0.0009340661051596842,
+      "uncontracted_original_C_seconds": 0.0009340661051596823,
+      "original_installed_reference_gate_passed": true
+    },
+    {
+      "tt_days": 1095727.5,
+      "tdb_minus_tt_seconds": -0.0012627316247356274,
+      "uncontracted_original_C_seconds": -0.0012627316247356302,
+      "original_installed_reference_gate_passed": true
+    },
+    {
+      "tt_days": 2921938.5,
+      "tdb_minus_tt_seconds": -0.000824498669538071,
+      "uncontracted_original_C_seconds": -0.0008244986695362583,
+      "original_installed_reference_gate_passed": false
+    },
+    {
+      "tt_days": -1505.5,
+      "tdb_minus_tt_seconds": -0.0012390887059889803,
+      "uncontracted_original_C_seconds": -0.0012390887059889806,
+      "original_installed_reference_gate_passed": true
+    },
+    {
+      "tt_days": 5017.307921954896,
+      "tdb_minus_tt_seconds": -0.001617716968105462,
+      "uncontracted_original_C_seconds": -0.0016177169681054618,
+      "original_installed_reference_gate_passed": true
+    },
+    {
+      "tt_days": -59554.53346831165,
+      "tdb_minus_tt_seconds": -0.0005388649728814302,
+      "uncontracted_original_C_seconds": -0.0005388649728816063,
+      "original_installed_reference_gate_passed": false
+    },
+    {
+      "tt_days": -38587.84130028542,
+      "tdb_minus_tt_seconds": 0.0013370432753045166,
+      "uncontracted_original_C_seconds": 0.0013370432753045166,
+      "original_installed_reference_gate_passed": true
+    },
+    {
+      "tt_days": 19548.679333320353,
+      "tdb_minus_tt_seconds": -0.00015937388455374544,
+      "uncontracted_original_C_seconds": -0.00015937388455374536,
+      "original_installed_reference_gate_passed": true
+    },
+    {
+      "tt_days": -67556.02736370545,
+      "tdb_minus_tt_seconds": 0.00043494559951869446,
+      "uncontracted_original_C_seconds": 0.00043494559951906493,
+      "original_installed_reference_gate_passed": false
+    },
+    {
+      "tt_days": -62708.177333449945,
+      "tdb_minus_tt_seconds": 0.0015269196146603312,
+      "uncontracted_original_C_seconds": 0.0015269196146601915,
+      "original_installed_reference_gate_passed": false
+    },
+    {
+      "tt_days": -24940.800339854788,
+      "tdb_minus_tt_seconds": -0.001583810571715584,
+      "uncontracted_original_C_seconds": -0.0015838105717156069,
+      "original_installed_reference_gate_passed": false
+    },
+    {
+      "tt_days": -60586.67981196428,
+      "tdb_minus_tt_seconds": 0.0011396444852094956,
+      "uncontracted_original_C_seconds": 0.001139644485209497,
+      "original_installed_reference_gate_passed": true
+    },
+    {
+      "tt_days": 3151.8933674325235,
+      "tdb_minus_tt_seconds": -0.0011564531451259622,
+      "uncontracted_original_C_seconds": -0.0011564531451259622,
+      "original_installed_reference_gate_passed": true
+    },
+    {
+      "tt_days": 26114.079890606925,
+      "tdb_minus_tt_seconds": 0.00014628151687975368,
+      "uncontracted_original_C_seconds": 0.00014628151687975357,
+      "original_installed_reference_gate_passed": true
+    },
+    {
+      "tt_days": -62046.81239393819,
+      "tdb_minus_tt_seconds": 0.001184935515221987,
+      "uncontracted_original_C_seconds": 0.0011849355152219888,
+      "original_installed_reference_gate_passed": true
+    },
+    {
+      "tt_days": 33925.20362732932,
+      "tdb_minus_tt_seconds": -0.0012218798798352048,
+      "uncontracted_original_C_seconds": -0.0012218798798352048,
+      "original_installed_reference_gate_passed": true
+    },
+    {
+      "tt_days": -10453.75886562746,
+      "tdb_minus_tt_seconds": 0.001169858617427919,
+      "uncontracted_original_C_seconds": 0.0011698586174279184,
+      "original_installed_reference_gate_passed": true
+    },
+    {
+      "tt_days": -31750.16974555934,
+      "tdb_minus_tt_seconds": 0.0007023966299626596,
+      "uncontracted_original_C_seconds": 0.0007023966299624879,
+      "original_installed_reference_gate_passed": false
+    },
+    {
+      "tt_days": -49514.48160656821,
+      "tdb_minus_tt_seconds": 0.0006541794268977204,
+      "uncontracted_original_C_seconds": 0.0006541794268977207,
+      "original_installed_reference_gate_passed": true
+    },
+    {
+      "tt_days": -16481.79627647996,
+      "tdb_minus_tt_seconds": -0.0012037644278349302,
+      "uncontracted_original_C_seconds": -0.0012037644278349302,
+      "original_installed_reference_gate_passed": true
+    },
+    {
+      "tt_days": 8260.918130656239,
+      "tdb_minus_tt_seconds": -0.001027307559163489,
+      "uncontracted_original_C_seconds": -0.0010273075591634888,
+      "original_installed_reference_gate_passed": true
+    },
+    {
+      "tt_days": -32844.30164696276,
+      "tdb_minus_tt_seconds": 0.0007517914442187218,
+      "uncontracted_original_C_seconds": 0.0007517914442187211,
+      "original_installed_reference_gate_passed": true
+    },
+    {
+      "tt_days": -12561.177298002876,
+      "tdb_minus_tt_seconds": -0.0009691360389372294,
+      "uncontracted_original_C_seconds": -0.0009691360389372299,
+      "original_installed_reference_gate_passed": true
+    },
+    {
+      "tt_days": 9213.395941338502,
+      "tdb_minus_tt_seconds": 0.0016011291878057542,
+      "uncontracted_original_C_seconds": 0.001601129187805754,
+      "original_installed_reference_gate_passed": true
+    },
+    {
+      "tt_days": 7819.759265335742,
+      "tdb_minus_tt_seconds": 0.000960539255868953,
+      "uncontracted_original_C_seconds": 0.0009605392558689532,
+      "original_installed_reference_gate_passed": true
+    },
+    {
+      "tt_days": 4379.651555027347,
+      "tdb_minus_tt_seconds": -0.0001847925880191173,
+      "uncontracted_original_C_seconds": -0.0001847925880191173,
+      "original_installed_reference_gate_passed": true
+    },
+    {
+      "tt_days": 7665.111866887193,
+      "tdb_minus_tt_seconds": -0.0002485792461334719,
+      "uncontracted_original_C_seconds": -0.00024857924613347164,
+      "original_installed_reference_gate_passed": true
+    },
+    {
+      "tt_days": -47685.509899354074,
+      "tdb_minus_tt_seconds": 0.0006122067827969999,
+      "uncontracted_original_C_seconds": 0.0006122067827970003,
+      "original_installed_reference_gate_passed": true
+    }
+  ],
+  "gate_seconds": 2e-17
+}

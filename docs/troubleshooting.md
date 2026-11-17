@@ -53,7 +53,7 @@ uv lock --check
 uv sync --locked --extra dev
 ```
 
-`async def functions are not natively supported` 通常说明当前测试解释器没有 `pytest-asyncio`，检查是否安装了 dev 依赖。缺少 `swisseph` / `kerykeion` 时核对的是 Python 包依赖；缺 `.se1` 时核对的是星历数据，二者不同。
+`async def functions are not natively supported` 通常说明当前测试解释器没有 `pytest-asyncio`，检查是否安装了 dev 依赖。缺少 `swisseph` 时核对的是 Python 包依赖；缺 `.se1` 时核对的是星历数据，二者不同。
 
 ## 服务启动与连接
 
@@ -154,7 +154,7 @@ CLI 不自动读取 `.env`，`SE_EPHE_PATH` 应在启动前设进程环境。GUI
 
 ### 西占推运 `dependency_missing`
 
-`astro/timing*`、事件与生命周期工具缺 backend 会直接失败，不使用 FateBridge 的轨道近似替代。正常安装已声明 `kerykeion` / `pyswisseph`；核对实际进程的解释器及依赖版本。核心 chart 的回退能力不能推广到所有西占工具。
+`astro/timing*`、事件与生命周期工具缺 backend 会直接失败，不使用 FateBridge 的轨道近似替代。正常安装已声明 `pyswisseph`；核对实际进程的解释器及依赖版本。核心 chart 的回退能力不能推广到所有西占工具。
 
 ### 关系盘与 `synastry` 预期不同
 

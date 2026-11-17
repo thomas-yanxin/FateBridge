@@ -264,7 +264,7 @@
 
 ### 2.7 `western_timing` + `western_timing_tool` —— 西占推运（Implemented，依赖 backend）
 
-走 `fatebridge.core.predictive.*`；缺 `kerykeion` / Swiss Ephemeris 时**直接报错，不降级**（见 §3.3）。
+走 `fatebridge.core.predictive.*` 的原生底盘、时间轴和显式星历接口；逐项方法、数据来源与实际计算范围见[西占方法及证据](western-astrology.md)。
 
 | 工具 | 说明 | 状态 |
 | --- | --- | --- |
@@ -281,7 +281,15 @@
 | `firdaria` | 法达星限 | Implemented（依赖 backend） |
 | `decennials` | 十年星限 | Implemented（依赖 backend） |
 
-法达支持独立选择夜盘交点顺序和固定年／公历周年口径，默认行为保持；参数与日期边界见[年长与夜盘交点顺序](firdaria-compatibility.md)。
+日月返照搜索与本命／最终盘共用原生位置所有者，最终盘保留求得TT；行运的普通与紧密相位资格均从原始角度判定。两层阈值、地点宫位含义、已知返照周期选择反例及验证范围见[返照根与行运分档](western-astrology.md#返照根与行运分档)。数值控制与本地协议通过不代表完整传统方法或预测SOTA认证。
+
+年／月小限声明民用周年及compatible生成规则，次限声明365.24219日固定年键与quotidian轴宫，太阳弧声明真实太阳黄经差与刚性旋转。独立时间参考、所选Astrolog比较及未决范围见[具名时间模型](western-astrology.md#周年与次限的具名时间模型)。
+
+恒星次限、行星弧与赤纬次限共用该年键及一次微秒舍入，输出实际推运时刻与所用选项。赤纬次限原先独立使用365.2425日浮点换算，现已移除；同库坐标控制与三端一致性验证只证明时间和坐标传递，不构成这些技法现实有效性的证据。
+
+十年星限采用具名精确比例重建，声明UTC名义经过日与显示舍入，保留有理数偏移。所选FLINT／Morinus／Temporal对照与原典分歧见[十年星限来源与时轴](western-astrology.md#十年星限比例重建与精确时轴)；未证实的内部候选日表已经停止执行，不能据此将完整古法或预测记为通过。
+
+法达支持独立选择夜盘交点顺序和固定UTC名义年／公历周年口径；所有结果声明实际选项，固定年已从旧地方钟累加修订为UTC经过时长。参数、日期边界与来源分歧见[年长与夜盘交点顺序](firdaria-compatibility.md)。
 
 ### 2.8 `western_event` —— 事件占星（Implemented，依赖 backend）
 
@@ -292,11 +300,13 @@
 | `astro_mundane` | 世俗入宫盘 | Implemented（依赖 backend） |
 | `astro_extrareturns` | 多重回归 | Implemented（依赖 backend） |
 | `astro_horary` | 卜卦判断 | Implemented（依赖 backend） |
-| `astro_election` | 择日 | Implemented（依赖 backend） |
+| `astro_election` | 择日；婚姻来源回执含四宫主、自然星及有限历史的月亮相邻接触 | Implemented（限定事实；完整原典判断未验收） |
 
 此处Implemented表示接口与计算路径存在。卜卦已逐项实现Lilly1647的两列相位容许度、实际落宫、分别保留的宫位序次／宫位分值及居宫的必要月亮条件；完整偶然尊贵、传光／阻碍与全盘判词仍未验收，`verdict=uncertain`。具体来源与未通过项见[西方占星](western-astrology.md)。判断前审查按第121–123页12项手工清单与报告的例外，四个时主对应例复现；未知月亮晚度、受损定义及整盘判断资格仍保留，不能据此认证现实预测。
 
 卜卦与择日另支持显式儒略历日期，分别通过 `question_calendar`、`candidate_calendar` 选择；日期先按相应闰年规则校验、换成内部格里历，再处理时区。原日期与规范化日期并列返回，默认仍为前推格里历；其他出生／分析入口未据此扩展。地区改历、旧式年份与原典钟时不推断，见[西占历法与方法](western-astrology.md)。
+
+两入口的 `question_second`／`candidate_second` 支持已确认的整秒 `0..59`，省略沿用 `0`；原秒数随历法、正午进位和民用／LMT／LAT转换传递。输入分辨率不认证钟时记录、星历或预测精度；小数秒和直接输入秒60不支持。详见[秒数与时间尺度](western-astrology.md#输入与天文精度)。
 
 已确认的地方平／地心视太阳时可分别由 `question_clock_basis`／`candidate_clock_basis` 显式输入，不能与民用时区叠加；默认民用钟时及省略时区的旧 `+08:00` 行为保留并标来源。`clock_conversion` 分开输入钟面和物理时刻；太阳时卜卦的行星日按声明钟时的开启日出日期取星期，未借用内部UTC载体的日期。两组复用JPL历元及手工算术只验有限转换，原书钟时鉴定、整图验收和现实预测仍未成立，见[西占钟时](western-astrology.md)。
 
@@ -372,7 +382,7 @@
 
 检查 `chart_profile.engine_precision` / `engine_backend` 确认代码路径，再用 `chart_profile.ephemeris_model` 确认实际模型：`swieph` / `jpl` 为相应数据模型，`moshier` 为内置模型，`mixed` 表示混合。`run_metadata.engine_is_approximate` 会标记已识别的降级。数据获取、路径与版本复现见 [星历安装](ephemeris.md)。
 
-`pyswisseph` 与 `kerykeion` 都是 `pyproject.toml` 的常规安装依赖。“缺依赖回退”描述的是异常/裁剪环境的能力边界，不是另一种官方安装模式。
+`pyswisseph` 是 `pyproject.toml` 的常规安装依赖。“缺依赖回退”描述的是异常/裁剪环境的能力边界，不是另一种官方安装模式。
 
 ### 3.2 关系盘（`astro_relative_chart`）
 
@@ -385,15 +395,11 @@
 | `marks` | Implemented | 派生关系主层 |
 | 未识别的 `relative_mode` | Excluded | 返回 `validation_error`，不把非法 mode 当作受支持能力 |
 
-兼容性提醒：
-
-- `relative_mode="Synastry"` / `"synastry"` 按现代语义收敛到 `influence`
-- 关系盘统一使用 `relative_mode`：`compare` 为比较盘，`synastry` / `influence` 为影响盘；旧字段 `relationship_mode` 已移除
-- 两条语义不同，迁移旧调用时应显式区分
+关系盘使用 `relative_mode`：`compare` 为比较盘，`synastry` / `influence` 为影响盘；`Synastry` 大小写归一后同样映射为 `influence`。
 
 ### 3.3 西占推运 / 事件 / 寿命（`western_*` families）
 
-- 这四个 family 明确依赖 `kerykeion` / Swiss Ephemeris 运行时
+- 这四个 family 使用 FateBridge 原生底盘及 Swiss Ephemeris 运行时
 - `ensure_predictive_backend_available()` 会在缺依赖时抛错（`dependency_missing`）
 - 与核心 chart 不同，缺 backend 时不会使用 FateBridge 内置轨道近似；但这不保证所有 backend 都加载了相同星历数据，仍需检查返回的精度/模型字段
 - `pd` / `pdchart` 虽已实装，但内部会公开其近似/坐标策略（time key、direct/converse、相位列表等），不应被误读为单一路径高精度结果
@@ -428,3 +434,15 @@
 - 关系盘模式有明确语义，迁移时须核对 `relative_mode`（见 §3.2）
 
 如果你准备修改接口或新增能力，请同步更新本页，确保“文档状态”仍然是从代码反推出来的结果，而不是愿景描述。
+
+黄道释放八个完整函数的33项职责已另核对；共同360日年下438组父期、5404个子区间及17526次微秒边界查询与独立公开程序一致。Kerykeion不同年长造成的6672个日期字段差异、最高层解绊的来源选择与24段预览限制继续保留，见[方法范围与来源](western-astrology.md#黄道释放的起期角宫参照与经过日)。这些职责含交付辅助，不是33个新算法，也没有据此提高完整原典或预测的验收状态。
+
+奇门核心20个完整函数细分为61项职责，另列共享钟时与可信原件引用的11项边界内容。地盘及值符值使现各算一次；修正太阳钟面被夏令时规则再解释而错取时柱的问题。源码与安装包252次实际三端调用一致，包含36次预期错误；独立程序38组完整排盘及1080行共同操作数比较另列，原典9项未决不变，见[职责与第三方核对](qimen-depth-audit.md#完整核心职责与第三方程序核对)。有限使用与结构检查不提高完整原典、预测或SOTA的验收状态。
+
+奇门其余31个函数及7个局部定义后续细分为174项职责，补齐控制流内源码锚点。来源改为逐卷固定修订；全览转入页只作导航。共享农历与日干支在1900—2100全部73414个民用日期的七字段与Sxtwl2.0.6相符，月初锚点的派生与重复分别保留，见[叶规则职责与逐卷来源](qimen-depth-audit.md#叶规则职责与逐卷来源)。这是有限日期映射、来源和交付的核对，原典9项未决与既有定局差异继续保留。
+
+另逐字读取既有卷四影印的72项节气三元定局图题，查表全部相符，并在实际轨迹标明来源。2026年24个既有HKO节气参考，与另行运行的官方Skyfield算法均通过原60秒门槛；新候选奇门程序自身未通过节气及局数表资格，不能作权威裁判。12个复用日期的完整排盘及其差异分层保留，详见[比较程序资格](qimen-depth-audit.md#新比较程序的资格与定局表)。这不解除原有置闰和原典未决，也不提高全算法或预测验收状态。
+
+大六壬取传及相邻输入／课名层的14个完整定义，原12个粗项展开为87项职责。720个复用符号状态及新读取的169个涉害计数字段与原daliuren内核相符；另一固定程序Kinliuren在相同天地盘、四课下仍有121组三传不同和1项异常。上下五行原语另核264个有效身份配对，删除不可达的“平”回退，720份完整领域结果保持。新自包含算术回归985项通过；[来源、比较范围及未决](liuren-jinkou-audit.md#九宗门完整职责与独立内核比较)继续分开，不能把这些职责或状态计为新算法和完整原典通过。
+
+主盘其余部分及贵人、昼夜、旬遁、十二运、辅助星另审读11个完整定义、129项职责；原程序布盘比较5,760组对应4,320个不同符号输入，两套表分别一致，旬遁720字段及日马12项一致。通行贵人轨迹补接已核影印来源，见[布盘逐表比较](liuren-jinkou-audit.md#布盘完整职责与逐表比较)。这些比较没有解除原典、候选三传、完整神煞和预测的未决。

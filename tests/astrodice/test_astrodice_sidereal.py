@@ -210,7 +210,7 @@ def test_offline_sidereal_context_declares_its_approximation(monkeypatch):
     profile = result["chart"]["params"]["chart_profile"]
     assert profile["sidereal_position_method"] == "ayanamsha_offset_approximation"
     assert profile["sidereal_house_method"] == "ayanamsha_offset_approximation"
-    assert profile["ayanamsha_includes_nutation"] is False
+    assert profile["ayanamsha_includes_nutation"] is True
     assert profile["engine_precision"] == "approximate_orbital_model"
 
 

@@ -207,7 +207,7 @@ class EphemerisSourceError(ValueError):
         "coordinate_values_unavailable": "Ephemeris coordinates are missing, nonfinite, or outside their valid domain",
         "opaque_solar_barycentric_unavailable": "Opaque-Sun apparent positions could not obtain their native barycentric states",
         "opaque_solar_requires_barycentric_files": "Opaque-Sun apparent positions require actual barycentric file states; analytical fallback is not accepted",
-        "opaque_solar_light_time_not_stabilized": "Opaque-Sun light time did not stabilize at the available TT precision",
+        "light_cone_not_bracketed": "Source light cone could not be bracketed at adjacent representable epochs",
         "coordinate_motion_unavailable": "Native ephemeris did not provide the requested finite longitude motion",
         "point_mass_requires_barycentric_file_states": "Explicit Sun monopole comparison requires actual barycentric file states; analytical fallback is not accepted",
         "point_mass_light_time_did_not_stabilize": "Explicit Sun monopole light time did not stabilize at the available TT precision",
@@ -369,7 +369,6 @@ DEPENDENCY_ERROR_HINTS = (
     "dependency missing",
     "swisseph",
     "ephemeris",
-    "kerykeion",
     "依赖缺失",
     "未安装",
 )

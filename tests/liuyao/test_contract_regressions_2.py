@@ -10,12 +10,14 @@ from tests.liuyao.test_liuyao_model_boundary import (
     CASES,
     ROOT,
     SOURCE_CASES,
+    analytic_environment,
     assert_comparison,
 )
 from tests.support.result_delivery import assert_same_run_receipt
 from tests.support.transports import business, rest
 
 
+@pytest.mark.usefixtures("analytic_environment")
 @pytest.mark.parametrize("case", CASES, ids=lambda x: x["id"])
 @pytest.mark.parametrize("project", [False, True])
 def test_same_completed_path_comparison_in_rest_native_mcp_cli(
@@ -27,6 +29,7 @@ def test_same_completed_path_comparison_in_rest_native_mcp_cli(
         assert_comparison(output, case)
 
 
+@pytest.mark.usefixtures("analytic_environment")
 @pytest.mark.parametrize("case", CASES, ids=lambda x: x["id"])
 def test_source_adjudicated_current_month_change_survives_strict_projection(
     case, rest, tmp_path, capsys
@@ -44,6 +47,7 @@ def test_source_adjudicated_current_month_change_survives_strict_projection(
         }
 
 
+@pytest.mark.usefixtures("analytic_environment")
 @pytest.mark.parametrize("case", CASES[:2], ids=lambda x: x["id"])
 def test_completed_probe_comparison_restores_the_same_hash_verified_run(
     case, rest, tmp_path, capsys, monkeypatch
@@ -279,9 +283,11 @@ def test_stage_truths_and_admission_on_rest_cli_mcp(
         detail = output["liuyao_evidence"]["conditional_analysis"]
         assert detail["stage_knowledge"]["known_stages"]["火"] == {
             "寅": "长生",
+            "午": "帝旺",
             "戌": "墓",
+            "亥": "绝",
         }
-        assert detail["stage_knowledge"]["table_complete"] is False
+        assert detail["stage_knowledge"]["table_complete"] is True
         h = next(h for h in detail["hidden_conditions"] if h["position"] == position)
         assert h["reception"].get("condition_match") is reception
         assert (
@@ -291,7 +297,9 @@ def test_stage_truths_and_admission_on_rest_cli_mcp(
         assert h["stage_conditions"]["has_relevant_unknown"] is unknown
 
 
-def test_incomplete_table_false_leaf_has_no_sibling_requirement(rest, tmp_path, capsys):
+def test_stage_table_completeness_leaf_has_no_sibling_requirement(
+    rest, tmp_path, capsys
+):
     field = "liuyao_evidence.conditional_analysis.stage_knowledge.table_complete"
     payload = dict(
         date="2001-03-04",
@@ -302,8 +310,35 @@ def test_incomplete_table_false_leaf_has_no_sibling_requirement(rest, tmp_path, 
     )
     for output in all_surfaces(payload, [field], rest, tmp_path, capsys):
         assert output["liuyao_evidence"]["conditional_analysis"]["stage_knowledge"] == {
-            "table_complete": False
+            "table_complete": True
         }
+
+
+def test_fire_cessation_position_works_for_both_day_and_transformation(
+    rest, tmp_path, capsys
+):
+    payload = dict(
+        date="2003-03-03",
+        time="12:00:00",
+        zone="Asia/Shanghai",
+        gua_code="000000",
+        changed_code="011000",
+        focus_line=2,
+        timing_days=0,
+    )
+    root = "liuyao_evidence.conditional_analysis"
+    for output in all_surfaces(
+        payload, [root + ".cessation_conditions.focus"], rest, tmp_path, capsys
+    ):
+        focus = output["liuyao_evidence"]["conditional_analysis"][
+            "cessation_conditions"
+        ]["focus"]
+        assert (focus["branch"], focus["element"]) == ("巳", "火")
+        for location in ("day", "changed"):
+            fact = focus[location]
+            assert fact["branch"] == "亥"
+            assert fact["position_match"] is fact["condition_match"] is True
+            assert fact["actual_cessation_adjudicated"] is False
 
 
 def test_same_run_known_tomb_text_does_not_turn_a_position_into_final_entry(

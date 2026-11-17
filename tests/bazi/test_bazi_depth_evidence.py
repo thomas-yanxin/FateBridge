@@ -279,7 +279,7 @@ def test_nine_depth_views_match_actual_rest_mcp_cli(topic, gender, surface_calls
     evidence = analysis["evidence_chain"]
     assert evidence["topic"]["topic"] == topic
     assert evidence["strength_context"]["method_id"]
-    assert evidence["rulesets"][0]["source_sha256"]
+    assert evidence["rulesets"][0]["id"] == "ziping_prerequisites_v1"
     assert (
         evidence["topic"]["timing"]["layers"][-1]["pillar"]
         == analysis["timing_context"]["liunian_pillar"]

@@ -39,8 +39,11 @@
 
 `tests/data/ziwei_independent` 保留一手书影、HKO历表与独立字面规则参考。软件交叉对照只证明对指定配置的有限一致；条件宫位审计不认证历法转换，春节边界与同一瞬间跨区岁序另用独立日期资料检验。
 
+2026-11-09 在原1,080例之外，新增固定 [iztro 2.5.8](https://github.com/SylarLong/iztro/tree/2.5.8) 默认配置的普通月日时、六十年时序和四个闰月网格。13,936条比较记录对应13,910组不同输入；66颗本命星的919,776条记录及334,464个长生／博士格无差异，同时核对命身宫、五行局、命身主、宫名宫干及大限序列。104条不存在的闰月三十日保留为来源无效日期控制，未计通过。参考及采集计划位于本地 `tests/data/ziwei_independent/natal_factor_grid_v1`；网格有重叠，未覆盖所有年份的完整组合，也不裁定其他规则配置、原典异文或全部流曜。
+
 ```bash
-uv run --locked --extra dev pytest -n0 tests/ziwei/test_contract_regressions.py tests/ziwei/test_ziwei_horoscope_crosscheck.py tests/ziwei/test_ziwei_twenty_first_iteration.py
+uv run --locked --extra dev python -m pytest -n0 tests/ziwei/test_contract_regressions.py tests/ziwei/test_ziwei_horoscope_crosscheck.py tests/ziwei/test_ziwei_twenty_first_iteration.py
+uv run --locked --extra dev python -m scripts.ziwei.audit_ziwei_natal --fixtures tests/data/ziwei_independent/natal_factor_grid_v1 --output /tmp/ziwei-natal-factor-grid-audit.json
 ```
 
 精确的索引、可复现结果和局部文字符合度不证明现实预测有效。整书、全部流派、未知生时、连续未来时间以及实际事件预测仍需各自的独立验收。

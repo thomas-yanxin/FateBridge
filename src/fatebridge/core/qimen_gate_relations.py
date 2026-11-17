@@ -3,8 +3,9 @@
 from typing import Any
 
 from fatebridge.core.metaphysics.common import ELEMENT_CONTROLS, ELEMENT_GENERATES
+from fatebridge.core.qimen_sources import YANYI_VOLUMES
 
-SOURCE = "https://zh.wikisource.org/w/index.php?oldid=625940"
+SOURCE = YANYI_VOLUMES[2]
 PROFILE_ID = "yanyi_vol2_gate_palace_relations_v1"
 PALACE_ELEMENTS = {
     "坎": "水",

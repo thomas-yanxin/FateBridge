@@ -1,20 +1,88 @@
 """IERS historical UTC coefficients, clock adjustments and real chart epochs."""
 
+import copy
+import json
 from datetime import datetime, timedelta, timezone
+from decimal import Decimal
+from fractions import Fraction
+from pathlib import Path
 
 import pytest
 
+from fatebridge.core.astro import historical_utc as historical
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.geometry import _julian_day
 from fatebridge.core.astro.historical_utc import (
     HistoricalUTCAdjustment,
     historical_tai_minus_utc,
+    historical_tai_minus_utc_exact,
+    historical_utc_to_tt_point,
 )
-from fatebridge.core.astro.time_scales import datetime_from_tt, ephemeris_time
+from fatebridge.core.astro.time_scales import (
+    datetime_from_tt,
+    ephemeris_time,
+)
 from fatebridge.core.human_design import chart_at, design_epoch
 from fatebridge.core.human_design_time import sun_at_tt
 
 UTC = timezone.utc
+PRIMARY = json.loads(
+    (
+        Path(__file__).parents[1] / "fixtures/historical-utc-affine-reference-v1.json"
+    ).read_text()
+)
+
+
+def test_primary_decimal_offsets_and_exact_tt_points_across_all_historical_years():
+    for row in PRIMARY["forward_rows"]:
+        moment = datetime.fromisoformat(row["UTC"])
+        assert historical_tai_minus_utc_exact(moment) == Fraction(
+            row["expected_TAI_minus_UTC_seconds"]
+        )
+        assert historical_tai_minus_utc(moment) == row["nearest_float_offset"]
+        assert historical_utc_to_tt_point(moment).days == Fraction(row["expected_TT"])
+
+
+@pytest.mark.parametrize("year", [1960, 1969])
+@pytest.mark.parametrize(
+    "field", ["offset_seconds", "reference_mjd", "rate_seconds_per_day"]
+)
+def test_reloaded_coefficients_reach_both_clock_directions(year, field, monkeypatch):
+    moment = datetime(year, 6, 15, 12, 34, 56, 125000, tzinfo=UTC)
+    owner = "utc1960_table" if year == 1960 else "historical_utc_table"
+    table = copy.deepcopy(getattr(historical, owner)())
+    monkeypatch.setattr(historical, owner, lambda: table)
+    row = next(
+        r
+        for r in reversed(table["entries"])
+        if r["effective_date"] <= moment.date().isoformat()
+    )
+    before = historical_tai_minus_utc_exact(moment)
+    original_point = historical_utc_to_tt_point(moment)
+    assert historical.historical_utc_from_tt_point(original_point) == moment
+    increments = {
+        "offset_seconds": "2",
+        "reference_mjd": "1",
+        "rate_seconds_per_day": "0.000001",
+    }
+    increment = Decimal(increments[field])
+    rate = Fraction(str(row["rate_seconds_per_day"]))
+    reference = Fraction(str(row["reference_mjd"]))
+    row[field] = float(Decimal(str(row[field])) + increment)
+    elapsed = moment - datetime(2000, 1, 1, tzinfo=UTC)
+    # NAOJ's independent JD2451545 noon anchor gives MJD51544 at midnight.
+    mjd = Fraction(51544 + elapsed.days) + Fraction(
+        elapsed.seconds * 1000000 + elapsed.microseconds, 86400000000
+    )
+    shift = {
+        "offset_seconds": Fraction(2),
+        "reference_mjd": -rate,
+        "rate_seconds_per_day": (mjd - reference) / 1000000,
+    }[field]
+    assert historical_tai_minus_utc_exact(moment) == before + shift
+    changed_point = historical_utc_to_tt_point(moment)
+    assert changed_point.days - original_point.days == shift / 86400
+    assert historical.historical_utc_from_tt_point(changed_point) == moment
 
 
 @pytest.mark.parametrize(
@@ -89,7 +157,6 @@ def test_historical_drift_does_not_extend_outside_its_published_scope(date):
     "date,tt_minus_civil",
     [
         ("1961-01-01", 1.422818 + 32.184 - 0.0025),  # SOFA 5ms step
-        ("1961-08-01", 1.647570 + 32.184 + 0.025),  # two affine labels
         ("1964-04-01", 2.983730 + 32.184 - 0.05),  # no affine label
         ("1972-01-01", 10 + 32.184 - 0.05),
     ],

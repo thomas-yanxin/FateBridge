@@ -245,15 +245,13 @@ def test_reference_explicit_offsets_distinguish_repeated_birth_clock(offset):
     )
 
 
-def test_production_dst_behavior_is_local_wall_addition_not_utc_addition():
+def test_production_fixed_years_keep_utc_duration_across_dst():
     birth = _reference_local("2000-01-01T00:00:00", "Europe/Berlin")
     first = _production(birth, "day")["timeline"][0]["subperiods"][0]
     end = datetime.fromisoformat(first["end"])
     nominal_duration = timedelta(seconds=10 * SECONDS_PER_LEGACY_YEAR) / 7
     assert end.utcoffset() == timedelta(hours=2)
-    assert end.astimezone(UTC) - birth.astimezone(UTC) == (
-        nominal_duration - timedelta(hours=1)
-    )
+    assert end.astimezone(UTC) - birth.astimezone(UTC) == nominal_duration
 
 
 @pytest.mark.parametrize("sect", ["day", "night"])
@@ -378,10 +376,12 @@ def test_production_options_are_independent(sect, basis, night_order):
         assert major["end"] == expected.isoformat()
     if (night_order, basis) == ("nodes_at_end", "fixed_365_2425"):
         assert result == _production(birth, sect)
-        assert "calculation_options" not in result
-    else:
-        assert result["calculation_options"]["night_order"] == night_order
-        assert result["calculation_options"]["year_basis"] == basis
+    assert result["calculation_options"] == {
+        "night_order": night_order,
+        "year_basis": basis,
+        "subperiod_basis": "utc_elapsed",
+        "timezone": "UTC",
+    }
 
 
 @pytest.mark.parametrize("second,microsecond", [(0, 1), (34, 285714), (59, 999999)])
@@ -417,3 +417,113 @@ def test_native_horizon_sect_feeds_the_explicit_calendar_arithmetic(hour, sect):
     assert build_firdaria_payload(
         info, subject, analysis_datetime=info.local_datetime
     ) == build_firdaria_for_sect(info, sect, analysis_datetime=info.local_datetime)
+
+
+@pytest.mark.parametrize(
+    "case",
+    VECTORS["third_party"]["morinus_cases"],
+    ids=lambda case: case["date"] + "-" + case["schedule"],
+)
+def test_pinned_morinus_calendar_dates_and_all_displayed_sub_lords(case):
+    birth = datetime.fromisoformat(case["date"]).replace(tzinfo=UTC)
+    result = _production(
+        birth,
+        "day" if case["schedule"] == "day" else "night",
+        birth + timedelta(days=40 * 365),
+        firdaria_night_order=(
+            "nodes_after_mars"
+            if case["schedule"] == "night_nodes_after_mars"
+            else "nodes_at_end"
+        ),
+        firdaria_year_basis="calendar_anniversary",
+    )
+    for major, expected in zip(result["timeline"], case["majors"], strict=True):
+        assert major["planet"] == expected["planet"]
+        assert major["years"] == expected["years"]
+        assert major["start"][:10] == expected["start"]
+        assert (
+            datetime.fromisoformat(major["end"]) - timedelta(days=1)
+        ).date().isoformat() == expected["inclusive_end"]
+        for sub, reference in zip(
+            major["subperiods"], expected["subperiods"], strict=True
+        ):
+            assert sub["planet"] == reference["planet"]
+            assert sub["start"][:10] == reference["start"]
+
+
+@pytest.mark.parametrize(
+    "case",
+    VECTORS["third_party"]["temporal_cases"],
+    ids=lambda case: case["schedule"] + "-" + case["basis"],
+)
+def test_frozen_temporal_leap_clock_boundaries_and_active_intervals(case):
+    birth = datetime.fromisoformat(case["birth"]["local"]).replace(tzinfo=UTC)
+    target = datetime.fromisoformat(case["target"]["local"]).replace(tzinfo=UTC)
+    options = dict(
+        firdaria_night_order=case["night_order"],
+        firdaria_year_basis=case["basis"],
+    )
+    result = _production(birth, case["sect"], target, **options)
+    epoch = datetime(1970, 1, 1, tzinfo=UTC)
+    for major, reference in zip(result["timeline"], case["timeline"], strict=True):
+        assert major["planet"] == reference["planet"]
+        assert major["years"] == reference["years"]
+        pairs = [
+            (major, reference),
+            *zip(major["subperiods"], reference["subperiods"], strict=True),
+        ]
+        for period, expected in pairs:
+            assert period["planet"] == expected["planet"]
+            for field in ("start", "end"):
+                boundary = datetime.fromisoformat(period[field])
+                assert (
+                    str((boundary - epoch) // MICROSECOND * 1000)
+                    == expected[field]["instant_ns"]
+                )
+                assert (
+                    boundary.replace(tzinfo=None).isoformat(timespec="microseconds")
+                    == expected[field]["local"]
+                )
+                assert boundary.utcoffset() == timedelta(0)
+    for probe in case["probes"]:
+        instant = epoch + timedelta(microseconds=int(probe["instant_ns"]) // 1000)
+        active = _production(birth, case["sect"], instant, **options)
+        assert active["current_major"]["planet"] == probe["major"]
+        assert (active["current_sub"] or {}).get("planet") == probe["sub"]
+
+
+@pytest.mark.parametrize(
+    "case",
+    VECTORS["third_party"]["birchfield_tables"],
+    ids=lambda case: case["schedule"],
+)
+def test_literal_paper_table_disagreements_with_governing_order_are_retained(case):
+    birth = datetime(2000, 1, 1, tzinfo=UTC)
+    result = _production(
+        birth,
+        "day" if case["schedule"] == "day" else "night",
+        firdaria_night_order=(
+            "nodes_after_mars"
+            if case["schedule"] == "night_nodes_after_mars"
+            else "nodes_at_end"
+        ),
+    )
+    differences = []
+    for major, literal in zip(result["timeline"][:9], case["rows"], strict=True):
+        assert (major["planet"], major["years"]) == (
+            literal["planet"],
+            literal["years"],
+        )
+        for index, (sub, paper) in enumerate(
+            zip(major["subperiods"], literal["subperiods"], strict=True)
+        ):
+            if sub["planet"] != paper:
+                differences.append(
+                    dict(
+                        major=major["planet"],
+                        sub_index=index,
+                        literal_paper=paper,
+                        governing_rule=sub["planet"],
+                    )
+                )
+    assert differences == case["literal_discrepancies"]

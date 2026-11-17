@@ -245,7 +245,14 @@ def test_compatibility_uses_one_declared_basis_for_both_people():
 
 
 def test_host_basis_never_moves_the_physical_sky_and_native_text_keeps_provenance():
-    payload = dict(date="2017-06-24", time="12:00:00", zone="+09:00", szchart=1)
+    payload = dict(
+        lat="31n13",
+        lon="121e28",
+        date="2017-06-24",
+        time="12:00:00",
+        zone="+09:00",
+        szchart=1,
+    )
     china = calculate_suzhan_analysis(**payload)
     japan = calculate_suzhan_analysis(**payload, calendar_basis=BASIS)
     assert "error" not in china and "error" not in japan, (china, japan)
@@ -294,4 +301,5 @@ def test_default_chinese_path_never_loads_the_optional_japanese_table(monkeypatc
         props = spec.output_model.model_json_schema()["$defs"][
             "SukuyoCalendarReference"
         ]["properties"]
-        assert "source_bundle_sha256" in props and "date_provenance" in props
+        assert "source_bundle_sha256" not in props
+        assert {"id", "source_url", "date_source_uri", "date_provenance"} <= set(props)

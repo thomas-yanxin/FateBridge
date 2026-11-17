@@ -1,0 +1,40 @@
+{
+  "scope": "Independent transcription of specified author tables and classical noun categories; no efficacy, modern job suitability or complete traditional method acceptance.",
+  "sources": {
+    "JY2018": {"url": "https://www.joeyyap.com/fstw/%5BJoey%20Yap%5DFengShuiThatWorks1.pdf", "locator": "Copyright2018; printed8/PDF9, directly inspected diagram"},
+    "JY2009": {"url": "https://masteryacademy.com/estore/images/Products/report/AnnualFlyingStarsReport-Sample.pdf", "locator": "Copyright2009; printed/PDF9,10,20, directly inspected"},
+    "AFSI2006": {"url": "https://www.amfengshui.com/wp-content/uploads/2014/09/fs351.pdf", "locator": "printed/PDF56, star elements table only; all clinical and timing applications excluded"},
+    "SHUOGUA": {"url": "https://zh.wikisource.org/zh-hant/易傳/說卦", "revision": 2614055, "locator": "chapters10-11, family roles and object nouns; transcription, no printed-edition certification"},
+    "MEIHUA": {"url": "https://zh.wikisource.org/w/index.php?title=%E6%A2%85%E8%8A%B1%E6%98%93%E6%95%B8%2F%E5%8D%B7%E4%B8%80&oldid=2690596", "revision": 2690596, "locator": "八卦万物属类, 人物 and 静物; geographic furnace-place noun is not adopted as a portable static object"}
+  },
+  "stars": [
+    {"number": 1, "element": "水", "trigram": "坎", "source_theme": "Noble People", "theme": "人际协助主题"},
+    {"number": 2, "element": "土", "trigram": "坤", "source_theme": "Illness", "theme": "传统病符类警示标签"},
+    {"number": 3, "element": "木", "trigram": "震", "source_theme": "Arguments", "theme": "言语争议主题"},
+    {"number": 4, "element": "木", "trigram": "巽", "source_theme": "Academic", "theme": "学习与学术主题"},
+    {"number": 5, "element": "土", "trigram": null, "source_theme": "Calamity", "theme": "传统灾厄类警示标签"},
+    {"number": 6, "element": "金", "trigram": "乾", "source_theme": "Career/Authority", "theme": "职业与权威主题"},
+    {"number": 7, "element": "金", "trigram": "兑", "source_theme": "Discord", "theme": "人际不和主题"},
+    {"number": 8, "element": "土", "trigram": "艮", "source_theme": "Wealth", "theme": "财富象征主题"},
+    {"number": 9, "element": "火", "trigram": "离", "source_theme": "Investment/Promotion", "theme": "晋升与投资象征主题"}
+  ],
+  "author_annual_charts": {
+    "2009": {"SE": 8, "S": 4, "SW": 6, "E": 7, "C": 9, "W": 2, "NE": 3, "N": 5, "NW": 1},
+    "2018": {"SE": 8, "S": 4, "SW": 6, "E": 7, "C": 9, "W": 2, "NE": 3, "N": 5, "NW": 1}
+  },
+  "classical_symbols": [
+    {"trigram": "乾", "family": "父", "objects": ["金玉", "圆物", "镜"]},
+    {"trigram": "坤", "family": "母", "objects": ["布帛", "丝绵", "瓦器", "釜"]},
+    {"trigram": "震", "family": "长男", "objects": ["木竹", "芦苇", "竹木乐器"]},
+    {"trigram": "巽", "family": "长女", "objects": ["绳", "竹木", "工巧之器"]},
+    {"trigram": "坎", "family": "中男", "objects": ["水具", "酒器", "弓轮"]},
+    {"trigram": "离", "family": "中女", "objects": ["文书", "甲胄"]},
+    {"trigram": "艮", "family": "少男", "objects": ["土石", "门阙"], "additional_object_source": "说卦第十一章, 艮为门阙"},
+    {"trigram": "兑", "family": "少女", "objects": ["金器", "乐器"]}
+  ],
+  "observation_references": [
+    {"id": "metal_opening_instruments", "classical_objects": ["金器", "乐器"], "retained_modern_candidate": "开口容器", "required_classical_source": "MEIHUA_TRIGRAM_SYMBOLS"},
+    {"id": "stone_and_gate", "classical_objects": ["土石", "门阙"], "retained_modern_candidate": "房门", "required_classical_source": "SHUOGUA_PRIMARY"},
+    {"id": "documents_and_hearth", "classical_objects": ["文书"], "retained_modern_candidate": "灶具", "required_classical_source": "MEIHUA_TRIGRAM_SYMBOLS"}
+  ]
+}

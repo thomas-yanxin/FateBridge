@@ -1,0 +1,39 @@
+{
+  "source": {
+    "title": "增刪卜易",
+    "editor": "秦慎安校勘",
+    "publisher": "文明書局",
+    "year": 1925,
+    "institution": "中國國家圖書館",
+    "catalog_id": "NLC416-12jh005345-45344",
+    "pdf_sha256": "caac111bc5c5b1c08fd27b3828e7cf6b5430503800f2427d8f2b28809022abaa",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/42/NLC416-12jh005345-45344_%E5%A2%9E%E5%88%AA%E5%8D%9C%E6%98%93.pdf",
+    "palace_list_pdf_pages": [24, 25, 26],
+    "diagram_pdf_pages": [26, 27, 28, 29, 30, 31, 32, 33, 34],
+    "method": "Manual visual reading of the named palace lists, line diagrams and eight pure-hexagram branch columns. No OCR or FateBridge corpus code/name lookup. Branches of mixed hexagrams are inferred by joining the corresponding inner and outer pure-trigram columns, not claimed as 384 separate literal transcriptions."
+  },
+  "convention": "Six binary lines and branches bottom to top; each pair names upper then lower trigram. Simplified characters normalize glyphs only.",
+  "trigrams": {"乾": "111", "兑": "110", "离": "101", "震": "100", "巽": "011", "坎": "010", "艮": "001", "坤": "000"},
+  "subject_positions": [6, 1, 2, 3, 4, 5, 4, 3],
+  "palaces": [
+    {"palace": "乾", "element": "金", "upper_lower": ["乾乾", "乾巽", "乾艮", "乾坤", "巽坤", "艮坤", "离坤", "离乾"]},
+    {"palace": "坎", "element": "水", "upper_lower": ["坎坎", "坎兑", "坎震", "坎离", "兑离", "震离", "坤离", "坤坎"]},
+    {"palace": "艮", "element": "土", "upper_lower": ["艮艮", "艮离", "艮乾", "艮兑", "离兑", "乾兑", "巽兑", "巽艮"]},
+    {"palace": "震", "element": "木", "upper_lower": ["震震", "震坤", "震坎", "震巽", "坤巽", "坎巽", "兑巽", "兑震"]},
+    {"palace": "巽", "element": "木", "upper_lower": ["巽巽", "巽乾", "巽离", "巽震", "乾震", "离震", "艮震", "艮巽"]},
+    {"palace": "离", "element": "火", "upper_lower": ["离离", "离艮", "离巽", "离坎", "艮坎", "巽坎", "乾坎", "乾离"]},
+    {"palace": "坤", "element": "土", "upper_lower": ["坤坤", "坤震", "坤兑", "坤乾", "震乾", "兑乾", "坎乾", "坎坤"]},
+    {"palace": "兑", "element": "金", "upper_lower": ["兑兑", "兑坎", "兑坤", "兑艮", "坎艮", "坤艮", "震艮", "震兑"]}
+  ],
+  "pure_branches": {
+    "乾": {"pdf_page": 26, "branches": "子寅辰午申戌"},
+    "坎": {"pdf_page": 27, "branches": "寅辰午申戌子"},
+    "艮": {"pdf_page": 28, "branches": "辰午申戌子寅"},
+    "震": {"pdf_page": 29, "branches": "子寅辰午申戌"},
+    "巽": {"pdf_page": 30, "branches": "丑亥酉未巳卯"},
+    "离": {"pdf_page": 31, "branches": "卯丑亥酉未巳"},
+    "坤": {"pdf_page": 32, "branches": "未巳卯丑亥酉"},
+    "兑": {"pdf_page": 34, "branches": "巳卯丑亥酉未"}
+  },
+  "scope": "Selected structural tables only, not a full-book collation or support for classical case outcomes, conditional strength, timing or prediction. The modern chapter-four transcription's 辰在内 heading is retained in its original fixture; the actual 艮 trigram and its branches are checked from page 28 here."
+}

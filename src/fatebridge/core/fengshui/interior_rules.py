@@ -4,8 +4,10 @@ import json
 from copy import deepcopy
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, cast
+from typing import Any, Dict, Iterable, List, Sequence, cast
 
+from .interior_inputs import InteriorRelation
+from .models import LayoutConstraint
 from .workstation_sources import disagreement, provenance
 
 
@@ -28,22 +30,29 @@ def interior_relation_provenance() -> Dict[str, Any]:
     return cast(Dict[str, Any], result)
 
 
-def _get(value: Any, key: str, default: Any = None) -> Any:
-    if isinstance(value, dict):
-        return value.get(key, default)
-    return getattr(value, key, default)
-
-
 def _action(
-    relation: Any,
+    relation: InteriorRelation,
     rule: Dict[str, Any],
     specification: Dict[str, Any],
-    constraints: Dict[str, Any],
+    constraints: Dict[str, LayoutConstraint],
 ) -> Dict[str, Any]:
-    object_id = _get(relation, specification["endpoint"] + "_object_id")
+    object_id = (
+        relation.source_object_id
+        if specification["endpoint"] == "source"
+        else relation.target_object_id
+    )
     operation = specification["operation"]
     permission_field = {"location": "can_relocate", "facing": "can_rotate"}[operation]
-    permission = _get(constraints.get(object_id), permission_field)
+    constraint = constraints.get(object_id)
+    permission = (
+        None
+        if constraint is None
+        else (
+            constraint.can_relocate
+            if operation == "location"
+            else constraint.can_rotate
+        )
+    )
     blocked = permission is False
     pending = []
     if not blocked:
@@ -56,10 +65,10 @@ def _action(
             ]
         )
     return {
-        "action_id": f"interior:{_get(relation, 'relation_id')}:{object_id}:{operation}",
-        "relation_id": _get(relation, "relation_id"),
-        "source_object_id": _get(relation, "source_object_id"),
-        "target_object_id": _get(relation, "target_object_id"),
+        "action_id": f"interior:{relation.relation_id}:{object_id}:{operation}",
+        "relation_id": relation.relation_id,
+        "source_object_id": relation.source_object_id,
+        "target_object_id": relation.target_object_id,
         "object_id": object_id,
         "operation": operation,
         "status": "blocked" if blocked else "conditional_option",
@@ -83,7 +92,7 @@ def _action(
 
 
 def analyze_interior_relations(
-    context: Optional[Any], constraints: Iterable[Any]
+    relations: Sequence[InteriorRelation], constraints: Iterable[LayoutConstraint]
 ) -> Dict[str, Any]:
     """Review only supplied relations; no direction or relocation is invented.
 
@@ -92,9 +101,6 @@ def analyze_interior_relations(
     fresh candidate position's geometry or physical feasibility.
     """
     data = _bundle()
-    relations = _get(context, "interior_relations")
-    if relations is None:
-        relations = _get(context, "relations", [])
     result: Dict[str, Any] = {
         "status": "complete" if relations else "not_requested",
         "findings": [],
@@ -110,10 +116,10 @@ def analyze_interior_relations(
         "action_options": [],
         "limitations": deepcopy(data["limitations"]) if relations else [],
     }
-    constraint_map = {_get(item, "object_id"): item for item in constraints}
+    constraint_map = {item.object_id: item for item in constraints}
     for relation in relations:
-        rule = deepcopy(data["rules"][_get(relation, "kind")])
-        if _get(relation, "kind") == "sharp_corner_points_at_desk":
+        rule = deepcopy(data["rules"][relation.kind])
+        if relation.kind == "sharp_corner_points_at_desk":
             rule.setdefault("method_disagreements", []).append(disagreement("corners"))
             if not any(
                 r["ruleset_id"] == "workstation_source_boundaries_v1"
@@ -122,9 +128,9 @@ def analyze_interior_relations(
                 result["rulesets"].append(
                     provenance("workstation_source_boundaries_v1")
                 )
-        present = _get(relation, "present")
-        basis = _get(relation, "observation_basis")
-        relation_id = _get(relation, "relation_id")
+        present = relation.present
+        basis = relation.observation_basis
+        relation_id = relation.relation_id
         missing: List[str] = []
         if basis == "image_observed":
             status = "candidate_only"
@@ -140,14 +146,23 @@ def analyze_interior_relations(
             status = "authored_caution" if present else "not_present"
         confirmed = status in {"authored_caution", "not_present"}
         result["rule_coverage_counts"]["supported" if confirmed else "unknown"] += 1
+        actions = (
+            [
+                _action(relation, rule, specification, constraint_map)
+                for specification in rule["actions"]
+            ]
+            if status == "authored_caution"
+            or (status == "candidate_only" and present is True)
+            else []
+        )
         finding = {
             "relation_id": relation_id,
-            "kind": _get(relation, "kind"),
-            "source_object_id": _get(relation, "source_object_id"),
-            "target_object_id": _get(relation, "target_object_id"),
+            "kind": relation.kind,
+            "source_object_id": relation.source_object_id,
+            "target_object_id": relation.target_object_id,
             "present": present,
             "observation_basis": basis,
-            "evidence": _get(relation, "evidence"),
+            "evidence": relation.evidence,
             "status": status,
             "method": "indoor_authored_relations",
             "scope": "authored_non_compass_interior_relation_only",
@@ -173,16 +188,8 @@ def analyze_interior_relations(
                             "action_basis": action["action_basis"],
                             "condition": "若允许相应调整且新位置可容纳、不妨碍通行和使用",
                         }
-                        for action in rule["actions"]
-                        if _get(
-                            constraint_map.get(
-                                _get(relation, action["endpoint"] + "_object_id")
-                            ),
-                            {"location": "can_relocate", "facing": "can_rotate"}[
-                                action["operation"]
-                            ],
-                        )
-                        is not False
+                        for action in actions
+                        if action["status"] != "blocked"
                     ],
                     "source_ids": list(rule["source_ids"]),
                     "rule_id": rule["rule_id"],
@@ -196,11 +203,7 @@ def analyze_interior_relations(
             "action_status": "not_applicable",
         }
         if status == "authored_caution":
-            finding["action_options"] = [
-                _action(relation, rule, specification, constraint_map)
-                for specification in rule["actions"]
-            ]
-            actions = finding["action_options"]
+            finding["action_options"] = actions
             finding["action_status"] = (
                 "no_registered_nonstructural_action"
                 if not actions
@@ -221,8 +224,8 @@ def analyze_interior_relations(
                 "method": "indoor_authored_relations",
                 "source_ids": list(rule["source_ids"]),
                 "relation_id": relation_id,
-                "source_object_id": _get(relation, "source_object_id"),
-                "target_object_id": _get(relation, "target_object_id"),
+                "source_object_id": relation.source_object_id,
+                "target_object_id": relation.target_object_id,
                 "status": status,
                 "predicate_confirmed": confirmed,
                 "predicate_present": present if confirmed else None,

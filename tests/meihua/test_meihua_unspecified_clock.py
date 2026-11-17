@@ -5,12 +5,9 @@ from datetime import datetime, timedelta, timezone
 import pytest
 
 from fatebridge.application.execution import (
-    OutputContractError,
     execute_spec,
-    execute_tool,
 )
 from fatebridge.core import meihua_clock_resolution as policy
-from fatebridge.core.requests.divination import MeihuaAnalysisRequest
 from fatebridge.services import divination as service
 from fatebridge.services.tool_catalog import CATALOG
 from tests.support.meihua_unspecified_clock_reference import load

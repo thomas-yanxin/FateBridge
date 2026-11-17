@@ -1,0 +1,11 @@
+{
+  "author": "R.Santhanam, translator",
+  "source": "BPHS selected volumeI fixed scan",
+  "source_sha256": "13609f1af89541e070c798b8c70c6bfd74a8b9a71a71388913bf898e9f9ddf3f",
+  "pdf_page": 267,
+  "printed_page": 268,
+  "section": "27.8\u20139",
+  "numerical_interpretation": "For supplied apparent solar meridian angleH, shortest arcA in[0,180]; Moon/Mars/Saturn=A/3; Sun/Jupiter/Venus=60-A/3; Mercury=60. Each final scalar is rendered independently.",
+  "implementation_qualification": "Apparent meridian/right-ascension angle is the existing declared coordinate interpretation; this benchmark does not certify native apparent time, physical frames or source uniqueness.",
+  "page_image_sha256": "e1b58b22cf4df9bbdf693863072091462ff90887402880c094059f4b9f8ac4d3"
+}

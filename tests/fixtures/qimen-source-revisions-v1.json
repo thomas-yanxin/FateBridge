@@ -1,0 +1,51 @@
+{
+  "publisher": "Wikisource fixed revision API; public-domain Dunjia Yanyi Siku transcription",
+  "retrieved_on": "2026-11-13",
+  "authority_scope": "Verifies revision identities and wikitext; not scan library authentication, full textual collation or prediction validity.",
+  "api_documentation": "https://www.mediawiki.org/wiki/API:Revisions",
+  "full_view": {
+    "title": "遁甲演義 (四庫全書本)/全覽",
+    "revision": 625946,
+    "timestamp": "2016-10-14T03:21:22Z",
+    "wikitext_sha256": "cf8309c044fa24b1f1be766dfeedfa8e2c20070b84a0ce43a0699eb14ae32075",
+    "source": "https://zh.wikisource.org/w/index.php?oldid=625946",
+    "transcluded_page_titles": [
+      "遁甲演義 (四庫全書本)",
+      "遁甲演義 (四庫全書本)/卷1",
+      "遁甲演義 (四庫全書本)/卷2",
+      "遁甲演義 (四庫全書本)/卷3",
+      "遁甲演義 (四庫全書本)/卷4"
+    ],
+    "contains_fixed_child_revision_ids": false
+  },
+  "volumes": {
+    "2": {
+      "title": "遁甲演義 (四庫全書本)/卷2",
+      "revision": 625940,
+      "timestamp": "2016-10-14T03:21:21Z",
+      "wikitext_sha256": "b9519b8ce35564a1c8ac9fadd18581c44e96c9a3dfc63ed062a378fd987df69f",
+      "source": "https://zh.wikisource.org/w/index.php?oldid=625940"
+    },
+    "1": {
+      "title": "遁甲演義 (四庫全書本)/卷1",
+      "revision": 625938,
+      "timestamp": "2016-10-14T03:21:21Z",
+      "wikitext_sha256": "cb6060b194dec30759baeaeccb5e1ce0e8f8ae28f22d331c54a95b26c8f7515b",
+      "source": "https://zh.wikisource.org/w/index.php?oldid=625938"
+    },
+    "3": {
+      "title": "遁甲演義 (四庫全書本)/卷3",
+      "revision": 625942,
+      "timestamp": "2016-10-14T03:21:21Z",
+      "wikitext_sha256": "8c9cbf86291965986f2638a75ba6c5dfcd18bf174ae2958450ab0834e2874745",
+      "source": "https://zh.wikisource.org/w/index.php?oldid=625942"
+    },
+    "4": {
+      "title": "遁甲演義 (四庫全書本)/卷4",
+      "revision": 625944,
+      "timestamp": "2016-10-14T03:21:22Z",
+      "wikitext_sha256": "38de46d50544c37e6db0685c4a3e0e096089b0d48012d60b5060c91c9a132003",
+      "source": "https://zh.wikisource.org/w/index.php?oldid=625944"
+    }
+  }
+}

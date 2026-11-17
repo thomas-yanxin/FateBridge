@@ -1,6 +1,6 @@
 """Measured planar scenes and finite search domains, independent of lineages."""
 
-from math import cos, hypot, radians, remainder, sin
+from math import hypot
 from typing import Annotated, Literal
 
 from pydantic import (
@@ -13,6 +13,8 @@ from pydantic import (
 from shapely.geometry import Polygon
 
 from .numeric_inputs import FengshuiInput
+from .spatial_angles import _sin_cos_degrees, compose_degrees
+from .surface_inputs import PLANT_REPRESENTATIONS, Representation
 from .workstation_inputs import ObservedCondition
 
 Identifier = Annotated[str, Field(min_length=1, max_length=100, pattern=r"\S")]
@@ -20,7 +22,6 @@ Evidence = Annotated[str, Field(min_length=1, max_length=1000, pattern=r"\S")]
 Number = Annotated[float, Field(allow_inf_nan=False)]
 Positive = Annotated[float, Field(gt=0, allow_inf_nan=False)]
 ObservationBasis = Literal["measured", "user_confirmed", "image_observed"]
-CompassDirection = Literal["N", "NE", "E", "SE", "S", "SW", "W", "NW"]
 RelativePosition = Literal[
     "front",
     "front_right",
@@ -129,8 +130,8 @@ class SpatialOpening(FengshuiInput):
                 self.segment.end.x - self.segment.start.x,
                 self.segment.end.y - self.segment.start.y,
             )
-            angle = radians(self.inward_degrees)
-            if abs(dx * sin(angle) + dy * cos(angle)) > 1e-8 * hypot(dx, dy):
+            sine, cosine = _sin_cos_degrees(self.inward_degrees)
+            if abs(dx * sine + dy * cosine) > 1e-8 * hypot(dx, dy):
                 raise ValueError("入口向内方向须垂直于门洞线段")
         return self
 
@@ -182,15 +183,10 @@ class WorkSeat(FengshuiInput):
 
 
 DesktopRepresentation = Literal[
-    "living_plant",
-    "fresh_flowers",
+    Representation,
     "lamp",
     "smooth_crystal_ball",
     "metal_office_equipment",
-    "water_image",
-    "dark_accessory",
-    "other",
-    "unknown",
 ]
 
 
@@ -220,24 +216,24 @@ class DesktopObject(FengshuiInput):
     )
     healthy: ObservedCondition | None = Field(
         default=None,
-        description="植物/鲜花状态的独立事实；位置与活植物身份不证明状态良好",
+        description="植物/鲜花/剪枝状态的独立事实；位置与活植物身份不证明状态良好",
     )
 
     @model_validator(mode="after")
     def plant_condition(self) -> "DesktopObject":
-        if self.healthy is not None and self.representation not in {
-            "living_plant",
-            "fresh_flowers",
-        }:
-            raise ValueError("植物/鲜花状态条件不能套到其他物件")
+        if (
+            self.healthy is not None
+            and self.representation not in PLANT_REPRESENTATIONS
+        ):
+            raise ValueError("植物/鲜花/剪枝状态条件不能套到其他物件")
         if self.screen is not None:
             screen = self.screen
             if screen.bottom_above_desktop_m + screen.height_m > self.height_m:
                 raise ValueError("显示面须包含在所登记物件的完整高度包络内")
-            angle = radians(remainder(screen.front_degrees, 360))
+            sine, cosine = _sin_cos_degrees(screen.front_degrees)
             for sign in (-1, 1):
-                x = screen.center.x + sign * screen.width_m / 2 * cos(angle)
-                y = screen.center.y - sign * screen.width_m / 2 * sin(angle)
+                x = screen.center.x + sign * screen.width_m / 2 * cosine
+                y = screen.center.y - sign * screen.width_m / 2 * sine
                 if (
                     abs(x) > self.footprint.width_m / 2 + 1e-10
                     or abs(y) > self.footprint.depth_m / 2 + 1e-10
@@ -357,7 +353,7 @@ class SpatialMoveDomain(FengshuiInput):
             {(p.x, p.y) for p in self.positions}
         ) != len(self.positions):
             raise ValueError("搜索位置不能重复")
-        if len({r % 360 for r in self.rotations_degrees}) != len(
+        if len({compose_degrees(r) for r in self.rotations_degrees}) != len(
             self.rotations_degrees
         ):
             raise ValueError("搜索角度归一化后不能重复")

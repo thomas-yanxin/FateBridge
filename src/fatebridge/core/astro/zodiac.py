@@ -148,9 +148,11 @@ def native_lahiri_houses(
             longitude,
             house_code,
             runtime.swe.FLG_SIDEREAL,
+            _julian_day_tt=julian_day_tt,
         )
         cusps, angles, house_axis_convention = canonical_house_geometry(
             julian_day_ut1=julian_day_ut1,
+            julian_day_tt=julian_day_tt,
             latitude=latitude,
             longitude=longitude,
             house_code=house_code,
@@ -167,7 +169,10 @@ def native_lahiri_houses(
         if flags < 0 or mean_flags < 0:
             raise ValueError("Lahiri偏移计算失败")
         definition = native_ecliptic_horizon_angle_definition(
-            julian_day_ut1=julian_day_ut1, latitude=latitude, armc=float(angles[2])
+            julian_day_ut1=julian_day_ut1,
+            julian_day_tt=julian_day_tt,
+            latitude=latitude,
+            armc=float(angles[2]),
         )
     return {
         "ascendant": normalize_angle(float(angles[0])),

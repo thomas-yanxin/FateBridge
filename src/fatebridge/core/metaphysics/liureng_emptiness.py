@@ -54,12 +54,13 @@ def emptiness_evidence(
         ("月建", month_branch),
         ("月将", month_general_branch),
     )
-    return dict(
-        ruleset_id="liuren_tanyuan_empty_scope_v1",
+    evidence = dict(
+        ruleset_id="liuren_tanyuan_empty_scope_v3",
         source_url=TANYUAN_SOURCE,
         source_sha256=TANYUAN_SCAN_SHA256,
         source_title="大六壬探原·卷下论空亡（所选条件）",
         original_pdf_pages=[84, 85],
+        year_fate_placement_pdf_pages=[70, 71, 72, 73],
         day_ganzhi=day_ganzhi,
         xun_head=xun_head_for_ganzhi(day_ganzhi),
         empty_branches=list(empty),
@@ -70,7 +71,12 @@ def emptiness_evidence(
         hour_branch=hour_branch,
         hour_branch_xun_kong=hour_branch in empty,
         role_conditions=[
-            dict(role=name, branch=branch, branch_xun_kong=branch in empty)
+            dict(
+                role=name,
+                branch=branch,
+                branch_xun_kong=branch in empty,
+                xunkong_exception_applies=branch in empty,
+            )
             for name, branch in roles
         ],
         rows=[
@@ -84,14 +90,53 @@ def emptiness_evidence(
                 sky_authority_roles=[
                     name for name, branch in roles if branch == sky_by_earth[earth]
                 ],
+                sky_authority_xunkong_exception=sky_by_earth[earth] in empty
+                and any(branch == sky_by_earth[earth] for _, branch in roles),
                 effective_empty=None,
             )
             for earth in EARTHLY_BRANCHES
         ],
-        nianming_status="not_adjudicated_in_this_excerpt",
         seasonal_true_half_empty_status="not_adjudicated",
-        filling_clashing_status="not_adjudicated",
+        filling_clashing_status="role_exceptions_only",
         comprehensive_judgement=None,
         complete_classical_conformance=False,
-        scope="天盘本支旬空与地盘落底空分别保留。日干所寄地盘虽本空，本节不作空论；该局部例外不取消同名天盘支的本空。太岁、月建、月将列角色及本空条件，原文另有年命例外，本层未裁定其全部含义，不以分析年或行年代替。年月角色沿用本次四柱，月将沿用本次所选将；同支角色可并存。占时值空只列时支事实，不给现实成败断言。所列例外不改旬空两支、旬遁、原三传本空或坐空标志；真空半空、填实冲实、例外优先级及综合有效空亡仍未裁定。",
+        scope="天盘本空与地盘落底空分列。日干寄地盘本空，依本节例外不作空论；天盘本空支为太岁、月建或月将，命中该角色填实。探原卷上规定行年、本命干支均书地盘；卷下年命值空不以空论，依此合读在其书地盘位判该例外，不把上神当年命地盘位。未知年命只影响地盘本空且未被其他已知例外覆盖的位置。各例外不改本空、旬遁、三传本空或坐空；真空半空、其他填实冲实及综合有效空亡仍未裁定。",
     )
+    apply_year_fate_emptiness(evidence, natal=None, annual=None)
+    return evidence
+
+
+def apply_year_fate_emptiness(
+    evidence: dict[str, Any], *, natal: str | None, annual: str | None
+) -> None:
+    """Apply the 卷下 exception at the 卷上 earth positions on the same board."""
+    placements = {"natal": natal, "annual": annual}
+    complete = natal is not None and annual is not None
+    evidence["year_fate_earth_branches"] = placements
+    evidence["nianming_status"] = (
+        "calculated"
+        if complete
+        else (
+            "partial"
+            if natal is not None or annual is not None
+            else "inputs_not_available"
+        )
+    )
+    for row in evidence["rows"]:
+        roles = [
+            role for role, branch in placements.items() if branch == row["earth_branch"]
+        ]
+        exempt = row["earth_xun_kong"] and bool(roles)
+        row.update(
+            earth_year_fate_roles=roles,
+            earth_year_fate_xunkong_exception=(
+                exempt if exempt or not row["earth_xun_kong"] or complete else None
+            ),
+            earth_xunkong_after_seat_and_year_fate=(
+                False
+                if not row["earth_xun_kong"]
+                or row["earth_stem_house_exception"]
+                or exempt
+                else True if complete else None
+            ),
+        )

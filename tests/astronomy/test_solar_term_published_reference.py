@@ -15,8 +15,8 @@ from datetime import datetime
 import pytest
 
 from fatebridge.core.almanac import get_solar_terms_for_year
+from fatebridge.core.de441_solar import MODEL_ID, PROVIDER
 from fatebridge.core.ephemeris_runtime import preserve_ephemeris_path
-from fatebridge.core.moshier_solar import MODEL_ID, PROVIDER
 
 
 @pytest.fixture(scope="module")

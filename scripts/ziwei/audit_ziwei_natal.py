@@ -128,9 +128,10 @@ def audit_natal(fixtures: Path = FIXTURES) -> dict[str, Any]:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--fixtures", type=Path, default=FIXTURES)
     parser.add_argument("--output", type=Path)
     args = parser.parse_args()
-    result = audit_natal()
+    result = audit_natal(args.fixtures)
     encoded = json.dumps(result, ensure_ascii=False, indent=2) + "\n"
     if args.output:
         args.output.write_text(encoded, encoding="utf-8")

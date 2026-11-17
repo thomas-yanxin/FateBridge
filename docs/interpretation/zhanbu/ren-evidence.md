@@ -19,7 +19,7 @@
 | 依据 | 实际字段 | 解读范围 |
 | --- | --- | --- |
 | 四课上下与日干 | `four_lessons.upper_branch/lower_branch/anchor_branch/upper_lower_relation` | 寄宫只定位，第一课仍以日干五行比较；不能拿寄宫五行代替日干 |
-| 干支相加课体 | `day_placement_patterns.day_ganzhi/sky_by_earth/placements/element_relations/evaluations` | 干加支指天盘日干寄宫临日支，支加干指天盘日支临日干寄宫；生克比和比较日干、日支自身五行。俯就／归福、脱我／历虚等十条保留方向，不能改为两个上神之间的关系，或以寄宫五行代日干。十二题全部保留，归合、求合的`matched=null`表示合式投影未裁，不能套寄宫六合、遁干五合或藏干来补结论。干我支彼只为传统关系释读，不单据课名断他人意图、婚姻角色、现实胜负或应期；同日宫重合时两个方向可以同时成立，不强制只选一名。来源与复核见[干支相加审计](../../../scripts/ren/audit_liuren_day_placements.py) |
+| 干支相加课体 | `day_placement_patterns.day_ganzhi/sky_by_earth/placements/element_relations/evaluations` | 干加支指天盘日干寄宫临日支，支加干指天盘日支临日干寄宫；生克比和比较日干、日支自身五行。俯就／归福、脱我／历虚等十条保留方向，不能改为两个上神之间的关系，或以寄宫五行代日干。十二题全部保留，归合、求合缺实际加临时`matched=false`；加临成立而合式未裁时为`null`。不能套寄宫六合、遁干五合或藏干来补合式。干我支彼只为传统关系释读，不单据课名断他人意图、婚姻角色、现实胜负或应期；同日宫重合时两个方向可以同时成立，不强制只选一名。来源与复核见[干支相加审计](../../../scripts/ren/audit_liuren_day_placements.py) |
 | 交车六合与同宫排除 | `cross_harmony.day_ganzhi/sky_by_earth/cross_pairs/distinct_anchors/both_cross_pairs/matched/exclusion_reason` | 按两边分别核对干上神与日支、支上神与日干寄宫支的六合；不是两个上神彼此六合，也不改用天干五合。甲寅、庚申、丁未、己未、癸丑五个同宫日，即使两边配对都为true，命名`matched`仍为false，须保留排除原因。原书还列交车害、刑、冲等题名，不能一概改写为交车六合：如辛酉伏吟在交车害例中，两边并不符合六合；本字段为false只是否定所选六合结构，不否定整章其他交车条件。`comprehensive_judgement=null`不补作成局、交易成功或关系必成；金口诀附盘用同一六壬字段，不替代金口诀本课。取实际发布的`cross_harmony`或附盘`liuren_cross_harmony`视图，保留规则集。计算与书影分别见[交车六合审计](../../../scripts/ren/audit_liuren_cross_harmony.py)及[经纬书影对读](../../../scripts/ren/audit_liuren_jingwei_harmony.py) |
 | 取传与细课体 | `board_style/board_style_detail`、`classification.labels/basis`、`three_transmissions.method`、`rule_trace` | 细名按《探原》总说从事实推导；下贼上比用与上克下知一分开，伏吟读实际杜传／不虞等分支。课间六害不等于涉害取传，“复等”不能说成单一孟位优先 |
 | 三传支、遁干与天将 | `three_transmissions.initial/middle/final` | 支序、六亲、神将分别引用；`ganzhi=null` 可因旬空无遁干，不能自行补干或当成没起盘 |
@@ -27,7 +27,7 @@
 | 斫轮、铸印、轩盖传序 | `transmission_relations.named_structures` | 按探原原页分别核对卯—戌—巳、巳—戌—卯、午—卯—子；同一组三支也须核初中末顺序。`evaluations`列全三条，`matched_ids`只摘要实际命中；它不改变九宗门取传，也不把课名推成升职、得权或现实成败。来源与复核见[三传序列审计](../../../scripts/ren/audit_liuren_ordered_patterns.py) |
 | 课体纲要所选27条条件 | `transmission_relations.course_conditions` | 先读本课日干支、初传、天将、承座和十二运，再引用三个条件组及`matched_ids`。荒淫须为“衰乘天后”，不能改成沐浴；十二运采用探原十干口径，不取天将五行或地盘阶段。斩关须辰戌发用且临干寄宫或日支，不能套金口诀同名规则；一体只取酉酉酉，始终取本课占日同旬首尾。三组可同时命中，无综合优先级；退龄／遐龄异读未裁。`required_stage_branch/possible_god_branches/compatible_in_any_supported_noble_layout`只核两张贵人表、昼夜与顺逆8种替代配置的必要条件；可配不保证九宗取到，不可配也不表示占事不吉。崇位在该配置范围内必要条件始终无法满足；两版本原页仍保留该句，作者列此课的原意未裁，不能改公式制造命中或把布尔结果升级为原典全义。必要条件与原页见[课体布局审计](../../../scripts/ren/audit_liuren_course_layout.py)。病、死、灾伤、孕童等只为原书结构名，不导出寿命、临床、产育或灾祸断言；综合判断仍为null。全章90题名的目录核对不代表90种公式已验收，范围见[课体条件审计](../../../scripts/ren/audit_liuren_course_conditions.py) |
 | 本空与坐空 | 三传的 `xun_kong/earth_branch/seated_kong` | 两种空分开；不把空亡直接断成必败、消失或灾祸 |
-| 空亡分层与局部例外 | `emptiness_evidence.rows/role_conditions/day_stem_house/hour_branch_xun_kong` | 对应本次天盘支及地盘座。日干寄宫地盘例外不取消同名天盘支的本空；太岁、月建、月将角色可同支并存。`effective_empty/comprehensive_judgement=null` 表示尚未综合裁定，不能改说有效空或已填实。年命、真空半空、填实冲实仍未裁定，不能以本命或行年支自行补结论；本层属六壬，不替代金口诀四位规则 |
+| 空亡分层与局部例外 | `emptiness_evidence.rows/role_conditions/year_fate_earth_branches` | 太岁、月建、月将取天盘支，日干寄宫及年命例外取地盘位。行年入口同课年命落在地盘本空位时，`earth_year_fate_xunkong_exception=true`；`earth_xunkong_after_seat_and_year_fate` 只反映所列地盘规则。同名天盘支的本空保留。`effective_empty/comprehensive_judgement=null` 表示尚未综合裁定；本层属六壬，不替代金口诀四位规则 |
 | 德禄马定位 | `auxiliary_stars.stars` | 七项各读实际 `branch/earth_branch/god`、`lesson_indices/transmission_positions` 与本空、坐空；这是天盘星支落到地盘的位置，不能反读成该地支上神。阴干日德不同于本干日禄，天德寄支按原表，不以禄替换 |
 | 月德、天德、天马月序 | `auxiliary_stars.month_building_branch/nominal_month/month_basis` | 软件将节换月月建寅至丑对应一至十二，非农历月、闰月或月将。名义正月不表示已经过农历新年；只认证本次所选定位，非完整神煞断法 |
 | 行年 | 根字段 `runyear.age/ganzhi/gender/age_basis/status` | 男丙寅顺、女壬申逆的农历虚岁行年；未知性别时不补男式。分析时刻课不等于全年逐流月结果 |
@@ -35,7 +35,7 @@
 
 行年当前没有逐月计算，不输出未返回的月份排名或应期。原典异文仍在 `ruleset.unresolved`；细读时保留实际 `source_title/source_urls/version`，不混称多部原典全部一致。
 
-《四库全书》第0808册书影已对读交车公式、同宫五日排除与“五十五日每日一课”三段，范围只限这些段落。生产1.16.0的`source_kind`仍记录原固定转录，不能说该返回字段已变成全书书影校勘。补充来源须另标为所选段落的书影对读；40次原书日名中4处坐标未裁，重复日例也不是独立占验。相邻第二十二法和这些段落均未裁定`day_placement_patterns`里的归合、求合，继续按实际null交付。
+《四库全书》第0808册书影已对读交车公式、同宫五日排除与“五十五日每日一课”三段，范围只限这些段落。生产1.16.0的`source_kind`仍记录原固定转录，不能说该返回字段已变成全书书影校勘。补充来源须另标为所选段落的书影对读；40次原书日名中4处坐标未裁，重复日例也不是独立占验。相邻第二十二法和这些段落均未裁定`day_placement_patterns`里归合、求合的合式；盘内可先用加临条件排除。
 
 细问空亡时可复制实际发布的 `evidence_views.emptiness_evidence.fields` 取证，视图名不是请求参数。结合所问说明原支、座位和已命中的局部例外；占时本空是传统条件事实，不能据此保证现实成败。原书壬申日只给亥的地盘／天盘对照，没有完整历史课盘或现实结果。
 

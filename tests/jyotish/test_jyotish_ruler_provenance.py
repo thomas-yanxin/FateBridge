@@ -9,6 +9,7 @@ from fatebridge.core.jyotish import build_india
 from fatebridge.core.jyotish_evidence import cheshta_ruler_provenance
 from fatebridge.core.jyotish_mean import MODEL, SOURCE, STAR_PLANETS
 from fatebridge.core.jyotish_motion import cheshta_arc
+from tests.support.reference_data import resolve
 
 
 def birth_payload(year=2000, hour=0):
@@ -30,12 +31,6 @@ def motion_factors(india):
         for f in topic["factors"]
         if f.get("fact_path", "").startswith("india.strengths.cheshta_bala.summary.")
     ]
-
-
-def resolve(body, path):
-    for part in path.split("."):
-        body = body[int(part)] if isinstance(body, list) else body[part]
-    return body
 
 
 def assert_attribution(india):

@@ -20,6 +20,7 @@ from fatebridge.core.astro.birth_clock import (
     resolve_solar_birth_clock,
     resolve_solar_epoch,
 )
+from fatebridge.core.astro.reference_frames import rotate_spherical
 from fatebridge.core.astro.solar_sources import SunSourceCohort, sun_source
 from fatebridge.core.astro.source_session import source_session
 from fatebridge.core.guolao_classical import BRANCHES
@@ -150,10 +151,16 @@ def solar_input_context(
 
     if basis == "local_apparent_solar":
         clock = raw["solar_clock"]
+        # Bind the clock to the same natal ray in its actual physical equator;
+        # raw states retain the source-native equatorial convention.
+        solar_ra, _ = rotate_spherical(
+            raw["_solar_clock_native_to_physical"],
+            raw["states"]["Sun"]["right_ascension"],
+            raw["states"]["Sun"]["declination"],
+        )
         if (
             clock["julian_day_ut1"] != raw["julian_day_ut1"]
-            or clock["sun_apparent_right_ascension"]
-            != raw["states"]["Sun"]["right_ascension"]
+            or clock["sun_apparent_right_ascension"] != solar_ra
         ):
             raise EphemerisSourceError("birth_clock_source_mismatch")
         actual = (

@@ -11,6 +11,7 @@ from fatebridge.core import human_design_knowledge_v5 as parent
 from fatebridge.core import human_design_line_catalogue as base
 from fatebridge.core.human_design_references import coherent_human_design_references
 from fatebridge.utils.errors import EphemerisSourceError
+from fatebridge.utils.json_digest import canonical_bytes
 
 CATEGORY = "lines_v6"
 CATALOGUE_PATH = base.CATALOGUE_PATH.with_name("line-knowledge-gate5-v1.json")
@@ -133,7 +134,7 @@ def _catalogue() -> tuple[dict, dict[Path, bytes], dict]:
         provenance.update(
             source_catalogue_version=6,
             source_catalogue_content_sha256=hashlib.sha256(
-                base._canonical(data)
+                canonical_bytes(data)
             ).hexdigest(),
             scope=base._scope(data) + parent.SCOPE + SCOPE,
         )

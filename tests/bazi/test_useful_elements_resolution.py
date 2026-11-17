@@ -9,6 +9,7 @@ from fastapi.testclient import TestClient
 from fatebridge.core.classical import seasonal_climate_god
 from fatebridge.core.elements import ElementAnalysis
 from fatebridge.core.rules import BaZiRules
+from fatebridge.core.useful_elements import resolve_useful_elements
 from fatebridge.utils.data import STEM_ELEMENTS, Element
 
 PILLARS = {
@@ -43,15 +44,60 @@ def test_sensitive_strength_does_not_automatically_add_water():
     assert evidence["limitations"]
 
 
+def test_source_strength_without_fuyi_applicability_never_selects_preferences():
+    analysis = ElementAnalysis.comprehensive_analysis(PILLARS)
+    day_master = analysis["day_master"]
+    adjudication = day_master["classical_adjudication"]
+    assert adjudication["status"] == "not_adjudicated"
+    assert ElementAnalysis.get_favorable_elements(day_master) == []
+    # Hypothetical source-layer inputs, not an assertion about these pillars.
+    adjudication.update(status="adjudicated", body_strength="弱")
+    assert adjudication["ordinary_fuyi_applicable"] is None
+    assert ElementAnalysis.get_favorable_elements(day_master) == []
+    adjudication["ordinary_fuyi_applicable"] = True
+    assert ElementAnalysis.get_favorable_elements(day_master) == [
+        Element.WATER,
+        Element.METAL,
+    ]
+
+
+def test_unadjudicated_reference_cannot_change_an_established_fuyi_direction():
+    analysis = ElementAnalysis.comprehensive_analysis(PILLARS)
+    # Interface counterfactual, not a source judgment about this chart.
+    analysis["day_master"]["classical_adjudication"].update(
+        status="adjudicated", body_strength="弱", ordinary_fuyi_applicable=True
+    )
+    analysis["favorable_elements"] = [
+        value.value
+        for value in ElementAnalysis.get_favorable_elements(analysis["day_master"])
+    ]
+    result = resolve_useful_elements(
+        PILLARS,
+        analysis,
+        [
+            {
+                "key": "unadjudicated_test_reference",
+                "useful_elements": ["火"],
+                "avoid_elements": ["水", "金"],
+            }
+        ],
+    )
+    assert result["useful_elements"] == ["水", "金"]
+    assert set(result["avoid_elements"]) == {"木", "火", "土"}
+
+
 def test_original_case_preserves_wood_conflict_and_fire_reference():
     profile = BaZiRules.chart_useful_profile(PILLARS)
     assert profile["useful_elements"] == []
     assert profile["avoid_elements"] == []
-    assert set(profile["conditional_elements"]) == {"木", "火", "土", "金"}
+    assert profile["assessment_status"] == "not_adjudicated"
+    assert set(profile["conditional_elements"]) == {"木", "火", "土", "金", "水"}
+    engineering = profile["engineering_reference"]
+    assert set(engineering["conditional_elements"]) == {"木", "火", "土", "金"}
     # A sensitive baseline supplies no preference; an unadjudicated
     # co-occurrence candidate must not reintroduce automatic useful elements.
     assert profile["candidate_selection"]["chosen_path_id"] is None
-    assert profile["neutral_elements"] == ["水"]
+    assert engineering["neutral_elements"] == ["水"]
     wood = next(item for item in profile["conflicts"] if item["element"] == "木")
     assert "shang_guan_pei_yin" in wood["supporting_sources"]
     assert "yang_ren_jia_sha" in wood["opposing_sources"]
@@ -68,9 +114,12 @@ def test_original_case_preserves_wood_conflict_and_fire_reference():
 def test_strong_label_cannot_make_wood_both_useful_and_avoided(strength):
     # Sensitivity input, not a recalculation or a claim that this chart is strong.
     analysis = ElementAnalysis.comprehensive_analysis(PILLARS)
-    analysis["day_master"]["strength_level"] = strength
-    analysis["favorable_elements"] = [
-        e.value for e in ElementAnalysis.get_favorable_elements(analysis["day_master"])
+    analysis["day_master"]["engineering_index"]["strength_level"] = strength
+    analysis["engineering_favorable_elements"] = [
+        e.value
+        for e in ElementAnalysis.get_engineering_favorable_elements(
+            analysis["day_master"]
+        )
     ]
     profile = BaZiRules.build_structure_profile(PILLARS, analysis)
     assert not set(profile["useful_elements"]) & set(profile["avoid_elements"])
@@ -107,11 +156,16 @@ def test_specialties_share_resolver_without_complement_avoidance():
 
     career = CareerAnalysis._analyze_industries(PILLARS, "壬", Element.WATER)
     assert career["favorable_elements"] == []
+    assert career["preference_status"] == "not_adjudicated"
     assert career["avoid_industries"] == []
     education = EducationAnalysis._analyze_subjects(
         PILLARS, "壬", {"seal_weight": 1, "food_hurt_weight": 1, "officer_weight": 1}
     )
-    assert set(education["conditional_elements"]) == {"木", "火", "土", "金"}
+    assert set(education["conditional_elements"]) == {"木", "火", "土", "金", "水"}
+    assert education["preference_status"] == "not_adjudicated"
+    directions = CareerAnalysis._analyze_noble_direction(PILLARS, Element.WATER)
+    assert directions["favorable_directions"] == []
+    assert directions["preference_status"] == "not_adjudicated"
 
 
 def test_birth_evidence_and_layers_match_rest_mcp_cli(capsys, monkeypatch):

@@ -1,3 +1,5 @@
+from fatebridge.utils.formatting import format_json_response
+
 """Related contract regressions with shared imports; original cases retained."""
 
 import asyncio
@@ -21,7 +23,7 @@ from fatebridge.core.human_design_time import epoch_context_at_tt
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.validation.human_design import verify_human_design_reading
 from scripts.human_design.check_human_design_solar_projection import checks
-from tests.support.ephemeris_context import moshier_ephemeris
+from tests.support.ephemeris_context import empty_ephemeris_path
 
 
 def test_duplicate_page_locator_never_displaces_complete_receipt_provenance(
@@ -56,12 +58,12 @@ def test_duplicate_page_locator_never_displaces_complete_receipt_provenance(
         not in ("available_fields", "total_bytes", "page_chars", "rest_manifest_path")
     }
     ref["compact_reference"] = True
-    size = len(delivery._json({**prototype, "result_delivery": ref}))
+    size = len(format_json_response({**prototype, "result_delivery": ref}))
     original["cycle_summary"]["reading"] = "中" * (8192 + 50 - size)
     before = copy.deepcopy(original)
     shaped = delivery.bound_response(original, 8192)
     ref = shaped["result_delivery"]
-    assert len(delivery._json(shaped)) <= 8192
+    assert len(format_json_response(shaped)) <= 8192
     assert ref["deferred_fields"] == ["run_metadata.runtime"]
     assert shaped["run_metadata"]["provenance"] == before["run_metadata"]["provenance"]
     assert shaped["cycle_summary"] == before["cycle_summary"]
@@ -272,7 +274,7 @@ def test_epoch_ut1_is_the_inverse_of_the_declared_forward_policy(year, empty_fil
         assert tt_from_ut1(context["jd_ut1"]) == forward.jd_tt
 
     if empty_files:
-        with moshier_ephemeris():
+        with empty_ephemeris_path():
             check()
     else:
         check()

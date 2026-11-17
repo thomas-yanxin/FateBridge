@@ -40,6 +40,26 @@ GEOMETRY_PATH = CORRECTED / "geometry.json"
 GEOMETRY = json.loads(GEOMETRY_PATH.read_text())
 
 
+def test_all_c04_intervals_match_separate_sofa_flint_continuous_clock_reference():
+    raw = (FIXTURE / "flint-interpolation-v1.json.gz").read_bytes()
+    proof = json.loads((FIXTURE / "flint-interpolation-v1.provenance.json").read_text())
+    assert hashlib.sha256(raw).hexdigest() == proof["reference_sha256"]
+    reference = json.loads(gzip.decompress(raw))
+    from fractions import Fraction as F
+
+    table = c04_table()
+    gate = F(str(LINE))
+    for sample, row in zip(table.samples, reference["anchors"], strict=True):
+        assert sample.mjd == row["mjd"]
+        assert abs(F(sample.tt) - F(row["tt_exact"])) * 86400 <= gate
+        assert abs(F(sample.ut1) - F(row["ut1_exact"])) * 86400 <= gate
+    for row in reference["controls"]:
+        actual_ut1 = table.ut1_from_tt(float.fromhex(row["tt_hex"]))
+        actual_tt = table.tt_from_ut1(float.fromhex(row["ut1_query_hex"]))
+        assert abs(F(actual_ut1) - F(row["ut1_exact"])) * 86400 <= gate, row
+        assert abs(F(actual_tt) - F(row["inverse_tt_exact"])) * 86400 <= gate, row
+
+
 def test_external_reference_and_full_source_are_sealed():
     assert MANIFEST["production_imports"] is MANIFEST["swiss_imports"] is False
     assert MANIFEST["published_daily_records"] == 23638
@@ -186,7 +206,7 @@ def test_observed_source_reaches_native_rotation_without_replacing_planetary_tt(
     policy = actual.calculation_basis["earth_rotation"]
     assert policy["measured_eop_applied"]
     assert policy["ut1_reference"] == receipt["ut1_reference"]
-    assert policy["sidereal_time_model"] == "IERS2010_expression_Swiss_nutation"
+    assert policy["sidereal_time_model"] == "IAU2006_2000A_CIO"
     WesternEventClockConversion.model_validate(receipt)
 
 

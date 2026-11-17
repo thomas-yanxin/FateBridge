@@ -13,7 +13,7 @@ from ..utils.data import (
     DESTRUCTION_CYCLE,
     Element,
     check_branch_conflict,
-    count_element_distribution,
+    count_element_distribution_units,
     get_ten_god,
 )
 
@@ -53,50 +53,48 @@ class HealthAnalysis:
         }
 
     @staticmethod
-    def _element_counts(pillars: Dict[str, Tuple[str, str]]) -> Dict[Element, float]:
-        return count_element_distribution(pillars)
-
-    @staticmethod
     def _analyze_constitution(
         pillars: Dict[str, Tuple[str, str]],
     ) -> Dict[str, Any]:
         from ..core.elements import ElementAnalysis
 
-        strength = ElementAnalysis.analyze_day_master_strength(pillars)[
-            "strength_level"
-        ]
-        counts = HealthAnalysis._element_counts(pillars)
-        warm = round(sum(counts[e] for e in WARM_ELEMENTS), 1)
-        cold = round(sum(counts[e] for e in COLD_ELEMENTS), 1)
+        day_master = ElementAnalysis.analyze_day_master_strength(pillars)
+        engineering_index = day_master["engineering_index"]
+        strength = engineering_index["strength_level"]
+        counts = count_element_distribution_units(pillars)
+        warm_units = sum(counts[e] for e in WARM_ELEMENTS)
+        cold_units = sum(counts[e] for e in COLD_ELEMENTS)
         climate = (
             "偏燥热"
-            if warm - cold >= 3
-            else "偏寒湿" if cold - warm >= 3 else "寒暖均衡"
+            if warm_units - cold_units >= 30
+            else "偏寒湿" if cold_units - warm_units >= 30 else "寒暖均衡"
         )
         return {
             "day_master_strength": strength,
+            "engineering_index": engineering_index,
             "climate": climate,
-            "warm_strength": warm,
-            "cold_strength": cold,
+            "warm_strength": warm_units / 10,
+            "cold_strength": cold_units / 10,
             "notes": [
-                f"日主{strength}、{climate}均为盘内规则分类，不表示身体强弱或中医证候。"
+                f"工程旺衰政策档{strength}、{climate}均为盘内规则分类，不表示身体强弱或中医证候。"
             ],
             "reference_scope": _SCOPE,
         }
 
     @staticmethod
     def _analyze_organs(pillars: Dict[str, Tuple[str, str]]) -> Dict[str, Any]:
-        counts = HealthAnalysis._element_counts(pillars)
-        avg = (sum(counts.values()) or 1.0) / 5.0
+        counts = count_element_distribution_units(pillars)
+        total = sum(counts.values())
         findings = []
         for elem, weight in counts.items():
+            # 均量为total/5；1.8倍与0.4倍阈值用整数交叉相乘。
             status = (
                 "盘内缺失"
                 if weight == 0
                 else (
                     "盘内偏多"
-                    if weight >= avg * 1.8
-                    else "盘内偏少" if weight <= avg * 0.4 else "盘内相对均衡"
+                    if weight * 25 >= total * 9
+                    else ("盘内偏少" if weight * 25 <= total * 2 else "盘内相对均衡")
                 )
             )
             organs = ELEMENT_ORGANS[elem]["organs"]
@@ -109,7 +107,7 @@ class HealthAnalysis:
                 }
             )
         return {
-            "element_distribution": {e.value: round(c, 1) for e, c in counts.items()},
+            "element_distribution": {e.value: c / 10 for e, c in counts.items()},
             "findings": findings,
             "summary": "以下是五行权重与传统名称对照，不产生器官功能或健康风险结论。",
             "reference_scope": _SCOPE,

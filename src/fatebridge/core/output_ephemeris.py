@@ -8,6 +8,16 @@ from fatebridge.core.output_base import PartialOutput
 from fatebridge.core.output_midpoints import PhysicalFactorSource
 
 
+class SolarEphemerisReference(PartialOutput):
+    author: Optional[str] = None
+    source_version: Optional[str] = None
+    source_url: Optional[str] = None
+    calculation_library: Optional[str] = None
+    time_argument: Optional[str] = None
+    coefficient_representation: Optional[str] = None
+    coefficient_profile: Optional[str] = None
+
+
 class CompressedFileWindow(PartialOutput):
     slot: Optional[int] = None
     filename: Optional[str] = None

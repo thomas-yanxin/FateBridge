@@ -96,7 +96,7 @@ def make_rest_handler(
     from fastapi import Query
 
     model = spec.request_model
-    error_label = spec.rest_error_label or f"{spec.operation_label_zh}参数"
+    error_label = f"{spec.operation_label_zh}参数"
     # A bare ``List`` param without ``Query()`` is read by FastAPI as a *body*
     # field, which would force the request model to embed under ``request`` and
     # break the flat body contract. Marking both params as Query keeps the body
@@ -141,9 +141,7 @@ def make_rest_handler(
                 execute_tool,
                 spec,
                 request,
-                tool_name=spec.run_metadata_name,
                 cpu_bound=spec.cpu_bound,
-                error_is_fatal=spec.error_is_fatal,
                 options=options,
             )
             return deliver_response(
@@ -152,7 +150,7 @@ def make_rest_handler(
                 strict_fields=strict_fields,
                 include_snapshot_text=include_snapshot_text,
                 response_char_limit=response_char_limit,
-                failed=result_is_error(spec, result),
+                failed=result_is_error(result),
             )
         except ValidationError as exc:
             raise http_exception(status_code=422, detail=validation_error_result(exc))

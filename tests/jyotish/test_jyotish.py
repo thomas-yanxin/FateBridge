@@ -8,7 +8,6 @@ import pytest
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.birth import build_astro_birth_info
 from fatebridge.core.jyotish import (
-    DASHA_ORDER,
     GRAHAS,
     YEAR_DAYS,
     build_india,
@@ -165,7 +164,7 @@ def test_india_core_contains_nine_grahas_sources_and_theme_factors():
     assert {r["rule_id"] for r in india["rule_trace"]} >= set(
         india["charts"]["D1"]["rule_ids"]
     )
-    assert "western_reference_only" in result["interpretation"]["scope"]
+    assert "western_reference_view_only" in result["interpretation"]["scope"]
     assert "india only" in result["interpretation"]["vedic"]["scope"]
     assert result["interpretation"]["signature"]
     assert "D9 上升" in result["snapshot_text"]

@@ -37,6 +37,7 @@ class CivilDateParts(PartialOutput):
 class CivilClockParts(PartialOutput):
     hour: Optional[int] = None
     minute: Optional[int] = None
+    second: Optional[int] = None
 
 
 class WesternCivilCalendarConversion(PartialOutput):
@@ -356,7 +357,18 @@ class PrimaryDirections(PartialOutput):
     sign_changes: Optional[List[SignChange]] = None
 
 
+class ProfectionCalculationOptions(PartialOutput):
+    annual_basis: Optional[str] = None
+    monthly_basis: Optional[str] = None
+    anniversary_clock_policy: Optional[str] = None
+    timezone: Optional[str] = None
+
+
 class Profection(PartialOutput):
+    age_years: Optional[int] = None
+    year_start: Optional[str] = None
+    year_end: Optional[str] = None
+    calculation_options: Optional[ProfectionCalculationOptions] = None
     activated_house: Optional[int] = None
     activated_sign: Optional[str] = None
     activated_sign_label: Optional[str] = None
@@ -386,8 +398,30 @@ class HouseEmphasis(PartialOutput):
     count: Optional[int] = None
 
 
+class ProgressionClockOptions(PartialOutput):
+    method: Optional[str] = None
+    year_basis: Optional[str] = None
+    year_key_numerator: Optional[int] = None
+    year_key_denominator: Optional[int] = Field(default=None, gt=0)
+    time_basis: Optional[str] = None
+    timestamp_rounding: Optional[str] = None
+
+
+class ProgressionCalculationOptions(ProgressionClockOptions):
+    house_method: Optional[str] = None
+
+
+class SolarArcCalculationOptions(PartialOutput):
+    arc_method: Optional[str] = None
+    angle_method: Optional[str] = None
+    progression: Optional[ProgressionCalculationOptions] = None
+
+
 class TimingChart(PartialOutput):
     calculation_basis: Optional[WesternCalculationBasis] = None
+    calculation_options: Optional[
+        ProgressionCalculationOptions | SolarArcCalculationOptions
+    ] = None
     solver: Optional[ReturnSolver] = None
     return_datetime_utc: Optional[str] = None
     analysis_datetime: Optional[str] = None
@@ -405,6 +439,7 @@ class TimingChart(PartialOutput):
     transit_reference: Optional[Dict[str, WesternPoint]] = None
     house_emphasis: Optional[List[HouseEmphasis]] = None
     orb_limit: Optional[float] = None
+    exact_orb_limit: Optional[float] = None
     annual_profection: Optional[Profection] = None
     monthly_profections: Optional[List[MonthlyProfection]] = None
     year_start: Optional[str] = None
@@ -443,6 +478,22 @@ class Firdaria(PartialOutput):
     calculation_options: Optional[FirdariaCalculationOptions] = None
 
 
+class DecennialExactOffset(PartialOutput):
+    numerator: Optional[int] = None
+    denominator: Optional[int] = Field(default=None, gt=0)
+
+
+class DecennialCalculationOptions(PartialOutput):
+    start_mode: Optional[str] = None
+    order_type: Optional[str] = None
+    day_method: Optional[str] = None
+    calendar_type: Optional[str] = None
+    time_basis: Optional[str] = None
+    timestamp_rounding: Optional[str] = None
+    offset_minutes_rounding: Optional[str] = None
+    timezone: Optional[str] = None
+
+
 class DecennialPeriod(PartialOutput):
     key: Optional[str] = None
     level: Optional[int] = None
@@ -455,6 +506,8 @@ class DecennialPeriod(PartialOutput):
     active: Optional[bool] = None
     start_offset_minutes: Optional[int] = None
     end_offset_minutes: Optional[int] = None
+    start_offset_exact_minutes: Optional[DecennialExactOffset] = None
+    end_offset_exact_minutes: Optional[DecennialExactOffset] = None
     sublevel: Optional[List["DecennialPeriod"]] = None
 
 
@@ -466,6 +519,7 @@ class Decennials(PartialOutput):
     current_level_2: Optional[DecennialPeriod] = None
     current_level_3: Optional[DecennialPeriod] = None
     timeline: Optional[List[DecennialPeriod]] = None
+    calculation_options: Optional[DecennialCalculationOptions] = None
 
 
 class ReleasingPeriod(PartialOutput):
@@ -474,7 +528,10 @@ class ReleasingPeriod(PartialOutput):
     ruler: Optional[str] = None
     ruler_label: Optional[str] = None
     level: Optional[int] = None
-    duration_value: Optional[float] = None
+    duration_value: Optional[float] = Field(
+        default=None,
+        description="Nominal full-sign duration before parent truncation, in duration_unit: 360-day years at L1, 30-day months at L2, calendar days at L3. Actual interval is start/end.",
+    )
     duration_unit: Optional[str] = None
     duration_unit_label: Optional[str] = None
     start: Optional[str] = None
@@ -499,6 +556,8 @@ class ReleasingTrack(PartialOutput):
     base_point_label: Optional[str] = None
     release_start_sign: Optional[str] = None
     release_start_sign_label: Optional[str] = None
+    start_sign_adjusted: Optional[bool] = None
+    angular_reference_sign: Optional[str] = None
     lot: Optional[WesternPoint] = None
     peak_signs: Optional[List[SignLabel]] = None
     current_level_1: Optional[ReleasingPeriod] = None
@@ -511,7 +570,24 @@ class ReleasingTrack(PartialOutput):
     level_4_timeline: Optional[List[ReleasingPeriod]] = None
 
 
+class ReleasingCalculationBasis(PartialOutput):
+    method_id: Optional[str] = None
+    source_authors: Optional[List[str]] = None
+    source_title: Optional[str] = None
+    source_date: Optional[str] = None
+    source_url: Optional[str] = None
+    year_basis: Optional[str] = None
+    year_days: Optional[float] = None
+    interval_time_basis: Optional[str] = None
+    angular_reference_point: Optional[str] = None
+    angular_reference_sign: Optional[str] = None
+    spirit_same_sign_rule: Optional[str] = None
+    published_levels: Optional[List[int]] = None
+    whole_procedure_certified: Optional[bool] = None
+
+
 class ZodiacalReleasing(PartialOutput):
+    calculation_basis: Optional[ReleasingCalculationBasis] = None
     fortune: Optional[ReleasingTrack] = None
     spirit: Optional[ReleasingTrack] = None
 
@@ -709,6 +785,8 @@ class Keypoints(SystemOutput):
 
 
 class PlanetaryArc(SystemOutput):
+    progressed_datetime: Optional[str] = None
+    progression_options: Optional[ProgressionCalculationOptions] = None
     arc_degrees: Optional[float] = None
     arc_source: Optional[str] = None
     arc_source_label: Optional[str] = None
@@ -760,6 +838,8 @@ class AgePoint(SystemOutput):
 
 
 class VedicProgression(SystemOutput):
+    progressed_datetime: Optional[str] = None
+    calculation_options: Optional[ProgressionCalculationOptions] = None
     orb: Optional[float] = None
     zodiac: Optional[str] = None
     positions: Optional[Dict[str, WesternPoint]] = None
@@ -779,6 +859,8 @@ class DeclinationParallel(PartialOutput):
 
 
 class JaynesDeclination(SystemOutput):
+    progressed_datetime: Optional[str] = None
+    calculation_options: Optional[ProgressionClockOptions] = None
     orb: Optional[float] = None
     parallels: Optional[List[DeclinationParallel]] = None
 

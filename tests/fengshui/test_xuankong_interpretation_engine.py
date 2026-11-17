@@ -31,13 +31,16 @@ def _natal(period, angle, uncertainty=0):
     return xuankong_natal(
         XuankongRequest.model_validate(
             {
-                "house": {"facing_degrees": angle, "north_reference": "magnetic"},
+                "house": {
+                    "facing_degrees": angle,
+                    "north_reference": "magnetic",
+                    "bearing_uncertainty_degrees": uncertainty,
+                },
                 "period": {
                     "basis": "expert_confirmed",
                     "period_number": period,
                     "evidence": "独立确认历史宅运",
                 },
-                "bearing_uncertainty_degrees": uncertainty,
             }
         )
     )

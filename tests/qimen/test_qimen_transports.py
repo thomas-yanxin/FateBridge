@@ -122,6 +122,8 @@ def test_qimen_evidence_agrees_across_real_transports(
         assert q["day_ganzhi"] == "甲午"
         assert q["time_ganzhi"] == "甲子"
         assert q["source_disagreements"] == []
+        assert "candidate_outcomes" in q["stem_context"]["day"]
+        assert "伏干所列候选" in bodies[0]["snapshot_text"]
     elif month == 1 and day == 15:
         assert q["stem_context"]["day"]["effective_stem"] == "己"
         assert any(p["rule_id"] == "flying_day_stem" for p in q["patterns"])

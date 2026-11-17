@@ -7,18 +7,31 @@ Earlier calendar labels are outside this scope. No Earth rotation is inferred.
 from __future__ import annotations
 
 import json
-from datetime import datetime, timedelta, timezone
+from dataclasses import dataclass
+from datetime import datetime, timezone
 from fractions import Fraction
 from functools import lru_cache
 from importlib.resources import files
 from typing import Any, Optional, cast
 
-from fatebridge.core.astro.julian_day import _julian_day
+from fatebridge.core.astro.julian_day import _datetime_from_julian_day
 from fatebridge.core.astro.tt_epoch import TTInstant
+from fatebridge.core.astro.utc_policy import leap_table
 
 
 class HistoricalUTCAdjustment(ValueError):
-    """TT occurs in a fractional UTC adjustment with no unique civil label."""
+    """TT has no unique supported ordinary historical datetime label."""
+
+
+@dataclass(frozen=True)
+class UTCDriftInterval:
+    start: datetime
+    start_day: Fraction
+    stop_day: Fraction
+    offset_at_start: Fraction
+    rate: Fraction
+    start_tt: Fraction
+    stop_tt: Fraction
 
 
 @lru_cache(maxsize=1)
@@ -56,8 +69,73 @@ def historical_utc_source(moment: datetime) -> dict[str, Any]:
     )
 
 
-def _entries() -> list[dict[str, Any]]:
-    return [*utc1960_table()["entries"], *historical_utc_table()["entries"]]
+def _utc_intervals() -> tuple[UTCDriftInterval, ...]:
+    table = historical_utc_table()
+    rows = tuple(
+        (
+            row["effective_date"],
+            str(row["offset_seconds"]),
+            str(row["reference_mjd"]),
+            str(row["rate_seconds_per_day"]),
+        )
+        for row in [*utc1960_table()["entries"], *table["entries"]]
+    )
+    return _utc_intervals_cached(
+        rows,
+        table["valid_until"],
+        Fraction(leap_table()["entries"][0]["tai_minus_utc_seconds"]),
+    )
+
+
+@lru_cache(maxsize=1)
+def _utc_intervals_cached(
+    source_rows: tuple[tuple[str, str, str, str], ...],
+    valid_until: str,
+    modern_offset: Fraction,
+) -> tuple[UTCDriftInterval, ...]:
+    """Ordinary UTC source domains, including removed negative-step tails."""
+    rows = [
+        (
+            _date(effective_date),
+            Fraction(offset),
+            Fraction(4800001, 2) + Fraction(reference_mjd),
+            Fraction(rate),
+        )
+        for effective_date, offset, reference_mjd, rate in source_rows
+    ]
+    intervals = []
+    for index, (start, offset, reference, rate) in enumerate(rows):
+        start_day = Fraction(start.toordinal()) + Fraction(3442849, 2)
+        stop = rows[index + 1][0] if index + 1 < len(rows) else _date(valid_until)
+        stop_day = Fraction(stop.toordinal()) + Fraction(3442849, 2)
+        if index + 1 < len(rows):
+            _, next_offset, next_reference, next_rate = rows[index + 1]
+            next_offset += (stop_day - next_reference) * next_rate
+        else:
+            next_offset = modern_offset
+        end_offset = offset + (stop_day - reference) * rate
+        # SOFA dtf2d: remove the daily frequency drift before measuring the
+        # jump. A negative jump removes the final fraction of the UTC day.
+        stop_day += min(Fraction(0), next_offset - end_offset) / 86400
+        offset_at_start = offset + (start_day - reference) * rate
+        intervals.append(
+            UTCDriftInterval(
+                start,
+                start_day,
+                stop_day,
+                offset_at_start,
+                rate,
+                start_day + (offset_at_start + Fraction(4023, 125)) / 86400,
+                stop_day
+                + (
+                    offset_at_start
+                    + (stop_day - start_day) * rate
+                    + Fraction(4023, 125)
+                )
+                / 86400,
+            )
+        )
+    return tuple(intervals)
 
 
 def _date(value: str) -> datetime:
@@ -65,51 +143,22 @@ def _date(value: str) -> datetime:
 
 
 def historical_tai_minus_utc(moment: datetime) -> Optional[float]:
-    """Use the full fractional UTC day, not just midnight's TAI-UTC value."""
+    """Round the published affine offset once, after exact UTC evaluation."""
+    offset = historical_tai_minus_utc_exact(moment)
+    return None if offset is None else float(offset)
+
+
+def historical_tai_minus_utc_exact(moment: datetime) -> Optional[Fraction]:
+    """One published-decimal offset for scalar and exact-point consumers."""
     if moment.utcoffset() is None:
         raise ValueError("Historical UTC requires an aware datetime")
     moment = moment.astimezone(timezone.utc)
-    entries = _entries()
-    if (
-        not _date(entries[0]["effective_date"])
-        <= moment
-        < _date(historical_utc_table()["valid_until"])
-    ):
-        return None
-    entry = next(
-        row
-        for row in reversed(entries)
-        if row["effective_date"] <= moment.date().isoformat()
-    )
-    return float(
-        entry["offset_seconds"]
-        + (_julian_day(moment) - 2400000.5 - entry["reference_mjd"])
-        * entry["rate_seconds_per_day"]
-    )
-
-
-def historical_utc_to_tt_point(moment: datetime) -> Optional[TTInstant]:
-    """Encode a covered UTC label using the exact published affine decimals.
-
-    This is a separate point contract. The established float forward and
-    inverse functions retain their existing arithmetic and results. It does
-    not infer Earth rotation, authenticate a clock, or extend table coverage.
-    """
-    if moment.utcoffset() is None:
-        raise ValueError("Historical UTC requires an aware datetime")
-    moment = moment.astimezone(timezone.utc)
-    entries = _entries()
+    intervals = _utc_intervals()
     if not (
-        _date(entries[0]["effective_date"])
-        <= moment
-        < _date(historical_utc_table()["valid_until"])
+        intervals[0].start <= moment < _date(historical_utc_table()["valid_until"])
     ):
         return None
-    row = next(
-        entry
-        for entry in reversed(entries)
-        if entry["effective_date"] <= moment.date().isoformat()
-    )
+    interval = next(row for row in reversed(intervals) if row.start <= moment)
     micros = (
         moment.hour * 3600 + moment.minute * 60 + moment.second
     ) * 1_000_000 + moment.microsecond
@@ -118,101 +167,66 @@ def historical_utc_to_tt_point(moment: datetime) -> Optional[TTInstant]:
         + Fraction(3442849, 2)
         + Fraction(micros, 86_400_000_000)
     )
-    offset = Fraction(str(row["offset_seconds"])) + (
-        day - Fraction(4800001, 2) - Fraction(str(row["reference_mjd"]))
-    ) * Fraction(str(row["rate_seconds_per_day"]))
-    return TTInstant.from_utc(moment, tai_minus_utc_seconds=offset)
+    if day >= interval.stop_day:
+        raise ValueError(
+            "UTC clock label was removed by a historical negative adjustment"
+        )
+    return interval.offset_at_start + (day - interval.start_day) * interval.rate
 
 
-def historical_utc_from_tt(jd_tt: float) -> Optional[datetime]:
-    """Invert each affine segment; refuse a gap or multiple civil candidates.
+def historical_utc_to_tt_point(moment: datetime) -> Optional[TTInstant]:
+    """Encode a covered UTC label with the same exact published offset."""
+    offset = historical_tai_minus_utc_exact(moment)
+    return (
+        None
+        if offset is None
+        else TTInstant.from_utc(moment, tai_minus_utc_seconds=offset)
+    )
 
-    datetime cannot encode the fractional UTC clock-adjustment intervals. The
-    caller may retain TT and report that a unique normalized label is missing.
-    """
-    table = historical_utc_table()
-    entries = _entries()
-    first = _date(entries[0]["effective_date"])
-    first_offset = historical_tai_minus_utc(first)
-    if first_offset is None:
-        raise ValueError("Historical UTC table does not cover its first epoch")
-    first_tt = _julian_day(first) + (first_offset + 32.184) / 86400
-    # Modern UTC conversion handles the upper endpoint and later epochs.
-    stop_tt = _julian_day(_date(table["valid_until"])) + (10 + 32.184) / 86400
-    if not first_tt <= jd_tt < stop_tt:
-        return None
-    candidates = []
-    for index, row in enumerate(entries):
-        start = _julian_day(_date(row["effective_date"]))
-        stop = _julian_day(
-            _date(
-                entries[index + 1]["effective_date"]
-                if index + 1 < len(entries)
-                else table["valid_until"]
-            )
-        )
-        rate = row["rate_seconds_per_day"]
-        offset = (
-            row["offset_seconds"] + (start - 2400000.5 - row["reference_mjd"]) * rate
-        )
-        start_tt = start + (offset + 32.184) / 86400
-        # Evaluate both endpoints directly. Accumulating a multi-year segment
-        # from start_tt can create a one-ULP false overlap at a continuous
-        # coefficient change (for example 1962-01-01).
-        stop_offset = (
-            row["offset_seconds"] + (stop - 2400000.5 - row["reference_mjd"]) * rate
-        )
-        stop_tt = stop + (stop_offset + 32.184) / 86400
-        if start_tt <= jd_tt < stop_tt:
-            civil = start + (jd_tt - start_tt) / (1 + rate / 86400)
-            candidates.append(
-                datetime(1970, 1, 1, tzinfo=timezone.utc)
-                + timedelta(days=civil - 2440587.5)
-            )
-    if len(candidates) != 1:
-        raise HistoricalUTCAdjustment(
-            "TT lies in a historical fractional UTC adjustment without a unique datetime label"
-        )
-    return candidates[0]
+
+def historical_utc_from_tt(
+    jd_tt: float, *, nominal_boundaries: bool = False
+) -> Optional[datetime]:
+    """Use one point inverse; nominal encoded midnights are explicit policy."""
+    point = TTInstant.from_float(jd_tt)
+    if nominal_boundaries:
+        for interval in _utc_intervals():
+            if jd_tt == float(interval.start_tt):
+                return interval.start
+    return historical_utc_from_tt_point(point)
 
 
 def historical_utc_from_tt_point(point: TTInstant) -> Optional[datetime]:
     """Invert the same published affine coefficients without large-JD loss.
 
-    Decimal coefficients denote their published decimal values. Positive
-    steps have no civil candidate; negative steps may have two. Keep those
-    conditions explicit instead of choosing an offset from a rounded label.
+    Removed negative-step labels are outside the ordinary UTC source domain.
+    Inserted fractional labels remain unsupported by datetime; tiny gaps in
+    the declared source equations are not filled with an invented label.
     """
-    entries = _entries()
-    intervals = []
-    for index, row in enumerate(entries):
-        start_date = _date(row["effective_date"])
-        stop_date = _date(
-            entries[index + 1]["effective_date"]
-            if index + 1 < len(entries)
-            else historical_utc_table()["valid_until"]
-        )
-        start = Fraction(start_date.toordinal()) + Fraction(3442849, 2)
-        stop = Fraction(stop_date.toordinal()) + Fraction(3442849, 2)
-        rate = Fraction(str(row["rate_seconds_per_day"]))
-        offset = Fraction(str(row["offset_seconds"]))
-        reference = Fraction(str(row["reference_mjd"])) + Fraction(4800001, 2)
-        base = Fraction(4023, 125) + offset
-        start_tt = start + (base + (start - reference) * rate) / 86400
-        stop_tt = stop + (base + (stop - reference) * rate) / 86400
-        intervals.append((start, stop, start_tt, stop_tt, rate))
+    intervals = _utc_intervals()
     modern = Fraction(_date(historical_utc_table()["valid_until"]).toordinal())
-    modern += Fraction(3442849, 2) + Fraction(5273, 125) / 86400
-    if not intervals[0][2] <= point.days < modern:
+    modern += (
+        Fraction(3442849, 2)
+        + (
+            Fraction(leap_table()["entries"][0]["tai_minus_utc_seconds"])
+            + Fraction(4023, 125)
+        )
+        / 86400
+    )
+    if not intervals[0].start_tt <= point.days < modern:
         return None
     candidates = [
-        start + (point.days - first) / (1 + rate / 86400)
-        for start, stop, first, last, rate in intervals
-        if first <= point.days < last
+        (
+            interval.start_day
+            + (point.days - interval.start_tt) / (1 + interval.rate / 86400),
+            interval.stop_day,
+        )
+        for interval in intervals
+        if interval.start_tt <= point.days < interval.stop_tt
     ]
     if len(candidates) != 1:
         raise HistoricalUTCAdjustment(
-            "TT lies in a historical fractional UTC adjustment without a unique datetime label"
+            "TT lies in a historical UTC adjustment without a unique ordinary datetime label"
         )
-    micros = round((candidates[0] - Fraction(4881175, 2)) * 86_400_000_000)
-    return datetime(1970, 1, 1, tzinfo=timezone.utc) + timedelta(microseconds=micros)
+    civil, stop = candidates[0]
+    return _datetime_from_julian_day(civil, before=stop)

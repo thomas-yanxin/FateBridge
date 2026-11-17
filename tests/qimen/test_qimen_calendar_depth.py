@@ -10,10 +10,6 @@ from fatebridge.core.almanac import localize_datetime
 from fatebridge.services.divination import calculate_sanshiunited_analysis
 from fatebridge.services.metaphysics import calculate_qimen_analysis
 
-REFERENCE = json.loads(
-    (Path(__file__).parents[1] / "fixtures/calendar_hko_v1/reference.json").read_text()
-)
-
 
 def qimen(at, *, zone="America/New_York", solar=False):
     return calculate_qimen_analysis(
@@ -33,7 +29,12 @@ def qimen(at, *, zone="America/New_York", solar=False):
 @pytest.mark.parametrize("solar", [False, True])
 @pytest.mark.parametrize("year", [2026, 2027, 2028])
 def test_all_72_hko_term_boundaries_drive_chaibu_by_civil_instant(zone, solar, year):
-    cases = [c for c in REFERENCE["cases"] if c["year"] == year]
+    reference = json.loads(
+        (
+            Path(__file__).parents[1] / "fixtures/calendar_hko_v1/reference.json"
+        ).read_text()
+    )
+    cases = [c for c in reference["cases"] if c["year"] == year]
     for index, case in enumerate(cases):
         instant = datetime.fromisoformat(case["at"])
         before_term = cases[index - 1]["term"]  # Small Cold follows Winter Solstice.
@@ -82,6 +83,7 @@ def test_corrected_solar_label_in_dst_gap_is_not_rejected_as_a_civil_input():
         gps_lat=40.7,
         gps_lon=-74.006,
         use_true_solar_time=True,
+        qimen_options={"ju_method": "chaibu"},
     )
     for body in [result, aggregate]:
         assert "error" not in body
@@ -89,6 +91,40 @@ def test_corrected_solar_label_in_dst_gap_is_not_rejected_as_a_civil_input():
             "2026-03-08 02:"
         )
     assert result["qimen"]["palaces"] == aggregate["qimen"]["palaces"]
+
+
+def test_solar_gap_label_keeps_its_hour_across_explicit_instant_representations():
+    # Sxtwl2.0.6 independently gives Xin-Si day and Ji-Chou for this supplied
+    # apparent-solar clock label. The physical civil instant is07:30UTC.
+    dedicated = calculate_qimen_analysis(
+        analysis_year=2026,
+        analysis_month=3,
+        analysis_day=8,
+        analysis_hour=3,
+        analysis_minute=30,
+        analysis_timezone="America/New_York",
+        analysis_utc_offset="-04:00",
+        analysis_longitude=-74.006,
+        use_true_solar_time=True,
+        qimen_options={"ju_method": "chaibu"},
+    )
+    aggregate = calculate_sanshiunited_analysis(
+        date="2026-03-08",
+        time="07:30:00+00:00",
+        zone="America/New_York",
+        gps_lat=40.7,
+        gps_lon=-74.006,
+        use_true_solar_time=True,
+        qimen_options={"ju_method": "chaibu"},
+    )
+    for body in [dedicated, aggregate]:
+        assert "error" not in body
+        assert body["analysis_context"]["corrected_datetime"].startswith(
+            "2026-03-08 02:"
+        )
+        assert body["qimen"]["day_ganzhi"] == "辛巳"
+        assert body["qimen"]["time_ganzhi"] == "己丑"
+    assert dedicated["qimen"]["palaces"] == aggregate["qimen"]["palaces"]
 
 
 @pytest.mark.parametrize("solar", [False, True])

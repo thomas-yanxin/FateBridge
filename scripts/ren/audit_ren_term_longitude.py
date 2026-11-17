@@ -13,10 +13,11 @@ from pathlib import Path
 from typing import Any
 
 from fatebridge.core import almanac
-from fatebridge.core.astro.time_scales import datetime_from_tt_point
+from fatebridge.core.astro.time_scales import datetime_from_tt
 from fatebridge.core.astro.tt_epoch import TTInstant
 from fatebridge.core.ephemeris_runtime import configure_ephemeris_path
 from fatebridge.core.metaphysics import ren_calendar
+from fatebridge.utils.errors import EphemerisSourceError
 
 ROOT = Path(__file__).resolve().parents[2]
 CORPUS = ROOT / "tests/fixtures/ren_term_longitude_v1"
@@ -240,7 +241,7 @@ def coherent_fault(term: almanac.SolarTerm, *, wide: bool) -> almanac.SolarTerm:
             d["root_bracket_tt"][1] - d["root_bracket_tt"][0]
         ) * 86400
         point = TTInstant.from_float(d["selected_crossing_jd_tt"])
-    moment = datetime_from_tt_point(point)
+    moment = datetime_from_tt(point)
     # The diagnostic native-probe delta stays mathematically consistent too.
     native = d.get("native_choice_probe_jd_tt")
     if type(native) in (int, float):
@@ -437,7 +438,7 @@ def audit(frozen_roots: Path, output: Path, *, matrix_only: bool) -> dict[str, A
                     try:
                         ren_calendar.require_ren_solar_term(replace(term, name=claimed))
                         decision = True
-                    except Exception:
+                    except EphemerisSourceError:
                         decision = False
                     matrix.append(
                         dict(
@@ -460,7 +461,7 @@ def audit(frozen_roots: Path, output: Path, *, matrix_only: bool) -> dict[str, A
                         try:
                             ren_calendar.require_ren_solar_term(bad)
                             rejected = False
-                        except Exception:
+                        except EphemerisSourceError:
                             rejected = True
                         additional.append(
                             dict(profile=profile, fault=fault, rejected=rejected)
@@ -482,7 +483,7 @@ def audit(frozen_roots: Path, output: Path, *, matrix_only: bool) -> dict[str, A
                         try:
                             ren_calendar.require_ren_solar_term(bad)
                             rejected = False
-                        except Exception:
+                        except EphemerisSourceError:
                             rejected = True
                         additional.append(
                             dict(

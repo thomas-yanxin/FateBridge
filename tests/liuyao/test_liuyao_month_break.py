@@ -136,6 +136,7 @@ def test_actual_hidden_mounting_does_not_release_day_valued_flying_month_break(
         c for c in h["supporting_conditions"] if c["rule_id"] == "flying_struck"
     )
     assert rule["matched"] is True and rule["qualified_matched"] is False
+    assert rule["qualification_status"] == "day_value_excludes_month_only_opposition"
     fact = next(
         x
         for x in result["month_break_conditions"]["hidden"]

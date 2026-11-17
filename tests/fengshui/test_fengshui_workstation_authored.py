@@ -693,7 +693,10 @@ def test_source_rules_resolve_and_references_never_enable_p3():
         assert rule_id.split(".")[0] in data["rulesets"]
     for ruleset_id in data["rulesets"]:
         p = provenance(ruleset_id)
-        assert p["version"] == "1.0.0" and p["sources"]
+        assert p["version"] == (
+            "1.1.0" if ruleset_id == "afsi_application_conditions_v1" else "1.0.0"
+        )
+        assert p["sources"]
         p["sources"].clear()
         assert provenance(ruleset_id)["sources"]
     for value in data["disagreements"].values():

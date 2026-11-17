@@ -1007,7 +1007,7 @@ def main():
         ).hexdigest(),
         "runtime_dependencies": {
             name: importlib.metadata.version(name)
-            for name in ("fastmcp", "pydantic", "kerykeion", "pyswisseph")
+            for name in ("fastmcp", "pydantic", "pyswisseph")
         },
         "cases": [],
         "selected_case_count": len(cases),

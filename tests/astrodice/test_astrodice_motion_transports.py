@@ -2,6 +2,7 @@
 
 import asyncio
 import json
+import math
 from fractions import Fraction
 from pathlib import Path
 
@@ -150,12 +151,15 @@ def test_published_motion_view_retains_unknowns_and_schema_in_all_transports(
     assert policy["reference_frame"] == (
         "lahiri_sidereal_ecliptic_of_date" if zodiacal else "tropical_ecliptic_of_date"
     )
-    assert points["Saturn"]["direction"] == (
-        "not_computed" if failed == "Saturn" else "retrograde"
-    )
+    assert points["Saturn"]["direction"] == "retrograde"
+    assert policy["uncomputed_points"] == ["Pars Fortuna"]
     if failed:
-        assert failed in policy["uncomputed_points"]
-        assert points[failed]["longitude_speed"] is None
+        approximate = {failed} | ({"South Node"} if failed == "North Node" else set())
+        for name in approximate:
+            motion = points[name]
+            assert math.isfinite(motion["longitude_speed"])
+            assert motion["correction_status"] == "approximate_model"
+            assert "native_longitude_speed" not in motion
     assert points["Pars Fortuna"]["longitude_speed"] is None
     native = asyncio.run(invoke(inputs, fields))
     assert run([*flags(inputs), "--fields", *fields, "--strict-fields"]) == 0

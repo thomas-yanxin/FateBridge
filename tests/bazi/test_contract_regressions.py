@@ -262,7 +262,7 @@ def test_known_root_clock_failure_is_bounded_and_cannot_return_none(
     def fail(*args):
         raise error
 
-    monkeypatch.setattr(solar_term_clock, "datetime_from_tt_point", fail)
+    monkeypatch.setattr(solar_term_clock, "utc_calendar_from_tt", fail)
     with pytest.raises(solar_term_clock.SolarTermClockError) as caught:
         solar_term_clock.native_solar_root_datetime(2451545.0)
     result = caught.value.as_result()
@@ -277,7 +277,7 @@ def test_original_strict_source_error_is_preserved_not_wrapped(monkeypatch):
     def fail(*args):
         raise error
 
-    monkeypatch.setattr(solar_term_clock, "datetime_from_tt_point", fail)
+    monkeypatch.setattr(solar_term_clock, "utc_calendar_from_tt", fail)
     with pytest.raises(EphemerisSourceError) as caught:
         solar_term_clock.native_solar_root_datetime(2451545.0)
     assert caught.value is error
@@ -314,7 +314,7 @@ def test_known_native_root_clock_failure_never_becomes_a_linear_year(
     def fail(*args):
         raise error
 
-    monkeypatch.setattr(solar_term_clock, "datetime_from_tt_point", fail)
+    monkeypatch.setattr(solar_term_clock, "utc_calendar_from_tt", fail)
     with pytest.raises(solar_term_clock.SolarTermClockError):
         almanac._calculate_solar_terms_for_year(2000, "UTC")
 

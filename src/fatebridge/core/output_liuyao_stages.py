@@ -45,11 +45,24 @@ class HiddenStageConditions(PartialOutput):
     scope: Optional[str] = None
 
 
+class FireStageCycle(PartialOutput):
+    source_url: Optional[str] = None
+    source_section: Optional[str] = None
+    stage_order_url: Optional[str] = None
+    start_branch: Optional[str] = None
+    branch_direction: Optional[str] = None
+    offsets_from_growth: Optional[Dict[str, int]] = None
+    derived_positions: Optional[Dict[str, str]] = None
+
+
 class StageKnowledge(PartialOutput):
     ruleset_id: Optional[str] = None
     ruleset_version: Optional[str] = None
     source_url: Optional[str] = None
     source_sha256: Optional[str] = None
+    literal_ruleset_version: Optional[str] = None
+    literal_source_stages: Optional[Dict[str, Dict[str, str]]] = None
+    fire_cycle_derivation: Optional[FireStageCycle] = None
     known_stages: Optional[Dict[str, Dict[str, str]]] = None
     missing_stages: Optional[Dict[str, List[str]]] = None
     clauses: Optional[List[Dict[str, Any]]] = None

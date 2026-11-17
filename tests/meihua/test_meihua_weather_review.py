@@ -1,6 +1,5 @@
 """Frozen original scores, independent source tokens and synthetic clock controls."""
 
-import ast
 import gzip
 import hashlib
 import json
@@ -10,7 +9,6 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.validation import meihua_weather_reference_study as strict
 from fatebridge.validation.meihua_weather_references import (
     climatology_reference,
     monthly_climatology_profile,

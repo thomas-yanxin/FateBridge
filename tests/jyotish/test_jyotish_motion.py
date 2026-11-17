@@ -167,7 +167,7 @@ def test_source_audit_cli_exits_nonzero_without_mutating_the_reference(tmp_path)
 def test_audit_report_cannot_overwrite_its_reference_inputs(tmp_path, which):
     # Use a disposable project copy: a broken guard must not corrupt repo data.
     script = tmp_path / "scripts/jyotish/audit_jyotish_motion.py"
-    script.parent.mkdir()
+    script.parent.mkdir(parents=True)
     script.write_bytes((ROOT / "scripts/jyotish/audit_jyotish_motion.py").read_bytes())
     primary = tmp_path / "tests/fixtures/jyotish-motion-primary.json"
     primary.parent.mkdir(parents=True)

@@ -7,8 +7,8 @@ from importlib.metadata import version
 from pathlib import Path
 from typing import Any, Dict, Optional, Sequence, Tuple
 
-from fatebridge.core.astro import continuous_lahiri as frames
-from fatebridge.core.astro import runtime
+from fatebridge.core.astro import reference_frames, runtime
+from fatebridge.core.astro.continuous_lahiri import frame_state
 from fatebridge.core.astro.inner_source import (
     METHOD_ID,
     SourceDerivativeUnavailable,
@@ -121,14 +121,14 @@ def complete_inner_rate(
             ]
             _, rotation = checked_fixed_acceleration(raw, earth)
             policy["fixed_reception_rotation"] = rotation
-            p = frames.mv(
+            p = reference_frames.mv(
                 rotation["matrix"], [float(x) for x in source["direction_icrf"]]
             )
-            v = frames.mv(
+            v = reference_frames.mv(
                 rotation["matrix"],
                 [float(x) for x in source["derivative_per_native_argument_day"]],
             )
-            frame = frames.frame_state(epoch)
+            mean, derivative = reference_frames.mean_ecliptic_frame(epoch)
             psi, deps, psi_d, _ = nutation(epoch)
             native, native_flags = runtime.ephemeris_call(
                 "calc", epoch, swe.ECL_NUT, swe.FLG_SWIEPH
@@ -139,13 +139,16 @@ def complete_inner_rate(
                 or not all(math.isfinite(x) for x in native[:4])
             ):
                 raise EphemerisSourceError("coordinate_values_unavailable")
-            mean_eps = math.degrees(frames.pair(epoch, "pepol", "peper")[0][1])
+            mean_eps = math.degrees(
+                reference_frames.pair(epoch, "pepol", "peper")[0][1]
+            )
             model_errors = [
                 abs(a - b) * 3600 for a, b in zip((mean_eps, psi, deps), native[1:4])
             ]
             origin = psi
             origin_d = psi_d
             if sidereal:
+                frame = frame_state(epoch)
                 runtime.ephemeris_call("set_sid_mode", swe.SIDM_LAHIRI, 0.0, 0.0)
                 aya_flags, aya = runtime.ephemeris_call(
                     "get_ayanamsa_ex", epoch, swe.FLG_SWIEPH | swe.FLG_NONUT
@@ -175,7 +178,9 @@ def complete_inner_rate(
                 return unavailable("declared_native_frame_not_reproduced")
             if max(position_errors) > POSITION_LINE_ARCSEC:
                 return unavailable("continuous_source_display_position_not_reproduced")
-            moving = frames.mv(frame["mean_omega"], p)
+            moving = reference_frames.mv(
+                reference_frames.mm(derivative, reference_frames.transpose(mean)), p
+            )
             source_rate = math.degrees((p[0] * v[1] - p[1] * v[0]) / rho2)
             frame_rate = math.degrees((p[0] * moving[1] - p[1] * moving[0]) / rho2)
             complete = math.fsum((source_rate, frame_rate, origin_d))

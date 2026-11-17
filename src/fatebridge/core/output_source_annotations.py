@@ -4,12 +4,16 @@ from typing import Dict, List, Literal, Optional
 
 from pydantic import JsonValue, field_validator, model_validator
 
-from fatebridge.core.output_base import PartialOutput
+from fatebridge.core.output_base import FullFact, PartialOutput
 from fatebridge.core.output_branch_candidates import (
     BranchCombinationCandidates,
     physical_branch_mapping,
     validate_effect_links,
     validate_punishment_resolution,
+)
+from fatebridge.core.output_classical_force import (
+    ClassicalForceAdjudication,
+    EngineeringStrengthIndex,
 )
 from fatebridge.core.output_energy_provenance import EnergyProvenance, bind_assessment
 from fatebridge.core.output_source_conditions import SourceConditionReview
@@ -230,6 +234,8 @@ class SourceAnnotationComparison(PartialOutput):
 
 class SourceCurrentCalculation(PartialOutput):
     strength_level: Optional[Grade] = None
+    engineering_index: FullFact[Optional[EngineeringStrengthIndex]] = None
+    classical_adjudication: FullFact[Optional[ClassicalForceAdjudication]] = None
     method_id: Optional[str] = None
     assessment: Optional[Dict[str, JsonValue]] = None
     energy_provenance: Optional[EnergyProvenance] = None
@@ -242,6 +248,20 @@ class SourceCurrentCalculation(PartialOutput):
             bind_assessment(
                 self.energy_provenance, self.assessment or {}, self.method_id
             )
+        index = self.engineering_index
+        if index is not None and (
+            (
+                self.strength_level is not None
+                and index.strength_level is not None
+                and self.strength_level != index.strength_level
+            )
+            or (
+                self.method_id is not None
+                and index.method_id is not None
+                and self.method_id != index.method_id
+            )
+        ):
+            raise ValueError("原典比较的工程档及方法须来自同次工程索引")
         return self
 
     @model_validator(mode="after")

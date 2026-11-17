@@ -15,7 +15,6 @@ import pytest
 from fatebridge.core.sukuyo import calendar_mansion, day_evidence
 from fatebridge.core.sukuyo_koya import SOURCE as ARC_SOURCE
 from fatebridge.core.sukuyo_koya_preface import (
-    SOURCE,
     preface_reading_lines,
     preface_reference,
 )

@@ -4,9 +4,11 @@ from __future__ import annotations
 
 import math
 from calendar import monthrange
-from datetime import datetime
+from dataclasses import dataclass
+from datetime import datetime, timezone
+from datetime import tzinfo as DateTimeZone
 from fractions import Fraction
-from typing import Any, Dict, List, Mapping, Optional
+from typing import Any, Dict, List, Literal, Mapping, Optional
 
 from fatebridge.core.astro.birth import (
     AstroBirthInfo,
@@ -19,15 +21,18 @@ from fatebridge.core.astro.geometry import (
     combine_longitudes,
     normalize_angle,
 )
-from fatebridge.core.astro.horizon import horizon_altitude
 from fatebridge.core.astro.physical_epoch import PhysicalEpoch
-from fatebridge.core.astro.time_scales import ephemeris_time
 from fatebridge.core.astrology_tables import (
     EGYPTIAN_BOUNDS_BY_SIGN as EGYPTIAN_BOUNDS_BY_SIGN,
 )
 from fatebridge.core.astrology_tables import SIGN_LABELS_ZH, SIGNS
-from fatebridge.core.ephemeris_runtime import ephemeris_call, swe
+from fatebridge.core.ephemeris_runtime import swe
 from fatebridge.core.execution_context import current_datetime
+from fatebridge.core.predictive.native_chart import (
+    NativePoint,
+    NativeSubject,
+    build_native_subject,
+)
 from fatebridge.utils.timezones import parse_timezone_name, validate_local_clock
 
 TROPICAL_YEAR_DAYS = 365.2425
@@ -233,13 +238,20 @@ def resolve_local_birthday_anniversary(
     birth_local_datetime: datetime,
     target_year: int,
     *,
-    tzinfo: Optional[Any] = None,
+    tzinfo: Optional[DateTimeZone] = None,
+    clock_policy: Literal["preserve_wall", "compatible"] = "preserve_wall",
 ) -> datetime:
+    """Reconstruct the original birthday; callers select generated-clock policy.
+
+    Strict calendar Firdaria validates the preserved wall clock itself.
+    Profections use Temporal-compatible generated anniversaries: earlier on
+    backward transitions, forward by the gap on forward transitions.
+    """
     target_day = min(
         birth_local_datetime.day,
         monthrange(target_year, birth_local_datetime.month)[1],
     )
-    return datetime(
+    moment = datetime(
         target_year,
         birth_local_datetime.month,
         target_day,
@@ -249,6 +261,47 @@ def resolve_local_birthday_anniversary(
         birth_local_datetime.microsecond,
         tzinfo=tzinfo or birth_local_datetime.tzinfo,
     )
+    if clock_policy == "compatible":
+        return moment.astimezone(timezone.utc).astimezone(moment.tzinfo)
+    return moment
+
+
+@dataclass(frozen=True)
+class BirthdayAnniversary:
+    analysis_datetime: datetime
+    nominal_year: int
+    start: datetime
+
+
+def resolve_last_birthday(
+    birth_info: AstroBirthInfo, *, analysis_datetime: datetime
+) -> BirthdayAnniversary:
+    """Locate the anniversary by exact instant and retain its nominal year.
+
+    A date-line gap can move a December anniversary into January, so the
+    displayed year cannot be used to choose the next birthday or the age.
+    """
+    analysis_local = analysis_datetime.astimezone(
+        parse_timezone_name(birth_info.timezone)
+    )
+    nominal_year = analysis_local.year
+    anniversary = resolve_local_birthday_anniversary(
+        birth_info.local_datetime,
+        nominal_year,
+        tzinfo=analysis_local.tzinfo,
+        clock_policy="compatible",
+    )
+    while analysis_local.astimezone(timezone.utc) < anniversary.astimezone(
+        timezone.utc
+    ):
+        nominal_year -= 1
+        anniversary = resolve_local_birthday_anniversary(
+            birth_info.local_datetime,
+            nominal_year,
+            tzinfo=analysis_local.tzinfo,
+            clock_policy="compatible",
+        )
+    return BirthdayAnniversary(analysis_local, nominal_year, anniversary)
 
 
 def normalize_sign_name(sign_name: str) -> str:
@@ -262,24 +315,17 @@ def sign_label(sign_name: str) -> str:
 
 def resolve_egyptian_bound(sign_name: str, degree_in_sign: float) -> Dict[str, Any]:
     normalized_sign = normalize_sign_name(sign_name)
-    normalized_degree = max(0.0, min(float(degree_in_sign), 29.9999))
-    for lord, start_degree, end_degree in EGYPTIAN_BOUNDS_BY_SIGN[normalized_sign]:
-        if start_degree <= normalized_degree < end_degree:
+    for lord, start_degree, end_degree in EGYPTIAN_BOUNDS_BY_SIGN.get(
+        normalized_sign, []
+    ):
+        if start_degree <= degree_in_sign < end_degree:
             return {
                 "bound_lord": lord,
                 "bound_lord_label": planet_label(lord),
                 "segment_start_degree": round(start_degree, 4),
                 "segment_end_degree": round(end_degree, 4),
             }
-    fallback_lord, start_degree, end_degree = EGYPTIAN_BOUNDS_BY_SIGN[normalized_sign][
-        -1
-    ]
-    return {
-        "bound_lord": fallback_lord,
-        "bound_lord_label": planet_label(fallback_lord),
-        "segment_start_degree": round(start_degree, 4),
-        "segment_end_degree": round(end_degree, 4),
-    }
+    raise ValueError("Egyptian bounds require a known sign and a degree in [0, 30)")
 
 
 def planet_label(planet_name: str) -> str:
@@ -303,25 +349,25 @@ def point_attribute_name(point_name: str) -> str:
     return POINT_ATTRIBUTE_NAMES.get(point_name, point_name.lower())
 
 
-def point_absolute_position(subject: Any, point_name: str) -> float:
+def point_absolute_position(subject: NativeSubject, point_name: str) -> float:
     point = getattr(subject, point_attribute_name(point_name))
     return float(point.abs_pos)
 
 
-def point_to_dict(point_name: str, point: Any) -> Dict[str, Any]:
-    sign_name = normalize_sign_name(getattr(point, "sign", ""))
-    house_name = getattr(point, "house", None)
+def point_to_dict(point_name: str, point: NativePoint) -> Dict[str, Any]:
+    sign_name = normalize_sign_name(point.sign)
+    house_name = point.house
     return {
         "point": point_name,
         "point_label": planet_label(point_name),
         "sign": sign_name,
         "sign_label": sign_label(sign_name),
-        "degree": float(getattr(point, "position", 0.0)),
-        "absolute_degree": float(getattr(point, "abs_pos", 0.0)),
-        "longitude": float(getattr(point, "abs_pos", 0.0)),
+        "degree": float(point.position),
+        "absolute_degree": float(point.abs_pos),
+        "longitude": float(point.abs_pos),
         "house": house_number(house_name),
         "house_label": house_label(house_name),
-        "retrograde": bool(getattr(point, "retrograde", False)),
+        "retrograde": point.retrograde,
     }
 
 
@@ -348,8 +394,8 @@ def opposite_sign(sign_name: str) -> str:
     return SIGNS[(SIGNS.index(sign_name) + 6) % 12]
 
 
-def classify_releasing_phase(sign_name: str, root_sign: str) -> Dict[str, Any]:
-    relative_index = ((SIGNS.index(sign_name) - SIGNS.index(root_sign)) % 12) + 1
+def classify_releasing_phase(sign_name: str, fortune_sign: str) -> Dict[str, Any]:
+    relative_index = ((SIGNS.index(sign_name) - SIGNS.index(fortune_sign)) % 12) + 1
     if relative_index in {1, 4, 7, 10}:
         phase = "angular"
     elif relative_index in {2, 5, 8, 11}:
@@ -389,7 +435,7 @@ def build_lot_point_dict(
     return payload
 
 
-def build_lot_payloads(natal_subject: Any) -> Dict[str, Dict[str, Any]]:
+def build_lot_payloads(natal_subject: NativeSubject) -> Dict[str, Dict[str, Any]]:
     asc_sign = normalize_sign_name(natal_subject.ascendant.sign)
     sect = determine_sect(natal_subject)
     sun_longitude = point_absolute_position(natal_subject, "Sun")
@@ -433,9 +479,8 @@ def build_subject(
     house_system: str = "P",
     zodiac_type: str = "Tropic",
     physical_epoch: PhysicalEpoch | None = None,
-) -> Any:
+) -> NativeSubject:
     ensure_predictive_backend_available()
-    from .native_chart import build_native_subject
 
     return build_native_subject(
         name=name,
@@ -454,7 +499,7 @@ def build_natal_subject(
     *,
     house_system: str = "P",
     zodiac_type: str = "Tropic",
-) -> Any:
+) -> NativeSubject:
     require_resolved_birth_timezone(birth_info.timezone_source)
     return build_subject(
         name=birth_info.name,
@@ -467,27 +512,8 @@ def build_natal_subject(
     )
 
 
-def determine_sect(subject: Any) -> str:
-    from .native_chart import NativeSubject
-
-    if isinstance(subject, NativeSubject):
-        # Native charts already used the physical TT Sun and UT1 horizon.
-        # Re-parsing a UTC display string would reject inserted second60.
-        return "day" if subject.is_diurnal else "night"
-    # Kerykeion's Sun in whole-sign house 1/7 is not a physical horizon test.
-    # Fetch tropical coordinates even when the subject uses a sidereal zodiac.
-    times = ephemeris_time(datetime.fromisoformat(subject.iso_formatted_utc_datetime))
-    coordinates, retflag = ephemeris_call("calc", times.jd_tt, swe.SUN, swe.FLG_SWIEPH)
-    if retflag < 0:
-        raise ValueError("Cannot determine sect: solar ephemeris failed")
-    altitude, _ = horizon_altitude(
-        times.jd_ut1,
-        subject.lng,
-        subject.lat,
-        float(coordinates[0]),
-        float(coordinates[1]),
-    )
-    return "day" if altitude >= 0.0 else "night"
+def determine_sect(subject: NativeSubject) -> str:
+    return "day" if subject.is_diurnal else "night"
 
 
 def sect_label(sect: str) -> str:
@@ -508,23 +534,16 @@ def calculate_age_years_int(
     birth_info: AstroBirthInfo,
     analysis_datetime: datetime,
 ) -> int:
-    years = analysis_datetime.year - birth_info.local_datetime.year
-    birthday_this_year = resolve_local_birthday_anniversary(
-        birth_info.local_datetime,
-        analysis_datetime.year,
-        tzinfo=analysis_datetime.tzinfo,
-    )
-    if analysis_datetime < birthday_this_year:
-        years -= 1
-    return years
+    anniversary = resolve_last_birthday(birth_info, analysis_datetime=analysis_datetime)
+    return anniversary.nominal_year - birth_info.local_datetime.year
 
 
-def extract_reference_points(subject: Any) -> Dict[str, Dict[str, Any]]:
+def extract_reference_points(subject: NativeSubject) -> Dict[str, Dict[str, Any]]:
     return extract_named_points(subject, TIMING_POINT_NAMES)
 
 
 def extract_named_points(
-    subject: Any,
+    subject: NativeSubject,
     point_names: List[str],
 ) -> Dict[str, Dict[str, Any]]:
     result = {}
@@ -536,12 +555,12 @@ def extract_named_points(
     return result
 
 
-def extract_reference_longitudes(subject: Any) -> Dict[str, float]:
+def extract_reference_longitudes(subject: NativeSubject) -> Dict[str, float]:
     return extract_named_longitudes(subject, TIMING_POINT_NAMES)
 
 
 def extract_named_longitudes(
-    subject: Any,
+    subject: NativeSubject,
     point_names: List[str],
 ) -> Dict[str, float]:
     return {

@@ -8,9 +8,10 @@ from typing import Any, Dict, List, Literal, Optional
 
 from pydantic import ConfigDict, model_validator
 
-from fatebridge.core.output_base import PartialOutput
+from fatebridge.core.output_base import FullFact, PartialOutput
 from fatebridge.core.output_bazi_evidence import BaziEvidenceChain
 from fatebridge.core.output_chinese import CalendarContext, SolarTerm
+from fatebridge.core.output_classical_force import EngineeringStrengthIndex
 
 
 class TimingOverrides(PartialOutput):
@@ -161,6 +162,7 @@ class IndustryRecommendation(PartialOutput):
 
 class IndustryAnalysis(PartialOutput):
     favorable_elements: Optional[List[str]] = None
+    preference_status: FullFact[Optional[str]] = None
     conditional_elements: Optional[List[str]] = None
     reference_scope: Optional[str] = None
     mapping_status: Optional[str] = None
@@ -176,6 +178,7 @@ class CareerRuleSignal(PartialOutput):
 
 
 class CareerStructure(PartialOutput):
+    engineering_index: FullFact[Optional[EngineeringStrengthIndex]] = None
     score_kind: Optional[str] = None
     scope: Optional[str] = None
     score_basis: Optional[str] = None
@@ -211,6 +214,7 @@ class FavorableDirection(PartialOutput):
 
 class NobleDirection(PartialOutput):
     favorable_directions: Optional[List[FavorableDirection]] = None
+    preference_status: FullFact[Optional[str]] = None
 
 
 class CareerAnalysis(DimensionOutput):
@@ -233,6 +237,7 @@ class WealthStars(PartialOutput):
 
 
 class WealthStructure(PartialOutput):
+    engineering_index: FullFact[Optional[EngineeringStrengthIndex]] = None
     day_master_strength: Optional[str] = None
     pattern: Optional[str] = None
     level: Optional[str] = None
@@ -295,6 +300,7 @@ class WealthAnalysis(DimensionOutput):
 
 
 class Constitution(PartialOutput):
+    engineering_index: FullFact[Optional[EngineeringStrengthIndex]] = None
     day_master_strength: Optional[str] = None
     climate: Optional[str] = None
     warm_strength: Optional[float] = None
@@ -405,6 +411,7 @@ class Wenchang(PartialOutput):
 class SubjectOrientation(PartialOutput):
     inclination: Optional[str] = None
     favorable_fields: Optional[List[str]] = None
+    preference_status: FullFact[Optional[str]] = None
     assessment_status: Optional[str] = None
 
 
@@ -439,6 +446,7 @@ class DominantTraits(PartialOutput):
 
 
 class Disposition(PartialOutput):
+    engineering_index: FullFact[Optional[EngineeringStrengthIndex]] = None
     strength: Optional[str] = None
     polarity: Optional[str] = None
     notes: Optional[List[str]] = None

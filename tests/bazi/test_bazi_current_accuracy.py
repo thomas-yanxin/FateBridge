@@ -12,9 +12,13 @@ from itertools import product
 from pathlib import Path
 
 import pytest
+from pydantic import ValidationError
 
 from fatebridge.core.elements import ElementAnalysis
-from fatebridge.core.output_source_annotations import SourceAnnotationComparison
+from fatebridge.core.output_source_annotations import (
+    SourceAnnotationComparison,
+    SourceCurrentCalculation,
+)
 from fatebridge.core.strength import DEFAULT_POLICY, evaluate_strength_policy
 from fatebridge.services.source_comparison import calculate_bazi_source_compare
 from scripts.bazi.audit_bazi_source_corpus import (
@@ -191,3 +195,26 @@ def test_missing_events_and_tied_clash_are_not_certified_source_matches():
         )["matches"]
         is None
     )
+
+
+@pytest.mark.parametrize("field", ["engineering_index", "classical_adjudication"])
+def test_full_source_comparison_preserves_both_layers_while_projection_is_optional(
+    field,
+):
+    current = calculate_bazi_source_compare("己巳", "癸酉", "癸未", "庚申")[
+        "current_calculation"
+    ]
+    SourceCurrentCalculation.model_validate(current, context={"full_result": True})
+    del current[field]
+    with pytest.raises(ValidationError):
+        SourceCurrentCalculation.model_validate(current, context={"full_result": True})
+    SourceCurrentCalculation.model_validate({"strength_level": "强"})
+
+
+def test_source_comparison_cannot_mix_engineering_grade_and_index():
+    current = calculate_bazi_source_compare("己巳", "癸酉", "癸未", "庚申")[
+        "current_calculation"
+    ]
+    current["engineering_index"]["strength_level"] = "弱"
+    with pytest.raises(ValidationError, match="同次工程索引"):
+        SourceCurrentCalculation.model_validate(current)

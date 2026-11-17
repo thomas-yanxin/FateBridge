@@ -11,12 +11,12 @@ from fatebridge.utils.timezones import parse_timezone_name
 
 from ._common import (
     build_subject,
-    calculate_age_years_int,
     collect_aspect_hits,
     extract_reference_longitudes,
     normalize_sign_name,
     planet_label,
     point_to_dict,
+    resolve_last_birthday,
     resolve_local_birthday_anniversary,
     sign_label,
 )
@@ -56,10 +56,10 @@ def build_annual_profection_payload(
     *,
     analysis_datetime: datetime,
 ) -> Dict[str, Any]:
-    analysis_datetime, last_birthday = resolve_last_birthday(
-        birth_info, analysis_datetime=analysis_datetime
-    )
-    age_years_int = calculate_age_years_int(birth_info, analysis_datetime)
+    anniversary = resolve_last_birthday(birth_info, analysis_datetime=analysis_datetime)
+    analysis_datetime = anniversary.analysis_datetime
+    last_birthday = anniversary.start
+    age_years_int = anniversary.nominal_year - birth_info.local_datetime.year
     asc_sign = normalize_sign_name(natal_subject.ascendant.sign)
     asc_index = SIGNS.index(asc_sign)
     activated_house = (age_years_int % 12) + 1
@@ -68,8 +68,9 @@ def build_annual_profection_payload(
 
     next_birthday = resolve_local_birthday_anniversary(
         birth_info.local_datetime,
-        last_birthday.year + 1,
+        anniversary.nominal_year + 1,
         tzinfo=last_birthday.tzinfo,
+        clock_policy="compatible",
     )
     months_since_birthday = monthly_profection_index(
         last_birthday, next_birthday, analysis_datetime
@@ -78,6 +79,15 @@ def build_annual_profection_payload(
     monthly_sign = SIGNS[(asc_index + monthly_house - 1) % 12]
 
     return {
+        "age_years": age_years_int,
+        "year_start": last_birthday.isoformat(),
+        "year_end": next_birthday.isoformat(),
+        "calculation_options": {
+            "annual_basis": "civil_birth_anniversary",
+            "monthly_basis": "equal_UTC_twelfths",
+            "anniversary_clock_policy": "compatible",
+            "timezone": birth_info.timezone,
+        },
         "activated_house": activated_house,
         "activated_sign": activated_sign,
         "activated_sign_label": sign_label(activated_sign),
@@ -87,30 +97,6 @@ def build_annual_profection_payload(
         "monthly_sign": monthly_sign,
         "monthly_sign_label": sign_label(monthly_sign),
     }
-
-
-def resolve_last_birthday(
-    birth_info: AstroBirthInfo,
-    *,
-    analysis_datetime: datetime,
-) -> tuple[datetime, datetime]:
-    analysis_local = analysis_datetime.astimezone(
-        parse_timezone_name(birth_info.timezone)
-    )
-    birthday_this_year = resolve_local_birthday_anniversary(
-        birth_info.local_datetime,
-        analysis_local.year,
-        tzinfo=analysis_local.tzinfo,
-    )
-    if analysis_local < birthday_this_year:
-        last_birthday = resolve_local_birthday_anniversary(
-            birth_info.local_datetime,
-            analysis_local.year - 1,
-            tzinfo=analysis_local.tzinfo,
-        )
-    else:
-        last_birthday = birthday_this_year
-    return analysis_local, last_birthday
 
 
 def build_monthly_profections_payload(
@@ -160,14 +146,17 @@ def build_given_year_payload(
     house_system: str = "P",
     zodiac_type: str = "Tropic",
 ) -> Dict[str, Any]:
-    analysis_local, last_birthday = resolve_last_birthday(
+    anniversary = resolve_last_birthday(
         birth_info,
         analysis_datetime=analysis_datetime,
     )
+    analysis_local = anniversary.analysis_datetime
+    last_birthday = anniversary.start
     year_end = resolve_local_birthday_anniversary(
         birth_info.local_datetime,
-        last_birthday.year + 1,
+        anniversary.nominal_year + 1,
         tzinfo=last_birthday.tzinfo,
+        clock_policy="compatible",
     )
     zone = parse_timezone_name(return_timezone)
     analysis_local = analysis_local.astimezone(zone)

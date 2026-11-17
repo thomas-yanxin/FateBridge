@@ -450,3 +450,13 @@ def test_four_component_reuse_keeps_source_remainder_without_recalculating(monke
         + lahiri[fields[1]]
         + lahiri[fields[2]]
     )
+    with pytest.raises(EphemerisSourceError) as error:
+        longitude_motion.corrected_longitude_motion(
+            "Moon",
+            2451545.0,
+            (0, 0, 1, 2, 0, 0),
+            "swieph",
+            sidereal=True,
+            lunar_adjustment=(1.0, "jpl", 0.0, None),
+        )
+    assert error.value.reason == "coordinate_model_changed"

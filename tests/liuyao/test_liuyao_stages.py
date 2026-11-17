@@ -1,4 +1,4 @@
-"""Frozen partial-knowledge queries do not invent missing fire positions."""
+"""Literal v15 evidence and the active calculation of the four stages."""
 
 import hashlib
 import json
@@ -23,10 +23,10 @@ def corrected(case):
 
 
 def test_stage_profile_and_original_table_bytes_are_frozen():
-    from fatebridge.core.liuyao_stages import PROFILE, STAGES
+    from fatebridge.core.liuyao_stages import PROFILE
 
     assert PROFILE == build_profile("stage")
-    assert STAGES["火"] == {"寅": "长生", "戌": "墓"}
+    assert PROFILE["known_stages"]["火"] == {"寅": "长生", "戌": "墓"}
     for name, digest in json.loads((REFERENCE / "freeze.json").read_text())[
         "sha256"
     ].items():
@@ -39,18 +39,29 @@ def test_stage_profile_and_original_table_bytes_are_frozen():
 
 @pytest.mark.parametrize("case", FROZEN["queries"], ids=lambda c: c["id"])
 def test_hand_derived_phase_queries_preserve_true_false_and_unknown(case):
-    from fatebridge.core.liuyao_stages import STAGES, query_stage
+    from fatebridge.core.liuyao_stages import PROFILE, query_stage
 
     result = query_stage(
-        STAGES, case["element"], case["branch"], case["expected_stages"]
+        PROFILE["known_stages"],
+        case["element"],
+        case["branch"],
+        case["expected_stages"],
     )
     assert result["condition_match"] is case["expected"]
     assert result["query_complete"] is (case["expected"] is not None)
     assert result["table_complete"] is (case["element"] != "火")
 
 
+@pytest.fixture
+def literal_table(monkeypatch):
+    from fatebridge.core import liuyao_judgment
+    from fatebridge.core.liuyao_stages import PROFILE
+
+    monkeypatch.setattr(liuyao_judgment, "STAGES", PROFILE["known_stages"])
+
+
 @pytest.mark.parametrize("case", FROZEN["cases"], ids=lambda c: c["id"])
-def test_hidden_stage_positions_and_query_specific_admission(case):
+def test_hidden_stage_positions_and_query_specific_admission(case, literal_table):
     result = hidden_case(corrected(case))
     hidden = result["hidden_conditions"][0]
     phases = hidden["stage_conditions"]
@@ -75,7 +86,9 @@ def test_hidden_stage_positions_and_query_specific_admission(case):
         assert hidden["table_gaps"]  # The global source gap remains visible.
 
 
-def test_verified_fire_tomb_dominates_other_unknown_positions_without_certifying_entry():
+def test_verified_fire_tomb_dominates_other_unknown_positions_without_certifying_entry(
+    literal_table,
+):
     hidden = hidden_case(FROZEN["cases"][-1])["hidden_conditions"][0]
     group = hidden["stage_conditions"]["hidden_tomb_cessation"]
     assert group["condition_match"] is True
@@ -88,7 +101,9 @@ def test_verified_fire_tomb_dominates_other_unknown_positions_without_certifying
     assert hidden["reception"]["condition_match"] is None
 
 
-def test_noncontrolling_fire_flying_unknown_is_diagnostic_and_pressure_unknown_is_relevant():
+def test_noncontrolling_fire_flying_unknown_is_diagnostic_and_pressure_unknown_is_relevant(
+    literal_table,
+):
     no_pressure = hidden_case(FROZEN["cases"][3])["hidden_conditions"][0]
     pressure = hidden_case(corrected(FROZEN["cases"][9]))["hidden_conditions"][0]
     assert no_pressure["stage_conditions"]["ignored_unknown_groups"] == [
@@ -97,6 +112,37 @@ def test_noncontrolling_fire_flying_unknown_is_diagnostic_and_pressure_unknown_i
     assert no_pressure["reception"]["condition_match"] is True
     assert pressure["stage_conditions"]["ignored_unknown_groups"] == []
     assert pressure["reception"]["condition_match"] is None
+
+
+def test_forward_cycle_agrees_with_printed_rows_and_computes_fire_positions():
+    from fatebridge.core.liuyao_relations import BRANCHES
+    from fatebridge.core.liuyao_stages import (
+        PROFILE,
+        STAGES,
+        query_stage,
+        stage_knowledge,
+    )
+
+    offsets = stage_knowledge()["fire_cycle_derivation"]["offsets_from_growth"]
+    for row in PROFILE["known_stages"].values():
+        growth = next(b for b, phase in row.items() if phase == "长生")
+        for branch, phase in row.items():
+            assert (BRANCHES.index(branch) - BRANCHES.index(growth)) % 12 == offsets[
+                phase
+            ]
+    assert STAGES["火"] == {"寅": "长生", "午": "帝旺", "戌": "墓", "亥": "绝"}
+    assert query_stage(STAGES, "火", "午", ["帝旺"])["condition_match"] is True
+    assert query_stage(STAGES, "火", "亥", ["绝"])["condition_match"] is True
+    assert query_stage(STAGES, "火", "子", ["帝旺", "绝"])["condition_match"] is False
+
+
+def test_completed_fire_cycle_adjudicates_previously_unresolved_flying_pressure():
+    case = next(c for c in FROZEN["cases"] if c["id"] == "metal-fire-pressure-unknown")
+    h = hidden_case(corrected(case))["hidden_conditions"][0]
+    assert (h["branch"], h["flying_branch"]) == ("申", "巳")
+    assert h["stage_conditions"]["flying_tomb_cessation"]["condition_match"] is False
+    assert h["stage_conditions"]["has_relevant_unknown"] is False
+    assert h["reception"]["condition_match"] is False
 
 
 def test_all_hidden_inputs_match_the_manually_identified_pure_palace_position():

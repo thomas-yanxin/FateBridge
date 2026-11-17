@@ -1,7 +1,6 @@
 """Exact boundary arithmetic must not fit labels or widen a tolerance band."""
 
 import asyncio
-import hashlib
 import json
 from datetime import datetime
 from fractions import Fraction
@@ -11,6 +10,7 @@ import pytest
 from pydantic import ValidationError
 
 from fatebridge.application.examples import suggested_fields
+from fatebridge.application.result_delivery import RESULT_STORE
 from fatebridge.core.calendar import BaZiCalendar
 from fatebridge.core.elements import ElementAnalysis
 from fatebridge.core.output_strength_thresholds import StrengthThresholdArithmetic
@@ -44,12 +44,14 @@ def delivered_payload(value):
     delivery = value.get("result_delivery")
     if not delivery:
         return value
+    run_id = value["run_metadata"]["run_id"]
+    verified = RESULT_STORE.verified_page(delivery["result_id"], run_id)
     wrapper = json.loads(Path(delivery["file_path"]).read_bytes())
     payload = wrapper[delivery["file_payload_path"]]
-    raw = json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode()
-    assert hashlib.sha256(raw).hexdigest() == delivery["sha256"]
-    if value.get("run_metadata", {}).get("run_id"):
-        assert payload["run_metadata"]["run_id"] == value["run_metadata"]["run_id"]
+    raw = json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
+    assert verified["total_chars"] == delivery["total_chars"] == len(raw)
+    assert raw.startswith(verified["text"])
+    assert payload["run_metadata"]["run_id"] == run_id
     return payload
 
 

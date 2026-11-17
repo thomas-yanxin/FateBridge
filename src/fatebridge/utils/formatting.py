@@ -2,7 +2,7 @@
 
 import json
 from datetime import datetime
-from typing import Any, Dict, Optional, Tuple
+from typing import Dict, Optional, Tuple
 
 
 def format_birth_datetime_display(
@@ -56,7 +56,7 @@ def create_pillar_dict(
 
 
 def format_json_response(
-    data: Dict[str, Any],
+    data: object,
     *,
     compact: bool = True,
 ) -> str:

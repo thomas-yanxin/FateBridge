@@ -236,6 +236,7 @@ def _historical_utc8_date(
 
 def native_month_context(epoch: PhysicalEpoch, basis: str) -> dict[str, Any]:
     label, lookup = native_utc8_clock(epoch)
+    search_by_year = lookup is None and basis == "jie_month"
     clocks: dict[str, Any] = {
         "instant_utc": epoch.utc_label,
         "calendar_datetime": label,
@@ -244,7 +245,7 @@ def native_month_context(epoch: PhysicalEpoch, basis: str) -> dict[str, Any]:
         "primary_julian_day_ut1": epoch.time.jd_ut1,
         "utc_representation": epoch.representation(),
     }
-    if lookup is None and basis == "jie_month":
+    if search_by_year:
         # _term_window uses only the anchor's Gregorian YEAR to obtain the
         # previous/current/next year's candidates. A missing UTC clock label
         # does not prevent selecting those candidates from the primary TT
@@ -316,11 +317,12 @@ def native_month_context(epoch: PhysicalEpoch, basis: str) -> dict[str, Any]:
     if basis != "jie_month":
         raise ValueError("Unknown native month policy")
     try:
-        terms = [
-            t
-            for t in almanac._term_window(lookup, "Etc/GMT-8")
-            if t.name in almanac.BAZI_MONTH_START_TERMS
-        ]
+        window = (
+            almanac._term_window(lookup, "Etc/GMT-8")
+            if search_by_year
+            else almanac._adjacent_term_window(lookup, "Etc/GMT-8")
+        )
+        terms = [t for t in window if t.name in almanac.BAZI_MONTH_START_TERMS]
     except OverflowError:
         return {
             **clocks,
@@ -332,7 +334,7 @@ def native_month_context(epoch: PhysicalEpoch, basis: str) -> dict[str, Any]:
     assert epoch.time.jd_tt is not None
     start = stop = None
     for term in terms:
-        tt = ephemeris_time(term.moment).jd_tt
+        tt = ephemeris_time(term.calendar.utc).jd_tt
         if tt is None:
             raise ValueError("Native jie comparison requires physical TT boundaries")
         if tt <= epoch.time.jd_tt:

@@ -8,8 +8,8 @@ from pydantic import BaseModel, JsonValue
 from fatebridge.core.output_base import PartialOutput
 
 from .layout_inputs import FormObservation
+from .spatial_angles import CompassDirection
 from .spatial_inputs import (
-    CompassDirection,
     PlanPoint,
     RelativePosition,
     ResolvedMoveDomain,

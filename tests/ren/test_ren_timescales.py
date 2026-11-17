@@ -48,7 +48,7 @@ def test_tt_root_reaches_correct_civil_clock_without_treating_ut1_as_utc(
     monkeypatch.setattr(almanac, "ephemeris_call", simulated_sun)
     actual = almanac._solar_term_utc_via_swe(civil.year, 0, civil)
     assert actual is not None
-    assert abs((actual - civil).total_seconds()) < 0.0002
+    assert abs((actual.as_datetime() - civil).total_seconds()) < 0.0002
     assert calls and abs(calls[-1] - expected_tt) * 86400 < 0.0002
 
 
@@ -96,12 +96,12 @@ def test_actual_ren_dependencies_disclose_the_time_scale_and_future_assumption(
 
 
 def test_leap_second_cannot_be_fabricated_as_next_day_by_the_solar_solver(monkeypatch):
-    from fatebridge.core.astro import time_scales
+    from fatebridge.core import solar_term_clock
 
     def unavailable_label(value):
         raise ValueError("UTC leap second not representable by datetime")
 
-    monkeypatch.setattr(time_scales, "datetime_from_tt", unavailable_label)
+    monkeypatch.setattr(solar_term_clock, "utc_calendar_from_tt", unavailable_label)
     from fatebridge.core.solar_term_clock import SolarTermClockError
 
     with pytest.raises(SolarTermClockError) as failure:

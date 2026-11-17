@@ -374,7 +374,12 @@ async def test_consultation_first_views_keep_interpretable_evidence_across_surfa
         assert payload["ten_gods"]
         assert payload["structure_profile"]["decision_basis"]
         profile = payload["structure_profile"]
-        assert profile["resolution_policy"] == "source_conditions_before_preference_v3"
+        assert profile["resolution_policy"] == "source_force_before_preference_v4"
+        assert (
+            payload["day_master"]["classical_adjudication"]["status"]
+            == "not_adjudicated"
+        )
+        assert payload["day_master"]["classical_adjudication"]["body_strength"] is None
         assert profile["dominant_structure"]["key"] == "selected_month_reference"
         assert set(profile["useful_elements"]).isdisjoint(profile["avoid_elements"])
         assert profile["layers"] and profile["conditional_elements"]

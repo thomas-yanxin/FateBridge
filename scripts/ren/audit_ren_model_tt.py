@@ -1,4 +1,4 @@
-"""Follow-up TT diagnosis against pre-existing independent DE440 references."""
+"""Diagnose supplied TT outcomes against reproducible independent DE440 roots."""
 
 from __future__ import annotations
 
@@ -7,9 +7,17 @@ import hashlib
 import json
 import math
 import os
+from collections.abc import Mapping
 from datetime import datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, TypedDict
+
+from pydantic import BaseModel
+
+from scripts.astronomy.solar_term_reference import (
+    REFERENCE_SHA256,
+    load_solar_term_reference,
+)
 
 ROOT = Path(__file__).resolve().parents[2]
 PROTOCOL = ROOT / "tests/fixtures/ren_model_matrix_v1/de440-followup-protocol.json"
@@ -21,31 +29,66 @@ def sha(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def reference() -> dict[tuple[int, str], dict[str, Any]]:
+class TTReference(TypedDict):
+    jd_tt: float
+
+
+class LegacySourceIdentity(TypedDict):
+    source_identifier: str
+    expected_sha256: str
+    historical_sha256: str | None
+    historical_identity_matches: bool
+    current_path: str
+    current_sha256: str | None
+    current_identity_matches: bool
+
+
+class _ComparisonSourcePins(BaseModel):
+    source_sha256: dict[str, str]
+
+
+def reference() -> dict[tuple[int, str], TTReference]:
+    """Use the independently reproduced roots under the original comparison gate."""
     if sha(PROTOCOL) != PROTOCOL_SHA256:
         raise ValueError("Follow-up protocol changed")
-    protocol = json.loads(PROTOCOL.read_text())
-    for filename, expected in protocol["source_sha256"].items():
-        if sha(ROOT / filename) != expected:
-            raise ValueError("Independent TT source changed: " + filename)
-    folder = ROOT / "tests/data/bazi_all_terms_v1"
-    raw = json.loads((folder / "reference.json").read_text())
-    if (
-        raw["protocol_sha256"] != sha(folder / "protocol.json")
-        or len(raw["rows"]) != 4872
-        or raw["kernel_published_md5"] != "c9d581bfd84209dbeee8b1583939b148"
-    ):
-        raise ValueError("Original complete independent TT provenance missing")
-    result = {(r["year"], r["name"]): r for r in raw["rows"]}
-    if len(result) != 4872:
-        raise ValueError("Duplicated independent TT event")
+    packet = load_solar_term_reference()
+    return {
+        (row.year, row.name): {"jd_tt": row.jd_tt}
+        for row in packet.rows
+        if 1899 <= row.year <= 2101
+    }
+
+
+def legacy_source_status() -> list[LegacySourceIdentity]:
+    """Retain old sidecar identity failures separately from the reproduced source."""
+    raw = PROTOCOL.read_bytes()
+    if hashlib.sha256(raw).hexdigest() != PROTOCOL_SHA256:
+        raise ValueError("Follow-up protocol changed")
+    pins = _ComparisonSourcePins.model_validate_json(raw).source_sha256
+    result: list[LegacySourceIdentity] = []
+    for filename, expected in pins.items():
+        historical = ROOT / filename
+        historical_sha = sha(historical) if historical.is_file() else None
+        current = ROOT / "tests/data/bazi_all_terms_v1" / Path(filename).name
+        actual = sha(current) if current.is_file() else None
+        result.append(
+            {
+                "source_identifier": filename,
+                "expected_sha256": expected,
+                "historical_sha256": historical_sha,
+                "historical_identity_matches": historical_sha == expected,
+                "current_path": str(current.relative_to(ROOT)),
+                "current_sha256": actual,
+                "current_identity_matches": actual == expected,
+            }
+        )
     return result
 
 
 def compare(
     matrix_path: Path,
     convert: Any,
-    expected: dict[tuple[int, str], dict[str, Any]],
+    expected: Mapping[tuple[int, str], TTReference],
 ) -> dict[str, Any]:
     matrix_sha = sha(matrix_path)
     matrix = json.loads(matrix_path.read_text())
@@ -108,7 +151,7 @@ def compare(
         ),
         "calculation_errors": errors,
         "comparisons": rows,
-        "scope": "Reused independent TT dynamics comparison. Same candidate civil converter is used for the time-label decomposition, so it does not independently certify that converter or adjudicate the PMO source's rounding/time convention.",
+        "scope": "Supplied-matrix TT dynamics comparison; the actual CLI reference source is recorded separately. The same candidate civil converter is used for the time-label decomposition, so it does not independently certify that converter or adjudicate the PMO source's rounding/time convention.",
         "all_declared_tt_comparisons_passed": len(rows) == 3024
         and not failures
         and not errors,
@@ -136,6 +179,26 @@ def main() -> int:
     from fatebridge.core.astro.time_scales import ephemeris_time
 
     result = compare(args.matrix, ephemeris_time, expected)
+    packet = load_solar_term_reference()
+    result["reference_source"] = {
+        "kind": "independently_reproduced_skyfield153_de440_tt",
+        "packet_sha256": REFERENCE_SHA256,
+        "kernel_sha256": packet.source.kernel_sha256,
+        "producer_sha256": packet.source.producer_sha256,
+        "software_versions": packet.source.software_versions,
+        "selected_rows": len(expected),
+        "original_comparison_protocol_sha256": PROTOCOL_SHA256,
+    }
+    legacy = legacy_source_status()
+    result["legacy_source_identities"] = legacy
+    result["legacy_cross_file_pins_passed"] = all(
+        row["historical_identity_matches"] for row in legacy
+    )
+    result["original_detached_provenance_restored"] = any(
+        Path(row["source_identifier"]).name == "provenance.json"
+        and (row["historical_identity_matches"] or row["current_identity_matches"])
+        for row in legacy
+    )
     with args.output.open("x", encoding="utf-8") as stream:
         stream.write(json.dumps(result, ensure_ascii=False, indent=2) + "\n")
     print(

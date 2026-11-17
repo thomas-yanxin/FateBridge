@@ -1,4 +1,4 @@
-"""Wealth-root positions and source-scoped food/wealth prerequisites.
+"""Shared hidden-root positions and source-scoped food/wealth prerequisites.
 
 Root categories themselves live in classical_roots. This module records the
 actual roots of revealed wealth and the unresolved force/formation conditions
@@ -7,7 +7,7 @@ of 《秘本子平真诠》PDF76–78, without fitting global strength to known 
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Mapping, Tuple
+from typing import Any, Dict, List, Literal, Mapping, Tuple, TypedDict
 
 from fatebridge.core.classical import determine_monthly_structure, twelve_life_stage
 from fatebridge.utils.data import (
@@ -24,7 +24,15 @@ Pillars = Mapping[str, Tuple[str, str]]
 ORDER = ("year", "month", "day", "hour")
 
 
-def hidden_roots(stem: str, pillars: Pillars) -> List[Dict[str, Any]]:
+class HiddenRootFact(TypedDict):
+    pillar: str
+    branch: str
+    stem: str
+    hidden_rank: int
+    kind: Literal["same_stem", "same_element"]
+
+
+def hidden_roots(stem: str, pillars: Pillars) -> List[HiddenRootFact]:
     """Actual matching hidden stems, keeping rank and physical position."""
     return [
         {

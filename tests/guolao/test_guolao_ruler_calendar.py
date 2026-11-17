@@ -12,7 +12,6 @@ from fatebridge.core.guolao_grid import load_grid
 from fatebridge.core.guolao_limits import limit_scale
 from fatebridge.core.guolao_ruler_calendar import (
     DATA,
-    METHOD_ID,
     NominalSourceDate,
     load_ruler_calendar,
     ruler_calendar_audit,

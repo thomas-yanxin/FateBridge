@@ -9,8 +9,9 @@ certified resolves the wording's scope.
 from typing import Any
 
 from fatebridge.core.metaphysics.common import SEXAGENARY_INDEX, xun_head_for_ganzhi
+from fatebridge.core.qimen_sources import YANYI_VOLUMES
 
-SOURCE = "https://zh.wikisource.org/w/index.php?oldid=625940"
+SOURCE = YANYI_VOLUMES[2]
 PROFILE_ID = "yanyi_vol2_six_instrument_scope_v1"
 # head: (concealed instrument, punished branch, Wang Zhang's named palace)
 PUNISHMENT_BY_HEAD = {

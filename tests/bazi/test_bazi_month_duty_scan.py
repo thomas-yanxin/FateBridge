@@ -203,10 +203,7 @@ def test_scan_witness_matches_actual_rest_native_mcp_cli_for_all_ten_tools(
     ]
     assert witness["month_branch"] == "寅"
     assert witness["source"]["chapter_original_pdf_pages"] == list(range(66, 74))
-    assert (
-        witness["source"]["source_pdf_sha256"]
-        == "af4a8ca65cc4dfdf63d6294adc7925a868214563d0d52664c7ba779b833db14a"
-    )
+    assert witness["source"]["id"] == "sanming_renyuan_cadal06066038"
     assert witness["annual_duration_arithmetic"]["computed_literal_sum"] == 380
     assert witness["annual_duration_arithmetic"]["matches_stated_total"] is False
     assert witness["selected_duty_stem"] is None

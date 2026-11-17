@@ -6,11 +6,12 @@ from dataclasses import replace
 import pytest
 
 from fatebridge.core import almanac, de440_solar
-from fatebridge.core.astro.time_scales import datetime_from_tt_point
+from fatebridge.core.astro.time_scales import datetime_from_tt
 from fatebridge.core.astro.tt_epoch import TTInstant
 from fatebridge.core.metaphysics import ren_calendar
 from fatebridge.core.output_chinese import RenTermDependency
 from fatebridge.services.metaphysics import _build_analysis_seed
+from fatebridge.utils.civil_time import ZonedCalendar
 from fatebridge.utils.errors import EphemerisSourceError
 from tests.support.ren_de440_profile_reference import reference
 from tests.support.transports import SPECS, business, rest, surface_calls
@@ -120,8 +121,10 @@ def test_coherent_tt_receipt_is_not_enough_for_wrong_extended_crossing():
     bad = replace(
         term,
         solar_model_details=details,
-        moment=datetime_from_tt_point(
-            TTInstant.from_parts(*details["selected_crossing_tt_parts"])
+        calendar=ZonedCalendar.from_datetime(
+            datetime_from_tt(
+                TTInstant.from_parts(*details["selected_crossing_tt_parts"])
+            )
         ),
     )
     from fatebridge.core.metaphysics.ren_term_point import validate_term_point

@@ -4,13 +4,17 @@ import hashlib
 import json
 
 
-def digest(value: object) -> str:
-    """Hash canonical UTF-8 JSON, rejecting non-finite numbers."""
-    encoded = json.dumps(
+def canonical_bytes(value: object) -> bytes:
+    """Encode canonical UTF-8 JSON, rejecting non-finite numbers."""
+    return json.dumps(
         value,
         ensure_ascii=False,
         sort_keys=True,
         separators=(",", ":"),
         allow_nan=False,
     ).encode("utf-8")
-    return hashlib.sha256(encoded).hexdigest()
+
+
+def digest(value: object) -> str:
+    """Hash canonical UTF-8 JSON, rejecting non-finite numbers."""
+    return hashlib.sha256(canonical_bytes(value)).hexdigest()

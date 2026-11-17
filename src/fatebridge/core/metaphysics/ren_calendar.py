@@ -150,7 +150,7 @@ def require_ren_solar_term(term: SolarTerm) -> None:
         provider
         in {
             "fatebridge_analytic",
-            "fatebridge_moshier",
+            "jpl_de441",
             "jpl_spk",
             "jpl_de440",
             "moshier_aa1996",
@@ -303,7 +303,7 @@ def require_ren_calendar(
     from fatebridge.core.aa1996_solar import MODEL_ID as AA1996_SOLAR_MODEL
     from fatebridge.core.de440_solar import EXTENDED_MODEL_ID as DE440_EXTENDED_MODEL
     from fatebridge.core.de440_solar import MODEL_ID as DE440_SOLAR_MODEL
-    from fatebridge.core.moshier_solar import MODEL_ID as COMPLETE_MOSHIER_SOLAR_MODEL
+    from fatebridge.core.de441_solar import MODEL_ID as DE441_SOLAR_MODEL
     from fatebridge.core.spk_solar import MODEL_ID as SPK_SOLAR_MODEL
     from fatebridge.core.vsop2013_solar import MODEL_ID as VSOP2013_SOLAR_MODEL
 
@@ -315,7 +315,7 @@ def require_ren_calendar(
             DE440_SOLAR_MODEL,
             DE440_EXTENDED_MODEL,
             AA1996_SOLAR_MODEL,
-            COMPLETE_MOSHIER_SOLAR_MODEL,
+            DE441_SOLAR_MODEL,
             VSOP2013_SOLAR_MODEL,
         }
         for t in dependencies
@@ -343,27 +343,27 @@ def require_ren_calendar(
         if SPK_SOLAR_MODEL in models:
             result["solar_longitude_definition"].update(
                 source_section="Per-boundary JPL SPK vectors, ERFA dtdb, IAU2006/P03 and IAU2000B",
-                scope="逐交气保留实际SPK文件散列、TDB覆盖与参考系；不借用Swiss原生返回标志或将有限比较认证为绝对UTC、Horizons等同或完整物理精度。",
+                scope="逐交气列出实际SPK文件、TDB覆盖与参考系；不借用Swiss原生返回标志或将有限比较认证为绝对UTC、Horizons等同或完整物理精度。",
             )
         if models & {DE440_SOLAR_MODEL, DE440_EXTENDED_MODEL}:
             result["solar_longitude_definition"].update(
                 source_section="Per-boundary losslessly extracted DE440 coefficients, geocentric ERFA Fairhead TDB, IAU2006/P03 and IAU2000B",
-                scope="逐交气保留实际载入系数及原始SPK来源的不同散列、TDB覆盖与参考系；FateBridge裁取系数产品的生产者另列。原始内核来源不等于运行时加载了完整SPK，也不认证绝对UTC、Horizons等同或完整物理精度。",
+                scope="逐交气列出实际载入系数及原始SPK的不同来源、TDB覆盖与参考系；FateBridge裁取系数产品的生产者另列。原始内核来源不等于运行时加载了完整SPK，也不认证绝对UTC、Horizons等同或完整物理精度。",
             )
         if AA1996_SOLAR_MODEL in models:
             result["solar_longitude_definition"].update(
                 source_section="Per-boundary AA1996 EMB and full Moshier Moon, complete Swiss2.10.03 native apparent recomputation",
-                scope="逐交气保留改版模型的实际二进制、源图与配置散列；底层Moshier类别标志不代表原版模型身份，不将有限数值比较认证为全部时刻、民用时制或Horizons等同。",
+                scope="逐交气列出改版模型的实际二进制、源图与配置来源；底层Moshier类别标志不代表原版模型身份，不将有限数值比较认证为全部时刻、民用时制或Horizons等同。",
             )
-        if COMPLETE_MOSHIER_SOLAR_MODEL in models:
+        if DE441_SOLAR_MODEL in models:
             result["solar_longitude_definition"].update(
-                source_section="Per-boundary complete Moshier December 1996 EMB, full native geometric Moon, IAU2006/P03 and IAU2000B",
-                scope="逐交气记录完整Moshier修订的系数来源、月球原生依赖与参考系；不重标为原版Swiss默认太阳，也不以有限TT对照认证整个时域、绝对UTC或预测。",
+                source_section="Per-boundary bundled DE441 Earth/EMB/Moon/Sun, geocentric ERFA Fairhead TDB, fixed-reception light cone and Lorentz aberration, Vondrak2011 scalar obliquity, full-Simon77 nutation and IAU2006 bias",
+                scope="逐交气记录同源DE441接收地球、发射太阳、TDB时标与参考系；不冒充原版Swiss默认太阳或运行时载入完整JPL文件，也不以有限TT对照认证整个时域、绝对UTC或预测。",
             )
         if VSOP2013_SOLAR_MODEL in models:
             result["solar_longitude_definition"].update(
                 source_section="Per-boundary complete VSOP2013 EMB and full Moshier Moon, geocentric ERFA TT-to-TDB and Swiss2.10.03 apparent recomputation",
-                scope="逐交气保留具名VSOP2013模型的实际二进制、配置与源图散列；内部Moshier类别选项不是原生模型身份。TT有限对照不认证绝对UTC、所有连续时刻或Horizons参考系等同。",
+                scope="逐交气列出具名VSOP2013模型的实际二进制、配置与源图来源；内部Moshier类别选项不是原生模型身份。TT有限对照不认证绝对UTC、所有连续时刻或Horizons参考系等同。",
             )
     if analysis_utc_offset is not None:
         resolved = resolve_civil_clock(

@@ -5,7 +5,7 @@ from pydantic import BaseModel, JsonValue, TypeAdapter
 from .directions import rule_data
 from .models import AssessRequest
 from .natal_interpretation import _ordered_relationship
-from .spatial_inputs import CompassDirection
+from .spatial_angles import CompassDirection
 from .spatial_outputs import EvaluatedGeometry
 from .timeliness import classify_timeliness
 

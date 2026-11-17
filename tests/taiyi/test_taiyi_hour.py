@@ -3,7 +3,7 @@
 import hashlib
 import json
 import shutil
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 
 import pytest
 from pydantic import ValidationError

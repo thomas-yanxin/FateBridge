@@ -10,13 +10,120 @@ from fractions import Fraction
 
 import pytest
 
+from fatebridge.core.astro.physical_epoch import PhysicalEpoch
 from fatebridge.core.astro.time_scales import ephemeris_time
 from fatebridge.core.predictive import returns
 from fatebridge.core.predictive._common import (
     build_natal_subject,
     build_predictive_birth_info,
+    build_subject,
 )
 from tests.support.transports import SPECS, business, rest, surface_calls
+
+
+@pytest.mark.parametrize(
+    "moment",
+    [
+        datetime(1900, 1, 1, tzinfo=timezone.utc),
+        datetime(1950, 6, 21, 12, tzinfo=timezone.utc),
+        datetime(1969, 7, 20, 20, 17, tzinfo=timezone.utc),
+        datetime(1972, 1, 1, tzinfo=timezone.utc),
+        datetime(1985, 12, 31, 5, 15, tzinfo=timezone.utc),
+        datetime(1990, 4, 6, 1, 33, tzinfo=timezone.utc),
+        datetime(1999, 12, 31, 23, 59, tzinfo=timezone.utc),
+        datetime(2000, 2, 29, 18, 15, tzinfo=timezone.utc),
+        datetime(2024, 3, 20, 6, 30, tzinfo=timezone.utc),
+        datetime(2026, 10, 22, tzinfo=timezone.utc),
+        datetime(2050, 12, 21, 12, tzinfo=timezone.utc),
+        datetime(2099, 12, 31, 23, 59, tzinfo=timezone.utc),
+    ],
+)
+@pytest.mark.parametrize("zodiac", ["Tropic", "Sidereal"])
+@pytest.mark.parametrize("key", ["solar_return", "lunar_return"])
+def test_native_return_at_natal_epoch_retains_present_cycle(
+    moment, zodiac, key, monkeypatch, tmp_path
+):
+    """Native identity at a known instant; not independent sky accuracy."""
+    monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
+    monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
+    natal = build_subject(
+        name="explicit-return-identity-control",
+        local_datetime=moment,
+        longitude=0,
+        latitude=40,
+        timezone_name="UTC",
+        house_system="W",
+        zodiac_type=zodiac,
+    )
+    result = returns.build_return_payload(
+        natal,
+        analysis_datetime=moment,
+        return_longitude=85.32,
+        return_latitude=27.72,
+        return_timezone="+05:45",
+        include=[key],
+    )[key]
+    assert result["solver"]["julian_day_tt"] == ephemeris_time(moment).jd_tt
+    assert (
+        result["calculation_basis"]["julian_day_tt"]
+        == result["solver"]["julian_day_tt"]
+    )
+    assert result["return_datetime_utc"] == moment.isoformat()
+    assert datetime.fromisoformat(result["return_datetime"]) == moment
+    assert result["solver"]["residual_arcseconds"] == 0
+    assert result["solver"]["event_not_after_analysis"] is True
+
+
+@pytest.mark.parametrize(
+    "jd_tt",
+    [
+        2300000.123456789,
+        2415020.500123456,
+        2451545.123456789,
+        2457754.5007949537,
+        2488069.499123456,
+    ],
+)
+def test_solved_tt_is_preserved_through_native_chart(jd_tt):
+    """Supplied physical epochs remain operands; labels are representations."""
+    epoch = PhysicalEpoch.from_tt(jd_tt)
+    chart = build_subject(
+        name="supplied-physical-epoch-control",
+        physical_epoch=epoch,
+        longitude=85.32,
+        latitude=27.72,
+        timezone_name="+05:45",
+        house_system="W",
+    )
+    assert epoch.time.jd_tt == chart.julian_day_tt == jd_tt
+    assert chart.calculation_basis["julian_day_tt"] == jd_tt
+    assert chart.calculation_basis["julian_day_ut1"] == epoch.time.jd_ut1
+
+
+@pytest.mark.parametrize("zone", ["UTC", "+05:45"])
+def test_tt_leap_second_keeps_physical_chart_and_explicit_utc_label(zone):
+    midnight = ephemeris_time(datetime(2017, 1, 1, tzinfo=timezone.utc)).jd_tt
+    solved = midnight - 0.5 / 86400
+    epoch = PhysicalEpoch.from_tt(solved)
+    chart = build_subject(
+        name="inserted-second-carrier-control",
+        physical_epoch=epoch,
+        longitude=0,
+        latitude=40,
+        timezone_name=zone,
+        house_system="W",
+    )
+    assert chart.julian_day_tt == solved
+    assert epoch.utc_datetime is None
+    assert epoch.utc_is_leap_second is True
+    assert epoch.utc_label.startswith("2016-12-31T23:59:60.")
+    assert chart.iso_formatted_utc_datetime == epoch.utc_label
+    assert chart.iso_formatted_local_datetime == (
+        epoch.utc_label if zone == "UTC" else None
+    )
+    assert (
+        chart.calculation_basis["utc_representation"]["datetime_representable"] is False
+    )
 
 
 @pytest.mark.parametrize("target", [0.0, 1.0, 10.0, 60.0, 120.0, 180.0, 359.0])

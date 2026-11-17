@@ -278,7 +278,7 @@ def test_offline_geometry_policy_does_not_invent_a_tt_epoch(monkeypatch):
     monkeypatch.setattr(runtime, "swe", None)
     policy = apparent_position_policy(
         None,
-        {"Mercury": "fatebridge_approximate_orbital_model"},
+        {"Mercury": "bounded_de441_earth_moon_planetary_fallback_v9"},
         PhysicalEphemerisTrace(),
     )
     assert policy["epoch_jd_tt"] is None

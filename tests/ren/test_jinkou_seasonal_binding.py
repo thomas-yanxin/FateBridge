@@ -11,6 +11,7 @@ from pydantic import ValidationError
 
 import fatebridge.application.execution as execution
 from fatebridge.core.output_chinese import JinkouCourse
+from fatebridge.core.public_output import same_public_value
 from tests.support.transports import AS_OF, REST_POST_CASES, SPECS, rest, surface_calls
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -131,4 +132,6 @@ def test_correct_main_and_annual_explanations_survive_three_ports(
             == expected["overview"]["power_basis"]
         )
         assert body["jinkou"]["rows"] == expected["rows"]
-        assert body["jinkou"]["year_fate"]["course"] == expected["year_fate"]["course"]
+        assert same_public_value(
+            body["jinkou"]["year_fate"]["course"], expected["year_fate"]["course"]
+        )

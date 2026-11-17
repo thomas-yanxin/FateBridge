@@ -150,7 +150,7 @@ def test_motion_and_solar_event_checks_honor_selected_jpl(selected):
     assert len(geometric) == 5
     assert all(row["ephemeris_model"] == "jpl" for row in geometric.values())
     packet = solar_packet(2451545, 0, 0, "require_data_files")
-    assert packet["ephemeris_models"] == ["jpl"]
+    assert packet["ephemeris_models"] == ["fatebridge_solar_horizon_de441_file_v1"]
     assert packet["events"]
 
 

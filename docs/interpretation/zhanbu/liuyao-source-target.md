@@ -14,6 +14,8 @@
 
 `month_break_conditions` 保留原月破和同支值日的本项限定。原始月令分类不删除，限定后月令反制不匹配也不排除独立动克、暗动、回头克、旬空或合绊。实际变支、飞神、伏神分别用自己的支值；不借另一主体值日。所列静克静分支是限定条款，不外推成一切静爻永远不能伤临日之爻。
 
+细问用爻空亡时可读 `void_conditions` 视图。日建生扶若同时返回原始 `matched` 与 `qualified_matched`，以资格字段判断该生扶能否用于本条，保留其三支条件出处。资格为 `false` 表示该条生扶不能计入，`null` 表示待审；两者都不单独证明用爻永久空亡。
+
 当前合同若提供 `generation_conditions.focus.source_condition_match/source_status/source_condition_path`，它们与同一位置的生源记录相连，可和原有 `target_reception_condition/target_status` 一起读取。`source_explanation/target_explanation` 分别转述这两项实际资格；摘要会明确写出已核向外生扶受阻，不能再省略成只有“另有克制、全局待审”。字段尚未提供的旧版本继续读原 `sources`，缺少新字段不等于资格为假。该焦点对象仅适用已明确的可见本爻；变爻、伏神或日月主体返回空时，转读其对应条件，不借原爻焦点代替。
 
 遇 `result_delivery`，先使用原回执直接给出的 `manifest_uri`、字段资源或 `file_path`；不能遍历临时目录后按修改时间挑“最新结果”。需要核验时使用同run引擎读取接口，传入原结果ID和run ID，由内部清单核对存储完整性；再提取实际所需字段，不重算取全文。完整读取方法见[引擎交付](../shared/fatebridge-engine.md)。

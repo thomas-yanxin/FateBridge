@@ -3,8 +3,74 @@
 import pytest
 from jsonschema import Draft202012Validator
 
-from tests.support.transports import SPECS, business, native, rest, surface_calls
+from tests.support.transports import SPECS, business
+from tests.support.transports import inputs as representative_inputs
+from tests.support.transports import native, rest, surface_calls
 from tests.western.test_western_accuracy import BIRTH
+
+
+@pytest.mark.native_engine_fault
+@pytest.mark.parametrize(
+    "key,variant",
+    [
+        ("astro_chart", "chart"),
+        ("astro_chart", "chart13"),
+        ("astro_chart", "hellen_chart"),
+        ("astro_chart", "india_chart"),
+        ("astro_chart", "germany"),
+        ("astro_chart13", None),
+        ("astro_hellen", None),
+        ("astro_india", None),
+        ("astro_germany", None),
+    ],
+)
+def test_ninth_part_boundary_facts_reach_every_core_chart_route(
+    key, variant, monkeypatch, surface_calls
+):
+    from fatebridge.core.astro import chart
+
+    original_record = chart._build_planet_record
+
+    def record(planet, *args, **kwargs):
+        # Controlled source coordinates isolate partition arithmetic from the
+        # ephemeris. These calls do not certify physical sky positions.
+        if planet in {"Moon", "Saturn"}:
+            kwargs["zodiac_longitude"] = 10.0 if planet == "Moon" else 20.0
+        return original_record(planet, *args, **kwargs)
+
+    monkeypatch.setattr(chart, "_build_planet_record", record)
+    spec = SPECS[key]
+    payload = representative_inputs(spec)
+    if variant is not None:
+        payload["chart_variant"] = variant
+    prefix = "base_chart." if variant == "germany" or key == "astro_germany" else ""
+    fields = [
+        prefix + "planets",
+        prefix + "classical.planets.Moon",
+        prefix + "classical.planets.Saturn",
+    ]
+    http, protocol, code, local = surface_calls(
+        spec,
+        payload,
+        projection={
+            "fields": fields,
+            "strict_fields": True,
+            "include_snapshot_text": False,
+            "response_char_limit": 0,
+        },
+    )
+    assert http.status_code == 200, http.text
+    assert code == 0 and not protocol.is_error
+    outputs = [http.json(), protocol.structured_content, local]
+    assert business(outputs[0]) == business(outputs[1]) == business(outputs[2])
+    for body in outputs:
+        assert not body.get("projection_warnings")
+        chart_body = body["base_chart"] if prefix else body
+        points = {point["id"]: point for point in chart_body["planets"]}
+        assert points["Moon"]["degree_in_sign"] == 10.0
+        assert points["Saturn"]["degree_in_sign"] == 20.0
+        assert chart_body["classical"]["planets"]["Moon"]["ninth_part"] == "Cancer"
+        assert chart_body["classical"]["planets"]["Saturn"]["ninth_part"] == "Libra"
 
 
 @pytest.mark.parametrize("key", ["astro_chart", "astro_hellen"])
@@ -246,15 +312,12 @@ def test_published_ptolemy_card_returns_supported_original_text_facts(rest):
     assert result["classical"]["ptolemy"]["lot_of_fortune"]["longitude"] >= 0
 
 
-def test_ready_uses_native_predictive_runtime_without_kerykeion(rest, monkeypatch):
-    import importlib.util
-
-    monkeypatch.setattr(importlib.util, "find_spec", lambda _: None)
+def test_ready_reports_native_predictive_runtime(rest):
     response = rest.get("/ready")
     assert response.status_code == 200
     check = response.json()["checks"]["western_predictive_runtime"]
     assert check["ok"] is True
-    assert check["kerykeion_available"] is False
+    assert check["swisseph_available"] is True
     assert check["engine_backend"] == "fatebridge_swisseph_native"
 
 

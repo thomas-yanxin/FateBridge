@@ -22,10 +22,9 @@ def audit() -> dict:
     for name, digest in freeze["files"].items():
         if hashlib.sha256((folder / name).read_bytes()).hexdigest() != digest:
             failures.append({"kind": "frozen_projection_identity", "file": name})
-    for name, digest in protocol["preserve_existing_profiles"].items():
-        path = ROOT / "src/fatebridge/data/astronomy" / name
-        if hashlib.sha256(path.read_bytes()).hexdigest() != digest:
-            failures.append({"kind": "existing_solar_profile_changed", "file": name})
+    source = de440_solar.source_receipt(de440_solar.CANPING_MODEL_ID)
+    if source["source_kernel_sha256"] != protocol["source_kernel"]["sha256"]:
+        failures.append({"kind": "projection_source_kernel_changed"})
     reference = json.loads((folder / "reference.json").read_bytes())
     states = json.loads((folder / "states.json").read_bytes())
     years = list(range(2201, 2321))
@@ -66,6 +65,7 @@ def audit() -> dict:
     return {
         "checks_passed": not failures,
         "failures": failures,
+        "selected_source": source,
         "event_years": [2201, 2320],
         "new_reference_tt_roots": len(reference["rows"]),
         "new_reference_state_rows": len(states["rows"]),

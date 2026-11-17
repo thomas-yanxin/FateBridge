@@ -9,8 +9,10 @@ from typing import Any, Dict, List, Optional, Union
 
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.angle_definitions import ecliptic_horizon_angle_definition
+from fatebridge.core.astro.continuous_lahiri import apparent_lahiri_origin
 from fatebridge.core.astro.julian_day import _julian_day as _julian_day
 from fatebridge.core.astro.reference import NAKSHATRAS, SU28
+from fatebridge.core.astro.time_scales import fallback_julian_day_tt
 from fatebridge.core.astrology_tables import SIGNS as SIGNS
 from fatebridge.utils.errors import EphemerisSourceError
 
@@ -65,20 +67,12 @@ def combine_longitudes(*terms: float) -> float:
     return longitude_float(reduced)
 
 
-def _deg_to_rad(value: float) -> float:
-    return math.radians(value)
-
-
-def _rad_to_deg(value: float) -> float:
-    return math.degrees(value)
-
-
 def _sin_deg(value: float) -> float:
-    return math.sin(_deg_to_rad(value))
+    return math.sin(math.radians(value))
 
 
 def _cos_deg(value: float) -> float:
-    return math.cos(_deg_to_rad(value))
+    return math.cos(math.radians(value))
 
 
 def _sign_name(longitude: float) -> str:
@@ -202,17 +196,17 @@ def native_lahiri_ayanamsha(
         raise RuntimeError("Native Lahiri ayanamsha unavailable") from error
 
 
-def _ayanamsha(julian_day: float) -> float:
+def _ayanamsha(julian_day: float, *, julian_day_tt: float | None = None) -> float:
     """Lahiri offset including nutation, for apparent tropical coordinates.
 
     New chart positions use native FLG_SIDEREAL. Legacy offset-based callers
     must also remove nutation rather than subtract the mean precession alone.
-    The linear fallback is only a mean-offset approximation, logged explicitly;
-    it carries no full-epoch astronomical accuracy guarantee.
+    The fallback uses the same complete mean-origin model as the continuous
+    frame plus nutation, evaluated on the orbital provider's TT clock.
     """
     if runtime.swe is not None:
         try:
-            return native_lahiri_ayanamsha(julian_day)
+            return native_lahiri_ayanamsha(julian_day, julian_day_tt=julian_day_tt)
         except EphemerisSourceError:
             raise
         except Exception as exc:  # pragma: no cover - swisseph runtime guard
@@ -220,12 +214,9 @@ def _ayanamsha(julian_day: float) -> float:
     else:
         runtime._log_swe_runtime_failure(
             "get_ayanamsa_ex_ut",
-            RuntimeError("swisseph unavailable; using linear ayanamsha approximation"),
+            RuntimeError("swisseph unavailable; using sourced complete Lahiri origin"),
         )
-    # Lahiri-like ayanamsha: base value at J2000.0 plus precession drift.
-    # J2000 baseline ≈ 23.853°, precession ≈ 50.29"/yr ≈ 1.3971°/Julian century.
-    centuries_since_j2000 = (julian_day - 2451545.0) / 36525.0
-    return 23.853 + centuries_since_j2000 * 1.3971
+    return apparent_lahiri_origin(fallback_julian_day_tt(julian_day, julian_day_tt))[0]
 
 
 def _nakshatra(longitude: float) -> str:
@@ -264,12 +255,12 @@ def _gmst(julian_day: float) -> float:
 def _angles(julian_day: float, longitude: float, latitude: float) -> Dict[str, Any]:
     armc = normalize_angle(_gmst(julian_day) + longitude)
     epsilon = 23.439291 - 0.0130042 * ((julian_day - 2451545.0) / 36525.0)
-    ascendant = _rad_to_deg(
+    ascendant = math.degrees(
         math.atan2(
             _cos_deg(armc),
             -(
                 _sin_deg(armc) * _cos_deg(epsilon)
-                + math.tan(_deg_to_rad(latitude)) * _sin_deg(epsilon)
+                + math.tan(math.radians(latitude)) * _sin_deg(epsilon)
             ),
         )
     )
@@ -281,11 +272,11 @@ def _angles(julian_day: float, longitude: float, latitude: float) -> Dict[str, A
     # Select the eastern intersection, as in Swiss Ephemeris §6.4. This is a
     # geometric convention; at a geographic pole it is not a daily rising.
     east_orientation = _cos_deg(epsilon) + (
-        math.tan(_deg_to_rad(latitude)) * _sin_deg(epsilon) * _sin_deg(armc)
+        math.tan(math.radians(latitude)) * _sin_deg(epsilon) * _sin_deg(armc)
     )
     if east_orientation < 0:
         ascendant = combine_longitudes(ascendant, 180.0)
-    midheaven = _rad_to_deg(
+    midheaven = math.degrees(
         math.atan2(
             _sin_deg(armc),
             _cos_deg(armc) * _cos_deg(epsilon),

@@ -11,9 +11,9 @@ from fatebridge.core.astrodice import build_symbolic_evidence, normalize_sign
 from fatebridge.core.local_techniques.chart import (
     _adapt_chart_objects,
     _build_birth_info,
-    _build_house_ring,
     _build_local_chart_response,
 )
+from fatebridge.core.local_techniques.house_geometry import HouseGeometry
 
 REFERENCE = json.loads(
     (
@@ -142,7 +142,7 @@ def test_preformatted_cusp_values_do_not_reassign_a_core_house():
         source,
         tradition=False,
         include_su28=False,
-        houses=_build_house_ring(0),
+        geometry=HouseGeometry.equal(0),
         preserve_core_houses=True,
     )
     assert points[0]["house"] == "House1"

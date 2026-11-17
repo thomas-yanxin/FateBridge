@@ -6,7 +6,7 @@ import math
 from datetime import datetime, timezone
 from typing import Any
 
-from ..astro.time_scales import datetime_from_tt_point
+from ..astro.time_scales import datetime_from_tt
 from ..astro.tt_epoch import TTInstant
 
 _SCALAR = "explicit_ieee_float_tt_point"
@@ -148,6 +148,6 @@ def validate_term_point(
     if point is not None and moment is not None:
         if moment.utcoffset() is None:
             raise _bad()
-        expected = datetime_from_tt_point(point)
+        expected = datetime_from_tt(point)
         if moment.astimezone(timezone.utc) != expected.astimezone(timezone.utc):
             raise _bad()

@@ -6,7 +6,10 @@ import pytest
 
 from fatebridge.core import solar_term_clock
 from tests.bazi.test_bazi_tt_utc_exact_transports import check_terms
-from tests.support.transports import AS_OF, SPECS, business, inputs, native
+from tests.support.ephemeris_case_runtime import (
+    native_ephemeris_files as native_ephemeris_files,
+)
+from tests.support.transports import AS_OF, SPECS, business, inputs
 from tests.support.transports import rest as _shared_rest
 from tests.support.transports import surface_calls
 
@@ -15,12 +18,11 @@ rest = _shared_rest
 
 @pytest.mark.parametrize("key", ["bazi_birth", "dayun_analysis", "timing_analysis"])
 @pytest.mark.parametrize("project", [False, True])
+@pytest.mark.usefixtures("native_ephemeris_files")
 def test_native_actual_selected_points_are_public_and_identical(
-    key, project, monkeypatch, tmp_path, surface_calls
+    key, project, monkeypatch, surface_calls
 ):
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
-    monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
-    monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
     spec = SPECS[key]
     payload = {
         **inputs(spec),
@@ -65,8 +67,8 @@ def test_native_actual_selected_points_are_public_and_identical(
         assert term["resolution_provider"] == "swisseph"
         assert details["model_id"] == "native_swiss_tt_solar_bisection_v2"
         assert details["root_selection_policy"] == "first_post_crossing_tt_float"
-        assert term["ephemeris_model"] == details["ephemeris_model"] == "moshier"
-        assert details["ephemeris_retflags"] == [4]
+        assert term["ephemeris_model"] == details["ephemeris_model"] == "swieph"
+        assert details["ephemeris_retflags"] == [2]
         assert (
             details["root_bracket_tt"][0]
             <= details["selected_crossing_jd_tt"]
@@ -94,7 +96,7 @@ def test_native_clock_failure_is_structured_before_projection(
     def fail(*args):
         raise fault
 
-    monkeypatch.setattr(solar_term_clock, "datetime_from_tt_point", fail)
+    monkeypatch.setattr(solar_term_clock, "utc_calendar_from_tt", fail)
     spec = SPECS["bazi_birth"]
     payload = {**inputs(spec), "use_true_solar_time": False}
     options = {"response_char_limit": 0}

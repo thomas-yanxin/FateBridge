@@ -55,7 +55,8 @@ def test_month_visible_output_is_not_erased_by_a_peer_principal_branch():
     )
     assert branch_principal["stem"] == "戊" and branch_principal["role"] == "peer"
     profile = BaZiRules.chart_useful_profile(p)
-    assert profile["metadata"]["baseline_useful_elements"] == ["土", "火"]
+    # The engineering preference stays in its layer while the source route is unresolved.
+    assert profile["metadata"]["baseline_useful_elements"] == []
     baseline = next(r for r in profile["layers"] if r["source"] == "扶抑")
     assert baseline["useful_elements"] == ["土", "火"]
     assert baseline["status"] == "requires_structure_review"

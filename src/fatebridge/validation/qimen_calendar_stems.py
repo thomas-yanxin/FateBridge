@@ -6,7 +6,11 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-from fatebridge.core.metaphysics.qimen import _qimen_build_palaces, _qimen_zhifu_zhishi
+from fatebridge.core.metaphysics.qimen import (
+    _qimen_build_palaces,
+    _qimen_pan_earth,
+    _qimen_zhifu_zhishi,
+)
 from fatebridge.core.qimen_calendar_stems import match_calendar_stems
 from fatebridge.services.metaphysics import calculate_qimen_analysis
 
@@ -40,22 +44,31 @@ def audit_calendar_stems(directory: Path) -> dict[str, Any]:
         or {s["file"] for s in reference["source_files"]} != required_files
     ):
         raise ValueError("须保留完整岁月格来源文件清单")
+    fixture_root = directory.resolve().parent
+    # The three HKO PDFs are deduplicated into this fixture's shared source directory.
+    shared = (
+        fixture_root.parent / "data" / "shared_sources" / "fixtures" / directory.name
+    )
     for entry in reference["source_files"]:
         path = (directory / entry["file"]).resolve()
-        if not path.is_relative_to(directory.resolve().parent):
+        shared_pdf = (
+            entry["file"]
+            in {"hko-lunar-2024.pdf", "hko-lunar-2025.pdf", "hko-lunar-2026.pdf"}
+            and path == shared / entry["file"]
+        )
+        if not path.is_relative_to(fixture_root) and not shared_pdf:
             raise ValueError("岁月格参考路径越界")
         if hashlib.sha256(path.read_bytes()).hexdigest() != entry["sha256"]:
             raise ValueError("岁月格参考文件指纹不一致")
     disagreements, observations = [], []
     for case in cases:
         text = f'{case["dun"]}{"一二三四五六七八九"[case["ju"]-1]}局上元'
-        leader = _qimen_zhifu_zhishi(case["hour"], text, dun_type=case["dun"])
+        earth = _qimen_pan_earth(text)
+        leader = _qimen_zhifu_zhishi(case["hour"], earth, dun_type=case["dun"])
         board = {
             "palaces": _qimen_build_palaces(
-                time_ganzhi=case["hour"],
-                ju_text=text,
-                dun_type=case["dun"],
-                current_term="立春",
+                earth=earth,
+                leader=leader,
             )
         }
         contexts = {

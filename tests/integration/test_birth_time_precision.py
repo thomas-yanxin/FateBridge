@@ -18,7 +18,6 @@ from fatebridge.utils.places import resolve_birth_place_context
 from fatebridge.utils.solar_time import normalize_birth_time
 from fatebridge.utils.timezones import parse_timezone_name
 from tests.fixtures.solar_reference import expected_solar_clock
-from tests.fixtures.transports import mcp_parameters
 
 
 def test_normalize_birth_time_preserves_legacy_hour_only_behavior():
@@ -956,57 +955,6 @@ def test_comprehensive_timing_matches_specialized_timing_tools():
         timing_result["liushi_analysis"]["pillar"]
         == liushi_result["liushi_info"]["pillar"]
     )
-
-
-def test_fastmcp_tools_expose_birth_time_precision_arguments():
-    analyze_properties = mcp_parameters("analyze_destiny")["properties"]
-    compatibility_properties = mcp_parameters("two_person_compatibility")["properties"]
-    timing_properties = mcp_parameters("timing_analysis")["properties"]
-    dayun_properties = mcp_parameters("dayun_analysis")["properties"]
-    liunian_properties = mcp_parameters("liunian_analysis")["properties"]
-    liuyue_properties = mcp_parameters("liuyue_analysis")["properties"]
-    liuri_properties = mcp_parameters("liuri_analysis")["properties"]
-    liushi_properties = mcp_parameters("liushi_analysis")["properties"]
-    jieqi_properties = mcp_parameters("jieqi_timeline_analysis")["properties"]
-
-    assert "birth_minute" in analyze_properties
-    assert "birth_timezone" in analyze_properties
-    assert "birth_longitude" in analyze_properties
-    assert "use_true_solar_time" in analyze_properties
-
-    assert "person1_birth_minute" in compatibility_properties
-    assert "person2_birth_minute" in compatibility_properties
-    assert "person1_birth_timezone" in compatibility_properties
-    assert "person2_birth_timezone" in compatibility_properties
-    assert "person1_birth_longitude" in compatibility_properties
-    assert "person2_birth_longitude" in compatibility_properties
-    assert "use_true_solar_time" in timing_properties
-    assert "analysis_day" in timing_properties
-    assert "analysis_hour" in timing_properties
-    assert "analysis_minute" in timing_properties
-    assert "selected_sections" in timing_properties
-    assert "selected_sections" in dayun_properties
-    assert "selected_sections" in liunian_properties
-    assert "analysis_year" in liuyue_properties
-    assert "analysis_month" in liuyue_properties
-    assert "analysis_day" in liuyue_properties
-    assert "analysis_hour" in liuyue_properties
-    assert "analysis_minute" in liuyue_properties
-    assert "selected_sections" in liuyue_properties
-    assert "analysis_year" in liuri_properties
-    assert "analysis_month" in liuri_properties
-    assert "analysis_day" in liuri_properties
-    assert "analysis_hour" in liuri_properties
-    assert "analysis_minute" in liuri_properties
-    assert "selected_sections" in liuri_properties
-    assert "analysis_year" in liushi_properties
-    assert "analysis_month" in liushi_properties
-    assert "analysis_day" in liushi_properties
-    assert "analysis_hour" in liushi_properties
-    assert "analysis_minute" in liushi_properties
-    assert "selected_sections" in liushi_properties
-    assert "target_year" in jieqi_properties
-    assert "selected_sections" in jieqi_properties
 
 
 def _offset_hours(tzinfo) -> float:

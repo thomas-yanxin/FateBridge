@@ -1,6 +1,5 @@
 """Reported tone categories cannot silently certify a historical sound system."""
 
-import hashlib
 import json
 from pathlib import Path
 
@@ -9,6 +8,7 @@ from pydantic import ValidationError
 
 from fatebridge.core.requests.meihua import MeihuaCastRequest
 from fatebridge.services.meihua import calculate_meihua_cast
+from fatebridge.validation.meihua_scans import read_frozen_artifact
 from tests.support.transports import SPECS, business, rest, surface_calls
 
 FIXTURE = Path(__file__).parents[1] / "fixtures/meihua_tone_basis_v1"
@@ -25,9 +25,7 @@ def test_witnesses_and_hand_oracles_precede_the_implementation():
     assert m["precedes_implementation"]
     for group in ["files", "references"]:
         for name, digest in m[group].items():
-            p = (FIXTURE / name).resolve()
-            assert p.is_relative_to(FIXTURE.parent.resolve())
-            assert hashlib.sha256(p.read_bytes()).hexdigest() == digest
+            read_frozen_artifact(FIXTURE, name, digest, root=FIXTURE.parent)
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])

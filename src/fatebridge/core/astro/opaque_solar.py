@@ -11,12 +11,17 @@ from __future__ import annotations
 import math
 from fractions import Fraction
 from importlib.util import find_spec
-from typing import Callable, NamedTuple, Sequence
+from typing import Sequence
 
 from pydantic import JsonValue
 
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.geometry import normalize_angle
+from fatebridge.core.astro.light_cone import (
+    LIGHT_SPEED_AU_DAY,
+    LIGHT_SPEED_AU_DAY_EXACT,
+    solve_light_cone,
+)
 from fatebridge.core.astro.native_coordinates import COORDINATE_FLAGS
 from fatebridge.core.astro.physical_sources import (
     PhysicalEphemerisTrace,
@@ -31,104 +36,7 @@ METHOD_ID = "finite_source_opaque_solar_apparent_positions_v1"
 FRAME = "IAU2006/2000A_true_ecliptic_of_date"
 SOLAR_RADIUS_M = 695700000
 SOLAR_RADIUS_AU = Fraction(SOLAR_RADIUS_M, 149597870700)
-LIGHT_SPEED_AU_DAY_EXACT = Fraction(299792458 * 86400, 149597870700)
-LIGHT_SPEED_AU_DAY = float(LIGHT_SPEED_AU_DAY_EXACT)
 DEFLECTION_LIMITER = 1e-11
-
-
-class _RetardedSample(NamedTuple):
-    epoch: float
-    coordinates: tuple[float, ...]
-    flags: int
-    distance: float
-    residual_squared: Fraction
-    delay: Fraction
-
-
-def _retarded_state(
-    observation: float,
-    observer: Sequence[float],
-    sample: Callable[[float], tuple[tuple[float, ...], int]],
-) -> tuple[_RetardedSample, int, dict[str, JsonValue]]:
-    """Bracket the light cone at adjacent representable TT, without a tolerance.
-
-    For the subluminal physical sources F(e)=e-observation+distance(e)/c is
-    increasing. Its sign is evaluated by exact squared distances of supplied
-    binary64 states, avoiding a rounded large-JD subtraction or square root.
-    Fixed-point steps only propose samples; equality never certifies a root.
-    """
-    emission = observation
-    lower: _RetardedSample | None = None
-    upper: _RetardedSample | None = None
-    for iteration in range(20):
-        coordinates, flags = sample(emission)
-        ray = [coordinates[i] - observer[i] for i in range(3)]
-        distance = math.hypot(*ray)
-        distance_squared = sum(
-            ((Fraction(coordinates[i]) - Fraction(observer[i])) ** 2 for i in range(3)),
-            Fraction(),
-        )
-        delay = Fraction(observation) - Fraction(emission)
-        residual = distance_squared - (LIGHT_SPEED_AU_DAY_EXACT * delay) ** 2
-        current = _RetardedSample(
-            emission, coordinates, flags, distance, residual, delay
-        )
-        if residual == 0:
-            lower = upper = current
-            break
-        if residual < 0:
-            lower = current
-        else:
-            upper = current
-        if (
-            lower is not None
-            and upper is not None
-            and math.nextafter(lower.epoch, math.inf) == upper.epoch
-        ):
-            break
-        proposal = observation - distance / LIGHT_SPEED_AU_DAY
-        if proposal == emission:
-            proposal = math.nextafter(emission, math.inf if residual < 0 else -math.inf)
-        if (
-            lower is not None
-            and upper is not None
-            and not lower.epoch < proposal < upper.epoch
-        ):
-            proposal = lower.epoch + (upper.epoch - lower.epoch) / 2
-        emission = proposal
-    else:
-        raise EphemerisSourceError("opaque_solar_light_time_not_stabilized")
-    assert lower is not None and upper is not None
-    residual_seconds = []
-    for endpoint in (lower, upper):
-        # Rationalization retains the sign when distance/c almost equals the
-        # small elapsed delay. This display value does not decide the bracket.
-        denominator = LIGHT_SPEED_AU_DAY_EXACT * (
-            Fraction(endpoint.distance) + LIGHT_SPEED_AU_DAY_EXACT * endpoint.delay
-        )
-        residual_seconds.append(
-            float(endpoint.residual_squared / denominator) * 86400
-            if endpoint.residual_squared
-            else 0.0
-        )
-    return (
-        upper,
-        iteration + 1,
-        {
-            "method_id": "exact_source_light_cone_adjacent_tt_v1",
-            "selected_endpoint": "first_nonnegative_F",
-            "lower_jd_tt": lower.epoch,
-            "upper_jd_tt": upper.epoch,
-            "lower_residual_seconds": residual_seconds[0],
-            "upper_residual_seconds": residual_seconds[1],
-            "bracket_width_seconds": float(
-                Fraction(upper.epoch) - Fraction(lower.epoch)
-            )
-            * 86400,
-            "exact_root": lower.epoch == upper.epoch,
-            "lower_target_barycentric_icrs_au_au_day": list(lower.coordinates),
-        },
-    )
 
 
 def opaque_solar_intersection(
@@ -228,10 +136,40 @@ def opaque_solar_positions(
     positions: list[JsonValue] = []
     for name in bodies:
         body = PLANET_SWISSEPH_IDS[name]
-        solved, iterations, light_time_solution = _retarded_state(
-            jd_tt, earth, lambda at: state(at, body, name)
+        solution = solve_light_cone(jd_tt, earth, lambda at: state(at, body, name))
+        solved = solution.upper
+        emission, target, target_flags, distance = (
+            solved.epoch,
+            solved.coordinates,
+            solved.payload,
+            solved.distance,
         )
-        emission, target, target_flags, distance = solved[:4]
+        residual_seconds = []
+        for endpoint in (solution.lower, solution.upper):
+            # The exact sign determined the bracket; rationalization only
+            # displays its residual when light time and delay almost cancel.
+            denominator = LIGHT_SPEED_AU_DAY_EXACT * (
+                Fraction(endpoint.distance) + LIGHT_SPEED_AU_DAY_EXACT * endpoint.delay
+            )
+            residual_seconds.append(
+                float(endpoint.residual_squared / denominator) * 86400
+                if endpoint.residual_squared
+                else 0.0
+            )
+        light_time_solution: dict[str, JsonValue] = {
+            "method_id": "exact_source_light_cone_adjacent_tt_v1",
+            "selected_endpoint": "first_nonnegative_F",
+            "lower_jd_tt": solution.lower.epoch,
+            "upper_jd_tt": solution.upper.epoch,
+            "lower_residual_seconds": residual_seconds[0],
+            "upper_residual_seconds": residual_seconds[1],
+            "bracket_width_seconds": float(
+                Fraction(solution.upper.epoch) - Fraction(solution.lower.epoch)
+            )
+            * 86400,
+            "exact_root": solution.lower.epoch == solution.upper.epoch,
+            "lower_target_barycentric_icrs_au_au_day": list(solution.lower.coordinates),
+        }
         ray = [target[i] - earth[i] for i in range(3)]
         light_time = distance / LIGHT_SPEED_AU_DAY
         direction = [x / distance for x in ray]
@@ -284,7 +222,7 @@ def opaque_solar_positions(
                 "solar_deflection_applied": body != swe.SUN and not intercepted,
                 "emission_jd_tt": emission,
                 "solar_passage_jd_tt": solar_epoch,
-                "light_time_iterations": iterations,
+                "light_time_iterations": solution.iterations,
                 "light_time_solution": light_time_solution,
                 "target_barycentric_icrs_au_au_day": list(target),
                 "solar_barycentric_icrs_au_au_day": list(solar),

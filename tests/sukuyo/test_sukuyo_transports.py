@@ -3,6 +3,7 @@
 import asyncio
 import json
 import shutil
+from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
@@ -17,6 +18,9 @@ from fatebridge.services.tool_catalog import CATALOG
 
 SPECS = {spec.key: spec for spec in CATALOG}
 AS_OF = "2026-10-22T12:00:00+08:00"
+FULLMOON_PRIMARY = json.loads(
+    (Path(__file__).parents[1] / "data/sukuyo-fullmoon-primary.json").read_text()
+)
 
 
 @pytest.mark.parametrize(
@@ -25,6 +29,8 @@ AS_OF = "2026-10-22T12:00:00+08:00"
         (
             "suzhan",
             {
+                "lat": "31n13",
+                "lon": "121e28",
                 "date": "2025-02-07",
                 "time": "12:00:00",
                 "zone": "+08:00",
@@ -42,6 +48,8 @@ AS_OF = "2026-10-22T12:00:00+08:00"
         (
             "suzhan",
             {
+                "lat": "31n13",
+                "lon": "121e28",
                 "date": "2025-02-11",
                 "time": "12:00:00",
                 "zone": "+08:00",
@@ -58,6 +66,8 @@ AS_OF = "2026-10-22T12:00:00+08:00"
         (
             "suzhan",
             {
+                "lat": "31n13",
+                "lon": "121e28",
                 "date": "2024-08-04",
                 "time": "12:00:00",
                 "zone": "+08:00",
@@ -75,6 +85,8 @@ AS_OF = "2026-10-22T12:00:00+08:00"
         (
             "suzhan",
             {
+                "lat": "31n13",
+                "lon": "121e28",
                 "date": "2025-02-04",
                 "time": "12:00:00",
                 "zone": "+08:00",
@@ -90,6 +102,8 @@ AS_OF = "2026-10-22T12:00:00+08:00"
         (
             "suzhan",
             {
+                "lat": "31n13",
+                "lon": "121e28",
                 "date": "0903-07-13",
                 "time": "00:00:00",
                 "zone": "+09:00",
@@ -104,6 +118,8 @@ AS_OF = "2026-10-22T12:00:00+08:00"
         (
             "suzhan",
             {
+                "lat": "31n13",
+                "lon": "121e28",
                 "date": "2025-02-06",
                 "time": "12:00:00",
                 "zone": "+08:00",
@@ -120,6 +136,8 @@ AS_OF = "2026-10-22T12:00:00+08:00"
         (
             "suzhan",
             {
+                "lat": "31n13",
+                "lon": "121e28",
                 "date": "2025-02-07",
                 "time": "12:00:00",
                 "zone": "+08:00",
@@ -136,6 +154,8 @@ AS_OF = "2026-10-22T12:00:00+08:00"
         (
             "suzhan",
             {
+                "lat": "31n13",
+                "lon": "121e28",
                 "date": "0806-01-28",
                 "time": "12:00:00",
                 "zone": "+09:00",
@@ -152,6 +172,8 @@ AS_OF = "2026-10-22T12:00:00+08:00"
         (
             "suzhan",
             {
+                "lat": "31n13",
+                "lon": "121e28",
                 "date": "0820-03-22",
                 "time": "12:00:00",
                 "zone": "+09:00",
@@ -168,6 +190,8 @@ AS_OF = "2026-10-22T12:00:00+08:00"
         (
             "suzhan",
             {
+                "lat": "31n13",
+                "lon": "121e28",
                 "date": "1872-12-31",
                 "time": "12:00:00",
                 "zone": "+09:00",
@@ -184,6 +208,8 @@ AS_OF = "2026-10-22T12:00:00+08:00"
         (
             "suzhan",
             {
+                "lat": "31n13",
+                "lon": "121e28",
                 "date": "0806-09-20",
                 "time": "12:00:00",
                 "zone": "+09:00",
@@ -240,6 +266,8 @@ AS_OF = "2026-10-22T12:00:00+08:00"
         (
             "suzhan",
             {
+                "lat": "31n13",
+                "lon": "121e28",
                 "date": "2025-03-04",
                 "time": "12:00:00",
                 "zone": "+08:00",
@@ -257,6 +285,8 @@ AS_OF = "2026-10-22T12:00:00+08:00"
         (
             "suzhan",
             {
+                "lat": "31n13",
+                "lon": "121e28",
                 "date": "2017-06-24",
                 "time": "12:00:00",
                 "zone": "+09:00",
@@ -273,6 +303,8 @@ AS_OF = "2026-10-22T12:00:00+08:00"
         (
             "suzhan",
             {
+                "lat": "31n13",
+                "lon": "121e28",
                 "date": "2017-06-24",
                 "time": "12:00:00",
                 "zone": "+09:00",
@@ -289,6 +321,8 @@ AS_OF = "2026-10-22T12:00:00+08:00"
         (
             "suzhan",
             {
+                "lat": "31n13",
+                "lon": "121e28",
                 "date": "2017-06-23",
                 "time": "15:00:00",
                 "zone": "UTC",
@@ -299,6 +333,8 @@ AS_OF = "2026-10-22T12:00:00+08:00"
         (
             "suzhan",
             {
+                "lat": "31n13",
+                "lon": "121e28",
                 "date": "2024-08-04",
                 "time": "12:00:00",
                 "zone": "+09:00",
@@ -366,6 +402,8 @@ AS_OF = "2026-10-22T12:00:00+08:00"
         (
             "suzhan",
             {
+                "lat": "31n13",
+                "lon": "121e28",
                 "date": "2025-03-03",
                 "time": "12:00:00",
                 "zone": "+08:00",
@@ -377,6 +415,8 @@ AS_OF = "2026-10-22T12:00:00+08:00"
         (
             "suzhan",
             {
+                "lat": "31n13",
+                "lon": "121e28",
                 "date": "2025-03-03",
                 "time": "12:00:00",
                 "zone": "+08:00",
@@ -388,6 +428,8 @@ AS_OF = "2026-10-22T12:00:00+08:00"
         (
             "suzhan",
             {
+                "lat": "31n13",
+                "lon": "121e28",
                 "date": "2025-03-03",
                 "time": "12:00:00",
                 "zone": "+08:00",
@@ -399,6 +441,8 @@ AS_OF = "2026-10-22T12:00:00+08:00"
         (
             "suzhan",
             {
+                "lat": "31n13",
+                "lon": "121e28",
                 "date": "2025-03-03",
                 "time": "12:00:00",
                 "zone": "+08:00",
@@ -410,6 +454,8 @@ AS_OF = "2026-10-22T12:00:00+08:00"
         (
             "suzhan",
             {
+                "lat": "31n13",
+                "lon": "121e28",
                 "date": "2025-03-02",
                 "time": "12:00:00",
                 "zone": "+08:00",
@@ -421,6 +467,8 @@ AS_OF = "2026-10-22T12:00:00+08:00"
         (
             "suzhan",
             {
+                "lat": "31n13",
+                "lon": "121e28",
                 "date": "2025-03-02",
                 "time": "12:00:00",
                 "zone": "+08:00",
@@ -435,6 +483,8 @@ AS_OF = "2026-10-22T12:00:00+08:00"
         (
             "suzhan",
             {
+                "lat": "31n13",
+                "lon": "121e28",
                 "date": "2025-03-04",
                 "time": "12:00:00",
                 "zone": "+08:00",
@@ -446,6 +496,8 @@ AS_OF = "2026-10-22T12:00:00+08:00"
         (
             "suzhan",
             {
+                "lat": "31n13",
+                "lon": "121e28",
                 "date": "2025-03-04",
                 "time": "12:00:00",
                 "zone": "+08:00",
@@ -458,6 +510,8 @@ AS_OF = "2026-10-22T12:00:00+08:00"
         (
             "suzhan",
             {
+                "lat": "31n13",
+                "lon": "121e28",
                 "date": "2025-03-04",
                 "time": "12:00:00",
                 "zone": "+08:00",
@@ -470,14 +524,19 @@ AS_OF = "2026-10-22T12:00:00+08:00"
         (
             "suzhan",
             {
+                "lat": "31n13",
+                "lon": "121e28",
                 "date": "2024-08-04",
                 "time": "12:00:00",
                 "zone": "+08:00",
                 "calendar_profile": "hinoo_t1299_host27",
             },
             [
-                "sukuyo.calendar.profile_calculation.source_bundle_sha256",
-                "sukuyo.calendar.profile_calculation.host_calculation.source_bundle_sha256",
+                "sukuyo.calendar.profile_calculation.calendar_profile",
+                "sukuyo.calendar.profile_calculation.host_calculation.ruleset_id",
+                "sukuyo.calendar.profile_calculation.host_calculation.source_url",
+                "sukuyo.calendar.profile_calculation.host_calculation.direct_locator",
+                "sukuyo.calendar.profile_calculation.host_calculation.shortcut_locator",
                 "sukuyo.calendar.profile_calculation.short_month_assignment",
                 "sukuyo.calendar.profile_calculation.hinoo_source.cached_primary_excerpt",
             ],
@@ -490,8 +549,11 @@ AS_OF = "2026-10-22T12:00:00+08:00"
                 "calendar_profile": "hinoo_t1299_host27",
             },
             [
-                "person1.calendar.profile_calculation.source_bundle_sha256",
-                "person1.calendar.profile_calculation.host_calculation.source_bundle_sha256",
+                "person1.calendar.profile_calculation.calendar_profile",
+                "person1.calendar.profile_calculation.host_calculation.ruleset_id",
+                "person1.calendar.profile_calculation.host_calculation.source_url",
+                "person1.calendar.profile_calculation.host_calculation.direct_locator",
+                "person1.calendar.profile_calculation.host_calculation.shortcut_locator",
                 "person2.calendar.profile_calculation.hinoo_source.cached_primary_excerpt",
                 "candidate_relation_analysis",
             ],
@@ -499,6 +561,8 @@ AS_OF = "2026-10-22T12:00:00+08:00"
         (
             "suzhan",
             {
+                "lat": "31n13",
+                "lon": "121e28",
                 "date": "2025-06-24",
                 "time": "12:00:00",
                 "zone": "+08:00",
@@ -516,6 +580,8 @@ AS_OF = "2026-10-22T12:00:00+08:00"
         (
             "suzhan",
             {
+                "lat": "31n13",
+                "lon": "121e28",
                 "date": "2025-02-02",
                 "time": "12:00:00",
                 "zone": "+08:00",
@@ -531,6 +597,8 @@ AS_OF = "2026-10-22T12:00:00+08:00"
         (
             "suzhan",
             {
+                "lat": "31n13",
+                "lon": "121e28",
                 "date": "2025-04-15",
                 "time": "12:00:00",
                 "zone": "+08:00",
@@ -547,6 +615,8 @@ AS_OF = "2026-10-22T12:00:00+08:00"
         (
             "suzhan",
             {
+                "lat": "31n13",
+                "lon": "121e28",
                 "date": "2025-03-13",
                 "time": "12:00:00",
                 "zone": "+08:00",
@@ -563,6 +633,8 @@ AS_OF = "2026-10-22T12:00:00+08:00"
         (
             "suzhan",
             {
+                "lat": "31n13",
+                "lon": "121e28",
                 "date": "2025-01-30",
                 "time": "12:00:00",
                 "zone": "+08:00",
@@ -578,7 +650,13 @@ AS_OF = "2026-10-22T12:00:00+08:00"
         ),
         (
             "suzhan",
-            {"date": "2025-01-29", "time": "20:00:00", "zone": "+08:00"},
+            {
+                "lat": "31n13",
+                "lon": "121e28",
+                "date": "2025-01-29",
+                "time": "20:00:00",
+                "zone": "+08:00",
+            },
             [
                 "sukuyo.calendar_day",
                 "sukuyo.reading_text",
@@ -593,6 +671,8 @@ AS_OF = "2026-10-22T12:00:00+08:00"
         (
             "suzhan",
             {
+                "lat": "31n13",
+                "lon": "121e28",
                 "date": "0806-07-23",
                 "time": "23:59:00",
                 "zone": "+09:00",
@@ -617,7 +697,13 @@ AS_OF = "2026-10-22T12:00:00+08:00"
         ),
         (
             "suzhan",
-            {"date": "2025-02-08", "time": "20:00:00", "zone": "+08:00"},
+            {
+                "lat": "31n13",
+                "lon": "121e28",
+                "date": "2025-02-08",
+                "time": "20:00:00",
+                "zone": "+08:00",
+            },
             [
                 "sukuyo.calendar_day.verse_abbreviation_resolution",
                 "sukuyo.calendar_day.time_restrictions",
@@ -672,6 +758,8 @@ AS_OF = "2026-10-22T12:00:00+08:00"
         (
             "suzhan",
             {
+                "lat": "31n13",
+                "lon": "121e28",
                 "date": "2025-03-04",
                 "time": "12:00:00",
                 "zone": "+08:00",
@@ -687,6 +775,8 @@ AS_OF = "2026-10-22T12:00:00+08:00"
         (
             "suzhan",
             {
+                "lat": "31n13",
+                "lon": "121e28",
                 "date": "2025-03-04",
                 "time": "12:00:00",
                 "zone": "+08:00",
@@ -703,6 +793,8 @@ AS_OF = "2026-10-22T12:00:00+08:00"
         (
             "suzhan",
             {
+                "lat": "31n13",
+                "lon": "121e28",
                 "date": "2025-03-13",
                 "time": "12:00:00",
                 "zone": "+08:00",
@@ -718,6 +810,8 @@ AS_OF = "2026-10-22T12:00:00+08:00"
         (
             "suzhan",
             {
+                "lat": "31n13",
+                "lon": "121e28",
                 "date": "2025-03-04",
                 "time": "12:00:00",
                 "zone": "+08:00",
@@ -743,6 +837,8 @@ AS_OF = "2026-10-22T12:00:00+08:00"
         (
             "suzhan",
             {
+                "lat": "31n13",
+                "lon": "121e28",
                 "date": "2025-03-04",
                 "time": "12:00:00",
                 "zone": "+08:00",
@@ -760,6 +856,8 @@ AS_OF = "2026-10-22T12:00:00+08:00"
         (
             "suzhan",
             {
+                "lat": "31n13",
+                "lon": "121e28",
                 "date": "2025-03-04",
                 "time": "12:00:00",
                 "zone": "+08:00",
@@ -809,6 +907,8 @@ AS_OF = "2026-10-22T12:00:00+08:00"
         (
             "suzhan",
             {
+                "lat": "31n13",
+                "lon": "121e28",
                 "date": "2024-08-04",
                 "time": "09:00:00",
                 "zone": "+08:00",
@@ -824,6 +924,8 @@ AS_OF = "2026-10-22T12:00:00+08:00"
         (
             "suzhan",
             {
+                "lat": "31n13",
+                "lon": "121e28",
                 "date": "2024-08-04",
                 "time": "09:00:00",
                 "zone": "+08:00",
@@ -861,12 +963,20 @@ AS_OF = "2026-10-22T12:00:00+08:00"
         ),
         (
             "suzhan",
-            {"date": "1954-11-25", "time": "12:00:00", "zone": "+08:00"},
+            {
+                "lat": "31n13",
+                "lon": "121e28",
+                "date": "1954-11-25",
+                "time": "12:00:00",
+                "zone": "+08:00",
+            },
             ["sukuyo", "rulesets", "params", "validation"],
         ),
         (
             "suzhan",
             {
+                "lat": "31n13",
+                "lon": "121e28",
                 "date": "2025-03-04",
                 "time": "12:00:00",
                 "zone": "+08:00",
@@ -885,6 +995,8 @@ AS_OF = "2026-10-22T12:00:00+08:00"
         (
             "suzhan",
             {
+                "lat": "31n13",
+                "lon": "121e28",
                 "date": "2025-03-04",
                 "time": "12:00:00",
                 "mansion_method": "legacy_equal28",
@@ -953,6 +1065,15 @@ def test_calendar_and_relations_across_all_real_transports(
     for body in payloads:
         spec.output_model.model_validate(body)
         Draft202012Validator(spec.output_model.model_json_schema()).validate(body)
+        if any(field.endswith("host_calculation.source_url") for field in fields):
+            source = body["sukuyo"] if key == "suzhan" else body["person1"]
+            profile = source["calendar"]["profile_calculation"]
+            host = profile["host_calculation"]
+            assert profile["calendar_profile"] == "hinoo_t1299_host27"
+            assert host["ruleset_id"] == "t1299_lower_fullmoon27_v1"
+            assert host["source_url"] == FULLMOON_PRIMARY["source_url"]
+            assert host["direct_locator"] == "T21n1299_p0394c20-0395a04; p0395b01-03"
+            assert host["shortcut_locator"] == "T21n1299_p0395b04-08"
     business = [
         {k: v for k, v in body.items() if k != "run_metadata"} for body in payloads
     ]
@@ -984,6 +1105,13 @@ def test_separator_catalogue_still_computes_all_real_transports(
         monkeypatch,
         capsys,
         "suzhan",
-        {"date": "2025-03-04", "time": "12:00:00", "zone": "+08:00", "szchart": 1},
+        {
+            "lat": "31n13",
+            "lon": "121e28",
+            "date": "2025-03-04",
+            "time": "12:00:00",
+            "zone": "+08:00",
+            "szchart": 1,
+        },
         ["astronomy", "chart", "sukuyo", "params"],
     )

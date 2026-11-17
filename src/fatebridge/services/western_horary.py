@@ -7,7 +7,6 @@ classical judgment engine in :mod:`fatebridge.core.astrology_horary`.
 
 from __future__ import annotations
 
-import json
 from typing import Any, Dict, Optional
 
 from fatebridge.core.astro.iers_ut1 import use_ut1_source
@@ -23,11 +22,8 @@ from fatebridge.services.snapshot_builders import (
     render_snapshot_text as _render_snapshot_text,
 )
 from fatebridge.utils.errors import handle_calculation_error
+from fatebridge.utils.formatting import format_json_response
 from fatebridge.utils.house_systems import house_system_fields, normalize_house_system
-
-
-def _json_block(value: Any) -> str:
-    return json.dumps(value, ensure_ascii=False, indent=2, default=str)
 
 
 def calculate_horary(
@@ -37,6 +33,7 @@ def calculate_horary(
     question_day: int,
     question_hour: int,
     question_minute: int = 0,
+    question_second: int = 0,
     timezone_name: Optional[str] = None,
     longitude: float,
     latitude: float,
@@ -68,6 +65,7 @@ def calculate_horary(
                     question_minute,
                     question_calendar,
                     question_hour_origin,
+                    second=question_second,
                 )
             )
             subject, clock_conversion = build_event_subject(
@@ -116,12 +114,18 @@ def calculate_horary(
                 f"{payload['reasoning']}"
             )
             sections = [
-                ("起盘信息", _json_block(context)),
-                ("历法日期换算", _json_block(calendar_conversion)),
-                ("钟时与物理时刻", _json_block(clock_conversion)),
+                ("起盘信息", format_json_response(context, compact=False)),
+                (
+                    "历法日期换算",
+                    format_json_response(calendar_conversion, compact=False),
+                ),
+                (
+                    "钟时与物理时刻",
+                    format_json_response(clock_conversion, compact=False),
+                ),
                 (
                     "主星与判词",
-                    _json_block(
+                    format_json_response(
                         {
                             "ascendant": payload["ascendant"],
                             "significators": payload["significators"],
@@ -131,13 +135,15 @@ def calculate_horary(
                             "verdict": payload["verdict"],
                             "reasoning": payload["reasoning"],
                             "rule_profile": payload["rule_profile"],
-                        }
+                        },
+                        compact=False,
                     ),
                 ),
                 (
                     "月相与裁决",
-                    _json_block(
-                        {"moon": payload["moon"], "radicality": payload["radicality"]}
+                    format_json_response(
+                        {"moon": payload["moon"], "radicality": payload["radicality"]},
+                        compact=False,
                     ),
                 ),
             ]

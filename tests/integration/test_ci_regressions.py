@@ -20,9 +20,9 @@ from pydantic import ValidationError
 import fatebridge.mcp_server as mcp
 from fatebridge.api import app as rest_app
 from fatebridge.application.result_delivery import bound_response
-from fatebridge.core import almanac, moshier_solar, solar_term_clock
+from fatebridge.core import almanac, de441_solar, solar_term_clock
 from fatebridge.core.astro.time_scales import ephemeris_time
-from fatebridge.core.ephemeris_runtime import ephemeris_call, swe
+from fatebridge.core.ephemeris_runtime import swe
 from fatebridge.core.local_techniques.chart import _resolve_coordinates
 from fatebridge.core.local_techniques.tongshefa import build_tongshefa_result
 from fatebridge.core.metaphysics.ren_calendar import require_ren_solar_term
@@ -34,6 +34,7 @@ from fatebridge.services.run_metadata import (
     engine_is_approximate,
     resolve_runtime_engine,
 )
+from fatebridge.utils.civil_time import ZonedCalendar
 from fatebridge.utils.coordinates import parse_geo_coordinate
 from fatebridge.utils.errors import EphemerisSourceError, ParameterError
 from fatebridge.utils.private_files import (
@@ -132,10 +133,10 @@ def test_all_original_native_events_select_the_first_post_crossing_point(
         details = term.solar_model_details
         point = details["selected_crossing_jd_tt"]
         before = math.nextafter(point, -math.inf)
-        assert term.resolution_provider == moshier_solar.PROVIDER
-        assert term.ephemeris_model == moshier_solar.MODEL_ID
-        left = moshier_solar.solar_longitude(before)
-        right = moshier_solar.solar_longitude(point)
+        assert term.resolution_provider == de441_solar.PROVIDER
+        assert term.ephemeris_model == de441_solar.MODEL_ID
+        left = de441_solar.solar_longitude(before)
+        right = de441_solar.solar_longitude(point)
         assert math.remainder(left - target, 360) < 0, term.name
         assert math.remainder(right - target, 360) >= 0, term.name
         assert details["root_bracket_tt"] == [before, point]
@@ -155,7 +156,7 @@ def test_exact_crossing_at_the_first_scan_sample_is_not_lost(monkeypatch):
 
     monkeypatch.setattr(almanac, "ephemeris_call", linear_sun)
     monkeypatch.setattr(
-        moshier_solar, "solar_longitude", lambda point: (point - root) % 360
+        de441_solar, "solar_longitude", lambda point: (point - root) % 360
     )
     provenance = {}
     moment = almanac._solar_term_utc_via_swe(2000, 0, anchor, provenance)
@@ -176,7 +177,9 @@ def test_new_post_crossing_contract_rejects_a_coherent_pre_crossing_point(
     details["selected_crossing_jd_tt"] = low
     bad = replace(
         term,
-        moment=solar_term_clock.native_solar_root_datetime(low),
+        calendar=ZonedCalendar.from_datetime(
+            solar_term_clock.native_solar_root_datetime(low)
+        ),
         solar_model_details=details,
     )
     with pytest.raises(EphemerisSourceError) as caught:
@@ -361,7 +364,7 @@ def test_catalog_cold_import_does_not_load_domain_engines():
 import sys
 from fatebridge.services.tool_catalog import CATALOG
 assert len({spec.key for spec in CATALOG}) == len(CATALOG)
-for module in ('kerykeion', 'fatebridge.services.bazi',
+for module in ('fatebridge.services.bazi',
                'fatebridge.services.astrology', 'fatebridge.services.western_timing'):
     assert module not in sys.modules, module
 """
@@ -580,7 +583,6 @@ import sys
 from fatebridge.core.classical_western import bound_lord
 assert bound_lord('Aries', 0.0) == 'Jupiter'
 assert 'fatebridge.core.predictive._common' not in sys.modules
-assert 'kerykeion' not in sys.modules
 """
     proc = subprocess.run(
         [sys.executable, "-c", code], capture_output=True, text=True, timeout=30
