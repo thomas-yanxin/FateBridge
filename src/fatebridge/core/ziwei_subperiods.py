@@ -71,10 +71,11 @@ def limit_subperiod_evidence(
     """Expose textual groups and actual positions without choosing encounter geometry."""
     source = _source()
     half = decade_half(palaces, scopes[0], nominal_age)
-    # 小限's map is available even before the first formal decade. It is only a
-    # container for the unchanged natal stars, not a choice of relevant stars.
+    # Use the annual map when gender leaves 小限 unresolved. Either map is only
+    # a container for unchanged natal stars, not a choice of relevant stars.
+    map_index = 1 if scopes[1]["palace_map"] else 2
     occurrences: dict[str, list[dict[str, Any]]] = {}
-    for i, p in enumerate(scopes[1]["palace_map"]):
+    for i, p in enumerate(scopes[map_index]["palace_map"]):
         for j, star in enumerate(p["natal_stars_detail"]):
             occurrences.setdefault(star["name"], []).append(
                 dict(
@@ -82,7 +83,7 @@ def limit_subperiod_evidence(
                     natal_branch=p["branch"],
                     natal_palace_name=p["natal_palace_name"],
                     natal_mutagen=star["mutagen"],
-                    calculation_path=f"ziwei_horoscope.scopes.1.palace_map.{i}.natal_stars_detail.{j}",
+                    calculation_path=f"ziwei_horoscope.scopes.{map_index}.palace_map.{i}.natal_stars_detail.{j}",
                 )
             )
     records = []

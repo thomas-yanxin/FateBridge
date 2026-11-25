@@ -39,17 +39,26 @@ def limit_source_evidence(
     branches = "子丑寅卯辰巳午未申酉戌亥"
     profile = chart["ruleset"]["id"]
     selected = profile == "quanshu_v2_excerpt"
+    gender_known = gender in {"男", "女"}
     forward = (chart["year_stem"] in "甲丙戊庚壬") == (gender == "男")
     sign = 1 if forward else -1
     ming = chart["ming_gong"]["branch"]
     first_age = chart["wuxing_ju"]["number"]
-    actual_first = next(p for p in chart["palaces"] if p["daxian_period"] == 1)
+    actual_first = (
+        next(p["name"] for p in chart["palaces"] if p["daxian_period"] == 1)
+        if gender_known
+        else None
+    )
     by_scope = {s["scope"]: s for s in scopes}
-    expected_first = source["daxian"]["initial_palace_by_direction"][
-        "forward" if forward else "reverse"
-    ]
+    expected_first = (
+        source["daxian"]["initial_palace_by_direction"][
+            "forward" if forward else "reverse"
+        ]
+        if gender_known
+        else None
+    )
     expected_daxian = None
-    if nominal_age >= first_age:
+    if gender_known and nominal_age >= first_age:
         expected_daxian = branches[
             (branches.index(ming) + sign * (1 + (nominal_age - first_age) // 10)) % 12
         ]
@@ -59,9 +68,11 @@ def limit_source_evidence(
         if natal_year_branch in r["year_branches"]
     )
     xiao_sign = 1 if gender == "男" else -1
-    expected_xiao = branches[
-        (branches.index(xiao_start) + xiao_sign * (nominal_age - 1)) % 12
-    ]
+    expected_xiao = (
+        branches[(branches.index(xiao_start) + xiao_sign * (nominal_age - 1)) % 12]
+        if gender_known
+        else None
+    )
     birth = chart["lunar_date"]
     expected_doujun = (
         None
@@ -94,8 +105,10 @@ def limit_source_evidence(
             "frame": source["daxian"]["frame"],
             "source_reading": source["daxian"]["quote"],
             "literal_initial_palace": expected_first,
-            "actual_initial_palace": actual_first["name"],
-            "matches_literal_initial_palace": actual_first["name"] == expected_first,
+            "actual_initial_palace": actual_first,
+            "matches_literal_initial_palace": (
+                actual_first == expected_first if gender_known else None
+            ),
             "first_age": first_age,
             "age_basis": source["daxian"]["age_basis"],
             "expected_branch_given_bureau_age": expected_daxian,
@@ -116,7 +129,9 @@ def limit_source_evidence(
             "given_age_ordinal": nominal_age,
             "expected_branch_given_age": expected_xiao,
             "actual_branch": by_scope["小限"]["branch"],
-            "matches_source_given_age": by_scope["小限"]["branch"] == expected_xiao,
+            "matches_source_given_age": (
+                by_scope["小限"]["branch"] == expected_xiao if gender_known else None
+            ),
             "age_boundary_rule": "software_lunar_new_year_not_independently_certified_here",
         },
         "doujun": {

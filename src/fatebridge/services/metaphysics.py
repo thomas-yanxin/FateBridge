@@ -1282,6 +1282,14 @@ def _build_ziwei_horoscope_snapshot_text(
         )
     ]
     for s in horoscope.get("scopes", []) or []:
+        if s.get("status") == "unresolved":
+            sections.append(
+                (
+                    str(s["scope"]),
+                    "性别未知，顺逆未定；本层宫位、宫干和四化未生成。流年、月、日、时分别计算。",
+                )
+            )
+            continue
         if s.get("status") == "not_started":
             sections.append(
                 (

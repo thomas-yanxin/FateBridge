@@ -1052,8 +1052,7 @@ def build_ziwei_horoscope(
         ]
     ):
         raise ValueError("本命四化与所选明刊来源不一致，须按实际来源重建命盘")
-    if normalize_gender(gender) not in {"男", "女"}:
-        raise ValueError("紫微运限的大限、小限顺逆需要明确性别；本命非运限部分仍可计算")
+    gender_known = normalize_gender(gender) in {"男", "女"}
     target_lunar, target_month, target_day = require_lunar_month_day(
         target_seed, "紫微斗数运限"
     )
@@ -1093,7 +1092,7 @@ def build_ziwei_horoscope(
             "status": "not_started",
             "unavailable_reason": "before_selected_bureau_start_no_childhood_substitution",
         }
-    else:
+    elif gender_known:
         daxian_palace = _palace_for_nominal_age(palaces, nominal_age)
         daxian = _horoscope_scope(
             "大限",
@@ -1103,19 +1102,45 @@ def build_ziwei_horoscope(
             sihua_source=sihua_source,
         )
         daxian["status"] = "computed"
+    else:
+        daxian = {}
     daxian["first_age"] = first_daxian_age
 
-    xiao_palace = _palace_by_branch(
-        palaces, _xiaoxian_branch(natal_year_branch, nominal_age, gender)
-    )
-    # 小限 四化 follows the 宫干 of the 小限 palace (iztro convention), not the 流年 stem.
-    xiaoxian = _horoscope_scope(
-        "小限",
-        xiao_palace,
-        xiao_palace["ganzhi"][0],
-        rule_profile,
-        sihua_source=sihua_source,
-    )
+    if gender_known:
+        xiao_palace = _palace_by_branch(
+            palaces, _xiaoxian_branch(natal_year_branch, nominal_age, gender)
+        )
+        # 小限 四化 follows its 宫干 (iztro convention), not the 流年 stem.
+        xiaoxian = _horoscope_scope(
+            "小限",
+            xiao_palace,
+            xiao_palace["ganzhi"][0],
+            rule_profile,
+            sihua_source=sihua_source,
+        )
+    else:
+        xiaoxian = {}
+        for scope_name, record in (("大限", daxian), ("小限", xiaoxian)):
+            # Before the first bureau age, absence of a formal decade is known
+            # independently of gender; otherwise its direction is unresolved.
+            if record.get("status") == "not_started":
+                continue
+            record.update(
+                scope=scope_name,
+                status="unresolved",
+                unavailable_reason="gender_required_for_direction",
+                palace_name=None,
+                scope_palace_role=None,
+                natal_palace_name=None,
+                branch=None,
+                branch_index=None,
+                palace_ganzhi=None,
+                stem=None,
+                mutagen=None,
+                palace_map=[],
+                mutagen_natal_links=[],
+                stem_origin=None,
+            )
 
     natal_month = effective_lunar_month(
         int(natal_lunar["month"]),
@@ -1180,7 +1205,7 @@ def build_ziwei_horoscope(
         "目标时柱天干",
     )
     for scope_record, stem_origin in zip(scopes, stem_origins):
-        if scope_record.get("status") == "not_started":
+        if scope_record.get("status") in {"not_started", "unresolved"}:
             continue
         scope_record["stem_origin"] = stem_origin
         scope_record["palace_map"] = scope_palace_map(

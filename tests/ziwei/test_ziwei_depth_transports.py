@@ -18,6 +18,7 @@ from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
 from tests.fixtures.mcp_receipt import verified_inline_business
 from tests.fixtures.mcp_result_delivery import read_full_result
+from tests.support.transports import rest, surface_calls, three_surfaces
 
 BIRTH = dict(
     birth_year=1992,
@@ -159,7 +160,6 @@ def test_profiles_and_evidence_match_all_public_surfaces(
 @pytest.mark.parametrize(
     "payload,error_fragment",
     [
-        ({**BIRTH, **TARGET, "gender": "未知"}, "需要明确性别"),
         (
             {
                 **BIRTH,
@@ -221,6 +221,151 @@ def test_default_mcp_budget_preserves_full_palace_evidence_in_the_same_run():
             )
 
     asyncio.run(call())
+
+
+@pytest.mark.parametrize("profile", ["iztro_2_5_8", "quanshu_v2_excerpt"])
+@pytest.mark.parametrize(
+    "birth,target",
+    [
+        ({}, {}),
+        # HKO: leap sixth month days 15/16 in 2025; retain the selected
+        # flowing-month split and the independently selected natal rule.
+        (
+            {"birth_year": 2020, "birth_month": 6, "birth_day": 6},
+            {"target_year": 2025, "target_month": 8, "target_day": 8},
+        ),
+        (
+            {"birth_year": 2020, "birth_month": 6, "birth_day": 7},
+            {"target_year": 2025, "target_month": 8, "target_day": 9},
+        ),
+        ({"birth_hour": 23}, {"target_hour": 23}),
+        (
+            {},
+            {
+                "target_year": 2026,
+                "target_month": 2,
+                "target_day": 16,
+                "target_hour": 23,
+                "target_timezone": "Asia/Shanghai",
+            },
+        ),
+        (
+            {},
+            {
+                "target_year": 2026,
+                "target_month": 2,
+                "target_day": 17,
+                "target_hour": 0,
+                "target_timezone": "Asia/Shanghai",
+            },
+        ),
+        # Same physical instant, different date labels and flowing clocks.
+        (
+            {},
+            {
+                "target_year": 2026,
+                "target_month": 2,
+                "target_day": 16,
+                "target_hour": 16,
+                "target_timezone": "UTC",
+            },
+        ),
+        (
+            {"birth_year": 2025, "birth_month": 7, "birth_day": 25},
+            {
+                "target_year": 2025,
+                "target_month": 7,
+                "target_day": 25,
+                "target_hour": 15,
+                "target_timezone": "Asia/Shanghai",
+            },
+        ),
+    ],
+)
+def test_unknown_gender_retains_common_facts_across_clocks_and_surfaces(
+    profile, birth, target, tmp_path, monkeypatch, capsys
+):
+    spec = next(s for s in CATALOG if s.key == "ziwei_horoscope")
+    fields = ["analysis_context", "birth_context", "ziwei_horoscope"]
+    results = []
+    for gender in ("男", "女", "未知"):
+        bodies = three_surfaces(
+            spec,
+            {
+                **BIRTH,
+                **TARGET,
+                **birth,
+                **target,
+                "gender": gender,
+                "rule_profile": profile,
+            },
+            fields,
+            "2026-10-22T12:00:00+08:00",
+            tmp_path,
+            monkeypatch,
+            capsys,
+        )
+        results.append(bodies["ziwei_horoscope"])
+    male, female, unknown = results
+    assert male["scopes"][2:] == female["scopes"][2:] == unknown["scopes"][2:]
+    assert (
+        male["nominal_age_calendar"]
+        == female["nominal_age_calendar"]
+        == unknown["nominal_age_calendar"]
+    )
+    assert (
+        male["calendar_basis"] == female["calendar_basis"] == unknown["calendar_basis"]
+    )
+    for scope in unknown["scopes"][:2]:
+        assert scope["status"] in {"unresolved", "not_started"}
+        assert scope["branch"] is None and scope["mutagen"] is None
+        assert scope["palace_map"] == scope["mutagen_natal_links"] == []
+    # The adult control exercises genuinely different directions. Children's
+    # first decades may share 命宫 under iztro; direction alone is not inequality.
+    if not birth:
+        assert male["scopes"][0]["branch"] != female["scopes"][0]["branch"]
+
+
+@pytest.mark.parametrize("gender", [None, "", "not-a-gender", "未知", "omitted"])
+def test_optional_and_unrecognized_gender_follow_existing_unknown_contract(
+    gender, tmp_path, monkeypatch, capsys
+):
+    spec = next(s for s in CATALOG if s.key == "ziwei_horoscope")
+    payload = {**BIRTH, **TARGET, "gender": gender}
+    if gender == "omitted":
+        payload.pop("gender")
+    bodies = three_surfaces(
+        spec,
+        payload,
+        ["ziwei_horoscope.scopes"],
+        "2026-10-22T12:00:00+08:00",
+        tmp_path,
+        monkeypatch,
+        capsys,
+    )
+    assert bodies["ziwei_horoscope"]["scopes"][0]["status"] == "unresolved"
+
+
+@pytest.mark.parametrize("gender", [123, ["男"]])
+def test_non_string_gender_is_rejected_on_all_surfaces(gender, surface_calls):
+    spec = next(s for s in CATALOG if s.key == "ziwei_horoscope")
+    http, protocol, code, local = surface_calls(
+        spec,
+        {**BIRTH, **TARGET, "gender": gender},
+        projection=dict(
+            fields=["ziwei_horoscope.scopes"],
+            strict_fields=True,
+            response_char_limit=0,
+            include_snapshot_text=False,
+        ),
+        rest_as_of="2026-10-12T02:00:00Z",
+    )
+    assert http.status_code == 422
+    assert protocol.is_error
+    assert code != 0
+    assert "gender" in http.text
+    assert "gender" in str(protocol.content)
+    assert "gender" in json.dumps(local)
 
 
 @pytest.mark.parametrize("view", ["symbolism", "voids"])

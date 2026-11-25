@@ -45,6 +45,11 @@ class ZiweiBirthRequest(FateBridgeRequest):
 class ZiweiHoroscopeRequest(FateBridgeRequest):
     """Request model for 紫微斗数 horoscope (运限) at a target date-time."""
 
+    gender: Optional[str] = Field(
+        default="未知",
+        description="性别可省略或传null；男/女及既有别名决定大、小限顺逆，未识别字符串按未知处理。未知时保留大、小限未定，独立计算流年、月、日、时及可用星曜。",
+    )
+
     birth_utc_offset: Optional[str] = Field(
         default=None,
         description="出生钟时的明确UTC偏移，格式±HH:MM或±HH:MM:SS；与出生时区核对并选择重复钟时，不替换命名时区。",

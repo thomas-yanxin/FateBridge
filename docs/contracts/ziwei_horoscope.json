@@ -336,7 +336,7 @@
           }
         ],
         "default": "未知",
-        "description": "性别（可选但建议提供：影响大运顺逆排布与部分六亲判断）。接受 男/女、male/female/m/f、阳/阴、乾/坤 等写法。"
+        "description": "性别可省略或传null；男/女及既有别名决定大、小限顺逆，未识别字符串按未知处理。未知时保留大、小限未定，独立计算流年、月、日、时及可用星曜。"
       },
       "include_snapshot_text": {
         "default": true,

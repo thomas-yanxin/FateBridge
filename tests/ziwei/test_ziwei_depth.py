@@ -182,13 +182,29 @@ def test_unknown_gender_keeps_natal_stars_but_does_not_guess_direction():
     assert [p["stars_detail"] for p in unknown["palaces"]] == [
         p["stars_detail"] for p in male["palaces"]
     ]
-    with pytest.raises(ValueError, match="需要明确性别"):
-        build_ziwei_horoscope(
-            birth_seed=synthetic_birth_clock(int((unknown)["lunar_date"]["year"])),
-            chart=unknown,
-            gender="未知",
-            target_seed=synthetic_seed(2026),
+    results = []
+    for gender in ("男", "女", "未知"):
+        results.append(
+            build_ziwei_horoscope(
+                birth_seed=synthetic_birth_clock(int(unknown["lunar_date"]["year"])),
+                chart=build_ziwei_chart(seed, gender),
+                gender=gender,
+                target_seed=synthetic_seed(2026),
+            )
         )
+    assert (
+        results[0]["scopes"][2:] == results[1]["scopes"][2:] == results[2]["scopes"][2:]
+    )
+    for scope in results[2]["scopes"][:2]:
+        assert scope["status"] == "unresolved"
+        assert scope["unavailable_reason"] == "gender_required_for_direction"
+        assert scope["branch"] is None and scope["mutagen"] is None
+        assert scope["palace_map"] == scope["mutagen_natal_links"] == []
+    source = results[2]["source_comparison"]
+    assert source["daxian"]["matches_literal_initial_palace"] is None
+    assert source["xiaoxian"]["matches_source_given_age"] is None
+    groups = results[2]["ming_limit_subperiods"]["natal_star_groups"]
+    assert any(g["actual_occurrences"] for g in groups)
 
 
 def test_natal_leap_excerpt_is_not_silently_extended_to_target_months():
