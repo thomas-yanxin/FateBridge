@@ -852,7 +852,9 @@ def _run_profile(
             2,
         )
 
-    _unify_birth_instant(inputs)
+    # Leave malformed place values to the child request's validation boundary.
+    if inputs.get("birth_place") is None or isinstance(inputs["birth_place"], str):
+        _unify_birth_instant(inputs)
 
     root_metadata = attach_run_metadata({}, tool_name="profile")["run_metadata"]
     if options.trace_id is not None:
@@ -897,9 +899,25 @@ def _run_profile(
     if not args.no_metadata:
         output["run_metadata"] = {**root_metadata, "effective_time": {"as_of": as_of}}
     if args.fields:
+        # A failed leg has no business fields to validate. Preserve its original
+        # error instead of replacing it with an unknown-path diagnostic.
+        failed_prefixes = tuple(
+            f"profile.{token}."
+            for token, _ in resolved
+            if result_is_error(profile[token])
+        )
+        projection_fields = [
+            path for path in args.fields if not path.startswith(failed_prefixes)
+        ]
         try:
-            output = project_fields(
-                output, args.fields, strict_fields=args.strict_fields
+            output = (
+                project_fields(
+                    output, projection_fields, strict_fields=args.strict_fields
+                )
+                if projection_fields
+                else {
+                    key: value for key, value in output.items() if key == "run_metadata"
+                }
             )
         except ParameterError as exc:
             return _emit_error(correlate_error(exc.as_result(), options), 1)
@@ -908,15 +926,40 @@ def _run_profile(
             leg = profile[token]
             if result_is_error(leg):
                 output.setdefault("profile", {})[token] = leg
-            elif token in output.get("profile", {}) and "run_metadata" in leg:
-                output["profile"][token]["run_metadata"] = leg["run_metadata"]
-    if args.include_snapshot_text is False:
-        for leg in output.get("profile", {}).values():
-            leg.pop("snapshot_text", None)
-    from fatebridge.application.result_delivery import bound_response
-
+    for token, spec in resolved:
+        if token not in output.get("profile", {}):
+            continue
+        prefix = f"profile.{token}."
+        child_fields = (
+            [
+                path.removeprefix(prefix)
+                for path in args.fields
+                if path.startswith(prefix)
+            ]
+            if args.fields
+            and "profile" not in args.fields
+            and f"profile.{token}" not in args.fields
+            else None
+        )
+        include_snapshot_text = args.include_snapshot_text
+        if include_snapshot_text is None:
+            include_snapshot_text = spec.include_snapshot_text
+        # Full paths were validated above. Scope delivery to this selected leg;
+        # budget the composed result once so paging retains the parent run.
+        output["profile"][token] = deliver_response(
+            profile[token],
+            fields=child_fields,
+            include_snapshot_text=include_snapshot_text,
+            response_char_limit=0,
+            compact=args.compact,
+            failed=result_is_error(profile[token]),
+        )
     try:
-        output = bound_response(output, args.response_char_limit, compact=args.compact)
+        output = deliver_response(
+            output,
+            response_char_limit=args.response_char_limit,
+            compact=args.compact,
+        )
     except ParameterError as exc:
         return _emit_error(exc.as_result(), 1)
     print(format_json_response(output, compact=args.compact))

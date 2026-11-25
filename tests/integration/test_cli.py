@@ -7,6 +7,13 @@ import pytest
 from fatebridge.application.execution import result_is_error
 from fatebridge.cli import run
 from fatebridge.services.tool_catalog import CATALOG
+from tests.support.result_delivery import reconstruct, store  # noqa: F401
+from tests.support.transports import (  # noqa: F401
+    AS_OF,
+    business,
+    projected_outputs,
+    rest,
+)
 
 
 def test_nested_model_tool_gives_hint_not_crash(capsys):
@@ -639,3 +646,234 @@ def test_subject_file_rejects_tool_options_not_in_selected_contract(tmp_path, ca
     payload = json.loads(capsys.readouterr().out)
     assert code == 0
     assert payload["chart_profile"]["house_system_code"] == 8
+
+
+@pytest.fixture
+def shanghai_subject(tmp_path):
+    data = {
+        "birth_year": 2000,
+        "birth_month": 5,
+        "birth_day": 1,
+        "birth_hour": 9,
+        "birth_minute": 0,
+        "birth_place": "上海",
+        "birth_timezone": "Asia/Shanghai",
+        "gender": "男",
+    }
+    return data, _write(tmp_path / "shanghai.json", json.dumps(data))
+
+
+def test_profile_shared_delivery_matches_single_tool_surfaces(
+    shanghai_subject, rest, tmp_path, capsys
+):
+    data, subject = shanghai_subject
+    fields = ["bazi_birth.four_pillars", "run_metadata.runtime"]
+    spec = next(spec for spec in CATALOG if spec.key == "bazi_birth")
+    controls = projected_outputs(
+        spec, data, fields, rest, tmp_path, capsys, include_snapshot_text=False
+    )
+    assert (
+        run(
+            [
+                "profile",
+                "--systems",
+                "bazi,astro",
+                "--subject-file",
+                subject,
+                "--as-of",
+                AS_OF,
+                "--include-snapshot-text",
+                "false",
+                "--fields",
+                *[f"profile.bazi.{field}" for field in fields],
+                "--strict-fields",
+                "true",
+                "--response-char-limit",
+                "0",
+                "--compact",
+            ]
+        )
+        == 0
+    )
+    payload = json.loads(capsys.readouterr().out)
+    leg = payload["profile"]["bazi"]
+    assert list(payload["profile"]) == ["bazi"]
+    assert (
+        business(leg)
+        == business(controls[0])
+        == business(controls[1])
+        == business(controls[2])
+    )
+    assert leg["bazi_birth"]["four_pillars"] == {
+        "year": {"stem": "庚", "branch": "辰"},
+        "month": {"stem": "庚", "branch": "辰"},
+        "day": {"stem": "己", "branch": "未"},
+        "hour": {"stem": "己", "branch": "巳"},
+    }
+    assert leg["run_metadata"]["runtime"] == controls[1]["run_metadata"]["runtime"]
+    assert leg["run_metadata"]["parent_run_id"] == payload["run_metadata"]["run_id"]
+    assert leg["run_metadata"]["trace_id"] == payload["run_metadata"]["trace_id"]
+
+
+@pytest.mark.parametrize("fields", [None, ["profile"], ["profile.bazi"]])
+def test_profile_snapshot_policy_uses_child_catalog_default(
+    shanghai_subject, capsys, monkeypatch, fields
+):
+    from dataclasses import replace
+
+    import fatebridge.cli as cli
+
+    original = cli._resolve_profile_systems
+
+    def resolve(tokens):
+        resolved, unknown = original(tokens)
+        return [
+            (token, replace(spec, include_snapshot_text=False))
+            for token, spec in resolved
+        ], unknown
+
+    monkeypatch.setattr(cli, "_resolve_profile_systems", resolve)
+    flags = ["--fields", *fields] if fields else []
+    assert (
+        run(
+            [
+                "profile",
+                "--systems",
+                "bazi",
+                "--subject-file",
+                shanghai_subject[1],
+                *flags,
+            ]
+        )
+        == 0
+    )
+    assert "snapshot_text" not in json.loads(capsys.readouterr().out)["profile"]["bazi"]
+
+
+def test_profile_small_budget_reads_selected_same_run(
+    shanghai_subject, store, capsys, monkeypatch
+):
+    assert (
+        run(
+            [
+                "profile",
+                "--systems",
+                "bazi",
+                "--subject-file",
+                shanghai_subject[1],
+                "--as-of",
+                AS_OF,
+                "--fields",
+                "profile.bazi.bazi_birth.four_pillars",
+                "profile.bazi.run_metadata.runtime",
+                "--strict-fields",
+                "true",
+                "--include-snapshot-text",
+                "false",
+                "--response-char-limit",
+                "4096",
+                "--compact",
+            ]
+        )
+        == 0
+    )
+    text = capsys.readouterr().out
+    assert len(text.rstrip("\n")) <= 4096
+    bounded = json.loads(text)
+    ref = bounded["result_delivery"]
+    run_id = bounded["run_metadata"]["run_id"]
+
+    def forbidden(*args, **kwargs):
+        pytest.fail("Reading must not recalculate")
+
+    monkeypatch.setattr("fatebridge.cli.execute_tool", forbidden)
+    restored = reconstruct(store, ref["result_id"])
+    assert restored["run_metadata"]["run_id"] == run_id
+    assert set(restored["profile"]["bazi"]["bazi_birth"]) == {"four_pillars"}
+    child = restored["profile"]["bazi"]["run_metadata"]
+    assert child["parent_run_id"] == run_id
+    assert child["trace_id"] == restored["run_metadata"]["trace_id"]
+    assert (
+        run(
+            [
+                "result-read",
+                ref["result_id"],
+                "--run-id",
+                run_id,
+                "--path",
+                "profile.bazi.bazi_birth.four_pillars",
+            ]
+        )
+        == 0
+    )
+    page = json.loads(capsys.readouterr().out)
+    assert (
+        json.loads(page["text"])
+        == restored["profile"]["bazi"]["bazi_birth"]["four_pillars"]
+    )
+
+
+def test_profile_preserves_unselected_failure_and_strict_path(
+    shanghai_subject, capsys, monkeypatch
+):
+    import fatebridge.cli as cli
+
+    original = cli.execute_tool
+
+    def execute(spec, request, **kwargs):
+        if spec.key == "ziwei_birth":
+            return {
+                "error": "synthetic failure",
+                "error_code": "calculation_error",
+                "retryable": False,
+            }
+        return original(spec, request, **kwargs)
+
+    monkeypatch.setattr(cli, "execute_tool", execute)
+    args = [
+        "profile",
+        "--systems",
+        "bazi,ziwei",
+        "--subject-file",
+        shanghai_subject[1],
+        "--fields",
+        "profile.bazi.bazi_birth.four_pillars",
+        "--strict-fields",
+        "true",
+    ]
+    assert run(args) == 1
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["profile"]["ziwei"]["error"] == "synthetic failure"
+    assert "bazi_birth" in payload["profile"]["bazi"]
+    failed_args = [
+        "profile",
+        "--systems",
+        "bazi,ziwei",
+        "--subject-file",
+        shanghai_subject[1],
+        "--fields",
+        "profile.ziwei.ziwei_birth.ming_gong",
+        "--strict-fields",
+        "true",
+    ]
+    assert run(failed_args) == 1
+    failed = json.loads(capsys.readouterr().out)
+    assert list(failed["profile"]) == ["ziwei"]
+    assert failed["profile"]["ziwei"]["error"] == "synthetic failure"
+    args[args.index("profile.bazi.bazi_birth.four_pillars")] = "profile.bazi.missing"
+    assert run(args) == 1
+    assert json.loads(capsys.readouterr().out)["issues"] == [
+        {"path": "profile.bazi.missing", "code": "unknown_projection_path"}
+    ]
+
+
+def test_profile_invalid_place_reaches_request_validation(
+    shanghai_subject, tmp_path, capsys
+):
+    data = {**shanghai_subject[0], "birth_place": 123}
+    data.pop("birth_timezone")
+    subject = _write(tmp_path / "invalid.json", json.dumps(data))
+    assert run(["profile", "--systems", "bazi", "--subject-file", subject]) == 1
+    result = json.loads(capsys.readouterr().out)["profile"]["bazi"]
+    assert result["error_code"] == "validation_error"
+    assert result["issues"] == [{"path": "birth_place", "code": "string_type"}]
