@@ -16,6 +16,10 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional, Tuple
 
 from fatebridge.core.astro.ephemeris import _swisseph_planet_state
+from fatebridge.core.astro.event_reference import (
+    reference_qualification,
+    unresolved_ascendant,
+)
 from fatebridge.core.astro.reference import PLANET_SWISSEPH_IDS
 from fatebridge.core.astro.time_scales import ephemeris_time
 from fatebridge.core.astrology_lifespan import (
@@ -241,11 +245,13 @@ def calculate_planetary_ages(
         payload = build_planetary_ages_payload(
             natal_reference, current_age_years=current_age
         )
-        if payload["active_planet"] is None:
+        if current_age is None:
             summary = "托勒密七年龄段：未指定参照日期，仅列出全生命周期分段。"
+        elif current_age < 0:
+            summary = "托勒密七年龄段：参照日期早于出生，尚未进入年龄分期。"
         else:
             summary = (
-                f"托勒密七年龄段：约 {payload['current_age_years']} 岁，"
+                f"托勒密七年龄段：约 {round(current_age, 2)} 岁，"
                 f"当前由{payload['active_planet_label']}主管。"
             )
         context = _analysis_context(
@@ -409,15 +415,23 @@ def calculate_distributions(
     """生成界推运（上升历经埃及界限）的分配主星时间轴。"""
     label = "界推运"
     try:
-        birth_info, _subject, natal_reference, sect = _prepare_chart(
+        birth_info, subject, natal_reference, sect = _prepare_chart(
             house_system=house_system, zodiac_type=zodiac_type, **birth_kwargs
         )
+        ascendant_resolved = not unresolved_ascendant(subject)
         payload = build_distributions_payload(
-            natal_reference, time_key=time_key, max_age_years=max_age_years
+            natal_reference,
+            time_key=time_key,
+            max_age_years=max_age_years,
+            ascendant_resolved=ascendant_resolved,
         )
+        if not ascendant_resolved:
+            payload["reference_qualification"] = reference_qualification(subject)
         summary = (
             f"界推运（{time_key} 时间钥匙）：{max_age_years} 岁内"
             f"上升历经 {len(payload['periods'])} 段界限分配。"
+            if ascendant_resolved
+            else "界推运：本命上升几何未定，界限分配时间轴未知。"
         )
         context = _analysis_context(
             label=label,
@@ -535,15 +549,25 @@ def calculate_keypoints(
     """生成数字相位推运（120 年关键点）激活时间轴。"""
     label = "数字相位推运"
     try:
-        birth_info, _subject, natal_reference, sect = _prepare_chart(
+        birth_info, subject, natal_reference, sect = _prepare_chart(
             house_system=house_system, zodiac_type=zodiac_type, **birth_kwargs
         )
+        ascendant_resolved = not unresolved_ascendant(subject)
         payload = build_keypoints_payload(
-            natal_reference, release_mode=release_mode, max_age_years=max_age_years
+            natal_reference,
+            release_mode=release_mode,
+            max_age_years=max_age_years,
+            ascendant_resolved=ascendant_resolved,
         )
+        if not ascendant_resolved:
+            payload["reference_qualification"] = reference_qualification(subject)
         summary = (
-            f"数字相位推运（释放点={payload['release_mode_label']}）："
-            f"共 {len(payload['activations'])} 个激活年。"
+            "数字相位推运：本命上升几何未定，上升释放的激活时间轴未知。"
+            if release_mode == "body" and not ascendant_resolved
+            else (
+                f"数字相位推运（释放点={payload['release_mode_label']}）："
+                f"共 {len(payload['activations'])} 个激活年。"
+            )
         )
         context = _analysis_context(
             label=label,

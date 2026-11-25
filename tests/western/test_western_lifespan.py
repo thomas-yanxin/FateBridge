@@ -5,6 +5,9 @@ These controls check selected derived arithmetic and service contracts. They do
 not certify natal ephemeris accuracy, complete classical methods or prediction.
 """
 
+import pytest
+
+from fatebridge.core.astro.event_reference import unresolved_ascendant
 from fatebridge.core.astrology_lifespan import (
     BALBILLUS_SMALL_YEARS,
     DOROTHEAN_TRIPLICITY_RULERS,
@@ -21,6 +24,7 @@ from fatebridge.core.astrology_lifespan import (
     build_yearsystem129_payload,
 )
 from fatebridge.services.western_lifespan import (
+    _prepare_chart,
     calculate_balbillus,
     calculate_distributions,
     calculate_harmonic_chart,
@@ -32,6 +36,148 @@ from fatebridge.services.western_lifespan import (
     calculate_yearsystem129,
 )
 from fatebridge.services.western_timing_tools import calculate_timing_tool
+from tests.support.transports import AS_OF, SPECS, business, rest, surface_calls
+
+J2000 = dict(
+    birth_year=2000,
+    birth_month=1,
+    birth_day=1,
+    birth_hour=12,
+    birth_minute=0,
+    birth_timezone="UTC",
+    birth_longitude=169.54144401512139,
+    birth_latitude=-66.5623231709126,
+    house_system="W",
+)
+
+
+@pytest.mark.parametrize("longitude_offset", [0, -0.001, 0.001, -48.07144401512139])
+@pytest.mark.parametrize("projected", [False, True])
+def test_lifespan_ascendant_qualification_three_surfaces(
+    longitude_offset, projected, surface_calls
+):
+    request = {**J2000, "birth_longitude": J2000["birth_longitude"] + longitude_offset}
+    _, subject, _, _ = _prepare_chart(zodiac_type="Tropic", **request)
+    assert unresolved_ascendant(subject) is (longitude_offset == 0)
+    for name, extra, key, paths in [
+        (
+            "distributions",
+            {},
+            "distributions",
+            ["periods", "ascendant_absolute_degree"],
+        ),
+        (
+            "keypoints",
+            {"release_mode": "body"},
+            "keypoints",
+            ["positions", "activations", "release_sign_index"],
+        ),
+        (
+            "keypoints",
+            {"release_mode": "soul"},
+            "keypoints",
+            ["positions", "activations", "release_sign_index"],
+        ),
+    ]:
+        fields = (
+            [f"{key}.{path}" for path in paths]
+            if projected
+            else [key, "summary", "natal_reference"]
+        )
+        http, protocol, code, cli = surface_calls(
+            SPECS[f"astro_{name}"],
+            {**request, **extra},
+            projection=dict(
+                fields=fields,
+                strict_fields=True,
+                response_char_limit=0,
+                include_snapshot_text=False,
+            ),
+            rest_as_of=AS_OF,
+        )
+        assert http.status_code == 200, http.text
+        assert not protocol.is_error, protocol.content
+        assert code == 0, cli
+        outputs = [
+            business(http.json()),
+            business(protocol.structured_content),
+            business(cli),
+        ]
+        assert outputs[0] == outputs[1] == outputs[2]
+        payload = outputs[0][key]
+        if not projected and longitude_offset == 0:
+            qualification = payload["reference_qualification"]
+            assert qualification["ascendant_resolved"] is False
+            assert (
+                qualification[
+                    "ascendant_dependent_backend_values_are_physical_reference"
+                ]
+                is False
+            )
+        unresolved = longitude_offset == 0 and extra.get("release_mode") != "soul"
+        if unresolved:
+            assert all(
+                payload[path] == []
+                for path in paths
+                if path in ("periods", "positions", "activations")
+            )
+            assert payload[paths[-1]] is None
+        else:
+            assert payload[paths[0]]
+            assert payload[paths[-1]] is not None
+
+
+@pytest.mark.parametrize("day,expected", [(None, None), (2, None), (3, "Moon")])
+@pytest.mark.parametrize("projected", [False, True])
+def test_planetary_ages_reference_boundaries_three_surfaces(
+    day, expected, projected, surface_calls
+):
+    request = dict(BIRTH)
+    if day is not None:
+        request.update(analysis_year=1995, analysis_month=6, analysis_day=day)
+    fields = (
+        [
+            "planetary_ages.current_age_years",
+            "planetary_ages.active_planet",
+            "planetary_ages.bands",
+            "summary",
+        ]
+        if projected
+        else ["planetary_ages", "summary"]
+    )
+    http, protocol, code, cli = surface_calls(
+        SPECS["astro_planetary_ages"],
+        request,
+        projection=dict(
+            **({"fields": fields} if projected else {}),
+            strict_fields=True,
+            response_char_limit=0,
+            include_snapshot_text=False,
+        ),
+        rest_as_of=AS_OF,
+    )
+    assert http.status_code == 200, http.text
+    assert not protocol.is_error, protocol.content
+    assert code == 0, cli
+    outputs = [
+        business(http.json()),
+        business(protocol.structured_content),
+        business(cli),
+    ]
+    assert outputs[0] == outputs[1] == outputs[2]
+    result = outputs[0]
+    payload = result["planetary_ages"]
+    assert payload["active_planet"] == expected
+    assert sum(band["active"] for band in payload["bands"]) == (expected is not None)
+    if day is None:
+        assert payload["current_age_years"] is None
+        assert "未指定参照日期" in result["summary"]
+    elif day == 2:
+        assert payload["current_age_years"] < 0
+        assert "尚未进入" in result["summary"]
+    else:
+        assert payload["current_age_years"] == 0
+
 
 BIRTH = dict(
     name="测试者",

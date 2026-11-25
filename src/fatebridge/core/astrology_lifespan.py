@@ -292,9 +292,7 @@ def build_planetary_ages_payload(
     return {
         "system": "ptolemy_seven_ages",
         "system_label": "托勒密七年龄段",
-        "current_age_years": (
-            None if current_age_years is None else round(current_age_years, 2)
-        ),
+        "current_age_years": current_age_years,
         "active_planet": active_planet,
         "active_planet_label": (
             None if active_planet is None else planet_label(active_planet)
@@ -486,6 +484,7 @@ def build_distributions_payload(
     *,
     time_key: str,
     max_age_years: float,
+    ascendant_resolved: bool = True,
 ) -> Dict[str, Any]:
     """
     Direct the Ascendant through the Egyptian bounds at the chosen ``time_key``
@@ -494,45 +493,50 @@ def build_distributions_payload(
     conjoins inside a period are recorded as participants (partners).
     """
     rate = DISTRIBUTION_TIME_KEY_RATES.get(time_key, 1.0)
-    asc_longitude = float(natal_reference["ascendant"]["absolute_degree"])
+    asc_longitude = (
+        float(natal_reference["ascendant"]["absolute_degree"])
+        if ascendant_resolved
+        else None
+    )
     span_degrees = max_age_years * rate
     longitudes = _natal_longitudes(natal_reference)
 
     periods: List[Dict[str, Any]] = []
-    for segment in _bound_segments_from(asc_longitude, span_degrees):
-        bound = segment["bound"]
-        start_age = segment["enter_arc"] / rate
-        end_age = segment["exit_arc"] / rate
+    if asc_longitude is not None:
+        for segment in _bound_segments_from(asc_longitude, span_degrees):
+            bound = segment["bound"]
+            start_age = segment["enter_arc"] / rate
+            end_age = segment["exit_arc"] / rate
 
-        participants: List[Dict[str, Any]] = []
-        for point_name, natal_lon in longitudes.items():
-            if point_name in ("Ascendant", "Medium_Coeli"):
-                continue
-            # Arc from the Ascendant to this body, measured forward.
-            contact_arc = (Fraction(natal_lon) - Fraction(asc_longitude)) % 360
-            if segment["enter_arc"] <= contact_arc < segment["exit_arc"]:
-                participants.append(
-                    {
-                        "planet": point_name,
-                        "planet_label": planet_label(point_name),
-                        "contact_age_years": round(contact_arc / rate, 3),
-                    }
-                )
-        participants.sort(key=lambda item: item["contact_age_years"])
+            participants: List[Dict[str, Any]] = []
+            for point_name, natal_lon in longitudes.items():
+                if point_name in ("Ascendant", "Medium_Coeli"):
+                    continue
+                # Arc from the Ascendant to this body, measured forward.
+                contact_arc = (Fraction(natal_lon) - Fraction(asc_longitude)) % 360
+                if segment["enter_arc"] <= contact_arc < segment["exit_arc"]:
+                    participants.append(
+                        {
+                            "planet": point_name,
+                            "planet_label": planet_label(point_name),
+                            "contact_age_years": round(contact_arc / rate, 3),
+                        }
+                    )
+            participants.sort(key=lambda item: item["contact_age_years"])
 
-        periods.append(
-            {
-                "distributor": bound["bound_lord"],
-                "distributor_label": bound["bound_lord_label"],
-                "sign": segment["sign"],
-                "sign_label": sign_label(segment["sign"]),
-                "bound_start_degree": bound["segment_start_degree"],
-                "bound_end_degree": bound["segment_end_degree"],
-                "start_age_years": round(start_age, 3),
-                "end_age_years": round(end_age, 3),
-                "participants": participants,
-            }
-        )
+            periods.append(
+                {
+                    "distributor": bound["bound_lord"],
+                    "distributor_label": bound["bound_lord_label"],
+                    "sign": segment["sign"],
+                    "sign_label": sign_label(segment["sign"]),
+                    "bound_start_degree": bound["segment_start_degree"],
+                    "bound_end_degree": bound["segment_end_degree"],
+                    "start_age_years": round(start_age, 3),
+                    "end_age_years": round(end_age, 3),
+                    "participants": participants,
+                }
+            )
 
     return {
         "system": "distributions_through_bounds",
@@ -541,7 +545,9 @@ def build_distributions_payload(
         "direction_model_label": "黄道度数推进（每年 rate° 推进上升黄经）",
         "time_key": time_key,
         "rate_deg_per_year": round(rate, 8),
-        "ascendant_absolute_degree": round(asc_longitude, 4),
+        "ascendant_absolute_degree": (
+            None if asc_longitude is None else round(asc_longitude, 4)
+        ),
         "max_age_years": max_age_years,
         "periods": periods,
     }
@@ -748,6 +754,7 @@ def build_keypoints_payload(
     *,
     release_mode: str = "soul",
     max_age_years: int = 120,
+    ascendant_resolved: bool = True,
 ) -> Dict[str, Any]:
     """
     Build the 120-year keypoints timeline. Each planet carries a position-number
@@ -761,13 +768,18 @@ def build_keypoints_payload(
 
     release_key = "ascendant" if release_mode == "body" else "moon"
     release_point = natal_reference.get(release_key, {})
-    release_longitude = release_point.get("absolute_degree")
+    release_longitude = (
+        None
+        if release_mode == "body" and not ascendant_resolved
+        else release_point.get("absolute_degree")
+    )
     if release_longitude is None:
         return {
             "system": "keypoints_120",
             "system_label": "数字相位推运（120年关键点）",
             "release_mode": release_mode,
             "release_mode_label": KEYPOINTS_RELEASE_MODES[release_mode],
+            "release_sign_index": None,
             "positions": [],
             "activations": [],
         }

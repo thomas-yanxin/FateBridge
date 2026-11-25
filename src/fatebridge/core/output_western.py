@@ -719,6 +719,7 @@ class DistributionPeriod(PartialOutput):
 
 
 class Distributions(SystemOutput):
+    reference_qualification: Optional[Dict[str, object]] = None
     ascendant_absolute_degree: Optional[float] = None
     direction_model: Optional[str] = None
     direction_model_label: Optional[str] = None
@@ -777,6 +778,7 @@ class KeypointActivation(PartialOutput):
 
 
 class Keypoints(SystemOutput):
+    reference_qualification: Optional[Dict[str, object]] = None
     release_mode: Optional[str] = None
     release_mode_label: Optional[str] = None
     release_sign_index: Optional[int] = None
