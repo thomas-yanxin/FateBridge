@@ -10,7 +10,9 @@
     "material_application": "material_facts.application显式选afsi_application_conditions_v1；有明确element_use才核相应水体清洁/流动、金属暴露/定性尺度或植物健康，各条件用value/observation_basis/evidence独立证据。target_request_id可引用本轮element_adjustments.request_id，只有实际算出的introduced_element才可绑定；资格、条件、目标绑定、实际位置、剂量和效力分开，不因条件确认返回ready。摆位候选须重核已有application的条件和目标，不能换目标或漏旧属性。",
     "material_facts": "材料器形用environmental_context.material_facts：fact_id/object_id/material?/shape?/colour?/plant_alive?/observation_basis/evidence；至少一属性，未知用unknown，属性按独立证据粒度保存。element_use只明确询问wood_remedy等代表物资格，不是个人喜用或房屋所需元素。AFSI材料/颜色与FSI器形参考分开；processed_wood不作AFSI木材料，明确绿色可另列颜色替代；镜面/尖角还核实际几何。仅相关输入时fields追加layout_analysis.material_analysis；资格不认证摆位或可执行动作。",
     "method_reference": "纯方法/职业家具参考可用scene=home作通用家居参考查询标签，analyze_layout=false，按问题显式methods并投影method_details；年度对照仅加实际effective_year或确认的query_at。无真实环境事实时省略environmental_context，不提交空对象或仅household_scope。scene不生成房屋/房间/观察/摆位结论；household_scope=symbolic_reference只用于已给household_members的家庭象意，不等于通用reference_only。",
-    "natal_interpretation": "玄空有限解释需 xuankong.interpretation 显式启用 xuankong_conditioned_v1；当前评价运 current_period_number 与 period_evidence 成对，不改历史宅运。external_forms 按全宅中心八宫独立确认外部山形/水形，未知省略，照片保留候选，不复用金锁砂水或室内靠背；床/门取用结合顶层 placements.location_direction，桌/灶未覆盖。fields 追加 layout_analysis.natal_interpretation；仅有限五行与当令形势条件，不是完整81组合吉凶或可立即搬动建议。",
+    "natal_delivery": "询问玄空宅盘时确认已选 xuankong_natal（可用 methods 显式选中）。通用 first_view 用于已执行布局分析；宅盘首读用 evidence_views.natal_candidates 取历史定运、朝向、全部候选、待补事实和来源。缺磁向用 house.facing_degrees 或 xuankong.house.facing_degrees 配同一 house 的 north_reference=magnetic。逐候选按 candidate_id 关联证据；需要格局及原典数字对照时首轮用 natal_patterns。若传 xuankong.city_gate，追加 layers.xuankong_natal.city_gate_analysis，独立核对其参考运、状态和缺项。",
+    "natal_interpretation": "玄空有限解释需 xuankong.interpretation 显式启用 xuankong_conditioned_v1，读取 evidence_views.natal_interpretation。当前评价运 current_period_number 与 period_evidence 成对，不改历史宅运。external_forms 按全宅中心八宫独立确认外部山形/水形，未知省略，照片保留候选，不复用金锁砂水或室内靠背；床/门取用结合顶层 placements.location_direction，桌/灶未覆盖。若 include_calculation_reading=true（启用解释时默认），追加 calculation_reading。已启用布局分析时仍可按需追加 layout_analysis.natal_interpretation。仅覆盖有限五行与当令形势条件。",
+    "natal_projection": "同次需要的视图在首轮合并 fields；result_delivery 只保留当次所选字段，分页沿同一 run 读回。兼容原始路径 layers.xuankong_natal.chart 只有唯一候选才有值；完整导出首次 fields=null。",
     "scene_selection": "工位scene=workstation，合租scene=shared_rental，家居scene=home；自动按事实展开飞星、金锁、八宅，局部前两法优先，显式methods优先。不为优先级补年份或宅运；年盘不替代历史宅盘。独立形态/桌面/context不要求生辰或罗盘。无场景无作者无context保留原三法默认。场景首轮fields按需追加method_policy；细节参考按需读method_details。 method_policy.priority_review_status/missing与已选计算状态独立；available_engine_layers仅现状已完整计算层，候选读priority_review_by_scope.candidates及available_candidate_engine_layers，不以候选代替现状。priority_missing_inputs为可选审查索引，不是待传参数或必追问清单。",
     "surface_frame": "以坐着使用的桌沿为近沿near，远离坐者的桌沿为far；这是桌面坐标，不是房间前后或罗盘方向",
     "workstation_measured": "有实际尺寸的人工标注用workstation_layout.scene；+y图纸前方、桌面+x右/+y远沿，米制尺寸/高度/眼高/头顶高分别明确。compass独立提供北基准、角误差、参考中心和chart_binding_confirmed，sector_anchor明确坐者或桌中心；不自动立极。照片/坐标误差保持候选，清单不完整时未列观察仍未知。search提供完整有限位置/角度域，复用layout_constraints搬转许可；实测同一对象不重复提交placements/form_observations/features或旧关系。fields按需追加layout_analysis.workstation_layout_analysis；保留全部search.receipts、拒绝与未显示前沿数量，不把ready或Pareto集合解释为风水总分。BTB与wofs_desktop_compass_v1须逐个明确另选；植物身份、状态及几何分别核对，向星不等于坐向或桌面水体需求。 搜索域可用positions或grid二选一；grid明确原点和步长，默认从房间/桌面生成中心候选。竖直屏幕可在items[].screen实测，检查整面透视遮挡，required_visible明确是否硬约束，不推断眩光。算法完工审查读取research_completion_status/research_coverage；请求complete不代表完整81或24山已完成。",
@@ -49,6 +51,41 @@
         "rule_trace"
       ],
       "scope": "Requires explicit workstation_layout.search. Preserve every finite-search receipt and rejection, frontier IDs and display omissions. Read deferred evidence from the same run; ready only describes geometry and action permissions, not universal auspiciousness."
+    },
+    "natal_candidates": {
+      "fields": [
+        "status",
+        "layers.xuankong_natal.status",
+        "layers.xuankong_natal.period_context",
+        "layers.xuankong_natal.orientation_context",
+        "layers.xuankong_natal.candidates",
+        "layers.xuankong_natal.missing_inputs",
+        "rulesets",
+        "rule_trace"
+      ],
+      "scope": "仅在已选 xuankong_natal 层时使用。按该层状态交付已知定运、定向、全部候选及待补事实；综合状态还可能反映其他已选层。"
+    },
+    "natal_interpretation": {
+      "fields": [
+        "layers.xuankong_natal.interpretation",
+        "rulesets",
+        "rule_trace"
+      ],
+      "scope": "需已选 xuankong_natal 层并传入 xuankong.interpretation。逐候选读五行、当令、外局与选定床门的条件，保留未知、待确认与规则未覆盖的解释。"
+    },
+    "natal_patterns": {
+      "fields": [
+        "status",
+        "layers.xuankong_natal.status",
+        "layers.xuankong_natal.period_context",
+        "layers.xuankong_natal.orientation_context",
+        "layers.xuankong_natal.candidates",
+        "layers.xuankong_natal.missing_inputs",
+        "layers.xuankong_natal.source_comparison",
+        "rulesets",
+        "rule_trace"
+      ],
+      "scope": "仅在已选 xuankong_natal 层时使用。用 candidate_id 关联每盘 structure 与原典数字对照，保留格局适用条件、差异及未裁定范围。缺定运或定向时对照可为 not_computed。"
     }
   },
   "first_view": {

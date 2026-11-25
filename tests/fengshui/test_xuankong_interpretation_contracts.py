@@ -9,7 +9,11 @@ from fastmcp import Client
 from jsonschema import Draft202012Validator
 
 from fatebridge.application import result_delivery as delivery
-from fatebridge.application.examples import call_guidance, suggested_fields
+from fatebridge.application.examples import (
+    call_guidance,
+    evidence_views,
+    suggested_fields,
+)
 from fatebridge.cli import run
 from fatebridge.core import solar_model_policy
 from fatebridge.core.fengshui.models import (
@@ -29,7 +33,14 @@ from tests.support.mcp_result_assertions import without_transport
 from tests.support.result_delivery import (
     assert_same_run_receipt as assert_stored_result,
 )
-from tests.support.transports import rest_client
+from tests.support.transports import (
+    SPECS,
+    business,
+    projected_outputs,
+    rest,
+    rest_client,
+    surface_calls,
+)
 
 
 def interpretation_input():
@@ -363,6 +374,165 @@ def test_boundary_candidates_are_interpreted_individually():
             original = charts[finding["candidate_id"]]["palaces"][direction]
             assert palace["mountain_star_number"] == original["mountain_star_number"]
             assert palace["facing_star_number"] == original["facing_star_number"]
+
+
+@pytest.mark.parametrize("name", ["xuankong_natal", "assess"])
+@pytest.mark.parametrize(
+    "case", ["boundary", "missing_period", "missing_bearing", "unique"]
+)
+def test_published_natal_first_view_preserves_available_chart_facts(
+    name, case, surface_calls, rest, tmp_path, capsys
+):
+    inputs = payload("xuankong_natal")
+    if case == "boundary":
+        inputs["house"]["facing_degrees"] = 355.5
+    elif case == "missing_period":
+        del inputs["period"]
+    elif case == "missing_bearing":
+        del inputs["house"]["facing_degrees"]
+    if name == "assess":
+        house = inputs.pop("house")
+        inputs = {"methods": ["xuankong_natal"], "house": house, "xuankong": inputs}
+
+    spec = SPECS["fengshui_" + name]
+    fields = evidence_views(spec)["natal_candidates"]["fields"]
+    if name == "xuankong_natal":
+        assert fields == suggested_fields(spec)
+    http, mcp, code, cli = surface_calls(
+        spec,
+        inputs,
+        projection={
+            "strict_fields": True,
+            "response_char_limit": 0,
+            "include_snapshot_text": False,
+        },
+    )
+    assert http.status_code == 200 and not mcp.is_error and code == 0
+    full = business(http.json())
+    assert full == business(mcp.structured_content) == business(cli)
+    raw = full["layers"]["xuankong_natal"]
+    http_body, cli_body, mcp_body = projected_outputs(
+        spec, inputs, fields, rest, tmp_path, capsys, include_snapshot_text=False
+    )
+    result = business(http_body)
+    assert result == business(cli_body) == business(mcp_body)
+    assert result == {
+        "status": full["status"],
+        "layers": {
+            "xuankong_natal": {
+                key: raw[key]
+                for key in (
+                    "status",
+                    "period_context",
+                    "orientation_context",
+                    "candidates",
+                    "missing_inputs",
+                )
+            }
+        },
+        "rulesets": full["rulesets"],
+        "rule_trace": full["rule_trace"],
+    }
+    layer = result["layers"]["xuankong_natal"]
+    assert layer["orientation_context"]["uncertainty_degrees"] == 0
+    assert layer["status"] == ("complete" if case == "unique" else "partial")
+    assert (
+        layer["orientation_context"]["facing_degrees"]
+        == {
+            "boundary": 355.5,
+            "missing_period": 255,
+            "missing_bearing": None,
+            "unique": 255,
+        }[case]
+    )
+    if case == "missing_period":
+        assert layer["period_context"] is None
+    else:
+        assert layer["period_context"]["number"] == 8
+    assert (
+        layer["missing_inputs"]
+        == {
+            "boundary": ["xuankong_natal.unambiguous_bearing"],
+            "missing_period": ["xuankong_natal.period"],
+            "missing_bearing": ["xuankong_natal.house.facing_degrees_magnetic"],
+            "unique": [],
+        }[case]
+    )
+    assert [candidate["candidate_id"] for candidate in layer["candidates"]] == {
+        "boundary": ["8:午-子:replacement", "8:午-子:lower"],
+        "missing_period": [],
+        "missing_bearing": [],
+        "unique": ["8:甲-庚:lower"],
+    }[case]
+    if case == "unique":
+        assert raw["chart"] == layer["candidates"][0]
+    else:
+        assert raw["chart"] is None
+    assert len(raw["mountain_registry"]) == 24
+    assert raw["source_comparison"]["summary"]["candidate_count"] == len(
+        layer["candidates"]
+    )
+
+
+@pytest.mark.parametrize("name", ["xuankong_natal", "assess"])
+def test_published_natal_detail_views_preserve_each_boundary_candidate(
+    name, rest, tmp_path, capsys
+):
+    inputs = payload("xuankong_natal")
+    inputs["house"]["facing_degrees"] = 355.5
+    inputs["interpretation"] = {
+        "external_forms": interpretation_input()["external_forms"]
+    }
+    if name == "assess":
+        inputs = {"methods": ["xuankong_natal"], "xuankong": inputs}
+    spec = SPECS["fengshui_" + name]
+    views = evidence_views(spec)
+    pattern_fields = views["natal_patterns"]["fields"]
+    assert set(views["natal_candidates"]["fields"]) < set(pattern_fields)
+    fields = list(
+        dict.fromkeys(
+            [
+                *pattern_fields,
+                *views["natal_interpretation"]["fields"],
+                "calculation_reading",
+            ]
+        )
+    )
+    http, cli, mcp = projected_outputs(
+        spec, inputs, fields, rest, tmp_path, capsys, include_snapshot_text=False
+    )
+    assert business(http) == business(cli) == business(mcp)
+    assert http["rulesets"] and http["rule_trace"]
+    assert http["calculation_reading"]
+    details = http["layers"]["xuankong_natal"]
+    candidates = {c["candidate_id"]: c for c in details["candidates"]}
+    assert set(candidates) == {"8:午-子:replacement", "8:午-子:lower"}
+    comparison = details["source_comparison"]
+    assert [c["candidate_id"] for c in comparison["candidates"]] == list(candidates)
+    assert comparison["source_angle_applicability_verified"] is False
+    assert comparison["summary"]["replacement_candidates_not_covered"] == 0
+    replacement = candidates["8:午-子:replacement"]["structure"]["classical_patterns"][
+        "volume_two_named_refrain"
+    ]
+    assert replacement["applicable"] is False and replacement["numeric_match"] is None
+    assert (
+        candidates["8:午-子:lower"]["structure"]["distribution"]["code"]
+        == "both_at_sitting"
+    )
+
+    interpretation = details["interpretation"]
+    assert interpretation["overall_auspiciousness"] == "not_produced"
+    assert interpretation["current_period_context"]["number"] is None
+    assert interpretation["missing_inputs"] == [
+        "interpretation.current_period_number",
+        "xuankong_natal.unambiguous_bearing",
+    ]
+    assert [c["candidate_id"] for c in interpretation["candidates"]] == list(candidates)
+    for candidate in interpretation["candidates"]:
+        north = candidate["palaces"]["N"]
+        assert candidate["candidate_only"] is True
+        assert north["timeliness"]["facing"]["status"] == "unknown"
+        assert north["external_form_analysis"]["water"]["observed"] is False
 
 
 @pytest.mark.parametrize("observed", [True, False])
