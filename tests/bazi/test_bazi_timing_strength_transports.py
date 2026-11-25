@@ -64,12 +64,13 @@ def test_unique_dayun_budget_and_unsupported_annual_match_have_three_surface_par
         "analysis_hour": 12,
         "analysis_minute": 0,
     }
-    fields = ["interaction_analysis.strength_projection"]
+    fields = ["interaction_analysis.strength_projection", "snapshot_text"]
     options = dict(
         fields=fields,
         strict_fields=True,
-        include_snapshot_text=False,
+        include_snapshot_text=True,
         response_char_limit=0,
+        as_of=AS_OF,
     )
     http, protocol, code, local = surface_calls(
         spec, payload, projection=options, cli_first=False, rest_as_of=AS_OF
@@ -86,11 +87,25 @@ def test_unique_dayun_budget_and_unsupported_annual_match_have_three_surface_par
         row = next(r for r in projection["layers"] if r["node_id"] == node)
         assert row["status"] == status
         assert projection["stem_binding_source"]["supported_layer"] == "dayun"
+        review = row["stem_binding_review"]
         if stem_position is not None:
             assert row["stem_retention_factors_exact"][stem_position] == "17/20"
+            assert review["budget_admission"] == "eligible"
+            assert review["budget_applied"] is True
+            assert review["review_reasons"] == []
         else:
             assert row["energies_exact"] == row["stem_retention_factors_exact"] == {}
             assert row["support_share_exact"] is None
+            assert review["budget_admission"] == "blocked"
+            assert review["budget_applied"] is False
+            assert "unsupported_time_layer" in review["review_reasons"]
+            snapshot_line = next(
+                line
+                for line in value["snapshot_text"].splitlines()
+                if line.startswith(f"{node}原局预算投影：")
+            )
+            assert "干合来源未覆盖此时间层" in snapshot_line
+            assert "本层未施加运干预算，未输出预算或数值档" in snapshot_line
 
 
 def test_root_effect_view_matches_rest_mcp_cli_and_retains_unadjudicated_scope(

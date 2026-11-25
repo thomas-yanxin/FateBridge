@@ -76,7 +76,25 @@ class ProjectedHiddenRoot(TypedDict):
     remaining_mass_exact: str
 
 
+StemBindingReviewReason = Literal[
+    "unsupported_time_layer",
+    "multiple_natal_partners",
+    "day_master_partner",
+    "competing_natal_stem",
+    "existing_natal_combination",
+]
+
+
+class TimingStemBindingReview(TypedDict):
+    candidate_relation_ids: list[str]
+    natal_partner_positions: list[str]
+    review_reasons: list[StemBindingReviewReason]
+    budget_admission: Literal["no_match", "eligible", "blocked"]
+    budget_applied: bool
+
+
 class TimingRootEffectLayer(TypedDict):
+    stem_binding_review: TimingStemBindingReview
     node_id: str
     status: Literal["projected", "blocked"]
     blocker_relation_ids: list[str]
@@ -152,6 +170,8 @@ def project_timing_root_effects(
         )
         stem_matches = [r for r in local if r["rule_id"] == "stem_combination"]
         stem_retention = {p: Fraction(1) for p in POSITIONS if p != "day"}
+        partners = []
+        review_reasons: list[StemBindingReviewReason] = []
         if stem_matches:
             partners = [
                 p
@@ -167,18 +187,33 @@ def project_timing_root_effects(
                 if event["kind"] == "天干合"
                 and set(partners).intersection(event["positions"])
             ]
-            if (
-                layer != "dayun"
-                or len(partners) != 1
-                or partners[0] == "day"
-                or competing
-                or original_links
-            ):
+            review_conditions: tuple[tuple[StemBindingReviewReason, bool], ...] = (
+                ("unsupported_time_layer", layer != "dayun"),
+                ("multiple_natal_partners", len(partners) != 1),
+                ("day_master_partner", "day" in partners),
+                ("competing_natal_stem", competing),
+                ("existing_natal_combination", bool(original_links)),
+            )
+            review_reasons = [
+                reason for reason, applies in review_conditions if applies
+            ]
+            if review_reasons:
                 blockers.extend(r["id"] for r in stem_matches)
                 blockers.extend(original_links)
             else:
                 stem_retention[partners[0]] = q["binding"]
         row: TimingRootEffectLayer = {
+            "stem_binding_review": {
+                "candidate_relation_ids": [r["id"] for r in stem_matches],
+                "natal_partner_positions": partners,
+                "review_reasons": review_reasons,
+                "budget_admission": (
+                    "blocked"
+                    if review_reasons
+                    else "eligible" if stem_matches else "no_match"
+                ),
+                "budget_applied": bool(stem_matches) and not blockers,
+            },
             "node_id": node_id,
             "status": "blocked" if blockers else "projected",
             "blocker_relation_ids": blockers,
@@ -297,8 +332,21 @@ def timing_strength_snapshot_lines(projection: TimingStrengthProjection) -> list
     lines = []
     for row in projection["layers"]:
         if row["status"] == "blocked":
+            reason_labels: dict[StemBindingReviewReason, str] = {
+                "unsupported_time_layer": "干合来源未覆盖此时间层",
+                "multiple_natal_partners": "原局配对不唯一",
+                "day_master_partner": "配对涉及日主",
+                "competing_natal_stem": "原局另有同字运干参与竞争",
+                "existing_natal_combination": "配对涉及原局已记录干合",
+            }
+            reasons = "、".join(
+                reason_labels[reason]
+                for reason in row["stem_binding_review"]["review_reasons"]
+            )
             lines.append(
-                f"{row['node_id']}原局预算投影：存在未解会合、日主之合或争合关系，本层未输出预算或数值档。"
+                f"{row['node_id']}原局预算投影："
+                + (reasons or "存在未解会合或原合冲突")
+                + "；本层未施加运干预算，未输出预算或数值档。"
             )
         else:
             stem_count = sum(

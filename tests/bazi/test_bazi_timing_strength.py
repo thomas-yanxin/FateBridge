@@ -139,6 +139,9 @@ def test_clash_on_old_combination_blocks_reusing_its_prior_transfer():
     row = result["layers"][0]
     assert row["status"] == "blocked"
     assert any(r.startswith("natal.relations:") for r in row["blocker_relation_ids"])
+    assert row["stem_binding_review"]["budget_admission"] == "no_match"
+    assert row["stem_binding_review"]["budget_applied"] is False
+    assert row["support_share_exact"] is None
 
 
 def test_layers_are_separate_and_a_new_wood_branch_does_not_create_a_natal_root():
