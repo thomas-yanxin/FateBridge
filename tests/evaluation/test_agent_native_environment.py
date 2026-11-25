@@ -61,6 +61,7 @@ def test_capture_roundtrip_preserves_unset_empty_and_exact_values_without_secret
     source = {
         "SE_EPHE_PATH": "/verified/path with spaces",
         "FATEBRIDGE_JPL_FILE": "",
+        "FATEBRIDGE_DE441_DIR": "/verified/de441 archive",
         "OPENAI_API_KEY": "do-not-forward",
         "UNRELATED_TEST_SECRET": "hidden",
     }
@@ -75,6 +76,7 @@ def test_capture_roundtrip_preserves_unset_empty_and_exact_values_without_secret
     assert selected_environment(loaded) == {
         "SE_EPHE_PATH": source["SE_EPHE_PATH"],
         "FATEBRIDGE_JPL_FILE": "",
+        "FATEBRIDGE_DE441_DIR": source["FATEBRIDGE_DE441_DIR"],
     }
     ambient = {**source, "FATEBRIDGE_SOLAR_TERM_MODEL": "later-ambient-mode"}
     actual = process_environment(loaded, ambient)
@@ -124,11 +126,18 @@ def test_a_new_hash_cannot_legitimize_an_unknown_config_schema(
         load_selection(p, expected)
 
 
+@pytest.mark.parametrize("capture_payloads", [False, True])
 def test_run_case_clears_later_inherited_choices_and_keeps_exact_mcp_settings(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, capture_payloads: bool
 ) -> None:
-    chosen = capture_selection({"SE_EPHE_PATH": "/frozen/empty-directory"})
+    chosen = capture_selection(
+        {
+            "SE_EPHE_PATH": "/frozen/empty-directory",
+            "FATEBRIDGE_DE441_DIR": "/frozen/de441 archive",
+        }
+    )
     monkeypatch.setenv("SE_EPHE_PATH", "/later/ambient-files")
+    monkeypatch.setenv("FATEBRIDGE_DE441_DIR", "/later/archive")
     monkeypatch.setenv("FATEBRIDGE_JPL_FILE", "/later/kernel.eph")
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "later-mode")
 
@@ -142,6 +151,8 @@ def test_run_case_clears_later_inherited_choices_and_keeps_exact_mcp_settings(
         seen.append((command, kwargs["env"]))
         target = tmp_path / "one"
         (target / "answer.txt").write_text("无需计算。")
+        if capture_payloads:
+            (target / "mcp-calls.jsonl").touch()
         kwargs["stdout"].write(
             json.dumps(
                 {
@@ -160,16 +171,32 @@ def test_run_case_clears_later_inherited_choices_and_keeps_exact_mcp_settings(
         "no_calculation": True,
         "allowed_tools": [],
         "manual_review": [],
+        "capture_payloads": capture_payloads,
     }
     result = evaluator.run_case(
-        "unused-cli", case, tmp_path, 10, native_selection=chosen
+        "unused-cli",
+        case,
+        tmp_path,
+        10,
+        source=ROOT,
+        native_selection=chosen,
+        native_working_directory=tmp_path,
     )
     assert result["mechanical_checks_passed"]
     command, env = seen[0]
     assert env["SE_EPHE_PATH"] == chosen["SE_EPHE_PATH"]
+    assert env["FATEBRIDGE_DE441_DIR"] == chosen["FATEBRIDGE_DE441_DIR"]
     assert "FATEBRIDGE_JPL_FILE" not in env and "FATEBRIDGE_SOLAR_TERM_MODEL" not in env
     config = settings(command)
+    if capture_payloads:
+        entry = ROOT / "validation/agent_capture.py"
+        assert entry.is_file()
+        assert config["mcp_servers.fatebridge.args"][-1] == str(entry)
     assert config["mcp_servers.fatebridge.env.SE_EPHE_PATH"] == chosen["SE_EPHE_PATH"]
+    assert (
+        config["mcp_servers.fatebridge.env.FATEBRIDGE_DE441_DIR"]
+        == chosen["FATEBRIDGE_DE441_DIR"]
+    )
     assert "mcp_servers.fatebridge.env.FATEBRIDGE_JPL_FILE" not in config
     assert os.environ["SE_EPHE_PATH"] == "/later/ambient-files"
 

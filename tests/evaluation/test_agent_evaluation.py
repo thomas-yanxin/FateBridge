@@ -239,11 +239,11 @@ def test_capture_is_only_enabled_for_opted_in_evaluation_cases() -> None:
     [
         ({"suite_id": "mingli-bench-v1"}, {}, "requires --external-suite"),
         ({"suite_id": "mingli-bench-v2"}, {}, "requires --external-suite"),
-        ({}, {"expected_skill": "onda-shiye"}, "need their original evaluator"),
+        ({}, {"expected_skill": "onda-shiye"}, "are unsupported"),
         (
             {},
             {"expected_skill_sets": [["onda-shiye"]]},
-            "need their original evaluator",
+            "are unsupported",
         ),
     ],
 )
@@ -279,11 +279,19 @@ def test_current_runner_rejects_cases_with_incompatible_grading_requirements(
     assert not output.exists()
 
 
-def test_prepare_only_rejects_unsafe_case_ids_before_creating_output(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+@pytest.mark.parametrize(
+    "cases,diagnostic",
+    [([{"id": "../outside"}], "safe file names"), ([], "No evaluation cases selected")],
+)
+def test_prepare_only_rejects_invalid_cases_before_creating_output(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    cases: list[dict[str, str]],
+    diagnostic: str,
 ) -> None:
     dataset = tmp_path / "cases.json"
-    dataset.write_text(json.dumps({"cases": [{"id": "../outside"}]}), encoding="utf-8")
+    dataset.write_text(json.dumps({"cases": cases}), encoding="utf-8")
     output = tmp_path / "prepared"
     monkeypatch.setattr(
         sys,
@@ -300,7 +308,7 @@ def test_prepare_only_rejects_unsafe_case_ids_before_creating_output(
     with pytest.raises(SystemExit) as caught:
         main()
     assert caught.value.code == 2
-    assert "safe file names" in capsys.readouterr().err
+    assert diagnostic in capsys.readouterr().err
     assert not output.exists()
 
 
@@ -359,10 +367,7 @@ def test_prepare_only_does_not_launch_a_model_or_need_cli_configuration(
     assert report["model_invocations"] == 0
     assert report["semantic_acceptance"] == "not_run"
     assert (output / "case-dataset.json").read_bytes() == dataset.read_bytes()
-    proposal = json.loads((output / "proposed-execution.json").read_text())
-    assert "--stop-on-execution-failure" in proposal["command"]
-    assert "--native-environment" in proposal["command"]
-    assert "--native-environment-sha256" in proposal["command"]
+    assert not (output / "proposed-execution.json").exists()
     assert (
         report["native_environment_sha256"]
         == __import__("hashlib")

@@ -6,21 +6,38 @@ from pathlib import Path as _Path
 _VAL_REPO_ROOT = _Path(__file__).resolve().parents[2]
 if str(_VAL_REPO_ROOT) not in _sys.path:
     _sys.path.insert(0, str(_VAL_REPO_ROOT))
-else:
-    pass
 
 
 import argparse
 import json
-from datetime import datetime
 from pathlib import Path
 
+from pydantic import JsonValue, TypeAdapter
+
+from fatebridge.utils.iso_clock import parse_iso_datetime
 from validation.predictions import (
     Forecast,
     Outcome,
     StudyPlan,
     evaluate_study,
 )
+
+
+def load_json(path: Path) -> object:
+    def unique_object(members: list[tuple[str, JsonValue]]) -> dict[str, JsonValue]:
+        result: dict[str, JsonValue] = {}
+        for key, value in members:
+            if key in result:
+                raise ValueError(f"Duplicate JSON member: {key}")
+            result[key] = value
+        return result
+
+    try:
+        return json.loads(
+            path.read_text(encoding="utf-8"), object_pairs_hook=unique_object
+        )
+    except (OSError, ValueError) as error:
+        raise ValueError(f"{path}: {error}") from error
 
 
 def main() -> int:
@@ -31,21 +48,20 @@ def main() -> int:
     parser.add_argument("--as-of", required=True)
     parser.add_argument("--output", required=True, type=Path)
     args = parser.parse_args()
-    plan = StudyPlan.model_validate_json(args.plan.read_text(encoding="utf-8"))
-    forecasts = [
-        Forecast.model_validate(row)
-        for row in json.loads(args.forecasts.read_text(encoding="utf-8"))
-    ]
-    outcomes = [
-        Outcome.model_validate(row)
-        for row in json.loads(args.outcomes.read_text(encoding="utf-8"))
-    ]
-    report = evaluate_study(
-        plan,
-        forecasts,
-        outcomes,
-        as_of=datetime.fromisoformat(args.as_of.replace("Z", "+00:00")),
-    )
+    try:
+        plan = StudyPlan.model_validate(load_json(args.plan))
+        forecasts = TypeAdapter(list[Forecast]).validate_python(
+            load_json(args.forecasts)
+        )
+        outcomes = TypeAdapter(list[Outcome]).validate_python(load_json(args.outcomes))
+        report = evaluate_study(
+            plan,
+            forecasts,
+            outcomes,
+            as_of=parse_iso_datetime(args.as_of.replace("Z", "+00:00")),
+        )
+    except ValueError as error:
+        parser.error(str(error))
     args.output.parent.mkdir(parents=True, exist_ok=True)
     with args.output.open("x", encoding="utf-8") as handle:
         handle.write(
@@ -72,5 +88,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-else:
-    pass

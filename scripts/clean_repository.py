@@ -10,33 +10,36 @@ import subprocess
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-CACHES = (
+ARTIFACT_DIRECTORIES = (
     "build",
     ".pytest_cache",
     ".mypy_cache",
     ".ruff_cache",
-    ".coverage",
     "htmlcov",
     "__pycache__",
+    "ci-evidence",
+)
+ARTIFACT_FILES = (
+    ".coverage",
     ".DS_Store",
     "ci-selection.json",
     "cache-status.txt",
     "pytest-results.xml",
     "nonuniform-reference-results.xml",
     "resolved-dependencies.txt",
-    "ci-evidence",
 )
 SOURCE_SCAN_SUFFIXES = {".pdf", ".png", ".jpg", ".jpeg", ".tif", ".tiff", ".webp"}
 
 
 def find_duplicate_scans(root: Path) -> dict[str, list[Path]]:
     """Group byte-identical original scans, excluding links and mutable records."""
+    tests = root / "tests"
+    if tests.is_symlink():
+        return {}
     sizes: dict[int, list[Path]] = {}
-    for base in (root / "tests/fixtures", root / "tests/data"):
+    for base in (tests / "fixtures", tests / "data"):
         if base.is_symlink():
             continue
-        else:
-            pass
         for current, directories, files in os.walk(base, followlinks=False):
             parent = Path(current)
             directories[:] = [
@@ -49,16 +52,13 @@ def find_duplicate_scans(root: Path) -> dict[str, list[Path]]:
                 if (
                     path.suffix.lower() in SOURCE_SCAN_SUFFIXES
                     and not path.is_symlink()
+                    and path.is_file()
                 ):
                     sizes.setdefault(path.stat().st_size, []).append(path)
-                else:
-                    pass
     groups: dict[str, list[Path]] = {}
     for paths in sizes.values():
         if len(paths) < 2:
             continue
-        else:
-            pass
         for path in sorted(paths):
             digest = hashlib.sha256()
             with path.open("rb") as stream:
@@ -71,21 +71,26 @@ def find_duplicate_scans(root: Path) -> dict[str, list[Path]]:
 def share_source_scans(root: Path, groups: dict[str, list[Path]]) -> None:
     """Store each original once; frozen corpus paths remain relative references."""
     storage = root / "tests/data/shared_sources"
+    destinations: list[tuple[list[Path], Path, bool]] = []
     for paths in groups.values():
-        stored = [path for path in paths if path.is_relative_to(storage)]
-        canonical = (
-            stored[0] if stored else storage / paths[0].relative_to(root / "tests")
-        )
-        if not stored:
+        stored = next((path for path in paths if path.is_relative_to(storage)), None)
+        canonical = stored or storage / paths[0].relative_to(root / "tests")
+        if stored is None:
+            if canonical.parent.resolve() != canonical.parent or canonical.is_symlink():
+                raise ValueError(
+                    f"Shared scan destination traverses a link: {canonical}"
+                )
+            if canonical.exists():
+                raise ValueError(f"Shared scan destination already exists: {canonical}")
+        destinations.append((paths, canonical, stored is None))
+
+    for paths, canonical, create in destinations:
+        if create:
             canonical.parent.mkdir(parents=True, exist_ok=True)
             os.link(paths[0], canonical)
-        else:
-            pass
         for path in paths:
             if path == canonical:
                 continue
-            else:
-                pass
             # Replace only after the relative link exists. A failed link creation
             # leaves the original scan in place, including on Windows hosts.
             temporary = path.with_name("." + path.name + ".shared-source")
@@ -98,43 +103,35 @@ def share_source_scans(root: Path, groups: dict[str, list[Path]]) -> None:
 
 def find_artifacts(root: Path) -> list[Path]:
     """Return a narrow allowlist without touching external reference bundles."""
-    candidates = [root / name for name in CACHES]
-    candidates.extend(root.glob(".coverage.*"))
+    directories = [root / name for name in ARTIFACT_DIRECTORIES]
+    files = [root / name for name in ARTIFACT_FILES]
+    files.extend(root.glob(".coverage.*"))
     dist = root / "dist"
     if not dist.is_symlink():
-        candidates.extend(dist.glob("*.whl"))
-        candidates.extend(dist.glob("*.tar.gz"))
-    else:
-        pass
+        files.extend(dist.glob("*.whl"))
+        files.extend(dist.glob("*.tar.gz"))
     for name in ("src", "scripts", "tests", "validation"):
         base = root / name
         if base.is_symlink():
             continue
-        else:
-            pass
         if name == "src":
-            candidates.extend(base.glob("*.egg-info"))
-        else:
-            pass
-        for current, directories, files in os.walk(base, followlinks=False):
+            directories.extend(base.glob("*.egg-info"))
+        for current, subdirectories, filenames in os.walk(base, followlinks=False):
             parent = Path(current)
-            directories[:] = [
-                item for item in directories if not (parent / item).is_symlink()
+            subdirectories[:] = [
+                item for item in subdirectories if not (parent / item).is_symlink()
             ]
-            if "__pycache__" in directories:
-                candidates.append(parent / "__pycache__")
-                directories.remove("__pycache__")
-            else:
-                pass
-            if ".DS_Store" in files:
-                candidates.append(parent / ".DS_Store")
-            else:
-                pass
-            candidates.extend(
-                parent / item for item in files if item.endswith((".pyc", ".pyo"))
+            if "__pycache__" in subdirectories:
+                directories.append(parent / "__pycache__")
+                subdirectories.remove("__pycache__")
+            files.extend(
+                parent / item
+                for item in filenames
+                if item == ".DS_Store" or item.endswith((".pyc", ".pyo"))
             )
     return sorted(
-        path for path in set(candidates) if path.exists() and not path.is_symlink()
+        {path for path in directories if not path.is_symlink() and path.is_dir()}
+        | {path for path in files if not path.is_symlink() and path.is_file()}
     )
 
 
@@ -142,8 +139,6 @@ def tracked_artifacts(root: Path, candidates: list[Path]) -> list[str]:
     """Read the index before deleting anything; Git failures stop the cleanup."""
     if not (root / ".git").exists():
         raise ValueError("The cleanup root has no Git checkout metadata")
-    else:
-        pass
     result = subprocess.run(
         ["git", "-C", str(root), "ls-files", "--cached", "-z"],
         check=True,
@@ -180,8 +175,6 @@ def main(argv: list[str] | None = None) -> int:
         print("Tracked files found in cleanup candidates; no artifacts removed:")
         print("\n".join(protected))
         return 1
-    else:
-        pass
     if options.deduplicate_scans:
         aliases = sum(len(paths) - 1 for paths in scans.values())
         size = sum(
@@ -192,10 +185,6 @@ def main(argv: list[str] | None = None) -> int:
         )
         if options.apply:
             share_source_scans(ROOT, scans)
-        else:
-            pass
-    else:
-        pass
     for path in candidates:
         print(path.relative_to(ROOT))
         if options.apply:
@@ -203,8 +192,6 @@ def main(argv: list[str] | None = None) -> int:
                 shutil.rmtree(path)
             else:
                 path.unlink()
-        else:
-            pass
     print(
         f"{'Removed' if options.apply else 'Would remove'} {len(candidates)} artifacts."
     )
@@ -213,5 +200,3 @@ def main(argv: list[str] | None = None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-else:
-    pass

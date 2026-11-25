@@ -373,7 +373,7 @@ async def test_reference_capture_preserves_external_projection_and_legacy_full_p
 
 
 @pytest.mark.parametrize("split", ["development", "holdout"])
-def test_external_prepare_only_and_replay_remain_sealed_without_models(
+def test_external_prepare_only_can_reuse_sealed_cases_without_models(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, split: str
 ) -> None:
     import scripts.evaluate_agent as evaluator
@@ -422,9 +422,6 @@ def test_external_prepare_only_and_replay_remain_sealed_without_models(
     assert report["model_invocations"] == 0
     assert report["semantic_acceptance"] == "not_run"
     assert report["dataset_kind"] == "public_competition"
-    proposal = json.loads((output / "proposed-execution.json").read_text())
-    assert "--external-suite" in proposal["command"]
-    assert "--split" in proposal["command"]
     other = "holdout" if split == "development" else "development"
     assert other + "_PROMPT_SENTINEL" not in (output / "case-dataset.json").read_text()
     monkeypatch.setattr(

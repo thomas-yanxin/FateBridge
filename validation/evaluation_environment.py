@@ -23,11 +23,12 @@ NATIVE_ENVIRONMENT_KEYS = (
     "XDG_CACHE_HOME",
     "FATEBRIDGE_AA1996_MANIFEST",
     "FATEBRIDGE_VSOP2013_MANIFEST",
+    "FATEBRIDGE_DE441_DIR",
 )
 NativeSelection = dict[str, str | None]
-METHOD = "evaluation_native_environment_with_optional_sources_v3"
+METHOD = "evaluation_native_environment_with_optional_sources_v4"
 CONTEXT_METHOD = (
-    "evaluation_native_environment_with_optional_sources_and_working_directory_v4"
+    "evaluation_native_environment_with_optional_sources_and_working_directory_v5"
 )
 
 
