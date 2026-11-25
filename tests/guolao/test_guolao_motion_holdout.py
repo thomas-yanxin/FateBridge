@@ -114,7 +114,7 @@ def test_guolao_chart_delivers_the_same_actual_motion_source_on_three_surfaces(
     capsys: pytest.CaptureFixture[str],
     backend: Literal["swieph", "moshier"],
 ) -> None:
-    """Published bodies must retain the actual raw rate and its source receipt."""
+    """Published motion must match its source and a converged TT derivative."""
     _, physical_path = ephemeris_files
     selected_path = physical_path if backend == "swieph" else tmp_path
     monkeypatch.setenv("SE_EPHE_PATH", str(selected_path))
@@ -159,7 +159,7 @@ def test_guolao_chart_delivers_the_same_actual_motion_source_on_three_surfaces(
         assert bodies[name]["longitude_speed"] == state["longitude_speed"]
         assert bodies[name]["longitude_speed_native"] == state["longitude_speed_native"]
         derivative_rates_degrees_per_day = []
-        for step_days in (2.0**-7, 2.0**-8):
+        for step_days in (0.5, 0.25, 0.125):
             differences_degrees = []
             for offset in (-2, -1, 1, 2):
                 coordinates, returned_flags = e.ephemeris_call(
@@ -181,12 +181,26 @@ def test_guolao_chart_delivers_the_same_actual_motion_source_on_three_surfaces(
                 )
                 / (12 * step_days)
             )
-        coarse_rate_degrees_per_day, fine_rate_degrees_per_day = (
-            derivative_rates_degrees_per_day
+        (
+            wide_rate_degrees_per_day,
+            coarse_rate_degrees_per_day,
+            fine_rate_degrees_per_day,
+        ) = derivative_rates_degrees_per_day
+        coarse_extrapolated_rate_degrees_per_day = (
+            coarse_rate_degrees_per_day
+            + (coarse_rate_degrees_per_day - wide_rate_degrees_per_day) / 15
         )
         extrapolated_rate_degrees_per_day = (
             fine_rate_degrees_per_day
             + (fine_rate_degrees_per_day - coarse_rate_degrees_per_day) / 15
+        )
+        assert (
+            abs(
+                extrapolated_rate_degrees_per_day
+                - coarse_extrapolated_rate_degrees_per_day
+            )
+            * 3600
+            < 0.002
         )
         assert (
             abs(state["longitude_speed"] - extrapolated_rate_degrees_per_day) * 3600
