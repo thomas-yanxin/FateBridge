@@ -215,6 +215,12 @@ class QimenAnalysisRequest(_DeferredModel):
     analysis_minute: int = Field(
         default=0, ge=0, le=59, description="Analysis minute (0-59)"
     )
+    analysis_second: int = Field(
+        default=0,
+        ge=0,
+        le=59,
+        description="起局秒数，用于节气实刻边界；省略按整分钟，不代表秒级预测精度。",
+    )
     analysis_timezone: Optional[str] = Field(
         default=None, description="Analysis timezone (IANA name or UTC offset)"
     )

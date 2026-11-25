@@ -100,6 +100,13 @@
         "minimum": 1,
         "type": "integer"
       },
+      "analysis_second": {
+        "default": 0,
+        "description": "起局秒数，用于节气实刻边界；省略按整分钟，不代表秒级预测精度。",
+        "maximum": 59,
+        "minimum": 0,
+        "type": "integer"
+      },
       "analysis_timezone": {
         "anyOf": [
           {

@@ -2,7 +2,7 @@
 
 import asyncio
 import json
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -27,6 +27,14 @@ from fatebridge.utils.civil_clock import (
     utc_instant,
 )
 from fatebridge.validation.qimen_clock import audit_clock_fold
+from tests.support.transports import (
+    AS_OF,
+    SPECS,
+    business,
+    rest,
+    surface_calls,
+    three_surfaces,
+)
 
 FIXTURES = Path(__file__).parents[1] / "fixtures/qimen_clock_fold_v1"
 REFERENCE = json.loads((FIXTURES / "reference.json").read_text())
@@ -233,3 +241,191 @@ def test_explicit_offset_across_rest_mcp_cli(
             == expected_hour
         )
         assert "civil_clock_resolution" in str(selected[0]["qimen"]["rule_trace"])
+
+
+@pytest.mark.parametrize(
+    "term_name,previous,jd_tt",
+    [
+        ("清明", "春分", 2461135.2785690883),
+        ("立冬", "霜降", 2461351.9119620677),
+    ],
+)
+@pytest.mark.parametrize("method", ["chaibu", "zhirun"])
+def test_dedicated_seconds_at_independent_term_roots(
+    term_name, previous, jd_tt, method, tmp_path, monkeypatch, capsys
+):
+    # Frozen Skyfield 1.53 / DE440 geocentric apparent-longitude roots from
+    # tests/data/solar_tt_de440_v1/reference.json.gz (no FateBridge imports in
+    # its producer). TT-UTC = 69.184 s in 2026. These two retained vectors keep
+    # clean-checkout CI independent of the optional full reference archive.
+    # The existing independent TT acceptance is 1 s; branch tests below use
+    # adjacent integer seconds around the actual production root, not a
+    # minute-rounded table or an assumed subsecond physical accuracy.
+    independent = datetime(2000, 1, 1, 12, tzinfo=timezone.utc) + timedelta(
+        days=jd_tt - 2451545.0, seconds=-69.184
+    )
+    term = next(t for t in get_solar_terms_for_year(2026, "UTC") if t.name == term_name)
+    assert abs((term.moment - independent).total_seconds()) < 1
+    before = term.moment.replace(microsecond=0)
+    if before == term.moment:
+        before -= timedelta(seconds=1)
+    after = before + timedelta(seconds=1)
+    assert before < term.moment <= after
+    assert before < independent <= after
+    boards = []
+    for instant, astronomical in ((before, previous), (after, term_name)):
+        payload = dict(
+            analysis_year=instant.year,
+            analysis_month=instant.month,
+            analysis_day=instant.day,
+            analysis_hour=instant.hour,
+            analysis_minute=instant.minute,
+            analysis_second=instant.second,
+            analysis_timezone="UTC",
+            analysis_utc_offset="+00:00",
+            use_true_solar_time=False,
+            qimen_options={"ju_method": method},
+        )
+        dedicated = three_surfaces(
+            SPECS["qimen"], payload, ["qimen"], AS_OF, tmp_path, monkeypatch, capsys
+        )
+        aggregate = three_surfaces(
+            SPECS["sanshiunited"],
+            dict(
+                date=instant.date().isoformat(),
+                time=instant.strftime("%H:%M:%S+00:00"),
+                zone="UTC",
+                gps_lat=0.0,
+                gps_lon=0.0,
+                use_true_solar_time=False,
+                qimen_options={"ju_method": method},
+            ),
+            ["qimen"],
+            AS_OF,
+            tmp_path,
+            monkeypatch,
+            capsys,
+        )
+        board = dedicated["qimen"]
+        assert set(dedicated) == set(aggregate) == {"qimen"}
+        assert board["calendar_policy"]["astronomical_term"]["name"] == astronomical
+        assert (
+            board["calendar_policy"]["civil_clock_resolution"]["instant_utc"]
+            == instant.isoformat()
+        )
+        for field in (
+            "ju_term",
+            "ju_decision",
+            "ju_number",
+            "palaces",
+            "day_ganzhi",
+            "time_ganzhi",
+        ):
+            assert board[field] == aggregate["qimen"][field]
+        if method == "chaibu":
+            assert board["ju_term"] == astronomical
+        boards.append(board)
+    if method == "chaibu":
+        assert boards[0]["ju_number"] != boards[1]["ju_number"]
+        assert boards[0]["palaces"] != boards[1]["palaces"]
+
+
+@pytest.mark.parametrize("second", [0, 59])
+@pytest.mark.parametrize("offset,fold", [("-04:00", 0), ("-05:00", 1)])
+@pytest.mark.parametrize("solar", [False, True])
+def test_seconds_preserve_dst_fold_and_minute_default(second, offset, fold, solar):
+    payload = dict(
+        analysis_year=2026,
+        analysis_month=11,
+        analysis_day=1,
+        analysis_hour=1,
+        analysis_minute=30,
+        analysis_timezone="America/New_York",
+        analysis_utc_offset=offset,
+        analysis_longitude=-74.0,
+        use_true_solar_time=solar,
+        qimen_options={"ju_method": "chaibu"},
+    )
+    dedicated = calculate_qimen_analysis(**payload, analysis_second=second)
+    aggregate = calculate_sanshiunited_analysis(
+        date="2026-11-01",
+        time=f"01:30:{second:02d}{offset}",
+        zone="America/New_York",
+        gps_lat=40.7,
+        gps_lon=-74.0,
+        use_true_solar_time=solar,
+        qimen_options={"ju_method": "chaibu"},
+    )
+    resolution = dedicated["qimen"]["calendar_policy"]["civil_clock_resolution"]
+    assert resolution["fold"] == fold
+    instant = datetime.fromisoformat(resolution["instant_utc"])
+    assert instant.hour == 5 + fold and instant.second == second
+    for field in ("ju_term", "ju_decision", "palaces"):
+        assert dedicated["qimen"][field] == aggregate["qimen"][field]
+    if second == 0:
+        assert dedicated == calculate_qimen_analysis(**payload)
+
+
+@pytest.mark.parametrize("second", [0, 59, 60])
+def test_seconds_validation_and_projection_across_surfaces(surface_calls, second):
+    payload = dict(
+        analysis_year=2026,
+        analysis_month=11,
+        analysis_day=1,
+        analysis_hour=1,
+        analysis_minute=30,
+        analysis_second=second,
+        analysis_timezone="America/New_York",
+        analysis_utc_offset="-05:00",
+        use_true_solar_time=False,
+        qimen_options={"ju_method": "chaibu"},
+    )
+    controls = dict(
+        fields=["qimen.calendar_policy", "qimen.palaces"],
+        strict_fields=True,
+        response_char_limit=0,
+        include_snapshot_text=False,
+    )
+    http, protocol, code, local = surface_calls(
+        SPECS["qimen"],
+        payload,
+        projection=controls,
+        rest_as_of=AS_OF,
+    )
+    if second == 60:
+        assert http.status_code == 422 and protocol.is_error and code != 0
+        assert http.json()["error_code"] == "validation_error"
+        assert "analysis_second" in str(http.json())
+        assert "analysis_second" in str(protocol.content)
+        assert "analysis_second" in str(local)
+        return
+    assert http.status_code == 200 and not protocol.is_error and code == 0
+    bodies = [
+        business(http.json()),
+        business(protocol.structured_content),
+        business(local),
+    ]
+    assert bodies[0] == bodies[1] == bodies[2]
+    assert set(bodies[0]) == {"qimen"}
+    assert set(bodies[0]["qimen"]) == {"calendar_policy", "palaces"}
+    # Compare projections with the same public full result: delivery removes
+    # internal provenance hashes, which raw service dictionaries still contain.
+    full_http, full_protocol, full_code, full_local = surface_calls(
+        SPECS["qimen"],
+        payload,
+        projection={**controls, "fields": ["qimen"]},
+        rest_as_of=AS_OF,
+    )
+    assert (
+        full_http.status_code == 200 and not full_protocol.is_error and full_code == 0
+    )
+    full_bodies = [
+        business(full_http.json()),
+        business(full_protocol.structured_content),
+        business(full_local),
+    ]
+    assert full_bodies[0] == full_bodies[1] == full_bodies[2]
+    full = full_bodies[0]["qimen"]
+    assert bodies[0]["qimen"] == {
+        key: full[key] for key in ("calendar_policy", "palaces")
+    }
