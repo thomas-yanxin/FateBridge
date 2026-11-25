@@ -20,55 +20,11 @@ from fatebridge.core.astro.time_scales import datetime_from_tt
 from fatebridge.core.predictive.native_chart import build_native_subject
 from fatebridge.core.response_models import Election
 from fatebridge.services.western_election import calculate_election
+from tests.support.western_election import event_result, synthetic_subject
 from tests.western.test_western_election import CANDIDATE
 
 FIXTURE = Path(__file__).parents[1] / "fixtures"
 REFERENCE = json.loads((FIXTURE / "western-horary-horizons.json").read_text())
-
-
-def synthetic_subject(**changes):
-    rows = {
-        "sun": (310, 1),
-        "moon": (55, 13),
-        "mercury": (280, 1.2),
-        "venus": (230, 1),
-        "mars": (105, 0.5),
-        "jupiter": (345, 0.08),
-        "saturn": (210, 0.03),
-        "ascendant": (70, None),
-        "medium_coeli": (160, None),
-        "first_house": (60, None),
-        "tenth_house": (150, None),
-    }
-    rows.update(changes)
-    points = {
-        p: SimpleNamespace(
-            abs_pos=float(lon), speed=speed, sign="Aries", house="First_House"
-        )
-        for p, (lon, speed) in rows.items()
-    }
-    for i, attr in enumerate(horary.HOUSE_ATTRIBUTES):
-        points.setdefault(
-            attr, SimpleNamespace(abs_pos=float(i * 30), sign=horary.SIGNS[i])
-        )
-    return SimpleNamespace(
-        **points,
-        julian_day_tt=2451545.0,
-        zodiac_type="Tropical",
-        is_diurnal=True,
-        calculation_basis={"julian_day_tt": 2451545.0},
-    )
-
-
-def event_result(voc=False):
-    return {
-        "status": "unavailable" if voc is None else "computed",
-        "method_id": "native_tt_lunar_contacts_before_ingress_v1",
-        "constant_velocity_projection": False,
-        "void_of_course": voc,
-        "contacts": [],
-        "start_julian_day_tt": 2451545.0,
-    }
 
 
 @pytest.fixture(autouse=True)

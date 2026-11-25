@@ -6,7 +6,7 @@ import pytest
 
 import fatebridge.core.astrology_election as election
 from fatebridge.core.response_models import Election
-from tests.western.test_western_election_conditions import (
+from tests.support.western_election import (
     event_result,
     synthetic_subject,
 )
@@ -131,6 +131,43 @@ def test_earlier_unclassified_contact_prevents_a_certain_next_party(source_case)
         second["contact_order_established"] is None
         and second["lunar_significator"] is None
     )
+
+
+def test_p175_lunar_role_is_adjacent_contact_even_when_it_is_a_malefic(source_case):
+    """The source assigns the adjacent planet, without a benefic-only filter."""
+    subject, history = source_case
+    history["events"] = [
+        contact("Venus", -0.5, "past"),
+        contact("Saturn", -0.1, "past"),
+        contact("Mars", 0.1, "future"),
+        contact("Jupiter", 0.5, "future"),
+    ]
+    history["events"].reverse()
+    receipt = election.build_election_payload(subject, topic_id="marriage")[
+        "marriage_significators"
+    ]
+    assert [row["lunar_significator"] for row in receipt["parties"]] == [
+        "Saturn",
+        "Mars",
+    ]
+    assert [row["natural_significator"] for row in receipt["parties"]] == [
+        "Sun",
+        "Venus",
+    ]
+    assert receipt["score_contribution"] == 0
+
+
+def test_contact_at_candidate_boundary_leaves_both_source_roles_unknown(source_case):
+    """A contact at the candidate instant cannot certify last or next."""
+    subject, history = source_case
+    history["events"].append(contact("Saturn", 0.0, "question_boundary"))
+    receipt = election.build_election_payload(subject, topic_id="marriage")[
+        "marriage_significators"
+    ]
+    assert receipt["status"] == "partial_lunar_history"
+    assert all(row["lunar_significator"] is None for row in receipt["parties"])
+    assert all(row["contact_order_established"] is None for row in receipt["parties"])
+    assert all(row["ruler"] is not None for row in receipt["houses"])
 
 
 def test_unknown_asc_does_not_erase_the_known_lunar_roles_or_mc(source_case):

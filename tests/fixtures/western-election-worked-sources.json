@@ -2,6 +2,16 @@
   "version": "western_election_worked_sources_v2_collation",
   "frozen_before_new_candidate_runs": false,
   "production_imports": false,
+  "clock_audit": {
+    "original_chart_count": 7,
+    "original_input_count": 13,
+    "original_position_count": 117,
+    "original_position_failures": 45,
+    "original_condition_failures": 17,
+    "original_counts_are_historical": true,
+    "original_v1_row_report_available_in_repository": false,
+    "source_clock_selection_policy": "Each explicit hypothesis is computable; no source clock is selected by fitting chart residuals. Historical v1 counts remain separate from comparisons of corrected v2 readings."
+  },
   "not_blind": "V2sourceglyphcorrectionsafterv1comparison;oldreference,allinitialfailuresandgatesremainimmutable. Correctionsfolloworiginalpixels,notfittingresiduals. IndependentJPLnumericsgatedseparately.",
   "printed_minute_tolerance_arcseconds": 60,
   "printed_second_tolerance_arcseconds": 1,
@@ -709,7 +719,8 @@
       "as_of": "2026-11-15T00:00:00+00:00",
       "geometric_reference_claim": "Originaldisplayedglyphs",
       "source_framework_confirmed": true,
-      "source_clock_or_calendar_resolved": true
+      "source_clock_or_calendar_resolved": false,
+      "clock_evidence_status": "explicit_EST_body_hypothesis_conflicts_with_EDT_image"
     },
     {
       "id": "w2003-image-EDT",
@@ -731,7 +742,8 @@
       "as_of": "2026-11-15T00:00:00+00:00",
       "geometric_reference_claim": "Originaldisplayedglyphs",
       "source_framework_confirmed": true,
-      "source_clock_or_calendar_resolved": true
+      "source_clock_or_calendar_resolved": false,
+      "clock_evidence_status": "explicit_EDT_image_hypothesis_conflicts_with_EST_body"
     },
     {
       "id": "g1991-local-caption",

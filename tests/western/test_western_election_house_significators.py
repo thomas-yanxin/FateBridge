@@ -9,7 +9,7 @@ import pytest
 
 import fatebridge.core.astrology_election as election
 from fatebridge.core.response_models import Election
-from tests.western.test_western_election_conditions import (
+from tests.support.western_election import (
     event_result,
     synthetic_subject,
 )
@@ -102,6 +102,28 @@ def test_other_selected_methods_are_unassessed_without_substituting_a_chart(
     assert facts["houses"] == []
     assert facts["house_system"] == code and facts["zodiac_type"] == zodiac
     assert result["score"] is not None
+
+
+@pytest.mark.parametrize(
+    "midheaven,expected",
+    [
+        (29.999, [(1, "Mars"), (7, "Venus"), (10, "Mars"), (4, "Venus")]),
+        (30.0, [(1, "Mars"), (7, "Venus"), (10, "Venus"), (4, "Mars")]),
+    ],
+)
+def test_p175_fourth_lord_is_ic_lord_and_can_differ_from_the_tenth_lord(
+    midheaven, expected
+):
+    """The p175 conclusion role must not reuse the between-parties lord."""
+    subject = synthetic_subject(ascendant=(0.0, None), medium_coeli=(midheaven, None))
+    subject.houses_system_identifier = "R"
+    facts = election.build_election_payload(subject, topic_id="marriage")[
+        "marriage_significators"
+    ]
+    assert [(row["house"], row["ruler"]) for row in facts["houses"]] == expected
+    assert facts["houses"][2]["role_in_source"] == "between_parties"
+    assert facts["houses"][3]["role_in_source"] == "conclusion"
+    assert "event and end of the Marriage" in REFERENCE["primary_sentences"][2]
 
 
 def test_marriage_source_subset_is_not_applied_to_another_topic():
