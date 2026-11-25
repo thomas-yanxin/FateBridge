@@ -60,7 +60,7 @@ def birth_at_tt(jd):
 def native_longitude(jd, body):
     swe = e.swe
     coordinates, returned = runtime.ephemeris_call(
-        "calc", jd, motion.PLANET_SWISSEPH_IDS[body], swe.FLG_MOSEPH | swe.FLG_SPEED
+        "calc", jd, getattr(swe, body.upper()), swe.FLG_MOSEPH | swe.FLG_SPEED
     )
     assert runtime.ephemeris_model_from_retflag(returned) == "moshier"
     return coordinates

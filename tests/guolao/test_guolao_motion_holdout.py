@@ -142,7 +142,7 @@ def test_guolao_chart_delivers_the_same_actual_motion_source_on_three_surfaces(
         monkeypatch,
         capsys,
     )
-    raw = guolao.positions(shared_sources.birth())
+    raw = json.loads(json.dumps(guolao.positions(shared_sources.birth())))
     profile = result["guolao"]["profile"]
     assert profile["ephemeris_models"] == [backend]
     assert profile["longitude_motion"] == raw["longitude_motion"]
