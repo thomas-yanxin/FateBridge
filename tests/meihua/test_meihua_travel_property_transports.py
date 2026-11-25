@@ -1,5 +1,6 @@
 """Traveler and lost-property chapters across REST, MCP, CLI and same-run paging."""
 
+import json
 import os
 import sys
 from pathlib import Path
@@ -223,9 +224,11 @@ async def test_bounded_topic_projection_restores_same_run_complete_evidence(
         restored = await read_full_result(client, payload)
         if tool == "meihua_analysis":
             assert expected["interpretation"]["casting_readings"] == []
-            uri = f"fatebridge://results/{delivery['result_id']}/verified/{run}/fields/interpretation.casting_readings/0"
+            field_uri = f"fatebridge://results/{delivery['result_id']}/verified/{run}/fields/interpretation.casting_readings"
+            page = json.loads((await client.read_resource(f"{field_uri}/0"))[0].text)
+            assert json.loads(page["text"]) == []
             with pytest.raises(MCPError, match="结果字段路径不存在"):
-                await client.read_resource(uri)
+                await client.read_resource(f"{field_uri}.0/0")
         for field in [FIELD, "interpretation.casting_readings"]:
             assert same_public_value(
                 restored["interpretation"][field.split(".")[1]],
