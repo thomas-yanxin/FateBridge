@@ -817,41 +817,30 @@
       "element_relationship"
     ],
     "meihua_analysis": [
-      "analysis_context",
+      "analysis_context.analysis_datetime",
+      "analysis_context.timezone",
+      "analysis_context.civil_utc_offset",
+      "analysis_context.civil_instant_utc",
+      "meihua.calendar_policy.day_boundary",
+      "meihua.calendar_policy.true_solar_time_applied",
+      "meihua.calendar_policy.label_precision.status",
       "meihua.base_hexagram.name",
       "meihua.base_hexagram.binary_code",
       "meihua.base_hexagram.symbol",
+      "meihua.mutual_hexagram.name",
+      "meihua.mutual_hexagram.binary_code",
       "meihua.changed_hexagram.name",
       "meihua.changed_hexagram.binary_code",
       "meihua.changed_hexagram.symbol",
-      "meihua.seed",
+      "meihua.seed.moving_line",
       "meihua.body_trigram.name",
       "meihua.use_trigram.name",
       "meihua.body_use_relation",
       "meihua.stage_relations",
       "meihua.ruleset.id",
-      "meihua.ruleset.sources",
       "meihua.ruleset.version",
-      "meihua.calendar_policy.lunar_year",
-      "meihua.calendar_policy.year_boundary",
-      "meihua.calendar_policy.day_boundary",
-      "meihua.calendar_policy.is_leap_month",
-      "meihua.calendar_policy.leap_month_rule",
-      "meihua.calendar_policy.timezone",
-      "meihua.calendar_policy.date_basis",
-      "meihua.calendar_policy.hour_basis",
-      "meihua.calendar_policy.true_solar_time_applied",
-      "meihua.calendar_policy.minute_role",
-      "meihua.calendar_policy.rule_kind",
-      "meihua.calendar_policy.label_precision.status",
-      "meihua.calendar_policy.label_precision.source_scope",
-      "meihua.calendar_policy.label_precision.exact_astronomical_accuracy_established",
-      "meihua.evidence_scope",
-      "interpretation.topic_reading",
+      "interpretation.interpretation_topic",
       "interpretation.classical_text_reference",
-      "interpretation.evidence_scope",
-      "interpretation.action_hint",
-      "interpretation.risk_hint",
       "summary"
     ],
     "sixyao": [
@@ -1373,28 +1362,26 @@
       "source_summary"
     ],
     "meihua_cast": [
-      "input_normalized",
-      "meihua.method",
-      "meihua.seed",
-      "meihua.counting_variants",
-      "meihua.ruleset.id",
-      "meihua.ruleset.sources",
-      "meihua.ruleset.version",
-      "meihua.calendar_policy",
-      "meihua.base_hexagram",
-      "meihua.changed_hexagram",
+      "meihua.seed.casting_method",
+      "meihua.calendar_policy.context_status",
+      "meihua.base_hexagram.name",
+      "meihua.base_hexagram.binary_code",
+      "meihua.base_hexagram.symbol",
+      "meihua.mutual_hexagram.name",
+      "meihua.mutual_hexagram.binary_code",
+      "meihua.changed_hexagram.name",
+      "meihua.changed_hexagram.binary_code",
+      "meihua.changed_hexagram.symbol",
+      "meihua.seed.moving_line",
+      "meihua.body_trigram.name",
+      "meihua.use_trigram.name",
+      "meihua.body_use_relation",
       "meihua.stage_relations",
-      "meihua.seasonal_strength",
-      "meihua.evidence_scope",
-      "interpretation.topic_reading",
+      "meihua.ruleset.id",
+      "meihua.ruleset.version",
+      "interpretation.interpretation_topic",
       "interpretation.classical_text_reference",
-      "interpretation.evidence_scope",
-      "interpretation.weather",
-      "summary",
-      "interpretation.casting_readings",
-      "interpretation.casting_comparison",
-      "interpretation.internal_countercontrol",
-      "interpretation.seasonal_qualification"
+      "summary"
     ],
     "astro_horary": [
       "analysis_context",
@@ -1795,6 +1782,7 @@
       "unknown_time": "time省略/null只计算现有历法与事项证据；params.calculationMode=calendar_date_only，birthTimeImputed=false，chart/astronomy=null。input_normalized保留所选历法、时区与输入；经纬度、宫制和盘式选项没有用于日历层。读取calendar、candidate_days及每个日期的candidate_mansion_days，不把一个已列候选当已确定。不要为了取得星图补00:00、中午或示例钟时。"
     },
     "meihua_analysis": {
+      "first_response": "普通卦务首轮复制evidence_views.general.fields（同suggested_fields），启用strict_fields并关闭快照文本。明确选择interpretation_topic=weather时用weather卡，明确选择人事题篇时用topic卡。按实际选定的分支取证，问题文字不切换分支。需要完整JSON时首次fields=null。",
       "casting": "只支持年月日時取数；输入公历钟时，按指定时区查中国农历。不得把八字立春年柱代替农历年支。",
       "conventions": "春节换年、民用午夜换日、闰月沿用本月数、节月季令是明示约定；不是原文唯一裁定。",
       "reading": "用、体互、用互、变用均相对原体分析；经文按实际卦码与动爻引用。is_active=false为其他爻单动的假设参考。",
@@ -1854,9 +1842,10 @@
       "source_readings": "rule_trace的source_comparison.matches_source_record只比较初选转录；independent_review另列更正复读、直接宫位及疑读，不能用实算落宫裁定疑字或认证整表。"
     },
     "meihua_cast": {
+      "first_response": "普通卦务首轮复制evidence_views.general.fields（同suggested_fields），启用strict_fields并关闭快照文本。明确选择interpretation_topic=weather时用weather卡，明确选择人事题篇时用topic卡。按实际选定的分支取证，问题文字不切换分支。需要完整JSON时首次fields=null。",
       "method": "casting.method为必填判别字段；所需字段只属于该方法，不混入别法参数。时间法另用meihua_analysis。",
       "sources": "字形与传统平上去入由已确认资料给出；不能用现代普通话声调或规范字笔画替换。端法上下卦已确认，采用乾一兑二等先天卦序取数。",
-      "unknowns": "没有season_month_branch时不算季令；不补当前日期或时辰。existing模式保留原卦码与动爻，不重起。",
+      "unknowns": "meihua.calendar_policy.context_status=not_supplied表示未提供节月支。季令未计算时可按需用strength卡核对原始状态，勿补当前日期或时辰。existing模式保留原卦码与动爻，不重起。天时占的季节只读已确认weather_context.season。",
       "conventions": "丈尺不加时且不用寸，尺寸加时而不用分；字占按具体例不暗加时。物数以实际数量取上卦、时支数取下卦，取爻保留原时支数且只加一次。物数与两段声音超八取爻有约定边界，保留line_sum_basis和counting_variants中各自的本变互、体用及stage_relations，不把默认口径当唯一原典答案。",
       "weather": "天时占显式选interpretation_topic=weather并复制weather字段卡到fields。按selected_readings的effective_status/controlled_tags/conditional_tags解释，不能只读raw status=matched。controls保留阈值和五/六位置及合计/单卦范围分歧，不投票。旧1.0.0研究组合128/209未胜过同日始终无雨134/209；不冒称当前组件已做现实预测验收。",
       "candidate_readings": "一般分支的interpretation.casting_readings按每个取爻候选分别给出生克、同一已报节月下的季令及实际动爻经文，fact_prefix指向自身counting_variants；纯乾坤按各自变卦取互。不可把所选口径的体气或爻辞套给另一候选。casting_comparison仅比较所列计算事实，不合成现实成败。",
@@ -6278,6 +6267,39 @@
       }
     },
     "meihua_analysis": {
+      "general": {
+        "purpose": "首轮读取本互变、实际动爻经文及原体用生克。",
+        "when": "interpretation_topic=general（默认）。明确选天时占用weather，明确选人事题篇用topic。",
+        "fields": [
+          "analysis_context.analysis_datetime",
+          "analysis_context.timezone",
+          "analysis_context.civil_utc_offset",
+          "analysis_context.civil_instant_utc",
+          "meihua.calendar_policy.day_boundary",
+          "meihua.calendar_policy.true_solar_time_applied",
+          "meihua.calendar_policy.label_precision.status",
+          "meihua.base_hexagram.name",
+          "meihua.base_hexagram.binary_code",
+          "meihua.base_hexagram.symbol",
+          "meihua.mutual_hexagram.name",
+          "meihua.mutual_hexagram.binary_code",
+          "meihua.changed_hexagram.name",
+          "meihua.changed_hexagram.binary_code",
+          "meihua.changed_hexagram.symbol",
+          "meihua.seed.moving_line",
+          "meihua.body_trigram.name",
+          "meihua.use_trigram.name",
+          "meihua.body_use_relation",
+          "meihua.stage_relations",
+          "meihua.ruleset.id",
+          "meihua.ruleset.version",
+          "interpretation.interpretation_topic",
+          "interpretation.classical_text_reference",
+          "summary"
+        ],
+        "strict_fields": true,
+        "include_snapshot_text": false
+      },
       "reading": {
         "purpose": "读同一次时间梅花的卦变、原体下初中终生克与季令，区分原文和现代建议",
         "fields": [
@@ -6348,6 +6370,7 @@
         "when": "interpretation_topic=weather时选择；需要的weather_context由已确认事实提供",
         "fields": [
           "analysis_context",
+          "interpretation.interpretation_topic",
           "meihua.seed",
           "meihua.calendar_policy.label_precision",
           "meihua.calendar_policy.solar_term_date_reference",
@@ -6375,7 +6398,7 @@
       },
       "weather_audit": {
         "purpose": "完整天气规则、计数、条件轨迹与来源；用于核对缺项和跨章制化候选",
-        "when": "interpretation_topic=weather且需要审计细节时；沿用同run结果",
+        "when": "interpretation_topic=weather且需要审计细节时，首次用本卡或fields=null。结果分页保留首次请求的字段。",
         "fields": [
           "analysis_context",
           "meihua",
@@ -6384,13 +6407,17 @@
         ]
       },
       "topic": {
-        "purpose": "核对所选文明书局本八章的初始体用条款及出行偏好、失物方位类象、行人初用参照、异文与各实际取数候选；不以通用吉凶取代章句",
-        "when": "interpretation_topic为planning/reputation/wealth/transaction/travel/meeting/lost_property/traveler之一",
+        "purpose": "核对所选文明书局本题篇的初始体用条款、章句限定、异文及各实际取数候选。",
+        "when": "interpretation_topic为planning/reputation/wealth/transaction/travel/meeting/lost_property/traveler/household/dwelling/marriage/dining之一。",
         "fields": [
           "analysis_context",
+          "interpretation.interpretation_topic",
           "interpretation.topic_reading",
+          "interpretation.classical_text_reference",
           "meihua.seed",
           "meihua.base_hexagram.name",
+          "meihua.changed_hexagram.name",
+          "meihua.changed_hexagram.binary_code",
           "meihua.calendar_policy",
           "meihua.stage_relations",
           "meihua.seasonal_strength",
@@ -6407,7 +6434,7 @@
       },
       "topic_audit": {
         "purpose": "完整所选题篇条款、异文及实际候选的原体用/互变/季令与爻辞参照",
-        "when": "八个显式题篇分支需要完整审计；沿用同run结果",
+        "when": "人事题篇需要审计细节时，首次用本卡或fields=null。结果分页保留首次请求的字段。",
         "fields": [
           "analysis_context",
           "meihua",
@@ -8048,6 +8075,34 @@
       }
     },
     "meihua_cast": {
+      "general": {
+        "purpose": "首轮读取本互变、实际动爻经文及原体用生克。",
+        "when": "interpretation_topic=general（默认）。明确选天时占用weather，明确选人事题篇用topic。",
+        "fields": [
+          "meihua.seed.casting_method",
+          "meihua.calendar_policy.context_status",
+          "meihua.base_hexagram.name",
+          "meihua.base_hexagram.binary_code",
+          "meihua.base_hexagram.symbol",
+          "meihua.mutual_hexagram.name",
+          "meihua.mutual_hexagram.binary_code",
+          "meihua.changed_hexagram.name",
+          "meihua.changed_hexagram.binary_code",
+          "meihua.changed_hexagram.symbol",
+          "meihua.seed.moving_line",
+          "meihua.body_trigram.name",
+          "meihua.use_trigram.name",
+          "meihua.body_use_relation",
+          "meihua.stage_relations",
+          "meihua.ruleset.id",
+          "meihua.ruleset.version",
+          "interpretation.interpretation_topic",
+          "interpretation.classical_text_reference",
+          "summary"
+        ],
+        "strict_fields": true,
+        "include_snapshot_text": false
+      },
       "reading": {
         "purpose": "按实际原始资料起卦或解释已有卦，不补钟时、字音和笔画",
         "fields": [
@@ -8102,6 +8157,7 @@
         "when": "interpretation_topic=weather时选择；需要的weather_context由已确认事实提供",
         "fields": [
           "input_normalized",
+          "interpretation.interpretation_topic",
           "meihua.counting_variants",
           "meihua.seed",
           "meihua.evidence_scope",
@@ -8128,7 +8184,7 @@
       },
       "weather_audit": {
         "purpose": "完整天气规则、计数、条件轨迹与来源；用于核对缺项和跨章制化候选",
-        "when": "interpretation_topic=weather且需要审计细节时；沿用同run结果",
+        "when": "interpretation_topic=weather且需要审计细节时，首次用本卡或fields=null。结果分页保留首次请求的字段。",
         "fields": [
           "input_normalized",
           "meihua",
@@ -8137,13 +8193,17 @@
         ]
       },
       "topic": {
-        "purpose": "核对所选文明书局本八章的初始体用条款及出行偏好、失物方位类象、行人初用参照、异文与各实际取数候选；不以通用吉凶取代章句",
-        "when": "interpretation_topic为planning/reputation/wealth/transaction/travel/meeting/lost_property/traveler之一",
+        "purpose": "核对所选文明书局本题篇的初始体用条款、章句限定、异文及各实际取数候选。",
+        "when": "interpretation_topic为planning/reputation/wealth/transaction/travel/meeting/lost_property/traveler/household/dwelling/marriage/dining之一。",
         "fields": [
           "input_normalized",
+          "interpretation.interpretation_topic",
           "interpretation.topic_reading",
+          "interpretation.classical_text_reference",
           "meihua.seed",
           "meihua.base_hexagram.name",
+          "meihua.changed_hexagram.name",
+          "meihua.changed_hexagram.binary_code",
           "meihua.calendar_policy",
           "meihua.stage_relations",
           "meihua.seasonal_strength",
@@ -8160,7 +8220,7 @@
       },
       "topic_audit": {
         "purpose": "完整所选题篇条款、异文及实际候选的原体用/互变/季令与爻辞参照",
-        "when": "八个显式题篇分支需要完整审计；沿用同run结果",
+        "when": "人事题篇需要审计细节时，首次用本卡或fields=null。结果分页保留首次请求的字段。",
         "fields": [
           "input_normalized",
           "meihua",

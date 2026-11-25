@@ -1,4 +1,4 @@
-"""Published default evidence and summaries carry their own computed qualifiers."""
+"""The first response carries the summary and deeper cards carry seasonal evidence."""
 
 import pytest
 
@@ -7,16 +7,17 @@ from tests.support.transports import SPECS
 
 
 @pytest.mark.parametrize("tool", ["meihua_cast", "meihua_analysis"])
-@pytest.mark.parametrize("view", [None, "reading"])
-def test_default_reading_view_contains_complete_qualification(tool, view):
-    fields = suggested_fields(SPECS[tool], view=view)
-    if tool == "meihua_analysis" and view is None:
-        # The compact time card carries the exact combined qualification in
-        # summary; the complete reading card still carries every source fact.
-        assert fields.count("summary") == 1
-        assert not any(
-            field.startswith("interpretation.seasonal_qualification.")
-            for field in fields
+def test_complete_seasonal_qualification_remains_available(tool):
+    spec = SPECS[tool]
+    fields = suggested_fields(spec)
+    assert fields.count("summary") == 1
+    assert not any(
+        field.startswith("interpretation.seasonal_qualification") for field in fields
+    )
+    for view in ("reading", "strength"):
+        assert (
+            suggested_fields(spec, view=view).count(
+                "interpretation.seasonal_qualification"
+            )
+            == 1
         )
-        fields = suggested_fields(SPECS[tool], view="reading")
-    assert fields.count("interpretation.seasonal_qualification") == 1

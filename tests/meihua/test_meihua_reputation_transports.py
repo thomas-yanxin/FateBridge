@@ -137,12 +137,13 @@ async def test_new_branch_domain_and_three_transports_agree(
             output["interpretation"]["casting_comparison"],
             domain["interpretation"]["casting_comparison"],
         )
-    for view in [None, "reading", "topic", "topic_audit"]:
+    assert FIELD not in suggested_fields(spec)
+    for view in ["reading", "topic", "topic_audit"]:
         assert FIELD in suggested_fields(spec, view=view)
 
 
 @pytest.mark.asyncio
-async def test_fresh_stdio_schema_and_actual_default_fields_accept_the_new_enum(
+async def test_fresh_stdio_schema_and_topic_fields_accept_the_new_enum(
     tmp_path,
 ):
     root = Path(__file__).resolve().parents[2]
@@ -171,7 +172,7 @@ async def test_fresh_stdio_schema_and_actual_default_fields_accept_the_new_enum(
                     **args,
                     "interpretation_topic": "reputation",
                     "reputation_context": {"label": "人工传输核对"},
-                    "fields": suggested_fields(SPECS[name]),
+                    "fields": suggested_fields(SPECS[name], view="topic"),
                     "strict_fields": True,
                     "include_snapshot_text": False,
                     "response_char_limit": 0,
@@ -197,7 +198,7 @@ async def test_fresh_stdio_schema_and_actual_default_fields_accept_the_new_enum(
 
 @pytest.mark.parametrize("tool,arguments", [CASES[0], CASES[2], CASES[3]])
 @pytest.mark.asyncio
-async def test_bounded_default_projection_restores_same_run_complete_evidence(
+async def test_bounded_topic_projection_restores_same_run_complete_evidence(
     tool, arguments, tmp_path
 ):
     root = Path(__file__).resolve().parents[2]
@@ -228,7 +229,7 @@ async def test_bounded_default_projection_restores_same_run_complete_evidence(
             tool,
             {
                 **arguments,
-                "fields": suggested_fields(SPECS[tool]),
+                "fields": suggested_fields(SPECS[tool], view="topic"),
                 "strict_fields": True,
                 "include_snapshot_text": False,
                 "response_char_limit": 4096,
@@ -240,16 +241,12 @@ async def test_bounded_default_projection_restores_same_run_complete_evidence(
         delivery = payload["result_delivery"]
         run = payload["run_metadata"]["run_id"]
         restored = await read_full_result(client, payload)
-        fields_to_restore = [FIELD]
-        if "interpretation.casting_readings" in suggested_fields(SPECS[tool]):
-            fields_to_restore.append("interpretation.casting_readings")
-        else:
-            assert tool == "meihua_analysis"
+        if tool == "meihua_analysis":
             assert expected["interpretation"]["casting_readings"] == []
             uri = f"fatebridge://results/{delivery['result_id']}/verified/{run}/fields/interpretation.casting_readings/0"
             with pytest.raises(MCPError, match="结果字段路径不存在"):
                 await client.read_resource(uri)
-        for field in fields_to_restore:
+        for field in [FIELD, "interpretation.casting_readings"]:
             assert same_public_value(
                 restored["interpretation"][field.split(".")[1]],
                 expected["interpretation"][field.split(".")[1]],

@@ -13,7 +13,7 @@ from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.divination import calculate_meihua_analysis
 from fatebridge.services.meihua import calculate_meihua_cast
 from tests.fixtures.mcp_result_delivery import read_full_result
-from tests.support.transports import SPECS, call_cli, rest
+from tests.support.transports import SPECS, business, call_cli, rest, surface_calls
 
 FIELD = "interpretation.topic_reading"
 GROUPS = {
@@ -345,6 +345,136 @@ def stdio(tmp_path):
         },
         log_file=tmp_path / "stdio.log",
     )
+
+
+@pytest.mark.parametrize(
+    "tool,arguments", [GROUPS["marriage"][0], GROUPS["marriage"][-1]]
+)
+@pytest.mark.parametrize(
+    "view,topic",
+    [("general", "general"), ("weather", "weather"), ("topic", "marriage")],
+)
+def test_first_response_views_match_full_values_on_three_transports(
+    tool, arguments, view, topic, surface_calls
+):
+    spec = SPECS[tool]
+    payload = {**arguments, "interpretation_topic": topic}
+    fields = suggested_fields(spec, view=view)
+    response, protocol, code, local = surface_calls(
+        spec,
+        payload,
+        projection={
+            "fields": fields,
+            "strict_fields": True,
+            "include_snapshot_text": False,
+            "response_char_limit": 0,
+        },
+    )
+    assert response.status_code == 200 and code == 0 and not protocol.is_error
+    assert (
+        business(response.json())
+        == business(local)
+        == business(protocol.structured_content)
+    )
+
+    full_response, full_protocol, full_code, full_cli = surface_calls(
+        spec,
+        payload,
+        params={"response_char_limit": 0},
+        options={"fields": None},
+        flags=["--response-char-limit", "0"],
+    )
+    assert (
+        full_response.status_code == 200
+        and full_code == 0
+        and not full_protocol.is_error
+    )
+    full = full_response.json()
+    assert (
+        business(full)
+        == business(full_cli)
+        == business(full_protocol.structured_content)
+    )
+    assert "projection_warnings" not in local
+    assert local["interpretation"]["interpretation_topic"] == topic
+    assert {"interpretation.interpretation_topic", "summary"} <= set(fields)
+    for field in fields:
+        projected_value, full_value = local, full
+        for part in field.split("."):
+            projected_value, full_value = projected_value[part], full_value[part]
+        if view == "general":
+            assert projected_value is not None, field
+        assert same_public_value(projected_value, full_value), field
+
+    interpretation = local["interpretation"]
+    if view == "general":
+        assert fields == suggested_fields(spec)
+        assert set(interpretation) == {
+            "interpretation_topic",
+            "classical_text_reference",
+        }
+        assert "seasonal_strength" not in local["meihua"]
+        assert full["interpretation"]["topic_reading"] is None
+        if tool == "meihua_analysis":
+            assert local["analysis_context"]["civil_utc_offset"] == "+08:00"
+            assert local["analysis_context"]["civil_instant_utc"]
+    elif view == "weather":
+        weather = interpretation["weather"]
+        assert weather["context"]["season"] is None
+        assert weather["pending_rule_ids"]
+        assert any(
+            type(count) is int and count == 0
+            for count in weather["trigram_counts"].values()
+        )
+        assert interpretation["evidence_scope"]["body_use_applied"] is False
+        assert "topic_reading" not in interpretation
+        assert full["interpretation"]["weather"]["single_forecast"] is None
+    else:
+        topic_reading = interpretation["topic_reading"]
+        assert topic_reading["ruleset_id"] == "meihua_marriage_clauses_nlc1925_v1"
+        assert interpretation["classical_text_reference"]["moving_yaoci"]
+        assert local["meihua"]["changed_hexagram"]["binary_code"]
+        assert (
+            topic_reading["chapter_qualifications"]["real_marriage_or_consent_verdict"]
+            is None
+        )
+        assert "weather" not in interpretation
+
+
+@pytest.mark.parametrize(
+    "view,topic,evidence_path",
+    [
+        ("weather", "weather", "weather.selected_readings"),
+        ("topic", "marriage", "topic_reading"),
+    ],
+)
+@pytest.mark.asyncio
+async def test_first_response_cards_preserve_evidence_at_default_mcp_budget(
+    view, topic, evidence_path
+):
+    tool, arguments = GROUPS["marriage"][1]
+    arguments = {**arguments, "interpretation_topic": topic}
+    fields = suggested_fields(SPECS[tool], view=view)
+    expected = calculate(tool, arguments)["interpretation"]
+    async with Client(create_mcp_app()) as client:
+        reply = await client.call_tool(
+            tool,
+            {
+                **arguments,
+                "fields": fields,
+                "strict_fields": True,
+                "include_snapshot_text": False,
+            },
+            raise_on_error=False,
+        )
+        assert not reply.is_error
+        inline = reply.structured_content
+        output = await read_full_result(client, inline)
+        assert output["run_metadata"]["run_id"] == inline["run_metadata"]["run_id"]
+        actual = output["interpretation"]
+        for part in evidence_path.split("."):
+            actual, expected = actual[part], expected[part]
+        assert same_public_value(actual, expected)
 
 
 @pytest.mark.parametrize("group,tool,arguments", CASES)
