@@ -2,6 +2,7 @@
 
 import asyncio
 import json
+from pathlib import Path
 
 import pytest
 from jsonschema import Draft202012Validator
@@ -9,9 +10,9 @@ from jsonschema import Draft202012Validator
 from fatebridge.cli import run as cli_run
 from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
 from tests.support.result_delivery import assert_same_run_receipt
-from tests.support.transports import SPECS, business, native
+from tests.support.transports import AS_OF, SPECS, business, native
 from tests.support.transports import rest as rest
-from tests.support.transports import surface_calls
+from tests.support.transports import surface_calls, three_surfaces
 
 
 @pytest.mark.parametrize(
@@ -653,3 +654,56 @@ def test_official_2100_extension_and_source_metadata_survive_all_surfaces(
         assert (lunar["year"], lunar["month"], lunar["day"]) == (2100, 12, 1)
         assert lunar["conversion_source"]["method_id"] == "hko_2100_month_starts_v1"
         assert output["cast"]["method"] == "time_meihua"
+
+
+@pytest.mark.parametrize(
+    "changed_code,active_positions,expected_status",
+    [
+        ("010010", [], "static_three_branches_only"),
+        ("110010", [1], "single_active_text_requires_review"),
+        ("111010", [1, 3], "formation_conditions_matched"),
+    ],
+)
+def test_single_and_double_moving_texts_keep_distinct_public_conditions(
+    changed_code: str,
+    active_positions: list[int],
+    expected_status: str,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    result = three_surfaces(
+        SPECS["sixyao"],
+        {
+            "date": "2026-02-10",
+            "time": "12:00:00",
+            "zone": "Asia/Shanghai",
+            "gua_code": "010010",
+            "changed_code": changed_code,
+        },
+        [
+            "liuyao_evidence.conditional_analysis.three_harmony",
+            "liuyao_evidence.prediction_validation",
+        ],
+        AS_OF,
+        tmp_path,
+        monkeypatch,
+        capsys,
+    )
+    evidence = result["liuyao_evidence"]
+    assert set(evidence) == {"conditional_analysis", "prediction_validation"}
+    assert set(evidence["conditional_analysis"]) == {"three_harmony"}
+    harmony = evidence["conditional_analysis"]["three_harmony"]
+    fire = next(
+        candidate
+        for candidate in harmony["candidates"]
+        if candidate["pattern"] == "base_three_branches"
+        and candidate["element"] == "火"
+    )
+    assert [member["branch"] for member in fire["members"]] == ["寅", "午", "戌"]
+    assert fire["active_positions"] == active_positions
+    assert fire["qualified_active_positions"] == active_positions
+    assert fire["status"] == fire["structural_status"] == expected_status
+    assert "首句一动成局条件未明" in harmony["scope"]
+    assert "也不代表全局吉凶" in harmony["scope"]
+    assert evidence["prediction_validation"]["status"] == "not_established"

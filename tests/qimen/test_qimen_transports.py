@@ -2,6 +2,7 @@
 
 import asyncio
 import json
+from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
@@ -10,6 +11,7 @@ from fastmcp import Client
 import fatebridge.api as api
 from fatebridge.cli import run
 from fatebridge.mcp_server import create_mcp_app
+from tests.support.transports import AS_OF, SPECS, three_surfaces
 
 
 @pytest.mark.parametrize(
@@ -371,3 +373,100 @@ def test_invalid_civil_clocks_fail_in_all_real_transports(
         assert body["retryable"] is False
         assert message in body["error"]
         assert "qimen" not in body
+
+
+@pytest.mark.parametrize(
+    "method,month,day,hour,expected_term,expected_ju,printed_case,printed_value,computed_value",
+    [
+        ("zhirun", 1, 19, 23, "大寒", "阳遁三局上元", "", "", ""),
+        ("chaibu", 1, 19, 23, "小寒", "阳遁二局上元", "", "", ""),
+        ("zhirun", 7, 5, 8, "小暑", "阴遁八局上元", "", "", ""),
+        (
+            "chaibu",
+            7,
+            5,
+            8,
+            "夏至",
+            "阴遁九局上元",
+            "vol4-yin9-gengchen-door",
+            "坎",
+            "坤",
+        ),
+        (
+            "chaibu",
+            6,
+            26,
+            8,
+            "夏至",
+            "阴遁三局中元",
+            "de-shi-yin3-renchen",
+            "杜门",
+            "开门",
+        ),
+    ],
+)
+def test_named_ju_method_keeps_its_own_printed_conflict_conditions(
+    method: str,
+    month: int,
+    day: int,
+    hour: int,
+    expected_term: str,
+    expected_ju: str,
+    printed_case: str,
+    printed_value: str,
+    computed_value: str,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    result = three_surfaces(
+        SPECS["qimen"],
+        {
+            "analysis_year": 2026,
+            "analysis_month": month,
+            "analysis_day": day,
+            "analysis_hour": hour,
+            "analysis_timezone": "+08:00",
+            "use_true_solar_time": False,
+            "qimen_options": {"ju_method": method},
+        },
+        [
+            "qimen.ju_method",
+            "qimen.ju_term",
+            "qimen.ju_text",
+            "qimen.source_disagreements",
+            "qimen.zhishi",
+        ],
+        AS_OF,
+        tmp_path,
+        monkeypatch,
+        capsys,
+    )
+    board = result["qimen"]
+    assert set(board) == {
+        "ju_method",
+        "ju_term",
+        "ju_text",
+        "source_disagreements",
+        "zhishi",
+    }
+    assert (board["ju_method"], board["ju_term"], board["ju_text"]) == (
+        method,
+        expected_term,
+        expected_ju,
+    )
+    conflicts = board["source_disagreements"]
+    if printed_case:
+        assert len(conflicts) == 1
+        assert (
+            conflicts[0]["case_id"],
+            conflicts[0]["source_value"],
+            conflicts[0]["computed_value"],
+        ) == (printed_case, printed_value, computed_value)
+        assert conflicts[0]["status"] == (
+            "unresolved_print_rule_disagreement"
+            if printed_case.startswith("vol4-")
+            else "unresolved_scan_rule_disagreement"
+        )
+    else:
+        assert conflicts == []

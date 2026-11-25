@@ -115,6 +115,12 @@ uv run --locked --extra dev fatebridge sixyao \
 
 古例与反例的 cases.json（本地数据：`../tests/fixtures/liuyao_scan_v3/cases.json`） 在实现前手工标注结构，不补古例没有给出的公历年份，不用书中结局评分。5 个 真实模型验收案例（本地数据：`../tests/fixtures/liuyao_scan_v3/agent-cases.json`） 及其冻结哈希（本地数据：`../tests/fixtures/liuyao_scan_v3/agent-cases-freeze.json`）也先写明检查标准；当前只完成测试准备，未将机械调用检查视为语义通过。它们是开发验收案例，不能称为外部盲测。
 
+本轮争议条件复核明确归属：`liuyao_complex.build_three_harmony` 维护三支、本变来源及指定初三／四六动变范围，`liuyao_complex.build_hidden_conditions` 与 `liuyao_hidden` 分别维护原飞伏关系和伏神承受门槛，`liuyao_focus` 维护本爻／实际变爻／伏神的取用次序；`local_techniques/sixyao.py` 负责装卦与同次摘要。原典构建检查仍使用 `build_liuyao_scan_profile --check` 及 `build_profile hidden --check`，原资料与勘误不互相覆盖。
+
+[新增三端反例](../tests/liuyao/test_liuyao_transports.py)用明确的合成日期2026-02-10午时、坎卦 `010010`，固定同一 `as_of`：不变为静三支；改为 `110010` 只有初爻动，火局仍是 `single_active_text_requires_review`；改为 `111010` 初三两动，寅午戌齐备，所列成局条件匹配。三端分别实际调用POST、FastMCP逐工具和CLI，严格选择完整候选数组及现实验证状态，禁止由结构状态推出全局吉凶或现实有效。它们是条件分支回归，不能算三个独立古例，也没有恢复影印古例的未知公历年份。
+
+1925本PDF77的一动句与双动句继续并列；冻结维基第19章修订2100447同样写“一爻動”，不能因常见口述“三爻动”就认定原扫描笔误。后段维基写“虛三待用”，影印摘记写“虛一待用”，分别保留，不从这两个字推造额外效力规则。现存天津清刻本第二册选页记录仅核7、8、9、10、12、14、15页，没有取得解除该首句歧义的材料，不能声称已经完成诸版校勘或清刻本没有该句。飞神生伏的原始方向、已获资格的飞生、伏神自身受生与最终出伏分别读取；原六项支持／五项阻碍及真、假、未知的现有正反例继续保留。4,096本变装卦和4,096钱数组合的旧分母、第三方字段范围与未定三合效力均不改变；协议相同不解除原典争议或现实效力缺证。
+
 历法全队列记录在 calendar-v3.json。日干支参考来自 [日本国立天文台儒略日公式](https://eco.mtk.nao.ac.jp/koyomi/topics/html/topics2023_1.html)，期望值以独立日期序数差推算，不调用生产 JDN 实现；23:00 换日是单独声明的程序约定。农历逐日比较复用已冻结的 香港天文台 1901–2100 年历表（本地数据：`../tests/fixtures/meihua_v1/sources.json`）。这证明与指定发布历表一致，不能扩成所有年代的天文确定性；[天文台说明](https://www.hko.gov.hk/tc/gts/time/conversion.htm)也指出未来临近午夜的月首与节气日期可能因计算修订变化。
 
 历表共 73,049 天，日干支 146,098 次及可用农历 72,723 次比较无差异。2100-02-09 至 2100-12-31 的 326 天超出当前离线农历支持范围，仍计入队列并单列缺失；1900-01-31 起的 335 个支持日期没有此套天文台年表参考。审计程序保留错误、差异、缺失和运行期间代码变更，不能静默剔除或重写期望值。
