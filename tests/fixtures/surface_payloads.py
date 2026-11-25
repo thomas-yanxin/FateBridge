@@ -231,6 +231,7 @@ def _export_content() -> str:
 
 
 REST_POST_CASES = {
+    "/api/psychometrics/ipip-big-five": lambda: {"ratings": [3] * 50},
     "/api/cn/bazi/source-compare": lambda: {
         "year_pillar": "甲子",
         "month_pillar": "丙寅",
@@ -565,6 +566,7 @@ REST_GET_CASES = {
 }
 
 MCP_CASES = {
+    "ipip_big_five": ("ipip_big_five", lambda: {"ratings": [3] * 50}),
     "bazi_source_compare": (
         "bazi_source_compare",
         lambda: {

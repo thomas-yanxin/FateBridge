@@ -6,6 +6,7 @@
 这里只保存常用工具的离线合同，不是全部公开工具清单；其他工具可用 `fatebridge describe <tool> --detail input` 离线核对。
 生成命令会移除本目录中已不再发布的 JSON；`--check` 同时检查缺失、内容漂移和遗留文件。
 
+- [ipip_big_five](ipip_big_five.json)
 - [human_design](human_design.json)
 - [astro_horary](astro_horary.json)
 - [astro_election](astro_election.json)

@@ -34,7 +34,7 @@ FateBridge 为 AI 应用提供本地术数与占星计算，通过 **MCP、REST 
 | 人类图 | 太阳 88° 双时刻、门线、通道、类型与权威 | [计算与验收范围](docs/human-design.md) |
 | 风水空间 | 八宅、基础砂水、年／月星、玄空历史宅盘、布局与实测工位 | [家居风水](docs/fengshui.md) · [实测工位](docs/fengshui-workstation-layout.md) |
 
-当前源码提供 **91 个业务 REST 路由**、**92 个 FastMCP 工具**，覆盖 **13 family / 92 工具**。中央目录含 93 条记录，CLI 可执行其中 92 条。三端共享领域计算，公开名称与输入形态见[接口边界](docs/api-reference.md#24-三端能力边界)。方法版本、原典分歧与尚未通过的项目见[当前算法状态](docs/algorithm-status.md)。
+当前源码提供 **92 个业务 REST 路由**、**93 个 FastMCP 工具**，覆盖 **14 family / 93 工具**。中央目录含 94 条记录，CLI 可执行其中 93 条。三端共享领域计算，公开名称与输入形态见[接口边界](docs/api-reference.md#24-三端能力边界)。方法版本、原典分歧与尚未通过的项目见[当前算法状态](docs/algorithm-status.md)。
 
 ## 快速开始
 

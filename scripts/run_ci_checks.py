@@ -8,6 +8,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 CHECKS = (
+    "psychometrics/test_ipip_big_five.py",
     "quality/test_architecture_boundaries.py",
     "evaluation/test_agentic_nested_outputs.py::test_current_unrounded_business_validates_without_mutation",
     "integration/test_ci_regressions.py",

@@ -4,7 +4,7 @@
 
 首次运行请先看[快速入门](getting-started.md)，可复制的客户端代码见[接入指南](agent-guide.md)，按日常问题选择方法见[工具覆盖](algorithm-coverage.md)。
 
-当前实际暴露 91 个业务 REST 路由（另含 `/health`、`/ready`、`/metrics` 三个运维端点）和 92 个 FastMCP 工具。两个数字由中央目录派生，并由 `tests/quality/test_doc_tool_counts.py` 锁定。版本之间的准确字段约束以当前服务的 `/openapi.json`、MCP `tools/list` 或 CLI `describe` 为准。
+当前实际暴露 92 个业务 REST 路由（另含 `/health`、`/ready`、`/metrics` 三个运维端点）和 93 个 FastMCP 工具。两个数字由中央目录派生，并由 `tests/quality/test_doc_tool_counts.py` 锁定。版本之间的准确字段约束以当前服务的 `/openapi.json`、MCP `tools/list` 或 CLI `describe` 为准。
 
 ## 阅读导航
 
@@ -20,7 +20,7 @@
 
 首次安装见[快速入门](getting-started.md)，客户端与完整导出见[接入指南](agent-guide.md)，当前字段以本页及运行环境的 Schema 为准。
 
-方法发现的完整记录包含`method_contracts/method_registration`，摘要包含`method_ids`。当前92个目录工具已登记领域方法，`bazi_personality` 除外；登记不表示专业验收通过。实际版本、输入/环境/结果依赖及误差状态随`run_metadata.calculation_evidence`交付，大图按同run分页读取，见[计算证据合同](computation-evidence.md)。
+方法发现的完整记录包含`method_contracts/method_registration`，摘要包含`method_ids`。当前93个目录工具已登记领域方法，`bazi_personality` 除外；登记不表示专业验收通过。实际版本、输入/环境/结果依赖及误差状态随`run_metadata.calculation_evidence`交付，大图按同run分页读取，见[计算证据合同](computation-evidence.md)。
 
 ## 1. 基础信息
 
@@ -159,7 +159,7 @@ REST OpenAPI、MCP `tools/list`、`/api/tools` 和 CLI `describe` 发布中央�
 
 ### 2.4 三端能力边界
 
-中央目录含 93 条记录；REST 默认公开 91 项，MCP 默认公开 92 项，CLI 可执行 92 条目录命令（另有 `list`、`discover`、`describe`、`profile`）。13 个 family 的能力矩阵按 MCP 集合统计，不能把目录长度当作单端工具数。
+中央目录含 94 条记录；REST 默认公开 92 项，MCP 默认公开 93 项，CLI 可执行 93 条目录命令（另有 `list`、`discover`、`describe`、`profile`）。14 个 family 的能力矩阵按 MCP 集合统计，不能把目录长度当作单端工具数。
 
 | 能力 | REST | MCP / CLI | 差异 |
 | --- | --- | --- | --- |
@@ -634,6 +634,10 @@ descriptor 形如：
 
 三端可复制示例、详细字段语义及来源限制见 [家居风水](fengshui.md)。CLI 示例：`fatebridge fengshui_assess --request-file docs/examples/fengshui-home.json`。MCP 参数为同一文件内容的 JSON 对象；REST 请求体同理。`--request-file` 保留未知字段交给模型拒绝，显式字段参数覆盖同名顶层字段。
 
+### 4.12 心理测量（family `psychometrics`）
+
+`POST /api/psychometrics/ipip-big-five` 与同名MCP、CLI共享 IPIP-50题项及五因子计分；参数、来源与缺题策略见[心理测量](psychometrics.md)。
+
 ## 5. REST 调用示例
 
 以下人物资料均为虚构示例，默认未开启 API Key 鉴权；开启后加 `-H "X-API-Key: <secret>"`。
@@ -726,7 +730,7 @@ uv run --locked --extra dev python -m fatebridge.mcp_server
 
 ### 6.2 MCP 工具分组
 
-> 全部 92 个 MCP 工具按 `family` 分组如下，各端绑定差异见 §2.4。机读清单见 `GET /api/tools` 或 `fatebridge list`。
+> 全部 93 个 MCP 工具按 `family` 分组如下，各端绑定差异见 §2.4。机读清单见 `GET /api/tools` 或 `fatebridge list`。
 
 #### 基础命理（family `bazi`）
 
@@ -828,6 +832,8 @@ uv run --locked --extra dev python -m fatebridge.mcp_server
 - `fengshui_annual_stars` / `fengshui_monthly_stars` / `fengshui_xuankong_natal` / `fengshui_assess`
 
 住宅输入、分层响应与复杂 CLI 用法见 [家居风水接口](#411-家居风水family-fengshui)。
+
+- 心理测量：`ipip_big_five`
 
 ### 6.3 MCP 与 REST 的差异
 

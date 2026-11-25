@@ -15,6 +15,7 @@ from fatebridge.services.catalog.compatibility import SPECS as COMPATIBILITY_SPE
 from fatebridge.services.catalog.divination import SPECS as DIVINATION_SPECS
 from fatebridge.services.catalog.fengshui import SPECS as FENGSHUI_SPECS
 from fatebridge.services.catalog.metaphysics import SPECS as METAPHYSICS_SPECS
+from fatebridge.services.catalog.psychometrics import SPECS as PSYCHOMETRICS_SPECS
 from fatebridge.services.catalog.reference import SPECS as REFERENCE_SPECS
 from fatebridge.services.catalog.timing import SPECS as TIMING_SPECS
 from fatebridge.services.catalog.western_events import SPECS as WESTERN_EVENTS_SPECS
@@ -29,6 +30,7 @@ CATALOG: List[ToolSpec] = [
     *DIVINATION_SPECS,
     *METAPHYSICS_SPECS,
     *REFERENCE_SPECS,
+    *PSYCHOMETRICS_SPECS,
     *ASTROLOGY_SPECS,
     *WESTERN_TIMING_SPECS,
     *WESTERN_LIFESPAN_SPECS,

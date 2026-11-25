@@ -8,7 +8,7 @@
 
 输入参数查 [API 参考](api-reference.md)，按用户问题选工具查[工具覆盖](algorithm-coverage.md)。
 
-查找体系、方法和适用场景先看[分类与方法矩阵](#分类与方法矩阵)；核对接口再看[总览](#1-总览13-个-family--92-个工具)和[工具清单](#2-逐-family-工具清单)。评估结果精度再看[依赖说明](#3-精度与依赖说明)与[快照覆盖](#4-快照协议覆盖)。八字和双人模型的版本分别见[八字判定](bazi-assessment.md)、[双人评分](compatibility-scoring.md)，风水规则见[家居风水](fengshui.md)。
+查找体系、方法和适用场景先看[分类与方法矩阵](#分类与方法矩阵)；核对接口再看[总览](#1-总览14-个-family--93-个工具)和[工具清单](#2-逐-family-工具清单)。评估结果精度再看[依赖说明](#3-精度与依赖说明)与[快照覆盖](#4-快照协议覆盖)。八字和双人模型的版本分别见[八字判定](bazi-assessment.md)、[双人评分](compatibility-scoring.md)，风水规则见[家居风水](fengshui.md)。
 
 状态分类：
 
@@ -18,7 +18,7 @@
 - `Placeholder`：合同或模式入口存在，但主输出层仍是占位兼容
 - `Excluded`：当前仓库不提供该能力
 
-> 工具的唯一信源是中央目录 `src/fatebridge/services/tool_catalog.py`。REST 公开 **91 个工具**，MCP 公开 **92 个工具**，分为 **13 个 family**。本页按 MCP 集合统计；目录有 93 条记录，CLI 可执行 92 条，差异见 [API 参考](api-reference.md#24-三端能力边界)。下表逐 family 列出全部工具；新增能力时请同步本页（总数、逐 family 数量与完整工具清单由 `tests/quality/test_doc_tool_counts.py` 锁定）。
+> 工具的唯一信源是中央目录 `src/fatebridge/services/tool_catalog.py`。REST 公开 **92 个工具**，MCP 公开 **93 个工具**，分为 **14 个 family**。本页按 MCP 集合统计；目录有 94 条记录，CLI 可执行 93 条，差异见 [API 参考](api-reference.md#24-三端能力边界)。下表逐 family 列出全部工具；新增能力时请同步本页（总数、逐 family 数量与完整工具清单由 `tests/quality/test_doc_tool_counts.py` 锁定）。
 
 所有目录记录现有统一的输入/输出 Schema，三端由同一 `ToolSpec` 发布并校验；这属于接口合同覆盖，不提高算法的 `Implemented` / `Approximate` 等级，也不表示全部嵌套专业字段已有完整类型定义。
 
@@ -115,7 +115,7 @@
 
 各方法的逐接口名称、技术依赖和具体验收情况见下文及对应领域文档。尤其须区分计算可复现、原典一致性、解释质量与前瞻性现实预测验证；它们不能互相替代。
 
-## 1. 总览：13 个 family / 92 个工具
+## 1. 总览：14 个 family / 93 个工具
 
 | family | 工具数 | 主题 | 总体状态 |
 | --- | --- | --- | --- |
@@ -132,6 +132,7 @@
 | `knowledge` | 2 | 内置知识库目录与读取 | Implemented |
 | `export` | 2 | 导出协议注册表与快照解析 | Implemented |
 | `fengshui` | 8 | 公共方位、命卦、八宅、砂水、年／月紫白、玄空宅盘、分层合参 | Implemented（明确版本） |
+| `psychometrics` | 1 | IPIP-50五因子题项与计分 | Implemented（项目缺题策略；未建立常模） |
 | 仓库内前端 | — | 内置 Web UI | Excluded |
 | 存储 / 账户 | — | 数据库、历史记录、用户体系 | Excluded |
 
@@ -365,6 +366,14 @@
 验证包括固定第三方命卦400项／关系64项、独立2026年星盘和跨端合同，不代表现实预测有效性。来源、算法和输入合同见 [家居风水](fengshui.md)。
 
 第二阶段的运／山／向宅盘与年星分层；版本选择、7套公开完整盘例及固定外部216盘比对的24项五黄差异见 [玄空宅盘](fengshui-xuankong.md)。
+
+### 2.12 `psychometrics` —— 心理测量
+
+| 工具 | 算法 | 状态 |
+| --- | --- | --- |
+| `ipip_big_five` | IPIP官方50题键、1–5正反向计分；各维至少8题才折算 | Implemented（算术与三端；中文为项目释义） |
+
+缺题阈值、原文来源和研究资格见[IPIP-50](psychometrics.md)。
 
 ## 3. 精度与依赖说明
 

@@ -201,7 +201,7 @@ python3 -m fatebridge.cli --no-metadata bazi_birth <出生参数> \
 
 ## 常用工具（按家族）
 
-下面列出常用入口，按任务选择。当前 REST 公开 91 个工具，MCP 公开 92 个工具，中央目录含 93 条记录，CLI 可执行其中 92 条。完整清单见[算法覆盖](../../algorithm-coverage.md)，名称与嵌套请求差异以 `describe` 和[API 参考](../../api-reference.md#24-三端能力边界)为准。
+下面列出常用入口，按任务选择。当前 REST 公开 92 个工具，MCP 公开 93 个工具，中央目录含 94 条记录，CLI 可执行其中 93 条。完整清单见[算法覆盖](../../algorithm-coverage.md)，名称与嵌套请求差异以 `describe` 和[API 参考](../../api-reference.md#24-三端能力边界)为准。
 
 ### 八字 · 命主本命（snapshot_text）
 

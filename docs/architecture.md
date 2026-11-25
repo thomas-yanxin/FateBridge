@@ -37,7 +37,7 @@ flowchart TD
 
 `application/discovery.py` 在生成 Schema 前筛选目录，供 REST `/api/tools`、CLI `discover` 和 MCP 摘要/单工具资源共用。MCP host 的 family 配置只筛选注册表；默认保留完整集合。`ToolSpec.execution_hints` 是三端发现记录与 MCP annotations 的共同来源，描述环境影响，不描述数值确定性。
 
-当前 FastAPI 提供 91 个业务 REST 路由，另有 `GET /api/tools` 发现接口与 `/health`、`/ready`、`/metrics` 运维端点；FastMCP 默认提供 92 个 MCP 工具。中央目录包含 93 条记录，CLI 可执行其中 92 条。CLI 另有 `list`、`discover`、`describe`、`profile`、`doctor`；风水工具明确启用嵌套 JSON `--request-file`，关系盘嵌套入口仍使用已有扁平变体。
+当前 FastAPI 提供 92 个业务 REST 路由，另有 `GET /api/tools` 发现接口与 `/health`、`/ready`、`/metrics` 运维端点；FastMCP 默认提供 93 个 MCP 工具。中央目录包含 94 条记录，CLI 可执行其中 93 条。CLI 另有 `list`、`discover`、`describe`、`profile`、`doctor`；风水工具明确启用嵌套 JSON `--request-file`，关系盘嵌套入口仍使用已有扁平变体。
 
 家居风水领域位于 `core/fengshui/`，请求、响应、公共方位、历法边界、八宅、年度飞星、玄空历史宅盘、砂水与可读快照各有模块。`services/fengshui.py` 只编排独立层和逐人差异，`data/fengshui/rules-v1.json` 保存版本与来源并随包发布。工具在中央目录显式绑定领域响应模型；`cli_request_file` 声明复杂 CLI 输入支持，不改变未启用工具的行为。规则与验收边界见 [家居风水](fengshui.md)。
 
@@ -141,7 +141,7 @@ Swiss Ephemeris 存在共享 C 状态。直接调用与会修改目录的第三�
 
 ### 方法合同与数量语义
 
-`core/method_contracts.py`与`services/method_registration.py`维护领域方法合同。当前92个工具登记65个共享领域方法；人格入口明确排除。完整发现返回`method_contracts/method_registration`，摘要返回`method_ids`；运行时实际策略版本与见证路径另记入`run_metadata.calculation_evidence`。
+`core/method_contracts.py`与`services/method_registration.py`维护领域方法合同。当前93个工具登记66个共享领域方法；人格入口明确排除。完整发现返回`method_contracts/method_registration`，摘要返回`method_ids`；运行时实际策略版本与见证路径另记入`run_metadata.calculation_evidence`。
 
 共享证据层绑定全部业务根、输入提供状态和环境，解析已有领域账本中的具名依赖，检查DAG闭合并支持保守失效传播。误差预算区分已知界、声明范围、未量化和不适用；没有传播依据时不生成输出误差界。声明依赖、包含与规则输入见证分开，未决语义依赖保持显式，详见[计算证据合同](computation-evidence.md)。完整业务覆盖不等于全部细粒度因果关系或连续稳定性已被证明。
 

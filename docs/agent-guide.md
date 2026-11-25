@@ -27,7 +27,7 @@ FateBridge 的领域能力通过三条通道暴露出来：
 
 三条通道共用 `src/fatebridge/services/tool_catalog.py` 装配的中央目录，领域声明位于 `services/catalog/`，请求字段定义于 `core/requests/`。共享领域计算和错误字段，各端仍有名称、绑定和校验阶段差异。
 
-目前 REST 暴露 91 个工具，MCP 暴露 92 个工具；目录共有 93 条记录，其中 CLI 可执行 92 条。`astro_relative` 是嵌套 REST 请求，与 MCP 的扁平请求存在对应关系，不是所有记录都能按同名跨端调用。完整算法清单见 [algorithm-coverage.md](algorithm-coverage.md)，完整端点说明见 [api-reference.md](api-reference.md)。
+目前 REST 暴露 92 个工具，MCP 暴露 93 个工具；目录共有 94 条记录，其中 CLI 可执行 93 条。`astro_relative` 是嵌套 REST 请求，与 MCP 的扁平请求存在对应关系，不是所有记录都能按同名跨端调用。完整算法清单见 [algorithm-coverage.md](algorithm-coverage.md)，完整端点说明见 [api-reference.md](api-reference.md)。
 
 ## 自助发现：别硬编码工具列表
 
@@ -57,7 +57,7 @@ curl 'http://localhost:8010/api/tools?tool=bazi_birth&detail=full'
 
 ```json
 {
-  "counts": {"rest": 91, "mcp": 92, "total": 93},
+  "counts": {"rest": 92, "mcp": 93, "total": 94},
   "tools": [
     {
       "tool": "bazi_wealth",
@@ -413,7 +413,7 @@ fatebridge profile --systems bazi,ziwei,astro \
 ## 相关文档
 
 - [api-reference.md](api-reference.md)：全部 REST 路由、FastMCP 工具、请求族、响应字段
-- [algorithm-coverage.md](algorithm-coverage.md)：13 family / 92 工具的算法与精度 / 依赖矩阵
+- [algorithm-coverage.md](algorithm-coverage.md)：14 family / 93 工具的算法与精度 / 依赖矩阵
 - [工具覆盖](algorithm-coverage.md)：各方法的实现范围、已知限制与验证边界
 - [getting-started.md](getting-started.md)：从零启动服务
 - [troubleshooting.md](troubleshooting.md)：依赖缺失、精度、快照导出等常见问题

@@ -1,6 +1,6 @@
 # FateBridge 细粒度算法清单（源码映射初审，2026-11-17）
 
-当前工作树中央目录为 **93条记录、MCP92个入口、REST91个入口、CLI92个入口、13个family**。关系盘REST/MCP请求形状不同；astro_chart分支与专用工具共享实现。65个唯一登记method_id包括复合方法和资料读取，不能称为65个细算法。
+当前工作树中央目录为 **94条记录、MCP93个入口、REST92个入口、CLI93个入口、14个family**。关系盘REST/MCP请求形状不同；astro_chart分支与专用工具共享实现。66个唯一登记method_id包括复合方法和资料读取，不能称为66个细算法。
 
 下表把已识别的计算步骤、规则子集和模型分支映射到实际实现文件与函数，并列公开消费者及现有来源/审计索引。按源码职责分组，同一文件可以分行；支持与参数条目标注角色，不把格式化、Schema、运输层和helper计作独立算法。同一函数的不同算法或规则分支分别列为审查项，所以审查项数不等于独立函数数。此次识别了10097个计算、规则及支持职责审查项，合并为2492个源码位置组，对应3854个不同的文件/符号组合，分布于626个实现文件；**这是初审索引，既不是最终算法总数，也不保证无遗漏**。已知复合项明确标记“待拆”；静态映射不证明每项已实际调用或对照通过。
 
@@ -2092,6 +2092,7 @@ WMM2025当前领域内核采用精确WGS84、有限P/cos递推与独立50位上�
 - `western_lifespan`（13）：`astro_harmonic`、`astro_planetary_ages`、`astro_triplicity_rulers`、`astro_lunation_phase`、`astro_distributions`、`astro_balbillus`、`astro_keypoints`、`astro_yearsystem129`、`astro_planetaryarc`、`astro_persiandirected`、`astro_agepoint`、`astro_vedicprog`、`astro_jaynesprog`。
 - `western_event`（4）：`astro_mundane`、`astro_extrareturns`、`astro_horary`、`astro_election`。
 - `fengshui`（8）：`fengshui_directions`、`fengshui_minggua`、`fengshui_bazhai`、`fengshui_jinsuo`、`fengshui_annual_stars`、`fengshui_monthly_stars`、`fengshui_xuankong_natal`、`fengshui_assess`。
+- `psychometrics`（1）：`ipip_big_five`。
 
 `astro_relative`是另一个仅REST的目录记录，公开MCP为扁平请求`astro_relative_chart`，共享关系算法。`bazi_personality`仍公开，但被method_registration.EXCLUDED_TOOLS排除于登记合同，不得漏审其实际规则。knowledge_registry/read和export_registry/parse是参考/交付能力，不将它们当独立数值或预测算法。
 

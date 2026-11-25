@@ -34,6 +34,9 @@
     }
   },
   "tools": {
+    "ipip_big_five": {
+      "action": "list_items"
+    },
     "heluo": {
       "date": "1990-06-15",
       "time": "09:33:00",
@@ -583,6 +586,12 @@
     }
   },
   "suggested_fields": {
+    "ipip_big_five": [
+      "mode",
+      "scale_id",
+      "provenance",
+      "summary"
+    ],
     "heluo": [
       "input_normalized",
       "four_pillars",
@@ -1948,6 +1957,10 @@
     }
   },
   "evidence_views": {
+    "ipip_big_five": {
+      "items": {"fields": ["mode", "scale_id", "items", "item_count", "provenance"], "scope": "action=list_items; Chinese glosses are project wording, not a validated adaptation."},
+      "scores": {"fields": ["mode", "scale_id", "status", "domains", "answered_count", "missing_count", "provenance"], "scope": "action=score; preserve per-domain insufficiency and the project 8/10 proration policy."}
+    },
     "heluo": {
       "line_conditions": {
         "purpose": "按实际先后天元堂核二五位、众宗及主本阴元堂阳应爻有援式，保留同阶段应位和阴阳事实；不把通用相应、偶数爻位或未中原句合成十体总评。",

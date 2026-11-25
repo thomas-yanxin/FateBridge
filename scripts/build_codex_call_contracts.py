@@ -18,6 +18,7 @@ from fatebridge.services.tool_catalog import CATALOG
 ROOT = Path(__file__).resolve().parents[1]
 TARGET = ROOT / "docs/contracts"
 TOOLS = (
+    "ipip_big_five",
     "human_design",
     "astro_horary",
     "astro_election",
