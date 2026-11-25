@@ -1,6 +1,6 @@
 {
   "id": "meihua_motion_nlc1925_v1",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "title": "文明书局本人事内卦、外物与占者动静所选条件",
   "source": {
     "selected_edition": "nlc_1925",
@@ -47,6 +47,20 @@
       "Source inner symbolic motion is not outer physical movement",
       "Not moving is not a basis to erase an existing cast or predict no event",
       "Observer mental stillness is a separate premise; exact implementation not adjudicated"
+    ]
+  },
+  "orientation_reference": {
+    "id": "meihua_xiangbei_wikisource_1441921_v1",
+    "section": "卷二·向背",
+    "url": "https://zh.wikisource.org/w/index.php?title=梅花易數/卷二&oldid=1441921",
+    "edition_status": "fixed_transcription_not_independently_collated_facsimile",
+    "definition": "向者，為事物之應，相向而來。背者，謂事物之應，相背而去也。",
+    "scope": "Conditional textual wording only. Material qualifications, motion speed, inner/outer synthesis and actual event timing remain unadjudicated across chapters; symbolic relations do not establish omen valence.",
+    "clauses": [
+      {"rule_id": "xiangbei_controlling_approach", "relation": "用克体", "orientation": "approaching", "quote": "其克體之卦，器物方來，其禍將至，去則禍散。", "relative_wording": "其禍將至"},
+      {"rule_id": "xiangbei_controlling_departure", "relation": "用克体", "orientation": "departing", "quote": "其克體之卦，器物方來，其禍將至，去則禍散。", "relative_wording": "去則禍散"},
+      {"rule_id": "xiangbei_generating_approach", "relation": "用生体", "orientation": "approaching", "quote": "其生體之卦，器物方來則吉，去則吉已過矣。", "relative_wording": "器物方來則吉"},
+      {"rule_id": "xiangbei_generating_departure", "relation": "用生体", "orientation": "departing", "quote": "其生體之卦，器物方來則吉，去則吉已過矣。", "relative_wording": "去則吉已過矣"}
     ]
   },
   "rules": [

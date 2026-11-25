@@ -344,8 +344,15 @@ class MeihuaExternalObservation(_DeferredModel):
         description="Optional caller-reported actual motion of this external observation. Omit if unknown; never inferred from material, description, observer activity or inner symbolic roles. Moving water/carried soil and still wells/ground remain distinct. Does not determine omen valence or an event date",
     )
 
+    orientation: Literal["approaching", "departing"] | None = Field(
+        default=None,
+        description="Caller-reported same-instant movement toward or away from the observer, for volume 2 向背. Separate from moving/stationary and compass direction; omit when unknown. Never inferred from label, question, observer activity or material. Source wording remains conditional; cross-chapter qualification and actual outcomes are unknown",
+    )
+
     @model_validator(mode="after")
     def nonblank_label(self) -> "MeihuaExternalObservation":
+        if self.orientation is not None and self.motion == "stationary":
+            raise ValueError("同一时刻静止的外物不能同时声明趋近或离开")
         if not self.label.strip():
             raise ValueError("外应资料须有已报描述，不能用空白代替未知事实")
         return self

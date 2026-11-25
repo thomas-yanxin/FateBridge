@@ -374,13 +374,19 @@ uv run --locked --extra dev fatebridge meihua_cast --casting '{"method":"object_
 
 ### 内卦、外物与占者的动静
 
-文明书局本卷三《体用动静之诀》在原 PDF 索引110、111（纸面卷三九、十）分别讨论内卦、外物和占者。`meihua_motion_nlc1925_v1@1.0.0`只选取其中9个句组，返回在`interpretation.motion_context`，天气分支为`null`。
+文明书局本卷三《体用动静之诀》在原 PDF 索引110、111（纸面卷三九、十）分别讨论内卦、外物和占者。`meihua_motion_nlc1925_v1@1.1.0`保留其中9个句组，另列固定转录卷二《向背》的独立条件，返回在`interpretation.motion_context`，天气分支为`null`。
 
 - `inner_roles`从同次实际卦图列原体静、体互静、用互静、初用动、变用动。这是原文的符号角色，不能当成现场物体正在移动。各计数候选用自己的原体、互卦与路径。
 - 可选`observer_activity`接已确认占者当时的`seated`（坐）、`walking`（行）或`standing`（立）。未知省略，不从问句、车辆运动或外物动静推断。`observer`保留调用方声明及原始输入路径；迟、速、半迟半速是所选原文相对措辞，没有持续天数或日期。
 - `external_observations`每条可选`motion=moving`或`stationary`。未填保持未知，返回资料不补`motion:null`。原书同时列井沼、山岩之静与担水、负土之动，不能按水、土或器物类别默认。`external_motion`逐条关联已报资料及本候选的外应资格；实物／形色资格仍按既有独立层保留。
 
 外应“动而吉”“动而凶”的速应句需要外应吉凶判断。当前没有内外综合判定，`omen_valence`及`omen_condition_met`保持`null`，不会把内卦某条生克、占者活动或`matter_scenario`的“问吉事”声明当成已判吉应，也不向调用方索取所希望预测的吉凶以填足条件。明确不动时，这两条动应句的条件不符；原文“不动而应者，吉凶之未见也”仅作为所选静止句保留，不扩大成无事发生、不吉或取消已有起卦。
+
+每条外应另可声明 `orientation=approaching`（相向而来）或 `departing`（相背而去），方向参照同次占者。未知省略；`motion=moving`、指南针方位、描述和问句不能补向背，向背也不自动补动静。同一时刻明确 `stationary` 与趋近／离开冲突，返回输入错误。依据为[卷二《向背》固定转录1441921](https://zh.wikisource.org/w/index.php?title=梅花易數/卷二&oldid=1441921)，不是此次独立校勘的文明书局书影。原句“其克體之卦，器物方來，其禍將至，去則禍散”“其生體之卦，器物方來則吉，去則吉已過矣”分别形成四个具名条件，在 `external_motion[].orientation_clauses` 返回方向条件与本候选原体符号生克条件。明确不符为 `false`，未知为 `null`；其他三种生克关系不外推这些句子。`orientation_source`保留来源、转录资格与适用范围。
+
+《向背》与实物／形色资格、《体用动静之诀》速应及内外综合的跨篇先后、充分条件尚未裁定，故 `cross_chapter_qualification_met=null`，即使方向及符号关系相符也不把 `full_clause_applies` 判真；这些是附带条件的历史原句。生体不是已核吉应，克体不是现实灾祸，离开也不证明某事已经发生或消散。`orientation_motion_synthesis=not_adjudicated`，不把向背读成吉凶、应期、动静输入或已知结局。
+
+本组钟界复核命令为 `uv run --locked --extra dev python scripts/meihua/audit_meihua_cast_conditions.py`。所选香港天文台[1993](https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T1993c.txt)及[2001](https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2001c.txt)公布标签含农历岁首、交节前后、闰四月进出；10日分别取00:00、22:59、23:00、23:59，共40钟时。本轮不据这些样例调整历法代码；它们仍在旧全历表审计域内，不能宣称脱离生产依据的天文留出验证。日干支另以日期序差复算，只共享已声明的2000-01-07甲子锚点，不是第二份独立干支史料。23时民用午夜候选与次日子初候选分别保留；午夜进入下一民用日。1993-02-03合成午时的农历向量为酉年正月十二、午时（7/6/六爻），交节向量为壬申年、丑月，两者各有职责，不以其中一个覆写另一个；HKO只给交节日期，不验证交节瞬时。三端回归见 `tests/meihua/test_meihua_cast_conditions.py`，固定同一 `as_of`，涵盖完整／严格投影及负例。旧梅花大部分审计资料未纳入基线Git，旧节点的收集缺口另报，不由本组新探针代替旧分母。
 
 影印本目读为“未见”“事应于迟／速”“我立则半迟半速”，固定旧转录为“末见”“事应之迟／速”“我立而半迟半速”，分别留在配置中，旧转录未改。此处为助手目读，未经过独立人类专家校勘。心境之静与“不动不占”的完整起占条件尚未裁定；三种动静也未合成为时间或结局。`duration`、`event_time`、`combined_outcome`保持`null`，可复现这些句组不证明现实预测有效。
 

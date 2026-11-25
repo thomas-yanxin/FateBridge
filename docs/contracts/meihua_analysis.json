@@ -571,6 +571,22 @@
                   ],
                   "default": null,
                   "description": "Optional caller-reported actual motion of this external observation. Omit if unknown; never inferred from material, description, observer activity or inner symbolic roles. Moving water/carried soil and still wells/ground remain distinct. Does not determine omen valence or an event date"
+                },
+                "orientation": {
+                  "anyOf": [
+                    {
+                      "enum": [
+                        "approaching",
+                        "departing"
+                      ],
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "description": "Caller-reported same-instant movement toward or away from the observer, for volume 2 向背. Separate from moving/stationary and compass direction; omit when unknown. Never inferred from label, question, observer activity or material. Source wording remains conditional; cross-chapter qualification and actual outcomes are unknown"
                 }
               },
               "required": [

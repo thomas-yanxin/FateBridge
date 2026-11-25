@@ -18,7 +18,7 @@ def _profile() -> dict[str, Any]:
             Path(__file__).resolve().parents[1] / "data/meihua/motion-nlc1925-v1.json"
         ).read_text(encoding="utf-8")
     )
-    if profile["id"] != "meihua_motion_nlc1925_v1" or profile["version"] != "1.0.0":
+    if profile["id"] != "meihua_motion_nlc1925_v1" or profile["version"] != "1.1.0":
         raise ValueError("Unknown selected Meihua motion profile")
     return profile
 
@@ -83,6 +83,7 @@ def _reading(
         "scope": "observer_activity_only_not_mental_stillness_or_omen_valence",
     }
     rows = []
+    qualified_observations = external["observations"] if external else []
     for index, observation in enumerate(
         external["reported_observations"] if external else []
     ):
@@ -105,9 +106,45 @@ def _reading(
                 ("moving_unfavorable", "unfavorable"),
             ]
         ]
+        orientation = observation.get("orientation")
+        relation = qualified_observations[index]["raw_relation_to_body"]
+        orientation_clauses = [
+            {
+                **clause,
+                "orientation_condition_met": (
+                    False
+                    if motion == "stationary"
+                    else (
+                        None
+                        if orientation is None
+                        else orientation == clause["orientation"]
+                    )
+                ),
+                "symbolic_relation_condition_met": relation == clause["relation"],
+                "cross_chapter_qualification_met": None,
+                "full_clause_applies": (
+                    False
+                    if motion == "stationary"
+                    or relation != clause["relation"]
+                    or (
+                        orientation is not None and orientation != clause["orientation"]
+                    )
+                    else None
+                ),
+            }
+            for clause in _profile()["orientation_reference"]["clauses"]
+        ]
         rows.append(
             {
                 "record_index": index,
+                "orientation": orientation,
+                "orientation_declaration_status": (
+                    "not_collected"
+                    if orientation is None
+                    else "caller_reported_unverified"
+                ),
+                "orientation_clauses": orientation_clauses,
+                "orientation_motion_synthesis": "not_adjudicated",
                 "motion": motion,
                 "declaration_status": (
                     "not_collected" if motion is None else "caller_reported_unverified"
@@ -135,6 +172,8 @@ def _reading(
         summary += "外应动静按逐条所报事实保留，不从水土或器物类别推定；动而吉／凶的速应句尚缺外应吉凶综合判断，问吉事或问不吉之事不能替代。"
         if any(r["motion"] == "stationary" for r in rows):
             summary += "所报不动对应原句“吉凶之未见”，不据此断无事发生或取消本次起卦。"
+    if any(row["orientation"] is not None for row in rows):
+        summary += "外应向背另按卷二《向背》相向而来／相背而去逐项列条件；生克仅为符号关系，与实物资格、动静速应的跨篇合参未定，不据此认定吉凶已至或已散。"
     if summary:
         summary = (
             "体互静、用变动是内卦符号角色，不等同现场运动。"
@@ -150,6 +189,7 @@ def _reading(
         "inner_role_motion_scope": "source_symbolic_roles_not_physical_movement",
         "observer": observer,
         "external_motion": rows,
+        "orientation_source": deepcopy(_profile()["orientation_reference"]),
         "casting_trigger_adjudicated": False,
         "mental_stillness_adjudicated": False,
         "motion_axes_synthesis": "not_computed",
