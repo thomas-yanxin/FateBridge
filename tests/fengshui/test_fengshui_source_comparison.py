@@ -2,6 +2,7 @@
 
 import asyncio
 import json
+import math
 from copy import deepcopy
 from pathlib import Path
 
@@ -24,7 +25,7 @@ from tests.support.result_delivery import (
     assert_same_run_receipt as assert_stored_result,
 )
 from tests.support.result_delivery import store
-from tests.support.transports import rest_client
+from tests.support.transports import SPECS, rest_client, three_surfaces
 
 
 def request(period=7, facing=60, **extra):
@@ -65,6 +66,105 @@ def test_known_printed_disagreements_reach_the_actual_response(period, facing):
         ]
         assert row["diagram"]["pdf_page"] == 353
         assert "原图5、计算2" in output["snapshot_text"]
+
+
+@pytest.mark.parametrize(
+    "period_number,facing_degrees,mountain_numbers,facing_numbers,prose_differences,diagram_differences",
+    [
+        (4, 270, [2, 3, 4, 5, 6, 7, 8, 9, 1], [6, 7, 8, 9, 1, 2, 3, 4, 5], 2, 0),
+        (1, 90, [3, 2, 1, 9, 8, 7, 6, 5, 4], [8, 9, 1, 2, 3, 4, 5, 6, 7], 1, 0),
+        (6, 315, [5, 6, 7, 8, 9, 1, 2, 3, 4], [7, 6, 5, 4, 3, 2, 1, 9, 8], 1, 0),
+        (7, 60, [4, 5, 6, 7, 8, 9, 1, 2, 3], [1, 9, 8, 7, 6, 5, 4, 3, 2], 0, 1),
+    ],
+)
+def test_disputed_prints_keep_independently_counted_flights(
+    period_number: int,
+    facing_degrees: float,
+    mountain_numbers: list[int],
+    facing_numbers: list[int],
+    prose_differences: int,
+    diagram_differences: int,
+) -> None:
+    """Literal print disagreements cannot change a complete nine-star flight."""
+    result = xuankong_natal(
+        XuankongRequest.model_validate(request(period_number, facing_degrees))
+    )
+    chart = result["chart"]
+    flight_path = ("C", "NW", "W", "NE", "S", "N", "SW", "E", "SE")
+    assert [
+        chart["mountain_chart"][direction] for direction in flight_path
+    ] == mountain_numbers
+    assert [
+        chart["facing_chart"][direction] for direction in flight_path
+    ] == facing_numbers
+    comparison = result["source_comparison"]["candidates"][0]
+    assert len(comparison["prose"]["differences"]) == prose_differences
+    assert len(comparison["diagram"]["differences"]) == diagram_differences
+
+
+@pytest.mark.parametrize(
+    "facing_degrees,expected_modes",
+    [
+        (math.nextafter(64.5, -math.inf), ["lower"]),
+        (64.5, ["lower", "replacement"]),
+        (math.nextafter(64.5, math.inf), ["replacement"]),
+        (60, ["lower"]),
+    ],
+)
+def test_edition_and_dispute_survive_real_boundary_transports(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    facing_degrees: float,
+    expected_modes: list[str],
+) -> None:
+    """Both boundary candidates retain their own source scope and printed values."""
+    fields = [
+        "layers.xuankong_natal",
+        "coverage.natal_source_comparison",
+        "rulesets",
+        "rule_trace",
+    ]
+    output = three_surfaces(
+        SPECS["fengshui_xuankong_natal"],
+        request(7, facing_degrees),
+        fields,
+        "2026-11-25T00:00:00Z",
+        tmp_path,
+        monkeypatch,
+        capsys,
+    )
+    natal = output["layers"]["xuankong_natal"]
+    assert [chart["chart_mode"] for chart in natal["candidates"]] == expected_modes
+    assert natal["status"] == ("complete" if len(expected_modes) == 1 else "partial")
+    rules = {record["ruleset_id"]: record for record in output["rulesets"]}
+    assert rules["xuankong_zhongzhou_v1"]["version"] == "1.4.0"
+    comparison = natal["source_comparison"]
+    assert comparison["ruleset"]["version"] == "2.0.0"
+    assert (
+        "2011年6月第1版、2016年2月第3次印刷"
+        in comparison["ruleset"]["sources"][0]["source_version"]
+    )
+    assert output["coverage"]["natal_source_comparison"] == comparison["summary"]
+    assert len(comparison["candidates"]) == len(expected_modes)
+    traces = {record["ruleset_id"]: record for record in output["rule_trace"]}
+    for ruleset_id in (
+        "xuankong_zhongzhou_v1",
+        "shen_2011_natal_numeric_comparison_v2",
+    ):
+        assert traces[ruleset_id]["version"] == rules[ruleset_id]["version"]
+        assert traces[ruleset_id]["source_ids"] == rules[ruleset_id]["source_ids"]
+    for chart, reference in zip(natal["candidates"], comparison["candidates"]):
+        assert chart["candidate_id"] == reference["candidate_id"]
+        assert reference["source_angle_applicability_verified"] is False
+        if chart["chart_mode"] == "lower":
+            assert chart["palaces"]["E"]["mountain_star_number"] == 2
+            assert reference["diagram"]["source_palaces"]["E"]["mountain"] == 5
+            assert reference["diagram"]["pdf_page"] == 353
+        else:
+            assert reference["source_section"]["source_id"] == "SRC1"
+            assert "申听禅" in reference["source_section"]["author"]
+            assert "prose" not in reference
 
 
 def test_packaged_corpus_contains_every_frozen_source_row_without_correction():
@@ -225,7 +325,10 @@ def test_packaged_source_cannot_be_silently_corrected_to_the_engine(
         source_comparison._bundle.cache_clear()
 
 
-@pytest.mark.parametrize("period,facing", [(7, 60), (4, 270), (9, 180), (7, 126)])
+@pytest.mark.parametrize(
+    "period,facing",
+    [(7, 60), (7, 64.5), (4, 270), (1, 90), (6, 315), (9, 180), (7, 126)],
+)
 @pytest.mark.parametrize("name", ["xuankong_natal", "assess"])
 def test_source_comparison_matches_actual_rest_mcp_cli(
     monkeypatch, tmp_path, capsys, period, facing, name
@@ -241,14 +344,29 @@ def test_source_comparison_matches_actual_rest_mcp_cli(
     async def call():
         async with Client(create_mcp_app()) as client:
             return await client.call_tool(
-                "fengshui_" + name, {**inputs, "response_char_limit": 0}
+                "fengshui_" + name,
+                {**inputs, "as_of": "2026-11-25T00:00:00Z", "response_char_limit": 0},
             )
 
-    response = rest_client(monkeypatch).post("/api/fengshui/" + name, json=inputs)
+    response = rest_client(monkeypatch).post(
+        "/api/fengshui/" + name,
+        json=inputs,
+        params={"as_of": "2026-11-25T00:00:00Z", "response_char_limit": 0},
+    )
     protocol = asyncio.run(call())
     path = tmp_path / "source-case.json"
     path.write_text(json.dumps(inputs, ensure_ascii=False))
-    code = run(["fengshui_" + name, "--request-file", str(path)])
+    code = run(
+        [
+            "fengshui_" + name,
+            "--request-file",
+            str(path),
+            "--as-of",
+            "2026-11-25T00:00:00Z",
+            "--response-char-limit",
+            "0",
+        ]
+    )
     cli = json.loads(capsys.readouterr().out)
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     assert (
