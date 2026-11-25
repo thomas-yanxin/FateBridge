@@ -203,8 +203,7 @@ def command_for(
         raise ValueError("Evidence-only models require a separate frozen MCP backend")
     else:
         pass
-    backend = backend_source if case.get("evidence_only_workspace") else workspace
-    assert backend is not None
+    backend = backend_source or workspace
     command = [
         cli,
         "exec",
@@ -315,27 +314,20 @@ def run_case(
             )
         else:
             pass
-        command = (
-            command_for(
-                cli,
-                workspace,
-                target,
-                case,
-                model,
-                source,
-                native_selection,
-                native_working_directory,
-            )
-            if case.get("evidence_only_workspace")
-            else command_for(
-                cli,
-                workspace,
-                target,
-                case,
-                model,
-                native_selection=native_selection,
-                native_working_directory=native_working_directory,
-            )
+        backend_source = (
+            source
+            if case.get("evidence_only_workspace") or case.get("capture_payloads")
+            else None
+        )
+        command = command_for(
+            cli,
+            workspace,
+            target,
+            case,
+            model,
+            backend_source,
+            native_selection,
+            native_working_directory,
         )
         with (
             (target / "events.jsonl").open("w", encoding="utf-8") as stdout,
@@ -809,12 +801,10 @@ def main() -> int:
             parser.error("Unknown case; available: " + ", ".join(sorted(known)))
         else:
             pass
+    if not cases:
+        parser.error("No evaluation cases selected")
     if any({"expected_skill", "expected_skill_sets"} & case.keys() for case in cases):
-        parser.error(
-            "Cases with retired skill requirements need their original evaluator"
-        )
-    else:
-        pass
+        parser.error("Cases with retired skill requirements are unsupported")
     cli = None if args.prepare_only else args.codex or resolve_codex_cli()["path"]
     output = args.output.expanduser().resolve()
     output.mkdir(parents=True, mode=0o700, exist_ok=False)
@@ -849,48 +839,6 @@ def main() -> int:
         frozen_manifest = source_manifest(source, extra_files=extra_files)
         if frozen_manifest != manifest:
             raise RuntimeError("Frozen source changed during reference preparation")
-        else:
-            pass
-        command = [
-            sys.executable,
-            str(source / "scripts/evaluate_agent.py"),
-            "--cases-file",
-            str(output / "case-dataset.json"),
-            "--output",
-            str(output / "model-run"),
-            "--timeout",
-            str(args.timeout),
-            "--stop-on-execution-failure",
-            "--native-environment",
-            str(output / "native-environment.json"),
-            "--native-environment-sha256",
-            native_sha256,
-        ]
-        for name in args.cases or []:
-            command.extend(["--case", name])
-        if external is not None:
-            command.extend(
-                ["--external-suite", args.external_suite, "--split", external["split"]]
-            )
-        else:
-            pass
-        if args.codex:
-            command.extend(["--codex", args.codex])
-        else:
-            pass
-        if args.model:
-            command.extend(["--model", args.model])
-        else:
-            pass
-        proposal = {
-            "command": command,
-            "cwd": str(source),
-            "environment": {"PYTHONPATH": str(source / "src")},
-            "requires_session_authorization_for_independent_model": True,
-        }
-        (output / "proposed-execution.json").write_text(
-            json.dumps(proposal, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
-        )
         report = {
             "scope": "Frozen preparation and real MCP reference capture only; not model evaluation",
             "selected_case_count": len(cases),

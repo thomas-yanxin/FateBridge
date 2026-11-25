@@ -53,9 +53,6 @@ ephe/
 .coverage
 .coverage.*
 htmlcov/
-/pytest-results.xml
-/nonuniform-reference-results.xml
-/resolved-dependencies.txt
 
 # Node modules (for frontend)
 node_modules/
@@ -185,7 +182,10 @@ docs/reviews/
 !/tests/fixtures/taiyi_dangshi_case_v41/freeze-original.json
 !/tests/fixtures/taiyi_dangshi_case_v41/collation.json
 
-# Generated CI evidence, kept as workflow artifacts rather than source.
+# Generated reports in the checkout root.
+/pytest-results.xml
+/nonuniform-reference-results.xml
+/resolved-dependencies.txt
 /ci-selection.json
 /cache-status.txt
 /ci-evidence/
@@ -391,3 +391,33 @@ docs/reviews/
 !/tests/data/house_coordinate_rounding_arb_v1/native-diagnostic-inputs.json
 !/tests/data/house_coordinate_rounding_arb_v1/provenance.json
 !/tests/data/house_coordinate_rounding_arb_v1/reference.jsonl.gz
+
+# Small, fixed inputs required by self-contained CI regressions.
+!/tests/data/bazi_dayun_calendar_carries_v1/reference.json.gz
+!/tests/data/bazi_dayun_calendar_carries_v1/reference.json.sha256
+!/tests/data/bazi_dayun_calendar_carries_v1/protocol.json
+!/tests/data/bazi_dayun_calendar_carries_v1/protocol.sha256
+!/tests/data/bazi_uncertainty_events_v1/reference.json.gz
+!/tests/data/bazi_uncertainty_events_v1/reference.json.sha256
+!/tests/data/bazi_uncertainty_events_v1/protocol.json
+!/tests/data/bazi_uncertainty_events_v1/protocol.sha256
+!/tests/data/astrodice/tables/de441-j2000.eph
+!/tests/data/astrodice/tables/de441-j2000.provenance.json
+!/tests/fixtures/guolao-native-jie-month-v1/reference-before-implementation.json
+!/tests/fixtures/guolao-native-lunar-date-v1/reference-before-implementation.json
+!/tests/fixtures/heluo_solar_context_v1/reference.json
+!/tests/fixtures/ren_calendar_guard_v1/reference.json
+!/tests/fixtures/ren_calendar_guard_v1/protocol.json
+!/tests/fixtures/ren_calendar_guard_v1/freeze.json
+!/tests/fixtures/meihua_civil_clock_v1/cases.json
+!/tests/fixtures/meihua_civil_clock_v1/manifest.json
+!/tests/fixtures/meihua_civil_clock_v1/source-scope.json
+!/tests/fixtures/meihua_civil_clock_v1/source-line-locator-amendment.json
+!/tests/fixtures/meihua_civil_clock_v1/historical-fold-supplement.json
+!/tests/fixtures/meihua_civil_clock_v1/historical-fold-supplement-lock.json
+!/tests/fixtures/meihua_civil_clock_v1/sources/asia
+!/tests/fixtures/meihua_civil_clock_v1/sources/australasia
+!/tests/fixtures/meihua_civil_clock_v1/sources/northamerica
+!/tests/fixtures/meihua_civil_clock_v1/sources/version
+!/tests/fixtures/western-returns-horizons.json
+!/tests/fixtures/western-ptolemy-fortune-robbins-1940.json

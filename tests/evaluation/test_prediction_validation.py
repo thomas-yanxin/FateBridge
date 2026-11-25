@@ -1,7 +1,11 @@
 """Hand-computed metrics, leakage counterexamples, and same-run quotations."""
 
+import json
+import subprocess
+import sys
 from copy import deepcopy
 from datetime import datetime
+from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
@@ -19,6 +23,64 @@ def test_empty_study_cannot_report_perfect_performance_or_authority() -> None:
     assert r["coverage"] == 0
     assert r["real_world_efficacy"] == "not_tested"
     assert not r["authority_certified"] and not r["preregistered_performance_gate_met"]
+
+
+@pytest.mark.parametrize(
+    "input_name,key,replacement,diagnostic",
+    [
+        ("forecasts", None, "{}", "Input should be a valid list"),
+        ("outcomes", None, "{}", "Input should be a valid list"),
+        (
+            "plan",
+            '"baseline_probability": 0.5',
+            '"baseline_probability": 0.4',
+            "Duplicate JSON member: baseline_probability",
+        ),
+        (
+            "forecasts",
+            '"probability": 1.0',
+            '"probability": 0.0',
+            "Duplicate JSON member: probability",
+        ),
+        (
+            "outcomes",
+            '"occurred": true',
+            '"occurred": false',
+            "Duplicate JSON member: occurred",
+        ),
+    ],
+)
+def test_study_cli_rejects_ambiguous_json(
+    tmp_path: Path, input_name: str, key: str | None, replacement: str, diagnostic: str
+) -> None:
+    root = Path(__file__).resolve().parents[2]
+    registered = plan()
+    inputs = {
+        "plan": registered.model_dump(mode="json"),
+        "forecasts": [forecast(0, 1.0, registered=registered).model_dump(mode="json")],
+        "outcomes": [outcome(0, True, registered=registered).model_dump(mode="json")],
+    }
+    command = [sys.executable, "-m", "scripts.evaluation.audit_prediction_study"]
+    for name, document in inputs.items():
+        content = json.dumps(document)
+        if name == input_name:
+            if key is None:
+                content = replacement
+            else:
+                assert key in content
+                content = content.replace(key, f"{replacement}, {key}", 1)
+        path = tmp_path / f"{name}.json"
+        path.write_text(content, encoding="utf-8")
+        command.extend([f"--{name}", str(path)])
+    output = tmp_path / "report.json"
+    command.extend(["--as-of", AS_OF.isoformat(), "--output", str(output)])
+
+    result = subprocess.run(
+        command, capture_output=True, cwd=root, text=True, timeout=30
+    )
+    assert result.returncode != 0
+    assert diagnostic in result.stderr
+    assert not output.exists()
 
 
 def test_metrics_match_hand_calculation_and_frozen_baseline() -> None:

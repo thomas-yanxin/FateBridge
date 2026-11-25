@@ -17,9 +17,9 @@ OLD_KEYS = (
 )
 OLD_METHOD = "evaluation_native_environment_v1"
 OLD_CONTEXT = "evaluation_native_environment_with_working_directory_v2"
-NEW_METHOD = "evaluation_native_environment_with_optional_sources_v3"
+NEW_METHOD = "evaluation_native_environment_with_optional_sources_v4"
 NEW_CONTEXT = (
-    "evaluation_native_environment_with_optional_sources_and_working_directory_v4"
+    "evaluation_native_environment_with_optional_sources_and_working_directory_v5"
 )
 VSOP = "FATEBRIDGE_VSOP2013_MANIFEST"
 AA = "FATEBRIDGE_AA1996_MANIFEST"
