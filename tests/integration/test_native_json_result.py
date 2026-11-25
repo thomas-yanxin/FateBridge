@@ -18,7 +18,9 @@ def wire_roundtrip(value):
     return execution.decode_result(json.loads(raw)["value"]), raw
 
 
-def test_finite_json_result_preserves_colliding_tags_unicode_and_numeric_types():
+def test_finite_json_result_preserves_colliding_tags_unicode_and_numeric_types() -> (
+    None
+):
     value = {
         "map": ["datetime", "not a protocol date", None, 0],
         "json_tree_v1": {"birth": [1, 2]},
@@ -34,17 +36,19 @@ def test_finite_json_result_preserves_colliding_tags_unicode_and_numeric_types()
         assert type(actual) is type(original)
         if type(original) is float:
             assert struct.pack(">d", actual) == struct.pack(">d", original)
+        else:
+            pass
     assert isinstance(result["map"], list)
 
 
-def test_current_typed_result_preserves_tuple_and_datetime():
+def test_current_typed_result_preserves_tuple_and_datetime() -> None:
     value = {"nested": [(1, 2), datetime(2000, 1, 1, tzinfo=timezone.utc)]}
     assert execution.encode_result(value) == [MODE, "typed", execution.encode(value)]
     result, _ = wire_roundtrip(value)
     assert result == value and type(result["nested"][0]) is tuple
 
 
-def test_non_json_trees_do_not_erase_tuple_dates_or_nonstring_keys():
+def test_non_json_trees_do_not_erase_tuple_dates_or_nonstring_keys() -> None:
     value = {1: ("a", datetime(2000, 1, 1, tzinfo=timezone.utc)), "1": [True, None]}
     assert execution.encode_result(value) == [MODE, "typed", execution.encode(value)]
     result, _ = wire_roundtrip(value)
@@ -56,7 +60,7 @@ def test_non_json_trees_do_not_erase_tuple_dates_or_nonstring_keys():
     "bad",
     [float("nan"), float("inf"), float("-inf"), (1, 2), {1: 2}, datetime(2000, 1, 1)],
 )
-def test_json_tag_cannot_smuggle_non_json_or_nonfinite_values(bad):
+def test_json_tag_cannot_smuggle_non_json_or_nonfinite_values(bad) -> None:
     with pytest.raises(
         execution.NativeExecutionError, match="Invalid native JSON tree"
     ):
@@ -74,12 +78,14 @@ def test_json_tag_cannot_smuggle_non_json_or_nonfinite_values(bad):
         [MODE, "invented", {"a": 1}],
     ],
 )
-def test_result_requires_the_current_explicit_envelope(invalid):
+def test_result_requires_the_current_explicit_envelope(invalid) -> None:
     with pytest.raises(execution.NativeExecutionError, match="Invalid native result"):
         execution.decode_result(invalid)
 
 
-def test_plain_json_result_cannot_bypass_the_same_message_bound(monkeypatch):
+def test_plain_json_result_cannot_bypass_the_same_message_bound(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setattr(execution, "_MAX_MESSAGE", 128)
     with pytest.raises(execution.NativeExecutionError, match="exceeds limit"):
         execution.message_bytes(
@@ -87,7 +93,7 @@ def test_plain_json_result_cannot_bypass_the_same_message_bound(monkeypatch):
         )
 
 
-def test_current_json_tree_keeps_values_under_the_same_64mib_message_bound():
+def test_current_json_tree_keeps_values_under_the_same_64mib_message_bound() -> None:
     # Repeated ordinary structured business rows inflate the typed envelope.
     # Keep the actual 64MiB budget: no recorded message or previous wire size.
     row = {"longitude": 1.25, "latitude": -0.0, "body": "Sun", "flags": 258}

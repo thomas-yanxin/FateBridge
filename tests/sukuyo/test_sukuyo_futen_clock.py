@@ -5,16 +5,16 @@ from fractions import Fraction
 
 import pytest
 
-from fatebridge.core.sukuyo import calendar_mansion, day_evidence
-from fatebridge.core.sukuyo_futen_clock import (
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence
+from fatebridge.core.sukuyo.sukuyo_futen_clock import (
     FUTEN,
     SENMYO,
     decode_clock,
     futen_clock_lines,
     futen_clock_reference,
 )
-from tests.sukuyo.test_sukuyo_transports import (
-    test_calendar_and_relations_across_all_real_transports as run_transport_check,
+from tests.unit_test.fixtures.sukuyo_transports import (
+    assert_sukuyo_transport_parity as run_transport_check,
 )
 
 
@@ -22,7 +22,7 @@ def ratio(value):
     return Fraction(value["numerator"], value["denominator"])
 
 
-def test_all_three_published_points_and_both_models_keep_exact_residuals():
+def test_all_three_published_points_and_both_models_keep_exact_residuals() -> None:
     reference = futen_clock_reference()
     points = reference["selected_point_comparisons"]
     assert [r["literal"] for r in points] == ["未6刻31分", "酉初刻6分", "戌2刻26分"]
@@ -67,7 +67,9 @@ def test_all_three_published_points_and_both_models_keep_exact_residuals():
     assert not interval["source_asymmetry_removed"]
 
 
-def test_explicit_clock_origin_preserves_previous_nominal_day_and_exact_boundary():
+def test_explicit_clock_origin_preserves_previous_nominal_day_and_exact_boundary() -> (
+    None
+):
     first = decode_clock("子初刻0分", model=FUTEN)
     assert first["nominal_day_shift"] == -1
     assert ratio(first["nominal_day_fraction_from_selected_origin"]) == Fraction(-1, 24)
@@ -105,12 +107,14 @@ def test_explicit_clock_origin_preserves_previous_nominal_day_and_exact_boundary
         ("guessed_1240", "未6刻31分"),
     ],
 )
-def test_unknown_model_or_ambiguous_and_overflow_clock_is_rejected(model, literal):
+def test_unknown_model_or_ambiguous_and_overflow_clock_is_rejected(
+    model, literal: str | None
+) -> None:
     with pytest.raises(ValueError):
         decode_clock(literal, model=model)
 
 
-def test_same_named_units_and_returned_source_are_not_collapsed_or_mutable():
+def test_same_named_units_and_returned_source_are_not_collapsed_or_mutable() -> None:
     expected = futen_clock_reference()
     actual = futen_clock_reference()
     actual["models"][0]["day_units"] = 8400
@@ -148,8 +152,8 @@ def test_same_named_units_and_returned_source_are_not_collapsed_or_mutable():
     ],
 )
 def test_unprovided_half_and_resolved_nonallocation_day_are_both_explained(
-    date, basis, mansion
-):
+    date: str, basis: str, mansion: str
+) -> None:
     calendar = calendar_mansion(
         date,
         "00:30:00",
@@ -166,7 +170,9 @@ def test_unprovided_half_and_resolved_nonallocation_day_are_both_explained(
 
 
 @pytest.mark.parametrize("date", ["1010-04-12", "0820-03-22"])
-def test_source_overlap_claim_carries_two_named_provider_bibliographies(date):
+def test_source_overlap_claim_carries_two_named_provider_bibliographies(
+    date: str,
+) -> None:
     calendar = calendar_mansion(
         date,
         "00:30:00",
@@ -198,8 +204,8 @@ def test_source_overlap_claim_carries_two_named_provider_bibliographies(date):
     ],
 )
 def test_static_historical_points_do_not_change_current_calendar_or_choose_half(
-    date, basis, half
-):
+    date: str, basis: str, half: str | None
+) -> None:
     calendar = calendar_mansion(
         date,
         "05:45:00",
@@ -227,13 +233,15 @@ def test_static_historical_points_do_not_change_current_calendar_or_choose_half(
         assert calendar["candidate_su27s"] == ["星", "鬼"]
     elif date == "2055-07-24":
         assert calendar["natal_su27"] == "鬼"
+    else:
+        pass
     assert "三个时点均保留" in evidence["reading_text"]
 
 
 @pytest.mark.parametrize("date", ["2026-10-24", "2036-07-23"])
 def test_full_reference_and_native_explanation_across_rest_native_mcp_cli(
-    monkeypatch, capsys, date
-):
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], date: str
+) -> None:
     run_transport_check(
         monkeypatch,
         capsys,

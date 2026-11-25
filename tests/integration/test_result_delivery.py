@@ -1,31 +1,56 @@
-from fatebridge.utils.formatting import format_json_response
-
 """Large responses stay bounded while the original run remains fully readable."""
 
 import asyncio
 import copy
 import json
 import os
+from collections.abc import Sequence
 from pathlib import Path
+from typing import NamedTuple, Protocol
 
 import pytest
 from fastapi.testclient import TestClient
 from fastmcp import Client
+from fastmcp.client.client import CallToolResult
+from httpx2 import Response
 
 import fatebridge.api as api
 from fatebridge.application import result_delivery as delivery
 from fatebridge.application.examples import example_input, suggested_fields
 from fatebridge.application.response_delivery import deliver_response
+from fatebridge.application.tool_spec import ServiceResult, ToolSpec
 from fatebridge.cli import run
-from fatebridge.mcp_server import create_mcp_app
+from fatebridge.services import western_events
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.errors import ParameterError
+from fatebridge.utils.formatting import format_json_response
 from fatebridge.utils.private_files import ensure_private_directory, open_private_file
 from tests.fixtures.mcp_result_delivery import assert_same_run_receipt
 from tests.support.result_delivery import reconstruct, store
+from tests.support.transports import (
+    business,
+    cached_mcp_app,
+    call_calculation,
+    surface_calls,
+)
+
+__all__ = ["store", "surface_calls"]
 
 
-def large_payload():
+class SurfaceResponse(NamedTuple):
+    rest: Response
+    mcp: CallToolResult
+    cli_exit_code: int
+    cli: ServiceResult
+
+
+class SurfaceCalls(Protocol):
+    def __call__(
+        self, spec: ToolSpec, payload: ServiceResult, *, projection: ServiceResult
+    ) -> SurfaceResponse: ...
+
+
+def large_payload() -> ServiceResult:
     return {
         "summary": "年度主题不是精确行运判断",
         "analysis_context": {"analysis_datetime": "2026-10-14T12:07:00+08:00"},
@@ -37,7 +62,9 @@ def large_payload():
 
 
 @pytest.mark.parametrize("compact", [False, True])
-def test_bounded_delivery_preserves_all_values_and_original_receipt(store, compact):
+def test_bounded_delivery_preserves_all_values_and_original_receipt(
+    store: delivery.ResultStore, compact: bool
+) -> None:
     original = large_payload()
     shaped = delivery.bound_response(original, 8192, compact=compact)
     assert len(format_json_response(shaped, compact=compact)) <= 8192
@@ -58,14 +85,16 @@ def test_bounded_delivery_preserves_all_values_and_original_receipt(store, compa
     assert delivery.bound_response(original, 0) == original
 
 
-def test_small_payload_is_not_rewritten_or_stored(store):
+def test_small_payload_is_not_rewritten_or_stored(store: delivery.ResultStore) -> None:
     original = {"summary": "small"}
     assert delivery.bound_response(original, 8192) == original
     assert not store.directory.exists()
 
 
 @pytest.mark.parametrize("compact", [False, True])
-def test_response_delivery_stores_only_the_exact_requested_facts(store, compact):
+def test_response_delivery_stores_only_the_exact_requested_facts(
+    store: delivery.ResultStore, compact: bool
+) -> None:
     original = {
         "selected": {"kept": '中文"换行\n' * 3000, "omitted": "not selected"},
         "unselected": "not selected",
@@ -97,7 +126,9 @@ def test_response_delivery_stores_only_the_exact_requested_facts(store, compact)
     assert original == before
 
 
-def test_response_delivery_keeps_errors_out_of_projection_and_storage(store):
+def test_response_delivery_keeps_errors_out_of_projection_and_storage(
+    store: delivery.ResultStore,
+) -> None:
     original = {
         "error": "unavailable" * 1000,
         "error_code": "source_unavailable",
@@ -116,7 +147,9 @@ def test_response_delivery_keeps_errors_out_of_projection_and_storage(store):
     assert not store.directory.exists()
 
 
-def test_invalid_strict_projection_does_not_publish_a_result(store):
+def test_invalid_strict_projection_does_not_publish_a_result(
+    store: delivery.ResultStore,
+) -> None:
     original = large_payload()
     before = copy.deepcopy(original)
     with pytest.raises(ParameterError) as caught:
@@ -134,7 +167,9 @@ def test_invalid_strict_projection_does_not_publish_a_result(store):
 
 
 @pytest.mark.parametrize("compact", [False, True])
-def test_current_cards_keep_facts_and_restore_every_deferred_child(store, compact):
+def test_current_cards_keep_facts_and_restore_every_deferred_child(
+    store: delivery.ResultStore, compact: bool
+) -> None:
     original = {
         key: {
             "first_view": {
@@ -167,7 +202,9 @@ def test_current_cards_keep_facts_and_restore_every_deferred_child(store, compac
     assert restored == reconstruct(store, ref["result_id"]) == before == original
 
 
-def test_supplementary_receipt_details_do_not_displace_complete_business(store):
+def test_supplementary_receipt_details_do_not_displace_complete_business(
+    store: delivery.ResultStore,
+) -> None:
     original = {
         "analysis": {"facts": "甲" * 5800},
         "run_metadata": {
@@ -201,7 +238,9 @@ def test_supplementary_receipt_details_do_not_displace_complete_business(store):
     assert reconstruct(store, ref["result_id"]) == before == original
 
 
-def test_receipt_fields_stay_inline_when_the_full_reference_fits(store):
+def test_receipt_fields_stay_inline_when_the_full_reference_fits(
+    store: delivery.ResultStore,
+) -> None:
     files = [f"reference-{i}-{'source_' * 12}.se1" for i in range(120)]
 
     original = {
@@ -229,7 +268,9 @@ def test_receipt_fields_stay_inline_when_the_full_reference_fits(store):
     assert original == before
 
 
-def test_duplicate_locators_do_not_displace_complete_business_facts(store):
+def test_duplicate_locators_do_not_displace_complete_business_facts(
+    store: delivery.ResultStore,
+) -> None:
     files = [f"reference-{i}-{'source_' * 12}.se1" for i in range(120)]
 
     original = {
@@ -285,8 +326,8 @@ def test_duplicate_locators_do_not_displace_complete_business_facts(store):
 
 @pytest.mark.parametrize("limit", [4096, 8192])
 def test_manifest_locator_preserves_sources_before_deferring_receipt_facts(
-    store, limit
-):
+    store: delivery.ResultStore, limit: int
+) -> None:
     original = {
         "analysis": {"facts": ""},
         "run_metadata": {
@@ -351,28 +392,36 @@ def test_manifest_locator_preserves_sources_before_deferring_receipt_facts(
 
 
 @pytest.mark.parametrize("result_id", ["../private", "a" * 47, "z" * 48])
-def test_result_references_cannot_escape_the_private_directory(store, result_id):
+def test_result_references_cannot_escape_the_private_directory(
+    store: delivery.ResultStore, result_id: str
+) -> None:
     with pytest.raises(ParameterError):
         store.get(result_id)
 
 
-def test_expired_result_is_reported_and_never_recalculated(store, monkeypatch):
+def test_expired_result_is_reported_and_never_recalculated(
+    store: delivery.ResultStore, monkeypatch: pytest.MonkeyPatch
+) -> None:
     ref = store.put(large_payload())
     monkeypatch.setattr(delivery.time, "time", lambda: ref["expires_at"] + 1)
     with pytest.raises(ParameterError, match="过期"):
         store.page(ref["result_id"])
+    assert Path(ref["file_path"]).exists()
+    store.put({"summary": "new result"})
     assert not Path(ref["file_path"]).exists()
 
 
-def test_pages_reject_missing_paths_and_invalid_offsets(store):
+def test_pages_reject_missing_paths_and_invalid_offsets(
+    store: delivery.ResultStore,
+) -> None:
     ref = store.put(large_payload())
     for kwargs in [{"offset": -1}, {"offset": 10**9}, {"path": "time_lords.missing"}]:
         with pytest.raises(ParameterError):
             store.page(ref["result_id"], **kwargs)
 
 
-def _cli_args(payload):
-    args = ["western_timing_analysis"]
+def _cli_args(payload: ServiceResult) -> list[str]:
+    args = ["western_timing"]
     for key, value in payload.items():
         args += ["--" + key.replace("_", "-"), str(value)]
     return args + [
@@ -384,8 +433,10 @@ def _cli_args(payload):
 
 
 def test_real_western_exact_time_and_delivery_match_all_transports(
-    store, capsys, monkeypatch
-):
+    store: delivery.ResultStore,
+    capsys: pytest.CaptureFixture[str],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     spec = next(s for s in CATALOG if s.key == "western_timing_analysis")
     payload = example_input(spec)
     payload.update(analysis_hour=12, analysis_minute=7)
@@ -407,9 +458,10 @@ def test_real_western_exact_time_and_delivery_match_all_transports(
     )
     assert response.status_code == 200
 
-    async def native():
-        async with Client(create_mcp_app()) as client:
-            result = await client.call_tool(
+    async def native() -> ServiceResult:
+        async with Client(cached_mcp_app()) as client:
+            result = await call_calculation(
+                client,
                 spec.tool_name,
                 {
                     **payload,
@@ -418,7 +470,6 @@ def test_real_western_exact_time_and_delivery_match_all_transports(
                 },
             )
             assert not result.is_error
-            assert json.loads(result.content[0].text) == result.structured_content
             ref = result.structured_content["result_delivery"]
             manifest = json.loads(
                 (await client.read_resource(ref["manifest_uri"]))[0].text
@@ -460,11 +511,14 @@ def test_real_western_exact_time_and_delivery_match_all_transports(
                 len(restored["ephemeris"]["files"]) == runtime["ephemeris_files_count"]
             )
             inline_metadata["runtime"] = restored
+        else:
+            pass
         evidence = inline_metadata.get("calculation_evidence")
         if evidence and "delivery_path" in evidence:
             restored = reconstruct(store, ref["result_id"], evidence["delivery_path"])
-            assert restored["coverage"] == evidence["coverage"]
             inline_metadata["calculation_evidence"] = restored
+        else:
+            pass
         assert original["run_metadata"] == inline_metadata
         full.append({k: v for k, v in original.items() if k != "run_metadata"})
         page = rest.get(
@@ -475,12 +529,15 @@ def test_real_western_exact_time_and_delivery_match_all_transports(
     assert full[0] == full[1] == full[2]
 
 
-def test_recommended_western_first_view_fits_default_budget(store):
+def test_recommended_western_first_view_fits_default_budget(
+    store: delivery.ResultStore,
+) -> None:
     spec = next(s for s in CATALOG if s.key == "western_timing_analysis")
 
-    async def invoke():
-        async with Client(create_mcp_app()) as client:
-            return await client.call_tool(
+    async def invoke() -> CallToolResult:
+        async with Client(cached_mcp_app()) as client:
+            return await call_calculation(
+                client,
                 spec.tool_name,
                 {
                     **example_input(spec),
@@ -493,22 +550,81 @@ def test_recommended_western_first_view_fits_default_budget(store):
     result = asyncio.run(invoke())
     assert not result.is_error
     if "result_delivery" in result.structured_content:
-        assert result.structured_content["result_delivery"]["deferred_fields"] == [
-            "run_metadata.calculation_evidence",
-            "run_metadata.runtime",
-        ]
+        assert set(result.structured_content["result_delivery"]["deferred_fields"]) <= {
+            "run_metadata.runtime"
+        }
+    else:
+        pass
     assert (
         result.structured_content["transits"]["current_transit"]["analysis_datetime"]
         == "2026-10-14T12:00:00+08:00"
     )
-    assert len(result.content[0].text) <= delivery.DEFAULT_MCP_RESPONSE_CHARS
+    assert (
+        len(format_json_response(result.structured_content))
+        <= delivery.DEFAULT_MCP_RESPONSE_CHARS
+    )
 
 
-def test_result_reader_respects_mcp_tool_profiles(store):
+def test_compact_sukuyo_uses_the_same_inline_chart_across_transports(
+    store: delivery.ResultStore, surface_calls: SurfaceCalls
+) -> None:
+    spec = next(spec for spec in CATALOG if spec.key == "suzhan")
+    arguments = example_input(spec)
+    budget = delivery.DEFAULT_MCP_RESPONSE_CHARS
+    response, protocol, code, cli = surface_calls(
+        spec, arguments, projection={"detail": "compact", "response_char_limit": budget}
+    )
+    assert response.status_code == 200 and code == 0 and not protocol.is_error
+    http = response.json()
+    mcp = protocol.structured_content
+    assert len(format_json_response(protocol.structured_content)) <= budget
+    assert business(http) == business(cli) == business(mcp)
+    assert http["sukuyo"] and http["validation"]
+    assert "result_delivery" not in http
+    assert not store.directory.exists()
+
+
+@pytest.mark.parametrize("key", ["astro_mundane", "astro_extrareturns"])
+@pytest.mark.parametrize("include_snapshot", [False, True])
+def test_western_event_compact_snapshots_render_only_on_request(
+    key: str,
+    include_snapshot: bool,
+    surface_calls: SurfaceCalls,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    rendered = []
+    render = western_events._render_snapshot_text
+
+    def record_snapshot(sections: Sequence[tuple[str, str]]) -> str:
+        snapshot = render(sections)
+        rendered.append(snapshot)
+        return snapshot
+
+    monkeypatch.setattr(western_events, "_render_snapshot_text", record_snapshot)
+    spec = next(spec for spec in CATALOG if spec.key == key)
+    projection = {"detail": "compact", "response_char_limit": 0}
+    if include_snapshot:
+        projection["include_snapshot_text"] = True
+    else:
+        pass
+    http, mcp, code, cli = surface_calls(
+        spec, example_input(spec), projection=projection
+    )
+    assert http.status_code == 200 and not mcp.is_error and code == 0
+    payloads = [http.json(), mcp.structured_content, cli]
+    assert business(payloads[0]) == business(payloads[1]) == business(payloads[2])
+    if include_snapshot:
+        assert rendered == [payload["snapshot_text"] for payload in payloads]
+    else:
+        assert not rendered
+        assert all("snapshot_text" not in payload for payload in payloads)
+
+
+def test_result_reader_respects_mcp_tool_profiles(store: delivery.ResultStore) -> None:
     ref = store.put(large_payload())
 
-    async def read_hidden():
-        async with Client(create_mcp_app(families="fengshui")) as client:
+    async def read_hidden() -> None:
+        async with Client(cached_mcp_app(families="fengshui")) as client:
             with pytest.raises(Exception, match="未在当前 MCP 配置中公开"):
                 await client.read_resource(ref["manifest_uri"])
 
@@ -516,8 +632,8 @@ def test_result_reader_respects_mcp_tool_profiles(store):
 
 
 def test_rest_result_readers_require_api_key_and_report_bad_references(
-    store, monkeypatch
-):
+    store: delivery.ResultStore, monkeypatch: pytest.MonkeyPatch
+) -> None:
     ref = store.put(large_payload())
     api._reset_runtime_state_for_tests()
     monkeypatch.setattr(

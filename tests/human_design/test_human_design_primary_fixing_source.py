@@ -6,12 +6,12 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.validation import human_design_primary_fixing as checks
+from validation import human_design_primary_fixing as checks
 
 ROOT = Path(__file__).resolve().parents[2]
 
 
-def test_bounded_written_facts_and_disclosed_examples_match():
+def test_bounded_written_facts_and_disclosed_examples_match() -> None:
     result = checks.primary_fixing_checks(ROOT)
     assert result["source_fact_count"] == result["source_facts_matched"] == 2
     assert result["case_count"] == result["cases_matched"] == 14
@@ -23,7 +23,7 @@ def test_bounded_written_facts_and_disclosed_examples_match():
     assert result["authority_certified"] is False
 
 
-def test_written_moon_example_does_not_delete_original_additional_venus():
+def test_written_moon_example_does_not_delete_original_additional_venus() -> None:
     result = checks.primary_fixing_checks(ROOT)
     fact = next(r for r in result["source_facts"] if r["role"] == "exaltation")
     assert fact["computed_planet_set"] == ["Moon", "Venus"]
@@ -40,7 +40,9 @@ def test_written_moon_example_does_not_delete_original_additional_venus():
         )
 
 
-def test_wrong_derived_state_keeps_the_failed_case_and_all_other_rows(monkeypatch):
+def test_wrong_derived_state_keeps_the_failed_case_and_all_other_rows(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     original = checks.line_fixings
 
     def corrupt(activations):
@@ -48,6 +50,8 @@ def test_wrong_derived_state_keeps_the_failed_case_and_all_other_rows(monkeypatc
         for row in rows:
             if row["body"] == "Moon" and row["gate"] == 11 and row["line"] == 4:
                 row["fixing_state"] = "unfixed"
+            else:
+                pass
         return rows
 
     monkeypatch.setattr(checks, "line_fixings", corrupt)
@@ -61,7 +65,9 @@ def test_wrong_derived_state_keeps_the_failed_case_and_all_other_rows(monkeypatc
 
 
 @pytest.mark.parametrize("mutation", ["delete_failed_row", "change_expected_state"])
-def test_frozen_reference_cannot_be_narrowed_or_relabelled(tmp_path, mutation):
+def test_frozen_reference_cannot_be_narrowed_or_relabelled(
+    tmp_path: Path, mutation: str
+) -> None:
     value = deepcopy(json.loads((ROOT / checks.FIXTURE).read_text()))
     if mutation == "delete_failed_row":
         value["cases"].pop(0)

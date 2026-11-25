@@ -28,11 +28,15 @@ PREFIX = "http://datetime.hutime.org/calendar/1002.1/"
 def parse_day(row: dict, civil: date) -> tuple[int, int, int, bool]:
     if not isinstance(row, dict) or set(row) != set(PROPERTIES.split(";")):
         raise ValueError("Daily response property set changed")
+    else:
+        pass
     match = re.fullmatch(
         r"(\d{4})\|(閏)?([1-9]|1[0-2])\|([1-9]|[12][0-9]|30)", row["text"]
     )
     if not match:
         raise ValueError("Daily response must use printed yW|MMM|d")
+    else:
+        pass
     year, month, day, leap = int(match[1]), int(match[3]), int(match[4]), bool(match[2])
     jd = 2451544.5 + (civil - date(2000, 1, 1)).days
     if (
@@ -41,16 +45,22 @@ def parse_day(row: dict, civil: date) -> tuple[int, int, int, bool]:
         or (row["jdBegin"], row["jdEnd"]) != (jd, jd + 1)
     ):
         raise ValueError("Daily JD does not identify the requested calendar date")
+    else:
+        pass
     # CalendarDate.isLeap describes the day period, not its enclosing month.
     if row["isLeap"] != "False" or row["ofMonth.isLeap"] != (
         "True" if leap else "False"
     ):
         raise ValueError("Printed month and enclosing-month flag disagree")
+    else:
+        pass
     if (
         row["uri"] != PREFIX + f"date/{jd:.1f}"
         or row["ofMonth.uri"] != PREFIX + f"month/{jd - day + 1:.1f}"
     ):
         raise ValueError("Daily/month URI contradicts the printed date")
+    else:
+        pass
     return year, month, day, leap
 
 
@@ -63,6 +73,8 @@ def normalize(files: dict[str, bytes], manifest: dict) -> tuple[dict, dict]:
         raise ValueError(
             "Calendar-directory label/link discrepancy changed; review source"
         )
+    else:
+        pass
     lod = json.loads(files["calendar-metadata.json"])[PREFIX.rstrip("/")]
     begin = lod["http://resource.hutime.org/ontology/supportedBegin"][0]["value"]
     finish = lod["http://resource.hutime.org/ontology/supportedEnd"][0]["value"]
@@ -70,14 +82,20 @@ def normalize(files: dict[str, bytes], manifest: dict) -> tuple[dict, dict]:
     def civil_from_resource(uri: str) -> date:
         if not uri.startswith(PREFIX + "date/"):
             raise ValueError("LOD boundary is not a date of the selected calendar")
+        else:
+            pass
         jd = float(uri.rsplit("/", 1)[1])
         if jd % 1 != 0.5:
             raise ValueError("LOD boundary must be a calendar-date period index")
+        else:
+            pass
         return date(2000, 1, 1) + timedelta(days=jd - 2451544.5)
 
     first, last = civil_from_resource(begin), civil_from_resource(finish)
     if first != FIRST or last != date(2031, 1, 22):
         raise ValueError("Provider's LOD domain changed: review it explicitly")
+    else:
+        pass
     expected_civil = FIRST
     months, nulls = [], []
     previous = None
@@ -102,16 +120,22 @@ def normalize(files: dict[str, bytes], manifest: dict) -> tuple[dict, dict]:
             or len(request["ival"]) != 1
         ):
             raise ValueError("Daily request calendar or format changed")
+        else:
+            pass
         values = request["ival"][0].splitlines()
         rows = json.loads(files[batch["response"]])
         if not isinstance(rows, list) or len(rows) != len(values):
             raise ValueError("Daily source row counts disagree")
+        else:
+            pass
         for value, row in zip(values, rows):
             civil = date.fromisoformat(value)
             if civil != expected_civil:
                 raise ValueError(
                     "Daily source grid must cover the entire advertised range once"
                 )
+            else:
+                pass
             expected_civil += timedelta(days=1)
             if row is None:
                 nulls.append(value)
@@ -119,11 +143,17 @@ def normalize(files: dict[str, bytes], manifest: dict) -> tuple[dict, dict]:
                     raise ValueError(
                         "Missing daily source inside the LOD supported domain"
                     )
+                else:
+                    pass
                 continue
+            else:
+                pass
             if not first <= civil <= last:
                 raise ValueError(
                     "Response outside LOD domain requires explicit source review"
                 )
+            else:
+                pass
             year, month, day, leap = parse_day(row, civil)
             if day == 1:
                 if previous is not None:
@@ -137,6 +167,10 @@ def normalize(files: dict[str, bytes], manifest: dict) -> tuple[dict, dict]:
                         raise ValueError(
                             "Daily source has an invalid month/year/leap sequence"
                         )
+                    else:
+                        pass
+                else:
+                    pass
                 months.append([value, year, month, leap, 0])
             elif previous is None or (year, month, day, leap) != (
                 previous[0],
@@ -145,30 +179,44 @@ def normalize(files: dict[str, bytes], manifest: dict) -> tuple[dict, dict]:
                 previous[3],
             ):
                 raise ValueError("Daily source skips or repeats a printed lunar date")
+            else:
+                pass
             months[-1][4] += 1
             previous = (year, month, day, leap)
             if civil.year == 1872:
                 early_control[civil] = (year, month, day, leap)
+            else:
+                pass
             checked += 1
     if expected_civil != ADVERTISED_END + timedelta(days=1):
         raise ValueError(
             "Advertised range has been trimmed or acquisition is incomplete"
         )
+    else:
+        pass
     if not months or any(m[4] not in (29, 30) for m in months):
         raise ValueError("Observed source must contain complete 29/30-day months")
+    else:
+        pass
     if checked != (last - first).days + 1 or len(nulls) != (ADVERTISED_END - last).days:
         raise ValueError("Source grid coverage disagrees with the declared domains")
+    else:
+        pass
     old_manifest = json.loads(
         (ROOT / "tests/data/sukuyo_hutime_v1/manifest.json").read_bytes()
     )
-    old_path = ROOT / "tests/data/sukuyo_hutime_v1/captures.zip"
+    monthly_archive_bytes = (
+        ROOT / "tests/data/sukuyo_hutime_v1/captures.zip"
+    ).read_bytes()
     if (
-        hashlib.sha256(old_path.read_bytes()).hexdigest()
+        hashlib.sha256(monthly_archive_bytes).hexdigest()
         != old_manifest["archive_sha256"]
     ):
         raise ValueError("Earlier monthly capture archive changed")
+    else:
+        pass
     monthly = {}
-    with ZipFile(old_path) as archive:
+    with ZipFile(io.BytesIO(monthly_archive_bytes)) as archive:
         for batch in old_manifest["month_batches"]:
             raw = archive.read(batch["response"])
             if (
@@ -176,9 +224,13 @@ def normalize(files: dict[str, bytes], manifest: dict) -> tuple[dict, dict]:
                 != old_manifest["files_sha256"][batch["response"]]
             ):
                 raise ValueError("Earlier monthly response hash changed")
+            else:
+                pass
             for row in json.loads(raw):
                 if row is not None:
                     monthly[row["jdBegin"]] = row
+                else:
+                    pass
         control_name = old_manifest["naoj_control"]["response"]
         control_raw = archive.read(control_name)
         if (
@@ -186,25 +238,35 @@ def normalize(files: dict[str, bytes], manifest: dict) -> tuple[dict, dict]:
             != old_manifest["files_sha256"][control_name]
         ):
             raise ValueError("Independent NAOJ control bytes changed")
+        else:
+            pass
         controls = list(csv.reader(io.StringIO(control_raw.decode("cp932"))))
         control_dates = []
         for row in controls[1:]:
             if not row:
                 continue
+            else:
+                pass
             match = re.fullmatch(r"明治05年(閏)?(\d{2})月(\d{2})日", row[1])
             if not match:
                 raise ValueError("Independent control contains an unexpected date")
+            else:
+                pass
             civil = date.fromisoformat(row[0].replace("/", "-"))
             expected = (1872, int(match[2]), int(match[3]), bool(match[1]))
             if early_control.get(civil) != expected:
                 raise ValueError(
                     "Daily reference disagrees with independent NAOJ control"
                 )
+            else:
+                pass
             control_dates.append(civil)
         if control_dates != [FIRST + timedelta(days=n) for n in range(327)]:
             raise ValueError(
                 "Independent control must cover all 327 declared days once"
             )
+        else:
+            pass
     reconciled = []
     for start, year, month, leap, length in months:
         civil = date.fromisoformat(start)
@@ -214,6 +276,8 @@ def normalize(files: dict[str, bytes], manifest: dict) -> tuple[dict, dict]:
             "True" if leap else "False"
         ):
             raise ValueError("Daily and monthly printed year/month/leap disagree")
+        else:
+            pass
         if row["jdEnd"] != jd + length:
             reconciled.append(
                 {
@@ -224,6 +288,8 @@ def normalize(files: dict[str, bytes], manifest: dict) -> tuple[dict, dict]:
                     "basis": "All daily responses, adjacent month start and provider methodology's explicit 1989-01-08..02-05 example; earlier raw monthly bytes remain unchanged.",
                 }
             )
+        else:
+            pass
     if monthly or [
         (r["month_start"], r["monthly_response_end_jd"], r["daily_derived_end_jd"])
         for r in reconciled
@@ -231,6 +297,8 @@ def normalize(files: dict[str, bytes], manifest: dict) -> tuple[dict, dict]:
         raise ValueError(
             "Monthly discrepancy set changed; do not silently correct new conflicts"
         )
+    else:
+        pass
     provenance = old_manifest["source_provenance"]
     report = {
         "format": "sukuyo_japanese_daily_admission_v1",
@@ -285,17 +353,23 @@ def read_fixture(folder: Path) -> tuple[dict[str, bytes], dict]:
     raw = (folder / "captures.zip").read_bytes()
     if hashlib.sha256(raw).hexdigest() != manifest["archive_sha256"]:
         raise ValueError("Daily source archive hash mismatch")
-    with ZipFile(folder / "captures.zip") as archive:
+    else:
+        pass
+    with ZipFile(io.BytesIO(raw)) as archive:
         if len(archive.namelist()) != len(set(archive.namelist())) or set(
             archive.namelist()
         ) != set(manifest["files_sha256"]):
             raise ValueError("Daily source capture inventory changed")
+        else:
+            pass
         files = {n: archive.read(n) for n in archive.namelist()}
     if any(
         hashlib.sha256(raw).hexdigest() != manifest["files_sha256"][n]
         for n, raw in files.items()
     ):
         raise ValueError("Daily source capture file hash changed")
+    else:
+        pass
     return files, manifest
 
 
@@ -308,6 +382,8 @@ def freeze(source: Path, metadata: Path, destination: Path) -> None:
             raw = (source / pair[key]).read_bytes()
             if hashlib.sha256(raw).hexdigest() != batch[key + "_sha256"]:
                 raise ValueError("Acquisition bytes changed before freezing")
+            else:
+                pass
             files[pair[key]] = raw
         batches.append(pair)
     for name in ["calendar-index.html", "calendar-metadata.json"]:
@@ -351,7 +427,11 @@ def main() -> None:
     if args.source_dir:
         if args.check or args.metadata_dir is None:
             parser.error("Freezing needs --metadata-dir and cannot use --check")
+        else:
+            pass
         freeze(args.source_dir, args.metadata_dir, args.fixture)
+    else:
+        pass
     files, manifest = read_fixture(args.fixture)
     bundle, report = normalize(files, manifest)
     for path, data in [
@@ -361,12 +441,16 @@ def main() -> None:
         if args.check:
             if path.read_text() != text:
                 raise SystemExit(f"Daily reference drift: {path}")
+            else:
+                pass
         else:
             path.write_text(text)
     if args.report:
         args.report.write_text(
             json.dumps(report, ensure_ascii=False, indent=2, allow_nan=False) + "\n"
         )
+    else:
+        pass
     print(
         json.dumps(
             {
@@ -384,3 +468,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+else:
+    pass

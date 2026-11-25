@@ -1,7 +1,7 @@
 """Shared birth primitives independent of any analysis response renderer."""
 
 from dataclasses import dataclass
-from typing import Any, Dict, Tuple
+from typing import Any
 
 from fatebridge.core.almanac import build_calendar_context
 from fatebridge.core.calendar import BaZiCalendar
@@ -18,15 +18,17 @@ class BirthComputationContext:
 
     person: PersonInfo
     normalized_birth_time: NormalizedBirthTime
-    birth_pillars: Dict[str, Tuple[str, str]]
-    birth_calendar_context: Dict[str, Any]
-    element_analysis: Dict[str, Any]
-    original_element_counts: Dict[Element, float]
+    birth_pillars: dict[str, tuple[str, str]]
+    birth_calendar_context: dict[str, Any]
+    element_analysis: dict[str, Any]
+    original_element_counts: dict[Element, float]
 
 
-def build_birth_computation_context(person: PersonInfo) -> BirthComputationContext:
+def build_birth_computation_context(
+    person: PersonInfo, *, field_prefix: str = ""
+) -> BirthComputationContext:
     """Build the shared birth context once so downstream services can reuse it."""
-    normalized_birth_time = normalize_birth_time(person)
+    normalized_birth_time = normalize_birth_time(person, field_prefix=field_prefix)
     corrected_birth_datetime = normalized_birth_time.corrected_datetime
     birth_pillars = BaZiCalendar.get_four_pillars(
         corrected_birth_datetime,

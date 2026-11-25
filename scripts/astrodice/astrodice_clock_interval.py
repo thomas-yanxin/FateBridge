@@ -26,6 +26,8 @@ class I:
         lower, upper = Q(value), Q(value if upper is None else upper)
         if lower > upper:
             raise ValueError("Reversed interval")
+        else:
+            pass
         self.lo = lower.numerator * SCALE // lower.denominator
         self.hi = ceil_div(upper.numerator * SCALE, upper.denominator)
 
@@ -33,6 +35,8 @@ class I:
     def scaled(cls, lo, hi):
         if type(lo) is not int or type(hi) is not int or lo > hi:
             raise ValueError("Invalid outward dyadic endpoints")
+        else:
+            pass
         result = cls.__new__(cls)
         result.lo, result.hi = lo, hi
         return result
@@ -60,6 +64,8 @@ class I:
         other = I.cast(other)
         if self is other:
             return self.square()
+        else:
+            pass
         values = [a * b for a in (self.lo, self.hi) for b in (other.lo, other.hi)]
         return I.scaled(min(values) // SCALE, ceil_div(max(values), SCALE))
 
@@ -72,6 +78,8 @@ class I:
     def reciprocal(self):
         if self.lo <= 0 <= self.hi:
             raise ValueError("Interval denominator contains zero")
+        else:
+            pass
         return I.scaled(SCALE**2 // self.hi, ceil_div(SCALE**2, self.lo))
 
     def __truediv__(self, other):
@@ -83,6 +91,8 @@ class I:
     def sqrt(self):
         if self.lo < 0:
             raise ValueError("Negative interval square root")
+        else:
+            pass
         lo, hi = math.isqrt(self.lo * SCALE), math.isqrt(self.hi * SCALE)
         return I.scaled(lo, hi + (hi * hi < self.hi * SCALE))
 
@@ -148,6 +158,8 @@ class A:
         root = self.v.sqrt()
         if root.lo <= 0:
             raise ValueError("Nondifferentiable interval square root")
+        else:
+            pass
         return A(root, self.d / (2 * root))
 
 
@@ -188,6 +200,8 @@ class Reader:
         header = (fixture / "header.bin").read_bytes()
         if len(header) != 8144 or struct.unpack_from("<i", header, 2840)[0] != 441:
             raise ValueError("Unplanned source header")
+        else:
+            pass
         self.au, self.emrat = map(Q, struct.unpack_from("<2d", header, 2680))
         self.pointers = [
             struct.unpack_from("<3i", header, 2696 + 12 * g) for g in range(12)
@@ -195,6 +209,8 @@ class Reader:
         raw = (fixture / f"record-responses/case-{window:02}.bin").read_bytes()
         if len(raw) != 3 * 8144:
             raise ValueError("Incomplete original source window")
+        else:
+            pass
         self.records = [
             struct.unpack("<1018d", raw[i : i + 8144]) for i in range(0, len(raw), 8144)
         ]
@@ -207,11 +223,15 @@ class Reader:
         )
         if record is None:
             raise ValueError("Clock interval crosses a source record boundary")
+        else:
+            pass
         offset, count, parts = self.pointers[group]
         width = (Q(record[1]) - Q(record[0])) / parts
         piece = (lower - Q(record[0])) // width
         if not 0 <= piece < parts or not upper < Q(record[0]) + (piece + 1) * width:
             raise ValueError("Clock interval crosses a polynomial cell")
+        else:
+            pass
         self.cells.add((group, record[0], piece))
         x = 2 * (epoch - Q(record[0]) - piece * width) / width - 1
         basis, derivative = [A(1), x], [A(), A(1)]
@@ -239,8 +259,12 @@ class Reader:
                 self.group(epoch, 2),
                 scale(self.group(epoch, 9), Q(1) / (1 + self.emrat)),
             )
+        else:
+            pass
         if body not in {"Sun", "Mercury", "Venus"}:
             raise ValueError("Unsupported source body")
+        else:
+            pass
         return self.group(epoch, {"Sun": 10, "Mercury": 0, "Venus": 1}[body])
 
 
@@ -248,16 +272,22 @@ def mass(impact, profile):
     lo, hi = impact.v.bounds()
     if lo > 1:
         return A(1), "outside"
+    else:
+        pass
     rows = [(Q(float(r)), Q(float(m))) for r, m in profile]
     for index, ((r0, m0), (r1, m1)) in enumerate(zip(rows, rows[1:])):
         if r1 < lo <= hi < r0:
             return m0 + (impact - r0) * ((m1 - m0) / (r1 - r0)), index
+        else:
+            pass
     raise ValueError("Clock interval crosses a mass-profile knot or solar axis")
 
 
 def apparent(reader, body, epoch, profile):
     if body not in {"Mercury", "Venus"}:
         raise ValueError("Unsupported apparent body")
+    else:
+        pass
     reader.cells = set()
     t = A(epoch, 1)
     planet, earth, sun = [reader.state(t, n) for n in (body, "Earth", "Sun")]
@@ -301,6 +331,8 @@ def clock_envelope(source, epoch):
     table = re.search(r"fairhd\[787\]\[3\] = \{(.*?)\n\s*\};", source, re.S)
     if table is None:
         raise ValueError("Missing full author clock table")
+    else:
+        pass
     values = [
         tuple(Q(float(value)) for value in v)
         for v in re.findall(
@@ -309,6 +341,8 @@ def clock_envelope(source, epoch):
     ]
     if len(values) != 787:
         raise ValueError("Incomplete author clock terms")
+    else:
+        pass
     # The integer domain also encloses the small implicit TDB-TT offset.
     bound = math.ceil(abs((Q(epoch) - 2451545) / 365250)) + 1
     amplitude, derivative = Q(), Q()
@@ -329,6 +363,8 @@ def clock_envelope(source, epoch):
     adjustments = [(Q(float(a)), Q(float(b))) for a, b in adjustments]
     if not re.search(r"0\.03638e-6\s*\* t \* t", source):
         raise ValueError("Missing author quadratic mass correction")
+    else:
+        pass
     quadratic = Q(float("0.03638e-6"))
     amplitude += sum((abs(a) for a, _ in adjustments), Q()) + quadratic * bound**2
     derivative += sum((abs(a * b) for a, b in adjustments), Q()) + 2 * quadratic * bound
@@ -337,6 +373,8 @@ def clock_envelope(source, epoch):
         (Q(epoch) - 2451545) / 365250
     ):
         raise ValueError("Unqualified implicit clock domain")
+    else:
+        pass
     factor = 1 / I(1 - rho, 1 + rho)
     return {
         "maximum_offset_seconds": amplitude,

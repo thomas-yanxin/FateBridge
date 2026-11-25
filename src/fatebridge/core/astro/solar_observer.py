@@ -27,6 +27,7 @@ from fatebridge.core.astro.de441_source import barycentric_state
 from fatebridge.core.astro.jpl_kinematics import source_kinematics
 from fatebridge.core.astro.light_cone import LIGHT_SPEED_AU_DAY, solve_light_cone
 from fatebridge.core.astro.tdb import geocentric_tdb_state
+from fatebridge.core.astro.tt_epoch import TTInstant
 from fatebridge.core.jpl_ephemeris import configured_jpl_file
 from fatebridge.core.solar_source_types import SolarSourceReference
 
@@ -73,23 +74,35 @@ def select_solar_source(
     """
     if native_flags is not None:
         return NativeSolarSource(native_flags)
+    else:
+        pass
     if configured_jpl_file() is not None:
         module = runtime.swe
         if module is None:
-            raise ImportError("Swiss Ephemeris is required for selected-file admission")
+            raise ModuleNotFoundError(
+                "Swiss Ephemeris is required for selected-file admission"
+            )
+        else:
+            pass
         # Reuse native file selection/header/fallback admission. The returned
         # approximate TT-as-TDB coordinates are not used for solar optics.
         runtime.ephemeris_call("calc", start_tt, module.SUN, module.FLG_JPLEPH)
         return FileSolarSource(Path(module.get_current_file_data(0)[0]))
+    else:
+        pass
     if require_data_files:
         return NativeSolarSource(2)  # SEFLG_SWIEPH; callers reject a native fallback.
+    else:
+        pass
     if _DE440_START_TT <= start_tt <= end_tt < _DE440_END_TT:
         return PackagedSolarSource.DE440
+    else:
+        pass
     return PackagedSolarSource.DE441
 
 
 def precise_solar_direction(
-    julian_day_tt: float,
+    julian_day_tt: TTInstant,
     receiver: CartesianState,
     source: SolarCoefficientSource,
 ) -> Vector3:
@@ -97,44 +110,32 @@ def precise_solar_direction(
 
     Receiver coordinates are the declared physical station relative to Earth;
     its velocity is the existing nominal instantaneous rotation convention.
-    Both Earth and emitting Sun use the same native TDB grid. The source's
-    analytic TDB velocity, with the station velocity, supplies SOFA aberration.
+    Earth and the emitting Sun use one TDB clock derived from the retained TT.
+    The source's analytic TDB velocity and station velocity supply aberration.
     """
-    relative = julian_day_tt - 2451545.0
-    whole = math.floor(relative)
+    relative = julian_day_tt.days - 2451545
+    tdb = relative + Fraction(geocentric_tdb_state(relative).seconds) / 86400
     if source is PackagedSolarSource.DE440:
-        fraction = (
-            relative
-            - whole
-            + de440_solar.geocentric_tdb_minus_tt_relative(
-                relative, profile_id=de440_solar.EXTENDED_MODEL_ID
-            )
-            / 86400
-        )
         emb, embv = de440_solar.state(
             (0, 3),
-            whole,
-            fractional_day=fraction,
+            tdb,
             profile_id=de440_solar.EXTENDED_MODEL_ID,
         )
         geo, geov = de440_solar.state(
             (3, 399),
-            whole,
-            fractional_day=fraction,
+            tdb,
             profile_id=de440_solar.EXTENDED_MODEL_ID,
         )
         x, y, z = ((a + b) / de440_solar.AU_KM for a, b in zip(emb, geo))
         vx, vy, vz = ((a + b) / de440_solar.AU_KM for a, b in zip(embv, geov))
         earth = CartesianState((x, y, z), (vx, vy, vz))
     else:
-        fraction = relative - whole + geocentric_tdb_state(relative).seconds / 86400
-        epoch = Fraction(whole) + Fraction(fraction)
         if isinstance(source, FileSolarSource):
-            values, _ = source_kinematics(source.path, 2451545 + epoch, "Earth")
+            values, _ = source_kinematics(source.path, 2451545 + tdb, "Earth")
             x, y, z, vx, vy, vz = values[:6]
             earth = CartesianState((x, y, z), (vx, vy, vz))
         else:
-            state = barycentric_state("Earth", epoch)
+            state = barycentric_state("Earth", tdb)
             earth = CartesianState(state.position, state.velocity)
     observer = tuple(a + b for a, b in zip(earth.position, receiver.position))
     beta = tuple(
@@ -145,21 +146,22 @@ def precise_solar_direction(
         if source is PackagedSolarSource.DE440:
             position, _ = de440_solar.state(
                 (0, 10),
-                whole,
-                fractional_day=math.fsum((fraction, delay)),
+                tdb + Fraction(delay),
                 profile_id=de440_solar.EXTENDED_MODEL_ID,
             )
             x, y, z = (v / de440_solar.AU_KM for v in position)
             return (x, y, z), None
+        else:
+            pass
         if isinstance(source, FileSolarSource):
             values, _ = source_kinematics(
-                source.path, 2451545 + epoch + Fraction(delay), "Sun"
+                source.path, 2451545 + tdb + Fraction(delay), "Sun"
             )
             x, y, z = values[:3]
             return (x, y, z), None
-        state = barycentric_state(
-            "Sun", Fraction(whole) + Fraction(fraction) + Fraction(delay)
-        )
+        else:
+            pass
+        state = barycentric_state("Sun", tdb + Fraction(delay))
         return state.position, None
 
     solution = solve_light_cone(0.0, observer, sun)
@@ -188,16 +190,20 @@ def solar_source_reference(model_id: str, native_version: str) -> SolarSourceRef
             "coefficient_representation": "original type2 coefficient records, lossless storage",
             "coefficient_profile": de440_solar.EXTENDED_MODEL_ID,
         }
+    else:
+        pass
     if model_id == PackagedSolarSource.DE441.value:
         return {
             "author": "NASA/JPL; Park, Folkner, Williams and Boggs",
             "source_version": DE441_SOURCE_VERSION,
             "source_url": DE441_SOURCE_URL,
-            "calculation_library": "FateBridge bounded-source reader; SOFA/ERFA optics",
+            "calculation_library": "FateBridge original-word bounded-span reader; SOFA/ERFA optics",
             "time_argument": "TDB from declared TT via geocentric Fairhead model",
-            "coefficient_representation": "original source cells with bounded binary coefficient quanta",
+            "coefficient_representation": "selected original binary64 source words with lossless storage",
             "coefficient_profile": DE441_MODEL_ID,
         }
+    else:
+        pass
     if model_id == FileSolarSource.value:
         return {
             "author": "NASA/JPL; Park, Folkner, Williams and Boggs",
@@ -208,8 +214,12 @@ def solar_source_reference(model_id: str, native_version: str) -> SolarSourceRef
             "coefficient_representation": "original selected-file records; exact split source epoch",
             "coefficient_profile": None,
         }
+    else:
+        pass
     if model_id not in {"jpl", "swieph", "moshier"}:
         raise ValueError("Unknown solar source model")
+    else:
+        pass
     return {
         "author": "Astrodienst native reader; JPL or Moshier source as recorded",
         "source_version": (

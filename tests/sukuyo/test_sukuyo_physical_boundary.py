@@ -4,14 +4,15 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 
-from fatebridge.core import almanac, guolao
+from fatebridge.core import almanac
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.clock_observation import observer
+from fatebridge.core.guolao import guolao
 from fatebridge.core.local_techniques.suzhan import build_suzhan_result
 from fatebridge.services.divination import calculate_suzhan_analysis
 from fatebridge.utils.civil_time import ZonedCalendar, utc_calendar, utc_ordering_key
-from tests.sukuyo.test_sukuyo_transports import (
-    test_calendar_and_relations_across_all_real_transports as run_transport_check,
+from tests.unit_test.fixtures.sukuyo_transports import (
+    assert_sukuyo_transport_parity as run_transport_check,
 )
 
 BASIS = "japanese_naoj_historical_utc09"
@@ -26,7 +27,9 @@ PAYLOAD = dict(
 
 
 @pytest.mark.parametrize("mode", [0, 1])
-def test_both_full_chart_modes_preserve_the_unrepresentable_utc_epoch(mode):
+def test_both_full_chart_modes_preserve_the_unrepresentable_utc_epoch(
+    mode: int,
+) -> None:
     result = calculate_suzhan_analysis(**PAYLOAD, szchart=mode)
     sky = result["astronomy"]
     assert result["chart"]["ok"]
@@ -71,7 +74,7 @@ def test_both_full_chart_modes_preserve_the_unrepresentable_utc_epoch(mode):
 
 
 @pytest.mark.parametrize("mode", [0, 1])
-def test_equivalent_second_offset_keeps_the_complete_sky_and_chart(mode):
+def test_equivalent_second_offset_keeps_the_complete_sky_and_chart(mode: int) -> None:
     named = calculate_suzhan_analysis(**PAYLOAD, szchart=mode)
     fixed = calculate_suzhan_analysis(**{**PAYLOAD, "zone": "+09:18:59"}, szchart=mode)
     assert named["astronomy"] == fixed["astronomy"]
@@ -79,7 +82,7 @@ def test_equivalent_second_offset_keeps_the_complete_sky_and_chart(mode):
 
 
 @pytest.mark.parametrize("mode", [0, 1])
-def test_exact_host_boundary_and_previous_second_are_not_clipped(mode):
+def test_exact_host_boundary_and_previous_second_are_not_clipped(mode: int) -> None:
     with pytest.raises(ValueError, match="超出可表示"):
         build_suzhan_result(**{**PAYLOAD, "time": "00:18:58"}, szchart=mode)
     boundary = calculate_suzhan_analysis(
@@ -90,7 +93,7 @@ def test_exact_host_boundary_and_previous_second_are_not_clipped(mode):
 
 
 @pytest.mark.parametrize("clock", ["01:30:00", "02:30:00"])
-def test_clock_validation_still_rejects_folds_and_gaps(clock):
+def test_clock_validation_still_rejects_folds_and_gaps(clock: str) -> None:
     day = "2025-11-02" if clock == "01:30:00" else "2025-03-09"
     with pytest.raises(ValueError):
         build_suzhan_result(
@@ -98,7 +101,7 @@ def test_clock_validation_still_rejects_folds_and_gaps(clock):
         )
 
 
-def test_clock_trace_labels_the_normalized_utc_instead_of_the_local_carrier():
+def test_clock_trace_labels_the_normalized_utc_instead_of_the_local_carrier() -> None:
     records = []
     token = observer.set(records.append)
     try:
@@ -115,14 +118,16 @@ def test_clock_trace_labels_the_normalized_utc_instead_of_the_local_carrier():
     assert all(r["utc_label"] == "0000-12-31T15:00:01+00:00" for r in direct)
 
 
-def test_supplied_zero_coordinates_are_preserved_as_explicit_input():
+def test_supplied_zero_coordinates_are_preserved_as_explicit_input() -> None:
     result = calculate_suzhan_analysis(**PAYLOAD, gps_lat=0, gps_lon=0)
     assert result["params"]["birthLatitude"] == 0
     assert result["params"]["birthLongitude"] == 0
     assert "沿用默认坐标" not in result["snapshot_text"]
 
 
-def test_year_pillar_comparison_keeps_exact_instants_without_datetime_utc(monkeypatch):
+def test_year_pillar_comparison_keeps_exact_instants_without_datetime_utc(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     zone = "+09:18:59"
     offset = timezone(timedelta(hours=9, minutes=18, seconds=59))
     boundary = datetime(1, 1, 1, 0, 19, tzinfo=offset)
@@ -138,7 +143,7 @@ def test_year_pillar_comparison_keeps_exact_instants_without_datetime_utc(monkey
 
 
 @pytest.mark.parametrize("offset", [-12, 0, 14])
-def test_integer_instant_order_agrees_with_representable_utc(offset):
+def test_integer_instant_order_agrees_with_representable_utc(offset) -> None:
     instant = datetime(2025, 2, 3, 23, 1, 2, 345678, timezone(timedelta(hours=offset)))
     universal = instant.astimezone(timezone.utc)
     assert utc_ordering_key(instant) == utc_ordering_key(universal)
@@ -149,8 +154,8 @@ def test_integer_instant_order_agrees_with_representable_utc(offset):
 
 @pytest.mark.parametrize("mode", [0, 1])
 def test_full_suzhan_boundary_across_actual_rest_native_mcp_cli(
-    monkeypatch, capsys, mode
-):
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], mode: int
+) -> None:
     run_transport_check(
         monkeypatch,
         capsys,

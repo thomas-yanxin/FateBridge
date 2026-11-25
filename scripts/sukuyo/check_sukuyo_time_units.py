@@ -13,12 +13,14 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[2]
 if not __package__:
     sys.path.insert(0, str(ROOT / "src"))
+else:
+    pass
 
-from fatebridge.core.sukuyo_calendar_text import (
+from fatebridge.core.sukuyo.sukuyo_calendar_text import (
     COMPARATIVE_TIME_SOURCE,
     calendar_day_evidence,
 )
-from fatebridge.core.sukuyo_sources import load_source
+from fatebridge.core.sukuyo.sukuyo_sources import load_source
 
 FIXTURE = ROOT / "tests/data/sukuyo-comparative-time-primary.json"
 
@@ -37,27 +39,45 @@ def selected_tei_lines(
         tag = node.tag.rsplit("}", 1)[-1]
         if tag in {"teiHeader", "back", "rdg"}:
             return
+        else:
+            pass
         if tag == "lb":
             if node.get("ed") == "T":
                 current = node.get("n")
                 if current is not None:
                     main.setdefault(current, "")
+                else:
+                    pass
+            else:
+                pass
             return
+        else:
+            pass
         if tag == "note":
             if node.get("place") == "inline" and current is not None:
                 notes.setdefault(current, []).append("".join(node.itertext()).strip())
+            else:
+                pass
             return
+        else:
+            pass
         if node.text and current is not None:
             main[current] += node.text.replace("\n", "")
+        else:
+            pass
         for child in node:
             visit(child)
             if child.tail and current is not None:
                 main[current] += child.tail.replace("\n", "")
+            else:
+                pass
 
     visit(root)
     selected = [key for key in main if start <= key <= end]
     if not selected or selected[0] != start or selected[-1] != end:
         raise ValueError("Comparative source line range is incomplete")
+    else:
+        pass
     return "".join(main[key] for key in selected), {
         key: notes[key] for key in selected if key in notes
     }
@@ -71,12 +91,18 @@ def verify_time_primary(capture_dir: Path | None = None) -> dict[str, Any]:
     errors = []
     if set(witnesses) != set(fixture["expected_main_excerpts"]):
         raise ValueError("Comparative witnesses changed; revalidate original sources")
+    else:
+        pass
     checked_files = []
     for identifier, witness in witnesses.items():
         if witness["source_excerpt"] != fixture["expected_main_excerpts"][identifier]:
             errors.append([identifier, "selected_main_excerpt"])
+        else:
+            pass
         if witness["inline_notes"] != fixture["expected_inline_notes"][identifier]:
             errors.append([identifier, "inline_notes"])
+        else:
+            pass
         file = identifier + ".xml"
         expected = fixture["source_files"][file]
         if (
@@ -85,10 +111,14 @@ def verify_time_primary(capture_dir: Path | None = None) -> dict[str, Any]:
             or witness["publisher_commit"] != fixture["publisher_commit"]
         ):
             errors.append([identifier, "publisher_provenance"])
+        else:
+            pass
         if capture_dir is not None:
             path = capture_dir / file
             if hashlib.sha256(path.read_bytes()).hexdigest() != expected["sha256"]:
                 raise ValueError("Comparative source bytes changed")
+            else:
+                pass
             authors = [
                 "".join(row.itertext()).strip()
                 for row in ET.fromstring(path.read_bytes()).findall(
@@ -98,16 +128,24 @@ def verify_time_primary(capture_dir: Path | None = None) -> dict[str, Any]:
             ]
             if witness["source_header_author_literal"] not in authors:
                 errors.append([identifier, "source_header_author_literal"])
+            else:
+                pass
             text, notes = selected_tei_lines(
                 path, *fixture["selected_line_ranges"][file]
             )
             if witness["source_excerpt"] not in text:
                 errors.append([identifier, "main_text_not_in_captured_source"])
+            else:
+                pass
             for row in witness["inline_notes"]:
                 line = row["locator"].rsplit("_p", 1)[1]
                 if row["text"] not in notes.get(line, []):
                     errors.append([identifier, "inline_note_not_in_captured_source"])
+                else:
+                    pass
             checked_files.append(file)
+        else:
+            pass
     for day in range(1, 31):
         result = calendar_day_evidence(day)
         doctrine = result["clock_doctrine"]
@@ -122,6 +160,8 @@ def verify_time_primary(capture_dir: Path | None = None) -> dict[str, Any]:
             or comparative["hinoo_half_mapping_established"]
         ):
             errors.append(["runtime_clock_promoted", day])
+        else:
+            pass
     return {
         "format": "sukuyo_comparative_time_primary_check_v1",
         "source_bundle_sha256": source.sha256,
@@ -153,3 +193,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

@@ -5,8 +5,14 @@ from __future__ import annotations
 import math
 from collections import Counter
 from fractions import Fraction
-from typing import Any, Dict, Iterable, List, Optional
+from typing import Any, Iterable
 
+from fatebridge.core.astro.astrology_tables import DOMICILE_RULERS as DOMICILE_RULERS
+from fatebridge.core.astro.astrology_tables import ELEMENT_BY_SIGN as ELEMENT_BY_SIGN
+from fatebridge.core.astro.astrology_tables import EXALTATION_SIGNS as EXALTATION_SIGNS
+from fatebridge.core.astro.astrology_tables import MODALITY_BY_SIGN as MODALITY_BY_SIGN
+from fatebridge.core.astro.astrology_tables import SIGN_LABELS_ZH as SIGN_LABELS_ZH
+from fatebridge.core.astro.astrology_tables import _opposite_sign as _opposite_sign
 from fatebridge.core.astro.geometry import (
     _degree_in_sign,
     _house_for_longitude,
@@ -17,18 +23,14 @@ from fatebridge.core.astro.geometry import (
     normalize_angle,
 )
 from fatebridge.core.astro.reference import DIGNITY_LABELS_ZH, NODE_BODIES
-from fatebridge.core.astrology_tables import DOMICILE_RULERS as DOMICILE_RULERS
-from fatebridge.core.astrology_tables import ELEMENT_BY_SIGN as ELEMENT_BY_SIGN
-from fatebridge.core.astrology_tables import EXALTATION_SIGNS as EXALTATION_SIGNS
-from fatebridge.core.astrology_tables import MODALITY_BY_SIGN as MODALITY_BY_SIGN
-from fatebridge.core.astrology_tables import SIGN_LABELS_ZH as SIGN_LABELS_ZH
-from fatebridge.core.astrology_tables import _opposite_sign as _opposite_sign
 
 
-def _essential_dignity(planet: str, sign: str) -> Optional[Dict[str, str]]:
+def _essential_dignity(planet: str, sign: str) -> dict[str, str] | None:
     """Sign-only major dignity summary; not a full peregrine classification."""
     if planet not in DOMICILE_RULERS:
         return None
+    else:
+        pass
     if sign in DOMICILE_RULERS[planet]:
         dignity = "rulership"
     elif sign == EXALTATION_SIGNS[planet]:
@@ -49,12 +51,12 @@ def _essential_dignity(planet: str, sign: str) -> Optional[Dict[str, str]]:
 def _build_houses(
     ascendant: float,
     house_system: str,
-    house_cusps: Optional[List[float]] = None,
-    midheaven: Optional[float] = None,
+    house_cusps: list[float] | None = None,
+    midheaven: float | None = None,
     *,
     round_coordinates: bool = False,
-) -> List[Dict[str, Any]]:
-    houses: List[Dict[str, Any]] = []
+) -> list[dict[str, Any]]:
+    houses: list[dict[str, Any]] = []
     if house_cusps:
         for house_number, cusp in enumerate(house_cusps, start=1):
             normalized_cusp = normalize_angle(cusp)
@@ -72,6 +74,8 @@ def _build_houses(
                 }
             )
         return houses
+    else:
+        pass
     if house_system == "whole_sign":
         first_cusp = float(((Fraction(ascendant) % 360) // 30) * 30)
     elif house_system == "equal_mc" and midheaven is not None:
@@ -96,6 +100,8 @@ def _build_houses(
         cusp = float(exact_cusp)
         if int(cusp // 30) != int(exact_cusp // 30):
             cusp = math.nextafter(cusp, -math.inf)
+        else:
+            pass
         sign = _sign_name(cusp)
         houses.append(
             {
@@ -108,12 +114,6 @@ def _build_houses(
     return houses
 
 
-def _build_thirteen_sectors(ascendant: float) -> List[Dict[str, Any]]:
-    from fatebridge.core.astro.sectors import thirteen_sectors
-
-    return thirteen_sectors(ascendant)
-
-
 def _build_planet_record(
     planet: str,
     longitude: float,
@@ -121,15 +121,15 @@ def _build_planet_record(
     ascendant: float,
     house_system: str,
     *,
-    house_cusps: Optional[List[float]] = None,
+    house_cusps: list[float] | None = None,
     sidereal: bool = False,
     ayanamsha: float = 0.0,
     include_sector13: bool = False,
     include_nakshatra: bool = False,
     include_su28: bool = False,
-    zodiac_longitude: Optional[float] = None,
-    projected_house_position: Optional[float] = None,
-) -> Dict[str, Any]:
+    zodiac_longitude: float | None = None,
+    projected_house_position: float | None = None,
+) -> dict[str, Any]:
     effective_longitude = (
         normalize_angle(zodiac_longitude)
         if zodiac_longitude is not None
@@ -163,6 +163,8 @@ def _build_planet_record(
     }
     if projected_house_position is not None:
         record["ecliptic_house_position"] = projected_house_position
+    else:
+        pass
     if include_sector13:
         record["sector13"] = _sector13_for_longitude(effective_longitude, ascendant)
         record["sector13_evidence"] = {
@@ -172,14 +174,20 @@ def _build_planet_record(
             "rule_id": "fatebridge.equal13.exact_partition.v1",
             "birth_time_uncertainty": "not_assessed",
         }
+    else:
+        pass
     if include_nakshatra:
         record["nakshatra"] = _nakshatra(effective_longitude)
+    else:
+        pass
     if include_su28:
         record["su28"] = _su28(effective_longitude)
+    else:
+        pass
     return record
 
 
-def _balance(planets: Iterable[Dict[str, Any]], key: str) -> Dict[str, int]:
+def _balance(planets: Iterable[dict[str, Any]], key: str) -> dict[str, int]:
     # 元素 / 模式平衡只统计行星本体；月亮交点是计算虚点（且仅排北交、不排南交，
     # 计入会造成不对称偏置），故排除在外。交点仍保留在 planets 列表中。
     counter = Counter(
@@ -190,11 +198,11 @@ def _balance(planets: Iterable[Dict[str, Any]], key: str) -> Dict[str, int]:
 
 def _summary(
     chart_variant: str,
-    planets: List[Dict[str, Any]],
-    aspects: List[Dict[str, Any]],
+    planets: list[dict[str, Any]],
+    aspects: list[dict[str, Any]],
     *,
     engine_precision: str,
-) -> List[str]:
+) -> list[str]:
     sun = next((item for item in planets if item["id"] == "Sun"), None)
     moon = next((item for item in planets if item["id"] == "Moon"), None)
     top_aspect = aspects[0] if aspects else None
@@ -206,10 +214,16 @@ def _summary(
     lines = [f"已生成 {chart_variant} 的 {chart_label}。"]
     if sun is not None:
         lines.append(f"太阳落在 {sun['sign_zh']}，宫位 {sun['house']}。")
+    else:
+        pass
     if moon is not None:
         lines.append(f"月亮落在 {moon['sign_zh']}，宫位 {moon['house']}。")
+    else:
+        pass
     if top_aspect is not None:
         lines.append(
             f"{top_aspect['planet_a']} 与 {top_aspect['planet_b']} 形成 {top_aspect['aspect']}，容许度 {top_aspect['orb']}。"
         )
+    else:
+        pass
     return lines

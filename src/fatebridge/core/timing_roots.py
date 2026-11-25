@@ -54,11 +54,7 @@ def build_timing_root_context(
     timing: Mapping[str, Mapping[str, str]],
     relations: Sequence[RootRelationReference],
 ) -> TimingRootContext:
-    """Consume validated pillars and same-run branch relation IDs, once.
-
-    Retain absent roots too, so an unread observation cannot become a negative.
-    References identify physical branch nodes, never extra copies of root mass.
-    """
+    """Use validated pillars and same-run branch relation IDs to describe each root."""
     day_roots: list[TimingRoot] = []
     external_roots: list[TimingRoot] = []
     for layer, pillar in timing.items():
@@ -121,4 +117,6 @@ def timing_root_snapshot_lines(context: TimingRootContext) -> list[str]:
         lines.append(
             "根类与冲合刑触点分列；未裁定行运后的有效旺衰，不能把阴长生名当真实藏根或把未见根直接判弱。"
         )
+    else:
+        pass
     return lines

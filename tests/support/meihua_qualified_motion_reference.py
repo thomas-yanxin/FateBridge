@@ -15,6 +15,8 @@ def load():
     for name, h in json.loads(raw)["files"].items():
         if str(name).endswith((".py", ".py.txt")):
             continue
+        else:
+            pass
         assert hashlib.sha256((FOLDER / name).read_bytes()).hexdigest() == h, name
     pdf = (
         Path(__file__).resolve().parents[2]
@@ -46,4 +48,6 @@ def expected_summary(case, reading, templates):
         values.update(
             quote=row["quote"], qualified_predicate=row["qualified_predicate"]
         )
+    else:
+        pass
     return templates["matched" if matches else "not_matched"].format(**values)

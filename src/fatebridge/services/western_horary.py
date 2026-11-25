@@ -1,28 +1,25 @@
-"""
-Service surface for 卜卦 (horary).
-
-Casts a chart for the moment the question was asked (NOT a birth) and runs the
-classical judgment engine in :mod:`fatebridge.core.astrology_horary`.
-"""
+"""Cast and render a Western horary chart."""
 
 from __future__ import annotations
 
-from typing import Any, Dict, Optional
+from typing import Any
 
-from fatebridge.core.astro.iers_ut1 import use_ut1_source
-from fatebridge.core.astrology_horary import (
+from fatebridge.core.astro.astrology_horary import (
     CATEGORY_LABELS_ZH,
     HOUSE_BY_CATEGORY,
     build_horary_payload,
 )
-from fatebridge.core.lilly_orbs import DEFAULT_ORB_PROFILE, full_orbs
+from fatebridge.core.astro.iers_ut1 import use_ut1_source
+from fatebridge.core.astro.lilly_orbs import DEFAULT_ORB_PROFILE, full_orbs
 from fatebridge.core.western_clock_origin import event_wall_datetime
 from fatebridge.core.western_event_clock import build_event_subject
+from fatebridge.services.snapshot_builders import (
+    format_snapshot_json,
+)
 from fatebridge.services.snapshot_builders import (
     render_snapshot_text as _render_snapshot_text,
 )
 from fatebridge.utils.errors import handle_calculation_error
-from fatebridge.utils.formatting import format_json_response
 from fatebridge.utils.house_systems import house_system_fields, normalize_house_system
 
 
@@ -34,26 +31,29 @@ def calculate_horary(
     question_hour: int,
     question_minute: int = 0,
     question_second: int = 0,
-    timezone_name: Optional[str] = None,
+    timezone_name: str | None = None,
     longitude: float,
     latitude: float,
     category: str = "general",
-    name: Optional[str] = None,
+    name: str | None = None,
     house_system: str = "R",
     zodiac_type: str = "Tropic",
     orb_profile: str = DEFAULT_ORB_PROFILE,
-    radicality_context: Optional[Dict[str, Any]] = None,
+    radicality_context: dict[str, Any] | None = None,
     question_calendar: str = "proleptic_gregorian",
     question_clock_basis: str = "civil",
     question_hour_origin: str = "midnight",
     ut1_source: str = "swiss_delta_t",
-) -> Dict[str, Any]:
+    render_snapshot: bool = True,
+) -> dict[str, Any]:
     """按提问时刻核算相位、月亮事件与原典条件的核验状态。"""
-    label = "卜卦判断"
+    label = "卜卦证据"
     try:
         with use_ut1_source(ut1_source):
             if category not in HOUSE_BY_CATEGORY:
                 raise ValueError("未知的卜卦类别；请使用公开 category 枚举")
+            else:
+                pass
             full_orbs(orb_profile)
             house_system = normalize_house_system(house_system)
             question_local, calendar_conversion, hour_origin_conversion = (
@@ -109,45 +109,8 @@ def calculate_horary(
                 "radicality_context": payload["radicality"]["reported_context"],
                 "engine": "fatebridge-offline",
             }
-            summary = (
-                f"卜卦（{payload['category_label']}）：{payload['verdict']} — "
-                f"{payload['reasoning']}"
-            )
-            sections = [
-                ("起盘信息", format_json_response(context, compact=False)),
-                (
-                    "历法日期换算",
-                    format_json_response(calendar_conversion, compact=False),
-                ),
-                (
-                    "钟时与物理时刻",
-                    format_json_response(clock_conversion, compact=False),
-                ),
-                (
-                    "主星与判词",
-                    format_json_response(
-                        {
-                            "ascendant": payload["ascendant"],
-                            "significators": payload["significators"],
-                            "planets": payload["planets"],
-                            "fortune": payload["fortune"],
-                            "perfection": payload["perfection"],
-                            "verdict": payload["verdict"],
-                            "reasoning": payload["reasoning"],
-                            "rule_profile": payload["rule_profile"],
-                        },
-                        compact=False,
-                    ),
-                ),
-                (
-                    "月相与裁决",
-                    format_json_response(
-                        {"moon": payload["moon"], "radicality": payload["radicality"]},
-                        compact=False,
-                    ),
-                ),
-            ]
-            return {
+            summary = f"卜卦（{payload['category_label']}），所问宫位为第{payload['quesited_house']}宫。"
+            result = {
                 "analysis_type": "西占卜卦",
                 "engine": "fatebridge-offline",
                 "analysis_context": context,
@@ -155,7 +118,44 @@ def calculate_horary(
                 "clock_conversion": clock_conversion,
                 "horary": payload,
                 "summary": summary,
-                "snapshot_text": _render_snapshot_text(sections),
             }
+            if render_snapshot:
+                sections = [
+                    ("起盘信息", format_snapshot_json(context)),
+                    (
+                        "历法日期换算",
+                        format_snapshot_json(calendar_conversion),
+                    ),
+                    (
+                        "钟时与物理时刻",
+                        format_snapshot_json(clock_conversion),
+                    ),
+                    (
+                        "主星与原典条件",
+                        format_snapshot_json(
+                            {
+                                "ascendant": payload["ascendant"],
+                                "significators": payload["significators"],
+                                "planets": payload["planets"],
+                                "fortune": payload["fortune"],
+                                "perfection": payload["perfection"],
+                                "rule_profile": payload["rule_profile"],
+                            },
+                        ),
+                    ),
+                    (
+                        "月亮事件与起盘条件",
+                        format_snapshot_json(
+                            {
+                                "moon": payload["moon"],
+                                "radicality": payload["radicality"],
+                            },
+                        ),
+                    ),
+                ]
+                result["snapshot_text"] = _render_snapshot_text(sections)
+            else:
+                pass
+            return result
     except Exception as exc:
         return handle_calculation_error(exc, label)

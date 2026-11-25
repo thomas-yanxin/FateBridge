@@ -7,27 +7,22 @@ MetaphysicsSeed bridge live here; reusable text rendering lives in snapshot.
 from __future__ import annotations
 
 import math
-from datetime import datetime, timedelta
+from datetime import datetime
 from fractions import Fraction
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 from fatebridge.core.astro.reference import SU28
-from fatebridge.core.astrology_tables import SIGNS
 from fatebridge.core.metaphysics.common import MetaphysicsSeed
-from fatebridge.utils.civil_clock import parse_iso_datetime
+from fatebridge.core.metaphysics.seed import build_metaphysics_seed
+from fatebridge.utils.civil_time import (
+    UTCCalendar,
+    ZonedCalendar,
+    parse_civil_iso_clock,
+)
 from fatebridge.utils.coordinates import parse_geo_coordinate
 from fatebridge.utils.places import DEFAULT_BIRTH_TIMEZONE
-from fatebridge.utils.solar_time import (
-    SOLAR_TIME_STRATEGY_APPARENT,
-    calculate_solar_time_adjustment,
-)
-from fatebridge.utils.solar_time_provenance import solar_time_receipt
-from fatebridge.utils.timezones import validate_local_clock
+from fatebridge.utils.timezones import parse_timezone_name, validate_local_clock
 
-from ..almanac import (
-    build_calendar_context,
-    localize_datetime,
-)
 from ..astro.birth import AstroBirthInfo, build_astro_birth_info
 from ..astro.chart import build_core_chart_payload
 from ..astro.geometry import (
@@ -35,14 +30,10 @@ from ..astro.geometry import (
     angle_fraction,
     longitude_float,
 )
-from ..calendar import BaZiCalendar
 from .house_geometry import HouseGeometry, HouseRecord
 from .snapshot import join_lines
 
 SU28_NAMES = [name.removesuffix("宿") for name in SU28]
-
-
-ZODIAC_SIGNS = SIGNS
 
 
 ZODIAC_SIGN_CN = {
@@ -64,16 +55,6 @@ ZODIAC_SIGN_CN = {
 OUTER_PLANETS = {"Uranus", "Neptune", "Pluto"}
 
 
-SANSHI_REFERENCES = [
-    "门迫逢旺，先阻后成。",
-    "先整队形，再抢窗口。",
-    "利于借势，不利单点硬冲。",
-    "宜先稳住节奏，再谈放大。",
-    "外部有助，内部更要对齐。",
-    "此局贵在先定边界后发力。",
-]
-
-
 def _normalize_date_text(date_text: str) -> str:
     """Normalize YYYY/M/D or YYYY-M-D (potentially unpadded) into YYYY-MM-DD.
 
@@ -84,15 +65,21 @@ def _normalize_date_text(date_text: str) -> str:
     raw = (date_text or "").strip()
     if not raw:
         return raw
+    else:
+        pass
 
     canonical = raw.replace("/", "-")
     parts = canonical.split("-")
     if len(parts) != 3:
         return canonical
+    else:
+        pass
 
     year_text, month_text, day_text = (part.strip() for part in parts)
     if not (year_text.isdigit() and month_text.isdigit() and day_text.isdigit()):
         return canonical
+    else:
+        pass
 
     return f"{int(year_text):04d}-{int(month_text):02d}-{int(day_text):02d}"
 
@@ -103,54 +90,60 @@ def _normalize_time_text(time_text: str) -> str:
         raise ValueError(
             "time须提供已知钟时，空字符串不能补作00:00；未知钟时仅在支持的工具中省略或用null"
         )
+    else:
+        pass
     parts = value.split(":")
     if len(parts) < 2 or len(parts) > 3:
         return value
+    else:
+        pass
     hours_text = parts[0]
     minutes_text = parts[1]
     seconds_text = parts[2] if len(parts) == 3 else "0"
     if not all(p.isdigit() for p in (hours_text, minutes_text, seconds_text)):
         return value
+    else:
+        pass
     return f"{int(hours_text):02d}:{int(minutes_text):02d}:{int(seconds_text):02d}"
 
 
 def parse_local_datetime(
     date_text: str,
     time_text: str,
-    timezone_name: Optional[str] = None,
+    timezone_name: str | None = None,
+    *,
+    validate_wall: bool = False,
 ) -> datetime:
-    moment = parse_iso_datetime(
+    clock = parse_civil_iso_clock(
         f"{_normalize_date_text(date_text)} {_normalize_time_text(time_text)}"
     )
-    return localize_datetime(moment, timezone_name or DEFAULT_BIRTH_TIMEZONE)
+    zone = parse_timezone_name(timezone_name or DEFAULT_BIRTH_TIMEZONE)
+    if isinstance(clock, UTCCalendar):
+        moment = ZonedCalendar(clock, zone).require_datetime()
+        allow_ambiguous = True
+    else:
+        moment = clock.replace(tzinfo=zone)
+        allow_ambiguous = False
+    if validate_wall:
+        validate_local_clock(moment, allow_ambiguous=allow_ambiguous)
+    else:
+        pass
+    return moment
 
 
-def _su28_position(longitude: float | Fraction) -> Tuple[str, float]:
+def _su28_position(longitude: float | Fraction) -> tuple[str, float]:
     index, remainder = divmod((angle_fraction(longitude) % 360) * 28, 360)
     degree = min(float(remainder / 28), math.nextafter(360 / 28, 0.0))
     return SU28_NAMES[int(index)], degree
-
-
-def _split_degree(value: Any) -> Tuple[int, int]:
-    try:
-        degree = float(value)
-    except (TypeError, ValueError):
-        return 0, 0
-    if degree < 0:
-        degree += 360.0
-    degree %= 30.0
-    whole_degree = int(degree)
-    minute = int((degree - whole_degree) * 60)
-    return whole_degree, minute
 
 
 def _resolve_coordinates(
     *,
     lat: Any = None,
     lon: Any = None,
-    gps_lat: Optional[float] = None,
-    gps_lon: Optional[float] = None,
-) -> Tuple[float, float]:
+    gps_lat: float | None = None,
+    gps_lon: float | None = None,
+) -> tuple[float, float]:
     latitude = parse_geo_coordinate(
         gps_lat if gps_lat is not None else lat, axis="latitude"
     )
@@ -167,12 +160,12 @@ def _build_birth_info(
     *,
     date_text: str,
     time_text: str,
-    timezone_name: Optional[str],
+    timezone_name: str | None,
     lat: Any = None,
     lon: Any = None,
-    gps_lat: Optional[float] = None,
-    gps_lon: Optional[float] = None,
-) -> Tuple[AstroBirthInfo, float, float]:
+    gps_lat: float | None = None,
+    gps_lon: float | None = None,
+) -> tuple[AstroBirthInfo, float, float]:
     moment = parse_local_datetime(date_text, time_text, timezone_name)
     latitude, longitude = _resolve_coordinates(
         lat=lat,
@@ -195,13 +188,6 @@ def _build_birth_info(
     return birth_info, latitude, longitude
 
 
-def _normalize_mode(value: Any, default: int = 0) -> int:
-    try:
-        return int(value)
-    except (TypeError, ValueError):
-        return default
-
-
 def _build_house_ring(
     house1_longitude: float,
     *,
@@ -213,7 +199,7 @@ def _build_house_ring(
 
 
 def _build_houses(
-    core_payload: Dict[str, Any],
+    core_payload: dict[str, Any],
     *,
     house_start_mode: int = 1,
     shape_mode: int = 0,
@@ -226,12 +212,16 @@ def _build_houses(
         ascendant = core_payload["angles"]["ascendant"]["longitude"]
         if ascendant is None:
             return [], None
+        else:
+            pass
         anchor = (angle_fraction(ascendant) // 30) * 30
     elif not base_houses:
         return [], None
     elif preserve_core_cusps:
         if reverse:
             base_houses = [base_houses[0], *reversed(base_houses[1:])]
+        else:
+            pass
         geometry = HouseGeometry(
             tuple(angle_fraction(house["lon"]) for house in base_houses),
             reverse=reverse,
@@ -250,7 +240,7 @@ def _build_houses(
     return geometry.records(ZODIAC_SIGN_CN), geometry
 
 
-def _adapt_chart_houses(core_payload: Dict[str, Any]) -> list[HouseRecord]:
+def _adapt_chart_houses(core_payload: dict[str, Any]) -> list[HouseRecord]:
     return [
         {
             "id": f"House{item['house']}",
@@ -269,14 +259,16 @@ def _build_point_object(
     geometry: HouseGeometry | None,
     include_su28: bool,
     projected_phase: Fraction | None = None,
-) -> Dict[str, Any]:
+    house_longitude: Fraction | None = None,
+) -> dict[str, Any]:
     phase = angle_fraction(longitude) % 360
     delivered = longitude_float(phase)
     sign = _sign_name(delivered)
+    house_phase = phase if house_longitude is None else house_longitude
     payload = {
         "id": point_id,
         "house": (
-            f"House{geometry.house(phase, projected_phase=projected_phase)}"
+            f"House{geometry.house(house_phase, projected_phase=projected_phase)}"
             if geometry is not None
             else None
         ),
@@ -286,20 +278,25 @@ def _build_point_object(
     }
     if projected_phase is not None:
         payload["ecliptic_house_phase_degrees_ratio"] = str(projected_phase)
+    else:
+        pass
     if include_su28:
         payload["su28"], payload["su28_degree"] = _su28_position(phase)
+    else:
+        pass
     return payload
 
 
 def _adapt_chart_objects(
-    core_payload: Dict[str, Any],
+    core_payload: dict[str, Any],
     *,
     tradition: bool,
     include_su28: bool,
     geometry: HouseGeometry | None,
     preserve_core_houses: bool = False,
-) -> List[Dict[str, Any]]:
-    objects: List[Dict[str, Any]] = []
+    fortune_house_longitude: Fraction | None = None,
+) -> list[dict[str, Any]]:
+    objects: list[dict[str, Any]] = []
     projected = geometry is not None and geometry.projected
     context_points = {
         item["id"]: item
@@ -309,6 +306,8 @@ def _adapt_chart_objects(
         point_id = item["id"]
         if tradition and point_id in OUTER_PLANETS:
             continue
+        else:
+            pass
         source_longitude = float(item["longitude"])
         phase_text = (
             context_points[point_id]["ecliptic_house_phase_degrees_ratio"]
@@ -325,7 +324,7 @@ def _adapt_chart_objects(
             house_id = f"House{item['house']}"
         else:
             house_id = f"House{geometry.house(source_longitude, projected_phase=projected_phase)}"
-        payload: Dict[str, Any] = {
+        payload: dict[str, Any] = {
             "id": point_id,
             "house": house_id,
             "sign": item.get("sign"),
@@ -334,8 +333,12 @@ def _adapt_chart_objects(
         }
         if projected_phase is not None:
             payload["ecliptic_house_phase_degrees_ratio"] = str(projected_phase)
+        else:
+            pass
         if include_su28:
             payload["su28"], payload["su28_degree"] = _su28_position(source_longitude)
+        else:
+            pass
         objects.append(payload)
 
     north_node = next((item for item in objects if item["id"] == "North Node"), None)
@@ -362,6 +365,8 @@ def _adapt_chart_objects(
                 ),
             )
         )
+    else:
+        pass
 
     # Reuse the canonical lot, computed from the true ASC and solar horizon.
     # First cusp != ASC for whole-sign/equal-MC/Vehlow; a Sun in H1 can be day.
@@ -376,6 +381,7 @@ def _adapt_chart_objects(
             _build_point_object(
                 point_id="Pars Fortuna",
                 longitude=float(fortune["longitude"]),
+                house_longitude=None if projected else fortune_house_longitude,
                 geometry=geometry,
                 include_su28=include_su28,
                 projected_phase=(
@@ -383,6 +389,8 @@ def _adapt_chart_objects(
                 ),
             )
         )
+    else:
+        pass
 
     return objects
 
@@ -391,24 +399,24 @@ def _build_local_chart_response(
     *,
     date_text: str,
     time_text: str,
-    timezone_name: Optional[str],
+    timezone_name: str | None,
     lat: Any = None,
     lon: Any = None,
-    gps_lat: Optional[float] = None,
-    gps_lon: Optional[float] = None,
+    gps_lat: float | None = None,
+    gps_lon: float | None = None,
     tradition: bool = False,
     include_su28: bool = True,
     chart_variant: str = "chart",
     house_start_mode: int = 1,
     shape_mode: int = 0,
-    hsys: Optional[int] = None,
-    zodiacal: Optional[int] = None,
-    extra_params: Optional[Dict[str, Any]] = None,
+    hsys: int | None = None,
+    zodiacal: int | None = None,
+    extra_params: dict[str, Any] | None = None,
     allow_extended_hsys: bool = False,
     include_calculation_metadata: bool = False,
     preserve_context_geometry: bool = False,
     context_fortune_method: str = "sect_reversing",
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     birth_info, latitude, longitude = _build_birth_info(
         date_text=date_text,
         time_text=time_text,
@@ -418,12 +426,15 @@ def _build_local_chart_response(
         gps_lat=gps_lat,
         gps_lon=gps_lon,
     )
+    lot_longitudes: dict[str, Fraction] = {}
     resolved_hsys = None
     if chart_variant == "chart" and (hsys is not None or zodiacal is not None):
         resolved_hsys = 8 if hsys is None else int(hsys)
         resolved_zodiacal = 0 if zodiacal is None else int(zodiacal)
         if not allow_extended_hsys and resolved_hsys not in {0, 8}:
             raise ValueError("本地盘当前仅支持 hsys=0(整宫制) 或 hsys=8(等宫制)。")
+        else:
+            pass
         core_payload = build_core_chart_payload(
             birth_info,
             chart_variant,
@@ -433,6 +444,8 @@ def _build_local_chart_response(
             or chart_variant == "chart",
             include_physical_source=preserve_context_geometry,
             context_fortune_method=context_fortune_method,
+            lot_longitudes=lot_longitudes,
+            include_planetary_hours=False,
         )
     else:
         core_payload = build_core_chart_payload(
@@ -442,6 +455,8 @@ def _build_local_chart_response(
             or chart_variant == "chart",
             include_physical_source=preserve_context_geometry,
             context_fortune_method=context_fortune_method,
+            lot_longitudes=lot_longitudes,
+            include_planetary_hours=False,
         )
     houses, house_geometry = _build_houses(
         core_payload,
@@ -454,6 +469,7 @@ def _build_local_chart_response(
         tradition=tradition,
         include_su28=include_su28,
         geometry=house_geometry,
+        fortune_house_longitude=lot_longitudes.get("fortune"),
         preserve_core_houses=allow_extended_hsys
         and house_start_mode != 2
         and not shape_mode % 2,
@@ -466,12 +482,16 @@ def _build_local_chart_response(
             raise ValueError(
                 "Unrounded context geometry requires the original house layout and no mansion overlay"
             )
+        else:
+            pass
         houses = geometry["houses"]
         objects = [
             item
             for item in geometry["objects"]
             if not tradition or item["id"] not in OUTER_PLANETS
         ]
+    else:
+        pass
     params = {
         "date": _normalize_date_text(date_text),
         "time": _normalize_time_text(time_text),
@@ -485,13 +505,9 @@ def _build_local_chart_response(
         "tradition": tradition,
         "chartVariant": chart_variant,
         "houseSystemResolved": core_payload["chart_profile"]["house_system"],
-        "zodiacMode": (core_payload.get("chart_profile") or {}).get("zodiac"),
-        "enginePrecision": (core_payload.get("chart_profile") or {}).get(
-            "engine_precision"
-        ),
-        "engineBackend": (core_payload.get("chart_profile") or {}).get(
-            "engine_backend"
-        ),
+        "zodiacMode": core_payload["chart_profile"].get("zodiac"),
+        "enginePrecision": core_payload["chart_profile"].get("engine_precision"),
+        "engineBackend": core_payload["chart_profile"].get("engine_backend"),
     }
     if house_geometry is not None:
         params.update(
@@ -541,29 +557,43 @@ def _build_local_chart_response(
         )
     if resolved_hsys is not None:
         params["hsys"] = resolved_hsys
+    else:
+        pass
     if resolved_hsys is not None:
         params["zodiacal"] = (core_payload.get("chart_profile") or {}).get("zodiacal")
         params["zodiacLabelZh"] = (core_payload.get("chart_profile") or {}).get(
             "zodiac_label_zh"
         )
+    else:
+        pass
     ayanamsha = (core_payload.get("chart_profile") or {}).get("ayanamsha")
     if ayanamsha:
         params["ayanamsha"] = ayanamsha
+    else:
+        pass
     if extra_params:
         params.update(extra_params)
+    else:
+        pass
     angle_definition = core_payload["chart_profile"].get("angle_definition")
     if angle_definition is not None:
         params["angleDefinition"] = angle_definition
+    else:
+        pass
     if house_geometry is not None and house_geometry.projected:
         projection = core_payload["context_geometry"]["house_position_projection"]
         params["housePositionMethod"] = projection["method"]
         params["housePositionProjection"] = projection
+    else:
+        pass
     if include_calculation_metadata:
         params["chart_profile"] = dict(core_payload.get("chart_profile") or {})
         params["calculationTimeLocal"] = birth_info.local_datetime.isoformat()
         params["calculationTimeUtc"] = birth_info.utc_isoformat
         if house_geometry is not None:
             params["houseAssignmentBasis"] = "core_geometry_before_display_rounding"
+        else:
+            pass
         params["auxiliaryPointSources"] = {
             "Pars Fortuna": "core.classical.lots.fortune"
         }
@@ -576,17 +606,27 @@ def _build_local_chart_response(
             params["fortuneDefinition"] = geometry["fortune_definition"]
             if "motion_policy" in geometry:
                 params["motionPolicy"] = geometry["motion_policy"]
+            else:
+                pass
             if "ephemeris_reference_points" in geometry:
                 params["ephemerisReferencePoints"] = geometry[
                     "ephemeris_reference_points"
                 ]
+            else:
+                pass
             params["housePositionMethod"] = "ecliptic_longitude_cusp_intervals"
             if "house_position_projection" in geometry:
                 projection = geometry["house_position_projection"]
                 params["housePositionMethod"] = projection["method"]
                 params["housePositionProjection"] = projection
                 params["houseOrientation"] = "native_nonprograde_cusps"
+            else:
+                pass
             params["lunarNodeModel"] = "mean_node_and_its_opposite"
+        else:
+            pass
+    else:
+        pass
     response: dict[str, object] = {
         "params": params,
         "chart": {
@@ -606,6 +646,8 @@ def _build_local_chart_response(
     if chart_variant == "guolao_chart":
         response["rulesets"] = core_payload["guolao"]["rulesets"]
         response["validation"] = core_payload["guolao"]["validation"]
+    else:
+        pass
     return response
 
 
@@ -613,89 +655,37 @@ def _build_metaphysics_seed(
     *,
     date_text: str,
     time_text: str,
-    timezone_name: Optional[str],
+    timezone_name: str | None,
     lat: Any = None,
     lon: Any = None,
-    gps_lat: Optional[float] = None,
-    gps_lon: Optional[float] = None,
+    gps_lat: float | None = None,
+    gps_lon: float | None = None,
     use_true_solar_time: bool = False,
 ) -> MetaphysicsSeed:
     timezone_value = timezone_name or DEFAULT_BIRTH_TIMEZONE
-    input_datetime_naive = parse_iso_datetime(
-        f"{_normalize_date_text(date_text)} {_normalize_time_text(time_text)}"
+    input_datetime = parse_local_datetime(
+        date_text, time_text, timezone_value, validate_wall=True
     )
-    input_datetime = localize_datetime(input_datetime_naive, timezone_value)
-    # A bare wall clock needs gap/fold validation. An explicit ISO offset
-    # already identifies one physical instant: converting it into a named
-    # zone may legitimately land in either side of a fold. Keep that instant
-    # rather than rejecting it merely because its local label repeats.
-    if input_datetime_naive.utcoffset() is None:
-        validate_local_clock(input_datetime)
-    corrected_datetime = input_datetime
-    total_correction_minutes = 0.0
-    solar_adjustment_evidence = None
     _, longitude = _resolve_coordinates(
         lat=lat,
         lon=lon,
         gps_lat=gps_lat,
         gps_lon=gps_lon,
     )
-
-    if use_true_solar_time:
-        adjustment = calculate_solar_time_adjustment(
-            input_datetime,
-            timezone_value,
-            longitude,
-            strategy=SOLAR_TIME_STRATEGY_APPARENT,
-        )
-        total_correction_minutes = adjustment["total_correction_minutes"]
-        # The adjustment maps this zone's civil wall clock to a solar label;
-        # it is not an elapsed-time shift of the physical input instant. An
-        # ISO input can carry a different UTC offset. Adding to that original
-        # clock and then converting zones can cross DST a second time, making
-        # equivalent inputs differ by an hour (and even a day/hour pillar).
-        # Keep this derived wall label naive. Attaching an IANA zone turns an
-        # imaginary DST-gap label into an instant that consumers normalize.
-        corrected_datetime = input_datetime.replace(tzinfo=None) + timedelta(
-            minutes=total_correction_minutes
-        )
-        solar_adjustment_evidence = solar_time_receipt(
-            civil_instant=input_datetime,
-            corrected_label=corrected_datetime,
-            timezone_name=timezone_value,
-            longitude=longitude,
-            adjustment=adjustment,
-        )
-
-    pillars = BaZiCalendar.get_four_pillars(
-        corrected_datetime,
+    return build_metaphysics_seed(
+        civil=input_datetime,
         timezone_name=timezone_value,
-        civil_datetime=input_datetime,
-    )
-    calendar_context = build_calendar_context(
-        corrected_datetime,
-        timezone_name=timezone_value,
-        pillars=pillars,
-        civil_datetime=input_datetime,
-    )
-    return MetaphysicsSeed(
-        input_datetime=input_datetime,
-        corrected_datetime=corrected_datetime,
-        timezone=timezone_value,
+        input_offset_visible=True,
         longitude=longitude,
-        applied_true_solar=use_true_solar_time,
-        total_correction_minutes=total_correction_minutes,
-        pillars=pillars,
-        calendar_context=calendar_context,
-        solar_time_adjustment=solar_adjustment_evidence,
+        use_true_solar_time=use_true_solar_time,
     )
 
 
-def _build_metaphysics_analysis_context(seed: MetaphysicsSeed) -> Dict[str, Any]:
+def _build_metaphysics_analysis_context(seed: MetaphysicsSeed) -> dict[str, Any]:
     lunar_context = seed.calendar_context.get("lunar_calendar") or {}
     return {
         "input_datetime": seed.input_datetime.strftime("%Y-%m-%d %H:%M:%S"),
-        "corrected_datetime": seed.corrected_datetime.strftime("%Y-%m-%d %H:%M:%S"),
+        "corrected_datetime": seed.clock.isoformat(sep=" ", timespec="seconds"),
         "timezone": seed.timezone,
         "longitude": seed.longitude,
         "applied_true_solar": seed.applied_true_solar,
@@ -707,11 +697,13 @@ def _build_metaphysics_analysis_context(seed: MetaphysicsSeed) -> Dict[str, Any]
     }
 
 
-def _render_qimen_palace_sections(qimen: Dict[str, Any]) -> List[Tuple[str, str]]:
-    sections: List[Tuple[str, str]] = []
+def _render_qimen_palace_sections(qimen: dict[str, Any]) -> list[tuple[str, str]]:
+    sections: list[tuple[str, str]] = []
     for palace in qimen.get("palaces", []) or []:
         if not isinstance(palace, dict):
             continue
+        else:
+            pass
         evidence = palace.get("evidence") or {}
         god_meaning = evidence.get("god_interpretation") or {}
         tomb = evidence.get("wonder_tomb") or {}
@@ -725,6 +717,8 @@ def _render_qimen_palace_sections(qimen: Dict[str, Any]) -> List[Tuple[str, str]
             or content_trigram != palace.get("trigram")
         ):
             content_line = f"内容来源：{content_palace} / {content_trigram or '无'}"
+        else:
+            pass
         sections.append(
             (
                 palace.get("name", "宫位"),
@@ -771,7 +765,7 @@ def _render_qimen_palace_sections(qimen: Dict[str, Any]) -> List[Tuple[str, str]
     return sections
 
 
-def _build_qimen_palace_overview_lines(qimen: Dict[str, Any]) -> List[str]:
+def _build_qimen_palace_overview_lines(qimen: dict[str, Any]) -> list[str]:
     return [
         (
             f"{palace.get('name', '宫位')}："

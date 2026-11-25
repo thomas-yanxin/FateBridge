@@ -28,7 +28,7 @@ def _semantic_sources(group):
     for key, case in declarations.items():
         with tempfile.TemporaryDirectory() as empty:
             path = (
-                root / "tests/data/human_design/jpl"
+                root / "tests/fixtures"
                 if case["backend"] == "jpl"
                 else Path(empty) if case["backend"] == "moshier" else root / "ephe"
             )

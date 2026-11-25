@@ -2,6 +2,7 @@
 
 import asyncio
 import json
+from pathlib import Path
 
 import pytest
 from fastmcp import Client
@@ -11,8 +12,16 @@ from pydantic import ValidationError
 
 import fatebridge.mcp_server as mcp
 from fatebridge.cli import run as cli_run
-from fatebridge.core.output_bazi_evidence import EvidenceStructureProfile
-from tests.support.transports import AS_OF, SPECS, business, call_cli, inputs, native
+from fatebridge.core.contracts.output_bazi_evidence import EvidenceStructureProfile
+from tests.support.transports import (
+    AS_OF,
+    SPECS,
+    business,
+    call_cli,
+    capability_contracts,
+    inputs,
+    native,
+)
 from tests.support.transports import rest as _rest_fixture
 
 rest = _rest_fixture
@@ -30,7 +39,7 @@ rest = _rest_fixture
 )
 def test_current_policy_cannot_accept_legacy_promotion_or_unadjudicated_preferences(
     dominant,
-):
+) -> None:
     payload = {
         "resolution_policy": "source_conditions_before_preference_v3",
         "dominant_structure": dominant,
@@ -53,10 +62,14 @@ def test_current_policy_cannot_accept_legacy_promotion_or_unadjudicated_preferen
         {"key": "selected_month_reference", "formation_status": "formed"},
     ],
 )
-def test_current_key_alone_never_bypasses_month_reference_semantics(policy, dominant):
+def test_current_key_alone_never_bypasses_month_reference_semantics(
+    policy: str | None, dominant
+) -> None:
     payload = {"dominant_structure": dominant}
     if policy is not None:
         payload["resolution_policy"] = policy
+    else:
+        pass
     with pytest.raises(ValidationError):
         EvidenceStructureProfile.model_validate(payload)
     with pytest.raises(SchemaError):
@@ -66,8 +79,8 @@ def test_current_key_alone_never_bypasses_month_reference_semantics(policy, domi
 
 
 def test_current_profile_and_version_conditions_agree_on_three_surfaces(
-    rest, tmp_path, capsys
-):
+    rest, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     spec = SPECS["bazi_birth"]
     payload = inputs(spec)
     options = {
@@ -100,15 +113,15 @@ def test_current_profile_and_version_conditions_agree_on_three_surfaces(
     )
     profile = cli["bazi_birth"]["structure_profile"]
     assert profile["resolution_policy"] == "source_force_before_preference_v4"
-    assert profile["dominant_structure"]["key"] == "selected_month_reference"
+    assert profile["dominant_structure"]["key"] == "month_use_reference"
     assert profile["dominant_structure"]["formation_status"] == "not_adjudicated"
     for key in ("useful_elements", "avoid_elements", "useful_ten_gods"):
         assert profile["dominant_structure"][key] == []
 
     async def native_schema():
         async with Client(mcp.app) as client:
-            tools = {tool.name: tool for tool in await client.list_tools()}
-        return tools[spec.tool_name].model_dump(by_alias=True)["outputSchema"]
+            tools = await capability_contracts(client, detail="full")
+        return tools[spec.tool_name]["output_schema"]
 
     assert cli_run(["describe", spec.tool_name]) == 0
     cli_schema = json.loads(capsys.readouterr().out)["output_schema"]

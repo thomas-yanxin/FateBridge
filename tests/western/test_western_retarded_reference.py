@@ -13,7 +13,9 @@ PROTOCOL = ROOT / "tests/fixtures/western-retarded-model-protocol.json"
 REFERENCE = ROOT / "tests/fixtures/western-retarded-model-reference.json"
 
 
-def test_reduction_reference_is_complete_and_distinct_from_an_independent_ephemeris():
+def test_reduction_reference_is_complete_and_distinct_from_an_independent_ephemeris() -> (
+    None
+):
     protocol, reference = validate_reference(PROTOCOL, REFERENCE)
     assert (
         len(reference["rows"]) == len(protocol["cases"]) * len(protocol["frames"]) == 12
@@ -37,11 +39,15 @@ def test_reduction_reference_is_complete_and_distinct_from_an_independent_epheme
             imports.extend(x.name for x in node.names)
         elif isinstance(node, ast.ImportFrom):
             imports.append(node.module or "")
+        else:
+            pass
     assert not any(x == "fatebridge" or x.startswith("fatebridge.") for x in imports)
 
 
 @pytest.mark.parametrize("changed", ["protocol", "reference"])
-def test_altered_reference_or_coverage_cannot_be_reaccepted(changed, tmp_path):
+def test_altered_reference_or_coverage_cannot_be_reaccepted(
+    changed: str, tmp_path: Path
+) -> None:
     protocol, reference = PROTOCOL, REFERENCE
     if changed == "protocol":
         protocol = tmp_path / "protocol.json"

@@ -5,10 +5,10 @@ import copy
 import pytest
 
 from fatebridge.core.astro.birth import build_astro_birth_info
-from fatebridge.core.jyotish import build_india
-from fatebridge.core.jyotish_evidence import cheshta_ruler_provenance
-from fatebridge.core.jyotish_mean import MODEL, SOURCE, STAR_PLANETS
-from fatebridge.core.jyotish_motion import cheshta_arc
+from fatebridge.core.jyotish.jyotish import build_india
+from fatebridge.core.jyotish.jyotish_evidence import cheshta_ruler_provenance
+from fatebridge.core.jyotish.jyotish_mean import MODEL, SOURCE, STAR_PLANETS
+from fatebridge.core.jyotish.jyotish_motion import cheshta_arc
 from tests.support.reference_data import resolve
 
 
@@ -72,8 +72,8 @@ def assert_attribution(india):
         else:
             assert "supporting_source_id" not in factor
             assert factor["fact"] is None
-            assert "本五星宫主" in factor["traditional_interpretation"]
-            assert "未计算" in factor["traditional_interpretation"]
+            assert method["value_origin"] == "unavailable_five_star_mean_model"
+            assert context["value_status"] == "unavailable"
         for claim in [
             *context["scenarios"],
             *context["constraints"],
@@ -87,8 +87,8 @@ def assert_attribution(india):
     "year,model", [(2000, "unadjudicated"), (2000, MODEL), (1800, MODEL), (2051, MODEL)]
 )
 def test_frozen_twelve_hour_grid_covers_every_ruler_without_global_model_leakage(
-    year, model
-):
+    year: int, model
+) -> None:
     found = set()
     for hour in range(0, 24, 2):
         india = build_india(
@@ -112,7 +112,7 @@ def computed():
 @pytest.mark.parametrize("planet", ["Sun", "Moon", *STAR_PLANETS])
 def test_contradictory_upstream_value_cannot_receive_a_faithful_source_receipt(
     computed, planet
-):
+) -> None:
     motion = copy.deepcopy(computed["strengths"]["cheshta_bala"])
     first = next(iter(motion["scenarios"].values()))
     first[planet] += 1
@@ -122,7 +122,7 @@ def test_contradictory_upstream_value_cannot_receive_a_faithful_source_receipt(
 
 def test_computed_mean_with_unadjudicated_arc_keeps_applied_source_and_missing_value(
     computed,
-):
+) -> None:
     # Controlled opposed operands, not an independently observed birth case.
     # Editing only the status/value would fabricate a missing calculation.
     motion = copy.deepcopy(computed["strengths"]["cheshta_bala"])
@@ -165,8 +165,8 @@ def test_computed_mean_with_unadjudicated_arc_keeps_applied_source_and_missing_v
 
 @pytest.mark.parametrize("hour,planet", [(2, "Moon"), (4, "Sun")])
 def test_luminary_origin_is_unchanged_by_selecting_an_unrelated_five_star_model(
-    hour, planet
-):
+    hour: int, planet: str
+) -> None:
     packets = []
     for model in ("unadjudicated", MODEL):
         india = build_india(
@@ -186,7 +186,6 @@ def test_luminary_origin_is_unchanged_by_selecting_an_unrelated_five_star_model(
         "rule_id",
         "source_id",
         "source_section",
-        "traditional_interpretation",
     ):
         assert packets[0][key] == packets[1][key]
     assert (
@@ -208,8 +207,13 @@ def test_luminary_origin_is_unchanged_by_selecting_an_unrelated_five_star_model(
     ],
 )
 def test_per_ruler_dependencies_survive_rest_mcp_cli(
-    monkeypatch, capsys, key, year, hour, model
-):
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    key: str,
+    year: int,
+    hour: int,
+    model,
+) -> None:
     from tests.jyotish.test_jyotish_transports import call_surfaces
 
     payload = {**birth_payload(year, hour), "divisions": [], "cheshta_model": model}
@@ -217,6 +221,8 @@ def test_per_ruler_dependencies_survive_rest_mcp_cli(
         payload["chart_variant"] = "india_chart"
     elif key == "astro_vimshottari":
         payload["analysis_year"] = 2100
+    else:
+        pass
     packet = call_surfaces(
         monkeypatch,
         capsys,
@@ -236,11 +242,11 @@ def test_per_ruler_dependencies_survive_rest_mcp_cli(
 
 
 @pytest.mark.parametrize("hour", [0, 2, 4])
-def test_upstream_input_claims_verify_against_the_same_original_run(hour):
+def test_upstream_input_claims_verify_against_the_same_original_run(hour: int) -> None:
     from fatebridge.application.execution import execute_tool
     from fatebridge.core.execution_context import ExecutionOptions
     from fatebridge.services.tool_catalog import CATALOG
-    from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
+    from validation.claims import CalculationClaim, verify_calculation_claims
 
     spec = next(s for s in CATALOG if s.key == "astro_india")
     body = execute_tool(

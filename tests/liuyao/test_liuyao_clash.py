@@ -6,15 +6,18 @@ from pathlib import Path
 
 import pytest
 
+from fatebridge.core.contracts.output_liuyao_clash import ClashConditions, LineClash
+from fatebridge.core.liuyao.liuyao_clash import PROFILE
+from fatebridge.core.local_techniques.sixyao import build_sixyao_result
 from scripts.liuyao.build_profile import build_profile
-from tests.liuyao.test_liuyao_conditions import conditional_case
+from tests.unit_test.fixtures.liuyao import conditional_case, liuyao_cases
+from tests.unit_test.fixtures.liuyao import strength_case as classical
 
 REFERENCE = Path(__file__).parents[1] / "fixtures/liuyao_clash_v10"
 CASES = json.loads((REFERENCE / "cases.json").read_text(encoding="utf-8"))["cases"]
 
 
-def test_clash_reference_remains_frozen():
-    from fatebridge.core.liuyao_clash import PROFILE
+def test_clash_reference_remains_frozen() -> None:
 
     assert build_profile("clash") == PROFILE
     frozen = json.loads((REFERENCE / "freeze.json").read_text())
@@ -23,7 +26,7 @@ def test_clash_reference_remains_frozen():
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
-def test_frozen_day_clash_break_fill_and_scatter_are_different(case):
+def test_frozen_day_clash_break_fill_and_scatter_are_different(case) -> None:
     result = conditional_case(case)
     detail = result["clash_conditions"]["focus"]
     assert detail["branch"] == case["expected_branch"]
@@ -36,6 +39,8 @@ def test_frozen_day_clash_break_fill_and_scatter_are_different(case):
         assert result["lines"][3]["activity_condition_match"] is None
         assert result["control_conditions"]["activity_resolution_passes"] >= 2
         assert result["control_conditions"]["activity_resolution_passes"] <= 7
+    else:
+        pass
     strength = result["classical_assessment"]["focus"]["strength"]
     for expected, field in [
         ("expected_weak", "is_weak"),
@@ -43,31 +48,43 @@ def test_frozen_day_clash_break_fill_and_scatter_are_different(case):
     ]:
         if expected in case:
             assert strength[field] is case[expected]
+        else:
+            pass
     if "expected_activity" in case:
         assert (
             result["lines"][case["focus_line"] - 1]["activity_condition_match"]
             is case["expected_activity"]
         )
+    else:
+        pass
     if "expected_day_injury" in case:
         assert detail["day_clash_harm_condition"] is case["expected_day_injury"]
+    else:
+        pass
     if "expected_back_clash" in case:
         assert detail["back_clash"] is case["expected_back_clash"]
         assert detail["back_control"] is case["expected_back_control"]
+    else:
+        pass
     if "expected_moving_clash_positions" in case:
         assert [
             a["position"] for a in detail["clash_actors"] if a["location"] == "visible"
         ] == case["expected_moving_clash_positions"]
+    else:
+        pass
     assert "probability" not in detail and "predicted_success" not in detail
 
 
-def test_raw_role_day_clash_is_not_an_applied_injury_without_a_harm_condition():
+def test_raw_role_day_clash_is_not_an_applied_injury_without_a_harm_condition() -> None:
     result = conditional_case({**CASES[3], "focus_line": 2})
     water = next(r for r in result["role_effects"]["lines"] if r["position"] == 4)
     assert water["atom_values"]["injured_relation"] is True
     assert water["conditional_atom_values"]["injured_relation"] is False
 
 
-def test_confirmed_current_void_filling_is_not_the_same_as_no_longer_in_xunkong():
+def test_confirmed_current_void_filling_is_not_the_same_as_no_longer_in_xunkong() -> (
+    None
+):
     result = conditional_case(CASES[6])
     assert result["clash_conditions"]["focus"]["day_void_fill_condition"] is True
     void = result["void_conditions"]["focus"]
@@ -80,7 +97,7 @@ def test_confirmed_current_void_filling_is_not_the_same_as_no_longer_in_xunkong(
     )
 
 
-def test_not_scattered_does_not_remove_own_back_control():
+def test_not_scattered_does_not_remove_own_back_control() -> None:
     result = conditional_case(CASES[9])
     assert result["clash_conditions"]["focus"]["moving_scatter_condition"] is False
     assert result["lines"][4]["outgoing_obstructions"]
@@ -93,8 +110,37 @@ def test_not_scattered_does_not_remove_own_back_control():
     )
 
 
-def test_unresolved_dark_activity_is_not_confirmed_harmony_or_nonvoid_activity():
-    from tests.liuyao.test_liuyao_control import CASES as CONTROL_CASES
+def test_moving_residual_qi_prevents_scatter_without_removing_day_control() -> None:
+
+    # Zengshan facsimile pp. 59–60 and 85: Wei-month residual fire,
+    # a moving Si line under a Hai-day clash and independent control.
+    result = build_sixyao_result(
+        date="2025-07-17",
+        time="12:00:00",
+        zone="+08:00",
+        gua_code="000111",
+        changed_code="010111",
+        focus_line=2,
+        focus_kind="visible",
+    )
+    detail = result["liuyao_evidence"]["conditional_analysis"]
+    assert detail["lines"][1]["monthly_strength"]["residual_qi"] is True
+    strength = detail["classical_assessment"]["focus"]["strength"]
+    assert strength["supports"] == strength["pending_supports"] == []
+    assert any(
+        h["location"] == "day" and h["branch"] == "亥" and h["grounded"] is True
+        for h in strength["oppositions"]
+    )
+    focus = detail["clash_conditions"]["focus"]
+    assert focus["branch"] == "巳" and focus["is_day_clash"] is True
+    assert focus["has_confirmed_qi"] is True
+    assert focus["moving_scatter_condition"] is False
+
+
+def test_unresolved_dark_activity_is_not_confirmed_harmony_or_nonvoid_activity() -> (
+    None
+):
+    CONTROL_CASES = liuyao_cases("liuyao_control_v9")
 
     result = conditional_case(CONTROL_CASES[3])
     gold = next(
@@ -115,8 +161,7 @@ def test_unresolved_dark_activity_is_not_confirmed_harmony_or_nonvoid_activity()
     assert active["matched"] is None and active["status"] == "unresolved"
 
 
-def test_canonical_hidden_water_does_not_borrow_unresolved_dark_metal():
-    from fatebridge.core.local_techniques.sixyao import build_sixyao_result
+def test_canonical_hidden_water_does_not_borrow_unresolved_dark_metal() -> None:
 
     # Modern synthetic input, independently mounted by the public builder.
     result = build_sixyao_result(
@@ -138,8 +183,7 @@ def test_canonical_hidden_water_does_not_borrow_unresolved_dark_metal():
     )
 
 
-def test_static_day_break_snapshot_does_not_mislabel_it_as_elemental_control():
-    from fatebridge.core.local_techniques.sixyao import build_sixyao_result
+def test_static_day_break_snapshot_does_not_mislabel_it_as_elemental_control() -> None:
 
     result = build_sixyao_result(
         date="2000-03-24", time="12:00:00", gua_code="110110", focus_line=4
@@ -150,14 +194,15 @@ def test_static_day_break_snapshot_does_not_mislabel_it_as_elemental_control():
     assert "静爻日破条件匹配，未见已列独立生扶" in result["snapshot_text"]
 
 
-def test_clash_focus_does_not_apply_original_day_clash_to_changed_or_hidden_focus():
+def test_clash_focus_does_not_apply_original_day_clash_to_changed_or_hidden_focus() -> (
+    None
+):
     result = conditional_case(CASES[0], focus_kind="changed")
     assert result["focus"]["selected"]["branch"] == "子"
     assert result["clash_conditions"]["focus"] is None
 
 
-def test_clash_models_accept_leaf_projection_without_siblings():
-    from fatebridge.core.output_liuyao_clash import ClashConditions, LineClash
+def test_clash_models_accept_leaf_projection_without_siblings() -> None:
 
     assert (
         LineClash.model_validate({"day_break_status": "no_day_clash"}).day_break_status
@@ -169,9 +214,10 @@ def test_clash_models_accept_leaf_projection_without_siblings():
     )
 
 
-def test_prior_true_tomb_annotation_retains_unknown_opening_and_clear_counterfactual():
-    from tests.liuyao.test_liuyao_strength import CASES as STRENGTH_CASES
-    from tests.liuyao.test_liuyao_strength import classical
+def test_prior_true_tomb_annotation_retains_unknown_opening_and_clear_counterfactual() -> (
+    None
+):
+    STRENGTH_CASES = liuyao_cases("liuyao_strength_v5")
 
     original = next(c for c in STRENGTH_CASES if c["id"] == "synthetic-weak-day-tomb")
     assert original["expected_true_tomb"] is True

@@ -48,6 +48,8 @@ def main():
         response = json.loads(raw)
         if "error" in response:
             raise RuntimeError(response["error"])
+        else:
+            pass
         text = response["result"]
         table = text.split("$$SOE\n", 1)[1].split("$$EOE", 1)[0]
         rows = []
@@ -92,3 +94,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+else:
+    pass

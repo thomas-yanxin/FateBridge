@@ -6,8 +6,8 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.canping import liunian_series
 from fatebridge.core.local_techniques.canping import build_canping_result
+from fatebridge.core.numerology.canping import liunian_series
 from fatebridge.services.tool_catalog import CATALOG
 
 FIXTURE = Path(__file__).parents[1] / "fixtures/canping_legacy_year_labels_v1"
@@ -27,7 +27,7 @@ def native_source(monkeypatch, tmp_path):
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path / "empty-ephe"))
 
 
-def test_frozen_oracle_is_the_reused_official_minute_with_safe_probe_margin():
+def test_frozen_oracle_is_the_reused_official_minute_with_safe_probe_margin() -> None:
     source = REFERENCE["reused_calendar_source"]
     assert (
         hashlib.sha256((FIXTURE / source["file"]).read_bytes()).hexdigest()
@@ -41,7 +41,9 @@ def test_frozen_oracle_is_the_reused_official_minute_with_safe_probe_margin():
 
 
 @pytest.mark.parametrize("case", REFERENCE["cases"], ids=lambda case: case["id"])
-def test_legacy_first_year_is_coherent_with_real_birth_pillar_on_both_sides(case):
+def test_legacy_first_year_is_coherent_with_real_birth_pillar_on_both_sides(
+    case,
+) -> None:
     result = build_canping_result(**request(case))
     pillar = result["four_pillars"]["year"]
     assert pillar["stem"] + pillar["branch"] == case["year_pillar"]
@@ -71,7 +73,7 @@ def test_legacy_first_year_is_coherent_with_real_birth_pillar_on_both_sides(case
     next(s for s in CATALOG if s.key == "canping").output_model.model_validate(result)
 
 
-def test_january_wrong_taisui_changes_real_numbers_and_selected_luck_text():
+def test_january_wrong_taisui_changes_real_numbers_and_selected_luck_text() -> None:
     result = build_canping_result(**request(REFERENCE["cases"][0]))
     first = result["liunian_series"]["rows"][0]
     expected = REFERENCE["january_manual_number"]
@@ -89,7 +91,7 @@ def test_january_wrong_taisui_changes_real_numbers_and_selected_luck_text():
     )
 
 
-def test_direct_fixed_pillar_helper_rejects_a_contradictory_first_year_label():
+def test_direct_fixed_pillar_helper_rejects_a_contradictory_first_year_label() -> None:
     with pytest.raises(ValueError, match="年标签.*年柱"):
         liunian_series(
             year_gz="乙巳",

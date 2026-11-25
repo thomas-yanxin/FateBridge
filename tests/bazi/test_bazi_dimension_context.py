@@ -41,7 +41,7 @@ def test_dayun_analysis_exposes_precise_start_age_and_direction() -> None:
     assert info["direction"] == "顺行"
 
 
-def test_unknown_gender_limits_dayun_without_losing_natal_or_liunian():
+def test_unknown_gender_limits_dayun_without_losing_natal_or_liunian() -> None:
     person = create_person_info(1990, 5, 20, 10, "t", birth_place="北京")  # gender 未知
     result = bazi.calculate_bazi_career(person, analysis_year=2026)
     assert "error" not in result
@@ -52,7 +52,7 @@ def test_unknown_gender_limits_dayun_without_losing_natal_or_liunian():
     assert result["career_analysis"]["evidence_chain"]["ten_gods"]
 
 
-def test_known_gender_produces_forward_dayun_for_yang_year_male():
+def test_known_gender_produces_forward_dayun_for_yang_year_male() -> None:
     person = create_person_info(1990, 5, 20, 10, "t", "男", "北京")  # 1990 庚午 阳年
     tc = bazi.calculate_bazi_career(person, analysis_year=2026)["career_analysis"][
         "timing_context"
@@ -64,8 +64,8 @@ def test_known_gender_produces_forward_dayun_for_yang_year_male():
     "year, month, expected_day", [(2030, 6, 30), (2025, 2, 28), (2024, 2, 29)]
 )
 def test_resolve_analysis_date_clamps_partial_day(
-    monkeypatch, year, month, expected_day
-):
+    monkeypatch: pytest.MonkeyPatch, year: int, month: int, expected_day: int
+) -> None:
     monkeypatch.setattr(
         bazi, "current_local_datetime", lambda: datetime(year, month, 15)
     )
@@ -77,39 +77,41 @@ def test_resolve_analysis_date_clamps_partial_day(
 
 
 @pytest.mark.parametrize("year, month", [(2030, 6), (2025, 2), (2024, 2)])
-def test_resolve_analysis_date_rejects_complete_invalid_date(year, month):
+def test_resolve_analysis_date_rejects_complete_invalid_date(
+    year: int, month: int
+) -> None:
     with pytest.raises(ValueError, match="day is out of range"):
         _resolve_analysis_date(year, month, 31)
 
 
-def test_children_star_differs_by_gender():
+def test_children_star_differs_by_gender() -> None:
     male = create_person_info(1990, 6, 15, 10, "t", "男", "北京")
     female = create_person_info(1990, 6, 15, 10, "t", "女", "北京")
     cs_m = bazi.calculate_bazi_children(male, dayun_pillar="壬戌")["children_analysis"][
-        "child_star"
-    ]["star"]
+        "evidence_chain"
+    ]["topic"]["stars"]
     cs_f = bazi.calculate_bazi_children(female, dayun_pillar="壬戌")[
         "children_analysis"
-    ]["child_star"]["star"]
-    assert "官杀" in cs_m  # 男命子女星 = 官杀
-    assert "食伤" in cs_f  # 女命子女星 = 食伤
+    ]["evidence_chain"]["topic"]["stars"]
+    assert set(cs_m) == {"正官", "七杀"}  # 男命子女星 = 官杀
+    assert set(cs_f) == {"食神", "伤官"}  # 女命子女星 = 食伤
     assert cs_m != cs_f
 
 
-def test_romance_opposite_sex_star_differs_by_gender():
+def test_romance_opposite_sex_star_differs_by_gender() -> None:
     male = create_person_info(1990, 6, 15, 10, "t", "男", "北京")
     female = create_person_info(1990, 6, 15, 10, "t", "女", "北京")
     bm = bazi.calculate_bazi_romance(male, dayun_pillar="壬戌")["romance_analysis"][
-        "opposite_sex_star"
-    ]["basis"]
+        "evidence_chain"
+    ]["topic"]["stars"]
     bf = bazi.calculate_bazi_romance(female, dayun_pillar="壬戌")["romance_analysis"][
-        "opposite_sex_star"
-    ]["basis"]
-    assert "财" in bm  # 男命异性缘 = 财
-    assert "官杀" in bf  # 女命异性缘 = 官杀
+        "evidence_chain"
+    ]["topic"]["stars"]
+    assert set(bm) == {"正财", "偏财"}  # 男命异性缘 = 财
+    assert set(bf) == {"正官", "七杀"}  # 女命异性缘 = 官杀
 
 
-def test_dimension_auto_derives_correct_dayun_and_liunian():
+def test_dimension_auto_derives_correct_dayun_and_liunian() -> None:
     person = create_person_info(1990, 6, 15, 10, "t", "男", "北京")
     tc = bazi.calculate_bazi_wealth(person, analysis_year=2026)["wealth_analysis"][
         "timing_context"
@@ -120,7 +122,7 @@ def test_dimension_auto_derives_correct_dayun_and_liunian():
     assert abs(tc["dayun_age"] - 28.56) < 0.5
 
 
-def test_explicit_pillars_override_auto_derivation():
+def test_explicit_pillars_override_auto_derivation() -> None:
     person = create_person_info(1990, 6, 15, 10, "t", "男", "北京")
     tc = bazi.calculate_bazi_wealth(person, analysis_year=2026, dayun_pillar="壬戌")[
         "wealth_analysis"
@@ -128,84 +130,28 @@ def test_explicit_pillars_override_auto_derivation():
     assert tc["overridden"]["dayun_pillar"] is True
 
 
-@pytest.mark.parametrize("hour_branch", ["寅", "亥", "子"])
 @pytest.mark.parametrize(
-    "hour_stem,expected_god,has_achievement",
-    [
-        ("甲", "比肩", False),
-        ("乙", "劫财", False),
-        ("丙", "食神", True),
-        ("丁", "伤官", True),
-        ("戊", "偏财", True),
-        ("己", "正财", True),
-        ("庚", "七杀", True),
-        ("辛", "正官", True),
-        ("壬", "偏印", True),
-        ("癸", "正印", True),
-    ],
+    "hour,expected",
+    [(("丙", "寅"), "食神"), (("辛", "未"), "正官"), (("壬", "申"), "偏印")],
 )
-def test_children_hour_gods_describe_parent_symbols_not_child_abilities(
-    hour_stem, expected_god, has_achievement, hour_branch
-):
-    """Every ten-god branch must retain facts without a child's own chart claims."""
-    import json
-
-    from fatebridge.analysis.children import ChildrenAnalysis
-    from fatebridge.core.output_bazi import ChildrenAnalysis as ChildrenOutput
-
-    pillars = {
-        "year": ("甲", "子"),
-        "month": ("丙", "寅"),
-        "day": ("甲", "午"),
-        "hour": (hour_stem, hour_branch),
-    }
-    result = ChildrenAnalysis.analyze_children(pillars, "女")
-    ChildrenOutput.model_validate(result)
-    palace = result["child_palace"]
-    relationship = result["relationship"]
-    assert palace["hour_pillar"] == hour_stem + hour_branch
-    assert palace["hour_ten_god"] == expected_god
-    assert relationship["hour_ten_god"] == expected_god
-    assert set(relationship) == {"hour_ten_god", "trait", "achievement"}
-    assert relationship["trait"] == palace["trait"]
-    assert "命主" in relationship["trait"] and "传统象意" in relationship["trait"]
-    assert isinstance(relationship["achievement"], list)
-    assert bool(relationship["achievement"]) is has_achievement
-    for interpretation in relationship["achievement"]:
-        assert "命主" in interpretation and "传统象意" in interpretation
-        assert "不推断孩子" in interpretation
-    assert "不推断孩子的性格、能力或成就" in result["interpretation_scope"]
-    text = json.dumps(result, ensure_ascii=False)
-    for claim in (
-        "子女聪慧",
-        "子女聪明",
-        "子女端正有出息",
-        "易有官贵之子",
-        "子女才华出众",
-        "学业文化有成",
-        "能成大事",
-        "得子女财力之助",
-        "亲子关系融洽",
-        "亲子关系较顺",
-        "聚少离多",
-    ):
-        assert claim not in text
-
-
-def test_children_symbol_wording_preserves_star_weights_and_affinity_score():
-    """A wording correction must not alter the underlying cultural classification."""
-    from fatebridge.analysis.children import ChildrenAnalysis
+def test_children_preserves_hour_pillar_and_its_stem_classification(
+    hour, expected: str
+) -> None:
+    from fatebridge.core.bazi.bazi_evidence import (
+        build_natal_evidence,
+        build_topic_evidence,
+    )
 
     pillars = {
         "year": ("甲", "子"),
         "month": ("丙", "寅"),
         "day": ("甲", "午"),
-        "hour": ("丙", "寅"),
+        "hour": hour,
     }
-    result = ChildrenAnalysis.analyze_children(pillars, "女")
-    assert result["child_star"]["weight"] == 3.5
-    assert len(result["child_star"]["positions"]) == 5
-    assert result["affinity"]["score"] == 77
-    assert result["children_timing"] == {
-        "timing_signals": ["本轮未取得子女星／宫的时间关系，不据此判断生育时机"]
-    }
+    natal = build_natal_evidence(pillars)
+    topic = build_topic_evidence(natal, pillars, "children", "女", None, None)
+    assert topic["palaces"]["hour"]["pillar"] == "".join(hour)
+    assert any(
+        row["pillar"] == "hour" and row["location"] == "天干"
+        for row in natal["ten_gods"][expected]
+    )

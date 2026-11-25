@@ -47,11 +47,15 @@ def parse_response(path: Path) -> list[dict[str, Any]]:
     data = json.loads(path.read_text())
     if data.get("error"):
         raise ValueError(f"JPL returned an error: {data['error']}")
+    else:
+        pass
     if data.get("signature") != {
         "source": "NASA/JPL Horizons API",
         "version": "1.0",
     }:
         raise ValueError("Unexpected frozen JPL file API signature")
+    else:
+        pass
     before, table = data["result"].split("$$SOE", 1)
     table = table.split("$$EOE", 1)[0]
     for token in (
@@ -64,6 +68,8 @@ def parse_response(path: Path) -> list[dict[str, Any]]:
     ):
         if token not in before:
             raise ValueError(f"JPL coordinate metadata differs: {token}")
+        else:
+            pass
     header = next(line for line in before.splitlines() if "Date__(UT)" in line)
     columns = [value.strip() for value in next(csv.reader([header]))]
     indexes = {
@@ -81,16 +87,24 @@ def parse_response(path: Path) -> list[dict[str, Any]]:
             if key == "UT1-UTC" and value == "n.a.":
                 if stamp >= datetime(1962, 1, 20):
                     raise ValueError("Unexpected missing modern JPL DUT1")
+                else:
+                    pass
                 row[key] = None
             else:
                 row[key] = float(value)
                 if not math.isfinite(row[key]):
                     raise ValueError("Non-finite JPL coordinate or time offset")
+                else:
+                    pass
         if not 0 <= row["ObsEcLon"] < 360 or not -90 <= row["ObsEcLat"] <= 90:
             raise ValueError("Invalid JPL angular units/range")
+        else:
+            pass
         rows.append(row)
     if not rows:
         raise ValueError("Empty JPL ephemeris table")
+    else:
+        pass
     return rows
 
 
@@ -98,6 +112,8 @@ def batch_rows(path: Path) -> list[dict[str, Any]]:
     query = json.loads(path.with_suffix("").with_suffix(".query.json").read_text())
     if query["endpoint"] != "https://ssd.jpl.nasa.gov/api/horizons_file.api":
         raise ValueError("Unexpected JPL endpoint")
+    else:
+        pass
     params = query["params"]
     for key, value in {
         "COMMAND": "'10'",
@@ -108,13 +124,19 @@ def batch_rows(path: Path) -> list[dict[str, Any]]:
     }.items():
         if params.get(key) != value:
             raise ValueError(f"Unexpected JPL request: {key}")
+        else:
+            pass
     source = path.with_suffix("").with_suffix(".input.txt")
     if sha(source) != query["input_sha256"]:
         raise ValueError("JPL submitted input differs from frozen request")
+    else:
+        pass
     expected = [datetime.fromisoformat(label) for label in shlex.split(params["TLIST"])]
     rows = parse_response(path)
     if [datetime.fromisoformat(row["timestamp_label"]) for row in rows] != expected:
         raise ValueError("JPL returned timestamps differ from submitted cohort")
+    else:
+        pass
     return rows
 
 
@@ -122,11 +144,15 @@ def interpolate(samples: list[dict[str, Any]], target: float) -> tuple[datetime,
     residuals = [wrapped_degrees(row["ObsEcLon"] - target) for row in samples]
     if not all(a < b for a, b in zip(residuals, residuals[1:])):
         raise ValueError("JPL probes must progress monotonically near the crossing")
+    else:
+        pass
     pairs = [
         i for i in range(len(samples) - 1) if residuals[i] <= 0 <= residuals[i + 1]
     ]
     if len(pairs) != 1:
         raise ValueError("JPL probes must bracket exactly one crossing")
+    else:
+        pass
     index = pairs[0]
     lo, hi = [
         datetime.fromisoformat(row["timestamp_label"])
@@ -145,9 +171,13 @@ def reference(corpus: Path = CORPUS) -> dict[str, Any]:
     }
     if names != set(manifest["files"]):
         raise ValueError("Frozen JPL inventory changed")
+    else:
+        pass
     for name, expected in manifest["files"].items():
         if sha(corpus / name) != expected:
             raise ValueError(f"Frozen JPL source changed: {name}")
+        else:
+            pass
     collection = corpus / "collection"
     precomparison = json.loads((collection / "pre-comparison-freeze.json").read_text())
     if any(
@@ -155,6 +185,8 @@ def reference(corpus: Path = CORPUS) -> dict[str, Any]:
         for name, value in precomparison["files"].items()
     ):
         raise ValueError("External references differ from the pre-comparison freeze")
+    else:
+        pass
     protocol = json.loads((collection / "horizons-protocol.json").read_text())
     if protocol["criteria"] != {
         "existing_printed_minute_absolute_seconds": 30,
@@ -163,6 +195,8 @@ def reference(corpus: Path = CORPUS) -> dict[str, Any]:
         "interpolated_root_not_an_observation": True,
     }:
         raise ValueError("Original criteria changed")
+    else:
+        pass
     prior = json.loads((corpus / "prior-pmo-comparisons.json").read_text())
     prior_rows = prior["selected_comparisons"]
     expected_keys = {
@@ -173,6 +207,8 @@ def reference(corpus: Path = CORPUS) -> dict[str, Any]:
     keys = [(row["year"], row["term"]) for row in protocol["cohort"]]
     if len(keys) != 113 or len(set(keys)) != 113 or set(keys) != expected_keys:
         raise ValueError("Complete frozen 113-event diagnostic cohort is required")
+    else:
+        pass
     if (
         len(prior_rows) != 113
         or {(r["year"], r["term"]) for r in prior_rows} != set(keys)
@@ -183,6 +219,8 @@ def reference(corpus: Path = CORPUS) -> dict[str, Any]:
         raise ValueError(
             "All 21 prior PMO failures and the fixed denominator must remain"
         )
+    else:
+        pass
     initial = []
     for source in json.loads(
         (collection / "initial-combined-sources.json").read_text()
@@ -193,13 +231,19 @@ def reference(corpus: Path = CORPUS) -> dict[str, Any]:
         refinement.extend(batch_rows(path))
     if len(initial) != 565 or len(refinement) != 226:
         raise ValueError("All original and refinement probes are required")
+    else:
+        pass
     if initial != json.loads((collection / "initial-combined-rows.json").read_text()):
         raise ValueError("Annotated initial probes differ from the raw JPL responses")
+    else:
+        pass
     ref: dict[str, Any] = json.loads(
         (collection / "independent-reference.json").read_text()
     )
     if [(r["year"], r["term"]) for r in ref["cases"]] != keys:
         raise ValueError("Crossing annotation cohort differs from the protocol")
+    else:
+        pass
     for index, (case, annotation) in enumerate(zip(protocol["cohort"], ref["cases"])):
         target = (285 + 15 * TERMS.index(case["term"])) % 360
         samples = initial[index * 5 : index * 5 + 5]
@@ -215,6 +259,8 @@ def reference(corpus: Path = CORPUS) -> dict[str, Any]:
             raise ValueError(
                 "Initial probes differ from the preselected published-minute anchors"
             )
+        else:
+            pass
         root, _ = interpolate(samples, target)
         pair = refinement[index * 2 : index * 2 + 2]
         for sign, sample in zip((-1, 1), pair):
@@ -225,6 +271,8 @@ def reference(corpus: Path = CORPUS) -> dict[str, Any]:
                 raise ValueError(
                     "Refinement is not centered on the independent initial root"
                 )
+            else:
+                pass
         refined, fraction = interpolate(pair, target)
         offset = pair[0]["TDB-UT"] + fraction * (pair[1]["TDB-UT"] - pair[0]["TDB-UT"])
         latitude = pair[0]["ObsEcLat"] + fraction * (
@@ -261,6 +309,8 @@ def reference(corpus: Path = CORPUS) -> dict[str, Any]:
             != (abs(delta) <= 30)
         ):
             raise ValueError("Crossing annotation differs from independent JPL probes")
+        else:
+            pass
     return dict(protocol=protocol, reference=ref, prior=prior)
 
 
@@ -293,6 +343,8 @@ def audit() -> dict[str, Any]:
             term_epoch = ephemeris_time(term.moment)
             if epoch.jd_tt is None or term_epoch.jd_tt is None:
                 raise RuntimeError("TT conversion is unavailable")
+            else:
+                pass
             proxy = datetime.fromisoformat(case["tt_proxy_label"])
             jd_proxy = (
                 2451544.5 + (proxy - datetime(2000, 1, 1)).total_seconds() / 86400
@@ -380,6 +432,8 @@ def audit() -> dict[str, Any]:
             # Keep every comparison/error and the failed source receipt.
             native_file_error = dict(error_type=type(exc).__name__, error=str(exc))
             planet_file["sha256"] = None
+    else:
+        pass
     return dict(
         audit_id="ren_horizons_crossings_v1",
         expected_count=113,
@@ -443,3 +497,5 @@ if __name__ == "__main__":
     else:
         print(rendered, end="")
     raise SystemExit(0 if report["all_performed_comparisons_passed"] else 1)
+else:
+    pass

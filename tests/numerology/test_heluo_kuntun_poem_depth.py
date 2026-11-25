@@ -7,10 +7,11 @@ import re
 from pathlib import Path
 
 import pytest
+from pytest import MonkeyPatch
 
-from fatebridge.core import heluo_poems as hp
-from fatebridge.core.heluo import _tiaowen, gua_lines, yao_text
-from fatebridge.core.heluo_timing import _selected_text
+from fatebridge.core.heluo import heluo_poems as hp
+from fatebridge.core.heluo.heluo import _tiaowen, gua_lines, yao_text
+from fatebridge.core.heluo.heluo_timing import _selected_text
 from fatebridge.utils.errors import NumerologySourceError
 
 ROOT = Path(__file__).parents[1] / "fixtures/heluo_kuntun_poems_v1"
@@ -18,7 +19,7 @@ VERIFIED = json.loads((ROOT / "verified-readings-v2.json").read_bytes())
 AMENDMENTS = json.loads((ROOT / "amendments.json").read_bytes())
 
 
-def test_new_source_identity_preserves_draft_images_and_previous_six_entries():
+def test_new_source_identity_preserves_draft_images_and_previous_six_entries() -> None:
     for name, key in [
         ("draft-transcription.json", "draft_sha256"),
         ("amendments.json", "amendments_sha256"),
@@ -53,7 +54,9 @@ def test_new_source_identity_preserves_draft_images_and_previous_six_entries():
 @pytest.mark.parametrize(
     "entry", VERIFIED["entries"], ids=lambda e: e["hexagram"] + str(e["line"])
 )
-def test_every_new_poem_matches_accepted_reading_and_page_not_inherited_summary(entry):
+def test_every_new_poem_matches_accepted_reading_and_page_not_inherited_summary(
+    entry,
+) -> None:
     g, p = entry["hexagram"], entry["line"]
     text = yao_text(g, p)
     inherited = _tiaowen()[g]["yao"][str(p)]
@@ -93,7 +96,7 @@ def test_every_new_poem_matches_accepted_reading_and_page_not_inherited_summary(
 
 
 @pytest.mark.parametrize("entry", AMENDMENTS["source_specific_differences"])
-def test_ten_source_specific_differences_have_retained_inherited_witness(entry):
+def test_ten_source_specific_differences_have_retained_inherited_witness(entry) -> None:
     t = yao_text(entry["hexagram"], entry["line"])
     assert entry["adopted"] in t["shige"]
     assert entry["inherited"] not in t["shige"]
@@ -101,7 +104,7 @@ def test_ten_source_specific_differences_have_retained_inherited_witness(entry):
 
 
 @pytest.mark.parametrize("entry", AMENDMENTS["draft_withdrawals"])
-def test_seven_rejected_draft_readings_are_not_production_defects(entry):
+def test_seven_rejected_draft_readings_are_not_production_defects(entry) -> None:
     draft = json.loads((ROOT / "draft-transcription.json").read_bytes())
     old = next(
         e
@@ -114,14 +117,16 @@ def test_seven_rejected_draft_readings_are_not_production_defects(entry):
     assert entry["draft"] in old and entry["adopted"] in actual
     if entry["draft"] != "進步且盤桓":
         assert entry["draft"] not in actual
+    else:
+        pass
 
 
 @pytest.mark.parametrize(
     "fault", ["negation", "single_count", "heading", "label", "cross_source"]
 )
 def test_extended_group_forgery_rejects_without_borrowing_version(
-    fault, tmp_path, monkeypatch
-):
+    fault: str, tmp_path: Path, monkeypatch: MonkeyPatch
+) -> None:
     d = json.loads(hp.COLLATION_PATH.read_bytes())
     target = next(
         e for e in d["entries"] if (e["hexagram"], e["line"]) == ("水雷屯", 1)
@@ -137,6 +142,8 @@ def test_extended_group_forgery_rejects_without_borrowing_version(
         target["poems"][1]["printed_label"] = "不葉者"
     elif fault == "cross_source":
         d["corpus_id"] = "heluo_nlc_volume3_qian_line_poems_v1"
+    else:
+        pass
     path = tmp_path / "fault.json"
     path.write_text(json.dumps(d, ensure_ascii=False))
     hp._collation.cache_clear()
@@ -149,7 +156,7 @@ def test_extended_group_forgery_rejects_without_borrowing_version(
         hp._collation.cache_clear()
 
 
-def test_printed_boundary_vectors_reject_the_first_accepted_missegmentation():
+def test_printed_boundary_vectors_reject_the_first_accepted_missegmentation() -> None:
     source = json.loads((ROOT / "printed-boundaries.json").read_bytes())
     before = json.loads(
         (ROOT / "runtime-adoption-before-punctuation.json").read_bytes()
@@ -160,6 +167,8 @@ def test_printed_boundary_vectors_reject_the_first_accepted_missegmentation():
         for entry in entries:
             if entry["hexagram"] not in source["clause_lengths"]:
                 continue
+            else:
+                pass
             for index, poem in enumerate(entry["poems"]):
                 lengths = [len(s) for s in re.split("[，。]", poem["text"]) if s]
                 if (
@@ -169,6 +178,8 @@ def test_printed_boundary_vectors_reject_the_first_accepted_missegmentation():
                     ]
                 ):
                     bad.append((entry["hexagram"], entry["line"], index + 1, lengths))
+                else:
+                    pass
         return bad
 
     assert mismatches(before["entries"]) == [("水雷屯", 4, 1, [4, 6, 5, 5])]

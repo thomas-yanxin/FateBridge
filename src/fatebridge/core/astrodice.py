@@ -6,11 +6,11 @@ FateBridge owns the synthesis policy, which is not an ancient dice method.
 
 from __future__ import annotations
 
-import math
 import re
+from fractions import Fraction
 from typing import Any, Dict, List, Literal
 
-from fatebridge.core.astrology_tables import (
+from fatebridge.core.astro.astrology_tables import (
     DOMICILE_RULERS,
     ELEMENT_BY_SIGN,
     EXALTATION_SIGNS,
@@ -19,9 +19,9 @@ from fatebridge.core.astrology_tables import (
     SIGN_LABELS_ZH,
     SIGNS,
 )
+from fatebridge.core.astro.ptolemy import SOURCE_URL as TRIPLICITY_SOURCE
+from fatebridge.core.astro.ptolemy import triplicity_assigned_rulers, triplicity_rulers
 from fatebridge.core.classical_western import planet_sect
-from fatebridge.core.ptolemy import SOURCE_URL as TRIPLICITY_SOURCE
-from fatebridge.core.ptolemy import triplicity_assigned_rulers, triplicity_rulers
 from fatebridge.utils.coordinates import parse_geo_coordinate
 
 METHOD_ID = "astrodice_symbolic_v7"
@@ -49,21 +49,20 @@ JOY_HOUSES = {
     "Saturn": 12,
 }
 
-PLANET_KEYWORDS = {
-    "Sun": "核心意志、主导权、表达与承担",
-    "Moon": "情绪需求、回应与习惯",
-    "Mercury": "沟通、文书、协商与策略细节",
-    "Venus": "关系温度、吸引、资源交换与和气",
-    "Mars": "行动力、冲突点、推进与突破",
-    "Jupiter": "扩展、机会、信念与增长空间",
-    "Saturn": "边界、责任、压力与长期结构",
-    "Uranus": "变化、独立、跳出惯例与临时改道",
-    "Neptune": "想象、模糊、投射与理想化",
-    "Pluto": "深层变化、控制与结构重置",
-    "NorthNode": "新的学习方向、尚待练习的经验与发展主题",
-    "SouthNode": "熟悉的模式、已有经验与需要取舍的惯性",
-}
-PLANETS = tuple(PLANET_KEYWORDS)
+PLANETS = (
+    "Sun",
+    "Moon",
+    "Mercury",
+    "Venus",
+    "Mars",
+    "Jupiter",
+    "Saturn",
+    "Uranus",
+    "Neptune",
+    "Pluto",
+    "NorthNode",
+    "SouthNode",
+)
 PLANET_LABELS_ZH = dict(
     zip(
         PLANETS,
@@ -103,54 +102,6 @@ PLANET_GLYPHS = dict(
     )
 )
 SIGN_GLYPHS = dict(zip(SIGNS, "♈♉♊♋♌♍♎♏♐♑♒♓"))
-SIGN_KEYWORDS = {
-    "Aries": "先行动、直接尝试与开局",
-    "Taurus": "稳定、持续投入与实际价值",
-    "Gemini": "多线沟通、信息交换与机动调整",
-    "Cancer": "照顾感受、安全感与根基",
-    "Leo": "表达、创造与获得认可",
-    "Virgo": "拆解细节、校对与改进",
-    "Libra": "关系平衡、条件协商与共识",
-    "Scorpio": "深入、信任边界与投入程度",
-    "Sagittarius": "扩大视角、探索与方向感",
-    "Capricorn": "规则、责任与长期安排",
-    "Aquarius": "独立思考、新方法与群体连接",
-    "Pisces": "感受、想象与边界辨识",
-}
-HOUSE_KEYWORDS = {
-    0: "自己、形象、主动权与起手姿态",
-    1: "个人金钱、资源与投入产出",
-    2: "沟通、消息、手足、邻里与短途往来",
-    3: "家庭、居所、基底与根系",
-    4: "恋爱、子女、创作、兴趣与娱乐",
-    5: "日常事务、劳动安排、服务与生活节律",
-    6: "伴侣、合作、对手与一对一互动",
-    7: "共同资金、债务、继承与资源绑定",
-    8: "远行、深造、信念与远景",
-    9: "事业、职责、名声与公共角色",
-    10: "朋友、社群、团队、愿景与外部助力",
-    11: "独处、隐私、休整与幕后事务",
-}
-HOUSE_CHECKS = (
-    "明确自己能决定的事项和行动边界。",
-    "核对预算、可动用资源和成本。",
-    "核实消息来源，把关键沟通写清楚。",
-    "确认居住安排和家庭成员的实际需求。",
-    "确认兴趣与投入是否得到回应。",
-    "核对任务量、分工和可持续的生活安排。",
-    "向对方确认意愿、责任与合作条件。",
-    "核实共同资金、债务条款与退出安排。",
-    "核实资格、行程和学习所需的现实条件。",
-    "确认目标、职责和评价标准。",
-    "确认团队承诺和支持是否实际到位。",
-    "核对尚未公开的信息，安排休整与隐私边界。",
-)
-CONDITION_TEXT = {
-    "domicile": "入庙：传统上表示该符号在自身熟悉的表达环境中。",
-    "exaltation": "擢升：传统上表示该符号在此星座受到抬举。",
-    "detriment": "失势：按对宫约定，表示该符号需调整惯用的表达方式。",
-    "fall": "落陷：传统上表示该符号在此星座的表达受到约束。",
-}
 
 
 def _key(value: Any) -> str:
@@ -206,10 +157,10 @@ def _validate_coordinate_aliases(
     if (text is not None and first is None) or (gps is not None and second is None):
         raise ValueError("附加天象盘不能使用空白坐标")
     if first is not None and second is not None:
-        difference = first - second
+        distance = abs(Fraction(first) - Fraction(second))
         if axis == "longitude":
-            difference = (difference + 180.0) % 360.0 - 180.0
-        if not math.isclose(difference, 0, rel_tol=0, abs_tol=1e-9):
+            distance = min(distance, 360 - distance)
+        if distance > 1e-9:
             raise ValueError(
                 f"{axis}文本坐标与GPS坐标不一致；请仅提供一套已核对坐标，不能静默覆盖"
             )
@@ -393,152 +344,6 @@ def planet_sect_condition(planet: str) -> Dict[str, Any]:
     }
 
 
-def _planet_sect_meaning(planet: str, condition: Dict[str, Any]) -> str:
-    if condition["status"] == "outside_seven_planet_scope":
-        return "此骰面不在《四书》Robbins译本I.7的七曜昼夜分派范围；未定义不等于逆派或失势。"
-    if planet == "Mercury":
-        assignments = condition["assignments_by_solar_phase"]
-        labels = {"day": "昼曜", "night": "夜曜"}
-        text = (
-            f"依《四书》Robbins译本I.7，水星为晨星时属{labels[assignments['morning_star']]}，"
-            f"为昏星时属{labels[assignments['evening_star']]}；本次骰面没有晨昏位置，未选定水星的分派。"
-        )
-    else:
-        label = "昼曜" if condition["natural_sect"] == "day" else "夜曜"
-        text = f"依《四书》Robbins译本I.7，{PLANET_LABELS_ZH[planet]}分派为{label}。"
-        if planet == "Saturn":
-            text += "原文以白昼的温暖调和土星的冷性说明这一分派。"
-        elif planet == "Mars":
-            text += "原文以夜间的湿润调和火星的干性说明这一分派。"
-    return text + (
-        "星体的昼夜分派不等于实际盘的昼夜条件；骰面宫号和附加天象均不替骰面选定昼夜，"
-        "因此不判定本骰是否合派或逆派，也不计入尊贵总分。"
-    )
-
-
-def _triplicity_meaning(condition: Dict[str, Any]) -> str:
-    if condition["status"] == "outside_seven_planet_scope":
-        return "此骰面不在托勒密七曜三分性规则范围；未定义不等于无尊贵。"
-    rulers = condition["rulers_by_sect"]
-    role_text = {
-        "primary": "本骰星为该条件下的首要主星",
-        "co_ruler": "本骰星为该条件下明确列出的共管主星",
-        "assigned_not_selected": "本骰星属总体分派，未列为该条件的首要或明确共管主星",
-        "not_assigned": "本骰星不在本章该三角的总体分派内",
-    }
-    descriptions = []
-    for sect, label in (("day", "昼"), ("night", "夜")):
-        names = f"首要主星为{rulers[sect]['primary']}"
-        if rulers[sect]["co_ruler"] is not None:
-            names += f"，明确共管主星为{rulers[sect]['co_ruler']}"
-        descriptions.append(
-            f"{label}条件下{names}，{role_text[condition['roles_by_sect'][sect]]}"
-        )
-    return (
-        "依《四书》Robbins译本I.18，该三角总体分派给"
-        + "、".join(condition["assigned_rulers"])
-        + "；"
-        + "；".join(descriptions)
-        + "。总体分派与条件角色分别保留；骰面未给出昼夜，附加天象也不替骰面选定条件，不计入尊贵总分。"
-    )
-
-
-def _interpretation_evidence(condition: Dict[str, Any]) -> Dict[str, Any]:
-    """Link each returned paragraph to facts and to its actual source scope.
-
-    This records dependencies; it does not certify arbitrary host-written prose.
-    Keywords and practical prompts remain explicitly editorial.
-    """
-
-    def basis(
-        kind: str, facts: List[str], rules: List[str], sources: List[str]
-    ) -> Dict[str, Any]:
-        return {
-            "kind": kind,
-            "fact_paths": list(facts),
-            "rule_ids": list(rules),
-            "ruleset_ids": list(sources),
-        }
-
-    editorial = [EDITORIAL_RULESET]
-    result = {
-        "interpretation.summary": basis(
-            "product_vocabulary",
-            ["planet", "sign", "symbolic_details.house_number"],
-            ["three_faces", "symbolic_traits"],
-            editorial,
-        ),
-        "interpretation.dispositor_meaning": basis(
-            "editorial_traditional_paraphrase",
-            [
-                "symbolic_details.sign_condition.domicile_ruler",
-                "symbolic_details.sign_condition.dispositor_status",
-            ],
-            ["sign_relationships"],
-            [SIGN_RULESET, EDITORIAL_RULESET],
-        ),
-        "interpretation.house_condition_meaning": basis(
-            "editorial_traditional_paraphrase",
-            ["symbolic_details.house_condition"],
-            ["planetary_house_joy"],
-            [HOUSE_RULESET, EDITORIAL_RULESET],
-        ),
-        "interpretation.triplicity_meaning": basis(
-            "conditional_rule_paraphrase",
-            ["symbolic_details.triplicity_condition"],
-            ["conditional_triplicity"],
-            [TRIPLICITY_RULESET, EDITORIAL_RULESET],
-        ),
-        "interpretation.planet_sect_meaning": basis(
-            "conditional_rule_paraphrase",
-            ["planet", "symbolic_details.planet_sect_condition"],
-            ["natural_planet_sect"],
-            [PLANET_SECT_RULESET, EDITORIAL_RULESET],
-        ),
-        "interpretation.symbolic_links": basis(
-            "product_convention",
-            [
-                "symbolic_details.houses_ruled_by_rolled_planet",
-                "symbolic_details.symbolic_house_ring",
-            ],
-            ["symbolic_whole_sign_ring"],
-            editorial,
-        ),
-        "interpretation.reality_check": basis(
-            "reality_check_prompt",
-            ["symbolic_details.house_number"],
-            ["symbolic_traits"],
-            editorial,
-        ),
-        "interpretation.limits": basis(
-            "epistemic_limit",
-            ["symbolic_details.sign_condition.unassessed", "validation"],
-            [],
-            editorial,
-        ),
-    }
-    text_index = 0
-    for index, row in enumerate(condition["condition_evidence"]):
-        if row["matched"] is True:
-            result[f"interpretation.condition_meanings.{text_index}"] = basis(
-                "editorial_traditional_paraphrase",
-                [
-                    f"symbolic_details.sign_condition.condition_evidence.{index}",
-                    "symbolic_details.sign_condition.conditions",
-                ],
-                ["sign_relationships"],
-                [row["ruleset_id"], EDITORIAL_RULESET],
-            )
-            text_index += 1
-    return {
-        path.removeprefix("interpretation.").replace(".", "_"): {
-            "text_path": path,
-            **entry,
-        }
-        for path, entry in result.items()
-    }
-
-
 def build_symbolic_evidence(planet: str, sign: str, house: int) -> Dict[str, Any]:
     condition = sign_condition(planet, sign)
     house_number = house + 1
@@ -598,7 +403,7 @@ def build_symbolic_evidence(planet: str, sign: str, house: int) -> Dict[str, Any
             "version": METHOD_ID,
             "source_path": "docs/astrodice.md",
             "source_kind": "product_convention",
-            "scope": "现代中文关键词、元素/模式、宫位组、假设整宫轮与现实核对提示；非原典逐句翻译。",
+            "scope": "元素、模式、宫位组与假设整宫轮。",
         },
         {
             "id": HOUSE_RULESET,
@@ -666,14 +471,11 @@ def build_symbolic_evidence(planet: str, sign: str, house: int) -> Dict[str, Any
             "ruleset_id": rulesets[2]["id"],
             "inputs": {"planet": planet, "sign": sign, "house": house},
             "result": {
-                "planet_keyword": PLANET_KEYWORDS[planet],
-                "sign_keyword": SIGN_KEYWORDS[sign],
-                "house_keyword": HOUSE_KEYWORDS[house],
                 "element": details["element"],
                 "modality": details["modality"],
                 "house_group": details["house_group"],
             },
-            "scope": "editorial_symbolic_vocabulary",
+            "scope": "symbolic_classification",
         },
         {
             "rule_id": "planetary_house_joy",
@@ -697,61 +499,13 @@ def build_symbolic_evidence(planet: str, sign: str, house: int) -> Dict[str, Any
             "scope": "natural_assignment_and_conditional_mercury_roles_without_chart_sect",
         },
     ]
-    interpretation: Dict[str, Any] = {
-        "planet_keyword": PLANET_KEYWORDS[planet],
-        "sign_keyword": SIGN_KEYWORDS[sign],
-        "house_keyword": HOUSE_KEYWORDS[house],
-        "summary": f"{planet}主{PLANET_KEYWORDS[planet]}，{SIGN_LABELS_ZH[sign]}座描述{SIGN_KEYWORDS[sign]}的方式，"
-        f"第{house_number}宫指向{HOUSE_KEYWORDS[house]}的议题。",
-        "condition_meanings": [CONDITION_TEXT[c] for c in condition["conditions"]],
-        "triplicity_meaning": _triplicity_meaning(details["triplicity_condition"]),
-        "planet_sect_meaning": _planet_sect_meaning(
-            planet, details["planet_sect_condition"]
-        ),
-        "dispositor_meaning": (
-            f"{SIGN_LABELS_ZH[sign]}座的传统守护星就是本次骰面的{planet}，可确认符号层的自定位；没有据此得到实际天文位置或其他星体的互容。"
-            if condition["dispositor_status"] == "self_symbolic"
-            else f"{SIGN_LABELS_ZH[sign]}座的传统守护星为{condition['domicile_ruler']}；本次骰面未给出该定位星，不能推断接纳或互容。"
-        ),
-        "house_condition_meaning": (
-            f"依Lilly，第{details['house_condition']['joy_house_number']}宫是{planet}的喜乐宫；本骰宫{'符合' if details['house_condition']['in_joy'] else '不符合'}该宫号关系。喜乐不是入庙、擢升或成功概率。"
-            if details["house_condition"]["in_joy"] is not None
-            else "此骰面不在七曜喜乐宫规则范围，不能当作不喜乐或凶象。"
-        ),
-        "symbolic_links": (
-            f"按假设整宫轮，此骰星符号主持第{details['houses_ruled_by_rolled_planet']}宫；这只是议题连接约定，不代表实际宫主星落点。"
-            if details["houses_ruled_by_rolled_planet"]
-            else "此骰面无七曜守护宫位，不套用现代外行星或交点守护星约定。"
-        ),
-        "reality_check": HOUSE_CHECKS[house],
-        "basis": [
-            "three_faces",
-            "sign_relationships",
-            "symbolic_whole_sign_ring",
-            "symbolic_traits",
-            "planetary_house_joy",
-            "conditional_triplicity",
-            "natural_planet_sect",
-        ],
-        "limits": "上述为符号解释；不直接给出是非、成功概率、具体应期或他人事实。没有条件标签不等于没有尊贵。",
-    }
-    interpretation["evidence"] = _interpretation_evidence(condition)
     return {
         "method_id": METHOD_ID,
         "symbolic_details": details,
         "rulesets": rulesets,
         "rule_trace": trace,
-        "interpretation": interpretation,
         "validation": {
             "calendar": "not_applicable_to_symbolic_roll",
             "classical": "specified_sign_joy_triangle_and_natural_planet_sect_subsets_only",
-            "interpretation": "deterministic_symbol_grounding_with_field_provenance",
-            "prediction": "not_validated",
-            "real_world_sample_size": 0,
-            "authority_certified": False,
-            "limitations": [
-                "天文参考不认证占卜效果。",
-                "未完成独立前瞻现实预测研究，不能宣称100%准确或权威认证。",
-            ],
         },
     }

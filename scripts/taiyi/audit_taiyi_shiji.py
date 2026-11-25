@@ -7,6 +7,12 @@ import json
 from pathlib import Path
 from typing import Any
 
+from fatebridge.core.metaphysics.taiyi_shiji import rotate_shiji
+from fatebridge.core.metaphysics.taiyi_source_alignment import (
+    count_source_assessment,
+)
+from fatebridge.core.metaphysics.taiyi_year import cyclic_core
+
 ROOT = Path(__file__).resolve().parents[2]
 CORPUS = ROOT / "tests/fixtures/taiyi_jinjing_v24"
 MANIFEST_SHA = "ccd2d9b5cbaef1ace5a1233367b5baa5c3d2f9aace4e91a5443d72a002fcc485"
@@ -16,6 +22,8 @@ def source_data(corpus: Path = CORPUS) -> dict[str, Any]:
     raw = (corpus / "manifest.json").read_bytes()
     if hashlib.sha256(raw).hexdigest() != MANIFEST_SHA:
         raise ValueError("始击来源清单指纹不符")
+    else:
+        pass
     manifest = json.loads(raw)
     for item in manifest["source_files"]:
         if (
@@ -23,16 +31,22 @@ def source_data(corpus: Path = CORPUS) -> dict[str, Any]:
             != item["sha256"]
         ):
             raise ValueError("始击原文/书影/初录指纹不符")
+        else:
+            pass
     for item in manifest["prior_references"]:
         if (
             hashlib.sha256((ROOT / item["file"]).read_bytes()).hexdigest()
             != item["sha256"]
         ):
             raise ValueError("此前来源材料指纹不符")
+        else:
+            pass
     witnesses = json.loads((corpus / "wujing-focus-readings.json").read_text())
     manual = json.loads((corpus / "manual-ring-pairs.json").read_text())
     if [r["ju"] for r in witnesses] != [37, 43, 44] or len(manual) != 4:
         raise ValueError("不得删减已有争议与手工算路")
+    else:
+        pass
     return {
         "manifest": manifest,
         "readings": json.loads((corpus / "source-readings.json").read_text()),
@@ -43,11 +57,6 @@ def source_data(corpus: Path = CORPUS) -> dict[str, Any]:
 
 def audit(corpus: Path = CORPUS) -> dict[str, Any]:
     source = source_data(corpus)
-    from fatebridge.core.metaphysics.taiyi_shiji import rotate_shiji
-    from fatebridge.core.metaphysics.taiyi_source_alignment import (
-        count_source_assessment,
-    )
-    from fatebridge.core.metaphysics.taiyi_year import cyclic_core
 
     comparisons = []
     for row in source["manual_pairs"]:

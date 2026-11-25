@@ -6,8 +6,8 @@ from pathlib import Path
 import pytest
 
 from fatebridge.services.divination import calculate_sukuyo_compatibility
-from tests.sukuyo.test_sukuyo_transports import (
-    test_calendar_and_relations_across_all_real_transports as _check_surfaces,
+from tests.unit_test.fixtures.sukuyo_transports import (
+    assert_sukuyo_transport_parity as _check_surfaces,
 )
 
 REFERENCE = json.loads(
@@ -18,7 +18,7 @@ REFERENCE = json.loads(
 
 
 @pytest.mark.parametrize("case", REFERENCE["cases"], ids=lambda case: case["case_id"])
-def test_pair_delivers_complete_pre_edit_reference(case):
+def test_pair_delivers_complete_pre_edit_reference(case) -> None:
     result = calculate_sukuyo_compatibility(**case["input_pair"])
     assert result["fixed_host_research_scope"] == REFERENCE["scope"]
     assert "274相合、52不同、1未知" in result["summary"]
@@ -27,7 +27,7 @@ def test_pair_delivers_complete_pre_edit_reference(case):
     assert result["validation"]["real_world_prediction"] == "not_established"
 
 
-def test_pair_reference_mutation_does_not_remove_next_calls_adverse_rows():
+def test_pair_reference_mutation_does_not_remove_next_calls_adverse_rows() -> None:
     result = calculate_sukuyo_compatibility(**REFERENCE["cases"][0]["input_pair"])
     result["fixed_host_research_scope"]["unknown_direction_rows"].clear()
     following = calculate_sukuyo_compatibility(**REFERENCE["cases"][1]["input_pair"])
@@ -35,7 +35,9 @@ def test_pair_reference_mutation_does_not_remove_next_calls_adverse_rows():
 
 
 @pytest.mark.parametrize("case", REFERENCE["cases"], ids=lambda case: case["case_id"])
-def test_pair_reference_across_actual_protocols(monkeypatch, capsys, case):
+def test_pair_reference_across_actual_protocols(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], case
+) -> None:
     _check_surfaces(
         monkeypatch,
         capsys,

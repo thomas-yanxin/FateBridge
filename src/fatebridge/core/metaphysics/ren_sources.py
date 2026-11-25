@@ -19,3 +19,9 @@ JINGWEI_SOURCE = "https://upload.wikimedia.org/wikipedia/commons/9/94/GGZBCK419_
 
 
 JINGWEI_SCAN_SHA256 = "5bc1538f57153f26f1498061820d26ca016b5075cdaeabaadfe0f0ef3b077378"
+
+
+JINKOU_SCAN_URL = "https://upload.wikimedia.org/wikipedia/commons/1/10/CNTS-00047981961_2_六壬神課金口訣.pdf"
+
+
+JINKOU_RELATIONS_SOURCE = "https://upload.wikimedia.org/wikipedia/commons/e/e1/CNTS-00047981961_1_六壬神課金口訣.pdf"

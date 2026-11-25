@@ -4,10 +4,12 @@ import hashlib
 import json
 import shutil
 from copy import deepcopy
+from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
 
+from fatebridge.core.contracts.output_taiyi_gates import TaiyiGates
 from fatebridge.core.metaphysics.taiyi_gates import (
     attach_gate_board,
     gate_cycle,
@@ -18,7 +20,6 @@ from fatebridge.core.metaphysics.taiyi_year import (
     cyclic_core,
     yearly_core,
 )
-from fatebridge.core.output_taiyi_gates import TaiyiGates
 from fatebridge.services.metaphysics import calculate_taiyi_analysis
 from scripts.taiyi.audit_taiyi_gates import CORPUS, audit, worked_board
 from tests.support.reference_data import resolve as _resolve
@@ -26,7 +27,7 @@ from tests.support.reference_data import resolve as _resolve
 CASES = json.loads((CORPUS / "worked-cases.json").read_text())["cases"]
 
 
-def test_complete_primary_audit_retains_failed_and_unreadable_fields():
+def test_complete_primary_audit_retains_failed_and_unreadable_fields() -> None:
     report = audit()
     anchors = report["gate_anchor_list"]
     assert anchors["total_rows"] == 18
@@ -47,7 +48,7 @@ def test_complete_primary_audit_retains_failed_and_unreadable_fields():
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
-def test_independent_determinate_markers_and_all_three_numerical_fields(case):
+def test_independent_determinate_markers_and_all_three_numerical_fields(case) -> None:
     board = worked_board(case)
     det = board["determinate_calculation"]
     for field in ("marker", "count", "general", "vice_general"):
@@ -60,7 +61,7 @@ def test_independent_determinate_markers_and_all_three_numerical_fields(case):
     assert board["core_board"]["set_count"] == det["count"]
 
 
-def test_wubeizhi_entire_eight_gate_arrangement_and_five_gates_conjunction():
+def test_wubeizhi_entire_eight_gate_arrangement_and_five_gates_conjunction() -> None:
     case = next(c for c in CASES if c["id"] == "wubeizhi-1571-year")
     board = worked_board(case)
     gates = board["gates"]
@@ -81,7 +82,7 @@ def test_wubeizhi_entire_eight_gate_arrangement_and_five_gates_conjunction():
     assert "主大" in board["center_marks"]["markers"]
 
 
-def test_distinct_source_anchors_and_subjects_never_select_favourable_profile():
+def test_distinct_source_anchors_and_subjects_never_select_favourable_profile() -> None:
     board = worked_board(CASES[0])
     gates = board["gates"]
     assert gates["selected_profile"] == "wang_annual_240"
@@ -115,18 +116,20 @@ def test_distinct_source_anchors_and_subjects_never_select_favourable_profile():
         (480, "惊", 30),
     ],
 )
-def test_inclusive_thirty_unit_and_complete_cycle_boundaries(count, door, unit):
+def test_inclusive_thirty_unit_and_complete_cycle_boundaries(
+    count: int, door: str, unit: int
+) -> None:
     result = gate_cycle(count)
     assert (result["duty_gate"], result["unit_in_gate"]) == (door, unit)
 
 
 @pytest.mark.parametrize("value", [True, False, 0, -1, 1.0, "1", None])
-def test_gate_counter_does_not_coerce_invalid_or_unknown_input(value):
+def test_gate_counter_does_not_coerce_invalid_or_unknown_input(value) -> None:
     with pytest.raises(ValueError):
         gate_cycle(value)
 
 
-def test_same_month_core_does_not_mean_same_gate_counter():
+def test_same_month_core_does_not_mean_same_gate_counter() -> None:
     boards = []
     for count in (335, 695):
         core = cyclic_core(count)
@@ -143,7 +146,9 @@ def test_same_month_core_does_not_mean_same_gate_counter():
 
 
 @pytest.mark.parametrize("mode", ["year", "month", "hour"])
-def test_public_result_and_every_gate_evidence_path_refer_to_same_chart(mode):
+def test_public_result_and_every_gate_evidence_path_refer_to_same_chart(
+    mode: str,
+) -> None:
     result = calculate_taiyi_analysis(
         analysis_year=2026,
         analysis_month=4,
@@ -167,6 +172,8 @@ def test_public_result_and_every_gate_evidence_path_refer_to_same_chart(mode):
         assert board["core_board"]["set_count"] is None
         assert "天正时实" in gates["reason"]
         return
+    else:
+        pass
     frames = [
         gates["moving_frame"],
         gates["dingmu_comparison_frame"],
@@ -188,7 +195,7 @@ def test_public_result_and_every_gate_evidence_path_refer_to_same_chart(mode):
     assert str(board["determinate_calculation"]["count"]) in result["snapshot_text"]
 
 
-def test_annual_gate_uses_same_civil_lunar_year_and_retains_center_markers():
+def test_annual_gate_uses_same_civil_lunar_year_and_retains_center_markers() -> None:
     for day, year in [(16, 2025), (17, 2026)]:
         result = calculate_taiyi_analysis(
             analysis_year=2026,
@@ -221,8 +228,8 @@ def _attached(year):
 
 @pytest.mark.parametrize("attempt", ["drop_anchor", "drop_worked_field", "image"])
 def test_source_audit_rejects_deleted_failures_even_with_refreshed_manifest(
-    tmp_path, attempt
-):
+    tmp_path: Path, attempt: str
+) -> None:
     corpus = tmp_path / "corpus"
     shutil.copytree(CORPUS, corpus)
     if attempt == "image":
@@ -241,12 +248,16 @@ def test_source_audit_rejects_deleted_failures_even_with_refreshed_manifest(
         for source in manifest["source_files"]:
             if source["file"] == path.name:
                 source["sha256"] = hashlib.sha256(path.read_bytes()).hexdigest()
+            else:
+                pass
         (corpus / "manifest.json").write_text(json.dumps(manifest))
     with pytest.raises(ValueError):
         audit(corpus)
 
 
-def test_optional_gate_contracts_reject_text_booleans_and_false_numeric_anchors():
+def test_optional_gate_contracts_reject_text_booleans_and_false_numeric_anchors() -> (
+    None
+):
     for payload in [
         {"moving_frame": {"anchor_number": True}},
         {"moving_frame": {"three_gates": {"conditions_satisfied": "true"}}},

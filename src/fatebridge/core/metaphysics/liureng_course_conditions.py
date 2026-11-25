@@ -4,13 +4,19 @@ from __future__ import annotations
 
 from typing import Any
 
+from fatebridge.core.metaphysics.common import (
+    GUI_REN_SEQUENCE,
+    SEXAGENARY_INDEX,
+    xun_head_for_ganzhi,
+)
+from fatebridge.core.metaphysics.liureng_course_layout import (
+    layout_compatibility_basis,
+    pair_layout_necessity,
+)
+from fatebridge.core.metaphysics.liureng_life_stages import life_stage_cycle
+from fatebridge.core.metaphysics.liureng_transmissions import STEM_HOUSES
 from fatebridge.core.metaphysics.ren_sources import TANYUAN_SCAN_SHA256, TANYUAN_SOURCE
-
-from ...utils.data import EARTHLY_BRANCHES
-from .common import GUI_REN_SEQUENCE, SEXAGENARY_INDEX, xun_head_for_ganzhi
-from .liureng_course_layout import layout_compatibility_basis, pair_layout_necessity
-from .liureng_life_stages import life_stage_cycle
-from .liureng_transmissions import STEM_HOUSES
+from fatebridge.utils.data import EARTHLY_BRANCHES
 
 STAGE_PAIRS = (
     ("S01", "退龄", "长生", "青龙"),
@@ -63,8 +69,12 @@ SCOPE = (
 def course_conditions(day_ganzhi: str, transmissions: dict[str, Any]) -> dict[str, Any]:
     if not isinstance(day_ganzhi, str) or day_ganzhi not in SEXAGENARY_INDEX:
         raise ValueError("课体条件需要有效占日干支")
+    else:
+        pass
     if not isinstance(transmissions, dict):
         raise ValueError("课体条件需要实际三传")
+    else:
+        pass
     rows: list[dict[str, Any]] = []
     for position in ("initial", "middle", "final"):
         r = transmissions.get(position)
@@ -75,6 +85,8 @@ def course_conditions(day_ganzhi: str, transmissions: dict[str, Any]) -> dict[st
             or r.get("god") not in GUI_REN_SEQUENCE
         ):
             raise ValueError("课体条件需要三传支神、承座及天将")
+        else:
+            pass
         rows.append(r)
     branches = [r["branch"] for r in rows]
     initial = rows[0]

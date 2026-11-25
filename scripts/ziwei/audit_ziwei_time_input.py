@@ -19,6 +19,8 @@ def audit_time_input(fixtures: Path = FIXTURES) -> dict[str, Any]:
         raw = (fixtures / source["path"]).read_bytes()
         if hashlib.sha256(raw).hexdigest() != source["sha256"]:
             raise ValueError("Time input source checksum mismatch: " + source["path"])
+        else:
+            pass
     differences, receipts = [], []
     for case in manifest["cases"]:
         for profile in ("iztro_2_5_8", "quanshu_v2_excerpt"):
@@ -52,6 +54,8 @@ def audit_time_input(fixtures: Path = FIXTURES) -> dict[str, Any]:
                 differences.append(
                     dict(case=case["id"], profile=profile, checks=checks)
                 )
+            else:
+                pass
             receipts.append(dict(case=case["id"], profile=profile, checks=checks))
     return {
         "method_id": manifest["schema_version"],

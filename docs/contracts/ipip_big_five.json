@@ -1,0 +1,153 @@
+{
+  "first_view": {
+    "fields": null,
+    "include_snapshot_text": false,
+    "strict_fields": true
+  },
+  "input": {
+    "additionalProperties": false,
+    "description": "Shared request contract for administering or scoring IPIP Big-Five 50.",
+    "properties": {
+      "action": {
+        "default": "score",
+        "description": "操作模式：list_items 列出50道标准IPIP题项与计分方向；score 对1-5分整数作答进行确定性正反向计分。",
+        "enum": [
+          "score",
+          "list_items"
+        ],
+        "title": "Action",
+        "type": "string"
+      },
+      "domain": {
+        "anyOf": [
+          {
+            "enum": [
+              "extraversion",
+              "agreeableness",
+              "conscientiousness",
+              "emotional_stability",
+              "intellect"
+            ],
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "仅在 action=list_items 时可选筛选单个维度：extraversion / agreeableness / conscientiousness / emotional_stability / intellect。",
+        "title": "Domain"
+      },
+      "include_item_breakdown": {
+        "default": false,
+        "description": "仅在 action=score 时为 true 返回逐题原始分、计分键与折算后分值明细。",
+        "title": "Include Item Breakdown",
+        "type": "boolean"
+      },
+      "ratings": {
+        "anyOf": [
+          {
+            "items": {
+              "anyOf": [
+                {
+                  "maximum": 5,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "maxItems": 50,
+            "minItems": 1,
+            "type": "array"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "按第1..50题顺序提交的1-5分整数列表（CLI支持 --ratings 5 1 4 ...）；缺题可设为 null，不可与 responses 同时提供。",
+        "title": "Ratings"
+      },
+      "responses": {
+        "anyOf": [
+          {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "maximum": 5,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": "object"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "按题号（'1'..'50'）映射的1-5分整数作答（JSON对象，CLI支持 --responses '{\"1\":5,...}'）；缺题可省略或设为 null，不可与 ratings 同时提供。",
+        "title": "Responses"
+      }
+    },
+    "title": "IpipBigFiveRequest",
+    "type": "object"
+  },
+  "method_contracts": [
+    {
+      "comparison_requirements": [
+        "相同 Goldberg (1992) IPIP 50 题条目键、反向计分公式 (6 - score) 与 8/10 缺失阈值"
+      ],
+      "dependencies": [
+        "validated_request"
+      ],
+      "error_sources": [],
+      "implementation_refs": [
+        "src/fatebridge/core/psychometrics/ipip_big_five.py",
+        "src/fatebridge/services/psychometrics.py"
+      ],
+      "limitations": [
+        "仅确定性算术计分与公有领域条目清单；不输出常模百分位、临床诊断或泛化叙事建议",
+        "仅作答 >= 8/10 题的因子计算折算均值；< 8 题标记为 insufficient_items 且 mean 为 null"
+      ],
+      "method_id": "fatebridge.ipip_big_five_50.contract_v1",
+      "output_paths": [
+        "mode",
+        "scale_id",
+        "domains",
+        "scale_raw_sum",
+        "scale_mean",
+        "items",
+        "provenance"
+      ],
+      "prerequisites": [
+        "action=list_items，或 action=score 且提供合法的 1..5 整数作答（responses 或 ratings）"
+      ],
+      "quantity_kind": "psychometric_scale_score",
+      "role": "calculation",
+      "selector_fields": [
+        "action",
+        "domain",
+        "include_item_breakdown"
+      ],
+      "source_refs": [
+        "https://ipip.ori.org/new_ipip-50-item-scale.htm",
+        "https://ipip.ori.org/newScoringInstructions.htm"
+      ],
+      "unit": "likert_1_to_5",
+      "validation_scope": {
+        "numerical": "method_specific_reference_required",
+        "real_world_validity": "not_established",
+        "source_conformity": "deterministic_arithmetic_verified"
+      }
+    }
+  ],
+  "tool": "ipip_big_five"
+}

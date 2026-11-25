@@ -27,7 +27,7 @@ def materials():
 
 def test_independent_reference_keeps_all_original_epochs_controls_and_dependencies(
     materials,
-):
+) -> None:
     plan, reference, _, _, _ = materials
     assert (
         plan["epoch_count"]
@@ -71,7 +71,9 @@ def reconstructed_node(row, prefix):
     return math.degrees(math.atan2(hx, -hy) + row["nutation_longitude_radians"]) % 360
 
 
-def test_all2522_geometric_and_light_time_node_facts_replay_from_raw_states(materials):
+def test_all2522_geometric_and_light_time_node_facts_replay_from_raw_states(
+    materials,
+) -> None:
     _, reference, _, _, _ = materials
     maximum = 0.0
     for row in reference["rows"] + reference["control_rows"]:
@@ -91,7 +93,7 @@ def test_all2522_geometric_and_light_time_node_facts_replay_from_raw_states(mate
 
 def test_full4800_comparison_replays_without_native_and_keeps_all_original_failures(
     materials,
-):
+) -> None:
     _, _, _, production, expected = materials
     with (
         patch(
@@ -146,7 +148,7 @@ def test_full4800_comparison_replays_without_native_and_keeps_all_original_failu
     )
 
 
-def test_one_arcsecond_pass_does_not_certify_exact_subdivision(materials):
+def test_one_arcsecond_pass_does_not_certify_exact_subdivision(materials) -> None:
     rows = materials[-1]["backends"]["moshier_diagnostic"]["rows"]
     near = [
         r
@@ -174,24 +176,40 @@ def test_one_arcsecond_pass_does_not_certify_exact_subdivision(materials):
         "incomplete_batch",
     ],
 )
-def test_same_longitude_cannot_hide_wrong_source_or_incomplete_batch(materials, fault):
+def test_same_longitude_cannot_hide_wrong_source_or_incomplete_batch(
+    materials, fault: str
+) -> None:
     _, reference, legacy, production, _ = materials
     actual = deepcopy(production["backends"]["selected"]["rows"][0])
     if fault == "model":
         actual["positions"]["NorthNode"]["native_return_flag_model"] = "moshier"
+    else:
+        pass
     if fault == "flags":
         for values in (actual["positions"], actual["observed_prefix"]):
             values["NorthNode"]["return_flags"] = 260
+    else:
+        pass
     if fault == "missing_position":
         actual["positions"].pop("Pluto")
+    else:
+        pass
     if fault == "missing_prefix":
         actual["observed_prefix"].pop("Moon")
+    else:
+        pass
     if fault == "opposition":
         actual["positions"]["SouthNode"]["derivation_source_longitude"] += 0.01
+    else:
+        pass
     if fault == "nonfinite":
         actual["positions"]["NorthNode"]["longitude"] = float("nan")
+    else:
+        pass
     if fault == "incomplete_batch":
         actual["complete_batch_returned"] = False
+    else:
+        pass
     physical = [
         {**r, "original_index": j}
         for j, r in enumerate(legacy["backends"]["selected"]["rows"][:10])
@@ -220,61 +238,97 @@ def test_same_longitude_cannot_hide_wrong_source_or_incomplete_batch(materials, 
         "duplicate_context",
     ],
 )
-def test_source_context_flags_cannot_replace_complete_observations(materials, fault):
+def test_source_context_flags_cannot_replace_complete_observations(
+    materials, fault: str
+) -> None:
     value = deepcopy(materials[3])
     source = value["source_evidence"]
     if fault == "missing_file":
         source["files"].pop()
+    else:
+        pass
     if fault == "detached_file":
         source["files"][0]["sha256"] = "0" * 64
+    else:
+        pass
     if fault == "count":
         source["contexts"][0]["observed_evaluation_count"] -= 1
+    else:
+        pass
     if fault == "wrong_role":
         source["contexts"][0]["role"] = "solar_root"
+    else:
+        pass
     if fault == "invented_accuracy":
         source["accuracy_certified"] = True
+    else:
+        pass
     if fault == "context_removed":
         source["contexts"].pop()
+    else:
+        pass
     if fault == "unknown_body":
         source["contexts"][0]["body"] = "NotANode"
+    else:
+        pass
     if fault == "nonfinite_range":
         source["files"][0]["start_julian_day_tt"] = float("nan")
+    else:
+        pass
     if fault == "nonfinite_context":
         source["contexts"][0]["maximum_jd_tt"] = float("inf")
+    else:
+        pass
     if fault == "boolean_edition":
         source["files"][0]["de_number"] = True
+    else:
+        pass
     if fault == "duplicate_context":
         original = source["contexts"][0]
         duplicate = deepcopy(original)
         duplicate["observed_evaluation_count"] = 1
         original["observed_evaluation_count"] -= 1
         source["contexts"].append(duplicate)
+    else:
+        pass
     assert checker.source_contexts_accepted(value) is False
 
 
 @pytest.mark.parametrize(
     "fault", ["missing", "reordered", "duplicate", "retimed", "backend"]
 )
-def test_fixed_cohort_cannot_be_narrowed_or_rebound(materials, fault, monkeypatch):
+def test_fixed_cohort_cannot_be_narrowed_or_rebound(
+    materials, fault: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
     plan, reference, legacy, production, _ = materials
     monkeypatch.setattr(checker, "reference", lambda: (plan, reference, legacy))
     value = deepcopy(production)
     rows = value["backends"]["selected"]["rows"]
     if fault == "missing":
         rows.pop()
+    else:
+        pass
     if fault == "reordered":
         rows[0], rows[1] = rows[1], rows[0]
+    else:
+        pass
     if fault == "duplicate":
         rows[1] = deepcopy(rows[0])
+    else:
+        pass
     if fault == "retimed":
         rows[0]["jd_tt"] += 0.01
+    else:
+        pass
     if fault == "backend":
         value["backends"].pop("moshier_diagnostic")
+    else:
+        pass
     with pytest.raises(ValueError):
         checker.compare(value)
 
 
-def test_reader_rejects_non_object_json(tmp_path):
+def test_reader_rejects_non_object_json(tmp_path: Path) -> None:
     path = tmp_path / "not-an-object.json"
     path.write_text("[]")
     with pytest.raises(ValueError):

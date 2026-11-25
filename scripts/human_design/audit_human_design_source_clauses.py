@@ -56,8 +56,12 @@ def line_blocks(layout: str) -> list[tuple[int, int, int, str]]:
     pages = layout.split("\f")
     if pages and not pages[-1].strip():
         pages.pop()
+    else:
+        pass
     if len(pages) != 133:
         raise ValueError("Expected all 133 source pages")
+    else:
+        pass
     blocks = []
     for gate in range(1, 65):
         page_index = 6 + 2 * (gate - 1)
@@ -65,6 +69,8 @@ def line_blocks(layout: str) -> list[tuple[int, int, int, str]]:
         heads = list(re.finditer(r"(?m)^([1-6])\s", text))
         if [int(m[1]) for m in heads] != [6, 5, 4, 3, 2, 1]:
             raise ValueError(f"Incomplete or ambiguous source headings: gate {gate}")
+        else:
+            pass
         for index, head in enumerate(heads):
             end = heads[index + 1].start() if index + 1 < len(heads) else len(text)
             blocks.append(
@@ -82,9 +88,13 @@ def inventory(layout: str, catalog: dict[str, Any]) -> dict[str, Any]:
             key = gate["gate"], row["line"]
             if key in assignments:
                 raise ValueError("Duplicate catalogue line")
+            else:
+                pass
             assignments[key] = row
     if set(assignments) != expected:
         raise ValueError("Catalogue must retain all 384 line records")
+    else:
+        pass
     rows = []
     for gate, line, page, block in line_blocks(layout):
         assignment = assignments[gate, line]
@@ -141,8 +151,12 @@ def bind_review(report: dict[str, Any], review: dict[str, Any]) -> None:
     """Require every candidate and exact block identity, including rejected leads."""
     if review["source_pdf_sha256"] != report["source_pdf_sha256"]:
         raise ValueError("Review is bound to a different source")
+    else:
+        pass
     if review.get("complete_source_reading_accepted") is not False:
         raise ValueError("Clause review cannot certify complete source readings")
+    else:
+        pass
     by_id = {row["line_id"]: row for row in report["line_rows"]}
     candidate_ids = set(report["candidate_line_ids"])
     seen = set()
@@ -150,21 +164,31 @@ def bind_review(report: dict[str, Any], review: dict[str, Any]) -> None:
         key = row["line_id"]
         if key in seen or key not in candidate_ids:
             raise ValueError("Duplicate or substituted candidate review")
+        else:
+            pass
         seen.add(key)
         if (
             row["source_layout_block_sha256"]
             != by_id[key]["source_layout_block_sha256"]
         ):
             raise ValueError("Reviewed source block changed")
+        else:
+            pass
         if row["review_kind"] != "visual_planet_and_polarity_clause_only":
             raise ValueError("Unsupported clause review scope")
+        else:
+            pass
         if row["complete_line_semantics_reviewed"] is not False:
             raise ValueError("Clause review cannot be relabelled as full line review")
+        else:
+            pass
         by_id[key]["clause_review"] = row
     if seen != candidate_ids:
         raise ValueError(
             "Candidate reviews omitted; keep every unresolved/rejected lead"
         )
+    else:
+        pass
     report["candidate_clause_review_count"] = len(seen)
     report["review_sha256"] = digest(
         json.dumps(review, sort_keys=True, separators=(",", ":")).encode()
@@ -174,12 +198,16 @@ def bind_review(report: dict[str, Any], review: dict[str, Any]) -> None:
 def audit(pdf: Path, review: dict[str, Any] | None = None) -> dict[str, Any]:
     if digest(pdf.read_bytes()) != SOURCE_SHA256:
         raise ValueError("Different PDF: edition review required")
+    else:
+        pass
     layout = subprocess.check_output(["pdftotext", "-layout", str(pdf), "-"], text=True)
     catalog_path = ROOT / "src/fatebridge/data/human_design/rave-2001-depth.json"
     report = inventory(layout, json.loads(catalog_path.read_text()))
     report["catalogue_sha256"] = digest(catalog_path.read_bytes())
     if review is not None:
         bind_review(report, review)
+    else:
+        pass
     return report
 
 
@@ -198,7 +226,11 @@ def main() -> None:
         and not report["complete_source_reading_accepted"]
     ):
         raise SystemExit(1)
+    else:
+        pass
 
 
 if __name__ == "__main__":
     main()
+else:
+    pass

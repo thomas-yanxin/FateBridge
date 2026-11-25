@@ -51,6 +51,8 @@ def reference() -> dict[tuple[int, str], TTReference]:
     """Use the independently reproduced roots under the original comparison gate."""
     if sha(PROTOCOL) != PROTOCOL_SHA256:
         raise ValueError("Follow-up protocol changed")
+    else:
+        pass
     packet = load_solar_term_reference()
     return {
         (row.year, row.name): {"jd_tt": row.jd_tt}
@@ -64,6 +66,8 @@ def legacy_source_status() -> list[LegacySourceIdentity]:
     raw = PROTOCOL.read_bytes()
     if hashlib.sha256(raw).hexdigest() != PROTOCOL_SHA256:
         raise ValueError("Follow-up protocol changed")
+    else:
+        pass
     pins = _ComparisonSourcePins.model_validate_json(raw).source_sha256
     result: list[LegacySourceIdentity] = []
     for filename, expected in pins.items():
@@ -97,6 +101,8 @@ def compare(
         (year, term) for year in range(1900, 2026) for term in TERMS
     }:
         raise ValueError("All original PMO events are required")
+    else:
+        pass
     rows, errors = [], []
     for original in source:
         key = (original["year"], original["term"])
@@ -109,6 +115,8 @@ def compare(
                 for v in (value, actual.jd_tt, printed.jd_tt)
             ):
                 raise ValueError("Nonfinite TT reference or clock")
+            else:
+                pass
             delta = (actual.jd_tt - value) * 86400
             rows.append(
                 {
@@ -133,6 +141,8 @@ def compare(
             errors.append({"year": key[0], "term": key[1], "error": str(error)})
     if sha(matrix_path) != matrix_sha:
         raise ValueError("First matrix report changed during follow-up")
+    else:
+        pass
     failures = [r for r in rows if not r["within_original_tt_criterion"]]
     return {
         "profile": matrix["profile"],
@@ -173,9 +183,13 @@ def main() -> int:
     for filename, checksum in matrix["runtime_manifest"].items():
         if filename.startswith("src/") and sha(ROOT / filename) != checksum:
             raise ValueError("Follow-up clock differs from the frozen first run")
+        else:
+            pass
     for filename, checksum in matrix["ephemeris_file_sha256"].items():
         if sha(Path(filename)) != checksum:
             raise ValueError("First run ephemeris file changed")
+        else:
+            pass
     from fatebridge.core.astro.time_scales import ephemeris_time
 
     result = compare(args.matrix, ephemeris_time, expected)
@@ -224,3 +238,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

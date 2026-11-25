@@ -8,15 +8,21 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.guolao_classical import SHOUSHI_EQUATORIAL_1281
-from fatebridge.core.guolao_huangchi import DATA, load_table, project_reference_mansions
+from fatebridge.core.guolao.guolao_classical import SHOUSHI_EQUATORIAL_1281
+from fatebridge.core.guolao.guolao_huangchi import (
+    DATA,
+    load_table,
+    project_reference_mansions,
+)
 
 ROOT = Path(__file__).parents[2]
 FIXTURE = Path(__file__).parents[1] / "fixtures/guolao-huangchi-v1"
 REFERENCE = json.loads((FIXTURE / "reference.json").read_text())
 
 
-def test_source_image_container_and_runtime_transcription_have_frozen_fingerprints():
+def test_source_image_container_and_runtime_transcription_have_frozen_fingerprints() -> (
+    None
+):
     scan = REFERENCE["primary_scan"]
     assert (
         hashlib.sha256((FIXTURE / scan["extracted_file"]).read_bytes()).hexdigest()
@@ -30,13 +36,15 @@ def test_source_image_container_and_runtime_transcription_have_frozen_fingerprin
     assert not REFERENCE["transcription"]["secondary_columns_jicha_chalv_collated"]
 
 
-def test_five_printed_numeric_variants_remain_separate_from_corrected_text():
+def test_five_printed_numeric_variants_remain_separate_from_corrected_text() -> None:
     a, b = load_table("nlc166"), load_table("wikisource")
     diffs = []
     for i, (x, y) in enumerate(zip(a.rows, b.rows)):
         for field in ["first", "second", "first_rate", "second_rate"]:
             if getattr(x, field) != getattr(y, field):
                 diffs.append((i, field))
+            else:
+                pass
     assert diffs == [
         (29, "second"),
         (31, "second_rate"),
@@ -54,7 +62,7 @@ def test_five_printed_numeric_variants_remain_separate_from_corrected_text():
     assert a.profile_id != b.profile_id and a.rows != b.rows
 
 
-def test_all_six_printed_rate_discontinuities_are_reported_without_repair():
+def test_all_six_printed_rate_discontinuities_are_reported_without_repair() -> None:
     result = load_table("nlc166").audit()
     assert {
         str(r["row_index"]): F(r["second_residual_du_exact"])
@@ -75,8 +83,8 @@ def test_all_six_printed_rate_discontinuities_are_reported_without_repair():
     ],
 )
 def test_four_direction_roles_against_hand_arithmetic(
-    origin, direction, input_degree, output_degree
-):
+    origin: str, direction: str, input_degree: str, output_degree: str
+) -> None:
     result = load_table("nlc166").convert(
         F(input_degree), origin=origin, direction=direction
     )
@@ -86,7 +94,7 @@ def test_four_direction_roles_against_hand_arithmetic(
     assert len(result["table_anchor_rate_residuals"]) == 6
 
 
-def test_rate_is_literal_even_when_the_next_anchor_disagrees():
+def test_rate_is_literal_even_when_the_next_anchor_disagrees() -> None:
     r = load_table("nlc166").convert(
         F("62.5"), origin="equinox", direction="equatorial_to_ecliptic"
     )
@@ -106,7 +114,9 @@ def test_rate_is_literal_even_when_the_next_anchor_disagrees():
         ("equatorial_to_ecliptic", "91.16865", "91.155"),
     ],
 )
-def test_fractional_last_interval_uses_both_printed_rates(direction, value, expected):
+def test_fractional_last_interval_uses_both_printed_rates(
+    direction: str, value: str, expected: str
+) -> None:
     result = load_table("nlc166").convert(
         F(value), origin="solstice", direction=direction
     )
@@ -114,7 +124,9 @@ def test_fractional_last_interval_uses_both_printed_rates(direction, value, expe
     assert F(result["output_local_accumulation_du_exact"]) == F(expected)
 
 
-def test_independent_gujin43_projection_operands_reproduce_raw_quotient_not_forced_text():
+def test_independent_gujin43_projection_operands_reproduce_raw_quotient_not_forced_text() -> (
+    None
+):
     result = load_table("wikisource").convert(
         F("5.3608"), origin="solstice", direction="equatorial_to_ecliptic"
     )
@@ -134,8 +146,8 @@ def test_independent_gujin43_projection_operands_reproduce_raw_quotient_not_forc
     ],
 )
 def test_short_final_segment_and_uncovered_quadrant_are_not_extended(
-    profile, origin, direction, endpoint
-):
+    profile: str, origin: str, direction: str, endpoint: str
+) -> None:
     table = load_table(profile)
     last = table.convert(F(endpoint), origin=origin, direction=direction)
     assert last["row_index"] == 91
@@ -152,7 +164,9 @@ def test_short_final_segment_and_uncovered_quadrant_are_not_extended(
     assert not table.audit()["full_theoretical_quadrant_covered"]
 
 
-def test_all_corrected_anchors_and_both_sides_preserve_half_open_interval_selection():
+def test_all_corrected_anchors_and_both_sides_preserve_half_open_interval_selection() -> (
+    None
+):
     table = load_table("wikisource")
     eps = F(1, 10**60)
     for i, row in enumerate(table.rows):
@@ -174,10 +188,14 @@ def test_all_corrected_anchors_and_both_sides_preserve_half_open_interval_select
                 < row.second
                 < F(after["output_local_accumulation_du_exact"])
             )
+        else:
+            pass
 
 
 @pytest.mark.parametrize("profile", ["nlc166", "wikisource"])
-def test_full_28_mansion_projection_retains_all_four_source_mismatches(profile):
+def test_full_28_mansion_projection_retains_all_four_source_mismatches(
+    profile: str,
+) -> None:
     result = project_reference_mansions(
         profile=profile, winter_mansion="箕", winter_degree_du=F(10)
     )
@@ -192,7 +210,7 @@ def test_full_28_mansion_projection_retains_all_four_source_mismatches(profile):
     assert not result["life_degree_accepted"] and not result["modern_epoch_calibrated"]
 
 
-def test_a_mansion_boundary_in_the_table_tail_gap_is_left_unavailable():
+def test_a_mansion_boundary_in_the_table_tail_gap_is_left_unavailable() -> None:
     result = project_reference_mansions(
         profile="wikisource", winter_mansion="角", winter_degree_du=F("0.001")
     )
@@ -207,14 +225,18 @@ def test_a_mansion_boundary_in_the_table_tail_gap_is_left_unavailable():
 
 
 @pytest.mark.parametrize("value", [1.0, True, 1, "1", None])
-def test_untyped_local_degrees_are_rejected(value):
+def test_untyped_local_degrees_are_rejected(
+    value: bool | float | int | str | None,
+) -> None:
     with pytest.raises(TypeError):
         load_table("nlc166").convert(
             value, origin="solstice", direction="equatorial_to_ecliptic"
         )
 
 
-def test_invalid_frame_name_missing_rate_and_mutable_collection_are_not_silent():
+def test_invalid_frame_name_missing_rate_and_mutable_collection_are_not_silent() -> (
+    None
+):
     table = load_table("nlc166")
     with pytest.raises(ValueError):
         load_table("best_fit")

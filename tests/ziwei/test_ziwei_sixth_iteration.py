@@ -4,6 +4,7 @@ import asyncio
 import copy
 import json
 import shutil
+from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
@@ -13,15 +14,18 @@ import fatebridge.api as api
 import scripts.ziwei.audit_ziwei_prerequisites as audit
 from fatebridge.cli import run
 from fatebridge.core.metaphysics.ziwei import build_ziwei_chart
-from fatebridge.core.ziwei_sources import ziwei_prerequisite_source_evidence
+from fatebridge.core.ziwei.ziwei_sources import ziwei_prerequisite_source_evidence
 from fatebridge.mcp_server import create_mcp_app
+from tests.support.transports import call_calculation
 
 
 def evidence(chart):
     return chart["rule_trace"][2]["outputs"]["source_comparison"]
 
 
-def test_ming_prerequisites_exhaust_small_normal_input_domain_without_inflating_sources():
+def test_ming_prerequisites_exhaust_small_normal_input_domain_without_inflating_sources() -> (
+    None
+):
     result = audit.audit_prerequisites()
     assert result["source_wuhu_anchor_rows"] == 5
     assert result["source_nayin_pair_rows"] == 30
@@ -40,7 +44,7 @@ def test_ming_prerequisites_exhaust_small_normal_input_domain_without_inflating_
     assert not result["whole_book_acceptance_passed"]
 
 
-def test_printed_worked_example_and_absolute_yin_stem_wrap():
+def test_printed_worked_example_and_absolute_yin_stem_wrap() -> None:
     chart = build_ziwei_chart(audit._seed(1984, 1, 1, "子", False), "男")
     result = evidence(chart)
     assert result["expected"] == {
@@ -59,7 +63,7 @@ def test_printed_worked_example_and_absolute_yin_stem_wrap():
     assert evidence(wrapped)["matches_source_chain"]
 
 
-def test_uncertain_internal_name_glyph_does_not_certify_literal_nayin_names():
+def test_uncertain_internal_name_glyph_does_not_certify_literal_nayin_names() -> None:
     chart = build_ziwei_chart(audit._seed(1985, 3, 1, "子", False), "男")
     result = evidence(chart)
     assert result["expected"]["ming_ganzhi"] == "庚辰"
@@ -72,7 +76,9 @@ def test_uncertain_internal_name_glyph_does_not_certify_literal_nayin_names():
     assert not result["whole_book_conformance_claimed"]
 
 
-def test_a_wrong_bureau_or_non_ming_palace_stem_cannot_inherit_a_matching_anchor():
+def test_a_wrong_bureau_or_non_ming_palace_stem_cannot_inherit_a_matching_anchor() -> (
+    None
+):
     chart = build_ziwei_chart(audit._seed(1984, 1, 1, "子", False), "男")
     palaces = copy.deepcopy(chart["palaces"])
     palaces[1]["ganzhi"] = "己卯"  # Ming unchanged; another stem corrupted.
@@ -94,8 +100,8 @@ def test_a_wrong_bureau_or_non_ming_palace_stem_cannot_inherit_a_matching_anchor
 
 
 def test_runtime_resource_edits_cannot_rewrite_frozen_nayin_readings(
-    tmp_path, monkeypatch
-):
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     name = "src/fatebridge/data/classical/ziwei-naj-ming-prerequisites.json"
     data = json.loads((audit.ROOT / name).read_text())
     data["nayin"]["rows"][0]["element"] = "火"
@@ -109,7 +115,7 @@ def test_runtime_resource_edits_cannot_rewrite_frozen_nayin_readings(
     )
 
 
-def test_source_audit_needs_the_frozen_image_bytes(tmp_path):
+def test_source_audit_needs_the_frozen_image_bytes(tmp_path: Path) -> None:
     directory = "naj_ming_prerequisites_v1"
     source = audit.FIXTURES / directory
     destination = tmp_path / directory
@@ -128,12 +134,12 @@ def test_source_audit_needs_the_frozen_image_bytes(tmp_path):
     ],
 )
 def test_leap_source_chain_and_active_chart_remain_distinct_on_rest_mcp_cli(
-    monkeypatch,
-    capsys,
-    profile,
-    matches,
-    branch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    profile: str,
+    matches: bool,
+    branch: str,
+) -> None:
     # HKO 2020-05-23 = leap fourth month day 1. The source comparison concerns
     # the two explicit month policies after that independently checked input.
     api._reset_runtime_state_for_tests()
@@ -161,7 +167,7 @@ def test_leap_source_chain_and_active_chart_remain_distinct_on_rest_mcp_cli(
         as_of="2026-10-22T12:00:00+08:00",
     )
     rest = TestClient(api.app).post(
-        "/api/cn/ziwei/birth",
+        "/api/ziwei/birth-chart",
         json=inputs,
         params=[
             ("fields", "ziwei_birth.rule_trace"),
@@ -175,11 +181,13 @@ def test_leap_source_chain_and_active_chart_remain_distinct_on_rest_mcp_cli(
 
     async def call():
         async with Client(create_mcp_app(families="metaphysics")) as client:
-            return await client.call_tool("ziwei_birth", {**inputs, **options})
+            return await call_calculation(
+                client, "ziwei_birth_chart", {**inputs, **options}
+            )
 
     native = asyncio.run(call())
     assert not native.is_error
-    args = ["ziwei_birth"]
+    args = ["ziwei_birth_chart"]
     for key, value in inputs.items():
         args.extend(["--" + key.replace("_", "-"), str(value)])
     args.extend(

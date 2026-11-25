@@ -6,65 +6,57 @@ extension fields and existing numeric values survive unchanged. Stable expert
 facts use the same nested contracts in validation and transport discovery.
 """
 
-from typing import Any, Dict, List, Optional, Union
+from typing import Any
 
 from pydantic import BaseModel, Field, JsonValue, create_model
 
-from fatebridge.core.output_astrodice import ASTRODICE_FIELDS
-from fatebridge.core.output_base import FullFact, PartialOutput
-from fatebridge.core.output_bazi import BAZI_FIELDS
-from fatebridge.core.output_bazi_evidence import EvidenceStructureProfile
-from fatebridge.core.output_charts import (
-    CHART_FIELDS,
-    CHART_TOOL_FIELDS,
-    ChartPlanet,
-    SolarConditionPolicy,
-)
-from fatebridge.core.output_chinese import (
-    CHINESE_FIELDS,
-    CHINESE_TOOL_FIELDS,
-    CalendarContext,
-    FourPillars,
-    PersonInfo,
-)
-from fatebridge.core.output_classical_force import (
-    ClassicalForceAdjudication,
-    EngineeringStrengthIndex,
-)
-from fatebridge.core.output_classical_roots import ClassicalOverview
-from fatebridge.core.output_compatibility import (
-    CompatibilityDetails,
-    CompatibilitySummary,
-    TraditionalCompatibility,
-)
-from fatebridge.core.output_jyotish import Vimshottari
-from fatebridge.core.output_reference import REFERENCE_TOOL_FIELDS, SnapshotExport
-from fatebridge.core.output_ren_anchors import RenAnchoredOutput
-from fatebridge.core.output_source_annotations import (
+from fatebridge.core.contracts.output_astrodice import ASTRODICE_FIELDS
+from fatebridge.core.contracts.output_base import PartialOutput
+from fatebridge.core.contracts.output_bazi import DimensionOutput
+from fatebridge.core.contracts.output_bazi_anchors import TOPICS
+from fatebridge.core.contracts.output_bazi_birth import BaziBirth, DayMaster
+from fatebridge.core.contracts.output_bazi_evidence import EvidenceStructureProfile
+from fatebridge.core.contracts.output_chart_geometry import ChartPlanet
+from fatebridge.core.contracts.output_charts import CHART_FIELDS, CHART_TOOL_FIELDS
+from fatebridge.core.contracts.output_chinese import CHINESE_FIELDS, CHINESE_TOOL_FIELDS
+from fatebridge.core.contracts.output_compatibility import COMPATIBILITY_FIELDS
+from fatebridge.core.contracts.output_jyotish import Vimshottari
+from fatebridge.core.contracts.output_projection import ProjectedOutput
+from fatebridge.core.contracts.output_reference import REFERENCE_TOOL_FIELDS
+from fatebridge.core.contracts.output_ren_anchors import RenAnchoredOutput
+from fatebridge.core.contracts.output_snapshot_export import SnapshotExport
+from fatebridge.core.contracts.output_source_annotations import (
     LiteralSourceInputContext,
     SourceAnnotationComparison,
     SourceCurrentCalculation,
 )
-from fatebridge.core.output_timing import (
+from fatebridge.core.contracts.output_timing import (
     AnalysisReference,
     BirthTimeSensitivity,
-    LifeDimensionAssessment,
-    LifeDimensionScores,
     TimingInteractions,
 )
-from fatebridge.core.output_western import (
-    WESTERN_FIELDS,
-    HoraryMotionBasis,
-    PlanetaryEvent,
-    PlanetaryEventHistory,
-    WesternCalculationBasis,
-)
-from fatebridge.core.output_western_policy import WesternDataPolicy
-from fatebridge.utils.errors import ValidationIssue
+from fatebridge.core.contracts.output_western import WESTERN_FIELDS
+from fatebridge.core.contracts.output_western_election import Election
+from fatebridge.core.contracts.output_western_policy import WesternDataPolicy
+from fatebridge.core.receipt_models import Object, RunMetadata
 
-Object = Dict[str, JsonValue]
+__all__ = [
+    "CHART_TOOL_FIELDS",
+    "CHART_VARIANT_TOOL_KEYS",
+    "CHINESE_TOOL_FIELDS",
+    "DayMaster",
+    "Election",
+    "Object",
+    "PartialOutput",
+    "ProjectedOutput",
+    "REFERENCE_TOOL_FIELDS",
+    "RunMetadata",
+    "SnapshotExport",
+    "output_model_for",
+    "required_output_fields_for",
+]
 
-# The aggregate tool publishes and validates the existing variant owners.
+
 CHART_VARIANT_TOOL_KEYS: dict[str, str] = {
     "chart": "astro_chart",
     "chart13": "astro_chart13",
@@ -75,266 +67,27 @@ CHART_VARIANT_TOOL_KEYS: dict[str, str] = {
 }
 
 
-class ResultDelivery(PartialOutput):
-    compact_reference: Optional[bool] = None
-    mode: Optional[str] = None
-    result_id: Optional[str] = None
-    total_chars: Optional[int] = None
-    total_bytes: Optional[int] = None
-    expires_at: Optional[float] = None
-    page_chars: Optional[int] = None
-    manifest_uri: Optional[str] = None
-    first_page_uri: Optional[str] = None
-    rest_manifest_path: Optional[str] = None
-    file_path: Optional[str] = None
-    file_payload_path: Optional[str] = None
-    available_fields: Optional[List[str]] = None
-    deferred_fields: Optional[List[str]] = None
-
-
-class ProjectedOutput(PartialOutput):
-    projection_warnings: Optional[List[ValidationIssue]] = None
-    result_delivery: Optional[ResultDelivery] = None
-
-
-class EffectiveTime(PartialOutput):
-    as_of: str
-    clock_timezones: List[str]
-
-
-class ReplayControls(PartialOutput):
-    as_of: str
-    overrides: Object
-    requires_original_input: bool
-
-
-class Determinism(PartialOutput):
-    uses_current_time: bool
-    current_time_fields_defaulted: List[str]
-    randomness_used: bool
-    seed_generated: bool
-    replayable_with_receipt: bool
-    scope: str
-
-
-class RunMetadata(PartialOutput):
-    run_id: str
-    trace_id: str
-    tool_name: str
-    generated_at: str
-    engine: str
-    engine_is_approximate: bool
-    parent_run_id: Optional[str] = None
-    metadata_schema_version: Optional[str] = None
-    package_version: Optional[str] = None
-    duration_ms: Optional[float] = Field(default=None, ge=0)
-    effective_time: Optional[EffectiveTime] = None
-    determinism: Optional[Determinism] = None
-    runtime: Optional[Object] = None
-    provenance: Optional[Dict[str, List[str]]] = None
-    calculation_evidence: Optional[Object] = None
-    replay: Optional[ReplayControls] = None
-    warnings: Optional[List[str]] = None
-
-
-class DayMaster(PartialOutput):
-    stem: Optional[str] = None
-    element: Optional[str] = None
-    polarity: Optional[str] = None
-    strength: Optional[str] = Field(
-        default=None,
-        description="既有工程旺衰政策档；完整依据见engineering_index，不是classical_adjudication的原典力量结论",
-    )
-    engineering_index: FullFact[Optional[EngineeringStrengthIndex]] = None
-    classical_adjudication: FullFact[Optional[ClassicalForceAdjudication]] = None
-    assessment: Optional[Object] = None
-
-
-class BaziBirth(PartialOutput):
-    classical: Optional[ClassicalOverview] = None
-    structure_profile: Optional[EvidenceStructureProfile] = None
-    day_master: Optional[DayMaster] = None
-    four_pillars: Optional[FourPillars] = None
-    favorable_elements: Optional[List[JsonValue]] = None
-    favorable_elements_status: FullFact[Optional[str]] = None
-    engineering_favorable_elements: FullFact[Optional[List[str]]] = None
-    element_distribution: Optional[Object] = None
-    person_info: Optional[PersonInfo] = None
-    calendar_context: Optional[CalendarContext] = None
-    patterns: Optional[Object] = None
-    ten_gods: Optional[Object] = None
-    analysis_date: Optional[str] = None
-
-
-class ElectionFactor(PartialOutput):
-    code: Optional[str] = None
-    polarity: Optional[str] = None
-    weight: Optional[int] = None
-    hard: Optional[bool] = None
-    detail: Optional[str] = None
-
-
-class ElectionPlanet(PartialOutput):
-    planet: Optional[str] = None
-    sign: Optional[str] = None
-    longitude: Optional[float] = None
-    speed: Optional[float] = None
-    retrograde: Optional[bool] = None
-    house: Optional[str] = None
-    dignity: Optional[str] = None
-    dignity_scope: Optional[str] = None
-
-
-class ElectionAxes(PartialOutput):
-    ascendant_longitude: Optional[float] = None
-    midheaven_longitude: Optional[float] = None
-    first_house_cusp: Optional[float] = None
-    tenth_house_cusp: Optional[float] = None
-    policy: Optional[str] = None
-
-
-class ElectionMoon(PartialOutput):
-    sign: Optional[str] = None
-    sign_label: Optional[str] = None
-    longitude: Optional[float] = None
-    void_of_course: Optional[bool] = None
-    phase: Optional[str] = None
-    elongation_degrees: Optional[float] = None
-    solar_condition: Optional[str] = None
-    motion_basis: Optional[HoraryMotionBasis] = None
-
-
-class ElectionAscendant(PartialOutput):
-    sign: Optional[str] = None
-    sign_label: Optional[str] = None
-    longitude: Optional[float] = None
-    ruler: Optional[str] = None
-    ruler_label: Optional[str] = None
-    ruler_dignity: Optional[str] = None
-
-
-class ElectionUnresolvedFactor(PartialOutput):
-    code: Optional[str] = None
-    minimum_weight: Optional[int] = None
-    maximum_weight: Optional[int] = None
-    may_be_hard: Optional[bool] = None
-    reason: Optional[str] = None
-
-
-class ElectionScoreEvidence(PartialOutput):
-    status: Optional[str] = None
-    base_score: Optional[int] = None
-    known_contribution: Optional[int] = None
-    raw_known_subtotal: Optional[int] = None
-    missing_factor_codes: Optional[List[str]] = None
-    bounds_scope: Optional[str] = None
-
-
-class ElectionScoringPolicy(PartialOutput):
-    rule_id: Optional[str] = None
-    base_score: Optional[int] = None
-    weights_and_band_boundaries_changed: Optional[bool] = None
-    scope: Optional[str] = None
-    full_original_text_acceptance: Optional[bool] = None
-    empirically_calibrated: Optional[bool] = None
-    moon_operational_policy: Optional[str] = None
-    solar_rule: Optional[str] = None
-    phase_weight_policy: Optional[str] = None
-
-
-class ElectionHouseSignificator(PartialOutput):
-    house: Optional[int] = None
-    reference_point: Optional[str] = None
-    role_in_source: Optional[str] = None
-    longitude: Optional[float] = None
-    sign: Optional[str] = None
-    ruler: Optional[str] = None
-    ruler_state: Optional[ElectionPlanet] = None
-
-
-class ElectionMarriageParty(PartialOutput):
-    role_in_source: Optional[str] = None
-    natural_significator: Optional[str] = None
-    lunar_contact_role: Optional[str] = None
-    lunar_significator: Optional[str] = None
-    contact_order_established: Optional[bool] = None
-    contact: Optional[PlanetaryEvent] = None
-
-
-class ElectionMarriageSignificators(PartialOutput):
-    method_id: Optional[str] = None
-    status: Optional[str] = None
-    author: Optional[str] = None
-    edition: Optional[str] = None
-    source_url: Optional[str] = None
-    source_pages: Optional[List[int]] = None
-    facsimile_url: Optional[str] = None
-    facsimile_pdf_pages: Optional[List[int]] = None
-    source_basis: Optional[str] = None
-    house_system: Optional[str] = None
-    zodiac_type: Optional[str] = None
-    houses: Optional[List[ElectionHouseSignificator]] = None
-    parties: Optional[List[ElectionMarriageParty]] = None
-    event_history: Optional[PlanetaryEventHistory] = None
-    score_contribution: Optional[int] = None
-    scope: Optional[str] = None
-    full_original_text_acceptance: Optional[bool] = None
-
-
-class Election(PartialOutput):
-    reference_geometry: Optional[Dict[str, Any]] = None
-    backend_convention: Optional[Dict[str, Any]] = None
-    system: Optional[str] = None
-    system_label: Optional[str] = None
-    significator: Optional[str] = None
-    significator_label: Optional[str] = None
-    planets: Optional[Dict[str, ElectionPlanet]] = None
-    axes: Optional[ElectionAxes] = None
-    calculation_basis: Optional[WesternCalculationBasis] = None
-    solar_condition_policy: Optional[SolarConditionPolicy] = None
-    moon: Optional[ElectionMoon] = None
-    ascendant: Optional[ElectionAscendant] = None
-    score_bounds: Optional[List[int]] = None
-    score_evidence: Optional[ElectionScoreEvidence] = None
-    scoring_policy: Optional[ElectionScoringPolicy] = None
-    unresolved_factors: Optional[List[ElectionUnresolvedFactor]] = None
-    dignity_scope: Optional[str] = None
-    marriage_significators: Optional[ElectionMarriageSignificators] = None
-    topic_id: Optional[str] = None
-    topic_label: Optional[str] = None
-    topic_house: Optional[int] = None
-    score: Optional[int] = Field(default=None, ge=0, le=100)
-    verdict: Optional[str] = None
-    has_hard_block: Optional[bool] = None
-    recommendation: Optional[str] = None
-    factors: Optional[List[ElectionFactor]] = None
-
-
 def output_model_for(key: str, *, western_data_policy: bool = False) -> type[BaseModel]:
     """Build each catalog's public schema from explicit root-field contracts."""
     if key not in _TOOL_FIELDS:
         raise KeyError(f"Missing output contract for tool {key}")
-    fields: Dict[str, Any] = {
-        "run_metadata": (Optional[RunMetadata], None),
-        "snapshot_text": (Optional[str], None),
-        "snapshot_export": (Optional[SnapshotExport], None),
+    else:
+        pass
+    fields: dict[str, Any] = {
+        "run_metadata": (RunMetadata | None, None),
+        "snapshot_text": (str | None, None),
+        "snapshot_export": (SnapshotExport | None, None),
     }
     if western_data_policy:
-        fields["ephemeris_data_policy"] = (Optional[WesternDataPolicy], None)
+        fields["ephemeris_data_policy"] = (WesternDataPolicy | None, None)
+    else:
+        pass
     tool_fields = {
         **CHINESE_TOOL_FIELDS.get(key, {}),
         **CHART_TOOL_FIELDS.get(key, {}),
         **REFERENCE_TOOL_FIELDS.get(key, {}),
         **(ASTRODICE_FIELDS if key == "otherbu" else {}),
-        **(
-            {
-                "summary": CompatibilitySummary,
-                "detailed_analysis": CompatibilityDetails,
-                "traditional_compatibility": TraditionalCompatibility,
-            }
-            if key == "two_person_compatibility"
-            else {}
-        ),
+        **(COMPATIBILITY_FIELDS if key == "two_person_compatibility" else {}),
         **(
             {
                 "input_context": LiteralSourceInputContext,
@@ -350,24 +103,24 @@ def output_model_for(key: str, *, western_data_policy: bool = False) -> type[Bas
         **CHINESE_FIELDS,
         **WESTERN_FIELDS,
         **CHART_FIELDS,
-        **BAZI_FIELDS,
+        **{f"{topic}_analysis": DimensionOutput for topic in TOPICS},
         "bazi_birth": BaziBirth,
         "day_master": DayMaster,
         "structure_profile": EvidenceStructureProfile,
-        "planets": List[ChartPlanet],
+        "planets": list[ChartPlanet],
         "election": Election,
         "vimshottari": Vimshottari,
         "interaction_analysis": TimingInteractions,
         "analysis_reference": AnalysisReference,
         "birth_time_sensitivity": BirthTimeSensitivity,
-        "life_dimensions": LifeDimensionScores,
-        "life_dimensions_assessment": LifeDimensionAssessment,
         **tool_fields,
     }
     root_fields = dict.fromkeys([*_TOOL_FIELDS[key].split(), *tool_fields])
     if key == "astro_chart":
         for variant_key in CHART_VARIANT_TOOL_KEYS.values():
             root_fields.update(dict.fromkeys(_TOOL_FIELDS[variant_key].split()))
+    else:
+        pass
     for field in root_fields:
         annotation = overrides.get(field, _FIELD_TYPES.get(field, Object))
         metadata: dict[str, JsonValue] = {}
@@ -386,6 +139,8 @@ def output_model_for(key: str, *, western_data_policy: bool = False) -> type[Bas
                     ],
                 }
             )
+        else:
+            pass
         if key == "astro_chart":
             variants: list[JsonValue] = [
                 variant
@@ -396,8 +151,12 @@ def output_model_for(key: str, *, western_data_policy: bool = False) -> type[Bas
                 metadata["x-fatebridge-full-result-required-for-chart-variants"] = (
                     variants
                 )
+            else:
+                pass
+        else:
+            pass
         fields[field] = (
-            Optional[annotation],
+            annotation | None,
             Field(
                 default=None,
                 min_length=7 if field == "planets" else None,
@@ -424,15 +183,14 @@ def required_output_fields_for(key: str) -> tuple[str, ...]:
     return tuple(_REQUIRED_OUTPUT_FIELDS[key].split())
 
 
-# Public root fields; specialized nested contracts are defined above.
-_FIELD_TYPES: Dict[str, Any] = {
+_FIELD_TYPES: dict[str, Any] = {
     "analysis_type": str,
-    "aspects": List[JsonValue],
+    "aspects": list[JsonValue],
     "balance_basis": str,
     "birth": str,
     "bundle_version": int,
     "category": str,
-    "challenges": List[JsonValue],
+    "challenges": list[JsonValue],
     "changed_code": str,
     "citation": str,
     "comprehensive_summary": str,
@@ -441,80 +199,79 @@ _FIELD_TYPES: Dict[str, Any] = {
     "dayGanZi": str,
     "dayInt": int,
     "day_palace_branch": str,
-    "dayun": Union[Object, List[JsonValue]],
+    "dayun": Object | list[JsonValue],
     "domain": str,
-    "domains": List[JsonValue],
+    "domains": list[JsonValue],
     "element": str,
     "element_distribution_basis": str,
     "engine": str,
     "export_text": str,
-    "favorable_elements": List[JsonValue],
+    "favorable_elements": list[JsonValue],
     "favorable_elements_status": str,
-    "engineering_favorable_elements": List[str],
-    "fixed_stars": List[JsonValue],
+    "engineering_favorable_elements": list[str],
+    "fixed_stars": list[JsonValue],
     "house": int,
-    "houses": List[JsonValue],
-    "in_to_out_antiscia": List[JsonValue],
-    "in_to_out_aspects": List[JsonValue],
-    "in_to_out_contra_antiscia": List[JsonValue],
+    "houses": list[JsonValue],
+    "in_to_out_antiscia": list[JsonValue],
+    "in_to_out_aspects": list[JsonValue],
+    "in_to_out_contra_antiscia": list[JsonValue],
     "jiedelta": str,
     "jieqi": str,
-    "jieqi_split_keys": List[JsonValue],
-    "jieqi_timeline": List[JsonValue],
-    "jieqi_year": List[JsonValue],
+    "jieqi_split_keys": list[JsonValue],
+    "jieqi_timeline": list[JsonValue],
+    "jieqi_year": list[JsonValue],
     "key": str,
     "leap": bool,
-    "lines": List[JsonValue],
+    "lines": list[JsonValue],
     "lookup_mode": str,
-    "midpoint_aspects": List[JsonValue],
-    "midpoints": List[JsonValue],
+    "midpoint_aspects": list[JsonValue],
+    "midpoints": list[JsonValue],
     "ming_gong": str,
-    "missing_selected_sections": List[JsonValue],
+    "missing_selected_sections": list[JsonValue],
     "module_snapshot_prefix": str,
     "month": str,
     "monthGanZi": str,
     "monthInt": int,
-    "moving_lines": List[JsonValue],
-    "nongli": Union[Object, str],
-    "out_to_in_antiscia": List[JsonValue],
-    "out_to_in_aspects": List[JsonValue],
-    "out_to_in_contra_antiscia": List[JsonValue],
+    "moving_lines": list[JsonValue],
+    "nongli": Object | str,
+    "out_to_in_antiscia": list[JsonValue],
+    "out_to_in_aspects": list[JsonValue],
+    "out_to_in_contra_antiscia": list[JsonValue],
     "pair": str,
     "part_name": str,
-    "patterns": Union[Object, List[JsonValue]],
+    "patterns": Object | list[JsonValue],
     "planet": str,
-    "planets": List[JsonValue],
-    "queries": List[JsonValue],
+    "planets": list[JsonValue],
+    "queries": list[JsonValue],
     "query": str,
-    "question": Union[JsonValue, str],
-    "recommendations": List[JsonValue],
+    "question": JsonValue | str,
     "rendered_text": str,
     "requested_year_stem": str,
-    "section_titles_detected": List[JsonValue],
-    "sections": List[JsonValue],
-    "selected_jieqi": List[JsonValue],
-    "selected_sections": List[JsonValue],
+    "section_titles_detected": list[JsonValue],
+    "sections": list[JsonValue],
+    "selected_jieqi": list[JsonValue],
+    "selected_sections": list[JsonValue],
     "settings_key": str,
     "settings_version": int,
     "sign": str,
     "source": str,
     "source_of_truth": str,
-    "strengths": List[JsonValue],
     "su27_basis": str,
-    "summary": Union[Object, List[JsonValue], str],
-    "synastry_aspects": List[JsonValue],
-    "target_year_jieqi": List[JsonValue],
-    "techniques": List[JsonValue],
-    "thirteen_sectors": List[JsonValue],
+    "summary": Object | list[JsonValue] | str,
+    "synastry_aspects": list[JsonValue],
+    "target_year_jieqi": list[JsonValue],
+    "techniques": list[JsonValue],
+    "thirteen_sectors": list[JsonValue],
     "time": str,
     "timeGanZi": str,
-    "tips": List[JsonValue],
+    "tips": list[JsonValue],
     "title": str,
-    "unknown_detected_sections": List[JsonValue],
-    "year": Union[int, str],
+    "unknown_detected_sections": list[JsonValue],
+    "year": int | str,
     "yearGanZi": str,
     "yearJieqi": str,
 }
+
 
 _TOOL_FIELDS = {
     "bazi_source_compare": "analysis_type four_pillars input_context current_calculation source_comparison summary",
@@ -529,13 +286,13 @@ _TOOL_FIELDS = {
     "bazi_personality": "analysis_type personality_analysis",
     "bazi_relatives": "analysis_type relatives_analysis",
     "bazi_romance": "analysis_type romance_analysis",
-    "two_person_compatibility": "challenges detailed_analysis element_relationship person_info recommendations strengths summary traditional_compatibility",
+    "two_person_compatibility": "relationship_type person_info natal_contexts element_relationship cross_chart_relations directional_ten_gods",
     "timing_analysis": "analysis_reference analysis_calendar analysis_type birth_pillars birth_time_sensitivity calendar_context combined_effects comprehensive_summary dayun_analysis interaction_analysis liunian_analysis liuri_analysis liushi_analysis liuyue_analysis personal_info",
     "dayun_analysis": "analysis_reference analysis_type birth_time_sensitivity calendar_context dayun_info element_effects personal_info summary timing_context",
     "liunian_analysis": "analysis_type calendar_context element_effects liunian_info personal_info summary target_year_jieqi",
     "liuyue_analysis": "analysis_reference analysis_calendar analysis_type calendar_context combination_effects detailed_analysis element_effects liunian_info liuyue_info personal_info summary target_year_jieqi",
     "liuri_analysis": "analysis_reference analysis_calendar analysis_type calendar_context element_effects liuri_info personal_info summary",
-    "liushi_analysis": "analysis_reference analysis_calendar analysis_type calendar_context detailed_analysis element_effects life_dimensions life_dimensions_assessment liushi_info personal_info summary",
+    "liushi_analysis": "analysis_reference analysis_calendar analysis_type calendar_context detailed_analysis element_effects liushi_info personal_info summary",
     "jieqi_timeline_analysis": "analysis_type calendar_context jieqi_timeline personal_info summary target_year_jieqi",
     "jieqi_year": "analysis_type jieqi_year query_context selected_jieqi summary year",
     "nongli_time": "analysis_context analysis_type birth calendar_context day dayGanZi dayInt four_pillars input_context jiedelta jieqi leap lunar_calendar month monthGanZi monthInt nongli summary timeGanZi yearGanZi yearJieqi",
@@ -548,8 +305,8 @@ _TOOL_FIELDS = {
     "heluo": "analysis_context analysis_type calendar_context chart dayun four_pillars input_normalized judge solar_term summary numerology_evidence heluo_timing jiehou_evidence",
     "suzhan": "analysis_type astronomy chart input_normalized params rulesets sukuyo validation summary",
     "sukuyo_compatibility": "analysis_type status pair person1 person1_to_person2 person2 person2_to_person1 candidate_relation_analysis su27_basis rulesets interpretation_contract validation summary",
-    "otherbu": "analysis_type chart diceChart house input_normalized interpretation planet question sign summary method_id symbolic_details rulesets rule_trace validation",
-    "sanshiunited": "analysis_context analysis_type input_normalized liureng qimen sources subresults summary taiyi",
+    "otherbu": "analysis_type chart diceChart house input_normalized planet question sign summary method_id symbolic_details rulesets rule_trace validation",
+    "sanshiunited": "analysis_context analysis_type input_normalized liureng qimen subresults summary taiyi",
     "ziwei_birth": "analysis_context analysis_type calendar_context four_pillars person_info ziwei_birth",
     "ziwei_horoscope": "analysis_context analysis_type birth_context person_info ziwei_horoscope",
     "ziwei_rules": "analysis_type engine focused_rules requested_year_stem rule_catalogue",
@@ -562,15 +319,14 @@ _TOOL_FIELDS = {
     "export_parse": "export_text missing_selected_sections section_titles_detected sections selected_sections settings_used technique unknown_detected_sections",
     "knowledge_registry": "bundle_version domains provenance source",
     "knowledge_read": "bundle_version category citation domain key lines provenance query_normalized reference_only reference_details rendered_text source tips title",
-    "astro_chart": "angles apparent_model_positions aspect_evidence aspects balance_basis chart_profile classical classical_patterns element_balance fixed_stars houses india interpretation interpretation_evidence modality_balance person_info planetary_hours planets summary sector_profile midpoint_analysis thirteen_sectors time_sensitivity midpoints midpoint_aspects base_chart",
-    "astro_chart13": "angles aspect_evidence aspects balance_basis chart_profile classical classical_patterns element_balance fixed_stars houses interpretation interpretation_evidence modality_balance person_info planetary_hours planets summary thirteen_sectors sector_profile time_sensitivity",
-    "astro_hellen": "angles aspect_evidence aspects balance_basis chart_profile classical classical_patterns element_balance fixed_stars hellenistic houses interpretation interpretation_evidence modality_balance person_info planetary_hours planets summary",
-    "astro_guolao": "angles aspect_evidence aspects balance_basis chart_profile classical classical_patterns element_balance fixed_stars guolao houses interpretation interpretation_evidence modality_balance person_info planetary_hours planets summary",
-    "astro_india": "angles aspect_evidence aspects balance_basis chart_profile classical classical_patterns element_balance fixed_stars houses india interpretation interpretation_evidence modality_balance person_info planetary_hours planets summary",
+    "astro_chart": "angles apparent_model_positions aspect_evidence aspects balance_basis chart_profile classical classical_patterns element_balance fixed_stars houses india modality_balance person_info planetary_hours planets summary sector_profile midpoint_analysis thirteen_sectors time_sensitivity midpoints midpoint_aspects base_chart",
+    "astro_chart13": "angles aspect_evidence aspects balance_basis chart_profile classical classical_patterns element_balance fixed_stars houses modality_balance person_info planetary_hours planets summary thirteen_sectors sector_profile time_sensitivity",
+    "astro_hellen": "angles aspect_evidence aspects balance_basis chart_profile classical classical_patterns element_balance fixed_stars hellenistic houses modality_balance person_info planetary_hours planets summary",
+    "astro_guolao": "angles aspect_evidence aspects balance_basis chart_profile classical classical_patterns element_balance fixed_stars guolao houses modality_balance person_info planetary_hours planets summary",
+    "astro_india": "angles aspect_evidence aspects balance_basis chart_profile classical classical_patterns element_balance fixed_stars houses india modality_balance person_info planetary_hours planets summary",
     "astro_vimshottari": "analysis_context person_info india vimshottari summary",
     "astro_germany": "base_chart chart_profile planets midpoint_aspects midpoints midpoint_analysis summary",
-    "astro_relative": "chart compatibility compatibility_evidence in_to_out_antiscia in_to_out_aspects in_to_out_contra_antiscia in_to_out_midpoint inner inner_chart marks_charts out_to_in_antiscia out_to_in_aspects out_to_in_contra_antiscia out_to_in_midpoint outer outer_chart relationship_profile summary synastry_aspects",
-    "astro_relative_chart": "chart compatibility compatibility_evidence in_to_out_antiscia in_to_out_aspects in_to_out_contra_antiscia in_to_out_midpoint inner inner_chart marks_charts out_to_in_antiscia out_to_in_aspects out_to_in_contra_antiscia out_to_in_midpoint outer outer_chart relationship_profile summary synastry_aspects",
+    "astro_relative_chart": "chart in_to_out_antiscia in_to_out_aspects in_to_out_contra_antiscia in_to_out_midpoint inner inner_chart marks_charts out_to_in_antiscia out_to_in_aspects out_to_in_contra_antiscia out_to_in_midpoint outer outer_chart relationship_profile summary synastry_aspects",
     "western_timing_analysis": "analysis_context analysis_type directions natal_reference returns summary time_lords transits",
     "solarreturn": "analysis_context analysis_type engine natal_reference solarreturn summary",
     "lunarreturn": "analysis_context analysis_type engine lunarreturn natal_reference summary",
@@ -603,8 +359,6 @@ _TOOL_FIELDS = {
 }
 
 
-# These are semantic business roots, not metadata or optional explanations.
-# Conditional chart variants declare their invariant roots only.
 _REQUIRED_OUTPUT_FIELDS = {
     "bazi_source_compare": "four_pillars input_context current_calculation source_comparison summary",
     "analyze_destiny": "four_pillars day_master",
@@ -618,13 +372,13 @@ _REQUIRED_OUTPUT_FIELDS = {
     "bazi_personality": "personality_analysis",
     "bazi_relatives": "relatives_analysis",
     "bazi_romance": "romance_analysis",
-    "two_person_compatibility": "summary detailed_analysis traditional_compatibility",
+    "two_person_compatibility": "natal_contexts cross_chart_relations directional_ten_gods",
     "timing_analysis": "birth_pillars comprehensive_summary",
     "dayun_analysis": "dayun_info",
     "liunian_analysis": "liunian_info",
     "liuyue_analysis": "liuyue_info",
     "liuri_analysis": "liuri_info",
-    "liushi_analysis": "liushi_info life_dimensions life_dimensions_assessment",
+    "liushi_analysis": "liushi_info",
     "jieqi_timeline_analysis": "jieqi_timeline",
     "jieqi_year": "jieqi_year",
     "nongli_time": "nongli four_pillars",
@@ -638,7 +392,7 @@ _REQUIRED_OUTPUT_FIELDS = {
     "suzhan": "analysis_type input_normalized params rulesets sukuyo validation summary",
     "sukuyo_compatibility": "person1 person2 rulesets status",
     "otherbu": "planet sign house",
-    "sanshiunited": "subresults synthesis",
+    "sanshiunited": "qimen taiyi liureng subresults synthesis",
     "ziwei_birth": "ziwei_birth",
     "ziwei_horoscope": "ziwei_horoscope",
     "ziwei_rules": "rule_catalogue",
@@ -658,7 +412,6 @@ _REQUIRED_OUTPUT_FIELDS = {
     "astro_india": "planets chart_profile india",
     "astro_vimshottari": "analysis_context person_info india vimshottari summary",
     "astro_germany": "base_chart midpoints chart_profile",
-    "astro_relative": "relationship_profile",
     "astro_relative_chart": "relationship_profile",
     "western_timing_analysis": "directions returns time_lords transits",
     "solarreturn": "solarreturn",
@@ -696,7 +449,7 @@ _REQUIRED_OUTPUT_FIELDS = {
     "fengshui_annual_stars": "status layers rulesets coverage rule_trace",
     "fengshui_monthly_stars": "status layers rulesets coverage rule_trace",
     "fengshui_xuankong_natal": "status layers rulesets coverage rule_trace",
-    # Form-only assessment legitimately has layers={}; its typed FullFact
+    # Form-only assessment legitimately has layers={}; its typed FULL_FACT
     # still requires the map to be present and non-null in complete output.
     "fengshui_assess": "status rulesets coverage rule_trace",
 }

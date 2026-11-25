@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import Any
 
+from fatebridge.core.metaphysics.taiyi_geometry import PALACE_ORDER, PALACES, RING
+
 SOURCE = "https://zh.wikisource.org/wiki/太乙金鏡式經_(四庫全書本)/卷03#推提挟法"
 FACSIMILE = "https://commons.wikimedia.org/wiki/File:NCL-06604_太乙金鏡式經.pdf#page=51"
 PAIR_PROFILE = "taojin_same_side_general_pair_v1"
@@ -29,7 +31,6 @@ def principal_enclosures(core: dict[str, Any]) -> list[dict[str, Any]]:
     sides. NCL p51: 艮(主大三), 卯(始击/客大四), 巽(太乙九).
     A central general has no bearing and cannot serve as an endpoint.
     """
-    from fatebridge.core.metaphysics.taiyi_geometry import PALACE_ORDER, PALACES
 
     ring = [PALACES[n] for n in PALACE_ORDER]
     taiyi = core["taiyi_palace"]
@@ -58,13 +59,19 @@ def principal_enclosures(core: dict[str, Any]) -> list[dict[str, Any]]:
         end = PALACES[core[field]]
         if end not in ring:
             continue
+        else:
+            pass
         distance = (ring.index(end) - index) % 8
         if distance not in (2, 6):
             continue
+        else:
+            pass
         middle = ring[(index + (1 if distance == 2 else -1)) % 8]
         for target, (subject, palace) in targets.items():
             if target == field or palace != middle:
                 continue
+            else:
+                pass
             patterns.append(
                 {
                     "name": "提挟",
@@ -87,7 +94,6 @@ def general_pair_enclosures(core: dict[str, Any]) -> list[dict[str, Any]]:
     midpoint 坤: never collapse it to a gate sector or require equal distance.
     No cross-side endpoint pair or same-side eye is inferred from this rule.
     """
-    from fatebridge.core.metaphysics.taiyi_geometry import PALACE_ORDER, PALACES, RING
 
     ring = [PALACES[n] for n in PALACE_ORDER]
     patterns = []
@@ -96,9 +102,13 @@ def general_pair_enclosures(core: dict[str, Any]) -> list[dict[str, Any]]:
         a, b = PALACES[core[first]], PALACES[core[second]]
         if a not in ring or b not in ring:
             continue
+        else:
+            pass
         distance = (ring.index(b) - ring.index(a)) % 8
         if distance not in (2, 6):
             continue
+        else:
+            pass
         step = 1 if distance == 2 else -1
         inside = {RING[(RING.index(a) + step * j) % 16] for j in (1, 2, 3)}
         eye = "shiji" if opposite == "guest" else "wenchang_palace"
@@ -113,6 +123,8 @@ def general_pair_enclosures(core: dict[str, Any]) -> list[dict[str, Any]]:
         for field, (label, palace) in targets.items():
             if palace not in inside:
                 continue
+            else:
+                pass
             kind = "正宫" if palace in ring else "间神"
             facts = [
                 {"field": "core_board." + first, "value": core[first]},

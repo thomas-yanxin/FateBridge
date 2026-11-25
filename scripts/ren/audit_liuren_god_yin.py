@@ -20,10 +20,13 @@ PROFILES: list[Literal["liuren_common_v1", "tanyuan_xieji_v1"]] = [
 WATCH = (
     "src/fatebridge/core/metaphysics/liureng_god_yin.py",
     "src/fatebridge/core/metaphysics/liureng.py",
+    "src/fatebridge/core/metaphysics/liureng_course_layout.py",
+    "src/fatebridge/core/metaphysics/liureng_selection.py",
+    "src/fatebridge/core/metaphysics/liureng_year_fate.py",
     "src/fatebridge/core/metaphysics/ren_gods.py",
-    "src/fatebridge/core/output_liuren_god_yin.py",
-    "src/fatebridge/core/output_chinese.py",
-    "src/fatebridge/core/output_ren_anchors.py",
+    "src/fatebridge/core/contracts/output_liuren_god_yin.py",
+    "src/fatebridge/core/contracts/output_chinese.py",
+    "src/fatebridge/core/contracts/output_ren_anchors.py",
     "src/fatebridge/services/metaphysics.py",
     "scripts/ren/audit_liuren_god_yin.py",
 )
@@ -36,11 +39,17 @@ def sha(path: Path) -> str:
 def reference() -> dict[str, Any]:
     if sha(CORPUS / "freeze.json") != PIN:
         raise ValueError("Frozen yin-spirit protocol changed")
+    else:
+        pass
     frozen = json.loads((CORPUS / "freeze.json").read_text())
     if {p.name for p in CORPUS.iterdir()} != set(frozen["files"]) | {"freeze.json"}:
         raise ValueError("Frozen yin-spirit source inventory changed")
+    else:
+        pass
     if any(sha(CORPUS / n) != d for n, d in frozen["files"].items()):
         raise ValueError("Frozen yin-spirit source bytes changed")
+    else:
+        pass
     value: dict[str, Any] = json.loads((CORPUS / "cases.json").read_text())
     return value
 
@@ -145,6 +154,8 @@ def audit() -> dict[str, Any]:
                                     expected=expected,
                                 )
                             )
+                        else:
+                            pass
                         predicate_leaks += row["comprehensive_eligibility"] is not None
                         rows_checked += 1
                     boards += 1

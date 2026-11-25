@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
-from typing import Literal, Optional, Union
+from typing import Literal
 
 from pydantic import Field
 
+from fatebridge.core.requests.base import AstroHouseValidatorMixin
 from fatebridge.core.requests.birth import AstroBirthRequest
 from fatebridge.core.requests.western_policy import WesternEphemerisRequest
 from fatebridge.utils.house_systems import TWELVE_HOUSE_SYSTEM_NOTE
@@ -15,10 +16,12 @@ ClassicalPlanet = Literal[
 ]
 
 
-class AstroLifespanRequest(AstroBirthRequest, WesternEphemerisRequest):
+class AstroLifespanRequest(
+    AstroHouseValidatorMixin, AstroBirthRequest, WesternEphemerisRequest
+):
     """Shared base for western *lifespan* techniques cast from a single natal chart."""
 
-    house_system: Union[int, str] = Field(
+    house_system: int | str = Field(
         default="P",
         description="House system, any convention: SE letter ('P'=Placidus, "
         "'R'=Regiomontanus, 'W'=whole sign, 'D'=equal_mc), key ('placidus', "
@@ -50,14 +53,14 @@ class AstroHarmonicRequest(AstroLifespanRequest):
 class AstroPlanetaryAgesRequest(AstroLifespanRequest):
     """Request model for the 行星年龄 (Ptolemy seven ages) tool."""
 
-    analysis_year: Optional[int] = Field(
+    analysis_year: int | None = Field(
         default=None,
         description="Reference year; with month/day, flags the active age band (omit to list all bands)",
     )
-    analysis_month: Optional[int] = Field(
+    analysis_month: int | None = Field(
         default=None, ge=1, le=12, description="Reference month (1-12)"
     )
-    analysis_day: Optional[int] = Field(
+    analysis_day: int | None = Field(
         default=None, ge=1, le=31, description="Reference day (1-31)"
     )
 
@@ -78,13 +81,17 @@ class AstroTriplicityRulersRequest(AstroLifespanRequest):
 
 
 class AstroLunationPhaseRequest(AstroLifespanRequest):
-    """Request model for the 月相推运 (progressed lunation phase) tool."""
+    """Actual postbirth ephemeris phases under the shared day/year clock."""
 
     max_age_years: float = Field(
         default=90.0,
         gt=0,
         le=200,
-        description="Upper age bound (years) for the phase-ingress timeline",
+        description=(
+            "Upper symbolic age bound: one nominal UTC day after birth per year; "
+            "actual Sun/Moon ephemeris crossings, strictly after birth through "
+            "the inclusive bound. Uses the shared fixed-year progression clock."
+        ),
     )
 
 
@@ -155,7 +162,7 @@ class AstroYearSystem129Request(AstroLifespanRequest):
 class AstroPlanetaryArcRequest(AstroLifespanRequest):
     """Request model for the 行星弧方向 (planetary arc directions) tool."""
 
-    arc_source: Union[ClassicalPlanet, Literal["Ascendant", "Medium_Coeli"]] = Field(
+    arc_source: ClassicalPlanet | Literal["Ascendant", "Medium_Coeli"] = Field(
         default="Moon",
         description="Body whose secondary-progressed arc directs the whole chart (default Moon)",
     )
@@ -165,13 +172,13 @@ class AstroPlanetaryArcRequest(AstroLifespanRequest):
         le=15,
         description="Aspect orb in degrees for directed-to-natal hits",
     )
-    analysis_year: Optional[int] = Field(
+    analysis_year: int | None = Field(
         default=None, description="Direction target year (omit for current date)"
     )
-    analysis_month: Optional[int] = Field(
+    analysis_month: int | None = Field(
         default=None, ge=1, le=12, description="Direction target month (1-12)"
     )
-    analysis_day: Optional[int] = Field(
+    analysis_day: int | None = Field(
         default=None, ge=1, le=31, description="Direction target day (1-31)"
     )
 
@@ -215,13 +222,13 @@ class AstroVedicProgRequest(AstroLifespanRequest):
         le=15,
         description="Aspect orb (degrees) for progressed→natal hits",
     )
-    analysis_year: Optional[int] = Field(
+    analysis_year: int | None = Field(
         default=None, description="Progression target year (omit for current date)"
     )
-    analysis_month: Optional[int] = Field(
+    analysis_month: int | None = Field(
         default=None, ge=1, le=12, description="Progression target month (1-12)"
     )
-    analysis_day: Optional[int] = Field(
+    analysis_day: int | None = Field(
         default=None, ge=1, le=31, description="Progression target day (1-31)"
     )
 
@@ -232,12 +239,12 @@ class AstroJaynesProgRequest(AstroLifespanRequest):
     orb: float = Field(
         default=1.0, ge=0, le=5, description="Declination orb (degrees) for parallels"
     )
-    analysis_year: Optional[int] = Field(
+    analysis_year: int | None = Field(
         default=None, description="Progression target year (omit for current date)"
     )
-    analysis_month: Optional[int] = Field(
+    analysis_month: int | None = Field(
         default=None, ge=1, le=12, description="Progression target month (1-12)"
     )
-    analysis_day: Optional[int] = Field(
+    analysis_day: int | None = Field(
         default=None, ge=1, le=31, description="Progression target day (1-31)"
     )

@@ -1,11 +1,13 @@
 """Contract caching preserves wire schemas and never caches user executions."""
 
+from collections.abc import Iterator
 from concurrent.futures import ThreadPoolExecutor
 from threading import Barrier
 from typing import ClassVar
 
 import pytest
 from pydantic import BaseModel, create_model
+from pydantic.json_schema import JsonSchemaValue
 
 from fatebridge.application.description import describe_input_spec, describe_spec
 from fatebridge.application.execution import execute_tool
@@ -17,13 +19,13 @@ from fatebridge.core.schema_cache import (
 
 
 @pytest.fixture(autouse=True)
-def clean_caches():
+def clean_caches() -> Iterator[None]:
     clear_contract_caches()
     yield
     clear_contract_caches()
 
 
-def test_schema_cache_isolates_public_copies():
+def test_schema_cache_isolates_public_copies() -> None:
     class Request(BaseModel):
         value: int
 
@@ -35,25 +37,25 @@ def test_schema_cache_isolates_public_copies():
     assert model_schema(Output) == Output.model_json_schema()
 
 
-def test_same_name_models_and_output_overrides_have_independent_contracts():
+def test_same_name_models_and_output_overrides_have_independent_contracts() -> None:
     integer = create_model("SameName", value=(int, ...))
     string = create_model("SameName", value=(str, ...))
     assert model_schema(integer) != model_schema(string)
 
 
-def test_concurrent_cold_calls_generate_one_schema_per_model():
+def test_concurrent_cold_calls_generate_one_schema_per_model() -> None:
     class Counted(BaseModel):
         value: int
         calls: ClassVar[int] = 0
 
         @classmethod
-        def model_json_schema(cls, **kwargs):
+        def model_json_schema(cls) -> JsonSchemaValue:
             cls.calls += 1
-            return super().model_json_schema(**kwargs)
+            return super().model_json_schema()
 
     barrier = Barrier(8)
 
-    def read():
+    def read() -> JsonSchemaValue:
         barrier.wait(timeout=5)
         return model_schema(Counted)
 
@@ -64,7 +66,7 @@ def test_concurrent_cold_calls_generate_one_schema_per_model():
     assert results[0] is not results[1]
 
 
-def test_model_rebuild_invalidates_contract_revision():
+def test_model_rebuild_invalidates_contract_revision() -> None:
     class Mutable(BaseModel):
         value: int
 
@@ -75,17 +77,19 @@ def test_model_rebuild_invalidates_contract_revision():
     assert model_schema(Mutable) != before
 
 
-def test_failed_generation_is_not_cached_and_schema_hooks_can_be_invalidated():
+def test_failed_generation_is_not_cached_and_schema_hooks_can_be_invalidated() -> None:
     class Hooked(BaseModel):
         value: int
         fail: ClassVar[bool] = True
         label: ClassVar[str] = "first"
 
         @classmethod
-        def model_json_schema(cls, **kwargs):
+        def model_json_schema(cls) -> JsonSchemaValue:
             if cls.fail:
                 raise ValueError("schema generation failed")
-            return {**super().model_json_schema(**kwargs), "title": cls.label}
+            else:
+                pass
+            return {**super().model_json_schema(), "title": cls.label}
 
     with pytest.raises(ValueError, match="schema generation failed"):
         model_schema(Hooked)
@@ -97,16 +101,16 @@ def test_failed_generation_is_not_cached_and_schema_hooks_can_be_invalidated():
     assert model_schema(Hooked) != before
 
 
-def test_user_inputs_results_and_receipts_still_execute_per_call():
+def test_user_inputs_results_and_receipts_still_execute_per_call() -> None:
     class Request(BaseModel):
         value: int
 
     class Output(BaseModel):
         doubled: int
 
-    seen = []
+    seen: list[int] = []
 
-    def service(value):
+    def service(value: int) -> dict[str, int]:
         seen.append(value)
         return {"doubled": value * 2}
 
@@ -128,7 +132,7 @@ def test_user_inputs_results_and_receipts_still_execute_per_call():
         assert left[field] != right[field]
 
 
-def test_input_discovery_does_not_materialize_output_schema():
+def test_input_discovery_does_not_materialize_output_schema() -> None:
     class Request(BaseModel):
         value: int
 
@@ -137,9 +141,9 @@ def test_input_discovery_does_not_materialize_output_schema():
         schema_calls: ClassVar[int] = 0
 
         @classmethod
-        def model_json_schema(cls, **kwargs):
+        def model_json_schema(cls) -> JsonSchemaValue:
             cls.schema_calls += 1
-            return super().model_json_schema(**kwargs)
+            return super().model_json_schema()
 
     spec = ToolSpec(
         key="review_probe",

@@ -1,21 +1,16 @@
 """Frozen real source brackets retain missing controls and rejected models."""
 
-import importlib.util
 import json
-import sys
 from copy import deepcopy
 from pathlib import Path
 
 import pytest
 
-ROOT = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(ROOT / "scripts"))
-SPEC = importlib.util.spec_from_file_location(
-    "hd_source_transitions",
-    ROOT / "scripts/human_design/audit_human_design_source_transitions.py",
+from scripts.human_design import (
+    audit_human_design_source_transitions as transition_audit,
 )
-MODULE = importlib.util.module_from_spec(SPEC)
-SPEC.loader.exec_module(MODULE)
+
+ROOT = Path(__file__).resolve().parents[2]
 FIXTURES = ROOT / "tests/fixtures"
 PLAN = (FIXTURES / "human-design-neptune-transition-plan.json").read_bytes()
 PRIOR = (FIXTURES / "human-design-disc-clock-observations.json").read_bytes()
@@ -32,16 +27,20 @@ MODEL_PLAN_SHA = "2082a9c76e5da303ebc399e8b7c4194e5b9172c8b4d0e32c0f2686039b5e87
 
 
 def search(observations=OBSERVATIONS):
-    return MODULE.adaptive_checks(PLAN, observations, PLAN_SHA, PRIOR, PRIOR_SHA)
+    return transition_audit.adaptive_checks(
+        PLAN, observations, PLAN_SHA, PRIOR, PRIOR_SHA
+    )
 
 
 def compare(predictions=PREDICTIONS, result=None):
-    return MODULE.hypothesis_checks(
+    return transition_audit.hypothesis_checks(
         MODEL_PLAN, predictions, search() if result is None else result, MODEL_PLAN_SHA
     )
 
 
-def test_real26_observations_complete_four_searches_but_no_declared_model_explains_all():
+def test_real26_observations_complete_four_searches_but_no_declared_model_explains_all() -> (
+    None
+):
     result = search()
     assert result["finite_adaptive_search_complete"]
     assert result["observations_supplied"] == result["observations_unique"] == 26
@@ -61,7 +60,9 @@ def test_real26_observations_complete_four_searches_but_no_declared_model_explai
 
 
 @pytest.mark.parametrize("index", [0, 2, 7, 13, 19, 25])
-def test_removing_a_required_query_does_not_make_the_search_complete(index):
+def test_removing_a_required_query_does_not_make_the_search_complete(
+    index: int,
+) -> None:
     changed = deepcopy(OBSERVATIONS)
     changed.pop(index)
     result = search(changed)
@@ -69,7 +70,7 @@ def test_removing_a_required_query_does_not_make_the_search_complete(index):
     assert result["observations_supplied"] == 25
 
 
-def test_unexpected_midpoint_label_is_preserved_as_failure():
+def test_unexpected_midpoint_label_is_preserved_as_failure() -> None:
     changed = deepcopy(OBSERVATIONS)
     changed[4]["facts"]["columns"]["personality"][11] = "20.1"
     result = search(changed)
@@ -79,7 +80,7 @@ def test_unexpected_midpoint_label_is_preserved_as_failure():
     assert result["observations_supplied"] == 26
 
 
-def test_duplicate_and_out_of_order_queries_are_not_silently_deduplicated():
+def test_duplicate_and_out_of_order_queries_are_not_silently_deduplicated() -> None:
     changed = deepcopy(OBSERVATIONS)
     changed.insert(2, deepcopy(changed[0]))
     result = search(changed)
@@ -91,7 +92,7 @@ def test_duplicate_and_out_of_order_queries_are_not_silently_deduplicated():
     assert not search(changed)["finite_adaptive_search_complete"]
 
 
-def test_wrong_visible_birth_input_cannot_be_hidden_behind_correct_case_id():
+def test_wrong_visible_birth_input_cannot_be_hidden_behind_correct_case_id() -> None:
     changed = deepcopy(OBSERVATIONS)
     changed[-1]["facts"]["properties"][
         "Date and Time (Local)"
@@ -101,7 +102,7 @@ def test_wrong_visible_birth_input_cannot_be_hidden_behind_correct_case_id():
     assert not result["observation_order_checks"][-1]["planned_local_input_matched"]
 
 
-def test_changed_repeat_control_does_not_replace_the_original_failure():
+def test_changed_repeat_control_does_not_replace_the_original_failure() -> None:
     changed = deepcopy(OBSERVATIONS)
     changed[0]["facts"]["columns"]["personality"][11] = "19.5"
     result = search(changed)
@@ -112,12 +113,14 @@ def test_changed_repeat_control_does_not_replace_the_original_failure():
 @pytest.mark.parametrize(
     "source,sha", [(PLAN, PLAN_SHA), (PRIOR, PRIOR_SHA), (MODEL_PLAN, MODEL_PLAN_SHA)]
 )
-def test_frozen_plan_or_prior_bytes_cannot_change_with_retained_digest(source, sha):
+def test_frozen_plan_or_prior_bytes_cannot_change_with_retained_digest(
+    source, sha
+) -> None:
     with pytest.raises(ValueError, match="required digest"):
-        MODULE.pinned_json(source + b" ", sha)
+        transition_audit.pinned_json(source + b" ", sha)
 
 
-def test_dropping_failed_neptune_predictions_keeps_all16_hypotheses_rejected():
+def test_dropping_failed_neptune_predictions_keeps_all16_hypotheses_rejected() -> None:
     changed = deepcopy(PREDICTIONS)
     changed["rows"] = [
         r for r in changed["rows"] if r["event_id"] != "neptune_boundary"
@@ -129,13 +132,17 @@ def test_dropping_failed_neptune_predictions_keeps_all16_hypotheses_rejected():
     assert len(result["all_supplied_prediction_rows_retained"]) == 24
 
 
-def test_extra_or_missing_clock_hypothesis_invalidates_the_prediction_inventory():
+def test_extra_or_missing_clock_hypothesis_invalidates_the_prediction_inventory() -> (
+    None
+):
     changed = deepcopy(PREDICTIONS)
     changed["rows"][0]["clock_hypotheses"].pop()
     assert not compare(changed)["all_declared_prediction_rows_present_once"]
 
 
-def test_self_inconsistent_clock_or_body_cannot_be_used_as_a_matching_prediction():
+def test_self_inconsistent_clock_or_body_cannot_be_used_as_a_matching_prediction() -> (
+    None
+):
     changed = deepcopy(PREDICTIONS)
     changed["rows"][0]["clock_hypotheses"][0][
         "predicted_local_calendar"

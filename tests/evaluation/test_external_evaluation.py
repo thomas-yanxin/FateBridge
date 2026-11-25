@@ -6,8 +6,10 @@ from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
+from pydantic import JsonValue
 
-from fatebridge.validation.external_evaluation import (
+from scripts.evaluate_agent import model_prompt, prepare_workspace
+from validation.external_evaluation import (
     LAYERS,
     evaluation_summary,
     freeze_external_selection,
@@ -16,7 +18,6 @@ from fatebridge.validation.external_evaluation import (
     load_frozen_selection,
     sha256,
 )
-from scripts.evaluate_agent import model_prompt, prepare_workspace
 
 
 def make_suite(root: Path):
@@ -108,7 +109,9 @@ def rewrite_hashed(root, name, mutate):
     manifest_path.write_bytes(json_bytes(manifest))
 
 
-def test_default_selection_and_frozen_replay_do_not_contain_holdout_content(tmp_path):
+def test_default_selection_and_frozen_replay_do_not_contain_holdout_content(
+    tmp_path: Path,
+) -> None:
     root = make_suite(tmp_path / "suite")
     document = load_external_suite(root)
     assert document["split"] == "development"
@@ -141,7 +144,7 @@ def test_default_selection_and_frozen_replay_do_not_contain_holdout_content(tmp_
         load_frozen_selection(output / "case-dataset.json", "development")
 
 
-def test_full_corpus_is_validated_before_subset_selection(tmp_path):
+def test_full_corpus_is_validated_before_subset_selection(tmp_path: Path) -> None:
     root = make_suite(tmp_path / "suite")
     with pytest.raises(ValueError, match="outside selected split"):
         load_external_suite(root, case_ids=["holdout_input_quality"])
@@ -152,8 +155,37 @@ def test_full_corpus_is_validated_before_subset_selection(tmp_path):
         load_external_suite(root)
 
 
+@pytest.mark.parametrize(
+    "filename, member, field, invalid_value, expected_message",
+    [
+        ("cases.json", "cases", "source", ["invalid"], "lacks prompt"),
+        ("cases.json", "cases", "manual_review", "invalid", "lacks prompt"),
+        ("split-manifest.json", "identities", "source_case_id", [], "source case"),
+        ("corpus.json", "records", "source_case_id", None, "corpus source ID"),
+    ],
+)
+def test_hashed_records_need_valid_evidence_types_before_split_selection(
+    tmp_path: Path,
+    filename: str,
+    member: str,
+    field: str,
+    invalid_value: JsonValue,
+    expected_message: str,
+) -> None:
+    root = make_suite(tmp_path / "suite")
+    rewrite_hashed(
+        root,
+        filename,
+        lambda document: document[member][0].update({field: invalid_value}),
+    )
+    with pytest.raises(ValueError, match=expected_message):
+        load_external_suite(root)
+
+
 @pytest.mark.parametrize("field", ["identity_key", "birth_fingerprint"])
-def test_duplicate_birth_identity_cannot_leak_between_splits(tmp_path, field):
+def test_duplicate_birth_identity_cannot_leak_between_splits(
+    tmp_path: Path, field: str
+) -> None:
     root = make_suite(tmp_path / "suite")
     rewrite_hashed(
         root,
@@ -164,7 +196,7 @@ def test_duplicate_birth_identity_cannot_leak_between_splits(tmp_path, field):
         load_external_suite(root)
 
 
-def test_relabelled_cases_and_unknown_layers_fail_closed(tmp_path):
+def test_relabelled_cases_and_unknown_layers_fail_closed(tmp_path: Path) -> None:
     root = make_suite(tmp_path / "suite")
     rewrite_hashed(
         root, "cases.json", lambda doc: doc["cases"][0].update(split="holdout")
@@ -173,7 +205,9 @@ def test_relabelled_cases_and_unknown_layers_fail_closed(tmp_path):
         load_external_suite(root)
 
 
-def test_rekeying_a_duplicate_birth_cannot_bypass_split_validation(tmp_path):
+def test_rekeying_a_duplicate_birth_cannot_bypass_split_validation(
+    tmp_path: Path,
+) -> None:
     root = make_suite(tmp_path / "suite")
     rewrite_hashed(
         root,
@@ -186,7 +220,9 @@ def test_rekeying_a_duplicate_birth_cannot_bypass_split_validation(tmp_path):
         load_external_suite(root)
 
 
-def test_layer_denominators_never_turn_mechanical_success_into_semantic_pass(tmp_path):
+def test_layer_denominators_never_turn_mechanical_success_into_semantic_pass(
+    tmp_path: Path,
+) -> None:
     document = load_external_suite(make_suite(tmp_path / "suite"))
     prepared = evaluation_summary(document)
     assert prepared["dataset_kind"] == "public_competition"
@@ -207,7 +243,9 @@ def test_layer_denominators_never_turn_mechanical_success_into_semantic_pass(tmp
     assert sum(row["selected"] for row in summary["layer_denominators"].values()) == 3
 
 
-def test_model_workspace_excludes_corpus_answers_and_evaluation_docs(tmp_path):
+def test_model_workspace_excludes_corpus_answers_and_evaluation_docs(
+    tmp_path: Path,
+) -> None:
     source = tmp_path / "source"
     for name, text in {
         "AGENTS.md": "runtime instructions",
@@ -232,7 +270,9 @@ def test_model_workspace_excludes_corpus_answers_and_evaluation_docs(tmp_path):
     assert case["manual_review"][0] not in model_prompt(case)
 
 
-def test_external_zero_tool_contract_is_explicit_without_changing_legacy_prompt():
+def test_external_zero_tool_contract_is_explicit_without_changing_legacy_prompt() -> (
+    None
+):
     external = {
         "prompt": "user request",
         "allowed_tools": [],
@@ -250,8 +290,8 @@ def test_external_zero_tool_contract_is_explicit_without_changing_legacy_prompt(
 
 @pytest.mark.asyncio
 async def test_reference_capture_preserves_external_projection_and_legacy_full_payload(
-    tmp_path, monkeypatch
-):
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     import fastmcp
     import fastmcp.client.transports
 
@@ -305,11 +345,23 @@ async def test_reference_capture_preserves_external_projection_and_legacy_full_p
                 evaluation_layer="interpretation_fidelity",
                 split="development",
             )
+        else:
+            pass
         await prepare_references([case], output, tmp_path)
         saved = json.loads(
             (output / "reference-payloads" / (name + ".json")).read_text()
         )
-        assert saved["arguments"] == observed[-1][1]
+        tool, envelope = observed[-1]
+        assert tool == "run_calculation" and envelope["tool"] == saved["tool"]
+        assert envelope["arguments"] == {"birth_year": 2000}
+        assert saved["arguments"] == {
+            **envelope["arguments"],
+            **{
+                field: value
+                for field, value in envelope.items()
+                if field not in {"tool", "detail", "arguments"}
+            },
+        }
         assert saved["is_error"] is False
     external_args, legacy_args = [arguments for _tool, arguments in observed]
     assert external_args["fields"] == ["core", "career"]
@@ -322,8 +374,8 @@ async def test_reference_capture_preserves_external_projection_and_legacy_full_p
 
 @pytest.mark.parametrize("split", ["development", "holdout"])
 def test_external_prepare_only_and_replay_remain_sealed_without_models(
-    tmp_path, monkeypatch, split
-):
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, split: str
+) -> None:
     import scripts.evaluate_agent as evaluator
 
     root = tmp_path / "root"

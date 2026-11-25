@@ -314,7 +314,7 @@
             "image_sha256": "a01d130f481a61298d0a80dee2f6b7751d054316c6fc4af4d9fb563565db6ac7"
           }
         ],
-        "reading_excerpt": "前則坐下印綬，七殺皆來生拱，而日主堅旺",
+        "reading_excerpt": "前則坐下印綬，七殺皆來生拱，而日主堅固",
         "excerpt_kind": "developer_transcription_for_scope",
         "body_seal_conditions": "与下例印坐长生作对比：本例日坐午印，寅午生拱；后例财坐日下、印遇财冲。主语和例次不可串用。",
         "passage_conditions": "不是“有印有根”即可一律生身；财冲印、季节浅深、承载及反事实差异须另审。",
@@ -780,6 +780,342 @@
         "reading_excerpt": "春土坐亥，財官太旺，最喜獨印逢生，財藏生官，則印綬之元神愈旺，氣貫生時，而日主之氣不薄，更妙連珠生化。",
         "body_seal_conditions": "日主之气不薄的对象明确是己土；财官太旺与独印逢生、印绶元神愈旺、气贯生时是同一段前提。保留气不薄不唯一决定强或中和的未知标签，也保留旧禁止弱约束与工程弱的差异；原文没有给工程支持占比阈值，不把工程数值改名为原典身力。",
         "passage_conditions": "原文主张连续生化而非把财官一概作耗克；应逐一核财、官、印、身的位置、根与承接，不凭五行齐见或任意相生路径宣布通关。气贯生时属于本段力量措辞，不据此重建出生瞬间、节气日数或新增司令结论。"
+      }
+    },
+    {
+      "reference_ids": [
+        "climate_research:HN01"
+      ],
+      "review": {
+        "review_id": "ditian-1947-hannuan:HN01",
+        "case_id": "HN01",
+        "pillars": [
+          "甲申",
+          "丙子",
+          "庚辰",
+          "戊寅"
+        ],
+        "review_kind": "same_developer_primary_image_reading",
+        "claim_shape": "contextual_semantic_mapping_needs_expert_adjudication",
+        "source_pdf_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
+        "source_pdf_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+        "source_page_anchors": [
+          {
+            "pdf_page": 258,
+            "image_sha256": "637a356769702e50cce7ca72c871c2a0dcde2ce9af64e641af22a5a3f4750d06"
+          }
+        ],
+        "reading_excerpt": "妙在寅申遙沖謂之動，動則生火矣",
+        "excerpt_kind": "developer_transcription_for_scope",
+        "body_seal_conditions": "庚日、丙子月。任注以时寅为年甲月丙木火得根的关键。所论根与气属于木火条件，庚日三档和身印力量未裁。",
+        "passage_conditions": "原局寅申遥冲，任注以遥冲为动、动则生火，藉此说明此局得气之暖能作用。后叙东南运属行运。",
+        "relative_timing_statements": [],
+        "independent_expert_review": "not_completed",
+        "effective_force_adjudication": "not_adjudicated",
+        "effective_passage_adjudication": "not_adjudicated",
+        "strength_annotation_assigned_or_regraded": false,
+        "new_independent_validation_credit": 0,
+        "calculation_effect": "none"
+      }
+    },
+    {
+      "reference_ids": [
+        "climate_research:HN02"
+      ],
+      "review": {
+        "review_id": "ditian-1947-hannuan:HN02",
+        "case_id": "HN02",
+        "pillars": [
+          "己酉",
+          "丙子",
+          "庚辰",
+          "甲申"
+        ],
+        "review_kind": "same_developer_primary_image_reading",
+        "claim_shape": "contextual_semantic_mapping_needs_expert_adjudication",
+        "source_pdf_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
+        "source_pdf_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+        "source_page_anchors": [
+          {
+            "pdf_page": 258,
+            "image_sha256": "637a356769702e50cce7ca72c871c2a0dcde2ce9af64e641af22a5a3f4750d06"
+          },
+          {
+            "pdf_page": 259,
+            "image_sha256": "31f83d00a8e0600632908ff52b4410512b6611704d102ffdd488adbbb87f6f0e"
+          }
+        ],
+        "reading_excerpt": "此則無寅木，火臨絕，所謂寒甚而暖無氣",
+        "excerpt_kind": "developer_transcription_for_scope",
+        "body_seal_conditions": "同为庚辰日、丙子月，原局无寅。任注区别火透与暖气，判此局火临绝、暖无气，庚日三档和身印力量未裁。",
+        "passage_conditions": "任注在此原局以无暖为美。后叙甲戌运时才以戌中暗丁作丙根，那是行运条件，原局未见该暗丁。",
+        "relative_timing_statements": [],
+        "independent_expert_review": "not_completed",
+        "effective_force_adjudication": "not_adjudicated",
+        "effective_passage_adjudication": "not_adjudicated",
+        "strength_annotation_assigned_or_regraded": false,
+        "new_independent_validation_credit": 0,
+        "calculation_effect": "none"
+      }
+    },
+    {
+      "reference_ids": [
+        "siku_vol8:WCBC-YCYY"
+      ],
+      "review": {
+        "review_id": "sanming-siku-vol8:WCBC-YCYY",
+        "case_id": "WCBC-YCYY",
+        "pillars": [
+          "乙丑",
+          "乙酉",
+          "戊辰",
+          "丙辰"
+        ],
+        "review_kind": "same_developer_primary_image_reading",
+        "claim_shape": "contextual_semantic_mapping_needs_expert_adjudication",
+        "source_pdf_sha256": "b25aab7fd62980aaea2fb5eddefe3dadedc9031eca654f85bab748814165f005",
+        "source_pdf_url": "https://archive.org/download/06066044.cn/06066044.cn.pdf",
+        "source_page_anchors": [
+          {
+            "pdf_page": 266,
+            "image_sha256": "7f870e62da6dd08e2b7485f674ac684ad710d92b518ede23a5bd4743a6ccc494"
+          },
+          {
+            "pdf_page": 267,
+            "image_sha256": "6eb8cc0687006c9a85f74611e72110af92306da9aa5821ee4edbec0bd2b150a6"
+          },
+          {
+            "pdf_page": 268,
+            "image_sha256": "843c652bf460f8bb071dcbd1457ce1c9f19c72661453c62d7885610cabbe7e07"
+          }
+        ],
+        "reading_excerpt": "戊辰日丙辰時……乙丑布政、乙酉",
+        "excerpt_kind": "developer_transcription_for_scope",
+        "body_seal_conditions": "大字日时条下的小字年、月为乙丑、乙酉，可合读四柱。小字仅列布政，未单列戊日三档。六戊日总论另见辰上乙有余气、辰上丙火无气及有倚托、通月气的条件。余气、透丙和全盘身印力量分开核对。",
+        "passage_conditions": "戊辰日丙辰时条正文分列通身旺月而行东北运，以及水木月而行身旺运。两处身旺的时态有别。小字乙丑、乙酉一例未明示归入哪一条件。此处只核字面四柱，不重建出生时刻或确认人物身份。",
+        "relative_timing_statements": [],
+        "independent_expert_review": "not_completed",
+        "effective_force_adjudication": "not_adjudicated",
+        "effective_passage_adjudication": "not_adjudicated",
+        "strength_annotation_assigned_or_regraded": false,
+        "new_independent_validation_credit": 0,
+        "calculation_effect": "none"
+      }
+    },
+    {
+      "reference_ids": [
+        "body_hidden_seal_v5:DTCW1947-JC-02"
+      ],
+      "review": {
+        "review_id": "root-load-source-conditions:DTCW1947-JC-02",
+        "case_id": "DTCW1947-JC-02",
+        "pillars": [
+          "丁丑",
+          "壬寅",
+          "丙申",
+          "壬辰"
+        ],
+        "review_kind": "same_developer_primary_image_reading",
+        "claim_shape": "explicit_day_master_weakness_and_damaged_seal",
+        "source_pdf_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
+        "source_pdf_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+        "source_page_anchors": [
+          {
+            "pdf_page": 382,
+            "image_sha256": "54287a767bbfa384ad921e031220a11be651e92f24d3c1ee71930f0f2e64821b"
+          }
+        ],
+        "reading_excerpt": "丙火生於初春，火虛木嫩；嫩木逢金緊貼相冲，連根拔盡。",
+        "excerpt_kind": "developer_transcription_for_scope",
+        "body_seal_conditions": "作者按初春火虚木嫩、寅申紧贴冲、申金得辰土扶杀、丑土生金晦火一并论。原文认定受损的是印木根，不能只保留寅藏丙这一事实便认定丙火已得充分生扶。当前实际藏干、工程减根与原典有效根力须并列；不因读到根拔便删除字面藏干。",
+        "passage_conditions": "同段格成从杀、用财是带这些前提的作者论断；当前关系候选、从格复核及生扶图未完成这些条件时不改成已成格。科名与行运叙事不作强弱标签或现实效度证据。",
+        "relative_timing_statements": [],
+        "independent_expert_review": "not_completed",
+        "effective_force_adjudication": "not_adjudicated",
+        "effective_passage_adjudication": "not_adjudicated",
+        "strength_annotation_assigned_or_regraded": false,
+        "new_independent_validation_credit": 0,
+        "calculation_effect": "none"
+      }
+    },
+    {
+      "reference_ids": [
+        "complete_qingqi_zhuoqi_v1:DTCW1947-QQ-01"
+      ],
+      "review": {
+        "review_id": "root-load-source-conditions:DTCW1947-QQ-01",
+        "case_id": "DTCW1947-QQ-01",
+        "pillars": [
+          "癸酉",
+          "甲子",
+          "丙寅",
+          "乙未"
+        ],
+        "review_kind": "same_developer_primary_image_reading",
+        "claim_shape": "explicit_day_master_strength_with_passage_conditions",
+        "source_pdf_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
+        "source_pdf_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+        "source_page_anchors": [
+          {
+            "pdf_page": 238,
+            "image_sha256": "ef137477bf2c0f10a3c8948940d63ff8df6c1db27899632a75ec6f19f1ea8de1"
+          }
+        ],
+        "reading_excerpt": "丙生子月，坐下長生，印透根深，弱中之旺。",
+        "excerpt_kind": "developer_transcription_for_scope",
+        "body_seal_conditions": "丙日坐寅长生、甲乙印透及其实际木根，与子月官星当令分别核对。原注弱中之旺是在这组承接条件下的身力措辞，不能从官当令直接判弱，也不能将印的工程总量直接当日主力量。保留原映射强及当前工程弱，不由来源标签回填计算。",
+        "passage_conditions": "原书透而生财一语旁有财字疑印字之误的校语；原字与校语分别保留，不替换四柱、悄改引文或据校语宣告已经通关。源流不停属于作者本例论断，不等于任意相生路径均有足够力量。",
+        "relative_timing_statements": [],
+        "independent_expert_review": "not_completed",
+        "effective_force_adjudication": "not_adjudicated",
+        "effective_passage_adjudication": "not_adjudicated",
+        "strength_annotation_assigned_or_regraded": false,
+        "new_independent_validation_credit": 0,
+        "calculation_effect": "none"
+      }
+    },
+    {
+      "reference_ids": [
+        "drywet_hiddenvisible_manyfew_v6:DTCW1947-YX-01"
+      ],
+      "review": {
+        "review_id": "root-load-source-conditions:DTCW1947-YX-01",
+        "case_id": "DTCW1947-YX-01",
+        "pillars": [
+          "己卯",
+          "辛未",
+          "丙子",
+          "辛卯"
+        ],
+        "review_kind": "same_developer_primary_image_reading",
+        "claim_shape": "explicit_day_master_strength",
+        "source_pdf_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
+        "source_pdf_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+        "source_page_anchors": [
+          {
+            "pdf_page": 264,
+            "image_sha256": "8e9a9e9a6090830f85ed3af8deae5962f72c60b700660bd5e2dcfcf65de3c1c2"
+          }
+        ],
+        "reading_excerpt": "丙火生於未月，火氣正盛，坐下官星被未土傷盡。",
+        "excerpt_kind": "developer_transcription_for_scope",
+        "body_seal_conditions": "作者同时采用未月火气正盛、未为燥土不能生金及所藏劫刃的语境。现有整月季土季相、实际丁火余气根与工程藏干预算均照录；不能将物理根存在、土五行名称或六害关系直接充作这些寒燥及受损力量的完整计算。",
+        "passage_conditions": "原文取天干辛金，另谈辛金不能生、反滋火根苗等条件。吉神显露凶物深藏是本段原则，不给出统一减根系数；官星被伤是此例原文断语，不自动推广为所有子未相害都清空水根。",
+        "relative_timing_statements": [],
+        "independent_expert_review": "not_completed",
+        "effective_force_adjudication": "not_adjudicated",
+        "effective_passage_adjudication": "not_adjudicated",
+        "strength_annotation_assigned_or_regraded": false,
+        "new_independent_validation_credit": 0,
+        "calculation_effect": "none"
+      }
+    },
+    {
+      "reference_ids": [
+        "drywet_hiddenvisible_manyfew_v6:DTCW1947-ZQ-02"
+      ],
+      "review": {
+        "review_id": "root-load-source-conditions:DTCW1947-ZQ-02",
+        "case_id": "DTCW1947-ZQ-02",
+        "pillars": [
+          "戊午",
+          "壬戌",
+          "丁卯",
+          "癸卯"
+        ],
+        "review_kind": "same_developer_primary_image_reading",
+        "claim_shape": "explicit_fire_extreme_strength",
+        "source_pdf_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
+        "source_pdf_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+        "source_page_anchors": [
+          {
+            "pdf_page": 267,
+            "image_sha256": "360006b0479ecd544a6c3d91251cb4184b16c1dc71db095ff858ff6931783797"
+          }
+        ],
+        "reading_excerpt": "戌午拱火，日時逢印，日主旺極，莫作用印而推。",
+        "excerpt_kind": "developer_transcription_for_scope",
+        "body_seal_conditions": "原注旺极紧承戌午拱火及日时逢印；土月数值季相、午火实根、卯印位置及拱火候选须分别记录。现行工程半合份额不等于作者已经认定的有效火力，不能由工程弱否定或覆盖原注，也不凭本例拟合统一拱局增益。",
+        "passage_conditions": "原文另明确亦不可作去官留杀论。原局壬癸官杀均有其位置，不能因叙事中后续官星得势便倒填原局取用、判已成通关，或把相对行运记录转成已核公历事件。",
+        "relative_timing_statements": [],
+        "independent_expert_review": "not_completed",
+        "effective_force_adjudication": "not_adjudicated",
+        "effective_passage_adjudication": "not_adjudicated",
+        "strength_annotation_assigned_or_regraded": false,
+        "new_independent_validation_credit": 0,
+        "calculation_effect": "none"
+      }
+    },
+    {
+      "reference_ids": [
+        "complete_role_units_root_load_v2:DTCW1947-CX-04"
+      ],
+      "review": {
+        "review_id": "root-load-source-conditions:DTCW1947-CX-04",
+        "case_id": "DTCW1947-CX-04",
+        "pillars": [
+          "甲寅",
+          "丙子",
+          "己酉",
+          "己巳"
+        ],
+        "review_kind": "same_developer_primary_image_reading",
+        "claim_shape": "explicit_day_master_strength_with_passage_conditions",
+        "source_pdf_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
+        "source_pdf_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+        "source_page_anchors": [
+          {
+            "pdf_page": 422,
+            "image_sha256": "8334f8d01491be3ae48effca5310c86e884228a0078cbb75927d522c89386f56"
+          }
+        ],
+        "reading_excerpt": "此謂君臣兩盛，更妙月上丙火一透，寒土向陽，轉生日主。",
+        "excerpt_kind": "developer_transcription_for_scope",
+        "body_seal_conditions": "己酉日仲冬、甲寅官坐禄、子水财当令生官、时逢印比与月丙向阳是同段前提。君臣两盛须核日主与官星各自力量；不能将财官一概作耗克，也不因见印比或己巳根就认定这种受生承载已完成。原保留强与工程弱的差异不改。",
+        "passage_conditions": "坐下酉金、巳时之拱及火生金卫水养的后文连读，明确寒暖和流通作用。日主之力更足以克财属于作者在整段条件后的叙述，不是任意见财官印身即通关的充分法，也不以仕途叙事作验证。",
+        "relative_timing_statements": [],
+        "independent_expert_review": "not_completed",
+        "effective_force_adjudication": "not_adjudicated",
+        "effective_passage_adjudication": "not_adjudicated",
+        "strength_annotation_assigned_or_regraded": false,
+        "new_independent_validation_credit": 0,
+        "calculation_effect": "none"
+      }
+    },
+    {
+      "reference_ids": [
+        "complete_xingqing_mediated_capacity_v1:DTCW1947-XQ-30"
+      ],
+      "review": {
+        "review_id": "root-load-source-conditions:DTCW1947-XQ-30",
+        "case_id": "DTCW1947-XQ-30",
+        "pillars": [
+          "庚午",
+          "乙酉",
+          "庚午",
+          "壬午"
+        ],
+        "review_kind": "same_developer_primary_image_reading",
+        "claim_shape": "explicit_day_master_strength",
+        "source_pdf_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
+        "source_pdf_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+        "source_page_anchors": [
+          {
+            "pdf_page": 448,
+            "image_sha256": "960469e5d980197434319e229f2be5a6b3e5a03bb9428fd3bf6eab933a6774fd"
+          }
+        ],
+        "reading_excerpt": "支中官星三見，則酉金陽刃受制，五行無土，弱可知矣。",
+        "excerpt_kind": "developer_transcription_for_scope",
+        "body_seal_conditions": "原文先指出三处午官制酉刃，再称五行无土与弱可知。通用藏干表中午藏己这一实际表项仍保留；原注无土不能被改写成字面绝无藏土，也不能用三处藏己就反驳为已具有效印生身。酉月得令、根的存在与受制后的力量是不同事实。",
+        "passage_conditions": "时上壬水为辅吐秀是本例作者的配合说明；不能从金水相生图直接判为充分通关，或以贪财、仕途等人物叙事给模型赋分。印是否能够承接、官制刃与财生官的相对力量仍待裁定。",
+        "relative_timing_statements": [],
+        "independent_expert_review": "not_completed",
+        "effective_force_adjudication": "not_adjudicated",
+        "effective_passage_adjudication": "not_adjudicated",
+        "strength_annotation_assigned_or_regraded": false,
+        "new_independent_validation_credit": 0,
+        "calculation_effect": "none"
       }
     }
   ],

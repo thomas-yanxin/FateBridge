@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.validation import meihua_weather_prospective as audit
+from validation import meihua_weather_prospective as audit
 
 FOLDER = Path(__file__).parents[1] / "fixtures/meihua_temporal_gates_v1"
 MANIFEST_SHA256 = "065cb780830bd1922965ee2c714cbcf771450bbe8563b539302bb975c989b0cf"
@@ -16,6 +16,8 @@ assert hashlib.sha256(raw).hexdigest() == MANIFEST_SHA256
 for name, digest in json.loads(raw)["files"].items():
     if str(name).endswith((".py", ".py.txt")):
         continue
+    else:
+        pass
     assert hashlib.sha256((FOLDER / name).read_bytes()).hexdigest() == digest
 CASES = json.loads((FOLDER / "cases324.json").read_bytes())
 UNKNOWN = json.loads((FOLDER / "unknown11.json").read_bytes())
@@ -24,7 +26,7 @@ OPAQUE = b"\xffopaque synthetic bytes; no weather outcome content"
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda r: r["id"])
-def test_shared_study_timestamp_preserves_the_integer_constructed_instant(case):
+def test_shared_study_timestamp_preserves_the_integer_constructed_instant(case) -> None:
     expected = datetime(*case["expected_utc_components"], tzinfo=timezone.utc)
     actual = audit.parse_study_timestamp(case["label"])
     assert actual == expected
@@ -36,7 +38,9 @@ def test_shared_study_timestamp_preserves_the_integer_constructed_instant(case):
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda r: r["id"])
-def test_source_receipt_gate_rejects_retrieval_after_its_actual_audit_instant(case):
+def test_source_receipt_gate_rejects_retrieval_after_its_actual_audit_instant(
+    case,
+) -> None:
     boundary = datetime(*case["boundary_utc_components"], tzinfo=timezone.utc)
     receipt = {
         "source_url": audit.SOURCE_URL,
@@ -56,7 +60,7 @@ def test_source_receipt_gate_rejects_retrieval_after_its_actual_audit_instant(ca
 
 
 @pytest.mark.parametrize("label", UNKNOWN)
-def test_unknown_offset_invalid_or_unrepresentable_time_is_never_rounded(label):
+def test_unknown_offset_invalid_or_unrepresentable_time_is_never_rounded(label) -> None:
     with pytest.raises(ValueError):
         audit.parse_study_timestamp(label)
 
@@ -70,7 +74,7 @@ def test_unknown_offset_invalid_or_unrepresentable_time_is_never_rounded(label):
         ("2026-10-21T21:03:44-00:00:00.000001000", 1),
     ],
 )
-def test_extra_zero_digits_do_not_lose_a_nonzero_microsecond(label, delta):
+def test_extra_zero_digits_do_not_lose_a_nonzero_microsecond(label: str, delta) -> None:
     expected = datetime(2026, 10, 21, 21, 3, 44, tzinfo=timezone.utc) + timedelta(
         microseconds=delta
     )
@@ -89,7 +93,9 @@ assert len(ANALYSIS_CASES) == 6
 
 @pytest.mark.parametrize("case", ANALYSIS_CASES, ids=lambda r: r["id"])
 @pytest.mark.parametrize("kind", ["synthetic", "unverified_submission"])
-def test_original_analysis_gate_precedes_any_outcome_parse(case, kind, monkeypatch):
+def test_original_analysis_gate_precedes_any_outcome_parse(
+    case, kind: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
     class ParseAttempt(Exception):
         pass
 

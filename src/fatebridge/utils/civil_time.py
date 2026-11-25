@@ -7,17 +7,20 @@ Gregorian ordinal and microseconds rather than clipping the physical instant.
 
 from __future__ import annotations
 
+import math
 import re
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta, timezone, tzinfo
 from fractions import Fraction
+from typing import Literal, TypedDict
 from zoneinfo import ZoneInfo
 
-from fatebridge.utils.civil_clock import parse_iso_datetime
+from fatebridge.utils.iso_clock import (
+    parse_iso_datetime,
+    parse_microsecond_iso_datetime,
+)
 
 _DAY_MICROSECONDS = 86400 * 1000000
-
-_ZERO_FRACTIONAL_OFFSET = re.compile(r"([+-])00(?::?00){0,2}[.,]([0-9]+)$")
 
 
 def gregorian_ordinal(year: int, month: int, day: int) -> int:
@@ -33,6 +36,72 @@ def gregorian_date_parts(ordinal: int) -> tuple[int, int, int]:
     return representative.year + cycle * 400, representative.month, representative.day
 
 
+ClockTimespec = Literal["auto", "minutes", "seconds", "microseconds"]
+
+
+def _wall_microseconds(moment: datetime) -> int:
+    return (
+        (moment.hour * 60 + moment.minute) * 60 + moment.second
+    ) * 1000000 + moment.microsecond
+
+
+def _time_parts(microseconds_of_day: int) -> tuple[int, int, int, int]:
+    seconds, microsecond = divmod(microseconds_of_day, 1000000)
+    hour, remainder = divmod(seconds, 3600)
+    minute, second = divmod(remainder, 60)
+    return hour, minute, second, microsecond
+
+
+@dataclass(frozen=True)
+class NominalClockLabel:
+    """A zone-free clock label, never a second physical instant.
+
+    Solar correction consumes the original timedelta quantization, then carries
+    days with integer arithmetic. Auxiliary label years are Gregorian calendar
+    coordinates; they do not extend any lunar table or ephemeris source domain.
+    """
+
+    ordinal: int
+    microseconds_of_day: int
+
+    @classmethod
+    def from_local_datetime(cls, moment: datetime) -> NominalClockLabel:
+        return cls(moment.toordinal(), _wall_microseconds(moment))
+
+    def shifted(self, delta: timedelta) -> NominalClockLabel:
+        delta_us = (delta.days * 86400 + delta.seconds) * 1000000 + delta.microseconds
+        carry, remainder = divmod(
+            self.microseconds_of_day + delta_us, _DAY_MICROSECONDS
+        )
+        return NominalClockLabel(self.ordinal + carry, remainder)
+
+    @property
+    def date_parts(self) -> tuple[int, int, int]:
+        return gregorian_date_parts(self.ordinal)
+
+    @property
+    def time_parts(self) -> tuple[int, int, int, int]:
+        return _time_parts(self.microseconds_of_day)
+
+    def date_isoformat(self) -> str:
+        year, month, day = self.date_parts
+        year_text = f"{year:04d}" if 0 <= year <= 9999 else f"{year:+07d}"
+        return f"{year_text}-{month:02d}-{day:02d}"
+
+    def isoformat(self, *, sep: str = "T", timespec: ClockTimespec = "auto") -> str:
+        hour, minute, second, microsecond = self.time_parts
+        clock = f"{hour:02d}:{minute:02d}"
+        if timespec != "minutes":
+            clock += f":{second:02d}"
+        else:
+            pass
+        if timespec == "microseconds" or (timespec == "auto" and microsecond):
+            clock += f".{microsecond:06d}"
+        else:
+            pass
+        return f"{self.date_isoformat()}{sep}{clock}"
+
+
 def _parse_calendar_isoformat(value: str) -> tuple[int, datetime]:
     """Parse ISO fields through a Gregorian-cycle representative when needed."""
     value = value[:-1] + "+00:00" if value.endswith("Z") else value
@@ -43,31 +112,34 @@ def _parse_calendar_isoformat(value: str) -> tuple[int, datetime]:
             proxy_year = 400 + year % 400
             proxy = parse_iso_datetime(f"{proxy_year:04d}" + value[extended.end() :])
             return year, proxy
+        else:
+            pass
+    else:
+        pass
     parsed = parse_iso_datetime(value)
     return parsed.year, parsed
 
 
 def datetime_fromisoformat_preserving_offset(value: str) -> datetime:
-    """Restore fractional zero-whole-second offsets on affected CPython builds.
-
-    CPython issue152079 can collapse these offsets to UTC. Keep the normal
-    parser's grammar and naive-datetime behavior, restoring just that offset.
-    """
-    result = datetime.fromisoformat(value)
-    match = _ZERO_FRACTIONAL_OFFSET.search(value)
-    if match is not None and result.utcoffset() == timedelta(0):
-        digits = match[2]
-        if len(digits) > 6:
-            raise ValueError("ISO UTC offset fractional seconds support at most6digits")
-        micros = int(digits.ljust(6, "0")) * (-1 if match[1] == "-" else 1)
-        result = result.replace(tzinfo=timezone(timedelta(microseconds=micros)))
-    return result
+    """Parse using the running Python version's ISO grammar."""
+    return parse_iso_datetime(value, portable=False)
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, order=True)
 class UTCCalendar:
     ordinal: int
     microseconds_of_day: int
+
+    def shifted(self, delta: timedelta) -> UTCCalendar:
+        label = NominalClockLabel(self.ordinal, self.microseconds_of_day).shifted(delta)
+        return UTCCalendar(label.ordinal, label.microseconds_of_day)
+
+    def elapsed_since(self, earlier: UTCCalendar) -> timedelta:
+        """Subtract nominal UTC coordinates before any display conversion."""
+        return timedelta(
+            days=self.ordinal - earlier.ordinal,
+            microseconds=self.microseconds_of_day - earlier.microseconds_of_day,
+        )
 
     @property
     def date_parts(self) -> tuple[int, int, int]:
@@ -77,21 +149,22 @@ class UTCCalendar:
 
     @property
     def time_parts(self) -> tuple[int, int, int, int]:
-        seconds, microsecond = divmod(self.microseconds_of_day, 1000000)
-        hour, remainder = divmod(seconds, 3600)
-        minute, second = divmod(remainder, 60)
-        return hour, minute, second, microsecond
+        return _time_parts(self.microseconds_of_day)
 
     def as_datetime(self) -> datetime | None:
         year, month, day = self.date_parts
         if not 1 <= year <= 9999:
             return None
+        else:
+            pass
         return datetime(year, month, day, *self.time_parts, tzinfo=timezone.utc)
 
     def isoformat(self) -> str:
         normal = self.as_datetime()
         if normal is not None:
             return normal.isoformat()
+        else:
+            pass
         year, month, day = self.date_parts
         year_text = f"{year:04d}" if 0 <= year <= 9999 else f"{year:+07d}"
         hour, minute, second, microsecond = self.time_parts
@@ -101,11 +174,90 @@ class UTCCalendar:
             f"{hour:02d}:{minute:02d}:{second:02d}{fraction}+00:00"
         )
 
-    def julian_day(self) -> float:
-        return float(
-            Fraction(2 * self.ordinal + 3442849, 2)
-            + Fraction(self.microseconds_of_day, _DAY_MICROSECONDS)
+    def julian_day_exact(self) -> Fraction:
+        """Nominal Gregorian day before scalar-JD rounding; not UTC quasi-JD."""
+        return Fraction(2 * self.ordinal + 3442849, 2) + Fraction(
+            self.microseconds_of_day, _DAY_MICROSECONDS
         )
+
+    def julian_day(self) -> float:
+        return float(self.julian_day_exact())
+
+
+class CivilFractionRecord(TypedDict):
+    numerator: str
+    denominator: str
+
+
+class CivilPointRecord(TypedDict):
+    unit: Literal["nominal_gregorian_day"]
+    numerator: str
+    denominator: str
+    excluded_before: CivilFractionRecord | None
+
+
+def nominal_calendar_bracket(day: Fraction) -> tuple[UTCCalendar, UTCCalendar]:
+    """Enclose a nominal coordinate without assuming a clock-formatting cap.
+
+    This is calendar arithmetic, not ordinary-clock qualification, a
+    physical error interval or an actual rounded-wall event threshold.
+    """
+    epoch = Fraction(4881175, 2)
+    micros = (day - epoch) * _DAY_MICROSECONDS
+    lower_days, lower_us = divmod(math.floor(micros), _DAY_MICROSECONDS)
+    upper_days, upper_us = divmod(math.ceil(micros), _DAY_MICROSECONDS)
+    return (
+        UTCCalendar(719163 + lower_days, lower_us),
+        UTCCalendar(719163 + upper_days, upper_us),
+    )
+
+
+@dataclass(frozen=True)
+class CivilPoint:
+    """An unrounded nominal Gregorian JD and its qualified formatting cap.
+
+    This coordinate orders ordinary civil labels; it is neither a UTC
+    quasi-JD nor a uniform SI duration. The clock owner selects the source
+    domain. Before atomic UTC, its existing modeled UT1 convention applies.
+    """
+
+    day: Fraction
+    excluded_before: Fraction | None = None
+
+    def as_calendar(self) -> UTCCalendar:
+        """Round within the ordinary interval already selected by the clock."""
+        epoch = Fraction(4881175, 2)
+        micros = round((self.day - epoch) * _DAY_MICROSECONDS)
+        if self.excluded_before is not None:
+            micros = min(
+                micros,
+                math.ceil((self.excluded_before - epoch) * _DAY_MICROSECONDS) - 1,
+            )
+        else:
+            pass
+        days, remainder = divmod(micros, _DAY_MICROSECONDS)
+        return UTCCalendar(719163 + days, remainder)
+
+    def nominal_calendar_bracket(self) -> tuple[UTCCalendar, UTCCalendar]:
+        """Return the pure nominal enclosure; the point's cap is not used."""
+        return nominal_calendar_bracket(self.day)
+
+    def to_record(self) -> CivilPointRecord:
+        """Serialize exact integers as strings, including an explicit cap."""
+        bound = self.excluded_before
+        return {
+            "unit": "nominal_gregorian_day",
+            "numerator": str(self.day.numerator),
+            "denominator": str(self.day.denominator),
+            "excluded_before": (
+                None
+                if bound is None
+                else {
+                    "numerator": str(bound.numerator),
+                    "denominator": str(bound.denominator),
+                }
+            ),
+        }
 
 
 @dataclass(frozen=True)
@@ -126,6 +278,8 @@ class ZonedCalendar:
         zone = moment.tzinfo
         if zone is None:
             raise ValueError("Civil-zone conversion requires an aware datetime")
+        else:
+            pass
         return cls(utc_calendar(moment), zone)
 
     @classmethod
@@ -138,13 +292,22 @@ class ZonedCalendar:
             result.zone,
         )
 
-    def _local_proxy(self) -> tuple[datetime, int]:
+    def utc_rule_proxy(self) -> tuple[datetime, int]:
+        """Return the representable UTC input and its Gregorian year shift."""
         year, month, day = self.utc.date_parts
         shift = 400 if year <= 1 else -400 if year >= 9999 else 0
         proxy = datetime(
             year + shift, month, day, *self.utc.time_parts, tzinfo=timezone.utc
-        ).astimezone(self.zone)
+        )
         return proxy, shift
+
+    def _local_proxy(self) -> tuple[datetime, int]:
+        proxy, shift = self.utc_rule_proxy()
+        return proxy.astimezone(self.zone), shift
+
+    def rule_sample(self) -> datetime:
+        """Read the loaded zone's offset and designation on its rule calendar."""
+        return self._local_proxy()[0]
 
     @property
     def local_parts(self) -> tuple[int, int, int, int, int, int, int]:
@@ -169,6 +332,8 @@ class ZonedCalendar:
         offset = proxy.utcoffset()
         if offset is None:
             raise ValueError("Civil-zone conversion requires a known UTC offset")
+        else:
+            pass
         return offset
 
     @property
@@ -179,6 +344,8 @@ class ZonedCalendar:
     def timezone_label(self) -> str | None:
         if isinstance(self.zone, ZoneInfo):
             return self.zone.key
+        else:
+            pass
         return self._local_proxy()[0].tzname()
 
     def as_datetime(self) -> datetime | None:
@@ -192,6 +359,8 @@ class ZonedCalendar:
             raise ValueError(
                 "Civil calendar label is outside Python datetime's year range"
             )
+        else:
+            pass
         return moment
 
     def matches_wall_label(self, value: str) -> bool:
@@ -222,12 +391,22 @@ def utc_calendar(moment: datetime) -> UTCCalendar:
     offset = moment.utcoffset()
     if offset is None:
         raise ValueError("UTC calendar normalization requires an aware datetime")
+    else:
+        pass
     offset_us = (offset.days * 86400 + offset.seconds) * 1000000 + offset.microseconds
-    local_us = (
-        (moment.hour * 60 + moment.minute) * 60 + moment.second
-    ) * 1000000 + moment.microsecond
-    carry, utc_us = divmod(local_us - offset_us, _DAY_MICROSECONDS)
+    carry, utc_us = divmod(_wall_microseconds(moment) - offset_us, _DAY_MICROSECONDS)
     return UTCCalendar(moment.toordinal() + carry, utc_us)
+
+
+def parse_civil_iso_clock(value: str) -> datetime | UTCCalendar:
+    """Resolve an explicit offset on the extended UTC calendar."""
+    moment, carry = parse_microsecond_iso_datetime(value)
+    if moment.tzinfo is None:
+        return moment
+    else:
+        pass
+    calendar = utc_calendar(moment)
+    return calendar.shifted(timedelta(microseconds=carry)) if carry else calendar
 
 
 def utc_ordering_key(moment: datetime) -> tuple[int, int]:

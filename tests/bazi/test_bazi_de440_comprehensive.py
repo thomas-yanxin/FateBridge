@@ -1,6 +1,7 @@
 """The comprehensive tool is distinct from the standard chart and9topics."""
 
 import asyncio
+from pathlib import Path
 
 import pytest
 
@@ -11,11 +12,11 @@ from tests.support.transports import SPECS, business, call_cli, inputs, native
 
 @pytest.mark.parametrize("project", [False, True])
 def test_comprehensive_default_source_matches_its_actual_mcp_and_cli_surfaces(
-    project,
-    monkeypatch,
-    tmp_path,
-    capsys,
-):
+    project: bool,
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     monkeypatch.delenv("FATEBRIDGE_SOLAR_TERM_MODEL", raising=False)
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
@@ -27,6 +28,8 @@ def test_comprehensive_default_source_matches_its_actual_mcp_and_cli_surfaces(
     if project:
         opts.update(fields=["calendar_context"], strict_fields=True)
         flags += ["--fields", "calendar_context", "--strict-fields", "true"]
+    else:
+        pass
     mcp = asyncio.run(native(spec, payload, **opts))
     code, cli = call_cli(spec, payload, tmp_path, capsys, flags=flags)
     assert not mcp.is_error and code == 0
@@ -42,10 +45,10 @@ def test_comprehensive_default_source_matches_its_actual_mcp_and_cli_surfaces(
 
 
 def test_comprehensive_default_data_failure_cannot_return_a_complete_report(
-    monkeypatch,
-    tmp_path,
-    capsys,
-):
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     def unavailable():
         raise EphemerisSourceError("solar_de440_invalid")
 

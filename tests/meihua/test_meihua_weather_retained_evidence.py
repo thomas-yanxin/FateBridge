@@ -7,7 +7,9 @@ from pathlib import Path
 DATA = Path(__file__).parents[1] / "data/meihua/weather_evidence"
 
 
-def test_original_full_cohort_negative_result_follows_issued_labels_and_observations():
+def test_original_full_cohort_negative_result_follows_issued_labels_and_observations() -> (
+    None
+):
     study = json.loads((DATA / "study_identity.json").read_bytes())
     forecasts = json.loads((DATA / "issued_forecasts2008.json").read_bytes())
     source = json.loads(

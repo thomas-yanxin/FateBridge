@@ -13,7 +13,9 @@ ROOT = Path(__file__).resolve().parents[2]
 FOLDER = ROOT / "tests/data/bazi_solar_intraday_v2"
 
 
-def test_full_grid_preserves_dates_hours_overlap_and_original_protocol_history():
+def test_full_grid_preserves_dates_hours_overlap_and_original_protocol_history() -> (
+    None
+):
     protocol = json.loads((FOLDER / "protocol.json").read_text())
     raw = (FOLDER / "selected-instants.json").read_bytes()
     assert (
@@ -32,7 +34,7 @@ def test_full_grid_preserves_dates_hours_overlap_and_original_protocol_history()
     assert protocol["tolerance_seconds"] == 5
 
 
-def test_decimal_reconstruction_matches_all_raw_horizons_clock_columns():
+def test_decimal_reconstruction_matches_all_raw_horizons_clock_columns() -> None:
     protocol = json.loads((FOLDER / "protocol.json").read_text())
     raw_manifest = (FOLDER / "manifest.json").read_bytes()
     assert (

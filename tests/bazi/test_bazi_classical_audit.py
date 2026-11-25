@@ -18,7 +18,7 @@ audit = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(audit)
 
 
-def test_frozen_reference_has_disjoint_cases_and_unknown_labels():
+def test_frozen_reference_has_disjoint_cases_and_unknown_labels() -> None:
     data = audit.load_frozen_corpus()
     development = {c["id"] for c in data["cases"] if c["split"] == "development"}
     reserved = {c["id"] for c in data["cases"] if c["split"] == "reserved"}
@@ -30,7 +30,9 @@ def test_frozen_reference_has_disjoint_cases_and_unknown_labels():
 
 
 @pytest.mark.parametrize("change", ["edit", "extra", "missing"])
-def test_reference_changes_cannot_silently_rewrite_acceptance(tmp_path, change):
+def test_reference_changes_cannot_silently_rewrite_acceptance(
+    tmp_path: Path, change: str
+) -> None:
     corpus = tmp_path / "corpus"
     shutil.copytree(audit.CORPUS, corpus)
     if change == "edit":
@@ -46,13 +48,11 @@ def test_reference_changes_cannot_silently_rewrite_acceptance(tmp_path, change):
         audit.load_frozen_corpus(corpus)
 
 
-def test_unknown_source_strength_is_not_a_program_generated_expected_answer():
+def test_unknown_source_strength_is_not_a_program_generated_expected_answer() -> None:
     data = audit.load_frozen_corpus()
     case = next(c for c in data["cases"] if c["adjudication"]["strength"] is None)
-    actual = {
-        "elements": {"day_master": {"strength_level": "强"}},
-        "monthly_structure": {"label": "正官格"},
-    }
+    actual = audit.observe(case["pillars"])
+    actual["elements"]["day_master"]["strength_level"] = "强"
     result = audit.compare(case, actual)
     assert result["strength"]["reference"] is None
     assert result["strength"]["status"] == "not_adjudicated_by_source"
@@ -60,24 +60,46 @@ def test_unknown_source_strength_is_not_a_program_generated_expected_answer():
     assert result["useful_roles"]["status"] == "different_semantic_object_not_accepted"
 
 
-def test_incomplete_source_chart_is_rejected_without_filling_hour():
+def test_incomplete_source_chart_is_rejected_without_filling_hour() -> None:
     with pytest.raises(ValueError, match="Unknown or incomplete"):
         audit.observe(["壬申", "丙午", "甲午", None])
 
 
-def test_actual_audit_retains_disagreement_and_does_not_claim_classical_pass():
+def test_actual_audit_retains_disagreement_and_does_not_claim_classical_pass() -> None:
     result = audit.audit()
     by_id = {c["id"]: c for c in result["cases"]}
+    source_by_id = {c["id"]: c for c in audit.load_frozen_corpus()["cases"]}
     # Independent book labels remain intact even when the program disagrees.
     assert by_id["ZP37-XIE"]["reference"]["strength"] == "强"
     # Deliberately wrong observation exercises the audit without locking a
     # production defect in place as a desired regression result.
-    case = next(c for c in audit.load_frozen_corpus()["cases"] if c["id"] == "ZP37-XIE")
+    case = source_by_id["ZP37-XIE"]
     wrong = {
         "elements": {"day_master": {"strength_level": "弱"}},
-        "monthly_structure": {"label": "食神格"},
+        "monthly_structure": by_id["ZP37-XIE"]["actual"]["monthly_structure"],
     }
     assert audit.compare(case, wrong)["strength"]["status"] == "disagreement"
+    for case_id, witness in (
+        ("ZP31-LONE", "month:revealed:乙"),
+        ("ZP31-XUAN", "month:revealed:己"),
+        ("ZP41-QIN", "month:revealed:己"),
+    ):
+        comparison = by_id[case_id]["comparison"]
+        assert comparison["month_pattern"]["status"] == "disagreement"
+        assert comparison["month_use_identity"]["status"] == "matched"
+        assert comparison["month_use_identity"]["witness_ids"] == [witness]
+        assert comparison["formation"]["status"] == "unsupported"
+    xuan = by_id["ZP31-XUAN"]["actual"]
+    xuan_source = source_by_id["ZP31-XUAN"]
+    xuan["monthly_structure"]["use_resolution"]["witnesses"] = [
+        w
+        for w in xuan["monthly_structure"]["use_resolution"]["witnesses"]
+        if w["kind"] == "complete_month_triad"
+    ]
+    assert (
+        audit.compare(xuan_source, xuan)["month_use_identity"]["status"]
+        == "not_observed"
+    )
     assert result["summary"]["classical_acceptance_passed"] is False
     assert result["summary"]["strength_unknown_in_source"] == 7
     assert all(not p["production_total_strength_called"] for p in result["probes"])
@@ -87,7 +109,7 @@ def test_actual_audit_retains_disagreement_and_does_not_claim_classical_pass():
     assert by_id["ZP37-LIANG"]["reference"]["strength"] == "强"
 
 
-def test_audit_can_run_through_a_symlinked_script_path(tmp_path):
+def test_audit_can_run_through_a_symlinked_script_path(tmp_path: Path) -> None:
     alias = tmp_path / "audit_alias.py"
     alias.symlink_to(ROOT / "scripts/bazi/audit_bazi_classical.py")
     report = tmp_path / "audit.json"

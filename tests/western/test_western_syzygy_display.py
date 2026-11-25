@@ -7,7 +7,7 @@ import pytest
 
 from fatebridge.core.astro import classical, runtime
 from fatebridge.core.astro.physical_epoch import utc_from_tt, utc_representation
-from fatebridge.core.output_charts import Syzygy
+from fatebridge.core.contracts.output_charts import Syzygy
 from fatebridge.utils.errors import EphemerisSourceError
 from tests.support.native_syzygy_witness import NativeSourceWitness
 from tests.support.reference_data import verify_source_files
@@ -21,7 +21,7 @@ INPUTS = json.loads((FIX / "inputs.json").read_text())
 CALENDAR = json.loads((FIX / "calendar-reference.json").read_text())["rows"]
 
 
-def test_independent_calendar_reference_has_its_current_source_identity():
+def test_independent_calendar_reference_has_its_current_source_identity() -> None:
     verify_source_files(FIX)
     calendar = json.loads((FIX / "calendar-reference.json").read_text())
     assert calendar["production_imports"] is calendar["swiss_imports"] is False
@@ -32,9 +32,9 @@ def test_independent_calendar_reference_has_its_current_source_identity():
 @pytest.mark.parametrize("syzygy_source_profile", ["full37"], indirect=True)
 def test_solved_event_survives_display_and_preserves_original_numbers(
     index,
-    monkeypatch,
+    monkeypatch: pytest.MonkeyPatch,
     syzygy_source_profile,  # noqa: F811 - pytest fixture dependency
-):
+) -> None:
     row = INPUTS[index]
     witness = NativeSourceWitness(runtime)
     with witness.observe(), runtime.preserve_ephemeris_path():
@@ -76,7 +76,7 @@ def test_solved_event_survives_display_and_preserves_original_numbers(
         assert representation["datetime_representable"] is True
 
 
-def test_utc_second60_is_a_label_without_a_python_carrier():
+def test_utc_second60_is_a_label_without_a_python_carrier() -> None:
     # A real UTC conversion control, not a claim that a lunation occurred here.
     at = 2457754.5 + (36 + 32.184 + 0.5) / 86400
     label, moment, leap = utc_from_tt(at)
@@ -86,7 +86,7 @@ def test_utc_second60_is_a_label_without_a_python_carrier():
     assert result["label_status"] == "inserted_UTC_leap_second"
 
 
-def test_a_nonunique_historical_label_is_not_fabricated():
+def test_a_nonunique_historical_label_is_not_fabricated() -> None:
     result = utc_representation(None, None, False)
     assert result["utc_label"] is None
     assert result["datetime_representable"] is False
@@ -95,7 +95,9 @@ def test_a_nonunique_historical_label_is_not_fabricated():
     )
 
 
-def test_display_stage_integrity_error_remains_fatal(monkeypatch):
+def test_display_stage_integrity_error_remains_fatal(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     def broken(_):
         raise EphemerisSourceError("changed_during")
 

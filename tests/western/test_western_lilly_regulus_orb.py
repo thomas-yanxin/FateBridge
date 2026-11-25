@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.lilly_fortune import evaluate_fortune
+from fatebridge.core.astro.lilly_fortune import evaluate_fortune
 from scripts.western.audit_western_lilly_fortitudes import audit
 from tests.support.reference_data import verify_source_files
 from tests.western.test_western_lilly_fortitudes import inputs, result, row
@@ -20,7 +20,9 @@ RAW = json.loads((FIXTURE / "cases.json").read_text())["cases"]
 CASES = list({(c["star"], c["gap_exact"]): c for c in RAW}.values())
 
 
-def test_manual_source_correction_is_sealed_and_does_not_replace_original_answers():
+def test_manual_source_correction_is_sealed_and_does_not_replace_original_answers() -> (
+    None
+):
     verify_source_files(FIXTURE)
     assert len(RAW) == 42 and len(CASES) == 39
     assert CORRECTION["stellar_orbs_degrees"] == {"Regulus": 6, "Spica": 5, "Algol": 5}
@@ -36,7 +38,7 @@ def test_manual_source_correction_is_sealed_and_does_not_replace_original_answer
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["star"] + ":" + c["gap_exact"])
-def test_planet_and_declared_fortune_transfer_use_each_stars_own_range(case):
+def test_planet_and_declared_fortune_transfer_use_each_stars_own_range(case) -> None:
     states, data = inputs()
     star = case["star"]
     gap = Fraction(case["gap_exact"])

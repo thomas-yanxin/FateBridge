@@ -1,12 +1,15 @@
 """Month-name evidence cannot reindex actual dates or repair another source."""
 
 from copy import deepcopy
+from pathlib import Path
 
 import pytest
 
-from fatebridge.core import sukuyo_month_names as names
-from fatebridge.core.sukuyo import calendar_mansion, day_evidence
-from fatebridge.core.sukuyo_commentarial_clock import commentarial_boundary_reference
+from fatebridge.core.sukuyo import sukuyo_month_names as names
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence
+from fatebridge.core.sukuyo.sukuyo_commentarial_clock import (
+    commentarial_boundary_reference,
+)
 from scripts.sukuyo.check_sukuyo_month_names import verify_primary
 
 
@@ -16,7 +19,7 @@ def reference():
     ]["month_name_reference"]
 
 
-def test_twelve_explicit_named_months_keep_their_tang_labels():
+def test_twelve_explicit_named_months_keep_their_tang_labels() -> None:
     rows = reference()["Tang_named_month_annotations"]
     assert len(rows) == 12
     assert {r["named_month_literal"]: r["Tang_month_label"] for r in rows} == {
@@ -36,7 +39,9 @@ def test_twelve_explicit_named_months_keep_their_tang_labels():
     assert reference()["upper_annotation_and_lower_all12_same_named_anchors"]
 
 
-def test_conditional_white_ninth_does_not_identify_xuanying_fortnight_or_exemplar():
+def test_conditional_white_ninth_does_not_identify_xuanying_fortnight_or_exemplar() -> (
+    None
+):
     value = reference()
     row = value["conditional_white_ninth_comparison"]
     assert (row["textual_month"], row["fortnight"], row["day"]) == (1, "white", 9)
@@ -46,7 +51,9 @@ def test_conditional_white_ninth_does_not_identify_xuanying_fortnight_or_exempla
     assert not value["interpretation_scope"]["actual_cited_exemplar_identified"]
 
 
-def test_all330_rows_and_eighty_differences_remain_without_compound_emendation():
+def test_all330_rows_and_eighty_differences_remain_without_compound_emendation() -> (
+    None
+):
     value = reference()
     rows = value["all330_fixed_projection_rows"]
     assert len(rows) == 330
@@ -61,7 +68,7 @@ def test_all330_rows_and_eighty_differences_remain_without_compound_emendation()
     ] == ["女虛", "牛女", "牛女", "牛女"]
 
 
-def test_seven_star_literal_and_month8_narrative_do_not_become_repaired_cells():
+def test_seven_star_literal_and_month8_narrative_do_not_become_repaired_cells() -> None:
     value = reference()
     missing = [
         r
@@ -78,7 +85,7 @@ def test_seven_star_literal_and_month8_narrative_do_not_become_repaired_cells():
     ]
 
 
-def test_twelve_endpoint_offsets_are_diagnostics_not_a_selected_calendar():
+def test_twelve_endpoint_offsets_are_diagnostics_not_a_selected_calendar() -> None:
     value = reference()
     assert [
         r["cyclic_label_offset"] for r in value["all12_cyclic_endpoint_diagnostics"]
@@ -89,7 +96,7 @@ def test_twelve_endpoint_offsets_are_diagnostics_not_a_selected_calendar():
     ]
 
 
-def test_changed_rizang_capture_cannot_reuse_month_name_binding():
+def test_changed_rizang_capture_cannot_reuse_month_name_binding() -> None:
     direct = commentarial_boundary_reference()["standalone_xuanying_reference"][
         "named_rizang_comparison"
     ]
@@ -98,7 +105,9 @@ def test_changed_rizang_capture_cannot_reuse_month_name_binding():
         names.month_name_reference(direct)
 
 
-def test_changed_t1299_capture_cannot_reuse_month_name_binding(tmp_path, monkeypatch):
+def test_changed_t1299_capture_cannot_reuse_month_name_binding(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     path = tmp_path / "source.json"
     path.write_text('{"source_sha256":"changed"}')
     monkeypatch.setattr(names, "T1299_SOURCE", path)
@@ -109,14 +118,14 @@ def test_changed_t1299_capture_cannot_reuse_month_name_binding(tmp_path, monkeyp
         names.month_name_reference(direct)
 
 
-def test_detached_reference_cannot_repair_later_literal_source():
+def test_detached_reference_cannot_repair_later_literal_source() -> None:
     value = reference()
     value["single_bull_counterexample"]["mansion_literal"] = "女"
     assert reference()["single_bull_counterexample"]["mansion_literal"] == "牛"
 
 
 @pytest.mark.parametrize("civil,expected", [("2024-03-17", "井"), ("2024-03-18", "鬼")])
-def test_current_host_month_is_not_shifted_again(civil, expected):
+def test_current_host_month_is_not_shifted_again(civil: str, expected: str) -> None:
     calendar = calendar_mansion(civil, "12:00:00", "+08:00")
     before = deepcopy(calendar)
     evidence = day_evidence(calendar)
@@ -130,14 +139,16 @@ def test_current_host_month_is_not_shifted_again(civil, expected):
 @pytest.mark.parametrize(
     "key", ["T21n1299.xml", "T13n0397.xml", "T2216-month-context.html"]
 )
-def test_actual_capture_substitution_is_rejected(tmp_path, key):
+def test_actual_capture_substitution_is_rejected(tmp_path: Path, key: str) -> None:
     path = tmp_path / "capture"
     path.write_bytes(b"substituted")
     with pytest.raises(ValueError, match="实际源文件字节指纹不一致"):
         verify_primary({key: path})
 
 
-def test_offline_check_does_not_claim_actual_source_reading_or_date_conversion():
+def test_offline_check_does_not_claim_actual_source_reading_or_date_conversion() -> (
+    None
+):
     checked = verify_primary()
     assert checked["actual_source_files_rechecked"] == []
     assert not checked["actual_date_conversion_or_cited_exemplar_certified"]

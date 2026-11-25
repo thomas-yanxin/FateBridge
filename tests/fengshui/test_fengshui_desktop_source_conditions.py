@@ -7,7 +7,9 @@ from pathlib import Path
 import pytest
 
 from fatebridge.services.fengshui import assess
-from tests.fengshui.test_fengshui_surfaces_authored import surface_input
+from tests.unit_test.fixtures.fengshui_layout import (
+    surface_input,
+)
 
 REFERENCE = json.loads(
     (
@@ -21,12 +23,14 @@ REFERENCE = json.loads(
 @pytest.mark.parametrize("state", REFERENCE["health_states"], ids=lambda s: s["id"])
 def test_botanical_conditions_follow_the_selected_author_without_guessing_state(
     representation, state
-):
+) -> None:
     inputs = surface_input()
     item = inputs["surface_layouts"][0]["items"][0]
     item["representation"] = representation
     if state["input"] != "omit":
         item["healthy"] = deepcopy(state["input"])
+    else:
+        pass
     result = assess(**inputs)
     layout = result["layout_analysis"]
     surface = layout["surface_analysis"]
@@ -53,8 +57,8 @@ def test_botanical_conditions_follow_the_selected_author_without_guessing_state(
 
 @pytest.mark.parametrize("companion", ["none", "annual", "forms", "annual_and_forms"])
 def test_monthly_numeric_completion_does_not_erase_its_unsupported_usage_scope(
-    companion,
-):
+    companion: str,
+) -> None:
     inputs = {
         "methods": ["monthly_stars"],
         "monthly": {"effective_solar_year": 2026, "solar_month_number": 9},
@@ -66,6 +70,8 @@ def test_monthly_numeric_completion_does_not_erase_its_unsupported_usage_scope(
     if "annual" in companion:
         inputs["methods"].append("annual_stars")
         inputs["effective_year"] = 2026
+    else:
+        pass
     if "forms" in companion:
         inputs["form_observations"] = [
             {
@@ -78,6 +84,8 @@ def test_monthly_numeric_completion_does_not_erase_its_unsupported_usage_scope(
                 "evidence": "其他作者条件独立确认",
             }
         ]
+    else:
+        pass
     result = assess(**inputs)
     layout = result["layout_analysis"]
     monthly = next(

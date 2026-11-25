@@ -7,9 +7,10 @@ is claimed to be a classical constant or a calibrated probability.
 from dataclasses import asdict, dataclass, replace
 from fractions import Fraction
 from itertools import combinations
-from typing import Any, Dict, Literal, Optional, Tuple, TypedDict
+from typing import Any, Literal, TypedDict
 
-from fatebridge.core.bazi_branch_facts import classify_triple_members
+from fatebridge.core.bazi.bazi_branch_facts import SOURCE as BRANCH_RELATION_SOURCE
+from fatebridge.core.bazi.bazi_branch_facts import classify_triple_members
 from fatebridge.core.clash_comparison import build_clash_comparison
 from fatebridge.core.classical_roots import SOURCE as ROOT_SOURCE
 from fatebridge.core.classical_roots import classify_classical_root
@@ -17,21 +18,36 @@ from fatebridge.core.complete_bureaus import MEMBERSHIP_POLICY
 from fatebridge.core.complete_bureaus import SOURCE as COMPLETE_BUREAU_SOURCE
 from fatebridge.core.formation_affiliations import SOURCE as AFFILIATION_SOURCE
 from fatebridge.core.formation_affiliations import partition_affiliations
+from fatebridge.core.punishment_resolution import (
+    MONTH_OFFICER_CLASH_RESOLVED,
+    MONTH_OFFICER_SOURCE,
+)
 from fatebridge.core.punishment_resolution import POLICY as PUNISHMENT_POLICY
-from fatebridge.core.punishment_resolution import SINGLE_PAIR_SOURCE
+from fatebridge.core.punishment_resolution import (
+    REPEATED_PAIR_SOURCE,
+    REPETITION_NO_PUNISHMENT,
+    SINGLE_PAIR_SOURCE,
+)
 from fatebridge.core.punishment_resolution import SOURCE as PUNISHMENT_SOURCE
 from fatebridge.core.punishment_resolution import (
     completed_combination_positions,
     punishment_is_resolved,
+    repeated_zi_mao_participants,
+    zi_month_officer_clash_alternative,
 )
 from fatebridge.core.root_budget import initial_hidden_budgets
 from fatebridge.core.stem_effects import evaluate_stem_effects
 from fatebridge.core.stem_order_review import build_stem_order_review
 from fatebridge.core.storage_movement import SOURCE as STORAGE_SOURCE
-from fatebridge.core.storage_movement import storage_movement_effect
-from fatebridge.core.strength_thresholds import exact_threshold_decision
-
-from ..utils.data import (
+from fatebridge.core.storage_movement import (
+    StorageMovementReceipt,
+    storage_movement_effect,
+)
+from fatebridge.core.strength_thresholds import (
+    exact_threshold_decision,
+    floating_support_share,
+)
+from fatebridge.utils.data import (
     BRANCH_COMBINATION_ELEMENT,
     BRANCH_CONFLICTS,
     BRANCH_ELEMENTS,
@@ -48,7 +64,7 @@ from ..utils.data import (
 
 POSITIONS = ("year", "month", "day", "hour")
 STRENGTH_METHOD_ID = "season_root_revelation_relations_v12"
-STRUCTURAL_PRIORITY_METHOD_ID = "source_root_capacity_priority_v3"
+STRUCTURAL_PRIORITY_METHOD_ID = "engineering_root_capacity_priority_v4"
 
 
 class EngineeringStrengthIndex(TypedDict):
@@ -71,6 +87,17 @@ STEM_PAIRS = {
         ("丁壬", "木"),
         ("戊癸", "火"),
     )
+}
+ZI_CHOU_CLASH_SOURCE = {
+    **PUNISHMENT_SOURCE,
+    "id": "ziping_zi_chou_separated_clash_resolution_v1",
+    "pdf_pages": [25],
+    "printed_pages": [16],
+    "scope": (
+        "子年午月日坐丑，丑与子隔位合可解年月子午冲。仅采用唯一丑位、无其他六冲及"
+        "无会合或含旺支半合争用的情形。此条只决定该六冲是否参与工程计算，"
+        "不将隔位子丑纳入普通邻接六合、合绊、化气或解刑，也不裁定力量或旺衰。"
+    ),
 }
 SOURCES: list[dict[str, Any]] = [
     {
@@ -114,7 +141,10 @@ SOURCES: list[dict[str, Any]] = [
     dict(COMPLETE_BUREAU_SOURCE),
     dict(AFFILIATION_SOURCE),
     dict(PUNISHMENT_SOURCE),
+    dict(BRANCH_RELATION_SOURCE),
     dict(SINGLE_PAIR_SOURCE),
+    dict(REPEATED_PAIR_SOURCE),
+    dict(MONTH_OFFICER_SOURCE),
     dict(STORAGE_SOURCE),
     dict(ROOT_SOURCE),
     {
@@ -146,7 +176,7 @@ SOURCES: list[dict[str, Any]] = [
 
 
 class _Token(TypedDict):
-    stem: Optional[str]
+    stem: str | None
     element: Element
     mass: float
     revealed: bool
@@ -162,7 +192,7 @@ class _QualifiedRoot(TypedDict):
     qualification_basis: str
     initial_hidden_mass: float
     remaining_hidden_mass: float
-    retention_fraction: Optional[float]
+    retention_fraction: float | None
     minimum_retention_policy: float
     qualified_for_structural_rule: bool
     source_ref: str
@@ -196,16 +226,20 @@ DEFAULT_POLICY = StrengthPolicy()
 def _label(share: float, policy: StrengthPolicy) -> str:
     if share > policy.strong_share:
         return "强"
+    else:
+        pass
     if share < policy.weak_share:
         return "弱"
+    else:
+        pass
     return "中和"
 
 
 def _evaluate(
-    pillars: Dict[str, Tuple[str, str]],
-    phases: Dict[str, str],
+    pillars: dict[str, tuple[str, str]],
+    phases: dict[str, str],
     policy: StrengthPolicy,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Score physical positions once; interactions alter those same root budgets."""
     # Stable pillar order, independent of dictionary insertion order.
     names = [name for name in POSITIONS if name in pillars]
@@ -227,7 +261,7 @@ def _evaluate(
         },
     )
     # Each token has one identity; revelation activates but never duplicates a root.
-    tokens: Dict[str, list[_Token]] = {
+    tokens: dict[str, list[_Token]] = {
         name: [
             {
                 "stem": stem,
@@ -247,10 +281,10 @@ def _evaluate(
     initial_hidden_mass = {
         (name, t["stem"]): t["mass"] for name in names for t in tokens[name]
     }
-    events: list[Dict[str, Any]] = []
+    events: list[dict[str, Any]] = []
     element_losses = {name: {e: 1.0 for e in Element} for name in names}
 
-    def apply_storage_effect(effect: Dict[str, Any]) -> None:
+    def apply_storage_effect(effect: StorageMovementReceipt) -> None:
         for root in effect["root_effects"]:
             name, element = root["pillar"], Element(root["element"])
             element_losses[name][element] = min(
@@ -260,7 +294,7 @@ def _evaluate(
     clashed: set[str] = set()
     claimed: set[str] = set()
     # Combination candidates are based on actual position sets, not just branch labels.
-    candidates: list[Tuple[str, Tuple[str, ...], Element]] = []
+    candidates: list[tuple[str, tuple[str, ...], Element]] = []
     for kind, groups in (
         ("三会", BRANCH_SEASONAL_COMBINATIONS),
         ("三合", BRANCH_TRIPLE_COMBINATIONS),
@@ -272,10 +306,15 @@ def _evaluate(
             members = tuple(name for name in names if branches[name] in group)
             if {branches[name] for name in members} == set(group):
                 candidates.append((kind, members, BUREAU_ELEMENT[bureau]))
-    for pair in combinations(names, 2):
+            else:
+                pass
+    pairs = list(combinations(names, 2))
+    for pair in pairs:
         target = BRANCH_COMBINATION_ELEMENT.get(frozenset(branches[n] for n in pair))
         if target is not None and abs(names.index(pair[0]) - names.index(pair[1])) == 1:
             candidates.append(("六合", pair, target))
+        else:
+            pass
     # A 六合 contained in a full bureau is not a competing claim or a second bonus.
     full_members = [set(c[1]) for c in candidates if len(c[1]) >= 3]
     candidates = [
@@ -284,6 +323,26 @@ def _evaluate(
         if len(c[1]) >= 3 or not any(set(c[1]) <= full for full in full_members)
     ]
     candidates, affiliations = partition_affiliations(candidates, branches)
+    clash_pairs = [
+        (left, right)
+        for left, right in pairs
+        if BRANCH_CONFLICTS[branches[left]] == branches[right]
+    ]
+    half_pairs = [
+        (pair, BUREAU_ELEMENT[bureau])
+        for group, bureau in BRANCH_TRIPLE_COMBINATIONS.items()
+        for pair in pairs
+        if classify_triple_members(group, (branches[n] for n in pair)) == "peak_pair"
+    ]
+    # The printed 子午丑 example establishes this clash decision. A competing
+    # half-pair is left to the ordinary path, whose eligibility depends on active clashes.
+    separated_zi_chou = (
+        clash_pairs == [("year", "month")]
+        and (branches["year"], branches["month"], branches["day"]) == ("子", "午", "丑")
+        and branches.get("hour") != "丑"
+        and not candidates
+        and not half_pairs
+    )
     # A unique adjacent 六合 or complete 三合 may resolve an external clash. If both
     # ends have incompatible claims, keep the clash and mark all those claims uncertain.
     memberships = {name: [c for c in candidates if name in c[1]] for name in names}
@@ -295,6 +354,8 @@ def _evaluate(
         )
         if not incompatible:
             protected.update(members)
+        else:
+            pass
     # Prespecified source profile: whole four-column wealth -> officer ->
     # seal -> body branch path, matching visible officer -> seal -> body,
     # with time LU/prosperity and no competing complete/paired formation.
@@ -319,9 +380,7 @@ def _evaluate(
         and classify_classical_root(pillars["day"][0], branches["hour"])["kind"]
         in {"lu_root", "yang_blade_root", "prosperity_root"}
     )
-    for left, right in combinations(names, 2):
-        if BRANCH_CONFLICTS[branches[left]] != branches[right]:
-            continue
+    for left, right in clash_pairs:
         if ordered_passage and names.index(right) - names.index(left) >= 2:
             events.append(
                 {
@@ -335,17 +394,21 @@ def _evaluate(
                 }
             )
             continue
+        else:
+            pass
         resolved = (left in protected) != (right in protected)
-        if resolved:
+        if resolved or separated_zi_chou:
             events.append(
                 {
                     "kind": "六冲",
                     "positions": [left, right],
                     "status": "resolved_by_combination",
-                    "source_id": "ziping_7",
+                    "source_id": "ziping_7" if resolved else ZI_CHOU_CLASH_SOURCE["id"],
                 }
             )
             continue
+        else:
+            pass
         # Both exposed to incompatible relations: no arbitrary choice of a winning 合.
         clashed.update((left, right))
         storage = storage_movement_effect(
@@ -364,6 +427,8 @@ def _evaluate(
                 }
             )
             continue
+        else:
+            pass
         e1, e2 = BRANCH_ELEMENTS[branches[left]][0], BRANCH_ELEMENTS[branches[right]][0]
         # Compare initial physical hidden budgets, before interaction losses.
         # The month multiplier is included; seasonal energy and stem activation
@@ -440,6 +505,8 @@ def _evaluate(
                 }
             )
             continue
+        else:
+            pass
         claimed.update(members)
         season_supports = phases[target.value] == "旺"
         revealed = any(STEM_ELEMENTS[stem][0] == target for stem in visible)
@@ -453,6 +520,8 @@ def _evaluate(
                         part = token["mass"] * policy.transformation_transfer
                         token["mass"] -= part
                         transferred += part
+                    else:
+                        pass
                 tokens[name].append(
                     {
                         "stem": None,
@@ -488,16 +557,11 @@ def _evaluate(
     events.extend(affiliations)
     # 半合 is 成势, never a full transformation. Shared peaks stay disputed,
     # rather than selecting one partner solely by iteration order.
-    half_candidates: list[Tuple[Tuple[str, str], Element]] = []
-    for group, bureau in BRANCH_TRIPLE_COMBINATIONS.items():
-        for pair in combinations(names, 2):
-            if (
-                classify_triple_members(group, (branches[n] for n in pair))
-                != "peak_pair"
-            ):
-                continue
-            if not any(n in claimed or n in clashed for n in pair):
-                half_candidates.append((pair, BUREAU_ELEMENT[bureau]))
+    half_candidates = [
+        (pair, target)
+        for pair, target in half_pairs
+        if not any(n in claimed or n in clashed for n in pair)
+    ]
     for pair, target in half_candidates:
         if any(set(pair) & set(other) for other, _ in half_candidates if other != pair):
             events.append(
@@ -510,6 +574,8 @@ def _evaluate(
                 }
             )
             continue
+        else:
+            pass
         claimed.update(pair)
         for name in pair:
             amount = 0.0
@@ -518,6 +584,8 @@ def _evaluate(
                     part = token["mass"] * policy.partial_transfer
                     token["mass"] -= part
                     amount += part
+                else:
+                    pass
             tokens[name].append(
                 {
                     "stem": None,
@@ -540,10 +608,39 @@ def _evaluate(
     # later stage candidates may have failed; only completed combinations can
     # then resolve a punishment. Half tendencies do not expand that criterion.
     punishment_cover = completed_combination_positions(events)
+    active_clashes = [
+        event["positions"]
+        for event in events
+        if event["kind"] == "六冲" and event["status"] == "active"
+    ]
+    # Decide punishment participation before applying any punishment loss.
+    # The alternative clashes and completed combinations above are settled;
+    # this source-local rule changes neither of their decisions or budgets.
     for punishment_group in BRANCH_THREE_PUNISHMENTS:
         punished = [n for n in names if branches[n] in punishment_group]
         if set(branches[n] for n in punished) != set(punishment_group):
             continue  # 寅巳/丑戌 two-branch fragments are not full 三刑 in this policy.
+        else:
+            pass
+        participants = repeated_zi_mao_participants(
+            punished, branches, punishment_cover
+        )
+        if participants is not None:
+            events.append(
+                {
+                    "kind": "刑",
+                    "positions": participants or punished,
+                    "status": "active" if participants else REPETITION_NO_PUNISHMENT,
+                    "source_positions": punished,
+                    "combination_removed_positions": [
+                        p for p in punished if p in punishment_cover
+                    ],
+                    "source_id": REPEATED_PAIR_SOURCE["id"],
+                }
+            )
+            continue
+        else:
+            pass
         if punishment_is_resolved(punished, branches, punishment_cover):
             events.append(
                 {
@@ -554,38 +651,75 @@ def _evaluate(
                 }
             )
             continue
-        storage = storage_movement_effect(
-            branches, punished, "刑", pillars["day"][0], policy.punishment
-        )
-        if storage is None:
-            for name in punished:
-                losses[name] = min(losses[name], policy.punishment)
         else:
-            apply_storage_effect(storage)
+            pass
+        alternative = zi_month_officer_clash_alternative(
+            punished,
+            branches,
+            punishment_cover,
+            active_clashes,
+            day_stem=pillars["day"][0],
+        )
+        if alternative is not None:
+            events.append(
+                {
+                    "kind": "刑",
+                    "positions": punished,
+                    "status": MONTH_OFFICER_CLASH_RESOLVED,
+                    "source_id": MONTH_OFFICER_SOURCE["id"],
+                    "source_day_stem": pillars["day"][0],
+                    "protected_position": "month",
+                    "alternative_kind": "六冲",
+                    "alternative_positions": alternative,
+                }
+            )
+            continue
+        else:
+            pass
         events.append(
             {
                 "kind": "刑",
                 "positions": punished,
                 "status": "active",
-                "source_id": (
-                    STORAGE_SOURCE["id"] if storage is not None else "ziping_7"
-                ),
-                **({"storage_effect": storage} if storage is not None else {}),
+                "source_id": "ziping_7",
             }
         )
     for branch in sorted(BRANCH_SELF_PUNISHMENTS):
         punished = [n for n in names if branches[n] == branch]
         if len(punished) > 1:
-            for name in punished:
-                losses[name] = min(losses[name], policy.punishment)
             events.append(
                 {
                     "kind": "自刑",
                     "positions": punished,
                     "status": "active",
-                    "source_id": "ziping_7",
+                    "source_id": BRANCH_RELATION_SOURCE["id"],
                 }
             )
+        else:
+            pass
+    for event in events:
+        if event["kind"] not in {"刑", "自刑"} or event["status"] != "active":
+            continue
+        else:
+            pass
+        storage = (
+            storage_movement_effect(
+                branches,
+                event["positions"],
+                "刑",
+                pillars["day"][0],
+                policy.punishment,
+            )
+            if event["kind"] == "刑"
+            else None
+        )
+        if storage is None:
+            for name in event["positions"]:
+                losses[name] = min(losses[name], policy.punishment)
+        else:
+            apply_storage_effect(storage)
+            event["source_id"] = STORAGE_SOURCE["id"]
+            event["storage_effect"] = storage
     for name in names:
         for token in tokens[name]:
             token["mass"] *= min(losses[name], element_losses[name][token["element"]])
@@ -650,6 +784,8 @@ def _evaluate(
                         "quantity_kind": "post_interaction_hidden_stem_budget",
                     }
                 )
+            else:
+                pass
             if token["stem"] is None and token["mass"]:
                 combination_contributions.append(
                     {
@@ -661,6 +797,8 @@ def _evaluate(
                         "energy_unrounded": energy,
                     }
                 )
+            else:
+                pass
             if (
                 token["element"] == day_element
                 and token["mass"]
@@ -675,6 +813,8 @@ def _evaluate(
                         "energy": round(energy, 6),
                     }
                 )
+            else:
+                pass
     stem_effects = evaluate_stem_effects(
         pillars,
         factors,
@@ -696,9 +836,10 @@ def _evaluate(
     )
     for element in Element:
         effective[element] += stem_effects["energies"][element.value]
-    support = effective[day_element] + effective[parent]
-    weaken = sum(effective[e] for e in Element if e not in {day_element, parent})
-    share = support / (support + weaken) if support + weaken else 0.5
+    unrounded_energies = {
+        element.value: amount for element, amount in effective.items()
+    }
+    float_share = floating_support_share(unrounded_energies, day_element.value)
     root_qualifications: list[_QualifiedRoot] = []
     for name in names:
         classification = classify_classical_root(pillars["day"][0], branches[name])
@@ -739,7 +880,7 @@ def _evaluate(
     vigorous_roots = [
         r["pillar"] for r in root_qualifications if r["qualified_for_structural_rule"]
     ]
-    float_numerical_label = _label(share, policy)
+    float_numerical_label = _label(float_share, policy)
     threshold_arithmetic = exact_threshold_decision(
         pillars, phases, PHASE_FACTORS, asdict(policy), events, float_numerical_label
     )
@@ -830,6 +971,15 @@ def _evaluate(
         )
     elif structural_rule:
         final_label, decision = "强", "in_command_multiple_vigorous_roots"
+    elif (
+        len(principal_roots) >= 2
+        and rooted_controllers >= 2
+        and not rooted_support_front
+    ):
+        final_label, decision = (
+            numerical_label,
+            "root_count_override_requires_controller_load_review",
+        )
     elif len(principal_roots) >= 2:
         final_label, decision = "强", "multiple_surviving_principal_body_roots"
     elif rooted_support_front:
@@ -903,27 +1053,31 @@ def _evaluate(
         "stem_effects": stem_effects,
         "relations": events,
         "effective_elements": {e.value: round(v, 6) for e, v in effective.items()},
-        "effective_elements_unrounded": {e.value: v for e, v in effective.items()},
+        "effective_elements_unrounded": unrounded_energies,
     }
 
 
 def evaluate_strength_policy(
-    pillars: Dict[str, Tuple[str, str]],
-    phases: Dict[str, str],
+    pillars: dict[str, tuple[str, str]],
+    phases: dict[str, str],
     policy: StrengthPolicy,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Evaluate a supplied policy with the sole adopted arithmetic."""
     return _evaluate(pillars, phases, policy)
 
 
 def assess_strength(
-    pillars: Dict[str, Tuple[str, str]], phases: Dict[str, str]
-) -> Dict[str, Any]:
+    pillars: dict[str, tuple[str, str]], phases: dict[str, str]
+) -> dict[str, Any]:
     # Binding acts on unrounded energy and preserves original stem identities.
     result = evaluate_strength_policy(pillars, phases, DEFAULT_POLICY)
-    result["clash_comparison"] = build_clash_comparison(
-        pillars, result["relations"], SOURCES
-    )
+    relations = result["relations"]
+    sources = SOURCES
+    if any(event["source_id"] == ZI_CHOU_CLASH_SOURCE["id"] for event in relations):
+        sources = [*SOURCES, ZI_CHOU_CLASH_SOURCE]
+    else:
+        pass
+    result["clash_comparison"] = build_clash_comparison(pillars, relations, sources)
     stem_receipt = result.pop("stem_effects")
     result["stem_energy_accounting"] = {
         "method_id": "unrounded_non_day_stem_budget_v1",
@@ -993,20 +1147,22 @@ def assess_strength(
                 "variants": variants,
             },
             "ordinary_fuyi_requires_review": set(numerical_labels)
-            != {result["strength_level"]},
+            != {result["strength_level"]}
+            or result["structural_decision"]["rule"]
+            == "root_count_override_requires_controller_load_review",
             "requires_special_structure_review": special_review,
             "month_command": {
                 "branch": pillars["month"][1],
                 "phase": phases[STEM_ELEMENTS[pillars["day"][0]][0].value],
             },
-            "sources": [dict(source) for source in SOURCES],
+            "sources": [dict(source) for source in sources],
             "limitations": [
                 "数值系数为公开工程参数，古籍只支持规则关系，不提供这些系数或现实预测效度。",
                 "月令按月支季相处理，未细分节气后司令天数、湿燥土与寒暖调候。",
                 "合化采用化神当令、透化神、无争合及未受冲的保守条件；不认证化气格。",
                 "同一完整会合局的重复支按实体位置各处理一次；不把同局重见误判为两个竞争局。不同局及半合仍分别审查。",
                 "合化或半合生成的趋势预算可参与有效能量，不冒充实际藏干通根或激活有根天干；真实根量与合成贡献分别记录。",
-                "刑害有门派分歧；三刑取全组、子卯取成对，自刑轻减，六害不机械减根。",
+                "刑害有门派分歧；三刑取全组、子卯取成对。自刑重见据《三命通会·论三刑》，其活动判定及减损系数为工程政策；六害不机械减根。",
                 "四墓土刑冲按所选原典区别冲动与冲克，土根不统一减损，不增造开库能量；水根减损幅度仍为工程约定。",
                 "旺衰极端或参数敏感时停止自动扶抑取用，另行核对从格及专旺。",
                 "结构三档不替代数值扶抑前提；两者不同或数值敏感时，普通扶抑喜忌继续待判。",

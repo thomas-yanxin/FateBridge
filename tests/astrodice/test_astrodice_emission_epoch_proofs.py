@@ -13,7 +13,7 @@ from scripts.astrodice.verify_astrodice_emission_epoch import (
     neighbor,
 )
 from scripts.astrodice.verify_astrodice_observer_clock import add, mul, rounded, sub
-from tests.astrodice.test_astrodice_emission_epoch import analytic_case
+from tests.unit_test.fixtures.astrodice_analytic import analytic_case
 
 
 @pytest.mark.parametrize(
@@ -26,12 +26,12 @@ from tests.astrodice.test_astrodice_emission_epoch import analytic_case
 )
 def test_independent_bit_neighbors_match_known_binary64_boundary_spacing(
     value, previous, following
-):
+) -> None:
     assert Q(neighbor(value, False)) == previous
     assert Q(neighbor(value, True)) == following
 
 
-def test_independent_enumeration_distinguishes_empty_support_from_limit():
+def test_independent_enumeration_distinguishes_empty_support_from_limit() -> None:
     lo, hi = Q(1), Q(1) + Q(2, 2**52)
     status, values = enumerate_bits(lo, hi, 3)
     assert status == "complete" and list(map(Q, values)) == [lo, lo + Q(1, 2**52), hi]
@@ -50,6 +50,8 @@ def proof_case(monkeypatch):
         def state(self, t, body):
             if body == "Earth":
                 return [rounded(0)] * 6
+            else:
+                pass
             return [
                 add(rounded(1), mul(rounded(Q(1, 100)), sub(t, rounded(epoch)))),
                 rounded(0),
@@ -91,7 +93,9 @@ def proof_case(monkeypatch):
     return stored, cal, row, plan
 
 
-def test_independent_inverse_and_lattice_proof_matches_analytic_source(monkeypatch):
+def test_independent_inverse_and_lattice_proof_matches_analytic_source(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     stored, cal, row, plan = proof_case(monkeypatch)
     assert infer_proof(
         Path("."), {"window_index": 0}, row, cal, "printing_only", stored, plan
@@ -103,8 +107,8 @@ def test_independent_inverse_and_lattice_proof_matches_analytic_source(monkeypat
     ["drop_candidate", "Earth_center", "Earth_radius", "endpoint", "tie", "promote"],
 )
 def test_independent_proof_rejects_changed_inverse_or_lattice_claims(
-    monkeypatch, mutation
-):
+    monkeypatch: pytest.MonkeyPatch, mutation: str
+) -> None:
     value, cal, row, plan = proof_case(monkeypatch)
     stored = copy.deepcopy(value)
     lattice = stored["lattices"]["seconds_from_J2000_binary64"]

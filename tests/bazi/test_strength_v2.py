@@ -9,14 +9,11 @@ import pytest
 
 from fatebridge.core.elements import ElementAnalysis
 from fatebridge.core.strength import DEFAULT_POLICY, _evaluate
+from tests.unit_test.fixtures.bazi_strength import bazi_pillars as pillars
 
 REFERENCE = json.loads(
     (Path(__file__).parents[1] / "data/bazi-strength-reference.json").read_text()
 )
-
-
-def pillars(text):
-    return dict(zip(("year", "month", "day", "hour"), map(tuple, text.split())))
 
 
 def score(text, **changes):
@@ -29,7 +26,7 @@ def score(text, **changes):
 
 
 @pytest.mark.parametrize("case", REFERENCE["cases"], ids=lambda c: c["id"])
-def test_primary_text_twenty_cases(case):
+def test_primary_text_twenty_cases(case) -> None:
     p = {k: tuple(v) for k, v in case["pillars"].items()}
     a = ElementAnalysis.analyze_day_master_strength(p)["assessment"]
     assert a["strength_level"] == case["expected_strength"]
@@ -37,16 +34,18 @@ def test_primary_text_twenty_cases(case):
     # These extremes are not used as generic 扶抑 prescriptions.
     if a["requires_special_structure_review"]:
         assert ElementAnalysis.comprehensive_analysis(p)["favorable_elements"] == []
+    else:
+        pass
 
 
-def test_month_command_not_equivalent_to_strength():
+def test_month_command_not_equivalent_to_strength() -> None:
     in_season = score("辛酉 辛卯 甲申 辛酉")
     out_of_season = score("甲寅 癸酉 甲寅 乙亥")
     assert in_season["strength_level"] != "强"
     assert out_of_season["strength_level"] != "弱"
 
 
-def test_month_season_root_and_revelation_change_actual_scores():
+def test_month_season_root_and_revelation_change_actual_scores() -> None:
     text = "甲寅 乙卯 甲子 丁丑"
     nominal = score(text)
     assert (
@@ -63,7 +62,7 @@ def test_month_season_root_and_revelation_change_actual_scores():
     assert nominal["support_share"] != score(text, seasonal_spread=0)["support_share"]
 
 
-def test_branch_budget_does_not_count_main_qi_twice():
+def test_branch_budget_does_not_count_main_qi_twice() -> None:
     a = score("庚辰 戊子 壬寅 乙巳")
     assert sum(b["initial"] for b in a["branch_budgets"].values()) == 10
     assert sum(b["remaining"] for b in a["branch_budgets"].values()) <= 10
@@ -71,14 +70,14 @@ def test_branch_budget_does_not_count_main_qi_twice():
     assert a["relations"][0]["status"] == "partial_tendency"
 
 
-def test_yin_birth_stage_without_hidden_same_element_is_not_a_root():
+def test_yin_birth_stage_without_hidden_same_element_is_not_a_root() -> None:
     a = score("戊戌 己丑 丁酉 庚申")
     assert not any(
         r["pillar"] == "day" for r in a["roots"]
     )  # 丁长生酉 cannot invent 丁根.
 
 
-def test_clash_direction_uses_seasonal_resources_not_fixed_element_winner():
+def test_clash_direction_uses_seasonal_resources_not_fixed_element_winner() -> None:
     winter = score("庚申 壬子 丙午 丁酉")
     summer = score("庚申 丙午 壬子 丁酉")
     cw = next(
@@ -99,7 +98,7 @@ def test_clash_direction_uses_seasonal_resources_not_fixed_element_winner():
     )
 
 
-def test_combination_can_resolve_clash_and_contested_claim_cannot():
+def test_combination_can_resolve_clash_and_contested_claim_cannot() -> None:
     resolved = score("壬子 己丑 丙午 乙酉")
     c = next(e for e in resolved["relations"] if e["kind"] == "六冲")
     assert c["status"] == "resolved_by_combination"
@@ -112,7 +111,7 @@ def test_combination_can_resolve_clash_and_contested_claim_cannot():
     assert c["status"] == "active"  # both sides have claims; no unconditional 解冲.
 
 
-def test_full_bureau_requires_in_command_and_revelation():
+def test_full_bureau_requires_in_command_and_revelation() -> None:
     transformed = score("壬申 壬子 甲辰 丁未")
     without_revelation = score("丙申 丙子 甲辰 丁未")
     merely_generated = score("壬申 己酉 庚子 庚辰")
@@ -133,14 +132,14 @@ def test_full_bureau_requires_in_command_and_revelation():
     )
 
 
-def test_seasonal_bureau_does_not_double_use_internal_six_combination():
+def test_seasonal_bureau_does_not_double_use_internal_six_combination() -> None:
     a = score("壬亥 壬子 甲丑 丁未")
     # 外冲 may prevent 化, but no 子丑六合 is counted a second time within 亥子丑.
     assert any(e["kind"] == "三会" for e in a["relations"])
     assert not any(e["kind"] == "六合" for e in a["relations"])
 
 
-def test_full_punishment_changes_energy_without_erasing_root():
+def test_full_punishment_changes_energy_without_erasing_root() -> None:
     text = "甲寅 丁巳 庚申 壬子"
     penalized, unpenalized = score(text), score(text, punishment=1)
     assert any(e["kind"] == "刑" for e in penalized["relations"])
@@ -148,7 +147,19 @@ def test_full_punishment_changes_energy_without_erasing_root():
     assert all(b["remaining"] > 0 for b in penalized["branch_budgets"].values())
 
 
-def test_stem_binding_changes_score_but_day_master_is_not_erased():
+def test_self_punishment_source_resolves_to_sanming() -> None:
+    chart = pillars("戊辰 乙酉 戊辰 辛酉")
+    assessment = ElementAnalysis.analyze_day_master_strength(chart)["assessment"]
+    sources = {source["id"]: source for source in assessment["sources"]}
+    events = [event for event in assessment["relations"] if event["kind"] == "自刑"]
+    assert len(events) == 2
+    for event in events:
+        source = sources[event["source_id"]]
+        assert source["author"] == "万民英"
+        assert "论三刑" in source["title"]
+
+
+def test_stem_binding_changes_score_but_day_master_is_not_erased() -> None:
     text = "甲子 己丑 丙寅 壬申"
     nominal = score(text)
     assert any(
@@ -162,7 +173,7 @@ def test_stem_binding_changes_score_but_day_master_is_not_erased():
     )
 
 
-def test_chart_dict_order_does_not_select_different_combination():
+def test_chart_dict_order_does_not_select_different_combination() -> None:
     p = pillars("壬申 壬子 甲辰 丁未")
     assert ElementAnalysis.analyze_day_master_strength(
         p
@@ -173,7 +184,7 @@ def test_chart_dict_order_does_not_select_different_combination():
 @pytest.mark.parametrize("month_branch", "子丑寅卯辰巳午未申酉戌亥")
 def test_finite_scores_conservation_and_json_for_every_stem_month(
     day_stem, month_branch
-):
+) -> None:
     p = pillars("庚辰 戊子 壬寅 乙巳")
     p["day"] = (day_stem, "寅")
     p["month"] = ("戊", month_branch)
@@ -195,7 +206,7 @@ def test_finite_scores_conservation_and_json_for_every_stem_month(
     json.dumps(result, allow_nan=False)
 
 
-def test_rooted_wealth_officer_chain_can_overturn_in_season_score():
+def test_rooted_wealth_officer_chain_can_overturn_in_season_score() -> None:
     case = REFERENCE["additional_cases"][0]
     p = {k: tuple(v) for k, v in case["pillars"].items()}
     a = ElementAnalysis.analyze_day_master_strength(p)["assessment"]
@@ -212,7 +223,7 @@ def test_rooted_wealth_officer_chain_can_overturn_in_season_score():
     assert changed["strength_level"] != a["strength_level"]
 
 
-def test_reference_directions_and_policy_sensitivity():
+def test_reference_directions_and_policy_sensitivity() -> None:
     from scripts.bazi.validate_bazi_strength import build_report
 
     report = build_report()
@@ -221,7 +232,7 @@ def test_reference_directions_and_policy_sensitivity():
     assert report["summary"]["stress_label_changes"] == 0
 
 
-def test_shared_peak_does_not_pick_arbitrary_half_combination():
+def test_shared_peak_does_not_pick_arbitrary_half_combination() -> None:
     a = score("甲辰 丁卯 甲子 戊辰")
     halves = [event for event in a["relations"] if event["kind"] == "半合"]
     assert len(halves) == 2
@@ -253,7 +264,7 @@ def test_hidden_stems_include_day_master_as_bi_jian() -> None:
     assert bi_jian["ten_god"] == "比肩"
 
 
-def test_month_command_flips_borderline_strength():
+def test_month_command_flips_borderline_strength() -> None:
     base = {"year": ("庚", "戌"), "day": ("甲", "子"), "hour": ("己", "巳")}
     de_ling = ElementAnalysis.analyze_day_master_strength(
         {**base, "month": ("丁", "卯")}

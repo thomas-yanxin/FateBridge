@@ -26,11 +26,17 @@ class ErrorComponent(BaseModel):
         if self.status in {"bounded", "declared"}:
             if self.interval is None or self.unit in {"categorical", "unresolved"}:
                 raise ValueError("数值界必须有量纲及区间")
+            else:
+                pass
             left, right = self.interval
             if not isfinite(left) or not isfinite(right) or left > right:
                 raise ValueError("误差区间必须有序且有限")
+            else:
+                pass
         elif self.interval is not None:
             raise ValueError("未知/不适用误差不能填写数值界")
+        else:
+            pass
         return self
 
 
@@ -56,11 +62,17 @@ class CombinedBound(BaseModel):
                 or self.unresolved_components
             ):
                 raise ValueError("已知合成界不能缺少区间、量纲或包含未决分量")
+            else:
+                pass
             left, right = self.interval
             if not isfinite(left) or not isfinite(right) or left > right:
                 raise ValueError("合成区间须有序且有限")
+            else:
+                pass
         elif self.interval is not None:
             raise ValueError("未量化或不适用不能填写数值界")
+        else:
+            pass
         return self
 
 
@@ -70,13 +82,21 @@ def circular_sector_candidates(
     """Complete closed-interval image for an equal angular partition only."""
     if not isfinite(nominal_degrees) or sectors < 1:
         raise ValueError("名义角度须有限，等分数量须为正")
+    else:
+        pass
     if bound.unit != "degrees":
         raise ValueError("角度离散化不能接受时间或未知量纲")
+    else:
+        pass
     if bound.interval is None:
         return None
+    else:
+        pass
     low, high = (Fraction(nominal_degrees) + Fraction(v) for v in bound.interval)
     if high - low >= 360:
         return tuple(range(sectors))
+    else:
+        pass
     first, last = (value * sectors // 360 for value in (low, high))
     return tuple(sorted({index % sectors for index in range(first, last + 1)}))
 
@@ -86,6 +106,8 @@ def combine_bounds(
 ) -> CombinedBound:
     if len({c.component_id for c in components}) != len(components):
         raise ValueError("同一误差源不可重复计入；相关项须保留共同来源")
+    else:
+        pass
     selected = [
         c for c in components if c.unit == unit and c.status != "not_applicable"
     ]
@@ -94,6 +116,8 @@ def combine_bounds(
         return CombinedBound(
             unit=unit, status="not_applicable", interval=None, unresolved_components=()
         )
+    else:
+        pass
     if unresolved or unit in {"categorical", "unresolved"}:
         return CombinedBound(
             unit=unit,
@@ -101,6 +125,8 @@ def combine_bounds(
             interval=None,
             unresolved_components=unresolved or tuple(c.component_id for c in selected),
         )
+    else:
+        pass
     # A worst-case sum remains valid with correlated errors; RSS would not.
     intervals = [c.interval for c in selected if c.interval is not None]
     exact_left = sum((Fraction(i[0]) for i in intervals), Fraction(0))
@@ -108,8 +134,12 @@ def combine_bounds(
     left, right = float(exact_left), float(exact_right)
     if Fraction(left) > exact_left:
         left = nextafter(left, -inf)
+    else:
+        pass
     if Fraction(right) < exact_right:
         right = nextafter(right, inf)
+    else:
+        pass
     return CombinedBound(
         unit=unit,
         status=(
@@ -140,22 +170,25 @@ def declared_error_budget(
     sources: tuple[str, ...], inputs: Mapping[str, object], origin: str
 ) -> dict[str, JsonValue]:
     components = []
-    paths = tuple(
-        k
-        for k, v in inputs.items()
-        if k.endswith("birth_time_uncertainty_minutes") and v is not None
-    )
-    bounds = [
-        Fraction(v) * 60
-        for k, v in inputs.items()
-        if k in paths
-        and isinstance(v, (int, float))
-        and not isinstance(v, bool)
-        and v > 0
-    ]
-    radius = float(max(bounds)) if bounds else None
-    if radius is not None and Fraction(radius) < max(bounds):
-        radius = nextafter(radius, inf)
+    field = "birth_time_uncertainty_minutes"
+    minutes = inputs.get(field)
+    radius = None
+    # LMT/LAT minutes belong to the recorded solar clock. Their converted
+    # endpoints do not establish a declared elapsed bound on the civil clock.
+    if (
+        inputs.get("birth_clock_basis", "civil") == "civil"
+        and isinstance(minutes, (int, float))
+        and not isinstance(minutes, bool)
+        and minutes > 0
+    ):
+        exact_radius = Fraction(minutes) * 60
+        radius = float(exact_radius)
+        if Fraction(radius) < exact_radius:
+            radius = nextafter(radius, inf)
+        else:
+            pass
+    else:
+        pass
     for source in sorted(set(sources)):
         unit = SOURCE_UNITS[source]
         interval = (
@@ -171,7 +204,7 @@ def declared_error_budget(
                 status="declared" if interval is not None else "unquantified",
                 interval=interval,
                 correlation_group=f"{origin}:{source}",
-                evidence_paths=paths if interval is not None else (),
+                evidence_paths=(field,) if interval is not None else (),
                 scope=(
                     "调用方声明的UTC经过时间范围，不认证出生记录、历史钟制或连续稳定"
                     if interval is not None

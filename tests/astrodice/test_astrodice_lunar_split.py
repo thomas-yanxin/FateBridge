@@ -7,51 +7,14 @@ import pytest
 
 from scripts.astrodice.astrodice_lunar_split import K, apparent
 from scripts.astrodice.verify_astrodice_lunar_split import binary64_nearest, model
-
-CENTER = Q(2451545)
-V, W, RADIUS = Q(1, 100), Q(1, 10000), Q(1, 400)
-
-
-class DirectLinearSource:
-    def group(self, t, group):
-        assert group == 9
-        zero = t * 0
-        return [zero + RADIUS, (t - CENTER) * W, zero, zero, zero + W, zero]
-
-    def state(self, t, body):
-        zero = t * 0
-        earth = [(t - CENTER) * V, zero, zero, zero + V, zero, zero]
-        if body == "Earth":
-            return earth
-        assert body == "Moon"
-        return [a + b for a, b in zip(earth, self.group(t, 9))]
-
-
-class PowerLinearSource:
-    def group_derivatives(self, t, group):
-        assert group == 9
-        return [
-            t.cast(RADIUS),
-            W * (t - CENTER),
-            t.cast(0),
-            t.cast(0),
-            t.cast(W),
-            t.cast(0),
-        ]
-
-    def state_derivatives(self, t, body):
-        earth = [
-            V * (t - CENTER),
-            t.cast(0),
-            t.cast(0),
-            t.cast(V),
-            t.cast(0),
-            t.cast(0),
-        ]
-        if body == "Earth":
-            return earth
-        assert body == "Moon"
-        return [a + b for a, b in zip(earth, self.group_derivatives(t, 9))]
+from tests.unit_test.fixtures.astrodice_analytic import (
+    CENTER,
+    RADIUS,
+    DirectLinearSource,
+    PowerLinearSource,
+    V,
+    W,
+)
 
 
 def expected_derivative():
@@ -72,7 +35,7 @@ def expected_derivative():
     ]
 
 
-def test_complete_lunar_chain_and_aberration_match_an_analytic_boost():
+def test_complete_lunar_chain_and_aberration_match_an_analytic_boost() -> None:
     result = apparent(DirectLinearSource(), CENTER, derivative=True)
     independent = model(PowerLinearSource(), CENTER, "continuous_split", True)
     expected = expected_derivative()
@@ -91,7 +54,7 @@ def test_complete_lunar_chain_and_aberration_match_an_analytic_boost():
 @pytest.mark.parametrize(
     "profile", ["rounded_emitter_only", "rounded_reception_and_emitter"]
 )
-def test_quantized_clock_profiles_never_gain_a_smooth_derivative(profile):
+def test_quantized_clock_profiles_never_gain_a_smooth_derivative(profile: str) -> None:
     with pytest.raises(ValueError):
         apparent(DirectLinearSource(), CENTER, profile, True)
     with pytest.raises(ValueError):
@@ -101,18 +64,18 @@ def test_quantized_clock_profiles_never_gain_a_smooth_derivative(profile):
 @pytest.mark.parametrize(
     "value", [Q(1721426), Q(5373482), Q(5373482) + Q(1, 86400000000)]
 )
-def test_independent_integer_rounding_agrees_with_binary64(value):
+def test_independent_integer_rounding_agrees_with_binary64(value) -> None:
     assert binary64_nearest(value) == Q(float(value))
 
 
-def test_binary64_midpoint_ties_choose_the_even_significand():
+def test_binary64_midpoint_ties_choose_the_even_significand() -> None:
     h = Q(1, 2**30)
     base = Q(5373482)
     assert binary64_nearest(base + h / 2) == base
     assert binary64_nearest(base + 3 * h / 2) == base + 2 * h
 
 
-def test_point_only_rounded_profile_does_not_report_a_rate():
+def test_point_only_rounded_profile_does_not_report_a_rate() -> None:
     a = apparent(DirectLinearSource(), CENTER + Q(1, 12345), "rounded_emitter_only")
     b = model(PowerLinearSource(), CENTER + Q(1, 12345), "rounded_emitter_only")
     assert a["direction_derivative_per_source_day"] is None

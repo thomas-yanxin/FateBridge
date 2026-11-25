@@ -11,7 +11,10 @@ from pydantic import ValidationError
 from fatebridge.cli import run
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.birth import build_astro_birth_info
-from fatebridge.core.astro.birth_clock import resolve_solar_birth_clock
+from fatebridge.core.astro.birth_clock import (
+    resolve_solar_birth_clock,
+    resolve_solar_epoch,
+)
 from fatebridge.core.astro.sensitivity import time_sensitivity
 from fatebridge.core.astro.time_scales import (
     datetime_from_ut1,
@@ -33,7 +36,9 @@ HAS_SWE = pytest.mark.skipif(runtime.swe is None, reason="Swiss Ephemeris requir
 
 @HAS_SWE
 @pytest.mark.parametrize("year", [1, 400, 1000, 1600, 1879, 1900, 1955, 1959])
-def test_pre_utc_ut1_helpers_preserve_the_native_forward_clock_policy(year):
+def test_pre_utc_ut1_helpers_preserve_the_native_forward_clock_policy(
+    year: int,
+) -> None:
     recorded = datetime(year, 5, 14, 22, 20, tzinfo=timezone.utc)
     jd_ut1 = recorded.toordinal() + 1721424.5 + (22 * 3600 + 20 * 60) / 86400
     native_tt, native_ut1 = runtime.ephemeris_call(
@@ -47,7 +52,7 @@ def test_pre_utc_ut1_helpers_preserve_the_native_forward_clock_policy(year):
 
 @HAS_SWE
 @pytest.mark.parametrize("year", [1960, 1968, 1972, 2000, 2050, 3000])
-def test_offset_utc_era_uses_the_existing_shared_clock_policy(year):
+def test_offset_utc_era_uses_the_existing_shared_clock_policy(year: int) -> None:
     recorded = datetime(year, 5, 14, 22, 20, tzinfo=timezone.utc)
     scales = ephemeris_time(recorded)
     assert abs(tt_from_ut1(scales.jd_ut1) - scales.jd_tt) * 86400 < 0.0002
@@ -82,7 +87,7 @@ def _clock_error_seconds(actual, expected):
 @pytest.mark.parametrize("longitude", [-180.0, -73.98765, 0.0, 10.0, 121.4667, 180.0])
 def test_historical_lmt_uses_east_positive_longitude_and_exact_clock_arithmetic(
     longitude,
-):
+) -> None:
     wall = datetime(1879, 5, 14, 23, 1, 17)
     actual, receipt = resolve_solar_birth_clock(wall, longitude, "local_mean_solar")
     expected = wall.replace(tzinfo=timezone.utc) - timedelta(
@@ -96,7 +101,9 @@ def test_historical_lmt_uses_east_positive_longitude_and_exact_clock_arithmetic(
 
 
 @HAS_SWE
-def test_explicit_historical_lmt_and_equivalent_civil_offset_have_identical_native_geometry():
+def test_explicit_historical_lmt_and_equivalent_civil_offset_have_identical_native_geometry() -> (
+    None
+):
     data = dict(
         birth_year=1879,
         birth_month=5,
@@ -123,7 +130,7 @@ def test_explicit_historical_lmt_and_equivalent_civil_offset_have_identical_nati
         ((1600, 12, 31), 180.0),
     ],
 )
-def test_lat_inversion_matches_independent_apparent_hour_angle(date, longitude):
+def test_lat_inversion_matches_independent_apparent_hour_angle(date, longitude) -> None:
     wall = datetime(*date, 0, 7, 19)
     actual, receipt = resolve_solar_birth_clock(wall, longitude, "local_apparent_solar")
     expected_seconds = wall.hour * 3600 + wall.minute * 60 + wall.second
@@ -147,7 +154,7 @@ def test_lat_inversion_matches_independent_apparent_hour_angle(date, longitude):
 
 
 @HAS_SWE
-def test_modern_lmt_is_ut1_and_must_not_be_relabelled_as_utc():
+def test_modern_lmt_is_ut1_and_must_not_be_relabelled_as_utc() -> None:
     wall = datetime(2000, 2, 29, 23)
     actual, receipt = resolve_solar_birth_clock(wall, 10.0, "local_mean_solar")
     expected_ut1 = wall.toordinal() + 1721424.5 + (23 * 3600 - 2400) / 86400
@@ -158,7 +165,9 @@ def test_modern_lmt_is_ut1_and_must_not_be_relabelled_as_utc():
 
 @HAS_SWE
 @pytest.mark.parametrize("basis", ["local_mean_solar", "local_apparent_solar"])
-def test_solar_clock_interval_maps_endpoints_before_building_the_utc_grid(basis):
+def test_solar_clock_interval_maps_endpoints_before_building_the_utc_grid(
+    basis: str,
+) -> None:
     wall = datetime(2000, 2, 29, 23, 1, 17)
     birth = build_astro_birth_info(
         birth_year=2000,
@@ -212,8 +221,8 @@ def test_solar_clock_interval_maps_endpoints_before_building_the_utc_grid(basis)
 @HAS_SWE
 @pytest.mark.parametrize("variant", ["germany", "chart13"])
 def test_solar_clock_provenance_and_instant_reach_native_services_and_directions(
-    variant,
-):
+    variant: str,
+) -> None:
     data = dict(
         birth_year=1879,
         birth_month=5,
@@ -228,6 +237,8 @@ def test_solar_clock_provenance_and_instant_reach_native_services_and_directions
             analysis_datetime=datetime(1879, 5, 14, 22, 20, tzinfo=timezone.utc),
             birth_time_uncertainty_minutes=0,
         )
+    else:
+        pass
     result = calculate_core_chart_analysis(**data, chart_variant=variant)
     base = result["base_chart"] if variant == "germany" else result
     receipt = base["person_info"]["clock_conversion"]
@@ -248,11 +259,108 @@ def test_solar_clock_provenance_and_instant_reach_native_services_and_directions
         assert result["time_sensitivity"]["status"] == "not_assessed"
 
 
+@HAS_SWE
+@pytest.mark.parametrize("offset_microseconds", [-1, 1], ids=["before", "after"])
+def test_historical_mean_solar_arc_orders_targets_with_the_same_native_tt_word(
+    offset_microseconds,
+) -> None:
+    # 23:00 LMT minus 10 degrees east at 240 seconds per degree.
+    center = datetime(1879, 5, 14, 22, 20, tzinfo=timezone.utc)
+    result = calculate_germany_chart_analysis(
+        birth_year=1879,
+        birth_month=5,
+        birth_day=14,
+        birth_hour=23,
+        birth_longitude=10,
+        birth_latitude=53.55,
+        birth_clock_basis="local_mean_solar",
+        analysis_datetime=center + timedelta(microseconds=offset_microseconds),
+        birth_time_uncertainty_minutes=0,
+    )
+    if offset_microseconds < 0:
+        assert result["error_code"] == "validation_error"
+        assert result["status_code"] == 400
+        assert result["retryable"] is False
+        assert result["error"] == (
+            "Solar arc supports target instants 0..150 Julian key years after birth"
+        )
+        return
+    else:
+        pass
+
+    solar = result["midpoint_analysis"]["solar_arc_analysis"]
+    profile = solar["profile"]
+    target_tt = solar["daily_meridian"]["profile"]["target_julian_day_tt"]
+    days = Fraction(1, 86_400_000_000)
+    assert profile["elapsed_calendar_days"] == float(days)
+    assert profile["key_years"] == float(days / Fraction(1461, 4))
+    assert target_tt == profile["birth_julian_day_tt"]
+    assert profile["progressed_julian_day_tt"] == profile["birth_julian_day_tt"]
+
+
+@HAS_SWE
+def test_historical_mean_solar_conversion_keeps_native_seconds_before_rounding() -> (
+    None
+):
+    wall = datetime(1894, 4, 18, 9, 15, 27)
+    longitude = float.fromhex("0x1.5500000000000p-24")
+    seconds = Fraction(27) - Fraction(longitude) * 240
+    native_tt, native_ut1 = runtime.ephemeris_call(
+        "utc_to_jd", 1894, 4, 18, 9, 15, float(seconds), runtime.swe.GREG_CAL
+    )
+    epoch, _ = resolve_solar_epoch(wall, longitude, "local_mean_solar")
+    assert epoch.source_calendar is not None
+    expected_day = (
+        wall.toordinal() + Fraction(3442849, 2) + (9 * 3600 + 15 * 60 + seconds) / 86400
+    )
+    assert epoch.source_calendar.day == expected_day
+    assert (epoch.time.jd_tt, epoch.time.jd_ut1) == (native_tt, native_ut1)
+    assert epoch.utc_datetime == datetime(
+        1894, 4, 18, 9, 15, 26, 999981, tzinfo=timezone.utc
+    )
+
+
+@HAS_SWE
+@pytest.mark.parametrize("longitude, admitted", [(1 / 2048, False), (3 / 2048, True)])
+def test_historical_solar_arc_uses_exact_mean_clock_at_the_rounded_label(
+    longitude, admitted: bool
+) -> None:
+    wall = datetime(1894, 4, 18, 9, 15, 27, tzinfo=timezone.utc)
+    target = wall - timedelta(microseconds=round(Fraction(longitude) * 240 * 1_000_000))
+    result = calculate_germany_chart_analysis(
+        birth_year=wall.year,
+        birth_month=wall.month,
+        birth_day=wall.day,
+        birth_hour=wall.hour,
+        birth_minute=wall.minute,
+        birth_second=wall.second,
+        birth_longitude=longitude,
+        birth_latitude=41.5,
+        birth_clock_basis="local_mean_solar",
+        analysis_datetime=target,
+        birth_time_uncertainty_minutes=0,
+    )
+    if not admitted:
+        assert result["error_code"] == "validation_error"
+        assert result["error"] == (
+            "Solar arc supports target instants 0..150 Julian key years after birth"
+        )
+        return
+    else:
+        pass
+
+    profile = result["midpoint_analysis"]["solar_arc_analysis"]["profile"]
+    days = Fraction(1, 172_800_000_000)
+    assert profile["elapsed_calendar_days"] == float(days)
+    assert profile["key_years"] == float(days / Fraction(1461, 4))
+    assert profile["progressed_julian_day_tt"] == profile["birth_julian_day_tt"]
+
+
 @pytest.mark.parametrize(
     "conflict", [{"birth_timezone": "UTC"}, {"use_true_solar_time": True}]
 )
 @pytest.mark.parametrize("model", [AstroGermanyRequest, AstroChartPolyRequest])
-def test_conflicting_clock_definitions_are_rejected(conflict, model):
+def test_conflicting_clock_definitions_are_rejected(conflict, model) -> None:
     data = dict(
         birth_year=1879,
         birth_month=5,
@@ -265,11 +373,13 @@ def test_conflicting_clock_definitions_are_rejected(conflict, model):
     )
     if model is AstroChartPolyRequest:
         data["chart_variant"] = "germany"
+    else:
+        pass
     with pytest.raises(ValidationError, match="Local solar birth clocks"):
         model.model_validate(data)
 
 
-def test_ambiguous_original_clock_basis_is_not_guessed_from_a_label():
+def test_ambiguous_original_clock_basis_is_not_guessed_from_a_label() -> None:
     with pytest.raises(ValidationError):
         AstroGermanyRequest.model_validate(
             dict(
@@ -285,7 +395,7 @@ def test_ambiguous_original_clock_basis_is_not_guessed_from_a_label():
 
 
 @pytest.mark.parametrize("variant", ["chart", "hellen_chart", "guolao_chart"])
-def test_chart_variants_enforce_declared_solar_input_scope(variant):
+def test_chart_variants_enforce_declared_solar_input_scope(variant: str) -> None:
     data = dict(
         birth_year=1879,
         birth_month=5,
@@ -305,12 +415,14 @@ def test_chart_variants_enforce_declared_solar_input_scope(variant):
         with pytest.raises(ValidationError):
             AstroChartPolyRequest.model_validate({**data, "birth_timezone": "UTC"})
         return
+    else:
+        pass
     with pytest.raises(ValidationError, match="Noncivil birth_clock_basis"):
         AstroChartPolyRequest.model_validate(data)
 
 
 @HAS_SWE
-def test_unrepresentable_utc_leap_second_is_not_shifted_to_an_adjacent_label():
+def test_unrepresentable_utc_leap_second_is_not_shifted_to_an_adjacent_label() -> None:
     wall = datetime(2017, 1, 1)
     midnight = ephemeris_time(wall.replace(tzinfo=timezone.utc)).jd_tt
     during_leap_ut1 = ut1_from_tt(midnight - 0.5 / 86400)
@@ -321,10 +433,12 @@ def test_unrepresentable_utc_leap_second_is_not_shifted_to_an_adjacent_label():
 
 
 @HAS_SWE
-def test_local_solar_clock_cli_flag_does_not_require_a_fake_civil_timezone(capsys):
+def test_local_solar_clock_cli_flag_does_not_require_a_fake_civil_timezone(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     code = run(
         [
-            "astro_germany_chart",
+            "hamburg_midpoint_chart",
             "--birth-year",
             "1879",
             "--birth-month",
@@ -358,14 +472,14 @@ def test_local_solar_clock_cli_flag_does_not_require_a_fake_civil_timezone(capsy
 )
 def test_lmt_dates_outside_datetime_range_are_rejected_instead_of_wrapped(
     wall, longitude
-):
+) -> None:
     with pytest.raises(ValueError):
         resolve_solar_birth_clock(wall, longitude, "local_mean_solar")
 
 
 def test_missing_astronomical_backend_cannot_fabricate_an_apparent_solar_instant(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setattr(runtime, "swe", None)
     with pytest.raises(ValueError, match="Swiss Ephemeris"):
         resolve_solar_birth_clock(

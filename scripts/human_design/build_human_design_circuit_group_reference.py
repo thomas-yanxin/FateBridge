@@ -30,6 +30,8 @@ class Page(HTMLParser):
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
         if tag == "h4":
             self.heading, self.parts, self.key = tag, [], None
+        else:
+            pass
 
     def handle_data(self, text: str) -> None:
         self.content.append(text)
@@ -37,18 +39,26 @@ class Page(HTMLParser):
             self.parts.append(text)
         elif self.key:
             self.entries[self.key].append(text)
+        else:
+            pass
 
     def handle_endtag(self, tag: str) -> None:
         if tag == self.heading:
             self.key = " ".join("".join(self.parts).split())
             if self.key in self.entries:
                 raise ValueError("Duplicate glossary heading")
+            else:
+                pass
             self.entries[self.key] = []
             self.heading = None
+        else:
+            pass
 
     def entry(self, key: str) -> str:
         if key not in self.entries:
             raise ValueError("Required glossary heading absent: " + key)
+        else:
+            pass
         return " ".join(" ".join(self.entries[key]).split())
 
 
@@ -63,22 +73,30 @@ def build(dictionary_html: Path, overview_html: Path) -> dict[str, Any]:
         for token in ("Knowing Circuit", "Centering Circuit", "Integration Channels")
     ):
         raise ValueError("Individual membership source anchors absent")
+    else:
+        pass
     collective = dictionary.entry("Collective")
     groups = dictionary.entry("Circuit Group")
     if not all(
         token in collective for token in ("Understanding Circuit", "Sensing Circuit")
     ):
         raise ValueError("Collective membership source anchors absent")
+    else:
+        pass
     if "Tribal (Tribal and Defense)" not in groups or not (
         "Tribal Ego Circuit" in dictionary.entry("Ego Circuit")
         and "minor Tribal Circuit" in dictionary.entry("Defense Circuit")
     ):
         raise ValueError("Tribal membership source anchors absent")
+    else:
+        pass
     overview_text = " ".join(" ".join(overview.content).split())
     start = overview_text.index("Individual Circuit Group (Empowerment)")
     end = overview_text.index("Collective Circuit Group (Sharing)", start)
     if "plus the Integration Channel" not in overview_text[start:end]:
         raise ValueError("Independent overview Integration anchor absent")
+    else:
+        pass
     return {
         "method_id": "jovian_public_circuit_group_membership_2026_v1",
         "publisher": "Jovian Archive",
@@ -134,6 +152,8 @@ def main() -> None:
     if args.check:
         if target.read_text() != text:
             raise SystemExit("Circuit-group source facts changed")
+        else:
+            pass
     else:
         target.write_text(text)
     print(
@@ -145,3 +165,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+else:
+    pass

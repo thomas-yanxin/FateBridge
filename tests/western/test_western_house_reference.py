@@ -17,7 +17,7 @@ REFERENCE = json.loads(
 
 
 @pytest.mark.parametrize("case", REFERENCE["cases"])
-def test_independent_erfa_vector_axes_across_the_complete_frozen_grid(case):
+def test_independent_erfa_vector_axes_across_the_complete_frozen_grid(case) -> None:
     p = case["input"]
     _, angles = runtime.ephemeris_call(
         "houses_ex", p["jd_ut1"], p["latitude"], p["longitude"], b"E"
@@ -29,7 +29,9 @@ def test_independent_erfa_vector_axes_across_the_complete_frozen_grid(case):
         )
 
 
-def test_full_independent_audit_retains_future_and_polar_cases_and_detects_false_angles():
+def test_full_independent_audit_retains_future_and_polar_cases_and_detects_false_angles() -> (
+    None
+):
     result = audit(REFERENCE)
     assert result["angle_count"] == len(REFERENCE["cases"]) == 126
     assert result["house_comparison_count"] == 13 * 126

@@ -1,53 +1,38 @@
-"""Private cache identity for the solar solver's selected data environment.
-
-Native data identity uses filesystem metadata, not an atomic-read guarantee
-or an accuracy claim. The loaded civil-clock profile uses a content hash.
-The Sun/Earth calculation may consume planetary, lunar or selected JPL data.
-"""
+"""Private cache identity for the solar solver's loaded clock and orbit data."""
 
 from __future__ import annotations
 
-import hashlib
 import json
+from types import ModuleType
 from typing import Any
 
-from .ephemeris_paths import ephemeris_search_directories
-from .ephemeris_runtime import effective_ephemeris_search_path
-from .jpl_ephemeris import configured_jpl_file
+from fatebridge.core import solar_model_policy
+from fatebridge.core.astro import historical_utc, utc_policy
+from fatebridge.core.ephemeris_paths import ephemeris_search_directories
+from fatebridge.core.ephemeris_runtime import effective_ephemeris_search_path
+from fatebridge.core.jpl_ephemeris import configured_jpl_file
 
 
 def loaded_clock_profile_key() -> str:
-    """Identify the tables actually consumed, including historical UTC drift.
-
-    Reading their files again could fingerprint a new disk version while the
-    conversion functions still hold older, cached contents. This key describes
-    loaded data; it neither authenticates the source nor proves atomic reads.
-    """
-    from fatebridge.core.astro.utc_policy import leap_table
-
-    from .astro.historical_utc import historical_utc_table, utc1960_table
-
-    return hashlib.sha256(
-        json.dumps(
-            {
-                "leap_seconds": leap_table(),
-                "utc_1960": utc1960_table(),
-                "utc_1961_1971": historical_utc_table(),
-            },
-            sort_keys=True,
-            separators=(",", ":"),
-        ).encode()
-    ).hexdigest()
+    """Snapshot the loaded coefficients and metadata used by clock calculations."""
+    return json.dumps(
+        (
+            utc_policy.leap_table(),
+            utc_policy.utc_definition_source(),
+            historical_utc.utc1960_table(),
+            historical_utc.historical_utc_table(),
+        ),
+        sort_keys=True,
+        separators=(",", ":"),
+    )
 
 
 def solar_term_cache_context(
-    module: Any, *, year: int | None = None, native_only: bool = False
+    module: ModuleType | None, *, year: int | None = None, native_only: bool = False
 ) -> tuple[Any, ...]:
     # Validate strict mode even when a prior default year is already cached.
     jpl_file = configured_jpl_file()
-    from .solar_model_policy import solar_model_cache_key, solar_model_policy
-
-    mode = "native" if native_only else solar_model_policy()
+    mode = "native" if native_only else solar_model_policy.solar_model_policy()
     if jpl_file is not None and mode in {
         "swiss",
         "analytic",
@@ -62,27 +47,37 @@ def solar_term_cache_context(
         raise ValueError(
             f"Explicit {label} solar mode conflicts with strict JPL selection"
         )
+    else:
+        pass
     # An explicit native reobservation must not load an unrelated configured
     # analytic/SPK source merely to fingerprint its native data candidates.
     solar_model = (
         "native_observation_only"
         if native_only
         else (
-            solar_model_cache_key(year=year)
+            solar_model_policy.solar_model_cache_key(year=year)
             if year is not None
-            else solar_model_cache_key()
+            else solar_model_policy.solar_model_cache_key()
         )
     )
     if jpl_file is not None and module is None:
-        raise ImportError(
+        raise ModuleNotFoundError(
             "Swiss Ephemeris is required for explicitly selected JPL mode"
         )
+    else:
+        pass
     clock_profile = loaded_clock_profile_key()
     selected = effective_ephemeris_search_path()
+    search_path = selected or "."
     entries = []
-    for directory in ephemeris_search_directories(selected or "."):
+    depths: dict[str, int] = {}
+    for index, directory in enumerate(ephemeris_search_directories(search_path)):
         path = directory.absolute()
-        files: list[tuple[Any, ...]] = []
+        files: list[
+            tuple[str, int, int, int, int, int]
+            | tuple[str, str, int | None]
+            | tuple[str, int | None]
+        ] = []
         try:
             candidates = {
                 p for pattern in ("sepl*.se1", "semo*.se1") for p in path.glob(pattern)
@@ -93,7 +88,20 @@ def solar_term_cache_context(
             )
             if jpl_file is not None:
                 candidates.add(path / jpl_file)
+            else:
+                pass
             for candidate in sorted(candidates):
+                name = candidate.name
+                if name not in depths:
+                    depths[name] = len(
+                        ephemeris_search_directories(search_path, filename=name)
+                    )
+                else:
+                    pass
+                if index >= depths[name]:
+                    continue
+                else:
+                    pass
                 try:
                     stat = candidate.stat()
                     files.append(

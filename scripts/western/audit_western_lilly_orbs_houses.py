@@ -7,9 +7,9 @@ import zipfile
 from fractions import Fraction
 from pathlib import Path
 
-from fatebridge.core.astrology_horary import _applying_aspect
-from fatebridge.core.lilly_houses import house_condition
-from fatebridge.core.lilly_orbs import full_orbs, pair_radius
+from fatebridge.core.astro.astrology_horary import _applying_aspect
+from fatebridge.core.astro.lilly_houses import house_condition
+from fatebridge.core.astro.lilly_orbs import full_orbs, pair_radius
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -26,9 +26,13 @@ def audit():
             source_checks.append({**row, "passed": passed})
             if not passed:
                 failures.append(f"source:{row['page']}.{row['type']}")
+            else:
+                pass
     for profile, table in reference["orb_tables"].items():
         if full_orbs(profile) != table:
             failures.append(f"table:{profile}")
+        else:
+            pass
         for a in table:
             for b in table:
                 expected = (Fraction(str(table[a])) + Fraction(str(table[b]))) / 2
@@ -44,6 +48,8 @@ def audit():
                 )
                 if actual != expected:
                     failures.append(f"pair:{profile}:{a}:{b}")
+                else:
+                    pass
     counterexamples = []
     for row in reference["counterexamples"]:
         states = [
@@ -58,6 +64,8 @@ def audit():
         counterexamples.append({**row, "observed_after": results, "passed": passed})
         if not passed:
             failures.append(f"counterexample:{row['kind']}")
+        else:
+            pass
     house_checks = []
     for rank, house in enumerate(reference["p48_house_strength_order"], 1):
         actual = house_condition(house, "R", "Tropic")
@@ -70,6 +78,8 @@ def audit():
         house_checks.append({"actual": actual, "passed": passed})
         if not passed:
             failures.append(f"house:{house}")
+        else:
+            pass
     return {
         "scope": "Named manually transcribed p107 tables, arithmetic and pp48/115 house rows only. Shared rows are not independent astronomical observations; not a whole-method acceptance audit.",
         "fixture_sha256": hashlib.sha256(fixture.read_bytes()).hexdigest(),
@@ -108,3 +118,5 @@ def main():
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

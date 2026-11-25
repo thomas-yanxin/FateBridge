@@ -10,10 +10,11 @@ import pytest
 from pydantic import ValidationError
 
 from fatebridge.application.examples import suggested_fields
-from fatebridge.core.output_strength_thresholds import (
+from fatebridge.core.contracts.output_strength_thresholds import (
     PhysicalRootUnitComparison,
     StrengthThresholdArithmetic,
 )
+from fatebridge.core.elements import ElementAnalysis
 from fatebridge.core.strength import DEFAULT_POLICY, _evaluate
 from fatebridge.core.strength_thresholds import threshold_snapshot_lines
 from tests.support.bazi_strength_reference_v3 import reconstruct, seasonal_phases
@@ -45,7 +46,9 @@ def evaluate(values, policy=DEFAULT_POLICY):
 
 
 @pytest.mark.parametrize("index", sorted(SELECTED))
-def test_first_counterexamples_keep_root_predicates_and_current_exact_arithmetic(index):
+def test_first_counterexamples_keep_root_predicates_and_current_exact_arithmetic(
+    index,
+) -> None:
     first = EXAMPLES[index]
     current = evaluate(first["pillars"])
     receipt = current["threshold_arithmetic"]
@@ -79,11 +82,30 @@ def test_first_counterexamples_keep_root_predicates_and_current_exact_arithmetic
     )
 
 
+def test_root_load_regression_keeps_ordinary_preferences_pending() -> None:
+    first = EXAMPLES[15172]
+    chart = dict(zip(("year", "month", "day", "hour"), map(tuple, first["pillars"])))
+    result = ElementAnalysis.analyze_day_master_strength(chart)
+    assessment = result["assessment"]
+    assert assessment["strength_level"] == first["expected_grade"] == "弱"
+    assert assessment["threshold_arithmetic"]["numerical_label"] == "弱"
+    assert assessment["ordinary_fuyi_requires_review"] is True
+    assert ElementAnalysis.get_engineering_favorable_elements(result) == []
+    assert ElementAnalysis.get_favorable_elements(result) == []
+    assert result["classical_adjudication"]["status"] == "not_adjudicated"
+    assert (
+        assessment["threshold_arithmetic"]["physical_root_unit_comparison"][
+            "masses_exact"
+        ]
+        == first["exact_root_masses"]
+    )
+
+
 @pytest.mark.parametrize("case", BOUNDARIES, ids=lambda r: str(r["index"]))
 @pytest.mark.parametrize("budget,expected", [(1.7, False), (2.0, True), (2.3, True)])
 def test_same_existing_unit_boundary_is_bracketed_without_an_epsilon(
-    case, budget, expected
-):
+    case, budget: float, expected: bool
+) -> None:
     current = evaluate(case["pillars"], replace(DEFAULT_POLICY, branch_budget=budget))
     root = current["threshold_arithmetic"]["physical_root_unit_comparison"]
     assert root["unit_threshold_exact"] == "1"
@@ -114,7 +136,7 @@ def test_same_existing_unit_boundary_is_bracketed_without_an_epsilon(
         {"quantity_kind": "classical_effective_root_force"},
     ],
 )
-def test_root_receipt_cannot_move_thresholds_or_invent_classical_force(patch):
+def test_root_receipt_cannot_move_thresholds_or_invent_classical_force(patch) -> None:
     with pytest.raises(ValidationError):
         PhysicalRootUnitComparison.model_validate(patch)
     PhysicalRootUnitComparison.model_validate({"masses_exact": {"金": "1"}})
@@ -124,8 +146,8 @@ def test_root_receipt_cannot_move_thresholds_or_invent_classical_force(patch):
 @pytest.mark.parametrize("legacy", [False, True])
 @pytest.mark.parametrize("field", ["rooted_controller_stems", "rooted_wealth_visible"])
 def test_complete_receipt_cannot_miscount_same_run_visible_financial_or_control_stems(
-    legacy, field
-):
+    legacy: bool, field: str
+) -> None:
     receipt = copy.deepcopy(
         evaluate(EXAMPLES[399737]["pillars"])["threshold_arithmetic"]
     )
@@ -140,8 +162,8 @@ def test_complete_receipt_cannot_miscount_same_run_visible_financial_or_control_
 
 @pytest.mark.parametrize("case", PUBLIC, ids=lambda r: r["id"])
 def test_all_selected_calendar_reproductions_and_eleven_entries_actual_transports(
-    case, rest, tmp_path, capsys
-):
+    case, rest, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     spec = SPECS[case["tool"]]
     fields = suggested_fields(spec, view="root_predicates")
     assert len(fields) == 5
@@ -186,7 +208,11 @@ def test_all_selected_calendar_reproductions_and_eleven_entries_actual_transport
             verify_identity(
                 value["result_delivery"], value["run_metadata"], rest_manifest
             )
+        else:
+            pass
         payloads.append(file_payload(value, rest_manifest, tmp_path, "rest"))
+    else:
+        pass
     for value in payloads:
         spec.output_model.model_validate(value)
     assert all(business(value) == business(payloads[0]) for value in payloads)

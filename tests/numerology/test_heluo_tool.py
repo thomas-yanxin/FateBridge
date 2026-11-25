@@ -13,15 +13,16 @@ Two parity goldens, both produced by horosa's own `heluoLocal.js` / `runHeluo`:
 
 from __future__ import annotations
 
-from fatebridge.core.heluo import (
+from fatebridge.core.heluo.heluo import (
     calculate,
+    transform_houtian,
 )
 from fatebridge.services.divination import calculate_heluo_analysis
 
 _CASE1 = {"year": "甲子", "month": "丁卯", "day": "庚申", "hour": "庚辰"}
 
 
-def test_heluo_documented_anchors():
+def test_heluo_documented_anchors() -> None:
     """heluoLocal.js:3-4 算例：甲子…→天風姤/上九；丁巳…→水風井。"""
     c1 = calculate(
         four_pillars=_CASE1, gender="男", hour_zhi="辰", birth_year=1924, month_zhi="卯"
@@ -39,7 +40,7 @@ def test_heluo_documented_anchors():
     assert c2["xian"]["name"] == "水風井"
 
 
-def test_heluo_service_shape():
+def test_heluo_service_shape() -> None:
     result = calculate_heluo_analysis(
         date="2000-05-15", time="09:33:00", zone="+08:00", gender="男", lon="121e28"
     )
@@ -51,9 +52,8 @@ def test_heluo_service_shape():
     assert set(result["four_pillars"]) == {"year", "month", "day", "hour"}
 
 
-def test_heluo_zhizun_bian_er_bu_yi():
+def test_heluo_zhizun_bian_er_bu_yi() -> None:
     """三至尊卦(坎為水/水雷屯/水山蹇) 九五阴令/上六阳令『变而不易』特例覆盖。"""
-    from fatebridge.core.heluo import transform_houtian
 
     lines = [0, 1, 0, 0, 1, 0]  # 坎為水
     # 上六(yuan=6) + 阳令 → 变而不易：只翻爻、不互换上下卦、元堂位不动。

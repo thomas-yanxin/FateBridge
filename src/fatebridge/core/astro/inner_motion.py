@@ -5,7 +5,7 @@ from __future__ import annotations
 import math
 from importlib.metadata import version
 from pathlib import Path
-from typing import Any, Dict, Optional, Sequence, Tuple
+from typing import Any, Sequence
 
 from fatebridge.core.astro import reference_frames, runtime
 from fatebridge.core.astro.continuous_lahiri import frame_state
@@ -38,9 +38,9 @@ def complete_inner_rate(
     model: str,
     *,
     sidereal: bool = False,
-    source_trace: Optional[PhysicalEphemerisTrace] = None,
-) -> Tuple[Optional[float], Dict[str, Any]]:
-    policy: Dict[str, Any] = {
+    source_trace: PhysicalEphemerisTrace | None = None,
+) -> tuple[float | None, dict[str, Any]]:
+    policy: dict[str, Any] = {
         "method_id": METHOD_ID,
         "epoch_jd_tt": epoch,
         "ephemeris_model": model,
@@ -56,24 +56,34 @@ def complete_inner_rate(
         "scope": "Derivative of the declared unrounded source model on its recorded local polynomial and solar-mass branches, plus the checked analytic date frame. The native numerical argument is retained without physical clock conversion. Displayed native positions are unchanged. Mathematical source agreement is not an observational or prediction certificate.",
     }
 
-    def unavailable(reason: str) -> Tuple[None, Dict[str, Any]]:
+    def unavailable(reason: str) -> tuple[None, dict[str, Any]]:
         policy.update(status="not_applied", reason=reason)
         return None, policy
 
     swe = runtime.swe
     if planet not in {"Mercury", "Venus"} or model != "jpl":
         return unavailable("unsupported_target_or_model")
+    else:
+        pass
     if swe is None or (
         str(swe.version),
         binding_distribution_version(swe, version),
     ) != ("2.10.03", "2.10.3.2"):
         return unavailable("unverified_native_version")
+    else:
+        pass
     if not math.isfinite(epoch) or not 1721425.5 <= epoch <= 5373485.5:
         return unavailable("outside_frame_model_domain")
+    else:
+        pass
     if epoch == 2451545.0:
         return unavailable("isolated_native_J2000_precession_identity_shortcut")
+    else:
+        pass
     if len(coordinates) != 6 or not all(math.isfinite(x) for x in coordinates):
         raise EphemerisSourceError("coordinate_values_unavailable")
+    else:
+        pass
 
     configuration = (configured_ephemeris_path(), configured_jpl_file())
     flags = swe.FLG_SWIEPH | swe.FLG_SPEED | (swe.FLG_SIDEREAL if sidereal else 0)
@@ -81,13 +91,19 @@ def complete_inner_rate(
     with runtime.preserve_ephemeris_path():
         if sidereal:
             runtime.ephemeris_call("set_sid_mode", swe.SIDM_LAHIRI, 0.0, 0.0)
+        else:
+            pass
         center, returned = runtime.ephemeris_call(
             "calc", epoch, PLANET_SWISSEPH_IDS[planet], flags
         )
         if runtime.ephemeris_model_from_retflag(returned) != model:
             raise EphemerisSourceError("coordinate_model_changed")
+        else:
+            pass
         if tuple(center) != tuple(coordinates):
             raise EphemerisSourceError("coordinate_motion_unavailable")
+        else:
+            pass
         file_context = tuple(swe.get_current_file_data(0))
         source_context = trace.observe(
             f"{planet}_analytic_inner_source", model, record_factor=False
@@ -116,6 +132,8 @@ def complete_inner_rate(
             )
             if runtime.ephemeris_model_from_retflag(earth_flags) != model:
                 raise EphemerisSourceError("coordinate_model_changed")
+            else:
+                pass
             raw = [
                 float(x) for x in source["earth_state"] + source["earth_acceleration"]
             ]
@@ -139,6 +157,8 @@ def complete_inner_rate(
                 or not all(math.isfinite(x) for x in native[:4])
             ):
                 raise EphemerisSourceError("coordinate_values_unavailable")
+            else:
+                pass
             mean_eps = math.degrees(
                 reference_frames.pair(epoch, "pepol", "peper")[0][1]
             )
@@ -157,13 +177,19 @@ def complete_inner_rate(
                     aya_flags
                 ) != model or not math.isfinite(aya):
                     raise EphemerisSourceError("coordinate_model_changed")
+                else:
+                    pass
                 model_errors.append(
                     abs(math.remainder(aya - frame["origin_degrees"], 360)) * 3600
                 )
                 origin, origin_d = -aya, -frame["origin_rate_degrees_per_TT_day"]
+            else:
+                pass
             rho2 = math.fsum(x * x for x in p[:2])
             if rho2 <= 0:
                 return unavailable("singular_ecliptic_longitude")
+            else:
+                pass
             lon = (math.degrees(math.atan2(p[1], p[0])) + origin) % 360
             lat = math.degrees(math.atan2(p[2], math.sqrt(rho2)))
             position_errors = [
@@ -176,8 +202,12 @@ def complete_inner_rate(
             )
             if max(model_errors) > FRAME_LINE_ARCSEC:
                 return unavailable("declared_native_frame_not_reproduced")
+            else:
+                pass
             if max(position_errors) > POSITION_LINE_ARCSEC:
                 return unavailable("continuous_source_display_position_not_reproduced")
+            else:
+                pass
             moving = reference_frames.mv(
                 reference_frames.mm(derivative, reference_frames.transpose(mean)), p
             )
@@ -186,6 +216,8 @@ def complete_inner_rate(
             complete = math.fsum((source_rate, frame_rate, origin_d))
             if not math.isfinite(complete):
                 raise EphemerisSourceError("coordinate_motion_unavailable")
+            else:
+                pass
             policy.update(
                 status="applied",
                 fixed_reception_source_rate_degrees_per_native_argument_day=source_rate,
@@ -206,10 +238,16 @@ def complete_inner_rate(
             assert_physical_configuration(configuration[0])
             if configured_jpl_file() != configuration[1]:
                 raise EphemerisSourceError("physical_configuration_changed")
+            else:
+                pass
             if tuple(replay) != tuple(center) or replay_flags != returned:
                 raise EphemerisSourceError("coordinate_motion_unavailable")
+            else:
+                pass
             if tuple(swe.get_current_file_data(0)) != file_context:
                 raise EphemerisSourceError("changed_during")
+            else:
+                pass
             policy.update(
                 center_native_states_reproduced_exactly=True,
                 center_file_context_reproduced_exactly=True,

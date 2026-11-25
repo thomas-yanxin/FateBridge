@@ -7,15 +7,15 @@ from pathlib import Path
 
 import pytest
 
-import fatebridge.core.guolao_table_usage as module
-from fatebridge.core.guolao_nijl_grid import compare_intro_examples, literal_cell
+import fatebridge.core.guolao.guolao_table_usage as module
+from fatebridge.core.guolao.guolao_nijl_grid import compare_intro_examples, literal_cell
 
 ROOT = Path(__file__).resolve().parents[2]
 FIXTURE = ROOT / "tests/fixtures/guolao-table-usage-v1"
 REFERENCE = "039c00fc3a036ef94b14493c9f7283f667a0d2114934bab34c945c79ab72e746"
 
 
-def test_held_originals_native_pixel_views_and_complete_prior_probe_are_bound():
+def test_held_originals_native_pixel_views_and_complete_prior_probe_are_bound() -> None:
     raw = (FIXTURE / "reference-complete-labels-before-domain-change.json").read_bytes()
     assert hashlib.sha256(raw).hexdigest() == REFERENCE
     data = module._data()
@@ -45,7 +45,7 @@ def test_held_originals_native_pixel_views_and_complete_prior_probe_are_bound():
             assert "国文学研究資料館提供" in view["credit"]
 
 
-def test_all360_contexts_match_prior_token_probe_without_mutating_raw_cells():
+def test_all360_contexts_match_prior_token_probe_without_mutating_raw_cells() -> None:
     reference = json.loads(
         (FIXTURE / "reference-complete-labels-before-domain-change.json").read_text()
     )
@@ -76,8 +76,8 @@ def test_all360_contexts_match_prior_token_probe_without_mutating_raw_cells():
     [("虚", 6, [6, 15, 26], 15, 12), ("女", 3, [9, 18, 29], 29, 21)],
 )
 def test_all_source_numerals_are_kept_before_context_restricts_the_candidates(
-    mansion, label, numeral_columns, column, anchor
-):
+    mansion: str, label: int, numeral_columns, column: int, anchor: int
+) -> None:
     result = module.locate_label(
         palace="子", mansion=mansion, label=label, context_policy=module.POLICY
     )
@@ -88,7 +88,7 @@ def test_all_source_numerals_are_kept_before_context_restricts_the_candidates(
     assert not result["target_based_ranking"]
 
 
-def test_both_original_numeric_counterexamples_survive_source_label_location():
+def test_both_original_numeric_counterexamples_survive_source_label_location() -> None:
     before = compare_intro_examples()
     result = module.audit_intro_usage(context_policy=module.POLICY)
     assert result["existing_literal_comparison"] == before
@@ -122,8 +122,8 @@ def test_both_original_numeric_counterexamples_survive_source_label_location():
 
 
 def test_an_initial_target_is_unknown_numeric_semantics_not_a_known_counterexample(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     rows = copy.deepcopy(module._contexts())
     target = next(r for r in rows if (r["palace"], r["column"]) == ("午", 15))
     target["literal_label"] = "初"
@@ -133,7 +133,9 @@ def test_an_initial_target_is_unknown_numeric_semantics_not_a_known_counterexamp
     assert not case["all_candidate_targets_are_numeric_counterexamples"]
 
 
-def test_no_source_candidate_is_not_a_vacuous_success_or_a_default_column(monkeypatch):
+def test_no_source_candidate_is_not_a_vacuous_success_or_a_default_column(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     rows = [r for r in module._contexts() if (r["palace"], r["column"]) != ("子", 15)]
     monkeypatch.setattr(module, "_contexts", lambda: rows)
     case = module.audit_intro_usage(context_policy=module.POLICY)["cases"][0]
@@ -145,8 +147,8 @@ def test_no_source_candidate_is_not_a_vacuous_success_or_a_default_column(monkey
 
 
 def test_multiple_conditional_source_positions_are_retained_without_target_ranking(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     rows = copy.deepcopy(module._contexts())
     extra = next(r for r in rows if (r["palace"], r["column"]) == ("子", 16))
     extra["literal_label"] = 6
@@ -166,7 +168,9 @@ def test_multiple_conditional_source_positions_are_retained_without_target_ranki
     "palace,mansion,column",
     [("辰", "氐", 1), ("申", "觜", 19), ("亥", "奎", 1)],
 )
-def test_initial_queries_retain_the_initial_glyph_without_zero(palace, mansion, column):
+def test_initial_queries_retain_the_initial_glyph_without_zero(
+    palace: str, mansion: str, column: int
+) -> None:
     result = module.locate_label(
         palace=palace, mansion=mansion, label="初", context_policy=module.POLICY
     )
@@ -176,7 +180,9 @@ def test_initial_queries_retain_the_initial_glyph_without_zero(palace, mansion, 
 
 
 @pytest.mark.parametrize("bad", [None, "", "default", "accepted"])
-def test_policy_is_required_and_cannot_be_upgraded_to_an_accepted_method(bad):
+def test_policy_is_required_and_cannot_be_upgraded_to_an_accepted_method(
+    bad: str | None,
+) -> None:
     with pytest.raises(ValueError, match="假设"):
         module.conditional_contexts(context_policy=bad)
 
@@ -194,13 +200,15 @@ def test_policy_is_required_and_cannot_be_upgraded_to_an_accepted_method(bad):
         dict(label="6"),
     ],
 )
-def test_inputs_never_round_alias_or_guess_source_labels(change):
+def test_inputs_never_round_alias_or_guess_source_labels(change) -> None:
     args = dict(palace="子", mansion="虚", label=6, context_policy=module.POLICY)
     with pytest.raises(ValueError):
         module.locate_label(**{**args, **change})
 
 
-def test_changed_usage_notes_and_changed_bound_grid_are_rejected(monkeypatch, tmp_path):
+def test_changed_usage_notes_and_changed_bound_grid_are_rejected(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     changed = json.loads(module.DATA.read_text())
     changed["ma591_note_palaces"].append("午")
     path = tmp_path / "changed.json"

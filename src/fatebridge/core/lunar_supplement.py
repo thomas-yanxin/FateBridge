@@ -12,7 +12,6 @@ from dataclasses import dataclass
 from datetime import date
 from functools import lru_cache
 from importlib.resources import files
-from typing import Optional
 
 START = date(2100, 2, 9)
 END = date(2100, 12, 31)
@@ -41,6 +40,8 @@ def _load() -> _Supplement:
         or raw["lunar_year"] != 2100
     ):
         raise ValueError("农历补充年表的版本或范围不一致")
+    else:
+        pass
     starts = tuple(date.fromisoformat(m["solar_start"]) for m in raw["months"])
     months = tuple(m["month"] for m in raw["months"])
     leap = tuple(m["is_leap_month"] for m in raw["months"])
@@ -52,6 +53,8 @@ def _load() -> _Supplement:
         or any(type(v) is not bool or v for v in leap)
     ):
         raise ValueError("2100年官方农历月首数据不完整或无序")
+    else:
+        pass
     source = raw["source"]
     return _Supplement(
         starts,
@@ -70,9 +73,11 @@ def _load() -> _Supplement:
     )
 
 
-def convert(solar_date: date) -> Optional[tuple[int, int, int, bool]]:
+def convert(solar_date: date) -> tuple[int, int, int, bool] | None:
     if not START <= solar_date <= END:
         return None
+    else:
+        pass
     data = _load()
     index = bisect_right(data.starts, solar_date) - 1
     return (
@@ -83,5 +88,5 @@ def convert(solar_date: date) -> Optional[tuple[int, int, int, bool]]:
     )
 
 
-def source_for(solar_date: date) -> Optional[dict[str, str]]:
+def source_for(solar_date: date) -> dict[str, str] | None:
     return dict(_load().source) if START <= solar_date <= END else None

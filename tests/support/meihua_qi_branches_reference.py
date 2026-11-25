@@ -45,16 +45,22 @@ def validate_branch_node(
     }
     if seasonal is not None:
         expected["month"].append(("seasonal_jie_month", seasonal["month_branch"]))
+    else:
+        pass
     if month is not None:
         expected["month"].append(
             ("nominal_lunar_month", PROFILE["nominal_month_labels"][str(month)])
         )
+    else:
+        pass
     day = layer.get("day_qi")
     if day is not None:
         expected["day"] = [
             (r["calendar"]["id"], r["calendar"]["day_branch"])
             for r in day["calendar_candidates"]
         ]
+    else:
+        pass
     for unit in UNITS:
         assert [(r["id"], r["branch"]) for r in labels[unit]] == expected[unit]
         for label in labels[unit]:
@@ -70,6 +76,8 @@ def validate_branch_node(
                 assert label["is_leap_month"] is result["meihua"][
                     "calendar_policy"
                 ].get("is_leap_month")
+            else:
+                pass
         assert node["input_label_branch_disagreement"][unit] is (
             len({r[1] for r in expected[unit]}) > 1
         )
@@ -93,6 +101,8 @@ def validate_branch_node(
         targets.append(
             ("reputation_body_without_attacker", "body", geometry["body"], "body_self")
         )
+    else:
+        pass
     actual = node["source_selected_role_references"]
     assert [
         (r["selector_id"], r["role"], r["trigram"], r["relation_to_original_body"])

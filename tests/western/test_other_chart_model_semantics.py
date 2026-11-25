@@ -3,6 +3,7 @@
 import asyncio
 import json
 import os
+from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
@@ -26,7 +27,8 @@ from fatebridge.core.fixed_stars import apparent_positions
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.errors import EphemerisSourceError
-from tests.astrodice.test_astrodice_jpl import jpl as jpl
+from tests.support.transports import call_calculation
+from tests.unit_test.fixtures.astrodice_jpl import jpl as jpl
 
 __all__ = ["jpl"]
 pytestmark = pytest.mark.skipif(e.swe is None, reason="Swiss Ephemeris required")
@@ -56,7 +58,9 @@ def empty(tmp_path, monkeypatch):
         e.configure_ephemeris_path(previous if previous is not None else "")
 
 
-def test_real_mean_node_returns_identical_coordinates_with_three_source_bits(empty):
+def test_real_mean_node_returns_identical_coordinates_with_three_source_bits(
+    empty,
+) -> None:
     coordinates, labels = [], []
     for requested in (e.swe.FLG_SWIEPH, e.swe.FLG_MOSEPH, e.swe.FLG_JPLEPH):
         values, returned = e.ephemeris_call(
@@ -74,7 +78,7 @@ def test_real_mean_node_returns_identical_coordinates_with_three_source_bits(emp
 
 
 @pytest.mark.parametrize("sidereal", [False, True])
-def test_node_does_not_make_a_moshier_chart_mixed(empty, sidereal):
+def test_node_does_not_make_a_moshier_chart_mixed(empty, sidereal: bool) -> None:
     birth = build_astro_birth_info(**BIRTH)
     base = build_core_chart_payload(birth, "chart13", zodiacal=int(sidereal))
     profile = base["chart_profile"]
@@ -91,7 +95,7 @@ def test_node_does_not_make_a_moshier_chart_mixed(empty, sidereal):
     assert set(native["physical_ephemeris_source"]["by_factor"]) == set(PHYSICAL_BODIES)
 
 
-def test_physical_summary_still_preserves_real_mixing_and_failed_bodies():
+def test_physical_summary_still_preserves_real_mixing_and_failed_bodies() -> None:
     node = {"North Node": ANALYTICAL_MEAN_NODE_MODEL}
     assert (
         physical_ephemeris_summary({**node, "Sun": "swieph", "Moon": "moshier"})
@@ -105,8 +109,8 @@ def test_physical_summary_still_preserves_real_mixing_and_failed_bodies():
 
 
 def test_native_node_does_not_claim_a_physical_ephemeris_for_approximate_planets(
-    empty, monkeypatch
-):
+    empty, monkeypatch: pytest.MonkeyPatch
+) -> None:
     actual = ephemeris._swisseph_planet_state
     monkeypatch.setattr(
         ephemeris,
@@ -126,7 +130,9 @@ def test_native_node_does_not_claim_a_physical_ephemeris_for_approximate_planets
 
 @pytest.mark.parametrize("sidereal", [False, True])
 @pytest.mark.parametrize("hypothetical", [False, True])
-def test_native_hamburg_loop_honors_real_strict_jpl_kernel(jpl, sidereal, hypothetical):
+def test_native_hamburg_loop_honors_real_strict_jpl_kernel(
+    jpl, sidereal: bool, hypothetical: bool
+) -> None:
     result = _native_factors(
         build_astro_birth_info(**BIRTH), sidereal, include_hypothetical=hypothetical
     )
@@ -145,8 +151,8 @@ def test_native_hamburg_loop_honors_real_strict_jpl_kernel(jpl, sidereal, hypoth
 
 @pytest.mark.parametrize("sidereal", [False, True])
 def test_fixed_star_observer_uses_jpl_and_restores_operator_configuration(
-    jpl, sidereal
-):
+    jpl, sidereal: bool
+) -> None:
     selected = os.environ["SE_EPHE_PATH"]
     positions, profile = apparent_positions(2451545.0, sidereal=sidereal)
     assert len(positions) == 20 and profile["status"] == "computed"
@@ -160,7 +166,9 @@ def test_fixed_star_observer_uses_jpl_and_restores_operator_configuration(
 
 
 @pytest.mark.parametrize("layer", ["hamburg", "stars"])
-def test_out_of_range_strict_jpl_is_a_source_failure_in_both_layers(jpl, layer):
+def test_out_of_range_strict_jpl_is_a_source_failure_in_both_layers(
+    jpl, layer: str
+) -> None:
     selected = os.environ["SE_EPHE_PATH"]
     with pytest.raises(EphemerisSourceError):
         if layer == "hamburg":
@@ -183,8 +191,13 @@ def test_out_of_range_strict_jpl_is_a_source_failure_in_both_layers(jpl, layer):
     ],
 )
 def test_model_semantics_cross_rest_mcp_cli(
-    jpl, tmp_path, monkeypatch, capsys, key, variant
-):
+    jpl,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    key: str,
+    variant: str | None,
+) -> None:
     spec = next(s for s in CATALOG if s.key == key)
     germany = key == "astro_germany" or variant == "germany"
     base = "base_chart.chart_profile" if germany else "chart_profile"
@@ -216,8 +229,8 @@ def test_model_semantics_cross_rest_mcp_cli(
 
     async def mcp():
         async with Client(create_mcp_app()) as client:
-            return await client.call_tool(
-                spec.tool_name, {**payload, **options}, raise_on_error=False
+            return await call_calculation(
+                client, spec.tool_name, {**payload, **options}, raise_on_error=False
             )
 
     protocol = asyncio.run(mcp())
@@ -257,3 +270,5 @@ def test_model_semantics_cross_rest_mcp_cli(
             node = next(p for p in native["factors"] if p["id"] == "North Node")
             assert node["model"] == ANALYTICAL_MEAN_NODE_MODEL
             assert node["native_return_flags"] & e.swe.FLG_JPLEPH
+        else:
+            pass

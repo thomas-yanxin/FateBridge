@@ -1,10 +1,13 @@
 """Public layered contract, including projection-compatible optional fields."""
 
-from typing import Dict, List, Literal, Optional
+from __future__ import annotations
+
+from typing import Annotated, Literal
 
 from pydantic import Field, ValidationInfo, model_validator
 
-from fatebridge.core.output_base import FullFact
+from fatebridge.core.contracts.output_base import FULL_FACT
+from fatebridge.core.fengshui.spatial_outputs import MeasuredLayoutOutput
 from fatebridge.core.response_models import (
     Object,
     PartialOutput,
@@ -13,247 +16,245 @@ from fatebridge.core.response_models import (
     SnapshotExport,
 )
 
-from .spatial_outputs import MeasuredLayoutOutput
-
 
 class RuleSource(PartialOutput):
-    # Only exposed as array items: projections select sources whole.
-    source_id: str
-    title: str
-    url: str
-    kind: str
-    scope: str
+    title: str | None = None
+    url: str | None = None
+    kind: str | None = None
+    author: str | None = None
+    author_identity_url: str | None = None
+    edition: str | None = None
+    isbn: str | None = None
 
 
 class Ruleset(PartialOutput):
-    ruleset_id: Optional[str] = None
-    version: Optional[str] = None
-    method: Optional[str] = None
-    source_ids: Optional[List[str]] = None
-    sources: Optional[List[RuleSource]] = None
-    scope: Optional[str] = None
-    conventions: Optional[List[str]] = None
-    bundle_version: Optional[str] = None
+    ruleset_id: str | None = None
+    version: str | None = None
+    method: str | None = None
+    source_ids: list[str] | None = None
+    source_citations: dict[str, Object] | None = None
+    scope: str | None = None
+    conventions: list[str] | None = None
+    bundle_version: str | None = None
 
 
 class Star(PartialOutput):
-    name: Optional[str] = None
-    element: Optional[str] = None
-    polarity: Optional[Literal["auspicious", "inauspicious"]] = None
+    name: str | None = None
+    element: str | None = None
+    polarity: Literal["auspicious", "inauspicious"] | None = None
 
 
 class Palace(PartialOutput):
-    direction: Optional[str] = None
-    palace_number: Optional[int] = None
-    trigram: Optional[str] = None
-    annual_star_number: Optional[int] = None
-    annual_star: Optional[Star] = None
-    star: Optional[Star] = None
-    you_nian_trace: Optional[Object] = None
-    palace_star_relationship: Optional[Object] = None
-    subject_id: Optional[str] = None
-    rule_id: Optional[str] = None
-    source_ids: Optional[List[str]] = None
+    direction: str | None = None
+    palace_number: int | None = None
+    trigram: str | None = None
+    annual_star_number: int | None = None
+    annual_star: Star | None = None
+    star: Star | None = None
+    you_nian_trace: Object | None = None
+    palace_star_relationship: Object | None = None
+    subject_id: str | None = None
+    rule_id: str | None = None
+    source_ids: list[str] | None = None
 
 
 class MingguaCandidate(PartialOutput):
-    gender_convention: Optional[Literal["male", "female"]] = None
-    raw_number: Optional[int] = None
-    palace_number: Optional[int] = None
-    substitution: Optional[bool] = None
-    trigram: Optional[str] = None
-    group: Optional[Literal["east", "west"]] = None
-    sectors: Optional[Dict[str, Palace]] = None
+    gender_convention: Literal["male", "female"] | None = None
+    raw_number: int | None = None
+    palace_number: int | None = None
+    substitution: bool | None = None
+    trigram: str | None = None
+    group: Literal["east", "west"] | None = None
+    sectors: dict[str, Palace] | None = None
 
 
 class PersonalChart(PartialOutput):
-    status: Optional[Literal["complete", "partial"]] = None
-    subject_id: Optional[str] = None
-    candidates: Optional[List[MingguaCandidate]] = None
-    time_context: Optional[Object] = None
-    missing_inputs: Optional[List[str]] = None
+    status: Literal["complete", "partial"] | None = None
+    subject_id: str | None = None
+    candidates: list[MingguaCandidate] | None = None
+    time_context: Object | None = None
+    missing_inputs: list[str] | None = None
 
 
 class HouseChart(PartialOutput):
-    object_id: Optional[str] = None
-    sitting_trigram: Optional[str] = None
-    north_reference: Optional[Literal["magnetic", "true"]] = None
-    sectors: Optional[Dict[str, Palace]] = None
-    candidate_id: Optional[str] = None
-    candidate_only: Optional[bool] = None
-    bearing_support: Optional[Object] = None
+    object_id: str | None = None
+    sitting_trigram: str | None = None
+    north_reference: Literal["magnetic", "true"] | None = None
+    sectors: dict[str, Palace] | None = None
+    candidate_id: str | None = None
+    candidate_only: bool | None = None
+    bearing_support: Object | None = None
 
 
 class Layer(PersonalChart):
-    geomagnetic_reference: Optional[Object] = None
-    ruleset: Optional[Ruleset] = None
-    house: Optional[HouseChart] = None
-    house_candidates: Optional[List[HouseChart]] = None
-    house_orientation_context: Optional[Object] = None
-    occupants: Optional[List[PersonalChart]] = None
-    placement_findings: Optional[List[Object]] = None
-    feature_findings: Optional[List[Object]] = None
-    preferences: Optional[Dict[str, Object]] = None
-    palaces: Optional[Dict[str, Palace]] = None
-    effective_year: Optional[int] = None
-    center_star_number: Optional[int] = None
-    current_period: Optional[Object] = None
-    directions: Optional[Dict[str, Object]] = None
-    bearing: Optional[Object] = None
+    geomagnetic_reference: Object | None = None
+    ruleset: Ruleset | None = None
+    house: HouseChart | None = None
+    house_candidates: list[HouseChart] | None = None
+    house_orientation_context: Object | None = None
+    occupants: list[PersonalChart] | None = None
+    placement_findings: list[Object] | None = None
+    feature_findings: list[Object] | None = None
+    preferences: dict[str, Object] | None = None
+    palaces: dict[str, Palace] | None = None
+    effective_year: int | None = None
+    center_star_number: int | None = None
+    current_period: Object | None = None
+    directions: dict[str, Object] | None = None
+    bearing: Object | None = None
 
 
 class NatalPalace(PartialOutput):
-    direction: Optional[str] = None
-    palace_number: Optional[int] = None
-    period_star_number: Optional[int] = None
-    mountain_star_number: Optional[int] = None
-    facing_star_number: Optional[int] = None
+    direction: str | None = None
+    palace_number: int | None = None
+    period_star_number: int | None = None
+    mountain_star_number: int | None = None
+    facing_star_number: int | None = None
 
 
 class NatalCandidate(PartialOutput):
-    candidate_id: Optional[str] = None
-    period_number: Optional[int] = None
-    facing: Optional[Object] = None
-    sitting: Optional[Object] = None
-    chart_mode: Optional[Literal["lower", "replacement"]] = None
-    mode_reason: Optional[str] = None
-    bearing_support: Optional[Object] = None
-    palaces: Optional[Dict[str, NatalPalace]] = None
-    period_chart: Optional[Dict[str, int]] = None
-    mountain_chart: Optional[Dict[str, int]] = None
-    facing_chart: Optional[Dict[str, int]] = None
-    trace: Optional[Dict[str, Object]] = None
-    flight_path: Optional[List[str]] = None
-    structure: Optional[Object] = None
+    candidate_id: str | None = None
+    period_number: int | None = None
+    facing: Object | None = None
+    sitting: Object | None = None
+    chart_mode: Literal["lower", "replacement"] | None = None
+    mode_reason: str | None = None
+    bearing_support: Object | None = None
+    palaces: dict[str, NatalPalace] | None = None
+    period_chart: dict[str, int] | None = None
+    mountain_chart: dict[str, int] | None = None
+    facing_chart: dict[str, int] | None = None
+    trace: dict[str, Object] | None = None
+    flight_path: list[str] | None = None
+    structure: Object | None = None
 
 
 class NatalLayer(PartialOutput):
-    source_comparison: Optional[Object] = None
-    city_gate_analysis: Optional[Object] = None
-    interpretation: Optional["NatalInterpretation"] = None
-    status: Optional[Literal["complete", "partial"]] = None
-    subject_id: Optional[str] = None
-    ruleset: Optional[Ruleset] = None
-    period_context: Optional[Object] = None
-    orientation_context: Optional[Object] = None
-    chart: Optional[NatalCandidate] = None
-    candidates: Optional[List[NatalCandidate]] = None
-    missing_inputs: Optional[List[str]] = None
-    interpretation_scope: Optional[str] = None
-    mountain_registry: Optional[List[Object]] = None
+    source_comparison: Object | None = None
+    city_gate_analysis: Object | None = None
+    interpretation: NatalInterpretation | None = None
+    status: Literal["complete", "partial"] | None = None
+    subject_id: str | None = None
+    ruleset: Ruleset | None = None
+    period_context: Object | None = None
+    orientation_context: Object | None = None
+    chart: NatalCandidate | None = None
+    candidates: list[NatalCandidate] | None = None
+    missing_inputs: list[str] | None = None
+    interpretation_scope: str | None = None
+    mountain_registry: list[Object] | None = None
 
 
 class MonthlyPalace(PartialOutput):
-    direction: Optional[str] = None
-    label: Optional[str] = None
-    palace_number: Optional[int] = None
-    trigram: Optional[str] = None
-    element: Optional[str] = None
-    monthly_star_number: Optional[int] = None
-    monthly_star: Optional[Object] = None
-    method: Optional[str] = None
-    rule_id: Optional[str] = None
-    source_ids: Optional[List[str]] = None
+    direction: str | None = None
+    label: str | None = None
+    palace_number: int | None = None
+    trigram: str | None = None
+    element: str | None = None
+    monthly_star_number: int | None = None
+    monthly_star: Object | None = None
+    method: str | None = None
+    rule_id: str | None = None
+    source_ids: list[str] | None = None
 
 
 class MonthlyLayer(PartialOutput):
-    status: Optional[Literal["complete", "partial"]] = None
-    ruleset: Optional[Ruleset] = None
-    time_context: Optional[Object] = None
-    year_branch: Optional[str] = None
-    year_group: Optional[Object] = None
-    center_star_number: Optional[int] = None
-    palaces: Optional[Dict[str, MonthlyPalace]] = None
-    flight_path: Optional[List[str]] = None
-    trace: Optional[Object] = None
-    position_reading: Optional[Object] = None
-    missing_inputs: Optional[List[str]] = None
-    interpretation_scope: Optional[str] = None
-    limitations: Optional[List[str]] = None
+    status: Literal["complete", "partial"] | None = None
+    ruleset: Ruleset | None = None
+    time_context: Object | None = None
+    year_branch: str | None = None
+    year_group: Object | None = None
+    center_star_number: int | None = None
+    palaces: dict[str, MonthlyPalace] | None = None
+    flight_path: list[str] | None = None
+    trace: Object | None = None
+    position_reading: Object | None = None
+    missing_inputs: list[str] | None = None
+    interpretation_scope: str | None = None
+    limitations: list[str] | None = None
 
 
 class Layers(PartialOutput):
-    directions: Optional[Layer] = None
-    minggua: Optional[Layer] = None
-    bazhai: Optional[Layer] = None
-    jinsuo: Optional[Layer] = None
-    annual_stars: Optional[Layer] = None
-    monthly_stars: Optional[MonthlyLayer] = None
-    xuankong_natal: Optional[NatalLayer] = None
+    directions: Layer | None = None
+    minggua: Layer | None = None
+    bazhai: Layer | None = None
+    jinsuo: Layer | None = None
+    annual_stars: Layer | None = None
+    monthly_stars: MonthlyLayer | None = None
+    xuankong_natal: NatalLayer | None = None
 
 
 class NatalInterpretation(PartialOutput):
-    status: Optional[Literal["complete", "partial"]] = None
-    ruleset_id: Optional[str] = None
-    timeliness_ruleset: Optional[Ruleset] = None
-    fixed_lingzheng_analysis: Optional[Object] = None
-    current_period_context: Optional[Object] = None
-    candidates: Optional[List[Object]] = None
-    missing_inputs: Optional[List[str]] = None
-    unsupported_queries: Optional[List[Object]] = None
-    rule_coverage_status: Optional[str] = None
-    overall_auspiciousness: Optional[str] = None
-    rule_trace: Optional[List[Object]] = None
-    limitations: Optional[List[str]] = None
+    status: Literal["complete", "partial"] | None = None
+    ruleset_id: str | None = None
+    timeliness_ruleset: Ruleset | None = None
+    fixed_lingzheng_analysis: Object | None = None
+    current_period_context: Object | None = None
+    candidates: list[Object] | None = None
+    missing_inputs: list[str] | None = None
+    unsupported_queries: list[Object] | None = None
+    rule_coverage_status: str | None = None
+    overall_auspiciousness: str | None = None
+    rule_trace: list[Object] | None = None
+    limitations: list[str] | None = None
 
 
 class PendingConfirmation(PartialOutput):
-    path: Optional[str] = None
-    reason: Optional[str] = None
-    object_id: Optional[str] = None
-    item_id: Optional[str] = None
-    action_id: Optional[str] = None
-    required_for: Optional[Literal["assessment", "action", "optional_action"]] = None
+    path: str | None = None
+    reason: str | None = None
+    object_id: str | None = None
+    item_id: str | None = None
+    action_id: str | None = None
+    required_for: Literal["assessment", "action", "optional_action"] | None = None
 
 
 class RuleCoverageCounts(PartialOutput):
-    supported: Optional[int] = Field(default=None, ge=0)
-    confirmed_unsupported: Optional[int] = Field(default=None, ge=0)
-    unknown: Optional[int] = Field(default=None, ge=0)
+    supported: int | None = Field(default=None, ge=0)
+    confirmed_unsupported: int | None = Field(default=None, ge=0)
+    unknown: int | None = Field(default=None, ge=0)
 
 
 class ActionCounts(PartialOutput):
-    ready: Optional[int] = Field(default=None, ge=0)
-    conditional: Optional[int] = Field(default=None, ge=0)
-    candidate: Optional[int] = Field(default=None, ge=0)
-    blocked: Optional[int] = Field(default=None, ge=0)
+    ready: int | None = Field(default=None, ge=0)
+    conditional: int | None = Field(default=None, ge=0)
+    candidate: int | None = Field(default=None, ge=0)
+    blocked: int | None = Field(default=None, ge=0)
 
 
 class ConsultationFollowUp(PartialOutput):
-    conclusion_candidates: Optional[List[str]] = Field(
+    conclusion_candidates: list[str] | None = Field(
         default=None,
         description="引用pending_confirmations.path；仅在会改变当前结论时择要追问，不是必补清单或新请求参数",
     )
-    execution_only: Optional[List[str]] = Field(
+    execution_only: list[str] | None = Field(
         default=None,
         description="引用pending_confirmations.path；仅用于落实动作，不阻塞普通解释或条件式建议",
     )
-    selection_policy: Optional[Literal["ask_only_if_changes_requested_conclusion"]] = (
-        None
-    )
-    unsupported_policy: Optional[
-        Literal["explain_limit_without_requesting_more_input"]
-    ] = None
+    selection_policy: Literal["ask_only_if_changes_requested_conclusion"] | None = None
+    unsupported_policy: (
+        Literal["explain_limit_without_requesting_more_input"] | None
+    ) = None
 
 
 class AnalysisProgress(PartialOutput):
-    interpretation_status: Optional[
+    interpretation_status: (
         Literal["available", "conditional", "scope_only", "insufficient_evidence"]
-    ] = Field(
+        | None
+    ) = Field(
         default=None,
         description="已有依据可解释／仅条件式解释／仅说明未覆盖范围／尚无事实依据；独立于计算完整性和执行状态",
     )
-    follow_up: Optional[ConsultationFollowUp] = None
-    calculation_status: Optional[Literal["complete", "partial"]] = None
-    rule_coverage_status: Optional[
-        Literal["reviewed", "needs_confirmation", "limited"]
-    ] = None
-    assessment_complete: Optional[bool] = None
-    rule_coverage_count_unit: Optional[
-        Literal["surface_items", "surface_items_and_layout_checks"]
-    ] = None
-    rule_coverage_counts: Optional[RuleCoverageCounts] = None
-    action_readiness: Optional[
+    follow_up: ConsultationFollowUp | None = None
+    calculation_status: Literal["complete", "partial"] | None = None
+    rule_coverage_status: (
+        Literal["reviewed", "needs_confirmation", "limited"] | None
+    ) = None
+    assessment_complete: bool | None = None
+    rule_coverage_count_unit: (
+        Literal["surface_items", "surface_items_and_layout_checks"] | None
+    ) = None
+    rule_coverage_counts: RuleCoverageCounts | None = None
+    action_readiness: (
         Literal[
             "no_action_needed",
             "not_evaluated",
@@ -262,85 +263,88 @@ class AnalysisProgress(PartialOutput):
             "blocked",
             "mixed",
         ]
-    ] = None
-    action_count_unit: Optional[Literal["candidate_actions"]] = None
-    action_counts: Optional[ActionCounts] = None
-    optional_action_count: Optional[int] = Field(default=None, ge=0)
-    pending_confirmations: Optional[List[PendingConfirmation]] = None
+        | None
+    ) = None
+    action_count_unit: Literal["candidate_actions"] | None = None
+    action_counts: ActionCounts | None = None
+    optional_action_count: int | None = Field(default=None, ge=0)
+    pending_confirmations: list[PendingConfirmation] | None = None
 
 
 class SurfaceItemFinding(PartialOutput):
-    object_id: Optional[str] = None
-    status: Optional[str] = None
-    rule_coverage_status: Optional[
+    object_id: str | None = None
+    status: str | None = None
+    rule_coverage_status: (
         Literal["reviewed_supported", "reviewed_unsupported", "needs_confirmation"]
-    ] = None
+        | None
+    ) = None
 
 
 class SurfaceAction(PartialOutput):
-    action_id: Optional[str] = None
-    item_id: Optional[str] = None
-    optional: Optional[bool] = None
-    action: Optional[str] = None
-    status: Optional[
-        Literal["ready", "conditional_option", "candidate_only", "blocked"]
-    ] = None
-    pending_confirmations: Optional[List[PendingConfirmation]] = None
+    action_id: str | None = None
+    item_id: str | None = None
+    optional: bool | None = None
+    action: str | None = None
+    status: (
+        Literal["ready", "conditional_option", "candidate_only", "blocked"] | None
+    ) = None
+    pending_confirmations: list[PendingConfirmation] | None = None
 
 
 class SurfaceFinding(PartialOutput):
-    object_id: Optional[str] = None
-    item_findings: Optional[List[SurfaceItemFinding]] = None
-    action_options: Optional[List[SurfaceAction]] = None
+    object_id: str | None = None
+    item_findings: list[SurfaceItemFinding] | None = None
+    action_options: list[SurfaceAction] | None = None
 
 
 class SurfaceAnalysis(PartialOutput):
-    status: Optional[Literal["complete", "partial"]] = None
-    analysis_progress: Optional[AnalysisProgress] = None
-    findings: Optional[List[SurfaceFinding]] = None
-    missing_inputs: Optional[List[str]] = None
-    uncovered_item_ids: Optional[List[str]] = None
+    status: Literal["complete", "partial"] | None = None
+    analysis_progress: AnalysisProgress | None = None
+    findings: list[SurfaceFinding] | None = None
+    missing_inputs: list[str] | None = None
+    uncovered_item_ids: list[str] | None = None
 
 
 class Coverage(PartialOutput):
-    measured_workstation: Optional[Object] = None
-    city_gate_status: Optional[Literal["complete", "partial"]] = None
-    city_gate_calculation_status: Optional[Literal["complete", "partial"]] = None
-    city_gate_missing_inputs: Optional[List[str]] = None
-    method_priority_review: Optional[Object] = None
-    environmental_context_status: Optional[Literal["complete", "partial"]] = None
-    environmental_context_missing_inputs: Optional[List[str]] = None
-    natal_interpretation_status: Optional[Literal["complete", "partial"]] = None
-    natal_interpretation_missing_inputs: Optional[List[str]] = None
-    scene_scope: Optional[Object] = None
-    analysis_progress: Optional[AnalysisProgress] = None
-    implemented_layers: Optional[List[str]] = None
-    missing_inputs: Optional[List[str]] = None
-    unavailable_layers: Optional[List[str]] = None
-    not_requested_layers: Optional[List[str]] = None
-    supplemental_rulesets: Optional[List[str]] = None
-    layout_status: Optional[Literal["complete", "partial"]] = None
-    layout_missing_inputs: Optional[List[str]] = None
-    requested_analysis_status: Optional[Literal["complete", "partial"]] = None
+    measured_workstation: Object | None = None
+    city_gate_status: Literal["complete", "partial"] | None = None
+    city_gate_calculation_status: Literal["complete", "partial"] | None = None
+    city_gate_missing_inputs: list[str] | None = None
+    method_priority_review: Object | None = None
+    environmental_context_status: Literal["complete", "partial"] | None = None
+    environmental_context_missing_inputs: list[str] | None = None
+    natal_interpretation_status: Literal["complete", "partial"] | None = None
+    natal_interpretation_missing_inputs: list[str] | None = None
+    scene_scope: Object | None = None
+    analysis_progress: AnalysisProgress | None = None
+    implemented_layers: list[str] | None = None
+    missing_inputs: list[str] | None = None
+    unavailable_layers: list[str] | None = None
+    not_requested_layers: list[str] | None = None
+    supplemental_rulesets: list[str] | None = None
+    layout_status: Literal["complete", "partial"] | None = None
+    layout_missing_inputs: list[str] | None = None
+    requested_analysis_status: Literal["complete", "partial"] | None = None
 
 
 class FengshuiOutput(ProjectedOutput):
-    calculation_reading: Optional[Object] = None
-    method_policy: Optional[Object] = None
-    method_details: Optional[Object] = None
-    analysis_type: Optional[str] = None
-    engine: Optional[str] = None
-    status: Optional[Literal["complete", "partial"]] = None
-    layers: FullFact[Optional[Layers]] = None
-    rulesets: Optional[List[Ruleset]] = None
-    coverage: Optional[Coverage] = None
-    conflicts: Optional[List[Object]] = None
-    rule_trace: Optional[List[Object]] = None
-    summary: Optional[str] = None
-    snapshot_text: Optional[str] = None
-    snapshot_export: Optional[SnapshotExport] = None
-    run_metadata: Optional[RunMetadata] = None
-    layout_analysis: Optional["LayoutAnalysis"] = None
+    calculation_reading: Object | None = None
+    method_policy: Object | None = None
+    method_details: Object | None = None
+    analysis_type: str | None = None
+    engine: str | None = None
+    status: Literal["complete", "partial"] | None = None
+    layers: Annotated[Layers | None, FULL_FACT] = None
+    rulesets: list[Ruleset] | None = None
+    source_catalog: dict[str, RuleSource] | None = None
+    coverage: Coverage | None = None
+    conflicts: list[Object] | None = None
+    rule_trace: list[Object] | None = None
+    summary: str | None = None
+    snapshot_text: str | None = None
+    snapshot_export: SnapshotExport | None = None
+    run_metadata: RunMetadata | None = None
+    layout_analysis: LayoutAnalysis | None = None
 
     @model_validator(mode="after")
     def require_declared_layers(self, info: ValidationInfo) -> "FengshuiOutput":
@@ -356,31 +360,35 @@ class FengshuiOutput(ProjectedOutput):
             )
             if set(self.coverage.implemented_layers or []) - actual:
                 raise ValueError("完整风水结果缺少已声明计算的图层")
+            else:
+                pass
+        else:
+            pass
         return self
 
 
 class LayoutAnalysis(PartialOutput):
-    workstation_layout_analysis: Optional[MeasuredLayoutOutput] = None
-    environmental_context: Optional[Object] = None
-    interior_analysis: Optional[Object] = None
-    material_analysis: Optional[Object] = None
-    workstation_analysis: Optional[Object] = None
-    natal_interpretation: Optional[NatalInterpretation] = None
-    alternatives_analysis: Optional[Object] = None
-    surface_analysis: Optional[SurfaceAnalysis] = None
-    analysis_progress: Optional[AnalysisProgress] = None
-    status: Optional[Literal["complete", "partial"]] = None
-    calculation_scope: Optional[str] = None
-    placement_findings: Optional[List[Object]] = None
-    adjustment_options: Optional[List[Object]] = None
-    environment_adjustments: Optional[List[Object]] = None
-    element_relationships: Optional[List[Object]] = None
-    missing_inputs: Optional[List[str]] = None
-    unsupported_queries: Optional[List[str]] = None
-    limitations: Optional[List[str]] = None
-    form_analysis: Optional[Object] = None
-    element_remedies: Optional[List[Object]] = None
-    annual_remedies: Optional[Object] = None
-    supplemental_rulesets: Optional[List[Ruleset]] = None
-    supplement_statuses: Optional[Object] = None
-    method_disagreements: Optional[List[Object]] = None
+    workstation_layout_analysis: MeasuredLayoutOutput | None = None
+    environmental_context: Object | None = None
+    interior_analysis: Object | None = None
+    material_analysis: Object | None = None
+    workstation_analysis: Object | None = None
+    natal_interpretation: NatalInterpretation | None = None
+    alternatives_analysis: Object | None = None
+    surface_analysis: SurfaceAnalysis | None = None
+    analysis_progress: AnalysisProgress | None = None
+    status: Literal["complete", "partial"] | None = None
+    calculation_scope: str | None = None
+    placement_findings: list[Object] | None = None
+    adjustment_options: list[Object] | None = None
+    environment_adjustments: list[Object] | None = None
+    element_relationships: list[Object] | None = None
+    missing_inputs: list[str] | None = None
+    unsupported_queries: list[str] | None = None
+    limitations: list[str] | None = None
+    form_analysis: Object | None = None
+    element_remedies: list[Object] | None = None
+    annual_remedies: Object | None = None
+    supplemental_rulesets: list[Ruleset] | None = None
+    supplement_statuses: Object | None = None
+    method_disagreements: list[Object] | None = None

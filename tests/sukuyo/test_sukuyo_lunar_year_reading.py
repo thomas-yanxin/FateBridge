@@ -6,12 +6,12 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.sukuyo import calendar_mansion, day_evidence
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence
 
 HKO = Path(__file__).parents[1] / "data/ziwei_independent/hko"
 
 
-def test_primary_cny_rows_bind_the_two_lunar_years():
+def test_primary_cny_rows_bind_the_two_lunar_years() -> None:
     for year, expected in (
         (2024, "0120d4df9b6638b084dcf35a0633f970ec47f8c1adde2553fba3e3c3570217fc"),
         (2025, "7a2803584dcd12a38a13e3710e643369996f59e690d684b9e3705fc5e988ebc2"),
@@ -29,8 +29,8 @@ def test_primary_cny_rows_bind_the_two_lunar_years():
     [("2025-01-28", 2024, 12, 29, "危"), ("2025-01-29", 2025, 1, 1, "室")],
 )
 def test_lunar_year_is_not_silently_replaced_by_gregorian_year(
-    date, year, month, day, mansion
-):
+    date: str, year: int, month: int, day: int, mansion: str
+) -> None:
     calendar = calendar_mansion(date)
     assert (calendar["lunar_year"], calendar["lunar_month"], calendar["lunar_day"]) == (
         year,
@@ -41,7 +41,7 @@ def test_lunar_year_is_not_silently_replaced_by_gregorian_year(
     assert f"农历{year}年{month}月{day}日" in day_evidence(calendar)["reading_text"]
 
 
-def test_one_microsecond_branch_keeps_its_own_lunar_year_and_utc_support():
+def test_one_microsecond_branch_keeps_its_own_lunar_year_and_utc_support() -> None:
     calendar = calendar_mansion("2025-01-29", zone="8.0000000002777778")
     assert calendar["input_datetime"] is None and not calendar["birth_time_known"]
     assert [

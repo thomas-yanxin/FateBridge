@@ -4,35 +4,31 @@ import copy
 import json
 import shutil
 from dataclasses import replace
-from functools import lru_cache
 from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
 
 import fatebridge.application.execution as execution
+from fatebridge.core.contracts.output_chinese import JinkouCourse
+from fatebridge.core.contracts.output_jinkou_breaks import JinkouBranchBreaks
 from fatebridge.core.metaphysics.jinkou_branch_breaks import branch_breaks, pair_facts
-from fatebridge.core.output_chinese import JinkouCourse
-from fatebridge.core.output_jinkou_breaks import JinkouBranchBreaks
 from scripts.ren.audit_jinkou_branch_breaks import CORPUS, reference
 from tests.support.transports import (
     AS_OF,
-    REST_POST_CASES,
-    SPECS,
     business,
     native,
     rest,
     surface_calls,
 )
+from tests.unit_test.fixtures.jinkou_courses import (
+    BRANCH_BREAKS_PAYLOAD,
+    JINKOU_SPEC,
+    branch_breaks_output,
+    jinkou_course,
+)
 
 ROOT = Path(__file__).resolve().parents[2]
-SPEC = SPECS["jinkou"]
-PAYLOAD = {
-    **REST_POST_CASES[SPEC.rest_path](),
-    "birth_year_ganzhi": "甲子",
-    "year_fate_age": 43,
-    "gender": "男",
-}
 
 
 @pytest.fixture(autouse=True)
@@ -41,18 +37,7 @@ def native_solar(monkeypatch):
     monkeypatch.setenv("SE_EPHE_PATH", str(ROOT / "ephe"))
 
 
-@lru_cache(maxsize=1)
-def raw():
-    fn, args, kw = SPEC.bind(SPEC.request_model.model_validate(PAYLOAD))
-    return fn(*args, **kw)
-
-
-def course(body, role):
-    board = body["jinkou"]
-    return board if role == "primary" else board[role]["course"]
-
-
-def test_entire_independent_matrix_and_all_internal_branch_triples():
+def test_entire_independent_matrix_and_all_internal_branch_triples() -> None:
     data = reference()
     for expected in data["reference"]["pair_matrix"]:
         assert pair_facts(expected["left_branch"], expected["right_branch"]) == expected
@@ -73,7 +58,9 @@ def test_entire_independent_matrix_and_all_internal_branch_triples():
 
 
 @pytest.mark.parametrize("change", ["reference", "source", "joint"])
-def test_reference_or_joint_manifest_rewrite_cannot_relabel_the_pairs(tmp_path, change):
+def test_reference_or_joint_manifest_rewrite_cannot_relabel_the_pairs(
+    tmp_path: Path, change: str
+) -> None:
     import hashlib
 
     target = tmp_path / "corpus"
@@ -85,11 +72,13 @@ def test_reference_or_joint_manifest_rewrite_cannot_relabel_the_pairs(tmp_path, 
         manifest = json.loads((target / "freeze.json").read_text())
         manifest["files"][name] = hashlib.sha256(path.read_bytes()).hexdigest()
         (target / "freeze.json").write_text(json.dumps(manifest))
+    else:
+        pass
     with pytest.raises(ValueError, match="Frozen printed-break"):
         reference(target)
 
 
-def test_reversed_position_order_preserves_printed_order_and_unknown_effects():
+def test_reversed_position_order_preserves_printed_order_and_unknown_effects() -> None:
     a, b = pair_facts("申", "巳"), pair_facts("巳", "申")
     assert a["source_pair_present"] is b["source_pair_present"] is True
     assert a["source_order"] == "left_then_right"
@@ -97,7 +86,10 @@ def test_reversed_position_order_preserves_printed_order_and_unknown_effects():
     assert a["source_written_pair"] == b["source_written_pair"] == ["申", "巳"]
     assert a["effective_break"] is b["effect_direction"] is None
     assert pair_facts("申", "寅")["source_pair_present"] is False  # 对冲不替代破支表。
-    for board in [course(raw(), r) for r in ("primary", "natal_course", "year_fate")]:
+    for board in [
+        jinkou_course(branch_breaks_output(), r)
+        for r in ("primary", "natal_course", "year_fate")
+    ]:
         assert board["use_evidence"]["comprehensive_position"] is None
         assert board["ruleset"]["version"] == "1.16.0"
         selected = [
@@ -112,13 +104,17 @@ def test_reversed_position_order_preserves_printed_order_and_unknown_effects():
 @pytest.mark.parametrize(
     "a,b", [("甲", "子"), ("申巳", "子"), (None, "子"), ("", "子")]
 )
-def test_invalid_symbols_are_not_interpreted_as_unmatched(a, b):
+def test_invalid_symbols_are_not_interpreted_as_unmatched(
+    a: str | None, b: str
+) -> None:
     with pytest.raises(ValueError):
         pair_facts(a, b)
 
 
 @pytest.mark.parametrize("project", [False, True])
-def test_valid_same_course_facts_survive_actual_rest_mcp_cli(project, surface_calls):
+def test_valid_same_course_facts_survive_actual_rest_mcp_cli(
+    project: bool, surface_calls
+) -> None:
     params = [("as_of", AS_OF), ("response_char_limit", "0")]
     flags, options = ["--response-char-limit", "0"], {}
     if project:
@@ -140,8 +136,15 @@ def test_valid_same_course_facts_survive_actual_rest_mcp_cli(project, surface_ca
             "false",
         ]
         options = dict(fields=fields, strict_fields=True, include_snapshot_text=False)
+    else:
+        pass
     http, protocol, code, cli = surface_calls(
-        SPEC, PAYLOAD, params=params, options=options, flags=flags, cli_first=False
+        JINKOU_SPEC,
+        BRANCH_BREAKS_PAYLOAD,
+        params=params,
+        options=options,
+        flags=flags,
+        cli_first=False,
     )
     assert http.status_code == 200 and code == 0 and not protocol.is_error
     assert (
@@ -149,7 +152,7 @@ def test_valid_same_course_facts_survive_actual_rest_mcp_cli(project, surface_ca
     )
     for body in (http.json(), cli, protocol.structured_content):
         for role in ("primary", "natal_course", "year_fate"):
-            block = course(body, role)["branch_breaks"]
+            block = jinkou_course(body, role)["branch_breaks"]
             assert len(block["rows"]) == 3
             assert block["effective_break"] is block["effect_direction"] is None
 
@@ -168,10 +171,10 @@ def test_valid_same_course_facts_survive_actual_rest_mcp_cli(project, surface_ca
     ],
 )
 def test_faults_in_each_course_are_rejected_before_projection_on_all_ports(
-    role, project, fault, monkeypatch, surface_calls
-):
-    bad = copy.deepcopy(raw())
-    board = course(bad, role)
+    role: str, project: bool, fault: str, monkeypatch: pytest.MonkeyPatch, surface_calls
+) -> None:
+    bad = copy.deepcopy(branch_breaks_output())
+    board = jinkou_course(bad, role)
     block = board["branch_breaks"]
     if fault == "missing":
         del board["branch_breaks"]
@@ -191,12 +194,14 @@ def test_faults_in_each_course_are_rejected_before_projection_on_all_ports(
             block["rows"][0]["source_pair_present"]
         )
     with pytest.raises(execution.OutputContractError):
-        execution.validate_output(SPEC, bad)
+        execution.validate_output(JINKOU_SPEC, bad)
     original = execution.execute_spec
 
     def broken(spec, request):
         if spec.key == "jinkou":
             spec = replace(spec, bind=lambda _: (lambda: copy.deepcopy(bad), (), {}))
+        else:
+            pass
         return original(spec, request)
 
     monkeypatch.setattr(execution, "execute_spec", broken)
@@ -206,21 +211,30 @@ def test_faults_in_each_course_are_rejected_before_projection_on_all_ports(
         params.update(fields="analysis_type", strict_fields="true")
         flags += ["--fields", "analysis_type", "--strict-fields", "true"]
         options = dict(fields=["analysis_type"], strict_fields=True)
+    else:
+        pass
     http, protocol, code, cli = surface_calls(
-        SPEC, PAYLOAD, params=params, options=options, flags=flags, cli_first=False
+        JINKOU_SPEC,
+        BRANCH_BREAKS_PAYLOAD,
+        params=params,
+        options=options,
+        flags=flags,
+        cli_first=False,
     )
     assert http.status_code == 500 and protocol.is_error and code == 1
     assert cli["error_code"] == "internal_error"
 
 
-def test_sparse_views_keep_missing_anchors_missing_and_trace_facts_are_checked():
-    block = raw()["jinkou"]["branch_breaks"]
+def test_sparse_views_keep_missing_anchors_missing_and_trace_facts_are_checked() -> (
+    None
+):
+    block = branch_breaks_output()["jinkou"]["branch_breaks"]
     sparse = dict(branch_breaks=block)
     assert JinkouCourse.model_validate(sparse).model_dump(exclude_unset=True) == sparse
     trace = copy.deepcopy(
         next(
             t
-            for t in raw()["jinkou"]["rule_trace"]
+            for t in branch_breaks_output()["jinkou"]["rule_trace"]
             if t["rule_id"] == "jinkou.printed_break_pairs"
         )
     )
@@ -230,8 +244,8 @@ def test_sparse_views_keep_missing_anchors_missing_and_trace_facts_are_checked()
 
 
 def test_shared_producer_validator_metadata_cannot_be_its_own_source_oracle(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     import fatebridge.core.metaphysics.jinkou_branch_breaks as production
     from scripts.ren.audit_jinkou_branch_breaks import audit
 
@@ -245,7 +259,7 @@ def test_shared_producer_validator_metadata_cannot_be_its_own_source_oracle(
     )
 
 
-def test_scan_extra_pair_is_not_deleted_to_match_the_web_transcription():
+def test_scan_extra_pair_is_not_deleted_to_match_the_web_transcription() -> None:
     from scripts.ren.audit_jinkou_branch_breaks import INITIAL_CORPUS, INITIAL_PIN, sha
 
     value = branch_breaks("寅", "巳", "申")
@@ -262,7 +276,9 @@ def test_scan_extra_pair_is_not_deleted_to_match_the_web_transcription():
     assert original["counts"]["pair_present_in_matrix"] == 12
 
 
-def test_reverting_to_six_pairs_fails_the_fixed_scan_reference(monkeypatch):
+def test_reverting_to_six_pairs_fails_the_fixed_scan_reference(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     import fatebridge.core.metaphysics.jinkou_branch_breaks as production
     from scripts.ren.audit_jinkou_branch_breaks import audit
 

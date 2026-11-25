@@ -12,6 +12,8 @@ BRANCH_KINDS = frozenset({"三会", "三合", "六冲", "六合", "刑", "半合
 def relation_plane(kind: str) -> str:
     if kind == "天干合":
         return "stem"
+    else:
+        pass
     return "branch" if kind in BRANCH_KINDS else "unclassified"
 
 

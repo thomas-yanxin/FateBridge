@@ -2,16 +2,21 @@
 
 import hashlib
 import json
+import math
 import os
+import shutil
 from pathlib import Path
 
 import pytest
 
-from fatebridge.core import almanac, spk_solar
+import fatebridge.api as api
+from fatebridge.application import result_delivery as delivery
+from fatebridge.core import almanac, analytic_solar, de441_solar, spk_solar
 from fatebridge.core.local_techniques.sixyao import build_sixyao_result
-from tests.liuyao.test_liuyao_clash_transports import all_surfaces
-from tests.support.result_delivery import assert_same_run_receipt
-from tests.support.transports import SPECS, business, native, rest, surface_calls
+from fatebridge.utils.errors import EphemerisSourceError
+from tests.support.result_delivery import assert_same_run_receipt, reconstruct
+from tests.support.transports import SPECS, business
+from tests.unit_test.fixtures.liuyao import all_surfaces
 
 MODEL = "fatebridge_jpl_spk_solar_v1"
 SHA = "a4ce9bf9b3282becc9f4b2ac3cebe03a2ae7599981aabd7265fd8482fff7c4b5"
@@ -33,6 +38,8 @@ def selected_spk(monkeypatch, tmp_path_factory):
     kernel = Path(os.environ.get("FATEBRIDGE_TEST_SPK_FILE", "ephe/solar-de440.bsp"))
     if not kernel.is_file():
         pytest.skip("External DE440 test kernel not present")
+    else:
+        pass
     assert hashlib.sha256(kernel.read_bytes()).hexdigest() == SHA
     empty = tmp_path_factory.mktemp("spk-empty-native")
     monkeypatch.setenv("SE_EPHE_PATH", str(empty))
@@ -42,10 +49,22 @@ def selected_spk(monkeypatch, tmp_path_factory):
     return kernel
 
 
+def test_segment_start_uses_inclusive_descriptor_seconds(selected_spk) -> None:
+
+    source = spk_solar._selected()
+    pair = (0, 3)
+    # The DE440 EMB segment begins at the DAF descriptor's -14200747200 s.
+    start = float.fromhex("-0x1.4104400000000p+17")
+    assert source.segment(pair, start).start_second == -14200747200
+    with pytest.raises(EphemerisSourceError) as caught:
+        source.segment(pair, math.nextafter(start, -math.inf))
+    assert caught.value.reason == "solar_spk_range"
+
+
 @pytest.mark.parametrize("mode", ["spk", "invalid-policy"])
 def test_static_yi_lookup_does_not_resolve_unused_solar_source(
-    mode, monkeypatch, tmp_path, surface_calls
-):
+    mode: str, monkeypatch: pytest.MonkeyPatch, tmp_path: Path, surface_calls
+) -> None:
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", mode)
     monkeypatch.setenv("FATEBRIDGE_SOLAR_SPK_FILE", str(tmp_path / "missing.bsp"))
 
@@ -75,14 +94,14 @@ def test_static_yi_lookup_does_not_resolve_unused_solar_source(
 
 @pytest.mark.parametrize("project", [False, True])
 def test_shared_sign_boundary_failure_is_corrected_by_actual_spk(
-    project,
+    project: bool,
     selected_spk,
     rest,
-    tmp_path,
-    capsys,
-):
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     fields = ["liuyao_evidence.calendar_conventions.month_branch"] if project else None
-    for output in all_surfaces(PAYLOAD, fields, rest, tmp_path, capsys):
+    for output in all_surfaces(PAYLOAD, fields, rest, tmp_path, capsys, audit=True):
         assert output["liuyao_evidence"]["calendar_conventions"]["month_branch"] == "亥"
         metadata = output["run_metadata"]
         assert MODEL in metadata["provenance"]["ephemeris_model"]
@@ -109,11 +128,12 @@ def test_shared_sign_boundary_failure_is_corrected_by_actual_spk(
 
 
 def test_spk_same_run_original_payload_hash(
-    selected_spk, rest, tmp_path, capsys, monkeypatch
-):
-    import fatebridge.api as api
-    from fatebridge.application import result_delivery as delivery
-    from tests.support.result_delivery import reconstruct
+    selected_spk,
+    rest,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
 
     store = delivery.ResultStore(tmp_path / "spk-results")
     monkeypatch.setattr(delivery, "RESULT_STORE", store)
@@ -135,8 +155,12 @@ def test_spk_same_run_original_payload_hash(
 
 @pytest.mark.parametrize("reason", ["missing", "invalid", "range"])
 def test_consuming_sixyao_fails_loudly_on_three_protocols(
-    reason, selected_spk, monkeypatch, tmp_path, surface_calls
-):
+    reason: str,
+    selected_spk,
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    surface_calls,
+) -> None:
     payload = dict(PAYLOAD)
     if reason == "range":
         payload["date"] = "2700-06-01"
@@ -145,6 +169,8 @@ def test_consuming_sixyao_fails_loudly_on_three_protocols(
         file = tmp_path / (reason + ".bsp")
         if reason == "invalid":
             file.write_bytes(b"not a SPK kernel")
+        else:
+            pass
         monkeypatch.setenv("FATEBRIDGE_SOLAR_SPK_FILE", str(file))
         expected = (
             "solar_spk_unavailable" if reason == "missing" else "solar_spk_invalid"
@@ -159,18 +185,29 @@ def test_consuming_sixyao_fails_loudly_on_three_protocols(
 
 
 def test_explicit_spk_cannot_relabel_native_and_default_failures(
-    selected_spk, monkeypatch
-):
+    selected_spk, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    expected_sources = {
+        "spk": ("jpl_spk", MODEL),
+        "native": (de441_solar.PROVIDER, de441_solar.MODEL_ID),
+        "analytic": ("fatebridge_analytic", analytic_solar.MODEL_ID),
+    }
     months = {}
-    for mode in ["spk", "native", "analytic"]:
+    for mode, source in expected_sources.items():
         monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", mode)
         result = build_sixyao_result(**PAYLOAD)
         months[mode] = result["liuyao_evidence"]["calendar_conventions"]["month_branch"]
-    assert months == {"spk": "亥", "native": "子", "analytic": "子"}
+        boundary = result["calendar_context"]["bazi_month_boundary"]
+        for key in ("start_term", "next_term"):
+            term = boundary[key]
+            assert (term["resolution_provider"], term["ephemeris_model"]) == source
+    # This instant precedes both DE crossings and follows the analytic crossing.
+    assert months == {"spk": "亥", "native": "亥", "analytic": "子"}
 
 
-def test_mid_batch_source_change_is_not_silently_accepted(selected_spk, monkeypatch):
-    from fatebridge.utils.errors import EphemerisSourceError
+def test_mid_batch_source_change_is_not_silently_accepted(
+    selected_spk, monkeypatch: pytest.MonkeyPatch
+) -> None:
 
     original = spk_solar.longitude_crossing_tt
     calls = 0
@@ -180,6 +217,8 @@ def test_mid_batch_source_change_is_not_silently_accepted(selected_spk, monkeypa
         calls += 1
         if calls == 2:
             raise EphemerisSourceError("solar_spk_changed")
+        else:
+            pass
         return original(*args, **kwargs)
 
     monkeypatch.setattr(spk_solar, "longitude_crossing_tt", changed)
@@ -197,7 +236,7 @@ MINUTE_CASES = json.loads(
 
 
 @pytest.mark.parametrize("case", MINUTE_CASES, ids=lambda case: case["id"])
-def test_original_minute_month_counterexamples_in_sixyao(case, selected_spk):
+def test_original_minute_month_counterexamples_in_sixyao(case, selected_spk) -> None:
     civil = case["civil_utc"]
     result = build_sixyao_result(
         **{**PAYLOAD, "date": civil[:10], "time": civil[11:19]}
@@ -215,11 +254,8 @@ def test_original_minute_month_counterexamples_in_sixyao(case, selected_spk):
 
 
 def test_changed_file_and_alias_change_actual_identity(
-    selected_spk, monkeypatch, tmp_path
-):
-    import shutil
-
-    from fatebridge.utils.errors import EphemerisSourceError
+    selected_spk, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
 
     copy = tmp_path / "copy.bsp"
     shutil.copy2(selected_spk, copy)
@@ -242,10 +278,10 @@ def test_changed_file_and_alias_change_actual_identity(
     assert spk_solar.cache_key()[2] != before[2]
 
 
-def test_wrong_spk_frame_is_rejected(selected_spk, monkeypatch):
+def test_wrong_spk_frame_is_rejected(
+    selected_spk, monkeypatch: pytest.MonkeyPatch
+) -> None:
     from jplephem.spk import SPK
-
-    from fatebridge.utils.errors import EphemerisSourceError
 
     original = SPK.open
 

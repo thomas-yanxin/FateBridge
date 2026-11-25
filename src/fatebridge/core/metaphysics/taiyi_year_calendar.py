@@ -15,7 +15,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Literal
 
-from .taiyi_historical import julian_to_proleptic_gregorian
+from fatebridge.core.metaphysics.taiyi_historical import julian_to_proleptic_gregorian
 
 TaiyiYearProfile = Literal[
     "jinjing_year_lunar_civil_v1",
@@ -37,6 +37,8 @@ def historical_month_table(
 ) -> tuple[dict[str, Any], tuple[date, ...], str]:
     if profile not in HISTORICAL_YEAR_PROFILES:
         raise ValueError("year_profile须明确选择已发布历史年计配置")
+    else:
+        pass
     filename = (
         "taiyi-qiliang-year-months-v1.json"
         if profile == QILIANG_YEAR_PROFILE
@@ -52,6 +54,8 @@ def historical_month_table(
     )
     if any((b - a).days not in (29, 30) for a, b in zip(dates, dates[1:])):
         raise ValueError("历史月首表不是连续大小月，不能补算缺行")
+    else:
+        pass
     for row, day in zip(rows, dates):
         jdn = day.toordinal() + 1721425
         if (
@@ -59,6 +63,8 @@ def historical_month_table(
             or (jdn + 49) % 60 != row["printed_cycle_counter"]
         ):
             raise ValueError("历史月首的原印星期/干支与日期不一致")
+        else:
+            pass
     lower, upper = data["supported_years"]
     for year in range(lower, upper + 1):
         selected = [r for r in rows if r["year"] == year]
@@ -66,6 +72,8 @@ def historical_month_table(
             range(1, 13)
         ):
             raise ValueError("历史年须保留正月至十二月的全部原表月份")
+        else:
+            pass
         previous = None
         for row in selected:
             if row["is_leap_month"] and (
@@ -74,12 +82,16 @@ def historical_month_table(
                 or previous["is_leap_month"]
             ):
                 raise ValueError("历史闰月须保留原表粗体重号，不能重新编号")
+            else:
+                pass
             previous = row
     if (
         rows[-1].get("role") != "exclusive_end_sentinel"
         or rows[-1]["year"] != upper + 1
     ):
         raise ValueError("历史范围缺少次年正月终界")
+    else:
+        pass
     return data, dates, hashlib.sha256(raw).hexdigest()
 
 
@@ -91,6 +103,8 @@ def historical_year_context(
         raise ValueError(
             f"所选太乙历史历表仅覆盖推算公历{dates[0].isoformat()}至{dates[-1].isoformat()}之前；不向未覆盖年代套用现代农历或回退算法"
         )
+    else:
+        pass
     i = bisect_right(dates, civil_date) - 1
     row = data["months"][i]
     day = (civil_date - dates[i]).days + 1
@@ -153,6 +167,8 @@ def historical_year_context(
             ],
             calendar_algorithm_identity_adjudicated=False,
         )
+    else:
+        pass
     return result
 
 
@@ -170,6 +186,8 @@ def historical_year_text(context: dict[str, Any]) -> str:
     )
     if context.get("year_label_basis"):
         text += "。" + str(context["year_label_basis"])
+    else:
+        pass
     for disagreement in context.get("source_disagreements", []):
         text += (
             "。历表分歧："

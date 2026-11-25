@@ -34,7 +34,7 @@ PLUTO = [
 ]
 
 
-def test_frozen_lunar_protocol_reference_and_generator_identity():
+def test_frozen_lunar_protocol_reference_and_generator_identity() -> None:
     for name, checksum in [
         (
             "lunar-chain-protocol.json",
@@ -73,8 +73,8 @@ def test_frozen_lunar_protocol_reference_and_generator_identity():
     ],
 )
 def test_lunar_validator_rejects_missing_data_and_fitted_or_redefined_reference(
-    mutation,
-):
+    mutation: str,
+) -> None:
     bad = copy.deepcopy(REFERENCE)
     if mutation == "drop_center":
         bad["rows"].pop()
@@ -95,7 +95,9 @@ def test_lunar_validator_rejects_missing_data_and_fitted_or_redefined_reference(
 
 
 @pytest.mark.parametrize("row", MODERN, ids=lambda r: r["date_tt"])
-def test_actual_domain_lunar_display_rate_against_independent_apparent_positions(row):
+def test_actual_domain_lunar_display_rate_against_independent_apparent_positions(
+    row,
+) -> None:
     jd = row["jd_tt"]
     state, model = ephemeris._swisseph_planet_state("Moon", jd, julian_day_tt=jd)
     assert model == "swieph"
@@ -116,7 +118,7 @@ def test_actual_domain_lunar_display_rate_against_independent_apparent_positions
 
 
 @pytest.mark.parametrize("row", PLUTO, ids=lambda r: r["date_tt"])
-def test_high_latitude_planet_uses_the_same_source_derived_rotation_term(row):
+def test_high_latitude_planet_uses_the_same_source_derived_rotation_term(row) -> None:
     state, model = ephemeris._swisseph_planet_state(
         "Pluto", row["jd_tt"], julian_day_tt=row["jd_tt"]
     )
@@ -137,7 +139,7 @@ def test_high_latitude_planet_uses_the_same_source_derived_rotation_term(row):
     )
 
 
-def test_aberration_jacobian_matches_directional_position_derivative():
+def test_aberration_jacobian_matches_directional_position_derivative() -> None:
     position = (0.002, 0.001, -0.0005)
     delta = (0.0003, -0.0002, 0.0001)
     beta = (0.0001, -0.00003, 0.00002)
@@ -155,7 +157,9 @@ def test_aberration_jacobian_matches_directional_position_derivative():
 
 
 @pytest.mark.parametrize("angle", [0, 23.7, 90, 180, 359])
-def test_longitude_chain_correction_is_invariant_under_common_origin_rotation(angle):
+def test_longitude_chain_correction_is_invariant_under_common_origin_rotation(
+    angle: float | int,
+) -> None:
     c, s = math.cos(math.radians(angle)), math.sin(math.radians(angle))
 
     def rotate(v):
@@ -168,7 +172,7 @@ def test_longitude_chain_correction_is_invariant_under_common_origin_rotation(an
     ) == pytest.approx(lunar_motion.longitude_rate_change(position, delta), abs=1e-14)
 
 
-def test_rotation_correction_is_the_derivative_of_the_final_axis_rotation():
+def test_rotation_correction_is_the_derivative_of_the_final_axis_rotation() -> None:
     lon, lat, eps_dot = 24.0, 17.0, 0.00003
     x, y, z = (
         math.cos(math.radians(lat)) * math.cos(math.radians(lon)),
@@ -184,7 +188,7 @@ def test_rotation_correction_is_the_derivative_of_the_final_axis_rotation():
 
 
 @pytest.mark.parametrize("sidereal", [False, True])
-def test_ut1_conversion_uses_same_native_tt_for_the_correction(sidereal):
+def test_ut1_conversion_uses_same_native_tt_for_the_correction(sidereal: bool) -> None:
     jd = 2451545.0
     swe = runtime.swe
     flags = swe.FLG_SWIEPH | swe.FLG_SPEED
@@ -207,12 +211,14 @@ def test_ut1_conversion_uses_same_native_tt_for_the_correction(sidereal):
 
 @pytest.mark.parametrize("problem", ["version", "moshier"])
 def test_unsupported_lunar_algorithm_preserves_raw_value_with_explicit_status(
-    problem, monkeypatch
-):
+    problem: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
     if problem == "version":
         monkeypatch.setattr(
             lunar_motion, "SOURCE_VERSION", ("unverified", "unverified")
         )
+    else:
+        pass
     correction, policy = lunar_motion.lunar_light_time_correction(
         2451545.0, (0, 0, 1, 2, 0, 0), "moshier" if problem == "moshier" else "swieph"
     )
@@ -227,8 +233,8 @@ def test_unsupported_lunar_algorithm_preserves_raw_value_with_explicit_status(
 
 @pytest.mark.parametrize("problem", ["flags", "model", "nan", "position"])
 def test_lunar_transaction_rejects_bad_source_and_restores_managed_sidereal_mode(
-    problem, monkeypatch
-):
+    problem: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
     swe = runtime.swe
     original = runtime.ephemeris_call
     coordinates = original("calc", 2451545.0, swe.MOON, swe.FLG_SWIEPH | swe.FLG_SPEED)[
@@ -244,11 +250,19 @@ def test_lunar_transaction_rejects_bad_source_and_restores_managed_sidereal_mode
             data, flags = values
             if problem == "flags":
                 return data, flags & ~swe.FLG_XYZ
+            else:
+                pass
             if problem == "model":
                 return data, (flags & ~7) | swe.FLG_MOSEPH
+            else:
+                pass
             if problem == "nan":
                 return (math.nan, *data[1:]), flags
+            else:
+                pass
             return (data[0] + 1e-5, *data[1:]), flags
+        else:
+            pass
         return values
 
     monkeypatch.setattr(runtime, "ephemeris_call", inject)
@@ -257,7 +271,9 @@ def test_lunar_transaction_rejects_bad_source_and_restores_managed_sidereal_mode
     assert original("calc", 2451545.0, swe.MOON, sidereal_flags) == expected
 
 
-def test_nutation_policy_is_per_epoch_and_retains_unknown_version(monkeypatch):
+def test_nutation_policy_is_per_epoch_and_retains_unknown_version(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     context = {}
     first = nutation_obliquity_rate(2451545.0, context)
     assert first is not None

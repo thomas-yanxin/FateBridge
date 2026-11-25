@@ -1,19 +1,64 @@
-"""Keep all64 month readings and intra-edition failures visible."""
+"""Compare all 64 Heluo month readings with the selected source profiles."""
 
 import argparse
 import hashlib
 import json
 from pathlib import Path
+from typing import TypedDict
 
-from fatebridge.core.heluo import MONTH_GUA, calculate
-from fatebridge.core.heluo_hexagrams import _gua_tables, gua_lines
-from fatebridge.core.heluo_months import MONTH_BRANCHES, month_affinity
+from pydantic import JsonValue
+
+from fatebridge.core.heluo.heluo import MONTH_GUA, calculate
+from fatebridge.core.heluo.heluo_hexagrams import _gua_tables, gua_lines
+from fatebridge.core.heluo.heluo_months import (
+    MONTH_BRANCHES,
+    MonthAssignmentMethod,
+    month_affinity,
+)
 
 ROOT = Path(__file__).resolve().parents[2]
 FIXTURES = ROOT / "tests/fixtures/heluo_month_profiles_v1"
 
 
-def audit():
+class MonthSourceComparison(TypedDict):
+    gua: str
+    table_month: int
+    table_pdf_page: int
+    intro_month: int | None
+    intro_pdf_page: int
+    source_months_agree: bool | None
+
+
+class MonthProfileFailure(TypedDict):
+    gua: str
+    method: str
+    month: int
+    phase: str
+    actual: dict[str, JsonValue]
+
+
+class MonthProfileAudit(TypedDict):
+    schema_version: str
+    references_sha256: dict[str, str]
+    all64_source_rows: list[MonthSourceComparison]
+    source_consistency_failures: list[MonthSourceComparison]
+    source_consistency_passed: bool
+    engine_profile_failures: list[MonthProfileFailure]
+    engine_profile_checks: int
+    engine_profile_checks_passed: bool
+    independent_second_reviews: int
+    calendar_reference_instants_added: int
+    original_birth_examples_added: int
+    real_model_runs_added: int
+    prediction_evidence: str
+    three_dimensions_full_score: bool
+    four_dimensions_full_score: bool
+    authority_system: bool
+    scope: str
+
+
+def audit() -> MonthProfileAudit:
+    """Record source conflicts separately from failed engine reproduction checks."""
     front = json.loads((FIXTURES / "front-table-reference.json").read_bytes())
     intro = {
         r["gua"]: r
@@ -21,8 +66,8 @@ def audit():
             "assigned_months"
         ]
     }
-    rows = []
-    engine_failures = []
+    rows: list[MonthSourceComparison] = []
+    engine_failures: list[MonthProfileFailure] = []
     pillars = dict(year="甲子", month="丁卯", day="庚申", hour="庚辰")
     chart = calculate(
         four_pillars=pillars,
@@ -31,48 +76,60 @@ def audit():
         birth_year=1924,
         month_zhi="卯",
     )
+    methods: tuple[MonthAssignmentMethod, ...] = (
+        "intro_preferred_v1",
+        "volume_one_table_v1",
+    )
     for source in front["assigned_months"]:
-        gua = source["gua"]
-        pair = _gua_tables()[0][gua]
-        for p in ("xian", "hou"):
-            chart[p].update(name=gua, **pair, lines=gua_lines(pair["up"], pair["low"]))
-        for method in ("intro_preferred_v1", "volume_one_table_v1"):
-            expected = (
-                source if method == "volume_one_table_v1" else intro.get(gua, source)
+        hexagram_name = source["gua"]
+        trigrams = _gua_tables()[0][hexagram_name]
+        for phase_name in ("xian", "hou"):
+            chart[phase_name].update(
+                name=hexagram_name,
+                **trigrams,
+                lines=gua_lines(trigrams["up"], trigrams["low"]),
             )
-            for number, branch in enumerate(MONTH_BRANCHES, 1):
+        for method in methods:
+            expected = (
+                source
+                if method == "volume_one_table_v1"
+                else intro.get(hexagram_name, source)
+            )
+            for month_number, month_branch in enumerate(MONTH_BRANCHES, 1):
                 result = month_affinity(
-                    chart, branch, MONTH_GUA, assignment_method=method
+                    chart, month_branch, MONTH_GUA, assignment_method=method
                 )
-                for p in result["phases"]:
+                for phase in result["phases"]:
                     if (
-                        p["assigned_month_number"],
-                        p["assigned_month_match"],
-                        p["source_pdf_page"],
+                        phase["assigned_month_number"],
+                        phase["assigned_month_match"],
+                        phase["source_pdf_page"],
                     ) != (
                         expected["month"],
-                        number == expected["month"],
+                        month_number == expected["month"],
                         expected["page"],
                     ):
                         engine_failures.append(
                             {
-                                "gua": gua,
+                                "gua": hexagram_name,
                                 "method": method,
-                                "month": number,
-                                "phase": p["phase"],
-                                "actual": p,
+                                "month": month_number,
+                                "phase": phase["phase"],
+                                "actual": phase,
                             }
                         )
-        other = intro.get(gua)
+                    else:
+                        pass
+        intro_reading = intro.get(hexagram_name)
         rows.append(
             {
-                "gua": gua,
+                "gua": hexagram_name,
                 "table_month": source["month"],
                 "table_pdf_page": source["page"],
-                "intro_month": other["month"] if other else None,
-                "intro_pdf_page": other["page"] if other else 177,
+                "intro_month": intro_reading["month"] if intro_reading else None,
+                "intro_pdf_page": intro_reading["page"] if intro_reading else 177,
                 "source_months_agree": (
-                    other["month"] == source["month"] if other else None
+                    intro_reading["month"] == source["month"] if intro_reading else None
                 ),
             }
         )
@@ -107,7 +164,7 @@ def audit():
     }
 
 
-def main():
+def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--require-source-consistency", action="store_true")
@@ -125,3 +182,5 @@ def main():
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

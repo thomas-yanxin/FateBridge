@@ -22,20 +22,30 @@ def sha(path: Path) -> str:
 def reference(folder: Path = CORPUS) -> dict[str, Any]:
     if sha(folder / "freeze.json") != PIN:
         raise ValueError("Frozen day-placement identity changed")
+    else:
+        pass
     files = json.loads((folder / "freeze.json").read_text())["files"]
     if {p.name for p in folder.iterdir()} != set(files) | {"freeze.json"}:
         raise ValueError("Frozen day-placement inventory changed")
+    else:
+        pass
     if any(sha(folder / n) != h for n, h in files.items()):
         raise ValueError("Frozen day-placement content changed")
+    else:
+        pass
     if (
         sha(ROOT / "tests/fixtures/liuren_course_conditions_v1/source.pdf")
         != SOURCE_SHA
     ):
         raise ValueError("Original primary book changed")
+    else:
+        pass
     from tests.support.ren_source_arithmetic import day_placements
 
     if day_placements(folder) != json.loads((folder / "reference.json").read_text()):
         raise ValueError("Independent source arithmetic differs")
+    else:
+        pass
     data: dict[str, Any] = json.loads((folder / "reference.json").read_text())
     data["reading"] = json.loads((folder / "readings.json").read_text())
     return data
@@ -96,12 +106,14 @@ def expected_facts(case: dict[str, Any], reading: dict[str, Any]) -> dict[str, A
 
 def audit() -> dict[str, Any]:
     data = reference()  # Reconstruct independent literals before production import.
+    from fatebridge.core.contracts.output_liuren_day_placements import (
+        LiurenDayPlacements,
+    )
     from fatebridge.core.metaphysics.liureng import build_liureng_board
     from fatebridge.core.metaphysics.liureng_day_placements import (
         day_placement_patterns,
         day_placements_trace,
     )
-    from fatebridge.core.output_liuren_day_placements import LiurenDayPlacements
     from scripts.ren.audit_ren_classical import make_seed
 
     paths = [
@@ -130,6 +142,8 @@ def audit() -> dict[str, Any]:
         literals.append(row)
         if not ok:
             failures.append(dict(kind="literal", **row))
+        else:
+            pass
         for profile in ("liuren_common_v1", "tanyuan_xieji_v1"):
             for diurnal in (True, False):
                 board = build_liureng_board(
@@ -160,6 +174,8 @@ def audit() -> dict[str, Any]:
                 boards.append(row)
                 if not ok:
                     failures.append(dict(kind="board", **row))
+                else:
+                    pass
     stable = before == {str(p.relative_to(ROOT)): sha(p) for p in paths}
     return dict(
         source_pin=PIN,

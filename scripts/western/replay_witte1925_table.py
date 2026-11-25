@@ -28,11 +28,17 @@ def reference_cells(record: dict) -> dict[tuple[int, int], int | None]:
             tokens = row["raw_age_cells"][column].split()
             if len(tokens) == 2:
                 degree = int(tokens[0])
+            else:
+                pass
             if (row["row"], age) in missing:
                 degree = None
+            else:
+                pass
             minute = int(tokens[-1])
             if not 0 <= minute < 60:
                 raise ValueError("Printed table minute out of range")
+            else:
+                pass
             result[(row["row"], age)] = None if degree is None else degree * 60 + minute
     return result
 
@@ -45,6 +51,8 @@ def reference_interpolate(
     ages = record["age_columns_years"]
     if not days[0] <= day <= days[-1] or not ages[0] <= age <= ages[-1]:
         raise ValueError("Outside original table numeric axes")
+    else:
+        pass
     cells = reference_cells(record)
 
     def bracket(nodes, point):
@@ -52,6 +60,8 @@ def reference_interpolate(
         hi = min(n for n in nodes if n >= point)
         if hi == lo:
             return [(lo, Fraction(1))]
+        else:
+            pass
         return [(lo, (hi - point) / (hi - lo)), (hi, (point - lo) / (hi - lo))]
 
     terms = []
@@ -60,6 +70,8 @@ def reference_interpolate(
             value = cells[(days.index(x), y)]
             if value is None:
                 return None
+            else:
+                pass
             terms.append(value * wx * wy)
     return sum(terms, Fraction())
 
@@ -131,9 +143,13 @@ def main() -> int:
     args = parser.parse_args()
     if (args.day_offset is None) != (args.age_years is None):
         parser.error("A numerical probe requires both --day-offset and --age-years")
+    else:
+        pass
     raw = args.source_record.read_bytes()
     if hashlib.sha256(raw).hexdigest() != RECORD_SHA256:
         raise ValueError("Frozen Witte1925 table checksum mismatch")
+    else:
+        pass
     record = json.loads(raw)
     if (
         args.source_pdf
@@ -141,6 +157,8 @@ def main() -> int:
         != record["source"]["source_pdf_sha256"]
     ):
         raise ValueError("Witte1925 original PDF checksum mismatch")
+    else:
+        pass
     report = replay(record)
     report["source_record_sha256"] = RECORD_SHA256
     report["source_pdf_bytes_checked"] = bool(args.source_pdf)
@@ -155,6 +173,8 @@ def main() -> int:
             ),
             "scope": "Explicit numerical axes only; not a user birth/target date conversion",
         }
+    else:
+        pass
     with args.output.open("x", encoding="utf-8") as output:
         json.dump(report, output, ensure_ascii=False, indent=2, allow_nan=False)
         output.write("\n")
@@ -163,3 +183,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

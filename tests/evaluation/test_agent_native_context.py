@@ -12,7 +12,8 @@ from fastmcp import Client
 from fastmcp.client.transports import StdioTransport
 
 import scripts.evaluate_agent as evaluator
-from fatebridge.validation.evaluation_environment import (
+from tests.support.transports import call_calculation, discover_capabilities
+from validation.evaluation_environment import (
     CONTEXT_METHOD,
     capture_selection,
     context_bytes,
@@ -39,7 +40,9 @@ def save(tmp_path, raw):
     return path, hashlib.sha256(raw).hexdigest()
 
 
-def test_context_keeps_path_list_basename_and_unset_values_exact(tmp_path):
+def test_context_keeps_path_list_basename_and_unset_values_exact(
+    tmp_path: Path,
+) -> None:
     values = {
         "SE_EPHE_PATH": "missing" + os.pathsep + "./ephe with spaces",
         "FATEBRIDGE_JPL_FILE": "de441.eph",
@@ -64,7 +67,9 @@ def test_context_keeps_path_list_basename_and_unset_values_exact(tmp_path):
 @pytest.mark.parametrize(
     "fault", ["missing", "extra", "relative", "number", "nul", "flavor", "list"]
 )
-def test_rehashed_invalid_directory_context_is_rejected(tmp_path, fault):
+def test_rehashed_invalid_directory_context_is_rejected(
+    tmp_path: Path, fault: str
+) -> None:
     record = json.loads(context_bytes(capture_selection({}), tmp_path))
     if fault == "missing":
         record.pop("working_directory")
@@ -87,8 +92,8 @@ def test_rehashed_invalid_directory_context_is_rejected(tmp_path, fault):
 
 @pytest.mark.parametrize("network_share", [False, True])
 def test_foreign_context_remains_offline_auditable_but_cannot_execute(
-    tmp_path, network_share
-):
+    tmp_path: Path, network_share: bool
+) -> None:
     record = json.loads(context_bytes(capture_selection({}), tmp_path))
     foreign = (
         {"flavor": "posix", "path": "/original/source"}
@@ -108,7 +113,7 @@ def test_foreign_context_remains_offline_auditable_but_cannot_execute(
         execution_directory(raw)
 
 
-def test_removed_directory_is_not_required_for_offline_binding(tmp_path):
+def test_removed_directory_is_not_required_for_offline_binding(tmp_path: Path) -> None:
     origin = tmp_path / "origin"
     origin.mkdir()
     raw = context_bytes(capture_selection({"SE_EPHE_PATH": "ephe"}), origin)
@@ -127,7 +132,9 @@ def test_removed_directory_is_not_required_for_offline_binding(tmp_path):
     assert result["actual_file_read_set_authenticated"] is False
 
 
-def test_same_selectors_in_a_different_directory_are_not_one_stage_context(tmp_path):
+def test_same_selectors_in_a_different_directory_are_not_one_stage_context(
+    tmp_path: Path,
+) -> None:
     chosen = capture_selection({"SE_EPHE_PATH": "ephe"})
     run = tmp_path / "run"
     run.mkdir()
@@ -141,7 +148,9 @@ def test_same_selectors_in_a_different_directory_are_not_one_stage_context(tmp_p
         verify_stage_selection(tmp_path, run)
 
 
-def test_missing_native_directory_stops_cli_before_model_lookup(tmp_path, monkeypatch):
+def test_missing_native_directory_stops_cli_before_model_lookup(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     raw = context_bytes(capture_selection({}), tmp_path / "not-present")
     path, sha = save(tmp_path, raw)
 
@@ -171,8 +180,8 @@ def test_missing_native_directory_stops_cli_before_model_lookup(tmp_path, monkey
 @pytest.mark.asyncio
 @pytest.mark.parametrize("path_mode", ["relative", "path_list", "empty"])
 async def test_actual_reference_and_model_workspaces_keep_requested_file_resolution(
-    tmp_path, path_mode, monkeypatch
-):
+    tmp_path: Path, path_mode: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
     origin = tmp_path / "native-origin"
     origin.mkdir()
     (origin / "fatebridge").mkdir()
@@ -194,8 +203,16 @@ async def test_actual_reference_and_model_workspaces_keep_requested_file_resolut
             workspace / "src",
             ignore=shutil.ignore_patterns("__pycache__", "*.pyc"),
         )
+        shutil.copytree(
+            ROOT / "validation",
+            workspace / "validation",
+            ignore=shutil.ignore_patterns("__pycache__", "*.pyc"),
+        )
     else:
         (workspace / "src").symlink_to(ROOT / "src", target_is_directory=True)
+        (workspace / "validation").symlink_to(
+            ROOT / "validation", target_is_directory=True
+        )
     if path_mode == "empty":
         empty = tmp_path / "empty"
         empty.mkdir()
@@ -239,9 +256,11 @@ async def test_actual_reference_and_model_workspaces_keep_requested_file_resolut
     config = settings(command)
     assert config["mcp_servers.fatebridge.cwd"] == str(origin)
     assert config["mcp_servers.fatebridge.args"][-1] == str(
-        workspace / "src/fatebridge/validation/agent_capture.py"
+        workspace / "validation/agent_capture.py"
     )
-    assert config["mcp_servers.fatebridge.env.PYTHONPATH"] == str(workspace / "src")
+    assert config["mcp_servers.fatebridge.env.PYTHONPATH"] == os.pathsep.join(
+        [str(workspace), str(workspace / "src")]
+    )
     assert config["mcp_servers.fatebridge.env.SE_EPHE_PATH"] == requested
     prefix = "mcp_servers.fatebridge.env."
     env = {k[len(prefix) :]: v for k, v in config.items() if k.startswith(prefix)}
@@ -255,7 +274,8 @@ async def test_actual_reference_and_model_workspaces_keep_requested_file_resolut
             log_file=tmp_path / "model-stderr.log",
         )
     ) as client:
-        model = await client.call_tool(
+        model = await call_calculation(
+            client,
             "human_design",
             {
                 **case["reference_request"]["arguments"],
@@ -287,7 +307,9 @@ async def test_actual_reference_and_model_workspaces_keep_requested_file_resolut
 
 
 @pytest.mark.asyncio
-async def test_anchored_non_capture_server_uses_frozen_absolute_entry(tmp_path):
+async def test_anchored_non_capture_server_uses_frozen_absolute_entry(
+    tmp_path: Path,
+) -> None:
     origin = tmp_path / "native-origin"
     origin.mkdir()
     (origin / "fatebridge").mkdir()
@@ -322,5 +344,5 @@ async def test_anchored_non_capture_server_uses_frozen_absolute_entry(tmp_path):
             log_file=log,
         )
     ) as client:
-        assert "human_design" in {t.name for t in await client.list_tools()}
+        assert "human_design" in set(await discover_capabilities(client))
     assert "UNFROZEN_NATIVE_CWD" not in log.read_text()

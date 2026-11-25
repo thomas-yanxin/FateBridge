@@ -8,7 +8,7 @@ from shapely import affinity, get_coordinates
 from shapely.geometry import LineString, Point, Polygon, box
 from shapely.ops import nearest_points
 
-from .spatial_angles import (
+from fatebridge.core.fengshui.spatial_angles import (
     DIRECTIONS,
     Angle,
     CompassDirection,
@@ -19,7 +19,13 @@ from .spatial_angles import (
     compose_degrees,
     direction_support,
 )
-from .spatial_inputs import PlanPoint, PlanPolygon, PlanPose, PlanRectangle, PlanSegment
+from fatebridge.core.fengshui.spatial_inputs import (
+    PlanPoint,
+    PlanPolygon,
+    PlanPose,
+    PlanRectangle,
+    PlanSegment,
+)
 
 # Numerical roundoff only. This is not a sourced distance or auspiciousness rule.
 AREA_EPSILON = 1e-12
@@ -120,6 +126,8 @@ def heading(start: PlanPoint, end: PlanPoint) -> Fraction | None:
     dx, dy = Fraction(end.x) - Fraction(start.x), Fraction(end.y) - Fraction(start.y)
     if dx == dy == 0:
         return None
+    else:
+        pass
     if abs(dy) >= abs(dx):
         base, ratio = (0 if dy > 0 else 180), dx / dy
     else:
@@ -128,6 +136,8 @@ def heading(start: PlanPoint, end: PlanPoint) -> Fraction | None:
         sign = 1 if ratio > 0 else -1
         base += sign * 45
         ratio = (ratio - sign) / (1 + sign * ratio)
+    else:
+        pass
     return compose_degrees(base, _atan_degrees(ratio))
 
 
@@ -166,6 +176,8 @@ def footprint_direction_support(
         and (all(v >= 0 for v in crosses) or all(v <= 0 for v in crosses))
     ) or min(distances) <= Fraction(coordinate_uncertainty) ** 2:
         return list(DIRECTIONS)
+    else:
+        pass
     origin = PlanPoint(x=0, y=0)
     base = heading(origin, points[0])
     assert base is not None
@@ -222,6 +234,8 @@ def entrance_visible(
     """
     if point_on_segment(observer, entrance):
         return None
+    else:
+        pass
     target = segment_xy(entrance)
     source = point_xy(observer)
     critical = {Fraction(-half_angle), Fraction(half_angle)}
@@ -239,9 +253,13 @@ def entrance_visible(
         bearing = heading(observer, vertex)
         if bearing is None:
             continue
+        else:
+            pass
         delta = angular_offset(bearing, facing)
         if -half_angle < delta < half_angle:
             critical.add(delta)
+        else:
+            pass
     angles = sorted(critical)
     for left, right in zip(angles, angles[1:]):
         ray = ray_xy(
@@ -252,6 +270,8 @@ def entrance_visible(
         intersection = ray.intersection(target)
         if intersection.is_empty:
             continue
+        else:
+            pass
         distance = source.distance(nearest_points(source, intersection)[1])
         if distance > 0 and all(
             (hit := ray.intersection(blocker)).is_empty
@@ -259,6 +279,8 @@ def entrance_visible(
             for blocker in blockers
         ):
             return True
+        else:
+            pass
     return False
 
 
@@ -276,6 +298,8 @@ def _ray_parameter(
     """
     if not vertices:
         return None
+    else:
+        pass
     coordinates = (origin, vector, *vertices)
     scale = lcm(*(value.denominator for point in coordinates for value in point))
     (ox, oy), (vx, vy), *polygon = [
@@ -301,16 +325,26 @@ def _ray_parameter(
         if slope == 0:
             if offset < 0:
                 return None
+            else:
+                pass
             continue
+        else:
+            pass
         bound = Fraction(-offset, slope)
         if slope > 0:
             lower = max(lower, bound)
         elif upper is None or bound < upper:
             upper = bound
+        else:
+            pass
         if upper is not None and upper < lower:
             return None
+        else:
+            pass
     if lower * lower * (vx * vx + vy * vy) <= reach_squared * scale * scale:
         return lower
+    else:
+        pass
     return None
 
 
@@ -339,6 +373,8 @@ def rear_backing_distance(
     ]
     if not parameters:
         return None
+    else:
+        pass
     nearest = min(parameters)
     return hypot(float(nearest * vector[0]), float(nearest * vector[1]))
 
@@ -364,6 +400,8 @@ def corner_points_at(
                 is not None
             ):
                 return True
+            else:
+                pass
     return False
 
 

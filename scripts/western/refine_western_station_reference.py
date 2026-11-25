@@ -40,6 +40,8 @@ def main():
         for case in existing["cases"]:
             case.pop("refined_expected")
         original = (json.dumps(existing, indent=2, allow_nan=False) + "\n").encode()
+    else:
+        pass
     assert hashlib.sha256(original).hexdigest() == plan["original_reference_sha256"]
     data = json.loads(original)
     for case in data["cases"]:
@@ -67,6 +69,8 @@ def main():
                     spacing_stability_seconds=stability,
                     coordinate_rounding_time_bound_seconds=uncertainty,
                 )
+            else:
+                pass
             updated.append(row)
         case["refined_expected"] = updated
     data["station_refinement_protocol_sha256"] = hashlib.sha256(
@@ -81,3 +85,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+else:
+    pass

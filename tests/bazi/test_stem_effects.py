@@ -18,7 +18,7 @@ def evaluate(text):
 
 
 @pytest.mark.parametrize("text", ["丙子 戊戌 癸酉 丁巳", "甲子 己巳 甲子 丁卯"])
-def test_day_master_and_contested_pairs_require_review(text):
+def test_day_master_and_contested_pairs_require_review(text: str) -> None:
     result = evaluate(text)
     assert all(
         d["status"] == "day_master_or_contested_review"
@@ -27,7 +27,7 @@ def test_day_master_and_contested_pairs_require_review(text):
     assert all(r["available_budget"] == 1 for r in result["stem_effects"]["ledger"])
 
 
-def test_no_synthetic_stem_identity_or_root_activation():
+def test_no_synthetic_stem_identity_or_root_activation() -> None:
     effects = evaluate("癸丑 戊午 丙午 壬辰")["stem_effects"]
     for row in effects["ledger"]:
         assert row["physical_element"] == STEM_ELEMENTS[row["physical_stem"]][0].value
@@ -35,7 +35,7 @@ def test_no_synthetic_stem_identity_or_root_activation():
     assert [r["physical_stem"] for r in effects["ledger"]] == ["癸", "戊", "壬"]
 
 
-def test_production_binding_has_closed_form_fraction_without_display_rounding():
+def test_production_binding_has_closed_form_fraction_without_display_rounding() -> None:
     pillars = dict(
         zip(("year", "month", "day", "hour"), map(tuple, "癸丑 戊午 丙午 壬辰".split()))
     )

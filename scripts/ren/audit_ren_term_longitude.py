@@ -30,12 +30,16 @@ def native_reference() -> tuple[dict[str, Any], dict[str, Any]]:
     folder = ROOT / "tests/fixtures/ren_native_context_v1"
     if hashlib.sha256((folder / "freeze.json").read_bytes()).hexdigest() != NATIVE_PIN:
         raise ValueError("Frozen native context protocol changed")
+    else:
+        pass
     frozen = json.loads((folder / "freeze.json").read_text())
     if any(
         hashlib.sha256((folder / n).read_bytes()).hexdigest() != h
         for n, h in frozen["files"].items()
     ):
         raise ValueError("Frozen native context reference changed")
+    else:
+        pass
     return json.loads((folder / "protocol.json").read_text()), json.loads(
         (folder / "reference.json").read_text()
     )
@@ -53,12 +57,16 @@ def leaf_deltas(before: Any, after: Any, path: str = "") -> list[dict[str, Any]]
             else:
                 result.extend(leaf_deltas(before[key], after[key], child))
         return result
+    else:
+        pass
     if type(before) is list and type(after) is list and len(before) == len(after):
         return [
             r
             for i, (a, b) in enumerate(zip(before, after))
             for r in leaf_deltas(a, b, path + f"[{i}]")
         ]
+    else:
+        pass
     return (
         []
         if canonical(before) == canonical(after)
@@ -99,9 +107,15 @@ def causal_delta_check(
                 and before["name"] in rule["terms"]
             ):
                 allowed_changes.update(rule["paths"])
+            else:
+                pass
         rule = protocol["allowed_derived_probe_paths"]
         if profile in rule["profiles"]:
             allowed_changes.update(rule["paths"])
+        else:
+            pass
+    else:
+        pass
     okay = True
     for delta in deltas:
         path = delta["path"]
@@ -151,6 +165,10 @@ def causal_delta_check(
             okay &= details["native_choice_probe_jd_tt"] == case["expected_jd_tt"]
         elif profile in ["de440", "spk"]:
             okay &= details["native_choice_probe_jd_tt"] is None
+        else:
+            pass
+    else:
+        pass
     return deltas, bool(okay)
 
 
@@ -167,6 +185,8 @@ def canonical(value: Any) -> str:
 def reference() -> tuple[dict[str, Any], dict[str, Any]]:
     if hashlib.sha256((CORPUS / "freeze.json").read_bytes()).hexdigest() != PIN:
         raise ValueError("Frozen longitude protocol changed")
+    else:
+        pass
     freeze = json.loads((CORPUS / "freeze.json").read_text())
     if set(p.name for p in CORPUS.iterdir()) != {
         "freeze.json",
@@ -177,6 +197,8 @@ def reference() -> tuple[dict[str, Any], dict[str, Any]]:
         for n, h in freeze["files"].items()
     ):
         raise ValueError("Frozen longitude protocol changed")
+    else:
+        pass
     return json.loads((CORPUS / "protocol.json").read_text()), json.loads(
         (CORPUS / "reference.json").read_text()
     )
@@ -199,9 +221,13 @@ def validate_event_inventory(
         key = (row.get("profile"), row.get("year"), name)
         if key not in expected or key in observed:
             raise ValueError("Frozen root inventory has an unknown or duplicate event")
+        else:
+            pass
         observed.add(key)
     if observed != expected:
         raise ValueError("Frozen root inventory has missing events")
+    else:
+        pass
     return len(observed)
 
 
@@ -209,6 +235,8 @@ def validate_frozen_roots(path: Path) -> dict[str, Any]:
     digest = hashlib.sha256(path.read_bytes()).hexdigest()
     if digest != ROOTS_SHA256:
         raise ValueError("Frozen before-root bytes changed")
+    else:
+        pass
     protocol, table = reference()
     with gzip.open(path, "rt") as source:
         count = validate_event_inventory(
@@ -248,6 +276,8 @@ def coherent_fault(term: almanac.SolarTerm, *, wide: bool) -> almanac.SolarTerm:
         d["selected_minus_native_seconds_tt"] = float(
             (point.days - TTInstant.from_float(native).days) * 86400
         )
+    else:
+        pass
     return replace(
         term,
         moment=moment,
@@ -266,6 +296,8 @@ def audit(frozen_roots: Path, output: Path, *, matrix_only: bool) -> dict[str, A
         row["term"]: row["longitude_degrees"] for row in table["rows"]
     }:
         raise ValueError("Engine target table differs from frozen HKO definitions")
+    else:
+        pass
     expected_sha = hashlib.sha256(frozen_roots.read_bytes()).hexdigest()
     rows_path = output.with_suffix(".rows.ndjson.gz")
     assert not rows_path.exists()
@@ -299,6 +331,8 @@ def audit(frozen_roots: Path, output: Path, *, matrix_only: bool) -> dict[str, A
 
     if original is not None:
         ren_calendar.validate_term_longitude = trace
+    else:
+        pass
     counters = dict(
         frozen_rows=0,
         replayed_roots=0,
@@ -323,6 +357,8 @@ def audit(frozen_roots: Path, output: Path, *, matrix_only: bool) -> dict[str, A
                 profile, year = row["profile"], row["year"]
                 if matrix_only and year != 2026:
                     continue
+                else:
+                    pass
                 if profile != current_profile:
                     current_profile = profile
                     mode = "native" if profile.startswith("native_") else profile
@@ -335,8 +371,12 @@ def audit(frozen_roots: Path, output: Path, *, matrix_only: bool) -> dict[str, A
                         os.environ["FATEBRIDGE_SOLAR_SPK_FILE"] = str(
                             data_root / "solar-de440.bsp"
                         )
+                    else:
+                        pass
                     configure_ephemeris_path()
                     current_year = None
+                else:
+                    pass
                 if current_year != year:
                     current_year = year
                     try:
@@ -355,6 +395,8 @@ def audit(frozen_roots: Path, output: Path, *, matrix_only: bool) -> dict[str, A
                                 message=str(exc),
                             )
                         )
+                else:
+                    pass
                 original_term = row.get("term")
                 if original_term is None:
                     failures.append(
@@ -366,6 +408,8 @@ def audit(frozen_roots: Path, output: Path, *, matrix_only: bool) -> dict[str, A
                         )
                     )
                     continue
+                else:
+                    pass
                 term = actual.get(original_term["name"])
                 observed = None
                 error = None
@@ -391,6 +435,8 @@ def audit(frozen_roots: Path, output: Path, *, matrix_only: bool) -> dict[str, A
                 try:
                     if term is None:
                         raise ValueError("Named frozen root missing from actual year")
+                    else:
+                        pass
                     ren_calendar.require_ren_solar_term(term)
                     accepted = True
                 except Exception as exc:
@@ -430,10 +476,16 @@ def audit(frozen_roots: Path, output: Path, *, matrix_only: bool) -> dict[str, A
                     or (original is not None and observed is None)
                 ):
                     failures.append(record)
+                else:
+                    pass
                 if term is not None and term.name == "冬至" and year % 25 == 0:
                     print(profile, year, counters, flush=True)
+                else:
+                    pass
                 if year != 2026 or term is None:
                     continue
+                else:
+                    pass
                 for claimed in names:
                     try:
                         ren_calendar.require_ren_solar_term(replace(term, name=claimed))
@@ -492,9 +544,15 @@ def audit(frozen_roots: Path, output: Path, *, matrix_only: bool) -> dict[str, A
                                 rejected=rejected,
                             )
                         )
+                    else:
+                        pass
+                else:
+                    pass
     finally:
         if original is not None:
             ren_calendar.validate_term_longitude = original
+        else:
+            pass
         for key, value in saved.items():
             if value is None:
                 os.environ.pop(key, None)
@@ -529,8 +587,12 @@ def audit(frozen_roots: Path, output: Path, *, matrix_only: bool) -> dict[str, A
         if p.is_file()
     }:
         raise ValueError("Native reference files changed during audit")
+    else:
+        pass
     if hashlib.sha256(frozen_roots.read_bytes()).hexdigest() != expected_sha:
         raise ValueError("Frozen before-root bytes changed during audit")
+    else:
+        pass
     return dict(
         input_binding=input_binding,
         reference_pin=PIN,
@@ -606,3 +668,5 @@ if __name__ == "__main__":
         and result["additional_faults_rejected"] == 17
         else 1
     )
+else:
+    pass

@@ -16,8 +16,8 @@ from tests.support.ephemeris_case_runtime import (
 @pytest.mark.local_data
 @pytest.mark.parametrize("restore_newer_moon", [False, True])
 def test_actual_overlapping_moon_profiles_remain_explicit_without_external_reset(
-    native_ephemeris_files, monkeypatch, restore_newer_moon
-):
+    native_ephemeris_files, monkeypatch: pytest.MonkeyPatch, restore_newer_moon: bool
+) -> None:
     native = ephemeris_runtime.swe
     birth = 2378496.5
     flags = (
@@ -39,6 +39,8 @@ def test_actual_overlapping_moon_profiles_remain_explicit_without_external_reset
     older_end = native.get_current_file_data(1)[2]
     if restore_newer_moon:
         ephemeris_runtime.ephemeris_call("calc", older_end + 1, native.MOON, flags)
+    else:
+        pass
 
     def unexpected_reset(*args):
         raise AssertionError("External solar reconstruction reset native configuration")
@@ -63,7 +65,7 @@ def test_actual_overlapping_moon_profiles_remain_explicit_without_external_reset
 @pytest.mark.local_data
 def test_owned_solar_source_restores_its_profile_after_off_epoch_history(
     native_ephemeris_files,
-):
+) -> None:
     native = ephemeris_runtime.swe
     birth = 2378496.5
     with c.audit_compressed_endpoints():
@@ -99,6 +101,8 @@ def fixture(monkeypatch, *, endpoint=True, mode="good"):
     def window(slot):
         if mode == "edition" and native.selected:
             return (*new[:3], 431)
+        else:
+            pass
         return new if native.selected else old
 
     native.get_current_file_data = window
@@ -112,13 +116,23 @@ def fixture(monkeypatch, *, endpoint=True, mode="good"):
         if epoch > 100:
             if mode == "unavailable":
                 raise RuntimeError("private path must not escape")
+            else:
+                pass
             native.selected = mode != "stuck"
             if mode == "fallback":
                 return corrected[0], 260
+            else:
+                pass
+        else:
+            pass
         if native.selected:
             if mode == "flags":
                 return corrected[0], 2
+            else:
+                pass
             return corrected
+        else:
+            pass
         return first
 
     return native, invoke, calls, first, corrected, (100.0 if endpoint else 50.0)
@@ -129,8 +143,8 @@ def fixture(monkeypatch, *, endpoint=True, mode="good"):
     [("calc", False), ("calc", True), ("calc_ut", False), ("calc_ut", True)],
 )
 def test_original_operation_and_epoch_are_recalculated(
-    monkeypatch, operation, keywords
-):
+    monkeypatch: pytest.MonkeyPatch, operation: str, keywords: bool
+) -> None:
     native, invoke, calls, first, selected, epoch = fixture(monkeypatch)
     epoch -= operation == "calc_ut"
     args = () if keywords else (epoch, 4, 258)
@@ -140,7 +154,7 @@ def test_original_operation_and_epoch_are_recalculated(
         else {}
     )
     with c.audit_compressed_endpoints():
-        result = c._post_call_endpoint_guard(native, operation, args, kwargs, invoke)
+        result, _ = c._post_call_endpoint_guard(native, operation, args, kwargs, invoke)
         receipt = c.endpoint_context_evidence()
     assert result is selected
     assert calls[0] == calls[-1] == (operation, args, kwargs)
@@ -156,7 +170,9 @@ def test_original_operation_and_epoch_are_recalculated(
 
 
 @pytest.mark.parametrize("body", [0, 1, 4, 14])
-def test_ordinary_native_states_are_returned_without_reset(monkeypatch, body):
+def test_ordinary_native_states_are_returned_without_reset(
+    monkeypatch: pytest.MonkeyPatch, body: int
+) -> None:
     native, invoke, calls, first, _, epoch = fixture(monkeypatch, endpoint=False)
     native.SUN = 0
     rebuilt = []
@@ -196,7 +212,9 @@ def test_ordinary_native_states_are_returned_without_reset(monkeypatch, body):
         ("stuck", "compressed_endpoint_unresolved"),
     ],
 )
-def test_endpoint_cannot_hide_a_failed_context(monkeypatch, mode, reason):
+def test_endpoint_cannot_hide_a_failed_context(
+    monkeypatch: pytest.MonkeyPatch, mode: str, reason: str
+) -> None:
     native, invoke, _, _, _, epoch = fixture(monkeypatch, mode=mode)
     with pytest.raises(EphemerisSourceError) as error:
         c.compressed_endpoint_call(native, "calc", (epoch, 4, 258), {}, invoke)
@@ -204,7 +222,9 @@ def test_endpoint_cannot_hide_a_failed_context(monkeypatch, mode, reason):
     assert "/private" not in str(error.value)
 
 
-def test_unknown_native_version_is_not_certified(monkeypatch):
+def test_unknown_native_version_is_not_certified(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     native, invoke, _, _, _, epoch = fixture(monkeypatch)
     native.version = "future_version"
     with pytest.raises(EphemerisSourceError) as error:
@@ -213,7 +233,9 @@ def test_unknown_native_version_is_not_certified(monkeypatch):
 
 
 @pytest.mark.parametrize("body", [-1, 10, 11, 40, 10001])
-def test_analytical_factors_ignore_stale_physical_slots(monkeypatch, body):
+def test_analytical_factors_ignore_stale_physical_slots(
+    monkeypatch: pytest.MonkeyPatch, body
+) -> None:
     native, invoke, calls, first, _, epoch = fixture(monkeypatch)
     assert (
         c.compressed_endpoint_call(native, "calc", (epoch, body, 258), {}, invoke)
@@ -222,7 +244,7 @@ def test_analytical_factors_ignore_stale_physical_slots(monkeypatch, body):
     assert len(calls) == 1
 
 
-def test_real_binding_ordinary_state_remains_exact():
+def test_real_binding_ordinary_state_remains_exact() -> None:
     from fatebridge.core import ephemeris_runtime as e
 
     with e.preserve_ephemeris_path():
@@ -236,8 +258,8 @@ def test_real_binding_ordinary_state_remains_exact():
 
 
 def test_private_preselection_precedes_requested_target_without_inventing_a_before_state(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     native, invoke, calls, first, _, epoch = fixture(monkeypatch, endpoint=False)
     resets = []
     native.set_ephe_path = resets.append
@@ -268,6 +290,8 @@ def test_private_preselection_precedes_requested_target_without_inventing_a_befo
                 state,
                 args[2] | native.FLG_NONUT | native.FLG_NOABERR | native.FLG_NOGDEFL,
             )
+        else:
+            pass
         return value
 
     with c.audit_compressed_endpoints():
@@ -293,7 +317,9 @@ def test_private_preselection_precedes_requested_target_without_inventing_a_befo
 @pytest.mark.parametrize(
     "fault", [None, "no_reception", "outside", "different_epoch", "file_changed"]
 )
-def test_retarded_sequence_retains_all_source_and_epoch_guards(monkeypatch, fault):
+def test_retarded_sequence_retains_all_source_and_epoch_guards(
+    monkeypatch: pytest.MonkeyPatch, fault: str | None
+) -> None:
     native, invoke, calls, _, _, _ = fixture(monkeypatch, endpoint=False)
     windows = (("/private/file.se1", 0.0, 200.0, 441),) * 2
     monkeypatch.setattr(c, "_windows", lambda unused: windows)
@@ -307,6 +333,8 @@ def test_retarded_sequence_retains_all_source_and_epoch_guards(monkeypatch, faul
                     "selected_windows": c._public_windows(windows),
                 }
             )
+        else:
+            pass
 
         def run():
             with c.preserve_native_dependency_context(
@@ -325,6 +353,8 @@ def test_retarded_sequence_retains_all_source_and_epoch_guards(monkeypatch, faul
                         "_windows",
                         lambda unused: (("/different/file.se1", 0.0, 200.0, 441),) * 2,
                     )
+                else:
+                    pass
 
         if fault is None:
             run()
@@ -335,3 +365,47 @@ def test_retarded_sequence_retains_all_source_and_epoch_guards(monkeypatch, faul
                 run()
             assert error.value.reason == "dependency_source_window_incoherent"
         assert c._DEPENDENCY_CONTEXT.get() is None
+
+
+@pytest.mark.parametrize("operation", ["calc", "calc_ut"])
+@pytest.mark.parametrize("endpoint", [False, True])
+def test_guard_retains_full_slots_and_the_final_requested_observation(
+    monkeypatch: pytest.MonkeyPatch, operation: str, endpoint: bool
+) -> None:
+    native, original_invoke, calls, first, corrected, epoch = fixture(
+        monkeypatch, endpoint=endpoint
+    )
+    native.SUN = 0
+    native.FLG_BARYCTR = 16384
+    initial_windows = (
+        ("/private/planets-old.se1", 0.0, 100.0, 441),
+        ("/private/moon-old.se1", -10.0, 110.0, 441),
+    )
+    final_windows = (
+        ("/private/planets-new.se1", 90.0, 200.0, 441),
+        ("/private/moon-new.se1", 80.0, 210.0, 441),
+    )
+    native.get_current_file_data = lambda slot: (
+        final_windows if native.selected else initial_windows
+    )[slot]
+    flags = 258 | native.FLG_BARYCTR
+    original = first[0], flags
+    selected = corrected[0], flags
+
+    def invoke(module, name, args, kwargs):
+        value = original_invoke(module, name, args, kwargs)
+        return original if value is first else selected
+
+    args = (epoch - (operation == "calc_ut"), native.SUN, flags)
+    result, observed = c._post_call_endpoint_guard(native, operation, args, {}, invoke)
+    expected = final_windows if endpoint else initial_windows
+    assert result is (selected if endpoint else original)
+    assert observed == expected
+    assert len(observed) == 2
+    assert c._physical_windows(native, native.SUN, flags, observed) == (expected[0],)
+    assert calls[0] == calls[-1] == (operation, args, {})
+    if endpoint:
+        assert observed != initial_windows
+        assert calls[1][0] == "calc" and calls[1][1][0] > 100.0
+    else:
+        assert len(calls) == 1

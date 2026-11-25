@@ -20,6 +20,8 @@ from typing import Any, Iterator, TextIO
 ROOT = Path(__file__).resolve().parents[2]
 if not __package__:
     sys.path[:0] = [str(ROOT), str(ROOT / "src")]
+else:
+    pass
 
 from scripts.sukuyo import check_sukuyo_month_transitions as monthly
 
@@ -104,6 +106,8 @@ def source_expectations() -> tuple[Iterator[dict[str, Any]], dict[str, Any]]:
                             excluded.append(target)
                             complete = False
                             continue
+                        else:
+                            pass
                         monthly_row = starts.get((basis, target))
                         if monthly_row is not None:
                             fields = monthly_row["lunar_fields"]
@@ -185,6 +189,8 @@ def compare_case(row: dict[str, Any], result: dict[str, Any]) -> dict[str, Any]:
     def check(path: str, expected: Any, actual: Any) -> None:
         if expected != actual or type(expected) is not type(actual):
             differences[path] = {"expected": expected, "actual": actual}
+        else:
+            pass
 
     profile = result["profile_calculation"]
     for key, value in row["outer"].items():
@@ -240,6 +246,8 @@ def compare_case(row: dict[str, Any], result: dict[str, Any]) -> dict[str, Any]:
         if context is None:
             check(prefix + "short_month_assignment", None, assignment)
             continue
+        else:
+            pass
         for path, diff in monthly.compare_calendar(context, row["half"], actual)[
             "differences"
         ].items():
@@ -338,6 +346,10 @@ def compare_case(row: dict[str, Any], result: dict[str, Any]) -> dict[str, Any]:
                             check(
                                 model_path + part + "." + key, value, calculation[key]
                             )
+            else:
+                pass
+        else:
+            pass
     for field_index, key in enumerate(FIELDS):
         fields = [b["lunar_fields"][field_index] for b in row["branches"]]
         common = (
@@ -355,6 +367,8 @@ def verify_all(ledger: TextIO | None = None) -> dict[str, Any]:
         raise ValueError(
             "Fixed composition protocol changed; no narrowed replacement accepted"
         )
+    else:
+        pass
     protocol = json.loads(raw)
     rows, original = source_expectations()
     if (
@@ -362,6 +376,8 @@ def verify_all(ledger: TextIO | None = None) -> dict[str, Any]:
         or protocol["original_oracle_sha256"] != original["oracle_sha256"]
     ):
         raise ValueError("Original full month-start gate binding changed")
+    else:
+        pass
     # The complete source-only digest is checked before any calculation imports.
     oracle_digest = hashlib.sha256()
     counts: Counter[str] = Counter()
@@ -373,7 +389,9 @@ def verify_all(ledger: TextIO | None = None) -> dict[str, Any]:
         or dict(counts) != protocol["counts"]
     ):
         raise ValueError("Full composition oracle or domain changed")
-    from fatebridge.core.sukuyo import calendar_mansion
+    else:
+        pass
+    from fatebridge.core.sukuyo.sukuyo import calendar_mansion
 
     actual_digest, failures = hashlib.sha256(), []
     completed: Counter[str] = Counter()
@@ -405,8 +423,12 @@ def verify_all(ledger: TextIO | None = None) -> dict[str, Any]:
         actual_digest.update(encoded)
         if ledger is not None:
             ledger.write(encoded.decode())
+        else:
+            pass
         if item.get("differences") or "exception" in item:
             failures.append(item)
+        else:
+            pass
     complete = dict(completed) == protocol["counts"]
     return {
         "format": "sukuyo_boundary_composition_check_v1",
@@ -441,3 +463,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

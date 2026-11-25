@@ -6,16 +6,17 @@ from copy import deepcopy
 from pathlib import Path
 
 import pytest
+from pytest import MonkeyPatch
 
-from fatebridge.core import heluo_texts as ht
-from fatebridge.core.heluo import _tiaowen, yao_text
+from fatebridge.core.heluo import heluo_texts as ht
+from fatebridge.core.heluo.heluo import _tiaowen, yao_text
 
 ROOT = Path(__file__).parents[1] / "fixtures/heluo_yu16_v1"
 READINGS = json.loads((ROOT / "verified-readings.json").read_bytes())
 FREEZE = json.loads((ROOT / "freeze.json").read_bytes())
 
 
-def test_header_uncertainty_is_not_suppressed_by_clear_commentary_status():
+def test_header_uncertainty_is_not_suppressed_by_clear_commentary_status() -> None:
     view = {
         "text_provenance": {
             "commentary_status": "source_commentary_visually_collated",
@@ -33,8 +34,8 @@ def test_header_uncertainty_is_not_suppressed_by_clear_commentary_status():
 
 
 def test_source_specific_header_review_and_notes_survive_the_public_line_view(
-    monkeypatch,
-):
+    monkeypatch: MonkeyPatch,
+) -> None:
     data = deepcopy(ht._collation())
     # Isolated view control: supplied source-reading metadata is independent
     # of the production corpus extension and must not become a global label.
@@ -46,7 +47,7 @@ def test_source_specific_header_review_and_notes_survive_the_public_line_view(
     assert p["header_reading_notes"] == READINGS["headers"][3]["reading_notes"]
 
 
-def test_first_draft_and_withdrawn_proposals_are_retained():
+def test_first_draft_and_withdrawn_proposals_are_retained() -> None:
     for name, digest in FREEZE["files"].items():
         assert hashlib.sha256((ROOT / name).read_bytes()).hexdigest() == digest
     assert FREEZE["frozen_before_production_edits"] is True
@@ -66,7 +67,9 @@ def test_first_draft_and_withdrawn_proposals_are_retained():
 
 
 @pytest.mark.parametrize("entry", READINGS["entries"], ids=lambda e: str(e["line"]))
-def test_all_printed_parent_conditions_and_old_poem_verdict_are_preserved(entry):
+def test_all_printed_parent_conditions_and_old_poem_verdict_are_preserved(
+    entry,
+) -> None:
     text = yao_text("雷地豫", entry["line"])
     assert text["detail"] == "".join(s["text"] for s in entry["sections"])
     assert text["commentary_sections"] == [
@@ -84,7 +87,7 @@ def test_all_printed_parent_conditions_and_old_poem_verdict_are_preserved(entry)
 
 
 @pytest.mark.parametrize("entry", READINGS["headers"], ids=lambda e: str(e["line"]))
-def test_header_has_its_actual_page_review_and_reading_notes(entry):
+def test_header_has_its_actual_page_review_and_reading_notes(entry) -> None:
     text = yao_text("雷地豫", entry["line"])
     assert text["yaoci"] == entry["yaoci"]
     p = text["text_provenance"]
@@ -93,7 +96,7 @@ def test_header_has_its_actual_page_review_and_reading_notes(entry):
     assert p["header_reading_notes"] == entry["reading_notes"]
 
 
-def test_nested_yin_ming_clause_keeps_its_printed_parent_and_uncertainties():
+def test_nested_yin_ming_clause_keeps_its_printed_parent_and_uncertainties() -> None:
     text = yao_text("雷地豫", 4)
     buxie = next(s for s in text["commentary_sections"] if s["section_id"] == "buxie")
     assert "若陰命妻葉卦者，得福得壽，但不居正位。" in buxie["text"]

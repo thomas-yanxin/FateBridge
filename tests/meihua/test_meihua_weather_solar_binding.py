@@ -4,13 +4,14 @@ import ast
 import copy
 import hashlib
 import json
+import xml.etree.ElementTree as ET
 from datetime import datetime, timedelta
 from pathlib import Path
 
 import pytest
 
-from fatebridge.validation import meihua_weather_solar_binding as binding
-from fatebridge.validation.meihua_weather_calendar_binding import (
+from validation import meihua_weather_solar_binding as binding
+from validation.meihua_weather_calendar_binding import (
     calendar_bound_weather_label,
 )
 
@@ -26,7 +27,9 @@ def first():
     return copy.deepcopy(PROBE["original"])
 
 
-def test_original_reference_and_old_reader_probe_precede_new_validator_execution():
+def test_original_reference_and_old_reader_probe_precede_new_validator_execution() -> (
+    None
+):
     freeze = json.loads((FIXTURE / "reference-freeze.json").read_bytes())
     assert not freeze["new_module_present"]
     assert not freeze["new_profile_present"]
@@ -51,7 +54,7 @@ def test_original_reference_and_old_reader_probe_precede_new_validator_execution
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["instant"])
-def test_predeclared_literal_phase_and_guard_cases(case):
+def test_predeclared_literal_phase_and_guard_cases(case) -> None:
     actual = binding.published_solar_month_context(
         datetime.fromisoformat(case["instant"])
     )
@@ -72,7 +75,9 @@ def test_predeclared_literal_phase_and_guard_cases(case):
 
 @pytest.mark.parametrize("index", range(72))
 @pytest.mark.parametrize("delta", [-2, -1, 0, 1])
-def test_all_printed_minor_terms_keep_both_guard_sides_and_coverage_edges(index, delta):
+def test_all_printed_minor_terms_keep_both_guard_sides_and_coverage_edges(
+    index, delta
+) -> None:
     row = MINOR[index]
     point = datetime.fromisoformat(row["printed_datetime"]) + timedelta(minutes=delta)
     actual = binding.published_solar_month_context(point)
@@ -98,8 +103,7 @@ def test_all_printed_minor_terms_keep_both_guard_sides_and_coverage_edges(index,
 @pytest.mark.parametrize(
     "row", PROFILE["terms"], ids=lambda c: f"{c['year']}:{c['term']}"
 )
-def test_reference_facts_remain_bound_to_original_xml_element_and_names(row):
-    import xml.etree.ElementTree as ET
+def test_reference_facts_remain_bound_to_original_xml_element_and_names(row) -> None:
 
     raw = (FIXTURE / row["source_file"]).read_bytes()
     assert hashlib.sha256(raw).hexdigest() == row["source_sha256"]
@@ -116,7 +120,7 @@ def test_reference_facts_remain_bound_to_original_xml_element_and_names(row):
     assert (row["declared_month_branch_after"] is None) == (row["kind"] == "major")
 
 
-def test_unchanged_old_reader_accepts_wrong_month_new_binding_rejects_it():
+def test_unchanged_old_reader_accepts_wrong_month_new_binding_rejects_it() -> None:
     assert PROBE["old_reader_result_unchanged"]
     assert (
         calendar_bound_weather_label(PROBE["forged"])
@@ -137,14 +141,16 @@ def test_unchanged_old_reader_accepts_wrong_month_new_binding_rejects_it():
 
 
 @pytest.mark.parametrize("season", [None, "summer", 1, True])
-def test_primary_scenario_cannot_substitute_or_omit_published_context(season):
+def test_primary_scenario_cannot_substitute_or_omit_published_context(
+    season: bool | int | str | None,
+) -> None:
     row = first()
     row["input"]["weather_context"]["season"] = season
     with pytest.raises(ValueError, match="weather_context.season"):
         binding.verify_published_solar_issue_context(row)
 
 
-def test_unsupplied_scenario_keeps_unknown_season_while_month_is_verified():
+def test_unsupplied_scenario_keeps_unknown_season_while_month_is_verified() -> None:
     row = first()
     row["scenario"] = "season_not_supplied"
     row["input"]["weather_context"] = None
@@ -156,7 +162,9 @@ def test_unsupplied_scenario_keeps_unknown_season_while_month_is_verified():
         binding.verify_published_solar_issue_context(row)
 
 
-def test_guard_case_stays_unverified_and_does_not_invent_a_month_or_suppress_row():
+def test_guard_case_stays_unverified_and_does_not_invent_a_month_or_suppress_row() -> (
+    None
+):
     row = first()
     row["input"].update(
         analysis_year=2026,
@@ -181,8 +189,8 @@ def test_guard_case_stays_unverified_and_does_not_invent_a_month_or_suppress_row
     ],
 )
 def test_original_hong_kong_clock_and_literal_types_are_not_silently_changed(
-    field, value
-):
+    field: str, value: bool | float | str
+) -> None:
     row = first()
     row["input"][field] = value
     with pytest.raises(ValueError):
@@ -192,14 +200,16 @@ def test_original_hong_kong_clock_and_literal_types_are_not_silently_changed(
 @pytest.mark.parametrize(
     "field,value", [("many_min_count", 2), ("prior_condition", "prolonged_rain")]
 )
-def test_original_unconditional_context_protocol_is_retained(field, value):
+def test_original_unconditional_context_protocol_is_retained(
+    field: str, value: int | str
+) -> None:
     row = first()
     row["input"]["weather_context"][field] = value
     with pytest.raises(ValueError, match="original_protocol"):
         binding.verify_published_solar_issue_context(row)
 
 
-def test_unknown_scenario_naive_time_and_unprinted_seconds_are_rejected():
+def test_unknown_scenario_naive_time_and_unprinted_seconds_are_rejected() -> None:
     row = first()
     row["scenario"] = "winning_subset"
     with pytest.raises(ValueError, match="two original"):
@@ -212,7 +222,7 @@ def test_unknown_scenario_naive_time_and_unprinted_seconds_are_rejected():
             binding.published_solar_month_context(value)
 
 
-def test_reference_is_an_isolated_copy_and_uses_minor_not_major_boundaries():
+def test_reference_is_an_isolated_copy_and_uses_minor_not_major_boundaries() -> None:
     point = datetime.fromisoformat("2026-04-21T12:00:00+08:00")
     a = binding.published_solar_month_context(point)
     assert a["month_branch"] == "辰"
@@ -222,7 +232,7 @@ def test_reference_is_an_isolated_copy_and_uses_minor_not_major_boundaries():
     assert binding.published_solar_month_context(point)["start_term"]["term"] == "清明"
 
 
-def test_validator_does_not_import_production_calendar_or_weather_calculators():
+def test_validator_does_not_import_production_calendar_or_weather_calculators() -> None:
     tree = ast.parse(Path(binding.__file__).read_text())
     modules = [
         node.module or "" for node in ast.walk(tree) if isinstance(node, ast.ImportFrom)
@@ -232,8 +242,8 @@ def test_validator_does_not_import_production_calendar_or_weather_calculators():
 
 
 def test_reference_hash_drift_is_not_accepted_as_better_agreement(
-    monkeypatch, tmp_path
-):
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     target = tmp_path / "meihua"
     target.mkdir()
     (target / "weather-solar-minutes-hko-v1.json").write_bytes(

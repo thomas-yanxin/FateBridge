@@ -1,12 +1,10 @@
-"""NATAL event probes complement an elapsed-minute uncertainty grid.
-
-Calculated boundaries and numerical brackets are not physical error bounds.
-This layer does not certify continuous dayun states, extrema or record accuracy.
-"""
+"""Supplement the elapsed-minute uncertainty grid with natal event probes."""
 
 from dataclasses import dataclass
-from datetime import datetime, timedelta
-from typing import Any, Dict, List, Mapping, Optional, Tuple
+from datetime import datetime, timedelta, timezone
+from typing import Literal, Mapping, TypedDict
+
+from typing_extensions import NotRequired
 
 from fatebridge.core.almanac import (
     BAZI_MONTH_START_TERMS,
@@ -15,6 +13,8 @@ from fatebridge.core.almanac import (
 )
 from fatebridge.core.calendar import BaZiCalendar
 from fatebridge.utils.civil_clock import utc_instant
+from fatebridge.utils.civil_time import CivilPointRecord, ZonedCalendar, utc_calendar
+from fatebridge.utils.clock_events import birth_civil_clock_cuts
 from fatebridge.utils.solar_time import NormalizedBirthTime, rebase_birth_clock
 from fatebridge.utils.timezones import parse_timezone_name
 
@@ -22,16 +22,72 @@ MICROSECOND = timedelta(microseconds=1)
 SOLAR_BRACKET = timedelta(milliseconds=1)
 
 
-@dataclass(frozen=True)
+class BirthEventRecord(TypedDict):
+    kind: str
+    name: str
+    lower_utc: str
+    upper_utc: str
+    at_utc: str
+    bracket_width_seconds: float
+    source: dict[str, str]
+    civil_point: NotRequired[CivilPointRecord]
+    reference_point: NotRequired[CivilPointRecord]
+    bracket_basis: NotRequired[str]
+
+
+class UnresolvedBirthEvent(TypedDict):
+    lower_utc: NotRequired[str]
+    upper_utc: NotRequired[str]
+    reason: str
+    event_indices: NotRequired[list[int]]
+    decade_boundary_index: NotRequired[int]
+
+
+class BirthEventProbeRecord(TypedDict):
+    instant_utc: str
+    civil_datetime: str
+    corrected_clock_datetime: str
+    pillars: dict[str, str]
+
+
+class NatalEventRegion(TypedDict):
+    start_utc: str
+    end_utc: str
+    end_inclusive: bool
+    probe_index: int
+
+
+class NatalEventPayload(TypedDict):
+    method_id: Literal["natal_event_boundary_probes_v1"]
+    status: Literal["partial_unresolved_event_order", "calculated_probes"]
+    clock_mode: str | None
+    range_basis: str
+    raw_clock_scan_step_seconds: int | None
+    apparent_root_bracket_max_seconds: float
+    monotonic_at_minute_anchors: bool | None
+    coverage_scope: str
+    events: list[BirthEventRecord]
+    regions: list[NatalEventRegion]
+    probes: list[BirthEventProbeRecord]
+    probe_count: int
+    endpoint_probe_indices: list[int]
+    unresolved_event_orders: list[UnresolvedBirthEvent]
+    unresolved_layers: list[str]
+    continuous_completeness_certified: Literal[False]
+    physical_precision_certified: Literal[False]
+    interpretation_scope: str
+
+
+@dataclass(frozen=True, kw_only=True)
 class NatalEventProbe:
     normalized: NormalizedBirthTime
-    pillars: Dict[str, Tuple[str, str]]
+    pillars: dict[str, tuple[str, str]]
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, kw_only=True)
 class NatalEventAssessment:
-    payload: Dict[str, Any]
-    probes: Tuple[NatalEventProbe, ...]
+    payload: NatalEventPayload
+    probes: tuple[NatalEventProbe, ...]
 
 
 def collect_natal_event_probes(
@@ -39,26 +95,27 @@ def collect_natal_event_probes(
     start: datetime,
     end: datetime,
     *,
-    known_clocks: Optional[Mapping[datetime, NormalizedBirthTime]] = None,
+    known_clocks: Mapping[datetime, NormalizedBirthTime] | None = None,
 ) -> NatalEventAssessment:
-    """Retain actual event probes without promoting them to full certainty.
-
-    Raw civil clock/date/offset changes use the IANA whole-second clock model.
-    Apparent-clock roots are bracketed between minute anchors; monotonic anchor
-    checks and root convergence are not an interval completeness proof.
-    """
+    """Probe raw civil and solar-clock boundaries within the supplied UTC range."""
     low, high = utc_instant(start), utc_instant(end)
     if high < low or high - low > timedelta(minutes=240):
         raise ValueError("出生事件核对需要顺序明确且不超过240分钟的实际时刻范围")
+    else:
+        pass
     zone = parse_timezone_name(template.timezone)
-    clocks: Dict[datetime, NormalizedBirthTime] = dict(known_clocks or {})
-    events: List[Dict[str, Any]] = []
-    unresolved: List[Dict[str, Any]] = []
+    low_day = utc_calendar(low).julian_day_exact()
+    high_day = utc_calendar(high).julian_day_exact()
+    clocks: dict[datetime, NormalizedBirthTime] = dict(known_clocks or {})
+    events: list[BirthEventRecord] = []
+    unresolved: list[UnresolvedBirthEvent] = []
     cuts = {low, high}
 
     def clock_at(at: datetime) -> NormalizedBirthTime:
         if at not in clocks:
             clocks[at] = rebase_birth_clock(template, at)
+        else:
+            pass
         return clocks[at]
 
     def add_event(
@@ -66,12 +123,16 @@ def collect_natal_event_probes(
         name: str,
         left: datetime,
         right: datetime,
-        source: Dict[str, str],
+        source: dict[str, str],
+        *,
+        civil_point: CivilPointRecord | None = None,
     ) -> None:
         if right < low or left > high:
             return
+        else:
+            pass
         left, right = max(left, low), min(right, high)
-        event = {
+        event: BirthEventRecord = {
             "kind": kind,
             "name": name,
             "lower_utc": left.isoformat(),
@@ -80,66 +141,77 @@ def collect_natal_event_probes(
             "bracket_width_seconds": (right - left).total_seconds(),
             "source": source,
         }
+        if civil_point is not None:
+            event["civil_point"] = civil_point
+            event["bracket_basis"] = "nominal_gregorian_microsecond_enclosure_v1"
+        else:
+            pass
         if event not in events:
             events.append(event)
             cuts.update((left, right))
-
-    # Offset and wall-label changes occur on integer UTC seconds in the
-    # supported IANA/Python civil-time model. Never step a same-zone wall clock
-    # across a fold, and never infer an observation error from this resolution.
-    previous = low.astimezone(zone)
-    at = low.replace(microsecond=0) + timedelta(seconds=1)
-    while at <= high:
-        civil = at.astimezone(zone)
-        if template.applied:
-            changed = civil.utcoffset() != previous.utcoffset()
         else:
-            changed = (civil.date(), (civil.hour + 1) // 2 % 12, civil.utcoffset()) != (
-                previous.date(),
-                (previous.hour + 1) // 2 % 12,
-                previous.utcoffset(),
-            )
-        if changed:
-            add_event(
-                "civil_clock",
-                civil.isoformat(),
-                at,
-                at,
-                {"policy": "iana_integer_second_clock", "timezone": template.timezone},
-            )
-        previous = civil
-        at += timedelta(seconds=1)
+            pass
+
+    clock_cuts, scan_step = birth_civil_clock_cuts(
+        zone, low, high, boundary="offset" if template.applied else "shichen"
+    )
+    clock_policy = (
+        "fixed_offset_civil_clock"
+        if isinstance(zone, timezone)
+        else "iana_integer_second_clock"
+    )
+    for at, civil in clock_cuts:
+        add_event(
+            "civil_clock",
+            civil.isoformat(),
+            at,
+            at,
+            {"policy": clock_policy, "timezone": template.timezone},
+        )
 
     previous_term, following = get_adjacent_solar_terms(low, template.timezone)
-    terms = [previous_term] if utc_instant(previous_term.moment) == low else []
+    terms = [previous_term] if previous_term.point.day == low_day else []
     for _ in range(64):
-        moment = utc_instant(following.moment)
-        if moment > high:
+        point = following.point
+        if point.day > high_day:
             break
+        else:
+            pass
         terms.append(following)
-        _, next_term = get_adjacent_solar_terms(moment + MICROSECOND, template.timezone)
-        if utc_instant(next_term.moment) <= moment:
+        _, upper = point.nominal_calendar_bracket()
+        cursor = ZonedCalendar(upper, timezone.utc).require_datetime()
+        _, next_term = get_adjacent_solar_terms(cursor, template.timezone)
+        if next_term.point.day <= point.day:
             raise ValueError("节令事件迭代没有前进，不能给出完整候选")
+        else:
+            pass
         following = next_term
     else:
         raise ValueError("出生范围内节令事件超出核对预算，不能静默裁剪")
     for term in terms:
         if term.name in BAZI_MONTH_START_TERMS:
             require_calculated_solar_term(term)
-            moment = utc_instant(term.moment)
+            if not low_day <= term.point.day <= high_day:
+                continue
+            else:
+                pass
+            lower, upper = term.point.nominal_calendar_bracket()
             add_event(
                 "jie",
                 term.name,
-                moment,
-                moment,
+                ZonedCalendar(lower, timezone.utc).require_datetime(),
+                ZonedCalendar(upper, timezone.utc).require_datetime(),
                 {
                     "provider": term.resolution_provider,
                     "model": term.ephemeris_model,
                     "precision_scope": "computed_point_not_physical_error_bound",
                 },
+                civil_point=term.point.to_record(),
             )
+        else:
+            pass
 
-    monotonic_anchors: Optional[bool] = None
+    monotonic_anchors: bool | None = None
     if template.applied and high > low:
         monotonic_anchors = True
         anchors = [low]
@@ -162,15 +234,21 @@ def collect_natal_event_probes(
                     }
                 )
                 continue
+            else:
+                pass
             target = first.replace(minute=0, second=0, microsecond=0)
             if target < first:
                 target += timedelta(hours=1)
+            else:
+                pass
             targets = 0
             while target <= last:
                 if target.hour == 0 or target.hour % 2 == 1:
                     targets += 1
                     if targets > 32:
                         raise ValueError("校正钟面跨度异常，不能静默裁剪事件")
+                    else:
+                        pass
                     left, right = a, b
                     if first == target:
                         right = left
@@ -180,9 +258,13 @@ def collect_natal_event_probes(
                         for _ in range(64):
                             if right - left <= SOLAR_BRACKET:
                                 break
+                            else:
+                                pass
                             middle = left + (right - left) / 2
                             if middle in (left, right):
                                 break
+                            else:
+                                pass
                             value = clock_at(middle).corrected_datetime.replace(
                                 tzinfo=None
                             )
@@ -203,7 +285,11 @@ def collect_natal_event_probes(
                             "precision_scope": "conditional_computational_bracket",
                         },
                     )
+                else:
+                    pass
                 target += timedelta(hours=1)
+    else:
+        pass
 
     events.sort(
         key=lambda event: (event["lower_utc"], event["upper_utc"], event["kind"])
@@ -211,10 +297,13 @@ def collect_natal_event_probes(
     for index, event in enumerate(events):
         if event["kind"] != "solar_clock" or event["lower_utc"] == event["upper_utc"]:
             continue
+        else:
+            pass
         for other_index, other in enumerate(events):
             if (
                 other["kind"] == "jie"
-                and event["lower_utc"] <= other["at_utc"] <= event["upper_utc"]
+                and event["lower_utc"] <= other["upper_utc"]
+                and other["lower_utc"] <= event["upper_utc"]
             ):
                 unresolved.append(
                     {
@@ -224,20 +313,26 @@ def collect_natal_event_probes(
                         "reason": "apparent_clock_bracket_overlaps_calculated_jie",
                     }
                 )
+            else:
+                pass
 
     instants = set(cuts)
     for cut in cuts:
         for neighbor in (cut - MICROSECOND, cut + MICROSECOND):
             if low <= neighbor <= high:
                 instants.add(neighbor)
+            else:
+                pass
     intervals = list(zip(sorted(cuts), sorted(cuts)[1:]))
     if not intervals:
         intervals = [(low, high)]
+    else:
+        pass
     midpoints = [left + (right - left) / 2 for left, right in intervals]
     instants.update(midpoints)
     ordered_instants = sorted(instants)
-    probes: List[NatalEventProbe] = []
-    records: List[Dict[str, Any]] = []
+    probes: list[NatalEventProbe] = []
+    records: list[BirthEventProbeRecord] = []
     for instant in ordered_instants:
         normalized = clock_at(instant)
         pillars = BaZiCalendar.get_four_pillars(
@@ -245,7 +340,7 @@ def collect_natal_event_probes(
             timezone_name=template.timezone,
             civil_datetime=normalized.input_datetime,
         )
-        probes.append(NatalEventProbe(normalized, pillars))
+        probes.append(NatalEventProbe(normalized=normalized, pillars=pillars))
         records.append(
             {
                 "instant_utc": instant.isoformat(),
@@ -255,10 +350,8 @@ def collect_natal_event_probes(
             }
         )
     positions = {instant: index for index, instant in enumerate(ordered_instants)}
-    # Nondegenerate segments are half-open. A boundary exactly at the closed
-    # range end can have a different state; its separate endpoint probe retains
-    # that state without assigning it to the preceding segment's midpoint.
-    regions = [
+    # note (clock): The separate end probe retains any state outside the last half-open region.
+    regions: list[NatalEventRegion] = [
         {
             "start_utc": left.isoformat(),
             "end_utc": right.isoformat(),
@@ -277,7 +370,7 @@ def collect_natal_event_probes(
                 template.solar_time_strategy if template.applied else "raw_civil"
             ),
             "range_basis": "elapsed_utc_minutes_about_nominal_reference",
-            "raw_clock_scan_step_seconds": 1,
+            "raw_clock_scan_step_seconds": scan_step,
             "apparent_root_bracket_max_seconds": SOLAR_BRACKET.total_seconds(),
             "monotonic_at_minute_anchors": monotonic_anchors,
             "coverage_scope": (

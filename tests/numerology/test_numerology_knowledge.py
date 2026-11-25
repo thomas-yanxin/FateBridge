@@ -5,13 +5,20 @@ import json
 from copy import deepcopy
 from dataclasses import replace
 from pathlib import Path
+from unittest.mock import patch
 
 import pytest
 from pydantic import ValidationError
+from pytest import MonkeyPatch
 
 from fatebridge.application.execution import execute_tool
-from fatebridge.core import numerology_knowledge as gateway
-from fatebridge.core.output_reference import NumerologyKnowledgeDetails
+from fatebridge.core.contracts.output_reference import NumerologyKnowledgeDetails
+from fatebridge.core.heluo.heluo import _tiaowen
+from fatebridge.core.human_design.human_design_knowledge import (
+    SOURCE as HUMAN_DESIGN_SOURCE,
+)
+from fatebridge.core.numerology import numerology_knowledge as gateway
+from fatebridge.core.numerology.canping_schedule_basis import APPLIED, clause_role
 from fatebridge.services.knowledge import (
     calculate_knowledge_read,
     calculate_knowledge_registry,
@@ -23,13 +30,15 @@ from tests.support.heluo_source_facts import (
     PENDING_COUNT,
 )
 
-DATA = Path(gateway.__file__).parents[1] / "data"
+SOURCE_DATA_ROOT = gateway.DATA_ROOT
 F = Path(__file__).parents[1] / "fixtures/numerology_knowledge_v1"
 SPECS = {s.key: s for s in CATALOG if s.key in ["knowledge_read", "knowledge_registry"]}
 
 
 @pytest.mark.parametrize("domain", ["heluo", "canping"])
-def test_registry_separates_keyspace_review_counts_and_applicability(domain):
+def test_registry_separates_keyspace_review_counts_and_applicability(
+    domain: str,
+) -> None:
     result = calculate_knowledge_registry(domain=domain)
     assert "error" not in result and result["source"] == gateway.SOURCE
     assert result["provenance"]["reference_only"] is True
@@ -63,7 +72,9 @@ def test_registry_separates_keyspace_review_counts_and_applicability(domain):
         assert categories["schedule_clauses"]["count"] == 6
 
 
-def test_global_registry_does_not_attribute_added_domains_to_legacy_hover_source():
+def test_global_registry_does_not_attribute_added_domains_to_legacy_hover_source() -> (
+    None
+):
     result = calculate_knowledge_registry()
     assert [d["domain"] for d in result["domains"]] == [
         "astro",
@@ -78,20 +89,30 @@ def test_global_registry_does_not_attribute_added_domains_to_legacy_hover_source
         result["source"] == "fatebridge_mixed_knowledge"
         and result["bundle_version"] is None
     )
-    for domain in result["domains"][:4]:
-        assert domain["source"] == "xingque_hover_docs"
+    for domain, source in zip(
+        result["domains"][:4],
+        (
+            "fatebridge_rule_references",
+            "xingque_hover_docs",
+            "xingque_hover_docs",
+            "fatebridge_rule_references",
+        ),
+        strict=True,
+    ):
+        assert domain["source"] == source
         assert calculate_knowledge_registry(domain=domain["domain"])["domains"] == [
             domain
         ]
     assert all(d["source"] == gateway.SOURCE for d in result["domains"][4:6])
-    from fatebridge.core.human_design_knowledge import SOURCE as HUMAN_DESIGN_SOURCE
 
     assert result["domains"][6]["source"] == HUMAN_DESIGN_SOURCE
 
 
-def test_all1170_bodies_match_version_bound_literal_records_and_columns():
+def test_all1170_bodies_match_version_bound_literal_records_and_columns() -> None:
     # Binding to existing records, not an independent reading of their images.
-    data = json.loads((DATA / "canping/text-collation-v1.json").read_bytes())
+    data = json.loads(
+        (SOURCE_DATA_ROOT / "canping/text-collation-v1.json").read_bytes()
+    )
     count = 0
     for entry in data["entries"]:
         for kind, literal in entry["cells"].items():
@@ -113,12 +134,13 @@ def test_all1170_bodies_match_version_bound_literal_records_and_columns():
             )
             if kind in entry.get("reading_uncertainties", {}):
                 assert record["selection"]["cell_status"] == "source_reading_uncertain"
+            else:
+                pass
             count += 1
     assert count == 1170
 
 
-def test_all384_line_references_leave_conditions_and_poems_unselected():
-    from fatebridge.core.heluo import _tiaowen
+def test_all384_line_references_leave_conditions_and_poems_unselected() -> None:
 
     count = 0
     for gua, value in _tiaowen().items():
@@ -146,8 +168,9 @@ def test_all384_line_references_leave_conditions_and_poems_unselected():
 @pytest.mark.parametrize(
     "profile", ["bazi_appendix_v1", "bazi_continuous_v1", "legacy_minggong_v1"]
 )
-def test_policy_reference_preserves_roles_and_has_no_personal_date(profile):
-    from fatebridge.core.canping_schedule_basis import APPLIED, clause_role
+def test_policy_reference_preserves_roles_and_has_no_personal_date(
+    profile: str,
+) -> None:
 
     result = gateway.read_reference(domain="canping", category=None, key=profile)
     record = result["reference_details"]["record"]
@@ -174,9 +197,12 @@ def test_policy_reference_preserves_roles_and_has_no_personal_date(profile):
     ],
 )
 def test_category_omission_resolves_exact_key_without_cross_domain_fallback(
-    domain, key
-):
-    result = gateway.read_reference(domain=domain, category=None, key=key)
+    domain: str, key: str
+) -> None:
+    spec = SPECS["knowledge_read"]
+    with patch.object(gateway, "read_reference", wraps=gateway.read_reference) as read:
+        result = execute_tool(spec, spec.request_model(domain=domain, key=key))
+        read.assert_called_once_with(domain=domain, category=None, key=key)
     assert result["key"] == key and result["provenance"]["domain"] == domain
     wrong = calculate_knowledge_read(
         domain="canping" if domain == "heluo" else "heluo", key=key
@@ -184,7 +210,7 @@ def test_category_omission_resolves_exact_key_without_cross_domain_fallback(
     assert wrong["status_code"] == 400
 
 
-def test_missing_row_and_unselected_column_do_not_become_printed_blanks():
+def test_missing_row_and_unselected_column_do_not_become_printed_blanks() -> None:
     missing = gateway.read_reference(
         domain="canping", category=None, key="火.3034.female"
     )["reference_details"]["record"]
@@ -199,7 +225,9 @@ def test_missing_row_and_unselected_column_do_not_become_printed_blanks():
 @pytest.mark.parametrize(
     "fault", ["citation", "title", "text", "role", "all_copies_wrong_query"]
 )
-def test_forged_consistent_card_still_binds_to_original_request(fault):
+def test_forged_card_differs_from_source_or_fails_runtime_identity_check(
+    fault: str,
+) -> None:
     spec = SPECS["knowledge_read"]
     request = spec.request_model.model_validate(
         dict(domain="canping", key="appendix_integer_rounding")
@@ -217,6 +245,14 @@ def test_forged_consistent_card_still_binds_to_original_request(fault):
         ] = "applied_rule"
     else:
         output = calculate_knowledge_read(domain="canping", key="appendix_month_order")
+    source = gateway.read_reference(
+        domain="canping", category=None, key="appendix_integer_rounding"
+    )
+    assert any(output[field] != expected for field, expected in source.items())
+    if fault != "all_copies_wrong_query":
+        return
+    else:
+        pass
     frozen = replace(spec, bind=lambda _: (lambda: deepcopy(output), (), {}))
     actual = execute_tool(frozen, request)
     assert actual["status_code"] == 503 and actual["retryable"] is False
@@ -233,36 +269,44 @@ def test_forged_consistent_card_still_binds_to_original_request(fault):
         {"personal_applicability_assessed": True},
     ],
 )
-def test_partial_reference_cannot_certify_personal_application(change):
+def test_partial_reference_cannot_certify_personal_application(change) -> None:
     with pytest.raises(ValidationError):
         NumerologyKnowledgeDetails.model_validate(change)
 
 
 @pytest.mark.parametrize("domain", ["heluo", "canping"])
-def test_reference_registry_normalizes_domain_like_reference_read(domain):
+def test_reference_registry_normalizes_domain_like_reference_read(domain: str) -> None:
     assert calculate_knowledge_registry(domain=f" {domain} ")["domains"] == (
         calculate_knowledge_registry(domain=domain)["domains"]
     )
 
 
 @pytest.mark.parametrize("attack", ["catalogue", "source", "missing", "malformed"])
-def test_source_identity_is_checked_from_actual_bytes(tmp_path, monkeypatch, attack):
+def test_source_identity_is_checked_from_actual_bytes(
+    tmp_path: Path, monkeypatch: MonkeyPatch, attack: str
+) -> None:
     catalogue = json.loads(gateway.CATALOGUE_PATH.read_bytes())
     source = next(e for e in catalogue["sources"] if e["key"] == "schedule_basis")
     target = tmp_path / source["source_path"]
     target.parent.mkdir(parents=True)
-    data = json.loads((DATA / source["source_path"]).read_bytes())
+    data = json.loads((SOURCE_DATA_ROOT / source["source_path"]).read_bytes())
     if attack in {"catalogue", "source"}:
         data["clauses"][0]["text"] = "Unreviewed source replacement"
+    else:
+        pass
     if attack == "catalogue":
         # Updating only the descriptor hash does not approve a new reading.
         source["canonical_content_sha256"] = hashlib.sha256(
             gateway.canonical_bytes(data)
         ).hexdigest()
+    else:
+        pass
     if attack != "missing":
         target.write_bytes(
             b"[" if attack == "malformed" else gateway.canonical_bytes(data)
         )
+    else:
+        pass
     manifest = tmp_path / "catalogue.json"
     manifest.write_bytes(gateway.canonical_bytes(catalogue))
     monkeypatch.setattr(gateway, "DATA_ROOT", tmp_path)

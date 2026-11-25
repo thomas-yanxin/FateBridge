@@ -1,8 +1,6 @@
-import json
-
 from fatebridge.services.bazi import calculate_bazi_birth
 from fatebridge.utils.birth_input import create_person_info
-from tests.fixtures.transports import mcp_text
+from tests.fixtures.transports import mcp_payload
 
 
 def _build_person():
@@ -19,7 +17,7 @@ def _build_person():
     )
 
 
-def test_calculate_bazi_birth_returns_snapshot_sections():
+def test_calculate_bazi_birth_returns_snapshot_sections() -> None:
     result = calculate_bazi_birth(
         _build_person(),
         analysis_year=2028,
@@ -47,7 +45,7 @@ def test_calculate_bazi_birth_returns_snapshot_sections():
     assert result["snapshot_export"]["export_text"] == result["snapshot_text"]
 
 
-def test_calculate_bazi_birth_supports_selected_export_sections():
+def test_calculate_bazi_birth_supports_selected_export_sections() -> None:
     result = calculate_bazi_birth(
         _build_person(),
         analysis_year=2028,
@@ -72,9 +70,9 @@ def test_calculate_bazi_birth_supports_selected_export_sections():
     assert "[四柱与三元]" not in result["snapshot_export"]["export_text"]
 
 
-def test_fastmcp_bazi_birth_compact_mode_can_drop_snapshot_text():
-    rendered = mcp_text(
-        "bazi_birth",
+def test_fastmcp_bazi_birth_can_drop_snapshot_text() -> None:
+    payload = mcp_payload(
+        "bazi_birth_chart",
         birth_year=1994,
         birth_month=8,
         birth_day=23,
@@ -87,20 +85,16 @@ def test_fastmcp_bazi_birth_compact_mode_can_drop_snapshot_text():
         analysis_year=2028,
         analysis_month=4,
         analysis_day=1,
-        compact=True,
         include_snapshot_text=False,
     )
 
-    payload = json.loads(rendered)
-
     assert "snapshot_text" not in payload
     assert "snapshot_export" in payload
-    assert "\n" not in rendered
 
 
-def test_fastmcp_bazi_birth_pretty_mode_keeps_snapshot_text():
-    rendered = mcp_text(
-        "bazi_birth",
+def test_fastmcp_bazi_birth_can_include_snapshot_text() -> None:
+    payload = mcp_payload(
+        "bazi_birth_chart",
         birth_year=1994,
         birth_month=8,
         birth_day=23,
@@ -113,11 +107,7 @@ def test_fastmcp_bazi_birth_pretty_mode_keeps_snapshot_text():
         analysis_year=2028,
         analysis_month=4,
         analysis_day=1,
-        compact=False,
         include_snapshot_text=True,
     )
 
-    payload = json.loads(rendered)
-
     assert "snapshot_text" in payload
-    assert "\n" in rendered

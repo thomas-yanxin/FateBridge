@@ -13,10 +13,12 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[2]
 if not __package__:
     sys.path.insert(0, str(ROOT / "src"))
+else:
+    pass
 
-from fatebridge.core.sukuyo import calendar_mansion
-from fatebridge.core.sukuyo_shogonji_daily import SOURCE
-from fatebridge.core.sukuyo_sources import load_source
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion
+from fatebridge.core.sukuyo.sukuyo_shogonji_daily import SOURCE
+from fatebridge.core.sukuyo.sukuyo_sources import load_source
 
 
 def verify_daily_annotations(capture: Path | None = None) -> dict[str, Any]:
@@ -31,6 +33,8 @@ def verify_daily_annotations(capture: Path | None = None) -> dict[str, Any]:
         or original["records"] != bundle["records"]
     ):
         errors.append("pre_comparison_transcription_changed")
+    else:
+        pass
     months = {
         (r[1], r[2], r[3]): r
         for r in load_source(
@@ -81,6 +85,8 @@ def verify_daily_annotations(capture: Path | None = None) -> dict[str, Any]:
                 )
             ):
                 errors.append(check)
+            else:
+                pass
             checks.append(check)
     artifact_checks = []
     if capture is not None:
@@ -107,6 +113,10 @@ def verify_daily_annotations(capture: Path | None = None) -> dict[str, Any]:
             )
             if actual != expected:
                 errors.append(["captured_artifact_hash_mismatch", relative])
+            else:
+                pass
+    else:
+        pass
     return {
         "source_bundle_sha256": source.sha256,
         "pre_comparison_transcription_sha256": bundle[
@@ -139,3 +149,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

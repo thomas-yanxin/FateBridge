@@ -4,22 +4,24 @@ import asyncio
 import json
 
 import pytest
+from fastapi.testclient import TestClient
 from fastmcp import Client
 
 from fatebridge.cli import run
 from fatebridge.core.local_techniques.otherbu import _solar_position_snapshot
 from fatebridge.mcp_server import create_mcp_app
-from tests.astrodice.test_astrodice_transports import SPEC
-from tests.astrodice.test_astrodice_transports import rest as rest_fixture
 from tests.support.ephemeris_case_runtime import native_ephemeris_files
-
-rest = rest_fixture
+from tests.support.transports import call_calculation
+from tests.unit_test.fixtures.astrodice_transports import SPEC, rest
 
 
 @pytest.mark.parametrize("zodiacal", [0, 1])
 def test_native_extension_is_explained_without_rewriting_the_dice(
-    rest, capsys, zodiacal, native_ephemeris_files
-):
+    rest: TestClient,
+    capsys: pytest.CaptureFixture[str],
+    zodiacal: int,
+    native_ephemeris_files,
+) -> None:
     inputs = dict(
         planet="Mars",
         sign="Aries",
@@ -52,8 +54,9 @@ def test_native_extension_is_explained_without_rewriting_the_dice(
 
     async def invoke():
         async with Client(create_mcp_app()) as client:
-            result = await client.call_tool(
-                "otherbu",
+            result = await call_calculation(
+                client,
+                "interpret_astrology_dice",
                 {
                     **inputs,
                     "fields": fields,
@@ -66,7 +69,7 @@ def test_native_extension_is_explained_without_rewriting_the_dice(
             return result.structured_content
 
     mcp = asyncio.run(invoke())
-    flags = ["otherbu"]
+    flags = ["interpret_astrology_dice"]
     for key, value in inputs.items():
         flags.extend(["--" + key.replace("_", "-"), str(value)])
     assert (
@@ -107,7 +110,7 @@ def test_native_extension_is_explained_without_rewriting_the_dice(
     assert values[0] == values[1] == values[2]
 
 
-def test_unverified_model_and_geometry_are_not_described_as_verified():
+def test_unverified_model_and_geometry_are_not_described_as_verified() -> None:
     text = _solar_position_snapshot(
         {
             "solar_deflection_model": "unverified_native_model",

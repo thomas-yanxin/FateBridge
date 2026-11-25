@@ -15,7 +15,11 @@ def break_pair_witnesses() -> dict[str, Any]:
     data = ASSET.read_bytes()
     if hashlib.sha256(data).hexdigest() != ASSET_SHA256:
         raise ValueError("破支见证资料字节与固定目读不一致")
+    else:
+        pass
     result = json.loads(data)
     if not isinstance(result, dict):
         raise ValueError("破支见证资料须为对象")
+    else:
+        pass
     return result

@@ -5,9 +5,9 @@
 python3 -m fatebridge.cli --no-metadata bazi_romance \
   --gender 女 --birth-year 1995 --birth-month 4 --birth-day 12 --birth-hour 20 --birth-place 成都
 
-python3 -m fatebridge.cli --no-metadata two_person_compatibility \
+python3 -m fatebridge.cli --no-metadata bazi_compatibility \
   --person1-name 我 --person1-gender 女 --person1-birth-year 1995 --person1-birth-month 4 --person1-birth-day 12 --person1-birth-hour 20 \
   --person2-name TA --person2-gender 男 --person2-birth-year 1993 --person2-birth-month 11 --person2-birth-day 3 --person2-birth-hour 7 \
   --relationship-type general --strict-fields --no-include-snapshot-text \
-  --fields summary strengths challenges traditional_compatibility detailed_analysis recommendations person_info element_relationship
+  --fields relationship_type person_info natal_contexts element_relationship cross_chart_relations directional_ten_gods
 ```

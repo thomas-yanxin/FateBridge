@@ -4,6 +4,7 @@ Direct Swiss calls check coordinate/time plumbing, not independent ephemeris
 accuracy or the empirical validity of symbolic progression techniques.
 """
 
+from contextlib import nullcontext
 from datetime import datetime, timezone
 
 import pytest
@@ -15,7 +16,13 @@ from fatebridge.core.ephemeris_runtime import (
     preserve_ephemeris_path,
     swe,
 )
-from fatebridge.services.western_lifespan import _body_declinations, calculate_vedicprog
+from fatebridge.services.western_lifespan import (
+    _body_declinations,
+    calculate_jaynesprog,
+    calculate_vedicprog,
+)
+from tests.support.ephemeris_case_runtime import native_ephemeris_files
+from tests.support.ephemeris_context import empty_ephemeris_path
 from tests.support.transports import SPECS, business, native, rest, surface_calls
 
 BIRTH_INPUTS = dict(
@@ -43,8 +50,12 @@ def native_coordinates(body, moment, *, sidereal=False, equatorial=False):
         if sidereal:
             swe.set_sid_mode(swe.SIDM_LAHIRI, 0, 0)
             flags |= swe.FLG_SIDEREAL
+        else:
+            pass
         if equatorial:
             flags |= swe.FLG_EQUATORIAL
+        else:
+            pass
         coordinates, returned = ephemeris_call(
             "calc", ephemeris_time(moment).jd_tt, body, flags
         )
@@ -60,14 +71,16 @@ def native_coordinates(body, moment, *, sidereal=False, equatorial=False):
         datetime(2024, 1, 1, tzinfo=timezone.utc),
     ],
 )
-def test_declinations_use_the_civil_instants_tt_instead_of_treating_utc_as_ut1(moment):
+def test_declinations_use_the_civil_instants_tt_instead_of_treating_utc_as_ut1(
+    moment,
+) -> None:
     actual = _body_declinations(moment)
     for body, planet in (("Sun", swe.SUN), ("Moon", swe.MOON), ("Mars", swe.MARS)):
         expected = native_coordinates(planet, moment, equatorial=True)[1]
         assert actual[body] == pytest.approx(expected, abs=1e-10)
 
 
-def test_vedic_natal_reference_and_progressed_positions_share_native_lahiri():
+def test_vedic_natal_reference_and_progressed_positions_share_native_lahiri() -> None:
     result = calculate_vedicprog(**BIRTH_INPUTS, zodiac_type="Tropic")
     assert "error" not in result, result
     assert (
@@ -94,17 +107,128 @@ def test_vedic_natal_reference_and_progressed_positions_share_native_lahiri():
     assert result["analysis_context"]["zodiac_type"] == "Sidereal"
 
 
+@pytest.mark.parametrize(
+    "zone,hour,minute,target,expected",
+    [
+        (
+            "Asia/Tokyo",
+            9,
+            18,
+            (1, 1, 1),
+            "1894-11-03T08:22:25.900465+09:00",
+        ),
+        (
+            "Etc/GMT+5",
+            19,
+            0,
+            (9999, 12, 31),
+            "1922-03-21T18:09:46.521190-05:00",
+        ),
+    ],
+    ids=["analysis-utc-year-zero", "analysis-utc-year-10000"],
+)
+def test_vedic_progression_from_extended_utc_analysis_clock(
+    zone: str, hour: int, minute: int, target, expected: str
+) -> None:
+    # Fixed TZif offsets and exact rational nominal-day quotient from R133.
+    year, month, day = target
+    result = calculate_vedicprog(
+        birth_year=1900,
+        birth_month=1,
+        birth_day=15,
+        birth_hour=hour,
+        birth_minute=minute,
+        birth_timezone=zone,
+        birth_longitude=139.6917,
+        birth_latitude=35.6895,
+        house_system="W",
+        analysis_year=year,
+        analysis_month=month,
+        analysis_day=day,
+    )
+    assert "error" not in result, result
+    assert result["vedic_progression"]["progressed_datetime"] == expected
+
+
+@pytest.mark.parametrize(
+    "use_files",
+    [False, pytest.param(True, marks=pytest.mark.local_data)],
+    ids=["moshier", "swiss-files"],
+)
+def test_progressions_from_birth_at_utc_year_zero(
+    use_files: bool, monkeypatch: pytest.MonkeyPatch, request
+) -> None:
+    monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
+    if use_files:
+        request.getfixturevalue("native_ephemeris_files")
+    else:
+        pass
+    inputs = dict(
+        birth_year=1,
+        birth_month=1,
+        birth_day=1,
+        birth_hour=13,
+        birth_minute=59,
+        birth_timezone="Etc/GMT-14",
+        birth_longitude=139.6917,
+        birth_latitude=35.6895,
+        house_system="W",
+        analysis_year=36,
+        analysis_month=1,
+        analysis_day=1,
+    )
+    # R161: fixed integer Gregorian clock, with coordinates verified per source.
+    progressed = datetime(1, 2, 4, 23, 57, 7, 245885, tzinfo=timezone.utc)
+    with nullcontext() if use_files else empty_ephemeris_path():
+        vedic = calculate_vedicprog(**inputs)
+        jayne = calculate_jaynesprog(**inputs)
+        expected_moon = (
+            263.83427532265  # Frozen independent Swiss C reference.
+            if use_files
+            else native_coordinates(swe.MOON, progressed, sidereal=True)[0]
+        )
+    assert "error" not in vedic, vedic
+    assert "error" not in jayne, jayne
+    assert (
+        vedic["vedic_progression"]["progressed_datetime"]
+        == "0001-02-05T13:57:07.245885+14:00"
+    )
+    assert vedic["vedic_progression"]["positions"]["moon"][
+        "absolute_degree"
+    ] == pytest.approx(expected_moon, rel=0, abs=1e-9)
+    declination = jayne["jaynes_declination"]
+    assert declination["progressed_datetime"] == "0001-02-04T23:57:07.245885+00:00"
+    closest = declination["parallels"][0]
+    assert (closest["progressed"], closest["natal"], closest["kind"]) == (
+        "Mars",
+        "Venus",
+        "contraparallel",
+    )
+    if use_files:
+        assert (
+            closest["progressed_declination"],
+            closest["natal_declination"],
+            closest["orb"],
+        ) == (13.0555, -13.0874, 0.0319)
+    else:
+        pass
+
+
 @pytest.mark.parametrize("failure", ["exception", "negative_flags", "nonfinite"])
 def test_vedic_native_offset_failure_never_succeeds_with_linear_approximation(
-    monkeypatch, failure
-):
+    monkeypatch: pytest.MonkeyPatch, failure: str
+) -> None:
     original = geometry.runtime.ephemeris_call
 
     def unavailable(operation, *args, **kwargs):
         if operation not in {"get_ayanamsa_ex_ut", "get_ayanamsa_ex"}:
             return original(operation, *args, **kwargs)
+        else:
+            pass
         if failure == "exception":
             raise RuntimeError("synthetic native offset failure")
+        else:
+            pass
         return (-1, 23.0) if failure == "negative_flags" else (2, float("nan"))
 
     monkeypatch.setattr(geometry.runtime, "ephemeris_call", unavailable)
@@ -114,7 +238,9 @@ def test_vedic_native_offset_failure_never_succeeds_with_linear_approximation(
 
 
 @pytest.mark.parametrize("tool", ["astro_vedicprog", "astro_jaynesprog"])
-def test_correct_progression_frames_reach_rest_mcp_cli(tool, surface_calls):
+def test_correct_progression_frames_reach_rest_mcp_cli(
+    tool: str, surface_calls
+) -> None:
     spec = SPECS[tool]
     key = "vedic_progression" if tool == "astro_vedicprog" else "jaynes_declination"
     fields = ["natal_reference", key, "analysis_context.zodiac_type"]

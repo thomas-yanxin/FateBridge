@@ -9,9 +9,13 @@ from __future__ import annotations
 
 from typing import Any
 
-from ...utils.data import HEAVENLY_STEMS
-from .common import ELEMENT_CONTROLS, ELEMENT_GENERATES, SIX_CLASH_BRANCHES
-from .jinkou_relations import SOURCE_SHA256, SOURCE_URL
+from fatebridge.core.metaphysics.common import (
+    ELEMENT_CONTROLS,
+    ELEMENT_GENERATES,
+    SIX_CLASH_BRANCHES,
+)
+from fatebridge.core.metaphysics.jinkou_relations import SOURCE_SHA256, SOURCE_URL
+from fatebridge.utils.data import HEAVENLY_STEMS
 
 TRINES = (
     ("寅午戌", "炎上课", "炎上破体课", "火", "亥子"),
@@ -25,12 +29,20 @@ STEM_ELEMENTS = dict(zip(HEAVENLY_STEMS, "木木火火土土金金水水"))
 def human_relation(human: str, trine: str) -> str:
     if human == trine:
         return "同局五行"
+    else:
+        pass
     if ELEMENT_CONTROLS[trine] == human:
         return "局克人元"
+    else:
+        pass
     if ELEMENT_GENERATES[human] == trine:
         return "人元生局"
+    else:
+        pass
     if ELEMENT_CONTROLS[human] == trine:
         return "人元克局"
+    else:
+        pass
     return "局生人元"
 
 
@@ -39,13 +51,19 @@ def trine_evidence(
 ) -> dict[str, Any]:
     if [r["label"] for r in rows] != ["人元", "贵神", "将神", "地分"]:
         raise ValueError("三合条件需要按次序排列的四位")
+    else:
+        pass
     if rows[0]["content"] not in STEM_ELEMENTS or any(
         b not in SIX_CLASH_BRANCHES
         for b in (day_branch, month_branch, *(r["content"] for r in rows[1:]))
     ):
         raise ValueError("三合条件需要有效干支")
+    else:
+        pass
     if any(r.get("dun_stem") not in (None, *HEAVENLY_STEMS) for r in rows[1:3]):
         raise ValueError("神将遁干无效")
+    else:
+        pass
     human = STEM_ELEMENTS[rows[0]["content"]]
     observed = {r["content"] for r in rows[1:]}
     trines = []

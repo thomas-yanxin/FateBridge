@@ -9,14 +9,14 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core import guolao_solar_fold as subject
-from fatebridge.validation.guolao_solar_fold import audit_source_solar_fold
+from fatebridge.core.guolao import guolao_solar_fold as subject
+from validation.guolao_solar_fold import audit_source_solar_fold
 
 FIXTURE = Path(__file__).parents[1] / "fixtures/guolao-solar-fold-v1"
 ORIGIN = "explicit arithmetic case, not a verified date"
 
 
-def test_original_images_official_html_and_constants_keep_source_fingerprints():
+def test_original_images_official_html_and_constants_keep_source_fingerprints() -> None:
     ref = json.loads((FIXTURE / "reference.json").read_text())
     assert hashlib.sha256(subject.DATA.read_bytes()).hexdigest() == ref["data_sha256"]
     for item in ref["artifacts"]:
@@ -34,7 +34,9 @@ def test_original_images_official_html_and_constants_keep_source_fingerprints():
     assert "在歲象限" in (FIXTURE / "sillok-fold-official.html").read_text()
 
 
-def test_source_year_and_celestial_quadrants_are_distinct_without_half_period_repair():
+def test_source_year_and_celestial_quadrants_are_distinct_without_half_period_repair() -> (
+    None
+):
     early = subject.load_source_fold(subject.PROFILES[0]).audit()
     candidate = subject.load_source_fold(subject.PROFILES[1]).audit()
     assert (
@@ -52,7 +54,9 @@ def test_source_year_and_celestial_quadrants_are_distinct_without_half_period_re
 
 
 @pytest.mark.parametrize("profile", subject.PROFILES)
-def test_threshold_equality_and_right_limit_follow_the_declared_reading(profile):
+def test_threshold_equality_and_right_limit_follow_the_declared_reading(
+    profile,
+) -> None:
     model = subject.load_source_fold(profile)
     epsilon = F(1, 100000000)
     at = model.fold(model.threshold, origin_reference=ORIGIN)
@@ -69,7 +73,9 @@ def test_threshold_equality_and_right_limit_follow_the_declared_reading(profile)
 
 
 @pytest.mark.parametrize("profile", subject.PROFILES)
-def test_exact_half_periods_and_one_source_cycle_are_not_modern_angle_modulo(profile):
+def test_exact_half_periods_and_one_source_cycle_are_not_modern_angle_modulo(
+    profile,
+) -> None:
     model = subject.load_source_fold(profile)
     for value, reductions in [(F(), 0), (model.half_year, 1), (2 * model.half_year, 2)]:
         row = model.fold(value, origin_reference=ORIGIN)
@@ -86,7 +92,9 @@ def test_exact_half_periods_and_one_source_cycle_are_not_modern_angle_modulo(pro
     ) == F("82.62125")
 
 
-def test_short_table_gap_retains_requested_origin_side_basis_and_unavailable_result():
+def test_short_table_gap_retains_requested_origin_side_basis_and_unavailable_result() -> (
+    None
+):
     model = subject.load_source_fold(subject.PROFILES[0])
     result = model.sunrise(
         model.threshold,
@@ -105,7 +113,7 @@ def test_short_table_gap_retains_requested_origin_side_basis_and_unavailable_res
     assert not result["table_gap_filled_or_fold_clamped"]
 
 
-def test_cross_witness_sunrise_is_labeled_and_keeps_the_Dadu_table_values():
+def test_cross_witness_sunrise_is_labeled_and_keeps_the_Dadu_table_values() -> None:
     model = subject.load_source_fold(subject.PROFILES[0])
     result = model.sunrise(
         model.threshold,
@@ -128,7 +136,7 @@ def test_cross_witness_sunrise_is_labeled_and_keeps_the_Dadu_table_values():
     assert not result["phase_day_or_birth_chart_backfilled"]
 
 
-def test_celestial_quadrant_candidate_keeps_its_gap_and_branch_jump():
+def test_celestial_quadrant_candidate_keeps_its_gap_and_branch_jump() -> None:
     model = subject.load_source_fold(subject.PROFILES[1])
     at = model.sunrise(
         model.threshold,
@@ -151,7 +159,9 @@ def test_celestial_quadrant_candidate_keeps_its_gap_and_branch_jump():
     assert after["fold"]["unqualified_Gujin_quadrant_reading_is_hypothesis"]
 
 
-def test_all104_directed_probe_records_include_failures_without_source_acceptance():
+def test_all104_directed_probe_records_include_failures_without_source_acceptance() -> (
+    None
+):
     audit = audit_source_solar_fold()
     rows = [
         q
@@ -167,7 +177,7 @@ def test_all104_directed_probe_records_include_failures_without_source_acceptanc
 
 
 @pytest.mark.parametrize("value", [0, True, 1.0, "1", Decimal(1)])
-def test_input_accumulation_requires_an_explicit_fraction(value):
+def test_input_accumulation_requires_an_explicit_fraction(value) -> None:
     with pytest.raises(TypeError):
         subject.load_source_fold(subject.PROFILES[0]).fold(
             value, origin_reference=ORIGIN
@@ -177,7 +187,7 @@ def test_input_accumulation_requires_an_explicit_fraction(value):
 @pytest.mark.parametrize(
     "value", [F(-1, 10000), F("365.24250001"), F("365.25"), F(2451545)]
 )
-def test_previous_cycle_and_modern_JD_are_not_silently_reduced(value):
+def test_previous_cycle_and_modern_JD_are_not_silently_reduced(value) -> None:
     with pytest.raises(ValueError):
         subject.load_source_fold(subject.PROFILES[0]).fold(
             value, origin_reference=ORIGIN
@@ -185,7 +195,9 @@ def test_previous_cycle_and_modern_JD_are_not_silently_reduced(value):
 
 
 @pytest.mark.parametrize("reference", [None, "", "  ", False])
-def test_origin_is_required_even_when_the_fold_number_can_be_computed(reference):
+def test_origin_is_required_even_when_the_fold_number_can_be_computed(
+    reference: bool | str | None,
+) -> None:
     with pytest.raises(ValueError):
         subject.load_source_fold(subject.PROFILES[0]).fold(
             F(1), origin_reference=reference
@@ -194,8 +206,8 @@ def test_origin_is_required_even_when_the_fold_number_can_be_computed(reference)
 
 @pytest.mark.parametrize("mutation", ["float", "quarter", "half_circle", "night_hash"])
 def test_changed_source_parameters_do_not_fall_back_or_repair(
-    monkeypatch, tmp_path, mutation
-):
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, mutation: str
+) -> None:
     raw = json.loads(subject.DATA.read_bytes())
     if mutation == "float":
         raw["source_half_year_days"] = 182.62125
@@ -218,7 +230,7 @@ def test_changed_source_parameters_do_not_fall_back_or_repair(
         )
 
 
-def test_no_implicit_profile_solar_side_or_location():
+def test_no_implicit_profile_solar_side_or_location() -> None:
     with pytest.raises(ValueError):
         subject.load_source_fold("best")
     model = subject.load_source_fold(subject.PROFILES[0])

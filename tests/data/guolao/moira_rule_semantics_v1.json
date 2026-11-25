@@ -1,0 +1,561 @@
+{
+  "schema": "moira_synthetic_rule_semantics_v1",
+  "qualification": "Ten synthetic interpreter mechanism controls. Original Java output; not complete author catalogue, natal astronomy, classical acceptance or prediction. No GPL298catalogue is included. Tests prepared but not run.",
+  "source": {
+    "engine": "Moira1.50Final unmodified original Java RuleEntry/RuleParse",
+    "commit": "9bb126fd84997aa26fed6e91b4bdf438fceb0e38",
+    "java_sources": {
+      "RuleEntry.java": {
+        "sha256": "2538427eba44c5fbff6f56a8dff5370797bc8592e401afec7d7428681091b219",
+        "url": "https://github.com/Horace-Maxwell/Moira_APP_MacOS_ARM/blob/9bb126fd84997aa26fed6e91b4bdf438fceb0e38/src/org/athomeprojects/base/RuleEntry.java"
+      },
+      "RuleParse.java": {
+        "sha256": "fffe62ef0c4e48c2f5c379a5ee15f6e5d465040ff7d939e6b534b1e399e04350",
+        "url": "https://github.com/Horace-Maxwell/Moira_APP_MacOS_ARM/blob/9bb126fd84997aa26fed6e91b4bdf438fceb0e38/src/org/athomeprojects/base/RuleParse.java"
+      },
+      "EvalRule.java": {
+        "sha256": "7addf229a1d45788222301a9e2d39aa36b5b010542a65dccbec1d4fa6e891607",
+        "url": "https://github.com/Horace-Maxwell/Moira_APP_MacOS_ARM/blob/9bb126fd84997aa26fed6e91b4bdf438fceb0e38/src/org/athomeprojects/base/EvalRule.java"
+      }
+    },
+    "cohort_sha256": "41e15a68036de433e3fb05f58f8f599a0597cc09047208888f8584c97286e65f",
+    "criteria_sha256": "df04bb559a1e0ed5f9f6084f2dd99c34f005c7d8e5b119f53db54cf9bc090f86",
+    "reference_seal_sha256": "e7530a1fdac9bad8f5b48bb15e09e3b92792c2b0afdd6bb7263dae068556e429",
+    "canonical_policy": "Original computeRules unlimited snapshot before diagnostics. Compare current-tag effective evaluated/result/valid/hidden; absolute tag numbers are run-local and omitted.",
+    "expected_origin": "Direct extraction of sealed original Java canonical outputs. No FateBridge imports or candidate outputs used."
+  },
+  "cases": [
+    {
+      "id": "U01",
+      "purpose": "original uppercase proposal; casefold/undefined-reference control, not intended priority witness",
+      "qualification": "synthetic DSL, author parser behavior only",
+      "dsl": "+A:[3.1.0] ?t ~ {B}\n+B:[2.9.0] ?t ~ {C}\n+C:[3.0.0] ?t",
+      "dsl_sha256": "874f3ed0bff97f027f75879ebc5754bfd9bbd6c25d7fb2baca8bc4677d2593fe",
+      "original_input_facts": {
+        "$e": [],
+        "$n": "\n",
+        "$s": "　",
+        "$s2": "　　",
+        "$s4": "　　　　",
+        "$s8": "　　　　　　　　",
+        "$t": "\t",
+        "?f": "f",
+        "?t": "t",
+        "?男": "t"
+      },
+      "male": true,
+      "display_level": 0,
+      "fill_max_styles": 2147483647,
+      "expected": {
+        "outer_evaluation_order": [
+          "b",
+          "a",
+          "c"
+        ],
+        "good": [
+          "a",
+          "c",
+          "b"
+        ],
+        "bad": [],
+        "states": {
+          "a": {
+            "tag_is_current": true,
+            "evaluated": true,
+            "result": "t",
+            "valid": true,
+            "hidden": false
+          },
+          "b": {
+            "tag_is_current": true,
+            "evaluated": true,
+            "result": "t",
+            "valid": true,
+            "hidden": false
+          },
+          "c": {
+            "tag_is_current": true,
+            "evaluated": true,
+            "result": "t",
+            "valid": true,
+            "hidden": false
+          }
+        }
+      }
+    },
+    {
+      "id": "G01",
+      "purpose": "preexecution lower-case intended priority/false-intermediate/hidden-reference control",
+      "qualification": "synthetic DSL, author parser behavior only",
+      "dsl": "+a:[3.1.0] ?t ~ {b}\n+b:[2.9.0] ?t ~ {c}\n+c:[3.0.0] ?t",
+      "dsl_sha256": "ee44b9c8332927d70ba2d80f71d227ae6598a95a8025ec0fb7276e66d0bd589a",
+      "original_input_facts": {
+        "$e": [],
+        "$n": "\n",
+        "$s": "　",
+        "$s2": "　　",
+        "$s4": "　　　　",
+        "$s8": "　　　　　　　　",
+        "$t": "\t",
+        "?f": "f",
+        "?t": "t",
+        "?男": "t"
+      },
+      "male": true,
+      "display_level": 0,
+      "fill_max_styles": 2147483647,
+      "expected": {
+        "outer_evaluation_order": [
+          "b",
+          "a",
+          "c"
+        ],
+        "good": [
+          "a",
+          "c"
+        ],
+        "bad": [],
+        "states": {
+          "a": {
+            "tag_is_current": true,
+            "evaluated": true,
+            "result": "t",
+            "valid": true,
+            "hidden": false
+          },
+          "b": {
+            "tag_is_current": true,
+            "evaluated": true,
+            "result": "t",
+            "valid": true,
+            "hidden": true
+          },
+          "c": {
+            "tag_is_current": true,
+            "evaluated": true,
+            "result": "t",
+            "valid": true,
+            "hidden": false
+          }
+        }
+      }
+    },
+    {
+      "id": "U02",
+      "purpose": "original uppercase proposal; casefold/undefined-reference control, not intended priority witness",
+      "qualification": "synthetic DSL, author parser behavior only",
+      "dsl": "+A:[2.3.0] ?t ~ {B}\n+B:[2.4.0] ?t",
+      "dsl_sha256": "d56000d5a09e75c3c60ecdd8850bc86b4eb1a8e6e07f2b973e5df26f381e0748",
+      "original_input_facts": {
+        "$e": [],
+        "$n": "\n",
+        "$s": "　",
+        "$s2": "　　",
+        "$s4": "　　　　",
+        "$s8": "　　　　　　　　",
+        "$t": "\t",
+        "?f": "f",
+        "?t": "t",
+        "?男": "t"
+      },
+      "male": true,
+      "display_level": 0,
+      "fill_max_styles": 2147483647,
+      "expected": {
+        "outer_evaluation_order": [
+          "b",
+          "a"
+        ],
+        "good": [
+          "b",
+          "a"
+        ],
+        "bad": [],
+        "states": {
+          "a": {
+            "tag_is_current": true,
+            "evaluated": true,
+            "result": "t",
+            "valid": true,
+            "hidden": false
+          },
+          "b": {
+            "tag_is_current": true,
+            "evaluated": true,
+            "result": "t",
+            "valid": true,
+            "hidden": false
+          }
+        }
+      }
+    },
+    {
+      "id": "G02",
+      "purpose": "preexecution lower-case intended priority/false-intermediate/hidden-reference control",
+      "qualification": "synthetic DSL, author parser behavior only",
+      "dsl": "+a:[2.3.0] ?t ~ {b}\n+b:[2.4.0] ?t",
+      "dsl_sha256": "fd54d82cd360c20826717bb0b722e0b3f6320077a974d110f11cca2005e3a63e",
+      "original_input_facts": {
+        "$e": [],
+        "$n": "\n",
+        "$s": "　",
+        "$s2": "　　",
+        "$s4": "　　　　",
+        "$s8": "　　　　　　　　",
+        "$t": "\t",
+        "?f": "f",
+        "?t": "t",
+        "?男": "t"
+      },
+      "male": true,
+      "display_level": 0,
+      "fill_max_styles": 2147483647,
+      "expected": {
+        "outer_evaluation_order": [
+          "b",
+          "a"
+        ],
+        "good": [
+          "b",
+          "a"
+        ],
+        "bad": [],
+        "states": {
+          "a": {
+            "tag_is_current": true,
+            "evaluated": true,
+            "result": "t",
+            "valid": true,
+            "hidden": false
+          },
+          "b": {
+            "tag_is_current": true,
+            "evaluated": true,
+            "result": "t",
+            "valid": true,
+            "hidden": false
+          }
+        }
+      }
+    },
+    {
+      "id": "U03",
+      "purpose": "original uppercase proposal; casefold/undefined-reference control, not intended priority witness",
+      "qualification": "synthetic DSL, author parser behavior only",
+      "dsl": "+A:[3.1.0] ?t ~ {B}\n+B:[2.1.0] ?f ~ {C}\n+C:[1.1.0] ?t",
+      "dsl_sha256": "4344d2ae7679899600862ed268dd837d0ff2143595da8fd816576e144b7d6c2b",
+      "original_input_facts": {
+        "$e": [],
+        "$n": "\n",
+        "$s": "　",
+        "$s2": "　　",
+        "$s4": "　　　　",
+        "$s8": "　　　　　　　　",
+        "$t": "\t",
+        "?f": "f",
+        "?t": "t",
+        "?男": "t"
+      },
+      "male": true,
+      "display_level": 0,
+      "fill_max_styles": 2147483647,
+      "expected": {
+        "outer_evaluation_order": [
+          "b",
+          "a",
+          "c"
+        ],
+        "good": [
+          "a",
+          "c"
+        ],
+        "bad": [],
+        "states": {
+          "a": {
+            "tag_is_current": true,
+            "evaluated": true,
+            "result": "t",
+            "valid": true,
+            "hidden": false
+          },
+          "b": {
+            "tag_is_current": true,
+            "evaluated": true,
+            "result": "f",
+            "valid": false,
+            "hidden": false
+          },
+          "c": {
+            "tag_is_current": true,
+            "evaluated": true,
+            "result": "t",
+            "valid": true,
+            "hidden": false
+          }
+        }
+      }
+    },
+    {
+      "id": "G03",
+      "purpose": "preexecution lower-case intended priority/false-intermediate/hidden-reference control",
+      "qualification": "synthetic DSL, author parser behavior only",
+      "dsl": "+a:[3.1.0] ?t ~ {b}\n+b:[2.1.0] ?f ~ {c}\n+c:[1.1.0] ?t",
+      "dsl_sha256": "a02a526ed98232c4e4acc87fc9143072f7e10973909b7dfaedc0abff01210e82",
+      "original_input_facts": {
+        "$e": [],
+        "$n": "\n",
+        "$s": "　",
+        "$s2": "　　",
+        "$s4": "　　　　",
+        "$s8": "　　　　　　　　",
+        "$t": "\t",
+        "?f": "f",
+        "?t": "t",
+        "?男": "t"
+      },
+      "male": true,
+      "display_level": 0,
+      "fill_max_styles": 2147483647,
+      "expected": {
+        "outer_evaluation_order": [
+          "b",
+          "a",
+          "c"
+        ],
+        "good": [
+          "a"
+        ],
+        "bad": [],
+        "states": {
+          "a": {
+            "tag_is_current": true,
+            "evaluated": true,
+            "result": "t",
+            "valid": true,
+            "hidden": false
+          },
+          "b": {
+            "tag_is_current": true,
+            "evaluated": true,
+            "result": "f",
+            "valid": false,
+            "hidden": true
+          },
+          "c": {
+            "tag_is_current": true,
+            "evaluated": false,
+            "result": null,
+            "valid": false,
+            "hidden": true
+          }
+        }
+      }
+    },
+    {
+      "id": "U04",
+      "purpose": "original uppercase proposal; casefold/undefined-reference control, not intended priority witness",
+      "qualification": "synthetic DSL, author parser behavior only",
+      "dsl": "+A:[3.1.0] ?t ~ {B}\n+B:[2.1.0] ?t\n+D:[4.1.0] ?{B}",
+      "dsl_sha256": "996fd155ab29b657928b949d53ec29ad8035625600fd748723f0bfe722928a22",
+      "original_input_facts": {
+        "$e": [],
+        "$n": "\n",
+        "$s": "　",
+        "$s2": "　　",
+        "$s4": "　　　　",
+        "$s8": "　　　　　　　　",
+        "$t": "\t",
+        "?f": "f",
+        "?t": "t",
+        "?男": "t"
+      },
+      "male": true,
+      "display_level": 0,
+      "fill_max_styles": 2147483647,
+      "expected": {
+        "outer_evaluation_order": [
+          "b",
+          "a",
+          "d"
+        ],
+        "good": [
+          "a",
+          "b"
+        ],
+        "bad": [],
+        "states": {
+          "a": {
+            "tag_is_current": true,
+            "evaluated": true,
+            "result": "t",
+            "valid": true,
+            "hidden": false
+          },
+          "b": {
+            "tag_is_current": true,
+            "evaluated": true,
+            "result": "t",
+            "valid": true,
+            "hidden": false
+          },
+          "d": {
+            "tag_is_current": true,
+            "evaluated": true,
+            "result": "f",
+            "valid": false,
+            "hidden": false
+          }
+        }
+      }
+    },
+    {
+      "id": "G04",
+      "purpose": "preexecution lower-case intended priority/false-intermediate/hidden-reference control",
+      "qualification": "synthetic DSL, author parser behavior only",
+      "dsl": "+a:[3.1.0] ?t ~ {b}\n+b:[2.1.0] ?t\n+d:[4.1.0] ?{b}",
+      "dsl_sha256": "1eaaa608035bff2ecb5e1ff741e25d8987b3f3ea485df0a7ba3be9c18a702674",
+      "original_input_facts": {
+        "$e": [],
+        "$n": "\n",
+        "$s": "　",
+        "$s2": "　　",
+        "$s4": "　　　　",
+        "$s8": "　　　　　　　　",
+        "$t": "\t",
+        "?f": "f",
+        "?t": "t",
+        "?男": "t"
+      },
+      "male": true,
+      "display_level": 0,
+      "fill_max_styles": 2147483647,
+      "expected": {
+        "outer_evaluation_order": [
+          "b",
+          "a",
+          "d"
+        ],
+        "good": [
+          "d",
+          "a"
+        ],
+        "bad": [],
+        "states": {
+          "a": {
+            "tag_is_current": true,
+            "evaluated": true,
+            "result": "t",
+            "valid": true,
+            "hidden": false
+          },
+          "b": {
+            "tag_is_current": true,
+            "evaluated": true,
+            "result": "t",
+            "valid": true,
+            "hidden": true
+          },
+          "d": {
+            "tag_is_current": true,
+            "evaluated": true,
+            "result": "t",
+            "valid": true,
+            "hidden": false
+          }
+        }
+      }
+    },
+    {
+      "id": "G05",
+      "purpose": "boolean recursion/cycle uncomputed/null behavior",
+      "qualification": "synthetic DSL; runtime order qualified",
+      "dsl": "+a:[2.1.0] ?{b}\n+b:[2.1.0] ?{a}",
+      "dsl_sha256": "99cc9c46643c2f9b7d5f372951ea126fc2a337bf097879cff05f93f4dd4fb6c9",
+      "original_input_facts": {
+        "$e": [],
+        "$n": "\n",
+        "$s": "　",
+        "$s2": "　　",
+        "$s4": "　　　　",
+        "$s8": "　　　　　　　　",
+        "$t": "\t",
+        "?f": "f",
+        "?t": "t",
+        "?男": "t"
+      },
+      "male": true,
+      "display_level": 0,
+      "fill_max_styles": 2147483647,
+      "expected": {
+        "outer_evaluation_order": [
+          "b",
+          "a"
+        ],
+        "good": [],
+        "bad": [],
+        "states": {
+          "a": {
+            "tag_is_current": true,
+            "evaluated": true,
+            "result": null,
+            "valid": false,
+            "hidden": false
+          },
+          "b": {
+            "tag_is_current": true,
+            "evaluated": true,
+            "result": null,
+            "valid": false,
+            "hidden": false
+          }
+        }
+      }
+    },
+    {
+      "id": "G06",
+      "purpose": "explicit rejection cycle terminates via hidden state",
+      "qualification": "synthetic DSL; runtime order qualified",
+      "dsl": "+a:[2.1.0] ?t ~ {b}\n+b:[2.1.0] ?t ~ {a}",
+      "dsl_sha256": "fade32e0fd616c72854409f8c5ecb3f16ec56be464fbfce2b8bbd4f5a8ea4e1e",
+      "original_input_facts": {
+        "$e": [],
+        "$n": "\n",
+        "$s": "　",
+        "$s2": "　　",
+        "$s4": "　　　　",
+        "$s8": "　　　　　　　　",
+        "$t": "\t",
+        "?f": "f",
+        "?t": "t",
+        "?男": "t"
+      },
+      "male": true,
+      "display_level": 0,
+      "fill_max_styles": 2147483647,
+      "expected": {
+        "outer_evaluation_order": [
+          "b",
+          "a"
+        ],
+        "good": [],
+        "bad": [],
+        "states": {
+          "a": {
+            "tag_is_current": true,
+            "evaluated": false,
+            "result": null,
+            "valid": false,
+            "hidden": true
+          },
+          "b": {
+            "tag_is_current": true,
+            "evaluated": true,
+            "result": "t",
+            "valid": true,
+            "hidden": true
+          }
+        }
+      }
+    }
+  ]
+}

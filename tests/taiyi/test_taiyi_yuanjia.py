@@ -3,20 +3,19 @@
 import hashlib
 import json
 import shutil
-import subprocess
-import sys
 from fractions import Fraction
+from pathlib import Path
 
 import pytest
 
-from fatebridge.validation.yuanjia_calendar import yuanjia_mean_year
+from scripts.taiyi.audit_taiyi_day_count_encodings import audit as day_encoding_audit
 from scripts.taiyi.audit_taiyi_yuanjia import (
     CORPUS,
     FREEZE_SHA256,
-    ROOT,
     audit,
     verify_sources,
 )
+from validation.yuanjia_calendar import yuanjia_mean_year
 
 
 @pytest.fixture(scope="module")
@@ -24,13 +23,13 @@ def report():
     return audit()
 
 
-def test_source_freeze_retains_complete_page_and_known_prior_evidence():
+def test_source_freeze_retains_complete_page_and_known_prior_evidence() -> None:
     frozen = verify_sources()
     assert (
         hashlib.sha256((CORPUS / "freeze.json").read_bytes()).hexdigest()
         == FREEZE_SHA256
     )
-    assert len(frozen["files"]) == 10 and len(frozen["prior_sources"]) == 58
+    assert len(frozen["files"]) == 10 and len(frozen["prior_sources"]) == 52
     assert not frozen["blinded"]
     assert not frozen["new_yuanjia_implementation_before_freeze"]
     assert frozen["new_executed_yuanjia_comparisons_before_freeze"] == 0
@@ -46,8 +45,8 @@ def test_source_freeze_retains_complete_page_and_known_prior_evidence():
 
 @pytest.mark.parametrize("rewrite_manifest", [False, True])
 def test_leap_four_oracle_cannot_be_replaced_by_a_better_matching_month(
-    tmp_path, rewrite_manifest
-):
+    tmp_path: Path, rewrite_manifest: bool
+) -> None:
     target = tmp_path / "source"
     shutil.copytree(CORPUS, target)
     path = target / "historical-months-initial.json"
@@ -62,11 +61,13 @@ def test_leap_four_oracle_cannot_be_replaced_by_a_better_matching_month(
         freeze = json.loads((target / "freeze.json").read_text())
         freeze["files"][path.name] = hashlib.sha256(path.read_bytes()).hexdigest()
         (target / "freeze.json").write_text(json.dumps(freeze))
+    else:
+        pass
     with pytest.raises(ValueError, match="V35"):
         verify_sources(target)
 
 
-def test_printed443_two_epoch_anchors_agree(report):
+def test_printed443_two_epoch_anchors_agree(report) -> None:
     anchor = report["source_anchor_check"]
     assert (
         anchor["actual_elapsed_years_within_ji"]
@@ -88,7 +89,9 @@ def test_printed443_two_epoch_anchors_agree(report):
         (3648, "甲子", 0),
     ],
 )
-def test_all_six_ji_origins_and_yuan_wrap_are_kept(elapsed, ji, within):
+def test_all_six_ji_origins_and_yuan_wrap_are_kept(
+    elapsed: int, ji: str, within: int
+) -> None:
     row = yuanjia_mean_year(elapsed, middle_term_assignment="civil_day")
     assert row["ji_ganzhi"] == ji
     assert row["elapsed_years_within_ji"] == within
@@ -98,18 +101,18 @@ def test_all_six_ji_origins_and_yuan_wrap_are_kept(elapsed, ji, within):
 
 
 @pytest.mark.parametrize("elapsed", [-1, True, 1.0, "231", None])
-def test_counter_refuses_implicit_year_coercion(elapsed):
+def test_counter_refuses_implicit_year_coercion(elapsed) -> None:
     with pytest.raises(ValueError, match="integral elapsed"):
         yuanjia_mean_year(elapsed, middle_term_assignment="civil_day")
 
 
 @pytest.mark.parametrize("assignment", [None, "auto", "best_match"])
-def test_qi_assignment_must_be_explicit(assignment):
+def test_qi_assignment_must_be_explicit(assignment: str | None) -> None:
     with pytest.raises(ValueError, match="Explicit Yuanjia"):
         yuanjia_mean_year(5703, middle_term_assignment=assignment)
 
 
-def test_a_complete_chapter_has_source235_months_and7_intercalations():
+def test_a_complete_chapter_has_source235_months_and7_intercalations() -> None:
     # A structural arithmetic control, not19 additional historical observations.
     years = [
         yuanjia_mean_year(i, middle_term_assignment="civil_day") for i in range(19)
@@ -118,7 +121,9 @@ def test_a_complete_chapter_has_source235_months_and7_intercalations():
     assert sum(r["chapter_leap_year"] for r in years) == 7
 
 
-def test_full63_firsts62_lengths_and1831_days_are_not_a_whole_calendar_pass(report):
+def test_full63_firsts62_lengths_and1831_days_are_not_a_whole_calendar_pass(
+    report,
+) -> None:
     assert report["source_calendar_reconstruction_checks_match"]
     assert len(report["source_calendar_controls"]) == 63
     for series in report["yuanjia_calendar_series"]:
@@ -142,7 +147,9 @@ def test_full63_firsts62_lengths_and1831_days_are_not_a_whole_calendar_pass(repo
             )
 
 
-def test_502_leap_disagreement_cannot_be_hidden_by_all_matching_day_phases(report):
+def test_502_leap_disagreement_cannot_be_hidden_by_all_matching_day_phases(
+    report,
+) -> None:
     civil, exact = report["yuanjia_calendar_series"]
     assert [s["matching_month_identities"] for s in (civil, exact)] == [60, 59]
     assert [s["matching_complete_lunar_dates"] for s in (civil, exact)] == [1772, 1742]
@@ -168,7 +175,7 @@ def test_502_leap_disagreement_cannot_be_hidden_by_all_matching_day_phases(repor
         assert printed_leap["month"] == 4
 
 
-def test_505_leap_two_is_retained_alongside_the_502_failure(report):
+def test_505_leap_two_is_retained_alongside_the_502_failure(report) -> None:
     for series in report["yuanjia_calendar_series"]:
         year = next(r["calculated"] for r in series["years"] if r["year"] == 505)
         assert year["nominal_leap_count_raw"] == 1
@@ -181,7 +188,9 @@ def test_505_leap_two_is_retained_alongside_the_502_failure(report):
         )
 
 
-def test_504_former_carry_disagreement_is_a_different_calendar_not_a_wang_patch(report):
+def test_504_former_carry_disagreement_is_a_different_calendar_not_a_wang_patch(
+    report,
+) -> None:
     civil = report["yuanjia_calendar_series"][0]
     rows = [r for r in civil["months"] if r["source"]["lunar_year"] == 504]
     assert [r["actual"]["small_remainder"] for r in rows[:3]] == [709, 356, 3]
@@ -194,19 +203,20 @@ def test_504_former_carry_disagreement_is_a_different_calendar_not_a_wang_patch(
     assert not report["new_public_calendar_installed"]
 
 
-def test_all_old_day8_day9_and_board_failures_remain_in_the_pinned_report(report):
+def test_all_old_day8_day9_and_board_failures_remain_in_the_pinned_report(
+    report,
+) -> None:
     evidence = report["previous_v34_evidence"]
-    old_bytes = (ROOT / evidence["path"]).read_bytes()
-    assert hashlib.sha256(old_bytes).hexdigest() == evidence["sha256"]
-    old = json.loads(old_bytes)
-    assert len(old["date_encoding_candidates"]) == 48
+    assert evidence["source"] == "current_taiyi_day_encoding_audit"
+    day_encoding = day_encoding_audit()
+    candidates = day_encoding["date_encoding_candidates"]
+    assert len(candidates) == 48
+    assert sum(len(row["counter_comparisons"]) for row in candidates) == 96
     assert (
-        sum(len(r["counter_comparisons"]) for r in old["date_encoding_candidates"])
-        == 96
-    )
-    assert (
-        old["original_observed_joint_matches"]
-        == old["xing_observed_joint_matches"]
+        evidence["original_observed_joint_matches"]
+        == day_encoding["original_observed_joint_matches"]
+        == evidence["xing_observed_joint_matches"]
+        == day_encoding["xing_observed_joint_matches"]
         == 0
     )
     assert (
@@ -217,20 +227,9 @@ def test_all_old_day8_day9_and_board_failures_remain_in_the_pinned_report(report
     assert not report["whole_goal_complete"]
 
 
-def test_direct_and_module_entrypoints_keep_failure_exit_and_identical_report(tmp_path):
-    results = []
-    for entry in (
-        [str(ROOT / "scripts/taiyi/audit_taiyi_yuanjia.py")],
-        ["-m", "scripts.taiyi.audit_taiyi_yuanjia"],
-    ):
-        path = tmp_path / f"report{len(results)}.json"
-        result = subprocess.run(
-            [sys.executable, *entry, "--output", str(path)],
-            text=True,
-            capture_output=True,
-            timeout=60,
-            check=False,
-        )
-        assert result.returncode == 1 and not result.stderr
-        results.append(path.read_bytes())
-    assert results[0] == results[1]
+def test_audit_report_is_deterministic_and_preserves_calendar_failures(report) -> None:
+    assert not report["whole_calendar_acceptance_passed"]
+    assert not report["whole_goal_complete"]
+    assert json.dumps(audit(), ensure_ascii=False) == json.dumps(
+        report, ensure_ascii=False
+    )

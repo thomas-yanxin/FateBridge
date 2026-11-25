@@ -7,10 +7,13 @@ a country's reform date, or infer English March25 year numbering.
 from __future__ import annotations
 
 from datetime import date, datetime
-from typing import Any, Literal
+from typing import Literal
 
 CivilCalendar = Literal["proleptic_gregorian", "julian"]
 GREGORIAN_ORDINAL_TO_JDN = 1721425
+
+
+CalendarConversionReceipt = dict[str, str | int | bool | dict[str, int] | None]
 
 
 def civil_date_jdn(
@@ -23,15 +26,25 @@ def civil_date_jdn(
     """
     if calendar not in {"proleptic_gregorian", "julian"}:
         raise ValueError("Unknown civil calendar")
+    else:
+        pass
     if any(type(v) is not int for v in (year, month, day)):
         raise ValueError("Civil date parts must be integers")
+    else:
+        pass
     if calendar == "proleptic_gregorian":
         return date(year, month, day).toordinal() + GREGORIAN_ORDINAL_TO_JDN
+    else:
+        pass
     if not 1 <= year <= 9999 or not 1 <= month <= 12:
         raise ValueError("Julian calendar requires CE year1..9999 and month1..12")
+    else:
+        pass
     length = (31, 29 if year % 4 == 0 else 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
     if not 1 <= day <= length[month - 1]:
         raise ValueError("Invalid Julian calendar date")
+    else:
+        pass
     a = (14 - month) // 12
     y, m = year + 4800 - a, month + 12 * a - 3
     return day + (153 * m + 2) // 5 + 365 * y + y // 4 - 32083
@@ -44,6 +57,8 @@ def gregorian_date(
     ordinal = civil_date_jdn(year, month, day, calendar) - GREGORIAN_ORDINAL_TO_JDN
     if not 1 <= ordinal <= date.max.toordinal():
         raise ValueError("Converted date lies outside supported Gregorian year1..9999")
+    else:
+        pass
     return date.fromordinal(ordinal)
 
 
@@ -56,11 +71,13 @@ def civil_datetime(
     calendar: str = "proleptic_gregorian",
     *,
     second: int = 0,
-) -> tuple[datetime, dict[str, Any]]:
+) -> tuple[datetime, CalendarConversionReceipt]:
     """Preserve the supplied wall clock; timezone is applied by the chart builder."""
     converted = gregorian_date(year, month, day, calendar)
     if any(type(v) is not int for v in (hour, minute, second)):
         raise ValueError("Civil clock parts must be integers")
+    else:
+        pass
     moment = datetime(
         converted.year, converted.month, converted.day, hour, minute, second
     )
@@ -88,7 +105,7 @@ def _calendar_conversion_receipt(
     normalized_label: datetime | None,
     *,
     second: int = 0,
-) -> dict[str, Any]:
+) -> CalendarConversionReceipt:
     """Date stage only; a raw hour label may still need origin normalization."""
     try:
         same_label = date(year, month, day)

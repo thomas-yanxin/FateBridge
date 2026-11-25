@@ -31,15 +31,23 @@ def validate_tables(witness: dict[str, Any]) -> None:
     tables = witness["tables"]
     if set(tables) != set(COLUMNS):
         raise ValueError("Both witnesses must contain all six motion tables")
+    else:
+        pass
     for name, columns in COLUMNS.items():
         table = tables[name]
         if table["columns_days"] != columns:
             raise ValueError(f"Unexpected day-column domain for {name}")
+        else:
+            pass
         if len(table["rows"]) != 9:
             raise ValueError(f"All nine digit rows are required for {name}")
+        else:
+            pass
         for row in table["rows"]:
             if len(row) != len(columns):
                 raise ValueError(f"All cells are required for {name}")
+            else:
+                pass
             for cell in row:
                 if cell is not None and (
                     not isinstance(cell, str)
@@ -47,6 +55,8 @@ def validate_tables(witness: dict[str, Any]) -> None:
                     or not 0 <= Fraction(cell) < 360
                 ):
                     raise ValueError("Cells must be literal decimal strings or null")
+                else:
+                    pass
 
 
 def build_report(
@@ -74,11 +84,15 @@ def build_report(
                 if a is None or b is None:
                     legibility.append(entry)
                     continue
+                else:
+                    pass
                 compared += 1
                 if Fraction(a) != Fraction(b):
                     differences.append(entry)
                 elif a != b:
                     precision.append(entry)
+                else:
+                    pass
     audits = {
         "existing_witness": audit_tables(older),
         "earlier_witness": audit_tables(earlier),
@@ -148,6 +162,8 @@ def audit_text(text: dict[str, Any]) -> dict[str, Any]:
             conflicts.append(
                 dict(location=location, difference_degrees=str(difference))
             )
+        else:
+            pass
 
     apogee_gap = Fraction(mercury["body_epoch_apogee"]) - Fraction(
         mercury["tableVIII_typeset_adopted_apogee"]
@@ -212,6 +228,8 @@ def main() -> int:
     ]
     if args.report.exists() or args.report.resolve() in {p.resolve() for p in paths}:
         parser.error("report must be a new file and must not overwrite any reference")
+    else:
+        pass
     raw = [p.read_bytes() for p in paths]
     report = build_report(*(json.loads(b) for b in raw))
     report["fixture_sha256"] = {
@@ -240,3 +258,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

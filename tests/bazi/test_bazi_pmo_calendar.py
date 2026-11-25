@@ -37,7 +37,7 @@ def frozen(name):
     "ignore:(from|to)SolarDate is deprecated.*:DeprecationWarning"
 )
 @pytest.mark.filterwarnings("ignore:use is_leap_month:DeprecationWarning")
-def test_hko_missing_month_cells_remain_partial_source_observations():
+def test_hko_missing_month_cells_remain_partial_source_observations() -> None:
     source = ROOT / "tests/data/ziwei_independent/hko/T1901c.txt"
     rows = hko_rows(source.read_text(encoding="utf-8-sig"), 1901)
     partial = [row for row in rows if row["month"] is None]
@@ -45,7 +45,9 @@ def test_hko_missing_month_cells_remain_partial_source_observations():
     assert all(row["day"] is not None for row in partial)
 
 
-def test_current_shared_date_components_match_every_frozen_literal_not_only_first_run():
+def test_current_shared_date_components_match_every_frozen_literal_not_only_first_run() -> (
+    None
+):
     differences = []
     for row in REFERENCE["rows"]:
         solar = date.fromisoformat(row["solar"])
@@ -55,6 +57,8 @@ def test_current_shared_date_components_match_every_frozen_literal_not_only_firs
         ganzhi = almanac.get_day_ganzhi(solar.year, solar.month, solar.day)
         if got != expected or ganzhi != row["day_ganzhi"]:
             differences.append((row["solar"], got, expected, ganzhi, row["day_ganzhi"]))
+        else:
+            pass
     assert differences == []
 
 
@@ -63,7 +67,7 @@ def test_current_shared_date_components_match_every_frozen_literal_not_only_firs
 )
 def test_accepted_birth_edges_do_not_fake_lunar_fields_outside_corrected_date_range(
     case, surface_calls
-):
+) -> None:
     spec = SPECS["bazi_birth"]
     payload = {
         k: v

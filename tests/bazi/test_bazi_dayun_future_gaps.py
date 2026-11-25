@@ -1,6 +1,5 @@
 """Frozen initial/internal/final-boundary future-gap range counterexamples."""
 
-import gzip
 import hashlib
 import json
 from datetime import datetime
@@ -10,16 +9,13 @@ import pytest
 
 from fatebridge.services.timing_uncertainty import analyze_birth_time_range
 from fatebridge.utils.birth_input import PersonInfo
-
-FIXTURE = Path(__file__).parents[1] / "data/bazi_dayun_future_gaps_v1"
-REFERENCE = FIXTURE / "reference.json.gz"
-assert (
-    hashlib.sha256(REFERENCE.read_bytes()).hexdigest()
-    == REFERENCE.with_suffix(".sha256").read_text().strip()
+from tests.unit_test.fixtures.dayun_future_gap_reference import (
+    FIXTURE,
+    FUTURE_GAP_REFERENCE,
+    INITIAL_BOUNDARY_CONTROLS,
+    FutureGapControl,
 )
-DATA = json.loads(gzip.decompress(REFERENCE.read_bytes()))
-KNOWN = [r for r in DATA["rows"] if r["status"] == "resolved_source_control"]
-INITIAL = [KNOWN[0], next(r for r in KNOWN if r["input"]["birth_year"] >= 2000)]
+
 LATER_PATH = FIXTURE / "later-period-controls.json"
 assert (
     hashlib.sha256(LATER_PATH.read_bytes()).hexdigest()
@@ -28,9 +24,11 @@ assert (
 LATER = json.loads(LATER_PATH.read_text())["controls"]
 
 
-@pytest.mark.parametrize("row", INITIAL, ids=lambda row: row["id"])
-def test_future_gap_initial_boundary_keeps_the_source_before_dayun_witness(row):
-    person = PersonInfo(**row["input"])
+@pytest.mark.parametrize("row", INITIAL_BOUNDARY_CONTROLS, ids=lambda row: row["id"])
+def test_future_gap_initial_boundary_keeps_the_source_before_dayun_witness(
+    row: FutureGapControl,
+) -> None:
+    person = PersonInfo.model_validate(row["input"])
     before = person.model_dump()
     result = analyze_birth_time_range(
         person, 1, analysis_moment=datetime.fromisoformat(row["analysis_at"])
@@ -46,8 +44,10 @@ def test_future_gap_initial_boundary_keeps_the_source_before_dayun_witness(row):
 
 
 @pytest.mark.parametrize("row", LATER, ids=lambda row: row["id"])
-def test_future_gap_internal_and_final_boundaries_keep_adjacent_period_candidates(row):
-    person = PersonInfo(**row["input"])
+def test_future_gap_internal_and_final_boundaries_keep_adjacent_period_candidates(
+    row,
+) -> None:
+    person = PersonInfo.model_validate(row["input"])
     before = person.model_dump()
     result = analyze_birth_time_range(
         person, 1, analysis_moment=datetime.fromisoformat(row["analysis_at"])
@@ -61,8 +61,10 @@ def test_future_gap_internal_and_final_boundaries_keep_adjacent_period_candidate
     assert result["sample_count"] == 3
 
 
-def test_source_reference_retains_all_declared_interactions_and_import_boundary():
-    assert len(DATA["rows"]) == 22162
-    assert DATA["counts"]["resolved_source_controls"] == 22035
-    assert DATA["counts"]["unresolved_interaction"] == 127
-    assert DATA["no_application_dateutil_zoneinfo_imported"] is True
+def test_source_reference_retains_all_declared_interactions_and_import_boundary() -> (
+    None
+):
+    assert len(FUTURE_GAP_REFERENCE["rows"]) == 22162
+    assert FUTURE_GAP_REFERENCE["counts"]["resolved_source_controls"] == 22035
+    assert FUTURE_GAP_REFERENCE["counts"]["unresolved_interaction"] == 127
+    assert FUTURE_GAP_REFERENCE["no_application_dateutil_zoneinfo_imported"] is True

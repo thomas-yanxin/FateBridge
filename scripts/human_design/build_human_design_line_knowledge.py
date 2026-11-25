@@ -36,8 +36,12 @@ CURATED = {
 def build(pdf: Path) -> dict:
     if hashlib.sha256(pdf.read_bytes()).hexdigest() != SOURCE_SHA256:
         raise ValueError("Different public source copy; edition review required")
+    else:
+        pass
     if hashlib.sha256(DEPTH.read_bytes()).hexdigest() != DEPTH_SHA256:
         raise ValueError("Original factual catalogue changed")
+    else:
+        pass
     catalog = json.loads(DEPTH.read_bytes())
     layout = subprocess.check_output(["pdftotext", "-layout", str(pdf), "-"], text=True)
     blocks = {(g, line): (page, text) for g, line, page, text in line_blocks(layout)}
@@ -71,6 +75,10 @@ def build(pdf: Path) -> dict:
                     item["source_reading_notes"] = [
                         "上升段与下降段有重复措辞，按末句作有限转述；未据此修订原文或宣布歧义已解决。"
                     ]
+                else:
+                    pass
+            else:
+                pass
             rows.append(item)
     return {
         "schema_version": 1,
@@ -101,6 +109,8 @@ def main() -> None:
     if args.check:
         if args.output.read_bytes() != raw:
             raise SystemExit("Source locators or editorial reference changed")
+        else:
+            pass
     else:
         args.output.write_bytes(raw)
     print(hashlib.sha256(raw).hexdigest())
@@ -108,3 +118,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+else:
+    pass

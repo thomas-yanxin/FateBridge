@@ -9,16 +9,16 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from fatebridge.core.meihua_weather import build_weather_interpretation
+from fatebridge.core.meihua.meihua_weather import build_weather_interpretation
 from fatebridge.core.requests.meihua import MeihuaCastRequest, MeihuaWeatherContext
 from fatebridge.services.meihua import calculate_meihua_cast
-from fatebridge.validation.meihua_weather import audit_weather_rules
+from validation.meihua_weather import audit_weather_rules
 
 REFERENCES = Path(__file__).parents[1] / "fixtures/meihua_weather_v1"
 CASES = json.loads((REFERENCES / "cases.json").read_text())["cases"]
 
 
-def test_frozen_weather_probes_and_primary_quotes():
+def test_frozen_weather_probes_and_primary_quotes() -> None:
     report = audit_weather_rules(REFERENCES)
     assert report["selected_rule_checks_passed"], report["cases"]
     assert report["source_clause_count"] == 40
@@ -32,7 +32,7 @@ def test_frozen_weather_probes_and_primary_quotes():
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
-def test_confirmed_context_and_rule_status_are_preserved(case):
+def test_confirmed_context_and_rule_status_are_preserved(case) -> None:
     output = calculate_meihua_cast(
         casting=case["casting"],
         interpretation_topic="weather",
@@ -46,14 +46,13 @@ def test_confirmed_context_and_rule_status_are_preserved(case):
         assert statuses[rule] == status
     assert reading["evidence_scope"]["body_use_applied"] is False
     assert "body_use_reading" not in reading
-    assert reading["action_hint"] is None
     assert weather["single_forecast"] is None
     assert sum(weather["trigram_counts"].values()) == 6
     for slot in weather["trigram_slots"]:
         assert "cuo" not in slot["path"] and "zong" not in slot["path"]
 
 
-def test_weather_is_invariant_to_unrelated_body_use_and_editorial_templates():
+def test_weather_is_invariant_to_unrelated_body_use_and_editorial_templates() -> None:
     cast = calculate_meihua_cast(casting=CASES[0]["casting"])["meihua"]
     before = build_weather_interpretation(cast, CASES[0]["context"])
     changed = deepcopy(cast)
@@ -63,7 +62,7 @@ def test_weather_is_invariant_to_unrelated_body_use_and_editorial_templates():
     assert build_weather_interpretation(changed, CASES[0]["context"]) == before
 
 
-def test_no_implicit_many_threshold_or_season_from_month_strength():
+def test_no_implicit_many_threshold_or_season_from_month_strength() -> None:
     a = calculate_meihua_cast(
         casting=CASES[0]["casting"],
         season_month_branch="午",
@@ -83,7 +82,7 @@ def test_no_implicit_many_threshold_or_season_from_month_strength():
     assert statuses["pure_li_summer_drought"] == "pending_context"
 
 
-def test_conflicting_rain_and_rain_stop_remain_visible():
+def test_conflicting_rain_and_rain_stop_remain_visible() -> None:
     case = CASES[3]
     output = calculate_meihua_cast(
         casting=case["casting"],
@@ -97,12 +96,12 @@ def test_conflicting_rain_and_rain_stop_remain_visible():
 
 
 @pytest.mark.parametrize("threshold", [True, 1, 7, "2"])
-def test_threshold_must_be_declared_strict_count(threshold):
+def test_threshold_must_be_declared_strict_count(threshold: bool | int | str) -> None:
     with pytest.raises(ValidationError):
         MeihuaWeatherContext(many_min_count=threshold)
 
 
-def test_context_requires_explicit_weather_branch():
+def test_context_requires_explicit_weather_branch() -> None:
     with pytest.raises(ValidationError, match="weather_context"):
         MeihuaCastRequest(
             casting=CASES[0]["casting"], weather_context={"season": "summer"}
@@ -112,7 +111,7 @@ def test_context_requires_explicit_weather_branch():
     assert general["interpretation"]["weather"] is None
 
 
-def test_corrupt_expected_weather_count_cannot_pass(tmp_path):
+def test_corrupt_expected_weather_count_cannot_pass(tmp_path: Path) -> None:
     directory = tmp_path / "meihua_weather_v1"
     shutil.copytree(REFERENCES, directory)
     shutil.copytree(

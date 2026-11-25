@@ -26,6 +26,7 @@ from fatebridge.services.western_timing import calculate_western_timing_analysis
 from fatebridge.services.western_timing_tools import calculate_timing_tool
 from tests.fixtures.mcp_result_delivery import read_full_result
 from tests.fixtures.transports import mcp_parameters
+from tests.support.transports import call_calculation
 
 BIRTH = {
     "name": "演示甲",
@@ -54,7 +55,9 @@ AS_OF = "2026-10-14T12:00:00+08:00"
         ({"analysis_minute": 7}, "10:07"),
     ],
 )
-def test_target_clock_overrides_preserve_date_only_defaults(clock, expected):
+def test_target_clock_overrides_preserve_date_only_defaults(
+    clock, expected: str
+) -> None:
     info = build_predictive_birth_info(**BIRTH)
     with call_clock("2031-01-01T00:00:00Z"):
         target = build_analysis_datetime(info, **DATE, **clock)
@@ -62,7 +65,36 @@ def test_target_clock_overrides_preserve_date_only_defaults(clock, expected):
     assert info.local_datetime.isoformat() == "1990-05-15T10:30:00+09:00"
 
 
-def test_partial_target_date_uses_local_call_clock_and_explicit_minutes():
+@pytest.mark.parametrize(
+    "zone,as_of,clock,expected",
+    [
+        pytest.param(
+            "-05:00",
+            "0001-01-01T00:00:00Z",
+            {"analysis_hour": 0, "analysis_minute": 7},
+            "2026-10-14T00:07:00-05:00",
+            id="lower",
+        ),
+        pytest.param(
+            "+08:00",
+            "9999-12-31T23:59:59.999999Z",
+            {},
+            "2026-10-14T10:30:00+08:00",
+            id="upper",
+        ),
+    ],
+)
+def test_complete_target_date_ignores_unrepresentable_local_call_clock(
+    zone: str, as_of: str, clock, expected: str
+) -> None:
+    info = build_predictive_birth_info(**{**BIRTH, "birth_timezone": zone})
+    with call_clock(as_of) as execution:
+        target = build_analysis_datetime(info, **DATE, **clock)
+    assert target.isoformat() == expected
+    assert not execution.reads
+
+
+def test_partial_target_date_uses_local_call_clock_and_explicit_minutes() -> None:
     info = build_predictive_birth_info(**BIRTH)
     # Frozen instant is March 31 locally. A default day must still fit February.
     with call_clock("2026-03-30T20:00:00Z"):
@@ -82,21 +114,21 @@ def test_partial_target_date_uses_local_call_clock_and_explicit_minutes():
         ("analysis_minute", 60, "less_than_equal"),
     ],
 )
-def test_target_clock_bounds(model, field, value, code):
+def test_target_clock_bounds(model, field: str, value, code: str) -> None:
     with pytest.raises(ValidationError) as exc:
         model(**BIRTH, **DATE, **{field: value})
     assert [(e["loc"], e["type"]) for e in exc.value.errors()] == [((field,), code)]
 
 
 @pytest.mark.parametrize("spec", SPECS, ids=lambda spec: spec.key)
-def test_every_timing_surface_exposes_the_same_clock_contract(spec):
+def test_every_timing_surface_exposes_the_same_clock_contract(spec) -> None:
     from fatebridge.api import app
 
     rest_schema = app.openapi()["components"]["schemas"][spec.request_model.__name__]
     mcp_schema = mcp_parameters(spec.tool_name)
     args = build_parser().parse_args(
         [
-            spec.key,
+            spec.tool_name,
             "--birth-year",
             "1990",
             "--birth-month",
@@ -169,7 +201,8 @@ def _all_transports(monkeypatch, capsys, tool, path, payload):
 
     async def native_call():
         async with Client(mcp.app) as client:
-            result = await client.call_tool(
+            result = await call_calculation(
+                client,
                 tool,
                 {
                     **payload,
@@ -180,7 +213,7 @@ def _all_transports(monkeypatch, capsys, tool, path, payload):
                 },
                 raise_on_error=False,
             )
-            inline = json.loads(result.content[0].text)
+            inline = result.structured_content
             assert inline == result.structured_content
             return result, await read_full_result(client, inline)
 
@@ -193,8 +226,8 @@ def _all_transports(monkeypatch, capsys, tool, path, payload):
 
 @pytest.mark.parametrize("spec", SPECS, ids=lambda spec: spec.key)
 def test_exact_clock_reaches_every_timing_engine_through_all_transports(
-    monkeypatch, capsys, spec
-):
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], spec
+) -> None:
     payload = {**BIRTH, **DATE, "analysis_hour": 12, "analysis_minute": 7}
     response, protocol, code, cli_payload, complete = _all_transports(
         monkeypatch, capsys, spec.tool_name, spec.rest_path, payload
@@ -226,8 +259,13 @@ def test_exact_clock_reaches_every_timing_engine_through_all_transports(
     ],
 )
 def test_invalid_clock_is_rejected_consistently(
-    monkeypatch, capsys, spec, field, value, code
-):
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    spec,
+    field: str,
+    value,
+    code: str,
+) -> None:
     payload = {**BIRTH, **DATE, **{field: value}}
     response, protocol, exit_code, cli_payload, _ = _all_transports(
         monkeypatch, capsys, spec.tool_name, spec.rest_path, payload
@@ -238,7 +276,7 @@ def test_invalid_clock_is_rejected_consistently(
         assert [(i["path"], i["code"]) for i in output["issues"]] == [(field, code)]
 
 
-def test_exact_clock_changes_computed_transit_and_matches_standalone():
+def test_exact_clock_changes_computed_transit_and_matches_standalone() -> None:
     kwargs = {**BIRTH, **DATE}
     legacy = calculate_timing_tool("transit", **kwargs)
     noon = calculate_western_timing_analysis(
@@ -267,7 +305,7 @@ def test_exact_clock_changes_computed_transit_and_matches_standalone():
     )
 
 
-def test_target_clock_keeps_the_instant_when_return_location_changes():
+def test_target_clock_keeps_the_instant_when_return_location_changes() -> None:
     result = calculate_timing_tool(
         "transit",
         **BIRTH,
@@ -283,3 +321,83 @@ def test_target_clock_keeps_the_instant_when_return_location_changes():
     assert target == "2026-10-14T00:00:00+08:00"
     assert transit_target == "2026-10-13T12:00:00-04:00"
     assert datetime.fromisoformat(target) == datetime.fromisoformat(transit_target)
+
+
+@pytest.mark.parametrize(
+    "zone,hour,minute,label,nominal_jd,return_zone,return_label",
+    [
+        pytest.param(
+            "Asia/Tokyo",
+            9,
+            18,
+            "0001-01-01T09:18:00+09:18:59",
+            148731163141 / 86400,
+            None,
+            "0001-01-01T09:18:00+09:18:59",
+            id="tokyo-lmt",
+        ),
+        pytest.param(
+            "+09:00",
+            8,
+            59,
+            "0001-01-01T08:59:00+09:00",
+            2478852719 / 1440,
+            None,
+            "0001-01-01T08:59:00+09:00",
+            id="fixed-offset",
+        ),
+        pytest.param(
+            "Asia/Tokyo",
+            9,
+            18,
+            "0001-01-01T09:18:00+09:18:59",
+            148731163141 / 86400,
+            "+10:00",
+            "0001-01-01T09:59:01+10:00",
+            id="tokyo-lmt-to-fixed",
+        ),
+        pytest.param(
+            "+09:00",
+            8,
+            59,
+            "0001-01-01T08:59:00+09:00",
+            2478852719 / 1440,
+            "Asia/Tokyo",
+            "0001-01-01T09:17:59+09:18:59",
+            id="fixed-offset-to-tokyo-lmt",
+        ),
+    ],
+)
+def test_transit_accepts_representable_local_clock_in_utc_year_zero(
+    zone: str,
+    hour: int,
+    minute: int,
+    label: str,
+    nominal_jd,
+    return_zone: str | None,
+    return_label: str,
+) -> None:
+    result = calculate_timing_tool(
+        "transit",
+        birth_year=1900,
+        birth_month=1,
+        birth_day=15,
+        birth_hour=12,
+        birth_minute=0,
+        birth_timezone=zone,
+        birth_longitude=139.6917,
+        birth_latitude=35.6895,
+        analysis_year=1,
+        analysis_month=1,
+        analysis_day=1,
+        analysis_hour=hour,
+        analysis_minute=minute,
+        house_system="W",
+        return_timezone=return_zone,
+    )
+    assert result["analysis_context"]["analysis_datetime"] == label
+    assert result["analysis_context"]["age_years"] == -1899.0373
+    assert result["transit"]["analysis_datetime"] == return_label
+    basis = result["transit"]["calculation_basis"]
+    assert basis["time_scale"] == "pre_1972_swiss_UT1_delta_t"
+    assert basis["julian_day_ut1"] == nominal_jd

@@ -1,20 +1,134 @@
 """Transport-independent declarations for one catalog tool."""
 
+from __future__ import annotations
+
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, Optional, Tuple, Type
+from decimal import Decimal
+from typing import Any, NamedTuple, Protocol, runtime_checkable
 
 from pydantic import BaseModel
+from typing_extensions import NotRequired, TypedDict
 
+from fatebridge.core.execution_context import DetailLevel
 from fatebridge.core.method_contracts import MethodContract
 from fatebridge.core.reproducibility import ReproducibilityPolicy
+from fatebridge.utils.birth_input import PersonInfo
 
-ServiceResult = Dict[str, Any]
-# A bind turns a validated request model into a concrete service call:
-#   (service_callable, positional_args, keyword_args)
-# The shared execution unit invokes this binding (REST offloads the unit to a
-# threadpool; MCP/CLI call it synchronously), keeping domain work off the event
-# loop while freezing time and attaching receipts consistently.
-Bind = Callable[[BaseModel], Tuple[Callable[..., ServiceResult], tuple, Dict[str, Any]]]
+ServiceResult = dict[str, Any]
+ServiceInput = (
+    str
+    | int
+    | float
+    | bool
+    | Decimal
+    | None
+    | Sequence["ServiceInput"]
+    | Mapping[str, "ServiceInput"]
+    | Mapping[int, "ServiceInput"]
+)
+ServicePositionalInput = ServiceInput | PersonInfo
+
+
+class EvidenceView(TypedDict):
+    fields: list[str]
+    when: NotRequired[str]
+    purpose: NotRequired[str]
+    strict_fields: NotRequired[bool]
+    include_snapshot_text: NotRequired[bool]
+    description: NotRequired[str]
+    label: NotRequired[str]
+    relative_mode: NotRequired[str]
+    primary_layer: NotRequired[str]
+    scope: NotRequired[str]
+    aliases: NotRequired[list[str | int]]
+
+
+EvidenceViews = dict[str, EvidenceView]
+
+
+@runtime_checkable
+class ResolvedService(Protocol):
+    """Domain entry point as exposed to the dynamic registration boundary."""
+
+    def __call__(
+        self, *positional: ServicePositionalInput, **keywords: ServiceInput
+    ) -> ServiceResult: ...
+
+
+class BoundServiceCall(NamedTuple):
+    service: ResolvedService
+    positional_arguments: tuple[ServicePositionalInput, ...]
+    keyword_arguments: dict[str, ServiceInput]
+
+
+class Bind(Protocol):
+    """Bind a validated request while supporting existing tuple consumers."""
+
+    def __call__(
+        self, request: BaseModel, /
+    ) -> tuple[
+        ResolvedService, tuple[ServicePositionalInput, ...], dict[str, ServiceInput]
+    ]: ...
+
+
+class RunService(Protocol):
+    def __call__(self) -> ServiceResult: ...
+
+
+class OutputValidator(Protocol):
+    def __call__(
+        self,
+        spec: ToolSpec,
+        result: ServiceResult,
+        validation_model: BaseModel | None,
+        request: BaseModel | None,
+        /,
+    ) -> None: ...
+
+
+class RequiredOutputValidator(Protocol):
+    def __call__(
+        self, spec: ToolSpec, result: ServiceResult, request: BaseModel | None, /
+    ) -> None: ...
+
+
+class ExecutionWrapper(Protocol):
+    def __call__(
+        self, spec: ToolSpec, request: BaseModel, run: RunService, /
+    ) -> ServiceResult: ...
+
+
+class EvidenceViewsBuilder(Protocol):
+    def __call__(self, views: EvidenceViews | None, /) -> EvidenceViews | None: ...
+
+
+class NeedsRandomSeed(Protocol):
+    def __call__(self, arguments: dict[str, ServiceInput], /) -> bool: ...
+
+
+class TimeDefaultsResolver(Protocol):
+    def __call__(
+        self, result: ServiceResult, omitted_fields: list[str], /
+    ) -> list[str]: ...
+
+
+class ApproximationDetector(Protocol):
+    def __call__(self, result: ServiceResult, /) -> bool: ...
+
+
+class CompactView(Protocol):
+    def __call__(self, result: ServiceResult, /) -> ServiceResult: ...
+
+
+class DetailView(Protocol):
+    def __call__(
+        self, result: ServiceResult, detail: DetailLevel, requested_fields: set[str], /
+    ) -> ServiceResult: ...
+
+
+class OutputContractError(RuntimeError):
+    """A service bug, never a user-input error."""
 
 
 @dataclass(frozen=True)
@@ -26,7 +140,7 @@ class ExecutionHints:
     idempotent: bool = True
     open_world: bool = False
 
-    def as_annotations(self) -> Dict[str, bool]:
+    def as_annotations(self) -> dict[str, bool]:
         return {
             "readOnlyHint": self.read_only,
             "destructiveHint": self.destructive,
@@ -41,32 +155,36 @@ class ToolSpec:
 
     key: str
     bind: Bind
-    request_model: Type[BaseModel]
+    request_model: type[BaseModel]
     summary: str
     operation_label_zh: str
     family: str
-    rest_path: Optional[str] = None
-    mcp_name: Optional[str] = None
+    rest_path: str | None = None
+    mcp_name: str | None = None
     cpu_bound: bool = False
     include_snapshot_text: bool = True
-    metadata_name: Optional[str] = None
-    output_model: Optional[Type[BaseModel]] = None
-    # Complete service results are validated before projection. Public output
-    # schemas allow omissions for fields selections, but a service must still
-    # produce its declared non-null business roots.
-    required_output_fields: Tuple[str, ...] = ()
+    optional_snapshot: bool = False
+    output_model: type[BaseModel] | None = None
+    # note (output validation): Complete service results must include these roots before projection.
+    required_output_fields: tuple[str, ...] = ()
+    required_output_validator: RequiredOutputValidator | None = None
     cli_request_file: bool = False
     execution_hints: ExecutionHints = field(default_factory=ExecutionHints)
     reproducibility: ReproducibilityPolicy = field(
         default_factory=ReproducibilityPolicy
     )
-    methods: Tuple[MethodContract, ...] = ()
+    methods: tuple[MethodContract, ...] = ()
+    output_validators: tuple[OutputValidator, ...] = ()
+    needs_random_seed: NeedsRandomSeed | None = None
+    resolve_time_defaults: TimeDefaultsResolver | None = None
+    approximate_record: ApproximationDetector | None = None
+    uses_astronomy_runtime: bool = False
+    execution_wrapper: ExecutionWrapper | None = None
+    required_output_fields_by_variant: dict[str, tuple[str, ...]] | None = None
+    evidence_views_builder: EvidenceViewsBuilder | None = None
+    compact_view: CompactView | None = None
+    detail_view: DetailView | None = None
 
     @property
     def tool_name(self) -> str:
         return self.mcp_name or self.key
-
-    @property
-    def run_metadata_name(self) -> str:
-        """The tool_name stamped into run_metadata (may differ from the registered name)."""
-        return self.metadata_name or self.mcp_name or self.key

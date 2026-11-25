@@ -8,9 +8,9 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
+from fatebridge.core.contracts.output_ren_patterns import JinkouPatternEvaluation
 from fatebridge.core.metaphysics.jinkou_patterns import structural_patterns
-from fatebridge.core.output_ren_patterns import JinkouPatternEvaluation
-from tests.ren.test_ren_classical_depth import AUDIT as V1
+from scripts.ren import audit_ren_classical
 
 ROOT = Path(__file__).resolve().parents[2]
 SPEC = importlib.util.spec_from_file_location(
@@ -23,7 +23,7 @@ SPEC.loader.exec_module(AUDIT)
 
 def literal(index):
     case = AUDIT.load_reference()["cases"][index - 1]
-    old = V1.load_frozen_corpus()
+    old = audit_ren_classical.load_frozen_corpus()
     return AUDIT.literal_rows(case, old["rules"]["inherent"]), case
 
 
@@ -36,7 +36,9 @@ def ids(result):
     return {p["id"] for p in result["matched"]}
 
 
-def test_all_64_scanned_entries_are_kept_including_disagreements_and_missing_days():
+def test_all_64_scanned_entries_are_kept_including_disagreements_and_missing_days() -> (
+    None
+):
     report = AUDIT.audit()
     assert report["corpus_case_count"] == 64
     assert report["matched_semantic_cases"] == 54
@@ -118,7 +120,7 @@ def test_all_64_scanned_entries_are_kept_including_disagreements_and_missing_day
         64,
     ],
 )
-def test_source_structure_has_its_named_predicate_with_a_locator(index):
+def test_source_structure_has_its_named_predicate_with_a_locator(index: int) -> None:
     result = recognize(index)
     match = next(p for p in result["matched"] if p["id"] == f"P{index:02}")
     assert match["condition"] and match["basis"]
@@ -130,12 +132,14 @@ def test_source_structure_has_its_named_predicate_with_a_locator(index):
     assert result["catalog_count"] == 64
 
 
-def test_equal_earth_elements_are_not_three_identical_house_branches():
+def test_equal_earth_elements_are_not_three_identical_house_branches() -> None:
     result = recognize(6)
     assert "P06" in ids(result) and "P05" not in ids(result)
 
 
-def test_complete_ledger_distinguishes_a_false_definition_from_an_unresolved_one():
+def test_complete_ledger_distinguishes_a_false_definition_from_an_unresolved_one() -> (
+    None
+):
     # The independently frozen 俱比 example has equal earth elements but
     # different house branches. P05 is false; P52 is still undecided.
     result = recognize(6)
@@ -174,12 +178,14 @@ def test_complete_ledger_distinguishes_a_false_definition_from_an_unresolved_one
         ("not_matched", None),
     ],
 )
-def test_public_contract_rejects_a_changed_three_state_verdict(status, matched):
+def test_public_contract_rejects_a_changed_three_state_verdict(
+    status: str, matched: bool | None
+) -> None:
     with pytest.raises(ValidationError, match="三态"):
         JinkouPatternEvaluation.model_validate(dict(status=status, matched=matched))
 
 
-def test_three_state_contract_accepts_actual_values_and_partial_projection():
+def test_three_state_contract_accepts_actual_values_and_partial_projection() -> None:
     for record in recognize(6)["evaluations"]:
         JinkouPatternEvaluation.model_validate(record)
     for partial in (
@@ -193,32 +199,38 @@ def test_three_state_contract_accepts_actual_values_and_partial_projection():
         JinkouPatternEvaluation.model_validate({"matched": "false"})
 
 
-def test_same_phase_does_not_make_same_branch_fuyin():
+def test_same_phase_does_not_make_same_branch_fuyin() -> None:
     result = recognize(13)
     assert {"P10", "P13"} <= ids(result)
     assert "P11" not in ids(result)
 
 
-def test_transformed_trine_control_and_noble_control_are_different_conditions():
+def test_transformed_trine_control_and_noble_control_are_different_conditions() -> None:
     result = recognize(2)
     assert "P02" in ids(result) and "P01" not in ids(result)
 
 
-def test_upward_and_downward_generation_remain_distinct():
+def test_upward_and_downward_generation_remain_distinct() -> None:
     assert "P34" in ids(recognize(34)) and "P36" not in ids(recognize(34))
     assert "P36" in ids(recognize(36)) and "P34" not in ids(recognize(36))
 
 
-def test_no_control_guideline_and_empty_use_do_not_invent_a_final_adjudication():
+def test_no_control_guideline_and_empty_use_do_not_invent_a_final_adjudication() -> (
+    None
+):
     # An entirely symbolic source-style board, never an asserted real date.
-    result = V1.observe_jinkou(dict(day="癸巳", hour="申", ground="子", general="戌"))
+    result = audit_ren_classical.observe_jinkou(
+        dict(day="癸巳", hour="申", ground="子", general="戌")
+    )
     evidence = result["use_evidence"]
     assert evidence["no_control_principle_applies"] is True
     assert evidence["status"] == "no_control_strength_priority_unresolved"
     assert evidence["comprehensive_position"] is None
     assert result["overview"]["use_position"] == evidence["polarity_position"]
     assert evidence["subject_position"] == "贵神"
-    result = V1.observe_jinkou(dict(day="丙申", hour="丑", ground="巳", general="子"))
+    result = audit_ren_classical.observe_jinkou(
+        dict(day="丙申", hour="丑", ground="巳", general="子")
+    )
     selected = next(r for r in result["rows"] if r["is_use"])
     evidence = result["use_evidence"]
     assert evidence["xun_kong"] == selected["xun_kong"]
@@ -226,7 +238,7 @@ def test_no_control_guideline_and_empty_use_do_not_invent_a_final_adjudication()
     assert evidence["comprehensive_position"] is None
 
 
-def test_reference_manifest_rejects_tampered_independent_labels(tmp_path):
+def test_reference_manifest_rejects_tampered_independent_labels(tmp_path: Path) -> None:
     target = tmp_path / "source"
     shutil.copytree(AUDIT.CORPUS, target)
     file = target / "cases.json"

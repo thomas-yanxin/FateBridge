@@ -8,11 +8,11 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core import guolao_day_rate as rate
-from fatebridge.core.guolao_calendar_year import gujin_fixed_qice_year
-from fatebridge.core.guolao_historical import shoushi_winter_cycle
-from fatebridge.core.guolao_lunar_velocity import gujin_table_conjunction
-from fatebridge.validation.guolao_calendars import (
+from fatebridge.core.guolao import guolao_day_rate as rate
+from fatebridge.core.guolao.guolao_calendar_year import gujin_fixed_qice_year
+from fatebridge.core.guolao.guolao_historical import shoushi_winter_cycle
+from fatebridge.core.guolao.guolao_lunar_velocity import gujin_table_conjunction
+from validation.guolao_calendars import (
     audit_named_year_grid,
     compare_named_calendar_methods,
     compare_official_calendar,
@@ -22,7 +22,7 @@ ROOT = Path(__file__).parents[2]
 FIXTURE = ROOT / "tests/fixtures/guolao-day-rate-v1"
 
 
-def test_original_images_and_complete_literal_transcription_are_pinned():
+def test_original_images_and_complete_literal_transcription_are_pinned() -> None:
     reference = json.loads((FIXTURE / "reference.json").read_text())
     for artifact in reference["artifacts"]:
         raw = (FIXTURE / artifact["path"]).read_bytes()
@@ -43,7 +43,7 @@ def test_original_images_and_complete_literal_transcription_are_pinned():
     assert not reference["independent_second_collator"]
 
 
-def test_all_rate_discrepancies_and_boundary_discontinuities_remain_visible():
+def test_all_rate_discrepancies_and_boundary_discontinuities_remain_visible() -> None:
     result = rate.audit_day_rate_table()
     assert result["rate_position_count"] == 169
     assert result["printed_numeric_rate_count"] == 168
@@ -69,8 +69,8 @@ def test_all_rate_discrepancies_and_boundary_discontinuities_remain_visible():
 @pytest.mark.parametrize("within", ["7.2807", "7.285", "7.2987"])
 @pytest.mark.parametrize("half", [F(), F("13.7773")])
 def test_printed_reversed_span_including_its_endpoints_is_not_resolved_by_sorting(
-    within, half
-):
+    within: str, half
+) -> None:
     result = rate.gujin_day_rate_lunar(F(within) + half)
     assert result["status"] == "ambiguous_literal_rate_not_repaired"
     assert result["conflicting_reversed_interval_indices"] == [89]
@@ -100,20 +100,24 @@ def test_printed_reversed_span_including_its_endpoints_is_not_resolved_by_sortin
         ("27.5546", 0),
     ],
 )
-def test_literal_rate_boundaries_and_conflicts_are_used_exactly(anomaly, index):
+def test_literal_rate_boundaries_and_conflicts_are_used_exactly(
+    anomaly: str, index: int
+) -> None:
     result = rate.gujin_day_rate_lunar(F(anomaly))
     assert result["whole_limit_index"] == index
     assert not result["interpolation_clipped_or_endpoint_smoothed"]
 
 
-def test_printed_long_interval_retains_extrapolation_and_reports_it():
+def test_printed_long_interval_retains_extrapolation_and_reports_it() -> None:
     result = rate.gujin_day_rate_lunar(F("7.4"))
     assert result["selected_printed_day_rate_days"] == "7.2807"
     assert F(result["interpolation_fraction_exact"]) == F(1193, 820)
     assert result["interpolation_fraction_exceeds_one"]
 
 
-def test_central_cumulative_cells_preserve_source_curvature_instead_of_flat_band():
+def test_central_cumulative_cells_preserve_source_curvature_instead_of_flat_band() -> (
+    None
+):
     expected = [
         F("5.42881000"),
         F("5.42916616"),
@@ -131,7 +135,9 @@ def test_central_cumulative_cells_preserve_source_curvature_instead_of_flat_band
     assert values[2] > values[1] > values[0]
 
 
-def test_original49_local_lunar_step_and_residual_are_independent_of_whole_year_epoch():
+def test_original49_local_lunar_step_and_residual_are_independent_of_whole_year_epoch() -> (
+    None
+):
     result = rate.gujin_day_rate_lunar(F("23.310758"))
     assert result["whole_limit_index"] == 116
     assert result["selected_printed_day_rate_days"] == "9.5129"
@@ -143,7 +149,9 @@ def test_original49_local_lunar_step_and_residual_are_independent_of_whole_year_
 
 
 @pytest.mark.parametrize("elapsed,sexagenary", [(31, "癸巳"), (296, "乙酉")])
-def test_old_endpoint_gaps_select_printed167_without_filling168(elapsed, sexagenary):
+def test_old_endpoint_gaps_select_printed167_without_filling168(
+    elapsed: int, sexagenary: str
+) -> None:
     middle = shoushi_winter_cycle(elapsed).zhongji_days
     old = gujin_table_conjunction(middle, 10)
     result = rate.gujin_day_rate_conjunction(middle, 10)
@@ -160,7 +168,7 @@ def test_old_endpoint_gaps_select_printed167_without_filling168(elapsed, sexagen
     assert not result["complete_source_calendar_accepted"]
 
 
-def test_exact_half_endpoint_remains_an_empty_velocity_not_periodic_fill():
+def test_exact_half_endpoint_remains_an_empty_velocity_not_periodic_fill() -> None:
     # Force only the mean angular context; the literal table and velocity are real.
     context = rate.source_conjunction(F(), 0, profile_id=rate.GUJIN_COMPONENTS)
     context["lunar"]["anomaly_phase_days_exact"] = "13.7773"
@@ -183,8 +191,8 @@ def test_exact_half_endpoint_remains_an_empty_velocity_not_periodic_fill():
     [("jiajing3_1524_wdl108", 26, 0), ("wanli27_1599_nlc_preview", 6, 4)],
 )
 def test_unchanged_official_reference_is_compared_under_explicit_new_method(
-    reference_id, matches, missing
-):
+    reference_id: str, matches: int, missing: int
+) -> None:
     result = compare_official_calendar(reference_id, conjunction_method="day_rate")
     assert result["counts"] == dict(
         matches=matches,
@@ -199,8 +207,8 @@ def test_unchanged_official_reference_is_compared_under_explicit_new_method(
 
 @pytest.mark.parametrize("elapsed", [31, 296])
 def test_named_year_closes_previous_gap_without_claiming_all_years_are_accepted(
-    elapsed,
-):
+    elapsed: int,
+) -> None:
     calendar = gujin_fixed_qice_year(
         shoushi_winter_cycle(elapsed).zhongji_days, conjunction_method="day_rate"
     )
@@ -210,13 +218,13 @@ def test_named_year_closes_previous_gap_without_claiming_all_years_are_accepted(
 
 
 @pytest.mark.parametrize("value", ["", "auto", "best_fit", True])
-def test_calendar_cannot_silently_pick_a_method_by_fit(value):
+def test_calendar_cannot_silently_pick_a_method_by_fit(value: bool | str) -> None:
     with pytest.raises(ValueError):
         gujin_fixed_qice_year(F(), conjunction_method=value)
 
 
 @pytest.mark.parametrize("value", [0, 1.2, "23.310758", True])
-def test_requires_exact_original_day_input(value):
+def test_requires_exact_original_day_input(value: bool | float | int | str) -> None:
     with pytest.raises(TypeError):
         rate.gujin_day_rate_lunar(value)
 
@@ -225,8 +233,8 @@ def test_requires_exact_original_day_input(value):
     "mutation", ["delete", "reorder", "precision", "endpoint", "anchors", "claim"]
 )
 def test_malformed_or_overclaimed_source_profiles_fail_closed(
-    tmp_path, monkeypatch, mutation
-):
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, mutation: str
+) -> None:
     data = json.loads(rate.DATA.read_text())
     if mutation == "delete":
         data["rows"].pop()
@@ -247,7 +255,7 @@ def test_malformed_or_overclaimed_source_profiles_fail_closed(
         rate.gujin_day_rate_lunar(F(1))
 
 
-def test_grid_keeps_new_method_failures_and_old_default_distinct():
+def test_grid_keeps_new_method_failures_and_old_default_distinct() -> None:
     # A source conflict can create new unresolved years; do not count old-gap
     # resolution as a universal coverage gain. Full400-year receipt is separate.
     result = audit_named_year_grid(0, 400, conjunction_method="day_rate")
@@ -284,8 +292,8 @@ def test_grid_keeps_new_method_failures_and_old_default_distinct():
     [(31, False, None), (45, False, None), (203, True, False), (243, True, True)],
 )
 def test_method_comparison_retains_disagreement_missingness_and_no_selection(
-    elapsed, both, agree
-):
+    elapsed: int, both: bool, agree: bool | None
+) -> None:
     result = compare_named_calendar_methods(elapsed, elapsed + 1)
     assert result["input_years"] == 1 and result["input_years_dropped"] == 0
     assert result["rows"][0]["both_complete"] is both

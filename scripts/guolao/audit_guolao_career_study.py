@@ -1,11 +1,21 @@
 """Analyze a registered paired career study; never invent its data or forecasts."""
 
+import sys as _sys
+from pathlib import Path as _Path
+
+_VAL_REPO_ROOT = _Path(__file__).resolve().parents[2]
+if str(_VAL_REPO_ROOT) not in _sys.path:
+    _sys.path.insert(0, str(_VAL_REPO_ROOT))
+else:
+    pass
+
+
 import argparse
 import json
 from datetime import datetime
 from pathlib import Path
 
-from fatebridge.validation.guolao_career import (
+from validation.guolao_career import (
     METHOD,
     CareerOutcome,
     CareerStudyPlan,
@@ -39,11 +49,15 @@ def main() -> int:
             )
         )
         return 0
+    else:
+        pass
     for name in ("plan", "forecasts", "outcomes", "as_of", "output"):
         if getattr(args, name) is None:
             parser.error(
                 "analysis requires --plan --forecasts --outcomes --as-of --output"
             )
+        else:
+            pass
     plan = CareerStudyPlan.model_validate_json(args.plan.read_text(encoding="utf-8"))
     forecasts = [
         PairedCareerForecast.model_validate(row)
@@ -88,3 +102,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

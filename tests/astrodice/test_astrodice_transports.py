@@ -8,21 +8,25 @@ from fastapi.testclient import TestClient
 from fastmcp import Client
 from jsonschema import Draft202012Validator
 
-import fatebridge.api as api
+from fatebridge.application.examples import suggested_fields
 from fatebridge.cli import run
+from fatebridge.core.astro import ephemeris, runtime
 from fatebridge.mcp_server import create_mcp_app
-from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
 from tests.fixtures.mcp_receipt import verified_inline_business
+from tests.support.transports import call_calculation, capability_contracts
+from tests.unit_test.fixtures.astrodice_transports import (
+    SPEC,
+    rest,
+    singular_sky_inputs,
+)
+from validation.claims import CalculationClaim, verify_calculation_claims
 
-SPEC = next(spec for spec in CATALOG if spec.key == "otherbu")
 FACES = {"planet": "☊", "sign": "处女座", "house": 11}
 
 
 def test_published_astronomical_view_recovers_complete_same_run_across_transports(
-    rest, capsys
-):
-    from fatebridge.application.examples import suggested_fields
+    rest: TestClient, capsys: pytest.CaptureFixture[str]
+) -> None:
 
     inputs = {
         "planet": "Jupiter",
@@ -54,8 +58,9 @@ def test_published_astronomical_view_recovers_complete_same_run_across_transport
 
     async def invoke():
         async with Client(create_mcp_app()) as client:
-            result = await client.call_tool(
-                "otherbu",
+            result = await call_calculation(
+                client,
+                "interpret_astrology_dice",
                 {
                     **inputs,
                     "fields": fields,
@@ -67,6 +72,8 @@ def test_published_astronomical_view_recovers_complete_same_run_across_transport
             first = result.structured_content
             if "result_delivery" not in first:
                 return first
+            else:
+                pass
             ref = first["result_delivery"]
             parts = []
             uri = ref["first_page_uri"]
@@ -81,7 +88,7 @@ def test_published_astronomical_view_recovers_complete_same_run_across_transport
             return full
 
     native = asyncio.run(invoke())
-    flags = ["otherbu"]
+    flags = ["interpret_astrology_dice"]
     for key, value in inputs.items():
         flags.extend(["--" + key.replace("_", "-"), str(value)])
     assert run([*flags, "--fields", *fields, "--strict-fields"]) == 0
@@ -94,9 +101,12 @@ def test_published_astronomical_view_recovers_complete_same_run_across_transport
 @pytest.mark.parametrize("zodiacal", [0, 1])
 @pytest.mark.parametrize("failed_body", [None, "Pluto", "North Node"])
 def test_actual_reference_points_project_across_three_transports(
-    rest, capsys, monkeypatch, zodiacal, failed_body
-):
-    from fatebridge.core.astro import ephemeris
+    rest: TestClient,
+    capsys: pytest.CaptureFixture[str],
+    monkeypatch: pytest.MonkeyPatch,
+    zodiacal: int,
+    failed_body: str | None,
+) -> None:
 
     original = ephemeris._swisseph_planet_state
     if failed_body:
@@ -107,6 +117,8 @@ def test_actual_reference_points_project_across_three_transports(
                 None if name == failed_body else original(name, *a, **kw)
             ),
         )
+    else:
+        pass
     inputs = {
         "planet": "Jupiter",
         "sign": "Aries",
@@ -139,8 +151,9 @@ def test_actual_reference_points_project_across_three_transports(
 
     async def invoke():
         async with Client(create_mcp_app()) as client:
-            result = await client.call_tool(
-                "otherbu",
+            result = await call_calculation(
+                client,
+                "interpret_astrology_dice",
                 {
                     **inputs,
                     "fields": fields,
@@ -152,7 +165,7 @@ def test_actual_reference_points_project_across_three_transports(
             return await verified_inline_business(client, result.structured_content)
 
     native = asyncio.run(invoke())
-    flags = ["otherbu"]
+    flags = ["interpret_astrology_dice"]
     for key, value in inputs.items():
         flags.extend(["--" + key.replace("_", "-"), str(value)])
     assert run([*flags, "--fields", *fields, "--strict-fields"]) == 0
@@ -174,15 +187,16 @@ def test_actual_reference_points_project_across_three_transports(
     ],
 )
 def test_i7_natural_assignment_and_unknown_chart_sect_project_across_three_transports(
-    rest, capsys, planet, assignment
-):
+    rest: TestClient,
+    capsys: pytest.CaptureFixture[str],
+    planet: str,
+    assignment: str | None,
+) -> None:
     inputs = {"planet": planet, "sign": "Aries", "house": 11}
     fields = [
         "method_id",
         "symbolic_details.planet_sect_condition",
         "symbolic_details.triplicity_condition.sect",
-        "interpretation.planet_sect_meaning",
-        "interpretation.evidence.planet_sect_meaning",
     ]
     response = rest.post(
         SPEC.rest_path,
@@ -204,16 +218,16 @@ def test_i7_natural_assignment_and_unknown_chart_sect_project_across_three_trans
             "morning_star": "day",
             "evening_star": "night",
         }
+    else:
+        pass
     assert expected["symbolic_details"]["triplicity_condition"]["sect"] is None
-    assert expected["interpretation"]["evidence"]["planet_sect_meaning"][
-        "rule_ids"
-    ] == ["natural_planet_sect"]
     Draft202012Validator(SPEC.output_model.model_json_schema()).validate(expected)
 
     async def invoke():
         async with Client(create_mcp_app()) as client:
-            result = await client.call_tool(
-                "otherbu",
+            result = await call_calculation(
+                client,
+                "interpret_astrology_dice",
                 {
                     **inputs,
                     "fields": fields,
@@ -225,7 +239,7 @@ def test_i7_natural_assignment_and_unknown_chart_sect_project_across_three_trans
             return await verified_inline_business(client, result.structured_content)
 
     native = asyncio.run(invoke())
-    flags = ["otherbu"]
+    flags = ["interpret_astrology_dice"]
     for key, value in inputs.items():
         flags.extend(["--" + key.replace("_", "-"), str(value)])
     assert run([*flags, "--fields", *fields, "--strict-fields"]) == 0
@@ -237,9 +251,11 @@ def test_i7_natural_assignment_and_unknown_chart_sect_project_across_three_trans
 
 @pytest.mark.parametrize("zodiacal", [0, 1])
 def test_one_failed_body_and_its_model_project_across_three_transports(
-    rest, capsys, monkeypatch, zodiacal
-):
-    from fatebridge.core.astro import ephemeris
+    rest: TestClient,
+    capsys: pytest.CaptureFixture[str],
+    monkeypatch: pytest.MonkeyPatch,
+    zodiacal: int,
+) -> None:
 
     original = ephemeris._swisseph_planet_state
     monkeypatch.setattr(
@@ -268,6 +284,8 @@ def test_one_failed_body_and_its_model_project_across_three_transports(
     ]
     if zodiacal:
         fields.append("chart.params.chart_profile.sidereal_planetary_methods.Pluto")
+    else:
+        pass
     response = rest.post(
         SPEC.rest_path, json=inputs, params={"fields": fields, "strict_fields": True}
     )
@@ -288,8 +306,9 @@ def test_one_failed_body_and_its_model_project_across_three_transports(
 
     async def invoke():
         async with Client(create_mcp_app()) as client:
-            result = await client.call_tool(
-                "otherbu",
+            result = await call_calculation(
+                client,
+                "interpret_astrology_dice",
                 {
                     **inputs,
                     "fields": fields,
@@ -301,7 +320,7 @@ def test_one_failed_body_and_its_model_project_across_three_transports(
             return result.structured_content
 
     native = asyncio.run(invoke())
-    flags = ["otherbu"]
+    flags = ["interpret_astrology_dice"]
     for key, value in inputs.items():
         flags.extend(["--" + key.replace("_", "-"), str(value)])
     assert run([*flags, "--fields", *fields, "--strict-fields"]) == 0
@@ -309,18 +328,6 @@ def test_one_failed_body_and_its_model_project_across_three_transports(
     for current in (expected, native, cli):
         current.pop("run_metadata")
     assert expected == native == cli
-
-
-@pytest.fixture
-def rest(monkeypatch):
-    api._reset_runtime_state_for_tests()
-    monkeypatch.setattr(
-        api,
-        "API_KEY_AUTHENTICATOR",
-        api.ApiKeyAuthenticator(header_name="X-API-Key", api_keys={}),
-    )
-    with TestClient(api.app) as client:
-        yield client
 
 
 @pytest.mark.parametrize(
@@ -387,32 +394,63 @@ def rest(monkeypatch):
         },
     ],
 )
-def test_full_results_match_across_three_transports(rest, capsys, context):
-    args = {**FACES, **context, "response_char_limit": 0}
-    response = rest.post(SPEC.rest_path, json={**FACES, **context})
+def test_full_results_match_across_three_transports(
+    rest: TestClient, capsys: pytest.CaptureFixture[str], context
+) -> None:
+    controls = {"detail": "audit", "response_char_limit": 0}
+    args = {**FACES, **context, **controls}
+    response = rest.post(
+        SPEC.rest_path,
+        json={**FACES, **context},
+        params=controls,
+    )
     assert response.status_code == 200, response.text
     expected = response.json()
     Draft202012Validator(SPEC.output_model.model_json_schema()).validate(expected)
 
     async def mcp_result():
-        async with Client(create_mcp_app()) as client:
-            tools = {t.name: t for t in await client.list_tools()}
-            schema = tools["otherbu"].model_dump(by_alias=True)["inputSchema"]
-            assert {"planet", "sign", "house"} <= set(schema["required"])
-            assert "date" not in schema["required"]
-            result = await client.call_tool("otherbu", args)
+        async with Client(create_mcp_app(families="divination")) as client:
+            tools = await capability_contracts(client, detail="full")
+            schema = tools[SPEC.tool_name]
+            assert {"planet", "sign", "house"} <= set(
+                schema["input_schema"]["required"]
+            )
+            assert "date" not in schema["input_schema"]["required"]
+            result = await call_calculation(client, SPEC.tool_name, args)
             assert not result.is_error
-            Draft202012Validator(
-                tools["otherbu"].model_dump(by_alias=True)["outputSchema"]
-            ).validate(result.structured_content)
+            Draft202012Validator(schema["output_schema"]).validate(
+                result.structured_content
+            )
             return result.structured_content
 
     via_mcp = asyncio.run(mcp_result())
-    flags = ["otherbu"]
+    flags = [SPEC.tool_name]
     for name, value in args.items():
         flags.extend(["--" + name.replace("_", "-"), str(value)])
     assert run(flags) == 0
     via_cli = json.loads(capsys.readouterr().out)
+    symbolic = "fatebridge.astrodice_symbolic_rules.contract_v1"
+    astronomical = "fatebridge.astrodice_astronomical_context.contract_v1"
+    expected_methods = [symbolic, astronomical] if context else [symbolic]
+    receipts = [
+        item["run_metadata"]["calculation_evidence"]
+        for item in (expected, via_mcp, via_cli)
+    ]
+    assert receipts[0] == receipts[1] == receipts[2]
+    receipt = receipts[0]
+    assert [method["method_id"] for method in receipt["registered_methods"]] == (
+        expected_methods
+    )
+    assert (expected.get("chart") is not None) is bool(context)
+    source_bounds = {
+        bound["unit"]: bound
+        for bound in receipt["error_budget"]["source_bounds_by_unit"]
+    }
+    for unit in ("seconds", "degrees"):
+        assert source_bounds[unit]["status"] == (
+            "unquantified" if context else "not_applicable"
+        )
+        assert source_bounds[unit]["interval"] is None
     for current in (expected, via_mcp, via_cli):
         current.pop("run_metadata")
     assert expected == via_mcp == via_cli
@@ -429,24 +467,30 @@ def test_full_results_match_across_three_transports(rest, capsys, context):
         {"planet": None},
     ],
 )
-def test_invalid_faces_rejected_by_rest_and_native_mcp(rest, changes):
+def test_invalid_faces_rejected_by_rest_and_native_mcp(
+    rest: TestClient, changes
+) -> None:
     args = {**FACES, **changes}
     assert rest.post(SPEC.rest_path, json=args).status_code == 422
 
     async def invoke():
         async with Client(create_mcp_app()) as client:
-            result = await client.call_tool("otherbu", args, raise_on_error=False)
+            result = await call_calculation(
+                client, "interpret_astrology_dice", args, raise_on_error=False
+            )
             assert result.is_error
 
     asyncio.run(invoke())
 
 
-def test_projection_and_same_run_calculation_claims(rest, capsys):
+def test_projection_and_same_run_calculation_claims(
+    rest: TestClient, capsys: pytest.CaptureFixture[str]
+) -> None:
     fields = [
         "planet",
         "symbolic_details.house_number",
         "symbolic_details.sign_condition.conditions",
-        "validation.prediction",
+        "validation.calendar",
         "rule_trace",
         "rulesets",
     ]
@@ -464,11 +508,11 @@ def test_projection_and_same_run_calculation_claims(rest, capsys):
     assert "snapshot_text" not in body
     Draft202012Validator(SPEC.output_model.model_json_schema()).validate(body)
     assert body["symbolic_details"]["house_number"] == 12
-    assert body["validation"]["prediction"] == "not_validated"
+    assert body["validation"]["calendar"] == "not_applicable_to_symbolic_roll"
     assert (
         run(
             [
-                "otherbu",
+                "interpret_astrology_dice",
                 "--planet",
                 "NorthNode",
                 "--sign",
@@ -500,12 +544,13 @@ def test_projection_and_same_run_calculation_claims(rest, capsys):
     assert verify_calculation_claims(full, [changed])["status"] == "rejected"
 
 
-def test_joy_and_self_dispositor_fields_project_on_all_surfaces(rest, capsys):
+def test_joy_and_self_dispositor_fields_project_on_all_surfaces(
+    rest: TestClient, capsys: pytest.CaptureFixture[str]
+) -> None:
     inputs = {"planet": "Mercury", "sign": "Virgo", "house": 0}
     fields = [
         "symbolic_details.house_condition.in_joy",
         "symbolic_details.sign_condition.dispositor_status",
-        "interpretation.house_condition_meaning",
     ]
     expected = rest.post(
         SPEC.rest_path, json=inputs, params={"fields": fields, "strict_fields": True}
@@ -517,8 +562,10 @@ def test_joy_and_self_dispositor_fields_project_on_all_surfaces(rest, capsys):
 
     async def invoke():
         async with Client(create_mcp_app()) as client:
-            result = await client.call_tool(
-                "otherbu", {**inputs, "fields": fields, "strict_fields": True}
+            result = await call_calculation(
+                client,
+                "interpret_astrology_dice",
+                {**inputs, "fields": fields, "strict_fields": True},
             )
             assert not result.is_error
             return await verified_inline_business(client, result.structured_content)
@@ -527,7 +574,7 @@ def test_joy_and_self_dispositor_fields_project_on_all_surfaces(rest, capsys):
     assert (
         run(
             [
-                "otherbu",
+                "interpret_astrology_dice",
                 "--planet",
                 "Mercury",
                 "--sign",
@@ -550,12 +597,17 @@ def test_joy_and_self_dispositor_fields_project_on_all_surfaces(rest, capsys):
 @pytest.mark.parametrize("latitude", [-90, 90])
 @pytest.mark.parametrize("offline", [True, False])
 def test_pole_convention_projects_across_three_transports(
-    rest, capsys, monkeypatch, latitude, offline
-):
+    rest: TestClient,
+    capsys: pytest.CaptureFixture[str],
+    monkeypatch: pytest.MonkeyPatch,
+    latitude,
+    offline: bool,
+) -> None:
     if offline:
-        from fatebridge.core.astro import runtime
 
         monkeypatch.setattr(runtime, "swe", None)
+    else:
+        pass
     inputs = {
         **FACES,
         "date": "2024-06-21",
@@ -583,14 +635,16 @@ def test_pole_convention_projects_across_three_transports(
 
     async def invoke():
         async with Client(create_mcp_app()) as client:
-            result = await client.call_tool(
-                "otherbu", {**inputs, "fields": fields, "strict_fields": True}
+            result = await call_calculation(
+                client,
+                "interpret_astrology_dice",
+                {**inputs, "fields": fields, "strict_fields": True},
             )
             assert not result.is_error
             return await verified_inline_business(client, result.structured_content)
 
     native = asyncio.run(invoke())
-    flags = ["otherbu"]
+    flags = ["interpret_astrology_dice"]
     for key, value in inputs.items():
         flags.extend(["--" + key.replace("_", "-"), str(value)])
     assert run([*flags, "--fields", *fields, "--strict-fields"]) == 0
@@ -603,13 +657,17 @@ def test_pole_convention_projects_across_three_transports(
 @pytest.mark.parametrize("hemisphere", [1, -1])
 @pytest.mark.parametrize("offline", [True, False])
 def test_horizon_degeneracy_projects_across_three_transports(
-    rest, capsys, monkeypatch, hemisphere, offline
-):
-    from fatebridge.core.astro import runtime
-    from tests.astrodice.test_astrodice_horizon_degeneracy import singular_sky_inputs
+    rest: TestClient,
+    capsys: pytest.CaptureFixture[str],
+    monkeypatch: pytest.MonkeyPatch,
+    hemisphere,
+    offline: bool,
+) -> None:
 
     if offline:
         monkeypatch.setattr(runtime, "swe", None)
+    else:
+        pass
     sky = singular_sky_inputs(native=not offline, hemisphere=hemisphere)
     inputs = {
         **FACES,
@@ -637,14 +695,16 @@ def test_horizon_degeneracy_projects_across_three_transports(
 
     async def invoke():
         async with Client(create_mcp_app()) as client:
-            result = await client.call_tool(
-                "otherbu", {**inputs, "fields": fields, "strict_fields": True}
+            result = await call_calculation(
+                client,
+                "interpret_astrology_dice",
+                {**inputs, "fields": fields, "strict_fields": True},
             )
             assert not result.is_error
             return await verified_inline_business(client, result.structured_content)
 
     native = asyncio.run(invoke())
-    flags = ["otherbu"]
+    flags = ["interpret_astrology_dice"]
     for key, value in inputs.items():
         flags.extend(["--" + key.replace("_", "-"), str(value)])
     assert run([*flags, "--fields", *fields, "--strict-fields"]) == 0
@@ -657,8 +717,8 @@ def test_horizon_degeneracy_projects_across_three_transports(
 @pytest.mark.parametrize("date", ["0001-06-21", "2050-12-21", "9999-06-21"])
 @pytest.mark.parametrize("zodiacal", [0, 1])
 def test_rotation_phase_policy_and_angles_project_across_three_transports(
-    rest, capsys, date, zodiacal
-):
+    rest: TestClient, capsys: pytest.CaptureFixture[str], date: str, zodiacal: int
+) -> None:
     inputs = {
         **FACES,
         "date": date,
@@ -685,7 +745,7 @@ def test_rotation_phase_policy_and_angles_project_across_three_transports(
     policy = expected["chart"]["params"]["chart_profile"]["earth_rotation"]
     assert policy["policy_id"] == "fatebridge_physical_earth_attitude_v6"
     assert policy["tt_argument_policy"] == (
-        "shared_default_DeltaT_minus1_before1960_SWIEPH_from1960"
+        "retained_supplied_TT_else_shared_default_DeltaT_minus1_before1960_SWIEPH_from1960"
     )
     if date.startswith("2050"):
         assert policy["sidereal_time_model"] == "IAU2006_2000A_CIO"
@@ -706,14 +766,16 @@ def test_rotation_phase_policy_and_angles_project_across_three_transports(
 
     async def invoke():
         async with Client(create_mcp_app()) as client:
-            result = await client.call_tool(
-                "otherbu", {**inputs, "fields": fields, "strict_fields": True}
+            result = await call_calculation(
+                client,
+                "interpret_astrology_dice",
+                {**inputs, "fields": fields, "strict_fields": True},
             )
             assert not result.is_error
             return await verified_inline_business(client, result.structured_content)
 
     native = asyncio.run(invoke())
-    flags = ["otherbu"]
+    flags = ["interpret_astrology_dice"]
     for key, value in inputs.items():
         flags.extend(["--" + key.replace("_", "-"), str(value)])
     assert run([*flags, "--fields", *fields, "--strict-fields"]) == 0
@@ -733,7 +795,9 @@ def test_rotation_phase_policy_and_angles_project_across_three_transports(
         {"fortune_method": "guess"},
     ],
 )
-def test_sky_coordinate_and_formula_errors_rejected_by_rest_and_mcp(rest, changes):
+def test_sky_coordinate_and_formula_errors_rejected_by_rest_and_mcp(
+    rest: TestClient, changes
+) -> None:
     inputs = {
         **FACES,
         "date": "2024-03-20",
@@ -748,13 +812,17 @@ def test_sky_coordinate_and_formula_errors_rejected_by_rest_and_mcp(rest, change
 
     async def invoke():
         async with Client(create_mcp_app()) as client:
-            result = await client.call_tool("otherbu", inputs, raise_on_error=False)
+            result = await call_calculation(
+                client, "interpret_astrology_dice", inputs, raise_on_error=False
+            )
             assert result.is_error
 
     asyncio.run(invoke())
 
 
-def test_sky_formula_provenance_projects_on_all_surfaces(rest, capsys):
+def test_sky_formula_provenance_projects_on_all_surfaces(
+    rest: TestClient, capsys: pytest.CaptureFixture[str]
+) -> None:
     inputs = {
         **FACES,
         "date": "2024-03-20",
@@ -783,14 +851,16 @@ def test_sky_formula_provenance_projects_on_all_surfaces(rest, capsys):
 
     async def invoke():
         async with Client(create_mcp_app()) as client:
-            result = await client.call_tool(
-                "otherbu", {**inputs, "fields": fields, "strict_fields": True}
+            result = await call_calculation(
+                client,
+                "interpret_astrology_dice",
+                {**inputs, "fields": fields, "strict_fields": True},
             )
             assert not result.is_error
             return await verified_inline_business(client, result.structured_content)
 
     native = asyncio.run(invoke())
-    flags = ["otherbu"]
+    flags = ["interpret_astrology_dice"]
     for key, value in inputs.items():
         flags.extend(["--" + key.replace("_", "-"), str(value)])
     assert run([*flags, "--fields", *fields, "--strict-fields"]) == 0
@@ -810,8 +880,14 @@ def test_sky_formula_provenance_projects_on_all_surfaces(rest, capsys):
     ],
 )
 def test_triangle_assignment_and_conditional_roles_project_across_three_transports(
-    rest, capsys, planet, sign, assigned, day_role, day_match
-):
+    rest: TestClient,
+    capsys: pytest.CaptureFixture[str],
+    planet: str,
+    sign: str,
+    assigned: bool | None,
+    day_role: str,
+    day_match: bool | None,
+) -> None:
     inputs = {"planet": planet, "sign": sign, "house": 0}
     fields = [
         "method_id",
@@ -820,7 +896,6 @@ def test_triangle_assignment_and_conditional_roles_project_across_three_transpor
         "symbolic_details.triplicity_condition.roles_by_sect.day",
         "symbolic_details.triplicity_condition.matches_by_sect.day",
         "symbolic_details.triplicity_condition.match_definition",
-        "interpretation.triplicity_meaning",
     ]
     response = rest.post(
         SPEC.rest_path,
@@ -838,12 +913,12 @@ def test_triangle_assignment_and_conditional_roles_project_across_three_transpor
     assert relation["in_assigned_group"] is assigned
     assert relation["roles_by_sect"] == {"day": day_role}
     assert relation["matches_by_sect"] == {"day": day_match}
-    assert "不属于该组" not in expected["interpretation"]["triplicity_meaning"]
 
     async def invoke():
         async with Client(create_mcp_app()) as client:
-            result = await client.call_tool(
-                "otherbu",
+            result = await call_calculation(
+                client,
+                "interpret_astrology_dice",
                 {
                     **inputs,
                     "fields": fields,
@@ -858,7 +933,7 @@ def test_triangle_assignment_and_conditional_roles_project_across_three_transpor
     assert (
         run(
             [
-                "otherbu",
+                "interpret_astrology_dice",
                 "--planet",
                 planet,
                 "--sign",
@@ -878,16 +953,17 @@ def test_triangle_assignment_and_conditional_roles_project_across_three_transpor
     assert expected == native == cli
 
 
-def test_default_native_delivery_recovers_the_same_run_roles_and_explanation():
+def test_default_native_delivery_recovers_the_same_run_roles() -> None:
     async def invoke():
         async with Client(create_mcp_app()) as client:
-            response = await client.call_tool(
-                "otherbu", {"planet": "Jupiter", "sign": "Aries", "house": 0}
+            response = await call_calculation(
+                client,
+                "interpret_astrology_dice",
+                {"planet": "Jupiter", "sign": "Aries", "house": 0},
             )
             assert not response.is_error
             first = response.structured_content
             reference = first["result_delivery"]
-            assert "interpretation" in reference["deferred_fields"]
             parts = []
             uri = reference["first_page_uri"]
             while uri is not None:
@@ -903,7 +979,6 @@ def test_default_native_delivery_recovers_the_same_run_roles_and_explanation():
             assert relation["in_assigned_group"] is True
             assert relation["matches_by_sect"]["day"] is False
             assert relation["roles_by_sect"]["day"] == "assigned_not_selected"
-            assert "本骰星属总体分派" in full["interpretation"]["triplicity_meaning"]
             receipt = full["run_metadata"]
             claim = CalculationClaim(
                 path="symbolic_details.triplicity_condition.in_assigned_group",
@@ -921,8 +996,8 @@ def test_default_native_delivery_recovers_the_same_run_roles_and_explanation():
 
 
 def test_native_sidereal_method_and_offsets_project_without_losing_their_meaning(
-    rest, capsys
-):
+    rest: TestClient, capsys: pytest.CaptureFixture[str]
+) -> None:
     inputs = {
         "planet": "Moon",
         "sign": "Cancer",
@@ -953,14 +1028,16 @@ def test_native_sidereal_method_and_offsets_project_without_losing_their_meaning
 
     async def invoke():
         async with Client(create_mcp_app()) as client:
-            result = await client.call_tool(
-                "otherbu", {**inputs, "fields": fields, "strict_fields": True}
+            result = await call_calculation(
+                client,
+                "interpret_astrology_dice",
+                {**inputs, "fields": fields, "strict_fields": True},
             )
             assert not result.is_error
             return await verified_inline_business(client, result.structured_content)
 
     native = asyncio.run(invoke())
-    flags = ["otherbu"]
+    flags = ["interpret_astrology_dice"]
     for key, value in inputs.items():
         flags.extend(["--" + key.replace("_", "-"), str(value)])
     assert run([*flags, "--fields", *fields, "--strict-fields"]) == 0
@@ -971,8 +1048,8 @@ def test_native_sidereal_method_and_offsets_project_without_losing_their_meaning
 
 
 def test_question_is_literal_and_condition_provenance_projects_on_three_surfaces(
-    rest, capsys
-):
+    rest: TestClient, capsys: pytest.CaptureFixture[str]
+) -> None:
     inputs = {
         "planet": "Mercury",
         "sign": "Pisces",
@@ -983,8 +1060,6 @@ def test_question_is_literal_and_condition_provenance_projects_on_three_surfaces
         "question",
         "snapshot_text",
         "symbolic_details.sign_condition.condition_evidence",
-        "interpretation.evidence.condition_meanings_0",
-        "interpretation.question_adjustment",
     ]
     response = rest.post(
         SPEC.rest_path, json=inputs, params={"fields": fields, "strict_fields": True}
@@ -992,21 +1067,21 @@ def test_question_is_literal_and_condition_provenance_projects_on_three_surfaces
     assert response.status_code == 200, response.text
     expected = response.json()
     assert expected["question"] == inputs["question"]
-    assert expected["snapshot_text"].splitlines().count("[符号解释]") == 1
-    assert (
-        expected["interpretation"]["evidence"]["condition_meanings_0"]["kind"]
-        == "editorial_traditional_paraphrase"
-    )
+    assert expected["snapshot_text"].splitlines().count("[符号解释]") == 0
 
     async def invoke():
         async with Client(create_mcp_app()) as client:
-            result = await client.call_tool(
-                "otherbu", {**inputs, "fields": fields, "strict_fields": True}
+            result = await call_calculation(
+                client,
+                "interpret_astrology_dice",
+                {**inputs, "fields": fields, "strict_fields": True},
             )
             assert not result.is_error
             first = result.structured_content
             if "result_delivery" not in first:
                 return first
+            else:
+                pass
             # A longer sourced snapshot can activate the unchanged MCP budget.
             # Compare complete content after a same-run read, not the envelope.
             reference = first["result_delivery"]
@@ -1027,7 +1102,7 @@ def test_question_is_literal_and_condition_provenance_projects_on_three_surfaces
     assert (
         run(
             [
-                "otherbu",
+                "interpret_astrology_dice",
                 "--planet",
                 "Mercury",
                 "--sign",
@@ -1065,14 +1140,16 @@ def test_question_is_literal_and_condition_provenance_projects_on_three_surfaces
 
 @pytest.mark.parametrize("planet,matches", [("Mars", True), ("NorthNode", None)])
 def test_conditional_triplicity_projects_without_selecting_sect(
-    rest, capsys, planet, matches
-):
+    rest: TestClient,
+    capsys: pytest.CaptureFixture[str],
+    planet: str,
+    matches: bool | None,
+) -> None:
     inputs = {"planet": planet, "sign": "Cancer", "house": 0}
     fields = [
         "symbolic_details.triplicity_condition.sect",
         "symbolic_details.triplicity_condition.rulers_by_sect.day.co_ruler",
         "symbolic_details.triplicity_condition.matches_by_sect.night",
-        "interpretation.triplicity_meaning",
     ]
     response = rest.post(
         SPEC.rest_path, json=inputs, params={"fields": fields, "strict_fields": True}
@@ -1086,8 +1163,10 @@ def test_conditional_triplicity_projects_without_selecting_sect(
 
     async def invoke():
         async with Client(create_mcp_app()) as client:
-            result = await client.call_tool(
-                "otherbu", {**inputs, "fields": fields, "strict_fields": True}
+            result = await call_calculation(
+                client,
+                "interpret_astrology_dice",
+                {**inputs, "fields": fields, "strict_fields": True},
             )
             assert not result.is_error
             return await verified_inline_business(client, result.structured_content)
@@ -1096,7 +1175,7 @@ def test_conditional_triplicity_projects_without_selecting_sect(
     assert (
         run(
             [
-                "otherbu",
+                "interpret_astrology_dice",
                 "--planet",
                 planet,
                 "--sign",
@@ -1117,8 +1196,8 @@ def test_conditional_triplicity_projects_without_selecting_sect(
 
 
 def test_polar_projection_parameters_are_projectable_across_all_transports(
-    rest, capsys
-):
+    rest: TestClient, capsys: pytest.CaptureFixture[str]
+) -> None:
     inputs = {
         "planet": "Mercury",
         "sign": "Virgo",
@@ -1151,7 +1230,7 @@ def test_polar_projection_parameters_are_projectable_across_all_transports(
     params = expected["chart"]["params"]
     assert (
         params["housePositionMethod"]
-        == "fatebridge_topocentric_zero_ecliptic_latitude_v1"
+        == "fatebridge_topocentric_zero_ecliptic_latitude_v2"
     )
     assert params["housePositionProjection"]["input_ecliptic_latitude"] == 0.0
     assert params["chart_profile"]["house_position_projection"] == {
@@ -1160,8 +1239,9 @@ def test_polar_projection_parameters_are_projectable_across_all_transports(
 
     async def invoke():
         async with Client(create_mcp_app()) as client:
-            result = await client.call_tool(
-                "otherbu",
+            result = await call_calculation(
+                client,
+                "interpret_astrology_dice",
                 {
                     **inputs,
                     "fields": fields,
@@ -1173,6 +1253,8 @@ def test_polar_projection_parameters_are_projectable_across_all_transports(
             first = result.structured_content
             if "result_delivery" not in first:
                 return first
+            else:
+                pass
             ref = first["result_delivery"]
             parts = []
             uri = ref["first_page_uri"]
@@ -1187,7 +1269,7 @@ def test_polar_projection_parameters_are_projectable_across_all_transports(
             return full
 
     native = asyncio.run(invoke())
-    flags = ["otherbu"]
+    flags = ["interpret_astrology_dice"]
     for name, value in inputs.items():
         flags.extend(["--" + name.replace("_", "-"), str(value)])
     assert run([*flags, "--fields", *fields, "--strict-fields"]) == 0

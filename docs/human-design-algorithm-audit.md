@@ -21,7 +21,7 @@
 
 ## 名义区间几何与来源
 
-实现所有者是 [human_design_interval_geometry.py](../src/fatebridge/core/human_design_interval_geometry.py)，由 [nominal_solar_projection](../src/fatebridge/core/human_design_solar_projection.py)消费，再交付到同次原生坐标批次的 `apparent_position_context`。本轮该所有者源码SHA-256为 `f6f5d5d7c5023ea04dd71cb3688ea8f0ae59499a7747360d59498128d2a03248`。
+实现所有者是 [human_design_interval_geometry.py](../src/fatebridge/core/human_design/human_design_interval_geometry.py)，由 [nominal_solar_projection](../src/fatebridge/core/human_design/human_design_solar_projection.py)消费，再交付到同次原生坐标批次的 `apparent_position_context`。本轮该所有者源码SHA-256为 `f6f5d5d7c5023ea04dd71cb3688ea8f0ae59499a7747360d59498128d2a03248`。
 
 区间端点为缩放整数。乘除与平方根向外舍入；精确有理数象限约化后用正余弦级数，反正切使用半角约化与交错余项界。π采用Machin恒等式。单位球面向量的叉积模与点积给出分离角，名义太阳半径与距离给出角半径，二者相减得到余量。只有两个包络端点舍入至同一binary64且证明原分类后才返回；128至8192位有限预算耗尽保持明确未解决状态。
 
@@ -79,6 +79,8 @@
 新距离覆盖紧邻名义太阳球外侧至有限浮点大值，这是库函数给定坐标域的数学检查，不是地球所见太阳的实际距离样本。原354、21627、36、432组各自保留原分母和状态，新增与重放不合并成独立物理样本。原生位置／设计根、Moshier超差及印刷门界与名称的失败继续保留，不能因名义几何相符便改成完整人类图或SOTA通过。
 
 ## 结果交付与大回执分页
+
+以下为旧索引实现的历史测量。当前溢出交付保存单份私有 JSON，完整导出走单次 HTTP 下载或本地文件读取。MCP 保留按需取证的字符页。当前路径见[字段投影与输出体积](api-reference.md#25-字段投影与输出体积)。
 
 完整人类图回归暴露共享交付层的开销：普通页虽不重新解析整个业务JSON，却会逐页解析包含完整运行回执的元数据。实际大回执约14.5 MB，完整原结果有7104页，按该路径累计读取元数据约103 GB；这是根据原文件和逐页读取代码推算的量，另有两项实际分页测试分别耗时1393.699与1355.600秒。
 

@@ -4,7 +4,7 @@ import pytest
 
 from fatebridge.core.requests.divination import SixYaoRequest
 from fatebridge.services.divination import calculate_sixyao_analysis
-from tests.support.transports import SPECS, business, rest, surface_calls
+from tests.support.transports import SPECS, business
 
 CASES = [
     pytest.param("2026-03-02", "001000", "001101", 6, "卯", None, [6], id="pending"),
@@ -65,7 +65,7 @@ def check(output, position, hidden_branch, own_match, possible):
 @pytest.mark.parametrize("date,base,changed,position,hidden,own,possible", CASES)
 def test_hidden_control_gate_preserves_all_three_blocker_states(
     date, base, changed, position, hidden, own, possible
-):
+) -> None:
     request = SixYaoRequest.model_validate(payload_for(date, base, changed))
     output = calculate_sixyao_analysis(**request.model_dump())
     check(output, position, hidden, own, possible)
@@ -74,7 +74,7 @@ def test_hidden_control_gate_preserves_all_three_blocker_states(
 @pytest.mark.parametrize("date,base,changed,position,hidden,own,possible", CASES)
 def test_hidden_control_uncertainty_agrees_across_real_transports(
     date, base, changed, position, hidden, own, possible, surface_calls
-):
+) -> None:
     spec = SPECS["sixyao"]
     payload = payload_for(date, base, changed)
     fields = [

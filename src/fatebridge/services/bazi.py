@@ -6,30 +6,26 @@ from __future__ import annotations
 
 import calendar
 from datetime import datetime
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any, Callable
 
-from fatebridge.analysis.career import CareerAnalysis
-from fatebridge.analysis.children import ChildrenAnalysis
-from fatebridge.analysis.education import EducationAnalysis
-from fatebridge.analysis.health import HealthAnalysis
-from fatebridge.analysis.marriage import MarriageAnalysis
-from fatebridge.analysis.personality import PersonalityAnalysis
-from fatebridge.analysis.relatives import RelativesAnalysis
-from fatebridge.analysis.romance import RomanceAnalysis
-from fatebridge.analysis.wealth import WealthAnalysis
+from fatebridge.analysis.timing_effects import TimingEffectsAnalysis
 from fatebridge.core.almanac import (
     build_calendar_context,
     current_local_datetime,
     get_solar_terms_for_year,
     localize_datetime,
 )
-from fatebridge.core.bazi_evidence import build_natal_evidence, build_topic_evidence
-from fatebridge.core.bazi_star_tables import (
+from fatebridge.core.bazi.bazi_evidence import (
+    build_natal_evidence,
+    build_topic_evidence,
+)
+from fatebridge.core.bazi.bazi_star_tables import (
     HONG_LUAN_TARGETS,
     PEACH_BLOSSOM_TARGETS,
     TIAN_XI_TARGETS,
     WEN_CHANG_TARGETS,
 )
+from fatebridge.core.calendar import BaZiCalendar
 from fatebridge.core.clash_comparison import clash_comparison_snapshot_lines
 from fatebridge.core.classical import (
     build_classical_overview,
@@ -43,13 +39,17 @@ from fatebridge.core.metaphysics.common import SEXAGENARY_INDEX, kongwang_for_ga
 from fatebridge.core.root_qualification import root_qualification_snapshot_lines
 from fatebridge.core.stem_effects import stem_energy_snapshot_lines
 from fatebridge.core.storage_movement import storage_movement_snapshot_lines
+from fatebridge.core.timing import TimingAnalysis
 from fatebridge.services.birth_context import (
     BirthComputationContext,
     build_birth_computation_context,
 )
 from fatebridge.services.birth_payload import build_destiny_payload
 from fatebridge.services.structured_snapshot import render_structured_snapshot_text
-from fatebridge.services.timing_state import build_current_timing_state
+from fatebridge.services.timing_state import (
+    build_current_timing_state,
+    calculate_analysis_age,
+)
 from fatebridge.utils.birth_clock import birth_clock_snapshot_lines
 from fatebridge.utils.birth_input import PersonInfo
 from fatebridge.utils.data import (
@@ -58,7 +58,6 @@ from fatebridge.utils.data import (
     HEAVENLY_STEMS,
     get_nayin,
     get_ten_god,
-    normalize_gender,
 )
 from fatebridge.utils.errors import (
     ParameterError,
@@ -255,11 +254,11 @@ CI_GUAN_TARGETS = {
 
 
 def _resolve_analysis_date(
-    analysis_year: Optional[int],
-    analysis_month: Optional[int],
-    analysis_day: Optional[int],
+    analysis_year: int | None,
+    analysis_month: int | None,
+    analysis_day: int | None,
     *,
-    timezone_name: Optional[str] = None,
+    timezone_name: str | None = None,
 ) -> datetime:
     if (
         analysis_year is not None
@@ -267,6 +266,8 @@ def _resolve_analysis_date(
         and analysis_day is not None
     ):
         return datetime(analysis_year, analysis_month, analysis_day)
+    else:
+        pass
     now = (
         current_local_datetime(timezone_name)
         if timezone_name is not None
@@ -279,6 +280,8 @@ def _resolve_analysis_date(
         value is not None for value in (analysis_year, analysis_month, analysis_day)
     ):
         return datetime(year, month, day)
+    else:
+        pass
     # Clamp the day to the resolved month so a partial date (e.g. only
     # analysis_day=31) combined with the current month never raises a
     # clock-dependent "day is out of range" error.
@@ -310,7 +313,7 @@ def _build_origin_payload(
     stem: str,
     branch: str,
     day_stem: str,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     return {
         "label": PILLAR_LABELS[label_key],
         "stem": stem,
@@ -323,8 +326,8 @@ def _build_origin_payload(
 
 
 def _build_three_origins(
-    pillars: Dict[str, Tuple[str, str]],
-) -> Dict[str, Dict[str, Any]]:
+    pillars: dict[str, tuple[str, str]],
+) -> dict[str, dict[str, Any]]:
     year_stem = pillars["year"][0]
     month_stem, month_branch = pillars["month"]
     day_stem = pillars["day"][0]
@@ -355,6 +358,8 @@ def _build_three_origins(
     shen_position = month_order + shen_hour_order
     if shen_position > 12:
         shen_position -= 12
+    else:
+        pass
     shen_branch = MONTH_HOUR_ORDER[shen_position - 1]
     shen_stem = _palace_stem(year_stem, shen_position)
 
@@ -377,49 +382,55 @@ def _build_three_origins(
 
 def _find_group_target(
     source_branch: str, mappings: tuple[tuple[tuple[str, ...], str], ...]
-) -> Optional[str]:
+) -> str | None:
     for group, target in mappings:
         if source_branch in group:
             return target
+        else:
+            pass
     return None
 
 
 def _collect_branch_hits(
-    target_branches: List[str],
-    positions: Dict[str, str],
-) -> List[str]:
-    hits: List[str] = []
+    target_branches: list[str],
+    positions: dict[str, str],
+) -> list[str]:
+    hits: list[str] = []
     for key, branch in positions.items():
         if branch in target_branches:
             hits.append(f"{PILLAR_LABELS[key]}{branch}")
+        else:
+            pass
     return hits
 
 
 def _collect_stem_or_branch_hits(
     target: str,
-    stem_positions: Dict[str, str],
-    branch_positions: Dict[str, str],
-) -> List[str]:
+    stem_positions: dict[str, str],
+    branch_positions: dict[str, str],
+) -> list[str]:
     """Collect hits for a target that can be either a stem or a branch."""
-    from fatebridge.utils.data import HEAVENLY_STEMS
-
-    hits: List[str] = []
+    hits: list[str] = []
     if target in HEAVENLY_STEMS:
         for key, stem in stem_positions.items():
             if stem == target:
                 hits.append(f"{PILLAR_LABELS[key]}{stem}")
+            else:
+                pass
     else:
         for key, branch in branch_positions.items():
             if branch == target:
                 hits.append(f"{PILLAR_LABELS[key]}{branch}")
+            else:
+                pass
     return hits
 
 
 def _build_shensha_entries(
     *,
-    pillars: Dict[str, Tuple[str, str]],
-    three_origins: Dict[str, Dict[str, Any]],
-) -> List[Dict[str, str]]:
+    pillars: dict[str, tuple[str, str]],
+    three_origins: dict[str, dict[str, Any]],
+) -> list[dict[str, str]]:
     branch_positions = {
         "year": pillars["year"][1],
         "month": pillars["month"][1],
@@ -442,7 +453,7 @@ def _build_shensha_entries(
     year_branch = pillars["year"][1]
     day_branch = pillars["day"][1]
 
-    entries: List[Dict[str, str]] = []
+    entries: list[dict[str, str]] = []
     for key, (stem, branch) in pillars.items():
         entries.append(
             {
@@ -475,7 +486,7 @@ def _build_shensha_entries(
     tian_de_target = TIAN_DE_TARGETS.get(month_branch)
     yue_de_target = YUE_DE_TARGETS.get(month_branch)
 
-    rule_rows: List[Tuple[str, List[str]]] = [
+    rule_rows: list[tuple[str, list[str]]] = [
         ("年支桃花", [year_peach] if year_peach else []),
         ("日支桃花", [day_peach] if day_peach else []),
         ("年支驿马", [year_horse] if year_horse else []),
@@ -571,8 +582,8 @@ def _build_timing_overview(
     *,
     birth_context: BirthComputationContext,
     analysis_date: datetime,
-    analysis_calendar_context: Optional[Dict[str, Any]] = None,
-) -> Dict[str, Any]:
+    analysis_calendar_context: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     timing_state = build_current_timing_state(
         birth_context,
         analysis_date=analysis_date,
@@ -583,7 +594,7 @@ def _build_timing_overview(
     liuri_result = timing_state["liuri_analysis"]
     liushi_result = timing_state["liushi_analysis"]
 
-    dayun_payload: Dict[str, Any]
+    dayun_payload: dict[str, Any]
     if "dayun_info" in dayun_result:
         dayun_payload = {
             "pillar": dayun_result["dayun_info"]["pillar"],
@@ -658,7 +669,7 @@ def _format_pillar_line(label: str, stem: str, branch: str, day_stem: str) -> st
     )
 
 
-def _format_origin_line(origin: Dict[str, Any]) -> str:
+def _format_origin_line(origin: dict[str, Any]) -> str:
     hidden_stems = "、".join(origin.get("hidden_stems") or []) or "无"
     return (
         f"{origin['label']}：{origin['pillar']}；"
@@ -674,17 +685,17 @@ def _build_snapshot_text(
     normalized_birth_datetime: datetime,
     input_birth_datetime: datetime,
     timezone_name: str,
-    longitude: Optional[float],
+    longitude: float | None,
     applied_true_solar: bool,
-    calendar_context: Dict[str, Any],
-    pillars: Dict[str, Tuple[str, str]],
-    three_origins: Dict[str, Dict[str, Any]],
-    shensha_entries: List[Dict[str, str]],
-    timing_overview: Dict[str, Any],
-    classical_overview: Dict[str, Any],
-    strength_assessment: Optional[Dict[str, Any]] = None,
-    structure_profile: Optional[Dict[str, Any]] = None,
-    analysis_calendar_context: Optional[Dict[str, Any]] = None,
+    calendar_context: dict[str, Any],
+    pillars: dict[str, tuple[str, str]],
+    three_origins: dict[str, dict[str, Any]],
+    shensha_entries: list[dict[str, str]],
+    timing_overview: dict[str, Any],
+    classical_overview: dict[str, Any],
+    strength_assessment: dict[str, Any] | None = None,
+    structure_profile: dict[str, Any] | None = None,
+    analysis_calendar_context: dict[str, Any] | None = None,
 ) -> str:
     include_minutes = (
         person.birth_minute != 0
@@ -722,6 +733,8 @@ def _build_snapshot_text(
         birth_context_lines.append(
             f"当下节气：{acc_solar_term}，后续节气：{acc_next_term}"
         )
+    else:
+        pass
     sections = [
         (
             "起盘信息",
@@ -802,25 +815,35 @@ def _build_snapshot_text(
         ),
     ]
 
-    blocks: List[str] = []
+    blocks: list[str] = []
     for title, body in sections:
         blocks.append(f"[{title}]")
         if body:
             blocks.append(body)
+        else:
+            pass
         blocks.append("")
     return "\n".join(blocks).strip()
 
 
-def _build_base_bazi_payload(
-    *,
+@calculation_guard("八字命盘")
+def calculate_bazi_birth(
     person: PersonInfo,
-    analysis_date: datetime,
-    birth_context: Optional[BirthComputationContext] = None,
-) -> Dict[str, Any]:
-    birth_context = birth_context or build_birth_computation_context(person)
-    normalized_birth_time = birth_context.normalized_birth_time
-    input_birth_datetime = normalized_birth_time.input_datetime
-    normalized_birth_datetime = normalized_birth_time.corrected_datetime
+    *,
+    analysis_year: int | None = None,
+    analysis_month: int | None = None,
+    analysis_day: int | None = None,
+    selected_sections: list[str] | None = None,
+    render_snapshot: bool = True,
+) -> dict[str, Any]:
+    birth_context = build_birth_computation_context(person)
+    normalized = birth_context.normalized_birth_time
+    analysis_date = _resolve_analysis_date(
+        analysis_year,
+        analysis_month,
+        analysis_day,
+        timezone_name=normalized.timezone,
+    )
     base_analysis = build_destiny_payload(birth_context)
     three_origins = _build_three_origins(birth_context.birth_pillars)
     shensha_entries = _build_shensha_entries(
@@ -828,11 +851,13 @@ def _build_base_bazi_payload(
         three_origins=three_origins,
     )
     classical_overview = build_classical_overview(birth_context.birth_pillars)
-    timezone_name = normalized_birth_time.timezone
-    analysis_pillars = birth_context.birth_pillars
+    analysis_pillars = BaZiCalendar.get_four_pillars(
+        analysis_date,
+        timezone_name=normalized.timezone,
+    )
     analysis_calendar_context = build_calendar_context(
         analysis_date,
-        timezone_name=timezone_name,
+        timezone_name=normalized.timezone,
         pillars=analysis_pillars,
     )
     timing_overview = _build_timing_overview(
@@ -840,78 +865,15 @@ def _build_base_bazi_payload(
         analysis_date=analysis_date,
         analysis_calendar_context=analysis_calendar_context,
     )
-    snapshot_text = _build_snapshot_text(
-        person=person,
-        normalized_birth_datetime=normalized_birth_datetime,
-        input_birth_datetime=input_birth_datetime,
-        timezone_name=normalized_birth_time.timezone,
-        longitude=normalized_birth_time.longitude,
-        applied_true_solar=normalized_birth_time.applied,
-        calendar_context=birth_context.birth_calendar_context,
-        pillars=birth_context.birth_pillars,
-        three_origins=three_origins,
-        shensha_entries=shensha_entries,
-        timing_overview=timing_overview,
-        classical_overview=classical_overview,
-        strength_assessment=base_analysis["day_master"]["assessment"],
-        structure_profile=base_analysis["structure_profile"],
-        analysis_calendar_context=analysis_calendar_context,
-    )
-    return {
-        "input_birth_datetime": input_birth_datetime,
-        "normalized_birth_datetime": normalized_birth_datetime,
-        "normalized_birth_time": normalized_birth_time,
-        "calendar_context": birth_context.birth_calendar_context,
-        "analysis_calendar_context": analysis_calendar_context,
-        "base_analysis": base_analysis,
-        "three_origins": three_origins,
-        "shensha_entries": shensha_entries,
-        "classical_overview": classical_overview,
-        "timing_overview": timing_overview,
-        "snapshot_text": snapshot_text,
-    }
-
-
-@calculation_guard("八字命盘")
-def calculate_bazi_birth(
-    person: PersonInfo,
-    *,
-    analysis_year: Optional[int] = None,
-    analysis_month: Optional[int] = None,
-    analysis_day: Optional[int] = None,
-    selected_sections: Optional[List[str]] = None,
-) -> Dict[str, Any]:
-    birth_context = build_birth_computation_context(person)
-    analysis_date = _resolve_analysis_date(
-        analysis_year,
-        analysis_month,
-        analysis_day,
-        timezone_name=birth_context.normalized_birth_time.timezone,
-    )
-    payload = _build_base_bazi_payload(
-        person=person,
-        analysis_date=analysis_date,
-        birth_context=birth_context,
-    )
-    base_analysis = payload["base_analysis"]
-    snapshot_text = payload["snapshot_text"]
-    snapshot_export = parse_export_content(
-        technique="bazi",
-        content=snapshot_text,
-        selected_sections=selected_sections,
-    )
-
-    return {
+    result: dict[str, Any] = {
         "analysis_type": "八字命盘",
         "bazi_birth": {
             "engine": "fatebridge-offline",
-            "time_algorithm": (
-                "真太阳时" if payload["normalized_birth_time"].applied else "直接时间"
-            ),
+            "time_algorithm": "真太阳时" if normalized.applied else "直接时间",
             "analysis_date": analysis_date.strftime("%Y-%m-%d"),
             "person_info": base_analysis["person_info"],
             "four_pillars": base_analysis["four_pillars"],
-            "three_origins": payload["three_origins"],
+            "three_origins": three_origins,
             "day_master": base_analysis["day_master"],
             "element_distribution": base_analysis["element_distribution"],
             "favorable_elements": base_analysis["favorable_elements"],
@@ -923,14 +885,37 @@ def calculate_bazi_birth(
             "ten_gods": base_analysis["ten_gods"],
             "patterns": base_analysis["patterns"],
             "calendar_context": base_analysis["calendar_context"],
-            "analysis_calendar_context": payload["analysis_calendar_context"],
-            "timing_overview": payload["timing_overview"],
-            "shensha": payload["shensha_entries"],
-            "classical": payload["classical_overview"],
+            "analysis_calendar_context": analysis_calendar_context,
+            "timing_overview": timing_overview,
+            "shensha": shensha_entries,
+            "classical": classical_overview,
         },
-        "snapshot_text": snapshot_text,
-        "snapshot_export": snapshot_export,
     }
+    if render_snapshot:
+        snapshot_text = _build_snapshot_text(
+            person=person,
+            normalized_birth_datetime=normalized.corrected_datetime,
+            input_birth_datetime=normalized.input_datetime,
+            timezone_name=normalized.timezone,
+            longitude=normalized.longitude,
+            applied_true_solar=normalized.applied,
+            calendar_context=birth_context.birth_calendar_context,
+            pillars=birth_context.birth_pillars,
+            three_origins=three_origins,
+            shensha_entries=shensha_entries,
+            timing_overview=timing_overview,
+            classical_overview=classical_overview,
+            strength_assessment=base_analysis["day_master"]["assessment"],
+            structure_profile=base_analysis["structure_profile"],
+            analysis_calendar_context=analysis_calendar_context,
+        )
+        result["snapshot_text"] = snapshot_text
+        result["snapshot_export"] = parse_export_content(
+            technique="bazi", content=snapshot_text, selected_sections=selected_sections
+        )
+    else:
+        pass
+    return result
 
 
 # 八字专项分析服务（财运 / 健康 / 子女 / 学业）
@@ -940,56 +925,54 @@ def calculate_bazi_birth(
 
 
 def _parse_pillar_str(
-    pillar_str: Optional[str], field_name: str = "pillar"
-) -> Optional[Tuple[str, str]]:
+    pillar_str: str | None, field_name: str = "pillar"
+) -> tuple[str, str] | None:
     """Only absent overrides default; explicit invalid pillars are rejected."""
     if pillar_str is None:
         return None
+    else:
+        pass
     if not isinstance(pillar_str, str) or pillar_str not in SEXAGENARY_INDEX:
         raise ParameterError(
             "覆盖柱必须为六十甲子中的完整两字干支",
             [{"path": field_name, "code": "invalid_sexagenary_pillar"}],
         )
+    else:
+        pass
     return (pillar_str[0], pillar_str[1])
 
 
 def _derive_current_pillars(
     birth_context: BirthComputationContext,
     analysis_date: datetime,
-) -> Tuple[Optional[Tuple[str, str]], Optional[Tuple[str, str]], Dict[str, Any]]:
+) -> tuple[tuple[str, str] | None, tuple[str, str] | None, dict[str, Any]]:
     """从命盘 + 分析日期内部推算当前大运、流年柱（用户无需自己知道大运）。"""
-    direction_known = normalize_gender(birth_context.person.gender) in (
-        "male",
-        "female",
+    normalized = birth_context.normalized_birth_time
+    timezone_name = normalized.timezone
+    dayun_result = TimingEffectsAnalysis.analyze_dayun_effects(
+        birth_context.birth_pillars,
+        normalized.input_datetime,
+        birth_context.person.gender,
+        calculate_analysis_age(normalized.input_datetime, analysis_date),
+        timezone_name=timezone_name,
+        original_element_counts=birth_context.original_element_counts,
+        analysis_moment=analysis_date,
+        allow_missing_gender=True,
     )
-    if direction_known:
-        state = build_current_timing_state(birth_context, analysis_date=analysis_date)
-    else:
-        # Unknown 大运 direction limits that layer, not the natal chart or the
-        # solar-term year. Do not guess a direction or abort all nine topics.
-        from fatebridge.core.timing import TimingAnalysis
-
-        state = {
-            "liunian_analysis": {
-                "liunian_info": TimingAnalysis.calculate_liunian(
-                    analysis_date.year,
-                    moment=analysis_date,
-                    timezone_name=birth_context.normalized_birth_time.timezone,
-                )
-            }
-        }
-    dayun_result = state.get("dayun_analysis", {}) or {}
-    liunian_result = state.get("liunian_analysis", {}) or {}
-    dayun_pillar_str = (dayun_result.get("dayun_info") or {}).get("pillar")
-    liunian_pillar_str = (liunian_result.get("liunian_info") or {}).get("pillar")
-    timezone_name = birth_context.normalized_birth_time.timezone
+    dayun_info = dayun_result.get("dayun_info", {})
+    dayun_pillar_str = dayun_info.get("pillar")
+    liunian_pillar_str = TimingAnalysis.calculate_liunian(
+        analysis_date.year, moment=analysis_date, timezone_name=timezone_name
+    )["pillar"]
     anchor = localize_datetime(analysis_date, timezone_name)
     # Date-only dimension APIs retain their historical midnight anchor. Expose
     # the boundary rather than treating an arbitrary clock time as equivalent.
     year_boundaries = [
         term
         for term in get_solar_terms_for_year(anchor.year, timezone_name)
-        if term.name == "立春" and term.moment.date() == anchor.date()
+        if term.name == "立春"
+        and term.has_defined_local_clock
+        and term.moment.date() == anchor.date()
     ]
     context = {
         "analysis_date": analysis_date.strftime("%Y-%m-%d"),
@@ -1004,7 +987,7 @@ def _derive_current_pillars(
         "boundaries_on_date": [term.as_dict() for term in year_boundaries],
         "boundary_scope": "只核验流年立春年界，不代表已扫描大运或全年时段边界。",
         "hourly_evidence": {
-            "tool": "timing_analysis",
+            "tool": "bazi_timing",
             "fields": ["personal_info.analysis_datetime", "liunian_analysis"],
             "when": "问题涉及交节当日钟时或跨工具时点比较时，按实际目标analysis_hour/minute补证；不把本零点锚点当作全天结果。",
         },
@@ -1018,11 +1001,15 @@ def _derive_current_pillars(
         "dayun_end_at": (dayun_result.get("dayun_info") or {}).get("end_at"),
         "source": "auto-derived",
     }
-    if not direction_known:
-        context["dayun_status"] = "unavailable_gender_direction"
-        context["limitations"] = [
-            "未选定性别对应的大运顺逆；保留本命及独立流年，不推定大运柱。"
-        ]
+    if "status" in dayun_result:
+        context["dayun_status"] = (
+            "unavailable_gender_direction"
+            if dayun_result["status"] == "unavailable_missing_gender"
+            else dayun_result["status"]
+        )
+        context["limitations"] = [dayun_result["message"]]
+    else:
+        pass
     return (
         _parse_pillar_str(dayun_pillar_str),
         _parse_pillar_str(liunian_pillar_str),
@@ -1033,16 +1020,15 @@ def _derive_current_pillars(
 def _run_bazi_dimension_analysis(
     person: PersonInfo,
     *,
-    analyzer: Callable[..., Dict[str, Any]],
+    topic: str,
     analysis_type: str,
-    result_key: str,
-    error_label: str,
-    analysis_year: Optional[int] = None,
-    analysis_month: Optional[int] = None,
-    analysis_day: Optional[int] = None,
-    dayun_pillar: Optional[str] = None,
-    liunian_pillar: Optional[str] = None,
-) -> Dict[str, Any]:
+    analysis_year: int | None = None,
+    analysis_month: int | None = None,
+    analysis_day: int | None = None,
+    dayun_pillar: str | None = None,
+    liunian_pillar: str | None = None,
+    render_snapshot: bool = True,
+) -> dict[str, Any]:
     """通用八字专项分析执行器。
 
     大运、流年默认由命盘 + 分析日期（默认今天，或 analysis_year/month/day）内部推算，
@@ -1056,7 +1042,7 @@ def _run_bazi_dimension_analysis(
         birth_context = build_birth_computation_context(person)
         pillars = birth_context.birth_pillars
 
-        timing_context: Dict[str, Any]
+        timing_context: dict[str, Any]
         if dayun is None or liunian is None:
             analysis_date = _resolve_analysis_date(
                 analysis_year,
@@ -1073,14 +1059,20 @@ def _run_bazi_dimension_analysis(
             }
             if dayun is None:
                 dayun = auto_dayun
+            else:
+                pass
             if liunian is None:
                 liunian = auto_liunian
+            else:
+                pass
             timing_context["dayun_pillar"] = "".join(dayun) if dayun else None
             timing_context["liunian_pillar"] = "".join(liunian) if liunian else None
             if timing_context["overridden"]["dayun_pillar"]:
                 if "dayun_status" in timing_context:
                     timing_context["dayun_status"] = "explicit_override"
                     timing_context["limitations"] = []
+                else:
+                    pass
                 # Keep the published fractional-year reference projectable,
                 # without presenting it as the age of the override pillar.
                 timing_context["dayun_age_basis"] = (
@@ -1088,6 +1080,8 @@ def _run_bazi_dimension_analysis(
                     if timing_context.get("dayun_age") is not None
                     else "unavailable_for_override"
                 )
+            else:
+                pass
         else:
             # Explicit pillars still have a provenance contract. They do not
             # have an automatically derived age/date; do not invent those.
@@ -1098,14 +1092,7 @@ def _run_bazi_dimension_analysis(
                 "overridden": {"dayun_pillar": True, "liunian_pillar": True},
             }
 
-        analysis = analyzer(
-            pillars,
-            gender=person.gender,
-            dayun_pillar=dayun,
-            liunian_pillar=liunian,
-        )
-        analysis = {
-            **analysis,
+        analysis: dict[str, Any] = {
             "calendar_context": birth_context.birth_calendar_context,
             "timing_context": timing_context,
         }
@@ -1115,17 +1102,24 @@ def _run_bazi_dimension_analysis(
         evidence["topic"] = build_topic_evidence(
             evidence,
             pillars,
-            result_key.removesuffix("_analysis"),
+            topic,
             person.gender,
             dayun,
             liunian,
         )
         analysis["evidence_chain"] = evidence
+        result = {"analysis_type": analysis_type, f"{topic}_analysis": analysis}
+        if not render_snapshot:
+            return result
+        else:
+            pass
         snapshot_text = render_structured_snapshot_text(
             {
-                k: v
-                for k, v in analysis.items()
-                if k not in {"evidence_chain", "calendar_context"}
+                "four_pillars": {
+                    name: "".join(pillar) for name, pillar in pillars.items()
+                },
+                "timing_context": timing_context,
+                "topic_evidence": evidence["topic"]["first_view"],
             },
             title=analysis_type,
         )
@@ -1150,117 +1144,52 @@ def _run_bazi_dimension_analysis(
         snapshot_export = parse_export_content(
             technique="generic", content=snapshot_text
         )
-        return {
-            "analysis_type": analysis_type,
-            result_key: analysis,
-            "snapshot_text": snapshot_text,
-            "snapshot_export": snapshot_export,
-        }
+        result["snapshot_text"] = snapshot_text
+        result["snapshot_export"] = snapshot_export
+        return result
     except ParameterError as exc:
         return exc.as_result()
     except Exception as exc:
-        return handle_calculation_error(exc, error_label)
+        return handle_calculation_error(exc, analysis_type)
 
 
 def _make_bazi_dimension_service(
-    *,
-    analyzer: Callable[..., Dict[str, Any]],
+    topic: str,
     analysis_type: str,
-    result_key: str,
-    doc: str,
-) -> Callable[..., Dict[str, Any]]:
-    """生成一个八字专项分析服务。
-
-    九个维度（婚姻/事业/财运/健康/子女/学业/性格/六亲/桃花）此前各自重复同一段透传
-    外壳，仅 analyzer / analysis_type / result_key / 文档串不同。这里统一生成，签名与
-    返回结构与逐个手写的版本完全一致；error_label 在所有九个维度均等于 analysis_type。
-    """
-
+) -> Callable[..., dict[str, Any]]:
     def service(
         person: PersonInfo,
         *,
-        analysis_year: Optional[int] = None,
-        analysis_month: Optional[int] = None,
-        analysis_day: Optional[int] = None,
-        dayun_pillar: Optional[str] = None,
-        liunian_pillar: Optional[str] = None,
-    ) -> Dict[str, Any]:
+        analysis_year: int | None = None,
+        analysis_month: int | None = None,
+        analysis_day: int | None = None,
+        dayun_pillar: str | None = None,
+        liunian_pillar: str | None = None,
+        render_snapshot: bool = True,
+    ) -> dict[str, Any]:
         return _run_bazi_dimension_analysis(
             person,
-            analyzer=analyzer,
+            topic=topic,
             analysis_type=analysis_type,
-            result_key=result_key,
-            error_label=analysis_type,
             analysis_year=analysis_year,
             analysis_month=analysis_month,
             analysis_day=analysis_day,
             dayun_pillar=dayun_pillar,
             liunian_pillar=liunian_pillar,
+            render_snapshot=render_snapshot,
         )
 
-    service.__doc__ = doc
     return service
 
 
-calculate_bazi_marriage = _make_bazi_dimension_service(
-    analyzer=MarriageAnalysis.analyze_marriage,
-    analysis_type="八字婚姻分析",
-    result_key="marriage_analysis",
-    doc="八字婚姻分析：配偶星、配偶宫、盘内婚恋信号与固定规则指数。",
-)
-
-calculate_bazi_career = _make_bazi_dimension_service(
-    analyzer=CareerAnalysis.analyze_career,
-    analysis_type="八字事业分析",
-    result_key="career_analysis",
-    doc="八字事业分析：十神结构、行业文化类比与固定规则指数。",
-)
-
-calculate_bazi_wealth = _make_bazi_dimension_service(
-    analyzer=WealthAnalysis.analyze_wealth,
-    analysis_type="八字财运分析",
-    result_key="wealth_analysis",
-    doc="八字财运分析：财星、墓库对应及盘内财务象义。",
-)
-
-calculate_bazi_health = _make_bazi_dimension_service(
-    analyzer=HealthAnalysis.analyze_health,
-    analysis_type="八字健康分析",
-    result_key="health_analysis",
-    doc="八字健康分析：五行寒暖与脏腑文化对应，不作健康判断。",
-)
-
-calculate_bazi_children = _make_bazi_dimension_service(
-    analyzer=ChildrenAnalysis.analyze_children,
-    analysis_type="八字子女分析",
-    result_key="children_analysis",
-    doc="八字子女分析：子女星、时柱与亲子关系象义。",
-)
-
-calculate_bazi_education = _make_bazi_dimension_service(
-    analyzer=EducationAnalysis.analyze_education,
-    analysis_type="八字学业分析",
-    result_key="education_analysis",
-    doc="八字学业分析：学习十神、文昌与固定规则指数。",
-)
-
+calculate_bazi_marriage = _make_bazi_dimension_service("marriage", "八字婚姻取证")
+calculate_bazi_career = _make_bazi_dimension_service("career", "八字事业取证")
+calculate_bazi_wealth = _make_bazi_dimension_service("wealth", "八字财星取证")
+calculate_bazi_health = _make_bazi_dimension_service("health", "八字五行寒暖取证")
+calculate_bazi_children = _make_bazi_dimension_service("children", "八字子女星宫取证")
+calculate_bazi_education = _make_bazi_dimension_service("education", "八字学业取证")
 calculate_bazi_personality = _make_bazi_dimension_service(
-    analyzer=PersonalityAnalysis.analyze_personality,
-    analysis_type="八字性格分析",
-    result_key="personality_analysis",
-    doc="八字性格分析：日主五行、十神计数与自省类比。",
+    "personality", "八字十神结构取证"
 )
-
-calculate_bazi_relatives = _make_bazi_dimension_service(
-    analyzer=RelativesAnalysis.analyze_relatives,
-    analysis_type="八字六亲分析",
-    result_key="relatives_analysis",
-    doc="八字六亲分析：六亲星位、宫位关系与盘内计数。",
-)
-
-calculate_bazi_romance = _make_bazi_dimension_service(
-    analyzer=RomanceAnalysis.analyze_romance,
-    analysis_type="八字正缘桃花分析",
-    result_key="romance_analysis",
-    doc="八字正缘桃花分析：桃花咸池、红鸾天喜与时间柱命中。",
-)
+calculate_bazi_relatives = _make_bazi_dimension_service("relatives", "八字六亲取证")
+calculate_bazi_romance = _make_bazi_dimension_service("romance", "八字桃花星宫取证")

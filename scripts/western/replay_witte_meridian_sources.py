@@ -22,14 +22,22 @@ def minutes(parts: list[int], *, zodiac: bool = True) -> int:
     size = 3 if zodiac else 2
     if len(parts) != size or any(type(value) is not int for value in parts):
         raise ValueError("Printed coordinates require integer sexagesimal parts")
+    else:
+        pass
     if zodiac:
         sign, degree, minute = parts
         if not 0 <= sign < 12 or not 0 <= degree < 30 or not 0 <= minute < 60:
             raise ValueError("Printed zodiac coordinate out of range")
+        else:
+            pass
         return sign * 1800 + degree * 60 + minute
+    else:
+        pass
     degree, minute = parts
     if degree < 0 or not 0 <= minute < 60:
         raise ValueError("Printed arc out of range")
+    else:
+        pass
     return degree * 60 + minute
 
 
@@ -58,6 +66,8 @@ def replay(fixture: dict) -> dict:
             item["opposite_matches_print"] = item[
                 "opposite_result_arcminutes"
             ] == minutes(row["printed_opposite_result"])
+        else:
+            pass
         if "source_compared_sensitive_point" in row:
             item["compared_sensitive_point_arcminutes"] = minutes(
                 row["source_compared_sensitive_point"]
@@ -65,6 +75,8 @@ def replay(fixture: dict) -> dict:
             item["signed_comparison_residual_arcminutes"] = (
                 result - item["compared_sensitive_point_arcminutes"] + CIRCLE // 2
             ) % CIRCLE - CIRCLE // 2
+        else:
+            pass
         operations.append(item)
 
     table = fixture["table"]
@@ -151,6 +163,8 @@ def main() -> int:
     data = FIXTURE.read_bytes()
     if hashlib.sha256(data).hexdigest() != FIXTURE_SHA256:
         raise ValueError("Frozen source transcription checksum mismatch")
+    else:
+        pass
     fixture = json.loads(data)
     result = replay(fixture)
     result["fixture_sha256"] = FIXTURE_SHA256
@@ -159,7 +173,11 @@ def main() -> int:
         actual = hashlib.sha256(args.source_pdf.read_bytes()).hexdigest()
         if actual != fixture["source_pdf_sha256"]:
             raise ValueError("Original source PDF checksum mismatch")
+        else:
+            pass
         result["source_pdf_bytes_checked"] = True
+    else:
+        pass
     args.output.parent.mkdir(parents=True, exist_ok=True)
     with args.output.open("x") as stream:
         stream.write(json.dumps(result, ensure_ascii=False, indent=2) + "\n")
@@ -181,3 +199,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

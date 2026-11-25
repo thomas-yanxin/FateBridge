@@ -9,12 +9,14 @@ import pytest
 from pydantic import ValidationError
 
 import fatebridge.application.execution as execution
+from fatebridge.core.contracts.output_liuren_course_conditions import (
+    LiurenCourseConditions,
+)
+from fatebridge.core.contracts.output_ren_anchors import require_complete_ren_anchors
 from fatebridge.core.metaphysics.liureng_course_conditions import (
     course_conditions,
     course_conditions_trace,
 )
-from fatebridge.core.output_liuren_course_conditions import LiurenCourseConditions
-from fatebridge.core.output_ren_anchors import require_complete_ren_anchors
 from scripts.ren.audit_liuren_course_conditions import (
     CORPUS,
     audit,
@@ -37,7 +39,7 @@ def native_solar(monkeypatch):
 
 
 @pytest.mark.parametrize("clause", CLAUSES[:24], ids=lambda c: c["id"])
-def test_each_literal_stage_and_god_pair(clause):
+def test_each_literal_stage_and_god_pair(clause) -> None:
     stages = [c["required_stage"] for c in CLAUSES[:12]]
     ordered = "亥子丑寅卯辰巳午未申酉戌"
     branch = (
@@ -52,7 +54,7 @@ def test_each_literal_stage_and_god_pair(clause):
     LiurenCourseConditions.model_validate(value)
 
 
-def test_entire_frozen_condition_space_and_unresolved_names_are_preserved():
+def test_entire_frozen_condition_space_and_unresolved_names_are_preserved() -> None:
     result = audit()
     assert result["engineering_checks_passed"] and not result["failures"]
     assert result["mathematical_stage_god_contexts"] == 8640
@@ -85,14 +87,16 @@ def test_entire_frozen_condition_space_and_unresolved_names_are_preserved():
         ("甲戌", "子寅酉", "贵人", "子", [], ["B03"]),
     ],
 )
-def test_distinguishes_nearby_but_different_rules(day, branches, god, seat, yes, no):
+def test_distinguishes_nearby_but_different_rules(
+    day: str, branches: str, god: str, seat: str, yes, no
+) -> None:
     value = course_conditions(day, transmissions(list(branches), god, seat))
     assert set(yes) <= set(value["matched_ids"])
     assert not set(no) & set(value["matched_ids"])
 
 
 @pytest.mark.parametrize("fault", ["bytes", "manifest", "extra", "missing"])
-def test_reference_cannot_be_pruned_or_relabelled(fault, tmp_path):
+def test_reference_cannot_be_pruned_or_relabelled(fault: str, tmp_path: Path) -> None:
     dest = tmp_path / "reference"
     shutil.copytree(CORPUS, dest)
     if fault == "bytes":
@@ -123,7 +127,7 @@ def test_reference_cannot_be_pruned_or_relabelled(fault, tmp_path):
         "name",
     ],
 )
-def test_present_claims_are_checked(fault):
+def test_present_claims_are_checked(fault: str) -> None:
     value = course_conditions("甲子", transmissions(["辰", "寅", "卯"], "天后", "子"))
     if fault == "source":
         value["source_sha256"] = "fake"
@@ -149,7 +153,7 @@ def test_present_claims_are_checked(fault):
         LiurenCourseConditions.model_validate(value)
 
 
-def test_sparse_projection_preserves_unknowns():
+def test_sparse_projection_preserves_unknowns() -> None:
     for value in (
         {"matched_ids": ["S06", "G12"]},
         {"comprehensive_judgement": None},
@@ -161,7 +165,7 @@ def test_sparse_projection_preserves_unknowns():
 @pytest.mark.parametrize(
     "fault", ["day", "day_type", "missing", "list", "branch", "god", "seat", "null"]
 )
-def test_invalid_inputs_are_not_filled(fault):
+def test_invalid_inputs_are_not_filled(fault: str) -> None:
     day = "甲子"
     values = transmissions(["辰", "寅", "卯"], "天后", "子")
     if fault == "day":
@@ -186,7 +190,9 @@ def test_invalid_inputs_are_not_filled(fault):
     "key", ["liureng_gods", "liureng_runyear", "jinkou", "sanshiunited"]
 )
 @pytest.mark.parametrize("project", [False, True])
-def test_same_new_facts_on_real_rest_mcp_cli(key, project, surface_calls):
+def test_same_new_facts_on_real_rest_mcp_cli(
+    key: str, project: bool, surface_calls
+) -> None:
     spec = SPECS[key]
     path = "liureng.transmission_relations.course_conditions"
     params = [("as_of", AS_OF), ("response_char_limit", "0")]
@@ -207,6 +213,8 @@ def test_same_new_facts_on_real_rest_mcp_cli(key, project, surface_calls):
             "false",
         ]
         options.update(fields=[path], strict_fields=True, include_snapshot_text=False)
+    else:
+        pass
     http, protocol, code, cli = surface_calls(
         spec,
         PAYLOADS[key],
@@ -236,13 +244,17 @@ def test_same_new_facts_on_real_rest_mcp_cli(key, project, surface_calls):
 @pytest.mark.parametrize(
     "fault", ["missing", "foreign", "trace", "duplicate", "old_version"]
 )
-def test_complete_gate_binds_same_board_even_if_foreign_proof_is_consistent(key, fault):
+def test_complete_gate_binds_same_board_even_if_foreign_proof_is_consistent(
+    key: str, fault: str
+) -> None:
     value = raw(key)
     board = value["liureng"]
     if fault in ("missing", "old_version"):
         board["transmission_relations"].pop("course_conditions")
         if fault == "old_version":
             board["ruleset"]["version"] = "1.0.0"
+        else:
+            pass
     elif fault == "foreign":
         actual = board["transmission_relations"]["course_conditions"]
         god = "天后" if actual["initial_god"] != "天后" else "贵人"
@@ -273,8 +285,8 @@ def test_complete_gate_binds_same_board_even_if_foreign_proof_is_consistent(key,
 
 @pytest.mark.parametrize("project", [False, True])
 def test_false_course_fails_before_unrelated_projection(
-    project, monkeypatch, surface_calls
-):
+    project: bool, monkeypatch: pytest.MonkeyPatch, surface_calls
+) -> None:
     spec = SPECS["liureng_gods"]
     value = raw(spec.key)
     value["liureng"]["transmission_relations"]["course_conditions"][
@@ -296,6 +308,8 @@ def test_false_course_fails_before_unrelated_projection(
         params += [("fields", "four_pillars"), ("strict_fields", "true")]
         flags += ["--fields", "four_pillars", "--strict-fields", "true"]
         options.update(fields=["four_pillars"], strict_fields=True)
+    else:
+        pass
     http, protocol, code, _ = surface_calls(
         spec,
         PAYLOADS[spec.key],

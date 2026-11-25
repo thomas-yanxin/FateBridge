@@ -14,7 +14,6 @@ from fatebridge.core.classical_western import (
     combustion_state,
     essential_dignities,
     face_lord,
-    triplicity_members,
 )
 from fatebridge.services.astrology import calculate_core_chart_analysis
 
@@ -67,7 +66,7 @@ _HOROSA_SCORE = {
 }
 
 
-def test_returned_symbol_labels_cannot_change_later_results():
+def test_returned_symbol_labels_cannot_change_later_results() -> None:
     from fatebridge.core.classical_western import SIGN_BODY_PARTS, melothesia
 
     original = SIGN_BODY_PARTS["Aries"].copy()
@@ -80,19 +79,19 @@ def test_returned_symbol_labels_cannot_change_later_results():
         SIGN_BODY_PARTS["Aries"][:] = original
 
 
-def test_faces_table_parity_with_horosa():
+def test_faces_table_parity_with_horosa() -> None:
     for sign in _SIGNS:
         assert [p.lower() for p in CHALDEAN_FACES[sign]] == _HOROSA_FACES[sign.lower()]
 
 
-def test_triplicity_table_parity_with_horosa():
+def test_triplicity_table_parity_with_horosa() -> None:
     for element, rulers in DOROTHEAN_TRIPLICITY.items():
         ref = _HOROSA_TRIPLICITY[element.lower()]
         for role in ("day", "night", "participating"):
             assert rulers[role].lower() == ref[role]
 
 
-def test_dignity_score_parity_with_horosa():
+def test_dignity_score_parity_with_horosa() -> None:
     # FB names: rulership↔domicile, bound↔term; values must match Lilly/horosa.
     assert DIGNITY_SCORE["rulership"] == _HOROSA_SCORE["domicile"]
     assert DIGNITY_SCORE["bound"] == _HOROSA_SCORE["term"]
@@ -191,7 +190,7 @@ _CANONICAL_EGYPTIAN_TERMS = {
 }
 
 
-def test_bound_lord_matches_canonical_egyptian_terms_all_signs():
+def test_bound_lord_matches_canonical_egyptian_terms_all_signs() -> None:
     """Every degree's term lord == the canonical Egyptian table (whole-table lock)."""
     for sign, table in _CANONICAL_EGYPTIAN_TERMS.items():
 
@@ -199,6 +198,8 @@ def test_bound_lord_matches_canonical_egyptian_terms_all_signs():
             for planet, end in table:
                 if deg < end:
                     return planet
+                else:
+                    pass
             return table[-1][0]
 
         for tenth in range(300):  # 0.0–29.9 in 0.1° steps
@@ -206,7 +207,7 @@ def test_bound_lord_matches_canonical_egyptian_terms_all_signs():
             assert bound_lord(sign, degree) == expected(degree), (sign, degree)
 
 
-def test_every_degree_has_exactly_one_bound_and_face_lord():
+def test_every_degree_has_exactly_one_bound_and_face_lord() -> None:
     for sign in _SIGNS:
         for degree in range(30):
             assert bound_lord(sign, float(degree) + 0.5) is not None
@@ -218,7 +219,7 @@ def test_every_degree_has_exactly_one_bound_and_face_lord():
     assert face_lord("Aries", 25.0) == "Venus"
 
 
-def test_classical_dignity_ground_truths():
+def test_classical_dignity_ground_truths() -> None:
     # Sun rules Leo; exalts in Aries; falls in Libra.
     assert "rulership" in essential_dignities("Sun", "Leo", 15.0, True)["dignities"]
     assert "exaltation" in essential_dignities("Sun", "Aries", 15.0, True)["dignities"]
@@ -240,12 +241,12 @@ def test_classical_dignity_ground_truths():
     assert saturn_aqua["score"] >= 5
 
 
-def test_non_traditional_bodies_have_no_essential_dignity():
+def test_non_traditional_bodies_have_no_essential_dignity() -> None:
     for body in ("Uranus", "Neptune", "Pluto", "North Node", "Chiron"):
         assert essential_dignities(body, "Leo", 1.0, True) is None
 
 
-def test_combustion_thresholds_match_chartfacts():
+def test_combustion_thresholds_match_chartfacts() -> None:
     assert combustion_state(100.1, 100.0) == "cazimi"  # ≤17′
     assert combustion_state(105.0, 100.0) == "combust"  # <8.5°
     assert combustion_state(112.0, 100.0) == "under_beams"  # <17°
@@ -253,7 +254,7 @@ def test_combustion_thresholds_match_chartfacts():
     assert combustion_state(100.0, None) is None
 
 
-def test_under_beams_uses_lilly_p113_seventeen_degrees():
+def test_under_beams_uses_lilly_p113_seventeen_degrees() -> None:
     # Printed Lilly 1647 p.113 says the planet clears the beams at 17°.
     # The pair-aspect ray allowance is a distinct quantity.
     assert combustion_state(114.0, 100.0) == "under_beams"  # 14° — under beams
@@ -261,12 +262,7 @@ def test_under_beams_uses_lilly_p113_seventeen_degrees():
     assert combustion_state(117.0, 100.0) is None
 
 
-def test_triplicity_members_unordered_set_of_three():
-    members = triplicity_members("Aries")  # Fire
-    assert set(members) == {"Sun", "Jupiter", "Saturn"}
-
-
-def test_chart_exposes_classical_layer():
+def test_chart_exposes_classical_layer() -> None:
     result = calculate_core_chart_analysis(
         name="测试",
         birth_year=2000,
@@ -286,4 +282,6 @@ def test_chart_exposes_classical_layer():
     assert classical["planets"]["Sun"]["essential"] is not None
     if "Pluto" in classical["planets"]:
         assert classical["planets"]["Pluto"]["essential"] is None
+    else:
+        pass
     assert "[古典]" in result["snapshot_text"]

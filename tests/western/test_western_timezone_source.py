@@ -23,8 +23,12 @@ CASE = dict(
 @pytest.mark.parametrize("solar", [False, True])
 @pytest.mark.parametrize("zodiacal", [0, 1])
 def test_western_service_rejects_unresolved_zone_before_sky_work(
-    monkeypatch, place, variant, solar, zodiacal
-):
+    monkeypatch: pytest.MonkeyPatch,
+    place: str | None,
+    variant: str,
+    solar: bool,
+    zodiacal: int,
+) -> None:
     def forbidden(*args, **kwargs):
         pytest.fail("An unconfirmed civil timezone must not reach native calculations")
 
@@ -42,7 +46,9 @@ def test_western_service_rejects_unresolved_zone_before_sky_work(
 
 
 @pytest.mark.parametrize("variant", ["chart", "hellen_chart", "chart13"])
-def test_direct_chart_cannot_accept_a_marked_fallback_instant(monkeypatch, variant):
+def test_direct_chart_cannot_accept_a_marked_fallback_instant(
+    monkeypatch: pytest.MonkeyPatch, variant: str
+) -> None:
     birth = build_astro_birth_info(**CASE)
     assert birth.timezone_source == "default_utc"
 
@@ -55,7 +61,9 @@ def test_direct_chart_cannot_accept_a_marked_fallback_instant(monkeypatch, varia
 
 
 @pytest.mark.parametrize("party", ["inner", "outer"])
-def test_direct_relative_chart_checks_both_original_clocks(monkeypatch, party):
+def test_direct_relative_chart_checks_both_original_clocks(
+    monkeypatch: pytest.MonkeyPatch, party: str
+) -> None:
     unknown = build_astro_birth_info(**CASE)
     known = build_astro_birth_info(**CASE, birth_timezone="UTC")
 
@@ -70,12 +78,14 @@ def test_direct_relative_chart_checks_both_original_clocks(monkeypatch, party):
         )
 
 
-def test_predictive_birth_factory_requires_a_resolved_civil_timezone():
+def test_predictive_birth_factory_requires_a_resolved_civil_timezone() -> None:
     with pytest.raises(ValueError, match="birth_timezone"):
         build_predictive_birth_info(**CASE)
 
 
-def test_predictive_natal_subject_also_rejects_a_marked_fallback(monkeypatch):
+def test_predictive_natal_subject_also_rejects_a_marked_fallback(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     birth = build_astro_birth_info(**CASE)
 
     def forbidden(*args, **kwargs):
@@ -88,7 +98,9 @@ def test_predictive_natal_subject_also_rejects_a_marked_fallback(monkeypatch):
 
 @pytest.mark.parametrize("variant", ["germany", "chart13"])
 @pytest.mark.parametrize("basis", ["local_mean_solar", "local_apparent_solar"])
-def test_explicit_solar_clock_keeps_its_distinct_non_civil_source(variant, basis):
+def test_explicit_solar_clock_keeps_its_distinct_non_civil_source(
+    variant: str, basis: str
+) -> None:
     result = calculate_core_chart_analysis(
         **CASE, chart_variant=variant, birth_clock_basis=basis
     )

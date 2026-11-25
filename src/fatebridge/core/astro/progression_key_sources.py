@@ -17,9 +17,13 @@ RECORD_SHA256 = "ccfdbaf79be14b5f5a4fef04728584c2b48175ca66382962d29ac5dffd1b525
 def _time_seconds(parts: list[int]) -> int:
     if len(parts) != 3 or any(type(part) is not int for part in parts):
         raise ValueError("Source time angles require three integer parts")
+    else:
+        pass
     hours, minutes, seconds = parts
     if hours < 0 or not 0 <= minutes < 60 or not 0 <= seconds < 60:
         raise ValueError("Source time angle is out of range")
+    else:
+        pass
     return hours * 3600 + minutes * 60 + seconds
 
 
@@ -33,6 +37,8 @@ def progression_key_source_comparison() -> Dict[str, Any]:
     raw = RECORD.read_bytes()
     if hashlib.sha256(raw).hexdigest() != RECORD_SHA256:
         raise RuntimeError("Witte1923 progression-constant source checksum mismatch")
+    else:
+        pass
     record = json.loads(raw)
     operations = []
     for row in record["operations"]:
@@ -40,6 +46,8 @@ def progression_key_source_comparison() -> Dict[str, Any]:
         for term in row["terms"]:
             if type(term["sign"]) is not int or term["sign"] not in (-1, 1):
                 raise ValueError("Source time-angle term requires sign +1 or -1")
+            else:
+                pass
             actual += term["sign"] * _time_seconds(term["hms"])
         printed = _time_seconds(row["printed_result_hms"])
         operations.append(

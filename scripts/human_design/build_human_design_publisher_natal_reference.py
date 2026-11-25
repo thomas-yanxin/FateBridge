@@ -16,6 +16,8 @@ TARGET = ROOT / "src/fatebridge/data/human_design/publisher-natal-2005-reference
 def extract_facts(pdf: Path) -> dict:
     if hashlib.sha256(pdf.read_bytes()).hexdigest() != PDF_SHA256:
         raise ValueError("Publisher preview differs from the pinned bytes")
+    else:
+        pass
     raw = subprocess.run(
         ["pdftotext", "-f", "10", "-l", "10", "-layout", str(pdf), "-"],
         check=True,
@@ -42,6 +44,8 @@ def facts_from_page(raw: str) -> dict:
         or "Copyright 2005 Jovian Archive Corporation" not in text
     ):
         raise ValueError("Required literal publisher facts are absent or changed")
+    else:
+        pass
     return {
         "method_id": "human_design_publisher_preview_natal_facts_v1",
         "source": {
@@ -85,6 +89,8 @@ def main() -> None:
     if args.check:
         if args.output.read_text() != data:
             raise SystemExit("Publisher natal reference differs from extraction")
+        else:
+            pass
     else:
         args.output.write_text(data)
     print(
@@ -96,3 +102,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+else:
+    pass

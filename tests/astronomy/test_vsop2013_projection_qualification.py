@@ -26,7 +26,9 @@ class Asset:
 
 
 @pytest.mark.parametrize("field", ["range", "series", "upstream", "graph"])
-def test_changed_nonempty_profile_cannot_authorize_itself(monkeypatch, field):
+def test_changed_nonempty_profile_cannot_authorize_itself(
+    monkeypatch: pytest.MonkeyPatch, field: str
+) -> None:
     data = copy.deepcopy(BASE)
     if field == "range":
         data["working_jd_tt"][1] -= 365
@@ -41,14 +43,18 @@ def test_changed_nonempty_profile_cannot_authorize_itself(monkeypatch, field):
         builder.source_profile()
 
 
-def test_duplicate_source_key_cannot_be_silently_reinterpreted(monkeypatch):
+def test_duplicate_source_key_cannot_be_silently_reinterpreted(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     raw = json.dumps(BASE).replace("{", '{"abi_version":1,', 1).encode()
     monkeypatch.setattr(builder, "files", lambda *_: Asset(raw))
     with pytest.raises(ValueError):
         builder.source_profile()
 
 
-def test_boolean_abi_is_not_a_reviewed_integer_profile(monkeypatch):
+def test_boolean_abi_is_not_a_reviewed_integer_profile(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     data = copy.deepcopy(BASE)
     data["abi_version"] = True
     monkeypatch.setattr(builder, "files", lambda *_: Asset(json.dumps(data).encode()))
@@ -62,8 +68,8 @@ def test_boolean_abi_is_not_a_reviewed_integer_profile(monkeypatch):
     ids=["malformed", "missing"],
 )
 def test_runtime_profile_failure_is_nonretryable_source_fault(
-    monkeypatch, tmp_path, error
-):
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, error
+) -> None:
     def fail():
         raise error
 
@@ -81,13 +87,17 @@ def test_runtime_profile_failure_is_nonretryable_source_fault(
     assert "/private/" not in json.dumps(result)
 
 
-def test_approved_profile_is_a_positive_precondition_for_mutations(monkeypatch):
+def test_approved_profile_is_a_positive_precondition_for_mutations(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setattr(builder, "files", lambda *_: Asset(json.dumps(BASE).encode()))
     actual, _ = builder.source_profile()
     assert actual == BASE
 
 
-def test_current_profile_scope_keeps_all_independent_tt_inputs_and_fixed_gates():
+def test_current_profile_scope_keeps_all_independent_tt_inputs_and_fixed_gates() -> (
+    None
+):
     import gzip
     import hashlib
 

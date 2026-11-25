@@ -4,22 +4,22 @@ import json
 from copy import deepcopy
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Sequence, cast
+from typing import Any, Dict, Iterable, Sequence, cast
 
-from .interior_inputs import InteriorRelation
-from .models import LayoutConstraint
-from .workstation_sources import disagreement, provenance
+from fatebridge.core.fengshui.interior_inputs import InteriorRelation
+from fatebridge.core.fengshui.models import LayoutConstraint
+from fatebridge.core.fengshui.workstation_sources import disagreement, provenance
 
 
 @lru_cache(maxsize=1)
-def _bundle() -> Dict[str, Any]:
+def _bundle() -> dict[str, Any]:
     path = (
         Path(__file__).parents[2] / "data" / "fengshui" / "interior-relations-v1.json"
     )
     return cast(Dict[str, Any], json.loads(path.read_text(encoding="utf-8")))
 
 
-def interior_relation_provenance() -> Dict[str, Any]:
+def interior_relation_provenance() -> dict[str, Any]:
     data = _bundle()
     result = deepcopy(data["ruleset"])
     result["bundle_version"] = data["bundle_version"]
@@ -32,10 +32,10 @@ def interior_relation_provenance() -> Dict[str, Any]:
 
 def _action(
     relation: InteriorRelation,
-    rule: Dict[str, Any],
-    specification: Dict[str, Any],
-    constraints: Dict[str, LayoutConstraint],
-) -> Dict[str, Any]:
+    rule: dict[str, Any],
+    specification: dict[str, Any],
+    constraints: dict[str, LayoutConstraint],
+) -> dict[str, Any]:
     object_id = (
         relation.source_object_id
         if specification["endpoint"] == "source"
@@ -58,12 +58,16 @@ def _action(
     if not blocked:
         if permission is not True:
             pending.append(f"layout_constraints.{object_id}.{permission_field}")
+        else:
+            pass
         pending.extend(
             [
                 "independently_confirmed_candidate_relation_geometry",
                 "independently_confirmed_candidate_physical_feasibility",
             ]
         )
+    else:
+        pass
     return {
         "action_id": f"interior:{relation.relation_id}:{object_id}:{operation}",
         "relation_id": relation.relation_id,
@@ -93,7 +97,7 @@ def _action(
 
 def analyze_interior_relations(
     relations: Sequence[InteriorRelation], constraints: Iterable[LayoutConstraint]
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Review only supplied relations; no direction or relocation is invented.
 
     Action prerequisites are separate from factual assessment completeness.
@@ -101,7 +105,7 @@ def analyze_interior_relations(
     fresh candidate position's geometry or physical feasibility.
     """
     data = _bundle()
-    result: Dict[str, Any] = {
+    result: dict[str, Any] = {
         "status": "complete" if relations else "not_requested",
         "findings": [],
         "rulesets": [interior_relation_provenance()] if relations else [],
@@ -128,10 +132,14 @@ def analyze_interior_relations(
                 result["rulesets"].append(
                     provenance("workstation_source_boundaries_v1")
                 )
+            else:
+                pass
+        else:
+            pass
         present = relation.present
         basis = relation.observation_basis
         relation_id = relation.relation_id
-        missing: List[str] = []
+        missing: list[str] = []
         if basis == "image_observed":
             status = "candidate_only"
             missing.append(
@@ -214,6 +222,8 @@ def analyze_interior_relations(
                 )
             )
             result["action_options"].extend(deepcopy(actions))
+        else:
+            pass
         result["findings"].append(finding)
         result["missing_inputs"].extend(missing)
         result["rule_trace"].append(
@@ -234,4 +244,6 @@ def analyze_interior_relations(
     if result["missing_inputs"]:
         result["status"] = "partial"
         result["rule_coverage_status"] = "needs_confirmation"
+    else:
+        pass
     return result

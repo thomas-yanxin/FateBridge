@@ -97,26 +97,32 @@ API_HOST=127.0.0.1 API_PORT=8011 python -m fatebridge.api
 
 ### 400 与 422 `validation_error`
 
-当前 REST 错误使用顶层字段，不再从 `detail` 取业务错误：
+例如 `birth_month=13` 会产生以下 REST 校验错误。
 
 ```json
 {
   "error": "请求参数无效",
   "error_code": "validation_error",
-  "retryable": false
+  "retryable": false,
+  "issues": [
+    {"path": "birth_month", "code": "less_than_equal",
+     "message": "Input should be less than or equal to 12", "constraints": {"le": 12}}
+  ]
 }
 ```
 
-- 422：请求字段缺失、类型/范围/枚举错误、未知字段或无效完整公历日期，在请求模型层被拒绝；REST JSON 语法错误也返回 422。
+- 422：请求字段缺失、类型或取值错误、未知字段、无效日期或 JSON。梅花时卦的钟时校验也返回 422。遇到回拨造成的重复钟时，`analysis_utc_offset` 的 `constraints.expected` 列出该时区实际允许的偏移，核实当时使用的偏移后再提交。
 - 400：请求进入领域计算后被拒绝，例如未由模型限制的未知模式，或显式要求太阳时却无经度。
 
 先查看 `issues[].path`；若路径是 `fields` 中的输出路径，修正投影。`fields`、`strict_fields`、`include_snapshot_text`、`as_of` 等 REST 控制项应放在查询参数，放入业务 JSON 会作为未知字段失败。多个 `fields` 重复写参数，CLI 则用空格分隔。
 
-同一错误码可以来自不同层。模型错误通过 `issues` 指明字段路径、错误类型及可选约束，不回显原始值。查看状态码与 schema，把月/日范围检查和真实日期检查都纳入调用侧校验。完整非法分析日期不会自动改成月底；部分年月日的补齐规则与完整日期校验不同。
+读 `issues[].message` 和 `constraints` 确认违反的规则。领域错误的具体原因见顶层 `error`，例如哪个地名未能解析出唯一经度。确认正确的参数后重新提交。若需排查内部异常，用服务端日志中的操作、异常类型和代码位置定位。
+
+项目自带的 REST 启动命令关闭 Uvicorn 的访问日志，调用量和状态码可从 `/metrics` 查询。
 
 ### MCP / CLI 返回错误的位置
 
-MCP 已知工具的模型/业务失败返回 `isError=true` 与结构化错误包络。FastMCP Client 默认抛出 `ToolError`；需读取 `issues` 时使用 `raise_on_error=False` 并读取 `structured_content`。未知工具、非法 RPC 等协议错误单独处理。CLI 工具结果与错误均写 stdout，日志写 stderr；退出码 0 成功、1 计算/模型失败、2 用法错误或不支持。`list` / `--help` 是文本输出。按实际 `retryable` 判断是否重试，参数或依赖错误需先修正。
+MCP 已知工具的模型或业务失败返回 `isError=true` 与结构化错误包络。FastMCP Client 默认抛出 `ToolError`。读取 `issues` 时设置 `raise_on_error=False`，再读取 `structured_content`。未知工具、非法 RPC 等协议错误单独处理。CLI 工具结果与错误均写 stdout，日志写 stderr。退出码 0 表示成功，1 表示计算或模型校验失败，2 表示用法错误或不支持。`list` 和 `--help` 输出文本。仅在 `retryable=true` 时考虑原参数重试。
 
 ### 浏览器 CORS 错误
 
@@ -136,7 +142,7 @@ MCP 已知工具的模型/业务失败返回 `isError=true` 与结构化错误�
 
 ### 命盘字段层级不同或无时盘报错
 
-新独立八字入口 `/api/cn/bazi/birth` 的业务字段在 `bazi_birth` 下；旧 `/api/calculate` 已移除。MCP / CLI `analyze_destiny` 执行综合分析。
+新独立八字入口 `/api/bazi/birth-chart` 的业务字段在 `bazi_birth` 下；旧 `/api/calculate` 已移除。MCP / CLI `bazi_overview` 执行综合分析。
 
 当前出生类模型要求小时，不能省略 `birth_hour` 来生成无时盘，也不能无依据填 0。字段投影的点号路径从响应根开始，不会深搜同名字段；无效路径默认附 `projection_warnings`，使用 `strict_fields=true` / `--strict-fields` 可明确拒绝。
 
@@ -158,7 +164,7 @@ CLI 不自动读取 `.env`，`SE_EPHE_PATH` 应在启动前设进程环境。GUI
 
 ### 关系盘与 `synastry` 预期不同
 
-`relative_mode="synastry"` 映射 `influence`；比较盘使用 `relative_mode="compare"`。旧字段 `relationship_mode` 已移除，提交会返回输入校验错误。REST 使用嵌套 `inner` / `outer`，MCP / CLI 使用 `inner_birth_*` / `outer_birth_*`；不要跨端直接复制整段请求。
+`relative_mode="synastry"` 映射 `influence`，比较盘使用 `relative_mode="compare"`。三端均使用 `inner_birth_*` / `outer_birth_*`。旧字段 `relationship_mode` 和旧 REST 嵌套对象会返回输入校验错误。
 
 ## 快照导出
 

@@ -18,6 +18,8 @@ def source_data(corpus: Path = CORPUS) -> dict[str, Any]:
     raw = (corpus / "manifest.json").read_bytes()
     if hashlib.sha256(raw).hexdigest() != MANIFEST_SHA:
         raise ValueError("胜败钤初始清单指纹不符")
+    else:
+        pass
     m = json.loads(raw)
     for row in m["source_files"]:
         if (
@@ -25,18 +27,24 @@ def source_data(corpus: Path = CORPUS) -> dict[str, Any]:
             != row["sha256"]
         ):
             raise ValueError("胜败钤源文件指纹漂移：" + row["file"])
+        else:
+            pass
     for row in m["prior_source_references"]:
         if (
             hashlib.sha256((CORPUS.parent / row["file"]).read_bytes()).hexdigest()
             != row["sha256"]
         ):
             raise ValueError("胜败钤既有源文件指纹漂移：" + row["file"])
+        else:
+            pass
     table = json.loads((corpus / "matrix-columns.json").read_text())
     cells = table["cells"]
     if len(cells) != 128 or {
         (c["wenchang_position"], c["taiyi_number"]) for c in cells
     } != {(p, n) for p in "子丑艮寅卯辰巽巳午未坤申酉戌乾亥" for n in [1, 2, 3, 4, 6, 7, 8, 9]}:
         raise ValueError("胜败钤128格须完整保留，包括缺文、空栏和未决条件")
+    else:
+        pass
     return {
         "id": "jinjing_victory_matrix_columns_v1",
         "version": "1.0.0",
@@ -66,6 +74,8 @@ def main() -> int:
     if args.check:
         if not DEST.exists() or DEST.read_bytes() != raw:
             raise SystemExit("胜败钤运行资料漂移")
+        else:
+            pass
     else:
         DEST.write_bytes(raw)
     print(hashlib.sha256(raw).hexdigest())
@@ -74,3 +84,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

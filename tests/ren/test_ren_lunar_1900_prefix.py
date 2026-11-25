@@ -9,15 +9,15 @@ import pytest
 
 from fatebridge.core import lunar_1900_prefix
 from fatebridge.core.almanac import get_lunar_context
-from fatebridge.validation.meihua_calendar import reference_bundle
 from tests.support.transports import SPECS, business, rest, surface_calls
+from validation.meihua_calendar import reference_bundle
 
 ROOT = Path(__file__).resolve().parents[2]
 CORPUS = ROOT / "tests/fixtures/ren_lunar_1900_prefix_v1"
 REFERENCE = json.loads((CORPUS / "reference.json").read_text())
 
 
-def test_frozen_month_and_year_boundary_match_pmo_and_tam_publications():
+def test_frozen_month_and_year_boundary_match_pmo_and_tam_publications() -> None:
     manifest = json.loads((CORPUS / "freeze.json").read_text())
     for name, value in manifest["files"].items():
         assert hashlib.sha256((CORPUS / name).read_bytes()).hexdigest() == value
@@ -41,7 +41,7 @@ def test_frozen_month_and_year_boundary_match_pmo_and_tam_publications():
             assert "conversion_source" not in actual
 
 
-def test_finite_prefix_never_extrapolates_to_unpublished_dates():
+def test_finite_prefix_never_extrapolates_to_unpublished_dates() -> None:
     assert lunar_1900_prefix.convert(date(1899, 12, 31)) is None
     assert lunar_1900_prefix.convert(date(1900, 1, 31)) is None
     assert lunar_1900_prefix.source_for(date(1900, 1, 31)) is None
@@ -51,7 +51,9 @@ def test_finite_prefix_never_extrapolates_to_unpublished_dates():
     )
 
 
-def test_corrupt_prefix_month_is_rejected(tmp_path, monkeypatch):
+def test_corrupt_prefix_month_is_rejected(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     raw = json.loads(
         (ROOT / "src/fatebridge/data/lunar_calendar_pmo_1900_prefix.json").read_text()
     )
@@ -70,8 +72,8 @@ def test_corrupt_prefix_month_is_rejected(tmp_path, monkeypatch):
 @pytest.mark.parametrize("day", [1, 30, 31])
 @pytest.mark.parametrize("project", [False, True])
 def test_prefix_lunar_year_and_source_survive_all_ren_transports(
-    key, day, project, surface_calls
-):
+    key: str, day: int, project: bool, surface_calls
+) -> None:
     spec = SPECS[key]
     data = dict(
         analysis_year=1900,
@@ -90,14 +92,20 @@ def test_prefix_lunar_year_and_source_survive_all_ren_transports(
             birth_timezone="+08:00",
             gender="男",
         )
+    else:
+        pass
     if key == "jinkou":
         data["di_fen"] = "子"
+    else:
+        pass
     fields = [
         "calendar_context.lunar_calendar",
         "calendar_context.lunar_calendar_support",
     ]
     if key == "liureng_runyear":
         fields += ["runyear"]
+    else:
+        pass
     params = [("response_char_limit", "0")]
     flags, options = ["--response-char-limit", "0"], {}
     if project:
@@ -114,6 +122,8 @@ def test_prefix_lunar_year_and_source_survive_all_ren_transports(
             *fields,
         ]
         options = dict(fields=fields, strict_fields=True, include_snapshot_text=False)
+    else:
+        pass
     http, protocol, code, cli = surface_calls(
         spec, data, params=params, options=options, flags=flags
     )
@@ -136,7 +146,11 @@ def test_prefix_lunar_year_and_source_survive_all_ren_transports(
             assert (
                 lunar["conversion_source"]["method_id"] == "pmo_1900_january_prefix_v1"
             )
+        else:
+            pass
         if key == "liureng_runyear":
             assert body["runyear"]["birth_lunar_year"] == 1899
             assert body["runyear"]["age"] == (2 if day == 31 else 1)
             assert body["runyear"]["ganzhi"] == ("丁卯" if day == 31 else "丙寅")
+        else:
+            pass

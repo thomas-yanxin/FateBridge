@@ -5,9 +5,9 @@ import json
 from fractions import Fraction
 from pathlib import Path
 
+from fatebridge.core.astro.lilly_fortitudes import evaluate_fortitudes
+from fatebridge.core.astro.lilly_star_orbs import STELLAR_ORB_DEGREES
 from fatebridge.core.classical_western import combustion_state
-from fatebridge.core.lilly_fortitudes import evaluate_fortitudes
-from fatebridge.core.lilly_star_orbs import STELLAR_ORB_DEGREES
 from scripts.western.audit_western_lilly_fortitudes import worked_inputs
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -103,6 +103,8 @@ def audit():
                         inputs=observed["inputs"],
                     )
                 )
+            else:
+                pass
             if code.startswith("E"):
                 essential_rows.append(
                     dict(
@@ -112,6 +114,8 @@ def audit():
                         matched=observed["contribution"] == wanted,
                     )
                 )
+            else:
+                pass
         positive_sum = sum(row["printed_positive_rows"].values())
         negative_sum = -sum(row["printed_negative_rows"].values())
         comparisons.append(
@@ -205,3 +209,5 @@ def main():
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

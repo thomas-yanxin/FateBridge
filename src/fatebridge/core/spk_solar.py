@@ -11,6 +11,7 @@ import hashlib
 import math
 import os
 import weakref
+from fractions import Fraction
 from functools import lru_cache
 from importlib import import_module
 from pathlib import Path
@@ -21,7 +22,7 @@ from fatebridge.core.analytic_solar import (
     C_AU_DAY,
     aberration,
     apparent_ecliptic,
-    profile,
+    loaded_sha256,
 )
 from fatebridge.utils.errors import EphemerisSourceError
 
@@ -36,6 +37,8 @@ def _signature(path: Path) -> tuple[int, ...]:
         stat = path.stat()
         if not path.is_file():
             raise OSError("not a file")
+        else:
+            pass
         return (
             stat.st_dev,
             stat.st_ino,
@@ -48,14 +51,14 @@ def _signature(path: Path) -> tuple[int, ...]:
 
 
 class _KernelSun:
-    def __init__(self, path: Path, signature: tuple[int, ...]):
+    def __init__(self, path: Path, signature: tuple[int, ...]) -> None:
         try:
             erfa = import_module("erfa")
             jplephem = import_module("jplephem")
             np = import_module("numpy")
             SPK = import_module("jplephem.spk").SPK
-        except ImportError as error:
-            raise ImportError(
+        except ModuleNotFoundError as error:
+            raise ModuleNotFoundError(
                 "JPL SPK太阳模型需要安装FateBridge的jpl可选依赖"
             ) from error
         self.path, self.signature, self.erfa = path, signature, erfa
@@ -68,7 +71,11 @@ class _KernelSun:
         }
         self.kernel: Any = None
         try:
-            self.sha256 = hashlib.sha256(path.read_bytes()).hexdigest()
+            kernel_digest = hashlib.sha256()
+            with path.open("rb") as kernel_file:
+                while kernel_chunk := kernel_file.read(1024 * 1024):
+                    kernel_digest.update(kernel_chunk)
+            self.sha256 = kernel_digest.hexdigest()
             self.kernel = SPK.open(str(path))
             self.segments = {
                 pair: [s for s in self.kernel.segments if (s.center, s.target) == pair]
@@ -79,6 +86,8 @@ class _KernelSun:
                 for group in self.segments.values()
             ):
                 raise ValueError("Required type2 Earth/EMB/Sun segments absent")
+            else:
+                pass
             self.coverage = {
                 f"{a}->{b}": [[float(s.start_jd), float(s.end_jd)] for s in group]
                 for (a, b), group in self.segments.items()
@@ -87,8 +96,12 @@ class _KernelSun:
         except Exception as error:
             if self.kernel is not None:
                 self.kernel.close()
+            else:
+                pass
             if isinstance(error, EphemerisSourceError):
                 raise
+            else:
+                pass
             raise EphemerisSourceError("solar_spk_invalid") from error
         # Eviction must not close a kernel still held by another active root.
         self._finalizer = weakref.finalize(self, self.kernel.close)
@@ -96,14 +109,19 @@ class _KernelSun:
     def check_unchanged(self) -> None:
         if _signature(self.path) != self.signature:
             raise EphemerisSourceError("solar_spk_changed")
+        else:
+            pass
 
     def segment(self, pair: tuple[int, int], tdb2: float) -> Any:
         # SPK priority is the last applicable segment, not simply the last
         # segment for that body across disjoint time intervals.
-        epoch = 2451545.0 + tdb2
+        # DAF segment descriptors use TDB seconds from J2000.
+        seconds = Fraction(tdb2) * 86400 if math.isfinite(tdb2) else tdb2
         for segment in reversed(self.segments[pair]):
-            if segment.start_jd <= epoch <= segment.end_jd:
+            if segment.start_second <= seconds <= segment.end_second:
                 return segment
+            else:
+                pass
         raise EphemerisSourceError("solar_spk_range")
 
     def longitude(self, jd_tt: float) -> float:
@@ -138,6 +156,8 @@ class _KernelSun:
         value = math.degrees(math.atan2(ecliptic[1], ecliptic[0])) % 360
         if not math.isfinite(value):
             raise EphemerisSourceError("solar_spk_invalid")
+        else:
+            pass
         return value
 
     def receipt(self) -> dict[str, Any]:
@@ -152,14 +172,13 @@ class _KernelSun:
             },
             "time_argument": "TDB from TT via geocentric ERFA dtdb",
             "position_frame": "BCRS then IAU2006/P03 and IAU2000B true ecliptic of date",
-            "frame_coefficient_sha256": profile()["loaded_sha256"],
+            "frame_coefficient_sha256": loaded_sha256(),
             "light_time_iterations": 3,
             "dependencies": dict(self.dependencies),
             "source_url": "https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/req/spk.html",
             "time_source_url": "https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/req/time.html",
             "native_moshier_relabelled": False,
             "accuracy_certified": False,
-            "source_identity_scope": "Actual selected file bytes; not authentication of a NASA download, atomic immutability or full physical/civil UTC accuracy",
         }
 
 
@@ -172,6 +191,8 @@ def _selected() -> _KernelSun:
     value = os.environ.get(FILE_ENV, "").strip()
     if not value:
         raise EphemerisSourceError("solar_spk_unavailable")
+    else:
+        pass
     path = Path(value).expanduser().resolve()
     return _load(path, _signature(path))
 
@@ -183,7 +204,7 @@ def cache_key() -> tuple[Any, ...]:
             str(source.path),
             source.signature,
             source.sha256,
-            profile()["loaded_sha256"],
+            loaded_sha256(),
         )
 
 
@@ -198,6 +219,8 @@ def solar_longitudes_tt(jd_tts: list[float]) -> dict[str, Any]:
         type(value) in (int, float) and math.isfinite(value) for value in jd_tts
     ):
         raise ValueError("SPK observations require finite numeric TT points")
+    else:
+        pass
     with _LOCK:
         source = _selected()
         selected_key = cache_key()
@@ -206,6 +229,8 @@ def solar_longitudes_tt(jd_tts: list[float]) -> dict[str, Any]:
         source.check_unchanged()
         if before != source.receipt() or selected_key != cache_key():
             raise EphemerisSourceError("solar_configuration_changed")
+        else:
+            pass
         return {"longitudes": values, "model": before}
 
 
@@ -218,6 +243,8 @@ def longitude_crossing_tt(
 ) -> dict[str, Any]:
     if not all(math.isfinite(x) for x in (target, low, high)) or low >= high:
         raise ValueError("SPK crossing requires a finite increasing TT bracket")
+    else:
+        pass
     with _LOCK:
         source = _selected()
 
@@ -225,21 +252,27 @@ def longitude_crossing_tt(
             str(source.path),
             source.signature,
             source.sha256,
-            profile()["loaded_sha256"],
+            loaded_sha256(),
         )
         if expected_source_key is not None and actual_key != expected_source_key:
             raise EphemerisSourceError("solar_configuration_changed")
+        else:
+            pass
 
         def residual(epoch: float) -> float:
             return math.remainder(source.longitude(epoch) - target, 360)
 
         if not residual(low) < 0 <= residual(high):
             raise ValueError("SPK TT bracket does not contain a forward crossing")
+        else:
+            pass
         iterations = 0
         for _ in range(40):
             middle = (low + high) / 2
             if middle == low or middle == high:
                 break
+            else:
+                pass
             if residual(middle) < 0:
                 low = middle
             else:

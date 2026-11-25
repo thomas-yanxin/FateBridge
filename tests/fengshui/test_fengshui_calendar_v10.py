@@ -15,17 +15,17 @@ from fatebridge.core.de441_solar import MODEL_ID as DE441_MODEL
 from fatebridge.core.fengshui.calendar import lichun_resolution
 from fatebridge.services.fengshui import calculate_annual_stars
 from fatebridge.services.run_metadata import attach_run_metadata
-from fatebridge.validation.fengshui_calendar import audit_lichun_reference
 from tests.fixtures.fengshui import payload
-from tests.support.fengshui_transports import mcp_call
+from tests.support.fengshui_transports import SPECS, mcp_call
 from tests.support.mcp_result_assertions import without_transport
 from tests.support.transports import rest_client
+from validation.fengshui_calendar import audit_lichun_reference
 
 FOLDER = Path(__file__).parents[1] / "data/fengshui_lichun_tt"
 REFERENCE = json.loads((FOLDER / "reference.json").read_text())
 
 
-def test_all_421_independent_tt_crossings_retain_the_original_values_and_gate():
+def test_all_421_independent_tt_crossings_retain_the_original_values_and_gate() -> None:
     manifest = json.loads((FOLDER / "hashes.json").read_text())
     for name, digest in manifest.items():
         assert hashlib.sha256((FOLDER / name).read_bytes()).hexdigest() == digest
@@ -53,8 +53,8 @@ def test_all_421_independent_tt_crossings_retain_the_original_values_and_gate():
     ],
 )
 def test_missing_or_corrupt_references_and_relaxed_gate_cannot_manufacture_acceptance(
-    fault,
-):
+    fault: str,
+) -> None:
     changed = deepcopy(REFERENCE)
     if fault == "missing":
         changed["rows"].pop()
@@ -74,7 +74,7 @@ def test_missing_or_corrupt_references_and_relaxed_gate_cannot_manufacture_accep
         audit_lichun_reference(changed)
 
 
-def test_one_changed_reference_row_is_reported_as_a_failed_comparison():
+def test_one_changed_reference_row_is_reported_as_a_failed_comparison() -> None:
     changed = deepcopy(REFERENCE)
     changed["rows"][0]["jd_tt"] += 60 / 86400
     audit = audit_lichun_reference(changed)
@@ -101,7 +101,7 @@ def unavailable_source(monkeypatch, request):
 @pytest.mark.parametrize("unavailable_source", ["solver_failure"], indirect=True)
 def test_failed_solver_cannot_pass_the_complete_independent_reference(
     unavailable_source,
-):
+) -> None:
     audit = audit_lichun_reference(REFERENCE)
     assert audit["rows"] == audit["failed_count"] == 421
     assert audit["matched"] == 0 and not audit["all_scoped_tt_checks_passed"]
@@ -111,8 +111,12 @@ def test_failed_solver_cannot_pass_the_complete_independent_reference(
 
 @pytest.mark.parametrize("name", ["annual_stars", "minggua", "xuankong_natal"])
 def test_unavailable_native_crossing_is_rejected_on_every_public_surface(
-    unavailable_source, monkeypatch, tmp_path, capsys, name
-):
+    unavailable_source,
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    name: str,
+) -> None:
     inputs = (
         {"effective_year": 2026}
         if name == "annual_stars"
@@ -125,11 +129,13 @@ def test_unavailable_native_crossing_is_rejected_on_every_public_surface(
             "effective_event_year": 2004,
             "evidence": "synthetic unavailable-provider test",
         }
-    http = rest_client(monkeypatch).post("/api/fengshui/" + name, json=inputs)
+    else:
+        pass
+    http = rest_client(monkeypatch).post(SPECS[name].rest_path, json=inputs)
     protocol = asyncio.run(mcp_call(name, inputs))
     path = tmp_path / "request.json"
     path.write_text(json.dumps(inputs))
-    code = run(["fengshui_" + name, "--request-file", str(path)])
+    code = run([SPECS[name].tool_name, "--request-file", str(path)])
     cli = json.loads(capsys.readouterr().out)
     assert http.status_code == 503 and protocol.is_error and code == 1
     for body in (http.json(), protocol.structured_content, cli):
@@ -140,8 +146,8 @@ def test_unavailable_native_crossing_is_rejected_on_every_public_surface(
 
 
 def test_optional_native_without_swiss_retains_the_original_independent_gate(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
     monkeypatch.setattr(almanac, "swe", None)
     almanac.get_solar_terms_for_year.cache_clear()
@@ -164,8 +170,11 @@ def test_optional_native_without_swiss_retains_the_original_independent_gate(
 
 @pytest.mark.parametrize("name", ["annual_stars", "minggua", "xuankong_natal"])
 def test_named_bundled_source_remains_available_across_public_surfaces(
-    monkeypatch, tmp_path, capsys, name
-):
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    name: str,
+) -> None:
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
     monkeypatch.setattr(almanac, "swe", None)
     almanac.get_solar_terms_for_year.cache_clear()
@@ -181,12 +190,14 @@ def test_named_bundled_source_remains_available_across_public_surfaces(
             "effective_event_year": 2004,
             "evidence": "synthetic explicit historical event",
         }
+    else:
+        pass
     try:
-        http = rest_client(monkeypatch).post("/api/fengshui/" + name, json=inputs)
+        http = rest_client(monkeypatch).post(SPECS[name].rest_path, json=inputs)
         protocol = asyncio.run(mcp_call(name, inputs))
         path = tmp_path / "request.json"
         path.write_text(json.dumps(inputs))
-        code = run(["fengshui_" + name, "--request-file", str(path)])
+        code = run([SPECS[name].tool_name, "--request-file", str(path)])
         cli = json.loads(capsys.readouterr().out)
         assert http.status_code == 200 and code == 0 and not protocol.is_error
         assert (
@@ -202,7 +213,9 @@ def test_named_bundled_source_remains_available_across_public_surfaces(
     "provider",
     ["linear_fallback", "linear_1900_fallback", "new_approximation_provider"],
 )
-def test_receipt_uses_resolution_semantics_instead_of_provider_spelling(provider):
+def test_receipt_uses_resolution_semantics_instead_of_provider_spelling(
+    provider: str,
+) -> None:
     record = {
         "moment": "2026-02-04T00:00:00+00:00",
         "provider": provider,
@@ -211,7 +224,9 @@ def test_receipt_uses_resolution_semantics_instead_of_provider_spelling(provider
     }
     assert (
         attach_run_metadata(
-            {"boundary_resolution": record}, tool_name="fengshui_annual_stars"
+            {"boundary_resolution": record},
+            tool_name=SPECS["annual_stars"].tool_name,
+            approximate_record=SPECS["annual_stars"].approximate_record,
         )["run_metadata"]["engine_is_approximate"]
         is True
     )
@@ -227,7 +242,9 @@ def test_receipt_uses_resolution_semantics_instead_of_provider_spelling(provider
         (2204, False, True),
     ],
 )
-def test_actual_tt_and_civil_time_policies_are_exposed(year, historical, future):
+def test_actual_tt_and_civil_time_policies_are_exposed(
+    year: int, historical: bool, future: bool
+) -> None:
     resolution = lichun_resolution(year, "UTC")
     assert not resolution["approximate"]
     basis = resolution["time_basis"]
@@ -241,14 +258,14 @@ def test_actual_tt_and_civil_time_policies_are_exposed(year, historical, future)
     "year,wording", [(1900, "UT1/ΔT约定"), (2028, "按冻结闰秒表不变假设")]
 )
 def test_snapshot_preserves_historical_or_conditional_civil_clock_meaning(
-    year, wording
-):
+    year: int, wording: str
+) -> None:
     result = calculate_annual_stars(effective_year=year)
     assert result["status"] == "complete"
     assert wording in result["snapshot_text"]
 
 
-def test_confirmed_year_does_not_invent_a_solver_or_clock_assumption():
+def test_confirmed_year_does_not_invent_a_solver_or_clock_assumption() -> None:
     from fatebridge.services.fengshui import calculate_minggua
 
     result = calculate_minggua(effective_birth_year=1900, gender_convention="male")

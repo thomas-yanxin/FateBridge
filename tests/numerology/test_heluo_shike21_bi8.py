@@ -5,11 +5,13 @@ import json
 from pathlib import Path
 
 import pytest
+from fastapi.testclient import TestClient
+from pytest import CaptureFixture
 
-from fatebridge.core import heluo_poems as hp
-from fatebridge.core import heluo_texts as ht
-from fatebridge.core.heluo import build_snapshot_text, yao_text
-from fatebridge.core.heluo_timing import selected_timing_snapshot
+from fatebridge.core.heluo import heluo_poems as hp
+from fatebridge.core.heluo import heluo_texts as ht
+from fatebridge.core.heluo.heluo import build_snapshot_text, yao_text
+from fatebridge.core.heluo.heluo_timing import selected_timing_snapshot
 from fatebridge.services.knowledge import calculate_knowledge_read
 from fatebridge.services.tool_catalog import CATALOG
 from tests.support.transports import business
@@ -31,7 +33,7 @@ def clear_sources():
         fn.cache_clear()
 
 
-def test_frozen_reading_retains_own_errors_and_no_independent_credit():
+def test_frozen_reading_retains_own_errors_and_no_independent_credit() -> None:
     freeze = json.loads((F / "reviewed-literal-freeze.json").read_bytes())
     assert freeze["before_producer_edits"] is True
     for n, h in freeze["files"].items():
@@ -51,7 +53,9 @@ def test_frozen_reading_retains_own_errors_and_no_independent_credit():
     assert not a["goal_complete"] and not a["independent_review_added"]
 
 
-def test_later_pixels_override_green_candidate_and_preserve_all_other_literals():
+def test_later_pixels_override_green_candidate_and_preserve_all_other_literals() -> (
+    None
+):
     freeze = json.loads((F / "reviewed-literal-v2-freeze.json").read_bytes())
     assert freeze["before_next_candidate_edit"] is True
     assert freeze["after_first_candidate_exposure_not_blind"] is True
@@ -75,7 +79,7 @@ def test_later_pixels_override_green_candidate_and_preserve_all_other_literals()
 
 
 @pytest.mark.parametrize("e", L["commentaries"], ids=lambda e: f"shike{e['line']}")
-def test_all_complete_commentary_parents_and_headers(e):
+def test_all_complete_commentary_parents_and_headers(e) -> None:
     r = yao_text(e["hexagram"], e["line"])
     assert r["yaoci"] == e["yaoci"]
     assert r["detail"] == "".join(s["text"] for s in e["sections"])
@@ -96,7 +100,7 @@ def test_all_complete_commentary_parents_and_headers(e):
 
 
 @pytest.mark.parametrize("e", L["poem_groups"], ids=lambda e: f"bi{e['line']}")
-def test_all_sixteen_poems_and_exact_page_and_clause_boundaries(e):
+def test_all_sixteen_poems_and_exact_page_and_clause_boundaries(e) -> None:
     r = yao_text(e["hexagram"], e["line"])
     assert r["shige"] == "\n".join(p["text"] for p in e["poems"])
     assert r["poem_sections"] == [dict(p, applicability=None) for p in e["poems"]]
@@ -107,7 +111,7 @@ def test_all_sixteen_poems_and_exact_page_and_clause_boundaries(e):
 
 
 @pytest.mark.parametrize("gua,line", ROWS)
-def test_reference_summary_preserves_literal_reading_notes(gua, line):
+def test_reference_summary_preserves_literal_reading_notes(gua, line) -> None:
     r = yao_text(gua, line)
     out = calculate_knowledge_read(domain="heluo", key=f"{gua}:{line}")
     assert (
@@ -125,7 +129,9 @@ def test_reference_summary_preserves_literal_reading_notes(gua, line):
 
 
 @pytest.mark.parametrize("gua,line", ROWS)
-def test_literal_notes_survive_both_natal_and_all_three_timing_renderings(gua, line):
+def test_literal_notes_survive_both_natal_and_all_three_timing_renderings(
+    gua, line
+) -> None:
     r = yao_text(gua, line)
     lines = [1, 0, 0, 1, 0, 1] if gua == "火雷噬嗑" else [0, 0, 0, 0, 1, 0]
     target = {"name": gua, "lines": lines, "yuan": line}
@@ -173,7 +179,9 @@ def test_literal_notes_survive_both_natal_and_all_three_timing_renderings(gua, l
         assert all(n in text for n in notes)
 
 
-def test_conditional_crossreferences_do_not_fill_unprinted_target_line_or_replace_chart():
+def test_conditional_crossreferences_do_not_fill_unprinted_target_line_or_replace_chart() -> (
+    None
+):
     one = yao_text("火雷噬嗑", 1)["commentary_cross_references"][0]
     six = yao_text("火雷噬嗑", 6)["commentary_cross_references"][0]
     assert one["target_hexagram"] == "火地晉" and one["target_line"] is None
@@ -189,7 +197,9 @@ def test_conditional_crossreferences_do_not_fill_unprinted_target_line_or_replac
 
 
 @pytest.mark.parametrize("gua,line", ROWS)
-def test_actual_local_rest_mcp_cli_reference_parity(gua, line, rest, tmp_path, capsys):
+def test_actual_local_rest_mcp_cli_reference_parity(
+    gua, line, rest: TestClient, tmp_path: Path, capsys: CaptureFixture[str]
+) -> None:
     spec = next(s for s in CATALOG if s.key == "knowledge_read")
     response, code, cli, mcp = run_three(
         spec,

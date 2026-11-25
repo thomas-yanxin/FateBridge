@@ -13,8 +13,9 @@ from fatebridge.application.execution import execute_tool
 from fatebridge.cli import run
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.validation.claims import _same_value
-from fatebridge.validation.human_design import verify_human_design_reading
+from fatebridge.utils.json_values import same_value
+from tests.support.transports import call_calculation
+from validation.human_design import verify_human_design_reading
 
 PLAN = json.loads(
     (Path(__file__).parents[1] / "data/human_design/numeric_offsets.json").read_text()
@@ -31,7 +32,9 @@ INPUT = dict(
 
 
 @pytest.mark.parametrize("case", PLAN["unicode_cases"], ids=lambda c: c["id"])
-def test_complete_unicode_and_ascii_charts_differ_only_in_original_input_echo(case):
+def test_complete_unicode_and_ascii_charts_differ_only_in_original_input_echo(
+    case,
+) -> None:
     values = []
     for zone in (case["offset"], case["ascii"]):
         value = execute_tool(
@@ -46,17 +49,23 @@ def test_complete_unicode_and_ascii_charts_differ_only_in_original_input_echo(ca
         assert value["clock_evidence"]["input"].pop("birth_timezone") == zone
         value.pop("run_metadata")
         values.append(value)
-    assert _same_value(*values)
+    assert same_value(*values)
 
 
 @pytest.mark.parametrize("before_birth", [True, False])
 def test_three_public_adapters_preserve_exact_cycle_reference_order(
-    before_birth, monkeypatch, capsys
-):
+    before_birth: bool,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     reference = (
         "1980-07-01T12:00:00" + ("+" if before_birth else "-") + "00:00:00.036000"
     )
-    params = {**INPUT, "cycle_reference_datetime": reference}
+    params = {
+        **INPUT,
+        "cycle_reference_datetime": reference,
+        "compare_apparent_models": True,
+    }
     api._reset_runtime_state_for_tests()
     monkeypatch.setattr(
         api,
@@ -64,14 +73,19 @@ def test_three_public_adapters_preserve_exact_cycle_reference_order(
         api.ApiKeyAuthenticator(header_name="X-API-Key", api_keys={}),
     )
     with TestClient(api.app) as client:
-        response = client.post("/api/astro/human-design", json=params)
+        response = client.post(
+            "/api/human-design/chart",
+            json=params,
+            params={"detail": "audit", "response_char_limit": 0},
+        )
     assert response.status_code == (422 if before_birth else 200), response.text
 
     async def call():
         async with Client(create_mcp_app(families="astro")) as client:
-            value = await client.call_tool(
+            value = await call_calculation(
+                client,
                 "human_design",
-                {**params, "response_char_limit": 0},
+                {**params, "detail": "audit", "response_char_limit": 0},
                 raise_on_error=False,
             )
             assert value.is_error is before_birth
@@ -81,6 +95,10 @@ def test_three_public_adapters_preserve_exact_cycle_reference_order(
     assert run(
         [
             "human_design",
+            "--detail",
+            "audit",
+            "--response-char-limit",
+            "0",
             *["--" + k.replace("_", "-") + "=" + str(v) for k, v in params.items()],
         ]
     ) == (1 if before_birth else 0)
@@ -104,4 +122,6 @@ def test_three_public_adapters_preserve_exact_cycle_reference_order(
             assert check["status"] == "verified_fixed_template_reading", check
             value.pop("run_metadata")
     if not before_birth:
-        assert _same_value(values[0], values[1]) and _same_value(values[0], values[2])
+        assert same_value(values[0], values[1]) and same_value(values[0], values[2])
+    else:
+        pass

@@ -7,7 +7,7 @@ import pytest
 from scripts import check_docs
 
 
-def test_fences_do_not_create_headings_or_links():
+def test_fences_do_not_create_headings_or_links() -> None:
     document = check_docs.inspect_markdown(
         '# 标题 `fields`\n\n```json\n{"sample": "[x](missing.md)"}\n```\n'
         "\n# 标题 `fields`\n`[literal](missing.md)`\n"
@@ -18,6 +18,25 @@ def test_fences_do_not_create_headings_or_links():
     assert document.errors == []
 
 
+def test_explicit_html_ids_are_link_targets_outside_literal_code(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(check_docs, "ROOT", tmp_path)
+    (tmp_path / "README.md").write_text(
+        '[section](#source-axis)\n<a\n id="source-axis"></a>\n'
+        '<h2 id="named-heading">Heading</h2>\n'
+        '`<a id="inline-code"></a>`\n'
+        '```html\n<a id="fenced-code"></a>\n```\n',
+        encoding="utf-8",
+    )
+    document = check_docs.inspect_markdown((tmp_path / "README.md").read_text())
+    assert document.anchors == {"source-axis", "named-heading"}
+    assert check_docs.main([]) == 0
+    with (tmp_path / "README.md").open("a", encoding="utf-8") as stream:
+        stream.write("[literal](#fenced-code)\n")
+    assert check_docs.main([]) == 1
+
+
 @pytest.mark.parametrize(
     "text,expected",
     [
@@ -26,13 +45,15 @@ def test_fences_do_not_create_headings_or_links():
         ("````python\n```\n", "unclosed code fence"),
     ],
 )
-def test_invalid_fences_and_json_report_opening_line(text, expected):
+def test_invalid_fences_and_json_report_opening_line(text: str, expected: str) -> None:
     document = check_docs.inspect_markdown(text)
     assert document.errors[0].startswith("1:")
     assert expected in document.errors[0]
 
 
-def test_local_links_encoded_paths_and_badges(tmp_path, monkeypatch):
+def test_local_links_encoded_paths_and_badges(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     monkeypatch.setattr(check_docs, "ROOT", tmp_path)
     (tmp_path / "README.md").write_text(
         "[part](docs/a%20b.md#标题-fields)\n"
@@ -58,8 +79,12 @@ def test_local_links_encoded_paths_and_badges(tmp_path, monkeypatch):
     ],
 )
 def test_broken_links_fail_with_source_location(
-    tmp_path, monkeypatch, capsys, text, expected
-):
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    text: str,
+    expected: str,
+) -> None:
     monkeypatch.setattr(check_docs, "ROOT", tmp_path)
     (tmp_path / "README.md").write_text(text, encoding="utf-8")
     assert check_docs.main([]) == 1
@@ -74,7 +99,12 @@ def test_broken_links_fail_with_source_location(
         "examples/study/broken.json",
     ],
 )
-def test_invalid_example_json_fails(tmp_path, monkeypatch, capsys, name):
+def test_invalid_example_json_fails(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    name: str,
+) -> None:
     monkeypatch.setattr(check_docs, "ROOT", tmp_path)
     example: Path = tmp_path / name
     example.parent.mkdir(parents=True)
@@ -83,7 +113,9 @@ def test_invalid_example_json_fails(tmp_path, monkeypatch, capsys, name):
     assert f"{name}: invalid JSON" in capsys.readouterr().out
 
 
-def test_interpretation_docs_are_checked(tmp_path, monkeypatch, capsys):
+def test_interpretation_docs_are_checked(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
     monkeypatch.setattr(check_docs, "ROOT", tmp_path)
     path = tmp_path / "docs/interpretation/shared/reference.md"
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -94,8 +126,8 @@ def test_interpretation_docs_are_checked(tmp_path, monkeypatch, capsys):
 
 
 def test_current_links_to_missing_historical_files_or_anchors_still_fail(
-    tmp_path, monkeypatch, capsys
-):
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
     monkeypatch.setattr(check_docs, "ROOT", tmp_path)
     archive = tmp_path / "docs/validation"
     archive.mkdir(parents=True)
@@ -111,7 +143,7 @@ def test_current_links_to_missing_historical_files_or_anchors_still_fail(
     assert "missing heading anchor" in output
 
 
-def test_reference_links_and_multiline_html_keep_source_locations():
+def test_reference_links_and_multiline_html_keep_source_locations() -> None:
     document = check_docs.inspect_markdown(
         "[guide][Getting Started]\n![logo][logo]\n[logo][]\n"
         '<a\n href="docs/start.md#setup">Start</a>\n'
@@ -134,7 +166,9 @@ def test_reference_links_and_multiline_html_keep_source_locations():
     "text",
     ['<img src="missing.png">', "[logo][asset]\n\n[asset]: missing.png"],
 )
-def test_missing_html_and_reference_assets_fail(tmp_path, monkeypatch, text):
+def test_missing_html_and_reference_assets_fail(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, text: str
+) -> None:
     monkeypatch.setattr(check_docs, "ROOT", tmp_path)
     (tmp_path / "README.md").write_text(text, encoding="utf-8")
     assert check_docs.main([]) == 1

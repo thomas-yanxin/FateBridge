@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from itertools import product
 
 import pytest
@@ -10,6 +10,7 @@ from fatebridge.core.metaphysics.common import MetaphysicsSeed
 from fatebridge.core.metaphysics.qimen import build_qimen_board, qimen_futou_for_ganzhi
 from fatebridge.services.divination import calculate_sanshiunited_analysis
 from fatebridge.services.metaphysics import calculate_qimen_analysis
+from fatebridge.utils.civil_time import NominalClockLabel
 
 
 def _make_seed(
@@ -20,9 +21,10 @@ def _make_seed(
     days_since_current: float,
     term_day_ganzhi: str | None = None,
 ) -> MetaphysicsSeed:
+    civil = datetime(2028, 4, 6, 9, 33, tzinfo=timezone(timedelta(hours=8)))
     return MetaphysicsSeed(
-        input_datetime=datetime(2028, 4, 6, 9, 33, 0),
-        corrected_datetime=datetime(2028, 4, 6, 9, 33, 0),
+        input_datetime=civil,
+        clock=NominalClockLabel.from_local_datetime(civil),
         timezone="+08:00",
         longitude=121.4737,
         applied_true_solar=False,
@@ -42,6 +44,7 @@ def _make_seed(
                 "days_since_current": days_since_current,
             },
         },
+        input_offset_visible=False,
     )
 
 
@@ -121,7 +124,7 @@ def test_calculate_qimen_analysis_keeps_day_reference_and_uses_hour_xun() -> Non
 
 
 @pytest.mark.parametrize("dun,ju", list(product(["阳遁", "阴遁"], range(1, 10))))
-def test_all_1080_boards_preserve_stars_stems_doors_gods_and_leaders(dun, ju):
+def test_all_1080_boards_preserve_stars_stems_doors_gods_and_leaders(dun, ju) -> None:
     stems, branches = "甲乙丙丁戊己庚辛壬癸", "子丑寅卯辰巳午未申酉戌亥"
     for i in range(60):
         hour = stems[i % 10] + branches[i % 12]
@@ -156,3 +159,5 @@ def test_all_1080_boards_preserve_stars_stems_doors_gods_and_leaders(dun, ju):
         assert at["god"] == "值符"
         if i % 10 == 0:
             assert all(p["heaven_stem"] == p["earth_stem"] for p in outer)
+        else:
+            pass

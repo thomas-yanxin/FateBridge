@@ -6,8 +6,8 @@ import pytest
 from pydantic import ValidationError
 
 from fatebridge.application.execution import OutputContractError, validate_output
+from fatebridge.core.contracts.output_chinese import Jinkou, JinkouYearFate
 from fatebridge.core.metaphysics.jinkou_year_fate import ordinal_year_fate
-from fatebridge.core.output_chinese import Jinkou, JinkouYearFate
 from fatebridge.core.requests.metaphysics import JinkouAnalysisRequest
 from fatebridge.services.metaphysics import calculate_jinkou_analysis
 from scripts.ren.audit_jinkou_year_fate import course_cases, references
@@ -20,7 +20,7 @@ SPEC = SPECS["jinkou"]
 
 
 @pytest.mark.parametrize("case", REF["source_ordinal_examples"])
-def test_printed_ordinal_examples(case):
+def test_printed_ordinal_examples(case) -> None:
     value = ordinal_year_fate(
         birth_year_ganzhi=case["birth_year_ganzhi"],
         age=case["age"],
@@ -33,7 +33,7 @@ def test_printed_ordinal_examples(case):
 
 @pytest.mark.parametrize("case", REF["start_table"])
 @pytest.mark.parametrize("sex,key", [("男", "male"), ("女", "female")])
-def test_every_birth_xun_has_its_own_printed_start(case, sex, key):
+def test_every_birth_xun_has_its_own_printed_start(case, sex: str, key: str) -> None:
     value = ordinal_year_fate(birth_year_ganzhi=case["birth_xun"], age=1, gender=sex)
     assert value["ganzhi"] == case[key]
 
@@ -47,7 +47,9 @@ def test_every_birth_xun_has_its_own_printed_start(case, sex, key):
         (None, 20, "female", ["birth_year_ganzhi"]),
     ],
 )
-def test_missing_facts_are_retained_without_inference(born, age, sex, missing):
+def test_missing_facts_are_retained_without_inference(
+    born: str | None, age: int | None, sex: str | None, missing
+) -> None:
     value = ordinal_year_fate(birth_year_ganzhi=born, age=age, gender=sex)
     assert value["missing_inputs"] == missing and value["status"] == "missing_inputs"
     assert value["ganzhi"] is None and value["branch"] is None
@@ -66,7 +68,7 @@ def test_missing_facts_are_retained_without_inference(born, age, sex, missing):
         {"natal_branch": "子"},
     ],
 )
-def test_invalid_or_contradictory_explicit_facts_rejected(change):
+def test_invalid_or_contradictory_explicit_facts_rejected(change) -> None:
     with pytest.raises(ValidationError):
         JinkouAnalysisRequest.model_validate(
             {**COURSE["calendar"], "gender": "男", **change}
@@ -102,7 +104,9 @@ def complete():
         "natal",
     ],
 )
-def test_copresent_year_fate_facts_cannot_contradict_the_course(complete, fault):
+def test_copresent_year_fate_facts_cannot_contradict_the_course(
+    complete, fault: str
+) -> None:
     v = copy.deepcopy(complete["jinkou"])
     y = v["year_fate"]
     if fault == "age":
@@ -135,6 +139,8 @@ def test_copresent_year_fate_facts_cannot_contradict_the_course(complete, fault)
                 trace["result"]["si_jue"]["natal"][
                     "input_source"
                 ] = "explicit_natal_branch"
+            else:
+                pass
     elif fault == "drop_course":
         y["course"] = None
     else:
@@ -151,7 +157,7 @@ def test_copresent_year_fate_facts_cannot_contradict_the_course(complete, fault)
         {"status": "missing_inputs", "course": None},
     ],
 )
-def test_sparse_projections_do_not_invent_omitted_inputs(payload):
+def test_sparse_projections_do_not_invent_omitted_inputs(payload) -> None:
     JinkouYearFate.model_validate(payload)
 
 
@@ -160,8 +166,8 @@ def test_sparse_projections_do_not_invent_omitted_inputs(payload):
     ["omit_year_fate", "omit_course_rows", "omit_nullable_birth", "reuse_another_day"],
 )
 def test_complete_business_cannot_hide_annual_inputs_or_reuse_another_day(
-    complete, fault
-):
+    complete, fault: str
+) -> None:
     body = copy.deepcopy(complete)
     y = body["jinkou"]["year_fate"]
     if fault == "omit_year_fate":
@@ -182,7 +188,7 @@ def test_complete_business_cannot_hide_annual_inputs_or_reuse_another_day(
 
 
 @pytest.mark.parametrize("case", CASES)
-def test_independent_year_course_and_real_rest_mcp_cli(case, surface_calls):
+def test_independent_year_course_and_real_rest_mcp_cli(case, surface_calls) -> None:
     payload = {
         **COURSE["calendar"],
         "gender": case["gender"],
@@ -237,7 +243,9 @@ def test_independent_year_course_and_real_rest_mcp_cli(case, surface_calls):
     assert len(set(facts)) == 1
 
 
-def test_unknown_sex_keeps_year_course_unknown_in_strict_three_port_view(surface_calls):
+def test_unknown_sex_keeps_year_course_unknown_in_strict_three_port_view(
+    surface_calls,
+) -> None:
     from fatebridge.application.examples import evidence_views
 
     view = evidence_views(SPEC)["year_fate"]
@@ -286,7 +294,7 @@ def test_unknown_sex_keeps_year_course_unknown_in_strict_three_port_view(surface
     assert len(set(facts)) == 1
 
 
-def test_invalid_birth_ganzhi_is_rejected_by_all_actual_ports(surface_calls):
+def test_invalid_birth_ganzhi_is_rejected_by_all_actual_ports(surface_calls) -> None:
     payload = {**COURSE["calendar"], "birth_year_ganzhi": "甲丑", "gender": "男"}
     response, protocol, code, _ = surface_calls(
         SPEC, payload, params={"as_of": AS_OF}, cli_first=False

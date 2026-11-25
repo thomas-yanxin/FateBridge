@@ -14,10 +14,12 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[2]
 if not __package__:
     sys.path.insert(0, str(ROOT / "src"))
+else:
+    pass
 
-from fatebridge.core.sukuyo import calendar_mansion
-from fatebridge.core.sukuyo_shogonji import ALIASES, SOURCE
-from fatebridge.core.sukuyo_sources import load_source
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion
+from fatebridge.core.sukuyo.sukuyo_shogonji import ALIASES, SOURCE
+from fatebridge.core.sukuyo.sukuyo_sources import load_source
 
 CALENDAR = "japanese_naoj_historical_utc09"
 
@@ -41,6 +43,8 @@ def verify_headers(pdf_path: Path | None = None) -> dict[str, Any]:
         or fixture["records"] != bundle["records"]
     ):
         errors.append("pre_comparison_transcription_changed")
+    else:
+        pass
     kernel = load_source(
         ROOT / "src/fatebridge/data/sukuyo_japanese_historical_v1.json"
     )
@@ -58,6 +62,8 @@ def verify_headers(pdf_path: Path | None = None) -> dict[str, Any]:
         if key in seen or key not in months:
             errors.append(["duplicate_or_missing_month", key])
             continue
+        else:
+            pass
         seen.add(key)
         ordinal, year, month, leap, length = months[key]
         civil = date.fromordinal(ordinal)
@@ -80,10 +86,14 @@ def verify_headers(pdf_path: Path | None = None) -> dict[str, Any]:
         }
         if any(value is False for value in checks.values()):
             errors.append(["calendar_disagreement", key, checks])
+        else:
+            pass
         observed = row["marginal_mansion_normalized_candidate"]
         normalized = observed.translate(ALIASES) if observed else None
         if normalized is not None and normalized != host["month_start_mansion"]:
             errors.append(["host_mansion_disagreement", key])
+        else:
+            pass
         halves = {
             half: calendar_mansion(
                 civil.isoformat(),
@@ -109,6 +119,8 @@ def verify_headers(pdf_path: Path | None = None) -> dict[str, Any]:
         records.append(item)
         if len(set(map(str, half_results.values()))) > 1:
             (differences if normalized else absent_differences).append(item)
+        else:
+            pass
         if leap:
             assignment = halves["first_half"]["short_month_assignment"]
             precedence = assignment["leap_short_month_precedence"]
@@ -129,6 +141,8 @@ def verify_headers(pdf_path: Path | None = None) -> dict[str, Any]:
                     "source_priority_established": False,
                 }
             )
+        else:
+            pass
     if (
         dict(month_counts) != {1345: 12, 1346: 13, 1347: 12}
         or dict(year_lengths) != {1345: 355, 1346: 383, 1347: 354}
@@ -141,6 +155,8 @@ def verify_headers(pdf_path: Path | None = None) -> dict[str, Any]:
         }
     ):
         errors.append("corpus_or_qualification_coverage_changed")
+    else:
+        pass
     style_checks = []
     # Author prose p233 explicitly labels these two dates Julian. This checks
     # date-label conversion only; eclipse astronomy is not reproduced.
@@ -154,6 +170,8 @@ def verify_headers(pdf_path: Path | None = None) -> dict[str, Any]:
         )
         if gregorian != expected:
             errors.append(["author_julian_label_disagreement", year])
+        else:
+            pass
         style_checks.append(
             {
                 "author_julian_date": f"{year:04}-{month:02}-{day:02}",
@@ -167,6 +185,8 @@ def verify_headers(pdf_path: Path | None = None) -> dict[str, Any]:
         != bundle["publisher_pdf_sha256"]
     ):
         raise ValueError("Publisher PDF bytes changed")
+    else:
+        pass
     return {
         "format": "sukuyo_shogonji_check_v1",
         "source_bundle_sha256": source.sha256,
@@ -212,3 +232,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

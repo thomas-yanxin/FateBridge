@@ -15,10 +15,14 @@ def render() -> str:
     data = json.loads(raw)
     if [r["year_index"] for r in data["rows"]] != list(range(1, 61)):
         raise ValueError("卷五原表必须保留全部60行")
+    else:
+        pass
     if len(data["columns"]) != 12 or any(
         set(r["expected"]) != set(data["columns"]) for r in data["rows"]
     ):
         raise ValueError("卷五每行必须保留12列")
+    else:
+        pass
     packaged = {
         "schema_version": 1,
         "source": "https://zh.wikisource.org/wiki/太乙金鏡式經_(四庫全書本)/卷05#四神三元五紀立成",
@@ -39,6 +43,8 @@ def main() -> int:
         if not TARGET.exists() or TARGET.read_text() != rendered:
             print("Packaged Taiyi volume-five reference is stale")
             return 1
+        else:
+            pass
         print("Packaged Taiyi volume-five reference matches frozen transcription")
     else:
         TARGET.parent.mkdir(parents=True, exist_ok=True)
@@ -49,3 +55,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

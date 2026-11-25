@@ -6,22 +6,22 @@ import json
 from pathlib import Path
 from typing import Any
 
-from fatebridge.validation.taiyi_epoch import (
-    mean_origin_hypothesis,
-    sexagenary_hypothesis,
-)
+from scripts.taiyi.audit_taiyi_day_epoch import audit as day_epoch_audit
+from scripts.taiyi.audit_taiyi_lunation_chain import audit as lunation_audit
 from scripts.taiyi.taiyi_origin_sources import (
     CORPUS,
     FREEZE_SHA256,
     ROOT,
     read_origin_sources,
 )
+from validation.taiyi_epoch import (
+    mean_origin_hypothesis,
+    sexagenary_hypothesis,
+)
 
 
 def audit(corpus: Path = CORPUS, *, root: Path = ROOT) -> dict[str, Any]:
     reading = read_origin_sources(corpus, root=root)
-    from scripts.taiyi.audit_taiyi_day_epoch import audit as day_epoch_audit
-    from scripts.taiyi.audit_taiyi_lunation_chain import audit as lunation_audit
 
     v28 = day_epoch_audit()
     v32 = lunation_audit(root=root)
@@ -85,6 +85,8 @@ def audit(corpus: Path = CORPUS, *, root: Path = ROOT) -> dict[str, Any]:
         )
     if len(cohorts) != 8 or len(old_calendar["records"]) != 355:
         raise ValueError("V33 must retain all8 cohorts and355 old calendar rows")
+    else:
+        pass
     return {
         "freeze_sha256": FREEZE_SHA256,
         "date_tokens_by_edition": reading["day_tokens"],

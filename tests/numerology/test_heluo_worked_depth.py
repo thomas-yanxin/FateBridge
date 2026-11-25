@@ -6,24 +6,9 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.heluo import calculate, da_yun, gua_lines, transform_houtian
-from fatebridge.core.heluo_timing import SOURCE_SHA256
-
-ROOT = Path(__file__).parents[1] / "fixtures/numerology_nlc_v1"
-REFERENCE = json.loads((ROOT / "worked-reference.json").read_text())
-
-
-def calculate_case(case, **changes):
-    pillars = dict(zip(("year", "month", "day", "hour"), case["pillars"]))
-    args = dict(
-        four_pillars=pillars,
-        gender=case["gender"],
-        birth_year=case["computational_year"],
-        month_zhi=pillars["month"][1],
-        hour_zhi=pillars["hour"][1],
-        month_yang_ling=case["yang_ling"],
-    )
-    return calculate(**{**args, **changes})
+from fatebridge.core.heluo.heluo import calculate, da_yun, gua_lines, transform_houtian
+from fatebridge.core.heluo.heluo_timing import SOURCE_SHA256
+from tests.unit_test.fixtures.heluo_worked import REFERENCE, ROOT, calculate_case
 
 
 def lookup(result, field):
@@ -33,7 +18,7 @@ def lookup(result, field):
 
 
 @pytest.mark.parametrize("case", REFERENCE["cases"], ids=lambda c: c["id"])
-def test_original_worked_steps_and_hand_added_totals(case):
+def test_original_worked_steps_and_hand_added_totals(case) -> None:
     result = calculate_case(case)
     for field, expected in case["arithmetic_totals"].items():
         assert result[field] == expected
@@ -46,9 +31,13 @@ def test_original_worked_steps_and_hand_added_totals(case):
     if "direct_houtian_start_age" in case:
         timing = da_yun(result["xian"], result["hou"])
         assert timing["hou"][0]["ageStart"] == case["direct_houtian_start_age"]
+    else:
+        pass
 
 
-def test_new_source_witnesses_are_identified_without_certifying_dates_or_outcomes():
+def test_new_source_witnesses_are_identified_without_certifying_dates_or_outcomes() -> (
+    None
+):
     manifest = json.loads((ROOT / "worked-manifest.json").read_text())
     assert (
         REFERENCE["source_pdf_sha256"] == manifest["source_pdf_sha256"] == SOURCE_SHA256
@@ -64,7 +53,7 @@ def test_new_source_witnesses_are_identified_without_certifying_dates_or_outcome
     assert not REFERENCE["independent_second_review_completed"]
 
 
-def test_literal_disagreements_cannot_be_replaced_with_runtime_answers():
+def test_literal_disagreements_cannot_be_replaced_with_runtime_answers() -> None:
     differences = []
     for case in REFERENCE["cases"]:
         result = calculate_case(case)
@@ -79,6 +68,8 @@ def test_literal_disagreements_cannot_be_replaced_with_runtime_answers():
                         repeated_in_source=case["source_repeated_totals"][field],
                     )
                 )
+            else:
+                pass
     assert differences == REFERENCE["expected_source_total_disagreements"]
     assert differences  # A nonempty disagreement must remain in the audit.
     dates = REFERENCE["cases"][1]["source_date_readings"]
@@ -86,15 +77,17 @@ def test_literal_disagreements_cannot_be_replaced_with_runtime_answers():
 
 
 @pytest.mark.parametrize("value", ["false", "true", "", "0", 0, 1, [], {}, None])
-def test_houtian_half_year_must_be_boolean(value):
+def test_houtian_half_year_must_be_boolean(value) -> None:
     with pytest.raises(ValueError, match="阴阳令"):
         transform_houtian("水雷屯", gua_lines("坎", "震"), 5, value)
     if value is not None:
         with pytest.raises(ValueError, match="阴阳令"):
             calculate_case(REFERENCE["cases"][3], month_yang_ling=value)
+    else:
+        pass
 
 
-def test_tun_five_half_year_difference_is_preserved_and_no_input_mutates():
+def test_tun_five_half_year_difference_is_preserved_and_no_input_mutates() -> None:
     lines = [1, 0, 0, 0, 1, 0]  # 屯, initial to upper.
     yin = transform_houtian("水雷屯", lines, 5, False)
     yang = transform_houtian("水雷屯", lines, 5, True)
@@ -112,7 +105,7 @@ def test_tun_five_half_year_difference_is_preserved_and_no_input_mutates():
 
 
 @pytest.mark.parametrize("position", [True, False, 0, 7, -1, 1.0, "5", None])
-def test_houtian_cannot_use_negative_indices_or_coerced_positions(position):
+def test_houtian_cannot_use_negative_indices_or_coerced_positions(position) -> None:
     with pytest.raises(ValueError, match="元堂"):
         transform_houtian("水雷屯", gua_lines("坎", "震"), position, False)
 
@@ -129,12 +122,12 @@ def test_houtian_cannot_use_negative_indices_or_coerced_positions(position):
         [1.0, 0, 0, 0, 1, 0],
     ],
 )
-def test_houtian_rejects_malformed_line_data(lines):
+def test_houtian_rejects_malformed_line_data(lines) -> None:
     with pytest.raises(ValueError, match="六个0/1"):
         transform_houtian("水雷屯", lines, 5, False)
 
 
-def test_wrong_name_cannot_switch_the_three_supreme_exception():
+def test_wrong_name_cannot_switch_the_three_supreme_exception() -> None:
     # Same six bits would otherwise produce a different result depending only
     # on the inconsistent name used to choose the exception.
     with pytest.raises(ValueError, match="卦名"):
@@ -142,7 +135,7 @@ def test_wrong_name_cannot_switch_the_three_supreme_exception():
 
 
 @pytest.mark.parametrize("case", REFERENCE["cases"][:3], ids=lambda c: c["id"])
-def test_derived_houtian_positions_are_not_counted_as_direct_readings(case):
+def test_derived_houtian_positions_are_not_counted_as_direct_readings(case) -> None:
     result = calculate_case(case)
     for field, expected in case.get("rule_derived_expected", {}).items():
         assert lookup(result, field) == expected

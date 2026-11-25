@@ -17,7 +17,7 @@ def _counts(**by_name: float) -> dict:
     return {name_to_element[name]: weight for name, weight in by_name.items()}
 
 
-def test_knife_edge_chart_is_deterministic_and_sums_to_100():
+def test_knife_edge_chart_is_deterministic_and_sums_to_100() -> None:
     # 庚午/辛巳/庚辰/辛巳：金 5.0 / 火 4.5 / 土 3.0 / 木 0.5 / 水 0.5，总权重 13.5。
     # 各项 round 后和为 99.9，旧逻辑在此刀刃上随 sum() 实现翻转；现固定补到 100。
     counts = _counts(金=5.0, 火=4.5, 土=3.0, 木=0.5, 水=0.5)
@@ -28,7 +28,7 @@ def test_knife_edge_chart_is_deterministic_and_sums_to_100():
     assert round(sum(result.values()), 1) == 100.0
 
 
-def test_always_normalizes_to_exactly_100():
+def test_always_normalizes_to_exactly_100() -> None:
     # 不变量：无论权重如何，归一化后总和恰为 100%。
     for counts in (
         _counts(金=5.0, 火=4.5, 土=3.0, 木=0.5, 水=0.5),  # 和偏低 0.1

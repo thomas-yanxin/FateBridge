@@ -1,12 +1,13 @@
 """Eastern intersection from independent horizon constraints and native method.
 
 The altitude constraint follows USNO faq/alt_az. The Swiss houses_armc oracle
-uses the same supplied sidereal angle and mean obliquity, isolating branch
-selection from the fallback's deliberately approximate sidereal-time model.
+uses the same supplied source sidereal angle and true obliquity, isolating
+branch selection from the fallback's source-frame attitude approximation.
 Neither test certifies the fallback's accuracy at all epochs.
 """
 
 import math
+from datetime import datetime, timezone
 from itertools import product
 
 import pytest
@@ -14,40 +15,47 @@ import pytest
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.angle_definitions import geographic_pole_angle_definition
 from fatebridge.core.astro.chart import build_core_chart_payload
-from fatebridge.core.astro.geometry import _angles, _gmst, _sign_name
+from fatebridge.core.astro.earth_attitude import analytic_earth_attitude
+from fatebridge.core.astro.geometry import _angles, _sign_name
+from fatebridge.core.astro.time_scales import fallback_julian_day_tt, utc_clock
 from fatebridge.core.local_techniques.chart import _build_birth_info
 from fatebridge.core.local_techniques.otherbu import build_otherbu_result
 
 JD = 2460483.0
-EPS = 23.439291 - 0.0130042 * ((JD - 2451545.0) / 36525.0)
+TT = fallback_julian_day_tt(JD, None)
+ATTITUDE = analytic_earth_attitude(JD, TT)
+EPS = ATTITUDE.true_obliquity
 LATITUDES = [-89.9999, -80, -66.6, -40, 0, 40, 66.6, 80, 89.9999]
 FACES = {"planet": "Jupiter", "sign": "Aries", "house": 0}
 SKY = {"date": "2024-06-21", "time": "12:00", "zone": "UTC", "lon": 0}
 
 
-def geographic_longitude(armc):
-    return (armc - _gmst(JD) + 180) % 360 - 180
+def geographic_longitude(armc, *, julian_day_tt=TT):
+    attitude = analytic_earth_attitude(JD, julian_day_tt)
+    return (armc - attitude.equator.greenwich_sidereal_degrees + 180) % 360 - 180
 
 
-@pytest.mark.parametrize("latitude,armc", list(product(LATITUDES, range(0, 360, 5))))
-def test_approximate_ascendant_satisfies_horizon_and_eastern_hemisphere(latitude, armc):
-    result = _angles(JD, geographic_longitude(armc), latitude)
-    lam, eps, phi, theta = map(math.radians, [result["ascendant"], EPS, latitude, armc])
-    # Independently convert the returned longitude to equatorial RA/Dec, then
-    # apply USNO's altitude equation and the local eastern component.
-    ra = math.atan2(math.sin(lam) * math.cos(eps), math.cos(lam))
-    dec = math.asin(math.sin(lam) * math.sin(eps))
-    hour_angle = theta - ra
-    sin_altitude = math.cos(hour_angle) * math.cos(dec) * math.cos(phi) + math.sin(
-        dec
-    ) * math.sin(phi)
-    eastern_component = -math.cos(dec) * math.sin(hour_angle)
-    assert abs(sin_altitude) < 2e-14
-    assert eastern_component > 0
-    assert 0 <= result["ascendant"] < 360
+def test_approximate_ascendant_satisfies_horizon_and_eastern_hemisphere() -> None:
+    for latitude, armc in product(LATITUDES, range(0, 360, 5)):
+        result = _angles(JD, geographic_longitude(armc), latitude)
+        lam, eps, phi, theta = map(
+            math.radians, [result["ascendant"], EPS, latitude, armc]
+        )
+        # Independently convert the returned longitude to equatorial RA/Dec, then
+        # apply USNO's altitude equation and the local eastern component.
+        ra = math.atan2(math.sin(lam) * math.cos(eps), math.cos(lam))
+        dec = math.asin(math.sin(lam) * math.sin(eps))
+        hour_angle = theta - ra
+        sin_altitude = math.cos(hour_angle) * math.cos(dec) * math.cos(phi) + math.sin(
+            dec
+        ) * math.sin(phi)
+        eastern_component = -math.cos(dec) * math.sin(hour_angle)
+        assert abs(sin_altitude) < 2e-14
+        assert eastern_component > 0
+        assert 0 <= result["ascendant"] < 360
 
 
-def test_approximate_branch_matches_native_method_with_identical_angle_inputs():
+def test_approximate_branch_matches_native_method_with_identical_angle_inputs() -> None:
     swe = pytest.importorskip("swisseph")
     for latitude, armc in product(LATITUDES, range(0, 360, 5)):
         actual = _angles(JD, geographic_longitude(armc), latitude)
@@ -58,13 +66,15 @@ def test_approximate_branch_matches_native_method_with_identical_angle_inputs():
 
 
 @pytest.mark.parametrize("latitude,armc", [(80, 270), (-80, 90)])
-def test_known_offline_counterexamples_use_eastern_intersection(latitude, armc):
+def test_known_offline_counterexamples_use_eastern_intersection(
+    latitude, armc: int
+) -> None:
     result = _angles(JD, geographic_longitude(armc), latitude)
     expected = 0 if latitude > 0 else 180
     assert abs((result["ascendant"] - expected + 180) % 360 - 180) < 1e-10
 
 
-def test_branch_flip_does_not_round_a_pre_zero_intersection_into_aries():
+def test_branch_flip_does_not_round_a_pre_zero_intersection_into_aries() -> None:
     # The unflipped computed candidate is 179.99999999999997 degrees. An
     # intermediate +180 rounds it to 360; exact reduction of those supplied
     # floats retains the preceding representable side. No accuracy claim is
@@ -75,11 +85,14 @@ def test_branch_flip_does_not_round_a_pre_zero_intersection_into_aries():
     assert _sign_name(result["ascendant"]) == "Pisces"
 
 
-def test_offline_high_latitude_context_recomputes_houses_and_fortune(monkeypatch):
+def test_offline_high_latitude_context_recomputes_houses_and_fortune(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setattr(runtime, "swe", None)
+    tt = utc_clock(datetime(2024, 6, 21, 12, tzinfo=timezone.utc)).tt
     result = build_otherbu_result(
         **FACES,
-        **{**SKY, "lon": geographic_longitude(270)},
+        **{**SKY, "lon": geographic_longitude(270, julian_day_tt=tt)},
         lat=80,
         hsys=0,
         fortune_method="ptolemy_iii10",
@@ -98,10 +111,12 @@ def test_offline_high_latitude_context_recomputes_houses_and_fortune(monkeypatch
 @pytest.mark.parametrize("latitude", [-90, 90])
 @pytest.mark.parametrize("native", [True, False])
 def test_exact_pole_keeps_computable_sky_and_declares_meridian_convention(
-    monkeypatch, latitude, native
-):
+    monkeypatch: pytest.MonkeyPatch, latitude, native: bool
+) -> None:
     if not native:
         monkeypatch.setattr(runtime, "swe", None)
+    else:
+        pass
     result = build_otherbu_result(**FACES, **SKY, lat=latitude, hsys=0)
     sky = result["chart"]
     profile = sky["params"]["chart_profile"]
@@ -118,7 +133,6 @@ def test_exact_pole_keeps_computable_sky_and_declares_meridian_convention(
     plain = build_otherbu_result(**FACES)
     for key in [
         "symbolic_details",
-        "interpretation",
         "rule_trace",
         "rulesets",
         "diceChart",
@@ -127,7 +141,7 @@ def test_exact_pole_keeps_computable_sky_and_declares_meridian_convention(
 
 
 @pytest.mark.parametrize("latitude", [-90, 90])
-def test_shared_core_summary_keeps_the_same_pole_qualification(latitude):
+def test_shared_core_summary_keeps_the_same_pole_qualification(latitude) -> None:
     birth, _, _ = _build_birth_info(
         date_text=SKY["date"],
         time_text=SKY["time"],
@@ -140,11 +154,11 @@ def test_shared_core_summary_keeps_the_same_pole_qualification(latitude):
 
 
 @pytest.mark.parametrize("latitude", [-89.999999999, -80, 0, 80, 89.999999999])
-def test_nearby_latitudes_are_not_reclassified_as_exact_poles(latitude):
+def test_nearby_latitudes_are_not_reclassified_as_exact_poles(latitude) -> None:
     assert geographic_pole_angle_definition(latitude) is None
 
 
-def test_pole_definition_cannot_be_mutated_for_later_calls():
+def test_pole_definition_cannot_be_mutated_for_later_calls() -> None:
     first = geographic_pole_angle_definition(90)
     first["source_urls"].clear()
     assert len(geographic_pole_angle_definition(90)["source_urls"]) == 2

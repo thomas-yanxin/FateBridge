@@ -8,11 +8,11 @@ from jsonschema import ValidationError as SchemaError
 from pydantic import ValidationError
 
 from fatebridge.application.execution import OutputContractError, validate_output
+from fatebridge.core.contracts.output_sanshi import SanshiSynthesis
 from fatebridge.core.metaphysics.sanshi_correspondences import (
     PHYSICAL,
     palace_correspondences,
 )
-from fatebridge.core.output_sanshi import SanshiSynthesis
 from fatebridge.services.divination import calculate_sanshiunited_analysis
 from fatebridge.services.tool_catalog import CATALOG
 from tests.support.reference_data import resolve
@@ -29,7 +29,7 @@ def result():
     )
 
 
-def test_every_join_fact_reads_the_same_actual_boards(result):
+def test_every_join_fact_reads_the_same_actual_boards(result) -> None:
     synthesis = result["synthesis"]
     SanshiSynthesis.model_validate(synthesis)
     joined = synthesis["palace_correspondences"]
@@ -64,6 +64,8 @@ def test_every_join_fact_reads_the_same_actual_boards(result):
             for key, value in profile.items():
                 if key not in {"source_path", "source_title", "unresolved_count"}:
                     assert original[key] == value
+                else:
+                    pass
             assert profile["source_title"] == original.get(
                 "source_title", original.get("title", "")
             )
@@ -84,8 +86,8 @@ def test_every_join_fact_reads_the_same_actual_boards(result):
     ],
 )
 def test_all_nine_positions_do_not_reuse_taiyi_number(
-    result, taiyi_number, trigram, qimen_number
-):
+    result, taiyi_number: int, trigram: str, qimen_number: int
+) -> None:
     taiyi = deepcopy(result["taiyi"])
     taiyi["core_board"]["main_general"] = taiyi_number
     rows = palace_correspondences(taiyi, result["qimen"], result["liureng"])["entries"]
@@ -99,10 +101,14 @@ def test_all_nine_positions_do_not_reuse_taiyi_number(
     if taiyi_number == 5:
         assert row["taiyi_palace"] == "中" and row["qimen"]["trigram"] == "中"
         assert row["qimen"]["star"] is None  # No invented center star/god.
+    else:
+        pass
 
 
 @pytest.mark.parametrize("failure", ["duplicate", "trigram"])
-def test_missing_or_displaced_physical_palace_cannot_silently_join(result, failure):
+def test_missing_or_displaced_physical_palace_cannot_silently_join(
+    result, failure: str
+) -> None:
     qimen = deepcopy(result["qimen"])
     number = PHYSICAL[result["taiyi"]["core_board"]["taiyi_number"]][1]
     palace = next(p for p in qimen["palaces"] if p["index"] == number)
@@ -114,7 +120,7 @@ def test_missing_or_displaced_physical_palace_cannot_silently_join(result, failu
         palace_correspondences(result["taiyi"], qimen, result["liureng"])
 
 
-def test_public_join_contract_rejects_numerical_facts_as_strings():
+def test_public_join_contract_rejects_numerical_facts_as_strings() -> None:
     with pytest.raises(ValidationError):
         SanshiSynthesis.model_validate(
             {"palace_correspondences": {"entries": [{"taiyi_number": "1"}]}}
@@ -132,7 +138,7 @@ def test_public_join_contract_rejects_numerical_facts_as_strings():
 )
 def test_catalog_root_checks_synthesis_instead_of_accepting_an_untyped_extension(
     synthesis,
-):
+) -> None:
     spec = next(spec for spec in CATALOG if spec.key == "sanshiunited")
     with pytest.raises(ValidationError):
         spec.output_model.model_validate({"synthesis": synthesis})
@@ -143,7 +149,9 @@ def test_catalog_root_checks_synthesis_instead_of_accepting_an_untyped_extension
 
 
 @pytest.mark.parametrize("failure", ["missing", "null", "empty"])
-def test_complete_execution_keeps_the_computed_synthesis_root(result, failure):
+def test_complete_execution_keeps_the_computed_synthesis_root(
+    result, failure: str
+) -> None:
     spec = next(spec for spec in CATALOG if spec.key == "sanshiunited")
     validate_output(spec, result)
     broken = deepcopy(result)
@@ -163,13 +171,15 @@ def test_complete_execution_keeps_the_computed_synthesis_root(result, failure):
         {"synthesis": None},
     ],
 )
-def test_synthesis_projection_retains_unknown_facts_and_omitted_siblings(projected):
+def test_synthesis_projection_retains_unknown_facts_and_omitted_siblings(
+    projected,
+) -> None:
     spec = next(spec for spec in CATALOG if spec.key == "sanshiunited")
     spec.output_model.model_validate(projected)
     Draft202012Validator(spec.output_model.model_json_schema()).validate(projected)
 
 
-def test_source_profiles_resolve_in_the_current_default_year_calculation():
+def test_source_profiles_resolve_in_the_current_default_year_calculation() -> None:
     # Keep the fictional request; retire its rejected accNum=0 placeholder.
     result = calculate_sanshiunited_analysis(
         date="2028-04-06",
@@ -193,3 +203,5 @@ def test_source_profiles_resolve_in_the_current_default_year_calculation():
             for key, value in profile.items():
                 if key not in {"source_path", "source_title", "unresolved_count"}:
                     assert original[key] == value
+                else:
+                    pass

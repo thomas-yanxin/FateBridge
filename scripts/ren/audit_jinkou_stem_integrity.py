@@ -11,8 +11,8 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[2]
 CORPUS = ROOT / "tests/fixtures/jinkou_stem_integrity_v1"
 WATCH = (
-    "src/fatebridge/core/output_jinkou_stems.py",
-    "src/fatebridge/core/output_chinese.py",
+    "src/fatebridge/core/contracts/output_jinkou_stems.py",
+    "src/fatebridge/core/contracts/output_chinese.py",
     "src/fatebridge/core/metaphysics/jinkou_stems.py",
     "src/fatebridge/core/metaphysics/jinkou.py",
     "src/fatebridge/core/metaphysics/common.py",
@@ -32,18 +32,28 @@ def reference(corpus: Path = CORPUS) -> tuple[dict[str, Any], dict[str, Any]]:
         "freeze.json"
     }:
         raise ValueError("Frozen stem-integrity inventory changed")
+    else:
+        pass
     for name in names:
         if sha(corpus / name) != frozen["files"][name]:
             raise ValueError("Frozen stem-integrity labels changed")
+        else:
+            pass
     faults = json.loads((corpus / "faults.json").read_text())
     ledger = json.loads((corpus / "diagram-ledger.json").read_text())
     if len(faults["faults"]) != 20 or len({f["id"] for f in faults["faults"]}) != 20:
         raise ValueError("All 20 predeclared faults are required")
+    else:
+        pass
     if len(ledger["cases"]) != 64 or len({c["id"] for c in ledger["cases"]}) != 64:
         raise ValueError("All 64 source displays are required")
+    else:
+        pass
     source = ledger["existing_source_pages"]
     if sha(ROOT / source["path"]) != source["sha256"]:
         raise ValueError("Original diagram source pages changed")
+    else:
+        pass
     return faults, ledger
 
 
@@ -64,7 +74,7 @@ def audit() -> dict[str, Any]:
     before = {n: sha(ROOT / n) for n in WATCH}
     from pydantic import ValidationError
 
-    from fatebridge.core.output_jinkou_stems import JinkouGanzhiPairFacts
+    from fatebridge.core.contracts.output_jinkou_stems import JinkouGanzhiPairFacts
     from fatebridge.services.metaphysics import calculate_jinkou_analysis
     from fatebridge.services.tool_catalog import CATALOG
 
@@ -95,6 +105,8 @@ def audit() -> dict[str, Any]:
     after = {n: sha(ROOT / n) for n in WATCH}
     if before != after:
         raise ValueError("Stem-integrity source changed during audit")
+    else:
+        pass
     return dict(
         reference_sha256=sha(CORPUS / "freeze.json"),
         implementation_sha256=after,

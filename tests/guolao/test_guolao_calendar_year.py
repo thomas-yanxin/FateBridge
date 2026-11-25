@@ -8,9 +8,9 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core import guolao_calendar_year as year
-from fatebridge.core.guolao_historical import shoushi_winter_cycle
-from fatebridge.validation import guolao_calendars as audit
+from fatebridge.core.guolao import guolao_calendar_year as year
+from fatebridge.core.guolao.guolao_historical import shoushi_winter_cycle
+from validation import guolao_calendars as audit
 
 ROOT = Path(__file__).parents[2]
 FIXTURE = ROOT / "tests/fixtures/guolao-official-calendar-v1"
@@ -27,10 +27,12 @@ def wanli():
     return audit.compare_official_calendar("wanli27_1599_nlc_preview")
 
 
-def test_original_files_and_precomparison_transcription_remain_pinned():
+def test_original_files_and_precomparison_transcription_remain_pinned() -> None:
     for artifact in SOURCE["artifacts"]:
         if artifact["path"].endswith("-cli-stdout.json"):
             continue  # Retired program output is not an independent source.
+        else:
+            pass
         raw = (FIXTURE / artifact["path"]).read_bytes()
         assert len(raw) == artifact["bytes"]
         assert hashlib.sha256(raw).hexdigest() == artifact["sha256"]
@@ -45,7 +47,9 @@ def test_original_files_and_precomparison_transcription_remain_pinned():
     assert SOURCE["original_pdf_pages"] == 36
 
 
-def test_complete_jiajing_summary_matches_all_twelve_month_starts_and_sizes(jiajing):
+def test_complete_jiajing_summary_matches_all_twelve_month_starts_and_sizes(
+    jiajing,
+) -> None:
     calendar, reference = jiajing["calendar"], jiajing["reference"]
     assert calendar["complete_named_year_assigned"]
     assert (calendar["month_count"], calendar["total_days"]) == (12, 354)
@@ -80,8 +84,8 @@ def test_complete_jiajing_summary_matches_all_twelve_month_starts_and_sizes(jiaj
 
 @pytest.mark.parametrize("fixture_name", ["jiajing", "wanli"])
 def test_year_end_and_shared_civil_boundaries_do_not_include_prior_winter_months(
-    request, fixture_name
-):
+    request: pytest.FixtureRequest, fixture_name: str
+) -> None:
     calendar = request.getfixturevalue(fixture_name)["calendar"]
     rows = calendar["months"]
     assert rows[0]["month_number"] == 1 and not rows[0]["is_leap_month"]
@@ -107,7 +111,7 @@ def test_year_end_and_shared_civil_boundaries_do_not_include_prior_winter_months
 
 def test_partial_wanli_reference_retains_two_unreadable_starts_and_two_unprovided_year_fields(
     wanli,
-):
+) -> None:
     assert (wanli["calendar"]["month_count"], wanli["calendar"]["total_days"]) == (
         13,
         384,
@@ -133,13 +137,17 @@ def test_partial_wanli_reference_retains_two_unreadable_starts_and_two_unprovide
     assert not wanli["parameters_selected_by_reference_fit"]
 
 
-def test_unused_missing_late_neighbor_does_not_invalidate_completed_year(monkeypatch):
+def test_unused_missing_late_neighbor_does_not_invalidate_completed_year(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     original = year.gujin_table_conjunction
 
     def missing(middle, index):
         result = original(middle, index)
         if index == 17:
             result["research_conjunction_offset_from_winter_days_exact"] = None
+        else:
+            pass
         return result
 
     monkeypatch.setattr(year, "gujin_table_conjunction", missing)
@@ -154,14 +162,16 @@ def test_unused_missing_late_neighbor_does_not_invalidate_completed_year(monkeyp
 
 
 def test_required_missing_year_end_keeps_valid_months_but_not_aggregate_acceptance(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     original = year.gujin_table_conjunction
 
     def missing(middle, index):
         result = original(middle, index)
         if index == 15:
             result["research_conjunction_offset_from_winter_days_exact"] = None
+        else:
+            pass
         return result
 
     monkeypatch.setattr(year, "gujin_table_conjunction", missing)
@@ -175,7 +185,9 @@ def test_required_missing_year_end_keeps_valid_months_but_not_aggregate_acceptan
     assert result["status"] == "required_calculation_unavailable"
 
 
-def test_first_cycle_failure_never_borrows_next_year_or_runs_tail(jiajing, monkeypatch):
+def test_first_cycle_failure_never_borrows_next_year_or_runs_tail(
+    jiajing, monkeypatch: pytest.MonkeyPatch
+) -> None:
     base = copy.deepcopy(jiajing["calendar"]["first_winter_cycle"])
     base["month_assignment"]["status"] = "unresolved"
     monkeypatch.setattr(year, "gujin_fixed_qice_months", lambda _: base)
@@ -187,7 +199,7 @@ def test_first_cycle_failure_never_borrows_next_year_or_runs_tail(jiajing, monke
     assert result["months"] == [] and not result["complete_named_year_assigned"]
 
 
-def test_anomalous_tail_length_is_not_clamped(monkeypatch):
+def test_anomalous_tail_length_is_not_clamped(monkeypatch: pytest.MonkeyPatch) -> None:
     original = year.gujin_table_conjunction
 
     def shifted(middle, index):
@@ -196,6 +208,8 @@ def test_anomalous_tail_length_is_not_clamped(monkeypatch):
             result["research_conjunction_offset_from_winter_days_exact"] = str(
                 F(result["research_conjunction_offset_from_winter_days_exact"]) + 3
             )
+        else:
+            pass
         return result
 
     monkeypatch.setattr(year, "gujin_table_conjunction", shifted)
@@ -205,8 +219,8 @@ def test_anomalous_tail_length_is_not_clamped(monkeypatch):
 
 
 def test_tail_qi_sequence_conflict_not_relabelled_to_complete_year(
-    jiajing, monkeypatch
-):
+    jiajing, monkeypatch: pytest.MonkeyPatch
+) -> None:
     base = copy.deepcopy(jiajing["calendar"]["first_winter_cycle"])
     for i in [12, 13, 14]:
         row = base["conjunction_candidates"][i]
@@ -220,8 +234,8 @@ def test_tail_qi_sequence_conflict_not_relabelled_to_complete_year(
 
 
 def test_comparison_exposes_mismatches_without_fitting_or_dropping_them(
-    jiajing, monkeypatch
-):
+    jiajing, monkeypatch: pytest.MonkeyPatch
+) -> None:
     calendar = copy.deepcopy(jiajing["calendar"])
     calendar["months"][6]["length_days"] += 1
     calendar["months"][6]["sexagenary_start_day"] = "乙丑"
@@ -236,7 +250,9 @@ def test_comparison_exposes_mismatches_without_fitting_or_dropping_them(
     assert not result["parameters_selected_by_reference_fit"]
 
 
-def test_missing_computed_month_does_not_become_reference_failure(jiajing, monkeypatch):
+def test_missing_computed_month_does_not_become_reference_failure(
+    jiajing, monkeypatch: pytest.MonkeyPatch
+) -> None:
     calendar = copy.deepcopy(jiajing["calendar"])
     calendar["months"].pop(4)
     monkeypatch.setattr(audit, "gujin_fixed_qice_year", lambda _: calendar)
@@ -246,7 +262,9 @@ def test_missing_computed_month_does_not_become_reference_failure(jiajing, monke
     assert result["status"] == "required_calculation_unavailable"
 
 
-def test_all_unknown_reference_is_not_vacuous_agreement(tmp_path, monkeypatch):
+def test_all_unknown_reference_is_not_vacuous_agreement(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     data = json.loads(audit.DATA.read_bytes())
     for case in data["cases"]:
         case["calendar_month_count"] = case["calendar_total_days"] = None
@@ -262,12 +280,14 @@ def test_all_unknown_reference_is_not_vacuous_agreement(tmp_path, monkeypatch):
 
 
 @pytest.mark.parametrize("bad", [None, 243, True, 88753.8789, "88753.8789"])
-def test_nonexact_year_input_never_coerced(bad):
+def test_nonexact_year_input_never_coerced(
+    bad: bool | float | int | str | None,
+) -> None:
     with pytest.raises(TypeError):
         year.gujin_fixed_qice_year(bad)
 
 
-def test_negative_middle_and_unknown_reference_are_rejected():
+def test_negative_middle_and_unknown_reference_are_rejected() -> None:
     with pytest.raises(ValueError):
         year.gujin_fixed_qice_year(F(-1))
     with pytest.raises(ValueError):
@@ -275,7 +295,7 @@ def test_negative_middle_and_unknown_reference_are_rejected():
 
 
 @pytest.mark.parametrize("elapsed", [31, 296])
-def test_actual_empty_endpoint_years_remain_unassigned(elapsed):
+def test_actual_empty_endpoint_years_remain_unassigned(elapsed: int) -> None:
     result = year.gujin_fixed_qice_year(shoushi_winter_cycle(elapsed).zhongji_days)
     assert result["reason"] == "first_winter_cycle_unresolved"
     base = result["first_winter_cycle"]
@@ -295,12 +315,14 @@ def test_actual_empty_endpoint_years_remain_unassigned(elapsed):
         (3, 3, ValueError),
     ],
 )
-def test_grid_range_is_not_coerced_or_reordered(start, stop, error):
+def test_grid_range_is_not_coerced_or_reordered(
+    start, stop: float | int, error
+) -> None:
     with pytest.raises(error):
         audit.audit_named_year_grid(start, stop)
 
 
-def test_grid_keeps_all_inputs_and_does_not_certify_external_accuracy():
+def test_grid_keeps_all_inputs_and_does_not_certify_external_accuracy() -> None:
     grid = audit.audit_named_year_grid(30, 33)
     assert grid["input_years"] == 3 and grid["input_years_dropped"] == 0
     assert [r["elapsed_years"] for r in grid["rows"]] == [30, 31, 32]

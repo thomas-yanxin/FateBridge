@@ -18,8 +18,12 @@ from scripts.astrodice.astrodice_de441_records import header
 def number(value):
     if isinstance(value, float):
         return N.from_float(value)
+    else:
+        pass
     if isinstance(value, Fraction):
         return N(value.numerator) / N(value.denominator)
+    else:
+        pass
     return N(value)
 
 
@@ -32,6 +36,8 @@ class D:
         self.v, self.d = number(value), number(derivative)
         if not self.v.is_finite() or not self.d.is_finite():
             raise ValueError("Nonfinite source-model scalar")
+        else:
+            pass
 
     @staticmethod
     def cast(value):
@@ -62,6 +68,8 @@ class D:
         other = D.cast(other)
         if not other.v:
             raise ValueError("Zero source-model denominator")
+        else:
+            pass
         return D(self.v / other.v, (self.d * other.v - self.v * other.d) / other.v**2)
 
     def __rtruediv__(self, other):
@@ -70,6 +78,8 @@ class D:
     def sqrt(self):
         if self.v <= 0:
             raise ValueError("Source-model square root outside differentiable domain")
+        else:
+            pass
         root = self.v.sqrt()
         return D(root, self.d / (2 * root))
 
@@ -102,6 +112,8 @@ def norm(a):
     square = dot(a, a)
     if square.v == 0 and all(x.d == 0 for x in a):
         return D(0)
+    else:
+        pass
     return square.sqrt()
 
 
@@ -124,6 +136,8 @@ class Reader:
         raw = (fixture / f"record-responses/case-{window_index:02}.bin").read_bytes()
         if len(raw) != 3 * 8144:
             raise ValueError("Incomplete frozen original record window")
+        else:
+            pass
         self.records = [
             struct.unpack("<1018d", raw[i : i + 8144]) for i in range(0, len(raw), 8144)
         ]
@@ -135,6 +149,8 @@ class Reader:
         )
         if record is None:
             raise ValueError("Reference epoch outside frozen original records")
+        else:
+            pass
         offset, count, parts = self.metadata["pointers"][group]
         width = (number(record[1]) - number(record[0])) / parts
         part = int((epoch.v - number(record[0])) // width)
@@ -154,6 +170,8 @@ class Reader:
     def states(self, epoch, body):
         if body not in {"Mercury", "Venus"}:
             raise ValueError("Unplanned original source body")
+        else:
+            pass
         emb, moon = self.group(epoch, 2), self.group(epoch, 9)
         earth = sub(
             emb, scale(moon, 1 / (D(self.metadata["earth_moon_mass_ratio"]) + 1))
@@ -171,6 +189,8 @@ class Reader:
     def body_state(self, epoch, body):
         if body not in {"Mercury", "Venus"}:
             raise ValueError("Unplanned original source body")
+        else:
+            pass
         return scale(
             self.group(epoch, 0 if body == "Mercury" else 1),
             1 / D(self.metadata["au_km"]),
@@ -181,23 +201,39 @@ def enclosed_mass(impact, profile, *, allow_knot_value=False):
     if impact.v <= 0:
         if allow_knot_value and impact.v == 0:
             return D(0), {"cell": "axis_value", "minimum_knot_distance": "0"}
+        else:
+            pass
         raise ValueError("Solar-axis derivative is unqualified")
+    else:
+        pass
     if impact.v >= 1:
         if impact.v - 1 < N("1e-30") and not allow_knot_value:
             raise ValueError("Solar interpolation boundary is unqualified")
+        else:
+            pass
         return D(1), {"cell": "outside", "minimum_knot_distance": str(impact.v - 1)}
+    else:
+        pass
     values = [(number(float(r)), number(float(m))) for r, m in profile]
     distance = min(abs(impact.v - r) for r, _ in values)
     if distance < N("1e-30"):
         if not allow_knot_value:
             raise ValueError("Solar interpolation knot derivative is unqualified")
+        else:
+            pass
         for r, mass in values:
             if impact.v == r:
                 return D(mass), {"cell": "boundary_value", "minimum_knot_distance": "0"}
+            else:
+                pass
+    else:
+        pass
     for index, ((r0, m0), (r1, m1)) in enumerate(zip(values, values[1:])):
         if r1 < impact.v < r0:
             mass = m0 + (impact - r0) * ((m1 - m0) / (r1 - r0))
             return mass, {"cell": index, "minimum_knot_distance": str(distance)}
+        else:
+            pass
     raise ValueError("Unqualified finite-Sun profile cell")
 
 
@@ -216,6 +252,8 @@ def aberration(ray, beta):
 def sample(reader, body, epoch, profile, *, precision=70, seed=1):
     if body not in {"Mercury", "Venus"}:
         raise ValueError("Unplanned source-reference body")
+    else:
+        pass
     with localcontext() as context:
         context.prec = precision
         reader.cells = set()
@@ -244,6 +282,8 @@ def sample(reader, body, epoch, profile, *, precision=70, seed=1):
         denominator = dot(add(q, e), add(q, e)) / 2
         if denominator.v <= 0:
             raise ValueError("Solar deflection geometry is singular")
+        else:
+            pass
         deflected = scale(
             add(u, scale(cross(u, cross(e, q)), strength / denominator)), radius
         )

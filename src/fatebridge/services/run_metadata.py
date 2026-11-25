@@ -1,75 +1,26 @@
-"""
-Lightweight runtime metadata helpers for REST and MCP responses.
-
-``tool_name`` is supplied authoritatively by the transport from the central
-``ToolSpec`` (``spec.run_metadata_name``), so it is never inferred from payload
-shape. This module only stamps the metadata envelope and detects the runtime
-engine that produced a result.
-"""
-
-from __future__ import annotations
+"""Attribute runtime engine and approximation facts to an execution receipt."""
 
 from collections import deque
+from dataclasses import dataclass
 from datetime import datetime, timezone
-from typing import Any, Deque, Dict, Iterable, Set
+from typing import Protocol
 from uuid import uuid4
+
+from pydantic import JsonValue
+
+from fatebridge.application.tool_spec import ServiceResult
 
 DEFAULT_ENGINE = "fatebridge-offline"
 
 
-def _enqueue_children(queue: Deque[Any], values: Iterable[Any]) -> None:
-    for value in values:
-        if isinstance(value, (dict, list, tuple)):
-            queue.append(value)
+class ApproximationDetector(Protocol):
+    def __call__(self, record: dict[str, JsonValue], /) -> bool: ...
 
 
-def resolve_runtime_engine(payload: Dict[str, Any]) -> str:
-    queue: Deque[Any] = deque([payload])
-    seen_dict_ids: Set[int] = set()
-
-    while queue:
-        current = queue.popleft()
-        if isinstance(current, dict):
-            current_id = id(current)
-            if current_id in seen_dict_ids:
-                continue
-            seen_dict_ids.add(current_id)
-
-            direct_engine = current.get("engine")
-            if isinstance(direct_engine, str) and direct_engine:
-                return direct_engine
-
-            for profile_key in ("relationship_profile", "chart_profile"):
-                profile = current.get(profile_key)
-                if isinstance(profile, dict):
-                    engine_backend = profile.get("engine_backend")
-                    if isinstance(engine_backend, str) and engine_backend:
-                        return engine_backend
-                    engine_precision = profile.get("engine_precision")
-                    if isinstance(engine_precision, str) and engine_precision:
-                        return engine_precision
-
-            _enqueue_children(queue, current.values())
-            continue
-
-        if isinstance(current, (list, tuple)):
-            _enqueue_children(queue, current)
-
-    return DEFAULT_ENGINE
-
-
-def engine_is_approximate(engine: str) -> bool:
-    """Whether the engine name itself declares an approximation.
-
-    Lets an agent branch on degraded precision without string-matching the
-    backend name or the Chinese precision label. Non-astro tools report
-    ``DEFAULT_ENGINE`` and are deterministic in their own domain, so they are
-    not "approximate"; only the orbital-approximation and mixed-precision astro
-    backends are flagged here. Actual ephemeris and Feng Shui calendar
-    resolution records are checked separately in ``attach_run_metadata``.
-    """
-    lowered = engine.lower()
-    return "approximate" in lowered or lowered.startswith("mixed")
+@dataclass(frozen=True, kw_only=True)
+class RuntimeInspection:
+    engine: str
+    has_downgraded_model: bool
 
 
 _DOWNGRADED_EPHEMERIS_MODELS = frozenset(
@@ -79,102 +30,146 @@ _DOWNGRADED_EPHEMERIS_MODELS = frozenset(
         "fatebridge_analytic_solar_v1",
         "fatebridge_complete_moshier_solar_v1",
         "fatebridge_complete_moshier_solar_v2",
-        # Bounded source representation and finite qualification remain
-        # explicit; changing the solar model must not silently promote status.
+        # note (ephemeris): Bounded DE441 source coverage keeps the downgraded status.
         "fatebridge_de441_solar_v1",
     }
 )
 
 
-def _ephemeris_is_downgraded(payload: Dict[str, Any]) -> bool:
-    """Whether any chart in the payload was served by a degraded ephemeris model.
-
-    The model actually used per run lives in ``chart_profile.ephemeris_model``
-    (derived from swisseph's ``retflag``). ``engine_backend`` /
-    ``engine_precision`` stay constant whether or not Swiss Ephemeris data files
-    were present, so a silent downgrade to the built-in Moshier model (no ``.se1``
-    files) is *only* visible here. Without consulting it, a chart computed from
-    Moshier would falsely report full precision via ``engine_is_approximate``.
-    """
-    queue: Deque[Any] = deque([payload])
-    seen_dict_ids: Set[int] = set()
+def _inspect_runtime(
+    payload: dict[str, JsonValue],
+    *,
+    should_check_downgrade: bool = True,
+    approximate_record: ApproximationDetector | None = None,
+) -> RuntimeInspection:
+    """Extract runtime engine and detect downgraded ephemeris models in one BFS pass."""
+    queue: deque[JsonValue] = deque([payload])
+    seen_dictionary_ids: set[int] = set()
+    engine: str | None = None
+    has_downgraded_model = False
 
     while queue:
         current = queue.popleft()
         if isinstance(current, dict):
-            current_id = id(current)
-            if current_id in seen_dict_ids:
+            record_identity = id(current)
+            if record_identity in seen_dictionary_ids:
                 continue
-            seen_dict_ids.add(current_id)
+            else:
+                pass
+            seen_dictionary_ids.add(record_identity)
 
-            model = current.get("ephemeris_model")
-            if isinstance(model, str) and model.lower() in _DOWNGRADED_EPHEMERIS_MODELS:
-                return True
+            if engine is None:
+                direct_engine = current.get("engine")
+                if isinstance(direct_engine, str) and direct_engine:
+                    engine = direct_engine
+                else:
+                    for profile_field in ("relationship_profile", "chart_profile"):
+                        profile = current.get(profile_field)
+                        if isinstance(profile, dict):
+                            engine_backend = profile.get("engine_backend")
+                            if isinstance(engine_backend, str) and engine_backend:
+                                engine = engine_backend
+                                break
+                            else:
+                                pass
+                            engine_precision = profile.get("engine_precision")
+                            if isinstance(engine_precision, str) and engine_precision:
+                                engine = engine_precision
+                                break
+                            else:
+                                pass
+                        else:
+                            pass
+                if engine is not None and not should_check_downgrade:
+                    return RuntimeInspection(engine=engine, has_downgraded_model=False)
+                else:
+                    pass
+            else:
+                pass
 
-            _enqueue_children(queue, current.values())
+            if should_check_downgrade and not has_downgraded_model:
+                model = current.get("ephemeris_model")
+                has_downgraded_model = (
+                    isinstance(model, str)
+                    and model.lower() in _DOWNGRADED_EPHEMERIS_MODELS
+                ) or (approximate_record is not None and approximate_record(current))
+            else:
+                pass
+            if engine is not None and has_downgraded_model:
+                return RuntimeInspection(engine=engine, has_downgraded_model=True)
+            else:
+                pass
+
+            queue.extend(
+                value
+                for value in current.values()
+                if isinstance(value, (dict, list, tuple))
+            )
             continue
+        else:
+            pass
 
         if isinstance(current, (list, tuple)):
-            _enqueue_children(queue, current)
+            queue.extend(
+                value for value in current if isinstance(value, (dict, list, tuple))
+            )
+        else:
+            pass
 
-    return False
-
-
-def _fengshui_calendar_is_approximate(payload: Dict[str, Any]) -> bool:
-    """Use actual solar-term resolution records, not dependency availability.
-
-    Only called for Feng Shui tools. Statistical WMM uncertainty and caller
-    evidence are not a degraded calendar provider. This also covers birth-date
-    boundaries and historical house-period endpoints, not just annual layers.
-    """
-    queue: Deque[Any] = deque([payload])
-    seen: Set[int] = set()
-    while queue:
-        current = queue.popleft()
-        if isinstance(current, dict):
-            if id(current) in seen:
-                continue
-            seen.add(id(current))
-            if (
-                current.get("approximate") is True
-                and isinstance(current.get("provider"), str)
-                and isinstance(current.get("moment"), str)
-                and "precision_scope" in current
-            ):
-                return True
-            _enqueue_children(queue, current.values())
-        elif isinstance(current, (list, tuple)):
-            _enqueue_children(queue, current)
-    return False
+    return RuntimeInspection(
+        engine=engine or DEFAULT_ENGINE, has_downgraded_model=has_downgraded_model
+    )
 
 
-def attach_run_metadata(
-    payload: Dict[str, Any],
+def resolve_runtime_engine(payload: dict[str, JsonValue]) -> str:
+    return _inspect_runtime(payload, should_check_downgrade=False).engine
+
+
+def engine_is_approximate(engine: str) -> bool:
+    """Identify orbital-approximation and mixed-precision engine labels."""
+    lowered = engine.lower()
+    return "approximate" in lowered or lowered.startswith("mixed")
+
+
+def build_run_metadata(
+    payload: dict[str, JsonValue],
     *,
     tool_name: str,
-) -> Dict[str, Any]:
+    approximate_record: ApproximationDetector | None = None,
+) -> dict[str, JsonValue]:
     existing = payload.get("run_metadata")
     if isinstance(existing, dict):
-        return payload
+        return existing
+    else:
+        pass
 
     run_id = uuid4().hex
     trace_id = uuid4().hex
-    engine = resolve_runtime_engine(payload)
-    approximate = (
-        engine_is_approximate(engine)
-        or _ephemeris_is_downgraded(payload)
-        or (
-            tool_name.startswith("fengshui_")
-            and _fengshui_calendar_is_approximate(payload)
-        )
-    )
-    enriched = dict(payload)
-    enriched["run_metadata"] = {
+    inspection = _inspect_runtime(payload, approximate_record=approximate_record)
+    return {
         "run_id": run_id,
         "trace_id": trace_id,
         "tool_name": tool_name,
         "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
-        "engine": engine,
-        "engine_is_approximate": approximate,
+        "engine": inspection.engine,
+        "engine_is_approximate": engine_is_approximate(inspection.engine)
+        or inspection.has_downgraded_model,
     }
-    return enriched
+
+
+def attach_run_metadata(
+    payload: dict[str, JsonValue],
+    *,
+    tool_name: str,
+    approximate_record: ApproximationDetector | None = None,
+) -> ServiceResult:
+    if isinstance(payload.get("run_metadata"), dict):
+        return payload
+    else:
+        pass
+    return {
+        **payload,
+        "run_metadata": build_run_metadata(
+            payload, tool_name=tool_name, approximate_record=approximate_record
+        ),
+    }

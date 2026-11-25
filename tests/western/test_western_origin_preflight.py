@@ -28,7 +28,7 @@ FRAMES = [
 ]
 
 
-def test_pre_candidate_reference_preserves_all_native_frames_and_failures():
+def test_pre_candidate_reference_preserves_all_native_frames_and_failures() -> None:
     verify_source_files(FIXTURE)
     assert (
         len(REFERENCE["cohorts"]) == 44
@@ -58,6 +58,8 @@ def directories(tmp_path_factory):
                 and not f.name.startswith("sepl_")
             ):
                 continue
+            else:
+                pass
             shutil.copy2(f, p / f.name)
     return roots
 
@@ -90,8 +92,8 @@ def calculate(selected, mode, operation, epoch, body, flags, owned=True):
 @pytest.mark.parametrize("origin", [8, 16384])
 @pytest.mark.parametrize("owned", [False, True])
 def test_missing_unused_moon_does_not_change_owned_values_or_file_endpoints(
-    selected, operation, frame, extra, origin, owned
-):
+    selected, operation: str, frame, extra, origin: int, owned: bool
+) -> None:
     flags = 258 | extra | origin
     for epoch in REFERENCE["epochs"]:
         for body in [0, *range(2, 10)]:
@@ -115,6 +117,8 @@ def test_missing_unused_moon_does_not_change_owned_values_or_file_endpoints(
                     )
                     assert start <= tt <= end
                 continue
+            else:
+                pass
             assert receipt["selected_native_state"] == list(partial[0])
             assert (
                 receipt["input_julian_day"] == epoch
@@ -138,6 +142,8 @@ def test_missing_unused_moon_does_not_change_owned_values_or_file_endpoints(
                     receipt["preflight_model_probe"]["physical_source_certified"]
                     is False
                 )
+            else:
+                pass
             windows = receipt["selected_windows"]
             if body == 0 and origin == 8:
                 assert set(partial[0]) == {0} and windows == []
@@ -156,8 +162,8 @@ def test_missing_unused_moon_does_not_change_owned_values_or_file_endpoints(
 )
 @pytest.mark.parametrize("body", [0, 4])
 def test_native_normalized_topocentric_origin_still_requires_real_observer(
-    selected, owned, operation, flags, body
-):
+    selected, owned: bool, operation: str, flags, body: int
+) -> None:
     with pytest.raises(EphemerisSourceError) as error:
         calculate(selected, "planet_only", operation, 2451545.0, body, flags, owned)
     assert error.value.reason == "swiss_dependency_unavailable"
@@ -177,8 +183,8 @@ def test_native_normalized_topocentric_origin_still_requires_real_observer(
     ],
 )
 def test_reference_identities_do_not_require_unused_physical_data(
-    selected, mode, operation, body, flags
-):
+    selected, mode: str, operation: str, body: int, flags
+) -> None:
     value, basis = calculate(selected, mode, operation, 2451545.0, body, flags)
     assert set(value[0]) == {0} and basis["selected_windows"] == []
     assert basis["preflight_solar_vector_is_defined_zero"] is True
@@ -190,8 +196,8 @@ def test_reference_identities_do_not_require_unused_physical_data(
 @pytest.mark.parametrize("mode", ["full", "planet_only", "empty"])
 @pytest.mark.parametrize("operation", ["calc", "calc_ut"])
 def test_wide_native_reference_identities_are_not_limited_by_unused_moon_range(
-    selected, year, mode, operation
-):
+    selected, year: int, mode: str, operation: str
+) -> None:
     epoch = runtime.swe.julday(year, 1, 1, 12.0)
     for body, flags in [(0, 266), (14, 258)]:
         value, basis = calculate(selected, mode, operation, epoch, body, flags)
@@ -201,8 +207,8 @@ def test_wide_native_reference_identities_are_not_limited_by_unused_moon_range(
 
 @pytest.mark.parametrize("year", [4000, 9000, 9999])
 def test_native_nonzero_range_failures_are_not_replaced_by_reference_zero(
-    selected, year
-):
+    selected, year: int
+) -> None:
     epoch = runtime.swe.julday(year, 1, 1, 12.0)
     for body, flags in [(0, 258 | 16384), (4, 266), (4, 258 | 16384)]:
         with pytest.raises(runtime.swe.Error) as error:
@@ -218,8 +224,8 @@ def test_native_nonzero_range_failures_are_not_replaced_by_reference_zero(
 @pytest.mark.parametrize("body", [1, 14])
 @pytest.mark.parametrize("origin", [8, 16384])
 def test_actual_lunar_and_earth_vectors_still_require_lunar_data(
-    selected, owned, operation, body, origin
-):
+    selected, owned: bool, operation: str, body: int, origin: int
+) -> None:
     with pytest.raises(EphemerisSourceError) as error:
         calculate(
             selected, "planet_only", operation, 2451545.0, body, 258 | origin, owned
@@ -270,7 +276,7 @@ print(json.dumps(dict(rows=out,native=s.version,python=sys.version,platform=plat
 
 def test_ordinary_owned_coordinates_match_fresh_same_runtime_native_exactly(
     selected, cold_native_controls
-):
+) -> None:
     assert len(cold_native_controls["planet_only"]) == 144
     for row in cold_native_controls["planet_only"]:
         value, _ = calculate(
@@ -286,7 +292,7 @@ def test_ordinary_owned_coordinates_match_fresh_same_runtime_native_exactly(
 
 def test_heliocentric_analytical_fallback_retains_same_runtime_native_values(
     selected, cold_native_controls
-):
+) -> None:
     assert len(cold_native_controls["empty"]) == 88
     for row in cold_native_controls["empty"]:
         value, basis = calculate(
@@ -301,3 +307,5 @@ def test_heliocentric_analytical_fallback_retains_same_runtime_native_values(
         assert basis["preflight_reference_origin"] == "heliocentric"
         if row["body"] not in {0, 14}:
             assert basis["preflight_model_probe"]["returned_flags"] & 7 == 4
+        else:
+            pass

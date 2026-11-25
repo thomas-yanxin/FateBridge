@@ -14,18 +14,25 @@ from pydantic import ValidationError
 
 import fatebridge.application.execution as execution
 from fatebridge.application.examples import evidence_views
+from fatebridge.core.contracts.output_jinkou_stems import JinkouStemRelations
 from fatebridge.core.metaphysics.jinkou_stems import (
     build_stem_relations,
     ganzhi_pair_facts,
     wuzidun_stem,
 )
 from fatebridge.core.metaphysics.ren_evidence import xun_dun_stems
-from fatebridge.core.output_jinkou_stems import JinkouStemRelations
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.metaphysics import calculate_jinkou_analysis
-from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
 from tests.fixtures.mcp_result_delivery import read_full_result
-from tests.support.transports import AS_OF, SPECS, business, rest, surface_calls
+from tests.support.transports import (
+    AS_OF,
+    SPECS,
+    business,
+    call_calculation,
+    rest,
+    surface_calls,
+)
+from validation.claims import CalculationClaim, verify_calculation_claims
 
 ROOT = Path(__file__).resolve().parents[2]
 SPEC = importlib.util.spec_from_file_location(
@@ -46,7 +53,7 @@ PAYLOAD = dict(
 )
 
 
-def test_literal_denominators_and_derived_checks_remain_separate():
+def test_literal_denominators_and_derived_checks_remain_separate() -> None:
     result = AUDIT.audit()
     assert len(result["literal_wuzi_groups"]) == 5
     assert (
@@ -75,7 +82,9 @@ def test_literal_denominators_and_derived_checks_remain_separate():
 
 
 @pytest.mark.parametrize("change", ["edit", "missing", "extra"])
-def test_frozen_sources_cannot_silently_rewrite合_as_double_harmony(tmp_path, change):
+def test_frozen_sources_cannot_silently_rewrite合_as_double_harmony(
+    tmp_path: Path, change: str
+) -> None:
     target = tmp_path / "corpus"
     shutil.copytree(AUDIT.CORPUS, target)
     if change == "edit":
@@ -91,7 +100,9 @@ def test_frozen_sources_cannot_silently_rewrite合_as_double_harmony(tmp_path, c
         AUDIT.reference(target)
 
 
-def test_missing_clause_cannot_shrink_the_5760_required_checks(monkeypatch):
+def test_missing_clause_cannot_shrink_the_5760_required_checks(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     import fatebridge.core.metaphysics.jinkou_stems as implementation
 
     original = implementation.build_stem_relations
@@ -110,7 +121,9 @@ def test_missing_clause_cannot_shrink_the_5760_required_checks(monkeypatch):
     assert result["failures"]
 
 
-def test_all_symbolic_contexts_are_typed_without_pretending_full_identity_proof():
+def test_all_symbolic_contexts_are_typed_without_pretending_full_identity_proof() -> (
+    None
+):
     for day, god, general in product(
         REFERENCE["stems"], REFERENCE["branches"], REFERENCE["branches"]
     ):
@@ -121,14 +134,18 @@ def test_all_symbolic_contexts_are_typed_without_pretending_full_identity_proof(
         )
 
 
-def test_last_written_pair_is_continued_cycle_not_a_replacement_for_same_day_子():
+def test_last_written_pair_is_continued_cycle_not_a_replacement_for_same_day_子() -> (
+    None
+):
     assert wuzidun_stem("甲", "子") == "甲" and wuzidun_stem("乙", "子") == "丙"
     last = ganzhi_pair_facts("辛未", "丙子")
     assert last["stem_harmony_matched"] and not last["branch_harmony_matched"]
     assert not last["same_ganzhi_xun"] and last["transformation_confirmed"] is None
 
 
-def test_stem_harmony_does_not_erase_control_before_transformation_is_adjudicated():
+def test_stem_harmony_does_not_erase_control_before_transformation_is_adjudicated() -> (
+    None
+):
     result = build_stem_relations(
         day_stem="甲", rows=AUDIT.symbolic_rows(REFERENCE, "甲", "丑", "午")
     )
@@ -140,7 +157,7 @@ def test_stem_harmony_does_not_erase_control_before_transformation_is_adjudicate
     assert result["god"]["dun_element"] == "木"
 
 
-def test_jinkou_wuzi_stem_is_independent_of_liuren_day_xun_stem():
+def test_jinkou_wuzi_stem_is_independent_of_liuren_day_xun_stem() -> None:
     assert wuzidun_stem("乙", "午") == "壬"
     assert xun_dun_stems("乙丑")["午"] == "庚"
     assert xun_dun_stems("乙卯")["午"] == "戊"
@@ -150,7 +167,7 @@ def test_jinkou_wuzi_stem_is_independent_of_liuren_day_xun_stem():
 @pytest.mark.parametrize(
     "bad", ["bad_day", "bad_branch", "bad_pair", "wrong_stem", "wrong_intrinsic"]
 )
-def test_invalid_or_disagreeing_stem_inputs_are_rejected(bad):
+def test_invalid_or_disagreeing_stem_inputs_are_rejected(bad: str) -> None:
     if bad == "bad_day":
         with pytest.raises(ValueError):
             wuzidun_stem("甲子", "子")
@@ -171,8 +188,8 @@ def test_invalid_or_disagreeing_stem_inputs_are_rejected(bad):
 
 @pytest.mark.parametrize("project", [False, True])
 def test_three_ports_keep_intrinsic_daily_and_branch_relations_distinct(
-    project, surface_calls
-):
+    project: bool, surface_calls
+) -> None:
     spec = SPECS["jinkou"]
     fields = [
         "jinkou.stem_relations",
@@ -197,6 +214,8 @@ def test_three_ports_keep_intrinsic_daily_and_branch_relations_distinct(
             "false",
         ]
         options.update(fields=fields, strict_fields=True, include_snapshot_text=False)
+    else:
+        pass
     http, protocol, code, cli = surface_calls(
         spec, PAYLOAD, params=params, options=options, flags=flags, cli_first=False
     )
@@ -244,6 +263,8 @@ def test_three_ports_keep_intrinsic_daily_and_branch_relations_distinct(
                 )["result"]
                 == stems
             )
+        else:
+            pass
     assert "jinkou.stem_relations" in evidence_views(spec)["core"]["fields"]
 
 
@@ -321,8 +342,8 @@ def corrupt(payload, fault):
 @pytest.mark.parametrize("fault", FAULTS)
 @pytest.mark.parametrize("project", [False, True])
 def test_corrupt_complete_business_facts_fail_before_projection(
-    fault, project, monkeypatch, surface_calls
-):
+    fault, project: bool, monkeypatch: pytest.MonkeyPatch, surface_calls
+) -> None:
     spec = SPECS["jinkou"]
     valid = calculate_jinkou_analysis(**PAYLOAD)
     execution.validate_output(spec, valid)
@@ -336,6 +357,8 @@ def test_corrupt_complete_business_facts_fail_before_projection(
             actual = replace(
                 actual, bind=lambda _: (lambda: copy.deepcopy(bad), (), {})
             )
+        else:
+            pass
         return original(actual, request)
 
     monkeypatch.setattr(execution, "execute_spec", broken)
@@ -346,6 +369,8 @@ def test_corrupt_complete_business_facts_fail_before_projection(
         params.update(fields="analysis_type", strict_fields="true")
         options.update(fields=["analysis_type"], strict_fields=True)
         flags += ["--fields", "analysis_type", "--strict-fields", "true"]
+    else:
+        pass
     http, protocol, code, out = surface_calls(
         spec, PAYLOAD, params=params, options=options, flags=flags, cli_first=False
     )
@@ -363,7 +388,9 @@ def test_corrupt_complete_business_facts_fail_before_projection(
         "complete_classical_conformance",
     ],
 )
-def test_sparse_objects_keep_false_null_and_complete_rule_arrays(field, surface_calls):
+def test_sparse_objects_keep_false_null_and_complete_rule_arrays(
+    field: str, surface_calls
+) -> None:
     spec = SPECS["jinkou"]
     path = "jinkou.stem_relations." + field
     http, protocol, code, cli = surface_calls(
@@ -400,7 +427,9 @@ def test_sparse_objects_keep_false_null_and_complete_rule_arrays(field, surface_
     spec.output_model.model_validate(cli)
 
 
-def test_section_export_and_receipt_do_not_replace_壬_with_intrinsic_丙(surface_calls):
+def test_section_export_and_receipt_do_not_replace_壬_with_intrinsic_丙(
+    surface_calls,
+) -> None:
     spec = SPECS["jinkou"]
     payload = {**PAYLOAD, "selected_sections": ["金口诀四位"]}
     http, protocol, code, cli = surface_calls(
@@ -438,10 +467,11 @@ def test_section_export_and_receipt_do_not_replace_壬_with_intrinsic_丙(surfac
 
 
 @pytest.mark.asyncio
-async def test_published_first_view_reads_all_stem_evidence_from_one_run():
+async def test_published_first_view_reads_all_stem_evidence_from_one_run() -> None:
     contract = json.loads((ROOT / "docs/contracts/jinkou.json").read_text())
     async with Client(create_mcp_app()) as client:
-        response = await client.call_tool(
+        response = await call_calculation(
+            client,
             "jinkou",
             {
                 **PAYLOAD,

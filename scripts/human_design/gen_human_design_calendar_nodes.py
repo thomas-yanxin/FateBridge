@@ -29,6 +29,8 @@ def read(path: Path) -> dict:
     value = json.loads(gzip.decompress(raw) if path.suffix == ".gz" else raw)
     if not isinstance(value, dict):
         raise ValueError("A complete JSON object is required")
+    else:
+        pass
     return value
 
 
@@ -38,6 +40,8 @@ def write(path: Path, value: dict) -> None:
     ).encode()
     if path.suffix == ".gz":
         raw = gzip.compress(raw, mtime=0)
+    else:
+        pass
     with path.open("xb") as stream:
         stream.write(raw)
 
@@ -52,6 +56,8 @@ def inputs() -> tuple[dict, dict, dict]:
     for name in names:
         if sha(ROOT / name) != plan["input_bindings"][name]:
             raise ValueError("Frozen independent input changed: " + name)
+        else:
+            pass
     declared, independent, controls = [read(ROOT / n) for n in names[:3]]
     if (
         len(declared["birth_epochs"]) != 1200
@@ -59,8 +65,12 @@ def inputs() -> tuple[dict, dict, dict]:
         or len(controls["rows"]) != 122
     ):
         raise ValueError("Incomplete original cohorts or altered tolerance")
+    else:
+        pass
     if plan["tolerance_arcseconds"] != 1.0 or controls["tolerance_arcseconds"] != 1.0:
         raise ValueError("Original1arcsecond node criterion changed")
+    else:
+        pass
     for actual, pair in zip(
         declared["birth_epochs"], independent["pairs"], strict=True
     ):
@@ -69,6 +79,8 @@ def inputs() -> tuple[dict, dict, dict]:
             pair["personality"]["jd_tt"],
         ):
             raise ValueError("Original birth epoch or order changed")
+        else:
+            pass
     return plan, independent, controls
 
 
@@ -77,12 +89,16 @@ def package_files(modules: list[Any]) -> dict[str, str]:
     for module in modules:
         if module.__file__ is None:
             raise ValueError("Reference package file is unavailable")
+        else:
+            pass
         folder = Path(module.__file__).resolve().parent
         for path in sorted(folder.rglob("*")):
             if path.is_file() and "__pycache__" not in path.parts:
                 result[module.__name__ + "/" + str(path.relative_to(folder))] = sha(
                     path
                 )
+            else:
+                pass
     return result
 
 
@@ -96,12 +112,16 @@ def derive(kernel_path: Path) -> dict:
     versions = {name: version(name) for name in plan["versions"]}
     if versions != plan["versions"]:
         raise ValueError("Reference package versions differ from the frozen plan")
+    else:
+        pass
     kernel_before, code_before = sha(kernel_path), sha(Path(__file__))
     if (
         kernel_before != plan["kernel_sha256"]
         or hashlib.md5(kernel_path.read_bytes()).hexdigest() != plan["kernel_md5"]
     ):
         raise ValueError("DE440 identity changed")
+    else:
+        pass
     packages_before = package_files([erfa, jplephem, np])
     with SPK.open(kernel_path) as kernel:
 
@@ -155,6 +175,8 @@ def derive(kernel_path: Path) -> dict:
                 rows.append({"side": side, **fact(pair["label"], pair[side]["jd_tt"])})
         if len(rows) != 2400:
             raise ValueError("Incomplete original epoch cohort")
+        else:
+            pass
     packages_after = package_files([erfa, jplephem, np])
     if (
         packages_before != packages_after
@@ -164,6 +186,8 @@ def derive(kernel_path: Path) -> dict:
         raise ValueError(
             "Reference dependency, generator or kernel changed during generation"
         )
+    else:
+        pass
     return {
         "method_id": "human_design_original_calendar_de440_erfa_nodes_v1",
         "generator_sha256": code_before,
@@ -201,7 +225,11 @@ def main() -> None:
     )
     if not value["original122_controls_exact"]:
         raise SystemExit(1)
+    else:
+        pass
 
 
 if __name__ == "__main__":
     main()
+else:
+    pass

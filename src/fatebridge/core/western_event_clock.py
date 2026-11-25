@@ -72,14 +72,22 @@ def build_event_subject(
     """
     if clock_basis not in {"civil", *SOLAR_BASES}:
         raise ValueError("Unknown event clock basis")
+    else:
+        pass
     if local_datetime.tzinfo is not None:
         raise ValueError("Event input must be a naive wall-clock label")
+    else:
+        pass
     if local_datetime.microsecond:
         raise ValueError("Event clock input supports whole-second labels")
+    else:
+        pass
     if clock_basis in SOLAR_BASES and timezone_name is not None:
         raise ValueError(
             "Solar event clock must omit timezone_name; no civil zone is applied"
         )
+    else:
+        pass
     civil_zone = (
         ("+08:00" if timezone_name is None else timezone_name)
         if clock_basis == "civil"
@@ -101,6 +109,12 @@ def build_event_subject(
                     > 0.0002
                 ):
                     raise EphemerisSourceError("event_clock_source_mismatch")
+                else:
+                    pass
+            else:
+                pass
+        else:
+            pass
         subject = build_subject(
             name=name,
             **(
@@ -118,12 +132,18 @@ def build_event_subject(
             # Native chart must use the very same physical axis as inversion.
             assert expected_time is not None and expected_time.jd_tt is not None
             if (
-                abs(subject.julian_day - solar["julian_day_ut1"]) * 86400 > 0.0002
+                float(abs(subject.ut1.days - expected_time.ut1.days) * 86400) > 0.0002
                 or abs(subject.julian_day_tt - expected_time.jd_tt) * 86400 > 0.0002
             ):
                 raise EphemerisSourceError("event_clock_source_mismatch")
+            else:
+                pass
             if clock_basis == "local_apparent_solar":
                 comparison = _compare_sun_sources(solar, subject)
+            else:
+                pass
+        else:
+            pass
         return subject, {
             "method_id": METHOD,
             "input_clock_basis": clock_basis,
@@ -143,7 +163,7 @@ def build_event_subject(
             "julian_day_tt": subject.julian_day_tt,
             "julian_day_ut1": subject.julian_day,
             "time_scale_method": subject.calculation_basis["time_scale"],
-            "ut1_reference": ut1_reference(subject.julian_day_tt, subject.julian_day),
+            "ut1_reference": ut1_reference(subject.tt, subject.ut1),
             "utc_representation": (
                 epoch.representation() if solar is not None else None
             ),

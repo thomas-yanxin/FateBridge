@@ -1,10 +1,13 @@
 """Compare the maintained lunar derivative with independent source references."""
 
 import argparse
+import csv
 import hashlib
+import io
 import json
 import math
 import platform
+import re
 from datetime import datetime, timedelta
 from fractions import Fraction
 from pathlib import Path
@@ -18,12 +21,11 @@ def digest(path):
 
 
 def validate_reference(protocol, reference):
-    import csv
-    import io
-    import re
 
     if reference["candidate_imported"] or reference["candidate_compared"]:
         raise ValueError("Collection was not separated from candidate")
+    else:
+        pass
     dates = protocol["development_dates_tt"] + protocol["holdout_dates_tt"]
     counts = {
         "astrodice_lunar_wide_stencil_v1": 137,
@@ -34,6 +36,8 @@ def validate_reference(protocol, reference):
     count = counts.get(protocol["protocol_id"])
     if count is None or len(dates) != count or len(set(dates)) != count:
         raise ValueError("Frozen lunar cohorts changed")
+    else:
+        pass
     wanted = set()
     outside = []
     for d in dates:
@@ -52,6 +56,8 @@ def validate_reference(protocol, reference):
                 )
     if outside != reference["outside_calendar"]:
         raise ValueError("Missing calendar endpoints changed")
+    else:
+        pass
     points = {}
     missing = {r["date_tt"] for r in reference["missing_probe_epochs"]}
     for batch in reference["batches"]:
@@ -64,21 +70,31 @@ def validate_reference(protocol, reference):
             or hashlib.sha256(text.encode()).hexdigest() != batch["result_sha256"]
         ):
             raise ValueError("Raw lunar reference identity changed")
+        else:
+            pass
         if any(
             batch["parameters"].get(k) != v
             for k, v in protocol["reference_parameters"].items()
         ):
             raise ValueError("Lunar target/time/frame changed")
+        else:
+            pass
         requested = {
             parse_date(label, True)
             for label in re.findall(r"'([^']+)'", batch["parameters"]["TLIST"])
         }
         if not requested <= wanted:
             raise ValueError("Lunar request cohort changed")
+        else:
+            pass
         if "error" in batch:
             if "No ephemeris" not in batch["error"]:
                 raise ValueError("Unexplained reference failure")
+            else:
+                pass
             continue
+        else:
+            pass
         if not all(
             v in text
             for v in [
@@ -89,11 +105,15 @@ def validate_reference(protocol, reference):
             ]
         ):
             raise ValueError("Returned lunar headers changed")
+        else:
+            pass
         table = list(
             csv.reader(io.StringIO(text.split("$$SOE\n", 1)[1].split("$$EOE", 1)[0]))
         )
         if len(table) != len(batch["rows"]):
             raise ValueError("Lunar raw count changed")
+        else:
+            pass
         returned = set()
         for row, cols in zip(batch["rows"], table):
             d = parse_date(cols[0])
@@ -113,12 +133,18 @@ def validate_reference(protocol, reference):
                 > 1e-15
             ):
                 raise ValueError("Lunar raw direction/date changed")
+            else:
+                pass
             points[d] = row["icrf_unit_direction"]
             returned.add(d)
         if returned != requested:
             raise ValueError("Lunar requested probes missing")
+        else:
+            pass
     if set(points) & missing or set(points) | missing != wanted:
         raise ValueError("Lunar full coverage changed")
+    else:
+        pass
     weights = {
         k: float(
             Fraction((-1) ** (k + 1), k)
@@ -130,6 +156,8 @@ def validate_reference(protocol, reference):
     }
     if [r["date_tt"] for r in reference["rows"]] != dates:
         raise ValueError("Lunar centers changed")
+    else:
+        pass
     for row in reference["rows"]:
         center = datetime.fromisoformat(row["date_tt"])
         absent = []
@@ -143,10 +171,14 @@ def validate_reference(protocol, reference):
                 absent.append(
                     {"offset_seconds": o, "date_tt": probe, "reason": "No ephemeris"}
                 )
+            else:
+                pass
         if row["missing_probes"] != absent or row["status"] != (
             "incomplete" if absent else "available"
         ):
             raise ValueError("Lunar incomplete evidence changed")
+        else:
+            pass
         cohort = (
             "holdout"
             if row["date_tt"] in protocol["holdout_dates_tt"]
@@ -165,8 +197,12 @@ def validate_reference(protocol, reference):
         )
         if row["cohort"] != cohort or row["jd_tt"] != jd:
             raise ValueError("Lunar cohort or time changed")
+        else:
+            pass
         if absent:
             continue
+        else:
+            pass
         rates = {
             str(h): [
                 math.fsum(
@@ -192,6 +228,8 @@ def validate_reference(protocol, reference):
             or abs(row["step_difference_arcsec_per_day"] - diff) > 1e-12
         ):
             raise ValueError("Lunar frozen interpolation changed")
+        else:
+            pass
     return {
         "centers": len(dates),
         "position_probes": len(points),
@@ -235,6 +273,8 @@ def audit(protocol, reference, *, production_order=False):
                 {k: row[k] for k in ["date_tt", "cohort", "status", "missing_probes"]}
             )
             continue
+        else:
+            pass
         jd = row["jd_tt"]
         production_metadata = {}
         produced, model = ephemeris._swisseph_planet_state(
@@ -264,9 +304,13 @@ def audit(protocol, reference, *, production_order=False):
                 source_trace=trace,
                 motion_metadata=production_metadata,
             )
+        else:
+            pass
         native, returned = runtime.ephemeris_call("calc", jd, swe.MOON, flags)
         if runtime.ephemeris_model_from_retflag(returned) != model:
             raise ValueError("Lunar diagnostic source changed")
+        else:
+            pass
         trace.observe("Moon", model)
         fixed = production_metadata["lunar_light_time"]["fixed_frame_source_derivative"]
         result = {k: row[k] for k in ["date_tt", "cohort", "status"]}
@@ -293,6 +337,8 @@ def audit(protocol, reference, *, production_order=False):
             )
             rows.append(result)
             continue
+        else:
+            pass
         decoded = frame.decode_native_fixed_reception_state(
             jd,
             fixed["full_fixed_frame_apparent_position_au"],
@@ -321,6 +367,8 @@ def audit(protocol, reference, *, production_order=False):
         )
         if production_order:
             result["source_windows"] = production_metadata.get("lunar_source_windows")
+        else:
+            pass
         rows.append(result)
     available = [r for r in rows if r["status"] == "available"]
     metrics = [
@@ -392,6 +440,8 @@ if __name__ == "__main__":
     reference = json.loads(args.reference.read_text())
     if digest(args.protocol) != reference["protocol_sha256"]:
         raise ValueError("Frozen lunar protocol changed")
+    else:
+        pass
     validation = validate_reference(protocol, reference)
     result = (
         {"validation": validation, "candidate_compared": False}
@@ -416,3 +466,5 @@ if __name__ == "__main__":
         )
     )
     raise SystemExit(result.get("exit_code", 0))
+else:
+    pass

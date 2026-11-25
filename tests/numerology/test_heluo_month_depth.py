@@ -2,17 +2,18 @@
 
 import hashlib
 import json
+from copy import deepcopy
 from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
 
-from fatebridge.core.heluo import MONTH_GUA, gua_lines, judge
-from fatebridge.core.heluo_hexagrams import _gua_tables
-from fatebridge.core.heluo_months import MONTH_BRANCHES, month_affinity
-from fatebridge.core.output_numerology import HeluoMonthAffinity
+from fatebridge.core.contracts.output_numerology import HeluoMonthAffinity
+from fatebridge.core.heluo.heluo import MONTH_GUA, gua_lines, judge
+from fatebridge.core.heluo.heluo_months import MONTH_BRANCHES, month_affinity
+from fatebridge.core.local_techniques.heluo import build_heluo_result
 from fatebridge.utils.errors import NumerologySourceError
-from tests.numerology.test_heluo_najia_depth import PILLARS, example_chart
+from tests.unit_test.fixtures.heluo_charts import PILLARS, chart_for, example_chart
 
 ROOT = Path(__file__).parents[1] / "fixtures/numerology_nlc_v1"
 REFERENCE = json.loads((ROOT / "month-reference.json").read_text())
@@ -26,15 +27,7 @@ UNRESOLVED_QUALIFIER_MIGRATIONS = {
 }
 
 
-def chart_for(gua):
-    chart = example_chart()
-    pair = _gua_tables()[0][gua]
-    for phase in ("xian", "hou"):
-        chart[phase].update(name=gua, **pair, lines=gua_lines(pair["up"], pair["low"]))
-    return chart
-
-
-def test_month_source_witnesses_keep_the_declared_identity():
+def test_month_source_witnesses_keep_the_declared_identity() -> None:
     manifest = json.loads((ROOT / "month-manifest.json").read_text())
     assert manifest["pdf_sha256"] == REFERENCE["source_pdf_sha256"]
     for page in manifest["images"]:
@@ -45,7 +38,7 @@ def test_month_source_witnesses_keep_the_declared_identity():
 
 
 @pytest.mark.parametrize("case", REFERENCE["assigned_months"], ids=lambda c: c["gua"])
-def test_original_month_readings(case):
+def test_original_month_readings(case) -> None:
     chart = chart_for(case["gua"])
     actual = judge(chart, PILLARS, case["branch"])
     assert actual["deTime"] is True
@@ -67,15 +60,15 @@ def test_original_month_readings(case):
     ],
 )
 def test_default_intro_profile_preserves_its_source_month_readings(
-    gua, old_branch, new_branch
-):
+    gua: str, old_branch: str, new_branch: str
+) -> None:
     chart = chart_for(gua)
     assert judge(chart, PILLARS, old_branch)["deTime"] is False
     assert judge(chart, PILLARS, new_branch)["deTime"] is True
 
 
 @pytest.mark.parametrize("case", REFERENCE["window_cases"])
-def test_extra_windows_are_not_collapsed_into_assigned_month(case):
+def test_extra_windows_are_not_collapsed_into_assigned_month(case) -> None:
     actual = month_affinity(
         chart_for(case["gua"]), MONTH_BRANCHES[case["month"] - 1], MONTH_GUA
     )
@@ -97,9 +90,11 @@ def test_extra_windows_are_not_collapsed_into_assigned_month(case):
         assert (
             actual["phases"][0]["source_readings"][0]["status"] == "month_not_explicit"
         )
+    else:
+        pass
 
 
-def test_discrete_months_are_not_expanded_and_opposed_clauses_are_retained():
+def test_discrete_months_are_not_expanded_and_opposed_clauses_are_retained() -> None:
     def row(gua, month):
         return month_affinity(chart_for(gua), MONTH_BRANCHES[month - 1], MONTH_GUA)[
             "phases"
@@ -122,7 +117,9 @@ def test_discrete_months_are_not_expanded_and_opposed_clauses_are_retained():
 @pytest.mark.parametrize(
     "gua,month", [("離為火", 5), ("雷水解", 12), ("水風井", 3), ("風水渙", 5)]
 )
-def test_month_label_does_not_discharge_unevaluated_qualifiers(gua, month):
+def test_month_label_does_not_discharge_unevaluated_qualifiers(
+    gua: str, month: int
+) -> None:
     actual = month_affinity(chart_for(gua), MONTH_BRANCHES[month - 1], MONTH_GUA)
     matched = [
         w for w in actual["phases"][0]["additional_windows"] if w["month_label_match"]
@@ -134,7 +131,7 @@ def test_month_label_does_not_discharge_unevaluated_qualifiers(gua, month):
     assert actual["complete_assessment"] is False
 
 
-def test_full_intro_review_does_not_become_complete_book_or_full_assessment():
+def test_full_intro_review_does_not_become_complete_book_or_full_assessment() -> None:
     actual = month_affinity(chart_for("天雷無妄"), "酉", MONTH_GUA)
     assert actual["reviewed_hexagram_introductions"] == 64
     assert actual["explicit_assigned_months"] == 63
@@ -143,8 +140,7 @@ def test_full_intro_review_does_not_become_complete_book_or_full_assessment():
     assert actual["complete_assessment"] is False
 
 
-def test_table_stays_complete_and_conflicting_source_anchor_fails_visibly():
-    from copy import deepcopy
+def test_table_stays_complete_and_conflicting_source_anchor_fails_visibly() -> None:
 
     assert len([n for names in MONTH_GUA.values() for n in names]) == 64
     assert len({n for names in MONTH_GUA.values() for n in names}) == 64
@@ -156,7 +152,7 @@ def test_table_stays_complete_and_conflicting_source_anchor_fails_visibly():
 
 
 @pytest.mark.parametrize("branch", [None, "", "未知", "寅卯"])
-def test_unknown_month_cannot_become_a_negative_assessment(branch):
+def test_unknown_month_cannot_become_a_negative_assessment(branch: str | None) -> None:
     with pytest.raises(ValueError):
         month_affinity(chart_for("火澤睽"), branch, MONTH_GUA)
 
@@ -173,7 +169,7 @@ def test_unknown_month_cannot_become_a_negative_assessment(branch):
         {"phases": [{"opposed_month_conditions": "false"}]},
     ],
 )
-def test_corrupt_month_facts_are_rejected(payload):
+def test_corrupt_month_facts_are_rejected(payload) -> None:
     with pytest.raises(ValidationError):
         HeluoMonthAffinity.model_validate(payload)
 
@@ -187,9 +183,8 @@ def test_corrupt_month_facts_are_rejected(payload):
     ],
 )
 def test_snapshot_distinguishes_qualifier_uncertainty_endpoint_and_conflict(
-    date, expected, unexpected
-):
-    from fatebridge.core.local_techniques.heluo import build_heluo_result
+    date: str, expected: str, unexpected: str | None
+) -> None:
 
     result = build_heluo_result(
         date=date,
@@ -202,3 +197,5 @@ def test_snapshot_distinguishes_qualifier_uncertainty_endpoint_and_conflict(
     assert expected in text
     if unexpected:
         assert unexpected not in text
+    else:
+        pass

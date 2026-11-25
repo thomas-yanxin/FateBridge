@@ -41,7 +41,9 @@ PROTOCOL = json.loads(
     "rate,direction",
     [(0.0, "zero_instantaneous_rate"), (-1e-15, "retrograde"), (1e-15, "direct")],
 )
-def test_unrounded_rate_sign_does_not_locate_a_station_event(rate, direction):
+def test_unrounded_rate_sign_does_not_locate_a_station_event(
+    rate, direction: str
+) -> None:
     speed = require_longitude_speed((0, 0, 1, rate, 0, 0), 256, 256)
     motion = context_motion("Saturn", {"Saturn": speed}, {"Saturn": "swieph"}, FRAME)
     assert motion["longitude_speed"] == rate
@@ -62,7 +64,7 @@ def test_unrounded_rate_sign_does_not_locate_a_station_event(rate, direction):
 )
 def test_requested_native_motion_never_accepts_missing_or_nonfinite_speed(
     values, flags
-):
+) -> None:
     with pytest.raises(EphemerisSourceError) as error:
         require_longitude_speed(values, flags, 256)
     assert error.value.reason == "coordinate_motion_unavailable"
@@ -71,8 +73,8 @@ def test_requested_native_motion_never_accepts_missing_or_nonfinite_speed(
 @pytest.mark.parametrize("sidereal", [False, True])
 @pytest.mark.parametrize("problem", ["missing_flag", "nan"])
 def test_real_native_provider_failure_is_rejected_before_false_direct(
-    sidereal, problem, monkeypatch
-):
+    sidereal: bool, problem: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
     original = runtime.ephemeris_call
     swe = runtime.swe
     assert swe is not None
@@ -83,8 +85,12 @@ def test_real_native_provider_failure_is_rejected_before_false_direct(
                 # Actually ask Swiss not to compute speed: it returns zero,
                 # which used to be accepted despite Saturn being retrograde.
                 return original(operation, args[0], args[1], args[2] & ~swe.FLG_SPEED)
+            else:
+                pass
             values, flags = original(operation, *args, **kwargs)
             return (*values[:3], math.nan, *values[4:]), flags
+        else:
+            pass
         return original(operation, *args, **kwargs)
 
     assert (
@@ -106,8 +112,8 @@ def test_real_native_provider_failure_is_rejected_before_false_direct(
 
 @pytest.mark.parametrize("zodiacal", [0, 1])
 def test_context_retains_native_rate_and_explicit_corrections_without_changing_dice(
-    zodiacal,
-):
+    zodiacal: int,
+) -> None:
     result = build_otherbu_result(**FACES, **SKY, zodiacal=zodiacal)
     plain = build_otherbu_result(**FACES)
     points = {o["id"]: o for o in result["chart"]["chart"]["objects"]}
@@ -134,10 +140,14 @@ def test_context_retains_native_rate_and_explicit_corrections_without_changing_d
             )
             if zodiacal:
                 assert "rotation_correction" not in actual
+            else:
+                pass
             if name == "Moon":
                 assert actual["light_time_correction"] != 0
                 assert "spatial_aberration_correction" in actual
                 assert "lunar_source_remainder_correction" in actual
+            else:
+                pass
             assert actual["reference_frame"] == (
                 "lahiri_sidereal_ecliptic_of_date" if zodiacal else FRAME
             )
@@ -164,7 +174,6 @@ def test_context_retains_native_rate_and_explicit_corrections_without_changing_d
     for key in (
         "method_id",
         "symbolic_details",
-        "interpretation",
         "rule_trace",
         "rulesets",
         "diceChart",
@@ -175,8 +184,8 @@ def test_context_retains_native_rate_and_explicit_corrections_without_changing_d
 @pytest.mark.parametrize("failed", ["Saturn", "North Node"])
 @pytest.mark.parametrize("zodiacal", [0, 1])
 def test_approximate_motion_has_its_own_method_and_display_frame(
-    failed, zodiacal, monkeypatch
-):
+    failed: str, zodiacal: int, monkeypatch: pytest.MonkeyPatch
+) -> None:
     original = ephemeris._swisseph_planet_state
     monkeypatch.setattr(
         ephemeris,
@@ -209,9 +218,11 @@ def test_approximate_motion_has_its_own_method_and_display_frame(
             assert motion["longitude_speed"] == pytest.approx(
                 motion["model_longitude_speed"] - origin_rate, abs=1e-8
             )
+        else:
+            pass
 
 
-def test_frozen_velocity_protocol_and_reference_identity():
+def test_frozen_velocity_protocol_and_reference_identity() -> None:
     assert (
         hashlib.sha256(
             (ROOT / "tests/data/astrodice/tables/velocity-protocol.json").read_bytes()
@@ -231,7 +242,9 @@ def test_frozen_velocity_protocol_and_reference_identity():
     assert PROTOCOL["require_speed_flag"] is True
 
 
-def test_direction_derivative_removes_radial_velocity_and_retains_transverse_rate():
+def test_direction_derivative_removes_radial_velocity_and_retains_transverse_rate() -> (
+    None
+):
     assert direction_derivative((2.0, 0, 0), (3.0, 4.0, 0)) == [0.0, 2.0, 0.0]
     assert direction_derivative((2.0, 0, 0), (3.0, 0, 0)) == [0.0, 0.0, 0.0]
     with pytest.raises(ValueError):
@@ -249,7 +262,9 @@ def test_direction_derivative_removes_radial_velocity_and_retains_transverse_rat
         "wrong_velocity",
     ],
 )
-def test_velocity_audit_negative_controls_do_not_turn_absence_into_zero_error(problem):
+def test_velocity_audit_negative_controls_do_not_turn_absence_into_zero_error(
+    problem: str,
+) -> None:
     values = [1.0, 0.0, 0.0, 0.0, 0.01, 0.0]
     flags = 256
     row = {"position_au": values[:3], "velocity_au_per_day": values[3:].copy()}
@@ -263,10 +278,16 @@ def test_velocity_audit_negative_controls_do_not_turn_absence_into_zero_error(pr
         values[3] = math.nan
     elif problem == "wrong_velocity":
         values[4] += 1e-6
+    else:
+        pass
     result = velocity_diagnostics(values, flags, row, PROTOCOL, 256)
     assert result["passes_velocity_check"] is (problem == "none")
     if problem in {"missing_flag", "failed_flag"}:
         assert result["native_speed_flag_returned"] is False
+    else:
+        pass
     if problem not in {"none", "wrong_velocity"}:
         assert result["component_velocity_error_au_per_day"] is None
         assert result["direction_derivative_error_arcsec_per_day"] is None
+    else:
+        pass

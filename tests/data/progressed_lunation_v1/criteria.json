@@ -1,0 +1,29 @@
+{
+  "approved_gates": {
+    "source_matched_C_angular_degrees": 1e-08,
+    "source_matched_C_root_seconds": 0.001,
+    "independent_DE440_angular_degrees": 0.01,
+    "independent_DE440_root_seconds_all8": 60,
+    "all8_timing_qualification": "This is a new explicitextensiongate,not an assertion oldquartertimingsalreadyaccepted.",
+    "display_age_absolute_years": "1/2000",
+    "raw_age": "exact eventCivilPoint.day−birthCivilPoint.day; APIfieldCivilPoint.day singular,TTInstant.daysplural. No roundedUTCdatetime/msreceipt inverse or claim ofuniquequantizedclockinverse."
+  },
+  "scan_step_days_exact": "1/4",
+  "scan_full_window_nominal_days": 40,
+  "max_bisection_iterations": 128,
+  "solver": "Independent complete quarter-day scan per 8target; signed residual formed from exact delivered Sun/Moon binary64 fractions;128bisection or no distinct interior point; choose first postside source point.",
+  "counts": "No root count guessed. Both independent complete sets solved and sealed before product access. All failures/roots/order retained.",
+  "age": "Fraction(selected native TT float)-[2451545+64.184/86400]. This constant-offset-window identity implements exact nominal UTC day difference; no SI interval assertion/global affine UTC claim.",
+  "display_age": "Nearest half-even 3dp rational target; allowed absolute1/2000year gate separate from native root residual/time.",
+  "coordinate_model": "CALCEPH5.0.1units38,Earth399/Sun10/Moon301 relativeSSB,SOFA20231011Dtdb geocentricu=v0,finite-source lighttime,iauAb,Pnm06a+trueobliquity; oldsourcegeometryqualified, newwindow/all8 not preaccepted.",
+  "optical_model": "Earth399 at receive TDB; Sun10/Moon301 at12cap converged finite-distance emission TDB (1e-16day); SOFA iauAb with receiveEarthvelocity,Sunobserverdistance,bm1;Pnm06a andObl06+Nut06a trueobliquity. No topocentric/UT1/refraction/infinite-distance solar-deflection addition.",
+  "clock_model": "Geocentric SOFA iauDtdb(J2000,TTrelative,0,0,0,0),splitTDBsourceargument. Constant exactUTCoffset64.184s over thisfixedwindow only.",
+  "cross_evaluation": "Only independent authorC roots and independent DE440 roots after both sets exist; no candidate output/point/curve read or target/window selection.",
+  "failure_policy": "Write full partial results and failure diagnostics on first attempt; no retry/refitting/gate/model changes.",
+  "reference_source_scope": "Same-source authorC numerical method comparison; DE440 qualified bounded model comparison, not observation/physicalSOTA or complete traditional validation.",
+  "old_evidence": "R18Jan2026/quarter gates and all old corpora/mean/Horosa controls unchanged. This explicitly extends60s timing gate to all8angles for thisnewfixedwindow.",
+  "new_root_credit": 0,
+  "product_imports": 0,
+  "candidate_or_public_before_reads": 0,
+  "reference_runs_planned": 1
+}

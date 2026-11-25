@@ -2,6 +2,7 @@
 
 import copy
 import shutil
+from pathlib import Path
 
 import pytest
 
@@ -24,7 +25,7 @@ def report():
 )
 def test_every_original_unknown_has_its_native_reading_without_dropping_a_target(
     report, target
-):
+) -> None:
     row = next(
         r
         for r in report["target_comparisons"]
@@ -35,9 +36,11 @@ def test_every_original_unknown_has_its_native_reading_without_dropping_a_target
     assert row["effective_source_value"] == target["value"]
     if target["value"] is None:
         assert row["comparison_status"] == "unknown"
+    else:
+        pass
 
 
-def test_original_1440_layer_and_all_original_differences_are_unchanged(report):
+def test_original_1440_layer_and_all_original_differences_are_unchanged(report) -> None:
     old = literal_audit()
     assert report["original_layer"] == old
     assert report["current_literal_layer"] == old
@@ -62,7 +65,7 @@ def test_original_1440_layer_and_all_original_differences_are_unchanged(report):
     assert report["whole_classic_acceptance_passed"] is False
 
 
-def test_actual_mismatch_is_not_turned_into_an_unknown_or_fitted_source_value():
+def test_actual_mismatch_is_not_turned_into_an_unknown_or_fitted_source_value() -> None:
     readings = verify()
     old = literal_audit()
     changed = copy.deepcopy(old)
@@ -87,7 +90,7 @@ def test_actual_mismatch_is_not_turned_into_an_unknown_or_fitted_source_value():
 
 
 @pytest.mark.parametrize("name", ["native-readings.json", "native/page55.png"])
-def test_changed_literal_or_native_image_is_rejected(tmp_path, name):
+def test_changed_literal_or_native_image_is_rejected(tmp_path: Path, name: str) -> None:
     copied = tmp_path / "corpus"
     shutil.copytree(CORPUS, copied)
     (copied / name).write_bytes(b"changed")

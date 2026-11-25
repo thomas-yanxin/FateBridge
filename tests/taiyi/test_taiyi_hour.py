@@ -4,25 +4,29 @@ import hashlib
 import json
 import shutil
 from datetime import datetime, timedelta
+from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
 
 from fatebridge.core.almanac import get_solar_terms_for_year
+from fatebridge.core.contracts.output_taiyi_gates import TaiyiDeterminate
+from fatebridge.core.contracts.output_taiyi_hour import TaiyiHourOrigin
 from fatebridge.core.metaphysics.taiyi_gates import key_hour_gate_cycle
 from fatebridge.core.metaphysics.taiyi_hour import KEY_HOUR_PROFILE, key_hour_origin
 from fatebridge.core.metaphysics.taiyi_periods import period_frame
 from fatebridge.core.metaphysics.taiyi_year import cyclic_core
-from fatebridge.core.output_taiyi_gates import TaiyiDeterminate
-from fatebridge.core.output_taiyi_hour import TaiyiHourOrigin
 from fatebridge.services.metaphysics import calculate_taiyi_analysis
+from fatebridge.utils.civil_time import NominalClockLabel
 from scripts.taiyi.audit_taiyi_hour import CORPUS, audit, worked_board
-from tests.taiyi.test_taiyi_periods import seed_at
+from tests.unit_test.fixtures.taiyi import seed_at
 
 CASE = json.loads((CORPUS / "hour-worked.json").read_text())
 
 
-def test_full_original_example_retains_numerical_facts_and_unadjudicated_judgment():
+def test_full_original_example_retains_numerical_facts_and_unadjudicated_judgment() -> (
+    None
+):
     report = audit()
     example = report["hour_example"]
     assert example["required_fields"] == 20
@@ -54,7 +58,7 @@ def test_full_original_example_retains_numerical_facts_and_unadjudicated_judgmen
     assert alternative["applied_to_public_calendar"] is False
 
 
-def test_47_is_not_a_replacement_for_the_complete_887_counter():
+def test_47_is_not_a_replacement_for_the_complete_887_counter() -> None:
     board = worked_board(CASE)
     short = cyclic_core(CASE["shortcut_counter"])
     assert board["core_board"]["accumulation"] == 887
@@ -78,7 +82,7 @@ def test_47_is_not_a_replacement_for_the_complete_887_counter():
     TaiyiDeterminate.model_validate(board["determinate_calculation"])
 
 
-def test_different_jiazi_origin_dates_preserve_every_computed_cycle_phase():
+def test_different_jiazi_origin_dates_preserve_every_computed_cycle_phase() -> None:
     # A phase invariant, not 1,440 independent historical cases: any two
     # Jiazi day origins differ by 60 days = 720 double hours. The core's
     # 72/24/18/12 cycles and the Key's 120-hour gate cycle divide 720.
@@ -97,22 +101,26 @@ def test_different_jiazi_origin_dates_preserve_every_computed_cycle_phase():
             assert a == b
 
 
-def test_modern_date_phase_against_published_naoj_anchor_across_century_leap_rules():
+def test_modern_date_phase_against_published_naoj_anchor_across_century_leap_rules() -> (
+    None
+):
     # NAOJ's JDN 2000-01-01=2451545 and cycle=(JDN+49)%60 -> 戊午(54).
     # This is a derived civil-date sweep, not thousands of observed anchors.
     reference = datetime(2000, 1, 1)
-    winter = datetime(1899, 12, 21, 12)
+    winter = NominalClockLabel.from_local_datetime(datetime(1899, 12, 21, 12))
     day = datetime(1900, 1, 1)
     end = datetime(2101, 1, 1)
     while day < end:
-        result = key_hour_origin(winter, day.replace(hour=12))
+        result = key_hour_origin(
+            winter, NominalClockLabel.from_local_datetime(day.replace(hour=12))
+        )
         phase = (54 + (day - reference).days) % 60
         assert (result["accumulation"] - 1) % 720 == phase * 12 + 6
         day += timedelta(days=1)
 
 
-def test_zi_initial_and_midnight_are_explicit_and_do_not_double_count():
-    winter = datetime(2025, 12, 21, 23, 3)
+def test_zi_initial_and_midnight_are_explicit_and_do_not_double_count() -> None:
+    winter = NominalClockLabel.from_local_datetime(datetime(2025, 12, 21, 23, 3))
     clocks = [
         datetime.fromisoformat(t)
         for t in [
@@ -122,7 +130,10 @@ def test_zi_initial_and_midnight_are_explicit_and_do_not_double_count():
             "2026-04-05T01:00:00",
         ]
     ]
-    rows = [key_hour_origin(winter, c) for c in clocks]
+    rows = [
+        key_hour_origin(winter, NominalClockLabel.from_local_datetime(c))
+        for c in clocks
+    ]
     counts = [r["accumulation"] for r in rows]
     assert counts == [counts[0], counts[0] + 1, counts[0] + 1, counts[0] + 2]
     assert rows[0]["target_day_ganzhi"] == "戊申"
@@ -133,7 +144,9 @@ def test_zi_initial_and_midnight_are_explicit_and_do_not_double_count():
 
 
 @pytest.mark.parametrize("term_name", ["夏至", "冬至"])
-def test_solstice_switches_dun_without_resetting_the_key_phase_to_one(term_name):
+def test_solstice_switches_dun_without_resetting_the_key_phase_to_one(
+    term_name: str,
+) -> None:
     term = next(t for t in get_solar_terms_for_year(2026, "UTC") if t.name == term_name)
     moments = [
         (term.moment + timedelta(minutes=n)).replace(tzinfo=None) for n in (-2, 2)
@@ -146,7 +159,9 @@ def test_solstice_switches_dun_without_resetting_the_key_phase_to_one(term_name)
     assert rows[1]["accumulation"] != 1
 
 
-def test_apparent_clock_hour_origin_is_invariant_under_timezone_representation():
+def test_apparent_clock_hour_origin_is_invariant_under_timezone_representation() -> (
+    None
+):
     instant = datetime(2026, 8, 1, 12, 34, 56)
     rows = []
     for offset, zone in [(0, "UTC"), (8, "Asia/Shanghai"), (-4, "America/New_York")]:
@@ -160,8 +175,8 @@ def test_apparent_clock_hour_origin_is_invariant_under_timezone_representation()
 
 @pytest.mark.parametrize("month,day,hour", [(3, 8, 2), (11, 1, 1)])
 def test_key_profile_also_rejects_ambiguous_or_nonexistent_local_clocks(
-    month, day, hour
-):
+    month: int, day: int, hour: int
+) -> None:
     with pytest.raises(ValueError, match="local time"):
         seed = seed_at(datetime(2026, month, day, hour, 30), zone="America/New_York")
         period_frame(seed, "hour", KEY_HOUR_PROFILE)
@@ -177,12 +192,14 @@ def test_key_profile_also_rejects_ambiguous_or_nonexistent_local_clocks(
         ("hour", "made_up"),
     ],
 )
-def test_hour_profile_is_not_silently_ignored_or_coerced(mode, profile):
+def test_hour_profile_is_not_silently_ignored_or_coerced(mode: str, profile) -> None:
     with pytest.raises(ValueError, match="hour_profile"):
         period_frame(seed_at(datetime(2026, 4, 4, 12)), mode, profile)
 
 
-def test_output_snapshots_explain_selected_counter_and_do_not_claim_gates_passed():
+def test_output_snapshots_explain_selected_counter_and_do_not_claim_gates_passed() -> (
+    None
+):
     result = calculate_taiyi_analysis(
         analysis_year=2026,
         analysis_month=1,
@@ -215,8 +232,8 @@ def test_output_snapshots_explain_selected_counter_and_do_not_claim_gates_passed
     "attempt", ["drop_unknown_judgment", "drop_unit_conflict", "alter_facsimile"]
 )
 def test_audit_cannot_pass_by_removing_unadjudicated_or_failed_material(
-    tmp_path, attempt
-):
+    tmp_path: Path, attempt: str
+) -> None:
     corpus = tmp_path / "taiyi_jinjing_v6"
     shutil.copytree(CORPUS, corpus)
     prior = tmp_path / "taiyi_jinjing_v5"
@@ -244,12 +261,16 @@ def test_audit_cannot_pass_by_removing_unadjudicated_or_failed_material(
         for source in manifest["source_files"]:
             if source["file"] == path.name:
                 source["sha256"] = hashlib.sha256(path.read_bytes()).hexdigest()
+            else:
+                pass
         p.write_text(json.dumps(manifest))
     with pytest.raises(ValueError):
         audit(corpus)
 
 
-def test_calendar_source_literals_and_strict_optional_hour_schema_are_preserved():
+def test_calendar_source_literals_and_strict_optional_hour_schema_are_preserved() -> (
+    None
+):
     data = json.loads((CORPUS / "calendar-units.json").read_text())
     assert data["book"]["year_integral"] == "3835046.25"
     assert data["qian"]["year_integral"] == "3835048.25"

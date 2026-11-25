@@ -113,7 +113,9 @@ def candidate_result(request):
 
 @pytest.mark.parametrize("before,after", [(False, True), (True, False)])
 @pytest.mark.parametrize("basis", ["measured", "user_confirmed"])
-def test_move_or_turn_cannot_change_confirmed_plant_alive_state(before, after, basis):
+def test_move_or_turn_cannot_change_confirmed_plant_alive_state(
+    before: bool, after: bool, basis: str
+) -> None:
     inputs = relation_request(kind="sharp_corner_points_at_desk", changes=("facing",))
     original = dict(
         fact_id="plant",
@@ -132,7 +134,7 @@ def test_move_or_turn_cannot_change_confirmed_plant_alive_state(before, after, b
         assess(**inputs)
 
 
-def test_photo_plant_state_may_be_confirmed_without_replacing_the_object():
+def test_photo_plant_state_may_be_confirmed_without_replacing_the_object() -> None:
     inputs = relation_request(kind="sharp_corner_points_at_desk", changes=("facing",))
     original = dict(
         fact_id="plant",
@@ -158,7 +160,9 @@ def test_photo_plant_state_may_be_confirmed_without_replacing_the_object():
 
 
 @pytest.mark.parametrize("moving", ["source", "target"])
-def test_horizontal_relation_cannot_erase_static_other_endpoint_floor(moving):
+def test_horizontal_relation_cannot_erase_static_other_endpoint_floor(
+    moving: str,
+) -> None:
     inputs = relation_request(
         moving=moving,
         old_floors=[floor("upstairs", 2, ["source", "target"])],
@@ -172,7 +176,9 @@ def test_horizontal_relation_cannot_erase_static_other_endpoint_floor(moving):
 
 
 @pytest.mark.parametrize("moving,new_level", [("source", 0), ("target", 3)])
-def test_vertical_relation_cannot_erase_static_other_endpoint_floor(moving, new_level):
+def test_vertical_relation_cannot_erase_static_other_endpoint_floor(
+    moving: str, new_level: int
+) -> None:
     inputs = relation_request(
         kind="bed_above_stove",
         moving=moving,
@@ -196,7 +202,7 @@ def test_vertical_relation_cannot_erase_static_other_endpoint_floor(moving, new_
     ],
     ids=["different-floor-id", "different-level", "different-space-kind"],
 )
-def test_facing_only_proposal_cannot_change_known_floor_identity(new_floor):
+def test_facing_only_proposal_cannot_change_known_floor_identity(new_floor) -> None:
     inputs = relation_request(
         old_floors=[floor("original", 1, ["source", "target"])],
         new_floors=[deepcopy(new_floor)],
@@ -209,7 +215,7 @@ def test_facing_only_proposal_cannot_change_known_floor_identity(new_floor):
         assess(**inputs)
 
 
-def test_facing_only_floor_change_is_also_rejected_for_legacy_form_proposals():
+def test_facing_only_floor_change_is_also_rejected_for_legacy_form_proposals() -> None:
     observation = dict(
         object_id="desk",
         purpose="desk",
@@ -254,8 +260,8 @@ def test_facing_only_floor_change_is_also_rejected_for_legacy_form_proposals():
 
 @pytest.mark.parametrize("moving", ["source", "target"])
 def test_location_move_can_remove_horizontal_relation_without_moving_static_endpoint(
-    moving,
-):
+    moving: str,
+) -> None:
     inputs = relation_request(
         moving=moving,
         old_floors=[floor("original", 2, ["source", "target"])],
@@ -268,7 +274,7 @@ def test_location_move_can_remove_horizontal_relation_without_moving_static_endp
     assert candidate["missing_inputs"] == []
 
 
-def test_valid_vertical_location_move_uses_static_floor_only_for_validation():
+def test_valid_vertical_location_move_uses_static_floor_only_for_validation() -> None:
     inputs = relation_request(
         kind="bed_above_stove",
         old_floors=[
@@ -286,7 +292,7 @@ def test_valid_vertical_location_move_uses_static_floor_only_for_validation():
     assert candidate["decision_scope"].startswith("executable_proposal_not_universal_")
 
 
-def test_generic_mirror_candidate_keeps_static_action_permissions():
+def test_generic_mirror_candidate_keeps_static_action_permissions() -> None:
     inputs = relation_request(changes=("facing",), candidate_present=True)
     candidate = candidate_result(inputs)
     actions = candidate["interior_analysis"]["action_options"]

@@ -12,7 +12,9 @@ so neither is byte-lockable. We verify each by its defining invariant:
 
 from __future__ import annotations
 
-from fatebridge.core.astrology_lifespan import (
+from math import inf, nextafter
+
+from fatebridge.core.astro.astrology_lifespan import (
     build_jaynes_declination_payload,
     build_vedic_progression_payload,
 )
@@ -90,6 +92,38 @@ def test_declination_parallel_and_contraparallel() -> None:
             assert abs(p["progressed_declination"] - p["natal_declination"]) <= 0.5
         else:
             assert abs(p["progressed_declination"] + p["natal_declination"]) <= 0.5
+
+
+def test_declination_dual_orb_uses_the_nonzero_hemispheres() -> None:
+    rows = build_jaynes_declination_payload({"Sun": 0.125}, {"Moon": -0.25}, orb=0.5)[
+        "parallels"
+    ]
+    assert [(row["kind"], row["orb"]) for row in rows] == [("contraparallel", 0.125)]
+
+
+def test_declination_orb_uses_the_exact_supplied_coordinates() -> None:
+    progressed = {"Sun": float.fromhex("-0x1.716e5b896cd81p-2")}
+    natal = {"Sun": float.fromhex("0x1.cd6a946c82fdep-6")}
+    # The exact distance is one 2**-57 degree step above its binary64 image.
+    rounded_distance = float.fromhex("0x1.5497b242a4a83p-2")
+    outside = build_jaynes_declination_payload(progressed, natal, orb=rounded_distance)
+    assert outside["parallels"] == []
+    inside = build_jaynes_declination_payload(
+        progressed, natal, orb=nextafter(rounded_distance, inf)
+    )
+    assert [(row["kind"], row["orb"]) for row in inside["parallels"]] == [
+        ("contraparallel", 0.3326)
+    ]
+
+
+def test_declination_hits_sort_before_rounding_for_display() -> None:
+    rows = build_jaynes_declination_payload(
+        {"Sun": 10.0}, {"Moon": 10.00004, "Venus": 10.00003}, orb=0.5
+    )["parallels"]
+    assert [(row["natal"], row["orb"]) for row in rows] == [
+        ("Venus", 0.0),
+        ("Moon", 0.0),
+    ]
 
 
 def test_jaynesprog_end_to_end() -> None:

@@ -10,9 +10,9 @@ import pytest
 
 from fatebridge.application.execution import execute_tool
 from fatebridge.core.astro import native_execution, runtime
-from fatebridge.core.human_design_depth import line_fixings
+from fatebridge.core.human_design.human_design_depth import line_fixings
 from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.validation.human_design import verify_human_design_reading
+from validation.human_design import verify_human_design_reading
 
 ROOT = Path(__file__).resolve().parents[2]
 PLAN_PATH = ROOT / "tests/fixtures/human-design-additional-poles-plan.json"
@@ -36,7 +36,7 @@ def recipient(sides):
     return result
 
 
-def test_original_source_catalogue_and_preregistered_inputs_remain_immutable():
+def test_original_source_catalogue_and_preregistered_inputs_remain_immutable() -> None:
     assert (
         hashlib.sha256(PLAN_PATH.read_bytes()).hexdigest()
         == "d44b2199c8c2cf8bff6f2b0efe1ed2baf9280aed6a2c66dbd67c3f28c6c91da1"
@@ -94,7 +94,7 @@ def test_original_source_catalogue_and_preregistered_inputs_remain_immutable():
 
 @pytest.mark.parametrize("fact", PLAN["facts"], ids=lambda f: f["fact_id"])
 @pytest.mark.parametrize("case", PLAN["matrix_requirements"])
-def test_all_preregistered_planet_gate_line_and_side_conditions(fact, case):
+def test_all_preregistered_planet_gate_line_and_side_conditions(fact, case) -> None:
     gate, line = fact["gate"], fact["line"]
     harmonic = {11: 56, 25: 51}[gate]
     donor = fact["additional_planet"]
@@ -124,6 +124,8 @@ def test_all_preregistered_planet_gate_line_and_side_conditions(fact, case):
         sides["personality"][0]["gate"] = harmonic
     elif case == "dual_juxtaposition_preserved":
         sides["design"].append({"body": "Sun", "gate": harmonic, "line": 1})
+    else:
+        pass
     r = recipient(sides)
     reject = case in {
         "wrong_body_rejected",
@@ -148,11 +150,15 @@ def test_all_preregistered_planet_gate_line_and_side_conditions(fact, case):
                 r["additional_polarity_basis"][0]["source_catalog_sha256"]
                 == PLAN["source_catalog_sha256"]
             )
+        else:
+            pass
     assert r["polarity_kind"] == (
         "unitary" if gate == 25 and r["line"] == 4 else "dual"
     )
     if case == "node_recipient_accepted":
         assert r["recipient_kind"] == "node_activation"
+    else:
+        pass
     assert r["exaltation_planet"] == primary if r["line"] == line else True
 
 
@@ -160,8 +166,8 @@ def test_all_preregistered_planet_gate_line_and_side_conditions(fact, case):
 @pytest.mark.parametrize("mode", PLAN["modes"])
 @pytest.mark.parametrize("empty_files", [False, True])
 def test_every_original_public_case_both_modes_and_backends(
-    case, mode, empty_files, monkeypatch, tmp_path
-):
+    case, mode, empty_files: bool, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path if empty_files else ROOT / "ephe"))
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
     run = execute_tool(SPEC, SPEC.request_model(**case["input"], node_mode=mode))
@@ -202,8 +208,8 @@ def complete():
 
 @pytest.mark.parametrize("bad", PLAN["negative_receipts"])
 def test_rehashed_missing_or_forged_source_and_donor_receipts_are_rejected(
-    complete, bad, monkeypatch
-):
+    complete, bad, monkeypatch: pytest.MonkeyPatch
+) -> None:
     run = deepcopy(complete)
     depth = run["depth_evidence"]
     r = next(
@@ -243,7 +249,7 @@ def test_rehashed_missing_or_forged_source_and_donor_receipts_are_rejected(
     assert verify_human_design_reading(run)["status"] == "rejected"
 
 
-def test_returned_catalog_and_basis_cannot_mutate_later_source_results():
+def test_returned_catalog_and_basis_cannot_mutate_later_source_results() -> None:
     sides = {
         "design": [{"body": "Mercury", "gate": 11, "line": 4}],
         "personality": [{"body": "Venus", "gate": 11, "line": 1}],
@@ -255,7 +261,9 @@ def test_returned_catalog_and_basis_cannot_mutate_later_source_results():
     )
 
 
-def test_forged_additional_polarity_summary_rejected(complete, monkeypatch):
+def test_forged_additional_polarity_summary_rejected(
+    complete, monkeypatch: pytest.MonkeyPatch
+) -> None:
     run = deepcopy(complete)
     run["depth_evidence"]["additional_polarity_summary"]["matched_recipient_count"] = 0
     monkeypatch.setattr(runtime, "ephemeris_call", forbidden)

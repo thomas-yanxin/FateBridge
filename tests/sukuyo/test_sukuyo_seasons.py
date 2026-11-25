@@ -1,13 +1,16 @@
 """Seasonal relations cannot select ancient clock or leap-month precedence."""
 
 from copy import deepcopy
+from pathlib import Path
 
 import pytest
 
-from fatebridge.core import sukuyo_seasons as seasons
-from fatebridge.core.sukuyo import calendar_mansion, day_evidence
-from fatebridge.core.sukuyo_commentarial_clock import commentarial_boundary_reference
-from fatebridge.core.sukuyo_sources import LoadedSource
+from fatebridge.core.sukuyo import sukuyo_seasons as seasons
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence
+from fatebridge.core.sukuyo.sukuyo_commentarial_clock import (
+    commentarial_boundary_reference,
+)
+from fatebridge.core.sukuyo.sukuyo_sources import LoadedSource
 from scripts.sukuyo.check_sukuyo_seasons import verify_primary
 
 
@@ -34,7 +37,9 @@ def reference():
         (12, 13, 17),
     ],
 )
-def test_each_original_month_count_and_time_label(month, day, night):
+def test_each_original_month_count_and_time_label(
+    month: int, day: int, night: int
+) -> None:
     row = reference()["all12_season_rows"][month - 1]
     assert (row["textual_month"], row["day_count"], row["night_count"]) == (
         month,
@@ -45,7 +50,7 @@ def test_each_original_month_count_and_time_label(month, day, night):
     assert not row["explicit_equinox_term_in_selected_paragraph"]
 
 
-def test_eighth_month_narrative_does_not_become_missing_daily_cells():
+def test_eighth_month_narrative_does_not_become_missing_daily_cells() -> None:
     value = reference()
     assert not value["all12_season_rows"][7]["explicit_fortnight_table_for_this_month"]
     original = commentarial_boundary_reference()["standalone_xuanying_reference"][
@@ -55,7 +60,7 @@ def test_eighth_month_narrative_does_not_become_missing_daily_cells():
     assert not any(r["textual_month"] == 8 for r in original["literal_slots"])
 
 
-def test_shadow_repeat_and_half_footprint_are_not_smoothed_or_modern_lengths():
+def test_shadow_repeat_and_half_footprint_are_not_smoothed_or_modern_lengths() -> None:
     rows = reference()["all12_season_rows"]
     assert rows[4]["noon_shadow_literal"] == "半脚跡"
     assert (
@@ -66,7 +71,7 @@ def test_shadow_repeat_and_half_footprint_are_not_smoothed_or_modern_lengths():
     ]
 
 
-def test_same_fifth_label_or_count_does_not_certify_uniform_date_conversion():
+def test_same_fifth_label_or_count_does_not_certify_uniform_date_conversion() -> None:
     value = reference()
     compared = value["named_month_comparison_scope"]
     assert compared["Rizang_month5_fullmoon_literal"] == "女"
@@ -92,14 +97,16 @@ def test_same_fifth_label_or_count_does_not_certify_uniform_date_conversion():
     ],
 )
 def test_substituted_parent_edition_cannot_reuse_seasonal_binding(
-    monkeypatch, file, expected
-):
+    monkeypatch: pytest.MonkeyPatch, file: str, expected: str
+) -> None:
     load = seasons.load_source
 
     def changed(path):
         value = load(path)
         if path.name != file:
             return value
+        else:
+            pass
         payload = value.data
         if file == "sukuyo_t1299_days.json":
             payload["source_sha256"] = "changed"
@@ -114,12 +121,12 @@ def test_substituted_parent_edition_cannot_reuse_seasonal_binding(
         )
 
 
-def test_substituted_rizang_edition_is_rejected():
+def test_substituted_rizang_edition_is_rejected() -> None:
     with pytest.raises(ValueError, match="日藏具名版本不一致"):
         seasons.seasonal_reference({"source_sha256": "changed"})
 
 
-def test_detached_view_cannot_rewrite_later_shadow_or_clock_flags():
+def test_detached_view_cannot_rewrite_later_shadow_or_clock_flags() -> None:
     value = reference()
     value["all12_season_rows"][11]["noon_shadow_literal"] = "十脚跡"
     value["interpretation_scope"]["physical_day_boundary_established"] = True
@@ -127,7 +134,7 @@ def test_detached_view_cannot_rewrite_later_shadow_or_clock_flags():
     assert not reference()["interpretation_scope"]["physical_day_boundary_established"]
 
 
-def test_source_counts_do_not_change_actual_calendar_or_pick_half():
+def test_source_counts_do_not_change_actual_calendar_or_pick_half() -> None:
     calendar = calendar_mansion(
         "0806-07-23",
         "12:00:00",
@@ -149,14 +156,14 @@ def test_source_counts_do_not_change_actual_calendar_or_pick_half():
 
 
 @pytest.mark.parametrize("name", ["T13n0397.xml", "T21n1299.xml", "T25n1509.xml"])
-def test_wrong_actual_source_capture_is_rejected(tmp_path, name):
+def test_wrong_actual_source_capture_is_rejected(tmp_path: Path, name: str) -> None:
     path = tmp_path / "wrong"
     path.write_bytes(b"wrong")
     with pytest.raises(ValueError, match="实际源文件字节指纹不一致"):
         verify_primary({name: path})
 
 
-def test_offline_primary_check_has_no_claim_of_actual_capture_or_clock():
+def test_offline_primary_check_has_no_claim_of_actual_capture_or_clock() -> None:
     result = verify_primary()
     assert result["all_seasonal_month_rows_checked"] == 12
     assert result["actual_source_files_rechecked"] == []

@@ -29,13 +29,13 @@ def synthetic():
 
 
 @pytest.mark.parametrize("order", ORDERS)
-def test_independent_weights_exact_for_every_polynomial_moment(order):
+def test_independent_weights_exact_for_every_polynomial_moment(order) -> None:
     w = weights(order)
     for power in range(order + 1):
         assert sum(v * Fraction(k) ** power for k, v in w.items()) == int(power == 1)
 
 
-def test_smooth_function_selects_coarsest_middle_and_keeps_all_checks():
+def test_smooth_function_selects_coarsest_middle_and_keeps_all_checks() -> None:
     row, points = synthetic()
     result = quality(row, points)
     assert result["selected_step_seconds"] == 5400
@@ -45,13 +45,17 @@ def test_smooth_function_selects_coarsest_middle_and_keeps_all_checks():
     assert estimate(points, 5400, 12)[1] == pytest.approx(0.01, abs=1e-14)
 
 
-def test_coarse_discontinuity_forces_refinement_without_removing_failed_checks():
+def test_coarse_discontinuity_forces_refinement_without_removing_failed_checks() -> (
+    None
+):
     row, points = synthetic()
     # Three supports intersect an artificial distant jump; the finest triplet
     # remains local. It is selected by reference values alone.
     for o, p in points.items():
         if int(o) >= 27000:
             p[1] += 0.001
+        else:
+            pass
     result = quality(row, points)
     assert result["selected_step_seconds"] == 1350
     assert result["all_triplet_checks"][0]["qualified"] is False
@@ -59,7 +63,7 @@ def test_coarse_discontinuity_forces_refinement_without_removing_failed_checks()
     assert result["all_triplet_checks"][2]["qualified"] is True
 
 
-def test_projected_quality_must_use_preselected_icrf_support():
+def test_projected_quality_must_use_preselected_icrf_support() -> None:
     row, points = synthetic()
     assert quality(row, points, selected_step=1350)["selected_step_seconds"] == 1350
     assert (
@@ -68,7 +72,7 @@ def test_projected_quality_must_use_preselected_icrf_support():
     )
 
 
-def test_insufficient_printing_precision_is_not_converted_to_success():
+def test_insufficient_printing_precision_is_not_converted_to_success() -> None:
     row, points = synthetic()
     for p in row["samples"].values():
         p["printed_angles"] = ["0.0", "0.0"]
@@ -77,7 +81,7 @@ def test_insufficient_printing_precision_is_not_converted_to_success():
     assert result["selected_step_seconds"] is None
 
 
-def test_one_missing_planned_probe_keeps_case_unavailable():
+def test_one_missing_planned_probe_keeps_case_unavailable() -> None:
     row, points = synthetic()
     row["samples"]["64800"] = None
     result = quality(row, points)
@@ -85,14 +89,14 @@ def test_one_missing_planned_probe_keeps_case_unavailable():
 
 
 @pytest.mark.parametrize("bad", [float("nan"), float("inf")])
-def test_nonfinite_directions_fail_before_selection(bad):
+def test_nonfinite_directions_fail_before_selection(bad) -> None:
     row, points = synthetic()
     points["0"][0] = bad
     with pytest.raises(ValueError, match="Invalid refinement directions"):
         quality(row, points)
 
 
-def test_unplanned_removed_node_is_rejected():
+def test_unplanned_removed_node_is_rejected() -> None:
     row, points = synthetic()
     row["samples"].pop("64800")
     with pytest.raises(ValueError, match="node plan changed"):

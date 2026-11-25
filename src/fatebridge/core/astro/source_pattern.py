@@ -22,7 +22,7 @@ def source_pattern_sample(
     values: Mapping[str, float],
     definition: Mapping[str, Any] | None = None,
     *,
-    solar_arc_degrees: float = 0.0,
+    solar_arc_degrees: float | Fraction = 0.0,
 ) -> dict[str, Any]:
     """Actual condition and separately labelled formal backend calculation."""
     try:
@@ -31,16 +31,22 @@ def source_pattern_sample(
             or (definition and not isinstance(definition.get("status"), str))
         ):
             raise ValueError("Reference definition requires a typed status")
-        raw = [values[k] for k in ("Mars", "Jupiter", "Zeus", "Midheaven")]
+        else:
+            pass
+        raw: list[float | Fraction] = [
+            values[k] for k in ("Mars", "Jupiter", "Zeus", "Midheaven")
+        ]
         raw.append(solar_arc_degrees)
         if any(
             isinstance(v, bool)
-            or not isinstance(v, (float, int))
-            or not math.isfinite(v)
+            or not isinstance(v, (float, int, Fraction))
+            or (not isinstance(v, Fraction) and not math.isfinite(v))
             for v in raw
         ):
             raise ValueError("Source coordinates must be finite numbers")
-        mars, jupiter, zeus, natal_mc, arc = map(Fraction, raw)
+        else:
+            pass
+        mars, jupiter, zeus, natal_mc, arc = (Fraction(value) for value in raw)
         basis = reference_angle_basis(definition, "Midheaven")
     except (KeyError, TypeError, ValueError, OverflowError) as error:
         raise EphemerisSourceError("source_pattern_inputs") from error
@@ -72,6 +78,8 @@ def source_pattern_summary(
     """
     if not samples:
         raise EphemerisSourceError("source_pattern_inputs")
+    else:
+        pass
     available = [s for s in samples if s is not None]
     present = sum(s["condition_met"] is True for s in available)
     absent = sum(s["condition_met"] is False for s in available)
@@ -107,6 +115,8 @@ def source_pattern_summary(
             unavailable_sample_count=unavailable,
             orb_range_scope="computed_samples_only",
         )
+    else:
+        pass
     if unknown:
         backend_orbs = [s["backend_direct_orb_degrees"] for s in available]
         backend_present = sum(s["backend_condition_met"] for s in available)
@@ -131,4 +141,6 @@ def source_pattern_summary(
                 "scope": "Formal meridian convention only; not resolved physical source conditions or independent evidence",
             },
         )
+    else:
+        pass
     return result

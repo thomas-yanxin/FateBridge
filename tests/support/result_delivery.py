@@ -34,6 +34,8 @@ def reconstruct(store, result_id, path=None):
         offset = page["next_offset"]
         if offset is None:
             break
+        else:
+            pass
     text = "".join(parts)
     assert len(text) == page["total_chars"]
     return json.loads(text)
@@ -73,6 +75,8 @@ def block_writes(monkeypatch):
     def read_open(path, flags, *args, **kwargs):
         if flags & (os.O_WRONLY | os.O_RDWR | os.O_CREAT | os.O_TRUNC | os.O_APPEND):
             forbidden()
+        else:
+            pass
         return original_open(path, flags, *args, **kwargs)
 
     monkeypatch.setattr(os, "open", read_open)

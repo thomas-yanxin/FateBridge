@@ -8,6 +8,8 @@ from __future__ import annotations
 
 from typing import Any
 
+from fatebridge.core.metaphysics.taiyi_geometry import PALACES
+
 PROFILE = "wenchang_general_guan_shiji_general_yan_exact_palace_v1"
 SOURCE = "https://zh.wikisource.org/wiki/太乙金鏡式經_(四庫全書本)/卷03"
 ANNOTATIONS = (
@@ -29,7 +31,6 @@ GENERAL_FIELDS = {
 
 def eye_general_relations(core: dict[str, Any]) -> list[dict[str, Any]]:
     """Read this same core; no ju exceptions, calendar work or recasting."""
-    from fatebridge.core.metaphysics.taiyi_geometry import PALACES
 
     patterns = []
     for field, label in GENERAL_FIELDS.items():
@@ -53,6 +54,8 @@ def eye_general_relations(core: dict[str, Any]) -> list[dict[str, Any]]:
                     "scope": SCOPE,
                 }
             )
+        else:
+            pass
         if palace == core["shiji"]:
             patterns.append(
                 {
@@ -70,4 +73,6 @@ def eye_general_relations(core: dict[str, Any]) -> list[dict[str, Any]]:
                     "scope": SCOPE,
                 }
             )
+        else:
+            pass
     return patterns

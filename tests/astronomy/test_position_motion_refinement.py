@@ -16,10 +16,10 @@ class Trace:
 
 @pytest.fixture
 def analytical_provider(monkeypatch):
-    def install(function):
+    def install(function, center=2451545.0):
         def call(operation, epoch, body, flags):
             assert operation == "calc"
-            x = epoch - 2451545.0
+            x = epoch - center
             return (100.0 + function(x), 0.0, 1.0, 0.4, 0.0, 0.0), flags
 
         monkeypatch.setattr(motion.runtime, "ephemeris_call", call)
@@ -29,12 +29,14 @@ def analytical_provider(monkeypatch):
         if hasattr(motion, "stabilized_longitude_sample"):
 
             def identity(planet, epoch, coordinates, model, **kwargs):
-                return 100.0 + function(epoch - 2451545.0), {
+                return 100.0 + function(epoch - center), {
                     "epoch_remainder_days": 0.0,
                     "sampling_longitude_shift_arcseconds": 0.0,
                 }
 
             monkeypatch.setattr(motion, "stabilized_longitude_sample", identity)
+        else:
+            pass
         monkeypatch.setattr(
             motion, "assert_physical_configuration", lambda selected: None
         )
@@ -47,7 +49,9 @@ def analytical_provider(monkeypatch):
     return install
 
 
-def test_seventh_order_signal_refines_to_its_known_derivative(analytical_provider):
+def test_seventh_order_signal_refines_to_its_known_derivative(
+    analytical_provider,
+) -> None:
     analytical_provider(lambda x: 0.4 * x + 2 * x**7)
     rate, policy = motion.complete_position_rate(
         "Mercury", 2451545.0, (100, 0, 1), "swieph", source_trace=Trace()
@@ -59,9 +63,22 @@ def test_seventh_order_signal_refines_to_its_known_derivative(analytical_provide
     assert policy["step_difference_arcsec_per_day"] <= 0.0002
 
 
+def test_derivative_at_rounded_native_epoch_uses_actual_node_times(
+    analytical_provider,
+) -> None:
+    center = math.nextafter(2.0**22, -math.inf)
+    assert (center + 0.125) - center != 0.125
+    analytical_provider(lambda x: 0.4 * x + 0.002 * x**6, center=center)
+    rate, policy = motion.complete_position_rate(
+        "Sun", center, (100, 0, 1), "swieph", source_trace=Trace()
+    )
+    assert rate == pytest.approx(0.4, rel=0.0, abs=1e-10)
+    assert policy["step_difference_arcsec_per_day"] <= 0.0002
+
+
 def test_nondifferentiable_signal_still_fails_after_bounded_refinement(
     analytical_provider,
-):
+) -> None:
     analytical_provider(lambda x: x * math.log(abs(x)) if x else 0.0)
     with pytest.raises(EphemerisSourceError) as caught:
         motion.complete_position_rate(
@@ -70,7 +87,7 @@ def test_nondifferentiable_signal_still_fails_after_bounded_refinement(
     assert caught.value.reason == "position_motion_not_converged"
 
 
-def test_local_polynomial_derivative_preserves_degree_six_exactness():
+def test_local_polynomial_derivative_preserves_degree_six_exactness() -> None:
     for power in range(7):
         values = [x**power for x in motion.LOCAL_NODES]
         # This checks a mathematical identity, independently of ephemeris data.
@@ -81,7 +98,7 @@ def test_local_polynomial_derivative_preserves_degree_six_exactness():
 
 def test_real_solar_disc_venus_keeps_guard_and_failed_primary_evidence(
     native_ephemeris_files,
-):
+) -> None:
     from fatebridge.core.astro import runtime
 
     epoch = 2460465.5216340744
@@ -122,11 +139,11 @@ def test_real_solar_disc_venus_keeps_guard_and_failed_primary_evidence(
 
 
 def test_future_position_roots_use_native_guard_but_question_keeps_complete_motion(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     from types import SimpleNamespace
 
-    from fatebridge.core import horary_motion
+    from fatebridge.core.astro import horary_motion
 
     epoch = 2460465.5216340744
     calls = []
@@ -135,6 +152,8 @@ def test_future_position_roots_use_native_guard_but_question_keeps_complete_moti
         calls.append((kwargs["julian_day_tt"], kwargs["correct_motion"]))
         if kwargs["correct_motion"]:
             kwargs["motion_metadata"]["method_id"] = "complete_question_motion"
+        else:
+            pass
         return {
             "longitude": 1.0,
             "latitude": 0.0,

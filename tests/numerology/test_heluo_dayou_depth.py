@@ -6,10 +6,16 @@ from copy import deepcopy
 from pathlib import Path
 
 import pytest
+from pytest import MonkeyPatch
 
-from fatebridge.core import heluo_texts as ht
-from fatebridge.core.heluo import _tiaowen, yao_text
-from fatebridge.core.heluo_timing import _selected_text
+from fatebridge.core.heluo import heluo_texts as ht
+from fatebridge.core.heluo.heluo import (
+    _tiaowen,
+    lines_to_gua,
+    transform_houtian,
+    yao_text,
+)
+from fatebridge.core.heluo.heluo_timing import _selected_text
 from fatebridge.utils.errors import NumerologySourceError
 
 ROOT = Path(__file__).parents[1] / "fixtures/heluo_dayou_v1"
@@ -17,7 +23,7 @@ READINGS = json.loads((ROOT / "verified-readings.json").read_bytes())
 FREEZE = json.loads((ROOT / "freeze.json").read_bytes())
 
 
-def test_reference_keeps_all_six_lines_and_the_first_reader_corrections():
+def test_reference_keeps_all_six_lines_and_the_first_reader_corrections() -> None:
     assert [e["line"] for e in READINGS["entries"]] == list(range(1, 7))
     for name, digest in FREEZE["files"].items():
         assert hashlib.sha256((ROOT / name).read_bytes()).hexdigest() == digest
@@ -46,7 +52,9 @@ def test_reference_keeps_all_six_lines_and_the_first_reader_corrections():
 
 
 @pytest.mark.parametrize("entry", READINGS["entries"], ids=lambda e: str(e["line"]))
-def test_complete_prose_and_all_parent_conditions_use_the_primary_reading(entry):
+def test_complete_prose_and_all_parent_conditions_use_the_primary_reading(
+    entry,
+) -> None:
     t = yao_text(entry["hexagram"], entry["line"])
     assert t["detail"] == "".join(s["text"] for s in entry["sections"])
     assert t["commentary_sections"] == [
@@ -76,7 +84,7 @@ def test_complete_prose_and_all_parent_conditions_use_the_primary_reading(entry)
 
 
 @pytest.mark.parametrize("entry", READINGS["headers"], ids=lambda e: str(e["line"]))
-def test_header_does_not_inherit_other_editions_character_substitution(entry):
+def test_header_does_not_inherit_other_editions_character_substitution(entry) -> None:
     t = yao_text(entry["hexagram"], entry["line"])
     assert t["yaoci"] == entry["yaoci"]
     assert t["text_provenance"]["pdf_page"] == entry["pdf_page"]
@@ -100,14 +108,16 @@ def test_header_does_not_inherit_other_editions_character_substitution(entry):
     ],
 )
 def test_inherited_source_errors_keep_the_old_reading_and_repair_the_new(
-    line, wrong, right
-):
+    line: int, wrong: str, right: str
+) -> None:
     t = yao_text("火天大有", line)
     assert wrong in t["text_provenance"]["inherited_detail"]
     assert wrong not in t["detail"] and right in t["detail"]
 
 
-def test_source_condition_labels_do_not_predict_polarity_or_change_another_section():
+def test_source_condition_labels_do_not_predict_polarity_or_change_another_section() -> (
+    None
+):
     second = yao_text("火天大有", 2)
     assert "亦有福有壽" in second["commentary_sections"][2]["text"]
     assert second["commentary_sections"][2]["applicability"] is None
@@ -119,8 +129,7 @@ def test_source_condition_labels_do_not_predict_polarity_or_change_another_secti
         assert t["text_provenance"]["commentary_pdf_pages"] == pages
 
 
-def test_unnumbered_kui_reference_is_conditional_not_a_natal_transform():
-    from fatebridge.core.heluo import lines_to_gua, transform_houtian
+def test_unnumbered_kui_reference_is_conditional_not_a_natal_transform() -> None:
 
     t = yao_text("火天大有", 3)
     assert "凶則變睽刑傷難免" in t["detail"]
@@ -148,8 +157,8 @@ def test_unnumbered_kui_reference_is_conditional_not_a_natal_transform():
 
 @pytest.mark.parametrize("layer", ["header", "commentary"])
 def test_new_nonempty_source_corruption_cannot_keep_the_collated_identity(
-    layer, monkeypatch, tmp_path
-):
+    layer: str, monkeypatch: MonkeyPatch, tmp_path: Path
+) -> None:
     name, loader, reason = (
         ("COLLATION_PATH", ht._collation, "invalid_heluo_header_collation")
         if layer == "header"
@@ -178,7 +187,7 @@ def test_new_nonempty_source_corruption_cannot_keep_the_collated_identity(
         loader.cache_clear()
 
 
-def test_selections_remain_detached_from_the_inherited_and_collated_caches():
+def test_selections_remain_detached_from_the_inherited_and_collated_caches() -> None:
     before = deepcopy(_tiaowen())
     text = yao_text("火天大有", 4)
     text["commentary_sections"][1]["text"] = "污染"
@@ -189,7 +198,9 @@ def test_selections_remain_detached_from_the_inherited_and_collated_caches():
     assert _tiaowen() == before
 
 
-def test_independent_review_repairs_literal_errors_and_retains_uncertain_glyph():
+def test_independent_review_repairs_literal_errors_and_retains_uncertain_glyph() -> (
+    None
+):
     for line, right, wrong in [
         (2, "或曰輭車之兆", "輿車事之兆"),
         (4, "守常", "守當"),

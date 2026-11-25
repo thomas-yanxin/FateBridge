@@ -8,13 +8,16 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from fatebridge.core.metaphysics.taiyi_conditions import five_general_conditions
+from fatebridge.core.contracts.output_taiyi_conditions import TaiyiConditionAssessment
+from fatebridge.core.metaphysics.taiyi_conditions import (
+    conjunction,
+    five_general_conditions,
+)
 from fatebridge.core.metaphysics.taiyi_year import (
     cyclic_core,
     structural_patterns,
     yearly_core,
 )
-from fatebridge.core.output_taiyi_conditions import TaiyiConditionAssessment
 from fatebridge.services.metaphysics import calculate_taiyi_analysis
 from scripts.taiyi.audit_taiyi_historical import audit
 from tests.support.reference_data import resolve
@@ -24,7 +27,7 @@ TRUTH = json.loads((CORPUS / "predicate-cases.json").read_text())["cases"]
 HISTORY = json.loads((CORPUS / "historical-cases.json").read_text())["cases"]
 
 
-def test_complete_frozen_evidence_and_separate_oracle_kinds():
+def test_complete_frozen_evidence_and_separate_oracle_kinds() -> None:
     manifest = json.loads((CORPUS / "manifest.json").read_text())
     for item in manifest["source_files"]:
         assert (
@@ -53,7 +56,7 @@ def test_complete_frozen_evidence_and_separate_oracle_kinds():
 
 
 @pytest.mark.parametrize("case", TRUTH, ids=lambda c: c["id"])
-def test_each_of_three_clauses_is_required_and_all_blockers_survive(case):
+def test_each_of_three_clauses_is_required_and_all_blockers_survive(case) -> None:
     patterns = []
     for field, name, subject in [
         ("shiji_blocked", "掩", "始击"),
@@ -62,6 +65,8 @@ def test_each_of_three_clauses_is_required_and_all_blockers_survive(case):
     ]:
         if case[field]:
             patterns.append({"name": name, "subject": subject, "variant": name})
+        else:
+            pass
     assessment = five_general_conditions(patterns)
     TaiyiConditionAssessment.model_validate(assessment)
     # The frozen eight Boolean rows still verify the old evaluated-relation
@@ -80,7 +85,7 @@ def test_each_of_three_clauses_is_required_and_all_blockers_survive(case):
 @pytest.mark.parametrize(
     "name,subject", [("掩", "始击"), ("击", "始击"), ("囚", "文昌"), ("迫", "文昌")]
 )
-def test_every_explicit_eye_condition_can_block_alone(name, subject):
+def test_every_explicit_eye_condition_can_block_alone(name: str, subject: str) -> None:
     result = five_general_conditions(
         [{"name": name, "subject": subject, "variant": "independent boundary"}]
     )
@@ -88,7 +93,7 @@ def test_every_explicit_eye_condition_can_block_alone(name, subject):
     assert result["menju_jiangfa"] is False
 
 
-def test_passing_five_clauses_does_not_erase_other_relations_or_certify_gates():
+def test_passing_five_clauses_does_not_erase_other_relations_or_certify_gates() -> None:
     # Volume 3 Yang 23: Wen-chang 乾 is opposite Taiyi 巽. 對 is a separate
     # relation; the explicit volume-4 clause does not say "no relation at all".
     core = cyclic_core(23)
@@ -102,7 +107,7 @@ def test_passing_five_clauses_does_not_erase_other_relations_or_certify_gates():
 
 
 @pytest.mark.parametrize("mode", ["year", "month", "hour"])
-def test_returned_blockers_and_snapshot_resolve_to_this_same_board(mode):
+def test_returned_blockers_and_snapshot_resolve_to_this_same_board(mode: str) -> None:
     result = calculate_taiyi_analysis(
         analysis_year=2026,
         analysis_month=4,
@@ -121,7 +126,6 @@ def test_returned_blockers_and_snapshot_resolve_to_this_same_board(mode):
                 actual[key] == reference[key] for key in ("name", "subject", "variant")
             )
             assert reference["source_path"] in result["snapshot_text"]
-    from fatebridge.core.metaphysics.taiyi_conditions import conjunction
 
     assert assessment["menju_jiangfa"] is conjunction(
         assessment["five_generals"]["conditions_satisfied"],
@@ -129,7 +133,7 @@ def test_returned_blockers_and_snapshot_resolve_to_this_same_board(mode):
     )
 
 
-def test_all_144_ju_keep_each_blocking_relation_and_no_others():
+def test_all_144_ju_keep_each_blocking_relation_and_no_others() -> None:
     for yin in (False, True):
         for counter in range(1, 73):
             core = cyclic_core(counter, yin=yin)
@@ -152,7 +156,9 @@ def test_all_144_ju_keep_each_blocking_relation_and_no_others():
 
 
 @pytest.mark.parametrize("case", HISTORY, ids=lambda c: c["historical_label"])
-def test_entire_independent_historical_list_without_selecting_successful_years(case):
+def test_entire_independent_historical_list_without_selecting_successful_years(
+    case,
+) -> None:
     if "year_ce" in case:
         core = yearly_core(case["year_ce"])
     else:
@@ -170,7 +176,7 @@ def test_entire_independent_historical_list_without_selecting_successful_years(c
         assert core["kook_year"] == case["kook_year"]
 
 
-def test_published_historical_disagreement_remains_a_failing_audit():
+def test_published_historical_disagreement_remains_a_failing_audit() -> None:
     report = audit()
     assert report["checked_fields"] == 30 and report["matching_fields"] == 29
     assert report["historical_reference_acceptance_passed"] is False
@@ -187,7 +193,9 @@ def test_published_historical_disagreement_remains_a_failing_audit():
 
 
 @pytest.mark.parametrize("attempt", ["drop_row", "drop_field", "alter_image"])
-def test_historical_audit_rejects_deleted_failure_or_changed_source(tmp_path, attempt):
+def test_historical_audit_rejects_deleted_failure_or_changed_source(
+    tmp_path: Path, attempt: str
+) -> None:
     corpus = tmp_path / "corpus"
     shutil.copytree(CORPUS, corpus)
     if attempt == "alter_image":
@@ -195,6 +203,8 @@ def test_historical_audit_rejects_deleted_failure_or_changed_source(tmp_path, at
         with pytest.raises(ValueError, match="指纹"):
             audit(corpus)
         return
+    else:
+        pass
     path = corpus / "historical-cases.json"
     data = json.loads(path.read_text())
     if attempt == "drop_row":
@@ -207,12 +217,14 @@ def test_historical_audit_rejects_deleted_failure_or_changed_source(tmp_path, at
     for item in manifest["source_files"]:
         if item["file"] == path.name:
             item["sha256"] = hashlib.sha256(path.read_bytes()).hexdigest()
+        else:
+            pass
     manifest_path.write_text(json.dumps(manifest))
     with pytest.raises(ValueError, match="10.*3"):
         audit(corpus)
 
 
-def test_contract_does_not_coerce_unknown_gate_status_or_text_booleans():
+def test_contract_does_not_coerce_unknown_gate_status_or_text_booleans() -> None:
     with pytest.raises(ValidationError):
         TaiyiConditionAssessment.model_validate({"menju_jiangfa": "true"})
     with pytest.raises(ValidationError):

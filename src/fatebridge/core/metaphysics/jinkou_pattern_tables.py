@@ -2,8 +2,7 @@
 
 from __future__ import annotations
 
-JINKOU_SCAN_URL = "https://upload.wikimedia.org/wikipedia/commons/1/10/CNTS-00047981961_2_六壬神課金口訣.pdf"
-
+from fatebridge.core.metaphysics.ren_sources import JINKOU_SCAN_URL as JINKOU_SCAN_URL
 
 JINKOU_SCAN_SHA256 = "ee80bf68c7f87570540c88f073814af7adcd142b22ae71f6679253f59387785b"
 

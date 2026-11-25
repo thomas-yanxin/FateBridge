@@ -3,6 +3,7 @@
 import asyncio
 import json
 import shutil
+from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
@@ -12,24 +13,25 @@ import fatebridge.api as api
 from fatebridge.application.examples import suggested_fields
 from fatebridge.application.projection import project_fields
 from fatebridge.cli import run
+from fatebridge.core.contracts.output_chinese import Taiyi
 from fatebridge.core.metaphysics.taiyi_conditions import five_general_conditions
+from fatebridge.core.metaphysics.taiyi_enclosures import principal_enclosures
 from fatebridge.core.metaphysics.taiyi_eye_relations import (
     GENERAL_FIELDS,
     PROFILE,
     eye_general_relations,
 )
 from fatebridge.core.metaphysics.taiyi_year import cyclic_core, structural_patterns
-from fatebridge.core.output_chinese import Taiyi
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.metaphysics import calculate_taiyi_analysis
 from fatebridge.services.tool_catalog import CATALOG
 from scripts.taiyi.audit_taiyi_eye_relations import CORPUS, audit, pair_key
 from tests.support.reference_data import resolve
-from tests.taiyi.test_taiyi_enclosures import transport_payload
-from tests.taiyi.test_taiyi_transports import _same_run_payload
+from tests.support.transports import SPECS, call_calculation
+from tests.unit_test.fixtures.taiyi import same_run_payload, transport_payload
 
 
-def test_full_frozen_selected_corpus_keeps_numerical_and_pair_denominators():
+def test_full_frozen_selected_corpus_keeps_numerical_and_pair_denominators() -> None:
     report = audit()
     assert report["selected_cyclic_charts"] == 8
     assert report["required_numeric_observations"] == 88
@@ -44,7 +46,9 @@ def test_full_frozen_selected_corpus_keeps_numerical_and_pair_denominators():
 
 
 @pytest.mark.parametrize("eye,name", [("wenchang_palace", "关"), ("shiji", "掩")])
-def test_all_four_generals_all_sixteen_positions_without_gate_sector_merging(eye, name):
+def test_all_four_generals_all_sixteen_positions_without_gate_sector_merging(
+    eye: str, name: str
+) -> None:
     # Independent, literal physical mapping. No production PALACES or sector map.
     bearings = {1: "乾", 2: "午", 3: "艮", 4: "卯", 6: "酉", 7: "坤", 8: "子", 9: "巽"}
     spirits = "子丑艮寅卯辰巽巳午未坤申酉戌乾亥"
@@ -77,7 +81,7 @@ def test_all_four_generals_all_sixteen_positions_without_gate_sector_merging(eye
                     assert "版本范围不同" in p["scope"]
 
 
-def test_eyes_and_same_camp_generals_do_not_gain_unadjudicated_relations():
+def test_eyes_and_same_camp_generals_do_not_gain_unadjudicated_relations() -> None:
     core = {
         **cyclic_core(1),
         **dict.fromkeys(GENERAL_FIELDS, 5),
@@ -103,8 +107,8 @@ def test_eyes_and_same_camp_generals_do_not_gain_unadjudicated_relations():
     ],
 )
 def test_actual_false_positive_five_general_results_are_blocked_by_named_pairs(
-    year, ju, clause
-):
+    year: int, ju: int, clause: str
+) -> None:
     result = calculate_taiyi_analysis(**transport_payload("taiyi", year))
     board = result["taiyi"]
     assert board["core_board"]["kook_number"] == ju
@@ -132,8 +136,9 @@ def test_actual_false_positive_five_general_results_are_blocked_by_named_pairs(
     assert board["ruleset"]["classical_acceptance_passed"] is False
 
 
-def test_all_144_boards_append_without_reindexing_existing_relations_or_recasting():
-    from fatebridge.core.metaphysics.taiyi_enclosures import principal_enclosures
+def test_all_144_boards_append_without_reindexing_existing_relations_or_recasting() -> (
+    None
+):
 
     for yin in (False, True):
         for ju in range(1, 73):
@@ -148,6 +153,8 @@ def test_all_144_boards_append_without_reindexing_existing_relations_or_recastin
             old = [p for p in patterns if p.get("relation_profile") != PROFILE]
             if added:
                 assert patterns[-len(added) :] == added
+            else:
+                pass
             old_enclosures = [p for p in old if p["name"] == "提挟"]
             assert old_enclosures == principal_enclosures(core)
             assessed = five_general_conditions(patterns, core=core)
@@ -158,12 +165,14 @@ def test_all_144_boards_append_without_reindexing_existing_relations_or_recastin
                 is False
             ):
                 assert assessed["five_generals"]["conditions_satisfied"] is False
+            else:
+                pass
             assert sum(
                 len(c["blockers"]) for c in assessed["five_generals"]["clauses"]
             ) >= len(added)
 
 
-def test_every_added_projection_leaf_is_typed_and_retains_false_values():
+def test_every_added_projection_leaf_is_typed_and_retains_false_values() -> None:
     result = calculate_taiyi_analysis(**transport_payload("taiyi", 1912))
 
     def leaves(obj, prefix):
@@ -197,7 +206,9 @@ def test_every_added_projection_leaf_is_typed_and_retains_false_values():
 
 
 @pytest.mark.parametrize("mutation", ["remove_case", "change_count", "drop_pair"])
-def test_source_oracle_changes_cannot_improve_acceptance(tmp_path, mutation):
+def test_source_oracle_changes_cannot_improve_acceptance(
+    tmp_path: Path, mutation: str
+) -> None:
     target = tmp_path / "corpus"
     shutil.copytree(CORPUS, target)
     source = target / "eye-general-cases.json"
@@ -217,8 +228,12 @@ def test_source_oracle_changes_cannot_improve_acceptance(tmp_path, mutation):
 @pytest.mark.parametrize("year", [1900, 1912])
 @pytest.mark.parametrize("transport", ["REST", "MCP", "CLI"])
 def test_real_public_transports_return_corrected_pairs_and_conditions(
-    key, year, transport, capsys, monkeypatch
-):
+    key: str,
+    year: int,
+    transport: str,
+    capsys: pytest.CaptureFixture[str],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     spec = next(s for s in CATALOG if s.key == key)
     payload = transport_payload(key, year)
     fields = [
@@ -250,17 +265,18 @@ def test_real_public_transports_return_corrected_pairs_and_conditions(
 
         async def call():
             async with Client(create_mcp_app()) as client:
-                response = await client.call_tool(
+                response = await call_calculation(
+                    client,
                     spec.mcp_name,
                     {**payload, "fields": fields, "strict_fields": True},
                     raise_on_error=False,
                 )
                 assert not response.is_error, response
-                return await _same_run_payload(client, response)
+                return await same_run_payload(client, response)
 
         result = asyncio.run(call())
     else:
-        args = [key]
+        args = [SPECS[key].tool_name]
         for name, value in payload.items():
             args += ["--" + name.replace("_", "-"), str(value)]
         code = run(
@@ -290,14 +306,15 @@ def test_real_public_transports_return_corrected_pairs_and_conditions(
 @pytest.mark.parametrize("key", ["taiyi", "sanshiunited"])
 @pytest.mark.parametrize("year", [1900, 1910, 1912, 1926])
 def test_native_first_condition_view_keeps_all_business_and_full_same_run_receipt(
-    key, year
-):
+    key: str, year: int
+) -> None:
     spec = next(s for s in CATALOG if s.key == key)
     view = "conditions" if key == "taiyi" else "taiyi_conditions"
 
     async def call():
         async with Client(create_mcp_app()) as client:
-            result = await client.call_tool(
+            result = await call_calculation(
+                client,
                 spec.mcp_name,
                 {
                     **transport_payload(key, year),
@@ -308,7 +325,7 @@ def test_native_first_condition_view_keeps_all_business_and_full_same_run_receip
                 raise_on_error=False,
             )
             assert not result.is_error, result
-            await _same_run_payload(client, result, require_business_inline=True)
+            await same_run_payload(client, result, require_business_inline=True)
             return result.structured_content
 
     result = asyncio.run(call())

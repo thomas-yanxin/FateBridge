@@ -1,15 +1,19 @@
 """Source dependencies follow actual years; actual default labels stay faithful."""
 
 from datetime import datetime
+from pathlib import Path
 
 import pytest
 
+import fatebridge.api as api
+from fatebridge.application import result_delivery as delivery
 from fatebridge.core import almanac, calendar, de440_solar, de441_solar, timing
 from fatebridge.core.local_techniques.sixyao import build_sixyao_result
+from fatebridge.core.solar_model_policy import solar_model_cache_key
 from fatebridge.utils.errors import EphemerisSourceError
-from tests.liuyao.test_liuyao_clash_transports import all_surfaces
-from tests.support.result_delivery import assert_same_run_receipt
-from tests.support.transports import rest, surface_calls
+from tests.support.result_delivery import assert_same_run_receipt, reconstruct
+from tests.support.transports import SPECS
+from tests.unit_test.fixtures.liuyao import all_surfaces
 
 MODEL = "fatebridge_de440_solar_v1"
 PAYLOAD = dict(
@@ -39,7 +43,9 @@ def unavailable(profile_id=None):
 
 
 @pytest.mark.parametrize("year", [1700, 1799, 2201, 2300])
-def test_whole_year_native_path_does_not_resolve_unused_de440(year, monkeypatch):
+def test_whole_year_native_path_does_not_resolve_unused_de440(
+    year: int, monkeypatch: pytest.MonkeyPatch
+) -> None:
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
     native = almanac.get_solar_terms_for_year(year, "UTC")
     # These four years now belong to the extended packaged DE440 range.
@@ -58,7 +64,9 @@ def test_whole_year_native_path_does_not_resolve_unused_de440(year, monkeypatch)
 
 
 @pytest.mark.parametrize("year", [1799, 1800, 2200, 2201])
-def test_derived_cache_still_requires_actual_adjacent_packaged_years(year, monkeypatch):
+def test_derived_cache_still_requires_actual_adjacent_packaged_years(
+    year: int, monkeypatch: pytest.MonkeyPatch
+) -> None:
     monkeypatch.setattr(de440_solar, "_profile", unavailable)
     with pytest.raises(EphemerisSourceError) as caught:
         almanac.get_solar_term_environment_key(year=year)
@@ -66,7 +74,9 @@ def test_derived_cache_still_requires_actual_adjacent_packaged_years(year, monke
 
 
 @pytest.mark.parametrize("consumer", ["four_pillars", "month", "day"])
-def test_derived_cache_routes_the_actual_local_civil_year(consumer, monkeypatch):
+def test_derived_cache_routes_the_actual_local_civil_year(
+    consumer: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
     # Cache argument routing only; not a celestial comparison or new sample.
     instant = datetime.fromisoformat("1798-12-31T18:00:00+00:00")
     module = calendar if consumer == "four_pillars" else timing
@@ -89,8 +99,8 @@ def test_derived_cache_routes_the_actual_local_civil_year(consumer, monkeypatch)
 
 @pytest.mark.parametrize("project", [False, True])
 def test_default_near_boundary_month_and_explanation_on_all_protocols(
-    project, rest, tmp_path, capsys
-):
+    project: bool, rest, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     fields = ["liuyao_evidence.calendar_conventions.month_branch"] if project else None
     for output in all_surfaces(PAYLOAD, fields, rest, tmp_path, capsys):
         assert output["liuyao_evidence"]["calendar_conventions"]["month_branch"] == "亥"
@@ -109,14 +119,16 @@ def test_default_near_boundary_month_and_explanation_on_all_protocols(
                 if line.startswith("第4爻：月令层")
             ]
             assert len(lines) == 1 and "月破" not in lines[0]
+        else:
+            pass
 
 
 def test_default_same_run_sha_restores_actual_source_and_month(
-    rest, tmp_path, capsys, monkeypatch
-):
-    import fatebridge.api as api
-    from fatebridge.application import result_delivery as delivery
-    from tests.support.result_delivery import reconstruct
+    rest,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
 
     store = delivery.ResultStore(tmp_path / "default-de440-results")
     monkeypatch.setattr(delivery, "RESULT_STORE", store)
@@ -134,8 +146,8 @@ def test_default_same_run_sha_restores_actual_source_and_month(
 
 
 def test_selected_source_corruption_still_fails_and_explicit_range_still_refuses(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setattr(de440_solar, "_profile", unavailable)
     with pytest.raises(EphemerisSourceError) as caught:
         build_sixyao_result(**PAYLOAD)
@@ -146,10 +158,8 @@ def test_selected_source_corruption_still_fails_and_explicit_range_still_refuses
 
 
 def test_selected_default_fault_is_structured_on_three_protocols(
-    monkeypatch, surface_calls
-):
-
-    from tests.support.transports import SPECS, call_cli, native
+    monkeypatch: pytest.MonkeyPatch, surface_calls
+) -> None:
 
     monkeypatch.setattr(de440_solar, "_profile", unavailable)
     spec = SPECS["sixyao"]
@@ -161,7 +171,9 @@ def test_selected_default_fault_is_structured_on_three_protocols(
         assert "liuyao_evidence" not in output
 
 
-def test_actual_default_warm_cache_cannot_bypass_missing_strict_jpl(monkeypatch):
+def test_actual_default_warm_cache_cannot_bypass_missing_strict_jpl(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     terms = almanac.get_solar_terms_for_year(2026, "UTC")
     assert {term.ephemeris_model for term in terms} == {MODEL}
     monkeypatch.setenv("FATEBRIDGE_JPL_FILE", "missing-v29-strict.eph")
@@ -169,8 +181,9 @@ def test_actual_default_warm_cache_cannot_bypass_missing_strict_jpl(monkeypatch)
         almanac.get_solar_terms_for_year(2026, "UTC")
 
 
-def test_strict_native_selection_does_not_load_unselected_packaged_source(monkeypatch):
-    from fatebridge.core.solar_model_policy import solar_model_cache_key
+def test_strict_native_selection_does_not_load_unselected_packaged_source(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
 
     monkeypatch.setenv("FATEBRIDGE_JPL_FILE", "missing-v29-strict.eph")
     monkeypatch.setattr(de440_solar, "_profile", unavailable)

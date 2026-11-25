@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Literal
 
+from fatebridge.core.astro.angle_definitions import is_ascendant_resolved
 from fatebridge.core.astro.aspects import _build_aspects
+from fatebridge.core.astro.astrology_tables import SIGN_LABELS_ZH
 from fatebridge.core.astro.birth import AstroBirthInfo
 from fatebridge.core.astro.chart import build_core_chart_payload
 from fatebridge.core.astro.geometry import _sign_name
@@ -25,112 +27,184 @@ from fatebridge.core.astro.relationship_geometry import (
     marks_birth,
     unique_midpoint,
 )
-from fatebridge.core.astrology_tables import SIGN_LABELS_ZH as SIGN_LABELS_ZH
+
+
+def chart_angle(longitude_degrees: float) -> dict[str, float | str]:
+    sign = _sign_name(longitude_degrees)
+    return {
+        "longitude": longitude_degrees,
+        "sign": sign,
+        "sign_zh": SIGN_LABELS_ZH[sign],
+    }
 
 
 def _composite_chart(
-    inner_chart: Dict[str, Any],
-    outer_chart: Dict[str, Any],
+    inner_chart: dict[str, Any],
+    outer_chart: dict[str, Any],
     *,
-    house_system: str = "equal",
-    zodiacal_info: Dict[str, Any],
-) -> Dict[str, Any]:
+    house_system: str,
+    zodiacal_info: dict[str, Any],
+) -> dict[str, Any]:
     engine_profile = _derive_engine_profile(
         inner_chart.get("chart_profile", {}),
         outer_chart.get("chart_profile", {}),
     )
+    is_inner_ascendant_resolved = is_ascendant_resolved(inner_chart)
+    is_outer_ascendant_resolved = is_ascendant_resolved(outer_chart)
+    are_both_ascendants_resolved = (
+        is_inner_ascendant_resolved and is_outer_ascendant_resolved
+    )
+    are_houses_ascendant_dependent = house_system != "equal_mc"
+
     inner_planets = {item["id"]: item for item in inner_chart["planets"]}
     outer_planets = {item["id"]: item for item in outer_chart["planets"]}
+
+    inner_mc = (inner_chart.get("angles") or {}).get("midheaven", {}).get("longitude")
+    outer_mc = (outer_chart.get("angles") or {}).get("midheaven", {}).get("longitude")
+    midheaven = (
+        unique_midpoint(inner_mc, outer_mc)
+        if inner_mc is not None and outer_mc is not None
+        else None
+    )
+    ascendant = (
+        unique_midpoint(
+            inner_chart["angles"]["ascendant"]["longitude"],
+            outer_chart["angles"]["ascendant"]["longitude"],
+        )
+        if are_both_ascendants_resolved
+        else None
+    )
+    are_houses_resolved = (
+        are_both_ascendants_resolved or not are_houses_ascendant_dependent
+    ) and (are_both_ascendants_resolved or midheaven is not None)
     house_cusps = (
         []
-        if house_system == "whole_sign"
+        if not are_houses_resolved or house_system == "whole_sign"
         else _midpoint_house_cusps(
             _house_cusp_values_from_payload(inner_chart),
             _house_cusp_values_from_payload(outer_chart),
         )
     )
-    composite_planets: List[Dict[str, Any]] = []
-    ascendant = unique_midpoint(
-        inner_chart["angles"]["ascendant"]["longitude"],
-        outer_chart["angles"]["ascendant"]["longitude"],
-    )
-    midheaven = unique_midpoint(
-        inner_chart["angles"]["midheaven"]["longitude"],
-        outer_chart["angles"]["midheaven"]["longitude"],
-    )
+    planet_asc_anchor = ascendant if ascendant is not None else 0.0
+    composite_planets: list[dict[str, Any]] = []
     for planet in PLANET_SEQUENCE:
         if planet not in inner_planets or planet not in outer_planets:
             continue
+        else:
+            pass
         longitude = unique_midpoint(
             inner_planets[planet]["longitude"],
             outer_planets[planet]["longitude"],
         )
-        composite_planets.append(
-            _build_planet_record(
-                planet,
-                longitude,
-                (inner_planets[planet]["latitude"] + outer_planets[planet]["latitude"])
-                / 2.0,
-                ascendant,
-                house_system,
-                house_cusps=house_cusps or None,
-            )
+        record = _build_planet_record(
+            planet,
+            longitude,
+            (inner_planets[planet]["latitude"] + outer_planets[planet]["latitude"])
+            / 2.0,
+            planet_asc_anchor,
+            house_system if are_houses_resolved else "whole_sign",
+            house_cusps=house_cusps or None,
         )
+        if not are_houses_resolved:
+            record["house"] = None
+        else:
+            pass
+        composite_planets.append(record)
     aspect_evidence = _build_aspects(composite_planets, include_evidence=True)
     aspects = [
         {key: row[key] for key in ("planet_a", "planet_b", "aspect", "orb")}
         for row in aspect_evidence
     ]
-    return {
+    house_policy = (
+        "whole_sign_from_composite_ASC"
+        if are_houses_resolved and house_system == "whole_sign"
+        else (
+            "corresponding_cusp_short_arc_midpoints"
+            if are_houses_resolved
+            else "omitted_due_to_unresolved_ascendant"
+        )
+    )
+    chart_profile: dict[str, Any] = {
+        "chart_type": "composite",
+        "aspect_policy": inner_chart.get("chart_profile", {}).get("aspect_policy"),
+        "tradition": inner_chart.get("chart_profile", {}).get("tradition", False),
+        "house_system": house_system,
+        "house_system_code": inner_chart.get("chart_profile", {}).get(
+            "house_system_code"
+        ),
+        "house_system_label_zh": inner_chart.get("chart_profile", {}).get(
+            "house_system_label_zh"
+        ),
+        **_relative_zodiac_profile_overrides(zodiacal_info),
+        **engine_profile,
+        "derivation_policy": {
+            "method_id": "composite_corresponding_midpoints_v2",
+            "source_url": COMPOSITE_SOURCE,
+            "source_kind": "first_party_implementation_documentation",
+            "positions_from_single_instant": False,
+            "longitude_policy": "unique shorter arc; exact diametric inputs are ambiguous",
+            "latitude_policy": "symbolic arithmetic mean; not observed latitude",
+            "house_policy": house_policy,
+            "mercury_venus_policy": "no automatic 180-degree relocation",
+        },
+    }
+    summary = [
+        f"已生成 FateBridge 组合盘{_precision_label_zh(engine_profile['engine_precision'])}层。",
+        f"行星数量：{len(composite_planets)}。",
+        f"相位数量：{len(aspects)}。",
+    ]
+    if not are_both_ascendants_resolved:
+        chart_profile.update(
+            ascendant_resolved=False,
+            ascendant_status="underdetermined_ascendant",
+            inner_ascendant_resolved=is_inner_ascendant_resolved,
+            outer_ascendant_resolved=is_outer_ascendant_resolved,
+        )
+        summary.append(
+            "因参与方上升点未解析，组合盘未计算 ASC 及依赖 ASC 的宫位。"
+            if not are_houses_resolved
+            else "因参与方上升点未解析，组合盘未计算 ASC；已保留基于天顶（MC）的等宫宫位。"
+        )
+    else:
+        pass
+    result: dict[str, Any] = {
         "person_info": {
             "name": f"{inner_chart['person_info']['name']} / {outer_chart['person_info']['name']} 组合盘",
             "birth_place": f"{inner_chart['person_info']['birth_place']} / {outer_chart['person_info']['birth_place']}",
             "birth_timezone": inner_chart["person_info"]["birth_timezone"],
         },
-        "chart_profile": {
-            "chart_type": "composite",
-            "aspect_policy": inner_chart.get("chart_profile", {}).get("aspect_policy"),
-            "tradition": inner_chart.get("chart_profile", {}).get("tradition", False),
-            "house_system": house_system,
-            "house_system_code": inner_chart.get("chart_profile", {}).get(
-                "house_system_code"
-            ),
-            "house_system_label_zh": inner_chart.get("chart_profile", {}).get(
-                "house_system_label_zh"
-            ),
-            **_relative_zodiac_profile_overrides(zodiacal_info),
-            **engine_profile,
-            "derivation_policy": {
-                "method_id": "composite_corresponding_midpoints_v2",
-                "source_url": COMPOSITE_SOURCE,
-                "source_kind": "first_party_implementation_documentation",
-                "positions_from_single_instant": False,
-                "longitude_policy": "unique shorter arc; exact diametric inputs are ambiguous",
-                "latitude_policy": "symbolic arithmetic mean; not observed latitude",
-                "house_policy": (
-                    "whole_sign_from_composite_ASC"
-                    if house_system == "whole_sign"
-                    else "corresponding_cusp_short_arc_midpoints"
-                ),
-                "mercury_venus_policy": "no automatic 180-degree relocation",
-            },
-        },
+        "chart_profile": chart_profile,
         "angles": {
-            "ascendant": {
-                "longitude": ascendant,
-                "sign": _sign_name(ascendant),
-                "sign_zh": SIGN_LABELS_ZH[_sign_name(ascendant)],
-            },
-            "midheaven": {
-                "longitude": midheaven,
-                "sign": _sign_name(midheaven),
-                "sign_zh": SIGN_LABELS_ZH[_sign_name(midheaven)],
-            },
+            "ascendant": (
+                chart_angle(ascendant)
+                if ascendant is not None
+                else {
+                    "longitude": None,
+                    "sign": None,
+                    "sign_zh": None,
+                    "status": "underdetermined_ascendant",
+                }
+            ),
+            "midheaven": (
+                chart_angle(midheaven)
+                if midheaven is not None
+                else {
+                    "longitude": None,
+                    "sign": None,
+                    "sign_zh": None,
+                    "status": "unavailable",
+                }
+            ),
         },
-        "houses": _build_houses(
-            ascendant,
-            house_system,
-            house_cusps=house_cusps or None,
+        "houses": (
+            _build_houses(
+                planet_asc_anchor,
+                house_system,
+                house_cusps=house_cusps or None,
+                midheaven=midheaven,
+            )
+            if are_houses_resolved
+            else []
         ),
         "planets": composite_planets,
         "aspects": aspects,
@@ -138,29 +212,33 @@ def _composite_chart(
         "element_balance": _balance(composite_planets, "element"),
         "modality_balance": _balance(composite_planets, "modality"),
         "balance_basis": BALANCE_BASIS,
-        "summary": [
-            f"已生成 FateBridge 组合盘{_precision_label_zh(engine_profile['engine_precision'])}层。",
-            f"行星数量：{len(composite_planets)}。",
-            f"相位数量：{len(aspects)}。",
-        ],
+        "summary": summary,
     }
+    if not are_both_ascendants_resolved:
+        result.update(
+            status="underdetermined_ascendant",
+            ascendant_resolved=False,
+            unavailable_reason="unresolved_source_ascendant",
+        )
+    else:
+        pass
+    return result
 
 
 def _build_relative_base_chart(
     birth_info: AstroBirthInfo,
     *,
-    house_system_info: Dict[str, Any],
-    zodiacal_info: Dict[str, Any],
-) -> Dict[str, Any]:
+    house_system_info: dict[str, Any],
+    zodiacal_info: dict[str, Any],
+) -> dict[str, Any]:
     base_chart = build_core_chart_payload(
         birth_info,
         "chart",
         hsys=house_system_info["value"],
         zodiacal=zodiacal_info["value"],
+        include_planetary_hours=False,
     )
-    # Preserve the same native zodiac positions, latitude-aware house placement
-    # and time basis as the corresponding natal chart. Do not reproject a
-    # separately cast tropical/default-house chart by hand.
+    # note (recast): A derived event uses the same native zodiac, houses, and time basis as a natal chart.
     return {
         key: base_chart[key]
         for key in (
@@ -179,92 +257,23 @@ def _build_relative_base_chart(
     }
 
 
-def _planet_sort_key(item: Dict[str, Any]) -> Tuple[int, Any]:
-    planet_id = item.get("id")
+def planet_display_order(item: dict[str, Any]) -> tuple[int, int | str]:
+    planet_id: str = item["id"]
     if planet_id in PLANET_SEQUENCE:
         return (0, PLANET_SEQUENCE.index(planet_id))
-    return (1, planet_id or "")
-
-
-def _build_chart_from_positions(
-    *,
-    chart_type: str,
-    person_info: Dict[str, Any],
-    source_planets: List[Dict[str, Any]],
-    ascendant: float,
-    midheaven: float,
-    house_system: str,
-    house_cusps: Optional[List[float]] = None,
-    summary_prefix: str,
-    profile_overrides: Optional[Dict[str, Any]] = None,
-    engine_profile: Optional[Dict[str, str]] = None,
-) -> Dict[str, Any]:
-    planets = [
-        _build_planet_record(
-            item["id"],
-            item["longitude"],
-            item.get("latitude", 0.0),
-            ascendant,
-            house_system,
-            house_cusps=house_cusps,
-        )
-        for item in sorted(source_planets, key=_planet_sort_key)
-    ]
-    aspect_evidence = _build_aspects(planets, include_evidence=True)
-    aspects = [
-        {key: row[key] for key in ("planet_a", "planet_b", "aspect", "orb")}
-        for row in aspect_evidence
-    ]
-    chart_profile = {
-        "chart_type": chart_type,
-        "zodiac": "tropical",
-        "house_system": house_system,
-        "tradition": False,
-        "engine_precision": "approximate_orbital_model",
-        "engine_backend": "derived_midpoint_geometry",
-    }
-    if engine_profile:
-        chart_profile.update(engine_profile)
-    if profile_overrides:
-        chart_profile.update(profile_overrides)
-    return {
-        "person_info": person_info,
-        "chart_profile": chart_profile,
-        "angles": {
-            "ascendant": {
-                "longitude": ascendant,
-                "sign": _sign_name(ascendant),
-                "sign_zh": SIGN_LABELS_ZH[_sign_name(ascendant)],
-            },
-            "midheaven": {
-                "longitude": midheaven,
-                "sign": _sign_name(midheaven),
-                "sign_zh": SIGN_LABELS_ZH[_sign_name(midheaven)],
-            },
-        },
-        "houses": _build_houses(ascendant, house_system, house_cusps=house_cusps),
-        "planets": planets,
-        "aspects": aspects,
-        "aspect_evidence": aspect_evidence,
-        "element_balance": _balance(planets, "element"),
-        "modality_balance": _balance(planets, "modality"),
-        "balance_basis": BALANCE_BASIS,
-        "summary": [
-            summary_prefix,
-            f"行星数量：{len(planets)}。",
-            f"相位数量：{len(aspects)}。",
-        ],
-    }
+    else:
+        pass
+    return (1, planet_id)
 
 
 def _build_timespace_chart(
     inner_birth: AstroBirthInfo,
     outer_birth: AstroBirthInfo,
     *,
-    house_system_info: Dict[str, Any],
-    zodiacal_info: Dict[str, Any],
+    house_system_info: dict[str, Any],
+    zodiacal_info: dict[str, Any],
     davison_variant: str = "uncorrected",
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     midpoint_birth, policy = davison_birth(
         inner_birth, outer_birth, variant=davison_variant
     )
@@ -282,82 +291,107 @@ def _build_timespace_chart(
 
 def _build_influence_chart_wrapper(
     *,
-    role: str,
-    house_chart: Dict[str, Any],
-    source_chart: Dict[str, Any],
+    role: Literal["inner", "outer"],
+    house_chart: dict[str, Any],
+    source_chart: dict[str, Any],
     house_system: str,
-    zodiacal_info: Dict[str, Any],
-) -> Dict[str, Any]:
+    zodiacal_info: dict[str, Any],
+) -> dict[str, Any]:
+    target_profile = house_chart["chart_profile"]
     engine_profile = _derive_engine_profile(
-        house_chart.get("chart_profile", {}),
-        source_chart.get("chart_profile", {}),
+        target_profile, source_chart["chart_profile"]
     )
     target_name = house_chart["person_info"]["name"]
     source_name = source_chart["person_info"]["name"]
+    ascendant = house_chart["angles"]["ascendant"]["longitude"]
+    midheaven = house_chart["angles"]["midheaven"]["longitude"]
     house_cusps = (
         None
         if house_system == "whole_sign"
         else _house_cusp_values_from_payload(house_chart)
     )
-    influence_chart = _build_chart_from_positions(
-        chart_type=f"influence_{role}",
-        person_info={
+    planets = [
+        _build_planet_record(
+            planet["id"],
+            planet["longitude"],
+            planet["latitude"],
+            ascendant,
+            house_system,
+            house_cusps=house_cusps,
+        )
+        for planet in sorted(source_chart["planets"], key=planet_display_order)
+    ]
+    aspect_evidence = _build_aspects(planets, include_evidence=True)
+    aspects = [
+        {field: contact[field] for field in ("planet_a", "planet_b", "aspect", "orb")}
+        for contact in aspect_evidence
+    ]
+    chart_type = f"influence_{role}"
+    reference_frame = f"{source_name}_planets_in_{target_name}_houses"
+    profile_house_fields = {
+        "house_system": house_system,
+        "house_system_code": target_profile["house_system_code"],
+        "house_system_label_zh": target_profile["house_system_label_zh"],
+    }
+    profile_zodiac_fields = _relative_zodiac_profile_overrides(zodiacal_info)
+    influence_chart = {
+        "person_info": {
             **house_chart["person_info"],
             "name": f"{target_name}受{source_name}影响",
         },
-        source_planets=source_chart["planets"],
-        ascendant=house_chart["angles"]["ascendant"]["longitude"],
-        midheaven=house_chart["angles"]["midheaven"]["longitude"],
-        house_system=house_system,
-        house_cusps=house_cusps,
-        summary_prefix=f"已生成 {target_name} 视角的影响图盘。",
-        engine_profile=engine_profile,
-        profile_overrides={
-            "aspect_policy": house_chart.get("chart_profile", {}).get("aspect_policy"),
+        "chart_profile": {
+            "chart_type": chart_type,
+            "zodiac": profile_zodiac_fields["zodiac"],
+            "house_system": house_system,
+            "tradition": target_profile.get("tradition", False),
+            **engine_profile,
+            "aspect_policy": target_profile.get("aspect_policy"),
             "house_overlay_policy": "source ecliptic longitude in target cusp sectors; not a physical horizon recast",
-            "reference_frame": f"{source_name}_planets_in_{target_name}_houses",
-            "tradition": house_chart.get("chart_profile", {}).get("tradition", False),
-            "house_system_code": house_chart.get("chart_profile", {}).get(
-                "house_system_code"
-            ),
-            "house_system_label_zh": house_chart.get("chart_profile", {}).get(
-                "house_system_label_zh"
-            ),
-            **_relative_zodiac_profile_overrides(zodiacal_info),
+            "reference_frame": reference_frame,
+            **profile_house_fields,
+            **profile_zodiac_fields,
         },
-    )
+        "angles": {
+            "ascendant": chart_angle(ascendant),
+            "midheaven": chart_angle(midheaven),
+        },
+        "houses": _build_houses(ascendant, house_system, house_cusps=house_cusps),
+        "planets": planets,
+        "aspects": aspects,
+        "aspect_evidence": aspect_evidence,
+        "element_balance": _balance(planets, "element"),
+        "modality_balance": _balance(planets, "modality"),
+        "balance_basis": BALANCE_BASIS,
+        "summary": [
+            f"已生成 {target_name} 视角的影响图盘。",
+            f"行星数量：{len(planets)}。",
+            f"相位数量：{len(aspects)}。",
+        ],
+    }
     return {
         "chart_profile": {
-            "chart_type": f"influence_{role}",
-            "house_system": house_system,
-            "house_system_code": house_chart.get("chart_profile", {}).get(
-                "house_system_code"
-            ),
-            "house_system_label_zh": house_chart.get("chart_profile", {}).get(
-                "house_system_label_zh"
-            ),
-            "zodiac": influence_chart["chart_profile"].get("zodiac", "tropical"),
-            "zodiacal": zodiacal_info["value"],
-            "zodiac_label_zh": zodiacal_info["label_zh"],
-            "reference_frame": influence_chart["chart_profile"]["reference_frame"],
+            "chart_type": chart_type,
+            **profile_house_fields,
+            **profile_zodiac_fields,
+            "reference_frame": reference_frame,
             **engine_profile,
         },
         "chart": influence_chart,
         "summary": [
             f"以 {target_name} 的宫位框架投影 {source_name} 的星体。",
-            f"星体数量：{len(influence_chart['planets'])}。",
-            f"相位数量：{len(influence_chart['aspects'])}。",
+            f"星体数量：{len(planets)}。",
+            f"相位数量：{len(aspects)}。",
         ],
     }
 
 
 def _build_relative_influence_pair(
-    inner_chart: Dict[str, Any],
-    outer_chart: Dict[str, Any],
+    inner_chart: dict[str, Any],
+    outer_chart: dict[str, Any],
     *,
     house_system: str,
-    zodiacal_info: Dict[str, Any],
-) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+    zodiacal_info: dict[str, Any],
+) -> tuple[dict[str, Any], dict[str, Any]]:
     return (
         _build_influence_chart_wrapper(
             role="inner",
@@ -380,10 +414,10 @@ def _build_marks_chart(
     person_birth: AstroBirthInfo,
     relationship_birth: AstroBirthInfo,
     *,
-    house_system_info: Dict[str, Any],
-    zodiacal_info: Dict[str, Any],
+    house_system_info: dict[str, Any],
+    zodiacal_info: dict[str, Any],
     davison_variant: str = "uncorrected",
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     birth, policy = marks_birth(
         person_birth, relationship_birth, variant=davison_variant
     )

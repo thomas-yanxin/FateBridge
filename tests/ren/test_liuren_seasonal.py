@@ -11,13 +11,13 @@ from pydantic import ValidationError
 
 import fatebridge.application.execution as execution
 from fatebridge.application.examples import evidence_views
-from fatebridge.core.metaphysics.liureng import build_liureng_board
-from fatebridge.core.metaphysics.liureng_seasonal import seasonal_evidence
-from fatebridge.core.output_liuren_seasonal import (
+from fatebridge.core.contracts.output_liuren_seasonal import (
     LiurenSeasonalEvidence,
     LiurenSeasonalRow,
     require_complete_seasonal,
 )
+from fatebridge.core.metaphysics.liureng import build_liureng_board
+from fatebridge.core.metaphysics.liureng_seasonal import seasonal_evidence
 from scripts.ren.audit_liuren_seasonal import BRANCHES, CORPUS, reference, seed_for
 from tests.fixtures.ren_anchors import ANCHOR_PAYLOADS as PAYLOADS
 from tests.support.transports import SPECS, business, native, rest, surface_calls
@@ -51,7 +51,7 @@ def board(month="午", **kwargs):
 
 
 @pytest.mark.parametrize("case", REF["synthetic_cases"])
-def test_predeclared_synthetic_conditions_keep_branch_and_god_separate(case):
+def test_predeclared_synthetic_conditions_keep_branch_and_god_separate(case) -> None:
     r = sample(case["day"], case["month"], case["sky"], case["god"])
     LiurenSeasonalEvidence.model_validate(r)
     row = next(v for v in r["rows"] if v["sky_branch"] == case["sky"])
@@ -67,7 +67,9 @@ def test_predeclared_synthetic_conditions_keep_branch_and_god_separate(case):
     )
 
 
-def test_all25_literal_phase_cells_and12_god_phases_are_frozen_separately_from_month_profile():
+def test_all25_literal_phase_cells_and12_god_phases_are_frozen_separately_from_month_profile() -> (
+    None
+):
     assert REF["literal_phase_cells"] == 25 and len(REF["literal_god_elements"]) == 12
     for month in ["寅", "巳", "申", "亥", "辰"]:
         got = sample(month=month)
@@ -82,7 +84,9 @@ def test_all25_literal_phase_cells_and12_god_phases_are_frozen_separately_from_m
 
 
 @pytest.mark.parametrize("fault", ["data", "manifest", "extra", "missing"])
-def test_frozen_source_inventory_cannot_be_refrozen_or_pruned(fault, tmp_path):
+def test_frozen_source_inventory_cannot_be_refrozen_or_pruned(
+    fault: str, tmp_path: Path
+) -> None:
     p = tmp_path / "corpus"
     shutil.copytree(CORPUS, p)
     if fault == "data":
@@ -98,14 +102,16 @@ def test_frozen_source_inventory_cannot_be_refrozen_or_pruned(fault, tmp_path):
         reference(p)
 
 
-def test_day_stem_soil_does_not_borrow_its_fire_twelve_life_stage_element():
+def test_day_stem_soil_does_not_borrow_its_fire_twelve_life_stage_element() -> None:
     b = build_liureng_board(seed_for("戊辰", "寅"), month_general_override="丑")
     e = b["seasonal_evidence"]
     assert e["day_stem_element"] == "土" and e["day_stem_seasonal_power"] == "死"
     assert e["phase_powers"]["火"] == "相"
 
 
-def test_month_general_and_guiren_choices_do_not_replace_month_building_or_branch_phase():
+def test_month_general_and_guiren_choices_do_not_replace_month_building_or_branch_phase() -> (
+    None
+):
     a = board("卯", guiren_profile="liuren_common_v1", is_diurnal_override=True)
     b = board("卯", guiren_profile="tanyuan_xieji_v1", is_diurnal_override=True)
     assert (
@@ -135,7 +141,9 @@ def test_month_general_and_guiren_choices_do_not_replace_month_building_or_branc
         ("sky_xun_kong", 1),
     ],
 )
-def test_row_own_facts_and_unknown_effective_class_cannot_be_forged(field, value):
+def test_row_own_facts_and_unknown_effective_class_cannot_be_forged(
+    field: str, value: int | str
+) -> None:
     r = next(r for r in sample()["rows"] if r["sky_branch"] == "戌")
     r[field] = value
     with pytest.raises(ValidationError):
@@ -161,7 +169,7 @@ def test_row_own_facts_and_unknown_effective_class_cannot_be_forged(field, value
         "scope",
     ],
 )
-def test_full_same_context_evidence_rejects_internal_contradictions(fault):
+def test_full_same_context_evidence_rejects_internal_contradictions(fault: str) -> None:
     e = sample()
     if fault == "day":
         e["day_ganzhi"] = "甲丑"
@@ -195,7 +203,9 @@ def test_full_same_context_evidence_rejects_internal_contradictions(fault):
         LiurenSeasonalEvidence.model_validate(e)
 
 
-def test_sparse_context_validates_copresent_table_without_inventing_missing_inputs():
+def test_sparse_context_validates_copresent_table_without_inventing_missing_inputs() -> (
+    None
+):
     LiurenSeasonalEvidence.model_validate(dict(phase_powers={"土": "相"}))
     with pytest.raises(ValidationError):
         LiurenSeasonalEvidence.model_validate(
@@ -214,8 +224,8 @@ def test_sparse_context_validates_copresent_table_without_inventing_missing_inpu
     ["missing", "trace", "duplicate_trace", "forged_trace", "other_month", "effective"],
 )
 def test_full_guard_rejects_missing_trace_and_valid_other_month_before_projection(
-    fault,
-):
+    fault: str,
+) -> None:
     b = board()
     trace = next(
         t for t in b["rule_trace"] if t["rule_id"] == "liuren.seasonal_conditions"
@@ -238,8 +248,8 @@ def test_full_guard_rejects_missing_trace_and_valid_other_month_before_projectio
 
 @pytest.mark.parametrize("key", ["liureng_gods", "liureng_runyear", "jinkou"])
 def test_published_actual_evidence_view_agrees_in_rest_native_mcp_and_cli(
-    key, surface_calls
-):
+    key: str, surface_calls
+) -> None:
     s = SPECS[key]
     p = copy.deepcopy(PAYLOADS[key])
     name = "liuren_seasonal_evidence" if key == "jinkou" else "seasonal_evidence"
@@ -256,7 +266,7 @@ def test_published_actual_evidence_view_agrees_in_rest_native_mcp_and_cli(
     )
 
 
-def test_snapshot_lines_keep_branch_god_earth_and_effective_scope_separate():
+def test_snapshot_lines_keep_branch_god_earth_and_effective_scope_separate() -> None:
     s = SPECS["liureng_gods"]
     p = {**PAYLOADS["liureng_gods"], "selected_sections": ["季节五态与支神本空条件"]}
     fn, args, kw = s.bind(s.request_model.model_validate(p))
@@ -282,8 +292,8 @@ def test_snapshot_lines_keep_branch_god_earth_and_effective_scope_separate():
 
 @pytest.mark.parametrize("project", [False, True])
 def test_actual_three_protocols_reject_deleted_evidence_even_when_fields_hide_it(
-    project, monkeypatch, surface_calls
-):
+    project: bool, monkeypatch: pytest.MonkeyPatch, surface_calls
+) -> None:
     s = SPECS["liureng_gods"]
     p = PAYLOADS["liureng_gods"]
     fn, args, kw = s.bind(s.request_model.model_validate(p))
@@ -294,6 +304,8 @@ def test_actual_three_protocols_reject_deleted_evidence_even_when_fields_hide_it
     def broken(spec, request):
         if spec.key == s.key:
             spec = replace(spec, bind=lambda _: (lambda: copy.deepcopy(bad), (), {}))
+        else:
+            pass
         return original(spec, request)
 
     monkeypatch.setattr(execution, "execute_spec", broken)
@@ -304,6 +316,8 @@ def test_actual_three_protocols_reject_deleted_evidence_even_when_fields_hide_it
         params += [("fields", "four_pillars"), ("strict_fields", "true")]
         flags += ["--fields", "four_pillars", "--strict-fields", "true"]
         opts = dict(fields=["four_pillars"], strict_fields=True)
+    else:
+        pass
     h, m, code, c = surface_calls(
         s, p, params=params, options=opts, flags=flags, cli_first=False
     )
@@ -316,8 +330,8 @@ def test_actual_three_protocols_reject_deleted_evidence_even_when_fields_hide_it
 @pytest.mark.parametrize("key", ["liureng_gods", "jinkou"])
 @pytest.mark.parametrize("side", ["floor", "next_second"])
 def test_frozen_qingming_second_boundary_reaches_seasonal_table_across_protocols(
-    key, side, monkeypatch, tmp_path, surface_calls
-):
+    key: str, side: str, monkeypatch: pytest.MonkeyPatch, tmp_path: Path, surface_calls
+) -> None:
     from scripts.ren.audit_ren_seconds import reference as seconds_reference
 
     r = next(
@@ -341,6 +355,8 @@ def test_frozen_qingming_second_boundary_reaches_seasonal_table_across_protocols
     )
     if key == "jinkou":
         p["di_fen"] = "酉"
+    else:
+        pass
     s = SPECS[key]
     view = "liuren_seasonal_evidence" if key == "jinkou" else "seasonal_evidence"
     fields = evidence_views(s)[view]["fields"]

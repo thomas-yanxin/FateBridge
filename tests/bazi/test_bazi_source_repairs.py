@@ -24,11 +24,13 @@ def evaluate(text, policy=DEFAULT_POLICY):
         ("JH02_PDF386", "甲子 丙子 甲申 己巳", "弱"),
     ],
 )
-def test_existing_source_grade_without_regrading_the_reference(case, text, expected):
+def test_existing_source_grade_without_regrading_the_reference(
+    case: str, text: str, expected: str
+) -> None:
     assert evaluate(text)["strength_level"] == expected
 
 
-def test_full_generation_path_preserves_roots_without_inventing_energy():
+def test_full_generation_path_preserves_roots_without_inventing_energy() -> None:
     result = evaluate("癸酉 甲子 丁卯 丙午")
     clashes = [r for r in result["relations"] if r["kind"] == "六冲"]
     assert [r["positions"] for r in clashes] == [["year", "day"], ["month", "hour"]]
@@ -43,7 +45,9 @@ def test_full_generation_path_preserves_roots_without_inventing_energy():
 
 
 @pytest.mark.parametrize("control", ["癸酉 庚子 丁卯 丙午", "癸酉 甲子 丁丑 丙午"])
-def test_missing_visible_or_branch_intermediary_does_not_resolve_the_clash(control):
+def test_missing_visible_or_branch_intermediary_does_not_resolve_the_clash(
+    control: str,
+) -> None:
     result = evaluate(control)
     assert not result["structural_decision"]["source_premises"][
         "uncontested_full_generation_path"
@@ -54,7 +58,7 @@ def test_missing_visible_or_branch_intermediary_does_not_resolve_the_clash(contr
     )
 
 
-def test_a_real_wood_root_disables_the_winter_rootless_rule():
+def test_a_real_wood_root_disables_the_winter_rootless_rule() -> None:
     control = evaluate("甲子 丙子 甲申 丁卯")
     assert not control["structural_decision"]["source_premises"]["winter_rootless_wood"]
     assert (
@@ -63,7 +67,7 @@ def test_a_real_wood_root_disables_the_winter_rootless_rule():
     )
 
 
-def test_structural_grade_does_not_certify_ordinary_balance_preferences():
+def test_structural_grade_does_not_certify_ordinary_balance_preferences() -> None:
     pillars = dict(
         zip(("year", "month", "day", "hour"), map(tuple, "癸酉 甲子 丁卯 丙午".split()))
     )

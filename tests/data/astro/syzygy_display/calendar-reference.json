@@ -1,0 +1,218 @@
+{
+  "recorded_before_candidate": "2026-10-25T09:53:22.506246+00:00",
+  "production_imports": false,
+  "swiss_imports": false,
+  "erfa_version": "2.0.1.5",
+  "numpy_version": "2.5.4",
+  "scope": "Calendar conversion of retained UT1 only. Before1960 it is the existing UTC-named modeled-UT1 carrier. This does not independently validate lunar roots, DeltaT or historical clocks.",
+  "rows": [
+    {
+      "date": [
+        1,
+        1,
+        1
+      ],
+      "sidereal": false,
+      "jd_ut1": 1721421.1108749378,
+      "gregorian_year": 0,
+      "gregorian_month": 12,
+      "gregorian_day": 27,
+      "seconds_of_day": 52779.594630002975
+    },
+    {
+      "date": [
+        1,
+        1,
+        1
+      ],
+      "sidereal": true,
+      "jd_ut1": 1721421.1108749378,
+      "gregorian_year": 0,
+      "gregorian_month": 12,
+      "gregorian_day": 27,
+      "seconds_of_day": 52779.594630002975
+    },
+    {
+      "date": [
+        1,
+        1,
+        5
+      ],
+      "sidereal": false,
+      "jd_ut1": 1721421.1108749378,
+      "gregorian_year": 0,
+      "gregorian_month": 12,
+      "gregorian_day": 27,
+      "seconds_of_day": 52779.594630002975
+    },
+    {
+      "date": [
+        1,
+        1,
+        5
+      ],
+      "sidereal": true,
+      "jd_ut1": 1721421.1108749378,
+      "gregorian_year": 0,
+      "gregorian_month": 12,
+      "gregorian_day": 27,
+      "seconds_of_day": 52779.594630002975
+    },
+    {
+      "date": [
+        1,
+        1,
+        10
+      ],
+      "sidereal": false,
+      "jd_ut1": 1721421.1108749378,
+      "gregorian_year": 0,
+      "gregorian_month": 12,
+      "gregorian_day": 27,
+      "seconds_of_day": 52779.594630002975
+    },
+    {
+      "date": [
+        1,
+        1,
+        10
+      ],
+      "sidereal": true,
+      "jd_ut1": 1721421.1108749378,
+      "gregorian_year": 0,
+      "gregorian_month": 12,
+      "gregorian_day": 27,
+      "seconds_of_day": 52779.594630002975
+    },
+    {
+      "date": [
+        1,
+        1,
+        15
+      ],
+      "sidereal": false,
+      "jd_ut1": 1721435.9603207516,
+      "gregorian_year": 1,
+      "gregorian_month": 1,
+      "gregorian_day": 11,
+      "seconds_of_day": 39771.712942421436
+    },
+    {
+      "date": [
+        1,
+        1,
+        15
+      ],
+      "sidereal": true,
+      "jd_ut1": 1721435.9603207516,
+      "gregorian_year": 1,
+      "gregorian_month": 1,
+      "gregorian_day": 11,
+      "seconds_of_day": 39771.712942421436
+    },
+    {
+      "date": [
+        1,
+        2,
+        1
+      ],
+      "sidereal": false,
+      "jd_ut1": 1721450.5470186076,
+      "gregorian_year": 1,
+      "gregorian_month": 1,
+      "gregorian_day": 26,
+      "seconds_of_day": 4062.407697737217
+    },
+    {
+      "date": [
+        1,
+        2,
+        1
+      ],
+      "sidereal": true,
+      "jd_ut1": 1721450.5470186076,
+      "gregorian_year": 1,
+      "gregorian_month": 1,
+      "gregorian_day": 26,
+      "seconds_of_day": 4062.407697737217
+    },
+    {
+      "date": [
+        1961,
+        7,
+        31
+      ],
+      "sidereal": false,
+      "jd_ut1": 2437508.3264356568,
+      "gregorian_year": 1961,
+      "gregorian_month": 7,
+      "gregorian_day": 27,
+      "seconds_of_day": 71404.04074341059
+    },
+    {
+      "date": [
+        1961,
+        7,
+        31
+      ],
+      "sidereal": true,
+      "jd_ut1": 2437508.3264356568,
+      "gregorian_year": 1961,
+      "gregorian_month": 7,
+      "gregorian_day": 27,
+      "seconds_of_day": 71404.04074341059
+    },
+    {
+      "date": [
+        1972,
+        7,
+        1
+      ],
+      "sidereal": false,
+      "jd_ut1": 2441495.282055004,
+      "gregorian_year": 1972,
+      "gregorian_month": 6,
+      "gregorian_day": 26,
+      "seconds_of_day": 67569.55234855413
+    },
+    {
+      "date": [
+        1972,
+        7,
+        1
+      ],
+      "sidereal": true,
+      "jd_ut1": 2441495.282055004,
+      "gregorian_year": 1972,
+      "gregorian_month": 6,
+      "gregorian_day": 26,
+      "seconds_of_day": 67569.55234855413
+    },
+    {
+      "date": [
+        2026,
+        1,
+        4
+      ],
+      "sidereal": false,
+      "jd_ut1": 2461043.9186898633,
+      "gregorian_year": 2026,
+      "gregorian_month": 1,
+      "gregorian_day": 3,
+      "seconds_of_day": 36174.8041883111
+    },
+    {
+      "date": [
+        2026,
+        1,
+        4
+      ],
+      "sidereal": true,
+      "jd_ut1": 2461043.9186898633,
+      "gregorian_year": 2026,
+      "gregorian_month": 1,
+      "gregorian_day": 3,
+      "seconds_of_day": 36174.8041883111
+    }
+  ]
+}

@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.canping_texts import collation_summary, lookup_record
+from fatebridge.core.numerology.canping_texts import collation_summary, lookup_record
 
 ROOT = Path(__file__).parents[1] / "fixtures/canping_earth_v1"
 REFERENCE = json.loads((ROOT / "reference.json").read_text())
@@ -25,7 +25,7 @@ REREADINGS = {
 
 
 @pytest.mark.parametrize("row,kind", CELLS)
-def test_all_earth_cells_keep_literal_text_column_page_and_state(row, kind):
+def test_all_earth_cells_keep_literal_text_column_page_and_state(row, kind) -> None:
     number = int(row["number"])
     result = lookup_record("土", number, kind)
     selected = result["selection"]
@@ -33,6 +33,8 @@ def test_all_earth_cells_keep_literal_text_column_page_and_state(row, kind):
     assert result["text"] == (revision["text"] if revision else row[kind])
     if revision:
         assert selected["reading_revision"]["previous_text"] == row[kind]
+    else:
+        pass
     assert selected["number"] == number and selected["kind"] == kind
     assert selected["corpus_key"] == f"土.{number}.{kind}"
     assert selected["source_pdf_page"] == int(row["pdf_page"])
@@ -49,7 +51,9 @@ def test_all_earth_cells_keep_literal_text_column_page_and_state(row, kind):
         assert "reading_uncertainties" not in selected
 
 
-def test_earth_scope_reuses_three_cells_and_two_pages_without_claiming_complete_conformity():
+def test_earth_scope_reuses_three_cells_and_two_pages_without_claiming_complete_conformity() -> (
+    None
+):
     assert len(ROWS) == len({r["number"] for r in ROWS}) == 78
     assert len(CELLS) == 234
     assert (
@@ -91,7 +95,7 @@ def test_earth_scope_reuses_three_cells_and_two_pages_without_claiming_complete_
     assert REFERENCE["new_real_world_outcomes"] == 0
 
 
-def test_remaining_earth_uncertainties_are_not_filled_from_inherited_text():
+def test_remaining_earth_uncertainties_are_not_filled_from_inherited_text() -> None:
     assert lookup_record("土", 2460, "luck")["text"] == "再磨龍劍用，銳氣徹青□。"
     assert lookup_record("土", 3363, "luck")["text"] == "魚龍在釣□，志樂在其中。"
     assert lookup_record("土", 3377, "female")["text"] == "晝夕掩重門，虛空久寂寞。"
@@ -101,7 +105,9 @@ def test_remaining_earth_uncertainties_are_not_filled_from_inherited_text():
         assert selected["reading_uncertainties"]
 
 
-def test_earth_unusual_readings_and_circles_remain_separate_from_allusion_emendation():
+def test_earth_unusual_readings_and_circles_remain_separate_from_allusion_emendation() -> (
+    None
+):
     assert lookup_record("土", 2666, "female")["text"] == "汀蘭井岸芷，泛○奉浮家。"
     assert lookup_record("土", 2365, "female")["text"] == "一曲神仙○，風吹別調聞。"
     assert lookup_record("土", 2474, "female")["text"] == "雖是好羅裙，猶同紗○裡。"
@@ -110,7 +116,7 @@ def test_earth_unusual_readings_and_circles_remain_separate_from_allusion_emenda
     assert lookup_record("土", 2476, "male")["text"] == "水由地中行，江漢朝宗海。"
 
 
-def test_reused_corrected_header_and_unassigned_note_are_not_reinterpreted():
+def test_reused_corrected_header_and_unassigned_note_are_not_reinterpreted() -> None:
     for kind in ("male", "female", "luck"):
         assert lookup_record("土", 3373, kind)["selection"]["inherited_number"] == 3372
         retired = lookup_record("土", 3372, kind)

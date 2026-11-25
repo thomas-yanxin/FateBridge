@@ -5,8 +5,11 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.sukuyo import calendar_mansion, day_evidence
-from fatebridge.core.sukuyo_calendar_text import calendar_day_evidence, source_bundle
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence
+from fatebridge.core.sukuyo.sukuyo_calendar_text import (
+    calendar_day_evidence,
+    source_bundle,
+)
 from scripts.sukuyo.check_sukuyo_time_units import verify_time_primary
 
 
@@ -20,8 +23,8 @@ from scripts.sukuyo.check_sukuyo_time_units import verify_time_primary
     ],
 )
 def test_weekday_reconstruction_is_distinguished_from_mansion_glyph_change(
-    date, mansion, primary, ming, origin
-):
+    date: str, mansion: str, primary, ming, origin: str
+) -> None:
     day = day_evidence(calendar_mansion(date, "12:00:00"))
     assert day["day_mansion"] == mansion
     special = day["special_day_evidence"]
@@ -36,7 +39,7 @@ def test_weekday_reconstruction_is_distinguished_from_mansion_glyph_change(
     assert "不代入主表或确定事项" in day["reading_text"]
 
 
-def test_three_time_counts_are_not_sixteen_or_modern_clock_hours():
+def test_three_time_counts_are_not_sixteen_or_modern_clock_hours() -> None:
     report = verify_time_primary()
     assert report["errors"] == []
     assert report["selected_witnesses"] == 2 and report["inline_notes"] == 2
@@ -60,7 +63,7 @@ def test_three_time_counts_are_not_sixteen_or_modern_clock_hours():
     assert result["clock_evaluation_status"] == "not_computed"
 
 
-def test_comparative_time_evidence_is_detached_and_not_a_clock_solution():
+def test_comparative_time_evidence_is_detached_and_not_a_clock_solution() -> None:
     first = calendar_day_evidence(1)["clock_doctrine"]["comparative_time_systems"]
     first["witnesses"][0]["daily_time_units"] = 24
     second = calendar_day_evidence(1)["clock_doctrine"]["comparative_time_systems"]
@@ -72,7 +75,7 @@ def test_comparative_time_evidence_is_detached_and_not_a_clock_solution():
     assert len(second["source_bundle_sha256"]) == 64
 
 
-def test_changed_primary_file_is_rejected(tmp_path):
+def test_changed_primary_file_is_rejected(tmp_path: Path) -> None:
     fixture = json.loads(
         (
             Path(__file__).parents[1] / "data/sukuyo-comparative-time-primary.json"
@@ -84,7 +87,7 @@ def test_changed_primary_file_is_rejected(tmp_path):
         verify_time_primary(tmp_path)
 
 
-def test_native_preserves_comparative_texts_without_certifying_daybreak():
+def test_native_preserves_comparative_texts_without_certifying_daybreak() -> None:
     text = day_evidence(calendar_mansion("2025-01-07", "12:00:00"))["reading_text"]
     assert "一日夜三十时" in text
     assert "行内注为昼三夜三" in text and "行内注为昼四夜四" in text
@@ -93,7 +96,9 @@ def test_native_preserves_comparative_texts_without_certifying_daybreak():
 
 
 @pytest.mark.parametrize("date", ["2025-04-22", "2025-02-26"])
-def test_native_direction_reference_keeps_opposing_chapter_even_for_study(date):
+def test_native_direction_reference_keeps_opposing_chapter_even_for_study(
+    date: str,
+) -> None:
     day = day_evidence(
         calendar_mansion(date, "12:00:00"),
         activity="study",
@@ -109,7 +114,9 @@ def test_native_direction_reference_keeps_opposing_chapter_even_for_study(date):
     assert "未据此改变本次事项匹配状态" in text
 
 
-def test_native_direction_conflict_does_not_replace_declared_travel_assessment():
+def test_native_direction_conflict_does_not_replace_declared_travel_assessment() -> (
+    None
+):
     day = day_evidence(
         calendar_mansion("2025-04-22", "12:00:00"),
         activity="travel",
@@ -122,7 +129,7 @@ def test_native_direction_conflict_does_not_replace_declared_travel_assessment()
     assert any(r["rule_id"] == "t1299_direction_10" for r in matched)
 
 
-def test_native_does_not_invent_direction_conflict_for_other_mansion():
+def test_native_does_not_invent_direction_conflict_for_other_mansion() -> None:
     day = day_evidence(calendar_mansion("2025-01-07", "12:00:00"))
     assert day["day_mansion"] == "昴"
     assert "同向出行证言相反" not in day["reading_text"]

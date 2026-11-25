@@ -8,7 +8,9 @@ import pytest
 from fatebridge.core.fengshui.method_details import method_details
 from fatebridge.core.fengshui.snapshot import sections
 from fatebridge.services.fengshui import assess, calculate_annual_stars
-from tests.fengshui.test_fengshui_measured_workstation import measured_request
+from tests.unit_test.fixtures.fengshui_measured import (
+    measured_request,
+)
 
 REFERENCE = json.loads(
     (
@@ -18,7 +20,7 @@ REFERENCE = json.loads(
 
 
 @pytest.mark.parametrize("star", REFERENCE["stars"], ids=lambda r: str(r["number"]))
-def test_each_author_star_theme_element_and_symbol_route(star):
+def test_each_author_star_theme_element_and_symbol_route(star) -> None:
     references = method_details(["annual_stars"])
     actual = references["flying_star_references"][str(star["number"])]
     assert actual["element"] == star["element"]
@@ -38,7 +40,9 @@ def test_each_author_star_theme_element_and_symbol_route(star):
         for direction, number in chart.items()
     ],
 )
-def test_annual_numbers_equal_the_two_original_author_diagrams(year, direction, number):
+def test_annual_numbers_equal_the_two_original_author_diagrams(
+    year, direction, number
+) -> None:
     result = calculate_annual_stars(effective_year=year)
     assert (
         result["layers"]["annual_stars"]["palaces"][direction]["annual_star_number"]
@@ -49,7 +53,9 @@ def test_annual_numbers_equal_the_two_original_author_diagrams(year, direction, 
 @pytest.mark.parametrize(
     "symbol", REFERENCE["classical_symbols"], ids=lambda r: r["trigram"]
 )
-def test_classical_families_and_object_nouns_keep_the_adopted_source_categories(symbol):
+def test_classical_families_and_object_nouns_keep_the_adopted_source_categories(
+    symbol,
+) -> None:
     actual = method_details()["cross_text_trigram_symbols"][symbol["trigram"]]
     assert actual["family_symbol"] == symbol["family"]
     assert actual["object_symbols"] == symbol["objects"]
@@ -61,7 +67,7 @@ def test_classical_families_and_object_nouns_keep_the_adopted_source_categories(
 )
 def test_modern_observation_prompts_are_retained_with_correct_classical_sources(
     reference,
-):
+) -> None:
     actual = next(
         r
         for r in method_details()["object_observation_references"]
@@ -88,7 +94,7 @@ def test_modern_observation_prompts_are_retained_with_correct_classical_sources(
 )
 def test_workstation_reference_snapshot_does_not_deny_explicit_measured_rules(
     selection,
-):
+) -> None:
     request = measured_request()
     scene = request["workstation_layout"]["scene"]
     scene["desktops"][0]["ruleset_ids"] = selection
@@ -121,3 +127,5 @@ def test_workstation_reference_snapshot_does_not_deny_explicit_measured_rules(
     if active:
         lines = [line for _, part in sections(result) for line in part]
         assert not any("WOFS" in line and "未启用摆放规则" in line for line in lines)
+    else:
+        pass

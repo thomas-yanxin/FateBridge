@@ -1,0 +1,8 @@
+{
+  "files": {
+    "inputs.json": "2ce5f757058b3c8994e6d5da47b2f5cc6287b5eb589359a824c199690935230a",
+    "calendar-reference.json": "aac68e69f335b450734172f44a392c769d3a3683aed132fb0425c98dcc0bfa7a",
+    "protocol.json": "f3b97adfe1947bdfc195f8e46c7eb1085e52558197bbed49a9143fa73de0266a"
+  },
+  "scope": "Current fixed inputs, independent numeric references and raw source data only; no FateBridge source snapshots or old native output packets."
+}

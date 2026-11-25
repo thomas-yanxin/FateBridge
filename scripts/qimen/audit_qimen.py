@@ -2,6 +2,16 @@
 
 from __future__ import annotations
 
+import sys as _sys
+from pathlib import Path as _Path
+
+_VAL_REPO_ROOT = _Path(__file__).resolve().parents[2]
+if str(_VAL_REPO_ROOT) not in _sys.path:
+    _sys.path.insert(0, str(_VAL_REPO_ROOT))
+else:
+    pass
+
+
 import argparse
 import hashlib
 import importlib.metadata
@@ -21,6 +31,8 @@ from fatebridge.core.local_techniques.chart import _build_metaphysics_seed
 from fatebridge.core.local_techniques.qimen import build_qimen_with_options
 from fatebridge.core.metaphysics.common import MetaphysicsSeed
 from fatebridge.core.metaphysics.qimen import (
+    QIMEN_DOOR_DISPLAY,
+    QIMEN_STAR_DISPLAY,
     _qimen_build_ju_text,
     _qimen_build_palaces,
     _qimen_build_yinyangdun_map,
@@ -28,92 +40,103 @@ from fatebridge.core.metaphysics.qimen import (
     _qimen_resolve_zhirun_meta,
     _qimen_zhifu_zhishi,
 )
-from fatebridge.core.qimen_evidence import RULESET_ID, enrich_qimen_evidence
+from fatebridge.core.qimen.qimen_evidence import RULESET_ID, enrich_qimen_evidence
 from fatebridge.services.divination import calculate_sanshiunited_analysis
 from fatebridge.services.metaphysics import calculate_qimen_analysis
+from fatebridge.utils.civil_time import NominalClockLabel
 from fatebridge.utils.timezones import parse_timezone_name, validate_local_clock
-from fatebridge.validation.qimen import (
+from validation.qimen import (
     audit_chapter_profiles,
     audit_day_stem_collation,
     audit_head_dependent_examples,
     audit_numeric_tables,
     audit_scan_examples,
 )
-from fatebridge.validation.qimen_calendar_stems import audit_calendar_stems
-from fatebridge.validation.qimen_clock import audit_clock_fold
-from fatebridge.validation.qimen_five_jia import audit_five_jia
-from fatebridge.validation.qimen_gate_relations import audit_gate_relations
-from fatebridge.validation.qimen_punishment import audit_punishment
-from fatebridge.validation.qimen_solar import audit_solar_clocks
-from fatebridge.validation.qimen_table_integrity import (
+from validation.qimen_calendar_stems import audit_calendar_stems
+from validation.qimen_clock import audit_clock_fold
+from validation.qimen_five_jia import audit_five_jia
+from validation.qimen_gate_relations import audit_gate_relations
+from validation.qimen_punishment import audit_punishment
+from validation.qimen_solar import audit_solar_clocks
+from validation.qimen_table_integrity import (
     audit_printed_table_integrity,
     audit_table_source_context,
     unrepresented_walk_anomalies,
 )
-from fatebridge.validation.qimen_three_deceptions import audit_three_deceptions
-from fatebridge.validation.qimen_time_conditions import audit_hour_branch_tombs
-from fatebridge.validation.qimen_tombs import audit_wonder_tomb_clauses
+from validation.qimen_three_deceptions import audit_three_deceptions
+from validation.qimen_time_conditions import audit_hour_branch_tombs
+from validation.qimen_tombs import audit_wonder_tomb_clauses
 
 ROOT = Path(__file__).resolve().parents[2]
 
 
 def audit() -> dict[str, Any]:
+
     implementation_files = [
         "scripts/qimen/audit_qimen.py",
         "src/fatebridge/core/metaphysics/qimen.py",
         "src/fatebridge/core/metaphysics/common.py",
-        "src/fatebridge/core/qimen_evidence.py",
-        "src/fatebridge/core/qimen_profiles.py",
-        "src/fatebridge/core/qimen_tombs.py",
-        "src/fatebridge/core/qimen_punishment.py",
-        "src/fatebridge/validation/qimen_punishment.py",
-        "src/fatebridge/core/qimen_gate_relations.py",
-        "src/fatebridge/validation/qimen_gate_relations.py",
-        "src/fatebridge/validation/qimen_tombs.py",
-        "src/fatebridge/core/qimen_combinations.py",
-        "src/fatebridge/core/qimen_stem_context.py",
-        "src/fatebridge/core/qimen_calendar_stems.py",
-        "src/fatebridge/core/qimen_time_conditions.py",
-        "src/fatebridge/core/qimen_three_deceptions.py",
-        "src/fatebridge/validation/qimen_three_deceptions.py",
+        "src/fatebridge/core/qimen/qimen_evidence.py",
+        "src/fatebridge/core/qimen/qimen_geometry.py",
+        "src/fatebridge/core/qimen/qimen_zhirun.py",
+        "src/fatebridge/core/qimen/qimen_profiles.py",
+        "src/fatebridge/core/qimen/qimen_tombs.py",
+        "src/fatebridge/core/qimen/qimen_punishment.py",
+        "validation/qimen_punishment.py",
+        "src/fatebridge/core/qimen/qimen_gate_relations.py",
+        "validation/qimen_gate_relations.py",
+        "validation/qimen_tombs.py",
+        "src/fatebridge/core/qimen/qimen_combinations.py",
+        "src/fatebridge/core/qimen/qimen_stem_context.py",
+        "src/fatebridge/core/qimen/qimen_calendar_stems.py",
+        "src/fatebridge/core/qimen/qimen_time_conditions.py",
+        "src/fatebridge/core/qimen/qimen_three_deceptions.py",
+        "validation/qimen_three_deceptions.py",
         "tests/qimen/test_qimen_three_deceptions.py",
-        "src/fatebridge/core/qimen_five_jia.py",
-        "src/fatebridge/validation/qimen_five_jia.py",
+        "src/fatebridge/core/qimen/qimen_five_jia.py",
+        "validation/qimen_five_jia.py",
         "tests/qimen/test_qimen_five_jia.py",
-        "src/fatebridge/validation/qimen_time_conditions.py",
-        "src/fatebridge/validation/qimen_calendar_stems.py",
+        "validation/qimen_time_conditions.py",
+        "validation/qimen_calendar_stems.py",
         "src/fatebridge/core/almanac.py",
         "src/fatebridge/core/calendar.py",
         "src/fatebridge/core/local_techniques/qimen.py",
         "src/fatebridge/core/local_techniques/sanshi.py",
         "src/fatebridge/core/local_techniques/chart.py",
         "src/fatebridge/services/metaphysics.py",
+        "src/fatebridge/services/jinkou_snapshot.py",
+        "src/fatebridge/services/liureng_snapshot.py",
+        "src/fatebridge/services/ren_calendar_snapshot.py",
+        "src/fatebridge/services/taiyi_snapshot.py",
+        "src/fatebridge/services/ziwei_snapshot.py",
         "src/fatebridge/services/divination.py",
         "src/fatebridge/utils/solar_time.py",
         "src/fatebridge/utils/solar_time_provenance.py",
-        "src/fatebridge/validation/qimen_solar.py",
+        "validation/qimen_solar.py",
         "tests/qimen/test_qimen_solar_provenance.py",
         "src/fatebridge/utils/timezones.py",
         "src/fatebridge/utils/civil_clock.py",
-        "src/fatebridge/validation/qimen_clock.py",
-        "src/fatebridge/core/output_qimen.py",
-        "src/fatebridge/core/output_chinese.py",
+        "validation/qimen_clock.py",
+        "src/fatebridge/core/contracts/output_qimen.py",
+        "src/fatebridge/core/contracts/output_chinese.py",
         "src/fatebridge/core/requests/metaphysics.py",
         "src/fatebridge/core/requests/divination.py",
         "src/fatebridge/data/agent_examples.json",
-        "src/fatebridge/validation/qimen.py",
-        "src/fatebridge/validation/qimen_table_integrity.py",
+        "validation/qimen.py",
+        "validation/qimen_table_integrity.py",
         "tests/qimen/test_qimen_table_integrity.py",
-        "src/fatebridge/validation/qimen_study.py",
-        "src/fatebridge/validation/predictions.py",
+        "validation/qimen_study.py",
+        "validation/predictions.py",
         "scripts/qimen/audit_qimen_study.py",
         "scripts/qimen/demo_qimen_study.py",
         "tests/qimen/test_qimen_study.py",
         "tests/qimen/test_qimen_registration_binding.py",
+        "tests/unit_test/fixtures/qimen.py",
+        "tests/unit_test/fixtures/qimen_study.py",
         "tests/evaluation/test_prediction_baselines.py",
         "tests/qimen/test_qimen_clock_fold.py",
         "tests/evaluation/test_prediction_fold_order.py",
-        "src/fatebridge/validation/claims.py",
+        "validation/claims.py",
         "uv.lock",
     ]
     implementation = {
@@ -231,6 +254,8 @@ def audit() -> dict[str, Any]:
     def check(condition: bool, category: str, case: Any) -> None:
         if not condition:
             failures.append({"category": category, "case": case})
+        else:
+            pass
 
     terms = {
         t.name: t.moment for t in get_solar_terms_for_year(2026, calendar["timezone"])
@@ -362,8 +387,7 @@ def audit() -> dict[str, Any]:
                 counts["equivalent_clock_regression_pairs"] += 1
                 check(
                     a.input_datetime.isoformat() == b.input_datetime.isoformat()
-                    and a.corrected_datetime.isoformat()
-                    == b.corrected_datetime.isoformat()
+                    and a.clock_isoformat() == b.clock_isoformat()
                     and a.total_correction_minutes == b.total_correction_minutes
                     and a.pillars == b.pillars
                     and a.calendar_context == b.calendar_context
@@ -429,10 +453,6 @@ def audit() -> dict[str, Any]:
             )
             by_gua = {p["trigram"]: p for p in palaces}
             if group == "leader_examples":
-                from fatebridge.core.metaphysics.qimen import (
-                    QIMEN_DOOR_DISPLAY,
-                    QIMEN_STAR_DISPLAY,
-                )
 
                 ok = (
                     QIMEN_STAR_DISPLAY[leader["star"]] == case["star"]
@@ -451,14 +471,15 @@ def audit() -> dict[str, Any]:
             else:
                 at = datetime(2026, 1, 1, 12)
                 seed = MetaphysicsSeed(
-                    at,
-                    at,
-                    "Asia/Shanghai",
-                    None,
-                    False,
-                    0.0,
-                    {"month": ("丙", "寅")},
-                    {"current_solar_term": {"name": "冬至"}},
+                    input_datetime=localize_datetime(at, "Asia/Shanghai"),
+                    clock=NominalClockLabel.from_local_datetime(at),
+                    timezone="Asia/Shanghai",
+                    longitude=None,
+                    applied_true_solar=False,
+                    total_correction_minutes=0.0,
+                    pillars={"month": ("丙", "寅")},
+                    calendar_context={"current_solar_term": {"name": "冬至"}},
+                    input_offset_visible=False,
                 )
                 board = enrich_qimen_evidence(
                     {
@@ -503,6 +524,8 @@ def audit() -> dict[str, Any]:
                 )
                 if i % 10 == 0:
                     ok = ok and all(p["heaven_stem"] == p["earth_stem"] for p in outer)
+                else:
+                    pass
                 check(ok, "conservation", {"ju": ju, "hour": hour})
     for year in range(1901, 2100):
         current = _qimen_build_yinyangdun_map(year, "Asia/Shanghai")
@@ -511,18 +534,21 @@ def audit() -> dict[str, Any]:
             if key.startswith(str(year + 1)):
                 counts["year_seam_dates"] += 1
                 check(current[key] == following[key], "year_seam", key)
+            else:
+                pass
 
     for case in boundary["cases"]:
         at = datetime.fromisoformat(case["at"])
         seed = MetaphysicsSeed(
-            at,
-            at,
-            "Asia/Hong_Kong",
-            None,
-            False,
-            0.0,
-            {"day": tuple(case["day"]), "hour": ("甲", "子")},
-            {},
+            input_datetime=localize_datetime(at, "Asia/Hong_Kong"),
+            clock=NominalClockLabel.from_local_datetime(at),
+            timezone="Asia/Hong_Kong",
+            longitude=None,
+            applied_true_solar=False,
+            total_correction_minutes=0.0,
+            pillars={"day": tuple(case["day"]), "hour": ("甲", "子")},
+            calendar_context={},
+            input_offset_visible=False,
         )
         meta = _qimen_resolve_zhirun_meta(seed=seed)
         counts["zhirun_profile_boundary_cases"] += 1
@@ -740,6 +766,8 @@ def audit() -> dict[str, Any]:
         raise RuntimeError(
             "奇门审计期间依赖源码或参考资料发生变化；本次结果不写入，请固定输入后重跑"
         )
+    else:
+        pass
 
     return {
         "ruleset_id": RULESET_ID,
@@ -834,9 +862,9 @@ def audit() -> dict[str, Any]:
         "interpretation": {
             "status": "structured_rule_evidence",
             "live_model_behavior_validated": False,
-            "same_run_whole_pattern_quote_validator": "fatebridge.validation.qimen.verify_qimen_pattern_quotes",
-            "same_run_whole_time_condition_quote_validator": "fatebridge.validation.qimen_time_conditions.verify_qimen_time_condition_quotes",
-            "same_run_whole_solar_time_quote_validator": "fatebridge.validation.qimen_solar.verify_qimen_solar_time_quotes",
+            "same_run_whole_pattern_quote_validator": "validation.qimen.verify_qimen_pattern_quotes",
+            "same_run_whole_time_condition_quote_validator": "validation.qimen_time_conditions.verify_qimen_time_condition_quotes",
+            "same_run_whole_solar_time_quote_validator": "validation.qimen_solar.verify_qimen_solar_time_quotes",
             "free_text_semantics_validated": False,
         },
         "real_world_prediction": {
@@ -886,3 +914,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

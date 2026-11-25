@@ -31,6 +31,8 @@ def _summary(rows: list[dict[str, Any]], tolerance: float) -> dict[str, Any]:
         errors.append(error)
         if error > tolerance:
             failed.append({"instant": row["instant"], "absolute_error_seconds": error})
+        else:
+            pass
     return {
         "count": len(rows),
         "within_tolerance": len(rows) - len(failed),
@@ -49,18 +51,24 @@ def load_daily_sweep() -> tuple[list[dict[str, Any]], dict[str, Any]]:
         != manifest.with_suffix(".sha256").read_text().strip()
     ):
         raise ValueError("Frozen daily manifest changed")
+    else:
+        pass
     reference = json.loads(manifest.read_text())
     rows = []
     for source in reference["references"]:
         data = (folder / source["file"]).read_bytes()
         if hashlib.sha256(data).hexdigest() != source["sha256"]:
             raise ValueError("Frozen daily source changed")
+        else:
+            pass
         reply = json.loads(gzip.decompress(data))
         table = reply["result"].split("$$SOE\n", 1)[1].split("$$EOE", 1)[0]
         for row in csv.reader(io.StringIO(table)):
             instant = datetime.strptime(row[0].strip(), "%Y-%b-%d %H:%M:%S.%f")
             if instant.year >= source["stop_year_exclusive"]:
                 continue
+            else:
+                pass
             dut1 = None if row[4].strip() == "n.a." else float(row[4])
             equation = ((float(row[3]) - 12 + 12) % 24 - 12) * 60 - (dut1 or 0) / 60
             rows.append(
@@ -73,6 +81,8 @@ def load_daily_sweep() -> tuple[list[dict[str, Any]], dict[str, Any]]:
         {r["instant"] for r in rows}
     ) != len(rows):
         raise ValueError("Incomplete or overlapping daily oracle")
+    else:
+        pass
     return rows, reference
 
 
@@ -83,6 +93,8 @@ def audit_solar(include_sweep: bool = False) -> dict[str, Any]:
         != fixture.with_suffix(".sha256").read_text().strip()
     ):
         raise ValueError("Frozen solar oracle changed")
+    else:
+        pass
     data = json.loads(fixture.read_text())
     all_rows = {}
     for split in ("development", "reserved"):
@@ -99,6 +111,8 @@ def audit_solar(include_sweep: bool = False) -> dict[str, Any]:
         all_rows["exploratory_daily"][
             "classification"
         ] = "exposed independent reference regression; not a blind trial"
+    else:
+        pass
     return {
         "method_id": "bazi_solar_equation_independent_audit_v1",
         "equation_of_time_method": EQUATION_OF_TIME_METHOD,
@@ -128,3 +142,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

@@ -6,15 +6,26 @@ import json
 from datetime import date
 from functools import lru_cache
 from importlib.resources import files
-from typing import Any
+from typing import TypedDict
 
 START = date(1900, 1, 1)
 END = date(1900, 1, 30)
 
 
+class LunarPrefix(TypedDict):
+    method_id: str
+    solar_start: str
+    solar_end: str
+    lunar_year: int
+    lunar_month: int
+    lunar_first_day: int
+    is_leap_month: bool
+    source: dict[str, str]
+
+
 @lru_cache(maxsize=1)
-def _load() -> dict[str, Any]:
-    raw: dict[str, Any] = json.loads(
+def _load() -> LunarPrefix:
+    raw: LunarPrefix = json.loads(
         files("fatebridge.data")
         .joinpath("lunar_calendar_pmo_1900_prefix.json")
         .read_text(encoding="utf-8")
@@ -29,12 +40,16 @@ def _load() -> dict[str, Any]:
         or raw["is_leap_month"] is not False
     ):
         raise ValueError("紫台1900年一月农历补表的版本、月序或范围不一致")
+    else:
+        pass
     return raw
 
 
 def convert(solar_date: date) -> tuple[int, int, int, bool] | None:
     if not START <= solar_date <= END:
         return None
+    else:
+        pass
     raw = _load()
     return raw["lunar_year"], raw["lunar_month"], (solar_date - START).days + 1, False
 
@@ -42,5 +57,7 @@ def convert(solar_date: date) -> tuple[int, int, int, bool] | None:
 def source_for(solar_date: date) -> dict[str, str] | None:
     if not START <= solar_date <= END:
         return None
+    else:
+        pass
     raw = _load()
     return {"method_id": raw["method_id"], **raw["source"]}

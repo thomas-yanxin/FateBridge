@@ -3,12 +3,15 @@
 import asyncio
 import json
 import shutil
+from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
 from fastmcp import Client
 
 import fatebridge.api as api
+import fatebridge.utils.solar_time as module
+import scripts.ziwei.audit_ziwei_civil_fold as audit
 from fatebridge.application.examples import evidence_views, suggested_fields
 from fatebridge.cli import run
 from fatebridge.mcp_server import create_mcp_app
@@ -21,6 +24,7 @@ from fatebridge.utils.birth_input import create_person_info
 from fatebridge.utils.solar_time import normalize_birth_time
 from scripts.ziwei.audit_ziwei_civil_fold import FIXTURES, audit_civil_fold
 from tests.fixtures.mcp_receipt import verified_inline_business
+from tests.support.transports import call_calculation
 
 BIRTH = dict(
     birth_year=1991,
@@ -38,7 +42,7 @@ TARGET = dict(
 )
 
 
-def test_frozen_rule_audit_keeps_independent_denominators_and_known_gaps():
+def test_frozen_rule_audit_keeps_independent_denominators_and_known_gaps() -> None:
     r = audit_civil_fold()
     assert not r["differences"]
     assert r["independent_rule_conditioned_instants"] == 2
@@ -56,9 +60,8 @@ def test_frozen_rule_audit_keeps_independent_denominators_and_known_gaps():
 
 
 def test_changing_actual_instant_is_detected_without_rewriting_expected_values(
-    monkeypatch,
-):
-    import scripts.ziwei.audit_ziwei_civil_fold as audit
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
 
     original = audit.calculate_ziwei_birth
 
@@ -73,7 +76,7 @@ def test_changing_actual_instant_is_detected_without_rewriting_expected_values(
     assert len(audit.audit_civil_fold()["differences"]) == 16
 
 
-def test_original_timezone_rule_bytes_are_required(tmp_path):
+def test_original_timezone_rule_bytes_are_required(tmp_path: Path) -> None:
     shutil.copytree(FIXTURES / "ziwei_civil_fold_v1", tmp_path / "ziwei_civil_fold_v1")
     (tmp_path / "ziwei_civil_fold_v1/iana-2025b-asia.txt").write_bytes(b"changed")
     with pytest.raises(ValueError, match="source checksum mismatch"):
@@ -89,9 +92,8 @@ def test_original_timezone_rule_bytes_are_required(tmp_path):
     ],
 )
 def test_explicit_offset_retains_named_zone_and_physical_solar_input(
-    solar, offset, fold, utc, monkeypatch
-):
-    import fatebridge.utils.solar_time as module
+    solar: bool, offset: str, fold: int, utc: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
 
     seen = []
 
@@ -122,7 +124,9 @@ def test_explicit_offset_retains_named_zone_and_physical_solar_input(
 
 @pytest.mark.parametrize("tool", ["birth", "horoscope"])
 @pytest.mark.parametrize("offset", [None, "+07:00", "+08:30", "bad"])
-def test_ambiguity_or_mismatching_offset_is_rejected(tool, offset):
+def test_ambiguity_or_mismatching_offset_is_rejected(
+    tool: str, offset: str | None
+) -> None:
     p = create_person_info(**BIRTH)
     r = (
         calculate_ziwei_birth(p, birth_utc_offset=offset)
@@ -141,7 +145,9 @@ def test_ambiguity_or_mismatching_offset_is_rejected(tool, offset):
 
 @pytest.mark.parametrize("offset", ["+08:00", "+09:00"])
 @pytest.mark.parametrize("which", ["birth", "target"])
-def test_explicit_offset_cannot_make_a_nonexistent_wall_time_real(offset, which):
+def test_explicit_offset_cannot_make_a_nonexistent_wall_time_real(
+    offset: str, which: str
+) -> None:
     if which == "birth":
         p = create_person_info(
             **{**BIRTH, "birth_month": 4, "birth_day": 14, "birth_hour": 2}
@@ -157,12 +163,12 @@ def test_explicit_offset_cannot_make_a_nonexistent_wall_time_real(offset, which)
     assert r.get("status_code") == 400 and "nonexistent" in r["error"]
 
 
-def test_missing_target_offset_still_rejects_ambiguous_target():
+def test_missing_target_offset_still_rejects_ambiguous_target() -> None:
     p = create_person_info(**{**BIRTH, "birth_year": 1990})
     assert "ambiguous" in calculate_ziwei_horoscope(p, **TARGET)["error"]
 
 
-def test_minute_endpoint_preserves_second_occurrence_and_utc_progress():
+def test_minute_endpoint_preserves_second_occurrence_and_utc_progress() -> None:
     r = calculate_ziwei_birth(
         create_person_info(
             **{**BIRTH, "use_true_solar_time": False, "birth_minute": 59}
@@ -175,7 +181,7 @@ def test_minute_endpoint_preserves_second_occurrence_and_utc_progress():
     assert e == ["1991-09-15 01:59:00", "1991-09-15 01:59:59.999999"]
 
 
-def test_no_offset_and_redundant_correct_offset_keep_actual_natal_facts_equal():
+def test_no_offset_and_redundant_correct_offset_keep_actual_natal_facts_equal() -> None:
     p = create_person_info(**{**BIRTH, "birth_day": 16})
     a = calculate_ziwei_birth(p)
     b = calculate_ziwei_birth(p, birth_utc_offset="+08:00")
@@ -190,8 +196,12 @@ def test_no_offset_and_redundant_correct_offset_keep_actual_natal_facts_equal():
 @pytest.mark.parametrize("source", ["rule_profile", "naj_ming_v1"])
 @pytest.mark.parametrize("profile", ["iztro_2_5_8", "quanshu_v2_excerpt"])
 def test_explicit_birth_and_target_instants_match_rest_native_mcp_cli(
-    tool, source, profile, monkeypatch, capsys
-):
+    tool: str,
+    source: str,
+    profile: str,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     api._reset_runtime_state_for_tests()
     monkeypatch.setattr(
         api,
@@ -207,6 +217,8 @@ def test_explicit_birth_and_target_instants_match_rest_native_mcp_cli(
     }
     if tool == "ziwei_horoscope":
         inputs.update(**TARGET, target_utc_offset="+08:00")
+    else:
+        pass
     fields = evidence_views(spec)["calendar"]["fields"]
     opts = dict(
         fields=fields,
@@ -228,12 +240,14 @@ def test_explicit_birth_and_target_instants_match_rest_native_mcp_cli(
 
     async def call():
         async with Client(create_mcp_app(families="metaphysics")) as client:
-            r = await client.call_tool(tool, {**inputs, **opts}, raise_on_error=False)
+            r = await call_calculation(
+                client, spec.tool_name, {**inputs, **opts}, raise_on_error=False
+            )
             assert not r.is_error, r.content
             return await verified_inline_business(client, r.structured_content)
 
     native = asyncio.run(call())
-    args = [tool]
+    args = [spec.tool_name]
     for k, v in inputs.items():
         args += ["--" + k.replace("_", "-"), str(v)]
     args += [
@@ -259,16 +273,19 @@ def test_explicit_birth_and_target_instants_match_rest_native_mcp_cli(
         assert (
             basis["target"]["civil_clock"]["instant_utc"] == "1991-09-14T17:30:00+00:00"
         )
+    else:
+        pass
 
 
 @pytest.mark.parametrize("profile", ["iztro_2_5_8", "quanshu_v2_excerpt"])
-def test_explicit_birth_clock_default_view_keeps_all_stars_inline(profile):
+def test_explicit_birth_clock_default_view_keeps_all_stars_inline(profile: str) -> None:
     spec = next(s for s in CATALOG if s.key == "ziwei_birth")
 
     async def call():
         async with Client(create_mcp_app(families="metaphysics")) as client:
-            r = await client.call_tool(
-                "ziwei_birth",
+            r = await call_calculation(
+                client,
+                "ziwei_birth_chart",
                 {
                     **BIRTH,
                     "birth_utc_offset": "+08:00",

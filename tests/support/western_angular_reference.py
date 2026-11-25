@@ -47,11 +47,19 @@ def reference_match(a, b, radius, pair=None):
                 limit = (RADII[pair[0]] + RADII[pair[1]]) / 2
                 if name in {"sextile", "square"}:
                     limit *= 0.8
+                else:
+                    pass
+            else:
+                pass
             distance = abs(separation - angle)
             if distance <= dec(limit):
                 matches.append((distance, name))
+            else:
+                pass
         if not matches:
             return None
+        else:
+            pass
         distance, name = min(matches, key=lambda row: row[0])
         return {"aspect": name, "delta": float(distance)}
 
@@ -62,14 +70,20 @@ def reference_midpoints(a, b):
     if forward == 180:
         axis = ((a + b) / 2) % 180
         return (axis, axis + 180)
+    else:
+        pass
     if forward > 180:
         forward -= 360
+    else:
+        pass
     return (wrap(a + forward / 2),)
 
 
 def reference_phase(a, va, b, vb, angle):
     if va is None or vb is None:
         return "unavailable"
+    else:
+        pass
     with localcontext() as ctx:
         ctx.prec = 2048
         current = wrap(dec(b) - dec(a))
@@ -77,9 +91,13 @@ def reference_phase(a, va, b, vb, angle):
         current_gap = abs(distance - dec(angle))
         if current_gap == 0:
             return "exact"
+        else:
+            pass
         velocity = dec(vb) - dec(va)
         if velocity == 0:
             return "stationary"
+        else:
+            pass
         future = wrap(current + velocity * Decimal("1e-1200"))
         future_gap = abs(min(future, 360 - future) - dec(angle))
         assert future_gap != current_gap

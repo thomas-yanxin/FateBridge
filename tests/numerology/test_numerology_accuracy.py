@@ -11,19 +11,14 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.almanac import get_solar_terms_for_year
-from fatebridge.core.canping import (
-    BRANCHES,
-)
-from fatebridge.core.canping import calculate as canping
-from fatebridge.core.canping import compute_number, liunian_series
-from fatebridge.core.heluo import (
+from fatebridge.core.almanac import get_day_ganzhi, get_solar_terms_for_year
+from fatebridge.core.heluo.heluo import (
     _reduce_di,
     _reduce_tian,
     _wu_ji_gong,
 )
-from fatebridge.core.heluo import calculate as heluo
-from fatebridge.core.heluo import (
+from fatebridge.core.heluo.heluo import calculate as heluo
+from fatebridge.core.heluo.heluo import (
     four_pillar_number_totals,
     gua_lines,
     judge,
@@ -32,13 +27,19 @@ from fatebridge.core.heluo import (
     transform_houtian,
     yao_text,
 )
-from fatebridge.core.heluo_hexagrams import _gua_tables
-from fatebridge.core.heluo_yuantang import placement
+from fatebridge.core.heluo.heluo_hexagrams import _gua_tables
+from fatebridge.core.heluo.heluo_yuantang import placement
+from fatebridge.core.numerology.canping import (
+    BRANCHES,
+)
+from fatebridge.core.numerology.canping import calculate as canping
+from fatebridge.core.numerology.canping import compute_number, liunian_series
 from fatebridge.core.zhouyi import classical_hexagram
 from fatebridge.services.divination import (
     calculate_canping_analysis,
     calculate_heluo_analysis,
 )
+from fatebridge.utils.civil_time import utc_calendar
 
 FIXTURES = Path(__file__).parents[1] / "fixtures"
 REFERENCE = json.loads((FIXTURES / "numerology-classical-reference.json").read_text())
@@ -46,7 +47,7 @@ NAOJ = json.loads((FIXTURES / "numerology-naoj-2026.json").read_text())
 
 
 @pytest.mark.parametrize("case", REFERENCE["heluo"])
-def test_volume_one_original_examples(case):
+def test_volume_one_original_examples(case) -> None:
     pillars = dict(zip(("year", "month", "day", "hour"), case["pillars"]))
     # Both source printings literally retain this arithmetic illustration.
     # Its Geng-year/Wuxu-month conflict must not become a realizable birth chart.
@@ -80,13 +81,17 @@ def test_volume_one_original_examples(case):
     for phase in ("xian", "hou"):
         if phase in case:
             assert actual[phase]["name"] == case[phase]
+        else:
+            pass
     if "yuan" in case:
         assert actual["xian"]["yuan"] == case["yuan"]
         assert actual["hou"]["yuan"] == case["hou_yuan"]
+    else:
+        pass
 
 
 @pytest.mark.parametrize("case", REFERENCE["canping"])
-def test_volume_six_five_element_examples(case):
+def test_volume_six_five_element_examples(case) -> None:
     number = compute_number(case["day"], case["hour"], case["element"])
     assert number == {
         "shun": case["shun"],
@@ -107,7 +112,9 @@ def test_volume_six_five_element_examples(case):
         assert result["benming"]["numNi"] == case["num_ni"]
 
 
-def test_all_branch_pairs_use_inclusive_walk_with_full_circle_for_equal_branches():
+def test_all_branch_pairs_use_inclusive_walk_with_full_circle_for_equal_branches() -> (
+    None
+):
     # Independent literal ring walk, including all 12 same-branch cases.
     for day, hour in product(BRANCHES, repeat=2):
         for direction, field in [(1, "shun"), (-1, "ni")]:
@@ -117,6 +124,8 @@ def test_all_branch_pairs_use_inclusive_walk_with_full_circle_for_equal_branches
                 count += 1
                 if BRANCHES[position] == hour:
                     break
+                else:
+                    pass
             assert compute_number(day, hour, "金")[field] == count
 
 
@@ -124,14 +133,18 @@ def test_all_branch_pairs_use_inclusive_walk_with_full_circle_for_equal_branches
     "number,expected",
     [(20, 2), (25, 5), (31, 6), (35, 1), (44, 9), (50, 5), (55, 3), (60, 5), (65, 4)],
 )
-def test_heaven_number_subtracts_25_once_then_discards_tens(number, expected):
+def test_heaven_number_subtracts_25_once_then_discards_tens(
+    number: int, expected: int
+) -> None:
     assert _reduce_tian(number) == expected
 
 
 @pytest.mark.parametrize(
     "number,expected", [(24, 4), (30, 3), (40, 1), (50, 2), (60, 3), (70, 4)]
 )
-def test_earth_number_subtracts_30_once_then_discards_tens(number, expected):
+def test_earth_number_subtracts_30_once_then_discards_tens(
+    number: int, expected: int
+) -> None:
     assert _reduce_di(number) == expected
 
 
@@ -147,14 +160,16 @@ def test_earth_number_subtracts_30_once_then_discards_tens(number, expected):
         (2044, "艮", "坤"),
     ],
 )
-def test_three_yuan_cycles_follow_hongzhi_jiazi_anchor(year, male, female):
+def test_three_yuan_cycles_follow_hongzhi_jiazi_anchor(
+    year: int, male: str, female: str
+) -> None:
     assert _wu_ji_gong(year - 1911, True, True) == male
     assert _wu_ji_gong(year - 1911, True, False) == female
     for offset in (-360, -180, 180, 360):
         assert _wu_ji_gong(year + offset - 1911, True, True) == male
 
 
-def test_middle_yuan_yin_male_yang_female_and_pre_lichun_cycle_year():
+def test_middle_yuan_yin_male_yang_female_and_pre_lichun_cycle_year() -> None:
     assert _wu_ji_gong(1924 - 1911, False, True) == "坤"
     assert _wu_ji_gong(1924 - 1911, True, False) == "坤"
     result = calculate_heluo_analysis(
@@ -179,7 +194,9 @@ def test_middle_yuan_yin_male_yang_female_and_pre_lichun_cycle_year():
         ("震", "坤", "午未申酉戌亥", [1, 2, 3, 5, 6, 4]),
     ],
 )
-def test_yuantang_explicit_tables_from_volume_one(up, low, hours, expected):
+def test_yuantang_explicit_tables_from_volume_one(
+    up: str, low: str, hours: str, expected
+) -> None:
     lines = gua_lines(up, low)
     assert [placement(lines, h, True, True)["selected_pos"] for h in hours] == expected
 
@@ -195,7 +212,9 @@ def test_yuantang_explicit_tables_from_volume_one(up, low, hours, expected):
         ("坤", True, True, [1, 2, 3, 1, 2, 3, 4, 5, 6, 4, 5, 6]),
     ],
 )
-def test_pure_hexagrams_have_separate_sex_and_solstice_tables(up, male, yang, expected):
+def test_pure_hexagrams_have_separate_sex_and_solstice_tables(
+    up: str, male: bool, yang: bool, expected
+) -> None:
     lines = gua_lines(up, up)
     assert [
         placement(lines, h, male, yang)["selected_pos"] for h in BRANCHES
@@ -205,7 +224,7 @@ def test_pure_hexagrams_have_separate_sex_and_solstice_tables(up, male, yang, ex
 @pytest.mark.parametrize(
     "name,low", [("坎為水", "坎"), ("水雷屯", "震"), ("水山蹇", "艮")]
 )
-def test_three_supreme_hexagrams_both_exception_branches(name, low):
+def test_three_supreme_hexagrams_both_exception_branches(name: str, low: str) -> None:
     lines = gua_lines("坎", low)
     for pos, yang in [(5, False), (6, True)]:
         special = transform_houtian(name, lines, pos, yang)
@@ -217,7 +236,9 @@ def test_three_supreme_hexagrams_both_exception_branches(name, low):
 
 
 @pytest.mark.parametrize("name,instant", NAOJ["cases"])
-def test_24_solar_terms_against_naoj_and_external_boundary_bracketing(name, instant):
+def test_24_solar_terms_against_naoj_and_external_boundary_bracketing(
+    name, instant
+) -> None:
     reference = datetime.fromisoformat(instant)
     terms = get_solar_terms_for_year(2026, "Asia/Shanghai")
     actual = next(t.moment for t in terms if t.name == name)
@@ -247,28 +268,41 @@ def test_24_solar_terms_against_naoj_and_external_boundary_bracketing(name, inst
         ("秋分", False, "兌"),
     ],
 )
-def test_exact_instant_changes_both_solstice_and_huagong(term, new_yang, quarter):
-    at = next(
-        t.moment
-        for t in get_solar_terms_for_year(2026, "Asia/Shanghai")
-        if t.name == term
+def test_exact_instant_changes_both_solstice_and_huagong(
+    term: str, new_yang: bool, quarter: str
+) -> None:
+    crossing = next(
+        t for t in get_solar_terms_for_year(2026, "Asia/Shanghai") if t.name == term
     )
+    at = crossing.moment
+    _, upper = crossing.point.nominal_calendar_bracket()
+    first = datetime.fromisoformat(upper.isoformat()).astimezone(at.tzinfo)
     before = solar_term(
         2026,
-        at.month,
-        at.day,
+        first.month,
+        first.day,
         "Asia/Shanghai",
-        birth_datetime=at - timedelta(microseconds=1),
+        birth_datetime=first - datetime.resolution,
     )
-    after = solar_term(2026, at.month, at.day, "Asia/Shanghai", birth_datetime=at)
+    after = solar_term(
+        2026, first.month, first.day, "Asia/Shanghai", birth_datetime=first
+    )
     assert before["quarter"] != after["quarter"] == quarter
     assert after["yang_ling"] is new_yang
     if term in {"夏至", "冬至"}:
         assert before["yang_ling"] is not new_yang
+    else:
+        pass
+    on_display = solar_term(2026, at.month, at.day, "Asia/Shanghai", birth_datetime=at)
+    expected_display = (
+        before if utc_calendar(at).julian_day_exact() < crossing.point.day else after
+    )
+    for field in ("term", "quarter", "yang_ling"):
+        assert on_display[field] == expected_display[field]
     same = solar_term(2026, 1, 1, "+00:00", birth_datetime=at.astimezone(timezone.utc))
     # The new source receipt preserves the requested civil labels. Equal UTC
     # instants keep all prior numerical facts, while their local dates can differ.
-    a, b = same.copy(), after.copy()
+    a, b = same.copy(), on_display.copy()
     ca, cb = a.pop("boundary_context"), b.pop("boundary_context")
     assert a == b
     assert (
@@ -278,7 +312,6 @@ def test_exact_instant_changes_both_solstice_and_huagong(term, new_yang, quarter
     ca.pop("context_timezone")
     cb.pop("context_timezone")
     assert ca == cb
-    from fatebridge.core.almanac import get_day_ganzhi
 
     local_fields = {
         "datetime",
@@ -307,7 +340,7 @@ def test_exact_instant_changes_both_solstice_and_huagong(term, new_yang, quarter
             assert record["fold"] == 0 and record["timezone"] == label
 
 
-def test_service_uses_civil_instant_for_terms_despite_solar_clock_correction():
+def test_service_uses_civil_instant_for_terms_despite_solar_clock_correction() -> None:
     args = dict(date="2026-06-21", time="16:30:00", zone="+08:00", gender="女")
     civil = calculate_heluo_analysis(**args, use_true_solar_time=False)
     solar = calculate_heluo_analysis(**args, use_true_solar_time=True, lon="0")
@@ -318,19 +351,24 @@ def test_service_uses_civil_instant_for_terms_despite_solar_clock_correction():
 
 
 @pytest.mark.parametrize("name", ["立春", "立夏", "立秋", "立冬"])
-def test_tuyong_is_half_open_18_elapsed_days(name):
-    end = next(
-        t.moment
-        for t in get_solar_terms_for_year(2026, "Asia/Shanghai")
-        if t.name == name
+def test_tuyong_is_half_open_18_elapsed_days(name: str) -> None:
+    crossing = next(
+        t for t in get_solar_terms_for_year(2026, "Asia/Shanghai") if t.name == name
     )
+    end = crossing.moment
     start = end - timedelta(days=18)
-    for at, expected in [
-        (start - timedelta(microseconds=1), False),
-        (start, True),
-        (end - timedelta(microseconds=1), True),
-        (end, False),
-    ]:
+    _, upper = crossing.point.nominal_calendar_bracket()
+    upper_end = datetime.fromisoformat(upper.isoformat()).astimezone(end.tzinfo)
+    upper_start = upper_end - timedelta(days=18)
+    for at in sorted(
+        {
+            boundary + offset
+            for boundary in (start, end, upper_start, upper_end)
+            for offset in (-datetime.resolution, timedelta())
+        }
+    ):
+        point = utc_calendar(at).julian_day_exact()
+        expected = crossing.point.day - 18 <= point < crossing.point.day
         assert (
             solar_term(at.year, at.month, at.day, "Asia/Shanghai", birth_datetime=at)[
                 "tuyong"
@@ -339,7 +377,7 @@ def test_tuyong_is_half_open_18_elapsed_days(name):
         )
 
 
-def test_canping_late_ages_have_real_periods_instead_of_clamping_to_age_90():
+def test_canping_late_ages_have_real_periods_instead_of_clamping_to_age_90() -> None:
     series = liunian_series(
         year_gz="庚午",
         month_branch="寅",
@@ -353,7 +391,7 @@ def test_canping_late_ages_have_real_periods_instead_of_clamping_to_age_90():
     assert series["rows"][110]["dayunBranch"] != series["rows"][89]["dayunBranch"]
 
 
-def test_najia_policy_includes_houtian_direct_trigrams_and_is_partial():
+def test_najia_policy_includes_houtian_direct_trigrams_and_is_partial() -> None:
     p = dict(zip(("year", "month", "day", "hour"), REFERENCE["heluo"][0]["pillars"]))
     chart = heluo(
         four_pillars=p, gender="男", hour_zhi="辰", birth_year=1924, month_zhi="卯"
@@ -366,7 +404,7 @@ def test_najia_policy_includes_houtian_direct_trigrams_and_is_partial():
     assert actual["assessment_status"] == "partial"
 
 
-def test_invalid_four_pillars_cannot_silently_drop_branch_contributions():
+def test_invalid_four_pillars_cannot_silently_drop_branch_contributions() -> None:
     p = dict(zip(("year", "month", "day", "hour"), REFERENCE["heluo"][0]["pillars"]))
     with pytest.raises(ValueError):
         heluo(
@@ -382,7 +420,7 @@ def test_invalid_four_pillars_cannot_silently_drop_branch_contributions():
         )
 
 
-def test_same_run_text_selection_and_partial_assessment_are_explicit():
+def test_same_run_text_selection_and_partial_assessment_are_explicit() -> None:
     r = calculate_heluo_analysis(
         date="2000-05-15", time="09:33:00", gender="男", use_true_solar_time=False
     )
@@ -408,7 +446,9 @@ def test_same_run_text_selection_and_partial_assessment_are_explicit():
     )
 
 
-def test_all_64_heluo_names_and_line_positions_match_the_separate_zhouyi_corpus():
+def test_all_64_heluo_names_and_line_positions_match_the_separate_zhouyi_corpus() -> (
+    None
+):
     names = _gua_tables()[0]
     assert len(names) == 64
     for name, trigrams in names.items():
@@ -420,7 +460,7 @@ def test_all_64_heluo_names_and_line_positions_match_the_separate_zhouyi_corpus(
             assert yao_text(name, pos) is not None
 
 
-def test_invalid_method_and_unknown_element_do_not_silently_choose_a_school():
+def test_invalid_method_and_unknown_element_do_not_silently_choose_a_school() -> None:
     with pytest.raises(ValueError):
         canping(
             year_gz="庚午",
@@ -433,7 +473,9 @@ def test_invalid_method_and_unknown_element_do_not_silently_choose_a_school():
         compute_number("子", "丑", "unknown")
 
 
-def test_canping_variants_have_different_traceable_rulesets_and_corpus_statuses():
+def test_canping_variants_have_different_traceable_rulesets_and_corpus_statuses() -> (
+    None
+):
     args = dict(
         date="1990-06-15", time="09:33:00", gender="男", use_true_solar_time=False
     )

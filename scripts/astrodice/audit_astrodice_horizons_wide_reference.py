@@ -33,9 +33,13 @@ def input_tick(label):
     )
     if match is None:
         raise ValueError("TT input lost its explicit calendar era")
+    else:
+        pass
     y, era, m, d, h, mi, s, us = match.groups()
     if int(y) < 1:
         raise ValueError("BC/AD labeling has no year zero")
+    else:
+        pass
     y = int(y) if era == "ad" else 1 - int(y)
     cycle, remainder = divmod(y - 1, 400)
     ordinal = date(remainder + 1, MONTHS.index(m) + 1, int(d)).toordinal()
@@ -43,6 +47,8 @@ def input_tick(label):
     h, mi, s, us = map(int, (h, mi, s, us))
     if h >= 24 or mi >= 60 or s >= 60:
         raise ValueError("Invalid reference clock")
+    else:
+        pass
     return ordinal * DAY_US + ((h * 60 + mi) * 60 + s) * 1000000 + us
 
 
@@ -69,6 +75,8 @@ def interpolation_weights():
         for row in range(13):
             if row == col:
                 continue
+            else:
+                pass
             factor = a[row][col]
             a[row] = [v - factor * u for v, u in zip(a[row], a[col])]
     weights = dict(zip(nodes, (row[-1] for row in a)))
@@ -77,6 +85,8 @@ def interpolation_weights():
         for power in range(13)
     ):
         raise ValueError("Reference stencil moment identity failed")
+    else:
+        pass
     return weights
 
 
@@ -92,6 +102,8 @@ def validate(protocol_path, reference_path, material, seal_path):
         or reference["Swiss_imported"]
     ):
         raise ValueError("Frozen independent source identity changed")
+    else:
+        pass
     point_map = {}
     raw_failures = []
     auxiliary_batches_validated = 0
@@ -109,10 +121,16 @@ def validate(protocol_path, reference_path, material, seal_path):
             or anchored["parameters"] != params
         ):
             raise ValueError("Request journal differs from immutable reference batch")
+        else:
+            pass
         if any(params.get(k) != v for k, v in protocol["reference_parameters"].items()):
             raise ValueError("Reference parameter contract changed")
+        else:
+            pass
         if params["COMMAND"] != f"'{protocol['targets'][body]}'":
             raise ValueError("Reference target changed")
+        else:
+            pass
         labels = re.findall(r"'([^']+)'", params["TLIST"])
         if params["TLIST_TYPE"] in {"'JD'", "'MJD'"}:
             requested = []
@@ -128,6 +146,8 @@ def validate(protocol_path, reference_path, material, seal_path):
                 nearest = round(exact_tick)
                 if abs(exact_tick - nearest) > Fraction(1, 10**30):
                     raise ValueError("JD input label changed the requested microsecond")
+                else:
+                    pass
                 requested.append(nearest)
         elif params["TLIST_TYPE"] == "'CAL'":
             requested = [input_tick(v) for v in labels]
@@ -135,6 +155,8 @@ def validate(protocol_path, reference_path, material, seal_path):
             raise ValueError("Undeclared reference epoch encoding")
         if len(requested) != len(set(requested)):
             raise ValueError("Duplicate requested TT epoch")
+        else:
+            pass
         auxiliary = None
         guard = protocol.get("first_tlist_epoch_guard")
         if guard is not None:
@@ -145,6 +167,8 @@ def validate(protocol_path, reference_path, material, seal_path):
                 or len(requested) > protocol["maximum_labels_per_batch"]
             ):
                 raise ValueError("Changed first-TLIST-epoch guard protocol")
+            else:
+                pass
             auxiliary, requested = requested[0], requested[1:]
             minimum = min(Fraction(t, DAY_US) + Fraction(3442849, 2) for t in requested)
             expected_prefix = minimum.numerator // minimum.denominator - 1
@@ -152,19 +176,29 @@ def validate(protocol_path, reference_path, material, seal_path):
                 raise ValueError(
                     "Auxiliary epoch is not the declared integer-JD prefix"
                 )
+            else:
+                pass
+        else:
+            pass
         if "raw_file" in entry:
             raw = (material / entry["raw_file"]).read_bytes()
             if hashlib.sha256(raw).hexdigest() != entry["raw_sha256"]:
                 raise ValueError("Raw response changed")
+            else:
+                pass
         else:
             raw = b""
         if entry.get("http_status") != 200:
             raw_failures.append({k: v for k, v in entry.items() if k != "parameters"})
             continue
+        else:
+            pass
         if entry.get("raw_file") != anchored.get("raw_file") or entry.get(
             "raw_sha256"
         ) != anchored.get("raw_sha256"):
             raise ValueError("Raw provenance differs from immutable reference batch")
+        else:
+            pass
         for key in [
             "network_request_performed",
             "reused_raw_path",
@@ -172,11 +206,15 @@ def validate(protocol_path, reference_path, material, seal_path):
         ]:
             if entry.get(key) != anchored.get(key):
                 raise ValueError("Raw recovery provenance changed")
+            else:
+                pass
         if (
             entry.get("reused_raw_sha256") is not None
             and entry["reused_raw_sha256"] != entry["raw_sha256"]
         ):
             raise ValueError("Recovery bytes differ from original response")
+        else:
+            pass
         try:
             response = json.loads(raw)
         except ValueError:
@@ -188,11 +226,15 @@ def validate(protocol_path, reference_path, material, seal_path):
                 {"batch": entry["batch"], "error": response.get("error")}
             )
             continue
+        else:
+            pass
         target_header = re.search(
             r"^Target body name:\s+.+?\s+\((\d+)\)", text, re.MULTILINE
         )
         if target_header is None or int(target_header[1]) != protocol["targets"][body]:
             raise ValueError("Returned target header changed")
+        else:
+            pass
         if not all(
             token in text
             for token in [
@@ -203,6 +245,8 @@ def validate(protocol_path, reference_path, material, seal_path):
             ]
         ):
             raise ValueError("Returned target/frame/time header changed")
+        else:
+            pass
         table = csv.reader(io.StringIO(text.split("$$SOE", 1)[1].split("$$EOE", 1)[0]))
         received = set()
         auxiliary_rows = []
@@ -210,17 +254,25 @@ def validate(protocol_path, reference_path, material, seal_path):
         for columns in table:
             if not columns:
                 continue
+            else:
+                pass
             printed_jd = Fraction(columns[1].strip())
             if auxiliary is not None and abs(
                 printed_jd - Fraction(auxiliary, DAY_US) - Fraction(3442849, 2)
             ) <= Fraction(protocol["timestamp_printing_tolerance_days"]):
                 if auxiliary_rows:
                     raise ValueError("Duplicate auxiliary integer-JD epoch")
+                else:
+                    pass
                 ra, dec = map(float, columns[-3:-1])
                 if not all(math.isfinite(v) for v in (ra, dec)) or not -90 <= dec <= 90:
                     raise ValueError("Invalid auxiliary angles")
+                else:
+                    pass
                 auxiliary_rows.append(list(columns))
                 continue
+            else:
+                pass
             candidates = [
                 t
                 for t in requested
@@ -235,15 +287,23 @@ def validate(protocol_path, reference_path, material, seal_path):
                     }
                 )
                 continue
+            else:
+                pass
             if len(candidates) != 1:
                 raise ValueError("Returned JD is ambiguous or not requested")
+            else:
+                pass
             tick = candidates[0]
             if tick in received or (body, tick) in point_map:
                 raise ValueError("Duplicate returned TT epoch")
+            else:
+                pass
             received.add(tick)
             ra, dec = map(float, columns[-3:-1])
             if not all(math.isfinite(v) for v in (ra, dec)) or not -90 <= dec <= 90:
                 raise ValueError("Invalid independent angles")
+            else:
+                pass
             unit = precise_direction(ra, dec)
             point_map[(body, tick)] = (unit, columns, entry["batch"])
         if auxiliary is not None:
@@ -260,18 +320,32 @@ def validate(protocol_path, reference_path, material, seal_path):
                 or anchored.get("first_tlist_epoch_guard") != expected_guard
             ):
                 raise ValueError("Auxiliary integer-JD coverage or declaration changed")
+            else:
+                pass
             auxiliary_batches_validated += 1
+        else:
+            pass
         if len(received) != batches[entry["batch"]]["returned_points"]:
             raise ValueError("Declared raw coverage changed")
+        else:
+            pass
         if protocol.get("retain_rejected_epoch_rows", False):
             if rejected_epochs != anchored.get("rejected_epoch_rows"):
                 raise ValueError("Rejected epoch declaration changed")
+            else:
+                pass
             if rejected_epochs:
                 raw_failures.append(
                     {"batch": entry["batch"], "rejected_epoch_rows": rejected_epochs}
                 )
+            else:
+                pass
+        else:
+            pass
     if len(reference["rows"]) != len(protocol["cases"]):
         raise ValueError("Frozen case count changed")
+    else:
+        pass
     weights = interpolation_weights()
     failures = []
     available = probes = bc_probes = 0
@@ -280,9 +354,13 @@ def validate(protocol_path, reference_path, material, seal_path):
     for case, row in zip(protocol["cases"], reference["rows"]):
         if any(row.get(k) != v for k, v in case.items()):
             raise ValueError("Case identity changed")
+        else:
+            pass
         center = center_tick(case["date_tt"])
         if row["jd_tt"] != float(Fraction(center, DAY_US) + Fraction(3442849, 2)):
             raise ValueError("Center TT epoch changed")
+        else:
+            pass
         steps = protocol["steps_seconds"][case["body"]]
         offsets = sorted({k * h for h in steps for k in range(-6, 7)})
         explicit = protocol.get("explicit_offsets_seconds", {}).get(case["body"])
@@ -294,9 +372,15 @@ def validate(protocol_path, reference_path, material, seal_path):
                 or not set(offsets).issubset(explicit)
             ):
                 raise ValueError("Invalid explicit reference node plan")
+            else:
+                pass
             offsets = explicit
+        else:
+            pass
         if set(row["samples"]) != set(map(str, offsets)):
             raise ValueError("Reference probe nodes changed")
+        else:
+            pass
         missing = []
         for offset in offsets:
             tick = center + offset * 1000000
@@ -305,10 +389,16 @@ def validate(protocol_path, reference_path, material, seal_path):
             if actual is None:
                 if stored is not None:
                     raise ValueError("Invented reference sample")
+                else:
+                    pass
                 missing.append(str(offset))
                 continue
+            else:
+                pass
             if stored is None:
                 raise ValueError("Omitted available raw probe")
+            else:
+                pass
             unit, columns, batch = actual
             maximum_replay_ulps = max(
                 maximum_replay_ulps,
@@ -324,15 +414,21 @@ def validate(protocol_path, reference_path, material, seal_path):
                 or stored["dec_degrees"] != float(columns[-2])
             ):
                 raise ValueError("Frozen sample differs from raw material")
+            else:
+                pass
             probes += 1
             bc_probes += tick < DAY_US
         if missing != row["missing_offsets_seconds"]:
             raise ValueError("Missing-probe declaration changed")
+        else:
+            pass
         if missing:
             failures.append(
                 {"id": case["id"], "reason": "missing_probes", "offsets": missing}
             )
             continue
+        else:
+            pass
         estimates = {}
         for h in steps:
             estimates[str(h)] = [
@@ -350,12 +446,16 @@ def validate(protocol_path, reference_path, material, seal_path):
             ]
         if estimates != row["derivatives_per_tt_day"]:
             raise ValueError("Reference derivative replay changed")
+        else:
+            pass
         difference = max(
             math.degrees(math.dist(a, b)) * 3600
             for a, b in combinations(estimates.values(), 2)
         )
         if difference != row["step_difference_arcsec_per_day"]:
             raise ValueError("Reference convergence declaration changed")
+        else:
+            pass
         maximum = max(maximum, difference)
         available += 1
         if difference > protocol["fixed_reference_convergence_arcsec_per_day"]:
@@ -366,6 +466,8 @@ def validate(protocol_path, reference_path, material, seal_path):
                     "difference_arcsec_per_day": difference,
                 }
             )
+        else:
+            pass
     result = {
         "status": (
             "reference_quality_unresolved"
@@ -399,6 +501,8 @@ def validate(protocol_path, reference_path, material, seal_path):
             "auxiliary_used_in_position_or_rate_comparison": False,
             "all_primary_nodes_and_fixed_lines_preserved": True,
         }
+    else:
+        pass
     return result
 
 
@@ -412,3 +516,5 @@ if __name__ == "__main__":
         handle.write(json.dumps(result, indent=2) + "\n")
     print(json.dumps(result, indent=2))
     raise SystemExit(result["exit_code"])
+else:
+    pass

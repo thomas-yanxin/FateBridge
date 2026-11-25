@@ -7,10 +7,16 @@ from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
+from pytest import MonkeyPatch
 
-from fatebridge.core import heluo_clock as clock
-from fatebridge.core.heluo import calculate
-from fatebridge.core.heluo_timing import (
+from fatebridge.core.contracts.output_numerology import (
+    HeluoSourceClock,
+    HeluoTimingYearContext,
+)
+from fatebridge.core.heluo import heluo_clock as clock
+from fatebridge.core.heluo import heluo_timing
+from fatebridge.core.heluo.heluo import calculate
+from fatebridge.core.heluo.heluo_timing import (
     CYCLE,
     HeluoYearContextError,
     annual_timeline,
@@ -18,8 +24,8 @@ from fatebridge.core.heluo_timing import (
     year_context,
 )
 from fatebridge.core.local_techniques.heluo import build_heluo_result
-from fatebridge.core.output_numerology import HeluoSourceClock, HeluoTimingYearContext
 from fatebridge.utils.errors import NumerologySourceError
+from scripts.numerology import audit_numerology as audit
 
 ROOT = Path(__file__).parents[1] / "fixtures/heluo_clock_v1"
 REF = json.loads((ROOT / "reference.json").read_text())
@@ -40,7 +46,7 @@ def ratio(value):
     return [value["numerator"], value["denominator"]]
 
 
-def test_before_bug_mixed_year_changes_the_gua_and_is_now_rejected():
+def test_before_bug_mixed_year_changes_the_gua_and_is_now_rejected() -> None:
     c = chart()
     good = build_heluo_timing(c, "甲子", analysis_year=1924)
     assert good["selected_annual"]["gua"] == "天風姤"
@@ -54,7 +60,7 @@ def test_before_bug_mixed_year_changes_the_gua_and_is_now_rejected():
             build(c, "乙丑")
 
 
-def test_all_sixty_label_links_and_wrong_valid_ganzhi_are_not_mixed():
+def test_all_sixty_label_links_and_wrong_valid_ganzhi_are_not_mixed() -> None:
     for i, gz in enumerate(CYCLE):
         assert year_context(dict(cycleYear=1984 + i), gz)["matches"] is True
         with pytest.raises(HeluoYearContextError):
@@ -66,12 +72,14 @@ def test_all_sixty_label_links_and_wrong_valid_ganzhi_are_not_mixed():
 
 
 @pytest.mark.parametrize("cy", [True, False, None, "1924", 1924.0])
-def test_year_context_needs_an_actual_integer_label(cy):
+def test_year_context_needs_an_actual_integer_label(
+    cy: bool | float | str | None,
+) -> None:
     with pytest.raises(HeluoYearContextError):
         year_context(dict(cycleYear=cy), "甲子")
 
 
-def test_original_counts_make_a_hundred_without_uniform_branches():
+def test_original_counts_make_a_hundred_without_uniform_branches() -> None:
     expected = REF["cyclic_partition_from_zi"]
     rows = clock.source_branch_partition(origin_branch="子")
     assert [
@@ -102,19 +110,21 @@ def test_original_counts_make_a_hundred_without_uniform_branches():
         (Fraction(99999, 1000), "亥"),
     ],
 )
-def test_exact_source_clock_boundaries_without_a_physical_epoch(ke, branch):
+def test_exact_source_clock_boundaries_without_a_physical_epoch(
+    ke, branch: str
+) -> None:
     value = clock.source_branch_at_ke(ke, origin_branch="子")
     assert value["branch"] == branch and value["physical_epoch_established"] is False
     assert clock.source_branch_at_ke(0, origin_branch="寅")["branch"] == "寅"
 
 
 @pytest.mark.parametrize("ke", [True, False, 0.5, 100, -1, "16"])
-def test_no_float_boolean_or_silent_next_cycle_wrap(ke):
+def test_no_float_boolean_or_silent_next_cycle_wrap(ke) -> None:
     with pytest.raises(ValueError):
         clock.source_branch_at_ke(ke, origin_branch="子")
 
 
-def test_origin_and_fen_scale_have_no_implicit_defaults():
+def test_origin_and_fen_scale_have_no_implicit_defaults() -> None:
     with pytest.raises(TypeError):
         clock.source_branch_partition()
     with pytest.raises(TypeError):
@@ -129,7 +139,7 @@ def test_origin_and_fen_scale_have_no_implicit_defaults():
             clock.compare_daily_extra(fen_per_ke=scale)
 
 
-def test_six_day_blocks_follow_unequal_branch_lengths_without_selecting_fen():
+def test_six_day_blocks_follow_unequal_branch_lengths_without_selecting_fen() -> None:
     rows = clock.source_six_day_blocks(origin_branch="未", blocks=12)
     keys = ("branch", "next_branch", "start_ke", "end_ke", "extra_ke")
     assert [{k: row[k] for k in keys} for row in rows] == SHIFT_REF[
@@ -143,7 +153,7 @@ def test_six_day_blocks_follow_unequal_branch_lengths_without_selecting_fen():
     assert clock.source_clock_evidence()["daily_extra_literal"]["fen_per_ke"] is None
 
 
-def test_sixty_branch_shifts_close_the_source_year_for_every_explicit_origin():
+def test_sixty_branch_shifts_close_the_source_year_for_every_explicit_origin() -> None:
     for origin in clock.BRANCHES:
         rows = clock.source_six_day_blocks(origin_branch=origin, blocks=60)
         assert len(rows) == 60 and rows[-1]["next_branch"] == origin
@@ -157,12 +167,12 @@ def test_sixty_branch_shifts_close_the_source_year_for_every_explicit_origin():
 
 
 @pytest.mark.parametrize("blocks", [True, False, 0, -1, 61, 6.0, "6"])
-def test_source_block_scope_does_not_silently_wrap_or_coerce(blocks):
+def test_source_block_scope_does_not_silently_wrap_or_coerce(blocks) -> None:
     with pytest.raises(ValueError):
         clock.source_six_day_blocks(origin_branch="未", blocks=blocks)
 
 
-def test_six_day_blocks_require_an_explicit_branch_start_and_count():
+def test_six_day_blocks_require_an_explicit_branch_start_and_count() -> None:
     with pytest.raises(TypeError):
         clock.source_six_day_blocks(blocks=12)
     with pytest.raises(TypeError):
@@ -174,7 +184,7 @@ def test_six_day_blocks_require_an_explicit_branch_start_and_count():
 @pytest.mark.parametrize(
     "row", REF["equal_shi_projection"]["assumed_scale_comparisons"]
 )
-def test_conditional_arithmetic_does_not_certify_a_favorable_scale(row):
+def test_conditional_arithmetic_does_not_certify_a_favorable_scale(row) -> None:
     actual = clock.compare_daily_extra(fen_per_ke=row["fen_per_ke"])
     assert ratio(actual["extra_ke_per_day"]) == row["extra_ke_per_day"]
     assert ratio(actual["year_days"]) == row["year_days"]
@@ -188,7 +198,7 @@ def test_conditional_arithmetic_does_not_certify_a_favorable_scale(row):
     )
 
 
-def test_public_evidence_keeps_the_source_scale_and_origin_unresolved():
+def test_public_evidence_keeps_the_source_scale_and_origin_unresolved() -> None:
     p = clock.source_clock_evidence()
     HeluoSourceClock.model_validate(p)
     assert p["daily_extra_literal"]["fen_per_ke"] is p["physical_origin_branch"] is None
@@ -228,7 +238,7 @@ def test_public_evidence_keeps_the_source_scale_and_origin_unresolved():
         {"matches": 1},
     ],
 )
-def test_typed_year_facts_cannot_mix_labels_or_coerce_booleans(patch):
+def test_typed_year_facts_cannot_mix_labels_or_coerce_booleans(patch) -> None:
     value = year_context(chart(), "甲子")
     value.update(patch)
     with pytest.raises(ValidationError):
@@ -245,7 +255,7 @@ def test_typed_year_facts_cannot_mix_labels_or_coerce_booleans(patch):
         {"physical_origin_branch": "子"},
     ],
 )
-def test_typed_source_clock_is_not_a_physical_time_override(patch):
+def test_typed_source_clock_is_not_a_physical_time_override(patch) -> None:
     p = clock.source_clock_evidence()
     p.update(patch)
     with pytest.raises(ValidationError):
@@ -276,14 +286,16 @@ def test_typed_source_clock_is_not_a_physical_time_override(patch):
         ),
     ],
 )
-def test_typed_relative_arithmetic_cannot_be_promoted_to_resolved_clock(field, patch):
+def test_typed_relative_arithmetic_cannot_be_promoted_to_resolved_clock(
+    field: str, patch
+) -> None:
     p = clock.source_clock_evidence()
     p[field].update(patch)
     with pytest.raises(ValidationError):
         HeluoSourceClock.model_validate(p)
 
 
-def test_same_run_year_and_clock_trace_is_not_a_mutable_alias():
+def test_same_run_year_and_clock_trace_is_not_a_mutable_alias() -> None:
     r = build_heluo_result(
         date="2001-01-24",
         time="09:33",
@@ -325,8 +337,8 @@ def test_same_run_year_and_clock_trace_is_not_a_mutable_alias():
     ],
 )
 def test_source_file_cannot_be_fitted_to_make_the_arithmetic_close(
-    patch, tmp_path, monkeypatch
-):
+    patch, tmp_path: Path, monkeypatch: MonkeyPatch
+) -> None:
     d = json.loads(clock.SOURCE_PATH.read_text())
     d.update(patch)
     p = tmp_path / "source.json"
@@ -342,8 +354,9 @@ def test_source_file_cannot_be_fitted_to_make_the_arithmetic_close(
         clock._source.cache_clear()
 
 
-def test_audit_rejects_choosing_a_convenient_fen_scale(monkeypatch):
-    from scripts.numerology import audit_numerology as audit
+def test_audit_rejects_choosing_a_convenient_fen_scale(
+    monkeypatch: MonkeyPatch,
+) -> None:
 
     original = clock.source_clock_evidence
 
@@ -359,9 +372,8 @@ def test_audit_rejects_choosing_a_convenient_fen_scale(monkeypatch):
 
 
 def test_audit_rejects_promoting_the_closed_year_to_resolved_daily_distribution(
-    monkeypatch,
-):
-    from scripts.numerology import audit_numerology as audit
+    monkeypatch: MonkeyPatch,
+) -> None:
 
     original = clock.source_clock_evidence
 
@@ -376,9 +388,9 @@ def test_audit_rejects_promoting_the_closed_year_to_resolved_daily_distribution(
     assert {"kind": "heluo_clock_branch_projection_scope"} in r["failures"]
 
 
-def test_audit_rejects_silent_year_repair_instead_of_explicit_validation(monkeypatch):
-    from fatebridge.core import heluo_timing
-    from scripts.numerology import audit_numerology as audit
+def test_audit_rejects_silent_year_repair_instead_of_explicit_validation(
+    monkeypatch: MonkeyPatch,
+) -> None:
 
     original = heluo_timing.build_heluo_timing
 

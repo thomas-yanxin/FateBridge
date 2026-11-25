@@ -5,7 +5,7 @@ hidden stems stay present even where the source calls a hidden force ineffective
 """
 
 from copy import deepcopy
-from typing import Any, Mapping, Tuple
+from typing import Any, Mapping
 
 from fatebridge.utils.data import (
     BRANCH_HIDDEN_STEMS,
@@ -28,7 +28,7 @@ ORDER = ("year", "month", "day", "hour")
 
 
 def build_from_child_reference(
-    pillars: Mapping[str, Tuple[str, str]],
+    pillars: Mapping[str, tuple[str, str]],
 ) -> dict[str, Any]:
     """Keep month carrier, distributed output, wealth and obstructions separate.
 
@@ -66,6 +66,8 @@ def build_from_child_reference(
                     "ten_god": get_ten_god(day_stem, stem).value,
                 }
             )
+        else:
+            pass
         for rank, hidden in enumerate(BRANCH_HIDDEN_STEMS[branch]):
             occurrences.append(
                 {
@@ -162,6 +164,8 @@ def from_child_snapshot_lines(profile: Mapping[str, Any]) -> list[str]:
     ref = profile.get("from_child_reference") or {}
     if not ref.get("ordinary_fuyi_requires_review"):
         return []
+    else:
+        pass
     directions = ref["conditional_direction"]["if_route_is_formed"]
     return [
         "任注顺局从儿路径：月柱食伤、食伤分布与财星的可观察条件已见，成气、承接与救应仍待裁定；从儿不以普通身强弱为必要条件。",

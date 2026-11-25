@@ -9,7 +9,7 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core import guolao_lunations as l
+from fatebridge.core.guolao import guolao_lunations as l
 
 ROOT = Path(__file__).parents[2]
 FIXTURE = Path(__file__).parents[1] / "fixtures/guolao-source-lunations-v1"
@@ -17,7 +17,7 @@ SOURCE = json.loads((FIXTURE / "reference.json").read_text())
 EXAMPLE = SOURCE["worked_example"]
 
 
-def test_reviewed_artifacts_and_named_parameters_match_source_transcription():
+def test_reviewed_artifacts_and_named_parameters_match_source_transcription() -> None:
     for artifact in SOURCE["artifacts"]:
         assert hashlib.sha256(
             (FIXTURE / artifact["path"]).read_bytes()
@@ -32,7 +32,9 @@ def test_reviewed_artifacts_and_named_parameters_match_source_transcription():
 
 
 @pytest.mark.parametrize("key", ["purple", "apogee", "rahu", "ketu"])
-def test_all_four_original_month_remainders_and_mean_conjunction_cycles(key):
+def test_all_four_original_month_remainders_and_mean_conjunction_cycles(
+    key: str,
+) -> None:
     example = EXAMPLE["factors"][key]
     value = l.source_mean_lunation(
         F(EXAMPLE["zhongji_days"]), F(example["wait_days"]), profile_id=l.GUJIN
@@ -50,7 +52,9 @@ def test_all_four_original_month_remainders_and_mean_conjunction_cycles(key):
     assert value["lunar_date"] is None
 
 
-def test_yuanshi_runying_is_not_silently_substituted_into_gujin_worked_example():
+def test_yuanshi_runying_is_not_silently_substituted_into_gujin_worked_example() -> (
+    None
+):
     g = l.source_mean_lunation(F(EXAMPLE["zhongji_days"]), F(), profile_id=l.GUJIN)
     y = l.source_mean_lunation(F(EXAMPLE["zhongji_days"]), F(), profile_id=l.YUANSHI)
     assert F(g["runying_days_exact"]) == F("20.2050")
@@ -60,7 +64,7 @@ def test_yuanshi_runying_is_not_silently_substituted_into_gujin_worked_example()
     assert y["unintercalated_table_slot_label"] is None
 
 
-def test_epoch_constant_mixing_can_change_the_month_count_at_a_boundary():
+def test_epoch_constant_mixing_can_change_the_month_count_at_a_boundary() -> None:
     event = F("6.128262")
     g = l.source_mean_lunation(F(EXAMPLE["zhongji_days"]), event, profile_id=l.GUJIN)
     y = l.source_mean_lunation(F(EXAMPLE["zhongji_days"]), event, profile_id=l.YUANSHI)
@@ -70,13 +74,15 @@ def test_epoch_constant_mixing_can_change_the_month_count_at_a_boundary():
     assert F(y["days_since_mean_conjunction_exact"]) == F("29.510593")
 
 
-def test_runyu_difference_wraps_rather_than_always_being_positive_point_zero_two():
+def test_runyu_difference_wraps_rather_than_always_being_positive_point_zero_two() -> (
+    None
+):
     g = l.source_mean_lunation(F("9.34"), F(), profile_id=l.GUJIN)
     y = l.source_mean_lunation(F("9.34"), F(), profile_id=l.YUANSHI)
     assert F(g["runyu_days_exact"]) - F(y["runyu_days_exact"]) == F("-29.510593")
 
 
-def test_twelve_printed_month_table_boundaries_and_either_side_are_exact():
+def test_twelve_printed_month_table_boundaries_and_either_side_are_exact() -> None:
     epsilon = F(1, 10**12)
     base = F(EXAMPLE["zhongji_days"])
     runyu = F(EXAMPLE["runyu_days"])
@@ -96,7 +102,7 @@ def test_twelve_printed_month_table_boundaries_and_either_side_are_exact():
         assert F(after["days_since_mean_conjunction_exact"]) == epsilon
 
 
-def test_beyond_printed_table_is_not_wrapped_into_an_invented_lunar_month():
+def test_beyond_printed_table_is_not_wrapped_into_an_invented_lunar_month() -> None:
     value = l.source_mean_lunation(F(), F(500), profile_id=l.GUJIN)
     assert value["mean_lunation_index"] > 11
     assert value["unintercalated_table_slot_label"] is None
@@ -104,7 +110,7 @@ def test_beyond_printed_table_is_not_wrapped_into_an_invented_lunar_month():
     assert not value["intercalation_reconstructed"]
 
 
-def test_neither_mean_fraction_shortcut_can_reproduce_all_printed_lunar_days():
+def test_neither_mean_fraction_shortcut_can_reproduce_all_printed_lunar_days() -> None:
     values = l.gujin_four_extras_lunations(F(EXAMPLE["zhongji_days"]))["factors"]
     assert values["apogee"]["unaccepted_day_diagnostics"]["floor_elapsed_plus_one"] == 7
     assert EXAMPLE["factors"]["apogee"]["printed_day"] == 8
@@ -121,7 +127,9 @@ def test_neither_mean_fraction_shortcut_can_reproduce_all_printed_lunar_days():
 
 @pytest.mark.parametrize("field", ["middle", "event"])
 @pytest.mark.parametrize("bad", [0, True, "1", 2451545.0, None])
-def test_exact_units_are_required(field, bad):
+def test_exact_units_are_required(
+    field: str, bad: bool | float | int | str | None
+) -> None:
     with pytest.raises(TypeError, match="Fraction"):
         l.source_mean_lunation(
             bad if field == "middle" else F(),
@@ -131,13 +139,15 @@ def test_exact_units_are_required(field, bad):
 
 
 @pytest.mark.parametrize("middle,event", [(F(-1), F()), (F(), F(-1))])
-def test_lower_reckoning_does_not_infer_upward_or_prior_event_policy(middle, event):
+def test_lower_reckoning_does_not_infer_upward_or_prior_event_policy(
+    middle, event
+) -> None:
     with pytest.raises(ValueError, match="非负"):
         l.source_mean_lunation(middle, event, profile_id=l.GUJIN)
 
 
 @pytest.mark.parametrize("profile", [None, "shoushi", "auto", 1, []])
-def test_profile_must_be_explicitly_named(profile):
+def test_profile_must_be_explicitly_named(profile) -> None:
     with pytest.raises(ValueError, match="具名"):
         l.source_mean_lunation(F(), F(), profile_id=profile)
 
@@ -146,8 +156,8 @@ def test_profile_must_be_explicitly_named(profile):
     "fault", ["missing_month", "changed_cumulative", "invalid_runying"]
 )
 def test_damaged_source_data_fails_without_repairing_the_printed_table(
-    tmp_path, monkeypatch, fault
-):
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, fault: str
+) -> None:
     value = json.loads(l.DATA.read_bytes())
     if fault == "missing_month":
         value["gujin58_month_table"].pop()

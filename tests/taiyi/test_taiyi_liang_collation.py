@@ -4,6 +4,7 @@ import copy
 import hashlib
 import json
 import shutil
+from pathlib import Path
 
 import pytest
 
@@ -24,7 +25,7 @@ def report():
     return audit()
 
 
-def test_source_values_were_frozen_before_new_numeric_comparisons():
+def test_source_values_were_frozen_before_new_numeric_comparisons() -> None:
     frozen = verify_sources()
     assert len(frozen["files"]) == 7
     assert len(frozen["prior_sources"]) == 16
@@ -44,8 +45,8 @@ def test_source_values_were_frozen_before_new_numeric_comparisons():
 
 @pytest.mark.parametrize("update_manifest", [False, True])
 def test_cannot_make_disputed_position_pass_by_rewriting_source(
-    tmp_path, update_manifest
-):
+    tmp_path: Path, update_manifest: bool
+) -> None:
     corpus = tmp_path / "corpus"
     shutil.copytree(CORPUS, corpus)
     path = corpus / "readings.json"
@@ -56,11 +57,13 @@ def test_cannot_make_disputed_position_pass_by_rewriting_source(
         frozen = json.loads((corpus / "freeze.json").read_text())
         frozen["files"][path.name] = hashlib.sha256(path.read_bytes()).hexdigest()
         (corpus / "freeze.json").write_text(json.dumps(frozen))
+    else:
+        pass
     with pytest.raises(ValueError, match="V31"):
         verify_sources(corpus)
 
 
-def test_prior_calendar_is_pinned_too(tmp_path):
+def test_prior_calendar_is_pinned_too(tmp_path: Path) -> None:
     prior_root = tmp_path / "root"
     freeze = verify_sources()
     for name in freeze["prior_sources"]:
@@ -73,7 +76,7 @@ def test_prior_calendar_is_pinned_too(tmp_path):
         verify_sources(root=prior_root)
 
 
-def test_full_355_day_calendar_not_replaced_by_one_matching_day(report):
+def test_full_355_day_calendar_not_replaced_by_one_matching_day(report) -> None:
     cohort = report["calendar_cohort"]
     assert cohort["month_first_anchors"] == 13
     assert cohort["complete_months"] == 12
@@ -93,7 +96,7 @@ def test_full_355_day_calendar_not_replaced_by_one_matching_day(report):
     assert not report["original_jinjing_day8_overwritten"]
 
 
-def test_matching_counts_do_not_hide_the_differing_upstream_position(report):
+def test_matching_counts_do_not_hide_the_differing_upstream_position(report) -> None:
     literal = report["all_six_candidate_comparisons"][0]
     board = literal["board"]
     assert literal["accumulation"] == 707501061
@@ -113,14 +116,14 @@ def test_matching_counts_do_not_hide_the_differing_upstream_position(report):
 
 
 @pytest.mark.parametrize("field", BOARD_FIELDS)
-def test_cannot_drop_any_of_the_ten_source_fields(field):
+def test_cannot_drop_any_of_the_ten_source_fields(field) -> None:
     expected = json.loads((CORPUS / "readings.json").read_text())["board"]
     expected.pop(field)
     with pytest.raises(ValueError, match="ten source fields"):
         compare_board(707501061, expected)
 
 
-def test_all_old_failed_hypotheses_and_plus_one_remain_visible(report):
+def test_all_old_failed_hypotheses_and_plus_one_remain_visible(report) -> None:
     rows = report["all_six_candidate_comparisons"]
     assert [r["accumulation"] for r in rows] == [
         707501061,
@@ -139,7 +142,9 @@ def test_all_old_failed_hypotheses_and_plus_one_remain_visible(report):
     assert len(report["all_four_retained_formula_hypotheses"]) == 4
 
 
-def test_numbering_conventions_remain_hypotheses_without_silent_selection(report):
+def test_numbering_conventions_remain_hypotheses_without_silent_selection(
+    report,
+) -> None:
     rows = report["all_six_candidate_comparisons"]
     assert [r["ganzhi"] for r in rows[0]["day_numbering_hypotheses"]] == [
         "乙酉",
@@ -156,7 +161,7 @@ def test_numbering_conventions_remain_hypotheses_without_silent_selection(report
     assert report["source_calendar_identity"].startswith("not_adjudicated")
 
 
-def test_source_position_diagnostic_does_not_overwrite_the_source(report):
+def test_source_position_diagnostic_does_not_overwrite_the_source(report) -> None:
     expected = json.loads((CORPUS / "readings.json").read_text())["board"]
     initial = copy.deepcopy(expected)
     result = source_position_counts(expected)
@@ -172,7 +177,7 @@ def test_source_position_diagnostic_does_not_overwrite_the_source(report):
     assert sum(p["value"] for p in trace["path"]) == 29
 
 
-def test_spatial_agreement_cannot_certify_event_claims_or_full_classic(report):
+def test_spatial_agreement_cannot_certify_event_claims_or_full_classic(report) -> None:
     geometry = report["post_freeze_spatial_diagnostic"]
     actual = geometry["actual_wenchang_pressure"]
     assert len(actual) == 1

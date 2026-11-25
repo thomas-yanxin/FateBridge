@@ -28,7 +28,9 @@ def qimen(at, *, zone="America/New_York", solar=False):
 @pytest.mark.parametrize("zone", ["Asia/Hong_Kong", "America/New_York"])
 @pytest.mark.parametrize("solar", [False, True])
 @pytest.mark.parametrize("year", [2026, 2027, 2028])
-def test_all_72_hko_term_boundaries_drive_chaibu_by_civil_instant(zone, solar, year):
+def test_all_72_hko_term_boundaries_drive_chaibu_by_civil_instant(
+    zone: str, solar: bool, year: int
+) -> None:
     reference = json.loads(
         (
             Path(__file__).parents[1] / "fixtures/calendar_hko_v1/reference.json"
@@ -55,7 +57,9 @@ def test_all_72_hko_term_boundaries_drive_chaibu_by_civil_instant(zone, solar, y
         (datetime(2026, 11, 1, 1, 30), "ambiguous local time"),
     ],
 )
-def test_civil_gaps_and_folds_fail_in_both_clock_modes(entry, solar, at, message):
+def test_civil_gaps_and_folds_fail_in_both_clock_modes(
+    entry: str, solar: bool, at, message: str
+) -> None:
     if entry == "qimen":
         result = qimen(at, solar=solar)
     else:
@@ -73,7 +77,7 @@ def test_civil_gaps_and_folds_fail_in_both_clock_modes(entry, solar, at, message
     assert "qimen" not in result
 
 
-def test_corrected_solar_label_in_dst_gap_is_not_rejected_as_a_civil_input():
+def test_corrected_solar_label_in_dst_gap_is_not_rejected_as_a_civil_input() -> None:
     at = datetime(2026, 3, 8, 3, 30)  # This physical civil instant exists.
     result = qimen(at, solar=True)
     aggregate = calculate_sanshiunited_analysis(
@@ -93,7 +97,9 @@ def test_corrected_solar_label_in_dst_gap_is_not_rejected_as_a_civil_input():
     assert result["qimen"]["palaces"] == aggregate["qimen"]["palaces"]
 
 
-def test_solar_gap_label_keeps_its_hour_across_explicit_instant_representations():
+def test_solar_gap_label_keeps_its_hour_across_explicit_instant_representations() -> (
+    None
+):
     # Sxtwl2.0.6 independently gives Xin-Si day and Ji-Chou for this supplied
     # apparent-solar clock label. The physical civil instant is07:30UTC.
     dedicated = calculate_qimen_analysis(
@@ -128,7 +134,7 @@ def test_solar_gap_label_keeps_its_hour_across_explicit_instant_representations(
 
 
 @pytest.mark.parametrize("solar", [False, True])
-def test_explicit_offsets_resolve_the_fold_to_distinct_instants(solar):
+def test_explicit_offsets_resolve_the_fold_to_distinct_instants(solar: bool) -> None:
     results = []
     for offset in ["-04:00", "-05:00"]:
         result = calculate_qimen_analysis(
@@ -147,3 +153,5 @@ def test_explicit_offsets_resolve_the_fold_to_distinct_instants(solar):
     if solar:
         # At this longitude the earlier instant has a 子 solar hour, the later 丑.
         assert [r["qimen"]["time_ganzhi"][-1] for r in results] == ["子", "丑"]
+    else:
+        pass

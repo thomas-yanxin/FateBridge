@@ -18,7 +18,7 @@ AUDIT = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(AUDIT)
 
 
-def test_complete_prior_cohort_and_matching_of_date_controls():
+def test_complete_prior_cohort_and_matching_of_date_controls() -> None:
     ref = AUDIT.reference()
     assert len(ref["rows"]) == len(ref["protocol"]["cohort"]) == 113
     assert sum(row["UT1-UTC"] is None for row in ref["rows"]) == 33
@@ -31,7 +31,7 @@ def test_complete_prior_cohort_and_matching_of_date_controls():
     }
 
 
-def test_aligned_directions_keep_actual_flags_models_and_limit_of_claim():
+def test_aligned_directions_keep_actual_flags_models_and_limit_of_claim() -> None:
     report = AUDIT.audit()
     assert report["expected_count"] == report["compared_count"] == 113
     assert report["repeated_of_date_equal_count"] == 113
@@ -53,7 +53,9 @@ def test_aligned_directions_keep_actual_flags_models_and_limit_of_claim():
 
 
 @pytest.mark.parametrize("change", ["edit", "missing", "extra"])
-def test_source_changes_cannot_reduce_the_denominator(tmp_path, change):
+def test_source_changes_cannot_reduce_the_denominator(
+    tmp_path: Path, change: str
+) -> None:
     corpus = tmp_path / "source"
     shutil.copytree(AUDIT.CORPUS, corpus)
     path = corpus / "collection/batch-00.attempt-1.response.json"
@@ -86,7 +88,9 @@ def reseal(corpus):
 @pytest.mark.parametrize(
     "change", ["threshold", "anchor", "scale", "frame", "submitted_text"]
 )
-def test_rehashing_does_not_excuse_changed_criteria_or_wrong_geometry(tmp_path, change):
+def test_rehashing_does_not_excuse_changed_criteria_or_wrong_geometry(
+    tmp_path: Path, change: str
+) -> None:
     corpus = tmp_path / "source"
     shutil.copytree(AUDIT.CORPUS, corpus)
     p = corpus / "protocol.json"
@@ -120,7 +124,9 @@ def test_rehashing_does_not_excuse_changed_criteria_or_wrong_geometry(tmp_path, 
         AUDIT.reference(corpus)
 
 
-def test_treating_ut_as_tt_is_detected_by_the_independent_positions(monkeypatch):
+def test_treating_ut_as_tt_is_detected_by_the_independent_positions(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     bad = deepcopy(AUDIT.reference())
     for row in bad["rows"]:
         row["TDB-UT"] = 0
@@ -136,7 +142,9 @@ def test_treating_ut_as_tt_is_detected_by_the_independent_positions(monkeypatch)
     )
 
 
-def test_unavailable_native_module_keeps_the_entire_cohort(monkeypatch):
+def test_unavailable_native_module_keeps_the_entire_cohort(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     from fatebridge.core import ephemeris_runtime as runtime
 
     monkeypatch.setattr(runtime, "swe", None)
@@ -146,12 +154,16 @@ def test_unavailable_native_module_keeps_the_entire_cohort(monkeypatch):
 
 
 @pytest.mark.parametrize("kind", ["error", "geometry", "nonfinite"])
-def test_calculation_failures_keep_all_113_cases_and_cannot_pass(monkeypatch, kind):
+def test_calculation_failures_keep_all_113_cases_and_cannot_pass(
+    monkeypatch: pytest.MonkeyPatch, kind: str
+) -> None:
     from fatebridge.core import ephemeris_runtime as runtime
 
     def wrong(operation, jd, planet, flags):
         if kind == "error":
             raise RuntimeError("unavailable test engine")
+        else:
+            pass
         return ((float("nan") if kind == "nonfinite" else 0), 0, 1, 0, 0, 0), (
             flags if kind == "nonfinite" else 2
         )
@@ -163,7 +175,7 @@ def test_calculation_failures_keep_all_113_cases_and_cannot_pass(monkeypatch, ki
     assert not report["selected_inertial_comparison_passed"]
 
 
-def test_observed_source_drift_prevents_a_pass(monkeypatch):
+def test_observed_source_drift_prevents_a_pass(monkeypatch: pytest.MonkeyPatch) -> None:
     original = AUDIT.sha
     calls = 0
 
@@ -173,6 +185,10 @@ def test_observed_source_drift_prevents_a_pass(monkeypatch):
             calls += 1
             if calls > 1:
                 return "0" * 64
+            else:
+                pass
+        else:
+            pass
         return original(path)
 
     monkeypatch.setattr(AUDIT, "sha", changed)
@@ -181,7 +197,7 @@ def test_observed_source_drift_prevents_a_pass(monkeypatch):
     assert not report["selected_inertial_comparison_passed"]
 
 
-def test_requested_swieph_fallback_is_reported_as_actual_moshier():
+def test_requested_swieph_fallback_is_reported_as_actual_moshier() -> None:
     from tests.support.ephemeris_context import empty_ephemeris_path
 
     with empty_ephemeris_path():
@@ -190,7 +206,7 @@ def test_requested_swieph_fallback_is_reported_as_actual_moshier():
     assert report["selected_inertial_comparison_passed"]
 
 
-def test_vector_separation_handles_wrap_poles_and_small_angles():
+def test_vector_separation_handles_wrap_poles_and_small_angles() -> None:
     assert AUDIT.separation_arcseconds(20, 5, 20, 5) == 0
     assert AUDIT.separation_arcseconds(359.999, 0, 0.001, 0) == pytest.approx(7.2)
     assert AUDIT.separation_arcseconds(0, 90, 180, 90) < 1e-9

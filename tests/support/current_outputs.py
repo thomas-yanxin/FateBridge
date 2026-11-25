@@ -2,38 +2,44 @@
 
 from collections.abc import Callable
 from functools import cache
+from typing import Any
 
 import pytest
 
-from fatebridge.application.execution import execute_tool, result_is_error
-from fatebridge.application.tool_spec import ServiceResult
-from fatebridge.core.execution_context import ExecutionOptions
-from fatebridge.services.tool_catalog import CATALOG
-from tests.fixtures.surface_payloads import MCP_CASES, REST_POST_CASES
-from tests.support.ephemeris_context import empty_ephemeris_path
-
 
 @pytest.fixture(scope="session")
-def current_business() -> Callable[[str], ServiceResult]:
+def current_raw_business() -> Callable[[str], dict[str, Any]]:
+    from fatebridge.application.execution import execute_spec, result_is_error
+    from fatebridge.core.execution_context import call_clock
+    from fatebridge.services.tool_catalog import CATALOG
+    from tests.fixtures.surface_payloads import MCP_CASES, REST_POST_CASES
+    from tests.support.ephemeris_context import empty_ephemeris_path
+
     specs = {spec.key: spec for spec in CATALOG}
 
     @cache
-    def calculate(key: str) -> ServiceResult:
+    def calculate(key: str) -> dict[str, Any]:
         spec = specs[key]
-        with empty_ephemeris_path():
+        with empty_ephemeris_path(), call_clock("2026-10-12T02:00:00Z"):
             factory = (
                 REST_POST_CASES[spec.rest_path]
                 if spec.rest_path
                 else MCP_CASES[spec.tool_name][1]
             )
             request = spec.request_model.model_validate(factory())
-            result = execute_tool(
-                spec,
-                request,
-                options=ExecutionOptions(as_of="2026-10-12T02:00:00Z"),
-                include_metadata=False,
-            )
+            result = execute_spec(spec, request)
             assert not result_is_error(result), (spec.key, result)
         return result
+
+    return calculate
+
+
+@pytest.fixture(scope="session")
+def current_business(current_raw_business) -> Callable[[str], dict[str, Any]]:
+    from fatebridge.core.public_output import public_payload
+
+    @cache
+    def calculate(key: str) -> dict[str, Any]:
+        return public_payload(current_raw_business(key))
 
     return calculate

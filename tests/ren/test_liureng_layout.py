@@ -2,7 +2,7 @@
 
 import gzip
 import json
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import pytest
@@ -13,6 +13,7 @@ from fatebridge.core.metaphysics.liureng_auxiliary_stars import build_auxiliary_
 from fatebridge.core.metaphysics.liureng_course_layout import BASIS
 from fatebridge.core.metaphysics.ren_evidence import xun_dun_stems
 from fatebridge.core.metaphysics.ren_sources import JINGWEI_SCAN_SHA256, JINGWEI_SOURCE
+from fatebridge.utils.civil_time import NominalClockLabel
 
 REFERENCE = json.loads(
     gzip.decompress(
@@ -23,7 +24,7 @@ REFERENCE = json.loads(
 )
 
 
-def test_original_provider_identity_and_distinct_input_denominators():
+def test_original_provider_identity_and_distinct_input_denominators() -> None:
     rows = REFERENCE["layouts"]
     assert len(rows) == 4320
     assert (
@@ -48,60 +49,62 @@ def test_original_provider_identity_and_distinct_input_denominators():
     )
 
 
-@pytest.mark.parametrize("case", REFERENCE["layouts"])
-def test_complete_layout_matches_the_selected_original_external_program(case):
-    assert (
-        twelve_god_layout(
-            hour_branch=case["hour"],
-            month_general_branch=case["general"],
+def test_complete_layout_matches_the_selected_original_external_program() -> None:
+    for case in REFERENCE["layouts"]:
+        assert (
+            twelve_god_layout(
+                hour_branch=case["hour"],
+                month_general_branch=case["general"],
+                day_stem=case["day"][0],
+                is_diurnal=case["is_diurnal"],
+                guiren_profile=case["profile"],
+            )
+            == case["expected"]
+        ), case
+
+
+def test_all_day_identities_keep_original_actual_and_empty_xun_stems() -> None:
+    for case in REFERENCE["xun_days"]:
+        actual = xun_dun_stems(case["day"])
+        assert len(actual) == 10, case["day"]
+        assert {branch: actual.get(branch) for branch in case["stems"]} == case[
+            "stems"
+        ], case["day"]
+
+
+def test_auxiliary_day_horse_uses_the_original_day_branch_anchor() -> None:
+    for case in REFERENCE["day_horses"]:
+        layout = twelve_god_layout(
+            hour_branch="子",
+            month_general_branch="子",
             day_stem=case["day"][0],
-            is_diurnal=case["is_diurnal"],
-            guiren_profile=case["profile"],
+            is_diurnal=False,
         )
-        == case["expected"]
-    )
-
-
-@pytest.mark.parametrize("case", REFERENCE["xun_days"], ids=lambda case: case["day"])
-def test_all_day_identities_keep_original_actual_and_empty_xun_stems(case):
-    actual = xun_dun_stems(case["day"])
-    assert len(actual) == 10
-    assert {branch: actual.get(branch) for branch in case["stems"]} == case["stems"]
-
-
-@pytest.mark.parametrize("case", REFERENCE["day_horses"])
-def test_auxiliary_day_horse_uses_the_original_day_branch_anchor(case):
-    layout = twelve_god_layout(
-        hour_branch="子",
-        month_general_branch="子",
-        day_stem=case["day"][0],
-        is_diurnal=False,
-    )
-    result = build_auxiliary_stars(
-        day_ganzhi=case["day"],
-        month_branch="寅",
-        sky_by_earth=layout["sky_by_earth"],
-        god_by_sky=layout["god_by_sky"],
-        lessons=[
-            {"index": i, "upper_branch": branch}
-            for i, branch in enumerate("子丑寅卯", 1)
-        ],
-        transmissions=list("子辰申"),
-    )
-    assert (
-        next(row for row in result["stars"] if row["id"] == "day_horse")["branch"]
-        == case["branch"]
-    )
+        result = build_auxiliary_stars(
+            day_ganzhi=case["day"],
+            month_branch="寅",
+            sky_by_earth=layout["sky_by_earth"],
+            god_by_sky=layout["god_by_sky"],
+            lessons=[
+                {"index": i, "upper_branch": branch}
+                for i, branch in enumerate("子丑寅卯", 1)
+            ],
+            transmissions=list("子辰申"),
+        )
+        assert (
+            next(row for row in result["stars"] if row["id"] == "day_horse")["branch"]
+            == case["branch"]
+        ), case
 
 
 @pytest.mark.parametrize("profile", ["liuren_common_v1", "tanyuan_xieji_v1"])
 def test_actual_noble_trace_identifies_the_selected_source_without_changing_profile(
-    profile,
-):
-    instant = datetime(2026, 1, 1, 12)
+    profile: str,
+) -> None:
+    instant = datetime(2026, 1, 1, 12, tzinfo=timezone(timedelta(hours=8)))
     seed = MetaphysicsSeed(
         input_datetime=instant,
-        corrected_datetime=instant,
+        clock=NominalClockLabel.from_local_datetime(instant),
         timezone="Asia/Shanghai",
         longitude=None,
         applied_true_solar=False,
@@ -113,6 +116,7 @@ def test_actual_noble_trace_identifies_the_selected_source_without_changing_prof
             "hour": ("庚", "午"),
         },
         calendar_context={"current_solar_term": {"name": "冬至"}},
+        input_offset_visible=False,
     )
     board = build_liureng_board(
         seed,
@@ -137,7 +141,7 @@ def test_actual_noble_trace_identifies_the_selected_source_without_changing_prof
         assert JINGWEI_SOURCE not in board["ruleset"]["source_urls"]
 
 
-def test_primary_source_identity_matches_the_retained_existing_witness():
+def test_primary_source_identity_matches_the_retained_existing_witness() -> None:
     primary = REFERENCE["common_primary"]
     assert JINGWEI_SOURCE == primary["source_url"]
     assert JINGWEI_SCAN_SHA256 == primary["source_sha256"]

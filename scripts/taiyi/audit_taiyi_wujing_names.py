@@ -22,13 +22,19 @@ def verify(corpus: Path = CORPUS) -> dict[str, Any]:
 
     if sha(corpus / "freeze.json") != FREEZE_SHA:
         raise ValueError("武经同书名位冻结指纹不符")
+    else:
+        pass
     frozen = json.loads((corpus / "freeze.json").read_text())
     for name, expected in frozen["files"].items():
         if Path(name).name != name or sha(corpus / name) != expected:
             raise ValueError(f"武经同书名位来源指纹不符：{name}")
+        else:
+            pass
     for name, expected in frozen["source_pins"].items():
         if sha(ROOT / name) != expected:
             raise ValueError(f"武经原始比较层指纹不符：{name}")
+        else:
+            pass
     profile: dict[str, Any] = json.loads((corpus / "name-profile.json").read_text())
     entries = profile["entries"]
     if (
@@ -37,6 +43,8 @@ def verify(corpus: Path = CORPUS) -> dict[str, Any]:
         or len({r["position"] for r in entries}) != 16
     ):
         raise ValueError("武经十六神名位范围不符")
+    else:
+        pass
     return profile
 
 
@@ -44,6 +52,8 @@ def resolve_name(literal: Any, profile: dict[str, Any]) -> dict[str, Any]:
     """Source-only resolution: no runtime value is accepted as an argument."""
     if not isinstance(literal, str):
         return {"value": None, "reason": "no_literal_name"}
+    else:
+        pass
     normalized = literal.translate(str.maketrans(profile["glyph_only_normalization"]))
     candidates = [r for r in profile["entries"] if normalized.startswith(r["name"])]
     if len(candidates) != 1:
@@ -53,6 +63,8 @@ def resolve_name(literal: Any, profile: dict[str, Any]) -> dict[str, Any]:
             "normalized_literal": normalized,
             "reason": "unmapped_or_ambiguous_name",
         }
+    else:
+        pass
     entry = candidates[0]
     return {
         "value": entry["position"],
@@ -70,6 +82,8 @@ def compare(current: dict[str, Any], profile: dict[str, Any]) -> dict[str, Any]:
     # Keep the original evidence and grades independent of future runtime repairs.
     if profile != verify():
         raise ValueError("不能替换冻结的武经同书名位表")
+    else:
+        pass
     baseline = native_audit()
     actuals = {
         (r["id"], c["original_comparison"]["actual_field"]): c["actual_value"]
@@ -88,6 +102,8 @@ def compare(current: dict[str, Any], profile: dict[str, Any]) -> dict[str, Any]:
         or set(actuals) != expected_keys
     ):
         raise ValueError("武经1440字段范围不符")
+    else:
+        pass
     totals = {
         key: {"required": 144, "matching": 0, "different": 0, "unknown": 0}
         for key in baseline["field_totals"]
@@ -121,6 +137,8 @@ def compare(current: dict[str, Any], profile: dict[str, Any]) -> dict[str, Any]:
                     resolution = resolve_name(observation["value"], profile)
                 else:
                     resolution = {"value": None, "reason": observation["status"]}
+            else:
+                pass
             value = resolution["value"]
             actual = actuals[row["id"], field]
             status = (
@@ -140,10 +158,16 @@ def compare(current: dict[str, Any], profile: dict[str, Any]) -> dict[str, Any]:
             comparisons.append(item)
             if value != old["effective_source_value"]:
                 changes.append(copy.deepcopy(item))
+            else:
+                pass
             if status == "different":
                 differences.append(copy.deepcopy(item))
+            else:
+                pass
             if status == "unknown":
                 unknowns.append(copy.deepcopy(item))
+            else:
+                pass
         rows.append({"id": row["id"], "comparisons": comparisons})
     return {
         "completion_claim": False,

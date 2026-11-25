@@ -8,14 +8,14 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core import guolao_classical as c
-from fatebridge.core import guolao_historical as h
+from fatebridge.core.guolao import guolao_classical as c
+from fatebridge.core.guolao import guolao_historical as h
 
 SOURCE_DIR = Path(__file__).parents[1] / "fixtures" / "guolao-purple-facsimile-v1"
 SOURCE = json.loads((SOURCE_DIR / "reference.json").read_text())
 
 
-def test_bundled_facsimiles_match_the_recorded_reviewed_bytes():
+def test_bundled_facsimiles_match_the_recorded_reviewed_bytes() -> None:
     for item in SOURCE["images"]:
         assert hashlib.sha256((SOURCE_DIR / item["path"]).read_bytes()).hexdigest() == (
             item["sha256"]
@@ -33,7 +33,7 @@ def test_bundled_facsimiles_match_the_recorded_reviewed_bytes():
     assert alternate["header"] == "万历己亥岁"
 
 
-def test_printed_table_has_its_own_circle_not_a_normalized_shoushi_table():
+def test_printed_table_has_its_own_circle_not_a_normalized_shoushi_table() -> None:
     table = h.GUJIN_58_PURPLE
     assert table.circle_du == F("365.2564")
     assert table.widths_du[c.MANSIONS.index("虚")] == F("9.0064")
@@ -45,7 +45,7 @@ def test_printed_table_has_its_own_circle_not_a_normalized_shoushi_table():
         c.HistoricalMansions("no_silent_emendation", F("365.2575"), table.widths_du)
 
 
-def test_printed_28_cumulative_entries_and_the_column_offset_at_every_edge():
+def test_printed_28_cumulative_entries_and_the_column_offset_at_every_edge() -> None:
     epsilon = F(1, 10**12)
     origin = -F(SOURCE["offset_days"])
     entries = SOURCE["transcribed_interval_ends_days"]
@@ -76,7 +76,7 @@ def test_printed_28_cumulative_entries_and_the_column_offset_at_every_edge():
         start = end
 
 
-def test_original_worked_example_locates_bi_and_next_zi_without_a_modern_date():
+def test_original_worked_example_locates_bi_and_next_zi_without_a_modern_date() -> None:
     example = SOURCE["worked_example"]
     position = h.purple_historical_position(F(example["zhongji_days"]))
     assert position.phase_days == F(example["phase_days"])
@@ -91,7 +91,7 @@ def test_original_worked_example_locates_bi_and_next_zi_without_a_modern_date():
     assert not SOURCE["native_birth_model_changed"]
 
 
-def test_undefined_input_units_are_rejected_instead_of_guessed():
+def test_undefined_input_units_are_rejected_instead_of_guessed() -> None:
     for wrong in [2451545.0, "116147.0196", 0, None, True]:
         with pytest.raises(TypeError, match="中积"):
             h.purple_historical_position(wrong)

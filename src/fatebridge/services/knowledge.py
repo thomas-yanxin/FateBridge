@@ -1,33 +1,38 @@
-"""
-FateBridge bundled knowledge services.
-"""
+"""Serve bundled knowledge and render its source attribution."""
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional
+from typing import Any
 
+from pydantic import JsonValue
+
+from fatebridge.core.human_design import human_design_knowledge
 from fatebridge.core.knowledge_store import (
     ToolValidationError,
     build_knowledge_registry,
     read_knowledge_entry,
 )
-from fatebridge.services.snapshot_builders import (
-    build_snapshot_export as _build_snapshot_export,
+from fatebridge.core.numerology.numerology_knowledge import (
+    DOMAINS,
+    SCOPE,
+    SOURCE,
+    build_registry,
+    read_reference,
 )
 from fatebridge.services.snapshot_builders import (
-    render_snapshot_lines as _render_snapshot_text,
+    build_snapshot_export,
+    render_snapshot_lines,
 )
 from fatebridge.utils.errors import handle_calculation_error
 
 
-def _validation_error_payload(exc: ToolValidationError) -> Dict[str, Any]:
-    # Include status_code/error_code so the HTTP transport (_execute_service)
-    # maps this to a 400 instead of the default 500.
+def _validation_error_payload(error: ToolValidationError) -> dict[str, JsonValue]:
+    # note (REST): Status 400 keeps a lookup validation failure distinct from a service failure.
     return {
-        "error": str(exc),
-        "error_code": exc.code or "validation_error",
-        "code": exc.code,
-        "details": exc.details,
+        "error": str(error),
+        "error_code": error.code or "validation_error",
+        "code": error.code,
+        "details": error.details,
         "status_code": 400,
         "retryable": False,
     }
@@ -44,7 +49,7 @@ _QUERY_LABELS = {
 
 
 def _build_knowledge_registry_snapshot_text(
-    registry: Dict[str, Any], *, domain: Optional[str]
+    registry: dict[str, Any], *, domain: str | None
 ) -> str:
     provenance = registry.get("provenance") or {}
     domains = registry.get("domains") or []
@@ -55,14 +60,16 @@ def _build_knowledge_registry_snapshot_text(
     ]
     if registry.get("bundle_version") is not None:
         overview_lines.append(f"Bundle 版本：{registry['bundle_version']}")
+    else:
+        pass
 
-    sections: List[tuple[str, List[str]]] = [("目录概览", overview_lines)]
-    for item in domains:
+    sections: list[tuple[str, list[str]]] = [("目录概览", overview_lines)]
+    for domain_record in domains:
         category_lines = [
-            f"域：{item.get('domain', '未知')}",
-            f"分类数：{len(item.get('categories') or [])}",
+            f"域：{domain_record.get('domain', '未知')}",
+            f"分类数：{len(domain_record.get('categories') or [])}",
         ]
-        for category in item.get("categories") or []:
+        for category in domain_record.get("categories") or []:
             supports = "/".join(category.get("supports") or []) or "无"
             keys = (
                 "、".join(category.get("keys") or category.get("keys_sample") or [])
@@ -79,22 +86,30 @@ def _build_knowledge_registry_snapshot_text(
                     f"键列表：{'完整' if category.get('keys_complete') else '样例，非全部键'}；"
                     f"查询格式：{category.get('key_format')}；个人适用性未评估。"
                 )
-        sections.append((item.get("domain", "未知"), category_lines))
+            else:
+                pass
+        sections.append((domain_record.get("domain", "未知"), category_lines))
 
     source_lines = [
         f"来源：{provenance.get('source_domain', registry.get('source', '未提供'))}",
     ]
     if provenance.get("bundle_version") is not None:
         source_lines.append(f"Bundle 版本：{provenance['bundle_version']}")
+    else:
+        pass
     if provenance.get("upstream_source_marker"):
         source_lines.append(f"上游标记：{provenance['upstream_source_marker']}")
+    else:
+        pass
     if provenance.get("build_timestamp"):
         source_lines.append(f"构建时间：{provenance['build_timestamp']}")
+    else:
+        pass
     sections.append(("来源", source_lines))
-    return _render_snapshot_text(sections)
+    return render_snapshot_lines(sections)
 
 
-def _build_knowledge_snapshot_text(entry: Dict[str, Any]) -> str:
+def _build_knowledge_snapshot_text(entry: dict[str, Any]) -> str:
     query_normalized = entry.get("query_normalized") or {}
     provenance = entry.get("provenance") or {}
     query_lines = [
@@ -104,31 +119,33 @@ def _build_knowledge_snapshot_text(entry: Dict[str, Any]) -> str:
     ]
     if entry.get("title"):
         query_lines.append(f"标题：{entry['title']}")
+    else:
+        pass
     for field, label in _QUERY_LABELS.items():
         value = query_normalized.get(field)
         if value in {None, ""}:
             continue
+        else:
+            pass
         query_lines.append(f"{label}：{value}")
 
     body_lines: list[str] = []
     if entry.get("title"):
         body_lines.append(f"标题：{entry['title']}")
+    else:
+        pass
     tips = entry.get("tips")
     if isinstance(tips, list) and tips:
         for tip in tips:
             text = f"{tip}".strip()
-            if not text:
-                body_lines.append("")
-                continue
-            if text == "==":
-                body_lines.append("")
-                continue
-            body_lines.append(text)
+            body_lines.append("" if text in {"", "=="} else text)
     else:
         for line in entry.get("lines") or []:
             text = f"{line}".strip()
             if text:
                 body_lines.append(text)
+            else:
+                pass
 
     source_lines = [
         f"来源：{entry.get('source', '未提供')}",
@@ -136,11 +153,17 @@ def _build_knowledge_snapshot_text(entry: Dict[str, Any]) -> str:
     ]
     if entry.get("bundle_version") is not None:
         source_lines.append(f"Bundle 版本：{entry['bundle_version']}")
+    else:
+        pass
     if provenance.get("upstream_source_marker"):
         source_lines.append(f"上游标记：{provenance['upstream_source_marker']}")
+    else:
+        pass
     if provenance.get("build_timestamp"):
         label = "上游包构建时间" if provenance.get("entry_curation") else "构建时间"
         source_lines.append(f"{label}：{provenance['build_timestamp']}")
+    else:
+        pass
 
     curation = provenance.get("entry_curation")
     if isinstance(curation, dict):
@@ -161,6 +184,8 @@ def _build_knowledge_snapshot_text(entry: Dict[str, Any]) -> str:
         for reference in curation.get("implementation_refs") or []:
             source_lines.append(f"实现：{reference.get('source_path')}")
             source_lines.append(f"实现说明范围：{reference.get('support_scope')}")
+    else:
+        pass
 
     if provenance.get("reference_policy_id") == "numerology_source_reference_v1":
         source_lines.append(f"参考范围：{provenance.get('scope')}")
@@ -172,6 +197,10 @@ def _build_knowledge_snapshot_text(entry: Dict[str, Any]) -> str:
             )
             if record.get("source_url"):
                 source_lines.append(f"来源网址：{record['source_url']}")
+            else:
+                pass
+    else:
+        pass
 
     if provenance.get("reference_policy_id") == "human_design_line_reference_v1":
         source_lines.append(f"参考范围：{provenance.get('scope')}")
@@ -181,8 +210,12 @@ def _build_knowledge_snapshot_text(entry: Dict[str, Any]) -> str:
             )
             if record.get("source_url"):
                 source_lines.append(f"来源网址：{record['source_url']}")
+            else:
+                pass
+    else:
+        pass
 
-    return _render_snapshot_text(
+    return render_snapshot_lines(
         [
             ("查询信息", query_lines),
             ("知识正文", body_lines),
@@ -193,26 +226,17 @@ def _build_knowledge_snapshot_text(entry: Dict[str, Any]) -> str:
 
 def calculate_knowledge_registry(
     *,
-    domain: Optional[str] = None,
-    selected_sections: Optional[List[str]] = None,
-) -> Dict[str, Any]:
-    """
-    Return bundled hover-knowledge domains and categories.
-    """
+    domain: str | None = None,
+    selected_sections: list[str] | None = None,
+    render_snapshot: bool = True,
+) -> dict[str, Any]:
+    """List bundled knowledge domains and their available categories."""
     try:
-        from fatebridge.core import human_design_knowledge
-        from fatebridge.core.numerology_knowledge import (
-            DOMAINS,
-            SCOPE,
-            SOURCE,
-            build_registry,
-        )
-
-        domain_key = domain.strip() if isinstance(domain, str) else domain
-        if domain_key == human_design_knowledge.DOMAIN:
+        lookup_domain = domain.strip() if domain is not None else None
+        if lookup_domain == human_design_knowledge.DOMAIN:
             registry = human_design_knowledge.build_registry()
-        elif domain_key in DOMAINS:
-            registry = build_registry(domain_key)
+        elif lookup_domain in DOMAINS:
+            registry = build_registry(lookup_domain)
         elif domain is None or domain == "":
             base_registry = build_knowledge_registry(domain=domain)
             added = [build_registry(name) for name in DOMAINS]
@@ -223,13 +247,17 @@ def calculate_knowledge_registry(
                 "bundle_version": None,
                 "domains": [
                     *base_registry["domains"],
-                    *(item for r in added for item in r["domains"]),
+                    *(
+                        domain_record
+                        for provider in added
+                        for domain_record in provider["domains"]
+                    ),
                 ],
                 "provenance": {
                     "source_domain": "fatebridge_mixed_knowledge",
                     "components": [
                         base_registry["provenance"],
-                        *(r["provenance"] for r in added),
+                        *(provider["provenance"] for provider in added),
                     ],
                     "added_reference_source": SOURCE,
                     "added_reference_scope": SCOPE,
@@ -237,8 +265,12 @@ def calculate_knowledge_registry(
             }
         else:
             registry = build_knowledge_registry(domain=domain)
+        if not render_snapshot:
+            return registry
+        else:
+            pass
         snapshot_text = _build_knowledge_registry_snapshot_text(registry, domain=domain)
-        snapshot_export = _build_snapshot_export(
+        snapshot_export = build_snapshot_export(
             technique="knowledge_registry",
             snapshot_text=snapshot_text,
             selected_sections=selected_sections,
@@ -257,26 +289,22 @@ def calculate_knowledge_registry(
 def calculate_knowledge_read(
     *,
     domain: str,
-    category: Optional[str] = None,
-    key: Optional[str] = None,
-    selected_sections: Optional[List[str]] = None,
-    aspect_degree: Optional[int | str] = None,
-    object_a: Optional[str] = None,
-    object_b: Optional[str] = None,
-    jiang_name: Optional[str] = None,
-    tian_branch: Optional[str] = None,
-    di_branch: Optional[str] = None,
-) -> Dict[str, Any]:
-    """
-    Read bundled knowledge or a source-bound 河洛／参评 reference.
+    category: str | None = None,
+    key: str | None = None,
+    selected_sections: list[str] | None = None,
+    aspect_degree: int | str | None = None,
+    object_a: str | None = None,
+    object_b: str | None = None,
+    jiang_name: str | None = None,
+    tian_branch: str | None = None,
+    di_branch: str | None = None,
+    render_snapshot: bool = True,
+) -> dict[str, Any]:
+    """Read a knowledge card or source-bound reference.
 
-    ``category`` may be omitted; when it is, the category is auto-resolved from
-    ``key`` for domains that support exact-key resolution.
+    An omitted category requires a unique match in a domain that supports key lookup.
     """
     try:
-        from fatebridge.core import human_design_knowledge
-        from fatebridge.core.numerology_knowledge import DOMAINS, read_reference
-
         payload = {
             "domain": domain,
             "category": category,
@@ -288,26 +316,32 @@ def calculate_knowledge_read(
             "tian_branch": tian_branch,
             "di_branch": di_branch,
         }
-        domain_key = domain.strip() if isinstance(domain, str) else domain
-        if domain_key == human_design_knowledge.DOMAIN:
-            irrelevant = {
-                name: value
-                for name, value in payload.items()
-                if name not in {"domain", "category", "key"} and value is not None
-            }
-            if irrelevant:
+        lookup_domain = domain.strip()
+        if lookup_domain == human_design_knowledge.DOMAIN:
+            irrelevant_fields: list[JsonValue] = [
+                field_name
+                for field_name, value in sorted(payload.items())
+                if field_name not in {"domain", "category", "key"} and value is not None
+            ]
+            if irrelevant_fields:
                 raise ToolValidationError(
                     "人类图线参考只接受category与key定位，不接受相位或其他域对象",
                     code="knowledge.human_design.irrelevant_fields",
-                    details={"fields": sorted(irrelevant)},
+                    details={"fields": irrelevant_fields},
                 )
+            else:
+                pass
             entry = human_design_knowledge.read_reference(category=category, key=key)
-        elif domain_key in DOMAINS:
-            entry = read_reference(domain=domain_key, category=category, key=key)
+        elif lookup_domain in DOMAINS:
+            entry = read_reference(domain=lookup_domain, category=category, key=key)
         else:
             entry = read_knowledge_entry(payload)
+        if not render_snapshot:
+            return entry
+        else:
+            pass
         snapshot_text = _build_knowledge_snapshot_text(entry)
-        snapshot_export = _build_snapshot_export(
+        snapshot_export = build_snapshot_export(
             technique="knowledge",
             snapshot_text=snapshot_text,
             selected_sections=selected_sections,

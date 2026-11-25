@@ -10,19 +10,22 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core import ephemeris_runtime, guolao
+from fatebridge.core import ephemeris_runtime
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.birth import build_astro_birth_info
+from fatebridge.core.guolao import guolao
 from fatebridge.core.local_techniques.suzhan import _build_suzhan_snapshot_text
-from fatebridge.core.sukuyo import calendar_mansion, day_evidence
-from fatebridge.core.sukuyo_activities import source_bundle
-from fatebridge.core.suzhan_astronomy import build_equatorial_mansions
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence
+from fatebridge.core.sukuyo.sukuyo_activities import source_bundle
+from fatebridge.core.sukuyo.suzhan_astronomy import build_equatorial_mansions
 from fatebridge.services.divination import calculate_suzhan_analysis
 
 FIXTURES = Path(__file__).parents[1] / "data"
 
 
-def test_all_42_physical_ra_dec_positions_against_external_jpl(monkeypatch):
+def test_all_42_physical_ra_dec_positions_against_external_jpl(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     fixture = json.loads((FIXTURES / "sukuyo-equatorial-horizons.json").read_text())
     outputs = {}
     errors = []
@@ -63,6 +66,8 @@ def test_all_42_physical_ra_dec_positions_against_external_jpl(monkeypatch):
                         birth_latitude=0,
                     )
                 )
+            else:
+                pass
             actual = next(
                 p for p in outputs[row["utc"]]["bodies"] if p["id"] == ref["body"]
             )
@@ -84,7 +89,7 @@ def test_all_42_physical_ra_dec_positions_against_external_jpl(monkeypatch):
     assert len(errors) == 42
 
 
-def test_default_sky_mansion_is_not_the_calendrical_natal_mansion():
+def test_default_sky_mansion_is_not_the_calendrical_natal_mansion() -> None:
     r = calculate_suzhan_analysis(
         lat="31n13", lon="121e28", date="2025-03-04", time="12:00:00", zone="+08:00"
     )
@@ -103,7 +108,7 @@ def test_default_sky_mansion_is_not_the_calendrical_natal_mansion():
     )
 
 
-def test_houses_zodiac_and_location_cannot_shift_geocentric_mansions():
+def test_houses_zodiac_and_location_cannot_shift_geocentric_mansions() -> None:
     a = calculate_suzhan_analysis(
         date="2025-03-04",
         time="12:00:00",
@@ -127,7 +132,7 @@ def test_houses_zodiac_and_location_cannot_shift_geocentric_mansions():
     assert a["sukuyo"]["day_mansion"] == b["sukuyo"]["day_mansion"]
 
 
-def test_declared_boundaries_use_exact_half_open_intervals():
+def test_declared_boundaries_use_exact_half_open_intervals() -> None:
     birth = build_astro_birth_info(
         birth_year=2025,
         birth_month=3,
@@ -148,7 +153,7 @@ def test_declared_boundaries_use_exact_half_open_intervals():
         )
 
 
-def test_mansion_snapshot_can_display_more_than_30_degrees():
+def test_mansion_snapshot_can_display_more_than_30_degrees() -> None:
     payload = {
         "lat": "31n13",
         "lon": "121e28",
@@ -175,7 +180,22 @@ def test_mansion_snapshot_can_display_more_than_30_degrees():
     assert "32˚井" in text and "2˚井" not in text.replace("32˚井", "")
 
 
-def test_legacy_diagram_requires_explicit_method_and_remains_labelled():
+@pytest.mark.parametrize("longitude", [None, "bad"])
+def test_snapshot_does_not_replace_invalid_longitude_with_zero(
+    longitude: str | None,
+) -> None:
+    payload = {"date": "2025-03-04", "time": "12:00:00", "zone": "UTC"}
+    result = {
+        "chart": {
+            "houses": [{"id": "House1"}],
+            "objects": [{"house": "House1", "id": "Moon", "lon": longitude}],
+        }
+    }
+    with pytest.raises((TypeError, ValueError)):
+        _build_suzhan_snapshot_text(payload, result)
+
+
+def test_legacy_diagram_requires_explicit_method_and_remains_labelled() -> None:
     r = calculate_suzhan_analysis(
         lat="31n13",
         lon="121e28",
@@ -188,7 +208,9 @@ def test_legacy_diagram_requires_explicit_method_and_remains_labelled():
     assert "旧版等分黄道示意" in r["snapshot_text"]
 
 
-def test_missing_physical_engine_does_not_fabricate_equal_sky_mansions(monkeypatch):
+def test_missing_physical_engine_does_not_fabricate_equal_sky_mansions(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setattr(runtime, "swe", None)
     r = calculate_suzhan_analysis(
         lat="31n13", lon="121e28", date="2025-03-04", time="12:00:00"
@@ -196,7 +218,7 @@ def test_missing_physical_engine_does_not_fabricate_equal_sky_mansions(monkeypat
     assert r["error_code"] == "dependency_missing" and "astronomy" not in r
 
 
-def test_danger_marriage_preserves_both_contradictory_lower_volume_clauses():
+def test_danger_marriage_preserves_both_contradictory_lower_volume_clauses() -> None:
     r = day_evidence(calendar_mansion("2025-03-04"), "奎", "marriage")
     assert r["personal_day"]["relation"]["relation"] == "危"
     assert r["personal_day"]["textual_conflict"]
@@ -222,7 +244,7 @@ def test_danger_marriage_preserves_both_contradictory_lower_volume_clauses():
     )
 
 
-def test_day_nature_and_sanjiu_can_disagree_without_a_composite_score():
+def test_day_nature_and_sanjiu_can_disagree_without_a_composite_score() -> None:
     r = day_evidence(calendar_mansion("2025-03-04"), "女", "study")
     assert r["personal_day"]["relation"]["relation"] == "業"
     assert r["activity_assessment"]["evidence_status"] == "conflicted"
@@ -230,7 +252,7 @@ def test_day_nature_and_sanjiu_can_disagree_without_a_composite_score():
     assert "probability" not in r["activity_assessment"]
 
 
-def test_unspecified_or_uncovered_rules_do_not_become_negative_evidence():
+def test_unspecified_or_uncovered_rules_do_not_become_negative_evidence() -> None:
     r = day_evidence(
         {
             "natal_su27": "参",
@@ -252,7 +274,7 @@ def test_unspecified_or_uncovered_rules_do_not_become_negative_evidence():
         day_evidence(calendar_mansion("2025-03-04"), None, "medical")
 
 
-def test_activity_source_rows_have_unique_ids_and_precise_scope():
+def test_activity_source_rows_have_unique_ids_and_precise_scope() -> None:
     bundle = source_bundle()
     rules = bundle["rules"]
     assert len(rules) == len({x["rule_id"] for x in rules}) == 31
@@ -265,7 +287,7 @@ def test_activity_source_rows_have_unique_ids_and_precise_scope():
     )
 
 
-def test_activity_mapping_against_ten_independent_primary_source_clauses():
+def test_activity_mapping_against_ten_independent_primary_source_clauses() -> None:
     fixture = json.loads(
         (FIXTURES / "sukuyo-activity-primary-excerpts.json").read_text()
     )
@@ -277,6 +299,8 @@ def test_activity_mapping_against_ten_independent_primary_source_clauses():
         end = parts[-1]
         if len(end) == 2:
             end = start[:-2] + end
+        else:
+            pass
         return start, end
 
     for case in fixture["cases"]:

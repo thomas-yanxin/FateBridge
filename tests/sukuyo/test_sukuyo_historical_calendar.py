@@ -9,12 +9,12 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core import sukuyo_historical_calendar as historical
-from fatebridge.core.sukuyo import calendar_mansion, day_evidence, lunar_mansion
+from fatebridge.core.sukuyo import sukuyo_historical_calendar as historical
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence, lunar_mansion
 from fatebridge.services.divination import calculate_sukuyo_compatibility
-from fatebridge.validation.sukuyo_historical_sources import gregorian_ordinal, normalize
 from scripts.sukuyo.build_sukuyo_historical_calendar import read_fixture
 from scripts.sukuyo.check_sukuyo_historical_daily import verify_daily_controls
+from validation.sukuyo_historical_sources import gregorian_ordinal, normalize
 
 ROOT = Path(__file__).resolve().parents[2]
 BASIS = "japanese_naoj_historical_utc09"
@@ -24,7 +24,7 @@ def reference(value, **kwargs):
     return calendar_mansion(value, calendar_basis=BASIS, zone="+09:00", **kwargs)
 
 
-def test_all_683734_reference_dates_follow_raw_naoj_month_start_records():
+def test_all_683734_reference_dates_follow_raw_naoj_month_start_records() -> None:
     files, manifest = read_fixture(ROOT / "tests/data/sukuyo_historical_calendar_v1")
     starts = {}
     for year in range(1873):
@@ -69,7 +69,9 @@ def test_all_683734_reference_dates_follow_raw_naoj_month_start_records():
         ("1872-12-31", (1872, 12, 2, False)),
     ],
 )
-def test_source_edge_dates_and_legal_two_day_month_are_explicit(value, fields):
+def test_source_edge_dates_and_legal_two_day_month_are_explicit(
+    value: str, fields
+) -> None:
     result = reference(value)
     assert (
         tuple(
@@ -86,9 +88,13 @@ def test_source_edge_dates_and_legal_two_day_month_are_explicit(value, fields):
     if source["month_truncated_by_calendar_reform"]:
         assert source["source_month_length_days"] == 2
         assert "截为两天" in day_evidence(result)["reading_text"]
+    else:
+        pass
 
 
-def test_all_retained_source_disagreement_dates_have_unapplied_alternative_fields():
+def test_all_retained_source_disagreement_dates_have_unapplied_alternative_fields() -> (
+    None
+):
     files, manifest = read_fixture(ROOT / "tests/data/sukuyo_historical_calendar_v1")
     _, report = normalize(files, manifest)
     checked = 0
@@ -110,7 +116,7 @@ def test_all_retained_source_disagreement_dates_have_unapplied_alternative_field
     assert historical.date_reference(date(10, 1, 2))["cross_source_comparison"] is None
 
 
-def test_same_mansion_cannot_hide_month_day_and_leap_disagreement():
+def test_same_mansion_cannot_hide_month_day_and_leap_disagreement() -> None:
     result = reference("0820-03-22")
     assert (result["lunar_month"], result["lunar_day"], result["is_leap_month"]) == (
         2,
@@ -125,7 +131,9 @@ def test_same_mansion_cannot_hide_month_day_and_leap_disagreement():
     assert "820年闰1月30日" in text and "与所选NAOJ参考不同" in text
 
 
-def test_compatibility_native_text_retains_each_unknown_date_branch_disagreement():
+def test_compatibility_native_text_retains_each_unknown_date_branch_disagreement() -> (
+    None
+):
     pair = calculate_sukuyo_compatibility(
         person1_date="0820-03-22",
         person1_zone="UTC",
@@ -141,7 +149,7 @@ def test_compatibility_native_text_retains_each_unknown_date_branch_disagreement
     assert "不表示该年代已行用本经" in pair["summary"]
 
 
-def test_hinoo_previous_month_uses_the_same_historical_source():
+def test_hinoo_previous_month_uses_the_same_historical_source() -> None:
     first = reference(
         "0806-09-20",
         calendar_profile="hinoo_t1299_host27",
@@ -165,7 +173,7 @@ def test_hinoo_previous_month_uses_the_same_historical_source():
     )
 
 
-def test_known_fixed_clock_and_unknown_lower_boundary_do_not_drop_year_zero():
+def test_known_fixed_clock_and_unknown_lower_boundary_do_not_drop_year_zero() -> None:
     known = calendar_mansion("0001-01-01", "00:00:00", "+08:00", calendar_basis=BASIS)
     assert known["calendar_date"] == "0001-01-01"
     unknown = calendar_mansion("0001-01-01", zone="+08:00", calendar_basis=BASIS)
@@ -183,7 +191,7 @@ def test_known_fixed_clock_and_unknown_lower_boundary_do_not_drop_year_zero():
     ]
 
 
-def test_direct_daily_controls_preserve_all_source_disagreements_and_reform():
+def test_direct_daily_controls_preserve_all_source_disagreements_and_reform() -> None:
     report = verify_daily_controls()
     assert report["naoj_inside_host_range_daily_dates"] == 225
     assert report["hutime_direct_disagreement_dates"] == 210
@@ -194,7 +202,7 @@ def test_direct_daily_controls_preserve_all_source_disagreements_and_reform():
     ]
 
 
-def test_upper_boundary_remains_incomplete_and_never_switches_to_modern_japan():
+def test_upper_boundary_remains_incomplete_and_never_switches_to_modern_japan() -> None:
     with pytest.raises(ValueError):
         reference("1873-01-01")
     result = calendar_mansion("1872-12-31", zone="UTC", calendar_basis=BASIS)
@@ -213,8 +221,8 @@ def test_upper_boundary_remains_incomplete_and_never_switches_to_modern_japan():
 
 
 def test_returned_source_metadata_and_index_fingerprint_stay_coupled(
-    monkeypatch, tmp_path
-):
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     raw = historical.SOURCE.read_bytes()
     path = tmp_path / "historical.json"
     path.write_bytes(raw)
@@ -229,7 +237,9 @@ def test_returned_source_metadata_and_index_fingerprint_stay_coupled(
     assert later["source_provenance"]
 
 
-def test_default_and_modern_japanese_backends_do_not_load_historical_table(monkeypatch):
+def test_default_and_modern_japanese_backends_do_not_load_historical_table(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setattr(historical, "SOURCE", ROOT / "no-historical-table.json")
     assert calendar_mansion("2025-03-04")["natal_su27"] == "毕"
     assert calendar_mansion(

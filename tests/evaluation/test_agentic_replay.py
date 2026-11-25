@@ -1,18 +1,20 @@
 """Catalog discovery, native transport replay and isolation contracts."""
 
 import asyncio
+import contextlib
+import io
 import json
 import subprocess
 import sys
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import replace
 from datetime import timezone
+from pathlib import Path
 from threading import Barrier
 
 import pytest
 from fastapi.testclient import TestClient
 from fastmcp import Client
-from jsonschema import Draft202012Validator
 from pydantic import BaseModel
 
 import fatebridge.api as api
@@ -20,12 +22,20 @@ import fatebridge.mcp_server as mcp
 from fatebridge.application.discovery import discover_specs
 from fatebridge.application.execution import execute_tool
 from fatebridge.application.tool_spec import ToolSpec
+from fatebridge.cli import run as cli_run
 from fatebridge.core.execution_context import ExecutionOptions, current_datetime
 from fatebridge.core.reproducibility import ReproducibilityPolicy
+from fatebridge.core.schema_cache import model_schema
 from fatebridge.services.tool_catalog import CATALOG
 from tests.fixtures.surface_payloads import REST_POST_CASES
+from tests.support.transports import (
+    cached_mcp_app,
+    cached_output_validator,
+    call_calculation,
+    discover_capabilities,
+)
 
-BIRTH = REST_POST_CASES["/api/cn/bazi/birth"]()
+BIRTH = REST_POST_CASES["/api/bazi/birth-chart"]()
 AS_OF = "2024-02-29T16:30:00Z"
 CONTROLS = {
     "as_of": AS_OF,
@@ -45,32 +55,35 @@ def rest(monkeypatch):
 
 
 def cli(tool, inputs, controls=None, flags=None):
-    args = [sys.executable, "-m", "fatebridge.cli", tool]
+    args = [tool]
     for key, value in {**inputs, **(controls or {})}.items():
         if value is not None and value != []:
-            args += [
-                "--" + key.replace("_", "-"),
-                (
+            args.append("--" + key.replace("_", "-"))
+            if isinstance(value, list):
+                args.extend(str(item) for item in value)
+            else:
+                args.append(
                     json.dumps(value, ensure_ascii=False)
-                    if isinstance(value, (dict, list, bool))
+                    if isinstance(value, (dict, bool))
                     else str(value)
-                ),
-            ]
-    result = subprocess.run(
-        args + (flags or []), capture_output=True, text=True, timeout=45
-    )
-    return result.returncode, json.loads(result.stdout)
+                )
+        else:
+            pass
+    buffer = io.StringIO()
+    with contextlib.redirect_stdout(buffer):
+        code = cli_run(args + (flags or []))
+    return code, json.loads(buffer.getvalue())
 
 
 def native(tool, inputs, controls=None):
     async def call():
         async with Client(mcp.app) as client:
-            result = await client.call_tool(
+            result = await call_calculation(
+                client,
                 tool,
                 {**inputs, "response_char_limit": 0, **(controls or {})},
                 raise_on_error=False,
             )
-            assert json.loads(result.content[0].text) == result.structured_content
             return result
 
     return asyncio.run(call())
@@ -81,21 +94,21 @@ def business(payload):
 
 
 @pytest.mark.parametrize("family", ["bazi", "fengshui", "astro"])
-def test_family_discovery_matches_rest_cli_and_mcp(rest, family):
-    params = {"family": family, "surface": "mcp", "detail": "summary"}
+def test_family_discovery_matches_rest_cli_and_mcp(rest, family: str) -> None:
+    params = {"family": family, "surface": "mcp", "detail": "index"}
     http = rest.get("/api/tools", params=params)
     code, output = cli(
         "discover",
         {},
-        flags=["--family", family, "--surface", "mcp", "--detail", "summary"],
+        flags=["--family", family, "--surface", "mcp", "--detail", "index"],
     )
 
     async def read():
-        async with Client(mcp.create_mcp_app(families=family)) as client:
+        async with Client(cached_mcp_app(families=family)) as client:
             catalog = json.loads(
                 (await client.read_resource("fatebridge://catalog/summary"))[0].text
             )
-            assert {tool.name for tool in await client.list_tools()} == {
+            assert set(await discover_capabilities(client)) == {
                 record["tool"] for record in catalog["tools"]
             }
             return catalog
@@ -106,32 +119,32 @@ def test_family_discovery_matches_rest_cli_and_mcp(rest, family):
 
 
 @pytest.mark.parametrize(
-    "path,tool,inputs",
+    "tool,inputs",
     [
-        ("/api/cn/bazi/birth", "bazi_birth", BIRTH),
+        ("bazi_birth", BIRTH),
         (
-            "/api/cn/liuri_analysis",
             "liuri_analysis",
-            REST_POST_CASES.get("/api/cn/liuri_analysis", lambda: BIRTH)(),
+            REST_POST_CASES["/api/bazi/timing/daily"](),
         ),
     ],
 )
 def test_fixed_clock_replay_and_metadata_match_three_transports(
-    rest, path, tool, inputs
-):
-    # Use the actual catalog route rather than assuming older route spellings.
+    rest, tool: str, inputs
+) -> None:
     spec = next(spec for spec in CATALOG if spec.key == tool)
     inputs = {
         key: value for key, value in inputs.items() if not key.startswith("analysis_")
     }
     http = rest.post(spec.rest_path, json=inputs, params=CONTROLS)
-    protocol = native(tool, inputs, CONTROLS)
-    code, output = cli(tool, inputs, CONTROLS)
+    protocol = native(spec.tool_name, inputs, CONTROLS)
+    code, output = cli(spec.tool_name, inputs, CONTROLS)
     assert http.status_code == 200 and not protocol.is_error and code == 0
     payloads = [http.json(), protocol.structured_content, output]
     assert business(payloads[0]) == business(payloads[1]) == business(payloads[2])
     if tool == "bazi_birth":
         assert payloads[0]["bazi_birth"]["analysis_date"] == "2024-03-01"
+    else:
+        pass
     for payload in payloads:
         metadata = payload["run_metadata"]
         assert metadata["trace_id"] == CONTROLS["trace_id"]
@@ -140,7 +153,7 @@ def test_fixed_clock_replay_and_metadata_match_three_transports(
         assert metadata["determinism"]["uses_current_time"]
         assert metadata["duration_ms"] >= 0
         assert metadata["metadata_schema_version"] == "2.0"
-        Draft202012Validator(spec.output_model.model_json_schema()).validate(payload)
+        cached_output_validator(spec.output_model).validate(payload)
     for key in (
         "runtime",
         "replay",
@@ -168,7 +181,7 @@ def sixyao_inputs():
     ).model_dump(mode="json", exclude_unset=True)
 
 
-def test_random_coin_receipt_can_be_replayed_in_rest_mcp_and_cli(rest):
+def test_random_coin_receipt_can_be_replayed_in_rest_mcp_and_cli(rest) -> None:
     spec = next(spec for spec in CATALOG if spec.key == "sixyao")
     inputs = {
         **sixyao_inputs(),
@@ -186,8 +199,8 @@ def test_random_coin_receipt_can_be_replayed_in_rest_mcp_and_cli(rest):
     assert receipt["determinism"]["randomness_used"]
     inputs.update(receipt["replay"]["overrides"])
     replay = rest.post(spec.rest_path, json=inputs, params=CONTROLS)
-    protocol = native("sixyao", inputs, CONTROLS)
-    code, output = cli("sixyao", inputs, CONTROLS)
+    protocol = native(spec.tool_name, inputs, CONTROLS)
+    code, output = cli(spec.tool_name, inputs, CONTROLS)
     assert replay.status_code == 200 and not protocol.is_error and code == 0
     for payload in [replay.json(), protocol.structured_content, output]:
         assert business(payload) == business(initial.json())
@@ -203,7 +216,7 @@ def test_random_coin_receipt_can_be_replayed_in_rest_mcp_and_cli(rest):
         {"gua_code": "111111", "changed_code": "111111"},
     ],
 )
-def test_manual_or_time_casting_does_not_generate_a_seed(rest, override):
+def test_manual_or_time_casting_does_not_generate_a_seed(rest, override) -> None:
     spec = next(spec for spec in CATALOG if spec.key == "sixyao")
     inputs = {**sixyao_inputs(), "method": "coin", "seed": None, **override}
     result = rest.post(spec.rest_path, json=inputs, params={"as_of": AS_OF}).json()
@@ -212,7 +225,7 @@ def test_manual_or_time_casting_does_not_generate_a_seed(rest, override):
     assert result["run_metadata"]["replay"]["overrides"] == {}
 
 
-def test_normalized_coin_method_still_captures_the_random_seed(rest):
+def test_normalized_coin_method_still_captures_the_random_seed(rest) -> None:
     spec = next(spec for spec in CATALOG if spec.key == "sixyao")
     inputs = {
         **sixyao_inputs(),
@@ -235,8 +248,8 @@ def test_normalized_coin_method_still_captures_the_random_seed(rest):
 
 @pytest.mark.parametrize("field,value", [("gua_code", "  "), ("changed_code", "abc")])
 def test_invalid_hexagram_codes_cannot_be_silently_treated_as_random(
-    rest, field, value
-):
+    rest, field: str, value: str
+) -> None:
     spec = next(spec for spec in CATALOG if spec.key == "sixyao")
     inputs = {
         **sixyao_inputs(),
@@ -254,18 +267,22 @@ def test_invalid_hexagram_codes_cannot_be_silently_treated_as_random(
     assert "run_metadata" not in result.json()
 
 
-def test_pinned_partial_date_uses_existing_month_clamping_and_timezone_rules(rest):
+def test_pinned_partial_date_uses_existing_month_clamping_and_timezone_rules(
+    rest,
+) -> None:
     inputs = {**BIRTH, "analysis_year": 2024, "analysis_month": 2}
     result = rest.post(
-        "/api/cn/bazi/birth", json=inputs, params={"as_of": "2024-01-31T00:00:00+08:00"}
+        "/api/bazi/birth-chart",
+        json=inputs,
+        params={"as_of": "2024-01-31T00:00:00+08:00"},
     ).json()
     assert result["bazi_birth"]["analysis_date"] == "2024-02-29"
     assert result["run_metadata"]["effective_time"]["as_of"] == "2024-01-30T16:00:00Z"
 
 
 def test_ephemeris_inventory_lists_filenames_without_server_paths(
-    monkeypatch, tmp_path
-):
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     from fatebridge.core import ephemeris_runtime
     from fatebridge.services import replay_metadata
 
@@ -281,7 +298,44 @@ def test_ephemeris_inventory_lists_filenames_without_server_paths(
     assert replay_metadata.ephemeris_inventory()["files"] == []
 
 
-def test_rule_versions_and_actual_time_policy_survive_projection(rest):
+def test_ephemeris_inventory_records_unlisted_search_directory(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    from pathlib import Path
+
+    from fatebridge.core import ephemeris_runtime
+    from fatebridge.services import replay_metadata
+
+    searchable = tmp_path / "searchable"
+    searchable.mkdir()
+    known_source = searchable / "swe_deltat.txt"
+    known_source.write_bytes(b"source-by-known-name")
+    listed = tmp_path / "listed"
+    listed.mkdir()
+    (listed / "seasnam.txt").write_bytes(b"listed")
+    monkeypatch.setattr(
+        ephemeris_runtime,
+        "effective_ephemeris_search_path",
+        lambda: f"{tmp_path / 'missing'};{searchable};{listed}",
+    )
+    original_iterdir = Path.iterdir
+
+    def iterdir(path):
+        if path == searchable:
+            raise PermissionError(path)
+        else:
+            pass
+        return original_iterdir(path)
+
+    monkeypatch.setattr(Path, "iterdir", iterdir)
+    assert known_source.read_bytes() == b"source-by-known-name"
+    inventory = replay_metadata.ephemeris_inventory()
+    assert inventory["files"] == ["2/seasnam.txt"]
+    assert inventory["unlisted_directory_indices"] == [1]
+    assert str(tmp_path) not in json.dumps(inventory)
+
+
+def test_rule_versions_and_actual_time_policy_survive_projection(rest) -> None:
     from fatebridge.services.replay_metadata import provenance_values
 
     assert provenance_values(
@@ -291,7 +345,7 @@ def test_rule_versions_and_actual_time_policy_survive_projection(rest):
         }
     ) == {"ruleset": ["zhongzhou@1.0"], "ruleset_id": ["zhongzhou"]}
     response = rest.post(
-        "/api/cn/bazi/birth",
+        "/api/bazi/birth-chart",
         json=BIRTH,
         params={**CONTROLS, "fields": "bazi_birth.day_master"},
     ).json()
@@ -307,10 +361,10 @@ def test_rule_versions_and_actual_time_policy_survive_projection(rest):
         {"parent_run_id": "x" * 129},
     ],
 )
-def test_execution_controls_fail_safely_and_consistently(rest, invalid):
-    http = rest.post("/api/cn/bazi/birth", json=BIRTH, params=invalid)
-    protocol = native("bazi_birth", BIRTH, invalid)
-    code, output = cli("bazi_birth", BIRTH, invalid)
+def test_execution_controls_fail_safely_and_consistently(rest, invalid) -> None:
+    http = rest.post("/api/bazi/birth-chart", json=BIRTH, params=invalid)
+    protocol = native("bazi_birth_chart", BIRTH, invalid)
+    code, output = cli("bazi_birth_chart", BIRTH, invalid)
     assert http.status_code == 422 and protocol.is_error and code == 1
     assert (
         http.json()["issues"]
@@ -321,8 +375,64 @@ def test_execution_controls_fail_safely_and_consistently(rest, invalid):
         assert "private" not in json.dumps(payload)
 
 
+@pytest.mark.parametrize(
+    ("tool", "path", "date_parts"),
+    [
+        ("bazi_daily_timing", "/api/bazi/timing/daily", {}),
+        (
+            "bazi_daily_timing",
+            "/api/bazi/timing/daily",
+            {"analysis_month": 12, "analysis_day": 1},
+        ),
+        (
+            "bazi_birth_chart",
+            "/api/bazi/birth-chart",
+            {"analysis_month": 12, "analysis_day": 1},
+        ),
+        (
+            "transit_chart",
+            "/api/astrology/timing/transit-chart",
+            {"analysis_month": 12, "analysis_day": 1},
+        ),
+        ("solar_term_timeline", "/api/calendar/solar-term-timeline", {}),
+    ],
+    ids=["liuri-implicit", "liuri-missing-year", "bazi", "transit", "jieqi"],
+)
+def test_execution_clock_requires_a_defined_local_projection(
+    rest, tool: str, path: str, date_parts
+) -> None:
+    # IANA tzdb marks local time unspecified during Vostok's 1994 closure.
+    payload = {
+        "birth_year": 1990,
+        "birth_month": 5,
+        "birth_day": 15,
+        "birth_hour": 10,
+        "birth_minute": 30,
+        "birth_timezone": "Antarctica/Vostok",
+        "birth_longitude": 0,
+        **date_parts,
+    }
+    if tool == "transit_chart":
+        payload.update(birth_latitude=0, house_system="W")
+    else:
+        payload.update(gender="男", use_true_solar_time=False)
+    controls = {**CONTROLS, "as_of": "1994-06-01T12:34:56.123456Z"}
+    http = rest.post(path, json=payload, params=controls)
+    protocol = native(tool, payload, controls)
+    code, output = cli(tool, payload, controls)
+    assert http.status_code == 422 and protocol.is_error and code == 1
+    for body in (http.json(), protocol.structured_content, output):
+        assert body["error_code"] == "validation_error"
+        assert body["retryable"] is False
+        assert body["issues"] == [
+            {"path": "as_of", "code": "unresolved_timezone_offset"}
+        ]
+        assert body["trace_id"] == controls["trace_id"]
+        assert body["parent_run_id"] == controls["parent_run_id"]
+
+
 @pytest.mark.parametrize("case", ["model", "domain", "projection"])
-def test_caller_correlation_survives_failure_paths(rest, case):
+def test_caller_correlation_survives_failure_paths(rest, case: str) -> None:
     inputs = dict(BIRTH)
     query = dict(CONTROLS)
     flags = []
@@ -335,19 +445,19 @@ def test_caller_correlation_survives_failure_paths(rest, case):
     else:
         query.update(fields=["typo"], strict_fields=True)
         flags = ["--fields", "typo", "--strict-fields"]
-    http = rest.post("/api/cn/bazi/birth", json=inputs, params=query)
-    protocol = native("bazi_birth", inputs, query)
-    code, output = cli("bazi_birth", inputs, CONTROLS, flags)
+    http = rest.post("/api/bazi/birth-chart", json=inputs, params=query)
+    protocol = native("bazi_birth_chart", inputs, query)
+    code, output = cli("bazi_birth_chart", inputs, CONTROLS, flags)
     assert http.status_code in {400, 422} and protocol.is_error and code == 1
     for payload in [http.json(), protocol.structured_content, output]:
         assert payload["trace_id"] == CONTROLS["trace_id"]
         assert payload["parent_run_id"] == CONTROLS["parent_run_id"]
 
 
-def test_projection_and_no_metadata_keep_business_output_compatible(rest):
-    full = rest.post("/api/cn/bazi/birth", json=BIRTH, params=CONTROLS).json()
+def test_projection_and_no_metadata_keep_business_output_compatible(rest) -> None:
+    full = rest.post("/api/bazi/birth-chart", json=BIRTH, params=CONTROLS).json()
     projected = rest.post(
-        "/api/cn/bazi/birth",
+        "/api/bazi/birth-chart",
         json=BIRTH,
         params={
             **CONTROLS,
@@ -358,20 +468,22 @@ def test_projection_and_no_metadata_keep_business_output_compatible(rest):
     ).json()
     assert projected["bazi_birth"]["day_master"] == full["bazi_birth"]["day_master"]
     assert projected["run_metadata"]["provenance"] == full["run_metadata"]["provenance"]
-    code, output = cli("bazi_birth", BIRTH, CONTROLS)
-    args = [sys.executable, "-m", "fatebridge.cli", "--no-metadata", "bazi_birth"]
+    code, output = cli("bazi_birth_chart", BIRTH, CONTROLS)
+    args = [sys.executable, "-m", "fatebridge.cli", "--no-metadata", "bazi_birth_chart"]
     for key, value in {**BIRTH, **CONTROLS}.items():
         if value is not None:
             args += [
                 "--" + key.replace("_", "-"),
                 str(value).lower() if isinstance(value, bool) else str(value),
             ]
+        else:
+            pass
     result = subprocess.run(args, capture_output=True, text=True, timeout=30)
     assert code == result.returncode == 0
     assert json.loads(result.stdout) == business(output)
 
 
-def test_clocks_are_isolated_between_threads_and_reset_after_error():
+def test_clocks_are_isolated_between_threads_and_reset_after_error() -> None:
     class Empty(BaseModel):
         pass
 
@@ -419,9 +531,9 @@ def test_clocks_are_isolated_between_threads_and_reset_after_error():
     assert current_datetime(timezone.utc).year not in {2000, 2030}
 
 
-def test_metadata_versions_and_privacy(rest):
+def test_metadata_versions_and_privacy(rest) -> None:
     first = rest.post(
-        "/api/cn/bazi/birth",
+        "/api/bazi/birth-chart",
         json={**BIRTH, "name": "PrivateIdentityMarker"},
         params=CONTROLS,
     ).json()["run_metadata"]
@@ -430,7 +542,7 @@ def test_metadata_versions_and_privacy(rest):
     assert "implementation_sha256" not in first["runtime"]
     assert "environment_sha256" not in first["runtime"]
     second = rest.post(
-        "/api/cn/bazi/birth",
+        "/api/bazi/birth-chart",
         json={**BIRTH, "name": "DifferentIdentityMarker"},
         params=CONTROLS,
     ).json()["run_metadata"]
@@ -438,10 +550,9 @@ def test_metadata_versions_and_privacy(rest):
     assert second["runtime"] == first["runtime"]
 
 
-def test_discovery_declares_replay_conditions_and_keeps_hints_separate():
+def test_discovery_declares_replay_conditions_and_keeps_hints_separate() -> None:
     descriptions = {
-        tool["tool"]: tool
-        for tool in discover_specs(CATALOG, detail="summary")["tools"]
+        tool["key"]: tool for tool in discover_specs(CATALOG, detail="summary")["tools"]
     }
     assert descriptions["sixyao"]["reproducibility"]["requires_seed_for_replay"]
     assert descriptions["sixyao"]["annotations"]["idempotentHint"]
@@ -449,7 +560,7 @@ def test_discovery_declares_replay_conditions_and_keeps_hints_separate():
     assert not descriptions["knowledge_read"]["reproducibility"]["may_use_current_time"]
 
 
-def test_profile_children_share_clock_and_correlate_to_parent():
+def test_profile_children_share_clock_and_correlate_to_parent() -> None:
     code, output = cli("profile", BIRTH, CONTROLS, ["--systems", "bazi,ziwei"])
     assert code == 0
     root = output["run_metadata"]
@@ -465,16 +576,16 @@ def test_profile_children_share_clock_and_correlate_to_parent():
 
 
 def test_receipt_generation_failure_is_internal_and_keeps_correlation(
-    rest, monkeypatch
-):
+    rest, monkeypatch: pytest.MonkeyPatch
+) -> None:
     from fatebridge.services import replay_metadata
 
     def fail(*args, **kwargs):
         raise ValueError("private-server-error")
 
     monkeypatch.setattr(replay_metadata, "execution_receipt", fail)
-    http = rest.post("/api/cn/bazi/birth", json=BIRTH, params=CONTROLS)
-    protocol = native("bazi_birth", BIRTH, CONTROLS)
+    http = rest.post("/api/bazi/birth-chart", json=BIRTH, params=CONTROLS)
+    protocol = native("bazi_birth_chart", BIRTH, CONTROLS)
     assert http.status_code == 500 and protocol.is_error
     for payload in [http.json(), protocol.structured_content]:
         assert payload["error_code"] == "internal_error"

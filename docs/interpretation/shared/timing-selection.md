@@ -18,21 +18,20 @@
 
 ## 计算路径
 
-- 中式全景用 `timing_analysis`，窄层分别为 `dayun_analysis`、`liunian_analysis`、`liuyue_analysis`、`liuri_analysis`、`liushi_analysis`。专项已有 `timing_context` 的大运流年在同一目标范围与精度内复用；日期级零点不能替代交节当日指定小时，见下方边界补证。独立大运默认按目标真实瞬间选运；`analysis_age`只是用户明确给出的年龄参考，不必由助手推算或自套虚岁。
-- 读取流时 `life_dimensions` 时同时读取 `life_dimensions_assessment`，核对 `life_dimension_tanh_v2`、参与层与缺项。爱情为null表示性别口径不足，未知大运与尚未起运分别保留。索引只可在同方法、同参与层内比较，不作为现实成功率或心理测量。
+- 中式全景用 `bazi_timing`，窄层分别为 `bazi_luck_cycles`、`bazi_yearly_timing`、`bazi_monthly_timing`、`bazi_daily_timing`、`bazi_hourly_timing`。专项已有 `timing_context` 的大运流年在同一目标范围与精度内复用；日期级零点不能替代交节当日指定小时，见下方边界补证。独立大运默认按目标真实瞬间选运；`analysis_age`只是用户明确给出的年龄参考，不必由助手推算或自套虚岁。
 
 问“当前”时，五个八字时间入口的分析日期分量全部省略，必要时以带时区`as_of`冻结已确认瞬间；不要只补上当前年月而触发旧部分日期的日1／日15规则。读取`analysis_reference`核对完整当地／UTC瞬间、偏移、fold及补齐来源。显式日期的不存在／重复钟时不能猜第一遍；可保持出生时区、用`as_of`表达已确认UTC瞬间。时柱整点标签不能替代交气或交运的完整比较时刻，见[分析瞬间](../../bazi-timing.md)。
-- 紫微用 `ziwei_horoscope` 的实际 scopes 和动态四化；普通首轮取 `analysis_context`、`birth_context`、`ziwei_horoscope.interpretation_scope/nominal_age/calendar_rules/scopes`。`analysis_context` 须回显目标，出生 context 与目标分开。scopes 整体取回再按本次粒度解释；运限命宫所临本命宫、完整运限其他功能宫、本命宫不能互换，四化优先读实际 `mutagen_natal_links`。已有连接无需再排本命，细则见[紫微专题取证](ziwei-topic-evidence.md)。
-- 西占多层确有价值时用 `western_timing_analysis`；阶段窄问可直接 `firdaria`，年度可选 `profection`，按问题选 `solarreturn`、`lunarreturn`、`transit`，另有 `zr`、`decennials`、`solararc`、`pd`、`pdchart`、`givenyear` 及相关生命周期技法。保留法达实际主／分运、时间线、夜盘顺序和年长口径；不自行换版本找更好的答案。
-- 给定活动时刻用 `astro_election`。先有活动、地点和现实可用候选，不索取无关出生资料；不使用医疗／手术主题，不由个人流日替代活动择时。
+- 紫微用 `ziwei_timing` 的实际 scopes 和动态四化；普通首轮取 `analysis_context`、`birth_context`、`ziwei_horoscope.interpretation_scope/nominal_age/calendar_rules/scopes`。`analysis_context` 须回显目标，出生 context 与目标分开。scopes 整体取回再按本次粒度解释；运限命宫所临本命宫、完整运限其他功能宫、本命宫不能互换，四化优先读实际 `mutagen_natal_links`。已有连接无需再排本命，细则见[紫微专题取证](ziwei-topic-evidence.md)。
+- 西占多层确有价值时用 `western_timing`；阶段窄问可直接 `firdaria`，年度可选 `profection`，按问题选 `solar_return`、`lunar_return`、`transit_chart`，另有 `zodiacal_releasing`、`decennials`、`solar_arc`、`primary_directions`、`primary_directions_chart`、`chart_for_year` 及相关生命周期技法。保留法达实际主／分运、时间线、夜盘顺序和年长口径；不自行换版本找更好的答案。
+- 给定活动时刻用 `evaluate_election_time`。先有活动、地点和现实可用候选，不索取无关出生资料；不使用医疗／手术主题，不由个人流日替代活动择时。
 
 ## 印占阶段
 
-印占阶段是正常候选之一，详见[印占取证](vedic-evidence.md)。`astro_vimshottari` 支持 Moon-nakshatra 大运／次运、出生剩余运与目标所在规则周期。首次按 `stage` 卡保留目标、年长与真实起止、本命运星上下文；不把一个锚点当全年扫描。它与八字大运、法达各有机制，不合并成总分或事件成功率。
+印占阶段是正常候选之一，详见[印占取证](vedic-evidence.md)。`vimshottari_dasha` 支持 Moon-nakshatra 大运／次运、出生剩余运与目标所在规则周期。首次按 `stage` 卡保留目标、年长与真实起止、本命运星上下文；不把一个锚点当全年扫描。它与八字大运、法达各有机制，不合并成总分或事件成功率。
 
 ## 西占首次字段按任务选择
 
-`western_timing_analysis` 公开的 `evidence_views` 是权威任务字段卡，CLI describe 与 REST 工具详情同样发布。首次计算前选卡，把其中 `fields` 放入请求；`stage/annual/short_term` 是描述内卡名，不是请求参数。多任务时合并相关卡去重，完整导出规则优先。
+`western_timing` 公开的 `evidence_views` 是权威任务字段卡，CLI describe 与 REST 工具详情同样发布。首次计算前选卡，把其中 `fields` 放入请求；`stage/annual/short_term` 是描述内卡名，不是请求参数。多任务时合并相关卡去重，完整导出规则优先。
 
 | 本轮任务 | 任务卡 | 先取得再解释的证据 |
 | --- | --- | --- |
@@ -67,7 +66,7 @@
 
 ### 日期级锚点与交界补证
 
-`bazi_career` 等只有 `analysis_year/month/day` 的专项，在完整年月日输入下按日期零点计算；核对实际 `timing_context` 的分析日期及口径，不能把同日12时问题写成已算12时。用户只问全年时内部锚点仅用于定位，不能称全年逐段已审。交节当日、交运附近或用户明确要求小时且会影响所问结论时，保留已有专项结构，调用接受 `analysis_hour/minute` 的 `timing_analysis` 或所需窄层补证，沿用已确认目标时刻和 trace；这不属于重复相同时间层。出生时刻不能当目标钟时，不能用 `as_of` 绕过不支持小时的接口。
+`bazi_career` 等只有 `analysis_year/month/day` 的专项，在完整年月日输入下按日期零点计算；核对实际 `timing_context` 的分析日期及口径，不能把同日12时问题写成已算12时。用户只问全年时内部锚点仅用于定位，不能称全年逐段已审。交节当日、交运附近或用户明确要求小时且会影响所问结论时，保留已有专项结构，调用接受 `analysis_hour/minute` 的 `bazi_timing` 或所需窄层补证，沿用已确认目标时刻和 trace；这不属于重复相同时间层。出生时刻不能当目标钟时，不能用 `as_of` 绕过不支持小时的接口。
 
 八字节气年与紫微农历年可在同一公历日不同；先核对真实锚点、时区和各自 `calendar_rules`，不为追求一致强改其中一套。专项零点与聚合中午得不同年柱，须按时间解释，不能直接报为体系冲突。未知目标钟时只限制边界判断，不阻塞不受影响的岗位结构解释；用户已说不知道则不反复追问。
 

@@ -10,17 +10,17 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.validation.predictions import StudyPlan, evaluate_study
-from fatebridge.validation.qimen_study import (
+from tests.unit_test.fixtures.prediction_study import AS_OF, forecast, outcome, plan
+from tests.unit_test.fixtures.qimen_study import AS_OF as QIMEN_AS_OF  # noqa: F401
+from tests.unit_test.fixtures.qimen_study import ISSUED, frozen_study, outcomes, packet
+from validation.predictions import StudyPlan, evaluate_study
+from validation.qimen_study import (
     QimenCommitment,
     StudyInput,
     audit_study,
     commitment_fingerprint,
     seal_forecasts,
 )
-from tests.evaluation.test_prediction_validation import AS_OF, forecast, outcome, plan
-from tests.qimen.test_qimen_study import AS_OF as QIMEN_AS_OF  # noqa: F401
-from tests.qimen.test_qimen_study import ISSUED, frozen_study, outcomes, packet
 
 
 def records(ids, probabilities):
@@ -46,7 +46,9 @@ def casewise(probabilities):
     return StudyPlan.model_validate(raw)
 
 
-def test_scores_use_the_corresponding_reference_probability_for_each_same_case():
+def test_scores_use_the_corresponding_reference_probability_for_each_same_case() -> (
+    None
+):
     r = evaluate_study(
         casewise([0.7, 0.1]),
         [forecast(0, 0.9), forecast(1, 0.6)],
@@ -67,7 +69,9 @@ def test_scores_use_the_corresponding_reference_probability_for_each_same_case()
     assert all(x["baseline_record_sha256"] for x in r["rows"])
 
 
-def test_shuffling_reference_forecast_and_outcome_records_cannot_swap_case_alignment():
+def test_shuffling_reference_forecast_and_outcome_records_cannot_swap_case_alignment() -> (
+    None
+):
     p = casewise([0.1, 0.8, 0.3])
     forecasts = [forecast(0, 0.2), forecast(1, 0.7), forecast(2, 0.4)]
     labels = [outcome(0, False), outcome(1, True), outcome(2, True)]
@@ -86,7 +90,9 @@ def test_shuffling_reference_forecast_and_outcome_records_cannot_swap_case_align
     )
 
 
-def test_a_strong_reference_can_reverse_the_result_without_changing_any_prediction():
+def test_a_strong_reference_can_reverse_the_result_without_changing_any_prediction() -> (
+    None
+):
     n = 1000
     submitted = [forecast(i, 0.75 if i % 2 else 0.25) for i in range(n)]
     labels = [outcome(i, bool(i % 2)) for i in range(n)]
@@ -119,7 +125,7 @@ def test_a_strong_reference_can_reverse_the_result_without_changing_any_predicti
     assert strong["data_kind"] == "synthetic"
 
 
-def test_identical_casewise_references_preserve_constant_baseline_statistics():
+def test_identical_casewise_references_preserve_constant_baseline_statistics() -> None:
     submitted = [forecast(0, 0.9), forecast(1, 0.8)]
     labels = [outcome(0, True), outcome(1, False)]
     a = evaluate_study(plan(), submitted, labels, as_of=AS_OF)
@@ -130,7 +136,7 @@ def test_identical_casewise_references_preserve_constant_baseline_statistics():
     )
 
 
-def test_heterogeneous_references_keep_the_registered_hoeffding_bound():
+def test_heterogeneous_references_keep_the_registered_hoeffding_bound() -> None:
     p = casewise([0.7, 0.1])
     p.minimum_brier_skill = 0.4
     p.planned_evaluations = 3
@@ -150,7 +156,9 @@ def test_heterogeneous_references_keep_the_registered_hoeffding_bound():
     ] == pytest.approx(lower)
 
 
-def test_abstentions_and_missing_forecasts_stay_in_coverage_without_reference_fallback():
+def test_abstentions_and_missing_forecasts_stay_in_coverage_without_reference_fallback() -> (
+    None
+):
     p = casewise([0.2, 0.8, 0.9])
     r = evaluate_study(
         p,
@@ -169,7 +177,7 @@ def test_abstentions_and_missing_forecasts_stay_in_coverage_without_reference_fa
     assert not r["preregistered_performance_gate_met"]
 
 
-def test_perfect_reference_is_not_divided_by_zero_or_called_model_skill():
+def test_perfect_reference_is_not_divided_by_zero_or_called_model_skill() -> None:
     r = evaluate_study(
         casewise([1.0, 0.0]),
         [forecast(0, 1.0), forecast(1, 0.0)],
@@ -204,7 +212,9 @@ def test_perfect_reference_is_not_divided_by_zero_or_called_model_skill():
         "window_end_mismatch",
     ],
 )
-def test_incomplete_or_post_registration_reference_information_is_rejected(mutation):
+def test_incomplete_or_post_registration_reference_information_is_rejected(
+    mutation: str,
+) -> None:
     raw = casewise([0.7, 0.1]).model_dump(mode="json")
     if mutation == "missing":
         raw["baseline_forecasts"].pop()
@@ -244,7 +254,7 @@ def test_incomplete_or_post_registration_reference_information_is_rejected(mutat
         StudyPlan.model_validate(raw)
 
 
-def test_mutated_model_copy_is_validated_again_before_generic_scoring():
+def test_mutated_model_copy_is_validated_again_before_generic_scoring() -> None:
     p = casewise([0.7, 0.1])
     p.baseline_forecasts.pop()
     with pytest.raises(ValueError, match="覆盖注册队列"):
@@ -267,7 +277,9 @@ def qimen_casewise(packet):
     return seal_forecasts(StudyInput.model_validate(study), at=ISSUED)
 
 
-def test_actual_qimen_replay_scores_against_the_frozen_same_case_reference(packet):
+def test_actual_qimen_replay_scores_against_the_frozen_same_case_reference(
+    packet,
+) -> None:
     sealed = qimen_casewise(packet)
     r = audit_study(
         sealed,
@@ -292,8 +304,8 @@ def test_actual_qimen_replay_scores_against_the_frozen_same_case_reference(packe
     ],
 )
 def test_reference_value_and_source_edits_are_bound_to_the_same_qimen_receipts(
-    packet, field, value
-):
+    packet, field: str, value
+) -> None:
     sealed = qimen_casewise(packet)
     raw = sealed.model_dump(mode="json")
     raw["study"]["plan"]["baseline_forecasts"][0][field] = value
@@ -303,7 +315,7 @@ def test_reference_value_and_source_edits_are_bound_to_the_same_qimen_receipts(
 
 def test_whole_reference_reseal_cannot_replace_the_independently_anchored_packet(
     packet,
-):
+) -> None:
     sealed = qimen_casewise(packet)
     expected = commitment_fingerprint(sealed)
     study = sealed.study.model_copy(deep=True)
@@ -320,8 +332,8 @@ def test_whole_reference_reseal_cannot_replace_the_independently_anchored_packet
 
 @pytest.mark.parametrize("version", ["v1", "v2"])
 def test_old_qimen_packets_are_not_silently_upgraded_for_new_baseline_semantics(
-    packet, version
-):
+    packet, version: str
+) -> None:
     raw = packet.model_dump(mode="json")
     raw["format"] = "qimen_forecast_commitment_" + version
     with pytest.raises(ValueError, match="原固定环境"):
@@ -329,8 +341,8 @@ def test_old_qimen_packets_are_not_silently_upgraded_for_new_baseline_semantics(
 
 
 def test_cli_roundtrip_keeps_frozen_casewise_baseline_artifacts(
-    packet, tmp_path, capsys
-):
+    packet, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     sealed = qimen_casewise(packet)
     spec = importlib.util.spec_from_file_location(
         "qimen_casewise_cli",
@@ -383,8 +395,8 @@ def test_cli_roundtrip_keeps_frozen_casewise_baseline_artifacts(
 
 
 def test_synthetic_demo_writes_reference_artifacts_matching_frozen_hashes(
-    tmp_path, monkeypatch, capsys
-):
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
     spec = importlib.util.spec_from_file_location(
         "qimen_casewise_demo",
         Path(__file__).parents[2] / "scripts/qimen/demo_qimen_study.py",

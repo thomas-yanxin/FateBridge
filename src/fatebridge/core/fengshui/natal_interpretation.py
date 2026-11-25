@@ -9,27 +9,33 @@ import json
 from copy import deepcopy
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Dict, List, Optional, cast
+from typing import Any, Dict, cast
 
+from fatebridge.core.fengshui.host_guest import analyze as analyze_host_guest
+from fatebridge.core.fengshui.host_guest import validate as validate_host_guest
+from fatebridge.core.fengshui.lingzheng import analyze_fixed_lingzheng
+from fatebridge.core.fengshui.models import (
+    ExternalFormObservation,
+    Placement,
+    XuankongInterpretationRequest,
+)
+from fatebridge.core.fengshui.mutual_geometry import validate_author_geometries
+from fatebridge.core.fengshui.timeliness import (
+    classify_timeliness,
+    timeliness_provenance,
+)
 from fatebridge.core.hexagram_relations import ELEMENT_CONTROLS, ELEMENT_GENERATES
-
-from .host_guest import analyze as analyze_host_guest
-from .host_guest import validate as validate_host_guest
-from .lingzheng import analyze_fixed_lingzheng
-from .models import ExternalFormObservation, Placement, XuankongInterpretationRequest
-from .mutual_geometry import validate_author_geometries
-from .timeliness import classify_timeliness, timeliness_provenance
 
 
 @lru_cache(maxsize=1)
-def _bundle() -> Dict[str, Any]:
+def _bundle() -> dict[str, Any]:
     path = (
         Path(__file__).parents[2] / "data" / "fengshui" / "natal-interpretation-v1.json"
     )
     return cast(Dict[str, Any], json.loads(path.read_text(encoding="utf-8")))
 
 
-def interpretation_provenance() -> Dict[str, Any]:
+def interpretation_provenance() -> dict[str, Any]:
     """Return this interpretation version without altering chart provenance."""
     bundle = _bundle()
     result = deepcopy(bundle["ruleset"])
@@ -41,25 +47,33 @@ def interpretation_provenance() -> Dict[str, Any]:
     return cast(Dict[str, Any], result)
 
 
-def _rule(key: str) -> Dict[str, Any]:
+def _rule(key: str) -> dict[str, Any]:
     return cast(Dict[str, Any], deepcopy(_bundle()["rules"][key]))
 
 
 def _ordered_relationship(mountain: str, facing: str) -> str:
     if mountain == facing:
         return "same_element"
+    else:
+        pass
     if ELEMENT_GENERATES[mountain] == facing:
         return "mountain_generates_facing"
+    else:
+        pass
     if ELEMENT_GENERATES[facing] == mountain:
         return "facing_generates_mountain"
+    else:
+        pass
     if ELEMENT_CONTROLS[mountain] == facing:
         return "mountain_controls_facing"
+    else:
+        pass
     return "facing_controls_mountain"
 
 
 def _timeliness(
-    number: int, current: Optional[int], author_profile: bool = False
-) -> Dict[str, Any]:
+    number: int, current: int | None, author_profile: bool = False
+) -> dict[str, Any]:
     result = {
         **_rule("current_period"),
         "star_number": number,
@@ -80,6 +94,8 @@ def _timeliness(
             "base_rule_no_subdivision_author_profile_separate"
         )
         result["author_classification"] = classify_timeliness(number, current)
+    else:
+        pass
     return result
 
 
@@ -87,9 +103,9 @@ def _external_condition(
     direction: str,
     role: str,
     number: int,
-    current: Optional[int],
-    observation: Optional[ExternalFormObservation],
-) -> Dict[str, Any]:
+    current: int | None,
+    observation: ExternalFormObservation | None,
+) -> dict[str, Any]:
     field = "mountain_present" if role == "mountain" else "water_present"
     observed = getattr(observation, field) if observation is not None else None
     image = (
@@ -131,11 +147,11 @@ def _external_condition(
 
 def _placement_finding(
     placement: Placement,
-    palaces: Dict[str, Any],
+    palaces: dict[str, Any],
     candidate_id: str,
     ambiguous: bool,
-) -> Dict[str, Any]:
-    result: Dict[str, Any] = {
+) -> dict[str, Any]:
+    result: dict[str, Any] = {
         **_rule("placement_role"),
         "object_id": placement.object_id,
         "purpose": placement.purpose,
@@ -152,6 +168,8 @@ def _placement_finding(
             "status": "unsupported",
             "reason": "selected_rules_do_not_cover_desk_or_stove",
         }
+    else:
+        pass
     role = "mountain" if placement.purpose == "bed" else "facing"
     result["selected_star_role"] = role
     if placement.location_direction is None:
@@ -160,6 +178,8 @@ def _placement_finding(
             "status": "needs_location",
             "reason": "facing_does_not_establish_house_centred_location",
         }
+    else:
+        pass
     palace = palaces[placement.location_direction]
     timeliness = palace["timeliness"][role]
     external = palace["external_form_analysis"][
@@ -168,6 +188,8 @@ def _placement_finding(
     status = external["status"]
     if status in {"matches_presence_requirement", "required_form_absent"}:
         status = "candidate_only" if ambiguous else "conditional_role_assessment"
+    else:
+        pass
     return {
         **result,
         "status": status,
@@ -183,9 +205,9 @@ def _placement_finding(
 
 def analyze_natal_interpretation(
     config: XuankongInterpretationRequest,
-    natal: Dict[str, Any],
-    placements: List[Placement],
-) -> Dict[str, Any]:
+    natal: dict[str, Any],
+    placements: list[Placement],
+) -> dict[str, Any]:
     """Evaluate each possible chart independently using only explicit facts."""
     current = config.current_period_number
     author_profile = config.timeliness_ruleset_id is not None
@@ -195,23 +217,29 @@ def analyze_natal_interpretation(
     charts = natal.get("candidates", [])
     if not charts and natal.get("chart") is not None:
         charts = [natal["chart"]]
+    else:
+        pass
     ambiguous = len(charts) > 1
-    missing: List[str] = []
+    missing: list[str] = []
     if current is None:
         missing.append("interpretation.current_period_number")
+    else:
+        pass
     if not charts:
         missing.extend(
             natal.get("missing_inputs", []) or ["xuankong_natal.computed_chart"]
         )
     elif ambiguous:
         missing.append("xuankong_natal.unambiguous_bearing")
-    candidates: List[Dict[str, Any]] = []
-    trace: List[Dict[str, Any]] = []
-    unsupported: List[Dict[str, Any]] = []
+    else:
+        pass
+    candidates: list[dict[str, Any]] = []
+    trace: list[dict[str, Any]] = []
+    unsupported: list[dict[str, Any]] = []
     elements = _bundle()["star_elements"]
     for chart in charts:
         candidate_id = chart["candidate_id"]
-        palaces: Dict[str, Any] = {}
+        palaces: dict[str, Any] = {}
         for direction, palace in chart["palaces"].items():
             mountain = palace["mountain_star_number"]
             facing = palace["facing_star_number"]
@@ -245,6 +273,8 @@ def analyze_natal_interpretation(
                     missing.append(f"{path}.{condition['criterion']}")
                 elif condition["status"] == "candidate_only":
                     missing.append(f"{path}.user_or_measurement_confirmation")
+                else:
+                    pass
             palaces[direction] = {
                 "direction": direction,
                 "period_star_number": palace["period_star_number"],
@@ -271,6 +301,8 @@ def analyze_natal_interpretation(
                     }
                     for role in ("mountain", "facing")
                 )
+            else:
+                pass
             trace.append(
                 {
                     **_rule("ordered_pair"),
@@ -302,6 +334,8 @@ def analyze_natal_interpretation(
                         "reason": finding["reason"],
                     }
                 )
+            else:
+                pass
             trace.append(
                 {
                     **_rule("placement_role"),
@@ -328,6 +362,8 @@ def analyze_natal_interpretation(
     if fixed is not None:
         missing.extend(fixed["missing_inputs"])
         trace.extend(fixed["rule_trace"])
+    else:
+        pass
     host_guest = (
         analyze_host_guest(natal) if config.host_guest_ruleset_id is not None else None
     )
@@ -340,6 +376,8 @@ def analyze_natal_interpretation(
                 "scope": host_guest["scope"],
             }
         )
+    else:
+        pass
     missing = list(dict.fromkeys(missing))
     unique_unsupported = {
         (item["object_id"], item["purpose"]): item for item in unsupported

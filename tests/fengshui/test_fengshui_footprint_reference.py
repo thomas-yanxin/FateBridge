@@ -17,7 +17,7 @@ RAW = gzip.decompress((FOLDER / "reference.json.gz").read_bytes())
 REFERENCE = json.loads(RAW)
 
 
-def test_convex_footprint_support_matches_all_fixed_exact_CGAL_arguments():
+def test_convex_footprint_support_matches_all_fixed_exact_CGAL_arguments() -> None:
     assert (
         hashlib.sha256(RAW).hexdigest()
         == (FOLDER / "reference.json.sha256").read_text().strip()
@@ -36,7 +36,7 @@ def test_convex_footprint_support_matches_all_fixed_exact_CGAL_arguments():
         ), row["id"]
 
 
-def test_point_error_support_retains_all_fixed_closed_tangencies():
+def test_point_error_support_retains_all_fixed_closed_tangencies() -> None:
     template = json.loads(
         Path("docs/examples/fengshui-workstation-measured.json").read_text()
     )
@@ -65,7 +65,7 @@ def test_point_error_support_retains_all_fixed_closed_tangencies():
         ), row["id"]
 
 
-def test_whole_north_footprint_excludes_southeast_without_inventing_a_score():
+def test_whole_north_footprint_excludes_southeast_without_inventing_a_score() -> None:
     request = json.loads(
         Path("docs/examples/fengshui-workstation-measured.json").read_text()
     )

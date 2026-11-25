@@ -1,13 +1,23 @@
 """Seal/replay local Qimen study packets; no registration or efficacy certificate."""
 
+import sys as _sys
+from pathlib import Path as _Path
+
+_VAL_REPO_ROOT = _Path(__file__).resolve().parents[2]
+if str(_VAL_REPO_ROOT) not in _sys.path:
+    _sys.path.insert(0, str(_VAL_REPO_ROOT))
+else:
+    pass
+
+
 import argparse
 import json
 from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-from fatebridge.validation.predictions import Outcome, digest
-from fatebridge.validation.qimen_study import (
+from validation.predictions import Outcome, digest
+from validation.qimen_study import (
     FrozenQimenPolicy,
     QimenCommitment,
     StudyInput,
@@ -92,3 +102,5 @@ def main(argv: list[str] | None = None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

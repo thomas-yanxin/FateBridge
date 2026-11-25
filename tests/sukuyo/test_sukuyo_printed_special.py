@@ -5,8 +5,8 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.sukuyo import calendar_mansion, day_evidence
-from fatebridge.core.sukuyo_special_days import special_day_evidence
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence
+from fatebridge.core.sukuyo.sukuyo_special_days import special_day_evidence
 from scripts.sukuyo.check_sukuyo_printed_special import verify_printed_special
 
 
@@ -20,7 +20,7 @@ def printed(result):
     return result["direct_printed_comparisons"][0]
 
 
-def test_all_selected_print_cells_and_unaccepted_glyph_match_source_fixture():
+def test_all_selected_print_cells_and_unaccepted_glyph_match_source_fixture() -> None:
     report = verify_printed_special()
     assert report["errors"] == []
     assert report["selected_slots"] == 21
@@ -35,7 +35,9 @@ def test_all_selected_print_cells_and_unaccepted_glyph_match_source_fixture():
 
 
 @pytest.mark.parametrize("name,weekday", [("尾", 6), ("女", 1)])
-def test_print_variants_stay_separate_from_selected_taisho(name, weekday):
+def test_print_variants_stay_separate_from_selected_taisho(
+    name: str, weekday: int
+) -> None:
     result = evidence(name, weekday)
     assert result["primary"]["matched_labels"] == []
     direct = printed(result)
@@ -46,14 +48,14 @@ def test_print_variants_stay_separate_from_selected_taisho(name, weekday):
     assert len(result["comparisons"]) == 3
 
 
-def test_saturday_kang_is_not_silently_replaced_with_printed_tail():
+def test_saturday_kang_is_not_silently_replaced_with_printed_tail() -> None:
     result = evidence("亢", 6)
     assert result["primary"]["matched_labels"] == ["金刚峰"]
     assert printed(result)["matched_labels"] == []
     assert printed(result)["labels_complete_for_selected_day"]
 
 
-def test_printed_stomach_does_not_repair_lower_taisho_mao():
+def test_printed_stomach_does_not_repair_lower_taisho_mao() -> None:
     result = evidence("胃", 0)
     assert printed(result)["matched_labels"] == ["罗刹"]
     lower = next(r for r in result["comparisons"] if r["witness"] == "lower_taisho")
@@ -63,7 +65,9 @@ def test_printed_stomach_does_not_repair_lower_taisho_mao():
 
 
 @pytest.mark.parametrize("name", ["氐", "亢", "鬼"])
-def test_unaccepted_thursday_glyph_is_not_normalized_or_declared_absent(name):
+def test_unaccepted_thursday_glyph_is_not_normalized_or_declared_absent(
+    name: str,
+) -> None:
     direct = printed(evidence(name, 4))
     assert not direct["labels_complete_for_selected_day"]
     assert direct["disagrees_with_primary"] is None
@@ -74,14 +78,14 @@ def test_unaccepted_thursday_glyph_is_not_normalized_or_declared_absent(name):
     assert not row["candidate_readings_accepted_as_mansion"]
 
 
-def test_unknown_mansion_keeps_printed_labels_unapplied():
+def test_unknown_mansion_keeps_printed_labels_unapplied() -> None:
     direct = printed(evidence(None, 6))
     assert direct["matched_labels"] == []
     assert not direct["labels_complete_for_selected_day"]
     assert not direct["applied_to_primary"]
 
 
-def test_printed_reference_is_detached_and_has_its_own_fingerprint():
+def test_printed_reference_is_detached_and_has_its_own_fingerprint() -> None:
     first = evidence("尾", 6)
     direct = printed(first)
     assert (
@@ -95,7 +99,7 @@ def test_printed_reference_is_detached_and_has_its_own_fingerprint():
     assert again["source_reference"]["images"][0]["sha256"] != "changed"
 
 
-def test_checker_rejects_changed_captured_image(tmp_path):
+def test_checker_rejects_changed_captured_image(tmp_path: Path) -> None:
     fixture = json.loads(
         (
             Path(__file__).parents[1] / "data/sukuyo-wakita-special-primary.json"
@@ -107,7 +111,7 @@ def test_checker_rejects_changed_captured_image(tmp_path):
         verify_printed_special(tmp_path)
 
 
-def test_native_print_description_retains_source_and_partial_transcription():
+def test_native_print_description_retains_source_and_partial_transcription() -> None:
     day = day_evidence(calendar_mansion("2025-03-06", "12:00:00"))
     assert day["weekday"]["luminary"] == "木"
     text = day["reading_text"]
@@ -127,17 +131,23 @@ def test_native_print_description_retains_source_and_partial_transcription():
         ("2025-07-03", "正文底，校记重建氐"),
     ],
 )
-def test_native_explicitly_compares_all_four_old_special_day_witnesses(date, expected):
+def test_native_explicitly_compares_all_four_old_special_day_witnesses(
+    date: str, expected: str
+) -> None:
     text = day_evidence(calendar_mansion(date, "12:00:00"))["reading_text"]
     for witness in ["上卷大正", "下卷大正", "上卷明本校记重建", "下卷明本校记重建"]:
         assert f"{witness}本曜表项：" in text
     assert expected in text
     if date in {"2025-09-27", "2025-02-15"}:
         assert "金刚峰位尾" in text
+    else:
+        pass
     assert "不代入主表或确定事项" in text
 
 
-def test_native_unresolved_mansion_preserves_old_witness_agreement_without_labels():
+def test_native_unresolved_mansion_preserves_old_witness_agreement_without_labels() -> (
+    None
+):
     text = day_evidence(calendar_mansion("2025-07-25", "12:00:00"))["reading_text"]
     assert text.count("本曜表项：甘露位房、金刚峰位張、罗刹位奎") == 4
     assert text.count("本次日宿未定，候选不代入确定标签；标签集合未定") == 4

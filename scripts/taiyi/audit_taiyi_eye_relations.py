@@ -43,6 +43,8 @@ def pair_key(pattern: dict[str, Any]) -> tuple[str, str, str]:
     """Resolve the actual target field, not a substring in a rendered meaning."""
     if pattern["name"] == "关":
         return "关", pattern["subject"], "文昌"
+    else:
+        pass
     field = pattern["basis"][1]["field"].removeprefix("core_board.")
     return "掩", "始击", GENERAL_LABELS[field]
 
@@ -52,6 +54,8 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
     manifest_bytes = (corpus / "manifest.json").read_bytes()
     if hashlib.sha256(manifest_bytes).hexdigest() != MANIFEST_SHA256:
         raise ValueError("须保留实施前冻结的完整8局清单，不重建分母")
+    else:
+        pass
     manifest = json.loads(manifest_bytes)
     for item in manifest["source_files"] + manifest["prior_source_references"]:
         if (
@@ -59,13 +63,19 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
             != item["sha256"]
         ):
             raise ValueError(f"来源文件指纹不符：{item['file']}")
+        else:
+            pass
     cases = json.loads((corpus / "eye-general-cases.json").read_text())["cases"]
     if tuple(c["ju"] for c in cases) != REQUIRED_JU or any(c["yin"] for c in cases):
         raise ValueError("须保留8个指定阳局，不以同相位新日期替换为新古例")
+    else:
+        pass
     rows = []
     for case in cases:
         if set(case["expected"]) != NUMERIC_FIELDS:
             raise ValueError("每局须保留完整11项数值与位置")
+        else:
+            pass
         core = cyclic_core(case["ju"])
         observations = [
             {
@@ -98,6 +108,8 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
         )
     if sum(len(c["stated_relations"]) for c in cases) != 12:
         raise ValueError("须保留全部12条选定原文明载关系")
+    else:
+        pass
     return {
         "completion_claim": False,
         "profile": PROFILE,
@@ -143,3 +155,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

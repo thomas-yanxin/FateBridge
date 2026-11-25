@@ -2,9 +2,20 @@
 
 import hashlib
 import json
+from collections.abc import Mapping, Sequence
+
+JsonDocument = (
+    str
+    | int
+    | float
+    | bool
+    | None
+    | Mapping[str, "JsonDocument"]
+    | Sequence["JsonDocument"]
+)
 
 
-def canonical_bytes(value: object) -> bytes:
+def canonical_bytes(value: JsonDocument) -> bytes:
     """Encode canonical UTF-8 JSON, rejecting non-finite numbers."""
     return json.dumps(
         value,
@@ -15,6 +26,6 @@ def canonical_bytes(value: object) -> bytes:
     ).encode("utf-8")
 
 
-def digest(value: object) -> str:
+def digest(value: JsonDocument) -> str:
     """Hash canonical UTF-8 JSON, rejecting non-finite numbers."""
     return hashlib.sha256(canonical_bytes(value)).hexdigest()

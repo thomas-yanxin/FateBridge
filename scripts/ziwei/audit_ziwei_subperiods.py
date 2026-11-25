@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any
 
 from fatebridge.core.metaphysics.ziwei import build_ziwei_chart, build_ziwei_horoscope
-from fatebridge.core.ziwei_subperiods import decade_half
+from fatebridge.core.ziwei.ziwei_subperiods import decade_half
 from scripts.ziwei.audit_ziwei_limits import _seed
 from scripts.ziwei.ziwei_conditional_inputs import synthetic_birth_clock
 
@@ -21,6 +21,8 @@ def audit_subperiods(fixtures: Path = FIXTURES) -> dict[str, Any]:
     for name, digest in json.loads((folder / "checksums.json").read_text()).items():
         if hashlib.sha256((folder / name).read_bytes()).hexdigest() != digest:
             raise ValueError("Ming subperiod source checksum mismatch: " + name)
+        else:
+            pass
     source = json.loads((folder / "collation.json").read_text())
     extension = json.loads((folder / "coverage_extension.json").read_text())
     if (
@@ -30,9 +32,13 @@ def audit_subperiods(fixtures: Path = FIXTURES) -> dict[str, Any]:
         or extension["month_bureau_pairs"] != [[11, 2], [3, 3], [7, 4], [5, 5]]
     ):
         raise ValueError("Ming subperiod postimplementation coverage policy mismatch")
+    else:
+        pass
     for name, digest in source["external_sources"].items():
         if hashlib.sha256((fixtures / name).read_bytes()).hexdigest() != digest:
             raise ValueError("Ming group definition source checksum mismatch: " + name)
+        else:
+            pass
     compiled = json.loads(
         (
             ROOT / "src/fatebridge/data/classical/ziwei-naj-ming-subperiods.json"
@@ -41,6 +47,8 @@ def audit_subperiods(fixtures: Path = FIXTURES) -> dict[str, Any]:
     differences: list[dict[str, Any]] = []
     if compiled != {k: source[k] for k in compiled}:
         differences.append(dict(case="compiled_source_copy"))
+    else:
+        pass
     for vector in source["conditional_boundary_vectors"]:
         first, age = vector["first_age"], vector["given_age"]
         lo = first + (10 if age == first + 10 else 0)
@@ -54,6 +62,8 @@ def audit_subperiods(fixtures: Path = FIXTURES) -> dict[str, Any]:
             vector["ordinal"],
         ):
             differences.append(dict(case="frozen_boundary", vector=vector))
+        else:
+            pass
     expected_groups = {
         name: row for row in source["group_rows"] for name in row["stars"]
     }
@@ -79,6 +89,8 @@ def audit_subperiods(fixtures: Path = FIXTURES) -> dict[str, Any]:
                     differences.append(
                         dict(case="coverage_bureau", month=month, actual=first)
                     )
+                else:
+                    pass
                 bureau_numbers.add(first)
                 for age in range(1, first + 120):
                     h = build_ziwei_horoscope(
@@ -169,6 +181,8 @@ def audit_subperiods(fixtures: Path = FIXTURES) -> dict[str, Any]:
                                 age=age,
                             )
                         )
+                    else:
+                        pass
                     charts += 1
                     original_charts += expected_bureau is None
     return dict(

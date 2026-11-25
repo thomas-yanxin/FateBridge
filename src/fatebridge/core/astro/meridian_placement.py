@@ -10,7 +10,7 @@ from __future__ import annotations
 import math
 import sys
 from fractions import Fraction
-from typing import Any, Dict, Mapping, Sequence
+from typing import Any, Mapping, Sequence
 
 RULESET = "witte1924_meridian_ra_placement_v1"
 POLE_NORM_THRESHOLD = 64 * sys.float_info.epsilon
@@ -36,13 +36,15 @@ def _finite(value: float) -> None:
         or not math.isfinite(value)
     ):
         raise ValueError("Meridian coordinates require finite numbers")
+    else:
+        pass
 
 
 def _turn(value: Fraction) -> float:
     return min(float(value % 360), math.nextafter(360.0, 0.0))
 
 
-def house_from_ra(right_ascension: float, armc: float) -> Dict[str, Any]:
+def house_from_ra(right_ascension: float, armc: float) -> dict[str, Any]:
     """Half-open30deg sectors, using the actual input floats without cusp bias."""
     _finite(right_ascension)
     _finite(armc)
@@ -61,11 +63,13 @@ def house_from_ra(right_ascension: float, armc: float) -> Dict[str, Any]:
 
 def project_direction(
     longitude: float, latitude: float, obliquity: float
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     for value in (longitude, latitude, obliquity):
         _finite(value)
     if not -90 <= latitude <= 90 or not 0 <= obliquity < 90:
         raise ValueError("Invalid ecliptic latitude or house obliquity")
+    else:
+        pass
     lam, beta, eps = map(math.radians, (longitude % 360, latitude, obliquity))
     x = math.cos(beta) * math.cos(lam)
     y = math.cos(beta) * math.sin(lam) * math.cos(eps) - math.sin(beta) * math.sin(eps)
@@ -79,6 +83,8 @@ def project_direction(
             "declination": declination,
             "equatorial_horizontal_norm": horizontal,
         }
+    else:
+        pass
     # Keep the signed raw angle until sector classification, so a tiny
     # negative angle is not rounded by float addition to exactly360deg.
     if obliquity == 0.0:
@@ -100,7 +106,7 @@ def project_direction(
 
 def factor_position(
     *, longitude: float, latitude: float, obliquity: float, armc: float
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     _finite(armc)
     direction = project_direction(longitude, latitude, obliquity)
     control = project_direction(longitude, 0.0, obliquity)
@@ -122,11 +128,13 @@ def factor_position(
     if raw_ra is not None:
         result.update(house_from_ra(raw_ra, armc))
         result["latitude_changes_house"] = result["house"] != zero["house"]
+    else:
+        pass
     return result
 
 
 def attach_factor_placement(
-    meridian: Dict[str, Any],
+    meridian: dict[str, Any],
     factors: Sequence[Mapping[str, Any]],
     *,
     factor_ayanamsha: float,
@@ -135,6 +143,8 @@ def attach_factor_placement(
     profile = meridian["profile"]
     if not factors or len({factor["id"] for factor in factors}) != len(factors):
         raise RuntimeError("Meridian placement requires a nonempty distinct factor set")
+    else:
+        pass
     _finite(factor_ayanamsha)
     rows = []
     for factor in factors:
@@ -185,6 +195,8 @@ def placement_sample_summaries(
     nominal = meridian.get("factor_placement")
     if not nominal or sensitivity["status"] != "sampled":
         return []
+    else:
+        pass
     expected = {r["id"] for r in nominal["factors"]}
     cohorts = []
     for sample in sensitivity["samples"]:
@@ -195,6 +207,8 @@ def placement_sample_summaries(
             raise RuntimeError(
                 "Every meridian placement sample requires the same factor set"
             )
+        else:
+            pass
         cohorts.append(rows)
     summaries = []
     for factor in nominal["factors"]:

@@ -2,20 +2,33 @@
 
 import gzip
 import hashlib
+import json
 import math
+from dataclasses import replace
 from datetime import date, datetime, timezone
+from fractions import Fraction
 from pathlib import Path
 from typing import Literal
 
 import pytest
 from pydantic import BaseModel
 
-from fatebridge.core.astrology_tables import SIGNS
+from fatebridge.core.astro.astrology_tables import SIGNS
+from fatebridge.core.astro.tt_epoch import TTInstant
+from fatebridge.core.astro.ut1_epoch import UT1Instant
 from fatebridge.core.predictive import western_timing
-from fatebridge.core.predictive._common import build_predictive_birth_info
+from fatebridge.core.predictive._common import (
+    build_lot_payloads,
+    build_predictive_birth_info,
+    extract_reference_points,
+)
 from fatebridge.core.predictive.native_chart import NativePoint, NativeSubject
 from fatebridge.core.predictive.primary_directions import (
+    build_primary_direction_bounds_overlay,
     build_primary_directions_payload,
+    build_shifted_lot_payloads,
+    build_shifted_reference_points,
+    build_sign_change_payloads,
 )
 from fatebridge.services.western_timing import calculate_western_timing_module_analysis
 
@@ -92,7 +105,13 @@ assert (
     hashlib.sha256(clock_bytes).hexdigest()
     == (CLOCK_DIRECTORY / "reference.json.sha256").read_text().strip()
 )
-CLOCK_REFERENCE = PrimaryClockReference.model_validate_json(clock_bytes)
+# Adapt the frozen scalar epochs to the current NativeSubject fields.
+clock_values = json.loads(clock_bytes)
+for clock_case in clock_values["cases"]:
+    clock_subject = clock_case["natal_subject"]
+    clock_subject["ut1"] = UT1Instant.from_float(clock_subject.pop("julian_day"))
+    clock_subject["tt"] = TTInstant.from_float(clock_subject.pop("julian_day_tt"))
+CLOCK_REFERENCE = PrimaryClockReference.model_validate(clock_values)
 
 
 @pytest.fixture(scope="module")
@@ -118,8 +137,8 @@ def frozen_primary_subject() -> NativeSubject:
         tz_str="UTC",
         iso_formatted_utc_datetime=REFERENCE.birth_UTC.isoformat(),
         iso_formatted_local_datetime=REFERENCE.birth_UTC.isoformat(),
-        julian_day=REFERENCE.adopted_UT1,
-        julian_day_tt=math.fsum(REFERENCE.TT_parts),
+        ut1=UT1Instant.from_float(REFERENCE.adopted_UT1),
+        tt=TTInstant.from_float(math.fsum(REFERENCE.TT_parts)),
         houses_system_identifier="P",
         zodiac_type="Tropic",
         sidereal_mode=None,
@@ -131,6 +150,105 @@ def frozen_primary_subject() -> NativeSubject:
             "julian_day_ut1": REFERENCE.adopted_UT1,
         },
     )
+
+
+def test_linear_direction_classifies_working_angles_before_display(
+    frozen_primary_subject: NativeSubject,
+) -> None:
+    epsilon = 2.0**-53
+    longitudes = {"ascendant": 0.0, "sun": epsilon, "moon": 15.0, "mercury": 38.0}
+    subject = replace(
+        frozen_primary_subject,
+        is_diurnal=True,
+        points={
+            **frozen_primary_subject.points,
+            **{
+                name: replace(
+                    frozen_primary_subject.points[name],
+                    abs_pos=longitude,
+                    position=longitude % 30,
+                    sign=SIGNS[int(longitude // 30)],
+                    sign_num=int(longitude // 30),
+                )
+                for name, longitude in longitudes.items()
+            },
+        },
+    )
+
+    # Fortune = 0 + 15 - epsilon; adding 15 stays below the sign boundary.
+    directed_lots = build_shifted_lot_payloads(subject, arc_degrees=15.0)
+    fortune = directed_lots["lot_of_fortune"]
+    assert (fortune["longitude"], fortune["sign"], fortune["house"]) == (
+        math.nextafter(30.0, 0.0),
+        "Aries",
+        1,
+    )
+    changes = build_sign_change_payloads(
+        extract_reference_points(subject),
+        build_shifted_reference_points(subject, arc_degrees=15.0),
+        build_lot_payloads(subject),
+        directed_lots,
+    )
+    assert all(change["point"] != "Fortune" for change in changes)
+
+    # Mercury's exact directed degree is just below the second Taurus bound.
+    points = build_shifted_reference_points(subject, arc_degrees=-epsilon)
+    bounds = build_primary_direction_bounds_overlay(points, {}, enabled=True)
+    assert points["Mercury"]["sign"] == "Taurus"
+    assert points["Mercury"]["degree"] == math.nextafter(8.0, 0.0)
+    assert bounds["points"]["Mercury"]["bound_lord"] == "Venus"
+
+
+@pytest.mark.parametrize("direction", [0, 1], ids=["direct", "converse"])
+@pytest.mark.parametrize("offset", [0.0, 2.0**-53], ids=["at-limit", "above-limit"])
+def test_primary_direction_window_compares_before_rounding(
+    direction: int, offset: float, frozen_primary_subject: NativeSubject
+) -> None:
+    # The wrapped arc is 100 + offset in either direction. Both offsets
+    # deliver the same float age, but only exact equality owns the upper limit.
+    ascendant, sun = (260.0, offset) if direction == 0 else (offset, 260.0)
+    subject = replace(
+        frozen_primary_subject,
+        points={
+            **frozen_primary_subject.points,
+            **{
+                name: replace(
+                    frozen_primary_subject.points[name],
+                    abs_pos=longitude,
+                    position=longitude % 30,
+                    sign=SIGNS[int(longitude // 30)],
+                    sign_num=int(longitude // 30),
+                )
+                for name, longitude in {"ascendant": ascendant, "sun": sun}.items()
+            },
+        },
+    )
+    natal = REFERENCE.birth_UTC
+    birth = build_predictive_birth_info(
+        birth_year=natal.year,
+        birth_month=natal.month,
+        birth_day=natal.day,
+        birth_hour=natal.hour,
+        birth_minute=natal.minute,
+        birth_timezone="UTC",
+        birth_longitude=REFERENCE.birth_longitude,
+        birth_latitude=REFERENCE.birth_latitude,
+    )
+    result = build_primary_directions_payload(
+        birth,
+        subject,
+        analysis_datetime=natal,
+        pd_method="astroapp_alchabitius",
+        pd_time_key="Ptolemy",
+        pd_type=direction,
+        pd_aspects=[0],
+    )
+    ages = [
+        hit["event_age_years"]
+        for hit in result["timeline"]
+        if hit["promissor"] == "Ascendant" and hit["significator"] == "Sun"
+    ]
+    assert ages == ([100.0] if offset == 0.0 else [])
 
 
 @pytest.mark.parametrize("case", REFERENCE.rows, ids=lambda case: case.id)
@@ -209,6 +327,50 @@ def test_primary_services_keep_external_model_precision(
             assert abs(math.remainder(point["longitude"] - expected, 360)) <= 1e-10
 
 
+def test_primary_services_accept_extended_utc_birth_clock(
+    frozen_primary_subject: NativeSubject, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(
+        western_timing,
+        "build_natal_subject",
+        lambda birth_info, *, house_system, zodiac_type: frozen_primary_subject,
+    )
+    kwargs = dict(
+        birth_year=1,
+        birth_month=1,
+        birth_day=1,
+        birth_hour=13,
+        birth_minute=59,
+        birth_timezone="Etc/GMT-14",
+        birth_longitude=0.0,
+        birth_latitude=0.0,
+        analysis_year=40,
+        analysis_month=6,
+        analysis_day=1,
+        analysis_hour=12,
+        analysis_minute=0,
+        pd_aspects=[0],
+    )
+    result = calculate_western_timing_module_analysis(
+        technique="primarydirect", **kwargs
+    )
+    chart_result = calculate_western_timing_module_analysis(
+        technique="primarydirchart", **kwargs
+    )
+    directions = result["directions"]["primary_directions"]
+    chart = chart_result["directions"]["primary_direction_chart"]
+    hit = next(
+        event
+        for event in directions["timeline"]
+        if event["promissor"] == "Ascendant" and event["significator"] == "Saturn"
+    )
+    # Independent integer Gregorian/TZif reference for the frozen sky operands.
+    assert directions["current_age_years"] == 39.414683015013615
+    assert hit["event_datetime"] == "0007-12-11T20:22:41+14:00"
+    assert chart["current_arc_degrees"] == directions["current_arc_degrees"]
+    assert chart["hits"] == directions["current_window"][:8]
+
+
 @pytest.mark.parametrize("case", CLOCK_REFERENCE.cases, ids=lambda case: case.id)
 def test_primary_event_clocks_match_independent_temporal_instants(
     case: PrimaryClockCase,
@@ -237,6 +399,20 @@ def test_primary_event_clocks_match_independent_temporal_instants(
         (row.promissor, row.significator, row.aspect_degree, row.variant): row
         for row in case.events
     }
+    # The frozen ages describe the former rounded-arc calculation. Check
+    # current ages from the frozen sky operands and keep Temporal's clock gate.
+    degrees = {
+        name: Fraction(point.abs_pos)
+        for name, point in case.natal_subject.points.items()
+    }
+    moon_from_sun = degrees["moon"] - degrees["sun"]
+    fortune_offset = moon_from_sun if case.natal_subject.is_diurnal else -moon_from_sun
+    degrees["fortune"] = degrees["ascendant"] + fortune_offset
+    degrees["spirit"] = degrees["ascendant"] - fortune_offset
+    rate = Fraction(
+        {"Ptolemy": 1.0, "Naibod": 0.98564733, "Cardan": 0.98666667}[case.time_key]
+    )
+    sense = 1 if case.direction == 0 else -1
     assert len(expected) == len(case.events) == len(payload["timeline"])
     for group in (
         "timeline",
@@ -252,7 +428,12 @@ def test_primary_event_clocks_match_independent_temporal_instants(
                 hit["aspect_degree"],
                 hit["aspect_variant_degrees"],
             ]
-            assert hit["event_age_years"] == row.event_age_years
+            offset_angle = (
+                degrees[row.significator.lower()]
+                + row.variant
+                - degrees[row.promissor.lower()]
+            )
+            assert hit["event_age_years"] == float((sense * offset_angle % 360) / rate)
             actual = datetime.fromisoformat(hit["event_datetime"])
             offset = actual.utcoffset()
             assert offset is not None

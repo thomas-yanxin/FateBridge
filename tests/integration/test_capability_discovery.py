@@ -7,21 +7,15 @@ self-describing MCP transport flags.
 
 from __future__ import annotations
 
-import inspect
-from typing import get_args
+import asyncio
 
 from fastapi.testclient import TestClient
+from fastmcp import Client
 
 from fatebridge.api import app
 from fatebridge.application.description import describe_spec
+from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG, mcp_specs, rest_specs
-from fatebridge.transports.mcp import _make_mcp_fn
-
-# Intentional single-surface tools — test-locked 口径 aliases: a nested-model REST
-# variant + its flat MCP twin, plus the legacy aggregate alias. If this set
-# changes, the parity tests below fail on purpose so the change is reviewed.
-_REST_ONLY = {"astro_relative"}
-_MCP_ONLY = {"analyze_destiny", "astro_relative_chart"}
 
 
 def _tools_payload() -> dict:
@@ -47,34 +41,30 @@ def test_tools_endpoint_records_are_well_formed() -> None:
             assert {"name", "type", "required", "description"} <= param.keys()
 
 
-def test_describe_spec_does_not_claim_phantom_mcp_for_rest_only_tools() -> None:
-    by_key = {s.key: s for s in CATALOG}
-    for key in _REST_ONLY:
-        assert describe_spec(by_key[key])["surfaces"]["mcp_name"] is None
-
-
-def test_every_tool_is_dual_surface_or_documented_single_surface() -> None:
-    rest_only = {s.key for s in CATALOG if s.rest_path and not s.mcp_name}
-    mcp_only = {s.key for s in CATALOG if s.mcp_name and not s.rest_path}
-    assert (
-        rest_only == _REST_ONLY
-    ), "REST-only tools changed; if intentional, update the documented allow-list"
-    assert (
-        mcp_only == _MCP_ONLY
-    ), "MCP-only tools changed; if intentional, update the documented allow-list"
+def test_every_tool_declares_the_same_public_name_across_surfaces() -> None:
+    for spec in CATALOG:
+        surfaces = describe_spec(spec)["surfaces"]
+        assert surfaces["rest_path"]
+        assert surfaces["mcp_name"] == spec.tool_name
+        assert surfaces["cli"]
 
 
 def test_mcp_transport_flags_are_self_describing() -> None:
-    spec = next(s for s in CATALOG if s.mcp_name)
-    fn = _make_mcp_fn(
-        spec,
-        render_response=lambda *a, **k: "",
-        render_error=lambda *a, **k: "",
-    )
-    sig = inspect.signature(fn)
-    for flag in ("compact", "include_snapshot_text", "fields"):
-        annotation = sig.parameters[flag].annotation
-        descriptions = [
-            getattr(meta, "description", None) for meta in get_args(annotation)[1:]
-        ]
-        assert any(descriptions), f"MCP flag {flag!r} has no description"
+    async def fetch():
+        async with Client(create_mcp_app()) as client:
+            tool = next(
+                t for t in await client.list_tools() if t.name == "run_calculation"
+            )
+            return tool.input_schema["properties"]
+
+    properties = asyncio.run(fetch())
+    assert "compact" not in properties
+    assert properties["detail"]["default"] == "compact"
+    assert properties["detail"]["enum"] == ["compact", "standard", "audit"]
+    for flag in (
+        "include_snapshot_text",
+        "fields",
+        "strict_fields",
+        "response_char_limit",
+    ):
+        assert properties[flag]["description"]

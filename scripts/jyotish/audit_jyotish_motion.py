@@ -30,6 +30,8 @@ def audit_tables(primary: dict) -> dict:
                     if a is None or b is None:
                         skipped.append(label)
                         continue
+                    else:
+                        pass
                     comparisons += 1
                     multiplier = higher // lower
                     difference = (Fraction(b) - multiplier * Fraction(a)) % 360
@@ -47,6 +49,8 @@ def audit_tables(primary: dict) -> dict:
                                 "meaning": "Inconsistent pair, not a choice of the correct cell",
                             }
                         )
+                    else:
+                        pass
     return {
         "evaluated_relations": comparisons,
         "skipped_unclear_relations": skipped,
@@ -63,6 +67,8 @@ def primary_angular_reference(case: dict) -> float:
     vector = cmath.exp(1j * a) + cmath.exp(1j * b)
     if abs(vector) < 1e-12:
         raise ValueError("Opposed mean/true midpoint is ambiguous")
+    else:
+        pass
     cosine = math.cos(apogee - cmath.phase(vector))
     return math.degrees(math.acos(max(-1.0, min(1.0, cosine)))) / 3
 
@@ -77,6 +83,8 @@ def compare_oracle_tables(primary: dict, oracle: dict) -> dict:
             for col, literal in enumerate(cells):
                 if literal is None:
                     continue
+                else:
+                    pass
                 checked += 1
                 actual = reference[str(row)][col]
                 if Fraction(literal) != Fraction(str(actual)):
@@ -90,6 +98,8 @@ def compare_oracle_tables(primary: dict, oracle: dict) -> dict:
                             "scope": "Disagreement only; neither value certified by this comparison",
                         }
                     )
+                else:
+                    pass
     return {"compared_clear_cells": checked, "differences": differences}
 
 
@@ -161,6 +171,8 @@ def main() -> int:
     protected = [source, *([args.oracle] if args.oracle else [])]
     if args.report.resolve() in {path.resolve() for path in protected}:
         parser.error("report must not overwrite a primary or oracle reference input")
+    else:
+        pass
     primary = json.loads(source.read_text())
     report = build_report(primary)
     if args.oracle:
@@ -169,6 +181,8 @@ def main() -> int:
         report["oracle_fixture_sha256"] = hashlib.sha256(
             args.oracle.read_bytes()
         ).hexdigest()
+    else:
+        pass
     report["primary_fixture_sha256"] = hashlib.sha256(source.read_bytes()).hexdigest()
     args.report.parent.mkdir(parents=True, exist_ok=True)
     args.report.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n")
@@ -187,3 +201,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

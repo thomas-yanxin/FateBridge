@@ -3,7 +3,7 @@
 import pytest
 from pydantic import ValidationError
 
-from fatebridge.validation.acceptance import (
+from validation.acceptance import (
     GateObservation,
     GateProtocol,
     evaluate_gate,
@@ -28,7 +28,7 @@ def observed(name, error=None, reference="a" * 64):
     return GateObservation(case_id=name, error=error, reference_sha256=reference)
 
 
-def test_all_rows_and_reference_identity_are_required():
+def test_all_rows_and_reference_identity_are_required() -> None:
     p = protocol()
     rows = (observed("pass", 1), observed("fail", 3), observed("missing", None))
     r = evaluate_gate(p, rows)
@@ -42,7 +42,7 @@ def test_all_rows_and_reference_identity_are_required():
     assert wrong["status"] == "failed" and wrong["wrong_reference"] == ["pass"]
 
 
-def test_duplicates_unknowns_and_unregistered_cases_do_not_become_passes():
+def test_duplicates_unknowns_and_unregistered_cases_do_not_become_passes() -> None:
     p = protocol()
     good = tuple(observed(k, 0) for k in p.case_ids)
     assert evaluate_gate(p, good)["status"] == "passed"
@@ -53,6 +53,6 @@ def test_duplicates_unknowns_and_unregistered_cases_do_not_become_passes():
 
 
 @pytest.mark.parametrize("error", [-1, float("nan"), float("inf")])
-def test_nonphysical_error_values_are_rejected(error):
+def test_nonphysical_error_values_are_rejected(error) -> None:
     with pytest.raises(ValidationError):
         observed("pass", error)

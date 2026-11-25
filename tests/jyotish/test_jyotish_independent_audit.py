@@ -20,13 +20,15 @@ import pytest
 
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.birth import build_astro_birth_info
-from fatebridge.core.jyotish import (
+from fatebridge.core.jyotish.jyotish import (
     divisional_chart,
     nakshatra,
     positions,
     varga_longitude,
     vimshottari,
 )
+from tests.support.ephemeris_case_runtime import native_ephemeris_files  # noqa: F401
+from tests.support.reference_data import read
 
 UTC = timezone.utc
 FIXTURE = json.loads(
@@ -62,7 +64,7 @@ def probe_angles(division):
     return values
 
 
-def test_all_mansion_and_pada_cusps_against_exact_rational_partition():
+def test_all_mansion_and_pada_cusps_against_exact_rational_partition() -> None:
     # Independent interval search, including the 108 pada boundaries.
     edges = [Fraction(10 * n, 3) for n in range(109)]
     for value in probe_angles(9):
@@ -83,7 +85,7 @@ def test_all_mansion_and_pada_cusps_against_exact_rational_partition():
 
 
 @pytest.mark.parametrize("division", [1, 9, 10])
-def test_all_varga_segments_against_rational_reference(division):
+def test_all_varga_segments_against_rational_reference(division: int) -> None:
     for value in probe_angles(division):
         angle = Fraction(value) % 360
         if division in (1, 9):
@@ -136,7 +138,9 @@ def reference_periods(birth, moon, days, cycle=0):
 
 
 @pytest.mark.parametrize("basis,days", list(zip(BASES, DAYS)))
-def test_dasha_dates_against_source_formula_with_exact_microseconds(basis, days):
+def test_dasha_dates_against_source_formula_with_exact_microseconds(
+    basis, days
+) -> None:
     birth = datetime(2000, 1, 1, tzinfo=UTC)
     rng = random.Random(581043)
     for moon in [
@@ -171,7 +175,7 @@ def test_dasha_dates_against_source_formula_with_exact_microseconds(basis, days)
 @pytest.mark.parametrize("basis,days", list(zip(BASES, DAYS)))
 def test_distant_cycle_and_every_subperiod_boundary_from_independent_formula(
     basis, days
-):
+) -> None:
     birth = datetime(2000, 1, 1, tzinfo=UTC)
     # 5 degrees yields the exactly representable 3/8 mansion fraction.
     for cycle in [0, 1, 2, 10, 50]:
@@ -180,6 +184,8 @@ def test_distant_cycle_and_every_subperiod_boundary_from_independent_formula(
             for sublord, start, _ in subs:
                 if start < birth:
                     continue
+                else:
+                    pass
                 at = vimshottari(birth, 5, start, year_basis=basis)
                 before = vimshottari(
                     birth, 5, start - timedelta(microseconds=1), year_basis=basis
@@ -195,7 +201,7 @@ def test_distant_cycle_and_every_subperiod_boundary_from_independent_formula(
                 ) != (lord, sublord)
 
 
-def test_pvr_example_34_aspects_with_nonzero_origin():
+def test_pvr_example_34_aspects_with_nonzero_origin() -> None:
     # Example 34 explicitly gives Jupiter Gemini -> Libra/Sagittarius/Aquarius;
     # Mars Leo -> Scorpio/Aquarius/Pisces; Saturn Sagittarius -> Aquarius/Gemini/Virgo.
     planets = dict(
@@ -224,8 +230,8 @@ def test_pvr_example_34_aspects_with_nonzero_origin():
 
 @pytest.mark.parametrize("reference", FIXTURE["references"], ids=lambda r: r["body"])
 def test_physical_positions_against_frozen_nasa_jpl_horizons(
-    reference, monkeypatch, tmp_path
-):
+    reference, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
     assert (
         hashlib.sha256(reference["response"]["result"].encode()).hexdigest()
@@ -253,7 +259,7 @@ def test_physical_positions_against_frozen_nasa_jpl_horizons(
         assert abs(error) * 3600 < FIXTURE["tolerance_arcseconds"]
 
 
-def test_utc_conversion_does_not_treat_modern_utc_as_ut1():
+def test_utc_conversion_does_not_treat_modern_utc_as_ut1() -> None:
     birth = build_astro_birth_info(
         birth_year=2000,
         birth_month=2,
@@ -273,12 +279,19 @@ def test_utc_conversion_does_not_treat_modern_utc_as_ut1():
     assert (raw["julian_day_ut"] - utc_jd) * 86400 == pytest.approx(0.30387, abs=0.05)
 
 
-def test_ascendant_against_independent_horizon_intersection_geometry():
-    # Ecliptic/horizon intersection, not another call to a house routine.
-    # Sidereal time, obliquity and Lahiri still come from Swiss; this verifies
-    # geometry/wiring, not independent Earth-orientation astronomy.
+@pytest.mark.local_data
+def test_ascendant_against_independent_horizon_intersection_geometry(
+    native_ephemeris_files,
+) -> None:
+    # SOFA and the author C library define the two planes independently of
+    # the chart output. The separately bound SWIEPH inputs use modeled UT1.
+    reference = read(
+        Path(__file__).parents[1] / "fixtures/jyotish-ascendant-frame-reference-v1.json"
+    )
+    rows = reference["random_geometry"]
+    assert len(rows) == 50
     rng = random.Random(419032)
-    for _ in range(50):
+    for row in rows:
         birth = build_astro_birth_info(
             birth_year=rng.randrange(1980, 2020),
             birth_month=rng.randrange(1, 13),
@@ -288,33 +301,19 @@ def test_ascendant_against_independent_horizon_intersection_geometry():
             birth_longitude=rng.uniform(-180, 180),
             birth_timezone="UTC",
         )
+        assert birth.require_utc_datetime.isoformat() == row["utc"]
+        assert birth.latitude.hex() == row["latitude_hex"]
+        assert birth.longitude.hex() == row["longitude_hex"]
         actual = positions(birth)
-        with runtime.preserve_ephemeris_path():
-            theta = math.radians(
-                runtime.swe.sidtime(actual["julian_day_ut"]) * 15 + birth.longitude
-            )
-            epsilon = math.radians(
-                runtime.swe.calc(actual["julian_day_tt"], runtime.swe.ECL_NUT)[0][0]
-            )
-        ascendant = (
-            math.degrees(
-                math.atan2(
-                    -math.cos(theta),
-                    math.sin(theta) * math.cos(epsilon)
-                    + math.tan(math.radians(birth.latitude)) * math.sin(epsilon),
-                )
-            )
-            + 180
-        )
-        expected = (ascendant - actual["ayanamsha"]) % 360
-        error = (actual["ascendant"] - expected + 180) % 360 - 180
-        assert abs(error) < 1e-9
+        assert actual["ephemeris_by_body"]["Sun"] == "swieph"
+        error = math.remainder(actual["ascendant"] - row["ascendant"], 360)
+        assert abs(error) < 1e-9, (row, error)
 
 
 @pytest.mark.native_engine_fault
 def test_each_worker_applies_configured_ephemeris_path_before_delta_t_conversion(
-    monkeypatch, tmp_path
-):
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     thread_state = local()
     expected_path = str(tmp_path)
     real_set_path = runtime.swe.set_ephe_path

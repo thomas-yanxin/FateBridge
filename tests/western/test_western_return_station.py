@@ -13,16 +13,18 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 
-from fatebridge.core import astrology_events
+from fatebridge.core.astro import astrology_events
 from fatebridge.utils.errors import EphemerisSourceError
-from tests.support.transports import SPECS, business, rest, surface_calls
+from tests.support.transports import SPECS, business
 
 BIRTH = datetime(2001, 1, 25, 3, tzinfo=timezone.utc)
 REFERENCE = BIRTH + timedelta(days=2)
 INDEPENDENT_RECENT = datetime(2001, 1, 25, 14, 15, 53, 98888, tzinfo=timezone.utc)
 
 
-def test_real_jupiter_two_return_roots_in_one_daily_cell_match_independent_de421():
+def test_real_jupiter_two_return_roots_in_one_daily_cell_match_independent_de421() -> (
+    None
+):
     target = astrology_events.planet_longitude_at_utc(5, BIRTH)
     roots = astrology_events.find_planet_returns(
         5, target, period_days=4332.59, reference_utc=REFERENCE
@@ -39,7 +41,13 @@ def test_real_jupiter_two_return_roots_in_one_daily_cell_match_independent_de421
 def synthetic_clock(monkeypatch):
     origin = datetime(2000, 1, 1, tzinfo=timezone.utc)
     monkeypatch.setattr(
-        astrology_events, "datetime_from_tt", lambda jd: origin + timedelta(days=jd)
+        astrology_events,
+        "utc_from_tt",
+        lambda point, **options: (
+            None,
+            origin + timedelta(days=point.as_float()),
+            False,
+        ),
     )
     monkeypatch.setattr(
         astrology_events,
@@ -51,21 +59,24 @@ def synthetic_clock(monkeypatch):
 
 @pytest.mark.parametrize("offset, expected", [(-0.0625, [0.25, 0.75]), (0.0, [0.5])])
 def test_actual_longitude_brackets_both_roots_or_an_exact_turn_contact(
-    monkeypatch, offset, expected
-):
+    monkeypatch: pytest.MonkeyPatch, offset, expected
+) -> None:
     origin = synthetic_clock(monkeypatch)
     monkeypatch.setattr(
         astrology_events,
         "_planet_motion",
         lambda jd, body, **kw: (120 + (jd - 0.5) ** 2 + offset, 2 * (jd - 0.5), 0, ()),
     )
-    roots = astrology_events._longitude_crossings_utc(5, 120, 0, 1, 1)
+    roots = [
+        event.utc_datetime
+        for event in astrology_events._longitude_crossings(5, 120, 0, 1, 1)
+    ]
     assert roots == [origin + timedelta(days=at) for at in expected]
 
 
 def test_two_roots_on_opposite_sides_of_annual_chunk_boundary_are_both_retained(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     origin = synthetic_clock(monkeypatch)
     turn = 365.25
     monkeypatch.setattr(
@@ -94,8 +105,8 @@ def test_two_roots_on_opposite_sides_of_annual_chunk_boundary_are_both_retained(
 
 
 def test_native_speed_is_only_a_split_guide_and_cannot_invent_a_longitude_contact(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     origin = synthetic_clock(monkeypatch)
     # The deliberately inaccurate speed reverses at0.5 while the actual
     # longitude is monotone and has exactly one root at0.25.
@@ -104,12 +115,17 @@ def test_native_speed_is_only_a_split_guide_and_cannot_invent_a_longitude_contac
         "_planet_motion",
         lambda at, body, **kw: (120 + at - 0.25, 2 * (at - 0.5), 0, ()),
     )
-    roots = astrology_events._longitude_crossings_utc(5, 120, 0, 1, 1)
+    roots = [
+        event.utc_datetime
+        for event in astrology_events._longitude_crossings(5, 120, 0, 1, 1)
+    ]
     assert roots == [origin + timedelta(days=0.25)]
 
 
 @pytest.mark.parametrize("change", ["model", "file"])
-def test_local_station_refinement_rejects_changed_native_source(monkeypatch, change):
+def test_local_station_refinement_rejects_changed_native_source(
+    monkeypatch: pytest.MonkeyPatch, change: str
+) -> None:
     synthetic_clock(monkeypatch)
 
     def motion(at, body, **kwargs):
@@ -120,11 +136,11 @@ def test_local_station_refinement_rejects_changed_native_source(monkeypatch, cha
 
     monkeypatch.setattr(astrology_events, "_planet_motion", motion)
     with pytest.raises(EphemerisSourceError) as caught:
-        astrology_events._longitude_crossings_utc(5, 120, 0, 1, 1)
+        astrology_events._longitude_crossings(5, 120, 0, 1, 1)
     assert caught.value.reason == "model_changed"
 
 
-def test_station_cell_root_is_the_same_on_rest_mcp_cli(surface_calls):
+def test_station_cell_root_is_the_same_on_rest_mcp_cli(surface_calls) -> None:
     spec = SPECS["astro_extrareturns"]
     inputs = dict(
         birth_year=2001,
@@ -169,7 +185,9 @@ def test_station_cell_root_is_the_same_on_rest_mcp_cli(surface_calls):
 
 
 @pytest.mark.parametrize("base", [0.0, 1.0, 61.18774508129519, 180.0, 359.0])
-def test_signed_residual_retains_the_negative_neighbor_of_the_target(base):
+def test_signed_residual_retains_the_negative_neighbor_of_the_target(
+    base: float,
+) -> None:
     previous = math.nextafter(base, -math.inf)
     assert astrology_events._wrapped_diff(previous, base) == previous - base < 0
     assert astrology_events._wrapped_diff(base, previous) == base - previous > 0
@@ -179,5 +197,7 @@ def test_signed_residual_retains_the_negative_neighbor_of_the_target(base):
     "longitude,target,expected",
     [(0.25, 359.75, 0.5), (359.75, 0.25, -0.5), (360.0, 0.0, 0.0), (0.0, 360.0, 0.0)],
 )
-def test_signed_residual_preserves_true_longitude_wrap(longitude, target, expected):
+def test_signed_residual_preserves_true_longitude_wrap(
+    longitude: float, target: float, expected
+) -> None:
     assert astrology_events._wrapped_diff(longitude, target) == expected

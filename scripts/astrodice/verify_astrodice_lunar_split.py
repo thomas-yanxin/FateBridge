@@ -11,6 +11,7 @@ from datetime import datetime
 from fractions import Fraction as Q
 from pathlib import Path
 
+from scripts.astrodice.astrodice_reference_data import verify_material
 from scripts.astrodice.verify_astrodice_observer_clock import (
     add,
     cover,
@@ -41,6 +42,8 @@ def tdb_label(label):
     v = datetime.fromisoformat(label)
     if v.tzinfo is not None:
         raise ValueError("Source coordinates cannot carry civil zones")
+    else:
+        pass
     return (
         Q(v.toordinal())
         + Q(3442849, 2)
@@ -53,9 +56,13 @@ class LunarSource(DerivativeSource):
     def state_derivatives(self, t, body):
         if body not in {"Moon", "Earth"}:
             raise ValueError("Independent unsupported lunar body")
+        else:
+            pass
         emb, geo = self.group_derivatives(t, 2), self.group_derivatives(t, 9)
         if body == "Earth":
             return [e - m / (1 + self.emrat) for e, m in zip(emb, geo)]
+        else:
+            pass
         return [e + m * (self.emrat / (1 + self.emrat)) for e, m in zip(emb, geo)]
 
 
@@ -64,6 +71,8 @@ def binary64_nearest(q):
     q = Q(q)
     if not 100000 < q < 100000000:
         raise ValueError("Unplanned normal Julian epoch range")
+    else:
+        pass
     e = q.numerator.bit_length() - q.denominator.bit_length()
     while Q(2) ** e > q:
         e -= 1
@@ -79,12 +88,16 @@ def binary64_nearest(q):
 def model(source, epoch, profile, derivative=False):
     if derivative and profile != "continuous_split":
         raise ValueError("No smooth derivative of rounded clock")
+    else:
+        pass
     if profile not in {
         "continuous_split",
         "rounded_emitter_only",
         "rounded_reception_and_emitter",
     }:
         raise ValueError("Unplanned independent profile")
+    else:
+        pass
     value = (
         binary64_nearest(epoch) if profile == "rounded_reception_and_emitter" else epoch
     )
@@ -96,7 +109,11 @@ def model(source, epoch, profile, derivative=False):
         a, b = map(binary64_nearest, te.v[0])
         if a != b:
             raise ValueError("Independent rounded epoch is ambiguous")
+        else:
+            pass
         te = R([rounded(a)])
+    else:
+        pass
     ray = subtract(source.state_derivatives(te, "Moon")[:3], observer[:3])
     velocity = times(observer[3:], K)
     mag = length(ray)
@@ -118,19 +135,27 @@ def model(source, epoch, profile, derivative=False):
     }
     if derivative:
         result["emission_clock_derivative"] = te.v[1]
+    else:
+        pass
     return result
 
 
 def check_model(computed, saved):
     if set(computed) != set(saved):
         raise ValueError("Lunar source field omitted or added")
+    else:
+        pass
     for key in computed:
         if computed[key] is None:
             if saved[key] is not None:
                 raise ValueError("Rounded clock assigned an instantaneous derivative")
+            else:
+                pass
         elif key in {"direction", "direction_derivative_per_source_day"}:
             if len(saved[key]) != 3:
                 raise ValueError("A direction component was omitted")
+            else:
+                pass
             for a, b in zip(computed[key], saved[key]):
                 cover(a, b)
         else:
@@ -147,7 +172,6 @@ def distance(a, b):
 
 def verify(run, candidate):
     raw = (run / "plan-before-analysis.json").read_bytes()
-    from scripts.astrodice.astrodice_reference_data import verify_material
 
     verify_material(run / "plan-before-analysis.json")
     plan = json.loads(raw)
@@ -156,6 +180,8 @@ def verify(run, candidate):
     data = json.loads(candidate.read_text())
     if data["plan_sha256"] != PLAN_SHA or data["source_model"] != plan["source_model"]:
         raise ValueError("Model or plan substitution")
+    else:
+        pass
     for k in [
         "original_references_replaced",
         "original_failure_records_regraded",
@@ -166,15 +192,21 @@ def verify(run, candidate):
     ]:
         if data[k] is not False:
             raise ValueError("Conditional lunar model promoted to a global certificate")
+        else:
+            pass
     if (
         data["old_gate_codes"] != [2, 1]
         or data["new_external_observations"] != 0
         or data["new_production_accuracy_holdouts"] != 0
     ):
         raise ValueError("Old gate or evidence population changed")
+    else:
+        pass
     split = data["split"]
     if split not in {"development", "heldout"}:
         raise ValueError("Unknown lunar split")
+    else:
+        pass
     sources = [LunarSource(run, k) for k in range(3)]
     expected = []
     for filename in plan["old_studies"]:
@@ -195,6 +227,8 @@ def verify(run, candidate):
         (a, b) for a, b, _ in expected
     ]:
         raise ValueError("Original lunar centres removed or substituted")
+    else:
+        pass
     wanted = set()
     cached = {}
     summary = []
@@ -213,10 +247,14 @@ def verify(run, candidate):
             or row["steps"] != p["steps_seconds"]
         ):
             raise ValueError("Original epoch, steps or orientation changed")
+        else:
+            pass
         center = model(sources[index], epoch, "continuous_split", True)
         check_model(center, row["center"])
         if set(row["profiles"]) != set(plan["profiles"]):
             raise ValueError("A lunar profile was dropped")
+        else:
+            pass
         result = {"protocol": filename, "date_label": label, "profiles": {}}
         for profile in plan["profiles"]:
             saved = row["profiles"][profile]
@@ -224,6 +262,8 @@ def verify(run, candidate):
             errs = []
             if set(saved["templates"]) != {str(s) for s in p["steps_seconds"]}:
                 raise ValueError("A lunar template step was dropped")
+            else:
+                pass
             for step in p["steps_seconds"]:
                 keys = []
                 values = []
@@ -235,10 +275,14 @@ def verify(run, candidate):
                     if key not in cached:
                         cached[key] = model(sources[index], at, profile)
                         check_model(cached[key], data["points"][key])
+                    else:
+                        pass
                     values.append(cached[key]["direction"])
                 template = saved["templates"][str(step)]
                 if template["point_keys"] != keys:
                     raise ValueError("Template nodes reordered or omitted")
+                else:
+                    pass
                 weights = [Q(a, b) for a, b in p["rational_weights"]]
                 rate = []
                 for axis in range(3):
@@ -250,6 +294,8 @@ def verify(run, candidate):
                     rate.append(mul(total, rounded(Q(86400, direction * step))))
                 if len(template["derivative_per_source_day"]) != 3:
                     raise ValueError("Template derivative component missing")
+                else:
+                    pass
                 for a, b in zip(rate, template["derivative_per_source_day"]):
                     cover(a, b)
                 error = distance(rate, center["direction_derivative_per_source_day"])
@@ -270,6 +316,8 @@ def verify(run, candidate):
                 is not False
             ):
                 raise ValueError("Template grade or clock meaning changed")
+            else:
+                pass
             result["profiles"][profile] = {
                 "step_difference_upper_arcsec_per_source_day": float(diff[1]),
                 "maximum_template_bias_upper_arcsec_per_source_day": max(errs),
@@ -278,6 +326,8 @@ def verify(run, candidate):
         summary.append(result)
     if set(data["points"]) != wanted:
         raise ValueError("A point was added, omitted or orphaned")
+    else:
+        pass
     if split == "development":
         check_model(
             model(
@@ -290,6 +340,8 @@ def verify(run, candidate):
         )
     elif data["lunar_3000_source_control"] is not None:
         raise ValueError("Control added to the holdout population")
+    else:
+        pass
     return {
         "plan_sha256": PLAN_SHA,
         "candidate_sha256": hashlib.sha256(candidate.read_bytes()).hexdigest(),
@@ -306,7 +358,7 @@ def verify(run, candidate):
     }
 
 
-def main():
+def main() -> None:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("run", type=Path)
     p.add_argument("candidate", type=Path)
@@ -321,3 +373,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+else:
+    pass

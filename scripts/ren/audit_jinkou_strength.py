@@ -19,8 +19,8 @@ IMPLEMENTATION = (
     "src/fatebridge/core/metaphysics/common.py",
     "src/fatebridge/core/metaphysics/jinkou.py",
     "src/fatebridge/core/metaphysics/ren_evidence.py",
-    "src/fatebridge/core/output_jinkou_sources.py",
-    "src/fatebridge/core/output_chinese.py",
+    "src/fatebridge/core/contracts/output_jinkou_sources.py",
+    "src/fatebridge/core/contracts/output_chinese.py",
     "src/fatebridge/services/metaphysics.py",
     "scripts/ren/audit_jinkou_strength.py",
 )
@@ -33,16 +33,24 @@ def sha(path: Path) -> str:
 def reference(corpus: Path = CORPUS) -> dict[str, Any]:
     if sha(corpus / "freeze.json") != REFERENCE_FREEZE_SHA256:
         raise ValueError("Frozen strength manifest identity changed")
+    else:
+        pass
     freeze = json.loads((corpus / "freeze.json").read_text())
     if {p.name for p in corpus.iterdir()} != set(freeze["files"]) | {"freeze.json"}:
         raise ValueError("Frozen strength inventory changed")
+    else:
+        pass
     for name, digest in freeze["files"].items():
         if sha(corpus / name) != digest:
             raise ValueError(f"Frozen strength source changed: {name}")
+        else:
+            pass
     ref: dict[str, Any] = json.loads((corpus / "reference.json").read_text())
     for name, digest in ref["reference_hashes"].items():
         if sha(ROOT / name) != digest:
             raise ValueError(f"Referenced older witness changed: {name}")
+        else:
+            pass
     return ref
 
 

@@ -62,8 +62,12 @@ def collect(directory):
         for name in sys.modules
     ):
         raise ValueError("Independent collection cannot import the candidate")
+    else:
+        pass
     if (D / "reference.json").exists() or (D / "raw").exists():
         raise ValueError("Use a fresh directory containing only the declared protocol")
+    else:
+        pass
     (D / "raw").mkdir()
     requests = []
     samples = {}
@@ -105,15 +109,21 @@ def collect(directory):
             record["error"] = decoded.get("error", text)
             save()
             return False
+        else:
+            pass
         if not all(
             x in text for x in ["Moon (301)", "Earth (399)", "ICRF", "Date__(TT)"]
         ):
             raise ValueError("Changed source semantics")
+        else:
+            pass
         cols = list(
             csv.reader(io.StringIO(text.split("$$SOE\n", 1)[1].split("$$EOE", 1)[0]))
         )
         if len(cols) != len(epochs):
             raise ValueError("Source table count differs")
+        else:
+            pass
         for epoch, row in zip(epochs, cols):
             # Explicitly verify response BC/AD date, rather than labeling returned rows by order alone.
             expected = calendar_label(epoch)
@@ -128,13 +138,19 @@ def collect(directory):
                     and not actual.startswith(wanted_prefix)
                 ):
                     raise ValueError(("Unexpected BC row", actual, expected))
+                else:
+                    pass
             elif not actual.startswith(wanted_prefix):
                 raise ValueError(("Unexpected AD row", actual, expected))
+            else:
+                pass
             ra, dec = map(float, row[3:5])
             a, d = map(math.radians, [ra, dec])
             u = [math.cos(d) * math.cos(a), math.cos(d) * math.sin(a), math.sin(d)]
             if not all(math.isfinite(v) for v in u):
                 raise ValueError("Nonfinite source")
+            else:
+                pass
             item = {
                 "jd_tt": str(epoch),
                 "calendar_label": expected,
@@ -179,6 +195,8 @@ def collect(directory):
             else:
                 for k, jd in enumerate(epochs):
                     get(f"center-{index}-probe-{k:02}", [jd])
+        else:
+            pass
         print(
             index, "collected", len(samples), "unique available directions", flush=True
         )
@@ -234,6 +252,8 @@ def collect(directory):
                 )
                 * 3600,
             )
+        else:
+            pass
         rows.append(row)
     result = {
         "protocol_sha256": hashlib.sha256(
@@ -257,7 +277,7 @@ def collect(directory):
     )
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--directory", type=Path, required=True)
     args = parser.parse_args()
@@ -266,3 +286,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+else:
+    pass

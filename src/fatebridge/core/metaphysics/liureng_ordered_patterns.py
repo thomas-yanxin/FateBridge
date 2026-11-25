@@ -5,8 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 from fatebridge.core.metaphysics.ren_sources import TANYUAN_SCAN_SHA256, TANYUAN_SOURCE
-
-from ...utils.data import EARTHLY_BRANCHES
+from fatebridge.utils.data import EARTHLY_BRANCHES
 
 PATTERNS = (
     ("zhuolun", "斫轮", "卯戌巳"),
@@ -29,6 +28,8 @@ def ordered_transmission_patterns(branches: list[str]) -> dict[str, Any]:
         )
     ):
         raise ValueError("传序课体需要按初中末排列的三个有效地支")
+    else:
+        pass
     evaluations = [
         dict(
             id=key,

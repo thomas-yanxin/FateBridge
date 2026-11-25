@@ -123,7 +123,7 @@ def produce(key, payload):
     return copy.deepcopy(_produced(key, json.dumps(payload, sort_keys=True)))
 
 
-def test_reference_preserves_original_setup_errors_and_all_supported_rows():
+def test_reference_preserves_original_setup_errors_and_all_supported_rows() -> None:
     assert len(REF["probes"]) == 70
     assert len(FAULTS) == REF["expected_fault_probe_count"] == 68
     assert (ROOT / "tests/fixtures/ren_request_binding_v1/freeze.json").is_file()
@@ -131,7 +131,9 @@ def test_reference_preserves_original_setup_errors_and_all_supported_rows():
 
 
 @pytest.mark.parametrize("fault", ["edit", "extra", "missing"])
-def test_all_frozen_inventory_failures_still_rejected(tmp_path, fault):
+def test_all_frozen_inventory_failures_still_rejected(
+    tmp_path: Path, fault: str
+) -> None:
     from scripts.ren.audit_ren_request_binding import reference as frozen_reference
 
     target = tmp_path / "corpus"
@@ -147,7 +149,7 @@ def test_all_frozen_inventory_failures_still_rejected(tmp_path, fault):
 
 
 @pytest.mark.parametrize("probe", FAULTS, ids=lambda p: p["id"])
-def test_complete_foreign_result_is_a_server_error(probe):
+def test_complete_foreign_result_is_a_server_error(probe) -> None:
     spec = SPECS[probe["key"]]
     request = spec.request_model.model_validate(probe["request"])
     foreign = produce(spec.key, probe["returned_request"])
@@ -158,7 +160,7 @@ def test_complete_foreign_result_is_a_server_error(probe):
 
 
 @pytest.mark.parametrize("label", VALID_REQUESTS)
-def test_correct_request_keeps_complete_business_bytes(label):
+def test_correct_request_keeps_complete_business_bytes(label) -> None:
     key, payload = VALID_REQUESTS[label]
     spec = SPECS[key]
     before = produce(key, payload)
@@ -168,7 +170,7 @@ def test_correct_request_keeps_complete_business_bytes(label):
 
 
 @pytest.mark.parametrize("label", EDGE_REQUESTS)
-def test_normalized_clocks_and_explicitly_unknown_inputs_still_work(label):
+def test_normalized_clocks_and_explicitly_unknown_inputs_still_work(label) -> None:
     key, payload = EDGE_REQUESTS[label]
     spec = SPECS[key]
     before = produce(key, payload)
@@ -180,8 +182,8 @@ def test_normalized_clocks_and_explicitly_unknown_inputs_still_work(label):
 @pytest.mark.parametrize("key", REF["bases"])
 @pytest.mark.parametrize("project", [False, True])
 def test_correct_complete_and_projected_results_agree_on_three_ports(
-    key, project, surface_calls
-):
+    key, project: bool, surface_calls
+) -> None:
     spec = SPECS[key]
     payload = REF["bases"][key]
     params = [("as_of", AS_OF), ("response_char_limit", "0")]
@@ -191,6 +193,8 @@ def test_correct_complete_and_projected_results_agree_on_three_ports(
         params += [("fields", "analysis_type"), ("strict_fields", "true")]
         options.update(fields=["analysis_type"], strict_fields=True)
         flags += ["--fields", "analysis_type", "--strict-fields", "true"]
+    else:
+        pass
     http, protocol, code, value = surface_calls(
         spec, payload, params=params, options=options, flags=flags, cli_first=False
     )
@@ -205,8 +209,8 @@ def test_correct_complete_and_projected_results_agree_on_three_ports(
 @pytest.mark.parametrize("key", REF["bases"])
 @pytest.mark.parametrize("project", [False, True])
 def test_foreign_complete_result_fails_on_three_ports_before_projection(
-    key, project, monkeypatch, surface_calls
-):
+    key, project: bool, monkeypatch: pytest.MonkeyPatch, surface_calls
+) -> None:
     spec = SPECS[key]
     probe = next(p for p in FAULTS if p["key"] == key)
     foreign = produce(key, probe["returned_request"])
@@ -217,6 +221,8 @@ def test_foreign_complete_result_fails_on_three_ports_before_projection(
             actual = replace(
                 actual, bind=lambda _: (lambda: copy.deepcopy(foreign), (), {})
             )
+        else:
+            pass
         return original(actual, request)
 
     monkeypatch.setattr(execution, "execute_spec", broken)
@@ -227,6 +233,8 @@ def test_foreign_complete_result_fails_on_three_ports_before_projection(
         params.update(fields="analysis_type", strict_fields="true")
         options.update(fields=["analysis_type"], strict_fields=True)
         flags += ["--fields", "analysis_type", "--strict-fields", "true"]
+    else:
+        pass
     payload = probe["request"]
     http, protocol, code, result = surface_calls(
         spec, payload, params=params, options=options, flags=flags, cli_first=False
@@ -237,7 +245,7 @@ def test_foreign_complete_result_fails_on_three_ports_before_projection(
 
 
 @pytest.mark.parametrize("key", REF["bases"])
-def test_metadata_free_shared_execution_cannot_return_a_foreign_result(key):
+def test_metadata_free_shared_execution_cannot_return_a_foreign_result(key) -> None:
     spec = SPECS[key]
     row = next(p for p in FAULTS if p["key"] == key)
     foreign = produce(key, row["returned_request"])
@@ -250,13 +258,13 @@ def test_metadata_free_shared_execution_cannot_return_a_foreign_result(key):
     assert value["error_code"] == "internal_error" and value["status_code"] == 500
 
 
-def test_unsupported_original_birth_second_still_rejected_before_service():
+def test_unsupported_original_birth_second_still_rejected_before_service() -> None:
     row = next(p for p in REF["probes"] if p["id"] == "liureng_runyear:birth_second")
     with pytest.raises(ValidationError):
         SPECS[row["key"]].request_model.model_validate(row["returned_request"])
 
 
-def test_original_invalid_historical_birth_offset_is_not_a_false_success():
+def test_original_invalid_historical_birth_offset_is_not_a_false_success() -> None:
     row = next(p for p in REF["probes"] if p["id"] == "liureng_runyear:birth_offset")
     spec = SPECS[row["key"]]
     result = execution.execute_spec(
@@ -266,7 +274,9 @@ def test_original_invalid_historical_birth_offset_is_not_a_false_success():
 
 
 @pytest.mark.parametrize("key", REF["bases"])
-def test_genuine_source_failure_during_binding_keeps_its_type(key, monkeypatch):
+def test_genuine_source_failure_during_binding_keeps_its_type(
+    key, monkeypatch: pytest.MonkeyPatch
+) -> None:
     from fatebridge.application import ren_request_binding
     from fatebridge.utils.errors import EphemerisSourceError
 
@@ -289,8 +299,8 @@ def test_genuine_source_failure_during_binding_keeps_its_type(key, monkeypatch):
 @pytest.mark.parametrize("key", REF["bases"])
 @pytest.mark.parametrize("project", [False, True])
 def test_genuine_source_failure_keeps_its_classification_on_three_ports(
-    key, project, monkeypatch, surface_calls
-):
+    key, project: bool, monkeypatch: pytest.MonkeyPatch, surface_calls
+) -> None:
     from fatebridge.application import ren_request_binding
     from fatebridge.utils.errors import EphemerisSourceError
 
@@ -307,6 +317,8 @@ def test_genuine_source_failure_keeps_its_classification_on_three_ports(
         params.update(fields="analysis_type", strict_fields="true")
         options.update(fields=["analysis_type"], strict_fields=True)
         flags += ["--fields", "analysis_type", "--strict-fields", "true"]
+    else:
+        pass
     http, protocol, code, result = surface_calls(
         spec, payload, params=params, options=options, flags=flags, cli_first=False
     )

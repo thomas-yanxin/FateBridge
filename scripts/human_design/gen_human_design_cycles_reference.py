@@ -26,9 +26,13 @@ def derive(planet_path: Path, chiron_path: Path, source_path: Path) -> dict:
     plan = json.loads(PLAN.read_text())
     if hashlib.md5(planet_path.read_bytes()).hexdigest() != plan["kernel_md5"]:
         raise ValueError("DE440 checksum mismatch")
+    else:
+        pass
     source = json.loads(source_path.read_text())
     if hashlib.sha256(chiron_path.read_bytes()).hexdigest() != source["kernel_sha256"]:
         raise ValueError("Chiron source hash mismatch")
+    else:
+        pass
     planets = load_file(str(planet_path))
     spice.furnsh(str(planet_path))
     spice.furnsh(str(chiron_path))
@@ -163,3 +167,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+else:
+    pass

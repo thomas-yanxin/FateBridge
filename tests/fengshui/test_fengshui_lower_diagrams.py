@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.validation import fengshui_lower_diagrams as audit
+from validation import fengshui_lower_diagrams as audit
 
 FOLDER = Path(__file__).parents[1] / "data/fengshui_lower_diagrams_v1"
 
@@ -17,7 +17,7 @@ def source():
     return audit.load_lower_diagram_reference(FOLDER)
 
 
-def test_all_5832_printed_numerals_keep_the_one_difference():
+def test_all_5832_printed_numerals_keep_the_one_difference() -> None:
     result = audit.audit_lower_diagrams(source())
     assert (result["printed_charts_checked"], result["printed_charts_matched"]) == (
         216,
@@ -65,7 +65,7 @@ def test_all_5832_printed_numerals_keep_the_one_difference():
         assert result[key] is False
 
 
-def test_source_was_frozen_before_comparison_and_keeps_old_print_five():
+def test_source_was_frozen_before_comparison_and_keeps_old_print_five() -> None:
     assert (
         hashlib.sha256((FOLDER / "reference.json").read_bytes()).hexdigest()
         == "44488715143b6e6aebcfe8ae638397ced12ed07dfee392cce81440a43c8de483"
@@ -91,7 +91,7 @@ def test_source_was_frozen_before_comparison_and_keeps_old_print_five():
         "boolean",
     ],
 )
-def test_every_chart_palace_and_explicit_numeral_is_required(mutation):
+def test_every_chart_palace_and_explicit_numeral_is_required(mutation: str) -> None:
     data = source()
     rows = data["reference"]["rows"]
     if mutation == "remove_chart":
@@ -110,7 +110,9 @@ def test_every_chart_palace_and_explicit_numeral_is_required(mutation):
         audit.audit_lower_diagrams(data)
 
 
-def test_corrupting_the_engine_to_match_the_print_cannot_clear_the_gate(monkeypatch):
+def test_corrupting_the_engine_to_match_the_print_cannot_clear_the_gate(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     real = audit.xuankong_natal
 
     def altered(request):
@@ -118,6 +120,8 @@ def test_corrupting_the_engine_to_match_the_print_cannot_clear_the_gate(monkeypa
         chart = result["chart"]
         if chart["period_number"] == 7 and chart["facing"]["name"] == "寅":
             chart["palaces"]["E"]["mountain_star_number"] = 5
+        else:
+            pass
         return result
 
     monkeypatch.setattr(audit, "xuankong_natal", altered)
@@ -129,7 +133,9 @@ def test_corrupting_the_engine_to_match_the_print_cannot_clear_the_gate(monkeypa
     assert result["complete_diagram_acceptance_passed"] is False
 
 
-def test_regression_outside_the_known_dispute_is_not_allowlisted(monkeypatch):
+def test_regression_outside_the_known_dispute_is_not_allowlisted(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     real = audit.xuankong_natal
 
     def altered(request):
@@ -137,6 +143,8 @@ def test_regression_outside_the_known_dispute_is_not_allowlisted(monkeypatch):
         chart = result["chart"]
         if chart["period_number"] == 1 and chart["facing"]["name"] == "午":
             chart["palaces"]["SE"]["mountain_star_number"] = 1
+        else:
+            pass
         return result
 
     monkeypatch.setattr(audit, "xuankong_natal", altered)
@@ -147,7 +155,7 @@ def test_regression_outside_the_known_dispute_is_not_allowlisted(monkeypatch):
     assert result["complete_diagram_acceptance_passed"] is False
 
 
-def test_audit_is_read_only_and_derives_coverage_from_the_complete_data():
+def test_audit_is_read_only_and_derives_coverage_from_the_complete_data() -> None:
     data = source()
     data["reference"]["numeral_count"] = 99999
     data["reference"]["whole_book_conformity_established"] = True
@@ -161,7 +169,7 @@ def test_audit_is_read_only_and_derives_coverage_from_the_complete_data():
 @pytest.mark.parametrize(
     "name", ["reference.json", "native-images/申-寅-7.png", "historical-page-57.png"]
 )
-def test_changed_source_capture_is_rejected(tmp_path, name):
+def test_changed_source_capture_is_rejected(tmp_path: Path, name: str) -> None:
     folder = tmp_path / "source"
     shutil.copytree(FOLDER, folder)
     with (folder / name).open("ab") as stream:
@@ -170,7 +178,9 @@ def test_changed_source_capture_is_rejected(tmp_path, name):
         audit.load_lower_diagram_reference(folder)
 
 
-def test_rehashing_a_source_correction_cannot_replace_the_frozen_five(tmp_path):
+def test_rehashing_a_source_correction_cannot_replace_the_frozen_five(
+    tmp_path: Path,
+) -> None:
     folder = tmp_path / "source"
     shutil.copytree(FOLDER, folder)
     data = json.loads((folder / "reference.json").read_text())
@@ -188,7 +198,7 @@ def test_rehashing_a_source_correction_cannot_replace_the_frozen_five(tmp_path):
         audit.load_lower_diagram_reference(folder)
 
 
-def test_capture_manifest_cannot_omit_the_disagreeing_diagram(tmp_path):
+def test_capture_manifest_cannot_omit_the_disagreeing_diagram(tmp_path: Path) -> None:
     folder = tmp_path / "source"
     shutil.copytree(FOLDER, folder)
     manifest = json.loads((folder / "hashes.json").read_text())

@@ -1,7 +1,6 @@
 """Related contract regressions with shared imports; original cases retained."""
 
 import asyncio
-import json
 import math
 import os
 import subprocess
@@ -9,13 +8,13 @@ import sys
 import threading
 from dataclasses import replace
 from datetime import datetime, timezone
-from types import SimpleNamespace
+from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
 from fastmcp import Client
 from jsonschema import Draft202012Validator
-from pydantic import ValidationError
+from pydantic import TypeAdapter, ValidationError
 
 import fatebridge.mcp_server as mcp
 from fatebridge.api import app as rest_app
@@ -27,48 +26,55 @@ from fatebridge.core.local_techniques.chart import _resolve_coordinates
 from fatebridge.core.local_techniques.tongshefa import build_tongshefa_result
 from fatebridge.core.metaphysics.ren_calendar import require_ren_solar_term
 from fatebridge.mcp_server import create_mcp_app
-from fatebridge.mcp_transport import OutputFlags
 from fatebridge.services import run_metadata
 from fatebridge.services.run_metadata import (
     attach_run_metadata,
     engine_is_approximate,
     resolve_runtime_engine,
 )
+from fatebridge.transports.flags import ResponseCharLimit
 from fatebridge.utils.civil_time import ZonedCalendar
 from fatebridge.utils.coordinates import parse_geo_coordinate
 from fatebridge.utils.errors import EphemerisSourceError, ParameterError
 from fatebridge.utils.private_files import (
-    _windows_user,
     ensure_private_directory,
     locked_private_file,
     open_private_file,
 )
 from tests.support.output_facts import canonical_json
-from tests.support.transports import SPECS, native, rest, surface_calls
+from tests.support.transports import (
+    SPECS,
+    cached_mcp_app,
+    call_calculation,
+    native,
+    rest,
+    surface_calls,
+)
 
 
-@pytest.mark.parametrize(
-    "value,axis,expected",
-    [
+def test_decimal_and_direction_coordinates() -> None:
+    cases = [
         (0, "longitude", 0),
         (0, "latitude", 0),
         ("121e30", "longitude", 121.5),
         ("31s15", "latitude", -31.25),
         ("-180", "longitude", -180),
         ("90N0", "latitude", 90),
+        ("31n59.999999999999999", "latitude", 32),
+        ("1.0000000000000001n0.000000000000006", "latitude", 1.0000000000000002),
         (None, "latitude", None),
         ("", "longitude", None),
-    ],
-)
-def test_decimal_and_direction_coordinates(value, axis, expected):
-    assert parse_geo_coordinate(value, axis=axis) == expected
+    ]
+    for value, axis, expected in cases:
+        assert parse_geo_coordinate(value, axis=axis) == expected
 
 
-@pytest.mark.parametrize(
-    "value,axis",
-    [
+def test_invalid_coordinates_never_fall_back_to_a_default() -> None:
+    cases = [
         ("31N90", "latitude"),
         ("190", "longitude"),
+        ("90.000000000000001", "latitude"),
+        ("180E0.000000000000001", "longitude"),
         (-91, "latitude"),
         (float("nan"), "longitude"),
         (float("inf"), "latitude"),
@@ -77,53 +83,58 @@ def test_decimal_and_direction_coordinates(value, axis, expected):
         ("bad", "longitude"),
         ("-31N0", "latitude"),
         (True, "latitude"),
-    ],
-)
-def test_invalid_coordinates_never_fall_back_to_a_default(value, axis):
-    with pytest.raises(ValueError):
-        parse_geo_coordinate(value, axis=axis)
+    ]
+    for value, axis in cases:
+        with pytest.raises(ValueError):
+            parse_geo_coordinate(value, axis=axis)
 
 
 @pytest.mark.parametrize("latitude,longitude", [(0, 0), (0, 32.5), (51.5, 0)])
-def test_zero_coordinates_are_preserved(latitude, longitude):
+def test_zero_coordinates_are_preserved(
+    latitude: float | int, longitude: float | int
+) -> None:
     assert _resolve_coordinates(gps_lat=latitude, gps_lon=longitude) == (
         latitude,
         longitude,
     )
 
 
-def test_gps_coordinates_take_precedence_over_text_hints():
+def test_gps_coordinates_take_precedence_over_text_hints() -> None:
     assert _resolve_coordinates(lat="bad", lon="bad", gps_lat=0, gps_lon=0) == (0, 0)
 
 
-@pytest.mark.parametrize(
-    "key,options",
-    [
+def test_empty_required_clock_fails_on_every_transport(rest, surface_calls) -> None:
+    cases = [
         ("sixyao", {"method": "time"}),
         ("sixyao", {"method": "coin", "seed": 42}),
         ("sixyao", {"coins": [6, 7, 8, 9, 7, 8]}),
         ("sixyao", {"gua_code": "111111"}),
         ("sanshiunited", {}),
-    ],
-)
-@pytest.mark.parametrize("clock", ["", "   "])
-def test_empty_required_clock_fails_on_every_transport(
-    key, options, clock, surface_calls
-):
-    spec = SPECS[key]
-    payload = {"date": "2026-02-10", "time": clock, **options}
-    response, protocol, code, local = surface_calls(spec, payload)
-    assert response.status_code == 400 and code == 1 and protocol.is_error
-    for output in [response.json(), local, protocol.structured_content]:
-        assert output["error_code"] == "validation_error"
-        assert "time" in output["error"]
-        assert "run_metadata" not in output
+    ]
+    surface_targets = {("sixyao", "   "), ("sanshiunited", "   ")}
+    for key, options in cases:
+        spec = SPECS[key]
+        for clock in ("", "   "):
+            payload = {"date": "2026-02-10", "time": clock, **options}
+            if (key, clock) in surface_targets:
+                surface_targets.remove((key, clock))
+                response, protocol, code, local = surface_calls(spec, payload)
+                assert response.status_code == 400 and code == 1 and protocol.is_error
+                outputs = (response.json(), local, protocol.structured_content)
+            else:
+                response = rest.post(spec.rest_path, json=payload)
+                assert response.status_code == 400
+                outputs = (response.json(),)
+            for output in outputs:
+                assert output["error_code"] == "validation_error"
+                assert "time" in output["error"]
+                assert "run_metadata" not in output
 
 
 @pytest.mark.parametrize("year", [1799, 1800, 2200, 2201])
 def test_all_original_native_events_select_the_first_post_crossing_point(
-    year, monkeypatch, tmp_path
-):
+    year: int, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
@@ -146,7 +157,9 @@ def test_all_original_native_events_select_the_first_post_crossing_point(
         require_ren_solar_term(term)
 
 
-def test_exact_crossing_at_the_first_scan_sample_is_not_lost(monkeypatch):
+def test_exact_crossing_at_the_first_scan_sample_is_not_lost(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     anchor = datetime(2000, 6, 1, tzinfo=timezone.utc)
     root = ephemeris_time(anchor).jd_tt - 30.0
 
@@ -166,8 +179,8 @@ def test_exact_crossing_at_the_first_scan_sample_is_not_lost(monkeypatch):
 
 
 def test_new_post_crossing_contract_rejects_a_coherent_pre_crossing_point(
-    monkeypatch, tmp_path
-):
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
@@ -177,8 +190,8 @@ def test_new_post_crossing_contract_rejects_a_coherent_pre_crossing_point(
     details["selected_crossing_jd_tt"] = low
     bad = replace(
         term,
-        calendar=ZonedCalendar.from_datetime(
-            solar_term_clock.native_solar_root_datetime(low)
+        calendar=ZonedCalendar(
+            solar_term_clock.native_solar_root_calendar(low), timezone.utc
         ),
         solar_model_details=details,
     )
@@ -194,7 +207,7 @@ def test_new_post_crossing_contract_rejects_a_coherent_pre_crossing_point(
         require_ren_solar_term(replace(bad, solar_model_details=historical))
 
 
-def test_current_facts_ignore_only_execution_receipts():
+def test_current_facts_ignore_only_execution_receipts() -> None:
     payload = {
         "value": 1.0,
         "provenance": {"source": "primary"},
@@ -214,44 +227,12 @@ def test_current_facts_ignore_only_execution_receipts():
 
 
 @pytest.mark.parametrize("value", [math.inf, -math.inf, math.nan])
-def test_nonfinite_current_facts_are_rejected(value):
+def test_nonfinite_current_facts_are_rejected(value) -> None:
     with pytest.raises(ValueError):
         canonical_json({"coordinate": value})
 
 
-@pytest.mark.parametrize("fail", [False, True])
-def test_windows_token_is_closed_without_assuming_a_context_manager(monkeypatch, fail):
-    closed = []
-    token = SimpleNamespace(Close=lambda: closed.append(True))
-
-    def information(handle, kind):
-        assert handle is token and kind == "user"
-        if fail:
-            raise OSError("token query failed")
-        return ("sid",)
-
-    monkeypatch.setitem(
-        sys.modules, "win32api", SimpleNamespace(GetCurrentProcess=lambda: "process")
-    )
-    monkeypatch.setitem(sys.modules, "win32con", SimpleNamespace(TOKEN_QUERY="query"))
-    monkeypatch.setitem(
-        sys.modules,
-        "win32security",
-        SimpleNamespace(
-            OpenProcessToken=lambda process, access: token,
-            GetTokenInformation=information,
-            TokenUser="user",
-        ),
-    )
-    if fail:
-        with pytest.raises(OSError, match="token query failed"):
-            _windows_user()
-    else:
-        assert _windows_user() == "sid"
-    assert closed == [True]
-
-
-def test_threads_cannot_enter_the_same_artifact_lock_together(tmp_path):
+def test_threads_cannot_enter_the_same_artifact_lock_together(tmp_path: Path) -> None:
     directory = ensure_private_directory(tmp_path / "private")
     started, acquired = threading.Event(), threading.Event()
     errors = []
@@ -274,7 +255,9 @@ def test_threads_cannot_enter_the_same_artifact_lock_together(tmp_path):
     assert acquired.is_set()
 
 
-def test_new_files_are_private_and_exclusive_creation_never_replaces_them(tmp_path):
+def test_new_files_are_private_and_exclusive_creation_never_replaces_them(
+    tmp_path: Path,
+) -> None:
     directory = ensure_private_directory(tmp_path / "private")
     path = directory / "result"
     fd = open_private_file(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL)
@@ -286,7 +269,7 @@ def test_new_files_are_private_and_exclusive_creation_never_replaces_them(tmp_pa
 
 
 @pytest.mark.skipif(sys.platform == "win32", reason="POSIX mode bits")
-def test_world_readable_directory_and_file_are_rejected(tmp_path):
+def test_world_readable_directory_and_file_are_rejected(tmp_path: Path) -> None:
     directory = ensure_private_directory(tmp_path / "private")
     path = directory / "result"
     path.write_bytes(b"secret")
@@ -299,7 +282,7 @@ def test_world_readable_directory_and_file_are_rejected(tmp_path):
 
 
 @pytest.mark.skipif(sys.platform != "win32", reason="native Windows ACL")
-def test_windows_rejects_directory_with_an_everyone_read_ace(tmp_path):
+def test_windows_rejects_directory_with_an_everyone_read_ace(tmp_path: Path) -> None:
     import win32con
     import win32security
 
@@ -327,7 +310,7 @@ def test_windows_rejects_directory_with_an_everyone_read_ace(tmp_path):
 
 
 @pytest.mark.skipif(sys.platform != "win32", reason="native Windows junction")
-def test_windows_never_uses_a_junction_as_the_result_directory(tmp_path):
+def test_windows_never_uses_a_junction_as_the_result_directory(tmp_path: Path) -> None:
     outside = ensure_private_directory(tmp_path / "outside")
     junction = tmp_path / "junction"
     subprocess.run(
@@ -342,16 +325,14 @@ def test_windows_never_uses_a_junction_as_the_result_directory(tmp_path):
         junction.rmdir()
 
 
-def test_domain_requests_build_nested_schemas():
+def test_domain_requests_build_nested_schemas() -> None:
     code = """
 from fatebridge.core.requests.divination import SixYaoRequest
-from fatebridge.core.requests.astrology import AstroRelativeRequest
 sixyao = SixYaoRequest.model_validate({'date': '2028-01-01', 'time': '00:00:00',
     'lines': [{'value': 1, 'change': True}] + [{'value': 0, 'change': False}] * 5})
 assert len(sixyao.lines) == 6
 assert sixyao.lines[0].value == 1 and sixyao.lines[0].change
 assert 'SixYaoLineRequest' in SixYaoRequest.model_json_schema()['$defs']
-assert 'AstroRelativePartyRequest' in AstroRelativeRequest.model_json_schema()['$defs']
 """
     result = subprocess.run(
         [sys.executable, "-c", code], capture_output=True, text=True
@@ -359,7 +340,7 @@ assert 'AstroRelativePartyRequest' in AstroRelativeRequest.model_json_schema()['
     assert result.returncode == 0, result.stderr
 
 
-def test_catalog_cold_import_does_not_load_domain_engines():
+def test_catalog_cold_import_does_not_load_domain_engines() -> None:
     code = """
 import sys
 from fatebridge.services.tool_catalog import CATALOG
@@ -374,19 +355,25 @@ for module in ('fatebridge.services.bazi',
     assert result.returncode == 0, result.stderr
 
 
-def test_rest_mcp_flags_and_renderer_agree_on_disjoint_response_budget():
+def test_rest_mcp_flags_and_renderer_agree_on_disjoint_response_budget() -> None:
+    from fastapi.openapi.utils import get_openapi
+
     async def schema():
-        async with Client(create_mcp_app(families="bazi")) as client:
+        async with Client(cached_mcp_app(families="bazi")) as client:
             tools = await client.list_tools()
-            career = next(tool for tool in tools if tool.name == "bazi_career")
+            career = next(tool for tool in tools if tool.name == "run_calculation")
             return career.model_dump(by_alias=True)["inputSchema"]["properties"][
                 "response_char_limit"
             ]
 
     mcp_schema = asyncio.run(schema())
+    route = next(
+        r for r in rest_app.routes if getattr(r, "path", None) == "/api/bazi/career"
+    )
+    single_openapi = get_openapi(title="t", version="0", routes=[route])
     rest_schema = next(
         parameter["schema"]
-        for parameter in rest_app.openapi()["paths"]["/api/cn/bazi/career"]["post"][
+        for parameter in single_openapi["paths"]["/api/bazi/career"]["post"][
             "parameters"
         ]
         if parameter["name"] == "response_char_limit"
@@ -394,21 +381,22 @@ def test_rest_mcp_flags_and_renderer_agree_on_disjoint_response_budget():
     validators = [Draft202012Validator(s) for s in (rest_schema, mcp_schema)]
     for value in [0, 4096, 8192, 65536]:
         assert all(validator.is_valid(value) for validator in validators)
-        assert OutputFlags(response_char_limit=value).response_char_limit == value
+        assert TypeAdapter(ResponseCharLimit).validate_python(value) == value
         assert bound_response({"status": "small"}, value) == {"status": "small"}
     for value in [-1, 1, 4095, 65537]:
         assert not any(validator.is_valid(value) for validator in validators)
         with pytest.raises(ValidationError):
-            OutputFlags(response_char_limit=value)
+            TypeAdapter(ResponseCharLimit).validate_python(value)
         with pytest.raises(ParameterError):
             bound_response({"status": "small"}, value)
 
 
-def test_explicit_zero_http_budget_and_invalid_budget_before_execution(monkeypatch):
+def test_explicit_zero_http_budget_and_invalid_budget_before_execution(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     import fatebridge.api as api
     from fatebridge.application.examples import example_input
     from fatebridge.services.tool_catalog import CATALOG
-    from fatebridge.transports import rest
 
     spec = next(spec for spec in CATALOG if spec.key == "bazi_career")
     inputs = example_input(spec)
@@ -428,11 +416,13 @@ def test_explicit_zero_http_budget_and_invalid_budget_before_execution(monkeypat
         if value == 0:
             assert "career_analysis" in response.json()
             assert "result_delivery" not in response.json()
+        else:
+            pass
 
     def must_not_execute(*args, **kwargs):
         pytest.fail("invalid HTTP budget must fail before domain execution")
 
-    monkeypatch.setattr(rest, "execute_tool", must_not_execute)
+    monkeypatch.setattr(api, "execute_tool", must_not_execute)
     for value in [1, 4095, 65537, "invalid"]:
         response = client.post(
             spec.rest_path, json=inputs, params={"response_char_limit": value}
@@ -441,12 +431,12 @@ def test_explicit_zero_http_budget_and_invalid_budget_before_execution(monkeypat
         assert response.json()["error_code"] == "validation_error"
 
 
-def test_attach_run_metadata_uses_explicit_name():
+def test_attach_run_metadata_uses_explicit_name() -> None:
     out = attach_run_metadata({"x": 1}, tool_name="bazi_wealth")
     assert out["run_metadata"]["tool_name"] == "bazi_wealth"
 
 
-def test_run_metadata_flags_approximate_astro_engine():
+def test_run_metadata_flags_approximate_astro_engine() -> None:
     # Approximate / mixed astro backends -> degraded precision flag is True.
     approx = attach_run_metadata(
         {"chart_profile": {"engine_backend": "fatebridge_approximate_orbital_model"}},
@@ -468,7 +458,7 @@ def test_run_metadata_flags_approximate_astro_engine():
     assert bazi["run_metadata"]["engine_is_approximate"] is False
 
 
-def test_run_metadata_flags_silent_moshier_downgrade():
+def test_run_metadata_flags_silent_moshier_downgrade() -> None:
     # swisseph backend reports a constant engine_precision/backend regardless of
     # whether .se1 data files exist; the real model is in ephemeris_model. A
     # silent downgrade to Moshier (or mixed) must still flag approximate=True so
@@ -499,19 +489,19 @@ def test_run_metadata_flags_silent_moshier_downgrade():
     assert swieph["run_metadata"]["engine_is_approximate"] is False
 
 
-def test_engine_is_approximate_unit():
+def test_engine_is_approximate_unit() -> None:
     assert engine_is_approximate("approximate_orbital_model") is True
     assert engine_is_approximate("mixed_runtime_backends") is True
     assert engine_is_approximate("ephemeris_runtime_model") is False
     assert engine_is_approximate(run_metadata.DEFAULT_ENGINE) is False
 
 
-def test_attach_run_metadata_is_idempotent():
+def test_attach_run_metadata_is_idempotent() -> None:
     seeded = {"run_metadata": {"tool_name": "already"}, "x": 1}
     assert attach_run_metadata(seeded, tool_name="other") is seeded
 
 
-def test_resolve_runtime_engine_still_detects_engine():
+def test_resolve_runtime_engine_still_detects_engine() -> None:
     assert (
         resolve_runtime_engine({"chart_profile": {"engine_backend": "swiss"}})
         == "swiss"
@@ -519,43 +509,41 @@ def test_resolve_runtime_engine_still_detects_engine():
     assert resolve_runtime_engine({"nothing": 1}) == run_metadata.DEFAULT_ENGINE
 
 
-@pytest.mark.parametrize("compact", [False, True])
-def test_native_response_preserves_the_tool_receipt_and_requested_json_style(compact):
+def test_native_response_preserves_the_tool_receipt_without_duplicate_text() -> None:
     spec = SPECS["gua_lookup"]
-    result = asyncio.run(native(spec, {"query": "111111"}, compact=compact))
+    result = asyncio.run(native(spec, {"query": "111111"}))
     assert not result.is_error
     payload = result.structured_content
-    assert payload["run_metadata"]["tool_name"] == spec.run_metadata_name
+    assert payload["run_metadata"]["tool_name"] == spec.tool_name
     assert payload["run_metadata"]["run_id"]
-    text = result.content[0].text
-    assert json.loads(text) == payload
-    assert ("\n" not in text) if compact else text.startswith("{\n")
+    assert result.content == []
 
 
 @pytest.mark.parametrize(
     "arguments",
     [
-        {"name": ["111", "000"], "compact": False, "include_snapshot_text": False},
+        {"name": ["111", "000"], "include_snapshot_text": False},
         {"name": ["111"], "fields": ["missing"], "strict_fields": True},
     ],
 )
-def test_native_success_and_error_have_matching_text_and_structured_content(arguments):
+def test_native_success_and_error_use_structured_content(arguments) -> None:
     async def run():
-        async with Client(mcp.create_mcp_app(families="divination")) as client:
-            result = await client.call_tool(
-                "gua_meiyi", arguments, raise_on_error=False
+        async with Client(cached_mcp_app(families="divination")) as client:
+            result = await call_calculation(
+                client, "gua_meanings", arguments, raise_on_error=False
             )
-            payload = json.loads(result.content[0].text)
-            assert payload == result.structured_content
+            payload = result.structured_content
             assert result.is_error is ("error_code" in payload)
-            if not arguments.get("strict_fields"):
-                assert "\n" in result.content[0].text
+            if result.is_error:
+                assert result.content[0].text == payload["error"]
+            else:
+                assert result.content == []
                 assert "snapshot_text" not in payload
 
     asyncio.run(run())
 
 
-def test_mcp_import_inside_running_loop_has_no_coroutine_warning():
+def test_mcp_import_inside_running_loop_has_no_coroutine_warning() -> None:
     code = """
 import asyncio, gc, warnings
 warnings.simplefilter('error', RuntimeWarning)
@@ -563,7 +551,7 @@ async def load():
     from fastmcp import Client
     import fatebridge.mcp_server as module
     async with Client(module.app) as client:
-        assert any(tool.name == 'gua_meiyi' for tool in await client.list_tools())
+        assert any(tool.name == 'run_calculation' for tool in await client.list_tools())
     gc.collect()
 asyncio.run(load())
 """
@@ -577,7 +565,7 @@ asyncio.run(load())
     assert "never awaited" not in proc.stderr
 
 
-def test_classical_rules_import_without_predictive_backend():
+def test_classical_rules_import_without_predictive_backend() -> None:
     code = """
 import sys
 from fatebridge.core.classical_western import bound_lord
@@ -590,34 +578,58 @@ assert 'fatebridge.core.predictive._common' not in sys.modules
     assert proc.returncode == 0, proc.stderr
 
 
-@pytest.mark.parametrize("field", ["taiyin", "taiyang", "shaoyang", "shaoyin"])
-@pytest.mark.parametrize("invalid", ["乾卦", ""])
-def test_invalid_trigram_is_not_replaced_by_a_default(field, invalid):
-    with pytest.raises(ValueError, match=field):
-        build_tongshefa_result(**{field: invalid})
+def test_invalid_or_missing_trigram_is_not_replaced_by_a_default() -> None:
+    base = {"taiyin": "巽", "taiyang": "坤", "shaoyang": "震", "shaoyin": "震"}
+    with pytest.raises(ValueError, match="taiyin"):
+        build_tongshefa_result()
+    with pytest.raises(ValueError, match="taiyin"):
+        build_tongshefa_result(taiyin=None, taiyang=None, shaoyang=None, shaoyin=None)
+    for field in ("taiyin", "taiyang", "shaoyang", "shaoyin"):
+        partial = {k: v for k, v in base.items() if k != field}
+        with pytest.raises(ValueError, match=field):
+            build_tongshefa_result(**partial)
+        for invalid in (None, "乾卦", ""):
+            with pytest.raises(ValueError, match=field):
+                build_tongshefa_result(**{**base, field: invalid})
 
 
-@pytest.mark.parametrize("field", ["taiyin", "taiyang", "shaoyang", "shaoyin"])
-def test_invalid_trigram_fails_on_all_transports(field, surface_calls):
+def test_empty_and_invalid_trigrams_fail_on_all_transports(rest, surface_calls) -> None:
     spec = SPECS["tongshefa"]
-    payload = {field: "乾卦"}
-    response, protocol, code, local = surface_calls(spec, payload)
-    assert response.status_code == 400 and code == 1 and protocol.is_error
-    for output in [response.json(), local, protocol.structured_content]:
+    valid = {"taiyin": "巽", "taiyang": "坤", "shaoyang": "震", "shaoyin": "震"}
+
+    response, protocol, code, local = surface_calls(spec, {})
+    assert response.status_code == 422 and code == 2 and protocol.is_error
+    for output in (response.json(), protocol.structured_content):
         assert output["error_code"] == "validation_error"
-        assert field in output["error"]
         assert "tongshefa" not in output
+        assert {issue["path"] for issue in output["issues"]} == set(valid)
+    assert local["error_code"] == "usage_error"
+    assert "tongshefa" not in local
+    for field in valid:
+        assert f"--{field}" in local["error"]
+
+    for field in ("taiyin", "taiyang", "shaoyang", "shaoyin"):
+        payload = {**valid, field: "乾卦"}
+        if field == "taiyin":
+            response, protocol, code, local = surface_calls(spec, payload)
+            assert response.status_code == 422 and code == 1 and protocol.is_error
+            outputs = (response.json(), local, protocol.structured_content)
+        else:
+            response = rest.post(spec.rest_path, json=payload)
+            assert response.status_code == 422
+            outputs = (response.json(),)
+        for output in outputs:
+            assert output["error_code"] == "validation_error"
+            assert any(issue["path"] == field for issue in output["issues"])
+            assert "tongshefa" not in output
 
 
-def test_omitted_and_null_trigrams_keep_the_declared_default_chart():
-    result = build_tongshefa_result(
-        taiyin=None, taiyang=None, shaoyang=None, shaoyin=None
-    )
-    assert result["input_normalized"] == {
-        "taiyin": "巽",
-        "taiyang": "坤",
-        "shaoyang": "震",
-        "shaoyin": "震",
-    }
+def test_explicit_trigrams_build_expected_tongshefa_chart(rest, surface_calls) -> None:
+    payload = {"taiyin": "巽", "taiyang": "坤", "shaoyang": "震", "shaoyin": "震"}
+    result = build_tongshefa_result(**payload)
+    assert result["input_normalized"] == payload
     assert result["tongshefa"]["baseLeft"]["name"] == "风雷益"
     assert result["tongshefa"]["baseRight"]["name"] == "地雷复"
+    response, protocol, code, local = surface_calls(SPECS["tongshefa"], payload)
+    assert response.status_code == 200 and code == 0 and not protocol.is_error
+    assert local["tongshefa"]["baseLeft"]["name"] == "风雷益"

@@ -7,9 +7,9 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core import sukuyo_witness_research as witnesses
-from fatebridge.core.sukuyo import calendar_mansion, day_evidence
-from tests.sukuyo.test_sukuyo_witness_research import critical
+from fatebridge.core.sukuyo import sukuyo_witness_research as witnesses
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence
+from tests.unit_test.fixtures.sukuyo_readings import critical
 
 ROOT = Path(__file__).resolve().parents[2]
 FROZEN = json.loads(
@@ -17,7 +17,7 @@ FROZEN = json.loads(
 )["expected_bundle"]
 
 
-def test_later_completion_preserves_the_same_queue_and_historical_firsts():
+def test_later_completion_preserves_the_same_queue_and_historical_firsts() -> None:
     result = critical()
     old = result["image_witness_research"]
     prior = result["image_witness_native_followup"]
@@ -42,7 +42,7 @@ def test_later_completion_preserves_the_same_queue_and_historical_firsts():
     ]
 
 
-def test_working_readings_and_feedback_do_not_rewrite_old_disagreements():
+def test_working_readings_and_feedback_do_not_rewrite_old_disagreements() -> None:
     result = critical()
     current = result["image_witness_native_completion"]
     timing = current["selected_timing"]
@@ -67,7 +67,7 @@ def test_working_readings_and_feedback_do_not_rewrite_old_disagreements():
 
 
 @pytest.mark.parametrize("field", ["id", "source_bundle_sha256"])
-def test_completion_cannot_bind_to_a_different_followup(field):
+def test_completion_cannot_bind_to_a_different_followup(field: str) -> None:
     prior = copy.deepcopy(critical()["image_witness_native_followup"])
     prior[field] = "changed"
     with pytest.raises(ValueError, match="此前后续参考不一致"):
@@ -75,8 +75,8 @@ def test_completion_cannot_bind_to_a_different_followup(field):
 
 
 def test_changed_facts_or_acceptance_are_rejected_before_delivery(
-    tmp_path, monkeypatch
-):
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     altered = copy.deepcopy(FROZEN)
     altered["acceptance"]["leap_short_overlap_priority"] = True
     changed = tmp_path / "altered-completion.json"
@@ -92,8 +92,8 @@ def test_changed_facts_or_acceptance_are_rejected_before_delivery(
     [("1903-06-25", ["鬼", "参"], "参"), ("1957-09-24", ["角", "轸"], "角")],
 )
 def test_new_dawn_evidence_keeps_overlap_uncertainty_and_known_second_half(
-    date, candidates, second
-):
+    date: str, candidates, second: str
+) -> None:
     for part in (None, "first_half", "second_half"):
         result = calendar_mansion(
             date, calendar_profile="hinoo_t1299_host27", calendar_day_part=part

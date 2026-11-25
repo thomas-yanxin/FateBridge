@@ -2,10 +2,11 @@
 
 import copy
 import json
+from pathlib import Path
 
 import pytest
 
-from fatebridge.core.sukuyo import calendar_mansion, day_evidence
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence
 from scripts.sukuyo import check_sukuyo_month_transitions as audit
 
 
@@ -32,7 +33,7 @@ def calculate(row, half="None"):
     )
 
 
-def test_source_only_oracle_keeps_all_hosts_and_declared_conditions(oracle):
+def test_source_only_oracle_keeps_all_hosts_and_declared_conditions(oracle) -> None:
     rows, protocol = oracle
     assert len(rows) == 27581
     assert {key: value["conditions"] for key, value in protocol["counts"].items()} == {
@@ -67,12 +68,14 @@ def test_source_only_oracle_keeps_all_hosts_and_declared_conditions(oracle):
     ],
 )
 @pytest.mark.parametrize("half", ["None", "first_half", "second_half"])
-def test_all_four_length_patterns_and_following_months_match(oracle, civil, half):
+def test_all_four_length_patterns_and_following_months_match(
+    oracle, civil: str, half: str
+) -> None:
     row = row_for(oracle, civil)
     assert not audit.compare_calendar(row, half, calculate(row, half))["differences"]
 
 
-def test_equal_mansion_cannot_hide_a_wrong_lunar_year(oracle):
+def test_equal_mansion_cannot_hide_a_wrong_lunar_year(oracle) -> None:
     row = row_for(oracle, "0801-02-21")
     result = calculate(row)
     assert result["natal_su27"] == "室"
@@ -85,7 +88,7 @@ def test_equal_mansion_cannot_hide_a_wrong_lunar_year(oracle):
     assert differences["before_regular_month"]["expected"][0] == 800
 
 
-def test_declared_second_half_cannot_hide_a_deleted_first_half_branch(oracle):
+def test_declared_second_half_cannot_hide_a_deleted_first_half_branch(oracle) -> None:
     row = row_for(oracle, "0814-08-23")
     result = calculate(row, "second_half")
     assert result["natal_su27"] == "张"
@@ -100,8 +103,8 @@ def test_declared_second_half_cannot_hide_a_deleted_first_half_branch(oracle):
 
 @pytest.mark.parametrize("mutation", ["shorten_domain", "change_expected", "omit_host"])
 def test_fixed_protocol_cannot_be_replaced_by_a_narrower_passing_subset(
-    tmp_path, monkeypatch, mutation
-):
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, mutation: str
+) -> None:
     protocol = json.loads(audit.PROTOCOL.read_bytes())
     if mutation == "shorten_domain":
         protocol["counts"]["chinese_hko_utc08"]["month_starts"] -= 1
@@ -125,8 +128,8 @@ def test_fixed_protocol_cannot_be_replaced_by_a_narrower_passing_subset(
     ],
 )
 def test_actual_missing_month_and_current_baseline_both_explained(
-    civil, year, month, leap, missing, ordinary
-):
+    civil: str, year: int, month: int, leap: bool, missing: str, ordinary: str
+) -> None:
     kwargs = (
         {"calendar_basis": "japanese_naoj_historical_utc09", "zone": "+09:00"}
         if civil < "1900"

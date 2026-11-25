@@ -12,17 +12,24 @@ from pathlib import Path
 import pytest
 
 from fatebridge.core import ephemeris_runtime
-from fatebridge.core.astro.ephemeris import _swisseph_angles
-from fatebridge.core.astro_models import (
+from fatebridge.core.astro import earth_attitude
+from fatebridge.core.astro.earth_rotation import (
     MODERN_HALF_WINDOW_DAYS,
     MODERN_REFERENCE_JD_TT,
+    selected_sidereal_model,
 )
+from fatebridge.core.astro.ephemeris import _swisseph_angles
+from fatebridge.core.astro.iers_ut1 import use_ut1_source
+from tests.support.reference_data import read
 
 ROOT = Path(__file__).parents[2]
 REFERENCE = json.loads(
     (ROOT / "tests/data/astrodice/tables/rotation-erfa.json").read_text()
 )
 PROTOCOL = REFERENCE["protocol"]
+ADOPTION_ANCHORS = read(
+    ROOT / "tests/data/astro/rotation_tt_policy/boundary-anchors.json"
+)
 LOCATIONS = [
     (case, location) for case in REFERENCE["cases"] for location in case["locations"]
 ]
@@ -40,7 +47,7 @@ def rotation_matches(case):
     )
 
 
-def test_reference_keeps_the_prepared_protocol_and_independent_generator():
+def test_reference_keeps_the_prepared_protocol_and_independent_generator() -> None:
     assert (
         REFERENCE["protocol_sha256"]
         == hashlib.sha256(
@@ -68,12 +75,14 @@ def test_reference_keeps_the_prepared_protocol_and_independent_generator():
 
 
 @pytest.mark.parametrize("case", REFERENCE["cases"], ids=lambda c: c["civil_utc"])
-def test_managed_apparent_sidereal_time_matches_independent_erfa(case):
+def test_managed_apparent_sidereal_time_matches_independent_erfa(case) -> None:
     assert rotation_matches(case)
 
 
 @pytest.mark.parametrize("case,location", LOCATIONS)
-def test_core_tropical_axes_match_independent_erfa_vector_geometry(case, location):
+def test_core_tropical_axes_match_independent_erfa_vector_geometry(
+    case, location
+) -> None:
     result = _swisseph_angles(
         case["jd_ut1"], location["longitude"], location["latitude"]
     )
@@ -87,8 +96,8 @@ def test_core_tropical_axes_match_independent_erfa_vector_geometry(case, locatio
 
 @pytest.mark.parametrize("date", ["2050-12-21", "2099-09-23"])
 def test_disabling_rotation_adapter_is_detected_by_the_same_erfa_gate(
-    monkeypatch, date
-):
+    monkeypatch: pytest.MonkeyPatch, date: str
+) -> None:
     case = next(
         c for c in REFERENCE["cases"] if c["civil_utc"].startswith(date + "T12:00")
     )
@@ -96,14 +105,14 @@ def test_disabling_rotation_adapter_is_detected_by_the_same_erfa_gate(
     monkeypatch.setattr(
         ephemeris_runtime,
         "native_rotation_call",
-        lambda module, operation, args, kwargs: getattr(module, operation)(
-            *args, **kwargs
-        ),
+        lambda module, operation, args, kwargs, *, calculate: getattr(
+            module, operation
+        )(*args, **kwargs),
     )
     assert not rotation_matches(case)
 
 
-def test_inventing_a_ten_arcsecond_reference_shift_is_detected():
+def test_inventing_a_ten_arcsecond_reference_shift_is_detected() -> None:
     case = REFERENCE["cases"][0]
     assert rotation_matches(case)
     assert not rotation_matches(
@@ -112,13 +121,18 @@ def test_inventing_a_ten_arcsecond_reference_shift_is_detected():
 
 
 def adoption_edge_discontinuity_arcseconds(boundary_tt):
-    swe = ephemeris_runtime.swe
-    ut1 = boundary_tt
-    for _ in range(5):
-        ut1 = boundary_tt - swe.deltat_ex(ut1, swe.FLG_SWIEPH)
+    ut1 = next(row["ut1"] for row in ADOPTION_ANCHORS if row["tt"] == boundary_tt)
     before, after = ut1 - 0.001 / 86400, ut1 + 0.001 / 86400
-    left = ephemeris_runtime.ephemeris_call("sidtime", before) * 15
-    right = ephemeris_runtime.ephemeris_call("sidtime", after) * 15
+    with use_ut1_source("swiss_delta_t"):
+        models = [
+            selected_sidereal_model(
+                earth_attitude._rotation_tt(ephemeris_runtime.swe, epoch)
+            )
+            for epoch in (before, after)
+        ]
+        assert models == ([4, 3] if boundary_tt < MODERN_REFERENCE_JD_TT else [3, 4])
+        left = ephemeris_runtime.ephemeris_call("sidtime", before) * 15
+        right = ephemeris_runtime.ephemeris_call("sidtime", after) * 15
     # Subtract nominal rotation over this ~2ms bracket. Precession/nutation
     # change over 2ms is negligible relative to the predeclared 0.02" gate.
     advance = (right - left + 180) % 360 - 180
@@ -127,7 +141,7 @@ def adoption_edge_discontinuity_arcseconds(boundary_tt):
 
 
 @pytest.mark.parametrize("sign", [-1, 1])
-def test_adoption_edge_has_no_resolvable_phase_jump(sign):
+def test_adoption_edge_has_no_resolvable_phase_jump(sign) -> None:
     boundary = MODERN_REFERENCE_JD_TT + sign * MODERN_HALF_WINDOW_DAYS
     assert (
         adoption_edge_discontinuity_arcseconds(boundary)
@@ -136,23 +150,17 @@ def test_adoption_edge_has_no_resolvable_phase_jump(sign):
 
 
 @pytest.mark.parametrize("sign", [-1, 1])
-def test_old_hard_switch_is_detected_at_both_adoption_edges(monkeypatch, sign):
-    import fatebridge.core.astro_models as models
-
+def test_old_hard_switch_is_detected_at_both_adoption_edges(
+    monkeypatch: pytest.MonkeyPatch, sign
+) -> None:
     boundary = MODERN_REFERENCE_JD_TT + sign * MODERN_HALF_WINDOW_DAYS
     assert (
         adoption_edge_discontinuity_arcseconds(boundary)
         <= PROTOCOL["gast_tolerance_arcseconds"]
     )
-    standard = models._standard_correction
-
-    def old_correction(module, jd_ut1):
-        tt = jd_ut1 + module.deltat_ex(jd_ut1, module.FLG_SWIEPH)
-        return (
-            standard(module, jd_ut1) if models.selected_sidereal_model(tt) == 3 else 0
-        )
-
-    monkeypatch.setattr(models, "_correction", old_correction)
+    # The modern branch already uses the standard frame GAST. Remove the
+    # remote branch's edge alignment to reproduce the old hard switch.
+    monkeypatch.setattr(earth_attitude, "_correction", lambda *args, **kwargs: 0.0)
     assert (
         adoption_edge_discontinuity_arcseconds(boundary)
         > PROTOCOL["gast_tolerance_arcseconds"]

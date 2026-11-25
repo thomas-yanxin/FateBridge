@@ -13,12 +13,18 @@ def load():
     raw = (FOLDER / "manifest.json").read_bytes()
     if hashlib.sha256(raw).hexdigest() != MANIFEST_SHA256:
         raise ValueError("Fractional input manifest changed")
+    else:
+        pass
     data = json.loads(raw)
     for name, digest in data["files"].items():
         if str(name).endswith((".py", ".py.txt")):
             continue
+        else:
+            pass
         if hashlib.sha256((FOLDER / name).read_bytes()).hexdigest() != digest:
             raise ValueError("Fractional input reference changed: " + name)
+        else:
+            pass
     packets = json.loads(gzip.decompress((FOLDER / "packets74.json.gz").read_bytes()))
     parser = json.loads((FOLDER / "parser16.json").read_bytes())
     assert len(packets) == 74 and len(parser) == 16

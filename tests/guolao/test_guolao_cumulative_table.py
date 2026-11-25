@@ -8,11 +8,11 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core import guolao_cumulative_table as table
-from fatebridge.core import guolao_day_rate as previous
-from fatebridge.core.guolao_calendar_year import gujin_fixed_qice_year
-from fatebridge.core.guolao_historical import shoushi_winter_cycle
-from fatebridge.validation.guolao_calendars import (
+from fatebridge.core.guolao import guolao_cumulative_table as table
+from fatebridge.core.guolao import guolao_day_rate as previous
+from fatebridge.core.guolao.guolao_calendar_year import gujin_fixed_qice_year
+from fatebridge.core.guolao.guolao_historical import shoushi_winter_cycle
+from validation.guolao_calendars import (
     audit_named_year_grid,
     compare_literal_calendar_methods,
     compare_official_calendar,
@@ -22,7 +22,9 @@ ROOT = Path(__file__).parents[2]
 FIXTURE = ROOT / "tests/fixtures/guolao-cumulative-table-v1"
 
 
-def test_complete_original_images_transcription_and_reading_corrections_are_pinned():
+def test_complete_original_images_transcription_and_reading_corrections_are_pinned() -> (
+    None
+):
     reference = json.loads((FIXTURE / "reference.json").read_text())
     for artifact in reference["artifacts"]:
         raw = (FIXTURE / artifact["path"]).read_bytes()
@@ -51,7 +53,7 @@ def test_complete_original_images_transcription_and_reading_corrections_are_pinn
     assert journal["genuine_source_increment_conflicts_retained"] == [12, 155, 163]
 
 
-def test_separately_printed_columns_keep_three_real_inconsistencies():
+def test_separately_printed_columns_keep_three_real_inconsistencies() -> None:
     result = table.audit_gujin45_cumulative_table()
     assert (
         result["numeric_cumulative_cells"],
@@ -84,8 +86,8 @@ def test_separately_printed_columns_keep_three_real_inconsistencies():
 )
 @pytest.mark.parametrize("slow", [False, True])
 def test_literal_increment_not_its_adjacent_difference_drives_interpolation(
-    within, index, cumulative, increment, slow
-):
+    within: str, index: int, cumulative: str, increment: str, slow: bool
+) -> None:
     anomaly = F(within) + (F("13.7773") if slow else F())
     result = table.gujin_literal_lunar(anomaly)
     expected = F(cumulative) + F(increment) / 2
@@ -107,7 +109,7 @@ def test_literal_increment_not_its_adjacent_difference_drives_interpolation(
     )
 
 
-def test_origin_empty_is_retained_with_only_its_explicit_zero_origin_policy():
+def test_origin_empty_is_retained_with_only_its_explicit_zero_origin_policy() -> None:
     result = table.gujin_literal_lunar(F(".041"))
     assert result["source_selected_cumulative_ancient_du"] is None
     assert result["empty_cumulative_origin_interpreted_as_zero"]
@@ -120,7 +122,7 @@ def test_origin_empty_is_retained_with_only_its_explicit_zero_origin_policy():
     assert not endpoint["empty_cumulative_endpoint_filled"]
 
 
-def test_last_interval_uses_its_own_printed_slope_without_filling_endpoint():
+def test_last_interval_uses_its_own_printed_slope_without_filling_endpoint() -> None:
     result = table.gujin_literal_lunar(F("13.7363"))
     assert result["whole_limit_index"] == 167
     assert result["source_selected_signed_increment_ancient_du"] == "-0.11081575"
@@ -129,14 +131,18 @@ def test_last_interval_uses_its_own_printed_slope_without_filling_endpoint():
 
 
 @pytest.mark.parametrize("anomaly", ["7.2807", "7.285", "7.2987", "21.0623"])
-def test_literal_table_does_not_bypass_existing_day_rate_ambiguity(anomaly):
+def test_literal_table_does_not_bypass_existing_day_rate_ambiguity(
+    anomaly: str,
+) -> None:
     result = table.gujin_literal_lunar(F(anomaly))
     assert result["status"] == "ambiguous_literal_rate_not_repaired"
     assert result["whole_limit_index"] is None
     assert result["signed_correction_ancient_du_exact"] is None
 
 
-def test_literal_runtime_is_independent_of_previous_integer_formula(monkeypatch):
+def test_literal_runtime_is_independent_of_previous_integer_formula(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     def forbidden(*args, **kwargs):
         raise AssertionError("integer formula must not supply literal-table cells")
 
@@ -148,7 +154,7 @@ def test_literal_runtime_is_independent_of_previous_integer_formula(monkeypatch)
     assert conjunction["profile_id"] == table.PROFILE
 
 
-def test_original49_local_angle_retains_published_rounding_residual():
+def test_original49_local_angle_retains_published_rounding_residual() -> None:
     result = table.gujin_literal_lunar(F("23.310758"))
     assert result["whole_limit_index"] == 116
     assert result["source_selected_cumulative_ancient_du"] == "4.56040000"
@@ -159,7 +165,7 @@ def test_original49_local_angle_retains_published_rounding_residual():
 
 
 @pytest.mark.parametrize("elapsed", [31, 296])
-def test_prior_endpoint_gap_still_uses167_and_never_supplies168(elapsed):
+def test_prior_endpoint_gap_still_uses167_and_never_supplies168(elapsed: int) -> None:
     middle = shoushi_winter_cycle(elapsed).zhongji_days
     result = table.gujin_literal_conjunction(middle, 10)
     assert result["lunar_velocity"]["whole_limit_index"] == 167
@@ -176,8 +182,8 @@ def test_prior_endpoint_gap_still_uses167_and_never_supplies168(elapsed):
     [("jiajing3_1524_wdl108", 26, 0), ("wanli27_1599_nlc_preview", 6, 4)],
 )
 def test_unchanged_official_facts_remain_distinct_from_missing_reference(
-    reference, expected, unknown
-):
+    reference: str, expected: int, unknown: int
+) -> None:
     result = compare_official_calendar(reference, conjunction_method="literal_table")
     assert result["counts"] == dict(
         matches=expected,
@@ -189,7 +195,7 @@ def test_unchanged_official_facts_remain_distinct_from_missing_reference(
     assert not result["pre_registered_holdout"]
 
 
-def test_full_grid_keeps_all_eight_unresolved_years():
+def test_full_grid_keeps_all_eight_unresolved_years() -> None:
     result = audit_named_year_grid(0, 400, conjunction_method="literal_table")
     assert result["input_years"] == 400 and result["input_years_dropped"] == 0
     assert result["counts"] == dict(
@@ -208,7 +214,9 @@ def test_full_grid_keeps_all_eight_unresolved_years():
 
 
 @pytest.mark.parametrize("elapsed", [31, 45, 46, 243])
-def test_method_comparison_keeps_all_declared_positions_and_missingness(elapsed):
+def test_method_comparison_keeps_all_declared_positions_and_missingness(
+    elapsed: int,
+) -> None:
     result = compare_literal_calendar_methods(elapsed, elapsed + 1)
     assert result["input_years"] == 1
     assert result["conjunction_comparison_positions"] == 18
@@ -218,6 +226,8 @@ def test_method_comparison_keeps_all_declared_positions_and_missingness(elapsed)
     for p in positions:
         if p["comparison_status"] != "compared":
             assert p["literal_minus_integer_correction_days_exact"] is None
+        else:
+            pass
     if elapsed == 46:
         assert (
             result["conjunction_comparison_status_counts"][
@@ -229,6 +239,8 @@ def test_method_comparison_keeps_all_declared_positions_and_missingness(elapsed)
             result["conjunction_comparison_status_counts"]["source_value_unavailable"]
             == 1
         )
+    else:
+        pass
     assert not result["methods_selected_by_year_or_reference_fit"]
     assert not result["missing_or_unrequested_corrections_counted_as_agreement"]
 
@@ -251,8 +263,8 @@ def test_method_comparison_keeps_all_declared_positions_and_missingness(elapsed)
     ],
 )
 def test_malformed_or_overclaimed_source_tables_fail_closed(
-    tmp_path, monkeypatch, mutation
-):
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, mutation: str
+) -> None:
     data = json.loads(table.DATA.read_text())
     if mutation == "row_count":
         data["rows"].pop()
@@ -286,6 +298,6 @@ def test_malformed_or_overclaimed_source_tables_fail_closed(
 
 
 @pytest.mark.parametrize("value", [1, 1.2, "1", True])
-def test_exact_original_day_input_required(value):
+def test_exact_original_day_input_required(value: bool | float | int | str) -> None:
     with pytest.raises(TypeError):
         table.gujin_literal_lunar(value)

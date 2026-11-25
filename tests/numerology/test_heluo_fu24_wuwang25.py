@@ -4,23 +4,25 @@ import json
 from pathlib import Path
 
 import pytest
+from pytest import MonkeyPatch
 
-from fatebridge.core import heluo_texts as ht
-from fatebridge.core.heluo import gua_lines, lines_to_gua, yao_text
-from fatebridge.core.numerology_knowledge import _catalogue
+from fatebridge.core.heluo import heluo_texts as ht
+from fatebridge.core.heluo.heluo import gua_lines, lines_to_gua, yao_text
+from fatebridge.core.numerology.numerology_knowledge import _catalogue
 from fatebridge.services.knowledge import calculate_knowledge_read
 from fatebridge.utils.errors import NumerologySourceError
-
-W = Path(__file__).parents[1] / "fixtures/heluo_fu24_wuwang25_v1"
-LITERAL = json.loads((W / "reviewed-literals-v1.json").read_bytes())
 from tests.support.heluo_source_facts import (
     CATALOGUE_VERSION,
     HEADER_COUNT,
     PENDING_COUNT,
 )
+from tests.support.transports import rest as shared_rest
+
+W = Path(__file__).parents[1] / "fixtures/heluo_fu24_wuwang25_v1"
+LITERAL = json.loads((W / "reviewed-literals-v1.json").read_bytes())
 
 
-def test_reading_retractions_do_not_gain_independent_reader_or_repair_credit():
+def test_reading_retractions_do_not_gain_independent_reader_or_repair_credit() -> None:
     assert LITERAL["new_independent_readers"] == 0
     assert (
         len(
@@ -43,7 +45,7 @@ def test_reading_retractions_do_not_gain_independent_reader_or_repair_credit():
 )
 def test_printed_hexagram_without_printed_target_line_keeps_parent_and_leaf_conditions(
     ref,
-):
+) -> None:
     text = yao_text("地雷復", ref["source_line"])
     rows = text.get("commentary_cross_references", [])
     assert len(rows) == 1
@@ -72,7 +74,9 @@ def test_printed_hexagram_without_printed_target_line_keeps_parent_and_leaf_cond
     assert "未指定目标爻" in summary and "不替代正式后天卦" in summary
 
 
-def test_three_qualified_glyphs_stay_visible_and_current_counts_are_not_accuracy_scores():
+def test_three_qualified_glyphs_stay_visible_and_current_counts_are_not_accuracy_scores() -> (
+    None
+):
     for gua, line in [("地雷復", 1), ("地雷復", 4), ("地雷復", 5)]:
         assert "字形未决" in ht.text_status_snapshot(yao_text(gua, line))
     assert (
@@ -89,7 +93,9 @@ def test_three_qualified_glyphs_stay_visible_and_current_counts_are_not_accuracy
 @pytest.mark.parametrize(
     "entry", LITERAL["entries"], ids=lambda e: f"knowledge-{e['hexagram']}-{e['line']}"
 )
-def test_knowledge_summary_keeps_the_actual_reading_notes_and_unknown_conditions(entry):
+def test_knowledge_summary_keeps_the_actual_reading_notes_and_unknown_conditions(
+    entry,
+) -> None:
     out = calculate_knowledge_read(
         domain="heluo", key=f"{entry['hexagram']}:{entry['line']}"
     )
@@ -104,8 +110,8 @@ def test_knowledge_summary_keeps_the_actual_reading_notes_and_unknown_conditions
 
 @pytest.mark.parametrize("fault", ["body", "parent", "uncertainty", "reference_line"])
 def test_content_and_explicit_qualification_mutations_cannot_retain_reviewed_identity(
-    fault, monkeypatch, tmp_path
-):
+    fault: str, monkeypatch: MonkeyPatch, tmp_path: Path
+) -> None:
     data = json.loads(ht.COMMENTARY_PATH.read_bytes())
     entry = next(
         e for e in data["entries"] if e["hexagram"] == "地雷復" and e["line"] == 3
@@ -136,8 +142,6 @@ def test_content_and_explicit_qualification_mutations_cannot_retain_reviewed_ide
     finally:
         ht._commentary_collation.cache_clear()
 
-
-from tests.support.transports import rest as shared_rest
 
 rest = shared_rest
 

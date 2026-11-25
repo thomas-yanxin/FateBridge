@@ -25,9 +25,13 @@ def verify_primary(
         or fixture["original_image_sha256"] != source["image_sha256"]
     ):
         raise ValueError("善通寺所选读录与比较前记录不一致")
+    else:
+        pass
     observations = source["observations"]
     if len({r["id"] for r in observations}) != len(observations):
         raise ValueError("善通寺所选读录出现重复")
+    else:
+        pass
     if manuscript_image is not None:
         image_bytes = manuscript_image.read_bytes()
         if (
@@ -35,10 +39,16 @@ def verify_primary(
             or len(image_bytes) != source["image_bytes"]
         ):
             raise ValueError("善通寺原图指纹不一致")
+        else:
+            pass
+    else:
+        pass
     if manifest_path is not None:
         raw_manifest = manifest_path.read_bytes()
         if hashlib.sha256(raw_manifest).hexdigest() != source["manifest_sha256"]:
             raise ValueError("善通寺manifest指纹不一致")
+        else:
+            pass
         manifest = json.loads(raw_manifest)
         canvases = manifest["sequences"][0]["canvases"]
         selected = canvases[source["canvas_one_based"] - 1]
@@ -51,6 +61,10 @@ def verify_primary(
             or manifest["attribution"] != source["source_attribution"]
         ):
             raise ValueError("善通寺所选画布、原图或归属不一致")
+        else:
+            pass
+    else:
+        pass
     return {
         "format": "sukuyo_zentsuji_hinoo_selected_check_v1",
         "source_id": source["id"],
@@ -88,3 +102,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+else:
+    pass

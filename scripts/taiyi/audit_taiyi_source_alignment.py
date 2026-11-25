@@ -5,13 +5,10 @@ from __future__ import annotations
 import json
 from collections import Counter
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 from fatebridge.core.metaphysics.taiyi_source_alignment import count_source_assessment
 from fatebridge.core.metaphysics.taiyi_year import cyclic_core
-
-if TYPE_CHECKING:
-    from scripts.taiyi.build_taiyi_source_alignment import CORPUS, source_data
 from scripts.taiyi.build_taiyi_source_alignment import CORPUS, source_data
 
 

@@ -9,9 +9,13 @@ from pathlib import Path
 import pytest
 
 from fatebridge.core.astro import runtime
-from fatebridge.core.human_design import bodygraph, chart_at, longitude_activation
-from fatebridge.core.human_design_mechanics import GATE_ORDER
-from fatebridge.core.human_design_precision import compare_node_backends
+from fatebridge.core.human_design.human_design import (
+    bodygraph,
+    chart_at,
+    longitude_activation,
+)
+from fatebridge.core.human_design.human_design_mechanics import GATE_ORDER
+from fatebridge.core.human_design.human_design_precision import compare_node_backends
 
 
 def _at_gate(gate):
@@ -41,8 +45,8 @@ def _chart():
 
 
 def test_backend_comparison_recomputes_joint_mechanics_and_preserves_selected_chart(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     chart = _chart()
     before = copy.deepcopy(chart)
     calls = []
@@ -70,14 +74,18 @@ def test_backend_comparison_recomputes_joint_mechanics_and_preserves_selected_ch
     assert result["subdivision_accuracy_certified"] is False
 
 
-def test_node_reference_does_not_inherit_the_selected_native_flag_label(monkeypatch):
-    from fatebridge.core import human_design_precision as module
+def test_node_reference_does_not_inherit_the_selected_native_flag_label(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from fatebridge.core.human_design import human_design_precision as module
 
     chart = _chart()
     for rows in chart["activations"].values():
         for row in rows:
             if row["body"] in {"NorthNode", "SouthNode"}:
                 row["native_return_flag_model"] = "swieph"
+            else:
+                pass
     original = copy.deepcopy(chart)
     monkeypatch.setattr(
         runtime,
@@ -103,15 +111,21 @@ def test_node_reference_does_not_inherit_the_selected_native_flag_label(monkeypa
                     == (runtime.ephemeris_model_from_retflag(row["return_flags"]))
                     == "moshier"
                 )
+            else:
+                pass
 
 
 @pytest.mark.parametrize("invalid", ["bad", None])
-def test_invalid_node_convention_cannot_be_hidden_by_diagnostic(invalid):
+def test_invalid_node_convention_cannot_be_hidden_by_diagnostic(
+    invalid: str | None,
+) -> None:
     with pytest.raises(ValueError):
         compare_node_backends(_chart(), invalid)
 
 
-def test_mean_node_cannot_gain_independence_by_switching_ephemeris_flags(monkeypatch):
+def test_mean_node_cannot_gain_independence_by_switching_ephemeris_flags(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     def forbidden(*args):
         raise AssertionError("mean-node backend switch must not be called")
 
@@ -125,10 +139,14 @@ def test_mean_node_cannot_gain_independence_by_switching_ephemeris_flags(monkeyp
 @pytest.mark.parametrize(
     "failure", ["exception", "nan", "negative_flag", "wrong_backend"]
 )
-def test_unavailable_reference_never_becomes_silent_agreement(monkeypatch, failure):
+def test_unavailable_reference_never_becomes_silent_agreement(
+    monkeypatch: pytest.MonkeyPatch, failure: str
+) -> None:
     def failed(*args):
         if failure == "exception":
             raise RuntimeError("reference failed")
+        else:
+            pass
         return (
             (float("nan") if failure == "nan" else 100, 0, 0, 0, 0, 0),
             (
@@ -148,7 +166,7 @@ def test_unavailable_reference_never_becomes_silent_agreement(monkeypatch, failu
     assert result["mechanical_comparison"] is None and result["rows"] == []
 
 
-def test_moshier_compared_to_itself_is_explicitly_not_independent():
+def test_moshier_compared_to_itself_is_explicitly_not_independent() -> None:
     from tests.support.ephemeris_context import empty_ephemeris_path
 
     with empty_ephemeris_path():
@@ -160,7 +178,7 @@ def test_moshier_compared_to_itself_is_explicitly_not_independent():
     assert result["independent_astronomy_certified"] is False
 
 
-def test_same_backend_equality_cannot_certify_fine_subdivision_accuracy():
+def test_same_backend_equality_cannot_certify_fine_subdivision_accuracy() -> None:
     from fatebridge.services.human_design import calculate_human_design
     from tests.support.ephemeris_context import empty_ephemeris_path
 
@@ -176,10 +194,9 @@ def test_same_backend_equality_cannot_certify_fine_subdivision_accuracy():
     assert result["node_backend_comparison"]["status"] == "same_backend_not_independent"
     assert result["node_backend_comparison"]["subdivision_accuracy_certified"] is False
     assert result["interpretation"]["ephemeris_scope"]
-    assert result["validation"]["all_three_axes_full_marks"] is False
 
 
-def test_independent_de440_reference_recomposes_from_saved_raw_vectors():
+def test_independent_de440_reference_recomposes_from_saved_raw_vectors() -> None:
     path = Path(__file__).parents[1] / "fixtures/human-design-node-de440.json"
     reference = json.loads(path.read_text())
     assert reference["tolerance_arcseconds"] == 1.0

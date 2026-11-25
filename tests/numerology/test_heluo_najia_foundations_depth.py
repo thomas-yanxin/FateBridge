@@ -8,19 +8,23 @@ from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
+from pytest import MonkeyPatch
 
-from fatebridge.core import heluo, heluo_najia
-from fatebridge.core.heluo import hexagram_najia, judge, lines_to_gua
-from fatebridge.core.output_numerology import HeluoNajiaCollation, HeluoNajiaLine
+from fatebridge.core.contracts.output_numerology import (
+    HeluoNajiaCollation,
+    HeluoNajiaLine,
+)
+from fatebridge.core.heluo import heluo, heluo_months, heluo_najia
+from fatebridge.core.heluo.heluo import hexagram_najia, judge, lines_to_gua
+from fatebridge.core.heluo.heluo_months import MONTH_BRANCHES
 from fatebridge.utils.errors import NumerologySourceError
-from tests.numerology.test_heluo_month_depth import chart_for
-from tests.numerology.test_heluo_najia_depth import PILLARS
+from tests.unit_test.fixtures.heluo_charts import PILLARS, chart_for
 
 ROOT = Path(__file__).parents[1] / "fixtures/heluo_najia_foundations_v1"
 REFERENCE = json.loads((ROOT / "reference.json").read_text())
 
 
-def test_named_witnesses_and_no_inflated_independent_counts():
+def test_named_witnesses_and_no_inflated_independent_counts() -> None:
     assert REFERENCE["source_pdf_sha256"] == heluo_najia.SOURCE_SHA256
     for image in REFERENCE["images"]:
         assert (
@@ -45,7 +49,7 @@ def test_named_witnesses_and_no_inflated_independent_counts():
 
 
 @pytest.mark.parametrize("case", REFERENCE["hexagram_entries"], ids=lambda c: c["gua"])
-def test_thirteen_printed_assignment_lists(case):
+def test_thirteen_printed_assignment_lists(case) -> None:
     rows = hexagram_najia(case["lines"])
     assert [r["direct"] for r in rows] == case["direct"]
     assert [r["borrowed"] for r in rows] == case["borrowed"]
@@ -60,7 +64,7 @@ def test_thirteen_printed_assignment_lists(case):
 
 
 @pytest.mark.parametrize("bits", list(itertools.product((0, 1), repeat=6)))
-def test_composite_application_to_all_hexagrams_is_counted_as_derived(bits):
+def test_composite_application_to_all_hexagrams_is_counted_as_derived(bits) -> None:
     lines = list(bits)
     gua = lines_to_gua(lines)["name"]
     bases = {tuple(p["bits"]): p for p in REFERENCE["pure_tables"]}
@@ -81,7 +85,7 @@ def test_composite_application_to_all_hexagrams_is_counted_as_derived(bits):
         assert source["source_pdf_page"] == (anchor or base)["page"]
 
 
-def test_distinct_base_slots_and_repeated_entry_observations_are_separate():
+def test_distinct_base_slots_and_repeated_entry_observations_are_separate() -> None:
     summary = heluo_najia.collation_summary()
     assert summary["pure_trigram_tables"] == 8
     assert summary["pure_table_assignment_slots"] == 48
@@ -110,8 +114,8 @@ def test_distinct_base_slots_and_repeated_entry_observations_are_separate():
     ],
 )
 def test_actual_year_match_uses_its_own_source_position(
-    gua, year, pos, kind, source_gua, page, basis
-):
+    gua: str, year: str, pos: int, kind: str, source_gua: str, page: int, basis: str
+) -> None:
     out = judge(chart_for(gua), {**PILLARS, "year": year}, "卯")
     for row in out["najia"]:
         assert row["matches"] == [{"pos": pos, "kind": kind}]
@@ -123,7 +127,9 @@ def test_actual_year_match_uses_its_own_source_position(
         )
 
 
-def test_jie_has_two_same_order_printings_without_reordered_computation_or_source_certification():
+def test_jie_has_two_same_order_printings_without_reordered_computation_or_source_certification() -> (
+    None
+):
     chart = chart_for("雷水解")
     out = judge(chart, {**PILLARS, "year": "庚申"}, "卯")
     row = out["najia"][0]
@@ -149,7 +155,7 @@ def test_jie_has_two_same_order_printings_without_reordered_computation_or_sourc
     assert "按纯卦内外位推演" in text
 
 
-def test_source_readers_and_phase_lists_are_detached():
+def test_source_readers_and_phase_lists_are_detached() -> None:
     rows = hexagram_najia([0, 1, 0, 1, 0, 0])
     out = heluo_najia.annotate_positions("雷水解", [0, 1, 0, 1, 0, 0], rows)
     out["lines"][0]["borrowed"].append("调用方写入")
@@ -171,8 +177,8 @@ def test_source_readers_and_phase_lists_are_detached():
 
 
 def test_wrong_runtime_assignment_is_rejected_instead_of_retaining_source_claim(
-    monkeypatch,
-):
+    monkeypatch: MonkeyPatch,
+) -> None:
     bad = deepcopy(heluo.NAJIA)
     bad["艮"][-1] = "丙寅"
     monkeypatch.setattr(heluo, "NAJIA", bad)
@@ -190,7 +196,9 @@ def test_wrong_runtime_assignment_is_rejected_instead_of_retaining_source_claim(
         "invalid_ganzhi",
     ],
 )
-def test_incoherent_source_basis_does_not_load(key, monkeypatch, tmp_path):
+def test_incoherent_source_basis_does_not_load(
+    key: str, monkeypatch: MonkeyPatch, tmp_path: Path
+) -> None:
     data = json.loads(heluo_najia.COLLATION_PATH.read_text())
     if key == "identity":
         data["source_pdf_sha256"] = "0" * 64
@@ -224,12 +232,12 @@ def test_incoherent_source_basis_does_not_load(key, monkeypatch, tmp_path):
         {"source": {"basis": "complete_book_certified"}},
     ],
 )
-def test_typed_source_facts_reject_invented_values(payload):
+def test_typed_source_facts_reject_invented_values(payload) -> None:
     with pytest.raises(ValidationError):
         HeluoNajiaLine.model_validate(payload)
 
 
-def test_complete_assessment_cannot_be_inferred_from_full_base_coverage():
+def test_complete_assessment_cannot_be_inferred_from_full_base_coverage() -> None:
     with pytest.raises(ValidationError):
         HeluoNajiaCollation.model_validate(
             {"pure_trigram_tables": 8, "complete_assessment": True}
@@ -241,8 +249,7 @@ def test_complete_assessment_cannot_be_inferred_from_full_base_coverage():
 )
 def test_four_new_month_and_najia_phrases_keep_actual_facts_and_unresolved_connector(
     clause,
-):
-    from fatebridge.core.heluo_months import MONTH_BRANCHES
+) -> None:
 
     base = next(p for p in REFERENCE["pure_tables"] if p["gua"] == clause["gua"])
     outside = next(m for m in range(1, 13) if m not in clause["month_numbers"])
@@ -266,7 +273,7 @@ def test_four_new_month_and_najia_phrases_keep_actual_facts_and_unresolved_conne
             assert actual["match"] is None
 
 
-def test_kan_timeliness_phrase_does_not_become_an_invented_fixed_month():
+def test_kan_timeliness_phrase_does_not_become_an_invented_fixed_month() -> None:
     summary = heluo_najia.collation_summary()
     nuance = summary["unquantified_timing_najia_clauses"][0]
     assert nuance["gua"] == "坎為水" and nuance["page"] == 187
@@ -278,8 +285,9 @@ def test_kan_timeliness_phrase_does_not_become_an_invented_fixed_month():
     )
 
 
-def test_month_cache_hash_and_data_version_identify_loaded_bytes(monkeypatch, tmp_path):
-    from fatebridge.core import heluo_months
+def test_month_cache_hash_and_data_version_identify_loaded_bytes(
+    monkeypatch: MonkeyPatch, tmp_path: Path
+) -> None:
 
     original = heluo_months.COLLATION_PATH.read_bytes()
     path = tmp_path / "month.json"

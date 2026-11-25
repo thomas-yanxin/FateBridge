@@ -13,7 +13,10 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
-from fatebridge.core.human_design import longitude_activation, opposite_activation
+from fatebridge.core.human_design.human_design import (
+    longitude_activation,
+    opposite_activation,
+)
 from scripts.human_design.gen_human_design_calendar_nodes import (
     BASE,
     inputs,
@@ -31,6 +34,8 @@ def reference() -> tuple[dict, dict, dict]:
     plan, cohort, controls = inputs()
     if sha(REFERENCE) != REFERENCE_SHA256:
         raise ValueError("Frozen independent node extension changed")
+    else:
+        pass
     value = read(REFERENCE)
     if (
         value["epoch_count"] != 2400
@@ -43,6 +48,8 @@ def reference() -> tuple[dict, dict, dict]:
         or value["package_files_before"] != value["package_files_after"]
     ):
         raise ValueError("Independent node identity, controls or scope changed")
+    else:
+        pass
     expected = [
         (p["label"], side, p[side]["jd_tt"])
         for p in cohort["pairs"]
@@ -50,6 +57,8 @@ def reference() -> tuple[dict, dict, dict]:
     ]
     if [(r["label"], r["side"], r["jd_tt"]) for r in value["rows"]] != expected:
         raise ValueError("Independent original epoch or ordering changed")
+    else:
+        pass
     from scripts.human_design.check_human_design_calendar_directions import (
         current_comparison,
     )
@@ -62,9 +71,9 @@ def _error(exc: Exception) -> dict[str, str]:
 
 
 def capture() -> dict:
-    from fatebridge.core import human_design_natal_sources as sources
     from fatebridge.core.astro import runtime
-    from fatebridge.core.human_design import positions_at_tt
+    from fatebridge.core.human_design import human_design_natal_sources as sources
+    from fatebridge.core.human_design.human_design import positions_at_tt
 
     _, independent, _ = reference()
     trace = sources.NatalSourceTrace()
@@ -82,6 +91,8 @@ def capture() -> dict:
                 def observe(body: str, tt: float, value: dict) -> None:
                     if tt != epoch["jd_tt"]:
                         raise ValueError("Native observer detached from requested TT")
+                    else:
+                        pass
                     seen[body] = dict(value)
 
                 positions = None
@@ -110,6 +121,8 @@ def capture() -> dict:
                 )
                 if (index + 1) % 200 == 0:
                     print(label, index + 1, flush=True)
+                else:
+                    pass
             backends[label] = {"requested_backend": backend, "rows": rows}
         try:
             evidence, error = trace.finish(), None
@@ -164,8 +177,12 @@ def compare_row(
             or set(positions) != required
         ):
             raise ValueError("Incomplete actual13-position batch")
+        else:
+            pass
         if set(actual["observed_prefix"]) != required - {"Earth", "SouthNode"}:
             raise ValueError("Incomplete native11-body observer prefix")
+        else:
+            pass
         for body, value in actual["observed_prefix"].items():
             if (
                 value != positions[body]
@@ -173,6 +190,8 @@ def compare_row(
                 or value["ephemeris_model"] != backend
             ):
                 raise ValueError("Native flag/backend/prefix inconsistency")
+            else:
+                pass
         node = positions["NorthNode"]
         if (
             node["native_return_flag_model"] != backend
@@ -181,6 +200,8 @@ def compare_row(
             or not math.isfinite(node["longitude_speed"])
         ):
             raise ValueError("Invalid actual node coordinate/model")
+        else:
+            pass
         actual_nodes = {
             "NorthNode": longitude_activation(node["longitude"]),
             "SouthNode": opposite_activation(node["longitude"]),
@@ -198,6 +219,8 @@ def compare_row(
                 or positions[body]["longitude"] != derived["longitude"]
             ):
                 raise ValueError("Derived opposition detached from same-batch source")
+            else:
+                pass
         differences = {
             body: [
                 level
@@ -228,6 +251,8 @@ def compare_row(
                         "new_return_flags": after["return_flags"],
                     }
                 )
+            else:
+                pass
         result.update(
             computed_node_longitude=node["longitude"],
             return_flags=node["return_flags"],
@@ -273,9 +298,13 @@ def source_contexts_accepted(production: dict) -> bool:
             or source["observed_native_position_evaluations"] != 52800
         ):
             return False
+        else:
+            pass
         files = {f["id"]: f for f in source["files"]}
         if len(files) != len(source["files"]) or not files:
             return False
+        else:
+            pass
         for key, row in files.items():
             if (
                 key != f"se1:{row['slot']}:{row['sha256']}"
@@ -293,6 +322,8 @@ def source_contexts_accepted(production: dict) -> bool:
                 or row["de_number"] <= 0
             ):
                 return False
+            else:
+                pass
         totals: Counter[tuple[str, str]] = Counter()
         seen = set()
         for row in source["contexts"]:
@@ -309,6 +340,8 @@ def source_contexts_accepted(production: dict) -> bool:
                 or row["minimum_jd_tt"] > row["maximum_jd_tt"]
             ):
                 return False
+            else:
+                pass
             if model == "swieph":
                 if (
                     row["status"] != "file_contexts_observed"
@@ -317,9 +350,13 @@ def source_contexts_accepted(production: dict) -> bool:
                     or {files[f]["slot"] for f in row["file_ids"]} != {0, 1}
                 ):
                     return False
+                else:
+                    pass
             elif model == "moshier":
                 if row["status"] != "library_builtin" or row["file_ids"]:
                     return False
+                else:
+                    pass
             else:
                 return False
             identity = (
@@ -331,6 +368,8 @@ def source_contexts_accepted(production: dict) -> bool:
             )
             if identity in seen:
                 return False
+            else:
+                pass
             seen.add(identity)
             totals[(model, row["body"])] += row["observed_evaluation_count"]
         bodies = {
@@ -361,6 +400,8 @@ def compare(production: dict) -> dict:
         or set(production["backends"]) != {"selected", "moshier_diagnostic"}
     ):
         raise ValueError("Unknown or incomplete original node capture")
+    else:
+        pass
     source_accepted = source_contexts_accepted(production)
     backends = {}
     for label, backend in (("selected", "swieph"), ("moshier_diagnostic", "moshier")):
@@ -372,6 +413,8 @@ def compare(production: dict) -> dict:
             or len(old_rows) != 24000
         ):
             raise ValueError("Missing original node or physical rows")
+        else:
+            pass
         rows = []
         for i, (actual, expected) in enumerate(
             zip(observed["rows"], independent["rows"], strict=True)
@@ -381,6 +424,8 @@ def compare(production: dict) -> dict:
                 "requested_backend"
             ] != backend:
                 raise ValueError("Original native epoch/order rebound")
+            else:
+                pass
             physical = [
                 {**r, "original_index": 10 * i + j}
                 for j, r in enumerate(old_rows[10 * i : 10 * i + 10])
@@ -389,6 +434,8 @@ def compare(production: dict) -> dict:
                 (r["label"], r["side"], r["jd_tt"]) != identity for r in physical
             ):
                 raise ValueError("Original physical rows rebound to different epoch")
+            else:
+                pass
             rows.append(compare_row(actual, expected, physical, backend))
         backends[label] = {
             "rows": rows,
@@ -479,9 +526,13 @@ def main() -> int:
             k: {n: v for n, v in b.items() if n != "rows"}
             for k, b in value["backends"].items()
         }
+    else:
+        pass
     print(json.dumps(summary, ensure_ascii=False))
     return int(args.command == "compare" and value["status"] != "passed")
 
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

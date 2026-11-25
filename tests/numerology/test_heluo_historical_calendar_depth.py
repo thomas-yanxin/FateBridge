@@ -8,9 +8,10 @@ from pathlib import Path
 import pytest
 
 from fatebridge.core.almanac import get_day_ganzhi
+from fatebridge.core.contracts.output_numerology import NumerologyBirthClock
 from fatebridge.core.local_techniques.canping import build_canping_result
 from fatebridge.core.local_techniques.heluo import build_heluo_result
-from fatebridge.core.output_numerology import NumerologyBirthClock
+from scripts.numerology.audit_numerology import historical_caption_checks
 
 ROOT = Path(__file__).parents[1] / "fixtures/heluo_historical_calendar_v1"
 REF = json.loads((ROOT / "reference.json").read_text())
@@ -18,7 +19,7 @@ DILA = json.loads((ROOT / "dila-excerpt.json").read_text())
 
 
 @pytest.mark.parametrize("row", REF["readings"], ids=lambda r: r["id"] + r["reading"])
-def test_printed_day_and_dila_month_agree_without_rewriting_heluo(row):
+def test_printed_day_and_dila_month_agree_without_rewriting_heluo(row) -> None:
     month = next(r for r in DILA["t_month"] if r[0] == row["month_id"])
     assert month[4] == 0 and month[10] == "S"
     assert month[6] + row["day"] - 1 == row["jdn"] <= month[7]
@@ -36,7 +37,7 @@ def test_printed_day_and_dila_month_agree_without_rewriting_heluo(row):
     assert (month[8] == row["printed_year_ganzhi"]) is row["year_caption_agrees"]
 
 
-def test_source_conflicts_and_same_named_eras_are_retained():
+def test_source_conflicts_and_same_named_eras_are_retained() -> None:
     rows = REF["readings"]
     assert [
         r["id"] + ":" + r["reading"]
@@ -52,7 +53,7 @@ def test_source_conflicts_and_same_named_eras_are_retained():
     assert not REF["all_literal_source_days_agree"]
 
 
-def test_original_witness_bytes_and_license_are_preserved():
+def test_original_witness_bytes_and_license_are_preserved() -> None:
     for item in REF["images"] + REF["data_files"]:
         assert (
             hashlib.sha256((ROOT / item["file"]).read_bytes()).hexdigest()
@@ -69,8 +70,8 @@ def test_original_witness_bytes_and_license_are_preserved():
 @pytest.mark.parametrize("build", [build_heluo_result, build_canping_result])
 @pytest.mark.parametrize("day", ["1150-08-23", "1582-10-10", "1990-06-15"])
 def test_public_date_is_explicitly_proleptic_gregorian_without_an_era_conversion(
-    build, day
-):
+    build, day: str
+) -> None:
     # Synthetic clock/offset only tests software semantics, not a historic birth instant.
     result = build(
         date=day, time="17:00", zone="+08:00", gender="男", use_true_solar_time=False
@@ -95,7 +96,7 @@ def test_public_date_is_explicitly_proleptic_gregorian_without_an_era_conversion
 
 
 @pytest.mark.parametrize("build", [build_heluo_result, build_canping_result])
-def test_julian_label_is_not_silently_interpreted_as_converted_gregorian(build):
+def test_julian_label_is_not_silently_interpreted_as_converted_gregorian(build) -> None:
     args = dict(time="17:00", zone="+08:00", gender="男", use_true_solar_time=False)
     gregorian = build(date="1150-08-23", **args)
     julian_label_as_input = build(date="1150-08-16", **args)
@@ -106,7 +107,7 @@ def test_julian_label_is_not_silently_interpreted_as_converted_gregorian(build):
 
 
 @pytest.mark.parametrize("build", [build_heluo_result, build_canping_result])
-def test_julian_only_leap_day_is_not_accepted_as_gregorian(build):
+def test_julian_only_leap_day_is_not_accepted_as_gregorian(build) -> None:
     with pytest.raises(ValueError):
         build(
             date="1700-02-29",
@@ -117,8 +118,7 @@ def test_julian_only_leap_day_is_not_accepted_as_gregorian(build):
         )
 
 
-def test_historical_audit_retains_disagreements_in_a_passing_integrity_check():
-    from scripts.numerology.audit_numerology import historical_caption_checks
+def test_historical_audit_retains_disagreements_in_a_passing_integrity_check() -> None:
 
     report = historical_caption_checks()
     assert report["checks_passed"] and not report["all_literal_source_days_agree"]

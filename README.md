@@ -28,13 +28,14 @@ FateBridge 为 AI 应用提供本地术数与占星计算，通过 **MCP、REST 
 
 | 领域 | 当前计算范围 | 实现与限制 |
 | --- | --- | --- |
-| 八字与关系 | 四柱、九项专题、双人规则评分、大运至流时 | [八字判定](docs/bazi-assessment.md) · [时运](docs/bazi-timing.md) · [双人评分](docs/compatibility-scoring.md) |
+| 八字与关系 | 四柱、九项专题、双人干支与十神关系、大运至流时 | [八字判定](docs/bazi-assessment.md) · [时运](docs/bazi-timing.md) · [双人八字取证](docs/compatibility-scoring.md) |
 | 中国术数与易占 | 紫微、奇门、六壬、金口诀、太乙、梅花、六爻、河洛与参评 | [专题索引](docs/README.md#计算原理与专题) |
 | 占星 | 西占本命、关系盘、推运与事件盘；印度占星、果老、宿曜与其他流派 | [西占](docs/western-astrology.md) · [印占](docs/jyotish.md) · [覆盖矩阵](docs/algorithm-coverage.md) |
 | 人类图 | 太阳 88° 双时刻、门线、通道、类型与权威 | [计算与验收范围](docs/human-design.md) |
 | 风水空间 | 八宅、基础砂水、年／月星、玄空历史宅盘、布局与实测工位 | [家居风水](docs/fengshui.md) · [实测工位](docs/fengshui-workstation-layout.md) |
+| 心理测量 | IPIP 50 题大五人格因子标记量表（Goldberg 1992 公有领域） | [覆盖矩阵](docs/algorithm-coverage.md#212-psychometrics--心理测量量表implemented) |
 
-当前源码提供 **91 个业务 REST 路由**、**92 个 FastMCP 工具**，覆盖 **13 family / 92 工具**。中央目录含 93 条记录，CLI 可执行其中 92 条。三端共享领域计算，公开名称与输入形态见[接口边界](docs/api-reference.md#24-三端能力边界)。方法版本、原典分歧与尚未通过的项目见[当前算法状态](docs/algorithm-status.md)。
+当前源码提供 **93 个业务 REST 路由**。MCP 通过四个入口提供 **93 项业务能力**，覆盖 **14 个 family**。中央目录含 93 条记录，CLI 可执行 93 条。三端共用公开工具名、请求字段与领域计算，见[接口边界](docs/api-reference.md#24-三端能力边界)。方法版本、原典分歧与尚未通过的项目见[当前算法状态](docs/algorithm-status.md)。
 
 ## 快速开始
 
@@ -67,7 +68,7 @@ uv run --locked --extra dev fatebridge doctor
 下列命令使用虚构资料，在 macOS / Linux 终端执行，无需启动服务。源码用户在 `fatebridge` 前加 `uv run --locked --extra dev`；[Windows 写法](docs/mcp-deployment.md#windows-powershell)另见部署指南。
 
 ```bash
-fatebridge bazi_birth \
+fatebridge bazi_birth_chart \
   --birth-year 1990 --birth-month 5 --birth-day 15 \
   --birth-hour 10 --birth-minute 30 --gender 男 \
   --birth-place 北京 --birth-timezone Asia/Shanghai \
@@ -80,7 +81,7 @@ fatebridge bazi_birth \
 
 ```bash
 fatebridge discover --family bazi
-fatebridge describe bazi_birth --detail input
+fatebridge describe bazi_birth_chart --detail input
 ```
 
 ## 接入 AI 助手或应用

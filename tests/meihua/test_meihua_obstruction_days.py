@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.meihua_obstruction_days import build_obstruction_timing
+from fatebridge.core.meihua.meihua_obstruction_days import build_obstruction_timing
 from fatebridge.services.divination import calculate_meihua_analysis
 from fatebridge.services.meihua import calculate_meihua_cast
 from tests.support.reference_data import resolve as at
@@ -35,7 +35,7 @@ def assert_null_forecast(value):
     assert value["independent_verified_observations"] == 0
 
 
-def test_preimplementation_reference_and_explicit_versus_analogy_scope():
+def test_preimplementation_reference_and_explicit_versus_analogy_scope() -> None:
     m = json.loads((FIXTURE / "manifest.json").read_bytes())
     assert not m["implementation_present_at_reference_freeze"]
     assert m["geometry_reused"] == 384
@@ -45,11 +45,13 @@ def test_preimplementation_reference_and_explicit_versus_analogy_scope():
     for name, expected in m["files"].items():
         if str(name).endswith((".py", ".py.txt")):
             continue
+        else:
+            pass
         assert hashlib.sha256((FIXTURE / name).read_bytes()).hexdigest() == expected
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: f"{c['code']}-{c['line']}")
-def test_all_384_reused_geometries_under_three_declared_scenario_states(case):
+def test_all_384_reused_geometries_under_three_declared_scenario_states(case) -> None:
     for scenario in [None, "favorable_matter", "unfavorable_matter"]:
         out = calculate_meihua_cast(
             casting={
@@ -102,13 +104,15 @@ def test_all_384_reused_geometries_under_three_declared_scenario_states(case):
         assert bool(value["summary"]) is (value["selected_clause_applies"] is True)
         if value["summary"]:
             assert value["summary"] in out["interpretation"]["comprehensive_judgement"]
+        else:
+            pass
         assert_null_forecast(value)
 
 
 @pytest.mark.parametrize("basis", ["raw_counts", "trigram_numbers"])
 def test_manual_count_candidates_do_not_share_timing_or_multiply_duplicate_trigrams(
-    basis,
-):
+    basis: str,
+) -> None:
     out = calculate_meihua_cast(
         casting={**MANUAL["inputs"], "line_sum_basis": basis},
         matter_scenario="favorable_matter",
@@ -156,7 +160,7 @@ def test_manual_count_candidates_do_not_share_timing_or_multiply_duplicate_trigr
     "topic",
     ["general", "planning", "reputation", "wealth", "transaction", "travel", "meeting"],
 )
-def test_topic_and_question_cannot_supply_missing_scenario(topic):
+def test_topic_and_question_cannot_supply_missing_scenario(topic: str) -> None:
     case = next(c for c in CASES if c["structural_condition_met"])
     out = calculate_meihua_cast(
         casting={
@@ -173,7 +177,9 @@ def test_topic_and_question_cannot_supply_missing_scenario(topic):
 
 
 @pytest.mark.parametrize("scenario", [None, "favorable_matter", "unfavorable_matter"])
-def test_civil_clock_and_day_qi_are_retained_without_inventing_a_delay_anchor(scenario):
+def test_civil_clock_and_day_qi_are_retained_without_inventing_a_delay_anchor(
+    scenario: str | None,
+) -> None:
     out = calculate_meihua_analysis(
         analysis_year=2026,
         analysis_month=10,
@@ -186,11 +192,13 @@ def test_civil_clock_and_day_qi_are_retained_without_inventing_a_delay_anchor(sc
     value = layer(out)
     if scenario is not None:
         assert at(out, value["scenario_fact_path"]) == scenario
+    else:
+        pass
     assert out["interpretation"]["day_qi"] is not None
     assert_null_forecast(value)
 
 
-def test_weather_does_not_acquire_human_body_timing():
+def test_weather_does_not_acquire_human_body_timing() -> None:
     out = calculate_meihua_cast(
         casting=MANUAL["inputs"], interpretation_topic="weather"
     )
@@ -200,7 +208,7 @@ def test_weather_does_not_acquire_human_body_timing():
 @pytest.mark.parametrize(
     "fault", ["body", "element", "relation", "path", "roles", "qualification"]
 )
-def test_source_timing_rejects_misbound_calculation_facts(fault):
+def test_source_timing_rejects_misbound_calculation_facts(fault: str) -> None:
     out = calculate_meihua_cast(casting=MANUAL["inputs"])
     stages = copy.deepcopy(out["meihua"]["stage_relations"])
     control = copy.deepcopy(out["interpretation"]["internal_countercontrol"])

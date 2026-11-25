@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parents[2]
 FIXTURE = ROOT / "tests/data/bazi_historical_point_v1"
 
 
-def test_all506_original_rows_and_first_seven_failures_are_retained():
+def test_all506_original_rows_and_first_seven_failures_are_retained() -> None:
     p = FIXTURE / "oracle.json.gz"
     assert (
         hashlib.sha256(p.read_bytes()).hexdigest()
@@ -32,7 +32,7 @@ def test_all506_original_rows_and_first_seven_failures_are_retained():
     assert len(first["failures"]) == 7
 
 
-def test_original506_and_source_domain_qualification_are_kept_separate():
+def test_original506_and_source_domain_qualification_are_kept_separate() -> None:
     oracle = json.loads(gzip.decompress((FIXTURE / "oracle.json.gz").read_bytes()))
     first = json.loads((FIXTURE / "first-diagnostic.json").read_text())
     primary = json.loads(
@@ -46,12 +46,16 @@ def test_original506_and_source_domain_qualification_are_kept_separate():
             assert row["status"] == reference["source_domain_class"]
             unknown += 1
             continue
+        else:
+            pass
         point = TTInstant.from_parts(*row["tt_parts"])
         if reference["source_domain_class"] != "unique":
             with pytest.raises(HistoricalUTCAdjustment):
                 datetime_from_tt(point)
             rejected += 1
             continue
+        else:
+            pass
         actual = datetime_from_tt(point).isoformat()
         assert actual == reference["expected_UTC"], row["id"]
         available_ids.add(row["id"])

@@ -33,6 +33,8 @@ def _signature(path: Path) -> tuple[int, ...]:
         stat = path.stat()
         if not path.is_file():
             raise OSError("not a file")
+        else:
+            pass
         return (
             stat.st_dev,
             stat.st_ino,
@@ -49,6 +51,8 @@ def _pairs(items: list[tuple[str, Any]]) -> dict[str, Any]:
     for key, value in items:
         if key in result:
             raise ValueError("Duplicate model manifest field")
+        else:
+            pass
         result[key] = value
     return result
 
@@ -80,25 +84,33 @@ def _loaded_image(function: Any, expected_path: Path, expected_hash: str) -> str
         or not info.filename
     ):
         raise ValueError("Actual calculation image could not be resolved")
+    else:
+        pass
     mapped = Path(os.fsdecode(info.filename)).resolve()
     if mapped != expected_path.resolve():
         raise ValueError("Calculation entry was resolved from another image")
+    else:
+        pass
     digest = hashlib.sha256(mapped.read_bytes()).hexdigest()
     if digest != expected_hash:
         raise ValueError("Actual calculation image bytes differ")
+    else:
+        pass
     return digest
 
 
 class _Source:
-    def __init__(self, path: Path, signature: tuple[int, ...]):
+    def __init__(self, path: Path, signature: tuple[int, ...]) -> None:
         self.path, self.signature = path, signature
-        self.profile, self.profile_sha256 = _profile()
         self._temporary: tempfile.TemporaryDirectory[str] | None = None
         try:
+            self.profile, self.profile_sha256 = _profile()
             raw = path.read_bytes()
             manifest = json.loads(raw, object_pairs_hook=_pairs)
             if not isinstance(manifest, dict):
                 raise ValueError("Model manifest must be an object")
+            else:
+                pass
             expected = dict(
                 model_id=MODEL_ID,
                 version=self.profile["version"],
@@ -115,18 +127,26 @@ class _Source:
                 raise ValueError(
                     "Manifest does not describe the loaded model/profile/platform"
                 )
+            else:
+                pass
             name = manifest["binary"]
             if not isinstance(name, str) or not name or Path(name).name != name:
                 raise ValueError("Model binary must be a sibling filename")
+            else:
+                pass
             binary = (path.parent / name).resolve()
             if binary.parent != path.parent:
                 raise ValueError("Model binary must remain in its manifest directory")
+            else:
+                pass
             self.binary_path = binary
             self.binary_signature = _signature(binary)
             data = binary.read_bytes()
             self.binary_sha256 = hashlib.sha256(data).hexdigest()
             if self.binary_sha256 != manifest.get("binary_sha256"):
                 raise ValueError("Binary differs from build manifest")
+            else:
+                pass
             self.manifest_sha256 = hashlib.sha256(raw).hexdigest()
             # A unique private copy avoids dlopen returning an old image for a
             # replaced configured filename. Hash that copy before loading it.
@@ -137,6 +157,8 @@ class _Source:
             loaded.write_bytes(data)
             if hashlib.sha256(loaded.read_bytes()).hexdigest() != self.binary_sha256:
                 raise ValueError("Private loaded bytes differ")
+            else:
+                pass
             self.library = ctypes.CDLL(str(loaded))
             for symbol, wanted in [
                 ("fatebridge_aa1996_model_id", MODEL_ID),
@@ -147,10 +169,14 @@ class _Source:
                 function.restype = ctypes.c_char_p
                 if function() != wanted.encode("ascii"):
                     raise ValueError("Actual binary model marker differs")
+                else:
+                    pass
             self.library.fatebridge_aa1996_abi_version.argtypes = []
             self.library.fatebridge_aa1996_abi_version.restype = ctypes.c_int
             if self.library.fatebridge_aa1996_abi_version() != 1:
                 raise ValueError("Unsupported model ABI")
+            else:
+                pass
             self.library.fatebridge_aa1996_solar.argtypes = [
                 ctypes.c_double,
                 ctypes.POINTER(ctypes.c_double),
@@ -167,6 +193,8 @@ class _Source:
             self.native_version = version.value.decode("ascii")
             if self.native_version != self.profile["sources"]["swiss"]["core_version"]:
                 raise ValueError("Actual native core version differs")
+            else:
+                pass
             self.library.swe_set_ephe_path.argtypes = [ctypes.c_char_p]
             self.library.swe_set_ephe_path.restype = None
             self.library.swe_set_ephe_path(self._temporary.name.encode())
@@ -174,8 +202,12 @@ class _Source:
         except Exception as error:
             if self._temporary is not None:
                 self._temporary.cleanup()
+            else:
+                pass
             if isinstance(error, EphemerisSourceError):
                 raise
+            else:
+                pass
             raise EphemerisSourceError("solar_aa1996_invalid") from error
 
     def check_unchanged(self, *, check_environment: bool = True) -> None:
@@ -187,6 +219,8 @@ class _Source:
                 or _signature(self.binary_path) != self.binary_signature
             ):
                 raise EphemerisSourceError("solar_aa1996_changed")
+            else:
+                pass
         except (OSError, EphemerisSourceError) as error:
             raise EphemerisSourceError("solar_aa1996_changed") from error
 
@@ -199,6 +233,8 @@ class _Source:
         # speed. This category flag does not identify the custom orbital model.
         if flags != 260 or not all(math.isfinite(x) for x in values):
             raise EphemerisSourceError("solar_aa1996_calculation")
+        else:
+            pass
         return float(values[0]) % 360.0, int(flags)
 
     def receipt(self) -> dict[str, Any]:
@@ -226,7 +262,6 @@ class _Source:
             derived_lichun_scope=deepcopy(self.profile["derived_lichun_scope"]),
             native_moshier_relabelled=False,
             accuracy_certified=False,
-            source_identity_scope="Locally built and actually loaded binary/profile identity; not upstream signature, atomic external-file immutability or all-epoch physical/civil accuracy",
         )
 
     def key(self) -> tuple[Any, ...]:
@@ -249,6 +284,8 @@ def _selected() -> _Source:
     configured = os.environ.get(MANIFEST_ENV, "").strip()
     if not configured:
         raise EphemerisSourceError("solar_aa1996_unavailable")
+    else:
+        pass
     path = Path(configured).expanduser().resolve()
     source = _load(path, _signature(path))
     try:
@@ -256,6 +293,8 @@ def _selected() -> _Source:
     except EphemerisSourceError as error:
         if error.reason != "solar_aa1996_changed":
             raise
+        else:
+            pass
         # A new request may resolve a fresh build after an installation. A
         # source already held by an active batch still fails on any drift.
         _load.cache_clear()
@@ -277,11 +316,15 @@ def source_receipt() -> dict[str, Any]:
 def solar_longitudes_tt(jd_tts: list[float]) -> dict[str, Any]:
     if not all(_finite(value) for value in jd_tts):
         raise ValueError("AA1996 observations require finite numeric TT points")
+    else:
+        pass
     with _LOCK:
         source = _selected()
         low, high = source.profile["working_jd_tt"]
         if not all(low <= value <= high for value in jd_tts):
             raise EphemerisSourceError("solar_aa1996_range")
+        else:
+            pass
         observed = [source.longitude(float(value)) for value in jd_tts]
         source.check_unchanged()
         return dict(
@@ -303,24 +346,36 @@ def longitude_crossing_tt(
         raise ValueError(
             "AA1996 crossing requires finite target and increasing TT bracket"
         )
+    else:
+        pass
     with _LOCK:
         source = _selected()
         if expected_source_key is not None and source.key() != expected_source_key:
             raise EphemerisSourceError("solar_configuration_changed")
+        else:
+            pass
         scope = source.profile["derived_lichun_scope"]
         if projection_year is not None:
             if type(projection_year) is not int or target != scope["target_degrees"]:
                 raise ValueError("AA1996 projection context requires a Lichun year")
+            else:
+                pass
             first = date(projection_year, 2, 1).toordinal() + 1721424.5
             last = date(projection_year, 2, 12).toordinal() + 1721424.5
             if not first <= low < high <= last:
                 raise ValueError("AA1996 projection bracket must belong to its year")
+            else:
+                pass
+        else:
+            pass
         working_low, working_high = source.profile["working_jd_tt"]
         if not working_low <= low < high <= working_high and not (
             projection_year is not None
             and scope["years"][0] <= projection_year <= scope["years"][1]
         ):
             raise EphemerisSourceError("solar_aa1996_range")
+        else:
+            pass
         observed_flags = set()
 
         def residual(epoch: float) -> float:
@@ -331,10 +386,14 @@ def longitude_crossing_tt(
         left, right = residual(low), residual(high)
         if not left < 0 <= right or right - left >= 90:
             raise ValueError("AA1996 bracket does not contain a forward solar crossing")
+        else:
+            pass
         for _ in range(48):
             middle = (low + high) / 2.0
             if middle == low or middle == high:
                 break
+            else:
+                pass
             if residual(middle) < 0:
                 low = middle
             else:

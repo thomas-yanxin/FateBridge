@@ -10,7 +10,7 @@ Ascendant after 72 years. We verify exactly those invariants on a synthetic char
 
 from __future__ import annotations
 
-from fatebridge.core.astrology_lifespan import build_age_point_payload
+from fatebridge.core.astro.astrology_lifespan import build_age_point_payload
 from fatebridge.services.western_lifespan import calculate_age_point
 
 # Whole-sign-like synthetic Koch cusps: 12 equal 30° houses from 0° Aries, so the

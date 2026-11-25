@@ -1,10 +1,20 @@
 """Check a committed forecast vector before spending a cohort on its score."""
 
+import sys as _sys
+from pathlib import Path as _Path
+
+_VAL_REPO_ROOT = _Path(__file__).resolve().parents[2]
+if str(_VAL_REPO_ROOT) not in _sys.path:
+    _sys.path.insert(0, str(_VAL_REPO_ROOT))
+else:
+    pass
+
+
 import argparse
 import json
 from pathlib import Path
 
-from fatebridge.validation.meihua_weather_feasibility import audit_feasibility_vector
+from validation.meihua_weather_feasibility import audit_feasibility_vector
 
 
 def main() -> None:
@@ -24,3 +34,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+else:
+    pass

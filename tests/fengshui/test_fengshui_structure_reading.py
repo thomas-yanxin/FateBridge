@@ -1,49 +1,29 @@
 """Printed arithmetic, author terminology and complete current coverage."""
 
-import json
 from copy import deepcopy
-from pathlib import Path
 
 import pytest
 
 from fatebridge.core.fengshui.reading import build_natal_reading
-from fatebridge.core.fengshui.xuankong import _chart, natal_rules
+from fatebridge.core.fengshui.xuankong import _chart
 from fatebridge.services.fengshui import calculate_xuankong_natal
-from fatebridge.validation.fengshui_reading import verify_fengshui_reading
-from fatebridge.validation.fengshui_structure import audit_printed_structures
-from tests.fengshui.test_fengshui_fixed_reading import executed, trusted
-
-FOLDER = Path(__file__).parents[1] / "data/fengshui_structure_reading_v1"
-REFERENCE = json.loads((FOLDER / "printed-charts.json").read_text())
-MOUNTAINS = natal_rules()["mountains"]
-
-
-def request(example, offset=0):
-    angle = next(
-        m["center_degrees"] for m in MOUNTAINS if m["name"] == example["facing"]
-    )
-    return {
-        "house": {
-            "facing_degrees": (angle + offset) % 360,
-            "north_reference": "magnetic",
-        },
-        "period": {
-            "basis": "expert_confirmed",
-            "period_number": example["period"],
-            "evidence": "原典数字例，非真实住宅",
-        },
-        "interpretation": {
-            "current_period_number": 9,
-            "period_evidence": "独立评价九运",
-        },
-    }
+from tests.unit_test.fixtures.fengshui_reading import (
+    PRINTED_CHART_REFERENCE as REFERENCE,
+)
+from tests.unit_test.fixtures.fengshui_reading import executed
+from tests.unit_test.fixtures.fengshui_reading import printed_chart_request as request
+from tests.unit_test.fixtures.fengshui_reading import trusted
+from validation.fengshui_reading import verify_fengshui_reading
+from validation.fengshui_structure import audit_printed_structures
 
 
 def statements(result, kind):
     return [s for s in result["calculation_reading"]["statements"] if s["kind"] == kind]
 
 
-def test_new_run_cannot_be_downgraded_using_a_valid_legacy_template_and_rehash():
+def test_new_run_cannot_be_downgraded_using_a_valid_legacy_template_and_rehash() -> (
+    None
+):
     result = executed(request(REFERENCE["charts"][0]))
     anchor = trusted(result)
     result["calculation_reading"]["version"] = "1.0.0"
@@ -52,7 +32,7 @@ def test_new_run_cannot_be_downgraded_using_a_valid_legacy_template_and_rehash()
     assert not report["numeric_structure_coverage_verified"]
 
 
-def test_missing_natal_does_not_receive_numeric_structure_coverage_credit():
+def test_missing_natal_does_not_receive_numeric_structure_coverage_credit() -> None:
     result = executed(
         {
             "interpretation": {
@@ -69,7 +49,9 @@ def test_missing_natal_does_not_receive_numeric_structure_coverage_credit():
 
 
 @pytest.mark.parametrize("part", ["pair", "palace", "role"])
-def test_incomplete_raw_numeric_context_is_unsupported_rather_than_certified(part):
+def test_incomplete_raw_numeric_context_is_unsupported_rather_than_certified(
+    part: str,
+) -> None:
     result = calculate_xuankong_natal(**request(REFERENCE["charts"][0]))
     structure = result["layers"]["xuankong_natal"]["candidates"][0]["structure"]
     if part == "pair":
@@ -81,7 +63,9 @@ def test_incomplete_raw_numeric_context_is_unsupported_rather_than_certified(par
     assert build_natal_reading(result)["status"] == "unsupported_context"
 
 
-def test_six_independently_transcribed_charts_match162_cells_and_seven_scoped_headings():
+def test_six_independently_transcribed_charts_match162_cells_and_seven_scoped_headings() -> (
+    None
+):
     report = audit_printed_structures(REFERENCE)
     assert report["scoped_acceptance_passed"] and not report["differences"]
     assert (
@@ -92,7 +76,9 @@ def test_six_independently_transcribed_charts_match162_cells_and_seven_scoped_he
 
 
 @pytest.mark.parametrize("example", REFERENCE["charts"], ids=lambda e: e["id"])
-def test_printed_charts_keep_full_pattern_reading_with_precise_bound_context(example):
+def test_printed_charts_keep_full_pattern_reading_with_precise_bound_context(
+    example,
+) -> None:
     result = calculate_xuankong_natal(**request(example))
     reading = result["calculation_reading"]
     assert reading["status"] == "rendered" and reading["version"] == "1.2.0"
@@ -113,7 +99,9 @@ def test_printed_charts_keep_full_pattern_reading_with_precise_bound_context(exa
         assert "历史" + str(example["period"]) + "运" in s["text"]
 
 
-def test_full_ten_is_pair_specific_and_negative_global_does_not_erase_local_ten():
+def test_full_ten_is_pair_specific_and_negative_global_does_not_erase_local_ten() -> (
+    None
+):
     result = calculate_xuankong_natal(**request(REFERENCE["charts"][0]))
     mountain, facing, _ = statements(result, "numeric_sum_ten")
     assert "历史运星与山星九宫全部同宫合十：符合" in mountain["text"]
@@ -122,7 +110,7 @@ def test_full_ten_is_pair_specific_and_negative_global_does_not_erase_local_ten(
     assert "不是异宫对角合十" in mountain["text"]
 
 
-def test_wang_reverse_example_and_shen_finite_list_counterexample_coexist():
+def test_wang_reverse_example_and_shen_finite_list_counterexample_coexist() -> None:
     result = calculate_xuankong_natal(**request(REFERENCE["charts"][3]))
     mountain = next(
         s
@@ -135,7 +123,7 @@ def test_wang_reverse_example_and_shen_finite_list_counterexample_coexist():
     assert "名单不覆盖各作者全部反伏用语" in named["text"]
 
 
-def test_local_period_overlap_retained_separately_from_fixed_ground():
+def test_local_period_overlap_retained_separately_from_fixed_ground() -> None:
     result = calculate_xuankong_natal(**request({"period": 7, "facing": "酉"}))
     s = next(
         s
@@ -146,7 +134,9 @@ def test_local_period_overlap_retained_separately_from_fixed_ground():
     assert "历史运盘全盘同数：不符合，同数宫位['NW']" in s["text"]
 
 
-def test_parental_group_does_not_override_other_negative_relations_or_imply_robbery():
+def test_parental_group_does_not_override_other_negative_relations_or_imply_robbery() -> (
+    None
+):
     result = calculate_xuankong_natal(**request(REFERENCE["charts"][4]))
     assert (
         "全局父母三般卦数字条件：符合"
@@ -169,7 +159,9 @@ def test_parental_group_does_not_override_other_negative_relations_or_imply_robb
     assert "对应状态未判定" in statements(replacement, "named_refrain")[0]["text"]
 
 
-def test_complete432_chart_domain_retains_every_pair_palace_role_and_applicability():
+def test_complete432_chart_domain_retains_every_pair_palace_role_and_applicability() -> (
+    None
+):
     payload = calculate_xuankong_natal(**request(REFERENCE["charts"][0]))
     layer = payload["layers"]["xuankong_natal"]
     layer["interpretation"] = None
@@ -212,7 +204,9 @@ def test_complete432_chart_domain_retains_every_pair_palace_role_and_applicabili
         "unknown_version",
     ],
 )
-def test_forged_complete_receipt_does_not_hide_new_structure_omissions(change):
+def test_forged_complete_receipt_does_not_hide_new_structure_omissions(
+    change: str,
+) -> None:
     result = executed(request(REFERENCE["charts"][0]))
     reading = result["calculation_reading"]
     if change == "omit_negative_ten":
@@ -257,8 +251,8 @@ def test_forged_complete_receipt_does_not_hide_new_structure_omissions(change):
     ],
 )
 def test_source_audit_preserves_complete_scope_and_reports_real_numeric_disagreement(
-    corruption,
-):
+    corruption: str,
+) -> None:
     reference = deepcopy(REFERENCE)
     if corruption == "drop_example":
         reference["charts"].pop()

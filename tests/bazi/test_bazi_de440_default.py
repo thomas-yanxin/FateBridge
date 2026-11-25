@@ -14,10 +14,10 @@ from fatebridge.core.ephemeris_runtime import (
     configured_ephemeris_path,
 )
 from fatebridge.utils.errors import EphemerisSourceError
-from tests.bazi.test_bazi_year_contract import TOPICS
 from tests.support.transports import AS_OF, SPECS, business, inputs, native
 from tests.support.transports import rest as _shared_rest
 from tests.support.transports import surface_calls
+from tests.unit_test.fixtures.bazi_year_cases import TOPICS
 
 rest = _shared_rest
 
@@ -42,7 +42,7 @@ def default_without_external_files(monkeypatch, tmp_path):
         configure_ephemeris_path(previous)
 
 
-def test_packaged_profile_is_orbital_data_with_declared_time_and_frame():
+def test_packaged_profile_is_orbital_data_with_declared_time_and_frame() -> None:
     receipt = de440_solar.source_receipt()
     assert receipt["model_id"] == de440_solar.MODEL_ID
     assert receipt["source_kernel_sha256"] == (
@@ -58,7 +58,7 @@ def test_packaged_profile_is_orbital_data_with_declared_time_and_frame():
         assert end >= date(2203, 1, 1).toordinal() + 1721424.5
 
 
-def test_packaged_profile_receipt_does_not_expose_mutable_loaded_metadata():
+def test_packaged_profile_receipt_does_not_expose_mutable_loaded_metadata() -> None:
     first = de440_solar.source_receipt()
     original = first["segment_coverage_tdb_jd"]["0->3"][0]
     first["segment_coverage_tdb_jd"]["0->3"][0] = -1
@@ -70,7 +70,9 @@ def test_packaged_profile_receipt_does_not_expose_mutable_loaded_metadata():
 
 
 @pytest.mark.parametrize("fault", ["missing", "bytes", "frame", "tdb_nan"])
-def test_packaged_profile_corruption_is_a_source_error(monkeypatch, tmp_path, fault):
+def test_packaged_profile_corruption_is_a_source_error(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, fault: str
+) -> None:
     folder = tmp_path / "data/astronomy"
     folder.mkdir(parents=True)
     for name in [
@@ -109,7 +111,7 @@ def test_packaged_profile_corruption_is_a_source_error(monkeypatch, tmp_path, fa
             de440_solar._coefficient_data.cache_clear()
 
 
-def test_out_of_coverage_and_nonfinite_points_do_not_receive_an_approximation():
+def test_out_of_coverage_and_nonfinite_points_do_not_receive_an_approximation() -> None:
     for pair in [(0, 3), (3, 399), (0, 10)]:
         for epoch in [-1000000, 1000000]:
             with pytest.raises(EphemerisSourceError, match="cover"):
@@ -122,7 +124,7 @@ def test_out_of_coverage_and_nonfinite_points_do_not_receive_an_approximation():
 
 def test_default_corrects_all_five_analytic_and_the_swiss_term_counterexamples(
     default_without_external_files,
-):
+) -> None:
     probes = json.loads(
         (ROOT / "tests/data/bazi_boundary_decisions_v1/probes.json").read_text()
     )["rows"]
@@ -157,8 +159,8 @@ def test_default_corrects_all_five_analytic_and_the_swiss_term_counterexamples(
 
 def test_default_orbit_source_does_not_probe_an_unused_native_sun(
     default_without_external_files,
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     def unused(*args, **kwargs):
         raise AssertionError("Unused native Sun solver was called")
 
@@ -182,7 +184,7 @@ def test_default_orbit_source_does_not_probe_an_unused_native_sun(
 )
 def test_default_de440_is_consumed_identically_by_three_protocols(
     key, default_without_external_files, surface_calls
-):
+) -> None:
     spec = SPECS[key]
     payload = inputs(spec)
     opts = dict(include_snapshot_text=False, response_char_limit=0)

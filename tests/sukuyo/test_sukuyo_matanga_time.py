@@ -12,8 +12,8 @@ R1 = ROOT / "tests/data/sukuyo-matanga-before-production-v79.json"
 R2 = ROOT / "tests/data/sukuyo-matanga-edition-before-production-v79.json"
 
 
-def test_entire_source_and_edition_layers_equal_both_before_code_references():
-    from fatebridge.core.sukuyo_matanga_time import matanga_time_reference
+def test_entire_source_and_edition_layers_equal_both_before_code_references() -> None:
+    from fatebridge.core.sukuyo.sukuyo_matanga_time import matanga_time_reference
 
     result = matanga_time_reference()
     assert result["source_data"] == json.loads(R1.read_bytes())["source_data"]
@@ -21,8 +21,8 @@ def test_entire_source_and_edition_layers_equal_both_before_code_references():
     assert result["hash_scope"] == "source_data_and_edition_identity_v79"
 
 
-def test_four_chains_match_independent_literal_factor_products():
-    from fatebridge.core.sukuyo_matanga_time import matanga_time_reference
+def test_four_chains_match_independent_literal_factor_products() -> None:
+    from fatebridge.core.sukuyo.sukuyo_matanga_time import matanga_time_reference
 
     result = matanga_time_reference()
     assert (
@@ -33,8 +33,8 @@ def test_four_chains_match_independent_literal_factor_products():
     assert result["modern_seconds_per_unit"] is None
 
 
-def test_year_total_stays_literal_without_normalizing_ancient_yi_or_emending():
-    from fatebridge.core.sukuyo_matanga_time import matanga_time_reference
+def test_year_total_stays_literal_without_normalizing_ancient_yi_or_emending() -> None:
+    from fatebridge.core.sukuyo.sukuyo_matanga_time import matanga_time_reference
 
     result = matanga_time_reference()
     assert result["source_data"]["year_total_literal"]["literal"] == (
@@ -45,8 +45,8 @@ def test_year_total_stays_literal_without_normalizing_ancient_yi_or_emending():
     assert "modern_numeric_reading_of_annual_literal" not in result
 
 
-def test_repeated_cycle_comparison_is_explicitly_conditional():
-    from fatebridge.core.sukuyo_matanga_time import matanga_time_reference
+def test_repeated_cycle_comparison_is_explicitly_conditional() -> None:
+    from fatebridge.core.sukuyo.sukuyo_matanga_time import matanga_time_reference
 
     comparison = matanga_time_reference()["strict_repeated_cycle_hypothesis_only"]
     assert comparison["common_years"] == 95
@@ -57,8 +57,8 @@ def test_repeated_cycle_comparison_is_explicitly_conditional():
     assert comparison["rates"] == ["7/19", "2/5"]
 
 
-def test_witness_namespaces_and_reused_editorial_layers_stay_distinct():
-    from fatebridge.core.sukuyo_matanga_time import matanga_time_reference
+def test_witness_namespaces_and_reused_editorial_layers_stay_distinct() -> None:
+    from fatebridge.core.sukuyo.sukuyo_matanga_time import matanga_time_reference
 
     result = matanga_time_reference()
     editions = {r["source_id"]: r for r in result["edition_identity"]["sources"]}
@@ -89,8 +89,10 @@ def test_witness_namespaces_and_reused_editorial_layers_stay_distinct():
         "leap_literal",
     ],
 )
-def test_changed_source_or_unearned_acceptance_requires_new_review(mutation):
-    from fatebridge.core.sukuyo_matanga_time import validate_matanga_data
+def test_changed_source_or_unearned_acceptance_requires_new_review(
+    mutation: str,
+) -> None:
+    from fatebridge.core.sukuyo.sukuyo_matanga_time import validate_matanga_data
 
     data = {
         "source_data": copy.deepcopy(json.loads(R1.read_bytes())["source_data"]),
@@ -124,8 +126,8 @@ def test_changed_source_or_unearned_acceptance_requires_new_review(mutation):
         validate_matanga_data(data)
 
 
-def test_upstream_delivers_new_layer_without_relabeling_old_v76_hash():
-    from fatebridge.core.sukuyo_upstream_dawn import upstream_reference
+def test_upstream_delivers_new_layer_without_relabeling_old_v76_hash() -> None:
+    from fatebridge.core.sukuyo.sukuyo_upstream_dawn import upstream_reference
 
     result = upstream_reference()
     assert (
@@ -139,8 +141,11 @@ def test_upstream_delivers_new_layer_without_relabeling_old_v76_hash():
     )
 
 
-def test_native_explanation_preserves_activity_units_literal_and_hypothesis():
-    from fatebridge.core.sukuyo_upstream_dawn import upstream_lines, upstream_reference
+def test_native_explanation_preserves_activity_units_literal_and_hypothesis() -> None:
+    from fatebridge.core.sukuyo.sukuyo_upstream_dawn import (
+        upstream_lines,
+        upstream_reference,
+    )
 
     text = "\n".join(upstream_lines(upstream_reference()))
     for phrase in [
@@ -162,7 +167,7 @@ def test_native_explanation_preserves_activity_units_literal_and_hypothesis():
         assert phrase in text
 
 
-def test_all_prior_dawn_and_apparatus_bundles_remain_unchanged():
+def test_all_prior_dawn_and_apparatus_bundles_remain_unchanged() -> None:
     expected = {
         "sukuyo_daybreak_sources.json": "2c78e5f4164b59a8b4343c9398afe1d1bb1d6abab7aef284c1f3ff93ee0f8dea",
         "sukuyo_upstream_dawn_sources.json": "744af87237075bf003bbceed2def968afee781039ab6f706208b565831ff9c83",

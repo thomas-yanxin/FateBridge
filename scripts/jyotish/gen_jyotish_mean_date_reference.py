@@ -27,6 +27,8 @@ def main() -> None:
     args = parser.parse_args()
     if args.output.exists():
         parser.error("Frozen reference must use a new path")
+    else:
+        pass
     d0, dm = erfa.cal2jd(1, 1, 1)
     assert d0 == 2400000.5 and d0 + dm == 1721425.5
     # Exhaust the supported civil date range, in bounded vectors. These are
@@ -170,3 +172,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+else:
+    pass

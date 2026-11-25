@@ -25,7 +25,9 @@ KEY = "藏干序位与人元司令"
 QUERY = {"domain": "bazi", "category": CATEGORY, "key": KEY}
 
 
-def test_selected_same_chapter_lists_have_equal_days_and_different_display_order():
+def test_selected_same_chapter_lists_have_equal_days_and_different_display_order() -> (
+    None
+):
     source = json.loads(
         (ROOT / "tests/data/bazi_month_duty_scan_v1/witness-first.json").read_bytes()
     )
@@ -66,7 +68,16 @@ def test_selected_same_chapter_lists_have_equal_days_and_different_display_order
         ),
         [],
     )
-    assert sorted(partitions) == list(range(8))
+    assert sorted(partitions) == list(range(9))
+    siku, yongzheng = curation["source_refs"]
+    assert siku["supporting_tip_indexes"] == [1, 2, 3, 8]
+    assert yongzheng["supporting_tip_indexes"] == [8]
+    assert yongzheng["source_url"] == "https://www.digital.archives.go.jp/item/4919180"
+    assert "IIIF扫描30酉月始文、31" in yongzheng["source_locator"]
+    assert curation["coefficient_adoption"] == "unchanged_uncalibrated_policy"
+    assert "庚七日、辛二十三日，合三十日" in record["tips"][8]
+    assert "丁三日，合三十日" in record["tips"][8]
+    assert "丁五日，合三十二日" in record["tips"][8]
     for ref in curation["implementation_refs"]:
         assert (ROOT / ref["source_path"]).is_file()
 
@@ -76,8 +87,8 @@ def test_selected_same_chapter_lists_have_equal_days_and_different_display_order
     [("knowledge_read", QUERY), ("knowledge_registry", {"domain": "bazi"})],
 )
 def test_new_card_and_discovery_cross_actual_transports_at_fixed8192(
-    tool, payload, rest, tmp_path, capsys
-):
+    tool: str, payload, rest, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     spec = SPECS[tool]
     flags = {"include_snapshot_text": True, "response_char_limit": 8192}
     result, manifest = asyncio.run(
@@ -106,6 +117,8 @@ def test_new_card_and_discovery_cross_actual_transports_at_fixed8192(
         assert response.status_code == 200
         rest_manifest = response.json()
         verify_identity(value["result_delivery"], value["run_metadata"], rest_manifest)
+    else:
+        pass
     values.append(file_payload(value, rest_manifest, tmp_path, "rest"))
     assert all(business(v) == business(values[0]) for v in values)
     for value in values:

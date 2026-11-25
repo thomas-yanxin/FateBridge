@@ -16,7 +16,7 @@ PLAN = json.loads((FIXTURE / "protocol.json").read_text())
 
 
 @pytest.mark.parametrize("tt", PLAN["tt_epochs"])
-def test_native_offset_rate_is_a_circle_difference_and_preserves_retrograde(tt):
+def test_native_offset_rate_is_a_circle_difference_and_preserves_retrograde(tt) -> None:
     epoch = PhysicalEpoch(
         EphemerisTime(None, ut1_from_tt(tt), tt, "controlled TT input", False),
         None,

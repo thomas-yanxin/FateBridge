@@ -31,7 +31,11 @@ def merge_case(tmp_path, monkeypatch):
 
     def records(path, rows):
         path.write_bytes(
-            gzip.compress("".join(json.dumps(r) + "\n" for r in rows).encode(), mtime=0)
+            gzip.compress(
+                "".join(json.dumps(r) + "\n" for r in rows).encode(),
+                compresslevel=1,
+                mtime=0,
+            )
         )
 
     engine = root / "engine/src/fatebridge"
@@ -147,7 +151,7 @@ def merge_case(tmp_path, monkeypatch):
     return module, shards, output, write, records
 
 
-def test_merge_keeps_every_unknown_and_original_order(merge_case):
+def test_merge_keeps_every_unknown_and_original_order(merge_case) -> None:
     module, _, output, _, _ = merge_case
     assert module.main() == 0
     result = json.loads(output.read_text())
@@ -170,8 +174,8 @@ def test_merge_keeps_every_unknown_and_original_order(merge_case):
     ],
 )
 def test_merge_rejects_forged_or_incomplete_cohorts_even_with_rebound_hashes(
-    merge_case, fault
-):
+    merge_case, fault: str
+) -> None:
     module, shards, output, write, records = merge_case
     path = shards[1]
     report = json.loads(path.read_text())
@@ -188,6 +192,8 @@ def test_merge_rejects_forged_or_incomplete_cohorts_even_with_rebound_hashes(
         rows[-1]["source_status"] = "resolved_source_control"
     elif fault == "wrong_runner":
         report["runner_sha256"] = "0" * 64
+    else:
+        pass
     records(rec, rows)
     report["records_sha256"] = module.sha(rec)
     write(path, report)

@@ -16,12 +16,18 @@ PIN = "d17d459dc6cd8b88982456828a1f0169e304361f81b72fe741a67b7f15790717"
 def reference() -> dict[str, Any]:
     if hashlib.sha256((CORPUS / "freeze.json").read_bytes()).hexdigest() != PIN:
         raise ValueError("Frozen natal-course reference changed")
+    else:
+        pass
     files = json.loads((CORPUS / "freeze.json").read_text())
     if {p.name for p in CORPUS.iterdir()} != set(files) | {"freeze.json"}:
         raise ValueError("Natal-course source inventory changed")
+    else:
+        pass
     for name, digest in files.items():
         if hashlib.sha256((CORPUS / name).read_bytes()).hexdigest() != digest:
             raise ValueError("Natal-course source changed")
+        else:
+            pass
     return json.loads((CORPUS / "reference.json").read_text())
 
 
@@ -75,5 +81,9 @@ if __name__ == "__main__":
     value = json.dumps(result, ensure_ascii=False, sort_keys=True, indent=2) + "\n"
     if args.output:
         args.output.write_text(value)
+    else:
+        pass
     print(value)
     raise SystemExit(0 if result["matched"] == 6 else 1)
+else:
+    pass

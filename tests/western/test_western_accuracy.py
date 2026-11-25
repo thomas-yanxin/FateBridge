@@ -13,16 +13,16 @@ from fatebridge.core.astro import runtime
 from fatebridge.core.astro.birth import build_astro_birth_info
 from fatebridge.core.astro.geometry import _julian_day
 from fatebridge.core.astro.horizon import horizon_altitude
+from fatebridge.core.astro.ptolemy import build_ptolemy_layer
 from fatebridge.core.astro.time_scales import ephemeris_time, leap_table
 from fatebridge.core.classical_western import compute_lot
 from fatebridge.core.predictive._common import build_natal_subject, determine_sect
-from fatebridge.core.ptolemy import build_ptolemy_layer
 from fatebridge.services.astrology import calculate_core_chart_analysis
 
 FIXTURES = Path(__file__).parents[1] / "fixtures"
 
 
-def test_lot_just_before_zero_stays_on_the_previous_side_of_the_circle():
+def test_lot_just_before_zero_stays_on_the_previous_side_of_the_circle() -> None:
     result = compute_lot(
         ["asc", "moon", "sun"],
         {"asc": 0.0, "moon": 0.0, "sun": math.nextafter(0.0, 1.0)},
@@ -30,20 +30,11 @@ def test_lot_just_before_zero_stays_on_the_previous_side_of_the_circle():
     assert result == math.nextafter(360.0, 0.0)
 
 
-BIRTH = dict(
-    birth_year=2024,
-    birth_month=3,
-    birth_day=20,
-    birth_hour=6,
-    birth_minute=30,
-    birth_timezone="UTC",
-    birth_longitude=0.0,
-    birth_latitude=51.5,
-)
+from tests.unit_test.fixtures.western_natal import GREENWICH_EQUINOX_BIRTH as BIRTH
 
 
 @pytest.mark.parametrize("hsys", [0, 2, 3, 5, 8])
-def test_sun_above_horizon_in_whole_sign_first_house_is_day(hsys):
+def test_sun_above_horizon_in_whole_sign_first_house_is_day(hsys: int) -> None:
     result = calculate_core_chart_analysis(
         **BIRTH, chart_variant="hellen_chart", hsys=hsys
     )
@@ -52,6 +43,8 @@ def test_sun_above_horizon_in_whole_sign_first_house_is_day(hsys):
     sun = next(p for p in result["planets"] if p["id"] == "Sun")
     if hsys == 0:
         assert sun["house"] == 1  # Original bug: called this night.
+    else:
+        pass
     assert result["classical"]["planets"]["Sun"]["above_horizon"] is True
     assert (
         result["hellenistic"]["lot_of_fortune"]["longitude"]
@@ -62,7 +55,9 @@ def test_sun_above_horizon_in_whole_sign_first_house_is_day(hsys):
 
 
 @pytest.mark.parametrize("house_system", ["P", "W", "V", "D"])
-def test_predictive_sect_agrees_with_natal_independent_of_houses(house_system):
+def test_predictive_sect_agrees_with_natal_independent_of_houses(
+    house_system: str,
+) -> None:
     birth = build_astro_birth_info(**BIRTH)
     assert (
         determine_sect(build_natal_subject(birth, house_system=house_system)) == "day"
@@ -70,7 +65,7 @@ def test_predictive_sect_agrees_with_natal_independent_of_houses(house_system):
 
 
 @pytest.mark.parametrize("month,expected", [(6, "day"), (12, "night")])
-def test_polar_sect_uses_sun_not_arbitrary_house(month, expected):
+def test_polar_sect_uses_sun_not_arbitrary_house(month: int, expected: str) -> None:
     result = calculate_core_chart_analysis(
         **{
             **BIRTH,
@@ -85,7 +80,9 @@ def test_polar_sect_uses_sun_not_arbitrary_house(month, expected):
 
 
 @pytest.mark.parametrize("year,month,day,hour", [(2024, 3, 10, 2), (2024, 11, 3, 1)])
-def test_gap_or_fold_cannot_silently_select_birth_instant(year, month, day, hour):
+def test_gap_or_fold_cannot_silently_select_birth_instant(
+    year: int, month: int, day: int, hour: int
+) -> None:
     result = calculate_core_chart_analysis(
         **{
             **BIRTH,
@@ -101,14 +98,14 @@ def test_gap_or_fold_cannot_silently_select_birth_instant(year, month, day, hour
     assert "planets" not in result
 
 
-def test_fold_resolves_to_two_distinct_instants_with_explicit_offsets():
+def test_fold_resolves_to_two_distinct_instants_with_explicit_offsets() -> None:
     base = {**BIRTH, "birth_month": 11, "birth_day": 3, "birth_hour": 1}
     a = build_astro_birth_info(**{**base, "birth_timezone": "-04:00"})
     b = build_astro_birth_info(**{**base, "birth_timezone": "-05:00"})
     assert b.utc_datetime - a.utc_datetime == timedelta(hours=1)
 
 
-def test_gregorian_jd_is_continuous_and_offset_and_subsecond_aware():
+def test_gregorian_jd_is_continuous_and_offset_and_subsecond_aware() -> None:
     # USNO/J2000 epoch and continuity, not a copy of our conversion algorithm.
     utc = datetime(2000, 1, 1, 12, tzinfo=timezone.utc)
     assert _julian_day(utc) == 2451545.0
@@ -122,7 +119,9 @@ def test_gregorian_jd_is_continuous_and_offset_and_subsecond_aware():
     )
 
 
-def test_geometric_horizon_fallback_matches_coordinate_rotation(monkeypatch):
+def test_geometric_horizon_fallback_matches_coordinate_rotation(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     swe = pytest.importorskip("swisseph")
     jd = 2460389.7708333335
     probes = [
@@ -146,7 +145,9 @@ def test_geometric_horizon_fallback_matches_coordinate_rotation(monkeypatch):
     "reference",
     json.loads((FIXTURES / "western-horizons.json").read_text())["references"],
 )
-def test_public_western_planets_against_frozen_jpl(reference, monkeypatch):
+def test_public_western_planets_against_frozen_jpl(
+    reference, monkeypatch: pytest.MonkeyPatch
+) -> None:
     fixture = json.loads((FIXTURES / "western-horizons.json").read_text())
     assert (
         hashlib.sha256(reference["response"]["result"].encode()).hexdigest()
@@ -192,7 +193,7 @@ def test_public_western_planets_against_frozen_jpl(reference, monkeypatch):
             )
 
 
-def test_primary_text_triangles_are_not_a_dorothean_substitution():
+def test_primary_text_triangles_are_not_a_dorothean_substitution() -> None:
     ref = json.loads((FIXTURES / "western-ptolemy-robbins-1940.json").read_text())
     for row in ref["signs"]:
         for sect in ("day", "night"):
@@ -210,7 +211,7 @@ def test_primary_text_triangles_are_not_a_dorothean_substitution():
     )
 
 
-def test_primary_text_exaltations_and_mercury_sect():
+def test_primary_text_exaltations_and_mercury_sect() -> None:
     ref = json.loads((FIXTURES / "western-ptolemy-robbins-1940.json").read_text())
     signs = [row["sign"] for row in ref["signs"]]
     for planet, exaltation in ref["exaltations"].items():
@@ -228,7 +229,7 @@ def test_primary_text_exaltations_and_mercury_sect():
         assert fact["planets"]["Mercury"]["natural_sect"] == expected
 
 
-def test_iers_leap_second_transition_and_future_assumption_are_explicit():
+def test_iers_leap_second_transition_and_future_assumption_are_explicit() -> None:
     before = ephemeris_time(datetime(2016, 12, 31, 23, 59, 59, tzinfo=timezone.utc))
     after = ephemeris_time(datetime(2017, 1, 1, tzinfo=timezone.utc))
     assert (after.jd_tt - before.jd_tt) * 86400 == pytest.approx(2.0, abs=0.00004)
@@ -240,7 +241,7 @@ def test_iers_leap_second_transition_and_future_assumption_are_explicit():
     assert leap_table()["entries"][-1]["tai_minus_utc_seconds"] == 37
 
 
-def test_unknown_altitude_never_fabricates_above_horizon_from_house():
+def test_unknown_altitude_never_fabricates_above_horizon_from_house() -> None:
     from fatebridge.core.classical_western import build_planet_classical
 
     result = build_planet_classical(
@@ -256,7 +257,7 @@ def test_unknown_altitude_never_fabricates_above_horizon_from_house():
     assert result["in_halb"] is None
 
 
-def test_out_of_bounds_uses_epoch_obliquity_instead_of_modern_constant():
+def test_out_of_bounds_uses_epoch_obliquity_instead_of_modern_constant() -> None:
     from fatebridge.core.classical_western import out_of_bounds
 
     assert out_of_bounds(23.5, 23.7) is False
@@ -267,8 +268,8 @@ def test_out_of_bounds_uses_epoch_obliquity_instead_of_modern_constant():
 
 
 def test_partial_native_geometry_failure_is_not_labeled_full_runtime_precision(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     swe = pytest.importorskip("swisseph")
 
     def fail(*args, **kwargs):

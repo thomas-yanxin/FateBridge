@@ -3,13 +3,14 @@
 import copy
 import json
 import shutil
+from pathlib import Path
 
 import pytest
 
 from scripts.ren.audit_liuren_daquan_cross_scan import CORPUS, audit, reference
 
 
-def test_complete_printed_mention_cohort_preserves_unknowns_and_repeated_days():
+def test_complete_printed_mention_cohort_preserves_unknowns_and_repeated_days() -> None:
     data = reference()
     rows = data["reference"]["rows"]
     assert len(rows) == 40
@@ -27,7 +28,7 @@ def test_complete_printed_mention_cohort_preserves_unknowns_and_repeated_days():
     assert data["witness"]["full_original_downloaded"] is False
 
 
-def test_crossed_he_is_not_a_truth_label_for_every_named_jiaoche_subtype():
+def test_crossed_he_is_not_a_truth_label_for_every_named_jiaoche_subtype() -> None:
     result = audit()
     assert result["engineering_guard_passed"] is True
     assert len(result["selected_passages"]) == 3
@@ -55,7 +56,9 @@ def test_crossed_he_is_not_a_truth_label_for_every_named_jiaoche_subtype():
 
 
 @pytest.mark.parametrize("fault", ["named_heading_means_he", "certificate"])
-def test_auditor_rejects_inflating_structure_or_whole_book_claims(monkeypatch, fault):
+def test_auditor_rejects_inflating_structure_or_whole_book_claims(
+    monkeypatch: pytest.MonkeyPatch, fault: str
+) -> None:
     import fatebridge.core.metaphysics.liureng_cross_harmony as production
 
     original = production.cross_harmony
@@ -75,7 +78,9 @@ def test_auditor_rejects_inflating_structure_or_whole_book_claims(monkeypatch, f
     assert result["goal_complete"] is False
 
 
-def test_new_source_cannot_silently_turn_original_nulls_into_an_answer(monkeypatch):
+def test_new_source_cannot_silently_turn_original_nulls_into_an_answer(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     import fatebridge.core.metaphysics.liureng_day_placements as production
 
     original = production.day_placement_patterns
@@ -95,7 +100,9 @@ def test_new_source_cannot_silently_turn_original_nulls_into_an_answer(monkeypat
 
 
 @pytest.mark.parametrize("fault", ["image", "coordinated_answer_and_manifest"])
-def test_changed_source_or_jointly_rehashed_answer_is_rejected(tmp_path, fault):
+def test_changed_source_or_jointly_rehashed_answer_is_rejected(
+    tmp_path: Path, fault: str
+) -> None:
     shutil.copytree(CORPUS, tmp_path / "reference")
     folder = tmp_path / "reference"
     if fault == "image":

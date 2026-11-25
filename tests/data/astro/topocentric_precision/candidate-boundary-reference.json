@@ -1,0 +1,412 @@
+{
+  "rows": [
+    {
+      "ordinal": 0,
+      "id": "boundary-0",
+      "model_id": "candidate-boundary-0",
+      "population": "endpoint",
+      "longitude": 0.0,
+      "status": "defined",
+      "phase_degrees": "180",
+      "house_position": 7.0,
+      "house": 7,
+      "above_horizon": true,
+      "reflected_western": true,
+      "selected_root_degrees": "90",
+      "candidate_root_degrees": [
+        "90"
+      ],
+      "candidate_positions": [
+        7.0
+      ],
+      "root_selection": "horizon_endpoint",
+      "working_bits": [
+        256
+      ],
+      "reference_definition": "continuous_unshifted_t_v2"
+    },
+    {
+      "ordinal": 1,
+      "id": "boundary-1",
+      "model_id": "candidate-boundary-0",
+      "population": "endpoint",
+      "longitude": 90.0,
+      "status": "defined",
+      "phase_degrees": "270",
+      "house_position": 10.0,
+      "house": 10,
+      "above_horizon": true,
+      "reflected_western": false,
+      "selected_root_degrees": "0",
+      "candidate_root_degrees": [
+        "0",
+        "90"
+      ],
+      "candidate_positions": [
+        10.0,
+        1.0
+      ],
+      "root_selection": "endpoint_limit",
+      "working_bits": [
+        256
+      ],
+      "reference_definition": "continuous_unshifted_t_v2"
+    },
+    {
+      "ordinal": 2,
+      "id": "boundary-2",
+      "model_id": "candidate-boundary-0",
+      "population": "endpoint",
+      "longitude": 180.0,
+      "status": "defined",
+      "phase_degrees": "0",
+      "house_position": 1.0,
+      "house": 1,
+      "above_horizon": true,
+      "reflected_western": false,
+      "selected_root_degrees": "90",
+      "candidate_root_degrees": [
+        "90"
+      ],
+      "candidate_positions": [
+        1.0
+      ],
+      "root_selection": "horizon_endpoint",
+      "working_bits": [
+        256
+      ],
+      "reference_definition": "continuous_unshifted_t_v2"
+    },
+    {
+      "ordinal": 3,
+      "id": "boundary-3",
+      "model_id": "candidate-boundary-0",
+      "population": "endpoint",
+      "longitude": 270.0,
+      "status": "defined",
+      "phase_degrees": "0",
+      "house_position": 1.0,
+      "house": 1,
+      "above_horizon": true,
+      "reflected_western": false,
+      "selected_root_degrees": "90",
+      "candidate_root_degrees": [
+        "0",
+        "90"
+      ],
+      "candidate_positions": [
+        10.0,
+        1.0
+      ],
+      "root_selection": "endpoint_limit",
+      "working_bits": [
+        256
+      ],
+      "reference_definition": "continuous_unshifted_t_v2"
+    },
+    {
+      "ordinal": 4,
+      "id": "boundary-4",
+      "model_id": "candidate-boundary-1",
+      "population": "endpoint",
+      "longitude": 0.0,
+      "status": "defined",
+      "phase_degrees": "0",
+      "house_position": 1.0,
+      "house": 1,
+      "above_horizon": true,
+      "reflected_western": false,
+      "selected_root_degrees": "90",
+      "candidate_root_degrees": [
+        "90"
+      ],
+      "candidate_positions": [
+        1.0
+      ],
+      "root_selection": "horizon_endpoint",
+      "working_bits": [
+        256
+      ],
+      "reference_definition": "continuous_unshifted_t_v2"
+    },
+    {
+      "ordinal": 5,
+      "id": "boundary-5",
+      "model_id": "candidate-boundary-1",
+      "population": "endpoint",
+      "longitude": 90.0,
+      "status": "defined",
+      "phase_degrees": "90",
+      "house_position": 4.0,
+      "house": 4,
+      "above_horizon": false,
+      "reflected_western": false,
+      "selected_root_degrees": "0",
+      "candidate_root_degrees": [
+        "0"
+      ],
+      "candidate_positions": [
+        4.0
+      ],
+      "root_selection": "meridian_endpoint",
+      "working_bits": [
+        256
+      ],
+      "reference_definition": "continuous_unshifted_t_v2"
+    },
+    {
+      "ordinal": 6,
+      "id": "boundary-6",
+      "model_id": "candidate-boundary-1",
+      "population": "endpoint",
+      "longitude": 180.0,
+      "status": "defined",
+      "phase_degrees": "180",
+      "house_position": 7.0,
+      "house": 7,
+      "above_horizon": true,
+      "reflected_western": true,
+      "selected_root_degrees": "90",
+      "candidate_root_degrees": [
+        "90"
+      ],
+      "candidate_positions": [
+        7.0
+      ],
+      "root_selection": "horizon_endpoint",
+      "working_bits": [
+        256
+      ],
+      "reference_definition": "continuous_unshifted_t_v2"
+    },
+    {
+      "ordinal": 7,
+      "id": "boundary-7",
+      "model_id": "candidate-boundary-1",
+      "population": "endpoint",
+      "longitude": 270.0,
+      "status": "defined",
+      "phase_degrees": "270",
+      "house_position": 10.0,
+      "house": 10,
+      "above_horizon": true,
+      "reflected_western": false,
+      "selected_root_degrees": "0",
+      "candidate_root_degrees": [
+        "0"
+      ],
+      "candidate_positions": [
+        10.0
+      ],
+      "root_selection": "meridian_endpoint",
+      "working_bits": [
+        256
+      ],
+      "reference_definition": "continuous_unshifted_t_v2"
+    },
+    {
+      "ordinal": 8,
+      "id": "boundary-8",
+      "model_id": "candidate-boundary-2",
+      "population": "endpoint",
+      "longitude": 0.0,
+      "status": "defined",
+      "phase_degrees": "180",
+      "house_position": 7.0,
+      "house": 7,
+      "above_horizon": true,
+      "reflected_western": true,
+      "selected_root_degrees": "90",
+      "candidate_root_degrees": [
+        "90"
+      ],
+      "candidate_positions": [
+        7.0
+      ],
+      "root_selection": "horizon_endpoint",
+      "working_bits": [
+        256
+      ],
+      "reference_definition": "continuous_unshifted_t_v2"
+    },
+    {
+      "ordinal": 9,
+      "id": "boundary-9",
+      "model_id": "candidate-boundary-2",
+      "population": "endpoint",
+      "longitude": 90.0,
+      "status": "defined",
+      "phase_degrees": "270",
+      "house_position": 10.0,
+      "house": 10,
+      "above_horizon": true,
+      "reflected_western": false,
+      "selected_root_degrees": "0",
+      "candidate_root_degrees": [
+        "0"
+      ],
+      "candidate_positions": [
+        10.0
+      ],
+      "root_selection": "meridian_endpoint",
+      "working_bits": [
+        256
+      ],
+      "reference_definition": "continuous_unshifted_t_v2"
+    },
+    {
+      "ordinal": 10,
+      "id": "boundary-10",
+      "model_id": "candidate-boundary-2",
+      "population": "endpoint",
+      "longitude": 180.0,
+      "status": "defined",
+      "phase_degrees": "0",
+      "house_position": 1.0,
+      "house": 1,
+      "above_horizon": true,
+      "reflected_western": false,
+      "selected_root_degrees": "90",
+      "candidate_root_degrees": [
+        "90"
+      ],
+      "candidate_positions": [
+        1.0
+      ],
+      "root_selection": "horizon_endpoint",
+      "working_bits": [
+        256
+      ],
+      "reference_definition": "continuous_unshifted_t_v2"
+    },
+    {
+      "ordinal": 11,
+      "id": "boundary-11",
+      "model_id": "candidate-boundary-2",
+      "population": "endpoint",
+      "longitude": 270.0,
+      "status": "defined",
+      "phase_degrees": "90",
+      "house_position": 4.0,
+      "house": 4,
+      "above_horizon": false,
+      "reflected_western": false,
+      "selected_root_degrees": "0",
+      "candidate_root_degrees": [
+        "0"
+      ],
+      "candidate_positions": [
+        4.0
+      ],
+      "root_selection": "meridian_endpoint",
+      "working_bits": [
+        256
+      ],
+      "reference_definition": "continuous_unshifted_t_v2"
+    },
+    {
+      "ordinal": 12,
+      "id": "boundary-12",
+      "model_id": "candidate-boundary-3",
+      "population": "endpoint",
+      "longitude": 0.0,
+      "status": "defined",
+      "phase_degrees": "0",
+      "house_position": 1.0,
+      "house": 1,
+      "above_horizon": true,
+      "reflected_western": false,
+      "selected_root_degrees": "90",
+      "candidate_root_degrees": [
+        "90"
+      ],
+      "candidate_positions": [
+        1.0
+      ],
+      "root_selection": "horizon_endpoint",
+      "working_bits": [
+        256
+      ],
+      "reference_definition": "continuous_unshifted_t_v2"
+    },
+    {
+      "ordinal": 13,
+      "id": "boundary-13",
+      "model_id": "candidate-boundary-3",
+      "population": "endpoint",
+      "longitude": 90.0,
+      "status": "defined",
+      "phase_degrees": "0",
+      "house_position": 1.0,
+      "house": 1,
+      "above_horizon": true,
+      "reflected_western": false,
+      "selected_root_degrees": "90",
+      "candidate_root_degrees": [
+        "0",
+        "90"
+      ],
+      "candidate_positions": [
+        10.0,
+        1.0
+      ],
+      "root_selection": "endpoint_limit",
+      "working_bits": [
+        256
+      ],
+      "reference_definition": "continuous_unshifted_t_v2"
+    },
+    {
+      "ordinal": 14,
+      "id": "boundary-14",
+      "model_id": "candidate-boundary-3",
+      "population": "endpoint",
+      "longitude": 180.0,
+      "status": "defined",
+      "phase_degrees": "180",
+      "house_position": 7.0,
+      "house": 7,
+      "above_horizon": true,
+      "reflected_western": true,
+      "selected_root_degrees": "90",
+      "candidate_root_degrees": [
+        "90"
+      ],
+      "candidate_positions": [
+        7.0
+      ],
+      "root_selection": "horizon_endpoint",
+      "working_bits": [
+        256
+      ],
+      "reference_definition": "continuous_unshifted_t_v2"
+    },
+    {
+      "ordinal": 15,
+      "id": "boundary-15",
+      "model_id": "candidate-boundary-3",
+      "population": "endpoint",
+      "longitude": 270.0,
+      "status": "defined",
+      "phase_degrees": "270",
+      "house_position": 10.0,
+      "house": 10,
+      "above_horizon": true,
+      "reflected_western": false,
+      "selected_root_degrees": "0",
+      "candidate_root_degrees": [
+        "0",
+        "90"
+      ],
+      "candidate_positions": [
+        10.0,
+        1.0
+      ],
+      "root_selection": "endpoint_limit",
+      "working_bits": [
+        256
+      ],
+      "reference_definition": "continuous_unshifted_t_v2"
+    }
+  ]
+}

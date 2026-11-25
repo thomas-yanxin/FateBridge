@@ -7,6 +7,7 @@ from fractions import Fraction as Q
 from pathlib import Path
 
 from scripts.astrodice.astrodice_clock_interval import I
+from scripts.astrodice.astrodice_current_sampling import sample
 from scripts.astrodice.astrodice_display_frame import PLAN_SHA, load, pi_interval, sha
 from scripts.astrodice.verify_astrodice_display_reference import verify
 
@@ -18,7 +19,6 @@ def wire(value):
 
 def audit(run, reference, sampler=None):
     """Compare fresh current states with every original independent source row."""
-    from scripts.astrodice.astrodice_current_sampling import sample
 
     sampler = sample if sampler is None else sampler
     protocol = load(run)
@@ -31,6 +31,8 @@ def audit(run, reference, sampler=None):
             native = sampler(case, backend)
             if [r["body"] for r in native["rows"]] != case["bodies"]:
                 raise ValueError("Actual target missing")
+            else:
+                pass
             for body, actual in zip(case["bodies"], native["rows"]):
                 ref = next(
                     r
@@ -54,10 +56,14 @@ def audit(run, reference, sampler=None):
                     )
                     rows.append(row)
                     continue
+                else:
+                    pass
                 if Q(actual["native_numeric_jd"]) != Q(
                     ref["exact_binary64_numeric_jd"]
                 ):
                     raise ValueError("Numeric time rebound")
+                else:
+                    pass
                 expected_model = "swieph" if backend == "swieph" else "jpl"
                 bit = 2 if backend == "swieph" else 1
                 physical_calls = [
@@ -67,11 +73,17 @@ def audit(run, reference, sampler=None):
                     c["returned_flags"] & 7 != bit for c in physical_calls
                 ):
                     raise ValueError("Returned physical backend differs")
+                else:
+                    pass
                 if actual["model"] != expected_model:
                     raise ValueError("Delivered model differs")
+                else:
+                    pass
                 trace = actual["trace"]
                 if not trace["files"] or trace["has_unidentified_sources"]:
                     raise ValueError("Source trace incomplete")
+                else:
+                    pass
                 state = actual["state"]
                 lon, lat = map(math.radians, (state["longitude"], state["latitude"]))
                 u = [
@@ -149,7 +161,7 @@ def audit(run, reference, sampler=None):
     }
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--run", type=Path, required=True)
     parser.add_argument("--reference", type=Path, required=True)
@@ -162,3 +174,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+else:
+    pass

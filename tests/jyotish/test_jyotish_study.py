@@ -3,17 +3,18 @@
 import hashlib
 from copy import deepcopy
 from datetime import datetime
+from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
 
-from fatebridge.validation.jyotish_study import (
+from validation.jyotish_study import (
     BlindProtocol,
     register,
     reveal_and_evaluate,
     seal_forecasts,
 )
-from fatebridge.validation.predictions import Forecast, Outcome
+from validation.predictions import Forecast, Outcome
 
 MODEL = b"frozen synthetic probability policy; not a real prediction model"
 MODEL_SHA = hashlib.sha256(MODEL).hexdigest()
@@ -84,7 +85,7 @@ def outcomes():
     ]
 
 
-def test_full_commit_seal_reveal_preserves_metrics_and_no_authority_claim():
+def test_full_commit_seal_reveal_preserves_metrics_and_no_authority_claim() -> None:
     reg = register(protocol(), MODEL, at=AT, artifacts=ARTIFACTS)
     sealed = seal_forecasts(reg, forecasts(), at=ISSUED)
     report = reveal_and_evaluate(reg, sealed, outcomes(), at=AFTER)
@@ -95,7 +96,7 @@ def test_full_commit_seal_reveal_preserves_metrics_and_no_authority_claim():
     assert not report["authority_certified"]
 
 
-def test_no_real_outcomes_remains_unassessed_with_all_pending_rows():
+def test_no_real_outcomes_remains_unassessed_with_all_pending_rows() -> None:
     reg = register(protocol(), MODEL, at=AT, artifacts=ARTIFACTS)
     report = reveal_and_evaluate(
         reg, seal_forecasts(reg, forecasts(), at=ISSUED), [], at=AFTER
@@ -105,17 +106,17 @@ def test_no_real_outcomes_remains_unassessed_with_all_pending_rows():
     assert report["coverage"] == 0
 
 
-def test_training_cohort_overlap_is_rejected():
+def test_training_cohort_overlap_is_rejected() -> None:
     with pytest.raises(ValidationError, match="重叠"):
         protocol(training_subject_ids=["held-out-fictional-0"])
 
 
-def test_wrong_actual_model_file_is_rejected():
+def test_wrong_actual_model_file_is_rejected() -> None:
     with pytest.raises(ValueError, match="模型文件"):
         register(protocol(), MODEL + b"changed", at=AT, artifacts=ARTIFACTS)
 
 
-def test_artifact_hashes_are_verified_against_actual_bytes():
+def test_artifact_hashes_are_verified_against_actual_bytes() -> None:
     with pytest.raises(ValueError, match="实际规则"):
         register(
             protocol(),
@@ -127,7 +128,7 @@ def test_artifact_hashes_are_verified_against_actual_bytes():
         register(protocol(), MODEL, at=AT, artifacts={})
 
 
-def test_registration_and_forecast_tampering_are_rejected():
+def test_registration_and_forecast_tampering_are_rejected() -> None:
     reg = register(protocol(), MODEL, at=AT, artifacts=ARTIFACTS)
     sealed = seal_forecasts(reg, forecasts(), at=ISSUED)
     changed = deepcopy(reg)
@@ -140,7 +141,7 @@ def test_registration_and_forecast_tampering_are_rejected():
         reveal_and_evaluate(reg, changed, outcomes(), at=AFTER)
 
 
-def test_incomplete_forecasts_cannot_be_sealed_but_explicit_abstention_can():
+def test_incomplete_forecasts_cannot_be_sealed_but_explicit_abstention_can() -> None:
     reg = register(protocol(), MODEL, at=AT, artifacts=ARTIFACTS)
     fs = forecasts()
     with pytest.raises(ValueError, match="完整注册队列"):
@@ -153,7 +154,7 @@ def test_incomplete_forecasts_cannot_be_sealed_but_explicit_abstention_can():
     assert not report["preregistered_performance_gate_met"]
 
 
-def test_late_seal_and_early_reveal_are_rejected():
+def test_late_seal_and_early_reveal_are_rejected() -> None:
     reg = register(protocol(), MODEL, at=AT, artifacts=ARTIFACTS)
     with pytest.raises(ValueError):
         seal_forecasts(reg, forecasts(), at=AFTER)
@@ -163,8 +164,8 @@ def test_late_seal_and_early_reveal_are_rejected():
 
 
 def test_real_cli_creates_distinct_commitments_and_refuses_overwrite_or_early_reveal(
-    tmp_path, monkeypatch, capsys
-):
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
     import importlib.util
     import json
     import sys

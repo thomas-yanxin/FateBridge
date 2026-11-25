@@ -8,10 +8,12 @@ from pathlib import Path
 import pytest
 from jsonschema import Draft202012Validator
 
-from tests.liuyao.test_liuyao_clash_transports import all_surfaces
-from tests.liuyao.test_liuyao_roles import classical
-from tests.support.result_delivery import assert_same_run_receipt
-from tests.support.transports import SPECS, business, surface_calls
+import fatebridge.api as api
+from fatebridge.application import result_delivery as delivery
+from tests.support.result_delivery import assert_same_run_receipt, reconstruct
+from tests.support.transports import SPECS, business
+from tests.unit_test.fixtures.liuyao import all_surfaces
+from tests.unit_test.fixtures.liuyao import classical_case as classical
 
 BASE = Path(__file__).parents[1] / "fixtures/liuyao_explanation_v30"
 CASES = json.loads((BASE / "cases.json").read_text())["cases"]
@@ -25,6 +27,8 @@ def assert_caution(detail, position, expected):
     if expected is False:
         assert cautions == []
         return
+    else:
+        pass
     assert len(cautions) == 1
     assert "刑的总作用未裁定" in cautions[0]
     if expected is None:
@@ -36,7 +40,7 @@ def assert_caution(detail, position, expected):
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
-def test_final_scope_and_caution_agree(case):
+def test_final_scope_and_caution_agree(case) -> None:
     result = classical(case)
     assert_caution(result, case["position"], case["expected_presence"])
     for fact in result["penalty_conditions"]["lines"]:
@@ -47,9 +51,11 @@ def test_final_scope_and_caution_agree(case):
         assert gate["month_break_qualified_gate"] is True
         assert gate["condition_match"] is False
         assert "本位变寅" in result["lines"][0]["stage_cautions"][0]
+    else:
+        pass
 
 
-def test_case_protocol_and_primary_source_stay_frozen():
+def test_case_protocol_and_primary_source_stay_frozen() -> None:
     for name, digest in json.loads((BASE / "freeze.json").read_text())[
         "sha256"
     ].items():
@@ -73,8 +79,8 @@ PUBLIC = [
 @pytest.mark.parametrize("case_id,day", PUBLIC)
 @pytest.mark.parametrize("project", [False, True])
 def test_caution_and_snapshot_use_same_final_context(
-    case_id, day, project, surface_calls
-):
+    case_id, day, project: bool, surface_calls
+) -> None:
     case = next(c for c in CASES if c["id"] == case_id)
     spec = SPECS["sixyao"]
     payload = dict(
@@ -108,6 +114,8 @@ def test_caution_and_snapshot_use_same_final_context(
             ("include_snapshot_text", "true"),
         ]
         options.update(fields=fields, strict_fields=True, include_snapshot_text=True)
+    else:
+        pass
     http, mcp, code, cli = surface_calls(
         spec, payload, params=params, options=options, flags=flags
     )
@@ -143,14 +151,16 @@ def test_caution_and_snapshot_use_same_final_context(
             )
             + "\n"
         )
+    else:
+        pass
 
 
 def test_same_run_full_hash_preserves_unknown_caution(
-    rest, tmp_path, capsys, monkeypatch
-):
-    import fatebridge.api as api
-    from fatebridge.application import result_delivery as delivery
-    from tests.support.result_delivery import reconstruct
+    rest,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
 
     store = delivery.ResultStore(tmp_path / "same-run-results")
     monkeypatch.setattr(delivery, "RESULT_STORE", store)

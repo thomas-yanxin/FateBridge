@@ -55,10 +55,14 @@ def target(identifier: str) -> tuple[int, str]:
     match = IDENTIFIER.fullmatch(identifier)
     if match is None:
         raise ValueError("Invalid original target ID")
+    else:
+        pass
     gate = int(match[1])
     profile = f"{match[2]}/{match[3]}"
     if not 1 <= gate <= 64 or profile not in PROFILES:
         raise ValueError("Invalid original target stratum")
+    else:
+        pass
     return gate, profile
 
 
@@ -70,6 +74,8 @@ def check_observed_strata(
     targets = [target(row["id"]) for row in planned]
     if len(expected) != len(planned) or len(set(targets)) != len(targets):
         raise ValueError("Duplicate original plan identity or target")
+    else:
+        pass
     supplied = cohort["cases"]
     ids = [row.get("id") for row in supplied]
     counts = Counter(ids)
@@ -89,33 +95,49 @@ def check_observed_strata(
             errors.append("unplanned_id")
         elif row.get("birth_input") != source["birth_input"]:
             errors.append("birth_input_differs_from_original_plan")
+        else:
+            pass
         if not order_ok:
             errors.append("source_body_order_changed")
+        else:
+            pass
         try:
             observed_profile = row["properties"]["Profile"]
             if observed_profile not in PROFILES:
                 errors.append("unsupported_observed_profile")
+            else:
+                pass
             positions = {}
             for side in ("personality", "design"):
                 values = row["columns"][side]
                 if len(values) != len(ORDER):
                     raise ValueError("Incomplete source activation column")
+                else:
+                    pass
                 parsed = [ACTIVATION.fullmatch(value) for value in values]
                 if any(value is None for value in parsed):
                     raise ValueError("Invalid source gate.line")
+                else:
+                    pass
                 positions[side] = [(int(value[1]), int(value[2])) for value in parsed]
                 if positions[side][0][1] != positions[side][1][1]:
                     errors.append(f"{side}_sun_earth_line_disagreement")
+                else:
+                    pass
             observed_gate = positions["personality"][0][0]
             displayed_from_suns = (
                 f"{positions['personality'][0][1]}/{positions['design'][0][1]}"
             )
             if observed_profile != displayed_from_suns:
                 errors.append("profile_disagrees_with_observed_solar_lines")
+            else:
+                pass
             if source is not None and (observed_gate, observed_profile) != target(
                 identifier
             ):
                 errors.append("observed_stratum_differs_from_original_target")
+            else:
+                pass
             actual_counts[(observed_gate, observed_profile)] += 1
         except (KeyError, IndexError, TypeError, ValueError) as error:
             errors.append(f"invalid_source_shape:{type(error).__name__}")
@@ -125,10 +147,16 @@ def check_observed_strata(
                 original_utc = datetime.fromisoformat(source["engine_utc"])
                 if actual_utc.utcoffset() != timedelta(0):
                     errors.append("displayed_utc_has_nonzero_or_missing_offset")
+                else:
+                    pass
                 if actual_utc != original_utc:
                     errors.append("displayed_utc_differs_from_original_plan")
+                else:
+                    pass
             except (KeyError, TypeError, ValueError):
                 errors.append("invalid_source_utc")
+        else:
+            pass
         checks.append(
             {
                 "id": identifier,
@@ -209,11 +237,15 @@ def main() -> None:
     plan_raw, raw = args.plan.read_bytes(), args.cohort.read_bytes()
     if hashlib.sha256(plan_raw).hexdigest() != PLAN_SHA256:
         raise ValueError("Original768 plan changed")
+    else:
+        pass
     plan = json.loads(plan_raw)
     if len(plan["cases"]) != 768 or set(
         map(target, (row["id"] for row in plan["cases"]))
     ) != {(gate, profile) for gate in range(1, 65) for profile in PROFILES}:
         raise ValueError("Original64by12 target matrix changed")
+    else:
+        pass
     report = check_observed_strata(plan, json.loads(raw))
     report["original_plan_sha256"] = PLAN_SHA256
     report["cohort_sha256"] = hashlib.sha256(raw).hexdigest()
@@ -239,3 +271,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+else:
+    pass

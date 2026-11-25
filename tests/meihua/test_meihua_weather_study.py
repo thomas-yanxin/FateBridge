@@ -4,10 +4,11 @@ import hashlib
 import json
 from datetime import date, timedelta
 from decimal import Decimal
+from pathlib import Path
 
 import pytest
 
-from fatebridge.validation.meihua_weather_study import (
+from validation.meihua_weather_study import (
     RainObservation,
     audit_locked_weather_pilot,
     evaluate_weather_cohort,
@@ -37,7 +38,7 @@ def parse(rows, **options):
     )
 
 
-def test_trace_is_an_interval_and_incomplete_is_not_zero():
+def test_trace_is_an_interval_and_incomplete_is_not_zero() -> None:
     observations = parse(
         ["2025,1,1,Trace,C", "2025,1,2,12.0,#", "2025,1,3,***,C", "2025,1,4,0.1,C"]
     )
@@ -51,12 +52,12 @@ def test_trace_is_an_interval_and_incomplete_is_not_zero():
     assert observations[date(2025, 1, 4)].occurred(Decimal("0.1")) is True
 
 
-def test_trace_without_source_bound_remains_unknown():
+def test_trace_without_source_bound_remains_unknown() -> None:
     observations = parse(["2025,1,1,Trace,C"], legend="C data Complete\n")
     assert observations[date(2025, 1, 1)].occurred(Decimal("0.1")) is None
 
 
-def test_unavailable_invalid_date_outside_locked_year_cannot_drop_cohort_days():
+def test_unavailable_invalid_date_outside_locked_year_cannot_drop_cohort_days() -> None:
     observations = parse(["1900,2,29,***,", "2025,1,1,0,C"])
     assert list(observations) == [date(2025, 1, 1)]
     with pytest.raises(ValueError, match="day is out of range"):
@@ -64,12 +65,12 @@ def test_unavailable_invalid_date_outside_locked_year_cannot_drop_cohort_days():
 
 
 @pytest.mark.parametrize("value", ["NaN", "Infinity", "-0.1", "unknown", ""])
-def test_bad_values_fail_instead_of_becoming_dry(value):
+def test_bad_values_fail_instead_of_becoming_dry(value: str) -> None:
     with pytest.raises(ValueError, match="rainfall"):
         parse([f"2025,1,1,{value},C"])
 
 
-def test_wrong_station_bad_rows_and_duplicates_fail():
+def test_wrong_station_bad_rows_and_duplicates_fail() -> None:
     for raw in [
         source(["2025,1,1,1.0,C"]).replace(b"Hong Kong Observatory", b"King's Park"),
         source(["2025,1,1,1.0"]),
@@ -80,7 +81,7 @@ def test_wrong_station_bad_rows_and_duplicates_fail():
             parse_hko_rainfall(raw, start=date(2025, 1, 1), end=date(2026, 1, 1))
 
 
-def test_all_days_abstentions_unknowns_and_equal_baselines_are_retained():
+def test_all_days_abstentions_unknowns_and_equal_baselines_are_retained() -> None:
     days = [f"2025-01-0{i}" for i in range(1, 7)]
     observations = parse(
         [
@@ -115,7 +116,7 @@ def test_all_days_abstentions_unknowns_and_equal_baselines_are_retained():
     assert not report["real_world_predictive_efficacy_established"]
 
 
-def test_missing_predictions_and_observations_cannot_disappear():
+def test_missing_predictions_and_observations_cannot_disappear() -> None:
     report = evaluate_weather_cohort(
         ["2025-01-01", "2025-01-02"], [], parse(["2025,1,1,0,C"])
     )
@@ -125,7 +126,7 @@ def test_missing_predictions_and_observations_cannot_disappear():
     assert len(report["rows"]) == 2
 
 
-def test_invalid_and_repeated_forecasts_are_rejected():
+def test_invalid_and_repeated_forecasts_are_rejected() -> None:
     for forecasts in [
         [{"date": "2025-01-02", "label": "dry"}],
         [{"date": "2025-01-01", "label": "unknown"}],
@@ -148,12 +149,12 @@ def test_invalid_and_repeated_forecasts_are_rejected():
 @pytest.mark.parametrize(
     "threshold", [Decimal("0"), Decimal("-1"), Decimal("NaN"), Decimal("Infinity")]
 )
-def test_invalid_thresholds_fail_even_when_no_outcomes(threshold):
+def test_invalid_thresholds_fail_even_when_no_outcomes(threshold) -> None:
     with pytest.raises(ValueError):
         evaluate_weather_cohort(["2025-01-01"], [], {}, threshold=threshold)
 
 
-def test_the_frozen_label_adapter_does_not_vote_or_use_pending_rules():
+def test_the_frozen_label_adapter_does_not_vote_or_use_pending_rules() -> None:
     assert (
         rain_without_clear_label(
             [{"status": "matched", "tags": ["rain"]}] * 10
@@ -178,7 +179,9 @@ def test_the_frozen_label_adapter_does_not_vote_or_use_pending_rules():
     )
 
 
-def test_old_research_policy_cannot_silently_consume_new_control_aware_results():
+def test_old_research_policy_cannot_silently_consume_new_control_aware_results() -> (
+    None
+):
     with pytest.raises(ValueError, match="frozen pre-control trace"):
         rain_without_clear_label(
             [
@@ -279,7 +282,9 @@ def _synthetic_pilot(directory):
     )
 
 
-def test_all_abstention_synthetic_audit_does_not_produce_perfect_accuracy(tmp_path):
+def test_all_abstention_synthetic_audit_does_not_produce_perfect_accuracy(
+    tmp_path: Path,
+) -> None:
     _synthetic_pilot(tmp_path)
     report = audit_locked_weather_pilot(tmp_path)
     assert report["declared_abstentions"] == 365
@@ -293,7 +298,9 @@ def test_all_abstention_synthetic_audit_does_not_produce_perfect_accuracy(tmp_pa
         audit_locked_weather_pilot(tmp_path)
 
 
-def test_sealed_forecast_tampering_and_resigned_policy_drift_are_rejected(tmp_path):
+def test_sealed_forecast_tampering_and_resigned_policy_drift_are_rejected(
+    tmp_path: Path,
+) -> None:
     _synthetic_pilot(tmp_path)
     path = tmp_path / "forecasts.json"
     forecasts = json.loads(path.read_text())

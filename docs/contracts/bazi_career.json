@@ -1,9 +1,9 @@
 {
   "call_guidance": {
     "depth": "evidence_chain按星位、根气与条件取证；structure_checks只审有限前提，formation_status=not_adjudicated不能解释成已成格。topic.timing使用实际生效柱，不是全年扫描；未知性别保留传统选星分支。",
-    "evidence": "首次按问题选evidence_views.direction/target_year；默认视图保留完整十神权重、并列与作用域，primary只作兼容首标签，不表示显著占优。",
-    "patterns": "career_structure/entrepreneurship中的共现标签为heuristic_candidate_only；按rule_signals.trigger、unverified_conditions解释，分数及level不认证古典成格或现实能力。",
-    "target_clock": "日期级专项固定出生时区的本地零点，timing_context回显analysis_datetime、timezone和boundary_status；交节当日涉及钟时才按实际目标用timing_analysis补证，不以已有流年阻止必要补证。"
+    "evidence": "首轮按问题选 direction 或 target_year。按实际星位、透藏和时运触点取证。",
+    "interpretation": "结合已知工作经历、职责和目标解释；需要传统定义时查询 knowledge_catalog 和 knowledge_read。行业映射和实践建议由 Agent 结合语境提出。",
+    "target_clock": "日期级专项固定出生时区的本地零点，timing_context回显analysis_datetime、timezone和boundary_status；交节当日涉及钟时时，用 bazi_timing 核对实际目标时刻。"
   },
   "evidence_views": {
     "bureau_season_reference": {
@@ -60,11 +60,6 @@
     },
     "direction": {
       "fields": [
-        "career_analysis.interpretation_scope",
-        "career_analysis.dominant_ten_gods",
-        "career_analysis.career_structure",
-        "career_analysis.entrepreneurship",
-        "career_analysis.suggestions",
         "career_analysis.evidence_chain.method_id",
         "career_analysis.evidence_chain.strength_context.strength_level",
         "career_analysis.evidence_chain.strength_context.method_id",
@@ -79,7 +74,7 @@
         "career_analysis.evidence_chain.strength_context.stem_energy_accounting.conversion_policy",
         "career_analysis.evidence_chain.topic.first_view"
       ],
-      "when": "工作方向、职责或创业角色比较，保留并列、计权口径及启发式条件；不展开未问行业。 保留旺衰、根气与关系依据及能量算法摘要；逐项未取整账本见stem_energy深度视图。"
+      "when": "按问题读取专题星位、透藏和当前时运触点。结合用户实际经历解释主题。"
     },
     "element_presence": {
       "fields": [
@@ -186,13 +181,13 @@
         "career_analysis.evidence_chain.month_command.intra_month_duty.status",
         "career_analysis.evidence_chain.classical_passage.summary"
       ],
-      "when": "核对所选甲木或丙火原典提要、正文、接引与根的不同语义，以及同次未裁定的身印、司令、通关。旧简表候选保留；不把读过来源当作完成取用。"
+      "when": "核对已校格的提要、正文条件与干支位置，以及同次未裁定的身印、司令和通关。已校范围含甲、乙、丙、丁、戊各月及己土各月。"
     },
     "seasonal_reference": {
       "fields": [
         "career_analysis.evidence_chain.seasonal_reference"
       ],
-      "when": "区分旧调候简表、已目校的甲木选段与丙火完整单元、实际干见支藏；全盘取用未裁定，其余96格仍待对应底本校勘。"
+      "when": "区分旧调候简表、具页来源与实际干见支藏。已校范围含甲、乙、丙、丁、戊各月及己土各月，共72格。全盘取用未裁定。"
     },
     "stage_profile": {
       "fields": [
@@ -230,13 +225,7 @@
     },
     "target_year": {
       "fields": [
-        "career_analysis.interpretation_scope",
-        "career_analysis.dominant_ten_gods",
-        "career_analysis.career_timing",
         "career_analysis.timing_context",
-        "career_analysis.career_structure",
-        "career_analysis.entrepreneurship",
-        "career_analysis.suggestions",
         "career_analysis.evidence_chain.method_id",
         "career_analysis.evidence_chain.strength_context.strength_level",
         "career_analysis.evidence_chain.strength_context.method_id",
@@ -251,7 +240,7 @@
         "career_analysis.evidence_chain.strength_context.stem_energy_accounting.conversion_policy",
         "career_analysis.evidence_chain.topic.first_view"
       ],
-      "when": "工作方向与目标年份转职安排，结构与目标锚点一起取；日期锚点不代表全年时间线。 保留旺衰、根气与关系依据及能量算法摘要；逐项未取整账本见stem_energy深度视图。"
+      "when": "询问指定年份或日期时读取对应大运、流年及命盘触点。"
     },
     "thresholds": {
       "fields": [
@@ -265,32 +254,15 @@
   },
   "first_view": {
     "fields": [
-      "career_analysis.interpretation_scope",
-      "career_analysis.dominant_ten_gods",
-      "career_analysis.career_timing",
-      "career_analysis.timing_context",
-      "career_analysis.career_structure",
-      "career_analysis.entrepreneurship",
-      "career_analysis.suggestions",
-      "career_analysis.evidence_chain.method_id",
-      "career_analysis.evidence_chain.strength_context.strength_level",
-      "career_analysis.evidence_chain.strength_context.method_id",
-      "career_analysis.evidence_chain.strength_context.status",
-      "career_analysis.evidence_chain.strength_context.requires_special_structure_review",
-      "career_analysis.evidence_chain.strength_context.candidate_strengths",
-      "career_analysis.evidence_chain.strength_context.root_effect_policy",
-      "career_analysis.evidence_chain.strength_context.root_qualifications",
-      "career_analysis.evidence_chain.strength_context.storage_movement_effects",
-      "career_analysis.evidence_chain.strength_context.stem_energy_accounting.method_id",
-      "career_analysis.evidence_chain.strength_context.stem_energy_accounting.arithmetic_policy",
-      "career_analysis.evidence_chain.strength_context.stem_energy_accounting.conversion_policy",
-      "career_analysis.evidence_chain.topic.first_view"
+      "career_analysis.evidence_chain.topic.first_view",
+      "career_analysis.timing_context"
     ],
     "include_snapshot_text": false,
     "strict_fields": true
   },
   "input": {
     "additionalProperties": false,
+    "description": "Request model for BaZi career analysis.",
     "properties": {
       "analysis_day": {
         "anyOf": [
@@ -304,7 +276,8 @@
           }
         ],
         "default": null,
-        "description": "Analysis day (1-31)"
+        "description": "Analysis day (1-31)",
+        "title": "Analysis Day"
       },
       "analysis_month": {
         "anyOf": [
@@ -318,7 +291,8 @@
           }
         ],
         "default": null,
-        "description": "Analysis month (1-12)"
+        "description": "Analysis month (1-12)",
+        "title": "Analysis Month"
       },
       "analysis_year": {
         "anyOf": [
@@ -330,30 +304,21 @@
           }
         ],
         "default": null,
-        "description": "Analysis year (defaults to current year)"
-      },
-      "as_of": {
-        "anyOf": [
-          {
-            "type": "string"
-          },
-          {
-            "type": "null"
-          }
-        ],
-        "default": null,
-        "description": "Freeze implicit current time: ISO 8601 datetime with timezone"
+        "description": "Analysis year (defaults to current year)",
+        "title": "Analysis Year"
       },
       "birth_day": {
         "description": "Birth day (1-31)",
         "maximum": 31,
         "minimum": 1,
+        "title": "Birth Day",
         "type": "integer"
       },
       "birth_hour": {
         "description": "Birth hour (0-23)",
         "maximum": 23,
         "minimum": 0,
+        "title": "Birth Hour",
         "type": "integer"
       },
       "birth_longitude": {
@@ -368,19 +333,22 @@
           }
         ],
         "default": null,
-        "description": "Birth longitude (optional)"
+        "description": "Birth longitude (optional)",
+        "title": "Birth Longitude"
       },
       "birth_minute": {
         "default": 0,
         "description": "Birth minute (0-59)",
         "maximum": 59,
         "minimum": 0,
+        "title": "Birth Minute",
         "type": "integer"
       },
       "birth_month": {
         "description": "Birth month (1-12)",
         "maximum": 12,
         "minimum": 1,
+        "title": "Birth Month",
         "type": "integer"
       },
       "birth_place": {
@@ -393,7 +361,8 @@
           }
         ],
         "default": "未提供",
-        "description": "Birth place (optional)"
+        "description": "Birth place (optional)",
+        "title": "Birth Place"
       },
       "birth_second": {
         "anyOf": [
@@ -407,7 +376,8 @@
           }
         ],
         "default": null,
-        "description": "已知出生秒数0–59；提供时必须显式提供birth_minute。未知请省略或传null；沿用00秒作为兼容计算参考，并返回省略分量说明，不代表已知出生在整分、不推定误差区间或记录精度。不接受闰秒60。"
+        "description": "已知出生秒数0–59；提供时必须显式提供birth_minute。未知请省略或传null；沿用00秒作为兼容计算参考，并返回省略分量说明，不代表已知出生在整分、不推定误差区间或记录精度。不接受闰秒60。",
+        "title": "Birth Second"
       },
       "birth_timezone": {
         "anyOf": [
@@ -419,7 +389,8 @@
           }
         ],
         "default": null,
-        "description": "Birth timezone (IANA name or UTC offset)"
+        "description": "Birth timezone (IANA name or UTC offset)",
+        "title": "Birth Timezone"
       },
       "birth_utc_offset": {
         "anyOf": [
@@ -431,18 +402,15 @@
           }
         ],
         "default": null,
-        "description": "已确认的出生民用UTC偏移，格式±HH:MM或±HH:MM:SS；用于消歧重复钟时。必须与解析出的birth_timezone在该钟时的规则一致；不据此猜测时区，不替未知的重复小时选边，不能使跳过的钟时有效。保留原IANA时区用于后续交运边界；不认证出生记录精度。未知请省略或传null。"
+        "description": "已确认的出生民用UTC偏移，格式±HH:MM或±HH:MM:SS；用于消歧重复钟时。必须与解析出的birth_timezone在该钟时的规则一致；不据此猜测时区，不替未知的重复小时选边，不能使跳过的钟时有效。保留原IANA时区用于后续交运边界；不认证出生记录精度。未知请省略或传null。",
+        "title": "Birth Utc Offset"
       },
       "birth_year": {
         "description": "Birth year (1900–2100, the existing individual-birth service range)",
         "maximum": 2100,
         "minimum": 1900,
+        "title": "Birth Year",
         "type": "integer"
-      },
-      "compact": {
-        "default": true,
-        "description": "紧凑 JSON 输出（无缩进）；设为 false 则美化缩进。默认 true。",
-        "type": "boolean"
       },
       "dayun_pillar": {
         "anyOf": [
@@ -457,22 +425,8 @@
           }
         ],
         "default": null,
-        "description": "Optional override: exactly one valid sexagenary pillar, e.g. '甲子'"
-      },
-      "fields": {
-        "anyOf": [
-          {
-            "items": {
-              "type": "string"
-            },
-            "type": "array"
-          },
-          {
-            "type": "null"
-          }
-        ],
-        "default": null,
-        "description": "仅返回选定字段以节省 token：接受顶层键（如 'snapshot_text'）或点路径子字段（如 'bazi_birth.day_master'）。run_metadata 始终保留；留空请求全部字段，超出响应字符预算的部分由 result_delivery 保留供读取。无效路径默认附 projection_warnings；strict_fields=true 时拒绝。"
+        "description": "Optional override: exactly one valid sexagenary pillar, e.g. '甲子'",
+        "title": "Dayun Pillar"
       },
       "gender": {
         "anyOf": [
@@ -484,12 +438,8 @@
           }
         ],
         "default": "未知",
-        "description": "性别（可选但建议提供：影响大运顺逆排布与部分六亲判断）。接受 男/女、male/female/m/f、阳/阴、乾/坤 等写法。"
-      },
-      "include_snapshot_text": {
-        "default": true,
-        "description": "是否包含人类可读的 snapshot_text 文本段（默认随工具而定）；设为 false 可显著减少返回的 token 数。",
-        "type": "boolean"
+        "description": "性别（可选但建议提供：影响大运顺逆排布与部分六亲判断）。接受 男/女、male/female/m/f、阳/阴、乾/坤 等写法。",
+        "title": "Gender"
       },
       "liunian_pillar": {
         "anyOf": [
@@ -504,7 +454,8 @@
           }
         ],
         "default": null,
-        "description": "Optional override: exactly one valid sexagenary pillar, e.g. '丙寅'"
+        "description": "Optional override: exactly one valid sexagenary pillar, e.g. '丙寅'",
+        "title": "Liunian Pillar"
       },
       "name": {
         "anyOf": [
@@ -516,55 +467,13 @@
           }
         ],
         "default": "未提供",
-        "description": "姓名（可选，仅用于结果快照中的标识，不参与计算）"
-      },
-      "parent_run_id": {
-        "anyOf": [
-          {
-            "type": "string"
-          },
-          {
-            "type": "null"
-          }
-        ],
-        "default": null,
-        "description": "Parent call's run_id; correlation only, no stored execution lookup"
-      },
-      "response_char_limit": {
-        "anyOf": [
-          {
-            "const": 0,
-            "type": "integer"
-          },
-          {
-            "maximum": 65536,
-            "minimum": 4096,
-            "type": "integer"
-          }
-        ],
-        "default": 8192,
-        "description": "完整 JSON 响应字符预算：0 不限制，或 4096–65536。MCP 默认 8192，REST/CLI 默认 0。超限不截断数据，返回 result_delivery 完整结果引用和可读取字段；按 manifest_uri 或字段分页读取原 run 的数据，不要重新计算或解析单页为完整文档。"
-      },
-      "strict_fields": {
-        "default": false,
-        "description": "是否拒绝无效 fields 路径；默认 false，使用宽松投影并返回警告。",
-        "type": "boolean"
-      },
-      "trace_id": {
-        "anyOf": [
-          {
-            "type": "string"
-          },
-          {
-            "type": "null"
-          }
-        ],
-        "default": null,
-        "description": "Caller trace ID"
+        "description": "姓名（可选，仅用于结果快照中的标识，不参与计算）",
+        "title": "Name"
       },
       "use_true_solar_time": {
         "default": true,
         "description": "Rebase the birth clock onto true solar time (longitude + equation of time). Default on in the current software policy; this option does not certify a classical text's clock rule. Set false for the raw civil clock.",
+        "title": "Use True Solar Time",
         "type": "boolean"
       }
     },
@@ -574,6 +483,7 @@
       "birth_day",
       "birth_hour"
     ],
+    "title": "BaziCareerRequest",
     "type": "object"
   },
   "method_contracts": [

@@ -6,6 +6,16 @@ publisher backend, replace physical accuracy tests or complete source prose.
 
 from __future__ import annotations
 
+import sys as _sys
+from pathlib import Path as _Path
+
+_VAL_REPO_ROOT = _Path(__file__).resolve().parents[2]
+if str(_VAL_REPO_ROOT) not in _sys.path:
+    _sys.path.insert(0, str(_VAL_REPO_ROOT))
+else:
+    pass
+
+
 import argparse
 import hashlib
 import json
@@ -14,7 +24,7 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
-from fatebridge.validation.human_design import verify_human_design_reading
+from validation.human_design import verify_human_design_reading
 
 PLAN_SHA256 = "9cc92b18370480e2d27c88c5945d50704dcef0978695dd45238ee7642cd731ee"
 ORDER = (
@@ -104,6 +114,8 @@ GATES = (
 def uniform_label(longitude: float) -> str:
     if not math.isfinite(longitude) or not 0 <= longitude < 360:
         raise ValueError("Finite normalized longitude required")
+    else:
+        pass
     index = math.floor(((longitude - 302) % 360) * 16 / 15)
     return f"{GATES[index // 6]}.{index % 6 + 1}"
 
@@ -119,6 +131,8 @@ def compare_all(
 ) -> dict[str, Any]:
     if hashlib.sha256(plan_raw).hexdigest() != expected_plan_sha256:
         raise ValueError("Original off-disc plan changed")
+    else:
+        pass
     plan = json.loads(plan_raw)
     cases = plan["cases"]
     ids = [c["id"] for c in cases]
@@ -130,6 +144,8 @@ def compare_all(
     }
     if len(ids) != len(set(ids)) or len(ids) != 24 or cells != required_cells:
         raise ValueError("All original24 stratified inputs required")
+    else:
+        pass
     models = plan["native_models"] + plan["independent_models"]
     expected_initial = {
         (c["id"], model, clock["utc_label"]): (c, clock)
@@ -172,6 +188,8 @@ def compare_all(
                 well_formed = False
             if not well_formed:
                 bad.append(index)
+            else:
+                pass
         return {
             "required": len(expected),
             "provided": len(rows),
@@ -314,6 +332,8 @@ def compare_all(
         if not supplied:
             native_links.append({"id": c["id"], "matched": False})
             continue
+        else:
+            pass
         run = rows[0]["run"]
         target = next(
             a for a in run["activations"]["personality"] if a["body"] == c["body"]
@@ -493,3 +513,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+else:
+    pass

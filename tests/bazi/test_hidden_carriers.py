@@ -3,6 +3,10 @@
 import pytest
 from pydantic import ValidationError
 
+from fatebridge.core.contracts.output_hidden_carriers import (
+    HiddenCarrierRelations,
+    HiddenCarrierTarget,
+)
 from fatebridge.core.hidden_carriers import (
     build_natal_hidden_carriers,
     describe_hidden_targets,
@@ -10,10 +14,6 @@ from fatebridge.core.hidden_carriers import (
     hidden_target_reference,
 )
 from fatebridge.core.metaphysics.common import SEXAGENARY_CYCLE
-from fatebridge.core.output_hidden_carriers import (
-    HiddenCarrierRelations,
-    HiddenCarrierTarget,
-)
 from fatebridge.core.timing_carriers import (
     describe_timing_carrier,
     timing_carrier_snapshot_lines,
@@ -92,7 +92,7 @@ MATRIX = {
 }
 
 
-def test_dingchou_can_cover_hidden_xin_without_overcoming_principal_ji():
+def test_dingchou_can_cover_hidden_xin_without_overcoming_principal_ji() -> None:
     row = describe_timing_carrier("timing.dayun", "丁", "丑", NATAL)
     assert row["principal_relation"] == "stem_generates_branch"
     assert row["branch_covered_if_desired"] is False
@@ -117,7 +117,7 @@ def test_dingchou_can_cover_hidden_xin_without_overcoming_principal_ji():
 
 
 @pytest.mark.parametrize("pair", SEXAGENARY_CYCLE)
-def test_all_sixty_columns_match_an_independent_complete_relation_table(pair):
+def test_all_sixty_columns_match_an_independent_complete_relation_table(pair) -> None:
     ref = describe_hidden_targets(*pair)
     HiddenCarrierRelations.model_validate(ref)
     # These independent literal contents do not prescribe a disputed 中余氣
@@ -136,7 +136,9 @@ def test_all_sixty_columns_match_an_independent_complete_relation_table(pair):
         )
 
 
-def test_contract_rejects_false_cover_and_false_effectiveness_but_keeps_projection():
+def test_contract_rejects_false_cover_and_false_effectiveness_but_keeps_projection() -> (
+    None
+):
     HiddenCarrierTarget.model_validate({"hidden_stem": "辛"})
     with pytest.raises(ValidationError):
         HiddenCarrierTarget.model_validate(
@@ -153,7 +155,9 @@ def test_contract_rejects_false_cover_and_false_effectiveness_but_keeps_projecti
         describe_hidden_targets("甲", "丑")
 
 
-def test_unavailable_hidden_table_keeps_legacy_text_without_inventing_target_claims():
+def test_unavailable_hidden_table_keeps_legacy_text_without_inventing_target_claims() -> (
+    None
+):
     row = describe_timing_carrier("timing.dayun", "丁", "丑", NATAL)
     before = timing_carrier_snapshot_lines({"pillar_carriers": [row]})
     unknown = timing_carrier_snapshot_lines(

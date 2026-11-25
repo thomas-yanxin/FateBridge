@@ -8,8 +8,8 @@ import math
 
 import pytest
 
-from fatebridge.core.astrology_horary import _applying_aspect
-from fatebridge.core.horary_event_paths import evaluate_event_paths
+from fatebridge.core.astro.astrology_horary import _applying_aspect
+from fatebridge.core.astro.horary_event_paths import evaluate_event_paths
 
 
 @pytest.fixture
@@ -54,8 +54,8 @@ def controlled_history():
 @pytest.mark.parametrize("reverse_roles", [False, True])
 @pytest.mark.parametrize("recipient_station", ["before", "touching", "question"])
 def test_recipient_reversal_that_can_precede_applicant_does_not_certify_pattern(
-    controlled_history, recipient_station, reverse_roles
-):
+    controlled_history, recipient_station: str, reverse_roles: bool
+) -> None:
     history, states = controlled_history
     applicant = history["events"][0]
     if recipient_station == "before":
@@ -97,8 +97,8 @@ def test_recipient_reversal_that_can_precede_applicant_does_not_certify_pattern(
 
 @pytest.mark.parametrize("recipient_after", [False, True])
 def test_no_recipient_station_or_a_strictly_later_one_preserves_selected_pattern(
-    controlled_history, recipient_after
-):
+    controlled_history, recipient_after: bool
+) -> None:
     history, states = controlled_history
     applicant = history["events"][0]
     if recipient_after:
@@ -113,6 +113,8 @@ def test_no_recipient_station_or_a_strictly_later_one_preserves_selected_pattern
                 "direction": -1,
             }
         )
+    else:
+        pass
     result = evaluate_event_paths(
         history, "Mars", "Saturn", "day", states, _applying_aspect
     )
@@ -128,8 +130,12 @@ def test_no_recipient_station_or_a_strictly_later_one_preserves_selected_pattern
 )
 @pytest.mark.parametrize("principal_pair", [False, True])
 def test_unresolved_principal_contact_must_be_after_the_refranation_station(
-    controlled_history, reverse_roles, unresolved_kind, location, principal_pair
-):
+    controlled_history,
+    reverse_roles: bool,
+    unresolved_kind: str,
+    location: str,
+    principal_pair: bool,
+) -> None:
     history, states = controlled_history
     station = history["events"][0]
     epoch = history["question_julian_day_tt"]

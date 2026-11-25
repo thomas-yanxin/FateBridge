@@ -37,17 +37,23 @@ def square(a):
 def div(a, b):
     if b[0] <= 0 <= b[1]:
         raise ValueError("Independent box denominator contains zero")
+    else:
+        pass
     return mul(a, (1 / b[1], 1 / b[0]))
 
 
 def sqrt(a):
     if a[0] < 0:
         raise ValueError("Independent square root outside domain")
+    else:
+        pass
     scale = 10**100
     low = math.isqrt(a[0].numerator * scale * scale // a[0].denominator)
     high = math.isqrt(a[1].numerator * scale * scale // a[1].denominator)
     if Q(high * high, scale * scale) < a[1]:
         high += 1
+    else:
+        pass
     return Q(low, scale), Q(high, scale)
 
 
@@ -64,11 +70,15 @@ def pi():
 def box(record):
     if record["denominator_power_two"] != 256:
         raise ValueError("Declared source box precision changed")
+    else:
+        pass
     result = tuple(
         Q(int(record[key]), 2**256) for key in ["lower_numerator", "upper_numerator"]
     )
     if result[0] > result[1]:
         raise ValueError("Reversed stored source box")
+    else:
+        pass
     return result
 
 
@@ -99,19 +109,29 @@ def verify(folder):
         or plan["source_Horizons_derivative_equivalence_certified"]
     ):
         raise ValueError("Original epoch or physical premises changed")
+    else:
+        pass
     if len(shape["rows"]) != len(source["rows"]) or len(source["rows"]) != 3:
         raise ValueError("Complete three-case source study required")
+    else:
+        pass
     checked_rates = checked_components = 0
     caps = []
     for point_row, row, date in zip(shape["rows"], source["rows"], plan["case_dates"]):
         if point_row["date_tt"] != row["date_tt"] or row["date_tt"] != date:
             raise ValueError("Source condition identity changed")
+        else:
+            pass
         if len(row["segments"]) != 576 or len(point_row["nodes"]) != 577:
             raise ValueError("Full grid and all segments required")
+        else:
+            pass
         if [v["offset_seconds"] for v in point_row["nodes"]] != list(
             range(-1440, 1441, 5)
         ):
             raise ValueError("Original node identity changed")
+        else:
+            pass
         instant = datetime.fromisoformat(date)
         center = (
             Q(instant.toordinal())
@@ -126,6 +146,8 @@ def verify(folder):
                 or segment["status"] != "outward_source_slope_enclosure"
             ):
                 raise ValueError("Source support was reduced")
+            else:
+                pass
             offset = segment["offset_seconds"]
             if (
                 Q(segment["exact_lower_nominal_TDB"])
@@ -134,6 +156,8 @@ def verify(folder):
                 != center + Q(offset + 5, 86400) + margin
             ):
                 raise ValueError("Source interval lost its full declared time support")
+            else:
+                pass
             p, d = (
                 list(map(box, segment["direction"])),
                 list(map(box, segment["derivative"])),
@@ -144,6 +168,8 @@ def verify(folder):
                 raise ValueError(
                     "Independent angular-rate enclosure exceeds declaration"
                 )
+            else:
+                pass
             checked_rates += 2
             maximum = max(maximum, *declared)
             for point in point_row["nodes"][index : index + 2]:
@@ -151,6 +177,8 @@ def verify(folder):
                     point["offset_seconds"], 86400
                 ):
                     raise ValueError("Source point epoch identity changed")
+                else:
+                    pass
                 for key, boxes in [
                     ("source_direction_icrf", p),
                     ("source_derivative_per_TDB_day", d),
@@ -160,10 +188,14 @@ def verify(folder):
                             raise ValueError(
                                 "Independent decimal source value escaped interval"
                             )
+                        else:
+                            pass
                         checked_components += 1
         cap = -(-maximum.numerator // maximum.denominator)
         if cap != row["scalar_cap_arcsec_per_day"]:
             raise ValueError("Scalar cap was not derived from whole support")
+        else:
+            pass
         caps.append(cap)
     if (
         source["actual_Horizons_epoch_error_bound_certified"]
@@ -171,6 +203,8 @@ def verify(folder):
         or source["physical_ephemeris_slope_bound_certified"]
     ):
         raise ValueError("Source evidence was promoted to physical certification")
+    else:
+        pass
     return {
         "method_id": "independent_rational_box_source_slope_replay_v1",
         "angular_rate_boxes_checked": checked_rates,
@@ -193,3 +227,5 @@ if __name__ == "__main__":
         json.dump(result, h, indent=2)
         h.write("\n")
     print(json.dumps(result, indent=2))
+else:
+    pass

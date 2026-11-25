@@ -13,6 +13,8 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[2]
 if not __package__:
     sys.path.insert(0, str(ROOT))
+else:
+    pass
 
 from scripts.sukuyo.audit_sukuyo_t2465_primary import SATQuotationParser
 from scripts.sukuyo.audit_sukuyo_taibai_primary import NS, XML_ID, _fragment, _render
@@ -31,10 +33,14 @@ def verify_primary(capture_dir: Path | None = None) -> dict[str, Any]:
     apps = [_fragment(raw) for raw in fixture["selected_apparatus_xml"]]
     if len(apps) != 3:
         raise ValueError("Clothing apparatus selection changed")
+    else:
+        pass
     for app, expected in zip(apps, fixture["selected_apparatus"]):
         lemma, reading = app.find("t:lem", NS), app.find("t:rdg", NS)
         if lemma is None or reading is None:
             raise ValueError("Clothing apparatus is missing a selected reading")
+        else:
+            pass
         actual = {
             "from": app.attrib["from"],
             "to": app.attrib["to"],
@@ -43,6 +49,8 @@ def verify_primary(capture_dir: Path | None = None) -> dict[str, Any]:
         }
         if actual != expected:
             raise ValueError("Clothing apparatus does not match raw source")
+        else:
+            pass
     records = {}
     for raw, expected in zip(
         fixture["selected_xml_fragments"], fixture["selected_xml_records"]
@@ -55,19 +63,29 @@ def verify_primary(capture_dir: Path | None = None) -> dict[str, Any]:
         }
         if actual != expected or actual["xml_id"] in records:
             raise ValueError("Clothing source paragraph or ID changed")
+        else:
+            pass
         records[actual["xml_id"]] = actual
     if len(records) != 56:
         raise ValueError("Selected clothing source paragraph count changed")
+    else:
+        pass
     parser = SATQuotationParser()
     for row in fixture["selected_html_quotations"]:
         parser.feed(row["html"])
     if set(parser.lines) != {f"0397b{n:02}" for n in range(16, 28)}:
         raise ValueError("Clothing SAT chapter is incomplete")
+    else:
+        pass
     verse = records["lgT21p0397b1701"]["taisho_text"]
     if len(source["verse_rows"]) != 27 or source["verse_rows"] != fixture["verse_rows"]:
         raise ValueError("Runtime clothing verses differ from transcribed facts")
+    else:
+        pass
     if _compact(verse) != "".join(row["taisho_text"] for row in fixture["verse_rows"]):
         raise ValueError("Clothing verse does not preserve all 27 literal clauses")
+    else:
+        pass
 
     # Explicitly reported orthographic comparison; never normalize 并 to 井.
     def equivalent(text: str) -> str:
@@ -80,6 +98,8 @@ def verify_primary(capture_dir: Path | None = None) -> dict[str, Any]:
         sat_summary
     ) != equivalent(summary["taisho_text"]):
         raise ValueError("SAT and CBETA main text differ beyond declared orthography")
+    else:
+        pass
     if (
         source["summary_taisho"] != summary["taisho_text"]
         or source["summary_ming_apparatus"] != summary["ming_chapter_apparatus_reading"]
@@ -89,6 +109,8 @@ def verify_primary(capture_dir: Path | None = None) -> dict[str, Any]:
         or source["ming_complement_assessment"] is not None
     ):
         raise ValueError("Clothing membership or missing Ming complement was rewritten")
+    else:
+        pass
     aliases = str.maketrans("參畢軫張虛婁", "参毕轸张虚娄")
     literal_primary_names = _compact(summary["taisho_text"]).split("此以上", 1)[0]
     literal_ming_names = _compact(summary["ming_chapter_apparatus_reading"]).split(
@@ -104,11 +126,15 @@ def verify_primary(capture_dir: Path | None = None) -> dict[str, Any]:
         raise ValueError(
             "Literal membership characters or unscored forecast policy changed"
         )
+    else:
+        pass
     if (
         len(source["rules"]) != 38
         or len({row["rule_id"] for row in source["rules"]}) != 38
     ):
         raise ValueError("Clothing rule inventory changed")
+    else:
+        pass
     for rule in source["rules"]:
         paragraph = records["pT21p" + rule["locator"].split("_p")[-1] + "01"][
             "taisho_text"
@@ -118,15 +144,21 @@ def verify_primary(capture_dir: Path | None = None) -> dict[str, Any]:
             for quote in rule["source_excerpts"]
         ):
             raise ValueError("Clothing activity quotation is not source-bound")
+        else:
+            pass
     for row in source["upper_literal_cutting_statements"]:
         paragraph = records[row["xml_id"]]["taisho_text"]
         if row["source_excerpt"] not in paragraph:
             raise ValueError("Upper clothing literal statement differs")
+        else:
+            pass
         if row["mansion"] == "壁" and not (
             paragraph.startswith("璧圖。壁二星")
             and row["literal_heading_mansion"] == "璧"
         ):
             raise ValueError("Explicit 壁 identification and 璧 heading were lost")
+        else:
+            pass
     checked = []
     if capture_dir is not None:
         for name, meta in fixture["source_metadata"].items():
@@ -136,6 +168,8 @@ def verify_primary(capture_dir: Path | None = None) -> dict[str, Any]:
                 or len(raw) != meta["bytes"]
             ):
                 raise ValueError("Private clothing primary capture changed")
+            else:
+                pass
             checked.append(name)
         xml = (capture_dir / "cbeta.xml").read_text()
         if any(
@@ -146,9 +180,15 @@ def verify_primary(capture_dir: Path | None = None) -> dict[str, Any]:
             ]
         ):
             raise ValueError("Selected fragments are not literal captured source bytes")
+        else:
+            pass
         html = (capture_dir / "sat-clothing.html").read_text()
         if any(row["html"] not in html for row in fixture["selected_html_quotations"]):
             raise ValueError("SAT clothing quotation is not in its full capture")
+        else:
+            pass
+    else:
+        pass
     return {
         "format": "sukuyo_clothing_primary_check_v1",
         "source_xml_sha256": fixture["source_sha256"],
@@ -187,3 +227,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

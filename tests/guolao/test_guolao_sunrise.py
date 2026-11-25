@@ -9,9 +9,9 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core import guolao_sunrise as subject
-from fatebridge.core.guolao_lunar_phases import assign_source_phase_day
-from fatebridge.validation.guolao_sunrise import (
+from fatebridge.core.guolao import guolao_sunrise as subject
+from fatebridge.core.guolao.guolao_lunar_phases import assign_source_phase_day
+from validation.guolao_sunrise import (
     audit_sunrise_tables,
     parse_cell,
     parse_digital_table,
@@ -20,7 +20,9 @@ from fatebridge.validation.guolao_sunrise import (
 FIXTURE = Path(__file__).parents[1] / "fixtures/guolao-sunrise-v1"
 
 
-def test_raw_facsimiles_table_glyphs_and_prearithmetic_transcription_are_pinned():
+def test_raw_facsimiles_table_glyphs_and_prearithmetic_transcription_are_pinned() -> (
+    None
+):
     ref = json.loads((FIXTURE / "reference.json").read_text())
     for r in ref["artifacts"]:
         raw = (FIXTURE / r["path"]).read_bytes()
@@ -31,7 +33,7 @@ def test_raw_facsimiles_table_glyphs_and_prearithmetic_transcription_are_pinned(
     assert ref["digital_readings_known_during_Siku_collation"]
 
 
-def test_all_required_siku_cells_equal_the_original_unrescaled_transcription():
+def test_all_required_siku_cells_equal_the_original_unrescaled_transcription() -> None:
     rows = list(csv.DictReader((FIXTURE / "siku-five-fields-transcription.csv").open()))
     data = json.loads(subject.DATA.read_bytes())["profiles"]["gujin37_siku"]["rows"]
     assert len(rows) == len(data) == 93
@@ -43,7 +45,9 @@ def test_all_required_siku_cells_equal_the_original_unrescaled_transcription():
     assert data[-1]["argument_du"] == "91.3125"
 
 
-def test_complete_digital_edition_parse_keeps_critical_marks_and_separate_profile():
+def test_complete_digital_edition_parse_keeps_critical_marks_and_separate_profile() -> (
+    None
+):
     parsed = parse_digital_table(
         (FIXTURE / "yuanshi055-table-with-critical-marks.html").read_text()
     )
@@ -66,12 +70,14 @@ def test_complete_digital_edition_parse_keeps_critical_marks_and_separate_profil
         ("<p>{{*|三}}</p>", "rate"),
     ],
 )
-def test_blank_unmarked_or_truncated_precision_is_not_guessed(value, kind):
+def test_blank_unmarked_or_truncated_precision_is_not_guessed(
+    value: str, kind: str
+) -> None:
     with pytest.raises(ValueError):
         parse_cell(value, kind)
 
 
-def test_missing_source_row_or_cell_not_filled_by_adjacent_values():
+def test_missing_source_row_or_cell_not_filled_by_adjacent_values() -> None:
     raw = (FIXTURE / "yuanshi055-table-with-critical-marks.html").read_text()
     with pytest.raises(ValueError):
         parse_digital_table(raw.replace("<p>初</p>", "<p>空</p>", 1))
@@ -83,8 +89,8 @@ def test_missing_source_row_or_cell_not_filled_by_adjacent_values():
 
 @pytest.mark.parametrize("profile", ["gujin37_siku", "yuanshi55_digital"])
 def test_origin_clock_matches_independently_printed_complete_day_night_constants(
-    profile,
-):
+    profile: str,
+) -> None:
     t = subject.load_table(profile)
     outside = t.sunrise(F(), solar_side="outside", basis="dadu_source_table")
     inside = t.sunrise(F(), solar_side="inside", basis="dadu_source_table")
@@ -102,7 +108,9 @@ def test_origin_clock_matches_independently_printed_complete_day_night_constants
     assert not outside["midnight_solar_argument_or_fold_derived"]
 
 
-def test_literal_five_witness_differences_are_not_replaced_by_neighbor_differences():
+def test_literal_five_witness_differences_are_not_replaced_by_neighbor_differences() -> (
+    None
+):
     result = audit_sunrise_tables()
     assert [(r["index"], r["field"]) for r in result["witness_differences"]] == [
         (7, "day_night_difference_fen"),
@@ -120,7 +128,9 @@ def test_literal_five_witness_differences_are_not_replaced_by_neighbor_differenc
     assert result["modern_astronomical_truth_comparison"] is None
 
 
-def test_exact_source_rate_is_used_even_when_adjacent_anchor_closure_is_imperfect():
+def test_exact_source_rate_is_used_even_when_adjacent_anchor_closure_is_imperfect() -> (
+    None
+):
     t = subject.load_table("gujin37_siku")
     q = t.sunrise(F("7.5"), solar_side="inside", basis="dadu_source_table")
     # The printed1.41 differs from the1.42 adjacent-anchor difference.
@@ -131,7 +141,9 @@ def test_exact_source_rate_is_used_even_when_adjacent_anchor_closure_is_imperfec
     assert F(t.segment_residual(39)["summer_half_night_anchor_residual_fen_exact"]) == 0
 
 
-def test_short_terminal_segment_is_not_stretched_and_empty_declination_is_not_zero():
+def test_short_terminal_segment_is_not_stretched_and_empty_declination_is_not_zero() -> (
+    None
+):
     t = subject.load_table("gujin37_siku")
     assert F(t.segment_residual(91)["width_du_exact"]) == F(".3125")
     assert F(
@@ -147,7 +159,7 @@ def test_short_terminal_segment_is_not_stretched_and_empty_declination_is_not_ze
         t.sunrise(F("91.314375"), solar_side="outside", basis="dadu_source_table")
 
 
-def test_digital_terminal_rate_discontinuity_is_kept_and_not_a_fitted_pass():
+def test_digital_terminal_rate_discontinuity_is_kept_and_not_a_fitted_pass() -> None:
     t = subject.load_table("yuanshi55_digital")
     r = t.segment_residual(91)
     assert F(r["winter_half_night_anchor_residual_fen_exact"]) == F("1.9251")
@@ -157,7 +169,7 @@ def test_digital_terminal_rate_discontinuity_is_kept_and_not_a_fitted_pass():
     assert r["declination_anchor_residual_du_exact"] is None
 
 
-def test_slight_negative_printed_declination_near_last_anchor_is_not_clamped():
+def test_slight_negative_printed_declination_near_last_anchor_is_not_clamped() -> None:
     q = subject.load_table("gujin37_siku").sunrise(
         F("91.31249"), solar_side="inside", basis="dadu_source_table"
     )
@@ -167,13 +179,15 @@ def test_slight_negative_printed_declination_near_last_anchor_is_not_clamped():
 
 
 @pytest.mark.parametrize("value", [0, 0.5, False, "0"])
-def test_source_angles_need_fraction_and_explicit_dadu_basis(value):
+def test_source_angles_need_fraction_and_explicit_dadu_basis(
+    value: bool | float | int | str,
+) -> None:
     t = subject.load_table("gujin37_siku")
     with pytest.raises(TypeError):
         t.sunrise(value, solar_side="inside", basis="dadu_source_table")
 
 
-def test_unknown_profile_wrong_city_or_out_of_table_angle_not_defaulted():
+def test_unknown_profile_wrong_city_or_out_of_table_angle_not_defaulted() -> None:
     with pytest.raises(ValueError):
         subject.load_table("best_fit")
     t = subject.load_table("gujin37_siku")
@@ -188,8 +202,8 @@ def test_unknown_profile_wrong_city_or_out_of_table_angle_not_defaulted():
 
 @pytest.mark.parametrize("solstice,night", [("winter", F(62)), ("summer", F(38))])
 def test_nine_regions_requires_explicit_observation_and_uses_239_normalizer(
-    solstice, night
-):
+    solstice: str, night
+) -> None:
     kwargs = dict(
         solar_side="outside",
         measured_solstice=solstice,
@@ -209,8 +223,8 @@ def test_nine_regions_requires_explicit_observation_and_uses_239_normalizer(
 
 @pytest.mark.parametrize("solstice,night", [("winter", F(49)), ("summer", F(51))])
 def test_local_observation_direction_does_not_silently_apply_northern_rule_to_south(
-    solstice, night
-):
+    solstice: str, night
+) -> None:
     with pytest.raises(ValueError):
         subject.local_solstice_sunrise(
             F(10),
@@ -221,7 +235,9 @@ def test_local_observation_direction_does_not_silently_apply_northern_rule_to_so
         )
 
 
-def test_source_local_formula_outside_physical_range_is_not_clamped_into_a_sunrise():
+def test_source_local_formula_outside_physical_range_is_not_clamped_into_a_sunrise() -> (
+    None
+):
     q = subject.local_solstice_sunrise(
         F("23.9030"),
         solar_side="outside",
@@ -234,7 +250,9 @@ def test_source_local_formula_outside_physical_range_is_not_clamped_into_a_sunri
     assert not q["source_clock"]["source_clock_within_day_range"]
 
 
-def test_original_phase_day_boundary_receives_exact_table_fraction_not_rounded_clock():
+def test_original_phase_day_boundary_receives_exact_table_fraction_not_rounded_clock() -> (
+    None
+):
     q = subject.load_table("gujin37_siku").sunrise(
         F(), solar_side="outside", basis="dadu_source_table"
     )
@@ -252,8 +270,8 @@ def test_original_phase_day_boundary_receives_exact_table_fraction_not_rounded_c
 
 
 def test_loader_rejects_unit_metadata_or_boolean_literal_instead_of_reinterpreting(
-    monkeypatch, tmp_path
-):
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     data = json.loads(subject.DATA.read_bytes())
     path = tmp_path / "data.json"
     monkeypatch.setattr(subject, "DATA", path)

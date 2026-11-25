@@ -19,53 +19,15 @@ from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.fengshui import assess
 from tests.support.fengshui_transports import mcp_call
 from tests.support.mcp_result_assertions import without_transport
-from tests.support.transports import rest_client
+from tests.support.transports import call_calculation, rest_client
+from tests.unit_test.fixtures.fengshui_measured import (
+    body,
+    measured_request,
+    measured_result,
+)
 
 
-def measured_request(*, search=False, charts=False):
-    request = json.loads(
-        Path("docs/examples/fengshui-workstation-measured.json").read_text()
-    )
-    scene = request["workstation_layout"]["scene"]
-    scene["desktops"][0]["items"][0]["healthy"] = dict(
-        value=True, observation_basis="user_confirmed", evidence="独立确认状态良好"
-    )
-    if not search:
-        request["workstation_layout"].pop("search")
-    if charts:
-        template = json.loads(
-            Path("docs/examples/fengshui-workstation-activity.json").read_text()
-        )
-        request["methods"] = ["xuankong_natal", "annual_stars", "monthly_stars"]
-        request["xuankong"] = template["xuankong"]
-        request["effective_year"] = 2026
-        request["monthly"] = dict(effective_solar_year=2026, solar_month_number=3)
-        request["workstation_layout"].update(
-            evaluation_period=9,
-            evaluation_period_evidence="独立评价运，不改变2004年竣工宅盘",
-            timeliness_ruleset_id="wang_zhongzhou_timeliness_v1",
-        )
-    return request
-
-
-def measured_result(request):
-    return assess(**request)["layout_analysis"]["workstation_layout_analysis"]
-
-
-def body(object_id, kind, x, y, width, depth, bottom, top, blocks=False):
-    return dict(
-        object_id=object_id,
-        kind=kind,
-        footprint=dict(
-            center=dict(x=x, y=y), width_m=width, depth_m=depth, rotation_degrees=0
-        ),
-        bottom_m=bottom,
-        top_m=top,
-        blocks_view=blocks,
-    )
-
-
-def test_analytic_geometry_and_distinct_desktop_frames():
+def test_analytic_geometry_and_distinct_desktop_frames() -> None:
     result = assess(**measured_request())
     FengshuiOutput.model_validate(result)
     branch = result["layout_analysis"]["workstation_layout_analysis"]
@@ -85,7 +47,7 @@ def test_analytic_geometry_and_distinct_desktop_frames():
     assert result["status"] == "complete"
 
 
-def test_complete_search_retains_every_rejection_and_tradeoff():
+def test_complete_search_retains_every_rejection_and_tradeoff() -> None:
     branch = measured_result(measured_request(search=True))
     search = branch["search"]
     assert search["enumeration_complete"] is True
@@ -113,7 +75,7 @@ def test_complete_search_retains_every_rejection_and_tradeoff():
     )
 
 
-def test_each_generated_pose_matches_fresh_standalone_request():
+def test_each_generated_pose_matches_fresh_standalone_request() -> None:
     request = measured_request(search=True, charts=True)
     branch = measured_result(request)
     for candidate in branch["search"]["candidates"]:
@@ -128,17 +90,21 @@ def test_each_generated_pose_matches_fresh_standalone_request():
             for obj in fresh["workstation_layout"]["scene"]["bodies"]:
                 if obj["object_id"] == object_id:
                     obj["footprint"].update(pose)
+                else:
+                    pass
             for desktop in fresh["workstation_layout"]["scene"]["desktops"]:
                 for item in desktop["items"]:
                     if item["object_id"] == object_id:
                         item["footprint"].update(pose)
+                    else:
+                        pass
         standalone = measured_result(fresh)
         assert candidate["geometry"] == standalone["geometry"]
         assert candidate["readings"] == standalone["readings"]
         assert candidate["rule_comparisons"] == standalone["rule_comparisons"]
 
 
-def test_turn_recomputes_backing_entry_and_items_instead_of_reusing_them():
+def test_turn_recomputes_backing_entry_and_items_instead_of_reusing_them() -> None:
     request = measured_request(search=True)
     branch = measured_result(request)
     turned = next(
@@ -155,7 +121,9 @@ def test_turn_recomputes_backing_entry_and_items_instead_of_reusing_them():
 
 
 @pytest.mark.parametrize("basis,error", [("image_observed", 0), ("measured", 0.03)])
-def test_uncertain_geometry_cannot_become_confirmed_placements_or_ready(basis, error):
+def test_uncertain_geometry_cannot_become_confirmed_placements_or_ready(
+    basis: str, error: float | int
+) -> None:
     request = measured_request(search=True)
     request["workstation_layout"]["scene"].update(
         observation_basis=basis, coordinate_uncertainty_m=error
@@ -169,7 +137,9 @@ def test_uncertain_geometry_cannot_become_confirmed_placements_or_ready(basis, e
     assert result["status"] == "partial"
 
 
-def test_uncertain_compass_retains_all_sector_readings_without_changing_house_period():
+def test_uncertain_compass_retains_all_sector_readings_without_changing_house_period() -> (
+    None
+):
     request = measured_request(charts=True)
     request["workstation_layout"]["scene"]["compass"].update(
         y_axis_bearing_degrees=22.5, uncertainty_degrees=0.1
@@ -205,14 +175,18 @@ def test_uncertain_compass_retains_all_sector_readings_without_changing_house_pe
         (0, 180, ["N", "NE", "E", "SE", "S", "SW", "W", "NW"]),
     ],
 )
-def test_exact_direction_cells_and_closed_error_support(bearing, radius, expected):
+def test_exact_direction_cells_and_closed_error_support(
+    bearing: float | int, radius: float | int, expected
+) -> None:
     assert direction_support(bearing, radius) == expected
 
 
 @pytest.mark.parametrize(
     "bottom,top,visible", [(0, 1, True), (0, 1.5, False), (2, 2.5, True)]
 )
-def test_visibility_uses_height_not_only_plan_overlap(bottom, top, visible):
+def test_visibility_uses_height_not_only_plan_overlap(
+    bottom: int, top: float | int, visible: bool
+) -> None:
     request = measured_request()
     scene = request["workstation_layout"]["scene"]
     scene["bodies"].append(
@@ -222,7 +196,7 @@ def test_visibility_uses_height_not_only_plan_overlap(bottom, top, visible):
     assert result["geometry"]["seats"][0]["form"]["entrance_visible"] is visible
 
 
-def test_beam_projection_is_independent_of_floor_collision():
+def test_beam_projection_is_independent_of_floor_collision() -> None:
     request = measured_request()
     request["workstation_layout"]["scene"]["bodies"].append(
         body("beam", "beam", 0, 0.2, 0.8, 0.4, 2.5, 2.8)
@@ -232,7 +206,7 @@ def test_beam_projection_is_independent_of_floor_collision():
     assert geometry["physically_feasible"] is True
 
 
-def test_concave_room_does_not_accept_rectangle_inside_only_bounding_box():
+def test_concave_room_does_not_accept_rectangle_inside_only_bounding_box() -> None:
     request = measured_request()
     scene = request["workstation_layout"]["scene"]
     scene["boundary"]["vertices"] = [
@@ -251,7 +225,7 @@ def test_concave_room_does_not_accept_rectangle_inside_only_bounding_box():
     assert geometry["physically_feasible"] is False
 
 
-def test_missing_inventory_is_unknown_and_blocks_only_execution():
+def test_missing_inventory_is_unknown_and_blocks_only_execution() -> None:
     request = measured_request(search=True)
     scene = request["workstation_layout"]["scene"]
     scene["inventory_confirmed"] = False
@@ -264,7 +238,7 @@ def test_missing_inventory_is_unknown_and_blocks_only_execution():
     assert not any(row["status"] == "ready" for row in result["search"]["receipts"])
 
 
-def test_no_rule_is_not_an_adverse_rule_or_reason_to_request_compass():
+def test_no_rule_is_not_an_adverse_rule_or_reason_to_request_compass() -> None:
     request = measured_request()
     scene = request["workstation_layout"]["scene"]
     scene.pop("compass")
@@ -277,7 +251,7 @@ def test_no_rule_is_not_an_adverse_rule_or_reason_to_request_compass():
     assert not any("rules.plant" in p for p in result["missing_inputs"])
 
 
-def test_health_is_independent_of_live_plant_identity_and_location():
+def test_health_is_independent_of_live_plant_identity_and_location() -> None:
     request = measured_request()
     item = request["workstation_layout"]["scene"]["desktops"][0]["items"][0]
     item.pop("healthy")
@@ -298,7 +272,7 @@ def test_health_is_independent_of_live_plant_identity_and_location():
     )
 
 
-def test_denied_permissions_and_attached_locked_item_are_preserved():
+def test_denied_permissions_and_attached_locked_item_are_preserved() -> None:
     request = measured_request(search=True)
     request["layout_constraints"][0].update(can_relocate=False, can_rotate=False)
     request["layout_constraints"][1].update(can_relocate=False, can_rotate=False)
@@ -312,7 +286,7 @@ def test_denied_permissions_and_attached_locked_item_are_preserved():
     )
 
 
-def test_display_limit_does_not_change_frontier_or_discard_receipts():
+def test_display_limit_does_not_change_frontier_or_discard_receipts() -> None:
     request = measured_request(search=True)
     full = measured_result(request)["search"]
     request["workstation_layout"]["search"]["max_results"] = 1
@@ -323,7 +297,7 @@ def test_display_limit_does_not_change_frontier_or_discard_receipts():
     assert limited["omitted_frontier_count"] == len(full["frontier_candidate_ids"]) - 1
 
 
-def test_sand_water_requires_explicit_classification_and_moves_to_new_sector():
+def test_sand_water_requires_explicit_classification_and_moves_to_new_sector() -> None:
     request = measured_request(search=True)
     request.pop("methods")
     scene = request["workstation_layout"]["scene"]
@@ -365,7 +339,7 @@ def test_sand_water_requires_explicit_classification_and_moves_to_new_sector():
         "north_mismatch",
     ],
 )
-def test_invalid_scene_rejected_at_shared_request_boundary(mutation):
+def test_invalid_scene_rejected_at_shared_request_boundary(mutation: str) -> None:
     request = measured_request(search=True, charts=True)
     scene = request["workstation_layout"]["scene"]
     if mutation == "boolean_number":
@@ -407,13 +381,15 @@ def test_invalid_scene_rejected_at_shared_request_boundary(mutation):
         ]
     elif mutation == "north_mismatch":
         scene["compass"]["north_reference"] = "true"
+    else:
+        pass
     with pytest.raises(ValidationError):
         AssessRequest.model_validate(request)
 
 
 def test_new_branch_matches_real_rest_mcp_cli_and_strict_projection(
-    monkeypatch, tmp_path, capsys
-):
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     request = measured_request(search=True, charts=True)
     fields = [
         "layout_analysis.workstation_layout_analysis",
@@ -467,7 +443,9 @@ def test_new_branch_matches_real_rest_mcp_cli_and_strict_projection(
         "layout_analysis.workstation_layout_analysis.search.receipts",
     ],
 )
-def test_nested_projection_retains_typed_new_evidence(monkeypatch, field):
+def test_nested_projection_retains_typed_new_evidence(
+    monkeypatch: pytest.MonkeyPatch, field: str
+) -> None:
     request = measured_request(search=True)
     rest = rest_client(monkeypatch).post(
         "/api/fengshui/assess",
@@ -483,7 +461,7 @@ def test_nested_projection_retains_typed_new_evidence(monkeypatch, field):
     FengshuiOutput.model_validate(rest.json())
 
 
-def test_wide_entrance_visibility_is_not_forced_into_midpoint_direction():
+def test_wide_entrance_visibility_is_not_forced_into_midpoint_direction() -> None:
     request = measured_request()
     entry = request["workstation_layout"]["scene"]["openings"][0]
     entry.update(
@@ -502,7 +480,7 @@ def test_wide_entrance_visibility_is_not_forced_into_midpoint_direction():
     assert "back_right" in seat["entrance_relative_positions"]
 
 
-def test_head_clearance_is_not_eye_clearance():
+def test_head_clearance_is_not_eye_clearance() -> None:
     request = measured_request()
     request["workstation_layout"]["scene"]["bodies"].append(
         body("beam", "beam", 0, 0.2, 0.8, 0.4, 1.3, 2.8)
@@ -515,7 +493,9 @@ def test_head_clearance_is_not_eye_clearance():
     )
 
 
-def test_barrier_geometry_reaches_existing_afsi_rule_and_recomputes_after_move():
+def test_barrier_geometry_reaches_existing_afsi_rule_and_recomputes_after_move() -> (
+    None
+):
     request = measured_request(search=True)
     scene = request["workstation_layout"]["scene"]
     scene["openings"][0]["segment"] = dict(
@@ -554,7 +534,7 @@ def test_barrier_geometry_reaches_existing_afsi_rule_and_recomputes_after_move()
     assert any(r["ruleset_id"] == "afsi_entry_barrier_v1" for r in result["rulesets"])
 
 
-def test_reexpressing_plan_in_rotated_frame_preserves_physical_results():
+def test_reexpressing_plan_in_rotated_frame_preserves_physical_results() -> None:
     request = measured_request()
     original = measured_result(request)
     changed = deepcopy(request)
@@ -591,13 +571,9 @@ def test_reexpressing_plan_in_rotated_frame_preserves_physical_results():
     assert result["rule_comparisons"] == original["rule_comparisons"]
 
 
-def test_source_ids_resolve_and_snapshot_includes_measured_actions():
+def test_source_ids_resolve_and_snapshot_includes_measured_actions() -> None:
     result = assess(**measured_request(search=True, charts=True))
-    sources = {
-        source["source_id"]
-        for ruleset in result["rulesets"]
-        for source in ruleset.get("sources", [])
-    }
+    sources = result["source_catalog"].keys()
     branch = result["layout_analysis"]["workstation_layout_analysis"]
     assert all(set(c["source_ids"]) <= sources for c in branch["rule_comparisons"])
     assert all(set(r["source_ids"]) <= sources for r in branch["readings"])
@@ -614,8 +590,8 @@ def test_source_ids_resolve_and_snapshot_includes_measured_actions():
 
 
 def test_default_budget_pages_reconstruct_same_run_search_without_recomputation(
-    monkeypatch, tmp_path
-):
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     import fatebridge.api as api
     from fatebridge.application import result_delivery as delivery
     from tests.support.result_delivery import reconstruct
@@ -626,7 +602,8 @@ def test_default_budget_pages_reconstruct_same_run_search_without_recomputation(
 
     async def native():
         async with Client(create_mcp_app(families="fengshui")) as client:
-            result = await client.call_tool(
+            result = await call_calculation(
+                client,
                 "fengshui_assess",
                 {
                     **measured_request(search=True, charts=True),
@@ -653,19 +630,18 @@ def test_default_budget_pages_reconstruct_same_run_search_without_recomputation(
     asyncio.run(native())
 
 
-def test_measured_task_cards_are_published_and_choose_actual_fields():
+def test_measured_task_cards_are_published_and_choose_actual_fields() -> None:
     from fatebridge.application.examples import evidence_views
     from fatebridge.services.tool_catalog import CATALOG
 
     spec = next(s for s in CATALOG if s.key == "fengshui_assess")
     views = evidence_views(spec)
     assert "measured_workstation" in views and "measured_workstation_search" in views
-    request = measured_request(search=True)
     for view in views.values():
         assert "rulesets" in view["fields"] and "rule_trace" in view["fields"]
 
 
-def test_full_turn_is_an_identity_even_with_locked_attached_items():
+def test_full_turn_is_an_identity_even_with_locked_attached_items() -> None:
     request = measured_request(search=True)
     request["workstation_layout"]["search"]["domains"] = [
         dict(object_id="desk", positions=[dict(x=0, y=1)], rotations_degrees=[360])
@@ -679,7 +655,9 @@ def test_full_turn_is_an_identity_even_with_locked_attached_items():
 
 
 @pytest.mark.parametrize("on_axis", [False, True])
-def test_host_guest_reference_does_not_expand_beyond_registered_axes(on_axis):
+def test_host_guest_reference_does_not_expand_beyond_registered_axes(
+    on_axis: bool,
+) -> None:
     request = measured_request(charts=True)
     request["xuankong"]["interpretation"] = dict(
         ruleset_id="xuankong_conditioned_v1",
@@ -691,6 +669,8 @@ def test_host_guest_reference_does_not_expand_beyond_registered_axes(on_axis):
         request["workstation_layout"]["scene"]["compass"]["sector_origin"] = dict(
             x=2, y=0.2
         )
+    else:
+        pass
     result = measured_result(request)
     reading = result["readings"][0]
     assert (reading["host_guest_reference"] is not None) is on_axis
@@ -701,7 +681,7 @@ def test_host_guest_reference_does_not_expand_beyond_registered_axes(on_axis):
     )
 
 
-def test_rectangle_envelope_does_not_confirm_a_sourced_sharp_corner():
+def test_rectangle_envelope_does_not_confirm_a_sourced_sharp_corner() -> None:
     request = measured_request()
     pillar = body("pillar", "pillar", 1, 1.2, 0.4, 0.4, 0, 2, True)
     request["workstation_layout"]["scene"]["bodies"].append(pillar)
@@ -727,7 +707,7 @@ def test_rectangle_envelope_does_not_confirm_a_sourced_sharp_corner():
     )
 
 
-def test_period_condition_is_a_real_frontier_dimension_not_only_returned_text():
+def test_period_condition_is_a_real_frontier_dimension_not_only_returned_text() -> None:
     request = measured_request(search=True, charts=True)
     request["workstation_layout"]["search"]["domains"] = [
         dict(
@@ -752,7 +732,7 @@ def test_period_condition_is_a_real_frontier_dimension_not_only_returned_text():
     } == {False, True}
 
 
-def test_unknown_application_condition_cannot_receive_a_satisfied_dimension():
+def test_unknown_application_condition_cannot_receive_a_satisfied_dimension() -> None:
     request = measured_request(search=True)
     request["workstation_layout"]["scene"]["desktops"][0]["items"][0].pop("healthy")
     search = measured_result(request)["search"]
@@ -764,7 +744,7 @@ def test_unknown_application_condition_cannot_receive_a_satisfied_dimension():
     assert search["receipts"][0]["rule_dimensions"][key] is None
 
 
-def test_geometry_keeps_explicit_occupant_scope_for_house_and_person_rules():
+def test_geometry_keeps_explicit_occupant_scope_for_house_and_person_rules() -> None:
     request = measured_request()
     request["methods"] = ["bazhai"]
     request["house"] = {"sitting_trigram": "坎"}
@@ -783,7 +763,7 @@ def test_geometry_keeps_explicit_occupant_scope_for_house_and_person_rules():
         AssessRequest.model_validate(request)
 
 
-def test_geometry_does_not_bypass_independent_floor_center_confirmation():
+def test_geometry_does_not_bypass_independent_floor_center_confirmation() -> None:
     request = measured_request()
     request["environmental_context"] = {
         "floors": [
@@ -800,7 +780,7 @@ def test_geometry_does_not_bypass_independent_floor_center_confirmation():
         AssessRequest.model_validate(request)
 
 
-def test_seated_right_is_relative_to_actual_user_not_desktop_center():
+def test_seated_right_is_relative_to_actual_user_not_desktop_center() -> None:
     request = measured_request()
     scene = request["workstation_layout"]["scene"]
     scene["seats"][0]["offset"]["x"] = -0.6
@@ -824,7 +804,7 @@ def test_seated_right_is_relative_to_actual_user_not_desktop_center():
     assert finding["matches"] is True
 
 
-def test_btb_near_edge_rule_is_not_rotated_from_an_incompatible_real_seat():
+def test_btb_near_edge_rule_is_not_rotated_from_an_incompatible_real_seat() -> None:
     request = measured_request()
     request["workstation_layout"]["scene"]["seats"][0]["facing_offset_degrees"] = 180
     rules = measured_result(request)["rule_comparisons"]
@@ -836,7 +816,7 @@ def test_btb_near_edge_rule_is_not_rotated_from_an_incompatible_real_seat():
     assert btb["matches"] is None and btb["status"] == "not_covered"
 
 
-def test_backing_segment_does_not_invent_height_or_eye_occlusion():
+def test_backing_segment_does_not_invent_height_or_eye_occlusion() -> None:
     request = measured_request()
     scene = request["workstation_layout"]["scene"]
     scene["solid_backing_segments"].append(

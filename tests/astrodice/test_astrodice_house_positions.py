@@ -6,7 +6,9 @@ Boundary expectations apply only where cusps form one prograde partition.
 
 import math
 from datetime import datetime
+from fractions import Fraction
 from itertools import product
+from pathlib import Path
 
 import pytest
 
@@ -14,7 +16,6 @@ from fatebridge.core.astro import runtime
 from fatebridge.core.astro.chart import build_core_chart_payload
 from fatebridge.core.astro.geometry import (
     _house_for_longitude,
-    combine_longitudes,
     is_prograde_house_partition,
 )
 from fatebridge.core.astro.house_positions import (
@@ -28,10 +29,10 @@ from fatebridge.core.astro.topocentric_precision import TOPOCENTRIC_PROJECTION_M
 from fatebridge.core.local_techniques.chart import _build_birth_info
 from fatebridge.core.local_techniques.otherbu import build_otherbu_result
 from fatebridge.core.predictive.native_chart import HOUSE_NAMES, build_native_subject
-from tests.western.test_western_topocentric_precision import (
-    legacy_references,
-    phase_error,
+from tests.support.ephemeris_case_runtime import (
+    native_ephemeris_files as native_ephemeris_files,
 )
+from tests.support.reference_data import read
 
 swe = pytest.importorskip("swisseph")
 FACES = {"planet": "Moon", "sign": "Cancer", "house": 0}
@@ -42,6 +43,18 @@ POLAR = [
     (80, "2024-06-21", 2),  # Reversed Regiomontanus cusps.
     (-80, "1900-01-01", 2),
 ]
+FOLDED_POSITIONS = {
+    (
+        case["latitude"],
+        case["date"],
+        case["hsys"],
+        case["zodiacal"],
+        case["fortune_method"],
+    ): case
+    for case in read(
+        Path(__file__).parents[1] / "data/astrodice/tables/folded-house-positions.json"
+    )["cases"]
+}
 
 
 @pytest.mark.parametrize(
@@ -55,7 +68,7 @@ POLAR = [
 )
 def test_actual_regular_cusps_keep_adjacent_floats_in_the_correct_half_open_house(
     date, latitude
-):
+) -> None:
     times = ephemeris_time(datetime.fromisoformat(date + "T00:30:00+00:00"))
     with runtime.preserve_ephemeris_path():
         for code in CODES:
@@ -68,6 +81,8 @@ def test_actual_regular_cusps_keep_adjacent_floats_in_the_correct_half_open_hous
             wraps = sum(cusps[i] >= cusps[(i + 1) % 12] for i in range(12))
             if wraps != 1 or len(set(cusps)) != 12:
                 continue
+            else:
+                pass
             for index, cusp in enumerate(cusps):
                 for longitude, expected in [
                     (math.nextafter(cusp, -math.inf), (index - 1) % 12 + 1),
@@ -80,6 +95,7 @@ def test_actual_regular_cusps_keep_adjacent_floats_in_the_correct_half_open_hous
                     )
 
 
+@pytest.mark.usefixtures("native_ephemeris_files")
 @pytest.mark.parametrize("latitude,date,hsys", POLAR)
 @pytest.mark.parametrize(
     "zodiacal,fortune_method",
@@ -87,7 +103,7 @@ def test_actual_regular_cusps_keep_adjacent_floats_in_the_correct_half_open_hous
 )
 def test_folded_and_reversed_context_uses_declared_zero_latitude_native_projection(
     latitude, date, hsys, zodiacal, fortune_method
-):
+) -> None:
     result = build_otherbu_result(
         **FACES,
         date=date,
@@ -101,57 +117,29 @@ def test_folded_and_reversed_context_uses_declared_zero_latitude_native_projecti
     )
     params = result["chart"]["params"]
     chart = result["chart"]["chart"]
-    times = ephemeris_time(datetime.fromisoformat(date + "T00:30:00+00:00"))
-    with runtime.preserve_ephemeris_path():
-        cusps, angles = swe.houses_ex(times.jd_ut1, latitude, 0, CODES[hsys])
-        eps = swe.calc(times.jd_tt, swe.ECL_NUT, swe.FLG_SWIEPH)[0][0]
-        physical = {
-            name: swe.calc(times.jd_tt, body, swe.FLG_SWIEPH | swe.FLG_SPEED)[0][0]
-            for name, body in [
-                ("Sun", swe.SUN),
-                ("Moon", swe.MOON),
-                ("Mercury", swe.MERCURY),
-                ("Venus", swe.VENUS),
-                ("Mars", swe.MARS),
-                ("Jupiter", swe.JUPITER),
-                ("Saturn", swe.SATURN),
-                ("Uranus", swe.URANUS),
-                ("Neptune", swe.NEPTUNE),
-                ("Pluto", swe.PLUTO),
-                ("North Node", swe.MEAN_NODE),
-            ]
-        }
-        physical["South Node"] = combine_longitudes(physical["North Node"], 180.0)
-        offset = params["chart_profile"]["ayanamsha"]
-        fortune = next(p for p in chart["objects"] if p["id"] == "Pars Fortuna")
-        physical["Pars Fortuna"] = combine_longitudes(fortune["lon"], offset)
-        expected = {
-            name: swe.house_pos(angles[2], latitude, eps, (lon, 0), CODES[hsys])
-            for name, lon in physical.items()
-        }
     assert not is_prograde_house_partition([p["lon"] for p in chart["houses"]])
     projection = params["housePositionProjection"]
-    for point in chart["objects"]:
-        position = expected[point["id"]]
+    reference = FOLDED_POSITIONS[latitude, date, hsys, zodiacal, fortune_method]
+    assert projection["armc"] == reference["armc"]
+    assert projection["true_obliquity"] == reference["obliquity"]
+    origin = Fraction(projection["backend_longitude_origin"])
+    assert origin == Fraction(reference["backend_longitude_origin"])
+    assert {p["id"] for p in chart["objects"]} == reference["points"].keys()
+    for point, check in zip(
+        chart["objects"], projection["precision"]["checks"], strict=True
+    ):
+        longitude, phase, position, house = reference["points"][point["id"]]
+        exact = check.get("exact_tropical_longitude_ratio")
+        tropical = Fraction(*exact) if exact else Fraction(check["tropical_longitude"])
+        assert tropical - origin == Fraction(longitude)
+        actual = point["ecliptic_house_position"]
+        assert actual == check["delivered_position"] == position
+        assert point["house"] == f"House{house}"
         if CODES[hsys] == b"T":
-            # The historical node name is retained; T is now checked against
-            # the independently frozen vector answer, not old native bits.
-            checks = projection["precision"]["checks"]
-            check = min(
-                checks,
-                key=lambda r: abs(r["tropical_longitude"] - physical[point["id"]]),
-            )
-            assert abs(check["tropical_longitude"] - physical[point["id"]]) < 1e-10
-            key = (latitude, angles[2], eps, check["tropical_longitude"])
-            reference = legacy_references()[key]
-            assert phase_error(point["ecliptic_house_position"], reference) <= 1
-            assert point["house"] == f"House{reference['house']}"
+            assert abs(math.remainder((actual - 1) * 30 - phase, 360)) * 3600 <= 1
         else:
-            assert point["ecliptic_house_position"] == position
-            assert point["house"] == f"House{math.floor(position)}"
-    assert projection["armc"] == angles[2]
+            pass
     assert projection["library_version"] == swe.version
-    assert projection["true_obliquity"] == eps
     assert projection["input_ecliptic_latitude"] == 0.0
     assert projection["input_frame"] == "tropical_true_ecliptic_of_date"
     assert projection["source_url"] == HOUSE_POSITION_SOURCE
@@ -171,7 +159,6 @@ def test_folded_and_reversed_context_uses_declared_zero_latitude_native_projecti
     plain = build_otherbu_result(**FACES)
     for key in [
         "symbolic_details",
-        "interpretation",
         "rule_trace",
         "rulesets",
         "diceChart",
@@ -179,7 +166,7 @@ def test_folded_and_reversed_context_uses_declared_zero_latitude_native_projecti
         assert result[key] == plain[key]
 
 
-def test_actual_polar_counterexample_changes_wrong_first_house_assignments():
+def test_actual_polar_counterexample_changes_wrong_first_house_assignments() -> None:
     result = build_otherbu_result(
         **FACES,
         date="2024-06-21",
@@ -199,8 +186,8 @@ def test_actual_polar_counterexample_changes_wrong_first_house_assignments():
 @pytest.mark.parametrize("latitude,date,hsys", POLAR)
 @pytest.mark.parametrize("zodiacal", [0, 1])
 def test_shared_core_and_timing_house_numbers_use_the_same_projection(
-    latitude, date, hsys, zodiacal
-):
+    latitude, date, hsys, zodiacal: int
+) -> None:
     birth, _, _ = _build_birth_info(
         date_text=date, time_text="00:30", timezone_name="UTC", lat=latitude, lon=0
     )
@@ -248,21 +235,25 @@ def test_shared_core_and_timing_house_numbers_use_the_same_projection(
         [0.0, 60.0, 30.0, *[float(i * 30) for i in range(3, 12)]],
     ],
 )
-def test_interval_classifier_refuses_to_fabricate_a_partition(cusps):
+def test_interval_classifier_refuses_to_fabricate_a_partition(cusps) -> None:
     assert not is_prograde_house_partition(cusps)
     with pytest.raises(ValueError, match="原生宫位投影"):
         _house_for_longitude(45, 0, "cusps", cusps)
 
 
 @pytest.mark.parametrize("bad", [0.0, -1.0, 13.0, float("nan"), float("inf")])
-def test_native_projection_failure_never_becomes_a_default_house(bad, monkeypatch):
+def test_native_projection_failure_never_becomes_a_default_house(
+    bad, monkeypatch: pytest.MonkeyPatch
+) -> None:
     projection = EclipticHouseProjection(0, 80, 23.4, b"T")
     monkeypatch.setattr(runtime, "ephemeris_call", lambda *args: bad)
     with pytest.raises(ValueError, match="不能钳制"):
         projection.position(90)
 
 
-def test_native_projection_is_not_advertised_without_the_native_runtime(monkeypatch):
+def test_native_projection_is_not_advertised_without_the_native_runtime(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setattr(runtime, "swe", None)
     with pytest.raises(ValueError, match="需要Swiss"):
         EclipticHouseProjection(0, 80, 23.4, b"T").position(90)

@@ -1,11 +1,6 @@
-"""Same-column timing support, separated from roots supplied by the natal chart.
+"""Describe principal relations, actual hidden roots and external natal support separately."""
 
-The selected 任注 describes 盖头/截脚 in relation to which component is
-desired. The same 丙申 may obstruct desired 申金 with 丙火 or leave desired
-丙火 without principal-branch support. Neither observation adjudicates fortune.
-"""
-
-from typing import Any, Mapping, Sequence, Tuple
+from typing import Any, Literal, Mapping, Sequence, TypedDict
 
 from fatebridge.core.metaphysics.common import SEXAGENARY_INDEX
 from fatebridge.utils.data import (
@@ -37,20 +32,64 @@ RELATION_LABELS = {
 SCOPE = "本柱主气生克、本柱真实藏根与原局外援分别计算。盖头按支为所喜、截脚压力按干为所喜给条件，未裁定真正喜忌与救应。长生名不是实际藏根；既有根不自动消除主气相克或泄耗。任注运年上下同看，其他时间层仅给同柱事实，不套十年运法。"
 
 
-def describe_timing_carrier(
-    node_id: str, stem: str, branch: str, natal: Mapping[str, Tuple[str, str]]
-) -> dict[str, Any]:
-    """Calculate literal principal relation and actual root presence, once.
+CarrierPrincipalRelation = Literal[
+    "same_element",
+    "branch_generates_stem",
+    "stem_generates_branch",
+    "branch_overcomes_stem",
+    "stem_overcomes_branch",
+]
 
-    External natal roots are a different receipt from this pillar's roots.
-    Hidden-root presence does not erase a contrary principal relation. Pressure
-    is a formal conditional observation; original-chart and annual rescue,
-    month command, effective force and actual desired gods remain unadjudicated.
-    """
+
+class CarrierHiddenRoot(TypedDict):
+    stem: str
+    rank: int
+    exact_stem: bool
+
+
+class CarrierNatalRoot(TypedDict):
+    position: str
+    hidden_stem: str
+    exact_stem: bool
+
+
+class TimingCarrierReceipt(TypedDict):
+    node_id: str
+    pillar: str
+    stem_element: str
+    branch_principal_element: str
+    principal_relation: CarrierPrincipalRelation
+    own_hidden_roots: list[CarrierHiddenRoot]
+    own_hidden_root_present: bool
+    external_natal_roots: list[CarrierNatalRoot]
+    branch_covered_if_desired: bool
+    stem_pressure_if_desired: bool
+    effective_force_status: Literal["not_adjudicated"]
+    source_ref: str
+
+
+class TimingCarrierSummary(TypedDict):
+    node_id: str
+    pillar: str
+    principal_relation: CarrierPrincipalRelation
+    own_hidden_root_present: bool
+    branch_covered_if_desired: bool
+    stem_pressure_if_desired: bool
+    effective_force_status: Literal["not_adjudicated"]
+    external_natal_root_count: int
+
+
+def describe_timing_carrier(
+    node_id: str, stem: str, branch: str, natal: Mapping[str, tuple[str, str]]
+) -> TimingCarrierReceipt:
+    """Calculate the principal branch relation and actual hidden-root presence."""
     if stem + branch not in SEXAGENARY_INDEX:
         raise ValueError("时运本柱承载需要六十甲子中的完整干支")
+    else:
+        pass
     element = STEM_ELEMENTS[stem][0]
     principal = BRANCH_ELEMENTS[branch][0]
+    relation: CarrierPrincipalRelation
     if element == principal:
         relation = "same_element"
     elif GENERATION_CYCLE[principal] == element:
@@ -61,12 +100,12 @@ def describe_timing_carrier(
         relation = "branch_overcomes_stem"
     else:
         relation = "stem_overcomes_branch"
-    own = [
+    own: list[CarrierHiddenRoot] = [
         {"stem": hidden, "rank": index + 1, "exact_stem": hidden == stem}
         for index, hidden in enumerate(BRANCH_HIDDEN_STEMS[branch])
         if STEM_ELEMENTS[hidden][0] == element
     ]
-    external = [
+    external: list[CarrierNatalRoot] = [
         {"position": name, "hidden_stem": hidden, "exact_stem": hidden == stem}
         for name in ("year", "month", "day", "hour")
         for hidden in BRANCH_HIDDEN_STEMS[natal[name][1]]
@@ -94,6 +133,8 @@ def timing_carrier_snapshot_lines(interactions: Mapping[str, Any]) -> list[str]:
     rows = interactions.get("pillar_carriers") or []
     if not rows:
         return []
+    else:
+        pass
     layers = {
         "dayun": "大运",
         "liunian": "流年",
@@ -123,6 +164,8 @@ def timing_carrier_snapshot_lines(interactions: Mapping[str, Any]) -> list[str]:
             lines.append(
                 f"{row['pillar']}另见干克真实藏干{'、'.join(covered)}；仅在这些藏干为所喜时列盖头候选，不改述为全支受克。"
             )
+        else:
+            pass
     lines.append(
         "盖头须以支为所喜、截脚压力须以干为所喜分别核对；本柱关系、藏根与长生名不裁定实际喜忌、救应或吉凶。"
     )
@@ -130,22 +173,19 @@ def timing_carrier_snapshot_lines(interactions: Mapping[str, Any]) -> list[str]:
 
 
 def summarize_timing_carriers(
-    rows: Sequence[Mapping[str, Any]],
-) -> list[dict[str, Any]]:
-    """Project the same receipts; root count is positions, never force or scores."""
-    keys = (
-        "node_id",
-        "pillar",
-        "principal_relation",
-        "own_hidden_root_present",
-        "branch_covered_if_desired",
-        "stem_pressure_if_desired",
-        "effective_force_status",
-    )
+    carriers: Sequence[TimingCarrierReceipt],
+) -> list[TimingCarrierSummary]:
+    """Count natal root positions in each supplied carrier receipt."""
     return [
         {
-            **{k: row[k] for k in keys},
-            "external_natal_root_count": len(row["external_natal_roots"]),
+            "node_id": carrier["node_id"],
+            "pillar": carrier["pillar"],
+            "principal_relation": carrier["principal_relation"],
+            "own_hidden_root_present": carrier["own_hidden_root_present"],
+            "branch_covered_if_desired": carrier["branch_covered_if_desired"],
+            "stem_pressure_if_desired": carrier["stem_pressure_if_desired"],
+            "effective_force_status": carrier["effective_force_status"],
+            "external_natal_root_count": len(carrier["external_natal_roots"]),
         }
-        for row in rows
+        for carrier in carriers
     ]

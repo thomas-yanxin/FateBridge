@@ -4,16 +4,19 @@ from datetime import date
 
 import pytest
 
-from fatebridge.core.sukuyo import calendar_mansion, day_evidence
-from fatebridge.core.sukuyo_calendar_text import render_day_reading
-from fatebridge.core.sukuyo_historical_calendar import date_reference
-from fatebridge.core.sukuyo_shogonji_daily import daily_annotation_reference
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence
+from fatebridge.core.sukuyo.sukuyo_calendar_text import render_day_reading
+from fatebridge.core.sukuyo.sukuyo_historical_calendar import date_reference
+from fatebridge.core.sukuyo.sukuyo_shogonji_daily import daily_annotation_reference
 from scripts.sukuyo.check_sukuyo_shogonji_daily import verify_daily_annotations
+from tests.unit_test.fixtures.sukuyo_transports import (
+    assert_sukuyo_transport_parity as check,
+)
 
 HISTORICAL = "japanese_naoj_historical_utc09"
 
 
-def test_four_frozen_headings_do_not_resolve_two_different_relocations():
+def test_four_frozen_headings_do_not_resolve_two_different_relocations() -> None:
     report = verify_daily_annotations()
     assert not report["errors"]
     assert report["source_annotations"] == 2
@@ -35,8 +38,8 @@ def test_four_frozen_headings_do_not_resolve_two_different_relocations():
     ],
 )
 def test_original_and_proposed_positions_retain_their_own_dates(
-    civil, role, day, ganzhi
-):
+    civil: str, role: str, day: int, ganzhi: str
+) -> None:
     c = calendar_mansion(civil, zone="+09:00", calendar_basis=HISTORICAL)
     r = c["calendar_reference"]["manuscript_daily_annotations"]
     assert c["calendar_date"] == civil and c["lunar_day"] == day
@@ -55,7 +58,7 @@ def test_original_and_proposed_positions_retain_their_own_dates(
     assert "本日不是初一" in text  # This limit still applies to the month header only.
 
 
-def test_term_witness_and_birth_year_conditions_survive_native_prose():
+def test_term_witness_and_birth_year_conditions_survive_native_prose() -> None:
     c = calendar_mansion("1346-08-30", zone="+09:00", calendar_basis=HISTORICAL)
     text = render_day_reading(day_evidence(c))
     for phrase in (
@@ -83,7 +86,7 @@ def test_term_witness_and_birth_year_conditions_survive_native_prose():
     ]
 
 
-def test_known_cross_zone_time_uses_actual_reference_date_without_relocation():
+def test_known_cross_zone_time_uses_actual_reference_date_without_relocation() -> None:
     c = calendar_mansion(
         "1346-07-17", time_text="23:30:00", zone="+08:00", calendar_basis=HISTORICAL
     )
@@ -93,8 +96,10 @@ def test_known_cross_zone_time_uses_actual_reference_date_without_relocation():
     assert not r["acceptance"]["ancient_day_boundary_accepted"]
 
 
-def test_unknown_time_keeps_both_source_roles_in_separate_date_branches():
-    from fatebridge.core.sukuyo_historical_calendar import compatibility_reference_notes
+def test_unknown_time_keeps_both_source_roles_in_separate_date_branches() -> None:
+    from fatebridge.core.sukuyo.sukuyo_historical_calendar import (
+        compatibility_reference_notes,
+    )
 
     c = calendar_mansion("1346-07-17", zone="+08:00", calendar_basis=HISTORICAL)
     branches = c["calendar_candidates"]
@@ -113,7 +118,9 @@ def test_unknown_time_keeps_both_source_roles_in_separate_date_branches():
     assert not c["birth_time_known"]
 
 
-def test_unread_dates_and_uncovered_leap_months_are_not_claimed_annotation_free():
+def test_unread_dates_and_uncovered_leap_months_are_not_claimed_annotation_free() -> (
+    None
+):
     assert daily_annotation_reference(1346, 6, False, 22) is None
     assert daily_annotation_reference(1346, 6, True, 21) is None
     assert "manuscript_daily_annotations" not in date_reference(date(1346, 8, 29))
@@ -136,11 +143,8 @@ def test_unread_dates_and_uncovered_leap_months_are_not_claimed_annotation_free(
 
 @pytest.mark.parametrize("civil", ["1346-07-18", "1346-08-28"])
 def test_daily_evidence_is_preserved_across_rest_native_mcp_and_cli(
-    monkeypatch, capsys, civil
-):
-    from tests.sukuyo.test_sukuyo_transports import (
-        test_calendar_and_relations_across_all_real_transports as check,
-    )
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], civil: str
+) -> None:
 
     check(
         monkeypatch,

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, Mapping, Optional
+from typing import Any, Mapping
 
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.reference import (
@@ -26,6 +26,8 @@ def native_factor_model(body_id: int, returned_flags: int) -> str:
     """
     if runtime.swe is not None and body_id == runtime.swe.MEAN_NODE:
         return ANALYTICAL_MEAN_NODE_MODEL
+    else:
+        pass
     return runtime.ephemeris_model_from_retflag(returned_flags)
 
 
@@ -34,14 +36,18 @@ def physical_ephemeris_summary(models: Mapping[str, str]) -> str:
     physical = {model for name, model in models.items() if name not in NODE_BODIES}
     if not physical:
         return "none"
+    else:
+        pass
     if len(physical) == 1:
         return next(iter(physical))
+    else:
+        pass
     return "mixed"
 
 
 def _derive_engine_profile(
-    *profiles: Optional[Dict[str, Any]],
-) -> Dict[str, str]:
+    *profiles: dict[str, Any] | None,
+) -> dict[str, str]:
     precisions = {
         str(profile["engine_precision"])
         for profile in profiles
@@ -81,18 +87,22 @@ def _derive_engine_profile(
 def _precision_label_zh(engine_precision: str) -> str:
     if engine_precision == "ephemeris_runtime_model":
         return "离线高精度"
+    else:
+        pass
     if engine_precision == "mixed_precision_runtime_model":
         return "离线混合精度"
+    else:
+        pass
     return "离线近似"
 
 
 def _precision_label_from_profiles(
-    *profiles: Optional[Dict[str, Any]],
+    *profiles: dict[str, Any] | None,
 ) -> str:
     return _precision_label_zh(_derive_engine_profile(*profiles)["engine_precision"])
 
 
-def _coerce_house_system_code(hsys: object) -> Optional[int]:
+def _coerce_house_system_code(hsys: object) -> int | None:
     """Translate a user-facing house-system identifier into the internal 0-8 code.
 
     Accepts:
@@ -108,26 +118,32 @@ def _coerce_house_system_code(hsys: object) -> Optional[int]:
     resolved (caller raises a descriptive error)."""
     if hsys is None:
         return None
+    else:
+        pass
     try:
         return house_system_fields(hsys)["house_system_code"]
     except InvalidHouseSystemError:
         return None
 
 
-def _resolve_offline_house_system(hsys: Any, *, context_label: str) -> Dict[str, Any]:
+def _resolve_offline_house_system(hsys: Any, *, context_label: str) -> dict[str, Any]:
     resolved = _coerce_house_system_code(hsys)
     if resolved is None or resolved not in RELATIVE_HOUSE_SYSTEM_SPECS:
         raise ValueError(
             f"{context_label}离线模式暂仅支持 hsys=0..8（整宫制、Alcabitus、Regiomontanus、Placidus、Koch、Vehlow Equal、Polich Page、Sripati、天顶为第10宫宫头的等宫制）。"
         )
+    else:
+        pass
     if runtime.swe is None and resolved != 0:
         raise ValueError(
             f"当前环境缺少 swisseph，{context_label}离线模式仅能在 hsys=0(整宫制) 下运行。"
         )
+    else:
+        pass
     return {"value": resolved, **RELATIVE_HOUSE_SYSTEM_SPECS[resolved]}
 
 
-def _resolve_relative_house_system(hsys: Any) -> Dict[str, Any]:
+def _resolve_relative_house_system(hsys: Any) -> dict[str, Any]:
     return _resolve_offline_house_system(hsys, context_label="relative 关系盘")
 
 
@@ -135,7 +151,7 @@ def _resolve_core_chart_house_system(
     hsys: Any,
     *,
     chart_variant: str,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     if hsys in (None, ""):
         default_house_system = CORE_CHART_DEFAULT_HOUSE_SYSTEMS[chart_variant]
         # These defaults use the local house layout without a Swiss house code.
@@ -146,6 +162,8 @@ def _resolve_core_chart_house_system(
                 "label_zh": CORE_CHART_DEFAULT_HOUSE_LABELS_ZH[default_house_system],
                 "source": "variant_default",
             }
+        else:
+            pass
         # For swisseph-backed defaults (e.g. "equal_mc"), look up the full spec so
         # _relative_house_layout has the swisseph_code it needs.  We do NOT call
         # _resolve_offline_house_system here because that raises when swe is None;
@@ -157,6 +175,8 @@ def _resolve_core_chart_house_system(
                     **spec,
                     "source": "variant_default",
                 }
+            else:
+                pass
         return {
             "value": None,
             "key": default_house_system,
@@ -165,6 +185,8 @@ def _resolve_core_chart_house_system(
             ),
             "source": "variant_default",
         }
+    else:
+        pass
     return {
         **_resolve_offline_house_system(hsys, context_label="核心星盘"),
         "source": "explicit",
@@ -175,7 +197,7 @@ def _resolve_offline_zodiacal_mode(
     zodiacal: Any,
     *,
     context_label: str,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     try:
         resolved = int(zodiacal)
     except (TypeError, ValueError):
@@ -186,6 +208,8 @@ def _resolve_offline_zodiacal_mode(
         raise ValueError(
             f"{context_label}离线模式暂仅支持 zodiacal=0(回归黄道) 或 zodiacal=1(恒星黄道/Lahiri)。"
         )
+    else:
+        pass
     return {
         "value": resolved,
         "zodiac": "sidereal" if resolved == 1 else "tropical",
@@ -194,7 +218,7 @@ def _resolve_offline_zodiacal_mode(
     }
 
 
-def _resolve_relative_zodiacal_mode(zodiacal: Any) -> Dict[str, Any]:
+def _resolve_relative_zodiacal_mode(zodiacal: Any) -> dict[str, Any]:
     return _resolve_offline_zodiacal_mode(
         zodiacal,
         context_label="relative 关系盘",
@@ -205,7 +229,7 @@ def _resolve_core_chart_zodiacal_mode(
     zodiacal: Any,
     *,
     chart_variant: str,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     if zodiacal in (None, ""):
         return {
             **_resolve_offline_zodiacal_mode(
@@ -214,6 +238,8 @@ def _resolve_core_chart_zodiacal_mode(
             ),
             "source": "variant_default",
         }
+    else:
+        pass
     return {
         **_resolve_offline_zodiacal_mode(
             zodiacal,
@@ -224,15 +250,17 @@ def _resolve_core_chart_zodiacal_mode(
 
 
 def _relative_zodiac_profile_overrides(
-    zodiacal_info: Dict[str, Any],
+    zodiacal_info: dict[str, Any],
     *,
-    ayanamsha: Optional[float] = None,
-) -> Dict[str, Any]:
-    overrides: Dict[str, Any] = {
+    ayanamsha: float | None = None,
+) -> dict[str, Any]:
+    overrides: dict[str, Any] = {
         "zodiac": zodiacal_info["zodiac"],
         "zodiacal": zodiacal_info["value"],
         "zodiac_label_zh": zodiacal_info["label_zh"],
     }
     if ayanamsha is not None:
         overrides["ayanamsha"] = round(ayanamsha, 4)
+    else:
+        pass
     return overrides

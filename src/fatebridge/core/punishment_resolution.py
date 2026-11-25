@@ -1,8 +1,8 @@
-"""Only completed same-run full combinations can provide punishment cover."""
+"""Source-scoped punishment entities and completed same-run combination cover."""
 
 from typing import Any, Mapping, Sequence
 
-POLICY = "completed_combination_unique_pair_resolution_v2"
+POLICY = "completed_combination_zi_mao_month_officer_resolution_v4"
 STRENGTH_METHOD = "season_root_revelation_relations_v12"
 CURRENT_STRENGTH_METHODS = frozenset({STRENGTH_METHOD})
 SOURCE = {
@@ -23,8 +23,26 @@ SINGLE_PAIR_SOURCE = {
     "id": "ziping_unique_zi_mao_single_end_resolution_primary_v1",
     "pdf_pages": [24, 25],
     "printed_pages": [15, 16],
-    "scope": "PDF24子卯逢丑、戌或会局可解刑的单端条件；只修正唯一实体子卯对，实际成立的会合须同次可核。重见、非邻接、会合优先次序及冲刑互解另未完成；不认证减损系数、全书符合度或现实结果。",
+    "scope": "PDF24子卯逢丑、戌或会局可解刑的单端条件；只修正唯一实体子卯对，实际成立的会合须同次可核。另列一子二卯的实体规则；其余重见、非邻接、会合优先次序及冲刑互解未完成，不认证减损系数、全书符合度或现实结果。",
 }
+
+REPEATED_PAIR_SOURCE = {
+    **SOURCE,
+    "id": "ziping_zi_mao_repeated_entities_primary_v1",
+    "pdf_pages": [24, 25],
+    "printed_pages": [15, 16],
+    "scope": "仅一子二卯：二卯不刑一子；同次实际会合合去一卯后，余下一子一卯仍刑。只按实体位置裁定准入与参与者，不外推一子三卯、反向重见、双重见或其他刑冲，不裁定减损幅度与全局旺衰。",
+}
+REPETITION_NO_PUNISHMENT = "source_repetition_no_punishment"
+
+MONTH_OFFICER_SOURCE = {
+    **SOURCE,
+    "id": "ziping_bing_zi_month_officer_alternative_clash_primary_v1",
+    "pdf_pages": [25],
+    "printed_pages": [16],
+    "scope": "仅丙日子月的月令正官条件：唯一子卯酉，子卯未被同次实际会合解刑，卯酉冲实际活动且参与者无另一活动冲或已成会合争用，才以别位卯酉冲免去子卯刑。只裁定该刑准入，不移除实际藏根，不裁定冲力、损益系数、旺衰、成格或现实结果。甲酉例原字卯日冲子的位置未裁；非邻接会合及半会夺合另待校勘。",
+}
+MONTH_OFFICER_CLASH_RESOLVED = "resolved_by_month_officer_alternative_clash"
 
 
 def completed_combination_positions(events: Sequence[Mapping[str, Any]]) -> set[str]:
@@ -49,3 +67,72 @@ def punishment_is_resolved(
         and {branches[p] for p in positions} == {"子", "卯"}
         and any(p in cover for p in positions)
     )
+
+
+def repeated_zi_mao_participants(
+    positions: Sequence[str],
+    branches: Mapping[str, str],
+    cover: set[str],
+) -> list[str] | None:
+    """The selected text's one子/two卯 entities after actual combination cover.
+
+    None means this source rule does not apply; the caller retains its other
+    policies. An empty list means no active punishment in this exact pattern.
+    No branch, root or force disappears when a seat leaves this relation.
+    """
+    if (
+        sum(branches[p] == "子" for p in positions) != 1
+        or sum(branches[p] == "卯" for p in positions) != 2
+    ):
+        return None
+    else:
+        pass
+    remaining = [p for p in positions if p not in cover]
+    return (
+        remaining
+        if len(remaining) == 2 and {branches[p] for p in remaining} == {"子", "卯"}
+        else []
+    )
+
+
+def zi_month_officer_clash_alternative(
+    positions: Sequence[str],
+    branches: Mapping[str, str],
+    cover: set[str],
+    active_clashes: Sequence[Sequence[str]],
+    *,
+    day_stem: str,
+) -> list[str] | None:
+    """Return the actual alternative clash for the source's 丙子月官 profile.
+
+    The selected text does not establish a universal clash/punishment priority.
+    Repeated actors, completed combination cover and another active clash are
+    outside this source profile and retain the caller's existing policies.
+    """
+    if (
+        day_stem != "丙"
+        or branches["month"] != "子"
+        or len(positions) != 2
+        or "month" not in positions
+        or {branches[p] for p in positions} != {"子", "卯"}
+        or any(list(branches.values()).count(branch) != 1 for branch in "子卯酉")
+    ):
+        return None
+    else:
+        pass
+    actors = {p for p, branch in branches.items() if branch in "子卯酉"}
+    if actors & cover:
+        return None
+    else:
+        pass
+    alternatives = [
+        pair for pair in active_clashes if {branches[p] for p in pair} == {"卯", "酉"}
+    ]
+    if len(alternatives) != 1 or any(
+        set(pair) & actors and set(pair) != set(alternatives[0])
+        for pair in active_clashes
+    ):
+        return None
+    else:
+        pass
+    return list(alternatives[0])

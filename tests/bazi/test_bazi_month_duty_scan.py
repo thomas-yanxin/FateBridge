@@ -1,20 +1,23 @@
 """A scanned duration witness must never become an adopted duty or hidden root."""
 
+import json
 from copy import deepcopy
+from pathlib import Path
 
 import pytest
 
 from fatebridge.core.month_duty_reference import build_month_duty_reference
 from fatebridge.core.month_duty_scan_reference import build_month_duty_scan_reference
 from fatebridge.utils.data import BRANCH_HIDDEN_STEMS
+from scripts.bazi import audit_bazi_month_duty_scan
 from scripts.bazi.audit_bazi_month_duty_scan import (
     audit,
     compare_claims,
 )
-from tests.bazi.test_bazi_year_contract import TOPICS
 from tests.support.transports import AS_OF, SPECS, business, inputs
 from tests.support.transports import rest as _shared_rest
 from tests.support.transports import surface_calls
+from tests.unit_test.fixtures.bazi_year_cases import TOPICS
 
 
 def chart(branch="寅"):
@@ -23,7 +26,7 @@ def chart(branch="寅"):
     )
 
 
-def test_all24_scan_rows_and69_numbers_keep_printed_arithmetic_disagreements():
+def test_all24_scan_rows_and69_numbers_keep_printed_arithmetic_disagreements() -> None:
     result = audit()
     assert (result["month_rows"], result["duration_claims"]) == (24, 69)
     assert result["duration_value_differences"] == []
@@ -42,7 +45,19 @@ def test_all24_scan_rows_and69_numbers_keep_printed_arithmetic_disagreements():
     assert result["real_world_predictive_validity"] == "not_tested"
 
 
-def test_source_differences_are_retained_without_a_must_agree_gate():
+def test_scan_audit_rejects_a_missing_following_table(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    witness = json.loads(audit_bazi_month_duty_scan.DATA.read_bytes())
+    witness["profiles"].pop()
+    incomplete_witness = tmp_path / "incomplete-witness.json"
+    incomplete_witness.write_text(json.dumps(witness), encoding="utf-8")
+    monkeypatch.setattr(audit_bazi_month_duty_scan, "DATA", incomplete_witness)
+    with pytest.raises(ValueError, match="Both scanned month profiles"):
+        audit()
+
+
+def test_source_differences_are_retained_without_a_must_agree_gate() -> None:
     old = [{"source_name": "辛", "days": 20}, {"source_name": "已土", "days": 7}]
     new = [{"source_name": "辛", "days": 18}, {"source_name": "己土", "days": 9}]
     before = deepcopy((old, new))
@@ -61,7 +76,9 @@ rest = _shared_rest
 
 
 @pytest.mark.parametrize("branch", list("寅卯辰巳午未申酉戌亥子丑"))
-def test_each_scanned_month_names_actual_stems_without_inventing_roots_or_dates(branch):
+def test_each_scanned_month_names_actual_stems_without_inventing_roots_or_dates(
+    branch,
+) -> None:
     pillars = chart(branch)
     before, roots = deepcopy(pillars), deepcopy(BRANCH_HIDDEN_STEMS)
     old_and_new = build_month_duty_reference(pillars)
@@ -103,7 +120,9 @@ def test_each_scanned_month_names_actual_stems_without_inventing_roots_or_dates(
                 ]
 
 
-def test_explicit_scanned_ji_does_not_rewrite_digital_yi_or_month_hidden_catalog():
+def test_explicit_scanned_ji_does_not_rewrite_digital_yi_or_month_hidden_catalog() -> (
+    None
+):
     value = build_month_duty_reference(chart())
     digital = value["duration_source_layers"][1]["claims"][0]
     assert digital["source_name"] == "已土" and digital["canonical_stem"] is None
@@ -123,7 +142,7 @@ def test_explicit_scanned_ji_does_not_rewrite_digital_yi_or_month_hidden_catalog
     assert value["effective_command_status"] == "not_adjudicated"
 
 
-def test_a_printed_you_month_ding_claim_is_not_a_physical_ding_root():
+def test_a_printed_you_month_ding_claim_is_not_a_physical_ding_root() -> None:
     value = build_month_duty_reference(chart("酉"))
     table = value["scanned_witness"]["duration_source_layers"][1]
     assert [(r["source_name"], r["days"]) for r in table["claims"]] == [
@@ -135,7 +154,9 @@ def test_a_printed_you_month_ding_claim_is_not_a_physical_ding_root():
     assert all(r["pillar"] != "month" for r in table["claims"][2]["hidden_positions"])
 
 
-def test_returned_scan_pages_claims_and_critique_cannot_mutate_the_source_cache():
+def test_returned_scan_pages_claims_and_critique_cannot_mutate_the_source_cache() -> (
+    None
+):
     one = build_month_duty_scan_reference(chart())
     expected = deepcopy(one)
     one["source"]["chapter_original_pdf_pages"].append(-1)
@@ -147,7 +168,7 @@ def test_returned_scan_pages_claims_and_critique_cannot_mutate_the_source_cache(
 @pytest.mark.parametrize("topic", TOPICS)
 def test_scan_witness_matches_actual_rest_native_mcp_cli_for_all_ten_tools(
     topic, surface_calls
-):
+) -> None:
     spec = SPECS["bazi_" + topic]
     prefix = "bazi_birth" if topic == "birth" else topic + "_analysis"
     chain = prefix + (

@@ -3,6 +3,7 @@
 import asyncio
 import json
 from copy import deepcopy
+from pathlib import Path
 
 import pytest
 from fastmcp import Client
@@ -14,82 +15,14 @@ from fatebridge.core.fengshui.models import AssessRequest
 from fatebridge.core.fengshui.output import FengshuiOutput
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.fengshui import assess
-from tests.fengshui.test_fengshui_material_facts import material_request
 from tests.support.fengshui_transports import mcp_call
 from tests.support.mcp_result_assertions import without_transport
-from tests.support.transports import rest_client
-
-
-def relation_request(present=True, basis="user_confirmed"):
-    return dict(
-        scene="shared_rental",
-        methods=[],
-        environmental_context=dict(
-            orientation=dict(
-                direction_confirmed=False, evidence="未测方位，只核明确物理关系"
-            ),
-            objects=[
-                dict(
-                    object_id="mirror",
-                    kind="material_object",
-                    role="mirror",
-                    label="镜",
-                    evidence="明确确认镜面",
-                ),
-                dict(
-                    object_id="bed",
-                    kind="furniture",
-                    purpose="bed",
-                    label="床",
-                    evidence="明确确认用途",
-                ),
-                dict(
-                    object_id="corner",
-                    kind="material_object",
-                    role="pillar_corner",
-                    label="柱角",
-                    evidence="明确确认实体尖角源",
-                ),
-            ],
-            interior_relations=[
-                dict(
-                    relation_id="reflection",
-                    source_object_id="mirror",
-                    target_object_id="bed",
-                    kind="mirror_faces_bed",
-                    present=present,
-                    observation_basis=basis,
-                    evidence="镜与床关系独立观察，不从镜子名称推断",
-                )
-            ],
-        ),
-    )
-
-
-def relation_candidate(moving="mirror"):
-    request = relation_request()
-    fresh = deepcopy(request["environmental_context"]["interior_relations"][0])
-    fresh.update(present=False, evidence="候选位置独立核对：不再正对床")
-    operation = "facing" if moving == "mirror" else "location"
-    request["layout_constraints"] = [
-        dict(
-            object_id=moving,
-            can_relocate=True,
-            can_rotate=True,
-            evidence="用户明确许可本对象动作",
-        )
-    ]
-    request["layout_alternatives"] = [
-        dict(
-            candidate_id="candidate",
-            object_id=moving,
-            changes=[operation],
-            environmental_context=dict(interior_relations=[fresh]),
-            physically_feasible=True,
-            evidence="候选可容纳、保持操作与通行",
-        )
-    ]
-    return request
+from tests.support.transports import describe_capability, rest_client
+from tests.unit_test.fixtures.fengshui_layout import (
+    material_request,
+    relation_candidate,
+    relation_request,
+)
 
 
 def case_input(case):
@@ -97,8 +30,12 @@ def case_input(case):
         return material_request(
             element_use="wood_remedy", colour="green", shape="columnar"
         )
+    else:
+        pass
     if case == "candidate":
         return relation_candidate()
+    else:
+        pass
     return relation_request(
         present={
             "confirmed": True,
@@ -124,8 +61,11 @@ def case_input(case):
     ],
 )
 def test_sourced_cases_agree_across_actual_rest_mcp_cli(
-    monkeypatch, tmp_path, capsys, case
-):
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    case: str,
+) -> None:
     request = case_input(case)
     http = rest_client(monkeypatch).post("/api/fengshui/assess", json=request)
     protocol = asyncio.run(mcp_call("assess", request))
@@ -174,16 +114,18 @@ def test_sourced_cases_agree_across_actual_rest_mcp_cli(
             )
             if case in {"absent", "unknown", "photo_false"}:
                 assert finding["action_options"] == []
+            else:
+                pass
 
 
 def test_actual_mcp_schema_and_strict_projection_include_only_requested_branches(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     async def inspect():
         async with Client(create_mcp_app(families="fengshui")) as client:
-            return next(
-                t for t in await client.list_tools() if t.name == "fengshui_assess"
-            ).model_dump(by_alias=True)["inputSchema"]
+            return (await describe_capability(client, "fengshui_assess"))[
+                "input_schema"
+            ]
 
     schema = asyncio.run(inspect())
     encoded = json.dumps(schema)
@@ -206,7 +148,9 @@ def test_actual_mcp_schema_and_strict_projection_include_only_requested_branches
 
 
 @pytest.mark.parametrize("moving", ["mirror", "bed"])
-def test_either_relation_endpoint_can_move_without_faking_placement(moving):
+def test_either_relation_endpoint_can_move_without_faking_placement(
+    moving: str,
+) -> None:
     request = relation_candidate(moving)
     candidate = assess(**request)["layout_analysis"]["alternatives_analysis"][
         "findings"
@@ -220,7 +164,9 @@ def test_either_relation_endpoint_can_move_without_faking_placement(moving):
 
 
 @pytest.mark.parametrize("moving", ["mirror", "bed"])
-def test_another_relation_cannot_erase_old_predicate_on_either_endpoint(moving):
+def test_another_relation_cannot_erase_old_predicate_on_either_endpoint(
+    moving: str,
+) -> None:
     request = relation_candidate(moving)
     # The mirror is still explicitly defined as a source and can acquire a
     # second independently confirmed relation. It cannot erase its first one.
@@ -251,7 +197,7 @@ def test_another_relation_cannot_erase_old_predicate_on_either_endpoint(moving):
     assert any("reflection" in path for path in candidate["missing_inputs"])
 
 
-def test_static_target_permissions_survive_candidate_context_recalculation():
+def test_static_target_permissions_survive_candidate_context_recalculation() -> None:
     request = relation_candidate("bed")
     request["layout_constraints"].append(
         dict(
@@ -277,8 +223,11 @@ def test_static_target_permissions_survive_candidate_context_recalculation():
     "violation", ["role", "material", "goal", "duplicate", "unknown_id"]
 )
 def test_inconsistent_new_contracts_reject_on_all_transports(
-    monkeypatch, tmp_path, capsys, violation
-):
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    violation: str,
+) -> None:
     request = relation_candidate()
     context = request["environmental_context"]
     if violation in {"material", "goal"}:
@@ -320,7 +269,7 @@ def test_inconsistent_new_contracts_reject_on_all_transports(
     )
 
 
-def test_target_role_cannot_be_changed_to_erase_relation():
+def test_target_role_cannot_be_changed_to_erase_relation() -> None:
     request = relation_candidate()
     request["layout_alternatives"][0]["environmental_context"]["objects"] = [
         {**request["environmental_context"]["objects"][0], "role": "sharp_corner"}
@@ -329,7 +278,7 @@ def test_target_role_cannot_be_changed_to_erase_relation():
         AssessRequest.model_validate(request)
 
 
-def test_environment_role_cannot_override_explicit_layout_use():
+def test_environment_role_cannot_override_explicit_layout_use() -> None:
     request = relation_request()
     request["placements"] = [
         dict(

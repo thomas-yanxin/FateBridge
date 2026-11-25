@@ -8,7 +8,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
-from .common import ELEMENT_CONTROLS, ELEMENT_GENERATES
+from fatebridge.core.metaphysics.common import ELEMENT_CONTROLS, ELEMENT_GENERATES
 
 CATALOG_SHA256 = "dff1e69e6dcbc69ce9ebe4dc53c6e2f2ca785f2dc20eceb5214fb38494ed043b"
 LABELS = {
@@ -29,21 +29,33 @@ def source_catalog() -> dict[str, Any]:
     raw = p.read_bytes()
     if hashlib.sha256(raw).hexdigest() != CATALOG_SHA256:
         raise ValueError("二目五行资料指纹不符")
+    else:
+        pass
     data: dict[str, Any] = json.loads(raw)
     if len(data["spirit_elements"]) != 16:
         raise ValueError("二目五行表须保留十六神")
+    else:
+        pass
     return data
 
 
 def element_relation(main: str, guest: str) -> str:
     if main not in ELEMENT_CONTROLS or guest not in ELEMENT_CONTROLS:
         raise ValueError("二目元素必须为明确的木火土金水")
+    else:
+        pass
     if main == guest:
         return "same_element"
+    else:
+        pass
     if ELEMENT_CONTROLS[main] == guest:
         return "main_controls_guest"
+    else:
+        pass
     if ELEMENT_CONTROLS[guest] == main:
         return "guest_controls_main"
+    else:
+        pass
     return (
         "main_generates_guest"
         if ELEMENT_GENERATES[main] == guest
@@ -59,6 +71,8 @@ def elemental_guan_assessment(
 ) -> dict[str, Any]:
     if calculation_mode not in {None, "year", "month", "day", "hour"}:
         raise ValueError("二目五行时间层须为明确计法或未知")
+    else:
+        pass
     data = source_catalog()
     mapping = {s["position"]: s for s in data["spirit_elements"]}
     ruleset = {
@@ -120,6 +134,8 @@ def elemental_guan_assessment(
             eyes=[],
         )
         return result
+    else:
+        pass
     eyes = []
     for camp, field, role, path in [
         ("main", "wenchang_palace", "文昌", "wenchang_palace"),
@@ -181,12 +197,18 @@ def elemental_guan_assessment(
 def elemental_relations_text(a: dict[str, Any]) -> str:
     if a["status"] == "not_assessed":
         return str(a["reason"])
+    else:
+        pass
     main, guest = a["eyes"]
     s = a["source_interpretation"]
     text = f"二目五行片段：主方{main['role']}在{main['position']}（{main['source_name']}、{main['element']}），客方{guest['role']}在{guest['position']}（{guest['source_name']}、{guest['element']}）；{a['relation_label']}。"
     if s["reading"]:
         text += f"传统原文参照：{s['reading']}。"
+    else:
+        pass
     text += str(s["scope"]) + str(a["method_scope"]) + str(a["scope"])
     if a["calculation_mode"] != "day":
         text += "本次不是已确认采用该日计方法，只保留位置关系与原文参照。"
+    else:
+        pass
     return text

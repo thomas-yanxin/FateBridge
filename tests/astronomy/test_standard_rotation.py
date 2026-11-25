@@ -41,7 +41,7 @@ PHYSICAL_REFERENCE = json.loads(
 )
 
 
-def test_published_decimal_expression_is_no_worse_than_common_input_ERFA():
+def test_published_decimal_expression_is_no_worse_than_common_input_ERFA() -> None:
     assert REFERENCE["production_imported"] is False
     assert REFERENCE["precision_decimal_digits"] == 90
     assert REFERENCE["original_gast_gate_arcseconds"] == 0.001
@@ -76,12 +76,14 @@ def test_published_decimal_expression_is_no_worse_than_common_input_ERFA():
                     difference -= 360
                 elif difference < -180:
                     difference += 360
+                else:
+                    pass
                 errors.append(abs(difference) * 3600)
             assert errors[0] <= Decimal("0.001"), row
             assert errors[0] <= errors[1], (row, errors)
 
 
-def test_same_NPB_origins_and_ERA_are_no_worse_than_common_input_ERFA():
+def test_same_NPB_origins_and_ERA_are_no_worse_than_common_input_ERFA() -> None:
     reference = FRAME_REFERENCE
     assert reference["production_imported"] is False
     assert reference["precision_decimal_digits"] == 90
@@ -113,12 +115,14 @@ def test_same_NPB_origins_and_ERA_are_no_worse_than_common_input_ERFA():
                     difference -= 360
                 elif difference < -180:
                     difference += 360
+                else:
+                    pass
                 errors.append(abs(difference) * 3600)
             assert errors[0] <= Decimal("0.001"), row
             assert errors[0] <= errors[1], (row, errors)
 
 
-def test_native_frame_matches_original_author_C_axes_and_boundary_shortcuts():
+def test_native_frame_matches_original_author_C_axes_and_boundary_shortcuts() -> None:
     reference = FRAME_REFERENCE
     assert reference["native_clock_source"]["production_imported"] is False
     assert reference["native_clock_source"]["source_library_sha256"] == (
@@ -141,8 +145,8 @@ def test_native_frame_matches_original_author_C_axes_and_boundary_shortcuts():
 
 
 def test_managed_rotation_uses_matching_frame_and_clock_without_ephemeris_files(
-    monkeypatch, tmp_path
-):
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     rows = PHYSICAL_REFERENCE["epochs"]
     assert len(rows) == 257
     previous = ephemeris_runtime.configured_ephemeris_path()
@@ -160,7 +164,7 @@ def test_managed_rotation_uses_matching_frame_and_clock_without_ephemeris_files(
         ephemeris_runtime.configure_ephemeris_path(previous or "")
 
 
-def test_physical_equator_matches_unmodified_official_SOFA_axes():
+def test_physical_equator_matches_unmodified_official_SOFA_axes() -> None:
     data = gzip.decompress(
         (
             Path(__file__).parents[1] / "data/earth_attitude_v1/reference.json.gz"
@@ -191,8 +195,8 @@ def test_physical_equator_matches_unmodified_official_SOFA_axes():
 
 
 def test_selected_house_kernels_share_the_physical_pole_and_source_ecliptic(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     """Common frozen Sun input isolates geometry from ephemeris availability."""
     reference = PHYSICAL_REFERENCE
     cases = reference["house_cases"]
@@ -209,6 +213,8 @@ def test_selected_house_kernels_share_the_physical_pole_and_source_ecliptic(
                 (*epoch["source_equatorial_Sun"], 0.0, 0.0, 0.0),
                 runtime.swe.FLG_SWIEPH | runtime.swe.FLG_EQUATORIAL,
             )
+        else:
+            pass
         return actual_call(operation, *args, **kwargs)
 
     monkeypatch.setattr(ephemeris_runtime, "ephemeris_call", common_source)
@@ -228,6 +234,8 @@ def test_selected_house_kernels_share_the_physical_pole_and_source_ecliptic(
                 with pytest.raises(runtime.swe.Error):
                     common_source(*args, _julian_day_tt=epoch["jd_tt"])
                 continue
+            else:
+                pass
             cusps, angles = common_source(*args, _julian_day_tt=epoch["jd_tt"])
             actual = (*cusps, *angles)
             assert len(actual) == len(case["values"]) == 20

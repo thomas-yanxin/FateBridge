@@ -1,23 +1,18 @@
-"""Current model comparisons retain independently adjudicated source phases."""
+"""Explicit solar sources retain the independently adjudicated month phases."""
 
 import gzip
 import hashlib
 import json
-import math
-from copy import deepcopy
-from dataclasses import replace
 from datetime import datetime
 from pathlib import Path
 
 import erfa
 import pytest
 
-from fatebridge.core.almanac import get_solar_terms_for_year
+import fatebridge.core.analytic_solar as solar
 from fatebridge.core.de441_solar import MODEL_ID as DE441_MODEL
-from fatebridge.core.de441_solar import solar_longitude as de441_longitude
-from fatebridge.core.liuyao_calendar_models import SCOPE, month_model_comparison
+from fatebridge.core.liuyao.liuyao_calendar_models import SCOPE
 from fatebridge.core.local_techniques.sixyao import build_sixyao_result
-from tests.support.solar_source_facts import HKO_TERM_LONGITUDES
 
 CASES = json.loads(
     (Path(__file__).parents[1] / "data/liuyao/model_boundary_inputs.json").read_bytes()
@@ -39,7 +34,6 @@ def analytic_environment(monkeypatch, tmp_path_factory):
     empty = tmp_path_factory.getbasetemp() / "model-boundary-empty-ephe"
     empty.mkdir(exist_ok=True)
     monkeypatch.setenv("SE_EPHE_PATH", str(empty))
-    # Preserve the frozen former-default analytic/native comparison controls.
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "analytic")
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
 
@@ -48,76 +42,33 @@ def comparison(result):
     return result["liuyao_evidence"]["calendar_conventions"]["month_model_comparison"]
 
 
-def assert_comparison(result, case):
-    source = SOURCE_CASES[case["id"]]
+def assert_analytic_month(result, case):
     value = comparison(result)
-    assert value["coverage_complete"] is True
-    assert value["primary_context_consistent"] is True
-    assert value["compared_month_boundaries"] == 36
-    assert value["calculation_month_branch"] == case["selected_month_branch"]
-    assert value["native_month_branch"] == source["current_month_branch_from_reference"]
-    assert (
-        value["month_changed"]
-        is source["current_month_changed_between_completed_paths"]
+    assert value["status"] == "not_compared_incomplete_native_probes"
+    assert value["coverage_complete"] is False
+    assert value["compared_month_boundaries"] == 0
+    assert value["calculation_month_branch"] == (
+        SOURCE_CASES[case["id"]]["current_month_branch_from_reference"]
     )
-    assert value["native_models"] == [DE441_MODEL]
+    assert value["native_models"] == []
     assert value["selected_models"] == ["fatebridge_analytic_solar_v1"]
-    assert value["missing_native_probes"] == []
-    assert value["status"] == (
-        "month_differs_between_completed_paths"
-        if source["current_month_changed_between_completed_paths"]
-        else "same_month_in_completed_paths"
-    )
-    # Check actual completed roots even when both paths now give the same month.
-    for record in (value["native_previous_boundary"], value["native_next_boundary"]):
-        assert record["role"] == "completed_native_choice_probe"
-        assert record["native_retflags"] == []
-        high = record["julian_day_tt"]
-        low = math.nextafter(high, -math.inf)
-        target = HKO_TERM_LONGITUDES[record["name"]]
-        assert math.remainder(de441_longitude(low) - target, 360) < 0
-        assert math.remainder(de441_longitude(high) - target, 360) >= 0
-    active = value["active_boundary_differences"]
-    assert len(active) == int(source["current_month_changed_between_completed_paths"])
-    if active:
-        fact = active[0]
-        assert fact["name"] == case["term"]
-        assert fact["native"]["role"] == "completed_native_choice_probe"
-        assert fact["native"]["native_retflags"] == []
-        for record in (fact["selected"], fact["native"]):
-            if record["ephemeris_model"] != DE441_MODEL:
-                continue
-            hi = record["julian_day_tt"]
-            lo = math.nextafter(hi, -math.inf)
-            target = HKO_TERM_LONGITUDES[fact["name"]]
-            left = de441_longitude(lo)
-            right = de441_longitude(hi)
-            assert math.remainder(left - target, 360) < 0
-            assert math.remainder(right - target, 360) >= 0
-        assert fact["selected_has_passed"] is not fact["native_has_passed"]
-        assert (
-            fact["selected_minus_native_seconds_tt"]
-            == (fact["selected"]["julian_day_tt"] - fact["native"]["julian_day_tt"])
-            * 86400
-        )
+    assert len(value["missing_native_probes"]) == 36
+    assert value["active_boundary_differences"] == []
+    assert "month_changed" not in value and "native_month_branch" not in value
+    assert value["scope"] == SCOPE
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda x: x["id"])
-def test_current_completed_months_match_the_independent_source_phase(case):
+def test_explicit_analytic_month_matches_the_independent_source_phase(case) -> None:
     result = build_sixyao_result(**case["input"])
-    assert_comparison(result, case)
-    if SOURCE_CASES[case["id"]]["current_month_changed_between_completed_paths"]:
-        assert f"本次采用{case['selected_month_branch']}月" in result["snapshot_text"]
-        assert (
-            f"原生选择路径为{case['native_month_branch']}月" in result["snapshot_text"]
-        )
-        assert SCOPE in result["snapshot_text"]
-    else:
-        assert "同次交气模型比较：" not in result["snapshot_text"]
+    assert_analytic_month(result, case)
+    assert "同次交气比较未完成，不能认定月令路径一致。" in result["snapshot_text"]
 
 
-def test_explicit_native_does_not_start_an_alternate_analytic_calculation(monkeypatch):
-    import fatebridge.core.analytic_solar as solar
+@pytest.mark.parametrize("case", CASES, ids=lambda row: row["id"])
+def test_explicit_native_month_matches_source_without_starting_analytic(
+    case, monkeypatch: pytest.MonkeyPatch
+) -> None:
 
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
 
@@ -125,14 +76,14 @@ def test_explicit_native_does_not_start_an_alternate_analytic_calculation(monkey
         raise AssertionError("Native result must not manufacture another model")
 
     monkeypatch.setattr(solar, "solar_longitude", unexpected)
-    result = build_sixyao_result(**CASES[0]["input"])
+    result = build_sixyao_result(**case["input"])
     assert (
         "month_model_comparison"
         not in result["liuyao_evidence"]["calendar_conventions"]
     )
     assert (
         result["liuyao_evidence"]["calendar_conventions"]["month_branch"]
-        == SOURCE_CASES[CASES[0]["id"]]["current_month_branch_from_reference"]
+        == SOURCE_CASES[case["id"]]["current_month_branch_from_reference"]
     )
     assert (
         result["calendar_context"]["current_solar_term"]["ephemeris_model"]
@@ -140,68 +91,11 @@ def test_explicit_native_does_not_start_an_alternate_analytic_calculation(monkey
     )
 
 
-@pytest.mark.parametrize("bad", [None, True, math.nan, "not a TT epoch"])
-def test_missing_or_invalid_native_tt_is_unknown_not_agreement(bad):
-    case = CASES[0]
-    result = build_sixyao_result(**case["input"])
-    terms = [
-        term
-        for year in range(1971, 1974)
-        for term in get_solar_terms_for_year(year, "UTC")
-    ]
-    index = next(
-        i
-        for i, term in enumerate(terms)
-        if term.moment.year == 1972 and term.name == "立夏"
-    )
-    details = deepcopy(terms[index].solar_model_details)
-    details["native_choice_probe_jd_tt"] = bad
-    terms[index] = replace(terms[index], solar_model_details=details)
-    value = month_model_comparison(
-        datetime.fromisoformat(
-            case["input"]["date"] + "T" + case["input"]["time"] + "+00:00"
-        ),
-        "UTC",
-        result["calendar_context"]["bazi_month_boundary"],
-        terms=terms,
-    )
-    assert value["coverage_complete"] is False
-    assert value["status"] == "not_compared_incomplete_native_probes"
-    assert "month_changed" not in value and "native_month_branch" not in value
-    assert value["missing_native_probes"] == ["1972:立夏"]
-
-
-def test_modifying_returned_probe_data_does_not_change_cached_comparisons():
-    original = build_sixyao_result(**CASES[0]["input"])
-    changed = get_solar_terms_for_year(1972, "UTC")[8].as_dict()
-    changed["solar_model_details"]["native_choice_probe_datetime_utc"] = None
-    assert comparison(build_sixyao_result(**CASES[0]["input"])) == comparison(original)
-
-
-def test_different_primary_boundary_provenance_is_not_a_completed_comparison():
-    case = CASES[0]
-    result = build_sixyao_result(**case["input"])
-    primary = deepcopy(result["calendar_context"]["bazi_month_boundary"])
-    primary["start_term"]["solar_model_details"][
-        "coefficient_sha256"
-    ] = "deliberate simulated prior-source mismatch"
-    value = month_model_comparison(
-        datetime.fromisoformat(
-            case["input"]["date"] + "T" + case["input"]["time"] + "+00:00"
-        ),
-        "UTC",
-        primary,
-    )
-    assert value["primary_context_consistent"] is False
-    assert value["coverage_complete"] is False
-    assert value["status"] == "not_compared_primary_boundaries_changed"
-    assert value["active_boundary_differences"] == []
-    assert "month_changed" not in value and "native_month_branch" not in value
-
-
 @pytest.mark.local_data
 @pytest.mark.parametrize("case", CASES, ids=lambda row: row["id"])
-def test_original_inputs_and_stock_counterexamples_keep_independent_de440_phase(case):
+def test_original_inputs_and_stock_counterexamples_keep_independent_de440_phase(
+    case,
+) -> None:
     source = SOURCE_CASES[case["id"]]
     assert source["input"] == case["input"]
     assert source["stock_native_month_branch"] == case["native_month_branch"]

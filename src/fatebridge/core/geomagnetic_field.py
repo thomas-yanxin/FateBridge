@@ -54,6 +54,8 @@ def wmm2025_field(
     sin_phi, cos_phi = context.sin(phi), context.cos(phi)
     if abs(latitude) == 90:
         sin_phi, cos_phi = context.mpf(1 if latitude > 0 else -1), context.zero
+    else:
+        pass
     semimajor_axis = context.mpf("6378.137")
     flattening = 1 / context.mpf("298.257223563")
     e2 = flattening * (2 - flattening)

@@ -6,7 +6,8 @@ from pathlib import Path
 
 import pytest
 
-from tests.liuyao.test_liuyao_roles import classical
+from fatebridge.core.liuyao.liuyao_penalty import PROFILE
+from tests.unit_test.fixtures.liuyao import classical_case as classical
 
 BASE = Path(__file__).parents[1] / "fixtures/liuyao_penalty_precedence_v21"
 CASES = json.loads((BASE / "cases.json").read_text())["cases"]
@@ -25,7 +26,7 @@ CASES = [
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
-def test_frozen_yin_generation_priority(case):
+def test_frozen_yin_generation_priority(case) -> None:
     result = classical(case)
     i = case["position"] - 1
     context = result["penalty_conditions"]["lines"][i]
@@ -37,6 +38,8 @@ def test_frozen_yin_generation_priority(case):
     strength = result["classical_assessment"]["lines"][i]["strength"]
     if case["expected_yin_permission"] is not True:
         assert not any(a["branch"] == "寅" for a in strength["supports"])
+    else:
+        pass
     if case["id"].startswith("own-yin"):
         back = result["back_generation_conditions"]["sources"][i]
         assert back["is_back_generation"] is True
@@ -49,6 +52,8 @@ def test_frozen_yin_generation_priority(case):
             assert back["raw_condition_match"] is None
         source = result["generation_conditions"]["sources"][i]
         assert source["back_generation_condition"] is case["expected_yin_permission"]
+    else:
+        pass
     if case["id"].startswith("moving-yin"):
         pair = next(
             g
@@ -63,14 +68,17 @@ def test_frozen_yin_generation_priority(case):
                 pair["condition_match"]
                 is result["generation_conditions"]["sources"][1]["condition_match"]
             )
+        else:
+            pass
+    else:
+        pass
 
 
-def test_precedence_source_and_cases_are_immutable():
+def test_precedence_source_and_cases_are_immutable() -> None:
     for name, digest in json.loads((BASE / "freeze.json").read_text())[
         "sha256"
     ].items():
         assert hashlib.sha256((BASE / name).read_bytes()).hexdigest() == digest
-    from fatebridge.core.liuyao_penalty import PROFILE
 
     assert (
         hashlib.sha256((BASE / "expectation-errata.json").read_bytes()).hexdigest()
@@ -84,7 +92,7 @@ def test_precedence_source_and_cases_are_immutable():
     assert PROFILE["precedence"]["not_adjudicated"]
 
 
-def test_routing_does_not_reuse_a_target_excluded_yin_credit():
+def test_routing_does_not_reuse_a_target_excluded_yin_credit() -> None:
     result = classical(
         dict(
             base_code="100011",

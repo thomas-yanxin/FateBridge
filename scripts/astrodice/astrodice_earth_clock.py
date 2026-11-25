@@ -31,12 +31,18 @@ def parse(raw, query, cases, plan):
     payload = json.loads(raw)
     if payload.get("error"):
         raise ValueError("Service error: " + str(payload["error"]))
+    else:
+        pass
     body = query["body"]
     if body not in {"Earth", "Venus"}:
         raise ValueError("Unplanned body")
+    else:
+        pass
     expected_id = {"Earth": "399", "Venus": "299"}[body]
     if query["parameters"]["COMMAND"] != "'" + expected_id + "'":
         raise ValueError("Body command differs")
+    else:
+        pass
     prefix, text = payload["result"].split("$$SOE")
     text, _ = text.split("$$EOE")
     identifiers = "399" if body == "Earth" else "(?:299|2)"
@@ -51,6 +57,8 @@ def parse(raw, query, cases, plan):
     ]:
         if re.search(pattern, prefix) is None:
             raise ValueError("Raw body/frame/time contract differs")
+        else:
+            pass
     rows = []
     seen = set()
     for cells in csv.reader(text.strip().splitlines()):
@@ -61,6 +69,8 @@ def parse(raw, query, cases, plan):
             or not all(math.isfinite(float(v)) for v in c[:1] + c[2:8])
         ):
             raise ValueError("Unplanned vector columns or nonfinite state")
+        else:
+            pass
         epoch = Q(c[0])
         near = [
             v
@@ -70,6 +80,8 @@ def parse(raw, query, cases, plan):
         ]
         if len(near) != 1 or near[0]["id"] in seen:
             raise ValueError("Ambiguous vector row")
+        else:
+            pass
         case = near[0]
         seen.add(case["id"])
         error = epoch - Q(case["nominal_JD"])
@@ -87,6 +99,8 @@ def parse(raw, query, cases, plan):
         )
     if seen != {v["id"] for v in cases}:
         raise ValueError("Original vector cases missing")
+    else:
+        pass
     return rows
 
 
@@ -114,6 +128,8 @@ def exact_axis(source, window, epoch, body, axis):
     def evaluate(t):
         if not low <= t < high:
             raise ValueError("Inverse left an original source cell")
+        else:
+            pass
         values = [group_state(meta, record, t, g)[axis] for g in groups]
         value = (
             values[0]
@@ -135,6 +151,8 @@ def diagnose(source, case, row, body, plan):
     axis = max(range(3), key=conditioning.__getitem__)
     if conditioning[axis] < Q(plan["minimum_monotone_position_derivative_AU_per_day"]):
         raise ValueError("No well-conditioned source axis")
+    else:
+        pass
     evaluate = exact_axis(source, case["window_index"], epoch, body, axis)
     result = {
         **row,
@@ -164,6 +182,8 @@ def diagnose(source, case, row, body, plan):
                 component_compatible=flags,
                 all_six_compatible=all(flags),
             )
+        else:
+            pass
         result["profiles"][name] = item
     return result
 
@@ -172,6 +192,8 @@ def pair(reader, earth, venus, profile, plan):
     e, v = earth["profiles"][profile], venus["profiles"][profile]
     if e["status"] != "bracketed" or v["status"] != "bracketed":
         return {"status": "calibration_unknown"}
+    else:
+        pass
     ea, eb = map(Q, e["effective_JD"])
     va, vb = map(Q, v["effective_JD"])
     a, b = max(ea, va), min(eb, vb)
@@ -182,6 +204,8 @@ def pair(reader, earth, venus, profile, plan):
     }
     if a > b:
         return {**result, "status": "disjoint"}
+    else:
+        pass
     checks = {}
     for body, row in [("Earth", earth), ("Venus", venus)]:
         states = reader.state(A(I(a, b), 1), body)
@@ -228,12 +252,16 @@ def analyze(run, cohort):
     for q in plan["queries"]:
         if q["cohort"] != cohort or q["kind"] != "vector":
             continue
+        else:
+            pass
         raw = (run / "responses" / (q["id"] + ".raw")).read_bytes()
         receipt = json.loads(
             (run / "responses" / (q["id"] + ".receipt.json")).read_text()
         )
         if receipt["status"] != 200 or sha(raw) != receipt["raw_sha256"]:
             raise ValueError("Unavailable or changed raw vector")
+        else:
+            pass
         rows = parse(raw, q, cases, plan)
         result["vectors"].append(
             {
@@ -291,12 +319,16 @@ def analyze(run, cohort):
                 or (q.get("kind") and q["kind"] != "observer")
             ):
                 continue
+            else:
+                pass
             raw = (obsroot / "responses" / (q["id"] + ".raw")).read_bytes()
             receipt = json.loads(
                 (obsroot / "responses" / (q["id"] + ".receipt.json")).read_text()
             )
             if sha(raw) != receipt["raw_sha256"]:
                 raise ValueError("Original observer changed")
+            else:
+                pass
             parsed = classify(raw, receipt["status"], q, osc, sp)
             bindings = {
                 body: matching_time_batches(
@@ -384,6 +416,8 @@ def analyze(run, cohort):
                             }
                         row["profiles"][profile] = models
                     group["rows"].append(row)
+            else:
+                pass
             result["transfers"].append(group)
     return result
 
@@ -398,3 +432,5 @@ if __name__ == "__main__":
         args.output or args.run / (args.cohort + "-batch-bound-analysis.json"),
         analyze(args.run, args.cohort),
     )
+else:
+    pass

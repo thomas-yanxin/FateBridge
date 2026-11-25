@@ -7,10 +7,25 @@ a new key; an unidentifiable binary keeps the original uncached behaviour.
 Restart the calculation process after updating an installed distribution.
 """
 
+from dataclasses import dataclass
 from functools import lru_cache
 from importlib.metadata import PackageNotFoundError
 from pathlib import Path
-from typing import Callable
+from typing import Protocol
+
+
+class DistributionVersionResolver(Protocol):
+    def __call__(self, distribution_name: str, /) -> str: ...
+
+
+@dataclass(frozen=True, kw_only=True)
+class BindingIdentity:
+    resolver: DistributionVersionResolver
+    native_version: str
+    filename: str
+    inode: int
+    modified_nanoseconds: int
+    size_bytes: int
 
 
 @lru_cache(maxsize=16)
@@ -19,7 +34,7 @@ def _native_path(filename: str) -> Path:
     return Path(filename)
 
 
-def _read(resolver: Callable[[str], str]) -> str:
+def _read(resolver: DistributionVersionResolver) -> str:
     try:
         return resolver("pyswisseph")
     except PackageNotFoundError:
@@ -27,18 +42,13 @@ def _read(resolver: Callable[[str], str]) -> str:
 
 
 @lru_cache(maxsize=16)
-def _installed_version(
-    resolver: Callable[[str], str],
-    native_version: str,
-    filename: str,
-    inode: int,
-    mtime_ns: int,
-    size: int,
+def _installed_version(identity: BindingIdentity) -> str:
+    return _read(identity.resolver)
+
+
+def binding_distribution_version(
+    native: object, resolver: DistributionVersionResolver
 ) -> str:
-    return _read(resolver)
-
-
-def binding_distribution_version(native: object, resolver: Callable[[str], str]) -> str:
     try:
         hash(resolver)
     except TypeError:
@@ -46,6 +56,8 @@ def binding_distribution_version(native: object, resolver: Callable[[str], str])
     filename = getattr(native, "__file__", None)
     if not filename:
         return _read(resolver)
+    else:
+        pass
     try:
         stat = (
             _native_path(filename) if type(filename) is str else Path(filename)
@@ -53,10 +65,12 @@ def binding_distribution_version(native: object, resolver: Callable[[str], str])
     except (OSError, TypeError, ValueError):
         return _read(resolver)
     return _installed_version(
-        resolver,
-        str(getattr(native, "version", "unavailable")),
-        str(filename),
-        stat.st_ino,
-        stat.st_mtime_ns,
-        stat.st_size,
+        BindingIdentity(
+            resolver=resolver,
+            native_version=str(getattr(native, "version", "unavailable")),
+            filename=str(filename),
+            inode=stat.st_ino,
+            modified_nanoseconds=stat.st_mtime_ns,
+            size_bytes=stat.st_size,
+        )
     )

@@ -9,7 +9,6 @@ import pytest
 from jsonschema import Draft202012Validator
 
 from fatebridge.application.examples import evidence_views, example_input
-from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
 from tests.support.ephemeris_case_runtime import (
     native_ephemeris_files as native_ephemeris_files,
 )
@@ -21,19 +20,8 @@ from tests.support.transports import (
     rest,
     surface_calls,
 )
-
-PAYLOAD = dict(
-    analysis_year=2026,
-    analysis_month=4,
-    analysis_day=4,
-    analysis_hour=21,
-    analysis_minute=18,
-    analysis_second=37,
-    analysis_timezone="Asia/Shanghai",
-    use_true_solar_time=False,
-    is_diurnal=False,
-    guiren_profile="tanyuan_xieji_v1",
-)
+from tests.unit_test.fixtures.ren_protocol import REN_PROTOCOL_PAYLOAD
+from validation.claims import CalculationClaim, verify_calculation_claims
 
 
 @pytest.fixture(autouse=True)
@@ -43,10 +31,12 @@ def native_solar_control(monkeypatch, native_ephemeris_files):
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
 
 
-def test_source_annotation_disagreement_survives_all_three_transports(surface_calls):
+def test_source_annotation_disagreement_survives_all_three_transports(
+    surface_calls,
+) -> None:
     spec = SPECS["liureng_gods"]
     payload = {
-        **PAYLOAD,
+        **REN_PROTOCOL_PAYLOAD,
         "analysis_month": 2,
         "analysis_day": 23,
         "analysis_hour": 18,
@@ -74,13 +64,15 @@ def test_source_annotation_disagreement_survives_all_three_transports(surface_ca
 @pytest.mark.parametrize("key", ["liureng_gods", "liureng_runyear", "jinkou"])
 @pytest.mark.parametrize("project", [False, True])
 def test_corrected_facts_survive_each_transport_and_field_projection(
-    key, project, surface_calls
-):
-    payload = {**PAYLOAD, **({"di_fen": "酉"} if key == "jinkou" else {})}
+    key: str, project: bool, surface_calls
+) -> None:
+    payload = {**REN_PROTOCOL_PAYLOAD, **({"di_fen": "酉"} if key == "jinkou" else {})}
     if key == "liureng_runyear":
         payload.update(
             birth_year=1994, birth_month=8, birth_day=23, birth_hour=14, gender="女"
         )
+    else:
+        pass
     fields = (
         [
             "jinkou.rows",
@@ -111,6 +103,8 @@ def test_corrected_facts_survive_each_transport_and_field_projection(
     )
     if key == "liureng_runyear":
         fields += ["runyear"]
+    else:
+        pass
     spec = SPECS[key]
     params = [("response_char_limit", "0"), ("as_of", "2026-10-12T02:00:00Z")]
     flags, options = ["--response-char-limit", "0"], {}
@@ -128,6 +122,8 @@ def test_corrected_facts_survive_each_transport_and_field_projection(
             *fields,
         ]
         options = dict(fields=fields, strict_fields=True, include_snapshot_text=False)
+    else:
+        pass
     http, protocol, code, cli = surface_calls(
         spec, payload, params=params, options=options, flags=flags
     )
@@ -202,8 +198,12 @@ def test_corrected_facts_survive_each_transport_and_field_projection(
         if not project:
             assert result["analysis_context"]["input_datetime"].endswith(":37")
             assert "实际交气星历模型" in result["snapshot_text"]
+        else:
+            pass
         if project:
             assert "snapshot_text" not in result
+        else:
+            pass
     if key == "jinkou" and not project:
         original = bodies[0]
         receipt = original["run_metadata"]
@@ -286,6 +286,8 @@ def test_corrected_facts_survive_each_transport_and_field_projection(
             )["status"]
             == "rejected"
         )
+    else:
+        pass
 
 
 @pytest.mark.parametrize(
@@ -293,10 +295,14 @@ def test_corrected_facts_survive_each_transport_and_field_projection(
     [("di_fen", "north"), ("guiren_profile", "unknown"), ("analysis_second", 60)],
 )
 def test_invalid_ground_is_rejected_by_all_three_surfaces(
-    rest, tmp_path, capsys, field, value
-):
+    rest,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    field: str,
+    value: int | str,
+) -> None:
     spec = SPECS["jinkou"]
-    payload = {**PAYLOAD, field: value}
+    payload = {**REN_PROTOCOL_PAYLOAD, field: value}
     assert rest.post(spec.rest_path, json=payload).status_code == 422
     result = asyncio.run(native(spec, payload))
     assert result.is_error
@@ -305,15 +311,17 @@ def test_invalid_ground_is_rejected_by_all_three_surfaces(
 
 
 @pytest.mark.parametrize("key", ["liureng_gods", "liureng_runyear", "jinkou"])
-def test_published_evidence_view_projects_live_facts(key, rest):
+def test_published_evidence_view_projects_live_facts(key: str, rest) -> None:
     spec = SPECS[key]
     views = evidence_views(spec)
     assert views and views["core"]["fields"]
-    payload = {**PAYLOAD, "is_diurnal": True}
+    payload = {**REN_PROTOCOL_PAYLOAD, "is_diurnal": True}
     if key == "liureng_runyear":
         payload.update(
             birth_year=1994, birth_month=8, birth_day=23, birth_hour=14, gender="女"
         )
+    else:
+        pass
     response = rest.post(
         spec.rest_path,
         json=payload,
@@ -334,9 +342,11 @@ def test_published_evidence_view_projects_live_facts(key, rest):
 
 
 @pytest.mark.parametrize("section", ["六十四课钤结构", "三合与虚一待用"])
-def test_pattern_section_export_survives_rest_mcp_and_cli(section, surface_calls):
+def test_pattern_section_export_survives_rest_mcp_and_cli(
+    section: str, surface_calls
+) -> None:
     spec = SPECS["jinkou"]
-    payload = {**PAYLOAD, "di_fen": "酉", "selected_sections": [section]}
+    payload = {**REN_PROTOCOL_PAYLOAD, "di_fen": "酉", "selected_sections": [section]}
     http, protocol, code, cli = surface_calls(
         spec,
         payload,
@@ -359,19 +369,25 @@ def test_pattern_section_export_survives_rest_mcp_and_cli(section, surface_calls
             for trine in body["jinkou"]["combinations"]["trines"]:
                 if len(trine["present_branches"]) >= 2:
                     assert trine["basis"] in exported["export_text"]
+                else:
+                    pass
 
 
 @pytest.mark.parametrize("key", ["liureng_gods", "liureng_runyear", "jinkou"])
-def test_generated_call_contract_alone_can_drive_real_mcp(key):
+def test_generated_call_contract_alone_can_drive_real_mcp(key: str) -> None:
     spec = SPECS[key]
-    file = Path(__file__).resolve().parents[2] / "docs/contracts" / (key + ".json")
+    file = (
+        Path(__file__).resolve().parents[2]
+        / "docs/contracts"
+        / f"{spec.tool_name}.json"
+    )
     contract = json.loads(file.read_text())
-    params = {**example_input(spec), **contract["first_view"]}
-    Draft202012Validator(contract["input"]).validate(params)
-    result = asyncio.run(native(spec, params))
+    arguments = example_input(spec)
+    Draft202012Validator(contract["input"]).validate(arguments)
+    result = asyncio.run(native(spec, arguments, **contract["first_view"]))
     assert not result.is_error
     body = result.structured_content
-    assert body["run_metadata"]["tool_name"] == key
+    assert body["run_metadata"]["tool_name"] == spec.tool_name
     assert (
         body["jinkou" if key == "jinkou" else "liureng"]["ruleset"][
             "classical_conformance"

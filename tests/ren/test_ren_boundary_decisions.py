@@ -3,6 +3,7 @@
 import asyncio
 import shutil
 from datetime import datetime
+from pathlib import Path
 
 import pytest
 from jsonschema import Draft202012Validator
@@ -28,7 +29,7 @@ def frozen():
     return reference()
 
 
-def test_protocol_keeps_full_denominators_and_original_acceptance_rules(frozen):
+def test_protocol_keeps_full_denominators_and_original_acceptance_rules(frozen) -> None:
     protocol = frozen["protocol"]
     assert len(frozen["roots"]) == 4872
     assert len(frozen["probes"]) == 9744
@@ -42,7 +43,9 @@ def test_protocol_keeps_full_denominators_and_original_acceptance_rules(frozen):
 
 
 @pytest.mark.parametrize("change", ["replacement", "bytes", "truncated"])
-def test_audit_refuses_modified_frozen_protocol_before_computation(change, tmp_path):
+def test_audit_refuses_modified_frozen_protocol_before_computation(
+    change: str, tmp_path: Path
+) -> None:
     target = tmp_path / "fixture"
     shutil.copytree(FIXTURE, target)
     path = target / "reference.json.gz"
@@ -56,7 +59,7 @@ def test_audit_refuses_modified_frozen_protocol_before_computation(change, tmp_p
         reference(target)
 
 
-def test_term_year_month_and_zhongqi_changes_are_distinct(frozen):
+def test_term_year_month_and_zhongqi_changes_are_distinct(frozen) -> None:
     calendar = frozen["calendar"]
     roots = frozen["roots"]
     general_map = frozen["protocol"]["reference_maps"]["general_by_last_term"]
@@ -99,7 +102,9 @@ def native_files(monkeypatch):
         (2084, "IERS_UTC"),
     ],
 )
-def test_actual_ren_dependency_clock_method_and_scope_agree(year, prefix, native_files):
+def test_actual_ren_dependency_clock_method_and_scope_agree(
+    year: int, prefix: str, native_files
+) -> None:
     from fatebridge.services.metaphysics import calculate_jinkou_analysis
 
     result = calculate_jinkou_analysis(
@@ -137,8 +142,15 @@ def test_actual_ren_dependency_clock_method_and_scope_agree(year, prefix, native
     ],
 )
 def test_ren_boundary_facts_and_clock_attribution_agree_on_three_protocols(
-    key, mode, identifier, frozen, monkeypatch, rest, tmp_path, capsys
-):
+    key: str,
+    mode: str,
+    identifier: str,
+    frozen,
+    monkeypatch: pytest.MonkeyPatch,
+    rest,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     previous = configured_ephemeris_path()
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", mode)
@@ -148,6 +160,8 @@ def test_ren_boundary_facts_and_clock_attribution_agree_on_three_protocols(
         kernel = ROOT / "ephe/solar-de440.bsp"
         if not kernel.exists():
             pytest.skip("Explicit external DE440 kernel unavailable")
+        else:
+            pass
         assert sha(kernel) == frozen["protocol"]["kernel_sha256"]
         empty = tmp_path / "empty"
         empty.mkdir()
@@ -181,6 +195,8 @@ def test_ren_boundary_facts_and_clock_attribution_agree_on_three_protocols(
         )
         if key == "jinkou":
             payload["di_fen"] = "酉"
+        else:
+            pass
         spec = SPECS[key]
         fields = ["four_pillars", "liureng.month_general", "liureng.calendar_policy"]
         if key == "jinkou":
@@ -189,13 +205,21 @@ def test_ren_boundary_facts_and_clock_attribution_agree_on_three_protocols(
                 "jinkou.overview.use_position",
                 "jinkou.calendar_policy",
             ]
-        options = dict(fields=fields, strict_fields=True, include_snapshot_text=False)
+        else:
+            pass
+        options = dict(
+            detail="audit",
+            fields=fields,
+            strict_fields=True,
+            include_snapshot_text=False,
+        )
         http = rest.post(
             spec.rest_path,
             json=payload,
             params=[
                 *[("fields", field) for field in fields],
                 ("strict_fields", "true"),
+                ("detail", "audit"),
                 ("include_snapshot_text", "false"),
                 ("response_char_limit", "0"),
             ],
@@ -210,6 +234,8 @@ def test_ren_boundary_facts_and_clock_attribution_agree_on_three_protocols(
                 "0",
                 "--strict-fields",
                 "true",
+                "--detail",
+                "audit",
                 "--include-snapshot-text",
                 "false",
                 "--fields",
@@ -241,6 +267,8 @@ def test_ren_boundary_facts_and_clock_attribution_agree_on_three_protocols(
                     assert dep["ephemeris_retflags"] == []
                 elif moment.year == 1960:
                     assert dep["civil_time_method"].startswith("SOFA_1960")
+                else:
+                    pass
             if key == "jinkou":
                 board = value["jinkou"]
                 assert [r["content"] for r in board["rows"]] == expected["positions"]
@@ -249,5 +277,7 @@ def test_ren_boundary_facts_and_clock_attribution_agree_on_three_protocols(
                 ]
                 assert board["overview"]["use_position"] == expected["polarity_use"]
                 assert board["calendar_policy"] == policy
+            else:
+                pass
     finally:
         configure_ephemeris_path(previous)

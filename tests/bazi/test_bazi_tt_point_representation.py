@@ -19,7 +19,7 @@ PRIMARY = json.loads(
 )
 
 
-def test_all_atomic_policy_starts_retain_the_original_utc_midnight_losslessly():
+def test_all_atomic_policy_starts_retain_the_original_utc_midnight_losslessly() -> None:
     entries = leap_table()["entries"]
     assert len(entries) == 28
     for entry in entries:
@@ -33,7 +33,7 @@ def test_all_atomic_policy_starts_retain_the_original_utc_midnight_losslessly():
             assert datetime_from_tt(point) == actual_civil
 
 
-def test_twopart_input_is_not_silently_added_at_large_jd():
+def test_twopart_input_is_not_silently_added_at_large_jd() -> None:
     point = TTInstant.from_parts(2457754.5, 0.001)
     assert point.days == Fraction(2457754.5) + Fraction(0.001)
     assert point.days != Fraction(point.as_float())
@@ -43,7 +43,7 @@ def test_twopart_input_is_not_silently_added_at_large_jd():
 
 
 @pytest.mark.usefixtures("native_ephemeris_files")
-def test_pre_atomic_parts_keep_the_existing_exact_entry_precision():
+def test_pre_atomic_parts_keep_the_existing_exact_entry_precision() -> None:
     for row in PRIMARY["preUTC_native_reference"]["rows"]:
         actual = datetime_from_tt(TTInstant.from_parts(*row["TT_parts"]))
         assert actual.isoformat() == row["prior_exact_entry_UTC"]
@@ -51,8 +51,10 @@ def test_pre_atomic_parts_keep_the_existing_exact_entry_precision():
         assert abs((actual - native).total_seconds()) <= 0.0002
 
 
-def test_naive_utc_and_floating_atomic_offset_are_not_invented_or_rounded():
-    with pytest.raises(ValueError, match="timezone-aware"):
+def test_naive_utc_and_floating_atomic_offset_are_not_invented_or_rounded() -> None:
+    with pytest.raises(
+        ValueError, match="UTC calendar normalization requires an aware datetime"
+    ):
         TTInstant.from_utc(datetime(2000, 1, 1), tai_minus_utc_seconds=32)
     with pytest.raises(TypeError, match="exact integer or Fraction"):
         TTInstant.from_utc(
@@ -63,12 +65,12 @@ def test_naive_utc_and_floating_atomic_offset_are_not_invented_or_rounded():
 
 
 @pytest.mark.parametrize("value", [True, float("nan"), float("inf"), -float("inf")])
-def test_nonfinite_and_boolean_points_are_rejected(value):
+def test_nonfinite_and_boolean_points_are_rejected(value) -> None:
     with pytest.raises(ValueError, match="finite and numeric"):
         TTInstant.from_float(value)
 
 
-def test_explicit_exact_type_cannot_enable_nominal_scalar_aliases():
+def test_explicit_exact_type_cannot_enable_nominal_scalar_aliases() -> None:
     point = TTInstant.from_float(2457754.5)
     with pytest.raises(ValueError, match="nominal scalar boundary"):
         datetime_from_tt(point, exact_epoch=False)

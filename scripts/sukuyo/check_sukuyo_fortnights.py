@@ -10,7 +10,7 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 from typing import Any
 
-from fatebridge.core.sukuyo_fortnights import declared_fortnight_ordinal
+from fatebridge.core.sukuyo.sukuyo_fortnights import declared_fortnight_ordinal
 
 ROOT = Path(__file__).resolve().parents[2]
 DATA = ROOT / "src/fatebridge/data/sukuyo_fortnights.json"
@@ -23,8 +23,12 @@ def verify_primary(captures: dict[str, Path] | None = None) -> dict[str, Any]:
     before = json.loads(FIXTURE.read_bytes())
     if hashlib.sha256(raw).hexdigest() != before["source_bundle_sha256"]:
         raise ValueError("黑白分来源包与修改前指纹不一致")
+    else:
+        pass
     if data["selected_paragraphs"] != before["selected_paragraphs"]:
         raise ValueError("黑白分所选原段与修改前参考不一致")
+    else:
+        pass
     valid = invalid = 0
     for row in before["all68_declared_ordinal_cases"]:
         try:
@@ -34,10 +38,14 @@ def verify_primary(captures: dict[str, Path] | None = None) -> dict[str, Any]:
         except ValueError:
             if row["valid"]:
                 raise ValueError("声明有效的编号被拒绝")
+            else:
+                pass
             invalid += 1
         else:
             if not row["valid"] or value != row["ordinal"]:
                 raise ValueError("编号与修改前参考不一致")
+            else:
+                pass
             valid += 1
     checked = []
     ns = {
@@ -51,11 +59,15 @@ def verify_primary(captures: dict[str, Path] | None = None) -> dict[str, Any]:
             != before["actual_sources"][name]["sha256"]
         ):
             raise ValueError("黑白分实际源文件字节指纹不一致")
+        else:
+            pass
         if name.endswith(".xml"):
             tree = ET.fromstring(captured)
             for row in before["selected_paragraphs"]:
                 if row["source_file"] != name:
                     continue
+                else:
+                    pass
                 found = tree.findall(
                     f".//t:body//t:p[@xml:id='{row['paragraph_id']}']", ns
                 )
@@ -65,6 +77,10 @@ def verify_primary(captures: dict[str, Path] | None = None) -> dict[str, Any]:
                     != row["literal_with_inline_notes"]
                 ):
                     raise ValueError("黑白分实际原段与修改前参考不一致")
+                else:
+                    pass
+        else:
+            pass
         checked.append(name)
     return {
         "source_bundle_sha256": hashlib.sha256(raw).hexdigest(),
@@ -90,3 +106,5 @@ if __name__ == "__main__":
             indent=2,
         )
     )
+else:
+    pass

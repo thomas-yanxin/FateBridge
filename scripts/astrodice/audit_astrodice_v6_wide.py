@@ -24,6 +24,8 @@ def unit(values):
     radius = math.hypot(*values)
     if radius <= 0 or not math.isfinite(radius):
         raise ValueError("Invalid physical vector for frame reduction")
+    else:
+        pass
     return [v / radius for v in values]
 
 
@@ -59,6 +61,8 @@ def frame_rotation(epoch, sidereal, expected_model, trace):
     display = common | (swe.FLG_SIDEREAL if sidereal else 0)
     if sidereal:
         runtime.ephemeris_call("set_sid_mode", swe.SIDM_LAHIRI, 0, 0)
+    else:
+        pass
     pairs = []
     coordinate_mask = 0
     for flag in COORDINATE_FLAGS:
@@ -69,13 +73,21 @@ def frame_rotation(epoch, sidereal, expected_model, trace):
             value, ret = runtime.ephemeris_call("calc", epoch, body, flags)
             if ret < 0 or runtime.ephemeris_model_from_retflag(ret) != expected_model:
                 raise ValueError("Frame reduction source changed")
+            else:
+                pass
             required = flags | swe.FLG_NOABERR | swe.FLG_NOGDEFL
             if flags & (swe.FLG_J2000 | swe.FLG_SIDEREAL):
                 required |= swe.FLG_NONUT
+            else:
+                pass
             if ret & coordinate_mask != required & coordinate_mask:
                 raise ValueError("Frame reduction coordinate contract changed")
+            else:
+                pass
             if len(value) != 6 or not all(math.isfinite(x) for x in value):
                 raise ValueError("Invalid native frame vector")
+            else:
+                pass
             trace.observe(
                 f"frame_bridge_{body}_{label}", expected_model, record_factor=False
             )
@@ -89,6 +101,8 @@ def frame_rotation(epoch, sidereal, expected_model, trace):
     conditioning = math.hypot(*cross(pairs[i][0], pairs[j][0]))
     if conditioning < 0.001:
         raise ValueError("Ill-conditioned orientation reconstruction")
+    else:
+        pass
     first = basis(pairs[i][0], pairs[j][0])
     second = basis(pairs[i][1], pairs[j][1])
     matrix = [
@@ -101,6 +115,8 @@ def frame_rotation(epoch, sidereal, expected_model, trace):
     replay = max(math.dist(rotate(matrix, pair[0]), pair[1]) for pair in pairs)
     if orthogonal > 2e-12 or replay > 1e-11:
         raise ValueError("Native orientation does not map all geometric witnesses")
+    else:
+        pass
     return matrix, {
         "basis_indices": [i, j],
         "cross_product_conditioning": conditioning,
@@ -121,6 +137,8 @@ def derivative(points, h, weights):
     }
     if any(abs(v) >= 90 for v in differences.values()):
         raise ValueError("Reference longitude branch is not local")
+    else:
+        pass
     return (
         math.fsum(
             float(weights[k]) * (differences[str(k * h)] - differences[str(-k * h)])
@@ -154,6 +172,8 @@ def audit(
         for row in reference["rows"]:
             if row["body"] == "Moon":
                 continue
+            else:
+                pass
             record = {k: row[k] for k in ["id", "body", "date_tt", "role", "jd_tt"]}
             try:
                 if row["missing_offsets_seconds"]:
@@ -174,6 +194,8 @@ def audit(
                     )
                     if model != expected_model:
                         raise ValueError("Requested physical backend was not used")
+                    else:
+                        pass
                     lahiri = native_lahiri_positions(
                         [body],
                         julian_day_ut1=jd,
@@ -193,6 +215,8 @@ def audit(
                     )
                     if ret < 0 or runtime.ephemeris_model_from_retflag(ret) != model:
                         raise ValueError("ICRF source changed")
+                    else:
+                        pass
                     observed = unit(raw[:3])
                     oracle = row["samples"]["0"]["unit_direction"]
                     position_error = (
@@ -239,6 +263,8 @@ def audit(
                             != "fatebridge_complete_position_derivative_v6"
                         ):
                             raise ValueError("Actual v6 derivative was not applied")
+                        else:
+                            pass
                         frame_results[name] = {
                             "source_function_rate": state["longitude_speed"],
                             "native_uncorrected_rate": state.get(
@@ -327,6 +353,8 @@ def audit(
     moon = audit_moon(protocol, adapted, production_order=True)
     if moon["model"] != expected_model:
         raise ValueError("Moon physical backend mismatch")
+    else:
+        pass
     numeric = sum(r["status"] in {"numeric_failure", "candidate_error"} for r in rows)
     unresolved = (
         any(
@@ -389,3 +417,5 @@ if __name__ == "__main__":
     parser.add_argument("--model", required=True, choices=["swieph", "jpl"])
     a = parser.parse_args()
     audit(a.protocol, a.reference, a.material, a.seal, a.output, a.model)
+else:
+    pass

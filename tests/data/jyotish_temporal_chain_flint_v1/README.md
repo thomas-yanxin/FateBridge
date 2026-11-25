@@ -1,0 +1,7 @@
+# Temporal source-formula chain, fixed FLINT reference
+
+All36 original given-operand cases and3782 scalar comparisons are retained: four original native-coordinate cases and32 controlled arithmetic cases. These are not36 independent sky measurements. The original94 nearest-binary64 differences, including8 native-coordinate fields, remain in the external before records; the coarse1e-12 line passed before and after.
+
+Expected values were frozen with python-flint0.9.0/FLINT3.6.0 before production changes, with the pre-existing integer IEEE encoder and no FateBridge import. Natha and Ayana use the selected Santhanam VolI scan, SHA13609f1af89541e070c798b8c70c6bfd74a8b9a71a71388913bf898e9f9ddf3f, printed268/PDF267 and printed277/PDF276 commentary. Raman76–77 remains the existing war formula and through-Hora cutoff. Sthana/Dig and other already-supplied upstream operands remain their declared binary64 inputs. No input, coefficient, nature branch, missing value or printed-source conflict was fit to candidate output.
+
+The JSON contains the full original formula inputs and only independently frozen expected output paths. It requires no live ephemeris or original source book to replay this mathematical comparison. The SHA file hashes uncompressed bytes. Primary source provenance, full old observations and source code are outside the repository at fatebridge-audit-20261117-round17/jyotish-kala/. This finite numerical reference does not certify source uniqueness, full Shadbala, physical precision or prediction.

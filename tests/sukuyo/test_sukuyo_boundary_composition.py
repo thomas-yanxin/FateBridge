@@ -4,10 +4,11 @@ import copy
 import hashlib
 import json
 from collections import Counter
+from pathlib import Path
 
 import pytest
 
-from fatebridge.core.sukuyo import calendar_mansion
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion
 from scripts.sukuyo import check_sukuyo_boundary_composition as audit
 
 
@@ -41,7 +42,7 @@ def calculate(row):
     )
 
 
-def test_original_domain_composed_in_full_before_comparison():
+def test_original_domain_composed_in_full_before_comparison() -> None:
     protocol_raw = audit.PROTOCOL.read_bytes()
     assert audit.monthly.sha(protocol_raw) == audit.PROTOCOL_SHA256
     protocol = json.loads(protocol_raw)
@@ -57,7 +58,7 @@ def test_original_domain_composed_in_full_before_comparison():
     assert protocol["classes"]["incomplete_candidate_cases"] == 5
 
 
-def test_all_selected_hosts_halves_and_edge_directions(selected):
+def test_all_selected_hosts_halves_and_edge_directions(selected) -> None:
     assert len(selected) == 42
     for row in selected:
         assert not audit.compare_case(row, calculate(row)), row["id"]
@@ -75,7 +76,9 @@ def test_all_selected_hosts_halves_and_edge_directions(selected):
         "priority",
     ],
 )
-def test_corrupted_evidence_cannot_hide_behind_same_merged_mansions(selected, mutation):
+def test_corrupted_evidence_cannot_hide_behind_same_merged_mansions(
+    selected, mutation: str
+) -> None:
     if mutation == "false_complete":
         row = next(r for r in selected if r["excluded"])
     else:
@@ -115,7 +118,9 @@ def test_corrupted_evidence_cannot_hide_behind_same_merged_mansions(selected, mu
     assert audit.compare_case(row, result)
 
 
-def test_narrowed_passing_domain_is_rejected_before_calculation(tmp_path, monkeypatch):
+def test_narrowed_passing_domain_is_rejected_before_calculation(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     changed = json.loads(audit.PROTOCOL.read_bytes())
     changed["counts"]["japanese_naoj_historical_utc09"] -= 1
     replacement = tmp_path / "narrowed.json"
@@ -129,8 +134,8 @@ def test_narrowed_passing_domain_is_rejected_before_calculation(tmp_path, monkey
     "mutation", ["first_calculation", "second_calculation", "model_previous_year"]
 )
 def test_each_reconstruction_must_carry_its_actual_inputs_and_both_calculations(
-    selected, mutation
-):
+    selected, mutation: str
+) -> None:
     row = next(
         r
         for r in selected

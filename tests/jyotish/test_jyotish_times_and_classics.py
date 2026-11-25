@@ -12,14 +12,14 @@ import pytest
 
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.birth import build_astro_birth_info
-from fatebridge.core.jyotish import (
+from fatebridge.core.jyotish.jyotish import (
     GRAHAS,
     build_india,
     divisional_chart,
     positions,
     topic_evidence,
 )
-from fatebridge.core.jyotish_strength import (
+from fatebridge.core.jyotish.jyotish_strength import (
     SOURCE,
     SOURCE_ID,
     degree_condition,
@@ -40,6 +40,8 @@ def iers_offsets():
         fields = line.split()
         if not fields or fields[0].startswith("#"):
             continue
+        else:
+            pass
         _, day, month, year, offset = fields
         entries.append(
             (datetime(int(year), int(month), int(day), tzinfo=UTC), int(offset))
@@ -96,6 +98,8 @@ def assert_default_position_tt_trace(seen, raw, expected):
         assert result["status"] in {"computed", "not_evaluated"}
         if result["status"] == "computed":
             computed.add(planet)
+        else:
+            pass
     models = {raw["ephemeris_by_body"][planet] for planet in computed}
     assert models <= {"swieph", "jpl"}
     frame = equatorial | swe.FLG_XYZ | swe.FLG_ICRS | swe.FLG_J2000
@@ -110,7 +114,7 @@ def assert_default_position_tt_trace(seen, raw, expected):
     assert Counter((body, flags) for _, body, flags in seen) == required
 
 
-def test_primary_iers_response_is_frozen_and_dates_are_ordered():
+def test_primary_iers_response_is_frozen_and_dates_are_ordered() -> None:
     assert (
         hashlib.sha256(TIME_REFERENCE["source_text"].encode()).hexdigest()
         == TIME_REFERENCE["response_sha256"]
@@ -131,9 +135,9 @@ def test_primary_iers_response_is_frozen_and_dates_are_ordered():
 @pytest.mark.native_engine_fault
 @pytest.mark.parametrize("effective,offset", iers_offsets())
 def test_native_planets_use_primary_iers_tt_at_each_offset_transition(
-    effective, offset, monkeypatch
-):
-    from fatebridge.core import jyotish
+    effective, offset, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from fatebridge.core.jyotish import jyotish
 
     real_calc = runtime.ephemeris_call
     real_motion = jyotish.longitude_motion
@@ -175,6 +179,8 @@ def test_native_planets_use_primary_iers_tt_at_each_offset_transition(
         # probes run internally, outside the displayed-coordinate request.
         if operation == "calc":
             (auxiliary if in_auxiliary else seen).append(tuple(args))
+        else:
+            pass
         return real_calc(operation, *args, **kwargs)
 
     monkeypatch.setattr(runtime, "ephemeris_call", calculate)
@@ -185,6 +191,8 @@ def test_native_planets_use_primary_iers_tt_at_each_offset_transition(
     instants = [(effective, offset)]
     if effective.year > 1972 or effective.month > 1:
         instants.append((effective - timedelta(seconds=1), offset - 1))
+    else:
+        pass
     for instant, tai_minus_utc in instants:
         seen.clear()
         auxiliary.clear()
@@ -207,8 +215,8 @@ def test_native_planets_use_primary_iers_tt_at_each_offset_transition(
 @pytest.mark.native_engine_fault
 @pytest.mark.parametrize("year", [2030, 2050, 2099, 2200])
 def test_future_utc_never_silently_switches_to_ut1_or_claims_known_future_leaps(
-    year, monkeypatch
-):
+    year: int, monkeypatch: pytest.MonkeyPatch
+) -> None:
     def cannot_use_heuristic(*args):
         pytest.fail(
             "Post-1972 UTC must use the explicit leap policy, not Swiss UTC/UT1 heuristics"
@@ -230,7 +238,7 @@ def test_future_utc_never_silently_switches_to_ut1_or_claims_known_future_leaps(
     assert abs(raw["julian_day_tt"] - raw["julian_day_ut"] - delta) * 86400 < 0.00005
 
 
-def test_leap_table_expiry_is_reported_at_the_exact_boundary():
+def test_leap_table_expiry_is_reported_at_the_exact_boundary() -> None:
     expiry = datetime(2027, 6, 28, tzinfo=UTC)
     for instant, assumed in [(expiry - timedelta(seconds=1), False), (expiry, True)]:
         raw = positions(birth_at(instant), instant)
@@ -240,7 +248,9 @@ def test_leap_table_expiry_is_reported_at_the_exact_boundary():
         )
 
 
-def test_historical_input_is_labeled_as_ut1_assumption_without_invented_utc_jd():
+def test_historical_input_is_labeled_as_ut1_assumption_without_invented_utc_jd() -> (
+    None
+):
     raw = positions(birth_at(datetime(1900, 1, 1, tzinfo=UTC)))
     assert raw["julian_day_utc"] is None
     assert (
@@ -256,7 +266,9 @@ def test_historical_input_is_labeled_as_ut1_assumption_without_invented_utc_jd()
         "cases"
     ],
 )
-def test_indian_historical_utc_uses_independent_iers_affine_offset(stamp, offset):
+def test_indian_historical_utc_uses_independent_iers_affine_offset(
+    stamp, offset
+) -> None:
     instant = datetime.fromisoformat(stamp)
     raw = positions(birth_at(instant))
     assert raw["julian_day_utc"] is not None
@@ -277,7 +289,9 @@ def test_indian_historical_utc_uses_independent_iers_affine_offset(stamp, offset
     )
 
 
-def test_birth_uncertainty_reports_when_only_part_of_the_interval_uses_future_assumptions():
+def test_birth_uncertainty_reports_when_only_part_of_the_interval_uses_future_assumptions() -> (
+    None
+):
     birth = birth_at(datetime(2027, 6, 27, 23, 59, tzinfo=UTC))
     india = build_india(birth, divisions=[], birth_time_uncertainty_minutes=2)
     assert (
@@ -290,7 +304,9 @@ def test_birth_uncertainty_reports_when_only_part_of_the_interval_uses_future_as
     )
 
 
-def test_identified_scan_and_visually_reviewed_worked_example_override_bad_ocr():
+def test_identified_scan_and_visually_reviewed_worked_example_override_bad_ocr() -> (
+    None
+):
     assert SOURCE_ID == CLASSICAL["source_id"]
     assert SOURCE["sha256"] == CLASSICAL["scan_sha256"]
     worked = CLASSICAL["worked_uchcha"]
@@ -304,7 +320,7 @@ def test_identified_scan_and_visually_reviewed_worked_example_override_bad_ocr()
 @pytest.mark.parametrize("planet,orbs", list(CLASSICAL["solar_orbs"].items()))
 def test_author_specific_solar_orbs_both_directions_and_adjacent_float_boundaries(
     planet, orbs
-):
+) -> None:
     for direction, speed in [("direct", 0.1), ("retrograde", -0.1)]:
         orb = orbs[direction]
         if orb is None:
@@ -313,6 +329,8 @@ def test_author_specific_solar_orbs_both_directions_and_adjacent_float_boundarie
                 == "direction_not_covered"
             )
             continue
+        else:
+            pass
         at = solar_orb_condition(planet, orb, 0, speed)
         assert at["orb_degrees"] == orb
         assert at["status"] == "at_orb_boundary"
@@ -332,7 +350,7 @@ def test_author_specific_solar_orbs_both_directions_and_adjacent_float_boundarie
         assert at["source_layer"] == "translator_commentary"
 
 
-def test_solar_orb_wrap_and_stationary_ambiguity_are_not_rounded_away():
+def test_solar_orb_wrap_and_stationary_ambiguity_are_not_rounded_away() -> None:
     assert solar_orb_condition("Venus", 7, 359, -0.1)["status"] == "at_orb_boundary"
     assert (
         solar_orb_condition("Venus", math.nextafter(7, -math.inf), 359, -0.1)[
@@ -350,13 +368,17 @@ def test_solar_orb_wrap_and_stationary_ambiguity_are_not_rounded_away():
 
 
 @pytest.mark.parametrize("point", ["Sun", "Rahu", "Ketu"])
-def test_sun_and_nodes_are_never_assigned_an_author_solar_orb_verdict(point):
+def test_sun_and_nodes_are_never_assigned_an_author_solar_orb_verdict(
+    point: str,
+) -> None:
     assert "combustion" not in physical_state(point, 0, 0, 0, -0.1)
     with pytest.raises(ValueError):
         solar_orb_condition(point, 0, 0, -0.1)
 
 
-def test_empty_division_selection_does_not_project_physical_conditions_to_vargas():
+def test_empty_division_selection_does_not_project_physical_conditions_to_vargas() -> (
+    None
+):
     india = build_india(birth_at(datetime(1990, 4, 6, tzinfo=UTC)), divisions=[])
     assert set(india["charts"]) == {"D1"}
     assert india["profile"]["time_scale_context"]["planet_timescale"] == "TT"
@@ -367,24 +389,24 @@ def test_empty_division_selection_does_not_project_physical_conditions_to_vargas
 
 
 @pytest.mark.parametrize(
-    "status,phrase",
+    "status",
     [
-        ("within_orb", "符合 Santhanam"),
-        ("outside_orb", "本条件未触发"),
-        ("at_orb_boundary", "保留未裁定"),
-        ("stationary_direction_ambiguous", "黄经速度为零"),
-        ("direction_not_covered", "此项未覆盖"),
+        "within_orb",
+        "outside_orb",
+        "at_orb_boundary",
+        "stationary_direction_ambiguous",
+        "direction_not_covered",
     ],
 )
-def test_topic_interpretation_states_the_actual_solar_orb_result(status, phrase):
-    # Synthetic structured evidence tests narration routing only. It is neither
-    # a celestial reference case nor a real-world prediction sample.
+def test_topic_evidence_carries_the_actual_solar_orb_result(status: str) -> None:
     raw = {"ascendant": 0.0, "longitudes": {p: 40.0 for p in GRAHAS}}
     chart = divisional_chart(raw, 1)
     for point in chart["planets"]:
         point["physical_state"] = physical_state(point["id"], 40, 0, 0, 0.1)
         if "combustion" in point["physical_state"]:
             point["physical_state"]["combustion"]["status"] = status
+        else:
+            pass
     factors = [
         f
         for f in topic_evidence({"D1": chart})["career"]["factors"]
@@ -393,4 +415,4 @@ def test_topic_interpretation_states_the_actual_solar_orb_result(status, phrase)
     # Aries H10 is Capricorn, whose ruler Saturn has this explicit evidence.
     assert len(factors) == 1
     assert factors[0]["fact"]["status"] == status
-    assert phrase in factors[0]["traditional_interpretation"]
+    assert factors[0]["fact_path"].endswith(".physical_state.combustion")

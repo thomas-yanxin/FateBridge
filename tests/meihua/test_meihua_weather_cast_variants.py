@@ -8,9 +8,9 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.meihua_weather import build_weather_interpretation
+from fatebridge.core.meihua.meihua_weather import build_weather_interpretation
 from fatebridge.services.meihua import calculate_meihua_cast
-from fatebridge.validation.meihua_weather_cast_variants import (
+from validation.meihua_weather_cast_variants import (
     audit_weather_cast_variants,
 )
 
@@ -36,14 +36,20 @@ def resolve(output, path):
 def normalize_paths(value, prefix):
     if isinstance(value, str) and value.startswith(prefix):
         return "meihua" + value.removeprefix(prefix)
+    else:
+        pass
     if isinstance(value, dict):
         return {k: normalize_paths(v, prefix) for k, v in value.items()}
+    else:
+        pass
     if isinstance(value, list):
         return [normalize_paths(v, prefix) for v in value]
+    else:
+        pass
     return value
 
 
-def test_frozen_manual_candidate_geometry_and_conditions():
+def test_frozen_manual_candidate_geometry_and_conditions() -> None:
     report = audit_weather_cast_variants(REFERENCES)
     assert report["selected_checks_passed"], report["cases"]
     assert report["independent_manual_probe_count"] == 7
@@ -55,7 +61,7 @@ def test_frozen_manual_candidate_geometry_and_conditions():
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
-def test_every_candidate_uses_own_facts_and_same_context_without_new_cast(case):
+def test_every_candidate_uses_own_facts_and_same_context_without_new_cast(case) -> None:
     output = calculate(case)
     weather = output["interpretation"]["weather"]
     compact = weather["casting_variants"]
@@ -68,6 +74,8 @@ def test_every_candidate_uses_own_facts_and_same_context_without_new_cast(case):
     if not compact:
         assert weather["casting_comparison"]["candidate_count"] == 0
         return
+    else:
+        pass
     assert sum(v["selected"] for v in compact) == 1
     selected = next(v for v in compact if v["selected"])
     assert selected["line_sum_basis"] == output["meihua"]["seed"]["line_sum_basis"]
@@ -102,7 +110,7 @@ def test_every_candidate_uses_own_facts_and_same_context_without_new_cast(case):
 
 
 @pytest.mark.parametrize("case", CASES[:5], ids=lambda c: c["id"])
-def test_candidate_evaluation_matches_standalone_given_cast_integration(case):
+def test_candidate_evaluation_matches_standalone_given_cast_integration(case) -> None:
     # Integration equivalence is not counted as an independent mathematical oracle.
     output = calculate(case)
     weather = output["interpretation"]["weather"]
@@ -127,7 +135,7 @@ def test_candidate_evaluation_matches_standalone_given_cast_integration(case):
         )
 
 
-def test_context_agreement_is_not_universal_cast_or_forecast_agreement():
+def test_context_agreement_is_not_universal_cast_or_forecast_agreement() -> None:
     summer, winter = (calculate(c)["interpretation"]["weather"] for c in CASES[3:5])
     assert (
         summer["casting_comparison"]["status"]
@@ -139,7 +147,7 @@ def test_context_agreement_is_not_universal_cast_or_forecast_agreement():
     assert summer["single_forecast"] is winter["single_forecast"] is None
 
 
-def test_missing_season_keeps_the_affected_candidate_pending():
+def test_missing_season_keeps_the_affected_candidate_pending() -> None:
     case = deepcopy(CASES[3])
     case["context"]["season"] = None
     weather = calculate(case)["interpretation"]["weather"]
@@ -156,7 +164,7 @@ def test_missing_season_keeps_the_affected_candidate_pending():
     assert weather["casting_comparison"]["status"] == "different_rule_results"
 
 
-def test_source_control_difference_is_not_hidden_by_same_symbol_presence():
+def test_source_control_difference_is_not_hidden_by_same_symbol_presence() -> None:
     output = calculate(CASES[2])
     weather = output["interpretation"]["weather"]
     assert (
@@ -178,7 +186,7 @@ def test_source_control_difference_is_not_hidden_by_same_symbol_presence():
     assert reduced["controlled_tags"] == [] and reduced["conditional_tags"] == ["wind"]
 
 
-def test_candidate_weather_does_not_use_body_use_or_editorial_meanings():
+def test_candidate_weather_does_not_use_body_use_or_editorial_meanings() -> None:
     output = calculate(CASES[0])
     altered = deepcopy(output["meihua"])
     for row in altered["counting_variants"]:
@@ -190,7 +198,7 @@ def test_candidate_weather_does_not_use_body_use_or_editorial_meanings():
     ) == build_weather_interpretation(output["meihua"], CASES[0]["context"])
 
 
-def test_rehashed_false_expected_candidate_is_still_reported(tmp_path):
+def test_rehashed_false_expected_candidate_is_still_reported(tmp_path: Path) -> None:
     directory = tmp_path / REFERENCES.name
     shutil.copytree(REFERENCES, directory)
     shutil.copytree(

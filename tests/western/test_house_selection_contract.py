@@ -12,14 +12,9 @@ from fatebridge.utils.house_systems import (
     normalize_house_system,
     parse_house_code,
 )
-from tests.fixtures.surface_payloads import MCP_CASES, REST_POST_CASES
-
-HOUSE_SPECS = [s for s in CATALOG if "house_system" in s.request_model.model_fields]
-CODE_SPECS = [s for s in CATALOG if "hsys" in s.request_model.model_fields]
-
-
-def inputs(spec):
-    return (REST_POST_CASES.get(spec.rest_path) or MCP_CASES[spec.tool_name][1])()
+from tests.unit_test.fixtures.house_system import HOUSE_CODE_SPECS as CODE_SPECS
+from tests.unit_test.fixtures.house_system import HOUSE_SYSTEM_SPECS as HOUSE_SPECS
+from tests.unit_test.fixtures.house_system import house_system_payload as inputs
 
 
 @pytest.mark.parametrize(
@@ -59,7 +54,7 @@ def inputs(spec):
         ("Ｐ", "P"),
     ],
 )
-def test_declared_names_resolve_to_the_source_definition(name, code):
+def test_declared_names_resolve_to_the_source_definition(name: str, code: str) -> None:
     assert normalize_house_system(name) == code
 
 
@@ -87,13 +82,13 @@ def test_declared_names_resolve_to_the_source_definition(name, code):
         {},
     ],
 )
-def test_explicit_invalid_selection_never_substitutes_another_chart(value):
+def test_explicit_invalid_selection_never_substitutes_another_chart(value) -> None:
     with pytest.raises(InvalidHouseSystemError):
         normalize_house_system(value)
 
 
 @pytest.mark.parametrize("value", [True, False, 8.0, 3.7, 99, -1, "unknown", "", "  "])
-def test_both_request_families_reject_invalid_values_before_dispatch(value):
+def test_both_request_families_reject_invalid_values_before_dispatch(value) -> None:
     for field, specs, expected in (
         ("house_system", HOUSE_SPECS, "invalid_house_system"),
         ("hsys", CODE_SPECS, "invalid_house_code"),
@@ -107,7 +102,7 @@ def test_both_request_families_reject_invalid_values_before_dispatch(value):
             assert issue["type"] == expected, (spec.key, issue)
 
 
-def test_defaults_require_a_missing_override_and_validate_configuration():
+def test_defaults_require_a_missing_override_and_validate_configuration() -> None:
     assert normalize_house_system(None) == "P"
     assert normalize_house_system(None, default="Regiomontanus") == "R"
     assert normalize_house_system(0, default="R") == "W"
@@ -122,13 +117,13 @@ def test_defaults_require_a_missing_override_and_validate_configuration():
 @pytest.mark.parametrize(
     "code,letter", list(enumerate(["W", "B", "R", "P", "K", "V", "T", "S", "D"]))
 )
-def test_numeric_codes_have_one_unambiguous_meaning(code, letter):
+def test_numeric_codes_have_one_unambiguous_meaning(code, letter) -> None:
     assert parse_house_code(code) == parse_house_code(str(code)) == code
     assert normalize_house_system(code) == letter
     assert _coerce_house_system_code(code) == code
 
 
-def test_internal_numeric_coercion_does_not_truncate_or_accept_booleans():
+def test_internal_numeric_coercion_does_not_truncate_or_accept_booleans() -> None:
     for value in (True, False, 3.7, 8.0, 99, "unknown"):
         assert _coerce_house_system_code(value) is None
         with pytest.raises(InvalidHouseCodeError):
@@ -139,7 +134,9 @@ def test_internal_numeric_coercion_does_not_truncate_or_accept_booleans():
     assert _coerce_house_system_code("Axial Rotation") is None  # not in the0..8 family
 
 
-def test_previously_unlabelled_codes_have_named_metadata_and_distinct_sunshine_modes():
+def test_previously_unlabelled_codes_have_named_metadata_and_distinct_sunshine_modes() -> (
+    None
+):
     for code, key in {
         "F": "carter_poli_equatorial",
         "I": "sunshine",
@@ -154,7 +151,7 @@ def test_previously_unlabelled_codes_have_named_metadata_and_distinct_sunshine_m
         assert info["house_system_label_zh"] != code
 
 
-def test_every_representative_request_and_optional_missing_hsys_remains_valid():
+def test_every_representative_request_and_optional_missing_hsys_remains_valid() -> None:
     for spec in CATALOG:
         spec.request_model.model_validate(inputs(spec))
     from fatebridge.core.requests.astrology import AstroChartRequest
@@ -163,7 +160,7 @@ def test_every_representative_request_and_optional_missing_hsys_remains_valid():
     assert AstroChartRequest.model_validate({**inputs(spec), "hsys": None}).hsys is None
 
 
-def test_numeric_request_schema_advertises_the_actual_range():
+def test_numeric_request_schema_advertises_the_actual_range() -> None:
     for spec in CODE_SPECS:
         field = spec.request_model.model_json_schema()["properties"]["hsys"]
         shape = next(
@@ -172,7 +169,7 @@ def test_numeric_request_schema_advertises_the_actual_range():
         assert shape["minimum"] == 0 and shape["maximum"] == 8, spec.key
 
 
-def test_existing_strict_integer_domain_does_not_gain_string_coercion():
+def test_existing_strict_integer_domain_does_not_gain_string_coercion() -> None:
     spec = next(s for s in CODE_SPECS if s.key == "otherbu")
     with pytest.raises(ValidationError) as caught:
         spec.request_model.model_validate({**inputs(spec), "hsys": "3"})

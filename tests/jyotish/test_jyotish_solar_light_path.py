@@ -8,15 +8,15 @@ import pytest
 from fatebridge.core import compressed_ephemeris as context
 from fatebridge.core import ephemeris_runtime as e
 from tests.jyotish.test_jyotish_planet_light_path import requested_epoch, tt
-from tests.jyotish.test_jyotish_sources import restore_runtime  # noqa: F401
+from tests.unit_test.fixtures.jyotish_sources import restore_runtime  # noqa: F401
 
 
 @pytest.mark.parametrize("year", range(600, 9601, 600))
 @pytest.mark.parametrize("operation", ["calc", "calc_ut"])
 @pytest.mark.parametrize("frame", ["tropical", "lahiri", "equatorial", "icrf"])
 def test_two_exact_solar_nodes_and_rebuilt_observer_keep_original_request(
-    year, operation, frame
-):
+    year, operation: str, frame: str
+) -> None:
     e.configure_ephemeris_path(str(Path(__file__).resolve().parents[2] / "ephe"))
     e.ephemeris_call("set_sid_mode", e.swe.SIDM_LAHIRI, 0, 0)
     flags = (
@@ -65,7 +65,7 @@ def test_two_exact_solar_nodes_and_rebuilt_observer_keep_original_request(
 
 
 @pytest.mark.parametrize("flag", [16, 16384, 8, 32768, 128, 1048576])
-def test_solar_other_definitions_do_not_claim_two_node_coherence(flag):
+def test_solar_other_definitions_do_not_claim_two_node_coherence(flag: int) -> None:
     def forbidden(*args):
         raise AssertionError("Unsupported solar definition invoked a preflight")
 
@@ -81,8 +81,8 @@ def test_solar_other_definitions_do_not_claim_two_node_coherence(flag):
     [[], ["sepl_18.se1", "semo_18.se1"]],
 )
 def test_solar_actual_native_backend_survives_unavailable_auxiliary_files(
-    tmp_path, files
-):
+    tmp_path: Path, files
+) -> None:
     root = Path(__file__).resolve().parents[2] / "ephe"
     for name in files:
         shutil.copy2(root / name, tmp_path / name)
@@ -98,9 +98,13 @@ def test_solar_actual_native_backend_survives_unavailable_auxiliary_files(
     assert receipt["solar_light_path"]["status"] == "not_applied"
     if files:
         assert receipt["solar_light_path"]["native_context_restarted"] is True
+    else:
+        pass
 
 
-def test_partial_files_with_actual_covering_headers_still_repair_sun(tmp_path):
+def test_partial_files_with_actual_covering_headers_still_repair_sun(
+    tmp_path: Path,
+) -> None:
     root = Path(__file__).resolve().parents[2] / "ephe"
     for name in ["sepl_12.se1", "sepl_18.se1", "semo_18.se1"]:
         shutil.copy2(root / name, tmp_path / name)
@@ -128,7 +132,7 @@ def test_partial_files_with_actual_covering_headers_still_repair_sun(tmp_path):
     )
 
 
-def test_solar_endpoint_and_light_path_triggers_are_separate_evidence():
+def test_solar_endpoint_and_light_path_triggers_are_separate_evidence() -> None:
     with context.audit_compressed_endpoints():
         evidence = context.endpoint_context_evidence()
     assert (

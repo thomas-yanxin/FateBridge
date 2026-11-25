@@ -20,7 +20,9 @@ PROFILE = json.loads(
 )
 
 
-def test_all_original_cohorts_are_required_without_expanding_the_shared_verifier():
+def test_all_original_cohorts_are_required_without_expanding_the_shared_verifier() -> (
+    None
+):
     prepared = MODULE.prepare(deepcopy(PROFILE))
     assert [(name, len(ref["cases"])) for name, ref in prepared["cohorts"]] == [
         ("original19", 19),
@@ -51,8 +53,8 @@ def test_all_original_cohorts_are_required_without_expanding_the_shared_verifier
     ],
 )
 def test_original_plan_and_every_preserved_source_cannot_be_rewritten(
-    tmp_path, changed
-):
+    tmp_path: Path, changed
+) -> None:
     plan = json.loads((ROOT / MODULE.PLAN).read_text())
     for name in [
         MODULE.PLAN,
@@ -70,8 +72,8 @@ def test_original_plan_and_every_preserved_source_cannot_be_rewritten(
 
 @pytest.mark.parametrize("tamper", ["drop_middle", "reorder", "birth", "complete"])
 def test_profile_subset_reordering_changed_input_and_false_completion_are_rejected(
-    tamper,
-):
+    tamper: str,
+) -> None:
     profile = deepcopy(PROFILE)
     if tamper == "drop_middle":
         profile["cases"].pop(12)
@@ -89,7 +91,9 @@ def test_profile_subset_reordering_changed_input_and_false_completion_are_reject
         MODULE.prepare(profile)
 
 
-def test_all_failed_rows_stay_in_each_denominator_and_no_report_row_can_disappear():
+def test_all_failed_rows_stay_in_each_denominator_and_no_report_row_can_disappear() -> (
+    None
+):
     prepared = MODULE.prepare(deepcopy(PROFILE))
     # Synthetic report only: this deliberately failing input is not a chart oracle.
     rows = [

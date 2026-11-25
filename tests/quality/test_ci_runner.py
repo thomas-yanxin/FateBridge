@@ -8,7 +8,7 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 
 
-def test_repository_helpers_precede_dependency_tests_module(tmp_path):
+def test_repository_helpers_precede_dependency_tests_module(tmp_path: Path) -> None:
     (tmp_path / "tests.py").write_text(
         "raise AssertionError('dependency tests module imported')\n", encoding="utf-8"
     )
@@ -23,7 +23,7 @@ def test_repository_helpers_precede_dependency_tests_module(tmp_path):
     assert result.returncode == 0, result.stdout + result.stderr
 
 
-def test_shards_cover_every_eligible_node_once(tmp_path):
+def test_shards_cover_every_eligible_node_once(tmp_path: Path) -> None:
     source = tmp_path / "test_cases.py"
     source.write_text(
         "import pytest\n"
@@ -72,7 +72,7 @@ def test_shards_cover_every_eligible_node_once(tmp_path):
     assert set(weights) <= set(collected)
 
 
-def test_invalid_partition_is_rejected_before_collection():
+def test_invalid_partition_is_rejected_before_collection() -> None:
     root = Path(__file__).resolve().parents[2]
     result = subprocess.run(
         [
@@ -93,7 +93,7 @@ def test_invalid_partition_is_rejected_before_collection():
     assert "shard-index must be in" in result.stderr
 
 
-def test_distributed_workers_write_one_intact_coverage_report(tmp_path):
+def test_distributed_workers_write_one_intact_coverage_report(tmp_path: Path) -> None:
     root = Path(__file__).resolve().parents[2]
     source = tmp_path / "test_cases.py"
     source.write_text(

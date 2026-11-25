@@ -7,6 +7,7 @@ from dataclasses import replace
 import pytest
 from pydantic import ValidationError
 
+import fatebridge.services.divination as service
 from fatebridge.application.execution import execute_tool
 from fatebridge.application.meihua_clock_binding import require_meihua_clock_binding
 from fatebridge.core.requests.divination import MeihuaAnalysisRequest
@@ -21,7 +22,7 @@ TOPICS = MeihuaAnalysisRequest.model_json_schema()["properties"][
 ]["enum"]
 
 
-def test_all_sixteen_states_and_source_principles_precede_implementation():
+def test_all_sixteen_states_and_source_principles_precede_implementation() -> None:
     protocol = json.loads((FOLDER / "protocol.json").read_bytes())
     assert protocol["frozen_before_production_edits"]
     assert not protocol["expected_values_from_FateBridge"]
@@ -32,14 +33,14 @@ def test_all_sixteen_states_and_source_principles_precede_implementation():
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
 @pytest.mark.parametrize("topic", TOPICS)
-def test_all_declared_component_states_on_every_published_chapter(case, topic):
+def test_all_declared_component_states_on_every_published_chapter(case, topic) -> None:
     out = calculate_meihua_analysis(**case["arguments"], interpretation_topic=topic)
     assert "error" not in out
     assert_clock_input(out, case, "direct_service_optional_components")
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
-def test_bound_request_components_and_full_guard_match_independent_truth(case):
+def test_bound_request_components_and_full_guard_match_independent_truth(case) -> None:
     request = MeihuaAnalysisRequest(**case["arguments"])
     out = execute_tool(SPEC, request)
     assert "error" not in out
@@ -48,8 +49,9 @@ def test_bound_request_components_and_full_guard_match_independent_truth(case):
 
 
 @pytest.mark.parametrize("minute", [True, False, -1, 60, 1.0, 1.5, "1", {}, []])
-def test_invalid_or_coerced_minutes_never_reach_calendar(minute, monkeypatch):
-    import fatebridge.services.divination as service
+def test_invalid_or_coerced_minutes_never_reach_calendar(
+    minute, monkeypatch: pytest.MonkeyPatch
+) -> None:
 
     args = {**CASES[0]["arguments"], "analysis_minute": minute}
     with pytest.raises(ValidationError):
@@ -66,7 +68,7 @@ def test_invalid_or_coerced_minutes_never_reach_calendar(minute, monkeypatch):
     assert out["issues"][0]["path"] == "analysis_minute" and not called
 
 
-def test_omission_null_and_known_zero_have_honest_replay_identity():
+def test_omission_null_and_known_zero_have_honest_replay_identity() -> None:
     args = CASES[0]["arguments"]
     variants = [{}, {"analysis_minute": None}, {"analysis_minute": 0}]
     rows = [execute_tool(SPEC, MeihuaAnalysisRequest(**args, **v)) for v in variants]
@@ -108,17 +110,16 @@ def test_omission_null_and_known_zero_have_honest_replay_identity():
         "accuracy",
         "provenance",
         "nominal",
-        "missing_notice",
-        "duplicate_notice",
         "trace",
         "scope",
         "scope_basis",
         "classical_precision",
         "extra_accuracy_claim",
-        "changed_statement",
     ],
 )
-def test_forged_precision_or_request_binding_fails_before_projection(mutation):
+def test_forged_precision_or_request_binding_fails_before_projection(
+    mutation: str,
+) -> None:
     request = MeihuaAnalysisRequest(**CASES[0]["arguments"])
     good = execute_tool(SPEC, request)
     out = deepcopy({k: v for k, v in good.items() if k != "run_metadata"})
@@ -140,14 +141,6 @@ def test_forged_precision_or_request_binding_fails_before_projection(mutation):
         receipt["provenance"] = "guessed_components"
     elif mutation == "nominal":
         receipt["nominal_civil_datetime"] = "2000-01-06T09:01:00+08:00"
-    elif mutation in {"missing_notice", "duplicate_notice"}:
-        text = out["summary"]
-        text = (
-            text.replace(receipt["statement"] + " ", "", 1)
-            if mutation == "missing_notice"
-            else receipt["statement"] + " " + text
-        )
-        out["summary"] = out["interpretation"]["comprehensive_judgement"] = text
     elif mutation == "trace":
         out["meihua"]["rule_trace"][-1] = {
             **out["meihua"]["rule_trace"][-1],
@@ -166,11 +159,7 @@ def test_forged_precision_or_request_binding_fails_before_projection(mutation):
     elif mutation == "extra_accuracy_claim":
         receipt["unverified_accuracy"] = "perfect"
     else:
-        old = receipt["statement"]
-        receipt["statement"] = "记录精度已核实"
-        out["summary"] = out["interpretation"]["comprehensive_judgement"] = out[
-            "summary"
-        ].replace(old, receipt["statement"], 1)
+        pass
     with pytest.raises(ValueError):
         require_meihua_clock_binding(out, request)
     forged = replace(SPEC, bind=lambda request: (lambda: out, (), {}))
@@ -178,7 +167,7 @@ def test_forged_precision_or_request_binding_fails_before_projection(mutation):
     assert failure["status_code"] == 500 and failure["error_code"] == "internal_error"
 
 
-def test_internal_presence_flags_are_not_published_user_parameters():
+def test_internal_presence_flags_are_not_published_user_parameters() -> None:
     assert "_clock_supplied_components" not in MeihuaAnalysisRequest.model_fields
     with pytest.raises(ValidationError):
         MeihuaAnalysisRequest(

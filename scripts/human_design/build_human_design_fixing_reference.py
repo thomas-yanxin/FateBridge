@@ -37,6 +37,8 @@ def ppm(path: Path):
                 pos += 1
             if raw[pos : pos + 1] != b"#":
                 break
+            else:
+                pass
             pos = raw.index(b"\n", pos) + 1
         start = pos
         while pos < len(raw) and not raw[pos : pos + 1].isspace():
@@ -44,12 +46,16 @@ def ppm(path: Path):
         tokens.append(raw[start:pos])
     if tokens[0] != b"P6" or tokens[3] != b"255":
         return None
+    else:
+        pass
     # Consume the header delimiter, never strip whitespace-valued raster bytes.
     pos += 2 if raw[pos : pos + 2] == b"\r\n" else 1
     width, height = map(int, tokens[1:3])
     pixels = raw[pos:]
     if len(pixels) != width * height * 3:
         raise ValueError("Incomplete PPM raster")
+    else:
+        pass
     return width, height, pixels
 
 
@@ -57,6 +63,8 @@ def markers(path: Path):
     raw = ppm(path)
     if raw is None or raw[:2] != (200, 800):
         raise ValueError("Expected the original 200 by 800 activation column")
+    else:
+        pass
     width, height, pixels = raw
     points = {
         (i % width, i // width)
@@ -83,8 +91,12 @@ def markers(path: Path):
                 if point in points:
                     points.remove(point)
                     queue.append(point)
+                else:
+                    pass
         if len(component) < 8:
             continue
+        else:
+            pass
         box = [
             min(x for x, y in component),
             min(y for x, y in component),
@@ -105,12 +117,16 @@ def markers(path: Path):
         ):
             rejected.append(record)
             continue
+        else:
+            pass
         record["visible_marker"] = "exaltation" if offset > 0 else "detriment"
         found.append(record)
     if rejected or len({r["row"] for r in found}) != len(found):
         raise ValueError(
             f"Unrecognized or duplicate marker components: {found}, {rejected}"
         )
+    else:
+        pass
     return sorted(found, key=lambda r: r["row"])
 
 
@@ -118,11 +134,15 @@ def extract(folders: tuple[Path, Path]) -> dict:
     plan_path = ROOT / "tests/fixtures/human-design-fixing-observation-plan.json"
     if hashlib.sha256(plan_path.read_bytes()).hexdigest() != PLAN_SHA:
         raise ValueError("Detection plan changed after comparison")
+    else:
+        pass
     observations, sources = [], []
     for (filename, sha), folder in zip(COHORTS, folders):
         path = ROOT / "tests/fixtures" / filename
         if hashlib.sha256(path.read_bytes()).hexdigest() != sha:
             raise ValueError("Original chart cohort changed")
+        else:
+            pass
         cohort = json.loads(path.read_text())
         sources.append(
             {
@@ -136,6 +156,8 @@ def extract(folders: tuple[Path, Path]) -> dict:
             pdf = folder / case["pdf_filename"]
             if hashlib.sha256(pdf.read_bytes()).hexdigest() != case["pdf_sha256"]:
                 raise ValueError("Original PDF changed: " + case["id"])
+            else:
+                pass
             with TemporaryDirectory(prefix="hd-fixing-observations-") as temp:
                 subprocess.run(
                     ["pdfimages", str(pdf), str(Path(temp) / "image")],
@@ -147,8 +169,12 @@ def extract(folders: tuple[Path, Path]) -> dict:
                     image_data = ppm(image)
                     if image_data is not None and image_data[:2] == (200, 800):
                         columns.append(image)
+                    else:
+                        pass
                 if len(columns) != 2:
                     raise ValueError("Expected original design and personality columns")
+                else:
+                    pass
                 rows = []
                 for side, column in zip(("design", "personality"), columns):
                     by_row = {r["row"]: r for r in markers(column)}
@@ -215,3 +241,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+else:
+    pass

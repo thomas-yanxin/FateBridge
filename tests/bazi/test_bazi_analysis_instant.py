@@ -8,8 +8,8 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from fatebridge.core.execution_context import call_clock
-from fatebridge.core.output_timing import AnalysisReference
+from fatebridge.core.contracts.output_timing import AnalysisReference
+from fatebridge.core.execution_context import ExecutionOptions, call_clock
 from fatebridge.core.reproducibility import BAZI_ANALYSIS_CLOCK_TOOLS
 from fatebridge.core.timing import TimingAnalysis
 from fatebridge.services.timing_clock import DATE_FIELDS, resolve_analysis_moment
@@ -19,7 +19,7 @@ FIXTURE = ROOT / "tests/data/bazi_analysis_instant_v1"
 
 
 @pytest.mark.parametrize("tool", sorted(BAZI_ANALYSIS_CLOCK_TOOLS))
-def test_all_absent_components_keep_one_complete_execution_instant(tool):
+def test_all_absent_components_keep_one_complete_execution_instant(tool) -> None:
     with call_clock("2025-02-04T04:37:49.123456Z") as clock:
         selected = resolve_analysis_moment(tool, "Asia/Shanghai")
         assert selected.moment.isoformat() == "2025-02-04T12:37:49.123456+08:00"
@@ -41,8 +41,8 @@ def test_all_absent_components_keep_one_complete_execution_instant(tool):
     ],
 )
 def test_explicit_partial_inputs_keep_their_declared_completion_policy(
-    tool, expected, clock_fields
-):
+    tool: str, expected: str, clock_fields
+) -> None:
     with call_clock("2025-03-20T04:37:49Z") as clock:
         selected = resolve_analysis_moment(
             tool, "Asia/Shanghai", analysis_year=2028, analysis_month=4
@@ -54,7 +54,7 @@ def test_explicit_partial_inputs_keep_their_declared_completion_policy(
 
 
 @pytest.mark.parametrize("tool", sorted(BAZI_ANALYSIS_CLOCK_TOOLS))
-def test_explicit_zero_hour_and_minute_are_not_replaced_by_now(tool):
+def test_explicit_zero_hour_and_minute_are_not_replaced_by_now(tool) -> None:
     with call_clock("2025-03-20T04:37:49Z") as clock:
         selected = resolve_analysis_moment(
             tool,
@@ -76,8 +76,8 @@ def test_explicit_zero_hour_and_minute_are_not_replaced_by_now(tool):
     "month,day,hour,token", [(3, 9, 2, "nonexistent"), (11, 2, 1, "ambiguous")]
 )
 def test_explicit_analysis_clock_never_silently_picks_a_fold_or_gap(
-    tool, month, day, hour, token
-):
+    tool, month: int, day: int, hour: int, token: str
+) -> None:
     with pytest.raises(ValueError, match=token):
         resolve_analysis_moment(
             tool,
@@ -90,7 +90,9 @@ def test_explicit_analysis_clock_never_silently_picks_a_fold_or_gap(
         )
 
 
-def test_known_as_of_instants_keep_both_folds_and_distinct_cached_month_day_windows():
+def test_known_as_of_instants_keep_both_folds_and_distinct_cached_month_day_windows() -> (
+    None
+):
     moments = []
     for stamp in ["2025-11-02T05:30:00Z", "2025-11-02T06:30:00Z"]:
         with call_clock(stamp):
@@ -120,14 +122,36 @@ def test_known_as_of_instants_keep_both_folds_and_distinct_cached_month_day_wind
         assert results[0]["pillar"] == results[1]["pillar"]
 
 
-def test_clock_contract_stays_projectable_and_fold_bounds_are_validated():
+def test_execution_clock_compares_wall_and_offset_tails_before_projection() -> None:
+    as_of = "2025-11-02T05:29:59.9999999-00:00:00.0000001"
+    assert ExecutionOptions(as_of=as_of).as_of == "2025-11-02T05:30:00Z"
+    with call_clock(as_of) as clock:
+        assert clock.instant.isoformat() == "2025-11-02T05:30:00+00:00"
+        selected = resolve_analysis_moment("timing_analysis", "America/New_York")
+    assert selected.moment.isoformat() == "2025-11-02T01:30:00-04:00"
+    for invalid in (
+        "2025-11-02T05:30:00+00:00:00.0000001",
+        "2026-11-04.1234561+00:00:00.0000001",
+        "2026-11-04T12:34:5.0000000+00:00",
+        "2026-11-04Z12:34:56+00:00",
+    ):
+        with pytest.raises(ValidationError) as rejected:
+            ExecutionOptions(as_of=invalid)
+        assert [error["loc"] for error in rejected.value.errors()] == [("as_of",)]
+        with pytest.raises(ValueError), call_clock(invalid):
+            pass
+
+
+def test_clock_contract_stays_projectable_and_fold_bounds_are_validated() -> None:
     AnalysisReference.model_validate({"basis": "implicit_execution_clock"})
     AnalysisReference.model_validate({"utc_datetime": "2025-02-04T04:37:49+00:00"})
     with pytest.raises(ValidationError):
         AnalysisReference.model_validate({"fold": 2})
 
 
-def test_supplemental_day_and_term_witnesses_keep_their_original_source_hashes():
+def test_supplemental_day_and_term_witnesses_keep_their_original_source_hashes() -> (
+    None
+):
     path = FIXTURE / "date-side-witnesses.json"
     assert (
         hashlib.sha256(path.read_bytes()).hexdigest()

@@ -9,14 +9,14 @@ import pytest
 
 from fatebridge.application.examples import suggested_fields
 from fatebridge.services.meihua import calculate_meihua_cast
-from fatebridge.validation.meihua_weather import audit_weather_gen_rain
 from tests.support.transports import SPECS, business, rest, surface_calls
+from validation.meihua_weather import audit_weather_gen_rain
 
 REFERENCES = Path(__file__).parents[1] / "fixtures/meihua_weather_gen_v4"
 CASES = json.loads((REFERENCES / "cases.json").read_text())["cases"]
 
 
-def test_source_readings_and_all_frozen_manual_probes():
+def test_source_readings_and_all_frozen_manual_probes() -> None:
     report = audit_weather_gen_rain(REFERENCES)
     assert report["selected_checks_passed"], report["cases"]
     assert report["selected_manual_facsimile_readings"] == 2
@@ -28,7 +28,7 @@ def test_source_readings_and_all_frozen_manual_probes():
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
-def test_many_gen_clear_is_not_the_generic_single_gen_rain_stop(case):
+def test_many_gen_clear_is_not_the_generic_single_gen_rain_stop(case) -> None:
     result = calculate_meihua_cast(
         casting=case["casting"],
         interpretation_topic="weather",
@@ -51,16 +51,20 @@ def test_many_gen_clear_is_not_the_generic_single_gen_rain_stop(case):
         if clear["effective_status"] == "conditional_on_unresolved_frequency":
             assert clear["conditional_tags"] == ["clear"]
             assert "频数范围未裁定" in readings[clear["rule_id"]]["reading"]
+        else:
+            pass
     else:
         assert clear["rule_id"] not in readings
     if case["id"] == "one_gen_rain_stop_is_not_clear_clause":
         assert stop["status"] == "matched"
         assert not any("clear" in r["effective_tags"] for r in trace.values())
+    else:
+        pass
     assert weather["single_forecast"] is None
     assert any("久晴不雨得此亦然" in text for text in weather["ruleset"]["unresolved"])
 
 
-def test_gen_clear_clause_is_not_cancelled_as_if_it_were_li_fire_clear():
+def test_gen_clear_clause_is_not_cancelled_as_if_it_were_li_fire_clear() -> None:
     result = calculate_meihua_cast(
         casting=CASES[0]["casting"],
         interpretation_topic="weather",
@@ -72,7 +76,7 @@ def test_gen_clear_clause_is_not_cancelled_as_if_it_were_li_fire_clear():
     assert rows["many_gen_long_rain_clear"]["controlled_tags"] == []
 
 
-def test_corrupt_gen_oracle_cannot_pass_even_after_rehash(tmp_path):
+def test_corrupt_gen_oracle_cannot_pass_even_after_rehash(tmp_path: Path) -> None:
     directory = tmp_path / REFERENCES.name
     shutil.copytree(REFERENCES, directory)
     shutil.copytree(
@@ -98,7 +102,7 @@ def test_corrupt_gen_oracle_cannot_pass_even_after_rehash(tmp_path):
 @pytest.mark.parametrize(
     "case", [CASES[i] for i in [0, 1, 3, 5]], ids=lambda c: c["id"]
 )
-def test_gen_clause_conditions_survive_all_three_surfaces(case, surface_calls):
+def test_gen_clause_conditions_survive_all_three_surfaces(case, surface_calls) -> None:
     spec = SPECS["meihua_cast"]
     payload = {
         "casting": case["casting"],
@@ -147,3 +151,5 @@ def test_gen_clause_conditions_survive_all_three_surfaces(case, surface_calls):
             assert key not in selected
         if case["expected"]["many_gen_status"] == "pending_context":
             assert key in weather["pending_rule_ids"]
+        else:
+            pass

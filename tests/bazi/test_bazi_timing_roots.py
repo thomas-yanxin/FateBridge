@@ -5,7 +5,7 @@ from copy import deepcopy
 import pytest
 from pydantic import ValidationError
 
-from fatebridge.core.output_timing import TimingInteractions
+from fatebridge.core.contracts.output_timing import TimingInteractions
 from fatebridge.core.timing_interactions import analyze_timing_interactions
 from fatebridge.core.timing_roots import timing_root_snapshot_lines
 
@@ -26,8 +26,8 @@ NATAL = dict(
     ],
 )
 def test_day_master_in_timing_branch_uses_selected_source_root_kind(
-    pillar, kind, hidden, weight
-):
+    pillar: str, kind: str, hidden, weight: str
+) -> None:
     result = analyze_timing_interactions(
         NATAL, {"liunian": dict(zip(("stem", "branch"), pillar))}
     )
@@ -46,7 +46,7 @@ def test_day_master_in_timing_branch_uses_selected_source_root_kind(
     assert context["effective_force_status"] == "not_adjudicated"
 
 
-def test_yin_growth_is_a_reference_and_cannot_invent_a_hidden_root():
+def test_yin_growth_is_a_reference_and_cannot_invent_a_hidden_root() -> None:
     natal = {**NATAL, "day": ("丁", "巳")}
     result = analyze_timing_interactions(
         natal, {"dayun": {"stem": "丁", "branch": "酉"}}
@@ -58,7 +58,7 @@ def test_yin_growth_is_a_reference_and_cannot_invent_a_hidden_root():
     assert "阴长生" in "".join(timing_root_snapshot_lines(result["root_context"]))
 
 
-def test_a_clash_is_linked_to_the_root_without_erasing_its_physical_stem():
+def test_a_clash_is_linked_to_the_root_without_erasing_its_physical_stem() -> None:
     result = analyze_timing_interactions(
         NATAL, {"liunian": {"stem": "甲", "branch": "申"}}
     )
@@ -76,7 +76,7 @@ def test_a_clash_is_linked_to_the_root_without_erasing_its_physical_stem():
     assert row["classification"]["effect_status"] == "root_effect_not_adjudicated"
 
 
-def test_repeated_seats_and_multiple_stem_references_keep_physical_node_ids():
+def test_repeated_seats_and_multiple_stem_references_keep_physical_node_ids() -> None:
     natal = {**NATAL, "year": ("甲", "寅")}
     timing = {
         "dayun": {"stem": "甲", "branch": "子"},
@@ -107,7 +107,7 @@ def test_repeated_seats_and_multiple_stem_references_keep_physical_node_ids():
         "unrelated_branch",
     ],
 )
-def test_output_rejects_root_receipts_rebound_to_other_nodes(fault):
+def test_output_rejects_root_receipts_rebound_to_other_nodes(fault: str) -> None:
     result = analyze_timing_interactions(
         NATAL, {"liunian": {"stem": "庚", "branch": "申"}}
     )
@@ -143,7 +143,7 @@ def test_output_rejects_root_receipts_rebound_to_other_nodes(fault):
         TimingInteractions.model_validate(result)
 
 
-def test_partial_projection_does_not_require_unread_nodes_or_relations():
+def test_partial_projection_does_not_require_unread_nodes_or_relations() -> None:
     result = analyze_timing_interactions(
         NATAL, {"liunian": {"stem": "甲", "branch": "申"}}
     )
@@ -159,7 +159,7 @@ def test_partial_projection_does_not_require_unread_nodes_or_relations():
     assert empty["day_master_roots"] == empty["timing_stem_natal_roots"] == []
 
 
-def test_returned_source_pages_do_not_mutate_the_shared_root_source():
+def test_returned_source_pages_do_not_mutate_the_shared_root_source() -> None:
     first = analyze_timing_interactions(NATAL, {})["root_context"]
     first["source"]["pdf_pages"].append(999)
     second = analyze_timing_interactions(NATAL, {})["root_context"]

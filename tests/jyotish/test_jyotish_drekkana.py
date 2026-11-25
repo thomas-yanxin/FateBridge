@@ -9,8 +9,12 @@ import pytest
 from pydantic import ValidationError
 
 from fatebridge.core.astro.birth import build_astro_birth_info
-from fatebridge.core.jyotish import GRAHAS, build_india, positions
-from fatebridge.core.jyotish_sthana import COMPONENTS, calculate_sthana, drekkana
+from fatebridge.core.jyotish.jyotish import GRAHAS, build_india, positions
+from fatebridge.core.jyotish.jyotish_sthana import (
+    COMPONENTS,
+    calculate_sthana,
+    drekkana,
+)
 from fatebridge.core.requests.astrology import AstroChartPolyRequest, AstroIndiaRequest
 from tests.fixtures.surface_payloads import astro_payload
 
@@ -22,7 +26,9 @@ ORACLE = json.loads((FIXTURES / "jyotish-sthana-reference.json").read_text())
 @pytest.mark.parametrize("profile", PRIMARY["sources"])
 @pytest.mark.parametrize("planet", GRAHAS[:7])
 @pytest.mark.parametrize("decanate", [1, 2, 3])
-def test_all_source_categories_against_frozen_primary_tables(profile, planet, decanate):
+def test_all_source_categories_against_frozen_primary_tables(
+    profile, planet, decanate: int
+) -> None:
     primary = PRIMARY["sources"][profile]
     key = ["first", "second", "third"][decanate - 1]
     actual = drekkana(decanate * 10 - 5, planet, profile)
@@ -32,7 +38,7 @@ def test_all_source_categories_against_frozen_primary_tables(profile, planet, de
 
 
 @pytest.mark.parametrize("sign", range(12))
-def test_exact_d1_ten_degree_sides_are_not_transformed_d3_or_rounded(sign):
+def test_exact_d1_ten_degree_sides_are_not_transformed_d3_or_rounded(sign) -> None:
     for edge in [10, 20]:
         value = float(sign * 30 + edge)
         for longitude in [
@@ -51,7 +57,9 @@ def test_exact_d1_ten_degree_sides_are_not_transformed_d3_or_rounded(sign):
         assert drekkana(sign * 30.0 + 360, "Sun", profile)["D1_decanate"] == 1
 
 
-def test_raman_primary_worked_example_and_conflicting_summary_are_both_retained():
+def test_raman_primary_worked_example_and_conflicting_summary_are_both_retained() -> (
+    None
+):
     original = json.loads((FIXTURES / "jyotish-sthana-classical.json").read_text())[
         "raman_example9"
     ]
@@ -86,8 +94,8 @@ def test_raman_primary_worked_example_and_conflicting_summary_are_both_retained(
 
 @pytest.mark.parametrize("case", ORACLE["examples"])
 def test_raman_aligned_all_five_components_and_complete_sum_against_pinned_oracle(
-    case, monkeypatch, tmp_path
-):
+    case, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
     year, month, day = case["date"]
     hour, minute, second = case["time"]
@@ -122,7 +130,7 @@ def test_raman_aligned_all_five_components_and_complete_sum_against_pinned_oracl
         assert actual["total_virupa"] == sum(actual[c] for c in COMPONENTS)
 
 
-def test_profile_comparisons_hold_the_other_component_fixed():
+def test_profile_comparisons_hold_the_other_component_fixed() -> None:
     raw = {"ascendant": 0.0, "longitudes": dict.fromkeys(GRAHAS, 15.0)}
     for sapta in ["santhanam_27", "raman_30"]:
         old = calculate_sthana(raw, sapta)
@@ -134,6 +142,8 @@ def test_profile_comparisons_hold_the_other_component_fixed():
                         old["summary"][planet][component]
                         == new["summary"][planet][component]
                     )
+                else:
+                    pass
             assert (
                 new["drekkana_profile_comparison"]["santhanam_27_6"][planet][
                     "total_virupa"
@@ -147,7 +157,7 @@ def test_profile_comparisons_hold_the_other_component_fixed():
                 ] == pytest.approx(selected["total_virupa"], abs=1e-12, rel=0)
 
 
-def test_every_sensitivity_point_uses_the_selected_component_not_the_default():
+def test_every_sensitivity_point_uses_the_selected_component_not_the_default() -> None:
     from datetime import timedelta
 
     birth = build_astro_birth_info(**astro_payload())
@@ -174,17 +184,28 @@ def test_every_sensitivity_point_uses_the_selected_component_not_the_default():
     for topic in result["topic_evidence"].values():
         for factor in topic["factors"]:
             if factor["rule_id"] == "jyotish.sthana_bala.v1":
-                assert "raman_36" in factor["traditional_interpretation"]
+                assert (
+                    result["strengths"]["sthana_bala"]["profile"]["drekkana_profile"][
+                        "id"
+                    ]
+                    == "raman_36"
+                )
+                assert (
+                    "india.strengths.sthana_bala.profile.drekkana_profile"
+                    in factor["component_profile_paths"]
+                )
                 assert (
                     factor["fact"]
                     == result["strengths"]["sthana_bala"]["summary"][
                         factor["fact_path"].rsplit(".", 1)[1]
                     ]
                 )
+            else:
+                pass
 
 
-def test_downstream_war_uses_the_selected_total_and_retains_its_source():
-    from fatebridge.core.jyotish_war import war_bala
+def test_downstream_war_uses_the_selected_total_and_retains_its_source() -> None:
+    from fatebridge.core.jyotish.jyotish_war import war_bala
     from tests.jyotish.test_jyotish_war import inputs
 
     longitudes, components, _, dig = inputs()
@@ -222,17 +243,19 @@ def test_downstream_war_uses_the_selected_total_and_retains_its_source():
 
 
 @pytest.mark.parametrize("profile", ["unknown", "raman_60", "santhanam_27"])
-def test_unknown_or_unimplemented_summary_profiles_are_rejected(profile):
+def test_unknown_or_unimplemented_summary_profiles_are_rejected(profile: str) -> None:
     with pytest.raises(ValidationError):
         AstroIndiaRequest.model_validate(
             {**astro_payload(), "drekkana_profile": profile}
         )
     with pytest.raises(ValueError, match="drekkana_profile"):
-        calculate_sthana({"longitudes": {}}, drekkana_profile=profile)
+        calculate_sthana({"longitudes": {}, "ascendant": 0.0}, drekkana_profile=profile)
 
 
 @pytest.mark.parametrize("variant", ["chart", "germany", "chart13", "guolao_chart"])
-def test_custom_drekkana_cannot_be_silently_discarded_on_non_indian_charts(variant):
+def test_custom_drekkana_cannot_be_silently_discarded_on_non_indian_charts(
+    variant: str,
+) -> None:
     with pytest.raises(ValidationError, match="drekkana_profile"):
         AstroChartPolyRequest.model_validate(
             {
@@ -243,7 +266,7 @@ def test_custom_drekkana_cannot_be_silently_discarded_on_non_indian_charts(varia
         )
 
 
-def test_existing_oracle_reference_is_the_original_frozen_file():
+def test_existing_oracle_reference_is_the_original_frozen_file() -> None:
     # No answers are regenerated to accommodate the newly selectable reading.
     assert ORACLE["provenance"]["version"] == "4.8.7"
     assert (

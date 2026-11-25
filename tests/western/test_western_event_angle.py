@@ -10,9 +10,9 @@ from types import SimpleNamespace
 import mpmath as mp
 import pytest
 
-from fatebridge.core.astrology_election import build_election_payload
-from fatebridge.core.astrology_horary import build_horary_payload
-from fatebridge.core.astrology_tables import SIGNS
+from fatebridge.core.astro.astrology_election import build_election_payload
+from fatebridge.core.astro.astrology_horary import build_horary_payload
+from fatebridge.core.astro.astrology_tables import SIGNS
 from fatebridge.core.predictive.native_chart import build_native_subject
 from tests.support.reference_data import verify_source_files
 
@@ -29,7 +29,7 @@ SELECTED_FRAME_NULL_CASES = [
 ]
 
 
-def test_geometry_reference_precedes_candidate_and_retains_all_conditions():
+def test_geometry_reference_precedes_candidate_and_retains_all_conditions() -> None:
     verify_source_files(FIXTURE)
     assert len(REFERENCE["rows"]) == 28
     assert not REFERENCE["fatebridge_imported"]
@@ -40,7 +40,9 @@ def test_geometry_reference_precedes_candidate_and_retains_all_conditions():
 )
 @pytest.mark.parametrize("house", ["R", "E", "W"])
 @pytest.mark.parametrize("zodiac", ["Tropic", "Sidereal"])
-def test_native_subject_qualifies_the_selected_physical_angle_model(row, house, zodiac):
+def test_native_subject_qualifies_the_selected_physical_angle_model(
+    row, house: str, zodiac: str
+) -> None:
     from fatebridge.core.astro import runtime
     from fatebridge.core.astro.earth_attitude import earth_attitude
     from fatebridge.core.astro.time_scales import ephemeris_time
@@ -69,13 +71,9 @@ def test_native_subject_qualifies_the_selected_physical_angle_model(row, house, 
         house_system=house,
         zodiac_type=zodiac,
     )
-    # The frozen inputs approach the OLD native frame's degeneracy. The
-    # managed equator has a different pole/origin, so reuse their coordinates,
-    # not their old frame's boolean. The physical frame itself has separate
-    # official SOFA and original house-kernel controls.
-    attitude = earth_attitude(
-        runtime.swe, subject.julian_day, julian_day_tt=subject.julian_day_tt
-    )
+    # Retain the original test coordinates. Reconstruct the frame from the
+    # subject's exact epochs because the scalar adapters round TT.
+    attitude = earth_attitude(runtime.swe, subject.ut1, julian_day_tt=subject.tt)
     armc = float(
         (Fraction(attitude.house_sidereal_degrees) + Fraction(longitude)) % 360
     )
@@ -100,6 +98,8 @@ def test_native_subject_qualifies_the_selected_physical_angle_model(row, house, 
         condition_threshold = mp.sqrt(mp.mpf(2) ** -52)
     if row.get("selected_frame_null"):
         assert norm <= resolution_guard
+    else:
+        pass
     definition = subject.calculation_basis.get("angle_definition")
     if norm > condition_threshold:
         assert definition is None
@@ -180,15 +180,15 @@ def synthetic_subject(*, mc=90, code="R", resolved=False):
     return s
 
 
-def test_horary_keeps_sky_but_not_formal_ruler_fortune_or_house_awards():
+def test_horary_keeps_sky_but_not_formal_ruler_fortune_or_house_awards() -> None:
     value = build_horary_payload(synthetic_subject(), category="general")
     assert value["ascendant"]["longitude"] is None
     assert value["significators"]["querent"] is None
     assert value["significators"]["moon_co_significator"]["longitude"] == 250
     assert value["fortune"]["longitude"] is None
     assert value["radicality"]["ascendant_degree_gate"]["early"] is None
-    assert value["perfection"]["candidate"] is None
-    assert value["heuristic_verdict"] is None
+    assert value["perfection"]["lilly_conditions"] is None
+    assert value["perfection"]["status"] == "underdetermined_reference_geometry"
     assert value["backend_convention"]["ascendant"]["longitude"] == 0
     for state in value["planets"].values():
         assert state["longitude"] is not None and state["occupied_house"] is None
@@ -196,9 +196,10 @@ def test_horary_keeps_sky_but_not_formal_ruler_fortune_or_house_awards():
 
 
 @pytest.mark.parametrize("mc,known_hard", [(90, False), (2, True)])
-def test_election_or_condition_keeps_known_mc_hit_and_unknown_asc(mc, known_hard):
+def test_election_or_condition_keeps_known_mc_hit_and_unknown_asc(
+    mc: int, known_hard: bool
+) -> None:
     value = build_election_payload(synthetic_subject(mc=mc), topic_id="general")
-    assert value["score"] is None
     assert value["ascendant"]["ruler"] is None
     assert value["axes"]["midheaven_longitude"] == mc
     assert value["axes"]["ascendant_longitude"] is None
@@ -211,7 +212,9 @@ def test_election_or_condition_keeps_known_mc_hit_and_unknown_asc(mc, known_hard
 
 
 @pytest.mark.parametrize("code", ["D", "N", "X", "M", "H"])
-def test_independent_house_methods_keep_house_facts_but_not_an_asc_ruler(code):
+def test_independent_house_methods_keep_house_facts_but_not_an_asc_ruler(
+    code: str,
+) -> None:
     value = build_horary_payload(synthetic_subject(code=code), category="general")
     assert value["significators"]["querent"] is None
     assert value["planets"]["Mars"]["occupied_house"] == 1
@@ -227,7 +230,7 @@ def test_independent_house_methods_keep_house_facts_but_not_an_asc_ruler(code):
 )
 def test_ill_conditioned_but_resolved_asc_is_not_reclassified_as_unknown(
     builder, options
-):
+) -> None:
     value = builder(synthetic_subject(resolved=True), **options)
     assert "reference_geometry" not in value
     assert "backend_convention" not in value
@@ -235,7 +238,9 @@ def test_ill_conditioned_but_resolved_asc_is_not_reclassified_as_unknown(
 
 
 @pytest.mark.parametrize("code", ["R", "N", "D", "X", "M", "H"])
-def test_unknown_reference_does_not_erase_independent_lunar_or_essential_facts(code):
+def test_unknown_reference_does_not_erase_independent_lunar_or_essential_facts(
+    code: str,
+) -> None:
     value = build_horary_payload(synthetic_subject(code=code), category="career")
     backend = value["backend_convention"]
     assert value["moon"]["sign"] == backend["planets"]["Moon"]["sign"]
@@ -257,3 +262,5 @@ def test_unknown_reference_does_not_erase_independent_lunar_or_essential_facts(c
             assert state[key] == backend["planets"][name][key]
     if code != "R":
         assert value["significators"]["quesited"] is not None
+    else:
+        pass

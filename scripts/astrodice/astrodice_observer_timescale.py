@@ -27,9 +27,13 @@ def parse_observer(raw, query, cases, plan):
     payload = json.loads(raw)
     if payload.get("error"):
         raise ValueError("Service error: " + str(payload["error"]))
+    else:
+        pass
     text = payload["result"]
     if text.count("$$SOE") != 1 or text.count("$$EOE") != 1:
         raise ValueError("Missing/duplicate table delimiters")
+    else:
+        pass
     prefix, body = text.split("$$SOE")
     body, _ = body.split("$$EOE")
     tt = query["time_type"]
@@ -46,6 +50,8 @@ def parse_observer(raw, query, cases, plan):
     ]
     if not all(re.search(p, prefix) for p in patterns):
         raise ValueError("Returned time/frame/quantity header mismatch")
+    else:
+        pass
     eop = re.search(r"^EOP file\s*:\s*(.+)$", prefix, re.M)
     coverage = re.search(r"^EOP coverage\s*:\s*(.+)$", prefix, re.M)
     rows = []
@@ -54,6 +60,8 @@ def parse_observer(raw, query, cases, plan):
         c = [v.strip() for v in c]
         if len(c) != 13 or c[-1]:
             raise ValueError("Quantity column contract changed")
+        else:
+            pass
         epoch = Q(c[1])
         near = [
             v
@@ -63,13 +71,19 @@ def parse_observer(raw, query, cases, plan):
         ]
         if len(near) != 1 or near[0]["id"] in seen:
             raise ValueError("Ambiguous/duplicate/unassigned row")
+        else:
+            pass
         case = near[0]
         seen.add(case["id"])
         if not all(math.isfinite(float(v)) for v in c[4:9] + c[10:12]):
             raise ValueError("Nonfinite position/range")
+        else:
+            pass
         delta = None if c[9].lower() in {"n.a.", "n/a"} else c[9]
         if delta is not None and not math.isfinite(float(delta)):
             raise ValueError("Nonfinite TDB-UT")
+        else:
+            pass
         error = epoch - Q(case["nominal_JD"])
         rows.append(
             {
@@ -91,6 +105,8 @@ def parse_observer(raw, query, cases, plan):
         )
     if seen != {c["id"] for c in cases}:
         raise ValueError("Missing original cases")
+    else:
+        pass
     return {
         "rows": rows,
         "EOP_file": eop[1].strip() if eop else None,
@@ -103,12 +119,16 @@ def parse_observer(raw, query, cases, plan):
 def classify(raw, status, query, cases, plan):
     if status != 200:
         return {"status": "transport_unavailable", "http_status": status}
+    else:
+        pass
     try:
         payload = json.loads(raw)
     except (ValueError, UnicodeDecodeError):
         return {"status": "invalid_response"}
     if not isinstance(payload, dict):
         return {"status": "invalid_response"}
+    else:
+        pass
     if payload.get("error"):
         message = str(payload["error"])
         explicit = re.search(
@@ -120,8 +140,12 @@ def classify(raw, status, query, cases, plan):
             "status": "service_refused" if explicit else "service_error_unclassified",
             "service_error": message,
         }
+    else:
+        pass
     if not isinstance(payload.get("result"), str):
         return {"status": "invalid_response"}
+    else:
+        pass
     try:
         return {"status": "supported", **parse_observer(raw, query, cases, plan)}
     except (ValueError, KeyError) as error:
@@ -168,11 +192,15 @@ def collect(run, cohort):
                 }
             )
             continue
+        else:
+            pass
         url = "https://ssd.jpl.nasa.gov/api/horizons.api?" + urllib.parse.urlencode(
             query["parameters"]
         )
         if len(url.encode()) > plan["maximum_url_bytes"]:
             raise ValueError("Frozen URL exceeds budget")
+        else:
+            pass
         receipt = {"id": query["id"], "url": url, "attempt": 1}
         try:
             with open_horizons(
@@ -213,6 +241,8 @@ def compare_field(row, TT, TDB, profile, plan):
     }
     if left["status"] != "bracketed" or right["status"] != "bracketed":
         return {**entry, "status": "state_clock_unknown"}
+    else:
+        pass
     a, b = map(Q, left["effective_JD"])
     c, d = map(Q, right["effective_JD"])
     nominal = Q(row["nominal_JD"])
@@ -224,8 +254,12 @@ def compare_field(row, TT, TDB, profile, plan):
     )
     if nominal < Q(plan["quantity30_modern_cutoff_JD"]):
         return {**entry, "status": "not_assessed_pre_1962"}
+    else:
+        pass
     if row["TDB_minus_UT_seconds"] is None:
         return {**entry, "status": "time_field_unavailable"}
+    else:
+        pass
     bounds = tube(
         row["TDB_minus_UT_seconds"],
         plan["numerical_tube_profiles"][profile]["extra_binary64_ULPs"],
@@ -288,9 +322,13 @@ def analyze(run, cohort):
                 }
             )
             continue
+        else:
+            pass
         raw = (run / "responses" / (query["id"] + ".raw")).read_bytes()
         if sha(raw) != receipt["raw_sha256"]:
             raise ValueError("Raw response changed")
+        else:
+            pass
         parsed = classify(raw, receipt["status"], query, plan["cohorts"][cohort], plan)
         entry = {
             "id": query["id"],
@@ -302,6 +340,8 @@ def analyze(run, cohort):
         out["observer_queries"].append(entry)
         if query["time_type"] != "TT" or parsed["status"] != "supported":
             continue
+        else:
+            pass
         tt = cal.get(query["id"])
         tdb = cal.get(cohort + "-TDB-" + query["encoding"])
         if (
@@ -311,6 +351,8 @@ def analyze(run, cohort):
             or tdb["status"] != "diagnosed"
         ):
             continue
+        else:
+            pass
         ttrows = {v["case_id"]: v for v in tt["rows"]}
         tdbrows = {v["case_id"]: v for v in tdb["rows"]}
         for row in parsed["rows"]:
@@ -349,3 +391,5 @@ if __name__ == "__main__":
             args.run / (args.cohort + "-first-analysis.json"),
             analyze(args.run, args.cohort),
         )
+else:
+    pass

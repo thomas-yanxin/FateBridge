@@ -9,9 +9,9 @@ import pytest
 from pydantic import ValidationError
 
 from fatebridge.core.classical_stages import twelve_life_stage
+from fatebridge.core.contracts.output_timing import TimingInteractions
+from fatebridge.core.contracts.output_timing_carriers import TimingCarrier
 from fatebridge.core.metaphysics.common import SEXAGENARY_CYCLE
-from fatebridge.core.output_timing import TimingInteractions
-from fatebridge.core.output_timing_carriers import TimingCarrier
 from fatebridge.core.timing_carriers import describe_timing_carrier
 from fatebridge.core.timing_interactions import analyze_timing_interactions
 
@@ -24,7 +24,7 @@ FIXTURE = (
 REFERENCE = json.loads(FIXTURE.read_text())
 
 
-def test_source_transcription_and_all_38_conditional_examples():
+def test_source_transcription_and_all_38_conditional_examples() -> None:
     assert (
         hashlib.sha256(FIXTURE.read_bytes()).hexdigest()
         == FIXTURE.with_suffix(".sha256").read_text().strip()
@@ -41,7 +41,7 @@ def test_source_transcription_and_all_38_conditional_examples():
         assert row["effective_force_status"] == "not_adjudicated"
 
 
-def test_own_seat_is_not_replaced_by_external_natal_roots():
+def test_own_seat_is_not_replaced_by_external_natal_roots() -> None:
     row = describe_timing_carrier("timing.dayun", "乙", "酉", NATAL)
     assert row["principal_relation"] == "branch_overcomes_stem"
     assert row["own_hidden_roots"] == [] and row["own_hidden_root_present"] is False
@@ -50,7 +50,7 @@ def test_own_seat_is_not_replaced_by_external_natal_roots():
     assert row["branch_covered_if_desired"] is False
 
 
-def test_reference_yin_growth_name_does_not_invent_an_actual_fire_root():
+def test_reference_yin_growth_name_does_not_invent_an_actual_fire_root() -> None:
     assert twelve_life_stage("丁", "酉") == "长生"
     row = describe_timing_carrier("timing.liunian", "丁", "酉", NATAL)
     assert row["own_hidden_roots"] == [] and not row["own_hidden_root_present"]
@@ -59,7 +59,7 @@ def test_reference_yin_growth_name_does_not_invent_an_actual_fire_root():
     assert row["branch_covered_if_desired"] and row["stem_pressure_if_desired"]
 
 
-def test_actual_root_does_not_erase_a_contrary_principal_relation():
+def test_actual_root_does_not_erase_a_contrary_principal_relation() -> None:
     row = describe_timing_carrier("timing.dayun", "戊", "寅", NATAL)
     assert row["own_hidden_root_present"]
     assert row["own_hidden_roots"] == [{"stem": "戊", "rank": 3, "exact_stem": True}]
@@ -67,7 +67,7 @@ def test_actual_root_does_not_erase_a_contrary_principal_relation():
     assert row["stem_pressure_if_desired"]
 
 
-def test_generation_is_separate_from_an_actual_root_and_no_false_pressure():
+def test_generation_is_separate_from_an_actual_root_and_no_false_pressure() -> None:
     row = describe_timing_carrier("timing.liunian", "甲", "子", NATAL)
     assert row["principal_relation"] == "branch_generates_stem"
     assert not row["own_hidden_root_present"]
@@ -79,7 +79,7 @@ def test_generation_is_separate_from_an_actual_root_and_no_false_pressure():
     assert not row["stem_pressure_if_desired"]
 
 
-def test_all_sixty_legal_pillars_validate_without_mutating_natal_facts():
+def test_all_sixty_legal_pillars_validate_without_mutating_natal_facts() -> None:
     before = deepcopy(NATAL)
     for pair in SEXAGENARY_CYCLE:
         row = describe_timing_carrier("timing.dayun", *pair, NATAL)
@@ -95,7 +95,9 @@ def test_all_sixty_legal_pillars_validate_without_mutating_natal_facts():
         describe_timing_carrier("timing.dayun", "甲", "丑", NATAL)
 
 
-def test_shared_interactions_align_the_two_receipts_without_relabeling_existing_roots():
+def test_shared_interactions_align_the_two_receipts_without_relabeling_existing_roots() -> (
+    None
+):
     result = analyze_timing_interactions(
         NATAL,
         {
@@ -118,7 +120,7 @@ def test_shared_interactions_align_the_two_receipts_without_relabeling_existing_
     )
 
 
-def test_partial_contract_and_false_root_or_unconditional_role_are_rejected():
+def test_partial_contract_and_false_root_or_unconditional_role_are_rejected() -> None:
     TimingCarrier.model_validate({"own_hidden_root_present": False})
     with pytest.raises(ValidationError, match="本柱实根"):
         TimingCarrier.model_validate(
@@ -133,7 +135,7 @@ def test_partial_contract_and_false_root_or_unconditional_role_are_rejected():
         )
 
 
-def test_summary_cannot_change_an_actual_receipt():
+def test_summary_cannot_change_an_actual_receipt() -> None:
     result = analyze_timing_interactions(
         NATAL, {"dayun": {"stem": "乙", "branch": "酉"}}
     )

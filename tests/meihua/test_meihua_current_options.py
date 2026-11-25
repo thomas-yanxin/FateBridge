@@ -45,6 +45,8 @@ def result(kind, **kwargs):
             casting={"method": "existing", "hexagram_code": "111101", "moving_line": 1},
             **kwargs,
         )
+    else:
+        pass
     return calculate_meihua_analysis(
         analysis_year=2026,
         analysis_month=10,
@@ -57,7 +59,9 @@ def result(kind, **kwargs):
 
 @pytest.mark.parametrize("kind", ["cast", "time"])
 @pytest.mark.parametrize("topic", ["general", "reputation"])
-def test_omitted_and_null_optional_facts_have_identical_current_business(kind, topic):
+def test_omitted_and_null_optional_facts_have_identical_current_business(
+    kind: str, topic: str
+) -> None:
     omitted = result(kind, interpretation_topic=topic)
     explicit_null = result(kind, interpretation_topic=topic, **dict.fromkeys(FIELDS))
     assert "error" not in omitted and "error" not in explicit_null
@@ -66,7 +70,9 @@ def test_omitted_and_null_optional_facts_have_identical_current_business(kind, t
 
 @pytest.mark.parametrize("kind", ["cast", "time"])
 @pytest.mark.parametrize("field,value", VALID)
-def test_supplied_facts_survive_the_current_options_boundary(kind, field, value):
+def test_supplied_facts_survive_the_current_options_boundary(
+    kind: str, field, value
+) -> None:
     topic = "reputation" if field == "reputation_context" else "general"
     output = result(kind, interpretation_topic=topic, **{field: value})
     assert "error" not in output
@@ -86,7 +92,7 @@ def test_supplied_facts_survive_the_current_options_boundary(kind, field, value)
 
 
 @pytest.mark.parametrize("field", FIELDS)
-def test_invalid_supplied_optional_facts_are_rejected(field):
+def test_invalid_supplied_optional_facts_are_rejected(field) -> None:
     with pytest.raises(ValidationError):
         MeihuaInterpretationOptions.model_validate(
             {
@@ -98,7 +104,7 @@ def test_invalid_supplied_optional_facts_are_rejected(field):
         )
 
 
-def test_current_observation_model_retains_soil_generation_qualification():
+def test_current_observation_model_retains_soil_generation_qualification() -> None:
     out = calculate_meihua_cast(
         casting={"method": "existing", "hexagram_code": "111111", "moving_line": 6},
         external_observations=[{"manifestation": "soil", "label": "虚构新模型探针"}],

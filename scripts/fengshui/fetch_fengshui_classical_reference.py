@@ -42,6 +42,8 @@ def parse_shen(text):
     heads = list(re.finditer(r"([天人地])元(.)山(.)向挨星图", text))
     if len(heads) != 24:
         raise ValueError("Expected exactly 24 named mountain sections")
+    else:
+        pass
     cases = []
     for index, head in enumerate(heads):
         section = text[
@@ -52,12 +54,16 @@ def parse_shen(text):
         rows = re.findall(r"([一二三四五六七八九])运挨星，([^\n]+)", section)
         if len(rows) != 9:
             raise ValueError(f"Expected nine periods for {head[0]}")
+        else:
+            pass
         for period, row in rows:
             mountain = re.search(r"([一二三四五六七八九])(?:天星)?到山", row)
             facing = re.search(r"([一二三四五六七八九])(?:天星)?到向", row)
             flight = re.search(r"飞星(山向均[顺逆]|山[顺逆]向[顺逆])", row)
             if not mountain or not facing:
                 raise ValueError(f"Missing literal star seeds: {row}")
+            else:
+                pass
             if flight:
                 value = flight[1]
                 orders = (
@@ -71,6 +77,8 @@ def parse_shen(text):
                 f_order = re.search(r"到向，([顺逆])行", row)
                 if not m_order or not f_order:
                     raise ValueError(f"Unparsed flight orders: {row}")
+                else:
+                    pass
                 orders = [m_order[1], f_order[1]]
                 clause = row[: f_order.end()]
             cases.append(
@@ -88,6 +96,8 @@ def parse_shen(text):
             )
     if len({(c["period"], c["facing_mountain"]) for c in cases}) != 216:
         raise ValueError("Duplicate or missing mountain-period pair")
+    else:
+        pass
     return cases
 
 
@@ -101,6 +111,8 @@ def parse_you_nian(text):
     unique = list(dict.fromkeys(rows))
     if len(unique) != 8:
         raise ValueError("Expected exactly eight literal You Nian verses")
+    else:
+        pass
     return [
         dict(base=base, destinations=destinations, star_codes=codes)
         for base, destinations, codes in unique
@@ -111,6 +123,8 @@ def parse_you_nian_origin(text):
     paragraph = re.search(r"画卦自下而上.*?特为捷法以括之。", text, re.S)
     if paragraph is None:
         raise ValueError("Missing literal seven-change paragraph")
+    else:
+        pass
     cases = []
     for numeral, chunk, star in re.findall(
         r"([一二三四五六七])变而(.*?)(?:所以为|所以為)(生气|五鬼|延年|六煞|祸害|天医|绝命)",
@@ -120,6 +134,8 @@ def parse_you_nian_origin(text):
         pairs = re.findall(r"([乾坎艮震巽离坤兑])得([乾坎艮震巽离坤兑])", chunk)
         if len(pairs) != 8:
             raise ValueError("Each change must contain eight literal trigram pairs")
+        else:
+            pass
         cases.extend(
             dict(
                 base=base,
@@ -134,6 +150,8 @@ def parse_you_nian_origin(text):
         (base, target) for base in trigrams for target in trigrams if base != target
     }:
         raise ValueError("Expected every distinct non-self trigram pair exactly once")
+    else:
+        pass
     return {"literal_paragraph": paragraph[0], "cases": cases}
 
 
@@ -158,6 +176,8 @@ def main():
         parser.error(
             "Output already exists; review a new snapshot before replacing a reference"
         )
+    else:
+        pass
     raw = {}
     urls = SOURCES if args.profile == "foundation" else BAZHAI_DEPTH_SOURCES
     for name, url in urls.items():
@@ -181,6 +201,8 @@ def main():
         context = re.sub(r"\s+", "", plain(raw["fuwei_context"]).split("白话解读")[0])
         if "左辅右弼，随门而化。" not in context:
             raise ValueError("Missing literal Fu Wei context")
+        else:
+            pass
         args.output.mkdir(parents=True)
         reference = {
             "source": sources["you_nian_origin"],
@@ -197,6 +219,8 @@ def main():
             "Recorded 56 literal transformation pairs; printed element matrix requires separate manual page verification"
         )
         return
+    else:
+        pass
     cases = parse_shen(plain(raw["shen"]))
     verses = parse_you_nian(plain(raw["you-nian"]))
     reference = {
@@ -224,3 +248,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+else:
+    pass

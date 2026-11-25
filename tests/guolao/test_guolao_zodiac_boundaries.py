@@ -5,12 +5,14 @@ from fractions import Fraction
 
 import pytest
 
-from fatebridge.core import guolao
-from tests.guolao.test_guolao_depth import chart
+from fatebridge.core.guolao import guolao
+from tests.unit_test.fixtures.guolao import chart
 
 
 @pytest.mark.parametrize("ayanamsha", [0.0, 1.0, 23.6, 24.0, 100.0, 350.0])
-def test_rotation_never_rounds_previous_palace_into_next(monkeypatch, ayanamsha):
+def test_rotation_never_rounds_previous_palace_into_next(
+    monkeypatch: pytest.MonkeyPatch, ayanamsha: float
+) -> None:
     # Isolate the zodiac transform; these are synthetic boundary inputs, not
     # externally measured planets or a substitute for historical mansion data.
     monkeypatch.setattr(guolao, "mansion_at", lambda *a: {"degree_lord": "木"})
@@ -30,7 +32,9 @@ def test_rotation_never_rounds_previous_palace_into_next(monkeypatch, ayanamsha)
             assert 30 * expected <= body["zodiac_longitude"] < 30 * (expected + 1)
 
 
-def test_previous_spring_zero_remainder_is_last_palace_not_index_error(monkeypatch):
+def test_previous_spring_zero_remainder_is_last_palace_not_index_error(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setattr(guolao, "mansion_at", lambda *a: {"degree_lord": "木"})
     raw = math.nextafter(24.0, -math.inf)
     assert (raw - 24.0) % 360 == 360.0  # Reproduces the old crash.
@@ -49,8 +53,8 @@ def test_previous_spring_zero_remainder_is_last_palace_not_index_error(monkeypat
     ],
 )
 def test_natal_planet_record_reuses_exact_guolao_selected_placement(
-    monkeypatch, longitude, branch, sign
-):
+    monkeypatch: pytest.MonkeyPatch, longitude, branch: str, sign: str
+) -> None:
     original = guolao.positions
 
     def controlled(*args, **kwargs):

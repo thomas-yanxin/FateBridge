@@ -23,6 +23,8 @@ def verify_primary(
     primary = fixture["primary"]
     if primary != data["selected_primary"]:
         raise ValueError("Selected manuscript readings differ from the source fixture")
+    else:
+        pass
     if manuscript_image is not None:
         raw = manuscript_image.read_bytes()
         if (
@@ -30,10 +32,16 @@ def verify_primary(
             or len(raw) != primary["image_bytes"]
         ):
             raise ValueError("Manuscript image fingerprint changed")
+        else:
+            pass
+    else:
+        pass
     if manifest_path is not None:
         raw = manifest_path.read_bytes()
         if hashlib.sha256(raw).hexdigest() != primary["manifest_sha256"]:
             raise ValueError("Manuscript manifest fingerprint changed")
+        else:
+            pass
         manifest = json.loads(raw)
         canvas = manifest["items"][primary["canvas_index_one_based"] - 1]
         service = canvas["items"][0]["items"][0]["body"]["service"][0]["id"]
@@ -43,16 +51,24 @@ def verify_primary(
             or primary["image_url"] != service + "/full/max/0/default.jpg"
         ):
             raise ValueError("Selected canvas is not bound to the captured image URL")
+        else:
+            pass
+    else:
+        pass
     source = json.loads(
         (ROOT / "src/fatebridge/data/sukuyo_t1299_calendar_profiles.json").read_bytes()
     )["hinoo_addendum"]["downloaded_primary_edition"]
     if data["taisho_calendar_windows"] != source["downloaded_calendar_windows"]:
         raise ValueError("Taisho comparison quotations changed")
+    else:
+        pass
     span = data["apparatus_span_reference"]
     clean = re.sub(r"[。･、\s]+", "", data["taisho_calendar_windows"][0]["text"])
     selected = span["normalized_candidate_span"]
     if len(selected) != 16 or clean.count(selected) != 1:
         raise ValueError("Sixteen-character apparatus span does not match")
+    else:
+        pass
     shorter = span["shorter_sentence_boundary_candidate"]
     return {
         "format": "sukuyo_hinoo_critical_primary_check_v1",
@@ -94,3 +110,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+else:
+    pass

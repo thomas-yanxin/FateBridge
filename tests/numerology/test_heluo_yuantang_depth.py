@@ -12,10 +12,14 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.heluo import build_snapshot_text, calculate, judge
-from fatebridge.core.heluo_yuantang import RULESET_ID, placement, resolve_half_year
+from fatebridge.core.contracts.output_numerology import HeluoYuantangDerivation
+from fatebridge.core.heluo.heluo import build_snapshot_text, calculate, judge
+from fatebridge.core.heluo.heluo_yuantang import (
+    RULESET_ID,
+    placement,
+    resolve_half_year,
+)
 from fatebridge.core.local_techniques.heluo import build_heluo_result
-from fatebridge.core.output_numerology import HeluoYuantangDerivation
 
 ROOT = Path(__file__).parents[1] / "fixtures/numerology_nlc_v1"
 SOURCE = json.loads((ROOT / "yuantang-reference.json").read_text())
@@ -34,7 +38,7 @@ def fixed(case, **extra):
     )
 
 
-def test_source_identity_and_counts_are_not_worked_horoscope_counts():
+def test_source_identity_and_counts_are_not_worked_horoscope_counts() -> None:
     for witness in SOURCE["images"]:
         assert (
             hashlib.sha256((ROOT / witness["file"]).read_bytes()).hexdigest()
@@ -51,7 +55,7 @@ def test_source_identity_and_counts_are_not_worked_horoscope_counts():
 
 
 @pytest.mark.parametrize("row", SOURCE["mixed_tables"], ids=lambda r: r["id"])
-def test_ten_literal_mixed_tables(row):
+def test_ten_literal_mixed_tables(row) -> None:
     for h, pos in zip(row["hours"], row["positions"]):
         evidence = placement(row["lines"], h, True, None)
         assert evidence["selected_pos"] == pos
@@ -60,7 +64,7 @@ def test_ten_literal_mixed_tables(row):
 
 
 @pytest.mark.parametrize("row", SOURCE["pure_tables"], ids=lambda r: r["id"])
-def test_four_literal_pure_diagrams(row):
+def test_four_literal_pure_diagrams(row) -> None:
     bit = int(row["hexagram"] == "乾為天")
     for half in ((False, True) if row["half_year"] == "any" else (row["half_year"],)):
         for h, pos in zip(row["hours"], row["positions"]):
@@ -68,7 +72,7 @@ def test_four_literal_pure_diagrams(row):
 
 
 @pytest.mark.parametrize("row", SOURCE["pure_reuse_clauses"])
-def test_literal_reuse_clauses_derive_twenty_four_other_positions(row):
+def test_literal_reuse_clauses_derive_twenty_four_other_positions(row) -> None:
     table = next(t for t in SOURCE["pure_tables"] if t["id"] == row["reuse_table"])
     bit = int(row["hexagram"] == "乾為天")
     for h, pos in zip(table["hours"], table["positions"]):
@@ -81,7 +85,7 @@ def test_literal_reuse_clauses_derive_twenty_four_other_positions(row):
 
 
 @pytest.mark.parametrize("case", SOURCE["modern_selection_probes"])
-def test_solstice_month_cannot_choose_a_wrong_pure_yuantang(case):
+def test_solstice_month_cannot_choose_a_wrong_pure_yuantang(case) -> None:
     with pytest.raises(ValueError, match="跨至点"):
         fixed(case)
     for actual_half in (case["half_year"], not case["half_year"]):
@@ -97,7 +101,9 @@ def test_solstice_month_cannot_choose_a_wrong_pure_yuantang(case):
         assert r["yuantang_derivation"]["half_year"]["yuantang_depends_on_half_year"]
 
 
-def test_source_tun_five_requires_half_for_houtian_even_when_yuantang_is_identical():
+def test_source_tun_five_requires_half_for_houtian_even_when_yuantang_is_identical() -> (
+    None
+):
     case = WORKED["cases"][3]
     with pytest.raises(ValueError, match="后天卦"):
         fixed(case)
@@ -111,7 +117,7 @@ def test_source_tun_five_requires_half_for_houtian_even_when_yuantang_is_identic
     assert yin["yuantang_derivation"]["half_year"]["houtian_depends_on_half_year"]
 
 
-def test_unambiguous_results_survive_without_fabricating_half_or_heli():
+def test_unambiguous_results_survive_without_fabricating_half_or_heli() -> None:
     case = WORKED["cases"][2]  # printed Zi-month four pillars; half-independent 剝.
     r = fixed(case)
     for half in (False, True):
@@ -130,24 +136,26 @@ def test_unambiguous_results_survive_without_fabricating_half_or_heli():
 
 
 @pytest.mark.parametrize("month", list("丑寅卯辰巳未申酉戌亥"))
-def test_ten_non_solstice_month_pillars_resolve_the_half(month):
+def test_ten_non_solstice_month_pillars_resolve_the_half(month) -> None:
     value, basis = resolve_half_year(month, None)
     assert value is (month in "丑寅卯辰巳")
     assert basis == "month_branch_half_year"
 
 
 @pytest.mark.parametrize("month", ["子", "午"])
-def test_boundary_months_are_unknown_until_explicitly_resolved(month):
+def test_boundary_months_are_unknown_until_explicitly_resolved(month: str) -> None:
     assert resolve_half_year(month, None) == (None, "boundary_month_unresolved")
     for flag in (False, True):
         assert resolve_half_year(month, flag) == (flag, "explicit_half_year")
 
 
-def test_mixed_hexagrams_do_not_depend_on_gender_or_solstice_half():
+def test_mixed_hexagrams_do_not_depend_on_gender_or_solstice_half() -> None:
     # Metamorphic coverage over all 62 mixed bit patterns, not birth cases.
     for bits in product((0, 1), repeat=6):
         if len(set(bits)) == 1:
             continue
+        else:
+            pass
         for h in "子丑寅卯辰巳午未申酉戌亥":
             first = placement(list(bits), h, True, None)
             for male, half in product((False, True), (False, True)):
@@ -155,7 +163,7 @@ def test_mixed_hexagrams_do_not_depend_on_gender_or_solstice_half():
 
 
 @pytest.mark.parametrize("bad", ["false", "true", 0, 1, [], {}])
-def test_placement_cannot_coerce_half_or_gender(bad):
+def test_placement_cannot_coerce_half_or_gender(bad) -> None:
     with pytest.raises(ValueError):
         placement([1] * 6, "巳", False, bad)
     with pytest.raises(ValueError):
@@ -165,7 +173,7 @@ def test_placement_cannot_coerce_half_or_gender(bad):
 
 
 @pytest.mark.parametrize("case", SOURCE["modern_selection_probes"])
-def test_public_clock_resolves_half_and_copies_the_actual_same_run_trace(case):
+def test_public_clock_resolves_half_and_copies_the_actual_same_run_trace(case) -> None:
     r = build_heluo_result(
         date=case["date"],
         time=case["time"],

@@ -34,6 +34,8 @@ def main() -> None:
     ):
         if hashlib.sha256((source / name).read_bytes()).hexdigest() != digest:
             raise ValueError(f"External reference hash mismatch: {name}")
+        else:
+            pass
     epochs = []
     selected_epochs = [0, 1, 25, 50, 75, 100, 125, 150, 175, 200, 225, 256]
     with np.load(source / "author-house-reference.npz") as archive:
@@ -120,3 +122,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+else:
+    pass

@@ -4,9 +4,9 @@ from __future__ import annotations
 
 from typing import Any
 
-from ...utils.data import EARTHLY_BRANCHES
-from .jinkou_break_witnesses import break_pair_witnesses
-from .jinkou_sources import SCAN_SHA256, SCAN_URL
+from fatebridge.core.metaphysics.jinkou_break_witnesses import break_pair_witnesses
+from fatebridge.core.metaphysics.jinkou_sources import SCAN_SHA256, SCAN_URL
+from fatebridge.utils.data import EARTHLY_BRANCHES
 
 # The scan also prints 寅破巳, omitted by the online transcription.
 WRITTEN_PAIRS = ("申巳", "戌未", "亥寅", "寅巳", "丑辰", "午卯", "酉子")
@@ -49,6 +49,8 @@ def metadata() -> dict[str, Any]:
 def pair_facts(left: str, right: str) -> dict[str, Any]:
     if left not in EARTHLY_BRANCHES or right not in EARTHLY_BRANCHES:
         raise ValueError("京本破支配对须使用单个有效地支")
+    else:
+        pass
     written = next((p for p in WRITTEN_PAIRS if set(left + right) == set(p)), None)
     return dict(
         left_branch=left,
@@ -69,6 +71,8 @@ def branch_breaks(god: str, general: str, ground: str) -> dict[str, Any]:
     branches = (god, general, ground)
     if any(b not in EARTHLY_BRANCHES for b in branches):
         raise ValueError("京本破支配对须使用贵神、将神、地分的实际本支")
+    else:
+        pass
     rows = [
         dict(
             id=identifier,

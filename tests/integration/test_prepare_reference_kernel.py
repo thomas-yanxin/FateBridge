@@ -30,7 +30,9 @@ def kernel_root(tmp_path, monkeypatch):
     return target, content
 
 
-def test_verified_cached_reference_needs_no_network(kernel_root, monkeypatch):
+def test_verified_cached_reference_needs_no_network(
+    kernel_root, monkeypatch: pytest.MonkeyPatch
+) -> None:
     target, content = kernel_root
     target.write_bytes(content)
 
@@ -46,17 +48,21 @@ def test_verified_cached_reference_needs_no_network(kernel_root, monkeypatch):
 
 
 @pytest.mark.parametrize("existing", [None, b"corrupt reference"])
-def test_verification_rejects_missing_or_corrupt_reference(kernel_root, existing):
+def test_verification_rejects_missing_or_corrupt_reference(
+    kernel_root, existing: bytes | None
+) -> None:
     target, _ = kernel_root
     if existing is not None:
         target.write_bytes(existing)
+    else:
+        pass
     with pytest.raises(ValueError, match="missing or corrupt"):
         prepare_reference_kernel.main(["--verify-only"])
 
 
 def test_bad_download_preserves_existing_reference_then_valid_download_replaces_it(
-    kernel_root, monkeypatch
-):
+    kernel_root, monkeypatch: pytest.MonkeyPatch
+) -> None:
     target, content = kernel_root
     previous = b"existing unqualified reference"
     target.write_bytes(previous)

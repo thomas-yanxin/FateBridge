@@ -1,34 +1,34 @@
-"""Explicit acquisition profiles and verified per-user ephemeris discovery.
-
-This module never downloads, creates directories or changes Swiss state.
-Acquisition is an explicit fetch_ephe command; computations only discover data.
-"""
+"""Discover installed ephemeris files and check their acquisition profiles."""
 
 from __future__ import annotations
 
 import os
 import platform
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Any, Dict, Optional, Sequence
+
+from typing_extensions import NotRequired, TypedDict
 
 from fatebridge.core.astro.ephemeris_files import ephemeris_files_for_years
 from fatebridge.core.astro.ephemeris_integrity import (
     load_ephemeris_manifest,
     verify_ephemeris_bytes,
 )
+from fatebridge.core.ephemeris_paths import (
+    SWISS_PATH_BUFFER_BYTES,
+    ephemeris_search_directories,
+    ephemeris_search_path_fits,
+)
 
 FENGSHUI_PROFILE = "fengshui_calendar"
-MAX_EPHEMERIS_PATH_BYTES = 242
-# Full 20-year intervals around supported effective event years1800..2199.
+# note (coverage): Include full ephemeris intervals around event years 1800–2199.
 FENGSHUI_FIRST_BOUNDARY_YEAR = 1784
 FENGSHUI_LAST_BOUNDARY_YEAR = 2204
 FENGSHUI_FILES = ephemeris_files_for_years(
     (FENGSHUI_FIRST_BOUNDARY_YEAR, FENGSHUI_LAST_BOUNDARY_YEAR)
 )
 HUMAN_DESIGN_PROFILE = "human_design"
-# Civil births1800..2399, the110-day Design bracket, a1-hour uncertainty
-# interval and timezone rollover, then the optional65-Julian-year search.
-# The final year is a conservative calendar envelope, not an accuracy bound.
+# note (coverage): Allow 110 days for Design, one hour of uncertainty and 65 Julian years for cycle searches.
 HUMAN_DESIGN_FIRST_YEAR = 1799
 HUMAN_DESIGN_LAST_YEAR = 2465
 HUMAN_DESIGN_FILES = tuple(
@@ -63,27 +63,52 @@ def user_ephemeris_dir() -> Path:
     return root / "fatebridge/ephe"
 
 
-def _file_status(directory: Path, names: Sequence[str]) -> Dict[str, Any]:
+class EphemerisFileStatus(TypedDict):
+    verified: bool
+    reason: NotRequired[str]
+
+
+class EphemerisDirectoryStatus(TypedDict):
+    directory: str
+    edition: str
+    source_commit: str
+    files: dict[str, EphemerisFileStatus]
+    all_files_verified: bool
+    scope: str
+
+
+class FengshuiEphemerisStatus(EphemerisDirectoryStatus):
+    profile: str
+    boundary_years_inclusive: list[int]
+
+
+class HumanDesignEphemerisStatus(EphemerisDirectoryStatus):
+    profile: str
+    computation_years_inclusive: list[int]
+    coverage: str
+
+
+def _file_status(directory: Path, names: Sequence[str]) -> EphemerisDirectoryStatus:
     """File identity only: no claim about loaded model or TT acceptance."""
     manifest = load_ephemeris_manifest()
-    rows: Dict[str, Any] = {}
+    files: dict[str, EphemerisFileStatus] = {}
     for name in names:
         try:
             verify_ephemeris_bytes(name, (directory / name).read_bytes(), manifest)
-            rows[name] = {"verified": True}
+            files[name] = {"verified": True}
         except (OSError, ValueError) as exc:
-            rows[name] = {"verified": False, "reason": str(exc)}
+            files[name] = {"verified": False, "reason": str(exc)}
     return {
         "directory": str(directory),
         "edition": manifest["id"],
         "source_commit": manifest["source_commit"],
-        "files": rows,
-        "all_files_verified": all(row["verified"] for row in rows.values()),
+        "files": files,
+        "all_files_verified": all(file["verified"] for file in files.values()),
         "scope": "file_content_identity_not_loaded_model_or_astronomical_acceptance",
     }
 
 
-def fengshui_file_status(directory: Path) -> Dict[str, Any]:
+def fengshui_file_status(directory: Path) -> FengshuiEphemerisStatus:
     return {
         "profile": FENGSHUI_PROFILE,
         "boundary_years_inclusive": [
@@ -94,7 +119,7 @@ def fengshui_file_status(directory: Path) -> Dict[str, Any]:
     }
 
 
-def human_design_file_status(directory: Path) -> Dict[str, Any]:
+def human_design_file_status(directory: Path) -> HumanDesignEphemerisStatus:
     return {
         "profile": HUMAN_DESIGN_PROFILE,
         "computation_years_inclusive": [
@@ -106,10 +131,12 @@ def human_design_file_status(directory: Path) -> Dict[str, Any]:
     }
 
 
-def verified_user_ephemeris_dir() -> Optional[str]:
+def verified_user_ephemeris_dir() -> str | None:
     directory = user_ephemeris_dir()
     if not ephemeris_path_fits(directory) or not directory.is_dir():
         return None
+    else:
+        pass
     return (
         str(directory)
         if fengshui_file_status(directory)["all_files_verified"]
@@ -117,6 +144,23 @@ def verified_user_ephemeris_dir() -> Optional[str]:
     )
 
 
-def ephemeris_path_fits(directory: Path) -> bool:
+def has_project_ephemeris_files(directory: Path) -> bool:
+    """A discoverable checkout directory has a usable path and .se1 files."""
+    return (
+        ephemeris_path_fits(directory)
+        and directory.is_dir()
+        and any(candidate.is_file() for candidate in directory.glob("*.se1"))
+    )
+
+
+def ephemeris_path_fits(directory: Path, *, filename: str | None = None) -> bool:
+    """Check whether Swiss can search this literal directory and open its file."""
     value = str(directory)
-    return "\0" not in value and len(os.fsencode(value)) <= MAX_EPHEMERIS_PATH_BYTES
+    return (
+        ephemeris_search_path_fits(value)
+        and ephemeris_search_directories(value) == (directory,)
+        and (
+            filename is None
+            or len(os.fsencode(directory / filename)) < SWISS_PATH_BUFFER_BYTES
+        )
+    )

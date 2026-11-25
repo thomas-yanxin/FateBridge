@@ -25,21 +25,31 @@ def sha(p: Path) -> str:
 def reference(folder: Path = CORPUS) -> dict[str, Any]:
     if sha(folder / "freeze.json") != PIN:
         raise ValueError("Frozen construction diagnostic identity changed")
+    else:
+        pass
     manifest = json.loads((folder / "freeze.json").read_text())
     if set(manifest) != {"reference.json", "protocol.json"} or {
         p.name for p in folder.iterdir()
     } != {*manifest, "freeze.json"}:
         raise ValueError("Frozen construction diagnostic inventory changed")
+    else:
+        pass
     if any(sha(folder / n) != h for n, h in manifest.items()):
         raise ValueError("Frozen construction diagnostic reference changed")
+    else:
+        pass
     value: dict[str, Any] = json.loads((folder / "reference.json").read_text())
     for n, h in value["source_pins"].items():
         if sha(ROOT / n) != h:
             raise ValueError("Original source manifest changed")
+        else:
+            pass
         base = ROOT / n
         files = json.loads(base.read_text())["files"]
         if any(sha(base.parent / name) != digest for name, digest in files.items()):
             raise ValueError("Original source bytes changed")
+        else:
+            pass
     value["day_branches"] = json.loads(
         (ROOT / "tests/fixtures/ren_diurnal_v1/reference.json").read_text()
     )["software_policy"]["day_branches"]
@@ -126,6 +136,8 @@ def audit() -> dict[str, Any]:
         f"P{i:02}" for i in range(1, 65)
     ]:
         raise ValueError("All original64 entries required")
+    else:
+        pass
     # Expected arithmetic is independent of the functions checked below.
     reference_grid = {
         (stem, day): god_map(ref, stem, day)
@@ -154,6 +166,8 @@ def audit() -> dict[str, Any]:
                     expected=expected_map,
                 )
             )
+        else:
+            pass
     for stem in ref["stems"]:
         for ground in ref["branches"]:
             actual_stem = wuzidun_stem(stem, ground)
@@ -168,6 +182,8 @@ def audit() -> dict[str, Any]:
                         expected=expected_stem,
                     )
                 )
+            else:
+                pass
     rows = []
     component_counts: Counter[str] = Counter()
     engine_comparisons = 0
@@ -183,6 +199,8 @@ def audit() -> dict[str, Any]:
                 )
             )
             continue
+        else:
+            pass
         day = case["hour"] in ref["day_branches"]
         literal = list(case["positions"])
         literal[1] = ref["aliases"].get(literal[1], literal[1])
@@ -235,6 +253,8 @@ def audit() -> dict[str, Any]:
                         expected=expected_positions_for_mode,
                     )
                 )
+            else:
+                pass
         branches = ref["branches"]
         implied_general = branches[
             (

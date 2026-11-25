@@ -13,7 +13,8 @@ from fatebridge.core import knowledge_store
 from fatebridge.services.knowledge import (
     calculate_knowledge_read,
 )
-from tests.support.transports import AS_OF, SPECS, business
+from fatebridge.utils.formatting import format_json_response
+from tests.support.transports import AS_OF, SPECS, business, call_calculation
 from tests.support.transports import rest as _shared_rest
 from tests.support.transports import surface_calls
 
@@ -33,7 +34,7 @@ def sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def test_all_source_bytes_and_five_leaf_images_remain_bound():
+def test_all_source_bytes_and_five_leaf_images_remain_bound() -> None:
     source = read(FIXTURE / "source-binding.json")
     assert sha(ROOT / source["source_djvu_path"]) == source["source_djvu_sha256"]
     assert len(source["source_images_sha256"]) == 5
@@ -42,7 +43,9 @@ def test_all_source_bytes_and_five_leaf_images_remain_bound():
 
 
 @pytest.mark.parametrize("key", KEYS)
-def test_every_statement_keeps_its_author_and_role_without_classifier_credit(key):
+def test_every_statement_keeps_its_author_and_role_without_classifier_credit(
+    key,
+) -> None:
     value = calculate_knowledge_read(domain="bazi", key=key)
     c = value["provenance"]["entry_curation"]
     assert c["source_refs"][0]["author"] == "李雨田增补（初学捷径；雨田按）"
@@ -74,11 +77,15 @@ def test_every_statement_keeps_its_author_and_role_without_classifier_credit(key
         assert other["source_claim_id"] == "CENSUS-R539"
         assert other["source_pdf_pages"] == [177, 178]
         assert other["no_cross_author_table_merging"]
+    else:
+        pass
     for ref in c.get("implementation_refs", []):
         assert (ROOT / ref["source_path"]).is_file()
 
 
-def test_complete30_row_rendering_preserves_all_candidates_and_global_exclusions():
+def test_complete30_row_rendering_preserves_all_candidates_and_global_exclusions() -> (
+    None
+):
     actual = calculate_knowledge_read(domain="bazi", key=KEYS[2])
     source = read(FIXTURE / "source-binding.json")["all30_rows"]
     rendered = []
@@ -104,7 +111,7 @@ def test_complete30_row_rendering_preserves_all_candidates_and_global_exclusions
     )
 
 
-def test_ambiguous_editorial_vocabulary_is_not_recast_as_a_four_class_oracle():
+def test_ambiguous_editorial_vocabulary_is_not_recast_as_a_four_class_oracle() -> None:
     words = calculate_knowledge_read(domain="bazi", key=KEYS[0])["tips"]
     assert "不完全一致之处继续保留" in words[2]
     assert "不要拘泥" in words[2]
@@ -125,8 +132,8 @@ def test_ambiguous_editorial_vocabulary_is_not_recast_as_a_four_class_oracle():
     ],
 )
 def test_third_supplement_cannot_shadow_any_existing_layer(
-    attack, tmp_path, monkeypatch
-):
+    attack: str, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     value = read(BUNDLE)
     entry = value["categories"]["source_vocabulary"][KEYS[0]]
     categories = {
@@ -164,7 +171,7 @@ def test_third_supplement_cannot_shadow_any_existing_layer(
         knowledge_store.load_knowledge_bundles.cache_clear()
 
 
-def test_cached_source_rows_cannot_be_mutated_by_a_caller():
+def test_cached_source_rows_cannot_be_mutated_by_a_caller() -> None:
     first = calculate_knowledge_read(domain="bazi", key=KEYS[2])
     first["provenance"]["entry_curation"]["source_table_binding"]["rows"].clear()
     assert (
@@ -180,12 +187,14 @@ def test_cached_source_rows_cannot_be_mutated_by_a_caller():
 @pytest.mark.parametrize("key", KEYS)
 @pytest.mark.parametrize("category", [None, "source_vocabulary"])
 def test_full_card_is_identical_on_rest_native_mcp_and_cli(
-    key, category, surface_calls
-):
+    key, category: str | None, surface_calls
+) -> None:
     spec = SPECS["knowledge_read"]
     payload = dict(domain="bazi", key=key)
     if category:
         payload["category"] = category
+    else:
+        pass
     options = dict(include_snapshot_text=False, response_char_limit=0)
     http, protocol, code, cli = surface_calls(
         spec, payload, projection=options, cli_first=False
@@ -199,7 +208,7 @@ def test_full_card_is_identical_on_rest_native_mcp_and_cli(
 @pytest.mark.parametrize("key", KEYS)
 def test_source_projection_is_identical_and_keeps_requested_evidence(
     key, surface_calls
-):
+) -> None:
     spec = SPECS["knowledge_read"]
     payload = dict(domain="bazi", key=key)
     fields = [
@@ -212,6 +221,8 @@ def test_source_projection_is_identical_and_keeps_requested_evidence(
     ]
     if key == KEYS[2]:
         fields.append("provenance.entry_curation.source_table_binding")
+    else:
+        pass
     options = dict(
         fields=fields,
         strict_fields=True,
@@ -228,7 +239,7 @@ def test_source_projection_is_identical_and_keeps_requested_evidence(
     assert "snapshot_text" not in http.json() and "rendered_text" not in http.json()
 
 
-def test_complete_table_can_be_read_from_the_same_budgeted_mcp_run(rest):
+def test_complete_table_can_be_read_from_the_same_budgeted_mcp_run(rest) -> None:
     spec = SPECS["knowledge_read"]
     payload = dict(domain="bazi", key=KEYS[2])
     http = rest.post(
@@ -240,7 +251,8 @@ def test_complete_table_can_be_read_from_the_same_budgeted_mcp_run(rest):
 
     async def check():
         async with Client(mcp.app) as client:
-            answer = await client.call_tool(
+            answer = await call_calculation(
+                client,
                 spec.tool_name,
                 {
                     **payload,
@@ -253,7 +265,7 @@ def test_complete_table_can_be_read_from_the_same_budgeted_mcp_run(rest):
             )
             assert not answer.is_error
             inline = answer.structured_content
-            assert len(answer.content[0].text) <= 4096
+            assert len(format_json_response(answer.structured_content)) <= 4096
             ref = inline["result_delivery"]
             manifest = json.loads(
                 (await client.read_resource(ref["manifest_uri"]))[0].text

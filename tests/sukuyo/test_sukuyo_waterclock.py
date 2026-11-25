@@ -14,12 +14,12 @@ R = json.loads(RAW)
 
 
 def module():
-    from fatebridge.core import sukuyo_waterclock
+    from fatebridge.core.sukuyo import sukuyo_waterclock
 
     return sukuyo_waterclock
 
 
-def test_reference_frozen_before_production():
+def test_reference_frozen_before_production() -> None:
     assert (
         hashlib.sha256(RAW).hexdigest()
         == "6d7d3ca5693097a28073a77587d9a4a9bd9c6adcc57cdbb44196c78931bef54f"
@@ -28,7 +28,9 @@ def test_reference_frozen_before_production():
     assert len(R["expected"]["nalanda_counter_cases"]) == 33
 
 
-def test_all_named_count_identities_and_units_match_independent_source_reference():
+def test_all_named_count_identities_and_units_match_independent_source_reference() -> (
+    None
+):
     ref = module().source_specific_time_reference()
     assert ref["count_arithmetic"] == {
         k: v for k, v in R["expected"].items() if k != "nalanda_counter_cases"
@@ -43,7 +45,7 @@ def test_all_named_count_identities_and_units_match_independent_source_reference
     R["expected"]["nalanda_counter_cases"],
     ids=lambda v: str(v["completed_sinkings"]),
 )
-def test_every_counter_state_matches_frozen_fraction_arithmetic(expected):
+def test_every_counter_state_matches_frozen_fraction_arithmetic(expected) -> None:
     result = module().nalanda_group_count(expected["completed_sinkings"])
     assert {k: result[k] for k in expected} == expected
     assert not result["physical_clock_conversion"]
@@ -51,7 +53,7 @@ def test_every_counter_state_matches_frozen_fraction_arithmetic(expected):
 
 
 @pytest.mark.parametrize("value", [True, False, -1, 33, 100, 0.0, 4.0, "4", None])
-def test_counter_does_not_coerce_bool_out_of_cycle_or_inexact_input(value):
+def test_counter_does_not_coerce_bool_out_of_cycle_or_inexact_input(value) -> None:
     with pytest.raises(ValueError):
         module().nalanda_group_count(value)
 
@@ -65,7 +67,7 @@ def test_counter_does_not_coerce_bool_out_of_cycle_or_inexact_input(value):
         (("T2125", "kulun", "night_drum_strikes"), 16),
     ],
 )
-def test_source_count_corruption_is_rejected(path, value):
+def test_source_count_corruption_is_rejected(path, value: int) -> None:
     data = deepcopy(R["source_bundle"])
     target = data
     for key in path[:-1]:
@@ -75,7 +77,7 @@ def test_source_count_corruption_is_rejected(path, value):
         module().validate_source_controls(data)
 
 
-def test_source_reference_is_detached_and_preserves_unfavorable_literals():
+def test_source_reference_is_detached_and_preserves_unfavorable_literals() -> None:
     one = module().source_specific_time_reference()
     one["T2125"]["retained_unadjudicated_literals"].clear()
     two = module().source_specific_time_reference()
@@ -90,8 +92,8 @@ def test_source_reference_is_detached_and_preserves_unfavorable_literals():
     assert not two["scope"]["runtime_host_or_mansion_override"]
 
 
-def test_calendar_day_keeps_existing_16_parts_and_delivers_named_calibration():
-    from fatebridge.core.sukuyo_calendar_text import calendar_day_evidence
+def test_calendar_day_keeps_existing_16_parts_and_delivers_named_calibration() -> None:
+    from fatebridge.core.sukuyo.sukuyo_calendar_text import calendar_day_evidence
 
     day = calendar_day_evidence(1)
     clock = day["clock_doctrine"]
@@ -109,9 +111,9 @@ def test_calendar_day_keeps_existing_16_parts_and_delivers_named_calibration():
     ],
 )
 def test_native_full_day_explanation_delivers_source_units_and_never_moves_mansion(
-    civil, zone, basis
-):
-    from fatebridge.core.sukuyo import calendar_mansion, day_evidence
+    civil: str, zone: str, basis: str
+) -> None:
+    from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence
 
     c = calendar_mansion(civil, zone=zone, calendar_basis=basis)
     before = deepcopy(c)
@@ -129,8 +131,10 @@ def test_native_full_day_explanation_delivers_source_units_and_never_moves_mansi
     )
 
 
-def test_out_of_range_rejection_names_selected_hutime_snapshot_not_global_absence():
-    from fatebridge.core.sukuyo import calendar_mansion
+def test_out_of_range_rejection_names_selected_hutime_snapshot_not_global_absence() -> (
+    None
+):
+    from fatebridge.core.sukuyo.sukuyo import calendar_mansion
 
     with pytest.raises(ValueError) as error:
         calendar_mansion(
@@ -146,8 +150,8 @@ def test_out_of_range_rejection_names_selected_hutime_snapshot_not_global_absenc
     )
 
 
-def test_native_ordinary_counting_drums_remain_distinct_from_special_signals():
-    from fatebridge.core.sukuyo import calendar_mansion, day_evidence
+def test_native_ordinary_counting_drums_remain_distinct_from_special_signals() -> None:
+    from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence
 
     result = day_evidence(calendar_mansion("2025-01-29", "12:00:00", "+08:00"))
     ref = result["calendar_day"]["clock_doctrine"]["source_specific_time_calibration"]

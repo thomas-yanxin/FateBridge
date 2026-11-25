@@ -8,15 +8,15 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.guolao_classical import (
+from fatebridge.core.guolao.guolao_classical import (
     MANSIONS,
     SHOUSHI_1281,
     SHOUSHI_EQUATORIAL_1281,
     HistoricalMansions,
 )
-from fatebridge.core.guolao_coordinates import NLC166_PALACES
-from fatebridge.core.guolao_historical import GUJIN_58_PURPLE
-from fatebridge.core.guolao_solar import shoushi_winter_sun
+from fatebridge.core.guolao.guolao_coordinates import NLC166_PALACES
+from fatebridge.core.guolao.guolao_historical import GUJIN_58_PURPLE
+from fatebridge.core.guolao.guolao_solar import shoushi_winter_sun
 
 ROOT = Path(__file__).parents[2]
 FIXTURE = Path(__file__).parents[1] / "fixtures/guolao-shoushi-equatorial-v1"
@@ -30,7 +30,9 @@ REFERENCE = json.loads((FIXTURE / "reference.json").read_text())
         ("independent_digital_worked_example", "excerpt_file", "excerpt_sha256"),
     ],
 )
-def test_actual_source_artifacts_match_frozen_provenance(entry, file_key, hash_key):
+def test_actual_source_artifacts_match_frozen_provenance(
+    entry: str, file_key: str, hash_key: str
+) -> None:
     source = REFERENCE[entry]
     assert (
         hashlib.sha256((FIXTURE / source[file_key]).read_bytes()).hexdigest()
@@ -38,7 +40,9 @@ def test_actual_source_artifacts_match_frozen_provenance(entry, file_key, hash_k
     )
 
 
-def test_all_28_equatorial_widths_and_four_subtotals_against_scan_transcription():
+def test_all_28_equatorial_widths_and_four_subtotals_against_scan_transcription() -> (
+    None
+):
     source = REFERENCE["source_equatorial_table"]
     table = SHOUSHI_EQUATORIAL_1281
     assert "".join(MANSIONS) == source["mansion_names"]
@@ -55,7 +59,9 @@ def test_all_28_equatorial_widths_and_four_subtotals_against_scan_transcription(
 
 
 @pytest.mark.parametrize("frame", ["source_equatorial", "unspecified"])
-def test_same_circle_does_not_authorize_equatorial_widths_in_ecliptic_profile(frame):
+def test_same_circle_does_not_authorize_equatorial_widths_in_ecliptic_profile(
+    frame: str,
+) -> None:
     # This constructor succeeded before the repair, then labelled the resulting
     # intervals source_ecliptic regardless of the actual underlying table.
     table = replace(SHOUSHI_EQUATORIAL_1281, coordinate_frame=frame)
@@ -64,7 +70,7 @@ def test_same_circle_does_not_authorize_equatorial_widths_in_ecliptic_profile(fr
         replace(NLC166_PALACES, table=table)
 
 
-def test_unknown_coordinate_frame_is_not_silently_accepted():
+def test_unknown_coordinate_frame_is_not_silently_accepted() -> None:
     with pytest.raises(ValueError, match="坐标系"):
         replace(SHOUSHI_1281, coordinate_frame="modern_ra_degrees")
     unspecified = HistoricalMansions("synthetic_exact", F(28), (F(1),) * 28)
@@ -74,7 +80,9 @@ def test_unknown_coordinate_frame_is_not_silently_accepted():
     assert NLC166_PALACES.locate(F())["coordinate_frame"] == "source_ecliptic"
 
 
-def test_elapsed_318_complete_chain_against_independent_printed_digital_example():
+def test_elapsed_318_complete_chain_against_independent_printed_digital_example() -> (
+    None
+):
     expected = REFERENCE["independent_digital_worked_example"]
     result = shoushi_winter_sun(expected["elapsed_years"])
     for actual, source in [
@@ -92,14 +100,14 @@ def test_elapsed_318_complete_chain_against_independent_printed_digital_example(
     assert result["complete_revolutions"] == 318
 
 
-def test_following_winter_matches_source_without_refitting_an_offset():
+def test_following_winter_matches_source_without_refitting_an_offset() -> None:
     expected = REFERENCE["independent_digital_worked_example"]
     result = shoushi_winter_sun(expected["next_elapsed_years"])
     assert result["mansion"] == expected["next_mansion"]
     assert F(result["degree_in_mansion_du_exact"]) == F(expected["next_degree_du"])
 
 
-def test_wrong_circle_and_wrong_frame_have_material_source_degree_errors():
+def test_wrong_circle_and_wrong_frame_have_material_source_degree_errors() -> None:
     table = SHOUSHI_EQUATORIAL_1281
     xu_origin = sum(table.widths_du[: MANSIONS.index("虚")], F()) + 6
     at_epoch = shoushi_winter_sun(0)
@@ -113,7 +121,9 @@ def test_wrong_circle_and_wrong_frame_have_material_source_degree_errors():
     assert F("5.1346") - F(result["degree_in_mansion_du_exact"]) == F("0.0954")
 
 
-def test_reference_circle_and_annual_period_are_not_normalized_to_hide_difference():
+def test_reference_circle_and_annual_period_are_not_normalized_to_hide_difference() -> (
+    None
+):
     result = shoushi_winter_sun(318)
     assert result["coordinate_frame"] == "source_equatorial"
     assert F(result["mansion_reference_circle_du_exact"]) == F("365.2575")
@@ -131,7 +141,7 @@ def test_reference_circle_and_annual_period_are_not_normalized_to_hide_differenc
     ]
 
 
-def test_generic_mansion_reduction_does_not_assume_all_winters_stay_in_ji():
+def test_generic_mansion_reduction_does_not_assume_all_winters_stay_in_ji() -> None:
     result = shoushi_winter_sun(745)
     # Independent subtraction of the fixed printed arc to 箕初:
     # 302.8895 - 305.1075 = -2.2180; 尾19.10 - 2.2180 = 16.8820.
@@ -140,12 +150,14 @@ def test_generic_mansion_reduction_does_not_assume_all_winters_stay_in_ji():
 
 
 @pytest.mark.parametrize("value", [True, False, 318.0, F(318), "318", None])
-def test_source_elapsed_count_requires_explicit_integer_years(value):
+def test_source_elapsed_count_requires_explicit_integer_years(value) -> None:
     with pytest.raises(TypeError):
         shoushi_winter_sun(value)
 
 
 @pytest.mark.parametrize("value", [-1, 365242500])
-def test_out_of_scope_upward_reckoning_or_nonpositive_year_length_is_rejected(value):
+def test_out_of_scope_upward_reckoning_or_nonpositive_year_length_is_rejected(
+    value,
+) -> None:
     with pytest.raises(ValueError):
         shoushi_winter_sun(value)

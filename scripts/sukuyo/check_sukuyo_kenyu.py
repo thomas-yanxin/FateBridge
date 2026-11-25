@@ -11,9 +11,11 @@ from typing import Any
 
 if not __package__:
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+else:
+    pass
 
-from fatebridge.core.sukuyo_kenyu import SOURCE, lookup_printed_hour
-from fatebridge.core.sukuyo_sources import load_source
+from fatebridge.core.sukuyo.sukuyo_kenyu import SOURCE, lookup_printed_hour
+from fatebridge.core.sukuyo.sukuyo_sources import load_source
 from scripts.sukuyo.audit_sukuyo_t2465_primary import SATQuotationParser
 
 
@@ -25,11 +27,15 @@ def verify_kenyu(captures: Path | None = None) -> dict[str, Any]:
         len(r["luminaries"]) != 7 for r in table["table_rows"]
     ):
         raise ValueError("Printed matrix must retain all 56 cells")
+    else:
+        pass
     for example in table["source_prose_examples"]:
         part = {"上": "upper", "下": "lower", None: None}[example["part"]]
         actual = lookup_printed_hour(example["day_luminary"], example["branch"], part)
         if actual["selected_hour_luminary"] != example["hour_luminary"]:
             raise ValueError("Printed table differs from an explicit prose example")
+        else:
+            pass
     checked = []
     if captures is not None:
         for name, expected in [
@@ -45,11 +51,15 @@ def verify_kenyu(captures: Path | None = None) -> dict[str, Any]:
             actual_sha = hashlib.sha256(raw).hexdigest()
             if actual_sha != expected:
                 raise ValueError(f"Captured source bytes changed: {name}")
+            else:
+                pass
             checked.append({"name": name, "bytes": len(raw), "sha256": actual_sha})
         manifest = json.loads((captures / "nijl-100159236-manifest.json").read_bytes())
         canvases = manifest["sequences"][0]["canvases"]
         if len(canvases) != source["catalogue"]["manifest_canvas_count"]:
             raise ValueError("Manifest canvas count changed")
+        else:
+            pass
         for row in source["images"]:
             canvas = canvases[row["frame"] - 1]
             if (
@@ -57,12 +67,18 @@ def verify_kenyu(captures: Path | None = None) -> dict[str, Any]:
                 or canvas["images"][0]["resource"]["@id"] != row["url"]
             ):
                 raise ValueError("Captured image is not bound to its manifest canvas")
+            else:
+                pass
         parser = SATQuotationParser()
         parser.feed((captures / "sat-t2216-0058.html").read_text(encoding="utf-8"))
         text = "".join("".join(line) for line in parser.lines.values())
         for passage in source["commentary_selected"]["passages"]:
             if passage["literal"] not in text:
                 raise ValueError(f"Selected commentary changed: {passage['locator']}")
+            else:
+                pass
+    else:
+        pass
     return {
         "source_bundle_sha256": loaded.sha256,
         "captured_bytes_rechecked": captures is not None,
@@ -92,3 +108,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+else:
+    pass

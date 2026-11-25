@@ -10,7 +10,7 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.bazi_pattern_facts import (
+from fatebridge.core.bazi.bazi_pattern_facts import (
     analyze_special_patterns,
     check_hidden_patterns,
 )
@@ -33,7 +33,7 @@ def reference():
 
 def test_all_branch_assignments_match_independent_hidden_pairs_and_arch_predicate(
     reference,
-):
+) -> None:
     assert len(reference["arch_cases"]) == 12**4
     elements = {
         frozenset(pair): element
@@ -62,6 +62,8 @@ def test_all_branch_assignments_match_independent_hidden_pairs_and_arch_predicat
                         ],
                     }
                 )
+            else:
+                pass
         assert actual["hidden_stem_combinations"] == expected
         assert [
             {
@@ -85,7 +87,7 @@ def test_all_branch_assignments_match_independent_hidden_pairs_and_arch_predicat
             ]
 
 
-def test_all_branch_categories_match_primary_memberships(reference):
+def test_all_branch_categories_match_primary_memberships(reference) -> None:
     for case in reference["arch_cases"]:
         branches = case["branches"]
         pillars = dict(zip(POSITIONS, zip("甲丙戊庚", branches)))
@@ -104,7 +106,7 @@ def test_all_branch_categories_match_primary_memberships(reference):
             )
 
 
-def test_visible_element_facts_keep_each_stem_and_position(reference):
+def test_visible_element_facts_keep_each_stem_and_position(reference) -> None:
     # The exhaustive branch queue uses four fixed stems; add both polarities
     # of every element, including the water stems absent from that queue.
     for stem, position in itertools.product(reference["stems"], POSITIONS):
@@ -130,7 +132,7 @@ def test_visible_element_facts_keep_each_stem_and_position(reference):
 
 def test_all_day_clock_references_keep_day_list_separate_from_actual_lighting(
     reference,
-):
+) -> None:
     for index, hour in itertools.product(range(60), [None, *range(24)]):
         day = reference["stems"][index % 10] + reference["branches"][index % 12]
         pillars = {
@@ -153,9 +155,11 @@ def test_all_day_clock_references_keep_day_list_separate_from_actual_lighting(
         assert "noble_day_type" not in actual
         if hour is None or required is None:
             assert info["clock_matches_required"] is None
+        else:
+            pass
 
 
-def test_source_day_hour_arch_pairs_and_all_year_month_fillings(reference):
+def test_source_day_hour_arch_pairs_and_all_year_month_fillings(reference) -> None:
     pairs = {
         (row["day"], row["hour"]): row for row in reference["primary"]["arch_lu_gui"]
     }
@@ -196,7 +200,7 @@ def test_source_day_hour_arch_pairs_and_all_year_month_fillings(reference):
             )
 
 
-def test_labeled_clock_reference_preserves_the_frozen_legacy_computation():
+def test_labeled_clock_reference_preserves_the_frozen_legacy_computation() -> None:
     for row in json.loads((DATA / "legacy-clock.json").read_text())["cases"]:
         day = row["day"]
         pillars = {
@@ -212,7 +216,9 @@ def test_labeled_clock_reference_preserves_the_frozen_legacy_computation():
         )
 
 
-def test_source_lu_pairs_and_visible_stems_do_not_create_transformation(reference):
+def test_source_lu_pairs_and_visible_stems_do_not_create_transformation(
+    reference,
+) -> None:
     for a, b, sa, sb in reference["primary"]["lu_stem_pairs"]:
         pillars = {
             "year": ("甲", a),

@@ -33,23 +33,37 @@ class SATQuotationParser(HTMLParser):
             assert self.line is not None
             if self.line in self.lines:
                 raise ValueError(f"Duplicate primary text line: {self.line}")
+            else:
+                pass
             self.lines[self.line] = []
+        else:
+            pass
         if tag == "button":
             if self.line:
                 self.notes.setdefault(self.line, []).append(
                     attributes.get("title") or ""
                 )
+            else:
+                pass
             self.button_depth += 1
+        else:
+            pass
 
     def handle_endtag(self, tag: str) -> None:
         if tag == "button":
             self.button_depth -= 1
+        else:
+            pass
         if tag == "a":
             self.line = None
+        else:
+            pass
 
     def handle_data(self, data: str) -> None:
         if self.line and not self.button_depth:
             self.lines[self.line].append(data)
+        else:
+            pass
 
 
 def verify_primary(publisher_html: Path | None = None) -> dict[str, Any]:
@@ -59,6 +73,8 @@ def verify_primary(publisher_html: Path | None = None) -> dict[str, Any]:
         parser.feed(row["html"])
     if set(parser.lines) != {"0024a04", *[f"0030c{i:02}" for i in range(13, 27)]}:
         raise ValueError("Selected primary quotation line set is incomplete")
+    else:
+        pass
     calendar_text = "".join(
         "".join(parser.lines[f"0030c{i:02}"]) for i in range(13, 27)
     )
@@ -80,17 +96,25 @@ def verify_primary(publisher_html: Path | None = None) -> dict[str, Any]:
         raise ValueError(
             "Primary quotation differs beyond the recorded terminal punctuation finding"
         )
+    else:
+        pass
     if publisher_html is not None:
         raw = publisher_html.read_bytes()
         if hashlib.sha256(raw).hexdigest() != fixture["publisher_html_response_sha256"]:
             raise ValueError("Private publisher response fingerprint changed")
+        else:
+            pass
         if len(raw) != fixture["publisher_html_response_bytes"]:
             raise ValueError("Private publisher response byte count changed")
+        else:
+            pass
         text = raw.decode("utf-8")
         if any(row["html"] not in text for row in fixture["selected_html_quotations"]):
             raise ValueError(
                 "A selected quotation is absent from the publisher response"
             )
+        else:
+            pass
         keys = sorted(set(re.findall(r'<a name="(\d{4}[abc]\d\d)"', text)))
         if (len(keys), keys[0], keys[-1]) != (
             fixture["html_line_anchor_count"],
@@ -98,6 +122,10 @@ def verify_primary(publisher_html: Path | None = None) -> dict[str, Any]:
             fixture["html_line_anchor_last"],
         ):
             raise ValueError("Publisher response line extent changed")
+        else:
+            pass
+    else:
+        pass
     return {
         "format": "sukuyo_t2465_primary_quotation_check_v1",
         "publisher_html_response_sha256": fixture["publisher_html_response_sha256"],
@@ -156,3 +184,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

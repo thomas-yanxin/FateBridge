@@ -1,11 +1,12 @@
 """Selected clock arithmetic must retain conflicting readings and date gaps."""
 
 from fractions import Fraction
+from pathlib import Path
 
 import pytest
 
-from fatebridge.core.sukuyo import calendar_mansion, day_evidence
-from fatebridge.core.sukuyo_guchureki_clock import (
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence
+from fatebridge.core.sukuyo.sukuyo_guchureki_clock import (
     MODEL,
     clock_arithmetic_reference,
     decode_clock,
@@ -19,7 +20,9 @@ def fraction(value):
     return Fraction(value["numerator"], value["denominator"])
 
 
-def test_sukuyo_guchureki_all_printed_pairs_and_adverse_residuals_are_retained():
+def test_sukuyo_guchureki_all_printed_pairs_and_adverse_residuals_are_retained() -> (
+    None
+):
     result = verify_guchureki_clock()
     assert result["errors"] == []
     assert result["record_groups_checked"] == 40
@@ -58,8 +61,8 @@ def test_sukuyo_guchureki_all_printed_pairs_and_adverse_residuals_are_retained()
     ],
 )
 def test_sukuyo_guchureki_zero_midpoint_boundary_and_half_fun(
-    literal, expected, boundary
-):
+    literal: str, expected, boundary: bool
+) -> None:
     result = decode_clock(literal, model=MODEL)
     assert fraction(result["within_branch_fun"]) == expected
     assert result["literal"] == literal
@@ -67,6 +70,8 @@ def test_sukuyo_guchureki_zero_midpoint_boundary_and_half_fun(
     assert not result["civil_date_or_clock_assigned"]
     if literal == "亥4刻1分":
         assert result["next_branch_if_boundary"] == "子"
+    else:
+        pass
 
 
 @pytest.mark.parametrize(
@@ -85,12 +90,14 @@ def test_sukuyo_guchureki_zero_midpoint_boundary_and_half_fun(
         "卯0.5分",
     ],
 )
-def test_sukuyo_guchureki_rejects_ambiguous_units_or_invalid_clock_points(literal):
+def test_sukuyo_guchureki_rejects_ambiguous_units_or_invalid_clock_points(
+    literal: str | None,
+) -> None:
     with pytest.raises(ValueError):
         decode_clock(literal, model=MODEL)
 
 
-def test_sukuyo_guchureki_sums_are_quantities_not_clock_points():
+def test_sukuyo_guchureki_sums_are_quantities_not_clock_points() -> None:
     assert fraction(quantity_fun("3刻7分", model=MODEL)) == 25
     assert fraction(quantity_fun("4刻1分", model=MODEL)) == 25
     assert fraction(quantity_fun("4刻2分", model=MODEL)) == 26
@@ -102,7 +109,9 @@ def test_sukuyo_guchureki_sums_are_quantities_not_clock_points():
         decode_clock("卯時正", model="senmyoreki")
 
 
-def test_sukuyo_guchureki_same_named_units_and_abstract_difference_not_collapsed():
+def test_sukuyo_guchureki_same_named_units_and_abstract_difference_not_collapsed() -> (
+    None
+):
     reference = clock_arithmetic_reference()
     exact = reference["exact_unit_relations"]
     assert fraction(exact["nominal_seconds_per_half_fun"]) == 144
@@ -124,7 +133,7 @@ def test_sukuyo_guchureki_same_named_units_and_abstract_difference_not_collapsed
     ]
 
 
-def test_sukuyo_guchureki_seasonal_labels_use_nominal_360_axis():
+def test_sukuyo_guchureki_seasonal_labels_use_nominal_360_axis() -> None:
     reference = clock_arithmetic_reference(include_all_rows=True)
     names = reference["seasonal_axis"]["term_order_from_winter_solstice"]
     assert [
@@ -141,7 +150,7 @@ def test_sukuyo_guchureki_seasonal_labels_use_nominal_360_axis():
             seasonal_ordinal(invalid)
 
 
-def test_sukuyo_guchureki_reference_is_detached_from_cached_source():
+def test_sukuyo_guchureki_reference_is_detached_from_cached_source() -> None:
     first = clock_arithmetic_reference()
     expected = clock_arithmetic_reference()
     first["table_check"]["exception_readings"][0]["sunrise_literal"] = "changed"
@@ -149,7 +158,7 @@ def test_sukuyo_guchureki_reference_is_detached_from_cached_source():
     assert clock_arithmetic_reference() == expected
 
 
-def test_sukuyo_native_clock_delivery_explains_cycle_and_other_clock_origin():
+def test_sukuyo_native_clock_delivery_explains_cycle_and_other_clock_origin() -> None:
     text = day_evidence(calendar_mansion("2025-01-07", "12:00:00"))["reading_text"]
     for detail in [
         "末段18",
@@ -166,8 +175,8 @@ def test_sukuyo_native_clock_delivery_explains_cycle_and_other_clock_origin():
 
 @pytest.mark.parametrize("half", ["first_half", "second_half", None])
 def test_sukuyo_native_clock_delivery_preserves_explicit_half_without_clock_guess(
-    half,
-):
+    half: str | None,
+) -> None:
     calendar = calendar_mansion(
         "1010-04-12",
         "12:00:00",
@@ -185,7 +194,9 @@ def test_sukuyo_native_clock_delivery_preserves_explicit_half_without_clock_gues
 
 
 @pytest.mark.parametrize("kind", ["pdf", "table"])
-def test_sukuyo_guchureki_changed_source_capture_is_rejected(tmp_path, kind):
+def test_sukuyo_guchureki_changed_source_capture_is_rejected(
+    tmp_path: Path, kind: str
+) -> None:
     path = tmp_path / kind
     path.write_bytes(b"changed")
     with pytest.raises(ValueError, match="bytes changed"):
@@ -202,8 +213,8 @@ def test_sukuyo_guchureki_changed_source_capture_is_rejected(tmp_path, kind):
     ],
 )
 def test_sukuyo_guchureki_clock_reference_does_not_assign_current_daybreak_or_half(
-    date, basis
-):
+    date: str, basis: str
+) -> None:
     calendar = calendar_mansion(
         date,
         "00:30:00",
@@ -225,3 +236,5 @@ def test_sukuyo_guchureki_clock_reference_does_not_assign_current_daybreak_or_ha
             "角",
             "轸",
         ]
+    else:
+        pass

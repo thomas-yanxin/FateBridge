@@ -9,11 +9,10 @@ from __future__ import annotations
 
 from typing import Any
 
+from fatebridge.core.metaphysics.common import ELEMENT_GENERATES, branch_element_text
+from fatebridge.core.metaphysics.jinkou_sources import SCAN_SHA256, SCAN_URL
 from fatebridge.core.metaphysics.ren_sources import JINKOU_SOURCE
-
-from ...utils.data import EARTHLY_BRANCHES
-from .common import ELEMENT_GENERATES, branch_element_text
-from .jinkou_sources import SCAN_SHA256, SCAN_URL
+from fatebridge.utils.data import EARTHLY_BRANCHES
 
 
 def qi_metadata() -> dict[str, Any]:
@@ -28,6 +27,8 @@ def qi_metadata() -> dict[str, Any]:
 def month_qi_facts(month: str, general: str) -> dict[str, Any]:
     if month not in EARTHLY_BRANCHES or general not in EARTHLY_BRANCHES:
         raise ValueError("月建进退须使用实际月建支和将神本支")
+    else:
+        pass
     offset = (EARTHLY_BRANCHES.index(general) - EARTHLY_BRANCHES.index(month)) % 12
     return {
         "month_building_branch": month,
@@ -39,6 +40,8 @@ def month_qi_facts(month: str, general: str) -> dict[str, Any]:
 def offset_qi_facts(offset: int) -> dict[str, Any]:
     if type(offset) is not int or not 0 <= offset < 12:
         raise ValueError("月建支距须为0至11的整数")
+    else:
+        pass
     label = {0: "建旺", 1: "进气相", 2: "进气相", 6: "月破", 11: "退气"}.get(offset)
     return dict(
         month_offset=offset,
@@ -50,6 +53,8 @@ def offset_qi_facts(offset: int) -> dict[str, Any]:
 def day_qi_facts(day: str, general: str) -> dict[str, Any]:
     if day not in EARTHLY_BRANCHES or general not in EARTHLY_BRANCHES:
         raise ValueError("日辰生将须使用实际日支和将神本支")
+    else:
+        pass
     day_element, general_element = branch_element_text(day), branch_element_text(
         general
     )
@@ -89,6 +94,8 @@ def month_building_check(position: str, branch: str, month: str) -> dict[str, An
         or month not in EARTHLY_BRANCHES
     ):
         raise ValueError("神将建旺须使用贵神／将神本支及月建支")
+    else:
+        pass
     return dict(
         position=position,
         branch=branch,
@@ -106,6 +113,8 @@ def build_jinkou_qi(
     daily = day_qi_facts(day_branch, branch)
     if general["element"] != daily["jiangshen_element"]:
         raise ValueError("日辰生将须使用将神本支的五行")
+    else:
+        pass
     building_checks = [
         month_building_check(
             position,

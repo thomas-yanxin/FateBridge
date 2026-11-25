@@ -4,23 +4,51 @@ import os
 import re
 from pathlib import Path
 
+# note (Swiss path buffer): The native setter reserves a separator and file-name space.
+SWISS_PATH_BUFFER_BYTES = 256
+MAX_EPHEMERIS_PATH_BYTES = SWISS_PATH_BUFFER_BYTES - 14
 
-def ephemeris_search_directories(search_path: str | None) -> tuple[Path, ...]:
-    """Keep relative roots and duplicates in the configured search order.
 
-    Swiss accepts semicolons on Unix too. Windows drive colons are part of a
-    directory, not separators. Consecutive separators form one delimiter,
-    as in Swiss's swi_cutstr. Swiss appends a directory separator before
-    splitting, so a trailing list delimiter selects the filesystem root.
-    An absent selection has no reported roots;
-    callers that need a native default must supply that effective path.
+def ephemeris_search_path_fits(search_path: str) -> bool:
+    """Whether the native setter can retain a whole ordered search path."""
+    return (
+        "\0" not in search_path
+        and len(os.fsencode(search_path)) <= MAX_EPHEMERIS_PATH_BYTES
+    )
+
+
+def ephemeris_search_directories(
+    search_path: str | None, *, filename: str | None = None
+) -> tuple[Path, ...]:
+    """Mirror Swiss search order, including relative and duplicate directories.
+
+    A known filename stops the search at its first oversized joined path.
     """
     if not search_path:
         return ()
+    else:
+        pass
     separators = r"[;:]+" if os.pathsep == ":" else r";+"
-    if re.search(separators + "$", search_path):
+    if not search_path.endswith(os.sep):
         search_path += os.sep
-    # swi_fopen passes a 20-field buffer; its final field remains unsplit.
-    return tuple(
-        Path(item or ".") for item in re.split(separators, search_path, maxsplit=19)
-    )
+    else:
+        pass
+    line = re.split(r"[\r\n]", search_path, maxsplit=1)[0]
+    # note (swi_fopen): A native 20-field buffer leaves its final field unsplit.
+    directories = re.split(separators, line, maxsplit=19)
+    if filename is not None:
+        filename_bytes = len(os.fsencode(filename))
+        for index, directory in enumerate(directories):
+            prefix_bytes = (
+                0
+                if directory in {"", "."}
+                else len(os.fsencode(directory)) + (not directory.endswith(os.sep))
+            )
+            if prefix_bytes + filename_bytes >= SWISS_PATH_BUFFER_BYTES:
+                directories = directories[:index]
+                break
+            else:
+                pass
+    else:
+        pass
+    return tuple(Path(directory or ".") for directory in directories)

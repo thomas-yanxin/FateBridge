@@ -99,7 +99,7 @@
       "domain": "canping",
       "key": "schedule_basis",
       "source_path": "canping/schedule-basis-v1.json",
-      "canonical_content_sha256": "c8da433b4ab29c86f044f05e06593ead40992b76612147b6f1d11b5a37ccccc4",
+      "canonical_content_sha256": "0dd48c5f54c3ea3f496fd733d94dad3e5daaf70340d650cc9cfd4abc8b3a1072",
       "source_kind": "existing_partial_source_record"
     },
     {

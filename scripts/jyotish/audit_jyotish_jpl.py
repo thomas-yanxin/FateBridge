@@ -65,12 +65,14 @@ def audit(kernel: Path, reference_path: Path) -> dict:
     from fatebridge.core import ephemeris_runtime as e
     from fatebridge.core.astro.birth import build_astro_birth_info
     from fatebridge.core.execution_context import call_clock
-    from fatebridge.core.jyotish import build_india, positions
+    from fatebridge.core.jyotish.jyotish import build_india, positions
     from fatebridge.services.jyotish import calculate_vimshottari
 
     reference_raw = reference_path.read_bytes()
     if hashlib.sha256(reference_raw).hexdigest() != REFERENCE_SHA256:
         raise ValueError("The sealed J2000 reference changed")
+    else:
+        pass
     reference = json.loads(reference_raw)
     os.environ["SE_EPHE_PATH"] = str(kernel.parent)
     os.environ["FATEBRIDGE_JPL_FILE"] = kernel.name
@@ -98,6 +100,8 @@ def audit(kernel: Path, reference_path: Path) -> dict:
     raw = positions(build_astro_birth_info(**aligned, preserve_instant=True), **options)
     if raw["julian_day_tt"] != 2451545.0:
         raise ValueError("The declared recorded birth did not retain its reference TT")
+    else:
+        pass
     rows = []
     for row in reference["rows"]:
         point = raw["motion_true_j2000"][row["body"]]
@@ -130,6 +134,8 @@ def audit(kernel: Path, reference_path: Path) -> dict:
         )
     if "error" in service:
         raise ValueError("Vimshottari did not return its strict positive result")
+    else:
+        pass
     profiles = {}
     for name, result in [("india", india), ("vimshottari", service["india"])]:
         profile = result["profile"]
@@ -142,6 +148,8 @@ def audit(kernel: Path, reference_path: Path) -> dict:
             or result["birth_time_sensitivity"]["sample_count"] != 5
         ):
             raise ValueError("Strict positive frame/source/grid requirements failed")
+        else:
+            pass
         profiles[name] = {
             "sample_count": 5,
             "physical_source": source,
@@ -175,6 +183,8 @@ def main() -> int:
     a = p.parse_args()
     if a.report.resolve() in {a.kernel.resolve(), a.reference.resolve()}:
         p.error("report must not overwrite the kernel or reference")
+    else:
+        pass
     try:
         result = audit(a.kernel.resolve(), a.reference)
     except Exception as error:
@@ -194,3 +204,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

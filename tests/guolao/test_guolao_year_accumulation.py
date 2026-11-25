@@ -7,13 +7,15 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.guolao_historical import shoushi_winter_cycle
+from fatebridge.core.guolao.guolao_historical import shoushi_winter_cycle
 
 SOURCE_DIR = Path(__file__).parents[1] / "fixtures" / "guolao-shoushi-accumulation-v1"
 SOURCE = json.loads((SOURCE_DIR / "reference.json").read_text())
 
 
-def test_original_318_year_middle_and_winter_day_reproduce_the_printed_example():
+def test_original_318_year_middle_and_winter_day_reproduce_the_printed_example() -> (
+    None
+):
     image = SOURCE["image"]
     assert (
         hashlib.sha256((SOURCE_DIR / image["path"]).read_bytes()).hexdigest()
@@ -33,7 +35,7 @@ def test_original_318_year_middle_and_winter_day_reproduce_the_printed_example()
     assert not SOURCE["modern_epoch_calibrated"]
 
 
-def test_epoch_day_and_declared_whole_century_step_are_exact():
+def test_epoch_day_and_declared_whole_century_step_are_exact() -> None:
     initial = shoushi_winter_cycle(0)
     assert initial.zhongji_days == 0
     assert initial.winter_cycle_days == F("55.06")
@@ -49,7 +51,7 @@ def test_epoch_day_and_declared_whole_century_step_are_exact():
         assert value.zhongji_days == elapsed * F(year)
 
 
-def test_upward_reconstruction_and_undefined_units_are_not_guessed():
+def test_upward_reconstruction_and_undefined_units_are_not_guessed() -> None:
     with pytest.raises(ValueError, match="上考"):
         shoushi_winter_cycle(-1)
     for bad in [True, 318.0, F(318), "318", None]:

@@ -20,11 +20,13 @@ import hashlib
 import json
 import math
 from dataclasses import dataclass
+from fractions import Fraction
 from functools import lru_cache
 from pathlib import Path
 from typing import Sequence, Tuple, TypedDict
 
 from fatebridge.core.astro.nutation import nutation
+from fatebridge.core.astro.tt_epoch import TTInstant
 
 Vector = Tuple[float, ...]
 Matrix = Tuple[Vector, ...]
@@ -55,6 +57,8 @@ _COEFFICIENT_BYTES = (
 ).read_bytes()
 if hashlib.sha256(_COEFFICIENT_BYTES).hexdigest() != COEFFICIENT_SHA256:
     raise RuntimeError("Reference frame coefficients differ from the declared source")
+else:
+    pass
 DATA: ReferenceFrameParameters = json.loads(_COEFFICIENT_BYTES)
 AS2R = math.pi / 648000.0
 
@@ -92,8 +96,13 @@ def rotate_spherical(
     x, y, z = mv(
         matrix, (cosine * math.cos(lon), cosine * math.sin(lon), math.sin(lat))
     )
+    longitude_degrees = math.degrees(math.atan2(y, x)) % 360
+    if longitude_degrees == 360:
+        longitude_degrees = math.nextafter(360.0, 0.0)
+    else:
+        pass
     return (
-        math.degrees(math.atan2(y, x)) % 360,
+        longitude_degrees,
         math.degrees(math.atan2(z, math.hypot(x, y))),
     )
 
@@ -107,8 +116,10 @@ def madd(a: Sequence[Sequence[float]], b: Sequence[Sequence[float]]) -> Matrix:
     return tuple(add(x, y) for x, y in zip(a, b))
 
 
-def pair(tt: float, polynomial: str, periodic: str) -> Tuple[Vector, Vector]:
-    century = (tt - 2451545.0) / 36525.0
+def pair(
+    tt: float | TTInstant, polynomial: str, periodic: str
+) -> Tuple[Vector, Vector]:
+    century = float((TTInstant.from_value(tt).days - 2451545) / 36525)
     poly = DATA["native_tables"][polynomial]
     terms = DATA["native_tables"][periodic]
     values = []
@@ -134,7 +145,7 @@ def pair(tt: float, polynomial: str, periodic: str) -> Tuple[Vector, Vector]:
     return tuple(values), tuple(derivatives)
 
 
-def precession(tt: float) -> Tuple[Matrix, Matrix]:
+def precession(tt: float | TTInstant) -> Tuple[Matrix, Matrix]:
     (p, q), (pd, qd) = pair(tt, "pqpol", "pqper")
     eps0 = 84381.406 * AS2R
     ce, se = math.cos(eps0), math.sin(eps0)
@@ -170,8 +181,8 @@ def ecliptic_rotation(epsilon: float, epsilon_d: float = 0.0) -> Tuple[Matrix, M
     )
 
 
-def pmat76(tt: float) -> Matrix:
-    century = (tt - 2451545.0) / 36525.0
+def pmat76(tt: float | TTInstant) -> Matrix:
+    century = float((TTInstant.from_value(tt).days - 2451545) / 36525)
     angles = {
         name: math.fsum(float(c) * century**i for i, c in enumerate(terms)) * AS2R
         for name, terms in DATA["IAU1976_angles_arcsec_coefficients"].items()
@@ -202,7 +213,10 @@ def _polynomial(t: float, coefficients: Sequence[float]) -> float:
 def precession_angles(date1: float, date2: float = 0.0) -> Tuple[float, ...]:
     if not math.isfinite(date1) or not math.isfinite(date2):
         raise ValueError("Frame epoch must be finite")
-    t = ((date1 - 2451545.0) + date2) / 36525.0
+    else:
+        pass
+    # Reduce the two-part epoch before rounding the century argument once.
+    t = float((Fraction(date1) - 2451545 + Fraction(date2)) / 36525)
     return tuple(
         _polynomial(t, coefficients)
         for coefficients in [
@@ -242,10 +256,12 @@ def rotate(
     co, si = math.cos(angle), math.sin(angle)
     if axis == "x":
         return x, co * y + si * z, -si * y + co * z
+    else:
+        pass
     return co * x + si * y, -si * x + co * y, z
 
 
-def mean_ecliptic_frame(tt: float) -> Tuple[Matrix, Matrix]:
+def mean_ecliptic_frame(tt: float | TTInstant) -> Tuple[Matrix, Matrix]:
     """Mean-J2000 to scalar-obliquity ecliptic of date and TT derivative."""
     matrix, matrix_d = precession(tt)
     values, derivatives = pair(tt, "pepol", "peper")
@@ -254,17 +270,17 @@ def mean_ecliptic_frame(tt: float) -> Tuple[Matrix, Matrix]:
 
 
 @lru_cache(maxsize=512)
-def native_precession_frame(tt: float) -> Matrix:
+def native_precession_frame(tt: float | TTInstant) -> Matrix:
     """Original Swiss precession, including its exact J2000 shortcut."""
     return (
         ((1.0, 0.0, 0.0), (0.0, 1.0, 0.0), (0.0, 0.0, 1.0))
-        if tt == 2451545.0
+        if TTInstant.from_value(tt).days == 2451545
         else precession(tt)[0]
     )
 
 
 def native_equatorial_frame(
-    tt: float,
+    tt: float | TTInstant,
     mean_obliquity: float,
     nutation_longitude: float,
     nutation_obliquity: float,
@@ -279,9 +295,11 @@ def native_equatorial_frame(
 
     if not all(
         math.isfinite(x)
-        for x in (tt, mean_obliquity, nutation_longitude, nutation_obliquity)
+        for x in (mean_obliquity, nutation_longitude, nutation_obliquity)
     ):
         raise ValueError("Native frame inputs must be finite")
+    else:
+        pass
     precessed = native_precession_frame(tt)
     nutated: Matrix = tuple(
         tuple(float(value) for value in row)
@@ -315,7 +333,7 @@ class EquatorialReduction:
 
 
 @lru_cache(maxsize=512)
-def iau_equatorial_frame(tt: float) -> Matrix:
+def iau_equatorial_frame(tt: float | TTInstant) -> Matrix:
     """IAU 2006 precession with matched IAU 2000A nutation, from ERFA.
 
     This is a coordinate triad, not a physical ephemeris, measured pole or
@@ -323,12 +341,15 @@ def iau_equatorial_frame(tt: float) -> Matrix:
     """
     import erfa
 
-    return tuple(tuple(float(value) for value in row) for row in erfa.pnm06a(tt, 0.0))
+    return tuple(
+        tuple(float(value) for value in row)
+        for row in erfa.pnm06a(*TTInstant.from_value(tt).as_parts())
+    )
 
 
 @lru_cache(maxsize=512)
 def equatorial_reduction(
-    tt: float,
+    tt: float | TTInstant,
     true_obliquity: float,
     mean_obliquity: float,
     nutation_longitude: float,
@@ -344,6 +365,8 @@ def equatorial_reduction(
     """
     if not math.isfinite(true_obliquity):
         raise ValueError("Native true obliquity must be finite")
+    else:
+        pass
     native = native_equatorial_frame(
         tt, mean_obliquity, nutation_longitude, nutation_obliquity
     )
@@ -384,7 +407,40 @@ def icrs_to_mean_j2000() -> Matrix:
     return transpose(columns)
 
 
-def mean_j2000_apparent_ecliptic(vector: Sequence[float], tt: float) -> Vector:
+@dataclass(frozen=True)
+class EclipticSourceFrame:
+    """One analytic ray's true equatorial triad and ecliptic inclination."""
+
+    equatorial_matrix: Matrix
+    true_obliquity: float
+
+
+@lru_cache(maxsize=512)
+def analytic_ecliptic_frame(tt: float | TTInstant) -> EclipticSourceFrame:
+    """The fallback's Vondrak/77-term source frame on its supplied TT.
+
+    Keep the ray's mean-J2000 bias and non-shortcut precession matrix,
+    including at J2000. NUMAT's mean obliquity and nutation share the
+    inspected source convention; no physical-pole model is substituted.
+    https://github.com/liberfa/erfa/blob/v2.0.1/src/numat.c
+    """
+    import erfa
+
+    mean_epsilon = pair(tt, "pepol", "peper")[0][1]
+    dpsi, deps, _, _ = nutation(tt)
+    nutated: Matrix = tuple(
+        tuple(float(value) for value in row)
+        for row in erfa.numat(mean_epsilon, math.radians(dpsi), math.radians(deps))
+    )
+    return EclipticSourceFrame(
+        mm(nutated, mm(precession(tt)[0], icrs_to_mean_j2000())),
+        math.degrees(mean_epsilon) + deps,
+    )
+
+
+def mean_j2000_apparent_ecliptic(
+    vector: Sequence[float], tt: float | TTInstant
+) -> Vector:
     """Mean-J2000 apparent ray to the native true ecliptic of date."""
     mean, _ = mean_ecliptic_frame(tt)
     projected = mv(mean, vector)
@@ -392,7 +448,7 @@ def mean_j2000_apparent_ecliptic(vector: Sequence[float], tt: float) -> Vector:
     return rotate(projected, "z", -math.radians(dpsi))
 
 
-def native_apparent_ecliptic(vector: Sequence[float], tt: float) -> Vector:
+def native_apparent_ecliptic(vector: Sequence[float], tt: float | TTInstant) -> Vector:
     """ICRS ray to the inspected native scalar-obliquity true ecliptic.
 
     This is a coordinate convention, not a physical-accuracy certificate.

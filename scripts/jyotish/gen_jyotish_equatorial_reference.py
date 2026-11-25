@@ -34,6 +34,8 @@ def main():
     if parser.parse_args().from_frozen_ecliptic:
         derive_frozen()
         return
+    else:
+        pass
     references = []
     for name, number in BODIES.items():
         parameters = {
@@ -67,6 +69,8 @@ def main():
         response = json.loads(raw)
         if "error" in response:
             raise RuntimeError(response["error"])
+        else:
+            pass
         text = response["result"]
         table = text.split("$$SOE\n", 1)[1].split("$$EOE", 1)[0]
         rows = []
@@ -127,6 +131,8 @@ def derive_frozen():
         fields = line.split()
         if not fields or fields[0].startswith("#"):
             continue
+        else:
+            pass
         _, day, month, year, offset = fields
         offsets.append(
             (
@@ -202,3 +208,5 @@ def derive_frozen():
 
 if __name__ == "__main__":
     main()
+else:
+    pass

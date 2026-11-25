@@ -6,9 +6,9 @@ from itertools import product
 import pytest
 from pydantic import ValidationError
 
-from fatebridge.core.bazi_evidence import build_natal_evidence
+from fatebridge.core.bazi.bazi_evidence import build_natal_evidence
+from fatebridge.core.contracts.output_element_presence import ElementPresence
 from fatebridge.core.element_presence import build_element_presence
-from fatebridge.core.output_element_presence import ElementPresence
 
 ORDER = ("year", "month", "day", "hour")
 
@@ -17,7 +17,9 @@ def chart(*values):
     return dict(zip(ORDER, map(tuple, values)))
 
 
-def test_source_no_metal_context_keeps_actual_hidden_xin_without_fabricating_absence():
+def test_source_no_metal_context_keeps_actual_hidden_xin_without_fabricating_absence() -> (
+    None
+):
     pillars = chart("癸未", "乙卯", "甲戌", "乙亥")
     before = deepcopy(pillars)
     result = build_element_presence(pillars)
@@ -43,7 +45,9 @@ def test_source_no_metal_context_keeps_actual_hidden_xin_without_fabricating_abs
     assert build_natal_evidence(pillars)["element_presence"] == result
 
 
-def test_day_stem_is_an_occurrence_and_principal_hidden_is_not_a_fifth_layer_vote():
+def test_day_stem_is_an_occurrence_and_principal_hidden_is_not_a_fifth_layer_vote() -> (
+    None
+):
     result = build_element_presence(chart("庚午", "辛巳", "庚辰", "辛巳"))
     assert result["visible_stems"]["present_elements"] == ["金"]
     assert len(result["visible_stems"]["occurrences"]) == 4
@@ -68,7 +72,7 @@ def test_day_stem_is_an_occurrence_and_principal_hidden_is_not_a_fifth_layer_vot
 @pytest.mark.parametrize(
     "plane", ["visible_stems", "principal_hidden_stems", "all_hidden_stems"]
 )
-def test_each_object_projection_keeps_only_requested_siblings(plane):
+def test_each_object_projection_keeps_only_requested_siblings(plane: str) -> None:
     result = build_element_presence(chart("癸未", "乙卯", "甲戌", "乙亥"))
     for field in ("present_elements", "absent_elements", "occurrences"):
         projected = {plane: {field: result[plane][field]}}
@@ -80,7 +84,7 @@ def test_each_object_projection_keeps_only_requested_siblings(plane):
     "corruption",
     ["element", "absent", "rank", "principal", "union", "duplicate", "verdict"],
 )
-def test_contract_rejects_fabricated_element_or_plane_claims(corruption):
+def test_contract_rejects_fabricated_element_or_plane_claims(corruption: str) -> None:
     result = build_element_presence(chart("癸未", "乙卯", "甲戌", "乙亥"))
     if corruption == "element":
         result["visible_stems"]["occurrences"][0]["element"] = "金"
@@ -104,7 +108,9 @@ def test_contract_rejects_fabricated_element_or_plane_claims(corruption):
         ElementPresence.model_validate(result)
 
 
-def test_twelve_branch_position_permutations_do_not_erase_physical_hidden_elements():
+def test_twelve_branch_position_permutations_do_not_erase_physical_hidden_elements() -> (
+    None
+):
     # Exercise every branch in every position, including repeated identical
     # branches. This is a fact invariant, not a force or classical accuracy test.
     for position, branch in product(ORDER, "子丑寅卯辰巳午未申酉戌亥"):

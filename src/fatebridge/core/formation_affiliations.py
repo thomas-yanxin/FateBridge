@@ -56,17 +56,25 @@ def partition_affiliations(
                     or set(positions) <= set(seats)
                 ):
                     continue
+                else:
+                    pass
                 union = set(positions) | set(seats)
                 if any(
                     BRANCH_CONFLICTS[branches[a]] == branches[b]
                     for a, b in combinations(union, 2)
                 ):
                     continue
+                else:
+                    pass
                 primary = formation
                 break
+        else:
+            pass
         if primary is None:
             active.append(candidate)
             continue
+        else:
+            pass
         primary_kind, seats, _ = primary
         target_text = target.value if isinstance(target, Element) else target
         affiliations.append(

@@ -1,0 +1,21 @@
+{
+  "sources": [
+    {
+      "path": "src/fatebridge/data/knowledge/western-leap-seconds.json",
+      "sha256": "3f5fd6054e143fdd65b3f41fb4575a99d52c0ef00f3dce682b59c194b40fdfb0"
+    },
+    {
+      "path": "src/fatebridge/data/knowledge/western-utc1960.json",
+      "sha256": "a57748fc9da32398dfed225c56abdc1c6d735f637a1dc362108abc2ba96ebcff"
+    },
+    {
+      "path": "src/fatebridge/data/knowledge/western-historical-utc.json",
+      "sha256": "40ac00ce019460b1f0b9eeb2a8039f94f127a97ec31d445476b7eed3daef1e6a"
+    },
+    {
+      "path": "tests/fixtures/ren_timescale_v1/iers-history.txt",
+      "sha256": "54e702abdc388ae3bf8cfc5f126900a5277829ad90e80f6773df6e714a133642"
+    }
+  ],
+  "scope": "Existing separately frozen IERS and SOFA source tables reused; no new reference event. Real coefficient files must keep these bytes."
+}

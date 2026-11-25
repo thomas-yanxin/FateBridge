@@ -77,12 +77,16 @@ def opaque_solar_positions(
     day. Their native flags never describe the final derived apparent places.
     """
     if find_spec("erfa") is None:
-        raise ImportError("opaque_solar requires the jpl extra (pyerfa)")
+        raise ModuleNotFoundError("opaque_solar requires the jpl extra (pyerfa)")
+    else:
+        pass
     import erfa  # type: ignore[import-untyped]
 
     swe = runtime.swe
     if swe is None:
-        raise ImportError("opaque_solar requires Swiss Ephemeris")
+        raise ModuleNotFoundError("opaque_solar requires Swiss Ephemeris")
+    else:
+        pass
     flags = (
         swe.FLG_SWIEPH
         | swe.FLG_XYZ
@@ -113,14 +117,22 @@ def opaque_solar_positions(
         assert_physical_configuration(selected)
         if returned < 0 or returned & mask != expected & mask:
             raise EphemerisSourceError("coordinate_contract_changed")
+        else:
+            pass
         model = runtime.ephemeris_model_from_retflag(returned)
         if model not in {"swieph", "jpl"}:
             raise EphemerisSourceError("opaque_solar_requires_barycentric_files")
+        else:
+            pass
         input_models.add(model)
         if len(input_models) != 1:
             raise EphemerisSourceError("model_changed")
+        else:
+            pass
         if len(values) != 6 or not all(math.isfinite(value) for value in values):
             raise EphemerisSourceError("coordinate_values_unavailable")
+        else:
+            pass
         trace.observe(label, model)
         return tuple(float(value) for value in values), int(returned)
 
@@ -202,6 +214,8 @@ def opaque_solar_positions(
                     DEFLECTION_LIMITER,
                 )
             ]
+        else:
+            pass
         apparent = erfa.ab(direction, beta, em, bm1)
         equator = matrix @ apparent
         x = float(equator[0])

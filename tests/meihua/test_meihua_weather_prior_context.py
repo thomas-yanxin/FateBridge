@@ -6,7 +6,7 @@ import json
 import pytest
 from pydantic import ValidationError
 
-from fatebridge.core.meihua_weather import build_weather_interpretation
+from fatebridge.core.meihua.meihua_weather import build_weather_interpretation
 from fatebridge.core.requests.meihua import MeihuaWeatherContext
 from fatebridge.services.meihua import calculate_meihua_cast
 from tests.support.transports import SPECS, business, rest, surface_calls
@@ -23,7 +23,7 @@ def rows(output):
     return {r["rule_id"]: r for r in output["weather"]["rule_trace"]}
 
 
-def test_confirmed_neither_is_accepted_but_never_supplied_by_default():
+def test_confirmed_neither_is_accepted_but_never_supplied_by_default() -> None:
     assert MeihuaWeatherContext().prior_condition is None
     assert MeihuaWeatherContext(prior_condition=None).prior_condition is None
     assert (
@@ -33,13 +33,17 @@ def test_confirmed_neither_is_accepted_but_never_supplied_by_default():
 
 
 @pytest.mark.parametrize("value", ["", "unknown", "dry", "mixed", False, 0])
-def test_no_undeclared_alias_or_rainfall_proxy_becomes_confirmed_neither(value):
+def test_no_undeclared_alias_or_rainfall_proxy_becomes_confirmed_neither(
+    value: bool | int | str,
+) -> None:
     with pytest.raises(ValidationError):
         MeihuaWeatherContext(prior_condition=value)
 
 
 @pytest.mark.parametrize("threshold", [None, 2])
-def test_all384_casts_confirmed_neither_only_disables_four_prior_clauses(threshold):
+def test_all384_casts_confirmed_neither_only_disables_four_prior_clauses(
+    threshold: int | None,
+) -> None:
     for bits in itertools.product("01", repeat=6):
         for line in range(1, 7):
             cast = calculate_meihua_cast(
@@ -62,6 +66,8 @@ def test_all384_casts_confirmed_neither_only_disables_four_prior_clauses(thresho
                 if rule_id not in PRIOR_RULES:
                     assert after[rule_id] == before[rule_id]
                     continue
+                else:
+                    pass
                 assert after[rule_id]["status"] == "not_met"
                 prior = next(
                     c
@@ -76,8 +82,8 @@ def test_all384_casts_confirmed_neither_only_disables_four_prior_clauses(thresho
 
 @pytest.mark.parametrize("tool", ["meihua_analysis", "meihua_cast"])
 def test_confirmed_neither_and_pending_other_conditions_agree_on_all_surfaces(
-    tool, surface_calls
-):
+    tool: str, surface_calls
+) -> None:
     spec = SPECS[tool]
     payload = {
         "interpretation_topic": "weather",

@@ -1,24 +1,40 @@
 """Evaluation capture must preserve the ordinary server's published contracts."""
 
 import asyncio
+import hashlib
 import json
 import os
+import shutil
 import subprocess
 import sys
 from pathlib import Path
 
 import pytest
+from fastapi.testclient import TestClient
 from fastmcp import Client
 from fastmcp.client.transports import StdioTransport
 
-from fatebridge.validation.agent_capture import read_capture
+import fatebridge.api as api
+import fatebridge.mcp_server as server
+import scripts.ziwei.audit_ziwei_targeted_rereading as audit
+import scripts.ziwei.build_ziwei_targeted_rereading as builder
+import validation.agent_capture as capture
+from fatebridge.application.result_delivery import RESULT_STORE
+from fatebridge.cli import run
+from fatebridge.core.ziwei.ziwei_sources import ziwei_day_source_evidence
+from fatebridge.mcp_server import create_mcp_app
+from scripts.ziwei.build_ziwei_targeted_rereading import ROOT, TARGET, build
+from tests.support.transports import call_calculation
+from validation.agent_capture import read_capture
 
 
 @pytest.mark.parametrize(
     "family",
     ["", "metaphysics"],
 )
-def test_capture_and_ordinary_stdio_publish_identical_contracts(tmp_path, family):
+def test_capture_and_ordinary_stdio_publish_identical_contracts(
+    tmp_path: Path, family: str
+) -> None:
     root = Path(__file__).resolve().parents[2]
 
     async def published(module, log):
@@ -52,11 +68,14 @@ def test_capture_and_ordinary_stdio_publish_identical_contracts(tmp_path, family
     ordinary_log = tmp_path / "ordinary-should-not-capture.jsonl"
     normal = asyncio.run(published("fatebridge.mcp_server", ordinary_log))
     capture_log = tmp_path / "actual-capture.jsonl"
-    captured = asyncio.run(
-        published("fatebridge.validation.agent_capture", capture_log)
-    )
+    captured = asyncio.run(published("validation.agent_capture", capture_log))
     assert captured == normal
-    assert {"ziwei_birth", "ziwei_horoscope", "ziwei_rules"} <= normal["tools"].keys()
+    assert set(normal["tools"]) == {
+        "discover_capabilities",
+        "describe_capability",
+        "run_calculation",
+        "read_result",
+    }
     assert not ordinary_log.exists()
     journal = read_capture(capture_log)
     assert len(journal) == 1
@@ -65,7 +84,9 @@ def test_capture_and_ordinary_stdio_publish_identical_contracts(tmp_path, family
     assert not any(r["event"] == "tool_call" for r in journal)
 
 
-def test_capture_without_opt_in_fails_before_business_configuration(tmp_path):
+def test_capture_without_opt_in_fails_before_business_configuration(
+    tmp_path: Path,
+) -> None:
     root = Path(__file__).resolve().parents[2]
     environment = {
         **os.environ,
@@ -73,7 +94,7 @@ def test_capture_without_opt_in_fails_before_business_configuration(tmp_path):
         "FATEBRIDGE_EVALUATION_LOG": "",
     }
     result = subprocess.run(
-        [sys.executable, "-m", "fatebridge.validation.agent_capture"],
+        [sys.executable, "-m", "validation.agent_capture"],
         cwd=root,
         env=environment,
         text=True,
@@ -86,8 +107,7 @@ def test_capture_without_opt_in_fails_before_business_configuration(tmp_path):
     assert not result.stdout
 
 
-def test_targeted_rereading_does_not_resolve_a_conflict_by_matching_the_chart():
-    from fatebridge.core.ziwei_sources import ziwei_day_source_evidence
+def test_targeted_rereading_does_not_resolve_a_conflict_by_matching_the_chart() -> None:
 
     for branch in "寅未子":
         evidence = ziwei_day_source_evidence(
@@ -105,11 +125,7 @@ def test_targeted_rereading_does_not_resolve_a_conflict_by_matching_the_chart():
         assert later["whole_day_table_certified"] is False
 
 
-def test_five_targeted_readings_keep_all_unknowns_and_original_transcription():
-    import hashlib
-
-    from fatebridge.core.ziwei_sources import ziwei_day_source_evidence
-    from scripts.ziwei.build_ziwei_targeted_rereading import ROOT, TARGET, build
+def test_five_targeted_readings_keep_all_unknowns_and_original_transcription() -> None:
 
     package = build()
     assert json.loads(TARGET.read_text()) == package
@@ -141,11 +157,8 @@ def test_five_targeted_readings_keep_all_unknowns_and_original_transcription():
 
 
 def test_targeted_generator_refuses_an_edited_frozen_first_reading(
-    tmp_path, monkeypatch
-):
-    import shutil
-
-    import scripts.ziwei.build_ziwei_targeted_rereading as builder
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
 
     shutil.copytree(builder.FROZEN, tmp_path / "frozen")
     changed = tmp_path / "frozen/original-first-reading-frozen.json"
@@ -158,14 +171,11 @@ def test_targeted_generator_refuses_an_edited_frozen_first_reading(
 @pytest.mark.parametrize("day", [7, 9])
 @pytest.mark.parametrize("profile", ["iztro_2_5_8", "quanshu_v2_excerpt"])
 def test_actual_birth_three_transports_keep_the_new_textual_conflict(
-    day, profile, capsys, monkeypatch
-):
-    from fastapi.testclient import TestClient
-
-    import fatebridge.api as api
-    from fatebridge.application.result_delivery import RESULT_STORE
-    from fatebridge.cli import run
-    from fatebridge.mcp_server import create_mcp_app
+    day: int,
+    profile: str,
+    capsys: pytest.CaptureFixture[str],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
 
     api._reset_runtime_state_for_tests()
     monkeypatch.setattr(
@@ -192,7 +202,7 @@ def test_actual_birth_three_transports_keep_the_new_textual_conflict(
         as_of="2026-10-22T12:00:00+08:00",
     )
     response = TestClient(api.app).post(
-        "/api/cn/ziwei/birth",
+        "/api/ziwei/birth-chart",
         json=inputs,
         params=[
             ("fields", "ziwei_birth.rule_trace"),
@@ -206,11 +216,13 @@ def test_actual_birth_three_transports_keep_the_new_textual_conflict(
 
     async def native():
         async with Client(create_mcp_app(families="metaphysics")) as client:
-            result = await client.call_tool("ziwei_birth", {**inputs, **flags})
+            result = await call_calculation(
+                client, "ziwei_birth_chart", {**inputs, **flags}
+            )
             assert not result.is_error
             return result.structured_content
 
-    args = ["ziwei_birth"]
+    args = ["ziwei_birth_chart"]
     for key, value in inputs.items():
         args += ["--" + key.replace("_", "-"), str(value)]
     args += [
@@ -258,10 +270,8 @@ def test_actual_birth_three_transports_keep_the_new_textual_conflict(
 
 
 def test_capture_shutdown_restores_an_ordinary_app_and_allows_a_fresh_journal(
-    tmp_path, monkeypatch
-):
-    import fatebridge.mcp_server as server
-    import fatebridge.validation.agent_capture as capture
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
 
     baseline = list(server.app.middleware)
 
@@ -282,9 +292,8 @@ def test_capture_shutdown_restores_an_ordinary_app_and_allows_a_fresh_journal(
 
 
 def test_targeted_audit_rejects_false_confirmation_even_when_the_position_matches(
-    monkeypatch,
-):
-    import scripts.ziwei.audit_ziwei_targeted_rereading as audit
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
 
     original = audit.ziwei_day_source_evidence
 

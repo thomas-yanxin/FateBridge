@@ -9,13 +9,16 @@ from pathlib import Path
 
 import pytest
 import swisseph as swe
+from pytest import MonkeyPatch
 
 from fatebridge.core import aa1996_solar, almanac
 from fatebridge.core.de441_solar import MODEL_ID as DE441_MODEL
 from fatebridge.core.local_techniques.canping import build_canping_result
 from fatebridge.core.local_techniques.heluo import build_heluo_result
+from fatebridge.core.numerology.canping_solar import projection_boundary
+from fatebridge.core.numerology.numerology_solar_sources import solar_source_profiles
 from fatebridge.fetch_aa1996 import build
-from fatebridge.utils.errors import EphemerisSourceError
+from fatebridge.utils.errors import EphemerisSourceError, NumerologySourceError
 
 FIXTURE = Path(__file__).parents[1] / "fixtures/numerology_solar_providers_v1"
 REFERENCE = json.loads((FIXTURE / "reference.json").read_bytes())
@@ -26,6 +29,8 @@ TRACE_ID = "numerology_consumed_solar_sources_v1"
 def solar_aa1996_build(tmp_path_factory):
     if shutil.which("cc") is None:
         pytest.skip("A C compiler is required for this optional source build")
+    else:
+        pass
     root = tmp_path_factory.mktemp("aa1996-numerology") / "build"
     for name, digest in REFERENCE["files"].items():
         assert hashlib.sha256((FIXTURE / name).read_bytes()).hexdigest() == digest
@@ -47,6 +52,8 @@ def solar_provider_environment(monkeypatch, solar_aa1996_build, tmp_path):
 def source_rows(result, family):
     if family == "heluo":
         return result["solar_term"]["boundary_context"]["dependencies"]
+    else:
+        pass
     return result["liunian_series"]["year_boundaries"]
 
 
@@ -95,14 +102,16 @@ def assert_actual_source(result, family, mode):
             for p in profiles
         )
         assert all(p["ephemeris_model"] != "moshier" for p in profiles)
+    else:
+        pass
     return trace
 
 
 @pytest.mark.parametrize("mode", REFERENCE["provider_modes"])
 @pytest.mark.parametrize("family", ["heluo", "canping"])
 def test_actual_model_source_replaces_unconditional_jpl_attribution(
-    mode, family, monkeypatch, solar_provider_environment
-):
+    mode, family: str, monkeypatch: MonkeyPatch, solar_provider_environment
+) -> None:
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", mode)
     fn = build_heluo_result if family == "heluo" else build_canping_result
     out = fn(**REFERENCE["valid_input"])
@@ -115,12 +124,13 @@ def test_actual_model_source_replaces_unconditional_jpl_attribution(
             == p["model_metadata"]["loaded_image_sha256"]
             for p in trace["source_profiles"]
         )
+    else:
+        pass
 
 
 def test_aa1996_single_lichun_matches_all_full_year_fields_and_projection(
-    monkeypatch, solar_provider_environment
-):
-    from fatebridge.core.canping_solar import projection_boundary
+    monkeypatch: MonkeyPatch, solar_provider_environment
+) -> None:
 
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "aa1996")
     full = almanac.get_solar_terms_for_year(2000, "UTC")
@@ -135,8 +145,8 @@ def test_aa1996_single_lichun_matches_all_full_year_fields_and_projection(
 
 
 def test_aa1996_keeps_all_original96_tt_rows_with_stock_control_retained(
-    monkeypatch, solar_provider_environment
-):
+    monkeypatch: MonkeyPatch, solar_provider_environment
+) -> None:
     expected = json.loads((FIXTURE / "reused-96-tt-reference.json").read_bytes())[
         "rows"
     ]
@@ -161,6 +171,8 @@ def test_aa1996_keeps_all_original96_tt_rows_with_stock_control_retained(
                     assert term.ephemeris_model == (
                         DE441_MODEL if mode == "native" else aa1996_solar.MODEL_ID
                     )
+                else:
+                    pass
         assert set(rows) == set(lookup)
         results[mode] = rows
 
@@ -180,6 +192,8 @@ def test_aa1996_keeps_all_original96_tt_rows_with_stock_control_retained(
             middle = lower + (upper - lower) / 2
             if middle in (lower, upper):
                 break
+            else:
+                pass
             if stock_residual(middle, row["longitude"]) < 0:
                 lower = middle
             else:
@@ -198,8 +212,8 @@ def test_aa1996_keeps_all_original96_tt_rows_with_stock_control_retained(
 
 
 def test_aa1996_birth_at_lower_public_year_keeps_complete_existing_horizon(
-    monkeypatch, solar_provider_environment
-):
+    monkeypatch: MonkeyPatch, solar_provider_environment
+) -> None:
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "aa1996")
     out = build_canping_result(**{**REFERENCE["valid_input"], "date": "1800-01-03"})
     assert len(out["liunian_series"]["rows"]) == 120
@@ -225,8 +239,8 @@ def test_aa1996_birth_at_lower_public_year_keeps_complete_existing_horizon(
 
 @pytest.mark.parametrize("method", ["bazi_appendix_v1", "bazi_continuous_v1"])
 def test_aa1996_upper_birth_year_keeps_complete_existing_horizon_and_source(
-    method, monkeypatch, solar_provider_environment
-):
+    method: str, monkeypatch: MonkeyPatch, solar_provider_environment
+) -> None:
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "aa1996")
     out = build_canping_result(
         **{
@@ -252,9 +266,8 @@ def test_aa1996_upper_birth_year_keeps_complete_existing_horizon_and_source(
 
 
 def test_aa1996_derived_lichun_matches_all116_independent_roots_without_regrading(
-    monkeypatch, solar_provider_environment
-):
-    from fatebridge.core.canping_solar import projection_boundary
+    monkeypatch: MonkeyPatch, solar_provider_environment
+) -> None:
 
     folder = Path(__file__).parents[1] / "data/solar/aa1996-projection"
     manifest = json.loads((folder / "manifest.json").read_bytes())
@@ -279,6 +292,8 @@ def test_aa1996_derived_lichun_matches_all116_independent_roots_without_regradin
     for case, expected in zip(cases, reference["rows"], strict=True):
         if case["year"] < 2205 or case["longitude"] != 315:
             continue
+        else:
+            pass
         boundary = projection_boundary(
             case["year"],
             "UTC",
@@ -299,8 +314,8 @@ def test_aa1996_derived_lichun_matches_all116_independent_roots_without_regradin
 
 @pytest.mark.parametrize("year", [2205, 2320, 2321])
 def test_aa1996_derived_permission_does_not_expand_ordinary_observations_or_roots(
-    year, solar_provider_environment
-):
+    year: int, solar_provider_environment
+) -> None:
     low = date(year, 2, 1).toordinal() + 1721424.5
     high = date(year, 2, 12).toordinal() + 1721424.5
     for invoke in (
@@ -316,6 +331,8 @@ def test_aa1996_derived_permission_does_not_expand_ordinary_observations_or_root
         with pytest.raises(EphemerisSourceError) as caught:
             aa1996_solar.longitude_crossing_tt(315.0, low, high, projection_year=year)
         assert caught.value.reason == "solar_aa1996_range"
+    else:
+        pass
 
 
 @pytest.mark.parametrize(
@@ -323,16 +340,15 @@ def test_aa1996_derived_permission_does_not_expand_ordinary_observations_or_root
     [(300.0, 2205, 0), (315.0, 2206, 0), (315.0, 2205, -1), (315.0, True, 0)],
 )
 def test_aa1996_derived_permission_requires_the_actual_lichun_year_and_window(
-    target, year, offset, solar_provider_environment
-):
+    target: float, year: bool | int, offset, solar_provider_environment
+) -> None:
     low = date(2205, 2, 1).toordinal() + 1721424.5 + offset
     high = date(2205, 2, 12).toordinal() + 1721424.5
     with pytest.raises(ValueError, match="AA1996 projection"):
         aa1996_solar.longitude_crossing_tt(target, low, high, projection_year=year)
 
 
-def test_unknown_and_mixed_sources_are_not_relabelled_as_jpl():
-    from fatebridge.core.numerology_solar_sources import solar_source_profiles
+def test_unknown_and_mixed_sources_are_not_relabelled_as_jpl() -> None:
 
     def row(model, provider, details):
         return dict(
@@ -394,9 +410,7 @@ def test_unknown_and_mixed_sources_are_not_relabelled_as_jpl():
         "zero_metadata",
     ],
 )
-def test_malformed_internal_source_receipt_is_runtime503(fault):
-    from fatebridge.core.numerology_solar_sources import solar_source_profiles
-    from fatebridge.utils.errors import NumerologySourceError
+def test_malformed_internal_source_receipt_is_runtime503(fault: str) -> None:
 
     record = dict(
         ephemeris_model="moshier",

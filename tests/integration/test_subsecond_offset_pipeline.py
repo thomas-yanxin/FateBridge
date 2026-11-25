@@ -9,10 +9,10 @@ from pathlib import Path
 import pytest
 
 from fatebridge.core.astro.native_execution import decode, encode
-from fatebridge.core.human_design_cycles import reference_epoch
+from fatebridge.core.human_design.human_design_cycles import reference_epoch
 from fatebridge.core.requests.human_design import HumanDesignRequest
 from fatebridge.utils.civil_time import (
-    datetime_fromisoformat_preserving_offset,
+    parse_iso_datetime,
     utc_calendar,
 )
 from fatebridge.utils.timezones import parse_timezone_name, timezone_rules_metadata
@@ -22,18 +22,20 @@ PLAN = json.loads(PATH.read_text())
 
 
 @pytest.mark.parametrize("case", PLAN["unicode_cases"], ids=lambda c: c["id"])
-def test_all_original_unicode_aliases_retain_their_exact_offset(case):
+def test_all_original_unicode_aliases_retain_their_exact_offset(case) -> None:
     value = parse_timezone_name(case["offset"]).utcoffset(None)
     ticks = (value.days * 86400 + value.seconds) * 1000000 + value.microseconds
     assert ticks == case["expected_offset_microseconds"]
 
 
 @pytest.mark.parametrize("case", PLAN["rounding_cases"], ids=lambda c: c["id"])
-def test_independent_fraction_rounding_facts_and_visible_bound(case):
+def test_independent_fraction_rounding_facts_and_visible_bound(case) -> None:
     if not case["accepted_in_original_scope"]:
         with pytest.raises(ValueError):
             parse_timezone_name(case["offset"])
         return
+    else:
+        pass
     value = parse_timezone_name(case["offset"]).utcoffset(None)
     ticks = (value.days * 86400 + value.seconds) * 1000000 + value.microseconds
     assert ticks == case["expected_offset_microseconds"]
@@ -47,7 +49,7 @@ def test_independent_fraction_rounding_facts_and_visible_bound(case):
 
 
 @pytest.mark.parametrize("case", PLAN["iso_cases"], ids=lambda c: c["id"])
-def test_iso_reference_and_native_envelope_preserve_the_actual_instant(case):
+def test_iso_reference_and_native_envelope_preserve_the_actual_instant(case) -> None:
     moment = datetime(
         1980,
         7,
@@ -58,14 +60,14 @@ def test_iso_reference_and_native_envelope_preserve_the_actual_instant(case):
     restored = decode(encode(moment))
     assert restored.utcoffset() == moment.utcoffset()
     assert restored == moment
-    assert datetime_fromisoformat_preserving_offset(case["iso"]) == moment
+    assert parse_iso_datetime(case["iso"]) == moment
     label, _ = reference_epoch(case["iso"])
     assert datetime.fromisoformat(label) == datetime.fromisoformat(
         case["expected_utc_label"]
     )
 
 
-def test_decimal_resolution_does_not_depend_on_caller_decimal_context():
+def test_decimal_resolution_does_not_depend_on_caller_decimal_context() -> None:
     with localcontext() as context:
         context.prec = 2
         context.rounding = ROUND_UP
@@ -77,8 +79,8 @@ def test_decimal_resolution_does_not_depend_on_caller_decimal_context():
 @pytest.mark.parametrize("year", [1, 9999])
 @pytest.mark.parametrize("micros", [-36000, 36000])
 def test_native_offset_roundtrip_does_not_rebase_or_clip_calendar_extremes(
-    year, micros
-):
+    year: int, micros
+) -> None:
     moment = datetime(
         year,
         1 if year == 1 else 12,
@@ -90,22 +92,21 @@ def test_native_offset_roundtrip_does_not_rebase_or_clip_calendar_extremes(
     assert utc_calendar(restored) == utc_calendar(moment)
 
 
-def test_prebirth_iso_offset_cannot_be_accepted_as_equal_to_birth():
+def test_prebirth_iso_offset_cannot_be_accepted_as_equal_to_birth() -> None:
     with pytest.raises(ValueError):
         HumanDesignRequest(**PLAN["before_birth_reference"]["input"])
 
 
-def test_iso_fix_does_not_invent_a_timezone_for_a_naive_timestamp():
-    assert (
-        datetime_fromisoformat_preserving_offset("1980-07-01T12:00:00.036").tzinfo
-        is None
-    )
+def test_iso_fix_does_not_invent_a_timezone_for_a_naive_timestamp() -> None:
+    assert parse_iso_datetime("1980-07-01T12:00:00.036").tzinfo is None
 
 
 @pytest.mark.parametrize("micros", [-36000, 36000])
-def test_actual_fresh_native_positions_receive_the_same_subsecond_instant(micros):
+def test_actual_fresh_native_positions_receive_the_same_subsecond_instant(
+    micros,
+) -> None:
     from fatebridge.core.astro.birth import build_astro_birth_info
-    from fatebridge.core.jyotish import positions
+    from fatebridge.core.jyotish.jyotish import positions
 
     birth = build_astro_birth_info(
         birth_year=2000,

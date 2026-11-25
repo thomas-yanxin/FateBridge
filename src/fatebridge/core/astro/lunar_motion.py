@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import math
 from importlib.metadata import version
-from typing import Any, Dict, Optional, Sequence, Tuple
+from typing import Any, Sequence
 
 from fatebridge.core import ephemeris_runtime
 from fatebridge.core.astro import runtime
@@ -41,7 +41,7 @@ SOURCE_VERSION = ("2.10.03", "2.10.3.2")
 
 def aberration_spatial_correction(
     position: Sequence[float], velocity: Sequence[float], beta: Sequence[float]
-) -> Tuple[float, ...]:
+) -> tuple[float, ...]:
     """Replace swi_aberr_light's backward spatial difference by its Jacobian.
 
     Observer beta is held fixed. Subtract the inspected source approximation,
@@ -52,7 +52,7 @@ def aberration_spatial_correction(
     """
     _, analytic = aberration_position_jvp(position, velocity, beta)
 
-    def native_position(values: Sequence[float]) -> Tuple[float, ...]:
+    def native_position(values: Sequence[float]) -> tuple[float, ...]:
         # Explicit source order, independent of Python sum() version changes.
         # Compiled contraction/rounding can still differ from this replay.
         radius = math.sqrt(
@@ -67,6 +67,8 @@ def aberration_spatial_correction(
     previous = tuple(x - step * v for x, v in zip(position, velocity))
     if math.hypot(*previous) <= 0:
         raise EphemerisSourceError("coordinate_values_unavailable")
+    else:
+        pass
     apparent = native_position(position)
     previous_apparent = native_position(previous)
     change = tuple(
@@ -77,6 +79,8 @@ def aberration_spatial_correction(
     )
     if not all(math.isfinite(x) for x in change):
         raise EphemerisSourceError("coordinate_values_unavailable")
+    else:
+        pass
     return change
 
 
@@ -85,8 +89,8 @@ def lunar_light_time_correction(
     displayed_coordinates: Sequence[float],
     model: str,
     *,
-    source_trace: Optional[PhysicalEphemerisTrace] = None,
-) -> Tuple[Optional[float], Dict[str, Any]]:
+    source_trace: PhysicalEphemerisTrace | None = None,
+) -> tuple[float | None, dict[str, Any]]:
     """Return a longitude-rate correction and explicit applicability metadata.
 
     Only the locked/source-inspected native version and physical JPL/Swiss
@@ -97,7 +101,7 @@ def lunar_light_time_correction(
     swe = runtime.swe
     native_version = str(getattr(swe, "version", "unavailable"))
     binding_version = binding_distribution_version(swe, version)
-    metadata: Dict[str, Any] = {
+    metadata: dict[str, Any] = {
         "method_id": METHOD_ID,
         "native_version": native_version,
         "binding_version": binding_version,
@@ -113,18 +117,24 @@ def lunar_light_time_correction(
             "status": "not_applied",
             "reason": "unsupported_physical_model",
         }
+    else:
+        pass
     if (native_version, binding_version) != SOURCE_VERSION or swe is None:
         return None, {
             **metadata,
             "status": "not_applied",
             "reason": "unverified_native_version",
         }
+    else:
+        pass
     if not math.isfinite(julian_day_tt):
         raise EphemerisSourceError("coordinate_values_unavailable")
+    else:
+        pass
     trace = source_trace if source_trace is not None else PhysicalEphemerisTrace()
     factors = []
     contexts = {}
-    returned_flags: Dict[str, int] = {}
+    returned_flags: dict[str, int] = {}
     # Keep reception-frame auxiliary states in the already checked apparent
     # light-path window. Resetting each geometric sample can select the newer
     # reception-only file and sever the retarded dependency at a file start.
@@ -150,21 +160,31 @@ def lunar_light_time_correction(
             barycentric: bool,
             factor: str,
             kind: str = "geometric",
-        ) -> Tuple[float, ...]:
+        ) -> tuple[float, ...]:
             flags = base | (swe.FLG_BARYCTR if barycentric else 0)
             if kind != "geometric":
                 flags &= ~swe.FLG_TRUEPOS
+            else:
+                pass
             if kind == "preaberration":
                 flags |= swe.FLG_NOABERR
+            else:
+                pass
             if kind not in {"geometric", "preaberration", "apparent"}:
                 raise ValueError("Unknown lunar Cartesian state kind")
+            else:
+                pass
             values, returned = runtime.ephemeris_call("calc", epoch, body, flags)
             assert_physical_configuration(selected)
             required = swe.FLG_SPEED | swe.FLG_XYZ | swe.FLG_SIDEREAL | swe.FLG_NONUT
             if kind == "geometric":
                 required |= swe.FLG_TRUEPOS
+            else:
+                pass
             if kind == "preaberration":
                 required |= swe.FLG_NOABERR
+            else:
+                pass
             forbidden = (
                 swe.FLG_EQUATORIAL
                 | swe.FLG_J2000
@@ -175,8 +195,12 @@ def lunar_light_time_correction(
             )
             if kind != "geometric":
                 forbidden |= swe.FLG_TRUEPOS
+            else:
+                pass
             if kind == "apparent":
                 forbidden |= swe.FLG_NOABERR
+            else:
+                pass
             if (
                 returned < 0
                 or returned & required != required
@@ -184,10 +208,16 @@ def lunar_light_time_correction(
                 or bool(returned & swe.FLG_BARYCTR) != barycentric
             ):
                 raise EphemerisSourceError("coordinate_contract_changed")
+            else:
+                pass
             if runtime.ephemeris_model_from_retflag(returned) != model:
                 raise EphemerisSourceError("coordinate_model_changed")
+            else:
+                pass
             if len(values) != 6 or not all(math.isfinite(v) for v in values):
                 raise EphemerisSourceError("coordinate_values_unavailable")
+            else:
+                pass
             contexts[factor] = trace.observe(factor, model, record_factor=False)
             returned_flags[factor] = int(returned)
             factors.append(factor)
@@ -200,7 +230,7 @@ def lunar_light_time_correction(
             barycentric: bool,
             factor: str,
             kind: str = "geometric",
-        ) -> Tuple[Tuple[float, ...], int]:
+        ) -> tuple[tuple[float, ...], int]:
             values = state(
                 epoch, body, barycentric=barycentric, factor=factor, kind=kind
             )
@@ -219,6 +249,8 @@ def lunar_light_time_correction(
             radius = math.hypot(*geometric[:3])
             if radius <= 0:
                 raise EphemerisSourceError("coordinate_values_unavailable")
+            else:
+                pass
             light_time = radius / LIGHT_SPEED_AU_PER_DAY
             light_time_rate = (
                 dot(geometric[:3], geometric[3:]) / radius / LIGHT_SPEED_AU_PER_DAY
@@ -264,6 +296,8 @@ def lunar_light_time_correction(
             # Internal frame/source coherence, not observational tolerances.
             if latitude_residual > 1e-8 or radius_residual > 1e-12:
                 raise EphemerisSourceError("lunar_motion_position_mismatch")
+            else:
+                pass
             correction = longitude_rate_change(apparent, change)
             spatial_correction = longitude_rate_change(apparent, spatial_change)
             # Late import keeps the pure Jacobians available to the sampler
@@ -284,6 +318,8 @@ def lunar_light_time_correction(
         assert_physical_configuration(selected)
         if source_trace is None:
             trace.finish()
+        else:
+            pass
     return correction, {
         **metadata,
         "status": "applied",

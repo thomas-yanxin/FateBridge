@@ -11,7 +11,7 @@ from fatebridge.core.classical_roots import (
     build_classical_root_profile,
     classify_classical_root,
 )
-from fatebridge.core.output_classical_roots import ClassicalRootProfile
+from fatebridge.core.contracts.output_classical_roots import ClassicalRootProfile
 
 REFERENCE = json.loads(
     (Path(__file__).parents[1] / "data/bazi_roots_v1/reference.json").read_text(
@@ -23,27 +23,29 @@ REFERENCE = json.loads(
 @pytest.mark.parametrize(
     "case", REFERENCE["cases"], ids=lambda c: c["stem"] + c["branch"]
 )
-def test_root_categories_match_manually_read_source_examples(case):
+def test_root_categories_match_manually_read_source_examples(case) -> None:
     actual = classify_classical_root(case["stem"], case["branch"])
     assert actual["kind"] == case["kind"]
     assert actual["hidden_element_present"] == case["hidden_element_present"]
 
 
-def test_storage_and_residual_are_not_the_rank_in_the_hidden_stem_list():
+def test_storage_and_residual_are_not_the_rank_in_the_hidden_stem_list() -> None:
     assert classify_classical_root("甲", "未")["kind"] == "storage_root"
     assert classify_classical_root("乙", "辰")["kind"] == "residual_root"
     assert classify_classical_root("庚", "巳")["source_weight_class"] == "heavy"
 
 
 @pytest.mark.parametrize("stem,branch", [("乙", "寅"), ("癸", "亥")])
-def test_yin_prosperity_root_is_distinct_from_yang_blade_qualification(stem, branch):
+def test_yin_prosperity_root_is_distinct_from_yang_blade_qualification(
+    stem: str, branch: str
+) -> None:
     root = classify_classical_root(stem, branch)
     assert root["kind"] == "prosperity_root"
     assert root["source_weight_class"] == "heavy"
     assert root["hidden_element_present"] is True
 
 
-def test_profile_preserves_positions_and_does_not_adjudicate_clash_root_loss():
+def test_profile_preserves_positions_and_does_not_adjudicate_clash_root_loss() -> None:
     chart = dict(
         zip(
             ("year", "month", "day", "hour"),
@@ -61,7 +63,7 @@ def test_profile_preserves_positions_and_does_not_adjudicate_clash_root_loss():
     assert result["source"]["source_sha256"] == REFERENCE["source_sha256"]
 
 
-def test_yin_growth_remains_a_textual_reference_without_inventing_hidden_fire():
+def test_yin_growth_remains_a_textual_reference_without_inventing_hidden_fire() -> None:
     chart = {name: ("丁", "酉") for name in ("year", "month", "day", "hour")}
     overview = build_classical_overview(chart)
     profile = overview["root_profile"]
@@ -73,7 +75,7 @@ def test_yin_growth_remains_a_textual_reference_without_inventing_hidden_fire():
     assert "身强" not in text
 
 
-def test_published_root_fields_validate_types_before_projection():
+def test_published_root_fields_validate_types_before_projection() -> None:
     with pytest.raises(ValidationError):
         ClassicalRootProfile.model_validate(
             {"roots": [{"hidden_element_present": "yes"}]}

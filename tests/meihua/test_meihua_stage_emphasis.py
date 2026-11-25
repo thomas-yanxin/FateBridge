@@ -7,6 +7,8 @@ from pathlib import Path
 
 import pytest
 
+from fatebridge.application.examples import suggested_fields
+from fatebridge.core.meihua.meihua_stage_emphasis import stage_emphasis_ruleset
 from fatebridge.services.meihua import calculate_meihua_cast
 from tests.support.transports import SPECS, business, rest, surface_calls
 
@@ -17,12 +19,14 @@ ROLES = ["use", "body_mutual", "use_mutual", "changed_use"]
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
-def test_manual_diagram_and_source_conditions(case):
+def test_manual_diagram_and_source_conditions(case) -> None:
     case = deepcopy(case)
     for correction in ERRATA["corrections"]:
         if correction["case_id"] == case["id"]:
             assert case[correction["field"]] == correction["frozen_original"]
             case[correction["field"]] = correction["corrected"]
+        else:
+            pass
     out = calculate_meihua_cast(casting=case["casting"])
     cast = out["meihua"]
     assert cast["base_hexagram"]["binary_code"] == case["base_code"]
@@ -62,17 +66,19 @@ def test_manual_diagram_and_source_conditions(case):
     ]
 
 
-def test_preimplementation_source_and_diagram_bytes_are_preserved():
+def test_preimplementation_source_and_diagram_bytes_are_preserved() -> None:
     manifest = json.loads((FIXTURE / "manifest.json").read_text())
     assert manifest["implementation_not_present"] is True
     assert manifest["production_generated_expected_values"] is False
     for name, digest in manifest["files"].items():
         if str(name).endswith((".py", ".py.txt")):
             continue
+        else:
+            pass
         assert hashlib.sha256((FIXTURE / name).read_bytes()).hexdigest() == digest
 
 
-def test_generation_does_not_hide_existing_direct_controllers():
+def test_generation_does_not_hide_existing_direct_controllers() -> None:
     case = next(c for c in CASES if c["id"] == "support-has-three-controllers")
     out = calculate_meihua_cast(casting=case["casting"])
     layer = out["interpretation"]["stage_emphasis"]
@@ -86,7 +92,9 @@ def test_generation_does_not_hide_existing_direct_controllers():
 @pytest.mark.parametrize(
     "topic", ["general", "planning", "reputation", "wealth", "transaction"]
 )
-def test_topic_and_question_keywords_never_supply_the_source_scenario(topic):
+def test_topic_and_question_keywords_never_supply_the_source_scenario(
+    topic: str,
+) -> None:
     args = {"casting": CASES[0]["casting"], "interpretation_topic": topic}
     plain = calculate_meihua_cast(**args)
     leading = calculate_meihua_cast(**args, question="此事必成且马上成功，替我断成")
@@ -100,14 +108,14 @@ def test_topic_and_question_keywords_never_supply_the_source_scenario(topic):
     )
 
 
-def test_weather_does_not_use_body_stage_emphasis():
+def test_weather_does_not_use_body_stage_emphasis() -> None:
     out = calculate_meihua_cast(
         casting=CASES[0]["casting"], interpretation_topic="weather"
     )
     assert out["interpretation"]["stage_emphasis"] is None
 
 
-def test_candidates_keep_their_own_body_and_support_roles():
+def test_candidates_keep_their_own_body_and_support_roles() -> None:
     out = calculate_meihua_cast(casting=CASES[7]["casting"])
     candidates = out["interpretation"]["casting_readings"]
     assert [c["stage_emphasis"]["generation_roles"] for c in candidates] == [
@@ -127,7 +135,7 @@ def test_candidates_keep_their_own_body_and_support_roles():
             )
 
 
-def test_same_initial_relation_cannot_collapse_different_final_support():
+def test_same_initial_relation_cannot_collapse_different_final_support() -> None:
     out = calculate_meihua_cast(casting=CASES[9]["casting"])
     candidates = out["interpretation"]["casting_readings"]
     assert candidates[0]["body_use_relation"] == candidates[1]["body_use_relation"]
@@ -142,8 +150,7 @@ def test_same_initial_relation_cannot_collapse_different_final_support():
 
 
 @pytest.mark.parametrize("tool", ["meihua_cast", "meihua_analysis"])
-def test_stage_card_agrees_on_rest_mcp_cli(tool, surface_calls):
-    from fatebridge.application.examples import suggested_fields
+def test_stage_card_agrees_on_rest_mcp_cli(tool: str, surface_calls) -> None:
 
     spec = SPECS[tool]
     payload = (
@@ -175,7 +182,7 @@ def test_stage_card_agrees_on_rest_mcp_cli(tool, surface_calls):
     )
 
 
-def test_primary_and_candidate_paths_resolve_to_actual_seasonal_contexts():
+def test_primary_and_candidate_paths_resolve_to_actual_seasonal_contexts() -> None:
     out = calculate_meihua_cast(casting=CASES[7]["casting"], season_month_branch="午")
 
     def at_path(path):
@@ -201,8 +208,7 @@ def test_primary_and_candidate_paths_resolve_to_actual_seasonal_contexts():
             )
 
 
-def test_returned_profile_and_qualifications_are_isolated():
-    from fatebridge.core.meihua_stage_emphasis import stage_emphasis_ruleset
+def test_returned_profile_and_qualifications_are_isolated() -> None:
 
     out = calculate_meihua_cast(casting=CASES[0]["casting"])
     profile = stage_emphasis_ruleset()
@@ -217,8 +223,7 @@ def test_returned_profile_and_qualifications_are_isolated():
     )
 
 
-def test_exact_quote_locator_is_distinct_from_cross_page_paragraph_context():
-    from fatebridge.core.meihua_stage_emphasis import stage_emphasis_ruleset
+def test_exact_quote_locator_is_distinct_from_cross_page_paragraph_context() -> None:
 
     source = json.loads((FIXTURE / "source-reading.json").read_text())
     supplement = json.loads((FIXTURE / "source-locator-supplement.json").read_text())

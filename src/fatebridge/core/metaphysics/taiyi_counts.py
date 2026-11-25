@@ -23,6 +23,8 @@ SCOPE = (
 def _validate(count: int) -> None:
     if type(count) is not int or not 1 <= count <= 40:
         raise ValueError("主客算分类需要1至40的整数")
+    else:
+        pass
 
 
 @lru_cache(maxsize=1)
@@ -34,6 +36,8 @@ def source_profiles() -> list[dict[str, Any]]:
     raw = path.read_bytes()
     if hashlib.sha256(raw).hexdigest() != CATALOG_SHA256:
         raise ValueError("主客算分源目录指纹不符")
+    else:
+        pass
     profiles: list[dict[str, Any]] = json.loads(raw)["profiles"]
     return profiles
 
@@ -49,14 +53,24 @@ def count_labels(count: int) -> list[str]:
     labels = []
     if count < 10:
         labels.append("无天")
+    else:
+        pass
     if 1 <= count % 10 <= 4:
         labels.append("无地")
+    else:
+        pass
     if count % 10 == 0:
         labels.append("无人")
+    else:
+        pass
     if all(components(count).values()):
         labels.append("三才足数（数理推导）")
+    else:
+        pass
     if count % 10 == 5:
         labels.append("杜塞（淘金歌）")
+    else:
+        pass
     return labels
 
 
@@ -67,6 +81,8 @@ def contextual_harmony(
     _validate(count)
     if type(value) not in (int, str):
         raise ValueError("配数参照需要宫数或方位，不接受布尔代替宫数")
+    else:
+        pass
     if reference == "太乙" and type(value) is int:
         polarity = (
             "阳" if value in (8, 3, 4, 9) else ("阴" if value in (2, 7, 6, 1) else None)

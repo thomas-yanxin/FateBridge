@@ -4,9 +4,14 @@ from typing import Literal
 
 from pydantic import Field, PrivateAttr, model_validator
 
-from .numeric_inputs import FengshuiInput
-from .spatial_domains import resolve_search_domains
-from .spatial_inputs import Evidence, ResolvedMoveDomain, SpatialScene, SpatialSearch
+from fatebridge.core.fengshui.numeric_inputs import FengshuiInput
+from fatebridge.core.fengshui.spatial_domains import resolve_search_domains
+from fatebridge.core.fengshui.spatial_inputs import (
+    Evidence,
+    ResolvedMoveDomain,
+    SpatialScene,
+    SpatialSearch,
+)
 
 
 class WorkstationLayoutInput(FengshuiInput):
@@ -24,6 +29,8 @@ class WorkstationLayoutInput(FengshuiInput):
             self.evaluation_period_evidence is None
         ):
             raise ValueError("评价运及其依据须成对，不从宅运/查询日期补值")
+        else:
+            pass
         if self.search:
             movable = {
                 b.object_id
@@ -37,7 +44,11 @@ class WorkstationLayoutInput(FengshuiInput):
                 raise ValueError(
                     "搜索只能移动已登记家具/物件；不移动门窗、梁柱和空间边界"
                 )
+            else:
+                pass
             self._resolved_domains = resolve_search_domains(self.scene, self.search)
+        else:
+            pass
         return self
 
     @property

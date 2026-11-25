@@ -11,7 +11,7 @@ import pytest
 from pydantic import ValidationError
 
 import fatebridge.application.execution as execution
-from fatebridge.core.output_chinese import JinkouQiEvidence
+from fatebridge.core.contracts.output_chinese import JinkouQiEvidence
 from fatebridge.core.public_output import same_public_value
 from scripts.ren.audit_ren_classical import observe_jinkou
 from tests.support.transports import AS_OF, REST_POST_CASES, SPECS, rest, surface_calls
@@ -41,7 +41,7 @@ def output():
 
 
 @pytest.mark.parametrize("case", REF["symbolic_cases"], ids=lambda c: c["id"])
-def test_symbolic_source_contrasts_reach_the_actual_board(case):
+def test_symbolic_source_contrasts_reach_the_actual_board(case) -> None:
     board = observe_jinkou(case)
     assert [board["rows"][i]["content"] for i in (1, 2)] == [
         case["expected_god"],
@@ -53,7 +53,7 @@ def test_symbolic_source_contrasts_reach_the_actual_board(case):
     assert board["use_evidence"]["comprehensive_position"] is None
 
 
-def test_main_and_annual_keep_their_own_month_building_inputs():
+def test_main_and_annual_keep_their_own_month_building_inputs() -> None:
     body = output()
     for board in (body["jinkou"], body["jinkou"]["year_fate"]["course"]):
         qi = board["qi_evidence"]
@@ -68,7 +68,7 @@ def test_main_and_annual_keep_their_own_month_building_inputs():
         )
 
 
-def test_existing_complete_service_cannot_accept_a_fabricated_new_layer():
+def test_existing_complete_service_cannot_accept_a_fabricated_new_layer() -> None:
     bad = copy.deepcopy(output())
     month = bad["jinkou"]["qi_evidence"]["month_building_branch"]
     bad["jinkou"]["qi_evidence"]["month_building_checks"] = [
@@ -79,7 +79,7 @@ def test_existing_complete_service_cannot_accept_a_fabricated_new_layer():
         execution.validate_output(SPEC, bad)
 
 
-def test_all_branch_triples_keep_the_complete_source_and_failure_denominator():
+def test_all_branch_triples_keep_the_complete_source_and_failure_denominator() -> None:
     report = AUDIT.audit()
     assert report["identities_match"] and report["symbolic_matched_count"] == 4
     assert (
@@ -96,8 +96,8 @@ def test_all_branch_triples_keep_the_complete_source_and_failure_denominator():
 @pytest.mark.parametrize("fault", FAULTS)
 @pytest.mark.parametrize("project", [False, True])
 def test_wrong_or_missing_new_evidence_fails_before_projection_on_all_ports(
-    annual, fault, project, monkeypatch, surface_calls
-):
+    annual: bool, fault, project: bool, monkeypatch: pytest.MonkeyPatch, surface_calls
+) -> None:
     bad = AUDIT.corrupt(output(), fault, annual)
     with pytest.raises(execution.OutputContractError):
         execution.validate_output(SPEC, bad)
@@ -106,6 +106,8 @@ def test_wrong_or_missing_new_evidence_fails_before_projection_on_all_ports(
     def broken(spec, request):
         if spec.key == SPEC.key:
             spec = replace(spec, bind=lambda _: (lambda: copy.deepcopy(bad), (), {}))
+        else:
+            pass
         return original(spec, request)
 
     monkeypatch.setattr(execution, "execute_spec", broken)
@@ -116,6 +118,8 @@ def test_wrong_or_missing_new_evidence_fails_before_projection_on_all_ports(
         params.update(fields="analysis_type", strict_fields="true")
         opts.update(fields=["analysis_type"], strict_fields=True)
         flags += ["--fields", "analysis_type", "--strict-fields", "true"]
+    else:
+        pass
     http, protocol, code, cli = surface_calls(
         SPEC, PAYLOAD, params=params, options=opts, flags=flags, cli_first=False
     )
@@ -125,8 +129,8 @@ def test_wrong_or_missing_new_evidence_fails_before_projection_on_all_ports(
 
 @pytest.mark.parametrize("project", [False, True])
 def test_actual_three_ports_keep_the_same_main_and_annual_month_evidence(
-    project, surface_calls
-):
+    project: bool, surface_calls
+) -> None:
     fields = [
         "jinkou.qi_evidence",
         "jinkou.year_fate.course.qi_evidence",
@@ -139,6 +143,8 @@ def test_actual_three_ports_keep_the_same_main_and_annual_month_evidence(
         params += [("fields", f) for f in fields] + [("strict_fields", "true")]
         flags += ["--fields", *fields, "--strict-fields", "true"]
         opts.update(fields=fields, strict_fields=True)
+    else:
+        pass
     http, protocol, code, cli = surface_calls(
         SPEC, PAYLOAD, params=params, options=opts, flags=flags, cli_first=False
     )
@@ -153,7 +159,9 @@ def test_actual_three_ports_keep_the_same_main_and_annual_month_evidence(
         )
 
 
-def test_sparse_source_and_month_checks_validate_present_anchors_without_filling():
+def test_sparse_source_and_month_checks_validate_present_anchors_without_filling() -> (
+    None
+):
     value = {
         "month_building_branch": "寅",
         "month_building_checks": [

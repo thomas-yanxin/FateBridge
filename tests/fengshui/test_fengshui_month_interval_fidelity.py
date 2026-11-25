@@ -4,6 +4,7 @@ import asyncio
 import json
 from copy import deepcopy
 from datetime import datetime, timedelta
+from pathlib import Path
 
 import pytest
 from fastmcp import Client
@@ -14,11 +15,13 @@ from fatebridge.core.fengshui import monthly_time
 from fatebridge.core.fengshui.monthly import monthly_position_reading
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.fengshui import calculate_monthly_stars
+from tests.support.fengshui_clock import seconds_from_boundary
+from tests.support.fengshui_transports import SPECS
 from tests.support.mcp_result_assertions import (
     same_run_projected_response,
     without_transport,
 )
-from tests.support.transports import rest_client
+from tests.support.transports import call_calculation, rest_client
 
 
 @pytest.fixture(params=["native", "analytic"])
@@ -52,8 +55,8 @@ def layer(at, zone="UTC"):
 @pytest.mark.parametrize("delta", [-1, 1])
 @pytest.mark.parametrize("clock", ["analytic"], indirect=True)
 def test_all_candidate_windows_keep_actual_endpoints_and_conditional_reading(
-    clock, term, months, delta
-):
+    clock, term: str, months, delta
+) -> None:
     resolution = boundary(term)
     actual_model = resolution["ephemeris_model"]
     assert actual_model == MODEL_ID
@@ -126,21 +129,26 @@ def test_all_candidate_windows_keep_actual_endpoints_and_conditional_reading(
 
 
 @pytest.mark.parametrize("delta", [-6, -5, -1, 0, 1, 5, 6])
-def test_guard_width_and_numeric_acceptance_are_not_relaxed(clock, delta):
-    at = datetime.fromisoformat(boundary()["moment"]) + timedelta(seconds=delta)
+def test_guard_width_and_numeric_acceptance_are_not_relaxed(clock, delta) -> None:
+    resolution = boundary()
+    at = datetime.fromisoformat(resolution["moment"]) + timedelta(seconds=delta)
     result = layer(at)
     time = result["time_context"]
-    ambiguous = abs(delta) <= 5
+    ambiguous = abs(seconds_from_boundary(at, resolution["civil_point"])) <= 5
     assert (result["status"] == "partial") is ambiguous
     assert time["precision_policy"]["numeric_acceptance_gate_seconds"] == 1.0
     assert time["precision_policy"]["moshier_guard_seconds"] == 5
     if not ambiguous:
         assert time["valid_from"] and time["valid_until"]
         assert "provisional_interval" not in time and "candidate_months" not in time
+    else:
+        pass
 
 
 @pytest.mark.parametrize("year,month", [(2025, 12), (2026, 1), (2026, 2)])
-def test_confirmed_month_preserves_existing_unique_window(clock, year, month):
+def test_confirmed_month_preserves_existing_unique_window(
+    clock, year: int, month: int
+) -> None:
     result = calculate_monthly_stars(
         effective_solar_year=year, solar_month_number=month
     )["layers"]["monthly_stars"]
@@ -154,7 +162,9 @@ def test_confirmed_month_preserves_existing_unique_window(clock, year, month):
 @pytest.mark.parametrize(
     "zone", ["Asia/Shanghai", "America/New_York", "Pacific/Kiritimati"]
 )
-def test_candidate_instants_are_independent_of_display_timezone(clock, zone):
+def test_candidate_instants_are_independent_of_display_timezone(
+    clock, zone: str
+) -> None:
     at = datetime.fromisoformat(boundary()["moment"])
     utc = layer(at)["time_context"]["candidate_months"]
     displayed = layer(at, zone)["time_context"]["candidate_months"]
@@ -167,23 +177,29 @@ def test_candidate_instants_are_independent_of_display_timezone(clock, zone):
 
 @pytest.mark.parametrize("name", ["monthly_stars", "assess"])
 def test_actual_rest_mcp_cli_agree_on_candidate_month_intervals(
-    clock, monkeypatch, tmp_path, capsys, name
-):
+    clock,
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    name: str,
+) -> None:
     inputs = {"query_at": boundary()["moment"], "timezone_name": "UTC"}
     if name == "assess":
         inputs = {"methods": ["monthly_stars"], "monthly": inputs}
+    else:
+        pass
 
     async def call():
         async with Client(create_mcp_app()) as client:
-            return await client.call_tool(
-                "fengshui_" + name, {"response_char_limit": 0, **inputs}
+            return await call_calculation(
+                client, SPECS[name].tool_name, {"response_char_limit": 0, **inputs}
             )
 
-    response = rest_client(monkeypatch).post("/api/fengshui/" + name, json=inputs)
+    response = rest_client(monkeypatch).post(SPECS[name].rest_path, json=inputs)
     protocol = asyncio.run(call())
     path = tmp_path / "month.json"
     path.write_text(json.dumps(inputs, ensure_ascii=False))
-    code = run(["fengshui_" + name, "--request-file", str(path)])
+    code = run([SPECS[name].tool_name, "--request-file", str(path)])
     cli = json.loads(capsys.readouterr().out)
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     assert (
@@ -196,7 +212,7 @@ def test_actual_rest_mcp_cli_agree_on_candidate_month_intervals(
     assert len(time["candidate_months"]) == 2
 
 
-def test_historical_partial_payload_keeps_its_original_generic_reading():
+def test_historical_partial_payload_keeps_its_original_generic_reading() -> None:
     old = {
         "status": "partial",
         "time_context": {
@@ -219,10 +235,12 @@ def test_historical_partial_payload_keeps_its_original_generic_reading():
 
 
 @pytest.mark.parametrize("name", ["monthly_stars", "assess"])
-def test_default_wire_budget_keeps_selected_candidate_facts(clock, name):
+def test_default_wire_budget_keeps_selected_candidate_facts(clock, name: str) -> None:
     inputs = {"query_at": boundary()["moment"], "timezone_name": "UTC"}
     if name == "assess":
         inputs = {"methods": ["monthly_stars"], "monthly": inputs}
+    else:
+        pass
     fields = ["layers.monthly_stars.status"] + [
         "layers.monthly_stars.time_context." + key
         for key in (
@@ -236,8 +254,9 @@ def test_default_wire_budget_keeps_selected_candidate_facts(clock, name):
 
     async def call():
         async with Client(create_mcp_app()) as client:
-            response = await client.call_tool(
-                "fengshui_" + name,
+            response = await call_calculation(
+                client,
+                SPECS[name].tool_name,
                 {
                     **inputs,
                     "fields": fields,

@@ -4,6 +4,7 @@ import asyncio
 import json
 import shutil
 from copy import deepcopy
+from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
@@ -14,7 +15,7 @@ import scripts.ziwei.audit_ziwei_childhood as audit
 from fatebridge.application.examples import evidence_views
 from fatebridge.cli import run
 from fatebridge.core.metaphysics.ziwei import build_ziwei_chart, build_ziwei_horoscope
-from fatebridge.core.ziwei_childhood import childhood_limit
+from fatebridge.core.ziwei.ziwei_childhood import childhood_limit
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.metaphysics import calculate_ziwei_horoscope
 from fatebridge.services.tool_catalog import CATALOG
@@ -22,6 +23,7 @@ from fatebridge.utils.birth_input import create_person_info
 from scripts.ziwei.audit_ziwei_limits import _seed
 from scripts.ziwei.ziwei_conditional_inputs import synthetic_birth_clock
 from tests.fixtures.mcp_receipt import verified_inline_business
+from tests.support.transports import call_calculation
 
 BIRTH = dict(
     birth_year=1984,
@@ -42,7 +44,7 @@ LITERAL_ROWS = [
 ]
 
 
-def test_independent_childhood_audit_retains_six_cells_and_unresolved_tail():
+def test_independent_childhood_audit_retains_six_cells_and_unresolved_tail() -> None:
     r = audit.audit_childhood()
     assert r["independent_explicit_ordinal_cells"] == 6
     assert r["conditional_chart_age_cases_checked"] == 288
@@ -54,20 +56,26 @@ def test_independent_childhood_audit_retains_six_cells_and_unresolved_tail():
     assert not r["pre_decade_substitution_certified"]
 
 
-def test_mutated_actual_branch_does_not_redefine_independent_expectation(monkeypatch):
+def test_mutated_actual_branch_does_not_redefine_independent_expectation(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     original = audit.childhood_limit
 
     def wrong(*args, **kwargs):
         r = original(*args, **kwargs)
         if r["status"] == "computed_given_age_ordinal":
             r["natal_branch"] = "bad"
+        else:
+            pass
         return r
 
     monkeypatch.setattr(audit, "childhood_limit", wrong)
     assert len(audit.audit_childhood()["mismatches"]) == 288
 
 
-def test_runtime_source_rewrite_is_not_accepted_as_the_original(tmp_path, monkeypatch):
+def test_runtime_source_rewrite_is_not_accepted_as_the_original(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     name = "src/fatebridge/data/classical/ziwei-naj-ming-childhood.json"
     r = json.loads((audit.ROOT / name).read_text())
     r["ordinal_rows"][1]["modern_palace_name"] = "父母宫"
@@ -78,7 +86,7 @@ def test_runtime_source_rewrite_is_not_accepted_as_the_original(tmp_path, monkey
     assert dict(case="production_source_data") in audit.audit_childhood()["mismatches"]
 
 
-def test_original_childhood_page_is_required(tmp_path):
+def test_original_childhood_page_is_required(tmp_path: Path) -> None:
     name = "naj_ming_childhood_v1"
     shutil.copytree(audit.FIXTURES / name, tmp_path / name)
     p = tmp_path / name / "frame_0080.jpg"
@@ -90,8 +98,8 @@ def test_original_childhood_page_is_required(tmp_path):
 @pytest.mark.parametrize("profile", ["iztro_2_5_8", "quanshu_v2_excerpt"])
 @pytest.mark.parametrize("age,name,branch", LITERAL_ROWS)
 def test_real_lunar_age_rows_join_actual_palace_and_natal_stars(
-    profile, age, name, branch
-):
+    profile: str, age, name, branch
+) -> None:
     r = calculate_ziwei_horoscope(
         create_person_info(**BIRTH),
         rule_profile=profile,
@@ -116,7 +124,7 @@ def test_real_lunar_age_rows_join_actual_palace_and_natal_stars(
     assert len(h["scopes"]) == 6
 
 
-def test_childhood_second_age_does_not_replace_formal_first_decade():
+def test_childhood_second_age_does_not_replace_formal_first_decade() -> None:
     chart = build_ziwei_chart(
         _seed(1984, hour="丑"), "男", rule_profile="quanshu_v2_excerpt"
     )
@@ -134,7 +142,7 @@ def test_childhood_second_age_does_not_replace_formal_first_decade():
 
 
 @pytest.mark.parametrize("age", [7, 14, 15, 16, 40])
-def test_unresolved_tail_and_adult_age_never_default_to_ming(age):
+def test_unresolved_tail_and_adult_age_never_default_to_ming(age: int) -> None:
     chart = build_ziwei_chart(_seed(1984), "女")
     r = childhood_limit(chart, age)
     assert r["status"] == "unresolved_from_source"
@@ -143,7 +151,7 @@ def test_unresolved_tail_and_adult_age_never_default_to_ming(age):
     assert r["unresolved_reason"]
 
 
-def test_returned_natal_star_details_cannot_mutate_the_chart_or_cached_source():
+def test_returned_natal_star_details_cannot_mutate_the_chart_or_cached_source() -> None:
     chart = build_ziwei_chart(_seed(1984), "女")
     before = deepcopy(chart)
     r = childhood_limit(chart, 1)
@@ -156,8 +164,11 @@ def test_returned_natal_star_details_cannot_mutate_the_chart_or_cached_source():
 @pytest.mark.parametrize("profile", ["iztro_2_5_8", "quanshu_v2_excerpt"])
 @pytest.mark.parametrize("age", [2, 8])
 def test_childhood_view_is_equal_in_rest_mcp_cli_and_fits_default_mcp_budget(
-    profile, age, monkeypatch, capsys
-):
+    profile: str,
+    age: int,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     api._reset_runtime_state_for_tests()
     monkeypatch.setattr(
         api,
@@ -182,7 +193,7 @@ def test_childhood_view_is_equal_in_rest_mcp_cli_and_fits_default_mcp_budget(
         include_snapshot_text=False,
     )
     rest = TestClient(api.app).post(
-        "/api/cn/ziwei/horoscope",
+        "/api/ziwei/timing",
         json=inputs,
         params=[
             ("as_of", options["as_of"]),
@@ -194,14 +205,14 @@ def test_childhood_view_is_equal_in_rest_mcp_cli_and_fits_default_mcp_budget(
 
     async def call():
         async with Client(create_mcp_app(families="metaphysics")) as client:
-            result = await client.call_tool(
-                "ziwei_horoscope", {**inputs, **options}, raise_on_error=False
+            result = await call_calculation(
+                client, "ziwei_timing", {**inputs, **options}, raise_on_error=False
             )
             await verified_inline_business(client, result.structured_content)
             return result
 
     native = asyncio.run(call())
-    args = ["ziwei_horoscope"]
+    args = ["ziwei_timing"]
     for name, value in inputs.items():
         args += ["--" + name.replace("_", "-"), str(value)]
     args += [

@@ -15,10 +15,10 @@ from fatebridge.core.fengshui.xuankong import (
     validate_replacement_catalog,
 )
 from fatebridge.services.fengshui import calculate_xuankong_natal
-from fatebridge.validation.fengshui_replacement import audit_replacement_reference
-from tests.support.fengshui_transports import mcp_call
+from tests.support.fengshui_transports import SPECS, mcp_call
 from tests.support.mcp_result_assertions import without_transport
 from tests.support.transports import rest_client
+from validation.fengshui_replacement import audit_replacement_reference
 
 FOLDER = Path(__file__).parents[1] / "data/fengshui_replacement_v1"
 ORIGINAL = json.loads((FOLDER / "reference.json").read_text())
@@ -39,7 +39,7 @@ def request(angle=354):
     }
 
 
-def test_all24_primary_rows_four_clauses_and_five_full_nine_palace_charts():
+def test_all24_primary_rows_four_clauses_and_five_full_nine_palace_charts() -> None:
     result = audit_replacement_reference(ORIGINAL, PRINTED)
     assert result["scoped_acceptance_passed"]
     assert result["complete_table_entries"] == 24
@@ -55,7 +55,9 @@ def test_all24_primary_rows_four_clauses_and_five_full_nine_palace_charts():
 
 
 @pytest.mark.parametrize("name,expected", EXPECTED.items())
-def test_complete_explicit_table_distinguishes_changed_and_same_star(name, expected):
+def test_complete_explicit_table_distinguishes_changed_and_same_star(
+    name, expected
+) -> None:
     rules = natal_rules()
     physical = next(m for m in rules["mountains"] if m["name"] == name)
     original = rules["replacement_catalog"][name]["native_star_number"]
@@ -89,7 +91,9 @@ def test_complete_explicit_table_distinguishes_changed_and_same_star(name, expec
         "extra_mountain",
     ],
 )
-def test_incomplete_or_conflicting_catalog_cannot_silently_fall_back(corruption):
+def test_incomplete_or_conflicting_catalog_cannot_silently_fall_back(
+    corruption: str,
+) -> None:
     rules = natal_rules()
     if corruption == "missing_same":
         del rules["replacement_catalog"]["子"]
@@ -113,7 +117,7 @@ def test_incomplete_or_conflicting_catalog_cannot_silently_fall_back(corruption)
         validate_replacement_catalog(rules)
 
 
-def test_missing_or_mutated_independent_oracle_never_appears_as_acceptance():
+def test_missing_or_mutated_independent_oracle_never_appears_as_acceptance() -> None:
     original = deepcopy(ORIGINAL)
     original["groups"][0]["mountains"] = "子癸甲"
     with pytest.raises(ValueError):
@@ -134,7 +138,7 @@ def test_missing_or_mutated_independent_oracle_never_appears_as_acceptance():
     )
 
 
-def test_all_four_decisions_have_distinct_calculation_and_readable_evidence():
+def test_all_four_decisions_have_distinct_calculation_and_readable_evidence() -> None:
     found = set()
     for angle in [180, 354, 84, 309]:
         result = calculate_xuankong_natal(**request(angle))
@@ -166,16 +170,22 @@ def test_all_four_decisions_have_distinct_calculation_and_readable_evidence():
 
 @pytest.mark.parametrize("name", ["xuankong_natal", "assess"])
 def test_full_lookup_matches_rest_real_mcp_cli_and_keeps_primary_sources(
-    monkeypatch, tmp_path, capsys, name
-):
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    name: str,
+) -> None:
     data = request()
     if name == "assess":
         data = {"methods": ["xuankong_natal"], "xuankong": data}
-    http = rest_client(monkeypatch).post("/api/fengshui/" + name, json=data)
-    protocol = asyncio.run(mcp_call(name, data))
+    else:
+        pass
+    spec = SPECS[name]
+    http = rest_client(monkeypatch).post(spec.rest_path, json=data)
+    protocol = asyncio.run(mcp_call(spec.tool_name.removeprefix("fengshui_"), data))
     path = tmp_path / "replacement.json"
     path.write_text(json.dumps(data))
-    assert run(["fengshui_" + name, "--request-file", str(path)]) == 0
+    assert run([spec.tool_name, "--request-file", str(path)]) == 0
     cli = json.loads(capsys.readouterr().out)
     assert http.status_code == 200 and not protocol.is_error
     assert (
@@ -187,13 +197,17 @@ def test_full_lookup_matches_rest_real_mcp_cli_and_keeps_primary_sources(
         r for r in cli["rulesets"] if r["ruleset_id"] == "xuankong_zhongzhou_v1"
     )
     assert record["version"] == "1.4.0"
-    assert {"X8", "X9"}.issubset({s["source_id"] for s in record["sources"]})
+    for source_id in ("X8", "X9"):
+        assert cli["source_catalog"][source_id]["url"]
+        assert record["source_citations"][source_id]["scope"]
 
 
-def test_strict_mcp_projection_retains_same_star_decision_and_original_polarity():
+def test_strict_mcp_projection_retains_same_star_decision_and_original_polarity() -> (
+    None
+):
     result = asyncio.run(
         mcp_call(
-            "xuankong_natal",
+            SPECS["xuankong_natal"].tool_name.removeprefix("fengshui_"),
             {
                 **request(309),
                 "fields": [

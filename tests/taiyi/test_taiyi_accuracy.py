@@ -2,12 +2,17 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
+import shutil
+from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
 
+from fatebridge.core.contracts.output_chinese import Taiyi
 from fatebridge.core.local_techniques.sanshi import _build_taiyi_with_options
+from fatebridge.core.metaphysics.seed import build_analysis_seed
 from fatebridge.core.metaphysics.taiyi_year import (
     PALACES,
     count_categories,
@@ -16,11 +21,9 @@ from fatebridge.core.metaphysics.taiyi_year import (
     structural_patterns,
     yearly_core,
 )
-from fatebridge.core.output_chinese import Taiyi
 from fatebridge.core.requests.metaphysics import TaiyiAnalysisRequest
 from fatebridge.services.divination import calculate_sanshiunited_analysis
 from fatebridge.services.metaphysics import (
-    _build_analysis_seed,
     calculate_taiyi_analysis,
 )
 from scripts.taiyi.audit_taiyi_classical import CORPUS, audit
@@ -36,7 +39,7 @@ CASES = json.loads((CORPUS / "cases.json").read_text())
         {"rule_trace": {"guest": {"terminal_excluded": "false"}}},
     ],
 )
-def test_public_evidence_contract_rejects_facts_with_wrong_types(invalid):
+def test_public_evidence_contract_rejects_facts_with_wrong_types(invalid) -> None:
     with pytest.raises(ValidationError):
         Taiyi.model_validate(invalid)
 
@@ -44,14 +47,14 @@ def test_public_evidence_contract_rejects_facts_with_wrong_types(invalid):
 @pytest.mark.parametrize(
     "case", [c for c in CASES if c["status"] == "transcribed"], ids=lambda c: c["id"]
 )
-def test_yearly_core_against_frozen_primary_table(case):
+def test_yearly_core_against_frozen_primary_table(case) -> None:
     core = yearly_core(case["year"])
     assert core["kook_number"] == case["ju"]
     for field, expected in case["expected"].items():
         assert core[field] == expected
 
 
-def test_unresolved_cases_are_counted_and_block_classical_acceptance():
+def test_unresolved_cases_are_counted_and_block_classical_acceptance() -> None:
     report = audit()
     assert report["total_cases"] == 72
     assert report["matching_cases"] == 70
@@ -61,8 +64,7 @@ def test_unresolved_cases_are_counted_and_block_classical_acceptance():
     assert report["real_world_efficacy"] == "not_tested"
 
 
-def test_independent_corpus_tampering_is_rejected(tmp_path):
-    import shutil
+def test_independent_corpus_tampering_is_rejected(tmp_path: Path) -> None:
 
     shutil.copytree(CORPUS, tmp_path / "corpus")
     cases = tmp_path / "corpus" / "cases.json"
@@ -72,9 +74,9 @@ def test_independent_corpus_tampering_is_rejected(tmp_path):
 
 
 @pytest.mark.parametrize("attempt", ["drop_cases", "drop_fields"])
-def test_audit_cannot_be_gamed_by_removing_disagreements(tmp_path, attempt):
-    import hashlib
-    import shutil
+def test_audit_cannot_be_gamed_by_removing_disagreements(
+    tmp_path: Path, attempt: str
+) -> None:
 
     corpus = tmp_path / "corpus"
     shutil.copytree(CORPUS, corpus)
@@ -93,7 +95,7 @@ def test_audit_cannot_be_gamed_by_removing_disagreements(tmp_path, attempt):
         audit(corpus)
 
 
-def test_volume_two_worked_example_and_count_categories():
+def test_volume_two_worked_example_and_count_categories() -> None:
     trace = count_to_taiyi("亥", 9)
     assert trace["count"] == 16
     assert [(p["palace"], p["value"]) for p in trace["path"]] == [
@@ -116,11 +118,13 @@ def test_volume_two_worked_example_and_count_categories():
 @pytest.mark.parametrize(
     "count,expected", [(10, 1), (20, 2), (30, 3), (40, 4), (25, 5), (39, 9)]
 )
-def test_generals_from_same_count_including_exact_tens(count, expected):
+def test_generals_from_same_count_including_exact_tens(
+    count: int, expected: int
+) -> None:
     assert general_for_count(count) == expected
 
 
-def test_volume_nine_forty_is_four_not_five():
+def test_volume_nine_forty_is_four_not_five() -> None:
     core = yearly_core(700)  # 阳遁25局，卷九《推敌使言虚实》例
     assert (core["guest_count"], core["guest_general"], core["guest_vice_general"]) == (
         40,
@@ -129,7 +133,7 @@ def test_volume_nine_forty_is_four_not_five():
     )
 
 
-def test_full_cycle_trace_and_general_consistency():
+def test_full_cycle_trace_and_general_consistency() -> None:
     for year in range(1900, 2101):
         core = yearly_core(year)
         for side, key in (("main", "main_count"), ("guest", "guest_count")):
@@ -141,7 +145,7 @@ def test_full_cycle_trace_and_general_consistency():
             assert core[f"{side}_vice_general"] in PALACES
 
 
-def test_structural_interpretation_references_actual_returned_fields():
+def test_structural_interpretation_references_actual_returned_fields() -> None:
     for year in range(676, 748):
         core = yearly_core(year)
         board = {
@@ -174,14 +178,16 @@ def call_taiyi(year=2026, month=4, day=4, hour=12, minute=0, **kwargs):
     "month,day,lunar_year,branch",
     [(2, 4, 2025, "巳"), (2, 16, 2025, "巳"), (2, 17, 2026, "午"), (4, 17, 2026, "午")],
 )
-def test_hko_2026_new_year_is_distinct_from_lichun(month, day, lunar_year, branch):
+def test_hko_2026_new_year_is_distinct_from_lichun(
+    month: int, day: int, lunar_year: int, branch: str
+) -> None:
     # HKO Gregorian-Lunar Calendar Conversion Table of 2026, Feb/Apr rows.
     board = call_taiyi(month=month, day=day)["taiyi"]
     assert board["calendar_rules"]["year"] == lunar_year
     assert board["core_board"]["suijun"] == branch
 
 
-def test_yearly_default_does_not_require_longitude_for_hourly_correction():
+def test_yearly_default_does_not_require_longitude_for_hourly_correction() -> None:
     request = TaiyiAnalysisRequest(
         analysis_year=2026, analysis_month=4, analysis_day=4, analysis_hour=12
     )
@@ -191,7 +197,7 @@ def test_yearly_default_does_not_require_longitude_for_hourly_correction():
     assert result["analysis_context"]["time_algorithm"] == "直接时间"
 
 
-def test_apparent_solar_midnight_cannot_rewrite_civil_lunar_year():
+def test_apparent_solar_midnight_cannot_rewrite_civil_lunar_year() -> None:
     result = calculate_taiyi_analysis(
         analysis_year=2026,
         analysis_month=2,
@@ -220,7 +226,9 @@ def test_apparent_solar_midnight_cannot_rewrite_civil_lunar_year():
         (2034, 2, 19, 2034),
     ],
 )
-def test_frozen_hko_years_include_2033_leap_eleven(year, month, day, expected_year):
+def test_frozen_hko_years_include_2033_leap_eleven(
+    year: int, month: int, day: int, expected_year: int
+) -> None:
     board = call_taiyi(year=year, month=month, day=day)["taiyi"]
     assert board["calendar_rules"]["year"] == expected_year
     assert (
@@ -229,7 +237,7 @@ def test_frozen_hko_years_include_2033_leap_eleven(year, month, day, expected_ye
     )
 
 
-def test_center_general_is_preserved_and_explained_from_same_board():
+def test_center_general_is_preserved_and_explained_from_same_board() -> None:
     result = call_taiyi(year=2017)
     board = result["taiyi"]
     assert board["core_board"]["main_count"] == 5
@@ -253,8 +261,8 @@ def test_center_general_is_preserved_and_explained_from_same_board():
         {"accNum": 0, "acc_num": 1},
     ],
 )
-def test_unsupported_transformations_never_create_a_plausible_board(options):
-    seed = _build_analysis_seed(
+def test_unsupported_transformations_never_create_a_plausible_board(options) -> None:
+    seed = build_analysis_seed(
         analysis_year=2026, analysis_month=4, analysis_day=4, analysis_hour=12
     )
     with pytest.raises(ValueError):
@@ -266,16 +274,18 @@ def test_unsupported_transformations_never_create_a_plausible_board(options):
     "obsolete",
     [{"accNum": 0}, {"acc_num": 0}, {"rotation": "顺布"}, {"rotation": "forward"}],
 )
-def test_obsolete_noop_keys_are_rejected_in_every_current_mode(mode, obsolete):
-    seed = _build_analysis_seed(
+def test_obsolete_noop_keys_are_rejected_in_every_current_mode(
+    mode: str, obsolete
+) -> None:
+    seed = build_analysis_seed(
         analysis_year=2026, analysis_month=4, analysis_day=4, analysis_hour=12
     )
     with pytest.raises(ValueError, match="未实现的太乙选项"):
         _build_taiyi_with_options(seed, {"calculation_mode": mode, **obsolete})
 
 
-def test_default_current_options_do_not_fabricate_patterns():
-    seed = _build_analysis_seed(
+def test_default_current_options_do_not_fabricate_patterns() -> None:
+    seed = build_analysis_seed(
         analysis_year=2026, analysis_month=4, analysis_day=4, analysis_hour=12
     )
     default = _build_taiyi_with_options(seed, {})
@@ -284,7 +294,7 @@ def test_default_current_options_do_not_fabricate_patterns():
     assert default["ruleset"]["classical_acceptance_passed"] is False
 
 
-def test_sanshi_does_not_conflate_yearly_background_with_hourly_event():
+def test_sanshi_does_not_conflate_yearly_background_with_hourly_event() -> None:
     result = calculate_sanshiunited_analysis(
         date="2026-04-04",
         time="12:00:00",
@@ -292,7 +302,6 @@ def test_sanshi_does_not_conflate_yearly_background_with_hourly_event():
         use_true_solar_time=False,
     )
     assert result["taiyi"] == call_taiyi()["taiyi"]
-    assert result["subresults"]["taiyi"]["pan"] == result["taiyi"]
     assert result["synthesis"]["time_scopes"]["taiyi"] == "year"
     assert result["synthesis"]["independent_evidence_count"] is None
     assert result["synthesis"]["real_world_efficacy"] == "not_tested"

@@ -3,6 +3,7 @@
 import asyncio
 import json
 from datetime import datetime, timedelta
+from pathlib import Path
 
 import pytest
 from fastmcp import Client
@@ -17,8 +18,10 @@ from fatebridge.services.fengshui import (
     calculate_minggua,
     calculate_xuankong_natal,
 )
+from tests.support.fengshui_clock import seconds_from_boundary
+from tests.support.fengshui_transports import SPECS
 from tests.support.mcp_result_assertions import without_transport
-from tests.support.transports import rest_client
+from tests.support.transports import call_calculation, rest_client
 
 
 @pytest.fixture(params=["native", "analytic"])
@@ -35,6 +38,11 @@ def instant(year=2025, zone="UTC"):
     return datetime.fromisoformat(calendar.lichun_resolution(year, zone)["moment"])
 
 
+def model_side_year(moment):
+    point = calendar.lichun_resolution(moment.year, "UTC")["civil_point"]
+    return moment.year - int(seconds_from_boundary(moment, point) < 0)
+
+
 def natal_input(moment):
     return {
         "house": {"facing_degrees": 270, "north_reference": "magnetic"},
@@ -47,11 +55,12 @@ def natal_input(moment):
     }
 
 
-def test_shared_year_context_never_exposes_a_confirmed_year_or_interval(clock):
-    time = calendar.year_context(None, instant(), "UTC")
+def test_shared_year_context_never_exposes_a_confirmed_year_or_interval(clock) -> None:
+    at = instant()
+    time = calendar.year_context(None, at, "UTC")
     assert time["effective_year_status"] == "requires_confirmation"
     assert time["effective_year"] is None
-    assert time["provisional_effective_year"] == 2025
+    assert time["provisional_effective_year"] == model_side_year(at)
     assert time["candidate_effective_years"] == [2024, 2025]
     assert time["valid_from"] is time["valid_until"] is None
     candidates = time["candidate_year_intervals"]
@@ -61,7 +70,7 @@ def test_shared_year_context_never_exposes_a_confirmed_year_or_interval(clock):
     assert all(c["valid_until"] == c["end_resolution"]["moment"] for c in candidates)
 
 
-def test_period_stays_resolved_without_manufacturing_a_unique_event_year(clock):
+def test_period_stays_resolved_without_manufacturing_a_unique_event_year(clock) -> None:
     output = calculate_xuankong_natal(**natal_input(instant()))
     natal = output["layers"]["xuankong_natal"]
     period = natal["period_context"]
@@ -79,8 +88,8 @@ def test_period_stays_resolved_without_manufacturing_a_unique_event_year(clock):
 
 @pytest.mark.parametrize("year,periods", [(2024, [8, 9]), (2044, [9, 1])])
 def test_cross_period_candidates_keep_both_windows_in_chronological_order(
-    clock, year, periods
-):
+    clock, year: int, periods
+) -> None:
     natal = calculate_xuankong_natal(**natal_input(instant(year)))["layers"][
         "xuankong_natal"
     ]
@@ -102,7 +111,7 @@ def test_cross_period_candidates_keep_both_windows_in_chronological_order(
     assert windows[0]["valid_until"] == windows[1]["valid_from"]
 
 
-def test_annual_and_minggua_keep_model_side_only_as_provisional(clock):
+def test_annual_and_minggua_keep_model_side_only_as_provisional(clock) -> None:
     at = instant()
     annual = calculate_annual_stars(query_at=at, timezone_name="UTC")["layers"][
         "annual_stars"
@@ -113,10 +122,9 @@ def test_annual_and_minggua_keep_model_side_only_as_provisional(clock):
     for layer in [annual, birth]:
         assert layer["status"] == "partial"
         time = layer["time_context"]
-        assert (
-            time["effective_year"] is None
-            and time["provisional_effective_year"] == 2025
-        )
+        assert time["effective_year"] is None and time[
+            "provisional_effective_year"
+        ] == model_side_year(at)
         assert time["valid_from"] is time["valid_until"] is None
         assert [c["effective_year"] for c in time["candidate_year_intervals"]] == [
             2024,
@@ -125,33 +133,38 @@ def test_annual_and_minggua_keep_model_side_only_as_provisional(clock):
     assert annual["palaces"] == {} and birth["candidates"] == []
 
 
-def test_skipping_interval_resolution_does_not_silently_confirm_an_instant(clock):
-    time = calendar.year_context(None, instant(), "UTC", resolve_interval=False)
+def test_skipping_interval_resolution_does_not_silently_confirm_an_instant(
+    clock,
+) -> None:
+    at = instant()
+    time = calendar.year_context(None, at, "UTC", resolve_interval=False)
     assert time["input_basis"] == "aware_datetime"
     assert time["effective_year"] is None
     assert time["candidate_effective_years"] == [2024, 2025]
-    assert time["provisional_effective_year"] == 2025
+    assert time["provisional_effective_year"] == model_side_year(at)
 
 
 @pytest.mark.parametrize("delta", [-6, -5, 0, 5, 6])
 def test_existing_guard_width_and_candidate_period_arithmetic_remain_exact(
     clock, delta
-):
+) -> None:
     at = instant() + timedelta(seconds=delta)
     period = xuankong.period_context(
         HousePeriod.model_validate(natal_input(at)["period"])
     )
-    ambiguous = abs(delta) <= 5
+    point = calendar.lichun_resolution(at.year, "UTC")["civil_point"]
+    distance = seconds_from_boundary(at, point)
+    ambiguous = abs(distance) <= 5
     assert period["number"] == 9
     if ambiguous:
         assert period["effective_event_year"] is None
         assert period["candidate_effective_event_years"] == [2024, 2025]
     else:
-        assert period["effective_event_year"] == (2024 if delta < 0 else 2025)
+        assert period["effective_event_year"] == (2024 if distance < 0 else 2025)
         assert "candidate_effective_event_years" not in period
 
 
-def test_explicit_confirmed_year_and_period_are_not_reinterpreted(clock):
+def test_explicit_confirmed_year_and_period_are_not_reinterpreted(clock) -> None:
     explicit = xuankong.period_context(
         HousePeriod(
             basis="first_occupancy",
@@ -168,7 +181,7 @@ def test_explicit_confirmed_year_and_period_are_not_reinterpreted(clock):
     assert "effective_event_year_status" not in confirmed
 
 
-def test_snapshot_and_bound_reading_distinguish_event_year_from_period(clock):
+def test_snapshot_and_bound_reading_distinguish_event_year_from_period(clock) -> None:
     output = calculate_xuankong_natal(**natal_input(instant()))
     text = output["snapshot_text"]
     assert "事件有效年待确认：2024、2025" in text
@@ -186,8 +199,12 @@ def test_snapshot_and_bound_reading_distinguish_event_year_from_period(clock):
     "name", ["xuankong_natal", "assess", "annual_stars", "minggua"]
 )
 def test_boundary_year_contract_agrees_on_actual_rest_mcp_cli(
-    clock, monkeypatch, tmp_path, capsys, name
-):
+    clock,
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    name: str,
+) -> None:
     at = instant()
     inputs = natal_input(at)
     if name == "assess":
@@ -204,18 +221,20 @@ def test_boundary_year_contract_agrees_on_actual_rest_mcp_cli(
             "timezone_name": "UTC",
             "gender_convention": "male",
         }
+    else:
+        pass
 
     async def call():
         async with Client(create_mcp_app()) as client:
-            return await client.call_tool(
-                "fengshui_" + name, {"response_char_limit": 0, **inputs}
+            return await call_calculation(
+                client, SPECS[name].tool_name, {"response_char_limit": 0, **inputs}
             )
 
-    response = rest_client(monkeypatch).post("/api/fengshui/" + name, json=inputs)
+    response = rest_client(monkeypatch).post(SPECS[name].rest_path, json=inputs)
     protocol = asyncio.run(call())
     path = tmp_path / "event.json"
     path.write_text(json.dumps(inputs, ensure_ascii=False))
-    code = run(["fengshui_" + name, "--request-file", str(path)])
+    code = run([SPECS[name].tool_name, "--request-file", str(path)])
     cli = json.loads(capsys.readouterr().out)
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     assert (

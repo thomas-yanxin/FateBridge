@@ -3,6 +3,7 @@
 import asyncio
 import json
 import shutil
+from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
@@ -13,14 +14,15 @@ import scripts.ziwei.audit_ziwei_limits as audit
 from fatebridge.application.examples import evidence_views
 from fatebridge.cli import run
 from fatebridge.core.metaphysics.ziwei import build_ziwei_chart, build_ziwei_horoscope
-from fatebridge.core.ziwei_rulesets import ziwei_ruleset_metadata
+from fatebridge.core.ziwei.ziwei_rulesets import ziwei_ruleset_metadata
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
 from scripts.ziwei.ziwei_conditional_inputs import synthetic_birth_clock
 from tests.fixtures.mcp_receipt import verified_inline_business
+from tests.support.transports import call_calculation
 
 
-def test_selected_limit_readings_have_independent_expected_sequences():
+def test_selected_limit_readings_have_independent_expected_sequences() -> None:
     r = audit.audit_limits()
     assert not r["mismatches"]
     assert r["daxian_assignments_checked"] == 5760
@@ -52,8 +54,8 @@ def test_selected_limit_readings_have_independent_expected_sequences():
     ],
 )
 def test_excerpt_first_decade_is_literal_neighbor_and_ming_remains_natal(
-    year, gender, first
-):
+    year: int, gender: str, first: str
+) -> None:
     chart = build_ziwei_chart(
         audit._seed(year), gender, rule_profile="quanshu_v2_excerpt"
     )
@@ -73,7 +75,9 @@ def test_excerpt_first_decade_is_literal_neighbor_and_ming_remains_natal(
 
 
 @pytest.mark.parametrize("profile", ["iztro_2_5_8", "quanshu_v2_excerpt"])
-def test_fire_year_only_reading_is_distinct_from_both_forward_hour_walks(profile):
+def test_fire_year_only_reading_is_distinct_from_both_forward_hour_walks(
+    profile: str,
+) -> None:
     positions = []
     for hour in ["子", "丑", "午", "亥"]:
         chart = build_ziwei_chart(
@@ -99,7 +103,7 @@ def test_fire_year_only_reading_is_distinct_from_both_forward_hour_walks(profile
     )
 
 
-def test_leap_doujun_and_childhood_substitution_remain_unverified():
+def test_leap_doujun_and_childhood_substitution_remain_unverified() -> None:
     c = build_ziwei_chart(
         audit._seed(1984, 4, 16, leap=True), "女", rule_profile="quanshu_v2_excerpt"
     )
@@ -122,17 +126,21 @@ def test_leap_doujun_and_childhood_substitution_remain_unverified():
 
 
 def test_relabeling_old_software_positions_as_new_excerpt_cannot_pass_audit(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     original = audit.build_ziwei_chart
 
     def relabel(*args, **kwargs):
         requested = kwargs.get("rule_profile")
         if requested == "quanshu_v2_excerpt":
             kwargs["rule_profile"] = "iztro_2_5_8"
+        else:
+            pass
         c = original(*args, **kwargs)
         if requested == "quanshu_v2_excerpt":
             c["ruleset"] = ziwei_ruleset_metadata(requested)
+        else:
+            pass
         return c
 
     monkeypatch.setattr(audit, "build_ziwei_chart", relabel)
@@ -143,8 +151,8 @@ def test_relabeling_old_software_positions_as_new_excerpt_cannot_pass_audit(
 
 
 def test_rewriting_runtime_limit_table_cannot_redefine_frozen_source(
-    tmp_path, monkeypatch
-):
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     name = "src/fatebridge/data/classical/ziwei-naj-ming-limits.json"
     data = json.loads((audit.ROOT / name).read_text())
     data["daxian"]["initial_palace_by_direction"]["forward"] = "命宫"
@@ -156,7 +164,7 @@ def test_rewriting_runtime_limit_table_cannot_redefine_frozen_source(
     assert any(d["case"] == "production_source_data" for d in r["mismatches"])
 
 
-def test_frozen_limit_audit_requires_the_actual_source_images(tmp_path):
+def test_frozen_limit_audit_requires_the_actual_source_images(tmp_path: Path) -> None:
     name = "naj_ming_limits_v1"
     shutil.copytree(audit.FIXTURES / name, tmp_path / name)
     p = tmp_path / name / "frame_0080.jpg"
@@ -168,8 +176,12 @@ def test_frozen_limit_audit_requires_the_actual_source_images(tmp_path):
 @pytest.mark.parametrize("profile", ["iztro_2_5_8", "quanshu_v2_excerpt"])
 @pytest.mark.parametrize("target_day,age", [(19, 1), (20, 2)])
 def test_cny_limit_boundary_and_actual_profile_reading_match_rest_mcp_cli(
-    monkeypatch, capsys, profile, target_day, age
-):
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    profile: str,
+    target_day: int,
+    age: int,
+) -> None:
     # HKO 1984-02-02 and 1985-02-20 are the two respective first lunar days.
     api._reset_runtime_state_for_tests()
     monkeypatch.setattr(
@@ -202,7 +214,7 @@ def test_cny_limit_boundary_and_actual_profile_reading_match_rest_mcp_cli(
         as_of="2026-10-22T12:00:00+08:00",
     )
     rest = TestClient(api.app).post(
-        "/api/cn/ziwei/horoscope",
+        "/api/ziwei/timing",
         json=inputs,
         params=[
             *[("fields", f) for f in fields],
@@ -215,13 +227,13 @@ def test_cny_limit_boundary_and_actual_profile_reading_match_rest_mcp_cli(
 
     async def call():
         async with Client(create_mcp_app(families="metaphysics")) as c:
-            result = await c.call_tool("ziwei_horoscope", {**inputs, **opts})
+            result = await call_calculation(c, "ziwei_timing", {**inputs, **opts})
             await verified_inline_business(c, result.structured_content)
             return result
 
     native = asyncio.run(call())
     assert not native.is_error
-    args = ["ziwei_horoscope"]
+    args = ["ziwei_timing"]
     for k, v in inputs.items():
         args.extend(["--" + k.replace("_", "-"), str(v)])
     args.extend(

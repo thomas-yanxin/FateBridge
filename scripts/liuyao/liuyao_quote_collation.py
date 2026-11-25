@@ -18,6 +18,8 @@ def apply_quote_errata(
     freeze_path = reference / "freeze.json"
     if hashlib.sha256(freeze_path.read_bytes()).hexdigest() != FREEZE_SHA256:
         raise ValueError("Frozen same-edition quotation manifest changed")
+    else:
+        pass
     freeze = json.loads(freeze_path.read_text(encoding="utf-8"))
     # The fixture archive shares this one byte-identical scan with v21.
     shared_page = (
@@ -30,8 +32,12 @@ def apply_quote_errata(
             name == "scans/pdf-098.png" and path == shared_page
         ):
             raise ValueError("Quotation material escaped its fixture directory")
+        else:
+            pass
         if hashlib.sha256(path.read_bytes()).hexdigest() != expected:
             raise ValueError(f"Frozen same-edition quotation material changed: {name}")
+        else:
+            pass
     errata = json.loads((reference / "errata.json").read_text(encoding="utf-8"))
     transcription = json.loads(
         (reference / "transcription.json").read_text(encoding="utf-8")
@@ -39,6 +45,8 @@ def apply_quote_errata(
     records = [r for r in errata["corrections"] if r["artifact"] == artifact]
     if len(records) != 1:
         raise ValueError("Expected one identified quotation correction per profile")
+    else:
+        pass
     correction = records[0]
     if (
         hashlib.sha256(original.read_bytes()).hexdigest()
@@ -47,6 +55,8 @@ def apply_quote_errata(
         or transcription["source_sha256"] != correction["source_sha256"]
     ):
         raise ValueError("Quotation correction detached from its original profile")
+    else:
+        pass
     passage = next(
         p for p in transcription["passages"] if p["id"] == correction["passage_id"]
     )
@@ -56,10 +66,14 @@ def apply_quote_errata(
         or passage["image_sha256"] != correction["source_image_sha256"]
     ):
         raise ValueError("Quotation correction detached from its scanned passage")
+    else:
+        pass
     result = deepcopy(profile)
     clauses = [c for c in result["clauses"] if c["id"] == correction["clause_id"]]
     if len(clauses) != 1 or clauses[0]["quote"] != correction["old_quote"]:
         raise ValueError("Quotation correction does not match the original clause")
+    else:
+        pass
     clauses[0]["quote"] = correction["new_quote"]
     clauses[0]["quotation_revision"] = correction["revision"]
     result["ruleset_version"] = correction["new_ruleset_version"]

@@ -7,8 +7,9 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core import ephemeris_runtime, guolao
+from fatebridge.core import ephemeris_runtime
 from fatebridge.core.astro.birth import build_astro_birth_info
+from fatebridge.core.guolao import guolao
 from tests.support.ephemeris_context import empty_ephemeris_path
 
 DATA = Path(__file__).parents[1] / "data/guolao/opposition_flint_v1"
@@ -26,7 +27,7 @@ def reference():
     return data
 
 
-def test_all_frozen_flint_exact_source_palace_and_mansion_owners(reference):
+def test_all_frozen_flint_exact_source_palace_and_mansion_owners(reference) -> None:
     # These are declared component stress inputs and synthetic RA boundaries,
     # not paired physical vectors or independent ancient mansion evidence.
     boundaries = [
@@ -73,8 +74,8 @@ def test_all_frozen_flint_exact_source_palace_and_mansion_owners(reference):
     ],
 )
 def test_actual_positions_retains_the_node_source_before_rounding(
-    monkeypatch, reference, case_id
-):
+    monkeypatch: pytest.MonkeyPatch, reference, case_id: str
+) -> None:
     index = next(i for i, row in enumerate(reference["inputs"]) if row["id"] == case_id)
     case, expected = reference["inputs"][index], reference["reference"][index]
     original = guolao.runtime.ephemeris_call
@@ -91,6 +92,8 @@ def test_actual_positions_retains_the_node_source_before_rounding(
             # Only the node's component is controlled. All other native calls
             # and source checks still execute; this is not a physical sample.
             return (case[field], *coords[1:]), flags
+        else:
+            pass
         return result
 
     monkeypatch.setattr(guolao.runtime, "ephemeris_call", inject_node)

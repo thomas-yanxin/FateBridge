@@ -4,20 +4,20 @@ This is an engineering feasibility policy, not another Feng Shui lineage.
 There are no invented scores, prescription rules, or inferred floorplan facts.
 """
 
-from typing import Any, Dict, List
+from typing import Any
 
-from .actions import permission_state
-from .bazhai import bazhai
-from .jinsuo import jinsuo
-from .layout import analyze_layout
-from .models import AssessRequest, JinsuoRequest
+from fatebridge.core.fengshui.actions import permission_state
+from fatebridge.core.fengshui.bazhai import bazhai
+from fatebridge.core.fengshui.jinsuo import jinsuo
+from fatebridge.core.fengshui.layout import analyze_layout
+from fatebridge.core.fengshui.models import AssessRequest, JinsuoRequest
 
 
-def evaluate_alternatives(req: AssessRequest, layers: Dict[str, Any]) -> Dict[str, Any]:
+def evaluate_alternatives(req: AssessRequest, layers: dict[str, Any]) -> dict[str, Any]:
     constraints = {c.object_id: c for c in req.layout_constraints}
     current_placements = {p.object_id: p for p in req.placements}
     current_forms = {o.object_id: o for o in req.form_observations}
-    findings: List[Dict[str, Any]] = []
+    findings: list[dict[str, Any]] = []
     for candidate in req.layout_alternatives:
         # Never transfer old entrance/backing observations after a move or turn.
         proposal_features = [
@@ -63,12 +63,16 @@ def evaluate_alternatives(req: AssessRequest, layers: Dict[str, Any]) -> Dict[st
                     )
                 }
             )
+        else:
+            pass
         candidate_layers = dict(layers)
         if "bazhai" in layers:
             candidate_layers["bazhai"] = {
                 **bazhai(proposed),
                 "ruleset": layers["bazhai"]["ruleset"],
             }
+        else:
+            pass
         if "jinsuo" in layers:
             candidate_layers["jinsuo"] = {
                 **jinsuo(
@@ -78,6 +82,8 @@ def evaluate_alternatives(req: AssessRequest, layers: Dict[str, Any]) -> Dict[st
                 ),
                 "ruleset": layers["jinsuo"]["ruleset"],
             }
+        else:
+            pass
         layout = analyze_layout(proposed, candidate_layers)
         if req.environmental_context is not None:
             static_floors = {
@@ -97,6 +103,10 @@ def evaluate_alternatives(req: AssessRequest, layers: Dict[str, Any]) -> Dict[st
                         location_reference="independently_confirmed_floor_center_shared_orientation",
                         chart_scope="declared_house_and_annual_layers_no_automatic_floor_period",
                     )
+                else:
+                    pass
+        else:
+            pass
         missing = list(layout["missing_inputs"])
         # Any moved end requires a new observation of the same relationship.
         if req.workstation_review:
@@ -109,6 +119,8 @@ def evaluate_alternatives(req: AssessRequest, layers: Dict[str, Any]) -> Dict[st
                     missing.append(
                         f"layout_alternatives.{candidate.candidate_id}.environmental_context.workstation_review.activities.{activity.object_id}"
                     )
+                else:
+                    pass
             for relation in req.workstation_review.entry_barriers:
                 identity = (relation.entrance_id, relation.desk_id, relation.barrier_id)
                 if candidate.object_id in identity and not any(
@@ -118,6 +130,10 @@ def evaluate_alternatives(req: AssessRequest, layers: Dict[str, Any]) -> Dict[st
                     missing.append(
                         f"layout_alternatives.{candidate.candidate_id}.environmental_context.workstation_review.entry_barriers.{relation.relation_id}"
                     )
+                else:
+                    pass
+        else:
+            pass
         if (
             "jinsuo" in layers
             and not candidate.features
@@ -126,6 +142,8 @@ def evaluate_alternatives(req: AssessRequest, layers: Dict[str, Any]) -> Dict[st
             )
         ):
             missing.append(f"layout_alternatives.{candidate.candidate_id}.features")
+        else:
+            pass
         if req.environmental_context is not None:
             context = req.environmental_context
             fresh = candidate.environmental_context
@@ -154,20 +172,24 @@ def evaluate_alternatives(req: AssessRequest, layers: Dict[str, Any]) -> Dict[st
             if fresh is None:
                 if old_floors or old_observations or old_relations or old_materials:
                     missing.append(branch)
+                else:
+                    pass
             else:
                 fresh_relations = {
                     (r.kind, r.source_object_id, r.target_object_id)
                     for r in fresh.interior_relations
                 }
-                for relation in old_relations:
+                for interior_relation in old_relations:
                     if (
-                        relation.kind,
-                        relation.source_object_id,
-                        relation.target_object_id,
+                        interior_relation.kind,
+                        interior_relation.source_object_id,
+                        interior_relation.target_object_id,
                     ) not in fresh_relations:
                         missing.append(
-                            f"{branch}.interior_relations.{relation.relation_id}"
+                            f"{branch}.interior_relations.{interior_relation.relation_id}"
                         )
+                    else:
+                        pass
                 for fact in old_materials:
                     if fact.application:
                         new_app = next(
@@ -185,6 +207,10 @@ def evaluate_alternatives(req: AssessRequest, layers: Dict[str, Any]) -> Dict[st
                                 missing.append(
                                     f"{branch}.material_facts.{fact.fact_id}.application.{field}"
                                 )
+                            else:
+                                pass
+                    else:
+                        pass
                     for attribute in (
                         "material",
                         "shape",
@@ -200,10 +226,14 @@ def evaluate_alternatives(req: AssessRequest, layers: Dict[str, Any]) -> Dict[st
                             missing.append(
                                 f"{branch}.material_facts.{fact.fact_id}.{attribute}"
                             )
+                        else:
+                            pass
                 if old_floors and not any(
                     candidate.object_id in f.object_ids for f in fresh.floors
                 ):
                     missing.append(f"{branch}.floors")
+                else:
+                    pass
                 for observation in old_observations:
                     if not any(
                         o.object_id == candidate.object_id
@@ -214,6 +244,8 @@ def evaluate_alternatives(req: AssessRequest, layers: Dict[str, Any]) -> Dict[st
                         missing.append(
                             f"{branch}.observations.{observation.category}.{observation.feature}"
                         )
+                    else:
+                        pass
                 old_influences = {
                     i.influence_id
                     for i in context.floor_influences
@@ -224,6 +256,8 @@ def evaluate_alternatives(req: AssessRequest, layers: Dict[str, Any]) -> Dict[st
                     i.influence_id for i in fresh.floor_influences
                 }:
                     missing.append(f"{branch}.floor_influences.{influence_id}")
+        else:
+            pass
         if candidate.object_id in current_forms and candidate.form_observation is None:
             missing.append(
                 f"layout_alternatives.{candidate.candidate_id}.form_observation"
@@ -246,6 +280,10 @@ def evaluate_alternatives(req: AssessRequest, layers: Dict[str, Any]) -> Dict[st
                     missing.append(
                         f"layout_alternatives.{candidate.candidate_id}.form_observation.{field}"
                     )
+                else:
+                    pass
+        else:
+            pass
         if (
             candidate.object_id in current_placements
             and candidate.placement is None
@@ -265,6 +303,10 @@ def evaluate_alternatives(req: AssessRequest, layers: Dict[str, Any]) -> Dict[st
                     missing.append(
                         f"layout_alternatives.{candidate.candidate_id}.placement.{field}"
                     )
+                else:
+                    pass
+        else:
+            pass
         constraint = constraints.get(candidate.object_id)
         permission = permission_state(constraint, [list(candidate.changes)])
         workstation_actions = [
@@ -323,6 +365,8 @@ def evaluate_alternatives(req: AssessRequest, layers: Dict[str, Any]) -> Dict[st
                             "required_for": "optional_action",
                         }
                     )
+                else:
+                    pass
             pending.extend(
                 {
                     "path": p,
@@ -333,6 +377,8 @@ def evaluate_alternatives(req: AssessRequest, layers: Dict[str, Any]) -> Dict[st
                 }
                 for p in dict.fromkeys(missing)
             )
+        else:
+            pass
         comparisons = []
         for finding in layout["placement_findings"]:
             if finding["method"] == "bazhai":
@@ -368,6 +414,8 @@ def evaluate_alternatives(req: AssessRequest, layers: Dict[str, Any]) -> Dict[st
                         "comparison_scope": "computed_star_reference_not_combination_fortune_judgment",
                     }
                 )
+            else:
+                pass
         for form in layout["form_analysis"]["findings"]:
             comparisons.extend(
                 {"method": "indoor_forms", **check} for check in form["checks"]

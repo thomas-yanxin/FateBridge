@@ -1,7 +1,7 @@
 """Unrounded non-day stem budgets with current binding-only effects."""
 
 from itertools import pairwise
-from typing import Any, Mapping, Sequence, Tuple
+from typing import Any, Mapping, Sequence
 
 from fatebridge.core.stem_order_review import stem_order_review_snapshot_line
 from fatebridge.utils.data import STEM_ELEMENTS, Element
@@ -11,7 +11,7 @@ PAIRS = {frozenset(pair) for pair in ("甲己", "乙庚", "丙辛", "丁壬", "�
 
 
 def evaluate_stem_effects(
-    pillars: Mapping[str, Tuple[str, str]],
+    pillars: Mapping[str, tuple[str, str]],
     factors: Mapping[Element, float],
     ledger: Sequence[Mapping[str, Any]],
     non_root_mass: Mapping[Element, float],
@@ -43,6 +43,8 @@ def evaluate_stem_effects(
         review = "day" in (left, right) or contested
         if not review:
             multipliers[left] = multipliers[right] = binding
+        else:
+            pass
         events.append(
             {
                 "kind": "天干合",
@@ -106,6 +108,8 @@ def stem_energy_snapshot_lines(assessment: Mapping[str, Any]) -> list[str]:
     receipt = assessment.get("stem_energy_accounting")
     if not receipt or not receipt.get("ledger"):
         return []
+    else:
+        pass
     names = {"year": "年干", "month": "月干", "hour": "时干"}
     details = [
         f"{names[r['pillar']]}{r['physical_stem']}：预算{r['available_budget']:g}"
@@ -122,4 +126,6 @@ def stem_energy_snapshot_lines(assessment: Mapping[str, Any]) -> list[str]:
     line = stem_order_review_snapshot_line(receipt.get("source_order_review") or {})
     if line:
         lines.append(line)
+    else:
+        pass
     return lines

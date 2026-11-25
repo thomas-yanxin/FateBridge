@@ -18,15 +18,20 @@ from fastmcp import Client
 
 import fatebridge.api as api
 from fatebridge.cli import run
-from fatebridge.core import guolao_epoch as module
 from fatebridge.core.astro.historical_utc import historical_utc_to_tt_point
+from fatebridge.core.astro.physical_epoch import PhysicalEpoch
 from fatebridge.core.astro.tt_epoch import TTInstant
+from fatebridge.core.guolao import guolao_epoch as module
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.astrology import calculate_core_chart_analysis
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.errors import EphemerisSourceError
-from tests.guolao.test_guolao_native_frames import fixed_moshier  # noqa:F401
-from tests.guolao.test_guolao_native_jie_month import SOURCE_DOMAINS, epoch_for
+from tests.support.transports import cached_mcp_app, call_calculation
+from tests.unit_test.fixtures.guolao import (
+    SOURCE_DOMAINS,
+    epoch_for,
+)
+from tests.unit_test.fixtures.guolao import fixed_moshier as fixed_moshier
 
 REFERENCE = json.loads(
     (
@@ -38,7 +43,9 @@ CASES = REFERENCE["cases"]
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
-def test_exact_forward_points_match_independent_published_midnight_coefficients(case):
+def test_exact_forward_points_match_independent_published_midnight_coefficients(
+    case,
+) -> None:
     for prefix, key in [
         ("previous", "day_start_TT_exact"),
         ("next", "day_end_TT_exact"),
@@ -55,7 +62,7 @@ def test_exact_forward_points_match_independent_published_midnight_coefficients(
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
 @pytest.mark.parametrize("sample", [0, 1, 2])
-def test_entire_clock_adjustment_has_one_proved_UTC8_date(case, sample):
+def test_entire_clock_adjustment_has_one_proved_UTC8_date(case, sample: int) -> None:
     low, high = map(Fraction, case["date_proof"]["adjustment_TT_interval_exact"])
     point = [low, (low + high) / 2, high][sample]
     lookup, evidence = module._historical_utc8_date(TTInstant(point))
@@ -73,13 +80,17 @@ def test_entire_clock_adjustment_has_one_proved_UTC8_date(case, sample):
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
 @pytest.mark.parametrize("side", [-1, 0, 1])
-def test_exact_midnight_half_open_contract_searches_adjacent_hint_dates(case, side):
+def test_exact_midnight_half_open_contract_searches_adjacent_hint_dates(
+    case, side
+) -> None:
     start = Fraction(case["date_proof"]["day_start_TT_exact"])
     point = start + Fraction(side, 86_400_000_000)
     lookup, proof = module._historical_utc8_date(TTInstant(point))
     expected = datetime.fromisoformat(case["id"]).date()
     if side < 0:
         expected -= timedelta(days=1)
+    else:
+        pass
     assert lookup.date() == expected
     assert Fraction(proof["start_boundary"]["julian_day_tt_exact"]) <= point
     assert point < Fraction(proof["next_boundary"]["julian_day_tt_exact"])
@@ -88,8 +99,8 @@ def test_exact_midnight_half_open_contract_searches_adjacent_hint_dates(case, si
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
 def test_native_lunar_lookup_matches_HKO_with_source_qualified_clock_labels(
     fixed_moshier, case
-):
-    epoch = epoch_for(case)
+) -> None:
+    epoch = epoch_for(case["jd_tt"])
     expected_utc = SOURCE_DOMAINS[case["id"]]["UTC"]
     if expected_utc is None:
         assert epoch.utc_label is None and epoch.utc_datetime is None
@@ -124,23 +135,39 @@ def test_native_lunar_lookup_matches_HKO_with_source_qualified_clock_labels(
         )
 
 
+def test_unlabeled_UTC8_date_evidence_keeps_the_primary_TT_point(fixed_moshier) -> None:
+    case = next(case for case in CASES if case["id"] == "1964-04-01")
+    low, high = map(Fraction, case["date_proof"]["adjustment_TT_interval_exact"])
+    point = TTInstant((low + high) / 2)
+    assert point.days != Fraction(point.as_float())
+    epoch = PhysicalEpoch.from_tt(point)
+    assert epoch.utc_label is None
+    actual = module.native_month_context(epoch, "chinese_lunar_utc8")
+    assert actual["calendar_date"] == case["id"]
+    assert actual["calendar_date_evidence"]["primary_julian_day_tt_exact"] == str(
+        point.days
+    )
+
+
 @pytest.mark.parametrize(
     "moment", ["1959-12-31T23:59:59+00:00", "1972-01-01T00:00:00+00:00"]
 )
-def test_exact_affine_encoder_does_not_extend_coefficient_coverage(moment):
+def test_exact_affine_encoder_does_not_extend_coefficient_coverage(moment: str) -> None:
     assert historical_utc_to_tt_point(datetime.fromisoformat(moment)) is None
 
 
-def test_exact_affine_encoder_rejects_naive_labels():
+def test_exact_affine_encoder_rejects_naive_labels() -> None:
     with pytest.raises(ValueError, match="aware datetime"):
         historical_utc_to_tt_point(datetime(1964, 4, 1))
 
 
 def test_date_proof_does_not_substitute_a_missing_lunar_table(
-    fixed_moshier, monkeypatch
-):
+    fixed_moshier, monkeypatch: pytest.MonkeyPatch
+) -> None:
     monkeypatch.setattr(module.almanac, "get_lunar_context", lambda *a, **k: None)
-    actual = module.native_month_context(epoch_for(CASES[3]), "chinese_lunar_utc8")
+    actual = module.native_month_context(
+        epoch_for(CASES[3]["jd_tt"]), "chinese_lunar_utc8"
+    )
     assert actual["status"] == "calendar_unavailable"
     assert actual["month_number"] is None
     assert actual["calendar_date"] == "1964-04-01"
@@ -148,11 +175,15 @@ def test_date_proof_does_not_substitute_a_missing_lunar_table(
 
 
 @pytest.mark.parametrize("point", [Fraction(2_000_000), Fraction(2_500_000)])
-def test_date_proof_does_not_extrapolate_outside_the_historical_adjustment_scope(point):
+def test_date_proof_does_not_extrapolate_outside_the_historical_adjustment_scope(
+    point,
+) -> None:
     assert module._historical_utc8_date(TTInstant(point)) is None
 
 
-def test_incoherent_atomic_transition_is_a_source_error(monkeypatch):
+def test_incoherent_atomic_transition_is_a_source_error(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     original = module.leap_table()
     altered = {
         **original,
@@ -165,10 +196,10 @@ def test_incoherent_atomic_transition_is_a_source_error(monkeypatch):
 
 
 def test_missing_date_source_never_yields_a_partial_valid_chart(
-    fixed_moshier, monkeypatch
-):
+    fixed_moshier, monkeypatch: pytest.MonkeyPatch
+) -> None:
     case = CASES[3]
-    epoch = epoch_for(case)
+    epoch = epoch_for(case["jd_tt"])
     date = datetime.fromisoformat(case["id"])
     wall_jd = date.toordinal() + 1721424.5
     monkeypatch.setattr(module, "historical_utc_to_tt_point", lambda _: None)
@@ -194,9 +225,15 @@ def test_missing_date_source_never_yields_a_partial_valid_chart(
 @pytest.mark.parametrize("case", [CASES[0], CASES[1], CASES[-1]], ids=lambda c: c["id"])
 @pytest.mark.parametrize("projected", [False, True])
 def test_lunar_gap_overlap_and_transition_match_all_three_surfaces(
-    fixed_moshier, monkeypatch, capsys, record_testsuite_property, tool, case, projected
-):
-    epoch = epoch_for(case)
+    fixed_moshier,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    record_testsuite_property,
+    tool: str,
+    case,
+    projected: bool,
+) -> None:
+    epoch = epoch_for(case["jd_tt"])
     date = datetime.fromisoformat(case["id"])
     wall_jd = date.toordinal() + 1721424.5
     payload = dict(
@@ -212,6 +249,8 @@ def test_lunar_gap_overlap_and_transition_match_all_three_surfaces(
     )
     if tool == "astro_chart":
         payload["chart_variant"] = "guolao_chart"
+    else:
+        pass
     options = dict(
         as_of="2026-10-25T00:00:00+08:00",
         include_snapshot_text=False,
@@ -233,8 +272,12 @@ def test_lunar_gap_overlap_and_transition_match_all_three_surfaces(
             "guolao.timing.month_limit.birth_month." + key
             for key in ["calendar_date", "calendar_date_evidence"]
         ]
+    else:
+        pass
     if projected:
         options.update(fields=fields, strict_fields=True)
+    else:
+        pass
     spec = next(s for s in CATALOG if s.key == tool)
     api._reset_runtime_state_for_tests()
     monkeypatch.setattr(
@@ -249,13 +292,15 @@ def test_lunar_gap_overlap_and_transition_match_all_three_surfaces(
     ]
     if projected:
         params += [("fields", value) for value in fields]
+    else:
+        pass
     response = TestClient(api.app).post(spec.rest_path, json=payload, params=params)
     assert response.status_code == 200, response.text
 
     async def call():
-        async with Client(create_mcp_app()) as client:
-            result = await client.call_tool(
-                spec.tool_name, {**payload, **options}, raise_on_error=False
+        async with Client(cached_mcp_app()) as client:
+            result = await call_calculation(
+                client, spec.tool_name, {**payload, **options}, raise_on_error=False
             )
             assert not result.is_error
             return result.structured_content
@@ -273,6 +318,8 @@ def test_lunar_gap_overlap_and_transition_match_all_three_surfaces(
     ]
     if projected:
         argv += ["--strict-fields", "--fields", *fields]
+    else:
+        pass
     assert run(argv) == 0
     cli = json.loads(capsys.readouterr().out)
     wire = dict(input=payload, options=options, rest=response.json(), mcp=mcp, cli=cli)
@@ -285,6 +332,8 @@ def test_lunar_gap_overlap_and_transition_match_all_three_surfaces(
         path.parent.mkdir(parents=True, exist_ok=True)
         with path.open("x") as stream:
             json.dump(wire, stream, ensure_ascii=False)
+    else:
+        pass
     values = [
         {k: v for k, v in result.items() if k != "run_metadata"}
         for result in [response.json(), mcp, cli]
@@ -319,8 +368,5 @@ def test_lunar_gap_overlap_and_transition_match_all_three_surfaces(
         assert (
             values[0]["guolao"]["timing"]["month_limit"]["status"] == "research_partial"
         )
-        if expected_utc is None:
-            assert "没有唯一UTC标签" in values[0]["interpretation"]["input_clock"]
-        assert (
-            "不能据此判断晋升或岗位变动" in values[0]["interpretation"]["month_limit"]
-        )
+    else:
+        pass

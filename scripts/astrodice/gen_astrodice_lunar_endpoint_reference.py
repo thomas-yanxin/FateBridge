@@ -36,6 +36,8 @@ def endpoint_weights(node_count=25, degree=10):
             if j != i:
                 multiple = matrix[j][i]
                 matrix[j] = [a - multiple * b for a, b in zip(matrix[j], matrix[i])]
+            else:
+                pass
     coefficients = [row[-1] for row in matrix]
     return [sum(c * x**i for i, c in enumerate(coefficients)) for x in nodes]
 
@@ -46,6 +48,8 @@ def collect(protocol_path, output, archive):
     weights = endpoint_weights(protocol["node_count"], protocol["polynomial_degree"])
     if [[w.numerator, w.denominator] for w in weights] != protocol["rational_weights"]:
         raise ValueError("Frozen endpoint geometry changed")
+    else:
+        pass
     digest = lambda b: hashlib.sha256(b).hexdigest()
     freeze = {
         "protocol_sha256": digest(protocol_path.read_bytes()),
@@ -88,6 +92,8 @@ def collect(protocol_path, output, archive):
                 )
                 if attempt == 3:
                     raise
+                else:
+                    pass
                 time.sleep(2**attempt)
 
     for start in range(0, len(wanted), 20):
@@ -101,7 +107,13 @@ def collect(protocol_path, output, archive):
                 if "error" in single:
                     if "No ephemeris" not in single["error"]:
                         raise ValueError(single["error"])
+                    else:
+                        pass
                     missing.append({"date_tt": date, "reason": single["error"]})
+                else:
+                    pass
+        else:
+            pass
         print(f"Journalled batch {start}: {len(dates)} requested positions", flush=True)
     points = {
         r["date_tt"]: r["icrf_unit_direction"]
@@ -110,6 +122,8 @@ def collect(protocol_path, output, archive):
     }
     if set(points) | {r["date_tt"] for r in missing} != set(wanted):
         raise ValueError("Endpoint request coverage changed")
+    else:
+        pass
     rows = []
     for date in centers:
         center = datetime.fromisoformat(date)
@@ -161,6 +175,8 @@ def collect(protocol_path, output, archive):
                 step_difference_arcsec_per_day=math.degrees(math.dist(*rates.values()))
                 * 3600,
             )
+        else:
+            pass
         rows.append(row)
     assert not any(
         k == "fatebridge" or k.startswith("fatebridge.") or k == "swisseph"
@@ -188,3 +204,5 @@ if __name__ == "__main__":
         parser.add_argument("--" + field, required=True, type=Path)
     args = parser.parse_args()
     collect(args.protocol, args.output, args.archive)
+else:
+    pass

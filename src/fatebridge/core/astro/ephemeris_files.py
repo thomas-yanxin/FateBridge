@@ -13,12 +13,16 @@ from typing import Sequence, Tuple
 def ephemeris_files_for_years(years: Sequence[int]) -> Tuple[str, ...]:
     if not years:
         raise ValueError("At least one CE year is required")
+    else:
+        pass
     segments: set[int] = set()
     for year in years:
         if type(year) is not int or not 1 <= year <= 9999:
             raise ValueError(
                 "Ephemeris file planning requires CE integer years 1..9999"
             )
+        else:
+            pass
         segments.update(
             (candidate // 600) * 6 for candidate in (year - 1, year, year + 1)
         )

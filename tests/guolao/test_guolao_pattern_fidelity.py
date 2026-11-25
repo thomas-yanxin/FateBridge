@@ -8,7 +8,7 @@ from datetime import datetime
 
 import pytest
 
-from fatebridge.core import guolao_moira as m
+from fatebridge.core.guolao import guolao_moira as m
 from fatebridge.services.astrology import calculate_core_chart_analysis
 from tests.fixtures.surface_payloads import astro_payload
 
@@ -94,7 +94,7 @@ CASES = [
 @pytest.mark.parametrize("name,positive,negative,expected_inputs", CASES)
 def test_each_current_predicate_has_actual_operands_and_changes_with_its_counterfactual(
     name, positive, negative, expected_inputs
-):
+) -> None:
     original = deepcopy(positive)
     patterns = m.calculate(positive)
     assert positive == original
@@ -108,12 +108,11 @@ def test_each_current_predicate_has_actual_operands_and_changes_with_its_counter
     assert evidence["model_id"] == m.PATTERN_MODEL_ID
     assert evidence["condition_satisfied"]
     assert not evidence["classical_acceptance"]
-    assert not evidence["event_probability_estimated"]
     for key, value in expected_inputs.items():
         assert evidence["inputs"][key] == value
 
 
-def test_life_palace_match_does_not_claim_a_calculated_life_degree():
+def test_life_palace_match_does_not_claim_a_calculated_life_degree() -> None:
     pattern = m.calculate({"life_sign_idx": 4, "god_signidx": {"岁驾": 4}})[0]
     assert pattern["name"] == "命登岁驾"
     assert "命宫与岁驾同宫" in pattern["detail"] and "命度" not in pattern["detail"]
@@ -121,7 +120,7 @@ def test_life_palace_match_does_not_claim_a_calculated_life_degree():
     assert "longitude" not in pattern["evidence"]["inputs"]
 
 
-def test_lost_rulership_evidence_exposes_the_actual_two_ruler_chains():
+def test_lost_rulership_evidence_exposes_the_actual_two_ruler_chains() -> None:
     result = m.calculate({"life_sign_idx": 0, "planet_signidx": {"土": 8}})
     inputs = next(p for p in result if p["name"] == "官福失垣")["evidence"]["inputs"]
     assert inputs["career"]["palace_index"] == 9
@@ -138,7 +137,7 @@ def test_lost_rulership_evidence_exposes_the_actual_two_ruler_chains():
 
 @pytest.mark.parametrize("mapping", ["planet_signidx", "god_signidx"])
 @pytest.mark.parametrize("bad", [True, 1.0, None, -2, 12, float("nan")])
-def test_invalid_indices_cannot_become_palace_facts(mapping, bad):
+def test_invalid_indices_cannot_become_palace_facts(mapping: str, bad) -> None:
     key = "月" if mapping == "planet_signidx" else "岁驾"
     with pytest.raises((TypeError, ValueError)):
         m.calculate({mapping: {key: bad}})
@@ -146,12 +145,16 @@ def test_invalid_indices_cannot_become_palace_facts(mapping, bad):
 
 @pytest.mark.parametrize("key", ["is_day", "is_winter"])
 @pytest.mark.parametrize("bad", [0, 1, "false"])
-def test_unknown_conditions_are_not_coerced_from_numbers_or_text(key, bad):
+def test_unknown_conditions_are_not_coerced_from_numbers_or_text(
+    key: str, bad: int | str
+) -> None:
     with pytest.raises(TypeError):
         m.calculate({key: bad})
 
 
-def test_missing_and_explicit_unknown_values_do_not_create_patterns_or_cross_roles():
+def test_missing_and_explicit_unknown_values_do_not_create_patterns_or_cross_roles() -> (
+    None
+):
     assert not m.calculate({})
     assert not m.calculate({"planet_signidx": {"月": -1}})
     with pytest.raises(ValueError):
@@ -161,9 +164,9 @@ def test_missing_and_explicit_unknown_values_do_not_create_patterns_or_cross_rol
 
 
 @pytest.mark.parametrize("target", [None, "2027-06-01T00:00:00+08:00"])
-def test_native_reading_evidence_resolves_to_the_same_calculation_and_preserves_nulls(
-    target,
-):
+def test_native_pattern_trace_matches_the_same_calculation_and_preserves_nulls(
+    target: str | None,
+) -> None:
     r = calculate_core_chart_analysis(
         chart_variant="guolao_chart",
         **{
@@ -175,13 +178,6 @@ def test_native_reading_evidence_resolves_to_the_same_calculation_and_preserves_
     g = r["guolao"]
     assert g["profile"]["pattern_model_id"] == m.PATTERN_MODEL_ID
     assert g["life_palace"]["longitude"] is None and g["life_palace"]["mansion"] is None
-    assert set(r["interpretation_evidence"]) == set(r["interpretation"])
-    for evidence in r["interpretation_evidence"].values():
-        assert evidence["policy_id"] == "guolao_calculation_reading_v2"
-        for path in evidence["source_paths"]:
-            value = r
-            for part in path.split("."):
-                value = value[part]
     trace = next(t for t in g["rule_trace"] if t["rule_id"] == m.PATTERN_MODEL_ID)
     assert [p["name"] for p in trace["outputs"]["matched_patterns"]] == [
         p["name"] for p in g["moira_patterns"]

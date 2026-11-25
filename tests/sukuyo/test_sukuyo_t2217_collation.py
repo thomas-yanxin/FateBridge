@@ -6,18 +6,18 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.sukuyo_t2217_collation import (
+from fatebridge.core.sukuyo.sukuyo_t2217_collation import (
     collation_lines,
     collation_reference,
     validate_collation,
     witness_reference,
 )
-from fatebridge.core.sukuyo_waterclock import source_specific_time_reference
+from fatebridge.core.sukuyo.sukuyo_waterclock import source_specific_time_reference
 
 FIXTURE = Path(__file__).parents[1] / "data/sukuyo-t2217-before-production-v87.json"
 
 
-def test_entire_preimplementation_print_reference_is_delivered():
+def test_entire_preimplementation_print_reference_is_delivered() -> None:
     expected = json.loads(FIXTURE.read_bytes())
     result = source_specific_time_reference()["daybreak_source_comparison"]
     assert result["T2217_printed_collation"]["source_data"] == expected
@@ -26,12 +26,12 @@ def test_entire_preimplementation_print_reference_is_delivered():
 
 
 @pytest.mark.parametrize("work", ["T2216", "T1299", "T1509", "", None])
-def test_witness_siglum_cannot_be_borrowed_by_another_work(work):
+def test_witness_siglum_cannot_be_borrowed_by_another_work(work: str | None) -> None:
     with pytest.raises(KeyError):
         witness_reference(work, "甲")
 
 
-def test_printed_key_is_not_a_direct_observation_of_the_described_manuscript():
+def test_printed_key_is_not_a_direct_observation_of_the_described_manuscript() -> None:
     witness = witness_reference("T2217", "甲")
     assert witness["description_literal"] == "室町時代寫高野山寶龜院藏本"
     assert witness["shelfmark"] is None
@@ -56,14 +56,16 @@ def test_printed_key_is_not_a_direct_observation_of_the_described_manuscript():
         ("acquisition", "highest_original_resolution_certified", True),
     ],
 )
-def test_unreviewed_claim_changes_require_new_source_review(branch, key, value):
+def test_unreviewed_claim_changes_require_new_source_review(
+    branch: str, key: str, value: bool | int | str
+) -> None:
     data = copy.deepcopy(json.loads(FIXTURE.read_bytes()))
     data[branch][key] = value
     with pytest.raises(ValueError):
         validate_collation(data)
 
 
-def test_native_text_keeps_material_variants_and_the_remaining_rule_gap():
+def test_native_text_keeps_material_variants_and_the_remaining_rule_gap() -> None:
     reference = collation_reference()
     assert reference["source_data"]["acquisition"]["images"][0][
         "actual_dimensions"

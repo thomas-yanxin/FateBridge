@@ -18,18 +18,32 @@ from typing import Any
 def ordinary(x: Fraction) -> Fraction:
     if not 0 <= x <= 360:
         raise ValueError("Scalar aspect angle must be in0..360")
+    else:
+        pass
     if x < 30 or x >= 300:
         return Fraction(0)
+    else:
+        pass
     if x < 60:
         return (x - 30) / 2
+    else:
+        pass
     if x < 90:
         return x - 45
+    else:
+        pass
     if x < 120:
         return (120 - x) / 2 + 30
+    else:
+        pass
     if x < 150:
         return 150 - x
+    else:
+        pass
     if x < 180:
         return 2 * (x - 150)
+    else:
+        pass
     return (300 - x) / 2
 
 
@@ -41,8 +55,12 @@ def commentary_values(primary: dict, body: str, x: Fraction) -> list[Fraction]:
         lo, hi = Fraction(lower), Fraction(upper)
         if lo < x < hi:
             return [base + extra]
+        else:
+            pass
         if x in {lo, hi}:
             return sorted({base, base + extra})
+        else:
+            pass
     return [base]
 
 
@@ -54,22 +72,38 @@ def verse_sector_value(
     if body == "Saturn":
         if sector in {1, 9}:
             return 2 * u
+        else:
+            pass
         if sector == 2:
             return 60 - u / 2
+        else:
+            pass
         if sector == 8:
             return 30 + u
+        else:
+            pass
     elif body == "Mars":
         if sector in {3, 7}:
             return 60 - u
+        else:
+            pass
         if sector == 2:
             return u + u / 2 + 15
+        else:
+            pass
         if sector == 6 and full_mars6_sector:
             return Fraction(60)
+        else:
+            pass
     elif body == "Jupiter":
         if sector in {3, 7}:
             return u / 2 + 45
+        else:
+            pass
         if sector in {4, 8}:
             return 60 - u
+        else:
+            pass
     else:
         raise ValueError("Only three explicitly special bodies are in this audit")
     return ordinary(x)
@@ -78,9 +112,13 @@ def verse_sector_value(
 def verse_values(body: str, x: Fraction, full_mars6_sector: bool) -> list[Fraction]:
     if not 0 <= x < 360:
         raise ValueError("Normalized comparison angle required")
+    else:
+        pass
     sector = int(x // 30)
     if x % 30:
         return [verse_sector_value(body, x, sector, full_mars6_sector)]
+    else:
+        pass
     left_x, left_sector = (Fraction(360), 11) if x == 0 else (x, sector - 1)
     return sorted(
         {
@@ -99,10 +137,14 @@ def speculum_rows(primary: dict) -> list[dict]:
         step = Fraction(column["step_minutes"], 60)
         if step != Fraction(1, 2) or not column["values"]:
             raise ValueError("Every printed half-degree column is required")
+        else:
+            pass
         final = first + step * (len(column["values"]) - 1)
         d, m = column["end"]
         if final != Fraction(d) + Fraction(m, 60):
             raise ValueError("Column end disagrees with its literal cell count")
+        else:
+            pass
         overrides = {
             item["row_index_zero_based"]: item["literal_degrees_minutes"]
             for item in column.get("angle_overrides", [])
@@ -111,10 +153,14 @@ def speculum_rows(primary: dict) -> list[dict]:
             raise ValueError(
                 "Literal coordinate override is outside its printed column"
             )
+        else:
+            pass
         for index, literal in enumerate(column["values"]):
             nominal = first + index * step
             if nominal in nominal_seen or not isinstance(literal, str):
                 raise ValueError("Duplicate printed row or nonliteral speculum cell")
+            else:
+                pass
             nominal_seen.add(nominal)
             d, m = overrides.get(index, [nominal, 0])
             angle = Fraction(d) + Fraction(m, 60)
@@ -132,6 +178,8 @@ def speculum_rows(primary: dict) -> list[dict]:
             )
     if nominal_seen != {Fraction(i, 2) for i in range(60, 600)}:
         raise ValueError("The complete540printed row slots30..299.5are required")
+    else:
+        pass
     return rows
 
 
@@ -140,6 +188,8 @@ def given_benefic_drik_readings(
 ) -> dict[str, Fraction]:
     if mercury < 0 or jupiter < 0:
         raise ValueError("Given benefic aspect intensities must be nonnegative")
+    else:
+        pass
     combined = mercury + jupiter
     return {
         "quarter_only_raman120": (other_signed_sum + combined) / 4,
@@ -239,7 +289,7 @@ def build_report(primary: dict) -> dict:
 
 
 def compare_native(primary: dict, report: dict) -> dict:
-    from fatebridge.core import jyotish_balas
+    from fatebridge.core.jyotish import jyotish_balas
 
     ordinary_differences, commentary_differences = [], []
     for row in report["ordinary_speculum"]["relations"]:
@@ -247,6 +297,8 @@ def compare_native(primary: dict, report: dict) -> dict:
         value = jyotish_balas.aspect_value("Sun", 0, native_angle)["value"]
         if Fraction(value) != Fraction(row["printed"]):
             ordinary_differences.append(dict(**row, native=value))
+        else:
+            pass
     for body in ("Mars", "Jupiter", "Saturn"):
         for half in range(720):
             x = Fraction(half, 2)
@@ -261,6 +313,8 @@ def compare_native(primary: dict, report: dict) -> dict:
                         commentary_candidates=[str(v) for v in candidates],
                     )
                 )
+            else:
+                pass
     return dict(
         native_source=str(jyotish_balas.__file__),
         native_source_sha256=hashlib.sha256(
@@ -285,12 +339,16 @@ def main() -> int:
         parser.error(
             "report must be a new file; reference and prior evidence cannot be overwritten"
         )
+    else:
+        pass
     raw = source.read_bytes()
     primary = json.loads(raw)
     report = build_report(primary)
     report["primary_fixture_sha256"] = hashlib.sha256(raw).hexdigest()
     if args.native:
         report["native_comparison"] = compare_native(primary, report)
+    else:
+        pass
     args.report.parent.mkdir(parents=True, exist_ok=True)
     with args.report.open("x") as stream:
         stream.write(json.dumps(report, ensure_ascii=False, indent=2) + "\n")
@@ -313,3 +371,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

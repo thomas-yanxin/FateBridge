@@ -8,14 +8,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional, Tuple
 
-from fatebridge.core.metaphysics.jinkou_guishen import (
-    GUISHEN_IDENTITIES,
-    _build_guishen_mapping,
-)
-from fatebridge.core.metaphysics.ren_sources import JINKOU_SOURCE
-
-from ...utils.data import EARTHLY_BRANCHES, HEAVENLY_STEMS
-from .common import (
+from fatebridge.core.metaphysics.common import (
     ELEMENT_CONTROLS,
     ELEMENT_GENERATES,
     SIX_CLASH_BRANCHES,
@@ -27,22 +20,40 @@ from .common import (
     stem_element_text,
     xun_head_for_ganzhi,
 )
-from .jinkou_branch_breaks import branch_breaks, branch_breaks_trace
-from .jinkou_branch_stars import branch_stars, branch_stars_trace
-from .jinkou_combinations import trine_evidence
-from .jinkou_definitions import definition_evidence
-from .jinkou_interactions import position_interactions
-from .jinkou_patterns import structural_patterns, use_evidence
-from .jinkou_qi import build_jinkou_qi
-from .jinkou_relations import structural_relations
-from .jinkou_seasonal import seasonal_power, seasonal_power_basis
-from .jinkou_stems import WUZI_DUN_START as WUZI_DUN_START
-from .jinkou_stems import build_stem_relations
-from .jinkou_stems import wuzidun_stem as _wuzidun_stem
-from .jinkou_strength import internal_strength
-from .ren_calendar import symbolic_calendar_policy
-from .ren_diurnal import resolve_diurnal
-from .ren_evidence import ruleset_metadata
+from fatebridge.core.metaphysics.jinkou_branch_breaks import (
+    branch_breaks,
+    branch_breaks_trace,
+)
+from fatebridge.core.metaphysics.jinkou_branch_stars import (
+    branch_stars,
+    branch_stars_trace,
+)
+from fatebridge.core.metaphysics.jinkou_combinations import trine_evidence
+from fatebridge.core.metaphysics.jinkou_definitions import definition_evidence
+from fatebridge.core.metaphysics.jinkou_guishen import (
+    GUISHEN_IDENTITIES,
+    _build_guishen_mapping,
+)
+from fatebridge.core.metaphysics.jinkou_interactions import position_interactions
+from fatebridge.core.metaphysics.jinkou_patterns import (
+    structural_patterns,
+    use_evidence,
+)
+from fatebridge.core.metaphysics.jinkou_qi import build_jinkou_qi
+from fatebridge.core.metaphysics.jinkou_relations import structural_relations
+from fatebridge.core.metaphysics.jinkou_seasonal import (
+    seasonal_power,
+    seasonal_power_basis,
+)
+from fatebridge.core.metaphysics.jinkou_stems import WUZI_DUN_START as WUZI_DUN_START
+from fatebridge.core.metaphysics.jinkou_stems import build_stem_relations
+from fatebridge.core.metaphysics.jinkou_stems import wuzidun_stem as _wuzidun_stem
+from fatebridge.core.metaphysics.jinkou_strength import internal_strength
+from fatebridge.core.metaphysics.ren_calendar import symbolic_calendar_policy
+from fatebridge.core.metaphysics.ren_diurnal import resolve_diurnal
+from fatebridge.core.metaphysics.ren_evidence import ruleset_metadata
+from fatebridge.core.metaphysics.ren_sources import JINKOU_SOURCE
+from fatebridge.utils.data import EARTHLY_BRANCHES, HEAVENLY_STEMS
 
 # 十二贵神所属: inherent identities, never their occupied earth positions.
 
@@ -55,6 +66,8 @@ def _jinkou_pick_use_position(rows: List[Dict[str, Any]]) -> Tuple[str, str, str
         minority = "阳" if count == 1 else "阴"
         label = next(row["label"] for row in rows if row["polarity"] == minority)
         return label, f"{pattern}，取少数{minority}位{label}为用。", pattern
+    else:
+        pass
     label = "贵神" if count == 4 else "将神"
     return label, f"{pattern}，依阴阳次第五用取{label}。", pattern
 
@@ -99,6 +112,8 @@ def _motion_evidence(rows: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
                     ],
                 }
             )
+        else:
+            pass
     return result
 
 
@@ -116,6 +131,8 @@ def build_jinkou_board(
     hour_branch = seed.pillars["hour"][1]
     if di_fen is not None and di_fen not in EARTHLY_BRANCHES:
         raise ValueError("di_fen 必须是一个十二地支")
+    else:
+        pass
     di_fen_branch = hour_branch if di_fen is None else di_fen
     diurnal = resolve_diurnal(hour_branch, is_diurnal_override)
     guiren_start, guishen_map = _build_guishen_mapping(
@@ -261,6 +278,8 @@ def build_jinkou_board(
     }
     if runyear:
         overview["runyear"] = runyear
+    else:
+        pass
     return {
         "overview": overview,
         "calendar_policy": dict(

@@ -11,16 +11,24 @@ from math import lcm
 from shapely.geometry import Polygon, box
 from shapely.ops import unary_union
 
-from .spatial_angles import _sin_cos_degrees, angular_offset, compose_degrees
-from .spatial_geometry import (
+from fatebridge.core.fengshui.spatial_angles import (
+    _sin_cos_degrees,
+    angular_offset,
+    compose_degrees,
+)
+from fatebridge.core.fengshui.spatial_geometry import (
     AREA_EPSILON,
     heading,
     rectangle_xy,
     transform_point,
     transform_rectangle,
 )
-from .spatial_inputs import PlanPoint, SpatialScene
-from .spatial_outputs import GeometryCheck, ScreenVisibility, SeatGeometry
+from fatebridge.core.fengshui.spatial_inputs import PlanPoint, SpatialScene
+from fatebridge.core.fengshui.spatial_outputs import (
+    GeometryCheck,
+    ScreenVisibility,
+    SeatGeometry,
+)
 
 
 def _shadow(
@@ -58,6 +66,8 @@ def _shadow(
             after = direction * (end[1] - boundary)
             if before >= 0:
                 result.append(start)
+            else:
+                pass
             if (before >= 0) != (after >= 0):
                 fraction = before / (before - after)
                 result.append(
@@ -66,9 +76,13 @@ def _shadow(
                         start[1] + fraction * (end[1] - start[1]),
                     )
                 )
+            else:
+                pass
         clipped = list(dict.fromkeys(result))
     if len(clipped) < 2 or max(d for _, d in clipped) <= 0:
         return Polygon()
+    else:
+        pass
     low, high = Fraction(bottom) - Fraction(eye_height), Fraction(top) - Fraction(
         eye_height
     )
@@ -97,10 +111,14 @@ def _shadow(
         c = left[0] * right_vertex[1] - left[1] * right_vertex[0]
         if a == b == c == 0:
             continue
+        else:
+            pass
         values = [a * u + b * z + c * d for u, z, d in rays]
         if not any(values):
             # All rays lie in one plane through the eye: zero projected area.
             return Polygon()
+        else:
+            pass
         if min(values) >= 0:
             pass
         elif max(values) <= 0:
@@ -113,6 +131,8 @@ def _shadow(
             after = a * end[0] + b * end[1] + c * depth
             if before >= 0:
                 result.append(start)
+            else:
+                pass
             if (before >= 0) != (after >= 0):
                 fraction = before / (before - after)
                 result.append(
@@ -121,9 +141,13 @@ def _shadow(
                         start[1] + fraction * (end[1] - start[1]),
                     )
                 )
+            else:
+                pass
         polygon = result
         if len(polygon) < 3:
             return Polygon()
+        else:
+            pass
     return Polygon([(float(x), float(y)) for x, y in polygon])
 
 
@@ -157,6 +181,8 @@ def evaluate_screens(
             screen = item.screen
             if screen is None:
                 continue
+            else:
+                pass
             seat, observer = (
                 seat_inputs[desktop.desk_id],
                 seat_geometry[desktop.desk_id],
@@ -205,6 +231,8 @@ def evaluate_screens(
                 for object_id, shape, low, high in blockers:
                     if object_id == item.object_id:
                         continue
+                    else:
+                        pass
                     shadow = _shadow(
                         shape,
                         low,
@@ -219,6 +247,10 @@ def evaluate_screens(
                     if shadow.area > AREA_EPSILON:
                         shadows.append(shadow)
                         ids.append(object_id)
+                    else:
+                        pass
+            else:
+                pass
             occluded = unary_union(shadows).area if shadows else 0.0
             fraction = (
                 max(0.0, min(1.0, 1 - occluded / display.area)) if front_facing else 0.0
@@ -250,4 +282,6 @@ def evaluate_screens(
                             passed=passed,
                         )
                     )
+            else:
+                pass
     return observations, checks

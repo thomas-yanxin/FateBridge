@@ -1,14 +1,14 @@
 """Trace the adopted clash proxy without adjudicating classical root force."""
 
 from copy import deepcopy
-from typing import Any, Mapping, Sequence, Tuple
+from typing import Any, Mapping, Sequence
 
 ORDER = ("year", "month", "day", "hour")
 SCOPE = "本表复用同次六冲决策。普通六冲仅比较两五行的初始藏干预算总量，包含月支预算倍数；未将季相、透干盖头、任意间接生扶、距离权重或寒暖纳入输赢。具名完整四支通关另列来源分支，不作预算输赢比较；不是见印即免冲。保留系数为工程政策，不等于原典完整有效根力、拔根、发福或吉凶。"
 
 
 def build_clash_comparison(
-    pillars: Mapping[str, Tuple[str, str]],
+    pillars: Mapping[str, tuple[str, str]],
     events: Sequence[Mapping[str, Any]],
     sources: Sequence[Mapping[str, Any]],
 ) -> dict[str, Any]:
@@ -18,6 +18,8 @@ def build_clash_comparison(
     for event in events:
         if event.get("kind") != "六冲":
             continue
+        else:
+            pass
         positions = list(event["positions"])
         row: dict[str, Any] = {
             "positions": positions,
@@ -65,6 +67,8 @@ def clash_comparison_snapshot_lines(assessment: Mapping[str, Any]) -> list[str]:
     receipt = assessment.get("clash_comparison")
     if not receipt or not receipt.get("events"):
         return []
+    else:
+        pass
     labels = {"year": "年支", "month": "月支", "day": "日支", "hour": "时支"}
     lines = []
     for row in receipt["events"]:

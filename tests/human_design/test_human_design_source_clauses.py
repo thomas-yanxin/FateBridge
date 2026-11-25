@@ -3,6 +3,7 @@
 import copy
 import json
 import sys
+from pathlib import Path
 
 import pytest
 
@@ -65,7 +66,7 @@ def review_for(report):
         "Mercurial wording alone is not a new assignment.",
     ],
 )
-def test_broadened_candidates_do_not_silently_disappear(clause):
+def test_broadened_candidates_do_not_silently_disappear(clause: str) -> None:
     report = audit.inventory(
         source_layout().replace("6 neutral", "6 " + clause, 1), catalog()
     )
@@ -78,7 +79,9 @@ def test_broadened_candidates_do_not_silently_disappear(clause):
 @pytest.mark.parametrize(
     "damage", ["delete_page", "delete_heading", "duplicate_heading"]
 )
-def test_incomplete_or_ambiguous_source_cannot_become_a_smaller_passing_subset(damage):
+def test_incomplete_or_ambiguous_source_cannot_become_a_smaller_passing_subset(
+    damage: str,
+) -> None:
     layout = source_layout()
     if damage == "delete_page":
         layout = "\f".join(layout.split("\f")[1:])
@@ -91,7 +94,7 @@ def test_incomplete_or_ambiguous_source_cannot_become_a_smaller_passing_subset(d
 
 
 @pytest.mark.parametrize("damage", ["omit", "duplicate"])
-def test_catalogue_cannot_drop_or_duplicate_a_line(damage):
+def test_catalogue_cannot_drop_or_duplicate_a_line(damage: str) -> None:
     reference = catalog()
     if damage == "omit":
         reference["gates"][0]["line_polarities"].pop()
@@ -116,7 +119,9 @@ def test_catalogue_cannot_drop_or_duplicate_a_line(damage):
         "line_full",
     ],
 )
-def test_review_cannot_omit_substitute_or_promote_candidate_evidence(damage):
+def test_review_cannot_omit_substitute_or_promote_candidate_evidence(
+    damage: str,
+) -> None:
     report = audit.inventory(
         source_layout().replace("6 neutral", "6 No polarity.", 1), catalog()
     )
@@ -142,8 +147,8 @@ def test_review_cannot_omit_substitute_or_promote_candidate_evidence(damage):
 
 
 def test_every_clause_review_still_cannot_claim_complete_interpretation(
-    tmp_path, monkeypatch
-):
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     report = audit.inventory(
         source_layout().replace("6 neutral", "6 No polarity.", 1), catalog()
     )
@@ -171,7 +176,9 @@ def test_every_clause_review_still_cannot_claim_complete_interpretation(
     assert saved["complete_semantic_reviewed_line_count"] == 0
 
 
-def test_different_pdf_is_rejected_before_text_extraction(tmp_path, monkeypatch):
+def test_different_pdf_is_rejected_before_text_extraction(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     source = tmp_path / "source.pdf"
     source.write_bytes(b"different edition")
     monkeypatch.setattr(

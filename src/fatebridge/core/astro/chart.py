@@ -2,27 +2,32 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict
+from fractions import Fraction
+from typing import Any
 
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.angle_definitions import geographic_pole_angle_definition
 from fatebridge.core.astro.aspects import _build_aspects
+from fatebridge.core.astro.astrology_tables import RULER_BY_SIGN as RULER_BY_SIGN
+from fatebridge.core.astro.astrology_tables import SIGN_LABELS_ZH as SIGN_LABELS_ZH
 from fatebridge.core.astro.birth import AstroBirthInfo, require_resolved_birth_timezone
 from fatebridge.core.astro.classical import (
     _build_classical_layer,
     _build_classical_patterns,
     _build_fixed_stars,
-    _fortune_lot,
     _planetary_hours,
     _sect,
 )
+from fatebridge.core.astro.context_geometry import build_context_geometry
 from fatebridge.core.astro.continuous_lahiri import apparent_lahiri_origin
+from fatebridge.core.astro.earth_attitude import physical_equator
 from fatebridge.core.astro.ephemeris import (
     _build_planet_states,
     _planet_set,
 )
 from fatebridge.core.astro.ephemeris_files import ephemeris_files_for_years
 from fatebridge.core.astro.geometry import (
+    _ayanamsha,
     _nakshatra,
     _sign_name,
     combine_longitudes,
@@ -31,6 +36,7 @@ from fatebridge.core.astro.geometry import (
 )
 from fatebridge.core.astro.horizon import populate_horizon
 from fatebridge.core.astro.house_positions import build_ecliptic_house_projection
+from fatebridge.core.astro.iers_ut1 import active_ut1
 from fatebridge.core.astro.layout import _relative_house_layout
 from fatebridge.core.astro.midpoints import build_midpoint_analysis
 from fatebridge.core.astro.orbits import FALLBACK_MODELS
@@ -38,7 +44,6 @@ from fatebridge.core.astro.parts import (
     _balance,
     _build_houses,
     _build_planet_record,
-    _build_thirteen_sectors,
     _summary,
 )
 from fatebridge.core.astro.physical_sources import (
@@ -50,6 +55,7 @@ from fatebridge.core.astro.profiles import (
     _resolve_core_chart_house_system,
     _resolve_core_chart_zodiacal_mode,
 )
+from fatebridge.core.astro.ptolemy import build_ptolemy_layer
 from fatebridge.core.astro.reference import (
     ASPECTS,
     BALANCE_BASIS,
@@ -57,16 +63,17 @@ from fatebridge.core.astro.reference import (
     NODE_BODIES,
 )
 from fatebridge.core.astro.reference_points import ephemeris_reference_points
+from fatebridge.core.astro.rotation_policy import earth_rotation_policy
+from fatebridge.core.astro.sectors import sector_profile, thirteen_sectors
 from fatebridge.core.astro.seven_planets import seven_planet_view
 from fatebridge.core.astro.solar_position import apparent_position_policy
-from fatebridge.core.astro.time_scales import ephemeris_time, fallback_julian_day_tt
+from fatebridge.core.astro.terrestrial_observer import terrestrial_frame
+from fatebridge.core.astro.time_scales import fallback_julian_day_tt
+from fatebridge.core.astro.utc_policy import utc_definition_evidence
 from fatebridge.core.astro.zodiac import native_lahiri_positions
-from fatebridge.core.astro_models import earth_rotation_policy
-from fatebridge.core.astrology_tables import RULER_BY_SIGN as RULER_BY_SIGN
-from fatebridge.core.astrology_tables import SIGN_LABELS_ZH as SIGN_LABELS_ZH
 from fatebridge.core.ephemeris_runtime import configured_ephemeris_path
 from fatebridge.core.jpl_ephemeris import configured_jpl_file
-from fatebridge.core.ptolemy import build_ptolemy_layer
+from fatebridge.utils.timezones import format_local_time_or_utc
 
 
 def build_core_chart_payload(
@@ -78,11 +85,15 @@ def build_core_chart_payload(
     include_context_geometry: bool = False,
     context_fortune_method: str = "sect_reversing",
     include_physical_source: bool = False,
+    lot_longitudes: dict[str, Fraction] | None = None,
     guolao_seasonal_anchor_policy: str | None = None,
-) -> Dict[str, Any]:
+    include_planetary_hours: bool = True,
+) -> dict[str, Any]:
     """Keep one physical chart on one managed ephemeris configuration."""
     if chart_variant != "guolao_chart":
         require_resolved_birth_timezone(birth_info.timezone_source)
+    else:
+        pass
     with runtime.preserve_ephemeris_path():
         selected = configured_ephemeris_path()
         result = _build_core_chart_payload(
@@ -93,11 +104,9 @@ def build_core_chart_payload(
             include_context_geometry=include_context_geometry,
             context_fortune_method=context_fortune_method,
             include_physical_source=include_physical_source,
-            **(
-                {"guolao_seasonal_anchor_policy": guolao_seasonal_anchor_policy}
-                if guolao_seasonal_anchor_policy is not None
-                else {}
-            ),
+            lot_longitudes=lot_longitudes,
+            guolao_seasonal_anchor_policy=guolao_seasonal_anchor_policy,
+            include_planetary_hours=include_planetary_hours,
         )
         assert_physical_configuration(selected)
         return result
@@ -112,27 +121,29 @@ def _build_core_chart_payload(
     include_context_geometry: bool = False,
     context_fortune_method: str = "sect_reversing",
     include_physical_source: bool = False,
+    lot_longitudes: dict[str, Fraction] | None = None,
     guolao_seasonal_anchor_policy: str | None = None,
-) -> Dict[str, Any]:
+    include_planetary_hours: bool = True,
+) -> dict[str, Any]:
     if guolao_seasonal_anchor_policy is not None and chart_variant != "guolao_chart":
         raise ValueError(
             "guolao_seasonal_anchor_policy requires chart_variant=guolao_chart"
         )
+    else:
+        pass
     if chart_variant == "guolao_chart":
-        from fatebridge.core.guolao import build_chart
+        from fatebridge.core.guolao.guolao import build_chart
 
         return build_chart(
             birth_info,
             hsys=hsys,
             zodiacal=zodiacal,
-            **(
-                {"seasonal_anchor_policy": guolao_seasonal_anchor_policy}
-                if guolao_seasonal_anchor_policy is not None
-                else {}
-            ),
+            seasonal_anchor_policy=guolao_seasonal_anchor_policy,
         )
-    times = ephemeris_time(birth_info.physical_datetime)
-    julian_day = times.jd_ut1
+    else:
+        pass
+    times = birth_info.time_scales
+    julian_day = times.ut1
     house_system_info = _resolve_core_chart_house_system(
         hsys,
         chart_variant=chart_variant,
@@ -154,11 +165,11 @@ def _build_core_chart_payload(
         None if house_system_info["key"] == "whole_sign" else layout["house_cusps"]
     )
     physical_trace = PhysicalEphemerisTrace()
-    motion_metadata: Dict[str, Any] = {}
+    motion_metadata: dict[str, Any] = {}
     batch = _build_planet_states(
         chart_variant,
-        julian_day,
-        julian_day_tt=times.jd_tt,
+        times.jd_ut1,
+        julian_day_tt=times.tt,
         source_trace=physical_trace,
         motion_metadata=motion_metadata,
     )
@@ -168,7 +179,11 @@ def _build_core_chart_payload(
     ephemeris_model = batch.physical_model
     planetary_models = batch.models
     horizon_method = populate_horizon(
-        planet_states, julian_day, birth_info.longitude, birth_info.latitude
+        planet_states,
+        julian_day,
+        birth_info.longitude,
+        birth_info.latitude,
+        julian_day_tt=times.tt,
     )
     if engine_precision == "ephemeris_runtime_model" and (
         horizon_method != "swisseph_true_altitude"
@@ -176,6 +191,8 @@ def _build_core_chart_payload(
     ):
         engine_precision = "mixed_precision_runtime_model"
         engine_backend = "swisseph_api_with_approximate_geometry"
+    else:
+        pass
     chart_sect = _sect(planet_states["Sun"]["altitude"])
     native_planets = [
         name for name, model in planetary_models.items() if model not in FALLBACK_MODELS
@@ -187,7 +204,7 @@ def _build_core_chart_payload(
         native_lahiri_positions(
             native_planets,
             julian_day_ut1=times.jd_ut1,
-            julian_day_tt=times.jd_tt,
+            julian_day_tt=times.tt,
             lunar_adjustments={
                 name: (
                     state["longitude_speed_light_time_correction"],
@@ -212,6 +229,8 @@ def _build_core_chart_payload(
                     planet_states[name]["longitude"], -ayanamsha
                 ),
             }
+    else:
+        pass
     interpretation_states = (
         {
             name: {
@@ -230,11 +249,12 @@ def _build_core_chart_payload(
     fallback_origin_rate = 0.0
     if sidereal and approximate_planets:
         if runtime.swe is not None:
-            assert times.jd_tt is not None
+            assert times.tt is not None
             offsets = [
                 (
                     native_lahiri_ayanamsha(
-                        julian_day, julian_day_tt=times.jd_tt + step * 0.01
+                        times.jd_ut1,
+                        julian_day_tt=times.tt.shifted_by(step * 0.01),
                     )
                     - ayanamsha
                     + 180.0
@@ -248,23 +268,27 @@ def _build_core_chart_payload(
             ) / 0.12
         else:
             fallback_origin_rate = apparent_lahiri_origin(
-                fallback_julian_day_tt(times.jd_ut1, times.jd_tt)
+                fallback_julian_day_tt(times.jd_ut1, times.tt)
             )[1]
         interpretation_states = dict(interpretation_states)
         for name in approximate_planets:
             state = interpretation_states[name]
             if "longitude_speed" not in state:
                 continue
+            else:
+                pass
             interpretation_states[name] = {
                 **state,
                 "longitude_speed_tropical": state["longitude_speed"],
                 "longitude_speed_sidereal_origin_correction": -fallback_origin_rate,
                 "longitude_speed": state["longitude_speed"] - fallback_origin_rate,
             }
+    else:
+        pass
     house_projection = (
         build_ecliptic_house_projection(
-            julian_day_ut1=times.jd_ut1,
-            julian_day_tt=times.jd_tt,
+            julian_day_ut1=times.ut1,
+            julian_day_tt=times.tt,
             geographic_latitude=birth_info.latitude,
             geographic_longitude=birth_info.longitude,
             house_code=house_system_info["swisseph_code"],
@@ -320,11 +344,11 @@ def _build_core_chart_payload(
         planets,
         effective_ascendant,
         effective_midheaven,
-        julian_day,
-        julian_day_tt=times.jd_tt,
+        times.jd_ut1,
+        julian_day_tt=times.tt,
         sidereal=sidereal,
     )
-    result: Dict[str, Any] = {
+    result: dict[str, Any] = {
         "person_info": {
             "name": birth_info.name,
             "birth_place": birth_info.birth_place,
@@ -336,7 +360,7 @@ def _build_core_chart_payload(
             ),
             "birth_longitude": birth_info.longitude,
             "birth_latitude": birth_info.latitude,
-            "birth_datetime": birth_info.local_datetime.isoformat(),
+            "birth_datetime": format_local_time_or_utc(birth_info.local_datetime),
             "utc_datetime": birth_info.utc_isoformat,
             **(
                 {"clock_conversion": dict(birth_info.clock_conversion)}
@@ -385,13 +409,14 @@ def _build_core_chart_payload(
             "calendar": "proleptic_gregorian",
             "time_scale": times.method,
             "earth_rotation": (
-                earth_rotation_policy(times.jd_tt, times.jd_ut1)
+                earth_rotation_policy(times.tt, times.ut1)
                 if layout["angle_method"] == "swisseph"
                 else None
             ),
             "julian_day_tt": times.jd_tt,
             "julian_day_ut1": times.jd_ut1,
             "future_leap_seconds_assumed_unchanged": times.future_leap_seconds_assumed_unchanged,
+            "utc_definition": utc_definition_evidence(),
             "horizon_method": horizon_method,
             "angle_method": layout["angle_method"],
             "sect_convention": "geocentric_solar_centre_true_altitude_ge_0",
@@ -429,19 +454,33 @@ def _build_core_chart_payload(
             house_list,
             effective_ascendant,
             states=interpretation_states,
+            source_ecliptic_coordinates={
+                name: (state["longitude"], state["latitude"])
+                for name, state in planet_states.items()
+            },
             julian_day=julian_day,
-            julian_day_tt=times.jd_tt,
+            julian_day_tt=times.tt,
             sidereal=sidereal,
             chart_sect=chart_sect,
+            lot_longitudes=lot_longitudes,
         ),
         "classical_patterns": _build_classical_patterns(
             planets, aspects, interpretation_states, chart_sect=chart_sect
         ),
-        "planetary_hours": _planetary_hours(
-            julian_day,
-            birth_info.longitude,
-            birth_info.latitude,
-            birth_info.timezone,
+        "planetary_hours": (
+            _planetary_hours(
+                julian_day,
+                birth_info.longitude,
+                birth_info.latitude,
+                birth_info.timezone,
+                weekday_clock_basis=(
+                    birth_info.clock_conversion["input_clock_basis"]
+                    if birth_info.clock_conversion is not None
+                    else "civil"
+                ),
+            )
+            if include_planetary_hours
+            else None
         ),
         "fixed_stars": fixed_stars,
         "element_balance": _balance(planets, "element"),
@@ -463,6 +502,8 @@ def _build_core_chart_payload(
                 + [f"classical.lots.{key}" for key in result["classical"]["lots"]],
             )
         )
+    else:
+        pass
     if house_projection is not None:
         result["chart_profile"][
             "house_position_projection"
@@ -472,11 +513,17 @@ def _build_core_chart_payload(
         )
         if projection_note:
             result["summary"].append(projection_note)
+        else:
+            pass
+    else:
+        pass
     if layout.get("house_axis_convention") is not None:
         result["chart_profile"]["house_axis_convention"] = layout[
             "house_axis_convention"
         ]
         result["summary"].append(layout["house_axis_convention"]["note_zh"])
+    else:
+        pass
     if approximate_planets:
         assert batch.fallback is not None
         result["chart_profile"]["planetary_models"] = planetary_models
@@ -500,8 +547,10 @@ def _build_core_chart_payload(
                     if native_planets
                     else "原生星历不可用。"
                 )
-                + "物理天体回退使用完整VSOP87B几何源和Astronomy Engine的光行时、光行差近似；"
-                "月球采用该库的Brown几何位置，冥王星采用其引力积分；统一使用长周期Vondrak标量黄道和77项章动，不含完整相对论修正。"
+                + "物理天体回退使用同源JPL DE441有界系数表示、固定接收时刻光行时、"
+                "有限距离太阳偏折和Lorentz光行差；月球由地月质心及地心月球位置构成，"
+                "行星保留对应系统质心。统一使用长周期Vondrak标量黄道和77项章动，"
+                "无原生引擎时，地平与宫轴使用匹配的源真赤道和GAST；这些计算不构成完整物理精度认证。"
                 "北交点若回退，采用Moshier平根数及已发布DE431修正的TT解析平均交点；"
                 "这是理论平滑点，不是JPL直接提供的观测位置。"
                 "物理天体在古代和远期仍有已知超线；派生计算继承对应模型限制。"
@@ -511,7 +560,7 @@ def _build_core_chart_payload(
                     else ""
                 )
                 + (
-                    "缺少原生时标时，TT采用该库的Espenak–Meeus模型估计，非观测钟时。"
+                    "缺少原生时标时，TT采用Astronomy Engine的Espenak–Meeus模型估计，非观测钟时。"
                     if times.jd_tt is None
                     else ""
                 )
@@ -520,6 +569,8 @@ def _build_core_chart_payload(
         result["summary"].append(
             "轨道近似天体：" + "、".join(approximate_planets) + "。"
         )
+    else:
+        pass
     result["classical"]["source_profile"] = "mixed_dorothean_egyptian_lilly"
     if sidereal:
         result["chart_profile"].update(
@@ -551,6 +602,10 @@ def _build_core_chart_payload(
                 )
                 for name in planetary_models
             }
+        else:
+            pass
+    else:
+        pass
     result["classical"]["ptolemy"] = build_ptolemy_layer(
         {planet: state["longitude"] for planet, state in planet_states.items()},
         chart_sect,
@@ -558,16 +613,29 @@ def _build_core_chart_payload(
         ascendant=effective_ascendant,
     )
 
+    pole_frame = None
+    if (
+        abs(birth_info.latitude) == 90
+        and layout["angle_method"] == "swisseph"
+        and active_ut1.get() is not None
+    ):
+        pole_frame = terrestrial_frame(
+            physical_equator(runtime.swe, times.ut1, julian_day_tt=times.tt),
+            longitude=birth_info.longitude,
+            latitude=birth_info.latitude,
+        )
+    else:
+        pass
     angle_definition = geographic_pole_angle_definition(
-        birth_info.latitude
+        birth_info.latitude, frame=pole_frame
     ) or layout.get("angle_definition")
     if angle_definition is not None:
         result["chart_profile"]["angle_definition"] = angle_definition
         result["summary"].append(angle_definition["note_zh"])
+    else:
+        pass
 
     if include_context_geometry:
-        from fatebridge.core.astro.context_geometry import build_context_geometry
-
         result["context_geometry"] = build_context_geometry(
             planet_states,
             _planet_set(chart_variant),
@@ -600,10 +668,10 @@ def _build_core_chart_payload(
                 "complete_position_derivatives", {}
             ),
         )
+    else:
+        pass
     if chart_variant == "chart13":
-        from fatebridge.core.astro.sectors import sector_profile
-
-        result["thirteen_sectors"] = _build_thirteen_sectors(effective_ascendant)
+        result["thirteen_sectors"] = thirteen_sectors(effective_ascendant)
         result["sector_profile"] = sector_profile(effective_ascendant)
         if angle_definition:
             result["sector_profile"]["angle_definition"] = angle_definition
@@ -624,18 +692,30 @@ def _build_core_chart_payload(
                         backend_convention_sector=planet["sector13"],
                     )
                     planet["sector13"] = None
+            else:
+                pass
+        else:
+            pass
+    else:
+        pass
     if chart_variant == "hellen_chart":
         asc_sign = _sign_name(effective_ascendant)
+        fortune = result["classical"]["lots"]["fortune"]
         result["hellenistic"] = {
             "sect": chart_sect,
-            "lot_of_fortune": _fortune_lot(
-                planets, effective_ascendant, chart_sect=chart_sect
-            ),
+            "lot_of_fortune": {
+                "longitude": fortune["longitude"],
+                "sign": fortune["sign"],
+                "sign_zh": SIGN_LABELS_ZH[fortune["sign"]],
+                "degree_in_sign": fortune["degree_in_sign"],
+            },
             "ascendant_ruler": RULER_BY_SIGN[asc_sign],
             "angular_planets": [
                 item["id"] for item in planets if item["house"] in {1, 4, 7, 10}
             ],
         }
+    else:
+        pass
     if chart_variant == "india_chart":
         result["india"] = {
             "ayanamsha": round(ayanamsha, 4),
@@ -645,6 +725,8 @@ def _build_core_chart_payload(
                 None,
             ),
         }
+    else:
+        pass
     result["chart_profile"]["apparent_position_policy"] = apparent_position_policy(
         times.jd_tt, planetary_models, physical_trace
     )
@@ -655,6 +737,8 @@ def _build_core_chart_payload(
         or configured_jpl_file() is not None
     ):
         result["chart_profile"]["physical_ephemeris_source"] = source
+    else:
+        pass
     return result
 
 
@@ -663,7 +747,7 @@ def build_midpoint_payload(
     *,
     hsys: Any = None,
     zodiacal: Any = None,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     base_chart = build_core_chart_payload(
         birth_info,
         "chart",
@@ -677,14 +761,12 @@ def build_midpoint_payload(
         raw_factors = midpoint_analysis["factors"]
         coordinate_source = "native_unrounded_same_instant"
     else:
-        from fatebridge.core.astro.geometry import _ayanamsha
-
-        times = ephemeris_time(birth_info.physical_datetime)
+        times = birth_info.time_scales
         raw_states = _build_planet_states(
-            "chart", times.jd_ut1, julian_day_tt=times.jd_tt
+            "chart", times.jd_ut1, julian_day_tt=times.tt
         ).states
         ayan = (
-            _ayanamsha(times.jd_ut1, julian_day_tt=times.jd_tt)
+            _ayanamsha(times.jd_ut1, julian_day_tt=times.tt)
             if base_chart["chart_profile"]["zodiac"] == "sidereal"
             else 0.0
         )

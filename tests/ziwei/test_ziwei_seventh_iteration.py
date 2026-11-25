@@ -3,6 +3,7 @@
 import asyncio
 import json
 import shutil
+from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
@@ -16,9 +17,10 @@ from fatebridge.core.metaphysics.ziwei import build_ziwei_chart
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
 from tests.fixtures.mcp_receipt import verified_inline_business
+from tests.support.transports import call_calculation
 
 
-def test_auxiliary_corpus_keeps_unknowns_and_source_denominators_separate():
+def test_auxiliary_corpus_keeps_unknowns_and_source_denominators_separate() -> None:
     result = audit.audit_auxiliaries()
     assert result["source_complete_directional_rule_groups"] == 8
     assert result["source_stars_with_complete_normal_month_rules"] == 16
@@ -39,7 +41,9 @@ def test_auxiliary_corpus_keeps_unknowns_and_source_denominators_separate():
 
 
 @pytest.mark.parametrize("hour", ["子", "丑", "午", "亥"])
-def test_fire_bell_hour_matching_zero_offset_never_resolves_missing_instruction(hour):
+def test_fire_bell_hour_matching_zero_offset_never_resolves_missing_instruction(
+    hour: str,
+) -> None:
     chart = build_ziwei_chart(audit._seed(1984, 1, 1, hour, False), "男")
     evidence = chart["auxiliary_placement_sources"]
     rows = {r["star"]: r for r in evidence["placements"]}
@@ -56,7 +60,7 @@ def test_fire_bell_hour_matching_zero_offset_never_resolves_missing_instruction(
 
 
 @pytest.mark.parametrize("profile", ["iztro_2_5_8", "quanshu_v2_excerpt"])
-def test_ming_shen_leap_clause_cannot_certify_monthly_auxiliaries(profile):
+def test_ming_shen_leap_clause_cannot_certify_monthly_auxiliaries(profile: str) -> None:
     chart = build_ziwei_chart(
         audit._seed(1984, 4, 16, "亥", True), "女", rule_profile=profile
     )
@@ -87,7 +91,7 @@ def test_ming_shen_leap_clause_cannot_certify_monthly_auxiliaries(profile):
     assert len(evidence["unchecked_star_names"]) == 48
 
 
-def test_source_mapping_results_cannot_mutate_the_cached_source():
+def test_source_mapping_results_cannot_mutate_the_cached_source() -> None:
     first = build_ziwei_chart(audit._seed(1984, 1, 1, "子", False), "男")
     first["auxiliary_placement_sources"]["source_name_mapping"][
         "source_天空"
@@ -99,7 +103,9 @@ def test_source_mapping_results_cannot_mutate_the_cached_source():
     )
 
 
-def test_wrong_tai_position_is_detected_without_redefining_source(monkeypatch):
+def test_wrong_tai_position_is_detected_without_redefining_source(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     original = audit.build_ziwei_chart
 
     def corrupt(*args, **kwargs):
@@ -110,6 +116,8 @@ def test_wrong_tai_position_is_detected_without_redefining_source(monkeypatch):
                 p["stars_detail"].remove(star)
                 chart["palaces"][(i + 1) % 12]["stars_detail"].append(star)
                 break
+            else:
+                pass
         return chart
 
     monkeypatch.setattr(audit, "build_ziwei_chart", corrupt)
@@ -120,8 +128,8 @@ def test_wrong_tai_position_is_detected_without_redefining_source(monkeypatch):
 
 
 def test_rewriting_runtime_auxiliary_table_does_not_rewrite_frozen_rules(
-    tmp_path, monkeypatch
-):
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     name = "src/fatebridge/data/classical/ziwei-naj-ming-auxiliaries.json"
     data = json.loads((audit.ROOT / name).read_text())
     data["methods"][0]["rows"][0]["direction"] = "forward"
@@ -135,7 +143,7 @@ def test_rewriting_runtime_auxiliary_table_does_not_rewrite_frozen_rules(
     )
 
 
-def test_source_audit_requires_actual_frozen_image_bytes(tmp_path):
+def test_source_audit_requires_actual_frozen_image_bytes(tmp_path: Path) -> None:
     d = "naj_ming_auxiliaries_v1"
     shutil.copytree(audit.FIXTURES / d, tmp_path / d)
     p = tmp_path / d / "frame_0076.jpg"
@@ -146,8 +154,8 @@ def test_source_audit_requires_actual_frozen_image_bytes(tmp_path):
 
 @pytest.mark.parametrize("profile", ["iztro_2_5_8", "quanshu_v2_excerpt"])
 def test_auxiliary_source_view_matches_real_rest_mcp_cli_and_default_budget(
-    monkeypatch, capsys, profile
-):
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], profile: str
+) -> None:
     api._reset_runtime_state_for_tests()
     monkeypatch.setattr(
         api,
@@ -174,7 +182,7 @@ def test_auxiliary_source_view_matches_real_rest_mcp_cli_and_default_budget(
         as_of="2026-10-22T12:00:00+08:00",
     )
     rest = TestClient(api.app).post(
-        "/api/cn/ziwei/birth",
+        "/api/ziwei/birth-chart",
         json=inputs,
         params=[
             *[("fields", f) for f in fields],
@@ -187,13 +195,15 @@ def test_auxiliary_source_view_matches_real_rest_mcp_cli_and_default_budget(
 
     async def call():
         async with Client(create_mcp_app(families="metaphysics")) as client:
-            result = await client.call_tool("ziwei_birth", {**inputs, **options})
+            result = await call_calculation(
+                client, "ziwei_birth_chart", {**inputs, **options}
+            )
             await verified_inline_business(client, result.structured_content)
             return result
 
     native = asyncio.run(call())
     assert not native.is_error
-    args = ["ziwei_birth"]
+    args = ["ziwei_birth_chart"]
     for k, v in inputs.items():
         args.extend(["--" + k.replace("_", "-"), str(v)])
     args.extend(

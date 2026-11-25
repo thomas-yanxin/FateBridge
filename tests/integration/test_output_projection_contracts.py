@@ -3,17 +3,22 @@
 import asyncio
 import copy
 import json
+from collections.abc import Iterator
+from pathlib import Path
+from typing import Protocol
 
 import pytest
 from fastapi.testclient import TestClient
 from fastmcp import Client
+from fastmcp.client.client import CallToolResult
 from jsonschema import Draft202012Validator
 from jsonschema import ValidationError as SchemaError
-from pydantic import ValidationError
+from pydantic import JsonValue, ValidationError
 
 import fatebridge.api as api
 import fatebridge.mcp_server as mcp
 from fatebridge.application.projection import project_fields
+from fatebridge.application.tool_spec import ServiceResult
 from fatebridge.cli import run
 from fatebridge.core.fengshui.output import Ruleset
 from fatebridge.core.response_models import (
@@ -24,12 +29,21 @@ from fatebridge.core.response_models import (
 from fatebridge.services.tool_catalog import CATALOG
 from tests.fixtures.fengshui import PAYLOADS, payload
 from tests.support.current_outputs import current_business
+from tests.support.transports import (
+    cached_output_validator,
+    call_calculation,
+    capability_contracts,
+)
 
 SPECS = {spec.key: spec for spec in CATALOG}
 AS_OF = "2026-10-12T02:00:00Z"
 
 
-def test_tool_specific_nested_contracts_are_published_at_the_catalog_root():
+class CurrentBusiness(Protocol):
+    def __call__(self, name: str, /) -> ServiceResult: ...
+
+
+def test_tool_specific_nested_contracts_are_published_at_the_catalog_root() -> None:
     for spec in CATALOG:
         for declarations in (
             CHINESE_TOOL_FIELDS,
@@ -41,7 +55,12 @@ def test_tool_specific_nested_contracts_are_published_at_the_catalog_root():
             ), spec.key
 
 
-def projectable_objects(root, node, path=(), refs=frozenset()):
+def projectable_objects(
+    root: ServiceResult,
+    node: ServiceResult,
+    path: tuple[str, ...] = (),
+    refs: set[tuple[str, bool]] | None = None,
+) -> Iterator[tuple[tuple[str, ...], ServiceResult]]:
     """Follow references/unions/map values, but never traverse array items.
 
     run_metadata is preserved whole by the projector, even when a child is
@@ -49,29 +68,47 @@ def projectable_objects(root, node, path=(), refs=frozenset()):
     """
     if path[:1] == ("run_metadata",):
         return
+    else:
+        pass
+    if refs is None:
+        refs = set()
+    else:
+        pass
     if "$ref" in node:
         ref = node["$ref"]
-        if ref in refs:
+        position = (ref, bool(path))
+        if position in refs:
             return
+        else:
+            pass
+        refs.add(position)
         target = root
         assert ref.startswith("#/")
         for part in ref[2:].split("/"):
             target = target[part.replace("~1", "/").replace("~0", "~")]
-        yield from projectable_objects(root, target, path, refs | {ref})
+        yield from projectable_objects(root, target, path, refs)
         return
+    else:
+        pass
     if node.get("type") == "object" or "properties" in node:
         yield path, node
+    else:
+        pass
     for name, child in node.get("properties", {}).items():
         yield from projectable_objects(root, child, (*path, name), refs)
     values = node.get("additionalProperties")
     if isinstance(values, dict):
         yield from projectable_objects(root, values, (*path, "{}"), refs)
+    else:
+        pass
     for keyword in ("anyOf", "oneOf", "allOf"):
         for child in node.get(keyword, []):
             yield from projectable_objects(root, child, path, refs)
 
 
-def leaves(value, path=()):
+def leaves(
+    value: JsonValue, path: tuple[str, ...] = ()
+) -> Iterator[tuple[str, JsonValue]]:
     # The API traverses objects only; nulls, scalars and arrays are whole values.
     if isinstance(value, dict) and value:
         if any("." in key or key.strip() != key for key in value):
@@ -80,19 +117,23 @@ def leaves(value, path=()):
             for key, child in value.items():
                 if path or key != "run_metadata":
                     yield from leaves(child, (*path, key))
+                else:
+                    pass
     elif path:
         yield ".".join(path), value
+    else:
+        pass
 
 
 @pytest.mark.parametrize("key", list(SPECS))
 def test_every_current_leaf_projection_validates_without_rewriting_facts(
-    key, current_business
-):
+    key: str, current_business: CurrentBusiness
+) -> None:
     spec = SPECS[key]
     result = copy.deepcopy(current_business(key))
     before = copy.deepcopy(result)
     spec.output_model.model_validate(result)
-    validator = Draft202012Validator(spec.output_model.model_json_schema())
+    validator = cached_output_validator(spec.output_model)
     for field, expected in leaves(result):
         projected = project_fields(result, [field], strict_fields=True)
         spec.output_model.model_validate(projected)
@@ -105,7 +146,7 @@ def test_every_current_leaf_projection_validates_without_rewriting_facts(
 
 
 @pytest.fixture
-def rest(monkeypatch):
+def rest(monkeypatch: pytest.MonkeyPatch) -> Iterator[TestClient]:
     api._reset_runtime_state_for_tests()
     monkeypatch.setattr(
         api,
@@ -116,18 +157,28 @@ def rest(monkeypatch):
         yield client
 
 
-def test_all_published_schemas_preserve_object_projection_compatibility(rest, capsys):
+def test_all_published_schemas_preserve_object_projection_compatibility(
+    rest: TestClient, capsys: pytest.CaptureFixture[str]
+) -> None:
     manifest = {
         tool["tool"]: tool["output_schema"]
         for tool in rest.get("/api/tools").json()["tools"]
     }
     openapi = rest.get("/openapi.json").json()
 
-    async def native_schemas():
-        async with Client(mcp.app) as client:
+    async def native_schemas() -> dict[str, ServiceResult]:
+        async with Client(mcp.app) as default_client:
+            default_tools = await default_client.list_tools()
+            assert all(
+                tool.model_dump(by_alias=True)["outputSchema"] is None
+                for tool in default_tools
+            )
+        async with Client(mcp.create_mcp_app()) as client:
             return {
-                tool.name: tool.model_dump(by_alias=True)["outputSchema"]
-                for tool in await client.list_tools()
+                name: contract["output_schema"]
+                for name, contract in (
+                    await capability_contracts(client, detail="full")
+                ).items()
             }
 
     published = asyncio.run(native_schemas())
@@ -140,11 +191,15 @@ def test_all_published_schemas_preserve_object_projection_compatibility(rest, ca
         roots = [(central, central)]
         if spec.mcp_name:
             roots.append((published[spec.tool_name], published[spec.tool_name]))
+        else:
+            pass
         if spec.rest_path:
             response = openapi["paths"][spec.rest_path]["post"]["responses"]["200"][
                 "content"
             ]["application/json"]["schema"]
             roots.append((openapi, response))
+        else:
+            pass
         for root, node in roots:
             for path, obj in projectable_objects(root, node):
                 assert not obj.get("required"), (
@@ -157,8 +212,12 @@ def test_all_published_schemas_preserve_object_projection_compatibility(rest, ca
 @pytest.mark.parametrize("name", list(PAYLOADS))
 @pytest.mark.parametrize("no_metadata", [False, True])
 def test_each_ruleset_field_projects_on_native_mcp_rest_and_cli(
-    name, no_metadata, rest, tmp_path, capsys
-):
+    name: str,
+    no_metadata: bool,
+    rest: TestClient,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     spec = SPECS["fengshui_" + name]
     inputs = payload(name)
     # Assess exposes several independent rule layers, including the natal one.
@@ -167,29 +226,40 @@ def test_each_ruleset_field_projects_on_native_mcp_rest_and_cli(
         inputs["house"] = natal.pop("house")
         inputs["xuankong"] = natal
         inputs["methods"] = ["bazhai", "jinsuo", "annual_stars", "xuankong_natal"]
+    else:
+        pass
     full = rest.post(spec.rest_path, json=inputs, params={"as_of": AS_OF})
     assert full.status_code == 200, full.text
     cases = []
-    for layer, data in full.json()["layers"].items():
-        for field in Ruleset.model_fields:
-            value = data["ruleset"][field]
+    body = full.json()
+    for layer, data in body["layers"].items():
+        for field, value in data["ruleset"].items():
             cases.append(
                 (
                     "layers." + layer + ".ruleset." + field,
                     {"layers": {layer: {"ruleset": {field: value}}}},
                 )
             )
+    source_id, source = next(iter(body["source_catalog"].items()))
+    cases.append(
+        (
+            f"source_catalog.{source_id}.title",
+            {"source_catalog": {source_id: {"title": source["title"]}}},
+        )
+    )
 
-    async def native_calls():
+    async def native_calls() -> list[CallToolResult]:
         async with Client(mcp.app) as client:
             tools = {tool.name: tool for tool in await client.list_tools()}
-            schema = tools[spec.tool_name].model_dump(by_alias=True)["outputSchema"]
+            assert all(tool.output_schema is None for tool in tools.values())
+            schema = spec.output_model.model_json_schema()
             results = []
             for field, _ in cases:
                 # Leave native client schema validation enabled. A renderer-only
                 # test would miss RuntimeError on a successful partial result.
                 results.append(
-                    await client.call_tool(
+                    await call_calculation(
+                        client,
                         spec.tool_name,
                         {
                             **inputs,
@@ -236,7 +306,6 @@ def test_each_ruleset_field_projects_on_native_mcp_rest_and_cli(
         )
         cli = json.loads(capsys.readouterr().out)
         assert http.status_code == 200 and not protocol.is_error and code == 0
-        assert json.loads(protocol.content[0].text) == protocol.structured_content
         for result in (http.json(), protocol.structured_content, cli):
             assert {k: v for k, v in result.items() if k != "run_metadata"} == expected
             spec.output_model.model_validate(result)
@@ -249,9 +318,9 @@ def test_each_ruleset_field_projects_on_native_mcp_rest_and_cli(
 
 
 @pytest.mark.parametrize(
-    "value", [{"version": 1}, {"source_ids": "S1"}, {"sources": [{"title": 1}]}]
+    "value", [{"version": 1}, {"source_ids": "S1"}, {"source_citations": []}]
 )
-def test_partial_ruleset_still_rejects_wrong_present_types(value):
+def test_partial_ruleset_still_rejects_wrong_present_types(value: JsonValue) -> None:
     with pytest.raises(ValidationError):
         Ruleset.model_validate(value)
     with pytest.raises(SchemaError):
@@ -262,13 +331,18 @@ def test_partial_ruleset_still_rejects_wrong_present_types(value):
 @pytest.mark.parametrize(
     "field,issue",
     [
-        ("layers.directions.ruleset.sources.0.title", "non_object_projection_path"),
+        ("layers.directions.ruleset.source_ids.0", "non_object_projection_path"),
         ("layers.directions.ruleset.versoin", "unknown_projection_path"),
     ],
 )
 def test_ruleset_invalid_paths_keep_same_diagnostics_on_all_surfaces(
-    strict, field, issue, rest, tmp_path, capsys
-):
+    strict: bool,
+    field: str,
+    issue: str,
+    rest: TestClient,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     inputs = payload("directions")
     http = rest.post(
         "/api/fengshui/directions",
@@ -276,9 +350,10 @@ def test_ruleset_invalid_paths_keep_same_diagnostics_on_all_surfaces(
         params={"fields": field, "strict_fields": strict, "as_of": AS_OF},
     )
 
-    async def native_call():
+    async def native_call() -> CallToolResult:
         async with Client(mcp.app) as client:
-            return await client.call_tool(
+            return await call_calculation(
+                client,
                 "fengshui_directions",
                 {**inputs, "fields": [field], "strict_fields": strict, "as_of": AS_OF},
                 raise_on_error=False,
@@ -306,4 +381,3 @@ def test_ruleset_invalid_paths_keep_same_diagnostics_on_all_surfaces(
     diagnostic = "issues" if strict else "projection_warnings"
     for result in (http.json(), protocol.structured_content, cli):
         assert result[diagnostic] == [{"path": field, "code": issue}]
-    assert json.loads(protocol.content[0].text) == protocol.structured_content

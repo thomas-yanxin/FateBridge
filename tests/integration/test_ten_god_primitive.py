@@ -31,12 +31,12 @@ PILLARS = {
 DAY_STEM = "戊"
 
 
-def test_day_stem_is_never_emitted_as_a_stem_entry():
+def test_day_stem_is_never_emitted_as_a_stem_entry() -> None:
     for entry in iter_pillar_gods(PILLARS, DAY_STEM):
         assert not (entry.pillar == "day" and entry.location == "天干")
 
 
-def test_default_counts_day_branch_hidden_stems():
+def test_default_counts_day_branch_hidden_stems() -> None:
     day_hidden_entries = [
         e
         for e in iter_pillar_gods(PILLARS, DAY_STEM)
@@ -47,17 +47,17 @@ def test_default_counts_day_branch_hidden_stems():
     assert all(e.weight == 0.5 for e in day_hidden_entries)
 
 
-def test_skip_day_pillar_drops_the_whole_day_pillar():
+def test_skip_day_pillar_drops_the_whole_day_pillar() -> None:
     entries = list(iter_pillar_gods(PILLARS, DAY_STEM, skip_day_pillar=True))
     assert all(e.pillar != "day" for e in entries)
 
 
-def test_stem_and_hidden_weights():
+def test_stem_and_hidden_weights() -> None:
     for e in iter_pillar_gods(PILLARS, DAY_STEM):
         assert e.weight == (1.0 if e.location == "天干" else 0.5)
 
 
-def test_count_matches_iter_sum():
+def test_count_matches_iter_sum() -> None:
     counts = count_ten_gods(PILLARS, DAY_STEM)
     manual = {tg: 0.0 for tg in TenGod}
     for e in iter_pillar_gods(PILLARS, DAY_STEM):
@@ -65,7 +65,7 @@ def test_count_matches_iter_sum():
     assert counts == manual
 
 
-def test_two_camps_differ_by_exactly_the_day_branch_hidden():
+def test_two_camps_differ_by_exactly_the_day_branch_hidden() -> None:
     default = count_ten_gods(PILLARS, DAY_STEM)
     skipped = count_ten_gods(PILLARS, DAY_STEM, skip_day_pillar=True)
     # the only difference is the day branch's hidden stems

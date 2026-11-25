@@ -14,13 +14,16 @@ from fatebridge.services.timing import (
     calculate_liuyue_analysis,
 )
 from fatebridge.utils.birth_input import create_person_info
-from fatebridge.utils.places import resolve_birth_place_context
+from fatebridge.utils.places import (
+    KNOWN_BIRTH_PLACE_ENTRIES,
+    resolve_birth_place_context,
+)
 from fatebridge.utils.solar_time import normalize_birth_time
 from fatebridge.utils.timezones import parse_timezone_name
 from tests.fixtures.solar_reference import expected_solar_clock
 
 
-def test_normalize_birth_time_preserves_legacy_hour_only_behavior():
+def test_normalize_birth_time_preserves_legacy_hour_only_behavior() -> None:
     person = create_person_info(
         birth_year=1990,
         birth_month=5,
@@ -37,7 +40,7 @@ def test_normalize_birth_time_preserves_legacy_hour_only_behavior():
     assert normalized.applied is False
 
 
-def test_normalize_birth_time_uses_birth_place_for_true_solar_time():
+def test_normalize_birth_time_uses_birth_place_for_true_solar_time() -> None:
     person = create_person_info(
         birth_year=1990,
         birth_month=5,
@@ -63,7 +66,7 @@ def test_normalize_birth_time_uses_birth_place_for_true_solar_time():
     assert normalized.applied is True
 
 
-def test_normalize_birth_time_resolves_full_form_chinese_city_address():
+def test_normalize_birth_time_resolves_full_form_chinese_city_address() -> None:
     person = create_person_info(
         birth_year=1990,
         birth_month=5,
@@ -84,7 +87,7 @@ def test_normalize_birth_time_resolves_full_form_chinese_city_address():
     assert normalized.applied is True
 
 
-def test_normalize_birth_time_supports_english_city_address():
+def test_normalize_birth_time_supports_english_city_address() -> None:
     person = create_person_info(
         birth_year=1990,
         birth_month=5,
@@ -103,7 +106,7 @@ def test_normalize_birth_time_supports_english_city_address():
     assert normalized.resolution_level == "county"
 
 
-def test_normalize_birth_time_supports_pinyin_city_address():
+def test_normalize_birth_time_supports_pinyin_city_address() -> None:
     person = create_person_info(
         birth_year=1990,
         birth_month=5,
@@ -122,7 +125,7 @@ def test_normalize_birth_time_supports_pinyin_city_address():
     assert normalized.resolution_level == "county"
 
 
-def test_normalize_birth_time_prefers_more_specific_city_match_over_province():
+def test_normalize_birth_time_prefers_more_specific_city_match_over_province() -> None:
     person = create_person_info(
         birth_year=1990,
         birth_month=5,
@@ -141,7 +144,7 @@ def test_normalize_birth_time_prefers_more_specific_city_match_over_province():
     assert normalized.resolution_level == "county"
 
 
-def test_normalize_birth_time_falls_back_to_province_when_city_is_unknown():
+def test_normalize_birth_time_falls_back_to_province_when_city_is_unknown() -> None:
     person = create_person_info(
         birth_year=1990,
         birth_month=5,
@@ -161,7 +164,7 @@ def test_normalize_birth_time_falls_back_to_province_when_city_is_unknown():
     assert normalized.resolution_level == "province"
 
 
-def test_normalize_birth_time_supports_english_district_address():
+def test_normalize_birth_time_supports_english_district_address() -> None:
     person = create_person_info(
         birth_year=1990,
         birth_month=5,
@@ -180,7 +183,7 @@ def test_normalize_birth_time_supports_english_district_address():
     assert normalized.resolution_level == "county"
 
 
-def test_calculate_destiny_analysis_uses_corrected_solar_time_for_hour_pillar():
+def test_calculate_destiny_analysis_uses_corrected_solar_time_for_hour_pillar() -> None:
     person = create_person_info(
         birth_year=2020,
         birth_month=1,
@@ -206,7 +209,7 @@ def test_calculate_destiny_analysis_uses_corrected_solar_time_for_hour_pillar():
     assert result["four_pillars"]["hour"]["branch"] == "亥"
 
 
-def test_calculate_comprehensive_timing_uses_corrected_birth_time():
+def test_calculate_comprehensive_timing_uses_corrected_birth_time() -> None:
     person = create_person_info(
         birth_year=2020,
         birth_month=1,
@@ -233,7 +236,9 @@ def test_calculate_comprehensive_timing_uses_corrected_birth_time():
     assert result["birth_pillars"]["hour"]["branch"] == "亥"
 
 
-def test_calculate_comprehensive_timing_supports_snapshot_export_and_age_override():
+def test_calculate_comprehensive_timing_supports_snapshot_export_and_age_override() -> (
+    None
+):
     person = create_person_info(
         birth_year=1990,
         birth_month=5,
@@ -276,7 +281,7 @@ def test_calculate_comprehensive_timing_supports_snapshot_export_and_age_overrid
     assert "[来源]" not in result["snapshot_export"]["export_text"]
 
 
-def test_calculate_comprehensive_timing_supports_analysis_day_boundaries():
+def test_calculate_comprehensive_timing_supports_analysis_day_boundaries() -> None:
     person = create_person_info(
         birth_year=2028,
         birth_month=4,
@@ -332,7 +337,7 @@ def test_calculate_comprehensive_timing_supports_analysis_day_boundaries():
     )
 
 
-def test_time_precision_changes_liuyue_across_qingming_boundary():
+def test_time_precision_changes_liuyue_across_qingming_boundary() -> None:
     person = create_person_info(
         birth_year=2028,
         birth_month=4,
@@ -388,7 +393,7 @@ def test_time_precision_changes_liuyue_across_qingming_boundary():
     )
 
 
-def test_time_precision_aligns_liuri_and_timing_with_jieqi_anchor():
+def test_time_precision_aligns_liuri_and_timing_with_jieqi_anchor() -> None:
     person = create_person_info(
         birth_year=2028,
         birth_month=4,
@@ -444,7 +449,7 @@ def test_time_precision_aligns_liuri_and_timing_with_jieqi_anchor():
     )
 
 
-def test_calculate_dayun_analysis_supports_snapshot_export():
+def test_calculate_dayun_analysis_supports_snapshot_export() -> None:
     person = create_person_info(
         birth_year=1990,
         birth_month=5,
@@ -466,7 +471,7 @@ def test_calculate_dayun_analysis_supports_snapshot_export():
     assert result["snapshot_export"]["export_text"] == result["snapshot_text"]
 
 
-def test_calculate_dayun_analysis_supports_selected_export_sections():
+def test_calculate_dayun_analysis_supports_selected_export_sections() -> None:
     person = create_person_info(
         birth_year=1990,
         birth_month=5,
@@ -491,7 +496,7 @@ def test_calculate_dayun_analysis_supports_selected_export_sections():
     assert "[来源]" not in result["snapshot_export"]["export_text"]
 
 
-def test_calculate_liuri_analysis_returns_expected_pillar():
+def test_calculate_liuri_analysis_returns_expected_pillar() -> None:
     person = create_person_info(
         birth_year=2028,
         birth_month=4,
@@ -521,7 +526,7 @@ def test_calculate_liuri_analysis_returns_expected_pillar():
     assert result["snapshot_export"]["export_text"] == result["snapshot_text"]
 
 
-def test_calculate_liuri_analysis_supports_selected_export_sections():
+def test_calculate_liuri_analysis_supports_selected_export_sections() -> None:
     person = create_person_info(
         birth_year=2028,
         birth_month=4,
@@ -548,7 +553,7 @@ def test_calculate_liuri_analysis_supports_selected_export_sections():
     assert "[来源]" not in result["snapshot_export"]["export_text"]
 
 
-def test_calculate_liushi_analysis_returns_expected_pillar():
+def test_calculate_liushi_analysis_returns_expected_pillar() -> None:
     person = create_person_info(
         birth_year=2028,
         birth_month=4,
@@ -589,7 +594,7 @@ def test_calculate_liushi_analysis_returns_expected_pillar():
     assert result["snapshot_export"]["export_text"] == result["snapshot_text"]
 
 
-def test_calculate_liushi_analysis_supports_selected_export_sections():
+def test_calculate_liushi_analysis_supports_selected_export_sections() -> None:
     person = create_person_info(
         birth_year=2028,
         birth_month=4,
@@ -618,7 +623,7 @@ def test_calculate_liushi_analysis_supports_selected_export_sections():
     assert "[来源]" not in result["snapshot_export"]["export_text"]
 
 
-def test_calculate_liunian_analysis_supports_snapshot_export():
+def test_calculate_liunian_analysis_supports_snapshot_export() -> None:
     person = create_person_info(
         birth_year=2028,
         birth_month=4,
@@ -643,7 +648,7 @@ def test_calculate_liunian_analysis_supports_snapshot_export():
     assert result["snapshot_export"]["export_text"] == result["snapshot_text"]
 
 
-def test_calculate_liunian_analysis_supports_selected_export_sections():
+def test_calculate_liunian_analysis_supports_selected_export_sections() -> None:
     person = create_person_info(
         birth_year=2028,
         birth_month=4,
@@ -668,7 +673,7 @@ def test_calculate_liunian_analysis_supports_selected_export_sections():
     assert "[来源]" not in result["snapshot_export"]["export_text"]
 
 
-def test_calculate_liuyue_analysis_returns_expected_pillar():
+def test_calculate_liuyue_analysis_returns_expected_pillar() -> None:
     person = create_person_info(
         birth_year=2028,
         birth_month=4,
@@ -705,7 +710,7 @@ def test_calculate_liuyue_analysis_returns_expected_pillar():
     assert result["snapshot_export"]["export_text"] == result["snapshot_text"]
 
 
-def test_calculate_liuyue_analysis_supports_selected_export_sections():
+def test_calculate_liuyue_analysis_supports_selected_export_sections() -> None:
     person = create_person_info(
         birth_year=2028,
         birth_month=4,
@@ -732,7 +737,7 @@ def test_calculate_liuyue_analysis_supports_selected_export_sections():
     assert "[影响摘要]" not in result["snapshot_export"]["export_text"]
 
 
-def test_calculate_jieqi_timeline_analysis_returns_qingming_node():
+def test_calculate_jieqi_timeline_analysis_returns_qingming_node() -> None:
     person = create_person_info(
         birth_year=2028,
         birth_month=4,
@@ -760,7 +765,7 @@ def test_calculate_jieqi_timeline_analysis_returns_qingming_node():
     assert result["snapshot_export"]["export_text"] == result["snapshot_text"]
 
 
-def test_calculate_jieqi_timeline_analysis_supports_selected_export_sections():
+def test_calculate_jieqi_timeline_analysis_supports_selected_export_sections() -> None:
     person = create_person_info(
         birth_year=2028,
         birth_month=4,
@@ -785,7 +790,7 @@ def test_calculate_jieqi_timeline_analysis_supports_selected_export_sections():
     assert "[来源]" not in result["snapshot_export"]["export_text"]
 
 
-def test_liuyue_timeline_anchor_is_minute_safe_and_replayable():
+def test_liuyue_timeline_anchor_is_minute_safe_and_replayable() -> None:
     person = create_person_info(
         birth_year=2028,
         birth_month=4,
@@ -828,7 +833,7 @@ def test_liuyue_timeline_anchor_is_minute_safe_and_replayable():
     )
 
 
-def test_jieqi_timeline_anchor_is_minute_safe_and_replayable():
+def test_jieqi_timeline_anchor_is_minute_safe_and_replayable() -> None:
     person = create_person_info(
         birth_year=2028,
         birth_month=4,
@@ -853,6 +858,8 @@ def test_jieqi_timeline_anchor_is_minute_safe_and_replayable():
 
         if item["jieqi"]["name"] not in sample_names:
             continue
+        else:
+            pass
 
         liuyue_result = calculate_liuyue_analysis(
             person,
@@ -885,7 +892,7 @@ def test_jieqi_timeline_anchor_is_minute_safe_and_replayable():
         assert timing_result["liuri_analysis"]["pillar"] == item["liuri"]["pillar"]
 
 
-def test_comprehensive_timing_matches_specialized_timing_tools():
+def test_comprehensive_timing_matches_specialized_timing_tools() -> None:
     person = create_person_info(
         birth_year=1990,
         birth_month=5,
@@ -975,11 +982,11 @@ def _offset_hours(tzinfo) -> float:
         ("GMT+8", 8.0),
     ],
 )
-def test_parse_timezone_name_accepts_offset_forms(value, expected_hours):
+def test_parse_timezone_name_accepts_offset_forms(value: str, expected_hours) -> None:
     assert _offset_hours(parse_timezone_name(value)) == pytest.approx(expected_hours)
 
 
-def test_parse_timezone_name_accepts_iana_name():
+def test_parse_timezone_name_accepts_iana_name() -> None:
     # IANA names still win over the numeric-offset shortcut.
     assert parse_timezone_name("Asia/Shanghai").utcoffset(
         datetime(2001, 1, 1, 12)
@@ -987,7 +994,9 @@ def test_parse_timezone_name_accepts_iana_name():
 
 
 @pytest.mark.parametrize("value", ["garbage", "1e3", "inf", "nan", "Asia/Nowhere"])
-def test_parse_timezone_name_rejects_invalid_with_actionable_message(value):
+def test_parse_timezone_name_rejects_invalid_with_actionable_message(
+    value: str,
+) -> None:
     with pytest.raises(ValueError) as excinfo:
         parse_timezone_name(value)
     message = str(excinfo.value)
@@ -997,7 +1006,7 @@ def test_parse_timezone_name_rejects_invalid_with_actionable_message(value):
     assert "bare offset" in message
 
 
-def test_normalize_birth_time_accepts_bare_integer_timezone():
+def test_normalize_birth_time_accepts_bare_integer_timezone() -> None:
     # End-to-end: the bare "8" that previously raised now drives correction.
     person = create_person_info(
         birth_year=1988,
@@ -1013,7 +1022,7 @@ def test_normalize_birth_time_accepts_bare_integer_timezone():
     assert normalized.applied is True
 
 
-def test_resolve_birth_place_resolves_prefecture_city_district_form():
+def test_resolve_birth_place_resolves_prefecture_city_district_form() -> None:
     # A catalogued district now resolves beyond its parent city.
     resolution = resolve_birth_place_context("咸阳市秦都区")
     assert resolution.canonical_name == "秦都区"
@@ -1021,7 +1030,7 @@ def test_resolve_birth_place_resolves_prefecture_city_district_form():
     assert resolution.level == "county"
 
 
-def test_normalize_birth_time_resolves_newly_catalogued_prefecture_city():
+def test_normalize_birth_time_resolves_newly_catalogued_prefecture_city() -> None:
     person = create_person_info(
         birth_year=1988,
         birth_month=8,
@@ -1038,7 +1047,7 @@ def test_normalize_birth_time_resolves_newly_catalogued_prefecture_city():
     assert normalized.longitude == pytest.approx(108.705, abs=0.01)
 
 
-def test_resolve_birth_place_context_returns_latitude():
+def test_resolve_birth_place_context_returns_latitude() -> None:
     # Latitude must travel with longitude so the astrology engine can build a
     # chart from a place name alone (same coverage as the BaZi true-solar path).
     shanghai = resolve_birth_place_context("上海")
@@ -1051,10 +1060,9 @@ def test_resolve_birth_place_context_returns_latitude():
     assert nantong.latitude is not None
 
 
-def test_every_catalogued_place_has_latitude():
+def test_every_catalogued_place_has_latitude() -> None:
     # Drift guard: a place may not be half-resolved (longitude without latitude).
     # If this fails, a new make_birth_place_entry is missing its latitude.
-    from fatebridge.utils.places import KNOWN_BIRTH_PLACE_ENTRIES
 
     missing = [
         entry["canonical_name"]
@@ -1064,7 +1072,7 @@ def test_every_catalogued_place_has_latitude():
     assert missing == [], f"places missing latitude: {missing}"
 
 
-def test_normalize_birth_time_unknown_place_errors_actionably():
+def test_normalize_birth_time_unknown_place_errors_actionably() -> None:
     person = create_person_info(
         birth_year=1988,
         birth_month=8,

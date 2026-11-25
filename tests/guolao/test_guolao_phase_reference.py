@@ -8,13 +8,14 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.validation import guolao_phase_reference as subject
+from fatebridge.core import lunar_phase_events
+from validation import guolao_phase_reference as subject
 
 ROOT = Path(__file__).parents[2]
 FIXTURE = ROOT / "tests/fixtures/guolao-nasa-phase-reference-v1"
 
 
-def test_original_reference_bytes_and_precomparison_subset_pinned():
+def test_original_reference_bytes_and_precomparison_subset_pinned() -> None:
     ref = json.loads((FIXTURE / "reference.json").read_text())
     for row in ref["artifacts"]:
         raw = (FIXTURE / row["path"]).read_bytes()
@@ -43,11 +44,13 @@ def test_original_reference_bytes_and_precomparison_subset_pinned():
         ((1582, 10, 15, 0, 0), "gregorian", F("2299160.5")),
     ],
 )
-def test_independent_jd_anchors_and_hybrid_reform_continuity(date, calendar, expected):
+def test_independent_jd_anchors_and_hybrid_reform_continuity(
+    date, calendar: str, expected
+) -> None:
     assert subject.calendar_jd(*date, calendar=calendar) == expected
 
 
-def test_julian_century_leap_is_kept_and_gregorian_century_nonleap_rejected():
+def test_julian_century_leap_is_kept_and_gregorian_century_nonleap_rejected() -> None:
     assert (
         subject.calendar_jd(1300, 3, 1, calendar="julian")
         - subject.calendar_jd(1300, 2, 29, calendar="julian")
@@ -64,8 +67,8 @@ def test_julian_century_leap_is_kept_and_gregorian_century_nonleap_rejected():
     [(1201, 4947), (1301, 4948), (1401, 4947), (1501, 4946), (1601, 4947)],
 )
 def test_every_published_century_cell_is_parsed_instead_of_selecting_favorable_rows(
-    start, count
-):
+    start: int, count: int
+) -> None:
     result = subject.parse_nasa_century(
         (FIXTURE / f"nasa-phases{start}.html").read_bytes(), start
     )
@@ -84,6 +87,8 @@ def test_every_published_century_cell_is_parsed_instead_of_selecting_favorable_r
             37,
         )
         assert result["delta_t_minutes_by_year"]["1301"] == 8
+    else:
+        pass
 
 
 @pytest.mark.parametrize(
@@ -95,7 +100,9 @@ def test_every_published_century_cell_is_parsed_instead_of_selecting_favorable_r
         (b"00h12m", b"unknown"),
     ],
 )
-def test_malformed_missing_or_wrong_units_reference_cells_do_not_get_filled(old, new):
+def test_malformed_missing_or_wrong_units_reference_cells_do_not_get_filled(
+    old: bytes, new: bytes
+) -> None:
     raw = (FIXTURE / "nasa-phases1201.html").read_bytes()
     assert old in raw
     raw = raw.replace(old, new, 1)
@@ -104,7 +111,7 @@ def test_malformed_missing_or_wrong_units_reference_cells_do_not_get_filled(old,
 
 
 @pytest.fixture
-def synthetic(monkeypatch):
+def synthetic(monkeypatch: pytest.MonkeyPatch):
     events = [
         {
             "event_id": f"ref{i}",
@@ -156,7 +163,7 @@ def synthetic(monkeypatch):
 
 def test_anchor_zero_is_not_counted_and_exact_interval_agreement_is_not_absolute_validation(
     synthetic,
-):
+) -> None:
     ref, _ = synthetic
     result = subject.compare_phase_intervals(ref, 0)
     assert result["status_counts"] == {
@@ -169,7 +176,9 @@ def test_anchor_zero_is_not_counted_and_exact_interval_agreement_is_not_absolute
     assert not result["absolute_source_epoch_fitted_or_calibrated"]
 
 
-def test_any_common_absolute_source_shift_cancels_and_remains_unvalidated(synthetic):
+def test_any_common_absolute_source_shift_cancels_and_remains_unvalidated(
+    synthetic,
+) -> None:
     ref, state = synthetic
     initial = subject.compare_phase_intervals(ref, 0)
     state["common_shift"] = F("123.456")
@@ -182,7 +191,9 @@ def test_any_common_absolute_source_shift_cancels_and_remains_unvalidated(synthe
     assert not shifted["absolute_source_epoch_fitted_or_calibrated"]
 
 
-def test_missing_source_time_preserved_without_reference_or_mean_replacement(synthetic):
+def test_missing_source_time_preserved_without_reference_or_mean_replacement(
+    synthetic,
+) -> None:
     ref, state = synthetic
     state["missing"] = {6}
     result = subject.compare_phase_intervals(ref, 0)
@@ -195,8 +206,8 @@ def test_missing_source_time_preserved_without_reference_or_mean_replacement(syn
 
 @pytest.mark.parametrize("field,value", [("mean_gap", F(1)), ("winter", F(991))])
 def test_unresolved_alignment_never_selects_another_cycle_to_get_a_match(
-    synthetic, field, value
-):
+    synthetic, field: str, value
+) -> None:
     ref, state = synthetic
     state[field] = value
     state["missing"] = {6}
@@ -208,7 +219,9 @@ def test_unresolved_alignment_never_selects_another_cycle_to_get_a_match(
     assert result["source_unavailable_phase_indices_independent_of_alignment"] == [6]
 
 
-def test_incomplete_reference_chain_is_not_joined_across_a_missing_month(synthetic):
+def test_incomplete_reference_chain_is_not_joined_across_a_missing_month(
+    synthetic,
+) -> None:
     ref, _ = synthetic
     ref = copy.deepcopy(ref)
     del ref["events"][8:12]
@@ -216,7 +229,7 @@ def test_incomplete_reference_chain_is_not_joined_across_a_missing_month(synthet
         subject.compare_phase_intervals(ref, 0)
 
 
-def test_non_declared_year_is_not_accepted_after_inspecting_fit(synthetic):
+def test_non_declared_year_is_not_accepted_after_inspecting_fit(synthetic) -> None:
     ref, _ = synthetic
     with pytest.raises(ValueError):
         subject.compare_phase_intervals(ref, 1)
@@ -224,7 +237,7 @@ def test_non_declared_year_is_not_accepted_after_inspecting_fit(synthetic):
 
 def test_unfavorable_phase_residual_kept_with_sign_and_without_a_fitted_threshold(
     synthetic,
-):
+) -> None:
     ref, state = synthetic
     state["per_index_shift"] = {3: F(1, 10)}
     result = subject.compare_phase_intervals(ref, 0)
@@ -237,7 +250,7 @@ def test_unfavorable_phase_residual_kept_with_sign_and_without_a_fitted_threshol
 
 def test_missing_source_anchor_does_not_turn_other_available_times_into_individual_gaps(
     synthetic,
-):
+) -> None:
     ref, state = synthetic
     state["missing"] = {0}
     result = subject.compare_phase_intervals(ref, 0)
@@ -248,7 +261,7 @@ def test_missing_source_anchor_does_not_turn_other_available_times_into_individu
     assert result["descriptive_residuals"] is None
 
 
-def test_all_declared_source_slots_and_adverse_phase_residuals_remain_visible():
+def test_all_declared_source_slots_and_adverse_phase_residuals_remain_visible() -> None:
     result = subject.audit_phase_reference()
     assert result["declared_cases"] == 17
     assert result["declared_positions"] == 1224
@@ -281,7 +294,7 @@ def test_all_declared_source_slots_and_adverse_phase_residuals_remain_visible():
     assert result["real_world_prediction_subjects"] == 0
 
 
-def test_modern_full_window_reference_coverage_is_not_a_physical_pass_rate():
+def test_modern_full_window_reference_coverage_is_not_a_physical_pass_rate() -> None:
     result = subject.audit_modern_phase_reference()
     assert result["merged_windows"] == 14
     assert result["compared_unique_events"] == result["reference_unique_events"] == 1302
@@ -296,9 +309,8 @@ def test_modern_full_window_reference_coverage_is_not_a_physical_pass_rate():
 
 
 def test_modern_sequence_mismatch_preserves_both_lists_without_best_fit_matching(
-    monkeypatch,
-):
-    from fatebridge.core import lunar_phase_events
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
 
     monkeypatch.setattr(
         lunar_phase_events,

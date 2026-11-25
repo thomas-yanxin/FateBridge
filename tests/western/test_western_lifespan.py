@@ -5,16 +5,16 @@ These controls check selected derived arithmetic and service contracts. They do
 not certify natal ephemeris accuracy, complete classical methods or prediction.
 """
 
-from fatebridge.core.astrology_lifespan import (
+import math
+
+from fatebridge.core.astro.astrology_lifespan import (
     BALBILLUS_SMALL_YEARS,
     DOROTHEAN_TRIPLICITY_RULERS,
     KEYPOINTS_PERIOD_NUMBERS,
-    SECONDARY_SYNODIC_RATE_DEG_PER_YEAR,
     build_balbillus_payload,
     build_distributions_payload,
     build_harmonic_payload,
     build_keypoints_payload,
-    build_lunation_phase_payload,
     build_planetary_ages_payload,
     build_planetary_arc_payload,
     build_triplicity_rulers_payload,
@@ -32,6 +32,7 @@ from fatebridge.services.western_lifespan import (
     calculate_yearsystem129,
 )
 from fatebridge.services.western_timing_tools import calculate_timing_tool
+from tests.fixtures.surface_payloads import J2000_UNRESOLVED_ASC_SITE
 
 BIRTH = dict(
     name="测试者",
@@ -62,7 +63,7 @@ def _point(absolute_degree: float, sign: str = "Aries", **extra) -> dict:
 # Pure-builder math (exact values).
 
 
-def test_harmonic_multiplies_longitude_mod_360():
+def test_harmonic_multiplies_longitude_mod_360() -> None:
     natal = {
         "sun": _point(40.0),
         "moon": _point(60.0),
@@ -75,7 +76,7 @@ def test_harmonic_multiplies_longitude_mod_360():
     assert payload["resonant_conjunctions"] == []
 
 
-def test_harmonic_detects_conjunction_within_orb():
+def test_harmonic_detects_conjunction_within_orb() -> None:
     # 10*9=90 ; 11*9=99 -> 9° apart, outside orb 2 but 10 vs 10.5 collapses:
     natal = {"sun": _point(10.0), "moon": _point(10.5)}
     payload = build_harmonic_payload(natal, harmonic=2, orb=2.0)
@@ -84,7 +85,14 @@ def test_harmonic_detects_conjunction_within_orb():
     assert payload["resonant_conjunctions"][0]["separation_degree"] == 1.0
 
 
-def test_planetary_ages_table_is_ptolemaic_and_flags_active_band():
+def test_harmonic_degree_keeps_the_exact_product_below_the_boundary() -> None:
+    """Three times the binary64 third is exactly halfway to one from below."""
+    chart = build_harmonic_payload({"sun": _point(1 / 3)}, harmonic=3, orb=2.0)
+
+    assert chart["positions"]["sun"]["degree"] == math.nextafter(1.0, 0.0)
+
+
+def test_planetary_ages_table_is_ptolemaic_and_flags_active_band() -> None:
     natal = {
         name: _point(0.0)
         for name in ("sun", "moon", "mercury", "venus", "mars", "jupiter", "saturn")
@@ -102,7 +110,7 @@ def test_planetary_ages_table_is_ptolemaic_and_flags_active_band():
     assert saturn_band["end_age"] is None
 
 
-def test_planetary_ages_without_reference_has_no_active_band():
+def test_planetary_ages_without_reference_has_no_active_band() -> None:
     natal = {
         name: _point(0.0)
         for name in ("sun", "moon", "mercury", "venus", "mars", "jupiter", "saturn")
@@ -112,7 +120,7 @@ def test_planetary_ages_without_reference_has_no_active_band():
     assert all(band["active"] is False for band in payload["bands"])
 
 
-def test_triplicity_rulers_order_by_sect_day():
+def test_triplicity_rulers_order_by_sect_day() -> None:
     # Sun in Leo (Fire) by day -> day order: Sun, Jupiter, Saturn.
     natal = {"sun": _point(125.0, sign="Leo"), "moon": _point(0.0, sign="Aries")}
     payload = build_triplicity_rulers_payload(natal, sect="day")
@@ -124,7 +132,7 @@ def test_triplicity_rulers_order_by_sect_day():
     ]
 
 
-def test_triplicity_rulers_order_by_sect_night():
+def test_triplicity_rulers_order_by_sect_night() -> None:
     # Night birth reads the Moon as the sect light; Moon in Taurus (Earth)
     # -> night order: Moon, Venus, Mars.
     natal = {"sun": _point(0.0, sign="Aries"), "moon": _point(40.0, sign="Taurus")}
@@ -134,7 +142,7 @@ def test_triplicity_rulers_order_by_sect_night():
     assert payload["sect_light"] == "Moon"
 
 
-def test_triplicity_age_bands_match_reference_default():
+def test_triplicity_age_bands_match_reference_default() -> None:
     # Default lifespan 75, thirds -> 0-25 / 25-50 / 50-75 (matches Horosa reference).
     natal = {"sun": _point(125.0, sign="Leo"), "moon": _point(0.0, sign="Aries")}
     payload = build_triplicity_rulers_payload(natal, sect="day")
@@ -146,7 +154,7 @@ def test_triplicity_age_bands_match_reference_default():
     assert [s["planetary_period_years"] for s in payload["stages"]] == [19, 12, 30]
 
 
-def test_triplicity_halves_division():
+def test_triplicity_halves_division() -> None:
     natal = {"sun": _point(125.0, sign="Leo"), "moon": _point(0.0, sign="Aries")}
     payload = build_triplicity_rulers_payload(
         natal, sect="day", lifespan=80.0, division="halves"
@@ -156,7 +164,7 @@ def test_triplicity_halves_division():
     assert bands == [(0.0, 40.0), (40.0, 80.0), (0.0, 80.0)]
 
 
-def test_dorothean_triplicity_table_is_canonical():
+def test_dorothean_triplicity_table_is_canonical() -> None:
     assert DOROTHEAN_TRIPLICITY_RULERS["Fire"] == {
         "day": "Sun",
         "night": "Jupiter",
@@ -169,25 +177,7 @@ def test_dorothean_triplicity_table_is_canonical():
     }
 
 
-def test_lunation_phase_uses_elongation_and_fixed_rate():
-    # Moon at 100, Sun at 10 -> elongation 90 -> first_quarter; next boundary 135.
-    natal = {"sun": _point(10.0), "moon": _point(100.0)}
-    payload = build_lunation_phase_payload(natal, max_age_years=90.0)
-    assert payload["natal_elongation_degree"] == 90.0
-    assert payload["natal_phase"] == "first_quarter"
-    assert payload["progression_rate_deg_per_year"] == round(
-        SECONDARY_SYNODIC_RATE_DEG_PER_YEAR, 6
-    )
-    first = payload["phase_ingresses"][0]
-    assert first["phase"] == "gibbous"
-    # 45° / 12.190749 °/yr ≈ 3.692 years.
-    assert (
-        abs(first["ingress_age_years"] - 45.0 / SECONDARY_SYNODIC_RATE_DEG_PER_YEAR)
-        < 1e-3
-    )
-
-
-def test_distributions_first_period_starts_at_ascendant_bound():
+def test_distributions_first_period_starts_at_ascendant_bound() -> None:
     # Ascendant at 2° Aries -> Jupiter bound (0-6°), Ptolemy 1°/yr.
     natal = {
         "ascendant": _point(2.0, sign="Aries"),
@@ -217,7 +207,7 @@ def test_distributions_first_period_starts_at_ascendant_bound():
 
 def _seven_planet_natal(longitudes: dict) -> dict:
     """Build a natal_reference stub from {planet: absolute_degree}."""
-    from fatebridge.core.astrology_tables import SIGNS
+    from fatebridge.core.astro.astrology_tables import SIGNS
 
     natal = {}
     for planet, lon in longitudes.items():
@@ -226,11 +216,11 @@ def _seven_planet_natal(longitudes: dict) -> dict:
     return natal
 
 
-def test_balbillus_small_years_sum_to_129():
+def test_balbillus_small_years_sum_to_129() -> None:
     assert sum(BALBILLUS_SMALL_YEARS.values()) == 129
 
 
-def test_balbillus_order_sorts_by_longitude_then_rotates():
+def test_balbillus_order_sorts_by_longitude_then_rotates() -> None:
     lons = {
         "Sun": 10.0,
         "Moon": 50.0,
@@ -253,7 +243,7 @@ def test_balbillus_order_sorts_by_longitude_then_rotates():
     ]
 
 
-def test_keypoints_period_numbers_table():
+def test_keypoints_period_numbers_table() -> None:
     assert KEYPOINTS_PERIOD_NUMBERS == {
         "Saturn": 3,
         "Mercury": 8,
@@ -265,7 +255,7 @@ def test_keypoints_period_numbers_table():
     }
 
 
-def test_keypoints_position_number_and_activation():
+def test_keypoints_position_number_and_activation() -> None:
     # Release = Moon at 0° Aries (sign 0). Sun at 60° Gemini (sign 2) -> k = 3.
     natal = _seven_planet_natal(
         {
@@ -289,7 +279,7 @@ def test_keypoints_position_number_and_activation():
     assert any(x["planet"] == "Sun" for x in by_age[18]["period_active"])
 
 
-def test_yearsystem129_uses_full_small_years_in_balbillus_order():
+def test_yearsystem129_uses_full_small_years_in_balbillus_order() -> None:
     lons = {
         "Sun": 10.0,
         "Moon": 50.0,
@@ -310,7 +300,7 @@ def test_yearsystem129_uses_full_small_years_in_balbillus_order():
     assert payload["sequence_model"] == "zodiacal"
 
 
-def test_planetary_arc_directs_whole_chart_by_source_arc():
+def test_planetary_arc_directs_whole_chart_by_source_arc() -> None:
     natal = {"Sun": 10.0, "Moon": 100.0, "Mars": 200.0}
     progressed = {"Sun": 40.0, "Moon": 130.0, "Mars": 250.0}
     # arc_source=Moon -> arc = 130-100 = 30; every point advances 30°.
@@ -320,7 +310,7 @@ def test_planetary_arc_directs_whole_chart_by_source_arc():
     assert payload["positions"]["mars"]["absolute_degree"] == 230.0
 
 
-def test_planetary_arc_with_sun_source_equals_solar_arc():
+def test_planetary_arc_with_sun_source_equals_solar_arc() -> None:
     """planetaryarc(arc_source=Sun) must reproduce FateBridge's own solar arc."""
     common = dict(analysis_year=2025, analysis_month=4, analysis_day=6)
     pa = calculate_planetary_arc(**BIRTH, arc_source="Sun", **common)
@@ -333,7 +323,7 @@ def test_planetary_arc_with_sun_source_equals_solar_arc():
 # Service envelope contract.
 
 
-def test_services_return_envelope_with_snapshot_and_no_error():
+def test_services_return_envelope_with_snapshot_and_no_error() -> None:
     cases = [
         (calculate_harmonic_chart, {}, "harmonic_chart"),
         (
@@ -358,9 +348,93 @@ def test_services_return_envelope_with_snapshot_and_no_error():
         assert result["natal_reference"], fn.__name__
 
 
-def test_harmonic_natal_longitude_matches_chart_engine():
+def test_harmonic_natal_longitude_matches_chart_engine() -> None:
     """The harmonic value must equal natal_longitude * H mod 360 exactly."""
     result = calculate_harmonic_chart(**BIRTH, harmonic=7)
     sun = result["harmonic_chart"]["positions"]["sun"]
     expected = (sun["natal_absolute_degree"] * 7) % 360.0
     assert abs(sun["absolute_degree"] - round(expected, 4)) < 1e-3
+
+
+def test_planetary_ages_pre_birth_date_reports_pre_birth_status() -> None:
+    pre_birth = calculate_planetary_ages(
+        **BIRTH, analysis_year=1990, analysis_month=1, analysis_day=1
+    )
+    ages = pre_birth["planetary_ages"]
+    assert ages["status"] == "pre_birth"
+    assert ages["active_planet"] is None
+    assert ages["active_planet_label"] is None
+    assert ages["current_age_years"] < 0
+    assert all(band["active"] is False for band in ages["bands"])
+    assert "未指定参照日期" not in pre_birth["summary"]
+    assert "早于出生时刻" in pre_birth["summary"]
+
+    unspecified = calculate_planetary_ages(**BIRTH)
+    assert unspecified["planetary_ages"]["status"] == "reference_date_unspecified"
+    assert "未指定参照日期" in unspecified["summary"]
+
+    active = calculate_planetary_ages(
+        **BIRTH, analysis_year=2025, analysis_month=6, analysis_day=3
+    )
+    assert active["planetary_ages"]["status"] == "active"
+    assert active["planetary_ages"]["active_planet"] == "Sun"
+
+
+def test_singular_ascendant_blocks_ascendant_dependent_results() -> None:
+    singular_birth = dict(
+        name="奇点",
+        birth_year=2000,
+        birth_month=1,
+        birth_day=1,
+        birth_hour=12,
+        birth_minute=0,
+        birth_timezone="UTC",
+        **J2000_UNRESOLVED_ASC_SITE,
+    )
+    distributions = calculate_distributions(**singular_birth, house_system="W")
+    dist_payload = distributions["distributions"]
+    assert (
+        distributions["natal_reference"]["calculation_basis"]["angle_definition"][
+            "geometric_ascendant_resolved"
+        ]
+        is False
+    )
+    assert dist_payload["status"] == "underdetermined_ascendant"
+    assert dist_payload["ascendant_resolved"] is False
+    assert dist_payload["ascendant_absolute_degree"] is None
+    assert dist_payload["periods"] == []
+    assert "本命上升未解析" in distributions["summary"]
+
+    harmonic = calculate_harmonic_chart(**singular_birth, house_system="W", orb=15.0)
+    assert "sun" in harmonic["harmonic_chart"]["positions"]
+    assert "ascendant" not in harmonic["harmonic_chart"]["positions"]
+    assert all(
+        "Ascendant" not in conjunction["points"]
+        for conjunction in harmonic["harmonic_chart"]["resonant_conjunctions"]
+    )
+
+    body_kp = calculate_keypoints(
+        **singular_birth, house_system="W", release_mode="body"
+    )
+    kp_body_payload = body_kp["keypoints"]
+    assert kp_body_payload["status"] == "underdetermined_ascendant"
+    assert kp_body_payload["ascendant_resolved"] is False
+    assert kp_body_payload["release_sign_index"] is None
+    assert kp_body_payload["positions"] == []
+    assert kp_body_payload["activations"] == []
+    assert "本命上升未解析" in body_kp["summary"]
+
+    soul_kp = calculate_keypoints(
+        **singular_birth, house_system="W", release_mode="soul"
+    )
+    kp_soul_payload = soul_kp["keypoints"]
+    assert "status" not in kp_soul_payload
+    assert len(kp_soul_payload["positions"]) == 7
+    assert len(kp_soul_payload["activations"]) > 0
+    assert kp_soul_payload["release_sign_index"] is not None
+
+
+def test_balbillus_source_metadata_has_no_redundant_sha256() -> None:
+    result = calculate_balbillus(**BIRTH)
+    source = result["balbillus"]["reduction_model"]["source"]
+    assert "sha256" not in source

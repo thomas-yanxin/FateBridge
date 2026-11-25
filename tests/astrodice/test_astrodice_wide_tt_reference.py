@@ -12,6 +12,7 @@ from types import SimpleNamespace
 
 import pytest
 
+from fatebridge.core.astro import runtime
 from scripts.astrodice.audit_astrodice_horizons_wide_reference import (
     input_tick,
     interpolation_weights,
@@ -26,8 +27,8 @@ FIXTURE = (
 
 
 def test_frozen_reference_preserves_both_unresolved_cases_without_platform_trig(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     def forbidden(*args):
         raise AssertionError(
             "Independent mathematical replay must not use libm sin/cos"
@@ -54,7 +55,7 @@ def test_frozen_reference_preserves_both_unresolved_cases_without_platform_trig(
     }
 
 
-def test_actual_horizons_bc_calendar_column_requires_the_jd_identity():
+def test_actual_horizons_bc_calendar_column_requires_the_jd_identity() -> None:
     response = json.loads((FIXTURE / "bc-calendar-witness.json").read_text())
     table = list(
         csv.reader(
@@ -81,7 +82,9 @@ def test_actual_horizons_bc_calendar_column_requires_the_jd_identity():
         "10000ad-Jan-01 00:00:00.000000",
     ],
 )
-def test_extended_reference_clock_round_trips_without_python_utc_limits(label):
+def test_extended_reference_clock_round_trips_without_python_utc_limits(
+    label: str,
+) -> None:
     assert calendar_label(input_tick(label)) == label
 
 
@@ -94,12 +97,14 @@ def test_extended_reference_clock_round_trips_without_python_utc_limits(label):
         "1ad-Feb-29 00:00:00.000000",
     ],
 )
-def test_invalid_or_era_ambiguous_reference_clocks_are_rejected(label):
+def test_invalid_or_era_ambiguous_reference_clocks_are_rejected(label: str) -> None:
     with pytest.raises(ValueError):
         input_tick(label)
 
 
-def test_independent_rational_weights_differentiate_a_degree_twelve_polynomial():
+def test_independent_rational_weights_differentiate_a_degree_twelve_polynomial() -> (
+    None
+):
     weights = interpolation_weights()
     polynomial = lambda x: 5 - 7 * x + 11 * x**4 - 3 * x**7 + 13 * x**12
     assert sum(w * polynomial(x) for x, w in weights.items()) == -7
@@ -110,8 +115,8 @@ def test_independent_rational_weights_differentiate_a_degree_twelve_polynomial()
     "kind", ["direction", "drop_point", "JD", "case", "nan", "dimension"]
 )
 def test_structural_raw_replay_rejects_tampering_even_with_a_resealed_json(
-    tmp_path, kind
-):
+    tmp_path: Path, kind: str
+) -> None:
     reference = json.loads((FIXTURE / "reference.json").read_text())
     row = reference["rows"][0]
     if kind == "direction":
@@ -138,7 +143,6 @@ def test_structural_raw_replay_rejects_tampering_even_with_a_resealed_json(
 
 
 def mock_frame_native(monkeypatch, bad_flags=False):
-    from fatebridge.core.astro import runtime
 
     swe = runtime.swe
     vectors = {
@@ -150,14 +154,22 @@ def mock_frame_native(monkeypatch, bad_flags=False):
     def call(operation, epoch, body, flags):
         if operation == "set_sid_mode":
             return None
+        else:
+            pass
         value = vectors[body]
         if not flags & swe.FLG_J2000:
             value = [-value[1], value[0], value[2]]
+        else:
+            pass
         returned = flags | swe.FLG_NOABERR | swe.FLG_NOGDEFL
         if flags & (swe.FLG_J2000 | swe.FLG_SIDEREAL):
             returned |= swe.FLG_NONUT
+        else:
+            pass
         if bad_flags:
             returned ^= swe.FLG_XYZ
+        else:
+            pass
         return (*value, 0.0, 0.0, 0.0), returned
 
     monkeypatch.setattr(runtime, "ephemeris_call", call)
@@ -165,23 +177,25 @@ def mock_frame_native(monkeypatch, bad_flags=False):
 
 
 def test_frame_reduction_uses_geometry_and_replays_an_independent_third_vector(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     trace = mock_frame_native(monkeypatch)
     matrix, receipt = frame_rotation(2451545.0, False, "swieph", trace)
     assert rotate(matrix, [0.2, 0.3, 0.4]) == pytest.approx([-0.3, 0.2, 0.4], abs=1e-15)
     assert receipt["geometric_witness_replay_maximum"] < 1e-15
 
 
-def test_frame_reduction_cannot_accept_a_wrong_coordinate_flag(monkeypatch):
+def test_frame_reduction_cannot_accept_a_wrong_coordinate_flag(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     trace = mock_frame_native(monkeypatch, bad_flags=True)
     with pytest.raises(ValueError, match="coordinate contract changed"):
         frame_rotation(2451545.0, False, "swieph", trace)
 
 
 def test_raw_provenance_cannot_be_forged_by_rehashing_only_the_request_journal(
-    tmp_path,
-):
+    tmp_path: Path,
+) -> None:
     raw = tmp_path / "raw"
     shutil.copytree(FIXTURE / "raw", raw)
     journal = [

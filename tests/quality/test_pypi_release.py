@@ -27,8 +27,8 @@ def release_workspace(tmp_path, monkeypatch):
 
 @pytest.mark.parametrize("files,expected", [([], "true"), ([{}], "false")])
 def test_pypi_files_control_build_and_publish(
-    release_workspace, monkeypatch, files, expected
-):
+    release_workspace, monkeypatch: pytest.MonkeyPatch, files, expected: str
+) -> None:
     def request(url, timeout):
         assert url == "https://pypi.org/pypi/fatebridge/0.2.0/json"
         assert timeout == 30
@@ -42,7 +42,9 @@ def test_pypi_files_control_build_and_publish(
 
 
 @pytest.mark.parametrize("status", [404, 403, 429, 500, 503])
-def test_only_pypi_404_means_a_new_version(release_workspace, monkeypatch, status):
+def test_only_pypi_404_means_a_new_version(
+    release_workspace, monkeypatch: pytest.MonkeyPatch, status: int
+) -> None:
     def request(*args, **kwargs):
         raise HTTPError("https://pypi.org", status, "fixture", {}, None)
 
@@ -60,8 +62,8 @@ def test_only_pypi_404_means_a_new_version(release_workspace, monkeypatch, statu
 
 @pytest.mark.parametrize("error", [URLError("offline"), TimeoutError("timeout")])
 def test_network_errors_never_authorize_publishing(
-    release_workspace, monkeypatch, error
-):
+    release_workspace, monkeypatch: pytest.MonkeyPatch, error
+) -> None:
     def request(*args, **kwargs):
         raise error
 
@@ -73,8 +75,8 @@ def test_network_errors_never_authorize_publishing(
 
 @pytest.mark.parametrize("payload", [b"unavailable", b"{}", b'{"urls": null}'])
 def test_invalid_pypi_response_never_authorizes_publishing(
-    release_workspace, monkeypatch, payload
-):
+    release_workspace, monkeypatch: pytest.MonkeyPatch, payload: bytes
+) -> None:
     monkeypatch.setattr(
         check_pypi_release, "urlopen", lambda *a, **kw: io.BytesIO(payload)
     )
@@ -84,7 +86,9 @@ def test_invalid_pypi_response_never_authorizes_publishing(
 
 
 @pytest.mark.parametrize("tag", ["v0.2.0", "v0.1.0", "0.2.0"])
-def test_release_tag_is_checked_before_pypi(release_workspace, monkeypatch, tag):
+def test_release_tag_is_checked_before_pypi(
+    release_workspace, monkeypatch: pytest.MonkeyPatch, tag: str
+) -> None:
     monkeypatch.setenv("RELEASE_TAG", tag)
     calls = []
     monkeypatch.setattr(
@@ -101,7 +105,9 @@ def test_release_tag_is_checked_before_pypi(release_workspace, monkeypatch, tag)
 
 
 @pytest.mark.parametrize("source", ["", "__version__ = 2", '__version__ = ""'])
-def test_missing_or_invalid_static_version_is_rejected(tmp_path, source):
+def test_missing_or_invalid_static_version_is_rejected(
+    tmp_path: Path, source: str
+) -> None:
     path = tmp_path / "version.py"
     path.write_text(source)
     with pytest.raises(ValueError):
@@ -126,7 +132,14 @@ WORKFLOW = yaml.safe_load(
         ("release", "", "", "", True, True),
     ],
 )
-def test_workflow_entry_gate(event, conclusion, trigger, branch, same_repo, allowed):
+def test_workflow_entry_gate(
+    event: str,
+    conclusion: str,
+    trigger: str,
+    branch: str,
+    same_repo: bool,
+    allowed: bool,
+) -> None:
     github = SimpleNamespace(
         event_name=event,
         repository="owner/FateBridge",
@@ -148,7 +161,9 @@ def test_workflow_entry_gate(event, conclusion, trigger, branch, same_repo, allo
     assert eval(expression, {"__builtins__": {}}, {"github": github}) is allowed
 
 
-def test_both_jobs_checkout_the_tested_commit_and_existing_versions_skip_build():
+def test_both_jobs_checkout_the_tested_commit_and_existing_versions_skip_build() -> (
+    None
+):
     jobs = WORKFLOW["jobs"]
     for name in ("check", "build", "github_release"):
         checkout = jobs[name]["steps"][0]
@@ -169,8 +184,8 @@ def test_both_jobs_checkout_the_tested_commit_and_existing_versions_skip_build()
     "publish_result", ["success", "failure", "skipped", "cancelled"]
 )
 def test_github_release_requires_a_successful_new_pypi_upload(
-    new_version, publish_result
-):
+    new_version: bool, publish_result: str
+) -> None:
     job = WORKFLOW["jobs"]["github_release"]
     needs = SimpleNamespace(
         check=SimpleNamespace(

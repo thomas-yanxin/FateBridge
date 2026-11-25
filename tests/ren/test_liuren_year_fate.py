@@ -12,12 +12,12 @@ from fatebridge.core.metaphysics.liureng import build_liureng_board
 from fatebridge.core.metaphysics.liureng_year_fate import build_year_fate
 from fatebridge.services.metaphysics import calculate_liureng_runyear
 from fatebridge.utils.birth_input import create_person_info
-from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
-from tests.evaluation.test_agentic_nested_outputs import (
-    test_nested_fact_faults_are_internal_failures_on_all_surfaces as reject_fault,
-)
-from tests.ren.test_ren_transports import PAYLOAD
 from tests.support.transports import SPECS, business, rest, surface_calls
+from tests.unit_test.fixtures.ren_protocol import REN_PROTOCOL_PAYLOAD
+from tests.unit_test.fixtures.schema_assertions import (
+    reject_nested_fact_fault as reject_fault,
+)
+from validation.claims import CalculationClaim, verify_calculation_claims
 
 ROOT = Path(__file__).resolve().parents[2]
 SPEC = importlib.util.spec_from_file_location(
@@ -43,7 +43,7 @@ def facts(board=None, birth=1941, annual="己酉"):
     )
 
 
-def test_complete_frozen_tables_and_single_diagram_keep_separate_denominators():
+def test_complete_frozen_tables_and_single_diagram_keep_separate_denominators() -> None:
     report = AUDIT.audit()
     assert report["literal_runyear_count"] == report["literal_runyear_matches"] == 120
     assert len(report["literal_natal_definition_checks"]) == 2
@@ -56,7 +56,9 @@ def test_complete_frozen_tables_and_single_diagram_keep_separate_denominators():
     assert not report["goal_complete"]
 
 
-def test_year_fate_and_upper_xun_stems_are_distinct_and_lookup_is_not_inverted():
+def test_year_fate_and_upper_xun_stems_are_distinct_and_lookup_is_not_inverted() -> (
+    None
+):
     male = facts()
     female = facts(annual="己丑")
     assert male["natal"] == female["natal"]
@@ -74,7 +76,9 @@ def test_year_fate_and_upper_xun_stems_are_distinct_and_lookup_is_not_inverted()
 
 
 @pytest.mark.parametrize("profile", ["tanyuan_xieji_v1", "liuren_common_v1"])
-def test_existing_board_is_the_only_source_of_sky_and_god_and_is_not_mutated(profile):
+def test_existing_board_is_the_only_source_of_sky_and_god_and_is_not_mutated(
+    profile: str,
+) -> None:
     board = source_board(profile)
     before = deepcopy(board)
     result = facts(board)
@@ -95,8 +99,8 @@ def test_existing_board_is_the_only_source_of_sky_and_god_and_is_not_mutated(pro
     [(2002, "午", "寅", True, False), (1998, "寅", "戌", False, True)],
 )
 def test_upper_empty_and_earth_empty_are_independent(
-    birth, earth, sky, upper_empty, earth_empty
-):
+    birth: int, earth: str, sky: str, upper_empty: bool, earth_empty: bool
+) -> None:
     item = facts(birth=birth)["natal"]
     assert item["earth_branch"] == earth and item["sky_branch"] == sky
     assert item["upper_xun_kong"] is upper_empty
@@ -107,7 +111,7 @@ def test_upper_empty_and_earth_empty_are_independent(
     assert item["god"] and item["upper_relation"]
 
 
-def test_unknown_gender_keeps_natal_and_does_not_fabricate_annual():
+def test_unknown_gender_keeps_natal_and_does_not_fabricate_annual() -> None:
     result = facts(annual=None)
     assert result["natal"]["status"] == "calculated"
     annual = result["annual"]
@@ -116,7 +120,9 @@ def test_unknown_gender_keeps_natal_and_does_not_fabricate_annual():
 
 
 @pytest.mark.parametrize("change", ["edit", "missing", "extra"])
-def test_frozen_source_tamper_does_not_create_a_pass(tmp_path, change):
+def test_frozen_source_tamper_does_not_create_a_pass(
+    tmp_path: Path, change: str
+) -> None:
     corpus = tmp_path / "reference"
     shutil.copytree(AUDIT.CORPUS, corpus)
     p = corpus / "reference.json"
@@ -133,12 +139,14 @@ def test_frozen_source_tamper_does_not_create_a_pass(tmp_path, change):
 
 
 @pytest.mark.parametrize("bad", [True, "1941", None])
-def test_birth_year_cannot_be_a_boolean_or_coerced_value(bad):
+def test_birth_year_cannot_be_a_boolean_or_coerced_value(
+    bad: bool | str | None,
+) -> None:
     with pytest.raises(ValueError):
         facts(birth=bad)
 
 
-def test_duplicate_earth_plate_and_invalid_day_or_year_are_rejected():
+def test_duplicate_earth_plate_and_invalid_day_or_year_are_rejected() -> None:
     board = source_board()
     board["twelve_board"][1] = board["twelve_board"][0]
     with pytest.raises(ValueError, match="天地盘"):
@@ -158,11 +166,11 @@ def test_duplicate_earth_plate_and_invalid_day_or_year_are_rejected():
 @pytest.mark.parametrize("gender", ["女", "未知"])
 @pytest.mark.parametrize("project", [False, True])
 def test_actual_lunar_birth_year_and_placements_agree_on_all_surfaces(
-    day, natal, gender, project, surface_calls
-):
+    day: int, natal: str, gender: str, project: bool, surface_calls
+) -> None:
     spec = SPECS["liureng_runyear"]
     payload = dict(
-        PAYLOAD,
+        REN_PROTOCOL_PAYLOAD,
         birth_year=2024,
         birth_month=2,
         birth_day=day,
@@ -187,6 +195,8 @@ def test_actual_lunar_birth_year_and_placements_agree_on_all_surfaces(
             "false",
         ]
         options = dict(fields=fields, strict_fields=True, include_snapshot_text=False)
+    else:
+        pass
     http, protocol, code, cli = surface_calls(
         spec, payload, params=params, options=options, flags=flags
     )
@@ -204,6 +214,8 @@ def test_actual_lunar_birth_year_and_placements_agree_on_all_surfaces(
             item = yf[key]
             if item["status"] != "calculated":
                 continue
+            else:
+                pass
             row = next(
                 r
                 for r in body["liureng"]["twelve_board"]
@@ -216,9 +228,13 @@ def test_actual_lunar_birth_year_and_placements_agree_on_all_surfaces(
             assert body["runyear"]["source_section"] == "大六壬探原·卷上推演篇·年命"
             if gender == "未知":
                 assert "行年落盘：未计算" in body["snapshot_text"]
+            else:
+                pass
+        else:
+            pass
 
 
-def test_1900_prefix_keeps_1899_birth_lunar_year_for_natal():
+def test_1900_prefix_keeps_1899_birth_lunar_year_for_natal() -> None:
     person = create_person_info(
         birth_year=1900,
         birth_month=1,
@@ -241,10 +257,10 @@ def test_1900_prefix_keeps_1899_birth_lunar_year_for_natal():
     assert result["runyear"]["birth_lunar_year"] == 1899
 
 
-def test_same_run_claims_do_not_substitute_natal_stem_for_upper_dun_stem(rest):
+def test_same_run_claims_do_not_substitute_natal_stem_for_upper_dun_stem(rest) -> None:
     spec = SPECS["liureng_runyear"]
     payload = dict(
-        PAYLOAD,
+        REN_PROTOCOL_PAYLOAD,
         birth_year=1994,
         birth_month=8,
         birth_day=23,
@@ -282,6 +298,10 @@ def test_same_run_claims_do_not_substitute_natal_stem_for_upper_dun_stem(rest):
     ],
 )
 def test_invalid_facts_cannot_be_hidden_with_projection(
-    payload, rest, monkeypatch, tmp_path, capsys
-):
+    payload,
+    rest,
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     reject_fault("liureng_runyear", payload, rest, monkeypatch, tmp_path, capsys)

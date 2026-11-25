@@ -8,14 +8,16 @@ from pathlib import Path
 
 import pytest
 
-import fatebridge.core.guolao_grid as module
+import fatebridge.core.guolao.guolao_grid as module
 
 ROOT = Path(__file__).parents[2]
 FIXTURE = Path(__file__).parents[1] / "fixtures/guolao-grid-markers-v1"
 REFERENCE = json.loads((FIXTURE / "reference.json").read_text())
 
 
-def test_marker_dataset_primary_scan_and_resampled_reading_aid_have_fingerprints():
+def test_marker_dataset_primary_scan_and_resampled_reading_aid_have_fingerprints() -> (
+    None
+):
     assert (
         hashlib.sha256((FIXTURE / REFERENCE["source_image"]).read_bytes()).hexdigest()
         == REFERENCE["source_image_sha256"]
@@ -33,7 +35,7 @@ def test_marker_dataset_primary_scan_and_resampled_reading_aid_have_fingerprints
 
 
 @pytest.mark.parametrize("case", REFERENCE["held_cases"])
-def test_held_visible_text_is_not_replaced_with_the_next_number_plus_one(case):
+def test_held_visible_text_is_not_replaced_with_the_next_number_plus_one(case) -> None:
     r = module.load_grid().cell(case["palace"], case["column"])
     reading = r["marker_reading"]
     for k, v in case.items():
@@ -43,7 +45,9 @@ def test_held_visible_text_is_not_replaced_with_the_next_number_plus_one(case):
     assert r["continuous_historical_degree"] is None
 
 
-def test_all_39_readings_are_recorded_without_a_fake_number_for_initial_or_blank():
+def test_all_39_readings_are_recorded_without_a_fake_number_for_initial_or_blank() -> (
+    None
+):
     g = module.load_grid()
     a = g.audit()
     assert a["marker_readings_recorded"] == 39
@@ -56,7 +60,9 @@ def test_all_39_readings_are_recorded_without_a_fake_number_for_initial_or_blank
     assert a["marker_data_sha256"] == REFERENCE["marker_data_sha256"]
 
 
-def test_all_three_new_numeric_conflicts_and_the_earlier_unmarked_restart_remain():
+def test_all_three_new_numeric_conflicts_and_the_earlier_unmarked_restart_remain() -> (
+    None
+):
     a = module.load_grid().audit()
     assert len(a["marker_to_regular_numeric_discontinuities"]) == 3
     for expected, actual in zip(
@@ -76,8 +82,8 @@ def test_all_three_new_numeric_conflicts_and_the_earlier_unmarked_restart_remain
     [("子", "虚", "九", 12), ("辰", "轸", "十四", 23), ("丑", "斗", None, 10)],
 )
 def test_literal_marker_lookup_returns_exact_declared_source_not_a_life_degree(
-    palace, mansion, text, column
-):
+    palace: str, mansion: str, text: str | None, column: int
+) -> None:
     r = module.load_grid().compare_marker(
         source_palace=palace, target_palace="午", mansion=mansion, attached_text=text
     )
@@ -99,7 +105,9 @@ def test_literal_marker_lookup_returns_exact_declared_source_not_a_life_degree(
         ("子", "虚", "9"),
     ],
 )
-def test_mismatching_guesses_and_filled_blank_are_rejected(palace, mansion, text):
+def test_mismatching_guesses_and_filled_blank_are_rejected(
+    palace: str, mansion: str, text: str | None
+) -> None:
     with pytest.raises(ValueError, match="附字"):
         module.load_grid().compare_marker(
             source_palace=palace,
@@ -110,14 +118,14 @@ def test_mismatching_guesses_and_filled_blank_are_rejected(palace, mansion, text
 
 
 @pytest.mark.parametrize("value", [9, 9.0, Fraction(9), True])
-def test_literal_text_argument_is_not_a_continuous_numeric_coordinate(value):
+def test_literal_text_argument_is_not_a_continuous_numeric_coordinate(value) -> None:
     with pytest.raises(TypeError):
         module.load_grid().compare_marker(
             source_palace="子", target_palace="午", mansion="虚", attached_text=value
         )
 
 
-def test_incomplete_or_duplicated_readings_are_not_silently_joined():
+def test_incomplete_or_duplicated_readings_are_not_silently_joined() -> None:
     g = module.load_grid()
     with pytest.raises(ValueError):
         replace(g, marker_readings=g.marker_readings[:-1])
@@ -140,8 +148,8 @@ def test_incomplete_or_duplicated_readings_are_not_silently_joined():
 
 
 def test_overlay_rejects_different_matrix_or_source_scan_fingerprints(
-    tmp_path, monkeypatch
-):
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     raw = json.loads(module.MARKER_DATA.read_text())
     for field in ["matrix_data_sha256", "source_image_sha256", "matrix_source_id"]:
         altered = {**raw, field: "different_source"}
@@ -164,7 +172,7 @@ def test_overlay_rejects_different_matrix_or_source_scan_fingerprints(
     ],
 )
 def test_reading_types_do_not_turn_missing_or_initial_into_zero(
-    kind, text, value, error
-):
+    kind: str, text: str | None, value: bool | float | int | None, error
+) -> None:
     with pytest.raises(error):
         module.MarkerReading("子", 12, "虚", kind, text, value)

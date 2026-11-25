@@ -31,7 +31,9 @@ def _build_person():
     "service",
     [bazi_module.calculate_bazi_birth],
 )
-def test_bazi_services_reuse_shared_birth_context(monkeypatch, service):
+def test_bazi_services_reuse_shared_birth_context(
+    monkeypatch: pytest.MonkeyPatch, service
+) -> None:
     person = _build_person()
     call_counts = {
         "normalize_birth_time": 0,
@@ -75,8 +77,8 @@ def test_bazi_services_reuse_shared_birth_context(monkeypatch, service):
 
 
 def test_analyze_element_strength_changes_skips_full_comprehensive_analysis(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     birth_pillars = {
         "year": ("戊", "辰"),
         "month": ("丙", "辰"),
@@ -110,7 +112,9 @@ def test_analyze_element_strength_changes_skips_full_comprehensive_analysis(
     }
 
 
-def test_analyze_liuyue_effects_reuses_precomputed_liuyue(monkeypatch):
+def test_analyze_liuyue_effects_reuses_precomputed_liuyue(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     birth_pillars = {
         "year": ("戊", "辰"),
         "month": ("丙", "辰"),
@@ -145,7 +149,9 @@ def test_analyze_liuyue_effects_reuses_precomputed_liuyue(monkeypatch):
     assert result["enhanced_summary"]
 
 
-def test_analyze_liuri_effects_reuses_precomputed_liuri(monkeypatch):
+def test_analyze_liuri_effects_reuses_precomputed_liuri(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     birth_pillars = {
         "year": ("戊", "辰"),
         "month": ("丙", "辰"),
@@ -175,29 +181,29 @@ def test_analyze_liuri_effects_reuses_precomputed_liuri(monkeypatch):
 
 
 @pytest.mark.asyncio
-async def test_heavy_api_routes_honor_shared_concurrency_limit(monkeypatch):
+async def test_heavy_api_routes_honor_shared_concurrency_limit(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     import fatebridge.api as api_module
     from fatebridge.core.requests.timing import TimingAnalysisRequest
 
-    api_module._reset_runtime_state_for_tests()
-    api_module.HEAVY_CALC_SEMAPHORE = asyncio.Semaphore(2)
-    api_module.HEAVY_CALC_SEMAPHORE_LOOP = None
+    monkeypatch.setattr(api_module, "HEAVY_CALC_SEMAPHORE", asyncio.Semaphore(2))
+    monkeypatch.setattr(api_module, "HEAVY_CALC_SEMAPHORE_LOOP", None)
 
     in_flight = 0
     max_in_flight = 0
+    run_in_threadpool = api_module.run_in_threadpool
 
-    async def fake_run_in_threadpool(func, *args, **kwargs):
+    async def observe_threadpool(func, *args, **kwargs):
         nonlocal in_flight, max_in_flight
         in_flight += 1
         max_in_flight = max(max_in_flight, in_flight)
-        await asyncio.sleep(0.01)
-        in_flight -= 1
-        return {
-            "analysis_type": "综合时运分析",
-            "summary": "ok",
-        }
+        try:
+            return await run_in_threadpool(func, *args, **kwargs)
+        finally:
+            in_flight -= 1
 
-    monkeypatch.setattr(api_module, "run_in_threadpool", fake_run_in_threadpool)
+    monkeypatch.setattr(api_module, "run_in_threadpool", observe_threadpool)
 
     request = TimingAnalysisRequest(
         birth_year=1990,

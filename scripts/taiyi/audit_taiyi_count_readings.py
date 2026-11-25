@@ -22,6 +22,8 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
     raw = (corpus / "manifest.json").read_bytes()
     if hashlib.sha256(raw).hexdigest() != MANIFEST_SHA256:
         raise ValueError("须保留实施前完整1至40域、五个源读法及所有未决材料")
+    else:
+        pass
     manifest = json.loads(raw)
     for item in manifest["source_files"] + manifest["prior_source_references"]:
         if (
@@ -29,13 +31,19 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
             != item["sha256"]
         ):
             raise ValueError("来源指纹不符：" + item["file"])
+        else:
+            pass
     cases = json.loads((corpus / "numeric-cases.json").read_text())["cases"]
     if [c["count"] for c in cases] != list(range(1, 41)):
         raise ValueError("不能删去15/25/35、10或有源差异的数值")
+    else:
+        pass
     catalog = json.loads((corpus / "source-profiles.json").read_text())
     profiles = catalog["profiles"]
     if profiles != source_profiles():
         raise ValueError("运行分源目录与独立冻结转录不一致")
+    else:
+        pass
     checks = []
     for c in cases:
         r = count_reading(c["count"])
@@ -60,6 +68,8 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
             differences.append({"count": n, "memberships": r["source_memberships"]})
         elif r["literal_rank_status"] == "partial_listing_not_unified":
             gaps.append(n)
+        else:
+            pass
     return {
         "completion_claim": False,
         "source_numeric_domain": 40,

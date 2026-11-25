@@ -18,10 +18,10 @@ from fatebridge.core.fengshui.lingzheng_inputs import (
 from fatebridge.core.fengshui.models import XuankongInterpretationRequest
 from fatebridge.services.fengshui import calculate_xuankong_natal
 from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.validation.fengshui_lingzheng import audit_lingzheng_reference
-from tests.support.fengshui_transports import mcp_call
+from tests.support.fengshui_transports import SPECS, mcp_call
 from tests.support.mcp_result_assertions import without_transport
 from tests.support.transports import rest_client
+from validation.fengshui_lingzheng import audit_lingzheng_reference
 
 DIRS = ("N", "NE", "E", "SE", "S", "SW", "W", "NW")
 REF = Path(__file__).parents[1] / "data/fengshui_lingzheng_v1/reference.json"
@@ -50,11 +50,15 @@ def inputs(current=8, half=None, natal=2, angle=0):
     }
     if half:
         fixed.update(five_period_half=half, half_evidence="明确核对评价五运的前后十年")
+    else:
+        pass
     config = {"fixed_lingzheng": fixed}
     if current is not None:
         config.update(
             current_period_number=current, period_evidence="独立评价时运，不取历史宅运"
         )
+    else:
+        pass
     return dict(
         house={"facing_degrees": angle, "north_reference": "magnetic"},
         period={
@@ -72,7 +76,7 @@ def fixed_result(request):
     ]["fixed_lingzheng_analysis"]
 
 
-def test_all_original_period_and_hosting_cases_and_incomplete_audit_rejected():
+def test_all_original_period_and_hosting_cases_and_incomplete_audit_rejected() -> None:
     reference = json.loads(REF.read_text())
     audit = audit_lingzheng_reference(reference)
     assert audit["matched_numeric_cases"] == audit["checked_numeric_cases"] == 10
@@ -86,7 +90,7 @@ def test_all_original_period_and_hosting_cases_and_incomplete_audit_rejected():
     assert not audit_lingzheng_reference(reference)["scoped_acceptance_passed"]
 
 
-def test_fifth_period_unknown_is_two_candidates_not_a_favourable_selection():
+def test_fifth_period_unknown_is_two_candidates_not_a_favourable_selection() -> None:
     unknown = fixed_result(inputs(5))
     assert unknown["calculation_status"] == "complete"
     assert unknown["selection_status"] == "requires_five_period_half"
@@ -110,7 +114,7 @@ def test_fifth_period_unknown_is_two_candidates_not_a_favourable_selection():
         )
 
 
-def test_water_and_low_terrain_are_independent_three_valued_conditions():
+def test_water_and_low_terrain_are_independent_three_valued_conditions() -> None:
     for low, water, high in itertools.product((True, False, None), repeat=3):
         raw = observation(
             "SW",
@@ -144,7 +148,7 @@ def test_water_and_low_terrain_are_independent_three_valued_conditions():
     )
 
 
-def test_images_unknown_period_and_missing_natal_are_not_confirmation():
+def test_images_unknown_period_and_missing_natal_are_not_confirmation() -> None:
     req = inputs()
     req["interpretation"]["fixed_lingzheng"]["observations"][5][
         "observation_basis"
@@ -173,7 +177,7 @@ def test_images_unknown_period_and_missing_natal_are_not_confirmation():
     )
 
 
-def test_non_river_water_is_not_a_contradiction_or_a_confirmed_river():
+def test_non_river_water_is_not_a_contradiction_or_a_confirmed_river() -> None:
     req = inputs()["interpretation"]
     req["external_forms"] = [
         dict(
@@ -190,7 +194,9 @@ def test_non_river_water_is_not_a_contradiction_or_a_confirmed_river():
     ).is_valid(req)
 
 
-def test_all_432_natal_charts_unchanged_and_current_not_historical_period_used():
+def test_all_432_natal_charts_unchanged_and_current_not_historical_period_used() -> (
+    None
+):
     tested = 0
     both = set()
     for natal in range(1, 10):
@@ -262,7 +268,7 @@ def test_all_432_natal_charts_unchanged_and_current_not_historical_period_used()
         "conflicting_water",
     ],
 )
-def test_runtime_and_published_schema_reject_invalid_facts(mutation):
+def test_runtime_and_published_schema_reject_invalid_facts(mutation: str) -> None:
     req = inputs()["interpretation"]
     fixed = req["fixed_lingzheng"]
     if mutation == "half_other_period":
@@ -304,11 +310,18 @@ def test_runtime_and_published_schema_reject_invalid_facts(mutation):
     ],
 )
 def test_real_surfaces_and_snapshot_preserve_authors_and_candidates(
-    monkeypatch, tmp_path, capsys, current, half, tool
-):
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    current: int | None,
+    half: str | None,
+    tool: str,
+) -> None:
     req = inputs(current, half)
     if tool == "assess":
         req = {"methods": ["xuankong_natal"], "xuankong": req}
+    else:
+        pass
     spec = next(s for s in CATALOG if s.key == "fengshui_" + tool)
     http = rest_client(monkeypatch).post(spec.rest_path, json=req)
     assert http.status_code == 200, http.text
@@ -316,7 +329,7 @@ def test_real_surfaces_and_snapshot_preserve_authors_and_candidates(
     assert not protocol.is_error
     p = tmp_path / "lingzheng.json"
     p.write_text(json.dumps(req))
-    assert run(["fengshui_" + tool, "--request-file", str(p)]) == 0
+    assert run([SPECS[tool].tool_name, "--request-file", str(p)]) == 0
     cli = json.loads(capsys.readouterr().out)
     assert (
         without_transport(http.json())
@@ -327,16 +340,22 @@ def test_real_surfaces_and_snapshot_preserve_authors_and_candidates(
     result = cli["layers"]["xuankong_natal"]["interpretation"][
         "fixed_lingzheng_analysis"
     ]
-    assert len(result["ruleset"]["sources"]) == 3
-    assert result["ruleset"]["sources"][0]["author"] == "沈竹礽正文"
-    assert any(r["ruleset_id"] == "shen_fixed_lingzheng_v1" for r in cli["rulesets"])
+    assert result["ruleset"]["source_ids"] == ["SFL1", "SFL2", "SFL3"]
+    assert cli["source_catalog"]["SFL1"]["author"] == "沈竹礽正文"
+    ruleset = next(
+        r for r in cli["rulesets"] if r["ruleset_id"] == "shen_fixed_lingzheng_v1"
+    )
+    assert set(ruleset["source_citations"]) == {"SFL1", "SFL2", "SFL3"}
     assert "固定地盘与山向飞星分别读取" in cli["snapshot_text"]
 
 
 @pytest.mark.parametrize("bad_fact", ["five_half_in_eight", "contradictory_water"])
 def test_invalid_site_facts_fail_consistently_on_all_surfaces(
-    monkeypatch, tmp_path, capsys, bad_fact
-):
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    bad_fact: str,
+) -> None:
     req = inputs()
     if bad_fact == "five_half_in_eight":
         req["interpretation"]["fixed_lingzheng"].update(
@@ -351,11 +370,11 @@ def test_invalid_site_facts_fail_consistently_on_all_surfaces(
                 evidence="同一方向明确无水",
             )
         ]
-    http = rest_client(monkeypatch).post("/api/fengshui/xuankong_natal", json=req)
+    http = rest_client(monkeypatch).post("/api/fengshui/xuankong-house-chart", json=req)
     protocol = asyncio.run(mcp_call("xuankong_natal", req))
     p = tmp_path / "invalid.json"
     p.write_text(json.dumps(req))
-    code = run(["fengshui_xuankong_natal", "--request-file", str(p)])
+    code = run(["fengshui_xuankong_house_chart", "--request-file", str(p)])
     cli = json.loads(capsys.readouterr().out)
     assert http.status_code == 422 and protocol.is_error and code != 0
     for result in (http.json(), protocol.structured_content, cli):

@@ -4,25 +4,24 @@ import json
 from copy import deepcopy
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Dict, List, cast
+from typing import Any, Dict, cast
 
+from fatebridge.core.fengshui.bazhai import placement_polarity
+from fatebridge.core.fengshui.models import AssessRequest
+from fatebridge.core.fengshui.surface import evaluate_surfaces, surface_provenance
+from fatebridge.core.fengshui.workstation_sources import disagreement, provenance
 from fatebridge.core.hexagram_relations import ELEMENT_CONTROLS, ELEMENT_GENERATES
-
-from .bazhai import placement_polarity
-from .models import AssessRequest
-from .surface import evaluate_surfaces, surface_provenance
-from .workstation_sources import disagreement, provenance
 
 
 @lru_cache(maxsize=1)
-def _bundle() -> Dict[str, Any]:
+def _bundle() -> dict[str, Any]:
     path = (
         Path(__file__).parents[2] / "data" / "fengshui" / "layout-supplements-v1.json"
     )
     return cast(Dict[str, Any], json.loads(path.read_text(encoding="utf-8")))
 
 
-def supplement_provenance(key: str) -> Dict[str, Any]:
+def supplement_provenance(key: str) -> dict[str, Any]:
     data = _bundle()
     rule = {"ruleset_id": key, **deepcopy(data["rulesets"][key])}
     rule["sources"] = [
@@ -32,22 +31,28 @@ def supplement_provenance(key: str) -> Dict[str, Any]:
     return rule
 
 
-def evaluate_forms(req: AssessRequest) -> Dict[str, Any]:
-    findings: List[Dict[str, Any]] = []
-    missing: List[str] = []
+def evaluate_forms(req: AssessRequest) -> dict[str, Any]:
+    findings: list[dict[str, Any]] = []
+    missing: list[str] = []
     for obs in req.form_observations:
         rear = obs.entrance_position in {"back", "back_left", "back_right"}
         checks = []
         for rule in _bundle()["form_rules"]:
             if obs.purpose not in rule["purposes"]:
                 continue
+            else:
+                pass
             key = rule["criterion"]
             value = getattr(obs, key)
             if rule.get("optional") and value is None:
                 continue
+            else:
+                pass
             matches = None if value is None else value == rule["expected"]
             if value is None:
                 missing.append(f"form_observations.{obs.object_id}.{key}")
+            else:
+                pass
             checks.append(
                 {
                     "criterion": key,
@@ -66,10 +71,14 @@ def evaluate_forms(req: AssessRequest) -> Dict[str, Any]:
             )
             if key == "sharp_corner_points_at_user":
                 checks[-1]["method_disagreements"] = [disagreement("corners")]
+            else:
+                pass
         if obs.observation_basis == "image_observed":
             missing.append(
                 f"form_observations.{obs.object_id}.user_or_measurement_confirmation"
             )
+        else:
+            pass
         if obs.purpose == "desk" and obs.window_position is not None:
             side = obs.window_position in {"left", "right"}
             checks.append(
@@ -98,6 +107,10 @@ def evaluate_forms(req: AssessRequest) -> Dict[str, Any]:
                 missing.append(
                     f"form_observations.{obs.object_id}.window_side_or_direct_front_relation"
                 )
+            else:
+                pass
+        else:
+            pass
         unknown = any(c["finding"] == "undetermined" for c in checks)
         finding = (
             "needs_confirmation"
@@ -137,6 +150,8 @@ def evaluate_forms(req: AssessRequest) -> Dict[str, Any]:
                         "required_for": "optional_action",
                     }
                 )
+            else:
+                pass
             mirrors.append(
                 {
                     "object": "镜面",
@@ -158,6 +173,8 @@ def evaluate_forms(req: AssessRequest) -> Dict[str, Any]:
                     "source_ids": ["F1"],
                 }
             )
+        else:
+            pass
         findings.append(
             {
                 **obs.model_dump(mode="json"),
@@ -192,18 +209,26 @@ def evaluate_forms(req: AssessRequest) -> Dict[str, Any]:
 def _effect(introduced: str, target: str) -> str:
     if introduced == target:
         return "same_element"
+    else:
+        pass
     if ELEMENT_GENERATES[introduced] == target:
         return "generates_target"
+    else:
+        pass
     if ELEMENT_GENERATES[target] == introduced:
         return "drains_target"
+    else:
+        pass
     if ELEMENT_CONTROLS[introduced] == target:
         return "controls_target"
+    else:
+        pass
     return "controlled_by_target"
 
 
 def _cross_scope_effects(
-    introduced: str, object_id: str, profiles: List[Dict[str, Any]]
-) -> List[Dict[str, Any]]:
+    introduced: str, object_id: str, profiles: list[dict[str, Any]]
+) -> list[dict[str, Any]]:
     return [
         {
             "method": p["method"],
@@ -225,10 +250,10 @@ def _cross_scope_effects(
 
 
 def evaluate_element_targets(
-    req: AssessRequest, profiles: List[Dict[str, Any]]
-) -> Dict[str, Any]:
-    plans: List[Dict[str, Any]] = []
-    missing: List[str] = []
+    req: AssessRequest, profiles: list[dict[str, Any]]
+) -> dict[str, Any]:
+    plans: list[dict[str, Any]] = []
+    missing: list[str] = []
     complete = True
     for request in req.element_adjustments:
         targets = [
@@ -253,6 +278,8 @@ def evaluate_element_targets(
                     "reason": "所选层/位置/作用域尚无可绑定的计算事实，不能生成物件候选",
                 }
             )
+        else:
+            pass
         for target in targets:
             identity = {
                 k: target[k]
@@ -290,6 +317,8 @@ def evaluate_element_targets(
                     }
                 )
                 continue
+            else:
+                pass
             if target["method"] == "bazhai":
                 expected = placement_polarity(target["purpose"], target["aspect"])
                 matches = target["star"]["polarity"] == expected
@@ -304,6 +333,10 @@ def evaluate_element_targets(
                         }
                     )
                     continue
+                else:
+                    pass
+            else:
+                pass
             introduced = (
                 target["draining_element"]
                 if request.goal == "drain"
@@ -315,6 +348,8 @@ def evaluate_element_targets(
                 missing.append(
                     f"element_adjustments.{request.request_id}.unambiguous_target_chart"
                 )
+            else:
+                pass
             plans.append(
                 {
                     **plan,
@@ -345,10 +380,12 @@ def evaluate_element_targets(
 
 
 def evaluate_annual_remedies(
-    req: AssessRequest, layers: Dict[str, Any], profiles: List[Dict[str, Any]]
-) -> Dict[str, Any]:
+    req: AssessRequest, layers: dict[str, Any], profiles: list[dict[str, Any]]
+) -> dict[str, Any]:
     if req.annual_remedy_ruleset_id is None:
         return {"status": "not_requested", "findings": [], "missing_inputs": []}
+    else:
+        pass
     annual = layers.get("annual_stars", {})
     year = annual.get("effective_year")
     policy = _bundle()["annual_remedies"]
@@ -358,6 +395,8 @@ def evaluate_annual_remedies(
             "findings": [],
             "missing_inputs": ["annual_stars.query_at_or_effective_year"],
         }
+    else:
+        pass
     if year != policy["effective_year"]:
         return {
             "status": "unsupported_year",
@@ -367,10 +406,14 @@ def evaluate_annual_remedies(
             "missing_inputs": [],
             "reason": "已登记作者规则只覆盖2026年；不把该年度物件规则外推到其他年份",
         }
-    findings: List[Dict[str, Any]] = []
-    missing: List[str] = []
+    else:
+        pass
+    findings: list[dict[str, Any]] = []
+    missing: list[str] = []
     if not req.placements:
         missing.append("annual_remedies.placements")
+    else:
+        pass
     for placement in req.placements:
         if placement.location_direction is None:
             missing.append(f"placements.{placement.object_id}.location_direction")
@@ -382,6 +425,8 @@ def evaluate_annual_remedies(
                 }
             )
             continue
+        else:
+            pass
         palace = annual["palaces"][placement.location_direction]
         matches = [
             r
@@ -398,6 +443,8 @@ def evaluate_annual_remedies(
                     "annual_star_number": palace["annual_star_number"],
                 }
             )
+        else:
+            pass
         for rule in matches:
             element = rule["introduced_element"]
             findings.append(
@@ -427,18 +474,24 @@ def evaluate_annual_remedies(
 
 
 def analyze_supplements(
-    req: AssessRequest, layers: Dict[str, Any], profiles: List[Dict[str, Any]]
-) -> Dict[str, Any]:
+    req: AssessRequest, layers: dict[str, Any], profiles: list[dict[str, Any]]
+) -> dict[str, Any]:
     forms = evaluate_forms(req)
     targets = evaluate_element_targets(req, profiles)
     annual = evaluate_annual_remedies(req, layers, profiles)
-    keys: List[str] = []
+    keys: list[str] = []
     if req.form_observations:
         keys.append(req.form_ruleset_id)
+    else:
+        pass
     if req.element_adjustments:
         keys.append(req.element_ruleset_id)
+    else:
+        pass
     if req.annual_remedy_ruleset_id is not None:
         keys.append(req.annual_remedy_ruleset_id)
+    else:
+        pass
     statuses = {
         "forms": forms["status"],
         "element_adjustments": targets["status"],
@@ -449,6 +502,8 @@ def analyze_supplements(
     if surface is not None:
         statuses["surfaces"] = surface["status"]
         extra["surface_analysis"] = surface
+    else:
+        pass
     corner_review = any(
         c["criterion"] == "sharp_corner_points_at_user"
         for f in forms["findings"]

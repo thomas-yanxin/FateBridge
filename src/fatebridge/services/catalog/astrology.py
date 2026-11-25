@@ -2,11 +2,15 @@
 
 from __future__ import annotations
 
-from typing import List
+from itertools import chain
 
 from fatebridge.application.bindings import lazy_service, raw_invoke
-from fatebridge.application.tool_spec import ToolSpec
-from fatebridge.core.output_human_design import HumanDesignOutput
+from fatebridge.application.domain_validators import (
+    validate_astro_chart_variant,
+    validate_chart_variant_roots,
+)
+from fatebridge.application.tool_spec import EvidenceViews, ServiceResult, ToolSpec
+from fatebridge.core.contracts.output_human_design import HumanDesignOutput
 from fatebridge.core.requests.astrology import (
     AstroChartPolyRequest,
     AstroChartRequest,
@@ -14,18 +18,90 @@ from fatebridge.core.requests.astrology import (
     AstroGuolaoRequest,
     AstroIndiaRequest,
     AstroRelativeFlatRequest,
-    AstroRelativeRequest,
     AstroSpecialtyRequest,
     AstroVimshottariRequest,
 )
 from fatebridge.core.requests.human_design import HumanDesignRequest
+from fatebridge.core.response_models import (
+    CHART_VARIANT_TOOL_KEYS,
+    required_output_fields_for,
+)
 from fatebridge.services.catalog.astro_bindings import (
     _astro_chart_bind,
     _astro_relative_flat_bind,
-    _astro_relative_rest_bind,
     calculate_core_chart_analysis,
     calculate_germany_chart_analysis,
 )
+
+_RELATIONSHIP_PRIMARY_FIELDS = {
+    "directional_synastry": {
+        "synastry_aspects",
+        "in_to_out_aspects",
+        "out_to_in_aspects",
+    },
+    "composite_chart": {"chart"},
+    "influence_chart_pair": {"inner", "outer"},
+    "timespace_chart": {"chart"},
+    "marks_chart_pair": {"marks_charts"},
+}
+
+
+def _compact_relationship(result: ServiceResult) -> ServiceResult:
+    primary_layer = result["relationship_profile"]["primary_layer"]
+    fields = {"relationship_profile", "summary", "run_metadata", "snapshot_text"}
+    fields.update(_RELATIONSHIP_PRIMARY_FIELDS[primary_layer])
+    view = {key: value for key, value in result.items() if key in fields}
+    planet_fields = {"id", "longitude", "latitude", "sign", "sign_zh", "house"}
+
+    def positions(chart: ServiceResult) -> ServiceResult:
+        return {
+            **chart,
+            "planets": [
+                {key: value for key, value in planet.items() if key in planet_fields}
+                for planet in chart["planets"]
+            ],
+        }
+
+    if primary_layer == "marks_chart_pair":
+        view["marks_charts"] = {
+            role: positions(chart) for role, chart in view["marks_charts"].items()
+        }
+    elif primary_layer == "influence_chart_pair":
+        for role in ("inner", "outer"):
+            view[role] = {**view[role], "chart": positions(view[role]["chart"])}
+    elif "chart" in view:
+        view["chart"] = positions(view["chart"])
+    else:
+        pass
+    return view
+
+
+def _relative_evidence_views(
+    views: EvidenceViews | None,
+) -> EvidenceViews | None:
+    if views is None:
+        return None
+    else:
+        pass
+    from fatebridge.core.astro.reference import (
+        RELATIVE_MODE_EXACT_ALIASES,
+        RELATIVE_MODE_FALLBACK_ALIASES,
+        RELATIVE_MODE_NUMERIC_MAP,
+    )
+
+    aliases: dict[str | int, str] = dict(
+        chain(
+            RELATIVE_MODE_FALLBACK_ALIASES.items(),
+            RELATIVE_MODE_EXACT_ALIASES.items(),
+            RELATIVE_MODE_NUMERIC_MAP.items(),
+        )
+    )
+    for name, card in views.items():
+        if "relative_mode" in card:
+            card["aliases"] = [a for a, target in aliases.items() if target == name]
+        else:
+            pass
+    return views
 
 
 def _chart_spec(
@@ -34,7 +110,6 @@ def _chart_spec(
     mcp_name: str,
     variant: str,
     label: str,
-    metadata_name: str,
 ) -> ToolSpec:
     return ToolSpec(
         key=key,
@@ -66,11 +141,11 @@ def _chart_spec(
         cpu_bound=True,
         rest_path=rest_path,
         mcp_name=mcp_name,
-        metadata_name=metadata_name,
+        output_validators=(validate_astro_chart_variant,),
     )
 
 
-SPECS: List[ToolSpec] = [
+SPECS: list[ToolSpec] = [
     ToolSpec(
         key="human_design",
         bind=raw_invoke(
@@ -104,7 +179,7 @@ SPECS: List[ToolSpec] = [
         operation_label_zh="人类图",
         family="astro",
         cpu_bound=True,
-        rest_path="/api/astro/human-design",
+        rest_path="/api/human-design/chart",
         mcp_name="human_design",
         include_snapshot_text=False,
     ),
@@ -115,46 +190,47 @@ SPECS: List[ToolSpec] = [
         summary=(
             "离线核心星盘：默认本命盘；可选 chart_variant 切换盘式"
             "（chart13=13等分扇区 / hellen_chart=希腊 / guolao_chart=果老星宗 / "
-            "india_chart=印度 / germany=德国盘引擎），等价于对应的 astro_chart13 等专用工具。"
+            "india_chart=印度 / germany=德国盘引擎），等价于对应的 thirteen_sector_chart 等专用工具。"
         ),
         operation_label_zh="星盘",
         family="astro",
         cpu_bound=True,
-        rest_path="/api/astro/chart",
-        mcp_name="astro_chart",
-        metadata_name="chart",
+        rest_path="/api/astrology/chart",
+        mcp_name="astrology_chart",
+        required_output_validator=validate_chart_variant_roots,
+        required_output_fields_by_variant={
+            variant: tuple(required_output_fields_for(owner))
+            for variant, owner in CHART_VARIANT_TOOL_KEYS.items()
+        },
+        output_validators=(validate_astro_chart_variant,),
     ),
     _chart_spec(
         "astro_chart13",
-        "/api/astro/chart13",
-        "astro_chart13",
+        "/api/astrology/thirteen-sector-chart",
+        "thirteen_sector_chart",
         "chart13",
         "13等分扇区盘",
-        "chart13",
     ),
     _chart_spec(
         "astro_hellen",
-        "/api/astro/hellen",
-        "astro_hellen_chart",
+        "/api/astrology/hellenistic-chart",
+        "hellenistic_chart",
         "hellen_chart",
         "希腊盘",
-        "astro_hellen_chart",
     ),
     _chart_spec(
         "astro_guolao",
-        "/api/astro/guolao",
-        "astro_guolao_chart",
+        "/api/astrology/guolao-chart",
+        "guolao_chart",
         "guolao_chart",
         "果老星宗盘",
-        "astro_guolao_chart",
     ),
     _chart_spec(
         "astro_india",
-        "/api/astro/india",
-        "astro_india_chart",
+        "/api/astrology/vedic-chart",
+        "vedic_chart",
         "india_chart",
         "印度盘",
-        "astro_india_chart",
     ),
     ToolSpec(
         key="astro_vimshottari",
@@ -166,8 +242,8 @@ SPECS: List[ToolSpec] = [
         operation_label_zh="印占 Vimshottari 分期",
         family="astro",
         cpu_bound=True,
-        rest_path="/api/astro/vimshottari",
-        mcp_name="astro_vimshottari",
+        rest_path="/api/astrology/vimshottari-dasha",
+        mcp_name="vimshottari_dasha",
     ),
     ToolSpec(
         key="astro_germany",
@@ -177,39 +253,21 @@ SPECS: List[ToolSpec] = [
         operation_label_zh="德国盘",
         family="astro",
         cpu_bound=True,
-        rest_path="/api/astro/germany",
-        mcp_name="astro_germany_chart",
-        metadata_name="germany",
-    ),
-    # The relative/合盘 tool is exposed as ONE logical tool through two request
-    # shapes: a nested inner/outer model on REST, and a flat inner_/outer_ model
-    # on MCP. They INTENTIONALLY share a single provenance name
-    # (``astro_relative_chart``) so downstream metrics/logs treat them as one
-    # tool regardless of surface — this parity is locked by
-    # tests/integration/test_api_alignment.py (both surfaces assert the same run_metadata
-    # tool_name). The ``metadata_name`` override on the REST spec is what aligns
-    # its provenance to the MCP name; do not split them without updating that test.
-    ToolSpec(
-        key="astro_relative",
-        bind=_astro_relative_rest_bind,
-        request_model=AstroRelativeRequest,
-        summary="关系／合盘：比较、影响、组合中点、三种Davison变体及双方Marks个人盘。附原生坐标、时间与方法来源；几何汇总分非概率。嵌套inner/outer，REST端，与astro_relative_chart同计算。",
-        operation_label_zh="关系星盘分析",
-        family="astro",
-        cpu_bound=True,
-        rest_path="/api/astro/relative",
-        mcp_name=None,
-        metadata_name="astro_relative_chart",
+        rest_path="/api/astrology/hamburg-midpoint-chart",
+        mcp_name="hamburg_midpoint_chart",
+        output_validators=(validate_astro_chart_variant,),
     ),
     ToolSpec(
         key="astro_relative_chart",
         bind=_astro_relative_flat_bind,
         request_model=AstroRelativeFlatRequest,
-        summary="关系／合盘：比较、影响、组合中点、三种Davison变体及双方Marks个人盘。附原生坐标、时间与方法来源；几何汇总分非概率。扁平inner_/outer_，MCP端，与astro_relative同计算。",
+        summary="关系／合盘：比较、影响、组合中点、三种Davison变体及双方Marks个人盘。请求使用 inner_ 和 outer_ 字段，返回原生坐标、时间与方法来源。",
         operation_label_zh="关系星盘分析",
         family="astro",
         cpu_bound=True,
-        rest_path=None,
-        mcp_name="astro_relative_chart",
+        rest_path="/api/astrology/relationship-chart",
+        mcp_name="relationship_chart",
+        evidence_views_builder=_relative_evidence_views,
+        compact_view=_compact_relationship,
     ),
 ]

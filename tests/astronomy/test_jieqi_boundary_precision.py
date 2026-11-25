@@ -38,14 +38,14 @@ def _pillars(year, month, day, hour, minute):
     return {key: value["stem"] + value["branch"] for key, value in four.items()}
 
 
-def test_year_pillar_uses_true_lichun_instant_not_civil_date():
+def test_year_pillar_uses_true_lichun_instant_not_civil_date() -> None:
     """1972-02-04 23:00：立春(02-05 01:20)之前，年柱必须是「辛亥」而非「壬子」。"""
     pillars = _pillars(1972, 2, 4, 23, 0)
     assert pillars["year"] == "辛亥"
     assert pillars["month"] == "辛丑"  # 立春前仍属丑月
 
 
-def test_month_pillar_uses_true_xiaoshu_instant_not_civil_date():
+def test_month_pillar_uses_true_xiaoshu_instant_not_civil_date() -> None:
     """1936-07-07 05:05：小暑(07-07 15:58)之前约 11 小时，月柱必须是午月「甲午」。"""
     pillars = _pillars(1936, 7, 7, 5, 5)
     assert pillars["month"] == "甲午"

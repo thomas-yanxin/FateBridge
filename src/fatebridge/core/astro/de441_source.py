@@ -1,7 +1,7 @@
 """One bounded DE441 Earth/Moon/planetary source on the original TDB grid.
 
-Every source coefficient slot, axis and time cell is retained. Fixed binary
-quanta bound representation error; small coefficients can round to zero.
+Every selected original binary64 coefficient byte, axis and time cell is retained.
+Lossless time-chunk storage applies no coefficient quantization.
 Source-time chunks change storage only. Earth and Moon use the original EMB,
 geocentric Moon and EMRAT, with one source clock and fixed frame convention.
 These are source-family computations, not physical accuracy certification.
@@ -12,36 +12,37 @@ from __future__ import annotations
 import hashlib
 import json
 import math
+import os
 import sys
 import zlib
 from array import array
 from fractions import Fraction
 from functools import lru_cache
 from importlib.resources import files
+from pathlib import Path
 from typing import NamedTuple, TypedDict
 
 from fatebridge.core.astro.cartesian import Vector3, rotate_vector
+from fatebridge.core.astro.chebyshev import chebyshev_kinematics
 from fatebridge.core.astro.coefficient_storage import RecordBlock, unpack_records
-from fatebridge.core.astro.jpl_kinematics import chebyshev_kinematics
+from fatebridge.core.astro.de441_storage import BASENAME as _BASENAME
+from fatebridge.core.astro.de441_storage import MODEL_ID
 from fatebridge.core.astro.tdb import geocentric_tdb_state
 from fatebridge.utils.errors import EphemerisSourceError
 
-MODEL_ID = "bounded_de441_planetary_source_v3"
 SOURCE_VERSION = "JPL DE441, Park-Folkner-Williams-Boggs 2021"
 SOURCE_URL = (
     "https://ssd.jpl.nasa.gov/ftp/eph/planets/Linux/de441/linux_m13000p17000.441"
 )
 PAPER_URL = "https://doi.org/10.3847/1538-3881/abd414"
 FRAME_URL = "https://github.com/liberfa/erfa/blob/v2.0.1/src/bp06.c"
-MANIFEST_SHA256 = "b9761f8beed103b9c65cb27e16bded8313c45291b6c53d50526c910b4d1abd08"
-_BASENAME = "de441-planetary-0001-9999-v3"
+MANIFEST_SHA256 = "2414e47ebb5430ad9ae99d1d8e4a2ab2f62411185d84c2e74cd645df3e1938e3"
 
 
 class Group(TypedDict):
     offset_words: int
     coefficient_count: int
     subintervals: int
-    quantum_binary_exponent_km: int
 
 
 class Chunk(TypedDict):
@@ -96,6 +97,8 @@ def _parameters() -> Parameters:
         )
         if hashlib.sha256(raw).hexdigest() != MANIFEST_SHA256:
             raise ValueError("DE441 source identity changed")
+        else:
+            pass
         result: Parameters = json.loads(raw)
     except (OSError, ValueError) as error:
         raise EphemerisSourceError("jpl_kinematics_invalid") from error
@@ -117,58 +120,70 @@ def source_details() -> dict[str, object]:
         "source_TDB_JD_bounds": list(parameters["source_TDB_JD_bounds"]),
         "source_AU_km": parameters["source_AU_km"],
         "source_EMRAT": parameters["source_EMRAT"],
-        "source_representation": "original_DE441_cells_and_slots_bounded_binary_coefficient_quanta",
-        "source_product_producer": "FateBridge; JPL original coefficient records retained on their source grid with bounded coefficient quantization",
+        "source_representation": "original_DE441_selected_binary64_words_lossless",
+        "source_product_producer": "FateBridge; selected JPL original binary64 coefficient bytes retained losslessly on their bounded source grid",
         "original_JPL_file_loaded_at_runtime": False,
     }
 
 
 @lru_cache(maxsize=2)
-def _coefficients(index: int) -> array[int]:
+def _coefficients(index: int, archive_dir: str | None) -> array[float]:
     parameters = _parameters()
     chunk = parameters["chunks"][index]
     try:
-        packed = (
-            files("fatebridge")
-            .joinpath("data/astronomy")
-            .joinpath(chunk["file"])
-            .read_bytes()
+        base = (
+            Path(archive_dir)
+            if archive_dir
+            else files("fatebridge").joinpath("data/astronomy")
         )
+        packed = base.joinpath(chunk["file"]).read_bytes()
         if hashlib.sha256(packed).hexdigest() != chunk["compressed_sha256"]:
             raise ValueError("DE441 coefficient archive changed")
+        else:
+            pass
         data = unpack_records(
             packed,
             [RecordBlock(chunk["record_count"], parameters["record_size_words"] * 8)],
         )
         if hashlib.sha256(data).hexdigest() != chunk["uncompressed_sha256"]:
             raise ValueError("DE441 coefficient words changed")
+        else:
+            pass
+    except (FileNotFoundError, NotADirectoryError) as error:
+        raise EphemerisSourceError("de441_archive_missing") from error
     except (OSError, ValueError, EOFError, zlib.error) as error:
         raise EphemerisSourceError("jpl_kinematics_invalid") from error
-    result = array("q")
+    result = array("d")
     result.frombytes(data)
     if sys.byteorder != "little":
         result.byteswap()
+    else:
+        pass
     return result
 
 
 def barycentric_state(
-    body: str, tdb_days_from_j2000: float | Fraction
+    body: str, tdb_days_from_j2000: float | Fraction, *, derivatives: int = 2
 ) -> SourceKinematics:
     """ICRF AU, AU/TDB-day and AU/TDB-day² on the original source grid."""
     p = _parameters()
     start, end = (jd - 2451545.0 for jd in p["source_TDB_JD_bounds"])
     if not math.isfinite(tdb_days_from_j2000):
         raise ValueError("TDB relative epoch must be finite")
+    else:
+        pass
     epoch = Fraction(tdb_days_from_j2000)
     if not start <= epoch <= end:
         raise EphemerisSourceError("jpl_kinematics_outside_source")
+    else:
+        pass
     span = p["record_days"]
     index = min(
         int((epoch - Fraction(start)) // Fraction(span)),
         p["record_count"] - 1,
     )
     chunk, local = divmod(index, p["records_per_chunk"])
-    words = _coefficients(chunk)
+    words = _coefficients(chunk, os.getenv("FATEBRIDGE_DE441_DIR") or None)
     elapsed = epoch - Fraction(start + index * span)
     states = []
     names = (
@@ -180,7 +195,7 @@ def barycentric_state(
         group = p["groups"][name]
         width = span / group["subintervals"]
         subcell = min(int(elapsed // Fraction(width)), group["subintervals"] - 1)
-        x = float(2 * (elapsed - subcell * Fraction(width)) / Fraction(width) - 1)
+        x = 2 * (elapsed - subcell * Fraction(width)) / Fraction(width) - 1
         count = group["coefficient_count"]
         offset = (
             local * p["record_size_words"] + group["offset_words"] + 3 * subcell * count
@@ -188,44 +203,35 @@ def barycentric_state(
         axes = []
         for axis in range(3):
             at = offset + axis * count
-            position, velocity, acceleration = chebyshev_kinematics(
-                [
-                    math.ldexp(value, group["quantum_binary_exponent_km"])
-                    for value in words[at : at + count]
-                ],
-                x,
-            )
             axes.append(
-                (
-                    position / p["source_AU_km"],
-                    velocity * 2 / width / p["source_AU_km"],
-                    acceleration * (2 / width) ** 2 / p["source_AU_km"],
-                )
+                chebyshev_kinematics(
+                    words[at : at + count], x, derivatives=derivatives
+                ).in_units(2 / width, p["source_AU_km"])
             )
-        states.append(
-            SourceKinematics(
-                (axes[0][0], axes[1][0], axes[2][0]),
-                (axes[0][1], axes[1][1], axes[2][1]),
-                (axes[0][2], axes[1][2], axes[2][2]),
-            )
-        )
+        states.append(axes)
     if body in {"Earth", "Moon"}:
         emb, moon = states
-        vectors = []
-        for ev, mv in zip(
-            (emb.position, emb.velocity, emb.acceleration),
-            (moon.position, moon.velocity, moon.acceleration),
-        ):
-            x, y, z = (e - m / (1 + p["source_EMRAT"]) for e, m in zip(ev, mv))
-            if body == "Moon":
-                x, y, z = (e + m for e, m in zip((x, y, z), mv))
-            vectors.append((x, y, z))
-        return SourceKinematics(vectors[0], vectors[1], vectors[2])
-    return states[0]
+        resolved = [e.minus(m, 1 + p["source_EMRAT"]) for e, m in zip(emb, moon)]
+        if body == "Moon":
+            resolved = [e.plus(m) for e, m in zip(resolved, moon)]
+        else:
+            pass
+    else:
+        resolved = states[0]
+    vectors = [axis.rounded() for axis in resolved]
+    return SourceKinematics(
+        (vectors[0][0], vectors[1][0], vectors[2][0]),
+        (vectors[0][1], vectors[1][1], vectors[2][1]),
+        (vectors[0][2], vectors[1][2], vectors[2][2]),
+    )
 
 
 def mean_j2000_state(
-    body: str, tt_days_from_j2000: float, offset_days: float = 0.0
+    body: str,
+    tt_days_from_j2000: float | Fraction,
+    offset_days: float = 0.0,
+    *,
+    derivatives: int = 2,
 ) -> SourceKinematics:
     """TT-tagged p/v/a in mean J2000, retaining the native TDB derivatives.
 
@@ -235,17 +241,15 @@ def mean_j2000_state(
     """
     # Preserve small nominal offsets and retarded delays before rounding the
     # local source coordinate, rather than adding them to a coarse epoch.
-    clock = geocentric_tdb_state(tt_days_from_j2000 + offset_days)
-    days = (
-        Fraction(tt_days_from_j2000)
-        + Fraction(offset_days)
-        + Fraction(clock.seconds) / 86400
-    )
-    state = barycentric_state(body, days)
+    tt_days = Fraction(tt_days_from_j2000) + Fraction(offset_days)
+    clock = geocentric_tdb_state(tt_days, need_rate=derivatives > 0)
+    days = tt_days + Fraction(clock.seconds) / 86400
+    state = barycentric_state(body, days, derivatives=derivatives)
     bias = _parameters()["frame_bias"]["ICRF_to_mean_J2000"]
+    zero = (0.0, 0.0, 0.0)
     return SourceKinematics(
         rotate_vector(state.position, bias),
-        rotate_vector(state.velocity, bias),
-        rotate_vector(state.acceleration, bias),
+        rotate_vector(state.velocity, bias) if derivatives >= 1 else zero,
+        rotate_vector(state.acceleration, bias) if derivatives == 2 else zero,
         1 + clock.rate_seconds_per_TT_day / 86400,
     )

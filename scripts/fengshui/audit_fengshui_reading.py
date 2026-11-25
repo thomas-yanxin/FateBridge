@@ -1,10 +1,20 @@
 """Verify a fixed Feng Shui reading using a separately retained original result."""
 
+import sys as _sys
+from pathlib import Path as _Path
+
+_VAL_REPO_ROOT = _Path(__file__).resolve().parents[2]
+if str(_VAL_REPO_ROOT) not in _sys.path:
+    _sys.path.insert(0, str(_VAL_REPO_ROOT))
+else:
+    pass
+
+
 import argparse
 import json
 from pathlib import Path
 
-from fatebridge.validation.fengshui_reading import verify_fengshui_reading
+from validation.fengshui_reading import verify_fengshui_reading
 
 
 def main() -> int:
@@ -18,11 +28,17 @@ def main() -> int:
         receipt = json.loads(args.trusted_payload.read_text(encoding="utf-8"))
         if not isinstance(payload, dict) or not isinstance(receipt, dict):
             raise ValueError("输入须为JSON对象")
+        else:
+            pass
         if "run_metadata" not in payload and isinstance(payload.get("payload"), dict):
             payload = payload["payload"]
+        else:
+            pass
         receipt = receipt.get("payload", receipt)
         if not isinstance(receipt, dict):
             raise ValueError("可信回执须为完整原结果对象")
+        else:
+            pass
     except (OSError, ValueError) as exc:
         parser.error(str(exc))
     report = verify_fengshui_reading(payload, trusted_payload=receipt)
@@ -36,3 +52,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

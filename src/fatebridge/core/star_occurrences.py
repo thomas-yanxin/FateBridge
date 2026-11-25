@@ -15,6 +15,8 @@ def build_star_occurrences(
             if entry["location"] == "天干":
                 if entry["pillar"] == "day":
                     raise ValueError("被评日干不能混入支持星的实数")
+                else:
+                    pass
                 visible += 1
             elif entry["location"] == "地支藏干":
                 hidden += 1

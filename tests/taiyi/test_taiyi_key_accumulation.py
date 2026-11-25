@@ -157,6 +157,8 @@ def test_eight_complete_failed_cohorts_and_unknowns_survive(
                 d["ordinal_exists"] is None and d["actual_day_ganzhi"] is None
                 for d in s["source_days"]
             )
+        else:
+            pass
     assert not report["any_series_matches_full_observed_year"]
     assert not report["whole_goal_complete"]
     assert not report["wang_and_key_absolute_epoch_identity_adjudicated"]
@@ -208,5 +210,7 @@ def test_cannot_make_source_pass_by_changing_an_intermediate(
         freeze = json.loads((corpus / "freeze.json").read_text())
         freeze["files"]["readings.json"] = hashlib.sha256(path.read_bytes()).hexdigest()
         (corpus / "freeze.json").write_text(json.dumps(freeze))
+    else:
+        pass
     with pytest.raises(ValueError, match="V39"):
         verify_sources(corpus, root=ROOT)

@@ -29,6 +29,8 @@ def main() -> None:
     a = p.parse_args()
     if a.input.resolve() == a.output.resolve():
         p.error("output must not overwrite the sealed input")
+    else:
+        pass
     raw = a.input.read_bytes()
     assert hashlib.sha256(raw).hexdigest() == SOURCE_SHA256
     data = json.loads(raw)
@@ -85,3 +87,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+else:
+    pass

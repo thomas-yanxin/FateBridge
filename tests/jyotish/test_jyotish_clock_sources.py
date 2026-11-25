@@ -4,6 +4,7 @@ import copy
 import threading
 from collections import Counter
 from datetime import datetime
+from pathlib import Path
 
 import pytest
 
@@ -13,10 +14,13 @@ from fatebridge.core.astro.birth import build_astro_birth_info
 from fatebridge.core.astro.physical_sources import _file_digest
 from fatebridge.core.astro.solar_sources import SunSourceCohort
 from fatebridge.core.astro.source_session import current_source_session
-from fatebridge.core.jyotish import build_india
+from fatebridge.core.jyotish.jyotish import build_india
 from fatebridge.services import astrology, jyotish
 from fatebridge.utils.errors import EphemerisSourceError
-from tests.jyotish.test_jyotish_sources import data18, restore_runtime  # noqa: F401
+from tests.unit_test.fixtures.jyotish_sources import (  # noqa: F401
+    data18,
+    restore_runtime,
+)
 
 
 def subject(basis):
@@ -37,8 +41,8 @@ def subject(basis):
 
 @pytest.mark.parametrize("radius", [None, 0, 1])
 def test_existing_LAT_birth_cannot_silently_change_its_clock_source(
-    data18, tmp_path, radius
-):
+    data18, tmp_path: Path, radius: int | None
+) -> None:
     _, full = data18
     empty = tmp_path / "empty"
     empty.mkdir()
@@ -53,7 +57,9 @@ def test_existing_LAT_birth_cannot_silently_change_its_clock_source(
 
 @pytest.mark.parametrize("radius", [None, 0, 1])
 @pytest.mark.parametrize("model", ["empty", "full"])
-def test_unchanged_LAT_source_remains_valid(data18, tmp_path, radius, model):
+def test_unchanged_LAT_source_remains_valid(
+    data18, tmp_path: Path, radius: int | None, model: str
+) -> None:
     _, full = data18
     empty = tmp_path / "empty"
     empty.mkdir()
@@ -65,8 +71,8 @@ def test_unchanged_LAT_source_remains_valid(data18, tmp_path, radius, model):
 
 @pytest.mark.parametrize("radius", [None, 0, 1])
 def test_LMT_is_not_incorrectly_assigned_a_solar_position_dependency(
-    data18, tmp_path, radius
-):
+    data18, tmp_path: Path, radius: int | None
+) -> None:
     _, full = data18
     empty = tmp_path / "empty"
     empty.mkdir()
@@ -101,6 +107,8 @@ def arguments():
 def invoke(service):
     if service == "periods":
         return jyotish.calculate_vimshottari(**arguments(), analysis_year=2026)
+    else:
+        pass
     return astrology.calculate_core_chart_analysis(
         **arguments(), chart_variant="india_chart"
     )
@@ -109,8 +117,8 @@ def invoke(service):
 @pytest.mark.native_engine_fault
 @pytest.mark.parametrize("service", ["natal", "periods"])
 def test_writer_cannot_interleave_between_clock_resolution_and_native_build(
-    data18, tmp_path, monkeypatch, service
-):
+    data18, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, service: str
+) -> None:
     _, full = data18
     empty = tmp_path / "empty"
     empty.mkdir()
@@ -165,8 +173,8 @@ def test_writer_cannot_interleave_between_clock_resolution_and_native_build(
 @pytest.mark.native_engine_fault
 @pytest.mark.parametrize("service", ["natal", "periods"])
 def test_same_thread_configuration_mutation_returns_source_error(
-    data18, tmp_path, monkeypatch, service
-):
+    data18, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, service: str
+) -> None:
     _, full = data18
     empty = tmp_path / "empty"
     empty.mkdir()
@@ -195,8 +203,8 @@ def test_same_thread_configuration_mutation_returns_source_error(
 
 @pytest.mark.native_engine_fault
 def test_native_file_failure_after_clock_is_diagnosed_by_outer_endpoint_hash(
-    data18, monkeypatch
-):
+    data18, monkeypatch: pytest.MonkeyPatch
+) -> None:
     _, full = data18
     original = jyotish.build_astro_birth_info
 
@@ -218,8 +226,8 @@ def test_native_file_failure_after_clock_is_diagnosed_by_outer_endpoint_hash(
 
 @pytest.mark.native_engine_fault
 def test_clock_iteration_grid_and_replay_share_one_endpoint_verified_file_trace(
-    data18, monkeypatch
-):
+    data18, monkeypatch: pytest.MonkeyPatch
+) -> None:
     import fatebridge.core.astro.physical_sources as physical
 
     calls = []
@@ -229,20 +237,23 @@ def test_clock_iteration_grid_and_replay_share_one_endpoint_verified_file_trace(
         return _file_digest(path)
 
     monkeypatch.setattr(physical, "_file_digest", counted)
-    replay_calls = []
-    original = birth_clock.resolve_solar_birth_clock
+    solar_solves = []
+    original = birth_clock.resolve_solar_epoch
 
     def resolved(*args, **kwargs):
-        replay_calls.append(args[0])
+        solar_solves.append(args[0])
         return original(*args, **kwargs)
 
-    monkeypatch.setattr(birth_clock, "resolve_solar_birth_clock", resolved)
+    from fatebridge.core.jyotish import jyotish_clock
+
+    monkeypatch.setattr(birth_clock, "resolve_solar_epoch", resolved)
+    monkeypatch.setattr(jyotish_clock, "resolve_solar_epoch", resolved)
     result = invoke("periods")
     assert "error" not in result, result
     assert Counter(calls) == {"sepl_18.se1": 2, "semo_18.se1": 2}
     # One original, one nominal replay and two interval endpoints, not a
     # complete clock inversion for every native sample.
-    assert len(replay_calls) == 4
+    assert len(solar_solves) == 4
     grid = result["india"]["birth_time_sensitivity"]
     assert (
         len(grid["source_comparison"]["sample_source_indices"]) == grid["sample_count"]
@@ -253,7 +264,9 @@ def test_clock_iteration_grid_and_replay_share_one_endpoint_verified_file_trace(
     )
 
 
-def test_every_actual_LAT_sun_call_including_roundtrip_has_source_evidence(data18):
+def test_every_actual_LAT_sun_call_including_roundtrip_has_source_evidence(
+    data18,
+) -> None:
     birth = subject("local_apparent_solar")
     receipt = birth.clock_conversion
     sources = receipt["solar_source_comparison"]
@@ -273,7 +286,7 @@ def test_every_actual_LAT_sun_call_including_roundtrip_has_source_evidence(data1
 
 def test_legacy_identity_is_not_fabricated_and_old_library_is_not_silently_certified(
     data18,
-):
+) -> None:
     birth = subject("local_apparent_solar")
     birth.clock_conversion.pop("solar_source_comparison")
     result = build_india(birth, divisions=[])
@@ -287,8 +300,8 @@ def test_legacy_identity_is_not_fabricated_and_old_library_is_not_silently_certi
 
 
 def test_source_switch_smaller_than_numeric_tolerance_is_still_not_the_same_source(
-    data18, tmp_path
-):
+    data18, tmp_path: Path
+) -> None:
     _, full = data18
     empty = tmp_path / "empty"
     empty.mkdir()
@@ -316,8 +329,8 @@ def test_source_switch_smaller_than_numeric_tolerance_is_still_not_the_same_sour
 
 @pytest.mark.parametrize("predicate", ["edition", "hash"])
 def test_sun_context_comparison_handles_new_auxiliary_slots_without_rewriting_earlier_reads(
-    data18, predicate
-):
+    data18, predicate: str
+) -> None:
     original = subject("local_apparent_solar").clock_conversion[
         "solar_source_comparison"
     ]["physical_ephemeris_sources"][0]
@@ -341,7 +354,9 @@ def test_sun_context_comparison_handles_new_auxiliary_slots_without_rewriting_ea
     )
 
 
-def test_non_indian_route_does_not_enter_the_indian_source_session(monkeypatch):
+def test_non_indian_route_does_not_enter_the_indian_source_session(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     observed = []
 
     def stopped(*args, **kwargs):

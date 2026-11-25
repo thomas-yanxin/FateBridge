@@ -8,10 +8,15 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.output_timing import DayunBirthEventAnalysis
+import fatebridge.services.dayun_birth_events as events
+from fatebridge.core.contracts.output_timing import DayunBirthEventAnalysis
 from fatebridge.core.timing import TimingAnalysis
+from fatebridge.services.timing_snapshots import _birth_range_snapshot_lines
 from fatebridge.services.timing_uncertainty import analyze_birth_time_range
 from fatebridge.utils.birth_input import PersonInfo
+from tests.unit_test.fixtures.dayun_future_gap_reference import (
+    INITIAL_BOUNDARY_CONTROLS,
+)
 
 ROOT = Path(__file__).resolve().parents[2]
 STUDY = ROOT / "tests/data/bazi/dayun-clipping"
@@ -68,7 +73,7 @@ for zone in (
 
 
 @pytest.mark.parametrize("row", SELECTED, ids=lambda r: r["id"])
-def test_frozen_witness_states_and_matching_event_are_retained(row):
+def test_frozen_witness_states_and_matching_event_are_retained(row) -> None:
     person = PersonInfo(**row["input"])
     before = person.model_dump()
     result = analyze_birth_time_range(
@@ -101,11 +106,13 @@ def test_frozen_witness_states_and_matching_event_are_retained(row):
             abs((datetime.fromisoformat(r["at_utc"]) - expected).total_seconds()) <= 0.1
             for r in events
         )
+    else:
+        pass
     assert result["sample_count"] == 3
     assert person.model_dump() == before
 
 
-def test_full_gregorian_cycle_matches_the_independent_calendar_projection():
+def test_full_gregorian_cycle_matches_the_independent_calendar_projection() -> None:
     for row in DATA["calendar_cycle_rows"]:
         wall = datetime(row["year"], 2, 29)
         birth = datetime(1880, 1, 1, tzinfo=timezone.utc)
@@ -117,7 +124,7 @@ def test_full_gregorian_cycle_matches_the_independent_calendar_projection():
     assert len(DATA["calendar_cycle_rows"]) == 1261
 
 
-def test_source_full_scope_retains_all_unknowns_and_negative_controls():
+def test_source_full_scope_retains_all_unknowns_and_negative_controls() -> None:
     assert len(DATA["rows"]) == 11986 and len(FOLDS["rows"]) == 22649
     assert DATA["counts"] == {
         "resolved_source_control": 6981,
@@ -134,11 +141,11 @@ def test_source_full_scope_retains_all_unknowns_and_negative_controls():
     )
 
 
-def test_analysis_bracket_does_not_split_a_valid_future_gap_inverse(monkeypatch):
-    import fatebridge.services.dayun_birth_events as events
-    from tests.bazi.test_bazi_dayun_future_gaps import INITIAL
+def test_analysis_bracket_does_not_split_a_valid_future_gap_inverse(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
 
-    row = INITIAL[0]
+    row = INITIAL_BOUNDARY_CONTROLS[0]
     person = PersonInfo(**row["input"])
     analysis = datetime.fromisoformat(row["analysis_at"])
     first = analyze_birth_time_range(person, 1, analysis_moment=analysis)
@@ -164,6 +171,74 @@ def test_analysis_bracket_does_not_split_a_valid_future_gap_inverse(monkeypatch)
 
 
 @pytest.mark.parametrize(
+    "minutes,analysis_at,expected",
+    [
+        (
+            0,
+            "1993-02-24T04:47:06.968635+00:00",
+            ("1984-08-01T15:00:00+00:00", "1984-08-01T15:00:00+00:00"),
+        ),
+        (
+            1,
+            "1993-02-24T06:48:06.968634+00:00",
+            ("1984-08-01T15:00:59.999999+00:00", "1984-08-01T15:01:00+00:00"),
+        ),
+    ],
+)
+def test_analysis_inverse_includes_closed_birth_range_endpoint(
+    minutes: int, analysis_at: str, expected
+) -> None:
+    person = PersonInfo(
+        name="Closed birth range control",
+        gender="女",
+        birth_year=1984,
+        birth_month=8,
+        birth_day=1,
+        birth_hour=12,
+        birth_minute=0,
+        birth_second=0,
+        birth_timezone="America/Recife",
+        birth_utc_offset="-03:00",
+        use_true_solar_time=False,
+    )
+    result = analyze_birth_time_range(
+        person, minutes, analysis_moment=datetime.fromisoformat(analysis_at)
+    )
+    assert [
+        (event["lower_utc"], event["upper_utc"])
+        for event in result["dayun_event_analysis"]["events"]
+        if event["kind"] == "dayun_analysis_moment"
+    ] == [expected]
+
+
+def test_analysis_inverse_includes_the_forward_shifted_gap_label() -> None:
+    person = PersonInfo(
+        name="Civil gap inverse control",
+        gender="女",
+        birth_year=1984,
+        birth_month=7,
+        birth_day=9,
+        birth_hour=4,
+        birth_minute=16,
+        birth_second=0,
+        birth_timezone="America/New_York",
+        birth_utc_offset="-04:00",
+        use_true_solar_time=False,
+    )
+    result = analyze_birth_time_range(
+        person, 1, analysis_moment=datetime(1985, 4, 28, 7, 30, tzinfo=timezone.utc)
+    )
+    assert [
+        (event["lower_utc"], event["upper_utc"])
+        for event in result["dayun_event_analysis"]["events"]
+        if event["kind"] == "dayun_analysis_moment"
+    ] == [
+        ("1984-07-09T08:16:13.330837+00:00", "1984-07-09T08:16:13.330838+00:00"),
+        ("1984-07-09T08:16:43.082903+00:00", "1984-07-09T08:16:43.082904+00:00"),
+    ]
+
+
+@pytest.mark.parametrize(
     "kind,label",
     [
         ("dayun_analysis_moment", "分析时刻逆像"),
@@ -171,8 +246,9 @@ def test_analysis_bracket_does_not_split_a_valid_future_gap_inverse(monkeypatch)
         ("dayun_future_civil_fold_end", "未来回拨结束"),
     ],
 )
-def test_snapshot_names_only_additional_events_actually_returned(kind, label):
-    from fatebridge.services.timing_snapshots import _birth_range_snapshot_lines
+def test_snapshot_names_only_additional_events_actually_returned(
+    kind: str, label: str
+) -> None:
 
     data = {
         "uncertainty_minutes": 1,

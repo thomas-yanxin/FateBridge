@@ -5,15 +5,14 @@ model prose, or turn a selected presence condition into a fortune verdict.
 """
 
 from copy import deepcopy
-from typing import Any, Dict, List
+from typing import Any
 
+from fatebridge.core.fengshui.host_guest import statements as host_guest_statements
+from fatebridge.core.fengshui.host_guest import validate as validate_host_guest
+from fatebridge.core.fengshui.mutual_geometry import validate_author_geometries
+from fatebridge.core.fengshui.opposite import OPPOSITE
+from fatebridge.core.fengshui.source_comparison import comparison_statements
 from fatebridge.utils.errors import FengshuiCalculationError
-
-from .host_guest import statements as host_guest_statements
-from .host_guest import validate as validate_host_guest
-from .mutual_geometry import validate_author_geometries
-from .opposite import OPPOSITE
-from .source_comparison import comparison_statements
 
 FORMAT = "fengshui_natal_calculation_reading_v1"
 READING_VERSION = "1.2.0"
@@ -54,7 +53,7 @@ PRESENCE = {
 }
 
 
-def _get(payload: Dict[str, Any], path: str) -> Any:
+def _get(payload: dict[str, Any], path: str) -> Any:
     value: Any = payload
     for key in path.split("."):
         value = value[int(key)] if isinstance(value, list) else value[key]
@@ -64,22 +63,32 @@ def _get(payload: Dict[str, Any], path: str) -> Any:
 def _boolean(value: object) -> str:
     if value is True:
         return "符合"
+    else:
+        pass
     if value is False:
         return "不符合"
+    else:
+        pass
     if value is None:
         return "尚未确认"
+    else:
+        pass
     raise ValueError("不支持非布尔条件")
 
 
 def _period(value: object) -> str:
     if value is None:
         return "未确认"
+    else:
+        pass
     if type(value) is not int or value not in range(1, 10):
         raise ValueError("不支持的运数")
+    else:
+        pass
     return f"{value}运"
 
 
-def _condition_text(condition: Dict[str, Any]) -> str:
+def _condition_text(condition: dict[str, Any]) -> str:
     text = PRESENCE[condition["status"]]
     labels = {
         "high_solid_terrain_present": "高实",
@@ -90,10 +99,16 @@ def _condition_text(condition: Dict[str, Any]) -> str:
     def observed(value: object) -> str:
         if value is True:
             return "存在"
+        else:
+            pass
         if value is False:
             return "不存在"
+        else:
+            pass
         if value is None:
             return "未确认"
+        else:
+            pass
         raise ValueError("不支持的观察值")
 
     if "observed" in condition and condition["status"] != "not_applicable_center":
@@ -103,16 +118,20 @@ def _condition_text(condition: Dict[str, Any]) -> str:
             if isinstance(facts, dict)
             else observed(facts)
         )
+    else:
+        pass
     for name, label in (
         ("raw_condition_match", "本候选存在条件运算"),
         ("raw_pattern_match", "原始水形运算"),
     ):
         if name in condition:
             text += f"；{label}{_boolean(condition[name])}，不替代观察或适用性的确认"
+        else:
+            pass
     return text
 
 
-def _numeric_statements(chart: Dict[str, Any]) -> List[tuple[str, str, str]]:
+def _numeric_statements(chart: dict[str, Any]) -> list[tuple[str, str, str]]:
     """Describe returned relations, without recomputing or extending the rules."""
     statements = []
     structure = chart["structure"]
@@ -129,6 +148,8 @@ def _numeric_statements(chart: Dict[str, Any]) -> List[tuple[str, str, str]]:
         or (set(patterns["ground_comparison"]["reference_numbers"]) != directions)
     ):
         raise ValueError("固定数式释义需要完整三对、九宫和两侧参照")
+    else:
+        pass
     roles = {"period": "历史运星", "mountain": "山星", "facing": "向星"}
     for index, pair in enumerate(structure["combination_of_ten"]):
         left, right = (pair["left_role"], pair["right_role"])
@@ -174,6 +195,8 @@ def _numeric_statements(chart: Dict[str, Any]) -> List[tuple[str, str, str]]:
     named = patterns["volume_two_named_refrain"]
     if named["applicable"] is not (chart["chart_mode"] == "lower"):
         raise ValueError("下卦局名适用范围与候选模式不一致")
+    else:
+        pass
     if named["applicable"]:
         label = (
             f"卷二所列下卦反伏局名的有限数字对应：{_boolean(named['numeric_match'])}"
@@ -181,6 +204,8 @@ def _numeric_statements(chart: Dict[str, Any]) -> List[tuple[str, str, str]]:
     else:
         if named["numeric_match"] is not None:
             raise ValueError("替卦不能冒用下卦名单的布尔结论")
+        else:
+            pass
         label = (
             "替卦不适用此段下卦局名名单，对应状态未判定；未判定不等于数式不存在或不利"
         )
@@ -203,18 +228,22 @@ def _numeric_statements(chart: Dict[str, Any]) -> List[tuple[str, str, str]]:
     return statements
 
 
-def _opposite_statements(chart: Dict[str, Any]) -> List[tuple[str, str, str]]:
+def _opposite_statements(chart: dict[str, Any]) -> list[tuple[str, str, str]]:
     comparison = chart["structure"]["classical_patterns"]["opposite_star_comparison"]
     root = "structure.classical_patterns.opposite_star_comparison"
     directions = {"N", "NE", "E", "SE", "S", "SW", "W", "NW"}
     if set(comparison["pairs"]) != directions or comparison["spatial_pair_count"] != 8:
         raise ValueError("对宫释义须保留八个有向配对，不能只取四轴或中宫")
+    else:
+        pass
     center = comparison["center_numeric_pair"]
     if (
         center["spatial_opposite_exists"] is not False
         or center["included_in_spatial_conjunction"] is not False
     ):
         raise ValueError("中宫不能充当空间对宫或混入八宫合取")
+    else:
+        pass
     statements = [
         (
             "opposite_star_summary",
@@ -228,6 +257,8 @@ def _opposite_statements(chart: Dict[str, Any]) -> List[tuple[str, str, str]]:
             or pair["facing_direction"] != OPPOSITE[direction]
         ):
             raise ValueError("对宫配对的目标或参照宫不完整")
+        else:
+            pass
         statements.append(
             (
                 "opposite_star_pair",
@@ -238,22 +269,24 @@ def _opposite_statements(chart: Dict[str, Any]) -> List[tuple[str, str, str]]:
     return statements
 
 
-def build_natal_reading(payload: Dict[str, Any]) -> Dict[str, Any]:
+def build_natal_reading(payload: dict[str, Any]) -> dict[str, Any]:
     """Read every natal candidate and requested sublayer; never select the best.
 
     All field quotations are separate from the generated prose. A verifier can
     compare both against the full original response and a trusted receipt.
     """
-    basis: Dict[str, Any] = {}
-    statements: List[Dict[str, Any]] = []
+    basis: dict[str, Any] = {}
+    statements: list[dict[str, Any]] = []
 
     def quote(path: str) -> str:
         if path not in basis:
             basis[path] = deepcopy(_get(payload, path))
+        else:
+            pass
         return path
 
     def add(
-        kind: str, text: str, paths: List[str], target_path: str | None = None
+        kind: str, text: str, paths: list[str], target_path: str | None = None
     ) -> None:
         target = target_path or paths[0]
         statements.append(
@@ -272,9 +305,11 @@ def build_natal_reading(payload: Dict[str, Any]) -> Dict[str, Any]:
         natal = _get(payload, root)
         registered = {r["ruleset_id"]: r for r in payload["rulesets"]}
 
-        def require(key: str, record: Dict[str, Any] | None = None) -> None:
+        def require(key: str, record: dict[str, Any] | None = None) -> None:
             if registered[key]["version"] != VERSIONS[key]:
                 raise ValueError("未支持的规则版本")
+            else:
+                pass
             if record is not None and any(
                 (
                     record.get(field) != registered[key].get(field)
@@ -282,6 +317,8 @@ def build_natal_reading(payload: Dict[str, Any]) -> Dict[str, Any]:
                 )
             ):
                 raise ValueError("分支规则与来源登记不一致")
+            else:
+                pass
 
         require("xuankong_zhongzhou_v1", natal["ruleset"])
         comparison = natal.get("source_comparison")
@@ -289,21 +326,36 @@ def build_natal_reading(payload: Dict[str, Any]) -> Dict[str, Any]:
             comparison_profile = comparison["ruleset"]["ruleset_id"]
             if comparison_profile not in {"shen_2011_natal_numeric_comparison_v2"}:
                 raise ValueError("未支持的原书数字比较版本")
+            else:
+                pass
             require(comparison_profile, comparison["ruleset"])
             comparison_root = root + ".source_comparison"
-            for target, text in comparison_statements(comparison):
+            source_id = comparison["ruleset"]["source_ids"][0]
+            for target, text in comparison_statements(
+                comparison, payload["source_catalog"]
+            ):
                 paths = [
                     comparison_root + ".ruleset",
                     comparison_root + ".summary",
                     comparison_root + "." + target,
+                    f"source_catalog.{source_id}",
                 ]
                 if target.startswith("candidates."):
-                    paths.append(root + "." + target)
+                    if natal.get("candidates"):
+                        paths.append(root + "." + target)
+                    elif natal.get("chart") is not None:
+                        paths.append(root + ".chart")
+                    else:
+                        pass
+                else:
+                    pass
                 add("source_comparison", text, paths, comparison_root + "." + target)
+        else:
+            pass
         add(
             "sources",
-            "本释义仅解释已选择的玄空计算及其子层；来源、版本与作用域如下。不能据此认证原典全本、历法精度、完整现场或现实预测。",
-            ["rulesets"],
+            "玄空各层规则版本、书目及引用位置见计算记录。",
+            ["rulesets", "source_catalog"],
         )
         add(
             "natal_context",
@@ -328,29 +380,39 @@ def build_natal_reading(payload: Dict[str, Any]) -> Dict[str, Any]:
                 f"事件有效年候选为{years}；{conclusion}模型暂取年仅供追踪，不作为已确认事实。",
                 [root + ".period_context"],
             )
-        charts = natal.get("candidates", [])
+        else:
+            pass
+        has_candidates = bool(natal.get("candidates"))
+        charts = (
+            natal["candidates"]
+            if has_candidates
+            else ([natal["chart"]] if natal.get("chart") is not None else [])
+        )
         for index, chart in enumerate(charts):
+            chart_root = (
+                f"{root}.candidates.{index}" if has_candidates else f"{root}.chart"
+            )
             distribution = chart["structure"]["distribution"]
             qualifier = "待确认候选" if len(charts) > 1 else "本次计算候选"
             add(
                 "natal_distribution",
                 f"{qualifier}{chart['candidate_id']}，历史{_period(chart['period_number'])}：历史当运山星在{distribution['mountain_period_star_direction']}，向星在{distribution['facing_period_star_direction']}，数字结构为{distribution['traditional_label']}。这不是当前旺衰或现场吉凶。",
-                [f"{root}.candidates.{index}"],
+                [chart_root],
             )
             prefix = f"{qualifier}{chart['candidate_id']}，历史{_period(chart['period_number'])}、{ {'lower': '下卦', 'replacement': '替卦'}[chart['chart_mode']]}："
             for kind, target, text in _numeric_statements(chart):
                 add(
                     kind,
                     prefix + text,
-                    [f"{root}.candidates.{index}"],
-                    f"{root}.candidates.{index}.{target}",
+                    [chart_root],
+                    f"{chart_root}.{target}",
                 )
             for kind, target, text in _opposite_statements(chart):
                 add(
                     kind,
                     prefix + text,
-                    [f"{root}.candidates.{index}"],
-                    f"{root}.candidates.{index}.{target}",
+                    [chart_root],
+                    f"{chart_root}.{target}",
                 )
         if not charts:
             add(
@@ -358,6 +420,8 @@ def build_natal_reading(payload: Dict[str, Any]) -> Dict[str, Any]:
                 "尚无可解释的历史宅盘候选，不能补造星数或宫位；独立子层已返回的事实仍可分别解释。",
                 [root + ".missing_inputs"],
             )
+        else:
+            pass
         interpretation = natal.get("interpretation")
         if interpretation is not None:
             validate_author_geometries(
@@ -365,7 +429,7 @@ def build_natal_reading(payload: Dict[str, Any]) -> Dict[str, Any]:
                 natal,
                 current=interpretation["current_period_context"]["number"],
             )
-            validate_host_guest(interpretation, natal)
+            validate_host_guest(interpretation, natal, served_receipt=payload)
             require("xuankong_conditioned_v1")
             ir = root + ".interpretation"
             current = interpretation["current_period_context"]["number"]
@@ -388,6 +452,8 @@ def build_natal_reading(payload: Dict[str, Any]) -> Dict[str, Any]:
                     "王亭之基本旺生衰死表与先后天互用数字分别读取，互用不改基本标签，也不证明现场可用；原书所登记的未解决表文差异仍保留。",
                     [ir + ".timeliness_ruleset"],
                 )
+            else:
+                pass
             for ci, candidate in enumerate(interpretation["candidates"]):
                 for direction, palace in candidate["palaces"].items():
                     pair = palace["ordered_pair"]
@@ -404,6 +470,8 @@ def build_natal_reading(payload: Dict[str, Any]) -> Dict[str, Any]:
                                 else f"互用数字为{author['mutual_use_reference']['period_numbers']}"
                             )
                             text += f"王氏{label}基本时令为{author['traditional_label'] or '未定'}，术语仅指时令；{mutual}，本星成员条件{_boolean(author['mutual_use_reference']['numeric_membership'])}，仅为数字参考，不证明现场可用。"
+                        else:
+                            pass
                     add(
                         "natal_palace",
                         text,
@@ -447,6 +515,8 @@ def build_natal_reading(payload: Dict[str, Any]) -> Dict[str, Any]:
                                 ],
                                 f"{ir}.candidates.{ci}.palaces.{direction}.timeliness.{role}.author_classification.mutual_use_reference.geometry",
                             )
+                    else:
+                        pass
                 for pi, placement in enumerate(candidate["placement_findings"]):
                     purpose = {"bed": "床", "door": "门", "desk": "桌", "stove": "灶"}[
                         placement["purpose"]
@@ -481,7 +551,10 @@ def build_natal_reading(payload: Dict[str, Any]) -> Dict[str, Any]:
                     ],
                 )
                 for kind, target, text in host_guest_statements(host_guest):
-                    add(kind, text, [hr, root + ".candidates"], hr + "." + target)
+                    natal_basis = root + (".candidates" if has_candidates else ".chart")
+                    add(kind, text, [hr, natal_basis], hr + "." + target)
+            else:
+                pass
             fixed = interpretation.get("fixed_lingzheng_analysis")
             if fixed is not None:
                 require("shen_fixed_lingzheng_v1", fixed["ruleset"])
@@ -511,6 +584,8 @@ def build_natal_reading(payload: Dict[str, Any]) -> Dict[str, Any]:
                     for direction, palace in variant["palaces"].items():
                         if palace["role"] == "not_selected":
                             continue
+                        else:
+                            pass
                         label = {"zheng": "正神高实", "ling": "零神低洼河流"}[
                             palace["role"]
                         ]
@@ -524,6 +599,8 @@ def build_natal_reading(payload: Dict[str, Any]) -> Dict[str, Any]:
                                 chart_candidate or variant["candidate_only"]
                             ):
                                 raise ValueError("固定零正比较的候选上下文不一致")
+                            else:
+                                pass
                             comparison_qualifier = (
                                 "（宅盘与分段均为候选）"
                                 if chart_candidate and variant["candidate_only"]
@@ -548,6 +625,10 @@ def build_natal_reading(payload: Dict[str, Any]) -> Dict[str, Any]:
                             ],
                             f"{fr}.candidates.{vi}.palaces.{direction}",
                         )
+            else:
+                pass
+        else:
+            pass
         city = natal.get("city_gate_analysis")
         if city is not None:
             require("shen_city_gate_v1", city["ruleset"])
@@ -576,6 +657,8 @@ def build_natal_reading(payload: Dict[str, Any]) -> Dict[str, Any]:
                         [f"{cr}.candidates.{ci}", cr + ".reference_period_context"],
                         f"{cr}.candidates.{ci}.gates.{gi}",
                     )
+        else:
+            pass
         return {
             "format_id": FORMAT,
             "version": READING_VERSION,

@@ -51,7 +51,7 @@ def fixture():
     }
 
 
-def test_observed_cells_are_checked_without_awarding_professional_acceptance():
+def test_observed_cells_are_checked_without_awarding_professional_acceptance() -> None:
     plan, cohort = fixture()
     result = MODULE.check_observed_strata(plan, cohort)
     assert result["status"] == "observed_strata_and_input_links_matched"
@@ -60,7 +60,7 @@ def test_observed_cells_are_checked_without_awarding_professional_acceptance():
     assert not result["authority_certified"]
 
 
-def test_two_ids_and_a_complete_count_cannot_hide_one_repeated_observed_cell():
+def test_two_ids_and_a_complete_count_cannot_hide_one_repeated_observed_cell() -> None:
     plan, cohort = fixture()
     cohort["cases"][1]["columns"]["personality"][0] = "1.1"
     result = MODULE.check_observed_strata(plan, cohort)
@@ -76,7 +76,9 @@ def test_two_ids_and_a_complete_count_cannot_hide_one_repeated_observed_cell():
     "change",
     ["profile", "earth_line", "utc", "birth", "body_order", "invalid_activation"],
 )
-def test_contradictory_source_fields_are_rejected_without_dropping_rows(change):
+def test_contradictory_source_fields_are_rejected_without_dropping_rows(
+    change: str,
+) -> None:
     plan, cohort = fixture()
     row = cohort["cases"][0]
     if change == "profile":
@@ -97,7 +99,7 @@ def test_contradictory_source_fields_are_rejected_without_dropping_rows(change):
     assert result["cases"][0]["errors"]
 
 
-def test_partial_collection_cannot_claim_complete_by_editing_metadata():
+def test_partial_collection_cannot_claim_complete_by_editing_metadata() -> None:
     plan, cohort = fixture()
     cohort["cases"].pop()
     result = MODULE.check_observed_strata(plan, cohort)
@@ -106,7 +108,7 @@ def test_partial_collection_cannot_claim_complete_by_editing_metadata():
     assert not result["collection_metadata_consistent"]
 
 
-def test_duplicate_and_reordered_ids_remain_visible():
+def test_duplicate_and_reordered_ids_remain_visible() -> None:
     plan, cohort = fixture()
     cohort["cases"][1] = deepcopy(cohort["cases"][0])
     result = MODULE.check_observed_strata(plan, cohort)

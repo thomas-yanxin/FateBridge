@@ -2,6 +2,8 @@
 
 from datetime import date, datetime, timezone
 
+import pytest
+
 from fatebridge.core.aa1996_solar import MODEL_ID
 from fatebridge.core.fengshui import bazhai, xuankong
 from fatebridge.core.fengshui.models import HousePeriod, MingguaRequest
@@ -16,7 +18,9 @@ def resolution():
     }
 
 
-def test_calculated_period_guard_is_not_explained_as_approximate(monkeypatch):
+def test_calculated_period_guard_is_not_explained_as_approximate(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setattr(
         xuankong,
         "year_context",
@@ -51,7 +55,9 @@ def test_calculated_period_guard_is_not_explained_as_approximate(monkeypatch):
     )
 
 
-def test_date_only_guard_names_source_without_inventing_a_birth_hour(monkeypatch):
+def test_date_only_guard_names_source_without_inventing_a_birth_hour(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setattr(bazhai, "lichun_resolution", lambda *a: resolution())
     request = MingguaRequest(
         birth_date=date(2024, 2, 3), timezone_name="UTC", gender_convention="male"

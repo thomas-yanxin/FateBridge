@@ -6,7 +6,7 @@ mean ayanamsha from apparent tropical positions leaves nutation unremoved.
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.angle_definitions import (
@@ -25,23 +25,33 @@ from fatebridge.core.astro.native_coordinates import require_spherical_coordinat
 from fatebridge.core.astro.native_motion import require_longitude_speed
 from fatebridge.core.astro.physical_sources import PhysicalEphemerisTrace
 from fatebridge.core.astro.reference import PLANET_SWISSEPH_IDS
+from fatebridge.core.astro.tt_epoch import TTInstant
+from fatebridge.core.astro.ut1_epoch import UT1Instant
 
 
 def native_lahiri_positions(
-    planets: List[str],
+    planets: list[str],
     *,
     julian_day_ut1: float,
-    julian_day_tt: Optional[float],
-    lunar_adjustments: Optional[Dict[str, LunarAdjustment]] = None,
-    motion_metadata: Optional[Dict[str, Any]] = None,
-    source_trace: Optional[PhysicalEphemerisTrace] = None,
-) -> Dict[str, Dict[str, float]]:
+    julian_day_tt: float | TTInstant | None,
+    lunar_adjustments: dict[str, LunarAdjustment] | None = None,
+    motion_metadata: dict[str, Any] | None = None,
+    source_trace: PhysicalEphemerisTrace | None = None,
+) -> dict[str, dict[str, float]]:
     """Native zodiac coordinates/speeds; physical states remain for horizon."""
     if runtime.swe is None:
         raise ValueError("原生Lahiri黄道转换需要Swiss Ephemeris")
+    else:
+        pass
     operation = "calc" if julian_day_tt is not None else "calc_ut"
-    instant = julian_day_tt if julian_day_tt is not None else julian_day_ut1
-    result: Dict[str, Dict[str, float]] = {}
+    # Native states and their motion/source-window corrections share this
+    # actual SDK epoch, rather than a frame evaluated at an unrounded point.
+    instant = (
+        TTInstant.from_value(julian_day_tt).as_float()
+        if julian_day_tt is not None
+        else julian_day_ut1
+    )
+    result: dict[str, dict[str, float]] = {}
     trace = source_trace if source_trace is not None else PhysicalEphemerisTrace()
     with runtime.preserve_ephemeris_path():
         runtime.swe.set_sid_mode(runtime.swe.SIDM_LAHIRI, 0, 0)
@@ -66,7 +76,7 @@ def native_lahiri_positions(
                 "longitude_speed": longitude_speed,
             }
             motion_tt = (
-                julian_day_tt
+                instant
                 if julian_day_tt is not None
                 else julian_day_ut1
                 + float(
@@ -109,6 +119,10 @@ def native_lahiri_positions(
                     motion_metadata.setdefault("lunar_source_windows", {})[
                         "lahiri"
                     ] = policy
+                else:
+                    pass
+            else:
+                pass
             result[planet].update(
                 corrected_longitude_motion(
                     planet,
@@ -123,22 +137,30 @@ def native_lahiri_positions(
             )
         if source_trace is None:
             trace.finish()
+        else:
+            pass
     return result
 
 
 def native_lahiri_houses(
     *,
-    julian_day_ut1: float,
-    julian_day_tt: Optional[float],
+    julian_day_ut1: float | UT1Instant,
+    julian_day_tt: float | TTInstant | None,
     latitude: float,
     longitude: float,
     house_code: bytes,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Native sidereal cusps/angles and separately labelled true/mean offsets."""
     if runtime.swe is None:
         raise ValueError("原生Lahiri宫头计算需要Swiss Ephemeris")
+    else:
+        pass
     operation = "get_ayanamsa_ex" if julian_day_tt is not None else "get_ayanamsa_ex_ut"
-    instant = julian_day_tt if julian_day_tt is not None else julian_day_ut1
+    instant = (
+        TTInstant.from_value(julian_day_tt).as_float()
+        if julian_day_tt is not None
+        else UT1Instant.from_value(julian_day_ut1).as_float()
+    )
     with runtime.preserve_ephemeris_path():
         runtime.swe.set_sid_mode(runtime.swe.SIDM_LAHIRI, 0, 0)
         cusps, angles = runtime.ephemeris_call(
@@ -168,10 +190,13 @@ def native_lahiri_houses(
         )
         if flags < 0 or mean_flags < 0:
             raise ValueError("Lahiri偏移计算失败")
+        else:
+            pass
         definition = native_ecliptic_horizon_angle_definition(
             julian_day_ut1=julian_day_ut1,
             julian_day_tt=julian_day_tt,
             latitude=latitude,
+            longitude=longitude,
             armc=float(angles[2]),
         )
     return {

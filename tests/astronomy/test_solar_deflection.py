@@ -28,74 +28,68 @@ assert (
 assert len(SOLAR["rows"]) == len(PRECISE["rows"]) == 168
 
 
-@pytest.mark.parametrize("index", range(len(SOLAR["rows"])))
-def test_solar_formula_keeps_all_ERFA_inputs_and_gates_with_stronger_oracle(index):
+def test_solar_formula_keeps_all_ERFA_inputs_and_gates_with_stronger_oracle() -> None:
     # Eight original binary ERFA results miss this exact-parameter oracle at
     # their original 1e-13 line. Preserve them; require the stable formula to
     # satisfy the same line for every original input, without fitting ERFA's
     # cancellation error or claiming its binary rounding is reproduced.
-    row, reference = SOLAR["rows"][index], PRECISE["rows"][index]
-    assert reference["original_row_index"] == index
-    assert reference["absolute_component_gate"] == row["absolute_component_gate"]
-    actual = finite_source_solar_deflection(
-        CartesianState(tuple(row["ray"]), (0.0, 0.0, 0.0)),
-        CartesianState(tuple(row["observer"]), (0.0, 0.0, 0.0)),
-        CartesianState(tuple(row["sun_at_reception"]), (0.0, 0.0, 0.0)),
-        CartesianState(tuple(row["target_at_emission"]), (0.0, 0.0, 0.0)),
-        CartesianState(tuple(row["sun_at_emission"]), (0.0, 0.0, 0.0)),
-    )
-    distance = math.hypot(*row["ray"])
-    assert [value / distance for value in actual.position] == pytest.approx(
-        list(map(float, reference["high_precision_normalized"])),
-        rel=0,
-        abs=row["absolute_component_gate"],
-    )
+    for index in range(len(SOLAR["rows"])):
+        row, reference = SOLAR["rows"][index], PRECISE["rows"][index]
+        assert reference["original_row_index"] == index
+        assert reference["absolute_component_gate"] == row["absolute_component_gate"]
+        actual = finite_source_solar_deflection(
+            CartesianState(tuple(row["ray"]), (0.0, 0.0, 0.0)),
+            CartesianState(tuple(row["observer"]), (0.0, 0.0, 0.0)),
+            CartesianState(tuple(row["sun_at_reception"]), (0.0, 0.0, 0.0)),
+            CartesianState(tuple(row["target_at_emission"]), (0.0, 0.0, 0.0)),
+            CartesianState(tuple(row["sun_at_emission"]), (0.0, 0.0, 0.0)),
+        )
+        distance = math.hypot(*row["ray"])
+        assert [value / distance for value in actual.position] == pytest.approx(
+            list(map(float, reference["high_precision_normalized"])),
+            rel=0,
+            abs=row["absolute_component_gate"],
+        ), index
 
 
-@pytest.mark.parametrize("row", MOTION["rows"])
-def test_solar_motion_matches_independent_complex_step_in_every_mass_cell(row):
-    actual = finite_source_solar_deflection(
-        *(
-            CartesianState(
-                tuple(row["states"][name]["position"]),
-                tuple(row["states"][name]["velocity"]),
-            )
-            for name in (
-                "ray",
-                "observer",
-                "sun_at_reception",
-                "target_at_emission",
-                "sun_at_emission",
+def test_solar_motion_matches_independent_complex_step_in_every_mass_cell() -> None:
+    for row in MOTION["rows"]:
+        actual = finite_source_solar_deflection(
+            *(
+                CartesianState(
+                    tuple(row["states"][name]["position"]),
+                    tuple(row["states"][name]["velocity"]),
+                )
+                for name in (
+                    "ray",
+                    "observer",
+                    "sun_at_reception",
+                    "target_at_emission",
+                    "sun_at_emission",
+                )
             )
         )
-    )
-    assert actual.velocity is not None
-    assert actual.velocity == pytest.approx(
-        list(map(float, row["velocity_AU_per_TT_day"])),
-        rel=0,
-        abs=MOTION["gate_AU_per_TT_day"],
-    )
+        assert actual.velocity is not None
+        assert actual.velocity == pytest.approx(
+            list(map(float, row["velocity_AU_per_TT_day"])),
+            rel=0,
+            abs=MOTION["gate_AU_per_TT_day"],
+        ), row
 
 
-@pytest.mark.parametrize(
-    "radius",
-    [
-        row[0]
-        for row in solar_deflection._parameters()[
-            "mass_profile_radius_fraction_and_effective_mass"
-        ]
-    ],
-)
-def test_every_nonflat_mass_knot_has_no_invented_unique_slope(radius):
-    _, slope = solar_deflection.effective_solar_mass(radius)
-    assert slope is None
+def test_every_nonflat_mass_knot_has_no_invented_unique_slope() -> None:
+    for row in solar_deflection._parameters()[
+        "mass_profile_radius_fraction_and_effective_mass"
+    ]:
+        _, slope = solar_deflection.effective_solar_mass(row[0])
+        assert slope is None, row[0]
 
 
 @pytest.mark.parametrize("fraction", [0.5, 1.0])
 @pytest.mark.parametrize("crossing", [True, False])
 def test_mass_corner_crossing_keeps_position_and_tangent_motion_is_differentiable(
-    fraction, crossing
-):
+    fraction: float, crossing: bool
+) -> None:
     radius = (
         math.radians(
             solar_deflection._parameters()["solar_radius_at_one_au_arcsec"] / 3600
@@ -115,7 +109,9 @@ def test_mass_corner_crossing_keeps_position_and_tangent_motion_is_differentiabl
     assert (actual.velocity is None) == crossing
 
 
-def test_limiter_corner_preserves_position_without_an_invented_unique_rate(monkeypatch):
+def test_limiter_corner_preserves_position_without_an_invented_unique_rate(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     ray = (-2.0, 1e-5, 0.0)
     target = (-1.0, 1e-5, 0.0)
     length = math.hypot(*target)

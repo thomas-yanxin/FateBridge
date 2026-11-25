@@ -12,14 +12,14 @@ from jsonschema import Draft202012Validator
 from pydantic import ValidationError
 
 from fatebridge.application.examples import suggested_fields
-from fatebridge.core.bazi_evidence import build_natal_evidence
+from fatebridge.core.bazi.bazi_evidence import build_natal_evidence
 from fatebridge.core.classical import build_classical_overview, classical_snapshot_lines
 from fatebridge.core.classical_candidate_selection import build_candidate_selection
-from fatebridge.core.elements import ElementAnalysis
-from fatebridge.core.output_candidate_selection import (
+from fatebridge.core.contracts.output_candidate_selection import (
     CandidateSelection,
     MonthStructureReference,
 )
+from fatebridge.core.elements import ElementAnalysis
 from fatebridge.core.rules import BaZiRules
 from tests.support.transports import SPECS, business, call_cli, inputs, native
 from tests.support.transports import rest as _shared_rest
@@ -57,7 +57,7 @@ rest = _shared_rest
 
 
 @pytest.mark.parametrize("case", REFERENCE["cases"], ids=lambda c: c["id"])
-def test_source_path_observations_are_not_force_or_formation_labels(case):
+def test_source_path_observations_are_not_force_or_formation_labels(case) -> None:
     assert (
         hashlib.sha256(FIXTURE.read_bytes()).hexdigest()
         == FIXTURE.with_suffix(".sha256").read_text().strip()
@@ -67,11 +67,21 @@ def test_source_path_observations_are_not_force_or_formation_labels(case):
     selection = evidence["candidate_selection"]
     row = path_by_id(selection, case["expected_path"])
     assert row["status"] == "requires_force_adjudication"
-    assert case["basis"] in row["month_anchor_basis"]
+    expected_kinds = (
+        {"original_main_qi_reference"}
+        if case["basis"] == "original_main_qi"
+        else {"selected_month_rule", "revealed_month_stem"}
+    )
+    assert any(
+        witness["kind"] in expected_kinds and witness["id"] in row["month_anchor_basis"]
+        for witness in selection["month_use_resolution"]["witnesses"]
+    )
     if case.get("required_ref"):
         assert case["required_ref"] in {
             ref for c in row["observed_conditions"] for ref in c.get("star_refs", [])
         }
+    else:
+        pass
     ids = {
         s["evidence_id"] for entries in evidence["ten_gods"].values() for s in entries
     }
@@ -93,7 +103,9 @@ def test_source_path_observations_are_not_force_or_formation_labels(case):
     assert selection == BaZiRules.chart_useful_profile(pillars)["candidate_selection"]
 
 
-def test_original_seal_and_revealed_killer_are_not_collapsed_into_an_accepted_transformation():
+def test_original_seal_and_revealed_killer_are_not_collapsed_into_an_accepted_transformation() -> (
+    None
+):
     pillars = chart("壬寅 戊申 壬辰 壬寅")
     selection = build_candidate_selection(pillars)
     assert selection["selected_month"]["ten_god"] == "七杀"
@@ -102,9 +114,11 @@ def test_original_seal_and_revealed_killer_are_not_collapsed_into_an_accepted_tr
         "ten_god": "偏印",
     }
     assert path_by_id(selection, "seal_killer")["month_anchor_basis"] == [
-        "original_main_qi"
+        "month:original_main_qi_reference"
     ]
-    assert path_by_id(selection, "killer_seal")["month_anchor_basis"] == ["selected"]
+    assert path_by_id(selection, "killer_seal")["month_anchor_basis"] == [
+        "month:selected_month_rule"
+    ]
     assert selection["selected_month"]["basis_status"] == "original_and_selected_differ"
     assert (
         ElementAnalysis.analyze_day_master_strength(pillars)["strength_level"] == "中和"
@@ -114,7 +128,9 @@ def test_original_seal_and_revealed_killer_are_not_collapsed_into_an_accepted_tr
     assert "变格、兼格" in text and "成格与取用未裁定" in text
 
 
-def test_hidden_killer_is_observed_without_inventing_revelation_or_correcting_the_source_hour():
+def test_hidden_killer_is_observed_without_inventing_revelation_or_correcting_the_source_hour() -> (
+    None
+):
     source = chart("戊戌 乙卯 丙午 乙亥")
     result = build_candidate_selection(source)
     condition = path_by_id(result, "seal_killer")["observed_conditions"][0]
@@ -128,7 +144,7 @@ def test_hidden_killer_is_observed_without_inventing_revelation_or_correcting_th
     assert source["hour"] == ("乙", "亥")
 
 
-def test_a_blade_outside_the_month_is_not_a_month_blade_class():
+def test_a_blade_outside_the_month_is_not_a_month_blade_class() -> None:
     selection = build_candidate_selection(chart("戊辰 甲寅 戊寅 戊午"))
     assert selection["selected_month"]["ten_god"] == "七杀"
     row = path_by_id(selection, "killer_blade")
@@ -136,7 +152,7 @@ def test_a_blade_outside_the_month_is_not_a_month_blade_class():
     assert not {"blade_officer", "blade_killer"} & {r["id"] for r in selection["paths"]}
 
 
-def test_source_caution_is_not_a_path_exclusion_or_an_event_forecast():
+def test_source_caution_is_not_a_path_exclusion_or_an_event_forecast() -> None:
     source = FIXTURE.parent / "source-caution-correction-v3.json"
     assert hashlib.sha256(source.read_bytes()).hexdigest() == (
         source.with_suffix(".sha256").read_text().strip()
@@ -157,7 +173,123 @@ def test_source_caution_is_not_a_path_exclusion_or_an_event_forecast():
         assert all(c["status"] == "unknown" for c in row["force_conditions"])
 
 
-def test_gold_water_officer_requires_the_selected_text_observations_and_is_never_automatically_good_or_bad():
+@pytest.mark.parametrize(
+    "pillars,mixed_refs,officer_refs,mixed_status,officer_status",
+    [
+        (
+            "辛丑 庚寅 甲辰 乙亥",
+            ["year:stem:辛", "month:stem:庚"],
+            ["year:stem:辛"],
+            "matched",
+            "not_matched",
+        ),
+        (
+            "庚寅 壬午 丁卯 壬寅",
+            ["month:stem:壬", "hour:stem:壬"],
+            ["month:stem:壬", "hour:stem:壬"],
+            "not_matched",
+            "matched",
+        ),
+        (
+            "庚午 戊子 癸卯 丁巳",
+            ["month:stem:戊"],
+            ["month:stem:戊"],
+            "not_matched",
+            "not_matched",
+        ),
+    ],
+)
+def test_peer_month_official_competition_is_positional_source_caution(
+    pillars: str, mixed_refs, officer_refs, mixed_status: str, officer_status: str
+) -> None:
+    # NLC PDF 89–91 and 徐注 228 distinguish visible and hidden competition.
+    selection = build_candidate_selection(chart(pillars))
+    row = path_by_id(selection, "peer_officer")
+    assert row["status"] == "requires_force_adjudication"
+    assert row["formation_status"] == "not_adjudicated"
+    cautions = CandidateSelection.model_validate(selection).paths
+    assert cautions is not None
+    peer = next(path for path in cautions if path.id == "peer_officer")
+    assert {
+        caution.id: (caution.status, caution.star_refs, caution.effect)
+        for caution in peer.source_cautions or []
+    } == {
+        "peer_officer_killer_both_revealed": (
+            mixed_status,
+            mixed_refs,
+            "source_caution_only",
+        ),
+        "peer_multiple_officers_revealed": (
+            officer_status,
+            officer_refs,
+            "source_caution_only",
+        ),
+    }
+    assert 91 in row["source_pdf_pages"]
+
+
+@pytest.mark.parametrize(
+    ("pillars", "path", "id", "positions"),
+    [
+        # NLC PDF90 and 徐注§45: 巳丑 witnesses an arch, 申子 includes the peak.
+        (
+            "己未 己巳 丁未 辛丑",
+            "peer_wealth",
+            "peer_wealth_wealth_triad:巳酉丑:arch_pair",
+            ["month", "hour"],
+        ),
+        (
+            "庚子 甲申 庚子 甲申",
+            "peer_wealth",
+            "peer_wealth_output_triad:申子辰:peak_pair",
+            ["year", "month", "day", "hour"],
+        ),
+        (
+            "己未 己巳 丁未 庚子",
+            "peer_wealth",
+            "peer_wealth_wealth_triad:巳酉丑:arch_pair",
+            None,
+        ),
+    ],
+)
+def test_peer_wealth_reports_literal_meeting_membership_without_formation(
+    pillars: str, path: str, id: str, positions
+) -> None:
+    row = path_by_id(build_candidate_selection(chart(pillars)), path)
+    observation = next(
+        (item for item in row["observed_conditions"] if item["id"] == id), None
+    )
+    if positions is None:
+        assert observation is None
+    else:
+        assert observation["positions"] == positions
+        assert observation["status"] == "matched"
+    assert row["formation_status"] == "not_adjudicated"
+
+
+def test_peer_output_keeps_hidden_wealth_and_revealed_wealth_distinct() -> None:
+    # NLC PDF91 and 徐注§37: hidden or revealed wealth does not settle selection.
+    for pillars, status, refs in (
+        ("甲子 丙寅 甲子 丙寅", "not_matched", []),
+        ("己丑 丙寅 甲子 戊辰", "matched", ["year:stem:己", "hour:stem:戊"]),
+    ):
+        selection = build_natal_evidence(chart(pillars))["candidate_selection"]
+        row = path_by_id(selection, "peer_output")
+        caution = next(
+            item
+            for item in row["source_cautions"]
+            if item["id"] == "peer_output_wealth_or_officer_revealed"
+        )
+        assert caution["status"] == status
+        assert caution["star_refs"] == refs
+        assert caution["effect"] == "source_caution_only"
+        assert row["status"] == "requires_force_adjudication"
+        assert row["formation_status"] == "not_adjudicated"
+
+
+def test_gold_water_officer_requires_the_selected_text_observations_and_is_never_automatically_good_or_bad() -> (
+    None
+):
     good = build_candidate_selection(chart("戊申 甲子 庚午 丁丑"))
     assert path_by_id(good, "hurt_officer")["status"] == "requires_force_adjudication"
     # Internally coherent fictional pillars: 癸伤官 is now revealed beside 丁官.
@@ -176,7 +308,9 @@ def test_gold_water_officer_requires_the_selected_text_observations_and_is_never
     assert other["formation_status"] == "not_adjudicated"
 
 
-def test_gold_water_helpers_need_not_be_revealed_and_only_both_revealed_is_the_observed_objection():
+def test_gold_water_helpers_need_not_be_revealed_and_only_both_revealed_is_the_observed_objection() -> (
+    None
+):
     # Internally coherent fictional inputs, with no source outcome labels.
     row = path_by_id(
         build_candidate_selection(chart("壬申 壬子 庚午 丁丑")), "hurt_officer"
@@ -208,8 +342,8 @@ def test_gold_water_helpers_need_not_be_revealed_and_only_both_revealed_is_the_o
 
 @pytest.mark.parametrize("index", [0, 1])
 def test_both_pdf85_examples_keep_wealth_as_a_bridge_without_erasing_hurt_or_selecting_a_winner(
-    index,
-):
+    index: int,
+) -> None:
     source = FIXTURE.with_name("pdf85-addendum.json")
     assert (
         hashlib.sha256(source.read_bytes()).hexdigest()
@@ -223,7 +357,7 @@ def test_both_pdf85_examples_keep_wealth_as_a_bridge_without_erasing_hurt_or_sel
     row = path_by_id(selection, case["expected_path"])
     assert row["status"] == "requires_force_adjudication"
     assert row["source_pdf_pages"] == [85]
-    assert selection["method_id"] == "month_path_conditions_v4"
+    assert selection["method_id"] == "month_path_conditions_v5"
     assert pillars == before and evidence["ten_gods"]["伤官"]
     assert selection["chosen_path_id"] is None and case["expected_strength"] is None
     assert all(c["status"] == "unknown" for c in row["force_conditions"])
@@ -231,12 +365,12 @@ def test_both_pdf85_examples_keep_wealth_as_a_bridge_without_erasing_hurt_or_sel
         assert {s["location"] for s in evidence["ten_gods"]["正财"]} == {"地支藏干"}
     else:
         assert selection["selected_month"]["ten_god"] == "正财"
-        assert row["month_anchor_basis"] == ["original_main_qi"]
+        assert row["month_anchor_basis"] == ["month:original_main_qi_reference"]
 
 
 def test_arbitrary_legacy_priority_cannot_choose_the_source_path_or_promote_useful_elements(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     pillars = chart("庚辰 戊子 壬寅 乙巳")
     before = BaZiRules.chart_useful_profile(pillars)
     monkeypatch.setattr(
@@ -258,7 +392,9 @@ def test_arbitrary_legacy_priority_cannot_choose_the_source_path_or_promote_usef
     assert set(before["conditional_elements"]) == {"木", "火", "土", "金", "水"}
 
 
-def test_contract_rejects_unearned_force_formation_and_path_selection_but_allows_projection():
+def test_contract_rejects_unearned_force_formation_and_path_selection_but_allows_projection() -> (
+    None
+):
     selection = build_candidate_selection(chart("戊辰 甲寅 戊寅 戊午"))
     for patch in [
         {"chosen_path_id": "killer_blade"},
@@ -296,7 +432,7 @@ def test_contract_rejects_unearned_force_formation_and_path_selection_but_allows
 )
 def test_all_stem_month_unit_inputs_preserve_unknown_force_and_have_no_chosen_path(
     stem, branch
-):
+) -> None:
     # Synthetic branch coverage; not independent, coherent birth charts or accuracy cases.
     pillars = chart(["庚辰", "戊" + branch, stem + "寅", "乙巳"])
     selection = build_candidate_selection(pillars)
@@ -311,8 +447,8 @@ def test_all_stem_month_unit_inputs_preserve_unknown_force_and_have_no_chosen_pa
     "key", ["analyze_destiny", *["bazi_" + topic for topic in TOPICS]]
 )
 def test_published_candidate_views_are_same_on_actual_rest_native_mcp_and_cli(
-    key, rest, tmp_path, capsys
-):
+    key, rest, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     # analyze_destiny is the root calculation tool; the catalog key can differ.
     spec = next(s for s in SPECS.values() if s.tool_name == key)
     payload = inputs(spec)
@@ -340,6 +476,8 @@ def test_published_candidate_views_are_same_on_actual_rest_native_mcp_and_cli(
     rest_business = business(response.json())
     if key == "analyze_destiny":
         rest_business = rest_business["bazi_birth"]
+    else:
+        pass
     assert rest_business == business(protocol.structured_content) == business(local)
     Draft202012Validator(rest_spec.output_model.model_json_schema()).validate(
         response.json()
@@ -356,4 +494,4 @@ def test_published_candidate_views_are_same_on_actual_rest_native_mcp_and_cli(
         )
         assert selection["source"]["url"] == REFERENCE["source_url"]
         assert selection["source"]["id"] == "ziping_month_path_conditions_v1"
-        assert selection["method_id"] == "month_path_conditions_v4"
+        assert selection["method_id"] == "month_path_conditions_v5"

@@ -3,6 +3,7 @@
 import asyncio
 import json
 import shutil
+from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
@@ -12,6 +13,7 @@ import fatebridge.api as api
 from fatebridge.application.examples import suggested_fields
 from fatebridge.application.projection import project_fields
 from fatebridge.cli import run
+from fatebridge.core.contracts.output_chinese import Taiyi
 from fatebridge.core.metaphysics.taiyi_shiji import (
     rotate_shiji,
     shiji_derivation,
@@ -23,17 +25,16 @@ from fatebridge.core.metaphysics.taiyi_year import (
     assemble_board,
     cyclic_core,
 )
-from fatebridge.core.output_chinese import Taiyi
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.metaphysics import calculate_taiyi_analysis
 from fatebridge.services.tool_catalog import CATALOG
 from scripts.taiyi.audit_taiyi_shiji import CORPUS, audit, source_data
 from tests.support.reference_data import resolve
-from tests.taiyi.test_taiyi_enclosures import transport_payload
-from tests.taiyi.test_taiyi_transports import _same_run_payload
+from tests.support.transports import call_calculation
+from tests.unit_test.fixtures.taiyi import same_run_payload, transport_payload
 
 
-def test_original_example_handwork_and_witnesses_keep_separate_denominators():
+def test_original_example_handwork_and_witnesses_keep_separate_denominators() -> None:
     result = audit()
     assert len(result["given_position_examples"]) == 1
     assert len(result["manual_applications_of_existing_rows"]) == 3
@@ -65,7 +66,7 @@ def test_original_example_handwork_and_witnesses_keep_separate_denominators():
     assert not readings["ncl_section_boundary"]["whole_book_absence_or_stemma_claimed"]
 
 
-def test_same_core_paths_and_zero_interval_explanation_are_literal():
+def test_same_core_paths_and_zero_interval_explanation_are_literal() -> None:
     for yin in (False, True):
         for ju in range(1, 73):
             core = cyclic_core(ju, yin=yin)
@@ -95,7 +96,7 @@ def test_same_core_paths_and_zero_interval_explanation_are_literal():
     assert identity["step_count"] == 0 and identity["derived_shiji"] == "艮"
 
 
-def test_rotation_does_not_collapse_different_spirits_for_any_legal_jishen():
+def test_rotation_does_not_collapse_different_spirits_for_any_legal_jishen() -> None:
     # A software bijection property, not 192 independent classical cases.
     for jishen in BRANCHES:
         results = [rotate_shiji(wenchang, jishen) for wenchang in RING]
@@ -103,7 +104,7 @@ def test_rotation_does_not_collapse_different_spirits_for_any_legal_jishen():
         assert {r["step_count"] for r in results} == set(range(16))
 
 
-def test_counterfactual_actual_value_is_retained_and_not_repaired_to_fit_rule():
+def test_counterfactual_actual_value_is_retained_and_not_repaired_to_fit_rule() -> None:
     core = {**cyclic_core(37, yin=True), "shiji": "午"}
     result = shiji_derivation(core)
     assert result["actual_shiji"] == core["shiji"] == "午"
@@ -117,19 +118,21 @@ def test_counterfactual_actual_value_is_retained_and_not_repaired_to_fit_rule():
 
 @pytest.mark.parametrize("field", ["wenchang_palace", "jishen", "shiji"])
 @pytest.mark.parametrize("value", [None, "", "子丑", True])
-def test_unknown_or_multiple_positions_are_not_filled(field, value):
+def test_unknown_or_multiple_positions_are_not_filled(
+    field: str, value: bool | str | None
+) -> None:
     result = shiji_derivation({**cyclic_core(1), field: value})
     assert result["status"] == "not_assessed" and "pairs" not in result
     assert "reason" in result
 
 
-def test_jishen_cannot_be_a_four_corner_spirit():
+def test_jishen_cannot_be_a_four_corner_spirit() -> None:
     for spirit in "乾坤艮巽":
         with pytest.raises(ValueError):
             rotate_shiji("子", spirit)
 
 
-def test_all_new_output_leaves_support_partial_projection():
+def test_all_new_output_leaves_support_partial_projection() -> None:
     data = {"taiyi": {"shiji_derivation": shiji_derivation(cyclic_core(37, yin=True))}}
 
     def leaves(value, prefix):
@@ -146,7 +149,9 @@ def test_all_new_output_leaves_support_partial_projection():
 
 
 @pytest.mark.parametrize("mode", ["year", "month", "day", "hour"])
-def test_public_snapshot_uses_the_exact_same_derived_and_actual_facts(mode):
+def test_public_snapshot_uses_the_exact_same_derived_and_actual_facts(
+    mode: str,
+) -> None:
     result = calculate_taiyi_analysis(
         analysis_year=2026,
         analysis_month=7,
@@ -173,7 +178,7 @@ def test_public_snapshot_uses_the_exact_same_derived_and_actual_facts(mode):
         "manifest.json",
     ],
 )
-def test_source_or_hand_oracle_mutation_is_rejected(tmp_path, file):
+def test_source_or_hand_oracle_mutation_is_rejected(tmp_path: Path, file: str) -> None:
     dest = tmp_path / "source"
     shutil.copytree(CORPUS, dest)
     with (dest / file).open("ab") as stream:
@@ -184,7 +189,12 @@ def test_source_or_hand_oracle_mutation_is_rejected(tmp_path, file):
 
 @pytest.mark.parametrize("key", ["taiyi", "sanshiunited"])
 @pytest.mark.parametrize("mode", ["year", "month", "day", "hour"])
-def test_real_rest_mcp_cli_and_new_first_views(key, mode, capsys, monkeypatch):
+def test_real_rest_mcp_cli_and_new_first_views(
+    key: str,
+    mode: str,
+    capsys: pytest.CaptureFixture[str],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     spec = next(s for s in CATALOG if s.key == key)
     payload = transport_payload(key, 2026)
     if key == "taiyi":
@@ -219,19 +229,28 @@ def test_real_rest_mcp_cli_and_new_first_views(key, mode, capsys, monkeypatch):
         expected["shiji_derivation"]["actual_shiji"] == expected["core_board"]["shiji"]
     )
     assert expected["shiji_derivation"]["matches_actual"]
-    args = [key, "--strict-fields", "--no-use-true-solar-time", "--fields", *fields]
+    args = [
+        spec.tool_name,
+        "--strict-fields",
+        "--no-use-true-solar-time",
+        "--fields",
+        *fields,
+    ]
     for name, value in payload.items():
         if name != "use_true_solar_time":
             args += [
                 "--" + name.replace("_", "-"),
                 json.dumps(value) if isinstance(value, dict) else str(value),
             ]
+        else:
+            pass
     assert run(args) == 0
     assert json.loads(capsys.readouterr().out)["taiyi"] == expected
 
     async def call():
         async with Client(create_mcp_app()) as client:
-            result = await client.call_tool(
+            result = await call_calculation(
+                client,
                 spec.tool_name,
                 {
                     **payload,
@@ -245,7 +264,8 @@ def test_real_rest_mcp_cli_and_new_first_views(key, mode, capsys, monkeypatch):
                 not result.is_error and result.structured_content["taiyi"] == expected
             )
             view = "shiji_derivation" if key == "taiyi" else "taiyi_shiji_derivation"
-            first = await client.call_tool(
+            first = await call_calculation(
+                client,
                 spec.tool_name,
                 {
                     **payload,
@@ -254,6 +274,6 @@ def test_real_rest_mcp_cli_and_new_first_views(key, mode, capsys, monkeypatch):
                     "include_snapshot_text": False,
                 },
             )
-            await _same_run_payload(client, first, require_business_inline=True)
+            await same_run_payload(client, first, require_business_inline=True)
 
     asyncio.run(call())

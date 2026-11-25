@@ -18,6 +18,10 @@ from fatebridge.core.astro.reference_angles import (
     UNRESOLVED_REFERENCE_BASES,
     reference_angle_basis,
 )
+from fatebridge.core.astro.solar_arc_state import (
+    SolarArcSampleUnavailable,
+    SolarArcState,
+)
 from fatebridge.utils.errors import EphemerisSourceError
 
 RULESET = "hamburg_mixed_pair_sampled_sensitivity_v1"
@@ -32,11 +36,12 @@ def _unresolved(names: Sequence[str], definition: Mapping[str, Any] | None) -> s
 
 
 def mixed_pair_sensitivity(
-    geometry: Mapping[str, Any],
+    nominal_state: SolarArcState,
     nominal_longitudes: Mapping[str, float],
     uncertainty: Mapping[str, Any],
-    solar_samples: Sequence[Mapping[str, Any]],
+    solar_states: Sequence[SolarArcState | SolarArcSampleUnavailable],
     *,
+    orb_degrees: float = 1.0,
     nominal_angle_definition: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Evaluate all nominal and sample relations; never select on outcomes.
@@ -51,7 +56,6 @@ def mixed_pair_sensitivity(
         "status": uncertainty["status"],
         "uncertainty_minutes": uncertainty["uncertainty_minutes"],
         "continuous_interval_proven": False,
-        "sample_frequency_is_probability": False,
         "summary": None,
         "sample_count": None,
         "computed_arc_sample_count": None,
@@ -64,64 +68,67 @@ def mixed_pair_sensitivity(
     if (
         not native
         or len(native) != uncertainty["sample_count"]
-        or len(native) != len(solar_samples)
+        or len(native) != len(solar_states)
     ):
         raise ValueError(
             "Mixed sensitivity requires every same-run native and solar sample"
         )
     names = sorted(nominal_longitudes)
     nominal = {n: _finite(v) % 360 for n, v in nominal_longitudes.items()}
-    arc = _finite(geometry["profile"]["solar_arc_degrees"]) % 360
-    orb = _finite(geometry["profile"]["orb_degrees"])
+    arc = nominal_state.arc
+    orb = _finite(orb_degrees)
     if not 0 <= orb <= 5:
         raise ValueError("Mixed sensitivity requires the declared inclusive orb0..5")
     records, coordinates, arcs, unknown_names = [], [], [], []
     offsets: list[Fraction] = []
-    for i, (sample, solar) in enumerate(zip(native, solar_samples)):
-        offset = _finite(sample["offset_seconds"])
-        if offset != _finite(solar["offset_seconds"]):
-            raise ValueError("Native and solar sample offsets must match in order")
-        if sample["effective_utc"] != solar.get("effective_utc") or _finite(
-            sample["julian_day_tt"]
-        ) != _finite(solar["julian_day_tt"]):
-            raise EphemerisSourceError("mixed_pair_sample_epoch_mismatch")
-        if offsets and offset <= offsets[-1]:
-            raise ValueError(
-                "Mixed sensitivity sample offsets must be unique and ordered"
-            )
-        offsets.append(offset)
+    grid = uncertainty.get("recorded_physical_grid")
+    for i, (sample, solar) in enumerate(zip(native, solar_states)):
+        if grid is None:
+            offset = _finite(sample["offset_seconds"])
+            if offsets and offset <= offsets[-1]:
+                raise ValueError(
+                    "Mixed sensitivity sample offsets must be unique and ordered"
+                )
+            offsets.append(offset)
+        if isinstance(solar, SolarArcSampleUnavailable):
+            arc_value = None
+            reason_code = solar.reason_code
+        else:
+            if sample["effective_utc"] != solar.birth_label or _finite(
+                sample["julian_day_tt"]
+            ) != _finite(solar.birth_julian_day_tt):
+                raise EphemerisSourceError("mixed_pair_sample_epoch_mismatch")
+            arc_value = solar.arc
+            reason_code = None
         if set(sample["factor_longitudes"]) != set(names):
             raise ValueError("Mixed sensitivity sample factor set changed")
         coordinates.append(
             {n: _finite(sample["factor_longitudes"][n]) % 360 for n in names}
         )
-        status = solar.get("status", "computed")
-        if status not in ("computed", "unavailable"):
-            raise ValueError("Mixed sensitivity has an unknown solar sample state")
-        arcs.append(
-            _finite(solar["solar_arc_degrees"]) % 360 if status == "computed" else None
-        )
+        arcs.append(arc_value)
         unresolved = _unresolved(names, sample.get("angle_definition"))
         unknown_names.append(unresolved)
         records.append(
             {
                 "sample_index": i,
-                "offset_seconds": float(offset),
+                "offset_seconds": sample["offset_seconds"],
                 "recorded_utc": sample["recorded_utc"],
                 "effective_utc": sample["effective_utc"],
                 "julian_day_tt": sample["julian_day_tt"],
                 "factor_longitudes": dict(sample["factor_longitudes"]),
-                "solar_arc_status": status,
-                "solar_arc_degrees": (
-                    solar.get("solar_arc_degrees") if status == "computed" else None
+                "solar_arc_status": (
+                    "computed" if arc_value is not None else "unavailable"
                 ),
-                "reason_code": solar.get("reason_code"),
+                "solar_arc_degrees": (
+                    float(arc_value) if arc_value is not None else None
+                ),
+                "reason_code": reason_code,
                 "unresolved_reference_names": sorted(unresolved),
                 "native_sample_reference": f"midpoint_analysis.time_sensitivity.samples[{i}]",
                 "solar_sample_reference": f"midpoint_analysis.solar_arc_analysis.birth_time_sensitivity.samples[{i}]",
             }
         )
-    if Fraction(0) not in offsets:
+    if grid is None and Fraction(0) not in offsets:
         raise ValueError(
             "Mixed sensitivity must retain the nominal birth-time grid point"
         )
@@ -270,7 +277,11 @@ def mixed_pair_sensitivity(
         sample_count=count,
         computed_arc_sample_count=sum(v is not None for v in arcs),
         unavailable_arc_sample_count=sum(v is None for v in arcs),
-        nominal_sample_index=offsets.index(Fraction(0)),
+        nominal_sample_index=(
+            grid["nominal_sample_index"]
+            if grid is not None
+            else offsets.index(Fraction(0))
+        ),
         nominal_unresolved_reference_names=sorted(nominal_unknown),
         exact_lattice_denominator_power=denominator.bit_length() - 1,
         summary=summaries,
@@ -285,6 +296,7 @@ def mixed_pair_sensitivity(
                 "recorded_interval_end_utc",
                 "maximum_recorded_sample_gap_seconds",
                 "represented_radius_seconds",
+                "recorded_physical_grid",
                 "clock_policy",
                 "input_clock_basis",
                 "recorded_interval_start_clock",

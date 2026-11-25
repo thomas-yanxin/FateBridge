@@ -36,7 +36,7 @@ def output(**extra):
     return result
 
 
-def test_primary_witness_reaches_the_actual_main_and_annual_course():
+def test_primary_witness_reaches_the_actual_main_and_annual_course() -> None:
     body = output(birth_year_ganzhi="甲子", year_fate_age=43, gender="男")
     main = body["jinkou"]["internal_strength"]["source_evidence"]
     assert "primary_witness" in main
@@ -53,7 +53,7 @@ def test_primary_witness_reaches_the_actual_main_and_annual_course():
     assert main["note"] in body["snapshot_text"]
 
 
-def test_source_url_cannot_be_forged_in_an_otherwise_correct_complete_result():
+def test_source_url_cannot_be_forged_in_an_otherwise_correct_complete_result() -> None:
     from fatebridge.application.execution import OutputContractError, validate_output
 
     result = output()
@@ -65,7 +65,7 @@ def test_source_url_cannot_be_forged_in_an_otherwise_correct_complete_result():
 
 
 @pytest.mark.parametrize("case", REF["cases"], ids=lambda c: c["id"])
-def test_every_original_waseda_phase_and_judgement(case):
+def test_every_original_waseda_phase_and_judgement(case) -> None:
     from fatebridge.core.metaphysics.jinkou_strength import internal_strength
 
     rows = [
@@ -78,8 +78,8 @@ def test_every_original_waseda_phase_and_judgement(case):
 
 @pytest.mark.parametrize("project", [False, True])
 def test_actual_three_transports_keep_this_primary_source_and_old_conflict(
-    project, surface_calls
-):
+    project: bool, surface_calls
+) -> None:
     spec = SPECS["jinkou"]
     payload = {
         **REST_POST_CASES[spec.rest_path](),
@@ -105,6 +105,8 @@ def test_actual_three_transports_keep_this_primary_source_and_old_conflict(
             "false",
         ]
         opts.update(fields=fields, strict_fields=True, include_snapshot_text=False)
+    else:
+        pass
     http, protocol, code, cli = surface_calls(
         spec, payload, params=params, options=opts, flags=flags, cli_first=False
     )
@@ -136,7 +138,7 @@ def test_actual_three_transports_keep_this_primary_source_and_old_conflict(
         "missing",
     ],
 )
-def test_full_source_ledger_and_its_trace_reject_inventions(fault):
+def test_full_source_ledger_and_its_trace_reject_inventions(fault: str) -> None:
     from fatebridge.application.execution import OutputContractError, validate_output
 
     body = copy.deepcopy(output())
@@ -178,7 +180,7 @@ def test_full_source_ledger_and_its_trace_reject_inventions(fault):
         validate_output(SPECS["jinkou"], body)
 
 
-def test_primary_source_can_be_projected_without_the_live_rows():
+def test_primary_source_can_be_projected_without_the_live_rows() -> None:
     spec = SPECS["jinkou"]
     spec.output_model.model_validate(
         {

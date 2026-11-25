@@ -58,8 +58,12 @@ def main() -> int:
     print(json.dumps({k: v for k, v in result.items() if k != "rows"}))
     if result["source_errors"] or result["unresolved_reference"]:
         return 2
+    else:
+        pass
     return 0 if result["numerical_subset_checks_passed"] else 1
 
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

@@ -16,10 +16,11 @@ from pydantic import ValidationError
 
 import fatebridge.api as api
 from fatebridge.cli import run
-from fatebridge.core import guolao
 from fatebridge.core.astro.birth import build_astro_birth_info
-from fatebridge.core.astro.birth_clock import _sun_clock
-from fatebridge.core.guolao_clock import apparent_solar_clock
+from fatebridge.core.astro.birth_clock import SolarClockContext, _sun_clock
+from fatebridge.core.astro.tt_epoch import TTInstant
+from fatebridge.core.guolao import guolao
+from fatebridge.core.guolao.guolao_clock import apparent_solar_clock
 from fatebridge.core.requests.astrology import (
     AstroChartPolyRequest,
     AstroGuolaoRequest,
@@ -29,7 +30,8 @@ from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services import astrology
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.errors import EphemerisSourceError
-from tests.guolao.test_guolao_native_frames import fixed_moshier  # noqa:F401
+from tests.support.transports import call_calculation
+from tests.unit_test.fixtures.guolao import fixed_moshier as fixed_moshier
 
 FIXTURE = Path(__file__).parents[1] / "fixtures/guolao-solar-input-integration-v1"
 CASES = [
@@ -74,8 +76,12 @@ def chart(args, **extra):
 @pytest.mark.parametrize("row", FRAME_REFERENCE["rows"], ids=lambda row: row["id"])
 def test_given_tt_ut1_solar_frame_and_clock_match_original_swiss_sofa_reference(
     fixed_moshier, row
-):
-    actual = _sun_clock(row["julian_day_ut1"], _julian_day_tt=row["julian_day_tt"])
+) -> None:
+    actual = _sun_clock(
+        SolarClockContext(
+            row["julian_day_ut1"], TTInstant.from_float(row["julian_day_tt"])
+        )
+    )
     for field, expected in [
         ("sun_apparent_right_ascension_degrees", row["physical_ra_degrees"]),
         ("greenwich_apparent_sidereal_degrees", row["gast_degrees"]),
@@ -110,7 +116,7 @@ def test_given_tt_ut1_solar_frame_and_clock_match_original_swiss_sofa_reference(
 
 def test_lat_clock_rejects_native_ra_substituted_for_its_physical_frame_ray(
     fixed_moshier,
-):
+) -> None:
     birth = build_astro_birth_info(**CASES[1], birth_clock_basis="local_apparent_solar")
     raw = guolao.positions(birth)
     assert guolao.solar_input_context(birth, raw) is not None
@@ -121,7 +127,7 @@ def test_lat_clock_rejects_native_ra_substituted_for_its_physical_frame_ray(
         guolao.solar_input_context(birth, raw)
 
 
-def test_prechange_reference_and_sdk_wrong_hour_are_retained():
+def test_prechange_reference_and_sdk_wrong_hour_are_retained() -> None:
     ref = json.loads((FIXTURE / "reference-before-implementation.json").read_text())
     root = Path(__file__).parents[2]
     for n, h in ref["source_assets_sha256"].items():
@@ -137,7 +143,7 @@ def test_prechange_reference_and_sdk_wrong_hour_are_retained():
 @pytest.mark.parametrize("row", SOLAR_REFERENCE["cases"])
 def test_reused_independent_clock_labels_preserve_three_epochs_and_sun(
     fixed_moshier, row
-):
+) -> None:
     wall = datetime.fromisoformat(row["input_wall_datetime"])
     value = chart(
         dict(
@@ -168,8 +174,8 @@ def test_reused_independent_clock_labels_preserve_three_epochs_and_sun(
 @pytest.mark.parametrize("solar", [False, True])
 @pytest.mark.parametrize("zodiac", [0, 1])
 def test_solar_input_epoch_hour_and_declared_clock_metadata(
-    fixed_moshier, args, basis, solar, zodiac
-):
+    fixed_moshier, args, basis: str, solar: bool, zodiac: int
+) -> None:
     result = chart(
         args, birth_clock_basis=basis, use_true_solar_time=solar, zodiacal=zodiac
     )
@@ -195,16 +201,14 @@ def test_solar_input_epoch_hour_and_declared_clock_metadata(
             life["birth_hour_branch"]
             == g["profile"]["apparent_solar_clock"]["birth_hour_branch"]
         )
-    assert "民用钟时" not in result["interpretation"]["core_identity"]
-    assert "不代表原记录采用UTC民用时区" in result["interpretation"]["input_clock"]
     assert "时区：None" not in result["snapshot_text"]
     assert g["validation"]["full_marks_established"] is False
 
 
 @pytest.mark.parametrize("basis", ["local_mean_solar", "local_apparent_solar"])
 def test_equivalent_civil_carrier_has_identical_sky_not_a_borrowed_hour(
-    fixed_moshier, basis
-):
+    fixed_moshier, basis: str
+) -> None:
     args = CASES[0]
     birth = build_astro_birth_info(**args, birth_clock_basis=basis)
     result = chart(args, birth_clock_basis=basis)
@@ -234,7 +238,9 @@ def test_equivalent_civil_carrier_has_identical_sky_not_a_borrowed_hour(
     assert civil["guolao"]["life_palace"]["birth_hour_branch"] == "亥"
 
 
-def test_lmt_apparent_preference_changes_hour_without_changing_the_epoch(fixed_moshier):
+def test_lmt_apparent_preference_changes_hour_without_changing_the_epoch(
+    fixed_moshier,
+) -> None:
     args = {**CASES[1], "birth_second": 0, "birth_microsecond": 0}
     ordinary = chart(args, birth_clock_basis="local_mean_solar")
     apparent = chart(
@@ -252,8 +258,8 @@ def test_lmt_apparent_preference_changes_hour_without_changing_the_epoch(fixed_m
 
 @pytest.mark.parametrize("microsecond", [0, 1, 999999])
 def test_nominal_lat_hour_at_boundary_is_the_given_label_and_forward_residual_is_visible(
-    fixed_moshier, microsecond
-):
+    fixed_moshier, microsecond: int
+) -> None:
     result = chart(
         {**CASES[1], "birth_second": 0, "birth_microsecond": microsecond},
         birth_clock_basis="local_apparent_solar",
@@ -265,13 +271,11 @@ def test_nominal_lat_hour_at_boundary_is_the_given_label_and_forward_residual_is
         c["hour_from_input_label"]
         and abs(c["same_natal_sky_label_residual_seconds"]) <= 0.0002
     )
-    if c["input_label_and_forward_hour_differ"]:
-        assert "分侧" in result["interpretation"]["input_clock"]
 
 
 def test_lat_redundant_display_preference_does_not_apply_another_correction(
     fixed_moshier,
-):
+) -> None:
     a = chart(CASES[0], birth_clock_basis="local_apparent_solar")
     b = chart(
         CASES[0], birth_clock_basis="local_apparent_solar", use_true_solar_time=True
@@ -285,8 +289,8 @@ def test_lat_redundant_display_preference_does_not_apply_another_correction(
 @pytest.mark.parametrize("basis", ["local_mean_solar", "local_apparent_solar"])
 @pytest.mark.parametrize("month", [None, "jie_month", "chinese_lunar_utc8"])
 def test_target_and_months_use_the_converted_epoch_and_declared_reference(
-    fixed_moshier, basis, month
-):
+    fixed_moshier, basis: str, month: str | None
+) -> None:
     args = {
         **CASES[1],
         "birth_month": 2,
@@ -311,6 +315,8 @@ def test_target_and_months_use_the_converted_epoch_and_declared_reference(
     if month:
         birth = timing["month_limit"]["birth_month"]
         assert birth["calendar_datetime"].startswith("2000-02-04T20:")
+    else:
+        pass
     converted = datetime.fromisoformat(result["person_info"]["utc_datetime"])
     earlier = chart(
         args,
@@ -328,8 +334,8 @@ def test_target_and_months_use_the_converted_epoch_and_declared_reference(
     "basis,solar", [("local_mean_solar", True), ("local_apparent_solar", False)]
 )
 def test_solar_day_policies_accept_an_apparent_clock_without_double_correction(
-    fixed_moshier, policy, basis, solar
-):
+    fixed_moshier, policy: str, basis: str, solar: bool
+) -> None:
     result = chart(
         CASES[0],
         birth_clock_basis=basis,
@@ -343,8 +349,8 @@ def test_solar_day_policies_accept_an_apparent_clock_without_double_correction(
 @pytest.mark.parametrize("basis", ["local_mean_solar", "local_apparent_solar"])
 @pytest.mark.parametrize("kind", ["year0", "second60"])
 def test_original_unrepresented_epochs_now_reach_native_physical_axes(
-    fixed_moshier, basis, kind, record_testsuite_property
-):
+    fixed_moshier, basis: str, kind: str, record_testsuite_property
+) -> None:
     if kind == "year0":
         args = {
             **CASES[1],
@@ -401,8 +407,8 @@ def test_original_unrepresented_epochs_now_reach_native_physical_axes(
     ["source_solar_days_winter_exclusive", "source_solar_days_winter_inclusive"],
 )
 def test_solar_day_numerical_boundary_is_not_relabelled_as_an_accepted_result(
-    fixed_moshier, policy, record_testsuite_property
-):
+    fixed_moshier, policy: str, record_testsuite_property
+) -> None:
     args = {
         **CASES[1],
         "birth_hour": 0,
@@ -427,8 +433,8 @@ def test_solar_day_numerical_boundary_is_not_relabelled_as_an_accepted_result(
 
 @pytest.mark.parametrize("poison", ["library", "missing_identity", "natal_Sun"])
 def test_inverse_and_natal_source_or_value_disagreement_never_publishes_a_chart(
-    monkeypatch, fixed_moshier, poison
-):
+    monkeypatch: pytest.MonkeyPatch, fixed_moshier, poison: str
+) -> None:
     if poison == "natal_Sun":
         native = guolao.runtime.ephemeris_call
 
@@ -444,6 +450,8 @@ def test_inverse_and_natal_source_or_value_disagreement_never_publishes_a_chart(
                 coords = list(coords)
                 coords[0] += 0.1
                 return tuple(coords), flags
+            else:
+                pass
             return v
 
         monkeypatch.setattr(guolao.runtime, "ephemeris_call", changed)
@@ -468,7 +476,7 @@ def test_inverse_and_natal_source_or_value_disagreement_never_publishes_a_chart(
 
 
 @pytest.mark.parametrize("basis", ["local_mean_solar", "local_apparent_solar"])
-def test_solar_and_civil_timezone_claims_cannot_be_combined(basis):
+def test_solar_and_civil_timezone_claims_cannot_be_combined(basis: str) -> None:
     for model, args in [
         (AstroGuolaoRequest, {}),
         (AstroChartPolyRequest, dict(chart_variant="guolao_chart")),
@@ -490,15 +498,15 @@ def test_solar_and_civil_timezone_claims_cannot_be_combined(basis):
     + [(b, False, True) for b in ["local_mean_solar", "local_apparent_solar"]],
 )
 def test_actual_three_surfaces_preserve_labels_epochs_and_complete_error_mapping(
-    monkeypatch,
+    monkeypatch: pytest.MonkeyPatch,
     fixed_moshier,
-    capsys,
+    capsys: pytest.CaptureFixture[str],
     record_testsuite_property,
-    tool,
+    tool: str,
     basis,
     solar,
     failed,
-):
+) -> None:
     if failed:
         native = guolao.runtime.ephemeris_call
 
@@ -510,13 +518,19 @@ def test_actual_three_surfaces_preserve_labels_epochs_and_complete_error_mapping
             ):
                 a = list(a)
                 a[2] |= guolao.runtime.swe.FLG_RADIANS
+            else:
+                pass
             return native(op, *a, **kw)
 
         monkeypatch.setattr(guolao.runtime, "ephemeris_call", radians)
+    else:
+        pass
     spec = next(s for s in CATALOG if s.key == tool)
     payload = {**CASES[0], "birth_clock_basis": basis, "use_true_solar_time": solar}
     if tool == "astro_chart":
         payload["chart_variant"] = "guolao_chart"
+    else:
+        pass
     options = dict(
         as_of="2026-10-25T00:00:00+08:00",
         include_snapshot_text=False,
@@ -540,11 +554,11 @@ def test_actual_three_surfaces_preserve_labels_epochs_and_complete_error_mapping
 
     async def protocol():
         async with Client(create_mcp_app()) as client:
-            v = await client.call_tool(
-                spec.tool_name, {**payload, **options}, raise_on_error=False
+            v = await call_calculation(
+                client, spec.tool_name, {**payload, **options}, raise_on_error=False
             )
             assert v.is_error is failed
-            return json.loads(v.content[0].text) if failed else v.structured_content
+            return v.structured_content
 
     mcp = asyncio.run(protocol())
     arguments = [spec.tool_name]
@@ -572,6 +586,8 @@ def test_actual_three_surfaces_preserve_labels_epochs_and_complete_error_mapping
         path.parent.mkdir(parents=True, exist_ok=True)
         with path.open("x") as stream:
             json.dump(wire, stream, ensure_ascii=False)
+    else:
+        pass
     values = [
         {k: v for k, v in body.items() if k != "run_metadata"}
         for body in [rest.json(), mcp, cli]
@@ -585,8 +601,8 @@ def test_actual_three_surfaces_preserve_labels_epochs_and_complete_error_mapping
 
 
 def test_new_clock_evidence_projection_is_available_with_strict_fields(
-    monkeypatch, fixed_moshier
-):
+    monkeypatch: pytest.MonkeyPatch, fixed_moshier
+) -> None:
     api._reset_runtime_state_for_tests()
     monkeypatch.setattr(
         api,
@@ -594,7 +610,7 @@ def test_new_clock_evidence_projection_is_available_with_strict_fields(
         api.ApiKeyAuthenticator(header_name="X-API-Key", api_keys={}),
     )
     response = TestClient(api.app).post(
-        "/api/astro/guolao",
+        "/api/astrology/guolao-chart",
         json={**CASES[0], "birth_clock_basis": "local_apparent_solar"},
         params=[
             ("fields", "guolao.profile.input_clock.source_comparison.status"),

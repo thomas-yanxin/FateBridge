@@ -6,14 +6,13 @@ from fractions import Fraction
 import mpmath as mp
 import pytest
 
-from fatebridge.core.evidence_graph import (
+from fatebridge.core.human_design.human_design_apparent_positions import build_context
+from validation.evidence_graph import (
     EvidenceGraph,
     affected_nodes,
     execution_evidence,
 )
-from fatebridge.core.human_design_apparent_positions import build_context
-from fatebridge.core.method_contracts import COMPATIBILITY_INDEX
-from fatebridge.core.verified_outputs import (
+from validation.verified_outputs import (
     collect_source_conflicts,
     collect_verified_outputs,
     verify_output_binding,
@@ -36,7 +35,7 @@ def budget():
     }
 
 
-def test_exact_ratio_error_bound_is_not_a_physical_error_bound():
+def test_exact_ratio_error_bound_is_not_a_physical_error_bound() -> None:
     data = budget()
     witness = next(
         w
@@ -58,14 +57,14 @@ def test_exact_ratio_error_bound_is_not_a_physical_error_bound():
         verify_output_binding(witness, changed)
 
 
-def test_internally_contradictory_exact_receipt_fails_closed():
+def test_internally_contradictory_exact_receipt_fails_closed() -> None:
     data = budget()
     data["assessment"]["threshold_arithmetic"]["share_exact"] = "1/2"
     with pytest.raises(RuntimeError, match="完整操作数矛盾"):
         collect_verified_outputs(data)
 
 
-def test_original_taiyi_volume2_integer_example_and_missing_term():
+def test_original_taiyi_volume2_integer_example_and_missing_term() -> None:
     data = {
         "taiyi": {
             "core_board": {
@@ -94,7 +93,7 @@ def test_original_taiyi_volume2_integer_example_and_missing_term():
         collect_verified_outputs(changed)
 
 
-def test_taiyi_correct_sum_with_wrong_ring_position_is_rejected():
+def test_taiyi_correct_sum_with_wrong_ring_position_is_rejected() -> None:
     data = {
         "alignment": {
             "source_marker": "亥",
@@ -120,7 +119,7 @@ def test_taiyi_correct_sum_with_wrong_ring_position_is_rejected():
         collect_verified_outputs(data)
 
 
-def test_qimen_nine_palace_wrap_is_a_discrete_result_not_a_confidence_score():
+def test_qimen_nine_palace_wrap_is_a_discrete_result_not_a_confidence_score() -> None:
     data = {
         "qimen": {
             "rule_trace": [
@@ -145,9 +144,9 @@ def test_qimen_nine_palace_wrap_is_a_discrete_result_not_a_confidence_score():
         collect_verified_outputs(data)
 
 
-def test_proven_operand_edges_invalidate_the_derived_ratio():
+def test_proven_operand_edges_invalidate_the_derived_ratio() -> None:
     data = budget()
-    value = execution_evidence((COMPATIBILITY_INDEX,), {}, data, "origin")
+    value = execution_evidence((), {}, data, "origin")
     graph = EvidenceGraph.model_validate(value["graph"])
     start = "operand:/assessment/threshold_arithmetic/energies_exact/木"
     target = "math:exact_component_support_relation_v1:/assessment/support_share"
@@ -157,7 +156,9 @@ def test_proven_operand_edges_invalidate_the_derived_ratio():
     assert value["error_budget"]["conditional_output_bounds"]
 
 
-def test_nominal_solar_geometry_enclosures_contain_independent_high_precision_values():
+def test_nominal_solar_geometry_enclosures_contain_independent_high_precision_values() -> (
+    None
+):
     # One degree on the equator; an independent arbitrary precision formula,
     # using literal nominal constants, not the production interval routines.
     context = build_context(
@@ -200,7 +201,9 @@ def test_nominal_solar_geometry_enclosures_contain_independent_high_precision_va
             verify_output_binding(w, {"context": context})
 
 
-def test_source_contradiction_preserves_both_sides_without_adjudicating_priority():
+def test_source_contradiction_preserves_both_sides_without_adjudicating_priority() -> (
+    None
+):
     data = {
         "alignment": {
             "actual_count": 18,

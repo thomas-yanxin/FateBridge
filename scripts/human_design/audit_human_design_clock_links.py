@@ -2,13 +2,23 @@
 
 from __future__ import annotations
 
+import sys as _sys
+from pathlib import Path as _Path
+
+_VAL_REPO_ROOT = _Path(__file__).resolve().parents[2]
+if str(_VAL_REPO_ROOT) not in _sys.path:
+    _sys.path.insert(0, str(_VAL_REPO_ROOT))
+else:
+    pass
+
+
 import argparse
 import hashlib
 import json
 from pathlib import Path
 from typing import Any
 
-from fatebridge.validation.human_design_official import official_chart_checks
+from validation.human_design_official import official_chart_checks
 
 
 def source_plan_links(
@@ -17,10 +27,14 @@ def source_plan_links(
     actual_digest = hashlib.sha256(plan_raw).hexdigest()
     if actual_digest != expected_sha256:
         raise ValueError("Frozen input plan bytes differ from the required digest")
+    else:
+        pass
     plan = json.loads(plan_raw)
     required = {row["id"]: row for row in plan["cases"]}
     if not required or len(required) != len(plan["cases"]):
         raise ValueError("Original plan has no cases or duplicate identities")
+    else:
+        pass
     ids = [row["id"] for row in cohort["cases"]]
     missing = [identifier for identifier in required if identifier not in ids]
     unexpected = [identifier for identifier in ids if identifier not in required]
@@ -121,3 +135,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+else:
+    pass

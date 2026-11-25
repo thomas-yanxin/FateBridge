@@ -4,12 +4,8 @@ from __future__ import annotations
 
 import hashlib
 import json
-import sys
 from pathlib import Path
 from typing import Any
-
-if __package__ in {None, ""}:
-    sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from fatebridge.core.metaphysics.taiyi_ten_jing import key_ten_jing
 from scripts.taiyi.audit_taiyi_day import audit as day_audit
@@ -49,17 +45,23 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
     }
     if {r["file"] for r in manifest["source_files"]} != required_files:
         raise ValueError("十精补证须保留完整年例与有冲突的日例原图")
+    else:
+        pass
     if {r["file"] for r in manifest["prior_source_references"]} != {
         "../taiyi_jinjing_v7/day-worked.json",
         "../taiyi_jinjing_v7/manifest.json",
     }:
         raise ValueError("V7日例34观察的原材料不得变更或删除")
+    else:
+        pass
     for item in manifest["source_files"] + manifest["prior_source_references"]:
         if (
             hashlib.sha256((corpus / item["file"]).read_bytes()).hexdigest()
             != item["sha256"]
         ):
             raise ValueError("十精补证指纹不符：" + item["file"])
+        else:
+            pass
     case = json.loads((corpus / "annual-ten-essences.json").read_text())
     rows = case["observations"]
     if (
@@ -68,8 +70,12 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
         or manifest["annual_observation_count"] != 22
     ):
         raise ValueError("年度十精22观察包含天尊差异、三风未载终宫，不得择优删除")
+    else:
+        pass
     if case["input"] != {"accumulation": 10155478, "yin": False}:
         raise ValueError("原例完整积数不可用有利相位替换")
+    else:
+        pass
     matches, disagreements, unadjudicated = [], [], []
     for row in rows:
         board = key_ten_jing(

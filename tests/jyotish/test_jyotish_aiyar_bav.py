@@ -7,10 +7,10 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core import jyotish_aiyar_ashtakavarga as aiyar
-from fatebridge.core import jyotish_ashtakavarga as rao
-from fatebridge.core import jyotish_pinda as pinda
-from fatebridge.core.output_jyotish import AiyarBavProfile
+from fatebridge.core.contracts.output_jyotish import AiyarBavProfile
+from fatebridge.core.jyotish import jyotish_aiyar_ashtakavarga as aiyar
+from fatebridge.core.jyotish import jyotish_ashtakavarga as rao
+from fatebridge.core.jyotish import jyotish_pinda as pinda
 
 FIXTURES = Path(__file__).parents[1] / "fixtures"
 PRIMARY_PATH = FIXTURES / "jyotish-aiyar-seven-bav-primary.json"
@@ -19,7 +19,7 @@ PRIMARY = json.loads(PRIMARY_PATH.read_text())
 REFERENCE = json.loads(REFERENCE_PATH.read_text())
 
 
-def test_original_transcription_and_preimplementation_full_chain_are_frozen():
+def test_original_transcription_and_preimplementation_full_chain_are_frozen() -> None:
     assert (
         hashlib.sha256(PRIMARY_PATH.read_bytes()).hexdigest()
         == "b18e3da44d7c6dded9e3050201a41a19d70f06f29a4d2abbde1abda7dbbdd7da"
@@ -32,7 +32,9 @@ def test_original_transcription_and_preimplementation_full_chain_are_frozen():
     assert PRIMARY["real_event_cases"] == REFERENCE["real_event_cases"] == 0
 
 
-def test_every672_literal_cell_matches_the_source_and_keeps_six_default_differences():
+def test_every672_literal_cell_matches_the_source_and_keeps_six_default_differences() -> (
+    None
+):
     actual = aiyar.calculate(dict.fromkeys(aiyar.CONTRIBUTORS, 0))
     differences = []
     for ti, target in enumerate(aiyar.TARGETS):
@@ -44,6 +46,8 @@ def test_every672_literal_cell_matches_the_source_and_keeps_six_default_differen
                 assert actual["prastara"][target][donor][h - 1] == expected
                 if int(rao.HOUSE_ROWS[ti][h - 1][di]) != expected:
                     differences.append((target, donor, h, expected))
+                else:
+                    pass
     assert differences == [
         ("Moon", "Moon", 9, 0),
         ("Moon", "Mars", 9, 1),
@@ -63,7 +67,7 @@ def test_every672_literal_cell_matches_the_source_and_keeps_six_default_differen
 
 
 @pytest.mark.parametrize("case", REFERENCE["rows"], ids=lambda c: c["case_id"])
-def test_all91_cases_own_raw_tables_and_637_reduced_rows(case):
+def test_all91_cases_own_raw_tables_and_637_reduced_rows(case) -> None:
     before = copy.deepcopy(case["signs"])
     actual = aiyar.calculate(case["signs"])
     assert case["signs"] == before
@@ -86,7 +90,7 @@ def test_all91_cases_own_raw_tables_and_637_reduced_rows(case):
 @pytest.mark.parametrize("shift", range(12))
 def test_raw_tables_rotate_with_all_contributors_without_asserting_reduction_equivariance(
     shift,
-):
+) -> None:
     case = REFERENCE["rows"][0]
     signs = {p: (v + shift) % 12 for p, v in case["signs"].items()}
     actual = aiyar.calculate(signs)
@@ -100,7 +104,7 @@ def test_raw_tables_rotate_with_all_contributors_without_asserting_reduction_equ
     )
 
 
-def test_the_old_same_raw_bav_reduction_is_still_a_distinct_computation():
+def test_the_old_same_raw_bav_reduction_is_still_a_distinct_computation() -> None:
     case = REFERENCE["rows"][0]
     old = rao.calculate(case["signs"])
     old_comparison = pinda.analyze(
@@ -119,7 +123,7 @@ def test_the_old_same_raw_bav_reduction_is_still_a_distinct_computation():
 @pytest.mark.parametrize(
     "change", ["missing", "extra", "node", "bool", "float", "negative", "twelve"]
 )
-def test_explicit_eight_contributor_domain_is_not_coerced(change):
+def test_explicit_eight_contributor_domain_is_not_coerced(change: str) -> None:
     signs = dict.fromkeys(aiyar.CONTRIBUTORS, 0)
     if change == "missing":
         signs.pop("Ascendant")

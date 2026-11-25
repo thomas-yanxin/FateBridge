@@ -3,6 +3,7 @@
 import asyncio
 import json
 import shutil
+from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
@@ -13,6 +14,8 @@ import fatebridge.api as api
 from fatebridge.application.examples import suggested_fields
 from fatebridge.application.projection import project_fields
 from fatebridge.cli import run
+from fatebridge.core.contracts.output_chinese import Taiyi
+from fatebridge.core.contracts.output_taiyi_conditions import TaiyiConditionClause
 from fatebridge.core.metaphysics.taiyi_conditions import (
     conditions_text,
     conjunction,
@@ -20,20 +23,18 @@ from fatebridge.core.metaphysics.taiyi_conditions import (
     update_conjunction,
 )
 from fatebridge.core.metaphysics.taiyi_year import cyclic_core, structural_patterns
-from fatebridge.core.output_chinese import Taiyi
-from fatebridge.core.output_taiyi_conditions import TaiyiConditionClause
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.metaphysics import calculate_taiyi_analysis
 from fatebridge.services.tool_catalog import CATALOG
 from scripts.taiyi.audit_taiyi_condition_coverage import CORPUS, audit
 from tests.support.reference_data import resolve
-from tests.taiyi.test_taiyi_enclosures import transport_payload
-from tests.taiyi.test_taiyi_transports import _same_run_payload
+from tests.support.transports import SPECS, call_calculation
+from tests.unit_test.fixtures.taiyi import same_run_payload, transport_payload
 
 TRUTH = json.loads((CORPUS / "truth-table.json").read_text())
 
 
-def test_four_literal_notes_are_not_four_complete_charts_or_a_new_guan_rule():
+def test_four_literal_notes_are_not_four_complete_charts_or_a_new_guan_rule() -> None:
     report = audit()
     assert report["selected_source_notes"] == 4
     assert (
@@ -60,7 +61,7 @@ def test_four_literal_notes_are_not_four_complete_charts_or_a_new_guan_rule():
 
 
 @pytest.mark.parametrize("case", TRUTH["two_inputs"] + TRUTH["three_inputs"])
-def test_entire_frozen_synthetic_truth_table_and_layer_composition(case):
+def test_entire_frozen_synthetic_truth_table_and_layer_composition(case) -> None:
     assert conjunction(*case["values"]) is case["expected"]
     if len(case["values"]) == 2:
         a = {
@@ -71,15 +72,17 @@ def test_entire_frozen_synthetic_truth_table_and_layer_composition(case):
         assert a["menju_jiangfa"] is case["expected"]
         assert a["five_generals"]["conditions_satisfied"] is case["values"][0]
         assert a["three_gates"]["conditions_satisfied"] is case["values"][1]
+    else:
+        pass
 
 
 @pytest.mark.parametrize("values", [(), ("false",), (0,), (1,), ([],)])
-def test_missing_or_coerced_logic_input_does_not_make_a_pass(values):
+def test_missing_or_coerced_logic_input_does_not_make_a_pass(values) -> None:
     with pytest.raises(ValueError):
         conjunction(*values)
 
 
-def test_missing_core_and_partial_core_cannot_prove_absent_relations():
+def test_missing_core_and_partial_core_cannot_prove_absent_relations() -> None:
     for c in [None, {}, {"main_general": 5}]:
         a = five_general_conditions([], core=c)
         assert a["five_generals"]["conditions_satisfied"] is None
@@ -96,7 +99,7 @@ def test_missing_core_and_partial_core_cannot_prove_absent_relations():
     assert a["five_generals"]["clauses"][1]["satisfied"] is None
 
 
-def test_all_144_cores_keep_patterns_and_retain_both_unknowns_and_blockers():
+def test_all_144_cores_keep_patterns_and_retain_both_unknowns_and_blockers() -> None:
     pending, withheld = 0, 0
     for yin in [False, True]:
         for ju in range(1, 73):
@@ -131,7 +134,7 @@ def test_all_144_cores_keep_patterns_and_retain_both_unknowns_and_blockers():
     assert pending == 42 and withheld == 21
 
 
-def test_partial_projection_retains_unknown_and_its_fact_paths():
+def test_partial_projection_retains_unknown_and_its_fact_paths() -> None:
     b = calculate_taiyi_analysis(**transport_payload("taiyi", 2020))["taiyi"]
     a = b["condition_assessment"]
     assert a["five_generals"]["conditions_satisfied"] is None
@@ -169,7 +172,9 @@ def test_partial_projection_retains_unknown_and_its_fact_paths():
 
 
 @pytest.mark.parametrize("mutation", ["drop_note", "declare_guan", "change_truth"])
-def test_frozen_knowledge_cannot_be_changed_to_make_acceptance_pass(tmp_path, mutation):
+def test_frozen_knowledge_cannot_be_changed_to_make_acceptance_pass(
+    tmp_path: Path, mutation: str
+) -> None:
     target = tmp_path / "corpus"
     shutil.copytree(CORPUS, target)
     p = target / (
@@ -188,7 +193,9 @@ def test_frozen_knowledge_cannot_be_changed_to_make_acceptance_pass(tmp_path, mu
 
 
 @pytest.mark.parametrize("name", ["gujin3216-page78.jpg", "facsimile-check.json"])
-def test_supplementary_facsimile_fingerprints_are_enforced(tmp_path, name):
+def test_supplementary_facsimile_fingerprints_are_enforced(
+    tmp_path: Path, name: str
+) -> None:
     target = tmp_path / "corpus"
     shutil.copytree(CORPUS, target)
     (target / name).write_bytes(b"altered")
@@ -198,8 +205,8 @@ def test_supplementary_facsimile_fingerprints_are_enforced(tmp_path, name):
 
 @pytest.mark.parametrize("key", ["taiyi", "sanshiunited"])
 def test_actual_rest_mcp_cli_keep_false_true_and_unknown_distinct(
-    key, monkeypatch, capsys
-):
+    key: str, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
     spec = next(s for s in CATALOG if s.key == key)
     fields = ["taiyi.condition_assessment"]
     api._reset_runtime_state_for_tests()
@@ -227,7 +234,8 @@ def test_actual_rest_mcp_cli_keep_false_true_and_unknown_distinct(
         out = {}
         async with Client(create_mcp_app()) as c:
             for year in rest:
-                r = await c.call_tool(
+                r = await call_calculation(
+                    c,
                     spec.tool_name,
                     {
                         **transport_payload(key, year),
@@ -244,10 +252,18 @@ def test_actual_rest_mcp_cli_keep_false_true_and_unknown_distinct(
 
     native = asyncio.run(mcp())
     for year, expected in [(1906, False), (1922, True), (2020, None)]:
-        args = [key, "--strict-fields", "--no-use-true-solar-time", "--fields", *fields]
+        args = [
+            SPECS[key].tool_name,
+            "--strict-fields",
+            "--no-use-true-solar-time",
+            "--fields",
+            *fields,
+        ]
         for name, value in transport_payload(key, year).items():
             if name == "use_true_solar_time":
                 continue
+            else:
+                pass
             args.extend(
                 [
                     "--" + name.replace("_", "-"),
@@ -263,14 +279,17 @@ def test_actual_rest_mcp_cli_keep_false_true_and_unknown_distinct(
 
 
 @pytest.mark.parametrize("key", ["taiyi", "sanshiunited"])
-def test_default_budget_condition_view_keeps_all_requested_facts_and_unknowns(key):
+def test_default_budget_condition_view_keeps_all_requested_facts_and_unknowns(
+    key: str,
+) -> None:
     spec = next(s for s in CATALOG if s.key == key)
     view = "conditions" if key == "taiyi" else "taiyi_conditions"
 
     async def call():
         async with Client(create_mcp_app()) as c:
             for year in [1906, 1922, 2020]:
-                r = await c.call_tool(
+                r = await call_calculation(
+                    c,
                     spec.tool_name,
                     {
                         **transport_payload(key, year),
@@ -280,10 +299,12 @@ def test_default_budget_condition_view_keeps_all_requested_facts_and_unknowns(ke
                     },
                     raise_on_error=False,
                 )
-                await _same_run_payload(c, r, require_business_inline=True)
+                await same_run_payload(c, r, require_business_inline=True)
                 a = r.structured_content["taiyi"]["condition_assessment"]
                 if year == 2020:
                     assert a["five_generals"]["conditions_satisfied"] is None
                     assert a["five_generals"]["clauses"][2]["unassessed"]
+                else:
+                    pass
 
     asyncio.run(call())

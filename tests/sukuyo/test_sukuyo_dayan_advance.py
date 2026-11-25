@@ -8,20 +8,22 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core import sukuyo_historical_calendar as historical
-from fatebridge.core.sukuyo import calendar_mansion, day_evidence
-from fatebridge.core.sukuyo_dayan_advance import (
+from fatebridge.core.sukuyo import sukuyo_historical_calendar as historical
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence
+from fatebridge.core.sukuyo.sukuyo_dayan_advance import (
     SOURCE,
     comparison_lines,
     month_comparison,
     validate_bundle,
 )
-from fatebridge.core.sukuyo_sources import load_source
+from fatebridge.core.sukuyo.sukuyo_sources import load_source
 
 FIXTURES = Path(__file__).parents[1] / "data"
 
 
-def test_every_before_code_source_and_host_row_preserves_52_conflicts_and_unknown():
+def test_every_before_code_source_and_host_row_preserves_52_conflicts_and_unknown() -> (
+    None
+):
     raw = (FIXTURES / "sukuyo-dayan-advance-source-v1.json").read_bytes()
     assert hashlib.sha256(raw).hexdigest() == (
         "5f93a0caaf6ced3024aaf116dcc457bf99d139f44a5ba94c53402f546accd3a7"
@@ -64,11 +66,15 @@ def test_every_before_code_source_and_host_row_preserves_52_conflicts_and_unknow
         counts[result["matches_author_direction_inference"]] += 1
         if result["author_direction_differs_from_ge_assumed_limit"]:
             exceptions.append(original["row_number"])
+        else:
+            pass
     assert counts == {True: 274, False: 52, None: 1}
     assert exceptions == [37, 48, 53, 56, 70, 76, 217, 281, 287, 304]
 
 
-def test_unknown_proposal_keeps_threshold_separate_from_missing_author_direction():
+def test_unknown_proposal_keeps_threshold_separate_from_missing_author_direction() -> (
+    None
+):
     result = month_comparison(841, 11, False, host_month_start_index=33)
     assert result["selected_row"]["computed_new_moon_remainder"] == 23
     assert result["selected_row"]["author_proposed_decision_literal"] == "-"
@@ -80,7 +86,7 @@ def test_unknown_proposal_keeps_threshold_separate_from_missing_author_direction
     assert "不能据此替横杠补定作者进退" in text
 
 
-def test_unknown_limit_does_not_remove_explicit_source_decision():
+def test_unknown_limit_does_not_remove_explicit_source_decision() -> None:
     result = month_comparison(764, 2, False, host_month_start_index=4)
     assert result["mechanical_ge_assumed_limit"] is None
     assert result["author_proposed_day_shift_from_literal"] == 0
@@ -89,7 +95,9 @@ def test_unknown_limit_does_not_remove_explicit_source_decision():
 
 
 @pytest.mark.parametrize("month,leap", [(1, False), (6, True)])
-def test_not_listed_is_not_false_or_a_reconstructed_complete_calendar(month, leap):
+def test_not_listed_is_not_false_or_a_reconstructed_complete_calendar(
+    month: int, leap: bool
+) -> None:
     assert month_comparison(764, month, leap, host_month_start_index=0) is None
 
 
@@ -104,13 +112,17 @@ def test_not_listed_is_not_false_or_a_reconstructed_complete_calendar(month, lea
         ((764, 2, False), {"host_month_start_index": -1}),
     ],
 )
-def test_wrong_keys_and_cycle_indices_cannot_silently_coerce_or_wrap(args, kwargs):
+def test_wrong_keys_and_cycle_indices_cannot_silently_coerce_or_wrap(
+    args, kwargs
+) -> None:
     with pytest.raises(ValueError):
         month_comparison(*args, **kwargs)
 
 
 @pytest.mark.parametrize("mutation", ["drop", "dash", "star", "limit", "scope"])
-def test_complete_source_binding_rejects_shrunk_or_rewritten_rows(mutation):
+def test_complete_source_binding_rejects_shrunk_or_rewritten_rows(
+    mutation: str,
+) -> None:
     data = deepcopy(load_source(SOURCE).data)
     if mutation == "drop":
         data["rows"].pop(262)
@@ -126,7 +138,9 @@ def test_complete_source_binding_rejects_shrunk_or_rewritten_rows(mutation):
         validate_bundle(data)
 
 
-def test_native_day_and_pair_scope_preserve_new_conflict_beside_old_provider_no_conflict():
+def test_native_day_and_pair_scope_preserve_new_conflict_beside_old_provider_no_conflict() -> (
+    None
+):
     result = calendar_mansion(
         "0766-03-19",
         "12:00:00",

@@ -28,11 +28,17 @@ def sha(path: Path) -> str:
 def reference(folder: Path = CORPUS) -> dict[str, Any]:
     if sha(folder / "freeze.json") != PIN:
         raise ValueError("Frozen authored-case identity changed")
+    else:
+        pass
     files = json.loads((folder / "freeze.json").read_text())["files"]
     if {p.name for p in folder.iterdir()} != set(files) | {"freeze.json"}:
         raise ValueError("Frozen authored-case inventory changed")
+    else:
+        pass
     if any(sha(folder / n) != h for n, h in files.items()):
         raise ValueError("Frozen authored-case content changed")
+    else:
+        pass
     data = {
         key: json.loads((folder / f"{key}.json").read_text())
         for key in ("readings", "calendar-sources", "reference", "protocol")
@@ -45,31 +51,49 @@ def reference(folder: Path = CORPUS) -> dict[str, Any]:
     ):
         if sha(ROOT / path) != digest:
             raise ValueError("Primary transitive source changed: " + path)
+        else:
+            pass
     for source in sources["hko"]:
         if sha(folder / Path(source["path"]).name) != source["sha256"]:
             raise ValueError("Original HKO table changed")
+        else:
+            pass
     from tests.support.ren_source_arithmetic import tanyuan_cases
 
     if tanyuan_cases(folder) != json.loads((folder / "reference.json").read_text()):
         raise ValueError("Independent source arithmetic differs")
+    else:
+        pass
     if [r["id"] for r in reading["cases"]] != [f"C{i:02}" for i in range(1, 9)]:
         raise ValueError("Whole authored cohort changed")
+    else:
+        pass
     return data
 
 
 def alias_reference(folder: Path = ALIAS_CORPUS) -> dict[str, Any]:
     if sha(folder / "freeze.json") != ALIAS_PIN:
         raise ValueError("Frozen alias review identity changed")
+    else:
+        pass
     files = json.loads((folder / "freeze.json").read_text())["files"]
     if {p.name for p in folder.iterdir()} != set(files) | {"freeze.json"}:
         raise ValueError("Frozen alias review inventory changed")
+    else:
+        pass
     if any(sha(folder / n) != h for n, h in files.items()):
         raise ValueError("Frozen alias review content changed")
+    else:
+        pass
     review: dict[str, Any] = json.loads((folder / "review.json").read_text())
     if review["aliases"] != {"天乙": "贵人"} or review["original_cases_pin"] != PIN:
         raise ValueError("Alias scope or original identity changed")
+    else:
+        pass
     if sha(ROOT / review["source_path"]) != review["source_sha256"]:
         raise ValueError("Alias primary source changed")
+    else:
+        pass
     return review
 
 
@@ -146,7 +170,7 @@ def audit() -> dict[str, Any]:
     from fatebridge.core.almanac import get_solar_term_environment_key
     from fatebridge.core.metaphysics.liureng import build_liureng_board
     from fatebridge.core.metaphysics.ren_calendar import require_ren_calendar
-    from fatebridge.services.metaphysics import _build_analysis_seed
+    from fatebridge.core.metaphysics.seed import build_analysis_seed
 
     paths = sorted((ROOT / "src").rglob("*.py")) + [
         ROOT / "pyproject.toml",
@@ -159,6 +183,8 @@ def audit() -> dict[str, Any]:
     ):
         if case["id"] != ref["id"]:
             raise ValueError("Case/reference input binding differs")
+        else:
+            pass
         solar = date.fromisoformat(ref["solar_date"])
         row: dict[str, Any] = dict(
             id=case["id"],
@@ -172,7 +198,7 @@ def audit() -> dict[str, Any]:
         for sample in ref["samples"]:
             minute = sample["minute_of_day"]
             try:
-                seed = _build_analysis_seed(
+                seed = build_analysis_seed(
                     analysis_year=solar.year,
                     analysis_month=solar.month,
                     analysis_day=solar.day,
@@ -210,10 +236,16 @@ def audit() -> dict[str, Any]:
                 calendar_rows.append(entry)
                 if not entry["calendar_passed"]:
                     row["calendar_failures"].append(entry)
+                else:
+                    pass
                 if not entry["printed_day_agrees"]:
                     row["printed_day_mismatch_minutes"].append(minute)
+                else:
+                    pass
                 if not entry["printed_title_recognized"]:
                     row["title_missing_minutes"].append(minute)
+                else:
+                    pass
                 if row["first_minute_symbolic"] is None:
                     # Separate controlled reconstruction: use the printed general,
                     # never count this override as a calendar validation pass.
@@ -251,6 +283,8 @@ def audit() -> dict[str, Any]:
                         "ren_calendar_policy"
                     ]
                     row["first_minute_symbolic"] = symbolic_row
+                else:
+                    pass
             except Exception as error:
                 errors.append(
                     dict(

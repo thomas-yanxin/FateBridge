@@ -7,33 +7,9 @@ from pydantic import ValidationError
 
 from fatebridge.core.fengshui.models import AssessRequest
 from fatebridge.services.fengshui import assess
-from tests.fengshui.test_fengshui_context import orientation
-from tests.fengshui.test_fengshui_planning import observation, proposal_request
-
-
-def feature(object_id="furniture", direction="N", classification="sand"):
-    return {
-        "object_id": object_id,
-        "direction": direction,
-        "classification": classification,
-        "classification_basis": "user_confirmed",
-        "evidence": "本次位置与砂水分类独立确认，不按物品名称推断",
-    }
-
-
-def inputs(*, fresh=False, facing_only=False):
-    values = proposal_request()
-    values["methods"] = ["jinsuo", "annual_stars"]
-    values["features"] = [feature(), feature("fixed_wall", "NW", "sand")]
-    candidate = values["layout_alternatives"][0]
-    if facing_only:
-        candidate["changes"] = ["facing"]
-        candidate["placement"]["location_direction"] = "N"
-    if fresh:
-        candidate["features"] = [
-            feature(direction=candidate["placement"]["location_direction"])
-        ]
-    return values
+from tests.unit_test.fixtures.fengshui_layout import candidate_features as inputs
+from tests.unit_test.fixtures.fengshui_layout import environment_feature as feature
+from tests.unit_test.fixtures.fengshui_layout import observation, orientation
 
 
 def proposal(values):
@@ -42,8 +18,8 @@ def proposal(values):
 
 @pytest.mark.parametrize("facing_only", [False, True])
 def test_old_target_feature_is_removed_and_missing_fresh_confirmation_prevents_ready(
-    facing_only,
-):
+    facing_only: bool,
+) -> None:
     result = proposal(inputs(facing_only=facing_only))
     assert result["status"] == "candidate_only"
     assert result["calculation_status"] == "partial"
@@ -57,8 +33,8 @@ def test_old_target_feature_is_removed_and_missing_fresh_confirmation_prevents_r
 
 @pytest.mark.parametrize("facing_only", [False, True])
 def test_independent_feature_confirmation_recalculates_target_and_retains_static_features(
-    facing_only,
-):
+    facing_only: bool,
+) -> None:
     values = inputs(fresh=True, facing_only=facing_only)
     # N prefers sand, while E likewise prefers sand. Use confirmed water to
     # ensure a complete proposal need not match a traditional preference.
@@ -86,8 +62,8 @@ def test_independent_feature_confirmation_recalculates_target_and_retains_static
 
 @pytest.mark.parametrize("classification", ["mixed", "unknown"])
 def test_fresh_feature_with_unconfirmed_single_classification_remains_partial(
-    classification,
-):
+    classification: str,
+) -> None:
     values = inputs(fresh=True)
     values["layout_alternatives"][0]["features"][0]["classification"] = classification
     result = proposal(values)
@@ -111,7 +87,9 @@ def test_fresh_feature_with_unconfirmed_single_classification_remains_partial(
         "wrong_current_direction",
     ],
 )
-def test_features_cannot_switch_identity_direction_or_method_scope(violation):
+def test_features_cannot_switch_identity_direction_or_method_scope(
+    violation: str,
+) -> None:
     values = inputs(fresh=True)
     candidate = values["layout_alternatives"][0]
     if violation == "unselected_method":
@@ -154,8 +132,8 @@ def form_only_candidate():
     "context_location", ["current", "candidate", "candidate_omits_orientation"]
 )
 def test_feature_only_physical_claim_cannot_bypass_unknown_global_orientation(
-    context_location,
-):
+    context_location: str,
+) -> None:
     values = form_only_candidate()
     unknown = {"orientation": {"evidence": "未确认方位"}}
     if context_location == "current":
@@ -187,8 +165,8 @@ def test_feature_only_physical_claim_cannot_bypass_unknown_global_orientation(
     ["center_confirmed", "floorplan_alignment_confirmed", "uses_shared_orientation"],
 )
 def test_new_feature_without_placement_still_requires_its_floor_geometry(
-    context_location, missing_flag
-):
+    context_location: str, missing_flag: str
+) -> None:
     values = form_only_candidate()
     floor = {
         "floor_id": "upper",
@@ -209,7 +187,9 @@ def test_new_feature_without_placement_still_requires_its_floor_geometry(
         AssessRequest.model_validate(values)
 
 
-def test_feature_only_candidate_can_be_reviewed_without_faking_furniture_location():
+def test_feature_only_candidate_can_be_reviewed_without_faking_furniture_location() -> (
+    None
+):
     result = proposal(form_only_candidate())
     assert result["status"] == "ready"
     assert result["placement_findings"] == []
@@ -219,7 +199,7 @@ def test_feature_only_candidate_can_be_reviewed_without_faking_furniture_locatio
     )
 
 
-def test_cross_floor_candidate_uses_new_feature_and_new_frame_together():
+def test_cross_floor_candidate_uses_new_feature_and_new_frame_together() -> None:
     values = inputs(fresh=True)
     for key, level in [("environmental_context", 1), ("candidate", 2)]:
         context = {

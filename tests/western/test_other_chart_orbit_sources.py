@@ -5,6 +5,7 @@ import json
 import os
 import subprocess
 import sys
+from pathlib import Path
 
 import pytest
 
@@ -49,7 +50,9 @@ def _birth():
 
 
 @HAS_SWE
-def test_real_library_environment_override_matches_reported_path(tmp_path):
+def test_real_library_environment_override_matches_reported_path(
+    tmp_path: Path,
+) -> None:
     a, b = tmp_path / "env", tmp_path / "explicit"
     write_orbits(a)
     write_orbits(b, cupido_anomaly="210.0000")
@@ -66,6 +69,8 @@ print(json.dumps({'path':selected,'longitude':x[0],'source':fictitious_element_s
         env.pop("SE_EPHE_PATH", None)
         if envpath is not None:
             env["SE_EPHE_PATH"] = str(envpath)
+        else:
+            pass
         result = subprocess.run(
             [sys.executable, "-c", code, str(explicit)],
             env=env,
@@ -87,8 +92,8 @@ print(json.dumps({'path':selected,'longitude':x[0],'source':fictitious_element_s
 
 @HAS_SWE
 def test_default_current_directory_and_first_readable_search_entry_are_traced(
-    tmp_path, monkeypatch
-):
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     a, b = tmp_path / "current", tmp_path / "later"
     source = write_orbits(a)
     write_orbits(b, cupido_anomaly="210.0000")
@@ -108,11 +113,42 @@ def test_default_current_directory_and_first_readable_search_entry_are_traced(
     )
     assert str(a) not in json.dumps(native["hypothetical_element_source"])
 
+    # Swiss ends the path at LF. The empty second root searches the cwd.
+    e.configure_ephemeris_path("missing;\n" + str(b))
+    native = _native_factors(_birth(), False)
+    assert native["hypothetical_element_source"]["search_path_index"] == 1
+    assert (
+        native["hypothetical_element_source"]["sha256"]
+        == hashlib.sha256(source.read_bytes()).hexdigest()
+    )
+
+
+@HAS_SWE
+@pytest.mark.parametrize("nested", [False, True])
+def test_fictitious_source_skips_non_directory_search_components(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, nested: bool
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    source = write_orbits(tmp_path / "usable", cupido_anomaly="210.0000")
+    blocker = "ordinary-file"
+    (tmp_path / blocker).touch()
+    unusable = f"{blocker}/not-reachable" if nested else blocker
+    e.configure_ephemeris_path("missing;usable")
+    expected = _native_factors(_birth(), False)
+    e.configure_ephemeris_path(f"{unusable};usable")
+    actual = _native_factors(_birth(), False)
+    assert actual["hypothetical_element_source"]["search_path_index"] == 1
+    assert (
+        actual["hypothetical_element_source"]["sha256"]
+        == hashlib.sha256(source.read_bytes()).hexdigest()
+    )
+    assert actual == expected
+
 
 @HAS_SWE
 def test_same_directory_orbit_edits_update_positions_and_receipt_without_cache_reset(
-    tmp_path,
-):
+    tmp_path: Path,
+) -> None:
     source = write_orbits(tmp_path)
     e.configure_ephemeris_path(str(tmp_path))
     before = _native_factors(_birth(), False)
@@ -138,7 +174,9 @@ def test_same_directory_orbit_edits_update_positions_and_receipt_without_cache_r
 
 
 @HAS_SWE
-def test_reordered_custom_bodies_are_not_mislabeled_as_hamburg_factors(tmp_path):
+def test_reordered_custom_bodies_are_not_mislabeled_as_hamburg_factors(
+    tmp_path: Path,
+) -> None:
     source = write_orbits(tmp_path)
     rows = list(ROWS)
     rows[0], rows[1] = rows[1], rows[0]
@@ -149,7 +187,37 @@ def test_reordered_custom_bodies_are_not_mislabeled_as_hamburg_factors(tmp_path)
 
 
 @HAS_SWE
-def test_orbit_change_during_one_factor_calculation_is_rejected(tmp_path, monkeypatch):
+def test_malformed_first_fictitious_table_is_a_native_calculation_failure(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    broken = tmp_path / "broken"
+    broken.mkdir()
+    (broken / "seorbel.txt").write_text("J1900,J1900\n", encoding="ascii")
+    write_orbits(tmp_path / "usable")
+    e.configure_ephemeris_path("broken;usable")
+
+    result = calculate_germany_chart_analysis(
+        birth_year=2000,
+        birth_month=1,
+        birth_day=1,
+        birth_hour=12,
+        birth_timezone="UTC",
+        birth_longitude=0,
+        birth_latitude=30,
+        zodiacal=0,
+    )
+
+    assert result["error_code"] == "ephemeris_calculation_failed"
+    assert result["status_code"] == 503
+    assert result["retryable"] is False
+    assert "seorbel.txt" not in result["error"]
+
+
+@HAS_SWE
+def test_orbit_change_during_one_factor_calculation_is_rejected(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     write_orbits(tmp_path)
     e.configure_ephemeris_path(str(tmp_path))
     original = e.swe.calc
@@ -158,6 +226,8 @@ def test_orbit_change_during_one_factor_calculation_is_rejected(tmp_path, monkey
         result = original(*args, **kwargs)
         if args[1] == 40:
             write_orbits(tmp_path, cupido_anomaly="164.7409")
+        else:
+            pass
         return result
 
     monkeypatch.setattr(e.swe, "calc", change_after_cupido)
@@ -166,7 +236,9 @@ def test_orbit_change_during_one_factor_calculation_is_rejected(tmp_path, monkey
 
 
 @HAS_SWE
-def test_orbit_change_between_birth_time_samples_is_rejected(tmp_path, monkeypatch):
+def test_orbit_change_between_birth_time_samples_is_rejected(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     import fatebridge.core.astro.sensitivity as sensitivity
 
     write_orbits(tmp_path)
@@ -178,6 +250,8 @@ def test_orbit_change_between_birth_time_samples_is_rejected(tmp_path, monkeypat
         calls.append(result)
         if len(calls) == 1:
             write_orbits(tmp_path, cupido_anomaly="164.7409")
+        else:
+            pass
         return result
 
     monkeypatch.setattr(sensitivity, "_native_factors", change_after_first)
@@ -187,8 +261,8 @@ def test_orbit_change_between_birth_time_samples_is_rejected(tmp_path, monkeypat
 
 @HAS_SWE
 def test_changed_environment_is_applied_to_an_existing_direct_call_worker(
-    tmp_path, monkeypatch
-):
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     a, b = tmp_path / "a", tmp_path / "b"
     write_orbits(a)
     write_orbits(b, cupido_anomaly="210.0000")
@@ -202,13 +276,15 @@ def test_changed_environment_is_applied_to_an_existing_direct_call_worker(
 
 @pytest.mark.parametrize("path", ["x" * 243, "界" * 81, "bad\0path"])
 @HAS_SWE
-def test_silent_library_path_fallbacks_are_rejected(path):
+def test_silent_library_path_fallbacks_are_rejected(path) -> None:
     with pytest.raises(ValueError, match="encoded bytes"):
         e.configure_ephemeris_path(path)
 
 
 @HAS_SWE
-def test_real_long_directory_would_silently_select_different_orbits(tmp_path):
+def test_real_long_directory_would_silently_select_different_orbits(
+    tmp_path: Path,
+) -> None:
     short = tmp_path / "short"
     write_orbits(short, cupido_anomaly="210.0000")
     suffix = "x" * (243 - len(os.fsencode(str(tmp_path))) - 1)
@@ -228,7 +304,9 @@ def test_real_long_directory_would_silently_select_different_orbits(tmp_path):
 
 
 @HAS_SWE
-def test_nominal_chart_and_birth_interval_cannot_use_different_orbit_files(tmp_path):
+def test_nominal_chart_and_birth_interval_cannot_use_different_orbit_files(
+    tmp_path: Path,
+) -> None:
     write_orbits(tmp_path)
     e.configure_ephemeris_path(str(tmp_path))
     payload = calculate_germany_chart_analysis(
@@ -248,7 +326,9 @@ def test_nominal_chart_and_birth_interval_cannot_use_different_orbit_files(tmp_p
 
 
 @HAS_SWE
-def test_equal13_time_samples_do_not_depend_on_unrelated_fictitious_orbits(tmp_path):
+def test_equal13_time_samples_do_not_depend_on_unrelated_fictitious_orbits(
+    tmp_path: Path,
+) -> None:
     from fatebridge.services.astrology import calculate_core_chart_analysis
 
     source = write_orbits(tmp_path)

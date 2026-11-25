@@ -40,18 +40,26 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
         != correction_manifest["original_manifest_sha256"]
     ):
         raise ValueError("原始初录清单指纹不符")
+    else:
+        pass
     for item in manifest["source_files"] + correction_manifest["source_files"]:
         if (
             hashlib.sha256((corpus / item["file"]).read_bytes()).hexdigest()
             != item["sha256"]
         ):
             raise ValueError(f"原典文件指纹不符：{item['file']}")
+        else:
+            pass
     case = json.loads((corpus / "principal-enclosure.json").read_text())
     correction = json.loads((corpus / "transcription-correction.json").read_text())
     if set(case["expected"]) != NUMERIC_FIELDS or len(case["enclosures"]) != 2:
         raise ValueError("须保留完整11项宫数及2个原文明载提挟目标")
+    else:
+        pass
     if (case["year_ce"], case["ju"], case["source_page"]) != (385, 70, 51):
         raise ValueError("须保留太元十年乙酉原例，不改为更容易通过的课例")
+    else:
+        pass
     if (
         correction["original_field"] != "expected.wenchang_palace"
         or (correction["original_value"], case["expected"]["wenchang_palace"])
@@ -59,9 +67,13 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
         or correction["corrected_value"] != "未"
     ):
         raise ValueError("天道初录订正不符")
+    else:
+        pass
     proof = (corpus / correction["proof_file"]).read_text()
     if not all(text in proof for text in ("未神曰天道", "亥神曰大義")):
         raise ValueError("缺少卷二天道/大义独立名称映射")
+    else:
+        pass
     core = yearly_core(case["year_ce"])
     initial = {key: core[key] == value for key, value in case["expected"].items()}
     corrected = {**case["expected"], "wenchang_palace": correction["corrected_value"]}

@@ -67,9 +67,13 @@ def fetch(job):
     response = json.loads(raw)
     if "error" in response:
         raise ValueError(response["error"])
+    else:
+        pass
     result = response["result"]
     if "Date__(TT)" not in result:
         raise ValueError("Independent time scale is not confirmed as TT")
+    else:
+        pass
     rows = []
     table = result.split("$$SOE\n", 1)[1].split("$$EOE", 1)[0]
     for row in csv.reader(io.StringIO(table)):
@@ -119,6 +123,8 @@ def independent_events(data):
     for planet, samples in data.items():
         if planet == "Moon":
             continue
+        else:
+            pass
         values = [moon[0][1] - samples[0][1]]
         for i in range(1, len(moon)):
             relative = moon[i][1] - samples[i][1]
@@ -140,6 +146,10 @@ def independent_events(data):
                                     "julian_day_tt": when,
                                 }
                             )
+                        else:
+                            pass
+                    else:
+                        pass
     contacts.sort(
         key=lambda row: (row["julian_day_tt"], row["other"], row["ray_degrees"])
     )
@@ -201,3 +211,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+else:
+    pass

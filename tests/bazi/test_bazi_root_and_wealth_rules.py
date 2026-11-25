@@ -6,21 +6,21 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-import fatebridge.analysis.personality as personality_module
-from fatebridge.analysis.personality import PersonalityAnalysis
-from fatebridge.analysis.wealth import WealthAnalysis
-from fatebridge.core.bazi_root_context import hidden_roots, wealth_rule_context
+from fatebridge.core.bazi.bazi_evidence import (
+    build_natal_evidence,
+    build_topic_evidence,
+)
+from fatebridge.core.bazi.bazi_root_context import hidden_roots, wealth_rule_context
 from fatebridge.core.classical_roots import build_classical_root_profile
-from fatebridge.utils.data import TenGod
-from fatebridge.validation.predictions import StudyPlan, evaluate_study
-from tests.evaluation.test_prediction_validation import AS_OF, forecast, outcome, plan
+from tests.unit_test.fixtures.prediction_study import AS_OF, forecast, outcome, plan
+from validation.predictions import StudyPlan, evaluate_study
 
 
 def pillars(values):
     return dict(zip(("year", "month", "day", "hour"), map(tuple, values)))
 
 
-def test_shared_hidden_root_positions_match_the_external_column_matrix():
+def test_shared_hidden_root_positions_match_the_external_column_matrix() -> None:
     reference = json.loads(
         (
             Path(__file__).parents[1] / "data/bazi_pillar_facts_v1/reference.json"
@@ -58,8 +58,8 @@ def test_shared_hidden_root_positions_match_the_external_column_matrix():
     ],
 )
 def test_root_categories_follow_pdf22_23_without_creating_stems_or_coefficients(
-    stem, branch, category
-):
+    stem: str, branch: str, category: str
+) -> None:
     # Local stem/branch probes from the chapter, not historical birth charts.
     chart = {name: (stem, branch) for name in ("year", "month", "day", "hour")}
     result = build_classical_root_profile(chart)
@@ -71,9 +71,13 @@ def test_root_categories_follow_pdf22_23_without_creating_stems_or_coefficients(
             and not result["light_hidden_root_positions"]
         )
         assert all(not o["matching_hidden_stems"] for o in result["roots"])
+    else:
+        pass
 
 
-def test_original_food_wealth_case_exposes_financial_root_without_fitting_body_strength():
+def test_original_food_wealth_case_exposes_financial_root_without_fitting_body_strength() -> (
+    None
+):
     chart = pillars(["丁未", "癸卯", "癸亥", "癸丑"])
     result = wealth_rule_context(chart)
     assert result["path"] == "food_generates_wealth_prerequisites"
@@ -94,82 +98,42 @@ def test_original_food_wealth_case_exposes_financial_root_without_fitting_body_s
     )
 
 
-def test_storage_appearance_without_natal_clash_cannot_be_reported_as_opening():
-    chart = pillars(["甲寅", "甲子", "丙子", "甲子"])
-    result = WealthAnalysis.analyze_wealth(chart, dayun_pillar=("壬", "丑"))
-    assert result["wealth_storage"]["has_storage"] is False
-    assert result["wealth_timing"]["storage_events"] == []
-    assert result["wealth_structure"]["score_kind"] == "uncalibrated_rule_index"
-    assert not any("主进大财" in s for s in result["wealth_timing"]["timing_signals"])
-
-
-def test_hidden_wealth_root_clash_is_not_lost_when_branch_primary_qi_is_earth():
-    chart = pillars(["辛丑", "丁巳", "丙子", "乙未"])
-    result = WealthAnalysis.analyze_wealth(chart, liunian_pillar=("辛", "未"))
-    relation = next(
-        r
-        for r in result["wealth_risk"]["relations"]
-        if r["wealth_pillar"] == "year" and r["other_pillar"] == "hour"
-    )
-    assert relation["wealth_hidden_stems"] == ["辛"]
-    storage = result["wealth_storage"]["storage_hits"][0]
-    assert storage["clash_present"] and storage["opened"] is None
-    assert any(
-        e["natal_pillar"] == "year" and e["storage_branch"] == "丑"
-        for e in result["wealth_timing"]["storage_events"]
-    )
-    assert not any("财务相对安稳" in r for r in result["wealth_risk"]["risks"])
-
-
-def test_zero_wealth_count_cannot_claim_it_is_hidden():
-    result = WealthAnalysis._locate_wealth_stars(
-        pillars(["庚申", "辛酉", "辛丑", "己酉"]), "辛"
-    )
-    assert result["total_weight"] == 0 and result["positions"] == []
-    assert "藏而不露" not in result["visibility"]
-
-
-def test_personality_ties_are_all_retained_without_arbitrary_primary(monkeypatch):
-    monkeypatch.setattr(
-        personality_module, "count_ten_gods", lambda *a: {god: 1.0 for god in TenGod}
-    )
-    full_result = PersonalityAnalysis.analyze_personality(
-        pillars(["甲子", "丙寅", "戊辰", "壬戌"])
-    )
-    result = full_result["dominant_traits"]
-    assert len(result["top_gods"]) == 10
-    assert set(result["tied_primary_gods"]) == {god.value for god in TenGod}
-    assert result["primary"].startswith("并列：")
-    assert len(set(full_result["strengths"])) == 11
-
-
-@pytest.mark.parametrize(
-    "chart,expected_primary",
-    [
-        (["甲子", "丙寅", "甲子", "壬戌"], {"比肩", "食神"}),
-        (["甲子", "甲子", "甲子", "壬戌"], {"比肩"}),
-        (
-            ["甲子", "丙戌", "甲子", "壬戌"],
-            {"比肩", "食神", "伤官", "偏财", "正官", "正印", "偏印"},
-        ),
-    ],
-)
-def test_personality_strengths_retain_joint_primary_and_exclude_lower_ranks(
-    chart, expected_primary
+def test_timing_storage_branch_without_a_natal_storage_branch_is_not_a_natal_hit() -> (
+    None
 ):
-    # Formal pillar fixtures, not claims about possible birth dates. These
-    # literal identities follow the pinned 6tail/lunar-python 1645ad3 tables
-    # under the declared non-day-stem=1, each-hidden-stem=1/2 policy.
-    result = PersonalityAnalysis.analyze_personality(pillars(chart))
-    dominant = result["dominant_traits"]
-    assert set(dominant["tied_primary_gods"]) == expected_primary
-    included = {
-        item["ten_god"]
-        for item in dominant["top_gods"]
-        if item["traits"] in result["strengths"]
-    }
-    assert included == expected_primary
-    assert len(result["strengths"]) == 1 + len(expected_primary)
+    chart = pillars(["甲寅", "甲子", "丙子", "甲子"])
+    topic = build_topic_evidence(
+        build_natal_evidence(chart), chart, "wealth", None, ("辛", "丑"), None
+    )
+    assert topic["storage_matches"] == []
+
+
+def test_hidden_wealth_root_clash_is_not_lost_when_branch_primary_qi_is_earth() -> None:
+    chart = pillars(["辛丑", "丁巳", "丙子", "乙未"])
+    topic = build_topic_evidence(
+        build_natal_evidence(chart), chart, "wealth", None, None, ("辛", "未")
+    )
+    assert any(
+        row["pillar"] == "year"
+        and row["stem"] == "辛"
+        and row["location"] == "地支藏干"
+        for row in topic["stars"]["正财"]
+    )
+    (storage,) = topic["storage_matches"]
+    assert storage["pillar"] == "year" and storage["branch"] == "丑"
+    assert [row["positions"] for row in storage["clashes"]] == [["year", "hour"]]
+    assert any(
+        row["kind"] == "六冲" and row["positions"] == ["liunian", "year"]
+        for row in topic["timing"]["layers"][0]["natal_relations"]
+    )
+
+
+def test_absent_wealth_stars_have_no_occurrences() -> None:
+    chart = pillars(["庚申", "辛酉", "辛丑", "己酉"])
+    topic = build_topic_evidence(
+        build_natal_evidence(chart), chart, "wealth", None, None, None
+    )
+    assert topic["stars"]["正财"] == topic["stars"]["偏财"] == []
 
 
 @pytest.mark.parametrize(
@@ -181,7 +145,9 @@ def test_personality_strengths_retain_joint_primary_and_exclude_lower_ranks(
         "registration_reference",
     ],
 )
-def test_perfect_metrics_cannot_pass_incomplete_registered_protocol(missing):
+def test_perfect_metrics_cannot_pass_incomplete_registered_protocol(
+    missing: str,
+) -> None:
     payload = plan(100).model_dump()
     payload.pop(missing)
     study = StudyPlan.model_validate(payload)
@@ -191,6 +157,8 @@ def test_perfect_metrics_cannot_pass_incomplete_registered_protocol(missing):
             f.model_copy(update={"interpretation_policy_sha256": None})
             for f in forecasts
         ]
+    else:
+        pass
     result = evaluate_study(
         study, forecasts, [outcome(i, bool(i % 2)) for i in range(100)], as_of=AS_OF
     )
@@ -204,7 +172,9 @@ def test_perfect_metrics_cannot_pass_incomplete_registered_protocol(missing):
     assert result["protocol_status"] == "incomplete" and result["protocol_blockers"]
 
 
-def test_unregistered_interpretation_change_is_rejected_even_with_same_calculation_model():
+def test_unregistered_interpretation_change_is_rejected_even_with_same_calculation_model() -> (
+    None
+):
     changed = forecast(0, 0.5).model_copy(
         update={"interpretation_policy_sha256": "e" * 64}
     )

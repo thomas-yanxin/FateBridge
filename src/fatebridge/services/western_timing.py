@@ -4,16 +4,13 @@ FateBridge western predictive timing services.
 
 from __future__ import annotations
 
-from typing import Any, Dict, Optional
+from typing import Any
 
 from fatebridge.core.predictive._common import (
     build_analysis_datetime,
     build_predictive_birth_info,
 )
-from fatebridge.core.predictive.firdaria import (
-    normalize_calendar_firdaria_birth,
-    validate_calendar_firdaria_inputs,
-)
+from fatebridge.core.predictive.firdaria import validate_calendar_firdaria_inputs
 from fatebridge.core.predictive.western_timing import (
     build_western_timing_module_payload,
     build_western_timing_payload,
@@ -32,27 +29,27 @@ def calculate_western_timing_analysis(
     birth_timezone: str,
     birth_longitude: float,
     birth_latitude: float,
-    name: Optional[str] = None,
+    name: str | None = None,
     birth_minute: int = 0,
-    birth_place: Optional[str] = None,
-    analysis_year: Optional[int] = None,
-    analysis_month: Optional[int] = None,
-    analysis_day: Optional[int] = None,
-    analysis_hour: Optional[int] = None,
-    analysis_minute: Optional[int] = None,
+    birth_place: str | None = None,
+    analysis_year: int | None = None,
+    analysis_month: int | None = None,
+    analysis_day: int | None = None,
+    analysis_hour: int | None = None,
+    analysis_minute: int | None = None,
     firdaria_night_order: str = "nodes_at_end",
     firdaria_year_basis: str = "fixed_365_2425",
-    return_longitude: Optional[float] = None,
-    return_latitude: Optional[float] = None,
-    return_timezone: Optional[str] = None,
+    return_longitude: float | None = None,
+    return_latitude: float | None = None,
+    return_timezone: str | None = None,
     house_system: str = "P",
     zodiac_type: str = "Tropic",
     pd_method: str = "astroapp_alchabitius",
     pd_time_key: str = "Ptolemy",
     pd_type: int = 0,
-    pd_aspects: Optional[list[int]] = None,
+    pd_aspects: list[int] | None = None,
     show_pd_bounds: bool = True,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Build a western astrology predictive package with returns, progressions,
     and time-lord systems around a target analysis date.
@@ -70,8 +67,6 @@ def calculate_western_timing_analysis(
         name=name,
         birth_place=birth_place,
     )
-    if firdaria_year_basis == "calendar_anniversary":
-        birth_info = normalize_calendar_firdaria_birth(birth_info)
     analysis_datetime = build_analysis_datetime(
         birth_info,
         analysis_year=analysis_year,
@@ -81,12 +76,9 @@ def calculate_western_timing_analysis(
         analysis_minute=analysis_minute,
     )
     if firdaria_year_basis == "calendar_anniversary":
-        # Request analysis fields are civil clocks in birth_timezone. Preserve
-        # that clock using IANA recurrence rules, including dates after 2038.
-        analysis_datetime = analysis_datetime.replace(
-            tzinfo=birth_info.local_datetime.tzinfo
-        )
         validate_calendar_firdaria_inputs(birth_info, analysis_datetime)
+    else:
+        pass
     return build_western_timing_payload(
         birth_info,
         analysis_datetime=analysis_datetime,
@@ -116,27 +108,27 @@ def calculate_western_timing_module_analysis(
     birth_timezone: str,
     birth_longitude: float,
     birth_latitude: float,
-    name: Optional[str] = None,
+    name: str | None = None,
     birth_minute: int = 0,
-    birth_place: Optional[str] = None,
-    analysis_year: Optional[int] = None,
-    analysis_month: Optional[int] = None,
-    analysis_day: Optional[int] = None,
-    analysis_hour: Optional[int] = None,
-    analysis_minute: Optional[int] = None,
+    birth_place: str | None = None,
+    analysis_year: int | None = None,
+    analysis_month: int | None = None,
+    analysis_day: int | None = None,
+    analysis_hour: int | None = None,
+    analysis_minute: int | None = None,
     firdaria_night_order: str = "nodes_at_end",
     firdaria_year_basis: str = "fixed_365_2425",
-    return_longitude: Optional[float] = None,
-    return_latitude: Optional[float] = None,
-    return_timezone: Optional[str] = None,
+    return_longitude: float | None = None,
+    return_latitude: float | None = None,
+    return_timezone: str | None = None,
     house_system: str = "P",
     zodiac_type: str = "Tropic",
     pd_method: str = "astroapp_alchabitius",
     pd_time_key: str = "Ptolemy",
     pd_type: int = 0,
-    pd_aspects: Optional[list[int]] = None,
+    pd_aspects: list[int] | None = None,
     show_pd_bounds: bool = True,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Build a single western timing technique payload for standalone tools."""
     house_system = normalize_house_system(house_system)
     birth_info = build_predictive_birth_info(
@@ -151,8 +143,6 @@ def calculate_western_timing_module_analysis(
         name=name,
         birth_place=birth_place,
     )
-    if technique == "firdaria" and firdaria_year_basis == "calendar_anniversary":
-        birth_info = normalize_calendar_firdaria_birth(birth_info)
     analysis_datetime = build_analysis_datetime(
         birth_info,
         analysis_year=analysis_year,
@@ -162,10 +152,9 @@ def calculate_western_timing_module_analysis(
         analysis_minute=analysis_minute,
     )
     if technique == "firdaria" and firdaria_year_basis == "calendar_anniversary":
-        analysis_datetime = analysis_datetime.replace(
-            tzinfo=birth_info.local_datetime.tzinfo
-        )
         validate_calendar_firdaria_inputs(birth_info, analysis_datetime)
+    else:
+        pass
     return build_western_timing_module_payload(
         birth_info,
         technique=technique,

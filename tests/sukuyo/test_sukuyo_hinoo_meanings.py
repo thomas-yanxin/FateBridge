@@ -7,10 +7,10 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core import sukuyo_hinoo_meanings as meanings
-from fatebridge.core.sukuyo import calendar_mansion, day_evidence
-from fatebridge.core.sukuyo_profiles import source_bundle
-from tests.sukuyo.test_sukuyo_witness_research import critical
+from fatebridge.core.sukuyo import sukuyo_hinoo_meanings as meanings
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence
+from fatebridge.core.sukuyo.sukuyo_profiles import source_bundle
+from tests.unit_test.fixtures.sukuyo_readings import critical
 
 ROOT = Path(__file__).resolve().parents[2]
 REFERENCE = json.loads(
@@ -18,7 +18,7 @@ REFERENCE = json.loads(
 )["expected_bundle"]
 
 
-def test_meanings_match_precode_reference_and_distinguish_both_month_contexts():
+def test_meanings_match_precode_reference_and_distinguish_both_month_contexts() -> None:
     result = critical()["calendar_clause_meanings"]
     assert (
         result.pop("source_bundle_sha256")
@@ -53,7 +53,9 @@ def test_meanings_match_precode_reference_and_distinguish_both_month_contexts():
         "calendar_apparatus",
     ],
 )
-def test_meanings_cannot_inherit_a_different_primary_text_or_apparatus(key):
+def test_meanings_cannot_inherit_a_different_primary_text_or_apparatus(
+    key: str,
+) -> None:
     primary = copy.deepcopy(
         source_bundle()["hinoo_addendum"]["downloaded_primary_edition"]
     )
@@ -62,7 +64,9 @@ def test_meanings_cannot_inherit_a_different_primary_text_or_apparatus(key):
         meanings.calendar_clause_meanings(primary)
 
 
-def test_policy_or_meaning_changes_fail_closed(tmp_path, monkeypatch):
+def test_policy_or_meaning_changes_fail_closed(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     data = copy.deepcopy(REFERENCE)
     data["textual_halves"]["modern_half_clock"] = "12:00"
     file = tmp_path / "changed-meanings.json"
@@ -81,8 +85,8 @@ def test_policy_or_meaning_changes_fail_closed(tmp_path, monkeypatch):
     ],
 )
 def test_clarified_meanings_preserve_conditional_results_and_known_part(
-    date, part, status, mansion, candidates
-):
+    date: str, part: str, status: str, mansion: str | None, candidates
+) -> None:
     result = calendar_mansion(
         date, calendar_profile="hinoo_t1299_host27", calendar_day_part=part
     )
@@ -100,7 +104,7 @@ def test_clarified_meanings_preserve_conditional_results_and_known_part(
     assert "段落先后不构成已经确定的程序优先级" in text
 
 
-def test_default_profile_does_not_claim_hinoo_clause_interpretation():
+def test_default_profile_does_not_claim_hinoo_clause_interpretation() -> None:
     result = calendar_mansion("1903-06-25")
     assert result["profile_calculation"]["hinoo_source"] is None
     assert "其正月指" not in day_evidence(result, "室", "travel")["reading_text"]

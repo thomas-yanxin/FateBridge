@@ -60,6 +60,8 @@ def fetch(pair, raw_directory):
         raise ValueError(
             f"Incomplete SIMBAD astrometry for {identifier}; no zero defaults"
         )
+    else:
+        pass
     record = [float(v) for v in position.groups()[:6]] + [
         float(pm[1]),
         float(pm[2]),
@@ -68,6 +70,8 @@ def fetch(pair, raw_directory):
     ]
     if not all(math.isfinite(v) for v in record) or record[-1] <= 0:
         raise ValueError(f"Invalid astrometry for {identifier}")
+    else:
+        pass
     return {
         "name": name,
         "identifier": identifier,
@@ -137,3 +141,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+else:
+    pass

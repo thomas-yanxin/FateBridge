@@ -10,13 +10,13 @@ from zoneinfo import ZoneInfo
 import pytest
 from pydantic import ValidationError
 
+from fatebridge.core.contracts.output_numerology import NumerologyEvidence
 from fatebridge.core.local_techniques.canping import build_canping_result
 from fatebridge.core.local_techniques.heluo import build_heluo_result
-from fatebridge.core.numerology_inputs import (
+from fatebridge.core.numerology.numerology_inputs import (
     CLOCK_POLICY_ID,
     resolve_numerology_longitude,
 )
-from fatebridge.core.output_numerology import NumerologyEvidence
 from fatebridge.core.requests.divination import CanpingRequest, HeluoRequest
 from tests.fixtures.solar_reference import expected_solar_clock
 
@@ -27,7 +27,7 @@ BASE = dict(date="2000-05-15", time="09:00:00", zone="Asia/Shanghai", gender="�
 
 
 @pytest.mark.parametrize("model", [HeluoRequest, CanpingRequest])
-def test_public_default_on_needs_longitude_and_civil_mode_needs_none(model):
+def test_public_default_on_needs_longitude_and_civil_mode_needs_none(model) -> None:
     with pytest.raises(ValidationError, match="经度"):
         model(**BASE)
     with pytest.raises(ValidationError, match="经度"):
@@ -38,14 +38,16 @@ def test_public_default_on_needs_longitude_and_civil_mode_needs_none(model):
 
 @pytest.mark.parametrize("build", BUILDERS)
 @pytest.mark.parametrize("longitude", [None, "", " ", "未知"])
-def test_direct_domain_never_uses_a_default_place_for_solar_time(build, longitude):
+def test_direct_domain_never_uses_a_default_place_for_solar_time(
+    build, longitude: str | None
+) -> None:
     with pytest.raises(ValueError):
         build(**BASE, lon=longitude, use_true_solar_time=True)
 
 
 @pytest.mark.parametrize("model", [HeluoRequest, CanpingRequest])
 @pytest.mark.parametrize("gps", [True, False, 181, -181, float("nan"), float("inf")])
-def test_invalid_gps_does_not_turn_into_a_numeric_place(model, gps):
+def test_invalid_gps_does_not_turn_into_a_numeric_place(model, gps) -> None:
     with pytest.raises(ValidationError):
         model(**BASE, gps_lon=gps)
     with pytest.raises(ValueError):
@@ -55,7 +57,7 @@ def test_invalid_gps_does_not_turn_into_a_numeric_place(model, gps):
 @pytest.mark.parametrize("build", BUILDERS)
 def test_civil_mode_has_no_invented_coordinate_and_known_unused_longitude_is_distinct(
     build,
-):
+) -> None:
     a = build(**BASE, use_true_solar_time=False)
     b = build(**BASE, lon="75", use_true_solar_time=False)
     assert a["analysis_context"]["longitude"] is None
@@ -71,7 +73,7 @@ def test_civil_mode_has_no_invented_coordinate_and_known_unused_longitude_is_dis
 
 
 @pytest.mark.parametrize("build", BUILDERS)
-def test_gps_precedence_zero_and_west_longitude_are_explicit(build):
+def test_gps_precedence_zero_and_west_longitude_are_explicit(build) -> None:
     gps = build(**BASE, lon="121e28", gps_lon=75, use_true_solar_time=True)
     single = build(**BASE, lon="75", use_true_solar_time=True)
     assert gps["four_pillars"] == single["four_pillars"]
@@ -86,7 +88,7 @@ def test_gps_precedence_zero_and_west_longitude_are_explicit(build):
 
 
 @pytest.mark.parametrize("build", BUILDERS)
-def test_clock_trace_is_the_same_run_but_not_a_mutable_alias(build):
+def test_clock_trace_is_the_same_run_but_not_a_mutable_alias(build) -> None:
     result = build(**BASE, lon="75", use_true_solar_time=True)
     evidence = result["numerology_evidence"]
     clock = evidence["birth_clock"]
@@ -104,8 +106,8 @@ def test_clock_trace_is_the_same_run_but_not_a_mutable_alias(build):
 @pytest.mark.parametrize("longitude", [0, 75])
 @pytest.mark.parametrize("case", JPL["rows"], ids=lambda c: c["instant"])
 def test_actual_calculation_wall_clock_against_frozen_independent_jpl(
-    build, longitude, case
-):
+    build, longitude: int, case
+) -> None:
     at = datetime.fromisoformat(case["instant"]).astimezone(ZoneInfo("Asia/Shanghai"))
     result = build(
         date=at.strftime("%Y-%m-%d"),
@@ -129,9 +131,13 @@ def test_actual_calculation_wall_clock_against_frozen_independent_jpl(
     assert result["four_pillars"]["hour"]["branch"] == expected_branch
     if "solar_term" in result:
         assert result["solar_term"]["anchor_utc"] == case["instant"]
+    else:
+        pass
 
 
-def test_reference_reuse_is_identified_without_inventing_new_external_instants():
+def test_reference_reuse_is_identified_without_inventing_new_external_instants() -> (
+    None
+):
     reference = json.loads((ROOT / "numerology_clock_v1/reference.json").read_text())
     assert (
         hashlib.sha256(

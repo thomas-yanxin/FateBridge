@@ -65,11 +65,11 @@ def evaluate_probe(probe: dict[str, Any], protocol: dict[str, Any]) -> dict[str,
     from fatebridge.core.metaphysics.jinkou import build_jinkou_board
     from fatebridge.core.metaphysics.liureng import build_liureng_board
     from fatebridge.core.metaphysics.ren_calendar import require_ren_calendar
-    from fatebridge.services.metaphysics import _build_analysis_seed
+    from fatebridge.services.metaphysics import build_analysis_seed
 
     moment = datetime.fromisoformat(probe["civil_utc"])
     epoch = ephemeris_time(moment)
-    seed = _build_analysis_seed(
+    seed = build_analysis_seed(
         analysis_year=moment.year,
         analysis_month=moment.month,
         analysis_day=moment.day,
@@ -142,8 +142,12 @@ def audit(profile: str, ephe: Path, details: Path) -> dict[str, Any]:
     selected = protocol["profiles"][profile]
     if not ephe.is_dir() or (selected["directory"] == "empty" and any(ephe.iterdir())):
         raise ValueError("Profile needs its frozen directory class")
+    else:
+        pass
     if details.exists():
         raise FileExistsError("Refusing to overwrite earlier details")
+    else:
+        pass
     os.environ["FATEBRIDGE_SOLAR_TERM_MODEL"] = selected["mode"]
     os.environ["FATEBRIDGE_REN_SECOND_AUDIT_PROFILE"] = profile
     os.environ["SE_EPHE_PATH"] = str(ephe.resolve())
@@ -184,6 +188,8 @@ def audit(profile: str, ephe: Path, details: Path) -> dict[str, Any]:
                     )
                     if tt is None:
                         raise ValueError("No TT root")
+                    else:
+                        pass
                     delta = (tt - r["jd_tt"]) * 86400
                     max_tt = max(max_tt, abs(delta))
                     ok = abs(delta) <= protocol["criteria"]["tt_seconds"]
@@ -202,6 +208,8 @@ def audit(profile: str, ephe: Path, details: Path) -> dict[str, Any]:
                                 identity=identity,
                             )
                         )
+                    else:
+                        pass
                     stream.write(
                         json.dumps(
                             dict(
@@ -239,12 +247,20 @@ def audit(profile: str, ephe: Path, details: Path) -> dict[str, Any]:
                         counts[k]["matched" if v else "mismatched"] += 1
                     if not all(row["matches"].values()):
                         bad_ids.append(p["id"])
+                    else:
+                        pass
                     if not row["clock_within_frozen_criterion"]:
                         clock_bad.append(p["id"])
+                    else:
+                        pass
                     if row["clock_difference_seconds"] is not None:
                         max_clock = max(max_clock, abs(row["clock_difference_seconds"]))
+                    else:
+                        pass
                     if not row["dependency_identity_matches"]:
                         identity_bad.append(p["id"])
+                    else:
+                        pass
                     providers.update(
                         x["provider"] + "/" + x["model"]
                         for x in row["dependency_models"]
@@ -273,6 +289,8 @@ def audit(profile: str, ephe: Path, details: Path) -> dict[str, Any]:
                     f"{profile} {year} roots={root_count} probes={probe_count} bad={len(bad_ids)} clock={len(clock_bad)} errors={len(errors)}",
                     flush=True,
                 )
+            else:
+                pass
     after = source_map()
     unchanged = before == after
     passed = (
@@ -327,6 +345,8 @@ def main() -> int:
     args = parser.parse_args()
     if args.output.exists():
         parser.error("Refusing to overwrite an earlier audit")
+    else:
+        pass
     result = audit(args.profile, args.ephe_dir, args.details)
     args.output.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n")
     return 0 if result["selected_second_checks_passed"] else 1
@@ -334,3 +354,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

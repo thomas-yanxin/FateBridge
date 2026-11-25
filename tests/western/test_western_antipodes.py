@@ -10,14 +10,14 @@ from fractions import Fraction
 
 import pytest
 
-from fatebridge.core import jyotish
 from fatebridge.core.astro import chart as core_chart
 from fatebridge.core.astro import runtime
+from fatebridge.core.astro.astrology_tables import SIGNS
 from fatebridge.core.astro.context_geometry import build_context_geometry
 from fatebridge.core.astro.reference import NAKSHATRAS
 from fatebridge.core.astro.time_scales import ephemeris_time
-from fatebridge.core.astrology_tables import SIGNS
-from fatebridge.core.jyotish_vargas import varga_coordinates, varga_longitude
+from fatebridge.core.jyotish import jyotish
+from fatebridge.core.jyotish.jyotish_vargas import varga_coordinates, varga_longitude
 from fatebridge.core.local_techniques.chart import _build_birth_info
 from tests.support.transports import SPECS, business
 from tests.support.transports import inputs as representative_inputs
@@ -25,7 +25,9 @@ from tests.support.transports import native, rest, surface_calls
 
 
 @pytest.mark.parametrize("boundary", range(0, 360, 30))
-def test_context_antipodes_keep_each_thirty_degree_boundary_and_neighbors(boundary):
+def test_context_antipodes_keep_each_thirty_degree_boundary_and_neighbors(
+    boundary,
+) -> None:
     source = float((boundary - 180) % 360)
     for longitude in (
         math.nextafter(source, -math.inf),
@@ -58,6 +60,8 @@ def reference_varga(longitude, division):
     degree = longitude - sign * 30
     if division == 1:
         return sign
+    else:
+        pass
     if division == 30:
         bounds, destinations = (
             ([5, 10, 18, 25, 30], [0, 10, 8, 2, 6])
@@ -65,17 +69,29 @@ def reference_varga(longitude, division):
             else ([5, 12, 20, 25, 30], [1, 5, 11, 9, 7])
         )
         return next(d for end, d in zip(bounds, destinations) if degree < end)
+    else:
+        pass
     part = int(degree * division // 30)
     if division == 2:
         return ([4, 3] if sign % 2 == 0 else [3, 4])[part]
+    else:
+        pass
     if division == 3:
         return (sign + 4 * part) % 12
+    else:
+        pass
     if division == 7:
         return (sign + (0 if sign % 2 == 0 else 6) + part) % 12
+    else:
+        pass
     if division == 9:
         return ([0, 9, 6, 3][sign % 4] + part) % 12
+    else:
+        pass
     if division == 10:
         return (sign + (0 if sign % 2 == 0 else 8) + part) % 12
+    else:
+        pass
     return (sign + part) % 12  # D12
 
 
@@ -93,6 +109,8 @@ def antipode_matrix_sources():
             source = float((boundary - 180) % 360)
             if source < 0:
                 source += 360
+            else:
+                pass
             for longitude in (
                 math.nextafter(source, -math.inf),
                 source,
@@ -100,10 +118,12 @@ def antipode_matrix_sources():
             ):
                 if 0 <= longitude < 360:
                     sources.add(longitude)
+                else:
+                    pass
     return sorted(sources)
 
 
-def test_exact_antipode_matrix_all_supported_vargas_nakshatras_and_padas():
+def test_exact_antipode_matrix_all_supported_vargas_nakshatras_and_padas() -> None:
     sources = antipode_matrix_sources()
     assert len(sources) == 1151
     with localcontext() as context:
@@ -116,6 +136,8 @@ def test_exact_antipode_matrix_all_supported_vargas_nakshatras_and_padas():
                 assert sign == reference_varga(expected, division), (source, division)
                 if division != 30:
                     assert int(varga_longitude(exact, division) // 30) == sign
+                else:
+                    pass
             star = jyotish.nakshatra(exact)
             index = int(expected * 27 // 360)
             pada = int(expected * 108 // 360) % 4 + 1
@@ -123,7 +145,7 @@ def test_exact_antipode_matrix_all_supported_vargas_nakshatras_and_padas():
             assert star["pada"] == pada
 
 
-def test_hand_given_raw_ketu_is_not_implicitly_rebuilt():
+def test_hand_given_raw_ketu_is_not_implicitly_rebuilt() -> None:
     raw = {
         "ascendant": 0.0,
         "longitudes": {planet: 0.0 for planet in jyotish.GRAHAS},
@@ -137,8 +159,8 @@ def test_hand_given_raw_ketu_is_not_implicitly_rebuilt():
 
 @pytest.mark.native_engine_fault
 def test_india_sample_grid_uses_exact_antipodes_for_vargas_nakshatra_and_pada(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     birth, _, _ = _build_birth_info(
         date_text="2024-03-20",
         time_text="06:30:00",
@@ -157,6 +179,8 @@ def test_india_sample_grid_uses_exact_antipodes_for_vargas_nakshatra_and_pada(
             coordinates = list(coordinates)
             coordinates[0] = source if args[0] == center else 20.0
             return tuple(coordinates), returned_flags
+        else:
+            pass
         return result
 
     monkeypatch.setattr(runtime, "ephemeris_call", controlled)
@@ -180,116 +204,3 @@ def test_india_sample_grid_uses_exact_antipodes_for_vargas_nakshatra_and_pada(
         (star["index"], star["pada"]): star["sample_count"]
         for star in sampled["nakshatra_alternatives"]["Ketu"]
     } == expected_stars
-
-
-@pytest.mark.native_engine_fault
-def test_public_otherbu_exact_node_antipode_through_three_transports(
-    monkeypatch, surface_calls
-):
-    original = core_chart._build_planet_states
-    source = math.nextafter(180.0, -math.inf)
-
-    def controlled(*args, **kwargs):
-        result = original(*args, **kwargs)
-        result.states["North Node"]["longitude"] = source
-        return result
-
-    monkeypatch.setattr(core_chart, "_build_planet_states", controlled)
-    spec = SPECS["otherbu"]
-    inputs = {
-        **representative_inputs(spec),
-        "planet": "Mercury",
-        "sign": "Virgo",
-        "house": 6,
-        "date": "2024-03-20",
-        "time": "06:30:00",
-        "zone": "UTC",
-        "lat": "0",
-        "lon": "0",
-        "hsys": 0,
-        "zodiacal": 0,
-    }
-    fields = ["chart.chart.objects"]
-    query = [("fields", field) for field in fields]
-    query += [("strict_fields", "true"), ("include_snapshot_text", "false")]
-    http, mcp, code, cli = surface_calls(
-        spec,
-        inputs,
-        params=query,
-        options={
-            "fields": fields,
-            "strict_fields": True,
-            "include_snapshot_text": False,
-        },
-        flags=["--fields", *fields],
-    )
-    assert http.status_code == 200, http.text
-    assert code == 0 and not mcp.is_error
-    values = [http.json(), cli, mcp.structured_content]
-    assert business(values[0]) == business(values[1]) == business(values[2])
-    for value in values:
-        points = {p["id"]: p for p in value["chart"]["chart"]["objects"]}
-        assert points["North Node"]["lon"] == source
-        assert points["South Node"]["sign"] == "Pisces"
-        assert points["South Node"]["house"] == "House12"
-
-
-@pytest.mark.native_engine_fault
-@pytest.mark.parametrize("tool", ["astro_india", "astro_chart"])
-@pytest.mark.parametrize(
-    "source", [math.nextafter(v, -math.inf) for v in (15.0, 20.0, 180.0)]
-)
-def test_public_india_partitions_preserve_the_exact_derived_ketu(
-    monkeypatch, tool, source, surface_calls
-):
-    original = runtime.ephemeris_call
-
-    def controlled(operation, *args, **kwargs):
-        result = original(operation, *args, **kwargs)
-        if operation == "calc" and args[1] in {
-            runtime.swe.MEAN_NODE,
-            runtime.swe.TRUE_NODE,
-        }:
-            coordinates, returned_flags = result
-            coordinates = list(coordinates)
-            coordinates[0] = source
-            return tuple(coordinates), returned_flags
-        return result
-
-    monkeypatch.setattr(runtime, "ephemeris_call", controlled)
-    spec = SPECS[tool]
-    divisions = [2, 3, 7, 9, 10, 12, 30]
-    inputs = {**representative_inputs(spec), "divisions": divisions}
-    if tool == "astro_chart":
-        inputs["chart_variant"] = "india_chart"
-    fields = ["india.charts", "india.nakshatras"]
-    query = [("fields", field) for field in fields]
-    query += [("strict_fields", "true"), ("include_snapshot_text", "false")]
-    http, mcp, code, cli = surface_calls(
-        spec,
-        inputs,
-        params=query,
-        options={
-            "fields": fields,
-            "strict_fields": True,
-            "include_snapshot_text": False,
-        },
-        flags=["--fields", *fields],
-    )
-    assert http.status_code == 200, http.text
-    assert code == 0 and not mcp.is_error
-    values = [http.json(), cli, mcp.structured_content]
-    assert business(values[0]) == business(values[1]) == business(values[2])
-    with localcontext() as context:
-        context.prec = 1200
-        opposite = (Decimal.from_float(source) + 180) % 360
-        for value in values:
-            charts = value["india"]["charts"]
-            for division in [1, *divisions]:
-                ketu = next(
-                    p for p in charts[f"D{division}"]["planets"] if p["id"] == "Ketu"
-                )
-                assert ketu["sign"] == SIGNS[reference_varga(opposite, division)]
-            star = value["india"]["nakshatras"]["Ketu"]
-            assert star["index"] == int(opposite * 27 // 360) + 1
-            assert star["pada"] == int(opposite * 108 // 360) % 4 + 1

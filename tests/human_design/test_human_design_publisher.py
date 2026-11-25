@@ -1,7 +1,6 @@
 """Publisher facts are independent; coarse agreement is not clock acceptance."""
 
 import ast
-import gzip
 import hashlib
 import json
 from copy import deepcopy
@@ -11,15 +10,18 @@ from unittest.mock import patch
 import pytest
 
 from fatebridge.core.astro import native_execution, runtime
-from fatebridge.validation.human_design import verify_human_design_reading
-from fatebridge.validation.human_design_publisher import (
-    publisher_natal_checks,
-    summarize_runs,
-)
 from scripts.human_design.build_human_design_publisher_natal_reference import (
     extract_facts,
     facts_from_page,
 )
+from tests.unit_test.fixtures.human_design_publisher import (
+    PublisherCapture,
+)
+from tests.unit_test.fixtures.human_design_publisher import (
+    publisher_capture as publisher_capture,
+)
+from validation.human_design import verify_human_design_reading
+from validation.human_design_publisher import summarize_runs
 
 ROOT = Path(__file__).resolve().parents[2]
 PLAN_PATH = ROOT / "tests/fixtures/human-design-cycle-publisher-plan.json"
@@ -40,18 +42,11 @@ Copyright 2005 Jovian Archive Corporation
 """
 
 
-@pytest.fixture(scope="module")
-def current(tmp_path_factory):
-    capture = tmp_path_factory.mktemp("publisher-current") / "current-runs.json.gz"
-    report = publisher_natal_checks(ROOT, capture=capture)
-    return json.loads(gzip.decompress(capture.read_bytes())), report
-
-
 def forbidden(*args, **kwargs):
     raise AssertionError("Pure publisher check called a native producer")
 
 
-def test_original_plan_facts_and_complete_sixteen_runs_are_immutable():
+def test_original_plan_facts_and_complete_sixteen_runs_are_immutable() -> None:
     assert (
         hashlib.sha256(PLAN_PATH.read_bytes()).hexdigest()
         == "efb7ca4becc8751e2d8cdd0215bfd9cd8f2678efd97a97df69a1f1f6bc6dbc03"
@@ -82,7 +77,7 @@ def test_original_plan_facts_and_complete_sixteen_runs_are_immutable():
     }
 
 
-def test_extractor_has_no_engine_imports_and_does_not_correct_source_clock():
+def test_extractor_has_no_engine_imports_and_does_not_correct_source_clock() -> None:
     script = (
         ROOT / "scripts/human_design/build_human_design_publisher_natal_reference.py"
     )
@@ -107,12 +102,14 @@ def test_extractor_has_no_engine_imports_and_does_not_correct_source_clock():
         ("Copyright 2005", "Copyright 2006"),
     ],
 )
-def test_source_fact_contradictions_do_not_extract_a_repaired_success(old, new):
+def test_source_fact_contradictions_do_not_extract_a_repaired_success(
+    old: str, new: str
+) -> None:
     with pytest.raises(ValueError):
         facts_from_page(FACTS_ONLY.replace(old, new))
 
 
-def test_changed_pdf_is_rejected_before_text_extraction(tmp_path):
+def test_changed_pdf_is_rejected_before_text_extraction(tmp_path: Path) -> None:
     path = tmp_path / "changed.pdf"
     path.write_bytes(b"changed source bytes")
     with (
@@ -126,25 +123,29 @@ def test_changed_pdf_is_rejected_before_text_extraction(tmp_path):
 
 
 @pytest.mark.parametrize("index", range(16))
-def test_every_original_complete_run_remains_purely_verifiable(index, current):
-    RUNS, _ = current
+def test_every_original_complete_run_remains_purely_verifiable(
+    index: int, publisher_capture: PublisherCapture
+) -> None:
+    runs = publisher_capture.runs
     with (
         patch.object(runtime, "ephemeris_call", forbidden),
         patch.object(native_execution, "calculate", forbidden),
     ):
         assert (
-            verify_human_design_reading(RUNS[index]["run"])["status"]
+            verify_human_design_reading(runs[index]["run"])["status"]
             == "verified_fixed_template_reading"
         )
 
 
-def test_one_source_example_two_facts_are_not_counted_as_sixteen_examples(current):
-    RUNS, _ = current
+def test_one_source_example_two_facts_are_not_counted_as_sixteen_examples(
+    publisher_capture: PublisherCapture,
+) -> None:
+    runs = publisher_capture.runs
     with (
         patch.object(runtime, "ephemeris_call", forbidden),
         patch.object(native_execution, "calculate", forbidden),
     ):
-        report = summarize_runs(PLAN, REFERENCE, RUNS)
+        report = summarize_runs(PLAN, REFERENCE, runs)
     assert report["independent_example_count"] == 1
     assert report["independent_structural_fact_count"] == 2
     assert (
@@ -190,10 +191,10 @@ def test_one_source_example_two_facts_are_not_counted_as_sixteen_examples(curren
     ],
 )
 def test_incomplete_or_rehashed_repaired_cases_never_gain_source_acceptance(
-    kind, current
-):
-    RUNS, _ = current
-    rows = deepcopy(RUNS)
+    kind: str, publisher_capture: PublisherCapture
+) -> None:
+    runs = publisher_capture.runs
+    rows = deepcopy(runs)
     if kind == "drop":
         rows.pop()
     elif kind == "duplicate":
@@ -212,8 +213,6 @@ def test_incomplete_or_rehashed_repaired_cases_never_gain_source_acceptance(
         rows[0]["run"]["interpretation"][
             "design_time_precision_meaning"
         ] = "All source facts accepted"
-    for row in rows:
-        run = row["run"]
     with (
         patch.object(runtime, "ephemeris_call", forbidden),
         patch.object(native_execution, "calculate", forbidden),
@@ -222,21 +221,25 @@ def test_incomplete_or_rehashed_repaired_cases_never_gain_source_acceptance(
         summarize_runs(PLAN, REFERENCE, rows)
 
 
-def test_new_source_contradiction_is_reported_instead_of_changing_inputs(current):
-    RUNS, _ = current
+def test_new_source_contradiction_is_reported_instead_of_changing_inputs(
+    publisher_capture: PublisherCapture,
+) -> None:
+    runs = publisher_capture.runs
     reference = deepcopy(REFERENCE)
     reference["example"]["expected_structural_fields"][
         "bodygraph.definition.kind"
     ] = "split"
-    report = summarize_runs(PLAN, reference, RUNS)
+    report = summarize_runs(PLAN, reference, runs)
     assert report["literal_structure_status"] == "failed"
     assert report["literal_structure_matches"] == 0
     assert report["literal_hypothesis_computation_count"] == 8
     assert report["diagnostic_matches_counted_as_acceptance"] == 0
 
 
-def test_current_native_audit_retains_all_fixed_hypotheses_and_both_backends(current):
-    _, report = current
+def test_current_native_audit_retains_all_fixed_hypotheses_and_both_backends(
+    publisher_capture: PublisherCapture,
+) -> None:
+    report = publisher_capture.report
     assert len(report["all_cases"]) == 16
     assert report["literal_structure_matches"] == 8
     assert {(r["backend"], r["node_mode"]) for r in report["all_cases"]} == {

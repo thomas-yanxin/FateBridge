@@ -23,12 +23,16 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
     manifest = json.loads((corpus / "manifest.json").read_text())
     if "historical-cases.json" not in {s["file"] for s in manifest["source_files"]}:
         raise ValueError("历史独立参照不得移除")
+    else:
+        pass
     for item in manifest["source_files"]:
         if (
             hashlib.sha256((corpus / item["file"]).read_bytes()).hexdigest()
             != item["sha256"]
         ):
             raise ValueError("冻结历史参照指纹不符：" + item["file"])
+        else:
+            pass
     data = json.loads((corpus / "historical-cases.json").read_text())
     cases = data["cases"]
     years = {c.get("year_ce", -c.get("year_bce", 0)) for c in cases}
@@ -38,6 +42,8 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
         or any(not set(FIELDS) <= c.keys() for c in cases)
     ):
         raise ValueError("必须完整核对10条历史参照及每条3项，不得删去失败字段")
+    else:
+        pass
     differences = []
     results = []
     for case in cases:

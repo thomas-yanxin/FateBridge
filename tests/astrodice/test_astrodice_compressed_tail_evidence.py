@@ -8,11 +8,11 @@ from scripts.astrodice.astrodice_swe_coefficients import PackedFile, crc32_msb, 
 from scripts.astrodice.verify_astrodice_swe_coefficients import reflected_crc
 
 
-def test_crc_matches_independent_known_bzip2_vector():
+def test_crc_matches_independent_known_bzip2_vector() -> None:
     assert crc32_msb(b"123456789") == reflected_crc(b"123456789") == 0xFC891918
 
 
-def test_missing_coefficient_has_known_polynomial_and_derivative():
+def test_missing_coefficient_has_known_polynomial_and_derivative() -> None:
     segment = {
         "ncoef": 4,
         "flags": 2,
@@ -29,7 +29,7 @@ def test_missing_coefficient_has_known_polynomial_and_derivative():
 
 
 @pytest.mark.parametrize("mutation", ["truncate", "crc"])
-def test_real_packed_file_corruption_is_rejected(tmp_path, mutation):
+def test_real_packed_file_corruption_is_rejected(tmp_path: Path, mutation: str) -> None:
     original = Path("ephe/semo_30.se1")
     raw = bytearray(original.read_bytes())
     if mutation == "truncate":

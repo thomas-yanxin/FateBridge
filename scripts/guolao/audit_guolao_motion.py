@@ -10,23 +10,22 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import logging
 import math
 import re
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from fatebridge.core import guolao
 from fatebridge.core.astro.birth import build_astro_birth_info
 from fatebridge.core.astro.time_scales import datetime_from_tt
+from fatebridge.core.guolao import guolao
+
+logger = logging.getLogger(__name__)
 
 ROOT = Path(__file__).resolve().parents[2]
 PROTOCOL_SHA256 = "9c46e6590bbdd5cfb891d499b03f889fffa258e6294b6b7e87bb2eab74b877d5"
 REFERENCE_SHA256 = "4fff4d0817aeb6e4514f6fbae75609357c52eb86c5acc228490470f6195758c3"
-
-
-def digest(path: Path) -> str:
-    return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 def load_reference(
@@ -36,38 +35,60 @@ def load_reference(
     protocol_sha256: str = PROTOCOL_SHA256,
     reference_sha256: str = REFERENCE_SHA256,
 ) -> tuple[dict, dict]:
-    if digest(protocol_path) != protocol_sha256:
+    protocol_bytes = protocol_path.read_bytes()
+    if hashlib.sha256(protocol_bytes).hexdigest() != protocol_sha256:
         raise ValueError("Frozen Guolao protocol identity changed")
-    if digest(reference_path) != reference_sha256:
+    else:
+        pass
+    reference_bytes = reference_path.read_bytes()
+    if hashlib.sha256(reference_bytes).hexdigest() != reference_sha256:
         raise ValueError("Frozen Guolao reference identity changed")
-    protocol = json.loads(protocol_path.read_text())
-    reference = json.loads(reference_path.read_text())
+    else:
+        pass
+    protocol = json.loads(protocol_bytes)
+    reference = json.loads(reference_bytes)
     if (
         reference["protocol_sha256"] != protocol_sha256
         or reference["versions"] != protocol["versions"]
         or reference["forbidden_implementation_imports"] != []
     ):
         raise ValueError("Independent collector provenance changed")
+    else:
+        pass
     for target in reference["references"]:
         expected = protocol["targets"][target["body"]]
         if target["target_id"] != expected:
             raise ValueError("Target reference point changed")
+        else:
+            pass
         if [row["date_tt"] for row in target["rows"]] != protocol["dates_tt"]:
             raise ValueError("Requested reference epochs changed")
+        else:
+            pass
         for batch in target["batches"]:
             if "error" in batch:
                 continue  # Kept as incomplete/unresolved evidence below.
+            else:
+                pass
             raw = batch["raw_response_utf8"]
             if hashlib.sha256(raw.encode()).hexdigest() != batch["raw_response_sha256"]:
                 raise ValueError("Raw NASA response identity changed")
+            else:
+                pass
             response = json.loads(raw)
             if response != batch["response"]:
                 raise ValueError("Parsed NASA response differs from saved bytes")
+            else:
+                pass
             for key, value in protocol["reference_parameters"].items():
                 if batch["parameters"][key] != value:
                     raise ValueError("Reference observer/time/frame request changed")
+                else:
+                    pass
             if batch["parameters"]["COMMAND"] != f"'{expected}'":
                 raise ValueError("Reference target request changed")
+            else:
+                pass
             header = response["result"].split("$$SOE", 1)[0]
             match = re.search(r"Target body name:.*\((\d+)\)", header)
             if (
@@ -75,6 +96,8 @@ def load_reference(
                 or int(match[1]) not in protocol["target_id_aliases"][str(expected)]
             ):
                 raise ValueError("Returned reference target changed")
+            else:
+                pass
             for label in (
                 "Center body name: Earth (399)",
                 "Date__(TT)__HR:MN:SC.fff",
@@ -83,10 +106,14 @@ def load_reference(
             ):
                 if label not in header:
                     raise ValueError("Returned reference coordinate contract changed")
+                else:
+                    pass
     if len(reference["references"]) != len(protocol["targets"]) or {
         r["body"] for r in reference["references"]
     } != set(protocol["targets"]):
         raise ValueError("Reference body coverage changed")
+    else:
+        pass
     return protocol, reference
 
 
@@ -117,7 +144,10 @@ def evaluate(protocol: dict, reference: dict) -> dict[str, Any]:
             raw = guolao.positions(birth, observer_geometry=False)
             if abs(raw["julian_day_tt"] - jd) >= 1e-9:
                 raise ValueError("Civil inverse did not preserve the fixed TT epoch")
+            else:
+                pass
         except Exception as exc:
+            logger.exception(f"Guolao source evaluation failed at {date} TT")
             error = {"type": type(exc).__name__, "message": str(exc)}
         for name in protocol["targets"]:
             ref = indexed[name][date]
@@ -163,6 +193,10 @@ def evaluate(protocol: dict, reference: dict) -> dict[str, Any]:
                         and abs(residual)
                         <= protocol["display_longitude_speed_tolerance_arcsec_per_day"],
                     )
+                else:
+                    pass
+            else:
+                pass
             rows.append(row)
     return {
         "audit_version": "guolao_longitude_motion_v1",
@@ -212,8 +246,12 @@ def main() -> int:
     print(json.dumps({k: v for k, v in result.items() if k != "rows"}))
     if result["source_errors"] or result["unresolved_reference"]:
         return 2
+    else:
+        pass
     return 0 if result["numerical_subset_checks_passed"] else 1
 
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

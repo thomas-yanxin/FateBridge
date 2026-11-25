@@ -44,9 +44,13 @@ def generate(args):
     ]:
         if hashlib.sha256(path.read_bytes()).hexdigest() != protocol[key]:
             raise ValueError("Initial reference identity changed")
+        else:
+            pass
     for name in ["pyerfa", "numpy"]:
         if importlib.metadata.version(name) != protocol[name + "_version"]:
             raise ValueError("Independent derivative dependency changed")
+        else:
+            pass
     args.archive.mkdir(parents=True, exist_ok=True)
     references = []
     for source in initial["references"]:
@@ -80,6 +84,8 @@ def generate(args):
                     "Missing derivative reference batch: "
                     + record["response"].get("error", text)
                 )
+            else:
+                pass
             rows = []
             for raw in csv.reader(
                 io.StringIO(text.split("$$SOE\n", 1)[1].split("$$EOE", 1)[0])
@@ -90,6 +96,8 @@ def generate(args):
                 )
                 if match is None:
                     raise ValueError("Unexpected derivative epoch format")
+                else:
+                    pass
                 year, month, day, hour, minute, second = match.groups()
                 date = datetime(
                     int(year),
@@ -104,6 +112,8 @@ def generate(args):
                     raise ValueError(
                         "Nonfinite or duplicate derivative source position"
                     )
+                else:
+                    pass
                 unit = direction_and_rate(ra, dec, 0, 0)[0]
                 points[date] = unit
                 rows.append(
@@ -117,6 +127,8 @@ def generate(args):
                 )
             if {r["date_tt"] for r in rows} != set(dates):
                 raise ValueError("Derivative batch lost requested samples")
+            else:
+                pass
             batches.append({**record, "rows": rows})
         derived = []
         for row in source["rows"]:
@@ -147,6 +159,8 @@ def generate(args):
                     rate,
                     protocol["frame_derivative_step_days"],
                 )
+            else:
+                pass
             derived.append(item)
         references.append(
             {
@@ -171,6 +185,8 @@ def generate(args):
     ]
     if forbidden:
         raise RuntimeError("Forbidden implementation imported by derivative generator")
+    else:
+        pass
     return {
         "protocol_sha256": hashlib.sha256(args.protocol.read_bytes()).hexdigest(),
         "generator_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
@@ -204,3 +220,5 @@ if __name__ == "__main__":
     args.output.write_text(
         json.dumps(result, ensure_ascii=False, indent=2, allow_nan=False) + "\n"
     )
+else:
+    pass

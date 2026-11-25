@@ -9,11 +9,13 @@ from __future__ import annotations
 
 import math
 from fractions import Fraction
-from typing import Any, Dict, Mapping, Sequence
+from typing import Any, Mapping, Sequence
 
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.earth_attitude import earth_attitude
 from fatebridge.core.astro.meridian_placement import placement_sample_summaries
+from fatebridge.core.astro.tt_epoch import TTInstant
+from fatebridge.core.astro.ut1_epoch import UT1Instant
 
 RULESET = "witte1923_natal_meridian_house_geometry_v1"
 SOURCE = {
@@ -35,7 +37,7 @@ SWISS_SOURCE = {
 }
 
 
-def unavailable_meridian_houses() -> Dict[str, Any]:
+def unavailable_meridian_houses() -> dict[str, Any]:
     return {
         "status": "unavailable",
         "reason": "Swiss Ephemeris is required for native Meridian cusps",
@@ -50,32 +52,43 @@ def unavailable_meridian_houses() -> Dict[str, Any]:
 
 def native_meridian_houses(
     *,
-    julian_day_ut1: float,
-    julian_day_tt: float,
+    julian_day_ut1: float | UT1Instant,
+    julian_day_tt: float | TTInstant,
     latitude: float,
     longitude: float,
     sidereal: bool,
     physical_angles: Sequence[float],
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Use X cusps in the shared physical house equator at the supplied TT."""
     swe = runtime.swe
     if swe is None:
         raise ValueError("Native meridian houses require Swiss Ephemeris")
+    else:
+        pass
+    point = TTInstant.from_value(julian_day_tt)
+    shared_tt = point.as_float()
     if len(physical_angles) < 3 or not all(
         math.isfinite(value)
         for value in (
-            julian_day_ut1,
-            julian_day_tt,
+            (
+                julian_day_ut1.as_float()
+                if isinstance(julian_day_ut1, UT1Instant)
+                else julian_day_ut1
+            ),
             latitude,
             longitude,
             *physical_angles[:3],
         )
     ):
         raise ValueError("Meridian houses require finite angle inputs")
+    else:
+        pass
     flags = swe.FLG_SIDEREAL if sidereal else 0
     with runtime.preserve_ephemeris_path():
         if sidereal:
             swe.set_sid_mode(swe.SIDM_LAHIRI, 0.0, 0.0)
+        else:
+            pass
         cusps, angles = runtime.ephemeris_call(
             "houses_ex",
             julian_day_ut1,
@@ -83,9 +96,9 @@ def native_meridian_houses(
             longitude,
             b"X",
             flags,
-            _julian_day_tt=julian_day_tt,
+            _julian_day_tt=point,
         )
-        attitude = earth_attitude(swe, julian_day_ut1, julian_day_tt=julian_day_tt)
+        attitude = earth_attitude(swe, julian_day_ut1, julian_day_tt=point)
         angle_tt = attitude.equator.jd_tt
         offset = 0.0
         if sidereal:
@@ -94,12 +107,18 @@ def native_meridian_houses(
             )
             if ayanflag < 0 or not math.isfinite(offset):
                 raise ValueError("Native meridian houses have no valid Lahiri offset")
+            else:
+                pass
+        else:
+            pass
     if (
         len(cusps) != 12
         or len(angles) < 3
         or not all(math.isfinite(value) for value in (*cusps, angles[2]))
     ):
         raise ValueError("Native meridian houses require twelve finite cusps")
+    else:
+        pass
     rows = [
         {
             "house": index,
@@ -124,10 +143,16 @@ def native_meridian_houses(
             "construction": "Twelve equal 30-degree right-ascension divisions starting at the upper meridian; ecliptic intersections are generally unequal in longitude",
             "zodiac": "sidereal_lahiri" if sidereal else "tropical",
             "right_ascension_frame": "physical equator with source-ecliptic intersection origin; unchanged by zodiac display",
-            "julian_day_ut1": julian_day_ut1,
-            "shared_julian_day_tt": julian_day_tt,
+            "julian_day_ut1": (
+                julian_day_ut1.as_float()
+                if isinstance(julian_day_ut1, UT1Instant)
+                else julian_day_ut1
+            ),
+            "shared_julian_day_tt": shared_tt,
             "native_angle_julian_day_tt": angle_tt,
-            "native_angle_minus_shared_tt_seconds": (angle_tt - julian_day_tt) * 86400,
+            "native_angle_minus_shared_tt_seconds": float(
+                (attitude.equator.tt.days - point.days) * 86400
+            ),
             "angle_time_policy": "explicit shared TT and UT1 for house geometry and apparent Lahiri origin",
             "armc": float(angles[2]) % 360,
             "true_obliquity": attitude.reduction.house_obliquity,
@@ -147,7 +172,6 @@ def native_meridian_houses(
             "status": "not_assessed",
             "uncertainty_minutes": None,
             "continuous_interval_proven": False,
-            "sample_frequency_is_probability": False,
             "sample_reference": "midpoint_analysis.time_sensitivity.samples",
         },
         "sources": [SOURCE, SWISS_SOURCE],
@@ -172,20 +196,21 @@ def native_meridian_houses(
 
 
 def attach_meridian_sensitivity(
-    meridian: Dict[str, Any], sensitivity: Mapping[str, Any]
+    meridian: dict[str, Any], sensitivity: Mapping[str, Any]
 ) -> None:
     """Summarize all supplied cusp samples; retain same-run raw sample references."""
     result = {
         "status": sensitivity["status"],
         "uncertainty_minutes": sensitivity["uncertainty_minutes"],
         "continuous_interval_proven": False,
-        "sample_frequency_is_probability": False,
         "sample_reference": "midpoint_analysis.time_sensitivity.samples",
     }
     if sensitivity["status"] == "sampled":
         samples = sensitivity["samples"]
         if not samples or len(samples) != sensitivity["sample_count"]:
             raise ValueError("Every confirmed birth-time sample needs meridian cusps")
+        else:
+            pass
         spans = []
         for index, cusp in enumerate(meridian["cusps"]):
             nominal = Fraction(cusp["longitude"])
@@ -208,9 +233,18 @@ def attach_meridian_sensitivity(
                 "maximum_recorded_sample_gap_seconds"
             ],
             cusp_spans=spans,
+            **(
+                {"recorded_physical_grid": sensitivity["recorded_physical_grid"]}
+                if "recorded_physical_grid" in sensitivity
+                else {}
+            ),
         )
+    else:
+        pass
     meridian["birth_time_sensitivity"] = result
     if sensitivity["status"] == "sampled":
         result["factor_placement_summary"] = placement_sample_summaries(
             meridian, sensitivity
         )
+    else:
+        pass

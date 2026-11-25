@@ -6,8 +6,8 @@ import json
 import zipfile
 from pathlib import Path
 
-from fatebridge.core.lilly import SIGNS
-from fatebridge.core.lilly_radicality import (
+from fatebridge.core.astro.lilly import SIGNS
+from fatebridge.core.astro.lilly_radicality import (
     CLAUSES,
     MOON_LATE_SPECIAL,
     OWN_NATURES,
@@ -111,3 +111,5 @@ def main():
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

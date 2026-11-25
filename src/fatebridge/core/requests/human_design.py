@@ -1,15 +1,16 @@
 """Civil-time inputs for Human Design, without irrelevant house coordinates."""
 
-from typing import Literal, Optional
+from typing import Literal
 
 from pydantic import Field, model_validator
+from pydantic_core import PydanticCustomError
 
-from fatebridge.core.human_design_birth_clock import resolve_birth_clock
+from fatebridge.core.human_design.human_design_birth_clock import resolve_birth_clock
 from fatebridge.core.requests.base import _DeferredModel
 
 
 class HumanDesignRequest(_DeferredModel):
-    name: Optional[str] = Field(default=None, description="显示名称，不参与计算")
+    name: str | None = Field(default=None, description="显示名称，不参与计算")
     birth_year: int = Field(ge=1800, le=2399, description="公历年；不自动转换儒略历")
     birth_month: int = Field(ge=1, le=12, description="公历出生月，1至12")
     birth_day: int = Field(ge=1, le=31, description="公历出生日，另校验月份实际天数")
@@ -40,7 +41,7 @@ class HumanDesignRequest(_DeferredModel):
         le=60,
         description="可选的出生时间正负范围；10秒TT网格、速度变号及已观测多依赖过渡细查，不认证连续区间穷尽；0表示未评估",
     )
-    cycle_reference_datetime: Optional[str] = Field(
+    cycle_reference_datetime: str | None = Field(
         default=None,
         description="可选带时区ISO时刻；当地时间的小数按最低已给单位（小时、分钟或秒）精确展开，最多6位，超限拒绝而非截断。提供才计算出生起65儒略年内土星首轮回归、天王星对冲及凯龙星首轮回归的多次交会与该时刻的相对位置。须在源定义的连续TT上不早于出生；输入顺序校验不认证微秒级天文精度。不按生日划阶段，不默认当前时间。有限采样不认证穷尽。",
     )
@@ -56,7 +57,16 @@ class HumanDesignRequest(_DeferredModel):
     @model_validator(mode="after")
     def _validate_clock(self) -> "HumanDesignRequest":
         if self.compare_cycle_origins and self.cycle_reference_datetime is None:
-            raise ValueError("周期原点对照须提供cycle_reference_datetime")
+            raise PydanticCustomError(
+                "cycle_reference_required",
+                "周期原点对照须提供cycle_reference_datetime",
+                {
+                    "path": "cycle_reference_datetime",
+                    "required_with": "compare_cycle_origins",
+                },
+            )
+        else:
+            pass
         resolve_birth_clock(
             birth_year=self.birth_year,
             birth_month=self.birth_month,
@@ -67,7 +77,7 @@ class HumanDesignRequest(_DeferredModel):
             birth_timezone=self.birth_timezone,
         )
         if self.cycle_reference_datetime is not None:
-            from fatebridge.core.human_design_cycle_input import (
+            from fatebridge.core.human_design.human_design_cycle_input import (
                 validate_cycle_reference,
             )
 
@@ -85,4 +95,6 @@ class HumanDesignRequest(_DeferredModel):
                     }
                 )
             )
+        else:
+            pass
         return self

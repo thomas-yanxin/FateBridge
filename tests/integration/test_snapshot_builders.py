@@ -5,10 +5,50 @@
 直接断言，作为 golden 之外的第二道防线。
 """
 
+import json
+from copy import deepcopy
+
+from fatebridge.core.export_parser import parse_export_content
 from fatebridge.services.snapshot_builders import (
+    build_snapshot_export,
+    format_snapshot_json,
     render_snapshot_lines,
     render_snapshot_text,
 )
+
+
+def test_snapshot_json_filters_keys_without_changing_facts_or_internal_input() -> None:
+    digest = "a" * 64
+    raw = {
+        "source_sha256": digest,
+        "source": {"version": "v1", "location": "catalog/table"},
+        "note": '{"source_sha256":"literal"}',
+        "facts": [
+            {"hash_scope": "internal", "label": digest, "angle": -0.0},
+            {"Fingerprint": digest, "value": 0.0},
+        ],
+        "first_record_identities": [digest],
+        "pixel_firsts": {"first": 1},
+    }
+    original = deepcopy(raw)
+    rendered = format_snapshot_json(raw)
+    actual = json.loads(rendered)
+    assert actual == {
+        "source": {"version": "v1", "location": "catalog/table"},
+        "note": '{"source_sha256":"literal"}',
+        "facts": [{"label": digest, "angle": -0.0}, {"value": 0.0}],
+    }
+    assert actual["facts"][0]["angle"].hex() == (-0.0).hex()
+    assert actual["facts"][1]["value"].hex() == (0.0).hex()
+    assert raw == original
+    assert raw["facts"][0]["angle"].hex() == (-0.0).hex()
+    snapshot = render_snapshot_text([("起盘信息", rendered)])
+    exported = build_snapshot_export(technique="qimen", snapshot_text=snapshot)
+    assert exported["export_text"] == snapshot
+    assert exported["sections"][0]["content"] == snapshot
+    assert digest in snapshot
+    assert "source_sha256" not in actual
+    assert "hash_scope" not in actual["facts"][0]
 
 
 class TestRenderSnapshotText:
@@ -42,8 +82,6 @@ def test_export_omits_text_duplicates() -> None:
     ``export_text``（含安全回退）+ 各 section 的 ``included`` 标记完整覆盖。两者
     都是纯重复，移除后每次工具响应可省下一到两份正文（西占盘 ~13%）。
     """
-    from fatebridge.core.export_parser import parse_export_content
-
     snap = render_snapshot_text([("起盘信息", "样例"), ("断语", "吉")])
     export = parse_export_content(technique="qimen", content=snap)
 
@@ -64,8 +102,6 @@ def test_export_section_omits_derivable_body() -> None:
     ``export_text`` 所需的小节标题；``body`` 仅是 ``content`` 去掉首行标题，可派生
     且无任何消费者。删去 ``body`` 再省一份小节正文（西占盘 ~8%）。
     """
-    from fatebridge.core.export_parser import parse_export_content
-
     snap = render_snapshot_text([("起盘信息", "样例正文"), ("断语", "吉")])
     export = parse_export_content(technique="qimen", content=snap)
 

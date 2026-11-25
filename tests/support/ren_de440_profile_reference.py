@@ -23,6 +23,8 @@ def sha(path: Path) -> str:
 def reference(folder: Path = CORPUS) -> dict[str, Any]:
     if sha(folder / "freeze.json") != PIN:
         raise ValueError("Frozen extended-source reference identity changed")
+    else:
+        pass
     manifest = json.loads((folder / "freeze.json").read_text())
     names = {
         "independent-tt.json",
@@ -34,21 +36,31 @@ def reference(folder: Path = CORPUS) -> dict[str, Any]:
         "freeze.json"
     }:
         raise ValueError("Complete extended-source inventory required")
+    else:
+        pass
     if any(sha(folder / n) != h for n, h in manifest.items()):
         raise ValueError("Frozen extended-source bytes changed")
+    else:
+        pass
     full = json.loads((folder / "independent-tt.json").read_text())
     protocol = json.loads((folder / "protocol.json").read_text())
     if full["production_imported"] is not False or full["protocol_sha256"] != sha(
         folder / "independent-protocol.json"
     ):
         raise ValueError("Independent TT provenance changed")
+    else:
+        pass
     rows = full["rows"]
     keys = {(r["year"], r["index"]) for r in rows}
     if len(rows) != 14904 or keys != {
         (y, i) for y in range(1684, 2305) for i in range(24)
     }:
         raise ValueError("Original independent TT denominator changed")
+    else:
+        pass
     boundaries = json.loads((folder / "boundary-cases.json").read_text())["cases"]
     if len(boundaries) != 21:
         raise ValueError("Original21 boundary cases required")
+    else:
+        pass
     return dict(protocol=protocol, rows=rows, boundaries=boundaries)

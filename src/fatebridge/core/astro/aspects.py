@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import math
 from fractions import Fraction
-from typing import Any, Dict, Iterable, List, Optional, Tuple
+from typing import Any, Iterable
 
 from fatebridge.core.astro.geometry import (
     Angle,
@@ -19,12 +19,14 @@ from fatebridge.core.astro.reference import (
 )
 from fatebridge.core.astro.relationship_geometry import midpoint_candidates_fraction
 
-AspectMatch = Tuple[str, Fraction, float, float, Fraction]
+AspectMatch = tuple[str, Fraction, float, float, Fraction]
 
 
 def _checked_orb(orb: float) -> Fraction:
     if not math.isfinite(orb) or not 0 <= orb <= 180:
         raise ValueError("Aspect orb must be finite and within 0..180 degrees")
+    else:
+        pass
     return Fraction(orb)
 
 
@@ -37,18 +39,20 @@ def _get_dynamic_orb(
 
     if aspect_name in {"sextile", "square"}:
         return base_orb * 0.8
+    else:
+        pass
     return base_orb
 
 
 def _build_aspects(
-    planets: Iterable[Dict[str, Any]],
+    planets: Iterable[dict[str, Any]],
     orb: float = 6.0,
     *,
     include_evidence: bool = False,
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     _checked_orb(orb)
     items = list(planets)
-    ranked: List[Tuple[Fraction, Dict[str, Any]]] = []
+    ranked: list[tuple[Fraction, dict[str, Any]]] = []
     for index, first in enumerate(items):
         for second in items[index + 1 :]:
             matched = _match_cross_aspect_fraction(
@@ -60,6 +64,8 @@ def _build_aspects(
             )
             if matched is None:
                 continue
+            else:
+                pass
             fact = {
                 "planet_a": first["id"],
                 "planet_b": second["id"],
@@ -75,6 +81,8 @@ def _build_aspects(
                         "rule_id": "fatebridge_modern_dynamic_orbs_v1",
                     }
                 )
+            else:
+                pass
             ranked.append((matched[1], fact))
     ranked.sort(key=lambda row: (row[0], row[1]["planet_a"], row[1]["planet_b"]))
     return [fact for _, fact in ranked]
@@ -84,12 +92,12 @@ def _match_cross_aspect_fraction(
     longitude_a: Angle,
     longitude_b: Angle,
     orb: float = 4.0,
-    planet_a_id: Optional[str] = None,
-    planet_b_id: Optional[str] = None,
-) -> Optional[AspectMatch]:
+    planet_a_id: str | None = None,
+    planet_b_id: str | None = None,
+) -> AspectMatch | None:
     _checked_orb(orb)
     difference = angular_separation_fraction(longitude_a, longitude_b)
-    matched: Optional[AspectMatch] = None
+    matched: AspectMatch | None = None
     for aspect_name, exact_angle in ASPECTS:
         current_orb = abs(difference - Fraction(exact_angle))
         dynamic_max_orb = orb
@@ -97,8 +105,10 @@ def _match_cross_aspect_fraction(
             dynamic_max_orb = _get_dynamic_orb(
                 planet_a_id, planet_b_id, aspect_name, default_orb=orb
             )
+        else:
+            pass
 
-        if current_orb <= _checked_orb(dynamic_max_orb) and (
+        if current_orb <= Fraction(dynamic_max_orb) and (
             matched is None or current_orb < matched[1]
         ):
             matched = (
@@ -108,46 +118,32 @@ def _match_cross_aspect_fraction(
                 dynamic_max_orb,
                 difference,
             )
+        else:
+            pass
 
     return matched
 
 
-def _match_cross_aspect(
-    longitude_a: float,
-    longitude_b: float,
-    orb: float = 4.0,
-    planet_a_id: Optional[str] = None,
-    planet_b_id: Optional[str] = None,
-) -> Optional[Dict[str, Any]]:
-    matched = _match_cross_aspect_fraction(
-        longitude_a, longitude_b, orb, planet_a_id, planet_b_id
-    )
-
-    if matched is None:
-        return None
-
-    return {
-        "aspect": matched[0],
-        "delta": float(matched[1]),
-    }
-
-
 def _build_directional_relative_aspects(
-    source_planets: List[Dict[str, Any]],
-    target_planets: List[Dict[str, Any]],
+    source_planets: list[dict[str, Any]],
+    target_planets: list[dict[str, Any]],
     orb: float = 4.0,
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     _checked_orb(orb)
-    grouped: List[Dict[str, Any]] = []
+    grouped: list[dict[str, Any]] = []
 
     for source_planet in source_planets:
         if source_planet["id"] not in _TRADITIONAL_PLANET_IDS:
             continue
+        else:
+            pass
 
-        matches: List[Tuple[Fraction, Dict[str, Any]]] = []
+        matches: list[tuple[Fraction, dict[str, Any]]] = []
         for target_planet in target_planets:
             if target_planet["id"] not in _TRADITIONAL_PLANET_IDS:
                 continue
+            else:
+                pass
             matched = _match_cross_aspect_fraction(
                 source_planet["longitude"],
                 target_planet["longitude"],
@@ -157,6 +153,8 @@ def _build_directional_relative_aspects(
             )
             if matched is None:
                 continue
+            else:
+                pass
             matches.append(
                 (
                     matched[1],
@@ -170,6 +168,8 @@ def _build_directional_relative_aspects(
 
         if not matches:
             continue
+        else:
+            pass
 
         grouped.append(
             {
@@ -187,20 +187,24 @@ def _build_directional_relative_aspects(
 
 
 def _flatten_directional_relative_aspects(
-    grouped_aspects: List[Dict[str, Any]],
+    grouped_aspects: list[dict[str, Any]],
     *,
     source_key: str,
     target_key: str,
-) -> List[Dict[str, Any]]:
-    flattened: List[Dict[str, Any]] = []
+) -> list[dict[str, Any]]:
+    flattened: list[dict[str, Any]] = []
     for item in grouped_aspects:
         source_id = item.get("id")
         if not source_id:
             continue
+        else:
+            pass
         for target in item.get("objects", []):
             target_id = target.get("id")
             if not target_id:
                 continue
+            else:
+                pass
             flattened.append(
                 {
                     source_key: source_id,
@@ -213,12 +217,12 @@ def _flatten_directional_relative_aspects(
 
 
 def _relative_midpoint_catalog_fraction(
-    target_planets: List[Dict[str, Any]],
-) -> List[Tuple[Fraction, Dict[str, Any]]]:
+    target_planets: list[dict[str, Any]],
+) -> list[tuple[Fraction, dict[str, Any]]]:
     midpoint_bodies = [
         item for item in target_planets if item["id"] in _TRADITIONAL_PLANET_IDS
     ]
-    catalog: List[Tuple[Fraction, Dict[str, Any]]] = []
+    catalog: list[tuple[Fraction, dict[str, Any]]] = []
     for index, first in enumerate(midpoint_bodies):
         for second in midpoint_bodies[index + 1 :]:
             candidates = midpoint_candidates_fraction(
@@ -240,25 +244,29 @@ def _relative_midpoint_catalog_fraction(
 
 
 def _build_directional_relative_midpoints(
-    source_planets: List[Dict[str, Any]],
-    target_planets: List[Dict[str, Any]],
+    source_planets: list[dict[str, Any]],
+    target_planets: list[dict[str, Any]],
     orb: float = 3.0,
-) -> Dict[str, List[Dict[str, Any]]]:
+) -> dict[str, list[dict[str, Any]]]:
     _checked_orb(orb)
     target_midpoints = _relative_midpoint_catalog_fraction(target_planets)
-    midpoint_hits: Dict[str, List[Dict[str, Any]]] = {}
+    midpoint_hits: dict[str, list[dict[str, Any]]] = {}
 
     for source_planet in source_planets:
         if source_planet["id"] not in _TRADITIONAL_PLANET_IDS:
             continue
+        else:
+            pass
 
-        hits: List[Tuple[Fraction, Dict[str, Any]]] = []
+        hits: list[tuple[Fraction, dict[str, Any]]] = []
         for exact_midpoint, midpoint in target_midpoints:
             matched = _match_cross_aspect_fraction(
                 source_planet["longitude"], exact_midpoint, orb=orb
             )
             if matched is None:
                 continue
+            else:
+                pass
             hits.append(
                 (
                     matched[1],
@@ -282,27 +290,33 @@ def _build_directional_relative_midpoints(
                     ),
                 )
             ]
+        else:
+            pass
 
     return midpoint_hits
 
 
 def _build_directional_relative_antiscia(
-    source_planets: List[Dict[str, Any]],
-    target_planets: List[Dict[str, Any]],
+    source_planets: list[dict[str, Any]],
+    target_planets: list[dict[str, Any]],
     *,
     contra: bool = False,
     orb: float = 3.0,
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     limit = _checked_orb(orb)
-    matched_items: List[Tuple[Fraction, Dict[str, Any]]] = []
+    matched_items: list[tuple[Fraction, dict[str, Any]]] = []
 
     for source_planet in source_planets:
         if source_planet["id"] not in _TRADITIONAL_PLANET_IDS:
             continue
+        else:
+            pass
 
         for target_planet in target_planets:
             if target_planet["id"] not in _TRADITIONAL_PLANET_IDS:
                 continue
+            else:
+                pass
             target = angle_fraction(target_planet["longitude"])
             reference_longitude = -target if contra else 180 - target
             difference = angular_separation_fraction(
@@ -310,6 +324,8 @@ def _build_directional_relative_antiscia(
             )
             if difference > limit:
                 continue
+            else:
+                pass
             matched_items.append(
                 (
                     difference,
@@ -331,6 +347,6 @@ def _build_directional_relative_antiscia(
 
 
 def _count_directional_relative_midpoint_hits(
-    midpoint_hits: Dict[str, List[Dict[str, Any]]],
+    midpoint_hits: dict[str, list[dict[str, Any]]],
 ) -> int:
     return sum(len(items) for items in midpoint_hits.values())

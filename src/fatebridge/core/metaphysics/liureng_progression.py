@@ -4,9 +4,8 @@ from __future__ import annotations
 
 from typing import Any
 
+from fatebridge.core.metaphysics.common import SEXAGENARY_INDEX, kongwang_for_ganzhi
 from fatebridge.core.metaphysics.ren_sources import TANYUAN_SCAN_SHA256, TANYUAN_SOURCE
-
-from .common import SEXAGENARY_INDEX, kongwang_for_ganzhi
 
 BRANCHES = "子丑寅卯辰巳午未申酉戌亥"
 SCOPE = (
@@ -19,6 +18,8 @@ SCOPE = (
 def transmission_progression(day_ganzhi: str, branches: list[str]) -> dict[str, Any]:
     if day_ganzhi not in SEXAGENARY_INDEX:
         raise ValueError("三传进退需要有效日干支")
+    else:
+        pass
     if (
         not isinstance(branches, list)
         or len(branches) != 3
@@ -27,6 +28,8 @@ def transmission_progression(day_ganzhi: str, branches: list[str]) -> dict[str, 
         )
     ):
         raise ValueError("三传进退需要按初中末排列的三个地支")
+    else:
+        pass
     indices = [BRANCHES.index(b) for b in branches]
     steps = [(b - a) % 12 for a, b in zip(indices, indices[1:])]
     step = steps[0] if steps[0] == steps[1] else None
@@ -49,6 +52,8 @@ def transmission_progression(day_ganzhi: str, branches: list[str]) -> dict[str, 
             reading, conditional = "见空不拘原进退说", None
         else:
             reading = "前进多阻" if direction == "进" else "后退有妨"
+    else:
+        pass
     return dict(
         ruleset_id="tanyuan_transmission_progression_v1",
         source_title="袁树珊《大六壬探原》卷下集说篇·课体纲要·三传连茹",

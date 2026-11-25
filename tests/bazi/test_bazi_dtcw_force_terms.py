@@ -15,7 +15,9 @@ KEY_PAGES = {
 
 
 @pytest.mark.parametrize("key,pages", KEY_PAGES.items())
-def test_public_card_retains_checked_edition_pages_and_no_force_acceptance(key, pages):
+def test_public_card_retains_checked_edition_pages_and_no_force_acceptance(
+    key, pages
+) -> None:
     result = calculate_knowledge_read(
         domain="bazi", category="classical_force_semantics", key=key
     )
@@ -35,7 +37,7 @@ def test_public_card_retains_checked_edition_pages_and_no_force_acceptance(key, 
     assert "非逐字引文" in result["citation"]
 
 
-def test_relative_balance_and_counterfactual_position_changes_remain_distinct():
+def test_relative_balance_and_counterfactual_position_changes_remain_distinct() -> None:
     balance = calculate_knowledge_read(
         domain="bazi", category="classical_force_semantics", key="身杀两停"
     )

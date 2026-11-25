@@ -3,12 +3,12 @@
 import pytest
 
 from fatebridge.application.examples import suggested_fields
-from fatebridge.core.bazi_evidence import build_natal_evidence
+from fatebridge.core.bazi.bazi_evidence import build_natal_evidence
 from fatebridge.core.elements import ElementAnalysis
-from tests.bazi.test_bazi_year_contract import TOPICS
 from tests.support.transports import SPECS, business, inputs
 from tests.support.transports import rest as _shared_rest
 from tests.support.transports import surface_calls
+from tests.unit_test.fixtures.bazi_year_cases import TOPICS
 
 
 def roots(text):
@@ -23,7 +23,7 @@ def by_position(stem):
     return {r["pillar"]: r for r in stem["roots"]}
 
 
-def test_ma_body_hidden_water_is_not_replaced_by_a_yang_growth_or_seal_root():
+def test_ma_body_hidden_water_is_not_replaced_by_a_yang_growth_or_seal_root() -> None:
     force, stems = roots("己巳 癸酉 癸未 庚申")
     body = by_position(stems["癸"])
     seal = by_position(stems["庚"])
@@ -51,7 +51,9 @@ def test_ma_body_hidden_water_is_not_replaced_by_a_yang_growth_or_seal_root():
     )
 
 
-def test_mao_clashed_growth_root_is_retained_without_claiming_its_remaining_force():
+def test_mao_clashed_growth_root_is_retained_without_claiming_its_remaining_force() -> (
+    None
+):
     force, stems = roots("壬寅 戊申 壬辰 壬寅")
     body = by_position(stems["壬"])
     assert body["month"]["kind"] == "yang_growth_root"
@@ -63,7 +65,7 @@ def test_mao_clashed_growth_root_is_retained_without_claiming_its_remaining_forc
     assert force["engineering_composition"]["strength_level"] == "中和"
 
 
-def test_yang_one_growth_root_does_not_automatically_flip_the_global_model():
+def test_yang_one_growth_root_does_not_automatically_flip_the_global_model() -> None:
     force, stems = roots("壬寅 壬寅 庚辰 辛巳")
     body = by_position(stems["庚"])
     assert body["hour"]["kind"] == "yang_growth_root"
@@ -74,7 +76,9 @@ def test_yang_one_growth_root_does_not_automatically_flip_the_global_model():
     assert stems["庚"]["force_status"] == "not_adjudicated"
 
 
-def test_yin_growth_reference_does_not_manufacture_a_hidden_stem_or_support_vote():
+def test_yin_growth_reference_does_not_manufacture_a_hidden_stem_or_support_vote() -> (
+    None
+):
     # Synthetic relation fixture, not a newly discovered classical chart.
     _, stems = roots("甲子 乙酉 丁卯 辛酉")
     day = stems["丁"]
@@ -92,7 +96,9 @@ rest = _shared_rest
 
 
 @pytest.mark.parametrize("topic", TOPICS)
-def test_per_stem_root_view_matches_actual_rest_native_mcp_cli(topic, surface_calls):
+def test_per_stem_root_view_matches_actual_rest_native_mcp_cli(
+    topic, surface_calls
+) -> None:
     spec = SPECS["bazi_" + topic]
     payload = {**inputs(spec), "use_true_solar_time": False}
     fields = suggested_fields(spec, view="force_roots")

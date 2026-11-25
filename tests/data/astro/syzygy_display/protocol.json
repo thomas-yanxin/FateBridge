@@ -1,0 +1,60 @@
+{
+  "frozen_before_candidate": true,
+  "known_development_controls_not_blind": true,
+  "dates": [
+    [
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      5
+    ],
+    [
+      1,
+      1,
+      10
+    ],
+    [
+      1,
+      1,
+      15
+    ],
+    [
+      1,
+      2,
+      1
+    ],
+    [
+      1961,
+      7,
+      31
+    ],
+    [
+      1972,
+      7,
+      1
+    ],
+    [
+      2026,
+      1,
+      4
+    ]
+  ],
+  "zodiacs": [
+    false,
+    true
+  ],
+  "birth_hour": 12,
+  "question": "Keep a numerically solved prenatal lunation and its TT/UT1 when a Python civil datetime cannot represent its display label. No root, source or scoring-weight change.",
+  "old_numeric_preservation_tolerance": 0,
+  "calendar_reference_line_seconds": 0.0002,
+  "reference_calendar": "ERFA proleptic Gregorian jd2cal on retained UT1 for the pre1960 carrier",
+  "ordinary_failure_and_source_integrity_errors_not_hidden": true,
+  "public_birth_year_range_unchanged": [
+    1,
+    9999
+  ]
+}

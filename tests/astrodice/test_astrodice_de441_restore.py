@@ -21,24 +21,24 @@ def frame(low, high, qualified=True):
     }
 
 
-def test_failure_cannot_be_hidden_by_other_frame_uncertainty():
+def test_failure_cannot_be_hidden_by_other_frame_uncertainty() -> None:
     assert (
         grade_frames({"tropical": frame(0.0021, 0.003), "lahiri": frame(0, 1)}) == FAIL
     )
 
 
 @pytest.mark.parametrize("other", [frame(0.001, 0.00201), frame(0, 0.001, False)])
-def test_midpoint_alone_or_unqualified_frame_cannot_pass(other):
+def test_midpoint_alone_or_unqualified_frame_cannot_pass(other) -> None:
     assert grade_frames({"tropical": frame(0, 0.001), "lahiri": other}) == UNRESOLVED
 
 
-def test_whole_error_interval_must_satisfy_original_line():
+def test_whole_error_interval_must_satisfy_original_line() -> None:
     assert (
         grade_frames({"tropical": frame(0, 0.002), "lahiri": frame(0, 0.002)}) == PASS
     )
 
 
-def test_observed_reference_spread_is_not_discarded_or_halved():
+def test_observed_reference_spread_is_not_discarded_or_halved() -> None:
     samples = {
         str(k * h): {"printed_angles": ["0.000000000", "0.000000000"]}
         for h in (21600, 43200)

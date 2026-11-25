@@ -47,6 +47,8 @@ def from_recorded(path):
     }
     if {r["utc"]: r["apparent_ecliptic_longitude"] for r in rows} != previously_parsed:
         raise ValueError("Saved parsed positions disagree with the recorded NASA table")
+    else:
+        pass
     cases = []
     for pair in original["pairs"]:
         start = datetime.fromisoformat(pair["design_candidate_utc"])
@@ -103,6 +105,8 @@ def main():
             f"Reparsed {len(result['rows'])} NASA Sun positions and {len(result['cases'])} symbolic-key pairs from recorded response"
         )
         return
+    else:
+        pass
     cases, dates = [], []
     for birth, years in CASES:
         start = datetime.fromisoformat(birth).replace(tzinfo=timezone.utc)
@@ -159,6 +163,8 @@ def main():
     response = json.loads(raw)
     if "error" in response:
         raise RuntimeError(response["error"])
+    else:
+        pass
     text = response["result"]
     table = text.split("$$SOE\n", 1)[1].split("$$EOE", 1)[0]
     rows = []
@@ -206,3 +212,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+else:
+    pass

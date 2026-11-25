@@ -23,24 +23,36 @@ def sha(path: Path) -> str:
 def reference(corpus: Path = CORPUS) -> dict[str, Any]:
     if sha(INITIAL_CORPUS / "freeze.json") != INITIAL_PIN:
         raise ValueError("Initial incomplete reading identity changed")
+    else:
+        pass
     initial = json.loads((INITIAL_CORPUS / "freeze.json").read_text())
     for name, digest in initial["files"].items():
         if sha(INITIAL_CORPUS / name) != digest:
             raise ValueError("Initial incomplete reading bytes changed")
+        else:
+            pass
     if sha(corpus / "freeze.json") != PIN:
         raise ValueError("Frozen printed-break reference identity changed")
+    else:
+        pass
     manifest = json.loads((corpus / "freeze.json").read_text())
     if {p.name for p in corpus.iterdir()} != set(manifest["files"]) | {"freeze.json"}:
         raise ValueError("Frozen printed-break reference inventory changed")
+    else:
+        pass
     for name, expected in manifest["files"].items():
         if sha(corpus / name) != expected:
             raise ValueError("Frozen printed-break reference changed: " + name)
+        else:
+            pass
     readings = json.loads((corpus / "readings.json").read_text())
     if (
         sha(ROOT / "tests/fixtures/jinkou_month_building_v1/source.pdf")
         != readings["source_sha256"]
     ):
         raise ValueError("Printed-break original PDF identity changed")
+    else:
+        pass
     return dict(
         readings=readings,
         reference=json.loads((corpus / "reference.json").read_text()),
@@ -55,11 +67,11 @@ def audit() -> dict[str, Any]:
         Path(__file__),
     ]
     before = {str(p.relative_to(ROOT)): sha(p) for p in files}
+    from fatebridge.core.contracts.output_jinkou_breaks import JinkouBranchBreaks
     from fatebridge.core.metaphysics.jinkou_branch_breaks import (
         branch_breaks,
         pair_facts,
     )
-    from fatebridge.core.output_jinkou_breaks import JinkouBranchBreaks
 
     matrix = []
     for expected in data["reference"]["pair_matrix"]:
@@ -104,12 +116,16 @@ def audit() -> dict[str, Any]:
                     metadata_matches=metadata_matches,
                 )
             )
+        else:
+            pass
         count += 1
     from scripts.ren.audit_jinkou_strength import audit as strength_audit
 
     original = strength_audit()
     if before != {str(p.relative_to(ROOT)): sha(p) for p in files}:
         raise ValueError("Source changed during printed-break audit")
+    else:
+        pass
     passed = all(r["matched"] for r in matrix) and count == 1728 and not failures
     return dict(
         reference_pin=PIN,
@@ -169,3 +185,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

@@ -6,11 +6,11 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from fatebridge.core.meihua_casting import cast_explicit_meihua
+from fatebridge.core.meihua.meihua_casting import cast_explicit_meihua
 from fatebridge.core.requests.meihua import MeihuaCastRequest
 from fatebridge.services.meihua import calculate_meihua_cast
-from fatebridge.validation.meihua_scans import read_frozen_artifact
 from tests.support.transports import SPECS, business, rest, surface_calls
+from validation.meihua_scans import read_frozen_artifact
 
 REFERENCE = Path(__file__).parents[1] / "fixtures/meihua_text_count_v1"
 CASES = json.loads((REFERENCE / "cases.json").read_text())["cases"]
@@ -25,7 +25,7 @@ def parameters(case, basis="raw_counts"):
     }
 
 
-def test_six_hand_probes_and_selected_source_bytes_are_preserved():
+def test_six_hand_probes_and_selected_source_bytes_are_preserved() -> None:
     manifest = json.loads((REFERENCE / "manifest.json").read_text())
     assert manifest["precedes_implementation"]
     for group in ["files", "references"]:
@@ -36,7 +36,9 @@ def test_six_hand_probes_and_selected_source_bytes_are_preserved():
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
 @pytest.mark.parametrize("basis", ["raw_counts", "trigram_numbers"])
-def test_declared_count_basis_keeps_hand_derived_geometry_and_body(case, basis):
+def test_declared_count_basis_keeps_hand_derived_geometry_and_body(
+    case, basis: str
+) -> None:
     output = calculate_meihua_cast(casting=parameters(case, basis))
     cast = output["meihua"]
     expected = case["raw" if basis == "raw_counts" else "reduced"]
@@ -62,9 +64,13 @@ def test_declared_count_basis_keeps_hand_derived_geometry_and_body(case, basis):
             output["interpretation"]["status"] == "conditional_on_declared_convention"
         )
         assert "原字数" in output["summary"] and "原声数" not in output["summary"]
+    else:
+        pass
 
 
-def test_hundred_plus_requires_an_explicit_textual_basis_and_remains_conditional():
+def test_hundred_plus_requires_an_explicit_textual_basis_and_remains_conditional() -> (
+    None
+):
     with pytest.raises(ValidationError):
         MeihuaCastRequest(casting={"method": "text_count", "character_count": 101})
     output = calculate_meihua_cast(casting=parameters(CASES[4]))
@@ -82,7 +88,9 @@ def test_hundred_plus_requires_an_explicit_textual_basis_and_remains_conditional
 
 
 @pytest.mark.parametrize("value", [10, 0, True, 17.0, "17", 1_000_001])
-def test_invalid_or_oversized_software_counts_do_not_become_ancient_rules(value):
+def test_invalid_or_oversized_software_counts_do_not_become_ancient_rules(
+    value: bool | float | int | str,
+) -> None:
     with pytest.raises(ValidationError):
         MeihuaCastRequest(
             casting={
@@ -93,7 +101,7 @@ def test_invalid_or_oversized_software_counts_do_not_become_ancient_rules(value)
         )
 
 
-def test_large_software_extension_is_not_a_source_range_certification():
+def test_large_software_extension_is_not_a_source_range_certification() -> None:
     output = calculate_meihua_cast(
         casting={
             "method": "text_count",
@@ -110,7 +118,7 @@ def test_large_software_extension_is_not_a_source_range_certification():
     assert output["interpretation"]["status"] == "conditional_on_textual_extent"
 
 
-def test_all_working_counts11through199_keep_both_formulae_without_an_hour():
+def test_all_working_counts11through199_keep_both_formulae_without_an_hour() -> None:
     changed = 0
     for n in range(11, 200):
         upper, lower = n // 2, n - n // 2
@@ -141,7 +149,7 @@ def test_all_working_counts11through199_keep_both_formulae_without_an_hour():
     assert changed > 0
 
 
-def test_other_methods_and_unknown_basis_cannot_silently_choose_this_policy():
+def test_other_methods_and_unknown_basis_cannot_silently_choose_this_policy() -> None:
     for extra in [
         {"text_basis": "best_outcome"},
         {"line_sum_basis": "best_outcome"},
@@ -165,7 +173,9 @@ def test_other_methods_and_unknown_basis_cannot_silently_choose_this_policy():
 @pytest.mark.parametrize(
     "topic", ["general", "planning", "reputation", "wealth", "transaction"]
 )
-def test_each_human_candidate_keeps_its_own_body_relation_and_clause(topic):
+def test_each_human_candidate_keeps_its_own_body_relation_and_clause(
+    topic: str,
+) -> None:
     output = calculate_meihua_cast(
         casting=parameters(CASES[1]), interpretation_topic=topic
     )
@@ -187,7 +197,9 @@ def test_each_human_candidate_keeps_its_own_body_relation_and_clause(topic):
             assert row["topic_clause"]["relation"] == row["body_use_relation"]
 
 
-def test_weather_variants_do_not_borrow_the_other_changed_hexagram_rain_symbol():
+def test_weather_variants_do_not_borrow_the_other_changed_hexagram_rain_symbol() -> (
+    None
+):
     output = calculate_meihua_cast(
         casting=parameters(CASES[1]), interpretation_topic="weather"
     )
@@ -216,8 +228,8 @@ def test_weather_variants_do_not_borrow_the_other_changed_hexagram_rain_symbol()
     ],
 )
 def test_textual_and_arithmetic_conditions_survive_rest_mcp_cli(
-    case, basis, topic, surface_calls
-):
+    case, basis: str, topic: str, surface_calls
+) -> None:
     spec = SPECS["meihua_cast"]
     payload = {"casting": parameters(case, basis), "interpretation_topic": topic}
     fields = [

@@ -6,8 +6,8 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.validation import qimen as engine_audit
-from fatebridge.validation.qimen_table_integrity import (
+from validation import qimen as engine_audit
+from validation.qimen_table_integrity import (
     audit_printed_table_integrity,
     audit_table_source_context,
     unrepresented_walk_anomalies,
@@ -39,8 +39,8 @@ def mutate(directory, filename, change):
 
 
 def test_two_source_sequences_are_checked_without_calling_production_engine(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     def forbidden(*args, **kwargs):
         raise AssertionError(
             "Source-internal diagnostic must not call production leaders"
@@ -70,7 +70,7 @@ def test_two_source_sequences_are_checked_without_calling_production_engine(
     assert r["independent_new_reference_cases"] == 0
 
 
-def test_original_sources_and_known_disagreements_are_not_rewritten():
+def test_original_sources_and_known_disagreements_are_not_rewritten() -> None:
     before = (TABLES / "sources-and-tables.json").read_bytes()
     r = audit_printed_table_integrity(TABLES)
     engine = engine_audit.audit_numeric_tables(TABLES)
@@ -79,7 +79,7 @@ def test_original_sources_and_known_disagreements_are_not_rewritten():
     assert (TABLES / "sources-and-tables.json").read_bytes() == before
 
 
-def test_engine_forced_to_mimic_printed_numbers_cannot_erase_source_anomalies():
+def test_engine_forced_to_mimic_printed_numbers_cannot_erase_source_anomalies() -> None:
     r = audit_printed_table_integrity(TABLES)
     assert len(unrepresented_walk_anomalies(r, [])) == 2
     first = r["anomalous_cells"][0]
@@ -88,14 +88,16 @@ def test_engine_forced_to_mimic_printed_numbers_cannot_erase_source_anomalies():
     assert len(unrepresented_walk_anomalies(r, [unrelated])) == 2
 
 
-def test_deleting_the_manifest_unresolved_list_does_not_hide_defects(copied_tables):
+def test_deleting_the_manifest_unresolved_list_does_not_hide_defects(
+    copied_tables,
+) -> None:
     mutate(copied_tables, "sources-and-tables.json", lambda d: d.update(unresolved=[]))
     assert len(audit_printed_table_integrity(copied_tables)["anomalous_cells"]) == 2
 
 
 def test_new_synthetic_bad_cell_is_detected_without_a_hardcoded_case_list(
     copied_tables,
-):
+) -> None:
     def change(d):
         tokens = d["tables"][0]["palace_pairs"][0].split()
         assert tokens[2] == "83"
@@ -109,7 +111,7 @@ def test_new_synthetic_bad_cell_is_detected_without_a_hardcoded_case_list(
     assert (d["hour"], d["printed_number"], d["walk_implied_number"]) == ("丙寅", 7, 3)
 
 
-def test_raw_centre_five_is_never_replaced_with_hosted_two(copied_tables):
+def test_raw_centre_five_is_never_replaced_with_hosted_two(copied_tables) -> None:
     def change(d):
         tokens = d["tables"][0]["palace_pairs"][3].split()
         assert tokens[1] == "95"
@@ -124,7 +126,7 @@ def test_raw_centre_five_is_never_replaced_with_hosted_two(copied_tables):
 
 def test_a_self_consistent_shift_does_not_certify_absolute_head_placement(
     copied_tables,
-):
+) -> None:
     def change(d):
         tokens = d["tables"][0]["palace_pairs"][0].split()
         d["tables"][0]["palace_pairs"][0] = " ".join(
@@ -140,7 +142,7 @@ def test_a_self_consistent_shift_does_not_certify_absolute_head_placement(
 
 
 @pytest.mark.parametrize("part", ["table", "column", "row", "invalid_digit"])
-def test_incomplete_or_malformed_corpus_is_rejected(copied_tables, part):
+def test_incomplete_or_malformed_corpus_is_rejected(copied_tables, part: str) -> None:
     def change(d):
         if part == "table":
             d["tables"].pop()
@@ -159,7 +161,7 @@ def test_incomplete_or_malformed_corpus_is_rejected(copied_tables, part):
 
 
 @pytest.mark.parametrize("kind", ["path", "bytes"])
-def test_source_pointer_and_bytes_are_checked(copied_tables, kind):
+def test_source_pointer_and_bytes_are_checked(copied_tables, kind: str) -> None:
     if kind == "path":
         mutate(
             copied_tables,
@@ -173,7 +175,7 @@ def test_source_pointer_and_bytes_are_checked(copied_tables, kind):
         audit_printed_table_integrity(copied_tables)
 
 
-def test_catalogue_title_match_is_not_scan_authentication():
+def test_catalogue_title_match_is_not_scan_authentication() -> None:
     r = audit_table_source_context(CONTEXT)
     assert len(r["catalogue_observations"]) == 3
     assert (
@@ -193,8 +195,8 @@ def test_catalogue_title_match_is_not_scan_authentication():
     ["readable_rule_images_verified", "selected_third_party_pdf_lineage_authenticated"],
 )
 def test_catalogue_record_cannot_be_relabelled_as_a_read_rule_image(
-    copied_context, record, field
-):
+    copied_context, record, field: str
+) -> None:
     def change(d):
         d["catalogue_observations"][record][field] = True
 
@@ -206,7 +208,7 @@ def test_catalogue_record_cannot_be_relabelled_as_a_read_rule_image(
 @pytest.mark.parametrize("index", range(3))
 def test_inaccessible_catalogue_entries_cannot_be_silently_deleted(
     copied_context, index
-):
+) -> None:
     mutate(
         copied_context,
         "source-diagnostics.json",
@@ -216,7 +218,7 @@ def test_inaccessible_catalogue_entries_cannot_be_silently_deleted(
         audit_table_source_context(copied_context)
 
 
-def test_binding_conflict_is_derived_and_not_a_fixed_label(copied_context):
+def test_binding_conflict_is_derived_and_not_a_fixed_label(copied_context) -> None:
     def change(d):
         npm = d["catalogue_observations"][0]
         npm["extended_binding"] = npm["main_binding"]

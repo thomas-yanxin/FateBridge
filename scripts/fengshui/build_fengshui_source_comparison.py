@@ -3,7 +3,13 @@
 import argparse
 import hashlib
 import json
+import logging
 from pathlib import Path
+
+from pydantic import JsonValue, TypeAdapter
+from typing_extensions import TypedDict
+
+LOGGER = logging.getLogger(__name__)
 
 ROOT = Path(__file__).resolve().parents[2]
 CLAUSES_SHA = "85a10d759544d5b7729e6ffbec6427a1a5ee443b353184d0daa49e34f3b5ac88"
@@ -12,22 +18,80 @@ REPLACEMENT_SHA = "43b04b453c5ae51cb6fc6e7ebb958a6e2da58e853b254e0c69f76e1458dd0
 TARGET = ROOT / "src/fatebridge/data/fengshui/shen-natal-source-comparison-v2.json"
 
 
-def frozen(name: str, expected: str) -> dict:
-    raw = (ROOT / "tests/data" / name / "reference.json").read_bytes()
-    if hashlib.sha256(raw).hexdigest() != expected:
-        raise ValueError("Pre-engine source freeze changed: " + name)
-    return json.loads(raw)
+class ChartIdentity(TypedDict):
+    period: int
+    sitting_mountain: str
+    facing_mountain: str
+
+
+class ClauseCapture(TypedDict):
+    sha256: str
+
+
+class LowerChartClause(ChartIdentity):
+    pdf_page: int
+    capture: ClauseCapture
+    mountain_seed: int
+    facing_seed: int
+    mountain_flight: str
+    facing_flight: str
+
+
+class ChartPage(TypedDict):
+    page: int
+
+
+class LowerChartDiagram(ChartIdentity):
+    source_diagram: ChartPage
+    native_image_sha256: str
+    palaces: dict[str, JsonValue]
+
+
+class ReplacementChartDiagram(ChartIdentity):
+    pdf_page: int
+    native_sha256: str
+    palaces: dict[str, JsonValue]
+
+
+class LowerClauseReference(TypedDict):
+    rows: list[LowerChartClause]
+
+
+class LowerDiagramReference(TypedDict):
+    source_pdf_sha256: str
+    rows: list[LowerChartDiagram]
+
+
+class ReplacementDiagramReference(TypedDict):
+    rows: list[ReplacementChartDiagram]
+
+
+def read_frozen_reference(folder_name: str, expected_digest: str) -> bytes:
+    reference_bytes = (
+        ROOT / "tests/data" / folder_name / "reference.json"
+    ).read_bytes()
+    if hashlib.sha256(reference_bytes).hexdigest() != expected_digest:
+        raise ValueError(f"Pre-engine source freeze changed: {folder_name}")
+    else:
+        pass
+    return reference_bytes
 
 
 def build() -> str:
-    clauses = frozen("fengshui_lower_clauses_v1", CLAUSES_SHA)
-    diagrams = frozen("fengshui_lower_diagrams_v1", DIAGRAMS_SHA)
+    clauses = TypeAdapter(LowerClauseReference).validate_json(
+        read_frozen_reference("fengshui_lower_clauses_v1", CLAUSES_SHA), strict=True
+    )
+    diagrams = TypeAdapter(LowerDiagramReference).validate_json(
+        read_frozen_reference("fengshui_lower_diagrams_v1", DIAGRAMS_SHA), strict=True
+    )
     lookup = {(r["period"], r["facing_mountain"]): r for r in diagrams["rows"]}
     rows = []
     for clause in clauses["rows"]:
         diagram = lookup[(clause["period"], clause["facing_mountain"])]
         if clause["sitting_mountain"] != diagram["sitting_mountain"]:
             raise ValueError("Different source mountain associations")
+        else:
+            pass
         rows.append(
             {
                 "period": clause["period"],
@@ -37,13 +101,10 @@ def build() -> str:
                     "pdf_page": clause["pdf_page"],
                     "capture_sha256": clause["capture"]["sha256"],
                     "numeric_profile": {
-                        key: clause[key]
-                        for key in (
-                            "mountain_seed",
-                            "facing_seed",
-                            "mountain_flight",
-                            "facing_flight",
-                        )
+                        "mountain_seed": clause["mountain_seed"],
+                        "facing_seed": clause["facing_seed"],
+                        "mountain_flight": clause["mountain_flight"],
+                        "facing_flight": clause["facing_flight"],
                     },
                 },
                 "diagram": {
@@ -77,7 +138,10 @@ def build() -> str:
         },
         "rows": rows,
     }
-    printed = frozen("fengshui_replacement_diagrams_v1", REPLACEMENT_SHA)
+    printed = TypeAdapter(ReplacementDiagramReference).validate_json(
+        read_frozen_reference("fengshui_replacement_diagrams_v1", REPLACEMENT_SHA),
+        strict=True,
+    )
     data["ruleset"] = {
         "ruleset_id": "shen_2011_natal_numeric_comparison_v2",
         "version": "2.0.0",
@@ -136,19 +200,27 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args()
-    for target, text in ((TARGET, build()),):
-        if args.check:
-            if not target.is_file() or target.read_text(encoding="utf-8") != text:
-                print(
-                    "Packaged source comparison differs from frozen facts: "
-                    + target.name
-                )
-                return 1
+    generated_reference = build()
+    if args.check:
+        if (
+            not TARGET.is_file()
+            or TARGET.read_text(encoding="utf-8") != generated_reference
+        ):
+            LOGGER.error(
+                f"Packaged source comparison differs from frozen facts: {TARGET.name}"
+            )
+            return 1
         else:
-            target.write_text(text, encoding="utf-8")
-        print(target.name + "; sha256=" + hashlib.sha256(text.encode()).hexdigest())
+            pass
+    else:
+        TARGET.write_text(generated_reference, encoding="utf-8")
+    print(
+        f"{TARGET.name}; sha256={hashlib.sha256(generated_reference.encode()).hexdigest()}"
+    )
     return 0
 
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

@@ -4,40 +4,36 @@ import asyncio
 import copy
 import json
 from dataclasses import replace
+from pathlib import Path
 
 import pytest
+from fastapi.testclient import TestClient
 from fastmcp import Client
 from jsonschema import Draft202012Validator
 from jsonschema import ValidationError as SchemaError
-from pydantic import ValidationError
+from pydantic import JsonValue
 
 import fatebridge.application.execution as execution
 import fatebridge.mcp_server as mcp
 from fatebridge.cli import run as cli_run
+from fatebridge.core.schema_cache import model_schema
 from fatebridge.services.tool_catalog import CATALOG
-from tests.support.current_outputs import current_business
 from tests.support.transports import (
     AS_OF,
     SPECS,
     business,
+    cached_output_validator,
     call_cli,
+    capability_contracts,
     inputs,
     native,
     rest,
-    rest_spec,
     surface_calls,
 )
-
-
-@pytest.mark.parametrize("key", list(SPECS))
-def test_current_unrounded_business_validates_without_mutation(key, current_business):
-    spec = SPECS[key]
-    payload = current_business(key)
-    before = copy.deepcopy(payload)
-    spec.output_model.model_validate(payload, context={"full_result": True})
-    Draft202012Validator(spec.output_model.model_json_schema()).validate(payload)
-    assert payload == before
-
+from tests.unit_test.fixtures.schema_assertions import (
+    reject_nested_fact_fault,
+    schema_leaf,
+)
 
 BAD_FACTS = [
     ("pd", {"pd": {"timeline": [{"event_age_years": "private-wrong-value"}]}}),
@@ -78,7 +74,7 @@ BAD_FACTS = [
     ("sixyao", {"lines": [{"change": "false"}]}),
     ("heluo", {"dayun": {"all": [{"ageStart": "3"}]}}),
     ("suzhan", {"chart": {"objects": [{"house": 1}]}}),
-    ("sanshiunited", {"subresults": {"qimen": {"pan": {"ju_number": "9"}}}}),
+    ("sanshiunited", {"qimen": {"ju_number": "9"}}),
     (
         "astro_horary",
         {
@@ -100,54 +96,14 @@ BAD_FACTS = [
 
 @pytest.mark.parametrize("key,payload", BAD_FACTS)
 def test_nested_fact_faults_are_internal_failures_on_all_surfaces(
-    key, payload, rest, monkeypatch, tmp_path, capsys
-):
-    spec = SPECS[key]
-    with pytest.raises(ValidationError):
-        spec.output_model.model_validate(payload)
-    with pytest.raises(SchemaError):
-        Draft202012Validator(spec.output_model.model_json_schema()).validate(payload)
-
-    original = execution.execute_spec
-
-    def broken_output(actual, request):
-        if actual.key in {key, rest_spec(spec).key}:
-            actual = replace(
-                actual, bind=lambda _: (lambda: copy.deepcopy(payload), (), {})
-            )
-        return original(actual, request)
-
-    monkeypatch.setattr(execution, "execute_spec", broken_output)
-    request = inputs(spec)
-    # Selecting an unrelated field cannot hide corrupt professional facts:
-    # validation is performed before projection in the shared execution unit.
-    http = rest.post(
-        rest_spec(spec).rest_path,
-        json=inputs(rest_spec(spec)),
-        params={"as_of": AS_OF, "fields": "analysis_type", "trace_id": "nested-fault"},
-    )
-    protocol = asyncio.run(
-        native(spec, request, fields=["analysis_type"], trace_id="nested-fault")
-    )
-    code, output = call_cli(
-        spec,
-        request,
-        tmp_path,
-        capsys,
-        ["--fields", "analysis_type", "--trace-id", "nested-fault"],
-    )
-    assert http.status_code == 500 and protocol.is_error and code == 1
-    assert {
-        k: v for k, v in protocol.structured_content.items() if k != "operation"
-    } == output
-    assert http.json() == {
-        k: v for k, v in output.items() if k not in {"operation", "status_code"}
-    }
-    assert output["status_code"] == 500
-    assert output["error_code"] == "internal_error"
-    assert output["trace_id"] == "nested-fault"
-    assert "private-wrong-value" not in json.dumps(output)
-    assert json.loads(protocol.content[0].text) == protocol.structured_content
+    key: str,
+    payload: dict[str, JsonValue],
+    rest: TestClient,
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    reject_nested_fact_fault(key, payload, rest, monkeypatch, tmp_path, capsys)
 
 
 PROJECTIONS = [
@@ -166,19 +122,19 @@ PROJECTIONS = [
     ("taiyi", "taiyi.core_board.guest_count"),
     ("sixyao", "lines"),
     ("suzhan", "chart.objects"),
-    ("sanshiunited", "subresults.qimen.pan.ju_number"),
+    ("sanshiunited", "qimen.ju_number"),
 ]
 
 
 @pytest.mark.parametrize("key,field", PROJECTIONS)
 def test_professional_partial_output_matches_transports_and_no_metadata(
-    key, field, rest, tmp_path, capsys
-):
+    key, field, rest, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     spec = SPECS[key]
     request = inputs(spec)
     http = rest.post(
-        rest_spec(spec).rest_path,
-        json=inputs(rest_spec(spec)),
+        spec.rest_path,
+        json=request,
         params={
             "as_of": AS_OF,
             "fields": field,
@@ -212,10 +168,10 @@ def test_professional_partial_output_matches_transports_and_no_metadata(
     assert business(http.json()) == business(protocol.structured_content) == output
     assert "run_metadata" not in output and "snapshot_text" not in output
     assert "projection_warnings" not in output
-    schema = spec.output_model.model_json_schema()
+    validator = cached_output_validator(spec.output_model)
     for result in [http.json(), protocol.structured_content, output]:
         spec.output_model.model_validate(result)
-        Draft202012Validator(schema).validate(result)
+        validator.validate(result)
 
 
 @pytest.mark.parametrize(
@@ -236,16 +192,18 @@ def test_professional_partial_output_matches_transports_and_no_metadata(
         ("gua_lookup", {"query": "坤为地"}),
     ],
 )
-def test_non_default_professional_branches_obey_the_same_contract(key, patch):
+def test_non_default_professional_branches_obey_the_same_contract(
+    key: str, patch
+) -> None:
     spec = SPECS[key]
     request = spec.request_model.model_validate({**inputs(spec), **patch})
     result = execution.execute_tool(spec, request)
     assert "error" not in result, result
     spec.output_model.model_validate(result)
-    Draft202012Validator(spec.output_model.model_json_schema()).validate(result)
+    cached_output_validator(spec.output_model).validate(result)
 
 
-def test_extensions_nulls_empty_lists_and_numeric_wire_values_are_preserved():
+def test_extensions_nulls_empty_lists_and_numeric_wire_values_are_preserved() -> None:
     spec = SPECS["decennials"]
     payload = {
         "decennials": {
@@ -269,39 +227,7 @@ def test_extensions_nulls_empty_lists_and_numeric_wire_values_are_preserved():
     )
     assert result is payload and result == before
     assert "current_level_1" not in result["decennials"]
-    Draft202012Validator(spec.output_model.model_json_schema()).validate(result)
-
-
-def schema_leaf(root, node, path):
-    """Resolve optional models, map values and list items without unrolling recursion."""
-
-    def unwrap(value):
-        while True:
-            if "$ref" in value:
-                ref = value["$ref"]
-                assert ref.startswith("#/")
-                value = root
-                for part in ref[2:].split("/"):
-                    value = value[part.replace("~1", "/").replace("~0", "~")]
-            elif "anyOf" in value:
-                candidates = [v for v in value["anyOf"] if v.get("type") != "null"]
-                assert len(candidates) == 1
-                value = candidates[0]
-            else:
-                return value
-
-    for part in path.split("."):
-        node = unwrap(node)
-        node = (
-            node["items"]
-            if part == "[]"
-            else (
-                node["additionalProperties"]
-                if part == "{}"
-                else node["properties"][part]
-            )
-        )
-    return unwrap(node)
+    cached_output_validator(spec.output_model).validate(result)
 
 
 SCHEMA_LEAVES = [
@@ -336,13 +262,13 @@ SCHEMA_LEAVES = [
     ("sixyao", "lines.[].change", "boolean"),
     ("heluo", "dayun.all.[].ageStart", "integer"),
     ("suzhan", "chart.objects.[].house", "string"),
-    ("sanshiunited", "subresults.qimen.pan.ju_number", "integer"),
+    ("sanshiunited", "qimen.ju_number", "integer"),
 ]
 
 
 def test_nested_schema_facts_are_discoverable_identically_on_all_transports(
-    rest, capsys
-):
+    rest, capsys: pytest.CaptureFixture[str]
+) -> None:
     openapi = rest.get("/openapi.json").json()
     manifest = rest.get("/api/tools").json()
     advertised = {tool["tool"]: tool["output_schema"] for tool in manifest["tools"]}
@@ -350,21 +276,23 @@ def test_nested_schema_facts_are_discoverable_identically_on_all_transports(
     async def schemas():
         async with Client(mcp.app) as client:
             return {
-                tool.name: tool.model_dump(by_alias=True)["outputSchema"]
-                for tool in await client.list_tools()
+                name: contract["output_schema"]
+                for name, contract in (
+                    await capability_contracts(client, detail="full")
+                ).items()
             }
 
     native_schemas = asyncio.run(schemas())
     for key, path, expected_type in SCHEMA_LEAVES:
         spec = SPECS[key]
-        central = spec.output_model.model_json_schema()
+        central = model_schema(spec.output_model)
         assert cli_run(["describe", spec.tool_name]) == 0
         cli_schema = json.loads(capsys.readouterr().out)["output_schema"]
         assert central == cli_schema == advertised[spec.tool_name]
         for root in [central, cli_schema, native_schemas[spec.tool_name]]:
             Draft202012Validator.check_schema(root)
             assert schema_leaf(root, root, path)["type"] == expected_type
-        endpoint = rest_spec(spec).rest_path
+        endpoint = spec.rest_path
         http_schema = openapi["paths"][endpoint]["post"]["responses"]["200"]["content"][
             "application/json"
         ]["schema"]
@@ -377,8 +305,8 @@ def test_nested_schema_facts_are_discoverable_identically_on_all_transports(
             Draft202012Validator(native_schemas[SPECS[key].tool_name]).validate(payload)
 
 
-def test_recursive_output_contract_keeps_standard_json_refs():
-    schema = SPECS["decennials"].output_model.model_json_schema()
+def test_recursive_output_contract_keeps_standard_json_refs() -> None:
+    schema = model_schema(SPECS["decennials"].output_model)
     assert "$defs" in schema
     json.dumps(schema)
     Draft202012Validator(schema).validate(
@@ -387,14 +315,13 @@ def test_recursive_output_contract_keeps_standard_json_refs():
 
 
 def test_numeric_relative_mode_preserves_integer_input_on_all_surfaces(
-    rest, tmp_path, capsys
-):
+    rest, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     spec = SPECS["astro_relative_chart"]
     request = {**inputs(spec), "relative_mode": 0}
-    nested = {**inputs(rest_spec(spec)), "relative_mode": 0}
     field = "relationship_profile.relative_mode_input"
     http = rest.post(
-        rest_spec(spec).rest_path, json=nested, params={"as_of": AS_OF, "fields": field}
+        spec.rest_path, json=request, params={"as_of": AS_OF, "fields": field}
     )
     protocol = asyncio.run(native(spec, request, fields=[field]))
     code, output = call_cli(spec, request, tmp_path, capsys, ["--fields", field])
@@ -409,8 +336,8 @@ def test_numeric_relative_mode_preserves_integer_input_on_all_surfaces(
 
 @pytest.mark.parametrize("retired", ["relationship_mode", "useTrueSolarTime"])
 def test_retired_astro_input_is_rejected_on_all_surfaces(
-    rest, tmp_path, capsys, retired
-):
+    rest, tmp_path: Path, capsys: pytest.CaptureFixture[str], retired: str
+) -> None:
     spec = (
         SPECS["astro_relative_chart"]
         if retired == "relationship_mode"
@@ -418,14 +345,13 @@ def test_retired_astro_input_is_rejected_on_all_surfaces(
     )
     value = "synastry" if retired == "relationship_mode" else True
     request = {**inputs(spec), retired: value}
-    nested = {**inputs(rest_spec(spec)), retired: value}
-    http = rest.post(rest_spec(spec).rest_path, json=nested)
+    http = rest.post(spec.rest_path, json=request)
     protocol = asyncio.run(native(spec, request))
     code, output = call_cli(spec, request, tmp_path, capsys)
     assert http.status_code == 422
     assert protocol.is_error
     assert code != 0 and "error" in output
-    assert retired not in spec.request_model.model_json_schema()["properties"]
+    assert retired not in model_schema(spec.request_model)["properties"]
     for output in (http.json(), protocol.structured_content, output):
         assert any(issue["code"] == "extra_forbidden" for issue in output["issues"])
 
@@ -433,10 +359,11 @@ def test_retired_astro_input_is_rejected_on_all_surfaces(
 @pytest.mark.parametrize(
     "mode", ["Comp", "Composite", "Synastry", "TimeSpace", "Marks"]
 )
-def test_canonical_relative_modes_agree_on_all_surfaces(rest, tmp_path, capsys, mode):
+def test_canonical_relative_modes_agree_on_all_surfaces(
+    rest, tmp_path: Path, capsys: pytest.CaptureFixture[str], mode: str
+) -> None:
     spec = SPECS["astro_relative_chart"]
     request = {**inputs(spec), "relative_mode": mode}
-    nested = {**inputs(rest_spec(spec)), "relative_mode": mode}
     fields = [
         "relationship_profile",
         "chart",
@@ -446,8 +373,8 @@ def test_canonical_relative_modes_agree_on_all_surfaces(rest, tmp_path, capsys, 
         "out_to_in_aspects",
     ]
     http = rest.post(
-        rest_spec(spec).rest_path,
-        json=nested,
+        spec.rest_path,
+        json=request,
         params={
             "as_of": AS_OF,
             "fields": fields,
@@ -485,8 +412,8 @@ def test_canonical_relative_modes_agree_on_all_surfaces(rest, tmp_path, capsys, 
 
 @pytest.mark.parametrize("method", ["legacy_reference", "legacy_equatorial", "unknown"])
 def test_retired_primary_direction_method_is_rejected_on_all_surfaces(
-    method, surface_calls
-):
+    method: str, surface_calls
+) -> None:
     spec = SPECS["pd"]
     payload = {**inputs(spec), "pd_method": method}
     http, protocol, code, output = surface_calls(spec, payload, cli_first=False)
@@ -504,8 +431,8 @@ def test_retired_primary_direction_method_is_rejected_on_all_surfaces(
     ],
 )
 def test_retired_field_alias_is_rejected_on_all_surfaces(
-    key, retired, value, surface_calls
-):
+    key: str, retired: str, value, surface_calls
+) -> None:
     spec = SPECS[key]
     payload = {**inputs(spec), retired: value}
     http, protocol, code, output = surface_calls(spec, payload, cli_first=False)
@@ -514,7 +441,7 @@ def test_retired_field_alias_is_rejected_on_all_surfaces(
     assert code != 0 and output["error_code"] == "validation_error"
 
 
-def test_request_contracts_have_one_name_per_field():
+def test_request_contracts_have_one_name_per_field() -> None:
     for spec in CATALOG:
         for field in spec.request_model.model_fields.values():
             assert field.alias is None

@@ -4,18 +4,18 @@ This is a conservative conflict policy, not a new classical scoring system.
 Seasonal lookup and pattern presence remain conditional references.
 """
 
-from typing import Any, Dict, List, Literal, Tuple, TypedDict
+from typing import Any, Literal, TypedDict
 
 from typing_extensions import NotRequired
 
-from ..utils.data import (
+from fatebridge.core.classical import seasonal_climate_god
+from fatebridge.core.classical_from_child import build_from_child_reference
+from fatebridge.utils.data import (
     BRANCH_HIDDEN_STEMS,
     GENERATION_CYCLE,
     STEM_ELEMENTS,
     Element,
 )
-from .classical import seasonal_climate_god
-from .classical_from_child import build_from_child_reference
 
 
 class ClimateStemReference(TypedDict):
@@ -38,10 +38,10 @@ class PreferenceLayer(TypedDict):
 
 
 def resolve_useful_elements(
-    pillars: Dict[str, Tuple[str, str]],
-    element_analysis: Dict[str, Any],
-    structures: List[Dict[str, Any]],
-) -> Dict[str, Any]:
+    pillars: dict[str, tuple[str, str]],
+    element_analysis: dict[str, Any],
+    structures: list[dict[str, Any]],
+) -> dict[str, Any]:
     day_stem = pillars["day"][0]
     day_element = STEM_ELEMENTS[day_stem][0]
     day_master = element_analysis["day_master"]
@@ -89,6 +89,8 @@ def resolve_useful_elements(
                 "scope": "仅在从儿成立时采用；普通扶抑和从儿条件方向均未提升为全局已定喜忌。",
             }
         )
+    else:
+        pass
     for structure in structures:
         layers.append(
             {
@@ -198,6 +200,8 @@ def resolve_useful_elements(
             for e in Element
             if e.value not in source_useful and e.value not in source_avoid
         ]
+    else:
+        pass
     return {
         "resolution_policy": "source_force_before_preference_v4",
         "from_child_reference": from_child,

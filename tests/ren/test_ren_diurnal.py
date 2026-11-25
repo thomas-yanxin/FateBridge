@@ -7,16 +7,16 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
+from fatebridge.core.contracts.output_chinese import RenDiurnalEvidence
 from fatebridge.core.metaphysics.liureng import build_liureng_board
 from fatebridge.core.metaphysics.ren_diurnal import resolve_diurnal
-from fatebridge.core.output_chinese import RenDiurnalEvidence
-from tests.ren.test_ren_classical_depth import AUDIT as V1
+from scripts.ren import audit_ren_classical
 
 CORPUS = Path(__file__).parents[1] / "fixtures/ren_diurnal_v1"
 REFERENCE = json.loads((CORPUS / "reference.json").read_text())
 
 
-def test_independent_source_and_software_policy_inventory_have_not_changed():
+def test_independent_source_and_software_policy_inventory_have_not_changed() -> None:
     freeze = json.loads((CORPUS / "freeze.json").read_text())
     assert set(freeze["files"]) == {"reference.json", "source-pages.pdf"}
     for name, checksum in freeze["files"].items():
@@ -29,7 +29,7 @@ def test_independent_source_and_software_policy_inventory_have_not_changed():
 
 
 @pytest.mark.parametrize("hour", list("子丑寅卯辰巳午未申酉戌亥"))
-def test_every_fixed_hour_choice_keeps_the_stellar_observation_unknown(hour):
+def test_every_fixed_hour_choice_keeps_the_stellar_observation_unknown(hour) -> None:
     result = resolve_diurnal(hour)
     policy = REFERENCE["software_policy"]
     assert result["is_diurnal"] == (hour in policy["day_branches"])
@@ -41,7 +41,7 @@ def test_every_fixed_hour_choice_keeps_the_stellar_observation_unknown(hour):
 
 
 @pytest.mark.parametrize("case", REFERENCE["explicit_cases"])
-def test_explicit_choice_wins_without_becoming_an_observation(case):
+def test_explicit_choice_wins_without_becoming_an_observation(case) -> None:
     result = resolve_diurnal(case["hour"], case["selected"])
     assert result["is_diurnal"] is case["selected"]
     assert result["explicit_choice"] is case["selected"]
@@ -51,10 +51,10 @@ def test_explicit_choice_wins_without_becoming_an_observation(case):
 
 @pytest.mark.parametrize("selected", [None, False, True])
 def test_both_methods_preserve_the_actual_choice_and_same_transmission_branches(
-    selected,
-):
+    selected: bool | None,
+) -> None:
     case = dict(day="戊辰", hour="申", ground="午", general="子", month="子")
-    seed = V1.make_seed(case)
+    seed = audit_ren_classical.make_seed(case)
     from fatebridge.core.metaphysics.jinkou import build_jinkou_board
 
     jk = build_jinkou_board(
@@ -80,7 +80,9 @@ def test_both_methods_preserve_the_actual_choice_and_same_transmission_branches(
 
 
 @pytest.mark.parametrize("value", [0, 1, "false", "night"])
-def test_domain_does_not_treat_truthy_nonboolean_values_as_day(value):
+def test_domain_does_not_treat_truthy_nonboolean_values_as_day(
+    value: int | str,
+) -> None:
     with pytest.raises(ValueError, match="布尔"):
         resolve_diurnal("卯", value)
 
@@ -90,7 +92,7 @@ def test_domain_does_not_treat_truthy_nonboolean_values_as_day(value):
     [("stellar_visibility_observed", False), ("solar_altitude_threshold_degrees", -6)],
 )
 def test_schema_cannot_forge_an_observation_or_numeric_classical_threshold(
-    field, value
-):
+    field: str, value
+) -> None:
     with pytest.raises(ValidationError):
         RenDiurnalEvidence.model_validate({field: value})

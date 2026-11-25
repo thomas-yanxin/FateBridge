@@ -6,8 +6,10 @@ from pathlib import Path
 
 import pytest
 
+from fatebridge.core.contracts.output_liuyao_control import DirectedControl
+from fatebridge.core.liuyao.liuyao_void_control import PROFILE
 from scripts.liuyao.build_profile import build_profile
-from tests.liuyao.test_liuyao_roles import classical
+from tests.unit_test.fixtures.liuyao import classical_case as classical
 
 BASE = Path(__file__).parents[1] / "fixtures/liuyao_void_control_v31"
 CASES = json.loads((BASE / "cases.json").read_text(encoding="utf-8"))["cases"]
@@ -23,13 +25,13 @@ def pair(result, case):
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
-def test_reference_control_truth(case):
+def test_reference_control_truth(case) -> None:
     result = classical(case)
     assert pair(result, case)["condition_match"] is case["expected_control"]
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
-def test_qualification_is_separate_from_remaining_controls(case):
+def test_qualification_is_separate_from_remaining_controls(case) -> None:
     result = classical(case)
     p = pair(result, case)
     assert (
@@ -57,6 +59,8 @@ def test_qualification_is_separate_from_remaining_controls(case):
             ]
             is True
         )
+    else:
+        pass
     if case["id"] == "same-edition-author-qian":
         assert p["source_calendar_supported"] is False
         assert (
@@ -80,17 +84,24 @@ def test_qualification_is_separate_from_remaining_controls(case):
             if x["positions"] == [2, 4, 3]
         )
         assert route["condition_match"] is not True
+    else:
+        pass
     if case["id"] == "additional-moving-metal":
         assert p["source_competing_active_controls"]
         assert p["condition_match"] is None
+    else:
+        pass
     if case["id"] == "target-actually-moving":
         assert p["status"] == "active_to_active_requires_arbitration"
+    else:
+        pass
     if case["id"] == "own-back-control-retained":
         assert p["status"] == "back_control_obstructs_outgoing_candidate"
+    else:
+        pass
 
 
-def test_frozen_author_clause_and_case_protocol():
-    from fatebridge.core.liuyao_void_control import PROFILE
+def test_frozen_author_clause_and_case_protocol() -> None:
 
     assert build_profile("void_control") == PROFILE
     for n, h in json.loads((BASE / "freeze.json").read_text(encoding="utf-8"))[
@@ -100,8 +111,7 @@ def test_frozen_author_clause_and_case_protocol():
     assert PROFILE["clauses"][0]["speaker"] == "予曰之后作者答语"
 
 
-def test_partial_false_does_not_require_qualification_siblings():
-    from fatebridge.core.output_liuyao_control import DirectedControl
+def test_partial_false_does_not_require_qualification_siblings() -> None:
 
     assert (
         DirectedControl.model_validate(

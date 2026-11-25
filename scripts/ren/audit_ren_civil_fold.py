@@ -24,9 +24,12 @@ IMPLEMENTATION = (
     "src/fatebridge/utils/timezones.py",
     "src/fatebridge/core/metaphysics/ren_calendar.py",
     "src/fatebridge/core/requests/metaphysics.py",
-    "src/fatebridge/core/output_ren_clock.py",
-    "src/fatebridge/core/output_chinese.py",
+    "src/fatebridge/core/contracts/output_ren_clock.py",
+    "src/fatebridge/core/contracts/output_chinese.py",
     "src/fatebridge/core/metaphysics/liureng.py",
+    "src/fatebridge/core/metaphysics/liureng_course_layout.py",
+    "src/fatebridge/core/metaphysics/liureng_selection.py",
+    "src/fatebridge/core/metaphysics/liureng_year_fate.py",
     "src/fatebridge/core/metaphysics/jinkou.py",
     "src/fatebridge/services/metaphysics.py",
     "scripts/ren/audit_ren_civil_fold.py",
@@ -41,13 +44,19 @@ def reference(corpus: Path = CORPUS) -> dict[str, Any]:
     manifest = json.loads((corpus / "freeze.json").read_text())
     if {p.name for p in corpus.iterdir()} != set(manifest["files"]) | {"freeze.json"}:
         raise ValueError("Frozen fold inventory changed")
+    else:
+        pass
     for name, expected in manifest["files"].items():
         if sha(corpus / name) != expected:
             raise ValueError(f"Frozen fold reference changed: {name}")
+        else:
+            pass
     ref: dict[str, Any] = json.loads((corpus / "reference.json").read_text())
     for name, expected in ref["references"].items():
         if sha(ROOT / name) != expected:
             raise ValueError(f"Referenced primary source changed: {name}")
+        else:
+            pass
     return ref
 
 
@@ -122,6 +131,8 @@ def audit() -> dict[str, Any]:
                             )
                         )
                         continue
+                    else:
+                        pass
                     board = result["jinkou" if tool == "jinkou" else "liureng"]
                     resolution = board["calendar_policy"]["civil_clock_resolution"]
                     expected_tzif = sha(
@@ -234,3 +245,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

@@ -5,11 +5,11 @@ every furniture corner. ``toilet_wall`` identifies the shared wall at the toilet
 fixture's side, not any partition adjoining a bathroom.
 """
 
-from typing import Any, Iterable, Literal, Mapping, Optional, Set, Tuple, get_args
+from typing import Any, Iterable, Literal, Mapping, get_args
 
 from pydantic import Field, StrictBool, field_validator, model_validator
 
-from .numeric_inputs import FengshuiInput as _DeferredModel
+from fatebridge.core.fengshui.numeric_inputs import FengshuiInput as _DeferredModel
 
 InteriorRole = Literal[
     "main_entry_door",
@@ -39,7 +39,7 @@ InteriorRelationKind = Literal[
     "stove_back_against_toilet_wall",
 ]
 SUPPORTED_INTERIOR_ROLES = frozenset(get_args(InteriorRole))
-RELATION_ROLES: Mapping[str, Tuple[str, str]] = {
+RELATION_ROLES: Mapping[str, tuple[str, str]] = {
     "main_entry_door_faces_bathroom_door": ("main_entry_door", "bathroom_door"),
     "bathroom_door_faces_stove": ("bathroom_door", "stove"),
     "sharp_corner_points_at_stove": ("sharp_corner", "stove"),
@@ -62,7 +62,7 @@ class InteriorRelation(_DeferredModel):
     source_object_id: str = Field(min_length=1, max_length=100)
     target_object_id: str = Field(min_length=1, max_length=100)
     kind: InteriorRelationKind
-    present: Optional[StrictBool] = Field(
+    present: StrictBool | None = Field(
         description="必须显式提供；null为未知，照片true/false均仅为候选观察"
     )
     observation_basis: Literal["measured", "user_confirmed", "image_observed"]
@@ -73,12 +73,16 @@ class InteriorRelation(_DeferredModel):
     def nonblank(cls, value: str) -> str:
         if not value.strip():
             raise ValueError("室内关系的对象、ID与依据不能为空白")
+        else:
+            pass
         return value
 
     @model_validator(mode="after")
     def different_objects(self) -> "InteriorRelation":
         if self.source_object_id == self.target_object_id:
             raise ValueError("室内关系的来源物件与目标物件不能相同")
+        else:
+            pass
         return self
 
 
@@ -88,7 +92,7 @@ def _level(floor: Any) -> Any:
 
 def validate_relation_references(
     relations: Iterable[InteriorRelation],
-    roles: Mapping[str, Set[str]],
+    roles: Mapping[str, set[str]],
     floor_maps: Mapping[str, Any],
 ) -> None:
     """Validate explicit identities and known levels, never infer from labels.
@@ -96,11 +100,13 @@ def validate_relation_references(
     An object can have both a use (desk) and a source attribute (sharp corner).
     Photo observations are candidates, including their spatial interpretation.
     """
-    relation_ids: Set[str] = set()
-    predicates: Set[Tuple[str, str, str]] = set()
+    relation_ids: set[str] = set()
+    predicates: set[tuple[str, str, str]] = set()
     for relation in relations:
         if relation.relation_id in relation_ids:
             raise ValueError("interior_relations.relation_id 不可重复")
+        else:
+            pass
         relation_ids.add(relation.relation_id)
         predicate = (
             relation.kind,
@@ -109,6 +115,8 @@ def validate_relation_references(
         )
         if predicate in predicates:
             raise ValueError("相同种类及端点的室内关系不可重复")
+        else:
+            pass
         predicates.add(predicate)
         for object_id, required_role in zip(
             (relation.source_object_id, relation.target_object_id),
@@ -116,22 +124,36 @@ def validate_relation_references(
         ):
             if object_id not in roles:
                 raise ValueError(f"室内关系引用未知对象 {object_id}")
+            else:
+                pass
             if required_role not in roles[object_id]:
                 raise ValueError(f"{object_id} 必须明确具有角色 {required_role}")
+            else:
+                pass
         if (
             relation.present is not True
             or relation.observation_basis == "image_observed"
         ):
             continue
+        else:
+            pass
         source_floor = floor_maps.get(relation.source_object_id)
         target_floor = floor_maps.get(relation.target_object_id)
         if source_floor is None or target_floor is None:
             continue
+        else:
+            pass
         source_level, target_level = _level(source_floor), _level(target_floor)
         if source_level is None or target_level is None:
             continue
+        else:
+            pass
         if relation.kind == "bed_above_stove":
             if source_level <= target_level:
                 raise ValueError("已确认床在灶上方时，床的楼层必须高于灶的楼层")
+            else:
+                pass
         elif source_level != target_level:
             raise ValueError("已确认的室内水平/顶上关系不能跨已知不同楼层")
+        else:
+            pass

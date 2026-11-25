@@ -1,0 +1,676 @@
+{
+  "ruleset": "given_source_geometry_constraints_v1",
+  "expectations_frozen_before_source_change": true,
+  "source_inputs_sha256": "99f00d1ad1e7c45dc27872c5d526ec42ba6fcb04f5222a5a598a50dd9cd311e1",
+  "independent_reference_sha256": "07dde00b6b370eab67951223eff2ef4d0aed5b490ec81236ebfe703a4a60fc30",
+  "given_ASC_contract_target_sha256": "d9f8f3a2c84d1a997c0431ab45b0752a7fd882a1f40e41e815e07740098697c3",
+  "source_definitions": [
+    "ERFA2.0.1s2c/c2s direction equations",
+    "Swiss6.2.5 and swehouse.c696bda432298d482d27e67a0cf1238920301a7dd A/E/V equal definitions"
+  ],
+  "physical_accuracy_or_original_474_acceptance": false,
+  "rotate": [
+    {
+      "input": {
+        "id": "R-minus55",
+        "matrix_hex": [
+          [
+            "0x1p+0",
+            "0x1p-55",
+            "0x0p+0"
+          ],
+          [
+            "-0x1p-55",
+            "0x1p+0",
+            "0x0p+0"
+          ],
+          [
+            "0x0p+0",
+            "0x0p+0",
+            "0x1p+0"
+          ]
+        ],
+        "longitude_hex": "0x0p+0",
+        "latitude_hex": "0x0p+0"
+      },
+      "expected_longitude_hex": "0x1.67fffffffffffp+8",
+      "expected_latitude_hex": "0x0.0p+0"
+    },
+    {
+      "input": {
+        "id": "R-plus55",
+        "matrix_hex": [
+          [
+            "0x1p+0",
+            "-0x1p-55",
+            "0x0p+0"
+          ],
+          [
+            "0x1p-55",
+            "0x1p+0",
+            "0x0p+0"
+          ],
+          [
+            "0x0p+0",
+            "0x0p+0",
+            "0x1p+0"
+          ]
+        ],
+        "longitude_hex": "0x0p+0",
+        "latitude_hex": "0x0p+0"
+      },
+      "expected_longitude_hex": "0x1.ca5dc1a63c1f8p-50",
+      "expected_latitude_hex": "0x0.0p+0"
+    },
+    {
+      "input": {
+        "id": "R-zero",
+        "matrix_hex": [
+          [
+            "0x1p+0",
+            "0x0p+0",
+            "0x0p+0"
+          ],
+          [
+            "0x0p+0",
+            "0x1p+0",
+            "0x0p+0"
+          ],
+          [
+            "0x0p+0",
+            "0x0p+0",
+            "0x1p+0"
+          ]
+        ],
+        "longitude_hex": "0x0p+0",
+        "latitude_hex": "0x0p+0"
+      },
+      "expected_longitude_hex": "0x0.0p+0",
+      "expected_latitude_hex": "0x0.0p+0"
+    }
+  ],
+  "equal": [
+    {
+      "id": "public-0-A",
+      "original_id": "public-0",
+      "house_code": "A",
+      "jd_ut1": 2415020.5208333335,
+      "jd_tt": 2415020.520810293,
+      "latitude": -89.0,
+      "longitude": -105.40281632765013,
+      "given_before_ASC_hex": "0x1.6d06dc26f2049p+7",
+      "source_recipe_targets": [
+        {
+          "value": 182.5133983774597,
+          "hex": "0x1.6d06dc26f2049p+7",
+          "exact_numerator": "6421619319709769",
+          "exact_denominator": "35184372088832",
+          "source_cell": 6
+        },
+        {
+          "value": 212.5133983774597,
+          "hex": "0x1.a906dc26f2049p+7",
+          "exact_numerator": "7477150482374729",
+          "exact_denominator": "35184372088832",
+          "source_cell": 7
+        },
+        {
+          "value": 242.5133983774597,
+          "hex": "0x1.e506dc26f2049p+7",
+          "exact_numerator": "8532681645039689",
+          "exact_denominator": "35184372088832",
+          "source_cell": 8
+        },
+        {
+          "value": 272.5133983774597,
+          "hex": "0x1.10836e1379024p+8",
+          "exact_numerator": "9588212807704649",
+          "exact_denominator": "35184372088832",
+          "source_cell": 9
+        },
+        {
+          "value": 302.5133983774597,
+          "hex": "0x1.2e836e1379024p+8",
+          "exact_numerator": "10643743970369609",
+          "exact_denominator": "35184372088832",
+          "source_cell": 10
+        },
+        {
+          "value": 332.5133983774597,
+          "hex": "0x1.4c836e1379024p+8",
+          "exact_numerator": "11699275133034569",
+          "exact_denominator": "35184372088832",
+          "source_cell": 11
+        },
+        {
+          "value": 2.5133983774597084,
+          "hex": "0x1.41b709bc81240p+1",
+          "exact_numerator": "88432343720009",
+          "exact_denominator": "35184372088832",
+          "source_cell": 0
+        },
+        {
+          "value": 32.51339837745971,
+          "hex": "0x1.041b709bc8124p+5",
+          "exact_numerator": "1143963506384969",
+          "exact_denominator": "35184372088832",
+          "source_cell": 1
+        },
+        {
+          "value": 62.51339837745971,
+          "hex": "0x1.f41b709bc8124p+5",
+          "exact_numerator": "2199494669049929",
+          "exact_denominator": "35184372088832",
+          "source_cell": 2
+        },
+        {
+          "value": 92.51339837745971,
+          "hex": "0x1.720db84de4092p+6",
+          "exact_numerator": "3255025831714889",
+          "exact_denominator": "35184372088832",
+          "source_cell": 3
+        },
+        {
+          "value": 122.51339837745971,
+          "hex": "0x1.ea0db84de4092p+6",
+          "exact_numerator": "4310556994379849",
+          "exact_denominator": "35184372088832",
+          "source_cell": 4
+        },
+        {
+          "value": 152.5133983774597,
+          "hex": "0x1.3106dc26f2049p+7",
+          "exact_numerator": "5366088157044809",
+          "exact_denominator": "35184372088832",
+          "source_cell": 5
+        }
+      ],
+      "qualification": "Targets are exact equal recipe for a fixed BEFORE-delivered ASC operand, not independent physical ASC; context drift is unqualified and must fail openly."
+    },
+    {
+      "id": "public-0-E",
+      "original_id": "public-0",
+      "house_code": "E",
+      "jd_ut1": 2415020.5208333335,
+      "jd_tt": 2415020.520810293,
+      "latitude": -89.0,
+      "longitude": -105.40281632765013,
+      "given_before_ASC_hex": "0x1.6d06dc26f2049p+7",
+      "source_recipe_targets": [
+        {
+          "value": 182.5133983774597,
+          "hex": "0x1.6d06dc26f2049p+7",
+          "exact_numerator": "6421619319709769",
+          "exact_denominator": "35184372088832",
+          "source_cell": 6
+        },
+        {
+          "value": 212.5133983774597,
+          "hex": "0x1.a906dc26f2049p+7",
+          "exact_numerator": "7477150482374729",
+          "exact_denominator": "35184372088832",
+          "source_cell": 7
+        },
+        {
+          "value": 242.5133983774597,
+          "hex": "0x1.e506dc26f2049p+7",
+          "exact_numerator": "8532681645039689",
+          "exact_denominator": "35184372088832",
+          "source_cell": 8
+        },
+        {
+          "value": 272.5133983774597,
+          "hex": "0x1.10836e1379024p+8",
+          "exact_numerator": "9588212807704649",
+          "exact_denominator": "35184372088832",
+          "source_cell": 9
+        },
+        {
+          "value": 302.5133983774597,
+          "hex": "0x1.2e836e1379024p+8",
+          "exact_numerator": "10643743970369609",
+          "exact_denominator": "35184372088832",
+          "source_cell": 10
+        },
+        {
+          "value": 332.5133983774597,
+          "hex": "0x1.4c836e1379024p+8",
+          "exact_numerator": "11699275133034569",
+          "exact_denominator": "35184372088832",
+          "source_cell": 11
+        },
+        {
+          "value": 2.5133983774597084,
+          "hex": "0x1.41b709bc81240p+1",
+          "exact_numerator": "88432343720009",
+          "exact_denominator": "35184372088832",
+          "source_cell": 0
+        },
+        {
+          "value": 32.51339837745971,
+          "hex": "0x1.041b709bc8124p+5",
+          "exact_numerator": "1143963506384969",
+          "exact_denominator": "35184372088832",
+          "source_cell": 1
+        },
+        {
+          "value": 62.51339837745971,
+          "hex": "0x1.f41b709bc8124p+5",
+          "exact_numerator": "2199494669049929",
+          "exact_denominator": "35184372088832",
+          "source_cell": 2
+        },
+        {
+          "value": 92.51339837745971,
+          "hex": "0x1.720db84de4092p+6",
+          "exact_numerator": "3255025831714889",
+          "exact_denominator": "35184372088832",
+          "source_cell": 3
+        },
+        {
+          "value": 122.51339837745971,
+          "hex": "0x1.ea0db84de4092p+6",
+          "exact_numerator": "4310556994379849",
+          "exact_denominator": "35184372088832",
+          "source_cell": 4
+        },
+        {
+          "value": 152.5133983774597,
+          "hex": "0x1.3106dc26f2049p+7",
+          "exact_numerator": "5366088157044809",
+          "exact_denominator": "35184372088832",
+          "source_cell": 5
+        }
+      ],
+      "qualification": "Targets are exact equal recipe for a fixed BEFORE-delivered ASC operand, not independent physical ASC; context drift is unqualified and must fail openly."
+    },
+    {
+      "id": "public-0-V",
+      "original_id": "public-0",
+      "house_code": "V",
+      "jd_ut1": 2415020.5208333335,
+      "jd_tt": 2415020.520810293,
+      "latitude": -89.0,
+      "longitude": -105.40281632765013,
+      "given_before_ASC_hex": "0x1.6d06dc26f2049p+7",
+      "source_recipe_targets": [
+        {
+          "value": 167.5133983774597,
+          "hex": "0x1.4f06dc26f2049p+7",
+          "exact_numerator": "5893853738377289",
+          "exact_denominator": "35184372088832",
+          "source_cell": 5
+        },
+        {
+          "value": 197.5133983774597,
+          "hex": "0x1.8b06dc26f2049p+7",
+          "exact_numerator": "6949384901042249",
+          "exact_denominator": "35184372088832",
+          "source_cell": 6
+        },
+        {
+          "value": 227.5133983774597,
+          "hex": "0x1.c706dc26f2049p+7",
+          "exact_numerator": "8004916063707209",
+          "exact_denominator": "35184372088832",
+          "source_cell": 7
+        },
+        {
+          "value": 257.5133983774597,
+          "hex": "0x1.01836e1379024p+8",
+          "exact_numerator": "9060447226372169",
+          "exact_denominator": "35184372088832",
+          "source_cell": 8
+        },
+        {
+          "value": 287.5133983774597,
+          "hex": "0x1.1f836e1379024p+8",
+          "exact_numerator": "10115978389037129",
+          "exact_denominator": "35184372088832",
+          "source_cell": 9
+        },
+        {
+          "value": 317.5133983774597,
+          "hex": "0x1.3d836e1379024p+8",
+          "exact_numerator": "11171509551702089",
+          "exact_denominator": "35184372088832",
+          "source_cell": 10
+        },
+        {
+          "value": 347.5133983774597,
+          "hex": "0x1.5b836e1379024p+8",
+          "exact_numerator": "12227040714367049",
+          "exact_denominator": "35184372088832",
+          "source_cell": 11
+        },
+        {
+          "value": 17.51339837745971,
+          "hex": "0x1.1836e13790248p+4",
+          "exact_numerator": "616197925052489",
+          "exact_denominator": "35184372088832",
+          "source_cell": 0
+        },
+        {
+          "value": 47.51339837745971,
+          "hex": "0x1.7c1b709bc8124p+5",
+          "exact_numerator": "1671729087717449",
+          "exact_denominator": "35184372088832",
+          "source_cell": 1
+        },
+        {
+          "value": 77.51339837745971,
+          "hex": "0x1.360db84de4092p+6",
+          "exact_numerator": "2727260250382409",
+          "exact_denominator": "35184372088832",
+          "source_cell": 2
+        },
+        {
+          "value": 107.51339837745971,
+          "hex": "0x1.ae0db84de4092p+6",
+          "exact_numerator": "3782791413047369",
+          "exact_denominator": "35184372088832",
+          "source_cell": 3
+        },
+        {
+          "value": 137.5133983774597,
+          "hex": "0x1.1306dc26f2049p+7",
+          "exact_numerator": "4838322575712329",
+          "exact_denominator": "35184372088832",
+          "source_cell": 4
+        }
+      ],
+      "qualification": "Targets are exact equal recipe for a fixed BEFORE-delivered ASC operand, not independent physical ASC; context drift is unqualified and must fail openly."
+    },
+    {
+      "id": "public-1-A",
+      "original_id": "public-1",
+      "house_code": "A",
+      "jd_ut1": 2415020.5208333335,
+      "jd_tt": 2415020.520810293,
+      "latitude": -89.0,
+      "longitude": -105.40281632765014,
+      "given_before_ASC_hex": "0x1.6d06dc26f2049p+7",
+      "source_recipe_targets": [
+        {
+          "value": 182.5133983774597,
+          "hex": "0x1.6d06dc26f2049p+7",
+          "exact_numerator": "6421619319709769",
+          "exact_denominator": "35184372088832",
+          "source_cell": 6
+        },
+        {
+          "value": 212.5133983774597,
+          "hex": "0x1.a906dc26f2049p+7",
+          "exact_numerator": "7477150482374729",
+          "exact_denominator": "35184372088832",
+          "source_cell": 7
+        },
+        {
+          "value": 242.5133983774597,
+          "hex": "0x1.e506dc26f2049p+7",
+          "exact_numerator": "8532681645039689",
+          "exact_denominator": "35184372088832",
+          "source_cell": 8
+        },
+        {
+          "value": 272.5133983774597,
+          "hex": "0x1.10836e1379024p+8",
+          "exact_numerator": "9588212807704649",
+          "exact_denominator": "35184372088832",
+          "source_cell": 9
+        },
+        {
+          "value": 302.5133983774597,
+          "hex": "0x1.2e836e1379024p+8",
+          "exact_numerator": "10643743970369609",
+          "exact_denominator": "35184372088832",
+          "source_cell": 10
+        },
+        {
+          "value": 332.5133983774597,
+          "hex": "0x1.4c836e1379024p+8",
+          "exact_numerator": "11699275133034569",
+          "exact_denominator": "35184372088832",
+          "source_cell": 11
+        },
+        {
+          "value": 2.5133983774597084,
+          "hex": "0x1.41b709bc81240p+1",
+          "exact_numerator": "88432343720009",
+          "exact_denominator": "35184372088832",
+          "source_cell": 0
+        },
+        {
+          "value": 32.51339837745971,
+          "hex": "0x1.041b709bc8124p+5",
+          "exact_numerator": "1143963506384969",
+          "exact_denominator": "35184372088832",
+          "source_cell": 1
+        },
+        {
+          "value": 62.51339837745971,
+          "hex": "0x1.f41b709bc8124p+5",
+          "exact_numerator": "2199494669049929",
+          "exact_denominator": "35184372088832",
+          "source_cell": 2
+        },
+        {
+          "value": 92.51339837745971,
+          "hex": "0x1.720db84de4092p+6",
+          "exact_numerator": "3255025831714889",
+          "exact_denominator": "35184372088832",
+          "source_cell": 3
+        },
+        {
+          "value": 122.51339837745971,
+          "hex": "0x1.ea0db84de4092p+6",
+          "exact_numerator": "4310556994379849",
+          "exact_denominator": "35184372088832",
+          "source_cell": 4
+        },
+        {
+          "value": 152.5133983774597,
+          "hex": "0x1.3106dc26f2049p+7",
+          "exact_numerator": "5366088157044809",
+          "exact_denominator": "35184372088832",
+          "source_cell": 5
+        }
+      ],
+      "qualification": "Targets are exact equal recipe for a fixed BEFORE-delivered ASC operand, not independent physical ASC; context drift is unqualified and must fail openly."
+    },
+    {
+      "id": "public-1-E",
+      "original_id": "public-1",
+      "house_code": "E",
+      "jd_ut1": 2415020.5208333335,
+      "jd_tt": 2415020.520810293,
+      "latitude": -89.0,
+      "longitude": -105.40281632765014,
+      "given_before_ASC_hex": "0x1.6d06dc26f2049p+7",
+      "source_recipe_targets": [
+        {
+          "value": 182.5133983774597,
+          "hex": "0x1.6d06dc26f2049p+7",
+          "exact_numerator": "6421619319709769",
+          "exact_denominator": "35184372088832",
+          "source_cell": 6
+        },
+        {
+          "value": 212.5133983774597,
+          "hex": "0x1.a906dc26f2049p+7",
+          "exact_numerator": "7477150482374729",
+          "exact_denominator": "35184372088832",
+          "source_cell": 7
+        },
+        {
+          "value": 242.5133983774597,
+          "hex": "0x1.e506dc26f2049p+7",
+          "exact_numerator": "8532681645039689",
+          "exact_denominator": "35184372088832",
+          "source_cell": 8
+        },
+        {
+          "value": 272.5133983774597,
+          "hex": "0x1.10836e1379024p+8",
+          "exact_numerator": "9588212807704649",
+          "exact_denominator": "35184372088832",
+          "source_cell": 9
+        },
+        {
+          "value": 302.5133983774597,
+          "hex": "0x1.2e836e1379024p+8",
+          "exact_numerator": "10643743970369609",
+          "exact_denominator": "35184372088832",
+          "source_cell": 10
+        },
+        {
+          "value": 332.5133983774597,
+          "hex": "0x1.4c836e1379024p+8",
+          "exact_numerator": "11699275133034569",
+          "exact_denominator": "35184372088832",
+          "source_cell": 11
+        },
+        {
+          "value": 2.5133983774597084,
+          "hex": "0x1.41b709bc81240p+1",
+          "exact_numerator": "88432343720009",
+          "exact_denominator": "35184372088832",
+          "source_cell": 0
+        },
+        {
+          "value": 32.51339837745971,
+          "hex": "0x1.041b709bc8124p+5",
+          "exact_numerator": "1143963506384969",
+          "exact_denominator": "35184372088832",
+          "source_cell": 1
+        },
+        {
+          "value": 62.51339837745971,
+          "hex": "0x1.f41b709bc8124p+5",
+          "exact_numerator": "2199494669049929",
+          "exact_denominator": "35184372088832",
+          "source_cell": 2
+        },
+        {
+          "value": 92.51339837745971,
+          "hex": "0x1.720db84de4092p+6",
+          "exact_numerator": "3255025831714889",
+          "exact_denominator": "35184372088832",
+          "source_cell": 3
+        },
+        {
+          "value": 122.51339837745971,
+          "hex": "0x1.ea0db84de4092p+6",
+          "exact_numerator": "4310556994379849",
+          "exact_denominator": "35184372088832",
+          "source_cell": 4
+        },
+        {
+          "value": 152.5133983774597,
+          "hex": "0x1.3106dc26f2049p+7",
+          "exact_numerator": "5366088157044809",
+          "exact_denominator": "35184372088832",
+          "source_cell": 5
+        }
+      ],
+      "qualification": "Targets are exact equal recipe for a fixed BEFORE-delivered ASC operand, not independent physical ASC; context drift is unqualified and must fail openly."
+    },
+    {
+      "id": "public-1-V",
+      "original_id": "public-1",
+      "house_code": "V",
+      "jd_ut1": 2415020.5208333335,
+      "jd_tt": 2415020.520810293,
+      "latitude": -89.0,
+      "longitude": -105.40281632765014,
+      "given_before_ASC_hex": "0x1.6d06dc26f2049p+7",
+      "source_recipe_targets": [
+        {
+          "value": 167.5133983774597,
+          "hex": "0x1.4f06dc26f2049p+7",
+          "exact_numerator": "5893853738377289",
+          "exact_denominator": "35184372088832",
+          "source_cell": 5
+        },
+        {
+          "value": 197.5133983774597,
+          "hex": "0x1.8b06dc26f2049p+7",
+          "exact_numerator": "6949384901042249",
+          "exact_denominator": "35184372088832",
+          "source_cell": 6
+        },
+        {
+          "value": 227.5133983774597,
+          "hex": "0x1.c706dc26f2049p+7",
+          "exact_numerator": "8004916063707209",
+          "exact_denominator": "35184372088832",
+          "source_cell": 7
+        },
+        {
+          "value": 257.5133983774597,
+          "hex": "0x1.01836e1379024p+8",
+          "exact_numerator": "9060447226372169",
+          "exact_denominator": "35184372088832",
+          "source_cell": 8
+        },
+        {
+          "value": 287.5133983774597,
+          "hex": "0x1.1f836e1379024p+8",
+          "exact_numerator": "10115978389037129",
+          "exact_denominator": "35184372088832",
+          "source_cell": 9
+        },
+        {
+          "value": 317.5133983774597,
+          "hex": "0x1.3d836e1379024p+8",
+          "exact_numerator": "11171509551702089",
+          "exact_denominator": "35184372088832",
+          "source_cell": 10
+        },
+        {
+          "value": 347.5133983774597,
+          "hex": "0x1.5b836e1379024p+8",
+          "exact_numerator": "12227040714367049",
+          "exact_denominator": "35184372088832",
+          "source_cell": 11
+        },
+        {
+          "value": 17.51339837745971,
+          "hex": "0x1.1836e13790248p+4",
+          "exact_numerator": "616197925052489",
+          "exact_denominator": "35184372088832",
+          "source_cell": 0
+        },
+        {
+          "value": 47.51339837745971,
+          "hex": "0x1.7c1b709bc8124p+5",
+          "exact_numerator": "1671729087717449",
+          "exact_denominator": "35184372088832",
+          "source_cell": 1
+        },
+        {
+          "value": 77.51339837745971,
+          "hex": "0x1.360db84de4092p+6",
+          "exact_numerator": "2727260250382409",
+          "exact_denominator": "35184372088832",
+          "source_cell": 2
+        },
+        {
+          "value": 107.51339837745971,
+          "hex": "0x1.ae0db84de4092p+6",
+          "exact_numerator": "3782791413047369",
+          "exact_denominator": "35184372088832",
+          "source_cell": 3
+        },
+        {
+          "value": 137.5133983774597,
+          "hex": "0x1.1306dc26f2049p+7",
+          "exact_numerator": "4838322575712329",
+          "exact_denominator": "35184372088832",
+          "source_cell": 4
+        }
+      ],
+      "qualification": "Targets are exact equal recipe for a fixed BEFORE-delivered ASC operand, not independent physical ASC; context drift is unqualified and must fail openly."
+    }
+  ]
+}

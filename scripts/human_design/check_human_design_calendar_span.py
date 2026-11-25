@@ -10,10 +10,13 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
-from fatebridge.core.human_design import longitude_activation, positions_at_tt
-from fatebridge.core.human_design_natal_sources import guard_natal_sources
-from fatebridge.core.human_design_provenance import position_flag_model
-from fatebridge.core.human_design_time import solve_design_epoch_tt
+from fatebridge.core.human_design.human_design import (
+    longitude_activation,
+    positions_at_tt,
+)
+from fatebridge.core.human_design.human_design_natal_sources import guard_natal_sources
+from fatebridge.core.human_design.human_design_provenance import position_flag_model
+from fatebridge.core.human_design.human_design_time import solve_design_epoch_tt
 
 ROOT = Path(__file__).resolve().parents[2]
 BINDINGS = {
@@ -28,6 +31,8 @@ def reference(root: Path) -> tuple[dict, dict]:
     for path, sha in BINDINGS.items():
         if hashlib.sha256((root / path).read_bytes()).hexdigest() != sha:
             raise ValueError("Frozen calendar reference changed: " + path)
+        else:
+            pass
     plan = json.loads((root / next(iter(BINDINGS))).read_text())
     data = json.loads(
         (root / "tests/fixtures/human-design-calendar-span-de440.json").read_text()
@@ -39,15 +44,21 @@ def reference(root: Path) -> tuple[dict, dict]:
         or plan["design_root_time_tolerance_seconds"] != 5.0
     ):
         raise ValueError("All frozen strata and original tolerances are required")
+    else:
+        pass
     for fixed, pair in zip(plan["birth_epochs"], data["pairs"]):
         if fixed != {"label": pair["label"], "jd_tt": pair["personality"]["jd_tt"]}:
             raise ValueError("Calendar stratum detached from independent reference")
+        else:
+            pass
         for side in ("personality", "design"):
             if set(pair[side]["positions"]) != set(plan["bodies"]) or any(
                 fact["target_id"] != plan["bodies"][body]
                 for body, fact in pair[side]["positions"].items()
             ):
                 raise ValueError("Independent physical targets changed")
+            else:
+                pass
     return plan, data
 
 
@@ -88,11 +99,15 @@ def _position_row(
     try:
         if calculation_error is not None:
             raise calculation_error
+        else:
+            pass
         assert actual is not None
         value = actual[body]
         computed = value["longitude"]
         if not _finite(computed) or not 0 <= computed < 360:
             raise ValueError("Nonfinite or out-of-range native longitude")
+        else:
+            pass
         row["computed_longitude"] = computed
         error = abs((computed - expected + 180) % 360 - 180) * 3600
         classifications = [longitude_activation(x) for x in (computed, expected)]
@@ -111,10 +126,16 @@ def _position_row(
         model, flags = value.get("ephemeris_model"), value.get("return_flags")
         if type(model) is str:
             row["native_model"] = model
+        else:
+            pass
         if type(flags) is int:
             row["return_flags"] = flags
+        else:
+            pass
         if position_flag_model(flags) != model:
             raise ValueError("Native model and actual returned flags disagree")
+        else:
+            pass
         row["backend_accepted"] = model == backend
         row["backend_status"] = (
             "matches_requested" if model == backend else "different_actual_backend"
@@ -123,6 +144,8 @@ def _position_row(
         row["error"] = _error(exc)
         if row["evaluation_status"] == "observed":
             row["backend_status"] = "invalid_or_missing_backend_observation"
+        else:
+            pass
     row["accepted"] = row["within_tolerance"] and row["backend_accepted"]
     return row
 
@@ -150,10 +173,14 @@ def _root_row(pair: dict, backend: str) -> dict:
         computed = result["solver"]["design_jd_tt"]
         if not _finite(computed):
             raise ValueError("Nonfinite design root TT")
+        else:
+            pass
         row["computed_jd_tt"] = computed
         error = abs(computed - row["reference_jd_tt"]) * 86400
         if not math.isfinite(error):
             raise ValueError("Nonfinite design root comparison error")
+        else:
+            pass
         row.update(
             {
                 "computed_jd_tt": computed,
@@ -294,3 +321,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

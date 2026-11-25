@@ -11,9 +11,10 @@ import os
 from pathlib import Path
 
 import pytest
+from pytest import MonkeyPatch
 
-from fatebridge.core import canping_texts as texts
-from fatebridge.core.output_numerology import CanpingTextWitness
+from fatebridge.core.contracts.output_numerology import CanpingTextWitness
+from fatebridge.core.numerology import canping_texts as texts
 from fatebridge.utils.errors import NumerologySourceError
 
 F = Path(
@@ -44,8 +45,8 @@ def register_reviewed(monkeypatch, data):
 
 
 def test_reviewed_same_book_same_number_different_pages_must_both_be_returned(
-    monkeypatch,
-):
+    monkeypatch: MonkeyPatch,
+) -> None:
     register_reviewed(monkeypatch, copy.deepcopy(REVIEWED))
     data = texts.source_readings(comparison=True)
     assert len(data["entries"]) == 69
@@ -68,8 +69,8 @@ def test_reviewed_same_book_same_number_different_pages_must_both_be_returned(
     "fault", ["exact_duplicate", "same_location", "missing_location", "forged_page"]
 )
 def test_different_page_support_does_not_accept_duplicate_or_unbound_entries(
-    fault, monkeypatch
-):
+    fault: str, monkeypatch: MonkeyPatch
+) -> None:
     data = copy.deepcopy(REVIEWED)
     group = [
         row

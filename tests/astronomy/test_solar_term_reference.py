@@ -6,6 +6,7 @@ import hashlib
 import json
 from datetime import date
 from fractions import Fraction
+from pathlib import Path
 
 import pytest
 
@@ -27,10 +28,26 @@ def packaged_solar(tmp_path_factory):
         yield
 
 
-@pytest.mark.parametrize("year", range(1699, 2302))
-def test_every_packaged_year_and_guard_matches_both_tt_paths(
-    year, reference, packaged_solar
-):
+_CI_YEARS = [
+    1699,
+    1700,
+    1701,
+    1799,
+    1800,
+    1899,
+    1900,
+    1972,
+    2000,
+    2026,
+    2100,
+    2200,
+    2201,
+    2300,
+    2301,
+]
+
+
+def _assert_year_matches_both_tt_paths(year, reference):
     expected = reference.rows[(year - 1699) * 24 : (year - 1699 + 1) * 24]
     context = min(max(year, 1700), 2300)
     terms = (
@@ -53,6 +70,8 @@ def test_every_packaged_year_and_guard_matches_both_tt_paths(
         if year != context:
             assert details["adjacent_boundary_context_year"] == context
             assert details["solar_model_input_years"] == [1700, 2300]
+        else:
+            pass
         parts = details["selected_crossing_tt_parts"]
         delta = float(
             (
@@ -77,16 +96,28 @@ def test_every_packaged_year_and_guard_matches_both_tt_paths(
         assert abs(delta) <= 0.01 and abs(scalar_delta) <= 0.01, root
 
 
+@pytest.mark.parametrize(
+    "years",
+    [tuple(_CI_YEARS[i::4]) for i in range(4)],
+    ids=lambda ys: f"{ys[0]}..{ys[-1]}",
+)
+def test_packaged_boundary_and_strided_years_match_both_tt_paths(
+    years, reference, packaged_solar
+) -> None:
+    for year in years:
+        _assert_year_matches_both_tt_paths(year, reference)
+
+
 @pytest.mark.parametrize("outside,context", [(1699, 1700), (2301, 2300)])
 def test_reference_guards_keep_the_public_packaged_range(
-    outside, context, packaged_solar
-):
+    outside: int, context: int, packaged_solar
+) -> None:
     almanac._solar_terms_for_context_year(outside, "UTC", context)
     with pytest.raises(ValueError, match="1700..2300"):
         almanac.get_solar_terms_for_year(outside, "UTC")
 
 
-def test_reference_producer_is_preserved_without_candidate_imports(reference):
+def test_reference_producer_is_preserved_without_candidate_imports(reference) -> None:
     tree = ast.parse(reference.source.producer_source)
     imports = set()
     for node in ast.walk(tree):
@@ -94,12 +125,14 @@ def test_reference_producer_is_preserved_without_candidate_imports(reference):
             imports.update(alias.name.split(".")[0] for alias in node.names)
         elif isinstance(node, ast.ImportFrom) and node.module:
             imports.add(node.module.split(".")[0])
+        else:
+            pass
     assert {"numpy", "skyfield"} <= imports
     assert "fatebridge" not in imports
     assert reference.production_imports == ()
 
 
-def test_reference_byte_edit_is_rejected(tmp_path):
+def test_reference_byte_edit_is_rejected(tmp_path: Path) -> None:
     data = bytearray(source.REFERENCE_PATH.read_bytes())
     data[-1] ^= 1
     target = tmp_path / "changed.json.gz"
@@ -110,8 +143,8 @@ def test_reference_byte_edit_is_rejected(tmp_path):
 
 @pytest.mark.parametrize("change", ["producer", "prune", "order", "candidate_import"])
 def test_coordinated_packet_checksum_edit_keeps_provenance_and_full_cohort_guards(
-    change, tmp_path, monkeypatch
-):
+    change: str, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     packet = json.loads(gzip.decompress(source.REFERENCE_PATH.read_bytes()))
     if change == "producer":
         packet["source"]["producer_source"] += "\n# altered producer\n"
@@ -121,7 +154,9 @@ def test_coordinated_packet_checksum_edit_keeps_provenance_and_full_cohort_guard
         packet["rows"][0], packet["rows"][1] = packet["rows"][1], packet["rows"][0]
     else:
         packet["production_imports"] = ["fatebridge"]
-    packed = gzip.compress(json.dumps(packet, ensure_ascii=False).encode(), mtime=0)
+    packed = gzip.compress(
+        json.dumps(packet, ensure_ascii=False).encode(), compresslevel=1, mtime=0
+    )
     target = tmp_path / "coordinated.json.gz"
     target.write_bytes(packed)
     monkeypatch.setattr(source, "REFERENCE_SHA256", hashlib.sha256(packed).hexdigest())

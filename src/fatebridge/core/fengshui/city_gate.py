@@ -8,14 +8,17 @@ import json
 from copy import deepcopy
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Dict, List, Optional, cast
+from typing import Any, Dict, cast
 
-from .city_gate_inputs import CityGateObservation, CityGateRequest
-from .directions import rule_data, wrap9
+from fatebridge.core.fengshui.city_gate_inputs import (
+    CityGateObservation,
+    CityGateRequest,
+)
+from fatebridge.core.fengshui.directions import rule_data, wrap9
 
 
 @lru_cache(maxsize=1)
-def _bundle() -> Dict[str, Any]:
+def _bundle() -> dict[str, Any]:
     return cast(
         Dict[str, Any],
         json.loads(
@@ -24,7 +27,7 @@ def _bundle() -> Dict[str, Any]:
     )
 
 
-def city_gate_provenance() -> Dict[str, Any]:
+def city_gate_provenance() -> dict[str, Any]:
     data = _bundle()
     return {
         **deepcopy(data["ruleset"]),
@@ -35,17 +38,19 @@ def city_gate_provenance() -> Dict[str, Any]:
     }
 
 
-def _conjunction(values: List[Optional[bool]]) -> Optional[bool]:
+def _conjunction(values: list[bool | None]) -> bool | None:
     return False if False in values else None if None in values else True
 
 
-def _form(observation: Optional[CityGateObservation]) -> Dict[str, Any]:
+def _form(observation: CityGateObservation | None) -> dict[str, Any]:
     if observation is None:
         return {
             "status": "not_requested",
             "condition_match": None,
             "scope": "no_site_observation_supplied",
         }
+    else:
+        pass
     facts = observation.model_dump(mode="json")
     water = observation.water_present
     if water is None and any(
@@ -57,12 +62,14 @@ def _form(observation: Optional[CityGateObservation]) -> Dict[str, Any]:
         )
     ):
         water = True
+    else:
+        pass
     if (
         observation.multiple_openings_present is True
         or observation.water_present is False
     ):
-        match: Optional[bool] = False
-        patterns: Dict[str, Optional[bool]] = {}
+        match: bool | None = False
+        patterns: dict[str, bool | None] = {}
     else:
         patterns = {
             "encircled_sole_water_opening": _conjunction(
@@ -123,9 +130,9 @@ def _form(observation: Optional[CityGateObservation]) -> Dict[str, Any]:
 
 def analyze_city_gate(
     config: CityGateRequest,
-    orientations: List[Dict[str, Any]],
-    registry: Dict[str, Any],
-) -> Dict[str, Any]:
+    orientations: list[dict[str, Any]],
+    registry: dict[str, Any],
+) -> dict[str, Any]:
     period = config.reference_period_number
     path = rule_data("flight_path")
     directions = rule_data("directions")
@@ -169,6 +176,8 @@ def analyze_city_gate(
             form = _form(observations.get(physical["name"]))
             if physical["name"] in observations:
                 used.add(physical["name"])
+            else:
+                pass
             gates.append(
                 {
                     "direction": direction,
@@ -211,6 +220,8 @@ def analyze_city_gate(
         missing.append("city_gate.confirmed_magnetic_house_facing")
     elif ambiguous:
         missing.append("city_gate.unambiguous_facing_mountain")
+    else:
+        pass
     for c in candidates:
         for gate in c["gates"]:
             if gate["form_assessment"]["status"] in {
@@ -220,6 +231,8 @@ def analyze_city_gate(
                 missing.append(
                     f"city_gate.observations.{gate['mountain']['name']}.source_pattern_confirmation"
                 )
+            else:
+                pass
     return {
         "status": "partial" if missing else "complete",
         "calculation_status": "complete" if orientations else "partial",

@@ -15,7 +15,14 @@ from fatebridge.core.astro import historical_utc, time_scales, utc_policy
 from fatebridge.core.metaphysics import ren_calendar
 from fatebridge.core.solar_term_runtime import solar_term_cache_context
 from fatebridge.services.metaphysics import calculate_liureng_gods
-from tests.support.transports import AS_OF, SPECS, business, rest, surface_calls
+from tests.support.transports import (
+    AS_OF,
+    SPECS,
+    business,
+    cached_output_validator,
+    rest,
+    surface_calls,
+)
 
 ROOT = Path(__file__).resolve().parents[2]
 MOD = importlib.util.spec_from_file_location(
@@ -34,7 +41,7 @@ def clear_clock_caches():
     AUDIT.reset()
 
 
-def test_all_four_predeclared_faults_and_hand_declared_arithmetic():
+def test_all_four_predeclared_faults_and_hand_declared_arithmetic() -> None:
     result = AUDIT.run()
     assert result["engineering_checks_passed"]
     assert result["historical_faults_fixed"] == result["receipt_faults_fixed"] == 2
@@ -43,7 +50,9 @@ def test_all_four_predeclared_faults_and_hand_declared_arithmetic():
 
 
 @pytest.mark.parametrize("change", ["edit", "missing", "extra", "prune"])
-def test_frozen_protocol_cannot_change_to_make_a_fault_disappear(tmp_path, change):
+def test_frozen_protocol_cannot_change_to_make_a_fault_disappear(
+    tmp_path: Path, change: str
+) -> None:
     target = tmp_path / "corpus"
     shutil.copytree(AUDIT.F, target)
     if change in {"edit", "prune"}:
@@ -71,8 +80,8 @@ def test_frozen_protocol_cannot_change_to_make_a_fault_disappear(tmp_path, chang
     ],
 )
 def test_all_three_loaded_profiles_change_the_key_and_restore_it(
-    owner, name, monkeypatch
-):
+    owner, name: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
     value = copy.deepcopy(getattr(owner, name)())
     monkeypatch.setattr(owner, name, lambda: value)
     before = solar_term_cache_context(almanac.swe)
@@ -86,8 +95,8 @@ def test_all_three_loaded_profiles_change_the_key_and_restore_it(
 @pytest.mark.parametrize("tool", ["liureng_gods", "jinkou"])
 @pytest.mark.parametrize("project", [False, True])
 def test_reloaded_historical_profile_reaches_three_ports_without_manual_cache_clear(
-    case, tool, project, monkeypatch, surface_calls
-):
+    case, tool: str, project: bool, monkeypatch: pytest.MonkeyPatch, surface_calls
+) -> None:
     name = "utc1960_table" if case["table"] == "utc1960" else "historical_utc_table"
     table = copy.deepcopy(getattr(historical_utc, name)())
     monkeypatch.setattr(historical_utc, name, lambda: table)
@@ -109,6 +118,8 @@ def test_reloaded_historical_profile_reaches_three_ports_without_manual_cache_cl
     fields = ["four_pillars", "liureng.month_general", "liureng.calendar_policy"]
     if tool == "jinkou":
         fields += ["jinkou.overview.month_general", "jinkou.calendar_policy"]
+    else:
+        pass
     params, flags, options = (
         [("as_of", AS_OF), ("response_char_limit", "0")],
         ["--response-char-limit", "0"],
@@ -128,6 +139,8 @@ def test_reloaded_historical_profile_reaches_three_ports_without_manual_cache_cl
             "false",
         ]
         options.update(fields=fields, strict_fields=True, include_snapshot_text=False)
+    else:
+        pass
     http, protocol, code, cli = surface_calls(
         spec, payload, params=params, options=options, flags=flags, cli_first=False
     )
@@ -137,15 +150,17 @@ def test_reloaded_historical_profile_reaches_three_ports_without_manual_cache_cl
     )
     for body in (http.json(), protocol.structured_content, cli):
         spec.output_model.model_validate(body)
-        Draft202012Validator(spec.output_model.model_json_schema()).validate(body)
+        cached_output_validator(spec.output_model).validate(body)
         assert body["liureng"]["month_general"]["branch"] == "亥"
         if tool == "jinkou":
             assert body["jinkou"]["overview"]["month_general"]["branch"] == "亥"
+        else:
+            pass
 
 
 def test_mid_receipt_profile_change_is_retried_before_publishing_mixed_metadata(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     table = copy.deepcopy(utc_policy.leap_table())
     monkeypatch.setattr(utc_policy, "leap_table", lambda: table)
     real = time_scales.ephemeris_time
@@ -156,6 +171,8 @@ def test_mid_receipt_profile_change_is_retried_before_publishing_mixed_metadata(
         calls.append(moment)
         if len(calls) == 1:
             table["expires_at"] = "2026-01-01T00:00:00+00:00"
+        else:
+            pass
         return epoch
 
     monkeypatch.setattr(time_scales, "ephemeris_time", changing)
@@ -168,8 +185,8 @@ def test_mid_receipt_profile_change_is_retried_before_publishing_mixed_metadata(
 
 
 def test_persistently_changing_receipt_profile_fails_instead_of_caching_mixed_data(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     table = copy.deepcopy(utc_policy.leap_table())
     monkeypatch.setattr(utc_policy, "leap_table", lambda: table)
     real = time_scales.ephemeris_time

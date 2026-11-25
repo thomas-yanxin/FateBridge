@@ -14,5 +14,5 @@ CASES = json.loads(
 
 
 @pytest.mark.parametrize("row", CASES)
-def test_current_components_match_literal_geometry_and_truth_tables(row):
+def test_current_components_match_literal_geometry_and_truth_tables(row) -> None:
     assert_current_components(calculate_meihua_analysis(**row["input"]))

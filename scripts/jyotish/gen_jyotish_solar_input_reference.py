@@ -36,6 +36,8 @@ for line in iers["source_text"].splitlines():
         offsets.append(
             (datetime(int(y), int(m), int(d), tzinfo=timezone.utc), int(seconds))
         )
+    else:
+        pass
 rows = []
 for sun in next(r["rows"] for r in equ["references"] if r["body"] == "Sun"):
     stamp = sun["utc"]

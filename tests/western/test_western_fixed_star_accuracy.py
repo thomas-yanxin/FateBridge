@@ -18,14 +18,14 @@ from fatebridge.services.astrology import (
     _build_fixed_stars_lines,
     calculate_core_chart_analysis,
 )
-from tests.western.test_western_accuracy import BIRTH
+from tests.unit_test.fixtures.western_natal import GREENWICH_EQUINOX_BIRTH as BIRTH
 
 FIXTURES = Path(__file__).parents[1] / "fixtures"
 REFERENCE = json.loads((FIXTURES / "western-fixed-stars-erfa.json").read_text())
 PROTOCOL = json.loads((FIXTURES / "western-fixed-star-protocol.json").read_text())
 
 
-def test_returned_nature_labels_cannot_change_later_results():
+def test_returned_nature_labels_cannot_change_later_results() -> None:
     positions = {
         "Algol": {
             "longitude": 0.0,
@@ -48,7 +48,7 @@ def test_returned_nature_labels_cannot_change_later_results():
         FIXED_STARS["Algol"]["nature"][:] = original
 
 
-def test_reference_inputs_have_not_been_replaced_with_runtime_answers():
+def test_reference_inputs_have_not_been_replaced_with_runtime_answers() -> None:
     assert (
         hashlib.sha256((fixed_stars.DATA / "sources.json").read_bytes()).hexdigest()
         == REFERENCE["source_sha256"]
@@ -64,7 +64,7 @@ def test_reference_inputs_have_not_been_replaced_with_runtime_answers():
 
 
 @pytest.mark.parametrize("epoch", PROTOCOL["epochs_tt"])
-def test_twenty_stars_at_each_declared_epoch_match_independent_erfa(epoch):
+def test_twenty_stars_at_each_declared_epoch_match_independent_erfa(epoch) -> None:
     rows = [r for r in REFERENCE["rows"] if r["epoch_tt"] == epoch]
     positions, profile = fixed_stars.apparent_positions(rows[0]["julian_day_tt"])
     assert profile["status"] == "computed"
@@ -79,7 +79,7 @@ def test_twenty_stars_at_each_declared_epoch_match_independent_erfa(epoch):
         ), row
 
 
-def test_lahiri_stars_and_native_planets_share_the_same_frame():
+def test_lahiri_stars_and_native_planets_share_the_same_frame() -> None:
     tropical, _ = fixed_stars.apparent_positions(2451545)
     sidereal, profile = fixed_stars.apparent_positions(2451545, sidereal=True)
     with preserve_ephemeris_path():
@@ -126,7 +126,7 @@ def test_lahiri_stars_and_native_planets_share_the_same_frame():
         (math.nextafter(1.0, math.inf), False),
     ],
 )
-def test_unrounded_longitude_contact_boundary(value, included):
+def test_unrounded_longitude_contact_boundary(value, included: bool) -> None:
     position = {
         "Spica": {
             "longitude": 0.0,
@@ -141,6 +141,8 @@ def test_unrounded_longitude_contact_boundary(value, included):
         assert hits[0]["orb"] == value
         # This traditional contact uses longitude only, not angular separation.
         assert hits[0]["star_latitude"] == 40
+    else:
+        pass
 
 
 @pytest.mark.parametrize(
@@ -153,8 +155,8 @@ def test_unrounded_longitude_contact_boundary(value, included):
 )
 @pytest.mark.parametrize("swap", [False, True])
 def test_wrap_boundary_retains_residual_erased_by_two_float_subtractions(
-    offset, included, swap
-):
+    offset, included: bool, swap: bool
+) -> None:
     star, point = (offset, 359.5) if not swap else (359.5, offset)
     position = {
         "Spica": {
@@ -171,18 +173,20 @@ def test_wrap_boundary_retains_residual_erased_by_two_float_subtractions(
 
 
 @pytest.mark.parametrize("value", [math.nan, math.inf, -math.inf])
-def test_invalid_star_time_cannot_become_an_empty_success(value):
+def test_invalid_star_time_cannot_become_an_empty_success(value) -> None:
     with pytest.raises(ValueError, match="finite"):
         fixed_stars.apparent_positions(value)
 
 
 @pytest.mark.parametrize("value", [math.nan, math.inf, -1, 181])
-def test_invalid_orb_cannot_become_an_empty_success(value):
+def test_invalid_orb_cannot_become_an_empty_success(value) -> None:
     with pytest.raises(ValueError, match="orb"):
         fixed_stars.conjunction_hits({}, {}, FIXED_STARS, orb=value)
 
 
-def test_catalogue_fingerprint_mismatch_is_explicit(monkeypatch, tmp_path):
+def test_catalogue_fingerprint_mismatch_is_explicit(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     (tmp_path / "sources.json").write_bytes(
         (fixed_stars.DATA / "sources.json").read_bytes()
     )
@@ -192,7 +196,9 @@ def test_catalogue_fingerprint_mismatch_is_explicit(monkeypatch, tmp_path):
         fixed_stars.apparent_positions(2451545)
 
 
-def test_unavailable_star_layer_is_rendered_as_uncomputed(monkeypatch):
+def test_unavailable_star_layer_is_rendered_as_uncomputed(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setattr(runtime, "swe", None)
     hits, profile = fixed_stars.build_layer({}, 2451545, FIXED_STARS)
     assert hits == [] and profile["status"] == "unavailable"
@@ -203,8 +209,8 @@ def test_unavailable_star_layer_is_rendered_as_uncomputed(monkeypatch):
 
 
 def test_catalogue_selection_survives_prior_cache_and_restores_operator_path(
-    monkeypatch, tmp_path
-):
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     # The C library ignores set_ephe_path when this override is nonempty.
     # Clear it only for the deliberate prior-catalogue cache setup below.
     monkeypatch.delenv("SE_EPHE_PATH", raising=False)
@@ -232,8 +238,8 @@ def test_catalogue_selection_survives_prior_cache_and_restores_operator_path(
 
 
 def test_native_error_does_not_leak_environment_or_fabricate_absence(
-    monkeypatch, tmp_path
-):
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
 
     def fail(*args):
@@ -245,13 +251,13 @@ def test_native_error_does_not_leak_environment_or_fabricate_absence(
     assert os.environ["SE_EPHE_PATH"] == str(tmp_path)
 
 
-def test_pleiades_original_text_nature_is_not_the_praesepe_nature():
+def test_pleiades_original_text_nature_is_not_the_praesepe_nature() -> None:
     # Robbins 1940 I.9 explicitly gives the Pleiades Moon and Jupiter;
     # the Cancer cloud (Praesepe) is Mars and Moon.
     assert FIXED_STARS["Alcyone"]["nature"] == ["Moon", "Jupiter"]
 
 
-def test_source_degree_qualifiers_are_preserved_without_numeric_weights():
+def test_source_degree_qualifiers_are_preserved_without_numeric_weights() -> None:
     rules = fixed_stars.nature_rules()
     assert len(rules["stars"]) == 20
     assert rules["stars"]["Spica"]["components"] == [
@@ -273,7 +279,7 @@ def test_source_degree_qualifiers_are_preserved_without_numeric_weights():
     assert "金星/火星（较轻程度）" in text
 
 
-def test_clock_and_frame_provenance_reach_the_readable_export():
+def test_clock_and_frame_provenance_reach_the_readable_export() -> None:
     result = calculate_core_chart_analysis(**BIRTH, chart_variant="hellen_chart")
     profile = result["chart_profile"]["fixed_stars"]
     assert profile["julian_day_tt"] == result["chart_profile"]["julian_day_tt"]

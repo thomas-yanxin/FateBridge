@@ -71,6 +71,8 @@ def fetch(body, *, times=None, start=None, end=None, step=None):
     response = json.loads(raw)
     if "error" in response:
         raise ValueError(response["error"])
+    else:
+        pass
     result = response["result"]
     table = result.split("$$SOE\n", 1)[1].split("$$EOE", 1)[0]
     rows = []
@@ -81,6 +83,8 @@ def fetch(body, *, times=None, start=None, end=None, step=None):
         pattern = "%Y-%b-%d %H:%M:%S.%f" if "." in label else "%Y-%b-%d %H:%M"
         if times is not None and pattern.endswith("%M"):
             raise ValueError("NASA refinement lost sub-minute timestamp precision")
+        else:
+            pass
         moment = datetime.strptime(label, pattern).replace(tzinfo=timezone.utc)
         rows.append((moment, float(row[3])))
     return rows, {
@@ -117,6 +121,8 @@ def collect(planet, body, lookback, step):
         ]
         if not brackets:
             raise ValueError(f"No NASA return bracket for {key}/{planet}")
+        else:
+            pass
         (low, lo_lon), (high, hi_lon) = brackets[-1]
         pending.append(
             dict(
@@ -154,8 +160,12 @@ def collect(planet, body, lookback, step):
                 item["high"], item["high_offset"] = when, error
         if all(item["oracle_residual_arcseconds"] < 0.002 for item in pending):
             break
+        else:
+            pass
     if any(item["oracle_residual_arcseconds"] >= 0.002 for item in pending):
         raise ValueError("NASA refinement did not converge; no reference file written")
+    else:
+        pass
     for item in pending:
         for key in ("low", "high", "low_offset", "high_offset"):
             item.pop(key)
@@ -193,3 +203,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+else:
+    pass

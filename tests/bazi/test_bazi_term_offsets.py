@@ -13,13 +13,12 @@ from pydantic import ValidationError
 import fatebridge.application.execution as execution
 from fatebridge.core.almanac import SolarTerm, get_solar_terms_for_year
 from fatebridge.core.analytic_solar import MODEL_ID
-from fatebridge.core.de441_solar import MODEL_ID as DE441_MODEL
-from fatebridge.core.output_chinese import SolarTerm as OutputTerm
+from fatebridge.core.contracts.output_chinese import SolarTerm as OutputTerm
 from fatebridge.utils.civil_time import ZonedCalendar
-from tests.bazi.test_bazi_year_contract import TOPICS
 from tests.support.transports import AS_OF, SPECS, business
 from tests.support.transports import rest as _shared_rest
 from tests.support.transports import surface_calls
+from tests.unit_test.fixtures.bazi_year_cases import TOPICS
 
 rest = _shared_rest
 
@@ -33,7 +32,7 @@ def witness():
 
 
 @pytest.mark.parametrize("seconds", [0, 1800, -1800, 19532, 19532.75])
-def test_actual_offsets_are_never_rounded_to_hours_or_minutes(seconds):
+def test_actual_offsets_are_never_rounded_to_hours_or_minutes(seconds) -> None:
     moment = datetime(
         1921, 6, 21, 23, 35, 35, 727999, tzinfo=timezone(timedelta(seconds=seconds))
     )
@@ -45,7 +44,7 @@ def test_actual_offsets_are_never_rounded_to_hours_or_minutes(seconds):
     OutputTerm.model_validate(value)
 
 
-def test_physical_terms_require_a_zone_while_partial_output_stays_partial():
+def test_physical_terms_require_a_zone_while_partial_output_stays_partial() -> None:
     naive = datetime(1921, 6, 21, 23, 35)
     with pytest.raises(ValueError, match="aware"):
         ZonedCalendar.from_datetime(naive)
@@ -79,7 +78,7 @@ def test_physical_terms_require_a_zone_while_partial_output_stays_partial():
         ],
     ],
 )
-def test_inconsistent_or_invalid_supplied_facts_are_rejected(bad):
+def test_inconsistent_or_invalid_supplied_facts_are_rejected(bad) -> None:
     with pytest.raises(ValidationError):
         OutputTerm.model_validate(bad)
 
@@ -95,8 +94,8 @@ def test_inconsistent_or_invalid_supplied_facts_are_rejected(bad):
     ],
 )
 def test_projection_cannot_hide_a_corrupt_solar_instant(
-    bad, monkeypatch, surface_calls
-):
+    bad, monkeypatch: pytest.MonkeyPatch, surface_calls
+) -> None:
     spec = SPECS["bazi_birth"]
     payload = {"bazi_birth": {"calendar_context": {"next_solar_term": bad}}}
     original = execution.execute_spec
@@ -104,6 +103,8 @@ def test_projection_cannot_hide_a_corrupt_solar_instant(
     def corrupt(actual, request):
         if actual.key == spec.key:
             actual = replace(actual, bind=lambda _: (lambda: deepcopy(payload), (), {}))
+        else:
+            pass
         return original(actual, request)
 
     monkeypatch.setattr(execution, "execute_spec", corrupt)
@@ -133,8 +134,12 @@ def test_projection_cannot_hide_a_corrupt_solar_instant(
 @pytest.mark.parametrize("topic", TOPICS)
 @pytest.mark.parametrize("leaf_projection", [False, True])
 def test_all_ten_bazi_tools_preserve_fold_on_rest_native_mcp_cli(
-    topic, leaf_projection, tmp_path, monkeypatch, surface_calls
-):
+    topic,
+    leaf_projection: bool,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    surface_calls,
+) -> None:
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
     # The historical cohort was produced by this explicitly named model.
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "analytic")
@@ -222,7 +227,9 @@ def test_all_ten_bazi_tools_preserve_fold_on_rest_native_mcp_cli(
             term["resolution_provider"] == "fatebridge_analytic"
             and term["ephemeris_model"] == MODEL_ID
         )
-        assert term["solar_model_details"]["native_choice_probe_model"] == DE441_MODEL
-        assert term["solar_model_details"]["accuracy_certified"] is False
+        details = term["solar_model_details"]
+        assert details["native_choice_probe_model"] is None
+        assert details["native_choice_probe_retflags"] == []
+        assert details["accuracy_certified"] is False
         assert value["run_metadata"]["engine_is_approximate"] is True
         assert not value.get("projection_warnings")

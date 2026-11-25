@@ -8,14 +8,14 @@ from pathlib import Path
 import pytest
 from jsonschema import Draft202012Validator
 
-from fatebridge.core.meihua_seasonal_reading import (
+from fatebridge.core.meihua.meihua_seasonal_reading import (
     build_seasonal_qualification,
     seasonal_reading_ruleset,
 )
 from fatebridge.services.divination import calculate_meihua_analysis
 from fatebridge.services.meihua import calculate_meihua_cast
-from fatebridge.validation.meihua_seasonal_reading import audit_seasonal_reading
 from tests.support.transports import SPECS, business, rest, surface_calls
+from validation.meihua_seasonal_reading import audit_seasonal_reading
 
 REFERENCES = Path(__file__).parents[1] / "fixtures/meihua_seasonal_reading_v1"
 DIAGRAMS = json.loads((REFERENCES / "cases.json").read_text())["diagrams"]
@@ -36,7 +36,9 @@ def resolve(out, path):
     ids=[f"{case['id']}-{context['month']}" for case, context in CASES],
 )
 @pytest.mark.parametrize("topic", TOPICS)
-def test_hand_diagrams_strengths_and_three_joint_rules_match(case, context, topic):
+def test_hand_diagrams_strengths_and_three_joint_rules_match(
+    case, context, topic
+) -> None:
     out = calculate_meihua_cast(
         casting=case["casting"],
         season_month_branch=context["month"],
@@ -54,12 +56,16 @@ def test_hand_diagrams_strengths_and_three_joint_rules_match(case, context, topi
         assert resolve(out, row["fact_path"])["name"] == row["trigram"]
         if row["strength_fact_path"] is not None:
             assert resolve(out, row["strength_fact_path"]) == row["strength"]
+        else:
+            pass
         if row["relation_fact_path"] is not None:
             assert resolve(out, row["relation_fact_path"]) == row["relation_to_body"]
-    assert q["net_verdict"] is q["success_probability"] is q["event_time"] is None
+        else:
+            pass
+    assert q["net_verdict"] is q["event_time"] is None
 
 
-def test_jing_weak_body_attack_and_support_are_not_cancelled_or_ranked():
+def test_jing_weak_body_attack_and_support_are_not_cancelled_or_ranked() -> None:
     out = calculate_meihua_cast(
         casting=DIAGRAMS[0]["casting"], season_month_branch="申"
     )
@@ -75,7 +81,7 @@ def test_jing_weak_body_attack_and_support_are_not_cancelled_or_ranked():
     assert attacked["countercontrol_qualifications"]["body_mutual"] == "partial_relief"
 
 
-def test_controlled_support_remains_a_relation_without_claiming_full_rescue():
+def test_controlled_support_remains_a_relation_without_claiming_full_rescue() -> None:
     out = calculate_meihua_cast(
         casting=DIAGRAMS[2]["casting"], season_month_branch="子"
     )
@@ -91,7 +97,7 @@ def test_controlled_support_remains_a_relation_without_claiming_full_rescue():
     assert "生助受到限制" in out["summary"] and "衰稍解" in out["summary"]
 
 
-def test_body_and_supporter_wang_preferences_are_not_a_joint_requirement():
+def test_body_and_supporter_wang_preferences_are_not_a_joint_requirement() -> None:
     out = calculate_meihua_cast(
         casting=DIAGRAMS[0]["casting"], season_month_branch="寅"
     )
@@ -102,7 +108,7 @@ def test_body_and_supporter_wang_preferences_are_not_a_joint_requirement():
     assert not q["preference_matches_are_joint_necessary_conditions"]
 
 
-def test_unclassified_strength_is_pending_and_never_neutral_or_weak():
+def test_unclassified_strength_is_pending_and_never_neutral_or_weak() -> None:
     out = calculate_meihua_cast(
         casting=DIAGRAMS[0]["casting"], season_month_branch="子"
     )
@@ -115,7 +121,9 @@ def test_unclassified_strength_is_pending_and_never_neutral_or_weak():
 
 @pytest.mark.parametrize("basis", ["raw_counts", "trigram_numbers"])
 @pytest.mark.parametrize("topic", ["general", "transaction"])
-def test_candidate_strength_paths_point_into_own_interpretation_rows(basis, topic):
+def test_candidate_strength_paths_point_into_own_interpretation_rows(
+    basis: str, topic: str
+) -> None:
     out = calculate_meihua_cast(
         casting={
             "method": "sound_groups",
@@ -141,7 +149,7 @@ def test_candidate_strength_paths_point_into_own_interpretation_rows(basis, topi
         assert q["summary"] in out["summary"]
 
 
-def test_time_entry_keeps_calendar_precision_and_body_strength_evidence():
+def test_time_entry_keeps_calendar_precision_and_body_strength_evidence() -> None:
     out = calculate_meihua_analysis(
         analysis_year=2057,
         analysis_month=9,
@@ -158,7 +166,7 @@ def test_time_entry_keeps_calendar_precision_and_body_strength_evidence():
     assert "相差一日" in out["summary"]
 
 
-def test_mismatched_cast_strength_or_control_context_is_rejected():
+def test_mismatched_cast_strength_or_control_context_is_rejected() -> None:
     a = calculate_meihua_cast(casting=DIAGRAMS[0]["casting"], season_month_branch="午")
     b = calculate_meihua_cast(casting=DIAGRAMS[2]["casting"], season_month_branch="午")
     with pytest.raises(ValueError, match="same actual cast"):
@@ -175,7 +183,7 @@ def test_mismatched_cast_strength_or_control_context_is_rejected():
         )
 
 
-def test_repeated_control_threshold_is_not_invented_and_profile_is_isolated():
+def test_repeated_control_threshold_is_not_invented_and_profile_is_isolated() -> None:
     p = seasonal_reading_ruleset()
     p["rules"][0]["quote"] = "changed"
     assert seasonal_reading_ruleset()["rules"][0]["quote"] != "changed"
@@ -191,7 +199,7 @@ def test_repeated_control_threshold_is_not_invented_and_profile_is_isolated():
 
 
 @pytest.mark.parametrize("month", [None, "申"])
-def test_weather_remains_exempt_from_body_strength_reading(month):
+def test_weather_remains_exempt_from_body_strength_reading(month: str | None) -> None:
     out = calculate_meihua_cast(
         casting=DIAGRAMS[0]["casting"],
         season_month_branch=month,
@@ -200,7 +208,7 @@ def test_weather_remains_exempt_from_body_strength_reading(month):
     assert out["interpretation"]["seasonal_qualification"] is None
 
 
-def test_frozen_audit_does_not_claim_prediction_or_full_book_acceptance():
+def test_frozen_audit_does_not_claim_prediction_or_full_book_acceptance() -> None:
     report = audit_seasonal_reading(REFERENCES)
     assert report["selected_checks_passed"], report
     assert report["unique_hand_diagrams"] == 4 and report["month_context_checks"] == 13
@@ -216,7 +224,7 @@ def test_frozen_audit_does_not_claim_prediction_or_full_book_acceptance():
     assert not report["predictive_efficacy_established"]
 
 
-def test_wrong_frozen_status_is_detected_even_after_rehashing(tmp_path):
+def test_wrong_frozen_status_is_detected_even_after_rehashing(tmp_path: Path) -> None:
     d = tmp_path / "fixtures/meihua_seasonal_reading_v1"
     shutil.copytree(REFERENCES, d)
     for name in [
@@ -244,8 +252,8 @@ def test_wrong_frozen_status_is_detected_even_after_rehashing(tmp_path):
 @pytest.mark.parametrize("tool", ["meihua_analysis", "meihua_cast"])
 @pytest.mark.parametrize("topic", ["general", "transaction", "weather"])
 def test_new_evidence_and_null_weather_agree_on_three_transports(
-    tool, topic, surface_calls
-):
+    tool: str, topic: str, surface_calls
+) -> None:
     spec = SPECS[tool]
     payload = (
         {"casting": DIAGRAMS[0]["casting"], "season_month_branch": "申"}

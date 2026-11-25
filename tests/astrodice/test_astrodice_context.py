@@ -32,6 +32,8 @@ REFERENCE = json.loads(
     [
         {"gps_lat": 0.0},
         {"gps_lon": 30.0},
+        {"lon": "0.0000000010000000000000003", "gps_lon": 0.0},
+        {"lon": "179.999999998999982", "gps_lon": -180.0},
         {"lat": "nonsense", "gps_lat": 0.0},
         {"lon": "200", "gps_lon": 0.0},
         {"lat": "", "gps_lat": 0.0},
@@ -43,7 +45,7 @@ REFERENCE = json.loads(
         {"gps_lon": float("inf")},
     ],
 )
-def test_invalid_or_conflicting_coordinate_aliases_are_not_ignored(changes):
+def test_invalid_or_conflicting_coordinate_aliases_are_not_ignored(changes) -> None:
     inputs = {**FACES, **SKY, **changes}
     with pytest.raises(ValueError):
         build_otherbu_result(**inputs)
@@ -59,12 +61,13 @@ def test_invalid_or_conflicting_coordinate_aliases_are_not_ignored(changes):
         ("33S30", "151E12", -33.5, 151.2),
         ("0", "180", 0, -180),
         ("0", "-180", 0, 180),
+        ("51.5", "0.000000001", 51.5, 0),
         ("51.500000123", "0.000000123", 51.500000123, 0.000000123),
     ],
 )
 def test_equivalent_coordinate_aliases_keep_exact_calculation_metadata(
-    latitude, longitude, gps_lat, gps_lon
-):
+    latitude: str, longitude: str, gps_lat, gps_lon
+) -> None:
     result = build_otherbu_result(
         **{
             **FACES,
@@ -81,7 +84,7 @@ def test_equivalent_coordinate_aliases_keep_exact_calculation_metadata(
     assert f"经纬度：{float(gps_lon)} {float(gps_lat)}" in result["snapshot_text"]
 
 
-def test_reported_location_is_the_actual_unrounded_location():
+def test_reported_location_is_the_actual_unrounded_location() -> None:
     result = build_otherbu_result(**FACES, **SKY)
     params = result["chart"]["params"]
     assert params["birthLatitude"] == 51.500000123
@@ -91,7 +94,7 @@ def test_reported_location_is_the_actual_unrounded_location():
 
 
 @pytest.mark.parametrize("case", REFERENCE["cases"])
-def test_ptolemy_context_fortune_against_annotated_edition_arithmetic(case):
+def test_ptolemy_context_fortune_against_annotated_edition_arithmetic(case) -> None:
     states = {p: {"longitude": case[p]} for p in ("Sun", "Moon")}
     start = int(case["ascendant"] // 30) * 30
     context = build_context_geometry(
@@ -114,7 +117,9 @@ def test_ptolemy_context_fortune_against_annotated_edition_arithmetic(case):
 @pytest.mark.parametrize(
     "hsys,zodiacal,time", list(product([0, 3, 5, 8], [0, 1], ["00:30", "12:30"]))
 )
-def test_method_selection_changes_only_fortune_and_its_provenance(hsys, zodiacal, time):
+def test_method_selection_changes_only_fortune_and_its_provenance(
+    hsys, zodiacal, time
+) -> None:
     inputs = {**FACES, **SKY, "time": time, "hsys": hsys, "zodiacal": zodiacal}
     a = build_otherbu_result(**inputs, fortune_method="sect_reversing")
     b = build_otherbu_result(**inputs, fortune_method="ptolemy_iii10")
@@ -123,7 +128,6 @@ def test_method_selection_changes_only_fortune_and_its_provenance(hsys, zodiacal
         "sign",
         "house",
         "symbolic_details",
-        "interpretation",
         "diceChart",
         "rulesets",
         "rule_trace",
@@ -153,7 +157,7 @@ def test_method_selection_changes_only_fortune_and_its_provenance(hsys, zodiacal
     assert b["symbolic_details"]["triplicity_condition"]["sect"] is None
 
 
-def test_unknown_fortune_policy_cannot_silently_select_another_formula():
+def test_unknown_fortune_policy_cannot_silently_select_another_formula() -> None:
     with pytest.raises(ValueError):
         build_otherbu_result(**FACES, **SKY, fortune_method="unknown")
     with pytest.raises(ValidationError):

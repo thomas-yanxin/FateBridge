@@ -18,7 +18,7 @@
 
 指定河洛理数用 `heluo`，指定金锁银匙／参评数用 `canping`。两者有不同起数与时间轴；不因“邵子”一名合并为同一技法。参数以实际MCP合同为准，离线可查[合同索引](../../contracts/README.md)。
 
-需要额外核对术语、原句或来源位置时，可按需查询`knowledge_registry(domain="heluo"/"canping")`，再用`knowledge_read`读取其分类和键。`keys_sample`只是明确标识的目录样例；键空间数量与已校勘覆盖数分列。`source_collections`保留完整结构化来源对象；`line_texts`按实际完整卦名与爻位（如`乾為天:1`），`text_cells`按实际部别、编号和栏目（如`水.3330.male`）检索，不猜性别、不跨栏补文。
+需要额外核对术语、原句或来源位置时，可按需查询`knowledge_catalog(domain="heluo"/"canping")`，再用`knowledge_read`读取其分类和键。`keys_sample`只是明确标识的目录样例；键空间数量与已校勘覆盖数分列。`source_collections`保留完整结构化来源对象；`line_texts`按实际完整卦名与爻位（如`乾為天:1`），`text_cells`按实际部别、编号和栏目（如`水.3330.male`）检索，不猜性别、不跨栏补文。
 
 读取河洛／参评参考时保留`citation`、`provenance`、`reference_only`及`reference_details`；完整正文或完整来源对象首次用`fields=null`并读取同run保留交付，不靠摘要重算补证。参考里的`role_by_profile`、`role_for_profile`与`applied_clause_ids_for_profile`只是政策说明；当前排盘实际采用何法、哪些条款适用，仍由同run的`schedule_basis`及选文回执核对。知识查询没有个人出生输入，不能把其中`actual_start_at=null`说成尚未起运。继承文本、编辑未定字、圈空、本地缺行、暂定编号与未选栏目按实际状态解释；来源目录不授予全书、独立复核或现实预测认证。
 

@@ -19,18 +19,22 @@ def inputs():
     return qualities, reports, intervals, copy.deepcopy(intervals)
 
 
-def test_two_qualified_paths_both_participate():
+def test_two_qualified_paths_both_participate() -> None:
     assert outcome(*inputs()) == PASS
 
 
 @pytest.mark.parametrize("encoding,layer", [("JD", "position"), ("MJD", "rate")])
-def test_one_passing_path_cannot_erase_the_other_numerical_failure(encoding, layer):
+def test_one_passing_path_cannot_erase_the_other_numerical_failure(
+    encoding: str, layer: str
+) -> None:
     q, reports, intervals, boxes = inputs()
     reports[encoding][layer]["status"] = FAIL
     assert outcome(q, reports, intervals, boxes) == FAIL
 
 
-def test_a_position_failure_survives_when_that_paths_rate_reference_is_unqualified():
+def test_a_position_failure_survives_when_that_paths_rate_reference_is_unqualified() -> (
+    None
+):
     q, reports, intervals, boxes = inputs()
     q["JD"] = "reference_unavailable"
     intervals.pop("JD")
@@ -40,20 +44,24 @@ def test_a_position_failure_survives_when_that_paths_rate_reference_is_unqualifi
 
 
 @pytest.mark.parametrize("which", ["intervals", "center"])
-def test_conflicting_references_remain_unresolved_even_when_both_candidates_pass(which):
+def test_conflicting_references_remain_unresolved_even_when_both_candidates_pass(
+    which: str,
+) -> None:
     q, reports, intervals, boxes = inputs()
     target = intervals if which == "intervals" else boxes
     target["MJD"][0] = (Q(4), Q(5))
     assert outcome(q, reports, intervals, boxes) == UNRESOLVED
 
 
-def test_no_available_reference_is_not_a_numerical_pass():
+def test_no_available_reference_is_not_a_numerical_pass() -> None:
     q, reports, _, boxes = inputs()
     q = {name: "reference_unavailable" for name in q}
     assert outcome(q, reports, {}, boxes) == UNRESOLVED
 
 
-def test_a_single_qualified_reference_does_not_drop_the_unavailable_alternative():
+def test_a_single_qualified_reference_does_not_drop_the_unavailable_alternative() -> (
+    None
+):
     q, reports, intervals, boxes = inputs()
     q["MJD"] = "reference_unavailable"
     reports["MJD"]["rate"]["status"] = UNRESOLVED
@@ -62,14 +70,14 @@ def test_a_single_qualified_reference_does_not_drop_the_unavailable_alternative(
     assert q["MJD"] == "reference_unavailable"
 
 
-def test_removing_an_encoding_is_a_coverage_error():
+def test_removing_an_encoding_is_a_coverage_error() -> None:
     q, reports, intervals, boxes = inputs()
     reports.pop("MJD")
     with pytest.raises(ValueError, match="Both declared encodings"):
         outcome(q, reports, intervals, boxes)
 
 
-def test_a_candidate_error_is_not_removed_by_reference_selection():
+def test_a_candidate_error_is_not_removed_by_reference_selection() -> None:
     q, reports, intervals, boxes = inputs()
     reports["MJD"]["rate"]["status"] = "candidate_error"
     assert outcome(q, reports, intervals, boxes) == "candidate_error"

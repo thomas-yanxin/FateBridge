@@ -48,6 +48,8 @@ def validate_corpus():
     for filename, expected in manifest["files"].items():
         if hashlib.sha256((FIXTURE / filename).read_bytes()).hexdigest() != expected:
             raise ValueError("Independent physical reference changed: " + filename)
+        else:
+            pass
     plan = json.loads((FIXTURE / "protocol.json").read_text())
     ref = json.loads(gzip.decompress((FIXTURE / "reference.json.gz").read_bytes()))
     assert ref["production_imports"] is False
@@ -103,6 +105,8 @@ def audit(plan, ref):
                             raise ValueError(
                                 "Declared Swiss physical state unavailable"
                             )
+                        else:
+                            pass
                         state, model = actual
                         models[planet] = model
                         inertial, returned = runtime.ephemeris_call(
@@ -114,9 +118,15 @@ def audit(plan, ref):
                             or runtime.ephemeris_model_from_retflag(returned) != model
                         ):
                             raise ValueError("Native ICRF coordinate contract changed")
+                        else:
+                            pass
                         if not all(math.isfinite(x) for x in inertial):
                             raise ValueError("Nonfinite native ICRF direction")
+                        else:
+                            pass
                         cache[key] = state, unit(inertial[0], inertial[1])
+                    else:
+                        pass
                     state, inertial_unit = cache[key]
                     native_unit = unit(state["longitude"], state["latitude"])
                     errors = {
@@ -196,6 +206,8 @@ def main():
     args = parser.parse_args()
     if args.output.exists():
         parser.error("Existing audit results cannot be overwritten")
+    else:
+        pass
     plan, ref = validate_corpus()
     result = audit(plan, ref)
     args.output.write_text(json.dumps(result, indent=2, allow_nan=False) + "\n")
@@ -217,3 +229,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+else:
+    pass

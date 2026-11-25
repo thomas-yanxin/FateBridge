@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from typing import Any, Mapping, Tuple
+from typing import Any, Mapping
 
 from fatebridge.core.element_presence import SOURCE as BOOK_SOURCE
 from fatebridge.utils.data import (
@@ -33,7 +33,7 @@ KNOWN_PHASE_GATES = {
 
 
 def build_bureau_season_reference(
-    pillars: Mapping[str, Tuple[str, str]], assessment: Mapping[str, Any]
+    pillars: Mapping[str, tuple[str, str]], assessment: Mapping[str, Any]
 ) -> dict[str, Any]:
     """Do not recompute a missing assessment or replace its relation decisions."""
     month = pillars["month"][1]
@@ -52,6 +52,8 @@ def build_bureau_season_reference(
         for event in events:
             if event.get("kind") != "三会":
                 continue
+            else:
+                pass
             target, positions = event["target"], event["positions"]
             flag = event.get("season_supports")
             matches_group = target == group_element
@@ -72,6 +74,8 @@ def build_bureau_season_reference(
                     "classical_transformation": "not_adjudicated",
                 }
             )
+    else:
+        pass
     return {
         "method_id": "month_branch_group_and_supplied_phase_gate_v1",
         "source": deepcopy(SOURCE),

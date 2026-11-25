@@ -9,8 +9,12 @@ from pydantic import ValidationError
 
 from fatebridge.core.requests.compatibility import SukuyoCompatibilityRequest
 from fatebridge.core.requests.divination import SuZhanRequest
-from fatebridge.core.sukuyo import SU27_ORDER, calendar_mansion, day_evidence
-from fatebridge.core.sukuyo_padas import palace_reference, reference_cell, source_bundle
+from fatebridge.core.sukuyo.sukuyo import SU27_ORDER, calendar_mansion, day_evidence
+from fatebridge.core.sukuyo.sukuyo_padas import (
+    palace_reference,
+    reference_cell,
+    source_bundle,
+)
 from fatebridge.services.divination import (
     calculate_sukuyo_compatibility,
     calculate_suzhan_analysis,
@@ -21,7 +25,7 @@ REFERENCE = json.loads(
 )
 
 
-def test_all_108_cells_against_manually_annotated_source_grid():
+def test_all_108_cells_against_manually_annotated_source_grid() -> None:
     bundle = source_bundle()
     assert bundle["source_sha256"] == REFERENCE["source_sha256"]
     assert [p["literal_name"] for p in bundle["palaces"]] == REFERENCE["source_names"]
@@ -38,7 +42,17 @@ def test_all_108_cells_against_manually_annotated_source_grid():
     assert not bundle["pada_ordinals_explicit_in_source"]
 
 
-def test_cow_palace_is_not_a_28th_mansion_and_literal_variants_are_preserved():
+def test_caller_mutation_cannot_separate_a_palace_from_its_source_cells() -> None:
+    expected = palace_reference({"natal_su27": "翼"}, 1)
+    source_bundle()["palaces"][0]["name"] = "mutated"
+    reference_cell("翼", 1)["palace_name"] = "mutated"
+
+    actual = palace_reference({"natal_su27": "翼"}, 1)
+    assert actual == expected
+    assert actual["selected_palace"]["name"] == actual["rows"][0]["palace_name"]
+
+
+def test_cow_palace_is_not_a_28th_mansion_and_literal_variants_are_preserved() -> None:
     assert reference_cell("毕", 1)["palace_name"] == "牛宫"
     with pytest.raises(ValueError):
         reference_cell("牛", 1)
@@ -49,7 +63,7 @@ def test_cow_palace_is_not_a_28th_mansion_and_literal_variants_are_preserved():
     assert [p["division"] for p in palaces] == ["太阳分"] * 6 + ["太阴分"] * 6
 
 
-def test_split_mansion_requires_explicit_reference_pada_without_guessing():
+def test_split_mansion_requires_explicit_reference_pada_without_guessing() -> None:
     context = {"natal_su27": "翼"}
     unknown = palace_reference(context)
     first, second = palace_reference(context, 1), palace_reference(context, 2)
@@ -64,7 +78,9 @@ def test_split_mansion_requires_explicit_reference_pada_without_guessing():
     assert single["textual_pada"] is None and len(single["rows"]) == 4
 
 
-def test_partial_mansion_does_not_block_other_layers_or_hide_incomplete_candidates():
+def test_partial_mansion_does_not_block_other_layers_or_hide_incomplete_candidates() -> (
+    None
+):
     same_palace = calendar_mansion("2024-08-04", calendar_profile="hinoo_t1299_host27")
     assert same_palace["natal_su27"] is None
     r = palace_reference(same_palace)
@@ -79,7 +95,9 @@ def test_partial_mansion_does_not_block_other_layers_or_hide_incomplete_candidat
 
 
 @pytest.mark.parametrize("pada", [0, 5, True, 1.5, "1"])
-def test_invalid_pada_is_rejected_without_coercion_by_domain_and_public_requests(pada):
+def test_invalid_pada_is_rejected_without_coercion_by_domain_and_public_requests(
+    pada: bool | float | int | str,
+) -> None:
     with pytest.raises(ValueError):
         palace_reference({"natal_su27": "翼"}, pada)
     with pytest.raises(ValidationError):
@@ -92,7 +110,7 @@ def test_invalid_pada_is_rejected_without_coercion_by_domain_and_public_requests
         )
 
 
-def test_reference_pada_does_not_change_calendar_sanjiu_activities_or_sky():
+def test_reference_pada_does_not_change_calendar_sanjiu_activities_or_sky() -> None:
     kwargs = dict(
         lat="31n13",
         lon="121e28",
@@ -120,7 +138,7 @@ def test_reference_pada_does_not_change_calendar_sanjiu_activities_or_sky():
         assert pair[key] == query[key]
 
 
-def test_known_civil_clocks_and_natal_parameter_do_not_determine_padas():
+def test_known_civil_clocks_and_natal_parameter_do_not_determine_padas() -> None:
     for clock in ("00:00:00", "06:00:00", "12:00:00", "23:59:59"):
         r = day_evidence(
             calendar_mansion("2025-03-04", clock, "+08:00"), natal_mansion="翼"

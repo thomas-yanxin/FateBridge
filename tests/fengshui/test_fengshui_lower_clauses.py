@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.validation import fengshui_lower_clauses as audit
+from validation import fengshui_lower_clauses as audit
 
 FOLDER = Path(__file__).parents[1] / "data/fengshui_lower_clauses_v1"
 WEB = Path(__file__).parents[1] / "data/fengshui_classical_v1/reference.json"
@@ -18,7 +18,7 @@ def sources():
     return audit.load_lower_clause_reference(FOLDER), json.loads(WEB.read_text())
 
 
-def test_complete_edition_keeps_all_three_unresolved_conflicts():
+def test_complete_edition_keeps_all_three_unresolved_conflicts() -> None:
     data, web = sources()
     result = audit.audit_lower_clauses(data, web)
     assert result["printed_prose_checked"] == 216
@@ -50,7 +50,7 @@ def test_complete_edition_keeps_all_three_unresolved_conflicts():
         assert result[key] is False
 
 
-def test_fixed_pre_engine_source_and_ocr_are_not_rewritten_for_a_pass():
+def test_fixed_pre_engine_source_and_ocr_are_not_rewritten_for_a_pass() -> None:
     assert hashlib.sha256((FOLDER / "reference.json").read_bytes()).hexdigest() == (
         "85a10d759544d5b7729e6ffbec6427a1a5ee443b353184d0daa49e34f3b5ac88"
     )
@@ -74,7 +74,9 @@ def test_fixed_pre_engine_source_and_ocr_are_not_rewritten_for_a_pass():
 
 @pytest.mark.parametrize("section", ["printed", "web"])
 @pytest.mark.parametrize("mutation", ["remove", "duplicate"])
-def test_cannot_silently_reduce_or_duplicate_the_216_pair_scope(section, mutation):
+def test_cannot_silently_reduce_or_duplicate_the_216_pair_scope(
+    section: str, mutation: str
+) -> None:
     data, web = sources()
     rows = data["reference"]["rows"] if section == "printed" else web["shen_cases"]
     if mutation == "remove":
@@ -88,7 +90,7 @@ def test_cannot_silently_reduce_or_duplicate_the_216_pair_scope(section, mutatio
 @pytest.mark.parametrize(
     "mutation", ["remove_chart", "remove_palace", "remove_numeral"]
 )
-def test_cannot_omit_conflicting_diagram_evidence(mutation):
+def test_cannot_omit_conflicting_diagram_evidence(mutation: str) -> None:
     data, web = sources()
     diagrams = data["diagrams"]["cases"]
     if mutation == "remove_chart":
@@ -101,7 +103,7 @@ def test_cannot_omit_conflicting_diagram_evidence(mutation):
         audit.audit_lower_clauses(data, web)
 
 
-def test_replacing_disagreeing_metadata_with_engine_values_cannot_pass():
+def test_replacing_disagreeing_metadata_with_engine_values_cannot_pass() -> None:
     data, web = sources()
     row = next(
         r
@@ -113,7 +115,9 @@ def test_replacing_disagreeing_metadata_with_engine_values_cannot_pass():
         audit.audit_lower_clauses(data, web)
 
 
-def test_corrupt_engine_grid_is_detected_without_rewriting_the_source(monkeypatch):
+def test_corrupt_engine_grid_is_detected_without_rewriting_the_source(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     data, web = sources()
     real = audit.xuankong_natal
 
@@ -131,7 +135,9 @@ def test_corrupt_engine_grid_is_detected_without_rewriting_the_source(monkeypatc
     assert result["unresolved_source_conflict_count"] == 3
 
 
-def test_regressed_trace_cannot_hide_behind_the_existing_three_disputes(monkeypatch):
+def test_regressed_trace_cannot_hide_behind_the_existing_three_disputes(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     data, web = sources()
     real = audit.xuankong_natal
 
@@ -140,6 +146,8 @@ def test_regressed_trace_cannot_hide_behind_the_existing_three_disputes(monkeypa
         chart = result["chart"]
         if chart["period_number"] == 1 and chart["facing"]["name"] == "午":
             chart["trace"]["mountain"]["flight"] = "reverse"
+        else:
+            pass
         return result
 
     monkeypatch.setattr(audit, "xuankong_natal", altered)
@@ -149,7 +157,7 @@ def test_regressed_trace_cannot_hide_behind_the_existing_three_disputes(monkeypa
     assert result["complete_printed_clause_acceptance_passed"] is False
 
 
-def test_audit_is_read_only_and_ignores_self_awarded_coverage_flags():
+def test_audit_is_read_only_and_ignores_self_awarded_coverage_flags() -> None:
     data, web = sources()
     data["reference"]["coverage"]["row_count"] = 99999
     data["reference"]["whole_book_conformity_established"] = True
@@ -165,7 +173,7 @@ def test_audit_is_read_only_and_ignores_self_awarded_coverage_flags():
 @pytest.mark.parametrize(
     "name", ["reference.json", "captures/p302-卯-酉-4.png", "modern-page-324.png"]
 )
-def test_changed_source_bytes_are_rejected(tmp_path, name):
+def test_changed_source_bytes_are_rejected(tmp_path: Path, name: str) -> None:
     folder = tmp_path / "source"
     shutil.copytree(FOLDER, folder)
     with (folder / name).open("ab") as stream:
@@ -174,7 +182,9 @@ def test_changed_source_bytes_are_rejected(tmp_path, name):
         audit.load_lower_clause_reference(folder)
 
 
-def test_rehashed_rewritten_prose_still_breaks_the_pre_engine_identity(tmp_path):
+def test_rehashed_rewritten_prose_still_breaks_the_pre_engine_identity(
+    tmp_path: Path,
+) -> None:
     folder = tmp_path / "source"
     shutil.copytree(FOLDER, folder)
     reference = json.loads((folder / "reference.json").read_text())
@@ -189,7 +199,9 @@ def test_rehashed_rewritten_prose_still_breaks_the_pre_engine_identity(tmp_path)
         audit.load_lower_clause_reference(folder)
 
 
-def test_removed_capture_manifest_entry_cannot_shrink_the_source_scope(tmp_path):
+def test_removed_capture_manifest_entry_cannot_shrink_the_source_scope(
+    tmp_path: Path,
+) -> None:
     folder = tmp_path / "source"
     shutil.copytree(FOLDER, folder)
     manifest = json.loads((folder / "hashes.json").read_text())

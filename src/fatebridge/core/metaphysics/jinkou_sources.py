@@ -4,6 +4,8 @@ import json
 from pathlib import Path
 from typing import Any
 
+from fatebridge.core.metaphysics.ren_sources import JINKOU_SOURCE
+
 SCAN_URL = "https://upload.wikimedia.org/wikipedia/commons/e/e1/CNTS-00047981961_1_六壬神課金口訣.pdf"
 SCAN_SHA256 = "dfa4b039f30100eb75a8fe21904256bc4e47c04538c8602d08aec9e7f7646364"
 STRENGTH_NOTE = (
@@ -15,7 +17,6 @@ STRENGTH_NOTE = (
 
 
 def strength_sources() -> dict[str, Any]:
-    from fatebridge.core.metaphysics.ren_sources import JINKOU_SOURCE
 
     asset = Path(__file__).resolve().parents[2] / "data/jinkou_waseda_strength.json"
     corroboration: dict[str, Any] = json.loads(asset.read_text(encoding="utf-8"))

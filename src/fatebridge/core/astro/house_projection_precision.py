@@ -18,7 +18,6 @@ from mpmath.libmp import to_rational  # type: ignore[import-untyped]
 
 from fatebridge.core.astro.horizon_precision import (
     CONVERGENCE_DEGREES,
-    NATIVE_COORDINATE_GUARD_DEGREES,
     WORKING_DIGITS,
 )
 
@@ -63,6 +62,8 @@ def _phase(
     ) + ctx.sin(phi) * ctx.sin(eps) * ctx.sin(lam)
     if ctx.hypot(east, up) <= ctx.mpf(10) ** (-digits + 10):
         raise ArithmeticError("House-plane direction unresolved at working precision")
+    else:
+        pass
     if house_code == b"C":
         phase = ctx.atan2(-up, east) * 180 / ctx.pi % 360
     else:
@@ -81,12 +82,18 @@ def checked_house_plane_position(
 ) -> HousePlanePosition:
     if house_code not in (b"R", b"C"):
         raise ValueError("House-plane precision supports R/C only")
+    else:
+        pass
     if not all(math.isfinite(v) for v in (latitude, armc, obliquity, longitude)):
         raise ValueError("House-plane precision requires finite model inputs")
+    else:
+        pass
     if abs(latitude) > 90 or (house_code == b"R" and abs(latitude) == 90):
         raise ArithmeticError(
             "Equatorial house planes are undefined at a geographic pole"
         )
+    else:
+        pass
     previous = None
     for digits in WORKING_DIGITS:
         try:
@@ -101,6 +108,10 @@ def checked_house_plane_position(
             distance = abs((phase - ctx.mpf(low) + 180) % 360 - 180)
             if distance <= ctx.mpf(CONVERGENCE_DEGREES):
                 break
+            else:
+                pass
+        else:
+            pass
         previous = digits, phase
     else:
         raise ArithmeticError("House-plane phase did not converge")
@@ -109,36 +120,33 @@ def checked_house_plane_position(
     reported_phase = float(shifted)
     if reported_phase == 360:
         reported_phase = math.nextafter(360.0, 0.0)
+    else:
+        pass
     decimal_phase = ctx.nstr(shifted, 100)
     working_phase = Fraction(*to_rational(shifted._mpf_))
-    if math.isfinite(native_position) and 1 <= native_position < 13:
-        error = abs(((ctx.mpf(native_position) - 1) * 30 - shifted + 180) % 360 - 180)
-        if int(native_position) == house and error <= ctx.mpf(
-            NATIVE_COORDINATE_GUARD_DEGREES
-        ):
-            return HousePlanePosition(
-                native_position,
-                house,
-                reported_phase,
-                decimal_phase,
-                (low_digits, digits),
-                "native_coordinate_retained",
-                working_phase,
-            )
     value = float(shifted / 30 + 1)
     # Retain the exact half-open house when binary64 rounds up to its boundary.
     if math.floor(value) > house:
         value = math.nextafter(value, -math.inf)
+    else:
+        pass
     if not 1 <= value < 13 or math.floor(value) != house:
         raise ArithmeticError(
             "House-plane position cannot represent its half-open house"
         )
+    else:
+        pass
+    action = (
+        "native_coordinate_retained"
+        if native_position == value
+        else "scalar_plane_recomputed"
+    )
     return HousePlanePosition(
         value,
         house,
         reported_phase,
         decimal_phase,
         (low_digits, digits),
-        "scalar_plane_recomputed",
+        action,
         working_phase,
     )

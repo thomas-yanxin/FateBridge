@@ -40,6 +40,8 @@ def replay(protocol_path, reference_path, material):
         or reference["Swiss_imported"]
     ):
         raise ValueError("Position-only protocol or source identity changed")
+    else:
+        pass
     entries = [
         json.loads(line)
         for line in (material / "requests.jsonl").read_text().splitlines()
@@ -58,10 +60,14 @@ def replay(protocol_path, reference_path, material):
             or params["COMMAND"] != f"'{protocol['targets'][body]}'"
         ):
             raise ValueError("Returned request parameters differ from frozen protocol")
+        else:
+            pass
         labels = re.findall(r"'([^']+)'", params["TLIST"])
         encoding = params["TLIST_TYPE"]
         if encoding not in {"'JD'", "'MJD'"}:
             raise ValueError("Undeclared position-reference encoding")
+        else:
+            pass
         origin = Q(3442849, 2) if encoding == "'JD'" else Q(-678576)
         wire = []
         for label in labels:
@@ -69,12 +75,16 @@ def replay(protocol_path, reference_path, material):
             nearest = round(tick)
             if abs(tick - nearest) > Q(1, 10**30):
                 raise ValueError("Numeric input lost its exact requested microsecond")
+            else:
+                pass
             wire.append(nearest)
         if (
             protocol["first_tlist_epoch_guard"] != {"method_id": "integer_jd_prefix_v1"}
             or not 2 <= len(wire) <= protocol["maximum_labels_per_batch"]
         ):
             raise ValueError("First-epoch guard changed")
+        else:
+            pass
         auxiliary, primary = wire[0], wire[1:]
         minimum = min(Q(t, DAY_US) + Q(3442849, 2) for t in primary)
         if (
@@ -82,25 +92,37 @@ def replay(protocol_path, reference_path, material):
             != minimum.numerator // minimum.denominator - 1
         ):
             raise ValueError("Auxiliary integer-JD epoch moved")
+        else:
+            pass
         if "raw_file" not in entry:
             unavailable.append(entry)
             continue
+        else:
+            pass
         raw_path = material / entry["raw_file"]
         if digest(raw_path) != entry["raw_sha256"]:
             raise ValueError("Raw position response changed")
+        else:
+            pass
         if entry.get("http_status") != 200:
             unavailable.append(entry)
             continue
+        else:
+            pass
         if (
             anchor.get("raw_sha256") != entry["raw_sha256"]
             or anchor.get("raw_file") != entry["raw_file"]
         ):
             raise ValueError("First response provenance changed")
+        else:
+            pass
         response = json.loads(raw_path.read_bytes())
         text = response.get("result", "")
         if response.get("error") or "$$SOE" not in text:
             unavailable.append(entry)
             continue
+        else:
+            pass
         target = re.search(
             r"^Target body name:\s+.+?\s+\((\d+)\).*?source: DE441", text, re.MULTILINE
         )
@@ -121,16 +143,24 @@ def replay(protocol_path, reference_path, material):
             raise ValueError(
                 "Position source, frame, quantities or clock identity changed"
             )
+        else:
+            pass
         returned, aux_count, bad = {}, 0, []
         for row in csv.reader(io.StringIO(text.split("$$SOE")[1].split("$$EOE")[0])):
             if not row or not row[0].strip():
                 continue
+            else:
+                pass
             if len(row) != 11 or row[-1].strip():
                 raise ValueError("Quantity column contract changed")
+            else:
+                pass
             stamp = Q(row[1].strip())
             if abs(stamp - Q(auxiliary, DAY_US) - Q(3442849, 2)) <= Q(1, 10**9):
                 aux_count += 1
                 continue
+            else:
+                pass
             candidates = [
                 t
                 for t in primary
@@ -144,8 +174,12 @@ def replay(protocol_path, reference_path, material):
                     }
                 )
                 continue
+            else:
+                pass
             if len(candidates) != 1 or candidates[0] in returned:
                 raise ValueError("Ambiguous or duplicate returned primary epoch")
+            else:
+                pass
             tick = candidates[0]
             astrometric, apparent = [v.strip() for v in row[4:6]], [
                 v.strip() for v in row[8:10]
@@ -158,6 +192,8 @@ def replay(protocol_path, reference_path, material):
                 or float(row[6]) < 0
             ):
                 raise ValueError("Invalid primary separation or visibility")
+            else:
+                pass
             returned[tick] = {
                 "astrometric_printed_angles": astrometric,
                 "apparent_printed_angles": apparent,
@@ -173,14 +209,20 @@ def replay(protocol_path, reference_path, material):
             or bad != anchor["rejected_epoch_rows"]
         ):
             raise ValueError("Position coverage or rejected epochs changed")
+        else:
+            pass
         rejected.extend({"batch": entry["batch"], **value} for value in bad)
         for tick, point in returned.items():
             key = body, tick
             if key in observed:
                 raise ValueError("Duplicate independently returned observation")
+            else:
+                pass
             observed[key] = point
     if len(reference["rows"]) != len(protocol["cases"]):
         raise ValueError("Planned condition count changed")
+    else:
+        pass
     rows = []
     for case, stored in zip(protocol["cases"], reference["rows"]):
         if (
@@ -192,18 +234,26 @@ def replay(protocol_path, reference_path, material):
             raise ValueError(
                 "Position-only case was changed, dropped or given a hidden rate"
             )
+        else:
+            pass
         tick = center_tick(case["date_tt"])
         if stored["jd_tt"] != float(Q(tick, DAY_US) + Q(3442849, 2)):
             raise ValueError("Native numeric argument changed")
+        else:
+            pass
         point = observed.get((case["body"], tick))
         sample = stored["samples"]["0"]
         if point is None:
             if sample is not None or stored["missing_offsets_seconds"] != ["0"]:
                 raise ValueError("Unavailable position was invented")
+            else:
+                pass
             rows.append(
                 {**case, "status": "reference_unavailable", "observation": None}
             )
             continue
+        else:
+            pass
         if (
             sample is None
             or sample["printed_angles"] != point["apparent_printed_angles"]
@@ -213,6 +263,8 @@ def replay(protocol_path, reference_path, material):
             or stored["missing_offsets_seconds"]
         ):
             raise ValueError("Stored position differs from immutable raw response")
+        else:
+            pass
         check_stored_direction(
             sample["unit_direction"],
             precise_direction(*map(float, point["apparent_printed_angles"])),

@@ -5,7 +5,6 @@ import json
 from copy import deepcopy
 from datetime import datetime
 from pathlib import Path
-from types import SimpleNamespace
 from zoneinfo import ZoneInfo
 
 import pytest
@@ -13,6 +12,8 @@ from dateutil.tz import gettz
 from pydantic import ValidationError
 
 from fatebridge.cli import run
+from fatebridge.core.almanac import SolarTerm
+from fatebridge.core.astro.time_scales import utc_clock
 from fatebridge.core.fengshui import calendar
 from fatebridge.core.fengshui.bazhai import sectors
 from fatebridge.core.fengshui.bazhai_interpretation import palace_star_relationship
@@ -24,12 +25,13 @@ from fatebridge.services.fengshui import (
     calculate_bazhai,
     calculate_minggua,
 )
+from fatebridge.utils.civil_time import ZonedCalendar, utc_calendar
 from fatebridge.utils.timezones import parse_timezone_name
-from fatebridge.validation.fengshui import audit_bazhai_depth
 from tests.fixtures.fengshui import payload
-from tests.support.fengshui_transports import mcp_call
+from tests.support.fengshui_transports import SPECS, mcp_call
 from tests.support.mcp_result_assertions import without_transport
 from tests.support.transports import rest_client
+from validation.fengshui import audit_bazhai_depth
 
 FOLDER = Path(__file__).parents[1] / "data/fengshui_classical_v2"
 CHANGES = json.loads((FOLDER / "you-nian-origin.json").read_text())
@@ -37,7 +39,7 @@ ELEMENTS = json.loads((FOLDER / "elements.json").read_text())
 TRIGRAM_DIRECTIONS = dict(zip("乾坎艮震巽离坤兑", "NW N NE E SE S SW W".split()))
 
 
-def test_complete_depth_source_audit_and_new_counterexample_detection():
+def test_complete_depth_source_audit_and_new_counterexample_detection() -> None:
     result = audit_bazhai_depth(CHANGES, ELEMENTS)
     assert result["scoped_acceptance_passed"]
     assert result["checked_transformation_pairs"] == 56
@@ -51,7 +53,7 @@ def test_complete_depth_source_audit_and_new_counterexample_detection():
     assert len(failed["disagreements"]) == 1
 
 
-def test_incomplete_or_duplicate_classical_source_cannot_manufacture_a_pass():
+def test_incomplete_or_duplicate_classical_source_cannot_manufacture_a_pass() -> None:
     changed = deepcopy(CHANGES)
     changed["cases"][0] = changed["cases"][1]
     with pytest.raises(ValueError, match="56"):
@@ -63,7 +65,7 @@ def test_incomplete_or_duplicate_classical_source_cannot_manufacture_a_pass():
 
 
 @pytest.mark.parametrize("case", CHANGES["cases"])
-def test_each_literal_classical_change_matches_computed_trace(case):
+def test_each_literal_classical_change_matches_computed_trace(case) -> None:
     assert len(CHANGES["cases"]) == 56
     chart = sectors(case["base"], "literal-reference", "source")
     entry = chart[TRIGRAM_DIRECTIONS[case["target"]]]
@@ -76,7 +78,7 @@ def test_each_literal_classical_change_matches_computed_trace(case):
 
 
 @pytest.mark.parametrize("base", list(TRIGRAM_DIRECTIONS))
-def test_unchanged_trigram_is_zero_operations_and_not_a_missing_step(base):
+def test_unchanged_trigram_is_zero_operations_and_not_a_missing_step(base) -> None:
     entry = sectors(base, "test", "source")[TRIGRAM_DIRECTIONS[base]]
     assert entry["star"]["name"] == "伏位"
     assert entry["you_nian_trace"]["operation_count"] == 0
@@ -84,7 +86,7 @@ def test_unchanged_trigram_is_zero_operations_and_not_a_missing_step(base):
     assert entry["you_nian_trace"]["net_changed_lines"] == []
 
 
-def test_seven_operations_are_not_seven_distinct_changed_lines_or_years():
+def test_seven_operations_are_not_seven_distinct_changed_lines_or_years() -> None:
     entry = sectors("乾", "test", "source")["S"]
     trace = entry["you_nian_trace"]
     assert entry["star"]["name"] == "绝命"
@@ -99,14 +101,16 @@ def test_seven_operations_are_not_seven_distinct_changed_lines_or_years():
 @pytest.mark.parametrize("column", range(5))
 def test_all_directed_palace_star_relations_against_literal_five_by_five_matrix(
     row, column
-):
+) -> None:
     palace, star = ELEMENTS["elements"][row], ELEMENTS["elements"][column]
     actual = palace_star_relationship(palace, "source-test", star)
     assert actual["traditional_label"] == ELEMENTS["palace_by_star_labels"][row][column]
     assert actual["palace_element"] == palace and actual["star_element"] == star
 
 
-def test_every_bazhai_chart_preserves_source_elements_and_fuwei_context_variation():
+def test_every_bazhai_chart_preserves_source_elements_and_fuwei_context_variation() -> (
+    None
+):
     for base in TRIGRAM_DIRECTIONS:
         for entry in sectors(base, "test", "source").values():
             star = entry["star"]
@@ -118,9 +122,11 @@ def test_every_bazhai_chart_preserves_source_elements_and_fuwei_context_variatio
                 assert context["other_clause"] == ELEMENTS["fuwei_alternative_clause"]
                 assert not context["other_context_applied"]
                 assert context["selected_source_ids"] == ["S10"]
+            else:
+                pass
 
 
-def test_element_relation_does_not_silently_override_basic_purpose_convention():
+def test_element_relation_does_not_silently_override_basic_purpose_convention() -> None:
     result = calculate_bazhai(
         house={"sitting_trigram": "坎"},
         placements=[{"object_id": "bed", "purpose": "bed", "location_direction": "E"}],
@@ -137,7 +143,7 @@ def test_element_relation_does_not_silently_override_basic_purpose_convention():
     assert "宫克星" in result["snapshot_text"]
 
 
-def test_method_reference_and_actual_chart_agree_on_selected_fuwei_context():
+def test_method_reference_and_actual_chart_agree_on_selected_fuwei_context() -> None:
     reference = method_details(["bazhai"])
     fuwei = reference["bazhai_you_nian_references"]["伏位"]
     actual = sectors("坎", "test", "source")["N"]["palace_star_relationship"]
@@ -147,7 +153,7 @@ def test_method_reference_and_actual_chart_agree_on_selected_fuwei_context():
         == actual["source_context_variation"]["other_clause"]
     )
     registered = {source["source_id"] for source in reference["ruleset"]["sources"]}
-    assert {"FOUNDATION_S10", "FOUNDATION_S12"} <= registered
+    assert {"S10", "S12"} <= registered
 
 
 @pytest.mark.parametrize("factory", [gettz, ZoneInfo])
@@ -160,8 +166,8 @@ def test_method_reference_and_actual_chart_agree_on_selected_fuwei_context():
     ],
 )
 def test_native_regional_gap_is_rejected_before_any_calendar_computation(
-    factory, model, field
-):
+    factory, model, field: str
+) -> None:
     at = datetime(2026, 3, 8, 2, 30, tzinfo=factory("America/New_York"))
     extra = (
         {"basis": "first_occupancy", "evidence": "Known historical event"}
@@ -183,8 +189,8 @@ def test_native_regional_gap_is_rejected_before_any_calendar_computation(
     ],
 )
 def test_aware_fold_selection_is_preserved_instead_of_discarded(
-    factory, fold, model, field
-):
+    factory, fold: int, model, field: str
+) -> None:
     at = datetime(2026, 11, 1, 1, 30, tzinfo=factory("America/New_York"), fold=fold)
     extra = (
         {
@@ -207,22 +213,25 @@ def test_aware_fold_selection_is_preserved_instead_of_discarded(
 
 
 def test_year_boundary_compares_instants_even_when_wall_clock_order_is_reversed(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     # Synthetic transition-aligned boundary tests datetime semantics only.
     # It is deliberately not an astronomical Li Chun reference or calendar claim.
-    def terms(year, zone):
-        return [
-            SimpleNamespace(
-                name="立春",
-                moment=datetime(
-                    year, 11, 1, 1, 30, tzinfo=parse_timezone_name(zone), fold=1
-                ),
-                resolution_provider="swisseph",
-            )
-        ]
+    def term(year, name, zone):
+        local_zone = parse_timezone_name(zone)
+        local = datetime(year, 11, 1, 1, 30, tzinfo=local_zone, fold=1)
+        utc = utc_calendar(local)
+        model = "synthetic_fold_fixture"
+        return SolarTerm(
+            name=name,
+            calendar=ZonedCalendar(utc, local_zone),
+            resolution_provider=model,
+            ephemeris_model=model,
+            solar_model_details={"model": model},
+            tt_instant=utc_clock(utc).tt,
+        )
 
-    monkeypatch.setattr(calendar.almanac, "get_solar_terms_for_year", terms)
+    monkeypatch.setattr(calendar.almanac, "get_solar_term", term)
     before = datetime(
         2026, 11, 1, 1, 45, tzinfo=parse_timezone_name("America/New_York"), fold=0
     )
@@ -236,7 +245,7 @@ def test_year_boundary_compares_instants_even_when_wall_clock_order_is_reversed(
     )
 
 
-def test_aggregate_cannot_bypass_invalid_query_or_occupant_clock():
+def test_aggregate_cannot_bypass_invalid_query_or_occupant_clock() -> None:
     at = datetime(2026, 3, 8, 2, 30, tzinfo=parse_timezone_name("America/New_York"))
     with pytest.raises(ValidationError, match="nonexistent"):
         assess(methods=["annual_stars"], query_at=at, timezone_name="America/New_York")
@@ -244,7 +253,9 @@ def test_aggregate_cannot_bypass_invalid_query_or_occupant_clock():
         assess(methods=["bazhai"], occupants=[{"subject_id": "a", "birth_at": at}])
 
 
-def test_explicit_iso_instants_remain_accepted_and_normalize_to_real_local_clock():
+def test_explicit_iso_instants_remain_accepted_and_normalize_to_real_local_clock() -> (
+    None
+):
     for at in (
         "2026-03-08T02:30:00-04:00",
         "2026-11-01T01:30:00-04:00",
@@ -268,19 +279,24 @@ def test_explicit_iso_instants_remain_accepted_and_normalize_to_real_local_clock
 
 @pytest.mark.parametrize("name", ["bazhai", "minggua", "assess", "annual_stars"])
 def test_deep_bazhai_facts_and_explicit_clock_instants_match_all_transports(
-    monkeypatch, tmp_path, capsys, name
-):
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    name: str,
+) -> None:
     request = payload(name)
     if name == "annual_stars":
         request = {
             "query_at": "2026-03-08T02:30:00-04:00",
             "timezone_name": "America/New_York",
         }
-    http = rest_client(monkeypatch).post("/api/fengshui/" + name, json=request)
+    else:
+        pass
+    http = rest_client(monkeypatch).post(SPECS[name].rest_path, json=request)
     protocol = asyncio.run(mcp_call(name, request))
     path = tmp_path / "deep.json"
     path.write_text(json.dumps(request))
-    assert run(["fengshui_" + name, "--request-file", str(path)]) == 0
+    assert run([SPECS[name].tool_name, "--request-file", str(path)]) == 0
     cli = json.loads(capsys.readouterr().out)
     assert http.status_code == 200 and not protocol.is_error
     assert (
@@ -291,3 +307,5 @@ def test_deep_bazhai_facts_and_explicit_clock_instants_match_all_transports(
     if name in {"bazhai", "minggua"}:
         assert "palace_star_relationship" in http.text
         assert "you_nian_trace" in http.text
+    else:
+        pass

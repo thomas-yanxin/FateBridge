@@ -1,11 +1,21 @@
 """Evaluate a registered study without generating forecasts or outcome labels."""
 
+import sys as _sys
+from pathlib import Path as _Path
+
+_VAL_REPO_ROOT = _Path(__file__).resolve().parents[2]
+if str(_VAL_REPO_ROOT) not in _sys.path:
+    _sys.path.insert(0, str(_VAL_REPO_ROOT))
+else:
+    pass
+
+
 import argparse
 import json
 from datetime import datetime
 from pathlib import Path
 
-from fatebridge.validation.predictions import (
+from validation.predictions import (
     Forecast,
     Outcome,
     StudyPlan,
@@ -62,3 +72,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

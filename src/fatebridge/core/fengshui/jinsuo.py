@@ -1,12 +1,12 @@
 """Fixed eight-palace sand/water preferences over confirmed observations."""
 
-from typing import Any, Dict
+from typing import Any
 
-from .directions import rule_data
-from .models import JinsuoRequest
+from fatebridge.core.fengshui.directions import rule_data
+from fatebridge.core.fengshui.models import JinsuoRequest
 
 
-def jinsuo(req: JinsuoRequest) -> Dict[str, Any]:
+def jinsuo(req: JinsuoRequest) -> dict[str, Any]:
     preferences = {
         d: {
             **i,
@@ -26,6 +26,8 @@ def jinsuo(req: JinsuoRequest) -> Dict[str, Any]:
             missing.append(
                 f"features.{feature.object_id}.single_confirmed_classification"
             )
+        else:
+            pass
         preference = preferences[feature.direction]["preferred_classification"]
         findings.append(
             {

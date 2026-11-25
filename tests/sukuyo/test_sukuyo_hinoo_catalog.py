@@ -8,19 +8,19 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.sukuyo import calendar_mansion, day_evidence
-from fatebridge.core.sukuyo_hinoo_catalog import (
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence
+from fatebridge.core.sukuyo.sukuyo_hinoo_catalog import (
     SOURCE,
     catalogue_reference,
     validate_bundle,
 )
-from fatebridge.core.sukuyo_sources import load_source
+from fatebridge.core.sukuyo.sukuyo_sources import load_source
 from fatebridge.services.divination import calculate_sukuyo_compatibility
 
 NOTE = "＜原＞建久六年寫高山寺藏本, ＜甲＞寶暦十一年寫智山專門學校藏本"
 
 
-def test_complete_catalogue_facts_match_before_production_source_snapshot():
+def test_complete_catalogue_facts_match_before_production_source_snapshot() -> None:
     raw = (
         Path(__file__).parents[1] / "data/sukuyo-hinoo-catalogue-source-v1.json"
     ).read_bytes()
@@ -65,7 +65,9 @@ def test_complete_catalogue_facts_match_before_production_source_snapshot():
         NOTE.replace("智山專門學校", "大正大学"),
     ],
 )
-def test_catalogue_candidate_cannot_be_inherited_by_another_publisher_note(note):
+def test_catalogue_candidate_cannot_be_inherited_by_another_publisher_note(
+    note,
+) -> None:
     with pytest.raises(ValueError, match="书目注不一致"):
         catalogue_reference(note)
 
@@ -83,8 +85,8 @@ def test_catalogue_candidate_cannot_be_inherited_by_another_publisher_note(note)
     ],
 )
 def test_candidate_or_negative_search_cannot_silently_become_an_acquired_witness(
-    mutation,
-):
+    mutation: str,
+) -> None:
     data = deepcopy(load_source(SOURCE).data)
     facts = data["facts"]
     hinoo = facts["kozanji_hinoo_search"]
@@ -115,7 +117,7 @@ def test_candidate_or_negative_search_cannot_silently_become_an_acquired_witness
 
 
 @pytest.mark.parametrize("civil", ["0806-07-20", "0814-09-17"])
-def test_hinoo_product_retains_real_result_and_catalogue_limits(civil):
+def test_hinoo_product_retains_real_result_and_catalogue_limits(civil: str) -> None:
     calendar = calendar_mansion(
         civil,
         "12:00:00",
@@ -145,7 +147,7 @@ def test_hinoo_product_retains_real_result_and_catalogue_limits(civil):
         assert part in text
 
 
-def test_catalogue_extension_does_not_select_hinoo_for_default_t1299_profile():
+def test_catalogue_extension_does_not_select_hinoo_for_default_t1299_profile() -> None:
     calendar = calendar_mansion(
         "0806-07-20",
         "12:00:00",
@@ -158,7 +160,7 @@ def test_catalogue_extension_does_not_select_hinoo_for_default_t1299_profile():
 
 
 @pytest.mark.parametrize("part", [None, "first_half", "second_half"])
-def test_no_split_still_explains_actual_big_leap_predecessor(part):
+def test_no_split_still_explains_actual_big_leap_predecessor(part: str | None) -> None:
     calendar = calendar_mansion(
         "0803-12-22",
         "04:00:00",
@@ -179,7 +181,7 @@ def test_no_split_still_explains_actual_big_leap_predecessor(part):
     assert "本次未生成小月分宿" in text
 
 
-def test_no_split_explanation_does_not_invent_context_on_a_later_day():
+def test_no_split_explanation_does_not_invent_context_on_a_later_day() -> None:
     calendar = calendar_mansion(
         "0803-12-23",
         "04:00:00",
@@ -193,7 +195,9 @@ def test_no_split_explanation_does_not_invent_context_on_a_later_day():
 
 
 @pytest.mark.parametrize("part", [None, "first_half", "second_half"])
-def test_two_person_explanation_keeps_big_leap_predecessor_for_resolved_person(part):
+def test_two_person_explanation_keeps_big_leap_predecessor_for_resolved_person(
+    part: str | None,
+) -> None:
     result = calculate_sukuyo_compatibility(
         person1_date="0803-12-22",
         person1_time="04:00:00",

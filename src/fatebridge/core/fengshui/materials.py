@@ -4,20 +4,20 @@ import json
 from copy import deepcopy
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, cast
+from typing import Any, Dict, Iterable, cast
 
-from .material_application import analyze_application
-from .material_inputs import MaterialShapeFact
-from .workstation_sources import disagreement, provenance
+from fatebridge.core.fengshui.material_application import analyze_application
+from fatebridge.core.fengshui.material_inputs import MaterialShapeFact
+from fatebridge.core.fengshui.workstation_sources import disagreement, provenance
 
 
 @lru_cache(maxsize=1)
-def _bundle() -> Dict[str, Any]:
+def _bundle() -> dict[str, Any]:
     path = Path(__file__).parents[2] / "data/fengshui/material-representations-v1.json"
     return cast(Dict[str, Any], json.loads(path.read_text(encoding="utf-8")))
 
 
-def material_reference() -> Dict[str, Any]:
+def material_reference() -> dict[str, Any]:
     data = deepcopy(_bundle())
     return {
         "status": "reference_only",
@@ -36,23 +36,27 @@ def material_reference() -> Dict[str, Any]:
 
 
 def analyze_material_facts(
-    facts: Iterable[MaterialShapeFact], targets: Optional[List[Dict[str, Any]]] = None
-) -> Dict[str, Any]:
+    facts: Iterable[MaterialShapeFact], targets: list[dict[str, Any]] | None = None
+) -> dict[str, Any]:
     data = _bundle()
     reference = material_reference()
     findings = []
     missing = []
     counts = dict(supported=0, confirmed_unsupported=0, unknown=0)
-    trace: List[Dict[str, Any]] = []
+    trace: list[dict[str, Any]] = []
     extra_rules = {}
     for fact in facts:
         path = f"environmental_context.material_facts.{fact.fact_id}"
         pending = []
         if fact.observation_basis == "image_observed":
             pending.append(f"{path}.observation_basis")
+        else:
+            pass
         for field in ("material", "shape", "colour"):
             if getattr(fact, field) == "unknown":
                 pending.append(f"{path}.{field}")
+            else:
+                pass
         shape = data["shapes"].get(fact.shape)
         material = data["materials"].get(fact.material)
         colour = data["colours"].get(fact.colour)
@@ -73,12 +77,16 @@ def analyze_material_facts(
         if target is not None:
             if fact.material is None and fact.colour is None:
                 pending.append(f"{path}.material_or_colour")
+            else:
+                pass
             if (
                 fact.material == "living_plant"
                 and target == "木"
                 and fact.plant_alive is None
             ):
                 pending.append(f"{path}.plant_alive")
+            else:
+                pass
             if fact.material is None:
                 material_status = "not_provided"
             elif fact.material == "unknown":
@@ -127,11 +135,15 @@ def analyze_material_facts(
                     )
                 )
             )
+        else:
+            pass
         unknown = bool(pending)
         if unknown:
             counts["unknown"] += 1
         elif target is not None:
             counts["supported"] += 1
+        else:
+            pass
         rule_id = (
             "sourced_material_representation_v1.afsi_use_eligibility"
             if target is not None
@@ -199,6 +211,8 @@ def analyze_material_facts(
             extra_rules["workstation_source_boundaries_v1"] = provenance(
                 "workstation_source_boundaries_v1"
             )
+        else:
+            pass
         if fact.application is not None:
             application = analyze_application(fact, targets or [], material_status)
             finding_record["application_analysis"] = {
@@ -225,6 +239,8 @@ def analyze_material_facts(
                 )
                 for c in application["application_conditions"]
             )
+        else:
+            pass
         findings.append(finding_record)
         missing.extend(pending)
         trace.append(dict(rule_id=rule_id, source_ids=sources, fact_id=fact.fact_id))

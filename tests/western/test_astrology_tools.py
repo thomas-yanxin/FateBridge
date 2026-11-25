@@ -11,11 +11,7 @@ from fatebridge.core.astro.geometry import (
     _sign_name,
 )
 from fatebridge.core.ephemeris_runtime import swe
-from fatebridge.core.requests.astrology import (
-    AstroChartRequest,
-    AstroRelativePartyRequest,
-    AstroRelativeRequest,
-)
+from fatebridge.core.requests.astrology import AstroChartRequest
 from fatebridge.services.astrology import (
     calculate_core_chart_analysis,
     calculate_germany_chart_analysis,
@@ -23,12 +19,9 @@ from fatebridge.services.astrology import (
 )
 from fatebridge.utils.places import KNOWN_BIRTH_PLACE_ENTRIES
 from tests.fixtures.surface_payloads import astro_payload
-from tests.fixtures.transports import rest_handler
-
-calculate_relative_chart_endpoint = rest_handler("astro_relative")
 
 
-def test_core_chart_variants_expose_variant_specific_fields():
+def test_core_chart_variants_expose_variant_specific_fields() -> None:
     chart = calculate_core_chart_analysis(chart_variant="chart", **astro_payload())
     chart13 = calculate_core_chart_analysis(
         chart_variant="chart13",
@@ -86,20 +79,17 @@ def test_core_chart_variants_expose_variant_specific_fields():
     assert "[行星]" in chart["snapshot_text"]
     assert "太阳：" in chart["snapshot_text"]
     assert "Asc：" in chart["snapshot_text"]
-    assert "人格签名：" in chart["snapshot_text"]
-    assert "核心人格：" in chart["snapshot_text"]
-    assert "成长建议：" in chart["snapshot_text"]
+    assert "人格签名：" not in chart["snapshot_text"]
+    assert "核心人格：" not in chart["snapshot_text"]
+    assert "成长建议：" not in chart["snapshot_text"]
     assert chart["snapshot_export"]["technique"]["key"] == "astrochart"
     assert "[起盘信息]" in chart["snapshot_export"]["export_text"]
     assert "[行星]" in chart["snapshot_export"]["export_text"]
-    assert chart["interpretation"]["signature"].startswith("太阳")
-    assert "核心驱动力" in chart["interpretation"]["core_identity"]
-    assert "安全感" in chart["interpretation"]["emotional_style"]
-    assert len(chart["summary"]) >= 7
-    assert chart["summary"][1].startswith("核心签名：")
+    assert "interpretation" not in chart
+    assert "个星体与虚点" in chart["summary"][0]
 
 
-def test_core_chart_can_infer_coordinates_from_birth_place():
+def test_core_chart_can_infer_coordinates_from_birth_place() -> None:
     # Integration with the published representative point, not an assertion
     # that every birth in Beijing occurred at one surveyed location. AreaCity's
     # GCJ-02 source point must not silently travel to the engine as WGS84.
@@ -154,7 +144,7 @@ def test_core_chart_can_infer_coordinates_from_birth_place():
     assert "[起盘信息]" in chart["snapshot_text"]
 
 
-def test_core_chart_infers_coordinates_for_prefecture_city():
+def test_core_chart_infers_coordinates_for_prefecture_city() -> None:
     # "南通" had longitude in the offline catalog but no latitude, so the core
     # chart used to reject a BaZi-resolvable place. Latitude now travels with it.
     chart = calculate_core_chart_analysis(
@@ -174,7 +164,7 @@ def test_core_chart_infers_coordinates_for_prefecture_city():
     assert chart["person_info"]["birth_latitude"] is not None
 
 
-def test_core_chart_accepts_but_ignores_gender():
+def test_core_chart_accepts_but_ignores_gender() -> None:
     # astro endpoints accept gender for uniform batch calling across tools, but
     # gender never participates in the chart calculation.
     payload = dict(
@@ -196,7 +186,7 @@ def test_core_chart_accepts_but_ignores_gender():
     assert male["planets"] == female["planets"]
 
 
-def test_core_chart_prefers_local_ephemeris_runtime_when_available():
+def test_core_chart_prefers_local_ephemeris_runtime_when_available() -> None:
     swe = pytest.importorskip("swisseph")
     birth_payload = astro_payload()
 
@@ -239,7 +229,7 @@ def test_core_chart_prefers_local_ephemeris_runtime_when_available():
     assert moon["latitude"] == pytest.approx(expected_moon[1], abs=0.001)
 
 
-def test_core_chart_offline_options_preserve_defaults_and_allow_overrides():
+def test_core_chart_offline_options_preserve_defaults_and_allow_overrides() -> None:
     default_chart = calculate_core_chart_analysis(
         chart_variant="chart",
         **astro_payload(),
@@ -297,7 +287,7 @@ def test_core_chart_offline_options_preserve_defaults_and_allow_overrides():
     assert india_tropical_placidus["india"]["ayanamsha"] == 0.0
 
 
-def test_germany_chart_returns_midpoint_payload():
+def test_germany_chart_returns_midpoint_payload() -> None:
     result = calculate_germany_chart_analysis(**astro_payload())
 
     assert result["chart_profile"]["chart_type"] == "germany"
@@ -320,7 +310,7 @@ def test_germany_chart_returns_midpoint_payload():
     assert result["base_chart"]["chart_profile"]["engine_backend"] == expected_backend
 
 
-def test_germany_chart_respects_core_house_and_zodiac_overrides():
+def test_germany_chart_respects_core_house_and_zodiac_overrides() -> None:
     result = calculate_germany_chart_analysis(
         **astro_payload(),
         hsys=0,
@@ -334,7 +324,7 @@ def test_germany_chart_respects_core_house_and_zodiac_overrides():
     assert result["midpoints"]
 
 
-def test_hsys_int_family_defaults_are_consistent():
+def test_hsys_int_family_defaults_are_consistent() -> None:
     # The Western tropical-quadrant charts (natal + relative/synastry) share one
     # default house system so a person's natal chart and its synastry chart agree
     # on houses. That default is Placidus (3), the de-facto Western convention.
@@ -362,7 +352,7 @@ def test_hsys_int_family_defaults_are_consistent():
     assert flat.hsys == 3
 
 
-def test_relative_chart_returns_canonical_layers_and_metadata():
+def test_relative_chart_returns_canonical_layers_and_metadata() -> None:
     result = calculate_relative_chart_analysis(
         inner_payload=astro_payload(),
         outer_payload={
@@ -404,11 +394,9 @@ def test_relative_chart_returns_canonical_layers_and_metadata():
     assert result["inner_chart"]["chart_profile"]["house_system"] == "whole_sign"
     assert result["outer_chart"]["chart_profile"]["house_system"] == "whole_sign"
     assert result["chart"]["chart_profile"]["house_system"] == "whole_sign"
-    assert result["compatibility"]["element_harmony_score"] >= 0
-    assert result["compatibility"]["element_harmony_score"] <= 100
 
 
-def test_relative_derived_layers_inherit_runtime_precision_from_sources():
+def test_relative_derived_layers_inherit_runtime_precision_from_sources() -> None:
     expected_precision = (
         "ephemeris_runtime_model" if swe is not None else "approximate_orbital_model"
     )
@@ -492,7 +480,7 @@ def test_relative_derived_layers_inherit_runtime_precision_from_sources():
     assert marks_result["chart"]["chart_profile"]["engine_backend"] == expected_backend
 
 
-def test_relative_chart_modern_lowercase_synastry_maps_to_influence_mode():
+def test_relative_chart_modern_lowercase_synastry_maps_to_influence_mode() -> None:
     result = calculate_relative_chart_analysis(
         inner_payload=astro_payload(),
         outer_payload={
@@ -517,7 +505,7 @@ def test_relative_chart_modern_lowercase_synastry_maps_to_influence_mode():
     assert result["outer"]["chart"]["chart_profile"]["chart_type"] == "influence_outer"
 
 
-def test_relative_chart_defaults_to_compare_mode_when_mode_omitted():
+def test_relative_chart_defaults_to_compare_mode_when_mode_omitted() -> None:
     result = calculate_relative_chart_analysis(
         inner_payload=astro_payload(),
         outer_payload={
@@ -537,7 +525,7 @@ def test_relative_chart_defaults_to_compare_mode_when_mode_omitted():
     assert result["relationship_profile"]["primary_layer"] == "directional_synastry"
 
 
-def test_relative_compare_and_composite_modes_expose_different_primary_layers():
+def test_relative_compare_and_composite_modes_expose_different_primary_layers() -> None:
     compare_result = calculate_relative_chart_analysis(
         inner_payload=astro_payload(),
         outer_payload={
@@ -585,7 +573,9 @@ def test_relative_compare_and_composite_modes_expose_different_primary_layers():
     assert composite_result["inner"]["chart"]["planets"]
 
 
-def test_relative_influence_timespace_and_marks_modes_expose_distinct_primary_layers():
+def test_relative_influence_timespace_and_marks_modes_expose_distinct_primary_layers() -> (
+    None
+):
     influence_result = calculate_relative_chart_analysis(
         inner_payload=astro_payload(),
         outer_payload={
@@ -669,7 +659,7 @@ def test_relative_influence_timespace_and_marks_modes_expose_distinct_primary_la
     )
 
 
-def test_relative_hsys_zero_and_eight_drive_supported_offline_house_systems():
+def test_relative_hsys_zero_and_eight_drive_supported_offline_house_systems() -> None:
     whole_sign_result = calculate_relative_chart_analysis(
         inner_payload=astro_payload(),
         outer_payload={
@@ -715,7 +705,7 @@ def test_relative_hsys_zero_and_eight_drive_supported_offline_house_systems():
     )
 
 
-def test_relative_hsys_one_to_seven_are_available_offline():
+def test_relative_hsys_one_to_seven_are_available_offline() -> None:
     expected_house_systems = {
         1: "alcabitus",
         2: "regiomontanus",
@@ -751,7 +741,7 @@ def test_relative_hsys_one_to_seven_are_available_offline():
         assert result["chart"]["houses"]
 
 
-def test_relative_unsupported_hsys_returns_error_payload():
+def test_relative_unsupported_hsys_returns_error_payload() -> None:
     result = calculate_relative_chart_analysis(
         inner_payload=astro_payload(),
         outer_payload={
@@ -775,7 +765,7 @@ def test_relative_unsupported_hsys_returns_error_payload():
     }
 
 
-def test_relative_zodiacal_one_switches_relative_layers_to_sidereal():
+def test_relative_zodiacal_one_switches_relative_layers_to_sidereal() -> None:
     tropical_result = calculate_relative_chart_analysis(
         inner_payload=astro_payload(),
         outer_payload={
@@ -829,7 +819,7 @@ def test_relative_zodiacal_one_switches_relative_layers_to_sidereal():
     )
 
 
-def test_relative_unsupported_zodiacal_returns_error_payload():
+def test_relative_unsupported_zodiacal_returns_error_payload() -> None:
     result = calculate_relative_chart_analysis(
         inner_payload=astro_payload(),
         outer_payload={
@@ -854,7 +844,7 @@ def test_relative_unsupported_zodiacal_returns_error_payload():
     }
 
 
-def test_relative_invalid_mode_returns_structured_validation_error():
+def test_relative_invalid_mode_returns_structured_validation_error() -> None:
     result = calculate_relative_chart_analysis(
         inner_payload=astro_payload(),
         outer_payload={
@@ -878,7 +868,7 @@ def test_relative_invalid_mode_returns_structured_validation_error():
     assert "Composite" in result["error"]
 
 
-def test_offline_angles_match_swisseph_across_charts():
+def test_offline_angles_match_swisseph_across_charts() -> None:
     # The offline _angles fallback (used when swisseph is unavailable) must
     # agree with the swisseph-backed angles, not be 180° / several degrees off.
     from datetime import datetime, timezone
@@ -900,7 +890,7 @@ def test_offline_angles_match_swisseph_across_charts():
             assert diff < 0.05, (key, year, offline[key], truth[key], diff)
 
 
-def test_julian_day_uses_same_proleptic_gregorian_calendar_as_timing():
+def test_julian_day_uses_same_proleptic_gregorian_calendar_as_timing() -> None:
     from datetime import datetime, timezone
 
     swe = pytest.importorskip("swisseph")
@@ -913,7 +903,7 @@ def test_julian_day_uses_same_proleptic_gregorian_calendar_as_timing():
     assert jd_old == pytest.approx(swe.julday(1500, 1, 1, 12.0, swe.GREG_CAL))
 
 
-def test_astro_chart_request_accepts_use_true_solar_time_by_python_name():
+def test_astro_chart_request_accepts_use_true_solar_time_by_python_name() -> None:
     """Canonical snake_case flag controls the clock; retired spelling is rejected."""
     assert (
         AstroChartRequest(
@@ -940,7 +930,7 @@ def test_astro_chart_request_accepts_use_true_solar_time_by_python_name():
     assert caught.value.errors()[0]["type"] == "extra_forbidden"
 
 
-def test_cli_no_true_solar_time_flag_actually_disables_correction():
+def test_cli_no_true_solar_time_flag_actually_disables_correction() -> None:
     """End-to-end CLI dispatch: ``--no-use-true-solar-time`` must leave the
     birth clock untouched (no longitude/equation-of-time rebasing)."""
     pytest.importorskip("swisseph")
@@ -949,7 +939,7 @@ def test_cli_no_true_solar_time_flag_actually_disables_correction():
 
     parser = build_parser()
     base = [
-        "astro_chart",
+        "astrology_chart",
         "--birth-year",
         "1988",
         "--birth-month",
@@ -988,27 +978,13 @@ def test_cli_no_true_solar_time_flag_actually_disables_correction():
     assert default["person_info"]["true_solar"]["applied"] is False
 
 
-def test_relative_requests_default_timezone_to_none_not_utc():
-    """关系/合盘两条入口的 birth_timezone 默认必须是 None，而非硬编码 "UTC"。
+def test_relative_requests_default_timezone_to_none_not_utc() -> None:
+    """关系盘两人的 birth_timezone 缺省时均交由出生地推断。
 
     回归历史 bug：默认 "UTC" 会把东八区等墙钟时间当成 UTC，整盘旋转。改默认
-    为 None 后，引擎走 birth_place 推断时区（与核心 AstroChartRequest 一致），
-    仅在无法识别地名时回退 UTC。
+    为 None 后，引擎走 birth_place 推断时区（与核心 AstroChartRequest 一致）。
     """
-    from fatebridge.core.requests.astrology import (
-        AstroRelativeFlatRequest,
-        AstroRelativePartyRequest,
-    )
-
-    party = AstroRelativePartyRequest(
-        birth_year=1990,
-        birth_month=4,
-        birth_day=6,
-        birth_hour=9,
-        birth_longitude=121.4667,
-        birth_latitude=31.2167,
-    )
-    assert party.birth_timezone is None
+    from fatebridge.core.requests.astrology import AstroRelativeFlatRequest
 
     flat = AstroRelativeFlatRequest(
         inner_birth_year=2000,
@@ -1035,12 +1011,12 @@ def test_relative_requests_default_timezone_to_none_not_utc():
         ("Synastry", (0, 0, 0)),
         ("Composite", (1, 0, 0)),
         ("TimeSpace", (0, 1, 0)),
-        ("Marks", (0, 1, 2)),
+        ("Marks", (0, 0, 2)),
     ],
 )
 def test_relative_chart_computes_only_selected_single_chart(
-    mode, expected_calls, monkeypatch
-):
+    mode: str, expected_calls, monkeypatch: pytest.MonkeyPatch
+) -> None:
     from fatebridge.core.astro import relationship
 
     calls = [0, 0, 0]

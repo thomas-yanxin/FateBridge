@@ -14,18 +14,18 @@ from fatebridge.core.astro import classical
 from fatebridge.core.astro.birth import build_astro_birth_info
 from fatebridge.core.astro.chart import build_core_chart_payload
 from fatebridge.core.astro.earth_attitude import earth_attitude
+from fatebridge.core.astro.rotation_policy import earth_rotation_policy
 from fatebridge.core.astro.solar_events import next_solar_event, solar_observation
 from fatebridge.core.astro.time_scales import ephemeris_time
 from fatebridge.core.astro_models import (
     MODERN_HALF_WINDOW_DAYS,
     MODERN_REFERENCE_JD_TT,
     _fundamental_arguments,
-    earth_rotation_policy,
     iers2010_gast,
     native_rotation_call,
     selected_sidereal_model,
 )
-from tests.western.test_western_accuracy import BIRTH
+from tests.unit_test.fixtures.western_natal import GREENWICH_EQUINOX_BIRTH as BIRTH
 from tests.western.test_western_house_reference import REFERENCE, separation
 
 KERNEL = json.loads(
@@ -36,7 +36,7 @@ KERNEL = json.loads(
 
 
 @pytest.mark.parametrize("case", KERNEL["cases"])
-def test_iers_kernel_against_independent_erfa_with_fixed_common_inputs(case):
+def test_iers_kernel_against_independent_erfa_with_fixed_common_inputs(case) -> None:
     actual = iers2010_gast(
         case["jd_ut1"],
         case["jd_tt"],
@@ -57,7 +57,7 @@ def test_iers_kernel_against_independent_erfa_with_fixed_common_inputs(case):
 
 
 @pytest.mark.parametrize("tt", [2378495.0, 2524595.0])
-def test_standard_to_longterm_boundary_has_no_large_phase_step(tt):
+def test_standard_to_longterm_boundary_has_no_large_phase_step(tt: float) -> None:
     jd = tt
     for _ in range(5):
         jd = tt - runtime.swe.deltat_ex(jd, runtime.swe.FLG_SWIEPH)
@@ -68,7 +68,7 @@ def test_standard_to_longterm_boundary_has_no_large_phase_step(tt):
     assert abs(((b - a + 180) % 360 - 180) - expected) * 3600 < 0.001
 
 
-def test_future_native_houses_match_reference_and_keep_supplied_location():
+def test_future_native_houses_match_reference_and_keep_supplied_location() -> None:
     case = REFERENCE["cases"][-1]
     p = case["input"]
     original = dict(p)
@@ -80,7 +80,9 @@ def test_future_native_houses_match_reference_and_keep_supplied_location():
     assert p == original
 
 
-def test_frame_rotation_uses_only_public_python_interfaces_and_does_not_relocate_input():
+def test_frame_rotation_uses_only_public_python_interfaces_and_does_not_relocate_input() -> (
+    None
+):
     module = ModuleType("windows_shaped_swiss")
     module.FLG_SWIEPH = 2
     module.FLG_SIDEREAL = 65536
@@ -119,7 +121,9 @@ def test_frame_rotation_uses_only_public_python_interfaces_and_does_not_relocate
 
 
 @pytest.mark.parametrize("year", [1, 500, 1000, 1500, 1750, 2300, 3000, 5000, 9999])
-def test_remote_epochs_retain_native_longterm_variation_with_one_constant_phase(year):
+def test_remote_epochs_retain_native_longterm_variation_with_one_constant_phase(
+    year: int,
+) -> None:
     times = ephemeris_time(datetime(year, 6, 21, 6, tzinfo=timezone.utc))
     assert selected_sidereal_model(times.jd_tt) == 4
     offsets = []
@@ -135,7 +139,7 @@ def test_remote_epochs_retain_native_longterm_variation_with_one_constant_phase(
     assert policy["longterm_phase_alignment"]["absolute_accuracy_certified"] is False
 
 
-def test_model_adoption_window_has_explicit_representable_boundaries():
+def test_model_adoption_window_has_explicit_representable_boundaries() -> None:
     lower = MODERN_REFERENCE_JD_TT - MODERN_HALF_WINDOW_DAYS
     upper = MODERN_REFERENCE_JD_TT + MODERN_HALF_WINDOW_DAYS
     assert selected_sidereal_model(lower) == selected_sidereal_model(upper) == 3
@@ -143,7 +147,7 @@ def test_model_adoption_window_has_explicit_representable_boundaries():
     assert selected_sidereal_model(math.nextafter(upper, math.inf)) == 4
 
 
-def test_parallel_native_workers_agree_without_private_model_exports():
+def test_parallel_native_workers_agree_without_private_model_exports() -> None:
     with ThreadPoolExecutor(max_workers=4) as pool:
         values = list(
             pool.map(lambda _: runtime.ephemeris_call("sidtime", 2487969.5), range(12))
@@ -151,7 +155,7 @@ def test_parallel_native_workers_agree_without_private_model_exports():
     assert max(values) == min(values)
 
 
-def test_raw_native_event_call_keeps_its_source_convention():
+def test_raw_native_event_call_keeps_its_source_convention() -> None:
     module = ModuleType("native_event_source")
     count = []
     restored = []
@@ -174,7 +178,9 @@ def test_raw_native_event_call_keeps_its_source_convention():
     assert count == [args] and restored == []
 
 
-def test_approximate_angles_do_not_claim_the_native_rotation_policy(monkeypatch):
+def test_approximate_angles_do_not_claim_the_native_rotation_policy(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     def fail(*args, **kwargs):
         raise RuntimeError("deliberate native failure")
 
@@ -194,7 +200,7 @@ def test_approximate_angles_do_not_claim_the_native_rotation_policy(monkeypatch)
         "2099-09-23T00:00:00+00:00",
     ],
 )
-def test_refracted_sunrise_has_an_adjacent_physical_altitude_bracket(date):
+def test_refracted_sunrise_has_an_adjacent_physical_altitude_bracket(date: str) -> None:
     time = ephemeris_time(datetime.fromisoformat(date))
     event = next_solar_event(
         time.jd_ut1,

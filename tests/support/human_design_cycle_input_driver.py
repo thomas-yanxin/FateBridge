@@ -40,6 +40,8 @@ assert clean["accepted"] == dirty["accepted"], (clean, dirty)
 assert before == after, (before, after)
 if clean["accepted"]:
     assert clean["normalized_request"] == dirty["normalized_request"]
+else:
+    pass
 print(
     json.dumps(
         {

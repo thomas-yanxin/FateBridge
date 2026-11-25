@@ -6,17 +6,59 @@ import json
 from copy import deepcopy
 from functools import lru_cache
 from importlib.resources import files
-from typing import Any
+from typing import TypedDict
+
+
+class SpecialVerse(TypedDict):
+    label: str
+    text: str
+
+
+class LineVerse(SpecialVerse):
+    position: int
+
+
+class HexagramChapter(TypedDict):
+    number: int
+    name: str
+    code: str
+    guaci: str
+    daxiang: str
+    yaoci: list[LineVerse]
+    special: SpecialVerse | None
+    source_url: str
+    source_revision: int
+    source_wikitext_sha256: str
+
+
+class CorpusProvenance(TypedDict):
+    corpus_id: str
+    source_kind: str
+    edition_status: str
+
+
+class ClassicalHexagram(HexagramChapter, CorpusProvenance):
+    pass
+
+
+class ZhouyiCorpus(CorpusProvenance):
+    title: str
+    license: str
+    line_order: str
+    chapters: list[HexagramChapter]
+
+
+MovingTextEvidence = dict[str, str | list[LineVerse] | SpecialVerse | None]
 
 
 @lru_cache(maxsize=1)
-def _corpus() -> dict[str, Any]:
+def _corpus() -> ZhouyiCorpus:
     resource = files("fatebridge.data").joinpath("classical/zhouyi.json")
-    corpus: dict[str, Any] = json.loads(resource.read_text(encoding="utf-8"))
+    corpus: ZhouyiCorpus = json.loads(resource.read_text(encoding="utf-8"))
     return corpus
 
 
-def classical_hexagram(code: str) -> dict[str, Any]:
+def classical_hexagram(code: str) -> ClassicalHexagram:
     """Return a fresh copy; caller mutations cannot alter cached source text."""
     corpus = _corpus()
     for chapter in corpus["chapters"]:
@@ -27,14 +69,21 @@ def classical_hexagram(code: str) -> dict[str, Any]:
                 "edition_status": corpus["edition_status"],
                 **deepcopy(chapter),
             }
+        else:
+            pass
     raise ValueError("周易卦码必须为初爻至上爻的六位 0/1 字符串")
 
 
-def moving_text_evidence(current_code: str, changed_code: str) -> dict[str, Any]:
+def moving_text_evidence(current_code: str, changed_code: str) -> MovingTextEvidence:
+    """Select verses for the changed lines in bottom-to-top order."""
     base = classical_hexagram(current_code)
     changed = classical_hexagram(changed_code)
     positions = [
-        i + 1 for i, (a, b) in enumerate(zip(current_code, changed_code)) if a != b
+        position
+        for position, (current_bit, changed_bit) in enumerate(
+            zip(current_code, changed_code), start=1
+        )
+        if current_bit != changed_bit
     ]
     return {
         "selection_policy": "all_actual_moving_lines_reference_only",

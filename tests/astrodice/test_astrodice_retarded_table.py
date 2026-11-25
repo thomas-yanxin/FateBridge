@@ -52,7 +52,7 @@ def analytic(vx="0.000000000000000", vy="0.000000000000000"):
     return vector, observer
 
 
-def test_stationary_one_au_geometry_has_all_expected_relations():
+def test_stationary_one_au_geometry_has_all_expected_relations() -> None:
     vector, observer = analytic()
     result = compare(vector, observer, "printing_only", PLAN)
     for value in result["checks"].values():
@@ -61,7 +61,7 @@ def test_stationary_one_au_geometry_has_all_expected_relations():
     assert not result["physical_internal_algorithm_or_velocity_derivative_certified"]
 
 
-def test_range_rate_uses_radial_projection_instead_of_total_speed():
+def test_range_rate_uses_radial_projection_instead_of_total_speed() -> None:
     vector, observer = analytic("0.010000000000000", "0.020000000000000")
     result = compare(vector, observer, "printing_only", PLAN)
     assert result["checks"]["vector_RR_matches_state_projection"]
@@ -70,7 +70,7 @@ def test_range_rate_uses_radial_projection_instead_of_total_speed():
     assert lo <= Q(".01") <= hi
 
 
-def test_au_per_day_cannot_be_compared_directly_with_kilometers_per_second():
+def test_au_per_day_cannot_be_compared_directly_with_kilometers_per_second() -> None:
     vector, observer = analytic("0.010000000000000")
     observer["deldot_km_per_second"] = "0.010000000000000"
     result = compare(vector, observer, "printing_only", PLAN)
@@ -79,7 +79,7 @@ def test_au_per_day_cannot_be_compared_directly_with_kilometers_per_second():
     assert result["checks"]["vector_RR_matches_state_projection"]
 
 
-def test_days_and_minutes_are_converted_before_comparing_light_time():
+def test_days_and_minutes_are_converted_before_comparing_light_time() -> None:
     vector, observer = analytic()
     observer["light_time_minutes"] = vector["light_time_days"]
     result = compare(vector, observer, "printing_only", PLAN)
@@ -87,7 +87,7 @@ def test_days_and_minutes_are_converted_before_comparing_light_time():
     assert result["checks"]["vector_LT_matches_norm_over_c"]
 
 
-def test_agreeing_observer_norm_does_not_mask_inconsistent_vector_rg():
+def test_agreeing_observer_norm_does_not_mask_inconsistent_vector_rg() -> None:
     vector, observer = analytic()
     vector["range_AU"] = "2.000000000000000"
     c = compare(vector, observer, "printing_only", PLAN)["checks"]
@@ -97,7 +97,7 @@ def test_agreeing_observer_norm_does_not_mask_inconsistent_vector_rg():
     assert not c["vector_LT_matches_RG_over_c"]
 
 
-def test_zero_length_vector_is_unqualified_instead_of_a_fake_direction():
+def test_zero_length_vector_is_unqualified_instead_of_a_fake_direction() -> None:
     vector, observer = analytic()
     vector["printed_state"][:3] = ["0.000000000000000"] * 3
     with pytest.raises(ValueError, match="Nonpositive"):
@@ -108,8 +108,8 @@ def test_zero_length_vector_is_unqualified_instead_of_a_fake_direction():
     "old,new", [("AU-D", "KM-S"), ("LT CORRECTED", "GEOMETRIC"), ("ICRF", "B1950")]
 )
 def test_actual_table_header_cannot_be_reinterpreted_as_another_unit_or_correction(
-    old, new
-):
+    old: str, new: str
+) -> None:
     plan = json.loads((FIXTURE / "plan-before-queries.json").read_text())
     query = plan["queries"][0]
     payload = json.loads((FIXTURE / "responses/A-LT-TT-JD.raw").read_bytes())
@@ -120,7 +120,9 @@ def test_actual_table_header_cannot_be_reinterpreted_as_another_unit_or_correcti
 
 
 @pytest.mark.parametrize("mutation", ["nonfinite", "missing_row"])
-def test_raw_state_contract_retains_nonfinite_and_missing_row_failures(mutation):
+def test_raw_state_contract_retains_nonfinite_and_missing_row_failures(
+    mutation: str,
+) -> None:
     plan = json.loads((FIXTURE / "plan-before-queries.json").read_text())
     query = plan["queries"][0]
     payload = json.loads((FIXTURE / "responses/A-LT-TT-JD.raw").read_bytes())

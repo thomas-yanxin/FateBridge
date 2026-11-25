@@ -1,13 +1,15 @@
-"""Describe the point actually represented by standard native coordinates.
+"""Describe the reference point of the actual native or bounded source.
 
 Swiss general documentation 2.4 distinguishes planetary system barycenters
 from centers of body. No CENTER_BODY flag is requested by the sky engine.
-The continuous DE441 Pluto source independently identifies that system's
-barycenter. Other approximate or unidentified sources keep their own limits.
+The coherent DE441 fallback retains the planetary-system source points and
+reconstructs the Moon center from EMB, geocentric Moon and EMRAT. Knowing
+these identities does not certify the source representation or optical model.
 """
 
 from typing import Any, Dict, List
 
+from fatebridge.core.astro.de441_source import SOURCE_URL as DE441_SOURCE_URL
 from fatebridge.core.astro.orbits import FALLBACK_MODELS, MEAN_NODE_MODEL, ORBITAL_MODEL
 from fatebridge.core.astro.profiles import ANALYTICAL_MEAN_NODE_MODEL
 
@@ -34,12 +36,12 @@ def ephemeris_reference_points(
             MEAN_NODE_MODEL,
         }:
             key = "theoretical_points"
-        elif model == ORBITAL_MODEL and name == "Pluto":
-            key = "system_barycenters"
-        elif model in FALLBACK_MODELS:
-            key = "approximate_points"
-        elif model not in NATIVE_MODELS:
-            key = "unresolved_points"
+        elif model not in NATIVE_MODELS and model != ORBITAL_MODEL:
+            key = (
+                "approximate_points"
+                if model in FALLBACK_MODELS
+                else "unresolved_points"
+            )
         elif name in BODY_CENTERS:
             key = "body_centers"
         elif name in SYSTEM_BARYCENTERS:
@@ -57,7 +59,7 @@ def ephemeris_reference_points(
             + "；未应用这些行星的本体中心修正。"
         )
     if groups["body_centers"]:
-        notes.append("原生本体中心：" + "、".join(groups["body_centers"]) + "。")
+        notes.append("本体中心：" + "、".join(groups["body_centers"]) + "。")
     if groups["approximate_points"]:
         notes.append(
             "近似参考点："
@@ -67,12 +69,20 @@ def ephemeris_reference_points(
     if groups["unresolved_points"]:
         notes.append("参考点未确认：" + "、".join(groups["unresolved_points"]) + "。")
     return {
-        "policy_id": "fatebridge_ephemeris_reference_points_v1",
+        "policy_id": "fatebridge_ephemeris_reference_points_v2",
         **groups,
         "derived_points": list(derived_points),
         "center_body_correction_applied": False,
         "source_url": "https://www.astro.com/swisseph/swisseph.htm",
         "source_section": "2.4",
+        "additional_source_urls": (
+            [
+                "https://ssd.jpl.nasa.gov/ftp/eph/planets/ascii/ascii_format.txt",
+                DE441_SOURCE_URL,
+            ]
+            if ORBITAL_MODEL in planetary_models.values()
+            else []
+        ),
         "note_zh": "".join(notes),
         "scope": "Geocentric reference-point identity; not absolute accuracy certification. Derived points inherit their source-coordinate limitations.",
     }

@@ -16,8 +16,8 @@ from fatebridge.core.astro.historical_utc import (
     utc1960_table,
 )
 from fatebridge.core.astro.time_scales import datetime_from_tt, ephemeris_time
-from fatebridge.core.human_design import chart_at
-from fatebridge.core.jyotish import positions
+from fatebridge.core.human_design.human_design import chart_at
+from fatebridge.core.jyotish.jyotish import positions
 from scripts.astronomy.build_utc1960_reference import SOURCE_FILES, build
 
 REFERENCE = json.loads(
@@ -26,14 +26,16 @@ REFERENCE = json.loads(
 UTC = timezone.utc
 
 
-def test_reference_generator_refuses_unpinned_source_before_compiling(tmp_path):
+def test_reference_generator_refuses_unpinned_source_before_compiling(
+    tmp_path: Path,
+) -> None:
     for name in SOURCE_FILES:
         (tmp_path / name).write_bytes(b"not the official source")
     with pytest.raises(ValueError, match="pinned official release"):
         build(tmp_path, "compiler-must-not-be-invoked")
 
 
-def test_all_planned_compiled_sofa_epochs_and_offsets():
+def test_all_planned_compiled_sofa_epochs_and_offsets() -> None:
     cases = REFERENCE["cases"]
     assert len(cases) == 233
     assert len({row["utc"] for row in cases}) == 233
@@ -48,14 +50,18 @@ def test_all_planned_compiled_sofa_epochs_and_offsets():
         delta = abs(math.fsum([actual.jd_tt, *(-p for p in row["tt_jd_parts"])]))
         if delta * 86400 > REFERENCE["comparison_tolerance_seconds"]:
             failures.append((row["utc"], delta * 86400))
+        else:
+            pass
         if moment.year < 1972:
             assert historical_tai_minus_utc(moment) == pytest.approx(
                 row["tai_minus_utc_seconds"], abs=1e-10
             ), row["utc"]
+        else:
+            pass
     assert not failures
 
 
-def test_sofa_supplement_does_not_rewrite_the_iers_source():
+def test_sofa_supplement_does_not_rewrite_the_iers_source() -> None:
     assert REFERENCE["historical_coefficients"][1:] == historical_utc_table()["entries"]
     assert len(historical_utc_table()["entries"]) == 13
     assert utc1960_table()["entries"] == REFERENCE["historical_coefficients"][:1]
@@ -63,7 +69,7 @@ def test_sofa_supplement_does_not_rewrite_the_iers_source():
     assert utc1960_table()["source_sha256"] == REFERENCE["source_file_sha256"]["dat.c"]
 
 
-def test_1960_uses_the_full_fractional_day_and_correct_source():
+def test_1960_uses_the_full_fractional_day_and_correct_source() -> None:
     # Independent source-array constants; 1960 Jan 1 is MJD 36934.
     start = datetime(1960, 1, 1, tzinfo=UTC)
     assert historical_tai_minus_utc(start) == pytest.approx(0.943482, abs=1e-10)
@@ -85,7 +91,9 @@ def test_1960_uses_the_full_fractional_day_and_correct_source():
         historical_utc_source(start.replace(tzinfo=None))
 
 
-def test_sofa_epoch_reaches_actual_human_design_calc(monkeypatch):
+def test_sofa_epoch_reaches_actual_human_design_calc(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     # A fixed, independently compiled SOFA monthly clock, not a chart-derived
     # expected longitude. This assertion works with either actual backend.
     row = next(
@@ -99,13 +107,15 @@ def test_sofa_epoch_reaches_actual_human_design_calc(monkeypatch):
     def observe(operation, *args, **kwargs):
         if operation == "calc" and args[1] == runtime.swe.MOON:
             moon_epochs.append(args[0])
+        else:
+            pass
         return original(operation, *args, **kwargs)
 
     monkeypatch.setattr(runtime, "ephemeris_call", observe)
     chart = chart_at(moment)
     # The nominal birth/design pair remains first. Later Moon calls must be
     # exactly the published root-candidate epochs, each observed once.
-    from fatebridge.core.human_design_solar_root_validation import (
+    from fatebridge.core.human_design.human_design_solar_root_validation import (
         verify_solar_root_context,
     )
 
@@ -117,6 +127,8 @@ def test_sofa_epoch_reaches_actual_human_design_calc(monkeypatch):
     family = precision["local_root_family"]
     if family is not None:
         declared.update(r["jd_tt"] for r in family["candidates"])
+    else:
+        pass
     assert len(moon_epochs) == len(declared)
     assert set(moon_epochs) == declared
     assert verify_solar_root_context(chart)["errors"] == []
@@ -125,7 +137,7 @@ def test_sofa_epoch_reaches_actual_human_design_calc(monkeypatch):
     assert chart["time_scales"]["personality"]["method"].startswith("SOFA_1960")
 
 
-def test_shared_jyotish_context_does_not_mislabel_1960_as_ut1_input():
+def test_shared_jyotish_context_does_not_mislabel_1960_as_ut1_input() -> None:
     birth = build_astro_birth_info(
         birth_year=1960,
         birth_month=6,

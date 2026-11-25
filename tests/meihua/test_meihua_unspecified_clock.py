@@ -7,9 +7,10 @@ import pytest
 from fatebridge.application.execution import (
     execute_spec,
 )
-from fatebridge.core import meihua_clock_resolution as policy
+from fatebridge.core.meihua import meihua_clock_resolution as policy
 from fatebridge.services import divination as service
 from fatebridge.services.tool_catalog import CATALOG
+from fatebridge.utils import civil_clock
 from tests.support.meihua_unspecified_clock_reference import load
 
 ROWS = load()
@@ -18,7 +19,7 @@ BAD = [row for row in ROWS if row["previous_false_acceptance"]]
 
 
 @pytest.mark.parametrize("row", ROWS, ids=lambda row: row["case"]["id"])
-def test_all355_frozen_undefined_defined_and_legacy_controls(row):
+def test_all355_frozen_undefined_defined_and_legacy_controls(row) -> None:
     args, case = row["arguments"], row["case"]
     for layer in ["service", "execution"]:
         value = (
@@ -47,12 +48,14 @@ def test_all355_frozen_undefined_defined_and_legacy_controls(row):
                 assert value["issues"] == [
                     {"path": "analysis_timezone", "code": "unresolved_timezone_offset"}
                 ]
+            else:
+                pass
 
 
 @pytest.mark.parametrize("row", BAD, ids=lambda row: row["case"]["id"])
 def test_every_original_false_acceptance_is_stopped_before_calendar_work(
-    row, monkeypatch
-):
+    row, monkeypatch: pytest.MonkeyPatch
+) -> None:
     called = []
 
     def forbidden(*args, **kwargs):
@@ -67,13 +70,14 @@ def test_every_original_false_acceptance_is_stopped_before_calendar_work(
 
 @pytest.mark.parametrize("seconds", [0, 3600, -3600, 68400, -68400])
 def test_placeholder_designation_is_not_verified_by_any_numerical_offset(
-    seconds, monkeypatch
-):
-    fake = datetime(
-        2000, 1, 6, 12, tzinfo=timezone(timedelta(seconds=seconds), name="-00")
-    )
-    monkeypatch.setattr(policy, "resolve_civil_clock", lambda *args: fake)
+    seconds, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    offset = timedelta(seconds=seconds)
+    zone = timezone(offset, name="-00")
+    monkeypatch.setattr(civil_clock, "parse_timezone_name", lambda _, **kwargs: zone)
     with pytest.raises(policy.MeihuaUnspecifiedClockError):
         policy.resolve_meihua_civil_clock(
-            datetime(2000, 1, 6, 12), "synthetic_format_control", "+00:00"
+            datetime(2000, 1, 6, 12),
+            "synthetic_format_control",
+            civil_clock.format_utc_offset(offset),
         )

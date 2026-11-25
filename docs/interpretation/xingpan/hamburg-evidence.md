@@ -1,6 +1,6 @@
 # 汉堡中点与德国盘取证
 
-只在指定德国／汉堡／中点盘及其太阳弧时读取。使用 `astro_germany_chart`；通用 `astro_chart(chart_variant=germany)` 等价，不重复计算两份。全部几何由引擎计算。
+只在指定德国／汉堡／中点盘及其太阳弧时读取。使用 `hamburg_midpoint_chart`；通用 `astrology_chart(chart_variant=germany)` 等价，不重复计算两份。全部几何由引擎计算。
 
 ## 先选本次需要的层
 
@@ -43,6 +43,8 @@
 ## 指定时刻的真太阳弧
 
 `midpoint_analysis.solar_arc_analysis` 仅在传入目标时刻时计算。它选用每 365.25 个 UTC 日历日对应 1 个 TT 星历日的符号钥匙，以实际太阳位移旋转本命因素；核对 `profile.analysis_utc/key_years/solar_arc_degrees/key_policy/sun_ephemeris_models`。不把它改写成固定每年 1°，也不宣称这项钥匙是 Witte 唯一原典约定。
+
+`profile.progressed_julian_day_tt` 是实际推进太阳查询时刻，由保留的出生 TT 和精确日历钥合成。`profile.key_years` 是显示值，日子午和生时样点用各自绑定的太阳观测。 [历元对照](../../precision-acceptance.md#hamburg-progressed-tt-round94)
 
 `directed_factors` 是象征旋转，不是目标时刻天上观测位置。每条联系的 `natal/solar_arc` 标签和 `zero_arc_identity` 保留；同名因素跨层仍需说明其来源。当前限定原文解释为 `Mars.natal+Jupiter.natal-Zeus.natal=Midheaven.solar_arc`，不能把推运 MC 改成本命 MC，也不能将这一时刻扩展为整年或一串未计算日期。
 

@@ -18,7 +18,7 @@ from fatebridge.services.fengshui import (
     calculate_bazhai,
     calculate_xuankong_natal,
 )
-from tests.support.fengshui_transports import mcp_call
+from tests.support.fengshui_transports import SPECS, mcp_call
 from tests.support.mcp_result_assertions import without_transport
 from tests.support.transports import rest_client
 
@@ -114,7 +114,7 @@ def assert_literal_chart(candidate):
 @pytest.mark.parametrize("offset", [-0.3, 0.3])
 def test_all_eight_shared_boundaries_retain_both_house_charts(
     divider, left, right, offset
-):
+) -> None:
     result = assess(**request(divider + offset))
     b, x = result["layers"]["bazhai"], result["layers"]["xuankong_natal"]
     assert b["house"] is None and b["status"] == "partial"
@@ -146,7 +146,7 @@ def test_all_eight_shared_boundaries_retain_both_house_charts(
         assert f"坐卦{trigram}" in result["snapshot_text"]
 
 
-def test_original_counterexample_keeps_the_opposing_house_findings():
+def test_original_counterexample_keeps_the_opposing_house_findings() -> None:
     b = assess(**request())["layers"]["bazhai"]
     findings = {
         f["house_sitting_trigram"]: f
@@ -167,7 +167,7 @@ def test_original_counterexample_keeps_the_opposing_house_findings():
     )
 
 
-def test_a_boundary_that_changes_the_basic_polarity_keeps_both_truth_values():
+def test_a_boundary_that_changes_the_basic_polarity_keeps_both_truth_values() -> None:
     b = assess(**request(angle=22.2))["layers"]["bazhai"]
     findings = {
         f["house_sitting_trigram"]: f
@@ -188,7 +188,7 @@ def test_a_boundary_that_changes_the_basic_polarity_keeps_both_truth_values():
 @pytest.mark.parametrize("divider,left,right", DIVIDERS)
 def test_exact_binary_endpoint_does_not_round_a_narrow_interval_across_a_line(
     divider, left, right
-):
+) -> None:
     angle = math.nextafter(divider, -math.inf)
     ulp = math.ulp(divider)
     single = calculate_bazhai(house=house(angle, ulp / 2))["layers"]["bazhai"]
@@ -217,8 +217,8 @@ def test_exact_binary_endpoint_does_not_round_a_narrow_interval_across_a_line(
     [(359, 24, {"巽", "离", "坤"}), (0, 180, set(TRIGRAMS.values())), (360, 1, {"离"})],
 )
 def test_wrap_and_wide_intervals_cover_all_supported_cells_without_duplicates(
-    angle, radius, expected
-):
+    angle: int, radius: int, expected
+) -> None:
     b = calculate_bazhai(house=house(angle, radius))["layers"]["bazhai"]
     assert {c["sitting_trigram"] for c in b["house_candidates"]} == expected
     assert len(b["house_candidates"]) == len(expected)
@@ -226,7 +226,9 @@ def test_wrap_and_wide_intervals_cover_all_supported_cells_without_duplicates(
         assert_literal_chart(candidate)
 
 
-def test_independently_confirmed_trigram_filters_the_interval_even_opposite_the_nominal_side():
+def test_independently_confirmed_trigram_filters_the_interval_even_opposite_the_nominal_side() -> (
+    None
+):
     inputs = request()
     inputs["house"]["sitting_trigram"] = "兑"
     result = assess(**inputs)
@@ -243,7 +245,7 @@ def test_independently_confirmed_trigram_filters_the_interval_even_opposite_the_
         assess(**inputs)
 
 
-def test_nested_house_is_not_lost_when_bazhai_is_explicitly_requested():
+def test_nested_house_is_not_lost_when_bazhai_is_explicitly_requested() -> None:
     inputs = request()
     inputs["scene"] = "home"
     inputs["xuankong"]["house"] = inputs.pop("house")
@@ -265,12 +267,12 @@ def test_nested_house_is_not_lost_when_bazhai_is_explicitly_requested():
 
 
 @pytest.mark.parametrize("value", [-1, 181, float("inf"), float("nan"), True])
-def test_invalid_shared_radii_are_rejected(value):
+def test_invalid_shared_radii_are_rejected(value) -> None:
     with pytest.raises(ValidationError):
         BazhaiRequest(house=house(radius=value))
 
 
-def test_retired_radius_alias_is_rejected():
+def test_retired_radius_alias_is_rejected() -> None:
     for value in [0, 1, 2]:
         inputs = request()
         inputs["xuankong"]["bearing_uncertainty_degrees"] = value
@@ -278,7 +280,9 @@ def test_retired_radius_alias_is_rejected():
             assess(**inputs)
 
 
-def test_public_schemas_preserve_fields_and_the_required_bearing_and_natal_limit():
+def test_public_schemas_preserve_fields_and_the_required_bearing_and_natal_limit() -> (
+    None
+):
     schema = BazhaiRequest.model_json_schema()
     with pytest.raises(ValidationError):
         BazhaiRequest(house={"bearing_uncertainty_degrees": 1, "sitting_trigram": "坤"})
@@ -301,7 +305,7 @@ def test_public_schemas_preserve_fields_and_the_required_bearing_and_natal_limit
     assert not list(Draft202012Validator(natal).iter_errors({"house": house()}))
 
 
-def test_proposal_keeps_the_same_house_candidates_and_cannot_become_ready():
+def test_proposal_keeps_the_same_house_candidates_and_cannot_become_ready() -> None:
     inputs = request()
     inputs["layout_constraints"] = [
         {"object_id": "bed", "can_relocate": True, "evidence": "合成输入，允许移动"}
@@ -340,17 +344,22 @@ def test_proposal_keeps_the_same_house_candidates_and_cannot_become_ready():
 
 @pytest.mark.parametrize("name", ["bazhai", "assess"])
 def test_new_house_candidates_match_rest_real_mcp_and_cli(
-    monkeypatch, tmp_path, capsys, name
-):
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    name: str,
+) -> None:
     inputs = request()
     if name == "bazhai":
         inputs = {key: inputs[key] for key in ["house", "occupants", "placements"]}
+    else:
+        pass
     original = deepcopy(inputs)
-    response = rest_client(monkeypatch).post("/api/fengshui/" + name, json=inputs)
+    response = rest_client(monkeypatch).post(SPECS[name].rest_path, json=inputs)
     protocol = asyncio.run(mcp_call(name, inputs))
     p = tmp_path / "bearing.json"
     p.write_text(json.dumps(inputs, ensure_ascii=False))
-    code = run(["fengshui_" + name, "--request-file", str(p)])
+    code = run([SPECS[name].tool_name, "--request-file", str(p)])
     cli = json.loads(capsys.readouterr().out)
     assert response.status_code == 200 and not protocol.is_error and code == 0
     assert (
@@ -362,14 +371,14 @@ def test_new_house_candidates_match_rest_real_mcp_and_cli(
     assert len(cli["layers"]["bazhai"]["house_candidates"]) == 2
 
 
-def test_standalone_natal_retains_the_same_measurement_interval():
+def test_standalone_natal_retains_the_same_measurement_interval() -> None:
     result = calculate_xuankong_natal(**request()["xuankong"], house=house())
     layer = result["layers"]["xuankong_natal"]
     assert layer["orientation_context"]["uncertainty_degrees"] == 1
     assert len(layer["candidates"]) > 1
 
 
-def test_point_and_explicit_zero_keep_the_original_float_wire_representation():
+def test_point_and_explicit_zero_keep_the_original_float_wire_representation() -> None:
     period = {
         "basis": "expert_confirmed",
         "period_number": 8,

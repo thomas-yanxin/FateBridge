@@ -1,31 +1,24 @@
-"""
-Su Zhan (宿占) local technique.
-
-Pure relocation from the package facade.
-"""
+"""Build a Su Zhan chart and its source-bound calendrical reading."""
 
 from __future__ import annotations
 
 from typing import Any, Dict, List, Optional
 
-from fatebridge.core.sukuyo import calendar_mansion, day_evidence, rulesets
-from fatebridge.core.suzhan_astronomy import (
+from fatebridge.core.local_techniques.chart import (
+    _build_birth_info,
+    _build_local_chart_response,
+    _normalize_date_text,
+    _normalize_time_text,
+    _su28_position,
+)
+from fatebridge.core.local_techniques.snapshot import join_lines, render_snapshot_text
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence, rulesets
+from fatebridge.core.sukuyo.suzhan_astronomy import (
     METHOD,
     apply_equatorial_mansions,
     build_equatorial_mansions,
 )
 from fatebridge.utils.places import DEFAULT_BIRTH_TIMEZONE
-
-from .chart import (
-    _build_birth_info,
-    _build_local_chart_response,
-    _normalize_date_text,
-    _normalize_mode,
-    _normalize_time_text,
-    _split_degree,
-    _su28_position,
-)
-from .snapshot import join_lines, render_snapshot_text
 
 
 def _build_suzhan_snapshot_text(
@@ -39,12 +32,20 @@ def _build_suzhan_snapshot_text(
     latitude = params.get("birthLatitude")
     if longitude is None:
         longitude = input_normalized.get("gpsLon")
+    else:
+        pass
     if latitude is None:
         latitude = input_normalized.get("gpsLat")
+    else:
+        pass
     if longitude is None:
         longitude = input_normalized.get("lon", "未提供")
+    else:
+        pass
     if latitude is None:
         latitude = input_normalized.get("lat", "未提供")
+    else:
+        pass
     astronomy = response.get("astronomy") or {}
     epoch_text = (
         join_lines(
@@ -76,6 +77,8 @@ def _build_suzhan_snapshot_text(
                 phase["scope"],
             ]
         )
+    else:
+        pass
     prediction_note = (
         "计算结果未建立现实预测效力；未获权威认证。"
         if validation.get("real_world_prediction") == "not_established"
@@ -92,6 +95,8 @@ def _build_suzhan_snapshot_text(
     unassigned = [item for item in objects if item.get("house") is None]
     if unassigned:
         house_groups.append(("参考宫位未定；以下星曜未分配落宫", unassigned))
+    else:
+        pass
     house_lines: List[str] = []
     for heading, in_house in house_groups:
         house_lines.append(heading)
@@ -99,6 +104,8 @@ def _build_suzhan_snapshot_text(
             house_lines.append("星曜：无")
             house_lines.append("")
             continue
+        else:
+            pass
         for item in in_house:
             su28 = str(item.get("su28") or "").strip()
             # A zodiac-sign degree is not a degree within a 360/28 band.
@@ -113,13 +120,17 @@ def _build_suzhan_snapshot_text(
             )
             if su28:
                 # Some real RA mansion bands exceed 30 degrees; do not apply
-                # the zodiac-sign modulo used by _split_degree.
+                # the zodiac-sign modulo.
                 if value is None:
                     raise ValueError("宿位缺少可显示的宿内度数")
+                else:
+                    pass
                 degree = int(float(value))
                 minute = int((float(value) - degree) * 60)
             else:
-                degree, minute = _split_degree(value)
+                sign_degree = float(value) % 30
+                degree = int(sign_degree)
+                minute = int((sign_degree - degree) * 60)
             star_text = f"{degree}˚{su28}{minute}分" if su28 else f"{degree}˚{minute}分"
             house_lines.append(f"星曜：{item.get('id')} {star_text}".strip())
         house_lines.append("")
@@ -211,6 +222,8 @@ def build_suzhan_result(
 ) -> Dict[str, Any]:
     if time is not None and not time.strip():
         raise ValueError("钟时须为已知时间；未知请省略或用null，空字符串不能代替未知。")
+    else:
+        pass
     if time is not None and (
         (gps_lat is None and (lat is None or not str(lat).strip()))
         or (gps_lon is None and (lon is None or not str(lon).strip()))
@@ -218,23 +231,21 @@ def build_suzhan_result(
         raise ValueError(
             "已知钟时的宿占星图须明确完整经纬度；请提供lat/lon或gps_lat/gps_lon，不能使用默认地点。"
         )
+    else:
+        pass
     if mansion_method not in {"equatorial_research28", "legacy_equal28"}:
         raise ValueError("mansion_method仅支持equatorial_research28或legacy_equal28")
-    normalized_szchart = 1 if _normalize_mode(szchart, default=0) else 0
-    normalized_szshape = 1 if _normalize_mode(szshape, default=0) else 0
-    normalized_house_start_mode = (
-        2 if _normalize_mode(house_start_mode, default=1) == 2 else 1
-    )
+    else:
+        pass
+    normalized_szchart = 1 if szchart else 0
+    normalized_szshape = 1 if szshape else 0
+    normalized_house_start_mode = 2 if house_start_mode == 2 else 1
     include_su28 = bool(doubing_su28)
-    normalized_hsys = 8 if hsys is None else int(hsys)
-    normalized_zodiacal = 0 if zodiacal is None else int(zodiacal)
     chart_variant = "guolao_chart" if normalized_szchart else "chart"
-    if (
-        time is not None
-        and normalized_szchart
-        and (normalized_hsys != 8 or normalized_zodiacal != 0)
-    ):
+    if time is not None and normalized_szchart and (hsys != 8 or zodiacal != 0):
         raise ValueError("宿占果老盘模式暂仅支持固定离线宫制 / 黄道语义。")
+    else:
+        pass
     input_normalized = {
         "date": _normalize_date_text(date),
         "time": _normalize_time_text(time) if time is not None else None,
@@ -247,8 +258,8 @@ def build_suzhan_result(
         "szshape": normalized_szshape,
         "houseStartMode": normalized_house_start_mode,
         "doubingSu28": include_su28,
-        "hsys": normalized_hsys,
-        "zodiacal": normalized_zodiacal,
+        "hsys": hsys,
+        "zodiacal": zodiacal,
         "leap_month_policy": leap_month_policy,
         "natal_mansion": natal_mansion,
         "mansion_method": mansion_method,
@@ -260,6 +271,8 @@ def build_suzhan_result(
     }
     if calendar_basis != "chinese_hko_utc08":
         input_normalized["calendar_basis"] = calendar_basis
+    else:
+        pass
     if time is None:
         calendar = calendar_mansion(
             input_normalized["date"],
@@ -328,6 +341,8 @@ def build_suzhan_result(
             "snapshot_text": snapshot,
             "summary": f"历日宿{evidence['day_mansion'] or '未定（见历法档案候选）'}；钟时未知，已交付历法与候选证据，天文宿位及宫位未计算。",
         }
+    else:
+        pass
     response = _build_local_chart_response(
         date_text=input_normalized["date"],
         time_text=input_normalized["time"],
@@ -341,16 +356,16 @@ def build_suzhan_result(
         chart_variant=chart_variant,
         house_start_mode=normalized_house_start_mode,
         shape_mode=normalized_szshape,
-        hsys=normalized_hsys,
-        zodiacal=normalized_zodiacal,
+        hsys=hsys,
+        zodiacal=zodiacal,
         allow_extended_hsys=not bool(normalized_szchart),
         extra_params={
             "szchart": normalized_szchart,
             "szshape": normalized_szshape,
             "houseStartMode": normalized_house_start_mode,
             "doubingSu28": include_su28,
-            "hsys": normalized_hsys,
-            "zodiacal": normalized_zodiacal,
+            "hsys": hsys,
+            "zodiacal": zodiacal,
         },
     )
     chart = response["chart"]
@@ -367,6 +382,8 @@ def build_suzhan_result(
         )
         astronomy = build_equatorial_mansions(birth)
         apply_equatorial_mansions(chart, astronomy)
+    else:
+        pass
     response["sukuyo"] = day_evidence(
         calendar_mansion(
             input_normalized["date"],
@@ -398,6 +415,8 @@ def build_suzhan_result(
     }
     if "validation" in response:
         validation["chart_source"] = response["validation"]
+    else:
+        pass
     if (
         response["params"].get("houseGeometryStatus")
         == "unavailable_selected_reference"
@@ -409,6 +428,8 @@ def build_suzhan_result(
             "house_geometry": "unavailable_selected_reference",
             "planet_positions": "computed",
         }
+    else:
+        pass
     snapshot_text = _build_suzhan_snapshot_text(
         input_normalized,
         {**response, "astronomy": astronomy, "validation": validation},

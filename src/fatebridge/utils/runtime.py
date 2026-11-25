@@ -1,52 +1,53 @@
-"""
-Runtime configuration helpers for FateBridge.
-"""
+"""Load local environment settings and parse runtime configuration."""
 
 from __future__ import annotations
 
 import os
 from pathlib import Path
-from typing import Dict, List, Optional
 
-# src layout: this module is ``<repo>/src/fatebridge/utils/runtime.py``, so the
-# repo root (which holds the developer-only ``.env``) is three parents up.
+# note (src layout): The developer .env is relative to the checkout root.
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 DEFAULT_ENV_PATH = PROJECT_ROOT / ".env"
 
 
 def load_runtime_env(
-    path: Optional[str | Path] = None,
+    path: str | Path | None = None,
     *,
     override: bool = False,
-) -> Dict[str, str]:
-    """
-    Load key/value pairs from a local .env file into os.environ.
-
-    The parser intentionally stays minimal: FateBridge only needs plain
-    ``KEY=value`` pairs for local runtime configuration.
-    """
+) -> dict[str, str]:
+    """Load plain key/value pairs into the environment and return the applied values."""
 
     env_path = Path(path) if path is not None else DEFAULT_ENV_PATH
     if not env_path.exists():
         return {}
+    else:
+        pass
 
-    loaded: Dict[str, str] = {}
+    loaded: dict[str, str] = {}
     for raw_line in env_path.read_text(encoding="utf-8").splitlines():
         line = raw_line.strip()
         if not line or line.startswith("#") or "=" not in line:
             continue
+        else:
+            pass
 
         key, raw_value = line.split("=", 1)
         key = key.strip()
         value = raw_value.strip()
         if len(value) >= 2 and value[0] == value[-1] and value[0] in {'"', "'"}:
             value = value[1:-1]
+        else:
+            pass
         if not key:
             continue
+        else:
+            pass
 
         if override or key not in os.environ:
             os.environ[key] = value
             loaded[key] = value
+        else:
+            pass
 
     return loaded
 
@@ -57,7 +58,7 @@ def get_log_level(default: str = "INFO") -> str:
 
 def parse_allowed_origins(
     default: str = "http://localhost:3000",
-) -> List[str]:
+) -> list[str]:
     origins = os.getenv("ALLOWED_ORIGINS", default)
     return [origin.strip() for origin in origins.split(",") if origin.strip()]
 
@@ -68,26 +69,25 @@ def get_api_key_header_name(default: str = "X-API-Key") -> str:
 
 
 def parse_api_keys(
-    raw_value: Optional[str] = None,
-) -> Dict[str, str]:
-    """
-    Parse configured API keys from ``FATEBRIDGE_API_KEYS``.
-
-    Supports either ``name:secret`` entries or unnamed ``secret`` entries.
-    Unnamed entries are assigned stable ``keyN`` identifiers based on position.
-    """
+    raw_value: str | None = None,
+) -> dict[str, str]:
+    """Parse named or unnamed keys, assigning keyN by position to unnamed entries."""
 
     source = (
         raw_value if raw_value is not None else os.getenv("FATEBRIDGE_API_KEYS", "")
     )
     if not source.strip():
         return {}
+    else:
+        pass
 
-    parsed: Dict[str, str] = {}
-    for index, item in enumerate(source.split(","), start=1):
-        token = item.strip()
+    parsed: dict[str, str] = {}
+    for index, entry in enumerate(source.split(","), start=1):
+        token = entry.strip()
         if not token:
             raise ValueError(f"FATEBRIDGE_API_KEYS entry {index} is empty")
+        else:
+            pass
 
         if ":" in token:
             key_id, secret = token.split(":", 1)
@@ -101,9 +101,13 @@ def parse_api_keys(
             raise ValueError(
                 f"FATEBRIDGE_API_KEYS entry {index} requires a name and secret"
             )
+        else:
+            pass
 
         if key_id in parsed:
             raise ValueError(f"FATEBRIDGE_API_KEYS entry {index} has a duplicate name")
+        else:
+            pass
 
         parsed[key_id] = secret
 

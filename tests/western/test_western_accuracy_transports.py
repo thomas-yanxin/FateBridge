@@ -3,80 +3,16 @@
 import pytest
 from jsonschema import Draft202012Validator
 
-from tests.support.transports import SPECS, business
+from tests.support.transports import SPECS, business, cached_output_validator
 from tests.support.transports import inputs as representative_inputs
 from tests.support.transports import native, rest, surface_calls
-from tests.western.test_western_accuracy import BIRTH
-
-
-@pytest.mark.native_engine_fault
-@pytest.mark.parametrize(
-    "key,variant",
-    [
-        ("astro_chart", "chart"),
-        ("astro_chart", "chart13"),
-        ("astro_chart", "hellen_chart"),
-        ("astro_chart", "india_chart"),
-        ("astro_chart", "germany"),
-        ("astro_chart13", None),
-        ("astro_hellen", None),
-        ("astro_india", None),
-        ("astro_germany", None),
-    ],
-)
-def test_ninth_part_boundary_facts_reach_every_core_chart_route(
-    key, variant, monkeypatch, surface_calls
-):
-    from fatebridge.core.astro import chart
-
-    original_record = chart._build_planet_record
-
-    def record(planet, *args, **kwargs):
-        # Controlled source coordinates isolate partition arithmetic from the
-        # ephemeris. These calls do not certify physical sky positions.
-        if planet in {"Moon", "Saturn"}:
-            kwargs["zodiac_longitude"] = 10.0 if planet == "Moon" else 20.0
-        return original_record(planet, *args, **kwargs)
-
-    monkeypatch.setattr(chart, "_build_planet_record", record)
-    spec = SPECS[key]
-    payload = representative_inputs(spec)
-    if variant is not None:
-        payload["chart_variant"] = variant
-    prefix = "base_chart." if variant == "germany" or key == "astro_germany" else ""
-    fields = [
-        prefix + "planets",
-        prefix + "classical.planets.Moon",
-        prefix + "classical.planets.Saturn",
-    ]
-    http, protocol, code, local = surface_calls(
-        spec,
-        payload,
-        projection={
-            "fields": fields,
-            "strict_fields": True,
-            "include_snapshot_text": False,
-            "response_char_limit": 0,
-        },
-    )
-    assert http.status_code == 200, http.text
-    assert code == 0 and not protocol.is_error
-    outputs = [http.json(), protocol.structured_content, local]
-    assert business(outputs[0]) == business(outputs[1]) == business(outputs[2])
-    for body in outputs:
-        assert not body.get("projection_warnings")
-        chart_body = body["base_chart"] if prefix else body
-        points = {point["id"]: point for point in chart_body["planets"]}
-        assert points["Moon"]["degree_in_sign"] == 10.0
-        assert points["Saturn"]["degree_in_sign"] == 20.0
-        assert chart_body["classical"]["planets"]["Moon"]["ninth_part"] == "Cancer"
-        assert chart_body["classical"]["planets"]["Saturn"]["ninth_part"] == "Libra"
+from tests.unit_test.fixtures.western_natal import GREENWICH_EQUINOX_BIRTH as BIRTH
 
 
 @pytest.mark.parametrize("key", ["astro_chart", "astro_hellen"])
 def test_civil_time_horizon_and_primary_text_facts_across_transports(
-    key, surface_calls
-):
+    key: str, surface_calls
+) -> None:
     spec = SPECS[key]
     payload = {**BIRTH, "hsys": 0}
     response, protocol, code, local = surface_calls(
@@ -89,21 +25,19 @@ def test_civil_time_horizon_and_primary_text_facts_across_transports(
     outputs = [response.json(), local, protocol.structured_content]
     assert business(outputs[0]) == business(outputs[1]) == business(outputs[2])
     for result in outputs:
-        Draft202012Validator(spec.output_model.model_json_schema()).validate(result)
+        cached_output_validator(spec.output_model).validate(result)
         assert result["classical"]["sect"] == "day"
         assert result["chart_profile"]["calendar"] == "proleptic_gregorian"
         assert result["classical"]["ptolemy"]["status"] == "computed_subset"
-        assert result["interpretation_evidence"]["core_identity"]["source_paths"] == [
-            "planets.0"
-        ]
 
 
-def test_new_evidence_supports_strict_projection_on_all_transports(surface_calls):
+def test_new_evidence_supports_strict_projection_on_all_transports(
+    surface_calls,
+) -> None:
     spec = SPECS["astro_hellen"]
     fields = [
         "classical.ptolemy.planets.Sun.triplicity_primary",
         "classical.sect",
-        "interpretation_evidence.core_identity.source_paths",
         "chart_profile.time_scale",
         "classical.syzygy.solver.strictly_before_birth",
         "classical.syzygy.zodiac",
@@ -141,26 +75,23 @@ def test_new_evidence_supports_strict_projection_on_all_transports(surface_calls
         )
 
 
-def test_explanation_references_can_be_checked_against_the_original_receipt(rest):
-    from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
+def test_explanation_references_can_be_checked_against_the_original_receipt(
+    rest,
+) -> None:
+    from validation.claims import CalculationClaim, verify_calculation_claims
 
     result = rest.post(
-        "/api/astro/chart", json=BIRTH, params={"response_char_limit": 0}
+        "/api/astrology/chart", json=BIRTH, params={"response_char_limit": 0}
     ).json()
     metadata = result["run_metadata"]
     claims = []
-    for evidence in result["interpretation_evidence"].values():
-        for path in evidence["source_paths"]:
-            value = result
-            for key in path.split("."):
-                value = value[int(key)] if isinstance(value, list) else value[key]
-            claims.append(
-                CalculationClaim(
-                    path=path,
-                    value=value,
-                    run_id=metadata["run_id"],
-                )
-            )
+    for path, value in (
+        ("angles.ascendant.longitude", result["angles"]["ascendant"]["longitude"]),
+        ("planets.0.longitude", result["planets"][0]["longitude"]),
+    ):
+        claims.append(
+            CalculationClaim(path=path, value=value, run_id=metadata["run_id"])
+        )
     assert (
         verify_calculation_claims(result, claims)["status"]
         == "verified_structured_facts"
@@ -176,7 +107,7 @@ def test_explanation_references_can_be_checked_against_the_original_receipt(rest
     assert verify_calculation_claims(result, claims)["status"] == "rejected"
 
 
-def test_dst_gap_fails_consistently_instead_of_returning_a_chart(surface_calls):
+def test_dst_gap_fails_consistently_instead_of_returning_a_chart(surface_calls) -> None:
     spec = SPECS["astro_chart"]
     payload = {
         **BIRTH,
@@ -192,8 +123,8 @@ def test_dst_gap_fails_consistently_instead_of_returning_a_chart(surface_calls):
 
 @pytest.mark.parametrize("key", ["solarreturn", "lunarreturn", "transit"])
 def test_native_timing_time_scales_and_full_precision_agree_across_surfaces(
-    key, surface_calls
-):
+    key: str, surface_calls
+) -> None:
     from tests.support.transports import AS_OF
 
     spec = SPECS[key]
@@ -225,6 +156,8 @@ def test_native_timing_time_scales_and_full_precision_agree_across_surfaces(
             f"{key}.return_datetime_utc",
             f"{key}.return_datetime",
         ]
+    else:
+        pass
     response, protocol, code, local = surface_calls(
         spec,
         payload,
@@ -255,7 +188,7 @@ def test_native_timing_time_scales_and_full_precision_agree_across_surfaces(
     outputs = [response.json(), local, protocol.structured_content]
     assert business(outputs[0]) == business(outputs[1]) == business(outputs[2])
     for result in outputs:
-        Draft202012Validator(spec.output_model.model_json_schema()).validate(result)
+        cached_output_validator(spec.output_model).validate(result)
         assert not result.get("projection_warnings")
         assert (
             result[key]["calculation_basis"]["future_leap_seconds_assumed_unchanged"]
@@ -270,11 +203,13 @@ def test_native_timing_time_scales_and_full_precision_agree_across_surfaces(
             assert result[key]["solver"]["residual_arcseconds"] < 0.002
             assert result[key]["solver"]["event_not_after_analysis"] is True
             assert result[key]["return_datetime"].endswith("+05:45")
+        else:
+            pass
 
 
 def test_robbins_fortune_formula_and_value_are_projectable_on_all_surfaces(
     surface_calls,
-):
+) -> None:
     spec = SPECS["astro_chart"]
     fields = ["classical.ptolemy.ruleset_id", "classical.ptolemy.lot_of_fortune"]
     response, protocol, code, local = surface_calls(
@@ -296,7 +231,7 @@ def test_robbins_fortune_formula_and_value_are_projectable_on_all_surfaces(
     )
 
 
-def test_published_ptolemy_card_returns_supported_original_text_facts(rest):
+def test_published_ptolemy_card_returns_supported_original_text_facts(rest) -> None:
     from fatebridge.application.examples import evidence_views
 
     spec = SPECS["astro_chart"]
@@ -312,7 +247,7 @@ def test_published_ptolemy_card_returns_supported_original_text_facts(rest):
     assert result["classical"]["ptolemy"]["lot_of_fortune"]["longitude"] >= 0
 
 
-def test_ready_reports_native_predictive_runtime(rest):
+def test_ready_reports_native_predictive_runtime(rest) -> None:
     response = rest.get("/ready")
     assert response.status_code == 200
     check = response.json()["checks"]["western_predictive_runtime"]
@@ -323,8 +258,8 @@ def test_ready_reports_native_predictive_runtime(rest):
 
 @pytest.mark.parametrize("month,day,hour", [(3, 10, 2), (11, 3, 1)])
 def test_invalid_analysis_dst_clock_is_rejected_across_surfaces(
-    month, day, hour, surface_calls
-):
+    month: int, day: int, hour: int, surface_calls
+) -> None:
     spec = SPECS["transit"]
     payload = {
         **BIRTH,
@@ -349,8 +284,8 @@ def test_invalid_analysis_dst_clock_is_rejected_across_surfaces(
 
 @pytest.mark.parametrize("key", ["astro_chart", "astro_hellen"])
 def test_unrounded_facts_and_source_specific_reading_agree_across_surfaces(
-    key, surface_calls
-):
+    key: str, surface_calls
+) -> None:
     import math
 
     spec = SPECS[key]
@@ -362,8 +297,6 @@ def test_unrounded_facts_and_source_specific_reading_agree_across_surfaces(
         "aspects",
         "aspect_evidence",
         "classical.ptolemy",
-        "interpretation",
-        "interpretation_evidence",
     ]
     response, protocol, code, local = surface_calls(
         spec,
@@ -391,7 +324,7 @@ def test_unrounded_facts_and_source_specific_reading_agree_across_surfaces(
         == business(protocol.structured_content)
     )
     for result in [response.json(), local, protocol.structured_content]:
-        Draft202012Validator(spec.output_model.model_json_schema()).validate(result)
+        cached_output_validator(spec.output_model).validate(result)
         assert (
             result["chart_profile"]["coordinate_precision"]
             == "unrounded_computation_and_numeric_output"
@@ -413,17 +346,11 @@ def test_unrounded_facts_and_source_specific_reading_agree_across_surfaces(
             )
             assert aspect["orb"] <= aspect["orb_limit"]
         assert len(result["classical"]["ptolemy"]["sign_relationships"]) == 21
-        assert "original_text_relations" in result["interpretation"]
-        assert (
-            result["interpretation_evidence"]["original_text_relations"]["kind"]
-            == "primary_text_rule_interpretation"
-        )
-        assert "最强主相位" not in result["interpretation"]["aspect_pattern"]
 
 
 def test_invalid_internal_coordinate_is_not_published_through_any_surface(
-    monkeypatch, surface_calls
-):
+    monkeypatch: pytest.MonkeyPatch, surface_calls
+) -> None:
     from dataclasses import replace
 
     import fatebridge.application.execution as execution
@@ -440,6 +367,8 @@ def test_invalid_internal_coordinate_is_not_published_through_any_surface(
                     {},
                 ),
             )
+        else:
+            pass
         return original(actual, request)
 
     monkeypatch.setattr(execution, "execute_spec", invalid_coordinate)
@@ -452,3 +381,32 @@ def test_invalid_internal_coordinate_is_not_published_through_any_surface(
         == protocol.structured_content["error_code"]
         == "internal_error"
     )
+
+
+def test_analysis_clock_retains_unspecified_offset_issue(surface_calls) -> None:
+    payload = {
+        "name": "虚构钟面审计",
+        "birth_year": 1976,
+        "birth_month": 6,
+        "birth_day": 1,
+        "birth_hour": 12,
+        "birth_minute": 0,
+        "birth_timezone": "Antarctica/Vostok",
+        "birth_longitude": 106.84,
+        "birth_latitude": -78.46,
+        "house_system": "W",
+        "analysis_year": 1994,
+        "analysis_month": 1,
+        "analysis_day": 31,
+        "analysis_hour": 20,
+        "analysis_minute": 0,
+    }
+    response, protocol, code, local = surface_calls(
+        SPECS["western_timing_analysis"], payload
+    )
+    assert response.status_code == 422 and protocol.is_error and code == 1
+    for body in (response.json(), protocol.structured_content, local):
+        assert body["error_code"] == "validation_error" and body["retryable"] is False
+        assert body["issues"] == [
+            {"path": "request", "code": "unresolved_timezone_offset"}
+        ]

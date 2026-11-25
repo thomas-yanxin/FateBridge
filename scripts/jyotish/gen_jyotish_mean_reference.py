@@ -88,6 +88,8 @@ def main():
             absolute = kernel[0, bary].compute(jd)
             if centre is not None:
                 absolute = absolute + kernel[bary, centre].compute(jd)
+            else:
+                pass
             geocentric = absolute - earth
             xyz = rotation @ geocentric
             true_points[name] = {
@@ -137,3 +139,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+else:
+    pass

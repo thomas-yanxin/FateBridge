@@ -1,27 +1,26 @@
 """Protocol defaults must not masquerade as supplied birth-record components."""
 
 import asyncio
+from pathlib import Path
 
 import pytest
 
-from tests.bazi.test_bazi_birth_seconds import BASE, SPECS
-from tests.bazi.test_bazi_birth_seconds_transports import leaf, receipt_path
-from tests.support.transports import AS_OF, call_cli, inputs, native
+from tests.support.transports import AS_OF, call_cli, native
 from tests.support.transports import rest as _shared_rest
-
-
-def omitted_payload(spec):
-    result = {**inputs(spec), **BASE}
-    result.pop("birth_minute", None)
-    result.pop("birth_second", None)
-    return result
-
+from tests.unit_test.fixtures.bazi_birth_clock import (
+    SPECS,
+    leaf,
+    omitted_payload,
+    receipt_path,
+)
 
 rest = _shared_rest
 
 
 @pytest.mark.parametrize("spec", SPECS, ids=lambda s: s.key)
-def test_mcp_preserves_omitted_minute_on_every_actual_bazi_and_timing_entry(spec):
+def test_mcp_preserves_omitted_minute_on_every_actual_bazi_and_timing_entry(
+    spec,
+) -> None:
     payload = omitted_payload(spec)
     result = asyncio.run(
         native(
@@ -51,8 +50,13 @@ def test_mcp_preserves_omitted_minute_on_every_actual_bazi_and_timing_entry(spec
     ],
 )
 def test_component_presence_agrees_on_actual_rest_mcp_and_cli(
-    key, components, expected, rest, tmp_path, capsys
-):
+    key: str,
+    components,
+    expected,
+    rest,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     spec = next(s for s in SPECS if s.key == key)
     payload = {**omitted_payload(spec), **components}
     flags = [
@@ -83,6 +87,8 @@ def test_component_presence_agrees_on_actual_rest_mcp_and_cli(
         )
         assert response.status_code == 200
         values.append(leaf(response.json(), receipt_path(spec)))
+    else:
+        pass
     assert all(value == values[0] for value in values)
     assert values[0]["omitted_components"] == expected
 
@@ -91,8 +97,8 @@ def test_component_presence_agrees_on_actual_rest_mcp_and_cli(
     "key", ["analyze_destiny", "bazi_birth", "bazi_career", "dayun_analysis"]
 )
 def test_missing_minute_is_not_filled_before_second_validation(
-    key, rest, tmp_path, capsys
-):
+    key: str, rest, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     spec = next(s for s in SPECS if s.key == key)
     payload = {**omitted_payload(spec), "birth_second": 0}
     result = asyncio.run(native(spec, payload))
@@ -100,3 +106,5 @@ def test_missing_minute_is_not_filled_before_second_validation(
     assert result.is_error and code != 0
     if spec.rest_path:
         assert rest.post(spec.rest_path, json=payload).status_code == 422
+    else:
+        pass

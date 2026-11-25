@@ -20,15 +20,16 @@ from fatebridge.cli import run
 from fatebridge.core.fengshui.geomagnetic import field_zone, geomagnetic_reference
 from fatebridge.core.fengshui.geomagnetic_inputs import GeomagneticReference
 from fatebridge.core.fengshui.models import DirectionsRequest, XuankongRequest
+from fatebridge.core.schema_cache import model_schema
 from fatebridge.mcp_server import app
 from fatebridge.services.fengshui import calculate_directions
-from fatebridge.validation.geomagnetic import audit_noaa_c_vectors, audit_noaa_vectors
 from tests.support.fengshui_transports import mcp_call
 from tests.support.mcp_result_assertions import (
     same_run_projected_response,
     without_transport,
 )
-from tests.support.transports import rest_client
+from tests.support.transports import call_calculation, rest_client
+from validation.geomagnetic import audit_noaa_c_vectors, audit_noaa_vectors
 
 FOLDER = Path(__file__).parents[1] / "data/fengshui_geomagnetic_v1"
 DATA = (
@@ -52,7 +53,9 @@ def calculate(**patch):
     return geomagnetic_reference(GeomagneticReference.model_validate(inputs(**patch)))
 
 
-def test_all_independent_official_vectors_remain_auditable_at_their_literal_precision():
+def test_all_independent_official_vectors_remain_auditable_at_their_literal_precision() -> (
+    None
+):
     small = audit_noaa_vectors(
         (FOLDER / "NOAA_12_test_values.txt").read_text(), layout="published_12"
     )
@@ -69,7 +72,9 @@ def test_all_independent_official_vectors_remain_auditable_at_their_literal_prec
     assert all(r["component"] not in ("d", "i") for r in large["disagreements"])
 
 
-def test_original_noaa_c_constant_discrepancies_and_reference_corruption_guards():
+def test_original_noaa_c_constant_discrepancies_and_reference_corruption_guards() -> (
+    None
+):
     reference = json.loads((FOLDER / "NOAA_C_100_main_field_values.json").read_text())
     raw = (FOLDER / "NOAA_100_test_values.txt").read_text()
     audit = audit_noaa_c_vectors(reference, raw)
@@ -105,8 +110,8 @@ def test_original_noaa_c_constant_discrepancies_and_reference_corruption_guards(
     ],
 )
 def test_primary_report_table3b_main_fields_at_their_printed_precision(
-    source_row, field
-):
+    source_row: int, field: str
+) -> None:
     reference = json.loads(
         (
             Path(__file__).parents[1] / "fixtures/fengshui-wmm2025-report-table3b.json"
@@ -123,12 +128,16 @@ def test_primary_report_table3b_main_fields_at_their_printed_precision(
     assert printed["row"] == source_row
     if printed["unit"] == "rad":
         result = math.radians(result)
+    else:
+        pass
     expected = Decimal(printed["value"])
     half_last_place = Decimal(1).scaleb(expected.as_tuple().exponent) / 2
     assert abs(Decimal.from_float(result) - expected) <= half_last_place
 
 
-def test_all_frozen_wgs84_cohorts_match_independent_rodrigues_binary64_rounding():
+def test_all_frozen_wgs84_cohorts_match_independent_rodrigues_binary64_rounding() -> (
+    None
+):
     reference = json.loads(
         (
             Path(__file__).parents[1] / "fixtures/fengshui-wmm-wgs84-reference-v1.json"
@@ -164,7 +173,7 @@ def test_all_frozen_wgs84_cohorts_match_independent_rodrigues_binary64_rounding(
             )
 
 
-def test_field_arithmetic_does_not_depend_on_process_global_precision():
+def test_field_arithmetic_does_not_depend_on_process_global_precision() -> None:
     expected = calculate()["field"]
     with mp.workdps(7):
         assert calculate()["field"] == expected
@@ -172,7 +181,9 @@ def test_field_arithmetic_does_not_depend_on_process_global_precision():
         assert calculate()["field"] == expected
 
 
-def test_missing_components_and_nonfinite_references_cannot_pass_numeric_acceptance():
+def test_missing_components_and_nonfinite_references_cannot_pass_numeric_acceptance() -> (
+    None
+):
     reference = json.loads((FOLDER / "NOAA_C_100_main_field_values.json").read_text())
     raw = (FOLDER / "NOAA_100_test_values.txt").read_text()
     for value in (float("nan"), float("inf"), True):
@@ -191,7 +202,7 @@ def test_missing_components_and_nonfinite_references_cannot_pass_numeric_accepta
         )
 
 
-def test_oracle_integrity_all_degree_twelve_coefficients_and_no_mutation():
+def test_oracle_integrity_all_degree_twelve_coefficients_and_no_mutation() -> None:
     manifest = json.loads((FOLDER / "provenance.json").read_text())
     for name, digest in manifest["files"].items():
         assert hashlib.sha256((FOLDER / name).read_bytes()).hexdigest() == digest
@@ -200,6 +211,8 @@ def test_oracle_integrity_all_degree_twelve_coefficients_and_no_mutation():
     for line in (FOLDER / "WMM2025.COF").read_text().splitlines()[1:]:
         if line.startswith("9999"):
             break
+        else:
+            pass
         parts = line.split()
         rows.append([int(parts[0]), int(parts[1]), *map(float, parts[2:])])
     assert bundle["coefficients"] == rows
@@ -211,7 +224,9 @@ def test_oracle_integrity_all_degree_twelve_coefficients_and_no_mutation():
     assert "caller mutation" not in calculate()["ruleset"]["source_ids"]
 
 
-def test_oracle_audit_rejects_removed_or_duplicated_reference_rows_and_detects_corruption():
+def test_oracle_audit_rejects_removed_or_duplicated_reference_rows_and_detects_corruption() -> (
+    None
+):
     raw = (FOLDER / "NOAA_12_test_values.txt").read_text()
     rows = [s for s in raw.splitlines() if s and not s.startswith("#")]
     for changed in (rows[:-1], [rows[0]] * 12):
@@ -230,8 +245,8 @@ def test_oracle_audit_rejects_removed_or_duplicated_reference_rows_and_detects_c
 )
 @pytest.mark.parametrize("bearing", [0, 360, 7.5, 359.9])
 def test_signed_conversion_wraps_keeps_raw_bearing_and_never_confirms_a_house(
-    north, longitude, bearing
-):
+    north: str, longitude: int, bearing: float | int
+) -> None:
     kwargs = {"bearing_degrees": bearing, "north_reference": north}
     original = calculate_directions(**kwargs)["layers"]["directions"]
     result = calculate_directions(
@@ -261,8 +276,68 @@ def test_signed_conversion_wraps_keeps_raw_bearing_and_never_confirms_a_house(
     assert "尚未确认现场方向" in result["snapshot_text"]
 
 
+@pytest.mark.parametrize(
+    "north,bearing,direction,trigram,mountain,numerator",
+    [
+        ("magnetic", 21.218517883865147, "N", "坎", "癸", "25332747903959039"),
+        ("true", 158.78148211613484, "SE", "巽", "巳", "177329235327713265"),
+    ],
+)
+def test_heading_conversion_partitions_before_display_rounding(
+    north: str,
+    bearing: float,
+    direction: str,
+    trigram: str,
+    mountain: str,
+    numerator: str,
+) -> None:
+    # The original independent Rodrigues/NOAA80N,0E reference fixes delivered D.
+    # These supplied binary64 headings put the exact sum just below a cell edge.
+    original = calculate_directions(bearing_degrees=bearing, north_reference=north)
+    result = calculate_directions(
+        bearing_degrees=bearing,
+        north_reference=north,
+        geomagnetic_reference=inputs(),
+    )
+    layer = result["layers"]["directions"]
+    geomagnetic = layer["geomagnetic_reference"]
+    conversion = geomagnetic["conversion"]
+    candidate = conversion["candidate"]
+    assert geomagnetic["field"]["declination_degrees_east"].hex() == (
+        "0x1.480f36433543cp+0"
+    )
+    assert layer["bearing"] == original["layers"]["directions"]["bearing"]
+    assert (candidate["direction"], candidate["trigram"], candidate["mountain"]) == (
+        direction,
+        trigram,
+        mountain,
+    )
+    assert candidate["bearing_degrees"] == (22.5 if north == "magnetic" else 157.5)
+    assert conversion["angle_exact"] == {
+        "numerator": numerator,
+        "denominator": "1125899906842624",
+    }
+    assert not conversion["automatically_applied_to_house"]
+
+
+def test_heading_conversion_keeps_wrapped_display_zero() -> None:
+    result = calculate_directions(
+        bearing_degrees=1.2814821161348522,
+        north_reference="true",
+        geomagnetic_reference=inputs(),
+    )
+    conversion = result["layers"]["directions"]["geomagnetic_reference"]["conversion"]
+    candidate = conversion["candidate"]
+    assert candidate["bearing_degrees"] == 0.0
+    assert (candidate["direction"], candidate["mountain"]) == ("N", "子")
+    assert conversion["angle_exact"] == {
+        "numerator": "1621295865853378559",
+        "denominator": "4503599627370496",
+    }
+
+
 @pytest.mark.parametrize("height", [-1, 0, 100, 850])
-def test_explicit_altitude_full_numeric_field_and_no_bearing_invention(height):
+def test_explicit_altitude_full_numeric_field_and_no_bearing_invention(height) -> None:
     r = calculate(height_km_wgs84=height)
     f = r["field"]
     assert f["horizontal_intensity_nt"] ** 2 == pytest.approx(
@@ -288,8 +363,8 @@ def test_explicit_altitude_full_numeric_field_and_no_bearing_invention(height):
     ],
 )
 def test_unusable_heading_keeps_fields_but_blocks_candidate(
-    latitude, longitude, height, reason
-):
+    latitude, longitude, height: int, reason: str
+) -> None:
     req = GeomagneticReference.model_validate(
         inputs(latitude=latitude, longitude=longitude, height_km_wgs84=height)
     )
@@ -301,7 +376,7 @@ def test_unusable_heading_keeps_fields_but_blocks_candidate(
     assert not r["heading_context"]["declination_usable_as_heading_reference"]
 
 
-def test_caution_thresholds_and_unconfirmed_time_space_weather():
+def test_caution_thresholds_and_unconfirmed_time_space_weather() -> None:
     assert [field_zone(h) for h in (1999.99, 2000, 5999.99, 6000)] == [
         "blackout",
         "caution",
@@ -313,7 +388,9 @@ def test_caution_thresholds_and_unconfirmed_time_space_weather():
     assert not r["heading_context"]["space_weather_checked"]
 
 
-def test_leap_year_decimal_reference_uses_actual_days_and_date_has_no_implicit_local_zone():
+def test_leap_year_decimal_reference_uses_actual_days_and_date_has_no_implicit_local_zone() -> (
+    None
+):
     data = inputs()
     data.pop("decimal_year")
     req = GeomagneticReference.model_validate({**data, "model_date": "2028-07-02"})
@@ -347,19 +424,23 @@ def test_leap_year_decimal_reference_uses_actual_days_and_date_has_no_implicit_l
         ({"model_id": "wmm2020_v1"}, None),
     ],
 )
-def test_rejects_ambiguous_or_unsupported_inputs_in_runtime_and_schema(patch, remove):
+def test_rejects_ambiguous_or_unsupported_inputs_in_runtime_and_schema(
+    patch, remove: str | None
+) -> None:
     data = inputs(**patch)
     if remove:
         data.pop(remove)
+    else:
+        pass
     with pytest.raises(ValidationError):
         GeomagneticReference.model_validate(data)
-    schema = GeomagneticReference.model_json_schema()
+    schema = model_schema(GeomagneticReference)
     assert list(
         Draft202012Validator(schema, format_checker=FormatChecker()).iter_errors(data)
     )
 
 
-def test_request_local_model_instances_are_deterministic_under_parallel_load():
+def test_request_local_model_instances_are_deterministic_under_parallel_load() -> None:
     data = [
         inputs(latitude=lat, longitude=lon, decimal_year=year)
         for lat, lon, year in [(80, 0, 2025), (0, 120, 2027.5), (-80, -120, 2029.9)]
@@ -373,7 +454,7 @@ def test_request_local_model_instances_are_deterministic_under_parallel_load():
         assert list(pool.map(field, data)) == serial
 
 
-def test_historical_natal_still_rejects_unconfirmed_true_bearing():
+def test_historical_natal_still_rejects_unconfirmed_true_bearing() -> None:
     with pytest.raises(ValidationError):
         XuankongRequest.model_validate(
             {"house": {"facing_degrees": 180, "north_reference": "true"}}
@@ -385,8 +466,8 @@ def test_historical_natal_still_rejects_unconfirmed_true_bearing():
 
 
 def test_optional_reference_matches_rest_real_mcp_and_cli(
-    monkeypatch, tmp_path, capsys
-):
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     data = {
         "bearing_degrees": 180,
         "north_reference": "true",
@@ -406,7 +487,9 @@ def test_optional_reference_matches_rest_real_mcp_and_cli(
     )
 
 
-def test_real_mcp_projection_keeps_all_conversion_conditions_and_model_provenance():
+def test_real_mcp_projection_keeps_all_conversion_conditions_and_model_provenance() -> (
+    None
+):
     result = asyncio.run(
         mcp_call(
             "directions",
@@ -418,6 +501,7 @@ def test_real_mcp_projection_keeps_all_conversion_conditions_and_model_provenanc
                     "layers.directions.bearing",
                     "layers.directions.geomagnetic_reference",
                     "rulesets",
+                    "source_catalog",
                     "rule_trace",
                 ],
                 "strict_fields": True,
@@ -436,13 +520,14 @@ def test_real_mcp_projection_keeps_all_conversion_conditions_and_model_provenanc
         result.structured_content["rule_trace"][-1]["method"]
         == "geophysical_heading_reference"
     )
-    assert result.structured_content["rulesets"][-1]["sources"][0]["source_id"] == "GM1"
+    assert "GM1" in result.structured_content["source_catalog"]
 
 
-def test_strict_evidence_business_projection_fits_real_default_mcp_budget():
+def test_strict_evidence_business_projection_fits_real_default_mcp_budget() -> None:
     async def invoke():
         async with Client(app) as client:
-            result = await client.call_tool(
+            result = await call_calculation(
+                client,
                 "fengshui_directions",
                 {
                     "bearing_degrees": 0,
@@ -452,6 +537,7 @@ def test_strict_evidence_business_projection_fits_real_default_mcp_budget():
                         "layers.directions.bearing",
                         "layers.directions.geomagnetic_reference",
                         "rulesets",
+                        "source_catalog",
                         "rule_trace",
                     ],
                     "strict_fields": True,
@@ -468,7 +554,7 @@ def test_strict_evidence_business_projection_fits_real_default_mcp_budget():
         ]["north_reference"]
         == "magnetic"
     )
-    assert {source["source_id"] for source in body["rulesets"][-1]["sources"]} == {
+    assert set(body["rulesets"][-1]["source_ids"]) == {
         "GM1",
         "GM2",
         "GM3",
@@ -476,3 +562,4 @@ def test_strict_evidence_business_projection_fits_real_default_mcp_budget():
         "GM6",
         "GM7",
     }
+    assert set(body["rulesets"][-1]["source_ids"]) <= body["source_catalog"].keys()

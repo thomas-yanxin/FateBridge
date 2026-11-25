@@ -3,6 +3,7 @@
 import asyncio
 import json
 import shutil
+from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
@@ -13,27 +14,27 @@ import fatebridge.api as api
 from fatebridge.application.examples import suggested_fields
 from fatebridge.application.projection import project_fields
 from fatebridge.cli import run
+from fatebridge.core.contracts.output_chinese import Taiyi
+from fatebridge.core.contracts.output_taiyi_elemental import TaiyiElementalAssessment
 from fatebridge.core.metaphysics.taiyi_elemental_relations import (
     element_relation,
     elemental_guan_assessment,
     elemental_relations_text,
 )
 from fatebridge.core.metaphysics.taiyi_year import assemble_board, cyclic_core
-from fatebridge.core.output_chinese import Taiyi
-from fatebridge.core.output_taiyi_elemental import TaiyiElementalAssessment
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
 from scripts.taiyi.audit_taiyi_elemental_relations import audit
 from scripts.taiyi.build_taiyi_elemental_relations import CORPUS, source_data
 from tests.support.reference_data import resolve
-from tests.taiyi.test_taiyi_enclosures import transport_payload
-from tests.taiyi.test_taiyi_transports import _same_run_payload
+from tests.support.transports import SPECS, call_calculation
+from tests.unit_test.fixtures.taiyi import same_run_payload, transport_payload
 
 DATA = source_data()
 
 
 @pytest.mark.parametrize("case", DATA["worked_examples"], ids=lambda c: c["id"])
-def test_all_literal_cases_use_context_roles_and_preserve_source_outcomes(case):
+def test_all_literal_cases_use_context_roles_and_preserve_source_outcomes(case) -> None:
     core = {
         "wenchang_palace": case["main"]["position"],
         "shiji": case["guest"]["position"],
@@ -51,10 +52,12 @@ def test_all_literal_cases_use_context_roles_and_preserve_source_outcomes(case):
             case["main"]["source_label"] == "地目"
             and case["guest"]["source_label"] == "天目"
         )
+    else:
+        pass
     assert "十六神" in a["method_scope"] and "日柱纳音" in a["method_scope"]
 
 
-def test_all_25_handwritten_relations_and_four_examples_keep_separate_counts():
+def test_all_25_handwritten_relations_and_four_examples_keep_separate_counts() -> None:
     r = audit()
     assert r["source_spirit_elements"] == 16
     assert r["literal_examples"] == 4 and r["literal_source_fields"] == 20
@@ -67,7 +70,9 @@ def test_all_25_handwritten_relations_and_four_examples_keep_separate_counts():
     )
 
 
-def test_all_256_positions_compare_the_actual_elements_and_keep_spatial_separate():
+def test_all_256_positions_compare_the_actual_elements_and_keep_spatial_separate() -> (
+    None
+):
     counts = {}
     for m in DATA["spirit_elements"]:
         for g in DATA["spirit_elements"]:
@@ -89,7 +94,7 @@ def test_all_256_positions_compare_the_actual_elements_and_keep_spatial_separate
 
 
 @pytest.mark.parametrize("mode", [None, "year", "month", "day", "hour"])
-def test_daily_usage_never_becomes_whole_method_acceptance(mode):
+def test_daily_usage_never_becomes_whole_method_acceptance(mode: str | None) -> None:
     a = elemental_guan_assessment(
         {"wenchang_palace": "卯", "shiji": "酉"}, calculation_mode=mode
     )
@@ -106,6 +111,8 @@ def test_daily_usage_never_becomes_whole_method_acceptance(mode):
     assert a["source_interpretation"]["overall_outcome_assessed"] is False
     if mode != "day":
         assert "本次不是已确认采用该日计方法" in elemental_relations_text(a)
+    else:
+        pass
 
 
 @pytest.mark.parametrize(
@@ -117,13 +124,13 @@ def test_daily_usage_never_becomes_whole_method_acceptance(mode):
         {"wenchang_palace": True, "shiji": "酉"},
     ],
 )
-def test_missing_positions_stay_unknown(core):
+def test_missing_positions_stay_unknown(core) -> None:
     a = elemental_guan_assessment(core)
     assert a["status"] == "not_assessed" and not a["eyes"] and "relation" not in a
     assert "不猜" in elemental_relations_text(a)
 
 
-def test_each_actual_eye_and_legacy_pattern_path_resolves_on_all_144_boards():
+def test_each_actual_eye_and_legacy_pattern_path_resolves_on_all_144_boards() -> None:
     for yin in [False, True]:
         for ju in range(1, 73):
             c = cyclic_core(ju, yin=yin)
@@ -136,7 +143,7 @@ def test_each_actual_eye_and_legacy_pattern_path_resolves_on_all_144_boards():
                 assert resolve(b, path)["name"] == "关"
 
 
-def test_partial_projection_and_strict_claim_booleans():
+def test_partial_projection_and_strict_claim_booleans() -> None:
     a = {
         "taiyi": {
             "elemental_guan_assessment": elemental_guan_assessment(
@@ -178,7 +185,9 @@ def test_partial_projection_and_strict_claim_booleans():
         "gujin477-page74.jpg",
     ],
 )
-def test_frozen_source_and_expectations_cannot_be_removed(tmp_path, name):
+def test_frozen_source_and_expectations_cannot_be_removed(
+    tmp_path: Path, name: str
+) -> None:
     d = tmp_path / "corpus"
     shutil.copytree(CORPUS, d)
     (d / name).write_bytes(b"changed")
@@ -188,7 +197,12 @@ def test_frozen_source_and_expectations_cannot_be_removed(tmp_path, name):
 
 @pytest.mark.parametrize("key", ["taiyi", "sanshiunited"])
 @pytest.mark.parametrize("mode", ["year", "month", "day", "hour"])
-def test_real_rest_mcp_cli_and_new_first_views(key, mode, capsys, monkeypatch):
+def test_real_rest_mcp_cli_and_new_first_views(
+    key: str,
+    mode: str,
+    capsys: pytest.CaptureFixture[str],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     spec = next(s for s in CATALOG if s.key == key)
     payload = transport_payload(key, 2026)
     if key == "taiyi":
@@ -215,13 +229,21 @@ def test_real_rest_mcp_cli_and_new_first_views(key, mode, capsys, monkeypatch):
     assert response.status_code == 200, response.text
     expected = response.json()["taiyi"]["elemental_guan_assessment"]
     assert expected["calculation_mode"] == mode
-    args = [key, "--strict-fields", "--no-use-true-solar-time", "--fields", *fields]
+    args = [
+        SPECS[key].tool_name,
+        "--strict-fields",
+        "--no-use-true-solar-time",
+        "--fields",
+        *fields,
+    ]
     for name, value in payload.items():
         if name != "use_true_solar_time":
             args += [
                 "--" + name.replace("_", "-"),
                 json.dumps(value) if isinstance(value, dict) else str(value),
             ]
+        else:
+            pass
     assert run(args) == 0
     assert (
         json.loads(capsys.readouterr().out)["taiyi"]["elemental_guan_assessment"]
@@ -230,7 +252,8 @@ def test_real_rest_mcp_cli_and_new_first_views(key, mode, capsys, monkeypatch):
 
     async def call():
         async with Client(create_mcp_app()) as c:
-            r = await c.call_tool(
+            r = await call_calculation(
+                c,
                 spec.tool_name,
                 {
                     **payload,
@@ -248,7 +271,8 @@ def test_real_rest_mcp_cli_and_new_first_views(key, mode, capsys, monkeypatch):
             view = (
                 "elemental_relations" if key == "taiyi" else "taiyi_elemental_relations"
             )
-            r = await c.call_tool(
+            r = await call_calculation(
+                c,
                 spec.tool_name,
                 {
                     **payload,
@@ -257,6 +281,6 @@ def test_real_rest_mcp_cli_and_new_first_views(key, mode, capsys, monkeypatch):
                     "include_snapshot_text": False,
                 },
             )
-            await _same_run_payload(c, r, require_business_inline=True)
+            await same_run_payload(c, r, require_business_inline=True)
 
     asyncio.run(call())

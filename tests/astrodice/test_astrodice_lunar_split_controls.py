@@ -7,7 +7,7 @@ import pytest
 
 from scripts.astrodice.astrodice_lunar_split import K, apparent
 from scripts.astrodice.verify_astrodice_lunar_split import model
-from tests.astrodice.test_astrodice_lunar_split import (
+from tests.unit_test.fixtures.astrodice_analytic import (
     CENTER,
     RADIUS,
     DirectLinearSource,
@@ -28,6 +28,8 @@ class AcceleratingDirect(DirectLinearSource):
         earth = [V * x + a * x * x / 2, zero, zero, V + a * x, zero, zero]
         if body == "Earth":
             return earth
+        else:
+            pass
         assert body == "Moon"
         return [u + v for u, v in zip(earth, self.group(t, 9))]
 
@@ -49,6 +51,8 @@ class AcceleratingPower(PowerLinearSource):
         ]
         if body == "Earth":
             return earth
+        else:
+            pass
         assert body == "Moon"
         return [x + y for x, y in zip(earth, self.group_derivatives(t, 9))]
 
@@ -83,7 +87,7 @@ def analytic(offset, acceleration):
 @pytest.mark.parametrize("acceleration", [Q(0), Q(1, 1000)])
 def test_full_clock_and_beta_derivatives_match_the_analytic_differential(
     offset, acceleration
-):
+) -> None:
     a = apparent(AcceleratingDirect(acceleration), CENTER + offset, derivative=True)
     b = model(
         AcceleratingPower(acceleration), CENTER + offset, "continuous_split", True

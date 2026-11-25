@@ -10,7 +10,7 @@ from scripts.sukuyo.audit_sukuyo_t2465_primary import SATQuotationParser, verify
 ROOT = Path(__file__).resolve().parents[2]
 
 
-def test_offline_quotation_check_does_not_claim_full_response_rechecked():
+def test_offline_quotation_check_does_not_claim_full_response_rechecked() -> None:
     result = verify_primary()
     assert result["selected_quotation_lines_checked"] == 15
     assert len(result["calendar_apparatus"]) == 5
@@ -29,7 +29,9 @@ def test_offline_quotation_check_does_not_claim_full_response_rechecked():
     ]
 
 
-def test_delivered_active_edition_matches_frozen_quotations_and_original_apparatus():
+def test_delivered_active_edition_matches_frozen_quotations_and_original_apparatus() -> (
+    None
+):
     source = json.loads(
         (ROOT / "src/fatebridge/data/sukuyo_t1299_calendar_profiles.json").read_bytes()
     )["hinoo_addendum"]
@@ -59,14 +61,16 @@ def test_delivered_active_edition_matches_frozen_quotations_and_original_apparat
     assert source["cached_primary_excerpt"] == retained
 
 
-def test_wrong_or_truncated_full_response_is_rejected(tmp_path):
+def test_wrong_or_truncated_full_response_is_rejected(tmp_path: Path) -> None:
     path = tmp_path / "primary.html"
     path.write_text("<a name='0030c23'>半已上</a>")
     with pytest.raises(ValueError, match="fingerprint changed"):
         verify_primary(path)
 
 
-def test_footnote_button_numbers_are_not_primary_characters_and_duplicates_fail():
+def test_footnote_button_numbers_are_not_primary_characters_and_duplicates_fail() -> (
+    None
+):
     parser = SATQuotationParser()
     parser.feed(
         '<a name="0030c23">初一日<button title="半＋（也）＜甲＞">34</button>半已上者</a>'

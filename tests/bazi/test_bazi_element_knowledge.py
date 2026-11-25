@@ -27,7 +27,9 @@ def frozen(name):
     return read(path)
 
 
-def test_exact_revision_capture_preserves_complete_source_units_and_taxonomies():
+def test_exact_revision_capture_preserves_complete_source_units_and_taxonomies() -> (
+    None
+):
     claims = frozen("source-claims.json")
     capture = FIXTURE / "sources/revision-capture.json"
     assert digest(capture) == claims["capture_sha256"]
@@ -75,7 +77,9 @@ def test_exact_revision_capture_preserves_complete_source_units_and_taxonomies()
 
 
 @pytest.mark.parametrize("key", KEYS)
-def test_published_card_attributes_each_field_and_exposes_sources_in_first_view(key):
+def test_published_card_attributes_each_field_and_exposes_sources_in_first_view(
+    key,
+) -> None:
     claims = frozen("source-claims.json")
     row = next(r for r in claims["rows"] if r["element"] == key)
     result = calculate_knowledge_read(domain="bazi", category="elements", key=key)

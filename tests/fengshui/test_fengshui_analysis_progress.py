@@ -3,6 +3,7 @@
 import asyncio
 import json
 from copy import deepcopy
+from pathlib import Path
 
 import pytest
 from fastmcp import Client
@@ -14,15 +15,17 @@ from fatebridge.core.fengshui.models import AssessRequest
 from fatebridge.core.fengshui.output import FengshuiOutput
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.fengshui import assess
-from tests.fengshui.test_fengshui_layout import facing_only
-from tests.fengshui.test_fengshui_supplements import (
+from tests.support.mcp_result_assertions import without_transport
+from tests.support.transports import call_calculation, rest_client
+from tests.unit_test.fixtures.fengshui_layout import (
     adjustment_inputs,
     annual_inputs,
+    facing_only,
     form_inputs,
+    material_request,
+    relation_candidate,
+    surface_input,
 )
-from tests.fengshui.test_fengshui_surfaces_authored import surface_input
-from tests.support.mcp_result_assertions import without_transport
-from tests.support.transports import rest_client
 
 
 def progress(inputs):
@@ -39,7 +42,9 @@ def progress(inputs):
         (adjustment_inputs(), "layout_analysis.element_remedies"),
     ],
 )
-def test_remedy_confirmation_identifies_its_actual_branch_and_action(inputs, branch):
+def test_remedy_confirmation_identifies_its_actual_branch_and_action(
+    inputs, branch: str
+) -> None:
     result, review = progress(inputs)
     layout = result["layout_analysis"]
     remedies = (
@@ -61,8 +66,8 @@ def test_remedy_confirmation_identifies_its_actual_branch_and_action(inputs, bra
 
 @pytest.mark.parametrize("purpose", ["bed", "stove"])
 def test_surface_and_form_identity_rejects_incompatible_purpose_without_placements(
-    purpose,
-):
+    purpose: str,
+) -> None:
     inputs = surface_input()
     inputs["form_observations"] = form_inputs(purpose=purpose)["form_observations"]
     inputs["form_observations"][0]["object_id"] = "work-surface"
@@ -73,7 +78,7 @@ def test_surface_and_form_identity_rejects_incompatible_purpose_without_placemen
     AssessRequest.model_validate(inputs)
 
 
-def test_same_desk_identity_is_valid_for_independent_surface_and_form():
+def test_same_desk_identity_is_valid_for_independent_surface_and_form() -> None:
     inputs = surface_input()
     inputs["form_observations"] = form_inputs()["form_observations"]
     inputs["form_observations"][0]["object_id"] = "work-surface"
@@ -87,7 +92,7 @@ def test_same_desk_identity_is_valid_for_independent_surface_and_form():
     assert len(result["rulesets"]) == len(result["rule_trace"]) == 2
 
 
-def test_calculation_can_finish_before_action_permission_and_space_are_known():
+def test_calculation_can_finish_before_action_permission_and_space_are_known() -> None:
     inputs = surface_input(healthy=True)
     constraints = inputs["surface_constraints"][0]
     del constraints["can_move_items"]
@@ -110,7 +115,9 @@ def test_calculation_can_finish_before_action_permission_and_space_are_known():
     )
 
 
-def test_confirmed_no_rule_item_finishes_review_without_changing_legacy_partial():
+def test_confirmed_no_rule_item_finishes_review_without_changing_legacy_partial() -> (
+    None
+):
     inputs = surface_input()
     inputs["surface_layouts"][0]["items"][0].update(
         representation="other", label="手机", evidence="已确认普通手机，无作者代表属性"
@@ -136,7 +143,9 @@ def test_confirmed_no_rule_item_finishes_review_without_changing_legacy_partial(
 
 
 @pytest.mark.parametrize("basis", ["user_confirmed", "image_observed"])
-def test_one_known_form_fact_can_be_explained_before_other_checks_and_actions(basis):
+def test_one_known_form_fact_can_be_explained_before_other_checks_and_actions(
+    basis: str,
+) -> None:
     inputs = form_inputs()
     inputs["form_observations"] = [
         {
@@ -169,7 +178,9 @@ def test_one_known_form_fact_can_be_explained_before_other_checks_and_actions(ba
     assert check["action_status"] != "ready"
 
 
-def test_unknown_checks_without_an_observed_predicate_do_not_create_a_judgment():
+def test_unknown_checks_without_an_observed_predicate_do_not_create_a_judgment() -> (
+    None
+):
     inputs = form_inputs()
     inputs["form_observations"] = [
         {
@@ -185,8 +196,7 @@ def test_unknown_checks_without_an_observed_predicate_do_not_create_a_judgment()
     assert not review["assessment_complete"]
 
 
-def test_optional_candidate_geometry_does_not_reopen_current_explanation():
-    from tests.fengshui.test_fengshui_sourced_contracts import relation_candidate
+def test_optional_candidate_geometry_does_not_reopen_current_explanation() -> None:
 
     inputs = relation_candidate()
     del inputs["layout_alternatives"][0]["physically_feasible"]
@@ -198,7 +208,7 @@ def test_optional_candidate_geometry_does_not_reopen_current_explanation():
     )
 
 
-def test_complete_annual_reference_can_be_explained_without_object_sectors():
+def test_complete_annual_reference_can_be_explained_without_object_sectors() -> None:
     result, review = progress(
         {"methods": ["annual_stars"], "effective_year": 2026, "analyze_layout": True}
     )
@@ -208,7 +218,7 @@ def test_complete_annual_reference_can_be_explained_without_object_sectors():
     assert result["layers"]["annual_stars"]["palaces"]
 
 
-def test_limited_implementation_without_chart_facts_still_needs_evidence():
+def test_limited_implementation_without_chart_facts_still_needs_evidence() -> None:
     _, review = progress(
         {
             "methods": ["xuankong_natal"],
@@ -220,8 +230,7 @@ def test_limited_implementation_without_chart_facts_still_needs_evidence():
     assert review["follow_up"]["conclusion_candidates"]
 
 
-def test_known_material_reference_survives_an_unrelated_unknown_attribute():
-    from tests.fengshui.test_fengshui_material_facts import material_request
+def test_known_material_reference_survives_an_unrelated_unknown_attribute() -> None:
 
     inputs = material_request(shape="round")
     inputs["environmental_context"]["material_facts"].append(
@@ -239,7 +248,9 @@ def test_known_material_reference_survives_an_unrelated_unknown_attribute():
 
 
 @pytest.mark.parametrize("representation", ["unknown", "other", "living_plant"])
-def test_photo_or_unknown_representation_is_not_confirmed_unsupported(representation):
+def test_photo_or_unknown_representation_is_not_confirmed_unsupported(
+    representation: str,
+) -> None:
     inputs = surface_input()
     inputs["surface_layouts"][0]["items"][0].update(
         representation=representation, observation_basis="image_observed"
@@ -257,7 +268,9 @@ def test_photo_or_unknown_representation_is_not_confirmed_unsupported(representa
     )
 
 
-def test_user_uncertain_representation_has_a_machine_readable_confirmation_reason():
+def test_user_uncertain_representation_has_a_machine_readable_confirmation_reason() -> (
+    None
+):
     inputs = surface_input()
     inputs["surface_layouts"][0]["items"][0]["representation"] = "unknown"
     _, review = progress(inputs)
@@ -266,7 +279,7 @@ def test_user_uncertain_representation_has_a_machine_readable_confirmation_reaso
     assert review["pending_confirmations"][0]["reason"] == "confirm_item_representation"
 
 
-def test_action_states_follow_permission_without_changing_calculated_rule():
+def test_action_states_follow_permission_without_changing_calculated_rule() -> None:
     inputs = surface_input(healthy=True)
     ready, ready_progress = progress(inputs)
     constraints = inputs["surface_constraints"][0]
@@ -295,7 +308,7 @@ def test_action_states_follow_permission_without_changing_calculated_rule():
     )
 
 
-def test_retention_does_not_ask_for_movement_permission():
+def test_retention_does_not_ask_for_movement_permission() -> None:
     inputs = surface_input(zone="far_left", healthy=True)
     inputs["surface_constraints"] = []
     result, review = progress(inputs)
@@ -308,7 +321,9 @@ def test_retention_does_not_ask_for_movement_permission():
     }
 
 
-def test_optional_representation_does_not_turn_into_a_required_assessment_task():
+def test_optional_representation_does_not_turn_into_a_required_assessment_task() -> (
+    None
+):
     inputs = surface_input(goal="career", healthy=True)
     del inputs["surface_constraints"][0]["can_add_items"]
     _, review = progress(inputs)
@@ -327,7 +342,9 @@ def test_optional_representation_does_not_turn_into_a_required_assessment_task()
     )
 
 
-def test_empty_confirmed_surface_has_optional_actions_and_no_missing_existing_item():
+def test_empty_confirmed_surface_has_optional_actions_and_no_missing_existing_item() -> (
+    None
+):
     inputs = surface_input()
     inputs["surface_layouts"][0]["items"] = []
     inputs["surface_constraints"] = []
@@ -344,7 +361,7 @@ def test_empty_confirmed_surface_has_optional_actions_and_no_missing_existing_it
     )
 
 
-def test_form_mirror_remains_conditional_then_closes_when_view_is_confirmed():
+def test_form_mirror_remains_conditional_then_closes_when_view_is_confirmed() -> None:
     inputs = form_inputs(entrance_visible=False)
     result, review = progress(inputs)
     assert review["calculation_status"] == "complete" and review["assessment_complete"]
@@ -368,7 +385,7 @@ def test_form_mirror_remains_conditional_then_closes_when_view_is_confirmed():
     assert review["pending_confirmations"] == []
 
 
-def test_direction_candidates_never_certify_relocation_feasibility():
+def test_direction_candidates_never_certify_relocation_feasibility() -> None:
     result, review = progress(facing_only())
     assert review["action_counts"]["ready"] == 0
     assert review["action_counts"]["conditional"] == 1
@@ -384,7 +401,7 @@ def test_direction_candidates_never_certify_relocation_feasibility():
     )
 
 
-def test_missing_form_facts_do_not_claim_no_action_needed():
+def test_missing_form_facts_do_not_claim_no_action_needed() -> None:
     inputs = form_inputs()
     observation = inputs["form_observations"][0]
     for key in ["entrance_visible", "entrance_direct_line", "solid_backing"]:
@@ -397,7 +414,9 @@ def test_missing_form_facts_do_not_claim_no_action_needed():
     )
 
 
-def test_unsupported_authored_year_closes_known_scope_without_an_action_verdict():
+def test_unsupported_authored_year_closes_known_scope_without_an_action_verdict() -> (
+    None
+):
     inputs = {
         "methods": ["annual_stars"],
         "effective_year": 2027,
@@ -419,8 +438,11 @@ def test_unsupported_authored_year_closes_known_scope_without_an_action_verdict(
     "state", ["ready", "conditional", "blocked", "unsupported", "photo", "unknown"]
 )
 def test_coverage_projection_preserves_review_and_action_states_on_all_transports(
-    monkeypatch, tmp_path, capsys, state
-):
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    state: str,
+) -> None:
     inputs = surface_input()
     if state == "conditional":
         del inputs["surface_constraints"][0]["feasible_zones"]
@@ -445,6 +467,8 @@ def test_coverage_projection_preserves_review_and_action_states_on_all_transport
         ]
     elif state == "unknown":
         inputs["surface_layouts"][0]["items"][0]["representation"] = "unknown"
+    else:
+        pass
     expected = assess(**deepcopy(inputs))["coverage"]["analysis_progress"]
     assert expected["interpretation_status"] == {
         "unsupported": "scope_only",
@@ -460,8 +484,8 @@ def test_coverage_projection_preserves_review_and_action_states_on_all_transport
 
     async def call():
         async with Client(create_mcp_app()) as client:
-            return await client.call_tool(
-                "fengshui_assess", {**inputs, **controls}, raise_on_error=False
+            return await call_calculation(
+                client, "fengshui_assess", {**inputs, **controls}, raise_on_error=False
             )
 
     response = rest_client(monkeypatch).post(
@@ -502,16 +526,16 @@ def test_coverage_projection_preserves_review_and_action_states_on_all_transport
 
 
 def test_object_purpose_conflict_is_rejected_on_rest_mcp_cli(
-    monkeypatch, tmp_path, capsys
-):
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     inputs = surface_input()
     inputs["form_observations"] = form_inputs(purpose="stove")["form_observations"]
     inputs["form_observations"][0]["object_id"] = "work-surface"
 
     async def call():
         async with Client(create_mcp_app()) as client:
-            return await client.call_tool(
-                "fengshui_assess", inputs, raise_on_error=False
+            return await call_calculation(
+                client, "fengshui_assess", inputs, raise_on_error=False
             )
 
     response = rest_client(monkeypatch).post("/api/fengshui/assess", json=inputs)
@@ -525,4 +549,10 @@ def test_object_purpose_conflict_is_rejected_on_rest_mcp_cli(
     assert code != 0
     for result in [response.json(), protocol.structured_content, cli]:
         assert result["error_code"] == "validation_error"
-        assert {"path": "request", "code": "value_error"} in result["issues"]
+        assert any(
+            issue["path"] == "request"
+            and issue["code"] == "value_error"
+            and issue["message"]
+            == "同一对象的桌面与形态用途不一致；桌面作者规则只能用于书桌"
+            for issue in result["issues"]
+        )

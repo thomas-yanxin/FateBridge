@@ -1,20 +1,30 @@
 """Audit a frozen weather study; keep each evidence check and its gate separate."""
 
+import sys as _sys
+from pathlib import Path as _Path
+
+_VAL_REPO_ROOT = _Path(__file__).resolve().parents[2]
+if str(_VAL_REPO_ROOT) not in _sys.path:
+    _sys.path.insert(0, str(_VAL_REPO_ROOT))
+else:
+    pass
+
+
 import argparse
 import json
 import sys
 from pathlib import Path
 
-from fatebridge.validation.meihua_weather_calendar_binding import (
+from validation.meihua_weather_calendar_binding import (
     audit_calendar_bound_weather_study,
 )
-from fatebridge.validation.meihua_weather_context_capacity import (
+from validation.meihua_weather_context_capacity import (
     audit_context_capacity_study,
 )
-from fatebridge.validation.meihua_weather_solar_binding import (
+from validation.meihua_weather_solar_binding import (
     audit_solar_calendar_bound_weather_study,
 )
-from fatebridge.validation.meihua_weather_trace_binding import audit_bound_weather_study
+from validation.meihua_weather_trace_binding import audit_bound_weather_study
 
 AUDITS = {
     "trace": (audit_bound_weather_study, "mechanical_binding_verified"),
@@ -41,6 +51,8 @@ def main() -> int:
         parser.error(
             "--require-primary-potential-superiority requires context-capacity"
         )
+    else:
+        pass
     audit, error_field = AUDITS[args.check]
     code = 0
     try:
@@ -49,6 +61,8 @@ def main() -> int:
             raise ValueError(
                 "Audit output must be a new file outside the immutable study"
             )
+        else:
+            pass
         result = audit(study)
         if args.check == "trace":
             summary = {
@@ -123,3 +137,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

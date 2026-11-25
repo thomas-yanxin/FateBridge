@@ -8,13 +8,17 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+from fatebridge.core.almanac import localize_datetime
 from fatebridge.core.metaphysics.common import MetaphysicsSeed
 from fatebridge.core.metaphysics.ziwei import (
-    _palace_for_nominal_age,
-    _xiaoxian_branch,
     build_ziwei_chart,
     build_ziwei_horoscope,
 )
+from fatebridge.core.ziwei.ziwei_horoscope import (
+    palace_for_nominal_age,
+    xiaoxian_branch,
+)
+from fatebridge.utils.civil_time import NominalClockLabel
 from scripts.ziwei.ziwei_conditional_inputs import synthetic_birth_clock
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -41,9 +45,10 @@ def _seed(
     year: int, month: int = 1, day: int = 1, hour: str = "子", leap: bool = False
 ) -> MetaphysicsSeed:
     """Synthetic lunar rule input; not a civil-date conversion oracle."""
+
     return MetaphysicsSeed(
-        input_datetime=datetime(year, 1, 1),
-        corrected_datetime=datetime(year, 1, 1),
+        input_datetime=localize_datetime(datetime(year, 1, 1), "Asia/Shanghai"),
+        clock=NominalClockLabel.from_local_datetime(datetime(year, 1, 1)),
         timezone="Asia/Shanghai",
         longitude=None,
         applied_true_solar=False,
@@ -52,6 +57,7 @@ def _seed(
         calendar_context={
             "lunar_calendar": dict(year=year, month=month, day=day, is_leap_month=leap)
         },
+        input_offset_visible=False,
     )
 
 
@@ -61,8 +67,12 @@ def walk(branch: str, steps: int, direction: int) -> str:
         index += direction
         if index < 0:
             index = 11
+        else:
+            pass
         if index > 11:
             index = 0
+        else:
+            pass
     return BRANCHES[index]
 
 
@@ -72,6 +82,8 @@ def audit_limits(fixtures: Path = FIXTURES) -> dict[str, Any]:
     for row in m["files"]:
         if hashlib.sha256((d / row["path"]).read_bytes()).hexdigest() != row["sha256"]:
             raise ValueError(f"Ming limit source checksum mismatch: {row['path']}")
+        else:
+            pass
     source = json.loads((d / "collation.json").read_text())
     expected_compiled = {
         k: v for k, v in source.items() if k not in ("images", "image_conditions_url")
@@ -82,6 +94,8 @@ def audit_limits(fixtures: Path = FIXTURES) -> dict[str, Any]:
     mismatches: list[dict[str, Any]] = []
     if actual_compiled != expected_compiled:
         mismatches.append(dict(case="production_source_data"))
+    else:
+        pass
     # Validate normalized palace-name inputs against the existing frozen text,
     # not against whatever names the engine happens to return.
     prefix = json.loads(
@@ -93,6 +107,8 @@ def audit_limits(fixtures: Path = FIXTURES) -> dict[str, Any]:
     ]
     if [reverse[0], *reversed(reverse[1:])] != PALACES:
         raise ValueError("Source palace sequence changed")
+    else:
+        pass
     assignments = boundaries = 0
     starts = {
         p: dict(matches=0, differences=0) for p in ("iztro_2_5_8", "quanshu_v2_excerpt")
@@ -141,10 +157,11 @@ def audit_limits(fixtures: Path = FIXTURES) -> dict[str, Any]:
                                     case=f"daxian_assignment/{profile}/{year}/{month}/{gender}/{name}"
                                 )
                             )
+                        else:
+                            pass
                         if (
-                            _palace_for_nominal_age(chart["palaces"], lo)["name"]
-                            != name
-                            or _palace_for_nominal_age(chart["palaces"], hi)["name"]
+                            palace_for_nominal_age(chart["palaces"], lo)["name"] != name
+                            or palace_for_nominal_age(chart["palaces"], hi)["name"]
                             != name
                         ):
                             mismatches.append(
@@ -152,6 +169,8 @@ def audit_limits(fixtures: Path = FIXTURES) -> dict[str, Any]:
                                     case=f"daxian_lookup/{profile}/{year}/{month}/{gender}/{name}"
                                 )
                             )
+                        else:
+                            pass
                         assignments += 1
                     for age in (ju - 1, ju, ju + 9, ju + 10):
                         h = build_ziwei_horoscope(
@@ -176,6 +195,8 @@ def audit_limits(fixtures: Path = FIXTURES) -> dict[str, Any]:
                                     case=f"daxian_horoscope/{profile}/{year}/{month}/{gender}/{age}"
                                 )
                             )
+                        else:
+                            pass
                         if age < ju and (
                             comparison["matches_literal_reading_given_bureau_age"]
                             is not None
@@ -187,6 +208,8 @@ def audit_limits(fixtures: Path = FIXTURES) -> dict[str, Any]:
                             mismatches.append(
                                 dict(case="childhood_cannot_certify_formal_decade")
                             )
+                        else:
+                            pass
                         if (
                             profile == "quanshu_v2_excerpt"
                             and age >= ju
@@ -197,6 +220,8 @@ def audit_limits(fixtures: Path = FIXTURES) -> dict[str, Any]:
                             mismatches.append(
                                 dict(case="selected_daxian_reading_trace")
                             )
+                        else:
+                            pass
                         boundaries += 1
     xiao_cases = 0
     for row in source["xiaoxian"]["anchors"]:
@@ -204,10 +229,12 @@ def audit_limits(fixtures: Path = FIXTURES) -> dict[str, Any]:
             for gender in ("男", "女"):
                 for age in range(1, 25):
                     wanted = walk(row["branch"], age - 1, 1 if gender == "男" else -1)
-                    if _xiaoxian_branch(branch, age, gender) != wanted:
+                    if xiaoxian_branch(branch, age, gender) != wanted:
                         mismatches.append(
                             dict(case=f"xiaoxian/{branch}/{gender}/{age}")
                         )
+                    else:
+                        pass
                     xiao_cases += 1
     dou_cases = 0
     for profile in starts:
@@ -240,6 +267,8 @@ def audit_limits(fixtures: Path = FIXTURES) -> dict[str, Any]:
                         mismatches.append(
                             dict(case=f"doujun/{profile}/{month}/{hour}/{target}")
                         )
+                    else:
+                        pass
                     dou_cases += 1
     fire_cases = 0
     fire_matches = {p: dict(matches=0, differences=0) for p in starts}
@@ -268,6 +297,8 @@ def audit_limits(fixtures: Path = FIXTURES) -> dict[str, Any]:
                 )
                 if any(actual[s] != b for s, b in selected.items()):
                     mismatches.append(dict(case=f"fire_bell/{profile}/{branch}/{hour}"))
+                else:
+                    pass
                 fire_matches[profile][
                     (
                         "matches"

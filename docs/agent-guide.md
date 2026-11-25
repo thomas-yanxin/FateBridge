@@ -27,7 +27,7 @@ FateBridge 的领域能力通过三条通道暴露出来：
 
 三条通道共用 `src/fatebridge/services/tool_catalog.py` 装配的中央目录，领域声明位于 `services/catalog/`，请求字段定义于 `core/requests/`。共享领域计算和错误字段，各端仍有名称、绑定和校验阶段差异。
 
-目前 REST 暴露 91 个工具，MCP 暴露 92 个工具；目录共有 93 条记录，其中 CLI 可执行 92 条。`astro_relative` 是嵌套 REST 请求，与 MCP 的扁平请求存在对应关系，不是所有记录都能按同名跨端调用。完整算法清单见 [algorithm-coverage.md](algorithm-coverage.md)，完整端点说明见 [api-reference.md](api-reference.md)。
+目录共有 93 条记录，REST 公开 93 个工具，CLI 可执行 93 条。MCP 通过四个入口提供 93 项业务能力。三端共用工具名和请求字段。完整算法清单见 [algorithm-coverage.md](algorithm-coverage.md)，完整端点说明见 [api-reference.md](api-reference.md)。
 
 ## 自助发现：别硬编码工具列表
 
@@ -50,7 +50,7 @@ FateBridge 的领域能力通过三条通道暴露出来：
 curl http://localhost:8010/api/tools
 # 推荐先筛选摘要，再按工具取完整 Schema
 curl 'http://localhost:8010/api/tools?detail=summary&family=bazi'
-curl 'http://localhost:8010/api/tools?tool=bazi_birth&detail=full'
+curl 'http://localhost:8010/api/tools?tool=bazi_birth_chart&detail=full'
 ```
 
 返回示例（节选）：
@@ -61,10 +61,10 @@ curl 'http://localhost:8010/api/tools?tool=bazi_birth&detail=full'
   "tools": [
     {
       "tool": "bazi_wealth",
-      "summary": "八字财运分析：已按出生资料与分析日期自动推算大运、流年和时机依据；首轮无需先调用 timing_analysis 或手动传大运柱。仅有明确外部口径时用 dayun_pillar / liunian_pillar 覆盖。",
+      "summary": "八字财运分析：已按出生资料与分析日期自动推算大运、流年和时机依据；首轮无需先调用 bazi_timing 或手动传大运柱。仅有明确外部口径时用 dayun_pillar / liunian_pillar 覆盖。",
       "operation_label_zh": "八字财运分析",
       "family": "bazi",
-      "surfaces": {"cli": true, "cli_name": "bazi_wealth", "rest_path": "/api/cn/bazi/wealth", "mcp_name": "bazi_wealth"},
+      "surfaces": {"cli": true, "cli_name": "bazi_wealth", "rest_path": "/api/bazi/wealth", "mcp_name": "bazi_wealth"},
       "parameters": [
         {"name": "birth_year", "type": "int", "required": true, "description": "..."}
       ]
@@ -73,7 +73,7 @@ curl 'http://localhost:8010/api/tools?tool=bazi_birth&detail=full'
 }
 ```
 
-如果某个工具不在某一端暴露，`surfaces.rest_path` 或 `surfaces.mcp_name` 会返回 `null`。`parameters` 是参数摘要，完整记录有 `input_schema` / `output_schema`；摘要省略这三项。可用 `family`（逗号分隔）、`q`、`tool`、`surface` 筛选，`matched_count` 为实际返回数量，`counts` 仍为全局数量。MCP 的实际输入 Schema 另包含传输开关，由 `tools/list` 发布。
+如果某项能力未在某一端公开，对应的 `surfaces.rest_path` 或 `surfaces.mcp_name` 为 `null`。`parameters` 是参数摘要，`detail=full` 还提供 `input_schema` 和 `output_schema`。可按 `family`（逗号分隔）、`q`、`tool`、`surface` 筛选，`matched_count` 是实际返回数量，`counts` 是全局数量。MCP 的 `tools/list` 发布四个协议工具及其参数。业务参数的 Schema 通过 `describe_capability` 按需读取。
 
 ### CLI：`list` 和 `describe`
 
@@ -81,39 +81,51 @@ curl 'http://localhost:8010/api/tools?tool=bazi_birth&detail=full'
 fatebridge list                 # 列出所有工具，一行一个
 fatebridge describe bazi_wealth # 输出单个工具的参数 schema、接口和示例（JSON）
 fatebridge discover --family bazi # 与 REST 同源的分类摘要 JSON
-fatebridge discover --tool bazi_birth --detail full
-fatebridge list --family astro --json # 文本 list 可按需改为 JSON 摘要
+fatebridge discover --tool bazi_birth_chart --detail full
+fatebridge list --family astro # 筛选文本列表
 ```
 
 `describe` 的输出比 REST 多一个 `cli_example` 字段，可以直接复制运行。
 
-`cli_example` 仅在提供了经过模型校验的虚构示例时返回；`cli_usage` 是需要替换占位符的语法模板。可用 `describe <tool> --detail input` 暂时省略输出 Schema。目录 key 和公开名称均可用于发现与 CLI，正式名称见 `surfaces.cli_name` / `mcp_name`。
+`cli_example` 仅在提供了经过模型校验的虚构示例时返回；`cli_usage` 是需要替换占位符的语法模板。可用 `describe <tool> --detail input` 暂时省略输出 Schema。发现和调用使用公开名称，见 `surfaces.cli_name` / `mcp_name`。
 
 ### FastMCP
 
-MCP 默认通过标准 `tools/list` 公开全部工具。host 可设置 `FATEBRIDGE_MCP_FAMILIES=bazi,knowledge` 只注册所需分类，拼错分类会在启动时失败。通过 `resources/read` 读取 `fatebridge://catalog/summary`、`fatebridge://families/bazi` 和 `fatebridge://tools/bazi_birth`，可获得当前公开集合的摘要及单工具完整契约。资源错误属于资源协议错误，工具失败仍使用 `isError`。
+MCP 公开 `discover_capabilities`、`describe_capability`、`run_calculation` 和 `read_result`。已知能力和参数时可用 `run_calculation` 直接执行。需要参数时用 `describe_capability` 查看该项。也可读取 `fatebridge://catalog/summary`、`fatebridge://families/bazi` 和 `fatebridge://tools/bazi_birth_chart` 等资源。
 
-首次取数优先查看当前工具的 `evidence_views`，按本轮任务或盘型复制其 `fields`；视图名称不是请求参数。先选好主证再调用，可避免摘要投影丢掉所需字段后另算。完整文件或全部时间线请求仍首次 `fields=null`。
+`run_calculation` 默认选取推荐核心字段并省略快照正文。主题需要特定证据时，按 `evidence_views` 提供 `fields`。完整文件、全部时间线及计算审计首次使用 `detail="audit"` 和 `fields=null`，按回执读取同一次运行。
 
-`FATEBRIDGE_MCP_FAMILIES` 按实际工具分类限制 MCP 注册范围。隐藏工具不可调用；用当前连接的 `tools/list` 和目录资源核对，配置见[部署指南](mcp-deployment.md#工具筛选与运行环境)。
+`compact` 回执保留运行标识、有效时刻、重放参数和实际降级状态。需要运行环境时，可选取 `run_metadata.runtime`。`standard` 附常规运行环境，`audit` 另提供本次启用的方法和声明误差预算。规则和操作数见各工具的业务字段。
+
+`FATEBRIDGE_MCP_FAMILIES` 限制可执行的能力。用 `discover_capabilities` 或目录资源核对当前公开范围，配置见[部署指南](mcp-deployment.md#工具筛选与运行环境)。
 
 ## 公共调用约定
 
 ### 统一错误包络
 
-已知工具的模型校验与业务计算错误共享顶层 `error`、`error_code`、`retryable`，CLI 错误可额外包含 `status_code`。模型校验提供 `issues` 中的字段路径、错误代码和可选约束，不回显原始输入。分支判断请用 `error_code`，不要依赖 `error` 文案：
+已知工具的模型校验与业务计算错误共享顶层 `error`、`error_code`、`retryable`，MCP 和 CLI 错误可额外包含 `status_code`。以下响应指向超出范围的出生月份。
 
 ```json
 {
-  "error": "无效的八字分析参数",
+  "error": "请求参数无效",
   "error_code": "validation_error",
-  "retryable": false
+  "retryable": false,
+  "issues": [
+    {
+      "path": "birth_month",
+      "code": "less_than_equal",
+      "message": "Input should be less than or equal to 12",
+      "constraints": {"le": 12}
+    }
+  ]
 }
 ```
 
+按 `error_code` 和 `issues[].code` 分支。用 `issues[].path` 找到参数，结合 `issues[].message`、`constraints` 和顶层 `error` 修正后再提交。缺少事实时向用户核对。只有 `retryable=true` 才考虑原参数重试。
+
 `error_code` 目前有以下几种：
 
-- `validation_error`：领域计算参数错误返回 400；模型字段缺失、类型/范围/枚举错误、未知字段、完整公历日期无效返回 422；REST 非法 JSON 也返回 422
+- `validation_error`：模型校验或领域输入被拒绝时返回 400 或 422。REST 的 JSON 语法错误返回 422
 - `authentication_required`：缺少或无效 API key（仅在配置了密钥时），REST 返回 401
 - `dependency_missing`：运行依赖缺失（例如西占 backend 不可用），REST 返回 503
 - `fengshui_calculation_inconsistent`：玄空内部数字或飞行记录矛盾，REST返回503且不可重试；停止解释，不用修改用户事实或挑选其余候选绕过，见[异常盘处理](fengshui-xuankong.md)
@@ -184,7 +196,7 @@ fatebridge bazi_wealth --birth-year 1990 --birth-month 6 --birth-day 15 \
     --birth-hour 10 --gender male --fields analysis_type wealth_analysis
 
 # 点号子路径：从大块 payload 里只抽某个标量
-fatebridge bazi_birth --birth-year 1990 --birth-month 6 --birth-day 15 \
+fatebridge bazi_birth_chart --birth-year 1990 --birth-month 6 --birth-day 15 \
     --birth-hour 10 --gender male --fields snapshot_text bazi_birth.day_master
 ```
 
@@ -202,7 +214,7 @@ MCP 默认 `response_char_limit=8192`，REST / CLI 默认 `0`（不限制）。�
 
 以上均读取原 run，不重新计算。预算、回执保留顺序和引用字段约定见[API 参考](api-reference.md#25-字段投影与输出体积)。
 
-需要完整 JSON、全部时间线或完整文件时，**首次调用 `fields=null`**；REST / CLI 不传字段筛选。需要完整快照时保留默认 `include_snapshot_text=true`，也不要用 `selected_sections` 缩小导出文本。保留默认预算即可。交付物保存的是投影和快照选项处理后的结果，摘要调用的文件无法恢复未选字段。
+需要完整 JSON、全部时间线或完整文件时，**首次调用用 `detail=audit` 和 `fields=null`**。REST / CLI 省略字段筛选。需要完整快照时可显式设置 `include_snapshot_text=true` 并省略 `selected_sections`。交付物保存当前结果级别、字段投影和快照选项处理后的结果。
 
 MCP 读取顺序：
 
@@ -241,7 +253,7 @@ raw = json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode("utf
 Path("full-result.json").write_bytes(raw)
 ```
 
-公开响应不提供哈希或指纹；直接读取文件不会执行存储完整性检查。HTTP 客户端使用 `GET /api/results/{result_id}` 和 `/api/results/{result_id}/pages?offset=0`；选择字段时另加 `path` 查询参数，鉴权与业务接口一致。
+HTTP 客户端从 `GET /api/results/{result_id}` 的 `rest_export_path` 一次下载完整保留 JSON。按需读少数字段时用 `/api/results/{result_id}/pages?offset=0&path=字段路径`。每页会读取整份 JSON，完整导出用单次读取路径。鉴权与业务接口一致。
 
 也可以让确定性读取接口执行存储完整性与 run 校验，再取所需页。下面沿用上例的`reply.json`，读取同一结果的`analysis_context`，不重算：
 
@@ -263,11 +275,11 @@ while offset is not None:
     offset = page["next_offset"]
 ```
 
-每次调用先只读核对完整 payload 与原 run，再从同一内存对象返回至多2048字符的所选文档片段。`verification.run_id`、`scope` 与 `calculation_repeated=false` 说明核验对象和范围；核验成功不表示助手已读全部业务字段。REST 入口为 `/api/results/{result_id}/verified`，必传 `expected_run_id`；MCP 模板见[交付合同](api-reference.md#25-字段投影与输出体积)。服务检查私有清单与内容的一致性；公开响应不提供用于独立认证原内容的摘要。错 run、损坏和失效不能得到成功核验。
+每次调用先使用私有摘要核对完整 payload 与原 run，再从同一内存对象返回至多 2048 字符的所选文档片段。`verification.run_id`、`scope` 与 `calculation_repeated=false` 说明核验对象和范围。REST 入口为 `/api/results/{result_id}/verified`，必传 `expected_run_id`。错 run、损坏和失效会返回错误。MCP 模板见[交付合同](api-reference.md#25-字段投影与输出体积)。
 
 `result-read`可在只读沙箱中读取已有结果，不依赖可写临时目录或锁文件。若原缓存位于自定义位置，或读写进程的临时目录环境不同，使用`--directory 原交付文件所在私有目录`；同ID匹配多个缓存目录时也须明确原目录，不能依次尝试副本来猜测原目录。过期或被并发回收的引用仍不可用，目录参数不延长保留期限。源码环境使用已有依赖环境的Python和正确的源码路径；临时评测工作目录未必包含`.venv`。
 
-引用约一小时过期，也可能因容量回收提前失效；长期留存须及时保存完整结果及原输入。`file_path` 指向运行 FateBridge 的机器，远程客户端应读取资源或 HTTP 分页。引用失效或字段未被首轮保留时，应说明本次交付范围，不能把新一次计算冒充旧结果。`parent_run_id` 仅关联调用，不自动继承输入事实。
+引用约一小时过期，也可因容量回收提前失效。升级单文件存储后，升级前的临时引用失效。长期留存须及时保存完整结果及原输入。`file_path` 指向运行 FateBridge 的机器。引用失效或字段未被首轮保留时，应说明本次交付范围。`parent_run_id` 用于关联调用，重算应使用已确认的原输入。
 
 ## 出生信息：一次说清
 
@@ -275,7 +287,7 @@ while offset is not None:
 
 - `birth_year` / `birth_month` / `birth_day` / `birth_hour`：必需，出生日期与时刻
 - `birth_minute`：可选，默认 0
-- `gender`：八字专项可选但建议传入；`dayun_analysis` 等工具要求必填，支持 `男` / `女`、`male` / `female` 等写法
+- `gender`：八字专项可选但建议传入；`bazi_luck_cycles` 等工具要求必填，支持 `男` / `女`、`male` / `female` 等写法
 - `birth_place`：可选，中文 / 英文 / 拼音地名；内置静态近似，不是联网地理编码
 - `birth_timezone`：可选，IANA 时区或 UTC offset
 - `birth_longitude` / `birth_latitude`：视工具而定，占星盘建议显式传入以保证精度
@@ -290,7 +302,7 @@ while offset is not None:
 先按[快速入门](getting-started.md#启动-rest-并检查状态)启动服务。业务输入放在 JSON 请求体，`fields`、`strict_fields`、`as_of` 等通用控制项放在 URL 查询参数。以下示例假设已开启密钥鉴权；未开启时可省略密钥头。
 
 ```bash
-curl -X POST 'http://localhost:8010/api/cn/bazi/wealth?fields=wealth_analysis&strict_fields=true&include_snapshot_text=false' \
+curl -X POST 'http://localhost:8010/api/bazi/wealth?fields=wealth_analysis&strict_fields=true&include_snapshot_text=false' \
   -H "Content-Type: application/json" \
   -H "X-API-Key: replace-me" \
   -d '{"gender":"男","birth_year":1990,"birth_month":5,"birth_day":15,
@@ -305,7 +317,7 @@ curl -X POST 'http://localhost:8010/api/cn/bazi/wealth?fields=wealth_analysis&st
 import requests
 
 resp = requests.post(
-    "http://localhost:8010/api/cn/bazi/wealth",
+    "http://localhost:8010/api/bazi/wealth",
     headers={"X-API-Key": "replace-me"},
     params={
         "fields": ["wealth_analysis"],
@@ -328,7 +340,7 @@ print(data["wealth_analysis"])
 **JavaScript（fetch）示例：**
 
 ```js
-const url = new URL("http://localhost:8010/api/cn/bazi/wealth");
+const url = new URL("http://localhost:8010/api/bazi/wealth");
 url.searchParams.append("fields", "wealth_analysis");
 url.searchParams.set("strict_fields", "true");
 url.searchParams.set("include_snapshot_text", "false");
@@ -356,7 +368,7 @@ console.log(data.wealth_analysis);
 
 - 默认使用 stdio，由 host 启动子进程；手工启动不会创建 HTTP MCP 地址。
 - 使用已安装 FateBridge 的解释器绝对路径，避免 GUI host 继承不到虚拟环境。Windows 使用 `.venv\Scripts\python.exe`。
-- MCP 工具同时返回 `structuredContent` JSON 对象与兼容的 text JSON；优先读取结构化对象，旧客户端仍可 parse text。
+- MCP 工具在 `structuredContent` 返回业务事实或结构化错误详情；失败时 `content` 带简短错误消息。
 - 输入和执行失败返回 `isError=true`，内容带 `error_code`。使用 FastMCP Client 读取错误详情时设置 `raise_on_error=False`；默认会抛出 ToolError。
 - 每个工具公布 `outputSchema`。业务字段允许缺省以支持 `fields` 投影；缺省不代表值为 null。根字段、核心命盘/择日、专业长尾事实及知识/导出嵌套字段有类型，动态键与未声明扩展保留。
 - 用 `fields` 参数控制返回体积。
@@ -368,8 +380,8 @@ console.log(data.wealth_analysis);
 
 ```bash
 fatebridge list
-fatebridge describe ziwei_birth
-fatebridge ziwei_birth --birth-year 1990 --birth-month 6 --birth-day 15 \
+fatebridge describe ziwei_birth_chart
+fatebridge ziwei_birth_chart --birth-year 1990 --birth-month 6 --birth-day 15 \
     --birth-hour 10 --gender male
 fatebridge knowledge_read --domain bazi --category romance --key 桃花咸池
 ```
@@ -387,9 +399,11 @@ fatebridge profile --systems bazi,ziwei,astro \
   --birth-longitude 116.40 --birth-latitude 39.90
 ```
 
-`profile` 保留各体系默认太阳时策略，不是全工具并行运行。支持 `--fields profile.bazi.bazi_birth.day_master`、`--strict-fields`、`--compact` 与 `--no-include-snapshot-text`；后者移除各子结果顶层快照。投影保留已选子结果的运行凭据和所有失败项，任一体系失败仍退出 1。按实际工具去重，空体系列表会失败；选项以 `profile --help` 为准。
+`profile` 保留各体系默认太阳时策略。档案若明确记录 `birth_clock_basis` 为地方平太阳时或地方真太阳时，请选择支持该输入的子工具。各子工具独立校验钟制，合法子项仍会返回结果。支持 `--fields profile.bazi.bazi_birth.day_master`、`--strict-fields`、`--compact` 与 `--no-include-snapshot-text`；后者移除各子结果顶层快照。投影保留已选子结果的运行凭据和所有失败项，任一体系失败仍退出 1。按实际工具去重，空体系列表会失败；选项以 `profile --help` 为准。
 
 ## Agent 接入建议
+
+首轮读取当前工具的 `suggested_fields`，追问时沿 `evidence_views` 补取所需事实。经典词条用 `knowledge_catalog` 查目录、用 `knowledge_read` 读取条文、版本和出处。按同次结果引用实际柱位、相位或规则条件，再结合用户确认的职责、关系和资源讨论现实问题。行业映射、心理类比和行动建议由 Agent 根据该对话生成。
 
 接口连通后，Agent 还要完成一段面向人的对话：收集必要资料、选择工具、解释结果，再处理追问。接入方负责本轮问题、解释方式及边界，Schema 规定可以提交哪些参数。用一条完整的虚构对话验证这些环节；连接成功本身无法证明它们都能正常工作。
 
@@ -408,12 +422,12 @@ fatebridge profile --systems bazi,ziwei,astro \
 
 室内入口可见性、直线、实体背靠使用 `form_observations`，可 `methods=[]` 独立算，不先索取生辰/宅向。照片仅作待确认假设，1.5米等数字不套吉凶阈值。问物件时用 `element_adjustments` 绑定实际计算目标与作用域；作者代表物只作为有条件选项，不推缺五行或要求购物。年度方案显式选 `pang_2026_annual_v1`，只覆盖2026年南5/西北2，不外推年份。物件方案还应解释 `cross_scope_effects` 和作者分歧，不能宣称一件物品对所有层都有利。完整峦头、距离阈值、物件效果大小保持未实现。
 
-玄空宅盘须显式调用 `fengshui_xuankong_natal` 或合参选择 `xuankong_natal`。宅盘按历史资料定运并记录事件依据、版本及来源，年度 `current_period` 不能当作宅运。兼向按本版本中州派规则，角度分界候选保持 `partial`，不自行裁成唯一盘。输入例子与独立验证见 [玄空宅盘](fengshui-xuankong.md)。
+玄空宅盘须显式调用 `fengshui_xuankong_house_chart` 或合参选择 `xuankong_natal`。宅盘按历史资料定运并记录事件依据、版本及来源，年度 `current_period` 不能当作宅运。兼向按本版本中州派规则，角度分界候选保持 `partial`，不自行裁成唯一盘。输入例子与独立验证见 [玄空宅盘](fengshui-xuankong.md)。
 
 ## 相关文档
 
 - [api-reference.md](api-reference.md)：全部 REST 路由、FastMCP 工具、请求族、响应字段
-- [algorithm-coverage.md](algorithm-coverage.md)：13 family / 92 工具的算法与精度 / 依赖矩阵
+- [algorithm-coverage.md](algorithm-coverage.md)：14 family / 93 工具的算法与精度 / 依赖矩阵
 - [工具覆盖](algorithm-coverage.md)：各方法的实现范围、已知限制与验证边界
 - [getting-started.md](getting-started.md)：从零启动服务
 - [troubleshooting.md](troubleshooting.md)：依赖缺失、精度、快照导出等常见问题

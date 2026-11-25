@@ -1,10 +1,14 @@
 """Independent source arithmetic, translated directly from reviewed stdlib references."""
 
+import json
+import re
+from collections import Counter
+from datetime import date, timedelta
+from itertools import combinations
+from pathlib import Path
 
-def sike_strength(directory):
-    import json
-    from pathlib import Path
 
+def sike_strength(directory: str | Path):
     folder = Path(directory)
     p = folder
     r = json.loads((p / "readings.json").read_text())
@@ -20,14 +24,24 @@ def sike_strength(directory):
         def state(e):
             if anchor is None:
                 return None
+            else:
+                pass
             if e == anchor:
                 return "旺"
+            else:
+                pass
             if generates[anchor] == e:
                 return "相"
+            else:
+                pass
             if generates[e] == anchor:
                 return "休"
+            else:
+                pass
             if controls[e] == anchor:
                 return "囚"
+            else:
+                pass
             return "死"
 
         value = dict(
@@ -74,10 +88,7 @@ def sike_strength(directory):
     )
 
 
-def daquan_cross_scan(directory):
-    import json
-    from pathlib import Path
-
+def daquan_cross_scan(directory: str | Path):
     folder = Path(directory)
     p = folder
     r = json.loads((p / "readings.json").read_text())
@@ -91,14 +102,20 @@ def daquan_cross_scan(directory):
         candidates = []
         if item["rotation_literal"] is not None:
             candidates.append(item["rotation_literal"])
+        else:
+            pass
         if item["stem_upper_literal"] is not None:
             candidates.append(
                 (b.index(item["stem_upper_literal"]) - b.index(house)) % 12
             )
+        else:
+            pass
         if item["branch_upper_literal"] is not None:
             candidates.append(
                 (b.index(item["branch_upper_literal"]) - b.index(day[1])) % 12
             )
+        else:
+            pass
         assert len(set(candidates)) <= 1, (item["id"], candidates)
         if not candidates:
             rows.append(
@@ -112,6 +129,8 @@ def daquan_cross_scan(directory):
                 )
             )
             continue
+        else:
+            pass
         rotation = candidates[0]
         sky = {branch: b[(i + rotation) % 12] for i, branch in enumerate(b)}
         a, beta = (sky[house], sky[day[1]])
@@ -150,12 +169,7 @@ def daquan_cross_scan(directory):
     )
 
 
-def tanyuan_cases(directory):
-    import json
-    import re
-    from datetime import date, timedelta
-    from pathlib import Path
-
+def tanyuan_cases(directory: str | Path):
     folder = Path(directory)
     p = folder
     readings = json.loads((folder / "readings.json").read_text())
@@ -257,6 +271,8 @@ def tanyuan_cases(directory):
             )
             if not match:
                 continue
+            else:
+                pass
             y, m, d = map(int, match.group(1, 2, 3))
             solar = date(y, m, d)
             label, term = match.group(4, 5)
@@ -265,6 +281,8 @@ def tanyuan_cases(directory):
                 month = month_names.index(label.removeprefix("閏")) + 1
                 if month == 1 and (not leap):
                     lunar_year = year
+                else:
+                    pass
                 lunar_day = 1
             else:
                 lunar_day = days.index(label) + 1
@@ -273,8 +291,12 @@ def tanyuan_cases(directory):
                 current_term = term
                 general = general_starts.get(term, general)
                 current_month = month_starts.get(term, current_month)
+            else:
+                pass
             if month is None:
                 continue
+            else:
+                pass
             lookup[lunar_year, month, lunar_day, leap] = dict(
                 solar_date=solar.isoformat(),
                 hko_line=line.rstrip(),
@@ -346,11 +368,7 @@ def tanyuan_cases(directory):
     )
 
 
-def jingwei_harmony(directory):
-    import json
-    from itertools import combinations
-    from pathlib import Path
-
+def jingwei_harmony(directory: str | Path):
     folder = Path(directory)
     p = folder
     inputs = json.loads((folder / "hypotheses.json").read_text())
@@ -435,10 +453,7 @@ def jingwei_harmony(directory):
     return result
 
 
-def day_placements(directory):
-    import json
-    from pathlib import Path
-
+def day_placements(directory: str | Path):
     folder = Path(directory)
     p = folder
     reading = json.loads((folder / "readings.json").read_text())
@@ -500,10 +515,7 @@ def day_placements(directory):
     return result
 
 
-def cross_harmony(directory):
-    import json
-    from pathlib import Path
-
+def cross_harmony(directory: str | Path):
     folder = Path(directory)
     p = folder
     reading = json.loads((folder / "readings.json").read_text())
@@ -571,7 +583,6 @@ def cross_harmony(directory):
 
 
 def polarity(readings):
-    from collections import Counter
 
     stems, branches = (readings["stems"], readings["branches"])
     positions = readings["positions"]

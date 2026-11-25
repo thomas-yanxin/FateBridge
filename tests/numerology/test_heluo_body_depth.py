@@ -7,17 +7,16 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from fatebridge.core.heluo import judge
-from fatebridge.core.heluo_body import ELEMENTS, body_evidence, element_relation
-from fatebridge.core.output_numerology import HeluoJudge
-from tests.numerology.test_heluo_month_depth import chart_for
-from tests.numerology.test_heluo_najia_depth import PILLARS
+from fatebridge.core.contracts.output_numerology import HeluoJudge
+from fatebridge.core.heluo.heluo import judge
+from fatebridge.core.heluo.heluo_body import ELEMENTS, body_evidence, element_relation
+from tests.unit_test.fixtures.heluo_charts import PILLARS, chart_for
 
 ROOT = Path(__file__).parents[1] / "fixtures/numerology_nlc_v1"
 REFERENCE = json.loads((ROOT / "body-reference.json").read_text())
 
 
-def test_two_edition_witnesses_keep_identity_and_do_not_claim_second_reviewer():
+def test_two_edition_witnesses_keep_identity_and_do_not_claim_second_reviewer() -> None:
     manifest = json.loads((ROOT / "body-manifest.json").read_text())
     assert len(manifest["images"]) == 8
     assert "independent_second_review_pending" in manifest["review_status"]
@@ -36,12 +35,12 @@ def test_two_edition_witnesses_keep_identity_and_do_not_claim_second_reviewer():
         for t, r in zip(REFERENCE["trigram_order"], rs)
     ],
 )
-def test_independent_forty_cell_directed_grid(natal, trigram, expected):
+def test_independent_forty_cell_directed_grid(natal, trigram, expected) -> None:
     assert element_relation(ELEMENTS[trigram], natal) == expected
 
 
 @pytest.mark.parametrize("case", REFERENCE["generating_clause_combinations"])
-def test_four_derived_combinations_from_one_water_nayin_clause(case):
+def test_four_derived_combinations_from_one_water_nayin_clause(case) -> None:
     chart = chart_for(
         case["trigram"] + "為" + ("天" if case["trigram"] == "乾" else "澤")
     )
@@ -53,7 +52,7 @@ def test_four_derived_combinations_from_one_water_nayin_clause(case):
     assert result["present"] is None and result["complete_assessment"] is False
 
 
-def test_existing_yuanqi_cannot_be_ignored_to_activate_page_51():
+def test_existing_yuanqi_cannot_be_ignored_to_activate_page_51() -> None:
     chart = chart_for("乾為天")
     jia = judge(chart, {**PILLARS, "year": "甲寅"}, "卯")["deTi"]
     yi = judge(chart, {**PILLARS, "year": "乙卯"}, "卯")["deTi"]
@@ -64,7 +63,7 @@ def test_existing_yuanqi_cannot_be_ignored_to_activate_page_51():
     assert yi["generating_qi"]["condition_match"] is True
 
 
-def test_reverse_generation_does_not_satisfy_the_directed_page_51_rule():
+def test_reverse_generation_does_not_satisfy_the_directed_page_51_rule() -> None:
     # 丙寅火纳音，纯坤土；火生土是第87页方向，不能倒称土生火。
     actual = judge(chart_for("坤為地"), {**PILLARS, "year": "丙寅"}, "卯")["deTi"]
     assert actual["nayin_element"] == "火" and actual["yuanqi_absent"] is True
@@ -74,7 +73,7 @@ def test_reverse_generation_does_not_satisfy_the_directed_page_51_rule():
     assert len(actual["mutual_generation"]["nayin_generates_body_ids"]) == 8
 
 
-def test_dingyou_xiaoguo_original_nuclear_example_and_actual_positions():
+def test_dingyou_xiaoguo_original_nuclear_example_and_actual_positions() -> None:
     case = REFERENCE["direct_nuclear_reading"]
     actual = judge(chart_for(case["gua"]), {**PILLARS, "year": case["year"]}, "卯")[
         "deTi"
@@ -92,7 +91,7 @@ def test_dingyou_xiaoguo_original_nuclear_example_and_actual_positions():
     assert actual["yuanqi_absent"] is False
 
 
-def test_day_stem_changes_do_not_change_year_nayin_body_relations():
+def test_day_stem_changes_do_not_change_year_nayin_body_relations() -> None:
     chart = chart_for("坎為水")
     a = judge(chart, {**PILLARS, "year": "丙寅", "day": "戊子"}, "卯")
     b = judge(chart, {**PILLARS, "year": "丙寅", "day": "己丑"}, "卯")
@@ -117,12 +116,12 @@ def test_day_stem_changes_do_not_change_year_nayin_body_relations():
         {"deTi": {"bodies": [{"line_positions": [True]}]}},
     ],
 )
-def test_output_contract_rejects_changed_meanings_and_wrong_fact_types(payload):
+def test_output_contract_rejects_changed_meanings_and_wrong_fact_types(payload) -> None:
     with pytest.raises(ValidationError):
         HeluoJudge.model_validate(payload)
 
 
 @pytest.mark.parametrize("year", [None, "", "甲", "甲丑", False])
-def test_nayin_input_is_never_guessed(year):
+def test_nayin_input_is_never_guessed(year: bool | str | None) -> None:
     with pytest.raises(ValueError):
         body_evidence(year, {}, {"tian": "乾", "di": "坤"})

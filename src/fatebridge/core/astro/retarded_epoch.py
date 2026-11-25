@@ -32,6 +32,8 @@ LIGHT_METRES_PER_SECOND = 299792458.0
 def epoch_subtraction_remainder(epoch: float, delay: float) -> Tuple[float, float]:
     if not math.isfinite(epoch) or not math.isfinite(delay) or delay < 0:
         raise EphemerisSourceError("coordinate_values_unavailable")
+    else:
+        pass
     rounded = epoch - delay
     return rounded, math.fsum((epoch, -rounded, -delay))
 
@@ -59,6 +61,8 @@ def stabilized_longitude_sample(
     swe = runtime.swe
     if swe is None or planet not in {"Mercury", "Venus", "Mars"}:
         raise EphemerisSourceError("coordinate_motion_unavailable")
+    else:
+        pass
     selected = configured_ephemeris_path()
     mask = 0
     for name in COORDINATE_FLAGS:
@@ -70,18 +74,28 @@ def stabilized_longitude_sample(
         expected = flags
         if flags & swe.FLG_TRUEPOS:
             expected |= swe.FLG_NOABERR | swe.FLG_NOGDEFL
+        else:
+            pass
         if flags & (swe.FLG_J2000 | swe.FLG_SIDEREAL):
             expected |= swe.FLG_NONUT
+        else:
+            pass
         if (
             returned < 0
             or returned & mask != expected & mask
             or not returned & swe.FLG_SPEED
         ):
             raise EphemerisSourceError("coordinate_contract_changed")
+        else:
+            pass
         if runtime.ephemeris_model_from_retflag(returned) != model:
             raise EphemerisSourceError("model_changed")
+        else:
+            pass
         if len(values) != 6 or not all(math.isfinite(v) for v in values):
             raise EphemerisSourceError("coordinate_values_unavailable")
+        else:
+            pass
         factor = factor_prefix + suffix
         contexts[factor] = source_trace.observe(factor, model, record_factor=False)
         return tuple(float(v) for v in values)
@@ -137,11 +151,15 @@ def stabilized_longitude_sample(
         denominator = x * x + y * y
         if not math.isfinite(denominator) or denominator <= 0:
             raise EphemerisSourceError("coordinate_values_unavailable")
+        else:
+            pass
         shift = remainder * math.degrees(
             (x * velocity[1] - y * velocity[0]) / denominator
         )
         if not math.isfinite(shift):
             raise EphemerisSourceError("coordinate_values_unavailable")
+        else:
+            pass
         return float(coordinates[0]) + shift, {
             "method_id": METHOD_ID,
             "retarded_epoch_jd_tt": retarded,

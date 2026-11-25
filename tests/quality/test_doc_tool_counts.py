@@ -28,18 +28,11 @@ LIVE_CLI = sum(spec_is_cli_safe(spec) for spec in CATALOG)
 # 正则用 (\d+) 捕获文档当前声称的数字；期望值取自实时目录。
 CHECKS = [
     ("README.md", "README REST 业务路由", r"(\d+)\s*个业务\s*REST\s*路由", LIVE_REST),
-    ("README.md", "README FastMCP 工具", r"(\d+)\s*个\s*FastMCP\s*工具", LIVE_MCP),
     (
         "docs/api-reference.md",
         "api-reference.md REST 业务路由",
         r"(\d+)\s*个业务\s*REST\s*路由",
         LIVE_REST,
-    ),
-    (
-        "docs/api-reference.md",
-        "api-reference.md FastMCP 工具",
-        r"(\d+)\s*个\s*FastMCP\s*工具",
-        LIVE_MCP,
     ),
     (
         "docs/architecture.md",
@@ -48,15 +41,9 @@ CHECKS = [
         LIVE_REST,
     ),
     (
-        "docs/architecture.md",
-        "architecture MCP 工具",
-        r"(\d+)\s*个\s*MCP\s*工具",
-        LIVE_MCP,
-    ),
-    (
         "README.md",
         "README family 数",
-        r"(\d+)\s*family\s*/\s*\d+\s*工具",
+        r"(\d+)\s*个\s*family",
         LIVE_FAMILIES,
     ),
     (
@@ -89,6 +76,12 @@ for _path in (
                 r"CLI\s*可执行(?:其中)?\s*(\d+)\s*条",
                 LIVE_CLI,
             ),
+            (
+                _path,
+                f"{_path} MCP 业务能力",
+                r"MCP\s*通过四个入口提供\s*\*{0,2}(\d+)\s*项业务能力",
+                LIVE_MCP,
+            ),
         ]
     )
 
@@ -97,21 +90,13 @@ for _path in (
     "docs/agent-guide.md",
     "docs/interpretation/shared/fatebridge-engine.md",
 ):
-    CHECKS.extend(
-        [
-            (
-                _path,
-                f"{_path} REST 数",
-                r"REST\s*(?:公开|暴露)\s*\*{0,2}(\d+)\s*个工具",
-                LIVE_REST,
-            ),
-            (
-                _path,
-                f"{_path} MCP 数",
-                r"MCP\s*(?:公开|暴露)\s*\*{0,2}(\d+)\s*个工具",
-                LIVE_MCP,
-            ),
-        ]
+    CHECKS.append(
+        (
+            _path,
+            f"{_path} REST 数",
+            r"REST\s*(?:公开|暴露)\s*\*{0,2}(\d+)\s*个工具",
+            LIVE_REST,
+        )
     )
 
 
@@ -201,7 +186,10 @@ def test_documented_test_commands_reference_existing_files(rel_path: str) -> Non
 def test_api_md_documents_every_live_rest_route() -> None:
     """API 参考必须列出每一个已发布的业务与发现路由。"""
     live_routes = {
-        r.path for r in app.routes if getattr(r, "path", "").startswith("/api")
+        r.path
+        for r in app.routes
+        if getattr(r, "include_in_schema", False)
+        and getattr(r, "path", "").startswith("/api")
     }
     api_md = (REPO_ROOT / "docs/api-reference.md").read_text(encoding="utf-8")
     documented = set(re.findall(r"/api/[A-Za-z0-9_/{}-]+", api_md))

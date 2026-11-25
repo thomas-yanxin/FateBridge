@@ -8,8 +8,8 @@ from unittest.mock import patch
 
 import pytest
 
-from fatebridge.core import human_design_cycles as cycles
-from fatebridge.validation.human_design import verify_human_design_reading
+from fatebridge.core.human_design import human_design_cycles as cycles
+from validation.human_design import verify_human_design_reading
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -26,8 +26,8 @@ def biased_speed_oracle(t):
 
 
 def test_coordinate_probe_recovers_both_roots_without_treating_speed_as_derivative(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setattr(cycles, "HORIZON_DAYS", 12)
     result = cycles.derive_body_contacts("Saturn", 1000.0, biased_speed_oracle)
     assert result["status"] == "sampled_search_completed"
@@ -48,8 +48,8 @@ def test_coordinate_probe_recovers_both_roots_without_treating_speed_as_derivati
 
 
 def test_observed_zero_component_is_not_counted_again_when_it_spans_coarse_intervals(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setattr(cycles, "HORIZON_DAYS", 18)
 
     def read(t):
@@ -65,14 +65,16 @@ def test_observed_zero_component_is_not_counted_again_when_it_spans_coarse_inter
 
 
 def test_velocity_zero_at_search_boundary_still_probes_the_observed_interval(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setattr(cycles, "HORIZON_DAYS", 12)
 
     def read(t):
         row = biased_speed_oracle(t)
         if t >= 1008:
             row[2] = float(-2 * (Fraction(t) - 1012))
+        else:
+            pass
         return row
 
     result = cycles.derive_body_contacts("Saturn", 1000.0, read)
@@ -95,7 +97,7 @@ def after():
     return complete_run(**inputs["cycle_coordinate_extrema"])
 
 
-def test_actual_coordinate_probes_keep_the_two_nearby_chiron_contacts(after):
+def test_actual_coordinate_probes_keep_the_two_nearby_chiron_contacts(after) -> None:
     row = next(r for r in after["cycle_context"]["bodies"] if r["body"] == "Chiron")
     assert len(row["contacts"]) == 5
     assert len([c for c in row["contacts"] if abs(c["jd_tt"] - 2419723.795) < 1]) == 2
@@ -126,7 +128,9 @@ def test_actual_coordinate_probes_keep_the_two_nearby_chiron_contacts(after):
         "missing_motion_evidence",
     ],
 )
-def test_rehashed_packet_cannot_forge_extremum_or_direction_evidence(after, fault):
+def test_rehashed_packet_cannot_forge_extremum_or_direction_evidence(
+    after, fault: str
+) -> None:
     value = deepcopy(after)
     row = next(r for r in value["cycle_context"]["bodies"] if r["body"] == "Chiron")
     station = min(row["station_witnesses"], key=lambda r: abs(r["jd_tt"] - 2419723.795))

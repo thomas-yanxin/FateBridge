@@ -11,8 +11,8 @@ import pytest
 from pydantic import ValidationError
 
 import fatebridge.application.execution as execution
+from fatebridge.core.contracts.output_chinese import Jinkou
 from fatebridge.core.metaphysics.jinkou_patterns import CATALOG
-from fatebridge.core.output_chinese import Jinkou
 from tests.support.transports import AS_OF, SPECS, rest, surface_calls
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -44,6 +44,8 @@ def valid(annual=False, other=False):
     payload = dict(ANNUAL_PAYLOAD if annual else PAYLOAD)
     if other:
         payload["di_fen"] = "子"
+    else:
+        pass
     fn, args, kw = SPEC.bind(SPEC.request_model.model_validate(payload))
     result = fn(*args, **kw)
     execution.validate_output(SPEC, result)
@@ -67,6 +69,8 @@ def set_verdict(patterns, pid, value):
                 basis="协调伪造的四位结构",
             )
         )
+    else:
+        pass
     patterns["evaluation_counts"] = dict(
         matched=sum(v["matched"] is True for v in patterns["evaluations"]),
         not_matched=sum(v["matched"] is False for v in patterns["evaluations"]),
@@ -136,13 +140,15 @@ def corrupt(name, annual=False):
 
 @pytest.mark.parametrize("annual", [False, True])
 @pytest.mark.parametrize("fault", REF["faults"])
-def test_coordinated_fault_is_rejected_against_this_courses_raw_anchors(fault, annual):
+def test_coordinated_fault_is_rejected_against_this_courses_raw_anchors(
+    fault, annual: bool
+) -> None:
     with pytest.raises(execution.OutputContractError):
         execution.validate_output(SPEC, corrupt(fault, annual))
 
 
 @pytest.mark.parametrize("annual", [False, True])
-def test_valid_complete_main_and_annual_courses_are_accepted(annual):
+def test_valid_complete_main_and_annual_courses_are_accepted(annual: bool) -> None:
     result = valid(annual)
     execution.validate_output(SPEC, result)
     assert len(result["jinkou"]["patterns"]["evaluations"]) == 64
@@ -154,14 +160,16 @@ def test_valid_complete_main_and_annual_courses_are_accepted(annual):
     "fault", ["coordinated_false_positive", "unknown_to_true", "missing_pattern_trace"]
 )
 def test_anchor_failure_survives_all_three_ports_before_projection(
-    fault, project, monkeypatch, surface_calls
-):
+    fault: str, project: bool, monkeypatch: pytest.MonkeyPatch, surface_calls
+) -> None:
     bad = corrupt(fault)
     original = execution.execute_spec
 
     def broken(spec, request):
         if spec.key == "jinkou":
             spec = replace(spec, bind=lambda _: (lambda: copy.deepcopy(bad), (), {}))
+        else:
+            pass
         return original(spec, request)
 
     monkeypatch.setattr(execution, "execute_spec", broken)
@@ -171,6 +179,8 @@ def test_anchor_failure_survives_all_three_ports_before_projection(
         params.update(fields="analysis_type", strict_fields="true")
         options = dict(fields=["analysis_type"], strict_fields=True)
         flags += ["--fields", "analysis_type", "--strict-fields", "true"]
+    else:
+        pass
     http, mcp, code, cli = surface_calls(
         SPEC, PAYLOAD, params=params, options=options, flags=flags, cli_first=False
     )
@@ -180,7 +190,7 @@ def test_anchor_failure_survives_all_three_ports_before_projection(
         assert "jinkou" not in value
 
 
-def test_a_patterns_only_projection_has_no_invented_input_anchors():
+def test_a_patterns_only_projection_has_no_invented_input_anchors() -> None:
     patterns = valid()["jinkou"]["patterns"]
     parsed = Jinkou.model_validate(dict(patterns=patterns))
     assert parsed.rows is None and parsed.calendar_policy is None
@@ -190,7 +200,7 @@ def test_a_patterns_only_projection_has_no_invented_input_anchors():
 
 
 @pytest.mark.parametrize("annual", [False, True])
-def test_reordered_catalogue_keeps_the_same_id_bound_facts(annual):
+def test_reordered_catalogue_keeps_the_same_id_bound_facts(annual: bool) -> None:
     result = json.loads(json.dumps(valid(annual)))
     board = result["jinkou"]["year_fate"]["course"] if annual else result["jinkou"]
     for key in ("evaluations", "matched", "unresolved"):
@@ -202,7 +212,9 @@ def test_reordered_catalogue_keeps_the_same_id_bound_facts(annual):
     execution.validate_output(SPEC, result)
 
 
-def test_partial_count_view_uses_available_symbols_without_inventing_omitted_fields():
+def test_partial_count_view_uses_available_symbols_without_inventing_omitted_fields() -> (
+    None
+):
     source = valid()["jinkou"]
     partial = dict(
         rows=[dict(label=r["label"], content=r["content"]) for r in source["rows"]],
@@ -223,7 +235,9 @@ def test_partial_count_view_uses_available_symbols_without_inventing_omitted_fie
 
 
 @pytest.mark.parametrize("position,symbol", [(0, "子"), (1, "甲"), (3, "invalid")])
-def test_invalid_raw_symbols_remain_structured_validation_errors(position, symbol):
+def test_invalid_raw_symbols_remain_structured_validation_errors(
+    position: int, symbol: str
+) -> None:
     result = json.loads(json.dumps(valid()))
     result["jinkou"]["rows"][position]["content"] = symbol
     with pytest.raises(ValidationError):

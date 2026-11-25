@@ -2,6 +2,7 @@
 
 import asyncio
 import json
+from pathlib import Path
 
 import pytest
 
@@ -13,7 +14,7 @@ from scripts.evaluate_agent import (
     prepare_references,
     prepare_workspace,
 )
-from tests.evaluation.test_agent_evaluation import event
+from tests.unit_test.fixtures.evaluation_events import event
 
 ERROR = {
     "error_code": "validation_error",
@@ -38,7 +39,7 @@ def rejected(payload=ERROR):
     return record
 
 
-def test_registered_refusal_is_not_a_successful_chart_or_an_unexpected_error():
+def test_registered_refusal_is_not_a_successful_chart_or_an_unexpected_error() -> None:
     result = grade_case(CASE, [rejected()], "explain actual refusal", 0)
     assert result["mechanical_checks_passed"]
     assert result["tool_calls"][0]["protocol_error"]
@@ -62,7 +63,7 @@ def test_registered_refusal_is_not_a_successful_chart_or_an_unexpected_error():
         {"error": "other validation cause"},
     ],
 )
-def test_different_error_or_coerced_type_never_matches(changes):
+def test_different_error_or_coerced_type_never_matches(changes) -> None:
     actual = {**ERROR, **changes}
     assert not matches_expected_error(actual, ERROR)
     assert not grade_case(CASE, [rejected(actual)], "x", 0)["mechanical_checks_passed"]
@@ -72,23 +73,34 @@ def test_different_error_or_coerced_type_never_matches(changes):
     "expected",
     [None, {}, {"error_code": "validation_error"}, {**ERROR, "status_code": True}],
 )
-def test_incomplete_error_declaration_cannot_ignore_failures(expected):
+def test_incomplete_error_declaration_cannot_ignore_failures(expected) -> None:
     assert not matches_expected_error(ERROR, expected)
 
 
-def test_expected_null_still_requires_an_actual_present_field():
+def test_expected_null_still_requires_an_actual_present_field() -> None:
     expected = {**ERROR, "extra_context": None}
     assert not matches_expected_error(ERROR, expected)
     assert matches_expected_error({**ERROR, "extra_context": None}, expected)
 
 
-def test_cli_failed_business_reply_needs_matching_actual_server_capture():
+@pytest.mark.parametrize("direct_call", [True, False])
+def test_cli_failed_business_reply_needs_matching_actual_server_capture(
+    direct_call: bool,
+) -> None:
     item = rejected()
     item["item"]["status"] = "failed"
     item["item"]["result"] = {"structured_content": ERROR}
+    if not direct_call:
+        item["item"]["tool"] = "run_calculation"
+        item["item"]["arguments"] = {
+            "tool": "taiyi",
+            "arguments": item["item"]["arguments"],
+        }
+    else:
+        pass
     captured = {
         "event": "tool_call",
-        "tool": "taiyi",
+        "tool": item["item"]["tool"],
         "arguments": item["item"]["arguments"],
         "outcome": "returned",
         "result": {"is_error": True, "structured_content": ERROR},
@@ -126,7 +138,7 @@ def test_cli_failed_business_reply_needs_matching_actual_server_capture():
     ]
 
 
-def test_transport_failure_repetition_or_wrong_tools_still_fail():
+def test_transport_failure_repetition_or_wrong_tools_still_fail() -> None:
     bad = rejected()
     bad["item"]["status"] = "failed"
     assert not grade_case(CASE, [bad], "x", 0)["mechanical_checks_passed"]
@@ -143,7 +155,7 @@ def test_transport_failure_repetition_or_wrong_tools_still_fail():
     assert not grade_case(CASE, [rejected()], "", 0)["mechanical_checks_passed"]
 
 
-def test_only_structured_or_json_error_codes_are_read_not_guessed_from_prose():
+def test_only_structured_or_json_error_codes_are_read_not_guessed_from_prose() -> None:
     assert error_response({"content": [{"text": json.dumps(ERROR)}]}) == ERROR
     assert error_response({"content": [{"text": "validation_error occurred"}]}) is None
     assert (
@@ -152,7 +164,9 @@ def test_only_structured_or_json_error_codes_are_read_not_guessed_from_prose():
     )
 
 
-def test_runtime_workspace_excludes_new_judge_document_but_keeps_live_guides(tmp_path):
+def test_runtime_workspace_excludes_new_judge_document_but_keeps_live_guides(
+    tmp_path: Path,
+) -> None:
     source = tmp_path / "source"
     source.mkdir()
     (source / "AGENTS.md").write_text("rules")
@@ -174,7 +188,9 @@ def test_runtime_workspace_excludes_new_judge_document_but_keeps_live_guides(tmp
     assert not (workspace / "tests").exists()
 
 
-def test_expected_error_reference_is_saved_and_next_real_stdio_case_continues(tmp_path):
+def test_expected_error_reference_is_saved_and_next_real_stdio_case_continues(
+    tmp_path: Path,
+) -> None:
     args = {
         "analysis_year": 2026,
         "analysis_month": 7,
@@ -219,7 +235,9 @@ def test_expected_error_reference_is_saved_and_next_real_stdio_case_continues(tm
     )
 
 
-def test_streamed_snapshot_rejects_source_changes_after_copy(tmp_path, monkeypatch):
+def test_streamed_snapshot_rejects_source_changes_after_copy(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     import scripts.evaluate_agent as evaluator
 
     source = tmp_path / "source"
@@ -234,6 +252,8 @@ def test_streamed_snapshot_rejects_source_changes_after_copy(tmp_path, monkeypat
         calls += 1
         if calls == 2:
             (source / "AGENTS.md").write_text("concurrent change")
+        else:
+            pass
         return original(root, **kwargs)
 
     monkeypatch.setattr(evaluator, "source_manifest", manifests)
@@ -245,8 +265,8 @@ def test_streamed_snapshot_rejects_source_changes_after_copy(tmp_path, monkeypat
 
 
 def test_snapshot_keeps_execution_and_judge_inputs_and_excludes_local_artifacts(
-    tmp_path,
-):
+    tmp_path: Path,
+) -> None:
     from scripts.evaluate_agent import freeze_source, source_manifest
 
     source = tmp_path / "source"

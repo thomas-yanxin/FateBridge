@@ -2,11 +2,11 @@
 
 import hashlib
 import json
-from typing import Any, Dict, Tuple
+from typing import Any
 
 from fatebridge.utils.data import EARTHLY_BRANCHES
 
-TWELVE_STAGES: Tuple[str, ...] = (
+TWELVE_STAGES: tuple[str, ...] = (
     "长生",
     "沐浴",
     "冠带",
@@ -22,7 +22,7 @@ TWELVE_STAGES: Tuple[str, ...] = (
 )
 
 # 阳干顺行、阴干逆行. A stage hit alone does not adjudicate a hidden root.
-_CHANGSHENG_START: Dict[str, Tuple[str, int]] = {
+_CHANGSHENG_START: dict[str, tuple[str, int]] = {
     "甲": ("亥", +1),
     "丙": ("寅", +1),
     "戊": ("寅", +1),
@@ -40,7 +40,7 @@ YANG_BLADE_SEATS = dict(zip("甲丙戊庚壬", "卯午午酉子"))
 STAGE_PROFILE_ID = "ten_stem_yang_forward_yin_reverse_fire_earth_v1"
 
 
-def life_stage_profile() -> Dict[str, Any]:
+def life_stage_profile() -> dict[str, Any]:
     """Expose the table actually used; do not adjudicate roots or force."""
     lookup = {
         "branch_cycle": list(EARTHLY_BRANCHES),

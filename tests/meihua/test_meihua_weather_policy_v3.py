@@ -7,12 +7,12 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.meihua_weather_time_scope import compare_weather_time_scopes
-from fatebridge.validation.meihua_weather_policy_v2 import (
+from fatebridge.core.meihua.meihua_weather_time_scope import compare_weather_time_scopes
+from validation.meihua_weather_policy_v2 import (
     canonical_sha256,
     full_cohort_assessment,
 )
-from fatebridge.validation.meihua_weather_policy_v3 import scope_aware_weather_label
+from validation.meihua_weather_policy_v3 import scope_aware_weather_label
 
 REF = Path(__file__).parents[1] / "fixtures/meihua_weather_policy_v3"
 MANIFEST = json.loads((REF / "manifest.json").read_text())
@@ -76,10 +76,12 @@ def label(weather):
     )
 
 
-def test_policy_plan_and_logical_oracles_remain_fixed():
+def test_policy_plan_and_logical_oracles_remain_fixed() -> None:
     for name, digest in MANIFEST["files"].items():
         if str(name).endswith((".py", ".py.txt")):
             continue
+        else:
+            pass
         assert hashlib.sha256((REF / name).read_bytes()).hexdigest() == digest
     assert canonical_sha256(PROFILE) == PLAN["profile_canonical_sha256"]
     assert canonical_sha256(CONTROL) == PLAN["control_profile_canonical_sha256"]
@@ -92,7 +94,7 @@ def test_policy_plan_and_logical_oracles_remain_fixed():
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
-def test_frozen_scope_aware_research_labels(case):
+def test_frozen_scope_aware_research_labels(case) -> None:
     q = label(synthetic(case))
     assert q["label"] == case["expected_label"]
     assert q["engine_single_forecast"] is None
@@ -119,7 +121,9 @@ def test_frozen_scope_aware_research_labels(case):
         "matched_with_qualification",
     ],
 )
-def test_incomplete_or_forged_source_trace_is_not_a_successful_label(mutation):
+def test_incomplete_or_forged_source_trace_is_not_a_successful_label(
+    mutation: str,
+) -> None:
     w = synthetic(CASES[0])
     row = next(r for r in w["rule_trace"] if r["rule_id"] == "symbol_kan")
     if mutation == "version":
@@ -152,7 +156,7 @@ def test_incomplete_or_forged_source_trace_is_not_a_successful_label(mutation):
         label(w)
 
 
-def test_morning_clear_and_evening_rain_do_not_become_daily_conflict():
+def test_morning_clear_and_evening_rain_do_not_become_daily_conflict() -> None:
     case = next(r for r in CASES if r["id"] == "morning-clear-evening-rain-compatible")
     q = label(synthetic(case))
     assert q["label"] == "rain"
@@ -162,7 +166,7 @@ def test_morning_clear_and_evening_rain_do_not_become_daily_conflict():
     ]
 
 
-def test_displayed_prior_study_results_cannot_change_the_new_policy_label():
+def test_displayed_prior_study_results_cannot_change_the_new_policy_label() -> None:
     w = synthetic(CASES[0])
     expected = label(w)
     w["research_validation"] = {
@@ -173,7 +177,7 @@ def test_displayed_prior_study_results_cannot_change_the_new_policy_label():
     assert label(w) == expected
 
 
-def test_primary_endpoint_keeps_unknown_observations_and_abstentions():
+def test_primary_endpoint_keeps_unknown_observations_and_abstentions() -> None:
     r = {
         "cohort_days": 273,
         "correct": 1,

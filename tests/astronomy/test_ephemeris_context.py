@@ -14,7 +14,9 @@ from tests.support.ephemeris_context import empty_ephemeris_path
 
 @pytest.mark.parametrize("caller_policy", [None, "analytic"])
 @pytest.mark.parametrize("fail", [False, True])
-def test_moshier_model_and_caller_state_are_isolated(monkeypatch, caller_policy, fail):
+def test_moshier_model_and_caller_state_are_isolated(
+    monkeypatch: pytest.MonkeyPatch, caller_policy: str | None, fail: bool
+) -> None:
     swe = pytest.importorskip("swisseph")
     from fatebridge.core.metaphysics.qimen import (
         _qimen_build_yinyangdun_map_from_seeds as cached,
@@ -27,7 +29,10 @@ def test_moshier_model_and_caller_state_are_isolated(monkeypatch, caller_policy,
     previous_path = runtime.configured_ephemeris_path()
     previous_configured = runtime._configured_path
     previous_env = os.environ.get("SE_EPHE_PATH")
-    cached((), ())
+    # Synthetic ordinal operands populate only the cache. They are not solar
+    # term dates, a real chart, or an expected ju/astronomical reference.
+    cache_operands = ((1, "甲子"), 196, 365)
+    cached(*cache_operands)
     assert cached.cache_info().currsize > 0
     with (
         pytest.raises(RuntimeError, match="fixture failure") if fail else nullcontext()
@@ -39,9 +44,11 @@ def test_moshier_model_and_caller_state_are_isolated(monkeypatch, caller_policy,
             )
             assert runtime.ephemeris_model_from_retflag(flags) == "moshier"
             get_solar_terms_for_year(2026)
-            cached((), ())
+            cached(*cache_operands)
             if fail:
                 raise RuntimeError("fixture failure")
+            else:
+                pass
     assert runtime.configured_ephemeris_path() == previous_path
     assert runtime._configured_path == previous_configured
     assert os.environ.get("SE_EPHE_PATH") == previous_env
@@ -50,7 +57,9 @@ def test_moshier_model_and_caller_state_are_isolated(monkeypatch, caller_policy,
     assert cached.cache_info().currsize == 0
 
 
-def test_empty_path_does_not_make_calendar_solar_terms_moshier(monkeypatch):
+def test_empty_path_does_not_make_calendar_solar_terms_moshier(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     swe = pytest.importorskip("swisseph")
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
     with empty_ephemeris_path():

@@ -11,7 +11,7 @@ from scripts.ren.audit_liuren_jingwei_harmony import CORPUS, audit, reference
 REVIEW = reference()
 
 
-def test_same_work_editions_and_anonymous_annotations_keep_their_identities():
+def test_same_work_editions_and_anonymous_annotations_keep_their_identities() -> None:
     witnesses = REVIEW["witnesses"]
     assert witnesses["red_annotations_attributed_to_mao_zhidao"] is False
     assert witnesses["reader_count"] == 1 and witnesses["blind"] is False
@@ -25,7 +25,7 @@ def test_same_work_editions_and_anonymous_annotations_keep_their_identities():
     assert inference["adjudicated_original_tanyuan_ids"] == []
 
 
-def test_same_hit_totals_can_conceal_disjoint_rule_answers():
+def test_same_hit_totals_can_conceal_disjoint_rule_answers() -> None:
     data = REVIEW["reference"]
     assert data["candidate_true_counts"]["H1"] == data["candidate_true_counts"]["H2"]
     days1 = {r["day_ganzhi"] for r in data["days"] if r["candidates"]["H1"]}
@@ -37,7 +37,7 @@ def test_same_hit_totals_can_conceal_disjoint_rule_answers():
     assert data["new_adjudicated_rules"] == data["new_empirical_events"] == 0
 
 
-def test_consensus_and_disagreement_both_leave_original_source_unknown():
+def test_consensus_and_disagreement_both_leave_original_source_unknown() -> None:
     rows = REVIEW["reference"]["contexts"]
     assert len(rows) == 720
     assert any(
@@ -52,7 +52,7 @@ def test_consensus_and_disagreement_both_leave_original_source_unknown():
     assert all(r["selected_production_model"] is None for r in rows)
 
 
-def test_full_original_cohort_stays_unchanged():
+def test_full_original_cohort_stays_unchanged() -> None:
     result = audit()
     assert result["engineering_guard_passed"] is True
     assert len(result["rows"]) == 720 and result["failures"] == []
@@ -70,7 +70,9 @@ def test_full_original_cohort_stays_unchanged():
 
 
 @pytest.mark.parametrize("invented", [False, True])
-def test_audit_detects_turning_unknown_into_candidate_answer(monkeypatch, invented):
+def test_audit_detects_turning_unknown_into_candidate_answer(
+    monkeypatch: pytest.MonkeyPatch, invented: bool
+) -> None:
     import fatebridge.core.metaphysics.liureng_day_placements as production
 
     actual = production.day_placement_patterns
@@ -89,7 +91,7 @@ def test_audit_detects_turning_unknown_into_candidate_answer(monkeypatch, invent
     assert result["goal_complete"] is False
 
 
-def test_modified_manifest_cannot_redefine_frozen_review(tmp_path: Path):
+def test_modified_manifest_cannot_redefine_frozen_review(tmp_path: Path) -> None:
     # Failure precedes loading the large source files; no PDF copies required.
     (tmp_path / "freeze.json").write_bytes((CORPUS / "freeze.json").read_bytes() + b" ")
     with pytest.raises(ValueError, match="identity changed"):

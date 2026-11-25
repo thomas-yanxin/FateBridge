@@ -25,6 +25,8 @@ def main():
     args = parser.parse_args()
     if args.output.exists():
         raise SystemExit("Refusing to overwrite a frozen reference")
+    else:
+        pass
     facts = json.loads(FACTS.read_text())
     gates = json.loads(GATES.read_text())["gates"]
     width, foundation = facts["line_arcseconds"], facts["foundation_arcseconds"]
@@ -38,6 +40,8 @@ def main():
             offset = ((lon - start) % 360) * 3600
             if offset < gate_width:
                 return gate, int(offset // width) + 1, offset % width
+            else:
+                pass
         raise AssertionError("Source gate interval gap")
 
     def ratio(value):
@@ -136,3 +140,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+else:
+    pass

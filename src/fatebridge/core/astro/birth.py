@@ -6,6 +6,8 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from typing import TYPE_CHECKING, Any, Dict, Literal, Optional
 
+from fatebridge.core.astro.time_scales import EphemerisTime, ephemeris_time
+
 if TYPE_CHECKING:
     from fatebridge.core.astro.physical_epoch import PhysicalEpoch
 
@@ -45,6 +47,16 @@ class AstroBirthInfo:
     timezone_source: Literal[
         "birth_timezone", "birth_place", "default_utc", "solar_clock_conversion"
     ] = "birth_timezone"
+    native_epoch: Optional[PhysicalEpoch] = None
+
+    @property
+    def time_scales(self) -> EphemerisTime:
+        """Use a retained solved epoch; a civil carrier is only its display."""
+        return (
+            self.native_epoch.time
+            if self.native_epoch is not None
+            else ephemeris_time(self.physical_datetime)
+        )
 
     @property
     def physical_datetime(self) -> datetime:
@@ -80,8 +92,6 @@ class NativeSolarBirthInfo(AstroBirthInfo):
     Legacy consumers must not turn that label into a fabricated UTC epoch.
     A target replacement clears native_epoch before using a real datetime.
     """
-
-    native_epoch: Optional[PhysicalEpoch] = None
 
     def __post_init__(self) -> None:
         if self.native_epoch is None:
@@ -152,7 +162,7 @@ def build_astro_birth_info(
             "核心星盘需要 birth_longitude / birth_latitude，或提供 FateBridge 支持的 birth_place 以自动补全坐标。"
         )
     if birth_clock_basis != "civil":
-        from fatebridge.core.astro.birth_clock import resolve_solar_birth_clock
+        from fatebridge.core.astro.birth_clock import resolve_solar_epoch
 
         if birth_timezone is not None or use_true_solar_time:
             raise ValueError(
@@ -167,37 +177,27 @@ def build_astro_birth_info(
             birth_second,
             birth_microsecond,
         )
-        if allow_native_solar_epoch:
-            from fatebridge.core.astro.birth_clock import resolve_solar_epoch
-
-            epoch, conversion = resolve_solar_epoch(
-                wall,
-                effective_longitude,
-                birth_clock_basis,
-                ephemeris_policy=solar_clock_ephemeris_policy,
+        epoch, conversion = resolve_solar_epoch(
+            wall,
+            effective_longitude,
+            birth_clock_basis,
+            ephemeris_policy=solar_clock_ephemeris_policy,
+        )
+        if allow_native_solar_epoch and epoch.utc_datetime is None:
+            return NativeSolarBirthInfo(
+                name=(name or "未提供").strip() or "未提供",
+                birth_place=(birth_place or "未提供").strip() or "未提供",
+                timezone="UTC",
+                longitude=effective_longitude,
+                latitude=effective_latitude,
+                local_datetime=wall.replace(tzinfo=timezone.utc),
+                utc_datetime=None,
+                recorded_datetime=None,
+                clock_conversion=conversion,
+                timezone_source="solar_clock_conversion",
+                native_epoch=epoch,
             )
-            if epoch.utc_datetime is None:
-                return NativeSolarBirthInfo(
-                    name=(name or "未提供").strip() or "未提供",
-                    birth_place=(birth_place or "未提供").strip() or "未提供",
-                    timezone="UTC",
-                    longitude=effective_longitude,
-                    latitude=effective_latitude,
-                    local_datetime=wall.replace(tzinfo=timezone.utc),
-                    utc_datetime=None,
-                    recorded_datetime=None,
-                    clock_conversion=conversion,
-                    timezone_source="solar_clock_conversion",
-                    native_epoch=epoch,
-                )
-            moment = epoch.utc_datetime
-        else:
-            moment, conversion = resolve_solar_birth_clock(
-                wall,
-                effective_longitude,
-                birth_clock_basis,
-                ephemeris_policy=solar_clock_ephemeris_policy,
-            )
+        moment = epoch.require_datetime()
         return AstroBirthInfo(
             name=(name or "未提供").strip() or "未提供",
             birth_place=(birth_place or "未提供").strip() or "未提供",
@@ -209,6 +209,7 @@ def build_astro_birth_info(
             recorded_datetime=moment,
             clock_conversion=conversion,
             timezone_source="solar_clock_conversion",
+            native_epoch=epoch,
         )
     tzinfo = parse_timezone_name(timezone_name)
     local_datetime = datetime(

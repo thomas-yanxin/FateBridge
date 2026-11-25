@@ -76,15 +76,21 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
     }
     if not mandatory <= {s["file"] for s in manifest["source_files"]}:
         raise ValueError("完整时计例、未决课语和历法冲突来源不得删除")
+    else:
+        pass
     for item in manifest["source_files"] + manifest["prior_source_references"]:
         if (
             hashlib.sha256((corpus / item["file"]).read_bytes()).hexdigest()
             != item["sha256"]
         ):
             raise ValueError("时计冻结来源指纹不符：" + item["file"])
+        else:
+            pass
     case = json.loads((corpus / "hour-worked.json").read_text())
     if set(case["expected"]) != FIELDS:
         raise ValueError("完整课例须保留20项，包括尚未裁定的门具语")
+    else:
+        pass
     board = worked_board(case)
     actual = {
         **board["core_board"],
@@ -103,11 +109,15 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
             unknown.append(row)
         elif actual[field] != expected:
             differences.append(row)
+        else:
+            pass
     sequences = json.loads((corpus / "door-sequences.json").read_text())["cases"]
     if len(sequences) != 8 or {(c["yin"], c["accumulation"]) for c in sequences} != {
         (y, a) for y in (False, True) for a in (1, 31, 61, 91)
     }:
         raise ValueError("阴阳四门须保留两遁各四项")
+    else:
+        pass
     sequence_differences = [
         {
             **c,
@@ -122,6 +132,8 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
     units = json.loads((corpus / "calendar-units.json").read_text())
     if set(units["requirements"]) != UNIT_REQUIREMENTS:
         raise ValueError("历法量纲及引文异数三项检查不得删除")
+    else:
+        pass
     book = {k: Fraction(v) for k, v in units["book"].items()}
     qian = {k: Fraction(v) for k, v in units["qian"].items()}
     pairs = [

@@ -1,74 +1,41 @@
 """Physical instant ordering and explicit-offset resolution of local clocks."""
 
 import re
-from datetime import datetime, timedelta, timezone
-from typing import Optional
+from datetime import datetime, time, timedelta, timezone
 
-from dateutil import tz
-
-from fatebridge.utils.timezones import parse_timezone_name, validate_local_clock
+from fatebridge.utils.civil_time import utc_ordering_key
+from fatebridge.utils.errors import ParameterError
+from fatebridge.utils.timezones import (
+    is_unspecified_local_time,
+    parse_timezone_name,
+    validate_local_clock,
+)
 
 _OFFSET = re.compile(r"^([+-])(\d{2}):(\d{2})(?::(\d{2}))?$")
-_SUBSECOND_ZERO_OFFSET = re.compile(r"([+-])00(?::?00){0,2}[.,]([0-9]+)$")
-
-
-def parse_iso_datetime(value: str) -> datetime:
-    """Preserve the UTC offset when reading an ISO datetime.
-
-    CPython gh-152079 drops a fractional offset whose whole-second part is
-    zero. Normalize that offset to six fractional digits for Python 3.10,
-    validate with the stdlib parser, then restore the component from its text.
-    Naive clocks retain their original parsing and timezone behavior.
-    """
-    match = _SUBSECOND_ZERO_OFFSET.search(value)
-    parser_value = value
-    if match is not None and match.start() > 10:
-        parser_value = (
-            value[: match.start()] + match[1] + "00:00:00." + match[2][:6].ljust(6, "0")
-        )
-    parsed = datetime.fromisoformat(parser_value)
-    if parsed.utcoffset() == timedelta(0):
-        if match is not None:
-            sign, fraction = match.groups()
-            # Match datetime's microsecond resolution and truncation policy.
-            microseconds = int(fraction[:6].ljust(6, "0"))
-            if microseconds:
-                offset = timedelta(
-                    microseconds=microseconds * (1 if sign == "+" else -1)
-                )
-                return parsed.replace(tzinfo=timezone(offset))
-    return parsed
 
 
 def utc_instant(moment: datetime) -> datetime:
     """Never compare same-zone wall labels when an actual instant is intended."""
     if moment.utcoffset() is None:
         raise ValueError("实际时刻比较必须带时区，不能默认服务器时区")
+    else:
+        pass
     return moment.astimezone(timezone.utc)
 
 
 def format_utc_offset(offset: timedelta) -> str:
-    """Format an actual offset, including IANA's historical offsets over 15h.
-
-    Python requires a magnitude below 24h. The separate fixed-zone input
-    policy is narrower; it must not reject an offset from a named zone.
-    """
-    seconds = offset.total_seconds()
-    if not seconds.is_integer() or abs(seconds) >= 24 * 3600:
-        raise ValueError("UTC偏移须为有效整秒且绝对值小于24小时")
-    sign = "+" if seconds >= 0 else "-"
-    hours, remainder = divmod(abs(int(seconds)), 3600)
-    minutes, rest = divmod(remainder, 60)
-    return f"{sign}{hours:02d}:{minutes:02d}" + (f":{rest:02d}" if rest else "")
+    """Render the actual offset at the same precision as an ISO clock label."""
+    return time(tzinfo=timezone(offset)).isoformat().removeprefix("00:00:00")
 
 
 def resolve_civil_clock(
     wall: datetime,
     zone: str,
-    explicit_offset: Optional[str] = None,
+    explicit_offset: str | None = None,
     *,
     offset_field: str = "analysis_utc_offset",
-    recorded_offset: Optional[str] = None,
+    timezone_field: str | None = None,
+    recorded_offset: str | None = None,
 ) -> datetime:
     """Resolve a local label without inventing a side of a fold or a gap.
 
@@ -77,47 +44,105 @@ def resolve_civil_clock(
     """
     if wall.utcoffset() is not None:
         raise ValueError("本地钟表字段须为无时区标签，实际时刻另外明确偏移")
+    else:
+        pass
     if recorded_offset is not None:
         if explicit_offset is None:
             explicit_offset = recorded_offset
         elif explicit_offset != recorded_offset:
             requested = resolve_civil_clock(
-                wall, zone, explicit_offset, offset_field=offset_field
+                wall,
+                zone,
+                explicit_offset,
+                offset_field=offset_field,
+                timezone_field=timezone_field,
             )
             recorded = resolve_civil_clock(
-                wall, zone, recorded_offset, offset_field=offset_field
+                wall,
+                zone,
+                recorded_offset,
+                offset_field=offset_field,
+                timezone_field=timezone_field,
             )
-            if utc_instant(requested) != utc_instant(recorded):
-                raise ValueError(f"{offset_field}与已确认出生记录的UTC偏移选择冲突")
+            if utc_ordering_key(requested) != utc_ordering_key(recorded):
+                raise ParameterError(
+                    f"{offset_field}与已确认出生记录的UTC偏移选择冲突",
+                    [{"path": offset_field, "code": "conflicting_utc_offset"}],
+                    status_code=400,
+                )
+            else:
+                pass
             return requested
-    zone_info = parse_timezone_name(zone)
+        else:
+            pass
+    else:
+        pass
+    zone_info = parse_timezone_name(zone, issue_path=timezone_field)
     local = wall.replace(tzinfo=zone_info)
     if explicit_offset is None:
         validate_local_clock(local)
         return local
-    if type(explicit_offset) is not str:
-        raise ValueError(f"{offset_field}须为±HH:MM或±HH:MM:SS")
-    match = _OFFSET.fullmatch(explicit_offset.strip())
+    else:
+        pass
+    match = (
+        _OFFSET.fullmatch(explicit_offset.strip())
+        if type(explicit_offset) is str
+        else None
+    )
     if match is None:
-        raise ValueError(f"{offset_field}须为±HH:MM或±HH:MM:SS")
+        raise ParameterError(
+            f"{offset_field}须为±HH:MM或±HH:MM:SS",
+            [{"path": offset_field, "code": "invalid_utc_offset"}],
+            status_code=400,
+        )
+    else:
+        pass
     sign, hour, minute, second = match.groups()
     h, m, s = int(hour), int(minute), int(second or 0)
     if h >= 24 or m >= 60 or s >= 60:
-        raise ValueError(f"{offset_field}超出有效UTC偏移范围")
+        raise ParameterError(
+            f"{offset_field}超出有效UTC偏移范围",
+            [{"path": offset_field, "code": "invalid_utc_offset"}],
+            status_code=400,
+        )
+    else:
+        pass
     expected = timedelta(hours=h, minutes=m, seconds=s) * (1 if sign == "+" else -1)
-    if not tz.datetime_exists(local):
-        validate_local_clock(local)  # Keep the shared, non-retryable gap error.
-    candidates: dict[datetime, datetime] = {}
-    for fold in (0, 1):
-        candidate = local.replace(fold=fold)
+    candidates = local.replace(fold=0), local.replace(fold=1)
+    for candidate in candidates:
         if candidate.utcoffset() == expected:
-            actual = utc_instant(candidate)
-            roundtrip = actual.astimezone(zone_info)
-            if roundtrip.replace(tzinfo=None) == wall:
-                # UTC -> UTC can retain the synthetic fold=1 candidate even
-                # though it is the same unambiguous instant as fold=0. Keep
-                # the first canonical representation instead of relabelling it.
-                candidates.setdefault(actual, roundtrip)
-    if len(candidates) != 1:
-        raise ValueError(f"{offset_field}与指定时区在该民用钟时的实际偏移不一致")
-    return next(iter(candidates.values()))
+            # The parsed types are fold-aware. Validate the selected member
+            # and keep fold=0 for an ordinary label with equal offsets.
+            validate_local_clock(candidate, allow_ambiguous=True)
+            return candidate
+        else:
+            pass
+    defined = next(
+        (
+            candidate
+            for candidate in candidates
+            if not is_unspecified_local_time(candidate)
+        ),
+        candidates[0],
+    )
+    validate_local_clock(defined, allow_ambiguous=True)
+    allowed = sorted(
+        {
+            format_utc_offset(offset)
+            for candidate in candidates
+            if not is_unspecified_local_time(candidate)
+            and (offset := candidate.utcoffset()) is not None
+        }
+    )
+    raise ParameterError(
+        f"{offset_field}={explicit_offset!r}与该钟时在时区{zone!r}的实际偏移不一致。"
+        f"该时区规则给出的偏移为{'、'.join(allowed)}，请核对原始钟时和时区。",
+        [
+            {
+                "path": offset_field,
+                "code": "utc_offset_mismatch",
+                "constraints": {"expected": allowed},
+            }
+        ],
+        status_code=400,
+    )

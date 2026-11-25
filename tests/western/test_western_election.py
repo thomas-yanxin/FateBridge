@@ -7,12 +7,12 @@ are pure and pinned exactly; the service-level tests assert structural facts
 ephemeris-sensitive exact scores. Current numerical checks use independent references.
 """
 
-from fatebridge.core.astrology_election import (
+from fatebridge.core.astro.astrology_election import (
     TOPIC_MASTER,
     _dignity,
-    _verdict,
 )
 from fatebridge.services.western_election import calculate_election
+from tests.unit_test.fixtures.western_event_cases import CANDIDATE
 
 VALID_VERDICTS = {"auspicious", "workable", "marginal", "avoid"}
 
@@ -20,7 +20,7 @@ VALID_VERDICTS = {"auspicious", "workable", "marginal", "avoid"}
 # Pure scoring primitives (exact, environment-independent).
 
 
-def test_dignity_table():
+def test_dignity_table() -> None:
     assert _dignity("Mars", "Capricorn") == "exaltation"
     assert _dignity("Mars", "Cancer") == "fall"
     assert _dignity("Mars", "Aries") == "rulership"
@@ -32,19 +32,7 @@ def test_dignity_table():
     assert _dignity("Saturn", "Sagittarius") == "no_major_dignity"
 
 
-def test_verdict_hard_block_overrides_score():
-    verdict, _ = _verdict(95, True, "结婚")
-    assert verdict == "avoid"
-
-
-def test_verdict_bands():
-    assert _verdict(80, False, "x")[0] == "auspicious"
-    assert _verdict(60, False, "x")[0] == "workable"
-    assert _verdict(45, False, "x")[0] == "marginal"
-    assert _verdict(20, False, "x")[0] == "avoid"
-
-
-def test_topic_master_covers_allowed_consultation_topics():
+def test_topic_master_covers_allowed_consultation_topics() -> None:
     for topic in (
         "marriage",
         "business",
@@ -62,39 +50,24 @@ def test_topic_master_covers_allowed_consultation_topics():
         assert 1 <= TOPIC_MASTER[topic]["house"] <= 12
 
 
-CANDIDATE = dict(
-    candidate_year=2025,
-    candidate_month=3,
-    candidate_day=15,
-    candidate_hour=10,
-    candidate_minute=0,
-    timezone_name="Asia/Shanghai",
-    longitude=116.4,
-    latitude=39.9,
-)
-
-
-def test_election_marriage_uses_venus_and_seventh_house():
+def test_election_marriage_uses_venus_and_seventh_house() -> None:
     result = calculate_election(**CANDIDATE, topic_id="marriage")
     assert "error" not in result, result
     payload = result["election"]
     assert payload["significator"] == "Venus"
     assert payload["topic_house"] == 7
-    assert payload["verdict"] in VALID_VERDICTS
-    assert 0 <= payload["score"] <= 100
+    assert payload["marriage_significators"]["method_id"]
 
 
-def test_election_unknown_topic_is_rejected():
+def test_election_unknown_topic_is_rejected() -> None:
     result = calculate_election(**CANDIDATE, topic_id="not_a_topic")
     assert result["error_code"] == "validation_error"
     assert "election" not in result
 
 
-def test_election_envelope_has_snapshot_and_factors():
+def test_election_envelope_has_snapshot_and_factors() -> None:
     result = calculate_election(**CANDIDATE, topic_id="contract")
     assert result["snapshot_text"]
     assert isinstance(result["election"]["factors"], list)
     for factor in result["election"]["factors"]:
-        assert factor["polarity"] in {"favorable", "adverse", "neutral"}
-        assert isinstance(factor["weight"], int)
-        assert isinstance(factor["hard"], bool)
+        assert factor["code"]

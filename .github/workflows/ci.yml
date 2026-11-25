@@ -265,9 +265,12 @@ jobs:
           for path in Path("ci-evidence").glob("*/ci-selection.json"):
               report = json.loads(path.read_text(encoding="utf-8"))
               attempt = int(path.parent.name.rsplit("-attempt", 1)[1])
-              key = (report["environment"], report["shard_index"])
-              if key not in latest or attempt > latest[key][0]:
-                  latest[key] = (attempt, report)
+              shard_identity = (report["environment"], report["shard_index"])
+              previous_attempt = latest.get(shard_identity)
+              if previous_attempt is None or attempt > previous_attempt[0]:
+                  latest[shard_identity] = (attempt, report)
+              else:
+                  pass
           assert len(latest) == 18, f"Expected 18 shard reports, found {len(latest)}"
           groups = defaultdict(list)
           for _, report in latest.values():

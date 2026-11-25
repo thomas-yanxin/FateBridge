@@ -3,6 +3,7 @@
 import asyncio
 import json
 from itertools import product
+from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
@@ -15,7 +16,8 @@ from fatebridge.services.catalog.western_timing import SPECS
 from fatebridge.services.western_timing_tools import calculate_timing_tool
 from tests.fixtures.surface_payloads import western_payload
 from tests.fixtures.transports import mcp_parameters
-from tests.western.test_firdaria_reference import VECTORS
+from tests.support.transports import call_calculation
+from tests.unit_test.fixtures.western_firdaria_cases import VECTORS
 
 TOOLS = [spec for spec in SPECS if spec.key in {"firdaria", "western_timing_analysis"}]
 OPTIONS = list(
@@ -80,12 +82,12 @@ def _surfaces(monkeypatch, capsys, spec, inputs, fields=None):
 
     async def protocol_call():
         async with Client(mcp.app) as client:
-            return await client.call_tool(
-                spec.tool_name, {**inputs, **options}, raise_on_error=False
+            return await call_calculation(
+                client, spec.tool_name, {**inputs, **options}, raise_on_error=False
             )
 
     protocol = asyncio.run(protocol_call())
-    protocol_payload = json.loads(protocol.content[0].text)
+    protocol_payload = protocol.structured_content
     assert protocol_payload == protocol.structured_content
     args = [spec.tool_name]
     for name, value in inputs.items():
@@ -115,7 +117,7 @@ def _firdaria(output, spec):
 
 
 @pytest.mark.parametrize("spec", TOOLS, ids=lambda spec: spec.key)
-def test_option_schemas_and_cli_defaults_match(spec):
+def test_option_schemas_and_cli_defaults_match(spec) -> None:
     rest = api.app.openapi()["components"]["schemas"][spec.request_model.__name__]
     protocol = mcp_parameters(spec.tool_name)
     for field, values, default in [
@@ -144,8 +146,12 @@ def test_option_schemas_and_cli_defaults_match(spec):
 @pytest.mark.parametrize("spec", TOOLS, ids=lambda spec: spec.key)
 @pytest.mark.parametrize("night_order,basis", OPTIONS)
 def test_all_four_combinations_reach_real_engines_on_all_surfaces(
-    monkeypatch, capsys, spec, night_order, basis
-):
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    spec,
+    night_order,
+    basis,
+) -> None:
     inputs = {
         **_inputs(VECTORS["examples"][0]),
         "firdaria_night_order": night_order,
@@ -186,13 +192,15 @@ def test_all_four_combinations_reach_real_engines_on_all_surfaces(
         if (night_order, basis) != ("nodes_at_end", "fixed_365_2425"):
             assert firdaria["calculation_options"]["night_order"] == night_order
             assert firdaria["calculation_options"]["year_basis"] == basis
+        else:
+            pass
 
 
 @pytest.mark.parametrize("spec", TOOLS, ids=lambda spec: spec.key)
 @pytest.mark.parametrize("case", VECTORS["examples"], ids=lambda case: case["id"])
 def test_original_reference_examples_and_projection_on_all_surfaces(
-    monkeypatch, capsys, spec, case
-):
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], spec, case
+) -> None:
     inputs = {
         **_inputs(case),
         "firdaria_night_order": "nodes_after_mars",
@@ -224,7 +232,12 @@ def test_original_reference_examples_and_projection_on_all_surfaces(
 
 @pytest.mark.parametrize("spec", TOOLS, ids=lambda spec: spec.key)
 @pytest.mark.parametrize("field", ["firdaria_night_order", "firdaria_year_basis"])
-def test_invalid_option_is_rejected_consistently(monkeypatch, capsys, spec, field):
+def test_invalid_option_is_rejected_consistently(
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    spec,
+    field: str,
+) -> None:
     response, protocol, code, outputs = _surfaces(
         monkeypatch, capsys, spec, {**_inputs(VECTORS["examples"][0]), field: "unknown"}
     )
@@ -240,7 +253,9 @@ def test_invalid_option_is_rejected_consistently(monkeypatch, capsys, spec, fiel
 @pytest.mark.parametrize(
     "case", VECTORS["invalid_local_times"], ids=lambda case: case["id"]
 )
-def test_calendar_dst_rejections_agree_on_all_surfaces(monkeypatch, capsys, spec, case):
+def test_calendar_dst_rejections_agree_on_all_surfaces(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], spec, case
+) -> None:
     inputs = {**_inputs(case), "firdaria_year_basis": "calendar_anniversary"}
     inputs["analysis_year"] = max(2026, inputs["birth_year"] + 1)
     # Invalid birth clocks are rejected before natal calculation. Valid births
@@ -254,13 +269,49 @@ def test_calendar_dst_rejections_agree_on_all_surfaces(monkeypatch, capsys, spec
         assert not output["retryable"]
 
 
+def test_undefined_calendar_firdaria_anniversary_agrees_on_all_surfaces(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    spec = next(spec for spec in TOOLS if spec.key == "firdaria")
+    response, protocol, code, outputs = _surfaces(
+        monkeypatch,
+        capsys,
+        spec,
+        {
+            "birth_year": 1976,
+            "birth_month": 6,
+            "birth_day": 1,
+            "birth_hour": 12,
+            "birth_minute": 0,
+            "birth_longitude": 105,
+            "birth_latitude": 0,
+            "birth_timezone": "Antarctica/Vostok",
+            "house_system": "W",
+            "analysis_year": 1994,
+            "analysis_month": 11,
+            "analysis_day": 10,
+            "analysis_hour": 12,
+            "analysis_minute": 0,
+            "firdaria_year_basis": "calendar_anniversary",
+        },
+    )
+    assert response.status_code == 422 and protocol.is_error and code == 1
+    for output in outputs:
+        assert output["issues"] == [
+            {"path": "request", "code": "unresolved_timezone_offset"}
+        ]
+        assert "18 岁周年边界" in output["error"]
+
+
 @pytest.mark.parametrize("spec", TOOLS, ids=lambda spec: spec.key)
 @pytest.mark.parametrize(
     "case",
     [case for case in VECTORS["invalid_local_times"] if case["age"] == 0],
     ids=lambda case: case["id"],
 )
-def test_calendar_invalid_analysis_clocks_are_rejected(monkeypatch, capsys, spec, case):
+def test_calendar_invalid_analysis_clocks_are_rejected(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], spec, case
+) -> None:
     from datetime import datetime
 
     target = datetime.fromisoformat(case["birth_local"])
@@ -282,7 +333,9 @@ def test_calendar_invalid_analysis_clocks_are_rejected(monkeypatch, capsys, spec
         assert "分析钟时" in output["error"]
 
 
-def test_default_firdaria_payload_matches_independent_utc_clock_and_declares_basis():
+def test_default_firdaria_payload_matches_independent_utc_clock_and_declares_basis() -> (
+    None
+):
     implicit = calculate_timing_tool("firdaria", **western_payload())
     explicit = calculate_timing_tool(
         "firdaria",
@@ -297,8 +350,8 @@ def test_default_firdaria_payload_matches_independent_utc_clock_and_declares_bas
 
 @pytest.mark.parametrize("spec", TOOLS, ids=lambda spec: spec.key)
 def test_calendar_iana_analysis_clock_after_2038_on_all_surfaces(
-    monkeypatch, capsys, spec
-):
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], spec
+) -> None:
     inputs = {
         **_inputs(VECTORS["examples"][0]),
         "birth_year": 2000,
@@ -328,3 +381,51 @@ def test_calendar_iana_analysis_clock_after_2038_on_all_surfaces(
         {k: v for k, v in output.items() if k != "run_metadata"} for output in outputs
     ]
     assert business[0] == business[1] == business[2]
+
+
+@pytest.mark.parametrize("spec", TOOLS, ids=lambda spec: spec.key)
+def test_calendar_clock_uses_locked_tzif_not_system_zoneinfo(
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    tmp_path: Path,
+    spec,
+) -> None:
+    import zoneinfo
+
+    from pytz import open_resource
+
+    zone = "America/Havana"
+    system_path = tmp_path / zone
+    system_path.parent.mkdir()
+    # A separate host database returns the older standard offset for the
+    # disputed label. The package's 2026f removes the November 2026 fallback.
+    with open_resource("Etc/GMT+5") as fixed_standard:
+        system_path.write_bytes(fixed_standard.read())
+    previous_path = zoneinfo.TZPATH
+    zoneinfo.reset_tzpath([str(tmp_path)])
+    zoneinfo.ZoneInfo.clear_cache(only_keys=[zone])
+    try:
+        inputs = {
+            **_inputs(VECTORS["examples"][0]),
+            "birth_year": 1990,
+            "birth_month": 1,
+            "birth_day": 1,
+            "birth_hour": 12,
+            "birth_minute": 0,
+            "birth_timezone": zone,
+            "birth_longitude": -82.3666,
+            "birth_latitude": 23.1136,
+            "analysis_year": 2026,
+            "analysis_month": 11,
+            "analysis_day": 3,
+            "firdaria_year_basis": "calendar_anniversary",
+        }
+        response, protocol, code, outputs = _surfaces(monkeypatch, capsys, spec, inputs)
+    finally:
+        zoneinfo.reset_tzpath(previous_path)
+        zoneinfo.ZoneInfo.clear_cache(only_keys=[zone])
+    assert response.status_code == 200 and not protocol.is_error and code == 0
+    assert all(
+        item["analysis_context"]["analysis_datetime"] == "2026-11-03T12:00:00-04:00"
+        for item in outputs
+    )

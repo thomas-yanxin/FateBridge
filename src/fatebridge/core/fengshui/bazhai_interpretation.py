@@ -1,6 +1,6 @@
 """Trace the literal You Nian operations and separate them from element relations."""
 
-from typing import Any, Dict
+from typing import Any
 
 from fatebridge.core.hexagram_relations import ELEMENT_CONTROLS, ELEMENT_GENERATES
 
@@ -10,18 +10,18 @@ _FLIPS = (3, 2, 1, 2, 3, 2, 1)
 _MASKS = (0, 4, 6, 7, 5, 1, 3, 2)
 
 
-def fuwei_element_context(source_prefix: str = "") -> Dict[str, Any]:
+def fuwei_element_context() -> dict[str, Any]:
     return {
         "selected_clause": "伏位，左辅星，属木，小吉。",
-        "selected_source_ids": [source_prefix + "S10"],
+        "selected_source_ids": ["S10"],
         "other_clause": "左辅右弼，随门而化。",
-        "other_source_ids": [source_prefix + "S12"],
+        "other_source_ids": ["S12"],
         "other_context_applied": False,
         "scope": "retain_text_context_difference_no_universal_fuwei_element_claim",
     }
 
 
-def you_nian_trace(base_bits: int, target_bits: int) -> Dict[str, Any]:
+def you_nian_trace(base_bits: int, target_bits: int) -> dict[str, Any]:
     mask = base_bits ^ target_bits
     step = _MASKS.index(mask)
     changed = [line for line in (1, 2, 3) if mask & (1 << (line - 1))]
@@ -40,7 +40,7 @@ def you_nian_trace(base_bits: int, target_bits: int) -> Dict[str, Any]:
 
 def palace_star_relationship(
     palace_element: str, star_name: str, star_element: str
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     if palace_element == star_element:
         code, label = "same_element", "宫星比和"
     elif ELEMENT_GENERATES[palace_element] == star_element:
@@ -51,7 +51,7 @@ def palace_star_relationship(
         code, label = "palace_controls_star", "宫克星"
     else:
         code, label = "star_controls_palace", "星克宫"
-    result: Dict[str, Any] = {
+    result: dict[str, Any] = {
         "rule_id": "bazhai_sitting_v1.palace_star_elements",
         "source_ids": ["S10", "S13"],
         "palace_element": palace_element,
@@ -64,4 +64,6 @@ def palace_star_relationship(
     }
     if star_name == "伏位":
         result["source_context_variation"] = fuwei_element_context()
+    else:
+        pass
     return result

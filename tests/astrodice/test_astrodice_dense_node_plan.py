@@ -13,7 +13,7 @@ def plan(nodes):
     }
 
 
-def test_dense_grid_keeps_all_printed_epochs_and_required_twelfth_order_nodes():
+def test_dense_grid_keeps_all_printed_epochs_and_required_twelfth_order_nodes() -> None:
     nodes = list(range(-1440, 1441, 10))
     assert row_points(plan(nodes))[0][2] == nodes
     assert len(nodes) == 289
@@ -22,7 +22,7 @@ def test_dense_grid_keeps_all_printed_epochs_and_required_twelfth_order_nodes():
 @pytest.mark.parametrize(
     "change", ["remove", "duplicate", "fraction", "unsorted", "boolean"]
 )
-def test_bad_dense_node_plan_rejected(change):
+def test_bad_dense_node_plan_rejected(change: str) -> None:
     nodes = list(range(-1440, 1441, 10))
     if change == "remove":
         nodes.remove(1440)

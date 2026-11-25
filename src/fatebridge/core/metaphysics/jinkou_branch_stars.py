@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from typing import Any
 
-from .common import SEXAGENARY_INDEX
-from .jinkou_sources import SCAN_SHA256, SCAN_URL
+from fatebridge.core.metaphysics.common import SEXAGENARY_INDEX
+from fatebridge.core.metaphysics.jinkou_sources import SCAN_SHA256, SCAN_URL
 
 BRANCHES = "子丑寅卯辰巳午未申酉戌亥"
 MONTHS = "寅卯辰巳午未申酉戌亥子丑"
@@ -35,15 +35,23 @@ def calendar_targets(
     if month_branch is not None:
         if month_branch not in MONTHS or len(month_branch) != 1:
             raise ValueError("京本神煞月建支无效")
+        else:
+            pass
         index = MONTHS.index(month_branch)
         result.update({k: values[index] for k, values in MONTH_TARGETS.items()})
         result["tianshe"] = TIANSHE_TARGETS[index // 3]
+    else:
+        pass
     if year_branch is not None:
         if year_branch not in BRANCHES or len(year_branch) != 1:
             raise ValueError("京本神煞年支无效")
+        else:
+            pass
         index = BRANCHES.index(year_branch)
         result["sangmen"] = BRANCHES[(index + 2) % 12]
         result["diaoke"] = BRANCHES[(index - 2) % 12]
+    else:
+        pass
     return result
 
 
@@ -71,6 +79,8 @@ def branch_stars(
         )
     ):
         raise ValueError("京本神煞需要明确年支、月建、日干支及三位本支")
+    else:
+        pass
     month_index = MONTHS.index(month_branch)
     season = "春夏秋冬"[month_index // 3]
     targets = calendar_targets(year_branch=year_branch, month_branch=month_branch)

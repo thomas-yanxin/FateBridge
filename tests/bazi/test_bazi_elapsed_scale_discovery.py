@@ -11,7 +11,7 @@ REFERENCE = json.loads(
 )
 
 
-def test_all_frozen_positive_steps_and_both_sided_controls_are_retained():
+def test_all_frozen_positive_steps_and_both_sided_controls_are_retained() -> None:
     rows = REFERENCE["rows"]
     assert len(rows) == len({r["id"] for r in rows}) == 108
     counts = Counter(r["transition_utc"] for r in rows)
@@ -22,7 +22,7 @@ def test_all_frozen_positive_steps_and_both_sided_controls_are_retained():
     assert REFERENCE["no_application_or_native_imports"] is True
 
 
-def test_known_atomic_elapsed_intervals_are_derived_from_endpoint_offsets():
+def test_known_atomic_elapsed_intervals_are_derived_from_endpoint_offsets() -> None:
     for row in REFERENCE["rows"]:
         nominal = (
             datetime.fromisoformat(row["end_utc"])
@@ -39,7 +39,9 @@ def test_known_atomic_elapsed_intervals_are_derived_from_endpoint_offsets():
         )
 
 
-def test_current_elapsed_helper_uses_nominal_labels_without_claiming_atomic_duration():
+def test_current_elapsed_helper_uses_nominal_labels_without_claiming_atomic_duration() -> (
+    None
+):
     from fatebridge.core.almanac import elapsed_days_between
 
     for row in REFERENCE["rows"]:

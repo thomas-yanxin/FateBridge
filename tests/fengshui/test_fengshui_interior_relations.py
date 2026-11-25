@@ -43,7 +43,7 @@ def analyze(relations, constraints=()):
 
 
 @pytest.mark.parametrize("kind", KINDS)
-def test_every_registered_predicate_is_reviewable_without_a_compass(kind):
+def test_every_registered_predicate_is_reviewable_without_a_compass(kind) -> None:
     fact = relation(kind)
     source_role, target_role = RELATION_ROLES[kind]
     validate_relation_references(
@@ -71,7 +71,7 @@ def test_every_registered_predicate_is_reviewable_without_a_compass(kind):
 @pytest.mark.parametrize("kind", KINDS)
 def test_confirmed_absence_is_covered_without_inventing_actions_or_overall_suitability(
     kind,
-):
+) -> None:
     result = analyze([relation(kind, present=False)])
     assert result["status"] == "complete"
     assert result["findings"][0]["status"] == "not_present"
@@ -81,7 +81,7 @@ def test_confirmed_absence_is_covered_without_inventing_actions_or_overall_suita
 
 
 @pytest.mark.parametrize("present", [True, False, None])
-def test_all_photo_relations_remain_candidates(present):
+def test_all_photo_relations_remain_candidates(present: bool | None) -> None:
     result = analyze([relation(present=present, basis="image_observed")])
     assert result["status"] == "partial"
     assert result["findings"][0]["status"] == "candidate_only"
@@ -94,7 +94,9 @@ def test_all_photo_relations_remain_candidates(present):
     assert result["rule_coverage_counts"]["unknown"] == 1
 
 
-def test_explicit_unknown_needs_relation_confirmation_without_requiring_direction():
+def test_explicit_unknown_needs_relation_confirmation_without_requiring_direction() -> (
+    None
+):
     result = analyze([relation(present=None, basis="measured")])
     assert result["findings"][0]["status"] == "needs_confirmation"
     assert result["missing_inputs"] == [
@@ -106,7 +108,7 @@ def test_explicit_unknown_needs_relation_confirmation_without_requiring_directio
 @pytest.mark.parametrize("kind", KINDS)
 def test_photo_caution_can_be_explained_conditionally_without_certifying_an_action(
     kind,
-):
+) -> None:
     result = analyze([relation(kind, basis="image_observed")])
     finding = result["findings"][0]
     conditional = finding["conditional_interpretation"]
@@ -120,14 +122,18 @@ def test_photo_caution_can_be_explained_conditionally_without_certifying_an_acti
 
 
 @pytest.mark.parametrize("present", [False, None])
-def test_photo_absence_or_unknown_does_not_create_a_conditional_caution(present):
+def test_photo_absence_or_unknown_does_not_create_a_conditional_caution(
+    present: bool | None,
+) -> None:
     finding = analyze([relation(present=present, basis="image_observed")])["findings"][
         0
     ]
     assert finding["conditional_interpretation"] is None
 
 
-def test_photo_conditional_suggestions_respect_both_endpoints_action_constraints():
+def test_photo_conditional_suggestions_respect_both_endpoints_action_constraints() -> (
+    None
+):
     constraints = [
         LayoutConstraint(
             object_id=object_id,
@@ -143,12 +149,12 @@ def test_photo_conditional_suggestions_respect_both_endpoints_action_constraints
 
 
 @pytest.mark.parametrize("present", [1, 0, "true", "false", "yes"])
-def test_relation_does_not_coerce_truth(present):
+def test_relation_does_not_coerce_truth(present: int | str) -> None:
     with pytest.raises(ValidationError):
         relation(present=present)
 
 
-def test_present_is_required_and_extra_personal_chart_fields_are_rejected():
+def test_present_is_required_and_extra_personal_chart_fields_are_rejected() -> None:
     payload = relation().model_dump()
     del payload["present"]
     with pytest.raises(ValidationError):
@@ -162,12 +168,12 @@ def test_present_is_required_and_extra_personal_chart_fields_are_rejected():
 @pytest.mark.parametrize(
     "field", ["relation_id", "source_object_id", "target_object_id", "evidence"]
 )
-def test_identifiers_and_evidence_must_be_nonblank(field):
+def test_identifiers_and_evidence_must_be_nonblank(field: str) -> None:
     with pytest.raises(ValidationError):
         relation(**{field: "  "})
 
 
-def test_endpoint_identity_and_reference_roles_are_explicit():
+def test_endpoint_identity_and_reference_roles_are_explicit() -> None:
     with pytest.raises(ValidationError):
         relation(target_object_id="source")
     with pytest.raises(ValueError, match="未知对象"):
@@ -185,7 +191,9 @@ def test_endpoint_identity_and_reference_roles_are_explicit():
         )
 
 
-def test_multiple_explicit_roles_are_independent_and_duplicate_facts_are_rejected():
+def test_multiple_explicit_roles_are_independent_and_duplicate_facts_are_rejected() -> (
+    None
+):
     first = relation("sharp_corner_points_at_desk")
     roles = {"source": {"desk", "sharp_corner"}, "target": {"desk"}}
     validate_relation_references([first], roles, {})
@@ -197,7 +205,9 @@ def test_multiple_explicit_roles_are_independent_and_duplicate_facts_are_rejecte
         )
 
 
-def test_bed_corner_rule_requires_a_pillar_and_does_not_generalize_furniture_corners():
+def test_bed_corner_rule_requires_a_pillar_and_does_not_generalize_furniture_corners() -> (
+    None
+):
     fact = relation("pillar_corner_points_at_bed")
     with pytest.raises(ValueError, match="pillar_corner"):
         validate_relation_references(
@@ -217,14 +227,14 @@ def test_bed_corner_rule_requires_a_pillar_and_does_not_generalize_furniture_cor
     "kind", ["bed_headboard_against_toilet_wall", "stove_back_against_toilet_wall"]
 )
 def test_toilet_wall_relation_requires_the_fixture_side_not_any_bathroom_partition(
-    kind,
-):
+    kind: str,
+) -> None:
     finding = analyze([relation(kind)])["findings"][0]
     assert "便器所在位置的共墙" in finding["predicate"]
     assert any("任意卫生间隔墙" in item for item in finding["exceptions"])
 
 
-def test_horizontal_relation_uses_level_not_interior_courtyard_floor_id():
+def test_horizontal_relation_uses_level_not_interior_courtyard_floor_id() -> None:
     fact = relation("sharp_corner_points_at_desk")
     roles = {"source": {"sharp_corner"}, "target": {"desk"}}
     floors = {
@@ -247,8 +257,8 @@ def test_horizontal_relation_uses_level_not_interior_courtyard_floor_id():
 
 @pytest.mark.parametrize("source_level,target_level", [(1, 1), (1, 2)])
 def test_bed_above_stove_requires_known_vertical_order_only_when_asserted(
-    source_level, target_level
-):
+    source_level: int, target_level: int
+) -> None:
     fact = relation("bed_above_stove")
     roles = {"source": {"bed"}, "target": {"stove"}}
     floors = {"source": {"level": source_level}, "target": {"level": target_level}}
@@ -267,7 +277,7 @@ def test_bed_above_stove_requires_known_vertical_order_only_when_asserted(
     validate_relation_references([fact], roles, {})
 
 
-def test_mirror_actions_have_independent_permissions_and_no_ready_state():
+def test_mirror_actions_have_independent_permissions_and_no_ready_state() -> None:
     result = analyze(
         [relation()],
         [
@@ -292,7 +302,9 @@ def test_mirror_actions_have_independent_permissions_and_no_ready_state():
     assert result["status"] == "complete"
 
 
-def test_all_actions_blocked_stop_action_questions_and_do_not_move_structural_sources():
+def test_all_actions_blocked_stop_action_questions_and_do_not_move_structural_sources() -> (
+    None
+):
     fact = relation("exposed_beam_above_bed")
     result = analyze(
         [fact],
@@ -316,7 +328,7 @@ def test_all_actions_blocked_stop_action_questions_and_do_not_move_structural_so
         } == {"source"}
 
 
-def test_vertical_alternatives_do_not_share_permission_between_bed_and_stove():
+def test_vertical_alternatives_do_not_share_permission_between_bed_and_stove() -> None:
     result = analyze(
         [relation("bed_above_stove")],
         [
@@ -334,7 +346,7 @@ def test_vertical_alternatives_do_not_share_permission_between_bed_and_stove():
     ]
 
 
-def test_main_entry_relation_has_no_invented_screen_or_door_reconstruction():
+def test_main_entry_relation_has_no_invented_screen_or_door_reconstruction() -> None:
     result = analyze([relation("main_entry_door_faces_bathroom_door")])
     assert (
         result["findings"][0]["action_status"] == "no_registered_nonstructural_action"
@@ -342,7 +354,9 @@ def test_main_entry_relation_has_no_invented_screen_or_door_reconstruction():
     assert result["action_options"] == []
 
 
-def test_source_versions_and_mirror_disagreement_are_preserved_and_not_auto_selected():
+def test_source_versions_and_mirror_disagreement_are_preserved_and_not_auto_selected() -> (
+    None
+):
     provenance = interior_relation_provenance()
     assert provenance["ruleset_id"] == "interior_authored_relations_v1"
     assert len(RELATION_ROLES) == len(KINDS) == 12
@@ -354,6 +368,8 @@ def test_source_versions_and_mirror_disagreement_are_preserved_and_not_auto_sele
         assert source["retrieved_at"] == "2026-10-15"
         if source["evidence_excerpt"]:
             assert len(source["evidence_excerpt"].split()) < 25
+        else:
+            pass
     result = analyze([relation()])
     disagreement = result["findings"][0]["method_disagreements"][0]
     assert disagreement["source_id"] in sources
@@ -365,12 +381,12 @@ def test_source_versions_and_mirror_disagreement_are_preserved_and_not_auto_sele
     assert interior_relation_provenance() == original
 
 
-def test_empty_scope_does_not_claim_assessment():
+def test_empty_scope_does_not_claim_assessment() -> None:
     assert analyze_interior_relations([], [])["status"] == "not_requested"
     assert analyze([])["rulesets"] == []
 
 
-def test_provenance_sources_meet_output_contract_and_keep_citable_locators():
+def test_provenance_sources_meet_output_contract_and_keep_citable_locators() -> None:
     from fatebridge.core.fengshui.output import RuleSource
 
     required = {

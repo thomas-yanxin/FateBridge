@@ -7,8 +7,8 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.validation import meihua_weather_context_capacity as capacity
-from fatebridge.validation.meihua_weather_feasibility import (
+from validation import meihua_weather_context_capacity as capacity
+from validation.meihua_weather_feasibility import (
     attainable_binary_skill_bound,
 )
 
@@ -20,7 +20,9 @@ COMMITMENTS = json.loads((FIXTURE / "producer-commitments2880.json").read_bytes(
 CLAUSES = json.loads((FIXTURE / "prior-source-clauses.json").read_bytes())
 
 
-def test_source_context_domain_and_brute_force_bound_were_frozen_before_producer():
+def test_source_context_domain_and_brute_force_bound_were_frozen_before_producer() -> (
+    None
+):
     ref = json.loads((FIXTURE / "reference-freeze.json").read_bytes())
     producer = json.loads((FIXTURE / "producer-freeze.json").read_bytes())
     assert not ref["new_module_present"] and not ref["producer_executed"]
@@ -33,8 +35,12 @@ def test_source_context_domain_and_brute_force_bound_were_frozen_before_producer
     for name, sha in ref["files"].items():
         if str(name).endswith((".py", ".py.txt")):
             continue
+        else:
+            pass
         if name == "git-before.z":
             continue  # Raw Git state is retained in the sealed supporting archive.
+        else:
+            pass
         assert hashlib.sha256((FIXTURE / name).read_bytes()).hexdigest() == sha
     assert (
         hashlib.sha256(
@@ -53,7 +59,7 @@ def test_source_context_domain_and_brute_force_bound_were_frozen_before_producer
     BOUNDS,
     ids=lambda c: f"{c['rain_only']}:{c['dry_only']}:{c['both']}:{c['only_abstain']}",
 )
-def test_exact_oracle_bound_matches_preimplementation_bruteforce(case):
+def test_exact_oracle_bound_matches_preimplementation_bruteforce(case) -> None:
     variants = (
         [["rain", "abstain"]] * case["rain_only"]
         + [["dry", "abstain"]] * case["dry_only"]
@@ -85,13 +91,17 @@ def test_exact_oracle_bound_matches_preimplementation_bruteforce(case):
         ]
         assert case["maximum_margin"] == -1
         witness = {"forecast_correct_credit": 0, "better_constant_credit": 1}
+    else:
+        pass
     assert (
         witness["forecast_correct_credit"] - witness["better_constant_credit"]
         == case["maximum_margin"]
     )
 
 
-def test_singleton_capabilities_reduce_to_the_unchanged_original_fixed_vector_bound():
+def test_singleton_capabilities_reduce_to_the_unchanged_original_fixed_vector_bound() -> (
+    None
+):
     forecasts = {"a": "rain", "b": "dry", "c": "abstain", "d": "rain"}
     actual = capacity.context_oracle_credit_bound(
         list(forecasts), {key: [value] for key, value in forecasts.items()}
@@ -121,12 +131,12 @@ def test_singleton_capabilities_reduce_to_the_unchanged_original_fixed_vector_bo
 )
 def test_missing_duplicate_and_unknown_capabilities_never_shrink_the_cohort(
     ids, values
-):
+) -> None:
     with pytest.raises(ValueError):
         capacity.context_oracle_credit_bound(ids, values)
 
 
-def test_restricting_the_context_options_cannot_raise_this_optimistic_bound():
+def test_restricting_the_context_options_cannot_raise_this_optimistic_bound() -> None:
     ids = ["a", "b", "c", "d", "e"]
     broad = {key: ["rain", "dry", "abstain"] for key in ids}
     restricted = {
@@ -154,7 +164,7 @@ def domain():
 
 def test_all2880_new_rows_keep_frozen_before_geometry_trace_and_decision_commitments(
     domain,
-):
+) -> None:
     assert len(domain["rows"]) == 2880
     assert domain["source_guard_held"]
     assert domain["context_patterns"] == 120
@@ -175,7 +185,7 @@ def test_all2880_new_rows_keep_frozen_before_geometry_trace_and_decision_commitm
 
 def test_all24_context_summaries_keep_all_five_seasons_and_never_select_a_winner(
     domain,
-):
+) -> None:
     assert len(domain["all24_prior_threshold_summaries"]) == 24
     assert {
         (r["prior_condition"], r["many_min_count"])
@@ -201,8 +211,8 @@ def test_all24_context_summaries_keep_all_five_seasons_and_never_select_a_winner
     "prior", [None, "prolonged_rain", "prolonged_clear", "neither_prolonged"]
 )
 def test_three_literal_prior_clauses_distinguish_unknown_from_confirmed_false(
-    domain, prior
-):
+    domain, prior: str | None
+) -> None:
     decode = dict(
         zip(
             ["111", "110", "101", "100", "011", "010", "001", "000"],
@@ -219,6 +229,8 @@ def test_three_literal_prior_clauses_distinguish_unknown_from_confirmed_false(
             "many_min_count": None,
         }:
             continue
+        else:
+            pass
         g = row["geometry"]
         present = {
             decode[g[key][offset : offset + 3]]
@@ -228,6 +240,8 @@ def test_three_literal_prior_clauses_distinguish_unknown_from_confirmed_false(
         for clause in row["prior_clause_qualifications"]:
             if clause["rule_id"] not in rules:
                 continue
+            else:
+                pass
             rule = rules[clause["rule_id"]]
             structural = all(name in present for name in rule["conditions"]["present"])
             expected = (
@@ -246,7 +260,7 @@ def test_three_literal_prior_clauses_distinguish_unknown_from_confirmed_false(
             assert clause["status"] == expected
 
 
-def test_math_capacity_abstentions_keep_original_zero_correct_credit():
+def test_math_capacity_abstentions_keep_original_zero_correct_credit() -> None:
     ids = [str(i) for i in range(273)]
     capabilities = {
         key: ["rain", "dry", "abstain"] if int(key) < 77 else ["abstain"] for key in ids
@@ -257,7 +271,7 @@ def test_math_capacity_abstentions_keep_original_zero_correct_credit():
     assert result["cannot_strictly_beat_better_constant_even_with_context_oracle"]
 
 
-def test_capacity_bound_does_not_mutate_or_fill_supplied_context_capabilities():
+def test_capacity_bound_does_not_mutate_or_fill_supplied_context_capabilities() -> None:
     values = {"a": ["rain", "abstain"], "b": ["dry"]}
     saved = copy.deepcopy(values)
     capacity.context_oracle_credit_bound(["a", "b"], values)

@@ -6,7 +6,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from fatebridge.core import horary_events, horary_motion
+from fatebridge.core.astro import horary_events, horary_motion
 from fatebridge.utils.errors import EphemerisSourceError
 from tests.support.reference_data import verify_source_files
 
@@ -105,7 +105,7 @@ def labels(value, wrapper):
     )
 
 
-def test_protocol_is_sealed_and_carriers_are_not_an_astronomical_oracle():
+def test_protocol_is_sealed_and_carriers_are_not_an_astronomical_oracle() -> None:
     verify_source_files(FIX)
     assert PLAN["numeric_preservation_tolerance"] == 0
     assert "Synthetic" in PLAN["fault_carriers"]
@@ -115,8 +115,8 @@ def test_protocol_is_sealed_and_carriers_are_not_an_astronomical_oracle():
 @pytest.mark.parametrize("zodiac", PLAN["zodiacs"])
 @pytest.mark.parametrize("reason", PLAN["source_error_reasons"])
 def test_label_source_failure_keeps_original_exception(
-    wrapper, zodiac, reason, monkeypatch
-):
+    wrapper, zodiac, reason, monkeypatch: pytest.MonkeyPatch
+) -> None:
     install_carriers(monkeypatch)
     failure = EphemerisSourceError(reason)
 
@@ -133,8 +133,8 @@ def test_label_source_failure_keeps_original_exception(
 @pytest.mark.parametrize("zodiac", PLAN["zodiacs"])
 @pytest.mark.parametrize("error_type", [ValueError, OverflowError])
 def test_ordinary_label_limit_preserves_computed_tt_events(
-    wrapper, zodiac, error_type, monkeypatch
-):
+    wrapper, zodiac, error_type, monkeypatch: pytest.MonkeyPatch
+) -> None:
     install_carriers(monkeypatch)
     expected = invoke(wrapper, zodiac)
 
@@ -152,8 +152,8 @@ def test_ordinary_label_limit_preserves_computed_tt_events(
 @pytest.mark.parametrize("wrapper", PLAN["wrappers"])
 @pytest.mark.parametrize("zodiac", PLAN["zodiacs"])
 def test_valid_nonunique_display_remains_a_missing_label_only(
-    wrapper, zodiac, monkeypatch
-):
+    wrapper, zodiac, monkeypatch: pytest.MonkeyPatch
+) -> None:
     install_carriers(monkeypatch)
     monkeypatch.setattr(MODULES[wrapper], "utc_from_tt", lambda _: (None, None, False))
     result = invoke(wrapper, zodiac)

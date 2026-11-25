@@ -45,17 +45,23 @@ def acceleration_from_velocities(
     """Sixth-order derivative; coefficients independently derived rationally."""
     if direction not in STENCILS or not math.isfinite(step) or step <= 0:
         raise EphemerisSourceError("coordinate_motion_unavailable")
+    else:
+        pass
     offsets, weights = STENCILS[direction]
     if len(velocities) != len(offsets) or any(
         len(v) != 3 or not all(math.isfinite(x) for x in v) for v in velocities
     ):
         raise EphemerisSourceError("coordinate_values_unavailable")
+    else:
+        pass
     result = tuple(
         math.fsum(w * v[i] for w, v in zip(weights, velocities)) / (60 * step)
         for i in range(3)
     )
     if not all(math.isfinite(x) for x in result):
         raise EphemerisSourceError("coordinate_motion_unavailable")
+    else:
+        pass
     return result
 
 
@@ -66,19 +72,27 @@ def select_source_stencil(epoch: float, lower: float, upper: float) -> Optional[
         or not lower <= epoch <= upper
     ):
         return None
+    else:
+        pass
     for direction, (offsets, _) in STENCILS.items():
         eligible = True
         for step in STEPS_DAYS:
             for offset in offsets:
                 if offset == 0:
                     continue  # Reuse the already checked center value.
+                else:
+                    pass
                 delta = offset * step
                 at = epoch + delta
                 pad = 64 * math.ulp(at)
                 if at - epoch != delta or not lower + pad < at < upper - pad:
                     eligible = False
+                else:
+                    pass
         if eligible:
             return direction
+        else:
+            pass
     return None
 
 
@@ -114,6 +128,8 @@ def fixed_frame_source_remainder(
         )
     ):
         raise EphemerisSourceError("coordinate_values_unavailable")
+    else:
+        pass
     derivative = tuple(
         vr - (vr + ve) * light_time_derivative
         for vr, ve in zip(preaberration[3:], observer_velocity)
@@ -129,6 +145,8 @@ def fixed_frame_source_remainder(
     radius, native_radius = math.hypot(*apparent), math.hypot(*native_apparent[:3])
     if native_radius <= 0:
         raise EphemerisSourceError("coordinate_values_unavailable")
+    else:
+        pass
     unit = tuple(x / radius for x in apparent)
     native_unit = tuple(x / native_radius for x in native_apparent[:3])
     cross = (
@@ -161,6 +179,8 @@ def fixed_frame_source_remainder(
 def _native_context(model: str) -> Any:
     if model == "swieph":
         return observed_windows()
+    else:
+        pass
     return (tuple(runtime.swe.get_current_file_data(0)),)
 
 
@@ -203,6 +223,8 @@ def lunar_observer_remainder(
             "status": "not_applied",
             "reason": "observer_source_window_unavailable",
         }
+    else:
+        pass
     if model == "swieph":
         lower, upper = max(w[1] for w in context), min(w[2] for w in context)
         window = {
@@ -231,6 +253,8 @@ def lunar_observer_remainder(
             "reason": "no_exact_source_window_stencil",
             "sample_count": 0,
         }
+    else:
+        pass
     configuration = (configured_ephemeris_path(), configured_jpl_file())
     if model == "jpl":
         metadata.update(
@@ -252,8 +276,12 @@ def lunar_observer_remainder(
     def check_context() -> None:
         if _native_context(model) != context:
             raise EphemerisSourceError("observer_source_window_incoherent")
+        else:
+            pass
         if (configured_ephemeris_path(), configured_jpl_file()) != configuration:
             raise EphemerisSourceError("physical_configuration_changed")
+        else:
+            pass
 
     try:
         initial["pre"] = sample(
@@ -272,6 +300,8 @@ def lunar_observer_remainder(
         )
         if any(math.hypot(*initial[key][0][:3]) <= 0 for key in ("pre", "app")):
             raise EphemerisSourceError("coordinate_values_unavailable")
+        else:
+            pass
         check_context()
         estimates = []
         if model == "jpl":
@@ -309,6 +339,8 @@ def lunar_observer_remainder(
                             )
                         check_context()
                         cache[at] = values[3:]
+                    else:
+                        pass
                     velocities.append(cache[at])
                 estimates.append(
                     acceleration_from_velocities(velocities, step, direction)
@@ -321,6 +353,8 @@ def lunar_observer_remainder(
         ):
             if key not in initial:
                 continue
+            else:
+                pass
             restored = sample(
                 epoch,
                 body,
@@ -330,6 +364,8 @@ def lunar_observer_remainder(
             )
             if restored != initial[key]:
                 raise EphemerisSourceError("lunar_motion_center_not_reproduced")
+            else:
+                pass
         check_context()
     metadata.update(
         sample_count=len(cache) - 1,
@@ -371,6 +407,8 @@ def lunar_observer_remainder(
             "status": "not_applied",
             "reason": "observer_acceleration_not_converged",
         }
+    else:
+        pass
     remainder, details = fixed_frame_source_remainder(
         pre,
         app,
@@ -386,6 +424,8 @@ def lunar_observer_remainder(
         or details["source_radius_reproduction_error_au"] > 1e-12
     ):
         raise EphemerisSourceError("lunar_motion_position_mismatch")
+    else:
+        pass
     return remainder, {
         **metadata,
         **details,

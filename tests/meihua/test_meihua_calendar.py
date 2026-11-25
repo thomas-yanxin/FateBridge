@@ -9,7 +9,7 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.validation.meihua_calendar import (
+from validation.meihua_calendar import (
     audit_tam_1900,
     reference_bundle,
     tam_calendar_rows,
@@ -22,7 +22,7 @@ def cells():
     return json.loads((REFERENCES / "cells.json").read_text())["cells"]
 
 
-def test_all_supported_1900_dates_match_primary_labels_in_declared_zones():
+def test_all_supported_1900_dates_match_primary_labels_in_declared_zones() -> None:
     report = audit_tam_1900(REFERENCES)
     assert report["primary_printed_date_count"] == 365
     assert report["unique_supported_date_count"] == 365
@@ -35,7 +35,7 @@ def test_all_supported_1900_dates_match_primary_labels_in_declared_zones():
     assert not report["real_world_predictive_efficacy_established"]
 
 
-def test_printed_leap_eighth_month_and_year_boundary():
+def test_printed_leap_eighth_month_and_year_boundary() -> None:
     _, rows = reference_bundle(REFERENCES)
     by_date = {r["date"].isoformat(): r for r in rows}
     expected = {
@@ -59,7 +59,7 @@ def test_printed_leap_eighth_month_and_year_boundary():
 @pytest.mark.parametrize(
     "mutation", ["removed", "duplicate", "day_gap", "wrong_leap", "invalid_gregorian"]
 )
-def test_source_decoder_rejects_omission_and_bad_transcriptions(mutation):
+def test_source_decoder_rejects_omission_and_bad_transcriptions(mutation: str) -> None:
     records = copy.deepcopy(cells())
     if mutation == "removed":
         records.pop()
@@ -77,7 +77,9 @@ def test_source_decoder_rejects_omission_and_bad_transcriptions(mutation):
         tam_calendar_rows(records, initial_lunar_year=1899)
 
 
-def test_changed_primary_material_cannot_silently_become_a_new_oracle(tmp_path):
+def test_changed_primary_material_cannot_silently_become_a_new_oracle(
+    tmp_path: Path,
+) -> None:
     target = tmp_path / "refs"
     shutil.copytree(REFERENCES, target)
     p = target / "cells.json"
@@ -90,7 +92,9 @@ def test_changed_primary_material_cannot_silently_become_a_new_oracle(tmp_path):
     "mutation",
     [None, "outside", "other_shared_scan", "changed", "rehashed", "redirected"],
 )
-def test_only_registered_shared_original_is_allowed_outside_bundle(tmp_path, mutation):
+def test_only_registered_shared_original_is_allowed_outside_bundle(
+    tmp_path: Path, mutation: str | None
+) -> None:
     target = tmp_path / "tests/fixtures/meihua_calendar_v2"
     shutil.copytree(REFERENCES, target)
     scan = target / "sources/tam-1900.pdf"
@@ -123,6 +127,10 @@ def test_only_registered_shared_original_is_allowed_outside_bundle(tmp_path, mut
                 r for r in manifest["artifacts"] if r["file"] == "sources/tam-1900.pdf"
             )["sha256"] = hashlib.sha256(shared.read_bytes()).hexdigest()
             path.write_text(json.dumps(manifest))
+        else:
+            pass
+    else:
+        pass
     scan.unlink()
     scan.symlink_to(destination)
     if mutation is None:
@@ -135,7 +143,9 @@ def test_only_registered_shared_original_is_allowed_outside_bundle(tmp_path, mut
             reference_bundle(target)
 
 
-def test_audit_cannot_get_perfect_agreement_by_shrinking_supported_dates(monkeypatch):
+def test_audit_cannot_get_perfect_agreement_by_shrinking_supported_dates(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setattr(
         "fatebridge.core.almanac.LUNAR_SUPPORTED_SOLAR_START", date(1900, 2, 1)
     )

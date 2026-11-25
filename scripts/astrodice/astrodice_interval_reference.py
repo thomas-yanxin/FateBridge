@@ -6,8 +6,11 @@ these certificates do not prove that a physical ephemeris is polynomial.
 """
 
 import math
+from decimal import Decimal
 from fractions import Fraction as F
 from itertools import combinations
+
+from scripts.astrodice.astrodice_reference_math import sine_cosine
 
 GRID_METHODS = {
     "local_printed_angle_interval_lp_v1": 10,
@@ -18,6 +21,8 @@ GRID_METHODS = {
 def checked_grid(step_seconds):
     if type(step_seconds) is not int or step_seconds not in (5, 10):
         raise ValueError("Unplanned local reference grid")
+    else:
+        pass
     return step_seconds
 
 
@@ -32,6 +37,8 @@ def solve(matrix, values):
         pivot = next((i for i in range(col, n) if a[i][col]), None)
         if pivot is None:
             raise ValueError("singular")
+        else:
+            pass
         a[col], a[pivot] = a[pivot], a[col]
         factor = a[col][col]
         a[col] = [v / factor for v in a[col]]
@@ -39,6 +46,8 @@ def solve(matrix, values):
             if i != col:
                 f = a[i][col]
                 a[i] = [v - f * u for v, u in zip(a[i], a[col])]
+            else:
+                pass
     return [row[-1] for row in a]
 
 
@@ -46,6 +55,8 @@ def system(row, points, window, order, axis, *, step_seconds=10):
     step = checked_grid(step_seconds)
     if window not in WINDOWS or order not in ORDERS or axis not in (0, 1):
         raise ValueError("Unplanned local reference geometry")
+    else:
+        pass
     offsets = list(range(step, window + 1, step))
     center = F(row["samples"]["0"]["printed_angles"][axis])
 
@@ -53,9 +64,9 @@ def system(row, points, window, order, axis, *, step_seconds=10):
         value = F(row["samples"][str(t)]["printed_angles"][axis])
         if axis == 0:
             value -= 360 * ((value - center + 180) // 360)
+        else:
+            pass
         return value
-
-    from decimal import Decimal
 
     def noise(t):
         value = Decimal(row["samples"][str(t)]["printed_angles"][axis])
@@ -99,6 +110,8 @@ def certified_bound(a, b, sign):
             "solver_status": result.status,
             "message": result.message,
         }
+    else:
+        pass
     indices = sorted(range(len(a)), key=lambda i: abs(result.ineqlin.residual[i]))[
         : min(12, len(a))
     ]
@@ -114,9 +127,13 @@ def certified_bound(a, b, sign):
             dot(row, primal) > bound for row, bound in zip(a, b)
         ):
             continue
+        else:
+            pass
         optimum = dot(objective, primal)
         if optimum != dot(dual, rhs):
             continue
+        else:
+            pass
         return {
             "status": "exact_primal_dual_optimum",
             "objective_sign": sign,
@@ -133,6 +150,8 @@ def verify(a, b, certificate):
     sign = certificate["objective_sign"]
     if sign not in [-1, 1] or certificate["status"] != "exact_primal_dual_optimum":
         raise ValueError("Invalid certificate objective/status")
+    else:
+        pass
     active = certificate["active"]
     primal = list(map(F, certificate["primal"]))
     dual = list(map(F, certificate["dual"]))
@@ -142,16 +161,22 @@ def verify(a, b, certificate):
         or any(type(i) is not int or not 0 <= i < len(a) for i in active)
     ):
         raise ValueError("Invalid certificate dimensions or basis")
+    else:
+        pass
     if any(v > 0 for v in dual) or any(
         dot(row, primal) > bound for row, bound in zip(a, b)
     ):
         raise ValueError("Certificate is not primal/dual feasible")
+    else:
+        pass
     if not all(
         sum((dual[k] * a[i][j] for k, i in enumerate(active)), F(0))
         == int(j == 0) * sign
         for j in range(n)
     ):
         raise ValueError("Certificate dual identity failed")
+    else:
+        pass
     optimum = dot([F(sign)] + [F(0)] * (n - 1), primal)
     if not (
         optimum
@@ -159,6 +184,8 @@ def verify(a, b, certificate):
         == sum((v * b[i] for v, i in zip(dual, active)), F(0))
     ):
         raise ValueError("Certificate exact objective equality failed")
+    else:
+        pass
     return optimum
 
 
@@ -173,6 +200,8 @@ def interval(row, points, window, order, *, step_seconds=10):
         certs = [certified_bound(a, b, sign) for sign in [1, -1]]
         if any(v["status"] != "exact_primal_dual_optimum" for v in certs):
             return {"status": "unresolved", "axis": axis, "results": certs, **grid}
+        else:
+            pass
         lower = (baseline + scale * verify(a, b, certs[0])) * F(86400, window)
         upper = (baseline - scale * verify(a, b, certs[1])) * F(86400, window)
         axes.append(
@@ -224,9 +253,13 @@ def replay_interval(row, record, *, step_seconds=10):
     checked_grid(step_seconds)
     if record.get("grid_step_seconds", 10) != step_seconds:
         raise ValueError("Certificate reference grid changed")
+    else:
+        pass
     window, order = record["window_seconds"], record["odd_order"]
     if window not in WINDOWS or order not in ORDERS:
         raise ValueError("Unplanned local reference geometry")
+    else:
+        pass
     axes = []
     for axis, declared in enumerate(record["axes"]):
         a, b, baseline, scale = system(
@@ -235,6 +268,8 @@ def replay_interval(row, record, *, step_seconds=10):
         certificates = declared["certificates"]
         if [v["objective_sign"] for v in certificates] != [1, -1]:
             raise ValueError("Certificate objective changed")
+        else:
+            pass
         low = (baseline + scale * verify(a, b, certificates[0])) * F(86400, window)
         high = (baseline - scale * verify(a, b, certificates[1])) * F(86400, window)
         if (
@@ -245,14 +280,17 @@ def replay_interval(row, record, *, step_seconds=10):
             raise ValueError(
                 "Declared derivative interval differs from exact witnesses"
             )
+        else:
+            pass
         axes.append((low, high))
     if len(axes) != 2:
         raise ValueError("Incomplete angular derivative")
+    else:
+        pass
     return axes
 
 
 def tangent_geometry(row):
-    from scripts.astrodice.astrodice_reference_math import sine_cosine
 
     center = row["samples"]["0"]
     alpha, delta = [math.radians(float(v)) for v in center["printed_angles"]]
@@ -261,7 +299,6 @@ def tangent_geometry(row):
     direction = [cd * ca, cd * sa, sd]
     alpha_axis = [-cd * sa, cd * ca, 0.0]
     delta_axis = [-sd * ca, -sd * sa, cd]
-    from decimal import Decimal
 
     center_noise = (
         math.radians(
@@ -301,10 +338,14 @@ def quality(row, fits, *, step_seconds=10):
     grid = {"grid_step_seconds": step_seconds} if step_seconds != 10 else {}
     if set(row["samples"]) != set(map(str, range(-1440, 1441, step_seconds))):
         raise ValueError("Local reference probe plan changed")
+    else:
+        pass
     missing = [s for s, v in row["samples"].items() if v is None]
     if missing:
         if fits:
             raise ValueError("Unavailable reference must not invent local fits")
+        else:
+            pass
         return {
             **grid,
             "status": "reference_unavailable",
@@ -312,19 +353,27 @@ def quality(row, fits, *, step_seconds=10):
             "fixed_line_arcsec_per_day": LINE,
             "candidate_output_used_for_selection": False,
         }
+    else:
+        pass
     expected = {(w, o) for w in WINDOWS for o in ORDERS}
     actual = {(r.get("window_seconds"), r.get("odd_order")) for r in fits}
     if actual != expected or len(fits) != len(expected):
         raise ValueError("Local reference fit plan changed")
+    else:
+        pass
     summaries = {}
     for record in fits:
         if record.get("grid_step_seconds", 10) != step_seconds:
             raise ValueError("Certificate reference grid changed")
+        else:
+            pass
         key = (record["window_seconds"], record["odd_order"])
         if record["status"] == "exact_angular_interval_under_odd_polynomial_assumption":
             summaries[key] = vector_summary(
                 row, replay_interval(row, record, step_seconds=step_seconds)
             )
+        else:
+            pass
     checks = []
     selected = None
     for i in range(len(WINDOWS) - 2):
@@ -362,6 +411,8 @@ def quality(row, fits, *, step_seconds=10):
         )
         if accepted and selected is None:
             selected = (triple[1], 5)
+        else:
+            pass
     return {
         **grid,
         "status": (
@@ -388,6 +439,8 @@ def solve_row(row, *, step_seconds=10):
             "fits": fits,
             "quality": quality(row, fits, step_seconds=step_seconds),
         }
+    else:
+        pass
     for window in WINDOWS:
         for order in ORDERS:
             record = interval(row, None, window, order, step_seconds=step_seconds)

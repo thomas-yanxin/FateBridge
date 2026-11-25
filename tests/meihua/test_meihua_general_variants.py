@@ -7,10 +7,19 @@ import unicodedata
 from pathlib import Path
 
 import pytest
+from jsonschema import Draft202012Validator
 
+from fatebridge.application.examples import evidence_views
 from fatebridge.services.meihua import calculate_meihua_cast
-from fatebridge.validation.meihua_general_variants import audit_general_casting_readings
-from tests.support.transports import rest, surface_calls
+from tests.support.transports import (
+    SPECS,
+    business,
+    call_cli,
+    native,
+    rest,
+    surface_calls,
+)
+from validation.meihua_general_variants import audit_general_casting_readings
 
 REFERENCES = Path(__file__).parents[1] / "fixtures/meihua_general_variants_v2"
 CASES = json.loads((REFERENCES / "cases.json").read_text())["cases"]
@@ -40,7 +49,7 @@ def resolve(output, path):
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
-def test_frozen_candidate_geometry_season_and_actual_verse(case):
+def test_frozen_candidate_geometry_season_and_actual_verse(case) -> None:
     output = calculate(case)
     readings = output["interpretation"]["casting_readings"]
     expected = case["expected"]
@@ -88,6 +97,8 @@ def test_frozen_candidate_geometry_season_and_actual_verse(case):
                     resolve(output, strength["fact_path"])["name"]
                     == strength["trigram"]
                 )
+        else:
+            pass
     if readings:
         assert sum(r["selected"] for r in readings) == 1
         assert (
@@ -95,9 +106,11 @@ def test_frozen_candidate_geometry_season_and_actual_verse(case):
             == output["meihua"]["seed"]["line_sum_basis"]
         )
         assert "各候选分列" in output["summary"]
+    else:
+        pass
 
 
-def test_frozen_audit_retains_source_and_acceptance_boundaries():
+def test_frozen_audit_retains_source_and_acceptance_boundaries() -> None:
     report = audit_general_casting_readings(REFERENCES)
     assert report["selected_checks_passed"], report
     assert report["literal_mathematical_probe_count"] == 9
@@ -109,7 +122,7 @@ def test_frozen_audit_retains_source_and_acceptance_boundaries():
     assert not report["predictive_efficacy_established"]
 
 
-def test_tampered_reference_still_fails_after_manifest_rehash(tmp_path):
+def test_tampered_reference_still_fails_after_manifest_rehash(tmp_path: Path) -> None:
     reference = tmp_path / "fixtures/meihua_general_variants_v2"
     shutil.copytree(REFERENCES, reference)
     shutil.copytree(
@@ -132,15 +145,21 @@ def test_tampered_reference_still_fails_after_manifest_rehash(tmp_path):
 def canonical_paths(value, prefix):
     if isinstance(value, str) and value.startswith(prefix):
         return "meihua" + value.removeprefix(prefix)
+    else:
+        pass
     if isinstance(value, list):
         return [canonical_paths(row, prefix) for row in value]
+    else:
+        pass
     if isinstance(value, dict):
         return {key: canonical_paths(row, prefix) for key, row in value.items()}
+    else:
+        pass
     return value
 
 
 @pytest.mark.parametrize("case", CASES[:7], ids=lambda c: c["id"])
-def test_each_candidate_agrees_with_standalone_existing_cast(case):
+def test_each_candidate_agrees_with_standalone_existing_cast(case) -> None:
     # Integration equivalence is separate from the frozen mathematical oracles.
     output = calculate(case)
     for reading in output["interpretation"]["casting_readings"]:
@@ -172,7 +191,7 @@ def test_each_candidate_agrees_with_standalone_existing_cast(case):
             resolve(output, reading["classical_text_reference"][field])
 
 
-def test_same_initial_relation_does_not_hide_opposite_final_relation():
+def test_same_initial_relation_does_not_hide_opposite_final_relation() -> None:
     output = calculate(CASES[4])
     comparison = output["interpretation"]["casting_comparison"]
     assert "body_use_relation" not in comparison["changed_fields"]
@@ -182,16 +201,16 @@ def test_same_initial_relation_does_not_hide_opposite_final_relation():
     assert "终应之变用乾对原体震为用克体" in output["summary"]
 
 
-def test_readings_do_not_mutate_cast_or_later_calls():
+def test_readings_do_not_mutate_cast_or_later_calls() -> None:
     a = calculate(CASES[0])
     a["interpretation"]["casting_readings"][0]["stage_relations"][0]["body"] = "伪造"
     assert a["meihua"]["counting_variants"][0]["stage_relations"][0]["body"] == "离"
     assert calculate(CASES[0])["interpretation"]["casting_readings"][0]["body"] == "离"
 
 
-def test_shared_audit_view_keeps_weather_body_readings_inapplicable(surface_calls):
-    from fatebridge.application.examples import evidence_views
-    from tests.support.transports import SPECS, business, call_cli, native
+def test_shared_audit_view_keeps_weather_body_readings_inapplicable(
+    surface_calls,
+) -> None:
 
     spec = SPECS["meihua_cast"]
     fields = evidence_views(spec)["audit"]["fields"]
@@ -215,11 +234,7 @@ def test_shared_audit_view_keeps_weather_body_readings_inapplicable(surface_call
 @pytest.mark.parametrize(
     "case", [CASES[0], CASES[3], CASES[4], CASES[6], CASES[8]], ids=lambda c: c["id"]
 )
-def test_candidate_reading_view_agrees_on_rest_mcp_cli(case, surface_calls):
-    from jsonschema import Draft202012Validator
-
-    from fatebridge.application.examples import evidence_views
-    from tests.support.transports import SPECS, business, call_cli, native
+def test_candidate_reading_view_agrees_on_rest_mcp_cli(case, surface_calls) -> None:
 
     spec = SPECS["meihua_cast"]
     fields = evidence_views(spec)["reading"]["fields"]

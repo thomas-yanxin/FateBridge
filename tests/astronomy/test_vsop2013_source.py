@@ -2,6 +2,7 @@
 
 import json
 import platform
+from pathlib import Path
 
 import pytest
 
@@ -10,7 +11,9 @@ from fatebridge.fetch_vsop2013 import source_profile
 from fatebridge.utils.errors import EphemerisSourceError
 
 
-def test_missing_manifest_is_a_nonretryable_source_failure(monkeypatch):
+def test_missing_manifest_is_a_nonretryable_source_failure(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.delenv(solar.MANIFEST_ENV, raising=False)
     with pytest.raises(EphemerisSourceError) as caught:
         solar.solar_longitudes_tt([2451545.0])
@@ -24,7 +27,9 @@ def test_missing_manifest_is_a_nonretryable_source_failure(monkeypatch):
     [True, "2451545", float("nan"), float("inf"), 10**1000],
     ids=["bool", "string", "nan", "inf", "huge_int"],
 )
-def test_invalid_epoch_precedes_native_loading(value, monkeypatch):
+def test_invalid_epoch_precedes_native_loading(
+    value, monkeypatch: pytest.MonkeyPatch
+) -> None:
     monkeypatch.setattr(
         solar, "_selected", lambda: pytest.fail("invalid epoch reached C")
     )
@@ -41,7 +46,9 @@ def test_invalid_epoch_precedes_native_loading(value, monkeypatch):
         (285.0, 1.0, 1.0),
     ],
 )
-def test_invalid_bracket_precedes_native_loading(args, monkeypatch):
+def test_invalid_bracket_precedes_native_loading(
+    args, monkeypatch: pytest.MonkeyPatch
+) -> None:
     monkeypatch.setattr(
         solar, "_selected", lambda: pytest.fail("invalid bracket reached C")
     )
@@ -76,7 +83,9 @@ def _manifest():
         {"binary": "/absolute.so"},
     ],
 )
-def test_wrong_model_or_path_cannot_load_a_library(fault, tmp_path, monkeypatch):
+def test_wrong_model_or_path_cannot_load_a_library(
+    fault, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     data = {**_manifest(), **fault}
     path = tmp_path / "manifest.json"
     path.write_text(json.dumps(data))
@@ -89,7 +98,7 @@ def test_wrong_model_or_path_cannot_load_a_library(fault, tmp_path, monkeypatch)
     assert caught.value.reason == "solar_vsop2013_invalid"
 
 
-def test_duplicate_manifest_key_is_rejected(tmp_path):
+def test_duplicate_manifest_key_is_rejected(tmp_path: Path) -> None:
     path = tmp_path / "manifest.json"
     path.write_text('{"abi_version":1,"abi_version":1}')
     with pytest.raises(EphemerisSourceError) as caught:
@@ -97,7 +106,9 @@ def test_duplicate_manifest_key_is_rejected(tmp_path):
     assert caught.value.reason == "solar_vsop2013_invalid"
 
 
-def test_binary_hash_is_checked_before_dlopen(tmp_path, monkeypatch):
+def test_binary_hash_is_checked_before_dlopen(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     path = tmp_path / "manifest.json"
     data = _manifest()
     (tmp_path / data["binary"]).write_bytes(b"not a native image")
@@ -121,7 +132,7 @@ def test_binary_hash_is_checked_before_dlopen(tmp_path, monkeypatch):
         "solar_vsop2013_calculation",
     ],
 )
-def test_new_consistency_errors_keep_the_shared_503_contract(reason):
+def test_new_consistency_errors_keep_the_shared_503_contract(reason: str) -> None:
     error = EphemerisSourceError(reason).as_result()
     assert error["error_code"] == "ephemeris_source_inconsistent"
     assert error["status_code"] == 503 and error["retryable"] is False

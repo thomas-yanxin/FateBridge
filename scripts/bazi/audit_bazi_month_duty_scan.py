@@ -34,6 +34,8 @@ def compare_claims(
     """Retain witnessed differences; agreement is never a publication gate."""
     if len(previous) != len(current):
         raise ValueError("A paired claim count changed; a new alignment is required")
+    else:
+        pass
     durations, glyphs = [], []
     for rank, (old, claim) in enumerate(zip(previous, current, strict=True)):
         locator = dict(
@@ -43,6 +45,8 @@ def compare_claims(
             durations.append(
                 dict(**locator, digital_days=old["days"], scanned_days=claim["days"])
             )
+        else:
+            pass
         if claim["source_name"] != old["source_name"]:
             glyphs.append(
                 dict(
@@ -57,14 +61,26 @@ def compare_claims(
                     ),
                 )
             )
+        else:
+            pass
     return durations, glyphs
 
 
 def audit() -> dict[str, Any]:
     data = json.loads(DATA.read_text(encoding="utf-8"))
+    profiles = data["profiles"]
+    if [profile["id"] for profile in profiles] != [
+        "sanming_cadal_opening_prose",
+        "sanming_cadal_following_table",
+    ]:
+        raise ValueError("Both scanned month profiles are required in source order")
+    else:
+        pass
     source = data["source"]
     if digest(FIXTURE / "06066038.cn.pdf") != source["source_pdf_sha256"]:
         raise ValueError("Full original scanned PDF changed")
+    else:
+        pass
     extraction = json.loads(
         (FIXTURE / "extraction-manifest.json").read_text(encoding="utf-8")
     )
@@ -73,17 +89,23 @@ def audit() -> dict[str, Any]:
         or digest(FIXTURE / "chapter66-74.pdf") != extraction["excerpt_sha256"]
     ):
         raise ValueError("Chapter excerpt binding changed")
+    else:
+        pass
     if [r["original_pdf_page"] for r in extraction["pages"]] != list(range(66, 75)):
         raise ValueError("Chapter or boundary page omitted")
+    else:
+        pass
     digital = json.loads(
         (ROOT / "src/fatebridge/data/bazi_month_duty_sources_v1.json").read_text()
     )
     rows = []
     glyph_differences = []
     duration_differences = []
-    for index, profile in enumerate(data["profiles"]):
+    for index, profile in enumerate(profiles):
         if list(profile["months"]) != list(MONTHS):
             raise ValueError("All twelve source months and their order required")
+        else:
+            pass
         text = "\n".join(r["literal_quote"] for r in profile["months"].values())
         parsed = transcribe(text, prose=index == 0)
         for branch, literal in zip(MONTHS, parsed, strict=True):
@@ -95,13 +117,19 @@ def audit() -> dict[str, Any]:
                 raise ValueError(
                     "Structured reading differs from its literal transcription"
                 )
+            else:
+                pass
             if not month["original_pdf_pages"] or not set(
                 month["original_pdf_pages"]
             ) <= set(range(66, 74)):
                 raise ValueError("Reading lacks actual chapter page references")
+            else:
+                pass
             previous = digital["profiles"][index]["months"][branch]
             if len(claims) != len(previous["claims"]):
                 raise ValueError("A digital claim disappeared from the comparison")
+            else:
+                pass
             durations, glyphs = compare_claims(
                 previous["claims"],
                 claims,
@@ -116,11 +144,15 @@ def audit() -> dict[str, Any]:
                 if stem is None:
                     if claim["source_name"] not in {"艮土", "坤土"}:
                         raise ValueError("Unclassified unknown stem")
+                    else:
+                        pass
                 elif (
                     stem not in "甲乙丙丁戊己庚辛壬癸"
                     or stem != claim["source_name"][0]
                 ):
                     raise ValueError("Canonical stem does not match explicit reading")
+                else:
+                    pass
             total = sum(c["days"] for c in claims)
             rows.append(
                 dict(
@@ -145,13 +177,19 @@ def audit() -> dict[str, Any]:
         (g["source_names"], g["each_days"]) for g in annual["groups"]
     ]:
         raise ValueError("Annual literal groups differ from structured readings")
+    else:
+        pass
     stated = re.search(r"共計([一二三四五六七八九十百]+)日", annual["literal_quote"])
     if stated is None:
         raise ValueError("Annual stated sum omitted")
+    else:
+        pass
     hundreds, remainder = stated[1].split("百")
     stated_number = number(hundreds) * 100 + (number(remainder) if remainder else 0)
     if stated_number != annual["stated_total_days"]:
         raise ValueError("Annual stated literal sum differs")
+    else:
+        pass
     annual_total = sum(
         len(g["source_names"]) * g["each_days"] for g in annual["groups"]
     )
@@ -165,6 +203,8 @@ def audit() -> dict[str, Any]:
     ]:
         if anchor not in quote:
             raise ValueError("Closing critique or its limits omitted")
+        else:
+            pass
     return dict(
         recorded_at_utc=datetime.now(timezone.utc).isoformat(),
         transcription_parser_sha256=digest(
@@ -202,6 +242,8 @@ def main() -> None:
     output = args.output.resolve()
     if output.exists() or Path(str(output) + ".sha256").exists():
         raise SystemExit("Preserve first results")
+    else:
+        pass
     result = audit()
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_bytes(
@@ -228,3 +270,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+else:
+    pass

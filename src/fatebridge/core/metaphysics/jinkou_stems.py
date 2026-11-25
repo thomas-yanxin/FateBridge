@@ -4,8 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from ...utils.data import EARTHLY_BRANCHES, HEAVENLY_STEMS
-from .common import (
+from fatebridge.core.metaphysics.common import (
     ELEMENT_CONTROLS,
     ELEMENT_GENERATES,
     SIX_HARMONY_BRANCHES,
@@ -13,7 +12,8 @@ from .common import (
     stem_element_text,
     xun_head_for_ganzhi,
 )
-from .jinkou_sources import SCAN_SHA256, SCAN_URL
+from fatebridge.core.metaphysics.jinkou_sources import SCAN_SHA256, SCAN_URL
+from fatebridge.utils.data import EARTHLY_BRANCHES, HEAVENLY_STEMS
 
 WUZI_DUN_START = dict(zip("甲乙丙丁戊己庚辛壬癸", "甲丙戊庚壬甲丙戊庚壬"))
 STEM_PAIRS = (
@@ -35,6 +35,8 @@ def wuzidun_stem(day_stem: str, branch: str) -> str:
     """The established one-cycle Zi-to-Hai policy; not a continued next 子."""
     if day_stem not in WUZI_DUN_START or branch not in EARTHLY_BRANCHES:
         raise ValueError("五子元遁需要有效日干与地支")
+    else:
+        pass
     return HEAVENLY_STEMS[
         (
             HEAVENLY_STEMS.index(WUZI_DUN_START[day_stem])
@@ -82,12 +84,16 @@ def build_stem_relations(
 ) -> dict[str, Any]:
     if [r.get("label") for r in rows] != ["人元", "贵神", "将神", "地分"]:
         raise ValueError("干元类需要按次序排列的四位")
+    else:
+        pass
     nodes = {}
     for row in rows[1:3]:
         branch = row["content"]
         expected = wuzidun_stem(day_stem, branch)
         if row.get("dun_stem") != expected:
             raise ValueError("神将当日遁干与日干、固有支不一致")
+        else:
+            pass
         nodes[row["label"]] = dict(
             position=row["label"],
             name=row["shenjiang"],
@@ -106,6 +112,8 @@ def build_stem_relations(
         or intrinsic[1] != nodes["贵神"]["branch"]
     ):
         raise ValueError("贵神固有干支与本支不一致")
+    else:
+        pass
     evaluations = []
     relation = "两干比和"
     motion_analogue: str | None = None
@@ -127,6 +135,8 @@ def build_stem_relations(
         )
         if matched:
             relation, motion_analogue = name, analogue
+        else:
+            pass
     return {
         "ruleset_id": "jinkou_jingben_dun_stem_relations_v1",
         "source_title": "校正京本金口诀·五子元遁、五合、干元类及五行气化（所选遁干事实）",

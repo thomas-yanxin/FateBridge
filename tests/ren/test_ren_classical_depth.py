@@ -1,6 +1,5 @@
 """Source cases, reference integrity and observable calculation boundaries."""
 
-import importlib.util
 import json
 import shutil
 from copy import deepcopy
@@ -18,24 +17,17 @@ from fatebridge.core.metaphysics.liureng import (
     build_liureng_runyear,
 )
 from fatebridge.core.metaphysics.ren_evidence import xun_dun_stems
+from fatebridge.core.metaphysics.seed import build_analysis_seed
 from fatebridge.core.requests.metaphysics import JinkouAnalysisRequest
 from fatebridge.services.metaphysics import (
-    _build_analysis_seed,
     calculate_liureng_runyear,
 )
 from fatebridge.utils.birth_input import create_person_info
-
-ROOT = Path(__file__).resolve().parents[2]
-SPEC = importlib.util.spec_from_file_location(
-    "audit_ren_classical", ROOT / "scripts/ren/audit_ren_classical.py"
-)
-assert SPEC and SPEC.loader
-AUDIT = importlib.util.module_from_spec(SPEC)
-SPEC.loader.exec_module(AUDIT)
+from scripts.ren import audit_ren_classical
 
 
-def test_frozen_examples_and_selected_rule_audit_keep_full_gates_closed():
-    report = AUDIT.audit()
+def test_frozen_examples_and_selected_rule_audit_keep_full_gates_closed() -> None:
+    report = audit_ren_classical.audit()
     assert report["selected_checks_passed"]
     assert len(report["checks"]) == 73
     assert len(report["calendar"]) == 12
@@ -51,9 +43,11 @@ def test_frozen_examples_and_selected_rule_audit_keep_full_gates_closed():
 
 
 @pytest.mark.parametrize("change", ["edit", "missing", "extra"])
-def test_source_drift_cannot_silently_improve_coverage(tmp_path, change):
+def test_source_drift_cannot_silently_improve_coverage(
+    tmp_path: Path, change: str
+) -> None:
     corpus = tmp_path / "corpus"
-    shutil.copytree(AUDIT.CORPUS, corpus)
+    shutil.copytree(audit_ren_classical.CORPUS, corpus)
     if change == "edit":
         data = json.loads((corpus / "cases.json").read_text())
         data["unresolved"] = []
@@ -63,16 +57,16 @@ def test_source_drift_cannot_silently_improve_coverage(tmp_path, change):
     else:
         (corpus / "extra.json").write_text("{}")
     with pytest.raises(ValueError, match="Reference"):
-        AUDIT.load_frozen_corpus(corpus)
+        audit_ren_classical.load_frozen_corpus(corpus)
 
 
 def source_case():
-    return AUDIT.load_frozen_corpus()["cases"]["cases"][0]
+    return audit_ren_classical.load_frozen_corpus()["cases"]["cases"][0]
 
 
-def test_jinkou_uses_ground_and_inherent_god_without_liuren_lessons():
+def test_jinkou_uses_ground_and_inherent_god_without_liuren_lessons() -> None:
     case = source_case()
-    board = AUDIT.observe_jinkou(case)
+    board = audit_ren_classical.observe_jinkou(case)
     assert board["overview"]["guishen"]["branch"] == "子"  # 玄武壬子, not 占时午.
     assert board["overview"]["guishen"]["earth_branch"] == "申"
     assert (
@@ -91,14 +85,19 @@ def test_jinkou_uses_ground_and_inherent_god_without_liuren_lessons():
         "kongwang": "FAKE",
         "twelve_board": [],
     }
-    assert build_jinkou_board(AUDIT.make_seed(case), poisoned, di_fen="申") == board
-    other_ground = build_jinkou_board(AUDIT.make_seed(case), poisoned, di_fen="酉")
+    assert (
+        build_jinkou_board(audit_ren_classical.make_seed(case), poisoned, di_fen="申")
+        == board
+    )
+    other_ground = build_jinkou_board(
+        audit_ren_classical.make_seed(case), poisoned, di_fen="酉"
+    )
     assert other_ground["overview"]["guishen"]["name"] == "太阴"
     assert other_ground["overview"]["yuejiang"]["branch"] == "丑"
 
 
 @pytest.mark.parametrize("bad", ["", "寅卯", "申 ", "北", "unknown"])
-def test_invalid_ground_cannot_silently_fall_back(bad):
+def test_invalid_ground_cannot_silently_fall_back(bad: str) -> None:
     with pytest.raises(ValidationError):
         JinkouAnalysisRequest(
             analysis_year=2026,
@@ -109,16 +108,16 @@ def test_invalid_ground_cannot_silently_fall_back(bad):
         )
     with pytest.raises(ValueError, match="di_fen"):
         build_jinkou_board(
-            AUDIT.make_seed(source_case()),
+            audit_ren_classical.make_seed(source_case()),
             {"month_general": {"branch": "戌"}},
             di_fen=bad,
         )
 
 
-def test_unobserved_ground_fallback_is_explicit():
+def test_unobserved_ground_fallback_is_explicit() -> None:
     case = source_case()
     board = build_jinkou_board(
-        AUDIT.make_seed(case), {"month_general": {"branch": "戌"}}
+        audit_ren_classical.make_seed(case), {"month_general": {"branch": "戌"}}
     )
     assert board["overview"]["di_fen"] == "午"
     assert (
@@ -128,9 +127,11 @@ def test_unobserved_ground_fallback_is_explicit():
     assert "星没" in board["ruleset"]["unresolved"][1]
 
 
-def test_explicit_day_night_can_override_hour_convention_without_relocating_gods():
+def test_explicit_day_night_can_override_hour_convention_without_relocating_gods() -> (
+    None
+):
     case = source_case()
-    seed = AUDIT.make_seed({**case, "hour": "子"})
+    seed = audit_ren_classical.make_seed({**case, "hour": "子"})
     inputs = {"month_general": {"branch": "戌"}}
     night = build_jinkou_board(seed, inputs, di_fen="申")
     day = build_jinkou_board(seed, inputs, di_fen="申", is_diurnal_override=True)
@@ -141,12 +142,12 @@ def test_explicit_day_night_can_override_hour_convention_without_relocating_gods
     assert day["overview"]["diurnal_basis"] == "explicit_override"
 
 
-def test_liuren_xun_stems_are_not_two_branch_strings_and_empty_is_not_filled():
+def test_liuren_xun_stems_are_not_two_branch_strings_and_empty_is_not_filled() -> None:
     for day in SEXAGENARY_CYCLE:
         stems = xun_dun_stems(day)
         assert len(stems) == 10
         assert set(stems.values()) == set("甲乙丙丁戊己庚辛壬癸")
-        seed = AUDIT.make_seed({"day": day, "hour": "午"})
+        seed = audit_ren_classical.make_seed({"day": day, "hour": "午"})
         for general in "子丑寅卯辰巳午未申酉戌亥":
             board = build_liureng_board(seed, month_general_override=general)
             assert board["board_order"] == "天盘顺布"
@@ -161,17 +162,17 @@ def test_liuren_xun_stems_are_not_two_branch_strings_and_empty_is_not_filled():
     assert "戌" not in xun_dun_stems("丙寅")
 
 
-def test_unknown_term_does_not_use_month_building_as_general():
+def test_unknown_term_does_not_use_month_building_as_general() -> None:
     seed = replace(
-        AUDIT.make_seed(source_case()),
+        audit_ren_classical.make_seed(source_case()),
         calendar_context={"current_solar_term": {"name": "missing"}},
     )
     with pytest.raises(ValueError, match="月建"):
         build_liureng_board(seed)
 
 
-def test_lesson_with_day_branch_means_actual_day_branch_not_stem_house():
-    seed = AUDIT.make_seed({"day": "甲子", "hour": "子"})
+def test_lesson_with_day_branch_means_actual_day_branch_not_stem_house() -> None:
+    seed = audit_ren_classical.make_seed({"day": "甲子", "hour": "子"})
     board = build_liureng_board(seed, month_general_override="酉")
     first = board["four_lessons"][0]
     assert first["upper_branch"] == "亥"
@@ -181,14 +182,14 @@ def test_lesson_with_day_branch_means_actual_day_branch_not_stem_house():
 
 @pytest.mark.parametrize("zone,longitude", [("UTC", 15), ("America/New_York", -60)])
 def test_zhongqi_is_an_instant_even_when_solar_hour_and_civil_date_differ(
-    zone, longitude
-):
+    zone: str, longitude
+) -> None:
     from zoneinfo import ZoneInfo
 
     published = datetime.fromisoformat("2026-02-18T23:52:00+08:00")
     for minutes, expected in [(-2, "子"), (2, "亥")]:
         dt = (published + timedelta(minutes=minutes)).astimezone(ZoneInfo(zone))
-        seed = _build_analysis_seed(
+        seed = build_analysis_seed(
             analysis_year=dt.year,
             analysis_month=dt.month,
             analysis_day=dt.day,
@@ -204,7 +205,9 @@ def test_zhongqi_is_an_instant_even_when_solar_hour_and_civil_date_differ(
 @pytest.mark.parametrize(
     "gender,expected", [("男", ["丙寅", "丁卯"]), ("女", ["壬申", "辛未"])]
 )
-def test_runyear_uses_lunar_new_year_and_correct_first_year(gender, expected):
+def test_runyear_uses_lunar_new_year_and_correct_first_year(
+    gender: str, expected
+) -> None:
     # Born before 2026's lunar new year: lunar birth year is 2025.
     person = create_person_info(
         birth_year=2026, birth_month=1, birth_day=10, birth_hour=12, gender=gender
@@ -223,8 +226,8 @@ def test_runyear_uses_lunar_new_year_and_correct_first_year(gender, expected):
         assert r["runyear"]["birth_lunar_year"] == 2025
 
 
-def test_unknown_gender_is_not_a_male_runyear_and_future_birth_is_rejected():
-    seed = _build_analysis_seed(
+def test_unknown_gender_is_not_a_male_runyear_and_future_birth_is_rejected() -> None:
+    seed = build_analysis_seed(
         analysis_year=2026, analysis_month=5, analysis_day=1, analysis_hour=12
     )
     result = build_liureng_runyear(seed, "未知", 2000, birth_lunar_year=2000)
@@ -233,7 +236,9 @@ def test_unknown_gender_is_not_a_male_runyear_and_future_birth_is_rejected():
         build_liureng_runyear(seed, "男", 2027, birth_lunar_year=2027)
 
 
-def test_wrong_output_cannot_pass_selected_reference_audit(monkeypatch):
+def test_wrong_output_cannot_pass_selected_reference_audit(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     import fatebridge.core.metaphysics.jinkou as module
 
     previous = module.build_jinkou_board
@@ -244,6 +249,6 @@ def test_wrong_output_cannot_pass_selected_reference_audit(monkeypatch):
         return result
 
     monkeypatch.setattr(module, "build_jinkou_board", corrupted)
-    report = AUDIT.audit()
+    report = audit_ren_classical.audit()
     assert not report["selected_checks_passed"]
     assert any(not c["matched"] for c in report["checks"])

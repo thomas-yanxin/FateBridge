@@ -63,17 +63,23 @@ def _number(value: Any) -> Fraction:
         or not math.isfinite(value)
     ):
         raise EphemerisSourceError("comparative_geometry_inputs")
+    else:
+        pass
     return Fraction(value)
 
 
 def _values(values: Mapping[str, float]) -> dict[str, Fraction]:
     if not isinstance(values, Mapping):
         raise EphemerisSourceError("comparative_geometry_inputs")
+    else:
+        pass
     required = {"Aries Point", *(a for a, _ in FRAMES.values())}
     if not required.issubset(values) or any(
         not isinstance(k, str) or not k for k in values
     ):
         raise EphemerisSourceError("comparative_geometry_inputs")
+    else:
+        pass
     return {name: _number(value) % 360 for name, value in sorted(values.items())}
 
 
@@ -214,7 +220,6 @@ def build_comparative_geometry(
         "uncertainty_minutes": uncertainty["uncertainty_minutes"],
         "sample_count": None,
         "continuous_interval_proven": False,
-        "sample_frequency_is_probability": False,
         "summary": None,
         "point_spans": None,
         "samples": None,
@@ -225,6 +230,7 @@ def build_comparative_geometry(
                 "recorded_interval_end_utc",
                 "maximum_recorded_sample_gap_seconds",
                 "represented_radius_seconds",
+                "recorded_physical_grid",
                 "clock_policy",
                 "input_clock_basis",
                 "recorded_interval_start_clock",
@@ -260,10 +266,14 @@ def build_comparative_geometry(
     if layer["status"] != "computed":
         result["reason"] = layer.get("reason", "Native factors are unavailable")
         return result
+    else:
+        pass
     factors = layer["factors"]
     nominal_values = {row["id"]: row["longitude"] for row in factors}
     if len(nominal_values) != len(factors):
         raise EphemerisSourceError("comparative_geometry_inputs")
+    else:
+        pass
     nominal_values_exact = _values(nominal_values)
     definition = layer["profile"].get("angle_definition")
     coordinates, exact_nominal = comparative_coordinates(nominal_values, definition)
@@ -286,6 +296,8 @@ def build_comparative_geometry(
     }
     if uncertainty["status"] != "sampled":
         return result
+    else:
+        pass
     samples = uncertainty.get("samples", [])
     count = uncertainty.get("sample_count")
     if (
@@ -295,6 +307,8 @@ def build_comparative_geometry(
         or len(samples) != count
     ):
         raise EphemerisSourceError("comparative_geometry_inputs")
+    else:
+        pass
     required_sample_keys = {
         "offset_seconds",
         "recorded_utc",
@@ -307,10 +321,17 @@ def build_comparative_geometry(
         for sample in samples
     ):
         raise EphemerisSourceError("comparative_geometry_inputs")
-    offsets = [_number(sample["offset_seconds"]) for sample in samples]
-    if offsets != sorted(set(offsets)) or Fraction(0) not in offsets:
-        raise EphemerisSourceError("comparative_geometry_inputs")
-    nominal_index = offsets.index(Fraction(0))
+    else:
+        pass
+    if (grid := uncertainty.get("recorded_physical_grid")) is not None:
+        nominal_index = grid["nominal_sample_index"]
+    else:
+        offsets = [_number(sample["offset_seconds"]) for sample in samples]
+        if offsets != sorted(set(offsets)) or Fraction(0) not in offsets:
+            raise EphemerisSourceError("comparative_geometry_inputs")
+        else:
+            pass
+        nominal_index = offsets.index(Fraction(0))
     zero = samples[nominal_index]
     if (
         _number(zero["julian_day_tt"]) != _number(layer["profile"]["julian_day_tt"])
@@ -318,6 +339,8 @@ def build_comparative_geometry(
         or zero.get("angle_definition") != definition
     ):
         raise EphemerisSourceError("comparative_geometry_inputs")
+    else:
+        pass
     nominal_systems = _systems(coordinates)
     tracks: dict[str, dict[str, _SampleTrack]] = {
         group: {
@@ -337,6 +360,8 @@ def build_comparative_geometry(
         values = sample["factor_longitudes"]
         if set(values) != set(nominal_values):
             raise EphemerisSourceError("comparative_geometry_inputs")
+        else:
+            pass
         _number(sample["julian_day_tt"])
         calculated, exact = comparative_coordinates(
             values, sample.get("angle_definition")
@@ -356,6 +381,8 @@ def build_comparative_geometry(
                         "input_reference_geometry_resolved"
                     ]:
                         _update(track["known"], delta)
+                    else:
+                        pass
                 else:
                     track["unresolved_sample_indices"].append(index)
         headers.append(

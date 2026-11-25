@@ -2,7 +2,7 @@
 
 [资料与来源](consultation.md) · [三端调用与验证](../../fengshui-xuankong.md) · [有限解释](xuankong-interpretation.md)
 
-`fengshui_xuankong_natal` 计算所选中州派版本的运／山／向数字盘与兼向替星。历史宅盘与年星独立；查询年份变化不改变住宅历史定运。
+`fengshui_xuankong_house_chart` 计算所选中州派版本的运／山／向数字盘与兼向替星。历史宅盘与年星独立；查询年份变化不改变住宅历史定运。
 
 历史事件与定运区间的交节记录还保留实际星历模型和时间政策；跨界及秒级精度问题参见[时间边界](calendar-boundaries.md)，不将未来UTC假设当成已观测交节秒。
 
@@ -25,7 +25,7 @@
 | 替星 | 在原星所属卦的同元龙找到替星，以原元龙阴阳飞布 | X2替星口诀及完整公开盘例；替后的星不能重新决定阴阳 |
 | 分界 | 恰在山界或下／替分界取两侧候选；误差区间内全部角区枚举 | FateBridge明确的保守应用约定，古籍没有现代浮点端点合同 |
 
-来源均在响应 `rulesets[].sources` 返回名称、URL、作用范围和版本。X1/X2/X4/X5的2026-10-12网页捕获保留内部完整性校验，不在业务输出提供散列，也不声称具有古籍校勘权威。
+按 `rulesets[].source_ids` 从 `source_catalog` 取来源名称与 URL。各规则引用的页码、来源版本和适用范围见该规则的 `source_citations`。
 
 - [X1：沈氏玄空学卷四](https://www.diancangwang.cn/xuanxuewushu/f6f37803664b/90b563d9cb41.html)
 - [X2：玄霖易学《第一篇 玄空基础2》](https://xuanlinyi.com/article_detail?id=301282)

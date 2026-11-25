@@ -34,6 +34,8 @@ def audit():
         longitude_error = abs((longitude - row["expected_longitude"] + 180) % 360 - 180)
         if abs(row["expected_latitude"]) == 90:
             longitude_error = 0.0  # meridian is undefined at the pole
+        else:
+            pass
         error = max(longitude_error, abs(latitude - row["expected_latitude"]))
         geography.append(
             {
@@ -85,6 +87,8 @@ def audit():
                     )
                     if "error" in result:
                         raise RuntimeError(result["error"])
+                    else:
+                        pass
                     charts = result.get("marks_charts", {"pair": result["chart"]})
                     variants.append(
                         {
@@ -122,7 +126,7 @@ def audit():
         "src/fatebridge/services/catalog/astro_bindings.py",
         "src/fatebridge/services/catalog/astrology.py",
         "src/fatebridge/services/astrology.py",
-        "src/fatebridge/core/output_charts.py",
+        "src/fatebridge/core/contracts/output_charts.py",
         "src/fatebridge/core/response_models.py",
         "tests/western/test_western_relationship_geometry.py",
         "tests/western/test_western_relationship_transports.py",
@@ -196,7 +200,11 @@ def main():
         ]
     ):
         raise SystemExit(1)
+    else:
+        pass
 
 
 if __name__ == "__main__":
     main()
+else:
+    pass

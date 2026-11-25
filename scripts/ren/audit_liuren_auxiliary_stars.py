@@ -16,9 +16,12 @@ IMPLEMENTATION = (
     "src/fatebridge/core/metaphysics/liureng_auxiliary_stars.py",
     "src/fatebridge/core/metaphysics/liureng_life_stages.py",
     "src/fatebridge/core/metaphysics/liureng.py",
+    "src/fatebridge/core/metaphysics/liureng_course_layout.py",
+    "src/fatebridge/core/metaphysics/liureng_selection.py",
+    "src/fatebridge/core/metaphysics/liureng_year_fate.py",
     "src/fatebridge/core/metaphysics/ren_evidence.py",
-    "src/fatebridge/core/output_liuren_auxiliary.py",
-    "src/fatebridge/core/output_chinese.py",
+    "src/fatebridge/core/contracts/output_liuren_auxiliary.py",
+    "src/fatebridge/core/contracts/output_chinese.py",
     "src/fatebridge/services/metaphysics.py",
     "src/fatebridge/data/agent_examples.json",
     "scripts/ren/audit_liuren_auxiliary_stars.py",
@@ -33,9 +36,13 @@ def reference(corpus: Path = CORPUS) -> dict[str, Any]:
     manifest = json.loads((corpus / "freeze.json").read_text())
     if {p.name for p in corpus.iterdir()} != set(manifest["files"]) | {"freeze.json"}:
         raise ValueError("Frozen auxiliary-star inventory changed")
+    else:
+        pass
     for name, value in manifest["files"].items():
         if sha(corpus / name) != value:
             raise ValueError(f"Frozen auxiliary-star source changed: {name}")
+        else:
+            pass
     result: dict[str, Any] = json.loads((corpus / "reference.json").read_text())
     for folder, key in (
         ("liuren_life_stages_v1", "reused_life_stage_freeze_sha256"),
@@ -43,6 +50,8 @@ def reference(corpus: Path = CORPUS) -> dict[str, Any]:
     ):
         if sha(ROOT / "tests/fixtures" / folder / "freeze.json") != result[key]:
             raise ValueError(f"Reused frozen reference changed: {folder}")
+        else:
+            pass
     return result
 
 
@@ -101,6 +110,8 @@ def audit() -> dict[str, Any]:
                             reason="seven-rule inventory changed",
                         )
                     )
+                else:
+                    pass
                 for star in actual["stars"]:
                     star_id = star["id"]
                     token = expected_token(ref, star_id, day, month)
@@ -143,6 +154,8 @@ def audit() -> dict[str, Any]:
                                 actual=star,
                             )
                         )
+                    else:
+                        pass
                     key = (
                         day[0]
                         if star_id in {"day_de", "day_lu"}
@@ -157,10 +170,14 @@ def audit() -> dict[str, Any]:
                             actual=star["source_token"],
                             matched=star["source_token"] == token,
                         )
+                    else:
+                        pass
                 if actual["complete_classical_conformance"] is not False:
                     failures.append(
                         dict(day=day, month=month, reason="overclaimed conformance")
                     )
+                else:
+                    pass
     civil = []
     for probe in ref["civil_probes"]:
         result = calculate_liureng_gods(

@@ -3,6 +3,7 @@
 import asyncio
 import json
 import shutil
+from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
@@ -13,6 +14,8 @@ import fatebridge.api as api
 from fatebridge.application.examples import suggested_fields
 from fatebridge.application.projection import project_fields
 from fatebridge.cli import run
+from fatebridge.core.contracts.output_chinese import Taiyi
+from fatebridge.core.contracts.output_taiyi_matrix import TaiyiVictoryMatrixAssessment
 from fatebridge.core.metaphysics.taiyi_victory_matrix import (
     victory_matrix_assessment,
     victory_matrix_text,
@@ -23,21 +26,21 @@ from fatebridge.core.metaphysics.taiyi_year import (
     count_to_taiyi,
     cyclic_core,
 )
-from fatebridge.core.output_chinese import Taiyi
-from fatebridge.core.output_taiyi_matrix import TaiyiVictoryMatrixAssessment
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
 from scripts.taiyi.audit_taiyi_victory_matrix import audit
 from scripts.taiyi.build_taiyi_victory_matrix import CORPUS, source_data
 from tests.support.reference_data import resolve
-from tests.taiyi.test_taiyi_enclosures import transport_payload
-from tests.taiyi.test_taiyi_transports import _same_run_payload
+from tests.support.transports import SPECS, call_calculation
+from tests.unit_test.fixtures.taiyi import same_run_payload, transport_payload
 
 CELLS = json.loads((CORPUS / "matrix-columns.json").read_text())["cells"]
 
 
 @pytest.mark.parametrize("cell", CELLS, ids=lambda c: c["id"])
-def test_every_source_cell_preserves_both_columns_locators_and_unknown_roles(cell):
+def test_every_source_cell_preserves_both_columns_locators_and_unknown_roles(
+    cell,
+) -> None:
     core = {
         "wenchang_palace": cell["wenchang_position"],
         "taiyi_number": cell["taiyi_number"],
@@ -58,12 +61,16 @@ def test_every_source_cell_preserves_both_columns_locators_and_unknown_roles(cel
                 "main",
                 "guest",
             }
+        else:
+            pass
     text = victory_matrix_text(a)
     for k in ["condition_column", "result_column"]:
         assert (cell[k]["text"] or "空栏") in text
 
 
-def test_entire_audit_retains_six_eye_differences_and_all_unadjudicated_fragments():
+def test_entire_audit_retains_six_eye_differences_and_all_unadjudicated_fragments() -> (
+    None
+):
     a = audit()
     assert a["source_cells"] == a["retrieved_source_cells"] == 128
     assert a["copied_source_fields_counted_as_calculated_hits"] == 0
@@ -80,6 +87,8 @@ def test_entire_audit_retains_six_eye_differences_and_all_unadjudicated_fragment
         for g in row["geometry"]:
             if g["field"].startswith("guest_"):
                 assert g["status"] == "not_assessed" and g["same_palace"] is None
+            else:
+                pass
 
 
 @pytest.mark.parametrize(
@@ -94,8 +103,8 @@ def test_entire_audit_retains_six_eye_differences_and_all_unadjudicated_fragment
     ],
 )
 def test_source_eye_disagreements_are_visible_without_overwriting_geometry(
-    eye, n, distance
-):
+    eye: str, n: int, distance: int
+) -> None:
     a = victory_matrix_assessment(
         {"wenchang_palace": eye, "taiyi_number": n, "taiyi_palace": PALACES[n]}
     )
@@ -104,7 +113,9 @@ def test_source_eye_disagreements_are_visible_without_overwriting_geometry(
     assert "差异保留" in victory_matrix_text(a)
 
 
-def test_main_candidate_conflict_never_becomes_a_replacement_calculation_or_outcome():
+def test_main_candidate_conflict_never_becomes_a_replacement_calculation_or_outcome() -> (
+    None
+):
     a = victory_matrix_assessment(
         {
             "wenchang_palace": "申",
@@ -127,7 +138,7 @@ def test_main_candidate_conflict_never_becomes_a_replacement_calculation_or_outc
     assert not a["source_outcome_applied"]
 
 
-def test_center_and_missing_generals_stay_unknown_and_do_not_turn_false():
+def test_center_and_missing_generals_stay_unknown_and_do_not_turn_false() -> None:
     a = victory_matrix_assessment(
         {
             "wenchang_palace": "申",
@@ -151,13 +162,13 @@ def test_center_and_missing_generals_stay_unknown_and_do_not_turn_false():
         {"wenchang_palace": "申", "taiyi_number": 1, "taiyi_palace": "午"},
     ],
 )
-def test_missing_or_conflicting_table_keys_are_not_guessed(core):
+def test_missing_or_conflicting_table_keys_are_not_guessed(core) -> None:
     a = victory_matrix_assessment(core)
     assert a["status"] == "not_assessed" and "source_cell" not in a
     assert "不猜" in victory_matrix_text(a)
 
 
-def test_all_144_boards_and_projected_leaves_use_actual_same_core_facts():
+def test_all_144_boards_and_projected_leaves_use_actual_same_core_facts() -> None:
     for yin in [False, True]:
         for ju in range(1, 73):
             core = cyclic_core(ju, yin=yin)
@@ -194,7 +205,9 @@ def test_all_144_boards_and_projected_leaves_use_actual_same_core_facts():
     "name",
     ["matrix-columns.json", "adjudication.json", "cadal-page100.jpg", "manifest.json"],
 )
-def test_no_source_cell_image_or_freeze_may_be_silently_replaced(tmp_path, name):
+def test_no_source_cell_image_or_freeze_may_be_silently_replaced(
+    tmp_path: Path, name: str
+) -> None:
     dest = tmp_path / "corpus"
     shutil.copytree(CORPUS, dest)
     (dest / name).write_bytes(b"changed")
@@ -204,7 +217,12 @@ def test_no_source_cell_image_or_freeze_may_be_silently_replaced(tmp_path, name)
 
 @pytest.mark.parametrize("key", ["taiyi", "sanshiunited"])
 @pytest.mark.parametrize("mode", ["year", "month", "day", "hour"])
-def test_real_rest_mcp_cli_and_new_first_views(key, mode, capsys, monkeypatch):
+def test_real_rest_mcp_cli_and_new_first_views(
+    key: str,
+    mode: str,
+    capsys: pytest.CaptureFixture[str],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     spec = next(s for s in CATALOG if s.key == key)
     payload = transport_payload(key, 2026)
     if key == "taiyi":
@@ -231,13 +249,21 @@ def test_real_rest_mcp_cli_and_new_first_views(key, mode, capsys, monkeypatch):
     assert response.status_code == 200, response.text
     expected = response.json()["taiyi"]["victory_matrix_assessment"]
     assert expected["calculation_mode"] == mode
-    args = [key, "--strict-fields", "--no-use-true-solar-time", "--fields", *fields]
+    args = [
+        SPECS[key].tool_name,
+        "--strict-fields",
+        "--no-use-true-solar-time",
+        "--fields",
+        *fields,
+    ]
     for name, value in payload.items():
         if name != "use_true_solar_time":
             args += [
                 "--" + name.replace("_", "-"),
                 json.dumps(value) if isinstance(value, dict) else str(value),
             ]
+        else:
+            pass
     assert run(args) == 0
     assert (
         json.loads(capsys.readouterr().out)["taiyi"]["victory_matrix_assessment"]
@@ -246,7 +272,8 @@ def test_real_rest_mcp_cli_and_new_first_views(key, mode, capsys, monkeypatch):
 
     async def call():
         async with Client(create_mcp_app()) as c:
-            r = await c.call_tool(
+            r = await call_calculation(
+                c,
                 spec.tool_name,
                 {
                     **payload,
@@ -262,7 +289,8 @@ def test_real_rest_mcp_cli_and_new_first_views(key, mode, capsys, monkeypatch):
                 == expected
             )
             view = "victory_matrix" if key == "taiyi" else "taiyi_victory_matrix"
-            r = await c.call_tool(
+            r = await call_calculation(
+                c,
                 spec.tool_name,
                 {
                     **payload,
@@ -271,7 +299,7 @@ def test_real_rest_mcp_cli_and_new_first_views(key, mode, capsys, monkeypatch):
                     "include_snapshot_text": False,
                 },
             )
-            await _same_run_payload(c, r, require_business_inline=True)
+            await same_run_payload(c, r, require_business_inline=True)
 
     asyncio.run(call())
 
@@ -291,13 +319,17 @@ def test_real_rest_mcp_cli_and_new_first_views(key, mode, capsys, monkeypatch):
         ("子", None),
     ],
 )
-def test_count_to_taiyi_rejects_non_single_spirit_and_non_strict_palace(marker, n):
+def test_count_to_taiyi_rejects_non_single_spirit_and_non_strict_palace(
+    marker: bool | int | str | None, n: bool | float | int | None
+) -> None:
     with pytest.raises(ValueError, match="十六神"):
         count_to_taiyi(marker, n)
 
 
 @pytest.mark.parametrize("position", ["", "子丑"])
-def test_matrix_empty_and_multichar_keys_are_unknown_instead_of_stopiteration(position):
+def test_matrix_empty_and_multichar_keys_are_unknown_instead_of_stopiteration(
+    position: str,
+) -> None:
     a = victory_matrix_assessment(
         {"wenchang_palace": position, "taiyi_number": 1, "taiyi_palace": "乾"}
     )

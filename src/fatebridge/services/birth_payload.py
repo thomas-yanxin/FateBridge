@@ -1,13 +1,13 @@
 """Shared public birth-analysis payload, separate from service entry points."""
 
-from typing import Any, Dict
+from typing import Any
 
-from fatebridge.core.bazi_branch_facts import (
+from fatebridge.core.bazi.bazi_branch_facts import (
     check_clash_patterns,
     check_harmony_patterns,
 )
-from fatebridge.core.bazi_evidence import build_natal_evidence
-from fatebridge.core.bazi_pattern_facts import (
+from fatebridge.core.bazi.bazi_evidence import build_natal_evidence
+from fatebridge.core.bazi.bazi_pattern_facts import (
     analyze_special_patterns,
     check_hidden_patterns,
     check_pillar_pair_patterns,
@@ -21,7 +21,7 @@ from fatebridge.utils.formatting import (
 )
 
 
-def build_destiny_payload(context: BirthComputationContext) -> Dict[str, Any]:
+def build_destiny_payload(context: BirthComputationContext) -> dict[str, Any]:
     """Render the public destiny-analysis payload from a shared birth context."""
     person = context.person
     normalized_birth_time = context.normalized_birth_time

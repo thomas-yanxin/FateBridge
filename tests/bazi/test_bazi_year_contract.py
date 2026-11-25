@@ -1,6 +1,7 @@
 """Published year limits must match the already-existing service limits."""
 
 import asyncio
+from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
@@ -8,26 +9,13 @@ from pydantic import ValidationError
 from fatebridge.utils.birth_input import PersonInfo
 from tests.support.transports import SPECS, call_cli, native
 from tests.support.transports import rest as _shared_rest
-
-TOPICS = [
-    "birth",
-    "career",
-    "wealth",
-    "health",
-    "children",
-    "education",
-    "personality",
-    "relatives",
-    "marriage",
-    "romance",
-]
-
+from tests.unit_test.fixtures.bazi_year_cases import TOPICS
 
 rest = _shared_rest
 
 
 @pytest.mark.parametrize("topic", TOPICS)
-def test_all_ten_year_schemas_match_internal_person_limits(topic):
+def test_all_ten_year_schemas_match_internal_person_limits(topic) -> None:
     spec = SPECS["bazi_" + topic]
     internal = PersonInfo.model_json_schema()["properties"]["birth_year"]
     public = spec.request_model.model_json_schema()["properties"]["birth_year"]
@@ -50,7 +38,9 @@ def test_all_ten_year_schemas_match_internal_person_limits(topic):
 
 
 @pytest.mark.parametrize("year,month,day", [(1900, 1, 1), (2100, 12, 31)])
-def test_boundary_years_retain_bazi_and_explicit_lunar_sources(year, month, day, rest):
+def test_boundary_years_retain_bazi_and_explicit_lunar_sources(
+    year: int, month: int, day: int, rest
+) -> None:
     args = {
         "birth_year": year,
         "birth_month": month,
@@ -96,8 +86,8 @@ def test_boundary_years_retain_bazi_and_explicit_lunar_sources(year, month, day,
 @pytest.mark.parametrize("topic", TOPICS)
 @pytest.mark.parametrize("year", [1899, 2101])
 def test_invalid_year_is_rejected_before_computation_on_three_surfaces(
-    topic, year, rest, tmp_path, capsys
-):
+    topic, year: int, rest, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     spec = SPECS["bazi_" + topic]
     args = {
         "birth_year": year,
@@ -119,6 +109,7 @@ def test_invalid_year_is_rejected_before_computation_on_three_surfaces(
         {
             "path": "birth_year",
             "code": "greater_than_equal" if year < 1900 else "less_than_equal",
+            "message": error.value.errors()[0]["msg"],
             "constraints": {"ge": 1900} if year < 1900 else {"le": 2100},
         }
     ]

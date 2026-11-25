@@ -9,9 +9,9 @@ import pytest
 
 from fatebridge.core.metaphysics import qimen as engine
 from fatebridge.core.metaphysics.common import sexagenary_text
-from fatebridge.core.qimen_combinations import build_combinations
-from fatebridge.validation.qimen import audit_head_dependent_examples
-from tests.qimen.test_qimen_depth import fixed_board
+from fatebridge.core.qimen.qimen_combinations import build_combinations
+from tests.unit_test.fixtures.qimen import fixed_board
+from validation.qimen import audit_head_dependent_examples
 
 BUNDLE = Path(__file__).parents[1] / "fixtures/qimen_classical_v5"
 MANIFEST = json.loads((BUNDLE / "sources-and-cases.json").read_text())
@@ -19,7 +19,9 @@ HEAD_RULES = {d["rule_id"] for d in MANIFEST["definitions"]}
 
 
 @pytest.mark.parametrize("case", MANIFEST["cases"], ids=lambda c: c["id"])
-def test_six_frozen_source_examples_use_the_actual_palace_and_head(monkeypatch, case):
+def test_six_frozen_source_examples_use_the_actual_palace_and_head(
+    monkeypatch: pytest.MonkeyPatch, case
+) -> None:
     b = fixed_board(monkeypatch, case)
     palace = next(p for p in b["palaces"] if p["trigram"] == case["palace"])
     for field, expected in case["observations"].items():
@@ -40,9 +42,11 @@ def test_six_frozen_source_examples_use_the_actual_palace_and_head(monkeypatch, 
         assert not binding["fixed_wu_substitution_allowed"]
         assert not binding["independent_outcome_evidence"]
         assert not match["qualification"]["outcome_inference_allowed"]
+    else:
+        pass
 
 
-def test_source_audit_does_not_pass_deferred_day_jia_or_whole_book():
+def test_source_audit_does_not_pass_deferred_day_jia_or_whole_book() -> None:
     report = audit_head_dependent_examples(BUNDLE)
     assert (report["case_count"], report["matched_case_count"]) == (6, 6)
     assert report["literal_pair_definitions_checked"] == 2
@@ -54,7 +58,9 @@ def test_source_audit_does_not_pass_deferred_day_jia_or_whole_book():
     assert not report["real_world_efficacy_validated"]
 
 
-def test_non_jiazi_head_is_not_lost_by_a_fixed_wu_shortcut(monkeypatch):
+def test_non_jiazi_head_is_not_lost_by_a_fixed_wu_shortcut(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     b = fixed_board(monkeypatch, {"dun": "阳遁", "ju": 1, "hour": "丙子"}, day="甲子")
     assert b["day_xun_head"] == "甲子"
     assert b["xun_head"] == "甲戌"
@@ -66,7 +72,9 @@ def test_non_jiazi_head_is_not_lost_by_a_fixed_wu_shortcut(monkeypatch):
     assert dragon["qualification"]["overall_judgment"] == "requires_whole_board"
 
 
-def test_bing_wu_pairs_outside_current_xun_do_not_acquire_these_names(monkeypatch):
+def test_bing_wu_pairs_outside_current_xun_do_not_acquire_these_names(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     b = fixed_board(monkeypatch, {"dun": "阳遁", "ju": 1, "hour": "乙亥"})
     assert b["xun_head"] == "甲戌"
     assert any(
@@ -81,8 +89,8 @@ def test_bing_wu_pairs_outside_current_xun_do_not_acquire_these_names(monkeypatc
 
 
 def test_hosted_ren_is_in_both_flight_structures_without_becoming_main_stem(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     b = fixed_board(monkeypatch, {"dun": "阳遁", "ju": 1, "hour": "丙午"})
     assert b["zhifu"]["star"] == "天禽"
     by_name = {p["name"]: p for p in b["palaces"]}
@@ -96,8 +104,8 @@ def test_hosted_ren_is_in_both_flight_structures_without_becoming_main_stem(
 
 
 def test_tianqin_flying_palace_uses_hosted_instrument_instead_of_rui_main_stem(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     b = fixed_board(monkeypatch, {"dun": "阳遁", "ju": 5, "hour": "庚午"})
     assert b["zhifu"]["star"] == "天禽"
     pattern = next(p for p in b["patterns"] if p["rule_id"] == "flying_palace")
@@ -107,14 +115,18 @@ def test_tianqin_flying_palace_uses_hosted_instrument_instead_of_rui_main_stem(
     assert pattern["facts"]["earth_stem"] == "庚"
 
 
-def test_hidden_palace_is_the_native_head_palace_not_the_moving_god(monkeypatch):
+def test_hidden_palace_is_the_native_head_palace_not_the_moving_god(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     b = fixed_board(monkeypatch, {"dun": "阳遁", "ju": 2, "hour": "壬申"})
     pattern = next(p for p in b["patterns"] if p["rule_id"] == "hidden_palace")
     assert pattern["palace"] == "坤二宫"
     assert pattern["palace"] != b["zhifu"]["palace"] == "乾六宫"
 
 
-def test_favourable_name_cannot_erase_the_same_bing_geng_conflict(monkeypatch):
+def test_favourable_name_cannot_erase_the_same_bing_geng_conflict(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     b = fixed_board(monkeypatch, {"dun": "阳遁", "ju": 1, "hour": "辛卯"})
     assert b["xun_head"] == "甲申"
     bird = next(p for p in b["patterns"] if p["rule_id"] == "flying_bird_enters_cave")
@@ -128,7 +140,9 @@ def test_favourable_name_cannot_erase_the_same_bing_geng_conflict(monkeypatch):
 
 
 @pytest.mark.parametrize("dun,ju", list(product(["阳遁", "阴遁"], range(1, 10))))
-def test_head_pattern_identity_and_uniqueness_across_1080_structural_boards(dun, ju):
+def test_head_pattern_identity_and_uniqueness_across_1080_structural_boards(
+    dun, ju
+) -> None:
     text = f'{dun}{"一二三四五六七八九"[ju-1]}局上元'
     for i in range(60):
         hour = sexagenary_text(i)
@@ -161,8 +175,8 @@ def test_head_pattern_identity_and_uniqueness_across_1080_structural_boards(dun,
 
 @pytest.mark.parametrize("change", ["source", "case", "duplicate", "deferred"])
 def test_audit_refuses_changed_source_deleted_case_and_hidden_deferred_scope(
-    tmp_path, change
-):
+    tmp_path: Path, change: str
+) -> None:
     shutil.copytree(BUNDLE, tmp_path / "qimen_classical_v5")
     shutil.copytree(
         BUNDLE.parent / "qimen_classical_v2", tmp_path / "qimen_classical_v2"

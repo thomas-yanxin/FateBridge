@@ -66,10 +66,14 @@ def build(pdf_directory):
         raise ValueError(
             "Frozen rendered observations changed; review before rebuilding"
         )
+    else:
+        pass
     observed = json.loads(raw)
     plan = json.loads(PLAN.read_bytes())
     if hashlib.sha256(PLAN.read_bytes()).hexdigest() != observed["plan_sha256"]:
         raise ValueError("The pre-output selection plan changed")
+    else:
+        pass
     samples = {r["id"]: r for r in plan["cases"]}
     facts = {r["id"]: r["facts"] for r in observed["observations"]}
     sources = {r["id"]: r for r in observed["sources"]}
@@ -79,6 +83,8 @@ def build(pdf_directory):
         or set(samples) != set(sources)
     ):
         raise ValueError("Missing, extra or duplicated planned source observations")
+    else:
+        pass
     cases = []
     for sample in plan["cases"]:
         identifier = sample["id"]
@@ -87,10 +93,16 @@ def build(pdf_directory):
         pdf = pdf_directory / source["pdf_filename"]
         if hashlib.sha256(pdf.read_bytes()).hexdigest() != source["pdf_sha256"]:
             raise ValueError(f"Original PDF changed: {identifier}")
+        else:
+            pass
         if visible_properties(pdf) != row["properties"]:
             raise ValueError(f"Rendered/PDF properties differ: {identifier}")
+        else:
+            pass
         if any(len(row["columns"][s]) != 13 for s in ("design", "personality")):
             raise ValueError("Incomplete rendered activation column")
+        else:
+            pass
         cases.append(
             {
                 "id": identifier,
@@ -146,6 +158,8 @@ def main():
             )
             if match is None:
                 raise ValueError("Unknown visible source cross label")
+            else:
+                pass
             gates = list(map(int, match.groups()[2:]))
             columns = c["columns"]
             if gates != [
@@ -160,6 +174,8 @@ def main():
                 raise ValueError(
                     "Visible cross gate quartet differs from visible Sun/Earth columns"
                 )
+            else:
+                pass
             rows.append(
                 {
                     "case_id": c["id"],
@@ -186,6 +202,8 @@ def main():
         args.catalog_output.write_text(
             json.dumps(value, ensure_ascii=False, indent=2) + "\n"
         )
+    else:
+        pass
     print(
         json.dumps(
             {"source_charts": 193, "activation_slots": 5018, "output": str(args.output)}
@@ -195,3 +213,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+else:
+    pass

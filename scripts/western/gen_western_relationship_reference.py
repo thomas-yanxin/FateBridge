@@ -21,6 +21,8 @@ TOLERANCE_DEGREES = 1e-9
 def main():
     if geographiclib.__version__ != "2.1":
         raise RuntimeError("Use the pinned independent oracle GeographicLib 2.1")
+    else:
+        pass
     inputs = [
         [longitude, latitude, (longitude + 137 + 180) % 360 - 180, -latitude / 2 + 11]
         for longitude in (-179, -120, -45, 0, 45, 120, 179)
@@ -73,3 +75,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+else:
+    pass

@@ -6,11 +6,13 @@ import json
 from pathlib import Path
 
 import pytest
+from pytest import MonkeyPatch
 
-from fatebridge.core import heluo_texts
-from fatebridge.core.heluo import _tiaowen, yao_text
-from fatebridge.core.heluo_timing import _selected_text
+from fatebridge.core.heluo import heluo_texts
+from fatebridge.core.heluo.heluo import _tiaowen, yao_text
+from fatebridge.core.heluo.heluo_timing import _selected_text
 from fatebridge.utils.errors import NumerologySourceError
+from scripts.numerology import audit_numerology as audit
 from tests.support.heluo_source_facts import HEADER_COUNT, PENDING_COUNT
 
 ROOT = Path(__file__).parents[1] / "fixtures/heluo_tunmeng_v1"
@@ -21,7 +23,7 @@ VERIFIED = json.loads((ROOT / "verified-readings.json").read_text())
 @pytest.mark.parametrize(
     "row", VERIFIED["entries"], ids=lambda e: e["hexagram"] + str(e["line"])
 )
-def test_complete_source_reading_is_used_for_the_actual_selected_line(row):
+def test_complete_source_reading_is_used_for_the_actual_selected_line(row) -> None:
     text = yao_text(row["hexagram"], row["line"])
     assert text["detail"] == "".join(s["text"] for s in row["sections"])
     assert text["text_provenance"]["commentary_pdf_pages"] == row["pdf_pages"]
@@ -50,6 +52,8 @@ def test_complete_source_reading_is_used_for_the_actual_selected_line(row):
         )
         poems = next(e["poems"] for e in source["poems"] if e["line"] == row["line"])
         assert text["shige"] == "\n".join(poem["text"] for poem in poems)
+    else:
+        pass
     assert text["text_provenance"]["poem_presence_in_reviewed_sections"] is False
     timed = _selected_text(
         dict(
@@ -67,7 +71,9 @@ def test_complete_source_reading_is_used_for_the_actual_selected_line(row):
     assert timed["heluo_commentary"] == text
 
 
-def test_corrections_do_not_normalize_the_primary_edition_into_expected_meaning():
+def test_corrections_do_not_normalize_the_primary_edition_into_expected_meaning() -> (
+    None
+):
     tun = yao_text("水雷屯", 1)
     assert (
         "顯達之選" in tun["detail"]
@@ -103,7 +109,7 @@ def test_corrections_do_not_normalize_the_primary_edition_into_expected_meaning(
     assert "蘊其用" in upper["detail"] and "擅其用" not in upper["detail"]
 
 
-def test_nested_conditions_stay_in_their_printed_parent_and_are_not_applied():
+def test_nested_conditions_stay_in_their_printed_parent_and_are_not_applied() -> None:
     girl = yao_text("山水蒙", 3)
     assert "女命則為龍妾" in girl["commentary_sections"][1]["text"]
     assert [s["section_id"] for s in girl["commentary_sections"]] == [
@@ -117,7 +123,9 @@ def test_nested_conditions_stay_in_their_printed_parent_and_are_not_applied():
     assert all(s["applicability"] is None for s in girl["commentary_sections"])
 
 
-def test_reference_reinspection_keeps_draft_withdrawals_and_does_not_inflate_evidence():
+def test_reference_reinspection_keeps_draft_withdrawals_and_does_not_inflate_evidence() -> (
+    None
+):
     assert (
         VERIFIED["draft_sha256"]
         == hashlib.sha256((ROOT / "reference.json").read_bytes()).hexdigest()
@@ -187,8 +195,8 @@ def test_reference_reinspection_keeps_draft_withdrawals_and_does_not_inflate_evi
     ],
 )
 def test_damaged_or_incomplete_source_is_an_internal_source_fault(
-    layer, fault, tmp_path, monkeypatch
-):
+    layer: str, fault: str, tmp_path: Path, monkeypatch: MonkeyPatch
+) -> None:
     path_name, loader, reason = (
         ("COLLATION_PATH", heluo_texts._collation, "invalid_heluo_header_collation")
         if layer == "header"
@@ -202,21 +210,35 @@ def test_damaged_or_incomplete_source_is_an_internal_source_fault(
     p = tmp_path / "source.json"
     if fault == "identity":
         data["source_pdf_sha256"] = "0" * 64
+    else:
+        pass
     if fault == "empty":
         data["entries"] = []
+    else:
+        pass
     if fault == "removed":
         data["entries"].pop()
+    else:
+        pass
     if fault == "duplicate":
         data["entries"][-1] = data["entries"][0]
+    else:
+        pass
     if fault == "bool_line":
         data["entries"][0]["line"] = True
+    else:
+        pass
     if fault == "blank_text":
         if layer == "header":
             data["entries"][0]["yaoci"] = " "
         else:
             data["entries"][0]["sections"][0]["text"] = " "
+    else:
+        pass
     if fault != "missing":
         p.write_text("{" if fault == "json" else json.dumps(data))
+    else:
+        pass
     loader.cache_clear()
     try:
         with monkeypatch.context() as patch:
@@ -231,17 +253,27 @@ def test_damaged_or_incomplete_source_is_an_internal_source_fault(
 @pytest.mark.parametrize(
     "fault", ["wrong_label", "missing_branch", "wrong_order", "invalid_page"]
 )
-def test_commentary_preserves_literal_sections_and_pages(fault, tmp_path, monkeypatch):
+def test_commentary_preserves_literal_sections_and_pages(
+    fault: str, tmp_path: Path, monkeypatch: MonkeyPatch
+) -> None:
     data = json.loads(heluo_texts.COMMENTARY_PATH.read_text())
     e = data["entries"][0]
     if fault == "wrong_label":
         e["sections"][1]["condition_label"] = "不葉者"
+    else:
+        pass
     if fault == "missing_branch":
         e["sections"].pop(2)
+    else:
+        pass
     if fault == "wrong_order":
         e["sections"][1], e["sections"][2] = e["sections"][2], e["sections"][1]
+    else:
+        pass
     if fault == "invalid_page":
         e["pdf_pages"] = [True]
+    else:
+        pass
     p = tmp_path / "source.json"
     p.write_text(json.dumps(data))
     heluo_texts._commentary_collation.cache_clear()
@@ -254,8 +286,9 @@ def test_commentary_preserves_literal_sections_and_pages(fault, tmp_path, monkey
         heluo_texts._commentary_collation.cache_clear()
 
 
-def test_finite_audit_rejects_normalizing_a_literal_primary_reading(monkeypatch):
-    from scripts.numerology import audit_numerology as audit
+def test_finite_audit_rejects_normalizing_a_literal_primary_reading(
+    monkeypatch: MonkeyPatch,
+) -> None:
 
     original = audit.yao_text
 
@@ -263,6 +296,8 @@ def test_finite_audit_rejects_normalizing_a_literal_primary_reading(monkeypatch)
         text = original(gua, pos)
         if gua == "山水蒙" and pos == 3:
             text["detail"] = text["detail"].replace("龍妾", "寵妾")
+        else:
+            pass
         return text
 
     monkeypatch.setattr(audit, "yao_text", normalize_primary)

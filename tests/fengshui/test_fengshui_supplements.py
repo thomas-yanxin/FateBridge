@@ -2,6 +2,7 @@
 
 import asyncio
 import json
+from pathlib import Path
 
 import pytest
 from fastmcp import Client
@@ -12,69 +13,23 @@ from fatebridge.cli import run
 from fatebridge.core.fengshui.models import AssessRequest
 from fatebridge.core.fengshui.output import FengshuiOutput
 from fatebridge.services.fengshui import assess
-from tests.fengshui.test_fengshui_layout import facing_only
 from tests.fixtures.fengshui import payload
 from tests.support.mcp_result_assertions import without_transport
-from tests.support.transports import rest_client
-
-
-def form_inputs(**changes):
-    return {
-        "methods": [],
-        "form_observations": [
-            {
-                "object_id": "x",
-                "purpose": "desk",
-                "entrance_position": "front_left",
-                "entrance_visible": True,
-                "entrance_direct_line": False,
-                "solid_backing": True,
-                "observation_basis": "user_confirmed",
-                "evidence": "已确认使用者视野、入口直线与实体支撑",
-                **changes,
-            }
-        ],
-    }
-
-
-def adjustment_inputs(goal="drain"):
-    inputs = facing_only()
-    inputs["element_adjustments"] = [
-        {
-            "request_id": "r",
-            "object_id": "table",
-            "target_method": "bazhai",
-            "subject_id": "a",
-            "aspect": "facing",
-            "goal": goal,
-            "evidence": "基于当前作用域判定，按所选版本比较元素调节候选",
-        }
-    ]
-    return inputs
-
-
-def annual_inputs(direction="S", facing="W", year=2026):
-    return {
-        "methods": ["annual_stars"],
-        "effective_year": year,
-        "annual_remedy_ruleset_id": "pang_2026_annual_v1",
-        "placements": [
-            {
-                "object_id": "x",
-                "purpose": "desk",
-                "location_direction": direction,
-                "facing_direction": facing,
-                "facing_role": "desk_facing",
-            }
-        ],
-    }
+from tests.support.transports import call_calculation, rest_client
+from tests.unit_test.fixtures.fengshui_layout import (
+    adjustment_inputs,
+    annual_inputs,
+    form_inputs,
+)
 
 
 @pytest.mark.parametrize("purpose", ["desk", "bed", "stove"])
-def test_forms_independent_of_charts_birth_and_compass(purpose):
+def test_forms_independent_of_charts_birth_and_compass(purpose: str) -> None:
     inputs = form_inputs(purpose=purpose)
     if purpose == "stove":
         inputs["form_observations"][0]["solid_backing"] = False
+    else:
+        pass
     actual = assess(**inputs)
     assert actual["status"] == "complete" and actual["layers"] == {}
     assert actual["layout_analysis"]["status"] == "complete"
@@ -85,7 +40,7 @@ def test_forms_independent_of_charts_birth_and_compass(purpose):
     assert "生辰" not in " ".join(actual["layout_analysis"]["missing_inputs"])
 
 
-def test_reported_rear_right_and_distance_do_not_become_door_clash():
+def test_reported_rear_right_and_distance_do_not_become_door_clash() -> None:
     inputs = {
         "methods": [],
         "form_observations": [
@@ -113,7 +68,7 @@ def test_reported_rear_right_and_distance_do_not_become_door_clash():
     assert all(c["adjustment"] is None for c in finding["checks"])
 
 
-def test_measured_distance_does_not_invent_lucky_cutoff():
+def test_measured_distance_does_not_invent_lucky_cutoff() -> None:
     findings = [
         assess(**form_inputs(backing_distance_m=d))["layout_analysis"]["form_analysis"][
             "findings"
@@ -124,7 +79,7 @@ def test_measured_distance_does_not_invent_lucky_cutoff():
     assert findings[0]["checks"] == findings[1]["checks"] == findings[2]["checks"]
 
 
-def test_direct_line_and_view_are_separate_rules():
+def test_direct_line_and_view_are_separate_rules() -> None:
     actual = assess(**form_inputs(entrance_position="front", entrance_direct_line=True))
     finding = actual["layout_analysis"]["form_analysis"]["findings"][0]
     assert finding["finding"] == "adjust_position_or_layout"
@@ -133,7 +88,7 @@ def test_direct_line_and_view_are_separate_rules():
     assert line["finding"] == "opposes_rule" and line["source_ids"] == ["F1"]
 
 
-def test_image_hypothesis_is_not_confirmed_prescription():
+def test_image_hypothesis_is_not_confirmed_prescription() -> None:
     actual = assess(
         **form_inputs(observation_basis="image_observed", solid_backing=False)
     )
@@ -142,7 +97,7 @@ def test_image_hypothesis_is_not_confirmed_prescription():
     assert all(c["candidate_only"] for c in finding["checks"])
 
 
-def test_mirror_option_has_conditions_and_only_corrects_view():
+def test_mirror_option_has_conditions_and_only_corrects_view() -> None:
     actual = assess(
         **form_inputs(entrance_position="back_right", entrance_visible=False)
     )
@@ -176,25 +131,26 @@ def test_mirror_option_has_conditions_and_only_corrects_view():
         {"observation_basis": "image_observed", "backing_distance_m": 1.5},
     ],
 )
-def test_form_validation(changes):
+def test_form_validation(changes) -> None:
     with pytest.raises(ValidationError):
         AssessRequest.model_validate(form_inputs(**changes))
 
 
-def test_mutable_response_cannot_corrupt_cached_rule_sources():
+def test_mutable_response_cannot_corrupt_cached_rule_sources() -> None:
     a = assess(**form_inputs())
     a["layout_analysis"]["form_analysis"]["findings"][0]["checks"][0][
         "source_ids"
     ].append("fake")
-    a["rulesets"][0]["sources"][0]["url"] = "fake"
+    source_id = a["rulesets"][0]["source_ids"][0]
+    a["source_catalog"][source_id]["url"] = "fake"
     b = assess(**form_inputs())
     assert b["layout_analysis"]["form_analysis"]["findings"][0]["checks"][0][
         "source_ids"
     ] == ["F1"]
-    assert b["rulesets"][0]["sources"][0]["url"].startswith("https://")
+    assert b["source_catalog"][source_id]["url"].startswith("https://")
 
 
-def test_element_goal_binds_current_star_and_selects_materials():
+def test_element_goal_binds_current_star_and_selects_materials() -> None:
     plan = assess(**adjustment_inputs())["layout_analysis"]["element_remedies"][0]
     assert plan["status"] == "conditional_options"
     assert (
@@ -213,7 +169,7 @@ def test_element_goal_binds_current_star_and_selects_materials():
     )
 
 
-def test_supporting_bad_star_and_draining_matched_star_are_not_indicated():
+def test_supporting_bad_star_and_draining_matched_star_are_not_indicated() -> None:
     assert (
         assess(**adjustment_inputs("support"))["layout_analysis"]["element_remedies"][
             0
@@ -229,7 +185,7 @@ def test_supporting_bad_star_and_draining_matched_star_are_not_indicated():
     )
 
 
-def test_selected_afsi_wood_option_is_living_plant_not_wood_desk():
+def test_selected_afsi_wood_option_is_living_plant_not_wood_desk() -> None:
     inputs = adjustment_inputs()
     inputs["placements"][0]["facing_direction"] = "NW"  # 离命绝命金，泄金取水
     plan = assess(**inputs)["layout_analysis"]["element_remedies"][0]
@@ -241,7 +197,7 @@ def test_selected_afsi_wood_option_is_living_plant_not_wood_desk():
     assert plan["representations"]["excluded_objects"] == ["处理过的木家具"]
 
 
-def test_unknown_gender_candidates_do_not_become_confirmed_cure():
+def test_unknown_gender_candidates_do_not_become_confirmed_cure() -> None:
     inputs = adjustment_inputs()
     inputs["occupants"][0].pop("gender_convention")
     actual = assess(**inputs)
@@ -254,7 +210,7 @@ def test_unknown_gender_candidates_do_not_become_confirmed_cure():
     )
 
 
-def test_stove_seat_special_convention_not_treated_as_ordinary_bad_star():
+def test_stove_seat_special_convention_not_treated_as_ordinary_bad_star() -> None:
     inputs = {
         **payload("assess"),
         "element_adjustments": [
@@ -273,7 +229,7 @@ def test_stove_seat_special_convention_not_treated_as_ordinary_bad_star():
     assert plan["status"] == "unsupported_application" and "representations" not in plan
 
 
-def test_natal_role_and_candidate_preserved_in_element_requests():
+def test_natal_role_and_candidate_preserved_in_element_requests() -> None:
     inputs = {
         "methods": ["xuankong_natal"],
         "xuankong": payload("xuankong_natal"),
@@ -302,8 +258,8 @@ def test_natal_role_and_candidate_preserved_in_element_requests():
 
 @pytest.mark.parametrize("direction,number", [("S", 5), ("NW", 2)])
 def test_registered_2026_annual_rules_have_exact_location_time_and_goal(
-    direction, number
-):
+    direction: str, number: int
+) -> None:
     actual = assess(**annual_inputs(direction))
     recipe = actual["layout_analysis"]["annual_remedies"]["findings"][0]
     assert recipe["status"] == "conditional_author_rule"
@@ -322,7 +278,9 @@ def test_registered_2026_annual_rules_have_exact_location_time_and_goal(
     ]
 
 
-def test_facing_south_is_not_south_palace_cure_and_missing_location_stays_missing():
+def test_facing_south_is_not_south_palace_cure_and_missing_location_stays_missing() -> (
+    None
+):
     recipe = assess(**annual_inputs("W", "S"))["layout_analysis"]["annual_remedies"][
         "findings"
     ][0]
@@ -337,7 +295,9 @@ def test_facing_south_is_not_south_palace_cure_and_missing_location_stays_missin
     assert actual["annual_remedies"]["findings"][0]["status"] == "needs_location"
 
 
-def test_policy_not_extrapolated_to_other_year_and_lichun_queries_use_effective_year():
+def test_policy_not_extrapolated_to_other_year_and_lichun_queries_use_effective_year() -> (
+    None
+):
     actual = assess(**annual_inputs(year=2027))["layout_analysis"]
     assert actual["status"] == "partial"
     assert actual["annual_remedies"]["status"] == "unsupported_year"
@@ -349,7 +309,7 @@ def test_policy_not_extrapolated_to_other_year_and_lichun_queries_use_effective_
     assert actual["effective_year"] == 2026 and actual["status"] == "complete"
 
 
-def test_introduced_element_effects_on_other_scopes_are_visible_not_merged():
+def test_introduced_element_effects_on_other_scopes_are_visible_not_merged() -> None:
     inputs = annual_inputs()
     inputs["methods"] = ["bazhai", "annual_stars"]
     inputs["occupants"] = [
@@ -398,7 +358,7 @@ def test_introduced_element_effects_on_other_scopes_are_visible_not_merged():
         {**adjustment_inputs(), "element_ruleset_id": "guessed"},
     ],
 )
-def test_no_silent_ignored_or_invented_policy(inputs):
+def test_no_silent_ignored_or_invented_policy(inputs) -> None:
     with pytest.raises(ValidationError):
         AssessRequest.model_validate(inputs)
 
@@ -414,13 +374,17 @@ def test_no_silent_ignored_or_invented_policy(inputs):
     ],
 )
 def test_supplements_match_real_rest_mcp_cli_and_output_schema(
-    monkeypatch, tmp_path, capsys, inputs
-):
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    inputs,
+) -> None:
     from fatebridge.mcp_server import create_mcp_app
 
     async def call():
         async with Client(create_mcp_app()) as client:
-            return await client.call_tool(
+            return await call_calculation(
+                client,
                 "fengshui_assess",
                 {"response_char_limit": 0, **inputs},
                 raise_on_error=False,
@@ -443,7 +407,9 @@ def test_supplements_match_real_rest_mcp_cli_and_output_schema(
         assert result["run_metadata"]["tool_name"] == "fengshui_assess"
 
 
-def test_form_only_first_view_can_project_on_real_mcp_without_missing_chart_path():
+def test_form_only_first_view_can_project_on_real_mcp_without_missing_chart_path() -> (
+    None
+):
     from fatebridge.application.examples import suggested_fields
     from fatebridge.mcp_server import create_mcp_app
     from fatebridge.services.tool_catalog import CATALOG
@@ -452,7 +418,8 @@ def test_form_only_first_view_can_project_on_real_mcp_without_missing_chart_path
 
     async def call():
         async with Client(create_mcp_app()) as client:
-            return await client.call_tool(
+            return await call_calculation(
+                client,
                 "fengshui_assess",
                 {
                     **form_inputs(),
@@ -476,14 +443,17 @@ def test_form_only_first_view_can_project_on_real_mcp_without_missing_chart_path
     ],
 )
 def test_new_nested_and_semantic_errors_match_every_surface(
-    monkeypatch, tmp_path, capsys, inputs
-):
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    inputs,
+) -> None:
     from fatebridge.mcp_server import create_mcp_app
 
     async def call():
         async with Client(create_mcp_app()) as client:
-            return await client.call_tool(
-                "fengshui_assess", inputs, raise_on_error=False
+            return await call_calculation(
+                client, "fengshui_assess", inputs, raise_on_error=False
             )
 
     rest = rest_client(monkeypatch).post("/api/fengshui/assess", json=inputs)

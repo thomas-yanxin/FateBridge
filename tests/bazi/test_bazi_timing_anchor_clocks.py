@@ -1,13 +1,14 @@
 """Replay anchors must obey public local-clock validation, not only formatting."""
 
 from datetime import datetime, timedelta, timezone
+from fractions import Fraction
 
 import pytest
 
 import fatebridge.core.timing as timing
 from fatebridge.core.almanac import SolarTerm
 from fatebridge.core.timing import TimingAnalysis
-from fatebridge.utils.civil_time import ZonedCalendar
+from fatebridge.utils.civil_time import CivilPoint, ZonedCalendar
 from fatebridge.utils.timezones import parse_timezone_name, validate_local_clock
 from tests.support.transports import SPECS, business
 from tests.support.transports import rest as _shared_rest
@@ -25,10 +26,11 @@ rest = _shared_rest
     ],
 )
 def test_anchor_skips_unrepresentable_gap_repeat_and_historical_clock(
-    zone, wall, expected
-):
+    zone: str, wall: str, expected: str
+) -> None:
     moment = datetime.fromisoformat(wall).replace(tzinfo=parse_timezone_name(zone))
-    anchor = TimingAnalysis._next_supported_analysis_anchor(moment, zone)
+    term = SolarTerm("立春", ZonedCalendar.from_datetime(moment))
+    anchor = TimingAnalysis._next_supported_analysis_anchor(term, zone)
     assert anchor.isoformat() == expected
     validate_local_clock(anchor)
     assert anchor.second == 0 and anchor.microsecond == 0
@@ -39,25 +41,75 @@ def test_anchor_skips_unrepresentable_gap_repeat_and_historical_clock(
     if previous.astimezone(timezone.utc) > moment.astimezone(timezone.utc):
         with pytest.raises(ValueError):
             validate_local_clock(previous)
+    else:
+        pass
 
 
-def test_exact_term_minute_keeps_the_documented_strictly_after_policy():
+def test_exact_term_minute_keeps_the_documented_strictly_after_policy() -> None:
     moment = datetime(2028, 4, 4, 14, 4, tzinfo=timezone(timedelta(hours=8)))
-    anchor = TimingAnalysis._next_supported_analysis_anchor(moment, "+08:00")
+    term = SolarTerm("清明", ZonedCalendar.from_datetime(moment))
+    anchor = TimingAnalysis._next_supported_analysis_anchor(term, "+08:00")
     assert anchor == moment + timedelta(minutes=1)
 
 
-def test_repeated_hour_anchor_never_replays_before_its_source_instant():
+def test_repeated_hour_anchor_never_replays_before_its_source_instant() -> None:
     zone = parse_timezone_name("America/New_York")
     # A fully specified UTC instant is the second 01:30 local occurrence.
     moment = datetime(2025, 11, 2, 6, 30, 30, tzinfo=timezone.utc).astimezone(zone)
     assert moment.fold == 1
-    anchor = TimingAnalysis._next_supported_analysis_anchor(moment, "America/New_York")
+    term = SolarTerm("立冬", ZonedCalendar.from_datetime(moment))
+    anchor = TimingAnalysis._next_supported_analysis_anchor(term, "America/New_York")
     assert anchor.isoformat() == "2025-11-02T02:00:00-05:00"
     assert anchor.astimezone(timezone.utc) > moment.astimezone(timezone.utc)
 
 
-def test_timeline_window_does_not_floor_a_fractional_computed_boundary(monkeypatch):
+@pytest.mark.parametrize("end_delta_us", [-1, 0, 1])
+def test_timeline_anchor_respects_ownership_at_the_clock_reopening(
+    end_delta_us,
+) -> None:
+    name = "Antarctica/Vostok"
+    zone = parse_timezone_name(name)
+    reopening = datetime(1994, 11, 1, tzinfo=timezone.utc)
+    start = datetime(1994, 10, 23, tzinfo=timezone.utc).astimezone(zone)
+    start_term = SolarTerm("霜降", ZonedCalendar.from_datetime(start))
+    end = (reopening + timedelta(microseconds=end_delta_us)).astimezone(zone)
+    end_term = SolarTerm("立冬", ZonedCalendar.from_datetime(end))
+
+    anchor = TimingAnalysis._next_supported_analysis_anchor(
+        start_term, name, end_term=end_term
+    )
+    if end_delta_us <= 0:
+        assert anchor is None
+    else:
+        assert anchor is not None
+        assert anchor.isoformat() == "1994-11-01T07:00:00+07:00"
+        validate_local_clock(anchor)
+
+
+def test_timeline_anchor_uses_a_minute_after_the_exact_start_within_the_window() -> (
+    None
+):
+    minute = datetime(2028, 2, 4, 9, tzinfo=timezone.utc)
+    calendar = ZonedCalendar.from_datetime(minute)
+    minute_day = calendar.utc.julian_day_exact()
+    quarter_microsecond = Fraction(1, 4 * 86_400_000_000)
+    start = SolarTerm(
+        "立春", calendar, civil_point=CivilPoint(minute_day - quarter_microsecond)
+    )
+    end = SolarTerm(
+        "雨水", calendar, civil_point=CivilPoint(minute_day + quarter_microsecond)
+    )
+
+    assert start.moment == end.moment == minute
+    assert (
+        TimingAnalysis._next_supported_analysis_anchor(start, "UTC", end_term=end)
+        == minute
+    )
+
+
+def test_timeline_window_does_not_floor_a_fractional_computed_boundary(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     zone = parse_timezone_name("Asia/Shanghai")
     first = datetime(2028, 1, 6, 3, 54, 38, 700247, tzinfo=zone)
     second = datetime(2028, 2, 4, 15, 30, 0, 123456, tzinfo=zone)
@@ -92,7 +144,7 @@ def test_timeline_window_does_not_floor_a_fractional_computed_boundary(monkeypat
 
 def test_actual_provider_lidong_replays_new_month_on_rest_native_mcp_and_cli(
     surface_calls,
-):
+) -> None:
     spec = SPECS["jieqi_timeline_analysis"]
     args = {
         "birth_year": 1990,

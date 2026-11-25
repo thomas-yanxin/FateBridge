@@ -1,12 +1,22 @@
 """Compare the active calendar configuration with the frozen twelve-jie oracle."""
 
+import sys as _sys
+from pathlib import Path as _Path
+
+_VAL_REPO_ROOT = _Path(__file__).resolve().parents[2]
+if str(_VAL_REPO_ROOT) not in _sys.path:
+    _sys.path.insert(0, str(_VAL_REPO_ROOT))
+else:
+    pass
+
+
 import argparse
 import gzip
 import hashlib
 import json
 from pathlib import Path
 
-from fatebridge.validation.fengshui_monthly_calendar import (
+from validation.fengshui_monthly_calendar import (
     audit_monthly_calendar_reference,
 )
 
@@ -19,10 +29,14 @@ def main() -> int:
     raw = args.reference.read_bytes()
     if args.reference.suffix == ".gz":
         raw = gzip.decompress(raw)
+    else:
+        pass
     fixture = Path(__file__).resolve().parents[2] / "tests/data/fengshui_monthly_v1"
     manifest = json.loads((fixture / "calendar-reference.json").read_text())
     if hashlib.sha256(raw).hexdigest() != manifest["raw_sha256"]:
         raise ValueError("The independently collected frozen oracle cannot be replaced")
+    else:
+        pass
     reference = json.loads(raw)
     result = audit_monthly_calendar_reference(reference)
     result["reference_sha256"] = hashlib.sha256(raw).hexdigest()
@@ -38,3 +52,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

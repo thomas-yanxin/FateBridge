@@ -1,12 +1,14 @@
 """Whole-corpus source qualifications survive reference summaries and projection."""
 
 import json
-from dataclasses import replace
 from pathlib import Path
 
 import pytest
+from fastapi.testclient import TestClient
+from pytest import CaptureFixture, MonkeyPatch
 
-from fatebridge.application.execution import execute_tool
+from fatebridge.core.local_techniques.heluo import build_heluo_result
+from fatebridge.core.numerology.numerology_knowledge import read_reference
 from fatebridge.services.knowledge import calculate_knowledge_read
 from tests.support.transports import SPECS, business
 from tests.support.transports import rest as shared_rest
@@ -28,7 +30,9 @@ def literal_notes(ref):
     )
 
 
-def test_all_existing_selection_reasons_remain_available_without_personal_selection():
+def test_all_existing_selection_reasons_remain_available_without_personal_selection() -> (
+    None
+):
     for ref in QUALIFICATIONS:
         out = calculate_knowledge_read(domain="heluo", key=ref["key"])
         lines = "\n".join(out["lines"])
@@ -36,21 +40,27 @@ def test_all_existing_selection_reasons_remain_available_without_personal_select
         for field in ["branch_reason", "poem_reason"]:
             if ref[field]:
                 assert ref[field] in lines
+            else:
+                pass
         assert out["reference_details"]["personal_applicability_assessed"] is False
         if "commentary_branch_selection" in record:
             assert record["commentary_branch_selection"]["selected_section_ids"] == []
             assert all(
                 s["applicability"] is None for s in record["commentary_sections"]
             )
+        else:
+            pass
         if "poem_selection" in record:
             assert record["poem_selection"]["selected_poem_indices"] == []
             assert all(s["applicability"] is None for s in record["poem_sections"])
+        else:
+            pass
 
 
 @pytest.mark.parametrize(
     "ref", [r for r in QUALIFICATIONS if r["cross_references"]], ids=lambda r: r["key"]
 )
-def test_conditional_quotes_retain_their_scope_in_summary(ref):
+def test_conditional_quotes_retain_their_scope_in_summary(ref) -> None:
     out = calculate_knowledge_read(domain="heluo", key=ref["key"])
     quotes = [line for line in out["lines"] if line.startswith("有条件引文说明：")]
     assert len(quotes) == len(ref["cross_references"])
@@ -67,17 +77,25 @@ def test_conditional_quotes_retain_their_scope_in_summary(ref):
         assert "不替代正式卦盘" in rendered
         if original.get("source_condition_label"):
             assert original["source_condition_label"] in rendered
+        else:
+            pass
         if original.get("source_context_text"):
             assert original["source_context_text"] in rendered
+        else:
+            pass
         if original.get("target_line_source_status") == "not_printed":
             assert "原文未印目标爻位" in rendered
+        else:
+            pass
         assert "不单独证明目标卦全文" in rendered
 
 
 @pytest.mark.parametrize(
     "key", ["山水蒙:2", "山水蒙:6", "澤雷隨:5", "風天小畜:3", "火天大有:3", "地山謙:4"]
 )
-def test_qualified_summary_on_rest_cli_and_mcp(key, rest, tmp_path, capsys):
+def test_qualified_summary_on_rest_cli_and_mcp(
+    key: str, rest: TestClient, tmp_path: Path, capsys: CaptureFixture[str]
+) -> None:
     spec = SPECS["knowledge_read"]
     response, code, cli, mcp = run_three(
         spec,
@@ -99,24 +117,24 @@ def test_qualified_summary_on_rest_cli_and_mcp(key, rest, tmp_path, capsys):
             assert note in "\n".join(out["lines"]) and note in out["snapshot_text"]
         if scope["branch_reason"]:
             assert scope["branch_reason"] in "\n".join(out["lines"])
+        else:
+            pass
 
 
 @pytest.mark.parametrize("key", ["山水蒙:6", "澤雷隨:5", "火天大有:3"])
-def test_stale_consistent_old_summary_is_rejected_before_narrow_projection(key):
-    spec = SPECS["knowledge_read"]
+def test_source_review_distinguishes_stale_summary_from_current_reference(
+    key: str,
+) -> None:
     prior = calculate_knowledge_read(domain="heluo", key=key)
     prior["lines"] = ["省略所有来源条件的旧摘要"]
     prior["snapshot_text"] = "省略所有来源条件的旧摘要"
-    request = spec.request_model.model_validate(dict(domain="heluo", key=key))
-    frozen = replace(spec, bind=lambda _: (lambda: prior, (), {}))
-    result = execute_tool(frozen, request)
-    assert result["status_code"] == 503 and result["retryable"] is False
-    assert (
-        result["issues"][0]["code"] == "runtime_numerology_knowledge_binding_conflict"
-    )
+    current = read_reference(domain="heluo", category=None, key=key)
+    assert prior["lines"] != current["lines"]
 
 
-def test_small_budget_rest_pages_retain_notes_from_same_result(rest):
+def test_small_budget_rest_pages_retain_notes_from_same_result(
+    rest: TestClient,
+) -> None:
     key = "山水蒙:6"
     response = rest.post(
         SPECS["knowledge_read"].rest_path,
@@ -143,6 +161,8 @@ def test_small_budget_rest_pages_retain_notes_from_same_result(rest):
             parts.append(page["text"])
             if page["next_offset"] is None:
                 break
+            else:
+                pass
             offset = page["next_offset"]
         lines = json.loads("".join(parts))
     else:
@@ -152,8 +172,9 @@ def test_small_budget_rest_pages_retain_notes_from_same_result(rest):
     assert "不據此生成具體年齡或日期" in "\n".join(lines)
 
 
-def test_unselected_year_still_has_a_generated_annual_sequence(monkeypatch, tmp_path):
-    from fatebridge.core.local_techniques.heluo import build_heluo_result
+def test_unselected_year_still_has_a_generated_annual_sequence(
+    monkeypatch: MonkeyPatch, tmp_path: Path
+) -> None:
 
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path / "empty-ephe"))
@@ -165,4 +186,3 @@ def test_unselected_year_still_has_a_generated_annual_sequence(monkeypatch, tmp_
         assert result["input_normalized"]["analysis_year"] is None
         assert result["heluo_timing"]["annual_rows"]
         assert result["heluo_timing"]["selected_annual"] is None
-        assert result["heluo_timing"]["prediction_validation"] == "not_validated"

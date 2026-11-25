@@ -7,21 +7,21 @@ from unittest.mock import patch
 
 import pytest
 
-from fatebridge.core import human_design_knowledge as base
-from fatebridge.core import human_design_knowledge_v7 as hd
-from fatebridge.core.human_design_mechanics import CHANNELS, GATE_CENTER
-from fatebridge.core.human_design_source_context import bind_source_context
-from fatebridge.services.human_design_context_lines import (
-    build_human_design_context_packet,
-)
+from fatebridge.core.human_design import human_design_knowledge as base
+from fatebridge.core.human_design import human_design_knowledge_v7 as hd
+from fatebridge.core.human_design.human_design_mechanics import CHANNELS, GATE_CENTER
+from fatebridge.core.human_design.human_design_source_context import bind_source_context
 from fatebridge.utils.errors import EphemerisSourceError
-from fatebridge.validation.human_design_context_lines import (
-    verify_human_design_context_packet,
-)
 from tests.support.reference_data import read, sha
 from tests.support.transports import SPECS, business
 from tests.support.transports import rest as shared_rest
 from tests.support.transports import run_three
+from validation.human_design_context_lines import (
+    verify_human_design_context_packet,
+)
+from validation.human_design_context_packet import (
+    build_human_design_context_packet,
+)
 
 ROOT = Path(__file__).resolve().parents[2]
 E = ROOT / "tests/data/human_design/gate6"
@@ -29,7 +29,9 @@ rest = shared_rest
 LOCATOR_SHA = "f49c6a9ea3b8e394615c44babe50a06ff3c38367d3c22cf6f8829af4650a0b46"
 
 
-def test_all384_references_preserve_inherited_poles_annotations_and_other_meanings():
+def test_all384_references_preserve_inherited_poles_annotations_and_other_meanings() -> (
+    None
+):
     for gate in range(1, 65):
         for line in range(1, 7):
             key = f"{gate}.{line}"
@@ -46,6 +48,8 @@ def test_all384_references_preserve_inherited_poles_annotations_and_other_meanin
             assert new["actual_fixing_state"] is new["selected_polarity"] is None
             if gate != 6:
                 assert new == old
+            else:
+                pass
 
 
 @pytest.mark.parametrize(
@@ -60,8 +64,8 @@ def test_all384_references_preserve_inherited_poles_annotations_and_other_meanin
     ],
 )
 def test_six_lines_match_frozen_independent_locators_and_do_not_decide_applicability(
-    line, up, down
-):
+    line: int, up: str, down: str
+) -> None:
     path = E / "gate6-independent-source-locators.json"
     assert sha(path) == LOCATOR_SHA
     fact = read(path)["rows"][line - 1]
@@ -86,16 +90,20 @@ def test_six_lines_match_frozen_independent_locators_and_do_not_decide_applicabi
         assert annotation["source_role"] == "line_intro"
         assert annotation["scope"] == "named_clause_only_not_whole_line_or_pole"
         assert annotation["source_interpretation_resolved"] is False
+    else:
+        pass
     if line == 5:
         assert any("内在权威" in n for n in record["source_reading_notes"])
+    else:
+        pass
 
 
 @pytest.mark.parametrize(
     "key", ["6.1", "6.2", "6.3", "6.4", "6.5", "6.6", "5.6", "2.3"]
 )
 def test_actual_rest_mcp_cli_keep_complete_bound_reference_values(
-    key, rest, tmp_path, capsys
-):
+    key: str, rest, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     response, code, cli, mcp = run_three(
         SPECS["knowledge_read"],
         {"domain": "human_design", "category": "lines_v7", "key": key},
@@ -114,6 +122,8 @@ def test_actual_rest_mcp_cli_keep_complete_bound_reference_values(
             cli["reference_details"]["record"]["editorial_paraphrase"]["detriment"]
             is None
         )
+    else:
+        pass
 
 
 @pytest.mark.parametrize(
@@ -131,8 +141,8 @@ def test_actual_rest_mcp_cli_keep_complete_bound_reference_values(
     ],
 )
 def test_deliberately_rehashed_invalid_supplement_cannot_override_inherited_clauses(
-    fault, tmp_path, monkeypatch
-):
+    fault: str, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     data = json.loads(hd.CATALOGUE_PATH.read_text())
     row = data["rows"][2]
     if fault == "inherited_override":
@@ -193,7 +203,7 @@ def rows63(packet):
 
 def test_actual63_interpretation_binds_intro_observation_without_biological_conclusion(
     packet63,
-):
+) -> None:
     source, packet = packet63
     assert packet["packet_version"] == 7
     assert (
@@ -219,8 +229,8 @@ def test_actual63_interpretation_binds_intro_observation_without_biological_conc
     ["role", "biology", "outcome", "drop_annotation", "condition", "wrong_version"],
 )
 def test_complete_context_replay_rejects_role_outcome_and_version_forgery(
-    packet63, fault
-):
+    packet63, fault: str
+) -> None:
     source, original = packet63
     packet = deepcopy(original)
     row = rows63(packet)[0]
@@ -250,8 +260,8 @@ def test_complete_context_replay_rejects_role_outcome_and_version_forgery(
     "state", ["unfixed", "exaltation", "detriment", "juxtaposition"]
 )
 def test_synthetic_graph_controls_keep_intro_separate_from_fixing_and_world_outcomes(
-    connected, state
-):
+    connected: bool, state: str
+) -> None:
     # Pure graph controls are not astronomical cases or predictive samples.
     gates = [6, 59] if connected else [6, 1]
     acts = [{"body": str(i), "gate": gates[i % 2], "line": 3} for i in range(13)]

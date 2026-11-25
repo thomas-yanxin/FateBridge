@@ -4,6 +4,7 @@ import asyncio
 import json
 from pathlib import Path
 
+import pytest
 from fastapi.testclient import TestClient
 from fastmcp import Client
 from jsonschema import Draft202012Validator
@@ -11,10 +12,11 @@ from jsonschema import Draft202012Validator
 import fatebridge.api as api
 from fatebridge.application.examples import evidence_views
 from fatebridge.cli import run
-from fatebridge.core.human_design_cycle_summary import cycle_contact_facts
+from fatebridge.core.human_design.human_design_cycle_summary import cycle_contact_facts
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.validation.human_design import verify_human_design_reading
+from tests.support.transports import call_calculation
+from validation.human_design import verify_human_design_reading
 
 SPEC = next(s for s in CATALOG if s.key == "human_design")
 INPUT = dict(
@@ -31,8 +33,8 @@ INPUT = dict(
 
 
 def test_observed_extremum_candidates_and_direction_evidence_match_three_surfaces(
-    monkeypatch, capsys
-):
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
     monkeypatch.setenv(
         "SE_EPHE_PATH", str(Path(__file__).resolve().parents[2] / "ephe")
     )
@@ -51,11 +53,12 @@ def test_observed_extremum_candidates_and_direction_evidence_match_three_surface
 
     async def call():
         async with Client(create_mcp_app(families="astro")) as client:
-            reply = await client.call_tool(
-                "human_design", {**INPUT, "response_char_limit": 0}
+            reply = await call_calculation(
+                client, "human_design", {**INPUT, "response_char_limit": 0}
             )
             assert not reply.is_error
-            card = await client.call_tool(
+            card = await call_calculation(
+                client,
                 "human_design",
                 {
                     **INPUT,

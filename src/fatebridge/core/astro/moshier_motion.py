@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import math
 from importlib.metadata import version
-from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple
+from typing import Any, Callable, Sequence
 
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.lunar_motion import SOURCE_VERSION
@@ -31,6 +31,7 @@ from fatebridge.core.astro.solar_decimal import (
     MOSHIER_LUNAR_METHOD_ID,
     MOSHIER_METHOD_ID,
     MOSHIER_SOURCE_TARGETS,
+    MoshierGeometricStates,
     ReductionReceipt,
     reduced_longitude,
 )
@@ -58,8 +59,8 @@ def complete_moshier_longitude_rate(
     coordinates: Sequence[float],
     *,
     sidereal: bool = False,
-    source_trace: Optional[PhysicalEphemerisTrace] = None,
-) -> Tuple[Optional[float], Dict[str, Any]]:
+    source_trace: PhysicalEphemerisTrace | None = None,
+) -> tuple[float | None, dict[str, Any]]:
     """Require two source steps and their declared stencil convergence.
 
     Only Moshier and the inspected binding/native version are supported.
@@ -69,7 +70,7 @@ def complete_moshier_longitude_rate(
     swe = runtime.swe
     native_version = str(getattr(swe, "version", "unavailable"))
     binding = binding_distribution_version(swe, version)
-    policy: Dict[str, Any] = {
+    policy: dict[str, Any] = {
         "method_id": SIDEREAL_METHOD_ID if sidereal else METHOD_ID,
         "native_version": native_version,
         "binding_version": binding,
@@ -97,39 +98,47 @@ def complete_moshier_longitude_rate(
     }
     if planet not in TARGETS:
         return None, {**policy, "status": "not_applied", "reason": "unsupported_target"}
+    else:
+        pass
     if swe is None or (native_version, binding) != SOURCE_VERSION:
         return None, {
             **policy,
             "status": "not_applied",
             "reason": "unverified_native_version",
         }
+    else:
+        pass
     if (
         not math.isfinite(julian_day_tt)
         or len(coordinates) < 4
         or not all(math.isfinite(v) for v in coordinates[:4])
     ):
         raise EphemerisSourceError("coordinate_values_unavailable")
+    else:
+        pass
     trace = source_trace if source_trace is not None else PhysicalEphemerisTrace()
-    contexts: Dict[str, Any] = {}
-    attempts: List[Dict[str, object]] = []
-    result: Optional[float] = None
+    contexts: dict[str, Any] = {}
+    attempts: list[dict[str, object]] = []
+    result: float | None = None
     with runtime.preserve_ephemeris_path():
         selected = configured_ephemeris_path()
         if sidereal:
             runtime.ephemeris_call("set_sid_mode", swe.SIDM_LAHIRI, 0.0, 0.0)
+        else:
+            pass
 
         def run_stencils(
             provider: Callable[[float], float],
             center: float,
             steps: Sequence[float],
-        ) -> Tuple[Optional[float], List[Dict[str, object]]]:
-            selected_rate: Optional[float] = None
-            trials: List[Dict[str, object]] = []
+        ) -> tuple[float | None, list[dict[str, object]]]:
+            selected_rate: float | None = None
+            trials: list[dict[str, object]] = []
             for polynomial in (False, True):
-                rates: List[float] = []
-                tried_steps: List[float] = []
-                differences: List[float] = []
-                checks: List[Dict[str, object]] = []
+                rates: list[float] = []
+                tried_steps: list[float] = []
+                differences: list[float] = []
+                checks: list[dict[str, object]] = []
                 consecutive = 0
                 for step in steps:
                     rate = (
@@ -157,6 +166,8 @@ def complete_moshier_longitude_rate(
                     rates.append(rate)
                     if len(rates) < 2:
                         continue
+                    else:
+                        pass
                     error = abs(rate - rates[-2]) * 3600
                     differences.append(error)
                     consecutive = (
@@ -166,8 +177,10 @@ def complete_moshier_longitude_rate(
                     )
                     if consecutive < 2:
                         continue
+                    else:
+                        pass
                     parent = 2 * step
-                    estimates: List[Dict[str, object]] = []
+                    estimates: list[dict[str, object]] = []
                     directional_rates = []
                     for count, (nodes, _) in DIRECTIONAL_POLYNOMIALS.items():
                         for direction in (-1, 1):
@@ -205,6 +218,8 @@ def complete_moshier_longitude_rate(
                     if passed:
                         selected_rate = rate
                         break
+                    else:
+                        pass
                 trials.append(
                     {
                         "stencil": (
@@ -226,6 +241,8 @@ def complete_moshier_longitude_rate(
                 )
                 if selected_rate is not None:
                     break
+                else:
+                    pass
             return selected_rate, trials
 
         # A complete trial includes its parent-step one-sided checks. Select
@@ -267,12 +284,13 @@ def complete_moshier_longitude_rate(
             "moshier_geometric_source", "moshier", record_factor=False
         )
         source_rates = []
-        source_checks: List[Dict[str, object]] = []
+        source_checks: list[dict[str, object]] = []
         centers_agree = True
         sample_count = 0
+        geometric_states: MoshierGeometricStates = {}
         source_steps = (source_step, source_step / 2) if radius >= source_radius else ()
         for source_step in source_steps:
-            reduced_samples: Dict[float, Tuple[float, ReductionReceipt]] = {}
+            reduced_samples: dict[float, tuple[float, ReductionReceipt]] = {}
 
             def source_sample(delta: float) -> float:
                 if delta not in reduced_samples:
@@ -287,7 +305,10 @@ def complete_moshier_longitude_rate(
                         center_source=center_source,
                         model="moshier",
                         source_step_days=source_step,
+                        moshier_geometric_states=geometric_states,
                     )
+                else:
+                    pass
                 return reduced_samples[delta][0]
 
             center = source_sample(0.0)
@@ -298,10 +319,12 @@ def complete_moshier_longitude_rate(
                 # span uniformly in this source geometry, retaining the
                 # bilateral trials as diagnostics. Every direction whose
                 # whole support exists still participates.
-                def source_branch(delta: float) -> Dict[str, object]:
+                def source_branch(delta: float) -> dict[str, object]:
                     epoch = julian_day_tt + delta
                     if epoch - source_radius < lower or epoch + source_radius > upper:
                         return {"cell": None}
+                    else:
+                        pass
                     source_sample(delta)
                     return reduced_samples[delta][1]["solar_interpolation_branch"]
 
@@ -327,6 +350,8 @@ def complete_moshier_longitude_rate(
                 rate = (
                     sided["selected_rate"] if sided["status"] == "converged" else None
                 )
+            else:
+                pass
             shift = math.remainder(center - float(coordinates[0]), 360) * 3600
             centers_agree = centers_agree and abs(shift) <= SOURCE_POSITION_LINE_ARCSEC
             for trial in trials:
@@ -334,6 +359,8 @@ def complete_moshier_longitude_rate(
             attempts.extend(trials)
             if rate is not None:
                 source_rates.append(rate)
+            else:
+                pass
             sample_count += len(reduced_samples)
             source_checks.append(
                 {
@@ -360,6 +387,8 @@ def complete_moshier_longitude_rate(
             and centers_agree
         ):
             result = source_rates[-1]
+        else:
+            pass
         policy["source_reduction"] = {
             "method_id": (
                 MOSHIER_LUNAR_METHOD_ID if planet == "Moon" else MOSHIER_METHOD_ID
@@ -376,6 +405,8 @@ def complete_moshier_longitude_rate(
         assert_physical_configuration(selected)
         if source_trace is None:
             trace.finish()
+        else:
+            pass
     return result, {
         **policy,
         "status": "applied" if result is not None else "not_applied",

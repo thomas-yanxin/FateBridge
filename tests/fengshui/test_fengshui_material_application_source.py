@@ -57,8 +57,13 @@ SOURCE = json.loads(
     "source_material", SOURCE["materials"], ids=lambda row: row["material"]
 )
 def test_published_application_proportion_condition_for_every_registered_material(
-    source_material, case, value, basis, application_status, condition_status
-):
+    source_material,
+    case: str,
+    value: bool | None,
+    basis: str | None,
+    application_status: str,
+    condition_status: str,
+) -> None:
     application = {
         "ruleset_id": "afsi_application_conditions_v1",
         **{
@@ -77,6 +82,8 @@ def test_published_application_proportion_condition_for_every_registered_materia
             "observation_basis": basis,
             "evidence": "工程样本：记录原作者定性尺度观察，不计算足量",
         }
+    else:
+        pass
     record = {
         "fact_id": "source-application",
         "object_id": "item",
@@ -88,6 +95,8 @@ def test_published_application_proportion_condition_for_every_registered_materia
     }
     if source_material["material"] == "living_plant":
         record["plant_alive"] = True
+    else:
+        pass
     finding = analyze_material_facts([MaterialShapeFact.model_validate(record)])[
         "findings"
     ][0]

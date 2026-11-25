@@ -37,7 +37,7 @@ _BIRTH = dict(
 )
 
 
-def test_true_solar_is_off_by_default():
+def test_true_solar_is_off_by_default() -> None:
     # Tradition: western charts use the recorded civil clock, so the default
     # leaves 09:55 untouched (no longitude/equation-of-time shift).
     result = calculate_core_chart_analysis(**_BIRTH)
@@ -47,14 +47,14 @@ def test_true_solar_is_off_by_default():
     assert result["person_info"]["birth_datetime"].startswith("2000-12-10T09:55")
 
 
-def test_true_solar_opt_in_rebases_onto_solar_clock():
+def test_true_solar_opt_in_rebases_onto_solar_clock() -> None:
     result = calculate_core_chart_analysis(**_BIRTH, use_true_solar_time=True)
     ts = result["person_info"]["true_solar"]
     assert ts["applied"] is True
     assert ts["correction_minutes"] != 0.0
 
 
-def test_correction_matches_bazi_helper_single_source():
+def test_correction_matches_bazi_helper_single_source() -> None:
     expected = calculate_solar_time_adjustment(
         datetime(2000, 12, 10, 9, 55),
         "Asia/Shanghai",
@@ -67,7 +67,7 @@ def test_correction_matches_bazi_helper_single_source():
     )
 
 
-def test_core_chart_request_default_timezone_is_none():
+def test_core_chart_request_default_timezone_is_none() -> None:
     # The 'UTC' default belonged to the request-model layer (REST/MCP/CLI):
     # Pydantic filled birth_timezone='UTC' when omitted, pre-empting the
     # place-based inference in build_astro_birth_info. The core chart model must
@@ -80,7 +80,7 @@ def test_core_chart_request_default_timezone_is_none():
     assert req.birth_timezone is None
 
 
-def test_omitted_timezone_uses_birth_place_not_utc():
+def test_omitted_timezone_uses_birth_place_not_utc() -> None:
     # End-to-end through the request layer: a known birth place with no timezone
     # must infer the place's timezone (as BaZi does), not fall back to 'UTC' and
     # rotate the whole chart.
@@ -101,7 +101,7 @@ def test_omitted_timezone_uses_birth_place_not_utc():
     assert result["person_info"]["utc_datetime"].startswith("2000-12-10T0")
 
 
-def test_true_solar_shifts_birth_instant_and_positions():
+def test_true_solar_shifts_birth_instant_and_positions() -> None:
     on = calculate_core_chart_analysis(**_BIRTH, use_true_solar_time=True)
     off = calculate_core_chart_analysis(**_BIRTH, use_true_solar_time=False)
     # Corrected clock is later than the raw 09:55 (east of the standard meridian).

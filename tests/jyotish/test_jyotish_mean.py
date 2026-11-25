@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.jyotish_mean import (
+from fatebridge.core.jyotish.jyotish_mean import (
     FRAME,
     LOWER_TT,
     MODEL,
@@ -31,8 +31,8 @@ def error_arcsec(a, b):
 
 @pytest.mark.parametrize("case", REFERENCE["rows"])
 def test_primary_secular_means_and_geometric_positions_against_frozen_independent_references(
-    case, monkeypatch, tmp_path
-):
+    case, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     jd = case["jd_tt_substituted_for_tdb"]
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
     if not admitted(jd):
@@ -40,6 +40,8 @@ def test_primary_secular_means_and_geometric_positions_against_frozen_independen
             mean_longitudes(jd)
         assert geometric_points(jd, "auto") == {}
         return
+    else:
+        pass
     means = mean_longitudes(jd)
     for planet, expected in case["mean_j2000_degrees"].items():
         assert error_arcsec(means[planet], expected) < 0.01, (
@@ -62,7 +64,7 @@ def test_primary_secular_means_and_geometric_positions_against_frozen_independen
         )
 
 
-def test_coordinate_rotation_matches_independent_erfa_matrix():
+def test_coordinate_rotation_matches_independent_erfa_matrix() -> None:
     for column in range(3):
         value = tuple(1.0 if i == column else 0.0 for i in range(3))
         actual = icrs_to_j2000_ecliptic(value)
@@ -73,7 +75,7 @@ def test_coordinate_rotation_matches_independent_erfa_matrix():
         assert actual == pytest.approx(expected, abs=2e-15, rel=0)
 
 
-def test_j2000_published_mean_constants_and_millennial_time_unit():
+def test_j2000_published_mean_constants_and_millennial_time_unit() -> None:
     result = mean_longitudes(2451545.0)
     assert result["Mercury"] == pytest.approx(252.25090552, abs=1e-12)
     assert result["Mars"] == pytest.approx(355.43299958, abs=1e-12)
@@ -85,7 +87,7 @@ def test_j2000_published_mean_constants_and_millennial_time_unit():
     assert 4.09 < advance < 4.10
 
 
-def test_validated_tt_window_is_half_open_not_a_guessed_source_validity():
+def test_validated_tt_window_is_half_open_not_a_guessed_source_validity() -> None:
     assert admitted(LOWER_TT)
     assert admitted(math.nextafter(UPPER_TT, -math.inf))
     assert not admitted(UPPER_TT)
@@ -94,7 +96,7 @@ def test_validated_tt_window_is_half_open_not_a_guessed_source_validity():
     assert not admitted(math.inf)
 
 
-def test_declared_model_uses_mean_sun_and_separate_geometric_frame():
+def test_declared_model_uses_mean_sun_and_separate_geometric_frame() -> None:
     raw = {
         "cheshta_model": MODEL,
         "julian_day_tt": 2451545.0,
@@ -116,7 +118,7 @@ def test_declared_model_uses_mean_sun_and_separate_geometric_frame():
     assert model_balas(raw) == result  # no D1 longitude or varga masquerade
 
 
-def test_default_and_outside_window_remain_missing_without_model_substitution():
+def test_default_and_outside_window_remain_missing_without_model_substitution() -> None:
     result = model_balas({})
     assert all(value is None for value in result["summary"].values())
     result = model_balas({"cheshta_model": MODEL, "julian_day_tt": UPPER_TT})
@@ -126,7 +128,9 @@ def test_default_and_outside_window_remain_missing_without_model_substitution():
         model_balas({"cheshta_model": "fitted_JPL_elements_are_not_means"})
 
 
-def test_strict_policy_covers_geometric_positions(monkeypatch, tmp_path):
+def test_strict_policy_covers_geometric_positions(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
     auto = geometric_points(2451545.0, "auto")
     assert all(value["ephemeris_model"] == "moshier" for value in auto.values())

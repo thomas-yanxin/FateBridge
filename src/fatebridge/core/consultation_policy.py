@@ -1,15 +1,10 @@
-"""Conservative, transport-independent gates for explicit restricted intents.
-
-This detects known formulations, not arbitrary conversational meaning. Hosts
-must also apply the shared consultation boundaries before choosing a tool.
-Never inspect person names or echo submitted questions in rejection payloads.
-"""
+"""Detect explicit restricted consultation requests without inspecting person names."""
 
 from __future__ import annotations
 
 import re
 import unicodedata
-from typing import Any, Mapping, Optional
+from collections.abc import Mapping
 
 POLICY_ID = "consultation_boundaries_v1"
 BLOCKED_HORARY_CATEGORIES = frozenset({"death", "health", "pregnancy"})
@@ -48,38 +43,33 @@ def _normalize(value: str) -> str:
     )
 
 
-def restricted_intent_path(data: Mapping[str, Any]) -> Optional[str]:
-    """Find explicit known restricted requests without classifying neutral charts."""
+def restricted_intent_path(data: Mapping[str, object]) -> str | None:
+    """Find the path of an explicit restricted intent in a raw request."""
+    category = data.get("category")
+    topic = data.get("topic_id")
     if (
         "question_year" in data
-        and _normalize(str(data.get("category", ""))) in BLOCKED_HORARY_CATEGORIES
+        and isinstance(category, str)
+        and _normalize(category) in BLOCKED_HORARY_CATEGORIES
     ):
         return "category"
-    if _normalize(str(data.get("topic_id", ""))) in BLOCKED_ELECTION_TOPICS:
+    elif isinstance(topic, str) and _normalize(topic) in BLOCKED_ELECTION_TOPICS:
         return "topic_id"
-    for key, value in data.items():
-        if key in _INTENT_FIELDS and isinstance(value, str):
-            normalized = _normalize(value)
-            if any(pattern.search(normalized) for pattern in _PATTERNS):
-                return key
-        elif isinstance(value, Mapping):
-            nested = restricted_intent_path(value)
-            if nested:
-                return f"{key}.{nested}"
+    else:
+        pass
+    for field_name, submitted_value in data.items():
+        if field_name in _INTENT_FIELDS and isinstance(submitted_value, str):
+            normalized_intent = _normalize(submitted_value)
+            if any(pattern.search(normalized_intent) for pattern in _PATTERNS):
+                return field_name
+            else:
+                pass
+        elif isinstance(submitted_value, Mapping):
+            nested_path = restricted_intent_path(submitted_value)
+            if nested_path:
+                return f"{field_name}.{nested_path}"
+            else:
+                pass
+        else:
+            pass
     return None
-
-
-def restriction_result(path: str) -> dict[str, Any]:
-    return {
-        "error": "此请求涉及不提供的生死、灾祸或临床预测／医疗择时，请转向现实支持或允许的文化解释。",
-        "error_code": "consultation_restricted",
-        "status_code": 422,
-        "retryable": False,
-        "issues": [
-            {
-                "path": path,
-                "code": "consultation_restricted",
-                "constraints": {"policy": POLICY_ID},
-            }
-        ],
-    }

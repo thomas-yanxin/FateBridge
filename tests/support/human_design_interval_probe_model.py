@@ -5,8 +5,10 @@ from copy import deepcopy
 from fractions import Fraction
 from pathlib import Path
 
-from fatebridge.core.human_design import chart_at_tt, longitude_activation
-from fatebridge.core.human_design_root_interpretations import candidate_chart
+from fatebridge.core.human_design.human_design import chart_at_tt, longitude_activation
+from fatebridge.core.human_design.human_design_root_interpretations import (
+    candidate_chart,
+)
 
 ROOT = Path(__file__).resolve().parents[2]
 E = ROOT / "tests/data/human_design"
@@ -50,6 +52,8 @@ def model(case_id):
             # These inherited clock/root records are scaffolding, deliberately
             # not offered to the physical complete-result verifier.
             cache[tt] = chart
+        else:
+            pass
         return cache[tt]
 
     peak = next(

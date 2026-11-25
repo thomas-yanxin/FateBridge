@@ -39,7 +39,7 @@ def symbolic_board(is_day=True, profile="tanyuan_xieji_v1"):
 
 
 @pytest.mark.parametrize("case", REF["explicit_examples"], ids=lambda r: r["id"])
-def test_all_four_explicit_book_lookups(case):
+def test_all_four_explicit_book_lookups(case) -> None:
     board = symbolic_board(case.get("is_diurnal", True))
     assert "god_yin" in board, "The original yin-spirit calculation is absent"
     row = next(r for r in board["god_yin"]["rows"] if r["god"] == case["god"])
@@ -47,10 +47,14 @@ def test_all_four_explicit_book_lookups(case):
         assert row[key] == case[key]
     if "riding_earth_branch" in case:
         assert row["riding_earth_branch"] == case["riding_earth_branch"]
+    else:
+        pass
 
 
 @pytest.mark.parametrize("case", REF["counterexamples"], ids=lambda r: r["id"])
-def test_noble_exception_and_actual_riding_branch_are_not_intrinsic_house_lookup(case):
+def test_noble_exception_and_actual_riding_branch_are_not_intrinsic_house_lookup(
+    case,
+) -> None:
     row = next(
         r for r in symbolic_board()["god_yin"]["rows"] if r["god"] == case["god"]
     )
@@ -59,7 +63,9 @@ def test_noble_exception_and_actual_riding_branch_are_not_intrinsic_house_lookup
     assert row["yin_branch"] != wrong
 
 
-def test_default_profile_remains_declared_and_does_not_silently_take_book_nobles():
+def test_default_profile_remains_declared_and_does_not_silently_take_book_nobles() -> (
+    None
+):
     common = symbolic_board(profile="liuren_common_v1")["god_yin"]
     selected = symbolic_board()["god_yin"]
     c = next(r for r in common["rows"] if r["god"] == "贵人")
@@ -71,7 +77,9 @@ def test_default_profile_remains_declared_and_does_not_silently_take_book_nobles
 
 
 @pytest.mark.parametrize("case", REF["synthetic_role_logic"])
-def test_known_positive_missing_year_inputs_and_complete_negative_are_distinct(case):
+def test_known_positive_missing_year_inputs_and_complete_negative_are_distinct(
+    case,
+) -> None:
     from fatebridge.core.metaphysics.liureng_god_yin import role_presence
 
     assert (
@@ -82,7 +90,7 @@ def test_known_positive_missing_year_inputs_and_complete_negative_are_distinct(c
     )
 
 
-def test_original_paragraph_is_not_a_full_usability_or_prediction_verdict():
+def test_original_paragraph_is_not_a_full_usability_or_prediction_verdict() -> None:
     evidence = symbolic_board()["god_yin"]
     assert len(evidence["rows"]) == 12
     noble = next(r for r in evidence["rows"] if r["god"] == "贵人")
@@ -93,7 +101,9 @@ def test_original_paragraph_is_not_a_full_usability_or_prediction_verdict():
     assert evidence["complete_classical_conformance"] is False
 
 
-def test_selectable_snapshot_reports_each_actual_yin_without_certifying_usability():
+def test_selectable_snapshot_reports_each_actual_yin_without_certifying_usability() -> (
+    None
+):
     from fatebridge.services.metaphysics import calculate_liureng_gods
 
     payload = REST_POST_CASES[SPECS["liureng_gods"].rest_path]()
@@ -110,7 +120,9 @@ def test_selectable_snapshot_reports_each_actual_yin_without_certifying_usabilit
     assert result["snapshot_export"]["selected_sections"] == ["类神阴神"]
 
 
-def test_unknown_runyear_gender_keeps_known_natal_and_unknown_annual_membership():
+def test_unknown_runyear_gender_keeps_known_natal_and_unknown_annual_membership() -> (
+    None
+):
     spec = SPECS["liureng_runyear"]
     payload = REST_POST_CASES[spec.rest_path]()
     payload["gender"] = "未知"
@@ -125,15 +137,17 @@ def test_unknown_runyear_gender_keeps_known_natal_and_unknown_annual_membership(
         assert row["appears_in_roles"] is not False
 
 
-def test_a_legitimate_partial_year_context_is_not_invented_or_required_complete():
-    from fatebridge.core.output_liuren_god_yin import LiurenGodYin
+def test_a_legitimate_partial_year_context_is_not_invented_or_required_complete() -> (
+    None
+):
+    from fatebridge.core.contracts.output_liuren_god_yin import LiurenGodYin
 
     value = copy.deepcopy(symbolic_board()["god_yin"])
     del value["year_fate_uppers"]["annual"]
     assert LiurenGodYin.model_validate(value).model_dump(exclude_unset=True) == value
 
 
-def test_omitted_projected_year_upper_is_not_a_false_unknown_assertion():
+def test_omitted_projected_year_upper_is_not_a_false_unknown_assertion() -> None:
     spec = SPECS["liureng_runyear"]
     payload = REST_POST_CASES[spec.rest_path]()
     fn, args, kw = spec.bind(spec.request_model.model_validate(payload))
@@ -149,8 +163,8 @@ def test_omitted_projected_year_upper_is_not_a_false_unknown_assertion():
 )
 @pytest.mark.parametrize("project", [False, True])
 def test_new_lookup_and_current_year_memberships_survive_three_ports(
-    key, project, surface_calls
-):
+    key: str, project: bool, surface_calls
+) -> None:
     spec = SPECS[key]
     payload = REST_POST_CASES[spec.rest_path]()
     # These are the repository's explicitly fictional test inputs, not data
@@ -158,8 +172,8 @@ def test_new_lookup_and_current_year_memberships_survive_three_ports(
     fields = ["liureng.god_yin", "liureng.twelve_board", "liureng.meta"]
     if key == "liureng_runyear":
         fields.append("runyear.year_fate")
-    if key == "sanshiunited":
-        fields.append("subresults.liureng_gods.liureng.god_yin")
+    else:
+        pass
     params = [("as_of", AS_OF), ("response_char_limit", "0")]
     flags, opts = ["--response-char-limit", "0"], {}
     if project:
@@ -176,6 +190,8 @@ def test_new_lookup_and_current_year_memberships_survive_three_ports(
             "false",
         ]
         opts.update(fields=fields, strict_fields=True, include_snapshot_text=False)
+    else:
+        pass
     http, protocol, code, cli = surface_calls(
         spec, payload, params=params, options=opts, flags=flags, cli_first=False
     )
@@ -194,11 +210,11 @@ def test_new_lookup_and_current_year_memberships_survive_three_ports(
                     assert row[f"in_{role}_upper"] is (
                         None if upper is None else row["yin_branch"] == upper
                     )
-        if key == "sanshiunited":
-            assert evidence == body["subresults"]["liureng_gods"]["liureng"]["god_yin"]
+        else:
+            pass
 
 
-def test_source_formula_faults_and_missing_complete_layer_are_rejected():
+def test_source_formula_faults_and_missing_complete_layer_are_rejected() -> None:
     from fatebridge.application.execution import OutputContractError, validate_output
 
     spec = SPECS["liureng_gods"]
@@ -225,7 +241,7 @@ def test_source_formula_faults_and_missing_complete_layer_are_rejected():
             validate_output(spec, bad)
 
 
-def test_internally_valid_but_unprovided_year_membership_cannot_be_invented():
+def test_internally_valid_but_unprovided_year_membership_cannot_be_invented() -> None:
     from fatebridge.application.execution import OutputContractError, validate_output
     from fatebridge.core.metaphysics.liureng_god_yin import add_year_fate_membership
 

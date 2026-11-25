@@ -8,7 +8,7 @@ from fractions import Fraction
 from pathlib import Path
 from typing import Any, Callable
 
-from fatebridge.core.human_design_time import solve_design_epoch_tt
+from fatebridge.core.human_design.human_design_time import solve_design_epoch_tt
 
 ROOT = Path(__file__).resolve().parents[2]
 FROZEN_REFERENCES = {
@@ -79,10 +79,16 @@ def compare_case(c: dict[str, Any], s: dict[str, Any]) -> dict[str, Any]:
                 "reference_exact_residual_preserved",
             )
         )
+    else:
+        pass
     if not bracket_observed:
         not_assessed.append("reference_minimum_in_its_own_bracket")
+    else:
+        pass
     if not current_observed:
         not_assessed.append("current_exact_residual_matches_its_own_chart")
+    else:
+        pass
     return {
         "status": "compared",
         "label": c["label"],
@@ -199,7 +205,11 @@ def main() -> None:
     )
     if args.require_exact and not r["bounded_numeric_conformance_passed"]:
         raise SystemExit(1)
+    else:
+        pass
 
 
 if __name__ == "__main__":
     main()
+else:
+    pass

@@ -7,14 +7,14 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.sukuyo import SU27_ORDER, calendar_mansion, day_evidence
-from fatebridge.core.sukuyo_kenyu_lingbi import lookup_lingbi_interval
-from fatebridge.core.sukuyo_kenyu_pairs import conditional_pair_comparison
-from fatebridge.core.sukuyo_profiles import fullmoon_calculation
+from fatebridge.core.sukuyo.sukuyo import SU27_ORDER, calendar_mansion, day_evidence
+from fatebridge.core.sukuyo.sukuyo_kenyu_lingbi import lookup_lingbi_interval
+from fatebridge.core.sukuyo.sukuyo_kenyu_pairs import conditional_pair_comparison
+from fatebridge.core.sukuyo.sukuyo_profiles import fullmoon_calculation
 from scripts.sukuyo.check_sukuyo_kenyu_pairs import verify_pairs
 
 
-def test_sukuyo_pair_source_matches_both_literal_membership_reads():
+def test_sukuyo_pair_source_matches_both_literal_membership_reads() -> None:
     report = verify_pairs()
     assert report["errors"] == []
     assert report["readable_memberships_checked"] == 27
@@ -22,7 +22,7 @@ def test_sukuyo_pair_source_matches_both_literal_membership_reads():
     assert not report["independent_human_image_acceptance"]
 
 
-def test_sukuyo_complete_preimplementation_grid_keeps_all_unlisted_conditions():
+def test_sukuyo_complete_preimplementation_grid_keeps_all_unlisted_conditions() -> None:
     fixture = json.loads(
         (
             Path(__file__).parents[1] / "data/sukuyo-kenyu-component-grid.json"
@@ -90,8 +90,8 @@ def test_sukuyo_complete_preimplementation_grid_keeps_all_unlisted_conditions():
     ],
 )
 def test_sukuyo_unlisted_positive_is_explained_without_filling_the_month_table(
-    date, day, mansion, ruler
-):
+    date: str, day: int, mansion: str, ruler: str
+) -> None:
     result = day_evidence(calendar_mansion(date, "06:30:00"))
     reference = result["kenyu_lingbi_reference"]
     selected = reference["weekday_mansion_comparison"][
@@ -116,7 +116,7 @@ def test_sukuyo_unlisted_positive_is_explained_without_filling_the_month_table(
     assert reference["applied_to_primary_or_activities"] is False
 
 
-def test_sukuyo_leap_keeps_seven_conditions_and_uses_unadjusted_baseline_only():
+def test_sukuyo_leap_keeps_seven_conditions_and_uses_unadjusted_baseline_only() -> None:
     calendar = calendar_mansion(
         "1957-09-24",
         "06:30:00",
@@ -148,8 +148,8 @@ def test_sukuyo_leap_keeps_seven_conditions_and_uses_unadjusted_baseline_only():
     "damage", ["missing", "different_day", "different_digest", "disagree"]
 )
 def test_sukuyo_pair_model_never_substitutes_the_selected_mansion_for_missing_basis(
-    damage,
-):
+    damage: str,
+) -> None:
     calendar = calendar_mansion("2017-10-17", "06:30:00")
     host = calendar["profile_calculation"]["host_calculation"]
     if damage == "missing":
@@ -167,7 +167,7 @@ def test_sukuyo_pair_model_never_substitutes_the_selected_mansion_for_missing_ba
     assert comparison["selected_civil_condition_comparison"] is None
 
 
-def test_sukuyo_pair_model_refuses_inconsistent_period_context():
+def test_sukuyo_pair_model_refuses_inconsistent_period_context() -> None:
     calendar = calendar_mansion("2017-10-17", "06:30:00")
     with pytest.raises(ValueError, match="条件不一致"):
         conditional_pair_comparison(

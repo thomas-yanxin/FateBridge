@@ -9,8 +9,8 @@ import pytest
 from fatebridge.application.execution import execute_tool
 from fatebridge.core.astro import runtime
 from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.validation.human_design import verify_human_design_reading
-from fatebridge.validation.human_design_sampling import verify_sampled_interval
+from validation.human_design import verify_human_design_reading
+from validation.human_design_sampling import verify_sampled_interval
 
 ROOT = Path(__file__).resolve().parents[2]
 SPEC = next(s for s in CATALOG if s.key == "human_design")
@@ -36,7 +36,7 @@ def set_path(value, path, replacement):
 
 
 @pytest.mark.parametrize("case", PLAN["cases"], ids=lambda c: c["id"])
-def test_every_original_rehashed_contradiction_is_rejected(complete, case):
+def test_every_original_rehashed_contradiction_is_rejected(complete, case) -> None:
     changed = deepcopy(complete)
     set_path(changed, case["path"], case["replacement"])
     (changed)
@@ -70,7 +70,9 @@ def test_every_original_rehashed_contradiction_is_rejected(complete, case):
         "unassessed",
     ],
 )
-def test_native_replay_and_derived_reading_reject_tampering(complete, kind):
+def test_native_replay_and_derived_reading_reject_tampering(
+    complete, kind: str
+) -> None:
     p = deepcopy(complete)
     report = p["time_sensitivity"]
     w = report["evaluation_witnesses"]
@@ -120,11 +122,15 @@ def test_native_replay_and_derived_reading_reject_tampering(complete, kind):
         report["status"] = "not_assessed"
     if kind == "native_nan":
         assert verify_sampled_interval(p)["errors"]
+    else:
+        pass
     checked = verify_human_design_reading(p)
     assert checked["status"] == "rejected", checked
 
 
-def test_complete_25_sample_replay_never_calls_native(complete, monkeypatch):
+def test_complete_25_sample_replay_never_calls_native(
+    complete, monkeypatch: pytest.MonkeyPatch
+) -> None:
     def forbidden(*a, **k):
         raise AssertionError("Replay must not call an ephemeris")
 
@@ -149,7 +155,9 @@ def test_complete_25_sample_replay_never_calls_native(complete, monkeypatch):
     ],
 )
 @pytest.mark.parametrize("mode", ["true", "mean"])
-def test_special_clock_and_future_interval_replay(clock, mode, monkeypatch):
+def test_special_clock_and_future_interval_replay(
+    clock, mode: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
     monkeypatch.setenv("SE_EPHE_PATH", str(ROOT / "ephe"))
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
     y, m, d, h, n, s = clock
@@ -175,8 +183,8 @@ def test_special_clock_and_future_interval_replay(clock, mode, monkeypatch):
 
 @pytest.mark.parametrize("mode", ["true", "mean"])
 def test_empty_files_moshier_and_not_assessed_remain_explicit(
-    tmp_path, monkeypatch, mode
-):
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, mode: str
+) -> None:
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
     for radius in (0, 1):

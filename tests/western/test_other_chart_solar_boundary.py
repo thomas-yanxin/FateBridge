@@ -30,8 +30,8 @@ HAS_SWE = pytest.mark.skipif(runtime.swe is None, reason="Swiss Ephemeris requir
 )
 @pytest.mark.parametrize("zodiacal", [0, 1])
 def test_nominal_and_all_samples_survive_both_model_range_edges(
-    key_years, missing_offsets, zodiacal
-):
+    key_years: int, missing_offsets, zodiacal: int
+) -> None:
     target = BIRTH + timedelta(days=key_years * 365.25)
     result = calculate_germany_chart_analysis(
         **PAYLOAD, analysis_datetime=target, zodiacal=zodiacal
@@ -102,15 +102,10 @@ def test_nominal_and_all_samples_survive_both_model_range_edges(
         is ds["continuous_interval_proven"]
         is False
     )
-    assert (
-        sensitivity["sample_frequency_is_probability"]
-        is ds["sample_frequency_is_probability"]
-        is False
-    )
 
 
 @HAS_SWE
-def test_supported_interval_keeps_the_existing_complete_output_shape():
+def test_supported_interval_keeps_the_existing_complete_output_shape() -> None:
     result = calculate_germany_chart_analysis(
         **PAYLOAD, analysis_datetime=BIRTH + timedelta(days=50 * 365.25)
     )
@@ -129,23 +124,29 @@ def test_supported_interval_keeps_the_existing_complete_output_shape():
 
 @HAS_SWE
 def test_other_sample_calculation_failures_are_not_disguised_as_range_limits(
-    monkeypatch,
-):
-    original = solar_arc.solar_arc_state
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    original = solar_arc.resolve_solar_arc_state
 
-    def broken_sample(birth_utc, *args, **kwargs):
-        if birth_utc < BIRTH:
+    injected = []
+
+    def broken_sample(birth_utc, *args, clock=None, **kwargs):
+        if birth_utc is None and clock.recorded.epoch.require_datetime() < BIRTH:
+            injected.append(clock.recorded.epoch.utc_label)
             raise ValueError("synthetic unexpected Sun calculation failure")
-        return original(birth_utc, *args, **kwargs)
+        else:
+            pass
+        return original(birth_utc, *args, clock=clock, **kwargs)
 
-    monkeypatch.setattr(solar_arc, "solar_arc_state", broken_sample)
+    monkeypatch.setattr(solar_arc, "resolve_solar_arc_state", broken_sample)
     result = calculate_germany_chart_analysis(**PAYLOAD, analysis_datetime=BIRTH)
-    assert "error" in result
-    assert "synthetic unexpected Sun calculation failure" in result["error"]
+    assert injected == ["2000-01-01T11:59:00+00:00"]
+    assert result["error_code"] == "validation_error"
+    assert result["error"] == "synthetic unexpected Sun calculation failure"
     assert "midpoint_analysis" not in result
 
 
-def test_day_meridian_spans_do_not_bridge_an_unavailable_gap():
+def test_day_meridian_spans_do_not_bridge_an_unavailable_gap() -> None:
     # Pure aggregation retains the gap regression. The actual chart builder now
     # rejects an unavailable nominal sample as incoherent with a valid nominal arc.
     spans = sampled_day_meridian_spans(

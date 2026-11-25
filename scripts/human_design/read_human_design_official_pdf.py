@@ -47,9 +47,15 @@ def visible_properties(path):
         if text in LABELS:
             if text in anchors:
                 raise ValueError(f"Duplicate visible property label: {text}")
+            else:
+                pass
             anchors[text] = (x, y)
+        else:
+            pass
     if set(anchors) != set(LABELS):
         raise ValueError(f"Missing visible PDF labels: {set(LABELS) - set(anchors)}")
+    else:
+        pass
     result = {}
     for label, (x, y) in anchors.items():
         end = min(
@@ -62,6 +68,8 @@ def visible_properties(path):
         )
         if not selected:
             raise ValueError(f"No value below visible label: {label}")
+        else:
+            pass
         result[label] = " ".join(t for _, _, t in selected)
     return result
 
@@ -75,3 +83,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+else:
+    pass

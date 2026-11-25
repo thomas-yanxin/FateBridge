@@ -15,7 +15,9 @@ PROFILES = [p["profile"] for p in REFERENCE["literal_clock_rules"]]
 
 
 @pytest.mark.parametrize("row", REFERENCE["literal_clock_rules"])
-def test_printed_multipliers_and_divisors_normalize_to_twelve_chen_and_hundred_ke(row):
+def test_printed_multipliers_and_divisors_normalize_to_twelve_chen_and_hundred_ke(
+    row,
+) -> None:
     r = clock.source_clock_from_fraction(
         profile_id=row["profile"], numerator=0, denominator=1
     )
@@ -29,7 +31,7 @@ def test_printed_multipliers_and_divisors_normalize_to_twelve_chen_and_hundred_k
 
 
 @pytest.mark.parametrize("row", REFERENCE["printed_clock_captions"])
-def test_two_reused_mei_calculations_match_their_printed_clock_captions(row):
+def test_two_reused_mei_calculations_match_their_printed_clock_captions(row) -> None:
     r = clock.source_term_clock(
         profile_id=row["profile"],
         accumulated_years=row["prior_worked_accumulated"],
@@ -55,7 +57,7 @@ def test_two_reused_mei_calculations_match_their_printed_clock_captions(row):
 
 
 @pytest.mark.parametrize("row", REFERENCE["derived_term_clock_probes"])
-def test_three_derived_clock_probes_keep_exact_remainders(row):
+def test_three_derived_clock_probes_keep_exact_remainders(row) -> None:
     r = clock.source_term_clock(
         profile_id=row["profile"],
         accumulated_years=row["accumulated"],
@@ -72,7 +74,9 @@ def test_three_derived_clock_probes_keep_exact_remainders(row):
 
 
 @pytest.mark.parametrize("profile", PROFILES)
-def test_half_chen_boundaries_do_not_round_early_or_advance_the_day_at_zi_chu(profile):
+def test_half_chen_boundaries_do_not_round_early_or_advance_the_day_at_zi_chu(
+    profile,
+) -> None:
     labels = [
         "子正",
         "丑初",
@@ -113,9 +117,13 @@ def test_half_chen_boundaries_do_not_round_early_or_advance_the_day_at_zi_chu(pr
             assert c["branch"] + c["phase"] == labels[k - 1]
             assert c["whole_ke"] == 4
             assert c["remaining_ke_fraction"] != {"numerator": 0, "denominator": 1}
+        else:
+            pass
 
 
-def test_kai_xi_whole_hai_branch_straddles_daxue_without_an_imputed_birth_minute():
+def test_kai_xi_whole_hai_branch_straddles_daxue_without_an_imputed_birth_minute() -> (
+    None
+):
     r = clock.compare_branch_window_to_term(
         profile_id="songshi_tongtian_mei_v1",
         accumulated_years=3842,
@@ -144,8 +152,8 @@ def test_kai_xi_whole_hai_branch_straddles_daxue_without_an_imputed_birth_minute
     ],
 )
 def test_resolvable_order_is_reported_without_extending_the_uncertainty(
-    birth_branch, offset, relation
-):
+    birth_branch: str, offset, relation: str
+) -> None:
     r = clock.compare_branch_window_to_term(
         profile_id="songshi_tongtian_mei_v1",
         accumulated_years=3842,
@@ -160,14 +168,16 @@ def test_resolvable_order_is_reported_without_extending_the_uncertainty(
     if birth_branch == "子":
         assert len(r["birth_windows_relative_to_term_day"]) == 2
         assert not r["boundary_inside_birth_window"]
+    else:
+        pass
 
 
 @pytest.mark.parametrize(
     "n,relation", [(21, "entirely_at_or_after"), (23, "entirely_before")]
 )
 def test_exact_branch_edges_use_inclusive_start_and_exclusive_end(
-    monkeypatch, n, relation
-):
+    monkeypatch: pytest.MonkeyPatch, n: int, relation: str
+) -> None:
     monkeypatch.setattr(
         clock,
         "source_term_clock",
@@ -200,7 +210,9 @@ def test_exact_branch_edges_use_inclusive_start_and_exclusive_end(
         (None, 24),
     ],
 )
-def test_day_fraction_cannot_be_guessed_rounded_or_carried_to_another_date(n, d):
+def test_day_fraction_cannot_be_guessed_rounded_or_carried_to_another_date(
+    n, d
+) -> None:
     with pytest.raises(ValueError):
         clock.source_clock_from_fraction(
             profile_id="songshi_tongtian_mei_v1", numerator=n, denominator=d
@@ -208,7 +220,9 @@ def test_day_fraction_cannot_be_guessed_rounded_or_carried_to_another_date(n, d)
 
 
 @pytest.mark.parametrize("bad", [True, 0.0, "0", None])
-def test_signed_day_offset_is_explicit_not_inferred_from_a_cyclic_day_name(bad):
+def test_signed_day_offset_is_explicit_not_inferred_from_a_cyclic_day_name(
+    bad: bool | float | str | None,
+) -> None:
     with pytest.raises(ValueError):
         clock.compare_branch_window_to_term(
             profile_id="songshi_tongtian_mei_v1",
@@ -220,7 +234,7 @@ def test_signed_day_offset_is_explicit_not_inferred_from_a_cyclic_day_name(bad):
 
 
 @pytest.mark.parametrize("bad", ["", "亥時", "auto", None])
-def test_unknown_branch_never_receives_a_default(bad):
+def test_unknown_branch_never_receives_a_default(bad: str | None) -> None:
     with pytest.raises(ValueError):
         clock.compare_branch_window_to_term(
             profile_id="songshi_tongtian_mei_v1",
@@ -232,12 +246,12 @@ def test_unknown_branch_never_receives_a_default(bad):
 
 
 @pytest.mark.parametrize("bad", ["", "auto", "tongtian", None])
-def test_clock_profile_requires_an_explicit_verified_rule_name(bad):
+def test_clock_profile_requires_an_explicit_verified_rule_name(bad: str | None) -> None:
     with pytest.raises(ValueError):
         clock.source_clock_from_fraction(profile_id=bad, numerator=0, denominator=1)
 
 
-def test_sources_are_reused_without_claiming_new_original_examples():
+def test_sources_are_reused_without_claiming_new_original_examples() -> None:
     for item in REFERENCE["witnesses"]:
         assert (
             hashlib.sha256((ROOT / item["file"]).read_bytes()).hexdigest()
@@ -261,7 +275,9 @@ def test_sources_are_reused_without_claiming_new_original_examples():
     )
 
 
-def test_audit_rejects_a_modern_ninety_six_ke_substitution(monkeypatch):
+def test_audit_rejects_a_modern_ninety_six_ke_substitution(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     from dataclasses import replace
 
     from scripts.numerology.audit_numerology import song_clock_source_checks

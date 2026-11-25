@@ -13,7 +13,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from fatebridge.core.astro import runtime
-from fatebridge.core.astro_models import earth_rotation_policy
+from fatebridge.core.astro.rotation_policy import earth_rotation_policy
 
 ROOT = Path(__file__).resolve().parents[2]
 FIXTURE = ROOT / "tests/fixtures/western-houses-erfa-astrolog.json"
@@ -132,6 +132,7 @@ def audit(reference=None):
                 "src/fatebridge/core/astro/geometry.py",
                 "src/fatebridge/core/astro/reference.py",
                 "src/fatebridge/core/astro_models.py",
+                "src/fatebridge/core/astro/rotation_policy.py",
                 "src/fatebridge/core/iers2010_series.py",
                 "src/fatebridge/core/ephemeris_runtime.py",
                 "src/fatebridge/utils/house_systems.py",
@@ -163,3 +164,5 @@ if __name__ == "__main__":
         f"Axes {result['angle_matched_count']}/{result['angle_count']}; house statuses {result['house_status_counts']}"
     )
     raise SystemExit(0 if result["all_independent_checks_passed"] else 1)
+else:
+    pass

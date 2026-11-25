@@ -6,15 +6,23 @@ from dataclasses import replace
 from pathlib import Path
 
 import pytest
+from fastapi.testclient import TestClient
 from pydantic import ValidationError
+from pytest import CaptureFixture
 
 from fatebridge.application.execution import execute_spec, execute_tool
-from fatebridge.core.numerology_clock_input import (
+from fatebridge.core.contracts.output_numerology import (
+    NumerologyBirthClock,
+    NumerologyClockInput,
+)
+from fatebridge.core.numerology.numerology_clock_input import (
     clock_input_representation,
     require_clock_input_binding,
 )
-from fatebridge.core.numerology_inputs import CLOCK_POLICY_ID, require_birth_clock
-from fatebridge.core.output_numerology import NumerologyBirthClock, NumerologyClockInput
+from fatebridge.core.numerology.numerology_inputs import (
+    CLOCK_POLICY_ID,
+    require_birth_clock,
+)
 from tests.support.transports import SPECS, business
 from tests.support.transports import rest as shared_rest
 from tests.support.transports import run_three
@@ -34,7 +42,7 @@ def native_model(monkeypatch, tmp_path):
 
 
 @pytest.mark.parametrize("row", REFERENCE["rows"], ids=lambda r: r["input"])
-def test_independent_lexical_vectors_and_partial_projections(row):
+def test_independent_lexical_vectors_and_partial_projections(row) -> None:
     assert clock_input_representation(row["input"]) == row["expected"]
     assert clock_input_representation("  " + row["input"] + "  ") == row["expected"]
     NumerologyClockInput.model_validate(row["expected"])
@@ -45,7 +53,9 @@ def test_independent_lexical_vectors_and_partial_projections(row):
 
 @pytest.mark.parametrize("value", REFERENCE["invalid"])
 @pytest.mark.parametrize("key", ["heluo", "canping"])
-def test_original_unknown_and_invalid_time_rejections_stay_in_force(value, key):
+def test_original_unknown_and_invalid_time_rejections_stay_in_force(
+    value, key: str
+) -> None:
     with pytest.raises((ValueError, TypeError)):
         clock_input_representation(value)
     with pytest.raises(ValidationError):
@@ -55,8 +65,8 @@ def test_original_unknown_and_invalid_time_rejections_stay_in_force(value, key):
 @pytest.mark.parametrize("row", REFERENCE["rows"], ids=lambda r: r["input"])
 @pytest.mark.parametrize("key", ["heluo", "canping"])
 def test_request_retains_original_components_while_numeric_parser_stays_canonical(
-    row, key
-):
+    row, key: str
+) -> None:
     request = SPECS[key].request_model.model_validate({**BASE, "time": row["input"]})
     assert request.time == row["input"]
     assert require_birth_clock(request.time) == row["expected"]["normalized_clock"]
@@ -77,7 +87,9 @@ def test_request_retains_original_components_while_numeric_parser_stays_canonica
         {"statement": "出生已精确至秒"},
     ],
 )
-def test_text_does_not_certify_physical_precision_or_fabricate_components(change):
+def test_text_does_not_certify_physical_precision_or_fabricate_components(
+    change,
+) -> None:
     with pytest.raises(ValidationError):
         NumerologyClockInput.model_validate(
             {**REFERENCE["rows"][0]["expected"], **change}
@@ -97,7 +109,7 @@ def complete_result(request):
 
 def test_actual_result_and_same_clock_trace_are_bound_to_original_request(
     complete_result,
-):
+) -> None:
     _, request, result = complete_result
     before = deepcopy(result)
     require_clock_input_binding(result, requested_time=request.time)
@@ -109,8 +121,8 @@ def test_actual_result_and_same_clock_trace_are_bound_to_original_request(
     "fault", ["missing", "trace", "snapshot", "normalized", "civil", "all_copies"]
 )
 def test_forgery_is_rejected_against_actual_request_before_any_projection(
-    complete_result, fault
-):
+    complete_result, fault: str
+) -> None:
     spec, request, result = complete_result
     bad = deepcopy(result)
     clock = bad["numerology_evidence"]["birth_clock"]
@@ -152,8 +164,8 @@ def test_forgery_is_rejected_against_actual_request_before_any_projection(
 @pytest.mark.parametrize("key", ["heluo", "canping"])
 @pytest.mark.parametrize("clock", ["09:00", "09:00:00", "09:00:00.123400"])
 def test_original_components_survive_actual_three_local_adapters(
-    key, clock, rest, tmp_path, capsys
-):
+    key: str, clock: str, rest: TestClient, tmp_path: Path, capsys: CaptureFixture[str]
+) -> None:
     fields = [
         "input_normalized.time",
         "numerology_evidence.birth_clock.input_representation",

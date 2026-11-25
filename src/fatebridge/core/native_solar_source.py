@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import math
+from datetime import date
 from functools import lru_cache
 from pathlib import Path
 from typing import Any, Callable
@@ -16,6 +17,21 @@ POLICY_ID = (
     "same_epoch_moshier_preflight_then_requested_swiss_before_fixed_source_bisection_v1"
 )
 SOURCE_URL = "https://github.com/astrorigin/swisseph/blob/696bda432298d482d27e67a0cf1238920301a7dd/sweph.c#L348-L380"
+SWISS_SOLAR_CONTEXT_TT_INTERVAL = (
+    date(1799, 1, 1).toordinal() + 1721424.5,
+    date(2202, 1, 1).toordinal() + 1721424.5,
+)
+
+
+def swiss_solar_context_required(jd_tt: float) -> bool:
+    """Register fixed-source refinement by its actual TT, including guard years.
+
+    This is the application's source-pinning interval, not the full native
+    Sun range or a physical-accuracy claim. Request and neighbor-context year
+    labels cannot move a consumed root into this interval.
+    """
+    start, end = SWISS_SOLAR_CONTEXT_TT_INTERVAL
+    return start <= jd_tt < end
 
 
 def _signature(path: Path) -> tuple[int, ...]:
@@ -31,6 +47,8 @@ def _digest(path: Path, signature: tuple[int, ...]) -> str:
             result.update(block)
     if _signature(path) != signature:
         raise EphemerisSourceError("solar_configuration_changed")
+    else:
+        pass
     return result.hexdigest()
 
 
@@ -39,6 +57,8 @@ def native_solar_file_context(native: Any) -> dict[str, Any] | None:
     getter = getattr(native, "get_current_file_data", None)
     if not callable(getter):
         return None
+    else:
+        pass
     windows = []
     for slot in (0, 1):
         filename, start, end, edition = getter(slot)
@@ -48,6 +68,8 @@ def native_solar_file_context(native: Any) -> dict[str, Any] | None:
             or start >= end
         ):
             return None
+        else:
+            pass
         path = Path(filename).absolute()
         try:
             signature = _signature(path)
@@ -89,14 +111,20 @@ def prime_swiss_solar_context(
     Swiss closes computed states/files when its requested ephemeris changes.
     The built-in preflight's coordinate is discarded. No set_ephe_path,
     set_tid_acc, set_delta_t_userdef or private C state is changed here.
-    Call only in the registered modern/guard solar-year interval, where the
+    Call only in the registered modern/guard TT interval, where the
     built-in Sun is available. Strict JPL and actual Moshier stay on their
     own paths. The caller checks the final returned model.
     """
+    if not swiss_solar_context_required(jd_tt):
+        raise EphemerisSourceError("solar_native_context_unavailable")
+    else:
+        pass
     with lock_ephemeris_configuration():
         _, flags = invoke("calc", jd_tt, native.SUN, native.FLG_MOSEPH)
         if flags != native.FLG_MOSEPH:
             raise EphemerisSourceError("coordinate_contract_changed")
+        else:
+            pass
         result = invoke("calc", jd_tt, native.SUN, native.FLG_SWIEPH)
         context = (
             native_solar_file_context(native)

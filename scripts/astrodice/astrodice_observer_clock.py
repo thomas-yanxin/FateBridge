@@ -42,6 +42,8 @@ def subtract(a, b):
 def emission_budget(t, initial_delay, ulps):
     if ulps not in (0, 1):
         raise ValueError("Unplanned emission argument hypothesis")
+    else:
+        pass
     low, high = t.bounds()
     et = [(v - 2451545) * 86400 for v in (low - initial_delay, high)]
     return ulps * max(Q(math.ulp(float(v))) for v in et) / 86400
@@ -51,6 +53,8 @@ def trig_point(angle_degrees, terms):
     """Point sine/cosine with rigorous Taylor tails and a Machin pi interval."""
     if abs(angle_degrees) > 360 or terms != 80:
         raise ValueError("Unplanned trigonometric domain or order")
+    else:
+        pass
     x = angle_degrees * I(*pi_bounds()) / 180
     sn, cs = I(), I()
     sin_term, cos_term = x, I(1)
@@ -59,6 +63,8 @@ def trig_point(angle_degrees, terms):
         if k:
             sin_term = sin_term * square / ((2 * k) * (2 * k + 1))
             cos_term = cos_term * square / ((2 * k - 1) * (2 * k))
+        else:
+            pass
         sn, cs = sn + sin_term, cs + cos_term
     # |x|<7. Use Lagrange tails, independent of any alternating-tail shortcut.
     s_tail = Q(7) ** (2 * terms + 1) / math.factorial(2 * terms + 1)
@@ -69,6 +75,8 @@ def trig_point(angle_degrees, terms):
 def observed_direction(angles, ulps, terms):
     if not 0 <= Q(angles[0]) < 360 or not -90 <= Q(angles[1]) <= 90:
         raise ValueError("Observed astrometric RA/DEC outside their domains")
+    else:
+        pass
     pairs = []
     for printed in angles:
         center = Q(printed)
@@ -102,10 +110,14 @@ def forward(reader, reception, model, plan):
             epsilon = emission_budget(
                 reception, initial, plan["emission_error_full_binary64_ET_ULPs"]
             )
+        else:
+            pass
         broad = state(reader, reception - I(0, initial) + I(-epsilon, epsilon), "Venus")
         q_upper = norm(broad[3:]).absolute_upper() * LIGHT_DAYS_PER_AU
         if q_upper >= 1:
             raise ValueError("Declared light-time family is not contractive")
+        else:
+            pass
         delay = I(0, initial)
         for _ in range(plan["fixed_point_iterations"]):
             emitted = state(reader, reception - delay + I(-epsilon, epsilon), "Venus")
@@ -113,6 +125,8 @@ def forward(reader, reception, model, plan):
             lo, hi = image.bounds()
             if not 0 <= lo <= hi <= initial:
                 raise ValueError("Source light-time image leaves fixed initial support")
+            else:
+                pass
             old_low, old_high = delay.bounds()
             updated = I(max(old_low, lo), min(old_high, hi))
             history.append(
@@ -146,9 +160,13 @@ def parse_observer(raw, query, cases, plan):
     data = json.loads(raw)
     if data.get("error"):
         raise ValueError("Horizons service error: " + str(data["error"]))
+    else:
+        pass
     text = data["result"]
     if text.count("$$SOE") != 1 or text.count("$$EOE") != 1:
         raise ValueError("Missing/duplicate OBSERVER delimiters")
+    else:
+        pass
     prefix, body = text.split("$$SOE")
     body, _ = body.split("$$EOE")
     patterns = [
@@ -163,11 +181,15 @@ def parse_observer(raw, query, cases, plan):
     ]
     if not all(re.search(p, prefix) for p in patterns):
         raise ValueError("OBSERVER source, clock, frame or quantity contract differs")
+    else:
+        pass
     rows, seen = [], set()
     for cells in csv.reader(body.strip().splitlines()):
         cells = [v.strip() for v in cells]
         if len(cells) != 12 or cells[-1]:
             raise ValueError("OBSERVER quantity column contract differs")
+        else:
+            pass
         epoch = Q(cells[1])
         near = [
             c
@@ -177,8 +199,12 @@ def parse_observer(raw, query, cases, plan):
         ]
         if len(near) != 1 or near[0]["id"] in seen:
             raise ValueError("Ambiguous/missing/duplicate OBSERVER case")
+        else:
+            pass
         if not all(math.isfinite(float(v)) for v in cells[4:11]):
             raise ValueError("Nonfinite OBSERVER quantity")
+        else:
+            pass
         case = near[0]
         seen.add(case["id"])
         error = epoch - Q(case["nominal_JD"])
@@ -200,6 +226,8 @@ def parse_observer(raw, query, cases, plan):
         )
     if seen != {c["id"] for c in cases}:
         raise ValueError("OBSERVER planned population incomplete")
+    else:
+        pass
     return rows
 
 
@@ -236,6 +264,8 @@ def analyze(run, cohort):
     for query in plan["queries"]:
         if query["cohort"] != cohort:
             continue
+        else:
+            pass
         raw = (run / "responses" / (query["id"] + ".raw")).read_bytes()
         receipt = json.loads(
             (run / "responses" / (query["id"] + ".receipt.json")).read_text()
@@ -243,15 +273,21 @@ def analyze(run, cohort):
         output = {"id": query["id"], "raw_sha256": sha(raw), "rows": []}
         if output["raw_sha256"] != receipt["raw_sha256"]:
             raise ValueError("Raw OBSERVER response drift")
+        else:
+            pass
         try:
             if receipt["status"] != 200:
                 raise ValueError(
                     "Unavailable OBSERVER response: " + str(receipt["status"])
                 )
+            else:
+                pass
             rows = parse_observer(raw, query, list(cases.values()), plan)
             calibration = cal_queries[query["id"]]
             if calibration["status"] != "diagnosed":
                 raise ValueError("Geometric calibration unavailable")
+            else:
+                pass
             lookup = {v["case_id"]: v for v in calibration["rows"]}
             for row in rows:
                 case = cases[row["case_id"]]
@@ -272,6 +308,8 @@ def analyze(run, cohort):
                         entry.update(status="calibration_unknown")
                         row["profiles"][profile] = entry
                         continue
+                    else:
+                        pass
                     reception = interval(c["effective_JD"])
                     entry["reception_JD_TDB"] = c["effective_JD"]
                     observed = {
@@ -340,3 +378,5 @@ if __name__ == "__main__":
         args.run / (args.cohort + "-first-analysis.json"),
         analyze(args.run, args.cohort),
     )
+else:
+    pass

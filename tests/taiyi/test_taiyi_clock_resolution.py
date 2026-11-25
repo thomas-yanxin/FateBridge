@@ -15,14 +15,14 @@ from pydantic import ValidationError
 
 import fatebridge.api as api
 from fatebridge.application.examples import suggested_fields
+from fatebridge.application.result_delivery import RESULT_STORE
+from fatebridge.core.contracts.output_chinese import Taiyi
 from fatebridge.core.metaphysics.taiyi_clock import validate_seed_civil_clock
-from fatebridge.core.output_chinese import Taiyi
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.divination import calculate_sanshiunited_analysis
 from fatebridge.services.metaphysics import calculate_taiyi_analysis
-from tests.support.transports import SPECS, business, call_cli
-from tests.taiyi.test_taiyi_periods import seed_at
-from tests.taiyi.test_taiyi_transports import _same_run_payload
+from tests.support.transports import SPECS, business, call_calculation, call_cli
+from tests.unit_test.fixtures.taiyi import same_run_payload, seed_at
 
 CORPUS = Path(__file__).parents[1] / "fixtures/taiyi_jinjing_v29"
 FREEZE_SHA256 = "ab311d41c12241218ed4ea29c2c66402e19323ffb09126dea4222fa5a071c348"
@@ -97,7 +97,7 @@ def check_clock(result, case):
     Taiyi.model_validate(board)
 
 
-def test_original_iana_rules_and_clock_cases_remain_frozen():
+def test_original_iana_rules_and_clock_cases_remain_frozen() -> None:
     assert (
         hashlib.sha256((CORPUS / "freeze.json").read_bytes()).hexdigest()
         == FREEZE_SHA256
@@ -113,8 +113,8 @@ def test_original_iana_rules_and_clock_cases_remain_frozen():
 @pytest.mark.parametrize("mode,options", PROFILES)
 @pytest.mark.parametrize("solar", [False, True])
 def test_selected_fold_instant_survives_all_profiles_and_matches_iso_aggregate(
-    case, mode, options, solar
-):
+    case, mode, options, solar: bool
+) -> None:
     dedicated = calculate_taiyi_analysis(
         **inputs(case, solar=solar, mode=mode, options=options)
     )
@@ -128,7 +128,9 @@ def test_selected_fold_instant_survives_all_profiles_and_matches_iso_aggregate(
 
 @pytest.mark.parametrize("case", VALID[4:], ids=lambda c: c["id"])
 @pytest.mark.parametrize("solar", [False, True])
-def test_nonfold_solar_gap_label_historical_seconds_and_canonical_utc(case, solar):
+def test_nonfold_solar_gap_label_historical_seconds_and_canonical_utc(
+    case, solar: bool
+) -> None:
     result = calculate_taiyi_analysis(**inputs(case, solar=solar))
     check_clock(result, case)
     aggregate = calculate_sanshiunited_analysis(
@@ -140,11 +142,15 @@ def test_nonfold_solar_gap_label_historical_seconds_and_canonical_utc(case, sola
         assert result["analysis_context"]["corrected_datetime"].startswith(
             "2026-03-08 02:"
         )
+    else:
+        pass
 
 
 @pytest.mark.parametrize("case", INVALID, ids=lambda c: c["id"])
 @pytest.mark.parametrize("solar", [False, True])
-def test_explicit_offset_never_invents_missing_or_mismatched_clock(case, solar):
+def test_explicit_offset_never_invents_missing_or_mismatched_clock(
+    case, solar: bool
+) -> None:
     result = calculate_taiyi_analysis(**inputs(case, solar=solar))
     assert "taiyi" not in result and result["retryable"] is False
     assert case["error_contains"] in result["error"]
@@ -152,20 +158,24 @@ def test_explicit_offset_never_invents_missing_or_mismatched_clock(case, solar):
 
 @pytest.mark.parametrize("kind", ["naive_fold", "aware_gap"])
 def test_domain_guards_keep_unresolved_wall_clock_and_nonexistent_clock_rejections(
-    kind,
-):
+    kind: str,
+) -> None:
     base = seed_at(datetime(2026, 1, 1, 12), zone="America/New_York")
-    moment = (
-        datetime(2026, 11, 1, 1, 30)
-        if kind == "naive_fold"
-        else datetime(2026, 3, 8, 2, 30, tzinfo=ZoneInfo("America/New_York"))
-    )
-    with pytest.raises(ValueError, match="ambiguous|nonexistent"):
+    if kind == "naive_fold":
+        moment = datetime(2026, 11, 1, 1, 30)
+        with pytest.raises(ValueError, match="Datetime is naive"):
+            validate_seed_civil_clock(replace(base, input_datetime=moment))
+        moment = moment.replace(tzinfo=base.input_datetime.tzinfo)
+        message = "ambiguous local time"
+    else:
+        moment = datetime(2026, 3, 8, 2, 30, tzinfo=ZoneInfo("America/New_York"))
+        message = "nonexistent local time"
+    with pytest.raises(ValueError, match=message):
         validate_seed_civil_clock(replace(base, input_datetime=moment))
 
 
 @pytest.mark.parametrize("value", [True, 2, -1, "0"])
-def test_receipt_fold_is_a_strict_zero_or_one(value):
+def test_receipt_fold_is_a_strict_zero_or_one(value) -> None:
     with pytest.raises(ValidationError):
         Taiyi.model_validate(
             {"calendar_rules": {"civil_clock_resolution": {"fold": value}}}
@@ -190,8 +200,8 @@ def rest(monkeypatch):
 )
 @pytest.mark.parametrize("solar", [False, True])
 def test_real_rest_mcp_cli_clock_contract_and_default_budget(
-    rest, tmp_path, capsys, case, solar
-):
+    rest, tmp_path: Path, capsys: pytest.CaptureFixture[str], case, solar: bool
+) -> None:
     spec = SPECS["taiyi"]
     data = inputs(
         case,
@@ -224,7 +234,8 @@ def test_real_rest_mcp_cli_clock_contract_and_default_budget(
 
     async def protocol():
         async with Client(create_mcp_app()) as client:
-            result = await client.call_tool(
+            result = await call_calculation(
+                client,
                 spec.tool_name,
                 {
                     **data,
@@ -236,9 +247,11 @@ def test_real_rest_mcp_cli_clock_contract_and_default_budget(
                 raise_on_error=False,
             )
             if "utc" in case:
-                return result, await _same_run_payload(
+                return result, await same_run_payload(
                     client, result, require_business_inline=True
                 )
+            else:
+                pass
             return result, result.structured_content
 
     native, body = asyncio.run(protocol())
@@ -247,7 +260,6 @@ def test_real_rest_mcp_cli_clock_contract_and_default_budget(
         assert all(case["error_contains"] in str(r) for r in [http.json(), cli, body])
     else:
         assert code == 0 and not native.is_error and http.status_code == 200
-        from fatebridge.application.result_delivery import RESULT_STORE
 
         def full(value):
             return (

@@ -35,20 +35,28 @@ def affiliations(branches):
         seats = tuple(i for i, b in enumerate(branches) if b in letters)
         if set(branches[i] for i in seats) == set(letters):
             full.append((kind, seats, target))
+        else:
+            pass
     result = []
     for i in range(3):
         pair = (i, i + 1)
         target = PAIRS.get(frozenset(branches[j] for j in pair))
         if target is None or any(set(pair) <= set(f[1]) for f in full):
             continue
+        else:
+            pass
         for kind, seats, element in full:
             union = sorted(set(pair) | set(seats))
             if target != element or not set(pair) & set(seats):
                 continue
+            else:
+                pass
             if any(
                 set((branches[a], branches[b])) in CLASHES
                 for a, b in combinations(union, 2)
             ):
                 continue
+            else:
+                pass
             result.append((pair, kind, seats, target))
     return result

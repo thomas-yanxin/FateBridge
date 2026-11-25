@@ -48,6 +48,8 @@ def horizon_vector_reference(
             orientation = factor * eastward * cosine - altitude * sine
             if orientation < 0:
                 point = tuple(-value for value in point)
+            else:
+                pass
             longitude = context.atan2(point[1] * ce + point[2] * se, point[0])
             values.append(float(longitude * 180 / context.pi % 360) % 360)
         cusps[code] = values

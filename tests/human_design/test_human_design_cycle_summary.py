@@ -10,20 +10,20 @@ from unittest.mock import patch
 import pytest
 
 from fatebridge.application.result_delivery import bound_response
-from fatebridge.core.human_design_cycle_summary import (
+from fatebridge.core.human_design.human_design_cycle_summary import (
     FORMAT,
     compact_cycle_summary,
     cycle_contact_facts,
 )
-from fatebridge.core.human_design_cycles import (
+from fatebridge.core.human_design.human_design_cycles import (
     _cycle_summary_facts,
     cycle_summary,
     summary_conventions,
 )
 from fatebridge.core.public_output import public_payload
 from fatebridge.utils.formatting import format_json_response
-from fatebridge.validation.human_design import verify_human_design_reading
 from tests.support.human_design_current import complete_run
+from validation.human_design import verify_human_design_reading
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -79,6 +79,8 @@ def rich_current_run(mode="files", *, card=False):
             for k in ("position_frame", "ephemeris_model")
         }
         return card
+    else:
+        pass
     return result
 
 
@@ -94,7 +96,7 @@ def converted(value):
 
 
 @pytest.mark.parametrize("mode", ["files", "empty"])
-def test_current_card_keeps_business_facts_within8192(mode):
+def test_current_card_keeps_business_facts_within8192(mode: str) -> None:
     p = rich_current_run(mode, card=True)
     before = deepcopy(p)
     rich = p["cycle_summary"]
@@ -107,6 +109,8 @@ def test_current_card_keeps_business_facts_within8192(mode):
             path.startswith("run_metadata.")
             for path in result["result_delivery"]["deferred_fields"]
         )
+    else:
+        pass
     assert {
         k: v for k, v in result.items() if k not in {"run_metadata", "result_delivery"}
     } == {k: v for k, v in p.items() if k != "run_metadata"}
@@ -115,7 +119,9 @@ def test_current_card_keeps_business_facts_within8192(mode):
 
 
 @pytest.mark.parametrize("mode", ["files", "empty"])
-def test_current_full_format_verifies_and_preserves_rich_contact_facts(mode):
+def test_current_full_format_verifies_and_preserves_rich_contact_facts(
+    mode: str,
+) -> None:
     current = deepcopy(current_internal_cycle_run(mode))
     with patch(
         "fatebridge.core.astro.runtime.ephemeris_call",
@@ -138,7 +144,9 @@ def test_current_full_format_verifies_and_preserves_rich_contact_facts(mode):
         ("unrepresentable_historical_fractional_UTC_adjustment", False),
     ],
 )
-def test_label_exceptions_are_explicit_and_never_replaced_by_defaults(label, future):
+def test_label_exceptions_are_explicit_and_never_replaced_by_defaults(
+    label: str, future: bool
+) -> None:
     rich = rich_current_run()["cycle_summary"]
     event = rich["bodies"][0]["contacts"][0]
     event["utc_label_status"] = label
@@ -149,7 +157,7 @@ def test_label_exceptions_are_explicit_and_never_replaced_by_defaults(label, fut
     assert cycle_contact_facts(rich) == cycle_contact_facts(compact)
 
 
-def test_real_native_speed_and_segment_disagreement_survives_compaction():
+def test_real_native_speed_and_segment_disagreement_survives_compaction() -> None:
     inputs = json.loads(
         (
             Path(__file__).parents[1] / "data/human_design/regression-inputs.json"
@@ -182,7 +190,7 @@ def test_real_native_speed_and_segment_disagreement_survives_compaction():
 @pytest.mark.parametrize(
     "fault", ["missing_defaults", "false_physical", "reverse_mapping", "unknown_format"]
 )
-def test_decoder_rejects_missing_or_forged_conventions(fault):
+def test_decoder_rejects_missing_or_forged_conventions(fault: str) -> None:
     s = compact_cycle_summary(rich_current_run()["cycle_summary"])
     if fault == "missing_defaults":
         s.pop("contact_defaults")
@@ -212,7 +220,7 @@ def test_decoder_rejects_missing_or_forged_conventions(fault):
         "unknown_format",
     ],
 )
-def test_public_full_result_rejects_forged_compact_facts(fault):
+def test_public_full_result_rejects_forged_compact_facts(fault: str) -> None:
     p = public_payload(converted(rich_current_run()))
     assert verify_human_design_reading(p)["status"] == "verified_fixed_template_reading"
     s = p["cycle_summary"]
@@ -237,7 +245,7 @@ def test_public_full_result_rejects_forged_compact_facts(fault):
     assert verify_human_design_reading(p)["status"] == "rejected"
 
 
-def test_unobserved_motion_stays_unknown_instead_of_inheriting_agreement():
+def test_unobserved_motion_stays_unknown_instead_of_inheriting_agreement() -> None:
     rich = rich_current_run()["cycle_summary"]
     rich["bodies"][0]["contacts"][0]["motion_evidence"] = None
     compact = compact_cycle_summary(rich)
@@ -246,14 +254,14 @@ def test_unobserved_motion_stays_unknown_instead_of_inheriting_agreement():
     assert cycle_contact_facts(compact) == cycle_contact_facts(rich)
 
 
-def test_missing_format_cannot_turn_compact_defaults_into_implicit_rich_facts():
+def test_missing_format_cannot_turn_compact_defaults_into_implicit_rich_facts() -> None:
     compact = compact_cycle_summary(rich_current_run()["cycle_summary"])
     compact.pop("summary_format")
     with pytest.raises(ValueError, match="format declaration"):
         cycle_contact_facts(compact)
 
 
-def test_integer_zero_is_not_a_known_false_leap_status():
+def test_integer_zero_is_not_a_known_false_leap_status() -> None:
     rich = rich_current_run()["cycle_summary"]
     rich["bodies"][0]["contacts"][0]["future_leap_seconds_assumed_unchanged"] = 0
     compact = compact_cycle_summary(rich)

@@ -12,13 +12,13 @@ from pydantic import ValidationError
 
 import fatebridge.application.execution as execution
 from fatebridge.application.examples import evidence_views
+from fatebridge.core.contracts.output_liuren_auxiliary import LiurenAuxiliaryStars
 from fatebridge.core.metaphysics.liureng import build_liureng_board
 from fatebridge.core.metaphysics.liureng_auxiliary_stars import build_auxiliary_stars
-from fatebridge.core.output_liuren_auxiliary import LiurenAuxiliaryStars
 from fatebridge.core.public_output import same_public_value
-from tests.ren.test_ren_classical_depth import AUDIT as REN
-from tests.ren.test_ren_transports import PAYLOAD
+from scripts.ren import audit_ren_classical
 from tests.support.transports import AS_OF, SPECS, business, inputs, rest, surface_calls
+from tests.unit_test.fixtures.ren_protocol import REN_PROTOCOL_PAYLOAD
 
 ROOT = Path(__file__).resolve().parents[2]
 SPEC = importlib.util.spec_from_file_location(
@@ -42,7 +42,7 @@ def synthetic():
     )
 
 
-def test_literal_labels_and_derived_denominators_stay_separate():
+def test_literal_labels_and_derived_denominators_stay_separate() -> None:
     result = AUDIT.audit()
     assert result["literal_table_entries"] == result["literal_anchor_match_count"] == 80
     assert result["reused_lu_entries"] == 10
@@ -60,7 +60,9 @@ def test_literal_labels_and_derived_denominators_stay_separate():
     assert result["goal_complete"] is result["classical_acceptance_passed"] is False
 
 
-def test_removing_one_rule_cannot_improve_the_audit(monkeypatch):
+def test_removing_one_rule_cannot_improve_the_audit(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     import fatebridge.core.metaphysics.liureng_auxiliary_stars as implementation
 
     original = implementation.build_auxiliary_stars
@@ -79,7 +81,9 @@ def test_removing_one_rule_cannot_improve_the_audit(monkeypatch):
 
 
 @pytest.mark.parametrize("mode", ["edit", "missing", "extra"])
-def test_frozen_inventory_cannot_hide_or_change_a_label(tmp_path, mode):
+def test_frozen_inventory_cannot_hide_or_change_a_label(
+    tmp_path: Path, mode: str
+) -> None:
     target = tmp_path / "corpus"
     shutil.copytree(AUDIT.CORPUS, target)
     if mode == "edit":
@@ -95,7 +99,7 @@ def test_frozen_inventory_cannot_hide_or_change_a_label(tmp_path, mode):
         AUDIT.reference(target)
 
 
-def test_yin_de_is_not_its_own_lu_and_heaven_de_uses_explicit_lodging():
+def test_yin_de_is_not_its_own_lu_and_heaven_de_uses_explicit_lodging() -> None:
     actual = build_auxiliary_stars(**synthetic())
     stars = {s["id"]: s for s in actual["stars"]}
     assert stars["day_de"]["branch"] == "申" and stars["day_lu"]["branch"] == "卯"
@@ -114,7 +118,7 @@ def test_yin_de_is_not_its_own_lu_and_heaven_de_uses_explicit_lodging():
 @pytest.mark.parametrize(
     "fault", ["day", "month", "plate", "rotation", "gods", "lessons", "transmissions"]
 )
-def test_incomplete_or_impossible_inputs_are_rejected(fault):
+def test_incomplete_or_impossible_inputs_are_rejected(fault: str) -> None:
     args = synthetic()
     if fault == "day":
         args["day_ganzhi"] = "甲丑"
@@ -135,8 +139,8 @@ def test_incomplete_or_impossible_inputs_are_rejected(fault):
         build_auxiliary_stars(**args)
 
 
-def test_empty_lu_retains_its_position_and_does_not_cancel_stage():
-    seed = REN.make_seed({"day": "戊戌", "hour": "酉"})
+def test_empty_lu_retains_its_position_and_does_not_cancel_stage() -> None:
+    seed = audit_ren_classical.make_seed({"day": "戊戌", "hour": "酉"})
     boards = [
         build_liureng_board(seed, month_general_override="子", guiren_profile=p)
         for p in ("liuren_common_v1", "tanyuan_xieji_v1")
@@ -165,15 +169,19 @@ def test_empty_lu_retains_its_position_and_does_not_cancel_stage():
 
 @pytest.mark.parametrize("key", ["liureng_gods", "liureng_runyear", "jinkou"])
 @pytest.mark.parametrize("project", [False, True])
-def test_actual_auxiliary_facts_agree_on_rest_mcp_cli(key, project, surface_calls):
+def test_actual_auxiliary_facts_agree_on_rest_mcp_cli(
+    key: str, project: bool, surface_calls
+) -> None:
     spec = SPECS[key]
-    payload = dict(PAYLOAD)
+    payload = dict(REN_PROTOCOL_PAYLOAD)
     if key == "jinkou":
         payload["di_fen"] = "酉"
     elif key == "liureng_runyear":
         payload.update(
             birth_year=1994, birth_month=8, birth_day=23, birth_hour=14, gender="女"
         )
+    else:
+        pass
     fields = [
         "liureng.auxiliary_stars",
         "liureng.twelve_board",
@@ -198,6 +206,8 @@ def test_actual_auxiliary_facts_agree_on_rest_mcp_cli(key, project, surface_call
             "false",
         ]
         options.update(fields=fields, strict_fields=True, include_snapshot_text=False)
+    else:
+        pass
     http, protocol, code, cli = surface_calls(
         spec, payload, params=params, options=options, flags=flags, cli_first=False
     )
@@ -241,8 +251,12 @@ def test_actual_auxiliary_facts_agree_on_rest_mcp_cli(key, project, surface_call
                 "日德：" in body["snapshot_text"] and "天马：" in body["snapshot_text"]
             )
             assert aux["month_basis"] in body["snapshot_text"]
+        else:
+            pass
     if key != "jinkou":
         assert "liureng.auxiliary_stars" in evidence_views(spec)["core"]["fields"]
+    else:
+        pass
 
 
 @pytest.mark.parametrize(
@@ -258,12 +272,12 @@ def test_actual_auxiliary_facts_agree_on_rest_mcp_cli(key, project, surface_call
 )
 @pytest.mark.parametrize("project", [False, True])
 def test_corrupt_auxiliary_facts_fail_before_projection(
-    fault, project, monkeypatch, surface_calls
-):
+    fault: str, project: bool, monkeypatch: pytest.MonkeyPatch, surface_calls
+) -> None:
     spec = SPECS["liureng_gods"]
     from fatebridge.services.metaphysics import calculate_liureng_gods
 
-    valid = calculate_liureng_gods(**PAYLOAD)
+    valid = calculate_liureng_gods(**REN_PROTOCOL_PAYLOAD)
     execution.validate_output(spec, valid)
     bad = copy.deepcopy(valid)
     aux = bad["liureng"]["auxiliary_stars"]
@@ -288,6 +302,8 @@ def test_corrupt_auxiliary_facts_fail_before_projection(
             actual = replace(
                 actual, bind=lambda _: (lambda: copy.deepcopy(bad), (), {})
             )
+        else:
+            pass
         return original(actual, request)
 
     monkeypatch.setattr(execution, "execute_spec", broken)
@@ -298,8 +314,15 @@ def test_corrupt_auxiliary_facts_fail_before_projection(
         params.update(fields="analysis_type", strict_fields="true")
         flags += ["--fields", "analysis_type", "--strict-fields", "true"]
         options.update(fields=["analysis_type"], strict_fields=True)
+    else:
+        pass
     http, protocol, code, out = surface_calls(
-        spec, PAYLOAD, params=params, options=options, flags=flags, cli_first=False
+        spec,
+        REN_PROTOCOL_PAYLOAD,
+        params=params,
+        options=options,
+        flags=flags,
+        cli_first=False,
     )
     assert http.status_code == 500 and protocol.is_error and code == 1
     assert out["error_code"] == "internal_error"
@@ -313,12 +336,12 @@ def test_corrupt_auxiliary_facts_fail_before_projection(
         "liureng.auxiliary_stars.complete_classical_conformance",
     ],
 )
-def test_sparse_object_projections_survive(field, surface_calls):
+def test_sparse_object_projections_survive(field: str, surface_calls) -> None:
     spec = SPECS["liureng_gods"]
     options = dict(fields=[field], strict_fields=True, include_snapshot_text=False)
     http, protocol, code, cli = surface_calls(
         spec,
-        PAYLOAD,
+        REN_PROTOCOL_PAYLOAD,
         params=dict(
             fields=field,
             strict_fields="true",
@@ -346,12 +369,9 @@ def test_sparse_object_projections_survive(field, surface_calls):
     spec.output_model.model_validate(cli)
 
 
-def test_sanshi_embedded_board_carries_same_stars(surface_calls):
+def test_sanshi_board_projects_auxiliary_stars(surface_calls) -> None:
     spec = SPECS["sanshiunited"]
-    fields = [
-        "liureng.auxiliary_stars",
-        "subresults.liureng_gods.liureng.auxiliary_stars",
-    ]
+    fields = ["liureng.auxiliary_stars", "subresults.liureng_gods.four_pillars.day"]
     payload = inputs(spec)
     http, protocol, code, cli = surface_calls(
         spec,
@@ -367,9 +387,9 @@ def test_sanshi_embedded_board_carries_same_stars(surface_calls):
     assert (
         business(http.json()) == business(protocol.structured_content) == business(cli)
     )
+    day = cli["subresults"]["liureng_gods"]["four_pillars"]["day"]
     assert (
-        cli["liureng"]["auxiliary_stars"]
-        == cli["subresults"]["liureng_gods"]["liureng"]["auxiliary_stars"]
+        cli["liureng"]["auxiliary_stars"]["day_ganzhi"] == day["stem"] + day["branch"]
     )
 
 
@@ -381,9 +401,11 @@ def test_sanshi_embedded_board_carries_same_stars(surface_calls):
         ("支煞", ["日支德", "驿马"]),
     ],
 )
-def test_selected_section_exports_exact_placement_facts(section, names, surface_calls):
+def test_selected_section_exports_exact_placement_facts(
+    section: str, names, surface_calls
+) -> None:
     spec = SPECS["liureng_gods"]
-    payload = {**PAYLOAD, "selected_sections": [section]}
+    payload = {**REN_PROTOCOL_PAYLOAD, "selected_sections": [section]}
     http, protocol, code, cli = surface_calls(
         spec,
         payload,
@@ -404,14 +426,18 @@ def test_selected_section_exports_exact_placement_facts(section, names, surface_
                 f"{star['name']}：{star['branch']}临{star['earth_branch']}乘{star['god']}；"
                 in exported["export_text"]
             )
+        else:
+            pass
 
 
-def test_claim_receipt_rejects_a_changed_auxiliary_branch(rest):
-    from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
+def test_claim_receipt_rejects_a_changed_auxiliary_branch(rest) -> None:
+    from validation.claims import CalculationClaim, verify_calculation_claims
 
     spec = SPECS["liureng_gods"]
     body = rest.post(
-        spec.rest_path, json=PAYLOAD, params=dict(as_of=AS_OF, response_char_limit=0)
+        spec.rest_path,
+        json=REN_PROTOCOL_PAYLOAD,
+        params=dict(as_of=AS_OF, response_char_limit=0),
     ).json()
     aux = body["liureng"]["auxiliary_stars"]
     index = next(i for i, s in enumerate(aux["stars"]) if s["id"] == "day_de")

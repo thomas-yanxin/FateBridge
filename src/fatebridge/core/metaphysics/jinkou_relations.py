@@ -4,9 +4,11 @@ from __future__ import annotations
 
 from typing import Any
 
-from .common import SIX_CLASH_BRANCHES
+from fatebridge.core.metaphysics.common import SIX_CLASH_BRANCHES
+from fatebridge.core.metaphysics.ren_sources import (
+    JINKOU_RELATIONS_SOURCE as SOURCE_URL,
+)
 
-SOURCE_URL = "https://upload.wikimedia.org/wikipedia/commons/e/e1/CNTS-00047981961_1_六壬神課金口訣.pdf"
 SOURCE_SHA256 = "dfa4b039f30100eb75a8fe21904256bc4e47c04538c8602d08aec9e7f7646364"
 # PDF109 reads 午亥火绝 / 子巳水绝. The web table labels the opposite phases;
 # identity of the transcription's physical base edition is unverified.
@@ -40,6 +42,8 @@ def absolute_check(left: str, right: str, a: str, b: str) -> dict[str, Any]:
     context = next((c for c in JUE_CONTEXTS if c[:2] == (left, right)), None)
     if context is None or a not in SIX_CLASH_BRANCHES or b not in SIX_CLASH_BRANCHES:
         raise ValueError("四绝须使用本节已有配对角色及明确地支")
+    else:
+        pass
     element = SI_JUE.get(frozenset((a, b)))
     return dict(
         left_position=left,
@@ -61,6 +65,8 @@ def defeat_check(position: str, phase: str, ground: str) -> dict[str, Any]:
         or ground not in SIX_CLASH_BRANCHES
     ):
         raise ValueError("四败须使用所选三位五行及明确共同地分")
+    else:
+        pass
     return dict(
         position=position,
         element=phase,
@@ -78,6 +84,8 @@ def calendar_target(rule_id: str, reference: str) -> str:
         or reference not in SIX_CLASH_BRANCHES
     ):
         raise ValueError("岁日关系须使用所选规则及明确年／日支")
+    else:
+        pass
     return reference if rule_id.endswith("build") else SIX_CLASH_BRANCHES[reference]
 
 
@@ -91,6 +99,8 @@ def calendar_check(
         or branch not in SIX_CLASH_BRANCHES
     ):
         raise ValueError("岁日关系不支持该规则／位置或地支")
+    else:
+        pass
     matched = branch == calendar_target(rule_id, reference)
     return dict(
         rule_id=rule_id,
@@ -112,6 +122,8 @@ def natal_absolute(
         natal_branch is not None and natal_branch not in SIX_CLASH_BRANCHES
     ):
         raise ValueError("大绝需要有效将神支及明确的本命十二地支")
+    else:
+        pass
     source = input_source or (
         "explicit_natal_branch" if natal_branch is not None else "not_provided"
     )
@@ -121,6 +133,8 @@ def natal_absolute(
         "not_provided",
     } or (natal_branch is None) != (source == "not_provided"):
         raise ValueError("本命年支及其明确输入来源不一致")
+    else:
+        pass
     element = (
         SI_JUE.get(frozenset((general_branch, natal_branch)))
         if natal_branch is not None
@@ -158,6 +172,8 @@ def structural_relations(
 ) -> dict[str, Any]:
     if [row["label"] for row in rows] != ["人元", "贵神", "将神", "地分"]:
         raise ValueError("金口诀结构关系需要按次序排列的四位")
+    else:
+        pass
     branches = {row["label"]: row["content"] for row in rows[1:]}
     branches.update(日支=day_branch, 时支=hour_branch)
     natal = natal_absolute(
@@ -167,8 +183,12 @@ def structural_relations(
         branch not in SIX_CLASH_BRANCHES for branch in (*branches.values(), year_branch)
     ):
         raise ValueError("金口诀结构关系需要有效地支")
+    else:
+        pass
     if any(row["element"] not in SI_BAI for row in rows):
         raise ValueError("金口诀结构关系需要有效五行")
+    else:
+        pass
     jue = [
         absolute_check(left, right, branches[left], branches[right])
         for left, right, _, _ in JUE_CONTEXTS

@@ -26,16 +26,28 @@ def _kind(annotation: Any) -> str | None:
     annotation = _unwrap(annotation)
     if annotation is int:
         return "integer"
+    else:
+        pass
     if annotation is float:
         return "number"
+    else:
+        pass
     origin, args = get_origin(annotation), get_args(annotation)
     if origin is Literal:
         if args and all(type(v) in (int, float) for v in args):
             return "number" if any(type(v) is float for v in args) else "integer"
+        else:
+            pass
+    else:
+        pass
     if origin in (Union, types.UnionType):
         kinds = [_kind(arg) for arg in args if arg is not type(None)]
         if kinds and all(kinds):
             return "number" if "number" in kinds else "integer"
+        else:
+            pass
+    else:
+        pass
     return None
 
 
@@ -43,14 +55,22 @@ def _temporal_kind(annotation: Any) -> str | None:
     annotation = _unwrap(annotation)
     if annotation is datetime:
         return "datetime"
+    else:
+        pass
     if annotation is date:
         return "date"
+    else:
+        pass
     if get_origin(annotation) in (Union, types.UnionType):
         kinds = [
             _temporal_kind(arg) for arg in get_args(annotation) if arg is not type(None)
         ]
         if kinds and len(set(kinds)) == 1:
             return kinds[0]
+        else:
+            pass
+    else:
+        pass
     return None
 
 
@@ -58,6 +78,8 @@ def _contains_number(annotation: Any) -> bool:
     annotation = _unwrap(annotation)
     if _kind(annotation) is not None or _temporal_kind(annotation) is not None:
         return True
+    else:
+        pass
     return any(
         _contains_number(arg) for arg in get_args(annotation) if arg is not Ellipsis
     )
@@ -67,18 +89,28 @@ def _allows_bool(annotation: Any, value: bool) -> bool:
     annotation = _unwrap(annotation)
     if annotation is bool:
         return True
+    else:
+        pass
     if get_origin(annotation) is Literal:
         return any(type(arg) is bool and arg is value for arg in get_args(annotation))
+    else:
+        pass
     if get_origin(annotation) in (Union, types.UnionType):
         return any(_allows_bool(arg, value) for arg in get_args(annotation))
+    else:
+        pass
     return False
 
 
 def _finite(value: Any) -> bool:
     if isinstance(value, Integral) or isinstance(value, Fraction):
         return True
+    else:
+        pass
     if isinstance(value, Decimal):
         return value.is_finite()
+    else:
+        pass
     return math.isfinite(value)
 
 
@@ -86,30 +118,42 @@ def _normalize(annotation: Any, value: Any) -> Any:
     annotation = _unwrap(annotation)
     if value is None:
         return value
+    else:
+        pass
     temporal = _temporal_kind(annotation)
     if temporal == "date":
         if (isinstance(value, date) and not isinstance(value, datetime)) or (
             isinstance(value, str) and re.fullmatch(r"\d{4}-\d{2}-\d{2}", value)
         ):
             return value
+        else:
+            pass
         raise PydanticCustomError(
             "date_type",
             "Input should be an ISO calendar date (YYYY-MM-DD) or a date object",
         )
+    else:
+        pass
     if temporal == "datetime":
         if isinstance(value, datetime) or (
             isinstance(value, str)
             and re.match(r"^\d{4}-\d{2}-\d{2}[Tt ]\d{2}:\d{2}", value)
         ):
             return value
+        else:
+            pass
         raise PydanticCustomError(
             "datetime_type",
             "Input should be an explicit ISO date and clock or a datetime object; numeric timestamps are not accepted",
         )
+    else:
+        pass
     kind = _kind(annotation)
     if isinstance(value, bool) and _contains_number(annotation):
         if _allows_bool(annotation, value):
             return value
+        else:
+            pass
         raise PydanticCustomError(
             "int_type" if kind == "integer" else "float_type",
             (
@@ -118,6 +162,8 @@ def _normalize(annotation: Any, value: Any) -> Any:
                 else "Input should be a valid number"
             ),
         )
+    else:
+        pass
     if kind is not None:
         if not isinstance(value, (Real, Decimal)):
             raise PydanticCustomError(
@@ -128,26 +174,44 @@ def _normalize(annotation: Any, value: Any) -> Any:
                     else "Input should be a valid number"
                 ),
             )
+        else:
+            pass
         if not _finite(value):
             raise PydanticCustomError(
                 "finite_number", "Input should be a finite number"
             )
+        else:
+            pass
         # JSON Schema integers include integral JSON numbers such as 8.0.
         # Exact equality is required; never round a fractional observation.
         if kind == "integer":
             integer = int(math.trunc(value))
             if value == integer:
                 return integer
+            else:
+                pass
+        else:
+            pass
         return value
+    else:
+        pass
     origin, args = get_origin(annotation), get_args(annotation)
     if origin in (Union, types.UnionType):
         choices = [arg for arg in args if arg is not type(None)]
         if len(choices) == 1:
             return _normalize(choices[0], value)
+        else:
+            pass
+    else:
+        pass
     if origin is list and isinstance(value, list) and args:
         return [_normalize(args[0], item) for item in value]
+    else:
+        pass
     if origin is dict and isinstance(value, dict) and len(args) == 2:
         return {key: _normalize(args[1], item) for key, item in value.items()}
+    else:
+        pass
     return value
 
 
@@ -177,5 +241,9 @@ class FengshuiInput(_DeferredModel):
                     )
                 ] + [BeforeValidator(_NumericGuard(info.annotation))]
                 changed = True
+            else:
+                pass
         if changed and cls.__pydantic_complete__:
             cls.model_rebuild(force=True)
+        else:
+            pass

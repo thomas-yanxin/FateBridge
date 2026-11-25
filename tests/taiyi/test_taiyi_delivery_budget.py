@@ -2,6 +2,7 @@
 
 import json
 from copy import deepcopy
+from pathlib import Path
 
 import pytest
 
@@ -30,13 +31,19 @@ SPEC = next(spec for spec in CATALOG if spec.key == "sanshiunited")
     ],
 )
 def test_current_twelve_payloads_keep_essential_receipts_and_exact_same_run(
-    mode, profile, view, monkeypatch, tmp_path
-):
+    mode: str,
+    profile: str | None,
+    view: str | None,
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
     store = ResultStore(tmp_path / "delivery")
     monkeypatch.setattr(result_delivery, "RESULT_STORE", store)
     options = {"calculation_mode": mode}
     if profile is not None:
         options[mode + "_profile"] = profile
+    else:
+        pass
     request = SPEC.request_model.model_validate(
         {
             "date": "2026-04-04",
@@ -99,3 +106,5 @@ def test_current_twelve_payloads_keep_essential_receipts_and_exact_same_run(
             )
             > 8192
         )
+    else:
+        pass

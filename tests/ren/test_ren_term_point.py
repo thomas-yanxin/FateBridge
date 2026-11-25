@@ -11,16 +11,19 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
+from fatebridge.application.execution import execute_spec
 from fatebridge.core import almanac
 from fatebridge.core.astro.time_scales import datetime_from_tt
 from fatebridge.core.astro.tt_epoch import TTInstant
+from fatebridge.core.contracts.output_chinese import RenTermDependency
 from fatebridge.core.metaphysics import ren_calendar
-from fatebridge.core.output_chinese import RenTermDependency
 from fatebridge.utils.civil_time import ZonedCalendar
 from fatebridge.utils.errors import EphemerisSourceError
-from tests.ren.test_ren_anchors import assert_broken_on_three_ports
-from tests.ren.test_ren_transports import PAYLOAD
 from tests.support.transports import SPECS, business, rest, surface_calls
+from tests.unit_test.fixtures.ren_protocol import (
+    assert_output_fault_on_all_transports,
+    term_boundary_payload,
+)
 
 ROOT = Path(__file__).resolve().parents[2]
 CORPUS = ROOT / "tests/fixtures/ren_term_point_v1"
@@ -43,7 +46,7 @@ def reference():
 
 
 @pytest.mark.parametrize("row", reference()["rows"], ids=lambda row: row["id"])
-def test_independent_decimal_reference(row):
+def test_independent_decimal_reference(row) -> None:
     parts = row["tt_parts"]
     point = (
         TTInstant.from_float(parts[0])
@@ -65,6 +68,8 @@ def actual_term(request, monkeypatch):
             "a4ce9bf9b3282becc9f4b2ac3cebe03a2ae7599981aabd7265fd8482fff7c4b5"
         )
         monkeypatch.setenv("FATEBRIDGE_SOLAR_SPK_FILE", str(kernel))
+    else:
+        pass
     return almanac.get_solar_terms_for_year(2026, "UTC")[6]
 
 
@@ -75,14 +80,20 @@ def corrupt(term, fault):
             term,
             calendar=ZonedCalendar.from_datetime(term.moment + timedelta(seconds=1)),
         )
+    else:
+        pass
     if fault == "missing_details":
         return replace(term, solar_model_details=None)
+    else:
+        pass
     if fault == "selected_plus_day":
         details["selected_crossing_jd_tt"] += 1
     elif fault == "reversed_bracket":
         details["root_bracket_tt"].reverse()
         if "root_bracket_tt_parts" in details:
             details["root_bracket_tt_parts"].reverse()
+        else:
+            pass
     elif fault == "negative_width":
         details["root_bracket_seconds"] = -1
     elif fault == "wrong_width":
@@ -109,34 +120,15 @@ def corrupt(term, fault):
 FAULTS = json.loads((CORPUS / "protocol.json").read_text())["faults"][:13]
 
 
-def payload_for(key):
-    if key == "sanshiunited":
-        return dict(
-            date="2026-04-04",
-            time="21:18:37",
-            zone="+08:00",
-            qimen_options={"layout": "direct"},
-            taiyi_options={},
-            use_true_solar_time=False,
-            liureng_is_diurnal=False,
-        )
-    payload = dict(PAYLOAD)
-    if key == "liureng_runyear":
-        payload.update(
-            birth_year=1994, birth_month=8, birth_day=23, birth_hour=14, gender="女"
-        )
-    return payload
-
-
 @pytest.mark.parametrize("fault", FAULTS)
-def test_runtime_refuses_contradictory_actual_root(actual_term, fault):
+def test_runtime_refuses_contradictory_actual_root(actual_term, fault) -> None:
     # Missing independent-provider source identities already have their own
     # fail-closed path; this new gate preserves that earlier error identity.
     with pytest.raises((EphemerisSourceError, RuntimeError)):
         ren_calendar.require_ren_solar_term(corrupt(actual_term, fault))
 
 
-def test_actual_valid_receipt_and_same_instant_other_offset(actual_term):
+def test_actual_valid_receipt_and_same_instant_other_offset(actual_term) -> None:
     ren_calendar.require_ren_solar_term(actual_term)
     ren_calendar.require_ren_solar_term(
         replace(
@@ -165,7 +157,9 @@ def test_actual_valid_receipt_and_same_instant_other_offset(actual_term):
         "physical_accuracy_true",
     ],
 )
-def test_present_output_receipt_refuses_spliced_numerical_evidence(actual_term, fault):
+def test_present_output_receipt_refuses_spliced_numerical_evidence(
+    actual_term, fault: str
+) -> None:
     term = corrupt(actual_term, fault)
     with pytest.raises(ValidationError):
         RenTermDependency.model_validate(
@@ -176,7 +170,7 @@ def test_present_output_receipt_refuses_spliced_numerical_evidence(actual_term, 
         )
 
 
-def test_legacy_and_sparse_output_does_not_invent_missing_evidence():
+def test_legacy_and_sparse_output_does_not_invent_missing_evidence() -> None:
     RenTermDependency.model_validate(dict(civil_moment="2026-04-05T00:00:00Z"))
     RenTermDependency.model_validate(
         dict(solar_model_details={"selected_crossing_jd_tt": 2461135.0})
@@ -191,7 +185,9 @@ def test_legacy_and_sparse_output_does_not_invent_missing_evidence():
         "split_bracket_display_mismatch",
     ],
 )
-def test_split_exact_inputs_are_checked_before_rounded_display(fault, monkeypatch):
+def test_split_exact_inputs_are_checked_before_rounded_display(
+    fault: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "de440")
     term = almanac.get_solar_terms_for_year(2026, "UTC")[6]
     d = copy.deepcopy(term.solar_model_details)
@@ -218,9 +214,11 @@ def test_split_exact_inputs_are_checked_before_rounded_display(fault, monkeypatc
 @pytest.mark.parametrize(
     "key", ["liureng_gods", "liureng_runyear", "jinkou", "sanshiunited"]
 )
-def test_valid_actual_provider_agrees_on_three_ports(actual_term, key, surface_calls):
+def test_valid_actual_provider_agrees_on_three_ports(
+    actual_term, key: str, surface_calls
+) -> None:
     spec = SPECS[key]
-    payload = payload_for(key)
+    payload = term_boundary_payload(key)
     http, mcp, code, cli = surface_calls(
         spec,
         payload,
@@ -229,11 +227,7 @@ def test_valid_actual_provider_agrees_on_three_ports(actual_term, key, surface_c
     )
     assert http.status_code == 200 and not mcp.is_error and code == 0, http.text
     assert business(http.json()) == business(mcp.structured_content) == business(cli)
-    holder = (
-        http.json()["subresults"]["liureng_gods"]
-        if key == "sanshiunited"
-        else http.json()
-    )
+    holder = http.json()
     board = holder["jinkou"] if key == "jinkou" else holder["liureng"]
     assert {
         r["provider"] for r in board["calendar_policy"]["solar_term_dependencies"]
@@ -245,8 +239,8 @@ def test_valid_actual_provider_agrees_on_three_ports(actual_term, key, surface_c
 )
 @pytest.mark.parametrize("project", [False, True])
 def test_bad_consumed_clock_fails_before_projection_on_three_ports(
-    key, project, monkeypatch, surface_calls
-):
+    key: str, project: bool, monkeypatch: pytest.MonkeyPatch, surface_calls
+) -> None:
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
     original = ren_calendar.get_adjacent_solar_terms
     monkeypatch.setattr(
@@ -257,12 +251,14 @@ def test_bad_consumed_clock_fails_before_projection_on_three_ports(
         ),
     )
     spec = SPECS[key]
-    payload = payload_for(key)
+    payload = term_boundary_payload(key)
     params, options, flags = {}, {}, []
     if project:
         params = {"fields": "analysis_type", "strict_fields": "true"}
         options = {"fields": ["analysis_type"], "strict_fields": True}
         flags = ["--fields", "analysis_type", "--strict-fields", "true"]
+    else:
+        pass
     http, mcp, code, cli = surface_calls(
         spec, payload, params=params, options=options, flags=flags, cli_first=False
     )
@@ -279,20 +275,31 @@ def test_bad_consumed_clock_fails_before_projection_on_three_ports(
 )
 @pytest.mark.parametrize("project", [False, True])
 def test_bad_output_point_is_an_output_failure_before_projection(
-    key, project, monkeypatch, rest, tmp_path, capsys
-):
+    key: str,
+    project: bool,
+    monkeypatch: pytest.MonkeyPatch,
+    rest,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
     spec = SPECS[key]
-    request = spec.request_model.model_validate(payload_for(key))
-    fn, args, kw = spec.bind(request)
-    bad = fn(*args, **kw)
-    holder = bad["subresults"]["liureng_gods"] if key == "sanshiunited" else bad
-    board = holder["jinkou"] if key == "jinkou" else holder["liureng"]
+    request_payload = term_boundary_payload(key)
+    request = spec.request_model.model_validate(request_payload)
+    bad = execute_spec(spec, request)
+    board = bad["jinkou"] if key == "jinkou" else bad["liureng"]
     board["calendar_policy"]["solar_term_dependencies"][0]["solar_model_details"][
         "selected_crossing_jd_tt"
     ] += 1
     with pytest.raises(ValidationError):
         spec.output_model.model_validate(bad)
-    assert_broken_on_three_ports(
-        spec, bad, project, rest, monkeypatch, tmp_path, capsys
+    assert_output_fault_on_all_transports(
+        spec,
+        bad,
+        project,
+        rest,
+        monkeypatch,
+        tmp_path,
+        capsys,
+        request_payload=request_payload,
     )

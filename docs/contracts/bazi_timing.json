@@ -1,0 +1,470 @@
+{
+  "evidence_views": {
+    "analysis_clock": {
+      "fields": [
+        "analysis_reference"
+      ],
+      "when": "核对同次完整分析瞬间、UTC偏移/fold及分析日期的补齐来源；不把默认月初、月中或整点当成当前。"
+    },
+    "birth_time_sensitivity": {
+      "fields": [
+        "personal_info.analysis_datetime",
+        "calendar_context.birth_time_input",
+        "dayun_analysis",
+        "birth_time_sensitivity"
+      ],
+      "when": "用户确认名义出生参考的正负UTC经过分钟范围时，传birth_time_uncertainty_minutes并读取完整候选与事件未决层；无分钟样本的事件候选不能忽略，计数不是概率，None不是精确生时"
+    },
+    "carriers": {
+      "fields": [
+        "personal_info.analysis_datetime",
+        "interaction_analysis.method_id",
+        "interaction_analysis.pillar_carrier_summary",
+        "interaction_analysis.pillar_carrier_scope",
+        "interaction_analysis.pillar_carrier_source"
+      ],
+      "when": "核对大运至流时的同柱干支生克、本柱真实藏根及原局外援；喜支才核盖头、喜干才核截脚压力，不据候选裁定喜忌、合化、救应或吉凶。"
+    },
+    "carriers_detail": {
+      "fields": [
+        "personal_info.analysis_datetime",
+        "interaction_analysis.method_id",
+        "interaction_analysis.pillar_carriers",
+        "interaction_analysis.pillar_carrier_scope",
+        "interaction_analysis.pillar_carrier_source",
+        "interaction_analysis.hidden_target_reference",
+        "interaction_analysis.hidden_target_carriers"
+      ],
+      "when": "逐项核对本柱藏根和原局外援及原典来源；完整明细若分页，读取同一run，不另算补齐。"
+    },
+    "dayun_timeline": {
+      "fields": [
+        "personal_info.analysis_datetime",
+        "dayun_analysis"
+      ],
+      "when": "查看交运边界与十二步大运时间轴；analysis_age仅作显式年龄参考，默认按目标时刻选运"
+    },
+    "hidden_carriers": {
+      "fields": [
+        "interaction_analysis.pillar_carriers",
+        "interaction_analysis.hidden_target_carriers",
+        "interaction_analysis.hidden_target_reference"
+      ],
+      "when": "在已算大运、流年、流月、流日、流时中逐藏干核对同柱生克；干克某藏干只列该目标为所喜时的盖头候选，不能推成全支受克。"
+    },
+    "interactions": {
+      "fields": [
+        "personal_info.analysis_datetime",
+        "dayun_analysis",
+        "liunian_analysis",
+        "liuyue_analysis",
+        "interaction_analysis"
+      ],
+      "when": "核对原局、大运至流时之间的结构关系；关系成立不代表合化或吉凶，按所问时间层筛选"
+    },
+    "root_effects": {
+      "fields": [
+        "personal_info.analysis_datetime",
+        "interaction_analysis.nodes",
+        "interaction_analysis.relations",
+        "interaction_analysis.strength_projection"
+      ],
+      "when": "核对时间支冲刑及唯一大运干五合对原局既有预算的限定投影、来源、同次参数与阻塞关系；其它时间粒度的干合未定量，残存原局数值档不能解释为完整行运后旺衰。"
+    },
+    "roots": {
+      "fields": [
+        "personal_info.analysis_datetime",
+        "interaction_analysis.nodes",
+        "interaction_analysis.relations",
+        "interaction_analysis.root_context.method_id",
+        "interaction_analysis.root_context.month_command_node_id",
+        "interaction_analysis.root_context.day_master_roots",
+        "interaction_analysis.root_context.effective_force_status",
+        "interaction_analysis.root_context.source",
+        "interaction_analysis.root_context.scope"
+      ],
+      "when": "核对日主在时运支的原典根类、真实藏干及同次冲合刑触点；月令仍属原局，阴长生参考不补根，未见根不直接判弱，关系触点不等于有效损益。"
+    },
+    "stem_roots": {
+      "fields": [
+        "personal_info.analysis_datetime",
+        "interaction_analysis.nodes",
+        "interaction_analysis.relations",
+        "interaction_analysis.root_context.method_id",
+        "interaction_analysis.root_context.timing_stem_natal_roots",
+        "interaction_analysis.root_context.effective_force_status",
+        "interaction_analysis.root_context.source",
+        "interaction_analysis.root_context.scope"
+      ],
+      "when": "核对运干在四个原局支的根类及关系触点；共享根位不能重复相加为预算，不据原局根存在宣称已算行运后旺衰。"
+    }
+  },
+  "first_view": {
+    "fields": [
+      "personal_info.analysis_datetime",
+      "birth_pillars",
+      "dayun_analysis.current_dayun",
+      "dayun_analysis.start_at",
+      "dayun_analysis.end_at",
+      "dayun_analysis.selection_basis",
+      "liunian_analysis.pillar",
+      "liuyue_analysis.pillar",
+      "liuri_analysis.pillar",
+      "liushi_analysis.pillar",
+      "analysis_calendar.analysis_date_context.timezone",
+      "analysis_calendar.analysis_date_context.current_solar_term.name",
+      "analysis_calendar.analysis_date_context.current_solar_term.datetime_with_offset",
+      "analysis_calendar.analysis_date_context.next_solar_term.name",
+      "analysis_calendar.analysis_date_context.next_solar_term.datetime_with_offset",
+      "analysis_calendar.analysis_date_context.bazi_month_boundary.branch"
+    ],
+    "include_snapshot_text": false,
+    "strict_fields": true
+  },
+  "input": {
+    "additionalProperties": false,
+    "description": "Request model for comprehensive timing analysis.",
+    "properties": {
+      "analysis_age": {
+        "anyOf": [
+          {
+            "minimum": 0,
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Analysis age override",
+        "title": "Analysis Age"
+      },
+      "analysis_day": {
+        "anyOf": [
+          {
+            "maximum": 31,
+            "minimum": 1,
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Analysis day (1-31)",
+        "title": "Analysis Day"
+      },
+      "analysis_hour": {
+        "anyOf": [
+          {
+            "maximum": 23,
+            "minimum": 0,
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Analysis hour (0-23)",
+        "title": "Analysis Hour"
+      },
+      "analysis_minute": {
+        "anyOf": [
+          {
+            "maximum": 59,
+            "minimum": 0,
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Analysis minute (0-59)",
+        "title": "Analysis Minute"
+      },
+      "analysis_month": {
+        "anyOf": [
+          {
+            "maximum": 12,
+            "minimum": 1,
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Analysis month (1-12)",
+        "title": "Analysis Month"
+      },
+      "analysis_year": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "完全省略全部analysis_*日期分量时，使用本次as_of或执行开始时刻的完整当地瞬间；提供任一日期分量时沿用部分日期规则：缺年/月取当前年/月，缺日取1、缺时分取0。 显式日期的不存在或重复钟时须用有效钟时或明确UTC偏移消歧。",
+        "title": "Analysis Year"
+      },
+      "birth_day": {
+        "description": "Birth day (1-31)",
+        "maximum": 31,
+        "minimum": 1,
+        "title": "Birth Day",
+        "type": "integer"
+      },
+      "birth_hour": {
+        "description": "Birth hour (0-23)",
+        "maximum": 23,
+        "minimum": 0,
+        "title": "Birth Hour",
+        "type": "integer"
+      },
+      "birth_longitude": {
+        "anyOf": [
+          {
+            "maximum": 180,
+            "minimum": -180,
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Birth longitude (optional)",
+        "title": "Birth Longitude"
+      },
+      "birth_minute": {
+        "default": 0,
+        "description": "Birth minute (0-59)",
+        "maximum": 59,
+        "minimum": 0,
+        "title": "Birth Minute",
+        "type": "integer"
+      },
+      "birth_month": {
+        "description": "Birth month (1-12)",
+        "maximum": 12,
+        "minimum": 1,
+        "title": "Birth Month",
+        "type": "integer"
+      },
+      "birth_place": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": "未提供",
+        "description": "Birth place (optional)",
+        "title": "Birth Place"
+      },
+      "birth_second": {
+        "anyOf": [
+          {
+            "maximum": 59,
+            "minimum": 0,
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "已知出生秒数0–59；提供时必须显式提供birth_minute。未知请省略或传null；沿用00秒作为兼容计算参考，并返回省略分量说明，不代表已知出生在整分、不推定误差区间或记录精度。不接受闰秒60。",
+        "title": "Birth Second"
+      },
+      "birth_time_uncertainty_minutes": {
+        "anyOf": [
+          {
+            "maximum": 120,
+            "minimum": 0,
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "仅传用户确认的名义出生参考正负UTC经过分钟范围；保留分钟网格，并补充计算节令、钟面、大运名义月进位与当前分析日附近未来跳时逆像探针。未认证全部连续交运状态或极值。None表示未提供范围，不表示精确生时。",
+        "title": "Birth Time Uncertainty Minutes"
+      },
+      "birth_timezone": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Birth timezone (IANA name or UTC offset)",
+        "title": "Birth Timezone"
+      },
+      "birth_utc_offset": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "已确认的出生民用UTC偏移，格式±HH:MM或±HH:MM:SS；用于消歧重复钟时。必须与解析出的birth_timezone在该钟时的规则一致；不据此猜测时区，不替未知的重复小时选边，不能使跳过的钟时有效。保留原IANA时区用于后续交运边界；不认证出生记录精度。未知请省略或传null。",
+        "title": "Birth Utc Offset"
+      },
+      "birth_year": {
+        "description": "Birth year (1900–2100, the existing individual-birth service range)",
+        "maximum": 2100,
+        "minimum": 1900,
+        "title": "Birth Year",
+        "type": "integer"
+      },
+      "gender": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": "未知",
+        "description": "性别（可选但建议提供：影响大运顺逆排布与部分六亲判断）。接受 男/女、male/female/m/f、阳/阴、乾/坤 等写法。",
+        "title": "Gender"
+      },
+      "name": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": "未提供",
+        "description": "姓名（可选，仅用于结果快照中的标识，不参与计算）",
+        "title": "Name"
+      },
+      "selected_sections": {
+        "description": "Optional snapshot section titles for filtered export payload",
+        "items": {
+          "type": "string"
+        },
+        "title": "Selected Sections",
+        "type": "array"
+      },
+      "use_true_solar_time": {
+        "default": true,
+        "description": "Rebase the birth clock onto true solar time (longitude + equation of time). Default on in the current software policy; this option does not certify a classical text's clock rule. Set false for the raw civil clock.",
+        "title": "Use True Solar Time",
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "birth_year",
+      "birth_month",
+      "birth_day",
+      "birth_hour"
+    ],
+    "title": "TimingAnalysisRequest",
+    "type": "object"
+  },
+  "method_contracts": [
+    {
+      "comparison_requirements": [
+        "相同方法合同、实现与数据版本、选项及实际计算层"
+      ],
+      "dependencies": [
+        "validated_request"
+      ],
+      "error_sources": [
+        "civil_clock",
+        "solar_clock",
+        "calendar_model",
+        "rule_adjudication"
+      ],
+      "implementation_refs": [
+        "src/fatebridge/services/birth_context.py"
+      ],
+      "limitations": [
+        "contract_v1是登记合同版本，不冒充上游原典或数值算法版本；实际版本另列runtime_method_ids",
+        "登记不认证全书、全部历史范围、连续区间稳定或现实预测"
+      ],
+      "method_id": "fatebridge.bazi_natal.contract_v1",
+      "output_paths": [
+        "birth_pillars",
+        "comprehensive_summary"
+      ],
+      "prerequisites": [
+        "请求Schema及领域前提必须成立；条件分支以本次实际回执为准"
+      ],
+      "quantity_kind": "traditional_rule_result",
+      "role": "calculation",
+      "selector_fields": [],
+      "source_refs": [
+        "docs/bazi-assessment.md"
+      ],
+      "unit": "per_field",
+      "validation_scope": {
+        "numerical": "method_specific_reference_required",
+        "real_world_validity": "not_established",
+        "source_conformity": "not_fully_accepted"
+      }
+    },
+    {
+      "comparison_requirements": [
+        "相同方法合同、实现与数据版本、选项及实际计算层"
+      ],
+      "dependencies": [
+        "validated_request"
+      ],
+      "error_sources": [
+        "civil_clock",
+        "solar_clock",
+        "calendar_model",
+        "rule_adjudication"
+      ],
+      "implementation_refs": [
+        "src/fatebridge/services/timing_state.py"
+      ],
+      "limitations": [
+        "contract_v1是登记合同版本，不冒充上游原典或数值算法版本；实际版本另列runtime_method_ids",
+        "登记不认证全书、全部历史范围、连续区间稳定或现实预测"
+      ],
+      "method_id": "fatebridge.bazi_timing_layers.contract_v1",
+      "output_paths": [
+        "birth_pillars",
+        "comprehensive_summary"
+      ],
+      "prerequisites": [
+        "请求Schema及领域前提必须成立；条件分支以本次实际回执为准"
+      ],
+      "quantity_kind": "traditional_rule_result",
+      "role": "calculation",
+      "selector_fields": [],
+      "source_refs": [
+        "docs/bazi-timing.md"
+      ],
+      "unit": "per_field",
+      "validation_scope": {
+        "numerical": "method_specific_reference_required",
+        "real_world_validity": "not_established",
+        "source_conformity": "not_fully_accepted"
+      }
+    }
+  ],
+  "tool": "bazi_timing"
+}

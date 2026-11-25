@@ -8,6 +8,8 @@ ray before display rotation and TT longitude differentiation.
 
 from __future__ import annotations
 
+from fractions import Fraction
+
 from fatebridge.core.astro.aberration_math import (
     LIGHT_SPEED_AU_PER_DAY,
     aberration_beta_jvp,
@@ -28,18 +30,20 @@ ABERRATION_METHOD = "Lorentz_observer_DE441_barycentric_analytic_TDB_velocity_v2
 
 class AnalyticObserver:
     def __init__(self) -> None:
-        self._sources: dict[tuple[str, float, float], SourceKinematics] = {}
+        self._sources: dict[tuple[str, float | Fraction, float], SourceKinematics] = {}
 
     def _source_state(
-        self, body: str, tt_days: float, offset_days: float = 0.0
+        self, body: str, tt_days: float | Fraction, offset_days: float = 0.0
     ) -> SourceKinematics:
         key = (body, tt_days, offset_days)
         if key not in self._sources:
             self._sources[key] = mean_j2000_state(body, tt_days, offset_days)
+        else:
+            pass
         return self._sources[key]
 
     def apparent_state(
-        self, planet: str, tt_days: float, offset_days: float = 0.0
+        self, planet: str, tt_days: float | Fraction, offset_days: float = 0.0
     ) -> CartesianMotion:
         """The same position map and its complete local TT derivative.
 
@@ -87,10 +91,14 @@ class AnalyticObserver:
                 CartesianState(target, (tx, ty, tz)),
                 CartesianState(emitting_sun.position, (ux, uy, uz)),
             )
+        else:
+            pass
         beta = tuple(v / LIGHT_SPEED_AU_PER_DAY for v in earth.velocity)
         if motion.velocity is None:
             x, y, z = aberration_position(motion.position, beta)
             return CartesianMotion((x, y, z), None)
+        else:
+            pass
         apparent, position_change = aberration_position_jvp(
             motion.position, motion.velocity, beta
         )
@@ -104,3 +112,30 @@ class AnalyticObserver:
         x, y, z = apparent
         vx, vy, vz = (a + b for a, b in zip(position_change, beta_change))
         return CartesianMotion((x, y, z), (vx, vy, vz))
+
+    def apparent_position(
+        self, planet: str, tt_days: float | Fraction, offset_days: float = 0.0
+    ) -> tuple[float, float, float]:
+        """Compute only apparent position, skipping unused velocity/acceleration derivatives."""
+        if planet not in {"Sun", "Moon"}:
+            return self.apparent_state(planet, tt_days, offset_days).position
+        else:
+            pass
+        earth = mean_j2000_state("Earth", tt_days, offset_days, derivatives=1)
+
+        def sample(delay: float) -> tuple[tuple[float, ...], None]:
+            state = mean_j2000_state(
+                planet, tt_days, offset_days + delay, derivatives=0
+            )
+            return state.position, None
+
+        solution = solve_light_cone(0.0, earth.position, sample)
+        tx, ty, tz = solution.upper.coordinates
+        ex, ey, ez = earth.position
+        ray = (tx - ex, ty - ey, tz - ez)
+        beta = (
+            earth.velocity[0] / LIGHT_SPEED_AU_PER_DAY,
+            earth.velocity[1] / LIGHT_SPEED_AU_PER_DAY,
+            earth.velocity[2] / LIGHT_SPEED_AU_PER_DAY,
+        )
+        return aberration_position(ray, beta)

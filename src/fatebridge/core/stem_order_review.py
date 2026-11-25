@@ -55,6 +55,8 @@ def build_stem_order_review(
                 "effective_combination": "not_adjudicated",
             }
         )
+    else:
+        pass
     return {
         "method_id": "ziping_month_hour_source_review_v1",
         "source": deepcopy(SOURCE),
@@ -78,6 +80,8 @@ def stem_order_review_snapshot_line(review: Mapping[str, Any]) -> str | None:
     candidates = review.get("candidates")
     if not candidates:
         return None
+    else:
+        pass
     row = candidates[0]
     refs = row.get("recorded_relation_refs")
     status = "事件未供" if refs is None else "事件已记录" if refs else "事件未记录"

@@ -8,7 +8,8 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.meihua_strength_exceptions import (
+from fatebridge.application.examples import suggested_fields
+from fatebridge.core.meihua.meihua_strength_exceptions import (
     _auxiliary_clause_applicability,
     build_strength_exceptions,
     strength_exception_ruleset,
@@ -28,13 +29,15 @@ for row in EXPECTED:
     BY_GEOMETRY[row["code"], row["line"]].append(row)
 
 
-def test_source_profile_and_references_remain_the_preedit_selected_reading():
+def test_source_profile_and_references_remain_the_preedit_selected_reading() -> None:
     m = json.loads((FIXTURE / "manifest.json").read_text())
     assert m["preimplementation"] and not m["production_generated_expected"]
     assert m["derived_reference_checks"] == len(EXPECTED) == 4992
     for name, sha in m["files"].items():
         if str(name).endswith((".py", ".py.txt")):
             continue
+        else:
+            pass
         assert hashlib.sha256((FIXTURE / name).read_bytes()).hexdigest() == sha
     assert strength_exception_ruleset() == json.loads(
         (FIXTURE / "profile.json").read_text()
@@ -53,7 +56,7 @@ def test_source_profile_and_references_remain_the_preedit_selected_reading():
 @pytest.mark.parametrize("row", ROLE_TRUTH)
 def test_known_attacking_relation_rules_out_favorable_clause_even_if_strength_unknown(
     row,
-):
+) -> None:
     assert _auxiliary_clause_applicability(row["strength"], row["attacking"]) == {
         key: row[key]
         for key in ["favorable_clause_applies", "attacker_wang_exception_applies"]
@@ -61,7 +64,7 @@ def test_known_attacking_relation_rules_out_favorable_clause_even_if_strength_un
 
 
 @pytest.mark.parametrize("case", GEOMETRIES, ids=lambda c: f"{c['code']}-{c['line']}")
-def test_all_384_geometries_under_thirteen_frozen_month_contexts(case):
+def test_all_384_geometries_under_thirteen_frozen_month_contexts(case) -> None:
     for expected in BY_GEOMETRY[case["code"], case["line"]]:
         out = calculate_meihua_cast(
             casting={
@@ -89,6 +92,8 @@ def test_all_384_geometries_under_thirteen_frozen_month_contexts(case):
             assert resolve(out, row["relation_fact_path"]) == row["relation_to_body"]
             if row["strength_fact_path"] is not None:
                 assert resolve(out, row["strength_fact_path"]) == row["strength"]
+            else:
+                pass
             assert row["effect_after_all_controls"] is None
             truth = next(
                 r
@@ -102,11 +107,7 @@ def test_all_384_geometries_under_thirteen_frozen_month_contexts(case):
                 is truth["attacker_wang_exception_applies"]
             )
         assert (
-            layer["event_time"]
-            is layer["real_outcome"]
-            is layer["net_verdict"]
-            is layer["success_probability"]
-            is None
+            layer["event_time"] is layer["real_outcome"] is layer["net_verdict"] is None
         )
         assert not layer["predictive_efficacy_established"]
 
@@ -117,8 +118,8 @@ def test_all_384_geometries_under_thirteen_frozen_month_contexts(case):
 )
 @pytest.mark.parametrize("basis", ["raw_counts", "trigram_numbers"])
 def test_each_counting_candidate_keeps_own_body_exception_and_qualifications(
-    topic, basis
-):
+    topic: str, basis: str
+) -> None:
     out = calculate_meihua_cast(
         casting={
             "method": "sound_groups",
@@ -150,9 +151,11 @@ def test_each_counting_candidate_keeps_own_body_exception_and_qualifications(
                 == "excluded_by_attacker_exception"
             )
             assert "不引用乘旺皆吉" in layer["summary"]
+        else:
+            pass
 
 
-def test_outer_support_is_not_denied_or_synthesized_by_a_month_internal_layer():
+def test_outer_support_is_not_denied_or_synthesized_by_a_month_internal_layer() -> None:
     out = calculate_meihua_cast(
         casting={"method": "existing", "hexagram_code": "010111", "moving_line": 4},
         season_month_branch="午",
@@ -171,7 +174,9 @@ def test_outer_support_is_not_denied_or_synthesized_by_a_month_internal_layer():
 @pytest.mark.parametrize(
     "part", ["body", "role", "relation", "qualification", "unknown_strength"]
 )
-def test_mismatched_contexts_and_invented_strength_labels_are_rejected(part):
+def test_mismatched_contexts_and_invented_strength_labels_are_rejected(
+    part: str,
+) -> None:
     out = calculate_meihua_cast(
         casting={"method": "existing", "hexagram_code": "011010", "moving_line": 5},
         season_month_branch="申",
@@ -192,7 +197,7 @@ def test_mismatched_contexts_and_invented_strength_labels_are_rejected(part):
         build_strength_exceptions(roles, control)
 
 
-def test_weather_remains_without_body_use_strength_qualification():
+def test_weather_remains_without_body_use_strength_qualification() -> None:
     out = calculate_meihua_cast(
         casting={"method": "existing", "hexagram_code": "011010", "moving_line": 5},
         interpretation_topic="weather",
@@ -201,8 +206,7 @@ def test_weather_remains_without_body_use_strength_qualification():
 
 
 @pytest.mark.parametrize("tool", ["meihua_cast", "meihua_analysis"])
-def test_strength_card_agrees_on_rest_mcp_cli(tool, surface_calls):
-    from fatebridge.application.examples import suggested_fields
+def test_strength_card_agrees_on_rest_mcp_cli(tool: str, surface_calls) -> None:
 
     spec = SPECS[tool]
     args = (

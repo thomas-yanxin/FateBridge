@@ -9,15 +9,15 @@ from pathlib import Path
 import pytest
 
 from fatebridge.application.execution import execute_tool
-from fatebridge.core.human_design import bodygraph, longitude_activation
-from fatebridge.core.human_design_gate_context import (
+from fatebridge.core.human_design.human_design import bodygraph, longitude_activation
+from fatebridge.core.human_design.human_design_gate_context import (
     classify_gate_context,
     gate_context_report,
     source_records,
 )
 from fatebridge.core.public_output import same_public_value
 from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.validation.human_design import verify_human_design_reading
+from validation.human_design import verify_human_design_reading
 
 FIXTURE = Path(__file__).parents[1] / "data/human_design/gate_context"
 PLAN = json.loads((FIXTURE / "plan.json").read_text())
@@ -25,7 +25,7 @@ REFERENCE = json.loads(gzip.decompress((FIXTURE / "reference.json.gz").read_byte
 SPEC = next(s for s in CATALOG if s.key == "human_design")
 
 
-def test_preimplementation_plan_reference_and_source_disagreement_are_frozen():
+def test_preimplementation_plan_reference_and_source_disagreement_are_frozen() -> None:
     assert (
         hashlib.sha256((FIXTURE / "hashes.json").read_bytes()).hexdigest()
         == "c72404645445dd31bfe23a666efc66bf9b98e544d23e34e8864f8ab76fc3196a"
@@ -47,7 +47,9 @@ def test_preimplementation_plan_reference_and_source_disagreement_are_frozen():
 
 
 @pytest.mark.parametrize("start", range(0, 3339, 128))
-def test_every_original_graph_matches_the_independent_source_table_reference(start):
+def test_every_original_graph_matches_the_independent_source_table_reference(
+    start,
+) -> None:
     for case, fact in zip(
         PLAN["cases"][start : start + 128],
         REFERENCE["cases"][start : start + 128],
@@ -69,7 +71,7 @@ def test_every_original_graph_matches_the_independent_source_table_reference(sta
         )
 
 
-def test_both_published_hanging_conventions_are_kept_for_single_dormant_gate():
+def test_both_published_hanging_conventions_are_kept_for_single_dormant_gate() -> None:
     graph = bodygraph([20], [])
     context = classify_gate_context([20], [])
     assert graph["hanging_gates"] == context["broad_unpaired_activated_gates"] == [20]
@@ -78,7 +80,7 @@ def test_both_published_hanging_conventions_are_kept_for_single_dormant_gate():
     assert graph["type"] == "reflector" and graph["channels"] == []
 
 
-def test_shared_integration_gate_keeps_completed_and_uncompleted_connections():
+def test_shared_integration_gate_keeps_completed_and_uncompleted_connections() -> None:
     context = classify_gate_context([10], [20])
     row = next(r for r in context["gates"] if r["gate"] == 10)
     assert row["completed_channel_pairs"] == [[10, 20]]
@@ -87,7 +89,7 @@ def test_shared_integration_gate_keeps_completed_and_uncompleted_connections():
     assert context["broad_unpaired_activated_gates"] == []
 
 
-def test_every_witness_uses_its_own_gate_union_and_actual_array_sources():
+def test_every_witness_uses_its_own_gate_union_and_actual_array_sources() -> None:
     def chart(p, d):
         return {
             "activations": {
@@ -119,7 +121,9 @@ def test_every_witness_uses_its_own_gate_union_and_actual_array_sources():
     )
 
 
-def test_three_frozen_public_sources_do_not_become_an_original_manuscript_claim():
+def test_three_frozen_public_sources_do_not_become_an_original_manuscript_claim() -> (
+    None
+):
     identities = json.loads((FIXTURE / "source-identities.json").read_text())
     for record, key in zip(
         source_records(), ["dictionary", "broad-2025", "narrow-2026"], strict=True
@@ -129,7 +133,9 @@ def test_three_frozen_public_sources_do_not_become_an_original_manuscript_claim(
     assert "AI-assisted" in source_records()[1]["attribution"]
 
 
-def test_public_longitude_example_disagreement_is_retained_without_changing_the_engine():
+def test_public_longitude_example_disagreement_is_retained_without_changing_the_engine() -> (
+    None
+):
     record = json.loads((FIXTURE / "longitude-source-disagreement.json").read_text())
     assert record["status"] == "unresolved_public_example_disagreement"
     assert record["current_public_page_claimed_gate"] == 25
@@ -165,7 +171,7 @@ def complete():
 
 def test_complete_reading_keeps_old_statement_count_and_verifies_new_context_block(
     complete,
-):
+) -> None:
     check = verify_human_design_reading(complete)
     assert check["status"] == "verified_fixed_template_reading", check
     assert check["checked_statement_count"] == 10
@@ -178,7 +184,9 @@ def test_complete_reading_keeps_old_statement_count_and_verifies_new_context_blo
     )
 
 
-def test_json_object_sorting_never_changes_complete_context_verification(complete):
+def test_json_object_sorting_never_changes_complete_context_verification(
+    complete,
+) -> None:
     sorted_value = json.loads(json.dumps(complete, sort_keys=True))
     check = verify_human_design_reading(sorted_value)
     assert check["status"] == "verified_fixed_template_reading", check
@@ -191,27 +199,37 @@ def test_json_object_sorting_never_changes_complete_context_verification(complet
     ["all_regions", "report", "reading", "ruleset", "trace", "unknown_contract"],
 )
 def test_current_or_unknown_contract_cannot_drop_extension_after_rehash(
-    complete, fault
-):
+    complete, fault: str
+) -> None:
     value = copy.deepcopy(complete)
     if fault in ("all_regions", "report", "unknown_contract"):
         value.pop("gate_activation_context")
+    else:
+        pass
     if fault in ("all_regions", "reading", "unknown_contract"):
         value["interpretation"].pop("gate_activation_context")
+    else:
+        pass
     if fault in ("all_regions", "ruleset", "unknown_contract"):
         value["rulesets"] = [
             r
             for r in value["rulesets"]
             if r.get("id") != "human_design_gate_activation_context_v1"
         ]
+    else:
+        pass
     if fault in ("all_regions", "trace", "unknown_contract"):
         value["rule_trace"] = [
             r
             for r in value["rule_trace"]
             if r.get("rule_id") != "human_design_gate_activation_context_v1"
         ]
+    else:
+        pass
     if fault == "unknown_contract":
         value["run_metadata"]["contract_sha256"] = "0" * 64
+    else:
+        pass
     check = verify_human_design_reading(value)
     assert check["status"] == "rejected", check
     assert check["gate_activation_context_status"] == "not_verified"
@@ -234,8 +252,8 @@ def test_current_or_unknown_contract_cannot_drop_extension_after_rehash(
     ],
 )
 def test_rehashing_does_not_accept_false_states_sources_or_cross_witness_explanations(
-    complete, fault
-):
+    complete, fault: str
+) -> None:
     value = copy.deepcopy(complete)
     report = value["gate_activation_context"]
     nominal = report["nominal"]

@@ -5,15 +5,19 @@ import json
 import pytest
 
 from fatebridge.application.examples import suggested_fields
-from fatebridge.core.output_chinese import Taiyi
+from fatebridge.core.contracts.output_chinese import Taiyi
 from scripts.taiyi.audit_taiyi_origin_selection import (
+    CORPUS,
     calculate,
     inputs,
     inspect,
     native_inputs,
     references,
 )
-from tests.support.transports import AS_OF, SPECS, business, rest, surface_calls
+from scripts.taiyi.audit_taiyi_solar_guard import calculate as call
+from tests.support.transports import AS_OF, SPECS, business
+from tests.support.transports import rest as rest
+from tests.support.transports import surface_calls as surface_calls
 
 ROWS = references()
 
@@ -25,7 +29,7 @@ def pinned_native_data():
 
 
 @pytest.mark.parametrize("row", ROWS, ids=lambda row: row["id"])
-def test_original_declared_numeric_policy_and_new_selection_receipt(row):
+def test_original_declared_numeric_policy_and_new_selection_receipt(row) -> None:
     result = calculate(row)
     checked = inspect(result, row)
     assert checked["numeric_control_passed"], checked
@@ -48,20 +52,21 @@ def test_original_declared_numeric_policy_and_new_selection_receipt(row):
 )
 def test_solar_labels_keep_the_same_actual_selection_lineage_without_claiming_a_new_clock_oracle(
     row,
-):
+) -> None:
     result = calculate(row, solar=True)
     assert inspect(result, row, solar=True)["fidelity_receipt_passed"]
 
 
 @pytest.mark.parametrize("tool", ["taiyi", "sanshiunited"])
 @pytest.mark.parametrize("mode", ["year", "month", "hour"])
-def test_unrelated_profiles_do_not_fabricate_winter_jiazi_selection(tool, mode):
+def test_unrelated_profiles_do_not_fabricate_winter_jiazi_selection(
+    tool: str, mode: str
+) -> None:
     row = next(r for r in ROWS if r["year"] == 2026 and r["tool"] == tool)
     values = inputs(row)
     options = values if tool == "taiyi" else values["taiyi_options"]
     options["calculation_mode"] = mode
     options.pop("hour_profile", None)
-    from scripts.taiyi.audit_taiyi_solar_guard import calculate as call
 
     result = call(tool, values)
     assert "winter_origin_selection" not in result["taiyi"]
@@ -80,7 +85,9 @@ TRANSPORT_ROWS = [
 
 
 @pytest.mark.parametrize("row", TRANSPORT_ROWS, ids=lambda r: r["id"])
-def test_selection_view_on_all_three_transports(row, surface_calls):
+def test_selection_view_on_all_three_transports(
+    row, surface_calls  # noqa: F811 - pytest resolves the imported fixture by name.
+) -> None:
     tool = row["tool"]
     spec = SPECS[tool]
     values = inputs(row)
@@ -106,8 +113,7 @@ def test_selection_view_on_all_three_transports(row, surface_calls):
         assert selected["count_origin_clock"] == row["expected_count_origin_clock"]
 
 
-def test_reference_math_is_not_a_classical_activation_decision():
-    from scripts.taiyi.audit_taiyi_origin_selection import CORPUS
+def test_reference_math_is_not_a_classical_activation_decision() -> None:
 
     phase = json.loads((CORPUS / "phase-reference.json").read_text())
     assert phase["cases"] == 120

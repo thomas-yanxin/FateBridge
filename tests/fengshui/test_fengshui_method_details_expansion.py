@@ -22,9 +22,11 @@ def walk_records(value):
     elif isinstance(value, list):
         for item in value:
             yield from walk_records(item)
+    else:
+        pass
 
 
-def test_all_reference_sources_have_inspectable_version_and_locator():
+def test_all_reference_sources_have_inspectable_version_and_locator() -> None:
     details = method_details()
     provenance = method_reference_provenance()
     Ruleset.model_validate(provenance)
@@ -50,6 +52,8 @@ def test_all_reference_sources_have_inspectable_version_and_locator():
     for record in walk_records(details):
         if "source_ids" in record:
             assert set(record["source_ids"]) <= set(sources)
+        else:
+            pass
     assert sources["MEIHUA_TRIGRAM_SYMBOLS"]["kind"].startswith("cross_text_")
     assert "oldid=2690596" in sources["MEIHUA_TRIGRAM_SYMBOLS"]["url"]
     assert sources["JOEY_YAP_2018_STAR_THEMES"]["kind"].startswith(
@@ -58,7 +62,7 @@ def test_all_reference_sources_have_inspectable_version_and_locator():
     assert "二十山" in sources["CHEN_YIFENG_FORM_COMMENTARY"]["title"]
 
 
-def test_actual_arriving_star_routes_independently_of_fixed_direction():
+def test_actual_arriving_star_routes_independently_of_fixed_direction() -> None:
     result = assess(scene="home", methods=["annual_stars"], effective_year=2026)
     details = result["method_details"]
     north = result["layers"]["annual_stars"]["palaces"]["N"]
@@ -76,7 +80,9 @@ def test_actual_arriving_star_routes_independently_of_fixed_direction():
     assert list(result["layers"]) == ["annual_stars"]
 
 
-def test_nine_star_entries_cover_symbols_without_inventing_a_ninth_family_role():
+def test_nine_star_entries_cover_symbols_without_inventing_a_ninth_family_role() -> (
+    None
+):
     details = method_details()
     stars = details["flying_star_references"]
     assert set(stars) == {str(i) for i in range(1, 10)}
@@ -92,13 +98,15 @@ def test_nine_star_entries_cover_symbols_without_inventing_a_ninth_family_role()
             assert symbols["family_symbol_scope"].endswith(
                 "not_actual_household_identity"
             )
+        else:
+            pass
     assert stars["5"]["symbolic_trigram"] is None
     assert stars["5"]["symbolic_person_and_object_reference"] is None
     assert stars["5"]["profession_reference"]["examples"] == []
     assert details["palaces"]["C"]["cross_text_symbol_reference"] is None
 
 
-def test_classical_roles_and_modern_profession_examples_keep_distinct_sources():
+def test_classical_roles_and_modern_profession_examples_keep_distinct_sources() -> None:
     details = method_details()
     symbols = details["cross_text_trigram_symbols"]
     assert "舟人" in symbols["坎"]["ancient_role_symbols"]
@@ -134,7 +142,7 @@ def test_classical_roles_and_modern_profession_examples_keep_distinct_sources():
     assert "meihua_preheaven_numbers" in symbols["坎"]["not_imported"]
 
 
-def test_bazhai_shared_star_names_do_not_reuse_flying_star_elements():
+def test_bazhai_shared_star_names_do_not_reuse_flying_star_elements() -> None:
     details = method_details(["bazhai"])
     assert list(details["methods"]) == ["bazhai"]
     assert details["bazhai_you_nian_references"]["生气"]["element"] == "木"
@@ -155,7 +163,9 @@ def test_bazhai_shared_star_names_do_not_reuse_flying_star_elements():
     assert "不从旋钮、电线或厨门猜向" in stove["engine_scope"]
 
 
-def test_sand_water_and_furniture_references_request_facts_without_classifying():
+def test_sand_water_and_furniture_references_request_facts_without_classifying() -> (
+    None
+):
     details = method_details(["jinsuo"])
     for reference in details["object_observation_references"]:
         assert reference["classification"] == "requires_independent_confirmation"
@@ -173,7 +183,7 @@ def test_sand_water_and_furniture_references_request_facts_without_classifying()
     assert method_details([])["methods"] == {}
 
 
-def test_shape_symbols_do_not_become_afsi_material_or_placement_prescriptions():
+def test_shape_symbols_do_not_become_afsi_material_or_placement_prescriptions() -> None:
     details = method_details()
     material = details["material_shape_reference"]
     sources = {s["source_id"] for s in details["ruleset"]["sources"]}
@@ -192,7 +202,7 @@ def test_shape_symbols_do_not_become_afsi_material_or_placement_prescriptions():
     assert "processed_wood" not in material["materials"]
 
 
-def test_expansion_does_not_change_calculation_or_add_sourced_advice():
+def test_expansion_does_not_change_calculation_or_add_sourced_advice() -> None:
     raw = assess(methods=["annual_stars"], effective_year=2026)
     expanded = assess(scene="home", methods=["annual_stars"], effective_year=2026)
     assert raw["layers"] == expanded["layers"]
@@ -212,7 +222,7 @@ def test_expansion_does_not_change_calculation_or_add_sourced_advice():
         ("methods", "bazhai", "application_references", "references"),
     ],
 )
-def test_expanded_nested_data_is_isolated_between_calls(path):
+def test_expanded_nested_data_is_isolated_between_calls(path) -> None:
     original = method_details()
     changed = original
     for key in path:

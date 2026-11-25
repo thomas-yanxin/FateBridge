@@ -15,7 +15,7 @@ SPEC = next(s for s in CATALOG if s.key == "meihua_analysis")
 
 
 @pytest.mark.parametrize("row", PARSER, ids=lambda r: r["text"])
-def test_parsed_offset_and_instant_match_independent_literals(row):
+def test_parsed_offset_and_instant_match_independent_literals(row) -> None:
     at = _clock_datetime(row["text"], "frozen_parser", aware=row["aware"])
     if row["aware"]:
         assert at.astimezone(timezone.utc).isoformat() == row["expected_UTC"]
@@ -34,6 +34,8 @@ def test_parsed_offset_and_instant_match_independent_literals(row):
         ("2020-06-15T12:34:56Z", False),
     ],
 )
-def test_parser_retains_type_and_awareness_rejections(text, aware):
+def test_parser_retains_type_and_awareness_rejections(
+    text: int | str | None, aware: bool
+) -> None:
     with pytest.raises((ValueError, TypeError)):
         _clock_datetime(text, "invalid", aware=aware)

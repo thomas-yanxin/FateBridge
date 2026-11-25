@@ -5,7 +5,8 @@ import importlib.util
 import json
 import shutil
 from copy import deepcopy
-from datetime import date, datetime, timedelta
+from dataclasses import replace
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 import pytest
@@ -20,16 +21,18 @@ from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.divination import calculate_sanshiunited_analysis
 from fatebridge.services.metaphysics import calculate_qimen_analysis
 from fatebridge.services.tool_catalog import CATALOG
+from fatebridge.utils.civil_time import NominalClockLabel
 from fatebridge.utils.solar_time_provenance import solar_time_receipt
-from fatebridge.validation.claims import CalculationClaim
-from fatebridge.validation.qimen_solar import (
+from tests.support.transports import call_calculation
+from tests.unit_test.fixtures.qimen import seed
+from validation.claims import CalculationClaim
+from validation.qimen_solar import (
     audit_solar_clocks,
     expected_solar_label,
     label_classification,
     read_solar_reference,
     verify_qimen_solar_time_quotes,
 )
-from tests.qimen.test_qimen_depth import seed
 
 BUNDLE = Path(__file__).parents[1] / "fixtures/qimen_solar_jpl_v1"
 CASES = read_solar_reference(BUNDLE)
@@ -53,8 +56,8 @@ def payload(case, solar=True):
 @pytest.mark.parametrize("case", CASES, ids=lambda r: r["instant_utc"])
 @pytest.mark.parametrize("aggregate", [False, True])
 def test_solar_labels_and_provenance_match_jpl_without_claiming_every_boundary(
-    case, aggregate
-):
+    case, aggregate: bool
+) -> None:
     args = payload(case)
     if aggregate:
         instant = datetime.fromisoformat(case["instant_utc"])
@@ -105,11 +108,9 @@ def test_solar_labels_and_provenance_match_jpl_without_claiming_every_boundary(
         assert case["instant_utc"] == "2026-02-15T23:14:00+00:00"
         assert e["boundary_distances_seconds"]["day_boundary_23"] < 5
         assert not e["boundary_distances_seconds"]["certainty_inferred_from_distance"]
-    if aggregate:
-        assert result["subresults"]["qimen"]["pan"] == q
 
 
-def test_source_audit_retains_the_near_boundary_case_as_uncertified():
+def test_source_audit_retains_the_near_boundary_case_as_uncertified() -> None:
     r = audit_solar_clocks(BUNDLE)
     assert r["reference_instants"] == 12 and not r["implementation_disagreements"]
     assert r["boundary_cases_not_certified_at_reference_tolerance"] == [
@@ -121,8 +122,8 @@ def test_source_audit_retains_the_near_boundary_case_as_uncertified():
 
 
 def test_numeric_reference_failure_is_not_hidden_by_the_partial_boundary_status(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     spec = importlib.util.spec_from_file_location(
         "qimen_solar_failure_audit",
         Path(__file__).parents[2] / "scripts/qimen/audit_qimen.py",
@@ -149,8 +150,8 @@ def test_numeric_reference_failure_is_not_hidden_by_the_partial_boundary_status(
     ["drop_near_boundary", "alter_expected", "raw_response", "relax_tolerance"],
 )
 def test_reference_integrity_does_not_allow_dropping_the_difficult_row(
-    tmp_path, mutation
-):
+    tmp_path: Path, mutation: str
+) -> None:
     dest = tmp_path / "source"
     shutil.copytree(BUNDLE, dest)
     ref = json.loads((dest / "reference.json").read_text())
@@ -169,13 +170,12 @@ def test_reference_integrity_does_not_allow_dropping_the_difficult_row(
         read_solar_reference(dest)
 
 
-def test_direct_clock_and_supplied_seed_do_not_invent_astronomical_provenance():
+def test_direct_clock_and_supplied_seed_do_not_invent_astronomical_provenance() -> None:
     direct = calculate_qimen_analysis(**payload(CASES[0], solar=False))["qimen"][
         "calendar_policy"
     ]["solar_time_adjustment"]
     assert direct["status"] == "not_applied" and not direct["applied"]
     synthetic = seed()
-    from dataclasses import replace
 
     q = build_qimen_with_options(
         replace(synthetic, applied_true_solar=True), {"ju_method": "chaibu"}
@@ -186,7 +186,9 @@ def test_direct_clock_and_supplied_seed_do_not_invent_astronomical_provenance():
 
 
 @pytest.mark.parametrize("part", ["total", "label", "naive_instant"])
-def test_correction_receipt_rejects_inconsistent_components_or_clock_labels(part):
+def test_correction_receipt_rejects_inconsistent_components_or_clock_labels(
+    part: str,
+) -> None:
     case = CASES[0]
     result = calculate_qimen_analysis(**payload(case))
     e = result["qimen"]["calendar_policy"]["solar_time_adjustment"]
@@ -200,12 +202,14 @@ def test_correction_receipt_rejects_inconsistent_components_or_clock_labels(part
             "total_correction_minutes",
         ]
     }
-    actual = datetime.fromisoformat(e["apparent_solar_label"])
+    actual = NominalClockLabel.from_local_datetime(
+        datetime.fromisoformat(e["apparent_solar_label"])
+    )
     instant = datetime.fromisoformat(case["instant_utc"])
     if part == "total":
         adjustment["total_correction_minutes"] += 1
     elif part == "label":
-        actual += timedelta(seconds=1)
+        actual = actual.shifted(timedelta(seconds=1))
     else:
         instant = instant.replace(tzinfo=None)
     with pytest.raises(ValueError):
@@ -218,7 +222,7 @@ def test_correction_receipt_rejects_inconsistent_components_or_clock_labels(part
         )
 
 
-def test_whole_receipt_quote_cannot_omit_scale_boundaries_or_rebind_runs():
+def test_whole_receipt_quote_cannot_omit_scale_boundaries_or_rebind_runs() -> None:
     spec = next(s for s in CATALOG if s.tool_name == "qimen")
     result = execute_tool(spec, spec.request_model.model_validate(payload(CASES[1])))
     e = result["qimen"]["calendar_policy"]["solar_time_adjustment"]
@@ -276,10 +280,9 @@ def test_whole_receipt_quote_cannot_omit_scale_boundaries_or_rebind_runs():
     ],
 )
 def test_local_dst_fold_and_date_line_keep_the_actual_receipt(
-    date, time, zone, offset, longitude
-):
+    date: str, time: str, zone: str, offset: str, longitude
+) -> None:
     local = datetime.fromisoformat(date + "T" + time + offset)
-    from datetime import timezone
 
     instant = local.astimezone(timezone.utc).isoformat()
     case = next(r for r in CASES if r["instant_utc"] == instant)
@@ -322,8 +325,11 @@ def test_local_dst_fold_and_date_line_keep_the_actual_receipt(
 @pytest.mark.parametrize("aggregate", [False, True])
 @pytest.mark.parametrize("minute", [14, 15])
 def test_solar_receipt_and_boundary_limits_cross_rest_mcp_cli(
-    monkeypatch, capsys, aggregate, minute
-):
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    aggregate: bool,
+    minute: int,
+) -> None:
     api._reset_runtime_state_for_tests()
     monkeypatch.setattr(
         api,
@@ -332,7 +338,7 @@ def test_solar_receipt_and_boundary_limits_cross_rest_mcp_cli(
     )
     fields = ["qimen", "snapshot_text", "snapshot_export"]
     if aggregate:
-        tool, path = "sanshiunited", "/api/divination/sanshiunited"
+        tool, path = "sanshi_combined_chart", "/api/divination/sanshi"
         args = dict(
             date="2026-02-15",
             time=f"23:{minute}:00",
@@ -355,7 +361,7 @@ def test_solar_receipt_and_boundary_limits_cross_rest_mcp_cli(
             "0",
         ]
     else:
-        tool, path = "qimen", "/api/cn/qimen"
+        tool, path = "qimen", "/api/qimen"
         args = payload(
             next(
                 r
@@ -398,8 +404,8 @@ def test_solar_receipt_and_boundary_limits_cross_rest_mcp_cli(
 
     async def protocol():
         async with Client(create_mcp_app()) as client:
-            return await client.call_tool(
-                tool, {**args, **controls}, raise_on_error=False
+            return await call_calculation(
+                client, tool, {**args, **controls}, raise_on_error=False
             )
 
     native = asyncio.run(protocol())

@@ -43,7 +43,7 @@ export FATEBRIDGE_SOLAR_TERM_MODEL=swiss
 
 当前数值门槛为与固定 DE440 参考比较的1秒 TT，参考输入与原数值见 96点当前参考（本地 `tests/data/solar/de440-guard-tt.json`）。原版 Swiss Moshier 同一队列的12项失败继续单列；FateBridge内置DE441按独立身份验收，不将旧模型失败改判。
 
-当前原生求根使用 `native_swiss_tt_solar_bisection_v2`：返回首个达到或越过目标太阳黄经的可表示 TT 浮点点，其前一浮点点仍在交点之前，策略为 `first_post_crossing_tt_float`。这是同一太阳模型数值方程的边界取点约定，不修正星历系数，也不把浮点分辨率当作物理精度。实现见 [`almanac.py`](../src/fatebridge/core/almanac.py)，当前前后侧验证见 [`test_native_solar_crossing_side.py`](../tests/integration/test_ci_regressions.py)。
+当前原生求根使用 `native_swiss_tt_solar_bisection_v2`：返回首个达到或越过目标太阳黄经的可表示 TT 浮点点，其前一浮点点仍在交点之前，策略为 `first_post_crossing_tt_float`。这是同一太阳模型数值方程的边界取点约定，不修正星历系数，也不把浮点分辨率当作物理精度。实现见 [`almanac.py`](../src/fatebridge/core/almanac.py)，当前前后侧验证见 [`test_ci_regressions.py`](../tests/integration/test_ci_regressions.py)。
 
 ## 内置 DE441 太阳回退
 
@@ -51,9 +51,13 @@ export FATEBRIDGE_SOLAR_TERM_MODEL=swiss
 
 新路径复用已有 [`de441_source.py`](../src/fatebridge/core/astro/de441_source.py)、[`AnalyticObserver`](../src/fatebridge/core/astro/analytic_observer.py) 和公共日期框架，同一原始网格上的DE441地月质心、地心月球、EMRAT及质心太阳共同提供接收地球和发射太阳。完整地心Fairhead模型将TT映射到TDB，小光行时偏移保持双部精度；相邻本地TT光锥求解与Lorentz光行差作用于同一条光线。Vondrák长周期岁差、标量黄赤交角、完整Simon77项章动及IAU2006偏置沿用具名原生框架。源码入口为 [`de441_solar.py`](../src/fatebridge/core/de441_solar.py)，没有新拟合、逐年补偿或参考交点运行时依赖。
 
-载入的是FateBridge保留JPL原网格及系数槽的有界整数表示，不能写成运行时载入了完整JPL文件或逐位保留原double。内部回执分别绑定系数清单、原始准备文件、TDB、日期框架和章动；每块系数保持既有字节校验。没有借用被替代的原生太阳返回旗标，`ephemeris_retflags`为空。物理模型、数值求根和民用钟时分别说明。
+运行时读取从原始 DE441 网格裁出的有界分块，所选系数按原 binary64 字保留。内部回执区分完整 JPL 文件与包内表示，并分别绑定系数清单、原始准备文件、TDB、日期框架和章动。每块系数都有字节校验，内置回退的 `ephemeris_retflags` 为空。 [原始系数与同源状态对照](precision-acceptance.md#原始de441系数的完整保真与同源状态对照r35)
 
-独立原始JPL摘录由CALCEPH5.0.1和Swiss原生JPL读取器分别求值，九个控制点的地球／太阳与内置源最大差约0.48毫米，符合已声明的系数表示尺度。独立读取器之间最大约0.034毫米；相同几何定义下，Swiss压缩文件与原记录在这些点最大相差约761米。实际JPL读取必须核对返回JPLEPH旗标：本次发现完整路径配置静默回退Swiss文件，改用对应目录加文件名并逐项核对后才采为原始JPL参考。不能仅凭配置称来源已使用。
+早期整数表示的九个控制点由 CALCEPH 5.0.1 和 Swiss 原生 JPL 读取器对照，内置地球和太阳位置与原文件最大差约 0.48 毫米。两个读取器之间最大差约 0.034 毫米，同几何定义下 Swiss 压缩文件与原记录最大差约 761 米。原始 JPL 参考使用已确认返回 `JPLEPH` 旗标的文件配置。 [Swiss 返回旗标说明](https://www.astro.com/swisseph/swephprg.htm#_Toc112949031)
+
+<a id="de441-fallback-source-selection-round58"></a>
+
+`native` 缓存键使用可能回退的包内来源身份。实际选中 DE441 后，计算再读取并校验所用字节。固定缺失和损坏两臂中，Swiss 文件齐备时恢复两张 2000 年年表的 48 个节气和 6 个河洛三端响应，分别与无故障时逐值相同。实际选用 DE441 时，清单、所用分块和 TDB 注入保留原来源拒绝。固定 72 根继续通过原始 JPL 系数经 CALCEPH、Skyfield 和 ERFA 求根的 1 秒 TT、0.001 角秒两项门槛，最大差分别为 40.233 微秒和 `1.64e-6` 角秒。该样本覆盖显式 `native` 及实际消费的 DE441 路径。 [固定前后对照](historical-evidence.md#evidence-20261119-round58-numerology-source-failures-fixed-comparison-json) · [JPL 原作者说明](https://ssd.jpl.nasa.gov/doc/de440_de441.html)
 
 [独立参考包](../tests/data/solar_de441_v1/README.md)包含1684—2304年全部14904项及原1200年小寒。维护的生成器独立安装CALCEPH／Skyfield，按每月15日前后30个TT日括区，实际计算原始JPL光行时、引力偏折、光行差和同定义框架；未导入FateBridge，也未用其根作起点。全部事件及控制点的当前源码／安装包正向视黄经最大差约0.000000396角秒，原0.001角秒线全部符合；实际根与独立CALCEPH／Skyfield最大相差一个TT浮点间隔，约40.233微秒。对原生原始JPL的最大差约1.730毫秒，包含其TT数值参数与TDB来源时标处理差异。这不是全连续域或观测证书。
 

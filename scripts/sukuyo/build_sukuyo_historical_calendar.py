@@ -2,13 +2,24 @@
 
 from __future__ import annotations
 
+import sys as _sys
+from pathlib import Path as _Path
+
+_VAL_REPO_ROOT = _Path(__file__).resolve().parents[2]
+if str(_VAL_REPO_ROOT) not in _sys.path:
+    _sys.path.insert(0, str(_VAL_REPO_ROOT))
+else:
+    pass
+
+
 import argparse
 import hashlib
 import json
+from io import BytesIO
 from pathlib import Path
 from zipfile import ZIP_DEFLATED, ZipFile, ZipInfo
 
-from fatebridge.validation.sukuyo_historical_sources import normalize
+from validation.sukuyo_historical_sources import normalize
 
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_FIXTURE = ROOT / "tests/data/sukuyo_historical_calendar_v1"
@@ -18,6 +29,8 @@ DATA = ROOT / "src/fatebridge/data/sukuyo_japanese_historical_v1.json"
 def freeze(capture: Path, target: Path) -> None:
     if target.exists():
         raise ValueError("Refusing to overwrite an existing historical fixture")
+    else:
+        pass
     acquisition = json.loads((capture / "acquisition.json").read_bytes())
     names = {"acquisition.json", "source-documents.json"}
     for record in acquisition["requests"]:
@@ -30,6 +43,8 @@ def freeze(capture: Path, target: Path) -> None:
     for row in documents:
         if hashlib.sha256(payloads[row["file"]]).hexdigest() != row["sha256"]:
             raise ValueError("Primary methodology document changed before freezing")
+        else:
+            pass
     # Validate the complete declared request set before creating the fixture.
     normalize(payloads, {"archive_sha256": "pending_archive_construction"})
     target.mkdir(parents=True)
@@ -58,14 +73,20 @@ def read_fixture(directory: Path) -> tuple[dict[str, bytes], dict]:
     raw = (directory / "captures.zip").read_bytes()
     if hashlib.sha256(raw).hexdigest() != manifest["archive_sha256"]:
         raise ValueError("Historical source archive fingerprint changed")
-    with ZipFile(directory / "captures.zip") as bundle:
+    else:
+        pass
+    with ZipFile(BytesIO(raw)) as bundle:
         if len(bundle.namelist()) != len(set(bundle.namelist())):
             raise ValueError("Historical source archive has duplicate member names")
+        else:
+            pass
         files = {name: bundle.read(name) for name in bundle.namelist()}
     if {
         name: hashlib.sha256(raw).hexdigest() for name, raw in files.items()
     } != manifest["files_sha256"]:
         raise ValueError("Historical source members differ from their manifest")
+    else:
+        pass
     return files, manifest
 
 
@@ -81,24 +102,36 @@ def main() -> int:
     if args.capture_dir:
         if args.check:
             parser.error("--check cannot freeze a new source capture")
+        else:
+            pass
         freeze(args.capture_dir, args.fixture_dir)
+    else:
+        pass
     files, manifest = read_fixture(args.fixture_dir)
     data, report = normalize(files, manifest)
     report_text = json.dumps(report, ensure_ascii=False, indent=2) + "\n"
     if not report["naoj_reference_import_eligible"]:
         if args.report:
             args.report.write_text(report_text)
+        else:
+            pass
         raise SystemExit(
             "NAOJ reference admission failed; retained findings cannot be hidden by writing a runtime table"
         )
+    else:
+        pass
     text = json.dumps(data, ensure_ascii=False, indent=2) + "\n"
     if args.check:
         if DATA.read_text() != text:
             raise SystemExit("Historical reference table is stale")
+        else:
+            pass
     else:
         DATA.write_text(text)
     if args.report:
         args.report.write_text(report_text)
+    else:
+        pass
     print(
         json.dumps(
             {
@@ -115,3 +148,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

@@ -5,17 +5,17 @@ from itertools import product
 
 from pydantic import JsonValue, TypeAdapter
 
-from .models import AssessRequest
-from .spatial_angles import angular_delta, compose_degrees
-from .spatial_geometry import movement_distance, transform_point
-from .spatial_inputs import PlanPose
-from .spatial_layout import (
+from fatebridge.core.fengshui.models import AssessRequest
+from fatebridge.core.fengshui.spatial_angles import angular_delta, compose_degrees
+from fatebridge.core.fengshui.spatial_geometry import movement_distance, transform_point
+from fatebridge.core.fengshui.spatial_inputs import PlanPose
+from fatebridge.core.fengshui.spatial_layout import (
     SceneAssessment,
     evaluate_measured_candidate,
     geometry_output,
 )
-from .spatial_outputs import MeasuredSearchOutput, SearchReceipt
-from .spatial_scene import posed_scene, scene_poses
+from fatebridge.core.fengshui.spatial_outputs import MeasuredSearchOutput, SearchReceipt
+from fatebridge.core.fengshui.spatial_scene import posed_scene, scene_poses
 
 
 def _dominates(left: SearchReceipt, right: SearchReceipt) -> bool:
@@ -26,6 +26,8 @@ def _dominates(left: SearchReceipt, right: SearchReceipt) -> bool:
         for k in keys
     ):
         return False
+    else:
+        pass
     before = [left.changed_object_count, left.movement_m, left.rotation_degrees]
     after = [right.changed_object_count, right.movement_m, right.rotation_degrees]
     for key in sorted(keys):
@@ -33,6 +35,8 @@ def _dominates(left: SearchReceipt, right: SearchReceipt) -> bool:
         if lvalue is not None and rvalue is not None:
             before.append(lvalue)
             after.append(rvalue)
+        else:
+            pass
     return all(l <= r for l, r in zip(before, after)) and any(
         l < r for l, r in zip(before, after)
     )
@@ -44,6 +48,8 @@ def search_measured_layouts(
     spatial = original.workstation_layout
     if spatial is None or spatial.search is None:
         raise ValueError("search_measured_layouts requires explicit finite domains")
+    else:
+        pass
     scene, search = spatial.scene, spatial.search
     initial = scene_poses(scene)
     permissions = {
@@ -85,11 +91,15 @@ def search_measured_layouts(
             ):
                 if not required:
                     continue
+                else:
+                    pass
                 value = getattr(permission, kind) if permission is not None else None
                 if value is False:
                     blocked.append(f"permission:{object_id}:{kind}")
                 elif value is None:
                     pending.append(f"layout_constraints.{object_id}.{kind}")
+                else:
+                    pass
         before_bodies = {b.object_id: b for b in scene.bodies}
         after_bodies = {b.object_id: b for b in candidate_scene.bodies}
         for desktop, after_desktop in zip(scene.desktops, candidate_scene.desktops):
@@ -123,10 +133,14 @@ def search_measured_layouts(
                 ):
                     if not required:
                         continue
+                    else:
+                        pass
                     if value is False:
                         blocked.append(f"attached_locked_item:{item.object_id}:{kind}")
                     elif value is None:
                         pending.append(f"layout_constraints.{item.object_id}.{kind}")
+                    else:
+                        pass
         blocked.extend(
             f"geometry:{check.check_id}:{','.join(check.object_ids)}"
             for check in assessment.geometry.checks
@@ -168,8 +182,12 @@ def search_measured_layouts(
                     blocked.append(f"required_check:{seat.desk_id}:{key}")
                 elif checks[key] is None:
                     pending.append(f"workstation_layout.scene.{seat.desk_id}.{key}")
+                else:
+                    pass
         if not scene.inventory_confirmed:
             pending.append("workstation_layout.scene.inventory_confirmed")
+        else:
+            pass
         candidate_id = f"spatial-{index + 1:04d}"
         receipt = SearchReceipt(
             candidate_id=candidate_id,
@@ -211,6 +229,8 @@ def search_measured_layouts(
         receipts.append(receipt)
         if blocked:
             continue
+        else:
+            pass
         if not any(_dominates(other, receipt) for other, _ in frontier):
             frontier = [
                 (other, state)
@@ -218,6 +238,8 @@ def search_measured_layouts(
                 if not _dominates(receipt, other)
             ]
             frontier.append((receipt, assessment))
+        else:
+            pass
     frontier.sort(
         key=lambda pair: (
             pair[0].changed_object_count,
@@ -239,6 +261,8 @@ def search_measured_layouts(
             turn = angular_delta(pose.rotation_degrees, before.rotation_degrees)
             if displacement == 0 and turn == 0:
                 continue
+            else:
+                pass
             parent_desktop = next(
                 (
                     desktop

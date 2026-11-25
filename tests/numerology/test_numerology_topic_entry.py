@@ -2,15 +2,27 @@
 
 import asyncio
 import json
+from pathlib import Path
 from types import SimpleNamespace
 
+import fastmcp
 import pytest
+from fastapi.testclient import TestClient
 from fastmcp import Client
+from fastmcp.client import transports
+from pytest import CaptureFixture, MonkeyPatch
 
 from fatebridge.application.examples import evidence_views
 from fatebridge.mcp_server import create_mcp_app
 from scripts import evaluate_agent as evaluator
-from tests.support.transports import AS_OF, SPECS, business, call_cli
+from tests.support.transports import (
+    AS_OF,
+    SPECS,
+    business,
+    call_calculation,
+    call_cli,
+    discover_capabilities,
+)
 from tests.support.transports import rest as shared_rest
 
 rest = shared_rest
@@ -45,8 +57,14 @@ rest = shared_rest
     ],
 )
 def test_actual_mcp_and_rest_cli_return_the_same_method_facts(
-    tool, payload, view, rest, tmp_path, capsys, monkeypatch
-):
+    tool: str,
+    payload,
+    view: str,
+    rest: TestClient,
+    tmp_path: Path,
+    capsys: CaptureFixture[str],
+    monkeypatch: MonkeyPatch,
+) -> None:
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path / "empty"))
     spec = SPECS[tool]
@@ -75,9 +93,10 @@ def test_actual_mcp_and_rest_cli_return_the_same_method_facts(
 
     async def run():
         async with Client(create_mcp_app(families="divination")) as client:
-            names = {t.name for t in await client.list_tools()}
+            names = set(await discover_capabilities(client))
             assert {"heluo", "canping"} <= names
-            return await client.call_tool(
+            return await call_calculation(
+                client,
                 tool,
                 {
                     **payload,
@@ -123,9 +142,9 @@ def test_actual_mcp_and_rest_cli_return_the_same_method_facts(
         )
 
 
-def test_reference_capture_labels_full_catalog_before_any_model(tmp_path, monkeypatch):
-    import fastmcp
-    from fastmcp.client import transports
+def test_reference_capture_labels_full_catalog_before_any_model(
+    tmp_path: Path, monkeypatch: MonkeyPatch
+) -> None:
 
     seen = {}
 
@@ -173,7 +192,7 @@ def test_reference_capture_labels_full_catalog_before_any_model(tmp_path, monkey
     assert "隐藏标准" not in (tmp_path / "model-prompts/one.txt").read_text()
 
 
-def test_hidden_rubric_paths_are_excluded_from_model_workspace(tmp_path):
+def test_hidden_rubric_paths_are_excluded_from_model_workspace(tmp_path: Path) -> None:
     source = tmp_path / "source"
     source.mkdir()
     (source / "AGENTS.md").write_text("工程和咨询规则\n")

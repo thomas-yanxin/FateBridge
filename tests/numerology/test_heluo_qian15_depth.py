@@ -6,10 +6,11 @@ from copy import deepcopy
 from pathlib import Path
 
 import pytest
+from pytest import MonkeyPatch
 
-from fatebridge.core import heluo_texts as ht
-from fatebridge.core.heluo import _tiaowen, gua_lines, lines_to_gua, yao_text
-from fatebridge.core.heluo_timing import _selected_text
+from fatebridge.core.heluo import heluo_texts as ht
+from fatebridge.core.heluo.heluo import _tiaowen, gua_lines, lines_to_gua, yao_text
+from fatebridge.core.heluo.heluo_timing import _selected_text
 from fatebridge.utils.errors import NumerologySourceError
 
 ROOT = Path(__file__).parents[1] / "fixtures/heluo_qian15_v1"
@@ -18,7 +19,7 @@ REFERENCES = json.loads((ROOT / "references.json").read_bytes())["references"]
 FREEZE = json.loads((ROOT / "freeze.json").read_bytes())
 
 
-def test_source_artifacts_preserve_first_misreadings_and_all_six_lines():
+def test_source_artifacts_preserve_first_misreadings_and_all_six_lines() -> None:
     assert [e["line"] for e in READINGS["entries"]] == list(range(1, 7))
     for name, digest in FREEZE["files"].items():
         assert hashlib.sha256((ROOT / name).read_bytes()).hexdigest() == digest
@@ -37,7 +38,9 @@ def test_source_artifacts_preserve_first_misreadings_and_all_six_lines():
 
 
 @pytest.mark.parametrize("entry", READINGS["entries"], ids=lambda e: str(e["line"]))
-def test_complete_primary_prose_preserves_every_condition_and_inherited_roles(entry):
+def test_complete_primary_prose_preserves_every_condition_and_inherited_roles(
+    entry,
+) -> None:
     text = yao_text("地山謙", entry["line"])
     assert text["detail"] == "".join(s["text"] for s in entry["sections"])
     assert text["commentary_sections"] == [
@@ -61,7 +64,7 @@ def test_complete_primary_prose_preserves_every_condition_and_inherited_roles(en
 
 
 @pytest.mark.parametrize("entry", READINGS["headers"], ids=lambda e: str(e["line"]))
-def test_headers_use_the_selected_printing(entry):
+def test_headers_use_the_selected_printing(entry) -> None:
     text = yao_text("地山謙", entry["line"])
     assert text["yaoci"] == entry["yaoci"]
     assert text["text_provenance"]["pdf_page"] == entry["pdf_page"]
@@ -70,7 +73,7 @@ def test_headers_use_the_selected_printing(entry):
 @pytest.mark.parametrize("reference", REFERENCES, ids=lambda r: str(r["source_line"]))
 def test_printed_reference_never_acquires_an_unprinted_line_or_replaces_chart(
     reference,
-):
+) -> None:
     text = yao_text("地山謙", reference["source_line"])
     actual = text["commentary_cross_references"]
     assert len(actual) == 1
@@ -87,7 +90,7 @@ def test_printed_reference_never_acquires_an_unprinted_line_or_replaces_chart(
 
 
 @pytest.mark.parametrize("reference", REFERENCES, ids=lambda r: str(r["source_line"]))
-def test_status_uses_actual_condition_and_actual_printed_quote(reference):
+def test_status_uses_actual_condition_and_actual_printed_quote(reference) -> None:
     # A view input from the frozen literal reference, independent of the source
     # corpus extension. This reproduces the formerly hardcoded Dayou-only text.
     view = {
@@ -107,11 +110,15 @@ def test_status_uses_actual_condition_and_actual_printed_quote(reference):
     if reference["target_quote"]:
         assert reference["target_quote"] in note
         assert "只印卦名" not in note
+    else:
+        pass
     assert "None爻" not in note
 
 
 @pytest.mark.parametrize("line", [2, 5])
-def test_unsettled_glyph_is_visible_without_becoming_a_negative_branch(line):
+def test_unsettled_glyph_is_visible_without_becoming_a_negative_branch(
+    line: int,
+) -> None:
     text = yao_text("地山謙", line)
     assert (
         "glyph_choice_unresolved" in text["text_provenance"]["commentary_review_status"]
@@ -120,7 +127,7 @@ def test_unsettled_glyph_is_visible_without_becoming_a_negative_branch(line):
     assert text["commentary_branch_selection"]["selected_section_ids"] == []
 
 
-def test_existing_dayou_uncertainty_is_also_visible_from_its_actual_status():
+def test_existing_dayou_uncertainty_is_also_visible_from_its_actual_status() -> None:
     text = yao_text("火天大有", 4)
     assert (
         "glyph_disagreement_unresolved"
@@ -131,8 +138,8 @@ def test_existing_dayou_uncertainty_is_also_visible_from_its_actual_status():
 
 @pytest.mark.parametrize("fault", ["parent", "text", "header"])
 def test_nonempty_forged_source_or_swapped_parent_still_returns_source503(
-    fault, monkeypatch, tmp_path
-):
+    fault: str, monkeypatch: MonkeyPatch, tmp_path: Path
+) -> None:
     path = ht.COLLATION_PATH if fault == "header" else ht.COMMENTARY_PATH
     data = json.loads(path.read_bytes())
     entry = next(e for e in data["entries"] if e["hexagram"] == "地山謙")

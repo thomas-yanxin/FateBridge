@@ -6,14 +6,17 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.sukuyo import SU27_ORDER, calendar_mansion, day_evidence
-from fatebridge.core.sukuyo_lower import (
+from fatebridge.core.sukuyo.sukuyo import SU27_ORDER, calendar_mansion, day_evidence
+from fatebridge.core.sukuyo.sukuyo_lower import (
     DETAIL_PARENTS,
     DETAIL_TOPICS,
     activity_detail_closure,
 )
-from fatebridge.core.sukuyo_lower_methods import lower_methods_evidence, source_bundle
-from fatebridge.validation.sukuyo import required_quote_paths
+from fatebridge.core.sukuyo.sukuyo_lower_methods import (
+    lower_methods_evidence,
+    source_bundle,
+)
+from validation.sukuyo import required_quote_paths
 
 PRIMARY = json.loads(
     (Path(__file__).parents[1] / "data/sukuyo-lower-methods-primary.json").read_text()
@@ -30,7 +33,7 @@ def matched_ids(result):
     return {r["rule_id"] for r in result["matched_rules"]}
 
 
-def test_seven_groups_against_individually_transcribed_member_lists():
+def test_seven_groups_against_individually_transcribed_member_lists() -> None:
     # Hand transcribed from the seven primary paragraphs, not service output.
     expected = {
         "安重": "毕翼斗壁",
@@ -56,7 +59,7 @@ def test_seven_groups_against_individually_transcribed_member_lists():
         lower_methods_evidence("牛", "日", None)
 
 
-def test_light_heading_is_collated_without_turning_zhen_into_a_sixth_member():
+def test_light_heading_is_collated_without_turning_zhen_into_a_sixth_member() -> None:
     result = lower_methods_evidence("井", "日", "轻燥")
     group = result["nature"]["selected_group"]
     assert group["literal_heading"] == "軫" and group["name"] == "轻"
@@ -93,7 +96,7 @@ def test_light_heading_is_collated_without_turning_zhen_into_a_sixth_member():
 )
 def test_all_seven_lower_weekday_records_retain_their_own_primary_title(
     luminary, title
-):
+) -> None:
     result = lower_methods_evidence(None, luminary, None)
     row = result["weekday"]
     assert row["literal_title"] == title
@@ -105,7 +108,9 @@ def test_all_seven_lower_weekday_records_retain_their_own_primary_title(
     assert result["nature"]["selected_group"] is None
 
 
-def test_27_selected_lower_method_rules_have_primary_quotes_and_valid_conditions():
+def test_27_selected_lower_method_rules_have_primary_quotes_and_valid_conditions() -> (
+    None
+):
     rules = source_bundle()["rules"]
     refs = {p["rule_id"]: p for p in PRIMARY["rule_passages"]}
     assert len(rules) == len(refs) == 27
@@ -119,7 +124,7 @@ def test_27_selected_lower_method_rules_have_primary_quotes_and_valid_conditions
             assert all(DETAIL_TOPICS[d] == topic for d in condition["any_of"])
 
 
-def test_fire_marriage_and_debt_keep_opposite_upper_lower_witnesses():
+def test_fire_marriage_and_debt_keep_opposite_upper_lower_witnesses() -> None:
     marriage = assessment("2025-03-04", "marriage")
     ids = matched_ids(marriage)
     assert {"t1299_activity_23", "t1299_lower_method_weekday_06"} <= ids
@@ -131,7 +136,9 @@ def test_fire_marriage_and_debt_keep_opposite_upper_lower_witnesses():
     assert debt["evidence_status"] == "conflicted"
 
 
-def test_stomach_changes_membership_without_replacing_upper_nature_or_calendar():
+def test_stomach_changes_membership_without_replacing_upper_nature_or_calendar() -> (
+    None
+):
     day = day_evidence(
         calendar_mansion("2025-03-02"),
         activity="study",
@@ -149,7 +156,7 @@ def test_stomach_changes_membership_without_replacing_upper_nature_or_calendar()
     assert "下卷按明列成员归为猛恶宿" in day["reading_text"]
 
 
-def test_lower_rapid_main_sale_does_not_silently_apply_ming_purchase_reading():
+def test_lower_rapid_main_sale_does_not_silently_apply_ming_purchase_reading() -> None:
     bought = assessment("2025-03-13", "commerce", ["purchase"])
     sold = assessment("2025-03-13", "commerce", ["sale"])
     assert "t1299_lower_method_nature_06" not in matched_ids(bought)
@@ -161,7 +168,9 @@ def test_lower_rapid_main_sale_does_not_silently_apply_ming_purchase_reading():
     assert ">賣</lem>" in app and ">買賣</rdg>" in app
 
 
-def test_specific_purchase_and_sale_details_also_match_supported_parent_actions():
+def test_specific_purchase_and_sale_details_also_match_supported_parent_actions() -> (
+    None
+):
     specific = assessment("2025-03-04", "commerce", ["purchase_precious_goods"])
     generic = assessment("2025-03-04", "commerce", ["purchase"])
     assert "t1299_lower_method_weekday_05" in matched_ids(specific)
@@ -195,7 +204,9 @@ def test_specific_purchase_and_sale_details_also_match_supported_parent_actions(
     )
 
 
-def test_repaying_money_water_journeys_and_special_study_keep_their_specific_scope():
+def test_repaying_money_water_journeys_and_special_study_keep_their_specific_scope() -> (
+    None
+):
     assert "t1299_lower_method_nature_05" in matched_ids(
         assessment("2025-03-14", "commerce", ["repaying_debt"])
     )  # 角
@@ -219,7 +230,7 @@ def test_repaying_money_water_journeys_and_special_study_keep_their_specific_sco
     )
 
 
-def test_private_journey_and_saturday_far_travel_do_not_expand_to_all_travel():
+def test_private_journey_and_saturday_far_travel_do_not_expand_to_all_travel() -> None:
     rule = "t1299_lower_method_weekday_03"
     assert rule not in matched_ids(assessment("2025-03-03", "travel"))
     assert rule in matched_ids(assessment("2025-03-03", "travel", ["private_journey"]))
@@ -230,7 +241,9 @@ def test_private_journey_and_saturday_far_travel_do_not_expand_to_all_travel():
     )
 
 
-def test_partial_calendar_does_not_choose_lower_nature_but_keeps_known_weekday():
+def test_partial_calendar_does_not_choose_lower_nature_but_keeps_known_weekday() -> (
+    None
+):
     result = day_evidence(calendar_mansion("2025-07-25"), activity="marriage")
     assert result["lower_methods"]["nature"]["status"] == "not_evaluated"
     assert result["lower_methods"]["weekday"]["luminary"] == "金"
@@ -238,7 +251,7 @@ def test_partial_calendar_does_not_choose_lower_nature_but_keeps_known_weekday()
     assert "sukuyo.lower_methods" in required_quote_paths("activity")
 
 
-def test_lower_source_returns_copies_and_reading_preserves_both_fire_claims():
+def test_lower_source_returns_copies_and_reading_preserves_both_fire_claims() -> None:
     c = calendar_mansion("2025-03-04")
     first = day_evidence(c, activity="commerce", activity_details=["collecting_debt"])
     expected = deepcopy(first)

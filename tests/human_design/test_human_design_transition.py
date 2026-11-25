@@ -10,17 +10,17 @@ from pathlib import Path
 import pytest
 
 from fatebridge.application.execution import execute_tool
-from fatebridge.core.human_design import chart_at, chart_at_tt
-from fatebridge.core.human_design_joint import JointSnapshotCache
-from fatebridge.core.human_design_sensitivity import assess_birth_interval
-from fatebridge.core.human_design_transition import (
+from fatebridge.core.human_design.human_design import chart_at, chart_at_tt
+from fatebridge.core.human_design.human_design_joint import JointSnapshotCache
+from fatebridge.core.human_design.human_design_sensitivity import assess_birth_interval
+from fatebridge.core.human_design.human_design_transition import (
     dependency_projection,
     refine_joint_transitions,
 )
 from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.validation.human_design import verify_human_design_reading
-from fatebridge.validation.human_design_transition import verify_transition_trace
 from tests.support.ephemeris_context import empty_ephemeris_path
+from validation.human_design import verify_human_design_reading
+from validation.human_design_transition import verify_transition_trace
 
 ROOT = Path(__file__).resolve().parents[2]
 CASE = json.loads((ROOT / "tests/data/human_design/transition-inputs.json").read_text())
@@ -37,7 +37,9 @@ INPUT = dict(
 )
 
 
-def test_actual_ten_second_alias_retains_the_missing_coherent_state_with_one_extra_chart():
+def test_actual_ten_second_alias_retains_the_missing_coherent_state_with_one_extra_chart() -> (
+    None
+):
     with empty_ephemeris_path():
         nominal = chart_at(MOMENT)
         result = assess_birth_interval(nominal, 1, "true")
@@ -97,11 +99,17 @@ def synthetic(first=4.0, second=4.25, *, same_source=False, reversal=False):
                     for body in ("Sun", "Earth"):
                         bodies[body]["line"] = bodies[body]["line"] % 6 + 1
                         bodies[body]["tone"] = bodies[body]["tone"] % 6 + 1
+                else:
+                    pass
             else:
                 for body, boundary in [("Moon", first), ("Mercury", second)]:
                     if t >= boundary and (not reversal or t < 6):
                         bodies[body]["line"] = bodies[body]["line"] % 6 + 1
+                    else:
+                        pass
             cache[jd] = chart
+        else:
+            pass
         return cache[jd]
 
     for offset in range(-60, 61, 10):
@@ -120,7 +128,7 @@ def synthetic(first=4.0, second=4.25, *, same_source=False, reversal=False):
     return result, variants, sampling, calls, origin
 
 
-def test_close_distinct_dependency_steps_are_not_merged_or_mixed():
+def test_close_distinct_dependency_steps_are_not_merged_or_mixed() -> None:
     result, variants, sampling, calls, origin = synthetic()
     assert len(variants) == 3
     assert any(4 < (t - origin) * 86400 < 4.25 for t in calls)
@@ -132,7 +140,7 @@ def test_close_distinct_dependency_steps_are_not_merged_or_mixed():
     )
 
 
-def test_unseparated_steps_are_reported_without_claiming_exact_simultaneity():
+def test_unseparated_steps_are_reported_without_claiming_exact_simultaneity() -> None:
     result, variants, sampling, calls, origin = synthetic(4, 4)
     assert len(variants) == 2
     assert result["summary"]["unresolved_multiple_dependency_brackets"] == 1
@@ -145,10 +153,10 @@ def test_unseparated_steps_are_reported_without_claiming_exact_simultaneity():
 
 
 def test_budget_exhaustion_retains_unresolved_brackets_instead_of_false_success(
-    monkeypatch,
-):
-    from fatebridge.core import human_design_transition as core
-    from fatebridge.validation import human_design_transition as validation
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from fatebridge.core.human_design import human_design_transition as core
+    from validation import human_design_transition as validation
 
     monkeypatch.setattr(core, "MAX_ADDITIONAL_EVALUATIONS", 1)
     monkeypatch.setattr(validation, "MAX_ADDITIONAL_EVALUATIONS", 1)
@@ -163,7 +171,9 @@ def test_budget_exhaustion_retains_unresolved_brackets_instead_of_false_success(
     )
 
 
-def test_paired_opposition_and_same_body_line_tone_do_not_create_two_independent_events():
+def test_paired_opposition_and_same_body_line_tone_do_not_create_two_independent_events() -> (
+    None
+):
     result, variants, sampling, calls, origin = synthetic(same_source=True)
     assert result["summary"]["candidate_interval_count"] == 0
     assert calls == []
@@ -174,7 +184,7 @@ def test_paired_opposition_and_same_body_line_tone_do_not_create_two_independent
     )
 
 
-def test_unobserved_reversal_does_not_become_a_stability_certificate():
+def test_unobserved_reversal_does_not_become_a_stability_certificate() -> None:
     result, variants, _, calls, _ = synthetic(reversal=True)
     assert len(variants) == 1 and calls == []
     assert result["summary"]["status"] == "no_multiple_dependency_change_observed"
@@ -210,7 +220,9 @@ def full_run():
         "outcome",
     ],
 )
-def test_fresh_hash_does_not_accept_forged_finite_refinement_evidence(full_run, bad):
+def test_fresh_hash_does_not_accept_forged_finite_refinement_evidence(
+    full_run, bad: str
+) -> None:
     value = copy.deepcopy(full_run)
     interval = value["time_sensitivity"]
     report = interval["joint_transition_refinement"]
@@ -243,7 +255,7 @@ def test_fresh_hash_does_not_accept_forged_finite_refinement_evidence(full_run, 
     assert verify_human_design_reading(value)["status"] == "rejected"
 
 
-def test_unassessed_interval_cannot_acquire_a_refinement_claim():
+def test_unassessed_interval_cannot_acquire_a_refinement_claim() -> None:
     with empty_ephemeris_path():
         value = execute_tool(
             SPEC, SPEC.request_model(**{**INPUT, "birth_time_uncertainty_minutes": 0})
@@ -256,7 +268,9 @@ def test_unassessed_interval_cannot_acquire_a_refinement_claim():
     assert verify_human_design_reading(value)["status"] == "rejected"
 
 
-def test_audit_rejects_a_degraded_checker_that_drops_the_missed_state(monkeypatch):
+def test_audit_rejects_a_degraded_checker_that_drops_the_missed_state(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     from scripts.human_design import audit_human_design as audit
 
     assert (

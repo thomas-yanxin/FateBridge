@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core import guolao_intercalation as c
+from fatebridge.core.guolao import guolao_intercalation as c
 
 ROOT = Path(__file__).parents[2]
 FIXTURE = ROOT / "tests/fixtures/guolao-intercalation-v1"
@@ -25,7 +25,9 @@ def synthetic():
     )
 
 
-def test_worked_intercalary_label_matches_independent_original_transcription(worked):
+def test_worked_intercalary_label_matches_independent_original_transcription(
+    worked,
+) -> None:
     assignment = worked["month_assignment"]
     ref = SOURCE["independent_reference"]
     assert assignment["month_count"] == 13
@@ -38,7 +40,7 @@ def test_worked_intercalary_label_matches_independent_original_transcription(wor
     assert not ref["all_months_or_conjunction_times_accepted"]
 
 
-def test_full_cycle_has_complete_ordered_months_and_shared_boundaries(worked):
+def test_full_cycle_has_complete_ordered_months_and_shared_boundaries(worked) -> None:
     rows = worked["month_assignment"]["months"]
     assert [r["month_number"] for r in rows] == [
         11,
@@ -81,7 +83,9 @@ def test_full_cycle_has_complete_ordered_months_and_shared_boundaries(worked):
     assert worked["modern_lunar_date"] is None
 
 
-def test_actual_summer_solstice_precedes_conjunction_but_is_in_new_civil_month(worked):
+def test_actual_summer_solstice_precedes_conjunction_but_is_in_new_civil_month(
+    worked,
+) -> None:
     rows = worked["month_assignment"]["months"]
     qi = F(worked["solar_terms"][12]["source_day_counter_exact"])
     winter = F(worked["winter_source_day_counter_exact"])
@@ -103,8 +107,8 @@ def test_actual_summer_solstice_precedes_conjunction_but_is_in_new_civil_month(w
     [("before_midnight", 5), ("midnight", 4), ("before_moon", 4), ("at_moon", 4)],
 )
 def test_summer_qi_both_sides_exact_midnight_and_same_day_conjunction(
-    worked, position, leap
-):
+    worked, position: str, leap: int
+) -> None:
     winter = F(worked["winter_source_day_counter_exact"])
     moons = tuple(
         winter + F(x["research_conjunction_offset_from_winter_days_exact"])
@@ -128,7 +132,7 @@ def test_summer_qi_both_sides_exact_midnight_and_same_day_conjunction(
     assert result["leap_month_number"] == leap
 
 
-def test_no_leap_synthetic_cycle_and_winter_before_same_day_new_moon():
+def test_no_leap_synthetic_cycle_and_winter_before_same_day_new_moon() -> None:
     moons, qi = synthetic()
     assert qi[0] < moons[0] and qi[0] // 1 == moons[0] // 1
     result = c.assign_civil_sui(moons, qi)
@@ -140,7 +144,7 @@ def test_no_leap_synthetic_cycle_and_winter_before_same_day_new_moon():
     assert [m["month_number"] for m in result["months"]] == [11, 12, *range(1, 11)]
 
 
-def test_missing_unused_neighbor_does_not_invalidate_available_cycle():
+def test_missing_unused_neighbor_does_not_invalidate_available_cycle() -> None:
     moons, qi = synthetic()
     result = c.assign_civil_sui((*moons[:-1], None), qi)
     assert result["status"] == "assigned_under_explicit_civil_mean_qi_policy"
@@ -155,7 +159,7 @@ def test_missing_unused_neighbor_does_not_invalidate_available_cycle():
         (13, "winter_civil_day_not_bracketed_by_known_adjacent_conjunctions"),
     ],
 )
-def test_required_missing_boundary_stays_unassigned(index, reason):
+def test_required_missing_boundary_stays_unassigned(index: int, reason: str) -> None:
     moons, qi = synthetic()
     missing = tuple(None if i == index else t for i, t in enumerate(moons))
     result = c.assign_civil_sui(missing, qi)
@@ -164,7 +168,7 @@ def test_required_missing_boundary_stays_unassigned(index, reason):
     assert result["months"] == []
 
 
-def test_31_day_month_is_reported_without_repair():
+def test_31_day_month_is_reported_without_repair() -> None:
     moons, qi = synthetic()
     moons = tuple(t + F("1.2") if i == 6 else t for i, t in enumerate(moons))
     result = c.assign_civil_sui(moons, qi)
@@ -173,7 +177,7 @@ def test_31_day_month_is_reported_without_repair():
     assert all(m["month_number"] is None for m in result["months"])
 
 
-def test_double_principal_term_does_not_select_a_convenient_leap_month():
+def test_double_principal_term_does_not_select_a_convenient_leap_month() -> None:
     moons, qi = synthetic()
     conflicting = (qi[0], F("29.9"), *qi[2:])
     result = c.assign_civil_sui(moons, conflicting)
@@ -184,14 +188,14 @@ def test_double_principal_term_does_not_select_a_convenient_leap_month():
 
 
 @pytest.mark.parametrize("step", [F(26), F(33)])
-def test_non_12_or_13_cycle_rejected(step):
+def test_non_12_or_13_cycle_rejected(step) -> None:
     _, qi = synthetic()
     result = c.assign_civil_sui(tuple(F(".9") + i * step for i in range(17)), qi)
     assert result["reason"] == "winter_cycle_has_neither_12_nor_13_months"
 
 
 @pytest.mark.parametrize("bad", [0.0, 0, True, "116147.0196", None])
-def test_raw_input_never_coerced(bad):
+def test_raw_input_never_coerced(bad: bool | float | int | str | None) -> None:
     with pytest.raises(TypeError):
         c.gujin_fixed_qice_months(bad)
 
@@ -201,8 +205,8 @@ def test_raw_input_never_coerced(bad):
     [(F(-1, 10**15), False, None), (F(), True, 12), (F(1, 10**15), True, 12)],
 )
 def test_exact_mean_leap_threshold_does_not_apply_floor_plus_one(
-    delta, has_leap, index
-):
+    delta, has_leap: bool, index: int | None
+) -> None:
     month, month_run = F("29.530593"), F(".906282")
     runyu = month - 12 * month_run + delta
     middle = runyu - F("20.205") + month
@@ -212,12 +216,12 @@ def test_exact_mean_leap_threshold_does_not_apply_floor_plus_one(
     assert estimate["candidate_leap_month_number"] == (10 if has_leap else None)
 
 
-def test_negative_zhongji_not_upper_reckoning():
+def test_negative_zhongji_not_upper_reckoning() -> None:
     with pytest.raises(ValueError):
         c.gujin_fixed_qice_months(F(-1))
 
 
-def test_assembler_rejects_residues_duplicates_unsorted_and_inexact_inputs():
+def test_assembler_rejects_residues_duplicates_unsorted_and_inexact_inputs() -> None:
     moons, qi = synthetic()
     for a, b in [
         (tuple(t % 60 for t in moons), qi),
@@ -234,7 +238,7 @@ def test_assembler_rejects_residues_duplicates_unsorted_and_inexact_inputs():
         c.assign_civil_sui(moons, qi[:-1])
 
 
-def test_all_four_entry_dates_match_original_without_using_mean_month_slots():
+def test_all_four_entry_dates_match_original_without_using_mean_month_slots() -> None:
     result = c.gujin_four_extras_calendar(F("116147.0196"))
     for key, month, day in [
         ("purple", 1, 25),
@@ -262,8 +266,12 @@ def test_all_four_entry_dates_match_original_without_using_mean_month_slots():
     ],
 )
 def test_entry_event_assignment_searches_civil_months(
-    worked, monkeypatch, position, month, day
-):
+    worked,
+    monkeypatch: pytest.MonkeyPatch,
+    position: str,
+    month: int | None,
+    day: int | None,
+) -> None:
     winter = F(worked["winter_source_day_counter_exact"])
     row = worked["month_assignment"]["months"][7]
     midnight = F(row["start_source_day_integer"])
@@ -296,14 +304,16 @@ def test_entry_event_assignment_searches_civil_months(
 
 
 def test_missing_printed_conjunction_propagates_to_months_and_all_four_dates(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     original = c.gujin_table_conjunction
 
     def missing(middle, index):
         result = original(middle, index)
         if index == 6:
             result["research_conjunction_offset_from_winter_days_exact"] = None
+        else:
+            pass
         return result
 
     monkeypatch.setattr(c, "gujin_table_conjunction", missing)
@@ -318,7 +328,9 @@ def test_missing_printed_conjunction_propagates_to_months_and_all_four_dates(
     )
 
 
-def test_profile_constants_not_silently_rescaled(tmp_path, monkeypatch):
+def test_profile_constants_not_silently_rescaled(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     data = json.loads(c.DATA.read_bytes())
     data["qice_days"] = "15.218425"
     path = tmp_path / "modified.json"

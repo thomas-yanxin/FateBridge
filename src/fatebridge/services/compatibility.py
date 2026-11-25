@@ -1,121 +1,92 @@
-"""
-FateBridge Compatibility Services
-"""
+"""Compute both natal inputs once and publish their directional contacts."""
 
-from typing import Any, Dict
+from typing import Literal
 
-from fatebridge.analysis.compatibility import AdvancedCompatibility, RelationshipType
-from fatebridge.core.export_parser import parse_export_content
-from fatebridge.core.rules import BaZiRules
+from pydantic import JsonValue
+
+from fatebridge.core.bazi.bazi_evidence import cross_chart_relations
+from fatebridge.core.export_parser import ParsedExport, parse_export_content
 from fatebridge.services.birth_context import build_birth_computation_context
 from fatebridge.services.birth_payload import build_destiny_payload
 from fatebridge.services.structured_snapshot import render_structured_snapshot_text
 from fatebridge.utils.birth_input import PersonInfo
+from fatebridge.utils.data import BRANCH_HIDDEN_STEMS, get_ten_god
 from fatebridge.utils.elements import get_element_relationship
-from fatebridge.utils.errors import ParameterError, calculation_guard
+from fatebridge.utils.errors import calculation_guard
 
 
-@calculation_guard("配合度分析")
+@calculation_guard("双人八字取证")
 def calculate_compatibility_analysis(
-    person1: PersonInfo, person2: PersonInfo, relationship_type: str = "general"
-) -> Dict:
-    """
-    计算双人配合度，分析两人的命理相互关系和配合程度
-
-    Args:
-        person1: 第一人的个人信息对象
-        person2: 第二人的个人信息对象
-        relationship_type: 关系类型
-
-    Returns:
-        dict: 配合度分析结果
-    """
-    rel_type_map = {kind.value: kind for kind in RelationshipType}
-    if not isinstance(relationship_type, str) or relationship_type not in rel_type_map:
-        return ParameterError(
-            "relationship_type 必须为 general、marriage、friendship、business 或 family",
-            [
+    person1: PersonInfo,
+    person2: PersonInfo,
+    relationship_type: Literal[
+        "general", "marriage", "friendship", "business", "family"
+    ] = "general",
+) -> dict[str, JsonValue | ParsedExport]:
+    """Publish both natal contexts and directed ten-god evidence."""
+    contexts = {
+        "person1": build_birth_computation_context(person1, field_prefix="person1_"),
+        "person2": build_birth_computation_context(person2, field_prefix="person2_"),
+    }
+    natal_charts = {
+        role: build_destiny_payload(context) for role, context in contexts.items()
+    }
+    directional_ten_gods: dict[str, JsonValue] = {}
+    for source_role, target_role in (("person1", "person2"), ("person2", "person1")):
+        target_day_stem = contexts[target_role].birth_pillars["day"][0]
+        directional_ten_gods[f"{source_role}_to_{target_role}"] = {
+            "source": source_role,
+            "target": target_role,
+            "target_day_stem": target_day_stem,
+            "stars": [
                 {
-                    "path": "relationship_type",
-                    "code": "literal_error",
-                    "constraints": {
-                        "expected": "'general', 'marriage', 'friendship', 'business' or 'family'"
-                    },
+                    "pillar": position,
+                    "stem": evidenced_stem,
+                    "location": location,
+                    "ten_god": get_ten_god(target_day_stem, evidenced_stem).value,
                 }
+                for position, (stem, branch) in contexts[
+                    source_role
+                ].birth_pillars.items()
+                for evidenced_stem, location in (
+                    (stem, "天干"),
+                    *(
+                        (hidden_stem, "地支藏干")
+                        for hidden_stem in BRANCH_HIDDEN_STEMS[branch]
+                    ),
+                )
             ],
-        ).as_result()
-    rel_type = rel_type_map[relationship_type]
-
-    context1 = build_birth_computation_context(person1)
-    context2 = build_birth_computation_context(person2)
-    analysis1 = build_destiny_payload(context1)
-    analysis2 = build_destiny_payload(context2)
-
-    advanced_analysis = AdvancedCompatibility.analyze_comprehensive_compatibility(
-        analysis1, analysis2, rel_type
-    )
-
-    # 分别提供传统四柱规则与多维关系分析。
-    pillars1 = context1.birth_pillars
-    pillars2 = context2.birth_pillars
-    traditional_compatibility = BaZiRules.calculate_compatibility_score(
-        pillars1, pillars2
-    )
-
-    element1 = analysis1["day_master"]["element"]
-    element2 = analysis2["day_master"]["element"]
-    element_relationship = get_element_relationship(element1, element2)
-
-    result: Dict[str, Any] = {
-        "summary": {
-            "overall_score": advanced_analysis["overall_score"],
-            "compatibility_level": advanced_analysis["summary"],
-            "relationship_type": relationship_type,
-            "score_basis": "多维度规则加权的 0–100 分；不是关系成功概率。",
-            "status": advanced_analysis["scoring"]["status"],
-            "scoring": advanced_analysis["scoring"],
-        },
-        "detailed_analysis": {
-            "element_balance": advanced_analysis["detailed_analysis"][
-                "element_balance"
-            ],
-            "favorable_synergy": advanced_analysis["detailed_analysis"][
-                "favorable_synergy"
-            ],
-            "ten_gods_relationship": advanced_analysis["detailed_analysis"][
-                "ten_gods_relationship"
-            ],
-            "pattern_synergy": advanced_analysis["detailed_analysis"][
-                "pattern_synergy"
-            ],
-            "traditional_analysis": {
-                **advanced_analysis["detailed_analysis"]["traditional_analysis"],
-                "score": advanced_analysis["detailed_analysis"]["traditional_analysis"][
-                    "normalized_score"
-                ],
-                "score_basis": (
-                    "从 50 分起，按跨盘冲、害、刑扣分并截断至 0–100；"
-                    "是综合分的一个维度，与 traditional_compatibility 的净分独立。"
-                ),
-            },
-        },
-        "strengths": advanced_analysis["strengths"],
-        "challenges": advanced_analysis["challenges"],
-        "recommendations": advanced_analysis["recommendations"],
+        }
+    person1_element = natal_charts["person1"]["day_master"]["element"]
+    person2_element = natal_charts["person2"]["day_master"]["element"]
+    relation = get_element_relationship(person1_element, person2_element)
+    result: dict[str, JsonValue] = {
+        "relationship_type": relationship_type,
         "person_info": {
-            "person1": {
-                "name": analysis1["person_info"]["name"],
-                "birth_datetime": analysis1["person_info"]["birth_datetime"],
-                "day_master": f"{analysis1['day_master']['stem']}({analysis1['day_master']['element']})",
-                "strength": analysis1["day_master"]["strength"],
-                "engineering_index": analysis1["day_master"]["engineering_index"],
-                "classical_adjudication": analysis1["day_master"][
-                    "classical_adjudication"
-                ],
-                "favorable_elements": analysis1.get("favorable_elements", []),
+            role: {
+                "name": chart["person_info"]["name"],
+                "birth_datetime": chart["person_info"]["birth_datetime"],
+            }
+            for role, chart in natal_charts.items()
+        },
+        "natal_contexts": {
+            role: {
+                "four_pillars": chart["four_pillars"],
+                "calendar_context": chart["calendar_context"],
+                "element_distribution": chart["element_distribution"],
+                "day_master": {
+                    day_master_field: chart["day_master"][day_master_field]
+                    for day_master_field in (
+                        "stem",
+                        "element",
+                        "polarity",
+                        "engineering_index",
+                        "classical_adjudication",
+                    )
+                },
                 "preference_assessment": {
-                    key: analysis1["structure_profile"][key]
-                    for key in (
+                    preference_field: chart["structure_profile"][preference_field]
+                    for preference_field in (
                         "resolution_policy",
                         "assessment_status",
                         "useful_elements",
@@ -124,50 +95,31 @@ def calculate_compatibility_analysis(
                         "neutral_elements",
                     )
                 },
-            },
-            "person2": {
-                "name": analysis2["person_info"]["name"],
-                "birth_datetime": analysis2["person_info"]["birth_datetime"],
-                "day_master": f"{analysis2['day_master']['stem']}({analysis2['day_master']['element']})",
-                "strength": analysis2["day_master"]["strength"],
-                "engineering_index": analysis2["day_master"]["engineering_index"],
-                "classical_adjudication": analysis2["day_master"][
-                    "classical_adjudication"
-                ],
-                "favorable_elements": analysis2.get("favorable_elements", []),
-                "preference_assessment": {
-                    key: analysis2["structure_profile"][key]
-                    for key in (
-                        "resolution_policy",
-                        "assessment_status",
-                        "useful_elements",
-                        "avoid_elements",
-                        "conditional_elements",
-                        "neutral_elements",
-                    )
-                },
-            },
+            }
+            for role, chart in natal_charts.items()
         },
         "element_relationship": {
-            "person1_element": element1,
-            "person2_element": element2,
-            "relationship_type": element_relationship["type"],
-            "description": element_relationship["description"],
+            "person1_element": person1_element,
+            "person2_element": person2_element,
+            "relationship_type": relation["type"],
         },
-        "traditional_compatibility": {
-            "score": traditional_compatibility["overall_score"],
-            "level": traditional_compatibility["level"],
-            "details": traditional_compatibility.get("details", []),
-            "score_basis": (
-                "合与冲、刑、害等规则加减后的净分，0 为中性；不是 0–100 分。"
-                "level 只评价该净分，不能替代 summary 的综合等级；"
-                "与 detailed_analysis.traditional_analysis 使用不同计分规则。"
-            ),
-        },
+        "cross_chart_relations": cross_chart_relations(
+            contexts["person1"].birth_pillars, contexts["person2"].birth_pillars
+        ),
+        "directional_ten_gods": directional_ten_gods,
     }
-    snapshot_text = render_structured_snapshot_text(result, title="双人配合度分析")
-    result["snapshot_text"] = snapshot_text
-    result["snapshot_export"] = parse_export_content(
-        technique="generic", content=snapshot_text
+    snapshot_text = render_structured_snapshot_text(
+        {
+            "person_info": result["person_info"],
+            "element_relationship": result["element_relationship"],
+            "cross_chart_relations": result["cross_chart_relations"],
+        },
+        title="双人八字取证",
     )
-    return result
+    return {
+        **result,
+        "snapshot_text": snapshot_text,
+        "snapshot_export": parse_export_content(
+            technique="generic", content=snapshot_text
+        ),
+    }

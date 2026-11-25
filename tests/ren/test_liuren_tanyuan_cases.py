@@ -4,11 +4,12 @@ import copy
 import json
 import shutil
 from datetime import date
+from pathlib import Path
 
 import pytest
 
 from fatebridge.core.metaphysics.liureng import build_liureng_board
-from fatebridge.services.metaphysics import _build_analysis_seed
+from fatebridge.core.metaphysics.seed import build_analysis_seed
 from scripts.ren.audit_liuren_tanyuan_cases import (
     ALIAS_CORPUS,
     CORPUS,
@@ -29,7 +30,7 @@ DATA = reference()
 def seed_for(ref, sample):
     solar = date.fromisoformat(ref["solar_date"])
     minute = sample["minute_of_day"]
-    return _build_analysis_seed(
+    return build_analysis_seed(
         analysis_year=solar.year,
         analysis_month=solar.month,
         analysis_day=solar.day,
@@ -40,7 +41,7 @@ def seed_for(ref, sample):
     )
 
 
-def test_complete_section_and_calendar_cohort_are_not_selected_by_result():
+def test_complete_section_and_calendar_cohort_are_not_selected_by_result() -> None:
     cases = DATA["readings"]["cases"]
     refs = DATA["reference"]["cases"]
     assert [c["id"] for c in cases] == [f"C{i:02}" for i in range(1, 9)]
@@ -61,7 +62,7 @@ def test_complete_section_and_calendar_cohort_are_not_selected_by_result():
 
 
 @pytest.mark.parametrize("index", range(8))
-def test_authored_chart_and_title_with_explicit_book_profile(index):
+def test_authored_chart_and_title_with_explicit_book_profile(index) -> None:
     alias_reference()
     case, ref = DATA["readings"]["cases"][index], DATA["reference"]["cases"][index]
     sample = ref["samples"][0]
@@ -87,9 +88,11 @@ def test_authored_chart_and_title_with_explicit_book_profile(index):
     assert board["day_placement_patterns"]["complete_classical_conformance"] is False
     if case["id"] == "C03":
         assert "D08" in board["day_placement_patterns"]["matched_ids"]
+    else:
+        pass
 
 
-def test_zi_hour_preserves_both_civil_segments_and_changed_chart():
+def test_zi_hour_preserves_both_civil_segments_and_changed_chart() -> None:
     ref = DATA["reference"]["cases"][1]
     samples = ref["samples"]
     assert [s["minute_of_day"] for s in samples] == list(range(60)) + list(
@@ -108,7 +111,7 @@ def test_zi_hour_preserves_both_civil_segments_and_changed_chart():
 @pytest.mark.parametrize(
     "field", ["lunar", "day", "hour", "month_branch", "month_general"]
 )
-def test_independent_calendar_binding_detects_wrong_producer_field(field):
+def test_independent_calendar_binding_detects_wrong_producer_field(field: str) -> None:
     ref = DATA["reference"]["cases"][0]
     sample = ref["samples"][0]
     seed = seed_for(ref, sample)
@@ -126,7 +129,7 @@ def test_independent_calendar_binding_detects_wrong_producer_field(field):
     assert calendar_comparison(seed, board, ref, sample)[field] is False
 
 
-def test_alias_cannot_hide_wrong_branch_wrong_god_or_missing_fact():
+def test_alias_cannot_hide_wrong_branch_wrong_god_or_missing_fact() -> None:
     expected = expected_facts(DATA["readings"]["cases"][5])
     for field, replacement in (
         ("transmission_branches", ["子", "未", "丑"]),
@@ -143,7 +146,9 @@ def test_alias_cannot_hide_wrong_branch_wrong_god_or_missing_fact():
 
 
 @pytest.mark.parametrize("fault", ["bytes", "coordinated_rehash", "extra", "missing"])
-def test_original_reference_and_case_inventory_are_immutable(tmp_path, fault):
+def test_original_reference_and_case_inventory_are_immutable(
+    tmp_path: Path, fault: str
+) -> None:
     folder = tmp_path / "cases"
     shutil.copytree(CORPUS, folder)
     path = folder / "readings.json"
@@ -153,6 +158,8 @@ def test_original_reference_and_case_inventory_are_immutable(tmp_path, fault):
             freeze = json.loads((folder / "freeze.json").read_text())
             freeze["files"][path.name] = sha(path)
             (folder / "freeze.json").write_text(json.dumps(freeze))
+        else:
+            pass
     elif fault == "extra":
         (folder / "exclude-failed-case.json").write_text("{}")
     else:
@@ -161,7 +168,7 @@ def test_original_reference_and_case_inventory_are_immutable(tmp_path, fault):
         reference(folder)
 
 
-def test_post_audit_alias_review_cannot_be_expanded(tmp_path):
+def test_post_audit_alias_review_cannot_be_expanded(tmp_path: Path) -> None:
     folder = tmp_path / "aliases"
     shutil.copytree(ALIAS_CORPUS, folder)
     path = folder / "review.json"

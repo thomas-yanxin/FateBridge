@@ -14,9 +14,9 @@ from zoneinfo import ZoneInfo
 
 from fatebridge.core.astro.time_scales import datetime_from_tt, ephemeris_time
 from fatebridge.core.ephemeris_runtime import configure_ephemeris_path
-from fatebridge.core.human_design import chart_at
-from fatebridge.core.human_design_mechanics import GATE_ORDER
-from fatebridge.core.human_design_time import sun_at_tt
+from fatebridge.core.human_design.human_design import chart_at
+from fatebridge.core.human_design.human_design_mechanics import GATE_ORDER
+from fatebridge.core.human_design.human_design_time import sun_at_tt
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -99,6 +99,8 @@ def plan():
             )
             cases.append(first_quadruple)
             break
+        else:
+            pass
     return {
         "method_id": "human_design_pre_official_cross_coverage_plan_v1",
         "declared_at_utc": datetime.now(timezone.utc).isoformat(),
@@ -129,8 +131,8 @@ def plan():
         "source_bindings": {
             p: hashlib.sha256((ROOT / p).read_bytes()).hexdigest()
             for p in (
-                "src/fatebridge/core/human_design.py",
-                "src/fatebridge/core/human_design_time.py",
+                "src/fatebridge/core/human_design/human_design.py",
+                "src/fatebridge/core/human_design/human_design_time.py",
                 "src/fatebridge/data/human_design/rave-2001-depth.json",
                 "scripts/human_design/plan_human_design_cross_coverage.py",
             )
@@ -144,6 +146,8 @@ def main():
     args = parser.parse_args()
     if args.output.exists():
         raise SystemExit("Refusing to overwrite an existing observation plan")
+    else:
+        pass
     value = plan()
     args.output.write_text(json.dumps(value, ensure_ascii=False, indent=2) + "\n")
     print(
@@ -160,3 +164,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+else:
+    pass

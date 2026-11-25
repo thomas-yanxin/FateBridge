@@ -1,12 +1,12 @@
 """Unrounded geometry for optional sky context, from one core calculation.
 
-Formatting must not decide signs, derived points or cusp membership. The lot
-uses the shared LOTS definition and compute_lot, not an adapter-owned formula.
+Formatting must not decide signs, derived points or cusp membership. Keep
+working lot angles through the ordinary house partition.
 """
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from fatebridge.core.astro.geometry import (
     Angle,
@@ -14,6 +14,7 @@ from fatebridge.core.astro.geometry import (
     _sign_name,
     angle_fraction,
     combine_longitudes,
+    longitude_float,
     normalize_angle,
 )
 from fatebridge.core.astro.house_positions import (
@@ -23,43 +24,49 @@ from fatebridge.core.astro.house_positions import (
 from fatebridge.core.astro.house_projection_precision import RC_PLANE_PROJECTION_METHOD
 from fatebridge.core.astro.native_motion import context_motion
 from fatebridge.core.astro.parts import _build_houses
+from fatebridge.core.astro.ptolemy import FORTUNE_SOURCE_URL, fortune_working_longitude
 from fatebridge.core.astro.reference_points import ephemeris_reference_points
 from fatebridge.core.astro.topocentric_precision import TOPOCENTRIC_PROJECTION_METHOD
-from fatebridge.core.classical_western import LOTS, compute_lot
-from fatebridge.core.ptolemy import FORTUNE_SOURCE_URL, fortune_longitude
+from fatebridge.core.classical_western import LOTS, lot_longitude
 
 FORTUNE_METHODS = ("sect_reversing", "ptolemy_iii10")
 
 
 def build_context_geometry(
-    states: Dict[str, Dict[str, float]],
-    planet_ids: List[str],
+    states: dict[str, dict[str, float]],
+    planet_ids: list[str],
     *,
     ascendant: float,
     midheaven: float,
     house_system: str,
-    house_cusps: List[float],
+    house_cusps: list[float],
     ayanamsha: float,
     chart_sect: str,
     fortune_method: str = "sect_reversing",
-    zodiac_longitudes: Optional[Dict[str, float]] = None,
-    house_projection: Optional[EclipticHouseProjection] = None,
-    house_coordinates: Optional[Dict[str, HouseCoordinate]] = None,
-    planetary_models: Optional[Dict[str, str]] = None,
-    motion_rates: Optional[Dict[str, Optional[float]]] = None,
-    motion_states: Optional[Dict[str, Dict[str, float]]] = None,
-    motion_frame: Optional[str] = None,
-    motion_derivative_policies: Optional[Dict[str, Dict[str, Any]]] = None,
-) -> Dict[str, Any]:
+    zodiac_longitudes: dict[str, float] | None = None,
+    house_projection: EclipticHouseProjection | None = None,
+    house_coordinates: dict[str, HouseCoordinate] | None = None,
+    planetary_models: dict[str, str] | None = None,
+    motion_rates: dict[str, float | None] | None = None,
+    motion_states: dict[str, dict[str, float]] | None = None,
+    motion_frame: str | None = None,
+    motion_derivative_policies: dict[str, dict[str, Any]] | None = None,
+) -> dict[str, Any]:
     if motion_rates is not None and motion_frame not in {
         "tropical_ecliptic_of_date",
         "lahiri_sidereal_ecliptic_of_date",
     }:
         raise ValueError("Motion rates require their explicit display reference frame")
+    else:
+        pass
     if fortune_method not in FORTUNE_METHODS:
         raise ValueError("fortune_method必须为sect_reversing或ptolemy_iii10")
+    else:
+        pass
     if chart_sect not in {"day", "night"}:
         raise ValueError("天象福点需要核心引擎的明确昼夜条件")
+    else:
+        pass
     longitudes = {
         name: normalize_angle(
             zodiac_longitudes[name]
@@ -68,17 +75,19 @@ def build_context_geometry(
         )
         for name in planet_ids
     }
-    partition_longitudes: Dict[str, Angle] = {**longitudes}
+    partition_longitudes: dict[str, Angle] = {**longitudes}
     if "North Node" in longitudes:
         partition_longitudes["South Node"] = (
             angle_fraction(longitudes["North Node"]) + 180
         ) % 360
         longitudes["South Node"] = combine_longitudes(longitudes["North Node"], 180.0)
+    else:
+        pass
     markers = {name.lower(): lon for name, lon in longitudes.items()}
     markers["asc"] = ascendant
     if fortune_method == "ptolemy_iii10":
         fortune = (
-            fortune_longitude(ascendant, longitudes["Sun"], longitudes["Moon"])
+            fortune_working_longitude(ascendant, longitudes["Sun"], longitudes["Moon"])
             if {"Sun", "Moon"} <= longitudes.keys()
             else None
         )
@@ -93,7 +102,7 @@ def build_context_geometry(
             "scope": "Fortune formula only; no full-chart or dice-method conformity claim",
         }
     else:
-        fortune = compute_lot(LOTS["fortune"][chart_sect], markers)
+        fortune = lot_longitude(LOTS["fortune"][chart_sect], markers)
         fortune_definition = {
             "method": fortune_method,
             "formula": (
@@ -106,13 +115,18 @@ def build_context_geometry(
             "scope": "Shared day/night reversing formula; no specified original-text certification",
         }
     if fortune is not None:
-        longitudes["Pars Fortuna"] = fortune
-    projected_positions: Dict[str, HouseCoordinate] = {}
+        partition_longitudes["Pars Fortuna"] = fortune
+        longitudes["Pars Fortuna"] = longitude_float(fortune)
+    else:
+        pass
+    projected_positions: dict[str, HouseCoordinate] = {}
     if house_projection is not None:
         for name, lon in longitudes.items():
             if house_coordinates is not None and name in house_coordinates:
                 projected_positions[name] = house_coordinates[name]
                 continue
+            else:
+                pass
             exact_tropical_longitude = None
             if name in states:
                 tropical_longitude = states[name]["longitude"]
@@ -128,13 +142,15 @@ def build_context_geometry(
             projected_positions[name] = house_projection.coordinate(
                 tropical_longitude, exact_longitude=exact_tropical_longitude
             )
+    else:
+        pass
     houses = _build_houses(
         ascendant,
         house_system,
         house_cusps=house_cusps,
         round_coordinates=False,
     )
-    result: Dict[str, Any] = {
+    result: dict[str, Any] = {
         "coordinate_policy": "unrounded_engine_values_not_an_accuracy_claim",
         "interval_convention": (
             (
@@ -207,10 +223,14 @@ def build_context_geometry(
     }
     if house_projection is not None:
         result["house_position_projection"] = house_projection.metadata()
+    else:
+        pass
     if planetary_models is not None:
         result["ephemeris_reference_points"] = ephemeris_reference_points(
             planetary_models, [name for name in longitudes if name not in states]
         )
+    else:
+        pass
     if motion_rates is not None:
         uncomputed = [
             obj["id"]
@@ -228,4 +248,6 @@ def build_context_geometry(
             "source_sections": "3.3.3, 3.4, 12.2",
             "scope": "Instantaneous sky longitude motion only; does not alter dice conditions or establish event timing, observational accuracy or divination validity.",
         }
+    else:
+        pass
     return result

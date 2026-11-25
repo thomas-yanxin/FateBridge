@@ -16,3 +16,5 @@ def observe_clock(kind: str, **values: Any) -> None:
     callback = observer.get()
     if callback is not None:
         callback({"kind": kind, **values})
+    else:
+        pass

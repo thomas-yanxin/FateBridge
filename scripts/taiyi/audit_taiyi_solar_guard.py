@@ -10,6 +10,10 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Any, Iterator
 
+from fatebridge.core import almanac
+from fatebridge.services.divination import calculate_sanshiunited_analysis
+from fatebridge.services.metaphysics import calculate_taiyi_analysis
+
 ROOT = Path(__file__).resolve().parents[2]
 CORPUS = ROOT / "tests/fixtures/taiyi_solar_guard_v44"
 FREEZE_SHA = "b0f03b4240351a941443b62cab4cf62c4826c29020c08d77ef0ec1a07423ba8c"
@@ -67,6 +71,8 @@ def inputs(
             use_true_solar_time=solar,
             **profile,
         )
+    else:
+        pass
     return dict(
         date=f"{case['year']:04}-{case['month']:02}-{case['day']:02}",
         time=f"{case['hour']:02}:{case.get('minute', 0):02}:{case.get('second', 0):02}",
@@ -78,8 +84,6 @@ def inputs(
 
 
 def calculate(tool: str, values: dict[str, Any]) -> dict[str, Any]:
-    from fatebridge.services.divination import calculate_sanshiunited_analysis
-    from fatebridge.services.metaphysics import calculate_taiyi_analysis
 
     fn = (
         calculate_taiyi_analysis if tool == "taiyi" else calculate_sanshiunited_analysis
@@ -91,6 +95,8 @@ def root_error(details: dict[str, Any], expected: float) -> float:
     parts = details.get("selected_crossing_tt_parts")
     if parts:
         return math.fsum([parts[0] - expected, parts[1]]) * 86400
+    else:
+        pass
     return float(details["selected_crossing_jd_tt"] - expected) * 86400
 
 
@@ -106,6 +112,8 @@ def inspect_board(
     }
     if mode == "day" or profile.get("hour_profile") == "key_hour_winter_jiazi_v1":
         expected["winter_origin"] = case["winter_anchor"]
+    else:
+        pass
     observed = board.get("solar_anchors", {})
     checks = []
     for name, key in expected.items():
@@ -115,6 +123,8 @@ def inspect_board(
             error = root_error(
                 actual["solar_model_details"], refs[key["year"], key["index"]]["jd_tt"]
             )
+        else:
+            pass
         checks.append(
             dict(
                 anchor=name,
@@ -142,7 +152,6 @@ def inspect_board(
 
 
 def audit() -> dict[str, Any]:
-    from fatebridge.core import almanac
 
     protocol, refs = reference()
     rows = []

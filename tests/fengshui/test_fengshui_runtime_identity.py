@@ -14,7 +14,9 @@ from fatebridge.services.run_metadata import attach_run_metadata
 from tests.fixtures.fengshui import payload
 
 
-def test_runtime_receipt_includes_observed_field_arithmetic_version(monkeypatch):
+def test_runtime_receipt_includes_observed_field_arithmetic_version(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     original = replay_metadata.version
     replay_metadata.environment_receipt.cache_clear()
     try:
@@ -35,8 +37,8 @@ def test_runtime_receipt_includes_observed_field_arithmetic_version(monkeypatch)
 
 @pytest.mark.parametrize("kind", ["annual", "birth_date", "period"])
 def test_used_calendar_fallback_reaches_outer_receipt_even_away_from_boundary(
-    monkeypatch, kind
-):
+    monkeypatch: pytest.MonkeyPatch, kind: str
+) -> None:
     original = calendar.lichun_resolution
     fallback = lambda *a: {
         **original(*a),
@@ -71,8 +73,8 @@ def test_used_calendar_fallback_reaches_outer_receipt_even_away_from_boundary(
 
 
 def test_no_false_degradation_from_unused_solver_or_statistical_uncertainty(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setattr(calendar.almanac, "swe", None)
     # No solar-term lookup is needed for a confirmed effective birth year.
     monkeypatch.setattr(

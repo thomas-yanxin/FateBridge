@@ -17,8 +17,8 @@ FIXTURE = (
 
 
 def test_raw_holdout_replays_first_quality_report_without_host_trigonometry(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     def forbidden(*args):
         raise AssertionError("Reference replay must avoid platform sin/cos")
 
@@ -35,7 +35,9 @@ def test_raw_holdout_replays_first_quality_report_without_host_trigonometry(
     assert result["unqualified_case_ids"] == ["fresh-nearsolar-2500-Mercury-Mercury"]
 
 
-def test_resealing_with_relaxed_reference_line_does_not_regrade_the_fixture(tmp_path):
+def test_resealing_with_relaxed_reference_line_does_not_regrade_the_fixture(
+    tmp_path: Path,
+) -> None:
     material = tmp_path / "material"
     shutil.copytree(FIXTURE, material)
     protocol = json.loads((material / "protocol.json").read_text())

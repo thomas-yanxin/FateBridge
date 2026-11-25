@@ -12,7 +12,7 @@ from __future__ import annotations
 import math
 from fractions import Fraction
 from importlib.metadata import version
-from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple
+from typing import Any, Callable, Sequence
 
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.lunar_motion import SOURCE_VERSION
@@ -83,7 +83,7 @@ def local_polynomial_stencil(
     center: float,
     step: float,
     *,
-    abscissas_days: Optional[Sequence[float]] = None,
+    abscissas_days: Sequence[float] | None = None,
 ) -> float:
     """Redundant local derivative on the same total radius 3*step."""
     if (
@@ -94,13 +94,19 @@ def local_polynomial_stencil(
         or not all(math.isfinite(v) for v in values)
     ):
         raise EphemerisSourceError("coordinate_values_unavailable")
+    else:
+        pass
     differences = [math.remainder(v - center, 360) for v in values]
     if any(abs(v) >= 90 for v in differences):
         raise EphemerisSourceError("coordinate_motion_unavailable")
+    else:
+        pass
     if abscissas_days is not None and tuple(abscissas_days) != tuple(
         x * step for x in LOCAL_NODES
     ):
         return _sampled_derivative(differences, abscissas_days, step, 6)
+    else:
+        pass
     return math.fsum(w * v for w, v in zip(LOCAL_WEIGHTS, differences)) / step
 
 
@@ -109,7 +115,7 @@ def longitude_stencil(
     center: float,
     step: float,
     *,
-    abscissas_days: Optional[Sequence[float]] = None,
+    abscissas_days: Sequence[float] | None = None,
 ) -> float:
     """Sixth-order derivative of locally unwrapped longitude, in degrees/day."""
     if (
@@ -120,10 +126,14 @@ def longitude_stencil(
         or not all(math.isfinite(v) for v in values)
     ):
         raise EphemerisSourceError("coordinate_values_unavailable")
+    else:
+        pass
     differences = [math.remainder(v - center, 360) for v in values]
     # The local branch must be unambiguous; no inference across half a circle.
     if any(abs(v) >= 90 for v in differences):
         raise EphemerisSourceError("coordinate_motion_unavailable")
+    else:
+        pass
     if abscissas_days is not None and tuple(abscissas_days) != tuple(
         x * step for x in OFFSETS
     ):
@@ -131,6 +141,8 @@ def longitude_stencil(
         # asymmetric rounded grid still reproduces degree6, rather than
         # relying on symmetric cancellation of the sixth-degree term.
         return _sampled_derivative((*differences, 0.0), (*abscissas_days, 0.0), step, 6)
+    else:
+        pass
     return math.fsum(w * v for w, v in zip(WEIGHTS, differences)) / (60 * step)
 
 
@@ -172,10 +184,12 @@ def one_sided_polynomial_stencil(
     step: float,
     direction: int,
     *,
-    abscissas_days: Optional[Sequence[float]] = None,
+    abscissas_days: Sequence[float] | None = None,
 ) -> float:
     if len(values) not in DIRECTIONAL_POLYNOMIALS or direction not in {-1, 1}:
         raise EphemerisSourceError("coordinate_motion_unavailable")
+    else:
+        pass
     if (
         not math.isfinite(step)
         or step <= 0
@@ -183,20 +197,26 @@ def one_sided_polynomial_stencil(
         or not all(math.isfinite(v) for v in values)
     ):
         raise EphemerisSourceError("coordinate_values_unavailable")
+    else:
+        pass
     differences = [math.remainder(v - center, 360) for v in values]
     if any(abs(v) >= 90 for v in differences):
         raise EphemerisSourceError("coordinate_motion_unavailable")
+    else:
+        pass
     if abscissas_days is not None and tuple(abscissas_days) != tuple(
         direction * x * step for x in DIRECTIONAL_POLYNOMIALS[len(values)][0]
     ):
         return _sampled_derivative(differences, abscissas_days, step, 6)
+    else:
+        pass
     weights = DIRECTIONAL_POLYNOMIALS[len(values)][1]
     return math.fsum(w * v for w, v in zip(weights, differences)) / (direction * step)
 
 
 def refinement_budget(
     epoch: float, longitude: float
-) -> Tuple[Tuple[float, ...], Dict[str, Any]]:
+) -> tuple[tuple[float, ...], dict[str, Any]]:
     """Bound finer sampling by time representability and coordinate quantization.
 
     The scale estimates floating output quantization, not physical/source error.
@@ -205,6 +225,8 @@ def refinement_budget(
     """
     if not math.isfinite(epoch) or not math.isfinite(longitude):
         raise EphemerisSourceError("coordinate_values_unavailable")
+    else:
+        pass
     epoch_ulp = math.ulp(epoch)
     coordinate_ulp = max(math.ulp(longitude), math.ulp(1.0))
     norm = max(
@@ -221,6 +243,8 @@ def refinement_budget(
         step /= 2
     if not steps:
         raise EphemerisSourceError("coordinate_motion_unavailable")
+    else:
+        pass
     return tuple(steps), {
         "method_id": "binary_epoch_and_coordinate_quantization_budget_v1",
         "epoch_ulp_days": epoch_ulp,
@@ -233,11 +257,18 @@ def refinement_budget(
     }
 
 
+def _native_abscissas(epoch: float, deltas: Sequence[float]) -> list[float]:
+    """Use the operands passed to the scalar native evaluator."""
+    return [(epoch + delta) - epoch for delta in deltas]
+
+
 def homogeneous_side_derivative(
     steps: Sequence[float],
     provider: Callable[[float], float],
-    branch: Callable[[float], Dict[str, Any]],
-) -> Dict[str, Any]:
+    branch: Callable[[float], dict[str, Any]],
+    *,
+    native_epoch: float | None = None,
+) -> dict[str, Any]:
     """Use all sampled homogeneous directions, with three agreeing levels.
 
     A direction crossing a known source knot is ineligible. A direction with
@@ -245,7 +276,7 @@ def homogeneous_side_derivative(
     and changes in the eligible direction set reset convergence evidence.
     """
     center_branch = branch(0.0)
-    result: Dict[str, Any] = {
+    result: dict[str, Any] = {
         "method_id": "source_homogeneous_side_ls13_ls25_three_levels_v1",
         "source_function": "Swiss2.10.03 swi_deflect_light/meff",
         "center": center_branch,
@@ -258,8 +289,10 @@ def homogeneous_side_derivative(
     }
     if center_branch.get("cell") is None:
         return result
+    else:
+        pass
     center = provider(0.0)
-    run: List[Dict[str, Any]] = []
+    run: list[dict[str, Any]] = []
     for step in steps:
         sides = []
         estimates = []
@@ -272,16 +305,24 @@ def homogeneous_side_derivative(
             if eligible:
                 valid.append(direction)
                 for count, (fit_nodes, _) in DIRECTIONAL_POLYNOMIALS.items():
+                    deltas = [direction * x * step for x in fit_nodes]
                     value = one_sided_polynomial_stencil(
-                        [provider(direction * x * step) for x in fit_nodes],
+                        [provider(delta) for delta in deltas],
                         center,
                         step,
                         direction,
+                        abscissas_days=(
+                            _native_abscissas(native_epoch, deltas)
+                            if native_epoch is not None
+                            else None
+                        ),
                     )
                     estimates.append(
                         dict(direction=direction, sample_count=count, rate=value)
                     )
-        level: Dict[str, Any] = dict(
+            else:
+                pass
+        level: dict[str, Any] = dict(
             step_days=step,
             sides=sides,
             estimates=estimates,
@@ -292,8 +333,12 @@ def homogeneous_side_derivative(
         if not valid:
             run = []
             continue
+        else:
+            pass
         if run and run[-1]["eligible_directions"] != valid:
             run = []
+        else:
+            pass
         # Both fit densities take part in acceptance. Every eligible direction
         # contributes symmetrically to the finest 25-node returned estimate.
         level["rate"] = math.fsum(
@@ -302,6 +347,8 @@ def homogeneous_side_derivative(
         run.append(level)
         if len(run) < 3:
             continue
+        else:
+            pass
         values = [e["rate"] for item in run[-3:] for e in item["estimates"]]
         spread = (max(values) - min(values)) * 3600
         passed = math.isfinite(spread) and spread <= CONVERGENCE_LINE_ARCSEC_PER_DAY
@@ -320,6 +367,8 @@ def homogeneous_side_derivative(
                 consecutive_converged_pairs=2,
             )
             break
+        else:
+            pass
     return result
 
 
@@ -330,8 +379,8 @@ def complete_position_rate(
     model: str,
     *,
     sidereal: bool = False,
-    source_trace: Optional[PhysicalEphemerisTrace] = None,
-) -> Tuple[Optional[float], Dict[str, Any]]:
+    source_trace: PhysicalEphemerisTrace | None = None,
+) -> tuple[float | None, dict[str, Any]]:
     """Refine a wide stencil locally, rejecting model drift or non-convergence.
 
     No reference samples, date-specific coefficients or residuals enter this
@@ -343,7 +392,7 @@ def complete_position_rate(
     swe = runtime.swe
     native_version = str(getattr(swe, "version", "unavailable"))
     binding = binding_distribution_version(swe, version)
-    policy: Dict[str, Any] = {
+    policy: dict[str, Any] = {
         "method_id": METHOD_ID,
         "native_version": native_version,
         "binding_version": binding,
@@ -368,14 +417,20 @@ def complete_position_rate(
             "status": "not_applied",
             "reason": "unsupported_target_or_model",
         }
+    else:
+        pass
     if swe is None or (native_version, binding) != SOURCE_VERSION:
         return None, {
             **policy,
             "status": "not_applied",
             "reason": "unverified_native_version",
         }
+    else:
+        pass
     if not math.isfinite(julian_day_tt):
         raise EphemerisSourceError("coordinate_values_unavailable")
+    else:
+        pass
     if model == "jpl" and planet in {"Mercury", "Venus"}:
         from fatebridge.core.astro.inner_motion import complete_inner_rate
 
@@ -389,20 +444,24 @@ def complete_position_rate(
         )
         if analytic is not None:
             return analytic, analytic_policy
+        else:
+            pass
         # A knot, isolated frame shortcut or other unqualified analytic domain
         # remains visible even if the older sampled derivative is available.
         policy["analytic_source_attempt"] = analytic_policy
+    else:
+        pass
     trace = source_trace if source_trace is not None else PhysicalEphemerisTrace()
-    samples: Dict[float, float] = {0.0: float(coordinates[0])}
+    samples: dict[float, float] = {0.0: float(coordinates[0])}
     contexts = {}
     rates = []
     tried_steps = []
     pair_differences = []
     difference = math.inf
-    primary_attempt: Dict[str, Any] = {}
+    primary_attempt: dict[str, Any] = {}
     selected_stencil = "sixth_order_six_point"
-    stabilization: Dict[str, Any] = {}
-    source_branch_motion: Dict[str, Any] = {}
+    stabilization: dict[str, Any] = {}
+    source_branch_motion: dict[str, Any] = {}
     with runtime.preserve_ephemeris_path():
         selected = configured_ephemeris_path()
         center_windows = observed_windows() if model == "swieph" else None
@@ -413,13 +472,13 @@ def complete_position_rate(
         )
         if sidereal:
             runtime.ephemeris_call("set_sid_mode", swe.SIDM_LAHIRI, 0.0, 0.0)
+        else:
+            pass
         flags = swe.FLG_SWIEPH | swe.FLG_SPEED | (swe.FLG_SIDEREAL if sidereal else 0)
 
         def sample(delta: float) -> float:
             if delta not in samples:
                 epoch = julian_day_tt + delta
-                if epoch - julian_day_tt != delta:
-                    raise EphemerisSourceError("coordinate_motion_unavailable")
                 state, returned = runtime.ephemeris_call(
                     "calc", epoch, PLANET_SWISSEPH_IDS[planet], flags
                 )
@@ -427,35 +486,53 @@ def complete_position_rate(
                 actual_model = runtime.ephemeris_model_from_retflag(returned)
                 if actual_model != model:
                     raise AuxiliaryPositionModelChange(epoch, model, actual_model)
+                else:
+                    pass
                 lon, _, _ = require_spherical_coordinates(
                     state, returned, native=swe, sidereal=sidereal
                 )
                 factor = f"{planet}_motion_position_{'lahiri' if sidereal else 'tropical'}_{delta:+g}"
                 contexts[factor] = trace.observe(factor, model, record_factor=False)
                 samples[delta] = lon
+            else:
+                pass
             return samples[delta]
 
         def run_stencil(
-            steps: Sequence[float], provider: Any, polynomial: bool = False
-        ) -> Dict[str, Any]:
-            trial_rates: List[float] = []
-            trial_steps: List[float] = []
-            pair_errors: List[float] = []
-            checks: List[Dict[str, Any]] = []
+            steps: Sequence[float],
+            provider: Callable[[float], float],
+            polynomial: bool = False,
+        ) -> dict[str, Any]:
+            trial_rates: list[float] = []
+            trial_steps: list[float] = []
+            pair_errors: list[float] = []
+            checks: list[dict[str, Any]] = []
             consecutive_pairs = 0
+            nodes = LOCAL_NODES if polynomial else OFFSETS
+            stencil = local_polynomial_stencil if polynomial else longitude_stencil
             for h in steps:
-                if polynomial:
-                    rate = local_polynomial_stencil(
-                        [provider(x * h) for x in LOCAL_NODES], float(coordinates[0]), h
-                    )
+                deltas = [node * h for node in nodes]
+                abscissas = _native_abscissas(julian_day_tt, deltas)
+                values = [provider(delta) for delta in deltas]
+                center_value = float(coordinates[0])
+                if not polynomial and abscissas != deltas:
+                    # The nonuniform six-point fit also uses the provider's
+                    # center as a seventh node.
+                    center_value = provider(0.0)
                 else:
-                    rate = longitude_stencil(
-                        [provider(x * h) for x in OFFSETS], float(coordinates[0]), h
-                    )
+                    pass
+                rate = stencil(
+                    values,
+                    center_value,
+                    h,
+                    abscissas_days=abscissas,
+                )
                 trial_rates.append(rate)
                 trial_steps.append(h)
                 if len(trial_rates) < 2:
                     continue
+                else:
+                    pass
                 error = abs(trial_rates[-2] - rate) * 3600
                 pair_errors.append(error)
                 consecutive_pairs = (
@@ -465,19 +542,24 @@ def complete_position_rate(
                 )
                 if consecutive_pairs < 2:
                     continue
+                else:
+                    pass
                 center = provider(0.0)
                 parent = 2 * h
                 estimates = []
-                for count, (nodes, _) in DIRECTIONAL_POLYNOMIALS.items():
-                    sides = [
-                        one_sided_polynomial_stencil(
-                            [provider(direction * x * parent) for x in nodes],
-                            center,
-                            parent,
-                            direction,
+                for count, (fit_nodes, _) in DIRECTIONAL_POLYNOMIALS.items():
+                    sides = []
+                    for direction in (1, -1):
+                        deltas = [direction * node * parent for node in fit_nodes]
+                        sides.append(
+                            one_sided_polynomial_stencil(
+                                [provider(delta) for delta in deltas],
+                                center,
+                                parent,
+                                direction,
+                                abscissas_days=_native_abscissas(julian_day_tt, deltas),
+                            )
                         )
-                        for direction in (1, -1)
-                    ]
                     estimates.append(
                         dict(
                             sample_count=count,
@@ -509,6 +591,8 @@ def complete_position_rate(
                 )
                 if passed:
                     break
+                else:
+                    pass
             return dict(
                 steps_days=trial_steps,
                 rates=trial_rates,
@@ -520,7 +604,7 @@ def complete_position_rate(
                 ),
             )
 
-        def replayed_file_attempt() -> Optional[Dict[str, Any]]:
+        def replayed_file_attempt() -> dict[str, Any] | None:
             # A finite difference must sample one source function. At an
             # overlapping compressed-file join, replay the actual center's
             # files and require three jointly agreeing homogeneous-side fits.
@@ -544,7 +628,7 @@ def complete_position_rate(
                     julian_day_tt, float(coordinates[0])
                 )
                 result = homogeneous_side_derivative(
-                    source_grid, probe.value, probe.branch
+                    source_grid, probe.value, probe.branch, native_epoch=julian_day_tt
                 )
                 result.update(
                     method_id="center_file_homogeneous_side_ls13_ls25_three_levels_v1",
@@ -554,6 +638,8 @@ def complete_position_rate(
                 )
                 policy.setdefault("center_file_replay_attempts", []).append(result)
                 return result
+            else:
+                pass
             return None
 
         grid = STEPS_DAYS + REFINEMENT_STEPS_DAYS
@@ -562,6 +648,8 @@ def complete_position_rate(
             primary_attempt = attempt
             selected_stencil = "degree6_least_squares_25_point"
             attempt = run_stencil(grid, sample, polynomial=True)
+        else:
+            pass
         if attempt["status"] != "converged":
             replayed = replayed_file_attempt()
             if replayed is not None:
@@ -579,6 +667,12 @@ def complete_position_rate(
                         )
                     }
                     attempt["directional_checks"] = []
+                else:
+                    pass
+            else:
+                pass
+        else:
+            pass
         if attempt["status"] != "converged" and planet == "Sun":
             # Preserve all successful original paths. Only an unresolved Sun
             # needs this additional representability-bounded central attempt;
@@ -591,19 +685,21 @@ def complete_position_rate(
             policy["refinement_budget"] = grid_budget
             attempt = run_stencil(extended_grid, sample)
             selected_stencil = "bounded_extended_sixth_order_six_point"
+        else:
+            pass
         if attempt["status"] != "converged":
             if planet not in {"Mercury", "Venus", "Mars"}:
                 raise EphemerisSourceError("position_motion_not_converged")
+            else:
+                pass
             unstabilized_attempt = {"selected_stencil": selected_stencil, **attempt}
             selected_stencil = "retarded_epoch_stabilized_sixth_order"
-            stable_samples: Dict[float, float] = {}
+            stable_samples: dict[float, float] = {}
             policies = []
 
             def stable_sample(delta: float) -> float:
                 if delta not in stable_samples:
                     epoch = julian_day_tt + delta
-                    if epoch - julian_day_tt != delta:
-                        raise EphemerisSourceError("coordinate_motion_unavailable")
                     raw, returned = runtime.ephemeris_call(
                         "calc", epoch, PLANET_SWISSEPH_IDS[planet], flags
                     )
@@ -611,6 +707,8 @@ def complete_position_rate(
                     actual_model = runtime.ephemeris_model_from_retflag(returned)
                     if actual_model != model:
                         raise AuxiliaryPositionModelChange(epoch, model, actual_model)
+                    else:
+                        pass
                     require_spherical_coordinates(
                         raw, returned, native=swe, sidereal=sidereal
                     )
@@ -628,6 +726,8 @@ def complete_position_rate(
                     )
                     stable_samples[delta] = lon
                     policies.append(receipt)
+                else:
+                    pass
                 return stable_samples[delta]
 
             stable_grid, budget = refinement_budget(
@@ -636,13 +736,11 @@ def complete_position_rate(
             attempt = run_stencil(stable_grid, stable_sample)
             symmetric_attempt = attempt
             if attempt["status"] != "converged":
-                branches: Dict[float, Dict[str, Any]] = {}
+                branches: dict[float, dict[str, Any]] = {}
 
-                def branch(delta: float) -> Dict[str, Any]:
+                def branch(delta: float) -> dict[str, Any]:
                     if delta not in branches:
                         epoch = julian_day_tt + delta
-                        if epoch - julian_day_tt != delta:
-                            raise EphemerisSourceError("coordinate_motion_unavailable")
                         branches[delta] = solar_interpolation_branch(
                             planet,
                             epoch,
@@ -651,10 +749,12 @@ def complete_position_rate(
                             contexts,
                             f"{planet}_motion_source_cell_{delta:+g}",
                         )
+                    else:
+                        pass
                     return branches[delta]
 
                 source_branch_motion = homogeneous_side_derivative(
-                    stable_grid[2:], stable_sample, branch
+                    stable_grid[2:], stable_sample, branch, native_epoch=julian_day_tt
                 )
                 source_branch_motion["probe_count"] = len(branches)
                 if source_branch_motion["status"] == "converged":
@@ -670,6 +770,10 @@ def complete_position_rate(
                         )
                     }
                     attempt["directional_checks"] = []
+                else:
+                    pass
+            else:
+                pass
             rates = attempt["rates"]
             tried_steps = attempt["steps_days"]
             pair_differences = attempt["pair_differences_arcsec_per_day"]
@@ -703,6 +807,8 @@ def complete_position_rate(
                 "displayed_native_position_changed": False,
                 "scope": "First-order recovery of lost retarded-epoch fractions in auxiliary derivative samples only. Native frame-velocity and apparent-position Jacobian cross terms remain approximation limits; multi-step agreement is not an independent error bound.",
             }
+        else:
+            pass
         if attempt["status"] != "converged":
             replayed = replayed_file_attempt()
             if replayed is not None:
@@ -720,19 +826,23 @@ def complete_position_rate(
                         )
                     }
                     attempt["directional_checks"] = []
+                else:
+                    pass
+            else:
+                pass
+        else:
+            pass
         if (
             attempt["status"] != "converged"
             and model in {"swieph", "jpl"}
             and planet in {"Mercury", "Venus", "Mars"}
             and center_source.get("file_ids")
         ):
-            decimal_samples: Dict[float, Tuple[float, ReductionReceipt]] = {}
+            decimal_samples: dict[float, tuple[float, ReductionReceipt]] = {}
 
             def decimal_sample(delta: float) -> float:
                 if delta not in decimal_samples:
                     epoch = julian_day_tt + delta
-                    if epoch - julian_day_tt != delta:
-                        raise EphemerisSourceError("coordinate_motion_unavailable")
                     decimal_samples[delta] = reduced_longitude(
                         planet,
                         epoch,
@@ -743,11 +853,13 @@ def complete_position_rate(
                         center_source=center_source,
                         model=model,
                     )
+                else:
+                    pass
                 return decimal_samples[delta][0]
 
-            def decimal_branch(delta: float) -> Dict[str, Any]:
+            def decimal_branch(delta: float) -> dict[str, Any]:
                 decimal_sample(delta)
-                branch: Dict[str, Any] = decimal_samples[delta][1][
+                branch: dict[str, Any] = decimal_samples[delta][1][
                     "solar_interpolation_branch"
                 ]
                 return branch
@@ -761,7 +873,10 @@ def complete_position_rate(
                     julian_day_tt, float(coordinates[0])
                 )
                 result = homogeneous_side_derivative(
-                    decimal_grid[2:], decimal_sample, decimal_branch
+                    decimal_grid[2:],
+                    decimal_sample,
+                    decimal_branch,
+                    native_epoch=julian_day_tt,
                 )
                 result.update(
                     method_id="decimal_reduction_homogeneous_side_ls13_ls25_three_levels_v2",
@@ -809,8 +924,16 @@ def complete_position_rate(
                         )
                     }
                     attempt["directional_checks"] = []
+                else:
+                    pass
+            else:
+                pass
+        else:
+            pass
         if attempt["status"] != "converged":
             raise EphemerisSourceError("position_motion_not_converged")
+        else:
+            pass
         rates = attempt["rates"]
         tried_steps = attempt["steps_days"]
         pair_differences = attempt["pair_differences_arcsec_per_day"]
@@ -818,6 +941,8 @@ def complete_position_rate(
         assert_physical_configuration(selected)
         if source_trace is None:
             trace.finish()
+        else:
+            pass
     return rates[-1], {
         **policy,
         "status": "applied",

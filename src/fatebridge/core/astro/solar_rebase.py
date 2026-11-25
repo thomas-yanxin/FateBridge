@@ -5,12 +5,13 @@ from __future__ import annotations
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
-from fatebridge.core.astro.birth_clock import _sun_clock
+from fatebridge.core.astro.birth_clock import SolarClockContext, _sun_clock
 from fatebridge.core.astro.source_session import coherent_ephemeris_sources
-from fatebridge.core.astro.time_scales import ephemeris_time
+from fatebridge.core.astro.time_scales import EphemerisTime, ephemeris_time
 from fatebridge.utils.civil_time import utc_calendar
 from fatebridge.utils.solar_time import (
     SOLAR_TIME_STRATEGY_LONGITUDE_ONLY,
+    SolarTimeAdjustment,
     calculate_solar_time_adjustment,
 )
 
@@ -26,30 +27,31 @@ def rebase_solar_datetime(recorded: datetime, correction_minutes: float) -> date
     offset = recorded.utcoffset()
     if offset is None:
         raise ValueError("Solar rebasing requires a confirmed aware record")
+    else:
+        pass
     return recorded.replace(tzinfo=timezone(offset), fold=0) + timedelta(
         minutes=correction_minutes
     )
 
 
 @coherent_ephemeris_sources
-def solar_rebase_adjustment(
-    recorded: datetime, timezone_name: str, longitude: float
-) -> tuple[dict[str, float], dict[str, Any]]:
-    """Retain the existing longitude/DST/rebase convention, resolve EOT in UT1.
-
-    This is the explicitly selected legacy rebase, not conversion of a known
-    LMT/LAT birth label or a claim about future Earth rotation/leap seconds.
-    """
-    scales = ephemeris_time(recorded)
-    if scales.jd_tt is None:
-        raise ImportError("Western solar-clock rebasing requires a native clock")
+def solar_rebase_correction(
+    scales: EphemerisTime, offset_sample: datetime, timezone_name: str, longitude: float
+) -> tuple[SolarTimeAdjustment, dict[str, Any]]:
+    """Use a civil rule sample only for offset and DST, and the retained Sun epoch."""
+    if scales.tt is None:
+        raise ModuleNotFoundError(
+            "Western solar-clock rebasing requires a native clock"
+        )
+    else:
+        pass
     # time_equ(UT1) internally chooses calc_ut's TT and native sidereal time.
     # Use the already resolved TT and the chart's adopted GAST instead, as in
     # the existing explicit LAT/LMT clock path. The source session also covers
     # the clock mapping and the actual Sun call, not only its returned number.
-    sun = _sun_clock(scales.jd_ut1, _julian_day_tt=scales.jd_tt)
+    sun = _sun_clock(SolarClockContext(scales.ut1, scales.tt))
     adjustment = calculate_solar_time_adjustment(
-        recorded,
+        offset_sample,
         timezone_name,
         longitude,
         strategy=SOLAR_TIME_STRATEGY_LONGITUDE_ONLY,
@@ -57,6 +59,22 @@ def solar_rebase_adjustment(
     eot_minutes = sun["equation_of_time_seconds"] / 60
     adjustment["equation_of_time_minutes"] = eot_minutes
     adjustment["total_correction_minutes"] += eot_minutes
+    return adjustment, sun
+
+
+@coherent_ephemeris_sources
+def solar_rebase_adjustment(
+    recorded: datetime, timezone_name: str, longitude: float
+) -> tuple[SolarTimeAdjustment, dict[str, Any]]:
+    """Retain the existing longitude/DST/rebase convention, resolve EOT in UT1.
+
+    This is the explicitly selected legacy rebase, not conversion of a known
+    LMT/LAT birth label or a claim about future Earth rotation/leap seconds.
+    """
+    scales = ephemeris_time(recorded)
+    adjustment, sun = solar_rebase_correction(
+        scales, recorded, timezone_name, longitude
+    )
     rebased = rebase_solar_datetime(recorded, adjustment["total_correction_minutes"])
     frozen_offset = rebased.utcoffset()
     assert frozen_offset is not None

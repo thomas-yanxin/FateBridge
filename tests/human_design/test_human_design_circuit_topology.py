@@ -7,12 +7,14 @@ from pathlib import Path
 import pytest
 
 from fatebridge.application.execution import execute_tool
-from fatebridge.core.human_design import bodygraph
-from fatebridge.core.human_design_circuit_topology import topology_reference
-from fatebridge.core.human_design_evidence import reference_table_audit
-from fatebridge.core.human_design_references import clear_reference_cache
+from fatebridge.core.human_design.human_design import bodygraph
+from fatebridge.core.human_design.human_design_circuit_topology import (
+    topology_reference,
+)
+from fatebridge.core.human_design.human_design_evidence import reference_table_audit
+from fatebridge.core.human_design.human_design_references import clear_reference_cache
 from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.validation.human_design import verify_human_design_reading
+from validation.human_design import verify_human_design_reading
 
 ROOT = Path(__file__).resolve().parents[2]
 REFERENCE = topology_reference()
@@ -27,7 +29,7 @@ INPUT = dict(
 )
 
 
-def test_frozen_visual_facts_retain_all_pages_ocr_errors_and_source_conflict():
+def test_frozen_visual_facts_retain_all_pages_ocr_errors_and_source_conflict() -> None:
     p = ROOT / "tests/fixtures/human-design-circuit-pages-observations.json"
     assert (
         hashlib.sha256(p.read_bytes()).hexdigest()
@@ -55,7 +57,7 @@ def test_frozen_visual_facts_retain_all_pages_ocr_errors_and_source_conflict():
     assert prior["endpoint_inferences_checked"] == 30
 
 
-def test_connected_definition_is_not_complete_logic_circuit():
+def test_connected_definition_is_not_complete_logic_circuit() -> None:
     one = bodygraph([63, 4], [])
     assert one["definition"]["kind"] == "single"
     row = next(
@@ -69,7 +71,9 @@ def test_connected_definition_is_not_complete_logic_circuit():
     assert row["all_channels_defined"] is False
 
 
-def test_four_integration_gates_complete_only_the_separate_integration_topology():
+def test_four_integration_gates_complete_only_the_separate_integration_topology() -> (
+    None
+):
     graph = bodygraph([10, 20, 34, 57], [])
     assert len(graph["channels"]) == 6
     summary = graph["circuitry"]["topology_completion"]
@@ -80,7 +84,9 @@ def test_four_integration_gates_complete_only_the_separate_integration_topology(
     assert rows["individual_centering"]["defined_channel_ids"] == ["10-34"]
 
 
-def test_source_motor_heading_cannot_define_an_unconnected_center_or_override_type():
+def test_source_motor_heading_cannot_define_an_unconnected_center_or_override_type() -> (
+    None
+):
     graph = bodygraph([27, 50], [])
     assert graph["type"] == "generator" and graph["authority"] == "sacral"
     assert graph["centers"]["root"]["status"] == "completely_open"
@@ -89,9 +95,9 @@ def test_source_motor_heading_cannot_define_an_unconnected_center_or_override_ty
 
 
 def test_truncated_center_reference_reports_missing_facts_without_claiming_acceptance(
-    monkeypatch,
-):
-    from fatebridge.core import human_design_evidence as module
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from fatebridge.core.human_design import human_design_evidence as module
 
     truncated = deepcopy(module.source_reference())
     truncated["gates"] = truncated["gates"][:1]
@@ -109,7 +115,7 @@ def test_truncated_center_reference_reports_missing_facts_without_claiming_accep
     )
 
 
-def test_returned_source_observations_cannot_poison_the_reference_cache():
+def test_returned_source_observations_cannot_poison_the_reference_cache() -> None:
     first = reference_table_audit()["archival_channel_pages"]
     try:
         first["source_label_disagreements"][0]["printed_motor_names"][0] = "Tampered"
@@ -122,7 +128,7 @@ def test_returned_source_observations_cannot_poison_the_reference_cache():
         clear_reference_cache()
 
 
-def test_channel_subsets_match_the_independent_source_gate_presence_oracle():
+def test_channel_subsets_match_the_independent_source_gate_presence_oracle() -> None:
     # 824 channel-subset constructions include overlapping Integration gates.
     # The oracle uses only the visually transcribed source sets, not CHANNELS.
     expected = {
@@ -160,7 +166,7 @@ def complete():
 
 def test_complete_reading_preserves_old_statements_and_explains_topology_and_source(
     complete,
-):
+) -> None:
     assert len(complete["interpretation"]["statements"]) == 10
     text = complete["interpretation"]["circuit_topology_meaning"]
     assert (
@@ -173,7 +179,6 @@ def test_complete_reading_preserves_old_statements_and_explains_topology_and_sou
     check = verify_human_design_reading(complete)
     assert check["status"] == "verified_fixed_template_reading", check
     assert check["checked_circuit_topology_count"] == 7
-    assert complete["validation"]["all_three_axes_full_marks"] is False
 
 
 @pytest.mark.parametrize(
@@ -191,8 +196,8 @@ def test_complete_reading_preserves_old_statements_and_explains_topology_and_sou
     ],
 )
 def test_forged_completion_and_source_certification_rejected_even_after_rehash(
-    complete, tamper
-):
+    complete, tamper: str
+) -> None:
     value = deepcopy(complete)
     completion = value["bodygraph"]["circuitry"]["topology_completion"]
     row = next(r for r in completion["topologies"] if not r["all_channels_defined"])

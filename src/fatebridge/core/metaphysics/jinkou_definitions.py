@@ -6,9 +6,17 @@ import json
 from pathlib import Path
 from typing import Any
 
-from ...utils.data import EARTHLY_BRANCHES
-from .common import ELEMENT_CONTROLS, ELEMENT_GENERATES, stem_element_text
-from .jinkou_stems import wuzidun_stem
+from fatebridge.core.metaphysics.common import (
+    ELEMENT_CONTROLS,
+    ELEMENT_GENERATES,
+    stem_element_text,
+)
+from fatebridge.core.metaphysics.jinkou_guishen import (
+    GUISHEN_IDENTITIES,
+    _build_guishen_mapping,
+)
+from fatebridge.core.metaphysics.jinkou_stems import wuzidun_stem
+from fatebridge.utils.data import EARTHLY_BRANCHES
 
 
 def chapter_provenance() -> dict[str, Any]:
@@ -22,13 +30,11 @@ def definition_evidence(
     *, day_stem: str, hour_branch: str, is_diurnal: bool, rows: list[dict[str, Any]]
 ) -> dict[str, Any]:
     # Lazy import: the board builder calls this function after module loading.
-    from fatebridge.core.metaphysics.jinkou_guishen import (
-        GUISHEN_IDENTITIES,
-        _build_guishen_mapping,
-    )
 
     if [r.get("label") for r in rows] != ["人元", "贵神", "将神", "地分"]:
         raise ValueError("课钤疑义证据需要按次序排列的四位")
+    else:
+        pass
     by_label = {r["label"]: r for r in rows}
     ground, human = rows[3]["content"], rows[0]["content"]
     path = Path(__file__).resolve().parents[2] / "data/jinkou_definition_witnesses.json"

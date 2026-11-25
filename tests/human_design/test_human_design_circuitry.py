@@ -9,23 +9,26 @@ from pathlib import Path
 import pytest
 
 from fatebridge.application.execution import execute_tool
-from fatebridge.core.human_design import bodygraph
-from fatebridge.core.human_design_circuitry import (
+from fatebridge.core.human_design.human_design import bodygraph
+from fatebridge.core.human_design.human_design_circuitry import (
     audit_channel_circuits,
     audit_circuit_groups,
     circuit_group_reference,
     circuit_reference,
     circuitry_summary,
 )
-from fatebridge.core.human_design_evidence import circuitry_reading, source_reference
-from fatebridge.core.human_design_mechanics import CHANNELS
+from fatebridge.core.human_design.human_design_evidence import (
+    circuitry_reading,
+    source_reference,
+)
+from fatebridge.core.human_design.human_design_mechanics import CHANNELS
 from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.validation.human_design import verify_human_design_reading
 from tests.support.ephemeris_context import empty_ephemeris_path
+from validation.human_design import verify_human_design_reading
 
 
 @pytest.mark.parametrize("row", circuit_reference()["coupled_channels"])
-def test_official_six_coupled_channel_classifications(row):
+def test_official_six_coupled_channel_classifications(row) -> None:
     first, second = row["gates"]
     graph = bodygraph([first], [second])
     assert len(graph["channels"]) == 1
@@ -33,7 +36,7 @@ def test_official_six_coupled_channel_classifications(row):
     assert graph["channels"][0]["mixed_only"] is True
 
 
-def test_six_connections_are_not_six_integration_channels():
+def test_six_connections_are_not_six_integration_channels() -> None:
     graph = bodygraph([10, 20], [34, 57])
     assert len(graph["channels"]) == 6
     summary = graph["circuitry"]
@@ -69,7 +72,7 @@ def test_six_connections_are_not_six_integration_channels():
     assert "个体6" in circuitry_reading(graph)
 
 
-def test_brainwave_is_knowing_without_any_completed_integration_channel():
+def test_brainwave_is_knowing_without_any_completed_integration_channel() -> None:
     graph = bodygraph([20], [57])
     assert graph["type"] == "projector"
     assert graph["authority"] == "splenic"
@@ -84,7 +87,7 @@ def test_brainwave_is_knowing_without_any_completed_integration_channel():
     assert graph["circuitry"]["circuits"][0]["id"] == "individual_knowing"
 
 
-def test_hanging_gates_do_not_create_a_fixed_circuit_or_a_deficit_reading():
+def test_hanging_gates_do_not_create_a_fixed_circuit_or_a_deficit_reading() -> None:
     graph = bodygraph([20], [])
     assert graph["circuitry"]["defined_channel_count"] == 0
     assert graph["circuitry"]["circuits"] == []
@@ -93,7 +96,7 @@ def test_hanging_gates_do_not_create_a_fixed_circuit_or_a_deficit_reading():
     assert "单门仍保留" in circuitry_reading(graph)
 
 
-def test_direct_source_evidence_stays_separate_from_endpoint_inferences():
+def test_direct_source_evidence_stays_separate_from_endpoint_inferences() -> None:
     report = audit_channel_circuits(CHANNELS, source_reference()["gates"])
     assert report["status"] == "bounded_public_source_match"
     assert report["channels_matched"] == report["channels_checked"] == 36
@@ -102,7 +105,7 @@ def test_direct_source_evidence_stays_separate_from_endpoint_inferences():
     assert "推断" in report["scope"]
 
 
-def test_old_brainwave_misclassification_is_detected_against_unchanged_source():
+def test_old_brainwave_misclassification_is_detected_against_unchanged_source() -> None:
     old = tuple(
         (a, b, "integration" if (a, b) == (20, 57) else c) for a, b, c in CHANNELS
     )
@@ -119,8 +122,10 @@ def test_old_brainwave_misclassification_is_detected_against_unchanged_source():
     ]
 
 
-def test_deleting_source_facts_cannot_turn_the_check_into_full_acceptance(monkeypatch):
-    from fatebridge.core import human_design_circuitry as module
+def test_deleting_source_facts_cannot_turn_the_check_into_full_acceptance(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from fatebridge.core.human_design import human_design_circuitry as module
 
     shortened = deepcopy(circuit_reference())
     shortened["coupled_channels"] = shortened["coupled_channels"][:1]
@@ -131,14 +136,16 @@ def test_deleting_source_facts_cannot_turn_the_check_into_full_acceptance(monkey
     )
 
 
-def test_unknown_circuit_never_receives_an_invented_interpretation():
+def test_unknown_circuit_never_receives_an_invented_interpretation() -> None:
     with pytest.raises(ValueError, match="回路分类"):
         circuitry_summary(
             [{"circuit": "invented", "id": "20-57", "gates": [20, 57]}], [20, 57]
         )
 
 
-def test_all_channels_partition_into_three_groups_with_integration_in_individual():
+def test_all_channels_partition_into_three_groups_with_integration_in_individual() -> (
+    None
+):
     graph = bodygraph(range(1, 65), [])
     summary = graph["circuitry"]
     assert summary["defined_channel_count"] == 36
@@ -158,7 +165,7 @@ def test_all_channels_partition_into_three_groups_with_integration_in_individual
 
 
 @pytest.mark.parametrize("row", [c for c in CHANNELS if c[2] == "integration"])
-def test_each_integration_channel_counts_once_in_individual_and_its_subset(row):
+def test_each_integration_channel_counts_once_in_individual_and_its_subset(row) -> None:
     a, b, _ = row
     summary = bodygraph([a], [b])["circuitry"]
     assert summary["defined_channel_count"] == 1
@@ -173,8 +180,10 @@ def test_each_integration_channel_counts_once_in_individual_and_its_subset(row):
     )
 
 
-def test_old_exclusion_is_rejected_against_unchanged_official_membership(monkeypatch):
-    from fatebridge.core import human_design_circuitry as module
+def test_old_exclusion_is_rejected_against_unchanged_official_membership(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from fatebridge.core.human_design import human_design_circuitry as module
 
     old = {**module.CIRCUIT_GROUP, "integration": None}
     monkeypatch.setattr(module, "CIRCUIT_GROUP", old)
@@ -189,9 +198,9 @@ def test_old_exclusion_is_rejected_against_unchanged_official_membership(monkeyp
     "bad", ["remove_integration", "duplicate_membership", "swap_group"]
 )
 def test_incomplete_or_conflicting_reference_cannot_certify_group_membership(
-    monkeypatch, bad
-):
-    from fatebridge.core import human_design_circuitry as module
+    monkeypatch: pytest.MonkeyPatch, bad: str
+) -> None:
+    from fatebridge.core.human_design import human_design_circuitry as module
 
     ref = deepcopy(circuit_group_reference())
     if bad == "remove_integration":
@@ -205,7 +214,7 @@ def test_incomplete_or_conflicting_reference_cannot_certify_group_membership(
     assert audit_circuit_groups(CHANNELS)["status"] == "mismatch_or_incomplete"
 
 
-def test_no_channel_is_an_empty_partition_without_invented_group_themes():
+def test_no_channel_is_an_empty_partition_without_invented_group_themes() -> None:
     summary = bodygraph([10], [34])["circuitry"]
     assert summary["integration"]["completed_channel_ids"] == []
     assert summary["group_channel_counts"]["individual"] == 1
@@ -221,8 +230,8 @@ def test_no_channel_is_an_empty_partition_without_invented_group_themes():
 
 
 def test_membership_extractor_is_independent_and_rejects_missing_source_anchors(
-    tmp_path,
-):
+    tmp_path: Path,
+) -> None:
     path = (
         Path(__file__).resolve().parents[2]
         / "scripts/human_design/build_human_design_circuit_group_reference.py"
@@ -286,7 +295,9 @@ def integrated_run():
 @pytest.mark.parametrize(
     "bad", ["exclude", "double_count", "membership", "source", "joint", "text"]
 )
-def test_rehashed_group_claims_must_match_actual_structure(integrated_run, bad):
+def test_rehashed_group_claims_must_match_actual_structure(
+    integrated_run, bad: str
+) -> None:
     result = deepcopy(integrated_run)
     group = result["bodygraph"]["circuitry"]
     if bad in {"exclude", "double_count"}:

@@ -50,6 +50,8 @@ def read_protocol() -> dict:
     raw = PROTOCOL.read_bytes()
     if hashlib.sha256(raw).hexdigest() != PROTOCOL_SHA256:
         raise ValueError("Predeclared Meridian geometry protocol checksum mismatch")
+    else:
+        pass
     return json.loads(raw)
 
 
@@ -107,6 +109,8 @@ def original_table_comparison(protocol: dict) -> dict:
         != protocol["printed_source_comparison"]["printed_values_sha256"]
     ):
         raise ValueError("Frozen Witte printed positions checksum mismatch")
+    else:
+        pass
     fixture = json.loads(data)
     # A technical obliquity reference epoch, not an invented birth time.
     d1, d2 = erfa.cal2jd(1859, 1, 27)
@@ -115,6 +119,8 @@ def original_table_comparison(protocol: dict) -> dict:
     native, native_flags = swe.calc(jd, swe.ECL_NUT, 0)
     if native_flags < 0 or not math.isfinite(native[0]):
         raise ValueError("Independent source comparison has no native true obliquity")
+    else:
+        pass
     models = [
         ("IAU2006_mean_ERFA", math.degrees(erfa.obl06(d1, d2))),
         ("Swiss_native_true", float(native[0])),
@@ -182,6 +188,8 @@ def main() -> int:
     }
     if args.source_comparison:
         result["original_table_comparison"] = original_table_comparison(protocol)
+    else:
+        pass
     result.update(authority_certified=False, all_four_objectives_validated=False)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     with args.output.open("x") as stream:
@@ -206,3 +214,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

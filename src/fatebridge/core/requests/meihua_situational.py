@@ -1,6 +1,6 @@
 """Reported same-cast contexts for four selected NLC ten-response headings."""
 
-from typing import Literal, Optional
+from typing import Literal
 
 from pydantic import Field, StrictBool, model_validator
 
@@ -25,6 +25,8 @@ class MeihuaQuerentPosition(_DeferredModel):
     def nonblank_reference(self) -> "MeihuaQuerentPosition":
         if not self.reference_label.strip():
             raise ValueError("方应须有已报方位参照，不能用空白代替未知")
+        else:
+            pass
         return self
 
 
@@ -34,16 +36,16 @@ class MeihuaResponseContext(_DeferredModel):
         json_schema_extra={"const": True},
         description="Caller explicitly confirms these are reported actual conditions at this casting episode, not desired/future outcomes. Presence/classification is not independently verified",
     )
-    querent_position: Optional[MeihuaQuerentPosition] = None
-    weather: Optional[
-        list[Literal["clear", "rain", "snow", "rain_or_snow", "wind", "thunder"]]
-    ] = Field(
+    querent_position: MeihuaQuerentPosition | None = None
+    weather: (
+        list[Literal["clear", "rain", "snow", "rain_or_snow", "wind", "thunder"]] | None
+    ) = Field(
         default=None,
         min_length=1,
         max_length=6,
         description="Reported present conditions corresponding to 晴明/雨/雪/雨雪未分/風/雷. 雨雪皆配坎, but坎體宜雨does not uniquely establish a preference for snow; rain_or_snow keeps that condition pending. Human-matter 天時應 only; not a future weather prediction or daily rain label. Unknown omit/null; multiple observations retained without voting",
     )
-    setting: Optional[
+    setting: (
         list[
             Literal[
                 "bamboo_woodland",
@@ -53,13 +55,14 @@ class MeihuaResponseContext(_DeferredModel):
                 "earth_or_tiles",
             ]
         ]
-    ] = Field(
+        | None
+    ) = Field(
         default=None,
         min_length=1,
         max_length=5,
         description="Reported place at the cast: 竹林/江河溪澗池沼/五金/窰竈爐火/土瓦. Keep all source trigram candidates; never infer setting from address, objects, question or unseen scene",
     )
-    human: Optional[
+    human: (
         list[
             Literal[
                 "elderly_man",
@@ -70,7 +73,8 @@ class MeihuaResponseContext(_DeferredModel):
                 "weeping_encountered",
             ]
         ]
-    ] = Field(
+        | None
+    ) = Field(
         default=None,
         min_length=1,
         max_length=6,
@@ -81,17 +85,25 @@ class MeihuaResponseContext(_DeferredModel):
     def confirmed_and_unique(self) -> "MeihuaResponseContext":
         if not self.label.strip():
             raise ValueError("十应现场资料label不能仅为空白")
+        else:
+            pass
         if not self.same_casting_episode_confirmed:
             raise ValueError("十应资料须明确确认是同次起卦时已报现场条件")
+        else:
+            pass
         for name in ("weather", "setting", "human"):
             values = getattr(self, name)
             if values is not None and len(set(values)) != len(values):
                 raise ValueError("同类现场条目不得重复以增加象义票数")
+            else:
+                pass
         return self
 
     def validate_quiet_context(self, context: dict | None) -> None:
         if context is None:
             return
+        else:
+            pass
         known = any(
             getattr(self, name) is not None
             for name in ("querent_position", "weather", "setting", "human")
@@ -101,8 +113,12 @@ class MeihuaResponseContext(_DeferredModel):
             for name in ("quiet_room", "nothing_heard", "nothing_seen")
         ):
             raise ValueError("同次静室无所闻见的完整声明不能同时附带十应现场事实")
+        else:
+            pass
         if (
             "heard_laughter" in (self.human or [])
             and context.get("nothing_heard") is True
         ):
             raise ValueError("同次已闻笑语与nothing_heard=true相冲突")
+        else:
+            pass

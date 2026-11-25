@@ -4,6 +4,7 @@ import asyncio
 import json
 import shutil
 from copy import deepcopy
+from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
@@ -15,18 +16,19 @@ import scripts.ziwei.audit_ziwei_conditions as audit
 from fatebridge.application.examples import evidence_views
 from fatebridge.application.execution import execute_tool
 from fatebridge.cli import run
+from fatebridge.core.contracts.output_chinese import ZiweiStructuralConditionRecord
 from fatebridge.core.metaphysics.ziwei import build_ziwei_chart
-from fatebridge.core.output_chinese import ZiweiStructuralConditionRecord
-from fatebridge.core.ziwei_conditions import structural_condition_evidence
+from fatebridge.core.ziwei.ziwei_conditions import structural_condition_evidence
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
 from scripts.ziwei.audit_ziwei_limits import _seed
 from tests.fixtures.mcp_receipt import verified_inline_business
 from tests.fixtures.mcp_result_delivery import read_full_result
+from tests.support.transports import call_calculation
+from validation.claims import CalculationClaim, verify_calculation_claims
 
 
-def test_independent_printed_examples_are_distinct_from_derived_coverage():
+def test_independent_printed_examples_are_distinct_from_derived_coverage() -> None:
     r = audit.audit_conditions()
     assert not r["differences"]
     assert (
@@ -55,7 +57,9 @@ def test_independent_printed_examples_are_distinct_from_derived_coverage():
     assert r["live_model_blind_evaluation"] == "not_run"
 
 
-def test_wrong_geometric_result_is_detected_against_frozen_neighbor_lists(monkeypatch):
+def test_wrong_geometric_result_is_detected_against_frozen_neighbor_lists(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     original = audit.build_ziwei_chart
 
     def wrong(*a, **kw):
@@ -68,7 +72,7 @@ def test_wrong_geometric_result_is_detected_against_frozen_neighbor_lists(monkey
     assert len(audit.audit_conditions()["differences"]) == 34560
 
 
-def test_original_images_are_required(tmp_path):
+def test_original_images_are_required(tmp_path: Path) -> None:
     shutil.copytree(
         audit.FIXTURES / "naj_ming_conditions_v1", tmp_path / "naj_ming_conditions_v1"
     )
@@ -103,8 +107,8 @@ def _palaces(positions, ming):
     ],
 )
 def test_selected_bilateral_reading_rejects_same_side_same_palace_or_opposition(
-    ming, left, right, expected
-):
+    ming: str, left: str, right: str, expected: bool
+) -> None:
     p = _palaces({"左辅": left, "右弼": right}, ming)
     before = deepcopy(p)
     e = structural_condition_evidence(p, ming_branch=ming, year_stem="甲")
@@ -114,13 +118,15 @@ def test_selected_bilateral_reading_rejects_same_side_same_palace_or_opposition(
 
 
 @pytest.mark.parametrize("duplicate", [False, True])
-def test_missing_or_duplicated_star_is_unknown_not_a_negative(duplicate):
+def test_missing_or_duplicated_star_is_unknown_not_a_negative(duplicate: bool) -> None:
     p = _palaces({"左辅": "子", "右弼": "寅"}, "丑")
     next(x for x in p if x["ganzhi"][1] == "寅")["stars_detail"] = []
     if duplicate:
         next(x for x in p if x["ganzhi"][1] == "卯")["stars_detail"] = [
             dict(name="左辅", mutagen=None)
         ]
+    else:
+        pass
     r = next(
         r
         for r in structural_condition_evidence(p, ming_branch="丑", year_stem="甲")[
@@ -134,7 +140,9 @@ def test_missing_or_duplicated_star_is_unknown_not_a_negative(duplicate):
     assert "右弼" in r["missing_or_duplicated_stars"]
 
 
-def test_known_stem_failure_does_not_become_unknown_when_another_fact_is_missing():
+def test_known_stem_failure_does_not_become_unknown_when_another_fact_is_missing() -> (
+    None
+):
     r = structural_condition_evidence([], ming_branch="寅", year_stem="乙")["records"][
         0
     ]
@@ -143,7 +151,9 @@ def test_known_stem_failure_does_not_become_unknown_when_another_fact_is_missing
     )
 
 
-def test_all_evaluated_premises_do_not_discharge_unresolved_no_sha_qualification():
+def test_all_evaluated_premises_do_not_discharge_unresolved_no_sha_qualification() -> (
+    None
+):
     r = structural_condition_evidence(
         _palaces({"紫微": "寅", "天府": "寅"}, "寅"), ming_branch="寅", year_stem="甲"
     )["records"][0]
@@ -159,7 +169,9 @@ def test_all_evaluated_premises_do_not_discharge_unresolved_no_sha_qualification
         )
 
 
-def test_source_example_orientation_is_distinct_from_selected_general_geometry():
+def test_source_example_orientation_is_distinct_from_selected_general_geometry() -> (
+    None
+):
     e = structural_condition_evidence(
         _palaces({"天魁": "巳", "天钺": "卯"}, "辰"), ming_branch="辰", year_stem="壬"
     )
@@ -168,7 +180,7 @@ def test_source_example_orientation_is_distinct_from_selected_general_geometry()
     assert not e["actual_assignments_modified"]
 
 
-def test_returned_witnesses_do_not_mutate_cached_source_or_chart():
+def test_returned_witnesses_do_not_mutate_cached_source_or_chart() -> None:
     c = build_ziwei_chart(_seed(1992, 9, hour="午"), "未知")
     before = deepcopy(c)
     e = structural_condition_evidence(
@@ -187,8 +199,11 @@ def test_returned_witnesses_do_not_mutate_cached_source_or_chart():
 @pytest.mark.parametrize("profile", ["iztro_2_5_8", "quanshu_v2_excerpt"])
 @pytest.mark.parametrize("source", ["rule_profile", "naj_ming_v1"])
 def test_source_summary_and_null_judgment_match_rest_native_mcp_cli(
-    profile, source, monkeypatch, capsys
-):
+    profile: str,
+    source: str,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     api._reset_runtime_state_for_tests()
     monkeypatch.setattr(
         api,
@@ -228,12 +243,12 @@ def test_source_summary_and_null_judgment_match_rest_native_mcp_cli(
 
     async def call():
         async with Client(create_mcp_app(families="metaphysics")) as client:
-            r = await client.call_tool("ziwei_birth", {**inputs, **opts})
+            r = await call_calculation(client, "ziwei_birth_chart", {**inputs, **opts})
             assert not r.is_error
             return await verified_inline_business(client, r.structured_content)
 
     native = asyncio.run(call())
-    args = ["ziwei_birth"]
+    args = ["ziwei_birth_chart"]
     for k, v in inputs.items():
         args += ["--" + k.replace("_", "-"), str(v)]
     args += [
@@ -259,7 +274,7 @@ def test_source_summary_and_null_judgment_match_rest_native_mcp_cli(
     )
 
 
-def test_same_run_claim_distinguishes_unknown_full_judgment_from_true():
+def test_same_run_claim_distinguishes_unknown_full_judgment_from_true() -> None:
     spec = next(s for s in CATALOG if s.key == "ziwei_birth")
     request = spec.request_model.model_validate(
         dict(
@@ -291,8 +306,8 @@ def test_same_run_claim_distinguishes_unknown_full_judgment_from_true():
 
 @pytest.mark.parametrize("profile", ["iztro_2_5_8", "quanshu_v2_excerpt"])
 def test_complete_conditions_and_witnesses_survive_same_run_pagination(
-    profile, monkeypatch, capsys
-):
+    profile: str, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
 
     api._reset_runtime_state_for_tests()
     monkeypatch.setattr(
@@ -319,7 +334,7 @@ def test_complete_conditions_and_witnesses_survive_same_run_pagination(
         as_of="2026-10-22T12:00:00+08:00",
     )
     rest = TestClient(api.app).post(
-        "/api/cn/ziwei/birth",
+        "/api/ziwei/birth-chart",
         json=inputs,
         params=[
             ("as_of", opts["as_of"]),
@@ -332,14 +347,14 @@ def test_complete_conditions_and_witnesses_survive_same_run_pagination(
 
     async def call():
         async with Client(create_mcp_app(families="metaphysics")) as client:
-            r = await client.call_tool("ziwei_birth", {**inputs, **opts})
+            r = await call_calculation(client, "ziwei_birth_chart", {**inputs, **opts})
             assert not r.is_error
             p = r.structured_content
             assert len(json.dumps(p, ensure_ascii=False, separators=(",", ":"))) <= 8192
             return await read_full_result(client, p)
 
     native = asyncio.run(call())
-    args = ["ziwei_birth"]
+    args = ["ziwei_birth_chart"]
     for k, v in inputs.items():
         args += ["--" + k.replace("_", "-"), str(v)]
     args += [

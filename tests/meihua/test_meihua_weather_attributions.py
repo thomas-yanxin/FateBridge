@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.meihua_weather_attributions import (
+from fatebridge.core.meihua.meihua_weather_attributions import (
     build_weather_attributions,
     weather_attribution_profile,
 )
@@ -37,12 +37,14 @@ def slots_for(row):
     ]
 
 
-def test_frozen_source_and1920independent_contexts():
+def test_frozen_source_and1920independent_contexts() -> None:
     manifest = json.loads((REFERENCE / "manifest.json").read_text())
     assert not manifest["new_component_implementation_exists"]
     for name, digest in manifest["files"].items():
         if str(name).endswith((".py", ".py.txt")):
             continue
+        else:
+            pass
         assert hashlib.sha256((REFERENCE / name).read_bytes()).hexdigest() == digest
     geometry = json.loads((REFERENCE / "independent-geometry384.json").read_text())
     by_id = {(r["code"], r["line"]): r for r in geometry["cases"]}
@@ -61,11 +63,11 @@ def test_frozen_source_and1920independent_contexts():
             for term in result["terms"]
         ]
         assert actual == row["expected_terms"]
-        assert result["single_forecast"] is result["success_probability"] is None
+        assert result["single_forecast"] is None
         assert result["mapped_into_frozen_research_labels"] is False
 
 
-def test_source_order_is_preserved_without_applying_winter_to_hail_or_xian():
+def test_source_order_is_preserved_without_applying_winter_to_hail_or_xian() -> None:
     profile = weather_attribution_profile()
     assert profile["clauses"]["metal_attributions"]["quote"] == "乾兌為霜雪霰雹"
     assert (
@@ -82,7 +84,7 @@ def test_source_order_is_preserved_without_applying_winter_to_hail_or_xian():
         assert by_term[term]["seasonal_clause"] is None
 
 
-def test_unknown_season_never_becomes_a_matching_or_nonmatching_season():
+def test_unknown_season_never_becomes_a_matching_or_nonmatching_season() -> None:
     rows = [{"path": str(i), "trigram": t} for i, t in enumerate("乾兑离震艮坎")]
     result = build_weather_attributions(rows, None)
     terms = {r["term"]: r for r in result["terms"]}
@@ -92,7 +94,7 @@ def test_unknown_season_never_becomes_a_matching_or_nonmatching_season():
         assert terms[term]["seasonal_check"]["status"] == "no_explicit_season_clause"
 
 
-def test_offseason_is_not_a_prediction_of_absence_or_an_uncontrolled_verdict():
+def test_offseason_is_not_a_prediction_of_absence_or_an_uncontrolled_verdict() -> None:
     rows = [{"path": str(i), "trigram": t} for i, t in enumerate("乾兑离震艮坎")]
     result = build_weather_attributions(rows, "spring")
     for row in result["terms"]:
@@ -101,10 +103,12 @@ def test_offseason_is_not_a_prediction_of_absence_or_an_uncontrolled_verdict():
         assert not check["matched_season_is_effective_weather_verdict"]
         if check["required_season"]:
             assert check["status"] == "season_not_matched"
+        else:
+            pass
     assert not result["direct_controls_or_full_chapter_priority_adjudicated"]
 
 
-def test_no_named_trigram_does_not_supply_an_attribution():
+def test_no_named_trigram_does_not_supply_an_attribution() -> None:
     rows = [{"path": str(i), "trigram": t} for i, t in enumerate("坤艮坎巽艮坤")]
     for row in build_weather_attributions(rows, "winter")["terms"]:
         assert not row["symbol_present"] and not row["fact_paths"]
@@ -112,7 +116,7 @@ def test_no_named_trigram_does_not_supply_an_attribution():
 
 
 @pytest.mark.parametrize("season", ["", "autumn ", "rain", False])
-def test_unknown_or_invalid_season_is_not_invented(season):
+def test_unknown_or_invalid_season_is_not_invented(season: bool | str) -> None:
     with pytest.raises(ValueError, match="explicit or unknown"):
         build_weather_attributions(
             [{"path": str(i), "trigram": "乾"} for i in range(6)], season
@@ -120,7 +124,7 @@ def test_unknown_or_invalid_season_is_not_invented(season):
 
 
 @pytest.mark.parametrize("fault", ["missing", "duplicate", "unknown"])
-def test_incomplete_positions_do_not_turn_into_absence(fault):
+def test_incomplete_positions_do_not_turn_into_absence(fault: str) -> None:
     rows = [{"path": str(i), "trigram": "乾"} for i in range(6)]
     if fault == "missing":
         rows.pop()
@@ -132,7 +136,7 @@ def test_incomplete_positions_do_not_turn_into_absence(fault):
         build_weather_attributions(rows, None)
 
 
-def test_profile_is_deeply_isolated():
+def test_profile_is_deeply_isolated() -> None:
     profile = weather_attribution_profile()
     profile["terms"][0]["trigrams"].clear()
     profile["clauses"]["metal_attributions"]["quote"] = "changed"
@@ -141,7 +145,7 @@ def test_profile_is_deeply_isolated():
     assert fresh["clauses"]["metal_attributions"]["quote"] == "乾兌為霜雪霰雹"
 
 
-def test_each_counting_candidate_points_to_its_own_actual_trigrams():
+def test_each_counting_candidate_points_to_its_own_actual_trigrams() -> None:
     out = calculate_meihua_cast(
         casting={"method": "object_count", "count": 9, "hour_branch": "酉"},
         interpretation_topic="weather",

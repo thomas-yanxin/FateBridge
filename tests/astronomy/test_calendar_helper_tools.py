@@ -1,8 +1,10 @@
 import json
 from datetime import datetime
+from pathlib import Path
 
 import pytest
 
+from fatebridge.core.almanac import get_lunar_context
 from fatebridge.core.requests.calendar import NongliTimeRequest
 from fatebridge.services.calendar_tools import (
     calculate_jieqi_year,
@@ -10,10 +12,68 @@ from fatebridge.services.calendar_tools import (
 )
 from fatebridge.services.divination import calculate_gua_meiyi
 from tests.fixtures.solar_reference import expected_solar_clock
-from tests.fixtures.transports import mcp_text
+from tests.fixtures.transports import mcp_payload
+
+SOLAR_LABEL_REFERENCE = json.loads(
+    (
+        Path(__file__).parents[1] / "data/solar_clock_labels_v1/reference.json"
+    ).read_text()
+)
 
 
-def test_calculate_jieqi_year_returns_year_grid_and_selected_terms():
+@pytest.mark.parametrize("case", SOLAR_LABEL_REFERENCE["rows"], ids=lambda c: c["id"])
+def test_solar_clock_labels_keep_independent_lunar_day_and_hour(case) -> None:
+    result = calculate_nongli_time(**case["input"])
+    assert "error" not in result
+    expected = case["expected"]
+    label = result["analysis_context"]["corrected_datetime"]
+    corrected = datetime.fromisoformat(label)
+    assert (corrected.date().isoformat(), corrected.hour, corrected.minute) == (
+        expected["solar_date"],
+        expected["solar_hour"],
+        expected["solar_minute"],
+    )
+    calendar = result["calendar_context"]
+    lunar = calendar["lunar_calendar"]
+    assert calendar["solar_datetime"] == lunar["solar_datetime"] == label
+    assert result["lunar_calendar"] == lunar
+    assert [lunar[k] for k in ("year", "month", "day", "is_leap_month")] == [
+        expected[k] for k in ("lunar_year", "lunar_month", "lunar_day", "is_leap_month")
+    ]
+    assert result["dayGanZi"] == expected["day_ganzhi"]
+    assert result["timeGanZi"] == expected["hour_ganzhi"]
+    seed = lunar["meihua"]["seed"]
+    for key in (
+        "year_branch",
+        "hour_branch",
+        "upper_number",
+        "lower_number",
+        "moving_line",
+    ):
+        assert seed[key] == expected[key]
+
+    # The direct entry must also preserve the already corrected date; it used
+    # to reinterpret a synthetic gap label during its lunar-date lookup.
+    direct = get_lunar_context(
+        corrected,
+        timezone_name=case["input"]["zone"],
+        civil_datetime=datetime.fromisoformat(
+            case["independent_operands"]["civil_utc"]
+        ),
+    )
+    assert direct is not None
+    assert direct["solar_datetime"] == label
+    assert [direct[k] for k in ("year", "month", "day")] == [
+        expected[k] for k in ("lunar_year", "lunar_month", "lunar_day")
+    ]
+
+    # Physical seasonal boundaries still belong to the original civil instant.
+    civil = calculate_nongli_time(**{**case["input"], "time_alg": 1})
+    for key in ("current_solar_term", "next_solar_term", "bazi_month_boundary"):
+        assert calendar[key] == civil["calendar_context"][key]
+
+
+def test_calculate_jieqi_year_returns_year_grid_and_selected_terms() -> None:
     result = calculate_jieqi_year(
         year=2028,
         zone="Asia/Shanghai",
@@ -40,7 +100,7 @@ def test_calculate_jieqi_year_returns_year_grid_and_selected_terms():
     assert result["snapshot_export"]["export_text"] == result["snapshot_text"]
 
 
-def test_calculate_jieqi_year_supports_selected_export_sections():
+def test_calculate_jieqi_year_supports_selected_export_sections() -> None:
     result = calculate_jieqi_year(
         year=2028,
         zone="Asia/Shanghai",
@@ -55,8 +115,35 @@ def test_calculate_jieqi_year_supports_selected_export_sections():
     assert "[来源]" not in result["snapshot_export"]["export_text"]
 
 
+def test_jieqi_year_keeps_exact_events_when_local_clock_is_unspecified() -> None:
+    vostok = calculate_jieqi_year(year=1994, zone="Antarctica/Vostok")
+    utc = calculate_jieqi_year(year=1994, zone="UTC")
+    local_fields = {
+        "datetime",
+        "datetime_with_offset",
+        "date_key",
+        "day_ganzhi",
+        "utc_offset_seconds",
+        "fold",
+    }
+    assert len(vostok["jieqi_year"]) == len(utc["jieqi_year"]) == 24
+    for term, control in zip(vostok["jieqi_year"], utc["jieqi_year"], strict=True):
+        assert term["name"] == control["name"]
+        assert term["civil_point"] == control["civil_point"]
+        # IANA tzdb has no Vostok civil clock during the 1994 closure.
+        utc_label = control["datetime_with_offset"]
+        if "1994-01-31T17:00:00+00:00" <= utc_label < "1994-11-01T00:00:00+00:00":
+            assert term["datetime_utc"] == utc_label
+            assert local_fields.isdisjoint(term)
+        else:
+            assert local_fields.issubset(term)
+            assert "datetime_utc" not in term
+    assert sum("datetime_utc" in term for term in vostok["jieqi_year"]) == 18
+    assert "当地钟时未定义" in vostok["snapshot_text"]
+
+
 @pytest.mark.local_data
-def test_calculate_nongli_time_returns_lunar_and_ganzhi_context():
+def test_calculate_nongli_time_returns_lunar_and_ganzhi_context() -> None:
     result = calculate_nongli_time(
         date="2028-04-01",
         time="09:00:00",
@@ -105,7 +192,7 @@ def test_calculate_nongli_time_returns_lunar_and_ganzhi_context():
     assert result["snapshot_export"]["export_text"] == result["snapshot_text"]
 
 
-def test_calculate_nongli_time_supports_selected_export_sections():
+def test_calculate_nongli_time_supports_selected_export_sections() -> None:
     result = calculate_nongli_time(
         date="2028-04-01",
         time="09:00:00",
@@ -125,7 +212,7 @@ def test_calculate_nongli_time_supports_selected_export_sections():
 
 
 @pytest.mark.local_data
-def test_calculate_nongli_time_time_alg_zero_applies_true_solar_correction():
+def test_calculate_nongli_time_time_alg_zero_applies_true_solar_correction() -> None:
     direct_result = calculate_nongli_time(
         date="2020-01-01",
         time="00:30:00",
@@ -162,7 +249,7 @@ def test_calculate_nongli_time_time_alg_zero_applies_true_solar_correction():
     assert true_solar_result["timeGanZi"] != direct_result["timeGanZi"]
 
 
-def test_calculate_nongli_time_time_alg_zero_warns_without_longitude():
+def test_calculate_nongli_time_time_alg_zero_warns_without_longitude() -> None:
     result = calculate_nongli_time(
         date="2020-01-01",
         time="00:30:00",
@@ -178,7 +265,7 @@ def test_calculate_nongli_time_time_alg_zero_warns_without_longitude():
     ]
 
 
-def test_calculate_nongli_time_retains_last_legacy_lunar_date():
+def test_calculate_nongli_time_retains_last_legacy_lunar_date() -> None:
     result = calculate_nongli_time(
         date="2100-02-08",
         time="12:00:00",
@@ -194,7 +281,7 @@ def test_calculate_nongli_time_retains_last_legacy_lunar_date():
     assert result["lunar_calendar"]["display"] == "腊月三十"
 
 
-def test_calculate_nongli_time_rejects_dates_after_offline_lunar_range():
+def test_calculate_nongli_time_rejects_dates_after_offline_lunar_range() -> None:
     result = calculate_nongli_time(
         date="2101-01-01",
         time="12:00:00",
@@ -210,7 +297,7 @@ def test_calculate_nongli_time_rejects_dates_after_offline_lunar_range():
     }
 
 
-def test_calculate_nongli_time_rejects_non_ce_ad_flag():
+def test_calculate_nongli_time_rejects_non_ce_ad_flag() -> None:
     result = calculate_nongli_time(
         date="2028-04-01",
         time="09:00:00",
@@ -227,47 +314,60 @@ def test_calculate_nongli_time_rejects_non_ce_ad_flag():
     }
 
 
-def test_calculate_gua_meiyi_returns_batch_meiyi_explanations():
+@pytest.mark.parametrize("time_alg", [-1, 2])
+def test_calculate_nongli_time_rejects_unsupported_clock_mode(time_alg) -> None:
+    result = calculate_nongli_time(
+        date="2024-02-10",
+        time="00:00:00",
+        zone="Asia/Hong_Kong",
+        lon="0e00",
+        time_alg=time_alg,
+    )
+
+    assert result == {
+        "error": "time_alg 仅支持 0（真太阳时）或 1（直接时间）。",
+        "error_code": "validation_error",
+        "status_code": 400,
+        "retryable": False,
+    }
+
+
+def test_calculate_gua_meiyi_returns_batch_trigram_structures() -> None:
     result = calculate_gua_meiyi(name=["111", "000"])
 
     assert result["analysis_type"] == "梅易卦义"
     assert result["queries"] == ["111", "000"]
     assert result["results"]["111"]["name"] == "乾"
     assert result["results"]["111"]["lookup_type"] == "trigram"
-    assert "主动开创" in result["results"]["111"]["desc"]
+    assert result["results"]["111"]["lines"] == [1, 1, 1]
     assert "111" not in result
-    assert result["results"]["111"]["text"] == result["results"]["111"]["desc"]
     assert result["results"]["000"]["name"] == "坤"
     assert result["results"]["000"]["lookup_type"] == "trigram"
-    assert "承载顺势" in result["results"]["000"]["desc"]
+    assert result["results"]["000"]["lines"] == [0, 0, 0]
     assert "000" not in result
     assert "乾" in result["summary"]
     assert "坤" in result["summary"]
 
 
-def test_helper_mcp_tools_return_formatted_json_strings():
-    jieqi_result = json.loads(
-        mcp_text(
-            "jieqi_year",
-            year=2028,
-            zone="Asia/Shanghai",
-            lat="31n13",
-            lon="121e28",
-            jieqis=["春分", "冬至"],
-            selected_sections=["查询信息", "重点节气"],
-        )
+def test_helper_mcp_tools_return_structured_results() -> None:
+    jieqi_result = mcp_payload(
+        "solar_terms_for_year",
+        year=2028,
+        zone="Asia/Shanghai",
+        lat="31n13",
+        lon="121e28",
+        jieqis=["春分", "冬至"],
+        selected_sections=["查询信息", "重点节气"],
     )
-    nongli_result = json.loads(
-        mcp_text(
-            "nongli_time",
-            date="2028-04-01",
-            time="09:00:00",
-            zone="Asia/Shanghai",
-            lon="121e28",
-            selected_sections=["农历上下文"],
-        )
+    nongli_result = mcp_payload(
+        "lunar_calendar_time",
+        date="2028-04-01",
+        time="09:00:00",
+        zone="Asia/Shanghai",
+        lon="121e28",
+        selected_sections=["农历上下文"],
     )
-    gua_result = json.loads(mcp_text("gua_meiyi", name=["111", "000"]))
+    gua_result = mcp_payload("gua_meanings", name=["111", "000"])
 
     assert jieqi_result["analysis_type"] == "全年节气盘"
     assert jieqi_result["selected_jieqi"][0]["name"] == "春分"
@@ -282,7 +382,7 @@ def test_helper_mcp_tools_return_formatted_json_strings():
     assert gua_result["results"]["111"]["name"] == "乾"
 
 
-def test_nongli_rollover_uses_the_core_late_zi_rule_without_an_ignored_switch():
+def test_nongli_rollover_uses_the_core_late_zi_rule_without_an_ignored_switch() -> None:
     late = calculate_nongli_time(date="2026-12-31", time="23:30", time_alg=1)
     early = calculate_nongli_time(date="2027-01-01", time="00:30", time_alg=1)
     assert (

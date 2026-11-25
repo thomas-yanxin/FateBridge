@@ -10,7 +10,7 @@ from __future__ import annotations
 from copy import deepcopy
 from fractions import Fraction
 from math import isfinite
-from typing import Any, Literal, Mapping, Tuple, TypedDict
+from typing import Any, Literal, Mapping, TypedDict
 
 from fatebridge.core.classical_roots import SOURCE as ROOT_SOURCE
 from fatebridge.core.classical_roots import classify_classical_root
@@ -85,7 +85,7 @@ def _unresolved_force(
 
 
 def adjudicate_classical_force(
-    pillars: Mapping[str, Tuple[str, str]],
+    pillars: Mapping[str, tuple[str, str]],
 ) -> SourceForceAdjudication:
     """Observe literal roots; keep unestablished force premises unresolved."""
     body = STEM_ELEMENTS[pillars["day"][0]][0]
@@ -105,7 +105,7 @@ def adjudicate_classical_force(
 
 
 def _source_roots_by_stem(
-    pillars: Mapping[str, Tuple[str, str]], elements: Mapping[str, Any]
+    pillars: Mapping[str, tuple[str, str]], elements: Mapping[str, Any]
 ) -> list[dict[str, Any]]:
     """Classify actual visible/hidden stems without inferring effective force."""
     observed = {stem for stem, _ in pillars.values()} | {
@@ -116,6 +116,8 @@ def _source_roots_by_stem(
     for stem in "甲乙丙丁戊己庚辛壬癸":
         if stem not in observed:
             continue
+        else:
+            pass
         roots = []
         for position in ORDER:
             branch = pillars[position][1]
@@ -157,7 +159,7 @@ def _source_roots_by_stem(
 
 
 def build_force_components(
-    pillars: Mapping[str, Tuple[str, str]],
+    pillars: Mapping[str, tuple[str, str]],
     assessment: Mapping[str, Any],
     stars: Mapping[str, list[dict[str, Any]]],
     *,
@@ -238,6 +240,10 @@ def build_force_components(
         )
         if body_energy + seal_energy > 0:
             body_share = body_energy / (body_energy + seal_energy)
+        else:
+            pass
+    else:
+        pass
     float_relation = relation
     receipt = assessment.get("threshold_arithmetic") or {}
     rational = receipt.get("energies_exact")
@@ -253,6 +259,10 @@ def build_force_components(
             rational_energy = {}
         if any(value < 0 for value in rational_energy.values()):
             rational_energy = {}
+        else:
+            pass
+    else:
+        pass
     comparison_basis = basis
     body_share_exact = None
     if rational_energy:
@@ -268,6 +278,10 @@ def build_force_components(
         comparison_basis = "exact_rational_same_assessment"
         if body_exact + seal_exact:
             body_share_exact = str(body_exact / (body_exact + seal_exact))
+        else:
+            pass
+    else:
+        pass
     return {
         "method_id": "body_seal_force_components_v1",
         "source": deepcopy(SOURCE),

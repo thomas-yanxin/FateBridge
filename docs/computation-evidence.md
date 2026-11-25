@@ -2,15 +2,23 @@
 
 [文档中心](README.md) · [API 参考](api-reference.md) · [算法状态](algorithm-status.md)
 
-这三项合同分别表达方法是什么、误差界知道多少、实际结果依赖哪些输入和规则。登记、执行成功、数值精度、原典符合及现实效度分别验收。当前方法登记不涵盖 `bazi_personality`；领域计数见下文。
+这三项合同分别表达方法是什么、误差界知道多少、实际结果依赖哪些输入和规则。登记、执行成功、数值精度、原典符合及现实效度分别验收；领域计数见下文。
 
 ## 方法登记
 
-`services/method_registration.py`按实际领域计算登记65个共享方法，覆盖当前92个目录工具；`bazi_personality`明确排除。新增工具没有登记会在目录装配时失败。出生公共计算、各时运层、数算与卦象、各中式盘、西占各推运/事件、印占、人类图、风水以及知识/导出分别登记。人类图可选太阳点质量模型有独立方法、前提及输出范围。
+当前 92 条公开目录记录关联 65 个唯一 `method_id`，由 `services/method_registration.py` 登记。新增工具没有登记会在目录装配时失败。出生计算、各时运层、数算与卦象、各中式盘、西占各推运与事件、印占、人类图、风水以及知识与导出分别登记。人类图可选太阳点质量模型有独立方法、前提及输出范围。
+
+`bazi_source_compare` 直接使用给定四柱，登记字面排柱校核与来源对照。`ziwei_rules` 按所选规则查询资料，登记紫微规则目录。两者的声明误差源均为 `rule_adjudication`。`ziwei_birth`、`ziwei_horoscope` 和 `ziwei_rules` 均将实际生效的 `sihua_source` 列为方法选择器。
+
+`bazi_personality`复用出生前置合同，并单列`bazi_personality_symbolic`的计数和文化词义。非日干每次1、每个藏干每次0.5；按出现量取前三名并保留截止位同分，首位同分也全部列出。这是工程计数，不能测量性格强弱。日干五行阴阳、工程旺衰与词典叙述分别核对；五行、十神的具体文字来自FateBridge编辑词典，尚未逐条完成原典符合或现实人格效度验收。该方法登记不补造古籍来源、不等于人格量表，也不认证附带的时运层。
+
+出生合同将 `personality_analysis` 整体登记为保守依赖根，覆盖范围以方法声明为准。性格词典及计数不读取性别、大运或流年参数，这些参数记录在外层时运上下文中。
 
 完整发现返回`method_contracts`和`method_registration`，摘要返回`method_ids`。合同包括实际实现路径、维护来源、输出范围、数量类型、单位、前提、选项字段、依赖、误差源及比较条件。`contract_v1`是登记合同的版本，不能冒充上游算法或原典版本。
 
-每次执行还在`run_metadata.calculation_evidence.runtime_method_registry`登记实际返回的`method_id/ruleset_id/resolution_policy`及见证路径。它与公开领域登记分开：实际出现不代表验证通过；没有版本的事实也不自动补为最新版。`method_contract_coverage=declared_subset`保留此边界，不承诺全部内部子函数或所有流派都已独立认证。
+`detail=audit` 的 `run_metadata.calculation_evidence` 包含 `registered_methods` 和 `error_budget`。`run_metadata.provenance` 汇总本次业务实际返回的 `method_id`、`ruleset_id`、`resolution_policy` 等版本事实。具体规则、操作数和来源由各工具的业务字段提供，可按其 `evidence_views` 选择字段。
+
+`otherbu` 在发现合同中列出骰面符号和独立天象两种方法。`requires_non_null_output="chart"` 要求投影前的完整业务结果提供非空 `chart`，该次执行才登记天象方法及其误差源。`diceChart` 的方法归属是骰面符号。业务字段投影沿用同一次执行的完整 `run_metadata`。 [固定三端对照](precision-acceptance.md#conditional-method-address-round209)
 
 适用输入先由已发布输入Schema和领域前提核验。Schema允许某日期或纬度，不等于已有该范围的独立精度证明。条件、已知限制和实际后端仍须读取领域输出；并未实现一个凭缺少资料即可宣称完整可算的自动裁定器。
 
@@ -20,6 +28,8 @@
 
 公开出生范围选项的0表示未评估，不能转成已声明的零误差区间。
 
+正值民用出生范围可以声明 UTC 经过时间界。使用民用记录并选择真太阳时显示时，仍按民用记录处理。地方平太阳时和地方视太阳时的声明范围附在各自的记录钟面上，民用 UTC 来源界保留为未量化。 [出生记录钟基与固定三端对照](precision-acceptance.md#recorded-clock-error-budget-round140)
+
 账本分别维护民用钟、太阳钟、历法、地点、地球自转、星历、求解、显示量化、北向基准和规则裁定。秒、角度、离散规则及未明确量纲不会混加。相同来源不能重复计入；已知同量纲区间采用最坏情形和，不假设独立或做RSS。区间求和按精确有理数计算并向外舍入，避免浮点结果缩窄误差界。
 
 `circular_sector_candidates`能给出已知角误差闭区间在等分圆周上的完整候选，包括跨0°和恰好落界；这只证明该数学映射，不推导出生误差、星历物理误差或其他领域的连续状态。它不产生候选概率。
@@ -28,13 +38,13 @@
 
 `source_coverage_complete=false`表示来源分量仍是合同声明的子集。某量纲没有已登记分量时的`not_applicable`只针对这份来源集合，不能推为该方法没有其他误差来源。
 
-`conditional_output_bounds`交付已核验的局部数学关系：五行精确分量到扶抑量与比例、太乙环路与整数和、奇门值使九宫步进，以及人类图名义太阳投影的有理区间。每项列明输出路径、操作数摘要、精确有理上下界、数学值减已报告值的有符号误差界。离散宫位返回确切类别，不伪造数值置信度。三角函数界沿用已有整数区间实现的解析余项和向外舍入；未采用机器浮点近似值充当严格端点。
+离线审计的 `conditional_output_bounds` 记录已核验的局部数学关系，覆盖五行精确分量到扶抑量与比例、太乙环路与整数和、奇门值使九宫步进，以及人类图名义太阳投影的有理区间。每项列明输出路径、操作数摘要、精确有理上下界和数学值减去报告值的有符号误差界。离散宫位返回确切类别。三角函数界沿用整数区间实现的解析余项和向外舍入。
 
 这些界以所记操作数和具名规则成立为条件；零算术误差不证明输入无误，也不证明传统有效力量或天体物理精度。来源候选的有限包络另列，`alternatives_exhaustive=false`，不充当全部可能规则或连续不确定性的包络。全局`output_error_bounds`仍为null，未闭合的误差源继续保留。
 
-## 执行证据图
+## 离线执行证据图
 
-`core/evidence_graph.py`产生`execution_dependency_dag_v2`，绑定本次语义输入摘要、环境摘要、完整业务摘要、每个输出业务根及其子树。路径用JSON Pointer，字面键中的点、斜线和波浪号不会与嵌套路径混同。节点保留显式状态与方法版本，输入区分提供、默认、显式null、缺失和本次生成；嵌套输入的提供路径另列。
+离线代码通过 `validation/evidence_graph.py` 生成 `execution_dependency_dag_v2`。审计传入原始请求及完整业务事实，图绑定输入、环境、业务和输出子树的摘要。路径使用 JSON Pointer，节点保留实际版本及显式、默认、显式空值、缺失和本次生成等输入状态。
 
 边有不同含义：
 
@@ -51,11 +61,11 @@
 
 这批核验是条件数学关系的证明；`producer_instruction_read_set_attested=false`，没有将重建关系冒充生产者机器指令读集或全部上游因果关系的证明。全144太乙核心、1080奇门值使行可用`scripts/validation/audit_verified_output_relations.py`重验。
 
-MCP在入口复用已校验请求，避免框架填默认值后再次建模而丢掉提供字段信息。REST、MCP、CLI对同输入的证据回执一致。
+MCP 在入口复用已校验请求，保留显式提供的字段。REST、MCP、CLI 对相同输入返回一致的方法登记和声明误差预算。
 
-## 大图与同次读取
+## 同次读取
 
-图和误差账本随原完整run保存。响应预算不足时，`run_metadata.calculation_evidence`保留摘要与`delivery_path`，完整内容列入`result_delivery.deferred_fields`。使用同run的字段分页读取，路径为`run_metadata.calculation_evidence`；不重算原结果。业务首轮预算及完整源事实的要求保持原值，恢复后仍须核对原run与完整回执，内容完整性由私有存储核验。
+响应超出预算时，交付层将已选业务结果和回执写入同一份本地 JSON。若误差预算延后交付，回执提供 `delivery_path`，`result_delivery.deferred_fields` 列出对应路径。经验证的分页按原 `run_id` 读取，私有文件的整份载荷摘要用于核对保存内容，读取过程复用原结果。
 
 ## 固定总体的专业验收
 

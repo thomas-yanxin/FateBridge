@@ -3,12 +3,15 @@
 import asyncio
 import json
 from datetime import datetime, timedelta
+from pathlib import Path
 
 import pytest
 from fastmcp import Client
 
 from fatebridge.cli import run
 from fatebridge.core.analytic_solar import MODEL_ID
+from fatebridge.core.de440_solar import HISTORICAL_MODEL_ID
+from fatebridge.core.de440_solar import MODEL_ID as DE440_MODEL_ID
 from fatebridge.core.fengshui import bazhai as bazhai_module
 from fatebridge.core.fengshui.calendar import (
     boundary_model_policy,
@@ -21,8 +24,10 @@ from fatebridge.core.fengshui.xuankong import period_context
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.fengshui import calculate_annual_stars, calculate_minggua
 from tests.fixtures.fengshui import payload
+from tests.support.fengshui_clock import seconds_from_boundary
+from tests.support.fengshui_transports import SPECS
 from tests.support.mcp_result_assertions import without_transport
-from tests.support.transports import rest_client
+from tests.support.transports import call_calculation, rest_client
 
 
 @pytest.fixture(scope="module")
@@ -44,7 +49,7 @@ def actual_model(request, monkeypatch, empty_ephemeris):
 ANALYTIC_GUARD_REASON = "analytic_solar_model_guard_not_accuracy_certification"
 
 
-def test_actual_model_year_reason_survives_without_relabelling(actual_model):
+def test_actual_model_year_reason_survives_without_relabelling(actual_model) -> None:
     root = datetime.fromisoformat(lichun_resolution(2024, "UTC")["moment"])
     context = year_context(None, root, "UTC")
     assert context["effective_year_status"] == "requires_confirmation"
@@ -55,7 +60,7 @@ def test_actual_model_year_reason_survives_without_relabelling(actual_model):
     assert resolution["operational_guard_seconds"] == 5.0
 
 
-def test_actual_model_house_period_is_not_mislabelled_linear(actual_model):
+def test_actual_model_house_period_is_not_mislabelled_linear(actual_model) -> None:
     root = datetime.fromisoformat(lichun_resolution(2024, "UTC")["moment"])
     result = period_context(
         HousePeriod(
@@ -73,7 +78,7 @@ def test_actual_model_house_period_is_not_mislabelled_linear(actual_model):
     )
 
 
-def test_actual_model_month_policy_identifies_each_boundary(actual_model):
+def test_actual_model_month_policy_identifies_each_boundary(actual_model) -> None:
     root = datetime.fromisoformat(lichun_resolution(2024, "UTC")["moment"])
     result = solar_month_context(None, None, root, "UTC")
     policies = result["precision_policy"]["boundary_model_policies"]
@@ -88,24 +93,38 @@ def test_actual_model_month_policy_identifies_each_boundary(actual_model):
 
 
 @pytest.mark.parametrize("delta", [-6, -5, 0, 5, 6])
-def test_guard_does_not_change_numbers_or_expand_accuracy_gate(actual_model, delta):
-    root = datetime.fromisoformat(lichun_resolution(2024, "UTC")["moment"])
-    result = calculate_annual_stars(
-        query_at=root + timedelta(seconds=delta), timezone_name="UTC"
-    )
-    annual = result["layers"]["annual_stars"]
-    if abs(delta) <= 5:
+def test_guard_does_not_change_numbers_or_expand_accuracy_gate(
+    actual_model, delta
+) -> None:
+    resolution = lichun_resolution(2024, "UTC")
+    root = datetime.fromisoformat(resolution["moment"])
+    at = root + timedelta(seconds=delta)
+    distance = seconds_from_boundary(at, resolution["civil_point"])
+    annual = calculate_annual_stars(query_at=at, timezone_name="UTC")["layers"][
+        "annual_stars"
+    ]
+    if abs(distance) <= 5:
         assert annual["status"] == "partial" and annual["palaces"] == {}
         assert annual["time_context"]["candidate_effective_years"] == [2023, 2024]
     else:
         assert annual["status"] == "complete"
-        assert annual["effective_year"] == (2023 if delta < 0 else 2024)
+        assert annual["effective_year"] == (2023 if distance < 0 else 2024)
 
 
-@pytest.mark.parametrize("model", ["moshier", MODEL_ID])
+@pytest.mark.parametrize(
+    "model, prefix",
+    [
+        pytest.param("moshier", "moshier", id="moshier"),
+        pytest.param(MODEL_ID, "analytic_solar", id=MODEL_ID),
+        pytest.param(DE440_MODEL_ID, "de440_solar", id=DE440_MODEL_ID),
+        pytest.param(
+            HISTORICAL_MODEL_ID, "de440_historical_solar", id=HISTORICAL_MODEL_ID
+        ),
+    ],
+)
 def test_synthetic_midnight_crossing_keeps_model_reason_without_a_birth_hour(
-    monkeypatch, model
-):
+    monkeypatch: pytest.MonkeyPatch, model, prefix: str
+) -> None:
     # Synthetic geometry only. Never count this clock as an observed Lichun.
     monkeypatch.setattr(
         bazhai_module,
@@ -123,7 +142,6 @@ def test_synthetic_midnight_crossing_keeps_model_reason_without_a_birth_hour(
     assert result["status"] == "partial" and result["candidates"] == []
     policy = result["time_context"]["boundary_precision_policy"]
     assert policy["ephemeris_model"] == model
-    prefix = "moshier" if model == "moshier" else "analytic_solar"
     assert (
         policy["reason"]
         == prefix + "_guard_crosses_civil_date_not_fabricated_birth_hour"
@@ -132,7 +150,9 @@ def test_synthetic_midnight_crossing_keeps_model_reason_without_a_birth_hour(
     assert "birth_at" not in result["time_context"]
 
 
-def test_actual_model_reading_names_its_solver_without_claiming_seconds(actual_model):
+def test_actual_model_reading_names_its_solver_without_claiming_seconds(
+    actual_model,
+) -> None:
     result = calculate_annual_stars(effective_year=2024, timezone_name="UTC")
     text = result["snapshot_text"]
     assert "FateBridge解析太阳模型" in text
@@ -140,7 +160,9 @@ def test_actual_model_reading_names_its_solver_without_claiming_seconds(actual_m
     assert "星历为Moshier" not in text
 
 
-def test_confirmed_minggua_year_does_not_invent_a_solver_observation(actual_model):
+def test_confirmed_minggua_year_does_not_invent_a_solver_observation(
+    actual_model,
+) -> None:
     result = calculate_minggua(effective_birth_year=2024, gender_convention="male")
     context = result["layers"]["minggua"]["time_context"]
     assert result["status"] == "complete"
@@ -151,7 +173,7 @@ def test_confirmed_minggua_year_does_not_invent_a_solver_observation(actual_mode
 
 
 @pytest.mark.parametrize("model", ["moshier", MODEL_ID, "unknown_model"])
-def test_unqualified_resolution_does_not_borrow_numerical_model_credit(model):
+def test_unqualified_resolution_does_not_borrow_numerical_model_credit(model) -> None:
     resolution = {
         "moment": "2024-02-04T00:00:02+00:00",
         "approximate": True,
@@ -161,8 +183,8 @@ def test_unqualified_resolution_does_not_borrow_numerical_model_credit(model):
 
 
 def test_returned_analytic_provenance_cannot_poison_the_cached_term(
-    monkeypatch, empty_ephemeris
-):
+    monkeypatch: pytest.MonkeyPatch, empty_ephemeris
+) -> None:
     monkeypatch.setenv("SE_EPHE_PATH", str(empty_ephemeris))
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "analytic")
     original = lichun_resolution(2024, "UTC")
@@ -176,8 +198,12 @@ def test_returned_analytic_provenance_cannot_poison_the_cached_term(
 
 @pytest.mark.parametrize("name", ["annual_stars", "minggua", "xuankong_natal"])
 def test_model_reason_and_reading_match_rest_real_mcp_cli(
-    actual_model, monkeypatch, tmp_path, capsys, name
-):
+    actual_model,
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    name: str,
+) -> None:
     root = lichun_resolution(2024, "UTC")["moment"]
     if name == "annual_stars":
         inputs = {"query_at": root, "timezone_name": "UTC"}
@@ -191,18 +217,18 @@ def test_model_reason_and_reading_match_rest_real_mcp_cli(
             "timezone_name": "UTC",
             "evidence": "虚构协议回归事件",
         }
-    response = rest_client(monkeypatch).post("/api/fengshui/" + name, json=inputs)
+    response = rest_client(monkeypatch).post(SPECS[name].rest_path, json=inputs)
 
     async def call():
         async with Client(create_mcp_app(families="fengshui")) as client:
-            return await client.call_tool(
-                "fengshui_" + name, {**inputs, "response_char_limit": 0}
+            return await call_calculation(
+                client, SPECS[name].tool_name, {**inputs, "response_char_limit": 0}
             )
 
     protocol = asyncio.run(call())
     request = tmp_path / "request.json"
     request.write_text(json.dumps(inputs))
-    assert run(["fengshui_" + name, "--request-file", str(request)]) == 0
+    assert run([SPECS[name].tool_name, "--request-file", str(request)]) == 0
     cli = json.loads(capsys.readouterr().out)
     assert response.status_code == 200 and not protocol.is_error
     body = response.json()

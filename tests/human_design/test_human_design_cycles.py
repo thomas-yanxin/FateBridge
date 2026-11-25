@@ -10,15 +10,18 @@ from pathlib import Path
 import pytest
 
 from fatebridge.application.execution import execute_tool
-from fatebridge.core import human_design_cycles as cycles
-from fatebridge.core.human_design import chart_at_tt
-from fatebridge.core.human_design_cycles import calculate_cycle_context, cycle_summary
+from fatebridge.core.human_design import human_design_cycles as cycles
+from fatebridge.core.human_design.human_design import chart_at_tt
+from fatebridge.core.human_design.human_design_cycles import (
+    calculate_cycle_context,
+    cycle_summary,
+)
 from fatebridge.services.human_design import calculate_human_design
 from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.validation.human_design import verify_human_design_reading
-from fatebridge.validation.human_design_cycle_reference import independent_cycle_checks
 from tests.support.ephemeris_case_runtime import native_ephemeris_files
 from tests.support.ephemeris_context import empty_ephemeris_path
+from validation.human_design import verify_human_design_reading
+from validation.human_design_cycle_reference import independent_cycle_checks
 
 ROOT = Path(__file__).resolve().parents[2]
 SPEC = next(s for s in CATALOG if s.key == "human_design")
@@ -33,8 +36,8 @@ INPUT = dict(
 
 
 def test_station_refinement_recovers_two_contacts_hidden_inside_one_grid_cell(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setattr(cycles, "HORIZON_DAYS", 10.0)
 
     def read(t):
@@ -56,7 +59,9 @@ def test_station_refinement_recovers_two_contacts_hidden_inside_one_grid_cell(
     assert read(8)[1] < 20 and read(10)[1] < 20
 
 
-def test_natal_revisit_before_a_completed_revolution_is_not_a_return(monkeypatch):
+def test_natal_revisit_before_a_completed_revolution_is_not_a_return(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setattr(cycles, "HORIZON_DAYS", 10.0)
     result = cycles.derive_body_contacts(
         "Saturn", 0.0, lambda t: [t, (100 + math.sin(t)) % 360, math.cos(t), 258]
@@ -75,18 +80,20 @@ def test_natal_revisit_before_a_completed_revolution_is_not_a_return(monkeypatch
         "1960-01-01T00:00:00Z",
     ],
 )
-def test_reference_requires_a_valid_aware_post_birth_instant(value):
+def test_reference_requires_a_valid_aware_post_birth_instant(value: str) -> None:
     with pytest.raises(ValueError):
         SPEC.request_model(**INPUT, cycle_reference_datetime=value)
 
 
-def test_equivalent_offsets_mean_the_same_reference_epoch():
+def test_equivalent_offsets_mean_the_same_reference_epoch() -> None:
     assert cycles.reference_epoch(
         "2029-07-01T08:00:00+08:00"
     ) == cycles.reference_epoch("2029-07-01T00:00:00Z")
 
 
-def test_omission_never_reads_now_or_runs_the_cycle_sampler(monkeypatch):
+def test_omission_never_reads_now_or_runs_the_cycle_sampler(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     def forbidden(*args, **kwargs):
         raise AssertionError("optional cycles should not run")
 
@@ -96,7 +103,7 @@ def test_omission_never_reads_now_or_runs_the_cycle_sampler(monkeypatch):
     assert result["cycle_summary"]["sixth_line"]["current_phase"] is None
 
 
-def test_empty_installation_preserves_planets_and_reports_missing_chiron():
+def test_empty_installation_preserves_planets_and_reports_missing_chiron() -> None:
     with empty_ephemeris_path():
         result = calculate_human_design(
             **INPUT, cycle_reference_datetime="2029-07-01T00:00:00Z"
@@ -112,7 +119,7 @@ def test_empty_installation_preserves_planets_and_reports_missing_chiron():
 
 def test_three_real_retrograde_contacts_and_reference_relation_keep_natal_unchanged(
     native_ephemeris_files,
-):
+) -> None:
     chart = chart_at_tt(2444239.5)
     saved = copy.deepcopy(chart)
     context = calculate_cycle_context(
@@ -143,15 +150,19 @@ def test_three_real_retrograde_contacts_and_reference_relation_keep_natal_unchan
     "failure", ["native_ephemeris_unavailable", "native_model_changed_within_search"]
 )
 def test_interrupted_search_keeps_observed_contacts_but_does_not_claim_completion(
-    monkeypatch, failure
-):
+    monkeypatch: pytest.MonkeyPatch, failure: str
+) -> None:
     monkeypatch.setattr(cycles, "HORIZON_DAYS", 30.0)
 
     def read(t):
         if t > 25:
             if failure == "native_ephemeris_unavailable":
                 raise cycles.CycleUnavailable(failure, t)
+            else:
+                pass
             return [t, (15 * t) % 360, 15.0, 260]
+        else:
+            pass
         return [t, (15 * t) % 360, 15.0, 258]
 
     result = cycles.derive_body_contacts("Saturn", 0.0, read)
@@ -167,15 +178,15 @@ def complete_run():
     )
 
 
-def test_full_cycle_trace_replays_every_consumed_native_position(complete_run):
+def test_full_cycle_trace_replays_every_consumed_native_position(complete_run) -> None:
     report = verify_human_design_reading(complete_run)
     assert report["status"] == "verified_fixed_template_reading"
     assert report["checked_cycle_evaluation_count"] > 35000
 
 
 def test_large_cycle_result_pages_reconstruct_the_same_run_without_recalculation(
-    complete_run, tmp_path, monkeypatch
-):
+    complete_run, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     from fatebridge.application import result_delivery as delivery
 
     store = delivery.ResultStore(tmp_path / "private-cycles")
@@ -194,6 +205,8 @@ def test_large_cycle_result_pages_reconstruct_the_same_run_without_recalculation
         offset = page["next_offset"]
         if offset is None:
             break
+        else:
+            pass
     text = "".join(parts)
     assert "sha256" not in page
     reconstructed = json.loads(text)
@@ -225,7 +238,9 @@ def test_large_cycle_result_pages_reconstruct_the_same_run_without_recalculation
         "source",
     ],
 )
-def test_rehashing_cannot_hide_forged_cycle_search_or_age_assignment(complete_run, bad):
+def test_rehashing_cannot_hide_forged_cycle_search_or_age_assignment(
+    complete_run, bad: str
+) -> None:
     run = copy.deepcopy(complete_run)
     context, summary = run["cycle_context"], run["cycle_summary"]
     first = context["bodies"][0]
@@ -256,7 +271,7 @@ def test_rehashing_cannot_hide_forged_cycle_search_or_age_assignment(complete_ru
     assert verify_human_design_reading(run)["status"] == "rejected"
 
 
-def test_independent_plan_sources_and_generator_do_not_import_the_engine():
+def test_independent_plan_sources_and_generator_do_not_import_the_engine() -> None:
     plan = json.loads(
         (ROOT / "tests/fixtures/human-design-cycles-plan.json").read_text()
     )
@@ -282,7 +297,7 @@ def test_independent_plan_sources_and_generator_do_not_import_the_engine():
 
 def test_independent_reference_retains_fixed_angular_tolerances_and_all_outcomes(
     native_ephemeris_files,
-):
+) -> None:
     report = independent_cycle_checks(ROOT)
     assert report["cases_checked"] == 9
     assert report["bounded_acceptance_passed"] == all(
@@ -296,7 +311,7 @@ def test_independent_reference_retains_fixed_angular_tolerances_and_all_outcomes
     )
 
 
-def test_chiron_spk_adapter_is_checked_against_six_frozen_horizons_positions():
+def test_chiron_spk_adapter_is_checked_against_six_frozen_horizons_positions() -> None:
     fixture = json.loads(
         (ROOT / "tests/fixtures/human-design-cycles-horizons.json").read_text()
     )

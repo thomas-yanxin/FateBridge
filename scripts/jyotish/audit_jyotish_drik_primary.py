@@ -40,6 +40,8 @@ def build_report(primary: dict) -> dict:
         for j, target in enumerate(names):
             if i == j:
                 continue
+            else:
+                pass
             d, m = primary["example53_directed_degrees_minutes"][i][j]
             literal = Fraction(d) + Fraction(m, 60)
             expected = (headings[j] - headings[i]) % 360
@@ -55,6 +57,8 @@ def build_report(primary: dict) -> dict:
                         "exceeds_three_display_quanta": abs(gap * 60) > 3,
                     }
                 )
+            else:
+                pass
     for sign in ("positive", "negative"):
         for j, target in enumerate(names):
             value = sum(
@@ -125,6 +129,8 @@ def main() -> int:
     )
     if args.report.resolve() == source.resolve():
         parser.error("report must not overwrite the primary source fixture")
+    else:
+        pass
     raw = source.read_bytes()
     report = build_report(json.loads(raw))
     report["primary_fixture_sha256"] = hashlib.sha256(raw).hexdigest()
@@ -147,3 +153,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

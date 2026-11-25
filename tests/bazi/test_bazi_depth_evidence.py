@@ -9,11 +9,13 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from fatebridge.analysis.marriage import MarriageAnalysis
 from fatebridge.application.examples import suggested_fields
-from fatebridge.core.bazi_evidence import build_natal_evidence, build_topic_evidence
+from fatebridge.core.bazi.bazi_evidence import (
+    build_natal_evidence,
+    build_topic_evidence,
+)
+from fatebridge.core.contracts.output_bazi_evidence import BaziEvidenceChain
 from fatebridge.core.elements import ElementAnalysis
-from fatebridge.core.output_bazi_evidence import BaziEvidenceChain
 from fatebridge.core.strength import assess_strength
 from tests.support.result_delivery import reconstruct
 from tests.support.result_delivery import store as _shared_store
@@ -52,8 +54,8 @@ store = _shared_store
     ],
 )
 def test_frozen_book_cases_retain_financial_seal_separation(
-    case_id, distance, intervening, combination
-):
+    case_id: str, distance: int, intervening, combination: bool
+) -> None:
     # These spatial distinctions are explicitly described on PDF65/66/84.
     result = build_natal_evidence(source_case(case_id))
     relation = result["financial_seal_positions"][0]
@@ -64,7 +66,7 @@ def test_frozen_book_cases_retain_financial_seal_separation(
     assert relation["adjudication"] == "position_observation_only"
 
 
-def test_frozen_liang_food_wealth_keeps_root_in_wei_and_unresolved_force():
+def test_frozen_liang_food_wealth_keeps_root_in_wei_and_unresolved_force() -> None:
     result = build_natal_evidence(source_case("ZP37-LIANG"))
     wealth = result["ten_gods"]["偏财"]
     visible = next(e for e in wealth if e["location"] == "天干")
@@ -87,7 +89,9 @@ def test_frozen_liang_food_wealth_keeps_root_in_wei_and_unresolved_force():
     )
 
 
-def test_hurt_seal_cooccurrence_is_refuted_by_no_root_and_not_certified_by_root():
+def test_hurt_seal_cooccurrence_is_refuted_by_no_root_and_not_certified_by_root() -> (
+    None
+):
     no_root = pillars(["甲午", "丙午", "甲午", "壬午"])
     rooted = {**no_root, "hour": ("壬", "子")}
     a = check(build_natal_evidence(no_root), "hurt_with_seal")
@@ -101,7 +105,101 @@ def test_hurt_seal_cooccurrence_is_refuted_by_no_root_and_not_certified_by_root(
     )
 
 
-def test_root_kind_does_not_fabricate_yin_growth_phase_hidden_stems():
+def test_hurt_seal_candidate_respects_the_shared_root_prerequisite() -> None:
+    no_root = build_natal_evidence(pillars(["乙丑", "乙酉", "戊辰", "丙辰"]))
+    rooted = build_natal_evidence(source_case("ZP41-BO"))
+    stage_only = build_natal_evidence(source_case("ZP41-DUTONG"))
+
+    for result, expected in (
+        (no_root, "observable_prerequisite_not_met"),
+        (rooted, "requires_force_adjudication"),
+        (stage_only, "requires_force_adjudication"),
+    ):
+        path = next(
+            path
+            for path in result["candidate_selection"]["paths"]
+            if path["id"] == "hurt_seal"
+        )
+        assert path["status"] == expected
+        assert path["formation_status"] == "not_adjudicated"
+        gate = next(
+            (
+                item
+                for item in path["observed_conditions"]
+                if item["id"] == "seal_root_present"
+            ),
+            None,
+        )
+        if result is stage_only:
+            assert gate is None
+            assert {
+                "condition": "印仅见阶段根参考，印有根须复核",
+                "status": "unknown",
+            } in path["force_conditions"]
+        else:
+            assert gate["status"] == ("not_matched" if result is no_root else "matched")
+
+
+@pytest.mark.parametrize(
+    "values,path_id,status,root_status",
+    [
+        (
+            ["戊子", "乙卯", "癸酉", "丙辰"],
+            "food_wealth",
+            "observable_prerequisite_not_met",
+            "not_matched",
+        ),
+        (
+            ["丙午", "丁酉", "戊午", "壬戌"],
+            "hurt_wealth",
+            "observable_prerequisite_not_met",
+            "not_matched",
+        ),
+        (
+            ["癸卯", "辛酉", "己酉", "癸酉"],
+            "food_wealth",
+            "requires_force_adjudication",
+            "unknown",
+        ),
+    ],
+)
+def test_wealth_candidates_respect_the_shared_root_prerequisite(
+    values, path_id: str, status: str, root_status: str
+) -> None:
+    evidence = build_natal_evidence(pillars(values))
+    path = next(
+        row for row in evidence["candidate_selection"]["paths"] if row["id"] == path_id
+    )
+    roots = [
+        item
+        for item in path["observed_conditions"]
+        if item["id"] == "wealth_root_present"
+    ]
+    assert path["status"] == status
+    assert path["formation_status"] == "not_adjudicated"
+    if root_status == "unknown":
+        assert not roots
+        assert {"condition": "财仅见阶段根参考，财有根须复核", "status": "unknown"} in (
+            path["force_conditions"]
+        )
+    else:
+        assert [item["status"] for item in roots] == [root_status]
+        assert roots[0]["star_refs"]
+    if path_id == "food_wealth":
+        structure = check(evidence, "food_generates_wealth")
+        assert (
+            next(
+                c["status"]
+                for c in structure["conditions"]
+                if c["id"] == "helper_root_present"
+            )
+            == root_status
+        )
+    else:
+        pass
+
+
+def test_root_kind_does_not_fabricate_yin_growth_phase_hidden_stems() -> None:
     result = build_natal_evidence(pillars(["乙午", "丁酉", "甲戌", "癸丑"]))
     yi = result["visible_stems"][0]
     ding = result["visible_stems"][1]
@@ -116,7 +214,7 @@ def test_root_kind_does_not_fabricate_yin_growth_phase_hidden_stems():
     )
 
 
-def test_yin_growth_reference_is_not_rejected_as_certainly_rootless():
+def test_yin_growth_reference_is_not_rejected_as_certainly_rootless() -> None:
     result = build_natal_evidence(pillars(["乙午", "戊午", "丁午", "己巳"]))
     condition = next(
         c
@@ -126,16 +224,20 @@ def test_yin_growth_reference_is_not_rejected_as_certainly_rootless():
     assert condition["status"] == "unknown"
 
 
-def test_rob_wealth_in_month_is_not_automatically_yang_blade():
+def test_rob_wealth_in_month_is_not_automatically_yang_blade() -> None:
     # The frozen 孤官无辅 case is 戊 in 未; its 乙官 is actually 透 in 时.
     month = build_natal_evidence(source_case("ZP31-LONE"))["month_command"]
-    assert month["label"] == "正官格"  # 杂气透乙、卯未会支，不能误作月刃。
+    assert month["selected_god"]["ten_god"] == "正官"  # preserved old single anchor
+    assert {w["ten_god"] for w in month["use_resolution"]["witnesses"]} == {
+        "正印",
+        "正官",
+    }  # actual revelations coexist; not an automatic month blade.
     assert not month["yang_blade_seat"]
     officer = next(c for c in month["candidates"] if c["ten_god"] == "正官")
     assert officer["visible_in"] == ["hour"]
 
 
-def test_timing_retains_hidden_wealth_and_joint_dayun_liunian_bureau():
+def test_timing_retains_hidden_wealth_and_joint_dayun_liunian_bureau() -> None:
     p = pillars(["庚申", "丁巳", "甲午", "丙寅"])
     natal = build_natal_evidence(p)
     before = copy.deepcopy(natal)
@@ -156,7 +258,9 @@ def test_timing_retains_hidden_wealth_and_joint_dayun_liunian_bureau():
     assert natal == before  # Changing target time cannot mutate the natal chart.
 
 
-def test_book_weak_label_is_not_replaced_by_modern_strength_as_classical_truth():
+def test_book_weak_label_is_not_replaced_by_modern_strength_as_classical_truth() -> (
+    None
+):
     p = source_case("ZP41-BO")
     strength = ElementAnalysis.analyze_day_master_strength(p)
     result = build_natal_evidence(p, strength)
@@ -185,47 +289,56 @@ def test_book_weak_label_is_not_replaced_by_modern_strength_as_classical_truth()
     assert historical["requires_special_structure_review"] is True
 
 
-def test_spouse_star_only_in_day_palace_is_not_lost():
-    p = pillars(["甲寅", "丙寅", "甲戌", "丙寅"])
-    result = MarriageAnalysis._analyze_spouse_star(p, "甲", True)
+def test_spouse_star_only_in_day_palace_is_not_lost() -> None:
+    chart = pillars(["甲寅", "丙寅", "甲戌", "丙寅"])
+    topic = build_topic_evidence(
+        build_natal_evidence(chart), chart, "marriage", "男", None, None
+    )
     assert any(
-        e["position"] == "day_hidden" and e["stem"] == "戊"
-        for e in result["spouse_star_positions"]
+        row["pillar"] == "day" and row["stem"] == "戊" and row["location"] == "地支藏干"
+        for row in topic["stars"]["偏财"]
     )
 
 
-def test_unknown_gender_does_not_execute_female_marriage_scoring():
-    p = source_case("ZP31-LONE")
-    result = MarriageAnalysis.analyze_marriage(p)
-    assert result["gender_basis"] == "unselected_gender_alternatives"
-    assert result["marriage_quality"]["score"] is None
-    assert set(result["spouse_star"]["alternatives"]) == {"male", "female"}
+def test_unknown_gender_retains_both_spouse_star_conventions() -> None:
+    chart = source_case("ZP31-LONE")
+    topic = build_topic_evidence(
+        build_natal_evidence(chart), chart, "marriage", None, None, None
+    )
+    assert topic["selection_basis"] == "unselected_gender_alternatives"
+    assert topic["selection_alternatives"] == {
+        "male": ["正财", "偏财"],
+        "female": ["正官", "七杀"],
+    }
+    assert set(topic["stars"]) == {"正财", "偏财", "正官", "七杀"}
 
 
-def test_shensha_target_without_actual_branch_is_not_a_hit():
-    # 子年/子日 -> 红鸾卯、天喜酉、咸池酉、孤辰寅、寡宿戌，均未出现。
-    p = pillars(["甲子", "乙丑", "丙子", "己丑"])
-    assert MarriageAnalysis._check_marriage_shensha(p) == []
-    hit = MarriageAnalysis._check_marriage_shensha({**p, "hour": ("丁", "卯")})
-    assert [e["name"] for e in hit] == ["红鸾"]
+def test_shensha_target_without_actual_branch_is_not_a_hit() -> None:
+    chart = pillars(["甲子", "乙丑", "丙子", "己丑"])
+    topic = build_topic_evidence(
+        build_natal_evidence(chart), chart, "marriage", "男", None, None
+    )
+    assert topic["first_view"]["markers"] == []
+    chart["hour"] = ("丁", "卯")
+    topic = build_topic_evidence(
+        build_natal_evidence(chart), chart, "marriage", "男", None, None
+    )
+    assert [
+        (row["name"], row["natal_positions"]) for row in topic["first_view"]["markers"]
+    ] == [("红鸾", ["hour"])]
 
 
-def test_male_tomb_lookup_uses_wealth_not_officer_element():
-    p = pillars(["戊戌", "乙丑", "甲子", "辛丑"])
-    # 土为甲财，不在该四墓简表；辛金是官，不能被男命误当配偶星。
-    risks = MarriageAnalysis._identify_risk_factors(p, "甲", "子", True)
-    assert not any(r["type"] == "配偶星入墓" for r in risks)
+def test_male_tomb_lookup_uses_wealth_not_officer_element() -> None:
+    earth_wealth = pillars(["戊戌", "乙丑", "甲子", "辛丑"])
     fire_wealth = pillars(["丙戌", "乙丑", "壬子", "辛丑"])
-    risks = MarriageAnalysis._identify_risk_factors(fire_wealth, "壬", "子", True)
-    assert any(r["type"] == "配偶星入墓" and "丙" in r["description"] for r in risks)
-    assert not any("健康或运势需关注" in r["description"] for r in risks)
-
-
-def test_marriage_index_does_not_generate_late_marriage_or_affair_advice():
-    result = MarriageAnalysis.analyze_marriage(source_case("ZP31-LI"), "女")
-    assert result["marriage_quality"]["score_kind"] == "traditional_rule_index"
-    assert not any("建议晚婚" in s for s in result["suggestions"])
-    assert not any("第三者风险增加" in s for s in result["marriage_quality"]["notes"])
+    for chart, expected in ((earth_wealth, []), (fire_wealth, [("year", "戌", "火")])):
+        topic = build_topic_evidence(
+            build_natal_evidence(chart), chart, "marriage", "男", None, None
+        )
+        assert [
+            (row["pillar"], row["branch"], row["element"])
+            for row in topic["storage_matches"]
+        ] == expected
 
 
 @pytest.mark.parametrize(
@@ -243,7 +356,9 @@ def test_marriage_index_does_not_generate_late_marriage_or_affair_advice():
     ],
 )
 @pytest.mark.parametrize("gender", ["男", "未知"])
-def test_nine_depth_views_match_actual_rest_mcp_cli(topic, gender, surface_calls):
+def test_nine_depth_views_match_actual_rest_mcp_cli(
+    topic: str, gender: str, surface_calls
+) -> None:
     spec = SPECS["bazi_" + topic]
     request = inputs(spec)
     request.pop("dayun_pillar", None)
@@ -291,9 +406,11 @@ def test_nine_depth_views_match_actual_rest_mcp_cli(topic, gender, surface_calls
             analysis["timing_context"]["dayun_status"] == "unavailable_gender_direction"
         )
         assert len(evidence["topic"]["timing"]["layers"]) == 1
+    else:
+        pass
 
 
-def test_new_nested_contract_rejects_corrupt_root_rank():
+def test_new_nested_contract_rejects_corrupt_root_rank() -> None:
     result = build_natal_evidence(source_case("ZP37-LIANG"))
     BaziEvidenceChain.model_validate(result)
     entry = next(
@@ -318,7 +435,9 @@ def test_new_nested_contract_rejects_corrupt_root_rank():
         "health",
     ],
 )
-def test_nine_recommended_first_views_keep_analysis_within_default_budget(topic):
+def test_nine_recommended_first_views_keep_analysis_within_default_budget(
+    topic: str,
+) -> None:
     spec = SPECS["bazi_" + topic]
     response = asyncio.run(
         native(
@@ -342,13 +461,15 @@ def test_nine_recommended_first_views_keep_analysis_within_default_budget(topic)
             "run_metadata.calculation_evidence",
         }
         assert len(deferred) == len(set(deferred))
+    else:
+        pass
     analysis = result[topic + "_analysis"]
     assert analysis["evidence_chain"]["topic"]["first_view"]["timing"]
 
 
 def test_same_core_evidence_is_published_by_comprehensive_and_birth_surfaces(
-    rest, tmp_path, capsys
-):
+    rest, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     for key, field in (
         ("analyze_destiny", "structure_profile.evidence_chain"),
         ("bazi_birth", "bazi_birth.structure_profile.evidence_chain"),
@@ -383,6 +504,8 @@ def test_same_core_evidence_is_published_by_comprehensive_and_birth_surfaces(
             http = rest.post(spec.rest_path, json=request, params=flags)
             assert http.status_code == 200 and business(http.json()) == output
             output = output["bazi_birth"]
+        else:
+            pass
         evidence = output["structure_profile"]["evidence_chain"]
         assert evidence["ten_gods"] and evidence["structure_checks"]
     # Use a common actual input, since catalog examples may use distinct people.
@@ -398,7 +521,7 @@ def test_same_core_evidence_is_published_by_comprehensive_and_birth_surfaces(
     assert a == b
 
 
-def test_large_depth_response_preserves_same_run_complete_conditions(store):
+def test_large_depth_response_preserves_same_run_complete_conditions(store) -> None:
     spec = SPECS["bazi_career"]
     response = asyncio.run(
         native(

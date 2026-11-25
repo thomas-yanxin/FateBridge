@@ -7,14 +7,14 @@ from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
+from pytest import MonkeyPatch
 
-from fatebridge.core import heluo_months
-from fatebridge.core.heluo import MONTH_GUA, hexagram_najia, judge
-from fatebridge.core.heluo_months import MONTH_BRANCHES, month_affinity
-from fatebridge.core.output_numerology import HeluoNatalNajiaClause
+from fatebridge.core.contracts.output_numerology import HeluoNatalNajiaClause
+from fatebridge.core.heluo import heluo_months
+from fatebridge.core.heluo.heluo import MONTH_GUA, hexagram_najia, judge
+from fatebridge.core.heluo.heluo_months import MONTH_BRANCHES, month_affinity
 from fatebridge.utils.errors import NumerologySourceError
-from tests.numerology.test_heluo_month_depth import chart_for
-from tests.numerology.test_heluo_najia_depth import PILLARS
+from tests.unit_test.fixtures.heluo_charts import PILLARS, chart_for
 
 ROOT = Path(__file__).parents[1] / "fixtures/heluo_najia_qualifiers_v1"
 REFERENCE = json.loads((ROOT / "reference.json").read_text())
@@ -31,7 +31,7 @@ POSITIVE_YEARS = {
 }
 
 
-def test_clause_witnesses_reuse_the_same_primary_edition_without_new_counts():
+def test_clause_witnesses_reuse_the_same_primary_edition_without_new_counts() -> None:
     assert REFERENCE["source_pdf_sha256"] == heluo_months.SOURCE_SHA256
     assert len(REFERENCE["literal_clauses"]) == 9
     assert len(REFERENCE["images"]) == 9
@@ -55,14 +55,16 @@ def test_clause_witnesses_reuse_the_same_primary_edition_without_new_counts():
 
 
 @pytest.mark.parametrize("case", REFERENCE["najia_cases"], ids=lambda c: c["gua"])
-def test_three_new_six_line_tables_agree_with_primary_readings(case):
+def test_three_new_six_line_tables_agree_with_primary_readings(case) -> None:
     rows = hexagram_najia(case["lines"])
     assert [r["direct"] for r in rows] == case["direct"]
     assert [r["borrowed"] for r in rows] == case["borrowed"]
 
 
 @pytest.mark.parametrize("case", REFERENCE["literal_clauses"], ids=lambda c: c["gua"])
-def test_literal_binding_and_actual_najia_do_not_settle_an_unmatched_month(case):
+def test_literal_binding_and_actual_najia_do_not_settle_an_unmatched_month(
+    case,
+) -> None:
     outside = next(m for m in range(1, 13) if m not in case["month_numbers"])
     chart = chart_for(case["gua"])
     before = deepcopy(chart)
@@ -100,7 +102,7 @@ def test_literal_binding_and_actual_najia_do_not_settle_an_unmatched_month(case)
 
 
 @pytest.mark.parametrize("case", REFERENCE["literal_clauses"], ids=lambda c: c["gua"])
-def test_true_month_and_false_najia_stay_separate(case):
+def test_true_month_and_false_najia_stay_separate(case) -> None:
     year = "丁卯" if case["gua"] in {"乾為天", "風天小畜"} else "甲子"
     result = judge(
         chart_for(case["gua"]),
@@ -114,7 +116,7 @@ def test_true_month_and_false_najia_stay_separate(case):
     assert clause["match"] is None
 
 
-def test_najia_uses_its_own_phase_even_when_other_phase_makes_desheng_true():
+def test_najia_uses_its_own_phase_even_when_other_phase_makes_desheng_true() -> None:
     chart = chart_for("水風井")
     chart["hou"] = chart_for("離為火")["hou"]
     result = judge(chart, {**PILLARS, "year": "己酉"}, "辰")
@@ -129,7 +131,9 @@ def test_najia_uses_its_own_phase_even_when_other_phase_makes_desheng_true():
 @pytest.mark.parametrize(
     "gua,month", [("離為火", 9), ("水風井", 6), ("風水渙", 1), ("雷水解", 4)]
 )
-def test_false_month_label_does_not_resolve_a_qualified_clause(gua, month):
+def test_false_month_label_does_not_resolve_a_qualified_clause(
+    gua: str, month: int
+) -> None:
     row = month_affinity(chart_for(gua), MONTH_BRANCHES[month - 1], MONTH_GUA)[
         "phases"
     ][0]
@@ -145,7 +149,7 @@ def test_false_month_label_does_not_resolve_a_qualified_clause(gua, month):
     )
 
 
-def test_unregistered_hexagram_does_not_receive_an_invented_clause():
+def test_unregistered_hexagram_does_not_receive_an_invented_clause() -> None:
     result = judge(chart_for("天風姤"), PILLARS, "卯")
     assert all(
         row["natal_najia_clause"] is None for row in result["month_affinity"]["phases"]
@@ -166,7 +170,9 @@ def test_unregistered_hexagram_does_not_receive_an_invented_clause():
         "missing_borrowed",
     ],
 )
-def test_misaligned_phase_najia_cannot_be_used_as_clause_evidence(corruption):
+def test_misaligned_phase_najia_cannot_be_used_as_clause_evidence(
+    corruption: str,
+) -> None:
     chart = chart_for("水風井")
     rows = judge(chart, {**PILLARS, "year": "辛丑"}, "未")["najia"]
     if corruption == "duplicate_phase":
@@ -202,8 +208,8 @@ def test_misaligned_phase_najia_cannot_be_used_as_clause_evidence(corruption):
     ],
 )
 def test_clause_pointer_must_match_the_same_literal_witness(
-    key, value, monkeypatch, tmp_path
-):
+    key: str, value, monkeypatch: MonkeyPatch, tmp_path: Path
+) -> None:
     data = json.loads(heluo_months.COLLATION_PATH.read_text())
     clause = next(
         c for c in data["natal_najia_clauses"] if c["id"] == "jing_natal_najia"
@@ -221,18 +227,22 @@ def test_clause_pointer_must_match_the_same_literal_witness(
 
 
 @pytest.mark.parametrize("value", [True, False, "true", 1])
-def test_output_contract_rejects_a_decided_whole_clause(value):
+def test_output_contract_rejects_a_decided_whole_clause(
+    value: bool | int | str,
+) -> None:
     with pytest.raises(ValidationError):
         HeluoNatalNajiaClause.model_validate({"match": value})
 
 
-def test_partial_clause_leaf_remains_a_valid_output():
+def test_partial_clause_leaf_remains_a_valid_output() -> None:
     HeluoNatalNajiaClause.model_validate(
         {"month_label_match": False, "najia": {"present": True}, "match": None}
     )
 
 
-def test_jie_prose_order_disagreement_is_retained_without_claiming_positional_collation():
+def test_jie_prose_order_disagreement_is_retained_without_claiming_positional_collation() -> (
+    None
+):
     issue = REFERENCE["unresolved_source_order"][0]
     assert issue["page"] == 214 and issue["gua"] == "雷水解"
     actual = [r["direct"] for r in hexagram_najia(chart_for("雷水解")["xian"]["lines"])]

@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.validation import fengshui_replacement_diagrams as audit
+from validation import fengshui_replacement_diagrams as audit
 
 FOLDER = Path(__file__).parents[1] / "data/fengshui_replacement_diagrams_v1"
 
@@ -18,7 +18,7 @@ def frozen():
     return audit.load_replacement_diagram_reference(FOLDER)
 
 
-def test_all_216_replacement_diagrams_keep_three_literal_differences(frozen):
+def test_all_216_replacement_diagrams_keep_three_literal_differences(frozen) -> None:
     result = audit.audit_replacement_diagrams(frozen)
     assert (result["printed_charts_checked"], result["printed_charts_matched"]) == (
         216,
@@ -70,7 +70,7 @@ def test_all_216_replacement_diagrams_keep_three_literal_differences(frozen):
         assert result[key] is False
 
 
-def test_source_freeze_precedes_comparison_and_retains_review_errors(frozen):
+def test_source_freeze_precedes_comparison_and_retains_review_errors(frozen) -> None:
     raw = (FOLDER / "reference.json").read_bytes()
     assert hashlib.sha256(raw).hexdigest() == audit.REFERENCE_SHA256
     ref = frozen["reference"]
@@ -106,7 +106,9 @@ def test_source_freeze_precedes_comparison_and_retains_review_errors(frozen):
         "bool",
     ],
 )
-def test_all_literal_source_slots_and_identities_are_required(frozen, mutation):
+def test_all_literal_source_slots_and_identities_are_required(
+    frozen, mutation: str
+) -> None:
     data = deepcopy(frozen)
     rows = data["reference"]["rows"]
     if mutation == "remove":
@@ -129,7 +131,9 @@ def test_all_literal_source_slots_and_identities_are_required(frozen, mutation):
         audit.audit_replacement_diagrams(data)
 
 
-def test_copying_all_printed_errors_cannot_clear_acceptance(frozen, monkeypatch):
+def test_copying_all_printed_errors_cannot_clear_acceptance(
+    frozen, monkeypatch: pytest.MonkeyPatch
+) -> None:
     real = audit._chart
     by_key = {
         (r["period"], r["facing_mountain"]): r for r in frozen["reference"]["rows"]
@@ -154,7 +158,9 @@ def test_copying_all_printed_errors_cannot_clear_acceptance(frozen, monkeypatch)
     assert result["complete_diagram_acceptance_passed"] is False
 
 
-def test_new_permutation_error_outside_disputes_is_not_allowlisted(frozen, monkeypatch):
+def test_new_permutation_error_outside_disputes_is_not_allowlisted(
+    frozen, monkeypatch: pytest.MonkeyPatch
+) -> None:
     real = audit._chart
 
     def swap(period, selector):
@@ -164,6 +170,8 @@ def test_new_permutation_error_outside_disputes_is_not_allowlisted(frozen, monke
             for direction, value in (("E", b), ("W", a)):
                 chart["mountain_chart"][direction] = value
                 chart["palaces"][direction]["mountain_star_number"] = value
+        else:
+            pass
         return chart
 
     monkeypatch.setattr(audit, "_chart", swap)
@@ -173,7 +181,9 @@ def test_new_permutation_error_outside_disputes_is_not_allowlisted(frozen, monke
     assert result["complete_diagram_acceptance_passed"] is False
 
 
-def test_declared_mode_is_not_a_fabricated_source_angle(frozen, monkeypatch):
+def test_declared_mode_is_not_a_fabricated_source_angle(
+    frozen, monkeypatch: pytest.MonkeyPatch
+) -> None:
     real = audit._chart
     calls = []
 
@@ -193,7 +203,7 @@ def test_declared_mode_is_not_a_fabricated_source_angle(frozen, monkeypatch):
 @pytest.mark.parametrize(
     "name", ["reference.json", "native-images/子-午-5.jpeg", "ocr-native.json"]
 )
-def test_changed_original_or_proposal_is_rejected(tmp_path, name):
+def test_changed_original_or_proposal_is_rejected(tmp_path: Path, name: str) -> None:
     folder = tmp_path / "source"
     shutil.copytree(FOLDER, folder)
     with (folder / name).open("ab") as stream:
@@ -204,7 +214,7 @@ def test_changed_original_or_proposal_is_rejected(tmp_path, name):
         audit.load_replacement_diagram_reference(folder)
 
 
-def test_rehashing_cannot_omit_a_disagreeing_source_image(tmp_path):
+def test_rehashing_cannot_omit_a_disagreeing_source_image(tmp_path: Path) -> None:
     folder = tmp_path / "source"
     shutil.copytree(FOLDER, folder)
     manifest = json.loads((folder / "hashes.json").read_text())
@@ -214,7 +224,7 @@ def test_rehashing_cannot_omit_a_disagreeing_source_image(tmp_path):
         audit.load_replacement_diagram_reference(folder)
 
 
-def test_claimed_totals_and_awards_cannot_change_actual_coverage(frozen):
+def test_claimed_totals_and_awards_cannot_change_actual_coverage(frozen) -> None:
     data = deepcopy(frozen)
     data["reference"].update(numerals=99999, whole_book_conformity_established=True)
     unchanged = deepcopy(data)

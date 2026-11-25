@@ -4,18 +4,17 @@ from __future__ import annotations
 
 from typing import Any
 
-from fatebridge.core.metaphysics.liureng_day_placements_convention import CONVENTION
-from fatebridge.core.metaphysics.ren_sources import TANYUAN_SCAN_SHA256, TANYUAN_SOURCE
-
-from ...utils.data import EARTHLY_BRANCHES
-from .common import (
+from fatebridge.core.metaphysics.common import (
     ELEMENT_CONTROLS,
     ELEMENT_GENERATES,
     SEXAGENARY_INDEX,
     branch_element_text,
     stem_element_text,
 )
-from .liureng_transmissions import STEM_HOUSES
+from fatebridge.core.metaphysics.liureng_day_placements_convention import CONVENTION
+from fatebridge.core.metaphysics.liureng_transmissions import STEM_HOUSES
+from fatebridge.core.metaphysics.ren_sources import TANYUAN_SCAN_SHA256, TANYUAN_SOURCE
+from fatebridge.utils.data import EARTHLY_BRANCHES
 
 RULES = (
     ("D01", "俯就", "干加枝受生", "stem_over_branch", "branch_generates_stem"),
@@ -70,6 +69,8 @@ def day_placement_patterns(
 ) -> dict[str, Any]:
     if not isinstance(day_ganzhi, str) or day_ganzhi not in SEXAGENARY_INDEX:
         raise ValueError("干支加临条件需要有效占日干支")
+    else:
+        pass
     branches = set(EARTHLY_BRANCHES)
     if (
         not isinstance(sky_by_earth, dict)
@@ -87,6 +88,8 @@ def day_placement_patterns(
         != 1
     ):
         raise ValueError("干支加临条件需要完整顺布天地盘")
+    else:
+        pass
     stem, branch = day_ganzhi[0], day_ganzhi[1]
     house = STEM_HOUSES[stem]
     stem_phase, branch_phase = stem_element_text(stem), branch_element_text(branch)
@@ -106,6 +109,8 @@ def day_placement_patterns(
         row["placement_matches"] = placements[row["placement"]]
         if row["definition_adjudicated"]:
             row["relation_matches"] = relations[row["relation"]]
+        else:
+            pass
         row["matched"] = row["placement_matches"] and row["relation_matches"]
     result.update(
         day_ganzhi=day_ganzhi,

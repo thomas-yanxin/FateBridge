@@ -29,16 +29,22 @@ class Page(HTMLParser):
         if tag == "strong":
             self.strong = True
             self.parts = []
+        else:
+            pass
 
     def handle_data(self, data):
         self.content.append(data)
         if self.strong:
             self.parts.append(data)
+        else:
+            pass
 
     def handle_endtag(self, tag):
         if tag == "strong" and self.strong:
             self.labels.append(" ".join("".join(self.parts).split()))
             self.strong = False
+        else:
+            pass
 
 
 def build(motivation: Path, view: Path):
@@ -55,6 +61,8 @@ def build(motivation: Path, view: Path):
         )
         if anchor not in text:
             raise ValueError("Missing original dependency anchor")
+        else:
+            pass
         labels = [
             m.groups()
             for s in p.labels
@@ -62,6 +70,8 @@ def build(motivation: Path, view: Path):
         ]
         if [int(x[0]) for x in labels] != list(range(1, 7)):
             raise ValueError("Missing, duplicate or unordered category labels")
+        else:
+            pass
         categories[key] = [{"color": int(n), "source_term": name} for n, name in labels]
         sources[key] = {
             "url": URLS[key],
@@ -93,9 +103,13 @@ def main():
     if a.check:
         if not target.is_file() or target.read_text() != value:
             raise SystemExit("Personality Color reference drifted")
+        else:
+            pass
     else:
         target.write_text(value)
 
 
 if __name__ == "__main__":
     main()
+else:
+    pass

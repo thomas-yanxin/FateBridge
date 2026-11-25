@@ -4,6 +4,7 @@ import asyncio
 import json
 import shutil
 from copy import deepcopy
+from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
@@ -14,15 +15,17 @@ import scripts.ziwei.audit_ziwei_activation as audit
 from fatebridge.application.examples import evidence_views
 from fatebridge.application.execution import execute_tool
 from fatebridge.cli import run
-from fatebridge.core.metaphysics.ziwei import _palace_for_nominal_age, build_ziwei_chart
+from fatebridge.core.metaphysics.ziwei import build_ziwei_chart
+from fatebridge.core.ziwei.ziwei_horoscope import palace_for_nominal_age
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.metaphysics import calculate_ziwei_horoscope
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.birth_input import create_person_info
-from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
 from scripts.ziwei.audit_ziwei_limits import _seed
 from tests.fixtures.mcp_receipt import verified_inline_business
 from tests.fixtures.mcp_result_delivery import read_full_result
+from tests.support.transports import call_calculation
+from validation.claims import CalculationClaim, verify_calculation_claims
 
 BIRTH = dict(
     birth_year=1984,
@@ -35,7 +38,9 @@ BIRTH = dict(
 )
 
 
-def test_conditional_activation_audit_preserves_denominators_and_uncertainties():
+def test_conditional_activation_audit_preserves_denominators_and_uncertainties() -> (
+    None
+):
     r = audit.audit_activation()
     assert not r["mismatches"]
     assert r["conditional_chart_inputs"] == 20
@@ -49,7 +54,9 @@ def test_conditional_activation_audit_preserves_denominators_and_uncertainties()
     assert not r["whole_book_acceptance_passed"]
 
 
-def test_reintroduced_four_transformations_fail_all_pre_decade_cases(monkeypatch):
+def test_reintroduced_four_transformations_fail_all_pre_decade_cases(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     original = audit.build_ziwei_horoscope
 
     def broken(**kw):
@@ -57,6 +64,8 @@ def test_reintroduced_four_transformations_fail_all_pre_decade_cases(monkeypatch
         if h["scopes"][0]["status"] == "not_started":
             h["scopes"][0]["mutagen"] = {"化禄": "太阴"}
             h["scopes"][0]["palace_map"] = [{"branch": "丑"}]
+        else:
+            pass
         return h
 
     monkeypatch.setattr(audit, "build_ziwei_horoscope", broken)
@@ -75,14 +84,18 @@ def _copy_policy_sources(tmp_path):
     return fixtures
 
 
-def test_activation_audit_requires_previously_frozen_source_page(tmp_path):
+def test_activation_audit_requires_previously_frozen_source_page(
+    tmp_path: Path,
+) -> None:
     fixtures = _copy_policy_sources(tmp_path)
     (fixtures / "naj_ming_childhood_v1/frame_0080.jpg").write_bytes(b"changed")
     with pytest.raises(ValueError, match="activation source checksum mismatch"):
         audit.audit_activation(fixtures)
 
 
-def test_software_reference_cannot_be_rewritten_to_hide_declared_differences(tmp_path):
+def test_software_reference_cannot_be_rewritten_to_hide_declared_differences(
+    tmp_path: Path,
+) -> None:
     fixtures = _copy_policy_sources(tmp_path)
     p = tmp_path / "ziwei_horoscope_reference.json"
     r = json.loads(p.read_text())
@@ -93,21 +106,23 @@ def test_software_reference_cannot_be_rewritten_to_hide_declared_differences(tmp
 
 
 @pytest.mark.parametrize("profile", ["iztro_2_5_8", "quanshu_v2_excerpt"])
-def test_formal_lookup_rejects_both_pre_start_and_out_of_range_ages(profile):
+def test_formal_lookup_rejects_both_pre_start_and_out_of_range_ages(
+    profile: str,
+) -> None:
     chart = build_ziwei_chart(_seed(1984, 1), "男", rule_profile=profile)
     assert chart["wuxing_ju"]["number"] == 6
     before = deepcopy(chart)
     with pytest.raises(ValueError, match="尚未起正式大限"):
-        _palace_for_nominal_age(chart["palaces"], 5)
+        palace_for_nominal_age(chart["palaces"], 5)
     with pytest.raises(ValueError, match="支持范围"):
-        _palace_for_nominal_age(chart["palaces"], 126)
-    assert _palace_for_nominal_age(chart["palaces"], 6)["daxian"] == "6~15"
-    assert _palace_for_nominal_age(chart["palaces"], 125)["daxian"] == "116~125"
+        palace_for_nominal_age(chart["palaces"], 126)
+    assert palace_for_nominal_age(chart["palaces"], 6)["daxian"] == "6~15"
+    assert palace_for_nominal_age(chart["palaces"], 125)["daxian"] == "116~125"
     assert chart == before
 
 
 @pytest.mark.parametrize("profile", ["iztro_2_5_8", "quanshu_v2_excerpt"])
-def test_actual_cny_crossing_does_not_generate_a_pre_start_decade(profile):
+def test_actual_cny_crossing_does_not_generate_a_pre_start_decade(profile: str) -> None:
     results = [
         calculate_ziwei_horoscope(
             create_person_info(**BIRTH),
@@ -150,7 +165,9 @@ def test_actual_cny_crossing_does_not_generate_a_pre_start_decade(profile):
     assert len(before["scopes"]) == len(started["scopes"]) == 6
 
 
-def test_same_run_null_facts_reject_invented_decade_palace_and_transformations():
+def test_same_run_null_facts_reject_invented_decade_palace_and_transformations() -> (
+    None
+):
     spec = next(s for s in CATALOG if s.key == "ziwei_horoscope")
     request = spec.request_model.model_validate(
         {
@@ -193,8 +210,12 @@ def test_same_run_null_facts_reject_invented_decade_palace_and_transformations()
 @pytest.mark.parametrize("day", [19, 20])
 @pytest.mark.parametrize("view", ["decade_activation", "complete_scope_records"])
 def test_availability_and_nulls_survive_three_surfaces_and_same_run_pages(
-    profile, day, view, monkeypatch, capsys
-):
+    profile: str,
+    day: int,
+    view: str,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     api._reset_runtime_state_for_tests()
     monkeypatch.setattr(
         api,
@@ -222,7 +243,7 @@ def test_availability_and_nulls_survive_three_surfaces_and_same_run_pages(
         as_of="2026-10-22T12:00:00+08:00",
     )
     rest = TestClient(api.app).post(
-        "/api/cn/ziwei/horoscope",
+        "/api/ziwei/timing",
         json=inputs,
         params=[
             ("as_of", opts["as_of"]),
@@ -235,18 +256,20 @@ def test_availability_and_nulls_survive_three_surfaces_and_same_run_pages(
 
     async def call():
         async with Client(create_mcp_app(families="metaphysics")) as client:
-            r = await client.call_tool(
-                "ziwei_horoscope", {**inputs, **opts}, raise_on_error=False
+            r = await call_calculation(
+                client, "ziwei_timing", {**inputs, **opts}, raise_on_error=False
             )
             assert not r.is_error, r.content
             p = r.structured_content
             if view == "decade_activation":
                 return await verified_inline_business(client, p)
+            else:
+                pass
             assert len(json.dumps(p, ensure_ascii=False, separators=(",", ":"))) <= 8192
             return await read_full_result(client, p)
 
     native = asyncio.run(call())
-    args = ["ziwei_horoscope"]
+    args = ["ziwei_timing"]
     for k, v in inputs.items():
         args += ["--" + k.replace("_", "-"), str(v)]
     args += [
@@ -279,5 +302,7 @@ def test_availability_and_nulls_survive_three_surfaces_and_same_run_pages(
         if day == 19:
             assert d["mutagen"] is None and d["natal_palace_name"] is None
             assert d["palace_map"] == d["mutagen_natal_links"] == []
+        else:
+            pass
         assert len(h["scopes"]) == 6
         assert all(len(s["mutagen_natal_links"]) == 4 for s in h["scopes"][1:])

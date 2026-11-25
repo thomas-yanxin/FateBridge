@@ -9,11 +9,12 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from fatebridge.core.jyotish import vimshottari
-from fatebridge.core.jyotish_dasha_levels import active_levels
-from fatebridge.core.output_jyotish import DashaExactFraction, Vimshottari
+from fatebridge.core.contracts.output_jyotish import DashaExactFraction, Vimshottari
+from fatebridge.core.jyotish.jyotish import vimshottari
+from fatebridge.core.jyotish.jyotish_dasha_levels import active_levels
 from fatebridge.services.jyotish import calculate_vimshottari
 from tests.fixtures.surface_payloads import astro_payload
+from tests.support.ephemeris_case_runtime import native_ephemeris_files  # noqa: F401
 
 FIXTURES = Path(__file__).parents[1] / "fixtures"
 PRIMARY_PATH = FIXTURES / "jyotish-dasha-global-primary.json"
@@ -28,7 +29,7 @@ def microseconds(delta):
     return (delta.days * 86400 + delta.seconds) * 1000000 + delta.microseconds
 
 
-def test_reference_inputs_and_precision_target_predate_implementation():
+def test_reference_inputs_and_precision_target_predate_implementation() -> None:
     assert (
         hashlib.sha256(PRIMARY_PATH.read_bytes()).hexdigest()
         == "b196d7d600c44c021eab440457218ebe520a59b8bd23d3a076514f9ebe98e974"
@@ -42,8 +43,7 @@ def test_reference_inputs_and_precision_target_predate_implementation():
     assert PRIMARY["real_event_cases"] == BOUNDARIES["real_event_cases"] == 0
 
 
-@pytest.mark.parametrize("case", PRIMARY["rows"])
-def test_every_anchor_and_all_six_levels_equal_common_epoch_reference(case):
+def _assert_global_epoch_case(case):
     result = vimshottari(
         BIRTH,
         float.fromhex(case["moon_hex"]),
@@ -98,47 +98,56 @@ def test_every_anchor_and_all_six_levels_equal_common_epoch_reference(case):
     ] == case["current_levels"][0]["exact_start_offset_us"]
 
 
-@pytest.mark.parametrize("case", BOUNDARIES["rows"])
-def test_every_predeclared_boundary_probe_uses_the_same_global_quantizer(case):
-    result = vimshottari(
-        BIRTH,
-        float.fromhex(case["moon_hex"]),
-        datetime.fromisoformat(case["analysis_utc"]),
-        year_basis=case["year_basis"],
-        dasha_depth=6,
-    )
-    actual = result["subdivisions"]["current_levels"]
-    assert [
-        {name: row[name] for name in ["lord", "start", "end"]} for row in actual
-    ] == case["current_levels"]
+@pytest.mark.parametrize("chunk", range(4))
+def test_every_anchor_and_all_six_levels_equal_common_epoch_reference(chunk) -> None:
+    for case in PRIMARY["rows"][chunk::4]:
+        _assert_global_epoch_case(case)
 
 
-@pytest.mark.parametrize("index", range(0, 5211, 97))
-def test_default_two_levels_and_deep_levels_share_the_complete_epoch(index):
-    case = PRIMARY["rows"][index]
-    shallow = vimshottari(
-        BIRTH, float.fromhex(case["moon_hex"]), TARGET, year_basis=case["year_basis"]
-    )
-    deep = vimshottari(
-        BIRTH,
-        float.fromhex(case["moon_hex"]),
-        TARGET,
-        year_basis=case["year_basis"],
-        dasha_depth=6,
-    )
-    assert "subdivisions" not in shallow
-    for field in [
-        "current_major",
-        "current_sub",
-        "birth_balance",
-        "time_quantization",
-        "timeline",
-        "timeline_scope",
-    ]:
-        assert shallow[field] == deep[field]
+def test_every_predeclared_boundary_probe_uses_the_same_global_quantizer() -> None:
+    for case in BOUNDARIES["rows"]:
+        result = vimshottari(
+            BIRTH,
+            float.fromhex(case["moon_hex"]),
+            datetime.fromisoformat(case["analysis_utc"]),
+            year_basis=case["year_basis"],
+            dasha_depth=6,
+        )
+        actual = result["subdivisions"]["current_levels"]
+        assert [
+            {name: row[name] for name in ["lord", "start", "end"]} for row in actual
+        ] == case["current_levels"]
 
 
-def test_exact_epoch_offsets_cannot_contradict_the_supplied_major_start():
+def test_default_two_levels_and_deep_levels_share_the_complete_epoch() -> None:
+    for index in range(0, 5211, 97):
+        case = PRIMARY["rows"][index]
+        shallow = vimshottari(
+            BIRTH,
+            float.fromhex(case["moon_hex"]),
+            TARGET,
+            year_basis=case["year_basis"],
+        )
+        deep = vimshottari(
+            BIRTH,
+            float.fromhex(case["moon_hex"]),
+            TARGET,
+            year_basis=case["year_basis"],
+            dasha_depth=6,
+        )
+        assert "subdivisions" not in shallow
+        for field in [
+            "current_major",
+            "current_sub",
+            "birth_balance",
+            "time_quantization",
+            "timeline",
+            "timeline_scope",
+        ]:
+            assert shallow[field] == deep[field]
+
+
+def test_exact_epoch_offsets_cannot_contradict_the_supplied_major_start() -> None:
     target = BIRTH + timedelta(days=1)
     for extra in [
         {"_reference_epoch": BIRTH},
@@ -177,20 +186,21 @@ def test_exact_epoch_offsets_cannot_contradict_the_supplied_major_start():
     ] == {"numerator": "-1", "denominator": "3"}
 
 
-@pytest.mark.parametrize(
-    "value",
-    [
+def test_exact_fraction_contract_retains_strings_and_rejects_lossy_substitutions() -> (
+    None
+):
+    for value in (
         {"numerator": 1, "denominator": "3"},
         {"numerator": "01", "denominator": "3"},
         {"numerator": "1", "denominator": "0"},
-    ],
-)
-def test_exact_fraction_contract_retains_strings_and_rejects_lossy_substitutions(value):
-    with pytest.raises(ValidationError):
-        DashaExactFraction.model_validate(value)
+    ):
+        with pytest.raises(ValidationError):
+            DashaExactFraction.model_validate(value)
 
 
-def test_actual_service_records_each_endpoint_epoch_and_separate_policy_source():
+def test_actual_service_records_each_endpoint_epoch_and_separate_policy_source() -> (
+    None
+):
     body = calculate_vimshottari(
         **astro_payload(),
         analysis_year=2026,
@@ -215,3 +225,55 @@ def test_actual_service_records_each_endpoint_epoch_and_separate_policy_source()
     typed = Vimshottari.model_validate(vim).model_dump(exclude_unset=True)
     assert typed["time_quantization"] == vim["time_quantization"]
     assert typed["subdivisions"] == vim["subdivisions"]
+
+
+def test_early_birth_can_begin_vimshottari_before_year_one() -> None:
+    # Swiss 2.10.03 C ABI, V-C in R190. The complete first period starts before
+    # year one even though this birth and the analysis have ordinary UTC labels.
+    result = vimshottari(
+        datetime.fromisoformat("0001-01-01T00:00:00+00:00"),
+        166.05176535623977,
+        datetime.fromisoformat("0036-05-24T12:00:00+00:00"),
+        dasha_depth=4,
+    )
+    assert (
+        result["birth_balance"]["major_start"] == "-000004-06-18T03:58:33.093493+00:00"
+    )
+    assert result["birth_balance"]["major_end"] == "0006-06-18T17:30:08.133493+00:00"
+    assert [level["lord"] for level in result["subdivisions"]["current_levels"]] == [
+        "Jupiter",
+        "Mercury",
+        "Mercury",
+        "Jupiter",
+    ]
+
+
+@pytest.mark.local_data
+def test_vimshottari_keeps_extended_utc_birth_calendar(native_ephemeris_files) -> None:
+    result = calculate_vimshottari(
+        birth_year=1,
+        birth_month=1,
+        birth_day=1,
+        birth_hour=13,
+        birth_minute=59,
+        birth_timezone="Etc/GMT-14",
+        birth_latitude=0.0,
+        birth_longitude=0.0,
+        analysis_year=36,
+        analysis_month=5,
+        analysis_day=24,
+        analysis_hour=12,
+        analysis_timezone="Etc/UTC",
+        divisions=[],
+        dasha_depth=4,
+    )
+    assert result["person_info"]["utc_datetime"] == "0000-12-31T23:59:00+00:00"
+    profile = result["india"]["profile"]
+    assert profile["julian_day_tt"] == 1721425.6213716618
+    assert profile["ephemeris_by_body"]["Moon"] == "swieph"
+    dasha = result["vimshottari"]
+    assert (
+        dasha["time_quantization"]["reference_epoch_utc"] == "0000-12-31T23:59:00+00:00"
+    )
+    assert dasha["seed"]["name"] == "Hasta"
+    assert dasha["seed"]["pada"] == 2

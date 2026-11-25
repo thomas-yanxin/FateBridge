@@ -23,6 +23,7 @@ from scripts.astrodice.astrodice_clock_interval import (
     unit,
 )
 from scripts.astrodice.astrodice_de441_records import calendar_jd_tdb
+from scripts.astrodice.astrodice_reference_data import verify_material
 from scripts.astrodice.astrodice_source_slope_bounds import pi_bounds
 
 PLAN_SHA = "7e18e9a713c24709256890ffbc0af7f242cb73fb228a28abf41f18c04a982d25"
@@ -35,7 +36,6 @@ def sha(path):
 
 
 def load_plan(run):
-    from scripts.astrodice.astrodice_reference_data import verify_material
 
     path = run / "plan-before-analysis.json"
     verify_material(path)
@@ -50,6 +50,8 @@ class LunarSource(Reader):
     def state(self, epoch, body):
         if body not in {"Earth", "Moon"}:
             raise ValueError("Unplanned lunar source body")
+        else:
+            pass
         emb, geo = self.group(epoch, 2), self.group(epoch, 9)
         earth = sub(emb, scale(geo, 1 / (1 + self.emrat)))
         return earth if body == "Earth" else add(earth, geo)
@@ -60,18 +62,24 @@ def rounded_epoch(value):
     a, b = Q(float(low)), Q(float(high))
     if a != b:
         raise ValueError("Emission rounding cell is ambiguous; no node dropped")
+    else:
+        pass
     return I(a)
 
 
 def apparent(source, epoch, profile="continuous_split", derivative=False):
     if derivative and profile != "continuous_split":
         raise ValueError("A rounded clock does not acquire a smooth derivative")
+    else:
+        pass
     if profile not in {
         "continuous_split",
         "rounded_emitter_only",
         "rounded_reception_and_emitter",
     }:
         raise ValueError("Unknown lunar split profile")
+    else:
+        pass
     t = A(
         Q(float(epoch)) if profile == "rounded_reception_and_emitter" else epoch,
         int(derivative),
@@ -81,6 +89,8 @@ def apparent(source, epoch, profile="continuous_split", derivative=False):
     emitted = t - delay
     if profile != "continuous_split":
         emitted = A(rounded_epoch(emitted.v))
+    else:
+        pass
     ray = sub(source.state(emitted, "Moon")[:3], earth[:3])
     radius = norm(ray)
     beta = scale(earth[3:], K)
@@ -102,6 +112,8 @@ def apparent(source, epoch, profile="continuous_split", derivative=False):
     }
     if derivative:
         result["emission_clock_derivative"] = record(emitted.d)
+    else:
+        pass
     return result
 
 
@@ -158,6 +170,8 @@ def evaluate(run, split):
         key = f"{index}/{epoch}/{profile}"
         if key not in points:
             points[key] = apparent(sources[index], epoch, profile)
+        else:
+            pass
         return key
 
     for item in cases(run, plan, split):
@@ -216,6 +230,8 @@ def evaluate(run, split):
             calendar_jd_tdb(plan["record_window_labels"][2]),
             derivative=True,
         )
+    else:
+        pass
     return {
         "plan_sha256": PLAN_SHA,
         "split": split,
@@ -235,7 +251,7 @@ def evaluate(run, split):
     }
 
 
-def main():
+def main() -> None:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("run", type=Path)
     p.add_argument("split", choices=["development", "heldout"])
@@ -259,3 +275,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+else:
+    pass

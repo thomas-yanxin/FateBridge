@@ -2,8 +2,8 @@
 
 The DE440 inputs are staging products of the five source extractors. The
 DE441 input is the continuous direct-access source span and its preserved
-download manifest. DE440 views preserve source words; DE441 retains every
-selected polynomial degree/domain with bounded binary coefficient quanta.
+download manifest. DE440 views preserve source words; DE441 preserves every
+selected original coefficient byte on its existing polynomial grid/domain.
 Neither operation consumes reference states or event times.
 """
 
@@ -13,22 +13,22 @@ import argparse
 import gzip
 import hashlib
 import json
-import math
 import struct
-import sys
-from array import array
 from copy import deepcopy
-from fractions import Fraction
+from itertools import chain
 from pathlib import Path
-from typing import TypedDict
+from typing import Iterator, TypedDict
 
 from fatebridge.core.astro.coefficient_storage import RecordBlock, pack_records
 from fatebridge.core.astro.de441_source import (
     FRAME_URL,
-    MODEL_ID,
     PAPER_URL,
     SOURCE_URL,
 )
+from fatebridge.core.astro.de441_storage import BASENAME as DE441_BASENAME
+from fatebridge.core.astro.de441_storage import BINARY_ORDER as DE441_BINARY_ORDER
+from fatebridge.core.astro.de441_storage import MODEL_ID
+from fatebridge.core.astro.de441_storage import STORAGE as DE441_STORAGE
 from fatebridge.core.astro.tdb import COEFFICIENT_SHA256 as TDB_SHA256
 from fatebridge.core.de440_solar import RecordSegment, SolarManifest
 
@@ -51,10 +51,6 @@ class SourceGroup(TypedDict):
     offset_words: int
     coefficient_count: int
     subintervals: int
-    quantum_binary_exponent_km: int
-    coefficient_error_bound_km_exact: str
-    position_error_bound_km_exact: str
-    velocity_error_bound_km_per_TDB_day_exact: str
 
 
 def encoded(value: object) -> bytes:
@@ -80,6 +76,8 @@ def solar_atlas(staging: Path) -> dict[str, bytes]:
             or len(data) != manifest["uncompressed_bytes"]
         ):
             raise ValueError("Staged DE440 records differ from their source commitment")
+        else:
+            pass
         profiles[metadata.name] = manifest
         for segment in manifest["segments"]:
             pair = segment["center"], segment["target"]
@@ -87,6 +85,8 @@ def solar_atlas(staging: Path) -> dict[str, bytes]:
             span = segment["interval_seconds"]
             if pair in formats and formats[pair] != (size, span):
                 raise ValueError("Inconsistent original DE440 source record layout")
+            else:
+                pass
             formats[pair] = size, span
             bucket = records.setdefault(pair, {})
             for index in range(segment["record_count"]):
@@ -98,6 +98,8 @@ def solar_atlas(staging: Path) -> dict[str, bytes]:
                     span / 2,
                 ) or (midpoint in bucket and bucket[midpoint] != raw):
                     raise ValueError("DE440 source grid or overlapping words differ")
+                else:
+                    pass
                 bucket[midpoint] = raw
     if (
         {m["model_id"] for m in profiles.values()} != set(SOLAR_SOURCE_SHA256)
@@ -105,6 +107,8 @@ def solar_atlas(staging: Path) -> dict[str, bytes]:
         or set(records) != {(0, 3), (3, 399), (0, 10)}
     ):
         raise ValueError("All five original solar source selections are required")
+    else:
+        pass
     logical = bytearray()
     segments: list[RecordSegment] = []
     offsets: dict[tuple[int, int], tuple[int, float, int, float]] = {}
@@ -113,6 +117,8 @@ def solar_atlas(staging: Path) -> dict[str, bytes]:
         times = sorted(bucket)
         if any(b - a != span for a, b in zip(times, times[1:])):
             raise ValueError("DE440 original record union is not continuous")
+        else:
+            pass
         raw = b"".join(bucket[t] for t in times)
         offset = len(logical)
         logical.extend(raw)
@@ -164,37 +170,47 @@ def solar_atlas(staging: Path) -> dict[str, bytes]:
             index = int((midpoint - first) / span)
             if first + index * span != midpoint:
                 raise ValueError("DE440 view does not follow its original source grid")
+            else:
+                pass
             segment["offset_bytes"] = base + index * size
             at = segment["offset_bytes"]
             raw = logical[at : at + segment["bytes"]]
             if hashlib.sha256(raw).hexdigest() != segment["sha256"]:
                 raise ValueError("DE440 selected source-record words changed")
+            else:
+                pass
             selected.extend(raw)
         if (
             len(selected) != original["uncompressed_bytes"]
             or hashlib.sha256(selected).hexdigest() != original["uncompressed_sha256"]
         ):
             raise ValueError("DE440 logical profile changed during deduplication")
+        else:
+            pass
         outputs[filename] = encoded(view)
     return outputs
 
 
-def planetary_archive(source: Path, download_manifest: Path) -> dict[str, bytes]:
+def planetary_archive(
+    source: Path, download_manifest: Path
+) -> Iterator[tuple[str, bytes]]:
     if (
         hashlib.sha256(download_manifest.read_bytes()).hexdigest()
         != DE441_DOWNLOAD_MANIFEST_SHA256
     ):
         raise ValueError("DE441 source download commitment changed")
+    else:
+        pass
     groups: dict[str, SourceGroup] = {}
-    words = array("q")
+    words = bytearray()
     source_sha = hashlib.sha256()
     selected_source_sha = hashlib.sha256()
     logical_sha = hashlib.sha256()
-    outputs: dict[str, bytes] = {}
+    compressed_bytes = 0
     chunks: list[dict[str, str | int]] = []
     chunk_records = 8192
     chunk_count = 0
-    name = "de441-planetary-0001-9999-v3"
+    name = DE441_BASENAME
     with source.open("rb") as stream:
         header = stream.read(8144)
         constants = stream.read(8144)
@@ -209,37 +225,31 @@ def planetary_archive(source: Path, download_manifest: Path) -> dict[str, bytes]
             au,
         ) != (1721392.5, 5373520.5, 32.0, 149597870.7):
             raise ValueError("Unexpected original DE441 source header")
+        else:
+            pass
         offset = 0
-        for body, number, exponent in [
-            ("Mercury", 0, -24),
-            ("Venus", 1, -22),
-            ("EarthMoonBarycenter", 2, -23),
-            ("Mars", 3, -22),
-            ("Jupiter", 4, -20),
-            ("Saturn", 5, -20),
-            ("Uranus", 6, -20),
-            ("Neptune", 7, -20),
-            ("Pluto", 8, -20),
-            ("MoonGeocentric", 9, -25),
-            ("Sun", 10, -22),
+        for body, number in [
+            ("Mercury", 0),
+            ("Venus", 1),
+            ("EarthMoonBarycenter", 2),
+            ("Mars", 3),
+            ("Jupiter", 4),
+            ("Saturn", 5),
+            ("Uranus", 6),
+            ("Neptune", 7),
+            ("Pluto", 8),
+            ("MoonGeocentric", 9),
+            ("Sun", 10),
         ]:
             pointer, count, parts = struct.unpack_from(
                 "<3i", header, 2696 + 12 * number
             )
-            quantum = Fraction(1, 1 << -exponent)
-            width = Fraction(32, parts)
             groups[body] = {
                 "source_group": number,
                 "source_pointer": [pointer, count, parts],
                 "offset_words": offset,
                 "coefficient_count": count,
                 "subintervals": parts,
-                "quantum_binary_exponent_km": exponent,
-                "coefficient_error_bound_km_exact": str(quantum / 2),
-                "position_error_bound_km_exact": str(count * quantum / 2),
-                "velocity_error_bound_km_per_TDB_day_exact": str(
-                    quantum * sum(k * k for k in range(count)) / width
-                ),
             }
             offset += 3 * count * parts
         records = int((end - start) / span)
@@ -251,26 +261,23 @@ def planetary_archive(source: Path, download_manifest: Path) -> dict[str, bytes]
                 start + (index + 1) * span,
             ):
                 raise ValueError("Incomplete or discontinuous original DE441 record")
+            else:
+                pass
             for group in groups.values():
                 at = (group["source_pointer"][0] - 1) * 8
                 count = 3 * group["coefficient_count"] * group["subintervals"]
                 selected = raw[at : at + count * 8]
                 selected_source_sha.update(selected)
-                values = struct.unpack("<" + str(count) + "d", selected)
-                exponent = group["quantum_binary_exponent_km"]
-                quantized = [round(math.ldexp(value, -exponent)) for value in values]
-                if any(abs(value) > 2**53 for value in quantized):
-                    raise ValueError("Quantized coefficients cannot restore exactly")
-                words.extend(quantized)
+                # Preserve the actual8-byte words, including signed zero and
+                # every coefficient bit; no float decode/encode is performed.
+                words.extend(selected)
             chunk_count += 1
             if chunk_count == chunk_records or index == records - 1:
-                if sys.byteorder != "little":
-                    words.byteswap()
-                logical = words.tobytes()
+                logical = bytes(words)
                 logical_sha.update(logical)
                 packed = pack_records(logical, [RecordBlock(chunk_count, offset * 8)])
                 filename = f"{name}-part-{len(chunks):02d}.bin.gz"
-                outputs[filename] = packed
+                compressed_bytes += len(packed)
                 chunks.append(
                     {
                         "file": filename,
@@ -282,10 +289,15 @@ def planetary_archive(source: Path, download_manifest: Path) -> dict[str, bytes]
                         "compressed_sha256": hashlib.sha256(packed).hexdigest(),
                     }
                 )
-                words = array("q")
+                yield filename, packed
+                words = bytearray()
                 chunk_count = 0
+            else:
+                pass
         if stream.read() or source_sha.hexdigest() != DE441_SOURCE_SHA256:
             raise ValueError("The continuous DE441 source words changed")
+        else:
+            pass
     metadata = {
         "model_id": MODEL_ID,
         "source_version": "JPL DE441, Park-Folkner-Williams-Boggs 2021",
@@ -297,35 +309,28 @@ def planetary_archive(source: Path, download_manifest: Path) -> dict[str, bytes]
         "source_position_unit": "km",
         "source_AU_km": au,
         "source_EMRAT": emrat,
-        "binary_order": "little_endian_int64",
+        "binary_order": DE441_BINARY_ORDER,
         "source_TDB_JD_bounds": [start, end],
         "record_days": span,
         "record_count": records,
         "record_size_words": offset,
         "records_per_chunk": chunk_records,
         "groups": groups,
-        "storage": "source_time_chunks_fixed_point_int64_record_byte_channels_gzip_v1",
+        "storage": DE441_STORAGE,
         "chunks": chunks,
         "uncompressed_bytes": records * offset * 8,
         "uncompressed_sha256": logical_sha.hexdigest(),
-        "compressed_bytes": sum(len(value) for value in outputs.values()),
+        "compressed_bytes": compressed_bytes,
         "coefficient_counts_subcells_axes_and_coverage_preserved": True,
-        "original_float_coefficients_bitwise_preserved": False,
+        "original_float_coefficients_bitwise_preserved": True,
         "source_selected_float64_sha256": selected_source_sha.hexdigest(),
         "source_file_sha256": DE441_SOURCE_SHA256,
         "source_header_sha256": hashlib.sha256(header).hexdigest(),
         "source_manifest_sha256": DE441_DOWNLOAD_MANIFEST_SHA256,
         "coefficient_representation": {
-            "method": "nearest_even_integer_of_original_binary64_scaled_by_exact_binary_quantum",
-            "maximum_integer_magnitude": 2**53,
-            "coefficient_bound": "abs(delta_c_k) <= q/2",
-            "uniform_position_bound": "N*q/2 per original source axis over x in[-1,1]",
-            "uniform_velocity_bound": "q/width * sum(k*k for k in range(N)) per source axis and TDB day",
-            "references": [
-                "https://dlmf.nist.gov/18.5.E1",
-                "https://dlmf.nist.gov/18.9.E21",
-            ],
-            "scope": "Coefficient representation only; excludes evaluator rounding, physical source error, time conversion and output frame. Small nonzero coefficients may round to zero; basis slots and original time cells remain. Linear derived-state bounds propagate through EMRAT; bounds add for differences.",
+            "method": "original_selected_binary64_bytes_copied_without_numeric_conversion",
+            "coefficient_rounding_or_quantization_applied": False,
+            "scope": "Selected original coefficient bytes only; excludes evaluator rounding, source physics, time conversion, optical mapping and output frame.",
         },
         "derived_states": {
             "Earth": "EMB - geocentricMoon/(1+EMRAT)",
@@ -343,42 +348,48 @@ def planetary_archive(source: Path, download_manifest: Path) -> dict[str, bytes]
             "pyerfa_version": "2.0.1.5",
         },
         "runtime_usage": "One shared barycentric receiver/target source; TT-tagged lookup uses declared geocentricTDB(TT). Source TDB velocity supplies observer aberration; displayed longitude is differentiated in TT through the complete mapping.",
-        "derived_product_producer": "FateBridge project contributors; source selection, bounded fixed-point coefficients and reversible byte-channel/gzip time chunks. Not an unmodified NASA kernel or provider endorsement.",
-        "source_qualification": "Prepared continuous source span with guard records, not the whole remote2.79GB file. Source-file SHA and original download manifest are separate commitments. All original coefficient slots, source/time coverage and fixed quantization policy retained; no reference-state fit. No observational or broad civil-clock certification.",
+        "derived_product_producer": "FateBridge project contributors; selected original binary64 coefficient bytes and reversible byte-channel/gzip time chunks. Not a complete unmodified NASA kernel or provider endorsement.",
+        "source_qualification": "Prepared continuous source span with guard records, not the whole remote2.79GB file. Source-file SHA and original download manifest are separate commitments. Selected original8-byte coefficient fields are copied without numeric conversion; source/time coverage retained. Independent acceptance is separate from generation. No observational, optical or broad civil-clock certification.",
     }
-    outputs[name + ".json"] = encoded(metadata)
-    return outputs
+    yield name + ".json", encoded(metadata)
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(__doc__)
-    parser.add_argument("--solar-profiles", type=Path, required=True)
+    parser.add_argument("--solar-profiles", type=Path)
     parser.add_argument("--de441-source", type=Path, required=True)
     parser.add_argument("--de441-source-manifest", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args()
-    outputs = solar_atlas(args.solar_profiles)
-    outputs.update(planetary_archive(args.de441_source, args.de441_source_manifest))
-    for name, content in outputs.items():
+    identities = {}
+    outputs = chain(
+        (
+            solar_atlas(args.solar_profiles).items()
+            if args.solar_profiles is not None
+            else ()
+        ),
+        planetary_archive(args.de441_source, args.de441_source_manifest),
+    )
+    for name, content in outputs:
         path = args.output / name
         if args.check:
             if path.read_bytes() != content:
                 raise SystemExit(f"Distributed coefficient product differs: {name}")
+            else:
+                pass
         else:
             args.output.mkdir(parents=True, exist_ok=True)
             path.write_bytes(content)
-    print(
-        json.dumps(
-            {
-                name: {"bytes": len(raw), "sha256": hashlib.sha256(raw).hexdigest()}
-                for name, raw in outputs.items()
-            },
-            indent=2,
-        )
-    )
+        identities[name] = {
+            "bytes": len(content),
+            "sha256": hashlib.sha256(content).hexdigest(),
+        }
+    print(json.dumps(identities, indent=2))
     return 0
 
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

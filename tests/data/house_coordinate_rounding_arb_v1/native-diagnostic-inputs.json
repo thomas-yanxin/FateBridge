@@ -1,0 +1,938 @@
+[
+  {
+    "id": "HP-M01-S0-R-L0",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.aaeca25dfb7bcp+0",
+      "bits": "0x3ffaaeca25dfb7bc"
+    },
+    "origin": {
+      "context": "M01",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M01-S0-R-L0"
+    }
+  },
+  {
+    "id": "HP-M01-S0-R-L1",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.4c8c3ca77af1ep+1",
+      "bits": "0x4004c8c3ca77af1e"
+    },
+    "origin": {
+      "context": "M01",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M01-S0-R-L1"
+    }
+  },
+  {
+    "id": "HP-M01-S0-R-L2",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.2abb28cadc034p+2",
+      "bits": "0x4012abb28cadc034"
+    },
+    "origin": {
+      "context": "M01",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M01-S0-R-L2"
+    }
+  },
+  {
+    "id": "HP-M01-S0-R-L3",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.eabb28977edf0p+2",
+      "bits": "0x401eabb28977edf0"
+    },
+    "origin": {
+      "context": "M01",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M01-S0-R-L3"
+    }
+  },
+  {
+    "id": "HP-M01-S0-R-L4",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.555d94656e01ap+3",
+      "bits": "0x402555d94656e01a"
+    },
+    "origin": {
+      "context": "M01",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M01-S0-R-L4"
+    }
+  },
+  {
+    "id": "HP-M01-S0-R-L5",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.a7027d3588bddp+0",
+      "bits": "0x3ffa7027d3588bdd"
+    },
+    "origin": {
+      "context": "M01",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M01-S0-R-L5"
+    }
+  },
+  {
+    "id": "HP-M01-S0-C-L0",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.aaeca25dfb798p+0",
+      "bits": "0x3ffaaeca25dfb798"
+    },
+    "origin": {
+      "context": "M01",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M01-S0-C-L0"
+    }
+  },
+  {
+    "id": "HP-M01-S0-C-L1",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.4c8c3ca77af00p+1",
+      "bits": "0x4004c8c3ca77af00"
+    },
+    "origin": {
+      "context": "M01",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M01-S0-C-L1"
+    }
+  },
+  {
+    "id": "HP-M01-S0-C-L2",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.2abb28cadc03ep+2",
+      "bits": "0x4012abb28cadc03e"
+    },
+    "origin": {
+      "context": "M01",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M01-S0-C-L2"
+    }
+  },
+  {
+    "id": "HP-M01-S0-C-L3",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.eabb28977ede5p+2",
+      "bits": "0x401eabb28977ede5"
+    },
+    "origin": {
+      "context": "M01",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M01-S0-C-L3"
+    }
+  },
+  {
+    "id": "HP-M01-S0-C-L4",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.555d94656e01fp+3",
+      "bits": "0x402555d94656e01f"
+    },
+    "origin": {
+      "context": "M01",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M01-S0-C-L4"
+    }
+  },
+  {
+    "id": "HP-M01-S0-C-L5",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.a7027d3588bb9p+0",
+      "bits": "0x3ffa7027d3588bb9"
+    },
+    "origin": {
+      "context": "M01",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M01-S0-C-L5"
+    }
+  },
+  {
+    "id": "HP-M01-S0-T-L0",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.aaeca28000000p+0",
+      "bits": "0x3ffaaeca28000000"
+    },
+    "origin": {
+      "context": "M01",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M01-S0-T-L0"
+    }
+  },
+  {
+    "id": "HP-M01-S0-T-L1",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.4c8c3ca000000p+1",
+      "bits": "0x4004c8c3ca000000"
+    },
+    "origin": {
+      "context": "M01",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M01-S0-T-L1"
+    }
+  },
+  {
+    "id": "HP-M01-S0-T-L2",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.2abb28a000000p+2",
+      "bits": "0x4012abb28a000000"
+    },
+    "origin": {
+      "context": "M01",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M01-S0-T-L2"
+    }
+  },
+  {
+    "id": "HP-M01-S0-T-L3",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.eabb28a000000p+2",
+      "bits": "0x401eabb28a000000"
+    },
+    "origin": {
+      "context": "M01",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M01-S0-T-L3"
+    }
+  },
+  {
+    "id": "HP-M01-S0-T-L4",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.555d945000000p+3",
+      "bits": "0x402555d945000000"
+    },
+    "origin": {
+      "context": "M01",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M01-S0-T-L4"
+    }
+  },
+  {
+    "id": "HP-M01-S0-T-L5",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.a7027d0000000p+0",
+      "bits": "0x3ffa7027d0000000"
+    },
+    "origin": {
+      "context": "M01",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M01-S0-T-L5"
+    }
+  },
+  {
+    "id": "HP-M01-S1-R-L0",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.39329c011cac6p+3",
+      "bits": "0x40239329c011cac6"
+    },
+    "origin": {
+      "context": "M01",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M01-S1-R-L0"
+    }
+  },
+  {
+    "id": "HP-M01-S1-R-L1",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.53af3660b2eeap+3",
+      "bits": "0x40253af3660b2eea"
+    },
+    "origin": {
+      "context": "M01",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M01-S1-R-L1"
+    }
+  },
+  {
+    "id": "HP-M01-S1-R-L2",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.84d2028e6d0b4p+3",
+      "bits": "0x40284d2028e6d0b4"
+    },
+    "origin": {
+      "context": "M01",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M01-S1-R-L2"
+    }
+  },
+  {
+    "id": "HP-M01-S1-R-L3",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.e4ca700472b1bp+1",
+      "bits": "0x400e4ca700472b1b"
+    },
+    "origin": {
+      "context": "M01",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M01-S1-R-L3"
+    }
+  },
+  {
+    "id": "HP-M01-S1-R-L4",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.89a4051cda16cp+2",
+      "bits": "0x40189a4051cda16c"
+    },
+    "origin": {
+      "context": "M01",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M01-S1-R-L4"
+    }
+  },
+  {
+    "id": "HP-M01-S1-R-L5",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.38afeb889abeap+3",
+      "bits": "0x40238afeb889abea"
+    },
+    "origin": {
+      "context": "M01",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M01-S1-R-L5"
+    }
+  },
+  {
+    "id": "HP-M01-S1-C-L0",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.3728778b48ea3p+3",
+      "bits": "0x4023728778b48ea3"
+    },
+    "origin": {
+      "context": "M01",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M01-S1-C-L0"
+    }
+  },
+  {
+    "id": "HP-M01-S1-C-L1",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.5913af52b42f4p+3",
+      "bits": "0x4025913af52b42f4"
+    },
+    "origin": {
+      "context": "M01",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M01-S1-C-L1"
+    }
+  },
+  {
+    "id": "HP-M01-S1-C-L2",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.8a94634ac5419p+3",
+      "bits": "0x4028a94634ac5419"
+    },
+    "origin": {
+      "context": "M01",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M01-S1-C-L2"
+    }
+  },
+  {
+    "id": "HP-M01-S1-C-L3",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.dca1de2d23a90p+1",
+      "bits": "0x400dca1de2d23a90"
+    },
+    "origin": {
+      "context": "M01",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M01-S1-C-L3"
+    }
+  },
+  {
+    "id": "HP-M01-S1-C-L4",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.9528c6958a832p+2",
+      "bits": "0x4019528c6958a832"
+    },
+    "origin": {
+      "context": "M01",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M01-S1-C-L4"
+    }
+  },
+  {
+    "id": "HP-M01-S1-C-L5",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.367fabc7c18c0p+3",
+      "bits": "0x402367fabc7c18c0"
+    },
+    "origin": {
+      "context": "M01",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M01-S1-C-L5"
+    }
+  },
+  {
+    "id": "HP-M01-S1-T-L0",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.39329bf000000p+3",
+      "bits": "0x40239329bf000000"
+    },
+    "origin": {
+      "context": "M01",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M01-S1-T-L0"
+    }
+  },
+  {
+    "id": "HP-M01-S1-T-L1",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.54baa49800000p+3",
+      "bits": "0x40254baa49800000"
+    },
+    "origin": {
+      "context": "M01",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M01-S1-T-L1"
+    }
+  },
+  {
+    "id": "HP-M01-S1-T-L2",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.884bf87000000p+3",
+      "bits": "0x402884bf87000000"
+    },
+    "origin": {
+      "context": "M01",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M01-S1-T-L2"
+    }
+  },
+  {
+    "id": "HP-M01-S1-T-L3",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.e4ca6fc000000p+1",
+      "bits": "0x400e4ca6fc000000"
+    },
+    "origin": {
+      "context": "M01",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M01-S1-T-L3"
+    }
+  },
+  {
+    "id": "HP-M01-S1-T-L4",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.9097f0e000000p+2",
+      "bits": "0x4019097f0e000000"
+    },
+    "origin": {
+      "context": "M01",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M01-S1-T-L4"
+    }
+  },
+  {
+    "id": "HP-M01-S1-T-L5",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.38b1e2a000000p+3",
+      "bits": "0x40238b1e2a000000"
+    },
+    "origin": {
+      "context": "M01",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M01-S1-T-L5"
+    }
+  },
+  {
+    "id": "HP-M02-S0-R-L0",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.3f81b258a1d1cp+3",
+      "bits": "0x4023f81b258a1d1c"
+    },
+    "origin": {
+      "context": "M02",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M02-S0-R-L0"
+    }
+  },
+  {
+    "id": "HP-M02-S0-R-L1",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.72f30841d001ep+3",
+      "bits": "0x40272f30841d001e"
+    },
+    "origin": {
+      "context": "M02",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M02-S0-R-L1"
+    }
+  },
+  {
+    "id": "HP-M02-S0-R-L2",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.3f3d4d9866b54p+1",
+      "bits": "0x4003f3d4d9866b54"
+    },
+    "origin": {
+      "context": "M02",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M02-S0-R-L2"
+    }
+  },
+  {
+    "id": "HP-M02-S0-R-L3",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.fe06c96287471p+1",
+      "bits": "0x400fe06c96287471"
+    },
+    "origin": {
+      "context": "M02",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M02-S0-R-L3"
+    }
+  },
+  {
+    "id": "HP-M02-S0-R-L4",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.0fcf536619ad5p+3",
+      "bits": "0x4020fcf536619ad5"
+    },
+    "origin": {
+      "context": "M02",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M02-S0-R-L4"
+    }
+  },
+  {
+    "id": "HP-M02-S0-R-L5",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.3f066e27526f7p+3",
+      "bits": "0x4023f066e27526f7"
+    },
+    "origin": {
+      "context": "M02",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M02-S0-R-L5"
+    }
+  },
+  {
+    "id": "HP-M02-S0-C-L0",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.3ec2032ad0012p+3",
+      "bits": "0x4023ec2032ad0012"
+    },
+    "origin": {
+      "context": "M02",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M02-S0-C-L0"
+    }
+  },
+  {
+    "id": "HP-M02-S0-C-L1",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.8ad9e45ee4134p+3",
+      "bits": "0x4028ad9e45ee4134"
+    },
+    "origin": {
+      "context": "M02",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M02-S0-C-L1"
+    }
+  },
+  {
+    "id": "HP-M02-S0-C-L2",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.b7cb83d84f1c4p+0",
+      "bits": "0x3ffb7cb83d84f1c4"
+    },
+    "origin": {
+      "context": "M02",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M02-S0-C-L2"
+    }
+  },
+  {
+    "id": "HP-M02-S0-C-L3",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.fb080cab4004ap+1",
+      "bits": "0x400fb080cab4004a"
+    },
+    "origin": {
+      "context": "M02",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M02-S0-C-L3"
+    }
+  },
+  {
+    "id": "HP-M02-S0-C-L4",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.edf2e0f613c70p+2",
+      "bits": "0x401edf2e0f613c70"
+    },
+    "origin": {
+      "context": "M02",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M02-S0-C-L4"
+    }
+  },
+  {
+    "id": "HP-M02-S0-C-L5",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.3d8be1e1518fap+3",
+      "bits": "0x4023d8be1e1518fa"
+    },
+    "origin": {
+      "context": "M02",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M02-S0-C-L5"
+    }
+  },
+  {
+    "id": "HP-M02-S0-T-L0",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.3f81b26000000p+3",
+      "bits": "0x4023f81b26000000"
+    },
+    "origin": {
+      "context": "M02",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M02-S0-T-L0"
+    }
+  },
+  {
+    "id": "HP-M02-S0-T-L1",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.69dd9c8000000p+3",
+      "bits": "0x40269dd9c8000000"
+    },
+    "origin": {
+      "context": "M02",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M02-S0-T-L1"
+    }
+  },
+  {
+    "id": "HP-M02-S0-T-L2",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.1ac13c4000000p+1",
+      "bits": "0x4001ac13c4000000"
+    },
+    "origin": {
+      "context": "M02",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M02-S0-T-L2"
+    }
+  },
+  {
+    "id": "HP-M02-S0-T-L3",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.fe06c98000000p+1",
+      "bits": "0x400fe06c98000000"
+    },
+    "origin": {
+      "context": "M02",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M02-S0-T-L3"
+    }
+  },
+  {
+    "id": "HP-M02-S0-T-L4",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.06b04f1000000p+3",
+      "bits": "0x40206b04f1000000"
+    },
+    "origin": {
+      "context": "M02",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M02-S0-T-L4"
+    }
+  },
+  {
+    "id": "HP-M02-S0-T-L5",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.3f05b4e000000p+3",
+      "bits": "0x4023f05b4e000000"
+    },
+    "origin": {
+      "context": "M02",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M02-S0-T-L5"
+    }
+  },
+  {
+    "id": "HP-M02-S1-R-L0",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.2079b70896367p+2",
+      "bits": "0x4012079b70896367"
+    },
+    "origin": {
+      "context": "M02",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M02-S1-R-L0"
+    }
+  },
+  {
+    "id": "HP-M02-S1-R-L1",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.3fffe2683372fp+3",
+      "bits": "0x4023fffe2683372f"
+    },
+    "origin": {
+      "context": "M02",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M02-S1-R-L1"
+    }
+  },
+  {
+    "id": "HP-M02-S1-R-L2",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.3fffec737afbfp+3",
+      "bits": "0x4023fffec737afbf"
+    },
+    "origin": {
+      "context": "M02",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M02-S1-R-L2"
+    }
+  },
+  {
+    "id": "HP-M02-S1-R-L3",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.503cdb8448fdcp+3",
+      "bits": "0x402503cdb8448fdc"
+    },
+    "origin": {
+      "context": "M02",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M02-S1-R-L3"
+    }
+  },
+  {
+    "id": "HP-M02-S1-R-L4",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.ffffb1cdebefcp+1",
+      "bits": "0x400ffffb1cdebefc"
+    },
+    "origin": {
+      "context": "M02",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M02-S1-R-L4"
+    }
+  },
+  {
+    "id": "HP-M02-S1-R-L5",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.00050910daabep+2",
+      "bits": "0x40100050910daabe"
+    },
+    "origin": {
+      "context": "M02",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M02-S1-R-L5"
+    }
+  },
+  {
+    "id": "HP-M02-S1-C-L0",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.bfffbf6c958fcp+2",
+      "bits": "0x401bfffbf6c958fc"
+    },
+    "origin": {
+      "context": "M02",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M02-S1-C-L0"
+    }
+  },
+  {
+    "id": "HP-M02-S1-C-L1",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.e346988f0cff6p+2",
+      "bits": "0x401e346988f0cff6"
+    },
+    "origin": {
+      "context": "M02",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M02-S1-C-L1"
+    }
+  },
+  {
+    "id": "HP-M02-S1-C-L2",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.f39cb4f2ef6d7p+2",
+      "bits": "0x401f39cb4f2ef6d7"
+    },
+    "origin": {
+      "context": "M02",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M02-S1-C-L2"
+    }
+  },
+  {
+    "id": "HP-M02-S1-C-L3",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.9fffdfb64ac7dp+3",
+      "bits": "0x4029fffdfb64ac7d"
+    },
+    "origin": {
+      "context": "M02",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M02-S1-C-L3"
+    }
+  },
+  {
+    "id": "HP-M02-S1-C-L4",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.ce72d3cbbdb61p+0",
+      "bits": "0x3ffce72d3cbbdb61"
+    },
+    "origin": {
+      "context": "M02",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M02-S1-C-L4"
+    }
+  },
+  {
+    "id": "HP-M02-S1-C-L5",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.be55324c3f6e3p+2",
+      "bits": "0x401be55324c3f6e3"
+    },
+    "origin": {
+      "context": "M02",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M02-S1-C-L5"
+    }
+  },
+  {
+    "id": "HP-M02-S1-T-L0",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.2070000000000p+2",
+      "bits": "0x4012070000000000"
+    },
+    "origin": {
+      "context": "M02",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M02-S1-T-L0"
+    }
+  },
+  {
+    "id": "HP-M02-S1-T-L1",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.3ffe8e1b88000p+3",
+      "bits": "0x4023ffe8e1b88000"
+    },
+    "origin": {
+      "context": "M02",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M02-S1-T-L1"
+    }
+  },
+  {
+    "id": "HP-M02-S1-T-L2",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.3fff0b9860000p+3",
+      "bits": "0x4023fff0b9860000"
+    },
+    "origin": {
+      "context": "M02",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M02-S1-T-L2"
+    }
+  },
+  {
+    "id": "HP-M02-S1-T-L3",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.5038000000000p+3",
+      "bits": "0x4025038000000000"
+    },
+    "origin": {
+      "context": "M02",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M02-S1-T-L3"
+    }
+  },
+  {
+    "id": "HP-M02-S1-T-L4",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.fffc2e6180000p+1",
+      "bits": "0x400fffc2e6180000"
+    },
+    "origin": {
+      "context": "M02",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M02-S1-T-L4"
+    }
+  },
+  {
+    "id": "HP-M02-S1-T-L5",
+    "role": "diagnostic_input_not_target",
+    "position": {
+      "hex": "0x1.003e73a800000p+2",
+      "bits": "0x401003e73a800000"
+    },
+    "origin": {
+      "context": "M02",
+      "field": "precision_record.native_position",
+      "BEFORE_row_id": "HP-M02-S1-T-L5"
+    }
+  }
+]

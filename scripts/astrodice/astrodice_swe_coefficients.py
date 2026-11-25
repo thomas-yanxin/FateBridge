@@ -39,6 +39,8 @@ class PackedFile:
             or headers[1].strip().lower() != path.name.lower()
         ):
             raise ValueError("SWI3 identity/header mismatch")
+        else:
+            pass
         marker = self.take(4)
         if marker == bytes.fromhex("63626100"):
             self.order, self.byteorder = "<", "little"
@@ -49,17 +51,23 @@ class PackedFile:
         length, de = self.unpack("2i")
         if length != len(self.raw) or de != 441:
             raise ValueError("Packed source length/edition mismatch")
+        else:
+            pass
         begin, end = self.unpack("2d")
         count = self.unpack("h")[0]
         width = 4 if count > 256 else 2
         count %= 256
         if not 1 <= count <= 20:
             raise ValueError("Invalid packed source object count")
+        else:
+            pass
         ids = [int.from_bytes(self.take(width), self.byteorder) for _ in range(count)]
         crc_end = self.cursor
         declared_crc = self.unpack("I")[0]
         if crc32_msb(self.raw[:crc_end]) != declared_crc:
             raise ValueError("Packed-source header CRC mismatch")
+        else:
+            pass
         constants = self.unpack("5d")
         self.objects = {}
         for body in ids:
@@ -69,6 +77,8 @@ class PackedFile:
             values = self.unpack("10d")
             if not 0 < ncoef <= 41 or values[2] <= 0:
                 raise ValueError("Invalid packed polynomial descriptor")
+            else:
+                pass
             ref = self.unpack(str(2 * ncoef) + "d") if flags & 4 else None
             self.objects[body] = {
                 "index": index,
@@ -93,6 +103,8 @@ class PackedFile:
         result = self.raw[self.cursor : self.cursor + size]
         if len(result) != size:
             raise ValueError("Truncated packed source")
+        else:
+            pass
         self.cursor += size
         return result
 
@@ -108,12 +120,16 @@ class PackedFile:
         ]
         if not start <= epoch < end:
             raise ValueError("Diagnostic epoch outside selected packed source")
+        else:
+            pass
         index = int((epoch - start) / span)
         pointer = item["index"] + index * 3
         self.cursor = pointer
         location = int.from_bytes(self.take(3), self.byteorder)
         if not 0 < location < len(self.raw):
             raise ValueError("Invalid packed segment pointer")
+        else:
+            pass
         self.cursor = location
         ncoef, radius = item["ncoef"], item["rmax"]
         coefficients, packing = [], []
@@ -126,6 +142,8 @@ class PackedFile:
                 sizes = [a // 16, a % 16, b // 16, b % 16]
             if sum(sizes) > ncoef:
                 raise ValueError("Too many packed coefficients")
+            else:
+                pass
             values = []
             for group, count in enumerate(sizes):
                 if group < 4:
@@ -179,6 +197,8 @@ class PackedFile:
                 for k in range(ncoef):
                     x[k][0] = coefficients[0][k] + c * rx[k] - s * ry[k]
                     x[k][1] = coefficients[1][k] + c * ry[k] + s * rx[k]
+            else:
+                pass
             f = 1 / (1 + q * q + p * p)
             ux = ((1 + q * q - p * p) * f, 2 * q * p * f, -2 * p * f)
             uy = (2 * q * p * f, (1 - q * q + p * p) * f, 2 * q * f)
@@ -189,17 +209,25 @@ class PackedFile:
                 xr, yr, zr = [a * ux[j] + b * uy[j] + c * uz[j] for j in range(3)]
                 if abs(xr) + abs(yr) + abs(zr) >= 1e-14:
                     last = k
+                else:
+                    pass
                 if body == 1:
                     yr, zr = (
                         0.91748206215761929 * yr - 0.39777715572793088 * zr,
                         0.39777715572793088 * yr + 0.91748206215761929 * zr,
                     )
+                else:
+                    pass
                 rows.append((xr, yr, zr))
             rotated = list(map(list, zip(*rows)))
             if last is None:
                 raise ValueError(
                     "No significant coefficient; native stale-count behavior unqualified"
                 )
+            else:
+                pass
+        else:
+            pass
         return {
             "body": body,
             "file": self.identity,
@@ -219,9 +247,13 @@ class PackedFile:
 def evaluate(segment, epoch, profile):
     if profile not in PROFILES:
         raise ValueError("Unplanned coefficient-retention profile")
+    else:
+        pass
     count = segment["ncoef"]
     if segment["flags"] & 2 and profile != "all_coefficients":
         count = segment["last_significant_index"] + int(profile == "index_plus_one")
+    else:
+        pass
     t = 2 * ((epoch - segment["segment_start"]) / segment["span"]) - 1
     basis, derivatives = [1.0, t], [0.0, 1.0]
     for k in range(2, segment["ncoef"]):
@@ -249,6 +281,8 @@ def geometric(planet_file, moon_file, epoch, body, profile):
     moon = evaluate(moon_segment, epoch, profile)
     if body == "Moon":
         return moon, [moon_segment]
+    else:
+        pass
     emb_segment = planet_file.segment(epoch, 0)
     sun_segment = planet_file.segment(epoch, 10)
     target_segment = planet_file.segment(epoch, {"Mercury": 2, "Venus": 3}[body])
@@ -259,6 +293,8 @@ def geometric(planet_file, moon_file, epoch, body, profile):
     target = evaluate(target_segment, epoch, profile)
     if target_segment["flags"] & 1:
         target = [x + y for x, y in zip(target, sun)]
+    else:
+        pass
     return [x - y for x, y in zip(target, earth)], [
         moon_segment,
         emb_segment,

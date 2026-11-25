@@ -13,8 +13,8 @@ from unittest.mock import patch
 import pytest
 
 from fatebridge.application.execution import execute_tool
-from fatebridge.core.human_design_apparent_positions import geometry
-from fatebridge.core.human_design_interval_geometry import (
+from fatebridge.core.human_design.human_design_apparent_positions import geometry
+from fatebridge.core.human_design.human_design_interval_geometry import (
     METHOD,
     ProjectionRoundingUnresolved,
     _add,
@@ -22,15 +22,17 @@ from fatebridge.core.human_design_interval_geometry import (
     _MorePrecision,
     _sub,
 )
-from fatebridge.core.human_design_solar_projection import nominal_solar_projection
+from fatebridge.core.human_design.human_design_solar_projection import (
+    nominal_solar_projection,
+)
 from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.validation.human_design import verify_human_design_reading
+from validation.human_design import verify_human_design_reading
 
 ROOT = Path(__file__).resolve().parents[2]
 SPEC = next(s for s in CATALOG if s.key == "human_design")
 
 
-def test_all_original21600_and27_predeclared_independent_rounded_values():
+def test_all_original21600_and27_predeclared_independent_rounded_values() -> None:
     path = ROOT / "tests/fixtures/human-design-portable-projection-reference.json.gz"
     assert (
         hashlib.sha256(path.read_bytes()).hexdigest()
@@ -57,10 +59,9 @@ def test_all_original21600_and27_predeclared_independent_rounded_values():
             == "enclosure_endpoints_round_to_same_binary64"
         )
         assert actual["arithmetic_comparison_resolution_radians"] == 1e-12
-        assert actual["physical_accuracy_certified"] is False
 
 
-def test_primitive_outward_bounds_against_exact_rational_arithmetic():
+def test_primitive_outward_bounds_against_exact_rational_arithmetic() -> None:
     rng = random.Random(17290419)
     for bits in (16, 64, 128):
         a = _Arithmetic(bits)
@@ -80,13 +81,15 @@ def test_primitive_outward_bounds_against_exact_rational_arithmetic():
             ]
             if iy[0] > 0:
                 cases.append((a.divide(ix, iy), x / y))
+            else:
+                pass
             for interval, exact in cases:
                 assert Fraction(interval[0], a.s) <= exact <= Fraction(interval[1], a.s)
             root = a.sqrt(a.square(ix))
             assert Fraction(root[0], a.s) <= abs(x) <= Fraction(root[1], a.s)
 
 
-def test_all36_independent_equatorial_neighbors_at_the_unchanged_cuts():
+def test_all36_independent_equatorial_neighbors_at_the_unchanged_cuts() -> None:
     path = ROOT / "tests/fixtures/human-design-portable-limb-reference.json"
     assert (
         hashlib.sha256(path.read_bytes()).hexdigest()
@@ -101,8 +104,8 @@ def test_all36_independent_equatorial_neighbors_at_the_unchanged_cuts():
             assert value[key].hex() == expected, (row["id"], key)
 
 
-def test_unresolved_budget_is_explicit_without_silent_platform_fallback():
-    path = "fatebridge.core.human_design_interval_geometry._separation"
+def test_unresolved_budget_is_explicit_without_silent_platform_fallback() -> None:
+    path = "fatebridge.core.human_design.human_design_interval_geometry._separation"
     with patch(path, side_effect=_MorePrecision) as attempt:
         with pytest.raises(ProjectionRoundingUnresolved):
             nominal_solar_projection([0, 0, 1], [1, 1, 2])
@@ -127,12 +130,11 @@ def test_unresolved_budget_is_explicit_without_silent_platform_fallback():
             "status": "arithmetic_rounding_unresolved",
             "arithmetic_method": METHOD,
             "arithmetic_precision_budget_bits": 8192,
-            "physical_accuracy_certified": False,
         }
     ]
 
 
-def test_portable_projection_does_not_use_platform_transcendentals():
+def test_portable_projection_does_not_use_platform_transcendentals() -> None:
     names = (
         "sin",
         "cos",
@@ -198,7 +200,9 @@ def complete():
     return value
 
 
-def test_complete_portable_context_and_reading_replay_without_native_calls(complete):
+def test_complete_portable_context_and_reading_replay_without_native_calls(
+    complete,
+) -> None:
     with patch(
         "fatebridge.core.astro.runtime.ephemeris_call",
         side_effect=AssertionError("Verifier recalculated native positions"),
@@ -206,23 +210,18 @@ def test_complete_portable_context_and_reading_replay_without_native_calls(compl
         proof = verify_human_design_reading(complete)
     assert proof["status"] == "verified_fixed_template_reading", proof
     context = complete["apparent_position_context"]
-    assert (
-        context["arithmetic_method"]
-        == context["ruleset"]["arithmetic_method"]
-        == METHOD
-    )
-    assert context["ruleset"]["version"] == "1.1.0"
+    reading = complete["interpretation"]["apparent_position_context"]
+    assert reading["ruleset_id"] == context["method_id"]
+    ruleset = next(r for r in complete["rulesets"] if r["id"] == reading["ruleset_id"])
+    assert context["arithmetic_method"] == ruleset["arithmetic_method"] == METHOD
+    assert ruleset["version"] == "1.1.0"
     assert all(
         r["arithmetic_method"] == METHOD
         for b in context["batches"]
         for r in b["solar_projection"]
         if r["status"] == "supplied_coordinates_evaluated"
     )
-    assert (
-        "https://dlmf.nist.gov/4.45"
-        in complete["interpretation"]["apparent_position_context"]["source_urls"]
-    )
-    assert complete["validation"]["all_three_axes_full_marks"] is False
+    assert ruleset["sources"]["range_reduction"] == "https://dlmf.nist.gov/4.45"
 
 
 @pytest.mark.parametrize(
@@ -237,8 +236,8 @@ def test_complete_portable_context_and_reading_replay_without_native_calls(compl
     ],
 )
 def test_rehashed_current_receipt_cannot_change_arithmetic_or_claim_legacy(
-    complete, fault
-):
+    complete, fault: str
+) -> None:
     value = copy.deepcopy(complete)
     context = value["apparent_position_context"]
     row = context["batches"][0]["solar_projection"][0]
@@ -254,5 +253,9 @@ def test_rehashed_current_receipt_cannot_change_arithmetic_or_claim_legacy(
         context["arithmetic_method"] = "platform_libm"
     elif fault == "current_contract_downgrade":
         context.pop("arithmetic_method")
-        context["ruleset"]["version"] = "1.0.0"
+        next(r for r in value["rulesets"] if r["id"] == context["method_id"])[
+            "version"
+        ] = "1.0.0"
+    else:
+        pass
     assert verify_human_design_reading(value)["status"] == "rejected", fault

@@ -3,6 +3,7 @@
 import asyncio
 import json
 from copy import deepcopy
+from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
@@ -16,14 +17,14 @@ from fatebridge.core.fengshui.spatial_inputs import PlanPoint, PlanPose, Spatial
 from fatebridge.core.fengshui.spatial_scene import evaluate_geometry
 from fatebridge.services.fengshui import assess
 from fatebridge.services.tool_catalog import CATALOG
-from tests.fengshui.test_fengshui_measured_workstation import (
+from tests.support.fengshui_transports import mcp_call
+from tests.support.mcp_result_assertions import without_transport
+from tests.support.transports import rest_client
+from tests.unit_test.fixtures.fengshui_measured import (
     body,
     measured_request,
     measured_result,
 )
-from tests.support.fengshui_transports import mcp_call
-from tests.support.mcp_result_assertions import without_transport
-from tests.support.transports import rest_client
 
 
 def screen_request():
@@ -77,7 +78,9 @@ def screen_geometry(request):
     )
 
 
-def test_chartless_complete_output_requires_present_map_but_allows_empty_layers():
+def test_chartless_complete_output_requires_present_map_but_allows_empty_layers() -> (
+    None
+):
     request = screen_request()
     result = assess(**request)
     spec = next(s for s in CATALOG if s.key == "fengshui_assess")
@@ -98,7 +101,7 @@ def test_chartless_complete_output_requires_present_map_but_allows_empty_layers(
 @pytest.mark.parametrize("replacement", [{}, {"xuankong_natal": None}])
 def test_nonempty_declared_chart_layers_cannot_disappear_in_complete_result(
     replacement,
-):
+) -> None:
     request = measured_request(charts=True)
     result = assess(**request)
     spec = next(s for s in CATALOG if s.key == "fengshui_assess")
@@ -108,7 +111,7 @@ def test_nonempty_declared_chart_layers_cannot_disappear_in_complete_result(
         validate_output(spec, result)
 
 
-def test_thin_blocker_between_sample_rays_has_exact_projected_area():
+def test_thin_blocker_between_sample_rays_has_exact_projected_area() -> None:
     request = screen_request()
     scene = request["workstation_layout"]["scene"]
     scene["bodies"].append(body("thin", "pillar", 0.1, -1, 0.1, 0.1, 0, 2, True))
@@ -125,8 +128,8 @@ def test_thin_blocker_between_sample_rays_has_exact_projected_area():
     "center_y,bottom,top", [(1, 0, 2), (-3, 0, 2), (-1, 0, 0.8), (-1, 1.7, 2)]
 )
 def test_behind_display_behind_eye_or_outside_vertical_rays_cannot_occlude(
-    center_y, bottom, top
-):
+    center_y, bottom: float | int, top: float | int
+) -> None:
     request = screen_request()
     request["workstation_layout"]["scene"]["bodies"].append(
         body("irrelevant", "pillar", 0, center_y, 0.1, 0.1, bottom, top, True)
@@ -136,7 +139,7 @@ def test_behind_display_behind_eye_or_outside_vertical_rays_cannot_occlude(
     assert observation.blocking_object_ids == []
 
 
-def test_union_does_not_double_count_overlapping_shadows():
+def test_union_does_not_double_count_overlapping_shadows() -> None:
     request = screen_request()
     scene = request["workstation_layout"]["scene"]
     scene["bodies"].append(body("first", "pillar", 0.1, -1, 0.1, 0.1, 0, 2, True))
@@ -147,7 +150,7 @@ def test_union_does_not_double_count_overlapping_shadows():
     assert two.blocking_object_ids == ["first", "second"]
 
 
-def test_lower_obstacle_can_occlude_display_without_covering_eye_height():
+def test_lower_obstacle_can_occlude_display_without_covering_eye_height() -> None:
     request = screen_request()
     request["workstation_layout"]["scene"]["bodies"].append(
         body("low", "pillar", 0, -1, 1, 0.1, 0, 1.1, True)
@@ -158,7 +161,7 @@ def test_lower_obstacle_can_occlude_display_without_covering_eye_height():
 
 
 @pytest.mark.parametrize("angle", [0, 90, 180, 270, 37, -360, 720])
-def test_display_shadow_is_invariant_under_rigid_plan_rotation(angle):
+def test_display_shadow_is_invariant_under_rigid_plan_rotation(angle) -> None:
     request = screen_request()
     scene = request["workstation_layout"]["scene"]
     scene["bodies"].append(body("thin", "pillar", 0.1, -1, 0.1, 0.1, 0, 2, True))
@@ -177,7 +180,7 @@ def test_display_shadow_is_invariant_under_rigid_plan_rotation(angle):
     assert actual.front_facing == expected.front_facing
 
 
-def test_perspective_area_matches_independent_ray_box_intersection():
+def test_perspective_area_matches_independent_ray_box_intersection() -> None:
     request = screen_request()
     # Test an off-center, finite-height obstruction with partial vertical shadow.
     request["workstation_layout"]["scene"]["bodies"].append(
@@ -203,6 +206,8 @@ def test_perspective_area_matches_independent_ray_box_intersection():
                     if not lo <= origin <= hi:
                         upper = -1
                         break
+                    else:
+                        pass
                 else:
                     a, b = sorted(((lo - origin) / delta, (hi - origin) / delta))
                     lower, upper = max(lower, a), min(upper, b)
@@ -210,7 +215,7 @@ def test_perspective_area_matches_independent_ray_box_intersection():
     assert fraction == pytest.approx(1 - blocked / resolution**2, abs=0.008)
 
 
-def test_unknown_inventory_limits_positive_display_claim_and_search_readiness():
+def test_unknown_inventory_limits_positive_display_claim_and_search_readiness() -> None:
     request = screen_request()
     scene = request["workstation_layout"]["scene"]
     scene["inventory_confirmed"] = False
@@ -230,7 +235,9 @@ def test_unknown_inventory_limits_positive_display_claim_and_search_readiness():
 
 
 @pytest.mark.parametrize("front,expected", [(0, False), (180, True), (540, True)])
-def test_display_front_face_is_independent_of_seat_facing(front, expected):
+def test_display_front_face_is_independent_of_seat_facing(
+    front: int, expected: bool
+) -> None:
     request = screen_request()
     request["workstation_layout"]["scene"]["desktops"][0]["items"][0]["screen"][
         "front_degrees"
@@ -243,7 +250,7 @@ def test_display_front_face_is_independent_of_seat_facing(front, expected):
     )
 
 
-def test_grid_automatically_uses_scene_and_desktop_coordinate_frames():
+def test_grid_automatically_uses_scene_and_desktop_coordinate_frames() -> None:
     request = measured_request()
     request["workstation_layout"]["search"] = dict(
         domains=[
@@ -274,7 +281,7 @@ def test_grid_automatically_uses_scene_and_desktop_coordinate_frames():
         assert candidate["geometry"] == measured_result(independent)["geometry"]
 
 
-def test_grid_clips_centers_to_concave_region_then_audits_full_footprints():
+def test_grid_clips_centers_to_concave_region_then_audits_full_footprints() -> None:
     request = measured_request()
     scene = request["workstation_layout"]["scene"]
     scene["boundary"] = dict(
@@ -306,7 +313,9 @@ def test_grid_clips_centers_to_concave_region_then_audits_full_footprints():
     )
 
 
-def test_decimal_grid_boundary_is_inclusive_and_positions_are_not_silently_added():
+def test_decimal_grid_boundary_is_inclusive_and_positions_are_not_silently_added() -> (
+    None
+):
     request = measured_request()
     request["workstation_layout"]["search"] = dict(
         domains=[
@@ -336,7 +345,9 @@ def test_decimal_grid_boundary_is_inclusive_and_positions_are_not_silently_added
     assert dict(x=-0.45, y=0.3) not in domain["positions"]
 
 
-def test_display_measurement_uncertainty_remains_candidate_and_optional_visibility_is_not_hard_gate():
+def test_display_measurement_uncertainty_remains_candidate_and_optional_visibility_is_not_hard_gate() -> (
+    None
+):
     request = screen_request()
     scene = request["workstation_layout"]["scene"]
     scene["coordinate_uncertainty_m"] = 0.01
@@ -351,7 +362,9 @@ def test_display_measurement_uncertainty_remains_candidate_and_optional_visibili
 
 
 @pytest.mark.parametrize("bottom,expected", [(1.4, False), (1.55, True), (2, True)])
-def test_tabletop_item_collides_with_overhead_body_using_world_height(bottom, expected):
+def test_tabletop_item_collides_with_overhead_body_using_world_height(
+    bottom: float | int, expected: bool
+) -> None:
     request = screen_request()
     request["workstation_layout"]["scene"]["bodies"].append(
         body("over-display", "beam", 0, 0, 1, 0.1, bottom, 3)
@@ -365,7 +378,7 @@ def test_tabletop_item_collides_with_overhead_body_using_world_height(bottom, ex
     assert bool(collisions) is not expected
 
 
-def test_multiple_seats_and_declared_operating_zones_are_mutual_constraints():
+def test_multiple_seats_and_declared_operating_zones_are_mutual_constraints() -> None:
     request = screen_request()
     scene = request["workstation_layout"]["scene"]
     scene["bodies"].append(body("desk-two", "desk", 2, 0, 1, 1, 0, 0.75))
@@ -399,7 +412,7 @@ def test_multiple_seats_and_declared_operating_zones_are_mutual_constraints():
         "missing_seat",
     ],
 )
-def test_generated_and_display_input_boundaries_fail_explicitly(mutation):
+def test_generated_and_display_input_boundaries_fail_explicitly(mutation: str) -> None:
     request = screen_request()
     layout = request["workstation_layout"]
     grid = dict(origin=dict(x=0, y=0), step_x_m=1, step_y_m=1)
@@ -423,13 +436,15 @@ def test_generated_and_display_input_boundaries_fail_explicitly(mutation):
         layout["scene"]["desktops"][0]["items"][0]["screen"]["width_m"] = 2
     elif mutation == "missing_seat":
         layout["scene"]["seats"][0]["desk_id"] = "another"
+    else:
+        pass
     with pytest.raises(ValidationError):
         AssessRequest.model_validate(request)
 
 
 def test_generated_screen_candidates_recompute_visibility_and_real_transports(
-    monkeypatch, tmp_path, capsys
-):
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     request = screen_request()
     scene = request["workstation_layout"]["scene"]
     scene["bodies"].append(body("movable", "screen", 0.1, -1, 0.1, 0.1, 0, 2, True))

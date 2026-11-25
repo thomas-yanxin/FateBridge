@@ -29,12 +29,16 @@ def interpolate(nodes, values):
     """Exact Lagrange coefficients in ascending powers, distinct rational nodes."""
     if len(nodes) != len(set(nodes)) or len(nodes) != len(values):
         raise ValueError("Missing or duplicate interpolation nodes")
+    else:
+        pass
     coefficients = [Q()] * len(nodes)
     for i, (x, value) in enumerate(zip(nodes, values)):
         polynomial, denominator = [Q(1)], Q(1)
         for j, y in enumerate(nodes):
             if i == j:
                 continue
+            else:
+                pass
             denominator *= x - y
             new = [Q()] * (len(polynomial) + 1)
             for k, c in enumerate(polynomial):
@@ -56,18 +60,26 @@ def polynomial(coefficients, x):
 def system(angles, epochs, window, degree, axis):
     if degree not in DEGREES or window not in WINDOWS or axis not in (0, 1):
         raise ValueError("Unplanned nonuniform polynomial")
+    else:
+        pass
     offsets = sorted(o for o in angles if abs(o) <= window)
     if offsets != list(range(-window, window + 1, 5)) or set(epochs) != set(angles):
         raise ValueError("Full original five-second population required")
+    else:
+        pass
     center = Q(angles[0][axis])
     nodes = [(epochs[o] - epochs[0]) / window for o in offsets]
     if any(a >= b for a, b in zip(nodes, nodes[1:])):
         raise ValueError("Nonincreasing calibrated nodes")
+    else:
+        pass
     values, noise = [], []
     for o in offsets:
         value = Q(angles[o][axis])
         if axis == 0:
             value -= 360 * ((value - center + 180) // 360)
+        else:
+            pass
         values.append((value - center) * 3600)
         noise.append(Q(10) ** Decimal(angles[o][axis]).as_tuple().exponent * 3600)
     # Geometry-only equally ranked anchors, never selected using residuals.
@@ -108,6 +120,8 @@ def certified_derivative(a, b, sign):
             "solver_status": result.status,
             "message": result.message,
         }
+    else:
+        pass
     marginal = sorted(
         range(len(a)), key=lambda i: abs(result.ineqlin.marginals[i]), reverse=True
     )
@@ -164,6 +178,8 @@ def fit(angles, epochs, window, degree):
                 str(low * 86400 / window),
                 str(high * 86400 / window),
             ]
+        else:
+            pass
         axes.append(item)
     return {
         "window_seconds": window,
@@ -184,6 +200,8 @@ def quality(fits):
         lookup
     ):
         raise ValueError("All fixed windows and degrees are required")
+    else:
+        pass
     checks = []
     selected = None
     for i in range(len(WINDOWS) - 2):
@@ -209,6 +227,8 @@ def quality(fits):
             radius = max(
                 sum((((b - a) / 2) ** 2 for a, b in box), Q()) for box in boxes
             )
+        else:
+            pass
         accepted = complete and spread <= Q("0.002") ** 2 and radius <= Q("0.002") ** 2
         checks.append(
             {
@@ -223,6 +243,8 @@ def quality(fits):
         )
         if accepted and selected is None:
             selected = {"window_seconds": triple[1], "full_degree": 7}
+        else:
+            pass
     return {
         "status": (
             "conditional_quality_met" if selected else "reference_quality_unresolved"
@@ -243,6 +265,8 @@ def qualify_grid(source, case, row, body, inverse, profile, plan):
             "grid_hex": [],
             "six_component_matches": [],
         }
+    else:
+        pass
     a, b = map(Q, inverse["effective_JD"])
     grid = lattice_points((a - 2451545) * 86400, (b - 2451545) * 86400, 4096)
     matches = []
@@ -256,6 +280,10 @@ def qualify_grid(source, case, row, body, inverse, profile, plan):
             ]
             if all(a <= v <= b for v, (a, b) in zip(state, bounds)):
                 matches.append(value.hex())
+            else:
+                pass
+    else:
+        pass
     return {
         "status": grid["status"],
         "grid_hex": [p.hex() for p in grid["points"]],
@@ -282,16 +310,22 @@ def analyze(run, cohort):
     for q in plan["queries"]:
         if q["cohort"] != cohort or q["kind"] != "geometry":
             continue
+        else:
+            pass
         raw = (run / "responses" / (q["id"] + ".raw")).read_bytes()
         receipt = json.loads(
             (run / "responses" / (q["id"] + ".receipt.json")).read_text()
         )
         if receipt["status"] != 200 or sha(raw) != receipt["raw_sha256"]:
             raise ValueError("Unavailable or changed source calibration")
+        else:
+            pass
         records = []
         for row in parse(raw, q, q["cases"], plan):
             if row["role"] == "auxiliary_not_primary":
                 continue
+            else:
+                pass
             case = next(c for c in q["cases"] if c["id"] == row["case_id"])
             saved = diagnose(run / "source-records", case, row, q["body"], plan)
             saved["grid"] = {
@@ -337,6 +371,8 @@ def analyze(run, cohort):
             )
             if qualified:
                 epochs[offset] = Q(float.fromhex(common[0]))
+            else:
+                pass
         result["clock_population"][profile] = statuses
         if len(epochs) != 577:
             result["fits"][profile] = {
@@ -345,6 +381,8 @@ def analyze(run, cohort):
                 "required_nodes": 577,
             }
             continue
+        else:
+            pass
         fitted = [
             fit(angles, epochs, window, degree)
             for window in WINDOWS
@@ -361,7 +399,7 @@ def analyze(run, cohort):
     return result
 
 
-def main():
+def main() -> None:
     p = argparse.ArgumentParser()
     p.add_argument("--run", required=True, type=Path)
     p.add_argument("--cohort", required=True, choices=("A", "B"))
@@ -372,3 +410,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+else:
+    pass

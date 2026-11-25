@@ -2,26 +2,29 @@
 
 from __future__ import annotations
 
-from typing import List, Literal, Optional, Union
+from typing import Literal
 
 from pydantic import Field
 
+from fatebridge.core.requests.base import AstroHouseValidatorMixin
 from fatebridge.core.requests.birth import AstroBirthRequest
 from fatebridge.core.requests.western_policy import WesternEphemerisRequest
 from fatebridge.utils.house_systems import TWELVE_HOUSE_SYSTEM_NOTE
 
 
-class WesternTimingRequest(AstroBirthRequest, WesternEphemerisRequest):
+class WesternTimingRequest(
+    AstroHouseValidatorMixin, AstroBirthRequest, WesternEphemerisRequest
+):
     """Request model for western predictive timing analysis."""
 
-    analysis_year: Optional[int] = Field(default=None, description="Analysis year")
-    analysis_month: Optional[int] = Field(
+    analysis_year: int | None = Field(default=None, description="Analysis year")
+    analysis_month: int | None = Field(
         default=None, ge=1, le=12, description="Analysis month (1-12)"
     )
-    analysis_day: Optional[int] = Field(
+    analysis_day: int | None = Field(
         default=None, ge=1, le=31, description="Analysis day (1-31)"
     )
-    analysis_hour: Optional[int] = Field(
+    analysis_hour: int | None = Field(
         default=None,
         ge=0,
         le=23,
@@ -30,7 +33,7 @@ class WesternTimingRequest(AstroBirthRequest, WesternEphemerisRequest):
             "If omitted, keeps the birth hour for date-only compatibility."
         ),
     )
-    analysis_minute: Optional[int] = Field(
+    analysis_minute: int | None = Field(
         default=None,
         ge=0,
         le=59,
@@ -55,16 +58,16 @@ class WesternTimingRequest(AstroBirthRequest, WesternEphemerisRequest):
             "ambiguous/nonexistent birth, analysis and generated anniversary clocks."
         ),
     )
-    return_longitude: Optional[float] = Field(
+    return_longitude: float | None = Field(
         default=None, ge=-180, le=180, description="Return chart longitude"
     )
-    return_latitude: Optional[float] = Field(
+    return_latitude: float | None = Field(
         default=None, ge=-90, le=90, description="Return chart latitude"
     )
-    return_timezone: Optional[str] = Field(
+    return_timezone: str | None = Field(
         default=None, description="Return chart timezone (IANA name or UTC offset)"
     )
-    house_system: Union[int, str] = Field(
+    house_system: int | str = Field(
         default="P",
         description="House system, any convention: SE letter ('P'=Placidus, "
         "'R'=Regiomontanus, 'W'=whole sign, 'D'=equal_mc), key ('placidus', "
@@ -93,7 +96,7 @@ class WesternTimingRequest(AstroBirthRequest, WesternEphemerisRequest):
         le=1,
         description="Primary direction mode: 0 for direct, 1 for converse",
     )
-    pd_aspects: List[int] = Field(
+    pd_aspects: list[int] = Field(
         default_factory=lambda: [0, 60, 90, 120, 180],
         description="Primary direction aspects in degrees",
     )
@@ -106,7 +109,7 @@ class WesternTimingRequest(AstroBirthRequest, WesternEphemerisRequest):
 class WesternTimingModuleRequest(WesternTimingRequest):
     """Request model for standalone western timing module tools."""
 
-    selected_sections: List[str] = Field(
+    selected_sections: list[str] = Field(
         default_factory=list,
         description="Optional export sections to keep in snapshot_export",
     )

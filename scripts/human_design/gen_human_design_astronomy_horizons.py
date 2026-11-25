@@ -73,6 +73,8 @@ def main() -> None:
         payload = json.loads(raw)
         if "error" in payload:
             raise ValueError(payload["error"])
+        else:
+            pass
         result = payload["result"]
         table = result.split("$$SOE", 1)[1].split("$$EOE", 1)[0].strip()
         rows = []
@@ -83,6 +85,8 @@ def main() -> None:
             original = min(anchors, key=lambda r: abs(r["jd_tt"] - jd))
             if abs(original["jd_tt"] - jd) * 86400 > 0.001:
                 raise ValueError("Unmatched Horizons TT epoch")
+            else:
+                pass
             longitude = float(cells[3])
             expected = original["positions"][body]["longitude"]
             rows.append(
@@ -99,6 +103,8 @@ def main() -> None:
             )
         if len(rows) != len(anchors):
             raise ValueError("Incomplete Horizons anchor response")
+        else:
+            pass
         return {
             "body": body,
             "target_id": plan["bodies"][body],
@@ -139,3 +145,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+else:
+    pass

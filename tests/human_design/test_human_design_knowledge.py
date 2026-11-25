@@ -6,10 +6,10 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core import human_design_knowledge as hd
-from fatebridge.core import human_design_line_catalogue as catalogue
-from fatebridge.core.human_design_depth import depth_reference
-from fatebridge.core.output_reference import HumanDesignKnowledgeDetails
+from fatebridge.core.contracts.output_reference import HumanDesignKnowledgeDetails
+from fatebridge.core.human_design import human_design_knowledge as hd
+from fatebridge.core.human_design import human_design_line_catalogue as catalogue
+from fatebridge.core.human_design.human_design_depth import depth_reference
 from fatebridge.services.knowledge import (
     calculate_knowledge_read,
     calculate_knowledge_registry,
@@ -19,7 +19,7 @@ from fatebridge.utils.errors import EphemerisSourceError
 ROOT = Path(__file__).resolve().parents[2]
 
 
-def test_all384_keys_retain_source_poles_and_unknown_meanings():
+def test_all384_keys_retain_source_poles_and_unknown_meanings() -> None:
     seen = []
     curated = []
     for gate in range(1, 65):
@@ -55,8 +55,8 @@ def test_all384_keys_retain_source_poles_and_unknown_meanings():
     "key,expected", [("11.4", ["Moon", "Venus"]), ("25.4", ["Venus", "Jupiter"])]
 )
 def test_untriggered_additional_source_planets_are_visible_but_not_applied(
-    key, expected
-):
+    key: str, expected
+) -> None:
     entry = calculate_knowledge_read(domain="human_design", key=key)
     record = entry["reference_details"]["record"]
     assert record["source_polarity_planets"]["exaltation"] == expected
@@ -65,7 +65,7 @@ def test_untriggered_additional_source_planets_are_visible_but_not_applied(
     assert "含明文附加星体" in entry["snapshot_text"]
 
 
-def test_gate1_source_ambiguity_and_both_poles_survive_summary():
+def test_gate1_source_ambiguity_and_both_poles_survive_summary() -> None:
     entry = calculate_knowledge_read(domain="human_design", key="1.4")
     row = entry["reference_details"]["record"]
     assert row["source_reading_notes"] and "重复措辞" in entry["snapshot_text"]
@@ -93,13 +93,13 @@ def test_gate1_source_ambiguity_and_both_poles_survive_summary():
         "../../1.1",
     ],
 )
-def test_invalid_keys_do_not_guess_or_use_profile_lines(key):
+def test_invalid_keys_do_not_guess_or_use_profile_lines(key: str | None) -> None:
     result = calculate_knowledge_read(domain="human_design", key=key)
     assert result["status_code"] == 400
     assert result["error_code"] == "knowledge.human_design.unknown_key"
 
 
-def test_unknown_category_and_irrelevant_foreign_query_fields_are_user_errors():
+def test_unknown_category_and_irrelevant_foreign_query_fields_are_user_errors() -> None:
     result = calculate_knowledge_read(
         domain="human_design", category="profile", key="1.1"
     )
@@ -113,8 +113,8 @@ def test_unknown_category_and_irrelevant_foreign_query_fields_are_user_errors():
     "fault", ["delete", "replace", "certify", "unknown_to_curated"]
 )
 def test_changed_reference_is_rejected_before_partial_read(
-    tmp_path, monkeypatch, fault
-):
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, fault: str
+) -> None:
     value = json.loads(catalogue.CATALOGUE_PATH.read_bytes())
     if fault == "delete":
         value["rows"].pop()
@@ -128,7 +128,7 @@ def test_changed_reference_is_rejected_before_partial_read(
         )
     path = tmp_path / "changed.json"
     path.write_text(json.dumps(value))
-    from fatebridge.core import human_design_line_catalogue
+    from fatebridge.core.human_design import human_design_line_catalogue
 
     monkeypatch.setattr(human_design_line_catalogue, "CATALOGUE_PATH", path)
     with pytest.raises(EphemerisSourceError):
@@ -137,7 +137,7 @@ def test_changed_reference_is_rejected_before_partial_read(
     assert result["status_code"] == 503 and result["retryable"] is False
 
 
-def test_returned_mutation_cannot_change_subsequent_source_lookup():
+def test_returned_mutation_cannot_change_subsequent_source_lookup() -> None:
     first = hd.read_reference(category="lines", key="1.1")
     first["reference_details"]["record"]["editorial_paraphrase"][
         "exaltation"
@@ -159,7 +159,9 @@ def test_returned_mutation_cannot_change_subsequent_source_lookup():
         ("personal_applicability_assessed", 0),
     ],
 )
-def test_public_reference_contract_cannot_become_personal_applicability(field, value):
+def test_public_reference_contract_cannot_become_personal_applicability(
+    field: str, value: bool | int
+) -> None:
     from pydantic import ValidationError
 
     details = {
@@ -173,7 +175,9 @@ def test_public_reference_contract_cannot_become_personal_applicability(field, v
         HumanDesignKnowledgeDetails.model_validate(details)
 
 
-def test_current_public_registry_preserves_all_explicit_human_design_categories():
+def test_current_public_registry_preserves_all_explicit_human_design_categories() -> (
+    None
+):
     registry = calculate_knowledge_registry(domain="human_design")
     human = registry["domains"][0]
     assert human["source"] == hd.SOURCE

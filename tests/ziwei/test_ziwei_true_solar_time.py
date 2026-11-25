@@ -32,7 +32,7 @@ _PERSON = PersonInfo(
 )
 
 
-def test_ziwei_natal_correction_includes_equation_of_time():
+def test_ziwei_natal_correction_includes_equation_of_time() -> None:
     apparent = normalize_birth_time(
         _PERSON, solar_time_strategy=SOLAR_TIME_STRATEGY_APPARENT
     )

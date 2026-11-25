@@ -1,6 +1,6 @@
 """Literal source-study interface; never reconstruct a person's birth record."""
 
-from typing import Any, Dict
+from typing import Any
 
 from fatebridge.core.branch_candidates import build_branch_combination_candidates
 from fatebridge.core.elements import ElementAnalysis
@@ -8,17 +8,18 @@ from fatebridge.core.energy_provenance import build_energy_provenance
 from fatebridge.core.source_annotations import (
     annotation_comparison_summary,
     compare_registered_annotations,
+    input_consistency,
+    pillar_values,
 )
 from fatebridge.utils.data import STEM_ELEMENTS
 from fatebridge.utils.errors import calculation_guard
 from fatebridge.utils.formatting import create_pillar_dict
-from fatebridge.validation.bazi_source_corpus import input_consistency, pillar_values
 
 
 @calculation_guard("原典四柱核对")
 def calculate_bazi_source_compare(
     year_pillar: str, month_pillar: str, day_pillar: str, hour_pillar: str
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     values = pillar_values(
         {"pillars": [year_pillar, month_pillar, day_pillar, hour_pillar]}
     )

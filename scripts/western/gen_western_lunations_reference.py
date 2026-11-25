@@ -26,8 +26,12 @@ def coordinates(times):
         moon, moon_record = tasks[1].result()
     if [row[0] for row in sun] != [row[0] for row in moon]:
         raise ValueError("NASA Sun/Moon timestamps differ")
+    else:
+        pass
     if len(sun) != len(times):
         raise ValueError("NASA response omitted requested timestamps")
+    else:
+        pass
     return [(s[0], (m[1] - s[1]) % 360) for s, m in zip(sun, moon)], [
         sun_record,
         moon_record,
@@ -66,6 +70,8 @@ def main():
         state["f_right"] = offset(phase_right, state["target"])
         if not state["f_left"] < 0 < state["f_right"]:
             raise ValueError("NASA did not independently bracket a lunation")
+        else:
+            pass
     for _ in range(4):
         times = [
             state["left"]
@@ -86,6 +92,8 @@ def main():
     for state in states:
         if abs(state["residual"]) > 1e-6:
             raise ValueError("NASA root refinement did not converge")
+        else:
+            pass
         cases.append(
             {
                 "type": state["type"],
@@ -111,3 +119,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+else:
+    pass

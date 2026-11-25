@@ -30,7 +30,7 @@ _NATAL = dict(
 )
 
 
-def test_each_triplicity_opens_on_its_cardinal_sign():
+def test_each_triplicity_opens_on_its_cardinal_sign() -> None:
     # 0° of any sign → the cardinal sign of its element.
     assert ninth_part("Aries", 0.0) == "Aries"  # fire
     assert ninth_part("Leo", 0.0) == "Aries"
@@ -39,7 +39,7 @@ def test_each_triplicity_opens_on_its_cardinal_sign():
     assert ninth_part("Cancer", 0.0) == "Cancer"  # water
 
 
-def test_parts_advance_one_sign_every_three_and_a_third_degrees():
+def test_parts_advance_one_sign_every_three_and_a_third_degrees() -> None:
     # Aries: part boundaries at 0, 3°20′, 6°40′ … advance Aries→Taurus→Gemini…
     assert ninth_part("Aries", 3.0) == "Aries"
     assert ninth_part("Aries", 3.4) == "Taurus"
@@ -47,12 +47,12 @@ def test_parts_advance_one_sign_every_three_and_a_third_degrees():
     assert ninth_part("Aries", 29.9) == "Sagittarius"  # 9th part
 
 
-def test_non_zodiacal_sign_is_none():
+def test_non_zodiacal_sign_is_none() -> None:
     assert ninth_part("Ophiuchus", 5.0) is None
 
 
 @pytest.mark.skipif(swe is None, reason="swisseph 不可用")
-def test_chart_planets_carry_ninth_part():
+def test_chart_planets_carry_ninth_part() -> None:
     info = build_astro_birth_info(use_true_solar_time=True, **_NATAL)
     planets = build_core_chart_payload(info, "hellen_chart")["classical"]["planets"]
     # Sun at ~18.3° Sagittarius (fire → start Aries, 5th part) → Virgo.
@@ -61,7 +61,7 @@ def test_chart_planets_carry_ninth_part():
         assert "ninth_part" in entry
 
 
-def test_snapshot_renders_ninth_part_line():
+def test_snapshot_renders_ninth_part_line() -> None:
     payload = calculate_core_chart_analysis(
         chart_variant="hellen_chart", use_true_solar_time=True, **_NATAL
     )

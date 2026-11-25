@@ -6,11 +6,11 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.sukuyo import SU27_ORDER, calendar_mansion, day_evidence
-from fatebridge.core.sukuyo_calendar_text import month_table_variant
-from fatebridge.core.sukuyo_koya import SOURCE, printed_month_reference
-from fatebridge.core.sukuyo_profiles import select_profile
-from fatebridge.core.sukuyo_sources import load_source
+from fatebridge.core.sukuyo.sukuyo import SU27_ORDER, calendar_mansion, day_evidence
+from fatebridge.core.sukuyo.sukuyo_calendar_text import month_table_variant
+from fatebridge.core.sukuyo.sukuyo_koya import SOURCE, printed_month_reference
+from fatebridge.core.sukuyo.sukuyo_profiles import select_profile
+from fatebridge.core.sukuyo.sukuyo_sources import load_source
 from scripts.sukuyo.check_sukuyo_koya import verify_printed
 
 FIXTURE = json.loads(
@@ -35,7 +35,9 @@ def reference(month, day):
     )
 
 
-def test_all_360_literal_printed_cells_use_the_actual_february_to_january_order():
+def test_all_360_literal_printed_cells_use_the_actual_february_to_january_order() -> (
+    None
+):
     assert FIXTURE["frozen_before_runtime_comparison"]
     assert FIXTURE["computed_cells"] == 0
     for day, literal in enumerate(FIXTURE["literal_day_columns"], 1):
@@ -53,7 +55,9 @@ def test_all_360_literal_printed_cells_use_the_actual_february_to_january_order(
 
 
 @pytest.mark.parametrize("day,taisho", [(3, "翼"), (30, "張")])
-def test_adverse_readings_are_retained_in_three_named_identities(day, taisho):
+def test_adverse_readings_are_retained_in_three_named_identities(
+    day: int, taisho: str
+) -> None:
     ref = reference(8, day)
     assert ref["printed_literal_mansion"] is None
     assert ref["candidate_literal_mansions"] == ["亢", "氐"]
@@ -67,7 +71,7 @@ def test_adverse_readings_are_retained_in_three_named_identities(day, taisho):
     assert not ref["complete_critical_edition_accepted"]
 
 
-def test_full_audit_reports_both_mismatches_without_claiming_full_acceptance():
+def test_full_audit_reports_both_mismatches_without_claiming_full_acceptance() -> None:
     report = verify_printed()
     assert report["printed_cells_compared"] == 360
     assert [(r["month"], r["day"]) for r in report["unresolved_readings"]] == [
@@ -79,7 +83,7 @@ def test_full_audit_reports_both_mismatches_without_claiming_full_acceptance():
     assert not report["original_domain_or_criteria_reduced"]
 
 
-def test_changed_private_primary_bytes_are_rejected(tmp_path):
+def test_changed_private_primary_bytes_are_rejected(tmp_path: Path) -> None:
     (tmp_path / "upper-frame14.jpg").write_bytes(b"changed original image")
     with pytest.raises(ValueError, match="fingerprint changed"):
         verify_printed(tmp_path)
@@ -87,8 +91,8 @@ def test_changed_private_primary_bytes_are_rejected(tmp_path):
 
 @pytest.mark.parametrize("part,actual", [("first_half", "星"), ("second_half", "张")])
 def test_source_comparison_never_mislabels_half_assignment_as_unsplit_baseline(
-    part, actual
-):
+    part: str, actual: str
+) -> None:
     c = calendar_mansion(
         "2024-08-04", calendar_profile="hinoo_t1299_host27", calendar_day_part=part
     )
@@ -107,7 +111,9 @@ def test_source_comparison_never_mislabels_half_assignment_as_unsplit_baseline(
     assert "不覆盖本次主宿" in text
 
 
-def test_leap_precedence_and_unknown_half_candidates_survive_printed_agreement():
+def test_leap_precedence_and_unknown_half_candidates_survive_printed_agreement() -> (
+    None
+):
     c = calendar_mansion(
         "1903-06-25",
         calendar_profile="hinoo_t1299_host27",
@@ -125,7 +131,7 @@ def test_leap_precedence_and_unknown_half_candidates_survive_printed_agreement()
     ]
 
 
-def test_each_unknown_date_candidate_keeps_its_own_printed_month_day_cell():
+def test_each_unknown_date_candidate_keeps_its_own_printed_month_day_cell() -> None:
     c = calendar_mansion(
         "2024-08-04",
         zone="America/Los_Angeles",
@@ -143,7 +149,7 @@ def test_each_unknown_date_candidate_keeps_its_own_printed_month_day_cell():
         )
 
 
-def test_wrong_month_day_companion_rejected_and_result_detached():
+def test_wrong_month_day_companion_rejected_and_result_detached() -> None:
     ref = reference(8, 3)
     expected = copy.deepcopy(ref)
     ref["printed_locator"]["printed_month_order"][0] = 1
@@ -169,8 +175,8 @@ def test_wrong_month_day_companion_rejected_and_result_detached():
 
 
 def test_loaded_source_snapshot_is_not_evicted_by_more_than_sixteen_other_tables(
-    tmp_path,
-):
+    tmp_path: Path,
+) -> None:
     import hashlib
 
     p = tmp_path / "original.json"
@@ -193,8 +199,8 @@ def test_loaded_source_snapshot_is_not_evicted_by_more_than_sixteen_other_tables
     [("2024-02-10", "2024-02-10"), ("2024-09-05", "2024-10-02")],
 )
 def test_resolved_default_compatibility_still_explains_material_printed_evidence(
-    first_date, second_date
-):
+    first_date: str, second_date: str
+) -> None:
     from fatebridge.services.divination import calculate_sukuyo_compatibility
 
     result = calculate_sukuyo_compatibility(
@@ -219,8 +225,8 @@ def test_resolved_default_compatibility_still_explains_material_printed_evidence
     ],
 )
 def test_native_preserves_missing_natal_layers_and_empty_directional_coverage(
-    civil, activity, details
-):
+    civil: str, activity: str, details
+) -> None:
     from fatebridge.services.divination import calculate_suzhan_analysis
 
     result = calculate_suzhan_analysis(
@@ -253,9 +259,13 @@ def test_native_preserves_missing_natal_layers_and_empty_directional_coverage(
             assert literal in text
         assert "王者身份不能代替观兵条件" in text
         assert "未纳入事项汇总" in text and "不保证现实应验" in text
+    else:
+        pass
 
 
-def test_native_historical_provenance_keeps_full_range_and_each_ordinal_anchor():
+def test_native_historical_provenance_keeps_full_range_and_each_ordinal_anchor() -> (
+    None
+):
     from fatebridge.services.divination import calculate_sukuyo_compatibility
 
     result = calculate_sukuyo_compatibility(

@@ -12,7 +12,7 @@
 | 支持 URL 的客户端、远程机器 | Streamable HTTP | 你或服务管理器 | `http://127.0.0.1:8011/mcp`，远程可通过 SSH 隧道 |
 | 普通应用 HTTP 调用 | REST，见[快速入门](getting-started.md) | 你或服务管理器 | `http://127.0.0.1:8010/api/...` |
 
-`fatebridge-mcp` 默认运行 stdio；HTTP 模式由 FastMCP runner 加载同一个应用。两者共享计算与 MCP 资源，REST 是另一套协议。无需同时启动三个入口。
+`fatebridge-mcp` 运行 stdio，HTTP 部署加载 `app`。两种入口使用同一套四工具接口和 MCP 资源。REST 独立运行。
 
 ## 安装与本地验证
 
@@ -135,7 +135,7 @@ Claude Desktop 的 JSON 要双写反斜杠；Cursor 使用同样结构并在条�
 CLI 虚构计算可用 PowerShell 续行符执行，反引号后不要留空格：
 
 ```powershell
-uv run --locked --extra dev fatebridge bazi_birth `
+uv run --locked --extra dev fatebridge bazi_birth_chart `
   --birth-year 1990 --birth-month 5 --birth-day 15 `
   --birth-hour 10 --birth-minute 30 --gender 男 `
   --birth-place 北京 --birth-timezone Asia/Shanghai `
@@ -146,7 +146,7 @@ uv run --locked --extra dev fatebridge bazi_birth `
 
 ## 工具筛选与运行环境
 
-默认公开全部工具。需要较小的工具目录时，在客户端的 `env` 中设置 `FATEBRIDGE_MCP_FAMILIES`，例如 `"bazi,knowledge"` 或 `"fengshui"`；多个 family 取并集，空值保留全量，错误分类阻止启动。可用下面的命令验证独立进程：
+默认四个工具覆盖全部公开能力。在客户端的 `env` 中设置 `FATEBRIDGE_MCP_FAMILIES` 可限制能力范围，例如 `"bazi,knowledge"` 或 `"fengshui"`。多个 family 取并集，空值保留全量，错误分类阻止启动。以下命令可验证独立进程。
 
 ```bash
 uv run --locked --extra dev fatebridge doctor --mcp --family fengshui
@@ -184,11 +184,14 @@ async def main():
         tools = await client.list_tools()
         await client.read_resource("fatebridge://catalog/summary")
         result = await client.call_tool(
-            "bazi_birth",
+            "run_calculation",
             {
-                "birth_year": 1990, "birth_month": 5, "birth_day": 15,
-                "birth_hour": 10, "birth_minute": 30, "gender": "男",
-                "birth_place": "北京", "birth_timezone": "Asia/Shanghai",
+                "tool": "bazi_birth_chart",
+                "arguments": {
+                    "birth_year": 1990, "birth_month": 5, "birth_day": 15,
+                    "birth_hour": 10, "birth_minute": 30, "gender": "男",
+                    "birth_place": "北京", "birth_timezone": "Asia/Shanghai",
+                },
                 "fields": ["bazi_birth.day_master"],
                 "strict_fields": True, "include_snapshot_text": False,
             },
@@ -203,7 +206,7 @@ asyncio.run(main())
 PY
 ```
 
-成功时退出码 `0`，输出日主 `庚 / 金 / 阳` 与回执。Windows 将 `import asyncio` 到 `asyncio.run(main())` 的 Python 内容保存为 `verify_mcp.py`，执行 `uv run --locked --extra dev python verify_mcp.py`。该脚本要求公开 `bazi_birth`；筛选其他工具族时换成其可用工具。浏览器 GET `/mcp` 或普通 `curl` 的响应不能替代 MCP 协议验证。
+成功时退出码 `0`，输出日主 `庚 / 金 / 阳` 与回执。Windows 将 `import asyncio` 到 `asyncio.run(main())` 的 Python 内容保存为 `verify_mcp.py`，执行 `uv run --locked --extra dev python verify_mcp.py`。该脚本要求公开 `bazi_birth_chart`；筛选其他工具族时换成其可用工具。浏览器 GET `/mcp` 或普通 `curl` 的响应不能替代 MCP 协议验证。
 
 ### 远程接入
 

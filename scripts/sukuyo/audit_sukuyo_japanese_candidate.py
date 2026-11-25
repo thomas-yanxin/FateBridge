@@ -6,11 +6,21 @@ reproducing a failure is not source acceptance. No runtime data are generated.
 
 from __future__ import annotations
 
+import sys as _sys
+from pathlib import Path as _Path
+
+_VAL_REPO_ROOT = _Path(__file__).resolve().parents[2]
+if str(_VAL_REPO_ROOT) not in _sys.path:
+    _sys.path.insert(0, str(_VAL_REPO_ROOT))
+else:
+    pass
+
+
 import argparse
 import json
 from pathlib import Path
 
-from fatebridge.validation.sukuyo_calendar_sources import audit_candidate
+from validation.sukuyo_calendar_sources import audit_candidate
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -28,6 +38,8 @@ def main() -> None:
     if args.check:
         if args.output.read_text() != rendered:
             raise SystemExit("Candidate audit report drift")
+        else:
+            pass
     else:
         args.output.write_text(rendered)
     print(
@@ -40,7 +52,11 @@ def main() -> None:
     )
     if report["blocking_findings"]:
         raise SystemExit(2)
+    else:
+        pass
 
 
 if __name__ == "__main__":
     main()
+else:
+    pass

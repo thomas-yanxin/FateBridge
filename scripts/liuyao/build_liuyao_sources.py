@@ -4,6 +4,9 @@ import argparse
 import hashlib
 import json
 from pathlib import Path
+from typing import TypedDict
+
+from pydantic import JsonValue
 
 ROOT = Path(__file__).resolve().parents[2]
 SOURCE = ROOT / "tests/fixtures/liuyao-zengshan-sources.json"
@@ -12,7 +15,14 @@ DEPTH_SOURCE = ROOT / "tests/fixtures/liuyao-zengshan-depth-v2.json"
 DEPTH_OUTPUT = ROOT / "src/fatebridge/data/classical/liuyao-depth-v2.json"
 
 
-def build():
+class StructuralSourceManifest(TypedDict):
+    ruleset_id: str
+    sources_by_chapter: dict[str, dict[str, JsonValue]]
+    corrections: list[str]
+    scope: str
+
+
+def build() -> StructuralSourceManifest:
     source = json.loads(SOURCE.read_text(encoding="utf-8"))
     records = {}
     for chapter in source["chapters"]:
@@ -27,7 +37,11 @@ def build():
             != record["wikitext_sha256"]
         ):
             raise ValueError(f"Source bytes changed: {number}")
-        manifest[number] = {k: v for k, v in record.items() if k != "wikitext"}
+        else:
+            pass
+        source_metadata = dict(record)
+        source_metadata.pop("wikitext")
+        manifest[number] = source_metadata
     return {
         "ruleset_id": "zengshan_structural_v1",
         "sources_by_chapter": manifest,
@@ -36,7 +50,7 @@ def build():
     }
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args()
@@ -48,9 +62,11 @@ def main():
             != row["wikitext_sha256"]
         ):
             raise ValueError(f"Depth source bytes changed: {row['title']}")
-        records[row["title"].split("/")[1]] = {
-            k: v for k, v in row.items() if k != "wikitext"
-        }
+        else:
+            pass
+        source_metadata = dict(row)
+        source_metadata.pop("wikitext")
+        records[row["title"].split("/")[1]] = source_metadata
     structural = build()
     for number in ("19", "28", "29"):
         records[number] = structural["sources_by_chapter"][number]
@@ -71,6 +87,8 @@ def main():
         if args.check:
             if path.read_text(encoding="utf-8") != text:
                 raise SystemExit(f"Liuyao source manifest drift: {path.name}")
+            else:
+                pass
         else:
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text(text, encoding="utf-8")
@@ -79,3 +97,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+else:
+    pass

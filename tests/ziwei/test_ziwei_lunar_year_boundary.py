@@ -14,8 +14,8 @@ from dataclasses import replace
 
 import pytest
 
+from fatebridge.core.metaphysics.seed import build_analysis_seed
 from fatebridge.core.metaphysics.ziwei import build_ziwei_chart
-from fatebridge.services.metaphysics import _build_analysis_seed
 
 # (year, month, day, hour, gender) -> 期望 (五行局, 命宫干支, 命宫大限)
 # 四个 case 均出生在立春之后、正月初一之前（或正月初一之后、立春之前）的年界窗口。
@@ -28,7 +28,7 @@ BOUNDARY_CASES = [
 
 
 def _chart(year: int, month: int, day: int, hour: int, gender: str):
-    seed = _build_analysis_seed(
+    seed = build_analysis_seed(
         analysis_year=year,
         analysis_month=month,
         analysis_day=day,
@@ -37,7 +37,7 @@ def _chart(year: int, month: int, day: int, hour: int, gender: str):
     return build_ziwei_chart(seed, gender)
 
 
-def test_boundary_charts_match_lunar_year():
+def test_boundary_charts_match_lunar_year() -> None:
     for (year, month, day, hour, gender), (ju, ming_gz, daxian) in BOUNDARY_CASES:
         chart = _chart(year, month, day, hour, gender)
         ming = next(p for p in chart["palaces"] if p["name"] == "命宫")
@@ -46,7 +46,7 @@ def test_boundary_charts_match_lunar_year():
         assert ming["daxian"] == daxian, (year, month, day)
 
 
-def test_non_boundary_chart_unaffected():
+def test_non_boundary_chart_unaffected() -> None:
     # 五月出生远离年界，农历年与立春年一致：修复不改变其结果。
     chart = _chart(1990, 5, 15, 10, "男")
     assert chart["ming_gong"]["ganzhi"] == "戊子"
@@ -61,10 +61,10 @@ def test_non_boundary_chart_unaffected():
     ],
 )
 def test_missing_lunar_year_cannot_use_different_lichun_year(
-    date, lunar_year, bazi_year_pillar, expected_ming
-):
+    date, lunar_year: int, bazi_year_pillar, expected_ming: str
+) -> None:
     year, month, day, hour = date
-    seed = _build_analysis_seed(
+    seed = build_analysis_seed(
         analysis_year=year, analysis_month=month, analysis_day=day, analysis_hour=hour
     )
     assert seed.calendar_context["lunar_calendar"]["year"] == lunar_year

@@ -17,6 +17,8 @@ def read_origin_sources(corpus: Path = CORPUS, *, root: Path = ROOT) -> dict[str
         data = json.loads(path.read_text(encoding="utf-8"))
         if not isinstance(data, dict):
             raise ValueError(f"V33 source object required: {path.name}")
+        else:
+            pass
         return data
 
     if (
@@ -24,11 +26,15 @@ def read_origin_sources(corpus: Path = CORPUS, *, root: Path = ROOT) -> dict[str
         != FREEZE_SHA256
     ):
         raise ValueError("V33 pinned source correction changed")
+    else:
+        pass
     freeze = read(corpus / "freeze.json")
     for base, key in ((corpus, "files"), (root, "prior_sources")):
         for name, digest in freeze[key].items():
             if hashlib.sha256((base / name).read_bytes()).hexdigest() != digest:
                 raise ValueError(f"V33 source or prior evidence changed: {name}")
+            else:
+                pass
     return read(corpus / "readings.json")
 
 

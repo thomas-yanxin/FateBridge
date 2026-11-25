@@ -1,9 +1,4 @@
-"""Build the optional named VSOP2013 Sun library from pinned source bytes.
-
-The coefficients and full ERFA time conversion are embedded in the library.
-Only its checked Sun ABI is public. Failed builds and original sources remain
-in the explicitly requested new output directory.
-"""
+"""Build the optional VSOP2013 Sun library from pinned sources and coefficients."""
 
 from __future__ import annotations
 
@@ -21,7 +16,9 @@ import tarfile
 import urllib.request
 from importlib.resources import files
 from pathlib import Path
-from typing import Any
+from typing import TypedDict
+
+from pydantic import JsonValue
 
 MODEL_ID = "fatebridge_vsop2013_solar_v1"
 # Reviewed full profile, including the declared range and qualified source graph.
@@ -30,11 +27,13 @@ PROFILE_CONTENT_SHA256 = (
 )
 
 
-def _unique_object(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
-    result: dict[str, Any] = {}
+def _unique_object(pairs: list[tuple[str, JsonValue]]) -> dict[str, JsonValue]:
+    result: dict[str, JsonValue] = {}
     for key, value in pairs:
         if key in result:
             raise ValueError("Duplicate VSOP2013 source profile key")
+        else:
+            pass
         result[key] = value
     return result
 
@@ -94,13 +93,49 @@ def _sha(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def source_profile() -> tuple[dict[str, Any], str]:
+class Vsop2013SourceProfile(TypedDict):
+    model_id: str
+    version: str
+    abi_version: int
+    native_core_version: str
+    software_input_years: list[int]
+    qualified_solar_term_years: list[int]
+    working_jd_tt: list[float]
+    reference: str
+    sources: dict[str, dict[str, str]]
+    native_source_files_sha256: dict[str, str]
+    embedded_series_sha256: str
+    lunar_replacement_c: str
+    source_identity_scope: str
+    qualification_reference: str
+    accuracy_certified: bool
+    legacy_native_moshier_relabelled: bool
+    calculation_files_sha256: dict[str, str]
+    calculation_source_sha256: str
+    derived_lichun_scope: dict[str, JsonValue]
+
+
+class RemovedSecularTerm(TypedDict):
+    args: list[int]
+    coefficients: list[float]
+
+
+class SeriesPackingReceipt(TypedDict):
+    original_terms: int
+    evaluated_terms: int
+    removed_original_secular_term: list[RemovedSecularTerm]
+    series: list[tuple[int, int, int]]
+    amplitude_truncation: None
+    packed_sha256: str
+
+
+def source_profile() -> tuple[Vsop2013SourceProfile, str]:
     raw = (
         files("fatebridge")
         .joinpath("data/astronomy/vsop2013-solar-v1.json")
         .read_bytes()
     )
-    profile: dict[str, Any] = json.loads(raw, object_pairs_hook=_unique_object)
+    profile: Vsop2013SourceProfile = json.loads(raw, object_pairs_hook=_unique_object)
     content = json.dumps(
         profile,
         ensure_ascii=False,
@@ -110,10 +145,14 @@ def source_profile() -> tuple[dict[str, Any], str]:
     ).encode()
     if hashlib.sha256(content).hexdigest() != PROFILE_CONTENT_SHA256:
         raise ValueError("Unreviewed VSOP2013 source profile content")
+    else:
+        pass
     return profile, hashlib.sha256(raw).hexdigest()
 
 
-def _acquire(sources: dict[str, Any], folder: Path, supplied: Path | None) -> None:
+def _acquire(
+    sources: dict[str, dict[str, str]], folder: Path, supplied: Path | None
+) -> None:
     folder.mkdir()
     for name, identity in sources.items():
         if supplied is None:
@@ -123,14 +162,16 @@ def _acquire(sources: dict[str, Any], folder: Path, supplied: Path | None) -> No
             data = (supplied / name).read_bytes()
         if hashlib.sha256(data).hexdigest() != identity["sha256"]:
             raise ValueError(f"VSOP2013 upstream source bytes differ: {name}")
+        else:
+            pass
         with (folder / name).open("xb") as stream:
             stream.write(data)
 
 
-def _pack_series(original: Path, output: Path) -> dict[str, Any]:
-    terms = []
-    series = []
-    removed = []
+def _pack_series(original: Path, output: Path) -> SeriesPackingReceipt:
+    terms: list[tuple[int, int, float, float, float, float]] = []
+    series: list[tuple[int, int, int]] = []
+    removed: list[RemovedSecularTerm] = []
     with original.open(encoding="ascii") as stream:
         while line := stream.readline():
             ip, iv, power, count = [
@@ -138,11 +179,15 @@ def _pack_series(original: Path, output: Path) -> dict[str, Any]:
             ]
             if ip != 3 or not 1 <= iv <= 6 or not 0 <= power <= 20:
                 raise ValueError("Invalid original VSOP2013 EMB series header")
+            else:
+                pass
             series.append((iv, power, count))
             for rank in range(1, count + 1):
                 text = stream.readline().rstrip("\n")
                 if len(text) != 116 or int(text[:5]) != rank:
                     raise ValueError("Invalid original VSOP2013 term record")
+                else:
+                    pass
                 args: list[int] = []
                 pos = 6
                 for n, width in ((4, 3), (5, 3), (4, 4), (1, 6), (3, 3)):
@@ -156,8 +201,10 @@ def _pack_series(original: Path, output: Path) -> dict[str, Any]:
                     for a in (68, 92)
                 ]
                 if iv == 2 and power == 1 and rank == 1:
-                    removed.append(dict(args=args, coefficients=coefficients))
+                    removed.append({"args": args, "coefficients": coefficients})
                     continue
+                else:
+                    pass
                 a = b = 0.0
                 for j in range(17):
                     a += args[j] * CI0[j]
@@ -166,26 +213,30 @@ def _pack_series(original: Path, output: Path) -> dict[str, Any]:
                     math.isfinite(x) for x in (a, b, *coefficients)
                 ):
                     raise ValueError("Invalid VSOP2013 arguments or coefficients")
-                terms.append((iv - 1, power, a, b, *coefficients))
+                else:
+                    pass
+                terms.append((iv - 1, power, a, b, coefficients[0], coefficients[1]))
     if len(removed) != 1 or len(terms) != 294425:
         raise ValueError("Unexpected complete VSOP2013 EMB term count")
+    else:
+        pass
     with output.open("xb") as packed:
         packed.write(struct.pack("<I", len(terms)))
         for term in terms:
             packed.write(struct.pack("<IIdddd", *term))
-    return dict(
-        original_terms=sum(r[2] for r in series),
-        evaluated_terms=len(terms),
-        removed_original_secular_term=removed,
-        series=series,
-        amplitude_truncation=None,
-        packed_sha256=_sha(output),
-    )
+    return {
+        "original_terms": sum(subseries[2] for subseries in series),
+        "evaluated_terms": len(terms),
+        "removed_original_secular_term": removed,
+        "series": series,
+        "amplitude_truncation": None,
+        "packed_sha256": _sha(output),
+    }
 
 
 def _prepare_sources(
-    profile: dict[str, Any], upstream: Path, target: Path
-) -> dict[str, Any]:
+    profile: Vsop2013SourceProfile, upstream: Path, target: Path
+) -> SeriesPackingReceipt:
     target.mkdir()
     expected = profile["native_source_files_sha256"]
     with tarfile.open(upstream / "pyswisseph-2.10.3.2.tar.gz") as archive:
@@ -198,21 +249,31 @@ def _prepare_sources(
                 or parts[2] not in expected
             ):
                 continue
+            else:
+                pass
             source = archive.extractfile(member)
             if source is None:
                 raise ValueError("Pinned native source member unavailable")
+            else:
+                pass
             with source:
                 data = source.read()
             if hashlib.sha256(data).hexdigest() != expected[parts[2]]:
                 raise ValueError("Pinned native source member differs")
+            else:
+                pass
             with (target / parts[2]).open("xb") as stream:
                 stream.write(data)
     if any(not (target / name).is_file() for name in expected):
         raise ValueError("Pinned native source archive is incomplete")
+    else:
+        pass
     original = (target / "swemplan.c").read_text()
     needle = "int swi_moshplan2 (double J, int iplm, double *pobj)"
     if original.count(needle) != 1:
         raise ValueError("Unexpected pinned Moshier dispatch")
+    else:
+        pass
     patched = original.replace(
         needle,
         "extern int fatebridge_vsop2013_native_emb(double, double *);\n\n" + needle,
@@ -220,13 +281,13 @@ def _prepare_sources(
     needle = "  const struct plantbl *plan = planets[iplm];"
     if patched.count(needle) != 1:
         raise ValueError("Unexpected pinned Moshier Earth selector")
+    else:
+        pass
     patched = patched.replace(
         needle,
         needle + "\n\n  if (iplm == 2) return fatebridge_vsop2013_native_emb(J, pobj);",
     )
-    # The stock series always returned OK. The replacement can fail, so every
-    # position and finite-difference call must propagate its error before the
-    # native pipeline consumes a partial vector or publishes a cached epoch.
+    # note (native calls): Propagate checked series failures before consuming or caching their output.
     for arguments in (
         "tjd, pnoint2msh[SEI_EMB], xe",
         "tjd - PLAN_SPEED_INTV, pnoint2msh[SEI_EMB], x2",
@@ -236,12 +297,16 @@ def _prepare_sources(
         call = f"swi_moshplan2({arguments});"
         if patched.count(call) != 1:
             raise ValueError("Unexpected pinned native planet call")
+        else:
+            pass
         patched = patched.replace(
             call, f"if (swi_moshplan2({arguments}) != OK) return ERR;"
         )
     needle = "static void embofs_mosh(double tjd, double *xemb) \n{"
     if patched.count(needle) != 1:
         raise ValueError("Unexpected pinned lunar offset")
+    else:
+        pass
     patched = patched.replace(needle, needle + profile["lunar_replacement_c"])
     (target / "swemplan-vsop2013.c").write_text(patched)
     package = files("fatebridge").joinpath("data/astronomy/vsop2013")
@@ -258,6 +323,8 @@ def _prepare_sources(
     parsed = _pack_series(upstream / "VSOP2013p3.dat", target / "emb-series.bin")
     if parsed["packed_sha256"] != profile["embedded_series_sha256"]:
         raise ValueError("Series parser differs from frozen independent packed bytes")
+    else:
+        pass
     return parsed
 
 
@@ -267,12 +334,14 @@ def build(
     source_dir: Path | None = None,
     compiler: str | None = None,
     linker: str | None = None,
-) -> dict[str, Any]:
+) -> dict[str, int | str]:
     system = platform.system()
     if system not in {"Darwin", "Linux"} or sys.byteorder != "little":
         raise ValueError(
             "VSOP2013 builder currently requires macOS/Linux little-endian"
         )
+    else:
+        pass
     profile, profile_sha = source_profile()
     output = output.expanduser().resolve()
     output.mkdir(parents=True, exist_ok=False)
@@ -290,6 +359,8 @@ def build(
         or graph_sha != profile["calculation_source_sha256"]
     ):
         raise ValueError("Build sources differ from the qualified VSOP2013 graph")
+    else:
+        pass
     marker = f"""#define FB_API __attribute__((visibility("default")))
 FB_API const char *fatebridge_vsop2013_model_id(void) {{ return "{MODEL_ID}"; }}
 FB_API const char *fatebridge_vsop2013_profile_sha256(void) {{ return "{profile_sha}"; }}
@@ -299,6 +370,8 @@ FB_API int fatebridge_vsop2013_abi_version(void) {{ return 1; }}
     compiler = compiler or shutil.which("cc")
     if not compiler:
         raise ValueError("A C compiler is required for the optional VSOP2013 library")
+    else:
+        pass
     library = output / (
         "vsop2013-solar.dylib" if system == "Darwin" else "vsop2013-solar.so"
     )
@@ -313,6 +386,8 @@ FB_API int fatebridge_vsop2013_abi_version(void) {{ return 1; }}
     )
     if linker:
         flags.append("-fuse-ld=" + linker)
+    else:
+        pass
     command = [
         compiler,
         *flags,
@@ -353,6 +428,8 @@ FB_API int fatebridge_vsop2013_abi_version(void) {{ return 1; }}
         raise RuntimeError(
             "VSOP2013 compilation failed; original sources and log retained"
         )
+    else:
+        pass
     probe = ctypes.CDLL(str(library))
     for symbol, expected_value in (
         ("fatebridge_vsop2013_model_id", MODEL_ID),
@@ -362,6 +439,8 @@ FB_API int fatebridge_vsop2013_abi_version(void) {{ return 1; }}
         method.restype = ctypes.c_char_p
         if method().decode("ascii") != expected_value:
             raise ValueError("Built VSOP2013 identity marker mismatch")
+        else:
+            pass
     probe.fatebridge_vsop2013_solar.argtypes = [
         ctypes.c_double,
         ctypes.POINTER(ctypes.c_double),
@@ -379,13 +458,19 @@ FB_API int fatebridge_vsop2013_abi_version(void) {{ return 1; }}
         raise ValueError(
             "New VSOP2013 library does not reject an uninitialized calculation"
         )
+    else:
+        pass
     probe.fatebridge_vsop2013_initialize.argtypes = []
     probe.fatebridge_vsop2013_initialize.restype = ctypes.c_int
     if probe.fatebridge_vsop2013_initialize() != 0:
         raise ValueError("Built VSOP2013 immutable series could not be initialized")
+    else:
+        pass
     after = probe.fatebridge_vsop2013_solar(2451545.0, values, error)
     if after != 260 or not all(math.isfinite(x) for x in values):
         raise ValueError("Built VSOP2013 initialized calculation failed")
+    else:
+        pass
     (output / "probe.json").write_text(
         json.dumps(
             dict(
@@ -398,7 +483,7 @@ FB_API int fatebridge_vsop2013_abi_version(void) {{ return 1; }}
         )
         + "\n"
     )
-    manifest = dict(
+    manifest: dict[str, int | str] = dict(
         model_id=MODEL_ID,
         version=profile["version"],
         abi_version=1,
@@ -439,3 +524,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+else:
+    pass

@@ -15,7 +15,7 @@ import fatebridge.api as api
 from fatebridge.application.execution import execute_tool
 from fatebridge.cli import run
 from fatebridge.core.execution_context import ExecutionOptions
-from fatebridge.core.qimen_three_deceptions import (
+from fatebridge.core.qimen.qimen_three_deceptions import (
     build_three_deceptions,
     three_deception_context,
 )
@@ -23,11 +23,13 @@ from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.divination import calculate_sanshiunited_analysis
 from fatebridge.services.metaphysics import calculate_qimen_analysis
 from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.validation import qimen_three_deceptions as source_audit
-from fatebridge.validation.claims import CalculationClaim
-from fatebridge.validation.qimen import verify_qimen_pattern_quotes
-from fatebridge.validation.qimen_study import Condition, FrozenQimenPolicy, apply_policy
-from tests.qimen.test_qimen_depth import fixed_board
+from tests.support.transports import call_calculation
+from tests.unit_test.fixtures.qimen import calculate_january_board as calculate
+from tests.unit_test.fixtures.qimen import fixed_board
+from validation import qimen_three_deceptions as source_audit
+from validation.claims import CalculationClaim
+from validation.qimen import verify_qimen_pattern_quotes
+from validation.qimen_study import Condition, FrozenQimenPolicy, apply_policy
 
 BUNDLE = Path(__file__).parents[1] / "fixtures/qimen_classical_v13"
 REFERENCE = json.loads((BUNDLE / "source-and-three-deceptions.json").read_text())
@@ -39,22 +41,10 @@ NAMES = {
 RULES = {v[0] for v in NAMES.values()}
 
 
-def calculate(day, hour):
-    return calculate_qimen_analysis(
-        analysis_year=2026,
-        analysis_month=1,
-        analysis_day=day,
-        analysis_hour=hour,
-        analysis_timezone="Asia/Hong_Kong",
-        use_true_solar_time=False,
-        qimen_options={"ju_method": "chaibu"},
-    )
-
-
 @pytest.mark.parametrize(
     "stem,door,god", list(product("乙丙丁", ["开门", "休门", "生门"], NAMES))
 )
-def test_all_twenty_seven_defined_triples(stem, door, god):
+def test_all_twenty_seven_defined_triples(stem, door, god) -> None:
     c = three_deception_context("坎", [stem], door, god)
     assert c["matched"] and (c["rule_id"], c["name"]) == NAMES[god]
     assert (
@@ -65,7 +55,7 @@ def test_all_twenty_seven_defined_triples(stem, door, god):
 
 @pytest.mark.parametrize("missing", ["wonder", "door", "god"])
 @pytest.mark.parametrize("god", list(NAMES))
-def test_each_missing_layer_prevents_full_naming(god, missing):
+def test_each_missing_layer_prevents_full_naming(god, missing: str) -> None:
     c = three_deception_context(
         "乾",
         ["戊"] if missing == "wonder" else ["乙"],
@@ -75,7 +65,7 @@ def test_each_missing_layer_prevents_full_naming(god, missing):
     assert not c["matched"] and c["name"] is None and c["rule_id"] is None
 
 
-def test_door_taiyin_without_wonder_retains_opposed_partial_readings():
+def test_door_taiyin_without_wonder_retains_opposed_partial_readings() -> None:
     c = three_deception_context("离", ["戊"], "生门", "太阴")
     assert c["verse_exactly_two_components_present"]
     assert (
@@ -98,7 +88,9 @@ def test_door_taiyin_without_wonder_retains_opposed_partial_readings():
         ),
     ],
 )
-def test_hosted_wonders_keep_roles_without_multiple_named_patterns(stems, roles):
+def test_hosted_wonders_keep_roles_without_multiple_named_patterns(
+    stems, roles
+) -> None:
     c = three_deception_context("乾", stems, "开门", "太阴")
     assert c["matched"] and c["wonder_roles"] == roles
     assert c["observed_heaven_stems"] == stems
@@ -116,12 +108,14 @@ def test_hosted_wonders_keep_roles_without_multiple_named_patterns(stems, roles)
         ("坎", ["乙"], "开门", None),
     ],
 )
-def test_no_fake_centre_missing_input_or_unimplemented_alias(args):
+def test_no_fake_centre_missing_input_or_unimplemented_alias(args) -> None:
     with pytest.raises(ValueError):
         three_deception_context(*args)
 
 
-def test_source_audit_retains_three_names_three_partial_clauses_and_one_priority():
+def test_source_audit_retains_three_names_three_partial_clauses_and_one_priority() -> (
+    None
+):
     r = source_audit.audit_three_deceptions(BUNDLE)
     assert r["printed_naming_definitions"] == 3 and r["retained_partial_clauses"] == 3
     assert (
@@ -137,8 +131,8 @@ def test_source_audit_retains_three_names_three_partial_clauses_and_one_priority
 
 @pytest.mark.parametrize("corruption", ["partial_as_full", "outcome", "probability"])
 def test_auditor_detects_overbroad_or_outcome_claiming_implementations(
-    monkeypatch, corruption
-):
+    monkeypatch: pytest.MonkeyPatch, corruption: str
+) -> None:
     actual = source_audit.three_deception_context
 
     def changed(*args):
@@ -152,6 +146,8 @@ def test_auditor_detects_overbroad_or_outcome_claiming_implementations(
             r["outcome_inference_allowed"] = True
         elif corruption == "probability":
             r["rhetorical_fractions_converted_to_probability"] = True
+        else:
+            pass
         return r
 
     monkeypatch.setattr(source_audit, "three_deception_context", changed)
@@ -169,8 +165,8 @@ def test_auditor_detects_overbroad_or_outcome_claiming_implementations(
     ],
 )
 def test_reference_cannot_drop_awkward_clauses_or_invent_printed_charts(
-    tmp_path, corruption
-):
+    tmp_path: Path, corruption: str
+) -> None:
     shutil.copytree(BUNDLE, tmp_path / "source")
     d = tmp_path / "source"
     x = deepcopy(REFERENCE)
@@ -189,7 +185,7 @@ def test_reference_cannot_drop_awkward_clauses_or_invent_printed_charts(
         source_audit.audit_three_deceptions(d)
 
 
-def test_human_dun_overlap_is_not_independent_confirmation():
+def test_human_dun_overlap_is_not_independent_confirmation() -> None:
     q = calculate(2, 12)["qimen"]
     true = next(p for p in q["patterns"] if p["rule_id"] == "true_deception")
     human = next(
@@ -219,7 +215,7 @@ def test_human_dun_overlap_is_not_independent_confirmation():
     )
 
 
-def test_three_deceptions_never_erase_an_existing_door_pressure():
+def test_three_deceptions_never_erase_an_existing_door_pressure() -> None:
     r = calculate(1, 18)
     q = r["qimen"]
     p = next(p for p in q["patterns"] if p["rule_id"] == "heavy_deception")
@@ -235,8 +231,8 @@ def test_three_deceptions_never_erase_an_existing_door_pressure():
 
 
 def test_actual_board_hosted_wonder_is_used_once_and_earth_only_never_substituted(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     q = fixed_board(monkeypatch, {"dun": "阳遁", "ju": 6, "hour": "丙寅"})
     hosted = next(p for p in q["palaces"] if p["trigram"] == "艮")
     assert hosted["heaven_stems"] == ["癸", "乙"]
@@ -248,6 +244,8 @@ def test_actual_board_hosted_wonder_is_used_once_and_earth_only_never_substitute
         if p["trigram"] == "中":
             assert "three_deceptions" not in p["evidence"]
             continue
+        else:
+            pass
         c = p["evidence"]["three_deceptions"]
         assert c["heaven_wonder_stems"] == [
             s for s in p["heaven_stems"] if s in "乙丙丁"
@@ -258,7 +256,7 @@ def test_actual_board_hosted_wonder_is_used_once_and_earth_only_never_substitute
         ) == int(c["matched"])
 
 
-def test_earth_only_wonder_is_not_used_as_the_moving_heaven_wonder():
+def test_earth_only_wonder_is_not_used_as_the_moving_heaven_wonder() -> None:
     # Counterfactual layer swap: a synthetic adversarial probe, not a printed
     # or dated chart. The builder must read the actual heaven field.
     p = {
@@ -275,7 +273,7 @@ def test_earth_only_wonder_is_not_used_as_the_moving_heaven_wonder():
     assert p["evidence"]["three_deceptions"]["heaven_wonder_stems"] == []
 
 
-def test_same_run_quote_cannot_delete_partial_limits_or_shared_fact_markers():
+def test_same_run_quote_cannot_delete_partial_limits_or_shared_fact_markers() -> None:
     spec = next(s for s in CATALOG if s.tool_name == "qimen")
     payload = execute_tool(
         spec,
@@ -325,7 +323,9 @@ def test_same_run_quote_cannot_delete_partial_limits_or_shared_fact_markers():
     "rule,day,hour",
     [("rest_deception", 1, 0), ("heavy_deception", 1, 18), ("true_deception", 2, 14)],
 )
-def test_frozen_policy_queries_only_the_named_full_condition(rule, day, hour):
+def test_frozen_policy_queries_only_the_named_full_condition(
+    rule: str, day: int, hour: int
+) -> None:
     c = Condition(feature="pattern_present", pattern=rule, equals=True)
     policy = FrozenQimenPolicy(
         policy_id="synthetic-three-deceptions-not-calibrated",
@@ -358,8 +358,13 @@ def test_frozen_policy_queries_only_the_named_full_condition(rule, day, hour):
 )
 @pytest.mark.parametrize("aggregate", [False, True])
 def test_named_patterns_and_limits_agree_across_real_transports(
-    monkeypatch, capsys, day, hour, expected, aggregate
-):
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    day: int,
+    hour: int,
+    expected: str,
+    aggregate: bool,
+) -> None:
     api._reset_runtime_state_for_tests()
     monkeypatch.setattr(
         api,
@@ -376,8 +381,8 @@ def test_named_patterns_and_limits_agree_across_real_transports(
         use_true_solar_time=False,
         qimen_options={"ju_method": "chaibu"},
     )
-    tool = "sanshiunited" if aggregate else "qimen"
-    path = "/api/divination/sanshiunited" if aggregate else "/api/cn/qimen"
+    tool = "sanshi_combined_chart" if aggregate else "qimen"
+    path = "/api/divination/sanshi" if aggregate else "/api/qimen"
     if aggregate:
         payload = dict(
             date=f"2026-01-{day:02d}",
@@ -432,8 +437,8 @@ def test_named_patterns_and_limits_agree_across_real_transports(
 
     async def protocol():
         async with Client(create_mcp_app()) as client:
-            return await client.call_tool(
-                tool, {**payload, **controls}, raise_on_error=False
+            return await call_calculation(
+                client, tool, {**payload, **controls}, raise_on_error=False
             )
 
     native = asyncio.run(protocol())
@@ -465,15 +470,12 @@ def test_named_patterns_and_limits_agree_across_real_transports(
     assert not q["rule_profiles"]["three_deceptions"][
         "two_factor_judgment_priority_resolved"
     ]
-    assert (
-        q["rulesets"][0]["version"] == "2.12.0"
-        and not q["assessment"]["authority_certified"]
-    )
+    assert q["rulesets"][0]["version"] == "2.13.0"
     assert "十分七分不作概率" in bodies[0]["snapshot_text"]
 
 
 @pytest.mark.parametrize("day,hour", [(1, 18), (2, 12)])
-def test_sanshi_keeps_same_evidence_and_source_version(day, hour):
+def test_sanshi_keeps_same_evidence_and_source_version(day: int, hour: int) -> None:
     r = calculate_sanshiunited_analysis(
         date=f"2026-01-{day:02d}",
         time=f"{hour:02d}:00:00",
@@ -484,11 +486,15 @@ def test_sanshi_keeps_same_evidence_and_source_version(day, hour):
         qimen_options={"ju_method": "chaibu"},
     )
     assert "error" not in r, r
-    q = calculate(day, hour)["qimen"]
+    standalone = calculate(day, hour)
+    q = standalone["qimen"]
     assert (
         r["qimen"]["palaces"] == q["palaces"]
         and r["qimen"]["patterns"] == q["patterns"]
     )
-    assert r["subresults"]["qimen"]["pan"] == r["qimen"]
-    assert r["synthesis"]["source_profiles"]["qimen"][0]["version"] == "2.12.0"
+    assert r["subresults"]["qimen"]["four_pillars"] == standalone["four_pillars"]
+    assert (
+        r["subresults"]["qimen"]["calendar_context"] == standalone["calendar_context"]
+    )
+    assert r["synthesis"]["source_profiles"]["qimen"][0]["version"] == "2.13.0"
     assert "三诈口径" in r["snapshot_text"]

@@ -32,6 +32,8 @@ def references() -> dict:
         raw = (EVIDENCE / name).read_bytes()
         if hashlib.sha256(raw).hexdigest() != expected:
             raise ValueError("Fixed independent reference changed: " + name)
+        else:
+            pass
         result[name] = json.loads(raw)
     horizons = result["horizons-attempt1/reference.json"]
     for row in horizons["records"]:
@@ -43,30 +45,42 @@ def references() -> dict:
             raise ValueError(
                 "Captured NASA query differs from fixed target/TT/coordinate request"
             )
+        else:
+            pass
         if parse_response(raw, row["body"]) != row:
             raise ValueError("Saved coordinates detached from their raw NASA response")
+        else:
+            pass
     fixed = plan()
     for value in result.values():
         if [r["body"] for r in value["records"]] != list(fixed["bodies"]):
             raise ValueError("Reference target omitted or replaced")
+        else:
+            pass
         for record in value["records"]:
             if record["target_id"] != fixed["bodies"][record["body"]] or [
                 (r["id"], r["jd_tt"]) for r in record["rows"]
             ] != [(r["id"], r["jd_tt"]) for r in fixed["epochs"]]:
                 raise ValueError("Reference target or physical TT rebound")
+            else:
+                pass
     return result
 
 
 def capture() -> dict:
     from fatebridge.core.astro import runtime
-    from fatebridge.core.human_design import positions_at_tt
-    from fatebridge.core.human_design_mechanics import BODY_IDS
-    from fatebridge.core.human_design_natal_sources import guard_natal_sources
+    from fatebridge.core.human_design.human_design import positions_at_tt
+    from fatebridge.core.human_design.human_design_mechanics import BODY_IDS
+    from fatebridge.core.human_design.human_design_natal_sources import (
+        guard_natal_sources,
+    )
 
     @guard_natal_sources
     def observe() -> dict:
         if runtime.swe is None:
             raise RuntimeError("Swiss Ephemeris unavailable")
+        else:
+            pass
         rows = []
         for epoch in plan()["epochs"]:
             positions = positions_at_tt(
@@ -86,6 +100,8 @@ def capture() -> dict:
                         raise ValueError(
                             "Diagnostic native flags or coordinates changed"
                         )
+                    else:
+                        pass
                     controls[label] = {
                         "requested_flags": flags,
                         "return_flags": returned,
@@ -105,6 +121,8 @@ def capture() -> dict:
                     raise ValueError(
                         "Diagnostic default differs from the actual producer"
                     )
+                else:
+                    pass
                 rows.append(
                     {**epoch, "body": body, "position": original, "controls": controls}
                 )
@@ -121,7 +139,7 @@ def signed_arcseconds(a: float, b: float) -> float:
 
 
 def compare(production: dict, sources: dict) -> dict:
-    from fatebridge.core.human_design import longitude_activation
+    from fatebridge.core.human_design.human_design import longitude_activation
 
     fixed = plan()
     identities = [
@@ -129,6 +147,8 @@ def compare(production: dict, sources: dict) -> dict:
     ]
     if [(r["id"], r["body"], r["jd_tt"]) for r in production["rows"]] != identities:
         raise ValueError("Production cohort omitted, duplicated or rebound")
+    else:
+        pass
     actual = {(r["body"], r["id"]): r for r in production["rows"]}
     references_by_source = {
         name: {
@@ -148,6 +168,8 @@ def compare(production: dict, sources: dict) -> dict:
                 or native["position"]["return_flags"] != 258
             ):
                 raise ValueError("Current baseline did not use requested Swiss data")
+            else:
+                pass
             default = native["controls"]["default"]
             disabled = native["controls"]["no_gravitational_deflection"]
             if (
@@ -157,6 +179,8 @@ def compare(production: dict, sources: dict) -> dict:
                 or disabled["return_flags"] != 770
             ):
                 raise ValueError("Counterfactual or baseline flags changed")
+            else:
+                pass
             if (
                 default["native_coordinates"][0] % 360,
                 default["native_coordinates"][3],
@@ -165,6 +189,8 @@ def compare(production: dict, sources: dict) -> dict:
                 native["position"]["longitude_speed"],
             ):
                 raise ValueError("Producer detached from default raw coordinates")
+            else:
+                pass
             values = {
                 "swiss_default": native["position"]["longitude"],
                 "swiss_no_deflection": native["controls"][
@@ -182,6 +208,8 @@ def compare(production: dict, sources: dict) -> dict:
             }
             if not all(math.isfinite(x) and 0 <= x < 360 for x in values.values()):
                 raise ValueError("Nonfinite or out-of-range comparison position")
+            else:
+                pass
             differences = {
                 name: signed_arcseconds(values[a], values[b])
                 for name, a, b in [
@@ -238,6 +266,8 @@ def compare(production: dict, sources: dict) -> dict:
     original = fixed["original_failed_row"]
     if center["longitudes"]["de440_skyfield"] != original["reference_longitude"]:
         raise ValueError("Original independent reference replaced")
+    else:
+        pass
     comparison_keys = list(
         center["absolute_comparisons_with_original2arcsec_threshold"]
     )
@@ -288,6 +318,8 @@ def main() -> int:
     args = parser.parse_args()
     if args.output.exists() or args.capture.exists():
         raise FileExistsError("Never overwrite a numerical capture or report")
+    else:
+        pass
     sources = references()  # Verify independent artifacts before producer calls.
     production = capture()
     args.capture.write_text(json.dumps(production, indent=2) + "\n")
@@ -315,3 +347,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

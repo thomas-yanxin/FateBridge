@@ -2,8 +2,7 @@
 
 [文档中心](README.md) · [API 参考](api-reference.md) · [算法状态](algorithm-status.md)
 
-FateBridge 的 REST、MCP、CLI 共用 `utils/places.py`，不需要在线地理编码服务或 API Key。
-`birth_place` 可补全经度、纬度和 IANA 民用时区；显式提供的 `birth_longitude`、`birth_latitude`、`birth_timezone` 各自优先。
+FateBridge 的 REST、MCP、CLI 共用 `utils/places.py`，不需要在线地理编码服务或 API Key。 `birth_place` 可补全经度、纬度和 IANA 民用时区；显式提供的 `birth_longitude`、`birth_latitude`、`birth_timezone` 各自优先。
 
 ## 覆盖范围
 
@@ -19,12 +18,9 @@ FateBridge 的 REST、MCP、CLI 共用 `utils/places.py`，不需要在线地理
 | 中国相关代表点合计 | 3,602 |
 | 海外城市 | 6,333 |
 
-海外部分独立于中国行政区计数：亚洲 2,500、欧洲 1,090、非洲 1,140、美洲 1,497（北美 816、南美 681）、大洋洲 106。
-从 GeoNames `cities15000` 的现存居民点选择人口至少 10 万的城市、国家首都和一级行政中心，并补充每个国家/地区人口最多的 3 个居民点及大洋洲前 50 个。排除城区分片 `PPLX`、历史/废弃居民点和南极洲。
-人口仅用于选择覆盖范围，不用于在同名城市之间猜测用户地点。
+海外部分独立于中国行政区计数：亚洲 2,500、欧洲 1,090、非洲 1,140、美洲 1,497（北美 816、南美 681）、大洋洲 106。 从 GeoNames `cities15000` 的现存居民点选择人口至少 10 万的城市、国家首都和一级行政中心，并补充每个国家/地区人口最多的 3 个居民点及大洋洲前 50 个。排除城区分片 `PPLX`、历史/废弃居民点和南极洲。 人口仅用于选择覆盖范围，不用于在同名城市之间猜测用户地点。
 
-中国行政区数据去除了上游为多级联动生成的重复层级，例如地级市下同名的虚拟县级条目、省直辖县级市的重复父子条目。397 个县级市按原始六位行政区代码逐一核对，清单保存在 `manifest.json`。
-上游已明确缺少新设的**和康县、和安县**；这两项是县，不影响本版本的县级市覆盖验收，坐标没有用母县中心或猜测值填充。本库并非截至今天的全部县区无缺漏清单。
+中国行政区数据去除了上游为多级联动生成的重复层级，例如地级市下同名的虚拟县级条目、省直辖县级市的重复父子条目。397 个县级市按原始六位行政区代码逐一核对，清单保存在 `manifest.json`。 上游已明确缺少新设的**和康县、和安县**；这两项是县，不影响本版本的县级市覆盖验收，坐标没有用母县中心或猜测值填充。本库并非截至今天的全部县区无缺漏清单。
 
 ## 坐标代表什么
 
@@ -37,7 +33,7 @@ FateBridge 的 REST、MCP、CLI 共用 `utils/places.py`，不需要在线地理
 
 ## 地名与同名处理
 
-支持来源中的中文、简繁体、拼音和英文名称，以及既有兼容别名（如 `peking`、`amoy`、`开县`）。英文忽略大小写和拉丁重音，保留单词边界；不会从 `Comparison` 中抽出 `Paris`。
+支持目录收录的中文、简繁体、拼音、英文和部分当地名称，以及既有兼容别名（如 `peking`、`amoy`、`开县`）。匹配忽略大小写和组合重音。带大小写的字母与十进制数字相邻时，共同形成词内连续段。例如 `хBerlin` 无法定位到 Berlin，`德国Berlin` 仍可使用汉字国名限定 Berlin。 [固定词界对照](precision-acceptance.md#place-unicode-boundaries-round202)
 
 ```text
 江苏省南通市海安市                 → 海安，县级
@@ -51,12 +47,20 @@ Sydney, Nova Scotia, Canada       → Sydney，America/Glace_Bay
 
 上级行政区参与消歧；`通州区`、`朝阳区`、`和平区` 等缺少必要上级信息时不返回坐标，调用方应补充省、市或国家/州。`London`、`Sydney` 等少数原有常用别名保留既有默认含义，明确的国家/州信息优先。`上海安亭` 不会因跨越“上海”边界抽出“海安”。省级降级仍会通过现有 `resolution_advisory` 告知调用方。
 
+国家、州和省份的限定词按地址中的位置解释。用 `IN`、`CA` 等短码时请大写。同一个 `CA` 可能指加拿大或加利福尼亚州，可再补完整国名消歧。目录保留名称本身带有的逗号，另写的地址成分分别参与判定。例如「内蒙古自治区，呼和浩特市」中，行政名称内部的「蒙古」随实际父级归属。纯数字行政代码只为辖区相符的候选提供线索，例如 `08` 可协助区分安大略省的 London。门牌号或邮政数字不会排除其他辖区的候选。 [GeoNames 行政代码格式](https://download.geonames.org/export/dump/readme.txt)
+
+当逗号或换行分隔的每一项都能识别为完整地名或辖区，解析器要求同一候选能解释各个地点字段。重复的同一地点或其真实祖级可以保留，两个无隶属关系的城市会返回未定位，例如 `Paris, Lyon, France`。已识别的邮政地址沿用邮政字段的含义。 [独立对照](precision-acceptance.md#place-field-ownership-round209)
+
+对部分以逗号或换行分隔的英国格式地址，解析器在道路字段之后查找目录地名。支持的道路结尾包括 UPU 印例中的 `Square` 和 `Walk`。完整邮编字段可按 UPU 固定邮区表提供英国、马恩岛、泽西或根西的辖区线索，显式辖区与邮区冲突时返回未定位。邮区未识别时保留已有的显式限定词。可解析的结果仍取目录代表点，例如含 `Manchester` 邮镇的地址可返回 Manchester 代表点。 [UPU 英国地址指南](https://www.upu.int/UPU/media/upu/PostalEntitiesFiles/addressingUnit/gbrEn.pdf) · [固定对照](precision-acceptance.md#method-and-address-scope-round205)
+
+对没有道路字段的英国信箱地址，单独的 `PO Box`、紧邻邮编的已收录邮镇和一个可识别的完整邮编可以共同区分同名地点。例如 `PO Box 16875, Birmingham, B16 6TN` 可定位到英国 Birmingham 的目录代表点。州或国家与邮区冲突时返回未定位。 [Royal Mail PAF 指南](https://www.poweredbypaf.com/wp-content/uploads/2017/07/Latest-Programmers_guide_Edition-7-Version-6.pdf) · [无道路信箱固定对照](precision-acceptance.md#place-roadless-postal-round210)
+
 少量海外记录在同一国家、同一一级行政区内仍同名（如巴基斯坦 Punjab 的两个 Sahiwal）。无法由这些限定词区分时继续保留歧义，应提供实际经纬度；不会按人口或数组顺序替用户选点。
 
 三端接口参数保持不变。示例：
 
 ```bash
-uv run --locked --extra dev fatebridge astro_chart \
+uv run --locked --extra dev fatebridge astrology_chart \
   --birth-year 2000 --birth-month 7 --birth-day 1 \
   --birth-hour 12 --birth-minute 10 --birth-place 'Paris, France'
 ```
@@ -88,7 +92,11 @@ uv run --locked --extra dev python -m scripts.catalogs.build_place_catalog \
 uv run --locked --extra dev python -m scripts.catalogs.build_place_catalog --check
 ```
 
+`Ulaanbaatar` 和蒙古语西里尔原名 `Улаанбаатар` 均定位到 GeoNames 首都居民点 `2028462`。联合国地名专家组核对名称，GeoNames 居民点提供坐标和时区。 [UNGEGN 城市档案](https://ungegn.un.org/dashboard/cities/details?id=178) · [GeoNames 居民点](https://www.geonames.org/2028462)
+
 导入不会联网。`--check` 检查已发布 JSON 的摘要、坐标范围、原始坐标逆变换、时区、父子层级/循环、数量和覆盖清单；它不会重新下载上游。来源版本、取得日期和验收数量随区划变更一起审核更新。所有中国代表点还经过完整行政路径逐条解析测试；跨三端测试同时覆盖中国区县、欧洲和大洋洲，只证明软件调用一致性，不证明测绘精度或命理预测有效性。
+
+`St Helier` 和 `St Peter Port` 分别作为泽西、根西居民点的目录别名，沿用对应记录的代表点和时区。 [GeoNames 3042091](https://www.geonames.org/3042091) · [GeoNames 3042287](https://www.geonames.org/3042287) · [地址与别名对照](precision-acceptance.md#conditional-method-address-round209)
 
 ## English precision note
 

@@ -9,15 +9,17 @@ import pytest
 from fatebridge.core.local_techniques.qimen import _qimen_stem_context_lines
 from fatebridge.core.metaphysics import qimen as engine
 from fatebridge.core.metaphysics.common import sexagenary_text
-from fatebridge.core.qimen_stem_context import build_stem_context
-from fatebridge.validation.qimen import audit_day_stem_collation
-from tests.qimen.test_qimen_depth import fixed_board
+from fatebridge.core.qimen.qimen_stem_context import build_stem_context
+from tests.unit_test.fixtures.qimen import fixed_board
+from validation.qimen import audit_day_stem_collation
 
 BUNDLE = Path(__file__).parents[1] / "fixtures/qimen_classical_v6"
 DAY_RULES = {"hidden_day_stem", "flying_day_stem"}
 
 
-def test_literal_ji_day_block_matches_the_printed_fourth_palace(monkeypatch):
+def test_literal_ji_day_block_matches_the_printed_fourth_palace(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     board = fixed_board(
         monkeypatch, {"dun": "阴遁", "ju": 5, "hour": "丙寅"}, day="己巳"
     )
@@ -32,7 +34,9 @@ def test_literal_ji_day_block_matches_the_printed_fourth_palace(monkeypatch):
     assert not any(p["name"] in {"日格", "日干格"} for p in board["patterns"])
 
 
-def test_actual_ji_day_flying_stem_uses_ji_instead_of_hour_head_wu(monkeypatch):
+def test_actual_ji_day_flying_stem_uses_ji_instead_of_hour_head_wu(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     board = fixed_board(
         monkeypatch, {"dun": "阳遁", "ju": 5, "hour": "壬申"}, day="己丑"
     )
@@ -51,8 +55,8 @@ def test_actual_ji_day_flying_stem_uses_ji_instead_of_hour_head_wu(monkeypatch):
 
 
 def test_unresolved_day_jia_keeps_both_candidates_without_selecting_the_match(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     board = fixed_board(
         monkeypatch, {"dun": "阳遁", "ju": 5, "hour": "壬申"}, day="甲申"
     )
@@ -78,7 +82,9 @@ def test_unresolved_day_jia_keeps_both_candidates_without_selecting_the_match(
     assert diff["supporting_source"]["source_value"] == "坤"
 
 
-def test_equal_jia_candidates_do_not_certify_their_policy(monkeypatch):
+def test_equal_jia_candidates_do_not_certify_their_policy(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     board = fixed_board(
         monkeypatch, {"dun": "阳遁", "ju": 5, "hour": "壬申"}, day="甲子"
     )
@@ -95,7 +101,9 @@ def test_equal_jia_candidates_do_not_certify_their_policy(monkeypatch):
     assert not any(p["rule_id"] in DAY_RULES for p in board["patterns"])
 
 
-def test_hour_block_alias_does_not_set_whole_board_fuyin(monkeypatch):
+def test_hour_block_alias_does_not_set_whole_board_fuyin(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     board = fixed_board(
         monkeypatch, {"dun": "阳遁", "ju": 1, "hour": "乙酉"}, day="庚午"
     )
@@ -109,7 +117,7 @@ def test_hour_block_alias_does_not_set_whole_board_fuyin(monkeypatch):
 @pytest.mark.parametrize(
     "dun,number", [(d, n) for d in ["阳遁", "阴遁"] for n in range(1, 10)]
 )
-def test_source_claim_geng_leader_has_hour_block_in_all_ten_hours(dun, number):
+def test_source_claim_geng_leader_has_hour_block_in_all_ten_hours(dun, number) -> None:
     text = f'{dun}{"一二三四五六七八九"[number-1]}局上元'
     for index in range(20, 30):
         hour = sexagenary_text(index)
@@ -129,7 +137,9 @@ def test_source_claim_geng_leader_has_hour_block_in_all_ten_hours(dun, number):
         assert context["hour"]["effective_stem"] in at["earth_stems"]
 
 
-def test_source_collation_never_erases_preferred_conflict_or_supporting_variant():
+def test_source_collation_never_erases_preferred_conflict_or_supporting_variant() -> (
+    None
+):
     report = audit_day_stem_collation(BUNDLE)
     assert report["case_count"] == 6
     assert report["matched_observation_count"] == 3
@@ -156,7 +166,9 @@ def test_source_collation_never_erases_preferred_conflict_or_supporting_variant(
 
 
 @pytest.mark.parametrize("change", ["source", "case", "reference", "definition"])
-def test_audit_refuses_reference_deletions_or_changed_image(tmp_path, change):
+def test_audit_refuses_reference_deletions_or_changed_image(
+    tmp_path: Path, change: str
+) -> None:
     shutil.copytree(BUNDLE, tmp_path / "qimen_classical_v6")
     shutil.copytree(
         BUNDLE.parent / "qimen_classical_v5", tmp_path / "qimen_classical_v5"

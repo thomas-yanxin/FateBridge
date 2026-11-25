@@ -1,9 +1,11 @@
 """Independent printed historical dates, source retention and public adapters."""
 
 import asyncio
+import hashlib
 import json
 import shutil
 from datetime import date
+from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
@@ -12,18 +14,20 @@ from fastmcp import Client
 import fatebridge.api as api
 from fatebridge.application.projection import project_fields
 from fatebridge.cli import run
+from fatebridge.core.contracts.output_chinese import Taiyi
 from fatebridge.core.metaphysics.taiyi_historical import (
     historical_date_records,
     julian_to_proleptic_gregorian,
+    source_date_reference,
 )
-from fatebridge.core.output_chinese import Taiyi
 from fatebridge.mcp_server import create_mcp_app
 from scripts.taiyi.audit_taiyi_historical_dates import CORPUS, audit, public_case
+from tests.support.transports import SPECS, call_calculation
 
 CASES = [r for r in historical_date_records()["records"] if "mode" in r]
 
 
-def test_historical_replay_preserves_every_prior_conflict_and_unknown():
+def test_historical_replay_preserves_every_prior_conflict_and_unknown() -> None:
     report = audit()
     assert len(report["calendar_observations"]) == 4
     assert report["selected_calendar_observations_passed"] is True
@@ -67,7 +71,9 @@ def test_historical_replay_preserves_every_prior_conflict_and_unknown():
         ((1700, 2, 29), date(1700, 3, 11)),
     ],
 )
-def test_explicit_julian_math_does_not_infer_country_cutover(original, expected):
+def test_explicit_julian_math_does_not_infer_country_cutover(
+    original, expected
+) -> None:
     assert julian_to_proleptic_gregorian(*original) == expected
 
 
@@ -83,7 +89,7 @@ def test_explicit_julian_math_does_not_infer_country_cutover(original, expected)
         (9999, 12, 31),
     ],
 )
-def test_invalid_dates_and_overflow_are_rejected_without_normalization(invalid):
+def test_invalid_dates_and_overflow_are_rejected_without_normalization(invalid) -> None:
     with pytest.raises(ValueError):
         julian_to_proleptic_gregorian(*invalid)
 
@@ -91,7 +97,7 @@ def test_invalid_dates_and_overflow_are_rejected_without_normalization(invalid):
 @pytest.mark.parametrize("row", CASES, ids=lambda r: r["mode"])
 def test_historical_source_reference_is_typed_projectable_and_exported_from_same_board(
     row,
-):
+) -> None:
     result = public_case(row)
     b = result["taiyi"]
     ref = b["calendar_rules"]["historical_date_reference"]
@@ -111,7 +117,9 @@ def test_historical_source_reference_is_typed_projectable_and_exported_from_same
         Taiyi.model_validate(p["taiyi"])
 
 
-def test_wrong_calendar_label_can_falsely_pass_taiyi_and_gate_but_not_full_chain():
+def test_wrong_calendar_label_can_falsely_pass_taiyi_and_gate_but_not_full_chain() -> (
+    None
+):
     hour = next(r for r in CASES if r["mode"] == "hour")
     correct = public_case(hour)["taiyi"]
     wrong = public_case(hour, selected_date=hour["julian_date"])["taiyi"]
@@ -142,15 +150,16 @@ def test_wrong_calendar_label_can_falsely_pass_taiyi_and_gate_but_not_full_chain
     assert "historical_date_reference" not in wrong["calendar_rules"]
 
 
-def test_different_hour_on_source_date_is_not_certified_as_the_example():
-    from fatebridge.core.metaphysics.taiyi_historical import source_date_reference
+def test_different_hour_on_source_date_is_not_certified_as_the_example() -> None:
 
     ref = source_date_reference(date(1562, 2, 5), "hour", 886, "丁丑", "酉")
     assert ref and ref["day_ganzhi_matches"] is True
     assert ref["counter_matches"] is False and ref["hour_branch_matches"] is False
 
 
-def test_audit_rejects_deleted_calendar_observation_even_after_rehash(tmp_path):
+def test_audit_rejects_deleted_calendar_observation_even_after_rehash(
+    tmp_path: Path,
+) -> None:
     # Include the mandatory V6/V7 source siblings so a failure is specific to V8.
     fixtures = tmp_path / "fixtures"
     for name in ("taiyi_jinjing_v6", "taiyi_jinjing_v7", "taiyi_jinjing_v5"):
@@ -159,13 +168,14 @@ def test_audit_rejects_deleted_calendar_observation_even_after_rehash(tmp_path):
     for origin in CORPUS.parent.glob("taiyi_jinjing_v*"):
         if not (fixtures / origin.name).exists():
             shutil.copytree(origin, fixtures / origin.name)
+        else:
+            pass
     copy = fixtures / CORPUS.name
     manifest = json.loads((copy / "manifest.json").read_text())
     source = tmp_path / "source.json"
     content = historical_date_records().copy()
     content["records"] = content["records"][:-1]
     source.write_text(json.dumps(content))
-    import hashlib
 
     manifest["source_reference"] = {
         "file": str(source),
@@ -179,12 +189,14 @@ def test_audit_rejects_deleted_calendar_observation_even_after_rehash(tmp_path):
 @pytest.mark.parametrize("row", CASES, ids=lambda r: r["mode"])
 @pytest.mark.parametrize("key", ["taiyi", "sanshiunited"])
 def test_historical_date_evidence_across_actual_rest_native_mcp_and_cli(
-    monkeypatch, capsys, key, row
-):
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], key: str, row
+) -> None:
     d = date.fromisoformat(row["gregorian_date"])
     options = {"calculation_mode": row["mode"]}
     if row["mode"] == "hour":
         options["hour_profile"] = "key_hour_winter_jiazi_v1"
+    else:
+        pass
     payload = (
         {
             "analysis_year": d.year,
@@ -222,7 +234,7 @@ def test_historical_date_evidence_across_actual_rest_native_mcp_and_cli(
         "API_KEY_AUTHENTICATOR",
         api.ApiKeyAuthenticator(header_name="X-API-Key", api_keys={}),
     )
-    route = "/api/cn/taiyi" if key == "taiyi" else "/api/divination/sanshiunited"
+    route = "/api/taiyi" if key == "taiyi" else "/api/divination/sanshi"
     response = TestClient(api.app).post(
         route,
         json=payload,
@@ -237,8 +249,11 @@ def test_historical_date_evidence_across_actual_rest_native_mcp_and_cli(
 
     async def protocol():
         async with Client(create_mcp_app()) as client:
-            result = await client.call_tool(
-                key, {**payload, **transport_options}, raise_on_error=False
+            result = await call_calculation(
+                client,
+                SPECS[key].tool_name,
+                {**payload, **transport_options},
+                raise_on_error=False,
             )
             assert not result.is_error, result
             return result.structured_content

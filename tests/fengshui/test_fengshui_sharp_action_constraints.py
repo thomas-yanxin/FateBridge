@@ -47,7 +47,7 @@ def review(inputs):
 
 
 @pytest.mark.parametrize("relocate,add", list(product([None, False, True], repeat=2)))
-def test_each_corner_action_obeys_its_own_target_permission(relocate, add):
+def test_each_corner_action_obeys_its_own_target_permission(relocate, add) -> None:
     result, _, check = review(request(relocate=relocate, add=add))
     actions = {a["action"]: a for a in check["action_options"]}
     assert set(actions) == {"relocate_target_seat", "add_leafy_screen"}
@@ -81,6 +81,8 @@ def test_each_corner_action_obeys_its_own_target_permission(relocate, add):
             assert bool(permission_pending) is (value is None)
             if permission_pending:
                 assert permission_pending[0]["path"].endswith(permission_field)
+            else:
+                pass
             assert all(
                 p["object_id"] == "desk"
                 and p["action_id"] == action["action_id"]
@@ -106,7 +108,9 @@ def test_each_corner_action_obeys_its_own_target_permission(relocate, add):
     assert result["coverage"]["analysis_progress"]["assessment_complete"] is True
 
 
-def test_all_known_target_actions_blocked_do_not_ask_for_unknown_source_permission():
+def test_all_known_target_actions_blocked_do_not_ask_for_unknown_source_permission() -> (
+    None
+):
     result, _, check = review(request(relocate=False, add=False))
     assert check["action_status"] == "blocked"
     assert check["pending_confirmations"] == []
@@ -119,8 +123,8 @@ def test_all_known_target_actions_blocked_do_not_ask_for_unknown_source_permissi
 
 @pytest.mark.parametrize("relocate,add", [(None, None), (True, False), (False, False)])
 def test_photo_uncertainty_remains_even_when_actions_have_explicit_permissions(
-    relocate, add
-):
+    relocate: bool | None, add: bool | None
+) -> None:
     result, form, check = review(
         request(relocate=relocate, add=add, basis="image_observed")
     )
@@ -142,7 +146,7 @@ def test_photo_uncertainty_remains_even_when_actions_have_explicit_permissions(
         assert check["action_status"] == "candidate_only"
 
 
-def test_no_constraint_is_unknown_and_never_makes_either_action_ready():
+def test_no_constraint_is_unknown_and_never_makes_either_action_ready() -> None:
     inputs = request()
     inputs.pop("layout_constraints")
     _, _, check = review(inputs)
@@ -154,7 +158,9 @@ def test_no_constraint_is_unknown_and_never_makes_either_action_ready():
 
 
 @pytest.mark.parametrize("observed", [False, None])
-def test_false_and_unknown_observations_do_not_invent_corner_actions(observed):
+def test_false_and_unknown_observations_do_not_invent_corner_actions(
+    observed: bool | None,
+) -> None:
     result = assess(**request(relocate=False, add=False, observed=observed))
     checks = result["layout_analysis"]["form_analysis"]["findings"][0]["checks"]
     corners = [c for c in checks if c["criterion"] == "sharp_corner_points_at_user"]
@@ -172,7 +178,9 @@ def test_false_and_unknown_observations_do_not_invent_corner_actions(observed):
 
 
 @pytest.mark.parametrize("purpose", ["bed", "stove"])
-def test_legacy_corner_rule_does_not_expand_beyond_the_sourced_desk_scope(purpose):
+def test_legacy_corner_rule_does_not_expand_beyond_the_sourced_desk_scope(
+    purpose: str,
+) -> None:
     inputs = request()
     inputs["form_observations"][0]["purpose"] = purpose
     result = assess(**inputs)
@@ -180,7 +188,7 @@ def test_legacy_corner_rule_does_not_expand_beyond_the_sourced_desk_scope(purpos
     assert all(c["criterion"] != "sharp_corner_points_at_user" for c in checks)
 
 
-def test_other_form_criteria_keep_their_existing_permission_behavior():
+def test_other_form_criteria_keep_their_existing_permission_behavior() -> None:
     inputs = request(relocate=False, add=False, observed=False)
     inputs["form_observations"][0]["entrance_direct_line"] = True
     result = assess(**inputs)

@@ -2,10 +2,9 @@
 
 from __future__ import annotations
 
-from typing import List
-
 from fatebridge.application.bindings import lazy_service, raw_invoke
-from fatebridge.application.tool_spec import ToolSpec
+from fatebridge.application.domain_validators import validate_knowledge_bindings
+from fatebridge.application.tool_spec import ServiceResult, ToolSpec
 from fatebridge.core.requests.reference import (
     ExportParseRequest,
     ExportRegistryRequest,
@@ -32,7 +31,18 @@ calculate_knowledge_registry = lazy_service(
     "fatebridge.services.knowledge", "calculate_knowledge_registry"
 )
 
-SPECS: List[ToolSpec] = [
+
+def _compact_export_registry(result: ServiceResult) -> ServiceResult:
+    return {
+        **result,
+        "techniques": [
+            {"key": technique["key"], "label": technique["label"]}
+            for technique in result["techniques"]
+        ],
+    }
+
+
+SPECS: list[ToolSpec] = [
     ToolSpec(
         key="export_registry",
         bind=raw_invoke(calculate_export_registry),
@@ -40,8 +50,9 @@ SPECS: List[ToolSpec] = [
         summary="返回 FateBridge 导出协议注册表。",
         operation_label_zh="导出注册表",
         family="export",
-        rest_path="/api/export/registry",
-        mcp_name="export_registry",
+        rest_path="/api/export/formats",
+        mcp_name="export_formats",
+        compact_view=_compact_export_registry,
     ),
     ToolSpec(
         key="export_parse",
@@ -60,8 +71,10 @@ SPECS: List[ToolSpec] = [
         summary="列出内置知识域与分类。",
         operation_label_zh="知识目录",
         family="knowledge",
-        rest_path="/api/knowledge/registry",
-        mcp_name="knowledge_registry",
+        rest_path="/api/knowledge/catalog",
+        mcp_name="knowledge_catalog",
+        optional_snapshot=True,
+        output_validators=(validate_knowledge_bindings,),
     ),
     ToolSpec(
         key="knowledge_read",
@@ -72,5 +85,7 @@ SPECS: List[ToolSpec] = [
         family="knowledge",
         rest_path="/api/knowledge/read",
         mcp_name="knowledge_read",
+        optional_snapshot=True,
+        output_validators=(validate_knowledge_bindings,),
     ),
 ]

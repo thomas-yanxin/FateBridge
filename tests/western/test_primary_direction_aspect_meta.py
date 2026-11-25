@@ -23,10 +23,10 @@ from fatebridge.core.predictive.primary_directions import primary_direction_aspe
         (180, ("opposition", "冲")),
     ],
 )
-def test_known_aspect_degrees_map_to_their_meta(degree, expected):
+def test_known_aspect_degrees_map_to_their_meta(degree: int, expected) -> None:
     assert primary_direction_aspect_meta(degree) == expected
 
 
-def test_unknown_aspect_degree_falls_back_to_generic_label():
+def test_unknown_aspect_degree_falls_back_to_generic_label() -> None:
     assert primary_direction_aspect_meta(45) == ("45deg", "45°")
     assert primary_direction_aspect_meta(150) == ("150deg", "150°")

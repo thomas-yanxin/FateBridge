@@ -1,23 +1,6 @@
-"""Acquire and verify pinned Swiss Ephemeris ``.se1`` data files.
+"""Acquire and verify pinned Swiss Ephemeris files for a local installation.
 
-FateBridge ships this fetcher under Apache-2.0, but never the data files: the
-``.se1`` ephemeris files are Astrodienst's, dual-licensed AGPL-3.0 / commercial.
-Running this script acquires data separately; its licence is independent of
-FateBridge's source licence. See LICENSE and NOTICE.
-
-Usage::
-
-    python -m fatebridge.fetch_ephe                 # into <repo>/ephe
-    python -m fatebridge.fetch_ephe --dest /tmp/se  # custom directory
-    python -m fatebridge.fetch_ephe --force         # re-download existing files
-    python -m fatebridge.fetch_ephe --years 1500 9999  # planet/Moon segments
-    python -m fatebridge.fetch_ephe --profile fengshui_calendar
-    python -m fatebridge.fetch_ephe --profile human_design
-
-Verified repository-local files are discovered in ``ephe/`` on a fresh run.
-Custom directories require ``SE_EPHE_PATH``. Computations still report their
-actual model; file identity alone is not an astronomical accuracy guarantee.
-Both domain profiles support a verified per-user cache for wheel installs.
+The data files are separately licensed by Astrodienst under AGPL-3.0 or commercial terms. See LICENSE and NOTICE.
 """
 
 from __future__ import annotations
@@ -29,8 +12,9 @@ import os
 import sys
 import tempfile
 import urllib.request
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Sequence
+from typing import Any
 
 from fatebridge.core.astro.ephemeris_files import ephemeris_files_for_years
 from fatebridge.core.astro.ephemeris_integrity import (
@@ -44,38 +28,46 @@ from fatebridge.core.ephemeris_installation import (
     HUMAN_DESIGN_FILES,
     HUMAN_DESIGN_PROFILE,
     ephemeris_path_fits,
+    has_project_ephemeris_files,
     user_ephemeris_dir,
     verified_user_ephemeris_dir,
 )
-from fatebridge.core.ephemeris_paths import ephemeris_search_directories
+from fatebridge.core.ephemeris_paths import (
+    ephemeris_search_directories,
+    ephemeris_search_path_fits,
+)
 
-# Alois Treindl's official mirror serves the raw .se1 files reliably; the
-# astro.com HTTP front returns an HTML page for these same paths.
+# note (mirror): This URL serves raw files where the astro.com front serves HTML.
 BASE_URL = load_ephemeris_manifest()["base_url"]
 
-# 1800-2400 AD planet, moon, and main-asteroid segments — ~1.9 MB total, enough
-# for any modern birth chart. Other eras need their own additional segments.
+# note (coverage): These planet, Moon and asteroid segments cover CE 1800–2399.
 DEFAULT_FILES = ("sepl_18.se1", "semo_18.se1", "seas_18.se1")
 
 _TIMEOUT_SECONDS = 60
 logger = logging.getLogger(__name__)
 
 
-def _preserve_previous(target: Path, data: bytes) -> Path:
-    digest = hashlib.sha256(data).hexdigest()
+def _preserve_previous(target: Path, previous_bytes: bytes) -> Path:
+    digest = hashlib.sha256(previous_bytes).hexdigest()
     backup = target.parent / ".fatebridge-ephemeris-backups" / digest / target.name
     if backup.exists():
-        if backup.read_bytes() != data:
+        if backup.read_bytes() != previous_bytes:
             raise ValueError(
                 f"{target.name}: existing backup differs; leaving target unchanged"
             )
+        else:
+            pass
         return backup
+    else:
+        pass
     backup.parent.mkdir(parents=True, exist_ok=True)
-    fd, name = tempfile.mkstemp(prefix=f".{backup.name}.", dir=backup.parent)
-    pending = Path(name)
+    descriptor, staging_name = tempfile.mkstemp(
+        prefix=f".{backup.name}.", dir=backup.parent
+    )
+    pending = Path(staging_name)
     try:
-        with os.fdopen(fd, "wb") as handle:
-            handle.write(data)
+        with os.fdopen(descriptor, "wb") as handle:
+            handle.write(previous_bytes)
             handle.flush()
             os.fsync(handle.fileno())
         pending.replace(backup)
@@ -85,40 +77,31 @@ def _preserve_previous(target: Path, data: bytes) -> Path:
 
 
 def default_dest() -> Path:
-    """Project-root ``ephe/`` directory (created on demand by the caller).
-
-    src layout: this module is ``<repo>/src/fatebridge/fetch_ephe.py``, so the
-    repo root is two parents up. Must match ``ephemeris_runtime`` so a fetched
-    ``ephe/`` is found by the reader.
-    """
+    """Return the checkout-local data directory discovered by the runtime."""
     return Path(__file__).resolve().parents[2] / "ephe"
 
 
 def _download(url: str, timeout: int = _TIMEOUT_SECONDS) -> bytes:
     with urllib.request.urlopen(url, timeout=timeout) as response:
-        data: bytes = response.read()
-    return data
+        response_bytes: bytes = response.read()
+    return response_bytes
 
 
 def fetch_one(
     name: str,
     dest: Path,
     *,
-    base_url: Optional[str] = None,
+    base_url: str | None = None,
     force: bool = False,
-    manifest: Optional[Dict[str, Any]] = None,
+    manifest: dict[str, Any] | None = None,
 ) -> Path:
-    """Download a single ``.se1`` file into ``dest``, validating its content.
-
-    Existing files must match the selected edition. Unverified files are
-    replaced only after a verified download and a recoverable local backup.
-    Bad downloads leave the destination unchanged. Concurrent differing edits
-    are detected before replacement.
-    """
+    """Install one verified file and retain a backup if replacing other bytes."""
     catalog = manifest if manifest is not None else load_ephemeris_manifest()
     validate_file_name(name)
     if name not in catalog["files"]:
         raise ValueError(f"{name}: no fingerprint in the selected manifest")
+    else:
+        pass
     target = dest / name
     previous = target.read_bytes() if target.exists() else None
     if previous is not None and not force:
@@ -127,30 +110,40 @@ def fetch_one(
             return target
         except ValueError:
             pass
+    else:
+        pass
     if target.is_symlink():
         raise ValueError(
             f"{name}: refusing to replace a symlink; choose a regular data directory"
         )
-    data = _download(f"{base_url or catalog['base_url']}/{name}")
-    verify_ephemeris_bytes(name, data, catalog)
+    else:
+        pass
+    downloaded_bytes = _download(f"{base_url or catalog['base_url']}/{name}")
+    verify_ephemeris_bytes(name, downloaded_bytes, catalog)
     dest.mkdir(parents=True, exist_ok=True)
-    fd, temporary = tempfile.mkstemp(prefix=f".{target.name}.", dir=dest)
-    pending = Path(temporary)
+    descriptor, staging_name = tempfile.mkstemp(prefix=f".{target.name}.", dir=dest)
+    pending = Path(staging_name)
     try:
-        with os.fdopen(fd, "wb") as handle:
-            handle.write(data)
+        with os.fdopen(descriptor, "wb") as handle:
+            handle.write(downloaded_bytes)
             handle.flush()
             os.fsync(handle.fileno())
         current = target.read_bytes() if target.exists() else None
         if current != previous:
-            if current == data:
+            if current == downloaded_bytes:
                 return target
+            else:
+                pass
             raise ValueError(
                 f"{name}: destination changed during download; left unchanged"
             )
-        if previous is not None and previous != data:
+        else:
+            pass
+        if previous is not None and previous != downloaded_bytes:
             backup = _preserve_previous(target, previous)
-            logger.warning("Preserved previous %s at %s", target, backup)
+            logger.warning(f"Preserved previous {target} at {backup}")
+        else:
+            pass
         pending.replace(target)
     finally:
         pending.unlink(missing_ok=True)
@@ -158,14 +151,14 @@ def fetch_one(
 
 
 def fetch_ephemeris(
-    dest: Optional[Path] = None,
+    dest: Path | None = None,
     files: Sequence[str] = DEFAULT_FILES,
     *,
-    base_url: Optional[str] = None,
+    base_url: str | None = None,
     force: bool = False,
-    manifest: Optional[Dict[str, Any]] = None,
-) -> List[Path]:
-    """Download ``files`` into ``dest`` (default: the project ``ephe/`` dir)."""
+    manifest: dict[str, Any] | None = None,
+) -> list[Path]:
+    """Install the selected files using one edition manifest."""
     destination = dest if dest is not None else default_dest()
     catalog = manifest if manifest is not None else load_ephemeris_manifest()
     return [
@@ -174,7 +167,7 @@ def fetch_ephemeris(
     ]
 
 
-def main(argv: Optional[Sequence[str]] = None) -> int:
+def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         description="Download Swiss Ephemeris .se1 data files for FateBridge."
     )
@@ -243,14 +236,18 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             start, end = args.year_range
             if not 1 <= start <= end <= 9999:
                 raise ValueError("Year range must satisfy 1 <= START <= END <= 9999")
+            else:
+                pass
             files = ephemeris_files_for_years(range(start, end + 1))
+        else:
+            pass
     except ValueError as error:
         parser.error(str(error))
 
     project_directory = default_dest()
     profile_destination = (
         project_directory
-        if project_directory.is_dir() and any(project_directory.glob("*.se1"))
+        if has_project_ephemeris_files(project_directory)
         else user_ephemeris_dir()
     )
     destination: Path = (
@@ -263,8 +260,11 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     try:
         if args.profile and not ephemeris_path_fits(destination):
             raise ValueError(
-                "Profile directory exceeds Swiss Ephemeris path limits; choose a shorter --dest"
+                "Profile directory is not a literal Swiss Ephemeris search directory; "
+                "choose a shorter --dest without search-path delimiters"
             )
+        else:
+            pass
         catalog = load_ephemeris_manifest(args.manifest)
         if args.verify_only:
             for name in files:
@@ -286,22 +286,34 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     for path in paths:
         size_kb = path.stat().st_size / 1024
         print(f"  checksum verified  {path.name}  ({size_kb:.0f} KB)")
-    cached = verified_user_ephemeris_dir()
     override = os.environ.get("SE_EPHE_PATH")
-    if override:
-        chosen = [item.resolve() for item in ephemeris_search_directories(override)]
-        if destination.resolve() in chosen:
-            print(
-                "Done. SE_EPHE_PATH already includes this directory; restart FateBridge to reload data."
-            )
-        else:
-            print(
-                "Done. SE_EPHE_PATH selects another directory. Set SE_EPHE_PATH to include this directory before starting FateBridge to use these files."
-            )
-    elif destination.resolve() == default_dest().resolve() or (
-        cached is not None
-        and destination.resolve() == Path(cached).resolve()
-        and not (project_directory.is_dir() and any(project_directory.glob("*.se1")))
+    resolved_destination = destination.resolve()
+    usable_override = override is None or ephemeris_search_path_fits(override)
+    chosen = (
+        [item.resolve() for item in ephemeris_search_directories(override)]
+        if usable_override
+        else []
+    )
+    if resolved_destination in chosen:
+        print(
+            "Done. SE_EPHE_PATH already includes this directory; restart FateBridge to reload data."
+        )
+    elif not ephemeris_path_fits(destination):
+        print(
+            "Done. To use these files, make them available through a shorter directory path without Swiss Ephemeris search-path delimiters."
+        )
+    elif not usable_override:
+        print(
+            "Done. The current SE_EPHE_PATH exceeds the Swiss Ephemeris path limit. Set SE_EPHE_PATH to this directory before starting FateBridge to use these files."
+        )
+    elif override:
+        print(
+            "Done. SE_EPHE_PATH selects another directory. Set SE_EPHE_PATH to include this directory before starting FateBridge to use these files."
+        )
+    elif resolved_destination == project_directory.resolve() or (
+        (cached := verified_user_ephemeris_dir()) is not None
+        and resolved_destination == Path(cached).resolve()
+        and not has_project_ephemeris_files(project_directory)
     ):
         print("Done. FateBridge auto-discovers this directory on the next run.")
     else:
@@ -311,3 +323,5 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

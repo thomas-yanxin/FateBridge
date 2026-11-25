@@ -6,11 +6,12 @@ import json
 from pathlib import Path
 
 import pytest
+from pytest import MonkeyPatch
 
-from fatebridge.core import canping_texts as texts
-from fatebridge.core.canping_texts import lookup_record
+from fatebridge.core.numerology import canping_texts as texts
+from fatebridge.core.numerology.canping_texts import lookup_record
 from fatebridge.utils.errors import NumerologySourceError
-from tests.numerology.test_canping_rereading_depth import jpeg_dimensions
+from tests.unit_test.fixtures.canping_source import jpeg_dimensions
 
 ROOT = Path(__file__).parents[1] / "fixtures/canping_wood_rereading_v1"
 REFERENCE = json.loads((ROOT / "reference.json").read_text())
@@ -18,7 +19,9 @@ CELLS = REFERENCE["cells"]
 
 
 @pytest.mark.parametrize("cell", CELLS)
-def test_all_four_wood_revisions_retain_the_prior_reading_and_specific_witness(cell):
+def test_all_four_wood_revisions_retain_the_prior_reading_and_specific_witness(
+    cell,
+) -> None:
     out = lookup_record("木", cell["number"], cell["kind"])
     s = out["selection"]
     r = s["reading_revision"]
@@ -39,7 +42,7 @@ def test_all_four_wood_revisions_retain_the_prior_reading_and_specific_witness(c
 
 
 @pytest.mark.parametrize("page", REFERENCE["pages"])
-def test_four_native_pages_keep_pixels_source_identity_and_explicit_reuse(page):
+def test_four_native_pages_keep_pixels_source_identity_and_explicit_reuse(page) -> None:
     m = json.loads((ROOT / REFERENCE["source_manifest_file"]).read_text())
     c = m["sequences"][0]["canvases"][page["pdf_page"] - 1]
     assert [c["width"], c["height"]] == page["canvas_dimensions"] == [5900, 4400]
@@ -60,7 +63,7 @@ def test_four_native_pages_keep_pixels_source_identity_and_explicit_reuse(page):
         assert r["reused_prior_region"] == (page["pdf_page"] in (84, 86))
 
 
-def test_only_three_confirmed_cells_are_added_and_all_old_witnesses_remain():
+def test_only_three_confirmed_cells_are_added_and_all_old_witnesses_remain() -> None:
     assert len(CELLS) == REFERENCE["reviewed_previous_uncertain_cells"] == 4
     assert (
         sum(c["state"] == "source_cell_visually_collated" for c in CELLS)
@@ -134,7 +137,7 @@ def test_only_three_confirmed_cells_are_added_and_all_old_witnesses_remain():
     assert not s["numbered_table_clear_readings_complete"]
 
 
-def test_reading_one_of_two_unknown_glyphs_does_not_confirm_the_whole_cell():
+def test_reading_one_of_two_unknown_glyphs_does_not_confirm_the_whole_cell() -> None:
     r = lookup_record("木", 2519, "luck")
     s = r["selection"]
     assert r["text"] == "遇水得逢橋，憂心傾□然。"
@@ -150,8 +153,8 @@ def test_reading_one_of_two_unknown_glyphs_does_not_confirm_the_whole_cell():
     "change", ["remove_wood_only", "duplicate_wood_id", "wood_revision_given_fire_id"]
 )
 def test_wood_rereading_cannot_be_lost_duplicated_or_attributed_to_fire(
-    monkeypatch, change
-):
+    monkeypatch: MonkeyPatch, change: str
+) -> None:
     original = texts._loaded
     loaded = copy.deepcopy(original(texts.COLLATION_PATH))
     d = loaded["data"]
@@ -189,7 +192,7 @@ def test_wood_rereading_cannot_be_lost_duplicated_or_attributed_to_fire(
     assert error.value.as_result()["retryable"] is False
 
 
-def test_wood_witness_and_previous_reading_are_separate_copies():
+def test_wood_witness_and_previous_reading_are_separate_copies() -> None:
     s = texts.collation_summary()
     next(
         w

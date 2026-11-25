@@ -30,7 +30,7 @@ def raw_response(body="Uranus"):
     return (E / f"horizons-attempt1/{body}.response.json").read_bytes()
 
 
-def test_complete_predeclared_physical_tt_and_observer_request():
+def test_complete_predeclared_physical_tt_and_observer_request() -> None:
     fixed = plan()
     assert fixed["comparison_tolerance_arcseconds"] == 2
     assert len(fixed["epochs"]) == 17
@@ -68,7 +68,7 @@ def test_complete_predeclared_physical_tt_and_observer_request():
         "truncated",
     ],
 )
-def test_invalid_source_or_epoch_never_becomes_a_passing_coordinate(fault):
+def test_invalid_source_or_epoch_never_becomes_a_passing_coordinate(fault: str) -> None:
     payload = json.loads(raw_response())
     text = payload["result"]
     if fault == "target":
@@ -112,7 +112,7 @@ def test_invalid_source_or_epoch_never_becomes_a_passing_coordinate(fault):
         parse_response(json.dumps(payload).encode(), "Uranus")
 
 
-def test_raw_order_is_matched_by_physical_epoch_not_position():
+def test_raw_order_is_matched_by_physical_epoch_not_position() -> None:
     payload = json.loads(raw_response())
     prefix, rest = payload["result"].split("$$SOE")
     table, suffix = rest.split("$$EOE")
@@ -129,7 +129,7 @@ def test_raw_order_is_matched_by_physical_epoch_not_position():
     )
 
 
-def test_current_three_way_diagnostics_preserve_absolute_failure(production):
+def test_current_three_way_diagnostics_preserve_absolute_failure(production) -> None:
     result = check.compare(production, check.references())
     assert result["position_count"] == 34
     assert result["status"] == "disagreements_remain"
@@ -180,8 +180,8 @@ def test_current_three_way_diagnostics_preserve_absolute_failure(production):
     "fault", ["delete", "duplicate", "epoch", "backend", "flags", "coordinates"]
 )
 def test_captured_producer_cannot_lose_a_case_or_change_its_coordinate_binding(
-    fault, production
-):
+    fault: str, production
+) -> None:
     value = deepcopy(production)
     if fault == "delete":
         value["rows"].pop()
@@ -201,7 +201,7 @@ def test_captured_producer_cannot_lose_a_case_or_change_its_coordinate_binding(
         check.compare(value, check.references())
 
 
-def test_original_full_calendar_oracles_thresholds_and_generator_stay_frozen():
+def test_original_full_calendar_oracles_thresholds_and_generator_stay_frozen() -> None:
     from scripts.human_design.check_human_design_calendar_span import reference
 
     fixed, original = reference(ROOT)

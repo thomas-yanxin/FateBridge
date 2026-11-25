@@ -1,9 +1,14 @@
-from __future__ import annotations
+"""Parse titled snapshot blocks and apply export section selections."""
 
-from typing import Any
+from collections.abc import Iterable, Mapping
+from typing import TypedDict
+
+from pydantic import JsonValue
 
 from fatebridge.core.export_contracts import (
     AI_EXPORT_SETTINGS_VERSION,
+    NormalizedSettings,
+    TechniqueInfo,
     get_technique_info,
     normalize_astro_meaning_setting,
     normalize_planet_info_setting,
@@ -12,38 +17,66 @@ from fatebridge.core.export_contracts import (
 )
 
 
+class ContentSection(TypedDict):
+    raw_title: str
+    title: str
+    content: str
+
+
+class SelectedSection(ContentSection):
+    index: int
+    included: bool
+
+
+class ParsedExport(TypedDict):
+    technique: TechniqueInfo
+    settings_used: NormalizedSettings
+    section_titles_detected: list[str]
+    selected_sections: list[str]
+    unknown_detected_sections: list[str]
+    missing_selected_sections: list[str]
+    sections: list[SelectedSection]
+    export_text: str
+
+
 def parse_section_title_line(line: str | None) -> str:
     text = f"{line or ''}".strip()
     if not text:
         return ""
+    else:
+        pass
     if text.startswith("[") and text.endswith("]") and len(text) > 2:
         return normalize_section_title(text[1:-1])
+    else:
+        pass
     if text.startswith("【") and text.endswith("】") and len(text) > 2:
         return normalize_section_title(text[1:-1])
+    else:
+        pass
     return ""
 
 
-def split_content_sections(content: str) -> list[dict[str, Any]]:
+def split_content_sections(content: str) -> list[ContentSection]:
     lines = f"{content or ''}".splitlines()
-    sections: list[dict[str, Any]] = []
+    sections: list[ContentSection] = []
     current_title = ""
-    current_raw_title = ""
     current_lines: list[str] = []
 
     def push_current() -> None:
-        nonlocal current_title, current_raw_title, current_lines
+        nonlocal current_title, current_lines
         if not current_title and not "".join(current_lines).strip():
             current_lines = []
             return
+        else:
+            pass
         sections.append(
             {
-                "raw_title": current_raw_title,
+                "raw_title": current_title,
                 "title": current_title,
                 "content": "\n".join(current_lines).strip(),
             }
         )
         current_title = ""
-        current_raw_title = ""
         current_lines = []
 
     for line in lines:
@@ -51,24 +84,26 @@ def split_content_sections(content: str) -> list[dict[str, Any]]:
         if raw_title:
             if current_lines:
                 push_current()
-            current_raw_title = raw_title
+            else:
+                pass
             current_title = raw_title
             current_lines = [line]
             continue
+        else:
+            pass
         current_lines.append(line)
 
     if current_lines:
         push_current()
+    else:
+        pass
     return sections
 
 
-def render_sections_to_text(sections: list[dict[str, Any]]) -> str:
-    blocks = [
-        section["content"]
-        for section in sections
-        if f"{section.get('content', '')}".strip()
-    ]
-    return "\n\n".join(blocks).strip()
+def render_sections_to_text(section_contents: Iterable[str]) -> str:
+    return "\n\n".join(
+        content for content in section_contents if content.strip()
+    ).strip()
 
 
 def parse_export_content(
@@ -76,12 +111,14 @@ def parse_export_content(
     technique: str,
     content: str,
     selected_sections: list[str] | None = None,
-    planet_info: dict[str, Any] | None = None,
-    astro_meaning: dict[str, Any] | None = None,
-) -> dict[str, Any]:
+    planet_info: Mapping[str, JsonValue] | None = None,
+    astro_meaning: Mapping[str, JsonValue] | None = None,
+) -> ParsedExport:
     technique_info = get_technique_info(technique)
     if technique_info is None:
         raise ValueError(f"Unknown AI export technique: {technique}")
+    else:
+        pass
 
     raw_text = f"{content or ''}".strip()
     sections = split_content_sections(raw_text)
@@ -90,11 +127,11 @@ def parse_export_content(
     )
 
     forbidden = {
-        normalize_section_title(item) for item in technique_info["forbidden_sections"]
+        normalize_section_title(title) for title in technique_info["forbidden_sections"]
     }
-    preset_sections = [
-        normalize_section_title(item) for item in technique_info["preset_sections"]
-    ]
+    preset_titles = {
+        normalize_section_title(title) for title in technique_info["preset_sections"]
+    }
     requested = (
         selected_sections[:]
         if selected_sections
@@ -110,59 +147,53 @@ def parse_export_content(
     )
     wanted = {normalize_section_title(item) for item in selected_normalized}
 
-    filtered_sections = []
+    filtered_sections: list[SelectedSection] = []
     for index, section in enumerate(sections, start=1):
         normalized_title = normalize_section_title(section["title"])
-        include_section = (
+        should_include_section = (
             not selected_sections
             if not normalized_title
             else normalized_title in wanted
         )
         if normalized_title and normalized_title in forbidden:
-            include_section = False
+            should_include_section = False
+        else:
+            pass
         filtered_sections.append(
             {
                 "index": index,
                 "raw_title": section["raw_title"],
                 "title": section["title"],
-                "included": include_section,
-                # 仅保留 ``content``（含 ``[标题]`` 头）：它是 render_sections_to_text
-                # 的唯一数据源，也承载 ``export_text`` 所需的小节标题。``body`` 曾在此
-                # 双存（== content 去掉首行标题），可派生且无消费者，移除以省 token。
+                "included": should_include_section,
                 "content": section["content"],
             }
         )
 
-    strict_filtered = render_sections_to_text(
-        [section for section in filtered_sections if section["included"]]
+    export_text = render_sections_to_text(
+        section["content"] for section in filtered_sections if section["included"]
     )
-    # Unselected custom content remains exportable. An explicit selection must
-    # never broaden the export when its exact title is absent.
-    safe_export_text = strict_filtered
-    if not selected_sections and not strict_filtered:
-        safe_export_text = render_sections_to_text(
-            [
-                {
-                    "content": section["content"],
-                }
-                for section in filtered_sections
-                if normalize_section_title(section["title"]) not in forbidden
-            ]
+    # note (selection): Only implicit selection may fall back to custom sections.
+    if not selected_sections and not export_text:
+        export_text = render_sections_to_text(
+            section["content"]
+            for section in filtered_sections
+            if normalize_section_title(section["title"]) not in forbidden
         )
+    else:
+        pass
 
+    normalized_detected = {normalize_section_title(title) for title in detected_titles}
     unknown_detected = [
         title
         for title in detected_titles
-        if normalize_section_title(title)
-        not in {normalize_section_title(item) for item in preset_sections}
+        if normalize_section_title(title) not in preset_titles
     ]
     missing_selected = [
         title
         for title in selected_normalized
-        if normalize_section_title(title)
-        not in {normalize_section_title(item) for item in detected_titles}
+        if normalize_section_title(title) not in normalized_detected
     ]
-    settings_used: dict[str, Any] = {
+    settings_used: NormalizedSettings = {
         "version": AI_EXPORT_SETTINGS_VERSION,
         "sections": {technique: selected_normalized},
         "planetInfo": {},
@@ -172,6 +203,8 @@ def parse_export_content(
         settings_used["planetInfo"][technique] = normalize_planet_info_setting(
             planet_info
         )
+    else:
+        pass
     if (
         technique_info["supports_astro_meaning"]
         or technique_info["supports_hover_meaning"]
@@ -179,6 +212,8 @@ def parse_export_content(
         settings_used["astroMeaning"][technique] = normalize_astro_meaning_setting(
             astro_meaning
         )
+    else:
+        pass
 
     return {
         "technique": technique_info,
@@ -188,10 +223,5 @@ def parse_export_content(
         "unknown_detected_sections": unknown_detected,
         "missing_selected_sections": missing_selected,
         "sections": filtered_sections,
-        # ``raw_text`` (恒等于顶层 ``snapshot_text``) 与 ``filtered_text``
-        # (== ``strict_filtered``) 曾在此回携，但二者皆为纯重复：前者与顶层文本逐字
-        # 相同，后者的语义已由 ``export_text`` 与各 section 的
-        # ``included`` 标记完整覆盖。移除以削减每次响应 token，``strict_filtered``
-        # 仍在内部参与 ``safe_export_text`` 的计算，行为不变。
-        "export_text": safe_export_text,
+        "export_text": export_text,
     }

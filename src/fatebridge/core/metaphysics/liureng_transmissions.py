@@ -11,8 +11,12 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional, Tuple
 
-from ...utils.data import EARTHLY_BRANCHES, HEAVENLY_STEMS
-from .common import ELEMENT_CONTROLS, branch_element_text, stem_element_text
+from fatebridge.core.metaphysics.common import (
+    ELEMENT_CONTROLS,
+    branch_element_text,
+    stem_element_text,
+)
+from fatebridge.utils.data import EARTHLY_BRANCHES, HEAVENLY_STEMS
 
 STEM_HOUSES = dict(zip(HEAVENLY_STEMS, "寅辰巳未巳未申戌亥丑"))
 PUNISHMENT = dict(zip("寅巳申丑戌未子卯辰午酉亥", "巳申寅戌未丑卯子辰午酉亥"))
@@ -125,8 +129,12 @@ def select_transmissions(
                     },
                 }
             )
+        else:
+            pass
         if len(candidates) == 1:
             return candidates[0], "贼克"
+        else:
+            pass
         preferred = [l for l in candidates if same_polarity(l)]
         if trace is not None:
             trace.append(
@@ -136,8 +144,12 @@ def select_transmissions(
                     "result": {"preferred_lessons": [l["index"] for l in preferred]},
                 }
             )
+        else:
+            pass
         if len(preferred) == 1:
             return preferred[0], "比用"
+        else:
+            pass
         candidates = preferred or candidates
 
         walks = [harm_walk(lesson, day_stem, sky) for lesson in candidates]
@@ -162,19 +174,27 @@ def select_transmissions(
                     "result": {str(l["index"]): value for l, value in depths},
                 }
             )
+        else:
+            pass
         deepest = max(value for _, value in depths)
         candidates = [l for l, value in depths if value == deepest]
         if len(candidates) == 1:
             return candidates[0], "涉害"
+        else:
+            pass
         # When depths tie, prefer a god resting on 孟, then 仲. Count the
         # earthly position, not the upper god's own branch.
         for group, detail in (("寅巳申亥", "见机"), ("子卯午酉", "察微")):
             match = [l for l in candidates if earth[l["upper_branch"]] in group]
             if len(match) == 1:
                 return match[0], detail
+            else:
+                pass
             if match:
                 candidates = match
                 break
+            else:
+                pass
         # More than one 孟 must not silently become the first 见机. In the
         # attested 戊辰/戊戌 examples the remaining tie is 复等 (缀瑕).
         order = lessons[:2] + lessons[2:] if yang else lessons[2:] + lessons[:2]
@@ -191,6 +211,8 @@ def select_transmissions(
                     },
                 }
             )
+        else:
+            pass
         return selected, "复等"
 
     thieves = _unique([l for l in lessons if l["upper_lower_relation"] == "下贼上"])
@@ -207,9 +229,13 @@ def select_transmissions(
         middle = PUNISHMENT[initial]
         if middle == initial:
             middle = zhi_upper if stem_start else gan_upper
+        else:
+            pass
         final = PUNISHMENT[middle]
         if final in (initial, middle):
             final = _shift(middle, 6)
+        else:
+            pass
         return (
             "伏吟",
             "自任" if yang else "自信",
@@ -217,6 +243,8 @@ def select_transmissions(
             [initial, middle, final],
             lessons[0 if stem_start else 2]["index"],
         )
+    else:
+        pass
 
     if candidates:
         selected_lesson, detail = choose(candidates)
@@ -230,6 +258,8 @@ def select_transmissions(
             style, detail = "比用", "知一"
         if is_fanyin:
             return "返吟", detail, "返吟贼克", follow(initial), selected_lesson["index"]
+        else:
+            pass
         return (
             style,
             detail,
@@ -237,6 +267,8 @@ def select_transmissions(
             follow(initial),
             selected_lesson["index"],
         )
+    else:
+        pass
 
     if is_fanyin:
         horse = next(
@@ -245,6 +277,8 @@ def select_transmissions(
             if _shift(day_branch, offset) in "寅巳申亥"
         )
         return "返吟", "无依", "返吟无依", [horse, zhi_upper, gan_upper], None
+    else:
+        pass
 
     is_bazhuan = day_stem + day_branch in {"甲寅", "庚申", "丁未", "己未"}
     if not is_bazhuan:
@@ -261,6 +295,8 @@ def select_transmissions(
                 if _controls(stem_element, branch_element_text(l["upper_branch"]))
             ]
             detail = "弹射"
+        else:
+            pass
         if remote:
             selected_lesson, _ = choose(remote)
             initial = selected_lesson["upper_branch"]
@@ -271,11 +307,17 @@ def select_transmissions(
                 follow(initial),
                 selected_lesson["index"],
             )
+        else:
+            pass
+    else:
+        pass
 
     count = len({l["upper_branch"] for l in lessons})
     if count == 4:
         if yang:
             return "昴星", "虎视", "昴星虎视", [sky["酉"], zhi_upper, gan_upper], None
+        else:
+            pass
         return (
             "昴星",
             "冬蛇掩目",
@@ -283,6 +325,8 @@ def select_transmissions(
             [earth["酉"], gan_upper, zhi_upper],
             None,
         )
+    else:
+        pass
     if count == 3:
         initial = (
             sky[STEM_HOUSES[HEAVENLY_STEMS[(HEAVENLY_STEMS.index(day_stem) + 5) % 10]]]
@@ -290,7 +334,11 @@ def select_transmissions(
             else _shift(day_branch, 4)
         )
         return "别责", "别责", "别责", [initial, gan_upper, gan_upper], None
+    else:
+        pass
     if is_bazhuan:
         initial = _shift(gan_upper, 2) if yang else _shift(zhi_yin, -2)
         return "八专", "八专", "八专", [initial, gan_upper, gan_upper], None
+    else:
+        pass
     raise ValueError("四课不满足九宗门取传条件")

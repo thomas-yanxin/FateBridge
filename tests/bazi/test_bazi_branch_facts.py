@@ -8,11 +8,11 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.bazi_branch_facts import (
+from fatebridge.core.bazi.bazi_branch_facts import (
     check_clash_patterns,
     check_harmony_patterns,
 )
-from fatebridge.core.rules import BaZiRules
+from fatebridge.core.bazi.bazi_evidence import cross_chart_relations
 
 DATA = Path(__file__).resolve().parents[1] / "data/bazi_branch_facts_v1"
 ORDER = ("year", "month", "day", "hour")
@@ -30,7 +30,7 @@ def reference():
 
 def test_all20736_assignments_match_original_literal_bureaus_and_relation_tables(
     reference,
-):
+) -> None:
     external, convention = reference
     assert len(external["cases"]) == 12**4
     for case in external["cases"]:
@@ -97,33 +97,36 @@ def test_all20736_assignments_match_original_literal_bureaus_and_relation_tables
 
 def test_all144_ordered_cross_pairs_keep_exact_nominal_terms_and_peak_eligibility(
     reference,
-):
+) -> None:
     external, convention = reference
     half_pairs = {frozenset(pair) for pair in convention["selected_half_pairs"]}
     six_pairs = {frozenset(pair) for pair in external["six_harmony"]}
     for a, b in itertools.product(external["branches"], repeat=2):
         first = {p: ("甲", a) for p in ORDER}
         second = {p: ("庚", b) for p in ORDER}
-        result = BaZiRules.calculate_compatibility_score(first, second)
+        result = cross_chart_relations(first, second)
         pair = frozenset((a, b))
         harmonious = pair in six_pairs
         half = pair in half_pairs
         opposed = external["branch_attributes"][a]["冲"] == b
         harmed = external["branch_attributes"][a]["害"] == b
-        # Existing nominal weights:16 physical cross pairs, then the day-pair term.
-        assert (
-            result["harmony_score"] == 16 * (2 * harmonious + 3 * half) + 5 * harmonious
-        )
-        assert result["clash_score"] == 16 * (2 * opposed + harmed) + 5 * opposed
-        assert (
-            result["overall_score"] == result["harmony_score"] - result["clash_score"]
-        )
-        assert sum("半合" in text for text in result["details"]) == 16 * half
+        for kind, present in (
+            ("六合", harmonious),
+            ("六冲", opposed),
+            ("六害", harmed),
+        ):
+            assert sum(row["kind"] == kind for row in result["pairs"]) == 16 * present
+        assert any(row["kind"] == "半合" for row in result["groups"]) is half
+        target = external["branch_attributes"][a]["刑"]
+        assert sum(
+            row["source"].startswith("person1.")
+            for row in result["directional_punishments"]
+        ) == 16 * (target == b and a != b)
 
 
 def test_all3796_representable_union_sets_apply_the_same_convention_to_merged_events(
     reference,
-):
+) -> None:
     external, convention = reference
     count = 0
     for size in range(1, 9):
@@ -133,7 +136,7 @@ def test_all3796_representable_union_sets_apply_the_same_convention_to_merged_ev
             assigned = list(members) + [members[-1]] * (8 - size)
             first = dict(zip(ORDER, zip("甲乙丙丁", assigned[:4])))
             second = dict(zip(ORDER, zip("戊己庚辛", assigned[4:])))
-            result = BaZiRules.analyze_combined_chart_events(first, second)
+            result = cross_chart_relations(first, second)
             full = {
                 group for group in external["triple_groups"] if set(group) <= present
             }
@@ -143,19 +146,19 @@ def test_all3796_representable_union_sets_apply_the_same_convention_to_merged_ev
                 if set(pair) <= present and group not in full
             }
             assert {
-                "".join(r["branches"])
-                for r in result["events"]
-                if r["type"] == "three_harmony"
+                "".join(r["branches"]) for r in result["groups"] if r["kind"] == "三合"
             } == full
             assert {
                 frozenset(r["branches"])
-                for r in result["events"]
-                if r["type"] == "half_harmony"
+                for r in result["groups"]
+                if r["kind"] == "半合"
             } == halves
     assert count == 3796
 
 
-def test_external_virtual_member_variant_and_all12_half_table_are_retained(reference):
+def test_external_virtual_member_variant_and_all12_half_table_are_retained(
+    reference,
+) -> None:
     external, convention = reference
     assert len(external["half_pairs_all_twelve"]) == 12
     assert len(convention["selected_half_pairs"]) == 8
@@ -168,7 +171,7 @@ def test_external_virtual_member_variant_and_all12_half_table_are_retained(refer
     assert external["same_stem_additional_reported_triples"] == 2816
 
 
-def test_primary_name_variants_do_not_reverse_the_directed_chain():
+def test_primary_name_variants_do_not_reverse_the_directed_chain() -> None:
     first = check_clash_patterns(dict(zip(ORDER, zip("甲乙丙丁", "寅巳申辰"))))
     full = next(r for r in first["punishments"] if r["type"] == "three_punishment")
     assert full["name"] == "无恩之刑"

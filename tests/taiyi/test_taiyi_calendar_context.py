@@ -3,6 +3,7 @@
 import hashlib
 import json
 import shutil
+from pathlib import Path
 
 import pytest
 
@@ -53,8 +54,8 @@ def month(*, length=29, first="甲子"):
     ],
 )
 def test_counter_candidates_do_not_create_nonexistent_dates(
-    ganzhi, length, day, exists
-):
+    ganzhi: str, length: int, day: int, exists: bool
+) -> None:
     row = compare_event(event(ganzhi), [month(length=length)])
     assert row["candidate_day_number"] == day
     assert row["date_exists"] is exists
@@ -63,7 +64,7 @@ def test_counter_candidates_do_not_create_nonexistent_dates(
     assert row["day_position_in_year"] == (day - 1 if exists else None)
 
 
-def test_cycle_wrap_and_explicit_shuo_are_different_requirements():
+def test_cycle_wrap_and_explicit_shuo_are_different_requirements() -> None:
     wrapped = compare_event(event("甲子"), [month(first="癸亥")])
     assert wrapped["day_number"] == 2 and wrapped["date_exists"]
     required_first = compare_event(event("甲子", shuo=True), [month(first="癸亥")])
@@ -77,24 +78,24 @@ def test_cycle_wrap_and_explicit_shuo_are_different_requirements():
 @pytest.mark.parametrize(
     "rows,reason", [([], "missing_month"), ([month(), month()], "ambiguous_month")]
 )
-def test_missing_or_ambiguous_month_has_no_fabricated_day(rows, reason):
+def test_missing_or_ambiguous_month_has_no_fabricated_day(rows, reason: str) -> None:
     row = compare_event(event("甲子"), rows)
     assert row["reason"] == reason and not row["date_exists"]
     assert row["day_position_in_year"] is None and row["day_number"] is None
 
 
-def test_leap_month_does_not_fall_back_to_regular_month_with_the_same_number():
+def test_leap_month_does_not_fall_back_to_regular_month_with_the_same_number() -> None:
     row = compare_event(event("甲子", leap=True), [month()])
     assert row["reason"] == "missing_month" and not row["joint_source_date_satisfied"]
 
 
 @pytest.mark.parametrize("length", [0, 28, 31, 29.0, True])
-def test_invalid_month_length_is_not_accepted(length):
+def test_invalid_month_length_is_not_accepted(length: bool | float | int) -> None:
     with pytest.raises(ValueError, match="29 or30"):
         compare_event(event("甲子"), [month(length=length)])
 
 
-def test_chronology_distinguishes_reversal_equality_and_missing_dates():
+def test_chronology_distinguishes_reversal_equality_and_missing_dates() -> None:
     rows = []
     for i, position in enumerate([3, 1, 1, None, 10]):
         rows.append({"source": {"id": str(i)}, "day_position_in_year": position})
@@ -106,8 +107,8 @@ def test_chronology_distinguishes_reversal_equality_and_missing_dates():
 
 @pytest.mark.parametrize("rewrite_manifest", [False, True])
 def test_source_months_cannot_be_emended_to_improve_a_candidate(
-    tmp_path, rewrite_manifest
-):
+    tmp_path: Path, rewrite_manifest: bool
+) -> None:
     target = tmp_path / "corpus"
     shutil.copytree(CORPUS, target)
     path = target / "readings.json"
@@ -118,11 +119,15 @@ def test_source_months_cannot_be_emended_to_improve_a_candidate(
         frozen = json.loads((target / "freeze.json").read_text())
         frozen["files"][path.name] = hashlib.sha256(path.read_bytes()).hexdigest()
         (target / "freeze.json").write_text(json.dumps(frozen))
+    else:
+        pass
     with pytest.raises(ValueError, match="V37"):
         verify_sources(target)
 
 
-def test_complete_declared_passages_and_original_month_words_are_retained(report):
+def test_complete_declared_passages_and_original_month_words_are_retained(
+    report,
+) -> None:
     verify_sources()
     assert (
         hashlib.sha256((CORPUS / "freeze.json").read_bytes()).hexdigest()
@@ -147,7 +152,9 @@ def test_complete_declared_passages_and_original_month_words_are_retained(report
     assert report["source_date_observations"] == 42
 
 
-def test_all_candidates_keep_every_source_observation_and_chronology_edge(report):
+def test_all_candidates_keep_every_source_observation_and_chronology_edge(
+    report,
+) -> None:
     for candidate in report["calendar_comparisons"]:
         assert [c["required_date_observations"] for c in candidate["cohorts"]] == [
             20,
@@ -175,6 +182,8 @@ def test_all_candidates_keep_every_source_observation_and_chronology_edge(report
                         row["day_number"] is None
                         and row["day_position_in_year"] is None
                     )
+                else:
+                    pass
         assert not candidate["all_three_selected_passages_compatible"]
     assert not report["any_candidate_satisfies_all_selected_passages"]
     assert not report["calendar_selected_by_fit"]

@@ -4,11 +4,14 @@ from datetime import date
 
 import pytest
 
-from fatebridge.core.sukuyo import calendar_mansion, day_evidence
-from fatebridge.core.sukuyo_calendar_text import render_day_reading
-from fatebridge.core.sukuyo_historical_calendar import date_reference
-from fatebridge.core.sukuyo_shogonji import month_header_reference
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence
+from fatebridge.core.sukuyo.sukuyo_calendar_text import render_day_reading
+from fatebridge.core.sukuyo.sukuyo_historical_calendar import date_reference
+from fatebridge.core.sukuyo.sukuyo_shogonji import month_header_reference
 from scripts.sukuyo.check_sukuyo_shogonji import verify_headers
+from tests.unit_test.fixtures.sukuyo_transports import (
+    assert_sukuyo_transport_parity as check,
+)
 
 HISTORICAL = "japanese_naoj_historical_utc09"
 
@@ -20,7 +23,7 @@ def reading(civil, **kwargs):
     return calendar, render_day_reading(day_evidence(calendar))
 
 
-def test_complete_selected_corpus_retains_all_missing_and_qualified_records():
+def test_complete_selected_corpus_retains_all_missing_and_qualified_records() -> None:
     r = verify_headers()
     assert not r["errors"]
     assert r["month_headers_checked"] == 37
@@ -55,8 +58,8 @@ def test_complete_selected_corpus_retains_all_missing_and_qualified_records():
     ],
 )
 def test_actual_marginal_difference_does_not_overwrite_declared_half(
-    civil, first, observed
-):
+    civil: str, first: str, observed: str
+) -> None:
     c, text = reading(
         civil,
         calendar_profile="hinoo_t1299_host27",
@@ -78,7 +81,7 @@ def test_actual_marginal_difference_does_not_overwrite_declared_half(
     assert "不能验收所选半日规则" in text
 
 
-def test_missing_stamp_is_not_completed_using_generic_prose_anchors():
+def test_missing_stamp_is_not_completed_using_generic_prose_anchors() -> None:
     c, text = reading("1345-09-05", calendar_profile="hinoo_t1299_host27")
     assert c["natal_su27"] is None
     assert set(c["candidate_su27s"]) == {"轸", "角"}
@@ -89,7 +92,7 @@ def test_missing_stamp_is_not_completed_using_generic_prose_anchors():
     assert "也未断言原卷无注" in text
 
 
-def test_same_leap_result_is_not_a_priority_discriminant():
+def test_same_leap_result_is_not_a_priority_discriminant() -> None:
     c, text = reading(
         "1346-10-24",
         calendar_profile="hinoo_t1299_host27",
@@ -113,21 +116,23 @@ def test_same_leap_result_is_not_a_priority_discriminant():
         ("1346-07-28", "本日不是初一"),
     ],
 )
-def test_glyph_position_and_nonfirst_day_limits_survive_native_prose(civil, expected):
+def test_glyph_position_and_nonfirst_day_limits_survive_native_prose(
+    civil: str, expected: str
+) -> None:
     _, text = reading(civil)
     assert expected in text
     assert "1345年正文五行是纳音，不能当七曜" in text
     assert "不等于1092天逐日宿曜实录或预测样本" in text
 
 
-def test_modern_and_uncovered_years_do_not_acquire_a_manuscript_reference():
+def test_modern_and_uncovered_years_do_not_acquire_a_manuscript_reference() -> None:
     for civil in (date(1344, 2, 1), date(1349, 2, 1), date(1, 1, 1)):
         assert "manuscript_month_header" not in date_reference(civil)
     assert month_header_reference(2025, 1, False, 1) is None
     assert month_header_reference(1345, 9, True, 1) is None
 
 
-def test_reference_mutation_cannot_alter_later_source_bytes_or_readings():
+def test_reference_mutation_cannot_alter_later_source_bytes_or_readings() -> None:
     r = month_header_reference(1346, 9, True, 1)
     r["header"]["marginal_mansion_normalized_candidate"] = "牛"
     r["authors"].clear()
@@ -136,7 +141,7 @@ def test_reference_mutation_cannot_alter_later_source_bytes_or_readings():
     assert len(later["authors"]) == 3
 
 
-def test_known_civil_noon_does_not_invent_the_manuscript_annotation_half():
+def test_known_civil_noon_does_not_invent_the_manuscript_annotation_half() -> None:
     c, text = reading(
         "1346-07-27", time_text="12:00:00", calendar_profile="hinoo_t1299_host27"
     )
@@ -145,7 +150,9 @@ def test_known_civil_noon_does_not_invent_the_manuscript_annotation_half():
     assert "月首朱注未用于消除补配候选" in text
 
 
-def test_appendix_era_digit_is_not_silently_corrected_to_author_year_assignment():
+def test_appendix_era_digit_is_not_silently_corrected_to_author_year_assignment() -> (
+    None
+):
     c, text = reading("1345-02-11")
     assert c["lunar_year"] == 1345
     reference = c["calendar_reference"]["manuscript_month_header"]
@@ -157,7 +164,7 @@ def test_appendix_era_digit_is_not_silently_corrected_to_author_year_assignment(
     assert "同栏年干支为乙酉" in text
 
 
-def test_april_stamp_placement_and_glyph_questions_are_separate():
+def test_april_stamp_placement_and_glyph_questions_are_separate() -> None:
     c, text = reading("1345-05-11")
     reference = c["calendar_reference"]["manuscript_month_header"]
     assert reference["author_placement_notes"][0]["number"] == 3
@@ -166,19 +173,19 @@ def test_april_stamp_placement_and_glyph_questions_are_separate():
     assert "两个读字候选均保留" in text
 
 
-def test_shogonji_semantic_month_length_is_not_formatted_as_a_day_number():
+def test_shogonji_semantic_month_length_is_not_formatted_as_a_day_number() -> None:
     _, text = reading("1346-07-27")
     assert "1346年7月，月长30日；月首初一干支丁丑" in text
     assert "1346年7月30日，初一干支" not in text
 
 
-def test_shogonji_semantic_corpus_denominators_are_explicit_in_native_text():
+def test_shogonji_semantic_corpus_denominators_are_explicit_in_native_text() -> None:
     _, text = reading("1346-02-01")
     for phrase in ("27条清晰", "2条带限定", "8处所选栏未见", "1092是月长合计"):
         assert phrase in text
 
 
-def test_shogonji_semantic_computed_candidate_labels_are_not_omitted():
+def test_shogonji_semantic_computed_candidate_labels_are_not_omitted() -> None:
     _, text = reading("1345-09-05", calendar_profile="hinoo_t1299_host27")
     assert "候选轸的上卷主表标签为甘露" in text
     assert "候选角的上卷主表未匹配标签" in text
@@ -189,7 +196,9 @@ def test_shogonji_semantic_computed_candidate_labels_are_not_omitted():
     "civil,phrase",
     [("1345-06-09", "不宜舉百事"), ("1346-02-01", "諸事並不宜作")],
 )
-def test_shogonji_semantic_no_activity_does_not_erase_material_caution(civil, phrase):
+def test_shogonji_semantic_no_activity_does_not_erase_material_caution(
+    civil: str, phrase: str
+) -> None:
     c, text = reading(civil)
     assert day_evidence(c)["activity_assessment"] is None
     assert phrase in text
@@ -197,7 +206,7 @@ def test_shogonji_semantic_no_activity_does_not_erase_material_caution(civil, ph
     assert "未形成事项汇总" in text
 
 
-def test_shogonji_semantic_unassigned_text_retains_both_substantive_halves():
+def test_shogonji_semantic_unassigned_text_retains_both_substantive_halves() -> None:
     _, text = reading(
         "1346-10-24",
         calendar_profile="hinoo_t1299_host27",
@@ -213,11 +222,11 @@ def test_shogonji_semantic_unassigned_text_retains_both_substantive_halves():
     [("1346-07-27", "first_half"), ("1346-10-24", "second_half")],
 )
 def test_new_reference_survives_rest_fresh_native_mcp_and_cli(
-    monkeypatch, capsys, civil, part
-):
-    from tests.sukuyo.test_sukuyo_transports import (
-        test_calendar_and_relations_across_all_real_transports as check,
-    )
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    civil: str,
+    part: str,
+) -> None:
 
     check(
         monkeypatch,

@@ -25,8 +25,8 @@ def civil_jd(moment):
 
 @pytest.mark.parametrize("case", REFERENCE["synthetic_clock_cases"])
 def test_tt_root_reaches_correct_civil_clock_without_treating_ut1_as_utc(
-    case, monkeypatch
-):
+    case, monkeypatch: pytest.MonkeyPatch
+) -> None:
     civil = datetime.fromisoformat(case["utc"])
     jd = civil_jd(civil)
     if "tai_minus_utc_seconds" in case:
@@ -52,7 +52,7 @@ def test_tt_root_reaches_correct_civil_clock_without_treating_ut1_as_utc(
     assert calls and abs(calls[-1] - expected_tt) * 86400 < 0.0002
 
 
-def test_serialized_term_keeps_the_same_fractional_boundary_as_computation():
+def test_serialized_term_keeps_the_same_fractional_boundary_as_computation() -> None:
     terms = almanac.get_solar_terms_for_year(2026, "Asia/Shanghai")
     term = next(t for t in terms if 0 < t.moment.microsecond < 500000)
     value = term.as_dict()["datetime"]
@@ -70,8 +70,8 @@ def test_serialized_term_keeps_the_same_fractional_boundary_as_computation():
     [(1969, 5, 17, False), (2026, 2, 19, False), (2084, 3, 21, True)],
 )
 def test_actual_ren_dependencies_disclose_the_time_scale_and_future_assumption(
-    year, month, day, future
-):
+    year: int, month: int, day: int, future: bool
+) -> None:
     result = calculate_liureng_gods(
         analysis_year=year,
         analysis_month=month,
@@ -92,22 +92,27 @@ def test_actual_ren_dependencies_disclose_the_time_scale_and_future_assumption(
             row["civil_time_method"].startswith("IERS_1961_1971")
             for row in dependencies
         )
+    else:
+        pass
     assert "小数秒仅为数值分辨率" in result["snapshot_text"]
 
 
-def test_leap_second_cannot_be_fabricated_as_next_day_by_the_solar_solver(monkeypatch):
+def test_leap_second_cannot_be_fabricated_as_next_day_by_the_solar_solver(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     from fatebridge.core import solar_term_clock
 
     def unavailable_label(value):
         raise ValueError("UTC leap second not representable by datetime")
 
-    monkeypatch.setattr(solar_term_clock, "utc_calendar_from_tt", unavailable_label)
+    monkeypatch.setattr(solar_term_clock, "utc_point_from_tt", unavailable_label)
     from fatebridge.core.solar_term_clock import SolarTermClockError
 
     with pytest.raises(SolarTermClockError) as failure:
         almanac._solar_term_utc_via_swe(
             2026, 0, datetime(2026, 3, 20, tzinfo=timezone.utc)
         )
+    assert failure.value.reason == "solar_root_civil_unrepresentable"
     assert isinstance(failure.value.__cause__, ValueError)
     assert (
         str(failure.value.__cause__) == "UTC leap second not representable by datetime"

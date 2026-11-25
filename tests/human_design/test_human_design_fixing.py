@@ -6,10 +6,10 @@ from pathlib import Path
 import pytest
 
 from fatebridge.application.execution import execute_tool
-from fatebridge.core.human_design_depth import line_fixings
+from fatebridge.core.human_design.human_design_depth import line_fixings
 from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.validation.human_design import verify_human_design_reading
-from fatebridge.validation.human_design_fixing import fixing_marker_checks
+from validation.human_design import verify_human_design_reading
+from validation.human_design_fixing import fixing_marker_checks
 
 ROOT = Path(__file__).resolve().parents[2]
 SPEC = next(s for s in CATALOG if s.key == "human_design")
@@ -23,7 +23,9 @@ INPUT = dict(
 )
 
 
-def test_all_unchanged_official_fixing_slots_preserve_visible_and_unobservable_states():
+def test_all_unchanged_official_fixing_slots_preserve_visible_and_unobservable_states() -> (
+    None
+):
     report = fixing_marker_checks(ROOT)
     assert report["case_count"] == 19
     assert report["activation_slots_observed"] == 494
@@ -46,7 +48,9 @@ def test_all_unchanged_official_fixing_slots_preserve_visible_and_unobservable_s
     )
 
 
-def test_a_node_can_receive_the_harmonic_planet_fixing_but_cannot_fix_other_lines():
+def test_a_node_can_receive_the_harmonic_planet_fixing_but_cannot_fix_other_lines() -> (
+    None
+):
     records = line_fixings(
         {
             "design": [
@@ -97,7 +101,9 @@ def test_a_node_can_receive_the_harmonic_planet_fixing_but_cannot_fix_other_line
 
 
 @pytest.mark.parametrize("triggered", [False, True])
-def test_unitary_source_category_does_not_invent_an_active_fixing(triggered):
+def test_unitary_source_category_does_not_invent_an_active_fixing(
+    triggered: bool,
+) -> None:
     sides = {
         "design": [{"body": "Venus", "gate": 57, "line": 3}],
         "personality": [{"body": "Mercury", "gate": 57 if triggered else 1, "line": 2}],
@@ -114,7 +120,7 @@ def test_unitary_source_category_does_not_invent_an_active_fixing(triggered):
     assert ("本盘触发上升极性" in value["reading"]) is triggered
 
 
-def test_no_planet_polarity_has_no_invented_trigger_or_full_line_meaning():
+def test_no_planet_polarity_has_no_invented_trigger_or_full_line_meaning() -> None:
     value = line_fixings({"design": [{"body": "Sun", "gate": 54, "line": 4}]})[0]
     assert value["fixing_state"] == "not_applicable_no_planet_polarity"
     assert value["fixing_planets"] == {"exaltation": [], "detriment": []}
@@ -129,7 +135,7 @@ def complete():
 
 def test_all_26_mechanism_readings_are_checked_without_claiming_full_line_acceptance(
     complete,
-):
+) -> None:
     depth = complete["depth_evidence"]
     assert len(depth["line_fixings"]) == 26
     assert all(r["reading"] for r in depth["line_fixings"])
@@ -142,7 +148,6 @@ def test_all_26_mechanism_readings_are_checked_without_claiming_full_line_accept
     assert check["status"] == "verified_fixed_template_reading", check
     assert check["checked_fixing_reading_count"] == 26
     assert check["checked_statement_count"] == 10  # All prior statements retained.
-    assert complete["validation"]["all_three_axes_full_marks"] is False
 
 
 @pytest.mark.parametrize(
@@ -160,7 +165,9 @@ def test_all_26_mechanism_readings_are_checked_without_claiming_full_line_accept
         "certificate",
     ],
 )
-def test_forged_fixing_mechanism_cannot_pass_even_after_rehash(complete, tamper):
+def test_forged_fixing_mechanism_cannot_pass_even_after_rehash(
+    complete, tamper: str
+) -> None:
     value = deepcopy(complete)
     depth = value["depth_evidence"]
     row = next(

@@ -16,22 +16,28 @@ import fatebridge.mcp_server as mcp
 from fatebridge.cli import run as cli_run
 from fatebridge.core.export_contracts import AI_EXPORT_TECHNIQUES
 from fatebridge.core.knowledge_store import load_knowledge_bundles, read_knowledge_entry
-from fatebridge.core.sukuyo import SU27_ORDER, relation_between_su27
-from tests.evaluation.test_agentic_nested_outputs import schema_leaf
-from tests.support.transports import AS_OF, SPECS, business, inputs, rest, surface_calls
+from fatebridge.core.sukuyo.sukuyo import SU27_ORDER, relation_between_su27
+from tests.support.transports import (
+    AS_OF,
+    SPECS,
+    business,
+    capability_contracts,
+    inputs,
+)
+from tests.unit_test.fixtures.schema_assertions import schema_leaf
 
 PROJECTIONS = [
-    ("bazi_marriage", "marriage_analysis.spouse_star.spouse_star_positions"),
-    ("bazi_career", "career_analysis.industry_analysis.element_distribution.木"),
-    ("bazi_wealth", "wealth_analysis.wealth_stars.total_weight"),
-    ("bazi_health", "health_analysis.organ_analysis.findings"),
-    ("bazi_children", "children_analysis.child_star.positions"),
-    ("bazi_education", "education_analysis.wenchang.has_wenchang"),
-    ("bazi_personality", "personality_analysis.core_nature.virtue"),
-    ("bazi_relatives", "relatives_analysis.parents.father_star_weight"),
-    ("bazi_romance", "romance_analysis.opposite_sex_star.weight"),
+    ("bazi_marriage", "marriage_analysis.evidence_chain.topic.palaces.day"),
+    ("bazi_career", "career_analysis.evidence_chain.topic.first_view.natal_stars"),
+    ("bazi_wealth", "wealth_analysis.evidence_chain.topic.storage_matches"),
+    ("bazi_health", "health_analysis.evidence_chain.topic.scope"),
+    ("bazi_children", "children_analysis.evidence_chain.topic.palaces.hour"),
+    ("bazi_education", "education_analysis.evidence_chain.topic.markers"),
+    ("bazi_personality", "personality_analysis.evidence_chain.topic.first_view"),
+    ("bazi_relatives", "relatives_analysis.evidence_chain.topic.palaces.year"),
+    ("bazi_romance", "romance_analysis.evidence_chain.topic.selection_alternatives"),
     ("sukuyo_compatibility", "person1_to_person2.offset"),
-    ("knowledge_registry", "provenance.bundle_version"),
+    ("knowledge_registry", "provenance.coverage.categories"),
     ("knowledge_read", "provenance.coverage.categories"),
     ("export_registry", "selected_technique.settings_template.astroMeaning.enabled"),
     ("export_parse", "settings_used.astroMeaning.qimen.enabled"),
@@ -40,7 +46,9 @@ PROJECTIONS = [
 
 @pytest.mark.parametrize("key,field", PROJECTIONS)
 @pytest.mark.parametrize("project", [False, True])
-def test_full_and_partial_json_match_all_transports(key, field, project, surface_calls):
+def test_full_and_partial_json_match_all_transports(
+    key, field, project: bool, surface_calls
+) -> None:
     spec = SPECS[key]
     request = inputs(spec)
     params = {"as_of": AS_OF, "include_snapshot_text": False}
@@ -50,62 +58,59 @@ def test_full_and_partial_json_match_all_transports(key, field, project, surface
         params.update(fields=field, strict_fields=True)
         flags.update(fields=[field], strict_fields=True)
         cli_flags += ["--fields", field, "--strict-fields"]
+    else:
+        pass
     http, protocol, code, output = surface_calls(
         spec, request, params=params, options=flags, flags=cli_flags, cli_first=False
     )
     assert http.status_code == 200 and not protocol.is_error and code == 0
     assert business(http.json()) == business(protocol.structured_content) == output
     assert "run_metadata" not in output and "projection_warnings" not in output
-    assert json.loads(protocol.content[0].text) == protocol.structured_content
     for payload in [http.json(), protocol.structured_content, output]:
         spec.output_model.model_validate(payload)
         Draft202012Validator(spec.output_model.model_json_schema()).validate(payload)
 
 
+TOPIC_LEAVES = [
+    ("marriage", "palaces.{}.pillar", "string", {"palaces": {"day": {"pillar": 4}}}),
+    (
+        "career",
+        "first_view.natal_stars.[].visible_in.[]",
+        "string",
+        {"first_view": {"natal_stars": [{"visible_in": [3]}]}},
+    ),
+    (
+        "wealth",
+        "storage_matches.[].branch",
+        "string",
+        {"storage_matches": [{"branch": "private-wrong-value", "element": 1}]},
+    ),
+    ("health", "scope", "string", {"scope": 3}),
+    ("children", "palaces.{}.pillar", "string", {"palaces": {"hour": {"pillar": 3}}}),
+    (
+        "education",
+        "markers.[].natal_positions.[]",
+        "string",
+        {"markers": [{"natal_positions": [3]}]},
+    ),
+    (
+        "personality",
+        "first_view.timing.[].palace_relation_count",
+        "integer",
+        {"first_view": {"timing": [{"palace_relation_count": "1"}]}},
+    ),
+    (
+        "relatives",
+        "palaces.{}.relations",
+        "array",
+        {"palaces": {"year": {"relations": "invalid"}}},
+    ),
+]
+
 BAD_FACTS = [
-    (
-        "bazi_marriage",
-        {
-            "marriage_analysis": {
-                "spouse_star": {
-                    "spouse_star_positions": [{"is_primary": "private-wrong-value"}]
-                }
-            }
-        },
-    ),
-    (
-        "bazi_career",
-        {
-            "career_analysis": {
-                "industry_analysis": {"recommended_industries": [{"industries": [3]}]}
-            }
-        },
-    ),
-    (
-        "bazi_wealth",
-        {
-            "wealth_analysis": {
-                "wealth_storage": {"storage_hits": [{"opened": "false"}]}
-            }
-        },
-    ),
-    (
-        "bazi_health",
-        {"health_analysis": {"organ_analysis": {"element_distribution": {"木": "1"}}}},
-    ),
-    (
-        "bazi_children",
-        {"children_analysis": {"child_star": {"positions": [{"ten_god": 3}]}}},
-    ),
-    ("bazi_education", {"education_analysis": {"study_stars": {"seal_weight": "1"}}}),
-    (
-        "bazi_personality",
-        {"personality_analysis": {"dominant_traits": {"top_gods": [{"weight": "1"}]}}},
-    ),
-    (
-        "bazi_relatives",
-        {"relatives_analysis": {"parents": {"father_star_weight": "1"}}},
-    ),
+    (f"bazi_{topic}", {f"{topic}_analysis": {"evidence_chain": {"topic": invalid}}})
+    for topic, _, _, invalid in TOPIC_LEAVES
+] + [
     (
         "bazi_romance",
         {
@@ -135,8 +140,8 @@ BAD_FACTS = [
 
 @pytest.mark.parametrize("key,payload", BAD_FACTS)
 def test_faults_cannot_be_hidden_by_projection(
-    key, payload, monkeypatch, surface_calls
-):
+    key, payload, monkeypatch: pytest.MonkeyPatch, surface_calls
+) -> None:
     spec = SPECS[key]
     with pytest.raises(ValidationError):
         spec.output_model.model_validate(payload)
@@ -149,6 +154,8 @@ def test_faults_cannot_be_hidden_by_projection(
             actual = replace(
                 actual, bind=lambda _: (lambda: copy.deepcopy(payload), (), {})
             )
+        else:
+            pass
         return original(actual, request)
 
     monkeypatch.setattr(execution, "execute_spec", broken_output)
@@ -170,27 +177,13 @@ def test_faults_cannot_be_hidden_by_projection(
         k: v for k, v in protocol.structured_content.items() if k != "operation"
     } == output
     assert http.json() == {k: v for k, v in output.items() if k != "status_code"}
-    assert json.loads(protocol.content[0].text) == protocol.structured_content
     assert "private-wrong-value" not in json.dumps(output)
 
 
 SCHEMA_LEAVES = [
-    (
-        "bazi_marriage",
-        "marriage_analysis.spouse_star.spouse_star_positions.[].is_primary",
-        "boolean",
-    ),
-    ("bazi_career", "career_analysis.dominant_ten_gods.top_gods.[].weight", "number"),
-    ("bazi_wealth", "wealth_analysis.wealth_storage.storage_hits.[].opened", "boolean"),
-    ("bazi_health", "health_analysis.organ_analysis.findings.[].organs", "string"),
-    ("bazi_children", "children_analysis.affinity.score", "integer"),
-    ("bazi_education", "education_analysis.wenchang.hit_pillars.[]", "string"),
-    (
-        "bazi_personality",
-        "personality_analysis.dominant_traits.top_gods.[].weight",
-        "number",
-    ),
-    ("bazi_relatives", "relatives_analysis.parents.father_star_weight", "number"),
+    (f"bazi_{topic}", f"{topic}_analysis.evidence_chain.topic.{path}", kind)
+    for topic, path, kind, _ in TOPIC_LEAVES
+] + [
     (
         "bazi_romance",
         "romance_analysis.timing_context.overridden.dayun_pillar",
@@ -222,7 +215,9 @@ SCHEMA_LEAVES = [
 ]
 
 
-def test_published_schema_leaves_and_rejections_match(rest, capsys):
+def test_published_schema_leaves_and_rejections_match(
+    rest, capsys: pytest.CaptureFixture[str]
+) -> None:
     openapi = rest.get("/openapi.json").json()
     manifest = {
         tool["tool"]: tool["output_schema"]
@@ -232,8 +227,10 @@ def test_published_schema_leaves_and_rejections_match(rest, capsys):
     async def schemas():
         async with Client(mcp.app) as client:
             return {
-                tool.name: tool.model_dump(by_alias=True)["outputSchema"]
-                for tool in await client.list_tools()
+                name: contract["output_schema"]
+                for name, contract in (
+                    await capability_contracts(client, detail="full")
+                ).items()
             }
 
     advertised = asyncio.run(schemas())
@@ -260,7 +257,7 @@ def test_published_schema_leaves_and_rejections_match(rest, capsys):
 )
 @pytest.mark.parametrize("gender", ["男", "女", "未知"])
 @pytest.mark.parametrize("timing", ["auto", "partial-override", "both-overridden"])
-def test_gender_and_timing_variants(dimension, gender, timing):
+def test_gender_and_timing_variants(dimension, gender: str, timing: str) -> None:
     spec = SPECS[dimension]
     patch = {"gender": gender}
     request = inputs(spec)
@@ -270,6 +267,8 @@ def test_gender_and_timing_variants(dimension, gender, timing):
         patch.update(dayun_pillar="甲子", liunian_pillar="乙丑")
     elif timing == "partial-override":
         patch.update(dayun_pillar="甲子")
+    else:
+        pass
     result = execution.execute_tool(
         spec, spec.request_model.model_validate({**request, **patch})
     )
@@ -285,6 +284,8 @@ def test_gender_and_timing_variants(dimension, gender, timing):
             else "unavailable_gender_direction"
         )
         assert analysis["timing_context"]["liunian_pillar"]
+    else:
+        pass
     if timing == "both-overridden":
         assert analysis["timing_context"] == {
             "dayun_pillar": "甲子",
@@ -292,10 +293,12 @@ def test_gender_and_timing_variants(dimension, gender, timing):
             "source": "explicit_pillar_overrides",
             "overridden": {"dayun_pillar": True, "liunian_pillar": True},
         }
+    else:
+        pass
 
 
 @pytest.mark.parametrize("item", AI_EXPORT_TECHNIQUES, ids=lambda item: item["key"])
-def test_every_export_technique_has_valid_templates_and_settings(item):
+def test_every_export_technique_has_valid_templates_and_settings(item) -> None:
     key = item["key"]
     for tool, request in [
         ("export_registry", {"technique": key}),
@@ -319,21 +322,27 @@ def test_every_export_technique_has_valid_templates_and_settings(item):
         Draft202012Validator(spec.output_model.model_json_schema()).validate(result)
         if tool == "export_parse":
             assert result["export_text"] == "" and result["missing_selected_sections"]
+        else:
+            pass
 
 
 @pytest.mark.parametrize("domain", ["astro", "bazi", "qimen", "liureng"])
-def test_all_knowledge_entries_have_valid_nested_contracts(domain):
+def test_all_knowledge_entries_have_valid_nested_contracts(domain: str) -> None:
     spec = SPECS["knowledge_read"]
     bundle = load_knowledge_bundles()[domain]
     categories = bundle.get("categories", {})
     if domain == "liureng":
         categories = {"shen": bundle["shen_entries"], "house": bundle["jiang_info"]}
+    else:
+        pass
     count = 0
     for category, entries in categories.items():
         for key in entries:
             payload = {"domain": domain, "category": category, "key": key}
             if domain == "liureng" and category == "house":
                 payload.update(jiang_name=key, tian_branch="子", di_branch="丑")
+            else:
+                pass
             result = read_knowledge_entry(payload)
             spec.output_model.model_validate(result)
             Draft202012Validator(spec.output_model.model_json_schema()).validate(result)
@@ -341,7 +350,9 @@ def test_all_knowledge_entries_have_valid_nested_contracts(domain):
     assert count > 0
 
 
-def test_all_sukuyo_offsets_preserve_primary_text_groups_without_invented_distances():
+def test_all_sukuyo_offsets_preserve_primary_text_groups_without_invented_distances() -> (
+    None
+):
     model = SPECS["sukuyo_compatibility"].output_model
     distances = set()
     groups = set()
@@ -361,7 +372,7 @@ def test_all_sukuyo_offsets_preserve_primary_text_groups_without_invented_distan
 
 
 @pytest.mark.parametrize("key", ["knowledge_registry", "knowledge_read"])
-def test_reference_responses_do_not_expose_cached_coverage(key):
+def test_reference_responses_do_not_expose_cached_coverage(key: str) -> None:
     spec = SPECS[key]
     request = spec.request_model.model_validate(inputs(spec))
     first = business(execution.execute_tool(spec, request))
@@ -378,7 +389,7 @@ def test_reference_responses_do_not_expose_cached_coverage(key):
 
 
 @pytest.mark.parametrize("key", [key for key, _ in PROJECTIONS])
-def test_extensions_and_original_numeric_types_survive_validation(key):
+def test_extensions_and_original_numeric_types_survive_validation(key) -> None:
     spec = SPECS[key]
     request = spec.request_model.model_validate(inputs(spec))
     payload = execution.execute_spec(spec, request)
@@ -390,17 +401,23 @@ def test_extensions_and_original_numeric_types_survive_validation(key):
     def extend_objects(value, schema, root):
         if "$ref" in schema:
             schema = root["$defs"][schema["$ref"].split("/")[-1]]
+        else:
+            pass
         if "anyOf" in schema:
             schema = next(
                 item for item in schema["anyOf"] if item.get("type") != "null"
             )
             return extend_objects(value, schema, root)
+        else:
+            pass
         if isinstance(value, dict):
             properties = schema.get("properties", {})
             if properties:
                 for name, child in list(value.items()):
                     if name in properties:
                         extend_objects(child, properties[name], root)
+                    else:
+                        pass
                 if schema.get("additionalProperties") is False:
                     closed_objects.append(value)
                 else:
@@ -408,9 +425,13 @@ def test_extensions_and_original_numeric_types_survive_validation(key):
             elif isinstance(schema.get("additionalProperties"), dict):
                 for child in value.values():
                     extend_objects(child, schema["additionalProperties"], root)
+            else:
+                pass
         elif isinstance(value, list):
             for child in value:
                 extend_objects(child, schema.get("items", {}), root)
+        else:
+            pass
 
     schema = spec.output_model.model_json_schema()
     extend_objects(payload, schema, schema)
@@ -435,6 +456,8 @@ def test_extensions_and_original_numeric_types_survive_validation(key):
                 Draft202012Validator(schema).validate(payload)
         finally:
             del closed["future_fact"]
+    else:
+        pass
 
 
 @pytest.mark.parametrize(
@@ -451,7 +474,13 @@ def test_extensions_and_original_numeric_types_survive_validation(key):
         ),
         ("knowledge_registry", {}),
         ("knowledge_read", {"domain": "bazi", "category": "ten_gods", "key": "比肩"}),
+        ("knowledge_read", {"domain": "astro", "category": "planet", "key": "Mars"}),
+        (
+            "knowledge_read",
+            {"domain": "astro", "category": "aspect", "aspect_degree": 90},
+        ),
         ("knowledge_read", {"domain": "qimen", "category": "door", "key": "休"}),
+        ("knowledge_read", {"domain": "qimen", "category": "stem", "key": "戊"}),
         (
             "knowledge_read",
             {
@@ -466,7 +495,9 @@ def test_extensions_and_original_numeric_types_survive_validation(key):
         ("export_parse", {"technique": "generic", "content": ""}),
     ],
 )
-def test_nondefault_reference_results_match_transports(key, payload, surface_calls):
+def test_nondefault_reference_results_match_transports(
+    key: str, payload, surface_calls
+) -> None:
     spec = SPECS[key]
     http, protocol, code, output = surface_calls(
         spec, payload, params={"as_of": AS_OF}, flags=["--no-metadata"], cli_first=False
@@ -475,19 +506,35 @@ def test_nondefault_reference_results_match_transports(key, payload, surface_cal
     assert business(http.json()) == business(protocol.structured_content) == output
     spec.output_model.model_validate(output)
     Draft202012Validator(spec.output_model.model_json_schema()).validate(output)
+    if key == "knowledge_read" and payload["domain"] in {"astro", "qimen"}:
+        assert output["provenance"]["reference_only"] is True
+        assert output["lines"] and output["citation"]
+        if payload["domain"] == "qimen" and payload["category"] == "stem":
+            assert output["lines"] == ["六仪之一，藏甲子。"]
+            assert "《遁甲演义》卷三·奇遁布局法" in output["citation"]
+        else:
+            pass
+    else:
+        pass
     if key == "sukuyo_compatibility":
         assert output["person1_to_person2"]["offset"] == 0
         assert output["person1_to_person2"]["distance"] is None
+    else:
+        pass
 
 
 @pytest.mark.parametrize("partial", [False, True])
-def test_auto_timing_fractional_years_match_all_transports(partial, surface_calls):
+def test_auto_timing_fractional_years_match_all_transports(
+    partial: bool, surface_calls
+) -> None:
     spec = SPECS["bazi_marriage"]
     payload = inputs(spec)
     payload.pop("dayun_pillar", None)
     payload.pop("liunian_pillar", None)
     if partial:
         payload["dayun_pillar"] = "甲子"
+    else:
+        pass
     field = "marriage_analysis.timing_context.dayun_age"
     http, protocol, code, output = surface_calls(
         spec,
@@ -507,7 +554,7 @@ def test_auto_timing_fractional_years_match_all_transports(partial, surface_call
 )
 def test_unknown_timing_direction_preserves_available_layers_across_transports(
     dimension, surface_calls
-):
+) -> None:
     spec = SPECS[dimension]
     payload = inputs(spec)
     payload.pop("dayun_pillar", None)

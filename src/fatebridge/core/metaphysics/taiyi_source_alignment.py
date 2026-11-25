@@ -8,6 +8,16 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
+from fatebridge.core.metaphysics.taiyi_edition_witness import (
+    edition_comparisons,
+)
+from fatebridge.core.metaphysics.taiyi_geometry import (
+    BRANCHES,
+    PALACES,
+    RING,
+    count_to_taiyi,
+)
+
 CATALOG_SHA256 = "e3da8f35487b57146dcec7e2ef5e599d6254d808841dbfed87599d483e27868a"
 FIELDS = ("taiyi_number", "wenchang_palace", "shiji", "jishen")
 LITERAL_FIELDS = {
@@ -26,23 +36,18 @@ def source_catalog() -> tuple[dict[str, Any], dict[tuple[bool, int], Any]]:
     raw = path.read_bytes()
     if hashlib.sha256(raw).hexdigest() != CATALOG_SHA256:
         raise ValueError("太乙原表位置资料指纹不符")
+    else:
+        pass
     data = json.loads(raw)
     rows = {(r["yin"], r["ju"]): r for r in data["rows"]}
     if len(rows) != 144:
         raise ValueError("太乙原表须保留完整阴阳144局")
+    else:
+        pass
     return data, rows
 
 
 def count_source_assessment(core: dict[str, Any]) -> dict[str, Any]:
-    from fatebridge.core.metaphysics.taiyi_edition_witness import (
-        edition_comparisons,
-    )
-    from fatebridge.core.metaphysics.taiyi_geometry import (
-        BRANCHES,
-        PALACES,
-        RING,
-        count_to_taiyi,
-    )
 
     data, rows = source_catalog()
     ruleset = {
@@ -95,6 +100,8 @@ def count_source_assessment(core: dict[str, Any]) -> dict[str, Any]:
             "edition_comparisons": [],
             "scope": data["scope"],
         }
+    else:
+        pass
     row = rows[(core["yin_dun"], core["kook_number"])]
     positions = []
     for field in FIELDS:
@@ -230,6 +237,8 @@ def count_source_assessment(core: dict[str, Any]) -> dict[str, Any]:
 def source_alignment_text(assessment: dict[str, Any]) -> str:
     if assessment["status"] == "not_assessed":
         return str(assessment["reason"])
+    else:
+        pass
     labels = {"main": "主算", "guest": "客算"}
     lines = [
         f"卷三源表位置/两算校读：{'阴' if assessment['yin_dun'] else '阳'}遁{assessment['ju']}局。"
@@ -247,6 +256,8 @@ def source_alignment_text(assessment: dict[str, Any]) -> str:
             lines.append(
                 f"{names[fact['field']]}：本盘{fact['actual_value']}，所读原表{fact['source_literal']}→{fact['source_value']}，位置不合未裁定。"
             )
+        else:
+            pass
     for fact in assessment["counts"]:
         if (
             not fact["count_matches"]
@@ -257,6 +268,8 @@ def source_alignment_text(assessment: dict[str, Any]) -> str:
             lines.append(
                 f"{labels[fact['camp']]}：本盘目{fact['actual_marker']}、算{fact['actual_count']}；原表目{fact['source_marker']}、算{fact['source_table_count']}；把原表位置按所选卷二通则重算为{rec['count']}，加数{' + '.join(str(p['value']) for p in rec['path'])}。重算不是本盘替代值，差异保留。"
             )
+        else:
+            pass
     for check in assessment["facsimile_readings"]:
         if check["status"] == "transcription_differs_from_facsimile":
             lines.append(
@@ -268,6 +281,8 @@ def source_alignment_text(assessment: dict[str, Any]) -> str:
             lines.append(
                 f"初录整理误写{check['initial_manual_reading']}；旧转录与图{check['page']}书影均为{check['facsimile_reading']}。此为本次录入错误，不是旧转录错误；初录保留。"
             )
+        else:
+            pass
     for witness in assessment["edition_comparisons"]:
         facts = "、".join(
             f"{names[f['field']]}：{f['edition_literal']}→{f['edition_value']}"

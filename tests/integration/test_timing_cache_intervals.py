@@ -1,7 +1,7 @@
 """Timing cache isolation and fractional-timezone hour regressions."""
 
 from copy import deepcopy
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 import pytest
 
@@ -26,10 +26,14 @@ def _mutate_all_containers(value):
         for child in value:
             _mutate_all_containers(child)
         value.clear()
+    else:
+        pass
 
 
 @pytest.mark.parametrize("kind", ["liuyue", "liuri", "liushi"])
-def test_timing_cache_results_remain_detached_after_recursive_mutation(kind):
+def test_timing_cache_results_remain_detached_after_recursive_mutation(
+    kind: str,
+) -> None:
     moment = datetime(2024, 2, 4, 23, 45)
     calls = {
         "liuyue": lambda: TimingAnalysis.calculate_liuyue(
@@ -51,7 +55,7 @@ def test_timing_cache_results_remain_detached_after_recursive_mutation(kind):
         TimingAnalysis.calculate_jieqi_transition_timeline,
     ],
 )
-def test_timeline_mutations_do_not_pollute_cached_pillars(call):
+def test_timeline_mutations_do_not_pollute_cached_pillars(call) -> None:
     first = call(2024)
     original = deepcopy(first)
     _mutate_all_containers(first)
@@ -67,17 +71,26 @@ def test_timeline_mutations_do_not_pollute_cached_pillars(call):
         (datetime(2026, 1, 2, 2, 45, tzinfo=timezone.utc), "America/St_Johns"),
     ],
 )
-def test_liushi_truncates_hour_after_converting_to_target_timezone(moment, target_zone):
+def test_liushi_truncates_hour_after_converting_to_target_timezone(
+    moment, target_zone: str
+) -> None:
     local = localize_datetime(moment, target_zone)
     result = TimingAnalysis.calculate_liushi(moment, target_zone)
     assert result == TimingAnalysis.calculate_liushi(local, target_zone)
     assert result == TimingAnalysis.calculate_liushi(
         local.replace(tzinfo=None), target_zone
     )
-    assert result["hour"] == local.hour
-    assert result["analysis_datetime"] == local.replace(
-        minute=0, second=0, microsecond=0
-    ).strftime("%Y-%m-%d %H:%M:%S")
+    # IANA 2026f offsets for these four fixed January instants.
+    offset_minutes = {
+        "Asia/Kathmandu": 345,
+        "Asia/Kolkata": 330,
+        "America/St_Johns": -210,
+    }
+    expected = moment.astimezone(
+        timezone(timedelta(minutes=offset_minutes[target_zone]))
+    )
+    assert result["hour"] == local.hour == expected.hour
+    assert result["analysis_datetime"] == expected.strftime("%Y-%m-%d %H:%M:%S")
     assert (result["stem"], result["branch"]) == BaZiCalendar.calculate_hour_pillar(
         local.year, local.month, local.day, local.hour
     )
@@ -92,8 +105,8 @@ def test_liushi_truncates_hour_after_converting_to_target_timezone(moment, targe
     ],
 )
 def test_solar_durations_measure_elapsed_hours_across_dst(
-    start, end, zone, expected_hours
-):
+    start, end, zone: str, expected_hours: int
+) -> None:
     assert (
         elapsed_days_between(
             localize_datetime(start, zone), localize_datetime(end, zone)
@@ -122,8 +135,13 @@ def test_solar_durations_measure_elapsed_hours_across_dst(
     ],
 )
 def test_month_context_and_dayun_use_physical_solar_intervals(
-    monkeypatch, start, end, current, since_hours, until_hours
-):
+    monkeypatch: pytest.MonkeyPatch,
+    start,
+    end,
+    current,
+    since_hours: int,
+    until_hours: int,
+) -> None:
     zone = "America/New_York"
     start_term = SolarTerm(
         "惊蛰", ZonedCalendar.from_datetime(localize_datetime(start, zone))
@@ -143,7 +161,7 @@ def test_month_context_and_dayun_use_physical_solar_intervals(
     assert dayun["start_age_precise"] == round(since_hours / 72, 2)
 
 
-def test_solar_month_elapsed_lengths_are_timezone_invariant():
+def test_solar_month_elapsed_lengths_are_timezone_invariant() -> None:
     new_york = TimingAnalysis.calculate_liuyue_timeline(2026, "America/New_York")
     utc = TimingAnalysis.calculate_liuyue_timeline(2026, "UTC")
     assert [row["gregorian_window"]["days"] for row in new_york] == [

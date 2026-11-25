@@ -23,7 +23,7 @@ from collections import Counter
 from decimal import Decimal, localcontext
 from pathlib import Path
 
-from fatebridge.core.astrology_lifespan import build_persian_directed_payload
+from fatebridge.core.astro.astrology_lifespan import build_persian_directed_payload
 from fatebridge.services.western_lifespan import calculate_persian_directed
 
 _FIXTURES = Path(__file__).parents[1] / "fixtures"
@@ -70,13 +70,19 @@ def test_historical_values_and_independent_decimal_chronology() -> None:
             for target, longitude in targets:
                 if mover == target:
                     continue
+                else:
+                    pass
                 for aspect in (0, 60, 90, 120, 180):
                     for direction in ((1,) if aspect in (0, 180) else (1, -1)):
                         arc = (longitude + direction * aspect - source[mover]) % circle
                         if arc < 0:
                             arc += circle
+                        else:
+                            pass
                         if 0 < arc <= 90:
                             candidates.append((arc, mover, aspect, target))
+                        else:
+                            pass
         candidates.sort(key=lambda row: row[0])
         independent = [
             (round(float(arc) * 100) / 100, mover, aspect, target)

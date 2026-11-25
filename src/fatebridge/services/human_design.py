@@ -3,26 +3,44 @@
 from typing import Any, Callable, Dict, Optional
 
 from fatebridge.core.astro import runtime
-from fatebridge.core.astro.historical_utc import historical_utc_table, utc1960_table
 from fatebridge.core.astro.source_session import coherent_ephemeris_sources
 from fatebridge.core.ephemeris_runtime import configured_ephemeris_path
-from fatebridge.core.human_design import chart_at, chart_at_tt
-from fatebridge.core.human_design_apparent_positions import guard_apparent_positions
-from fatebridge.core.human_design_backend import compare_full_backends
-from fatebridge.core.human_design_birth_clock import resolve_birth_clock
-from fatebridge.core.human_design_clock_observation import observe_human_design_clocks
-from fatebridge.core.human_design_cycle_origins import calculate_origin_comparison
-from fatebridge.core.human_design_cycle_sources import CycleBirthSources
-from fatebridge.core.human_design_cycles import calculate_cycle_context, cycle_summary
-from fatebridge.core.human_design_evidence import evidence
-from fatebridge.core.human_design_execution import isolated_human_design
-from fatebridge.core.human_design_interval_summary import unassessed_interval
-from fatebridge.core.human_design_mechanics import BODY_IDS
-from fatebridge.core.human_design_natal_sources import guard_natal_sources
-from fatebridge.core.human_design_node_comparisons import node_convention_report
-from fatebridge.core.human_design_precision import compare_node_backends
-from fatebridge.core.human_design_references import coherent_human_design_references
-from fatebridge.core.human_design_sensitivity import assess_birth_interval
+from fatebridge.core.human_design.human_design import chart_at, chart_at_tt
+from fatebridge.core.human_design.human_design_apparent_positions import (
+    guard_apparent_positions,
+)
+from fatebridge.core.human_design.human_design_backend import compare_full_backends
+from fatebridge.core.human_design.human_design_birth_clock import resolve_birth_clock
+from fatebridge.core.human_design.human_design_clock_observation import (
+    observe_human_design_clocks,
+)
+from fatebridge.core.human_design.human_design_cycle_origins import (
+    calculate_origin_comparison,
+)
+from fatebridge.core.human_design.human_design_cycle_sources import CycleBirthSources
+from fatebridge.core.human_design.human_design_cycles import (
+    calculate_cycle_context,
+    cycle_summary,
+)
+from fatebridge.core.human_design.human_design_evidence import evidence
+from fatebridge.core.human_design.human_design_execution import isolated_human_design
+from fatebridge.core.human_design.human_design_interval_summary import (
+    unassessed_interval,
+)
+from fatebridge.core.human_design.human_design_mechanics import BODY_IDS
+from fatebridge.core.human_design.human_design_natal_sources import guard_natal_sources
+from fatebridge.core.human_design.human_design_node_comparisons import (
+    node_convention_report,
+)
+from fatebridge.core.human_design.human_design_point_mass import (
+    point_mass_positions,
+    solve_point_mass_design_root,
+)
+from fatebridge.core.human_design.human_design_precision import compare_node_backends
+from fatebridge.core.human_design.human_design_references import (
+    coherent_human_design_references,
+)
+from fatebridge.core.human_design.human_design_sensitivity import assess_birth_interval
 from fatebridge.core.jpl_ephemeris import configured_jpl_file
 from fatebridge.utils.errors import EphemerisSourceError, calculation_guard
 
@@ -54,6 +72,8 @@ def calculate_human_design(
 ) -> Dict[str, Any]:
     if compare_cycle_origins and cycle_reference_datetime is None:
         raise ValueError("周期原点对照须提供cycle_reference_datetime")
+    else:
+        pass
     clock = resolve_birth_clock(
         birth_year=birth_year,
         birth_month=birth_month,
@@ -84,6 +104,8 @@ def calculate_human_design(
                 source_observer=observer,
                 design_source_observer=design_observer,
             )
+        else:
+            pass
         return chart_at(
             clock.utc_anchor,
             mode,
@@ -109,6 +131,8 @@ def calculate_human_design(
             future_leap_seconds_assumed_unchanged=False,
         )
         chart["design_solver"]["civil_elapsed_days"] = None
+    else:
+        pass
     cycles = (
         calculate_cycle_context(
             chart,
@@ -129,7 +153,6 @@ def calculate_human_design(
         if design_sources is not None
         else None
     )
-    alternative = natal_chart("mean" if node_mode == "true" else "true")
     models = sorted(
         {
             a["ephemeris_model"]
@@ -146,13 +169,18 @@ def calculate_human_design(
             node_mode,
             require_swiss_files=require_swiss_files,
         )
-    node_backend = compare_node_backends(chart, node_mode)
-    ephemeris_backend = compare_full_backends(chart, node_mode)
+    else:
+        pass
+    comparison_reports: dict[str, dict[str, Any]] = {}
     if compare_apparent_models:
-        from fatebridge.core.human_design_point_mass import (
-            point_mass_positions,
-            solve_point_mass_design_root,
-        )
+        alternative = natal_chart("mean" if node_mode == "true" else "true")
+        comparison_reports = {
+            "node_convention_comparison": node_convention_report(
+                chart, alternative, node_mode
+            ),
+            "node_backend_comparison": compare_node_backends(chart, node_mode),
+            "ephemeris_backend_comparison": compare_full_backends(chart, node_mode),
+        }
 
         candidate_root = solve_point_mass_design_root(
             chart["time_scales"]["personality"]["jd_tt"]
@@ -170,32 +198,37 @@ def calculate_human_design(
             },
             "candidate_design_root": candidate_root,
         }
-        if root_available:
-            candidate_tt = candidate_root["design_jd_tt"]
-            assert isinstance(candidate_tt, float)
+        if candidate_root["status"] == "computed":
+            candidate_jd_tt = candidate_root["design_jd_tt"]
             chart["apparent_model_comparison"].update(
-                candidate_design_epoch=point_mass_positions(candidate_tt),
+                candidate_design_epoch=point_mass_positions(candidate_jd_tt),
                 candidate_minus_native_root_seconds=(
-                    candidate_tt - chart["time_scales"]["design"]["jd_tt"]
+                    candidate_jd_tt - chart["time_scales"]["design"]["jd_tt"]
                 )
                 * 86400,
             )
+        else:
+            pass
+    else:
+        pass
     if (
         configured_ephemeris_path() != selected_path
         or configured_jpl_file() != selected_jpl
     ):
         raise EphemerisSourceError("physical_configuration_changed")
+    else:
+        pass
     if birth_sources is not None:
         # Keep original source files pinned through the comparison passes.
         birth_sources.trace.finish()
+    else:
+        pass
     if design_sources is not None:
         design_sources.trace.finish()
-    chart["node_convention_comparison"] = node_convention_report(
-        chart, alternative, node_mode
-    )
-    chart["node_backend_comparison"] = node_backend
+    else:
+        pass
     chart["time_sensitivity"] = sensitivity
-    chart["ephemeris_backend_comparison"] = ephemeris_backend
+    chart.update(comparison_reports)
     return {
         "engine": "human_design_swiss_ephemeris",
         "method_id": "human_design_public_mechanics_v1",
@@ -236,13 +269,5 @@ def calculate_human_design(
             "require_swiss_files": require_swiss_files,
             "gate_41_start_degrees": 302.0,
             "boundary_policy": "half_open_no_preclassification_rounding",
-            "derived_opposition_policy": "地球与南交点从同侧来源黄经的精确二进制有理数加180度后分类；longitude仅为浮点显示，边界回放须同时读取derived_from与derivation_source_longitude。不认证来源星历的物理精度。",
-            "birth_precision_note": "输入秒默认为0；数值细分不是已核实的出生时间精度。",
-            "historical_time_convention": "1960使用IAU SOFA的UTC偏移与漂移，1961-1971使用IERS历史UTC漂移；1960之前按历史UT1解释。未核实当地钟表或授时台实现。",
-            "historical_utc_source": historical_utc_table()["source_url"],
-            "historical_utc_source_sha256": historical_utc_table()["source_sha256"],
-            "historical_utc_1960_source": utc1960_table()["source_url"],
-            "historical_utc_1960_source_sha256": utc1960_table()["source_sha256"],
         },
-        "ephemeris_backend_comparison": ephemeris_backend,
     }

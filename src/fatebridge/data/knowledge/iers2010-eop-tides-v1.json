@@ -1,0 +1,3674 @@
+{
+  "format_version": 1,
+  "model_id": "iers2010_printed_tables_20120810_tt_ut1_v1",
+  "source_documents": {
+    "chapter5": "https://iers-conventions.obspm.fr/content/chapter5/icc5.pdf",
+    "chapter8": "https://iers-conventions.obspm.fr/content/chapter8/icc8.pdf",
+    "chapter5_sha256": "9ec6fac43f7037ff43896539d759333fc7e6007176cd72043b38d71cfd3e69c0",
+    "chapter8_sha256": "8314a59c3f89536bcd081afe57ab49efaf9ebf1191d23109fa65b15cb4d56669"
+  },
+  "fundamental_arcseconds": [
+    [
+      "485868.24903600",
+      "1717915923.2178",
+      "31.8792",
+      "0.051635",
+      "-0.00024470"
+    ],
+    [
+      "1287104.79304800",
+      "129596581.0481",
+      "-0.5532",
+      "0.000136",
+      "-0.00001149"
+    ],
+    [
+      "335779.52623200",
+      "1739527262.8478",
+      "-12.7512",
+      "-0.001037",
+      "0.00000417"
+    ],
+    [
+      "1072260.70369200",
+      "1602961601.2090",
+      "-6.3706",
+      "0.006593",
+      "-0.00003169"
+    ],
+    [
+      "450160.39803600",
+      "-6962890.5431",
+      "7.4722",
+      "0.007702",
+      "-0.00005939"
+    ]
+  ],
+  "gmst_arcseconds": [
+    "0.014506",
+    "4612.156534",
+    "1.3915817",
+    "-0.00000044",
+    "-0.000029956",
+    "-0.0000000368"
+  ],
+  "ocean": [
+    {
+      "multipliers": [
+        1,
+        -1,
+        0,
+        -2,
+        -2,
+        -2
+      ],
+      "pole_microarcseconds": [
+        "0.0",
+        "0.9",
+        "-0.9",
+        "-0.1"
+      ],
+      "ut1_microseconds": [
+        "0.40",
+        "-0.08"
+      ],
+      "lod_microseconds": [
+        "-0.4",
+        "-2.1"
+      ],
+      "doodson": "117.655",
+      "period_days": "1.2113611"
+    },
+    {
+      "multipliers": [
+        1,
+        -2,
+        0,
+        -2,
+        0,
+        -1
+      ],
+      "pole_microarcseconds": [
+        "0.1",
+        "0.6",
+        "-0.6",
+        "0.1"
+      ],
+      "ut1_microseconds": [
+        "0.19",
+        "-0.06"
+      ],
+      "lod_microseconds": [
+        "-0.3",
+        "-1.1"
+      ],
+      "doodson": "125.745",
+      "period_days": "1.1671262"
+    },
+    {
+      "multipliers": [
+        1,
+        -2,
+        0,
+        -2,
+        0,
+        -2
+      ],
+      "pole_microarcseconds": [
+        "0.3",
+        "3.4",
+        "-3.4",
+        "0.3"
+      ],
+      "ut1_microseconds": [
+        "1.03",
+        "-0.31"
+      ],
+      "lod_microseconds": [
+        "-1.7",
+        "-5.6"
+      ],
+      "doodson": "125.755",
+      "period_days": "1.1669259"
+    },
+    {
+      "multipliers": [
+        1,
+        0,
+        0,
+        -2,
+        -2,
+        -1
+      ],
+      "pole_microarcseconds": [
+        "0.1",
+        "0.8",
+        "-0.8",
+        "0.1"
+      ],
+      "ut1_microseconds": [
+        "0.22",
+        "-0.07"
+      ],
+      "lod_microseconds": [
+        "-0.4",
+        "-1.2"
+      ],
+      "doodson": "127.545",
+      "period_days": "1.1605476"
+    },
+    {
+      "multipliers": [
+        1,
+        0,
+        0,
+        -2,
+        -2,
+        -2
+      ],
+      "pole_microarcseconds": [
+        "0.5",
+        "4.2",
+        "-4.1",
+        "0.5"
+      ],
+      "ut1_microseconds": [
+        "1.19",
+        "-0.39"
+      ],
+      "lod_microseconds": [
+        "-2.1",
+        "-6.4"
+      ],
+      "doodson": "127.555",
+      "period_days": "1.1603495"
+    },
+    {
+      "multipliers": [
+        1,
+        -1,
+        0,
+        -2,
+        0,
+        -1
+      ],
+      "pole_microarcseconds": [
+        "1.2",
+        "5.0",
+        "-5.0",
+        "1.2"
+      ],
+      "ut1_microseconds": [
+        "0.97",
+        "-0.47"
+      ],
+      "lod_microseconds": [
+        "-2.7",
+        "-5.4"
+      ],
+      "doodson": "135.645",
+      "period_days": "1.1196993"
+    },
+    {
+      "multipliers": [
+        1,
+        -1,
+        0,
+        -2,
+        0,
+        -2
+      ],
+      "pole_microarcseconds": [
+        "6.2",
+        "26.3",
+        "-26.3",
+        "6.2"
+      ],
+      "ut1_microseconds": [
+        "5.12",
+        "-2.50"
+      ],
+      "lod_microseconds": [
+        "-14.0",
+        "-28.7"
+      ],
+      "doodson": "135.655",
+      "period_days": "1.1195148"
+    },
+    {
+      "multipliers": [
+        1,
+        1,
+        0,
+        -2,
+        -2,
+        -1
+      ],
+      "pole_microarcseconds": [
+        "0.2",
+        "0.9",
+        "-0.9",
+        "0.2"
+      ],
+      "ut1_microseconds": [
+        "0.17",
+        "-0.09"
+      ],
+      "lod_microseconds": [
+        "-0.5",
+        "-1.0"
+      ],
+      "doodson": "137.445",
+      "period_days": "1.1136429"
+    },
+    {
+      "multipliers": [
+        1,
+        1,
+        0,
+        -2,
+        -2,
+        -2
+      ],
+      "pole_microarcseconds": [
+        "1.3",
+        "5.0",
+        "-5.0",
+        "1.3"
+      ],
+      "ut1_microseconds": [
+        "0.91",
+        "-0.47"
+      ],
+      "lod_microseconds": [
+        "-2.7",
+        "-5.1"
+      ],
+      "doodson": "137.455",
+      "period_days": "1.1134606"
+    },
+    {
+      "multipliers": [
+        1,
+        0,
+        0,
+        -2,
+        0,
+        0
+      ],
+      "pole_microarcseconds": [
+        "-0.3",
+        "-0.8",
+        "0.8",
+        "-0.3"
+      ],
+      "ut1_microseconds": [
+        "-0.09",
+        "0.07"
+      ],
+      "lod_microseconds": [
+        "0.4",
+        "0.5"
+      ],
+      "doodson": "145.535",
+      "period_days": "1.0761465"
+    },
+    {
+      "multipliers": [
+        1,
+        0,
+        0,
+        -2,
+        0,
+        -1
+      ],
+      "pole_microarcseconds": [
+        "9.2",
+        "25.1",
+        "-25.1",
+        "9.2"
+      ],
+      "ut1_microseconds": [
+        "3.03",
+        "-2.28"
+      ],
+      "lod_microseconds": [
+        "-13.3",
+        "-17.7"
+      ],
+      "doodson": "145.545",
+      "period_days": "1.0759762"
+    },
+    {
+      "multipliers": [
+        1,
+        0,
+        0,
+        -2,
+        0,
+        -2
+      ],
+      "pole_microarcseconds": [
+        "48.8",
+        "132.9",
+        "-132.9",
+        "48.8"
+      ],
+      "ut1_microseconds": [
+        "16.02",
+        "-12.07"
+      ],
+      "lod_microseconds": [
+        "-70.5",
+        "-93.6"
+      ],
+      "doodson": "145.555",
+      "period_days": "1.0758059"
+    },
+    {
+      "multipliers": [
+        1,
+        -2,
+        0,
+        0,
+        0,
+        0
+      ],
+      "pole_microarcseconds": [
+        "-0.3",
+        "-0.9",
+        "0.9",
+        "-0.3"
+      ],
+      "ut1_microseconds": [
+        "-0.10",
+        "0.08"
+      ],
+      "lod_microseconds": [
+        "0.5",
+        "0.6"
+      ],
+      "doodson": "145.755",
+      "period_days": "1.0750901"
+    },
+    {
+      "multipliers": [
+        1,
+        0,
+        0,
+        0,
+        -2,
+        0
+      ],
+      "pole_microarcseconds": [
+        "-0.7",
+        "-1.7",
+        "1.7",
+        "-0.7"
+      ],
+      "ut1_microseconds": [
+        "-0.19",
+        "0.15"
+      ],
+      "lod_microseconds": [
+        "0.9",
+        "1.1"
+      ],
+      "doodson": "147.555",
+      "period_days": "1.0695055"
+    },
+    {
+      "multipliers": [
+        1,
+        -1,
+        0,
+        -2,
+        2,
+        -2
+      ],
+      "pole_microarcseconds": [
+        "-0.4",
+        "-0.9",
+        "0.9",
+        "-0.4"
+      ],
+      "ut1_microseconds": [
+        "-0.08",
+        "0.07"
+      ],
+      "lod_microseconds": [
+        "0.5",
+        "0.5"
+      ],
+      "doodson": "153.655",
+      "period_days": "1.0406147"
+    },
+    {
+      "multipliers": [
+        1,
+        1,
+        0,
+        -2,
+        0,
+        -1
+      ],
+      "pole_microarcseconds": [
+        "-0.3",
+        "-0.6",
+        "0.6",
+        "-0.3"
+      ],
+      "ut1_microseconds": [
+        "-0.06",
+        "0.05"
+      ],
+      "lod_microseconds": [
+        "0.3",
+        "0.4"
+      ],
+      "doodson": "155.445",
+      "period_days": "1.0355395"
+    },
+    {
+      "multipliers": [
+        1,
+        1,
+        0,
+        -2,
+        0,
+        -2
+      ],
+      "pole_microarcseconds": [
+        "-1.6",
+        "-3.5",
+        "3.5",
+        "-1.6"
+      ],
+      "ut1_microseconds": [
+        "-0.31",
+        "0.27"
+      ],
+      "lod_microseconds": [
+        "1.7",
+        "1.9"
+      ],
+      "doodson": "155.455",
+      "period_days": "1.0353817"
+    },
+    {
+      "multipliers": [
+        1,
+        -1,
+        0,
+        0,
+        0,
+        0
+      ],
+      "pole_microarcseconds": [
+        "-4.5",
+        "-9.6",
+        "9.6",
+        "-4.5"
+      ],
+      "ut1_microseconds": [
+        "-0.86",
+        "0.75"
+      ],
+      "lod_microseconds": [
+        "4.6",
+        "5.2"
+      ],
+      "doodson": "155.655",
+      "period_days": "1.0347187"
+    },
+    {
+      "multipliers": [
+        1,
+        -1,
+        0,
+        0,
+        0,
+        -1
+      ],
+      "pole_microarcseconds": [
+        "-0.9",
+        "-1.9",
+        "1.9",
+        "-0.9"
+      ],
+      "ut1_microseconds": [
+        "-0.17",
+        "0.15"
+      ],
+      "lod_microseconds": [
+        "0.9",
+        "1.0"
+      ],
+      "doodson": "155.665",
+      "period_days": "1.0345612"
+    },
+    {
+      "multipliers": [
+        1,
+        1,
+        0,
+        0,
+        -2,
+        0
+      ],
+      "pole_microarcseconds": [
+        "-0.9",
+        "-1.8",
+        "1.8",
+        "-0.9"
+      ],
+      "ut1_microseconds": [
+        "-0.16",
+        "0.14"
+      ],
+      "lod_microseconds": [
+        "0.8",
+        "1.0"
+      ],
+      "doodson": "157.455",
+      "period_days": "1.0295447"
+    },
+    {
+      "multipliers": [
+        1,
+        0,
+        -1,
+        -2,
+        2,
+        -2
+      ],
+      "pole_microarcseconds": [
+        "1.5",
+        "3.0",
+        "-3.0",
+        "1.5"
+      ],
+      "ut1_microseconds": [
+        "0.31",
+        "-0.19"
+      ],
+      "lod_microseconds": [
+        "-1.2",
+        "-2.0"
+      ],
+      "doodson": "162.556",
+      "period_days": "1.0055058"
+    },
+    {
+      "multipliers": [
+        1,
+        0,
+        0,
+        -2,
+        2,
+        -1
+      ],
+      "pole_microarcseconds": [
+        "-0.3",
+        "-0.6",
+        "0.6",
+        "-0.3"
+      ],
+      "ut1_microseconds": [
+        "-0.06",
+        "0.03"
+      ],
+      "lod_microseconds": [
+        "0.2",
+        "0.4"
+      ],
+      "doodson": "163.545",
+      "period_days": "1.0028933"
+    },
+    {
+      "multipliers": [
+        1,
+        0,
+        0,
+        -2,
+        2,
+        -2
+      ],
+      "pole_microarcseconds": [
+        "26.1",
+        "51.2",
+        "-51.2",
+        "26.1"
+      ],
+      "ut1_microseconds": [
+        "5.51",
+        "-3.10"
+      ],
+      "lod_microseconds": [
+        "-19.4",
+        "-34.5"
+      ],
+      "doodson": "163.555",
+      "period_days": "1.0027454"
+    },
+    {
+      "multipliers": [
+        1,
+        0,
+        1,
+        -2,
+        2,
+        -2
+      ],
+      "pole_microarcseconds": [
+        "-0.2",
+        "-0.4",
+        "0.4",
+        "-0.2"
+      ],
+      "ut1_microseconds": [
+        "-0.05",
+        "0.02"
+      ],
+      "lod_microseconds": [
+        "0.2",
+        "0.3"
+      ],
+      "doodson": "164.554",
+      "period_days": "1.0000001"
+    },
+    {
+      "multipliers": [
+        1,
+        0,
+        -1,
+        0,
+        0,
+        0
+      ],
+      "pole_microarcseconds": [
+        "-0.6",
+        "-1.2",
+        "1.2",
+        "-0.6"
+      ],
+      "ut1_microseconds": [
+        "-0.13",
+        "0.07"
+      ],
+      "lod_microseconds": [
+        "0.4",
+        "0.8"
+      ],
+      "doodson": "164.556",
+      "period_days": "0.9999999"
+    },
+    {
+      "multipliers": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "pole_microarcseconds": [
+        "1.5",
+        "3.0",
+        "-3.0",
+        "1.5"
+      ],
+      "ut1_microseconds": [
+        "0.35",
+        "-0.17"
+      ],
+      "lod_microseconds": [
+        "-1.1",
+        "-2.2"
+      ],
+      "doodson": "165.545",
+      "period_days": "0.9974159"
+    },
+    {
+      "multipliers": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "pole_microarcseconds": [
+        "-77.5",
+        "-151.7",
+        "151.7",
+        "-77.5"
+      ],
+      "ut1_microseconds": [
+        "-17.62",
+        "8.55"
+      ],
+      "lod_microseconds": [
+        "53.9",
+        "111.0"
+      ],
+      "doodson": "165.555",
+      "period_days": "0.9972696"
+    },
+    {
+      "multipliers": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        -1
+      ],
+      "pole_microarcseconds": [
+        "-10.5",
+        "-20.6",
+        "20.6",
+        "-10.5"
+      ],
+      "ut1_microseconds": [
+        "-2.39",
+        "1.16"
+      ],
+      "lod_microseconds": [
+        "7.3",
+        "15.1"
+      ],
+      "doodson": "165.565",
+      "period_days": "0.9971233"
+    },
+    {
+      "multipliers": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        -2
+      ],
+      "pole_microarcseconds": [
+        "0.2",
+        "0.4",
+        "-0.4",
+        "0.2"
+      ],
+      "ut1_microseconds": [
+        "0.05",
+        "-0.03"
+      ],
+      "lod_microseconds": [
+        "-0.2",
+        "-0.3"
+      ],
+      "doodson": "165.575",
+      "period_days": "0.9969771"
+    },
+    {
+      "multipliers": [
+        1,
+        0,
+        1,
+        0,
+        0,
+        0
+      ],
+      "pole_microarcseconds": [
+        "-0.6",
+        "-1.2",
+        "1.2",
+        "-0.6"
+      ],
+      "ut1_microseconds": [
+        "-0.14",
+        "0.06"
+      ],
+      "lod_microseconds": [
+        "0.4",
+        "0.9"
+      ],
+      "doodson": "166.554",
+      "period_days": "0.9945541"
+    },
+    {
+      "multipliers": [
+        1,
+        0,
+        0,
+        2,
+        -2,
+        2
+      ],
+      "pole_microarcseconds": [
+        "-1.1",
+        "-2.1",
+        "2.1",
+        "-1.1"
+      ],
+      "ut1_microseconds": [
+        "-0.27",
+        "0.11"
+      ],
+      "lod_microseconds": [
+        "0.7",
+        "1.7"
+      ],
+      "doodson": "167.555",
+      "period_days": "0.9918532"
+    },
+    {
+      "multipliers": [
+        1,
+        -1,
+        0,
+        0,
+        2,
+        0
+      ],
+      "pole_microarcseconds": [
+        "-0.7",
+        "-1.4",
+        "1.4",
+        "-0.7"
+      ],
+      "ut1_microseconds": [
+        "-0.29",
+        "0.04"
+      ],
+      "lod_microseconds": [
+        "0.3",
+        "1.9"
+      ],
+      "doodson": "173.655",
+      "period_days": "0.9669565"
+    },
+    {
+      "multipliers": [
+        1,
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      "pole_microarcseconds": [
+        "-3.5",
+        "-7.3",
+        "7.3",
+        "-3.5"
+      ],
+      "ut1_microseconds": [
+        "-1.61",
+        "0.19"
+      ],
+      "lod_microseconds": [
+        "1.2",
+        "10.5"
+      ],
+      "doodson": "175.455",
+      "period_days": "0.9624365"
+    },
+    {
+      "multipliers": [
+        1,
+        1,
+        0,
+        0,
+        0,
+        -1
+      ],
+      "pole_microarcseconds": [
+        "-0.7",
+        "-1.4",
+        "1.4",
+        "-0.7"
+      ],
+      "ut1_microseconds": [
+        "-0.32",
+        "0.04"
+      ],
+      "lod_microseconds": [
+        "0.2",
+        "2.1"
+      ],
+      "doodson": "175.465",
+      "period_days": "0.9623003"
+    },
+    {
+      "multipliers": [
+        1,
+        0,
+        0,
+        0,
+        2,
+        0
+      ],
+      "pole_microarcseconds": [
+        "-0.4",
+        "-1.1",
+        "1.1",
+        "-0.4"
+      ],
+      "ut1_microseconds": [
+        "-0.41",
+        "-0.01"
+      ],
+      "lod_microseconds": [
+        "-0.0",
+        "2.7"
+      ],
+      "doodson": "183.555",
+      "period_days": "0.9341741"
+    },
+    {
+      "multipliers": [
+        1,
+        2,
+        0,
+        0,
+        0,
+        0
+      ],
+      "pole_microarcseconds": [
+        "-0.2",
+        "-0.5",
+        "0.5",
+        "-0.2"
+      ],
+      "ut1_microseconds": [
+        "-0.21",
+        "-0.01"
+      ],
+      "lod_microseconds": [
+        "-0.0",
+        "1.4"
+      ],
+      "doodson": "185.355",
+      "period_days": "0.9299547"
+    },
+    {
+      "multipliers": [
+        1,
+        0,
+        0,
+        2,
+        0,
+        2
+      ],
+      "pole_microarcseconds": [
+        "-1.1",
+        "-3.4",
+        "3.4",
+        "-1.1"
+      ],
+      "ut1_microseconds": [
+        "-1.44",
+        "-0.04"
+      ],
+      "lod_microseconds": [
+        "-0.3",
+        "9.7"
+      ],
+      "doodson": "185.555",
+      "period_days": "0.9294198"
+    },
+    {
+      "multipliers": [
+        1,
+        0,
+        0,
+        2,
+        0,
+        1
+      ],
+      "pole_microarcseconds": [
+        "-0.7",
+        "-2.2",
+        "2.2",
+        "-0.7"
+      ],
+      "ut1_microseconds": [
+        "-0.92",
+        "-0.02"
+      ],
+      "lod_microseconds": [
+        "-0.2",
+        "6.2"
+      ],
+      "doodson": "185.565",
+      "period_days": "0.9292927"
+    },
+    {
+      "multipliers": [
+        1,
+        0,
+        0,
+        2,
+        0,
+        0
+      ],
+      "pole_microarcseconds": [
+        "-0.1",
+        "-0.5",
+        "0.5",
+        "-0.1"
+      ],
+      "ut1_microseconds": [
+        "-0.19",
+        "0.00"
+      ],
+      "lod_microseconds": [
+        "-0.0",
+        "1.3"
+      ],
+      "doodson": "185.575",
+      "period_days": "0.9291657"
+    },
+    {
+      "multipliers": [
+        1,
+        1,
+        0,
+        2,
+        0,
+        2
+      ],
+      "pole_microarcseconds": [
+        "0.0",
+        "-0.6",
+        "0.6",
+        "0.0"
+      ],
+      "ut1_microseconds": [
+        "-0.40",
+        "-0.02"
+      ],
+      "lod_microseconds": [
+        "-0.2",
+        "2.8"
+      ],
+      "doodson": "195.455",
+      "period_days": "0.8990932"
+    },
+    {
+      "multipliers": [
+        1,
+        1,
+        0,
+        2,
+        0,
+        1
+      ],
+      "pole_microarcseconds": [
+        "0.0",
+        "-0.4",
+        "0.4",
+        "0.0"
+      ],
+      "ut1_microseconds": [
+        "-0.25",
+        "-0.02"
+      ],
+      "lod_microseconds": [
+        "-0.1",
+        "1.8"
+      ],
+      "doodson": "195.465",
+      "period_days": "0.8989743"
+    },
+    {
+      "multipliers": [
+        2,
+        -3,
+        0,
+        -2,
+        0,
+        -2
+      ],
+      "pole_microarcseconds": [
+        "-0.5",
+        "0.0",
+        "0.6",
+        "0.2"
+      ],
+      "ut1_microseconds": [
+        "-0.09",
+        "-0.01"
+      ],
+      "lod_microseconds": [
+        "-0.1",
+        "1.0"
+      ],
+      "doodson": "225.855",
+      "period_days": "0.5484264"
+    },
+    {
+      "multipliers": [
+        2,
+        -1,
+        0,
+        -2,
+        -2,
+        -2
+      ],
+      "pole_microarcseconds": [
+        "-1.3",
+        "-0.2",
+        "1.5",
+        "0.7"
+      ],
+      "ut1_microseconds": [
+        "-0.22",
+        "-0.03"
+      ],
+      "lod_microseconds": [
+        "-0.4",
+        "2.6"
+      ],
+      "doodson": "227.655",
+      "period_days": "0.5469695"
+    },
+    {
+      "multipliers": [
+        2,
+        -2,
+        0,
+        -2,
+        0,
+        -2
+      ],
+      "pole_microarcseconds": [
+        "-6.1",
+        "-1.6",
+        "3.1",
+        "3.4"
+      ],
+      "ut1_microseconds": [
+        "-0.64",
+        "-0.18"
+      ],
+      "lod_microseconds": [
+        "-2.1",
+        "7.4"
+      ],
+      "doodson": "235.755",
+      "period_days": "0.5377239"
+    },
+    {
+      "multipliers": [
+        2,
+        0,
+        0,
+        -2,
+        -2,
+        -2
+      ],
+      "pole_microarcseconds": [
+        "-7.6",
+        "-2.0",
+        "3.4",
+        "4.2"
+      ],
+      "ut1_microseconds": [
+        "-0.74",
+        "-0.22"
+      ],
+      "lod_microseconds": [
+        "-2.6",
+        "8.7"
+      ],
+      "doodson": "237.555",
+      "period_days": "0.5363232"
+    },
+    {
+      "multipliers": [
+        2,
+        0,
+        1,
+        -2,
+        -2,
+        -2
+      ],
+      "pole_microarcseconds": [
+        "-0.5",
+        "-0.1",
+        "0.2",
+        "0.3"
+      ],
+      "ut1_microseconds": [
+        "-0.05",
+        "-0.02"
+      ],
+      "lod_microseconds": [
+        "-0.2",
+        "0.6"
+      ],
+      "doodson": "238.554",
+      "period_days": "0.5355369"
+    },
+    {
+      "multipliers": [
+        2,
+        -1,
+        -1,
+        -2,
+        0,
+        -2
+      ],
+      "pole_microarcseconds": [
+        "0.5",
+        "0.1",
+        "-0.1",
+        "-0.3"
+      ],
+      "ut1_microseconds": [
+        "0.03",
+        "0.01"
+      ],
+      "lod_microseconds": [
+        "0.2",
+        "-0.4"
+      ],
+      "doodson": "244.656",
+      "period_days": "0.5281939"
+    },
+    {
+      "multipliers": [
+        2,
+        -1,
+        0,
+        -2,
+        0,
+        -1
+      ],
+      "pole_microarcseconds": [
+        "2.1",
+        "0.5",
+        "-0.4",
+        "-1.2"
+      ],
+      "ut1_microseconds": [
+        "0.14",
+        "0.06"
+      ],
+      "lod_microseconds": [
+        "0.7",
+        "-1.7"
+      ],
+      "doodson": "245.645",
+      "period_days": "0.5274721"
+    },
+    {
+      "multipliers": [
+        2,
+        -1,
+        0,
+        -2,
+        0,
+        -2
+      ],
+      "pole_microarcseconds": [
+        "-56.9",
+        "-12.9",
+        "11.1",
+        "32.9"
+      ],
+      "ut1_microseconds": [
+        "-3.79",
+        "-1.56"
+      ],
+      "lod_microseconds": [
+        "-18.6",
+        "45.2"
+      ],
+      "doodson": "245.655",
+      "period_days": "0.5274312"
+    },
+    {
+      "multipliers": [
+        2,
+        -1,
+        1,
+        -2,
+        0,
+        -2
+      ],
+      "pole_microarcseconds": [
+        "-0.5",
+        "-0.1",
+        "0.1",
+        "0.3"
+      ],
+      "ut1_microseconds": [
+        "-0.03",
+        "-0.01"
+      ],
+      "lod_microseconds": [
+        "-0.2",
+        "0.4"
+      ],
+      "doodson": "246.654",
+      "period_days": "0.5266707"
+    },
+    {
+      "multipliers": [
+        2,
+        1,
+        0,
+        -2,
+        -2,
+        -2
+      ],
+      "pole_microarcseconds": [
+        "-11.0",
+        "-2.4",
+        "1.9",
+        "6.4"
+      ],
+      "ut1_microseconds": [
+        "-0.70",
+        "-0.30"
+      ],
+      "lod_microseconds": [
+        "-3.6",
+        "8.3"
+      ],
+      "doodson": "247.455",
+      "period_days": "0.5260835"
+    },
+    {
+      "multipliers": [
+        2,
+        1,
+        1,
+        -2,
+        -2,
+        -2
+      ],
+      "pole_microarcseconds": [
+        "-0.5",
+        "-0.1",
+        "0.1",
+        "0.3"
+      ],
+      "ut1_microseconds": [
+        "-0.03",
+        "-0.01"
+      ],
+      "lod_microseconds": [
+        "-0.2",
+        "0.4"
+      ],
+      "doodson": "248.454",
+      "period_days": "0.5253269"
+    },
+    {
+      "multipliers": [
+        2,
+        -2,
+        0,
+        -2,
+        2,
+        -2
+      ],
+      "pole_microarcseconds": [
+        "1.0",
+        "0.1",
+        "-0.1",
+        "-0.6"
+      ],
+      "ut1_microseconds": [
+        "0.05",
+        "0.02"
+      ],
+      "lod_microseconds": [
+        "0.3",
+        "-0.6"
+      ],
+      "doodson": "253.755",
+      "period_days": "0.5188292"
+    },
+    {
+      "multipliers": [
+        2,
+        0,
+        -1,
+        -2,
+        0,
+        -2
+      ],
+      "pole_microarcseconds": [
+        "1.1",
+        "0.1",
+        "-0.1",
+        "-0.7"
+      ],
+      "ut1_microseconds": [
+        "0.06",
+        "0.03"
+      ],
+      "lod_microseconds": [
+        "0.3",
+        "-0.7"
+      ],
+      "doodson": "254.556",
+      "period_days": "0.5182593"
+    },
+    {
+      "multipliers": [
+        2,
+        0,
+        0,
+        -2,
+        0,
+        -1
+      ],
+      "pole_microarcseconds": [
+        "12.3",
+        "1.0",
+        "-1.4",
+        "-7.3"
+      ],
+      "ut1_microseconds": [
+        "0.60",
+        "0.27"
+      ],
+      "lod_microseconds": [
+        "3.2",
+        "-7.3"
+      ],
+      "doodson": "255.545",
+      "period_days": "0.5175645"
+    },
+    {
+      "multipliers": [
+        2,
+        0,
+        0,
+        -2,
+        0,
+        -2
+      ],
+      "pole_microarcseconds": [
+        "-330.2",
+        "-27.0",
+        "37.6",
+        "195.9"
+      ],
+      "ut1_microseconds": [
+        "-16.19",
+        "-7.25"
+      ],
+      "lod_microseconds": [
+        "-86.8",
+        "196.6"
+      ],
+      "doodson": "255.555",
+      "period_days": "0.5175251"
+    },
+    {
+      "multipliers": [
+        2,
+        0,
+        1,
+        -2,
+        0,
+        -2
+      ],
+      "pole_microarcseconds": [
+        "-1.0",
+        "-0.1",
+        "0.1",
+        "0.6"
+      ],
+      "ut1_microseconds": [
+        "-0.05",
+        "-0.02"
+      ],
+      "lod_microseconds": [
+        "-0.3",
+        "0.6"
+      ],
+      "doodson": "256.554",
+      "period_days": "0.5167928"
+    },
+    {
+      "multipliers": [
+        2,
+        -1,
+        0,
+        -2,
+        2,
+        -2
+      ],
+      "pole_microarcseconds": [
+        "2.5",
+        "-0.3",
+        "-0.4",
+        "-1.5"
+      ],
+      "ut1_microseconds": [
+        "0.11",
+        "0.03"
+      ],
+      "lod_microseconds": [
+        "0.4",
+        "-1.4"
+      ],
+      "doodson": "263.655",
+      "period_days": "0.5092406"
+    },
+    {
+      "multipliers": [
+        2,
+        1,
+        0,
+        -2,
+        0,
+        -2
+      ],
+      "pole_microarcseconds": [
+        "9.4",
+        "-1.4",
+        "-1.9",
+        "-5.6"
+      ],
+      "ut1_microseconds": [
+        "0.42",
+        "0.12"
+      ],
+      "lod_microseconds": [
+        "1.4",
+        "-5.3"
+      ],
+      "doodson": "265.455",
+      "period_days": "0.5079842"
+    },
+    {
+      "multipliers": [
+        2,
+        -1,
+        0,
+        0,
+        0,
+        0
+      ],
+      "pole_microarcseconds": [
+        "-2.4",
+        "0.4",
+        "0.5",
+        "1.4"
+      ],
+      "ut1_microseconds": [
+        "-0.11",
+        "-0.03"
+      ],
+      "lod_microseconds": [
+        "-0.4",
+        "1.3"
+      ],
+      "doodson": "265.655",
+      "period_days": "0.5078245"
+    },
+    {
+      "multipliers": [
+        2,
+        -1,
+        0,
+        0,
+        0,
+        -1
+      ],
+      "pole_microarcseconds": [
+        "-1.0",
+        "0.2",
+        "0.2",
+        "0.6"
+      ],
+      "ut1_microseconds": [
+        "-0.05",
+        "-0.01"
+      ],
+      "lod_microseconds": [
+        "-0.2",
+        "0.6"
+      ],
+      "doodson": "265.665",
+      "period_days": "0.5077866"
+    },
+    {
+      "multipliers": [
+        2,
+        0,
+        -1,
+        -2,
+        2,
+        -2
+      ],
+      "pole_microarcseconds": [
+        "-8.5",
+        "3.5",
+        "3.3",
+        "5.1"
+      ],
+      "ut1_microseconds": [
+        "-0.44",
+        "-0.02"
+      ],
+      "lod_microseconds": [
+        "-0.2",
+        "5.5"
+      ],
+      "doodson": "272.556",
+      "period_days": "0.5006854"
+    },
+    {
+      "multipliers": [
+        2,
+        0,
+        0,
+        -2,
+        2,
+        -2
+      ],
+      "pole_microarcseconds": [
+        "-144.1",
+        "63.6",
+        "59.2",
+        "86.6"
+      ],
+      "ut1_microseconds": [
+        "-7.55",
+        "-0.16"
+      ],
+      "lod_microseconds": [
+        "-2.0",
+        "94.8"
+      ],
+      "doodson": "273.555",
+      "period_days": "0.5000000"
+    },
+    {
+      "multipliers": [
+        2,
+        0,
+        1,
+        -2,
+        2,
+        -2
+      ],
+      "pole_microarcseconds": [
+        "1.2",
+        "-0.6",
+        "-0.5",
+        "-0.7"
+      ],
+      "ut1_microseconds": [
+        "0.06",
+        "0.00"
+      ],
+      "lod_microseconds": [
+        "0.0",
+        "-0.8"
+      ],
+      "doodson": "274.554",
+      "period_days": "0.4993165"
+    },
+    {
+      "multipliers": [
+        2,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "pole_microarcseconds": [
+        "0.5",
+        "-0.2",
+        "-0.2",
+        "-0.3"
+      ],
+      "ut1_microseconds": [
+        "0.03",
+        "0.00"
+      ],
+      "lod_microseconds": [
+        "-0.0",
+        "-0.3"
+      ],
+      "doodson": "275.545",
+      "period_days": "0.4986714"
+    },
+    {
+      "multipliers": [
+        2,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "pole_microarcseconds": [
+        "-38.5",
+        "19.1",
+        "17.7",
+        "23.1"
+      ],
+      "ut1_microseconds": [
+        "-2.10",
+        "0.04"
+      ],
+      "lod_microseconds": [
+        "0.5",
+        "26.5"
+      ],
+      "doodson": "275.555",
+      "period_days": "0.4986348"
+    },
+    {
+      "multipliers": [
+        2,
+        0,
+        0,
+        0,
+        0,
+        -1
+      ],
+      "pole_microarcseconds": [
+        "-11.4",
+        "5.8",
+        "5.3",
+        "6.9"
+      ],
+      "ut1_microseconds": [
+        "-0.63",
+        "0.01"
+      ],
+      "lod_microseconds": [
+        "0.2",
+        "7.9"
+      ],
+      "doodson": "275.565",
+      "period_days": "0.4985982"
+    },
+    {
+      "multipliers": [
+        2,
+        0,
+        0,
+        0,
+        0,
+        -2
+      ],
+      "pole_microarcseconds": [
+        "-1.2",
+        "0.6",
+        "0.6",
+        "0.7"
+      ],
+      "ut1_microseconds": [
+        "-0.07",
+        "0.00"
+      ],
+      "lod_microseconds": [
+        "0.0",
+        "0.9"
+      ],
+      "doodson": "275.575",
+      "period_days": "0.4985616"
+    },
+    {
+      "multipliers": [
+        2,
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      "pole_microarcseconds": [
+        "-1.8",
+        "1.8",
+        "1.7",
+        "1.0"
+      ],
+      "ut1_microseconds": [
+        "-0.15",
+        "0.04"
+      ],
+      "lod_microseconds": [
+        "0.5",
+        "1.9"
+      ],
+      "doodson": "285.455",
+      "period_days": "0.4897717"
+    },
+    {
+      "multipliers": [
+        2,
+        1,
+        0,
+        0,
+        0,
+        -1
+      ],
+      "pole_microarcseconds": [
+        "-0.8",
+        "0.8",
+        "0.8",
+        "0.5"
+      ],
+      "ut1_microseconds": [
+        "-0.06",
+        "0.02"
+      ],
+      "lod_microseconds": [
+        "0.2",
+        "0.8"
+      ],
+      "doodson": "285.465",
+      "period_days": "0.4897365"
+    },
+    {
+      "multipliers": [
+        2,
+        0,
+        0,
+        2,
+        0,
+        2
+      ],
+      "pole_microarcseconds": [
+        "-0.3",
+        "0.6",
+        "0.7",
+        "0.2"
+      ],
+      "ut1_microseconds": [
+        "-0.05",
+        "0.02"
+      ],
+      "lod_microseconds": [
+        "0.2",
+        "0.6"
+      ],
+      "doodson": "295.555",
+      "period_days": "0.4810750"
+    }
+  ],
+  "polar_libration": [
+    {
+      "multipliers": [
+        1,
+        -1,
+        0,
+        -2,
+        0,
+        -1
+      ],
+      "pole_microarcseconds": [
+        "-0.4",
+        "0.3",
+        "-0.3",
+        "-0.4"
+      ],
+      "doodson": "135.645",
+      "period_days": "1.1196992"
+    },
+    {
+      "multipliers": [
+        1,
+        -1,
+        0,
+        -2,
+        0,
+        -2
+      ],
+      "pole_microarcseconds": [
+        "-2.3",
+        "1.3",
+        "-1.3",
+        "-2.3"
+      ],
+      "doodson": "135.655",
+      "period_days": "1.1195149"
+    },
+    {
+      "multipliers": [
+        1,
+        1,
+        0,
+        -2,
+        -2,
+        -2
+      ],
+      "pole_microarcseconds": [
+        "-0.4",
+        "0.3",
+        "-0.3",
+        "-0.4"
+      ],
+      "doodson": "137.455",
+      "period_days": "1.1134606"
+    },
+    {
+      "multipliers": [
+        1,
+        0,
+        0,
+        -2,
+        0,
+        -1
+      ],
+      "pole_microarcseconds": [
+        "-2.1",
+        "1.2",
+        "-1.2",
+        "-2.1"
+      ],
+      "doodson": "145.545",
+      "period_days": "1.0759762"
+    },
+    {
+      "multipliers": [
+        1,
+        0,
+        0,
+        -2,
+        0,
+        -2
+      ],
+      "pole_microarcseconds": [
+        "-11.4",
+        "6.5",
+        "-6.5",
+        "-11.4"
+      ],
+      "doodson": "145.555",
+      "period_days": "1.0758059"
+    },
+    {
+      "multipliers": [
+        1,
+        -1,
+        0,
+        0,
+        0,
+        0
+      ],
+      "pole_microarcseconds": [
+        "0.8",
+        "-0.5",
+        "0.5",
+        "0.8"
+      ],
+      "doodson": "155.655",
+      "period_days": "1.0347187"
+    },
+    {
+      "multipliers": [
+        1,
+        0,
+        0,
+        -2,
+        2,
+        -2
+      ],
+      "pole_microarcseconds": [
+        "-4.8",
+        "2.7",
+        "-2.7",
+        "-4.8"
+      ],
+      "doodson": "163.555",
+      "period_days": "1.0027454"
+    },
+    {
+      "multipliers": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "pole_microarcseconds": [
+        "14.3",
+        "-8.2",
+        "8.2",
+        "14.3"
+      ],
+      "doodson": "165.555",
+      "period_days": "0.9972696"
+    },
+    {
+      "multipliers": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        -1
+      ],
+      "pole_microarcseconds": [
+        "1.9",
+        "-1.1",
+        "1.1",
+        "1.9"
+      ],
+      "doodson": "165.565",
+      "period_days": "0.9971233"
+    },
+    {
+      "multipliers": [
+        1,
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      "pole_microarcseconds": [
+        "0.8",
+        "-0.4",
+        "0.4",
+        "0.8"
+      ],
+      "doodson": "175.455",
+      "period_days": "0.9624365"
+    }
+  ],
+  "ut1_libration": [
+    {
+      "multipliers": [
+        2,
+        -2,
+        0,
+        -2,
+        0,
+        -2
+      ],
+      "ut1_microseconds": [
+        "0.05",
+        "-0.03"
+      ],
+      "lod_microseconds": [
+        "-0.3",
+        "-0.6"
+      ],
+      "doodson": "235.755",
+      "period_days": "0.5377239"
+    },
+    {
+      "multipliers": [
+        2,
+        0,
+        0,
+        -2,
+        -2,
+        -2
+      ],
+      "ut1_microseconds": [
+        "0.06",
+        "-0.03"
+      ],
+      "lod_microseconds": [
+        "-0.4",
+        "-0.7"
+      ],
+      "doodson": "237.555",
+      "period_days": "0.5363232"
+    },
+    {
+      "multipliers": [
+        2,
+        -1,
+        0,
+        -2,
+        0,
+        -2
+      ],
+      "ut1_microseconds": [
+        "0.35",
+        "-0.20"
+      ],
+      "lod_microseconds": [
+        "-2.4",
+        "-4.2"
+      ],
+      "doodson": "245.655",
+      "period_days": "0.5274312"
+    },
+    {
+      "multipliers": [
+        2,
+        1,
+        0,
+        -2,
+        -2,
+        -2
+      ],
+      "ut1_microseconds": [
+        "0.07",
+        "-0.04"
+      ],
+      "lod_microseconds": [
+        "-0.5",
+        "-0.8"
+      ],
+      "doodson": "247.455",
+      "period_days": "0.5260835"
+    },
+    {
+      "multipliers": [
+        2,
+        0,
+        0,
+        -2,
+        0,
+        -1
+      ],
+      "ut1_microseconds": [
+        "-0.07",
+        "0.04"
+      ],
+      "lod_microseconds": [
+        "0.5",
+        "0.8"
+      ],
+      "doodson": "255.545",
+      "period_days": "0.5175645"
+    },
+    {
+      "multipliers": [
+        2,
+        0,
+        0,
+        -2,
+        0,
+        -2
+      ],
+      "ut1_microseconds": [
+        "1.75",
+        "-1.01"
+      ],
+      "lod_microseconds": [
+        "-12.2",
+        "-21.3"
+      ],
+      "doodson": "255.555",
+      "period_days": "0.5175251"
+    },
+    {
+      "multipliers": [
+        2,
+        1,
+        0,
+        -2,
+        0,
+        -2
+      ],
+      "ut1_microseconds": [
+        "-0.05",
+        "0.03"
+      ],
+      "lod_microseconds": [
+        "0.3",
+        "0.6"
+      ],
+      "doodson": "265.455",
+      "period_days": "0.5079842"
+    },
+    {
+      "multipliers": [
+        2,
+        0,
+        -1,
+        -2,
+        2,
+        -2
+      ],
+      "ut1_microseconds": [
+        "0.05",
+        "-0.03"
+      ],
+      "lod_microseconds": [
+        "-0.3",
+        "-0.6"
+      ],
+      "doodson": "272.556",
+      "period_days": "0.5006854"
+    },
+    {
+      "multipliers": [
+        2,
+        0,
+        0,
+        -2,
+        2,
+        -2
+      ],
+      "ut1_microseconds": [
+        "0.76",
+        "-0.44"
+      ],
+      "lod_microseconds": [
+        "-5.5",
+        "-9.5"
+      ],
+      "doodson": "273.555",
+      "period_days": "0.5000000"
+    },
+    {
+      "multipliers": [
+        2,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "ut1_microseconds": [
+        "0.21",
+        "-0.12"
+      ],
+      "lod_microseconds": [
+        "-1.5",
+        "-2.6"
+      ],
+      "doodson": "275.555",
+      "period_days": "0.4986348"
+    },
+    {
+      "multipliers": [
+        2,
+        0,
+        0,
+        0,
+        0,
+        -1
+      ],
+      "ut1_microseconds": [
+        "0.06",
+        "-0.04"
+      ],
+      "lod_microseconds": [
+        "-0.4",
+        "-0.8"
+      ],
+      "doodson": "275.565",
+      "period_days": "0.4985982"
+    }
+  ],
+  "zonal": [
+    {
+      "multipliers": [
+        1,
+        0,
+        2,
+        2,
+        2
+      ],
+      "ut1_1e_minus4_seconds": [
+        "-0.0235",
+        "0.0000"
+      ],
+      "lod_1e_minus5_seconds": [
+        "0.2617",
+        "0.0000"
+      ],
+      "omega_1e_minus14_rad_per_second": [
+        "-0.2209",
+        "0.0000"
+      ],
+      "period_days": "5.64"
+    },
+    {
+      "multipliers": [
+        2,
+        0,
+        2,
+        0,
+        1
+      ],
+      "ut1_1e_minus4_seconds": [
+        "-0.0404",
+        "0.0000"
+      ],
+      "lod_1e_minus5_seconds": [
+        "0.3706",
+        "0.0000"
+      ],
+      "omega_1e_minus14_rad_per_second": [
+        "-0.3128",
+        "0.0000"
+      ],
+      "period_days": "6.85"
+    },
+    {
+      "multipliers": [
+        2,
+        0,
+        2,
+        0,
+        2
+      ],
+      "ut1_1e_minus4_seconds": [
+        "-0.0987",
+        "0.0000"
+      ],
+      "lod_1e_minus5_seconds": [
+        "0.9041",
+        "0.0000"
+      ],
+      "omega_1e_minus14_rad_per_second": [
+        "-0.7630",
+        "0.0000"
+      ],
+      "period_days": "6.86"
+    },
+    {
+      "multipliers": [
+        0,
+        0,
+        2,
+        2,
+        1
+      ],
+      "ut1_1e_minus4_seconds": [
+        "-0.0508",
+        "0.0000"
+      ],
+      "lod_1e_minus5_seconds": [
+        "0.4499",
+        "0.0000"
+      ],
+      "omega_1e_minus14_rad_per_second": [
+        "-0.3797",
+        "0.0000"
+      ],
+      "period_days": "7.09"
+    },
+    {
+      "multipliers": [
+        0,
+        0,
+        2,
+        2,
+        2
+      ],
+      "ut1_1e_minus4_seconds": [
+        "-0.1231",
+        "0.0000"
+      ],
+      "lod_1e_minus5_seconds": [
+        "1.0904",
+        "0.0000"
+      ],
+      "omega_1e_minus14_rad_per_second": [
+        "-0.9203",
+        "0.0000"
+      ],
+      "period_days": "7.10"
+    },
+    {
+      "multipliers": [
+        1,
+        0,
+        2,
+        0,
+        0
+      ],
+      "ut1_1e_minus4_seconds": [
+        "-0.0385",
+        "0.0000"
+      ],
+      "lod_1e_minus5_seconds": [
+        "0.2659",
+        "0.0000"
+      ],
+      "omega_1e_minus14_rad_per_second": [
+        "-0.2244",
+        "0.0000"
+      ],
+      "period_days": "9.11"
+    },
+    {
+      "multipliers": [
+        1,
+        0,
+        2,
+        0,
+        1
+      ],
+      "ut1_1e_minus4_seconds": [
+        "-0.4108",
+        "0.0000"
+      ],
+      "lod_1e_minus5_seconds": [
+        "2.8298",
+        "0.0000"
+      ],
+      "omega_1e_minus14_rad_per_second": [
+        "-2.3884",
+        "0.0000"
+      ],
+      "period_days": "9.12"
+    },
+    {
+      "multipliers": [
+        1,
+        0,
+        2,
+        0,
+        2
+      ],
+      "ut1_1e_minus4_seconds": [
+        "-0.9926",
+        "0.0000"
+      ],
+      "lod_1e_minus5_seconds": [
+        "6.8291",
+        "0.0000"
+      ],
+      "omega_1e_minus14_rad_per_second": [
+        "-5.7637",
+        "0.0000"
+      ],
+      "period_days": "9.13"
+    },
+    {
+      "multipliers": [
+        3,
+        0,
+        0,
+        0,
+        0
+      ],
+      "ut1_1e_minus4_seconds": [
+        "-0.0179",
+        "0.0000"
+      ],
+      "lod_1e_minus5_seconds": [
+        "0.1222",
+        "0.0000"
+      ],
+      "omega_1e_minus14_rad_per_second": [
+        "-0.1031",
+        "0.0000"
+      ],
+      "period_days": "9.18"
+    },
+    {
+      "multipliers": [
+        -1,
+        0,
+        2,
+        2,
+        1
+      ],
+      "ut1_1e_minus4_seconds": [
+        "-0.0818",
+        "0.0000"
+      ],
+      "lod_1e_minus5_seconds": [
+        "0.5384",
+        "0.0000"
+      ],
+      "omega_1e_minus14_rad_per_second": [
+        "-0.4544",
+        "0.0000"
+      ],
+      "period_days": "9.54"
+    },
+    {
+      "multipliers": [
+        -1,
+        0,
+        2,
+        2,
+        2
+      ],
+      "ut1_1e_minus4_seconds": [
+        "-0.1974",
+        "0.0000"
+      ],
+      "lod_1e_minus5_seconds": [
+        "1.2978",
+        "0.0000"
+      ],
+      "omega_1e_minus14_rad_per_second": [
+        "-1.0953",
+        "0.0000"
+      ],
+      "period_days": "9.56"
+    },
+    {
+      "multipliers": [
+        1,
+        0,
+        0,
+        2,
+        0
+      ],
+      "ut1_1e_minus4_seconds": [
+        "-0.0761",
+        "0.0000"
+      ],
+      "lod_1e_minus5_seconds": [
+        "0.4976",
+        "0.0000"
+      ],
+      "omega_1e_minus14_rad_per_second": [
+        "-0.4200",
+        "0.0000"
+      ],
+      "period_days": "9.61"
+    },
+    {
+      "multipliers": [
+        2,
+        0,
+        2,
+        -2,
+        2
+      ],
+      "ut1_1e_minus4_seconds": [
+        "0.0216",
+        "0.0000"
+      ],
+      "lod_1e_minus5_seconds": [
+        "-0.1060",
+        "0.0000"
+      ],
+      "omega_1e_minus14_rad_per_second": [
+        "0.0895",
+        "0.0000"
+      ],
+      "period_days": "12.81"
+    },
+    {
+      "multipliers": [
+        0,
+        1,
+        2,
+        0,
+        2
+      ],
+      "ut1_1e_minus4_seconds": [
+        "0.0254",
+        "0.0000"
+      ],
+      "lod_1e_minus5_seconds": [
+        "-0.1211",
+        "0.0000"
+      ],
+      "omega_1e_minus14_rad_per_second": [
+        "0.1022",
+        "0.0000"
+      ],
+      "period_days": "13.17"
+    },
+    {
+      "multipliers": [
+        0,
+        0,
+        2,
+        0,
+        0
+      ],
+      "ut1_1e_minus4_seconds": [
+        "-0.2989",
+        "0.0000"
+      ],
+      "lod_1e_minus5_seconds": [
+        "1.3804",
+        "0.0000"
+      ],
+      "omega_1e_minus14_rad_per_second": [
+        "-1.1650",
+        "0.0000"
+      ],
+      "period_days": "13.61"
+    },
+    {
+      "multipliers": [
+        0,
+        0,
+        2,
+        0,
+        1
+      ],
+      "ut1_1e_minus4_seconds": [
+        "-3.1873",
+        "0.2010"
+      ],
+      "lod_1e_minus5_seconds": [
+        "14.6890",
+        "0.9266"
+      ],
+      "omega_1e_minus14_rad_per_second": [
+        "-12.3974",
+        "-0.7820"
+      ],
+      "period_days": "13.63"
+    },
+    {
+      "multipliers": [
+        0,
+        0,
+        2,
+        0,
+        2
+      ],
+      "ut1_1e_minus4_seconds": [
+        "-7.8468",
+        "0.5320"
+      ],
+      "lod_1e_minus5_seconds": [
+        "36.0910",
+        "2.4469"
+      ],
+      "omega_1e_minus14_rad_per_second": [
+        "-30.4606",
+        "-2.0652"
+      ],
+      "period_days": "13.66"
+    },
+    {
+      "multipliers": [
+        2,
+        0,
+        0,
+        0,
+        -1
+      ],
+      "ut1_1e_minus4_seconds": [
+        "0.0216",
+        "0.0000"
+      ],
+      "lod_1e_minus5_seconds": [
+        "-0.0988",
+        "0.0000"
+      ],
+      "omega_1e_minus14_rad_per_second": [
+        "0.0834",
+        "0.0000"
+      ],
+      "period_days": "13.75"
+    },
+    {
+      "multipliers": [
+        2,
+        0,
+        0,
+        0,
+        0
+      ],
+      "ut1_1e_minus4_seconds": [
+        "-0.3384",
+        "0.0000"
+      ],
+      "lod_1e_minus5_seconds": [
+        "1.5433",
+        "0.0000"
+      ],
+      "omega_1e_minus14_rad_per_second": [
+        "-1.3025",
+        "0.0000"
+      ],
+      "period_days": "13.78"
+    },
+    {
+      "multipliers": [
+        2,
+        0,
+        0,
+        0,
+        1
+      ],
+      "ut1_1e_minus4_seconds": [
+        "0.0179",
+        "0.0000"
+      ],
+      "lod_1e_minus5_seconds": [
+        "-0.0813",
+        "0.0000"
+      ],
+      "omega_1e_minus14_rad_per_second": [
+        "0.0686",
+        "0.0000"
+      ],
+      "period_days": "13.81"
+    },
+    {
+      "multipliers": [
+        0,
+        -1,
+        2,
+        0,
+        2
+      ],
+      "ut1_1e_minus4_seconds": [
+        "-0.0244",
+        "0.0000"
+      ],
+      "lod_1e_minus5_seconds": [
+        "0.1082",
+        "0.0000"
+      ],
+      "omega_1e_minus14_rad_per_second": [
+        "-0.0913",
+        "0.0000"
+      ],
+      "period_days": "14.19"
+    },
+    {
+      "multipliers": [
+        0,
+        0,
+        0,
+        2,
+        -1
+      ],
+      "ut1_1e_minus4_seconds": [
+        "0.0470",
+        "0.0000"
+      ],
+      "lod_1e_minus5_seconds": [
+        "-0.2004",
+        "0.0000"
+      ],
+      "omega_1e_minus14_rad_per_second": [
+        "0.1692",
+        "0.0000"
+      ],
+      "period_days": "14.73"
+    },
+    {
+      "multipliers": [
+        0,
+        0,
+        0,
+        2,
+        0
+      ],
+      "ut1_1e_minus4_seconds": [
+        "-0.7341",
+        "0.0000"
+      ],
+      "lod_1e_minus5_seconds": [
+        "3.1240",
+        "0.0000"
+      ],
+      "omega_1e_minus14_rad_per_second": [
+        "-2.6367",
+        "0.0000"
+      ],
+      "period_days": "14.77"
+    },
+    {
+      "multipliers": [
+        0,
+        0,
+        0,
+        2,
+        1
+      ],
+      "ut1_1e_minus4_seconds": [
+        "-0.0526",
+        "0.0000"
+      ],
+      "lod_1e_minus5_seconds": [
+        "0.2235",
+        "0.0000"
+      ],
+      "omega_1e_minus14_rad_per_second": [
+        "-0.1886",
+        "0.0000"
+      ],
+      "period_days": "14.80"
+    },
+    {
+      "multipliers": [
+        0,
+        -1,
+        0,
+        2,
+        0
+      ],
+      "ut1_1e_minus4_seconds": [
+        "-0.0508",
+        "0.0000"
+      ],
+      "lod_1e_minus5_seconds": [
+        "0.2073",
+        "0.0000"
+      ],
+      "omega_1e_minus14_rad_per_second": [
+        "-0.1749",
+        "0.0000"
+      ],
+      "period_days": "15.39"
+    },
+    {
+      "multipliers": [
+        1,
+        0,
+        2,
+        -2,
+        1
+      ],
+      "ut1_1e_minus4_seconds": [
+        "0.0498",
+        "0.0000"
+      ],
+      "lod_1e_minus5_seconds": [
+        "-0.1312",
+        "0.0000"
+      ],
+      "omega_1e_minus14_rad_per_second": [
+        "0.1107",
+        "0.0000"
+      ],
+      "period_days": "23.86"
+    },
+    {
+      "multipliers": [
+        1,
+        0,
+        2,
+        -2,
+        2
+      ],
+      "ut1_1e_minus4_seconds": [
+        "0.1006",
+        "0.0000"
+      ],
+      "lod_1e_minus5_seconds": [
+        "-0.2640",
+        "0.0000"
+      ],
+      "omega_1e_minus14_rad_per_second": [
+        "0.2228",
+        "0.0000"
+      ],
+      "period_days": "23.94"
+    },
+    {
+      "multipliers": [
+        1,
+        1,
+        0,
+        0,
+        0
+      ],
+      "ut1_1e_minus4_seconds": [
+        "0.0395",
+        "0.0000"
+      ],
+      "lod_1e_minus5_seconds": [
+        "-0.0968",
+        "0.0000"
+      ],
+      "omega_1e_minus14_rad_per_second": [
+        "0.0817",
+        "0.0000"
+      ],
+      "period_days": "25.62"
+    },
+    {
+      "multipliers": [
+        -1,
+        0,
+        2,
+        0,
+        0
+      ],
+      "ut1_1e_minus4_seconds": [
+        "0.0470",
+        "0.0000"
+      ],
+      "lod_1e_minus5_seconds": [
+        "-0.1099",
+        "0.0000"
+      ],
+      "omega_1e_minus14_rad_per_second": [
+        "0.0927",
+        "0.0000"
+      ],
+      "period_days": "26.88"
+    },
+    {
+      "multipliers": [
+        -1,
+        0,
+        2,
+        0,
+        1
+      ],
+      "ut1_1e_minus4_seconds": [
+        "0.1767",
+        "0.0000"
+      ],
+      "lod_1e_minus5_seconds": [
+        "-0.4115",
+        "0.0000"
+      ],
+      "omega_1e_minus14_rad_per_second": [
+        "0.3473",
+        "0.0000"
+      ],
+      "period_days": "26.98"
+    },
+    {
+      "multipliers": [
+        -1,
+        0,
+        2,
+        0,
+        2
+      ],
+      "ut1_1e_minus4_seconds": [
+        "0.4352",
+        "0.0000"
+      ],
+      "lod_1e_minus5_seconds": [
+        "-1.0093",
+        "0.0000"
+      ],
+      "omega_1e_minus14_rad_per_second": [
+        "0.8519",
+        "0.0000"
+      ],
+      "period_days": "27.09"
+    },
+    {
+      "multipliers": [
+        1,
+        0,
+        0,
+        0,
+        -1
+      ],
+      "ut1_1e_minus4_seconds": [
+        "0.5339",
+        "0.0000"
+      ],
+      "lod_1e_minus5_seconds": [
+        "-1.2224",
+        "0.0000"
+      ],
+      "omega_1e_minus14_rad_per_second": [
+        "1.0317",
+        "0.0000"
+      ],
+      "period_days": "27.44"
+    },
+    {
+      "multipliers": [
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      "ut1_1e_minus4_seconds": [
+        "-8.4046",
+        "0.2500"
+      ],
+      "lod_1e_minus5_seconds": [
+        "19.1647",
+        "0.5701"
+      ],
+      "omega_1e_minus14_rad_per_second": [
+        "-16.1749",
+        "-0.4811"
+      ],
+      "period_days": "27.56"
+    },
+    {
+      "multipliers": [
+        1,
+        0,
+        0,
+        0,
+        1
+      ],
+      "ut1_1e_minus4_seconds": [
+        "0.5443",
+        "0.0000"
+      ],
+      "lod_1e_minus5_seconds": [
+        "-1.2360",
+        "0.0000"
+      ],
+      "omega_1e_minus14_rad_per_second": [
+        "1.0432",
+        "0.0000"
+      ],
+      "period_days": "27.67"
+    },
+    {
+      "multipliers": [
+        0,
+        0,
+        0,
+        1,
+        0
+      ],
+      "ut1_1e_minus4_seconds": [
+        "0.0470",
+        "0.0000"
+      ],
+      "lod_1e_minus5_seconds": [
+        "-0.1000",
+        "0.0000"
+      ],
+      "omega_1e_minus14_rad_per_second": [
+        "0.0844",
+        "0.0000"
+      ],
+      "period_days": "29.53"
+    },
+    {
+      "multipliers": [
+        1,
+        -1,
+        0,
+        0,
+        0
+      ],
+      "ut1_1e_minus4_seconds": [
+        "-0.0555",
+        "0.0000"
+      ],
+      "lod_1e_minus5_seconds": [
+        "0.1169",
+        "0.0000"
+      ],
+      "omega_1e_minus14_rad_per_second": [
+        "-0.0987",
+        "0.0000"
+      ],
+      "period_days": "29.80"
+    },
+    {
+      "multipliers": [
+        -1,
+        0,
+        0,
+        2,
+        -1
+      ],
+      "ut1_1e_minus4_seconds": [
+        "0.1175",
+        "0.0000"
+      ],
+      "lod_1e_minus5_seconds": [
+        "-0.2332",
+        "0.0000"
+      ],
+      "omega_1e_minus14_rad_per_second": [
+        "0.1968",
+        "0.0000"
+      ],
+      "period_days": "31.66"
+    },
+    {
+      "multipliers": [
+        -1,
+        0,
+        0,
+        2,
+        0
+      ],
+      "ut1_1e_minus4_seconds": [
+        "-1.8236",
+        "0.0000"
+      ],
+      "lod_1e_minus5_seconds": [
+        "3.6018",
+        "0.0000"
+      ],
+      "omega_1e_minus14_rad_per_second": [
+        "-3.0399",
+        "0.0000"
+      ],
+      "period_days": "31.81"
+    },
+    {
+      "multipliers": [
+        -1,
+        0,
+        0,
+        2,
+        1
+      ],
+      "ut1_1e_minus4_seconds": [
+        "0.1316",
+        "0.0000"
+      ],
+      "lod_1e_minus5_seconds": [
+        "-0.2587",
+        "0.0000"
+      ],
+      "omega_1e_minus14_rad_per_second": [
+        "0.2183",
+        "0.0000"
+      ],
+      "period_days": "31.96"
+    },
+    {
+      "multipliers": [
+        1,
+        0,
+        -2,
+        2,
+        -1
+      ],
+      "ut1_1e_minus4_seconds": [
+        "0.0179",
+        "0.0000"
+      ],
+      "lod_1e_minus5_seconds": [
+        "-0.0344",
+        "0.0000"
+      ],
+      "omega_1e_minus14_rad_per_second": [
+        "0.0290",
+        "0.0000"
+      ],
+      "period_days": "32.61"
+    },
+    {
+      "multipliers": [
+        -1,
+        -1,
+        0,
+        2,
+        0
+      ],
+      "ut1_1e_minus4_seconds": [
+        "-0.0855",
+        "0.0000"
+      ],
+      "lod_1e_minus5_seconds": [
+        "0.1542",
+        "0.0000"
+      ],
+      "omega_1e_minus14_rad_per_second": [
+        "-0.1302",
+        "0.0000"
+      ],
+      "period_days": "34.85"
+    },
+    {
+      "multipliers": [
+        0,
+        2,
+        2,
+        -2,
+        2
+      ],
+      "ut1_1e_minus4_seconds": [
+        "-0.0573",
+        "0.0000"
+      ],
+      "lod_1e_minus5_seconds": [
+        "0.0395",
+        "0.0000"
+      ],
+      "omega_1e_minus14_rad_per_second": [
+        "-0.0333",
+        "0.0000"
+      ],
+      "period_days": "91.31"
+    },
+    {
+      "multipliers": [
+        0,
+        1,
+        2,
+        -2,
+        1
+      ],
+      "ut1_1e_minus4_seconds": [
+        "0.0329",
+        "0.0000"
+      ],
+      "lod_1e_minus5_seconds": [
+        "-0.0173",
+        "0.0000"
+      ],
+      "omega_1e_minus14_rad_per_second": [
+        "0.0146",
+        "0.0000"
+      ],
+      "period_days": "119.61"
+    },
+    {
+      "multipliers": [
+        0,
+        1,
+        2,
+        -2,
+        2
+      ],
+      "ut1_1e_minus4_seconds": [
+        "-1.8847",
+        "0.0000"
+      ],
+      "lod_1e_minus5_seconds": [
+        "0.9726",
+        "0.0000"
+      ],
+      "omega_1e_minus14_rad_per_second": [
+        "-0.8209",
+        "0.0000"
+      ],
+      "period_days": "121.75"
+    },
+    {
+      "multipliers": [
+        0,
+        0,
+        2,
+        -2,
+        0
+      ],
+      "ut1_1e_minus4_seconds": [
+        "0.2510",
+        "0.0000"
+      ],
+      "lod_1e_minus5_seconds": [
+        "-0.0910",
+        "0.0000"
+      ],
+      "omega_1e_minus14_rad_per_second": [
+        "0.0768",
+        "0.0000"
+      ],
+      "period_days": "173.31"
+    },
+    {
+      "multipliers": [
+        0,
+        0,
+        2,
+        -2,
+        1
+      ],
+      "ut1_1e_minus4_seconds": [
+        "1.1703",
+        "0.0000"
+      ],
+      "lod_1e_minus5_seconds": [
+        "-0.4135",
+        "0.0000"
+      ],
+      "omega_1e_minus14_rad_per_second": [
+        "0.3490",
+        "0.0000"
+      ],
+      "period_days": "177.84"
+    },
+    {
+      "multipliers": [
+        0,
+        0,
+        2,
+        -2,
+        2
+      ],
+      "ut1_1e_minus4_seconds": [
+        "-49.7174",
+        "0.4330"
+      ],
+      "lod_1e_minus5_seconds": [
+        "17.1056",
+        "0.1490"
+      ],
+      "omega_1e_minus14_rad_per_second": [
+        "-14.4370",
+        "-0.1257"
+      ],
+      "period_days": "182.62"
+    },
+    {
+      "multipliers": [
+        0,
+        2,
+        0,
+        0,
+        0
+      ],
+      "ut1_1e_minus4_seconds": [
+        "-0.1936",
+        "0.0000"
+      ],
+      "lod_1e_minus5_seconds": [
+        "0.0666",
+        "0.0000"
+      ],
+      "omega_1e_minus14_rad_per_second": [
+        "-0.0562",
+        "0.0000"
+      ],
+      "period_days": "182.63"
+    },
+    {
+      "multipliers": [
+        2,
+        0,
+        0,
+        -2,
+        -1
+      ],
+      "ut1_1e_minus4_seconds": [
+        "0.0489",
+        "0.0000"
+      ],
+      "lod_1e_minus5_seconds": [
+        "-0.0154",
+        "0.0000"
+      ],
+      "omega_1e_minus14_rad_per_second": [
+        "0.0130",
+        "0.0000"
+      ],
+      "period_days": "199.84"
+    },
+    {
+      "multipliers": [
+        2,
+        0,
+        0,
+        -2,
+        0
+      ],
+      "ut1_1e_minus4_seconds": [
+        "-0.5471",
+        "0.0000"
+      ],
+      "lod_1e_minus5_seconds": [
+        "0.1670",
+        "0.0000"
+      ],
+      "omega_1e_minus14_rad_per_second": [
+        "-0.1409",
+        "0.0000"
+      ],
+      "period_days": "205.89"
+    },
+    {
+      "multipliers": [
+        2,
+        0,
+        0,
+        -2,
+        1
+      ],
+      "ut1_1e_minus4_seconds": [
+        "0.0367",
+        "0.0000"
+      ],
+      "lod_1e_minus5_seconds": [
+        "-0.0108",
+        "0.0000"
+      ],
+      "omega_1e_minus14_rad_per_second": [
+        "0.0092",
+        "0.0000"
+      ],
+      "period_days": "212.32"
+    },
+    {
+      "multipliers": [
+        0,
+        -1,
+        2,
+        -2,
+        1
+      ],
+      "ut1_1e_minus4_seconds": [
+        "-0.0451",
+        "0.0000"
+      ],
+      "lod_1e_minus5_seconds": [
+        "0.0082",
+        "0.0000"
+      ],
+      "omega_1e_minus14_rad_per_second": [
+        "-0.0069",
+        "0.0000"
+      ],
+      "period_days": "346.60"
+    },
+    {
+      "multipliers": [
+        0,
+        1,
+        0,
+        0,
+        -1
+      ],
+      "ut1_1e_minus4_seconds": [
+        "0.0921",
+        "0.0000"
+      ],
+      "lod_1e_minus5_seconds": [
+        "-0.0167",
+        "0.0000"
+      ],
+      "omega_1e_minus14_rad_per_second": [
+        "0.0141",
+        "0.0000"
+      ],
+      "period_days": "346.64"
+    },
+    {
+      "multipliers": [
+        0,
+        -1,
+        2,
+        -2,
+        2
+      ],
+      "ut1_1e_minus4_seconds": [
+        "0.8281",
+        "0.0000"
+      ],
+      "lod_1e_minus5_seconds": [
+        "-0.1425",
+        "0.0000"
+      ],
+      "omega_1e_minus14_rad_per_second": [
+        "0.1202",
+        "0.0000"
+      ],
+      "period_days": "365.22"
+    },
+    {
+      "multipliers": [
+        0,
+        1,
+        0,
+        0,
+        0
+      ],
+      "ut1_1e_minus4_seconds": [
+        "-15.8887",
+        "0.1530"
+      ],
+      "lod_1e_minus5_seconds": [
+        "2.7332",
+        "0.0263"
+      ],
+      "omega_1e_minus14_rad_per_second": [
+        "-2.3068",
+        "-0.0222"
+      ],
+      "period_days": "365.26"
+    },
+    {
+      "multipliers": [
+        0,
+        1,
+        0,
+        0,
+        1
+      ],
+      "ut1_1e_minus4_seconds": [
+        "-0.1382",
+        "0.0000"
+      ],
+      "lod_1e_minus5_seconds": [
+        "0.0225",
+        "0.0000"
+      ],
+      "omega_1e_minus14_rad_per_second": [
+        "-0.0190",
+        "0.0000"
+      ],
+      "period_days": "386.00"
+    },
+    {
+      "multipliers": [
+        1,
+        0,
+        0,
+        -1,
+        0
+      ],
+      "ut1_1e_minus4_seconds": [
+        "0.0348",
+        "0.0000"
+      ],
+      "lod_1e_minus5_seconds": [
+        "-0.0053",
+        "0.0000"
+      ],
+      "omega_1e_minus14_rad_per_second": [
+        "0.0045",
+        "0.0000"
+      ],
+      "period_days": "411.78"
+    },
+    {
+      "multipliers": [
+        2,
+        0,
+        -2,
+        0,
+        0
+      ],
+      "ut1_1e_minus4_seconds": [
+        "-0.1372",
+        "0.0000"
+      ],
+      "lod_1e_minus5_seconds": [
+        "-0.0079",
+        "0.0000"
+      ],
+      "omega_1e_minus14_rad_per_second": [
+        "0.0066",
+        "0.0000"
+      ],
+      "period_days": "-1095.18"
+    },
+    {
+      "multipliers": [
+        -2,
+        0,
+        2,
+        0,
+        1
+      ],
+      "ut1_1e_minus4_seconds": [
+        "0.4211",
+        "0.0000"
+      ],
+      "lod_1e_minus5_seconds": [
+        "-0.0203",
+        "0.0000"
+      ],
+      "omega_1e_minus14_rad_per_second": [
+        "0.0171",
+        "0.0000"
+      ],
+      "period_days": "1305.48"
+    },
+    {
+      "multipliers": [
+        -1,
+        1,
+        0,
+        1,
+        0
+      ],
+      "ut1_1e_minus4_seconds": [
+        "-0.0404",
+        "0.0000"
+      ],
+      "lod_1e_minus5_seconds": [
+        "0.0008",
+        "0.0000"
+      ],
+      "omega_1e_minus14_rad_per_second": [
+        "-0.0007",
+        "0.0000"
+      ],
+      "period_days": "3232.86"
+    },
+    {
+      "multipliers": [
+        0,
+        0,
+        0,
+        0,
+        2
+      ],
+      "ut1_1e_minus4_seconds": [
+        "7.8998",
+        "0.0000"
+      ],
+      "lod_1e_minus5_seconds": [
+        "0.1460",
+        "0.0000"
+      ],
+      "omega_1e_minus14_rad_per_second": [
+        "-0.1232",
+        "0.0000"
+      ],
+      "period_days": "-3399.19"
+    },
+    {
+      "multipliers": [
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "ut1_1e_minus4_seconds": [
+        "-1617.2681",
+        "0.0000"
+      ],
+      "lod_1e_minus5_seconds": [
+        "-14.9471",
+        "0.0000"
+      ],
+      "omega_1e_minus14_rad_per_second": [
+        "12.6153",
+        "0.0000"
+      ],
+      "period_days": "-6798.38"
+    }
+  ],
+  "scope": "Fixed printed coefficients, modern GMST Eq5.32 and fundamental arguments Eq5.43; not the unmodified single-MJD Fortran operators. LOD/omega columns are retained source facts, not evaluated by this model."
+}

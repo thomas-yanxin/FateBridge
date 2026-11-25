@@ -1,10 +1,15 @@
 """Invert future civil gap ends through the existing dayun calendar policy."""
 
-from datetime import datetime, timedelta, timezone
-from typing import Any, Callable, Dict, Iterable, Optional, Tuple
+from datetime import date, datetime, timezone
+from typing import TypedDict
+
+from typing_extensions import NotRequired
 
 from fatebridge.core.almanac import localize_datetime
 from fatebridge.core.timing import DEFAULT_DAYUN_PERIODS, TimingAnalysis
+from fatebridge.services.birth_time_events import BirthEventRecord, UnresolvedBirthEvent
+from fatebridge.services.dayun_wall_cells import DayunWallCell
+from fatebridge.utils.civil_time import utc_calendar
 from fatebridge.utils.clock_events import (
     CivilClockFold,
     CivilClockGap,
@@ -16,30 +21,45 @@ from fatebridge.utils.solar_time import NormalizedBirthTime
 from fatebridge.utils.timezones import parse_timezone_name
 
 
-def _micros(delta: timedelta) -> int:
-    return (delta.days * 86400 + delta.seconds) * 1_000_000 + delta.microseconds
+class FutureClockScan(TypedDict):
+    status: str
+    timezone: NotRequired[str]
+    analysis_utc_day: NotRequired[str]
+    scan_start_utc: NotRequired[str]
+    scan_end_utc: NotRequired[str]
+    forward_gap_count: NotRequired[int]
+    backward_fold_count: NotRequired[int]
+    scan_step_seconds: NotRequired[int]
+    continuous_completeness_certified: NotRequired[bool]
+    physical_precision_certified: NotRequired[bool]
 
 
 def collect_future_dayun_gap_events(
     template: NormalizedBirthTime,
-    gender: Optional[str],
-    analysis_moment: Optional[datetime],
-    cuts: Iterable[datetime],
-    clock_at: Callable[[datetime], NormalizedBirthTime],
-) -> Tuple[list[Dict[str, Any]], list[Dict[str, Any]], Dict[str, Any]]:
+    analysis_moment: datetime | None,
+    cells: tuple[DayunWallCell, ...],
+) -> tuple[
+    list[BirthEventRecord],
+    list[UnresolvedBirthEvent],
+    FutureClockScan,
+    tuple[CivilClockGap, ...],
+]:
     """Retain calculated inverse brackets; never certify continuous coverage."""
     if analysis_moment is None:
-        return [], [], {"status": "not_applicable_explicit_age"}
+        return [], [], {"status": "not_applicable_explicit_age"}, ()
+    else:
+        pass
     zone = parse_timezone_name(template.timezone)
     if isinstance(zone, timezone):
-        return [], [], {"status": "fixed_offset"}
-    analysis = localize_datetime(analysis_moment, template.timezone).astimezone(
-        timezone.utc
-    )
+        return [], [], {"status": "fixed_offset"}, ()
+    else:
+        pass
+    analysis = utc_calendar(localize_datetime(analysis_moment, template.timezone))
     try:
-        scan_low, scan_high = clock_scan_bounds(analysis.date())
-        gaps = forward_clock_gaps_near_day(zone, analysis.date())
-        folds = backward_clock_folds_near_day(zone, analysis.date())
+        utc_day = date(*analysis.date_parts)
+        scan_low, scan_high = clock_scan_bounds(utc_day)
+        gaps = forward_clock_gaps_near_day(zone, utc_day)
+        folds = backward_clock_folds_near_day(zone, utc_day)
     except (ValueError, OverflowError):
         return (
             [],
@@ -48,11 +68,12 @@ def collect_future_dayun_gap_events(
                 "status": "unavailable_clock_window",
                 "continuous_completeness_certified": False,
             },
+            (),
         )
-    scan = {
+    scan: FutureClockScan = {
         "status": "calculated",
         "timezone": template.timezone,
-        "analysis_utc_day": analysis.date().isoformat(),
+        "analysis_utc_day": utc_day.isoformat(),
         "scan_start_utc": scan_low.isoformat(),
         "scan_end_utc": scan_high.isoformat(),
         "forward_gap_count": len(gaps),
@@ -62,46 +83,25 @@ def collect_future_dayun_gap_events(
         "physical_precision_certified": False,
     }
     if not gaps and not folds:
-        return [], [], scan
-    ordered = sorted(set(cuts))
-    events: list[Dict[str, Any]] = []
-    unresolved: list[Dict[str, Any]] = []
+        return [], [], scan, ()
+    else:
+        pass
+    events: list[BirthEventRecord] = []
+    unresolved: list[UnresolvedBirthEvent] = []
     seen = set()
-    for left, right in zip(ordered, ordered[1:]):
-        last = max(left, right - timedelta(microseconds=1))
-        birth_a, details_a, wall_a, offset_a = (
-            TimingAnalysis._dayun_calendar_wall_context(
-                clock_at(left).input_datetime, gender, template.timezone
-            )
-        )
-        birth_b, details_b, wall_b, offset_b = (
-            TimingAnalysis._dayun_calendar_wall_context(
-                clock_at(last).input_datetime, gender, template.timezone
-            )
-        )
-        forward = details_a["forward_direction"]
-        slope = -119 if forward else 121
-        reference = details_a["reference_term"]
-        affine = (
-            details_b["forward_direction"] == forward
-            and details_b["reference_term"]["datetime_with_offset"]
-            == reference["datetime_with_offset"]
-            and birth_a.date() == birth_b.date()
-            and birth_a.utcoffset() == birth_b.utcoffset()
-            and (offset_a["years"], offset_a["months"])
-            == (offset_b["years"], offset_b["months"])
-            and _micros(wall_b - wall_a) == slope * _micros(last - left)
-        )
-        if not affine:
+    changes: tuple[CivilClockGap | CivilClockFold, ...] = (*gaps, *folds)
+    for cell in cells:
+        if not cell.is_affine:
             unresolved.append(
                 {
-                    "lower_utc": left.isoformat(),
-                    "upper_utc": right.isoformat(),
+                    "lower_utc": cell.lower.isoformat(),
+                    "upper_utc": cell.upper.isoformat(),
                     "reason": "dayun_wall_cell_not_affine_under_declared_partition",
                 }
             )
             continue
-        changes: Tuple[CivilClockGap | CivilClockFold, ...] = (*gaps, *folds)
+        else:
+            pass
         for gap in changes:
             fold = gap.offset_after_seconds < gap.offset_before_seconds
             change_name = "fold" if fold else "gap"
@@ -110,14 +110,17 @@ def collect_future_dayun_gap_events(
                     gap.upper_wall, index * 10
                 )
                 for target in targets:
-                    if not min(wall_a, wall_b) <= target <= max(wall_a, wall_b):
+                    bracket = cell.inverse(target)
+                    if bracket is None:
                         continue
-                    quotient, remainder = divmod(_micros(target - wall_a), slope)
-                    lower = left + timedelta(microseconds=quotient)
-                    upper = lower + timedelta(microseconds=bool(remainder))
+                    else:
+                        pass
+                    lower, upper = bracket
                     key = (lower, upper, gap.instant_utc, index, target)
-                    if not left <= lower <= upper <= last or key in seen:
+                    if key in seen:
                         continue
+                    else:
+                        pass
                     seen.add(key)
                     events.append(
                         {
@@ -133,9 +136,9 @@ def collect_future_dayun_gap_events(
                             "bracket_width_seconds": (upper - lower).total_seconds(),
                             "source": {
                                 "policy": "three_days_one_year_calendar_v1",
-                                "direction": "顺行" if forward else "逆行",
-                                "reference_jie": reference["name"],
-                                "reference_at_utc": reference["datetime_with_offset"],
+                                "direction": "顺行" if cell.is_forward else "逆行",
+                                "reference_jie": cell.reference_term.name,
+                                "reference_at_utc": cell.reference_timestamp,
                                 f"future_{change_name}_at_utc": gap.instant_utc.isoformat(),
                                 f"future_{change_name}_start_wall": gap.lower_wall.isoformat(),
                                 f"future_{change_name}_end_wall": gap.upper_wall.isoformat(),
@@ -147,4 +150,4 @@ def collect_future_dayun_gap_events(
                             },
                         }
                     )
-    return events, unresolved, scan
+    return events, unresolved, scan, gaps

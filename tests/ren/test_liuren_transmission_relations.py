@@ -12,11 +12,11 @@ from jsonschema import Draft202012Validator
 from pydantic import ValidationError
 
 import fatebridge.application.execution as execution
+from fatebridge.core.contracts.output_liuren_transmission_relations import (
+    LiurenTransmissionRelations,
+)
 from fatebridge.core.metaphysics.liureng_transmission_relations import (
     transmission_relations,
-)
-from fatebridge.core.output_liuren_transmission_relations import (
-    LiurenTransmissionRelations,
 )
 from tests.fixtures.ren_anchors import ANCHOR_PAYLOADS as PAYLOADS
 from tests.support.ren_anchors import anchor_output as raw
@@ -32,7 +32,7 @@ MOD.loader.exec_module(AUDIT)
 RULES, CASES = AUDIT.reference()
 
 
-def test_literal_and_synthetic_evidence_have_separate_denominators():
+def test_literal_and_synthetic_evidence_have_separate_denominators() -> None:
     r = AUDIT.audit()
     assert r["engineering_checks_passed"]
     assert r["literal_god_phase_anchors"] == 12 and r["literal_trine_anchors"] == 4
@@ -51,7 +51,9 @@ def test_literal_and_synthetic_evidence_have_separate_denominators():
 
 
 @pytest.mark.parametrize("change", ["edit", "missing", "extra", "prune"])
-def test_frozen_readings_and_counterexamples_cannot_drift(tmp_path, change):
+def test_frozen_readings_and_counterexamples_cannot_drift(
+    tmp_path: Path, change: str
+) -> None:
     p = tmp_path / "corpus"
     shutil.copytree(AUDIT.CORPUS, p)
     if change in {"edit", "prune"}:
@@ -71,7 +73,7 @@ def test_frozen_readings_and_counterexamples_cannot_drift(tmp_path, change):
 
 
 @pytest.mark.parametrize("case", CASES["cases"], ids=lambda c: c["id"])
-def test_independently_handwritten_symbolic_conditions(case):
+def test_independently_handwritten_symbolic_conditions(case) -> None:
     v = transmission_relations(
         **AUDIT.context(case["day"], case["branches"], uppers=case["lesson_uppers"])
     )
@@ -81,7 +83,7 @@ def test_independently_handwritten_symbolic_conditions(case):
     assert all(not flags[i] for i in case["must_not_match"])
 
 
-def test_god_spirit_and_nominal_trine_never_replace_branch_kin():
+def test_god_spirit_and_nominal_trine_never_replace_branch_kin() -> None:
     v = transmission_relations(
         **AUDIT.context("甲子", ["子", "寅", "丑"], ["贵人", "朱雀", "玄武"])
     )
@@ -105,7 +107,7 @@ def test_god_spirit_and_nominal_trine_never_replace_branch_kin():
     assert t["transformation_confirmed"] is v["comprehensive_judgement"] is None
 
 
-def test_duplicate_trine_members_and_earth_branches_do_not_invent_a_trine():
+def test_duplicate_trine_members_and_earth_branches_do_not_invent_a_trine() -> None:
     for branches in (["巳", "酉", "酉"], ["辰", "戌", "丑"]):
         v = transmission_relations(**AUDIT.context("甲子", branches))
         assert not any(t["branches_complete"] for t in v["trines"])
@@ -116,8 +118,8 @@ def test_duplicate_trine_members_and_earth_branches_do_not_invent_a_trine():
 )
 @pytest.mark.parametrize("project", [False, True])
 def test_four_families_deliver_same_source_layers_on_three_ports(
-    key, project, surface_calls
-):
+    key: str, project: bool, surface_calls
+) -> None:
     spec = SPECS[key]
     fields = [
         "liureng.transmission_relations",
@@ -142,6 +144,8 @@ def test_four_families_deliver_same_source_layers_on_three_ports(
             "false",
         ]
         options.update(fields=fields, strict_fields=True, include_snapshot_text=False)
+    else:
+        pass
     http, protocol, code, cli = surface_calls(
         spec,
         PAYLOADS[key],
@@ -178,8 +182,8 @@ def test_four_families_deliver_same_source_layers_on_three_ports(
 @pytest.mark.parametrize("key", ["liureng_gods", "jinkou"])
 @pytest.mark.parametrize("project", [False, True])
 def test_false_source_layers_fail_before_unrelated_projection(
-    kind, key, project, monkeypatch, surface_calls
-):
+    kind: str, key: str, project: bool, monkeypatch: pytest.MonkeyPatch, surface_calls
+) -> None:
     spec = SPECS[key]
     bad = raw(key)
     e = bad["liureng"]["transmission_relations"]
@@ -203,6 +207,8 @@ def test_false_source_layers_fail_before_unrelated_projection(
             actual = replace(
                 actual, bind=lambda _: (lambda: copy.deepcopy(bad), (), {})
             )
+        else:
+            pass
         return original(actual, request)
 
     monkeypatch.setattr(execution, "execute_spec", broken)
@@ -213,6 +219,8 @@ def test_false_source_layers_fail_before_unrelated_projection(
         params.update(fields="analysis_type", strict_fields="true")
         options.update(fields=["analysis_type"], strict_fields=True)
         flags += ["--fields", "analysis_type", "--strict-fields", "true"]
+    else:
+        pass
     http, protocol, code, cli = surface_calls(
         spec,
         PAYLOADS[key],
@@ -231,8 +239,8 @@ def test_false_source_layers_fail_before_unrelated_projection(
 
 @pytest.mark.parametrize("field", ["rows", "rules", "trines", "day_ganzhi"])
 def test_complete_gate_keeps_source_dependencies_while_partial_models_allow_omission(
-    field,
-):
+    field: str,
+) -> None:
     spec = SPECS["liureng_gods"]
     bad = raw("liureng_gods")
     del bad["liureng"]["transmission_relations"][field]
@@ -241,7 +249,7 @@ def test_complete_gate_keeps_source_dependencies_while_partial_models_allow_omis
         execution.validate_output(spec, bad)
 
 
-def test_standalone_null_projections_preserve_unknowns():
+def test_standalone_null_projections_preserve_unknowns() -> None:
     v = {"comprehensive_judgement": None, "equivalent_three_empty_adjudicated": None}
     assert (
         LiurenTransmissionRelations.model_validate(v).model_dump(exclude_unset=True)
@@ -259,8 +267,8 @@ def test_standalone_null_projections_preserve_unknowns():
         {"god_element": "水", "element": "火", "god_to_spirit": "受克"},
     ],
 )
-def test_projected_rows_reject_contradictions_when_own_anchors_present(value):
-    from fatebridge.core.output_liuren_transmission_relations import (
+def test_projected_rows_reject_contradictions_when_own_anchors_present(value) -> None:
+    from fatebridge.core.contracts.output_liuren_transmission_relations import (
         TransmissionRelationRow,
     )
 

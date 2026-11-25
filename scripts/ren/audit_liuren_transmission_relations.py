@@ -12,13 +12,16 @@ ROOT = Path(__file__).resolve().parents[2]
 CORPUS = ROOT / "tests/fixtures/liuren_transmission_relations_v1"
 WATCH = (
     "src/fatebridge/core/metaphysics/liureng_transmission_relations.py",
-    "src/fatebridge/core/output_liuren_transmission_relations.py",
+    "src/fatebridge/core/contracts/output_liuren_transmission_relations.py",
     "src/fatebridge/core/metaphysics/liureng.py",
+    "src/fatebridge/core/metaphysics/liureng_course_layout.py",
+    "src/fatebridge/core/metaphysics/liureng_selection.py",
+    "src/fatebridge/core/metaphysics/liureng_year_fate.py",
     "src/fatebridge/core/metaphysics/liureng_life_stages.py",
     "src/fatebridge/core/metaphysics/ren_evidence.py",
     "src/fatebridge/core/metaphysics/common.py",
-    "src/fatebridge/core/output_chinese.py",
-    "src/fatebridge/core/output_ren_anchors.py",
+    "src/fatebridge/core/contracts/output_chinese.py",
+    "src/fatebridge/core/contracts/output_ren_anchors.py",
     "src/fatebridge/services/metaphysics.py",
     "scripts/ren/audit_liuren_transmission_relations.py",
     "uv.lock",
@@ -37,13 +40,19 @@ def reference(corpus: Path = CORPUS) -> tuple[dict[str, Any], dict[str, Any]]:
         "freeze.json"
     }:
         raise ValueError("Frozen transmission-relation inventory changed")
+    else:
+        pass
     for n in names:
         if sha(corpus / n) != f["files"][n]:
             raise ValueError("Frozen transmission-relation reference changed")
+        else:
+            pass
     r = json.loads((corpus / "rules.json").read_text())
     c = json.loads((corpus / "synthetic-cases.json").read_text())
     if len(r["god_elements"]) != 12 or len(r["trines"]) != 4 or len(c["cases"]) != 10:
         raise ValueError("Complete predeclared transmission reference required")
+    else:
+        pass
     return r, c
 
 

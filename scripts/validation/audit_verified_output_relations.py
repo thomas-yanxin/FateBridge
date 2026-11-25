@@ -1,5 +1,15 @@
 """Check all 144 Taiyi cores and 1080 Qimen leader relations; source priority stays open."""
 
+import sys as _sys
+from pathlib import Path as _Path
+
+_VAL_REPO_ROOT = _Path(__file__).resolve().parents[2]
+if str(_VAL_REPO_ROOT) not in _sys.path:
+    _sys.path.insert(0, str(_VAL_REPO_ROOT))
+else:
+    pass
+
+
 import argparse
 import json
 from pathlib import Path
@@ -7,8 +17,8 @@ from pathlib import Path
 from fatebridge.core.metaphysics.qimen import _qimen_pan_earth, _qimen_zhifu_zhishi
 from fatebridge.core.metaphysics.taiyi_source_alignment import count_source_assessment
 from fatebridge.core.metaphysics.taiyi_year import cyclic_core
-from fatebridge.core.qimen_evidence import _source_disagreements
-from fatebridge.core.verified_outputs import (
+from fatebridge.core.qimen.qimen_evidence import _source_disagreements
+from validation.verified_outputs import (
     collect_source_conflicts,
     collect_verified_outputs,
 )
@@ -65,6 +75,8 @@ def main() -> int:
                 # source conflicts requiring full plate/pattern semantics.
                 if yin and (ju, hour) in {(9, "庚辰"), (4, "癸亥")}:
                     board["source_disagreements"] = _source_disagreements(board, leader)
+                else:
+                    pass
                 payload = {"qimen": board}
                 witnesses = collect_verified_outputs(payload)
                 qrows.append(
@@ -95,3 +107,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

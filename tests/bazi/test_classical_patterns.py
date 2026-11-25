@@ -20,7 +20,7 @@ from fatebridge.services.astrology import (
 )
 
 
-def test_whole_sign_aspect_and_aversion():
+def test_whole_sign_aspect_and_aversion() -> None:
     assert whole_sign_aspect("Aries", "Aries") == "conjunction"
     assert whole_sign_aspect("Aries", "Gemini") == "sextile"
     assert whole_sign_aspect("Aries", "Cancer") == "square"
@@ -31,7 +31,7 @@ def test_whole_sign_aspect_and_aversion():
     assert whole_sign_aspect("Aries", "Scorpio") is None
 
 
-def test_overcoming_is_tenth_sign_superior_square():
+def test_overcoming_is_tenth_sign_superior_square() -> None:
     # Capricorn is the 10th sign from Aries → Capricorn overcomes Aries.
     assert overcomes("Capricorn", "Aries") is True
     assert overcomes("Aries", "Capricorn") is False  # directional
@@ -41,7 +41,7 @@ def _pos(pid, sign, lon):
     return {"id": pid, "sign": sign, "longitude": lon}
 
 
-def test_besiegement_by_malefics_and_enclosure_by_benefics():
+def test_besiegement_by_malefics_and_enclosure_by_benefics() -> None:
     # Mercury at 10° flanked by Mars (5°) and Saturn (15°) → besieged by malefics.
     positions = [
         _pos("Mars", "Aries", 5.0),
@@ -56,7 +56,7 @@ def test_besiegement_by_malefics_and_enclosure_by_benefics():
     assert patterns["besiegement"].get("Mercury") == "besieged_by_malefics"
 
 
-def test_besiegement_requires_malefics_within_orb():
+def test_besiegement_requires_malefics_within_orb() -> None:
     # Mercury's nearest neighbours are both malefic but ~50° away on each side.
     # Enclosure by body requires the flanking bodies within ~15°, so this is
     # NOT besiegement.
@@ -73,7 +73,7 @@ def test_besiegement_requires_malefics_within_orb():
     assert patterns["besiegement"].get("Mercury") is None
 
 
-def test_bonification_and_maltreatment_from_aspects():
+def test_bonification_and_maltreatment_from_aspects() -> None:
     positions = [
         _pos(p, "Aries", float(i))
         for i, p in enumerate(
@@ -89,14 +89,14 @@ def test_bonification_and_maltreatment_from_aspects():
     assert patterns["bonification"]["Moon"]["maltreated_by"] == ["Saturn"]
 
 
-def test_sect_benefic_malefic_by_sect():
+def test_sect_benefic_malefic_by_sect() -> None:
     day = build_classical_patterns([], [], "day")
     night = build_classical_patterns([], [], "night")
     assert (day["sect_benefic"], day["sect_malefic"]) == ("Jupiter", "Saturn")
     assert (night["sect_benefic"], night["sect_malefic"]) == ("Venus", "Mars")
 
 
-def test_chart_exposes_classical_patterns():
+def test_chart_exposes_classical_patterns() -> None:
     result = calculate_core_chart_analysis(
         name="t",
         birth_year=2000,
@@ -129,18 +129,18 @@ _NATAL = dict(
 )
 
 
-def test_applying_when_gap_to_exact_shrinks():
+def test_applying_when_gap_to_exact_shrinks() -> None:
     # Moon at 11° approaching a trine (120°) to Jupiter at 132° → applying.
     assert _aspect_is_applying(11.0, 13.0, 132.0, 0.08, 120.0) is True
     # Moon at 11° just past a conjunction with Saturn at 10° → separating.
     assert _aspect_is_applying(11.0, 13.0, 10.0, 0.03, 0.0) is False
 
 
-def test_applying_unknown_without_speed():
+def test_applying_unknown_without_speed() -> None:
     assert _aspect_is_applying(10.0, None, 50.0, 1.0, 0.0) is None
 
 
-def test_translation_of_light_fires():
+def test_translation_of_light_fires() -> None:
     planets = [
         {"id": "Moon", "sign": "Aries", "longitude": 11.0},
         {"id": "Saturn", "sign": "Aries", "longitude": 10.0},
@@ -157,7 +157,7 @@ def test_translation_of_light_fires():
     ]
 
 
-def test_lilly_p111_translation_definition_allows_aspected_endpoints():
+def test_lilly_p111_translation_definition_allows_aspected_endpoints() -> None:
     # Lilly's p.111 definition/example does not require aversion. The separate
     # p.126 judgement conditions must not be substituted for the definition.
     planets = [
@@ -180,7 +180,7 @@ def test_lilly_p111_translation_definition_allows_aspected_endpoints():
     )
 
 
-def test_collection_of_light_fires():
+def test_collection_of_light_fires() -> None:
     planets = [
         {"id": "Saturn", "sign": "Aries", "longitude": 10.0},
         {"id": "Moon", "sign": "Aries", "longitude": 8.0},
@@ -197,7 +197,7 @@ def test_collection_of_light_fires():
     ]
 
 
-def test_nodal_bending_north_and_south_within_orb():
+def test_nodal_bending_north_and_south_within_orb() -> None:
     node = 100.0
     planets = [
         {"id": "Mars", "sign": "Libra", "longitude": (node + 90.0) + 1.0},  # north
@@ -209,7 +209,7 @@ def test_nodal_bending_north_and_south_within_orb():
     assert bending == {"Mars": "north", "Venus": "south"}
 
 
-def test_nodal_bending_excluded_beyond_orb():
+def test_nodal_bending_excluded_beyond_orb() -> None:
     node = 100.0
     planets = [
         {"id": "Mars", "sign": "Libra", "longitude": node + 90.0 + NODE_BENDING_ORB + 1}
@@ -218,7 +218,7 @@ def test_nodal_bending_excluded_beyond_orb():
     assert result["nodal_bending"] == []
 
 
-def test_light_patterns_empty_without_speeds():
+def test_light_patterns_empty_without_speeds() -> None:
     planets = [
         {"id": "Moon", "sign": "Aries", "longitude": 11.0},
         {"id": "Saturn", "sign": "Aries", "longitude": 10.0},
@@ -234,21 +234,21 @@ def test_light_patterns_empty_without_speeds():
     assert result["collection_of_light"] == []
 
 
-def test_nodal_bending_empty_without_node():
+def test_nodal_bending_empty_without_node() -> None:
     planets = [{"id": "Mars", "sign": "Libra", "longitude": 190.0}]
     result = build_classical_patterns(planets, [], "day")
     assert result["nodal_bending"] == []
 
 
 @pytest.mark.skipif(swe is None, reason="swisseph 不可用")
-def test_chart_exposes_light_and_nodal_patterns():
+def test_chart_exposes_light_and_nodal_patterns() -> None:
     info = build_astro_birth_info(use_true_solar_time=True, **_NATAL)
     patterns = build_core_chart_payload(info, "hellen_chart")["classical_patterns"]
     for key in ("translation_of_light", "collection_of_light", "nodal_bending"):
         assert isinstance(patterns[key], list)
 
 
-def test_snapshot_renders_light_and_nodal_configurations():
+def test_snapshot_renders_light_and_nodal_configurations() -> None:
     payload = {
         "classical_patterns": {
             "sect_benefic": "Jupiter",

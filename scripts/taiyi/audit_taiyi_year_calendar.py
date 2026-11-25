@@ -54,6 +54,8 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
             != row["sha256"]
         ):
             raise ValueError("历史年历来源指纹不符：" + row["file"])
+        else:
+            pass
     data = json.loads((corpus / "month-starts.json").read_text())
     rows = data["months"]
     required = {(y, m, False) for y in range(381, 386) for m in range(1, 13)} | {
@@ -78,6 +80,8 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
         or {(r["year"], r["month"], r["is_leap_month"]) for r in rows} != required
     ):
         raise ValueError("须保留完整五年62个月及次年终界，共63月首与原印字段")
+    else:
+        pass
     dates = []
     observations = []
     daily = 0
@@ -110,6 +114,8 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
         length = (dates[i + 1] - dates[i]).days
         if length not in [29, 30]:
             raise ValueError("原表相邻月首不能构成完整大小月")
+        else:
+            pass
         for n in range(length):
             d = dates[i] + timedelta(days=n)
             actual = historical_year_context(d)
@@ -128,6 +134,8 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
                 daily_diffs.append(
                     {"date": d.isoformat(), "expected": expected, "actual": actual}
                 )
+            else:
+                pass
     # Original V11 cohort and explicit source correction remain immutable.
     previous = corpus.parent / "taiyi_jinjing_v11"
     case = json.loads((previous / "principal-enclosure.json").read_text())
@@ -136,6 +144,8 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
     result = public_case()
     if "taiyi" not in result:
         raise ValueError(result.get("error"))
+    else:
+        pass
     b = result["taiyi"]
     values = {
         **b["core_board"],

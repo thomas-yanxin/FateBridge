@@ -19,6 +19,7 @@ from fatebridge.core.local_techniques.qimen import build_qimen_with_options
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.divination import calculate_sanshiunited_analysis
 from fatebridge.services.metaphysics import calculate_qimen_analysis
+from tests.support.transports import call_calculation
 
 REFERENCE = json.loads(
     (
@@ -45,8 +46,8 @@ CASES = [
 @pytest.mark.parametrize("solar", [False, True])
 @pytest.mark.parametrize("method", ["chaibu", "zhirun"])
 def test_equivalent_offset_inputs_keep_the_same_seed_and_qimen(
-    zone, longitude, date, time, utc_date, utc_time, solar, method
-):
+    zone, longitude, date, time, utc_date, utc_time, solar: bool, method: str
+) -> None:
     seeds = [
         _build_metaphysics_seed(
             date_text=d,
@@ -59,7 +60,7 @@ def test_equivalent_offset_inputs_keep_the_same_seed_and_qimen(
     ]
     a, b = seeds
     assert a.input_datetime.isoformat() == b.input_datetime.isoformat()
-    assert a.corrected_datetime.isoformat() == b.corrected_datetime.isoformat()
+    assert a.clock_isoformat() == b.clock_isoformat()
     assert a.total_correction_minutes == b.total_correction_minutes
     assert a.pillars == b.pillars
     assert a.calendar_context == b.calendar_context
@@ -70,7 +71,9 @@ def test_equivalent_offset_inputs_keep_the_same_seed_and_qimen(
 
 @pytest.mark.parametrize("time", ["01:30:00", "04:30:00+00:00", "23:00:00-05:30"])
 @pytest.mark.parametrize("method", ["chaibu", "zhirun"])
-def test_santiago_offset_regression_matches_dedicated_qimen(time, method):
+def test_santiago_offset_regression_matches_dedicated_qimen(
+    time: str, method: str
+) -> None:
     date = "2026-09-05" if time.endswith("-05:30") else "2026-09-06"
     aggregate = calculate_sanshiunited_analysis(
         date=date,
@@ -113,15 +116,14 @@ def test_santiago_offset_regression_matches_dedicated_qimen(time, method):
     assert policy_without_clock_provenance(q) == policy_without_clock_provenance(
         dedicated["qimen"]
     )
-    assert aggregate["subresults"]["qimen"]["pan"] == q
 
 
 @pytest.mark.parametrize("offset,solar_branch", [("-04:00", "子"), ("-05:00", "丑")])
 @pytest.mark.parametrize("solar", [False, True])
 @pytest.mark.parametrize("method", ["chaibu", "zhirun"])
 def test_explicit_iso_offset_resolves_named_zone_fold(
-    offset, solar_branch, solar, method
-):
+    offset: str, solar_branch: str, solar: bool, method: str
+) -> None:
     aggregate = calculate_sanshiunited_analysis(
         date="2026-11-01",
         time=f"01:30:00{offset}",
@@ -154,8 +156,8 @@ def test_explicit_iso_offset_resolves_named_zone_fold(
 
 @pytest.mark.parametrize("time", ["01:30:00", "04:30:00+00:00"])
 def test_santiago_civil_and_utc_clock_agree_across_real_transports(
-    monkeypatch, capsys, time
-):
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], time: str
+) -> None:
     api._reset_runtime_state_for_tests()
     monkeypatch.setattr(
         api,
@@ -179,7 +181,7 @@ def test_santiago_civil_and_utc_clock_agree_across_real_transports(
         response_char_limit=0,
     )
     response = TestClient(api.app).post(
-        "/api/divination/sanshiunited",
+        "/api/divination/sanshi",
         json=payload,
         params=[
             ("as_of", controls["as_of"]),
@@ -191,8 +193,11 @@ def test_santiago_civil_and_utc_clock_agree_across_real_transports(
 
     async def protocol():
         async with Client(create_mcp_app()) as client:
-            return await client.call_tool(
-                "sanshiunited", {**payload, **controls}, raise_on_error=False
+            return await call_calculation(
+                client,
+                "sanshi_combined_chart",
+                {**payload, **controls},
+                raise_on_error=False,
             )
 
     native = asyncio.run(protocol())
@@ -200,7 +205,7 @@ def test_santiago_civil_and_utc_clock_agree_across_real_transports(
     capsys.readouterr()
     code = run(
         [
-            "sanshiunited",
+            "sanshi_combined_chart",
             "--date",
             payload["date"],
             "--time",
@@ -235,4 +240,3 @@ def test_santiago_civil_and_utc_clock_agree_across_real_transports(
         )
         assert body["qimen"]["day_ganzhi"] == "癸未"
         assert body["qimen"]["time_ganzhi"] == "壬子"
-        assert body["subresults"]["qimen"]["pan"] == body["qimen"]

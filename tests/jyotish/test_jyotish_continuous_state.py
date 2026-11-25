@@ -11,7 +11,7 @@ from fatebridge.core.astro import jyotish_continuous_state as continuous
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.physical_sources import PhysicalEphemerisTrace
 from fatebridge.utils.errors import EphemerisSourceError
-from tests.jyotish.test_jyotish_sources import restore_runtime  # noqa: F401
+from tests.unit_test.fixtures.jyotish_sources import restore_runtime  # noqa: F401
 
 ROOT = Path(__file__).resolve().parents[2]
 REFERENCE = json.loads(
@@ -42,7 +42,9 @@ CURRENT_ROWS = {
 CURRENT_INPUTS = {row["native_case_index"]: row for row in BINDING["native_inputs"]}
 
 
-def test_all518_apparent_input_states_and_original14_gate_scope(record_property):
+def test_all518_apparent_input_states_and_original14_gate_scope(
+    record_property,
+) -> None:
     e.configure_ephemeris_path(str(ROOT / "ephe"))
     swe = runtime.swe
     swe.set_ephe_path(str(ROOT / "ephe"))
@@ -98,11 +100,15 @@ def test_all518_apparent_input_states_and_original14_gate_scope(record_property)
         )
         if not value["native_position_reproduced_within_line"]:
             native_position_differences.append((tt, planet))
+        else:
+            pass
         actual = value["state"]["spherical"]
         expected = current["expected"]["spherical"]
         for key in ["longitude_rate_degrees_per_day", "latitude_rate_degrees_per_day"]:
             if abs(actual[key] - expected[key]) * 3600 > 1e-6:
                 failures.append((tt, planet, key, actual[key], expected[key]))
+            else:
+                pass
         # Keep the old producer-input compatibility failure visible. The old
         # independent frame fixture and its acceptance line are unchanged.
         if (
@@ -116,6 +122,8 @@ def test_all518_apparent_input_states_and_original14_gate_scope(record_property)
             > 1e-6
         ):
             legacy_failures.append([row["native_case_index"], tt, planet])
+        else:
+            pass
         for key in ["position", "velocity_per_TT_day"]:
             assert value["state"][key] == pytest.approx(
                 current["expected"][key], rel=0, abs=1e-12
@@ -139,7 +147,9 @@ def test_all518_apparent_input_states_and_original14_gate_scope(record_property)
 @pytest.mark.parametrize(
     "fault", ["bad_flags", "bad_values", "wrong_backend", "failed_restore"]
 )
-def test_auxiliary_corruption_is_rejected_after_restoration(monkeypatch, fault):
+def test_auxiliary_corruption_is_rejected_after_restoration(
+    monkeypatch: pytest.MonkeyPatch, fault: str
+) -> None:
     e.configure_ephemeris_path(str(ROOT / "ephe"))
     swe = runtime.swe
     swe.set_ephe_path(str(ROOT / "ephe"))
@@ -156,14 +166,24 @@ def test_auxiliary_corruption_is_rejected_after_restoration(monkeypatch, fault):
         if name == "calc" and args[2] & swe.FLG_XYZ:
             if fault == "bad_flags":
                 return value[0], value[1] | swe.FLG_RADIANS
+            else:
+                pass
             if fault == "wrong_backend":
                 return value[0], (value[1] & ~7) | swe.FLG_MOSEPH
+            else:
+                pass
             if fault == "bad_values":
                 return (float("nan"), *value[0][1:]), value[1]
+            else:
+                pass
         elif name == "calc":
             restored.append(value)
             if fault == "failed_restore":
                 return (value[0][0] + 0.1, *value[0][1:]), value[1]
+            else:
+                pass
+        else:
+            pass
         return value
 
     monkeypatch.setattr(runtime, "ephemeris_call", injected)

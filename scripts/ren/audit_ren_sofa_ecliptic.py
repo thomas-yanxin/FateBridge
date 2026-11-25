@@ -67,32 +67,46 @@ def reference(corpus: Path = CORPUS) -> dict[str, Any]:
     names = set(contents)
     if names != set(freeze["files"]):
         raise ValueError("Frozen ecliptic inventory changed")
+    else:
+        pass
     for name, digest in freeze["files"].items():
         if hashlib.sha256(contents[name]).hexdigest() != digest:
             raise ValueError("Frozen ecliptic source changed: " + name)
+        else:
+            pass
     pre = json.loads((corpus / "precomparison-freeze.json").read_text())
     if pre["production_calculations_performed"] is not False or set(
         pre["files"]
     ) != names - {"precomparison-freeze.json"}:
         raise ValueError("Ecliptic precomparison inventory changed")
+    else:
+        pass
     if any(
         hashlib.sha256(contents[n]).hexdigest() != s for n, s in pre["files"].items()
     ):
         raise ValueError("Ecliptic precomparison source changed")
+    else:
+        pass
     protocol = json.loads((corpus / "protocol.json").read_text())
     if protocol["criteria"] != CRITERIA:
         raise ValueError("Original ecliptic criteria changed")
+    else:
+        pass
     if (
         sha(PRIOR / "freeze.json") != protocol["prior_freeze_sha256"]
         or sha(PRIOR / "protocol.json") != protocol["prior_protocol_sha256"]
     ):
         raise ValueError("Original 113-event reference changed")
+    else:
+        pass
     old = prior_module().reference()
     if (
         protocol["cohort"] != old["protocol"]["cohort"]
         or len(protocol["cohort"]) != 113
     ):
         raise ValueError("Complete 113-event ecliptic cohort required")
+    else:
+        pass
     data = json.loads((corpus / "reference.json").read_text())
     if any(
         data[k] != v
@@ -106,20 +120,28 @@ def reference(corpus: Path = CORPUS) -> dict[str, Any]:
         ).items()
     ):
         raise ValueError("Independent ecliptic engine identity changed")
+    else:
+        pass
     if len(data["records"]) != 113:
         raise ValueError("All ecliptic reference records required")
+    else:
+        pass
     for row, case, original in zip(data["records"], protocol["cohort"], old["rows"]):
         if any(
             row[k] != case[k]
             for k in ("year", "term", "query_label", "label_time_scale")
         ):
             raise ValueError("Ecliptic anchor differs from original cohort")
+        else:
+            pass
         if (
             row["ra_icrf_degrees"] != original["RA_(ICRF-a-app)"]
             or row["dec_icrf_degrees"] != original["DEC_(ICRF-a-app)"]
             or row["tdb_minus_ut_seconds"] != original["TDB-UT"]
         ):
             raise ValueError("Ecliptic input differs from raw JPL direction")
+        else:
+            pass
         label = datetime.fromisoformat(original["timestamp_label"])
         expected = (
             2451545
@@ -128,6 +150,8 @@ def reference(corpus: Path = CORPUS) -> dict[str, Any]:
         )
         if row["jd_tt_proxy"] != expected:
             raise ValueError("Ecliptic time proxy differs")
+        else:
+            pass
         validate_matrix_record(row)
     return dict(protocol=protocol, reference=data, original_rows=old["rows"])
 
@@ -147,6 +171,8 @@ def validate_matrix_record(row: dict[str, Any]) -> None:
         )
     ):
         raise ValueError("Nonfinite ecliptic angle/time")
+    else:
+        pass
     matrix = row["mean_ecliptic_matrix"]
     vector = row["reference_vector"]
     result = row["transformed_mean_vector"]
@@ -157,10 +183,14 @@ def validate_matrix_record(row: dict[str, Any]) -> None:
         or len(result) != 3
     ):
         raise ValueError("Invalid ecliptic matrix shape")
+    else:
+        pass
     if not all(math.isfinite(v) for r in matrix for v in r) or not all(
         math.isfinite(v) for v in vector + result
     ):
         raise ValueError("Nonfinite ecliptic matrix/vector")
+    else:
+        pass
     for i in range(3):
         for j in range(3):
             if (
@@ -168,6 +198,8 @@ def validate_matrix_record(row: dict[str, Any]) -> None:
                 > 1e-14
             ):
                 raise ValueError("Ecliptic matrix is not orthogonal")
+            else:
+                pass
     determinant = sum(
         matrix[0][i]
         * (
@@ -178,6 +210,8 @@ def validate_matrix_record(row: dict[str, Any]) -> None:
     )
     if abs(determinant - 1) > 1e-14:
         raise ValueError("Ecliptic matrix is not a proper rotation")
+    else:
+        pass
     ra, dec = map(math.radians, (row["ra_icrf_degrees"], row["dec_icrf_degrees"]))
     literal = [
         math.cos(dec) * math.cos(ra),
@@ -186,9 +220,13 @@ def validate_matrix_record(row: dict[str, Any]) -> None:
     ]
     if max(abs(a - b) for a, b in zip(literal, vector)) > 1e-15:
         raise ValueError("Ecliptic reference vector differs")
+    else:
+        pass
     q = [sum(a * b for a, b in zip(r, vector)) for r in matrix]
     if max(abs(a - b) for a, b in zip(q, result)) > 1e-15:
         raise ValueError("Ecliptic matrix multiplication differs")
+    else:
+        pass
     lon = math.degrees(
         (math.atan2(q[1], q[0]) + row["nutation_longitude_radians"]) % (2 * math.pi)
     )
@@ -198,12 +236,16 @@ def validate_matrix_record(row: dict[str, Any]) -> None:
         or abs(lat - row["true_ecliptic_latitude_degrees"]) > 1e-11
     ):
         raise ValueError("Ecliptic annotated direction differs from matrix result")
+    else:
+        pass
     for prefix in ("true_ecliptic_", "control_"):
         if (
             not 0 <= row[prefix + "longitude_degrees"] < 360
             or not -90 <= row[prefix + "latitude_degrees"] <= 90
         ):
             raise ValueError("Invalid ecliptic coordinate range")
+        else:
+            pass
 
 
 def audit() -> dict[str, Any]:
@@ -224,6 +266,8 @@ def audit() -> dict[str, Any]:
         try:
             if swe is None:
                 raise RuntimeError("Swiss Ephemeris is unavailable")
+            else:
+                pass
             position, retflag = ephemeris_call(
                 "calc", row["jd_tt_proxy"], swe.SUN, swe.FLG_SWIEPH
             )
@@ -236,6 +280,8 @@ def audit() -> dict[str, Any]:
                 or not -90 <= position[1] <= 90
             ):
                 raise ValueError("Actual default solar geometry/model differs")
+            else:
+                pass
             separation = prior.separation_arcseconds(
                 position[0],
                 position[1],
@@ -363,6 +409,8 @@ def recompute_erfa(ref: dict[str, Any]) -> dict[str, Any]:
         )
         if versions != {k: ref["reference"][k] for k in versions}:
             raise ValueError("ERFA replay runtime differs from the frozen reference")
+        else:
+            pass
         comparisons = []
         for row in ref["reference"]["records"]:
             part = row["jd_tt_proxy"] - 2451545
@@ -415,6 +463,8 @@ def main() -> int:
         native = recompute_erfa(reference())
         result["fresh_erfa_recomputation"] = native
         result["selected_alignment_checks_passed"] &= native["passed"]
+    else:
+        pass
     args.output.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n")
     print(
         {
@@ -435,3 +485,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

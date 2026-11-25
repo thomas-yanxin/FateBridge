@@ -4,6 +4,7 @@ import asyncio
 import hashlib
 import json
 import shutil
+from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
@@ -13,22 +14,26 @@ import fatebridge.api as api
 from fatebridge.application.examples import suggested_fields
 from fatebridge.application.projection import project_fields
 from fatebridge.cli import run
+from fatebridge.core.contracts.output_chinese import Taiyi
+from fatebridge.core.metaphysics.taiyi_conditions import five_general_conditions
 from fatebridge.core.metaphysics.taiyi_enclosures import principal_enclosures
 from fatebridge.core.metaphysics.taiyi_year import (
     assemble_board,
     cyclic_core,
     yearly_core,
 )
-from fatebridge.core.output_chinese import Taiyi
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.metaphysics import calculate_taiyi_analysis
 from fatebridge.services.tool_catalog import CATALOG
 from scripts.taiyi.audit_taiyi_enclosures import CORPUS, audit
 from tests.support.reference_data import resolve
-from tests.taiyi.test_taiyi_transports import _same_run_payload
+from tests.support.transports import SPECS, call_calculation
+from tests.unit_test.fixtures.taiyi import same_run_payload, transport_payload
 
 
-def test_entire_selected_example_and_initial_transcription_correction_are_visible():
+def test_entire_selected_example_and_initial_transcription_correction_are_visible() -> (
+    None
+):
     report = audit()
     assert report["independent_classical_cases"] == 1
     assert report["required_numeric_observations"] == 11
@@ -46,7 +51,7 @@ def test_entire_selected_example_and_initial_transcription_correction_are_visibl
 
 @pytest.mark.parametrize("side", [-1, 1])
 @pytest.mark.parametrize("index", range(8))
-def test_each_physical_bearing_both_sides_and_wraparound(index, side):
+def test_each_physical_bearing_both_sides_and_wraparound(index, side) -> None:
     # Independently written physical bearing order, not the production ring.
     ring = [
         (1, "乾"),
@@ -84,7 +89,9 @@ def test_each_physical_bearing_both_sides_and_wraparound(index, side):
 
 
 @pytest.mark.parametrize("endpoint", [1, 2, 5, 6, 7, 9])
-def test_no_long_arc_opposite_endpoint_center_or_same_palace_is_manufactured(endpoint):
+def test_no_long_arc_opposite_endpoint_center_or_same_palace_is_manufactured(
+    endpoint: int,
+) -> None:
     core = {
         **cyclic_core(70),
         "main_general": endpoint,
@@ -95,25 +102,7 @@ def test_no_long_arc_opposite_endpoint_center_or_same_palace_is_manufactured(end
     assert principal_enclosures(core) == []
 
 
-def transport_payload(key, year):
-    if key == "taiyi":
-        return {
-            "analysis_year": year,
-            "analysis_month": 7,
-            "analysis_day": 1,
-            "analysis_hour": 12,
-            "analysis_timezone": "+08:00",
-            "use_true_solar_time": False,
-        }
-    return {
-        "date": f"{year}-07-01",
-        "time": "12:00:00",
-        "zone": "+08:00",
-        "use_true_solar_time": False,
-    }
-
-
-def test_historical_core_and_modern_phase_twin_keep_distinct_calendar_claims():
+def test_historical_core_and_modern_phase_twin_keep_distinct_calendar_claims() -> None:
     ancient = assemble_board(yearly_core(385))
     result = calculate_taiyi_analysis(
         analysis_year=1969,
@@ -160,7 +149,7 @@ def test_historical_core_and_modern_phase_twin_keep_distinct_calendar_claims():
     assert "1900" in unsupported["error"] and "taiyi" not in unsupported
 
 
-def test_non_hit_is_not_a_denial_of_unadjudicated_enclosure_rules():
+def test_non_hit_is_not_a_denial_of_unadjudicated_enclosure_rules() -> None:
     board = assemble_board(yearly_core(2026))
     assessment = board["enclosure_assessment"]
     assert assessment["principal_enclosure"]["present"] is False
@@ -168,7 +157,7 @@ def test_non_hit_is_not_a_denial_of_unadjudicated_enclosure_rules():
     assert {r["name"] for r in assessment["unassessed"]} == {"挟闭", "四郭固", "四郭杜"}
 
 
-def test_each_new_enclosure_leaf_has_projection_safe_typed_output():
+def test_each_new_enclosure_leaf_has_projection_safe_typed_output() -> None:
     b = assemble_board(yearly_core(385))
 
     def leaves(obj, path):
@@ -184,8 +173,7 @@ def test_each_new_enclosure_leaf_has_projection_safe_typed_output():
         )
 
 
-def test_all_144_ju_same_core_facts_and_five_general_result_are_preserved():
-    from fatebridge.core.metaphysics.taiyi_conditions import five_general_conditions
+def test_all_144_ju_same_core_facts_and_five_general_result_are_preserved() -> None:
 
     for yin in (False, True):
         for ju in range(1, 73):
@@ -218,7 +206,9 @@ def test_all_144_ju_same_core_facts_and_five_general_result_are_preserved():
 @pytest.mark.parametrize(
     "attempt", ["drop_number", "drop_target", "alter_image", "alter_correction"]
 )
-def test_source_cannot_be_reduced_or_correction_proof_replaced(tmp_path, attempt):
+def test_source_cannot_be_reduced_or_correction_proof_replaced(
+    tmp_path: Path, attempt: str
+) -> None:
     corpus = tmp_path / "corpus"
     shutil.copytree(CORPUS, corpus)
     if attempt == "alter_image":
@@ -226,11 +216,15 @@ def test_source_cannot_be_reduced_or_correction_proof_replaced(tmp_path, attempt
         with pytest.raises(ValueError, match="指纹"):
             audit(corpus)
         return
+    else:
+        pass
     if attempt == "alter_correction":
         (corpus / "vol02.txt").write_text("computed values instead of primary proof")
         with pytest.raises(ValueError, match="指纹"):
             audit(corpus)
         return
+    else:
+        pass
     path = corpus / "principal-enclosure.json"
     data = json.loads(path.read_text())
     if attempt == "drop_number":
@@ -243,6 +237,8 @@ def test_source_cannot_be_reduced_or_correction_proof_replaced(tmp_path, attempt
     for item in manifest["source_files"]:
         if item["file"] == path.name:
             item["sha256"] = hashlib.sha256(path.read_bytes()).hexdigest()
+        else:
+            pass
     manifest_path.write_text(json.dumps(manifest))
     correction_path = corpus / "correction-manifest.json"
     correction = json.loads(correction_path.read_text())
@@ -257,8 +253,12 @@ def test_source_cannot_be_reduced_or_correction_proof_replaced(tmp_path, attempt
 @pytest.mark.parametrize("key", ["taiyi", "sanshiunited"])
 @pytest.mark.parametrize("year,present", [(1969, True), (2026, False)])
 def test_enclosure_facts_match_real_rest_mcp_cli(
-    key, year, present, capsys, monkeypatch
-):
+    key: str,
+    year: int,
+    present: bool,
+    capsys: pytest.CaptureFixture[str],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     fields = ["taiyi.enclosure_assessment", "taiyi.patterns", "taiyi.core_board"]
     payload = transport_payload(key, year)
     kwargs = {
@@ -274,7 +274,7 @@ def test_enclosure_facts_match_real_rest_mcp_cli(
         "API_KEY_AUTHENTICATOR",
         api.ApiKeyAuthenticator(header_name="X-API-Key", api_keys={}),
     )
-    route = "/api/cn/taiyi" if key == "taiyi" else "/api/divination/sanshiunited"
+    route = "/api/taiyi" if key == "taiyi" else "/api/divination/sanshi"
     response = TestClient(api.app).post(
         route,
         json=payload,
@@ -289,12 +289,12 @@ def test_enclosure_facts_match_real_rest_mcp_cli(
 
     async def call():
         async with Client(create_mcp_app()) as client:
-            result = await client.call_tool(key, kwargs)
+            result = await call_calculation(client, SPECS[key].tool_name, kwargs)
             assert not result.is_error
             return result.structured_content
 
     mcp = asyncio.run(call())
-    args = [key]
+    args = [SPECS[key].tool_name]
     for name, value in payload.items():
         args += ["--" + name.replace("_", "-"), str(value)]
     args += ["--strict-fields", "--response-char-limit", "0", "--fields", *fields]
@@ -314,8 +314,8 @@ def test_enclosure_facts_match_real_rest_mcp_cli(
 @pytest.mark.parametrize("key", ["taiyi", "sanshiunited"])
 @pytest.mark.parametrize("year", [1969, 2026])
 def test_published_enclosure_first_view_keeps_business_inline_under_default_budget(
-    key, year
-):
+    key: str, year: int
+) -> None:
     spec = next(s for s in CATALOG if s.key == key)
     view = "enclosures" if key == "taiyi" else "taiyi_enclosures"
     fields = suggested_fields(spec, view=view)
@@ -329,8 +329,8 @@ def test_published_enclosure_first_view_keeps_business_inline_under_default_budg
 
     async def call():
         async with Client(create_mcp_app()) as client:
-            result = await client.call_tool(key, kwargs)
-            return await _same_run_payload(client, result)
+            result = await call_calculation(client, SPECS[key].tool_name, kwargs)
+            return await same_run_payload(client, result)
 
     result = asyncio.run(call())
     projected = project_fields(result, fields, strict_fields=True)
@@ -340,7 +340,7 @@ def test_published_enclosure_first_view_keeps_business_inline_under_default_budg
     ] is (year == 1969)
 
 
-def test_month_comparison_hypothesis_is_not_a_proved_source_calendar_basis():
+def test_month_comparison_hypothesis_is_not_a_proved_source_calendar_basis() -> None:
     r = calculate_taiyi_analysis(
         analysis_year=1561,
         analysis_month=11,

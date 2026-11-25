@@ -9,21 +9,31 @@ from __future__ import annotations
 
 from typing import Any
 
-from .common import ELEMENT_CONTROLS, ELEMENT_GENERATES, status_against_anchor
-from .jinkou_sources import strength_sources
+from fatebridge.core.metaphysics.common import (
+    ELEMENT_CONTROLS,
+    ELEMENT_GENERATES,
+    status_against_anchor,
+)
+from fatebridge.core.metaphysics.jinkou_sources import strength_sources
 
 
 def internal_strength(rows: list[dict[str, Any]]) -> dict[str, Any]:
     if len(rows) != 4 or {r["label"] for r in rows} != {"人元", "贵神", "将神", "地分"}:
         raise ValueError("课内旺衰需要四个不同的四位")
+    else:
+        pass
     if any(row["element"] not in ELEMENT_CONTROLS for row in rows):
         raise ValueError("四位五行无效")
+    else:
+        pass
     elements = list(dict.fromkeys(row["element"] for row in rows))
     relations = []
     for i, left in enumerate(rows):
         for j, right in enumerate(rows):
             if i == j:
                 continue
+            else:
+                pass
             a, b = left["element"], right["element"]
             relation = (
                 "克"
@@ -44,6 +54,8 @@ def internal_strength(rows: list[dict[str, Any]]) -> dict[str, Any]:
                         "relation": relation,
                     }
                 )
+            else:
+                pass
     candidates = [
         e
         for e in elements

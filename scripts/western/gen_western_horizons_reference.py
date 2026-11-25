@@ -82,6 +82,8 @@ def fetch(body):
     )
     if "error" in response:
         raise RuntimeError(response["error"])
+    else:
+        pass
     text = response["result"]
     table = text.split("$$SOE\n", 1)[1].split("$$EOE", 1)[0]
     rows = []
@@ -97,6 +99,8 @@ def fetch(body):
         )
     if len(rows) != len(DATES):
         raise ValueError(f"Incomplete Horizons data for {name}")
+    else:
+        pass
     return {
         "body": name,
         "parameters": parameters,
@@ -131,3 +135,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+else:
+    pass

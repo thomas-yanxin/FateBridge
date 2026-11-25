@@ -37,6 +37,8 @@ def reference_report(protocol_path, reference_path, material, seal):
         or protocol["fixed_position_arcsec"] != 0.02
     ):
         raise ValueError("Frozen refinement contract changed")
+    else:
+        pass
     rows = [{"id": r["id"], "role": r["role"], **quality(r)} for r in reference["rows"]]
     unresolved = [r["id"] for r in rows if r["status"] != "qualified"]
     return {
@@ -95,6 +97,8 @@ def compare(protocol_path, reference_path, material, seal, output, model):
                 )[body]
                 if actual_model != model:
                     raise ValueError("Declared physical backend was not used")
+                else:
+                    pass
                 flags = (
                     runtime.swe.FLG_SWIEPH
                     | runtime.swe.FLG_J2000
@@ -107,6 +111,8 @@ def compare(protocol_path, reference_path, material, seal, output, model):
                 )
                 if ret < 0 or runtime.ephemeris_model_from_retflag(ret) != model:
                     raise ValueError("ICRF comparison source changed")
+                else:
+                    pass
                 observed = unit(raw[:3])
                 points = portable_points(row)
                 oracle = points["0"]
@@ -145,6 +151,8 @@ def compare(protocol_path, reference_path, material, seal, output, model):
                         != "fatebridge_complete_position_derivative_v6"
                     ):
                         raise ValueError("Actual v6 derivative was not applied")
+                    else:
+                        pass
                     result = {
                         "candidate_rate_degrees_per_day": state["longitude_speed"],
                         "reference_quality": projected_quality,
@@ -160,6 +168,8 @@ def compare(protocol_path, reference_path, material, seal, output, model):
                             error_arcsec_per_day=abs(state["longitude_speed"] - rate)
                             * 3600,
                         )
+                    else:
+                        pass
                     frames[name] = result
                 qualified = independent["status"] == "qualified" and all(
                     v["reference_quality"]["status"] == "qualified"
@@ -255,3 +265,5 @@ if __name__ == "__main__":
         )
     )
     raise SystemExit(result["exit_code"])
+else:
+    pass

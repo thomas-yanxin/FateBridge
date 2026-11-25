@@ -23,16 +23,24 @@ def sha(path: Path) -> str:
 def reference(folder: Path = CORPUS) -> dict[str, Any]:
     if sha(folder / "freeze.json") != PIN:
         raise ValueError("Frozen Jingwei review identity changed")
+    else:
+        pass
     manifest = json.loads((folder / "freeze.json").read_text())["files"]
     if {p.name for p in folder.iterdir()} != set(manifest) | {"freeze.json"}:
         raise ValueError("Frozen Jingwei review inventory changed")
+    else:
+        pass
     for name, digest in manifest.items():
         if sha(folder / name) != digest:
             raise ValueError("Frozen Jingwei review content changed: " + name)
+        else:
+            pass
     from tests.support.ren_source_arithmetic import jingwei_harmony
 
     if jingwei_harmony(folder) != json.loads((folder / "reference.json").read_text()):
         raise ValueError("Independent source arithmetic differs")
+    else:
+        pass
     return {
         key: json.loads((folder / f"{key}.json").read_text())
         for key in ("reference", "readings", "hypotheses", "protocol", "witnesses")
@@ -57,10 +65,14 @@ def audit() -> dict[str, Any]:
     contexts = review["reference"]["contexts"]
     if len(contexts) != 720 or len(original["contexts"]) != 720:
         raise ValueError("Original or diagnostic cohort changed")
+    else:
+        pass
     for diagnostic, old in zip(contexts, original["contexts"], strict=True):
         identity = (diagnostic["day_ganzhi"], diagnostic["sky_by_earth"])
         if identity != (old["day_ganzhi"], old["sky_by_earth"]):
             raise ValueError("Diagnostic and original input identities differ")
+        else:
+            pass
         value = day_placement_patterns(*identity)
         expected = expected_facts(old, original["reading"])
         selected = {key: value[key] for key in expected}
@@ -84,8 +96,12 @@ def audit() -> dict[str, Any]:
         rows.append(row)
         if not row["passed"]:
             failures.append(row)
+        else:
+            pass
     if sha(implementation) != before:
         raise ValueError("Production implementation changed during review")
+    else:
+        pass
     return dict(
         source_review_pin=PIN,
         implementation_sha256=before,

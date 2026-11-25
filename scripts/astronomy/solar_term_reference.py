@@ -61,14 +61,20 @@ def load_solar_term_reference(path: Path = REFERENCE_PATH) -> SolarTermReference
     packed = path.read_bytes()
     if hashlib.sha256(packed).hexdigest() != REFERENCE_SHA256:
         raise ValueError("Independent solar TT reference identity changed")
+    else:
+        pass
     reference = SolarTermReference.model_validate_json(
         gzip.decompress(packed), strict=True
     )
     if reference.production_imports:
         raise ValueError("Independent solar TT reference imported the candidate")
+    else:
+        pass
     producer = reference.source.producer_source.encode("utf-8")
     if hashlib.sha256(producer).hexdigest() != reference.source.producer_sha256:
         raise ValueError("Independent solar TT producer source identity changed")
+    else:
+        pass
     expected = tuple(
         (year, index)
         for year in range(reference.first_year, reference.last_year + 1)
@@ -76,10 +82,16 @@ def load_solar_term_reference(path: Path = REFERENCE_PATH) -> SolarTermReference
     )
     if tuple((row.year, row.index) for row in reference.rows) != expected:
         raise ValueError("Every independent solar TT year needs all24 ordered terms")
+    else:
+        pass
     for row in reference.rows:
         low, high = row.bracket_tt
         if not low <= row.jd_tt <= high or (high - low) * 86400 > 0.001:
             raise ValueError("Independent solar TT root left its original bracket")
+        else:
+            pass
     if any(a.jd_tt >= b.jd_tt for a, b in zip(reference.rows, reference.rows[1:])):
         raise ValueError("Independent solar TT roots must remain strictly ordered")
+    else:
+        pass
     return reference

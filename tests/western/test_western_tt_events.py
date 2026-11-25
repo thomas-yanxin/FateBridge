@@ -10,8 +10,8 @@ import pytest
 
 from fatebridge.core.astro import geometry, runtime
 from fatebridge.core.astro.ephemeris import _swisseph_planet_state
+from fatebridge.core.astro.horary_motion import native_lunar_contacts
 from fatebridge.core.astro.iers_ut1 import C04Table, use_ut1_source
-from fatebridge.core.horary_motion import native_lunar_contacts
 
 FIXTURE = Path(__file__).parents[1] / "data/astro/tt_events"
 PROTOCOL = json.loads((FIXTURE / "protocol.json").read_text())
@@ -29,12 +29,14 @@ def refuse_ut1(monkeypatch):
     def ephemeris(operation, *args, **kwargs):
         if operation in {"calc_ut", "deltat", "deltat_ex", "get_ayanamsa_ex_ut"}:
             reject()
+        else:
+            pass
         return native(operation, *args, **kwargs)
 
     monkeypatch.setattr(runtime, "ephemeris_call", ephemeris)
 
 
-def test_external_corpus_remains_predeclared_and_not_a_production_oracle():
+def test_external_corpus_remains_predeclared_and_not_a_production_oracle() -> None:
     from scripts.western.audit_western_tt_events import validate_reference_identity
 
     validate_reference_identity(FIXTURE)
@@ -51,7 +53,9 @@ def test_external_corpus_remains_predeclared_and_not_a_production_oracle():
 
 @pytest.mark.parametrize("case", REFERENCE["cases"], ids=lambda r: r["case_id"])
 @pytest.mark.parametrize("zodiac", ["Tropic", "Sidereal"])
-def test_native_lunar_search_without_any_trial_ut1(case, zodiac, monkeypatch):
+def test_native_lunar_search_without_any_trial_ut1(
+    case, zodiac: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
     refuse_ut1(monkeypatch)
     with use_ut1_source("iers_c04"):
         value = native_lunar_contacts(
@@ -81,14 +85,18 @@ def test_native_lunar_search_without_any_trial_ut1(case, zodiac, monkeypatch):
                 abs(actual["julian_day_tt"] - reference["julian_day_tt"]) * 86400
                 <= PROTOCOL["comparison_tolerance_event_seconds"]
             )
+    else:
+        pass
 
 
 @pytest.mark.parametrize("case", REFERENCE["cases"], ids=lambda r: r["case_id"])
 @pytest.mark.parametrize("zodiac", ["Tropic", "Sidereal"])
-def test_planetary_sampler_uses_tt_outside_both_edges(case, zodiac, monkeypatch):
+def test_planetary_sampler_uses_tt_outside_both_edges(
+    case, zodiac: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
     # Probe the real sampler at distant trial epochs. The full +/-30-day
     # histories are retained separately by audit_western_tt_events.py.
-    from fatebridge.core import horary_events
+    from fatebridge.core.astro import horary_events
 
     refuse_ut1(monkeypatch)
     probes = []
@@ -114,7 +122,7 @@ def test_planetary_sampler_uses_tt_outside_both_edges(case, zodiac, monkeypatch)
 
 
 @pytest.mark.parametrize("epoch", [None, float("nan"), float("inf")])
-def test_tt_helper_requires_a_real_finite_epoch(epoch):
+def test_tt_helper_requires_a_real_finite_epoch(epoch) -> None:
     with pytest.raises(ValueError):
         _swisseph_planet_state("Moon", julian_day_tt=epoch)
     with pytest.raises(ValueError):

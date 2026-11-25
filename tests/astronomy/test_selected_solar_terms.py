@@ -3,11 +3,11 @@
 import pytest
 
 from fatebridge.core import almanac
-from fatebridge.core.canping_solar import projection_boundary
 from fatebridge.core.ephemeris_runtime import (
     configure_ephemeris_path,
     configured_ephemeris_path,
 )
+from fatebridge.core.numerology.canping_solar import projection_boundary
 from fatebridge.utils.errors import EphemerisSourceError
 
 
@@ -34,8 +34,13 @@ def empty_ephemeris(monkeypatch, tmp_path):
     [(2000, 2000, "UTC"), (1799, 1800, "+14:00"), (2201, 2200, "-12:00")],
 )
 def test_single_lichun_preserves_every_full_year_field(
-    empty_ephemeris, monkeypatch, mode, year, context_year, zone
-):
+    empty_ephemeris,
+    monkeypatch: pytest.MonkeyPatch,
+    mode: str,
+    year: int,
+    context_year: int,
+    zone: str,
+) -> None:
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", mode)
     full = almanac._solar_terms_for_context_year(year, zone, context_year)
     assert len(full) == 24 and full[2].name == "立春"
@@ -51,8 +56,8 @@ def test_single_lichun_preserves_every_full_year_field(
 
 
 def test_canping_solves_one_crossing_and_keeps_full_year_cache_separate(
-    empty_ephemeris, monkeypatch
-):
+    empty_ephemeris, monkeypatch: pytest.MonkeyPatch
+) -> None:
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "auto")
     original = almanac._solar_term_utc_via_analytic
     observed = []
@@ -82,16 +87,16 @@ def test_canping_solves_one_crossing_and_keeps_full_year_cache_separate(
     "year,context_year", [(1799, 1799), (1798, 1800), (2201, 2201)]
 )
 def test_selector_does_not_expand_analytic_public_or_context_bounds(
-    empty_ephemeris, monkeypatch, year, context_year
-):
+    empty_ephemeris, monkeypatch: pytest.MonkeyPatch, year: int, context_year: int
+) -> None:
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "analytic")
     with pytest.raises(ValueError):
         almanac._solar_terms_for_context_year(year, "UTC", context_year, term_index=2)
 
 
 def test_selector_cannot_substitute_for_required_swiss_files(
-    empty_ephemeris, monkeypatch
-):
+    empty_ephemeris, monkeypatch: pytest.MonkeyPatch
+) -> None:
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "swiss")
     with pytest.raises(EphemerisSourceError) as failure:
         almanac._solar_terms_for_context_year(2000, "UTC", 2000, term_index=2)

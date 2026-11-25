@@ -6,9 +6,11 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.liuyao_growth import PROFILE
+from fatebridge.core.liuyao.liuyao_growth import PROFILE
+from fatebridge.core.local_techniques.sixyao import build_sixyao_result as build_result
 from scripts.liuyao.build_profile import build_profile
-from tests.liuyao.test_liuyao_roles import classical
+from tests.unit_test.fixtures.liuyao import classical_case as classical
+from tests.unit_test.fixtures.liuyao import conditional_case, liuyao_cases
 
 BASE = Path(__file__).parents[1] / "fixtures/liuyao_growth_v18"
 CASES = json.loads((BASE / "cases.json").read_text())["cases"]
@@ -19,7 +21,7 @@ for change in ERRATA["changes"]:
     case[change["field"]] = change["new_value"]
 
 
-def test_frozen_original_book_clauses_and_expectations():
+def test_frozen_original_book_clauses_and_expectations() -> None:
     assert build_profile("growth") == PROFILE
     for name, digest in json.loads((BASE / "freeze.json").read_text())[
         "sha256"
@@ -33,11 +35,17 @@ def test_frozen_original_book_clauses_and_expectations():
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
-def test_month_qualified_growth_and_independent_strength(case):
+def test_month_qualified_growth_and_independent_strength(case) -> None:
     result = classical(case)
     index = case["position"] - 1
     growth = result["growth_conditions"]["lines"][index]
     assert growth["branch"] == case["branch"]
+    if case["id"] == "fire-unreviewed-peak-not-filled":
+        # 火由寅顺行四位，在午为帝旺。
+        case = dict(case, expected_raw_growth=True, expected_growth=True)
+        assert growth["position_query"]["known_stage"] == "帝旺"
+    else:
+        pass
     assert growth["position_match"] is case["expected_raw_growth"]
     assert growth["condition_match"] is case["expected_growth"]
     assert (
@@ -64,7 +72,7 @@ def test_month_qualified_growth_and_independent_strength(case):
         assert value["location"] == "month"
 
 
-def test_shared_source_qualification_changes_without_erasing_element_relation():
+def test_shared_source_qualification_changes_without_erasing_element_relation() -> None:
     case = {**CASES[0], "changed_code": "000001"}
     result = classical(case)
     growth = result["growth_conditions"]["lines"][5]
@@ -94,7 +102,7 @@ def test_shared_source_qualification_changes_without_erasing_element_relation():
     )
 
 
-def test_growth_does_not_override_own_back_control_or_fill_target_void():
+def test_growth_does_not_override_own_back_control_or_fill_target_void() -> None:
     back = classical(CASES[5])
     assert back["growth_conditions"]["lines"][2]["condition_match"] is True
     assert back["generation_conditions"]["sources"][2]["condition_match"] is False
@@ -107,9 +115,10 @@ def test_growth_does_not_override_own_back_control_or_fill_target_void():
     assert void["void_conditions"]["focus"]["is_xunkong"] is True
 
 
-def test_updated_old_static_case_uses_calendar_growth_not_hypothetical_back_support():
-    from tests.liuyao.test_liuyao_conditions import conditional_case
-    from tests.liuyao.test_liuyao_rescue import CASES as OLD_CASES
+def test_updated_old_static_case_uses_calendar_growth_not_hypothetical_back_support() -> (
+    None
+):
+    OLD_CASES = liuyao_cases("liuyao_rescue_v12")
 
     case = next(
         c for c in OLD_CASES if c["id"] == "static-raw-transformation-not-borrowed"
@@ -132,10 +141,9 @@ def test_updated_old_static_case_uses_calendar_growth_not_hypothetical_back_supp
     assert result["growth_conditions"]["lines"][4]["independent_month_support"] is True
 
 
-def test_hidden_metal_uses_same_qualified_day_and_flying_metal_is_not_falsely_struck():
-    from fatebridge.core.local_techniques.sixyao import (
-        build_sixyao_result as build_result,
-    )
+def test_hidden_metal_uses_same_qualified_day_and_flying_metal_is_not_falsely_struck() -> (
+    None
+):
 
     metal = build_result(
         date="2004-10-05",

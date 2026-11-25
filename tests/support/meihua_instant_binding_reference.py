@@ -15,6 +15,8 @@ def load():
     for name, expected in json.loads(raw)["files"].items():
         if str(name).endswith((".py", ".py.txt")):
             continue
+        else:
+            pass
         assert hashlib.sha256((FOLDER / name).read_bytes()).hexdigest() == expected
     cases = json.loads((FOLDER / "cases25.json").read_bytes())
     protocol = json.loads((FOLDER / "protocol.json").read_bytes())
@@ -50,6 +52,8 @@ def clock_aliases(result, clock):
         for row in cast["rule_trace"]:
             if row["rule_id"] == "civil_clock_resolution":
                 row["result"] = clock
+            else:
+                pass
 
 
 def shift(value, **kwargs):
@@ -123,6 +127,8 @@ def mutate(value, name):
             for row in cast["rule_trace"]:
                 if row["rule_id"] == "civil_clock_resolution":
                     row["inputs"][key] = "UTC" if key == "timezone" else "+09:00"
+                else:
+                    pass
     elif name == "month_start_timestamp_changed":
         month["start_term"]["datetime_with_offset"] = shift(
             month["start_term"]["datetime_with_offset"], days=1
@@ -169,6 +175,8 @@ def mutate(value, name):
             for row in cast["rule_trace"]:
                 if row["rule_id"] == "civil_clock_resolution":
                     row["inputs"]["timezone"] = "+07:00"
+                else:
+                    pass
     elif name == "clock_UTC_naive":
         clock["instant_utc"] = (
             datetime.fromisoformat(clock["instant_utc"])

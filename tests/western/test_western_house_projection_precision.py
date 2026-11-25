@@ -21,7 +21,7 @@ FIXTURE = Path(__file__).parents[1] / "data/astro/house_projection_precision"
 MODELS = json.loads((FIXTURE / "inputs.json").read_text())["cases"]
 
 
-def test_all_frozen_plane_phase_and_membership_probes():
+def test_all_frozen_plane_phase_and_membership_probes() -> None:
     assert (
         hashlib.sha256((FIXTURE / "inputs.json").read_bytes()).hexdigest()
         == "722c9c5924a97552b92342e1768ad7ffd4a05487b4afb41f7436bbf051f9333a"
@@ -53,6 +53,8 @@ def test_all_frozen_plane_phase_and_membership_probes():
             )
             if error > 1 or math.floor(actual) != row["house"]:
                 failures.append((row["id"], actual, error, row["house"]))
+            else:
+                pass
             count += 1
     assert count == 53568
     assert not failures, failures[:20]
@@ -66,7 +68,7 @@ def test_all_frozen_plane_phase_and_membership_probes():
         assert metadata["precision"]["maximum_physical_error_arcseconds"] is None
 
 
-def test_contexts_and_record_lists_are_private():
+def test_contexts_and_record_lists_are_private() -> None:
     m = MODELS[0]
     initial = mp.prec
 
@@ -85,8 +87,8 @@ def test_contexts_and_record_lists_are_private():
 
 
 def test_precision_failure_is_not_an_unregistered_reason_or_a_default_house(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     def fail(**kwargs):
         raise ArithmeticError("injected convergence failure")
 
@@ -100,7 +102,7 @@ def test_precision_failure_is_not_an_unregistered_reason_or_a_default_house(
     assert raised.value.as_result()["status_code"] == 503
 
 
-def test_regiomontanus_geographic_pole_is_still_an_open_method_boundary():
+def test_regiomontanus_geographic_pole_is_still_an_open_method_boundary() -> None:
     projection = EclipticHouseProjection(15.0, 90.0, 23.4, b"R")
     native = house_positions.runtime.ephemeris_call(
         "house_pos", 15.0, 90.0, 23.4, (45.0, 0.0), b"R"
@@ -117,8 +119,8 @@ def test_regiomontanus_geographic_pole_is_still_an_open_method_boundary():
 
 @pytest.mark.parametrize("code", ["R", "C"])
 def test_derived_point_projection_uses_original_tropical_input_before_display_rotation(
-    code,
-):
+    code: str,
+) -> None:
     case = MODELS[0]
     subjects = [
         build_native_subject(

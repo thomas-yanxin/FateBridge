@@ -4,7 +4,7 @@
 
 生成玄空数字宅盘，需要有依据的历史宅运与坐向。调用者可以追溯规则版本、核对九宫计算，并在资料支持时启用有限解释，用于空间咨询或应用集成。
 
-`fengshui_xuankong_natal` 的 REST 入口为 `POST /api/fengshui/xuankong_natal`，MCP 与 CLI 同名。选定版本 `xuankong_zhongzhou_v1@1.4.0` 完整计算九宫运星、山星、向星，支持下卦和中州派兼向替星。与 `layers.annual_stars` 独立；查询年份变化不改变历史宅盘。基础三法合同见[家居风水](fengshui.md)。
+`fengshui_xuankong_natal` 的 REST 入口为 `POST /api/fengshui/xuankong-house-chart`，MCP 与 CLI 同名。选定版本 `xuankong_zhongzhou_v1@1.4.0` 完整计算九宫运星、山星、向星，支持下卦和中州派兼向替星。与 `layers.annual_stars` 独立；查询年份变化不改变历史宅盘。基础三法合同见[家居风水](fengshui.md)。
 
 调用时先准备[历史定运与角度资料](#定运校验与角区实现)，再运行[三端示例](#三端调用)。已有数字盘需要进一步解释时，单独启用[有限解释](#显式启用有限解释)；维护者可从[独立验证](#独立验证与复现)追溯固定样本及版本分歧。
 
@@ -43,9 +43,9 @@ curl -X POST http://localhost:8010/api/fengshui/xuankong_natal \
   -H 'Content-Type: application/json' \
   --data-binary @docs/examples/fengshui-xuankong.json
 
-uv run --locked --extra dev fatebridge fengshui_xuankong_natal --request-file docs/examples/fengshui-xuankong.json
+uv run --locked --extra dev fatebridge fengshui_xuankong_house_chart --request-file docs/examples/fengshui-xuankong.json
 uv run --locked --extra dev fatebridge fengshui_assess --request-file docs/examples/fengshui-home.json
-uv run --locked --extra dev fatebridge describe fengshui_xuankong_natal
+uv run --locked --extra dev fatebridge describe fengshui_xuankong_house_chart
 ```
 
 MCP `fengshui_xuankong_natal` 的参数就是上面 JSON 对象。认证设置与其他REST端点一致；工具目录、发现接口、JSON输出schema、错误、字段投影和运行元数据均来自共用目录。CLI也支持 `--house '{...}' --period '{...}'`；请求文件保留未知字段供模型拒绝，不静默删除。
@@ -81,7 +81,7 @@ MCP `fengshui_xuankong_natal` 的参数就是上面 JSON 对象。认证设置�
 虚构示例 [4°±1°宅向支持](examples/fengshui-bearing-support.json) 返回唯一子向下卦，同时保留中央九度 `[3,9/2]` 与同宫同阴阳兼向 `[9/2,5]` 两段依据：
 
 ```bash
-uv run --locked --extra dev fatebridge fengshui_xuankong_natal \
+uv run --locked --extra dev fatebridge fengshui_xuankong_house_chart \
   --request-file docs/examples/fengshui-bearing-support.json \
   --fields layers.xuankong_natal.chart.bearing_support rulesets rule_trace --strict-fields
 ```

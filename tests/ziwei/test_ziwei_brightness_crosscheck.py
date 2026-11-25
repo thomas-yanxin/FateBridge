@@ -3,7 +3,10 @@
 import json
 from pathlib import Path
 
-from fatebridge.core.ziwei_tables import ZIWEI_STAR_BRIGHTNESS, lookup_star_brightness
+from fatebridge.core.ziwei.ziwei_tables import (
+    ZIWEI_STAR_BRIGHTNESS,
+    lookup_star_brightness,
+)
 from scripts.ziwei.gen_ziwei_brightness_fixture import BRANCHES, build_fixture
 
 REFERENCE = json.loads(
@@ -13,11 +16,11 @@ REFERENCE = json.loads(
 )
 
 
-def test_fixture_matches_independent_transcription():
+def test_fixture_matches_independent_transcription() -> None:
     assert REFERENCE == build_fixture()
 
 
-def test_complete_table_and_brightness_gaps_match_reference():
+def test_complete_table_and_brightness_gaps_match_reference() -> None:
     stars = {key.split("@", 1)[0] for key in REFERENCE}
     assert len(stars) == 20
     assert set(ZIWEI_STAR_BRIGHTNESS) == stars
@@ -29,7 +32,7 @@ def test_complete_table_and_brightness_gaps_match_reference():
             ), (star, branch)
 
 
-def test_uncovered_stars_have_no_brightness():
+def test_uncovered_stars_have_no_brightness() -> None:
     for star in ("天刑", "天钺", "天魁", "左辅", "右弼", "禄存", "天马", "天姚"):
         for branch in BRANCHES:
             assert lookup_star_brightness(star, branch) is None

@@ -15,6 +15,8 @@ from datetime import date
 from pathlib import Path
 from typing import Any, Literal
 
+from jplephem.spk import SPK
+
 ROOT = Path(__file__).resolve().parents[2]
 
 
@@ -25,7 +27,6 @@ def encoded(value: Any) -> bytes:
 def build(
     kernel_path: Path, profile: Literal["original", "extended"] = "original"
 ) -> tuple[bytes, dict[str, Any]]:
-    from jplephem.spk import SPK
 
     if profile == "original":
         fixture = "canping_projection_v1"
@@ -48,6 +49,8 @@ def build(
         raise ValueError(
             "Preserve the full predeclared horizon and pinned original kernel"
         )
+    else:
+        pass
     low, high = [
         (date(y, 1, 1).toordinal() + 1721424.5 - 2451545.0) * 86400
         for y in p["record_padding_years"]
@@ -58,15 +61,21 @@ def build(
     with SPK.open(str(kernel_path)) as kernel, kernel_path.open("rb") as stream:
         if kernel.daf.locfmt != b"LTL-IEEE":
             raise ValueError("Expected original little-endian DE440 records")
+        else:
+            pass
         for center, target in p["state_sampling"]["body_pairs"]:
             choices = [
                 s for s in kernel.segments if (s.center, s.target) == (center, target)
             ]
             if len(choices) != 1:
                 raise ValueError("Unexpected source segment priority")
+            else:
+                pass
             s = choices[0]
             if s.frame != 1 or s.data_type != 2:
                 raise ValueError("Expected J2000 type2 position records")
+            else:
+                pass
             initial, span, size, count = map(
                 float, s.daf.read_array(s.end_i - 3, s.end_i)
             )
@@ -79,6 +88,8 @@ def build(
             raw = stream.read(n * size * 8)
             if len(raw) != n * size * 8:
                 raise ValueError("Incomplete original records")
+            else:
+                pass
             segments.append(
                 dict(
                     center=center,
@@ -148,6 +159,8 @@ def build(
         != p["source_kernel"]["sha256"]
     ):
         raise ValueError("Original kernel changed during extraction")
+    else:
+        pass
     return raw, manifest
 
 
@@ -171,6 +184,8 @@ def main() -> int:
     else:
         if binary.exists() or metadata.exists():
             raise SystemExit("Refusing to overwrite existing profile files")
+        else:
+            pass
         packed = gzip.compress(raw, compresslevel=9, mtime=0)
         m["compressed_sha256"] = hashlib.sha256(packed).hexdigest()
         binary.write_bytes(packed)
@@ -198,3 +213,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

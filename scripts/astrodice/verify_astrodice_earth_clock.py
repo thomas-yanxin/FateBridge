@@ -45,6 +45,8 @@ def wire(run, query):
         + urllib.parse.urlencode(query["parameters"])
     ):
         raise ValueError("Raw query/transport identity differs")
+    else:
+        pass
     return raw, receipt
 
 
@@ -52,6 +54,8 @@ def raw_rows(raw, query, cases, plan):
     payload = json.loads(raw)
     if payload.get("error"):
         raise ValueError("Service error cannot be a vector")
+    else:
+        pass
     text = payload["result"]
     prefix, rows = text.split("$$SOE")
     rows, _ = rows.split("$$EOE")
@@ -62,6 +66,8 @@ def raw_rows(raw, query, cases, plan):
         or query["parameters"]["COMMAND"] != {"Earth": "'399'", "Venus": "'299'"}[body]
     ):
         raise ValueError("Target identity differs")
+    else:
+        pass
     for expr in [
         rf"Target body name: {body}.*?\({ids[body]}\).*?DE441",
         r"Center body name: Solar System Barycenter \(0\).*?DE441",
@@ -73,12 +79,16 @@ def raw_rows(raw, query, cases, plan):
     ]:
         if not re.search(expr, prefix):
             raise ValueError("Independent frame/center/time header mismatch")
+        else:
+            pass
     output = []
     seen = set()
     for cells in csv.reader(rows.strip().splitlines()):
         c = [v.strip() for v in cells]
         if len(c) != 9 or c[-1]:
             raise ValueError("Original vector columns differ")
+        else:
+            pass
         near = [
             x
             for x in cases
@@ -87,6 +97,8 @@ def raw_rows(raw, query, cases, plan):
         ]
         if len(near) != 1 or near[0]["id"] in seen:
             raise ValueError("Independent raw identity is ambiguous")
+        else:
+            pass
         case = near[0]
         seen.add(case["id"])
         output.append(
@@ -103,12 +115,16 @@ def raw_rows(raw, query, cases, plan):
         )
     if seen != {c["id"] for c in cases}:
         raise ValueError("Original vector coverage reduced")
+    else:
+        pass
     return output
 
 
 def vector_proof(run, body, case, original, record, plan):
     if {k: record[k] for k in original} != original:
         raise ValueError("Printed vector or role changed")
+    else:
+        pass
     source = Source(run / "source-records", case["window_index"])
     nominal = Q(case["nominal_JD"])
     radius = Q(plan["source_inverse_search_radius_seconds"]) / 86400
@@ -124,8 +140,12 @@ def vector_proof(run, body, case, original, record, plan):
         plan["minimum_monotone_position_derivative_AU_per_day"]
     ):
         raise ValueError("Conditioned axis rule changed")
+    else:
+        pass
     if set(record["profiles"]) != set(plan["numerical_tube_profiles"]):
         raise ValueError("Profile omitted")
+    else:
+        pass
     checks = boxes = 0
     for name, profile in plan["numerical_tube_profiles"].items():
         item = record["profiles"][name]
@@ -150,7 +170,11 @@ def vector_proof(run, body, case, original, record, plan):
                 or evaluate(nominal + radius) < targets[1]
             ):
                 raise ValueError("Unbracketed status unproved")
+            else:
+                pass
             continue
+        else:
+            pass
         brackets = list(map(parse, item["boundary_brackets_JD"]))
         for (a, b), target in zip(brackets, targets):
             if not (
@@ -160,13 +184,19 @@ def vector_proof(run, body, case, original, record, plan):
                 and evaluate(a) <= target <= evaluate(b)
             ):
                 raise ValueError("Exact inverse endpoint failed")
+            else:
+                pass
             checks += 2
         lo, hi = brackets[0][0], brackets[1][1]
         if parse(item["effective_JD"]) != (lo, hi):
             raise ValueError("Source inverse interval changed")
+        else:
+            pass
         actual = source.state(rounded(lo, hi, scale=1 << 256), body)
         if len(item["source_state_bounds"]) != 6:
             raise ValueError("Source component dropped")
+        else:
+            pass
         for a, b in zip(actual, item["source_state_bounds"]):
             cover(a, b)
             boxes += 1
@@ -178,6 +208,8 @@ def vector_proof(run, body, case, original, record, plan):
             flags
         ):
             raise ValueError("Source component contradiction hidden")
+        else:
+            pass
     return checks, boxes
 
 
@@ -186,7 +218,11 @@ def paired_proof(run, case, earth, venus, stored, profile, plan):
     if e["status"] != "bracketed" or v["status"] != "bracketed":
         if stored != {"status": "calibration_unknown"}:
             raise ValueError("Unavailable pair promoted")
+        else:
+            pass
         return 0
+    else:
+        pass
     ea, eb = parse(e["effective_JD"])
     va, vb = parse(v["effective_JD"])
     a, b = max(ea, va), min(eb, vb)
@@ -198,15 +234,23 @@ def paired_proof(run, case, earth, venus, stored, profile, plan):
     if a > b:
         if stored != {**expected, "status": "disjoint"}:
             raise ValueError("Disjoint clocks hidden")
+        else:
+            pass
         return 0
+    else:
+        pass
     if (
         any(stored[k] != v for k, v in expected.items())
         or stored["status"] != "intersecting"
         or parse(stored["common_JD"]) != (a, b)
     ):
         raise ValueError("Common clock intersection changed")
+    else:
+        pass
     if set(stored["common_checks"]) != {"Earth", "Venus"}:
         raise ValueError("Paired source omitted")
+    else:
+        pass
     count = 0
     all_flags = []
     source = Source(run / "source-records", case["window_index"])
@@ -215,6 +259,8 @@ def paired_proof(run, case, earth, venus, stored, profile, plan):
         check = stored["common_checks"][body]
         if len(check["source_state_bounds"]) != 6:
             raise ValueError("Common component dropped")
+        else:
+            pass
         for x, y in zip(actual, check["source_state_bounds"]):
             cover(x, y)
             count += 1
@@ -230,11 +276,15 @@ def paired_proof(run, case, earth, venus, stored, profile, plan):
         ]
         if check["component_compatible"] != flags:
             raise ValueError("Joint source flag differs")
+        else:
+            pass
         all_flags.extend(flags)
     if stored["joint_necessary_not_refuted"] != (
         e["all_six_compatible"] and v["all_six_compatible"] and all(all_flags)
     ):
         raise ValueError("Necessary pair condition promoted")
+    else:
+        pass
     return count
 
 
@@ -246,6 +296,8 @@ def verify(run, cohort):
         (run / "A-first-analysis.json").read_bytes()
     ):
         raise ValueError("B lost A binding")
+    else:
+        pass
     analysisraw = (run / (cohort + "-batch-bound-analysis.json")).read_bytes()
     data = json.loads(analysisraw)
     if (
@@ -267,12 +319,16 @@ def verify(run, cohort):
         or data["retained_overall_numeric_gate_exit_code"] != 1
     ):
         raise ValueError("Source diagnosis promoted to acceptance")
+    else:
+        pass
     cases = plan["cohorts"][cohort]
     queries = [
         q for q in plan["queries"] if q["cohort"] == cohort and q["kind"] == "vector"
     ]
     if [q["id"] for q in queries] != [q["id"] for q in data["vectors"]]:
         raise ValueError("Vector query coverage changed")
+    else:
+        pass
     endpoints = boxes = emission_endpoints = candidates = 0
     vector_summary = []
     for q, g in zip(queries, data["vectors"]):
@@ -284,9 +340,13 @@ def verify(run, cohort):
             or g["encoding"] != q["encoding"]
         ):
             raise ValueError("Vector provenance differs")
+        else:
+            pass
         originals = raw_rows(raw, q, cases, plan)
         if len(originals) != len(g["rows"]):
             raise ValueError("Vector row omitted")
+        else:
+            pass
         stats = {
             p: {"primary": 0, "label_pass": 0, "six_not_refuted": 0}
             for p in plan["numerical_tube_profiles"]
@@ -303,10 +363,14 @@ def verify(run, cohort):
                     s["six_not_refuted"] += record["profiles"][p].get(
                         "all_six_compatible", False
                     )
+            else:
+                pass
         vector_summary.append({"id": q["id"], "profiles": stats})
     expected_pairs = [(e, c) for e in ["JD", "MJD", "CAL"] for c in cases]
     if len(data["pairs"]) != len(expected_pairs):
         raise ValueError("Paired case omitted")
+    else:
+        pass
     pair_summary = {
         p: {
             "primary": 0,
@@ -328,6 +392,8 @@ def verify(run, cohort):
             }.items()
         ) or set(pair["profiles"]) != set(plan["numerical_tube_profiles"]):
             raise ValueError("Pair identity changed")
+        else:
+            pass
         groups = {
             g["body"]: next(r for r in g["rows"] if r["case_id"] == case["id"])
             for g in data["vectors"]
@@ -342,6 +408,8 @@ def verify(run, cohort):
                 s["primary"] += 1
                 s[item["status"]] += 1
                 s["joint_not_refuted"] += item.get("joint_necessary_not_refuted", False)
+            else:
+                pass
     transfers = []
     expected = []
     for spec in plan["transfer_groups"][cohort]:
@@ -357,6 +425,8 @@ def verify(run, cohort):
         )
     if len(data["transfers"]) != len(expected):
         raise ValueError("Transfer group omitted")
+    else:
+        pass
     for group, (spec, sp, q) in zip(data["transfers"], expected):
         raw, receipt = wire(run / spec["observation_root"], q)
         obs = inspect(raw, receipt["status"], q, sp["cohorts"][spec["cohort"]], sp)
@@ -384,11 +454,15 @@ def verify(run, cohort):
                 for k in keys
             ):
                 raise ValueError("Incomplete explicit time input batch")
+            else:
+                pass
             bindings[body] = all(
                 q["parameters"][k] == vector_query["parameters"][k] for k in keys
             )
         if group["clock_time_batches_match"] != bindings:
             raise ValueError("Cross-batch source-clock transfer was promoted")
+        else:
+            pass
         if any(
             group[k] != v
             for k, v in {
@@ -400,13 +474,21 @@ def verify(run, cohort):
             }.items()
         ):
             raise ValueError("Original observer group changed")
+        else:
+            pass
         if obs["status"] != "supported":
             if group["rows"]:
                 raise ValueError("Unavailable observation promoted")
+            else:
+                pass
             transfers.append({"query": q["id"], "status": obs["status"]})
             continue
+        else:
+            pass
         if len(obs["rows"]) != len(group["rows"]):
             raise ValueError("Transfer row omitted")
+        else:
+            pass
         stats = {
             p: {
                 m: {
@@ -426,6 +508,8 @@ def verify(run, cohort):
                 plan["numerical_tube_profiles"]
             ):
                 raise ValueError("Raw transfer identity differs")
+            else:
+                pass
             case = next(
                 c for c in sp["cohorts"][spec["cohort"]] if c["id"] == row["case_id"]
             )
@@ -438,6 +522,8 @@ def verify(run, cohort):
             for p, models in record["profiles"].items():
                 if set(models) != set(plan["transfer_receiver_models"]):
                     raise ValueError("Receiver model omitted")
+                else:
+                    pass
                 for model, value in models.items():
                     if model == "common_clock":
                         item = paired["profiles"][p]
@@ -471,6 +557,8 @@ def verify(run, cohort):
                         raise ValueError(
                             "Receiver calibration changed or unchecked unknown"
                         )
+                    else:
+                        pass
                     if not all(bindings.values()):
                         if value["inference"] != {
                             "status": "cross_batch_clock_unqualified",
@@ -481,6 +569,8 @@ def verify(run, cohort):
                             raise ValueError(
                                 "Unqualified clock batch promoted to an emission result"
                             )
+                        else:
+                            pass
                         n, k = 0, 0
                     else:
                         n, k = infer_proof(
@@ -490,6 +580,8 @@ def verify(run, cohort):
                     candidates += k
                     if case["role"] == "auxiliary_not_primary":
                         continue
+                    else:
+                        pass
                     s = stats[p][model]
                     s["primary"] += 1
                     status = value["inference"]["status"]
@@ -504,6 +596,8 @@ def verify(run, cohort):
                         s["ET_multi_or_unknown"] += not (
                             et["unique_not_refuted"] or et["conditional_refuted"]
                         )
+                    else:
+                        pass
         transfers.append({**spec, "query": q["id"], "profiles": stats})
     return {
         "method": "independent_direct_basis_Bernstein_paired_receiver_clock_v1",
@@ -535,3 +629,5 @@ if __name__ == "__main__":
     with args.output.open("x") as f:
         json.dump(verify(args.run, args.cohort), f, indent=2)
         f.write("\n")
+else:
+    pass

@@ -23,12 +23,16 @@ def frozen_calendar_rows(
     for name, expected in json.loads((folder / "checksums.json").read_text()).items():
         if hashlib.sha256((folder / name).read_bytes()).hexdigest() != expected:
             raise ValueError("Ziwei printed calendar source checksum mismatch: " + name)
+        else:
+            pass
     source = json.loads((folder / "manifest.json").read_text())
     expected = json.loads((folder / "expected_dates.json").read_text())
     if len(expected) != 365 or [r["solar"] for r in expected] != [
         (date(1900, 1, 1) + timedelta(days=i)).isoformat() for i in range(365)
     ]:
         raise ValueError("The entire fixed 1900 date cohort must be retained")
+    else:
+        pass
     return source, expected
 
 
@@ -43,6 +47,8 @@ def audit_calendar_sources(fixtures: Path = FIXTURES) -> dict[str, Any]:
     differences: list[dict[str, Any]] = []
     if compiled["references"] != source["references"]:
         differences.append(dict(case="compiled_date_reference_catalogue"))
+    else:
+        pass
     reports = []
     for zone in source["zones"]:
         for profile in source["profiles"]:
@@ -72,6 +78,8 @@ def audit_calendar_sources(fixtures: Path = FIXTURES) -> dict[str, Any]:
                         )
                     )
                     continue
+                else:
+                    pass
                 chart = result["ziwei_birth"]
                 basis = chart["calendar_basis"]
                 p = basis["date_conversion_provenance"]
@@ -140,6 +148,8 @@ def audit_calendar_sources(fixtures: Path = FIXTURES) -> dict[str, Any]:
                             profile=profile,
                         )
                     )
+                else:
+                    pass
                 cells += 1
             reports.append(
                 dict(
@@ -160,10 +170,14 @@ def audit_calendar_sources(fixtures: Path = FIXTURES) -> dict[str, Any]:
         or len(extension["correction_cases"]) != 6
     ):
         raise ValueError("Calendar implementation coverage policy mismatch")
+    else:
+        pass
     if {r["lunar_year"] for r in extension["correction_cases"]} != set(
         LUNAR_YEAR_INFO_CORRECTIONS
     ):
         differences.append(dict(case="uncovered_year_info_correction_registry"))
+    else:
+        pass
     correction_receipts = 0
     for row in extension["correction_cases"]:
         solar = date.fromisoformat(row["solar"])
@@ -203,6 +217,8 @@ def audit_calendar_sources(fixtures: Path = FIXTURES) -> dict[str, Any]:
                             zone=zone,
                         )
                     )
+                else:
+                    pass
                 correction_receipts += 1
     return dict(
         method_id=source["method_id"],

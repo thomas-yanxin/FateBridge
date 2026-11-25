@@ -8,8 +8,8 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.sukuyo import calendar_mansion, day_evidence
-from fatebridge.core.sukuyo_senmyo_phase import (
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence
+from fatebridge.core.sukuyo.sukuyo_senmyo_phase import (
     SOURCE,
     goryeosa_phase_annotation,
     phase_annotation_lines,
@@ -17,12 +17,12 @@ from fatebridge.core.sukuyo_senmyo_phase import (
     phase_annotation_reference,
     validate_selected_rule,
 )
-from fatebridge.core.sukuyo_sources import load_source
+from fatebridge.core.sukuyo.sukuyo_sources import load_source
 
 FIXTURE = Path(__file__).parents[1] / "data/sukuyo-senmyo-phase-oracle-v1.json"
 
 
-def test_complete_before_code_possible_world_oracle_including_rejected_rows():
+def test_complete_before_code_possible_world_oracle_including_rejected_rows() -> None:
     raw = FIXTURE.read_bytes()
     assert hashlib.sha256(raw).hexdigest() == (
         "2b4b0cbcbf1bc1bd034b95b5c574a77ed334aa8a2435482eb5b2a0e186cd773a"
@@ -49,7 +49,7 @@ def test_complete_before_code_possible_world_oracle_including_rejected_rows():
             assert not result["applied_to_current_input_or_host_calendar"]
 
 
-def test_above_threshold_cannot_hide_missing_eclipse_exception_predicate():
+def test_above_threshold_cannot_hide_missing_eclipse_exception_predicate() -> None:
     result = goryeosa_phase_annotation("full", 2557, 2193, has_lunar_eclipse=True)
     assert not result["phase_before_twilight"]
     assert result["full_moon_eclipse_exception_applies"] is None
@@ -59,7 +59,9 @@ def test_above_threshold_cannot_hide_missing_eclipse_exception_predicate():
     assert "退一日／不退两候选" in result["reading_text"]
 
 
-def test_known_eclipse_exception_changes_phase_designation_without_changing_clock():
+def test_known_eclipse_exception_changes_phase_designation_without_changing_clock() -> (
+    None
+):
     result = goryeosa_phase_annotation(
         "full", 2557, 2193, has_lunar_eclipse=True, initial_before_chenchu=True
     )
@@ -69,7 +71,9 @@ def test_known_eclipse_exception_changes_phase_designation_without_changing_cloc
     assert "记日结果为退一日" in result["reading_text"]
 
 
-def test_false_morning_answer_covers_requested_contrasts_and_declaration_provenance():
+def test_false_morning_answer_covers_requested_contrasts_and_declaration_provenance() -> (
+    None
+):
     variants = [
         goryeosa_phase_annotation(
             "full", 2557, 2193, has_lunar_eclipse=True, initial_before_chenchu=flag
@@ -88,7 +92,7 @@ def test_false_morning_answer_covers_requested_contrasts_and_declaration_provena
     assert variants[-1]["independent_adjudicator_identity"] is None
 
 
-def test_strict_equality_and_exact_subunits_are_not_rounded_into_same_case():
+def test_strict_equality_and_exact_subunits_are_not_rounded_into_same_case() -> None:
     for point, expected in [(Fraction(4385, 2), -1), (2193, 0), (Fraction(4387, 2), 0)]:
         result = goryeosa_phase_annotation("full", point, 2193, has_lunar_eclipse=False)
         assert result["annotation_day_shift"] == expected
@@ -100,7 +104,7 @@ def test_strict_equality_and_exact_subunits_are_not_rounded_into_same_case():
 
 
 @pytest.mark.parametrize("bad", [True, 0.0, "2193", None, -1, 8400, Fraction(-1, 2)])
-def test_remainders_reject_inferred_units_floats_and_implicit_day_carry(bad):
+def test_remainders_reject_inferred_units_floats_and_implicit_day_carry(bad) -> None:
     with pytest.raises(ValueError):
         goryeosa_phase_annotation("full", bad, 2193)
     with pytest.raises(ValueError):
@@ -108,7 +112,7 @@ def test_remainders_reject_inferred_units_floats_and_implicit_day_carry(bad):
 
 
 @pytest.mark.parametrize("bad", [0, 1, "unknown", "false"])
-def test_truth_values_cannot_silently_coerce_unknown_or_flags(bad):
+def test_truth_values_cannot_silently_coerce_unknown_or_flags(bad: int | str) -> None:
     with pytest.raises(ValueError, match="布尔或未知"):
         goryeosa_phase_annotation("full", 2557, 2193, has_lunar_eclipse=bad)
 
@@ -128,7 +132,9 @@ def test_truth_values_cannot_silently_coerce_unknown_or_flags(bad):
         "variant_identity",
     ],
 )
-def test_source_context_and_missing_terms_cannot_be_reduced_to_passing_rule(mutation):
+def test_source_context_and_missing_terms_cannot_be_reduced_to_passing_rule(
+    mutation: str,
+) -> None:
     data = deepcopy(load_source(SOURCE).data)
     if mutation == "exception":
         data["rules"].pop("full_moon_eclipse_exception")
@@ -154,7 +160,9 @@ def test_source_context_and_missing_terms_cannot_be_reduced_to_passing_rule(muta
         validate_selected_rule(data)
 
 
-def test_current_civil_time_does_not_set_phase_predicates_or_rewrite_hinoo_candidates():
+def test_current_civil_time_does_not_set_phase_predicates_or_rewrite_hinoo_candidates() -> (
+    None
+):
     calendar = calendar_mansion(
         "0814-09-21",
         "11:59:00",
@@ -178,7 +186,9 @@ def test_current_civil_time_does_not_set_phase_predicates_or_rewrite_hinoo_candi
     assert "相等处有差异" in result["reading_text"]
 
 
-def test_returned_source_cannot_mutate_later_calls_or_hardcode_rendered_candidates():
+def test_returned_source_cannot_mutate_later_calls_or_hardcode_rendered_candidates() -> (
+    None
+):
     first = phase_annotation_reference()
     first["rules"].clear()
     assert phase_annotation_reference()["rules"]

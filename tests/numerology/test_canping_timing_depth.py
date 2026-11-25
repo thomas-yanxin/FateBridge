@@ -9,15 +9,16 @@ from zoneinfo import ZoneInfo
 import pytest
 from pydantic import ValidationError
 
-from fatebridge.core.canping import calculate
-from fatebridge.core.canping_timing import (
+from fatebridge.core.contracts.output_chinese import CanpingTiming
+from fatebridge.core.local_techniques.canping import build_canping_result
+from fatebridge.core.numerology.canping import calculate
+from fatebridge.core.numerology.canping_timing import (
     APPENDIX,
     CONTINUOUS,
     SOURCE_SHA256,
     appendix_age,
     luck_timeline,
 )
-from fatebridge.core.output_chinese import CanpingTiming
 from fatebridge.core.requests.divination import CanpingRequest
 from fatebridge.services.divination import calculate_canping_analysis
 
@@ -36,7 +37,7 @@ def run_at(at=None, **changes):
     return calculate_canping_analysis(**{**INPUT, **changes}, analysis_datetime=at)
 
 
-def test_primary_source_identity_and_separate_appendix_are_preserved():
+def test_primary_source_identity_and_separate_appendix_are_preserved() -> None:
     manifest = json.loads((ROOT / "manifest.json").read_text())
     assert manifest["pdf_sha256"] == REF["source_pdf_sha256"] == SOURCE_SHA256
     assert [i["pdf_page"] for i in manifest["images"]] == [50, 105, 106]
@@ -49,7 +50,7 @@ def test_primary_source_identity_and_separate_appendix_are_preserved():
 
 
 @pytest.mark.parametrize("case", REF["rounding"])
-def test_source_rounding_rule_derived_cases(case):
+def test_source_rounding_rule_derived_cases(case) -> None:
     birth = datetime(2000, 1, 15, 12, tzinfo=timezone.utc)
     for direction in (-1, 1):
         offset = appendix_age(birth, birth + timedelta(days=case["days"] * direction))
@@ -58,7 +59,7 @@ def test_source_rounding_rule_derived_cases(case):
 
 
 @pytest.mark.parametrize("case", REF["directions"])
-def test_month_pillar_direction_from_named_appendix(case):
+def test_month_pillar_direction_from_named_appendix(case) -> None:
     birth = datetime.fromisoformat(
         "1990-06-15T09:33:00+08:00"
         if case["year"] == "庚午"
@@ -72,7 +73,9 @@ def test_month_pillar_direction_from_named_appendix(case):
     assert len(timeline["periods"]) == 12
 
 
-def test_independent_hko_civil_day_anchor_is_not_claimed_as_a_classical_horoscope():
+def test_independent_hko_civil_day_anchor_is_not_claimed_as_a_classical_horoscope() -> (
+    None
+):
     result = run_at()
     anchor = REF["modern_hko_anchor"]
     timing = result["canping_timing"]
@@ -86,7 +89,9 @@ def test_independent_hko_civil_day_anchor_is_not_claimed_as_a_classical_horoscop
     assert "not_heluo" in timing["heluo_period_distinction"]
 
 
-def test_continuous_and_day_rounding_are_separately_named_and_not_silently_merged():
+def test_continuous_and_day_rounding_are_separately_named_and_not_silently_merged() -> (
+    None
+):
     rounded = run_at()["canping_timing"]
     continuous = run_at(dayun_method=CONTINUOUS)["canping_timing"]
     assert rounded["profile_id"] == APPENDIX and continuous["profile_id"] == CONTINUOUS
@@ -96,7 +101,39 @@ def test_continuous_and_day_rounding_are_separately_named_and_not_silently_merge
     assert continuous["start_details"]["start_age_unrounded"] < 1
 
 
-def test_unstarted_and_first_dayun_are_split_within_the_same_lichun_year():
+@pytest.mark.parametrize("birth_date", ["1994-01-30", "1994-11-02"])
+def test_appendix_needs_a_defined_reference_local_date(birth_date: str) -> None:
+    result = run_at(date=birth_date, time="12:00:00", zone="Antarctica/Vostok")
+    assert result["status_code"] == 422
+    assert result["error_code"] == "validation_error"
+    assert result["retryable"] is False
+    assert result["issues"] == [
+        {"path": "request.dayun_method", "code": "undefined_canping_reference_date"}
+    ]
+
+
+@pytest.mark.parametrize("method", [APPENDIX, CONTINUOUS])
+@pytest.mark.parametrize(
+    "birth_date", ["1992-10-02", "1982-10-03"], ids=["initial", "later_decade"]
+)
+def test_generated_dayun_boundary_needs_defined_local_clock(
+    birth_date: str, method
+) -> None:
+    result = run_at(
+        date=birth_date,
+        time="12:00:00",
+        zone="Antarctica/Vostok",
+        gender="男",
+        dayun_method=method,
+    )
+    assert result["status_code"] == 422
+    assert result["retryable"] is False
+    assert result["issues"] == [
+        {"path": "request", "code": "unresolved_timezone_offset"}
+    ]
+
+
+def test_unstarted_and_first_dayun_are_split_within_the_same_lichun_year() -> None:
     result = run_at()
     row = result["liunian_series"]["rows"][1]
     assert row["year"] == 2027 and row["ganzhi"] == "丁未"
@@ -108,19 +145,25 @@ def test_unstarted_and_first_dayun_are_split_within_the_same_lichun_year():
     assert (b["numShun"], b["numNi"]) == (2738, 2738)
 
 
-def test_exact_decade_boundary_changes_branch_and_both_numbers():
+def test_exact_decade_boundary_changes_branch_and_both_numbers() -> None:
     at = datetime.fromisoformat("2037-02-06T04:02:00+08:00")
     a = run_at((at - timedelta(microseconds=1)).isoformat())["canping_timing"][
         "selected"
     ]
-    b = run_at(at.isoformat())["canping_timing"]["selected"]
+    # The signed fractional offset carries the wall label to the exact edge.
+    b = run_at("2037-02-05T20:01:59.9999999-00:00:00.0000001")["canping_timing"][
+        "selected"
+    ]
+    assert b["at"] == at.isoformat()
     assert (a["dayun_pillar"], b["dayun_pillar"]) == ("己丑", "戊子")
     assert (a["numShun"], a["numNi"]) == (2936, 2536)
     assert (b["numShun"], b["numNi"]) == (2835, 2635)
     assert a["end_at"] == b["start_at"]
 
 
-def test_lichun_not_civil_new_year_selects_taisui_and_no_first_period_fallback():
+def test_lichun_not_civil_new_year_selects_taisui_and_no_first_period_fallback() -> (
+    None
+):
     before = run_at("2027-02-02T12:00:00+08:00")["canping_timing"]["selected"]
     assert before["ganzhi"] == "丙午" and before["year"] == 2026
     assert before["status"] == "not_started" and "numShun" not in before
@@ -128,18 +171,22 @@ def test_lichun_not_civil_new_year_selects_taisui_and_no_first_period_fallback()
     assert after["ganzhi"] == "丁未" and after["dayunBranch"] == "丑"
 
 
-def test_every_annual_segment_is_contiguous_and_bounded_by_its_actual_dayun():
+def test_every_annual_segment_is_contiguous_and_bounded_by_its_actual_dayun() -> None:
     result = run_at()
     rows = result["liunian_series"]["rows"]
     assert len(rows) == 120 and rows[0]["start_at"] == "2026-02-06T04:02:00+08:00"
     for index, row in enumerate(rows):
         if index:
             assert rows[index - 1]["end_at"] == row["start_at"]
+        else:
+            pass
         assert row["segments"][0]["start_at"] == row["start_at"]
         assert row["segments"][-1]["end_at"] == row["end_at"]
         for i, segment in enumerate(row["segments"]):
             if i:
                 assert row["segments"][i - 1]["end_at"] == segment["start_at"]
+            else:
+                pass
             lo, hi = (
                 datetime.fromisoformat(segment[k]) for k in ("start_at", "end_at")
             )
@@ -153,9 +200,11 @@ def test_every_annual_segment_is_contiguous_and_bounded_by_its_actual_dayun():
                     <= datetime.fromisoformat(period["end_at"])
                 )
                 assert period["branch"] == segment["dayunBranch"]
+            else:
+                pass
 
 
-def test_date_counting_uses_civil_days_across_dst_not_fractional_elapsed_days():
+def test_date_counting_uses_civil_days_across_dst_not_fractional_elapsed_days() -> None:
     zone = ZoneInfo("America/New_York")
     a = datetime(2024, 3, 9, 12, tzinfo=zone)
     b = datetime(2024, 3, 11, 12, tzinfo=zone)
@@ -166,7 +215,7 @@ def test_date_counting_uses_civil_days_across_dst_not_fractional_elapsed_days():
     assert appendix_age(a, b)["civil_days_to_reference"] == 2
 
 
-def test_true_solar_hour_correction_does_not_shift_the_birth_to_jie_interval():
+def test_true_solar_hour_correction_does_not_shift_the_birth_to_jie_interval() -> None:
     a = run_at(lon="75", use_true_solar_time=False)
     b = run_at(lon="75", use_true_solar_time=True)
     assert a["canping_timing"]["start_at"] == b["canping_timing"]["start_at"]
@@ -174,7 +223,9 @@ def test_true_solar_hour_correction_does_not_shift_the_birth_to_jie_interval():
     assert a["four_pillars"]["hour"] != b["four_pillars"]["hour"]
 
 
-def test_query_instant_is_offset_invariant_and_evidence_matches_selected_texts():
+def test_query_instant_is_offset_invariant_and_evidence_matches_selected_texts() -> (
+    None
+):
     a = run_at("2037-02-06T04:02:00+08:00")
     b = run_at("2037-02-05T20:02:00Z")
     assert a["canping_timing"]["selected"] == b["canping_timing"]["selected"]
@@ -188,7 +239,7 @@ def test_query_instant_is_offset_invariant_and_evidence_matches_selected_texts()
     assert "尚未起运；不取第一运代替" in waiting["snapshot_text"]
 
 
-def test_legacy_schedule_is_explicit_and_does_not_replace_the_new_default():
+def test_legacy_schedule_is_explicit_and_does_not_replace_the_new_default() -> None:
     legacy = run_at(dayun_method="legacy_minggong_v1")
     modern = run_at()
     assert legacy["canping_timing"]["profile_id"] == "legacy_minggong_v1"
@@ -197,7 +248,7 @@ def test_legacy_schedule_is_explicit_and_does_not_replace_the_new_default():
     assert legacy["dayun"][0]["branch"] != modern["dayun"][0]["branch"]
 
 
-def test_raw_single_year_calculation_requires_the_explicit_active_branch():
+def test_raw_single_year_calculation_requires_the_explicit_active_branch() -> None:
     args = dict(
         year_gz="庚午",
         month_branch="寅",
@@ -218,6 +269,7 @@ def test_raw_single_year_calculation_requires_the_explicit_active_branch():
         {"gender": None},
         {"gender": "未知"},
         {"analysis_datetime": "2027-01-01T12:00:00"},
+        {"analysis_datetime": "2037-02-05T20:02:00+00:00:00.0000001"},
         {
             "analysis_datetime": "2030-02-01T00:00:00Z",
             "dayun_method": "legacy_minggong_v1",
@@ -225,20 +277,37 @@ def test_raw_single_year_calculation_requires_the_explicit_active_branch():
         {"dayun_method": "typo"},
     ],
 )
-def test_invalid_public_inputs_do_not_silently_select_a_sex_clock_or_method(change):
+def test_invalid_public_inputs_do_not_silently_select_a_sex_clock_or_method(
+    change,
+) -> None:
     with pytest.raises(ValidationError):
         CanpingRequest.model_validate({**INPUT, **change})
 
 
 @pytest.mark.parametrize("at", ["2025-01-01T00:00:00Z", "2200-01-01T00:00:00Z"])
-def test_query_before_birth_or_beyond_coverage_is_rejected(at):
+def test_query_before_birth_or_beyond_coverage_is_rejected(at: str) -> None:
     with pytest.raises(ValueError):
         # Service guard returns an error payload, so exercise the domain adapter.
-        from fatebridge.core.local_techniques.canping import build_canping_result
 
         build_canping_result(**INPUT, analysis_datetime=at)
 
 
-def test_selected_numeric_fact_types_are_strict():
+def test_query_clock_preserves_legacy_z_admission() -> None:
+
+    valid = "2037-02-05T20:02:00Z"
+    request = CanpingRequest.model_validate({**INPUT, "analysis_datetime": valid})
+    assert request.analysis_datetime == valid
+
+    invalid = "2037-02-05Z20:02:00+00:00"
+    with pytest.raises(ValidationError) as rejected:
+        CanpingRequest.model_validate({**INPUT, "analysis_datetime": invalid})
+    assert [error["loc"] for error in rejected.value.errors()] == [
+        ("analysis_datetime",)
+    ]
+    with pytest.raises(ValueError, match="Invalid isoformat string"):
+        build_canping_result(**INPUT, analysis_datetime=invalid)
+
+
+def test_selected_numeric_fact_types_are_strict() -> None:
     with pytest.raises(ValidationError):
         CanpingTiming.model_validate({"selected": {"numShun": "2738"}})

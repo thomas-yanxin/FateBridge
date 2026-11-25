@@ -28,13 +28,13 @@ The calculation service requires no LLM API key. It serves application developer
 
 | Domain | Implemented scope | Details and limits |
 | --- | --- | --- |
-| BaZi and relationships | Four pillars, nine topics, pairwise rule scores, luck periods through hourly timing | [Assessment](docs/bazi-assessment.md) · [Timing](docs/bazi-timing.md) · [Scores](docs/compatibility-scoring.md) |
+| BaZi and relationships | Four pillars, nine topics, cross-chart contacts, luck periods through hourly timing | [Assessment](docs/bazi-assessment.md) · [Timing](docs/bazi-timing.md) · [Pair evidence](docs/compatibility-scoring.md) |
 | Chinese systems and divination | Zi Wei, Qi Men, Liu Ren, Jin Kou, Tai Yi, Mei Hua, Liu Yao, He Luo, and Canping | [Topic index](docs/README.md#计算原理与专题) |
 | Astrology | Western natal, relationship, timing, and event charts; Jyotish, Guolao, Sukuyo, and other schools | [Western](docs/western-astrology.md) · [Jyotish](docs/jyotish.md) · [Coverage](docs/algorithm-coverage.md) |
 | Human Design | Dual moments separated by 88° solar longitude, gates and lines, channels, type, and authority | [Calculation and acceptance](docs/human-design.md) |
 | Feng Shui | Eight Mansions, basic sand/water rules, annual/monthly stars, historical Xuan Kong charts, layouts, and measured workstations | [Home assessment](docs/fengshui.md) · [Workstations](docs/fengshui-workstation-layout.md) |
 
-The current source exposes **91 business REST routes** and **92 FastMCP tools** across **13 families**. The central catalog contains 93 entries; 92 are executable through the CLI. The interfaces share domain calculations but differ in names and input shapes; see [interface boundaries](docs/api-reference.md#24-三端能力边界). [Algorithm status](docs/algorithm-status.md) records method versions, source disagreements, and outstanding acceptance work. Detailed guides are currently in Chinese; commands, field names, and schemas retain their API spelling.
+The current source exposes **91 business REST routes**. Four MCP tools provide access to **92 capabilities** across **13 families**. The central catalog contains 93 entries, with 92 available through the CLI. All three interfaces share the same domain calculations. See [interface boundaries](docs/api-reference.md#24-三端能力边界) for names and request shapes, and [algorithm status](docs/algorithm-status.md) for method versions, source disagreements, and outstanding acceptance work.
 
 ## Quick start
 
@@ -67,7 +67,7 @@ This README describes the development branch. For a released package, use the do
 The fictional example below runs in a macOS / Linux terminal without starting a service. Source users should prefix `fatebridge` with `uv run --locked --extra dev`. See the [Windows example](docs/mcp-deployment.md#windows-powershell) for PowerShell.
 
 ```bash
-fatebridge bazi_birth \
+fatebridge bazi_birth_chart \
   --birth-year 1990 --birth-month 5 --birth-day 15 \
   --birth-hour 10 --birth-minute 30 --gender 男 \
   --birth-place 北京 --birth-timezone Asia/Shanghai \
@@ -80,7 +80,7 @@ On success, the command exits with `0` and returns the day master `庚 / 金 / �
 
 ```bash
 fatebridge discover --family bazi
-fatebridge describe bazi_birth --detail input
+fatebridge describe bazi_birth_chart --detail input
 ```
 
 ## Connect an assistant or application

@@ -1,12 +1,12 @@
 """Whole declared-month table comparison; no fifth state or new predictions."""
 
-import hashlib
 import json
 from copy import deepcopy
 
 import pytest
 
-from fatebridge.core.meihua_volume5_strength import (
+from fatebridge.core.meihua import meihua_volume5_strength
+from fatebridge.core.meihua.meihua_volume5_strength import (
     build_volume5_strength_comparison,
     volume5_strength_ruleset,
 )
@@ -20,19 +20,9 @@ for row in EXPECTED:
     BY_GEOMETRY.setdefault((row["code"], row["line"]), []).append(row)
 
 
-def digest(value):
-    return hashlib.sha256(
-        json.dumps(
-            value,
-            ensure_ascii=False,
-            sort_keys=True,
-            separators=(",", ":"),
-            allow_nan=False,
-        ).encode()
-    ).hexdigest()
-
-
-def test_original_table_has_only_twenty_printed_cells_and_five_unlisted_combinations():
+def test_original_table_has_only_twenty_printed_cells_and_five_unlisted_combinations() -> (
+    None
+):
     profile = volume5_strength_ruleset()
     assert profile == json.loads((FOLDER / "profile.json").read_bytes())
     assert list(profile["rows"]) == ["旺", "相", "休", "囚"]
@@ -44,7 +34,7 @@ def test_original_table_has_only_twenty_printed_cells_and_five_unlisted_combinat
 
 
 @pytest.mark.parametrize("geometry", list(BY_GEOMETRY), ids=lambda g: str(g))
-def test_all_existing_geometries_and_thirteen_declared_month_contexts(geometry):
+def test_all_existing_geometries_and_thirteen_declared_month_contexts(geometry) -> None:
     for expected in BY_GEOMETRY[geometry]:
         out = calculate_meihua_cast(
             casting={
@@ -82,14 +72,37 @@ def test_all_existing_geometries_and_thirteen_declared_month_contexts(geometry):
             is layer["net_verdict"]
             is layer["event_time"]
             is layer["real_outcome"]
-            is layer["success_probability"]
             is None
         )
-        del q["volume5_table_comparison"]
-        assert digest(out) == expected["before_complete_output_sha256"]
 
 
-def test_each_actual_counting_candidate_uses_its_own_body_and_evidence_paths():
+@pytest.mark.parametrize("month_branch", [None, "寅"])
+def test_volume5_comparison_leaves_other_calculation_facts_unchanged(
+    monkeypatch: pytest.MonkeyPatch, month_branch: str | None
+) -> None:
+    casting = {"method": "existing", "hexagram_code": "010000", "moving_line": 1}
+    actual = calculate_meihua_cast(casting=casting, season_month_branch=month_branch)
+    qualification = actual["interpretation"]["seasonal_qualification"]
+    assert qualification.pop("volume5_table_comparison")["roles"]
+
+    monkeypatch.setattr(
+        meihua_volume5_strength,
+        "build_volume5_strength_comparison",
+        lambda roles, seasonal: None,
+    )
+    without_comparison = calculate_meihua_cast(
+        casting=casting, season_month_branch=month_branch
+    )
+    assert (
+        without_comparison["interpretation"]["seasonal_qualification"].pop(
+            "volume5_table_comparison"
+        )
+        is None
+    )
+    assert actual == without_comparison
+
+
+def test_each_actual_counting_candidate_uses_its_own_body_and_evidence_paths() -> None:
     out = calculate_meihua_cast(
         casting={
             "method": "sound_groups",
@@ -110,7 +123,7 @@ def test_each_actual_counting_candidate_uses_its_own_body_and_evidence_paths():
             )
 
 
-def test_returned_source_table_cannot_poison_the_next_call():
+def test_returned_source_table_cannot_poison_the_next_call() -> None:
     first = volume5_strength_ruleset()
     first["rows"]["囚"][0] = "金"
     assert volume5_strength_ruleset()["rows"]["囚"][0] == "土"
@@ -128,7 +141,7 @@ def test_returned_source_table_cannot_poison_the_next_call():
         "missing_month_strength",
     ],
 )
-def test_comparison_rejects_mixed_cast_or_month_inputs(mutation):
+def test_comparison_rejects_mixed_cast_or_month_inputs(mutation: str) -> None:
     out = calculate_meihua_cast(
         casting={"method": "existing", "hexagram_code": "010000", "moving_line": 1},
         season_month_branch="申",
@@ -153,7 +166,7 @@ def test_comparison_rejects_mixed_cast_or_month_inputs(mutation):
         build_volume5_strength_comparison(roles, seasonal)
 
 
-def test_missing_month_does_not_infer_a_season_from_labels_or_question():
+def test_missing_month_does_not_infer_a_season_from_labels_or_question() -> None:
     out = calculate_meihua_cast(
         casting={"method": "existing", "hexagram_code": "010000", "moving_line": 1},
         question="夏季，午月，土旺",

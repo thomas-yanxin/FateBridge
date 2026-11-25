@@ -273,6 +273,7 @@
   },
   "input": {
     "additionalProperties": false,
+    "description": "Request model for suzhan.",
     "properties": {
       "activity": {
         "anyOf": [
@@ -293,10 +294,10 @@
           }
         ],
         "default": null,
-        "description": "按事项核对T1299三九、宿性、逐宿、七曜、日名及专章条文；clothing须区分裁缝tailoring_garments、制作making_garments、修理repairing_garments、穿着wearing_garments和穿新衣wearing_new_garments。royal_wearer仅为明确王者身份，不由穿礼服推断；衣事不等于买衣。其他事项亦读取已确认activity_details，保留冲突、版本异文及钟时缺项"
+        "description": "按事项核对T1299三九、宿性、逐宿、七曜、日名及专章条文；clothing须区分裁缝tailoring_garments、制作making_garments、修理repairing_garments、穿着wearing_garments和穿新衣wearing_new_garments。royal_wearer仅为明确王者身份，不由穿礼服推断；衣事不等于买衣。其他事项亦读取已确认activity_details，保留冲突、版本异文及钟时缺项",
+        "title": "Activity"
       },
       "activity_details": {
-        "default": [],
         "description": "已确认的事项细节，须与activity对应；不从出生资料、GPS或目的地猜测。本人启程personal_departure不等于因私出行private_journey；王公百官行旅身份royal_or_official_traveler不由出差或使节任务推断。明确结交交友forming_friendship（不限首次相识）与聚会social_gathering分别核对，不互相代填。远行人入宅long_distance_traveler_entering_residence不自动当启程；出家人请教法要monastic_dharma_request需明确身份与动作。借贷、买卖、远近、方向及技艺等条件只在给定时匹配；空列表保留条件文，未列条件不等于已排除。",
         "items": {
           "enum": [
@@ -351,19 +352,8 @@
           ],
           "type": "string"
         },
+        "title": "Activity Details",
         "type": "array"
-      },
-      "as_of": {
-        "anyOf": [
-          {
-            "type": "string"
-          },
-          {
-            "type": "null"
-          }
-        ],
-        "default": null,
-        "description": "Freeze implicit current time: ISO 8601 datetime with timezone"
       },
       "calendar_basis": {
         "default": "chinese_hko_utc08",
@@ -373,6 +363,7 @@
           "japanese_hutime_1002_1_utc09",
           "japanese_naoj_historical_utc09"
         ],
+        "title": "Calendar Basis",
         "type": "string"
       },
       "calendar_day_part": {
@@ -389,7 +380,8 @@
           }
         ],
         "default": null,
-        "description": "仅Hinoo档案：已确定的原典日序前/后半；不由出生钟时自动推断，缺项保留候选"
+        "description": "仅Hinoo档案：已确定的原典日序前/后半；不由出生钟时自动推断，缺项保留候选",
+        "title": "Calendar Day Part"
       },
       "calendar_profile": {
         "default": "t1299_fullmoon27",
@@ -398,36 +390,19 @@
           "t1299_fullmoon27",
           "hinoo_t1299_host27"
         ],
+        "title": "Calendar Profile",
         "type": "string"
-      },
-      "compact": {
-        "default": true,
-        "description": "紧凑 JSON 输出（无缩进）；设为 false 则美化缩进。默认 true。",
-        "type": "boolean"
       },
       "date": {
         "description": "公历日期；历日宿按显式calendar_basis选择宿主历法与参考日界，默认现代中国农历UTC+08",
+        "title": "Date",
         "type": "string"
       },
       "doubing_su28": {
         "default": true,
         "description": "是否按mansion_method标注天文28宿；不用于农历本命宿；默认仅七个物理七曜有现代研究宿位",
+        "title": "Doubing Su28",
         "type": "boolean"
-      },
-      "fields": {
-        "anyOf": [
-          {
-            "items": {
-              "type": "string"
-            },
-            "type": "array"
-          },
-          {
-            "type": "null"
-          }
-        ],
-        "default": null,
-        "description": "仅返回选定字段以节省 token：接受顶层键（如 'snapshot_text'）或点路径子字段（如 'bazi_birth.day_master'）。run_metadata 始终保留；留空请求全部字段，超出响应字符预算的部分由 result_delivery 保留供读取。无效路径默认附 projection_warnings；strict_fields=true 时拒绝。"
       },
       "gps_lat": {
         "anyOf": [
@@ -439,7 +414,8 @@
           }
         ],
         "default": null,
-        "description": "GPS latitude"
+        "description": "GPS latitude",
+        "title": "Gps Lat"
       },
       "gps_lon": {
         "anyOf": [
@@ -451,11 +427,13 @@
           }
         ],
         "default": null,
-        "description": "GPS longitude"
+        "description": "GPS longitude",
+        "title": "Gps Lon"
       },
       "house_start_mode": {
         "default": 1,
         "description": "宫位起始模式（透传至宿曜引擎；默认 1）",
+        "title": "House Start Mode",
         "type": "integer"
       },
       "hsys": {
@@ -463,12 +441,8 @@
         "description": "Offline house system selector; standard suzhan supports 0..8 with the same FateBridge local house semantics as core chart Explicit values must be integer codes0..8; boolean, floating-point, blank and out-of-range values are rejected.",
         "maximum": 8,
         "minimum": 0,
+        "title": "Hsys",
         "type": "integer"
-      },
-      "include_snapshot_text": {
-        "default": true,
-        "description": "是否包含人类可读的 snapshot_text 文本段（默认随工具而定）；设为 false 可显著减少返回的 token 数。",
-        "type": "boolean"
       },
       "lat": {
         "anyOf": [
@@ -480,7 +454,8 @@
           }
         ],
         "default": null,
-        "description": "已知钟时须明确纬度；文本或十进制度，gps_lat优先；未知钟时不用于历法层"
+        "description": "已知钟时须明确纬度；文本或十进制度，gps_lat优先；未知钟时不用于历法层",
+        "title": "Lat"
       },
       "leap_month_policy": {
         "default": "unresolved",
@@ -489,6 +464,7 @@
           "unresolved",
           "repeat_month"
         ],
+        "title": "Leap Month Policy",
         "type": "string"
       },
       "lon": {
@@ -501,7 +477,8 @@
           }
         ],
         "default": null,
-        "description": "已知钟时须明确经度；文本或十进制度，gps_lon优先；未知钟时不用于历法层"
+        "description": "已知钟时须明确经度；文本或十进制度，gps_lon优先；未知钟时不用于历法层",
+        "title": "Lon"
       },
       "mansion_method": {
         "default": "equatorial_research28",
@@ -510,6 +487,7 @@
           "equatorial_research28",
           "legacy_equal28"
         ],
+        "title": "Mansion Method",
         "type": "string"
       },
       "natal_mansion": {
@@ -522,48 +500,19 @@
           }
         ],
         "default": null,
-        "description": "已核定的农历二十七宿本命宿（不含牛）；提供则计算本命六宫宿位置及命宿到历日宿的三九关系；七曜运行犯宿另未计算，不从黄经星图提取本命宿"
-      },
-      "parent_run_id": {
-        "anyOf": [
-          {
-            "type": "string"
-          },
-          {
-            "type": "null"
-          }
-        ],
-        "default": null,
-        "description": "Parent call's run_id; correlation only, no stored execution lookup"
-      },
-      "response_char_limit": {
-        "anyOf": [
-          {
-            "const": 0,
-            "type": "integer"
-          },
-          {
-            "maximum": 65536,
-            "minimum": 4096,
-            "type": "integer"
-          }
-        ],
-        "default": 8192,
-        "description": "完整 JSON 响应字符预算：0 不限制，或 4096–65536。MCP 默认 8192，REST/CLI 默认 0。超限不截断数据，返回 result_delivery 完整结果引用和可读取字段；按 manifest_uri 或字段分页读取原 run 的数据，不要重新计算或解析单页为完整文档。"
-      },
-      "strict_fields": {
-        "default": false,
-        "description": "是否拒绝无效 fields 路径；默认 false，使用宽松投影并返回警告。",
-        "type": "boolean"
+        "description": "已核定的农历二十七宿本命宿（不含牛）；提供则计算本命六宫宿位置及命宿到历日宿的三九关系；七曜运行犯宿另未计算，不从黄经星图提取本命宿",
+        "title": "Natal Mansion"
       },
       "szchart": {
         "default": 0,
         "description": "宿占盘模式开关（透传至宿曜引擎；默认 0）",
+        "title": "Szchart",
         "type": "integer"
       },
       "szshape": {
         "default": 0,
         "description": "宿占盘形态开关（透传至宿曜引擎；默认 0）",
+        "title": "Szshape",
         "type": "integer"
       },
       "textual_pada": {
@@ -578,7 +527,8 @@
           }
         ],
         "default": null,
-        "description": "仅按本次历日宿名查T1299分足表的显式第1..4足条件；非已排得出生足位，不能按钟时或现代月亮补造；省略保留四足候选"
+        "description": "仅按本次历日宿名查T1299分足表的显式第1..4足条件；非已排得出生足位，不能按钟时或现代月亮补造；省略保留四足候选",
+        "title": "Textual Pada"
       },
       "time": {
         "anyOf": [
@@ -590,23 +540,13 @@
           }
         ],
         "default": null,
-        "description": "已确认的当地钟时；已知时须同时提供完整经纬度以计算星图。未知时省略或null，保留历法日期／半日候选，不计算星图、宫位或瞬时天文宿位，不补00:00或示例钟时。空字符串无效。"
-      },
-      "trace_id": {
-        "anyOf": [
-          {
-            "type": "string"
-          },
-          {
-            "type": "null"
-          }
-        ],
-        "default": null,
-        "description": "Caller trace ID"
+        "description": "已确认的当地钟时；已知时须同时提供完整经纬度以计算星图。未知时省略或null，保留历法日期／半日候选，不计算星图、宫位或瞬时天文宿位，不补00:00或示例钟时。空字符串无效。",
+        "title": "Time"
       },
       "zodiacal": {
         "default": 0,
         "description": "Offline zodiac selector; standard suzhan supports 0=tropical and 1=sidereal(Lahiri-like)",
+        "title": "Zodiacal",
         "type": "integer"
       },
       "zone": {
@@ -619,12 +559,14 @@
           }
         ],
         "default": "+08:00",
-        "description": "Timezone spec"
+        "description": "Timezone spec",
+        "title": "Zone"
       }
     },
     "required": [
       "date"
     ],
+    "title": "SuZhanRequest",
     "type": "object"
   },
   "method_contracts": [

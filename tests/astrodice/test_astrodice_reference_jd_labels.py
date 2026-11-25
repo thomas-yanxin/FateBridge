@@ -26,7 +26,9 @@ FIXTURE = (
         "10000ad-Jan-01 00:00:00.999999",
     ],
 )
-def test_jd_wire_label_preserves_exact_microsecond_without_a_float_epoch(label):
+def test_jd_wire_label_preserves_exact_microsecond_without_a_float_epoch(
+    label: str,
+) -> None:
     tick = input_tick(label)
     recovered = (F(julian_input_label(tick)) - F(3442849, 2)) * DAY_US
     assert abs(recovered - tick) <= F(1, 10**30)
@@ -41,7 +43,7 @@ def table(path):
     ]
 
 
-def test_real_cal_input_failure_and_jd_repair_keep_the_same_1e9_day_line():
+def test_real_cal_input_failure_and_jd_repair_keep_the_same_1e9_day_line() -> None:
     request = json.loads((FIXTURE / "jd-input-probe-request.json").read_text())
     ticks = request["exact_same_TT_ticks"]
     jd_labels = re.findall("'([^']+)'", request["parameters"]["TLIST"])

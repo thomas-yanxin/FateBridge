@@ -11,8 +11,8 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from fatebridge.validation import jyotish_study as primitive
-from fatebridge.validation.jyotish_study_binding import (
+from validation import jyotish_study as primitive
+from validation.jyotish_study_binding import (
     REQUIRED_ARTIFACTS,
     JyotishProtocol,
     blind_outcome_sheet,
@@ -21,7 +21,7 @@ from fatebridge.validation.jyotish_study_binding import (
     reveal_and_evaluate,
     seal_forecasts,
 )
-from fatebridge.validation.predictions import Forecast, Outcome, digest
+from validation.predictions import Forecast, Outcome, digest
 
 MODEL = b"synthetic frozen policy; no claimed forecasting ability"
 ARTIFACTS = {name: f"synthetic {name}".encode() for name in REQUIRED_ARTIFACTS}
@@ -76,7 +76,7 @@ def registered():
     return register(protocol(), MODEL, at=REGISTERED, artifacts=ARTIFACTS)
 
 
-def test_schema_declares_required_plan_fields_and_named_materials():
+def test_schema_declares_required_plan_fields_and_named_materials() -> None:
     from jsonschema import Draft202012Validator
 
     schema = JyotishProtocol.model_json_schema()
@@ -136,7 +136,9 @@ def outcomes():
         "missing_artifact",
     ],
 )
-def test_strict_protocol_rejects_unbound_or_conflicting_declarations(change):
+def test_strict_protocol_rejects_unbound_or_conflicting_declarations(
+    change: str,
+) -> None:
     data = protocol_data()
     if change == "missing_training":
         data["plan"].pop("training_subject_ids")
@@ -156,7 +158,9 @@ def test_strict_protocol_rejects_unbound_or_conflicting_declarations(change):
         JyotishProtocol.model_validate(data)
 
 
-def test_registration_requires_actual_policy_bytes_and_revalidates_mutated_models():
+def test_registration_requires_actual_policy_bytes_and_revalidates_mutated_models() -> (
+    None
+):
     with pytest.raises(ValueError, match="实际规则"):
         register(
             protocol(),
@@ -179,12 +183,12 @@ def test_registration_requires_actual_policy_bytes_and_revalidates_mutated_model
         {**EVIDENCE, "extra": b"unregistered"},
     ],
 )
-def test_all_forecast_materials_must_match_exact_case_bytes(bad):
+def test_all_forecast_materials_must_match_exact_case_bytes(bad) -> None:
     with pytest.raises(ValueError, match="实际文件"):
         seal_forecasts(registered(), forecasts(), at=ISSUED, evidence=bad)
 
 
-def test_abstention_requires_material_and_never_acquires_full_coverage():
+def test_abstention_requires_material_and_never_acquires_full_coverage() -> None:
     reg = registered()
     fs = forecasts()
     fs[1].probability = None
@@ -207,14 +211,16 @@ def test_abstention_requires_material_and_never_acquires_full_coverage():
         {**SOURCES, "extra": b"unregistered"},
     ],
 )
-def test_every_submitted_outcome_requires_exact_source_bytes(bad):
+def test_every_submitted_outcome_requires_exact_source_bytes(bad) -> None:
     reg = registered()
     sealed = seal_forecasts(reg, forecasts(), at=ISSUED, evidence=EVIDENCE)
     with pytest.raises(ValueError, match="结局来源"):
         reveal_and_evaluate(reg, sealed, outcomes(), at=AFTER, outcome_sources=bad)
 
 
-def test_missing_follow_up_is_retained_without_inventing_sources_or_negative_labels():
+def test_missing_follow_up_is_retained_without_inventing_sources_or_negative_labels() -> (
+    None
+):
     reg = registered()
     sealed = seal_forecasts(reg, forecasts(), at=ISSUED, evidence=EVIDENCE)
     report = reveal_and_evaluate(
@@ -229,7 +235,9 @@ def test_missing_follow_up_is_retained_without_inventing_sources_or_negative_lab
     assert empty["metrics"]["brier_score"] is None
 
 
-def test_material_binding_preserves_hand_computed_metrics_without_certification():
+def test_material_binding_preserves_hand_computed_metrics_without_certification() -> (
+    None
+):
     reg = registered()
     sealed = seal_forecasts(reg, forecasts(), at=ISSUED, evidence=EVIDENCE)
     report = reveal_and_evaluate(
@@ -247,7 +255,9 @@ def test_material_binding_preserves_hand_computed_metrics_without_certification(
     assert report["real_world_efficacy"] == "not_established_by_synthetic_data"
 
 
-def test_rehashed_outer_forecast_cannot_replace_its_registered_inner_commitment():
+def test_rehashed_outer_forecast_cannot_replace_its_registered_inner_commitment() -> (
+    None
+):
     reg = registered()
     sealed = seal_forecasts(reg, forecasts(), at=ISSUED, evidence=EVIDENCE)
     other = protocol()
@@ -264,7 +274,7 @@ def test_rehashed_outer_forecast_cannot_replace_its_registered_inner_commitment(
         )
 
 
-def test_tampered_or_legacy_packets_are_not_upgraded_to_material_verified():
+def test_tampered_or_legacy_packets_are_not_upgraded_to_material_verified() -> None:
     reg = registered()
     changed = deepcopy(reg)
     changed["commitment"]["protocol"]["plan"]["baseline_probability"] = 0.8
@@ -275,7 +285,31 @@ def test_tampered_or_legacy_packets_are_not_upgraded_to_material_verified():
         read_registration(legacy)
 
 
-def test_seal_rejects_mutation_and_uncommitted_interpretation_policy():
+@pytest.mark.parametrize("packet_kind", ["registration", "forecast"])
+def test_a_matching_digest_does_not_make_a_null_commitment_valid(
+    packet_kind: str,
+) -> None:
+    """Reject a rehashed malformed packet at its material boundary."""
+    registration = registered()
+    with pytest.raises(ValueError, match="格式不受支持"):
+        if packet_kind == "registration":
+            registration.pop("registration_sha256")
+            registration["commitment"] = None
+            registration["registration_sha256"] = digest(registration)
+            read_registration(registration)
+        else:
+            sealed = seal_forecasts(
+                registration, forecasts(), at=ISSUED, evidence=EVIDENCE
+            )
+            sealed.pop("forecast_commitment_sha256")
+            sealed["commitment"] = None
+            sealed["forecast_commitment_sha256"] = digest(sealed)
+            reveal_and_evaluate(
+                registration, sealed, outcomes(), at=AFTER, outcome_sources=SOURCES
+            )
+
+
+def test_seal_rejects_mutation_and_uncommitted_interpretation_policy() -> None:
     reg = registered()
     fs = forecasts()
     fs[0].probability = True
@@ -287,7 +321,7 @@ def test_seal_rejects_mutation_and_uncommitted_interpretation_policy():
         seal_forecasts(reg, fs, at=ISSUED, evidence=EVIDENCE)
 
 
-def test_adjudicator_sheet_exposes_only_predeclared_outcome_task():
+def test_adjudicator_sheet_exposes_only_predeclared_outcome_task() -> None:
     registration = registered()
     sheet = blind_outcome_sheet(registration)
     assert set(sheet) == {
@@ -310,8 +344,8 @@ def test_adjudicator_sheet_exposes_only_predeclared_outcome_task():
 
 
 def test_cli_full_synthetic_flow_uses_actual_files_and_duplicate_bindings_fail(
-    tmp_path, monkeypatch
-):
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     spec = importlib.util.spec_from_file_location(
         "jyotish_material_cli",
         Path(__file__).resolve().parents[2] / "scripts/jyotish/jyotish_blind_study.py",

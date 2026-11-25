@@ -7,8 +7,8 @@ import pytest
 from pydantic import ValidationError
 
 from fatebridge.core.requests.divination import SuZhanRequest
-from fatebridge.core.sukuyo import SU27_ORDER, calendar_mansion, day_evidence
-from fatebridge.core.sukuyo_lower import (
+from fatebridge.core.sukuyo.sukuyo import SU27_ORDER, calendar_mansion, day_evidence
+from fatebridge.core.sukuyo.sukuyo_lower import (
     conjunction_doctrine,
     lower_mansion_evidence,
     source_bundle,
@@ -41,7 +41,7 @@ def lower_layer(result):
     )
 
 
-def test_all_named_entries_are_indexed_and_each_rule_quotes_its_own_source():
+def test_all_named_entries_are_indexed_and_each_rule_quotes_its_own_source() -> None:
     bundle = source_bundle()
     assert bundle["source_sha256"] == REFERENCE["source_sha256"]
     refs = {r["mansion"]: r for r in REFERENCE["paragraphs"]}
@@ -65,7 +65,7 @@ def test_all_named_entries_are_indexed_and_each_rule_quotes_its_own_source():
         assert bool(matched) == (case["assessment"] is not None), case
 
 
-def test_borrowing_does_not_become_a_prohibition_on_all_trade():
+def test_borrowing_does_not_become_a_prohibition_on_all_trade() -> None:
     generic = evidence("毕", "commerce")
     borrowing = evidence("毕", "commerce", ["borrowing"])
     sale = evidence("毕", "commerce", ["sale"])
@@ -88,7 +88,9 @@ def test_borrowing_does_not_become_a_prohibition_on_all_trade():
     assert "未计入上述宜忌状态" in generic["reading_text"]
 
 
-def test_southbound_restriction_requires_direction_and_does_not_replace_nature():
+def test_southbound_restriction_requires_direction_and_does_not_replace_nature() -> (
+    None
+):
     generic = evidence("壁", "travel")
     south = evidence("壁", "travel", ["southbound_journey"])
     assert lower_layer(generic)["status"] == "conditional_only"
@@ -97,7 +99,9 @@ def test_southbound_restriction_requires_direction_and_does_not_replace_nature()
     assert "不宜南行" in south["reading_text"]
 
 
-def test_ambiguous_reading_and_unattributed_paragraph_are_not_silently_applied():
+def test_ambiguous_reading_and_unattributed_paragraph_are_not_silently_applied() -> (
+    None
+):
     uncertain = evidence("女", "study", ["skill_learning"])
     pending = uncertain["activity_assessment"]["conditional_rules"]
     assert any(
@@ -117,7 +121,7 @@ def test_ambiguous_reading_and_unattributed_paragraph_are_not_silently_applied()
     assert not lower_mansion_evidence("星")["topic_rules"]
 
 
-def test_commerce_incoming_outgoing_and_general_trade_are_distinguished():
+def test_commerce_incoming_outgoing_and_general_trade_are_distinguished() -> None:
     generic = evidence("危", "commerce")
     spending = evidence("危", "commerce", ["spending_property"])
     assert lower_layer(generic)["status"] == "conditional_only"
@@ -135,7 +139,7 @@ def test_commerce_incoming_outgoing_and_general_trade_are_distinguished():
     )
 
 
-def test_all_conjunction_memberships_and_inference_are_explicit():
+def test_all_conjunction_memberships_and_inference_are_explicit() -> None:
     expected = REFERENCE["groups"]
     for key, names in expected.items():
         for name in names.translate(ALIASES):
@@ -152,7 +156,7 @@ def test_all_conjunction_memberships_and_inference_are_explicit():
         conjunction_doctrine("牛")
 
 
-def test_unresolved_mansion_does_not_apply_lower_rules_or_choose_a_group():
+def test_unresolved_mansion_does_not_apply_lower_rules_or_choose_a_group() -> None:
     r = day_evidence(
         calendar_mansion("2024-08-04", calendar_profile="hinoo_t1299_host27"),
         activity="commerce",
@@ -166,7 +170,9 @@ def test_unresolved_mansion_does_not_apply_lower_rules_or_choose_a_group():
     assert all(not r["applied_to_primary"] for r in doctrine["candidate_groups"])
 
 
-def test_existing_school_and_far_journey_rules_are_not_applied_to_all_study_or_travel():
+def test_existing_school_and_far_journey_rules_are_not_applied_to_all_study_or_travel() -> (
+    None
+):
     generic = evidence("毕", "study")
     founding = evidence("毕", "study", ["founding_school"])
     assert any(
@@ -203,8 +209,8 @@ def test_existing_school_and_far_journey_rules_are_not_applied_to_all_study_or_t
     ],
 )
 def test_invalid_detail_context_rejected_by_both_public_and_domain_models(
-    activity, details
-):
+    activity: str | None, details
+) -> None:
     with pytest.raises(ValidationError):
         SuZhanRequest(
             date="2025-03-04",

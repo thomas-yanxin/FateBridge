@@ -9,13 +9,15 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core import guolao_daily_solar as subject
-from fatebridge.validation.guolao_daily_solar import audit_daily_solar
+from fatebridge.core.guolao import guolao_daily_solar as subject
+from validation.guolao_daily_solar import audit_daily_solar
 
 FIXTURE = Path(__file__).parents[1] / "fixtures/guolao-daily-solar-v1"
 
 
-def test_source_data_matches_complete_literal_columns_frozen_before_implementation():
+def test_source_data_matches_complete_literal_columns_frozen_before_implementation() -> (
+    None
+):
     reference = json.loads((FIXTURE / "reference.json").read_text())
     assert (
         hashlib.sha256(subject.DATA.read_bytes()).hexdigest()
@@ -45,7 +47,7 @@ def test_source_data_matches_complete_literal_columns_frozen_before_implementati
     assert not reference["independent_expert_collation"]
 
 
-def test_forward_reverse_glyph_conflicts_not_reversed_or_repaired():
+def test_forward_reverse_glyph_conflicts_not_reversed_or_repaired() -> None:
     model = subject.load_daily_solar(subject.PROFILE)
     winter, spring, summer, autumn = model.segments
     assert winter.rates[38] == F("1.031411")
@@ -63,7 +65,9 @@ def test_forward_reverse_glyph_conflicts_not_reversed_or_repaired():
     assert audit["modern_astronomical_comparison"] is None
 
 
-def test_verified_primary_spring_span_retains_digital_transcription_difference():
+def test_verified_primary_spring_span_retains_digital_transcription_difference() -> (
+    None
+):
     audit = audit_daily_solar()
     difference = audit["source_witness_differences"][0]
     assert difference["siku_literal_du"] == "91.632579"
@@ -76,7 +80,7 @@ def test_verified_primary_spring_span_retains_digital_transcription_difference()
 @pytest.mark.parametrize("segment", range(4))
 def test_source_prescribed_bridge_uses_all_printed_rates_and_no_fitted_endpoint(
     segment,
-):
+) -> None:
     model = subject.load_daily_solar(subject.PROFILE)
     s = model.segments[segment]
     daily = (
@@ -100,7 +104,7 @@ def test_source_prescribed_bridge_uses_all_printed_rates_and_no_fitted_endpoint(
     ]
 
 
-def test_printed_difference_nonclosure_is_reported_at_every_cardinal_boundary():
+def test_printed_difference_nonclosure_is_reported_at_every_cardinal_boundary() -> None:
     model = subject.load_daily_solar(subject.PROFILE)
     for boundary in model.offsets[1:]:
         day = model.day(boundary, policy=subject.POLICIES[1])
@@ -118,7 +122,9 @@ def test_printed_difference_nonclosure_is_reported_at_every_cardinal_boundary():
 
 
 @pytest.mark.parametrize("policy", subject.POLICIES)
-def test_full_named_year_grid_and_noon_keep_source_units_and_unresolved_sunrise(policy):
+def test_full_named_year_grid_and_noon_keep_source_units_and_unresolved_sunrise(
+    policy,
+) -> None:
     model = subject.load_daily_solar(subject.PROFILE)
     days = [model.day(n, policy=policy) for n in range(366)]
     assert len(days) == 366
@@ -138,7 +144,9 @@ def test_full_named_year_grid_and_noon_keep_source_units_and_unresolved_sunrise(
             assert day["noon_unwrapped_from_ji_start_du_exact"] is None
 
 
-def test_independently_printed_first8_day_cumulative_and_all12_comparisons_kept():
+def test_independently_printed_first8_day_cumulative_and_all12_comparisons_kept() -> (
+    None
+):
     audit = audit_daily_solar()
     nodes = audit["worked_cumulative_comparison"]["residuals"]
     assert len(nodes) == 12
@@ -153,18 +161,18 @@ def test_independently_printed_first8_day_cumulative_and_all12_comparisons_kept(
 
 
 @pytest.mark.parametrize("value", [True, False, 1.5, F(1), "1"])
-def test_index_types_not_coerced_to_source_days(value):
+def test_index_types_not_coerced_to_source_days(value) -> None:
     with pytest.raises(TypeError):
         subject.load_daily_solar(subject.PROFILE).day(value, policy=subject.POLICIES[0])
 
 
 @pytest.mark.parametrize("value", [-1, 366])
-def test_no_year_extrapolation_or_modulo_wrap(value):
+def test_no_year_extrapolation_or_modulo_wrap(value) -> None:
     with pytest.raises(ValueError):
         subject.load_daily_solar(subject.PROFILE).day(value, policy=subject.POLICIES[0])
 
 
-def test_explicit_profile_and_policy_required():
+def test_explicit_profile_and_policy_required() -> None:
     with pytest.raises(ValueError):
         subject.load_daily_solar("best_fit")
     model = subject.load_daily_solar(subject.PROFILE)
@@ -175,14 +183,14 @@ def test_explicit_profile_and_policy_required():
 
 
 @pytest.mark.parametrize("index", [-1, 4, True, 0.0])
-def test_segment_indices_cannot_use_python_negative_or_boolean_index(index):
+def test_segment_indices_cannot_use_python_negative_or_boolean_index(index) -> None:
     model = subject.load_daily_solar(subject.PROFILE)
     with pytest.raises((ValueError, TypeError)):
         model.point(index, 0, policy=subject.POLICIES[0])
 
 
 @pytest.mark.parametrize("offset", [-1, 89, False, F(1)])
-def test_segment_offsets_preserve_integer_day_scope(offset):
+def test_segment_offsets_preserve_integer_day_scope(offset) -> None:
     model = subject.load_daily_solar(subject.PROFILE)
     with pytest.raises((ValueError, TypeError)):
         model.point(0, offset, policy=subject.POLICIES[0])
@@ -190,8 +198,8 @@ def test_segment_offsets_preserve_integer_day_scope(offset):
 
 @pytest.mark.parametrize("mutation", ["unit", "blank", "bool", "missing"])
 def test_corrupt_or_missing_source_rate_cannot_be_replaced(
-    monkeypatch, tmp_path, mutation
-):
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, mutation: str
+) -> None:
     raw = copy.deepcopy(json.loads(subject.DATA.read_bytes()))
     if mutation == "unit":
         raw["coordinate_unit"] = "modern_degrees"

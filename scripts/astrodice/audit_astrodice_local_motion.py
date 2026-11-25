@@ -45,8 +45,12 @@ def require_declared_derivative(source, policy):
         "fatebridge_complete_position_derivative_v8",
     }:
         raise ValueError("Unplanned candidate derivative method")
+    else:
+        pass
     if policy["status"] != "applied" or policy["method_id"] != expected:
         raise ValueError("Declared candidate derivative was not applied: " + expected)
+    else:
+        pass
 
 
 def position_comparison(row, observed):
@@ -94,10 +98,14 @@ def evaluate_layers(row, reference_quality, position_provider, rate_provider):
                 ),
             }
             continue
+        else:
+            pass
         try:
             layers[name] = provider()
             if layers[name].get("status") not in {PASS, FAIL, UNRESOLVED}:
                 raise ValueError("Unknown evidence-layer outcome")
+            else:
+                pass
         except Exception as error:
             layers[name] = {
                 "status": "candidate_error",
@@ -146,6 +154,8 @@ def display_reference(row, angular_axes, matrix, derivatives):
     rho2 = position[0] ** 2 + position[1] ** 2
     if rho2 < 0.0001:
         raise ValueError("Ill-conditioned local display longitude")
+    else:
+        pass
 
     def longitude_rate(v):
         return (position[0] * v[1] - position[1] * v[0]) / rho2
@@ -228,6 +238,8 @@ def audit(args):
                     or not all(math.isfinite(v) for v in native)
                 ):
                     raise ValueError("ICRF source/coordinate contract changed")
+                else:
+                    pass
                 trace.observe(f"{body}_independent_position_layer", args.model)
                 result = position_comparison(row, native[:3])
                 # Provenance is supplemental. Its failure cannot suppress an
@@ -267,6 +279,8 @@ def audit(args):
                 )[body]
                 if model != args.model:
                     raise ValueError("Declared physical source was not used")
+                else:
+                    pass
                 chosen = next(
                     f
                     for f in certificate["fits"]
@@ -381,3 +395,5 @@ if __name__ == "__main__":
     for name in ["protocol", "reference", "material", "seal"]:
         p.add_argument("--parent-" + name, type=Path)
     raise SystemExit(audit(p.parse_args()))
+else:
+    pass

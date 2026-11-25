@@ -5,11 +5,11 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core import jyotish_aiyar_reductions as aiyar
 from fatebridge.core.astro.birth import build_astro_birth_info
-from fatebridge.core.jyotish import build_india
-from fatebridge.core.jyotish_pinda import PLANETS, analyze
-from fatebridge.core.output_jyotish import JyotishIndia
+from fatebridge.core.contracts.output_jyotish import JyotishIndia
+from fatebridge.core.jyotish import jyotish_aiyar_reductions as aiyar
+from fatebridge.core.jyotish.jyotish import build_india
+from fatebridge.core.jyotish.jyotish_pinda import PLANETS, analyze
 from tests.fixtures.surface_payloads import astro_payload
 
 FIXTURES = Path(__file__).parents[1] / "fixtures"
@@ -19,7 +19,7 @@ EXPECTED = {r["case_id"]: r for r in NEW["full_rows"]}
 
 
 @pytest.mark.parametrize("case", OLD, ids=lambda c: c["name"])
-def test_all91_complete_inputs_keep_rao_values_and_add_separate637_rows(case):
+def test_all91_complete_inputs_keep_rao_values_and_add_separate637_rows(case) -> None:
     actual = analyze(case["bav"], {g: case["signs"][g] for g in PLANETS})
     profile = actual["source_profile_comparison"]["aiyar1905_commentary"]
     assert profile["source_id"] == aiyar.SOURCE["id"]
@@ -37,7 +37,7 @@ def test_all91_complete_inputs_keep_rao_values_and_add_separate637_rows(case):
         assert "sodhya_pinda" not in profile["targets"][planet]
 
 
-def test_all_vargas_and_own_sample_tables_keep_typed_source_comparisons():
+def test_all_vargas_and_own_sample_tables_keep_typed_source_comparisons() -> None:
     india = build_india(
         build_astro_birth_info(**astro_payload(), preserve_instant=True),
         divisions=[2, 3, 7, 9, 10, 12, 30],

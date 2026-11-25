@@ -21,14 +21,14 @@ assert (
 REFERENCE = json.loads(REFERENCE_PATH.read_text())
 
 
-def test_published_state_is_already_a_valid_JSON_value():
+def test_published_state_is_already_a_valid_JSON_value() -> None:
     result = frame.project_state(
         2451545.0, (1, 2, 3), (0.1, 0.2, 0.3), vector_rate_scale=1
     )
     assert TypeAdapter(JsonValue).validate_python(result) == result
 
 
-def test_complete_all5180_independent_state_projections_and_clock_controls():
+def test_complete_all5180_independent_state_projections_and_clock_controls() -> None:
     assert REFERENCE["candidate_or_production_imported"] is False
     assert REFERENCE["summary"]["projection_cases"] == 5180
     assert REFERENCE["summary"]["precision_crosscheck_failures"] == 0
@@ -66,6 +66,8 @@ def test_complete_all5180_independent_state_projections_and_clock_controls():
         )
         if error > 1e-7 or rate_error > 1e-6:
             failures.append((row["native_case_index"], gamma, error, rate_error))
+        else:
+            pass
         for key in ["position", "velocity_per_TT_day"]:
             assert max(abs(x - y) for x, y in zip(result[key], expected[key])) <= 1e-12
         assert abs(a["radius"] - b["radius"]) <= 1e-12
@@ -93,6 +95,8 @@ def test_complete_all5180_independent_state_projections_and_clock_controls():
                 no_frame_rejected += rejected
             elif row["vector_rate_scale_rational"] in {"2", "1/2"}:
                 wrong_uniform_rejected += rejected
+            else:
+                pass
     assert not failures, failures
     assert no_frame_rejected == 5180
     assert wrong_uniform_rejected > 0
@@ -101,13 +105,13 @@ def test_complete_all5180_independent_state_projections_and_clock_controls():
 @pytest.mark.parametrize(
     "bad", [float("nan"), float("inf"), float("-inf"), True, 1721425.0, 5373486.0]
 )
-def test_invalid_epochs_are_not_replaced_by_default_values(bad):
+def test_invalid_epochs_are_not_replaced_by_default_values(bad) -> None:
     with pytest.raises(ValueError):
         frame.frame_state(bad)
 
 
 @pytest.mark.parametrize("bad", [0, -1, float("nan"), float("inf"), True])
-def test_velocity_mapping_must_be_explicit_finite_and_positive(bad):
+def test_velocity_mapping_must_be_explicit_finite_and_positive(bad) -> None:
     with pytest.raises(ValueError):
         frame.project_state(2451545.0, (1, 0, 0), (0, 1, 0), vector_rate_scale=bad)
 
@@ -115,13 +119,15 @@ def test_velocity_mapping_must_be_explicit_finite_and_positive(bad):
 @pytest.mark.parametrize(
     "position", [(0, 0, 0), (float("nan"), 0, 0), (1, 2), (True, 0, 0)]
 )
-def test_invalid_cartesian_states_do_not_produce_spherical_claims(position):
+def test_invalid_cartesian_states_do_not_produce_spherical_claims(position) -> None:
     with pytest.raises(ValueError):
         frame.project_state(2451545.0, position, (0, 1, 0), vector_rate_scale=1)
 
 
 @pytest.mark.parametrize("sign", [-1, 1])
-def test_poles_retain_vectors_without_fabricating_longitude_or_derivatives(sign):
+def test_poles_retain_vectors_without_fabricating_longitude_or_derivatives(
+    sign,
+) -> None:
     result = frame.spherical_state((0, 0, sign), (1, 0, 2))
     assert result["longitude_degrees"] is None
     assert result["longitude_rate_degrees_per_day"] is None
@@ -130,7 +136,7 @@ def test_poles_retain_vectors_without_fabricating_longitude_or_derivatives(sign)
     assert result["radial_rate_per_day"] == sign * 2
 
 
-def test_business_endpoints_are_in_the_declared_frame_domain():
+def test_business_endpoints_are_in_the_declared_frame_domain() -> None:
     times = {row["epoch_jd_tt"] for row in REFERENCE["rows"]}
     assert 1721425.622066106 in times
     assert 5373484.500800741 in times

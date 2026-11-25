@@ -6,6 +6,8 @@ from functools import lru_cache
 
 import pytest
 
+import fatebridge.core.almanac as almanac
+import fatebridge.services.divination as service
 from fatebridge.application import meihua_clock_binding as binding
 from fatebridge.application.execution import execute_tool
 from fatebridge.services.tool_catalog import CATALOG
@@ -26,14 +28,14 @@ def original(case_id):
     return new_result(BY_ID[case_id])
 
 
-def test_frozen_fault_protocol_keeps_its_declared_scope():
+def test_frozen_fault_protocol_keeps_its_declared_scope() -> None:
     assert PROTOCOL["precedes_production_change"] is True
     assert not PROTOCOL["independent_expert_or_real_world_predictive_validation"]
     assert len(PROTOCOL["faults"]) == 34
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
-def test_all25_declared_clock_instants_and_fold_choices_stay_valid(case):
+def test_all25_declared_clock_instants_and_fold_choices_stay_valid(case) -> None:
     request, value = original(case["id"])
     saved = deepcopy(value)
     clock = clock_of(value)
@@ -46,14 +48,14 @@ def test_all25_declared_clock_instants_and_fold_choices_stay_valid(case):
 
 
 @pytest.mark.parametrize("fault", PROTOCOL["faults"], ids=lambda c: c["id"])
-def test_all34_inconsistent_complete_packets_fail_the_clock_binding(fault):
+def test_all34_inconsistent_complete_packets_fail_the_clock_binding(fault) -> None:
     req, value = original(fault["base_case"])
     with pytest.raises(ValueError):
         binding.require_meihua_clock_binding(mutate(value, fault["id"]), req)
 
 
 @pytest.mark.parametrize("fault", PROTOCOL["faults"], ids=lambda c: c["id"])
-def test_all34_packets_remain_internal_errors_in_real_shared_execution(fault):
+def test_all34_packets_remain_internal_errors_in_real_shared_execution(fault) -> None:
     req, value = original(fault["base_case"])
     bad = mutate(value, fault["id"])
     spec = replace(SPEC, bind=lambda _: (lambda: deepcopy(bad), (), {}))
@@ -65,12 +67,14 @@ def test_all34_packets_remain_internal_errors_in_real_shared_execution(fault):
 @pytest.mark.parametrize(
     "variant", PROTOCOL["positive_representation_variants"], ids=lambda c: c["id"]
 )
-def test_equivalent_representations_do_not_become_false_clock_errors(variant):
+def test_equivalent_representations_do_not_become_false_clock_errors(variant) -> None:
     req, value = original(variant["base_case"])
     binding.require_meihua_clock_binding(mutate(value, variant["id"]), req)
 
 
-def test_guard_resolves_the_request_without_rerunning_the_producer(monkeypatch):
+def test_guard_resolves_the_request_without_rerunning_the_producer(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     req, value = original("known-plus8")
     calls = []
     real = binding.resolve_civil_clock
@@ -83,9 +87,6 @@ def test_guard_resolves_the_request_without_rerunning_the_producer(monkeypatch):
         raise AssertionError(
             "The public producer or astronomical solver must not be its own oracle"
         )
-
-    import fatebridge.core.almanac as almanac
-    import fatebridge.services.divination as service
 
     monkeypatch.setattr(binding, "resolve_civil_clock", capture)
     monkeypatch.setattr(service, "calculate_meihua_analysis", forbidden)
@@ -107,7 +108,7 @@ def test_guard_resolves_the_request_without_rerunning_the_producer(monkeypatch):
         ("solar_term_delta", "days_until_next"),
     ],
 )
-def test_derived_day_durations_must_also_use_the_same_UTC_labels(path):
+def test_derived_day_durations_must_also_use_the_same_UTC_labels(path) -> None:
     # Supplemental engineering probes after the original34-fault freeze;
     # not new independent chronology or physical observations.
     req, value = original("known-plus8")

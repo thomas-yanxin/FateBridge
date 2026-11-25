@@ -21,7 +21,7 @@ AUTHOR_FRAME = json.loads(
 )
 
 
-def test_native_frame_reference_preserves_all_frozen_author_cases():
+def test_native_frame_reference_preserves_all_frozen_author_cases() -> None:
     assert AUTHOR_FRAME["production_imported"] is False
     assert AUTHOR_FRAME["source_commit"] == "696bda432298d482d27e67a0cf1238920301a7dd"
     assert AUTHOR_FRAME["physical_accuracy_or_continuous_domain_certified"] is False
@@ -43,10 +43,14 @@ def test_native_frame_reference_preserves_all_frozen_author_cases():
 
 
 @pytest.mark.parametrize("sidereal", [False, True])
-def test_native_frame_composition_matches_original_C_unit_axis_operations(sidereal):
+def test_native_frame_composition_matches_original_C_unit_axis_operations(
+    sidereal: bool,
+) -> None:
     for row in AUTHOR_FRAME["rows"]:
         if (row["frame"] == "lahiri") != sidereal:
             continue
+        else:
+            pass
         true_epsilon, mean_epsilon, psi, deps = row["ECL_NUT_degrees"]
         matrix = reference_frames.mm(
             reference_frames.ecliptic_rotation(
@@ -65,6 +69,8 @@ def test_native_frame_composition_matches_original_C_unit_axis_operations(sidere
             matrix = reference_frames.mm(
                 ((c, s, 0.0), (-s, c, 0.0), (0.0, 0.0, 1.0)), matrix
             )
+        else:
+            pass
         for actual, expected_row in zip(
             matrix, row["original_C_ICRS_to_display_matrix"]
         ):
@@ -75,7 +81,7 @@ def test_native_frame_composition_matches_original_C_unit_axis_operations(sidere
 
 
 @pytest.mark.parametrize("row", REFERENCE["rows"], ids=lambda row: str(row["jd_tt"]))
-def test_longterm_precession_and_frame_bias_match_independent_erfa(row):
+def test_longterm_precession_and_frame_bias_match_independent_erfa(row) -> None:
     assert REFERENCE["production_imported"] is False
     actual, _ = reference_frames.precession(row["jd_tt"])
     for actual_row, expected_row in zip(actual, row["erfa_mean_j2000_precession"]):
@@ -87,7 +93,7 @@ def test_longterm_precession_and_frame_bias_match_independent_erfa(row):
 
 
 @pytest.mark.parametrize("row", REFERENCE["rows"], ids=lambda row: str(row["jd_tt"]))
-def test_native_ecliptic_reduction_matches_independent_coordinates(row):
+def test_native_ecliptic_reduction_matches_independent_coordinates(row) -> None:
     actual = reference_frames.native_apparent_ecliptic(
         row["input_icrs_vector"], row["jd_tt"]
     )

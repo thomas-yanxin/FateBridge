@@ -40,7 +40,7 @@ HAS_SWE = pytest.mark.skipif(runtime.swe is None, reason="Swiss Ephemeris requir
     )["cases"],
     ids=lambda case: case["id"],
 )
-def test_cited_rudolph_propositions_with_hand_constructed_exact_examples(case):
+def test_cited_rudolph_propositions_with_hand_constructed_exact_examples(case) -> None:
     geometry = midpoint_geometry(case["positions"], orb_degrees=0.0)
     for dial in (90, 45):
         rows = [
@@ -52,9 +52,11 @@ def test_cited_rudolph_propositions_with_hand_constructed_exact_examples(case):
         if rows:
             assert rows[0]["orb"] == 0
             assert rows[0]["axis_offset_degrees"] == case["axis_offset_degrees"]
+        else:
+            pass
 
 
-def test_midpoint_axes_are_unordered_and_handle_antipodal_factors():
+def test_midpoint_axes_are_unordered_and_handle_antipodal_factors() -> None:
     for a, b, axis in [(350.0, 10.0, 0.0), (0.0, 180.0, 90.0), (90.0, 270.0, 0.0)]:
         first = midpoint_axis(a, b)
         assert first == midpoint_axis(b, a)
@@ -70,8 +72,8 @@ def test_midpoint_axes_are_unordered_and_handle_antipodal_factors():
 
 @pytest.mark.parametrize("dial", [90, 45])
 def test_three_and_four_factor_contacts_against_independent_doubled_angle_equations(
-    dial,
-):
+    dial: int,
+) -> None:
     rng = random.Random(13981)
     points = {str(i): rng.uniform(-400, 700) for i in range(9)}
     result = midpoint_geometry(points)["dials"][str(dial)]
@@ -88,12 +90,16 @@ def test_three_and_four_factor_contacts_against_independent_doubled_angle_equati
         for p in points:
             if p not in (a, b) and error(2 * points[p] - points[a] - points[b]) <= 1:
                 triples.add((p, a, b))
+            else:
+                pass
     for (a, b), (c, d) in combinations(pairs, 2):
         if (
             len({a, b, c, d}) == 4
             and error(points[a] + points[b] - points[c] - points[d]) <= 1
         ):
             quads.add((a, b, c, d))
+        else:
+            pass
     assert {
         (r["point"], r["id_a"], r["id_b"]) for r in result["three_factor_contacts"]
     } == triples
@@ -108,7 +114,7 @@ def test_three_and_four_factor_contacts_against_independent_doubled_angle_equati
         assert row["orb"] == pytest.approx(expected, abs=1e-12)
 
 
-def test_midpoint_orb_is_inclusive_without_rounding_or_algebraic_self_hits():
+def test_midpoint_orb_is_inclusive_without_rounding_or_algebraic_self_hits() -> None:
     for coordinate, expected in [
         (math.nextafter(1.0, -math.inf), True),
         (1.0, True),
@@ -130,12 +136,12 @@ def test_midpoint_orb_is_inclusive_without_rounding_or_algebraic_self_hits():
 
 
 @pytest.mark.parametrize("bad", [float("nan"), float("inf"), -1.0, 6.0])
-def test_invalid_midpoint_orbs_rejected(bad):
+def test_invalid_midpoint_orbs_rejected(bad) -> None:
     with pytest.raises(ValueError):
         midpoint_geometry({"A": 0.0}, orb_degrees=bad)
 
 
-def test_all_thirteen_sector_edges_against_exact_independent_interval_search():
+def test_all_thirteen_sector_edges_against_exact_independent_interval_search() -> None:
     edges = [Fraction(360 * n, 13) for n in range(14)]
     rng = random.Random(430231)
     for anchor in (0.0, 17.25, 121.4667, math.nextafter(360.0, 0.0), -180.0):
@@ -158,7 +164,7 @@ def test_all_thirteen_sector_edges_against_exact_independent_interval_search():
 
 @HAS_SWE
 @pytest.mark.parametrize("row", FIXTURE["rows"], ids=lambda row: row["utc"])
-def test_nineteen_factors_against_independent_witte_publisher_ephemeris(row):
+def test_nineteen_factors_against_independent_witte_publisher_ephemeris(row) -> None:
     assert (
         FIXTURE["source_pdf_sha256"]
         == "61e973148b74711196d5ec3b4a03e202cb3d1f1cfce8e6827bc51347f769bc57"
@@ -200,7 +206,7 @@ def test_nineteen_factors_against_independent_witte_publisher_ephemeris(row):
 
 
 @HAS_SWE
-def test_native_coordinates_use_one_physical_time_and_covariant_aries_point():
+def test_native_coordinates_use_one_physical_time_and_covariant_aries_point() -> None:
     birth = build_astro_birth_info(
         **{k: v for k, v in astro_payload().items() if k != "chart_variant"}
     )
@@ -231,7 +237,7 @@ def test_native_coordinates_use_one_physical_time_and_covariant_aries_point():
 
 
 @HAS_SWE
-def test_germany_publishes_native_geometry_with_bounded_claims():
+def test_germany_publishes_native_geometry_with_bounded_claims() -> None:
     result = calculate_germany_chart_analysis(**astro_payload())
     layer = result["midpoint_analysis"]
     assert layer["profile"]["factor_count"] == 22
@@ -243,18 +249,25 @@ def test_germany_publishes_native_geometry_with_bounded_claims():
     assert len(result["midpoints"]) == 21
 
 
-def test_no_swiss_runtime_cannot_fabricate_native_or_hypothetical_factors(monkeypatch):
+def test_no_swiss_runtime_cannot_fabricate_native_or_hypothetical_factors(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setattr(runtime, "swe", None)
     result = build_midpoint_analysis(None, {"chart_profile": {"zodiac": "tropical"}})
     assert result["status"] == "unavailable"
     assert "factors" not in result
 
 
-def test_chart13_explains_the_actual_partition_and_limits():
+def test_chart13_explains_the_actual_partition_and_limits() -> None:
     result = calculate_core_chart_analysis(chart_variant="chart13", **astro_payload())
     profile = result["sector_profile"]
     assert profile["sector_count"] == 13
     assert profile["astronomical_constellations"] is False
     assert profile["real_world_efficacy"] == "not_tested"
-    assert "IAU" in result["interpretation"]["variant_note"]
+    constellation_source = next(
+        source for source in profile["sources"] if source["id"] == "iau_constellations"
+    )
+    assert constellation_source["author"] == "International Astronomical Union"
+    assert "unequal widths" in constellation_source["scope"]
+    assert "interpretation" not in result
     assert all(1 <= row["sector13"] <= 13 for row in result["planets"])

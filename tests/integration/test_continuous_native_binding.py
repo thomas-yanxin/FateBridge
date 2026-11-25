@@ -15,7 +15,7 @@ OLD_PATH = ROOT / "tests/fixtures/jyotish-continuous-state-reference-v1.json"
 OLD = json.loads(OLD_PATH.read_text())
 
 
-def test_independent_source_and_math_provenance_preserves_original_fixture():
+def test_independent_source_and_math_provenance_preserves_original_fixture() -> None:
     assert hashlib.sha256(BINDING_PATH.read_bytes()).hexdigest() == (
         "8fcc67370a57d59d643db624a1f4a76ad49db8bc706d2aa0bdd9f8ade309a3dd"
     )
@@ -37,7 +37,7 @@ def test_independent_source_and_math_provenance_preserves_original_fixture():
     assert BINDING["whole_goal_complete"] is False
 
 
-def test_all2590_bound_frame_projections_keep_original_numeric_lines():
+def test_all2590_bound_frame_projections_keep_original_numeric_lines() -> None:
     assert BINDING["frame_position_line_arcsec"] == 1e-7
     assert BINDING["frame_rate_line_arcsec_per_day"] == 1e-6
     assert BINDING["cartesian_state_line"] == 1e-12
@@ -80,6 +80,8 @@ def test_all2590_bound_frame_projections_keep_original_numeric_lines():
                     rate_error,
                 )
             )
+        else:
+            pass
         for key in ["position", "velocity_per_TT_day"]:
             assert max(abs(x - y) for x, y in zip(result[key], expected[key])) <= 1e-12
         for key in ["radius", "radial_rate_per_day"]:
@@ -108,7 +110,9 @@ def test_all2590_bound_frame_projections_keep_original_numeric_lines():
     assert no_frame_rejected == 2590
 
 
-def test_old49_compatibility_failures_and_seven_position_failures_are_retained():
+def test_old49_compatibility_failures_and_seven_position_failures_are_retained() -> (
+    None
+):
     old = {
         r["native_case_index"]: r
         for r in OLD["rows"]
@@ -131,6 +135,8 @@ def test_old49_compatibility_failures_and_seven_position_failures_are_retained()
             > 1e-6
         ):
             failures.append([row["native_case_index"], row["epoch_jd_tt"], row["body"]])
+        else:
+            pass
     legacy = BINDING["legacy_original_rate_gate"]
     assert legacy["passed"] is False and legacy["status"] == "failed_retained"
     assert len(failures) == 49 and failures == legacy["failed_case_ids"]

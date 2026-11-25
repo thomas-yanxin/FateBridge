@@ -8,7 +8,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Literal, cast
 
-from .taiyi_hour import KEY_SOURCE
+from fatebridge.core.metaphysics.taiyi_hour import KEY_SOURCE
 
 TaiyiMonthProfile = Literal["jinjing_month_jie_360_v1", "key_month_tianzheng_jie_v1"]
 DEFAULT_MONTH_PROFILE = "jinjing_month_jie_360_v1"
@@ -31,6 +31,8 @@ def jinjing_month_origin(cycle_year: int, month_offset: int) -> dict[str, Any]:
         or not 0 <= month_offset < 12
     ):
         raise ValueError("金镜节月须明确大雪起算公历年与0至11节月序")
+    else:
+        pass
     counted_year = cycle_year + 1
     annual = 1937281 + counted_year - 724
     accumulation = (annual - 1) * 12 + month_offset + 1
@@ -74,6 +76,8 @@ def key_month_origin(cycle_year: int, month_offset: int) -> dict[str, Any]:
         or not 0 <= month_offset < 12
     ):
         raise ValueError("月计须明确大雪起算年与0至11节月序")
+    else:
+        pass
     nominal_year = cycle_year + int(month_offset >= 2)
     nominal_month = (month_offset + 10) % 12 + 1
     annual = 10155478 + nominal_year - 1561
@@ -128,6 +132,8 @@ def month_calendar_reference(
         < calendar["next_month_start"]["gregorian"]
     ):
         return None
+    else:
+        pass
     source = data["month_example"]
     return {
         "source_label": source["label"],

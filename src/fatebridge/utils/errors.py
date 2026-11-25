@@ -1,16 +1,15 @@
-"""Standardised calculation error envelope + guard decorator.
+"""Caller-facing error envelopes and runtime diagnostics."""
 
-Extracted verbatim from utils/helpers.py (god-file split). Pure error
-formatting/control-flow — no numerical computation.
-"""
+from __future__ import annotations
 
 import logging
-from builtins import TimeoutError as BuiltinTimeoutError
+from collections.abc import Sequence
 from functools import wraps
-from typing import Any, Callable, Dict, List, Optional, ParamSpec
+from traceback import walk_tb
+from typing import Any, Callable, ParamSpec
 
-from pydantic import BaseModel
-from pydantic_core import PydanticCustomError
+from pydantic import BaseModel, ValidationError
+from pydantic_core import ErrorDetails, PydanticCustomError
 
 logger = logging.getLogger(__name__)
 _P = ParamSpec("_P")
@@ -25,11 +24,19 @@ UNRESOLVED_OFFSET_MESSAGE = (
 )
 
 
-class NumerologySourceError(RuntimeError):
+class DomainSourceError(Exception):
+    """Base for source/configuration errors that callers cannot fix via birth inputs."""
+
+    reason: str
+
+    def as_result(self) -> dict[str, Any]:
+        raise NotImplementedError
+
+
+class NumerologySourceError(DomainSourceError, RuntimeError):
     """A source/configuration inconsistency cannot be fixed by changing a birth input."""
 
     MESSAGES = {
-        "solar_native_context_unavailable": "Native solar refinement could not verify its actual compressed-file source contexts",
         "invalid_source_data": "河洛纳甲来源数据未能通过一致性核对。",
         "invalid_month_source_data": "河洛卦月来源数据未能通过一致性核对。",
         "invalid_line_condition_source_data": "河洛爻位原句来源数据未能通过一致性核对。",
@@ -63,12 +70,13 @@ class NumerologySourceError(RuntimeError):
 
     def __init__(self, reason: str) -> None:
         if reason not in self.MESSAGES:
-            # Unregistered engine reasons cannot be corrected with birth data.
             raise RuntimeError("Unknown numerology source consistency reason")
+        else:
+            pass
         self.reason = reason
         super().__init__(self.MESSAGES[reason])
 
-    def as_result(self) -> Dict[str, Any]:
+    def as_result(self) -> dict[str, Any]:
         return {
             "error": str(self),
             "error_code": "numerology_source_inconsistent",
@@ -78,7 +86,7 @@ class NumerologySourceError(RuntimeError):
         }
 
 
-class FengshuiCalculationError(RuntimeError):
+class FengshuiCalculationError(DomainSourceError, RuntimeError):
     """Internal plate contradictions cannot be resolved by changing user facts."""
 
     MESSAGES = {
@@ -95,10 +103,12 @@ class FengshuiCalculationError(RuntimeError):
     def __init__(self, reason: str) -> None:
         if reason not in self.MESSAGES:
             raise ValueError("Unknown Feng Shui calculation consistency reason")
+        else:
+            pass
         self.reason = reason
         super().__init__(self.MESSAGES[reason])
 
-    def as_result(self) -> Dict[str, Any]:
+    def as_result(self) -> dict[str, Any]:
         return {
             "error": str(self),
             "error_code": "fengshui_calculation_inconsistent",
@@ -126,7 +136,7 @@ class FengshuiCalculationError(RuntimeError):
         }
 
 
-class JyotishCalculationError(RuntimeError):
+class JyotishCalculationError(DomainSourceError, RuntimeError):
     """An internal natal-evidence contradiction is not a bad birth input."""
 
     MESSAGES = {
@@ -136,10 +146,12 @@ class JyotishCalculationError(RuntimeError):
     def __init__(self, reason: str) -> None:
         if reason not in self.MESSAGES:
             raise ValueError("Unknown Jyotish calculation consistency reason")
+        else:
+            pass
         self.reason = reason
         super().__init__(self.MESSAGES[reason])
 
-    def as_result(self) -> Dict[str, Any]:
+    def as_result(self) -> dict[str, Any]:
         return {
             "error": str(self),
             "error_code": "jyotish_calculation_inconsistent",
@@ -149,12 +161,18 @@ class JyotishCalculationError(RuntimeError):
         }
 
 
-class EphemerisSourceError(ValueError):
+class EphemerisCalculationError(RuntimeError):
+    """A loaded native ephemeris calculation failed without a verified cause."""
+
+
+class EphemerisSourceError(DomainSourceError, ValueError):
     """Safe, enumerated data-consistency failure; no paths or personal input."""
 
     MESSAGES = {
         "solar_native_unavailable": "Selected native solar model could not solve the requested crossing; no linear approximation is returned",
+        "solar_native_context_unavailable": "Native solar refinement could not verify its actual compressed-file source contexts",
         "solar_term_source_unverified": "Solar-term crossing lacks a verified current model and source record; no approximate boundary is returned",
+        "earth_attitude_model_unavailable": "Native nutation and obliquity required for Earth attitude are unavailable",
         "horizon_direction_model_unavailable": "Eastern horizon direction requires a valid coherent native house-angle model",
         "house_projection_precision_unavailable": "House-plane direction or its half-open house could not be resolved at the available working precision",
         "horizon_direction_precision_unavailable": "Eastern horizon endpoint direction could not be resolved at the available working precision",
@@ -189,6 +207,7 @@ class EphemerisSourceError(ValueError):
         "timezone_rules_changed": "Named timezone data changed after its rules were loaded; restore consistent data and restart the runtime",
         "timezone_rules_unavailable": "Declared named timezone data could not be read",
         "timezone_rules_invalid": "Declared named timezone data is not a valid TZif rule set",
+        "design_origin_source_mismatch": "Human Design cycle source evidence disagrees with the calculated Design epoch or natal activations",
         "human_design_reference_changed": "Human Design reference data changed after loading; restore consistent data and restart the runtime",
         "human_design_reference_unavailable": "Human Design reference data could not be read",
         "human_design_reference_invalid": "Human Design reference data is not a valid unambiguous JSON object",
@@ -215,6 +234,7 @@ class EphemerisSourceError(ValueError):
         "jpl_file_unavailable": "Selected strict JPL kernel could not be opened",
         "jpl_kernel_invalid": "Selected strict JPL kernel is not a complete supported DE441 direct-access file",
         "jpl_kinematics_invalid": "Selected DE441 source record or analytic kinematic inputs are invalid",
+        "de441_archive_missing": "Required DE441 coefficient chunk is missing. Set FATEBRIDGE_DE441_DIR to the matching release's coefficient archive directory",
         "jpl_kinematics_outside_source": "Requested analytic kinematics are outside the selected DE441 source interval",
         "jpl_kinematics_frame_mismatch": "Raw DE441 position and velocity do not reproduce the native fixed observer frame",
         "jpl_mixed_request": "Strict JPL mode cannot mix an explicit analytical ephemeris request",
@@ -246,10 +266,12 @@ class EphemerisSourceError(ValueError):
     def __init__(self, reason: str) -> None:
         if reason not in self.MESSAGES:
             raise ValueError("Unknown physical-ephemeris consistency reason")
+        else:
+            pass
         self.reason = reason
         super().__init__(self.MESSAGES[reason])
 
-    def as_result(self) -> Dict[str, Any]:
+    def as_result(self) -> dict[str, Any]:
         return {
             "error": str(self),
             "error_code": "ephemeris_source_inconsistent",
@@ -260,101 +282,142 @@ class EphemerisSourceError(ValueError):
 
 
 class ValidationIssue(BaseModel):
-    """Safe correction hints: never include submitted values or raw messages."""
+    """A field or domain rule the caller can use to diagnose a failure."""
 
     path: str
     code: str
-    constraints: Optional[Dict[str, Any]] = None
+    message: str | None = None
+    constraints: dict[str, object] | None = None
 
 
 class ErrorEnvelope(BaseModel):
     error: Any
     error_code: str
     retryable: bool
-    issues: Optional[List[ValidationIssue]] = None
-    trace_id: Optional[str] = None
-    parent_run_id: Optional[str] = None
+    issues: list[ValidationIssue] | None = None
+    trace_id: str | None = None
+    parent_run_id: str | None = None
 
 
 class ParameterError(ValueError):
-    """Safe transport-independent rejection of non-model call parameters."""
+    """A caller-correctable parameter failure with public field paths."""
 
-    def __init__(self, message: str, issues: List[Dict[str, Any]]) -> None:
+    def __init__(
+        self, message: str, issues: list[dict[str, object]], *, status_code: int = 422
+    ) -> None:
         super().__init__(message)
         self.issues = issues
+        self.status_code = status_code
 
-    def as_result(self) -> Dict[str, Any]:
+    def as_result(self) -> dict[str, Any]:
         return {
             "error": str(self),
             "error_code": VALIDATION_ERROR_CODE,
-            "status_code": 422,
+            "status_code": self.status_code,
             "retryable": False,
             "issues": self.issues,
         }
 
 
-def validation_error_result(error: Any) -> Dict[str, Any]:
-    """Normalize Pydantic/FastAPI validation without echoing personal input."""
-    entries = error.errors()
-    # A model-level native time check can raise a source error. Pydantic wraps
-    # ValueError subclasses in ctx.error; retain the enumerated runtime failure
-    # instead of incorrectly blaming otherwise valid birth input. Only the
-    # actual exception type is trusted, never submitted text or ctx dictionaries.
+def validation_error_result(error: ValidationError) -> dict[str, Any]:
+    """Return validator feedback to the caller without attaching the input body."""
+    return validation_issues_result(
+        error.errors(include_input=False, include_url=False)
+    )
+
+
+def validation_issues_result(entries: Sequence[ErrorDetails]) -> dict[str, Any]:
+    # note (Pydantic): Keep typed native source faults carried in ctx.error.
     if not any(item["type"] == "consultation_restricted" for item in entries):
         for item in entries:
             cause = (item.get("ctx") or {}).get("error")
             if isinstance(cause, EphemerisSourceError):
                 return cause.as_result()
-    issues = []
-    restricted = False
+            else:
+                pass
+    else:
+        pass
+    issues: list[dict[str, object]] = []
+    is_restricted = False
+    message = "请求参数无效"
     for item in entries:
-        loc = list(item.get("loc", ()))
-        if loc and loc[0] in {"body", "query"}:
-            loc.pop(0)
+        loc = item["loc"]
         context = item.get("ctx") or {}
-        constraints = {
+        code = item["type"]
+        path = ".".join(str(part) for part in loc)
+        cause = context.get("error")
+        if isinstance(cause, ParameterError):
+            issues.extend(
+                {
+                    "message": str(cause),
+                    **issue,
+                    "path": f"{path}.{issue['path']}" if path else issue["path"],
+                }
+                for issue in cause.issues
+            )
+            continue
+        else:
+            pass
+        constraints: dict[str, object] = {
             key: context[key]
-            for key in ("ge", "gt", "le", "lt", "min_length", "max_length", "expected")
+            for key in (
+                "ge",
+                "gt",
+                "le",
+                "lt",
+                "min_length",
+                "max_length",
+                "expected",
+                "pattern",
+                "required_with",
+            )
             if key in context
         }
-        path = ".".join(str(part) for part in loc)
-        if item["type"] == "consultation_restricted":
-            restricted = True
-            path = context.get("path", "request")
+        if field := context.get("path"):
+            path = f"{path}.{field}" if path else field
+        else:
+            pass
+        issue_message = item["msg"]
+        if code == "consultation_restricted":
+            is_restricted = True
             constraints = {"policy": context["policy"]}
-        if item["type"] == "invalid_calendar_date":
-            path = context.get("prefix", "date") + "date"
-        issue = {"path": path or "request", "code": item["type"]}
+        elif code == "json_invalid":
+            path = "request"
+            if loc:
+                constraints["position"] = loc[0]
+            else:
+                pass
+            if cause:
+                issue_message = f"{issue_message}: {cause}"
+            else:
+                pass
+        elif code == "value_error" and isinstance(cause, ValueError):
+            issue_message = str(cause) or issue_message
+        else:
+            pass
+        if message == "请求参数无效" and code in {
+            "unsupported_house_system",
+            "invalid_house_system",
+            "invalid_house_code",
+            "unresolved_timezone_offset",
+        }:
+            message = issue_message
+        else:
+            pass
+        issue: dict[str, object] = {
+            "path": path or "request",
+            "code": code,
+            "message": issue_message,
+        }
         if constraints:
             issue["constraints"] = constraints
+        else:
+            pass
         issues.append(issue)
-    message = "此请求超出允许的咨询范围" if restricted else "请求参数无效"
-    if not restricted and any(
-        item["type"] == "unsupported_house_system" for item in entries
-    ):
-        from fatebridge.utils.house_systems import GAUQUELIN_UNSUPPORTED_MESSAGE
-
-        message = GAUQUELIN_UNSUPPORTED_MESSAGE
-    elif not restricted and any(
-        item["type"] == "invalid_house_system" for item in entries
-    ):
-        from fatebridge.utils.house_systems import INVALID_HOUSE_SYSTEM_MESSAGE
-
-        message = INVALID_HOUSE_SYSTEM_MESSAGE
-    elif not restricted and any(
-        item["type"] == "invalid_house_code" for item in entries
-    ):
-        from fatebridge.utils.house_systems import INVALID_HOUSE_CODE_MESSAGE
-
-        message = INVALID_HOUSE_CODE_MESSAGE
-    elif not restricted and any(
-        item["type"] == "unresolved_timezone_offset" for item in entries
-    ):
-        message = UNRESOLVED_OFFSET_MESSAGE
     return {
-        "error": message,
+        "error": "此请求超出允许的咨询范围" if is_restricted else message,
         "error_code": (
-            "consultation_restricted" if restricted else VALIDATION_ERROR_CODE
+            "consultation_restricted" if is_restricted else VALIDATION_ERROR_CODE
         ),
         "status_code": 422,
         "retryable": False,
@@ -362,85 +425,26 @@ def validation_error_result(error: Any) -> Dict[str, Any]:
     }
 
 
-DEPENDENCY_ERROR_HINTS = (
-    "no module named",
-    "module not found",
-    "missing dependency",
-    "dependency missing",
-    "swisseph",
-    "ephemeris",
-    "依赖缺失",
-    "未安装",
-)
-
-
-def handle_calculation_error(error: Exception, operation: str) -> Dict[str, Any]:
-    """统一的错误处理函数
-
-    Logs full error server-side but returns generic message to client
-    for security reasons.
-
-    Args:
-        error: 异常对象
-        operation: 操作名称
-
-    Returns:
-        包含错误信息的字典（不暴露内部细节）
-    """
-    error_text = str(error).strip()
-    normalized = error_text.casefold()
-
-    if isinstance(error, JyotishCalculationError):
-        logger.error(
-            "%s rejected inconsistent Jyotish computation: %s", operation, error.reason
-        )
+def handle_calculation_error(error: Exception, operation: str) -> dict[str, Any]:
+    """Return caller diagnostics and log only exception identity and stack locations."""
+    if isinstance(error, ValidationError):
+        return validation_error_result(error)
+    else:
+        pass
+    if isinstance(error, ParameterError):
         return error.as_result()
-
-    if isinstance(error, FengshuiCalculationError):
-        logger.error(
-            "%s rejected inconsistent Feng Shui computation: %s",
-            operation,
-            error.reason,
-        )
+    else:
+        pass
+    if isinstance(error, DomainSourceError):
+        logger.error(f"{operation} failed ({type(error).__name__}: {error.reason})")
         return error.as_result()
-
-    if isinstance(error, NumerologySourceError):
-        logger.error(
-            "%s rejected inconsistent numerology sources: %s", operation, error.reason
-        )
-        return error.as_result()
-
-    if isinstance(error, EphemerisSourceError):
-        logger.warning(
-            "%s rejected inconsistent ephemeris data: %s", operation, error_text
-        )
-        return error.as_result()
-
-    if isinstance(error, (ImportError, ModuleNotFoundError)) or any(
-        hint in normalized for hint in DEPENDENCY_ERROR_HINTS
-    ):
-        logger.error(f"{operation} failed: {error_text}", exc_info=True)
-        return {
-            "error": f"{operation}所需依赖缺失，请检查运行环境",
-            "error_code": DEPENDENCY_ERROR_CODE,
-            "status_code": 503,
-            "retryable": False,
-        }
-
-    if isinstance(error, (TimeoutError, BuiltinTimeoutError)):
-        logger.error(f"{operation} failed: {error_text}", exc_info=True)
-        return {
-            "error": f"{operation}处理超时，请稍后重试",
-            "error_code": TIMEOUT_ERROR_CODE,
-            "status_code": 504,
-            "retryable": True,
-        }
+    else:
+        pass
 
     if (
         isinstance(error, PydanticCustomError)
         and error.type == "unresolved_timezone_offset"
     ):
-        logger.warning("%s rejected an unspecified timezone offset", operation)
         return {
             "error": UNRESOLVED_OFFSET_MESSAGE,
             "error_code": VALIDATION_ERROR_CODE,
@@ -448,59 +452,76 @@ def handle_calculation_error(error: Exception, operation: str) -> Dict[str, Any]
             "retryable": False,
             "issues": [{"path": "request", "code": error.type}],
         }
+    else:
+        pass
 
     if isinstance(error, ValueError):
-        # User/domain input rejection (HTTP 400), not a system fault. Log a
-        # concise warning without a stack trace — dumping a full traceback for
-        # every "invalid date" or "unknown hexagram name" floods the error log
-        # with noise that looks like a crash.
-        logger.warning(f"{operation} rejected invalid input: {error_text}")
         return {
-            "error": error_text or f"{operation}输入无效",
+            "error": str(error).strip() or f"{operation}输入无效",
             "error_code": VALIDATION_ERROR_CODE,
             "status_code": 400,
             "retryable": False,
         }
+    else:
+        pass
 
-    # Unexpected internal fault — this is the one case that warrants a full
-    # stack trace at ERROR level for server-side diagnosis.
-    logger.error(f"{operation} failed: {error_text}", exc_info=True)
+    cause = error.__cause__ or error
+    frames = " -> ".join(
+        f"{frame.f_globals.get('__name__')}.{frame.f_code.co_name}:{line}"
+        for frame, line in walk_tb(cause.__traceback__)
+    )
+    logger.error(f"{operation} failed ({type(cause).__name__}) {frames}")
+    if isinstance(error, EphemerisCalculationError):
+        message, code, status, retryable = (
+            "原生星历计算失败，请检查运行环境",
+            "ephemeris_calculation_failed",
+            503,
+            False,
+        )
+    elif isinstance(error, ModuleNotFoundError):
+        message, code, status, retryable = (
+            "所需依赖缺失，请检查运行环境",
+            DEPENDENCY_ERROR_CODE,
+            503,
+            False,
+        )
+    elif isinstance(error, TimeoutError):
+        message, code, status, retryable = (
+            "处理超时，请稍后重试",
+            TIMEOUT_ERROR_CODE,
+            504,
+            True,
+        )
+    else:
+        message, code, status, retryable = (
+            "暂时不可用，请稍后重试",
+            INTERNAL_ERROR_CODE,
+            500,
+            True,
+        )
     return {
-        "error": f"{operation}暂时不可用，请稍后重试",
-        "error_code": INTERNAL_ERROR_CODE,
-        "status_code": 500,
-        "retryable": True,
+        "error": f"{operation}{message}",
+        "error_code": code,
+        "status_code": status,
+        "retryable": retryable,
     }
 
 
 def calculation_guard(
     operation: str,
-) -> Callable[[Callable[_P, Dict[str, Any]]], Callable[_P, Dict[str, Any]]]:
-    """将服务函数包裹为"任何异常都转成标准错误信封"的形式。
-
-    与此前散落在 ~50 个服务调用点的手写写法在行为上完全一致::
-
-        try:
-            ...函数体...
-        except Exception as exc:
-            return handle_calculation_error(exc, operation)
-
-    只适用于"整个函数体都在 try 内、except 是最后一步"的场景；
-    若函数在 try 之前另有语句，请勿迁移（包裹整函数会吞掉本应向上抛出的异常）。
-
-    Args:
-        operation: 操作名称，原样透传给 :func:`handle_calculation_error`
-            （它是错误信封的一部分，必须与迁移前的字符串逐字一致）。
-    """
+) -> Callable[[Callable[_P, dict[str, Any]]], Callable[_P, dict[str, Any]]]:
+    """Return the shared error envelope for direct service callers."""
 
     def decorator(
-        func: Callable[_P, Dict[str, Any]],
-    ) -> Callable[_P, Dict[str, Any]]:
+        func: Callable[_P, dict[str, Any]],
+    ) -> Callable[_P, dict[str, Any]]:
         @wraps(func)
-        def wrapper(*args: _P.args, **kwargs: _P.kwargs) -> Dict[str, Any]:
+        def wrapper(*args: _P.args, **kwargs: _P.kwargs) -> dict[str, Any]:
             try:
                 return func(*args, **kwargs)
-            except Exception as exc:  # noqa: BLE001 - 故意宽捕获，与迁移前行为一致
+            except (
+                Exception
+            ) as exc:  # noqa: BLE001 - preserve the public error envelope
                 return handle_calculation_error(exc, operation)
 
         return wrapper
@@ -508,7 +529,7 @@ def calculation_guard(
     return decorator
 
 
-def error_response_payload(data: Dict[str, Any], operation: str) -> Dict[str, Any]:
+def error_response_payload(data: dict[str, Any], operation: str) -> dict[str, Any]:
     """The shared JSON error envelope used by all transports."""
     return {
         "error": data["error"],

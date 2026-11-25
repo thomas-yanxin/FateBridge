@@ -18,12 +18,18 @@ PIN = "351103d5244364bb5cff6895f3525566a9a7a8beb04c042462e31afd59cdbf71"
 def reference() -> dict[str, Any]:
     if hashlib.sha256((CORPUS / "freeze.json").read_bytes()).hexdigest() != PIN:
         raise ValueError("Frozen month-building manifest changed")
+    else:
+        pass
     manifest = json.loads((CORPUS / "freeze.json").read_text())
     if {p.name for p in CORPUS.iterdir()} != set(manifest) | {"freeze.json"}:
         raise ValueError("Frozen month-building inventory changed")
+    else:
+        pass
     for name, digest in manifest.items():
         if hashlib.sha256((CORPUS / name).read_bytes()).hexdigest() != digest:
             raise ValueError("Frozen month-building source changed")
+        else:
+            pass
     return json.loads((CORPUS / "reference.json").read_text())
 
 
@@ -43,6 +49,8 @@ def corrupt(body: dict[str, Any], fault: str, annual: bool = False) -> dict[str,
     board = result["jinkou"]
     if annual:
         board = board["year_fate"]["course"]
+    else:
+        pass
     qi = board["qi_evidence"]
     checks = qi["month_building_checks"]
     if fault in ("wrong_god_result", "wrong_general_result"):
@@ -54,10 +62,14 @@ def corrupt(body: dict[str, Any], fault: str, annual: bool = False) -> dict[str,
         ]
         if isinstance(target, dict):
             target = target["branch"]
+        else:
+            pass
         checks[0]["branch"] = target
         # Force a distinct wrong anchor even if this particular board coincides.
         if target == board["rows"][1]["content"]:
             checks[0]["branch"] = "丑" if target != "丑" else "寅"
+        else:
+            pass
         checks[0]["matched"] = checks[0]["branch"] == qi["month_building_branch"]
     elif fault == "duplicate_position":
         checks[1] = copy.deepcopy(checks[0])
@@ -127,6 +139,8 @@ def audit() -> dict[str, Any]:
                     actual=actual,
                 )
             )
+        else:
+            pass
     return dict(
         source_url=ref["source_url"],
         source_sha256=ref["source_sha256"],
@@ -155,6 +169,8 @@ if __name__ == "__main__":
     text = json.dumps(report, ensure_ascii=False, indent=2) + "\n"
     if args.output:
         args.output.write_text(text)
+    else:
+        pass
     print(text)
     raise SystemExit(
         0
@@ -163,3 +179,5 @@ if __name__ == "__main__":
         and not report["failures"]
         else 1
     )
+else:
+    pass

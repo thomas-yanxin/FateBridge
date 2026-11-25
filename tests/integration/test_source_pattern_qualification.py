@@ -19,6 +19,7 @@ from fatebridge.services.astrology import (
     calculate_germany_chart_analysis,
 )
 from fatebridge.utils.errors import EphemerisSourceError
+from tests.fixtures.surface_payloads import J2000_UNRESOLVED_ASC_SITE
 
 VECTORS = json.loads(
     (
@@ -41,7 +42,7 @@ HAS_SWE = pytest.mark.skipif(runtime.swe is None, reason="Swiss Ephemeris requir
 
 
 @pytest.mark.parametrize("row", VECTORS, ids=lambda row: row["id"])
-def test_independently_frozen_vectors(row, monkeypatch):
+def test_independently_frozen_vectors(row, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(
         runtime,
         "ephemeris_call",
@@ -67,7 +68,7 @@ def test_independently_frozen_vectors(row, monkeypatch):
         )
 
 
-def test_inclusive_edge_and_adjacent_input_floats_are_not_rounded_into_a_hit():
+def test_inclusive_edge_and_adjacent_input_floats_are_not_rounded_into_a_hit() -> None:
     values = {"Mars": 10.0, "Jupiter": 20.0, "Zeus": 5.0, "Midheaven": 27.0}
     assert source_pattern_sample(values)["condition_met"] is True
     assert (
@@ -87,7 +88,7 @@ def test_inclusive_edge_and_adjacent_input_floats_are_not_rounded_into_a_hit():
 @pytest.mark.parametrize(
     "bad", [None, True, False, "25", float("inf"), float("-inf"), float("nan")]
 )
-def test_malformed_native_operands_are_typed_runtime_errors(bad):
+def test_malformed_native_operands_are_typed_runtime_errors(bad) -> None:
     with pytest.raises(EphemerisSourceError) as exc:
         source_pattern_sample({**VECTORS[0]["values"], "Mars": bad})
     result = exc.value.as_result()
@@ -100,12 +101,14 @@ def test_malformed_native_operands_are_typed_runtime_errors(bad):
 @pytest.mark.parametrize(
     "definition", [[], {"status": False}, {"status": None}, {"foo": "bar"}]
 )
-def test_malformed_reference_definitions_are_not_known_conditions(definition):
+def test_malformed_reference_definitions_are_not_known_conditions(definition) -> None:
     with pytest.raises(EphemerisSourceError):
         source_pattern_sample(VECTORS[0]["values"], definition)
 
 
-def test_known_absence_unknown_reference_and_unavailable_direction_are_distinct():
+def test_known_absence_unknown_reference_and_unavailable_direction_are_distinct() -> (
+    None
+):
     rows = [
         source_pattern_sample(row["values"], row["definition"])
         for row in [VECTORS[0], VECTORS[1], VECTORS[5]]
@@ -136,7 +139,7 @@ def test_known_absence_unknown_reference_and_unavailable_direction_are_distinct(
         source_pattern_summary([])
 
 
-def test_reference_reading_qualification_is_specific_and_idempotent():
+def test_reference_reading_qualification_is_specific_and_idempotent() -> None:
     original = {"factor_longitudes": VECTORS[0]["values"], "reading_zh": "原先形式主题"}
     geometry = {"interpretations": [copy.deepcopy(original)]}
     qualify_reference_geometry(geometry, VECTORS[4]["definition"])
@@ -156,8 +159,8 @@ def test_reference_reading_qualification_is_specific_and_idempotent():
 @pytest.mark.parametrize("longitude", [0, 90])
 @pytest.mark.parametrize("zodiacal", [0, 1])
 def test_actual_pole_backend_hit_or_miss_never_counts_as_actual_condition(
-    latitude, longitude, zodiacal
-):
+    latitude, longitude: int, zodiacal: int
+) -> None:
     result = calculate_germany_chart_analysis(
         **{**PAYLOAD, "birth_longitude": longitude},
         birth_latitude=latitude,
@@ -206,6 +209,8 @@ def test_actual_pole_backend_hit_or_miss_never_counts_as_actual_condition(
         assert (
             layer["interpretations"] and layer["solar_arc_analysis"]["interpretations"]
         )
+    else:
+        pass
     directed = layer["solar_arc_analysis"]["birth_time_sensitivity"]["samples"][0]
     assert directed["source_condition_met"] is None
     assert directed["source_direct_orb_degrees"] is None
@@ -217,7 +222,9 @@ def test_actual_pole_backend_hit_or_miss_never_counts_as_actual_condition(
 @HAS_SWE
 @pytest.mark.parametrize("zodiacal", [0, 1])
 @pytest.mark.parametrize("radius", [None, 0.5])
-def test_unknown_interval_and_complete_grid_keep_distinct_unknowns(zodiacal, radius):
+def test_unknown_interval_and_complete_grid_keep_distinct_unknowns(
+    zodiacal: int, radius: float | None
+) -> None:
     target = BIRTH if radius is None else datetime(2050, 1, 1, tzinfo=timezone.utc)
     result = calculate_germany_chart_analysis(
         **PAYLOAD,
@@ -249,19 +256,22 @@ def test_unknown_interval_and_complete_grid_keep_distinct_unknowns(zodiacal, rad
             for r in layer["interpretations"]
             + layer["solar_arc_analysis"]["interpretations"]
         )
+    else:
+        pass
 
 
 @HAS_SWE
 @pytest.mark.parametrize("zodiacal", [0, 1])
-def test_only_unresolved_ascendant_does_not_make_the_source_midheaven_unknown(zodiacal):
+def test_only_unresolved_ascendant_does_not_make_the_source_midheaven_unknown(
+    zodiacal: int,
+) -> None:
     result = calculate_germany_chart_analysis(
         **{
             **PAYLOAD,
+            **J2000_UNRESOLVED_ASC_SITE,
             "birth_hour": 12,
             "birth_minute": 0,
-            "birth_longitude": 169.5414439374805,
         },
-        birth_latitude=-66.56232328397007,
         zodiacal=zodiacal,
         birth_time_uncertainty_minutes=1,
         analysis_datetime=datetime(2050, 1, 1, tzinfo=timezone.utc),
@@ -281,7 +291,7 @@ def test_only_unresolved_ascendant_does_not_make_the_source_midheaven_unknown(zo
 
 @HAS_SWE
 @pytest.mark.parametrize("latitude", [-89.9, 89.9])
-def test_resolved_near_pole_meridian_is_not_replaced_by_an_unknown(latitude):
+def test_resolved_near_pole_meridian_is_not_replaced_by_an_unknown(latitude) -> None:
     result = calculate_germany_chart_analysis(
         **PAYLOAD,
         birth_latitude=latitude,
@@ -302,7 +312,9 @@ def test_resolved_near_pole_meridian_is_not_replaced_by_an_unknown(latitude):
 
 @HAS_SWE
 @pytest.mark.parametrize("latitude", [-90, 90])
-def test_equal13_shares_span_qualification_and_retains_its_declared_partition(latitude):
+def test_equal13_shares_span_qualification_and_retains_its_declared_partition(
+    latitude,
+) -> None:
     result = calculate_core_chart_analysis(
         **PAYLOAD,
         birth_latitude=latitude,
@@ -326,7 +338,9 @@ def test_equal13_shares_span_qualification_and_retains_its_declared_partition(la
 @HAS_SWE
 @pytest.mark.parametrize("zodiacal", [0, 1])
 @pytest.mark.parametrize("key_years", [0, 150])
-def test_unavailable_arc_and_unknown_reference_are_both_retained(zodiacal, key_years):
+def test_unavailable_arc_and_unknown_reference_are_both_retained(
+    zodiacal: int, key_years: int
+) -> None:
     result = calculate_germany_chart_analysis(
         **PAYLOAD,
         birth_latitude=90,
@@ -360,7 +374,9 @@ def test_unavailable_arc_and_unknown_reference_are_both_retained(zodiacal, key_y
 
 
 @HAS_SWE
-def test_corrupt_derived_native_source_is_503_not_invalid_birth(monkeypatch):
+def test_corrupt_derived_native_source_is_503_not_invalid_birth(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     import fatebridge.core.astro.sensitivity as module
 
     original = module.source_pattern_sample

@@ -1,5 +1,6 @@
 """Manufactured clock inversions and reference identity failure controls."""
 
+import json
 from fractions import Fraction as Q
 
 import pytest
@@ -13,7 +14,9 @@ from scripts.astrodice.astrodice_vector_clock import (
 
 
 @pytest.mark.parametrize("increasing", [True, False])
-def test_inverse_brackets_two_boundaries_without_observed_axis_selection(increasing):
+def test_inverse_brackets_two_boundaries_without_observed_axis_selection(
+    increasing: bool,
+) -> None:
     sign = 1 if increasing else -1
     result = inverse(
         lambda t: sign * 3 * t + 7,
@@ -30,19 +33,19 @@ def test_inverse_brackets_two_boundaries_without_observed_axis_selection(increas
         assert hi - lo == Q(2, 2**48)
 
 
-def test_inverse_rejects_unbracketed_support_instead_of_extending_it():
+def test_inverse_rejects_unbracketed_support_instead_of_extending_it() -> None:
     assert inverse(lambda t: t, Q(0), (Q(2), Q(3)), True, Q(1), 48) == {
         "status": "unbracketed"
     }
 
 
-def test_printing_and_extra_ulps_remain_separate_uncertified_profiles():
+def test_printing_and_extra_ulps_remain_separate_uncertified_profiles() -> None:
     assert tube("1.234E-03", 0) == (Q(".001233"), Q(".001235"))
     lo, hi = tube("1.234E-03", 64)
     assert lo < Q(".001233") and hi > Q(".001235")
 
 
-def test_numeric_representation_models_keep_exact_rationals_distinct():
+def test_numeric_representation_models_keep_exact_rationals_distinct() -> None:
     epoch = Q(4680826) + Q(1, 86400)
     values = clock_hypotheses(epoch)
     assert values["exact_nominal_TDB"] == epoch
@@ -51,7 +54,6 @@ def test_numeric_representation_models_keep_exact_rationals_distinct():
 
 
 def raw_vector(epoch="4680826.000000002", timescale="TDB"):
-    import json
 
     prefix = f"""Target body name: Venus (299) {{source: DE441}}
 Center body name: Solar System Barycenter (0)
@@ -70,7 +72,7 @@ JD{timescale}
     ).encode()
 
 
-def test_structural_assignment_does_not_relax_original_label_budget():
+def test_structural_assignment_does_not_relax_original_label_budget() -> None:
     rows = parse(
         raw_vector(),
         {"time_type": "TDB"},
@@ -91,7 +93,7 @@ def test_structural_assignment_does_not_relax_original_label_budget():
         b'{"error":"service failed"}',
     ],
 )
-def test_wrong_time_type_missing_case_and_service_error_are_rejected(raw):
+def test_wrong_time_type_missing_case_and_service_error_are_rejected(raw) -> None:
     with pytest.raises(ValueError):
         parse(
             raw,

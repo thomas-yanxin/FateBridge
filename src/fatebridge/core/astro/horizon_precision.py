@@ -53,6 +53,8 @@ def _solve(
         raise ArithmeticError(
             "Horizon endpoint sign is not resolved at working precision"
         )
+    else:
+        pass
 
     def projected(lam: Any) -> tuple[Any, Any]:
         x, y = ctx.cos(lam), ctx.sin(lam)
@@ -61,6 +63,8 @@ def _solve(
     point = ctx.atan2(-a, b)
     if projected(point)[0] < 0:
         point += ctx.pi
+    else:
+        pass
     asc = point * 180 / ctx.pi % 360
     mc = ctx.atan2(st / ce, ct) * 180 / ctx.pi % 360
     cusps = {}
@@ -78,6 +82,8 @@ def _solve(
             east, up = projected(lam)
             if x * east + y * up < 0:
                 lam += ctx.pi
+            else:
+                pass
             values.append(lam * 180 / ctx.pi % 360)
         cusps[code] = values
     return {
@@ -94,6 +100,8 @@ def horizon_geometry(latitude: float, armc: float, obliquity: float) -> HorizonG
     """Two-precision scalar solution over exact supplied finite doubles."""
     if not all(math.isfinite(v) for v in (latitude, armc, obliquity)):
         raise ValueError("Horizon precision requires finite angle inputs")
+    else:
+        pass
     previous = None
     for digits in WORKING_DIGITS:
         try:
@@ -104,6 +112,8 @@ def horizon_geometry(latitude: float, armc: float, obliquity: float) -> HorizonG
         if previous is None:
             previous = (digits, high)
             continue
+        else:
+            pass
         low_digits, low = previous
         ctx = high["ctx"]
         line = ctx.mpf(CONVERGENCE_DEGREES)
@@ -122,6 +132,8 @@ def horizon_geometry(latitude: float, armc: float, obliquity: float) -> HorizonG
             and max(values) <= line
         ):
             break
+        else:
+            pass
         previous = (digits, high)
     else:
         raise ArithmeticError("Horizon/spatial cusp solution did not converge")
@@ -163,4 +175,6 @@ def aligned_longitude(
     value = float(candidate)
     if value == 360:
         value = math.nextafter(360.0, 0.0)
+    else:
+        pass
     return value, action

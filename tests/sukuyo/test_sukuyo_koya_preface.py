@@ -12,19 +12,19 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.sukuyo import calendar_mansion, day_evidence
-from fatebridge.core.sukuyo_koya import SOURCE as ARC_SOURCE
-from fatebridge.core.sukuyo_koya_preface import (
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence
+from fatebridge.core.sukuyo.sukuyo_koya import SOURCE as ARC_SOURCE
+from fatebridge.core.sukuyo.sukuyo_koya_preface import (
     preface_reading_lines,
     preface_reference,
 )
-from fatebridge.core.sukuyo_sources import load_source
+from fatebridge.core.sukuyo.sukuyo_sources import load_source
 from fatebridge.services.divination import calculate_sukuyo_compatibility
 
 BASIS = "japanese_naoj_historical_utc09"
 
 
-def test_unaccepted_marginal_word_span_is_not_filled_from_other_note_layers():
+def test_unaccepted_marginal_word_span_is_not_filled_from_other_note_layers() -> None:
     ref = preface_reference(load_source(ARC_SOURCE).data)
     span = ref["arc_supplement_selected_reference"]["uncertain_marginal_spans"][0]
     assert span["accepted_literal"] is None
@@ -36,7 +36,9 @@ def test_unaccepted_marginal_word_span_is_not_filled_from_other_note_layers():
 
 
 @pytest.mark.parametrize("surface", ["single", "pair"])
-def test_selected_hinoo_original_passages_are_delivered_with_their_locators(surface):
+def test_selected_hinoo_original_passages_are_delivered_with_their_locators(
+    surface: str,
+) -> None:
     if surface == "single":
         c = calendar_mansion(
             "2024-08-04",
@@ -70,8 +72,8 @@ def test_selected_hinoo_original_passages_are_delivered_with_their_locators(surf
     ],
 )
 def test_printed_marginal_proposal_does_not_emend_body_or_confirm_birth_date(
-    civil, role, ganzhi, weekday
-):
+    civil: str, role: str, ganzhi: str, weekday: str
+) -> None:
     c = calendar_mansion(civil, zone="+09:00", calendar_basis=BASIS)
     ref = c["calendar_reference"]["early_weekday_editorial_comparison"]
     assert c["calendar_date"] == civil
@@ -102,8 +104,8 @@ def test_printed_marginal_proposal_does_not_emend_body_or_confirm_birth_date(
     ],
 )
 def test_actual_same_label_source_comparison_keeps_adverse_weekday(
-    civil, weekday, ganzhi, agrees
-):
+    civil: str, weekday: str, ganzhi: str | None, agrees: bool
+) -> None:
     c = calendar_mansion(civil, zone="+09:00", calendar_basis=BASIS)
     ref = c["calendar_reference"]["early_weekday_documentary_comparison"]
     assert ref["reference_luminary"] == weekday
@@ -131,7 +133,7 @@ def test_actual_same_label_source_comparison_keeps_adverse_weekday(
         ]
 
 
-def test_conjectured_tang_day_four_is_not_replaced_by_japanese_day_four():
+def test_conjectured_tang_day_four_is_not_replaced_by_japanese_day_four() -> None:
     c = calendar_mansion("0807-02-18", zone="+09:00", calendar_basis=BASIS)
     ref = c["calendar_reference"]["early_weekday_documentary_comparison"]
     assert ref["reference_lunar_fields"] == [807, 1, 3, False]
@@ -146,7 +148,7 @@ def test_conjectured_tang_day_four_is_not_replaced_by_japanese_day_four():
     assert "未用日本同名正月四日替代唐历四日" in day_evidence(c)["reading_text"]
 
 
-def test_unknown_clock_keeps_documentary_mismatch_in_its_actual_date_branch():
+def test_unknown_clock_keeps_documentary_mismatch_in_its_actual_date_branch() -> None:
     c = calendar_mansion("0808-03-10", zone="+08:00", calendar_basis=BASIS)
     assert c["status"] == "partial"
     branches = c["calendar_candidates"]
@@ -160,7 +162,9 @@ def test_unknown_clock_keeps_documentary_mismatch_in_its_actual_date_branch():
     assert "不同，保留分歧" in day_evidence(c)["reading_text"]
 
 
-def test_pair_native_does_not_drop_early_date_disagreement_or_ascribe_autograph():
+def test_pair_native_does_not_drop_early_date_disagreement_or_ascribe_autograph() -> (
+    None
+):
     r = calculate_sukuyo_compatibility(
         person1_date="0808-03-11",
         person1_zone="+09:00",
@@ -174,7 +178,9 @@ def test_pair_native_does_not_drop_early_date_disagreement_or_ascribe_autograph(
     assert "未把它们归给2013年编者" in text
 
 
-def test_modern_transcription_is_bound_to_preface_images_and_keeps_new_uncertainties():
+def test_modern_transcription_is_bound_to_preface_images_and_keeps_new_uncertainties() -> (
+    None
+):
     old = load_source(ARC_SOURCE).data
     ref = preface_reference(old)
     assert ref["modern_publication_date"] == "2013-03"
@@ -192,7 +198,7 @@ def test_modern_transcription_is_bound_to_preface_images_and_keeps_new_uncertain
     assert preface_reference(old)["dated_records"][0]["weekday_literal"] == "密日"
 
 
-def test_raw_naoj_month_starts_independently_locate_all_three_named_labels():
+def test_raw_naoj_month_starts_independently_locate_all_three_named_labels() -> None:
     base = Path(__file__).parents[1] / "data/sukuyo_historical_calendar_v1"
     manifest = json.loads((base / "manifest.json").read_bytes())
     expected = [

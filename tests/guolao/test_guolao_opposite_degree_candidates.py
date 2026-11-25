@@ -7,15 +7,17 @@ from pathlib import Path
 
 import pytest
 
-import fatebridge.core.guolao_coordinates as module
-from fatebridge.core.guolao_classical import BRANCHES
+import fatebridge.core.guolao.guolao_coordinates as module
+from fatebridge.core.guolao.guolao_classical import BRANCHES
 
 ROOT = Path(__file__).parents[2]
 FIXTURE = ROOT / "tests/fixtures/guolao-opposite-degree-v1"
 REFERENCE = json.loads((FIXTURE / "reference.json").read_text())
 
 
-def test_actual_cadal_original_and_publisher_read_views_have_frozen_fingerprints():
+def test_actual_cadal_original_and_publisher_read_views_have_frozen_fingerprints() -> (
+    None
+):
     for entry in REFERENCE["downloads"]:
         actual = (FIXTURE / entry["file"]).read_bytes()
         assert hashlib.sha256(actual).hexdigest() == entry["sha256"]
@@ -25,6 +27,8 @@ def test_actual_cadal_original_and_publisher_read_views_have_frozen_fingerprints
                 hashlib.sha1(actual).hexdigest()
                 == "37a4a82e01c7b806e75cdb7f6397947bb4d89d5c"
             )
+        else:
+            pass
     assert (
         hashlib.sha256(module.OPPOSITE_EXAMPLES.read_bytes()).hexdigest()
         == REFERENCE["runtime_data_sha256"]
@@ -40,7 +44,9 @@ def test_actual_cadal_original_and_publisher_read_views_have_frozen_fingerprints
 
 
 @pytest.mark.parametrize("key", module.PROFILES)
-def test_all_three_cases_and_all_15_shared_shifts_keep_known_counterexamples(key):
+def test_all_three_cases_and_all_15_shared_shifts_keep_known_counterexamples(
+    key,
+) -> None:
     result = module.audit_opposite_examples(module.PROFILES[key])
     shifts = result["constant_column_shift_candidates"]
     assert [r["shift"] for r in shifts] == list(range(-13, 2))
@@ -63,8 +69,8 @@ def test_all_three_cases_and_all_15_shared_shifts_keep_known_counterexamples(key
 @pytest.mark.parametrize("key", module.PROFILES)
 @pytest.mark.parametrize("basis", ["from_entrance", "to_exit"])
 def test_hand_exact_arithmetic_keeps_unrounded_candidates_from_each_named_version(
-    key, basis
-):
+    key, basis: str
+) -> None:
     result = module.audit_opposite_examples(module.PROFILES[key])
     candidate = next(r for r in result["coordinate_candidates"] if r["basis"] == basis)
     expected = REFERENCE["hand_arithmetic"][f"{key}_{basis}"]
@@ -79,7 +85,9 @@ def test_hand_exact_arithmetic_keeps_unrounded_candidates_from_each_named_versio
     assert not candidate["all_exact_literal_points_match"]
 
 
-def test_apparent_three_of_three_floor_fit_is_not_a_method_or_precision_acceptance():
+def test_apparent_three_of_three_floor_fit_is_not_a_method_or_precision_acceptance() -> (
+    None
+):
     result = module.audit_opposite_examples(module.WIKISOURCE_PALACES)
     high = next(r for r in result["coordinate_candidates"] if r["basis"] == "to_exit")
     assert high["all_nominal_points_floor_into_expected_bins"]
@@ -105,8 +113,8 @@ def test_apparent_three_of_three_floor_fit_is_not_a_method_or_precision_acceptan
 @pytest.mark.parametrize("key", module.PROFILES)
 @pytest.mark.parametrize("basis", ["from_entrance", "to_exit"])
 def test_transfer_preserves_the_declared_distance_and_inverts_for_all_144_branch_pairs(
-    key, basis
-):
+    key, basis: str
+) -> None:
     profile = module.PROFILES[key]
     for source_branch in BRANCHES:
         source = profile.from_palace(source_branch, profile.width(source_branch) / 2)
@@ -140,7 +148,7 @@ def test_transfer_preserves_the_declared_distance_and_inverts_for_all_144_branch
 
 
 @pytest.mark.parametrize("key", module.PROFILES)
-def test_out_of_target_branch_candidates_remain_unassigned_without_modulus(key):
+def test_out_of_target_branch_candidates_remain_unassigned_without_modulus(key) -> None:
     profile = module.PROFILES[key]
     wide = max(BRANCHES, key=profile.width)
     narrow = min(BRANCHES, key=profile.width)
@@ -175,8 +183,8 @@ def test_out_of_target_branch_candidates_remain_unassigned_without_modulus(key):
     ],
 )
 def test_transfer_requires_exact_units_an_explicit_policy_and_matching_source_branch(
-    degree, basis, branch, error
-):
+    degree, basis: str, branch: str, error
+) -> None:
     with pytest.raises(error):
         module.NLC166_PALACES.transfer_candidate(
             mansion="虚",
@@ -190,7 +198,9 @@ def test_transfer_requires_exact_units_an_explicit_policy_and_matching_source_br
 @pytest.mark.parametrize(
     "field", ["source_id", "source_image_sha256", "data_sha256", "marker_data_sha256"]
 )
-def test_grid_version_drift_rejects_old_case_placement(tmp_path, monkeypatch, field):
+def test_grid_version_drift_rejects_old_case_placement(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, field: str
+) -> None:
     raw = json.loads(module.OPPOSITE_EXAMPLES.read_bytes())
     raw["grid_binding"][field] = "another-version"
     path = tmp_path / "data.json"
@@ -204,8 +214,8 @@ def test_grid_version_drift_rejects_old_case_placement(tmp_path, monkeypatch, fi
     "mutation", ["drop_case", "duplicate_case", "unknown_source", "duplicate_source"]
 )
 def test_partial_or_duplicated_textual_denominators_are_rejected(
-    tmp_path, monkeypatch, mutation
-):
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, mutation: str
+) -> None:
     raw = json.loads(module.OPPOSITE_EXAMPLES.read_bytes())
     if mutation == "drop_case":
         raw["cases"].pop()

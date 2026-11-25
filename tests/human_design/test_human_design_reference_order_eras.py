@@ -17,8 +17,13 @@ ROOT = Path(__file__).resolve().parents[2]
     ],
 )
 def test_reference_with_earlier_civil_label_can_follow_birth_on_declared_tt(
-    monkeypatch, tmp_path, empty_files, year, month, reference
-):
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    empty_files: bool,
+    year: int,
+    month: int,
+    reference: str,
+) -> None:
     # This crosses the declared UT1/UTC convention boundary; compare TT.
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path if empty_files else ROOT / "ephe"))
     request = HumanDesignRequest(
@@ -39,8 +44,8 @@ def test_reference_with_earlier_civil_label_can_follow_birth_on_declared_tt(
     ["1961-07-31T23:59:59.950000Z", "1961-07-31T23:59:59.999999Z"],
 )
 def test_cycle_reference_rejects_labels_removed_by_negative_utc_adjustment(
-    monkeypatch, tmp_path, empty_files, reference
-):
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, empty_files: bool, reference: str
+) -> None:
     # USNO's -50 ms adjustment and ERFA dtf2d exclude these final labels.
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path if empty_files else ROOT / "ephe"))
     with pytest.raises(

@@ -1,10 +1,11 @@
 """Printed year-count instructions and a conservative decimal precision audit."""
 
 from fractions import Fraction
+from pathlib import Path
 
 import pytest
 
-from fatebridge.core.sukuyo_weekday import (
+from fatebridge.core.sukuyo.sukuyo_weekday import (
     _fraction_record,
     classical_calibration_precision,
     classical_source_year_count,
@@ -22,8 +23,8 @@ def fraction(record):
     [(1, 788), (713, 1500), (714, 1501), (715, 1502), (1816, 2603), (9999, 10786)],
 )
 def test_printed_year_add_subtract_counts_without_january_first_or_month_mapping(
-    year, elapsed
-):
+    year: int, elapsed: int
+) -> None:
     result = classical_source_year_count(year)
     assert result["elapsed_years"] == elapsed
     assert result["algebraic_zero_count_year_number"] == -787
@@ -33,12 +34,12 @@ def test_printed_year_add_subtract_counts_without_january_first_or_month_mapping
 
 
 @pytest.mark.parametrize("bad", [0, -1, True, 714.0, "714", None, 10000])
-def test_year_label_rejects_unstated_numbering_and_noninteger_inputs(bad):
+def test_year_label_rejects_unstated_numbering_and_noninteger_inputs(bad) -> None:
     with pytest.raises(ValueError):
         classical_source_year_count(bad)
 
 
-def test_year_count_and_entered_counts_remain_separate_from_a_civil_date():
+def test_year_count_and_entered_counts_remain_separate_from_a_civil_date() -> None:
     count = classical_source_year_count(714)
     result = classical_weekday_arithmetic(count["elapsed_years"], 4, 5)
     assert result["inputs"] == {
@@ -51,7 +52,7 @@ def test_year_count_and_entered_counts_remain_separate_from_a_civil_date():
     assert result["trace"]["accumulated_days"] == 548358
 
 
-def test_nominal_and_mean_days_cannot_be_swapped_in_the_secular_denominator():
+def test_nominal_and_mean_days_cannot_be_swapped_in_the_secular_denominator() -> None:
     trace = classical_calibration_precision()
     counter = trace["denominator_counterexample"]
     assert counter["source_nominal_days"] == 965850
@@ -68,7 +69,7 @@ def test_nominal_and_mean_days_cannot_be_swapped_in_the_secular_denominator():
     assert not counter["is_historical_observation"]
 
 
-def test_precision_gap_is_not_hidden_by_borrowing_an_earlier_loose_precision():
+def test_precision_gap_is_not_hidden_by_borrowing_an_earlier_loose_precision() -> None:
     trace = classical_calibration_precision()
     assert trace["selected_precision_discrepancies"] == [
         "base_omission_plus_printed_correction",
@@ -95,16 +96,18 @@ def test_precision_gap_is_not_hidden_by_borrowing_an_earlier_loose_precision():
     ],
 )
 def test_signed_fraction_displays_do_not_turn_small_negative_residuals_into_minus_one(
-    value, expected
-):
+    value, expected: str
+) -> None:
     result = _fraction_record(value)
     assert result["rounded_decimal_12"] == expected
     assert fraction(result) == value
     if abs(value) < 1:
         assert not result["truncated_decimal_12"].startswith("-1.")
+    else:
+        pass
 
 
-def test_printed_witness_comparison_does_not_certify_the_later_calibration():
+def test_printed_witness_comparison_does_not_certify_the_later_calibration() -> None:
     report = verify_printed_chapter()
     assert not report["implementation_or_selected_source_errors"]
     assert len(report["selected_formula_constant_comparison"]) == 9
@@ -114,8 +117,8 @@ def test_printed_witness_comparison_does_not_certify_the_later_calibration():
 
 
 def test_altered_primary_image_fails_before_accepting_any_selected_transcription(
-    tmp_path,
-):
+    tmp_path: Path,
+) -> None:
     import json
 
     from scripts.sukuyo.check_sukuyo_wakita_primary import FIXTURE

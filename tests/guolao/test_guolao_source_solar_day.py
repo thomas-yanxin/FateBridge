@@ -9,11 +9,11 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core import guolao_source_solar_day as subject
-from fatebridge.core.guolao_daily_solar import POLICIES
-from fatebridge.core.guolao_midnight_anchors import RATE_POLICIES
-from fatebridge.core.guolao_solar_fold import PROFILES as FOLD_PROFILES
-from fatebridge.validation.guolao_source_solar_day import audit_named_source_solar_day
+from fatebridge.core.guolao import guolao_source_solar_day as subject
+from fatebridge.core.guolao.guolao_daily_solar import POLICIES
+from fatebridge.core.guolao.guolao_midnight_anchors import RATE_POLICIES
+from fatebridge.core.guolao.guolao_solar_fold import PROFILES as FOLD_PROFILES
+from validation.guolao_source_solar_day import audit_named_source_solar_day
 
 FIXTURE = Path(__file__).parents[1] / "fixtures/guolao-source-solar-day-v1"
 
@@ -31,7 +31,7 @@ def model(**changes):
     return subject.load_named_source_solar_day(subject.PROFILE, **args)
 
 
-def test_reused_source_witnesses_and_policy_freeze_do_not_claim_new_collation():
+def test_reused_source_witnesses_and_policy_freeze_do_not_claim_new_collation() -> None:
     ref = json.loads((FIXTURE / "reference.json").read_text())
     assert hashlib.sha256(subject.DATA.read_bytes()).hexdigest() == ref["data_sha256"]
     for item in ref["artifacts"]:
@@ -48,7 +48,7 @@ def test_reused_source_witnesses_and_policy_freeze_do_not_claim_new_collation():
     assert not ref["independent_expert"]
 
 
-def test_day1_against_closed_form_source_polynomial_and_literal_night_rate():
+def test_day1_against_closed_form_source_polynomial_and_literal_night_rate() -> None:
     def p88(n):
         return F(n * (5133200 - n * (24600 + 31 * n)), 100000000)
 
@@ -77,8 +77,8 @@ def test_day1_against_closed_form_source_polynomial_and_literal_night_rate():
 
 
 def test_before_winter_midnight_retains_negative_accumulation_without_querying_previous_year(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     m = model()
 
     def must_not_query(*args, **kwargs):
@@ -103,7 +103,9 @@ def test_before_winter_midnight_retains_negative_accumulation_without_querying_p
         (277, "outside", "autumn"),
     ],
 )
-def test_cardinal_midnight_segment_is_not_the_event_time_side(index, side, segment):
+def test_cardinal_midnight_segment_is_not_the_event_time_side(
+    index: int, side: str, segment: str
+) -> None:
     result = model().day(index)
     assert result["source_midnight_result"]["segment"] == segment
     assert result["solar_side_reconstruction"]["selected_side"] == side
@@ -115,7 +117,9 @@ def test_cardinal_midnight_segment_is_not_the_event_time_side(index, side, segme
 
 
 @pytest.mark.parametrize("event", [1, 3])
-def test_exact_equinox_is_not_forced_to_fifty_ke_or_given_one_sided_night(event):
+def test_exact_equinox_is_not_forced_to_fifty_ke_or_given_one_sided_night(
+    event: int,
+) -> None:
     m = model()
     row = m.side_at(m.event_times[event], m.event_positions[event])
     assert row["status"] == "exact_equinox_boundary_unassigned"
@@ -125,7 +129,7 @@ def test_exact_equinox_is_not_forced_to_fifty_ke_or_given_one_sided_night(event)
 @pytest.mark.parametrize("time,position", [(F(131), F(95)), (F(130), F(96))])
 def test_source_time_and_coordinate_disagreement_is_not_resolved_by_best_side(
     time, position
-):
+) -> None:
     row = model().side_at(time, position)
     assert row["status"] == "source_time_position_side_disagreement"
     assert row["selected_side"] is None
@@ -140,7 +144,7 @@ def test_source_time_and_coordinate_disagreement_is_not_resolved_by_best_side(
         (F("369.8814"), "relative_accumulation_outside_declared_fold_cycle"),
     ],
 )
-def test_chain_retains_nonregular_partial_cases(position, status):
+def test_chain_retains_nonregular_partial_cases(position, status: str) -> None:
     m = model()
     index = 365 if status.startswith("relative") else 89
     original = m.anchor_model
@@ -163,9 +167,13 @@ def test_chain_retains_nonregular_partial_cases(position, status):
         assert F(result["coordinate_transfer"]["relative_accumulation_du_exact"]) == F(
             "365.2434"
         )
+    else:
+        pass
 
 
-def test_declared_cardinal_accumulations_do_not_get_aligned_to_fold_critical_values():
+def test_declared_cardinal_accumulations_do_not_get_aligned_to_fold_critical_values() -> (
+    None
+):
     audit = model().audit()
     assert [
         F(row["event_accumulation_minus_fold_critical_du_exact"])
@@ -175,7 +183,7 @@ def test_declared_cardinal_accumulations_do_not_get_aligned_to_fold_critical_val
     assert not audit["same_source_day_location_and_clock_relation_accepted"]
 
 
-def test_full24_policy_matrix_retains_every_midnight_and_pre_winter_failure():
+def test_full24_policy_matrix_retains_every_midnight_and_pre_winter_failure() -> None:
     audit = audit_named_source_solar_day()
     assert len(audit["all24_policy_configurations"]) == 24
     assert audit["source_midnight_cases_retained"] == 8784
@@ -196,12 +204,14 @@ def test_full24_policy_matrix_retains_every_midnight_and_pre_winter_failure():
         for row in rows.values():
             if row["source_sunrise_fraction_exact"] is not None:
                 assert 0 < F(row["source_sunrise_fraction_exact"]) < F(1, 2)
+            else:
+                pass
         assert not config["physical_sunrise_validated"]
     assert not audit["best_configuration_selected_using_coverage_or_matching"]
     assert not audit["four_axis_perfect_scores_established"]
 
 
-def test_last_midnight_does_not_require_or_fabricate_next_year_motion():
+def test_last_midnight_does_not_require_or_fabricate_next_year_motion() -> None:
     row = model().day(365)
     assert row["status"] == "calculated"
     assert (
@@ -217,13 +227,13 @@ def test_last_midnight_does_not_require_or_fabricate_next_year_motion():
 
 
 @pytest.mark.parametrize("value", [True, 1.0, "1", F(1)])
-def test_source_day_index_is_not_coerced(value):
+def test_source_day_index_is_not_coerced(value) -> None:
     with pytest.raises(TypeError):
         model().day(value)
 
 
 @pytest.mark.parametrize("value", [-1, 366, 2451545])
-def test_no_neighbor_year_or_modern_JD_as_source_day(value):
+def test_no_neighbor_year_or_modern_JD_as_source_day(value) -> None:
     with pytest.raises(ValueError):
         model().day(value)
 
@@ -239,7 +249,7 @@ def test_no_neighbor_year_or_modern_JD_as_source_day(value):
         ("basis", "birthplace"),
     ],
 )
-def test_every_source_policy_is_explicit(option, value):
+def test_every_source_policy_is_explicit(option: str, value: str) -> None:
     with pytest.raises(ValueError):
         model(**{option: value})
 
@@ -248,8 +258,8 @@ def test_every_source_policy_is_explicit(option, value):
     "mutation", ["origin", "side", "missing_input", "changed_input"]
 )
 def test_changed_chain_inputs_reject_instead_of_rebaselining(
-    monkeypatch, tmp_path, mutation
-):
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, mutation: str
+) -> None:
     raw = json.loads(subject.DATA.read_bytes())
     for name in subject.INPUTS:
         shutil.copy2(subject.DATA.parent / name, tmp_path / name)

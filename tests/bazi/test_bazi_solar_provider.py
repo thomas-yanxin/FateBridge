@@ -10,10 +10,10 @@ from fatebridge.core.calendar import BaZiCalendar
 from fatebridge.core.timing import TimingAnalysis
 from fatebridge.utils.civil_time import ZonedCalendar
 from fatebridge.utils.errors import EphemerisSourceError
-from tests.bazi.test_bazi_year_contract import TOPICS
 from tests.support.transports import SPECS, inputs, native
 from tests.support.transports import rest as _shared_rest
 from tests.support.transports import surface_calls
+from tests.unit_test.fixtures.bazi_year_cases import TOPICS
 
 
 def clear_solar_caches():
@@ -59,7 +59,7 @@ rest = _shared_rest
 )
 def test_missing_native_crossings_are_rejected_on_all_three_surfaces(
     key, failed_solver, surface_calls
-):
+) -> None:
     spec = SPECS[key]
     payload = {**inputs(spec), "use_true_solar_time": False}
     http, protocol, code, local = surface_calls(spec, payload)
@@ -73,7 +73,7 @@ def test_missing_native_crossings_are_rejected_on_all_three_surfaces(
 
 
 @pytest.mark.parametrize("provider", ["linear_1900_fallback", "unknown", ""])
-def test_unknown_provenance_is_not_promoted_to_a_calculated_term(provider):
+def test_unknown_provenance_is_not_promoted_to_a_calculated_term(provider: str) -> None:
     term = almanac.SolarTerm(
         "立春",
         ZonedCalendar.from_datetime(datetime(2026, 2, 4, tzinfo=timezone.utc)),
@@ -100,20 +100,22 @@ def test_unknown_provenance_is_not_promoted_to_a_calculated_term(provider):
         lambda: TimingAnalysis.calculate_jieqi_transition_timeline(2026),
     ],
 )
-def test_direct_domain_operations_reject_missing_native_roots(operation, failed_solver):
+def test_direct_domain_operations_reject_missing_native_roots(
+    operation, failed_solver
+) -> None:
     with pytest.raises(EphemerisSourceError, match="no linear approximation"):
         operation()
 
 
-def test_pure_sexagenary_arithmetic_does_not_require_astronomy(failed_solver):
+def test_pure_sexagenary_arithmetic_does_not_require_astronomy(failed_solver) -> None:
     assert TimingAnalysis.calculate_liunian(2026)["pillar"] == "丙午"
     assert BaZiCalendar.calculate_day_pillar(2026, 2, 4) == ("己", "酉")
 
 
 @pytest.mark.parametrize("name", ["立春", "惊蛰", "春分"])
 def test_actual_consumed_boundary_is_checked_even_when_other_terms_are_available(
-    name, monkeypatch
-):
+    name: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
     # Keep all calculated values, alter ONLY one term's provenance. The
     # guard must inspect the consumed object, not another year/provider probe.
     terms = almanac.get_solar_terms_for_year(2026)

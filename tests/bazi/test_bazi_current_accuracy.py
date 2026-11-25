@@ -14,11 +14,11 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from fatebridge.core.elements import ElementAnalysis
-from fatebridge.core.output_source_annotations import (
+from fatebridge.core.contracts.output_source_annotations import (
     SourceAnnotationComparison,
     SourceCurrentCalculation,
 )
+from fatebridge.core.elements import ElementAnalysis
 from fatebridge.core.strength import DEFAULT_POLICY, evaluate_strength_policy
 from fatebridge.services.source_comparison import calculate_bazi_source_compare
 from scripts.bazi.audit_bazi_source_corpus import (
@@ -41,53 +41,69 @@ SOURCE = json.loads(
 )
 
 
-@pytest.mark.parametrize(
-    "row",
-    json.loads((DATA / "arithmetic-inputs.json").read_text()),
-    ids=lambda r: r["group"] + ":" + r["id"],
-)
-def test_every_current_raw_budget_matches_literal_fraction_ledger(row):
-    values = row["pillars"]
-    chart = dict(zip(ORDER, map(tuple, values)))
-    assessment = ElementAnalysis.analyze_day_master_strength(chart)["assessment"]
-    assert_current_assessment_arithmetic(values, assessment)
-    assert evaluate_strength_policy(
-        chart, ElementAnalysis.seasonal_phases(chart["month"][1]), DEFAULT_POLICY
-    ) == evaluate_strength_policy(
-        dict(reversed(list(chart.items()))),
-        ElementAnalysis.seasonal_phases(chart["month"][1]),
-        DEFAULT_POLICY,
-    )
+def test_every_current_raw_budget_matches_literal_fraction_ledger() -> None:
+    for row in json.loads((DATA / "arithmetic-inputs.json").read_text()):
+        values = row["pillars"]
+        chart = dict(zip(ORDER, map(tuple, values)))
+        assessment = ElementAnalysis.analyze_day_master_strength(chart)["assessment"]
+        assert_current_assessment_arithmetic(values, assessment)
+        assert evaluate_strength_policy(
+            chart, ElementAnalysis.seasonal_phases(chart["month"][1]), DEFAULT_POLICY
+        ) == evaluate_strength_policy(
+            dict(reversed(list(chart.items()))),
+            ElementAnalysis.seasonal_phases(chart["month"][1]),
+            DEFAULT_POLICY,
+        )
 
 
-@pytest.mark.parametrize("row", SOURCE["records"], ids=lambda r: r["reference_id"])
-def test_every_registered_source_preserves_literal_input_and_unknown_grade(row):
-    values = row["pillars"]
-    result = calculate_bazi_source_compare(*values)
-    assert "error" not in result
-    actual = next(
-        r
-        for r in result["source_comparison"]["records"]
-        if r["reference_id"] == row["reference_id"]
-    )
-    assert actual["pillars"] == values
-    assert actual["retained_strength_annotation"] == row["retained_strength_annotation"]
-    assert actual["source_reference"] == row["source_reference"]
-    if row["retained_strength_annotation"] is None:
-        assert actual["comparison"] == "unadjudicated"
-    comparison = result["source_comparison"]
-    assert comparison["new_independent_validation_credit"] == 0
-    assert result["current_calculation"]["calculation_overridden"] is False
-    assert_current_assessment_arithmetic(
-        values, result["current_calculation"]["assessment"]
-    )
-    SourceAnnotationComparison.model_validate(comparison)
+def test_every_registered_source_preserves_literal_input_and_unknown_grade() -> None:
+    for row in SOURCE["records"]:
+        values = row["pillars"]
+        result = calculate_bazi_source_compare(*values)
+        assert "error" not in result
+        actual = next(
+            r
+            for r in result["source_comparison"]["records"]
+            if r["reference_id"] == row["reference_id"]
+        )
+        assert actual["pillars"] == values
+        assert (
+            actual["retained_strength_annotation"]
+            == row["retained_strength_annotation"]
+        )
+        assert actual["source_reference"] == row["source_reference"]
+        if row["retained_strength_annotation"] is None:
+            assert actual["comparison"] == "unadjudicated"
+        else:
+            pass
+        comparison = result["source_comparison"]
+        assert comparison["new_independent_validation_credit"] == 0
+        assert result["current_calculation"]["calculation_overridden"] is False
+        assert_current_assessment_arithmetic(
+            values, result["current_calculation"]["assessment"]
+        )
+        SourceAnnotationComparison.model_validate(comparison)
 
 
-def test_source_labels_conflicts_bounds_and_unknowns_remain_separate_from_model():
+def test_source_labels_conflicts_bounds_and_unknowns_remain_separate_from_model() -> (
+    None
+):
     report = audit()
-    assert report["record_count"] == 367 and report["distinct_inputs"] == 321
-    assert report["unknown_strength_records"] == 244
+    assert report["record_count"] == 370 and report["distinct_inputs"] == 324
+    assert report["unknown_strength_records"] == 247
+    siku_rows = [r for r in report["rows"] if r["group"] == "siku_vol8"]
+    assert [r["id"] for r in siku_rows] == ["WCBC-YCYY"]
+    assert siku_rows[0]["pillars"] == ["乙丑", "乙酉", "戊辰", "丙辰"]
+    assert siku_rows[0]["expected_strength"] is siku_rows[0]["matches"] is None
+    climate_rows = [r for r in report["rows"] if r["group"] == "climate_research"]
+    assert {r["id"] for r in climate_rows} == {"HN01", "HN02"}
+    assert all(r["expected_strength"] is r["matches"] is None for r in climate_rows)
+    original_rows = [
+        r for r in report["rows"] if r["group"] not in {"climate_research", "siku_vol8"}
+    ]
+    assert len(original_rows) == 367
+    assert len({tuple(r["pillars"]) for r in original_rows}) == 321
+    assert sum(r["expected_strength"] is None for r in original_rows) == 244
     # Repairs may reduce disagreements. Check the complete original population
     # and literal grades instead of requiring the old number of wrong answers.
     labels = {
@@ -101,6 +117,8 @@ def test_source_labels_conflicts_bounds_and_unknowns_remain_separate_from_model(
         assert row["expected_strength"] == label
         if label is not None and row["actual_strength"] != label:
             expected_disagreements.add(tuple(row["pillars"]))
+        else:
+            pass
     assert {
         tuple(row["pillars"]) for row in report["all_distinct_disagreements"]
     } == expected_disagreements
@@ -119,7 +137,9 @@ def test_source_labels_conflicts_bounds_and_unknowns_remain_separate_from_model(
     assert report["reality_prediction_efficacy"] == "not_tested"
 
 
-def test_source_lookups_and_editorial_annotation_are_read_only(monkeypatch):
+def test_source_lookups_and_editorial_annotation_are_read_only(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     from fatebridge.core import source_annotations
 
     values = SOURCE["records"][0]["pillars"]
@@ -145,28 +165,28 @@ def test_source_lookups_and_editorial_annotation_are_read_only(monkeypatch):
     assert calculate_bazi_source_compare(*values) == before
 
 
-@pytest.mark.parametrize("branches", GEOMETRIES)
-@pytest.mark.parametrize("coefficient", [Fraction(9, 10), Fraction(4, 5)])
-def test_contested_combinations_cannot_resolve_punishment_or_reuse_roots(
-    branches, coefficient
-):
-    chart = dict(zip(ORDER, (("甲", b) for b in branches)))
-    result = evaluate_strength_policy(
-        chart,
-        ElementAnalysis.seasonal_phases(chart["month"][1]),
-        replace(DEFAULT_POLICY, punishment=float(coefficient)),
-    )
-    assert (
-        next(e for e in result["relations"] if e["kind"] == "刑")["status"] == "active"
-    )
-    masses = remaining_masses(branches, coefficient)
-    for row in result["hidden_stem_ledger"]:
-        assert row["remaining_mass"] == pytest.approx(
-            float(masses[row["pillar"], row["stem"]]), rel=0, abs=1e-12
-        )
+def test_contested_combinations_cannot_resolve_punishment_or_reuse_roots() -> None:
+    for branches in GEOMETRIES:
+        chart = dict(zip(ORDER, (("甲", b) for b in branches)))
+        phases = ElementAnalysis.seasonal_phases(chart["month"][1])
+        for coefficient in (Fraction(9, 10), Fraction(4, 5)):
+            result = evaluate_strength_policy(
+                chart,
+                phases,
+                replace(DEFAULT_POLICY, punishment=float(coefficient)),
+            )
+            assert (
+                next(e for e in result["relations"] if e["kind"] == "刑")["status"]
+                == "active"
+            )
+            masses = remaining_masses(branches, coefficient)
+            for row in result["hidden_stem_ledger"]:
+                assert row["remaining_mass"] == pytest.approx(
+                    float(masses[row["pillar"], row["stem"]]), rel=0, abs=1e-12
+                )
 
 
-def test_all_branch_geometry_uses_literal_candidate_enumeration():
+def test_all_branch_geometry_uses_literal_candidate_enumeration() -> None:
     from fatebridge.core.branch_candidates import build_branch_combination_candidates
 
     for branches in product("子丑寅卯辰巳午未申酉戌亥", repeat=4):
@@ -179,7 +199,7 @@ def test_all_branch_geometry_uses_literal_candidate_enumeration():
         assert result["effects_status"] == "not_supplied"
 
 
-def test_missing_events_and_tied_clash_are_not_certified_source_matches():
+def test_missing_events_and_tied_clash_are_not_certified_source_matches() -> None:
     annotation = {"positions": ["year", "month"], "weaker_position": "year"}
     assert compare_direction({"relations": []}, annotation)["matches"] is None
     tied = {
@@ -199,8 +219,8 @@ def test_missing_events_and_tied_clash_are_not_certified_source_matches():
 
 @pytest.mark.parametrize("field", ["engineering_index", "classical_adjudication"])
 def test_full_source_comparison_preserves_both_layers_while_projection_is_optional(
-    field,
-):
+    field: str,
+) -> None:
     current = calculate_bazi_source_compare("己巳", "癸酉", "癸未", "庚申")[
         "current_calculation"
     ]
@@ -211,7 +231,7 @@ def test_full_source_comparison_preserves_both_layers_while_projection_is_option
     SourceCurrentCalculation.model_validate({"strength_level": "强"})
 
 
-def test_source_comparison_cannot_mix_engineering_grade_and_index():
+def test_source_comparison_cannot_mix_engineering_grade_and_index() -> None:
     current = calculate_bazi_source_compare("己巳", "癸酉", "癸未", "庚申")[
         "current_calculation"
     ]

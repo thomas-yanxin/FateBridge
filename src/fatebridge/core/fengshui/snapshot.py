@@ -1,6 +1,6 @@
 """Readable facts preserve the same method/subject scopes as structured JSON."""
 
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 from fatebridge.core.aa1996_solar import MODEL_ID as AA1996_SOLAR_MODEL
 from fatebridge.core.analytic_solar import MODEL_ID as ANALYTIC_SOLAR_MODEL
@@ -9,13 +9,12 @@ from fatebridge.core.de440_solar import (
 )
 from fatebridge.core.de440_solar import MODEL_ID as DE440_SOLAR_MODEL
 from fatebridge.core.de441_solar import MODEL_ID as DE441_SOLAR_MODEL
+from fatebridge.core.fengshui.host_guest import statements as host_guest_statements
+from fatebridge.core.fengshui.source_comparison import comparison_statements
 from fatebridge.core.vsop2013_solar import MODEL_ID as VSOP2013_SOLAR_MODEL
 
-from .host_guest import statements as host_guest_statements
-from .source_comparison import comparison_statements
 
-
-def _bazhai_scope(entry: Dict[str, Any]) -> str:
+def _bazhai_scope(entry: dict[str, Any]) -> str:
     subject = f"{entry['subject_kind']}:{entry['subject_id']}"
     if entry["subject_kind"] == "occupant":
         subject += f" 起法{entry['gender_convention']}"
@@ -23,12 +22,14 @@ def _bazhai_scope(entry: Dict[str, Any]) -> str:
         subject += (
             f" 坐卦{entry['house_sitting_trigram']} 编号{entry['house_candidate_id']}"
         )
+    else:
+        pass
     return subject + (
         "（未确认候选）" if entry["candidate_only"] else "（已确认作用域）"
     )
 
 
-def _bazhai_application(entry: Dict[str, Any]) -> str:
+def _bazhai_application(entry: dict[str, Any]) -> str:
     relation, trace = entry["palace_star_relationship"], entry["you_nian_trace"]
     star = entry["star"]
     return (
@@ -39,9 +40,9 @@ def _bazhai_application(entry: Dict[str, Any]) -> str:
     )
 
 
-def _calendar_cautions(layer: Dict[str, Any]) -> List[str]:
+def _calendar_cautions(layer: dict[str, Any]) -> list[str]:
     """Render actual clock policies without changing year or natal results."""
-    stack: List[Any] = [layer]
+    stack: list[Any] = [layer]
     historical = future = moshier = analytic = guarded_de440 = aa1996 = False
     vsop2013 = de441 = False
     while stack:
@@ -66,38 +67,58 @@ def _calendar_cautions(layer: Dict[str, Any]) -> List[str]:
             if isinstance(basis, dict):
                 historical |= basis.get("historical_ut1_convention") is True
                 future |= basis.get("future_leap_seconds_assumed_unchanged") is True
+            else:
+                pass
             stack.extend(current.values())
         elif isinstance(current, (list, tuple)):
             stack.extend(current)
+        else:
+            pass
     lines = []
     if moshier:
         lines.append("交节所报TT处星历为Moshier；该配置完整范围尚未通过1秒实现验收。")
+    else:
+        pass
     if de441:
         lines.append(
             "交节采用内置DE441同源地球与太阳视位置；逐边界保留实际系数、时标及参考系，有限TT验收不认证全部时刻或绝对UTC。"
         )
+    else:
+        pass
     if vsop2013:
         lines.append(
             "交节采用FateBridge VSOP2013太阳模型；TT数值对照与边界候选保护不认证绝对UTC精度。"
         )
+    else:
+        pass
     if aa1996:
         lines.append(
             "交节采用FateBridge AA1996太阳模型；边界候选保护不表示绝对UTC精度已获认证。"
         )
+    else:
+        pass
     if analytic:
         lines.append(
             "交节采用FateBridge解析太阳模型；边界候选保护不表示秒级精度已获认证。"
         )
+    else:
+        pass
     if guarded_de440:
         lines.append("交节采用DE440轨道计算；边界候选保护不表示绝对UTC精度已获认证。")
+    else:
+        pass
     if historical:
         lines.append("历史交节钟时采用UT1/ΔT约定；UTC形式的标签不表示当时已有UTC。")
+    else:
+        pass
     if future:
         lines.append("未来交节UTC按冻结闰秒表不变假设换算；不保证实际UTC交节秒。")
+    else:
+        pass
     return lines
 
 
-def sections(result: Dict[str, Any]) -> List[Tuple[str, List[str]]]:
+def sections(result: dict[str, Any]) -> list[tuple[str, list[str]]]:
     output = [("起盘信息", [result["summary"], f"覆盖状态：{result['status']}"])]
     if "method_policy" in result:
         policy = result["method_policy"]
@@ -115,6 +136,8 @@ def sections(result: Dict[str, Any]) -> List[Tuple[str, List[str]]]:
                 ],
             )
         )
+    else:
+        pass
     for name, layer in result["layers"].items():
         lines = [
             f"规则：{layer['ruleset']['ruleset_id']}@{layer['ruleset']['version']}"
@@ -129,6 +152,8 @@ def sections(result: Dict[str, Any]) -> List[Tuple[str, List[str]]]:
                 lines.append(
                     f"输入方位：{b['bearing_degrees']}° {b['north_reference']} {b['direction']} {b['mountain']}"
                 )
+            else:
+                pass
             geomagnetic = layer.get("geomagnetic_reference")
             if geomagnetic is not None:
                 field, conversion = geomagnetic["field"], geomagnetic["conversion"]
@@ -146,9 +171,15 @@ def sections(result: Dict[str, Any]) -> List[Tuple[str, List[str]]]:
                         f"模型换算候选：{candidate['bearing_degrees']:.4f}° {candidate['north_reference']}；"
                         "尚未确认现场方向，未用于修改宅盘。"
                     )
+                else:
+                    pass
                 if conversion["unavailable_reason"] is not None:
                     lines.append(f"换算不可用：{conversion['unavailable_reason']}")
+                else:
+                    pass
                 lines.extend(geomagnetic["limitations"])
+            else:
+                pass
         elif name == "xuankong_natal":
             period = layer.get("period_context")
             if period:
@@ -173,8 +204,17 @@ def sections(result: Dict[str, Any]) -> List[Tuple[str, List[str]]]:
                         else "候选年跨运，尚不能选定唯一历史宅盘。"
                     )
                     lines.append(f"事件有效年待确认：{years}；{conclusion}")
-            lines.append(f"候选数：{len(layer['candidates'])}；状态：{layer['status']}")
-            for chart in layer["candidates"]:
+                else:
+                    pass
+            else:
+                pass
+            charts = (
+                [layer["chart"]]
+                if layer.get("chart") is not None
+                else layer["candidates"]
+            )
+            lines.append(f"候选数：{len(charts)}；状态：{layer['status']}")
+            for chart in charts:
                 lines.append(
                     f"{chart['candidate_id']} {chart['sitting']['name']}山{chart['facing']['name']}向；{chart['chart_mode']}；{chart['mode_reason']}"
                 )
@@ -243,7 +283,14 @@ def sections(result: Dict[str, Any]) -> List[Tuple[str, List[str]]]:
                 )
             comparison = layer.get("source_comparison")
             if comparison is not None:
-                lines.extend(text for _, text in comparison_statements(comparison))
+                lines.extend(
+                    text
+                    for _, text in comparison_statements(
+                        comparison, result["source_catalog"]
+                    )
+                )
+            else:
+                pass
             interpretation = layer.get("interpretation")
             if interpretation is not None:
                 lines.append(
@@ -268,11 +315,17 @@ def sections(result: Dict[str, Any]) -> List[Tuple[str, List[str]]]:
                                 lines.append(
                                     f"{direction} 固定{value['role']}存在条件：{value['form_assessment']['status']}，不能推导综合吉凶或执行许可。"
                                 )
+                            else:
+                                pass
+                else:
+                    pass
                 if profile is not None:
                     lines.append(
                         f"作者时令：王亭之《中州派玄空学》上卷16–17页，{profile['ruleset_id']}@{profile['version']}；"
                         "基本时令与先后天互用数字分开，不能据衰死一律判不可用。"
                     )
+                else:
+                    pass
                 for candidate in interpretation["candidates"]:
                     lines.append(f"解释候选：{candidate['candidate_id']}")
                     for direction, palace in candidate["palaces"].items():
@@ -294,6 +347,8 @@ def sections(result: Dict[str, Any]) -> List[Tuple[str, List[str]]]:
                                     f"{direction} {label}{phase['star_number']}：王氏基本时令{phase['traditional_label'] or '未定'}；"
                                     f"互用数字成员{phase['mutual_use_reference']['numeric_membership']}，仅数字参考，不证明现场可用。"
                                 )
+                        else:
+                            pass
                     for use in candidate["placement_findings"]:
                         lines.append(f"用途对象{use['object_id']}：{use['status']}")
                 host_guest = interpretation.get("host_guest_analysis")
@@ -304,7 +359,11 @@ def sections(result: Dict[str, Any]) -> List[Tuple[str, List[str]]]:
                     lines.extend(
                         text for _, _, text in host_guest_statements(host_guest)
                     )
+                else:
+                    pass
                 lines.extend(interpretation["limitations"])
+            else:
+                pass
             city_gate = layer.get("city_gate_analysis")
             if city_gate is not None:
                 lines.append(
@@ -328,6 +387,8 @@ def sections(result: Dict[str, Any]) -> List[Tuple[str, List[str]]]:
                         f"水形{observation['mountain']}：不属于本次向首同元龙旁宫门位，未转成其他山位。"
                     )
                 lines.extend(city_gate["limitations"])
+            else:
+                pass
         elif name == "monthly_stars":
             lines.extend(s["text"] for s in layer["position_reading"]["statements"])
             lines.extend(layer["limitations"])
@@ -343,6 +404,8 @@ def sections(result: Dict[str, Any]) -> List[Tuple[str, List[str]]]:
                 lines.append(
                     f"有效期：{layer['time_context']['valid_from']} 至 {layer['time_context']['valid_until']}（结束不含）"
                 )
+            else:
+                pass
         elif name == "jinsuo":
             lines.extend(
                 f"{d} 偏好{p['preferred_classification']}"
@@ -366,6 +429,8 @@ def sections(result: Dict[str, Any]) -> List[Tuple[str, List[str]]]:
                     f"来源{orientation['uncertainty_input_path']}；坐卦状态{orientation['status']}。"
                     "仅为所给区间的计算支持，不是现场误差认证或候选概率。"
                 )
+            else:
+                pass
             houses = layer.get("house_candidates") or ([house] if house else [])
             for house in houses:
                 lines.append(
@@ -402,6 +467,8 @@ def sections(result: Dict[str, Any]) -> List[Tuple[str, List[str]]]:
                 f"{f['facing_role'] + ' ' if f['facing_role'] else ''}{f['direction']}；{_bazhai_application(f)}"
                 for f in layer.get("placement_findings", [])
             )
+        else:
+            pass
         lines.extend(_calendar_cautions(layer))
         output.append(
             (
@@ -437,6 +504,8 @@ def sections(result: Dict[str, Any]) -> List[Tuple[str, List[str]]]:
                 lines.append(
                     f"对象{option['object_id']} {option['aspect']}调整受限：用户明确禁止相应动作"
                 )
+            else:
+                pass
             for scope in option["scopes"]:
                 lines.append(
                     f"{_bazhai_scope(scope)} 当前{scope['direction']}：{_bazhai_application(scope)}；"
@@ -475,6 +544,8 @@ def sections(result: Dict[str, Any]) -> List[Tuple[str, List[str]]]:
                     lines.append(
                         f"物件{item['object_id']}：没有独立摆放规则，不按名称推断五行或吉侧"
                     )
+                else:
+                    pass
         for proposal in layout.get("alternatives_analysis", {}).get("findings", []):
             lines.append(
                 f"对象{proposal['object_id']} 候选{proposal['candidate_id']}：{proposal['status']}；计算{proposal['calculation_status']}；新位置形态独立核对，未沿用旧观察"
@@ -499,6 +570,8 @@ def sections(result: Dict[str, Any]) -> List[Tuple[str, List[str]]]:
                     f"目标绑定：{application['target_binding']['status']}；"
                     "剂量、目标位置、摆放利弊与效力仍未评估。"
                 )
+            else:
+                pass
         for finding in layout.get("workstation_analysis", {}).get("findings", []):
             if "activity" in finding:
                 lines.append(
@@ -528,6 +601,8 @@ def sections(result: Dict[str, Any]) -> List[Tuple[str, List[str]]]:
             lines.append(
                 "工位审查附带的WOFS资料仅作作者参考；实测桌面规则按本次显式选择独立计算。"
             )
+        else:
+            pass
         measured = layout.get("workstation_layout_analysis")
         if measured is not None:
             geometry = measured["geometry"]
@@ -557,6 +632,8 @@ def sections(result: Dict[str, Any]) -> List[Tuple[str, List[str]]]:
                         f"桌面物件{comparison['object_id']}：{comparison['rule_id']}；"
                         f"{comparison['status']}；参考系{comparison['reference_frame']}，不与房间落宫混同。"
                     )
+                else:
+                    pass
             search = measured.get("search")
             if search is not None:
                 lines.append(
@@ -570,6 +647,10 @@ def sections(result: Dict[str, Any]) -> List[Tuple[str, List[str]]]:
                         f"方案{candidate['candidate_id']}：{candidate['status']}；"
                         f"直接调整{len(candidate['actions'])}个对象；不是综合吉凶或效果保证。"
                     )
+            else:
+                pass
+        else:
+            pass
         if context is not None:
             orientation = context["orientation_review"]
             lines.append(
@@ -596,8 +677,12 @@ def sections(result: Dict[str, Any]) -> List[Tuple[str, List[str]]]:
                     f"{finding['finding']}；无独立规则不编绝对禁忌。"
                 )
             lines.extend(context["limitations"])
+        else:
+            pass
         lines.extend(layout["limitations"])
         output.append(("布局计算", lines))
+    else:
+        pass
     output.append(
         (
             "冲突清单",
@@ -645,9 +730,12 @@ def sections(result: Dict[str, Any]) -> List[Tuple[str, List[str]]]:
         (
             "规则来源",
             [
-                f"{ruleset['ruleset_id']}@{ruleset['version']} {source['source_id']} {source['title']} {source['url']}；范围：{source['scope']}"
+                f"{ruleset['ruleset_id']}@{ruleset['version']}：{'、'.join(ruleset['source_ids'])}"
                 for ruleset in result["rulesets"]
-                for source in ruleset["sources"]
+            ]
+            + [
+                f"{source_id} {source['title']} {source['url']}"
+                for source_id, source in result["source_catalog"].items()
             ],
         )
     )

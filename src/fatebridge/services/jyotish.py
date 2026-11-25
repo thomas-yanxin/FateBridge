@@ -3,23 +3,41 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, TypedDict
+
+from typing_extensions import Required, Unpack
 
 from fatebridge.core.astro.birth import AstroBirthInfo, build_astro_birth_info
 from fatebridge.core.execution_context import current_datetime
-from fatebridge.core.jyotish import LABELS, build_india, validate_clock, vimshottari
-from fatebridge.core.jyotish_dasha_grid import DashaGrid
-from fatebridge.core.jyotish_dasha_levels import QUANTIZATION_RULE, QUANTIZATION_SOURCE
-from fatebridge.core.jyotish_display import normalize_solar_display
-from fatebridge.core.jyotish_evidence import natal_prose
-from fatebridge.core.jyotish_sources import coherent_sources
+from fatebridge.core.jyotish.jyotish import (
+    LABELS,
+    build_india,
+    validate_clock,
+)
+from fatebridge.core.jyotish.jyotish_dasha_grid import DashaGrid
+from fatebridge.core.jyotish.jyotish_dasha_levels import (
+    QUANTIZATION_RULE,
+    QUANTIZATION_SOURCE,
+    vimshottari,
+)
+from fatebridge.core.jyotish.jyotish_display import normalize_solar_display
+from fatebridge.core.jyotish.jyotish_sources import coherent_sources
 from fatebridge.services.structured_snapshot import render_structured_snapshot_text
-from fatebridge.utils.errors import calculation_guard
-from fatebridge.utils.timezones import parse_timezone_name
+from fatebridge.utils.errors import ParameterError, calculation_guard
+from fatebridge.utils.timezones import is_unspecified_local_time, parse_timezone_name
 
 
 def enrich_india_chart(
-    result: Dict[str, Any], birth: AstroBirthInfo, **options: Any
+    result: dict[str, Any],
+    birth: AstroBirthInfo,
+    *,
+    node_mode: str,
+    ephemeris_policy: str,
+    saptavargaja_profile: str,
+    drekkana_profile: str,
+    cheshta_model: str,
+    divisions: list[int] | None,
+    birth_time_uncertainty_minutes: float | None,
 ) -> None:
     """Keep the public Western reference view separate from Indian calculations."""
     if (
@@ -33,23 +51,20 @@ def enrich_india_chart(
             }
         )
         return
-    india = build_india(birth, **options)
+    else:
+        pass
+    india = build_india(
+        birth,
+        node_mode=node_mode,
+        ephemeris_policy=ephemeris_policy,
+        saptavargaja_profile=saptavargaja_profile,
+        drekkana_profile=drekkana_profile,
+        cheshta_model=cheshta_model,
+        divisions=divisions,
+        birth_time_uncertainty_minutes=birth_time_uncertainty_minutes,
+    )
     result["india"] = india
     asc = india["charts"]["D1"]["ascendant"]
-    prose = natal_prose(india)
-    reading = {
-        "scope": "india only; generic Western top-level fields form a separate public reference view",
-        **prose,
-        "reading_basis": india["reading_basis"],
-        "variant_note": f"{india['ruleset_id']}；Lahiri，{india['profile']['node_mode']} node。",
-        "topic_evidence": india["topic_evidence"],
-        "development_advice": "把传统结构描述与实际职责、相处经历核对；分盘变化先核对出生时间范围。",
-    }
-    # Each public view retains its own coordinate and interpretive doctrine.
-    result["interpretation"][
-        "scope"
-    ] = "western_reference_view_only; Indian reading: india and interpretation.vedic"
-    result["interpretation"]["vedic"] = reading
     result["summary"] = (
         f"印占本命（名义生时）：上升{asc['sign_zh']}，月宿{india['moon_nakshatra']}；已计算{', '.join(india['charts'])}。"
         + (
@@ -60,16 +75,37 @@ def enrich_india_chart(
     )
 
 
+class VimshottariBirthArguments(TypedDict, total=False):
+    birth_year: Required[int]
+    birth_month: Required[int]
+    birth_day: Required[int]
+    birth_hour: Required[int]
+    birth_minute: int
+    birth_second: int
+    birth_microsecond: int
+    birth_clock_basis: str
+    birth_timezone: str | None
+    birth_longitude: float | None
+    birth_latitude: float | None
+    name: str | None
+    birth_place: str | None
+    use_true_solar_time: bool
+    preserve_instant: bool
+    solar_clock_ephemeris_policy: str
+    require_resolved_timezone: bool
+    allow_native_solar_epoch: bool
+
+
 @calculation_guard("印占 Vimshottari 分期")
 @coherent_sources
 def calculate_vimshottari(
     *,
-    analysis_timezone: Optional[str] = None,
-    analysis_year: Optional[int] = None,
-    analysis_month: Optional[int] = None,
-    analysis_day: Optional[int] = None,
-    analysis_hour: Optional[int] = None,
-    analysis_minute: Optional[int] = None,
+    analysis_timezone: str | None = None,
+    analysis_year: int | None = None,
+    analysis_month: int | None = None,
+    analysis_day: int | None = None,
+    analysis_hour: int | None = None,
+    analysis_minute: int | None = None,
     year_basis: str = "sidereal_365_25636",
     dasha_depth: int = 2,
     node_mode: str = "mean",
@@ -77,15 +113,17 @@ def calculate_vimshottari(
     saptavargaja_profile: str = "santhanam_27",
     drekkana_profile: str = "santhanam_27_6",
     cheshta_model: str = "unadjudicated",
-    divisions: Optional[List[int]] = None,
-    birth_time_uncertainty_minutes: Optional[float] = None,
-    hsys: Optional[int] = None,
-    zodiacal: Optional[int] = None,
-    gender: Optional[str] = None,
-    **birth_kwargs: Any,
-) -> Dict[str, Any]:
+    divisions: list[int] | None = None,
+    birth_time_uncertainty_minutes: float | None = None,
+    hsys: int | None = None,
+    zodiacal: int | None = None,
+    gender: str | None = None,
+    **birth_kwargs: Unpack[VimshottariBirthArguments],
+) -> dict[str, Any]:
     if hsys not in {None, 0} or zodiacal not in {None, 1}:
         raise ValueError("Vimshottari 使用 Lahiri 恒星黄道与整宫制。")
+    else:
+        pass
     # The solar option is a display label. It cannot change the ephemeris epoch
     # or enter a different mean-model window by moving to a neighbouring date.
     birth_kwargs["preserve_instant"] = True
@@ -98,15 +136,16 @@ def calculate_vimshottari(
         # Build the recorded instant without the generic UTC-as-UT1 display.
         # Noncivil conflicting options still reach the builder's validation.
         birth_kwargs["use_true_solar_time"] = False
+    else:
+        pass
     birth = build_astro_birth_info(**birth_kwargs)
     birth, _ = normalize_solar_display(
         birth, ephemeris_policy, requested=display_requested
     )
-    validate_clock(birth.local_datetime, "解析后的出生时刻")
     target_timezone = birth.timezone if analysis_timezone is None else analysis_timezone
     zone = parse_timezone_name(target_timezone)
     now = (
-        current_datetime(zone, target_timezone)
+        current_datetime(zone, target_timezone, issue_path="analysis_timezone")
         if analysis_year is None
         else datetime(analysis_year, 1, 1, tzinfo=zone)
     )
@@ -126,10 +165,15 @@ def calculate_vimshottari(
     analysis = datetime(
         year, month, day, analysis_hour or 0, analysis_minute or 0, tzinfo=zone
     )
+    if is_unspecified_local_time(analysis):
+        return ParameterError(
+            "分析钟时的当地 UTC 偏移未指定。请提供有效的分析时区或已核实的 UTC 偏移。",
+            [{"path": "analysis_timezone", "code": "unresolved_timezone_offset"}],
+        ).as_result()
+    else:
+        pass
     validate_clock(analysis, "分析钟时")
-    grid = DashaGrid(
-        birth.require_utc_datetime, analysis, year_basis, divisions, dasha_depth
-    )
+    grid = DashaGrid(analysis, year_basis, divisions, dasha_depth)
     india = build_india(
         birth,
         node_mode=node_mode,
@@ -139,7 +183,7 @@ def calculate_vimshottari(
         cheshta_model=cheshta_model,
         divisions=divisions,
         birth_time_uncertainty_minutes=birth_time_uncertainty_minutes,
-        _sample_observer=grid.observe,
+        _dasha_grid=grid,
     )
     moon = next(p for p in india["charts"]["D1"]["planets"] if p["id"] == "Moon")
     india["rulesets"].append(dict(QUANTIZATION_SOURCE))
@@ -151,58 +195,14 @@ def calculate_vimshottari(
         }
     )
     result = vimshottari(
-        birth.require_utc_datetime,
+        birth.utc_calendar,
         moon["longitude"],
         analysis,
         year_basis=year_basis,
         dasha_depth=dasha_depth,
     )
-    sensitivity = []
-    omitted_samples = []
-    for sample in india["birth_time_sensitivity"].get("moon_samples", []):
-        from datetime import timedelta
-
-        shifted = birth.require_utc_datetime + timedelta(
-            seconds=sample["offset_seconds"]
-        )
-        if analysis >= shifted:
-            alternative = vimshottari(
-                shifted,
-                sample["longitude"],
-                analysis,
-                year_basis=year_basis,
-                dasha_depth=dasha_depth,
-            )
-            sensitivity.append(
-                {
-                    "offset_seconds": sample["offset_seconds"],
-                    "birth_balance": alternative["birth_balance"],
-                    "time_quantization": alternative["time_quantization"],
-                    "current_major": alternative["current_major"],
-                    "current_sub": alternative["current_sub"],
-                    **(
-                        {"subdivisions": alternative["subdivisions"]}
-                        if dasha_depth > 2
-                        else {}
-                    ),
-                }
-            )
-        else:
-            omitted_samples.append(
-                {
-                    "offset_seconds": sample["offset_seconds"],
-                    "reason": "analysis_precedes_candidate_birth",
-                }
-            )
     result["birth_time_sensitivity"] = {
         **grid.result(),
-        "samples": sensitivity,
-        "samples_scope": "legacy endpoints and center subset; stage_variants covers the full grid",
-        "endpoint_subset_requested_count": len(
-            india["birth_time_sensitivity"].get("moon_samples", [])
-        ),
-        "endpoint_subset_evaluated_count": len(sensitivity),
-        "endpoint_subset_omitted_samples": omitted_samples,
         "reading_basis": india["reading_basis"],
     }
     current_lords = {result["current_major"]["lord"], result["current_sub"]["lord"]}
@@ -210,6 +210,8 @@ def calculate_vimshottari(
         current_lords.update(
             row["lord"] for row in result["subdivisions"]["current_levels"]
         )
+    else:
+        pass
     result["natal_ruler_context"] = [
         {
             "reference": "nominal_birth_instant_only",
@@ -252,7 +254,7 @@ def calculate_vimshottari(
         "person_info": {
             "name": birth.name,
             "birth_datetime": birth.local_datetime.isoformat(),
-            "utc_datetime": birth.require_utc_datetime.isoformat(),
+            "utc_datetime": birth.utc_isoformat,
             "birth_timezone": birth.timezone,
             "birth_longitude": birth.longitude,
             "birth_latitude": birth.latitude,
@@ -276,6 +278,8 @@ def calculate_vimshottari(
             f"按名义生时，目标时刻运主链为{chain}；按{year_basis}递归细分，"
             "给定生时误差另见完整运主链候选；细分边界不代表现实事件精度。"
         )
+    else:
+        pass
     output["snapshot_text"] = render_structured_snapshot_text(
         output, title="印占 Vimshottari 分期"
     )

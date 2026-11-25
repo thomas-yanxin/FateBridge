@@ -17,14 +17,22 @@ def fingerprints():
     raw = (FOLDER / "manifest.json").read_bytes()
     if hashlib.sha256(raw).hexdigest() != MANIFEST_SHA256:
         raise ValueError("Clock ISO manifest changed")
+    else:
+        pass
     data = json.loads(raw)
     for name, h in data["files"].items():
         if str(name).endswith((".py", ".py.txt")):
             continue
+        else:
+            pass
         if hashlib.sha256((FOLDER / name).read_bytes()).hexdigest() != h:
             raise ValueError("Clock ISO reference changed: " + name)
+        else:
+            pass
     if data["phase"] != "before_v66_production_parser_implementation":
         raise ValueError("Clock ISO reference chronology changed")
+    else:
+        pass
     return data
 
 
@@ -43,12 +51,18 @@ def load_supplement():
     raw = (SUPPLEMENT_FOLDER / "manifest.json").read_bytes()
     if hashlib.sha256(raw).hexdigest() != SUPPLEMENT_SHA256:
         raise ValueError("Clock ISO supplement manifest changed")
+    else:
+        pass
     data = json.loads(raw)
     for name, h in data["files"].items():
         if str(name).endswith((".py", ".py.txt")):
             continue
+        else:
+            pass
         if hashlib.sha256((SUPPLEMENT_FOLDER / name).read_bytes()).hexdigest() != h:
             raise ValueError("Clock ISO supplement changed")
+        else:
+            pass
     assert (
         data["phase"]
         == "after_parser_implementation_engineering_supplement_not_preimplementation_oracle"

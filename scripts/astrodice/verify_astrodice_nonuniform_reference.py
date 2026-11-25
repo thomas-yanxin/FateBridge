@@ -32,6 +32,8 @@ def linear_solve(a, b):
             if k != col:
                 factor = matrix[k][col]
                 matrix[k] = [x - factor * y for x, y in zip(matrix[k], matrix[col])]
+            else:
+                pass
     return [row[-1] for row in matrix]
 
 
@@ -47,6 +49,8 @@ def independent_system(angles, epochs, window, degree, axis):
                 angle -= 360
             while angle - center < -180:
                 angle += 360
+        else:
+            pass
         values[o] = (angle - center) * 3600
     anchors = [offsets[k * (len(offsets) - 1) // degree] for k in range(degree + 1)]
     baseline = linear_solve(
@@ -81,18 +85,26 @@ def bound_proof(a, b, cert):
         or sign not in {-1, 1}
     ):
         raise ValueError("Invalid independent certificate dimensions")
+    else:
+        pass
     if any(v > 0 for v in dual) or any(
         sum((x * y for x, y in zip(row, primal)), Q()) > rhs for row, rhs in zip(a, b)
     ):
         raise ValueError("All-point primal or dual inequality failed")
+    else:
+        pass
     for j in range(n):
         if sum((w * a[i][j] for i, w in zip(active, dual)), Q()) != (
             sign if j == 0 else 0
         ):
             raise ValueError("Independent exact dual identity failed")
+        else:
+            pass
     value = sum((w * b[i] for i, w in zip(active, dual)), Q())
     if value != sign * primal[0] or value != Q(cert["optimum"]):
         raise ValueError("Independent exact optimum failed")
+    else:
+        pass
     return value
 
 
@@ -101,6 +113,8 @@ def inspect_angles(run, cohort, plan):
     for query in plan["queries"] + plan["adopted_A_observer_queries"]:
         if query["cohort"] != cohort or query["kind"] != "observer":
             continue
+        else:
+            pass
         folder = run / ("adopted-A" if cohort == "A" else "responses")
         raw = (folder / (query["id"] + ".raw")).read_bytes()
         receipt = json.loads((folder / (query["id"] + ".receipt.json")).read_text())
@@ -109,6 +123,8 @@ def inspect_angles(run, cohort, plan):
             or hashlib.sha256(raw).hexdigest() != receipt["raw_sha256"]
         ):
             raise ValueError("Observer transport changed")
+        else:
+            pass
         payload = json.loads(raw)
         text = payload["result"]
         pre, data = text.split("$$SOE")
@@ -123,11 +139,15 @@ def inspect_angles(run, cohort, plan):
         ]:
             if not re.search(expr, pre):
                 raise ValueError("Independent observer contract mismatch")
+            else:
+                pass
         seen = set()
         for row in csv.reader(data.strip().splitlines()):
             row = [v.strip() for v in row]
             if len(row) != 7 or row[-1]:
                 raise ValueError("Independent observer column mismatch")
+            else:
+                pass
             near = [
                 c
                 for c in query["cases"]
@@ -135,18 +155,30 @@ def inspect_angles(run, cohort, plan):
             ]
             if len(near) != 1 or near[0]["id"] in seen:
                 raise ValueError("Observer identity ambiguous")
+            else:
+                pass
             c = near[0]
             seen.add(c["id"])
             if c["role"] != "auxiliary_not_primary":
                 if str(c["offset_seconds"]) in output:
                     raise ValueError("Repeated observer node")
+                else:
+                    pass
                 output[str(c["offset_seconds"])] = row[4:6]
+            else:
+                pass
         if seen != {c["id"] for c in query["cases"]}:
             raise ValueError("Missing observer node")
+        else:
+            pass
     if set(map(int, output)) != set(range(-1440, 1441, 5)):
         raise ValueError("Full 577 nodes missing")
+    else:
+        pass
     if output != json.loads((run / (cohort + "-angles.json")).read_text()):
         raise ValueError("Observed angles changed")
+    else:
+        pass
     return {int(k): v for k, v in output.items()}
 
 
@@ -156,12 +188,16 @@ def verify(run, cohort):
     for name, h in plan["inputs_sha256"].items():
         if hashlib.sha256((run / name).read_bytes()).hexdigest() != h:
             raise ValueError("Frozen input drift: " + name)
+        else:
+            pass
     saved = json.loads((run / (cohort + "-first-analysis.json")).read_text())
     if (
         saved["plan_sha256"] != hashlib.sha256(rawplan).hexdigest()
         or saved["cohort"] != cohort
     ):
         raise ValueError("Analysis identity changed")
+    else:
+        pass
     if (
         saved["full_goal_complete"]
         or saved["physical_time_model_certified"]
@@ -171,17 +207,23 @@ def verify(run, cohort):
         or saved["retained_overall_numeric_gate_exit_code"] != 1
     ):
         raise ValueError("Unproved acceptance promoted")
+    else:
+        pass
     angles = inspect_angles(run, cohort, plan)
     queries = [
         q for q in plan["queries"] if q["cohort"] == cohort and q["kind"] == "geometry"
     ]
     if [q["id"] for q in queries] != [q["id"] for q in saved["queries"]]:
         raise ValueError("Source query population changed")
+    else:
+        pass
     index = {}
     endpoints = boxes = points = 0
     for query, group in zip(queries, saved["queries"]):
         if group["body"] != query["body"]:
             raise ValueError("Source body metadata changed")
+        else:
+            pass
         observers = plan["queries"] + plan["adopted_A_observer_queries"]
         observer = next(q for q in observers if q["id"] == query["source_observer_id"])
         for key in (
@@ -194,9 +236,13 @@ def verify(run, cohort):
         ):
             if query["parameters"][key] != observer["parameters"][key]:
                 raise ValueError("Exact observer/geometry TT input batches differ")
+            else:
+                pass
         raw, receipt = wire(run, query)
         if receipt["status"] != 200:
             raise ValueError("Unavailable source row")
+        else:
+            pass
         original = [
             r
             for r in raw_rows(raw, query, query["cases"], plan)
@@ -204,6 +250,8 @@ def verify(run, cohort):
         ]
         if [r["case_id"] for r in original] != [r["case_id"] for r in group["rows"]]:
             raise ValueError("Source row population changed")
+        else:
+            pass
         for row, record in zip(original, group["rows"]):
             case = next(c for c in query["cases"] if c["id"] == row["case_id"])
             e, b = vector_proof(run, query["body"], case, row, record, plan)
@@ -241,6 +289,8 @@ def verify(run, cohort):
                         ]
                         if all(a <= v <= b for v, (a, b) in zip(state, obs)):
                             matches.append(value.hex())
+                        else:
+                            pass
                         points += 1
                     expected = {
                         "status": status,
@@ -249,6 +299,8 @@ def verify(run, cohort):
                     }
                 if item != expected:
                     raise ValueError("Independent grid candidate mismatch")
+                else:
+                    pass
             index[query["body"], case["offset_seconds"]] = record
     certified = 0
     full_populations = {}
@@ -257,6 +309,8 @@ def verify(run, cohort):
         statuses = saved["clock_population"][profile]
         if [r["offset_seconds"] for r in statuses] != list(range(-1440, 1441, 5)):
             raise ValueError("Clock population reduced")
+        else:
+            pass
         for entry in statuses:
             o = entry["offset_seconds"]
             earth = index["Earth", o]
@@ -286,8 +340,12 @@ def verify(run, cohort):
                 "qualified": qualified,
             }:
                 raise ValueError("Clock qualification changed")
+            else:
+                pass
             if qualified:
                 epochs[o] = Q(float.fromhex(common[0]))
+            else:
+                pass
         full_populations[profile] = len(epochs)
         fits = saved["fits"][profile]
         if len(epochs) != 577:
@@ -297,7 +355,11 @@ def verify(run, cohort):
                 "required_nodes": 577,
             }:
                 raise ValueError("Incomplete population promoted")
+            else:
+                pass
             continue
+        else:
+            pass
         if (
             fits["status"] != "conditional_diagnostic_only"
             or fits["original_odd_polynomial_acceptance_replaced"]
@@ -305,11 +367,15 @@ def verify(run, cohort):
             or fits["OBSERVER_clock_certified"]
         ):
             raise ValueError("Conditional fit promoted")
+        else:
+            pass
         expected_windows = [(w, d) for w in plan["windows_seconds"] for d in (5, 7)]
         if [
             (w["window_seconds"], w["full_degree"]) for w in fits["all_windows"]
         ] != expected_windows:
             raise ValueError("Window or degree dropped")
+        else:
+            pass
         for window in fits["all_windows"]:
             w, d = window["window_seconds"], window["full_degree"]
             for axis, record in enumerate(window["axes"]):
@@ -321,19 +387,27 @@ def verify(run, cohort):
                     or record["points_used"] != len(a) // 2
                 ):
                     raise ValueError("Polynomial population or baseline changed")
+                else:
+                    pass
                 certs = record["certificates"]
                 if all(c["status"] == "exact_primal_dual_optimum" for c in certs):
                     if [c["objective_sign"] for c in certs] != [1, -1]:
                         raise ValueError("LP objective directions changed")
+                    else:
+                        pass
                     low = (base[1] + scale * bound_proof(a, b, certs[0])) * 86400 / w
                     high = (base[1] - scale * bound_proof(a, b, certs[1])) * 86400 / w
                     if record["derivative_interval_arcsec_per_TDB_day"] != list(
                         map(str, (low, high))
                     ):
                         raise ValueError("Derived interval changed")
+                    else:
+                        pass
                     certified += 2
                 elif "derivative_interval_arcsec_per_TDB_day" in record:
                     raise ValueError("Unresolved interval promoted")
+                else:
+                    pass
             valid = all(
                 "derivative_interval_arcsec_per_TDB_day" in a for a in window["axes"]
             )
@@ -347,6 +421,8 @@ def verify(run, cohort):
                 or window["physical_remainder_certified"]
             ):
                 raise ValueError("Polynomial status or physical remainder promoted")
+            else:
+                pass
         checks = []
         selected = None
         for i in range(len(plan["windows_seconds"]) - 2):
@@ -380,6 +456,8 @@ def verify(run, cohort):
                 radius = max(
                     sum((((b - a) / 2) ** 2 for a, b in box), Q()) for box in bounds
                 )
+            else:
+                pass
             accepted = (
                 complete and spread <= Q(1, 500) ** 2 and radius <= Q(1, 500) ** 2
             )
@@ -398,6 +476,8 @@ def verify(run, cohort):
             )
             if accepted and selected is None:
                 selected = {"window_seconds": triple[1], "full_degree": 7}
+            else:
+                pass
         expected_quality = {
             "status": (
                 "conditional_quality_met"
@@ -413,6 +493,8 @@ def verify(run, cohort):
         }
         if fits["quality"] != expected_quality:
             raise ValueError("Independent fixed-line quality check changed")
+        else:
+            pass
     return {
         "cohort": cohort,
         "primary_nodes": 577,
@@ -429,7 +511,7 @@ def verify(run, cohort):
     }
 
 
-def main():
+def main() -> None:
     p = argparse.ArgumentParser()
     p.add_argument("--run", required=True, type=Path)
     p.add_argument("--cohort", choices=("A", "B"), required=True)
@@ -443,3 +525,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+else:
+    pass

@@ -8,32 +8,19 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.liuyao_judgment import build_conditional_analysis
-from fatebridge.core.liuyao_roles import PROFILE, evaluate
+from fatebridge.core.liuyao.liuyao_judgment import build_conditional_analysis
+from fatebridge.core.liuyao.liuyao_roles import PROFILE, evaluate
+from fatebridge.core.local_techniques.sixyao import build_sixyao_result
+from scripts.liuyao import build_profile as publisher
 from scripts.liuyao.build_profile import build_profile
-from tests.liuyao.test_liuyao_conditions import mounted
+from tests.unit_test.fixtures.liuyao import classical_case
+from tests.unit_test.fixtures.liuyao import mounted_lines as mounted
 
 REFERENCE = Path(__file__).parents[1] / "fixtures/liuyao_effects_v4"
 CASES = json.loads((REFERENCE / "cases.json").read_text(encoding="utf-8"))["cases"]
 
 
-def classical(case):
-    info, lines = mounted(case["base_code"], case["changed_code"])
-    return build_conditional_analysis(
-        lines=lines,
-        hidden=[],
-        month=case["month"],
-        day_ganzhi=case["day_ganzhi"],
-        palace=info["current_palace_element"],
-        moment=datetime.fromisoformat("2000-01-07T12:00:00+08:00"),
-        focus_line=case["focus_line"],
-        focus_kinship=None,
-        focus_kind=case.get("focus_kind"),
-        timing_days=0,
-    )
-
-
-def test_frozen_scan_clauses_and_expectations_are_not_engine_derived():
+def test_frozen_scan_clauses_and_expectations_are_not_engine_derived() -> None:
     assert build_profile("role") == PROFILE
     freeze = json.loads((REFERENCE / "freeze.json").read_text(encoding="utf-8"))
     for name, expected in freeze["sha256"].items():
@@ -48,9 +35,8 @@ def test_frozen_scan_clauses_and_expectations_are_not_engine_derived():
 
 @pytest.mark.parametrize("fault", ["changed_profile", "changed_scan", "escaped_scan"])
 def test_profile_publisher_rejects_changed_or_detached_source_material(
-    tmp_path, monkeypatch, fault
-):
-    from scripts.liuyao import build_profile as publisher
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, fault: str
+) -> None:
 
     monkeypatch.setattr(publisher, "ROOT", tmp_path)
     reference = tmp_path / "tests/fixtures/liuyao_effects_v4"
@@ -67,6 +53,8 @@ def test_profile_publisher_rejects_changed_or_detached_source_material(
     }
     if fault == "changed_scan":
         source.write_text("replaced source bytes")
+    else:
+        pass
     original = reference / "profile.json"
     original.write_text(json.dumps(profile))
     (reference / "freeze.json").write_text(
@@ -81,12 +69,14 @@ def test_profile_publisher_rejects_changed_or_detached_source_material(
     if fault == "changed_profile":
         profile["unregistered_claim"] = True
         original.write_text(json.dumps(profile))
+    else:
+        pass
     with pytest.raises(ValueError):
         publisher.build_profile("role")
 
 
 @pytest.mark.parametrize("values", list(product((True, False, None), repeat=3)))
-def test_unknown_predicates_are_not_silently_filled_or_counted(values):
+def test_unknown_predicates_are_not_silently_filled_or_counted(values) -> None:
     atoms = dict(zip("abc", values))
     and_expected = (
         False
@@ -105,8 +95,8 @@ def test_unknown_predicates_are_not_silently_filled_or_counted(values):
     )
 
 
-def test_original_daguo_chain_is_retained_without_claiming_effectiveness():
-    result = classical(CASES[0])
+def test_original_daguo_chain_is_retained_without_claiming_effectiveness() -> None:
+    result = classical_case(CASES[0])
     roles = result["role_effects"]
     chain = next(
         c for c in roles["chains"] if c["positions"] == CASES[0]["expected_chain"]
@@ -139,8 +129,8 @@ def test_original_daguo_chain_is_retained_without_claiming_effectiveness():
     assert ji["atom_values"]["strength_wang"] is True  # 未日临爻、巳月生土
 
 
-def test_bound_yuan_does_not_erase_the_direct_ji_control_candidate():
-    result = classical(CASES[1])
+def test_bound_yuan_does_not_erase_the_direct_ji_control_candidate() -> None:
+    result = classical_case(CASES[1])
     chain = next(
         c
         for c in result["role_effects"]["chains"]
@@ -167,27 +157,27 @@ def test_bound_yuan_does_not_erase_the_direct_ji_control_candidate():
     )
 
 
-def test_static_yuan_is_not_upgraded_to_co_motion():
-    result = classical(CASES[2])["role_effects"]
+def test_static_yuan_is_not_upgraded_to_co_motion() -> None:
+    result = classical_case(CASES[2])["role_effects"]
     assert result["chains"] == []
     assert all(not row["atom_values"]["paired_active"] for row in result["lines"])
 
 
-def test_bound_ji_cannot_be_presented_as_a_ready_successive_generation_path():
+def test_bound_ji_cannot_be_presented_as_a_ready_successive_generation_path() -> None:
     # Synthetic calendar variant: 未忌逢午日合，酉元并未逢此合。
-    result = classical({**CASES[0], "day_ganzhi": "甲午"})["role_effects"]
+    result = classical_case({**CASES[0], "day_ganzhi": "甲午"})["role_effects"]
     chain = next(c for c in result["chains"] if c["positions"] == [6, 5, 4])
     assert chain["status"] == "ji_binding_prevents_routing_candidate"
     assert chain["binding_positions"] == [6]
 
 
-def test_changed_focus_cannot_receive_other_base_line_control():
-    result = classical(CASES[3])["role_effects"]
+def test_changed_focus_cannot_receive_other_base_line_control() -> None:
+    result = classical_case(CASES[3])["role_effects"]
     assert result["status"] == CASES[3]["expected_status"]
     assert result["chains"] == [] and result["lines"] == []
 
 
-def test_no_selected_focus_and_calendar_focus_keep_their_own_scope():
+def test_no_selected_focus_and_calendar_focus_keep_their_own_scope() -> None:
     base = CASES[0]
     for kwargs, expected in [
         ({"focus_line": None}, "requires_selected_focus"),
@@ -196,7 +186,7 @@ def test_no_selected_focus_and_calendar_focus_keep_their_own_scope():
             "calendar_focus_not_subject_to_line_control",
         ),
     ]:
-        result = classical({**base, **kwargs})["role_effects"]
+        result = classical_case({**base, **kwargs})["role_effects"]
         assert result["status"] == expected
         assert result["chains"] == []
 
@@ -210,9 +200,9 @@ def condition(result, position, rule_id):
     )
 
 
-def test_back_generation_is_a_matched_ji_condition_even_on_a_clash_day():
+def test_back_generation_is_a_matched_ji_condition_even_on_a_clash_day() -> None:
     # Synthetic focus on 四爻未土. The known 渙→坎 transformation is 卯→子.
-    result = classical(
+    result = classical_case(
         {
             "base_code": "010011",
             "changed_code": "010010",
@@ -227,8 +217,7 @@ def test_back_generation_is_a_matched_ji_condition_even_on_a_clash_day():
     assert row["adjudication"] == "requires_strength_timing_and_focus_robustness"
 
 
-def test_advance_condition_and_static_void_condition_are_distinct():
-    from fatebridge.core.local_techniques.sixyao import build_sixyao_result
+def test_advance_condition_and_static_void_condition_are_distinct() -> None:
 
     result = build_sixyao_result(
         date="2000-01-07",
@@ -242,7 +231,7 @@ def test_advance_condition_and_static_void_condition_are_distinct():
     conditional = result["liuyao_evidence"]["conditional_analysis"]
     assert conditional["focus"]["selected"]["branch"] == "子"
     assert condition(conditional, 5, "yuan_support_2")["matched"] is True
-    static = classical(
+    static = classical_case(
         {
             "base_code": "111111",
             "changed_code": "111111",
@@ -255,8 +244,8 @@ def test_advance_condition_and_static_void_condition_are_distinct():
     assert condition(static, 3, "ji_obstruction_2")["matched"] is False
 
 
-def test_chou_co_motion_is_not_confused_with_yuan_co_motion():
-    result = classical(
+def test_chou_co_motion_is_not_confused_with_yuan_co_motion() -> None:
+    result = classical_case(
         {
             "base_code": "111111",
             "changed_code": "110011",
@@ -270,7 +259,7 @@ def test_chou_co_motion_is_not_confused_with_yuan_co_motion():
     assert result["role_effects"]["chains"] == []
 
 
-def test_fire_stage_is_looked_up_in_the_four_stage_cycle_for_yuan():
+def test_fire_stage_is_looked_up_in_the_four_stage_cycle_for_yuan() -> None:
     case = {
         "base_code": "111111",
         "changed_code": "111111",
@@ -278,22 +267,24 @@ def test_fire_stage_is_looked_up_in_the_four_stage_cycle_for_yuan():
         "day_ganzhi": "甲子",
         "focus_line": 3,
     }
-    assert condition(classical(case), 4, "yuan_support_3")["matched"] is False
+    assert condition(classical_case(case), 4, "yuan_support_3")["matched"] is False
     assert (
-        condition(classical({**case, "day_ganzhi": "庚午"}), 4, "yuan_support_3")[
+        condition(classical_case({**case, "day_ganzhi": "庚午"}), 4, "yuan_support_3")[
             "matched"
         ]
         is True
     )
     assert (
-        condition(classical({**case, "day_ganzhi": "庚寅"}), 4, "yuan_support_3")[
+        condition(classical_case({**case, "day_ganzhi": "庚寅"}), 4, "yuan_support_3")[
             "matched"
         ]
         is True
     )
 
 
-def test_all_base_changed_pairs_and_visible_foci_conserve_role_route_directions():
+def test_all_base_changed_pairs_and_visible_foci_conserve_role_route_directions() -> (
+    None
+):
     # 24,576 finite structures at one explicitly fixed month/day. This is
     # an invariant audit, not 24,576 independent classical or reality cases.
     codes = ["".join(bits) for bits in product("01", repeat=6)]
@@ -329,6 +320,8 @@ def test_all_base_changed_pairs_and_visible_foci_conserve_role_route_directions(
                     assert chain["obstructed_positions"] == []
                     assert not result["lines"][j - 1]["outgoing_obstructions"]
                     assert not result["lines"][y - 1]["outgoing_obstructions"]
+                else:
+                    pass
                 assert role_effects["focus_robustness"] == "not_adjudicated"
             for edge in result["interaction_edges"]:
                 if (
@@ -346,3 +339,5 @@ def test_all_base_changed_pairs_and_visible_foci_conserve_role_route_directions(
                         assert (
                             chains[chain_id]["positions"][0] == edge["source_position"]
                         )
+                else:
+                    pass

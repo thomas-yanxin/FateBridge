@@ -8,11 +8,11 @@ from pathlib import Path
 import pytest
 
 from fatebridge.core.public_output import same_public_value
-from tests.evaluation.test_agentic_nested_outputs import (
-    test_nested_fact_faults_are_internal_failures_on_all_surfaces as reject_fault,
-)
-from tests.ren.test_ren_transports import PAYLOAD
 from tests.support.transports import SPECS, business, rest, surface_calls
+from tests.unit_test.fixtures.ren_protocol import REN_PROTOCOL_PAYLOAD
+from tests.unit_test.fixtures.schema_assertions import (
+    reject_nested_fact_fault as reject_fault,
+)
 
 ROOT = Path(__file__).resolve().parents[2]
 SPEC = importlib.util.spec_from_file_location(
@@ -23,7 +23,7 @@ AUDIT = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(AUDIT)
 
 
-def test_raw_scan_failure_and_old_witness_remain_distinct():
+def test_raw_scan_failure_and_old_witness_remain_distinct() -> None:
     report = AUDIT.audit()
     assert report["scan_case_count"] == 12
     assert report["scan_matched_count"] == 11
@@ -43,7 +43,7 @@ def test_raw_scan_failure_and_old_witness_remain_distinct():
     assert report["implementation_unchanged_during_audit"]
 
 
-def test_modified_primary_label_rejected(tmp_path):
+def test_modified_primary_label_rejected(tmp_path: Path) -> None:
     corpus = tmp_path / "corpus"
     shutil.copytree(AUDIT.CORPUS, corpus)
     path = corpus / "reference.json"
@@ -55,9 +55,11 @@ def test_modified_primary_label_rejected(tmp_path):
 
 
 @pytest.mark.parametrize("project", [False, True])
-def test_actual_witness_and_correct_locator_on_all_surfaces(project, surface_calls):
+def test_actual_witness_and_correct_locator_on_all_surfaces(
+    project: bool, surface_calls
+) -> None:
     spec = SPECS["jinkou"]
-    payload = {**PAYLOAD, "di_fen": "子"}
+    payload = {**REN_PROTOCOL_PAYLOAD, "di_fen": "子"}
     fields = ["jinkou.internal_strength", "jinkou.use_evidence", "jinkou.ruleset"]
     params = [("response_char_limit", "0")]
     flags = ["--response-char-limit", "0"]
@@ -76,6 +78,8 @@ def test_actual_witness_and_correct_locator_on_all_surfaces(project, surface_cal
             "false",
         ]
         options = dict(fields=fields, strict_fields=True, include_snapshot_text=False)
+    else:
+        pass
     http, protocol, code, cli = surface_calls(
         spec, payload, params=params, options=options, flags=flags
     )
@@ -108,6 +112,8 @@ def test_actual_witness_and_correct_locator_on_all_surfaces(project, surface_cal
                 if t["rule_id"] == "jinkou.internal_strength"
             )
             assert trace["result"] == board["internal_strength"]
+        else:
+            pass
 
 
 @pytest.mark.parametrize(
@@ -139,6 +145,10 @@ def test_actual_witness_and_correct_locator_on_all_surfaces(project, surface_cal
     ],
 )
 def test_unsupported_certainty_is_internal_error_before_projection(
-    payload, rest, monkeypatch, tmp_path, capsys
-):
+    payload,
+    rest,
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     reject_fault("jinkou", payload, rest, monkeypatch, tmp_path, capsys)

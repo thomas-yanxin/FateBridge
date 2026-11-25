@@ -26,6 +26,8 @@ def fetch(year: int) -> dict:
     text = data.decode("utf-8-sig")
     if not re.search(rf"{year}年0?1月0?1日", text) or f"{year}年12月31日" not in text:
         raise ValueError(f"Incomplete HKO table for {year}")
+    else:
+        pass
     name = f"hko/T{year}c.txt"
     dest = TARGET / name
     dest.parent.mkdir(parents=True, exist_ok=True)
@@ -60,3 +62,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+else:
+    pass

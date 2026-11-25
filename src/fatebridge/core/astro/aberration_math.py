@@ -12,7 +12,7 @@ Native convention: https://github.com/astrorigin/swisseph/blob/696bda432298d482d
 from __future__ import annotations
 
 import math
-from typing import Sequence, Tuple
+from typing import Sequence
 
 from fatebridge.utils.errors import EphemerisSourceError
 
@@ -25,37 +25,44 @@ def dot(a: Sequence[float], b: Sequence[float]) -> float:
 
 def _lorentz_geometry(
     position: Sequence[float], beta: Sequence[float]
-) -> Tuple[float, float, float, float, Tuple[float, ...]]:
+) -> tuple[float, float, float, float, tuple[float, float, float]]:
     if len(position) != 3 or len(beta) != 3:
         raise EphemerisSourceError("coordinate_values_unavailable")
+    else:
+        pass
     radius = math.hypot(*position)
     beta2 = dot(beta, beta)
     if not math.isfinite(radius) or radius <= 0 or not 0 <= beta2 < 1:
         raise EphemerisSourceError("coordinate_values_unavailable")
+    else:
+        pass
     b = math.sqrt(1 - beta2)
     g = dot(position, beta) / radius
     h = 1 + g / (1 + b)
-    apparent = tuple(
-        (b * x + h * radius * be) / (1 + g) for x, be in zip(position, beta)
-    )
+    ax, ay, az = ((b * x + h * radius * be) / (1 + g) for x, be in zip(position, beta))
+    apparent = (ax, ay, az)
     if not all(math.isfinite(v) for v in apparent):
         raise EphemerisSourceError("coordinate_values_unavailable")
+    else:
+        pass
     return radius, b, g, h, apparent
 
 
 def aberration_position(
     position: Sequence[float], beta: Sequence[float]
-) -> Tuple[float, ...]:
+) -> tuple[float, float, float]:
     """The same pure Lorentz position map used by both directional derivatives."""
     return _lorentz_geometry(position, beta)[4]
 
 
 def aberration_position_jvp(
     position: Sequence[float], delta_velocity: Sequence[float], beta: Sequence[float]
-) -> Tuple[Tuple[float, ...], Tuple[float, ...]]:
+) -> tuple[tuple[float, ...], tuple[float, ...]]:
     """Position and Jacobian-vector product with observer beta held fixed."""
     if len(delta_velocity) != 3:
         raise EphemerisSourceError("coordinate_values_unavailable")
+    else:
+        pass
     radius, b, g, h, apparent = _lorentz_geometry(position, beta)
     dr = dot(position, delta_velocity) / radius
     dg = (dot(delta_velocity, beta) - g * dr) / radius
@@ -70,6 +77,8 @@ def aberration_position_jvp(
     )
     if not all(math.isfinite(v) for v in change):
         raise EphemerisSourceError("coordinate_values_unavailable")
+    else:
+        pass
     return apparent, change
 
 
@@ -77,6 +86,8 @@ def longitude_rate_change(position: Sequence[float], change: Sequence[float]) ->
     denominator = position[0] ** 2 + position[1] ** 2
     if not math.isfinite(denominator) or denominator <= 0:
         raise EphemerisSourceError("coordinate_values_unavailable")
+    else:
+        pass
     return math.degrees(
         (position[0] * change[1] - position[1] * change[0]) / denominator
     )
@@ -84,10 +95,12 @@ def longitude_rate_change(position: Sequence[float], change: Sequence[float]) ->
 
 def aberration_beta_jvp(
     position: Sequence[float], beta: Sequence[float], beta_derivative: Sequence[float]
-) -> Tuple[Tuple[float, ...], Tuple[float, ...]]:
+) -> tuple[tuple[float, ...], tuple[float, ...]]:
     """Lorentz position and observer-beta JVP, with position held fixed."""
     if len(beta_derivative) != 3:
         raise EphemerisSourceError("coordinate_values_unavailable")
+    else:
+        pass
     radius, b, g, h, apparent = _lorentz_geometry(position, beta)
     db = -dot(beta, beta_derivative) / b
     dg = dot(position, beta_derivative) / radius
@@ -102,4 +115,6 @@ def aberration_beta_jvp(
     )
     if not all(math.isfinite(v) for v in derivative):
         raise EphemerisSourceError("coordinate_values_unavailable")
+    else:
+        pass
     return apparent, derivative

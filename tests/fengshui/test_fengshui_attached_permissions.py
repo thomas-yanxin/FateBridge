@@ -3,8 +3,8 @@
 import pytest
 
 from fatebridge.services.fengshui import assess
-from tests.fengshui.test_fengshui_rotation_invariance import payload_for
 from tests.support.transports import SPECS, business, rest, surface_calls
+from tests.unit_test.fixtures.fengshui_measured import rotation_payload as payload_for
 
 
 def attached_request(kind, value, *, unchanged=False):
@@ -74,6 +74,8 @@ def attached_request(kind, value, *, unchanged=False):
                 "evidence": "Synthetic item permission, independent of the desk.",
             }
         )
+    else:
+        pass
     return request
 
 
@@ -92,8 +94,8 @@ def search_result(result):
     ],
 )
 def test_attached_actual_world_motion_preserves_three_permission_states(
-    kind, value, status
-):
+    kind: str, value: bool | str | None, status: str
+) -> None:
     search = search_result(assess(**attached_request(kind, value)))
     (receipt,) = search["receipts"]
     assert receipt["physically_feasible"] is True
@@ -114,7 +116,9 @@ def test_attached_actual_world_motion_preserves_three_permission_states(
 
 
 @pytest.mark.parametrize("value", [False, None, "missing"])
-def test_unchanged_attached_items_do_not_require_any_action_permission(value):
+def test_unchanged_attached_items_do_not_require_any_action_permission(
+    value: bool | str | None,
+) -> None:
     search = search_result(
         assess(**attached_request("can_rotate", value, unchanged=True))
     )
@@ -128,8 +132,8 @@ def test_unchanged_attached_items_do_not_require_any_action_permission(value):
 
 @pytest.mark.parametrize("kind", ["can_relocate", "can_rotate"])
 def test_unknown_attached_action_is_conditional_on_actual_three_transports(
-    kind, surface_calls
-):
+    kind: str, surface_calls
+) -> None:
     spec = SPECS["fengshui_assess"]
     payload = attached_request(kind, None)
     fields = ["layout_analysis"]

@@ -29,12 +29,18 @@ def sha(path: Path) -> str:
 def reference(corpus: Path = CORPUS) -> dict[str, Any]:
     if sha(corpus / "freeze.json") != PIN:
         raise ValueError("Frozen textual-witness identity changed")
+    else:
+        pass
     manifest = json.loads((corpus / "freeze.json").read_text())
     if {p.name for p in corpus.iterdir()} != set(manifest["files"]) | {"freeze.json"}:
         raise ValueError("Frozen textual-witness inventory changed")
+    else:
+        pass
     for name, expected in manifest["files"].items():
         if sha(corpus / name) != expected:
             raise ValueError("Frozen textual-witness bytes changed: " + name)
+        else:
+            pass
     evidence = json.loads((corpus / "evidence.json").read_text())
     for path, witness in zip(PDFS, evidence["witnesses"]):
         if (
@@ -42,6 +48,8 @@ def reference(corpus: Path = CORPUS) -> dict[str, Any]:
             or path.stat().st_size != witness["source_bytes"]
         ):
             raise ValueError("Original witness PDF identity changed")
+        else:
+            pass
     return evidence
 
 
@@ -67,13 +75,19 @@ def audit() -> dict[str, Any]:
         actual = pair_facts(expected["left_branch"], expected["right_branch"])
         if actual != expected:
             matrix_failures.append(dict(expected=expected, actual=actual))
+        else:
+            pass
     failures = []
     for case in seven["reference"]["contexts"]:
         actual = branch_breaks(*case["branches"])
         if actual.get("witness_evidence") != evidence or actual["rows"] != case["rows"]:
             failures.append(dict(expected=case, actual=actual))
+        else:
+            pass
     if before != {str(p.relative_to(ROOT)): sha(p) for p in paths}:
         raise ValueError("Source changed during textual-witness audit")
+    else:
+        pass
     return dict(
         reference_pin=PIN,
         independent_evidence=evidence,
@@ -113,3 +127,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

@@ -32,7 +32,6 @@ def check_layer(layer, case, result, prefix):
         "real_state",
         "travel_instruction",
         "hazard_verdict",
-        "success_probability",
         "real_outcome",
         "full_chapter_synthesis",
     ]:
@@ -56,7 +55,7 @@ def check_layer(layer, case, result, prefix):
 
 
 @pytest.mark.parametrize("case", GEOMETRY, ids=lambda c: c["id"])
-def test_all384_line_geometries_in_both_declared_chapters(case):
+def test_all384_line_geometries_in_both_declared_chapters(case) -> None:
     args = {
         "casting": {
             "method": "existing",
@@ -91,7 +90,7 @@ def test_all384_line_geometries_in_both_declared_chapters(case):
 
 
 @pytest.mark.parametrize("case", COUNTING, ids=lambda c: str(c["arguments"]))
-def test_each_distinct_counting_candidate_owns_its_initial_actor(case):
+def test_each_distinct_counting_candidate_owns_its_initial_actor(case) -> None:
     result = execute_spec(SPEC, SPEC.request_model(**case["arguments"]))
     assert "error" not in result
     main = {
@@ -115,7 +114,7 @@ def test_each_distinct_counting_candidate_owns_its_initial_actor(case):
         assert row["traditional_judgement"].count(layer["summary"]) == 1
 
 
-def test_public_result_mutation_cannot_poison_the_cached_source_profile():
+def test_public_result_mutation_cannot_poison_the_cached_source_profile() -> None:
     args = {
         "casting": {"method": "existing", "hexagram_code": "111111", "moving_line": 1},
         "interpretation_topic": "travel",

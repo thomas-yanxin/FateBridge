@@ -2,19 +2,20 @@
 
 from __future__ import annotations
 
-from typing import Literal, Optional, Union
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, StrictBool, model_validator
 
+from fatebridge.core.requests.base import AstroHouseValidatorMixin
 from fatebridge.core.requests.western_lifespan import AstroLifespanRequest
 from fatebridge.core.requests.western_policy import WesternEphemerisRequest
 from fatebridge.utils.house_systems import TWELVE_HOUSE_SYSTEM_NOTE
 
 
-class AstroMundaneRequest(WesternEphemerisRequest):
+class AstroMundaneRequest(AstroHouseValidatorMixin, WesternEphemerisRequest):
     """Request model for the 世俗入宫盘 (mundane ingress) tool — cast at a solar ingress, no birth data."""
 
-    name: Optional[str] = Field(default=None, description="Optional chart name")
+    name: str | None = Field(default=None, description="Optional chart name")
     year: int = Field(description="Civil year of the ingress, e.g. 2026")
     ingress_term: Literal["春分", "夏至", "秋分", "冬至"] = Field(
         default="春分",
@@ -29,7 +30,7 @@ class AstroMundaneRequest(WesternEphemerisRequest):
     timezone_name: str = Field(
         default="+08:00", description="Observation timezone (IANA name or UTC offset)"
     )
-    house_system: Union[int, str] = Field(
+    house_system: int | str = Field(
         default="P",
         description="House system, any convention: SE letter ('P'=Placidus, "
         "'R'=Regiomontanus, 'W'=whole sign, 'D'=equal_mc), key ('placidus', "
@@ -44,14 +45,14 @@ class AstroMundaneRequest(WesternEphemerisRequest):
 class AstroExtraReturnsRequest(AstroLifespanRequest):
     """Request model for the 多重回归 (Saturn/Jupiter/node returns) tool."""
 
-    analysis_year: Optional[int] = Field(
+    analysis_year: int | None = Field(
         default=None,
         description="Reference year for the returns (omit for current date)",
     )
-    analysis_month: Optional[int] = Field(
+    analysis_month: int | None = Field(
         default=None, ge=1, le=12, description="Reference month (1-12)"
     )
-    analysis_day: Optional[int] = Field(
+    analysis_day: int | None = Field(
         default=None, ge=1, le=31, description="Reference day (1-31)"
     )
 
@@ -60,36 +61,36 @@ class LillyRadicalityContext(BaseModel):
     """Optional caller reports for source exceptions, never inferred facts."""
 
     model_config = ConfigDict(extra="forbid")
-    figure_origin: Optional[
-        Literal["propounded_question", "timed_event", "unknown"]
-    ] = Field(
-        default=None,
-        description="Optional reported origin; timed_event only supplies context for the p122 exception, not a complete event-astrology method. Omission uses this API's question-instant convention.",
+    figure_origin: Literal["propounded_question", "timed_event", "unknown"] | None = (
+        Field(
+            default=None,
+            description="Optional reported origin; timed_event only supplies context for the p122 exception, not a complete event-astrology method. Omission uses this API's question-instant convention.",
+        )
     )
-    very_young_querent_reported: Optional[StrictBool] = None
-    rising_description_agreement_reported: Optional[StrictBool] = None
-    age_degree_agreement_reported: Optional[StrictBool] = None
-    event_time_certain_reported: Optional[StrictBool] = Field(
+    very_young_querent_reported: StrictBool | None = None
+    rising_description_agreement_reported: StrictBool | None = None
+    age_degree_agreement_reported: StrictBool | None = None
+    event_time_certain_reported: StrictBool | None = Field(
         default=None,
         description="Caller reports a certain event instant; a valid date or known question time does not establish this.",
     )
-    principal_significators_very_strong_reported: Optional[StrictBool] = None
-    seventh_cusp_afflicted_reported: Optional[StrictBool] = None
-    seventh_lord_impeded_reported: Optional[StrictBool] = None
-    seventh_lord_unfortunate_reported: Optional[StrictBool] = None
-    equal_fortune_infortune_testimonies_reported: Optional[StrictBool] = Field(
+    principal_significators_very_strong_reported: StrictBool | None = None
+    seventh_cusp_afflicted_reported: StrictBool | None = None
+    seventh_lord_impeded_reported: StrictBool | None = None
+    seventh_lord_unfortunate_reported: StrictBool | None = None
+    equal_fortune_infortune_testimonies_reported: StrictBool | None = Field(
         default=None,
         description="Reported testimony balance; not derived from p115 weighted score0. All context reports are unverified and optional.",
     )
 
 
-class AstroHoraryRequest(WesternEphemerisRequest):
+class AstroHoraryRequest(AstroHouseValidatorMixin, WesternEphemerisRequest):
     """Request model for the 卜卦 (horary) tool — chart cast at the question moment."""
 
-    name: Optional[str] = Field(default=None, description="Optional chart name")
+    name: str | None = Field(default=None, description="Optional chart name")
     ut1_source: Literal["swiss_delta_t", "iers_c04"] = Field(
         default="swiss_delta_t",
-        description="Earth-rotation time source: legacy Swiss Delta T model(default), or pinned IERS20 C04 final daily UT1 series,1962-01-01T00:00UTC..2026-09-19T00:00UTC. C04 uses continuous UT1-TAI interpolation; no out-of-range prediction/extrapolation/model fallback. Does not apply polar motion,CIP offsets or subdaily tides and does not certify clock-record precision. Geocentric TT longitude-event searches need no trial UT1; houses and horizon calculations still require covered UT1 epochs.",
+        description="Earth-rotation source: modeled Swiss Delta T(default), or pinned IERS20 C04 final daily data,1962-01-01T00:00UTC..2026-09-19T00:00UTC. C04 uses declared TT interpolation and tidal corrections; managed houses/horizons also apply polar motion and source-qualified celestial-pole offsets. No out-of-range prediction,extrapolation or model fallback; no clock-record or absolute-accuracy certification. Geocentric TT longitude-event searches need no trial UT1; houses and horizons require covered epochs.",
     )
     question_hour_origin: Literal["midnight", "noon"] = Field(
         default="midnight",
@@ -125,7 +126,7 @@ class AstroHoraryRequest(WesternEphemerisRequest):
         default="civil",
         description="Explicit question clock: civil zone clock, local mean solar (UT1 + east longitude/360), or geocentric local apparent solar (adds EOT). Do not infer an original author's clock by fitting the chart. Solar labels require timezone_name omitted/null.",
     )
-    timezone_name: Optional[str] = Field(
+    timezone_name: str | None = Field(
         default=None,
         description="Civil question timezone (IANA or UTC offset). Omitted/null with civil preserves legacy +08:00; supply the known zone explicitly. Solar clock bases must omit/null this field to prevent double correction.",
     )
@@ -159,11 +160,11 @@ class AstroHoraryRequest(WesternEphemerisRequest):
         default="lilly_1647_p107_first",
         description="Lilly1647 p107 printed full-orb column. Both source variants are supported; pair radius is their half-sum. First column matches the printed Saturn/Venus moiety example.",
     )
-    radicality_context: Optional[LillyRadicalityContext] = Field(
+    radicality_context: LillyRadicalityContext | None = Field(
         default=None,
         description="Optional already-known reports for Lilly pp121-123 prerequisites and exceptions. Unknown reports remain unknown; do not infer age, appearance, affliction or event certainty to clear a caution.",
     )
-    house_system: Union[int, str] = Field(
+    house_system: int | str = Field(
         default="R",
         description="House system, any convention (SE letter / key / integer "
         "code 0..8); Regiomontanus (R, code 2) is traditional for horary."
@@ -177,16 +178,18 @@ class AstroHoraryRequest(WesternEphemerisRequest):
     def _exclusive_question_clock(self) -> "AstroHoraryRequest":
         if self.question_clock_basis != "civil" and self.timezone_name is not None:
             raise ValueError("Solar question clock must omit timezone_name")
+        else:
+            pass
         return self
 
 
-class AstroElectionRequest(WesternEphemerisRequest):
+class AstroElectionRequest(AstroHouseValidatorMixin, WesternEphemerisRequest):
     """Request model for the 择日 (electional) tool — chart cast at the candidate moment."""
 
-    name: Optional[str] = Field(default=None, description="Optional chart name")
+    name: str | None = Field(default=None, description="Optional chart name")
     ut1_source: Literal["swiss_delta_t", "iers_c04"] = Field(
         default="swiss_delta_t",
-        description="Earth-rotation time source: legacy Swiss Delta T model(default), or pinned IERS20 C04 final daily UT1 series,1962-01-01T00:00UTC..2026-09-19T00:00UTC. No prediction/extrapolation/model fallback outside coverage; UT1-only correction, not full EOP. Geocentric TT longitude-event searches need no trial UT1; houses and horizon calculations still require covered UT1 epochs.",
+        description="Earth-rotation source: modeled Swiss Delta T(default), or pinned IERS20 C04 final daily data,1962-01-01T00:00UTC..2026-09-19T00:00UTC. C04 uses declared TT interpolation and tidal corrections; managed houses/horizons also apply polar motion and source-qualified celestial-pole offsets. No out-of-range prediction,extrapolation or model fallback; no clock-record or absolute-accuracy certification. Geocentric TT longitude-event searches need no trial UT1; houses and horizons require covered epochs.",
     )
     candidate_hour_origin: Literal["midnight", "noon"] = Field(
         default="midnight",
@@ -224,7 +227,7 @@ class AstroElectionRequest(WesternEphemerisRequest):
         default="civil",
         description="Explicit candidate clock: civil, local mean solar (UT1 + east longitude/360), or geocentric local apparent solar (adds EOT). Solar labels require timezone_name omitted/null; unknown original clocks stay unknown.",
     )
-    timezone_name: Optional[str] = Field(
+    timezone_name: str | None = Field(
         default=None,
         description="Civil candidate timezone (IANA or UTC offset). Omitted/null with civil preserves legacy +08:00; use the known zone explicitly. Omit/null for solar clock bases, never combine both corrections.",
     )
@@ -252,7 +255,7 @@ class AstroElectionRequest(WesternEphemerisRequest):
             "buy_property/trade/buy_car/contract/travel/job_hunt/general; 不提供医疗择时"
         ),
     )
-    house_system: Union[int, str] = Field(
+    house_system: int | str = Field(
         default="R",
         description="House system, any convention (SE letter / key / integer "
         "code 0..8); Regiomontanus (R, code 2) is traditional for elections."
@@ -266,4 +269,6 @@ class AstroElectionRequest(WesternEphemerisRequest):
     def _exclusive_candidate_clock(self) -> "AstroElectionRequest":
         if self.candidate_clock_basis != "civil" and self.timezone_name is not None:
             raise ValueError("Solar candidate clock must omit timezone_name")
+        else:
+            pass
         return self

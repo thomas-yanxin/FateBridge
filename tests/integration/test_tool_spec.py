@@ -1,23 +1,24 @@
 """Transport-agnostic tool_spec helpers (shared by REST/MCP/CLI)."""
 
-import inspect
+import asyncio
 
 import pytest
+from fastmcp import Client, FastMCP
 from pydantic import BaseModel
 
 from fatebridge.application.bindings import raw_invoke
-from fatebridge.application.execution import execute_spec, invalid_input_result
+from fatebridge.application.execution import execute_spec
 from fatebridge.application.projection import project_fields
 from fatebridge.application.tool_spec import ToolSpec
+from fatebridge.mcp_server import _register_mcp_tools
 from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.transports.mcp import _make_mcp_fn
 
 
 class _Empty(BaseModel):
     pass
 
 
-def test_request_service_drift_is_not_silently_ignored():
+def test_request_service_drift_is_not_silently_ignored() -> None:
     class Request(BaseModel):
         value: int
         new_option: bool = True
@@ -43,7 +44,7 @@ def _spec(service, **overrides):
     return ToolSpec(**base)
 
 
-def test_project_fields_keeps_subset_and_always_run_metadata():
+def test_project_fields_keeps_subset_and_always_run_metadata() -> None:
     payload = {
         "analysis_type": "x",
         "detailed_analysis": {"big": "blob"},
@@ -54,13 +55,13 @@ def test_project_fields_keeps_subset_and_always_run_metadata():
     assert out["run_metadata"]["run_id"] == "r"
 
 
-def test_project_fields_none_or_empty_is_identity():
+def test_project_fields_none_or_empty_is_identity() -> None:
     payload = {"a": 1, "b": 2}
     assert project_fields(payload, None) == payload
     assert project_fields(payload, []) == payload
 
 
-def test_project_fields_warns_for_unknown_keys_without_changing_selected_data():
+def test_project_fields_warns_for_unknown_keys_without_changing_selected_data() -> None:
     payload = {"a": 1, "run_metadata": {}}
     out = project_fields(payload, ["a", "no_such_key"])
     assert set(out) == {"a", "run_metadata", "projection_warnings"}
@@ -84,7 +85,7 @@ def _nested_payload():
     }
 
 
-def test_project_fields_dotted_prunes_into_subtree():
+def test_project_fields_dotted_prunes_into_subtree() -> None:
     out = project_fields(
         _nested_payload(),
         ["bazi_birth.day_master", "bazi_birth.favorable_elements"],
@@ -94,14 +95,14 @@ def test_project_fields_dotted_prunes_into_subtree():
     assert out["bazi_birth"]["day_master"] == {"stem": "壬", "strength": "弱"}
 
 
-def test_project_fields_mixes_dotted_and_top_level():
+def test_project_fields_mixes_dotted_and_top_level() -> None:
     out = project_fields(_nested_payload(), ["snapshot_text", "bazi_birth.day_master"])
     assert set(out) == {"snapshot_text", "bazi_birth", "run_metadata"}
     assert out["snapshot_text"] == "[起盘信息]..."
     assert set(out["bazi_birth"]) == {"day_master"}
 
 
-def test_project_fields_whole_parent_overrides_dotted_regardless_of_order():
+def test_project_fields_whole_parent_overrides_dotted_regardless_of_order() -> None:
     payload = _nested_payload()
     a = project_fields(payload, ["bazi_birth", "bazi_birth.day_master"])
     b = project_fields(payload, ["bazi_birth.day_master", "bazi_birth"])
@@ -109,14 +110,14 @@ def test_project_fields_whole_parent_overrides_dotted_regardless_of_order():
     assert b["bazi_birth"] == payload["bazi_birth"]
 
 
-def test_project_fields_unknown_subkey_keeps_legacy_shape_and_warns():
+def test_project_fields_unknown_subkey_keeps_legacy_shape_and_warns() -> None:
     out = project_fields(_nested_payload(), ["bazi_birth.no_such_sub"])
     assert set(out) == {"bazi_birth", "run_metadata", "projection_warnings"}
     assert out["bazi_birth"] == {}
     assert out["projection_warnings"][0]["path"] == "bazi_birth.no_such_sub"
 
 
-def test_project_fields_dotted_into_scalar_keeps_scalar():
+def test_project_fields_dotted_into_scalar_keeps_scalar() -> None:
     out = project_fields(_nested_payload(), ["snapshot_text.foo"])
     assert out["snapshot_text"] == "[起盘信息]..."
     assert out["projection_warnings"] == [
@@ -124,41 +125,33 @@ def test_project_fields_dotted_into_scalar_keeps_scalar():
     ]
 
 
-def _fake_renderers():
-    captured = {}
+def _call_mcp(spec, arguments, **options):
+    server = FastMCP("test")
+    _register_mcp_tools(server, [spec])
 
-    def render_response(result, **kwargs):
-        captured["result"] = result
-        captured.update(kwargs)
-        return "ok"
+    async def call():
+        async with Client(server) as client:
+            return await client.call_tool(
+                "run_calculation",
+                {"tool": spec.tool_name, "arguments": arguments, **options},
+                raise_on_error=False,
+            )
 
-    def render_error(result, operation, **kwargs):
-        captured["error_result"] = result
-        return "err"
-
-    return captured, render_response, render_error
+    return asyncio.run(call())
 
 
-def test_mcp_fn_exposes_fields_param_and_threads_it():
-    spec = next(s for s in CATALOG if s.rest_path == "/api/cn/bazi/wealth")
-    captured, render_response, render_error = _fake_renderers()
-    fn = _make_mcp_fn(spec, render_response=render_response, render_error=render_error)
-
-    assert "fields" in inspect.signature(fn).parameters
-
-    fn(
-        birth_year=1990,
-        birth_month=6,
-        birth_day=15,
-        birth_hour=10,
-        gender="male",
-        dayun_pillar="壬戌",
-        fields=["wealth_analysis"],
+def test_mcp_threads_fields_to_projection() -> None:
+    result = _call_mcp(
+        _spec(lambda: {"selected": 1, "other": 2}),
+        {},
+        fields=["selected"],
+        strict_fields=True,
     )
-    assert captured["fields"] == ["wealth_analysis"]
+    assert not result.is_error
+    assert set(result.structured_content) == {"selected", "run_metadata"}
 
 
-def test_execute_spec_preserves_domain_result_and_error():
+def test_execute_spec_preserves_domain_result_and_error() -> None:
     for payload in (
         {"a": 1},
         {"error": "boom", "error_code": "validation_error", "retryable": False},
@@ -166,58 +159,51 @@ def test_execute_spec_preserves_domain_result_and_error():
         assert execute_spec(_spec(lambda: payload), _Empty()) == payload
 
 
-def test_invalid_input_result_shape_mirrors_rest_400():
-    spec = _spec(lambda: {}, operation_label_zh="八字")
-    out = invalid_input_result(spec)
-    assert out["error"] == "无效的八字参数"
-    assert out["status_code"] == 400
-    assert out["error_code"] == "validation_error"
-    assert out["retryable"] is False
-
-
-def test_mcp_fn_renders_valueerror_as_clean_error():
-    # A ValueError raised during binding/validation must render via
-    # render_error, not bubble a raw exception out of the MCP tool.
+def test_mcp_preserves_binding_value_error_message() -> None:
     def _raising_bind(req):
         raise ValueError("bad input")
 
     spec = _spec(lambda: {}, bind=_raising_bind)
-    captured, render_response, render_error = _fake_renderers()
-    fn = _make_mcp_fn(spec, render_response=render_response, render_error=render_error)
-    assert fn() == "err"
-    assert captured["error_result"]["status_code"] == 400
-    assert captured["error_result"]["error_code"] == "validation_error"
+    result = _call_mcp(spec, {})
+    assert result.is_error
+    assert result.structured_content["status_code"] == 400
+    assert result.structured_content["error_code"] == "validation_error"
+    assert result.structured_content["error"] == "bad input"
 
 
-def test_mcp_fn_invalid_date_renders_error_end_to_end():
+def test_mcp_invalid_date_renders_error_end_to_end() -> None:
     # Complete civil dates are now rejected by shared request validation.
-    spec = next(s for s in CATALOG if s.rest_path == "/api/cn/bazi/wealth")
-    captured, render_response, render_error = _fake_renderers()
-    fn = _make_mcp_fn(spec, render_response=render_response, render_error=render_error)
-    out = fn(
-        birth_year=1990,
-        birth_month=2,
-        birth_day=31,
-        birth_hour=10,
-        gender="male",
-        dayun_pillar="壬戌",
+    spec = next(spec for spec in CATALOG if spec.key == "bazi_wealth")
+    result = _call_mcp(
+        spec,
+        dict(
+            birth_year=1990,
+            birth_month=2,
+            birth_day=31,
+            birth_hour=10,
+            gender="male",
+            dayun_pillar="壬戌",
+        ),
     )
-    assert out == "err"
-    assert captured["error_result"]["status_code"] == 422
+    assert result.is_error
+    assert result.structured_content["status_code"] == 422
 
 
-def test_mcp_fn_reserved_field_clash_raises():
-    class Bad(BaseModel):
-        fields: list = []
+def test_mcp_arguments_are_separate_from_delivery_controls() -> None:
+    class Request(BaseModel):
+        fields: list[str]
 
     spec = ToolSpec(
-        key="bad",
-        bind=lambda req: (lambda: {}, (), {}),
-        request_model=Bad,
+        key="field_calculation",
+        bind=raw_invoke(lambda fields: {"selection": fields, "other": 2}),
+        request_model=Request,
         summary="",
         operation_label_zh="",
         family="",
     )
-    _, render_response, render_error = _fake_renderers()
-    with pytest.raises(ValueError):
-        _make_mcp_fn(spec, render_response=render_response, render_error=render_error)
+    result = _call_mcp(
+        spec, {"fields": ["domain"]}, fields=["selection"], strict_fields=True
+    )
+    assert not result.is_error
+    assert result.structured_content["selection"] == ["domain"]
+    assert "other" not in result.structured_content

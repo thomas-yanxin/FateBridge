@@ -6,10 +6,11 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import pytest
+import pytz
 
-from fatebridge.core.sukuyo import calendar_mansion, day_evidence
-from fatebridge.core.sukuyo_date_support import local_date_support
-from fatebridge.core.sukuyo_padas import palace_reference
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence
+from fatebridge.core.sukuyo.sukuyo_date_support import local_date_support
+from fatebridge.core.sukuyo.sukuyo_padas import palace_reference
 from fatebridge.services.divination import calculate_sukuyo_compatibility
 
 ROOT = Path(__file__).parents[1] / "data/sukuyo_date_support_v1"
@@ -21,7 +22,7 @@ def moment(text):
     return datetime.fromisoformat(text)
 
 
-def test_primary_iana_excerpts_are_frozen():
+def test_primary_iana_excerpts_are_frozen() -> None:
     for ref in REFERENCE["sources"]:
         assert (
             hashlib.sha256((ROOT / ref["excerpt_file"]).read_bytes()).hexdigest()
@@ -29,7 +30,9 @@ def test_primary_iana_excerpts_are_frozen():
         )
 
 
-def test_live_catalog_names_date_support_and_relation_date_provenance_in_schema():
+def test_live_catalog_names_date_support_and_relation_date_provenance_in_schema() -> (
+    None
+):
     from fatebridge.services.tool_catalog import CATALOG
 
     spec = next(s for s in CATALOG if s.key == "sukuyo_compatibility")
@@ -46,7 +49,9 @@ def test_live_catalog_names_date_support_and_relation_date_provenance_in_schema(
 @pytest.mark.parametrize(
     "ref", REFERENCE["cases"], ids=lambda c: c["local_date"] + c["zone"]
 )
-def test_complete_preimages_against_manually_derived_primary_iana_intervals(ref):
+def test_complete_preimages_against_manually_derived_primary_iana_intervals(
+    ref,
+) -> None:
     result = local_date_support(ref["local_date"], ref["zone"])
     assert result["possible_calendar_dates"] == ref["calendar_dates"]
     rows = result["utc_support_intervals"]
@@ -76,12 +81,19 @@ def test_complete_preimages_against_manually_derived_primary_iana_intervals(ref)
         and not result["birth_time_imputed"]
     )
     if result["timezone_rules"]["database"] == "pytz":
-        assert result["timezone_rules"]["iana_version"] == REFERENCE["iana_version"]
-        assert len(result["timezone_rules"]["tzif_sha256"]) == 64
+        # The intervals above come from frozen IANA excerpts. This receipt
+        # identifies the TZif bytes the current calculation actually used.
+        rules = result["timezone_rules"]
+        assert rules["iana_version"] == pytz.OLSON_VERSION
+        assert rules["package_version"] == pytz.__version__
+        with pytz.open_resource(ref["zone"]) as resource:
+            assert rules["tzif_sha256"] == hashlib.sha256(resource.read()).hexdigest()
+    else:
+        pass
 
 
 @pytest.mark.parametrize("ref", REFERENCE["nonexistent_dates"])
-def test_whole_skipped_local_date_is_invalid_not_silently_moved(ref):
+def test_whole_skipped_local_date_is_invalid_not_silently_moved(ref) -> None:
     with pytest.raises(ValueError, match="日期.*不存在"):
         calendar_mansion(ref["local_date"], zone=ref["zone"])
 
@@ -91,8 +103,8 @@ def test_whole_skipped_local_date_is_invalid_not_silently_moved(ref):
     [("8.0002777777778", "2025-01-28"), ("7.9997222222222", "2025-01-30")],
 )
 def test_one_second_calendar_candidate_cannot_be_lost_to_hourly_or_noon_sampling(
-    zone, needle_date
-):
+    zone: str, needle_date: str
+) -> None:
     support = local_date_support("2025-01-29", zone)
     needle = next(
         r for r in support["utc_support_intervals"] if r["calendar_date"] == needle_date
@@ -103,7 +115,9 @@ def test_one_second_calendar_candidate_cannot_be_lost_to_hourly_or_noon_sampling
     assert len(support["possible_calendar_dates"]) == 2
 
 
-def test_unknown_foreign_date_returns_both_hko_calendar_branches_and_relations():
+def test_unknown_foreign_date_returns_both_hko_calendar_branches_and_relations() -> (
+    None
+):
     result = calculate_sukuyo_compatibility(
         person1_date="2025-01-29", person1_zone="UTC", person2_date="2025-03-04"
     )
@@ -131,14 +145,14 @@ def test_unknown_foreign_date_returns_both_hko_calendar_branches_and_relations()
     assert "多个可能中国历日" in result["summary"]
 
 
-def test_dst_start_can_still_determine_one_chinese_date_without_a_birth_hour():
+def test_dst_start_can_still_determine_one_chinese_date_without_a_birth_hour() -> None:
     result = calendar_mansion("1986-05-04", zone="Asia/Shanghai")
     assert result["status"] == "computed" and result["calendar_date"] == "1986-05-04"
     assert result["input_datetime"] is None and not result["birth_time_known"]
     assert result["date_support"]["civil_support_seconds"] == 23 * 3600
 
 
-def test_complete_different_dates_with_same_mansion_can_resolve_relation_only():
+def test_complete_different_dates_with_same_mansion_can_resolve_relation_only() -> None:
     # HKO2024: Feb9 is lunar12/30; Feb10 is1/1. Both selected T1299 cells are室.
     result = calculate_sukuyo_compatibility(
         person1_date="2024-02-09", person1_zone="UTC", person2_date="2025-03-04"
@@ -154,7 +168,7 @@ def test_complete_different_dates_with_same_mansion_can_resolve_relation_only():
     assert "未确定出生时刻或唯一历日" in result["summary"]
 
 
-def test_repeated_47_hour_date_preserves_three_chinese_dates():
+def test_repeated_47_hour_date_preserves_three_chinese_dates() -> None:
     result = calendar_mansion("1969-09-30", zone="Pacific/Kwajalein")
     assert result["date_support"]["civil_support_seconds"] == 47 * 3600
     assert [c["calendar_date"] for c in result["calendar_candidates"]] == [
@@ -167,7 +181,7 @@ def test_repeated_47_hour_date_preserves_three_chinese_dates():
     ]
 
 
-def test_date_and_hinoo_half_uncertainty_are_both_preserved():
+def test_date_and_hinoo_half_uncertainty_are_both_preserved() -> None:
     c = calendar_mansion(
         "2024-08-04", zone="Asia/Tokyo", calendar_profile="hinoo_t1299_host27"
     )
@@ -179,7 +193,9 @@ def test_date_and_hinoo_half_uncertainty_are_both_preserved():
     assert c["natal_su27"] is None
 
 
-def test_out_of_range_possible_date_cannot_make_surviving_mansion_or_palace_certain():
+def test_out_of_range_possible_date_cannot_make_surviving_mansion_or_palace_certain() -> (
+    None
+):
     c = calendar_mansion("1900-12-31", zone="UTC")
     assert c["out_of_range_calendar_dates"] == ["1900-12-31"]
     assert c["calendar_candidates"][0]["calendar_date"] == "1901-01-01"
@@ -190,7 +206,9 @@ def test_out_of_range_possible_date_cannot_make_surviving_mansion_or_palace_cert
     assert palace_reference(c)["selected_palace"] is None
 
 
-def test_conditional_day_reading_keeps_whole_branches_without_picking_a_weekday():
+def test_conditional_day_reading_keeps_whole_branches_without_picking_a_weekday() -> (
+    None
+):
     result = day_evidence(
         calendar_mansion("2025-01-29", zone="UTC"), activity="marriage"
     )
@@ -202,9 +220,9 @@ def test_conditional_day_reading_keeps_whole_branches_without_picking_a_weekday(
 
 
 def test_known_clock_still_rejects_dst_gap_or_fold_and_utc08_does_not_enumerate(
-    monkeypatch,
-):
-    import fatebridge.core.sukuyo_date_support as module
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import fatebridge.core.sukuyo.sukuyo_date_support as module
 
     for day, clock in [("2024-03-10", "02:30:00"), ("2024-11-03", "01:30:00")]:
         with pytest.raises(ValueError):
@@ -217,7 +235,9 @@ def test_known_clock_still_rejects_dst_gap_or_fold_and_utc08_does_not_enumerate(
     assert calendar_mansion("2025-01-29")["natal_su27"] == "室"
 
 
-def test_returned_support_mutation_does_not_corrupt_cached_intervals_or_fingerprint():
+def test_returned_support_mutation_does_not_corrupt_cached_intervals_or_fingerprint() -> (
+    None
+):
     first = local_date_support("2025-01-29", "UTC")
     first["utc_support_intervals"][0]["calendar_date"] = "tampered"
     first["possible_calendar_dates"].clear()
@@ -228,12 +248,16 @@ def test_returned_support_mutation_does_not_corrupt_cached_intervals_or_fingerpr
 
 
 @pytest.mark.parametrize("day,zone", [("9999-12-31", "UTC")])
-def test_unenumerable_upper_extreme_date_raises_a_clear_value_error(day, zone):
+def test_unenumerable_upper_extreme_date_raises_a_clear_value_error(
+    day: str, zone: str
+) -> None:
     with pytest.raises(ValueError):
         local_date_support(day, zone)
 
 
-def test_fixed_offset_lower_boundary_uses_exact_intervals_instead_of_datetime_underflow():
+def test_fixed_offset_lower_boundary_uses_exact_intervals_instead_of_datetime_underflow() -> (
+    None
+):
     result = local_date_support("0001-01-01", "+08:00", calendar_offset_hours=9)
     assert result["method_id"] == "complete_fixed_offset_lower_boundary_preimage_v1"
     assert result["possible_calendar_dates"] == ["0001-01-01", "0001-01-02"]
@@ -266,7 +290,7 @@ def test_fixed_offset_lower_boundary_uses_exact_intervals_instead_of_datetime_un
     )
 
 
-def test_year_zero_reference_branch_is_retained_and_support_is_detached():
+def test_year_zero_reference_branch_is_retained_and_support_is_detached() -> None:
     first = local_date_support("0001-01-01", "+15:00", calendar_offset_hours=9)
     assert first["possible_calendar_dates"] == ["0000-12-31", "0001-01-01"]
     first["utc_support_intervals"][0]["calendar_date"] = "changed"

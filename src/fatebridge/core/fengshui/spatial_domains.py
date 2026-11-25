@@ -5,8 +5,13 @@ from math import ceil, floor, prod
 
 from shapely.geometry import Point, box
 
-from .spatial_geometry import polygon_xy
-from .spatial_inputs import PlanPoint, ResolvedMoveDomain, SpatialScene, SpatialSearch
+from fatebridge.core.fengshui.spatial_geometry import polygon_xy
+from fatebridge.core.fengshui.spatial_inputs import (
+    PlanPoint,
+    ResolvedMoveDomain,
+    SpatialScene,
+    SpatialSearch,
+)
 
 
 def resolve_search_domains(
@@ -47,16 +52,24 @@ def resolve_search_domains(
                 raise ValueError(
                     "每个网格包围盒最多4096个采样点；请增大显式步长或缩小中心搜索区"
                 )
+            else:
+                pass
             positions = []
             for iy in range(iy0, iy1 + 1):
                 for ix in range(ix0, ix1 + 1):
                     x, y = float(ox + ix * sx), float(oy + iy * sy)
                     if region.covers(Point(x, y)):
                         positions.append(PlanPoint(x=x, y=y))
+                    else:
+                        pass
             if not positions:
                 raise ValueError(
                     "声明的网格没有落在中心搜索区内的点；不自动移动原点或改变步长"
                 )
+            else:
+                pass
+        else:
+            pass
         # The input XOR validator guarantees one of explicit positions or grid.
         assert positions is not None
         resolved.append(
@@ -70,4 +83,6 @@ def resolve_search_domains(
         )
     if prod(len(d.positions) * len(d.rotations_degrees) for d in resolved) > 4096:
         raise ValueError("搜索空间最多4096个完整组合；请缩小位置/角度域或增大网格步长")
+    else:
+        pass
     return resolved

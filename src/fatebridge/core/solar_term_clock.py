@@ -1,16 +1,22 @@
 """Explicit native root clock conversion; a solved root cannot become linear."""
 
 from datetime import datetime
-from typing import Any, Dict
+from typing import TypedDict
 
 from fatebridge.core.astro.time_scales import (
     ephemeris_time,
-    utc_calendar_from_tt,
     utc_clock,
+    utc_point_from_tt,
 )
 from fatebridge.core.astro.tt_epoch import TTInstant
-from fatebridge.utils.civil_time import UTCCalendar
+from fatebridge.utils.civil_time import CivilPoint, UTCCalendar
 from fatebridge.utils.errors import EphemerisSourceError
+
+
+class SolarTermClockPolicy(TypedDict):
+    civil_time_policy: str
+    historical_ut1_convention: bool
+    future_leap_seconds_assumed_unchanged: bool
 
 
 class SolarTermClockError(EphemerisSourceError):
@@ -21,16 +27,17 @@ class SolarTermClockError(EphemerisSourceError):
         "solar_root_clock_unavailable": "Selected TT solar crossing clock conversion is unavailable under the configured clock data",
     }
 
-    def as_result(self) -> Dict[str, Any]:
+    def as_result(self) -> dict[str, str | int | bool | list[dict[str, str]]]:
         result = super().as_result()
         result["issues"] = [{"path": "runtime.solar_term_clock", "code": self.reason}]
         return result
 
 
-def native_solar_root_calendar(jd_tt: float) -> UTCCalendar:
-    """Keep IEEE point intent and distinguish a clock failure from no root."""
+def native_solar_root_point(jd_tt: float | TTInstant) -> CivilPoint:
+    """Keep the selected TT point and distinguish a clock failure from no root."""
     try:
-        return utc_calendar_from_tt(TTInstant.from_float(jd_tt))
+        point = jd_tt if isinstance(jd_tt, TTInstant) else TTInstant.from_float(jd_tt)
+        return utc_point_from_tt(point)
     except EphemerisSourceError:
         raise
     except (ValueError, OverflowError) as error:
@@ -39,15 +46,14 @@ def native_solar_root_calendar(jd_tt: float) -> UTCCalendar:
         raise SolarTermClockError("solar_root_clock_unavailable") from error
 
 
-def native_solar_root_datetime(jd_tt: float) -> datetime:
-    """Require the selected root's UTC label to fit Python datetime."""
-    moment = native_solar_root_calendar(jd_tt).as_datetime()
-    if moment is None:
-        raise SolarTermClockError("solar_root_civil_unrepresentable")
-    return moment
+def native_solar_root_calendar(jd_tt: float | TTInstant) -> UTCCalendar:
+    """Format the same qualified point for calendar-only callers."""
+    return native_solar_root_point(jd_tt).as_calendar()
 
 
-def native_solar_root_time_policy(moment: datetime | UTCCalendar) -> Dict[str, Any]:
+def native_solar_root_time_policy(
+    moment: datetime | UTCCalendar,
+) -> SolarTermClockPolicy:
     """Qualify the selected root's civil clock without requiring unrelated UT1.
 
     A Gregorian UTC-shaped label before atomic UTC represents modeled UT1;

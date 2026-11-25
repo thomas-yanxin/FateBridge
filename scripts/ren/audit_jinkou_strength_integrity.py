@@ -22,18 +22,28 @@ def sha(path: Path) -> str:
 def reference(corpus: Path = CORPUS) -> dict[str, Any]:
     if sha(corpus / "freeze.json") != FROZEN:
         raise ValueError("Frozen strength-integrity manifest changed")
+    else:
+        pass
     freeze = json.loads((corpus / "freeze.json").read_text())
     if {p.name for p in corpus.iterdir()} != set(freeze["files"]) | {"freeze.json"}:
         raise ValueError("Frozen strength-integrity inventory changed")
+    else:
+        pass
     if any(sha(corpus / n) != d for n, d in freeze["files"].items()):
         raise ValueError("Frozen strength-integrity source changed")
+    else:
+        pass
     source = json.loads((corpus / "reference.json").read_text())
     for n, d in source["reference_hashes"].items():
         if sha(ROOT / n) != d:
             raise ValueError("Earlier strength witness changed")
+        else:
+            pass
     faults = json.loads((corpus / "faults.json").read_text())["faults"]
     if len(source["cases"]) != 12 or len(faults) != 37:
         raise ValueError("Complete strength-integrity denominators required")
+    else:
+        pass
     return dict(
         source=source,
         faults=faults,
@@ -44,16 +54,28 @@ def reference(corpus: Path = CORPUS) -> dict[str, Any]:
 def changed(value: Any, operation: str) -> Any:
     if operation == "flip":
         return not value
+    else:
+        pass
     if operation == "phase":
         return "木" if value != "木" else "金"
+    else:
+        pass
     if operation == "power":
         return "旺" if value != "旺" else "休"
+    else:
+        pass
     if operation == "pop":
         if not value:
             raise ValueError("Declared deletion fault has no item to remove")
+        else:
+            pass
         return value[:-1]
+    else:
+        pass
     if operation == "different_positions":
         return [] if value else ["人元"]
+    else:
+        pass
     if operation == "status":
         return {
             "ambiguous_excerpt": "resolved_excerpt",
@@ -61,12 +83,20 @@ def changed(value: Any, operation: str) -> Any:
             "no_control_strength_priority_unresolved": "polarity_and_afflictions_only",
             "polarity_and_afflictions_only": "no_control_strength_priority_unresolved",
         }[value]
+    else:
+        pass
     if operation == "increment":
         return value + 1
+    else:
+        pass
     if operation == "month_label":
         return "建旺" if value != "建旺" else "月破"
+    else:
+        pass
     if operation == "extra_power_role":
         return dict(value, **{"不存在的第五位": "旺"})
+    else:
+        pass
     raise ValueError("Unknown declared corruption")
 
 
@@ -82,7 +112,11 @@ def corrupt(output: dict[str, Any], fault: dict[str, Any]) -> dict[str, Any]:
         for trace in board["rule_trace"]:
             if trace["rule_id"] == "jinkou.internal_strength":
                 trace["result"]["powers"]["贵神"] = power
+            else:
+                pass
         return result
+    else:
+        pass
     node = board
     if "trace_rule" in fault:
         trace = next(
@@ -91,10 +125,16 @@ def corrupt(output: dict[str, Any], fault: dict[str, Any]) -> dict[str, Any]:
         if operation == "delete_record":
             board["rule_trace"].remove(trace)
             return result
+        else:
+            pass
         if operation == "duplicate_record":
             board["rule_trace"].append(copy.deepcopy(trace))
             return result
+        else:
+            pass
         node = trace["result"]
+    else:
+        pass
     path = [int(k) if k.isdigit() else k for k in fault["path"]]
     for key in path[:-1]:
         node = node[key]
@@ -109,17 +149,19 @@ def corrupt(output: dict[str, Any], fault: dict[str, Any]) -> dict[str, Any]:
 def audit() -> dict[str, Any]:
     ref = reference()
     watch: tuple[str, ...] = (
-        "src/fatebridge/core/output_chinese.py",
-        "src/fatebridge/core/output_ren_anchors.py",
+        "src/fatebridge/core/contracts/output_chinese.py",
+        "src/fatebridge/core/contracts/output_ren_anchors.py",
         "src/fatebridge/core/metaphysics/jinkou_strength.py",
         "src/fatebridge/core/metaphysics/jinkou_patterns.py",
         "src/fatebridge/core/metaphysics/jinkou_qi.py",
         "src/fatebridge/core/metaphysics/jinkou_sources.py",
         "scripts/ren/audit_jinkou_strength_integrity.py",
     )
-    helper = "src/fatebridge/core/output_jinkou_strength.py"
+    helper = "src/fatebridge/core/contracts/output_jinkou_strength.py"
     if (ROOT / helper).exists():
         watch += (helper,)
+    else:
+        pass
     before = {n: sha(ROOT / n) for n in watch}
     from fatebridge.application.execution import OutputContractError, validate_output
     from fatebridge.core.metaphysics.jinkou_strength import internal_strength

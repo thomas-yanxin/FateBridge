@@ -11,7 +11,7 @@ from fatebridge.core.astro.mixed_pairs import (
     mixed_pair_geometry,
     unavailable_mixed_pairs,
 )
-from fatebridge.core.output_midpoints import MixedPairGeometry
+from fatebridge.core.contracts.output_midpoints import MixedPairGeometry
 
 
 def expand(result, period):
@@ -30,7 +30,9 @@ def expand(result, period):
 
 
 @pytest.mark.parametrize("period", [90, 45])
-def test_every_retained_layering_matches_independent_direct_factor_arithmetic(period):
+def test_every_retained_layering_matches_independent_direct_factor_arithmetic(
+    period: int,
+) -> None:
     rng = random.Random(194505)
     natal = {str(i): rng.randrange(360 * 64) / 64 for i in range(6)}
     arc, orb = 23.125, 1.0
@@ -45,6 +47,8 @@ def test_every_retained_layering_matches_independent_direct_factor_arithmetic(pe
             for bits in product((0, 1), repeat=4):
                 if bits[0] == bits[1] and bits[2] == bits[3]:
                     continue
+                else:
+                    pass
                 # Compute all four actual factor coordinates before summing;
                 # do not reuse the production grouping/coefficient expression.
                 x = [
@@ -57,6 +61,8 @@ def test_every_retained_layering_matches_independent_direct_factor_arithmetic(pe
                 residual = difference - turns * period
                 if abs(residual) <= Fraction(orb):
                     expected[(names, bits)] = residual
+                else:
+                    pass
     assert set(found) == set(expected)
     for key, residual in expected.items():
         row = found[key]
@@ -74,7 +80,7 @@ def test_every_retained_layering_matches_independent_direct_factor_arithmetic(pe
     )
 
 
-def test_half_arc_contact_missing_from_homogeneous_pair_catalogue_is_computed():
+def test_half_arc_contact_missing_from_homogeneous_pair_catalogue_is_computed() -> None:
     result = mixed_pair_geometry({"A": 0, "B": 20, "C": 10, "D": 30}, 20, orb_degrees=0)
     matches = [
         row
@@ -91,7 +97,9 @@ def test_half_arc_contact_missing_from_homogeneous_pair_catalogue_is_computed():
     ]
 
 
-def test_one_directed_factor_on_each_side_cancels_without_creating_timing_signal():
+def test_one_directed_factor_on_each_side_cancels_without_creating_timing_signal() -> (
+    None
+):
     natal = {"A": 0, "B": 40, "C": 10, "D": 30}
     previous = None
     for arc in (0, 0.125, 17, 90, 359.5):
@@ -103,6 +111,8 @@ def test_one_directed_factor_on_each_side_cancels_without_creating_timing_signal
         ]
         if previous is not None:
             assert signature == previous
+        else:
+            pass
         previous = signature
         assert len(rows) == 1
         assert rows[0]["midpoint_arc_coefficient"] == 0
@@ -116,7 +126,7 @@ def test_one_directed_factor_on_each_side_cancels_without_creating_timing_signal
 @pytest.mark.parametrize(
     "arc", [math.nextafter(18.0, -math.inf), 18.0, math.nextafter(18.0, math.inf)]
 )
-def test_half_arc_inclusive_orb_preserves_nextafter_boundary_side(arc):
+def test_half_arc_inclusive_orb_preserves_nextafter_boundary_side(arc) -> None:
     # Base difference -10; at arc18 the residual is exactly -1degree.
     result = mixed_pair_geometry({"A": 0, "B": 20, "C": 10, "D": 30}, arc)
     rows = result["dials"]["90"]["arc_dependent_contacts"]
@@ -129,7 +139,7 @@ def test_half_arc_inclusive_orb_preserves_nextafter_boundary_side(arc):
     assert bool(match) == (arc >= 18)
 
 
-def test_input_order_and_common_display_rotation_do_not_change_relations():
+def test_input_order_and_common_display_rotation_do_not_change_relations() -> None:
     source = {"A": 2, "B": 22, "C": 12, "D": 32, "E": 199}
     first = mixed_pair_geometry(source, 20)
     rotated = mixed_pair_geometry(
@@ -151,12 +161,14 @@ def test_input_order_and_common_display_rotation_do_not_change_relations():
         ({"A": 1}, 1, 6),
     ],
 )
-def test_invalid_coordinates_or_orb_cannot_become_empty_success(values, arc, orb):
+def test_invalid_coordinates_or_orb_cannot_become_empty_success(
+    values, arc, orb
+) -> None:
     with pytest.raises(ValueError):
         mixed_pair_geometry(values, arc, orb_degrees=orb)
 
 
-def test_unavailable_native_layer_is_unknown_instead_of_zero_contacts():
+def test_unavailable_native_layer_is_unknown_instead_of_zero_contacts() -> None:
     result = unavailable_mixed_pairs("controlled missing-native input")
     assert result["status"] == "unavailable"
     assert result["profile"] is result["contact_counts"] is None

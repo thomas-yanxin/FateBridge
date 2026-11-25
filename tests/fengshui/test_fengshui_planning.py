@@ -2,6 +2,7 @@
 
 import asyncio
 import json
+from pathlib import Path
 
 import pytest
 from fastmcp import Client
@@ -14,74 +15,24 @@ from fatebridge.core.fengshui.output import FengshuiOutput
 from fatebridge.services.fengshui import assess
 from tests.fixtures.fengshui import payload
 from tests.support.mcp_result_assertions import without_transport
-from tests.support.transports import rest_client
-
-
-def observation(object_id="furniture", purpose="desk", **changes):
-    return {
-        "object_id": object_id,
-        "purpose": purpose,
-        "entrance_visible": True,
-        "entrance_direct_line": False,
-        "solid_backing": True,
-        "observation_basis": "user_confirmed",
-        "evidence": "合成资料：独立核对使用位置",
-        **changes,
-    }
-
-
-def proposal_request(purpose="desk", role="desk_facing"):
-    current = {
-        "object_id": "furniture",
-        "purpose": purpose,
-        "location_direction": "N",
-        "facing_direction": "S",
-        "facing_role": role,
-    }
-    return {
-        "scene": "home",
-        "methods": ["bazhai", "annual_stars"],
-        "house": {"sitting_trigram": "坎"},
-        "effective_year": 2026,
-        "occupants": [
-            {
-                "subject_id": "user",
-                "effective_birth_year": 1990,
-                "gender_convention": "male",
-            }
-        ],
-        "placements": [current],
-        "layout_constraints": [
-            {
-                "object_id": "furniture",
-                "can_relocate": True,
-                "can_rotate": True,
-                "evidence": "允许搬位和转向",
-            }
-        ],
-        "layout_alternatives": [
-            {
-                "candidate_id": "proposal",
-                "object_id": "furniture",
-                "changes": ["location", "facing"],
-                "placement": {
-                    **current,
-                    "location_direction": "E",
-                    "facing_direction": "N",
-                },
-                "physically_feasible": True,
-                "evidence": "新位置可容纳且不妨碍操作、通行",
-            }
-        ],
-    }
+from tests.support.transports import call_calculation, capability_contracts, rest_client
+from tests.unit_test.fixtures.fengshui_layout import (
+    observation,
+    proposal_request,
+    surface_input,
+)
 
 
 @pytest.mark.parametrize("scene", [None, "workstation", "home"])
 @pytest.mark.parametrize("purpose", ["desk", "bed", "stove"])
-def test_authored_only_does_not_request_unused_birth_compass_or_year(scene, purpose):
+def test_authored_only_does_not_request_unused_birth_compass_or_year(
+    scene: str | None, purpose: str
+) -> None:
     inputs = {"form_observations": [observation(purpose=purpose)]}
     if scene:
         inputs["scene"] = scene
+    else:
+        pass
     result = assess(**inputs)
     assert result["layers"] == {}
     assert result["layout_analysis"]["missing_inputs"] == []
@@ -89,7 +40,7 @@ def test_authored_only_does_not_request_unused_birth_compass_or_year(scene, purp
     assert result["rulesets"] and result["rule_trace"]
 
 
-def test_scene_selection_uses_inputs_and_explicit_choice_wins():
+def test_scene_selection_uses_inputs_and_explicit_choice_wins() -> None:
     base = proposal_request()
     explicit = assess(**base)
     automatic = assess(**{k: v for k, v in base.items() if k != "methods"})
@@ -106,7 +57,7 @@ def test_scene_selection_uses_inputs_and_explicit_choice_wins():
     ] == ["annual_stars"]
 
 
-def test_empty_scene_is_partial_and_empty_request_invents_no_methods():
+def test_empty_scene_is_partial_and_empty_request_invents_no_methods() -> None:
     result = assess(scene="workstation", analyze_layout=True)
     assert result["status"] == "partial"
     assert result["coverage"]["analysis_progress"]["assessment_complete"] is False
@@ -134,8 +85,12 @@ def test_empty_scene_is_partial_and_empty_request_invents_no_methods():
     ],
 )
 def test_feasibility_is_distinct_from_permission_for_every_purpose(
-    purpose, role, permission, feasible, expected
-):
+    purpose: str,
+    role: str,
+    permission: bool | None,
+    feasible: bool | None,
+    expected: str,
+) -> None:
     inputs = proposal_request(purpose, role)
     inputs["layout_constraints"][0]["can_relocate"] = permission
     inputs["layout_alternatives"][0]["physically_feasible"] = feasible
@@ -144,6 +99,8 @@ def test_feasibility_is_distinct_from_permission_for_every_purpose(
     assert actual["status"] == expected
     if expected == "blocked":
         assert actual["pending_confirmations"] == []
+    else:
+        pass
     assert result["coverage"]["analysis_progress"]["assessment_complete"] is True
     assert "score" not in actual
 
@@ -159,8 +116,8 @@ def test_feasibility_is_distinct_from_permission_for_every_purpose(
     ],
 )
 def test_proposals_match_independent_recalculation_across_directions_and_purposes(
-    location, purpose, role
-):
+    location: str, purpose: str, role: str
+) -> None:
     inputs = proposal_request(purpose, role)
     inputs["layout_alternatives"][0]["placement"]["location_direction"] = location
     actual = assess(**inputs)["layout_analysis"]["alternatives_analysis"]["findings"][0]
@@ -182,7 +139,7 @@ def test_proposals_match_independent_recalculation_across_directions_and_purpose
     assert annual["direction"] == location
 
 
-def test_new_position_never_reuses_previous_entrance_and_backing():
+def test_new_position_never_reuses_previous_entrance_and_backing() -> None:
     inputs = proposal_request()
     inputs["form_observations"] = [observation()]
     actual = assess(**inputs)["layout_analysis"]["alternatives_analysis"]["findings"][0]
@@ -213,7 +170,7 @@ def test_new_position_never_reuses_previous_entrance_and_backing():
         "window_position",
     ],
 )
-def test_candidate_cannot_hide_a_previously_assessed_form_criterion(field):
+def test_candidate_cannot_hide_a_previously_assessed_form_criterion(field: str) -> None:
     inputs = proposal_request()
     inputs["form_observations"] = [
         observation(**{field: "front" if field == "window_position" else True})
@@ -226,7 +183,7 @@ def test_candidate_cannot_hide_a_previously_assessed_form_criterion(field):
     assert any(p.endswith(field) for p in candidate["missing_inputs"])
 
 
-def test_candidate_cannot_hide_a_previously_assessed_facing():
+def test_candidate_cannot_hide_a_previously_assessed_facing() -> None:
     inputs = proposal_request()
     for key in ("facing_direction", "facing_role"):
         del inputs["layout_alternatives"][0]["placement"][key]
@@ -237,7 +194,9 @@ def test_candidate_cannot_hide_a_previously_assessed_facing():
     assert any(p.endswith("facing_direction") for p in candidate["missing_inputs"])
 
 
-def test_unknown_or_photo_proposal_does_not_reopen_current_review_or_become_ready():
+def test_unknown_or_photo_proposal_does_not_reopen_current_review_or_become_ready() -> (
+    None
+):
     inputs = {
         "scene": "workstation",
         "form_observations": [observation()],
@@ -263,7 +222,7 @@ def test_unknown_or_photo_proposal_does_not_reopen_current_review_or_become_read
     assert actual["coverage"]["analysis_progress"]["assessment_complete"] is True
 
 
-def test_fixed_furniture_blocks_moves_and_additions_but_preserves_findings():
+def test_fixed_furniture_blocks_moves_and_additions_but_preserves_findings() -> None:
     base = proposal_request()
     base["form_observations"] = [
         observation(
@@ -286,7 +245,9 @@ def test_fixed_furniture_blocks_moves_and_additions_but_preserves_findings():
     assert form["object_options"][0]["pending_confirmations"] == []
 
 
-def test_proposal_only_forms_publish_their_sources_without_changing_current_forms():
+def test_proposal_only_forms_publish_their_sources_without_changing_current_forms() -> (
+    None
+):
     inputs = proposal_request()
     inputs["layout_alternatives"][0]["form_observation"] = observation()
     result = assess(**inputs)
@@ -299,8 +260,9 @@ def test_proposal_only_forms_publish_their_sources_without_changing_current_form
     )
 
 
-def test_desk_wide_addition_prohibition_filters_desktop_without_faking_a_surface():
-    from tests.fengshui.test_fengshui_surfaces_authored import surface_input
+def test_desk_wide_addition_prohibition_filters_desktop_without_faking_a_surface() -> (
+    None
+):
 
     inputs = surface_input()
     inputs["surface_layouts"][0]["items"] = []
@@ -343,7 +305,7 @@ def test_desk_wide_addition_prohibition_filters_desktop_without_faking_a_surface
         "empty_evidence",
     ],
 )
-def test_invalid_candidate_or_constraint_is_rejected(mutation):
+def test_invalid_candidate_or_constraint_is_rejected(mutation: str) -> None:
     inputs = proposal_request()
     candidate = inputs["layout_alternatives"][0]
     if mutation == "unknown_constraint":
@@ -373,11 +335,13 @@ def test_invalid_candidate_or_constraint_is_rejected(mutation):
         inputs["layout_constraints"][0]["can_rotate"] = "true"
     elif mutation == "empty_evidence":
         candidate["evidence"] = " "
+    else:
+        pass
     with pytest.raises(ValidationError):
         AssessRequest.model_validate(inputs)
 
 
-def test_natal_scene_never_replaces_history_with_annual_year():
+def test_natal_scene_never_replaces_history_with_annual_year() -> None:
     inputs = {
         "scene": "home",
         "xuankong": payload("xuankong_natal"),
@@ -398,13 +362,18 @@ def test_natal_scene_never_replaces_history_with_annual_year():
 
 @pytest.mark.parametrize("automatic", [False, True])
 def test_scene_constraints_and_proposals_match_all_transports(
-    monkeypatch, tmp_path, capsys, automatic
-):
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    automatic: bool,
+) -> None:
     from fatebridge.mcp_server import create_mcp_app
 
     inputs = proposal_request()
     if automatic:
         del inputs["methods"]
+    else:
+        pass
     controls = {
         "fields": [
             "coverage",
@@ -419,11 +388,11 @@ def test_scene_constraints_and_proposals_match_all_transports(
 
     async def call():
         async with Client(create_mcp_app()) as client:
-            public = {t.name: t for t in await client.list_tools()}["fengshui_assess"]
-            Draft202012Validator(
-                public.model_dump(by_alias=True)["inputSchema"]
-            ).validate(inputs)
-            return await client.call_tool("fengshui_assess", {**inputs, **controls})
+            public = (await capability_contracts(client))["fengshui_assess"]
+            Draft202012Validator(public["input_schema"]).validate(inputs)
+            return await call_calculation(
+                client, "fengshui_assess", {**inputs, **controls}
+            )
 
     rest = rest_client(monkeypatch).post(
         "/api/fengshui/assess", params=controls, json=inputs
@@ -461,8 +430,11 @@ def test_scene_constraints_and_proposals_match_all_transports(
 
 @pytest.mark.parametrize("mutation", ["unknown_object", "purpose", "permission_string"])
 def test_invalid_planning_inputs_fail_on_every_transport(
-    monkeypatch, tmp_path, capsys, mutation
-):
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    mutation: str,
+) -> None:
     from fatebridge.mcp_server import create_mcp_app
 
     inputs = proposal_request()
@@ -477,8 +449,8 @@ def test_invalid_planning_inputs_fail_on_every_transport(
 
     async def call():
         async with Client(create_mcp_app()) as client:
-            return await client.call_tool(
-                "fengshui_assess", inputs, raise_on_error=False
+            return await call_calculation(
+                client, "fengshui_assess", inputs, raise_on_error=False
             )
 
     rest = rest_client(monkeypatch).post("/api/fengshui/assess", json=inputs)

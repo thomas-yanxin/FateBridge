@@ -34,6 +34,8 @@ def source_derivative_state_evidence(
     """Reframe qualified source vectors, preserving the earlier native state."""
     if isinstance(julian_day_tt, bool) or not math.isfinite(julian_day_tt):
         raise EphemerisSourceError("coordinate_values_unavailable")
+    else:
+        pass
     policy = {
         "model_id": SOURCE_STATE_METHOD_ID,
         "frame_model_id": FRAME_METHOD_ID,
@@ -57,6 +59,8 @@ def source_derivative_state_evidence(
             "reason": "continuous_input_unavailable",
             "input_reason": continuous.get("reason"),
         }
+    else:
+        pass
     if source.get("status") != "applied":
         return {
             **policy,
@@ -65,6 +69,8 @@ def source_derivative_state_evidence(
             "input_status": source.get("status", "unavailable"),
             "input_reason": source.get("reason"),
         }
+    else:
+        pass
     if (
         continuous.get("status") != "partial"
         or continuous.get("model_id") != FRAME_METHOD_ID
@@ -87,6 +93,8 @@ def source_derivative_state_evidence(
         or "source_context" not in continuous
     ):
         raise EphemerisSourceError("coordinate_contract_changed")
+    else:
+        pass
     try:
         for name, line in (
             ("source_position_reproduction_arcsec", 1e-7),
@@ -99,6 +107,8 @@ def source_derivative_state_evidence(
                 or not 0 <= value <= line
             ):
                 raise ValueError("Unqualified source position")
+            else:
+                pass
         decoded = decode_native_fixed_reception_state(
             julian_day_tt,
             source["full_fixed_frame_apparent_position_au"],
@@ -109,6 +119,8 @@ def source_derivative_state_evidence(
             not isinstance(x, bool) and math.isfinite(x) for x in native
         ):
             raise ValueError("Invalid native comparison state")
+        else:
+            pass
         position = decoded["position"]
         a = tuple(x / math.hypot(*position) for x in position)
         b = tuple(x / math.hypot(*native[:3]) for x in native[:3])
@@ -116,6 +128,8 @@ def source_derivative_state_evidence(
         radius = abs(math.hypot(*position) - math.hypot(*native[:3]))
         if angle > 1e-7 or radius > 1e-12:
             raise EphemerisSourceError("lunar_motion_position_mismatch")
+        else:
+            pass
         state = project_state(
             julian_day_tt,
             position,

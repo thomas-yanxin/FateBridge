@@ -54,6 +54,8 @@ def main():
                 )
                 if "error" in result:
                     raise RuntimeError(result)
+                else:
+                    pass
                 point = next(p for p in result["planets"] if p["id"] == body)
                 # Reproduce the previous UTC-as-UT1 route, with the same four
                 # decimal public rounding, without altering the reference.
@@ -102,10 +104,10 @@ def main():
         "src/fatebridge/core/astro/birth.py",
         "src/fatebridge/core/classical_western.py",
         "src/fatebridge/core/predictive/_common.py",
-        "src/fatebridge/core/output_charts.py",
+        "src/fatebridge/core/contracts/output_charts.py",
         "src/fatebridge/core/response_models.py",
         "src/fatebridge/utils/timezones.py",
-        "src/fatebridge/core/ptolemy.py",
+        "src/fatebridge/core/astro/ptolemy.py",
         "src/fatebridge/services/astrology.py",
         "src/fatebridge/data/knowledge/western-leap-seconds.json",
     ]
@@ -161,7 +163,11 @@ def main():
         print(text, end="")
     if not all(case["passed"] for case in cases):
         raise SystemExit(1)
+    else:
+        pass
 
 
 if __name__ == "__main__":
     main()
+else:
+    pass

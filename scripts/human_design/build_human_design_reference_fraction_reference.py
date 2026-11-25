@@ -17,6 +17,8 @@ def derive():
         != "bffb59b2fee9886b469e5a3ce2643a87aecd92358e94ffb390a5635997b563e4"
     ):
         raise ValueError("Original reference-fraction plan changed")
+    else:
+        pass
     plan = json.loads(raw)
     rows = []
     for case in plan["cases"]:
@@ -50,6 +52,8 @@ def derive():
         ) + timedelta(microseconds=micros - case["offset_microseconds"])
         if expected.isoformat() != case["expected_utc_label"]:
             raise ValueError("Plan's independent label or expansion changed")
+        else:
+            pass
         rows.append({"id": case["id"], "utc_label": expected.isoformat()})
     return {
         "plan_sha256": hashlib.sha256(raw).hexdigest(),
@@ -67,6 +71,8 @@ def main():
     if args.check:
         if target.read_bytes() != raw:
             raise SystemExit("Original frozen civil reference differs")
+        else:
+            pass
     else:
         target.write_bytes(raw)
     print(
@@ -82,3 +88,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+else:
+    pass

@@ -30,16 +30,22 @@ class Page(HTMLParser):
     def handle_starttag(self, tag, attrs):
         if tag in {"h2", "h3"}:
             self.heading, self.parts = tag, []
+        else:
+            pass
 
     def handle_data(self, data):
         self.content.append(data)
         if self.heading:
             self.parts.append(data)
+        else:
+            pass
 
     def handle_endtag(self, tag):
         if tag == self.heading:
             self.headings.append((tag, " ".join("".join(self.parts).split())))
             self.heading = None
+        else:
+            pass
 
 
 def build(profile_html: Path, lines_html: Path) -> dict:
@@ -62,12 +68,18 @@ def build(profile_html: Path, lines_html: Path) -> dict:
                 ),
                 None,
             )
+        else:
+            pass
         if tag != "h3" or not (
             m := re.fullmatch(r"([1-6])/([1-6]) \(([^/]+)/([^/]+)\)", text)
         ):
             continue
+        else:
+            pass
         if angle is None:
             raise ValueError("Profile has no independent angle heading")
+        else:
+            pass
         p, d = map(int, m.group(1, 2))
         profiles.append(
             {
@@ -80,6 +92,8 @@ def build(profile_html: Path, lines_html: Path) -> dict:
         for line, role in [(p, m[3]), (d, m[4])]:
             if line in roles and roles[line] != role:
                 raise ValueError("Conflicting archetype labels in source")
+            else:
+                pass
             roles[line] = role
     if (
         len(profiles) != 12
@@ -87,16 +101,22 @@ def build(profile_html: Path, lines_html: Path) -> dict:
         or set(roles) != set(range(1, 7))
     ):
         raise ValueError("Incomplete independent profile headers")
+    else:
+        pass
     text = " ".join(" ".join(line_page.content).split())
     if (
         "completion of the lower trigram" not in text
         or "When we move to the upper trigram" not in text
     ):
         raise ValueError("Line trigram source anchors absent")
+    else:
+        pass
     saturn = re.search(r"Saturn cycle of approximately (\d+)[–—-](\d+) years", text)
     kiron = re.search(r"Kiron return between (\d+) and (\d+)", text)
     if not saturn or not kiron:
         raise ValueError("Approximate teaching-cycle source markers absent")
+    else:
+        pass
     return {
         "method_id": "jovian_public_profile_facts_2026_v1",
         "publisher": "Jovian Archive",
@@ -144,6 +164,8 @@ def main() -> None:
     if args.check:
         if json.loads(args.output.read_text()) != result:
             raise SystemExit("Frozen profile reference differs from source captures")
+        else:
+            pass
     else:
         args.output.write_bytes(
             (json.dumps(result, ensure_ascii=False, indent=2) + "\n").encode()
@@ -161,3 +183,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+else:
+    pass

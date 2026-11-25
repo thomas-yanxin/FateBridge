@@ -4,19 +4,23 @@ import copy
 import hashlib
 import json
 import shutil
+from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
 
-from fatebridge.core.output_chinese import Jinkou
-from fatebridge.core.output_ren_patterns import JinkouPatternEvaluation, JinkouPatterns
+from fatebridge.core.contracts.output_chinese import Jinkou
+from fatebridge.core.contracts.output_ren_patterns import (
+    JinkouPatternEvaluation,
+    JinkouPatterns,
+)
 from scripts.ren.audit_jinkou_pattern_outline import CORPUS, audit, reference
 
 
 @pytest.mark.parametrize(
     "fault", ["data", "manifest", "missing", "extra", "joint_rewrite"]
 )
-def test_frozen_outline_identity_is_not_redefinable(fault, tmp_path):
+def test_frozen_outline_identity_is_not_redefinable(fault: str, tmp_path: Path) -> None:
     folder = tmp_path / "source"
     shutil.copytree(CORPUS, folder)
     p = folder / "reference.json"
@@ -28,6 +32,8 @@ def test_frozen_outline_identity_is_not_redefinable(fault, tmp_path):
             m = json.loads((folder / "freeze.json").read_text())
             m["reference.json"] = hashlib.sha256(p.read_bytes()).hexdigest()
             (folder / "freeze.json").write_text(json.dumps(m))
+        else:
+            pass
     elif fault == "manifest":
         (folder / "freeze.json").write_text("{}")
     elif fault == "missing":
@@ -38,7 +44,9 @@ def test_frozen_outline_identity_is_not_redefinable(fault, tmp_path):
         reference(folder)
 
 
-def test_source_definition_and_unknown_fragments_keep_full_predeclared_denominators():
+def test_source_definition_and_unknown_fragments_keep_full_predeclared_denominators() -> (
+    None
+):
     result = audit()
     assert result["counts"] == dict(
         invalid=344, invalid_accepted=0, valid=144, valid_rejected=0, valid_changed=0
@@ -57,13 +65,15 @@ def test_source_definition_and_unknown_fragments_keep_full_predeclared_denominat
         {"extension": {"source_unreviewed": True}},
     ],
 )
-def test_missing_course_or_id_never_invents_an_outcome(value):
+def test_missing_course_or_id_never_invents_an_outcome(value) -> None:
     original = copy.deepcopy(value)
     got = JinkouPatternEvaluation.model_validate(value).model_dump(exclude_unset=True)
     assert got == original
 
 
-def test_partial_source_validation_does_not_rewrite_existing_aliases_or_predicates():
+def test_partial_source_validation_does_not_rewrite_existing_aliases_or_predicates() -> (
+    None
+):
     from fatebridge.core.metaphysics.jinkou_patterns import (
         pattern_identity,
         pattern_metadata,
@@ -78,7 +88,7 @@ def test_partial_source_validation_does_not_rewrite_existing_aliases_or_predicat
     assert ref["unknown_ids"] == ["P52", "P53", "P56", "P57", "P58", "P59"]
 
 
-def test_trace_only_source_claims_are_checked_without_inventing_a_raw_course():
+def test_trace_only_source_claims_are_checked_without_inventing_a_raw_course() -> None:
     source = reference()["metadata"]["source_url"]
     value = {
         "rule_trace": [
@@ -101,7 +111,9 @@ def test_trace_only_source_claims_are_checked_without_inventing_a_raw_course():
         assert Jinkou.model_validate(other).model_dump(exclude_unset=True) == other
 
 
-def test_selected_id_does_not_allow_unresolved_definition_promotion_by_omitting_status():
+def test_selected_id_does_not_allow_unresolved_definition_promotion_by_omitting_status() -> (
+    None
+):
     for value in [True, False]:
         with pytest.raises(ValidationError):
             JinkouPatternEvaluation.model_validate(dict(id="P52", matched=value))

@@ -19,6 +19,8 @@ def build() -> str:
         raw = (SOURCE / "sources" / name).read_bytes()
         if hashlib.sha256(raw).hexdigest() != record["sha256"]:
             raise ValueError("Pinned primary source changed: " + name)
+        else:
+            pass
         sources[name] = re.sub(r"/\*.*?\*/", "", raw.decode(), flags=re.S)
     coefficients = {}
     for name, body in re.findall(
@@ -29,6 +31,8 @@ def build() -> str:
         numbers = [float(n) for n in re.findall(NUMBER, body)]
         if len(numbers) % 3:
             raise ValueError("Incomplete harmonic term")
+        else:
+            pass
         coefficients[name] = [numbers[i : i + 3] for i in range(0, len(numbers), 3)]
     assert set(coefficients) == {
         f"{kind}{power}{axis}" for kind in "es" for power in range(3) for axis in "xyz"
@@ -36,6 +40,8 @@ def build() -> str:
     nutation = re.search(r"x\[\] = \{(.*?)\};", sources["nut00b.c"], re.S)
     if nutation is None:
         raise ValueError("Missing nutation series")
+    else:
+        pass
     rows = [
         [float(v) for v in re.findall(NUMBER, row)]
         for row in re.findall(r"\{([^{}]+)\}", nutation[1])
@@ -46,6 +52,8 @@ def build() -> str:
         match = re.search(rf"\b{name}\s*=\s*({NUMBER})", sources["epv00.c"])
         if match is None:
             raise ValueError("Missing orientation constant: " + name)
+        else:
+            pass
         orientation[name] = float(match[1])
     return (
         json.dumps(
@@ -75,12 +83,16 @@ def main() -> int:
     if args.check:
         if not DESTINATION.exists() or DESTINATION.read_text() != expected:
             raise SystemExit("Analytic solar profile is stale")
+        else:
+            pass
         if (
             not DESTINATION.with_name("erfa-license.txt").exists()
             or DESTINATION.with_name("erfa-license.txt").read_text()
             != (SOURCE / "sources/LICENSE").read_text()
         ):
             raise SystemExit("The distributed ERFA license is missing or changed")
+        else:
+            pass
         print("Analytic solar coefficients match pinned ERFA sources")
     else:
         DESTINATION.parent.mkdir(parents=True, exist_ok=True)
@@ -93,3 +105,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

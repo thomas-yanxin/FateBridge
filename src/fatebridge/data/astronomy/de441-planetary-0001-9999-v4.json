@@ -1,0 +1,320 @@
+{
+  "model_id": "lossless_de441_planetary_source_v4",
+  "source_version": "JPL DE441, Park-Folkner-Williams-Boggs 2021",
+  "source_url": "https://ssd.jpl.nasa.gov/ftp/eph/planets/Linux/de441/linux_m13000p17000.441",
+  "paper_url": "https://doi.org/10.3847/1538-3881/abd414",
+  "source_object": "Original planetary-system barycenters, EMB, geocentric Moon and barycentric Sun",
+  "source_frame": "ICRF",
+  "source_time_scale": "TDB",
+  "source_position_unit": "km",
+  "source_AU_km": 149597870.7,
+  "source_EMRAT": 81.30056822149722,
+  "binary_order": "little_endian_float64",
+  "source_TDB_JD_bounds": [
+    1721392.5,
+    5373520.5
+  ],
+  "record_days": 32.0,
+  "record_count": 114129,
+  "record_size_words": 816,
+  "records_per_chunk": 8192,
+  "groups": {
+    "Mercury": {
+      "source_group": 0,
+      "source_pointer": [
+        3,
+        14,
+        4
+      ],
+      "offset_words": 0,
+      "coefficient_count": 14,
+      "subintervals": 4
+    },
+    "Venus": {
+      "source_group": 1,
+      "source_pointer": [
+        171,
+        10,
+        2
+      ],
+      "offset_words": 168,
+      "coefficient_count": 10,
+      "subintervals": 2
+    },
+    "EarthMoonBarycenter": {
+      "source_group": 2,
+      "source_pointer": [
+        231,
+        13,
+        2
+      ],
+      "offset_words": 228,
+      "coefficient_count": 13,
+      "subintervals": 2
+    },
+    "Mars": {
+      "source_group": 3,
+      "source_pointer": [
+        309,
+        11,
+        1
+      ],
+      "offset_words": 306,
+      "coefficient_count": 11,
+      "subintervals": 1
+    },
+    "Jupiter": {
+      "source_group": 4,
+      "source_pointer": [
+        342,
+        8,
+        1
+      ],
+      "offset_words": 339,
+      "coefficient_count": 8,
+      "subintervals": 1
+    },
+    "Saturn": {
+      "source_group": 5,
+      "source_pointer": [
+        366,
+        7,
+        1
+      ],
+      "offset_words": 363,
+      "coefficient_count": 7,
+      "subintervals": 1
+    },
+    "Uranus": {
+      "source_group": 6,
+      "source_pointer": [
+        387,
+        6,
+        1
+      ],
+      "offset_words": 384,
+      "coefficient_count": 6,
+      "subintervals": 1
+    },
+    "Neptune": {
+      "source_group": 7,
+      "source_pointer": [
+        405,
+        6,
+        1
+      ],
+      "offset_words": 402,
+      "coefficient_count": 6,
+      "subintervals": 1
+    },
+    "Pluto": {
+      "source_group": 8,
+      "source_pointer": [
+        423,
+        6,
+        1
+      ],
+      "offset_words": 420,
+      "coefficient_count": 6,
+      "subintervals": 1
+    },
+    "MoonGeocentric": {
+      "source_group": 9,
+      "source_pointer": [
+        441,
+        13,
+        8
+      ],
+      "offset_words": 438,
+      "coefficient_count": 13,
+      "subintervals": 8
+    },
+    "Sun": {
+      "source_group": 10,
+      "source_pointer": [
+        753,
+        11,
+        2
+      ],
+      "offset_words": 750,
+      "coefficient_count": 11,
+      "subintervals": 2
+    }
+  },
+  "storage": "source_time_chunks_original_binary64_record_byte_channels_gzip_v1",
+  "chunks": [
+    {
+      "file": "de441-planetary-0001-9999-v4-part-00.bin.gz",
+      "first_record": 0,
+      "record_count": 8192,
+      "uncompressed_bytes": 53477376,
+      "uncompressed_sha256": "92d5399b396fa933a60e3073d3b74be7e328a6f6d7bfe681af823c8d23021d7a",
+      "compressed_bytes": 45056862,
+      "compressed_sha256": "e799d4a73e8cdfe2cb1f77ccff368d6fe53b52802a1430b492a0f971375793fa"
+    },
+    {
+      "file": "de441-planetary-0001-9999-v4-part-01.bin.gz",
+      "first_record": 8192,
+      "record_count": 8192,
+      "uncompressed_bytes": 53477376,
+      "uncompressed_sha256": "0b70e0237975b3c800d5ab8862325c2e66a1a8b51ac1ff0a8a80b18998045805",
+      "compressed_bytes": 45057613,
+      "compressed_sha256": "cebf1a69d45dcf0fe10c031b6951179bcbbf58428dd394e80a7bf4eef05ee7c9"
+    },
+    {
+      "file": "de441-planetary-0001-9999-v4-part-02.bin.gz",
+      "first_record": 16384,
+      "record_count": 8192,
+      "uncompressed_bytes": 53477376,
+      "uncompressed_sha256": "567958ddc60e8bd3cb632753009fad625294724f2fbd3bb9bae01dde2f11e8ce",
+      "compressed_bytes": 45057126,
+      "compressed_sha256": "b6eb897432cb3030e5bccb39eb4e0698c254263974f68a65c3bf838a020f9bb7"
+    },
+    {
+      "file": "de441-planetary-0001-9999-v4-part-03.bin.gz",
+      "first_record": 24576,
+      "record_count": 8192,
+      "uncompressed_bytes": 53477376,
+      "uncompressed_sha256": "a428d04f3b7bc5e13d7e3368434cb685a66b0984544312931dcef9a419c48f7d",
+      "compressed_bytes": 45061475,
+      "compressed_sha256": "0613a72cd8b75b7c035db4e6cf2d0bf7bef87fd657a7180f65ef1ad5870d245e"
+    },
+    {
+      "file": "de441-planetary-0001-9999-v4-part-04.bin.gz",
+      "first_record": 32768,
+      "record_count": 8192,
+      "uncompressed_bytes": 53477376,
+      "uncompressed_sha256": "8654eeeeca7fc60dfceaf46740eb3a3e2cc6730fad30ca95f3421cf339f5eb06",
+      "compressed_bytes": 45055684,
+      "compressed_sha256": "46412cc981ceb2616b529f2caa3b892bb1b867033ef01f5e1c77e1d369a16236"
+    },
+    {
+      "file": "de441-planetary-0001-9999-v4-part-05.bin.gz",
+      "first_record": 40960,
+      "record_count": 8192,
+      "uncompressed_bytes": 53477376,
+      "uncompressed_sha256": "beeb87b9435781f9002ff568e53cfde1490edcbf354ba94dd8883655043560bb",
+      "compressed_bytes": 45052670,
+      "compressed_sha256": "a950bd267ed4cffc0a2a411e2331cadf43e8f6ed3537640092045fa6414a667b"
+    },
+    {
+      "file": "de441-planetary-0001-9999-v4-part-06.bin.gz",
+      "first_record": 49152,
+      "record_count": 8192,
+      "uncompressed_bytes": 53477376,
+      "uncompressed_sha256": "63e9787444c82caa3d1d26ffbc74fee75fca893599943c43c307fdc2deb31196",
+      "compressed_bytes": 45039742,
+      "compressed_sha256": "9bdf24c2eb6b3ec5d635c5080afee5f3dad89cd68bce47446a3486e9ad236342"
+    },
+    {
+      "file": "de441-planetary-0001-9999-v4-part-07.bin.gz",
+      "first_record": 57344,
+      "record_count": 8192,
+      "uncompressed_bytes": 53477376,
+      "uncompressed_sha256": "807049ca57c391c7852748d468da5465fd5c666fea97abfb89095ff465d649ed",
+      "compressed_bytes": 45048895,
+      "compressed_sha256": "046f5c488020f1d0cf176b2393cb047fe22c10ecfa3140043f7f397e8bbeeff3"
+    },
+    {
+      "file": "de441-planetary-0001-9999-v4-part-08.bin.gz",
+      "first_record": 65536,
+      "record_count": 8192,
+      "uncompressed_bytes": 53477376,
+      "uncompressed_sha256": "0f7b0dbd40775e99d7b30ffa1b137b8f161f37512313ff6f5fb42fea5d9f561b",
+      "compressed_bytes": 45039356,
+      "compressed_sha256": "1371c9c08e58b32374263401a1cd6749f556f5e4313cae9e4f40dee40fbef9a5"
+    },
+    {
+      "file": "de441-planetary-0001-9999-v4-part-09.bin.gz",
+      "first_record": 73728,
+      "record_count": 8192,
+      "uncompressed_bytes": 53477376,
+      "uncompressed_sha256": "7a039de6574b5eed39973a14f08d658249fb344650722e4c1d00a48f7023b76d",
+      "compressed_bytes": 45044722,
+      "compressed_sha256": "54fc8f232e5e92071b97ed67417d99fe356d3924d96df5a4dc9c0b78b0515040"
+    },
+    {
+      "file": "de441-planetary-0001-9999-v4-part-10.bin.gz",
+      "first_record": 81920,
+      "record_count": 8192,
+      "uncompressed_bytes": 53477376,
+      "uncompressed_sha256": "78ad3b7a014d83de841d425d2c34e57e5752d570b1b9f082c94eb297700255b3",
+      "compressed_bytes": 45034821,
+      "compressed_sha256": "b1215b4f5d034de884816f92c4658bf86f112ff9ffd948301b1ff0368b8c80f2"
+    },
+    {
+      "file": "de441-planetary-0001-9999-v4-part-11.bin.gz",
+      "first_record": 90112,
+      "record_count": 8192,
+      "uncompressed_bytes": 53477376,
+      "uncompressed_sha256": "137532e496344422888da1dcb362ea0a8cfa513f20ee51a80e45f969c0caee5b",
+      "compressed_bytes": 45043539,
+      "compressed_sha256": "160492dca109523e605bfec9e959ac3809d4269d826ac0af93a67388c5c2fdf0"
+    },
+    {
+      "file": "de441-planetary-0001-9999-v4-part-12.bin.gz",
+      "first_record": 98304,
+      "record_count": 8192,
+      "uncompressed_bytes": 53477376,
+      "uncompressed_sha256": "da7a1f5458b13c71dcf0e567a715f828ef952696bd32033597e0a4930856c0c2",
+      "compressed_bytes": 45035879,
+      "compressed_sha256": "313fd7c18cec85a13c9f924a588795a926d180297b207537d1aaabf4fba3790f"
+    },
+    {
+      "file": "de441-planetary-0001-9999-v4-part-13.bin.gz",
+      "first_record": 106496,
+      "record_count": 7633,
+      "uncompressed_bytes": 49828224,
+      "uncompressed_sha256": "bfee202a2df2473afff99181fb670bc6fc541ad82b074463a1670d895266ff0a",
+      "compressed_bytes": 42004798,
+      "compressed_sha256": "0bbb8eba8690e0efaaa89038e57e62da53735519ba958a41afa2aae585f483b9"
+    }
+  ],
+  "uncompressed_bytes": 745034112,
+  "uncompressed_sha256": "4153cc6ae77a902184639f332ca60a91b692409d9d498c041e96a509826255d2",
+  "compressed_bytes": 627633182,
+  "coefficient_counts_subcells_axes_and_coverage_preserved": true,
+  "original_float_coefficients_bitwise_preserved": true,
+  "source_selected_float64_sha256": "4153cc6ae77a902184639f332ca60a91b692409d9d498c041e96a509826255d2",
+  "source_file_sha256": "88289997e437cf115a95fc60d787129f7213952ecae323035ce341325674eee1",
+  "source_header_sha256": "141c4243cd6c245545cca6f0f7d20d557ec67414a93c79aa90857f998442d8b5",
+  "source_manifest_sha256": "942787c91479fcb6d4a49cba31e7805e637c423304f1e122003fcdf22a31d3b4",
+  "coefficient_representation": {
+    "method": "original_selected_binary64_bytes_copied_without_numeric_conversion",
+    "coefficient_rounding_or_quantization_applied": false,
+    "scope": "Selected original coefficient bytes only; excludes evaluator rounding, source physics, time conversion, optical mapping and output frame."
+  },
+  "derived_states": {
+    "Earth": "EMB - geocentricMoon/(1+EMRAT)",
+    "Moon": "Earth + geocentricMoon"
+  },
+  "frame_bias": {
+    "ICRF_to_mean_J2000": [
+      [
+        0.9999999999999941,
+        -7.078368960971559e-08,
+        8.056213977613186e-08
+      ],
+      [
+        7.078368694637678e-08,
+        0.9999999999999969,
+        3.305943738009795e-08
+      ],
+      [
+        -8.056214211620057e-08,
+        -3.305943169468331e-08,
+        0.9999999999999962
+      ]
+    ],
+    "source": "https://github.com/liberfa/erfa/blob/v2.0.1/src/bp06.c",
+    "calculation_epoch_TT_JD": [
+      2451545.0,
+      0.0
+    ],
+    "ERFA_version": "2.0.1",
+    "pyerfa_version": "2.0.1.5"
+  },
+  "runtime_usage": "One shared barycentric receiver/target source; TT-tagged lookup uses declared geocentricTDB(TT). Source TDB velocity supplies observer aberration; displayed longitude is differentiated in TT through the complete mapping.",
+  "derived_product_producer": "FateBridge project contributors; selected original binary64 coefficient bytes and reversible byte-channel/gzip time chunks. Not a complete unmodified NASA kernel or provider endorsement.",
+  "source_qualification": "Prepared continuous source span with guard records, not the whole remote2.79GB file. Source-file SHA and original download manifest are separate commitments. Selected original8-byte coefficient fields are copied without numeric conversion; source/time coverage retained. Independent acceptance is separate from generation. No observational, optical or broad civil-clock certification."
+}

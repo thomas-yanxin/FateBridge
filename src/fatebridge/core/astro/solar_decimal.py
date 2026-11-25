@@ -14,7 +14,7 @@ import math
 from decimal import Decimal, localcontext
 from fractions import Fraction
 from importlib.resources import files
-from typing import Any, Dict, List, Optional, Sequence, Tuple, TypedDict
+from typing import Any, Sequence, TypedDict
 
 from fatebridge.core import ephemeris_runtime
 from fatebridge.core.astro import moshier_lunar_geometry, reference_frames, runtime
@@ -43,6 +43,7 @@ MOSHIER_LUNAR_METHOD_ID = (
     "native_moshier_forward_moon_backward_earth_decimal_reduction_v1"
 )
 Vector = Sequence[Decimal]
+MoshierGeometricStates = dict[tuple[float, int, int], tuple[Decimal, ...]]
 
 
 class SourceVelocityReceipt(TypedDict):
@@ -57,18 +58,18 @@ class SourceVelocityReceipt(TypedDict):
 
 class LunarSourceVelocityReceipt(SourceVelocityReceipt):
     lunar_operator: SourceVelocityReceipt
-    lunar_geometry: Dict[str, str]
+    lunar_geometry: dict[str, str]
 
 
 class ReductionReceipt(TypedDict):
     frame_orthogonality_error: float
     epoch_remainder_days: float
-    solar_interpolation_branch: Dict[str, object]
+    solar_interpolation_branch: dict[str, object]
     ephemeris_model: str
-    source_velocity: Optional[SourceVelocityReceipt]
+    source_velocity: SourceVelocityReceipt | None
 
 
-def mass_profile() -> List[Tuple[Decimal, Decimal]]:
+def mass_profile() -> list[tuple[Decimal, Decimal]]:
     """Check the reviewed source table on every fallback sample, without caching."""
     try:
         raw = (
@@ -78,6 +79,8 @@ def mass_profile() -> List[Tuple[Decimal, Decimal]]:
         )
         if hashlib.sha256(raw).hexdigest() != PROFILE_SHA256:
             raise ValueError("Changed finite-Sun source profile")
+        else:
+            pass
         data = json.loads(raw)
         return [(Decimal(r), Decimal(m)) for r, m in data["radius_mass_pairs"]]
     except (OSError, ValueError, KeyError, TypeError) as error:
@@ -88,19 +91,19 @@ def dot(a: Vector, b: Vector) -> Decimal:
     return sum((x * y for x, y in zip(a, b)), Decimal(0))
 
 
-def add(a: Vector, b: Vector) -> List[Decimal]:
+def add(a: Vector, b: Vector) -> list[Decimal]:
     return [x + y for x, y in zip(a, b)]
 
 
-def sub(a: Vector, b: Vector) -> List[Decimal]:
+def sub(a: Vector, b: Vector) -> list[Decimal]:
     return [x - y for x, y in zip(a, b)]
 
 
-def scale(a: Vector, value: Decimal) -> List[Decimal]:
+def scale(a: Vector, value: Decimal) -> list[Decimal]:
     return [x * value for x in a]
 
 
-def cross(a: Vector, b: Vector) -> List[Decimal]:
+def cross(a: Vector, b: Vector) -> list[Decimal]:
     return [
         a[1] * b[2] - a[2] * b[1],
         a[2] * b[0] - a[0] * b[2],
@@ -112,16 +115,18 @@ def norm(a: Vector) -> Decimal:
     return dot(a, a).sqrt()
 
 
-def unit(a: Vector) -> List[Decimal]:
+def unit(a: Vector) -> list[Decimal]:
     size = norm(a)
     if not size.is_finite() or size <= 0:
         raise EphemerisSourceError("coordinate_values_unavailable")
+    else:
+        pass
     return scale(a, Decimal(1) / size)
 
 
 def stable_interpolation_cell(
     impact: Decimal, angular_radius: Decimal, observer_to_target_ratio: Decimal
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Classify the stable reduction's cell, retaining its arithmetic margin.
 
     The cross product avoids sqrt(1-dot²)'s inverse-radius-squared loss.
@@ -136,6 +141,8 @@ def stable_interpolation_cell(
         or observer_to_target_ratio <= 0
     ):
         raise EphemerisSourceError("coordinate_values_unavailable")
+    else:
+        pass
     pad = (
         64
         * Decimal.from_float(math.ulp(1.0))
@@ -164,12 +171,13 @@ def reduced_longitude(
     *,
     sidereal: bool,
     trace: PhysicalEphemerisTrace,
-    contexts: Dict[str, Any],
+    contexts: dict[str, Any],
     prefix: str,
-    center_source: Dict[str, Any],
+    center_source: dict[str, Any],
     model: str = "swieph",
     source_step_days: float = 0.0625,
-) -> Tuple[float, ReductionReceipt]:
+    moshier_geometric_states: MoshierGeometricStates | None = None,
+) -> tuple[float, ReductionReceipt]:
     """Reduce shared Swiss geometric states, retaining the center file cohort.
 
     Swiss/JPL use their two iterations and geometric retarded state, restoring
@@ -180,7 +188,8 @@ def reduced_longitude(
     The source-speed operators use checked geometric polynomials.
     Shared high-precision deflection and aberration are
     transformed by native frame pairs. This is source arithmetic, not an
-    independent ephemeris or a physical accuracy bound.
+    independent ephemeris or a physical accuracy bound. The Moshier caller may
+    share checked native geometry across samples of one locked derivative.
     """
     swe = runtime.swe
     if (
@@ -194,6 +203,8 @@ def reduced_longitude(
         or model not in {"swieph", "jpl", "moshier"}
     ):
         raise EphemerisSourceError("coordinate_motion_unavailable")
+    else:
+        pass
     selected = configured_ephemeris_path()
     base = (
         (swe.FLG_MOSEPH if model == "moshier" else swe.FLG_SWIEPH)
@@ -207,28 +218,52 @@ def reduced_longitude(
     for name in COORDINATE_FLAGS:
         mask |= getattr(swe, name)
 
-    def state(at: float, body: int, flags: int, suffix: str) -> List[Decimal]:
-        values, returned = runtime.ephemeris_call("calc", at, body, flags)
-        assert_physical_configuration(selected)
-        expected = flags | swe.FLG_NOABERR | swe.FLG_NOGDEFL
-        if flags & (swe.FLG_J2000 | swe.FLG_SIDEREAL):
-            expected |= swe.FLG_NONUT
-        if (
-            returned < 0
-            or returned & mask != expected & mask
-            or not returned & swe.FLG_SPEED
-        ):
-            raise EphemerisSourceError("coordinate_contract_changed")
-        if runtime.ephemeris_model_from_retflag(returned) != model:
-            raise EphemerisSourceError("model_changed")
-        if len(values) != 6 or not all(math.isfinite(x) for x in values):
-            raise EphemerisSourceError("coordinate_values_unavailable")
+    def state(at: float, body: int, flags: int, suffix: str) -> list[Decimal]:
+        key = (at, body, flags)
+        geometry = (
+            moshier_geometric_states.get(key)
+            if moshier_geometric_states is not None
+            else None
+        )
+        if geometry is None:
+            values, returned = runtime.ephemeris_call("calc", at, body, flags)
+            assert_physical_configuration(selected)
+            expected = flags | swe.FLG_NOABERR | swe.FLG_NOGDEFL
+            if flags & (swe.FLG_J2000 | swe.FLG_SIDEREAL):
+                expected |= swe.FLG_NONUT
+            else:
+                pass
+            if (
+                returned < 0
+                or returned & mask != expected & mask
+                or not returned & swe.FLG_SPEED
+            ):
+                raise EphemerisSourceError("coordinate_contract_changed")
+            else:
+                pass
+            if runtime.ephemeris_model_from_retflag(returned) != model:
+                raise EphemerisSourceError("model_changed")
+            else:
+                pass
+            if len(values) != 6 or not all(math.isfinite(x) for x in values):
+                raise EphemerisSourceError("coordinate_values_unavailable")
+            else:
+                pass
+            geometry = tuple(Decimal.from_float(float(x)) for x in values)
+            if moshier_geometric_states is not None:
+                moshier_geometric_states[key] = geometry
+            else:
+                pass
+        else:
+            assert_physical_configuration(selected)
         factor = prefix + suffix
         context = trace.observe(factor, model, record_factor=False)
         contexts[factor] = context
         if context != center_source:
             raise EphemerisSourceError("dependency_source_window_incoherent")
-        return [Decimal.from_float(float(x)) for x in values]
+        else:
+            pass
+        return list(geometry)
 
     with (
         localcontext() as ctx,
@@ -250,7 +285,9 @@ def reduced_longitude(
         earth = state(epoch, swe.EARTH, fixed | origin, "_earth")
         if planet == "Moon":
             initial[:3] = moshier_lunar_geometry.equatorial(epoch, epoch)
-        source_velocity: Optional[SourceVelocityReceipt] = None
+        else:
+            pass
+        source_velocity: SourceVelocityReceipt | None = None
         if model == "moshier":
             # swi_moshplan uses a short backward difference inside light time
             # and aberration. Evaluating its small numerator directly injects
@@ -268,6 +305,8 @@ def reduced_longitude(
                 if planet == "Sun" and role == "body":
                     # The analytical model's heliocentric Sun is the origin.
                     continue
+                else:
+                    pass
                 lunar = planet == "Moon" and role == "body"
                 interval_days = 0.00005 if lunar else 0.0001
                 operator_at = Fraction(interval_days) / Fraction(source_step_days)
@@ -304,6 +343,8 @@ def reduced_longitude(
                         position[:3] = moshier_lunar_geometry.equatorial(
                             epoch + i * source_step_days, epoch
                         )
+                else:
+                    pass
                 target[3:] = [
                     sum(
                         (
@@ -343,6 +384,8 @@ def reduced_longitude(
                     },
                 }
                 source_velocity = lunar_velocity
+            else:
+                pass
         else:
             sun = state(epoch, swe.SUN, fixed | origin, "_sun")
         rough = initial[:3]
@@ -374,7 +417,7 @@ def reduced_longitude(
             # app_pos_etc_sun has no solar self-deflection. There is no
             # effective-mass knot in this model, rather than a selected cell.
             deflected = ray
-            source_cell: Dict[str, object] = {
+            source_cell: dict[str, object] = {
                 "method_id": "moshier_solar_no_self_deflection_v1",
                 "status": "not_in_source_model",
                 "cell": "no_solar_deflection",
@@ -385,6 +428,8 @@ def reduced_longitude(
                     method_id="moshier_lunar_no_solar_deflection_v1",
                     scope="The geocentric Moshier lunar source omits solar deflection; its Moon/Earth geometric source-range intersection restricts this sampled branch.",
                 )
+            else:
+                pass
         else:
             mass = mass_profile()
             radius = norm(ray)
@@ -410,6 +455,8 @@ def reduced_longitude(
                     if impact >= r1:
                         fraction = m0 + (impact - r0) * (m1 - m0) / (r1 - r0)
                         break
+                    else:
+                        pass
                 else:
                     raise EphemerisSourceError("coordinate_values_unavailable")
             strength = (
@@ -418,6 +465,8 @@ def reduced_longitude(
             denominator = dot(add(q, e), add(q, e)) / 2
             if denominator <= 0:
                 raise EphemerisSourceError("coordinate_motion_unavailable")
+            else:
+                pass
             deflected = scale(
                 add(u, scale(cross(u, cross(e, q)), strength / denominator)), radius
             )
@@ -445,6 +494,8 @@ def reduced_longitude(
         )
         if returned < 0 or not all(math.isfinite(v) for v in angles[:4]):
             raise EphemerisSourceError("coordinate_values_unavailable")
+        else:
+            pass
         true_epsilon, mean_epsilon, psi, deps = angles[:4]
         matrix = reference_frames.mm(
             reference_frames.ecliptic_rotation(
@@ -463,10 +514,14 @@ def reduced_longitude(
             )
             if returned < 0 or not math.isfinite(ayanamsa):
                 raise EphemerisSourceError("coordinate_values_unavailable")
+            else:
+                pass
             c, s = math.cos(math.radians(ayanamsa)), math.sin(math.radians(ayanamsa))
             matrix = reference_frames.mm(
                 ((c, s, 0.0), (-s, c, 0.0), (0.0, 0.0, 1.0)), matrix
             )
+        else:
+            pass
         decimal_matrix = [[Decimal.from_float(v) for v in row] for row in matrix]
         orthogonal = max(
             abs(
@@ -493,6 +548,8 @@ def reduced_longitude(
         )
         if max(orthogonal, model_error, abs(determinant - 1)) > Decimal("1e-10"):
             raise EphemerisSourceError("coordinate_contract_changed")
+        else:
+            pass
         displayed = [dot(row, apparent) for row in decimal_matrix]
         longitude = (
             math.degrees(math.atan2(float(displayed[1]), float(displayed[0]))) % 360

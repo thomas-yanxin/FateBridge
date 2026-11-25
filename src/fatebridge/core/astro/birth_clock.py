@@ -8,17 +8,18 @@ inversion use FateBridge's shared TT/UT1 policy, including historical UTC.
 from __future__ import annotations
 
 import math
+from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from fractions import Fraction
-from typing import Any, Dict, Tuple
+from typing import Any
 
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.earth_attitude import earth_attitude
 from fatebridge.core.astro.iers_ut1 import active_ut1
-from fatebridge.core.astro.julian_day import _julian_day
 from fatebridge.core.astro.native_coordinates import require_spherical_coordinates
 from fatebridge.core.astro.physical_epoch import PhysicalEpoch
 from fatebridge.core.astro.reference_frames import rotate_spherical
+from fatebridge.core.astro.rotation_policy import earth_rotation_policy
 from fatebridge.core.astro.solar_sources import SunSourceCohort, sun_source
 from fatebridge.core.astro.source_session import (
     coherent_ephemeris_sources,
@@ -27,16 +28,37 @@ from fatebridge.core.astro.source_session import (
 )
 from fatebridge.core.astro.time_scales import (
     ephemeris_time,
-    tt_from_ut1,
+    historical_mean_solar_time,
+    resolve_tt_from_ut1,
 )
-from fatebridge.core.astro_models import earth_rotation_policy
+from fatebridge.core.astro.tt_epoch import TTInstant
+from fatebridge.core.astro.ut1_epoch import UT1Instant
 from fatebridge.core.ephemeris_runtime import configured_ephemeris_path
+from fatebridge.utils.civil_time import CivilPoint, utc_calendar
 from fatebridge.utils.errors import EphemerisSourceError
 
 RULESET = "fatebridge.local_solar_birth_clock.v1"
 SOLAR_BASES = {"local_mean_solar", "local_apparent_solar"}
+_PRE_ATOMIC_END = utc_calendar(
+    datetime(1960, 1, 1, tzinfo=timezone.utc)
+).julian_day_exact()
 SOURCE_URL = "https://www.astro.com/swisseph/swephprg.htm"
 CODE_URL = "https://github.com/aloistr/swisseph/blob/v2.10.03/sweph.c#L7280-L7333"
+
+
+@dataclass(frozen=True, init=False)
+class SolarClockContext:
+    ut1: UT1Instant
+    tt: TTInstant
+
+    def __init__(self, ut1: UT1Instant | float, tt: TTInstant) -> None:
+        object.__setattr__(self, "ut1", UT1Instant.from_value(ut1))
+        object.__setattr__(self, "tt", tt)
+
+    @property
+    def jd_ut1(self) -> float:
+        """Scalar native-query/display adapter of the retained UT1 point."""
+        return self.ut1.as_float()
 
 
 def _validate(basis: str, longitude: float, ephemeris_policy: str = "auto") -> None:
@@ -44,21 +66,27 @@ def _validate(basis: str, longitude: float, ephemeris_policy: str = "auto") -> N
         raise ValueError(
             "Solar birth clock requires local_mean_solar or local_apparent_solar"
         )
+    else:
+        pass
     if not math.isfinite(longitude) or not -180 <= longitude <= 180:
         raise ValueError("Solar clock longitude must be finite and within -180..180")
+    else:
+        pass
     if ephemeris_policy not in {"auto", "require_data_files"}:
         raise ValueError("Unsupported solar clock ephemeris policy")
+    else:
+        pass
     if runtime.swe is None:
         raise ValueError("Swiss Ephemeris is required for local solar clock conversion")
+    else:
+        pass
 
 
 @coherent_ephemeris_sources
 def _sun_clock(
-    jd_ut1: float,
+    context: SolarClockContext,
     ephemeris_policy: str = "auto",
-    *,
-    _julian_day_tt: float | None = None,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """EOT from apparent solar hour angle, evaluated in the shared TT policy.
 
     Uses the documented Swiss time_equ hour-angle expression in the selected
@@ -70,17 +98,17 @@ def _sun_clock(
     """
     swe = runtime.swe
     assert swe is not None
-    # A forward civil conversion already has its primary TT. Do not round-trip
-    # that through model UT1 and introduce a second JD rounding at a file edge.
-    # Solar-input inversions still obtain TT from their UT1 search coordinate.
-    jd_tt = tt_from_ut1(jd_ut1) if _julian_day_tt is None else _julian_day_tt
+    # Forward civil clocks retain their primary TT. Solar-input inversions
+    # construct this same context from their represented UT1 search coordinate.
+    ut1 = context.ut1
+    tt = context.tt
     coords, flag = runtime.ephemeris_call(
-        "calc", jd_tt, swe.SUN, swe.FLG_SWIEPH | swe.FLG_EQUATORIAL
+        "calc", tt.as_float(), swe.SUN, swe.FLG_SWIEPH | swe.FLG_EQUATORIAL
     )
     ra, dec, _ = require_spherical_coordinates(
         coords, flag, native=swe, equatorial=True
     )
-    attitude = earth_attitude(swe, jd_ut1, julian_day_tt=jd_tt)
+    attitude = earth_attitude(swe, ut1, julian_day_tt=tt)
     ra, _ = rotate_spherical(attitude.reduction.native_to_target, ra, dec)
     model = runtime.ephemeris_model_from_retflag(flag)
     session = current_source_session()
@@ -88,19 +116,15 @@ def _sun_clock(
     session.check()
     row = session.trace.observe("equatorial_Sun", model)
     physical_source = sun_source(session.trace.snapshot(), row)
-    sidereal_hours = runtime.ephemeris_call("sidtime", jd_ut1, _julian_day_tt=jd_tt)
-    try:
-        gast = float(sidereal_hours) * 15
-    except (TypeError, ValueError, OverflowError) as error:
-        raise EphemerisSourceError("coordinate_values_unavailable") from error
-    if not math.isfinite(gast) or not 0 <= gast < 360:
-        raise EphemerisSourceError("coordinate_values_unavailable")
+    gast = attitude.equator.greenwich_sidereal_degrees
     if ephemeris_policy == "require_data_files" and model not in {"swieph", "jpl"}:
         raise ValueError("Local solar clock requires data files; Sun used " + model)
-    day_fraction = (Fraction(jd_ut1) + Fraction(1, 2)) % 1
+    else:
+        pass
+    day_fraction = (ut1.days + Fraction(1, 2)) % 1
     phase = Fraction(gast) - Fraction(ra) - 360 * day_fraction - 180
     signed = (phase + 180) % 360 - 180
-    rotation = earth_rotation_policy(jd_tt, jd_ut1)
+    rotation = earth_rotation_policy(tt, ut1)
     return {
         "equation_of_time_seconds": float(signed * 240),
         "sun_apparent_right_ascension_degrees": ra,
@@ -111,7 +135,7 @@ def _sun_clock(
         "sidereal_time_model": rotation["sidereal_time_model"],
         "earth_rotation_policy_id": rotation["policy_id"],
         "_physical_source": physical_source,
-        "_julian_day_tt": jd_tt,
+        "_julian_day_tt": tt.as_float(),
     }
 
 
@@ -120,7 +144,7 @@ class _ClockSources:
         self.cohort = SunSourceCohort()
         self.observations: list[dict[str, Any]] = []
 
-    def add(self, sun: Dict[str, Any], jd_ut1: float, phase: str) -> None:
+    def add(self, sun: dict[str, Any], jd_ut1: float, phase: str) -> None:
         try:
             index = self.cohort.add(sun["_physical_source"])
         except EphemerisSourceError as error:
@@ -152,12 +176,12 @@ class _ClockSources:
 
 @coherent_ephemeris_sources
 def solar_clock_components(
-    moment: datetime,
+    moment: datetime | PhysicalEpoch,
     longitude: float,
     basis: str,
     *,
     ephemeris_policy: str = "auto",
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """One forward physical-time evaluation, before calendar representation.
 
     The Fraction label is internal arithmetic, not extra measured precision.
@@ -165,19 +189,27 @@ def solar_clock_components(
     without discarding a valid physical instant or its finite correction.
     """
     _validate(basis, longitude, ephemeris_policy)
-    if moment.utcoffset() is None:
-        raise ValueError("Solar clock display requires an aware physical instant")
+    if isinstance(moment, PhysicalEpoch):
+        scales = moment.time
+    else:
+        if moment.utcoffset() is None:
+            raise ValueError("Solar clock display requires an aware physical instant")
+        else:
+            pass
+        scales = ephemeris_time(moment)
     assert runtime.swe is not None
     runtime.swe.set_ephe_path(configured_ephemeris_path() or "")
-    scales = ephemeris_time(moment)
-    label = Fraction(scales.jd_ut1) + Fraction(longitude) / 360
-    sun = (
-        _sun_clock(scales.jd_ut1, ephemeris_policy, _julian_day_tt=scales.jd_tt)
-        if basis == "local_apparent_solar"
-        else None
-    )
+    label = scales.ut1.days + Fraction(longitude) / 360
+    sun = None
+    if basis == "local_apparent_solar":
+        assert scales.tt is not None
+        sun = _sun_clock(SolarClockContext(scales.ut1, scales.tt), ephemeris_policy)
+    else:
+        pass
     if sun is not None:
         label += Fraction(sun["equation_of_time_seconds"]) / 86400
+    else:
+        pass
     return {
         "julian_day_solar": label,
         "julian_day_ut1": scales.jd_ut1,
@@ -188,7 +220,7 @@ def solar_clock_components(
 
 
 def solar_wall_clock(
-    moment: datetime,
+    moment: datetime | PhysicalEpoch,
     longitude: float,
     basis: str,
     *,
@@ -197,9 +229,6 @@ def solar_wall_clock(
     _source_recorder: _ClockSources | None = None,
 ) -> datetime:
     """Physical civil instant to a naive solar label; never an IANA timezone."""
-    _validate(basis, longitude, ephemeris_policy)
-    if moment.utcoffset() is None:
-        raise ValueError("Solar clock display requires an aware physical instant")
     with source_session():
         parts = solar_clock_components(
             moment, longitude, basis, ephemeris_policy=ephemeris_policy
@@ -208,16 +237,25 @@ def solar_wall_clock(
         if sun is not None:
             if _source_recorder is not None:
                 _source_recorder.add(sun, parts["julian_day_ut1"], "roundtrip")
+            else:
+                pass
             if _observed_models is not None:
                 _observed_models.append(sun["solar_ephemeris_model"])
-        return datetime(1970, 1, 1) + timedelta(
-            days=float(parts["julian_day_solar"] - Fraction(4881175, 2))
-        )
+            else:
+                pass
+        else:
+            pass
+        label = CivilPoint(parts["julian_day_solar"]).as_calendar().as_datetime()
+        if label is None:
+            raise OverflowError("date value out of range")
+        else:
+            pass
+        return label.replace(tzinfo=None)
 
 
 def resolve_solar_epoch(
     wall: datetime, longitude: float, basis: str, *, ephemeris_policy: str = "auto"
-) -> Tuple[PhysicalEpoch, Dict[str, Any]]:
+) -> tuple[PhysicalEpoch, dict[str, Any]]:
     """A supplied solar label to physical TT/UT1 and an optional UTC carrier.
 
     The input's calendar is proleptic Gregorian. A UTC-named datetime carries
@@ -228,16 +266,22 @@ def resolve_solar_epoch(
     _validate(basis, longitude, ephemeris_policy)
     if wall.tzinfo is not None:
         raise ValueError("A local solar birth label must not have a civil timezone")
-    label_jd = _julian_day(wall.replace(tzinfo=timezone.utc))
+    else:
+        pass
+    label_jd = utc_calendar(wall.replace(tzinfo=timezone.utc)).julian_day_exact()
     longitude_days = Fraction(longitude) / 360
-    target_ut1 = float(Fraction(label_jd) - longitude_days)
-    sun: Dict[str, Any] = {}
+    nominal_mean = label_jd - longitude_days
+    target_ut1 = UT1Instant(nominal_mean)
+    sun: dict[str, Any] = {}
     observed_models: list[str] = []
     sources = _ClockSources()
 
-    def sun_at(jd: float, phase: str) -> Dict[str, Any]:
-        value = _sun_clock(jd, ephemeris_policy)
-        sources.add(value, jd, phase)
+    def sun_at(point: UT1Instant, phase: str) -> dict[str, Any]:
+        value = _sun_clock(
+            SolarClockContext(point, resolve_tt_from_ut1(point)),
+            ephemeris_policy,
+        )
+        sources.add(value, point.as_float(), phase)
         observed_models.append(value["solar_ephemeris_model"])
         return value
 
@@ -245,37 +289,58 @@ def resolve_solar_epoch(
         assert runtime.swe is not None
         runtime.swe.set_ephe_path(configured_ephemeris_path() or "")
         if basis == "local_apparent_solar":
+            selected = active_ut1.get()
+            bounds = selected.ut1_bounds if selected is not None else None
             for _ in range(8):
-                sun = sun_at(target_ut1, "inversion")
-                updated = float(
-                    Fraction(label_jd)
-                    - longitude_days
-                    - Fraction(sun["equation_of_time_seconds"]) / 86400
+                trial = target_ut1
+                if bounds is not None:
+                    trial = UT1Instant(min(max(trial.days, bounds[0]), bounds[1]))
+                else:
+                    pass
+                sun = sun_at(trial, "inversion")
+                updated = nominal_mean - (
+                    Fraction(sun["equation_of_time_seconds"]) / 86400
                 )
-                step = abs(updated - target_ut1)
-                target_ut1 = updated
-                if step <= math.ulp(target_ut1):
+                target_ut1 = UT1Instant(updated)
+                if bounds is not None:
+                    bounded = min(max(updated, bounds[0]), bounds[1])
+                    if updated != bounded:
+                        # The next trial would return to the same endpoint.
+                        if trial.days == bounded:
+                            raise ValueError(
+                                "Local apparent solar clock is outside the IERS C04 source bounds"
+                            )
+                        else:
+                            pass
+                        continue
+                    else:
+                        pass
+                else:
+                    pass
+                if abs(updated - trial.days) <= math.ulp(target_ut1.as_float()):
                     break
+                else:
+                    pass
             else:
                 raise ValueError(
                     "Local apparent solar clock inversion did not converge"
                 )
             sun = sun_at(target_ut1, "final")
-        # Exact LMT arithmetic need not introduce JD rounding into an old UT1
-        # carrier clock. Modern UTC must still invert the modeled UT1 offset.
+        else:
+            pass
         try:
-            exact_mean = (
-                wall.replace(tzinfo=timezone.utc)
-                - timedelta(microseconds=round(Fraction(longitude) * 240 * 1_000_000))
-                if basis == "local_mean_solar"
-                else None
-            )
-            if exact_mean is not None and exact_mean < datetime(
-                1960, 1, 1, tzinfo=timezone.utc
-            ):
-                moment = exact_mean
+            if basis == "local_mean_solar" and nominal_mean < _PRE_ATOMIC_END:
+                point = CivilPoint(nominal_mean)
+                # Keep the established rounded label and the exact UT1 input.
+                display = wall.replace(tzinfo=timezone.utc) - timedelta(
+                    microseconds=round(Fraction(longitude) * 240 * 1_000_000)
+                )
                 epoch = PhysicalEpoch(
-                    ephemeris_time(moment), moment.isoformat(), moment, False
+                    historical_mean_solar_time(point, utc_calendar(display)),
+                    display.isoformat(),
+                    display,
+                    False,
+                    point,
                 )
             else:
                 epoch = PhysicalEpoch.from_ut1(target_ut1)
@@ -285,15 +350,17 @@ def resolve_solar_epoch(
             # wrapper still rejects an absent carrier without shifting it.
             epoch = PhysicalEpoch.from_ut1(target_ut1)
         scales = epoch.time
-        error = (scales.jd_ut1 - target_ut1) * 86400
+        error = float((scales.ut1.days - target_ut1.days) * 86400)
         if abs(error) > 0.0002:
             raise ValueError(
                 "Solar clock inversion did not preserve UT1 within JD resolution"
             )
+        else:
+            pass
         if epoch.utc_datetime is not None:
             clock_error = (
                 solar_wall_clock(
-                    epoch.utc_datetime,
+                    epoch if epoch.source_calendar is not None else epoch.utc_datetime,
                     longitude,
                     basis,
                     ephemeris_policy=ephemeris_policy,
@@ -303,21 +370,26 @@ def resolve_solar_epoch(
                 - wall
             ).total_seconds()
         else:
-            physical_label = Fraction(scales.jd_ut1) + longitude_days
+            physical_label = scales.ut1.days + longitude_days
             if basis == "local_apparent_solar":
+                assert scales.tt is not None
                 check_sun = _sun_clock(
-                    scales.jd_ut1, ephemeris_policy, _julian_day_tt=scales.jd_tt
+                    SolarClockContext(scales.ut1, scales.tt), ephemeris_policy
                 )
                 sources.add(check_sun, scales.jd_ut1, "roundtrip")
                 observed_models.append(check_sun["solar_ephemeris_model"])
                 physical_label += (
                     Fraction(check_sun["equation_of_time_seconds"]) / 86400
                 )
-            clock_error = float((physical_label - Fraction(label_jd)) * 86400)
+            else:
+                pass
+            clock_error = float((physical_label - label_jd) * 86400)
         if abs(clock_error) > 0.0002:
             raise ValueError(
                 "Solar clock inversion did not preserve the supplied clock label"
             )
+        else:
+            pass
         return epoch, {
             "ruleset_id": RULESET,
             "author": "FateBridge",
@@ -331,14 +403,16 @@ def resolve_solar_epoch(
             "solar_model_call_count": len(observed_models),
             **{key: value for key, value in sun.items() if not key.startswith("_")},
             "solar_source_comparison": sources.result(),
-            "target_julian_day_ut1": target_ut1,
+            "target_julian_day_ut1": target_ut1.as_float(),
             "julian_day_ut1": scales.jd_ut1,
             "converted_utc": epoch.utc_label,
             "time_scale_method": scales.method,
             "future_leap_seconds_assumed_unchanged": scales.future_leap_seconds_assumed_unchanged,
             "ut1_roundtrip_error_seconds": error,
             "input_clock_roundtrip_error_seconds": clock_error,
-            "numerical_resolution_seconds": max(math.ulp(target_ut1) * 86400, 1e-6),
+            "numerical_resolution_seconds": max(
+                math.ulp(target_ut1.as_float()) * 86400, 1e-6
+            ),
             "measured_eop_applied": active_ut1.get() is not None,
             "clock_accuracy_certified": False,
             "swisseph_version": str(runtime.swe.version),
@@ -354,7 +428,7 @@ def resolve_solar_birth_clock(
     basis: str,
     *,
     ephemeris_policy: str = "auto",
-) -> Tuple[datetime, Dict[str, Any]]:
+) -> tuple[datetime, dict[str, Any]]:
     """Compatibility path for consumers that explicitly require datetime.
 
     Physical-native callers use resolve_solar_epoch instead. This wrapper

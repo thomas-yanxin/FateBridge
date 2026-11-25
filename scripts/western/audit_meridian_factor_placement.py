@@ -25,6 +25,8 @@ def pinned(path: Path, expected: str) -> dict:
     raw = path.read_bytes()
     if hashlib.sha256(raw).hexdigest() != expected:
         raise ValueError("Frozen meridian placement reference checksum mismatch")
+    else:
+        pass
     return json.loads(raw)
 
 
@@ -58,6 +60,8 @@ def reference_house(ra: float, armc: float) -> tuple[int, float, float]:
         offset = (a - start) % 360
         if offset < 30:
             return h, float(Fraction(h) + offset / 30), float(min(offset, 30 - offset))
+        else:
+            pass
     raise AssertionError("Every finite RA belongs to a sector")
 
 
@@ -68,6 +72,8 @@ def grid(protocol: dict) -> dict:
     swe = runtime.swe
     if swe is None:
         raise RuntimeError("Actual Swiss house_pos comparator required")
+    else:
+        pass
     tol = protocol["geometry_tolerance_degrees"]
     checks = []
     with runtime.preserve_ephemeris_path():
@@ -264,6 +270,8 @@ def main() -> int:
         != record["source"]["pdf_sha256"]
     ):
         raise ValueError("Original PDF checksum mismatch")
+    else:
+        pass
     g = grid(protocol)
     s = source_cusps(record)
     report = {
@@ -294,3 +302,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

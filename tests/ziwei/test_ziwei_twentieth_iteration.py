@@ -4,6 +4,7 @@ import asyncio
 import json
 import shutil
 from datetime import date
+from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
@@ -12,13 +13,13 @@ from fastmcp import Client
 from pydantic import ValidationError
 
 import fatebridge.api as api
-import scripts.ziwei.audit_ziwei as overall
+import scripts.ziwei.audit_ziwei_calendar_coverage as overall
 import scripts.ziwei.audit_ziwei_calendar_sources as audit
 from fatebridge.application.examples import evidence_views
 from fatebridge.application.execution import execute_tool
 from fatebridge.cli import run
-from fatebridge.core.output_chinese import ZiweiDateConversionProvenance
-from fatebridge.core.ziwei_date_sources import date_conversion_provenance
+from fatebridge.core.contracts.output_chinese import ZiweiDateConversionProvenance
+from fatebridge.core.ziwei.ziwei_date_sources import date_conversion_provenance
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.metaphysics import (
     calculate_ziwei_birth,
@@ -26,8 +27,9 @@ from fatebridge.services.metaphysics import (
 )
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.birth_input import create_person_info
-from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
 from tests.fixtures.mcp_result_delivery import read_full_result
+from tests.support.transports import call_calculation
+from validation.claims import CalculationClaim, verify_calculation_claims
 
 # Match the existing calendar-audit file's precise legacy-API filters; other
 # warnings still surface. This does not suppress conversion errors or defects.
@@ -38,7 +40,7 @@ pytestmark = [
 ]
 
 
-def test_full_1900_printed_cohort_and_source_roles_are_retained():
+def test_full_1900_printed_cohort_and_source_roles_are_retained() -> None:
     r = audit.audit_calendar_sources()
     assert not r["differences"]
     assert r["distinct_printed_civil_dates"] == 365
@@ -58,7 +60,9 @@ def test_full_1900_printed_cohort_and_source_roles_are_retained():
     assert r["live_model_blind_evaluation"] == "not_run"
 
 
-def test_misattributed_hko_1900_source_is_detected(monkeypatch):
+def test_misattributed_hko_1900_source_is_detected(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     original = audit.calculate_ziwei_birth
 
     def wrong(*args, **kwargs):
@@ -72,7 +76,7 @@ def test_misattributed_hko_1900_source_is_detected(monkeypatch):
     assert len(audit.audit_calendar_sources()["differences"]) == 1460
 
 
-def test_published_pdf_and_frozen_daily_values_are_required(tmp_path):
+def test_published_pdf_and_frozen_daily_values_are_required(tmp_path: Path) -> None:
     shutil.copytree(
         audit.FIXTURES / "calendar_1900_sources_v1",
         tmp_path / "calendar_1900_sources_v1",
@@ -83,7 +87,7 @@ def test_published_pdf_and_frozen_daily_values_are_required(tmp_path):
         audit.frozen_calendar_rows(tmp_path)
 
 
-def test_hko_audit_uses_current_support_and_a_printed_preceding_month():
+def test_hko_audit_uses_current_support_and_a_printed_preceding_month() -> None:
     r = overall.audit_calendar()
     assert not r["mismatches"]
     assert r["day_and_year_cells"] == r["full_date_cells"] == 73049
@@ -103,7 +107,9 @@ def test_hko_audit_uses_current_support_and_a_printed_preceding_month():
     )
 
 
-def test_newly_audited_2100_year_end_error_cannot_hide_outside_old_range(monkeypatch):
+def test_newly_audited_2100_year_end_error_cannot_hide_outside_old_range(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     original = overall._lunar_date_from_solar
 
     def wrong(solar):
@@ -115,6 +121,8 @@ def test_newly_audited_2100_year_end_error_cannot_hide_outside_old_range(monkeyp
                 day=2,
                 isLeapMonth=lunar.isLeapMonth,
             )
+        else:
+            pass
         return lunar
 
     monkeypatch.setattr(overall, "_lunar_date_from_solar", wrong)
@@ -122,7 +130,9 @@ def test_newly_audited_2100_year_end_error_cannot_hide_outside_old_range(monkeyp
     assert len(r["mismatches"]) == 1 and r["mismatches"][0]["solar"] == "2100-12-31"
 
 
-def test_smaller_runtime_support_cannot_shrink_the_fixed_source_cohort(monkeypatch):
+def test_smaller_runtime_support_cannot_shrink_the_fixed_source_cohort(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setattr(overall, "LUNAR_SUPPORTED_SOLAR_END", date(2100, 2, 8))
     r = overall.audit_calendar()
     assert r["day_and_year_cells"] == r["full_date_cells"] == 73049
@@ -145,8 +155,8 @@ def test_smaller_runtime_support_cannot_shrink_the_fixed_source_cohort(monkeypat
     ],
 )
 def test_provider_and_printed_witness_are_separate_at_both_supplement_seams(
-    year, month, day, provider, reference
-):
+    year: int, month: int, day: int, provider: str, reference: str
+) -> None:
     result = calculate_ziwei_birth(
         create_person_info(
             birth_year=year,
@@ -172,7 +182,7 @@ def test_provider_and_printed_witness_are_separate_at_both_supplement_seams(
         assert p["implementation_sources"][provider]["method_id"] == provider
 
 
-def test_foreign_reference_outside_printed_range_is_not_labelled_hko():
+def test_foreign_reference_outside_printed_range_is_not_labelled_hko() -> None:
     r = calculate_ziwei_birth(
         create_person_info(
             birth_year=1900,
@@ -206,8 +216,8 @@ def test_foreign_reference_outside_printed_range_is_not_labelled_hko():
     ],
 )
 def test_solar_shift_may_change_provider_or_reference_without_relabelling_civil(
-    month, day, placement_provider, reference
-):
+    month: int, day: int, placement_provider: str, reference: str
+) -> None:
     r = calculate_ziwei_birth(
         create_person_info(
             birth_year=1900,
@@ -233,10 +243,12 @@ def test_solar_shift_may_change_provider_or_reference_without_relabelling_civil(
             p["lookups"]["civil"]["implementation_provider"]
             == "pmo_1900_january_prefix_v1"
         )
+    else:
+        pass
     assert r["analysis_context"]["lunar_date_reference"] == reference
 
 
-def test_provenance_mutation_does_not_modify_the_cached_catalogue():
+def test_provenance_mutation_does_not_modify_the_cached_catalogue() -> None:
     args = ({"placement": "1900-01-31"}, {"placement": {"year": 1900}})
     a = date_conversion_provenance(*args)
     a["printed_date_references"]["tam_1900"]["date_scope"].clear()
@@ -254,7 +266,7 @@ def test_provenance_mutation_does_not_modify_the_cached_catalogue():
         "historical_clock_policy_verified",
     ],
 )
-def test_public_model_rejects_false_certification(field):
+def test_public_model_rejects_false_certification(field: str) -> None:
     with pytest.raises(ValidationError):
         ZiweiDateConversionProvenance.model_validate({field: True})
 
@@ -263,8 +275,12 @@ def test_public_model_rejects_false_certification(field):
 @pytest.mark.parametrize("profile", ["iztro_2_5_8", "quanshu_v2_excerpt"])
 @pytest.mark.parametrize("year", [1900, 1933])
 def test_source_view_and_actual_provider_match_rest_native_mcp_cli(
-    tool, profile, year, monkeypatch, capsys
-):
+    tool: str,
+    profile: str,
+    year: int,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     api._reset_runtime_state_for_tests()
     monkeypatch.setattr(
         api,
@@ -290,6 +306,8 @@ def test_source_view_and_actual_provider_match_rest_native_mcp_cli(
             target_day=31 if year == 1900 else 1,
             target_hour=12,
         )
+    else:
+        pass
     fields = evidence_views(spec)["calendar_sources"]["fields"]
     opts = dict(
         fields=fields,
@@ -311,14 +329,14 @@ def test_source_view_and_actual_provider_match_rest_native_mcp_cli(
 
     async def call():
         async with Client(create_mcp_app(families="metaphysics")) as client:
-            result = await client.call_tool(tool, {**inputs, **opts})
+            result = await call_calculation(client, spec.tool_name, {**inputs, **opts})
             assert not result.is_error
             p = result.structured_content
             assert len(json.dumps(p, ensure_ascii=False, separators=(",", ":"))) <= 8192
             return await read_full_result(client, p)
 
     native = asyncio.run(call())
-    args = [tool]
+    args = [spec.tool_name]
     for k, v in inputs.items():
         args += ["--" + k.replace("_", "-"), str(v)]
     args += [
@@ -366,8 +384,8 @@ def test_source_view_and_actual_provider_match_rest_native_mcp_cli(
     ],
 )
 def test_adapter_records_the_actual_lunar_year_override_across_civil_years(
-    solar, expected_year, expected_override
-):
+    solar: str, expected_year: int, expected_override: str
+) -> None:
     moment = date.fromisoformat(solar)
     result = calculate_ziwei_birth(
         create_person_info(
@@ -390,7 +408,7 @@ def test_adapter_records_the_actual_lunar_year_override_across_civil_years(
     )
 
 
-def test_same_run_claim_rejects_hko_as_the_actual_prefix_implementation():
+def test_same_run_claim_rejects_hko_as_the_actual_prefix_implementation() -> None:
     spec = next(s for s in CATALOG if s.key == "ziwei_birth")
     p = execute_tool(
         spec,
@@ -424,7 +442,7 @@ def test_same_run_claim_rejects_hko_as_the_actual_prefix_implementation():
     )
 
 
-def test_source_attribution_keeps_current_civil_age_boundary_unverified():
+def test_source_attribution_keeps_current_civil_age_boundary_unverified() -> None:
     person = create_person_info(
         birth_year=1984,
         birth_month=2,

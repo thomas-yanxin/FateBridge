@@ -11,6 +11,7 @@ from pydantic import ValidationError
 from fatebridge.core.fengshui.context_inputs import EnvironmentalContext
 from fatebridge.core.fengshui.models import AssessRequest
 from fatebridge.mcp_server import create_mcp_app
+from tests.support.transports import call_calculation, describe_capability
 
 
 def object_definition(object_id="item", role=None):
@@ -166,7 +167,7 @@ def context_cases():
 )
 def test_context_canonical_schema_matches_its_runtime_fact_gate(
     name, context, accepted
-):
+) -> None:
     validator = Draft202012Validator(EnvironmentalContext.model_json_schema())
     assert validator.is_valid(context) is accepted, name
     try:
@@ -177,44 +178,39 @@ def test_context_canonical_schema_matches_its_runtime_fact_gate(
     assert runtime_accepted is accepted, name
 
 
-def test_actual_mcp_schema_and_runtime_agree_for_empty_and_real_context_facts():
+def test_actual_mcp_schema_and_runtime_agree_for_empty_and_real_context_facts() -> None:
     async def check():
         async with Client(create_mcp_app(families="fengshui")) as client:
-            tool = next(
-                t for t in await client.list_tools() if t.name == "fengshui_assess"
-            )
-            Draft202012Validator.check_schema(
-                tool.model_dump(by_alias=True)["inputSchema"]
-            )
-            validator = Draft202012Validator(
-                tool.model_dump(by_alias=True)["inputSchema"]
-            )
+            tool = await describe_capability(client, "fengshui_assess")
+            Draft202012Validator.check_schema(tool["input_schema"])
+            validator = Draft202012Validator(tool["input_schema"])
             for name, context, accepted in context_cases():
                 inputs = {
                     "methods": [],
                     "scene": "home",
                     "environmental_context": deepcopy(context),
-                    "include_snapshot_text": False,
-                    "response_char_limit": 0,
                 }
                 assert validator.is_valid(inputs) is accepted, name
-                result = await client.call_tool(
-                    "fengshui_assess", inputs, raise_on_error=False
+                result = await call_calculation(
+                    client,
+                    "fengshui_assess",
+                    {
+                        **inputs,
+                        "include_snapshot_text": False,
+                        "response_char_limit": 0,
+                    },
+                    raise_on_error=False,
                 )
                 assert result.is_error is (not accepted), name
 
     asyncio.run(check())
 
 
-def test_nested_candidate_uses_the_same_schema_fact_gate():
+def test_nested_candidate_uses_the_same_schema_fact_gate() -> None:
     async def check():
         async with Client(create_mcp_app(families="fengshui")) as client:
-            tool = next(
-                t for t in await client.list_tools() if t.name == "fengshui_assess"
-            )
-            validator = Draft202012Validator(
-                tool.model_dump(by_alias=True)["inputSchema"]
-            )
+            tool = await describe_capability(client, "fengshui_assess")
+            validator = Draft202012Validator(tool["input_schema"])
             inputs = {
                 "methods": [],
                 "scene": "home",
@@ -243,31 +239,32 @@ def test_nested_candidate_uses_the_same_schema_fact_gate():
                         "evidence": "独立候选但未提供任何环境事实",
                     }
                 ],
-                "include_snapshot_text": False,
-                "response_char_limit": 0,
             }
             assert not validator.is_valid(inputs)
             with pytest.raises(ValidationError):
                 AssessRequest.model_validate(inputs)
-            result = await client.call_tool(
-                "fengshui_assess", inputs, raise_on_error=False
+            result = await call_calculation(
+                client,
+                "fengshui_assess",
+                {**inputs, "include_snapshot_text": False, "response_char_limit": 0},
+                raise_on_error=False,
             )
             assert result.is_error
 
     asyncio.run(check())
 
 
-def test_method_reference_and_annual_query_need_no_placeholder_environment():
+def test_method_reference_and_annual_query_need_no_placeholder_environment() -> None:
     async def check():
         async with Client(create_mcp_app(families="fengshui")) as client:
-            tool = next(
-                t for t in await client.list_tools() if t.name == "fengshui_assess"
-            )
+            tool = await describe_capability(client, "fengshui_assess")
             inputs = {
                 "scene": "home",
                 "analyze_layout": False,
                 "methods": ["annual_stars"],
                 "effective_year": 2026,
+            }
+            delivery_options = {
                 "fields": [
                     "status",
                     "layers.annual_stars.palaces.N",
@@ -282,11 +279,12 @@ def test_method_reference_and_annual_query_need_no_placeholder_environment():
                 "response_char_limit": 0,
             }
             assert "environmental_context" not in inputs
-            Draft202012Validator(
-                tool.model_dump(by_alias=True)["inputSchema"]
-            ).validate(inputs)
-            result = await client.call_tool(
-                "fengshui_assess", inputs, raise_on_error=False
+            Draft202012Validator(tool["input_schema"]).validate(inputs)
+            result = await call_calculation(
+                client,
+                "fengshui_assess",
+                {**inputs, **delivery_options},
+                raise_on_error=False,
             )
             assert not result.is_error
             payload = result.structured_content

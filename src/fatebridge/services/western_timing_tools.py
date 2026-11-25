@@ -4,9 +4,12 @@ Standalone western predictive timing tool surfaces for FateBridge.
 
 from __future__ import annotations
 
-from typing import Any, Dict, Optional
+from typing import Any
 
 from fatebridge.core.export_parser import parse_export_content
+from fatebridge.services.snapshot_builders import (
+    format_snapshot_json,
+)
 from fatebridge.services.snapshot_builders import (
     render_snapshot_text as _render_snapshot_text,
 )
@@ -14,7 +17,6 @@ from fatebridge.services.western_timing import (
     calculate_western_timing_module_analysis,
 )
 from fatebridge.utils.errors import handle_calculation_error
-from fatebridge.utils.formatting import format_json_response
 
 TOOL_SPECS: dict[str, dict[str, Any]] = {
     "solarreturn": {
@@ -97,16 +99,18 @@ TOOL_SPECS: dict[str, dict[str, Any]] = {
 }
 
 
-def _extract_path(payload: Dict[str, Any], path: tuple[str, ...]) -> Dict[str, Any]:
+def _extract_path(payload: dict[str, Any], path: tuple[str, ...]) -> dict[str, Any]:
     current: Any = payload
     for key in path:
         current = current[key]
     if not isinstance(current, dict):
         raise TypeError(f"Expected dict payload at {'.'.join(path)}")
+    else:
+        pass
     return current
 
 
-def _build_context(result: Dict[str, Any], label: str) -> Dict[str, Any]:
+def _build_context(result: dict[str, Any], label: str) -> dict[str, Any]:
     analysis_context = result.get("analysis_context", {})
     return {
         "tool": label,
@@ -126,20 +130,28 @@ def _build_context(result: Dict[str, Any], label: str) -> Dict[str, Any]:
 
 
 def _build_aspect_summary(
-    label: str, result: Dict[str, Any], payload: Dict[str, Any]
-) -> Dict[str, Any]:
-    summary: Dict[str, Any] = {
+    label: str, result: dict[str, Any], payload: dict[str, Any]
+) -> dict[str, Any]:
+    summary: dict[str, Any] = {
         "label": label,
         "summary": result.get("summary"),
     }
     if "sign_changes" in payload:
         summary["sign_changes"] = payload["sign_changes"]
+    else:
+        pass
     if "exact_hits" in payload:
         summary["exact_hits"] = payload["exact_hits"]
+    else:
+        pass
     if "current_window" in payload:
         summary["current_window"] = payload["current_window"]
+    else:
+        pass
     if len(summary) == 2:
         summary["note"] = "离线独立工具未额外生成单独相位表，请结合星盘信息阅读。"
+    else:
+        pass
     return summary
 
 
@@ -147,66 +159,65 @@ def _build_sections(
     *,
     section_kind: str,
     label: str,
-    result: Dict[str, Any],
-    payload: Dict[str, Any],
+    result: dict[str, Any],
+    payload: dict[str, Any],
 ) -> list[tuple[str, str]]:
     natal_reference = result.get("natal_reference", {})
     context = _build_context(result, label)
 
     if section_kind == "chart":
         return [
-            ("起盘信息", format_json_response(context, compact=False)),
+            ("起盘信息", format_snapshot_json(context)),
             (
                 "星盘信息",
-                format_json_response(
+                format_snapshot_json(
                     {"natal_reference": natal_reference, "module": payload},
-                    compact=False,
                 ),
             ),
             (
                 "相位",
-                format_json_response(
-                    _build_aspect_summary(label, result, payload), compact=False
-                ),
+                format_snapshot_json(_build_aspect_summary(label, result, payload)),
             ),
         ]
+    else:
+        pass
 
     if section_kind == "transit":
         return [
-            ("起盘信息", format_json_response(context, compact=False)),
+            ("起盘信息", format_snapshot_json(context)),
             (
                 "星盘信息",
-                format_json_response(
+                format_snapshot_json(
                     {
                         "natal_reference": natal_reference,
                         "transit_reference": payload.get("transit_reference"),
                         "house_emphasis": payload.get("house_emphasis"),
                         "location": payload.get("location"),
                     },
-                    compact=False,
                 ),
             ),
             (
                 "相位",
-                format_json_response(
+                format_snapshot_json(
                     {
                         "summary": result.get("summary"),
                         "orb_limit": payload.get("orb_limit"),
                         "top_hits": payload.get("hits"),
                         "exact_hits": payload.get("exact_hits"),
                     },
-                    compact=False,
                 ),
             ),
         ]
+    else:
+        pass
 
     if section_kind == "pd":
         return [
-            ("出生时间", format_json_response(context, compact=False)),
-            ("星盘信息", format_json_response(natal_reference, compact=False)),
+            ("出生时间", format_snapshot_json(context)),
+            ("星盘信息", format_snapshot_json(natal_reference)),
             (
                 "主/界限法设置",
-                format_json_response(
+                format_snapshot_json(
                     {
                         "method": payload.get("method"),
                         "method_label": payload.get("method_label"),
@@ -223,12 +234,11 @@ def _build_sections(
                         "coordinate_backend": payload.get("coordinate_backend"),
                         "aspects": payload.get("aspects"),
                     },
-                    compact=False,
                 ),
             ),
             (
                 "主/界限法表格",
-                format_json_response(
+                format_snapshot_json(
                     {
                         "current_arc_degrees": payload.get("current_arc_degrees"),
                         "current_window": payload.get("current_window"),
@@ -237,18 +247,19 @@ def _build_sections(
                         "exact_window": payload.get("exact_window"),
                         "timeline": payload.get("timeline"),
                     },
-                    compact=False,
                 ),
             ),
         ]
+    else:
+        pass
 
     if section_kind == "pdchart":
         return [
-            ("出生时间", format_json_response(context, compact=False)),
-            ("星盘信息", format_json_response(natal_reference, compact=False)),
+            ("出生时间", format_snapshot_json(context)),
+            ("星盘信息", format_snapshot_json(natal_reference)),
             (
                 "主限法盘设置",
-                format_json_response(
+                format_snapshot_json(
                     {
                         "method": payload.get("method"),
                         "method_label": payload.get("method_label"),
@@ -265,12 +276,11 @@ def _build_sections(
                         "coordinate_backend": payload.get("coordinate_backend"),
                         "show_pd_bounds": payload.get("show_pd_bounds"),
                     },
-                    compact=False,
                 ),
             ),
             (
                 "主限法盘说明",
-                format_json_response(
+                format_snapshot_json(
                     {
                         "current_arc_degrees": payload.get("current_arc_degrees"),
                         "bounds_overlay": payload.get("bounds_overlay"),
@@ -279,49 +289,64 @@ def _build_sections(
                         "sign_changes": payload.get("sign_changes"),
                         "exact_hits": payload.get("exact_hits"),
                     },
-                    compact=False,
                 ),
             ),
         ]
+    else:
+        pass
 
     if section_kind == "zr":
         return [
-            ("起盘信息", format_json_response(context, compact=False)),
+            ("起盘信息", format_snapshot_json(context)),
             (
                 "星盘信息",
-                format_json_response(
+                format_snapshot_json(
                     {
                         "sect": natal_reference.get("sect"),
                         "lots": natal_reference.get("lots"),
                     },
-                    compact=False,
                 ),
             ),
-            ("基于X点推运", format_json_response(payload, compact=False)),
+            ("基于X点推运", format_snapshot_json(payload)),
         ]
+    else:
+        pass
 
     if section_kind == "firdaria":
         return [
-            ("出生时间", format_json_response(context, compact=False)),
-            ("星盘信息", format_json_response(natal_reference, compact=False)),
-            ("法达星限表格", format_json_response(payload, compact=False)),
+            ("出生时间", format_snapshot_json(context)),
+            ("星盘信息", format_snapshot_json(natal_reference)),
+            ("法达星限表格", format_snapshot_json(payload)),
         ]
+    else:
+        pass
 
     if section_kind == "decennials":
-        # The complete native witnesses remain in the structured reference.
-        # Do not repeat them in snapshot_text and each export representation.
         display_reference = dict(natal_reference)
         display_reference["calculation_basis"] = {
             key: value
             for key, value in natal_reference.get("calculation_basis", {}).items()
-            if key not in {"longitude_motion", "apparent_position_policy"}
+            if key
+            in {
+                "engine_backend",
+                "engine_precision",
+                "ephemeris_model",
+                "calendar",
+                "time_scale",
+                "julian_day_tt",
+                "julian_day_ut1",
+                "future_leap_seconds_assumed_unchanged",
+                "horizon_method",
+                "ayanamsha_model",
+                "ayanamsha_degrees",
+            }
         }
         return [
-            ("起盘信息", format_json_response(context, compact=False)),
-            ("星盘信息", format_json_response(display_reference, compact=False)),
+            ("起盘信息", format_snapshot_json(context)),
+            ("星盘信息", format_snapshot_json(display_reference, compact=True)),
             (
                 "十年大运设置",
-                format_json_response(
+                format_snapshot_json(
                     {
                         "resolved_start_planet": payload.get("resolved_start_planet"),
                         "resolved_start_planet_label": payload.get(
@@ -329,11 +354,12 @@ def _build_sections(
                         ),
                         "base_order": payload.get("base_order"),
                     },
-                    compact=False,
                 ),
             ),
-            ("基于X起运", format_json_response(payload, compact=False)),
+            ("基于X起运", format_snapshot_json(payload, compact=True)),
         ]
+    else:
+        pass
 
     raise ValueError(f"Unsupported section kind: {section_kind}")
 
@@ -341,9 +367,10 @@ def _build_sections(
 def calculate_timing_tool(
     tool_name: str,
     *,
-    selected_sections: Optional[list[str]] = None,
+    selected_sections: list[str] | None = None,
+    render_snapshot: bool = True,
     **kwargs: Any,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     spec = TOOL_SPECS[tool_name]
     try:
         result = calculate_western_timing_module_analysis(
@@ -352,8 +379,24 @@ def calculate_timing_tool(
         )
         if "error" in result:
             return result
+        else:
+            pass
 
         payload = _extract_path(result, spec["path"])
+        response = {
+            "analysis_type": spec["analysis_type"],
+            "engine": result.get("natal_reference", {})
+            .get("calculation_basis", {})
+            .get("engine_backend", "fatebridge-offline"),
+            "analysis_context": result.get("analysis_context"),
+            "natal_reference": result.get("natal_reference"),
+            tool_name: payload,
+            "summary": result.get("summary"),
+        }
+        if not render_snapshot:
+            return response
+        else:
+            pass
         sections = _build_sections(
             section_kind=spec["section_kind"],
             label=spec["label"],
@@ -368,14 +411,7 @@ def calculate_timing_tool(
         )
 
         return {
-            "analysis_type": spec["analysis_type"],
-            "engine": result.get("natal_reference", {})
-            .get("calculation_basis", {})
-            .get("engine_backend", "fatebridge-offline"),
-            "analysis_context": result.get("analysis_context"),
-            "natal_reference": result.get("natal_reference"),
-            tool_name: payload,
-            "summary": result.get("summary"),
+            **response,
             "snapshot_text": snapshot_text,
             "snapshot_export": snapshot_export,
         }

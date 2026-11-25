@@ -7,11 +7,6 @@ from pathlib import Path
 
 from fastmcp import Client
 
-from fatebridge.application.examples import (
-    call_guidance,
-    evidence_views,
-    suggested_fields,
-)
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
 
@@ -26,8 +21,8 @@ TOOLS = (
     "gua_lookup",
     "meihua_analysis",
     "meihua_cast",
-    "astro_guolao_chart",
-    "astro_germany_chart",
+    "astro_guolao",
+    "astro_germany",
     "astro_chart13",
     "ziwei_birth",
     "ziwei_horoscope",
@@ -35,7 +30,7 @@ TOOLS = (
     "qimen",
     "taiyi",
     "sanshiunited",
-    "astro_india_chart",
+    "astro_india",
     "astro_vimshottari",
     "bazi_career",
     "bazi_source_compare",
@@ -53,37 +48,35 @@ TOOLS = (
     "jinkou",
     "knowledge_registry",
     "knowledge_read",
+    "ipip_big_five",
 )
 
 
 async def call_contracts() -> list[dict[str, object]]:
     """Derive definitions from the same public MCP interface clients receive."""
-    async with Client(create_mcp_app()) as client:
-        tools = {tool.name: tool for tool in await client.list_tools()}
-    specs = {spec.tool_name: spec for spec in CATALOG}
+    specs = {spec.key: spec for spec in CATALOG}
     records = []
-    for name in TOOLS:
-        spec = specs[name]
-        record: dict[str, object] = {
-            "tool": name,
-            "input": tools[name].model_dump(by_alias=True)["inputSchema"],
-            "first_view": {
-                "fields": suggested_fields(spec),
-                "strict_fields": True,
-                "include_snapshot_text": False,
-            },
-        }
-        guidance = call_guidance(spec)
-        if guidance:
-            record["call_guidance"] = guidance
-        views = evidence_views(spec)
-        if views:
-            record["evidence_views"] = views
-        if spec.methods:
-            record["method_contracts"] = [
-                method.as_manifest() for method in spec.methods
-            ]
-        records.append(record)
+    async with Client(create_mcp_app()) as client:
+        for key in TOOLS:
+            name = specs[key].tool_name
+            result = await client.call_tool("describe_capability", {"tool": name})
+            contract = result.structured_content
+            assert contract is not None
+            record: dict[str, object] = {
+                "tool": name,
+                "input": contract["input_schema"],
+                "first_view": {
+                    "fields": contract.get("suggested_fields"),
+                    "strict_fields": True,
+                    "include_snapshot_text": False,
+                },
+            }
+            for field in ("call_guidance", "evidence_views", "method_contracts"):
+                if contract.get(field):
+                    record[field] = contract[field]
+                else:
+                    pass
+            records.append(record)
     return records
 
 
@@ -109,8 +102,9 @@ def render_files(records: list[dict[str, object]]) -> dict[str, str]:
     lines.extend(
         [
             "",
-            "每个文件保留完整输入约束、参数说明、首轮字段及任务视图。视图名不是请求参数。",
-            "摘要投影与完整导出分别使用 first_view 和 fields=null；完整结果读取同一 run。",
+            "`input` 描述 `run_calculation.arguments`。工具名和 `first_view` 中的交付选项放在 `run_calculation` 的外层。",
+            "首次摘要使用 detail=compact 并省略 fields。需要指定业务字段时，可按问题选择 first_view 或 evidence_views 中的字段。",
+            "完整导出使用 detail=audit 和 fields=null，随后读取同一 run。",
             "输入日期使用公历；不猜生时、不套示例；出生与分析时刻、时区及太阳时策略以各工具合同为准。",
         ]
     )
@@ -136,6 +130,8 @@ async def main(argv: list[str] | None = None) -> None:
                 f"MCP call contracts are stale: {', '.join(stale)}; "
                 f"obsolete: {', '.join(sorted(obsolete))}"
             )
+        else:
+            pass
     else:
         TARGET.mkdir(parents=True, exist_ok=True)
         for name, text in files.items():
@@ -151,3 +147,5 @@ async def main(argv: list[str] | None = None) -> None:
 
 if __name__ == "__main__":
     asyncio.run(main())
+else:
+    pass

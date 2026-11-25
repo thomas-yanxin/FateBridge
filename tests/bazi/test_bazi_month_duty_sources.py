@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.bazi_evidence import build_natal_evidence
+from fatebridge.core.bazi.bazi_evidence import build_natal_evidence
 from fatebridge.core.classical_passage import SOURCE as PASSAGE_SOURCE
 from fatebridge.core.month_duty_reference import build_month_duty_reference
 from fatebridge.utils.data import BRANCH_HIDDEN_STEMS
@@ -31,7 +31,9 @@ def chart(branch="寅"):
     }
 
 
-def test_complete_24_month_rows_and_all69_durations_match_captured_full_chapter():
+def test_complete_24_month_rows_and_all69_durations_match_captured_full_chapter() -> (
+    None
+):
     result = audit()
     assert (
         result["source_paragraphs"],
@@ -52,7 +54,9 @@ def test_complete_24_month_rows_and_all69_durations_match_captured_full_chapter(
     assert DATA.read_bytes() == (FIXTURE / "source-layers-v3.json").read_bytes()
 
 
-def test_original_failed_anchor_and_literal_soil_identity_corrections_are_preserved():
+def test_original_failed_anchor_and_literal_soil_identity_corrections_are_preserved() -> (
+    None
+):
     first = json.loads((FIXTURE / "source-layers.json").read_text())
     preflight = json.loads((FIXTURE / "source-preflight-first.json").read_text())
     current = json.loads(DATA.read_text())
@@ -79,7 +83,9 @@ def test_original_failed_anchor_and_literal_soil_identity_corrections_are_preser
 
 
 @pytest.mark.parametrize("branch", list("寅卯辰巳午未申酉戌亥子丑"))
-def test_each_month_retains_source_order_and_unknowns_without_expanding_roots(branch):
+def test_each_month_retains_source_order_and_unknowns_without_expanding_roots(
+    branch,
+) -> None:
     pillars = chart(branch)
     before, roots = deepcopy(pillars), deepcopy(BRANCH_HIDDEN_STEMS)
     evidence = build_month_duty_reference(pillars)
@@ -113,9 +119,11 @@ def test_each_month_retains_source_order_and_unknowns_without_expanding_roots(br
             "source_stems_outside_month_hidden_catalog"
         ] == ["甲", "癸"]
         assert evidence["conventional_month_hidden_stems"] == ["乙"]
+    else:
+        pass
 
 
-def test_returned_metadata_mutations_cannot_contaminate_the_cached_source():
+def test_returned_metadata_mutations_cannot_contaminate_the_cached_source() -> None:
     one = build_month_duty_reference(chart())
     kept = deepcopy(one)
     one["sources"][0]["pdf_pages"].append(-1)
@@ -124,7 +132,7 @@ def test_returned_metadata_mutations_cannot_contaminate_the_cached_source():
     assert build_month_duty_reference(chart()) == kept
 
 
-def test_nominal_source_identity_cannot_be_confused_with_effective_duty():
+def test_nominal_source_identity_cannot_be_confused_with_effective_duty() -> None:
     value = build_natal_evidence(chart())["month_command"]["intra_month_duty"]
     assert (
         value["status"] == "not_adjudicated"
@@ -169,8 +177,8 @@ def test_nominal_source_identity_cannot_be_confused_with_effective_duty():
     ],
 )
 def test_month_source_layers_match_rest_native_mcp_cli_for_all_ten_outputs(
-    topic, rest, tmp_path, capsys
-):
+    topic: str, rest, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     spec = SPECS["bazi_" + topic]
     prefix = "bazi_birth" if topic == "birth" else topic + "_analysis"
     path = (

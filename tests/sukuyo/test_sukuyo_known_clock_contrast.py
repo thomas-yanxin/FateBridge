@@ -7,14 +7,14 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.sukuyo import calendar_mansion, day_evidence
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence
 
 FIXTURE = Path(__file__).parents[1] / "data/sukuyo-known-vs-unknown-before-c-v78.json"
 RAW = FIXTURE.read_bytes()
 REF = json.loads(RAW)
 
 
-def test_known_point_and_unknown_date_match_the_independent_reference():
+def test_known_point_and_unknown_date_match_the_independent_reference() -> None:
     assert (
         hashlib.sha256(RAW).hexdigest()
         == "5edf34f4916d3fe266aec449ded5a65cd10bfd7dd4e9ed080441c38629ede865"
@@ -50,7 +50,9 @@ def test_known_point_and_unknown_date_match_the_independent_reference():
 
 
 @pytest.mark.parametrize("clock", ["00:00:00", "12:00:00", "23:59:59"])
-def test_known_clock_reading_preserves_actual_mode_at_every_selected_time(clock):
+def test_known_clock_reading_preserves_actual_mode_at_every_selected_time(
+    clock: str,
+) -> None:
     result = calendar_mansion(REF["input_date"], clock, REF["zone"])
     moment = datetime.fromisoformat(REF["input_date"] + "T" + clock).replace(
         tzinfo=timezone(

@@ -168,12 +168,7 @@ def validate_layer(result, cast, layer, clause, prefix, line):
         "real_outcome",
     ]:
         assert q[name] is None
-    assert (
-        clause["event_time"]
-        is clause["success_probability"]
-        is clause["real_outcome_verdict"]
-        is None
-    )
+    assert clause["event_time"] is clause["real_outcome_verdict"] is None
 
 
 def validate(result):

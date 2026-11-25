@@ -7,9 +7,9 @@ from unittest.mock import patch
 
 import pytest
 
-from fatebridge.validation.human_design import verify_human_design_reading
-from fatebridge.validation.human_design_sampling import verify_sampled_interval
 from tests.support.human_design_current import complete_run
+from validation.human_design import verify_human_design_reading
+from validation.human_design_sampling import verify_sampled_interval
 
 
 @pytest.fixture(scope="module")
@@ -24,7 +24,7 @@ def complete():
 
 def test_actual_selected_probe_all_samples_and_explanation_replay_without_native(
     complete,
-):
+) -> None:
     with (
         patch(
             "fatebridge.core.astro.runtime.ephemeris_call",
@@ -62,8 +62,8 @@ def test_actual_selected_probe_all_samples_and_explanation_replay_without_native
     ],
 )
 def test_rehash_cannot_forge_or_remove_coordinate_evidence_or_downgrade(
-    complete, fault
-):
+    complete, fault: str
+) -> None:
     value = deepcopy(complete)
     report = value["time_sensitivity"]
     assessment = report["station_coordinate_extremum_assessment"]
@@ -97,6 +97,8 @@ def test_rehash_cannot_forge_or_remove_coordinate_evidence_or_downgrade(
         report["method_id"] = "unsupported_interval_method"
     elif fault == "unknown_method":
         report["method_id"] = "unknown_method"
+    else:
+        pass
     with (
         patch(
             "fatebridge.core.astro.runtime.ephemeris_call",
@@ -113,7 +115,7 @@ def test_rehash_cannot_forge_or_remove_coordinate_evidence_or_downgrade(
 
 def test_rehash_cannot_replace_bound_interval_explanation_with_stability_claim(
     complete,
-):
+) -> None:
     value = deepcopy(complete)
     value["interpretation"]["birth_interval_meaning"] = "附近所有时刻都绝对稳定。"
     with patch(

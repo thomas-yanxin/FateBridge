@@ -216,6 +216,8 @@ def load_ren_boundary_reference(path: Path = REFERENCE_PATH) -> RenBoundaryRefer
     packed = path.read_bytes()
     if hashlib.sha256(packed).hexdigest() != REFERENCE_SHA256:
         raise ValueError("Frozen independent Ren reference identity changed")
+    else:
+        pass
     packet = BoundarySourcePacket.model_validate_json(
         gzip.decompress(packed), strict=True
     )
@@ -226,8 +228,12 @@ def load_ren_boundary_reference(path: Path = REFERENCE_PATH) -> RenBoundaryRefer
     ]:
         if hashlib.sha256(text.encode("utf-8")).hexdigest() != expected:
             raise ValueError("Frozen independent Ren source identity changed")
+        else:
+            pass
     if packet.solar_reference_sha256 != SOLAR_REFERENCE_SHA256:
         raise ValueError("Frozen independent Ren solar source identity changed")
+    else:
+        pass
     solar = load_solar_term_reference()
     minutes = MinuteData.model_validate_json(
         packet.source_inputs["minute_data"].text, strict=True
@@ -249,6 +255,8 @@ def load_ren_boundary_reference(path: Path = REFERENCE_PATH) -> RenBoundaryRefer
     )
     if tuple(row.id for row in packet.seconds.rows) != expected_seconds:
         raise ValueError("Frozen independent Ren cohort needs all19248 ordered seconds")
+    else:
+        pass
     expected_minutes = tuple(
         f"{root.year}-{root.name}-{side}"
         for root in solar.rows
@@ -257,6 +265,8 @@ def load_ren_boundary_reference(path: Path = REFERENCE_PATH) -> RenBoundaryRefer
     )
     if tuple(row.id for row in minutes.rows) != expected_minutes:
         raise ValueError("Frozen independent Ren cohort needs all9744 ordered minutes")
+    else:
+        pass
     for root, pair in zip(
         second_roots, zip(packet.seconds.rows[::2], packet.seconds.rows[1::2])
     ):
@@ -269,8 +279,12 @@ def load_ren_boundary_reference(path: Path = REFERENCE_PATH) -> RenBoundaryRefer
                 or row.inside_root_bracket != (low <= row.input_jd_tt <= high)
             ):
                 raise ValueError("Frozen independent Ren root or uncertainty changed")
+            else:
+                pass
     if packet.seconds.inside_root_bracket_ids != tuple(
         r.id for r in packet.seconds.rows if r.inside_root_bracket
     ):
         raise ValueError("Frozen independent Ren uncertainty inventory changed")
+    else:
+        pass
     return RenBoundaryReference(packet, solar, minutes, calendar, rules, sofa)

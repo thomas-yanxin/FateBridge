@@ -21,6 +21,8 @@ def reference_grid(plan):
     method = plan["local_interval_method_id"]
     if method not in GRID_METHODS:
         raise ValueError("Unplanned local reference method")
+    else:
+        pass
     step = GRID_METHODS[method]
     if (
         plan.get("local_grid_step_seconds", 10) != step
@@ -35,6 +37,8 @@ def reference_grid(plan):
         or plan["fixed_reference_convergence_arcsec_per_day"] != 0.002
     ):
         raise ValueError("Frozen local reference policy changed")
+    else:
+        pass
     return method, step
 
 
@@ -46,7 +50,11 @@ def parent_from_args(args):
     if any(v is not None for v in values.values()):
         if any(v is None for v in values.values()):
             raise ValueError("All four parent source paths are required")
+        else:
+            pass
         return values
+    else:
+        pass
     return None
 
 
@@ -55,7 +63,11 @@ def parent_preservation(plan, raw, bundle):
     if parent is None:
         if bundle is not None:
             raise ValueError("Undeclared densification parent")
+        else:
+            pass
         return {}, None
+    else:
+        pass
     if (
         plan["local_interval_method_id"] != "local_printed_angle_interval_lp_grid5_v2"
         or bundle is None
@@ -65,6 +77,8 @@ def parent_preservation(plan, raw, bundle):
         != parent["reference_sha256"]
     ):
         raise ValueError("Densification parent identity or coverage changed")
+    else:
+        pass
     parent_validation = validate(
         bundle["protocol"], bundle["reference"], bundle["material"], bundle["seal"]
     )
@@ -76,8 +90,12 @@ def parent_preservation(plan, raw, bundle):
         )
         if old is None or any(old[k] != row[k] for k in ["body", "date_tt", "jd_tt"]):
             raise ValueError("Densification changed the parent condition")
+        else:
+            pass
         if set(old["samples"]) != set(map(str, range(-1440, 1441, 10))):
             raise ValueError("Densification parent grid changed")
+        else:
+            pass
         conflicts = []
         for t, observation in old["samples"].items():
             dense = row["samples"].get(t)
@@ -96,6 +114,8 @@ def parent_preservation(plan, raw, bundle):
                         "dense": dense,
                     }
                 )
+            else:
+                pass
         result[row["id"]] = {
             "parent_case_id": old["id"],
             "parent_observations_checked": len(old["samples"]),
@@ -119,15 +139,21 @@ def replay(protocol, reference, material, seal, certificates, *, parent_bundle=N
         or len(certificates["rows"]) != len(raw["rows"])
     ):
         raise ValueError("Local certificate dataset identity changed")
+    else:
+        pass
     rows = []
     for row, record in zip(raw["rows"], certificates["rows"]):
         if row["id"] != record["id"]:
             raise ValueError("Local certificate case changed")
+        else:
+            pass
         calculated = quality(row, record["fits"], step_seconds=step)
         if calculated != record["quality"]:
             raise ValueError(
                 "Declared local quality differs from exact certificate replay"
             )
+        else:
+            pass
         combined = {"id": row["id"], "role": row["role"], **calculated}
         if row["id"] in parent_checks:
             check = parent_checks[row["id"]]
@@ -140,6 +166,10 @@ def replay(protocol, reference, material, seal, certificates, *, parent_bundle=N
                     selected_order=None,
                     selected=None,
                 )
+            else:
+                pass
+        else:
+            pass
         rows.append(combined)
     failures = [
         r["id"]
@@ -162,8 +192,12 @@ def replay(protocol, reference, material, seal, certificates, *, parent_bundle=N
     }
     if step != 10:
         result["grid_step_seconds"] = step
+    else:
+        pass
     if parent_validation is not None:
         result["parent_raw_integrity_and_baseline_quality"] = parent_validation
+    else:
+        pass
     return result
 
 
@@ -212,3 +246,5 @@ if __name__ == "__main__":
         )
     )
     raise SystemExit(result["exit_code"])
+else:
+    pass

@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any
 
 from fatebridge.core.metaphysics.ziwei import build_ziwei_chart
-from fatebridge.core.ziwei_childhood import childhood_limit
+from fatebridge.core.ziwei.ziwei_childhood import childhood_limit
 from scripts.ziwei.audit_ziwei_limits import _seed
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -23,6 +23,8 @@ def audit_childhood(fixtures: Path = FIXTURES) -> dict[str, Any]:
             != entry["sha256"]
         ):
             raise ValueError("Childhood source checksum mismatch: " + entry["path"])
+        else:
+            pass
     source = json.loads((folder / "collation.json").read_text())
     production = json.loads(
         (
@@ -37,6 +39,8 @@ def audit_childhood(fixtures: Path = FIXTURES) -> dict[str, Any]:
     }
     if production != frozen_runtime:
         mismatches.append(dict(case="production_source_data"))
+    else:
+        pass
     # Explicit modern palace order is independently frozen in the prerequisite
     # corpus. We do not derive an expected name from the production mapping.
     prerequisite = json.loads(
@@ -49,6 +53,8 @@ def audit_childhood(fixtures: Path = FIXTURES) -> dict[str, Any]:
     digest = next(e["sha256"] for e in check["files"] if e["path"] == "collation.json")
     if hashlib.sha256(raw).hexdigest() != digest:
         raise ValueError("Childhood prerequisite collation checksum mismatch")
+    else:
+        pass
     # Printed order runs counterclockwise; convert its declared modern aliases
     # to clockwise offsets, relative to the given chart's Ming.
     offsets = {
@@ -89,6 +95,8 @@ def audit_childhood(fixtures: Path = FIXTURES) -> dict[str, Any]:
                                 checks=checks,
                             )
                         )
+                    else:
+                        pass
                     star_joins += len(palace["stars_detail"])
                     checked += 1
                 for age in [*range(7, 16), 16, 40, 100]:
@@ -102,6 +110,8 @@ def audit_childhood(fixtures: Path = FIXTURES) -> dict[str, Any]:
                         mismatches.append(
                             dict(case=f"unresolved/{profile}/{hour}/{gender}/{age}")
                         )
+                    else:
+                        pass
                     unresolved += 1
     return {
         "method_id": source["id"],

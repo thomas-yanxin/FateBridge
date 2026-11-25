@@ -26,7 +26,7 @@ def raw(body="Uranus"):
     return (E / f"nasa-attempt1/{body}.response.json").read_bytes()
 
 
-def test_independent_request_has_all_original_tt_and_same_response_two_frames():
+def test_independent_request_has_all_original_tt_and_same_response_two_frames() -> None:
     fixed = gen.plan()
     assert len(fixed["epochs"]) == 17 and fixed["angular_tolerance_arcseconds"] == 2
     for body, target in fixed["bodies"].items():
@@ -68,7 +68,7 @@ def test_independent_request_has_all_original_tt_and_same_response_two_frames():
         "api_error",
     ],
 )
-def test_nasa_parse_never_accepts_wrong_frame_or_lost_original_row(fault):
+def test_nasa_parse_never_accepts_wrong_frame_or_lost_original_row(fault: str) -> None:
     payload = json.loads(raw())
     text = payload["result"]
     replacements = {
@@ -102,14 +102,24 @@ def test_nasa_parse_never_accepts_wrong_frame_or_lost_original_row(fault):
             cells = lines[0].split(",")
             if fault == "shifted_tt":
                 cells[0] = str(float(cells[0]) + 1)
+            else:
+                pass
             if fault == "nan_ra":
                 cells[5] = "nan"
+            else:
+                pass
             if fault == "bad_dec":
                 cells[6] = "91"
+            else:
+                pass
             if fault == "extra_cell":
                 cells.append("0")
+            else:
+                pass
             if fault == "truncated":
                 cells = cells[:5]
+            else:
+                pass
             lines[0] = ",".join(cells)
         text = before + "$$SOE\n" + "\n".join(lines) + "\n$$EOE" + after
     payload["result"] = text
@@ -117,7 +127,7 @@ def test_nasa_parse_never_accepts_wrong_frame_or_lost_original_row(fault):
         gen.parse_response(json.dumps(payload).encode(), "Uranus")
 
 
-def test_physical_tt_join_ignores_raw_row_order():
+def test_physical_tt_join_ignores_raw_row_order() -> None:
     payload = json.loads(raw())
     before, rest = payload["result"].split("$$SOE")
     table, after = rest.split("$$EOE")
@@ -136,7 +146,7 @@ def test_physical_tt_join_ignores_raw_row_order():
 
 def test_all34_current_comparisons_keep_in_plane_pass_and_full_direction_failure(
     production,
-):
+) -> None:
     result = check.compare(production, check.references())
     assert result["position_count"] == 34
     assert result["counts"] == {
@@ -181,25 +191,37 @@ def test_all34_current_comparisons_keep_in_plane_pass_and_full_direction_failure
     "fault",
     ["delete", "duplicate", "epoch", "flags", "icrf_flags", "producer_coordinate"],
 )
-def test_supplied_producer_cannot_rebind_the_comparison(fault, production):
+def test_supplied_producer_cannot_rebind_the_comparison(fault: str, production) -> None:
     production = deepcopy(production)
     if fault == "delete":
         production["rows"].pop()
+    else:
+        pass
     if fault == "duplicate":
         production["rows"][-1] = deepcopy(production["rows"][0])
+    else:
+        pass
     if fault == "epoch":
         production["rows"][0]["jd_tt"] += 1
+    else:
+        pass
     if fault == "flags":
         production["rows"][0]["default_return_flags"] = 260
+    else:
+        pass
     if fault == "icrf_flags":
         production["rows"][0]["icrf_return_flags"] = 133410
+    else:
+        pass
     if fault == "producer_coordinate":
         production["rows"][0]["position"]["longitude"] += 1
+    else:
+        pass
     with pytest.raises(ValueError):
         check.compare(production, check.references())
 
 
-def test_angular_metric_keeps_out_of_plane_error_and_handles_wrap():
+def test_angular_metric_keeps_out_of_plane_error_and_handles_wrap() -> None:
     assert check.separation(
         {"right_ascension": 12, "declination": 0},
         {"right_ascension": 12, "declination": 3 / 3600},
@@ -210,22 +232,32 @@ def test_angular_metric_keeps_out_of_plane_error_and_handles_wrap():
 
 
 @pytest.mark.parametrize("fault", ["scale", "reflection", "nan", "short"])
-def test_invalid_rotation_does_not_become_a_valid_frame(fault, production):
+def test_invalid_rotation_does_not_become_a_valid_frame(fault: str, production) -> None:
     production = deepcopy(production)
     matrix = production["rows"][0]["declared_icrf_to_default_ecliptic_matrix"]
     if fault == "scale":
         matrix[0] = [v * 2 for v in matrix[0]]
+    else:
+        pass
     if fault == "reflection":
         matrix[0] = [-v for v in matrix[0]]
+    else:
+        pass
     if fault == "nan":
         matrix[0][0] = float("nan")
+    else:
+        pass
     if fault == "short":
         matrix.pop()
+    else:
+        pass
     with pytest.raises(ValueError):
         check.compare(production, check.references())
 
 
-def test_latitude_closure_error_cannot_hide_behind_longitude_closure(production):
+def test_latitude_closure_error_cannot_hide_behind_longitude_closure(
+    production,
+) -> None:
     production = deepcopy(production)
     production["rows"][0]["default_native_coordinates"][1] += 1
     result = check.compare(production, check.references())
@@ -233,7 +265,9 @@ def test_latitude_closure_error_cannot_hide_behind_longitude_closure(production)
     assert result["rotation_closure_maximum_arcseconds"]["swiss"] > 3599
 
 
-def test_declared_bias_matrix_is_the_inspected_source_formula_not_a_residual_fit():
+def test_declared_bias_matrix_is_the_inspected_source_formula_not_a_residual_fit() -> (
+    None
+):
     raw = (BASE / "sources/swephlib.c").read_bytes()
     assert (
         hashlib.sha256(raw).hexdigest()

@@ -2,10 +2,11 @@
 
 import hashlib
 import json
+from pathlib import Path
 
 import pytest
 
-from fatebridge.validation import evaluation_environment as env
+from validation import evaluation_environment as env
 
 OLD_KEYS = (
     "SE_EPHE_PATH",
@@ -24,7 +25,9 @@ VSOP = "FATEBRIDGE_VSOP2013_MANIFEST"
 AA = "FATEBRIDGE_AA1996_MANIFEST"
 
 
-def test_capture_keeps_full_optional_selector_values_and_explicit_nulls(tmp_path):
+def test_capture_keeps_full_optional_selector_values_and_explicit_nulls(
+    tmp_path: Path,
+) -> None:
     source = {
         "FATEBRIDGE_SOLAR_TERM_MODEL": "vsop2013",
         VSOP: "/verified/source with spaces/manifest.json",
@@ -42,7 +45,7 @@ def test_capture_keeps_full_optional_selector_values_and_explicit_nulls(tmp_path
 
 
 @pytest.mark.parametrize("method", [OLD_METHOD, OLD_CONTEXT])
-def test_retired_selector_records_are_rejected(method, tmp_path):
+def test_retired_selector_records_are_rejected(method, tmp_path: Path) -> None:
     values = {key: None for key in OLD_KEYS}
     raw = json.dumps(dict(method_id=method, values=values)).encode()
     path = tmp_path / "retired.json"
@@ -53,11 +56,13 @@ def test_retired_selector_records_are_rejected(method, tmp_path):
 
 @pytest.mark.parametrize("method,extended", [(OLD_METHOD, True), (NEW_METHOD, False)])
 def test_recomputed_hash_cannot_change_the_versioned_selector_shape(
-    method, extended, tmp_path
-):
+    method, extended: bool, tmp_path: Path
+) -> None:
     values = {key: None for key in OLD_KEYS}
     if extended:
         values.update({VSOP: None, AA: None})
+    else:
+        pass
     raw = json.dumps(dict(method_id=method, values=values)).encode()
     p = tmp_path / "wrong-shape.json"
     p.write_bytes(raw)
@@ -65,7 +70,7 @@ def test_recomputed_hash_cannot_change_the_versioned_selector_shape(
         env.load_selection(p, hashlib.sha256(raw).hexdigest())
 
 
-def test_later_ambient_optional_sources_are_cleared_without_mutating_caller():
+def test_later_ambient_optional_sources_are_cleared_without_mutating_caller() -> None:
     chosen = env.capture_selection({})
     ambient = {
         VSOP: "/later/vsop.json",
@@ -77,7 +82,9 @@ def test_later_ambient_optional_sources_are_cleared_without_mutating_caller():
     assert result["OPENAI_API_KEY"] == "private" and ambient[VSOP] == "/later/vsop.json"
 
 
-def test_command_builder_forwards_only_frozen_optional_selectors(monkeypatch, tmp_path):
+def test_command_builder_forwards_only_frozen_optional_selectors(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     from scripts.evaluate_agent import command_for
 
     selected = env.capture_selection(

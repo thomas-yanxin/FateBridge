@@ -84,12 +84,26 @@ version = {attr = "fatebridge.__version__"}
 where = ["src"]
 include = ["fatebridge*"]
 
-# packages.find discovers *code* only. The engines load their reference data at
-# runtime via ``Path(__file__).parents[1] / "data" / ...`` (canping, heluo,
-# knowledge_store), so the JSON payloads MUST be declared here or an installed
-# wheel raises FileNotFoundError. ``py.typed`` ships the PEP 561 typed marker.
+# The engines load these reference files at runtime from the installed package.
 [tool.setuptools.package-data]
-fatebridge = ["py.typed", "data/**/*.json", "data/guolao/sefstars.txt", "data/western_stars/sefstars.txt", "data/astronomy/erfa-license.txt", "data/astronomy/vsop2013/*.c", "data/astronomy/vsop2013/*.S", "data/astronomy/vsop2013/*.in", "data/astronomy/*.bin.gz", "data/knowledge/iers-c04-ut1-v1.json.gz", "data/knowledge/iers-c04-LICENSE.txt", "data/sukuyo_dayan_reference_LICENSE.txt"]
+fatebridge = [
+    "py.typed",
+    "data/**/*.json",
+    "data/guolao/sefstars.txt",
+    "data/western_stars/sefstars.txt",
+    "data/astronomy/erfa-license.txt",
+    "data/astronomy/vsop2013/*.c",
+    "data/astronomy/vsop2013/*.S",
+    "data/astronomy/vsop2013/*.in",
+    "data/astronomy/de440-solar-record-atlas-v1.bin.gz",
+    "data/knowledge/iers-c04-ut1-v1.json.gz",
+    "data/knowledge/iers-c04-orientation-v1.json.gz",
+    "data/knowledge/iers-c04-LICENSE.txt",
+    "data/sukuyo_dayan_reference_LICENSE.txt",
+]
+
+[tool.setuptools.exclude-package-data]
+fatebridge = ["data/astronomy/de441-planetary-*-part-*.bin.gz"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

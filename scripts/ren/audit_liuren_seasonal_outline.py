@@ -38,13 +38,19 @@ def canonical(value: Any) -> bytes:
 def frozen(folder: Path, pin: str, names: set[str]) -> None:
     if sha(folder / "freeze.json") != pin:
         raise ValueError("Seasonal source manifest identity changed")
+    else:
+        pass
     manifest = json.loads((folder / "freeze.json").read_text())
     if set(manifest) != names or {p.name for p in folder.iterdir()} != names | {
         "freeze.json"
     }:
         raise ValueError("Seasonal source inventory changed")
+    else:
+        pass
     if any(sha(folder / n) != h for n, h in manifest.items()):
         raise ValueError("Seasonal source bytes changed")
+    else:
+        pass
 
 
 def outline_reference(folder: Path = OUTLINE) -> dict[str, Any]:
@@ -65,6 +71,8 @@ def outline_reference(folder: Path = OUTLINE) -> dict[str, Any]:
         != value["source_sha256"]
     ):
         raise ValueError("Original source PDF identity changed")
+    else:
+        pass
     if (
         [g["id"] for g in value["course_groups"]] != ["Q056", "Q057", "Q058", "Q059"]
         or value["full_named_predicate_adjudicated"] is not False
@@ -72,6 +80,8 @@ def outline_reference(folder: Path = OUTLINE) -> dict[str, Any]:
         or value["transformation_confirmed"] is not None
     ):
         raise ValueError("Original four source groups or unresolved scope changed")
+    else:
+        pass
     return value
 
 
@@ -86,6 +96,8 @@ def fidelity_reference(folder: Path = FIDELITY) -> dict[str, Any]:
         or value["stem_elements"] != literal["stem_elements"]
     ):
         raise ValueError("Independent seasonal literals or input denominator changed")
+    else:
+        pass
     return value
 
 
@@ -112,6 +124,8 @@ def audit_outline() -> tuple[dict[str, Any], list[dict[str, Any]]]:
         ledger.update(canonical([kind, key, actual, expected]))
         if actual != expected:
             failures.append(dict(kind=kind, key=key, actual=actual, expected=expected))
+        else:
+            pass
 
     for season, table in ref["literal_phase_table"].items():
         for phase, expected_power in table.items():
@@ -226,7 +240,7 @@ def audit_outline() -> tuple[dict[str, Any], list[dict[str, Any]]]:
 
 def audit_sparse() -> dict[str, Any]:
     ref = fidelity_reference()
-    from fatebridge.core.output_liuren_seasonal import LiurenSeasonalEvidence
+    from fatebridge.core.contracts.output_liuren_seasonal import LiurenSeasonalEvidence
 
     counts = dict(
         valid=0,
@@ -268,6 +282,8 @@ def audit_sparse() -> dict[str, Any]:
                     failures.append(
                         dict(input=payload, expected_power=expected, accepted=accepted)
                     )
+                else:
+                    pass
     for field, wrong in ref["invalid_metadata_values"].items():
         counts["metadata_faults"] += 1
         try:
@@ -279,6 +295,8 @@ def audit_sparse() -> dict[str, Any]:
         if accepted:
             counts["metadata_faults_accepted"] += 1
             failures.append(dict(input={field: wrong}, accepted=True))
+        else:
+            pass
     return dict(
         counts=counts,
         failures=failures,
@@ -308,6 +326,8 @@ def main() -> int:
     args = parser.parse_args()
     if args.output.exists():
         parser.error("Refusing to overwrite existing audit evidence")
+    else:
+        pass
     result = audit()
     with args.output.open("x") as stream:
         json.dump(result, stream, ensure_ascii=False, indent=2, allow_nan=False)
@@ -329,3 +349,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

@@ -21,8 +21,8 @@ def development():
     "kind", ["row", "profile", "epoch", "direction", "time", "grade", "credit", "gate"]
 )
 def test_independent_reader_rejects_changed_evidence_before_blessing_it(
-    kind, development, tmp_path
-):
+    kind: str, development, tmp_path: Path
+) -> None:
     data = copy.deepcopy(development)
     if kind == "row":
         data["rows"].pop()

@@ -23,6 +23,8 @@ def minutes(position):
         0 <= sign < 12 and 0 <= degree < 30 and 0 <= minute < 60
     ):
         raise ValueError("Invalid manually transcribed zodiac coordinate")
+    else:
+        pass
     return (sign * 30 + degree) * 60 + minute
 
 
@@ -30,6 +32,8 @@ def audit(path=FIXTURE):
     raw = path.read_bytes()
     if hashlib.sha256(raw).hexdigest() != FIXTURE_SHA256:
         raise ValueError("Frozen original transcription digest mismatch")
+    else:
+        pass
     data = json.loads(raw)
     natal = {
         name: minutes(position)
@@ -126,3 +130,5 @@ def main():
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

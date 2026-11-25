@@ -4,22 +4,23 @@ import copy
 import hashlib
 import json
 import shutil
+from pathlib import Path
 
 import pytest
 
-from fatebridge.validation.taiyi_epoch import (
-    accumulation_hypothesis,
-    sexagenary_hypothesis,
-)
 from scripts.taiyi.audit_taiyi_day_epoch import (
     CORPUS,
     audit,
     calendar_cohort,
     verify_sources,
 )
+from validation.taiyi_epoch import (
+    accumulation_hypothesis,
+    sexagenary_hypothesis,
+)
 
 
-def test_complete_frozen_year_and_raw_readings_are_bound_before_comparisons():
+def test_complete_frozen_year_and_raw_readings_are_bound_before_comparisons() -> None:
     freeze = verify_sources()
     assert freeze["new_calendar_candidate_comparisons_before_freeze"] == 0
     assert len(freeze["files"]) == 11
@@ -29,7 +30,9 @@ def test_complete_frozen_year_and_raw_readings_are_bound_before_comparisons():
     assert data["source"]["printed_page"] == 101
 
 
-def test_summary_page_correction_keeps_initial_location_and_actual_native_page():
+def test_summary_page_correction_keeps_initial_location_and_actual_native_page() -> (
+    None
+):
     report = audit()
     errata = report["key_summary_location_correction"]
     assert errata["original"] == 42 and errata["corrected"] == 43
@@ -39,8 +42,8 @@ def test_summary_page_correction_keeps_initial_location_and_actual_native_page()
 
 @pytest.mark.parametrize("update_freeze", [False, True])
 def test_cannot_change_calendar_or_acceptance_by_rewriting_local_hashes(
-    tmp_path, update_freeze
-):
+    tmp_path: Path, update_freeze: bool
+) -> None:
     corpus = tmp_path / "corpus"
     shutil.copytree(CORPUS, corpus)
     p = corpus / "liang-504-months.json"
@@ -52,12 +55,14 @@ def test_cannot_change_calendar_or_acceptance_by_rewriting_local_hashes(
         x = json.loads(f.read_text())
         x["files"][p.name] = hashlib.sha256(p.read_bytes()).hexdigest()
         f.write_text(json.dumps(x))
+    else:
+        pass
     with pytest.raises(ValueError, match="V28"):
         verify_sources(corpus)
 
 
 @pytest.mark.parametrize("mutation", ["drop_month", "month_length"])
-def test_full_month_cohort_cannot_be_reduced_to_one_matching_day(mutation):
+def test_full_month_cohort_cannot_be_reduced_to_one_matching_day(mutation: str) -> None:
     x = json.loads((CORPUS / "liang-504-months.json").read_text())
     if mutation == "drop_month":
         x["months"].pop(0)
@@ -67,7 +72,7 @@ def test_full_month_cohort_cannot_be_reduced_to_one_matching_day(mutation):
         calendar_cohort(x)
 
 
-def test_full_year_respects_printed_week_cycle_and_original_erroneous_label():
+def test_full_year_respects_printed_week_cycle_and_original_erroneous_label() -> None:
     x = audit()
     cohort = x["calendar_cohort"]
     assert cohort["month_first_anchors"] == 13 and cohort["complete_months"] == 12
@@ -95,7 +100,7 @@ def test_full_year_respects_printed_week_cycle_and_original_erroneous_label():
     assert not x["whole_calendar_acceptance_passed"] and not x["whole_goal_complete"]
 
 
-def test_all_original_four_hypotheses_and_both_conventions_stay_in_report():
+def test_all_original_four_hypotheses_and_both_conventions_stay_in_report() -> None:
     x = audit()
     new = x["all_four_V27_hypotheses"]
     assert len(new) == 4
@@ -107,7 +112,9 @@ def test_all_original_four_hypotheses_and_both_conventions_stay_in_report():
     assert x["production_calendar_installed_or_changed"] is False
 
 
-def test_supplied_accumulation_replay_does_not_certify_date_bridge_or_other_book():
+def test_supplied_accumulation_replay_does_not_certify_date_bridge_or_other_book() -> (
+    None
+):
     x = audit()
     r = x["given_accumulation_replay"]
     assert r["original_accumulation"] == 707501061
@@ -123,7 +130,7 @@ def test_supplied_accumulation_replay_does_not_certify_date_bridge_or_other_book
     assert x["key_jishen_historical_yin_examples"] == 0
 
 
-def test_hypothesis_keeps_floor_remainders_and_explicit_offsets():
+def test_hypothesis_keeps_floor_remainders_and_explicit_offsets() -> None:
     inputs = dict(
         year_accumulation=1937060,
         chapter_years=657,
@@ -156,8 +163,8 @@ def test_hypothesis_keeps_floor_remainders_and_explicit_offsets():
     ],
 )
 def test_invalid_hypothesis_inputs_never_become_inferred_calendar_parameters(
-    field, value
-):
+    field: str, value
+) -> None:
     params = dict(
         year_accumulation=1937060,
         chapter_years=657,
@@ -175,6 +182,8 @@ def test_invalid_hypothesis_inputs_never_become_inferred_calendar_parameters(
 @pytest.mark.parametrize(
     "accumulation,origin", [(0, 0), (True, 1), (1, True), (1, 2), (1, "0")]
 )
-def test_invalid_ganzhi_conventions_are_rejected(accumulation, origin):
+def test_invalid_ganzhi_conventions_are_rejected(
+    accumulation: bool | int, origin: bool | int | str
+) -> None:
     with pytest.raises(ValueError, match="explicit Jiazi"):
         sexagenary_hypothesis(accumulation, jiazi_origin=origin)

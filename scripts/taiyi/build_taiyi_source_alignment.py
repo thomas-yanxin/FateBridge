@@ -8,11 +8,9 @@ import json
 from pathlib import Path
 from typing import Any
 
-from scripts.taiyi.audit_taiyi_native_columns import (
-    CORRECTION_SHA as NATIVE_CORRECTION_SHA,
-)
-from scripts.taiyi.audit_taiyi_native_columns import MANIFEST_SHA as NATIVE_MANIFEST_SHA
-from scripts.taiyi.audit_taiyi_native_columns import source_readings
+from scripts.taiyi.taiyi_native_sources import CORRECTION_SHA as NATIVE_CORRECTION_SHA
+from scripts.taiyi.taiyi_native_sources import MANIFEST_SHA as NATIVE_MANIFEST_SHA
+from scripts.taiyi.taiyi_native_sources import source_readings
 
 ROOT = Path(__file__).resolve().parents[2]
 CORPUS = ROOT / "tests/fixtures/taiyi_jinjing_v18"
@@ -27,6 +25,8 @@ def source_data(corpus: Path = CORPUS) -> dict[str, Any]:
     manifest_path = corpus / "manifest.json"
     if hashlib.sha256(manifest_path.read_bytes()).hexdigest() != MANIFEST_SHA:
         raise ValueError("原位置矩阵清单指纹不符")
+    else:
+        pass
     manifest = json.loads(manifest_path.read_text())
     for row in manifest["source_files"]:
         if (
@@ -34,12 +34,16 @@ def source_data(corpus: Path = CORPUS) -> dict[str, Any]:
             != row["sha256"]
         ):
             raise ValueError("原典位置材料指纹不符：" + row["file"])
+        else:
+            pass
     for row in manifest["prior_source_references"]:
         if (
             hashlib.sha256((CORPUS.parent / row["file"]).read_bytes()).hexdigest()
             != row["sha256"]
         ):
             raise ValueError("此前原典材料指纹不符：" + row["file"])
+        else:
+            pass
     for name, expected_hash, data_files in [
         (
             "supplement-manifest.json",
@@ -56,9 +60,13 @@ def source_data(corpus: Path = CORPUS) -> dict[str, Any]:
         path = corpus / name
         if hashlib.sha256(path.read_bytes()).hexdigest() != expected_hash:
             raise ValueError("补证/订正清单指纹不符")
+        else:
+            pass
         extra = json.loads(path.read_text())
         if extra["original_manifest_sha256"] != MANIFEST_SHA:
             raise ValueError("初录引用指纹不符")
+        else:
+            pass
         source_hashes = {item["file"]: item["sha256"] for item in extra["source_files"]}
         for data_file in data_files:
             if (
@@ -66,6 +74,8 @@ def source_data(corpus: Path = CORPUS) -> dict[str, Any]:
                 != source_hashes[data_file]
             ):
                 raise ValueError("补证/订正原文指纹不符")
+            else:
+                pass
     normal = json.loads((corpus / "name-normalization.json").read_text())
     correction = json.loads((corpus / "proof-quote-correction.json").read_text())
     quotes = [
@@ -75,6 +85,8 @@ def source_data(corpus: Path = CORPUS) -> dict[str, Any]:
     proof = (CORPUS.parent / "taiyi_jinjing_v1/vol02.txt").read_text()
     if not correction["mapping_unchanged"] or not all(q in proof for q in quotes):
         raise ValueError("缺少逐字名表证明")
+    else:
+        pass
     raw = json.loads((corpus / "raw-position-rows.json").read_text())
     collation = json.loads((corpus / "transcription-collation.json").read_text())
     collated = {r["id"]: r for r in collation["independent_source_rows"]}
@@ -86,12 +98,16 @@ def source_data(corpus: Path = CORPUS) -> dict[str, Any]:
     yin = yin.split("五子元積年立成法")[0]
     if len(collated) != 144:
         raise ValueError("逐字校读须保留完整144行")
+    else:
+        pass
     aliases = normal["map"]
     checks = json.loads((corpus / "facsimile-readings.json").read_text())
     if {(r["yin"], r["ju"]) for r in raw} != {
         (yin, n) for yin in (False, True) for n in range(1, 73)
     } or len(raw) != 144:
         raise ValueError("须保留完整阴阳144局四位置和两算")
+    else:
+        pass
     count_sources = {
         False: json.loads((CORPUS.parent / "taiyi_jinjing_v1/cases.json").read_text()),
         True: json.loads(
@@ -110,11 +126,17 @@ def source_data(corpus: Path = CORPUS) -> dict[str, Any]:
             for k in ("wenchang_literal", "shiji_literal", "jishen_literal")
         ):
             raise ValueError("逐字校读缺少同一冻结转录的原句证明")
+        else:
+            pass
         if reading["observed"]["taiyi_number"] != row["taiyi_number"]:
             raise ValueError("不得默改初录太乙宫数")
+        else:
+            pass
         expected = count_sources[row["yin"]][row["ju"] - 1]["expected"]
         if expected != {f: row[f] for f in ("main_count", "guest_count")}:
             raise ValueError("不允许改变此前288项两算原值")
+        else:
+            pass
         initial = {
             k: row[k] for k in ("wenchang_literal", "shiji_literal", "jishen_literal")
         }
@@ -128,11 +150,17 @@ def source_data(corpus: Path = CORPUS) -> dict[str, Any]:
                     initial_manual_reading=initial[check["field"]],
                     status="initial_manual_entry_differs_from_source_and_facsimile",
                 )
+            else:
+                pass
         for check in selected_checks:
             if selected[check["field"]] != check["text_reading"]:
                 raise ValueError("原转录与书影记录对应不符")
+            else:
+                pass
             if check["selected_reading"] == "facsimile":
                 selected[check["field"]] = check["facsimile_reading"]
+            else:
+                pass
         positions = {
             "taiyi_number": row["taiyi_number"],
             "wenchang_palace": aliases[selected["wenchang_literal"]],
@@ -141,17 +169,23 @@ def source_data(corpus: Path = CORPUS) -> dict[str, Any]:
         }
         if positions["jishen"] not in "子丑寅卯辰巳午未申酉戌亥":
             raise ValueError("原无效干字不能默认变成地支")
+        else:
+            pass
         if (
             type(row["yin"]) is not bool
             or type(row["ju"]) is not int
             or row["taiyi_number"] not in {1, 2, 3, 4, 6, 7, 8, 9}
         ):
             raise ValueError("原局身份与太乙宫数不符")
+        else:
+            pass
         facsimile = native[row["id"]]
         if facsimile["positions"] != positions or facsimile["table_counts"] != expected:
             raise ValueError(
                 "完整书影语义核读与此前所选来源不同，须独立裁定，不默认覆盖"
             )
+        else:
+            pass
         rows.append(
             {
                 "id": row["id"],
@@ -200,6 +234,8 @@ def main() -> int:
     if args.check:
         if not DEST.exists() or DEST.read_bytes() != raw:
             raise SystemExit("太乙原表位置资料漂移，请从冻结来源生成")
+        else:
+            pass
     else:
         DEST.write_bytes(raw)
     print(hashlib.sha256(raw).hexdigest())
@@ -208,3 +244,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

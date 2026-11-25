@@ -5,24 +5,36 @@ from dataclasses import dataclass
 
 from pydantic import BaseModel, JsonValue, TypeAdapter
 
-from .bazhai import bazhai
-from .context_inputs import EnvironmentalContext, EnvironmentalObject
-from .jinsuo import jinsuo
-from .layout import analyze_layout
-from .models import AssessRequest, EnvironmentFeature, JinsuoRequest, Placement
-from .spatial_desktop import desktop_rule_comparisons
-from .spatial_inputs import SpatialScene
-from .spatial_outputs import EvaluatedGeometry, GeometryOutput
-from .spatial_reasoning import (
+from fatebridge.core.fengshui.bazhai import bazhai
+from fatebridge.core.fengshui.context_inputs import (
+    EnvironmentalContext,
+    EnvironmentalObject,
+)
+from fatebridge.core.fengshui.jinsuo import jinsuo
+from fatebridge.core.fengshui.layout import analyze_layout
+from fatebridge.core.fengshui.models import (
+    AssessRequest,
+    EnvironmentFeature,
+    JinsuoRequest,
+    Placement,
+)
+from fatebridge.core.fengshui.spatial_desktop import desktop_rule_comparisons
+from fatebridge.core.fengshui.spatial_inputs import SpatialScene
+from fatebridge.core.fengshui.spatial_outputs import EvaluatedGeometry, GeometryOutput
+from fatebridge.core.fengshui.spatial_reasoning import (
     ComputedSpatialFacts,
     RuleComparison,
     TimedWorkstationReading,
     conditioned_readings,
 )
-from .spatial_scene import evaluate_geometry
-from .spatial_sources import RegisteredRuleset, spatial_ruleset
-from .timeliness import timeliness_provenance
-from .workstation_inputs import EntryBarrier, ObservedCondition, WorkstationReview
+from fatebridge.core.fengshui.spatial_scene import evaluate_geometry
+from fatebridge.core.fengshui.spatial_sources import RegisteredRuleset, spatial_ruleset
+from fatebridge.core.fengshui.timeliness import timeliness_provenance
+from fatebridge.core.fengshui.workstation_inputs import (
+    EntryBarrier,
+    ObservedCondition,
+    WorkstationReview,
+)
 
 
 class FormCheckEvidence(BaseModel):
@@ -111,6 +123,8 @@ def prepare_spatial_request(
             not geometry.candidate_only or scene.observation_basis == "image_observed"
         ):
             forms.append(seat.form)
+        else:
+            pass
         location = (
             seat.location_directions[0]
             if seat.chart_binding_status == "confirmed" and not geometry.candidate_only
@@ -132,6 +146,8 @@ def prepare_spatial_request(
                     facing_role="desk_facing" if facing is not None else None,
                 )
             )
+        else:
+            pass
     spatial = req.workstation_layout
     context = req.environmental_context
     barriers = [body for body in scene.bodies if body.kind in {"plant", "screen"}]
@@ -144,6 +160,8 @@ def prepare_spatial_request(
         for seat_input, seat in zip(scene.seats, geometry.seats):
             if seat_input.entrance_id is None or seat.form is None:
                 continue
+            else:
+                pass
             entry = openings[seat_input.entrance_id]
             for object_id, kind, purpose in (
                 (entry.object_id, "opening", "door"),
@@ -162,6 +180,8 @@ def prepare_spatial_request(
                         )
                     )
                     existing_ids.add(object_id)
+                else:
+                    pass
             for barrier in barriers:
                 if barrier.object_id not in existing_ids:
                     objects.append(
@@ -173,6 +193,8 @@ def prepare_spatial_request(
                         )
                     )
                     existing_ids.add(barrier.object_id)
+                else:
+                    pass
                 facts = {
                     key: ObservedCondition(
                         value=value,
@@ -240,6 +262,10 @@ def prepare_spatial_request(
                     objects=objects, workstation_review=new_review
                 )
             )
+        else:
+            pass
+    else:
+        pass
     body_ids = {body.object_id for body in scene.bodies}
     features = [
         feature for feature in req.features if feature.object_id not in body_ids
@@ -269,6 +295,8 @@ def prepare_spatial_request(
                     evidence=observation.evidence,
                 )
             )
+        else:
+            pass
     return (
         req.model_copy(
             update=dict(
@@ -298,6 +326,8 @@ def measured_assessment(
     spatial = req.workstation_layout
     if spatial is None:
         raise ValueError("measured_assessment requires a measured scene")
+    else:
+        pass
     comparisons, desktop_rulesets = desktop_rule_comparisons(spatial.scene, geometry)
     for finding in legacy.form_analysis.findings:
         for check in finding.checks:
@@ -336,10 +366,14 @@ def measured_assessment(
                     status="reference_only_no_combined_direction_verdict",
                 )
             )
+        else:
+            pass
     readings, missing = conditioned_readings(req, geometry, facts)
     for reading in readings:
         if reading.selected_role is None or reading.evaluation_period_number is None:
             continue
+        else:
+            pass
         comparisons.append(
             RuleComparison(
                 object_id=reading.desk_id,
@@ -384,6 +418,8 @@ def measured_assessment(
                 or relation.barrier_between_entry_and_user is None
             ):
                 continue
+            else:
+                pass
             line, between = (
                 relation.entry_line_through_user,
                 relation.barrier_between_entry_and_user,
@@ -403,6 +439,8 @@ def measured_assessment(
                     instance_id=relation.relation_id,
                 )
             )
+    else:
+        pass
     rulesets = [
         spatial_ruleset("workstation_layout_v1"),
         *legacy.supplemental_rulesets,
@@ -410,17 +448,27 @@ def measured_assessment(
     ]
     if facts.xuankong_natal is not None:
         rulesets.append(spatial_ruleset("workstation_conditioned_v1"))
+    else:
+        pass
     if any("wofs_desktop_compass_v1" in d.ruleset_ids for d in spatial.scene.desktops):
         rulesets.append(spatial_ruleset("wofs_desktop_compass_v1"))
+    else:
+        pass
     if spatial.timeliness_ruleset_id:
         rulesets.append(RegisteredRuleset.model_validate(timeliness_provenance()))
+    else:
+        pass
     if geometry.candidate_only:
         missing.append("workstation_layout.scene.confirmed_measurements")
+    else:
+        pass
     for geometry_check in geometry.checks:
         if geometry_check.passed is None:
             missing.append(
                 f"workstation_layout.geometry.{geometry_check.check_id}:{','.join(geometry_check.object_ids)}"
             )
+        else:
+            pass
     # A source's uncovered object is not a missing fact. Do not ask for
     # orientation/material simply to invent an unregistered placement rule.
     for comparison in comparisons:
@@ -432,6 +480,8 @@ def measured_assessment(
             missing.append(
                 f"workstation_layout.rules.{comparison.object_id}.{comparison.rule_id}"
             )
+        else:
+            pass
     return SceneAssessment(
         request=req,
         geometry=geometry,
@@ -453,13 +503,19 @@ def evaluate_measured_candidate(
         prior = candidate_layers["bazhai"]
         if not isinstance(prior, dict):
             raise ValueError("computed bazhai layer must be an object")
+        else:
+            pass
         candidate_layers["bazhai"] = TypeAdapter(dict[str, JsonValue]).validate_python(
             {**bazhai(req), "ruleset": prior["ruleset"]}
         )
+    else:
+        pass
     if "jinsuo" in candidate_layers:
         prior = candidate_layers["jinsuo"]
         if not isinstance(prior, dict):
             raise ValueError("computed jinsuo layer must be an object")
+        else:
+            pass
         candidate_layers["jinsuo"] = TypeAdapter(dict[str, JsonValue]).validate_python(
             {
                 **jinsuo(
@@ -470,6 +526,8 @@ def evaluate_measured_candidate(
                 "ruleset": prior["ruleset"],
             }
         )
+    else:
+        pass
     layout = TypeAdapter(dict[str, JsonValue]).validate_python(
         analyze_layout(req, candidate_layers)
     )
@@ -480,6 +538,8 @@ def geometry_output(assessment: SceneAssessment) -> GeometryOutput:
     spatial = assessment.request.workstation_layout
     if spatial is None:
         raise ValueError("geometry_output requires a measured scene")
+    else:
+        pass
     scene = spatial.scene
     return GeometryOutput(
         frame_id=scene.frame_id,

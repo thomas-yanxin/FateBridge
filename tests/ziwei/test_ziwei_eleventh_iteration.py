@@ -3,6 +3,7 @@
 import asyncio
 import json
 import shutil
+from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
@@ -13,14 +14,17 @@ import scripts.ziwei.audit_ziwei_cycles as audit
 from fatebridge.application.examples import evidence_views, suggested_fields
 from fatebridge.cli import run
 from fatebridge.core.metaphysics.ziwei import build_ziwei_chart
-from fatebridge.core.ziwei_auxiliary import attach_natal_cycles
+from fatebridge.core.ziwei.ziwei_auxiliary import attach_natal_cycles
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
 from scripts.ziwei.audit_ziwei_limits import _seed
 from tests.fixtures.mcp_receipt import verified_inline_business
+from tests.support.transports import call_calculation
 
 
-def test_independent_cycles_keep_real_software_differences_and_unresolved_slots():
+def test_independent_cycles_keep_real_software_differences_and_unresolved_slots() -> (
+    None
+):
     r = audit.audit_cycles()
     assert not r["mismatches"]
     assert r["source_start_rows"] == 5 and r["lucun_stem_rows"] == 10
@@ -38,7 +42,9 @@ def test_independent_cycles_keep_real_software_differences_and_unresolved_slots(
     assert not r["whole_book_acceptance_passed"]
 
 
-def test_discarding_all_unknown_labels_is_detected(monkeypatch):
+def test_discarding_all_unknown_labels_is_detected(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     original = audit.attach_natal_cycles
 
     def discard(palaces, **kwargs):
@@ -46,13 +52,17 @@ def test_discarding_all_unknown_labels_is_detected(monkeypatch):
         if kwargs["gender"] == "未知":
             for p in palaces:
                 p["changsheng12"] = p["boshi12"] = None
+        else:
+            pass
         return r
 
     monkeypatch.setattr(audit, "attach_natal_cycles", discard)
     assert audit.audit_cycles()["mismatches"]
 
 
-def test_runtime_source_cannot_rewrite_the_ming_reading(tmp_path, monkeypatch):
+def test_runtime_source_cannot_rewrite_the_ming_reading(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     name = "src/fatebridge/data/classical/ziwei-naj-ming-cycles.json"
     r = json.loads((audit.ROOT / name).read_text())
     r["boshi"]["sequence_as_read"][9] = "天耗"
@@ -63,7 +73,7 @@ def test_runtime_source_cannot_rewrite_the_ming_reading(tmp_path, monkeypatch):
     assert dict(case="production_source_data") in audit.audit_cycles()["mismatches"]
 
 
-def test_official_boshi_crop_is_required(tmp_path):
+def test_official_boshi_crop_is_required(tmp_path: Path) -> None:
     folder = "naj_ming_cycles_v1"
     shutil.copytree(audit.FIXTURES / folder, tmp_path / folder)
     p = tmp_path / folder / "boshi-region.jpg"
@@ -74,7 +84,9 @@ def test_official_boshi_crop_is_required(tmp_path):
 
 @pytest.mark.parametrize("profile", ["iztro_2_5_8", "quanshu_v2_excerpt"])
 @pytest.mark.parametrize("element", ["水", "木", "金", "土", "火"])
-def test_two_labels_per_cycle_are_known_without_gender(element, profile):
+def test_two_labels_per_cycle_are_known_without_gender(
+    element: str, profile: str
+) -> None:
     p = [dict(ganzhi="甲" + b) for b in "子丑寅卯辰巳午未申酉戌亥"]
     r = attach_natal_cycles(
         p, element=element, year_stem="乙", gender="未知", rule_profile=profile
@@ -92,7 +104,9 @@ def test_two_labels_per_cycle_are_known_without_gender(element, profile):
 
 @pytest.mark.parametrize("profile", ["iztro_2_5_8", "quanshu_v2_excerpt"])
 @pytest.mark.parametrize("year", [1984, 1985])
-def test_unknown_chart_is_the_intersection_of_both_directions(profile, year):
+def test_unknown_chart_is_the_intersection_of_both_directions(
+    profile: str, year: int
+) -> None:
     charts = {
         g: build_ziwei_chart(_seed(year), g, rule_profile=profile)
         for g in ("男", "女", "未知")
@@ -116,7 +130,7 @@ def test_unknown_chart_is_the_intersection_of_both_directions(profile, year):
     assert sum(r["match"] is None for r in e["positions"]["changsheng"].values()) == 10
 
 
-def test_yin_year_software_difference_is_not_hidden_by_same_anchors():
+def test_yin_year_software_difference_is_not_hidden_by_same_anchors() -> None:
     c = build_ziwei_chart(_seed(1985), "男")
     e = c["cycle_source_comparison"]
     assert c["wuxing_ju"]["element"] == "土"
@@ -131,8 +145,11 @@ def test_yin_year_software_difference_is_not_hidden_by_same_anchors():
 @pytest.mark.parametrize("profile", ["iztro_2_5_8", "quanshu_v2_excerpt"])
 @pytest.mark.parametrize("gender", ["男", "未知"])
 def test_cycle_view_survives_three_surfaces_and_default_mcp_budget(
-    profile, gender, monkeypatch, capsys
-):
+    profile: str,
+    gender: str,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     api._reset_runtime_state_for_tests()
     monkeypatch.setattr(
         api,
@@ -158,7 +175,7 @@ def test_cycle_view_survives_three_surfaces_and_default_mcp_budget(
         include_snapshot_text=False,
     )
     rest = TestClient(api.app).post(
-        "/api/cn/ziwei/birth",
+        "/api/ziwei/birth-chart",
         json=inputs,
         params=[
             ("as_of", options["as_of"]),
@@ -170,14 +187,15 @@ def test_cycle_view_survives_three_surfaces_and_default_mcp_budget(
 
     async def call():
         async with Client(create_mcp_app(families="metaphysics")) as client:
-            r = await client.call_tool(
-                "ziwei_birth", {**inputs, **options}, raise_on_error=False
+            r = await call_calculation(
+                client, "ziwei_birth_chart", {**inputs, **options}, raise_on_error=False
             )
             assert not r.is_error, r.content
             await verified_inline_business(client, r.structured_content)
             if gender == "未知":
-                normal = await client.call_tool(
-                    "ziwei_birth",
+                normal = await call_calculation(
+                    client,
+                    "ziwei_birth_chart",
                     {**inputs, **options, "fields": suggested_fields(spec)},
                 )
                 await verified_inline_business(client, normal.structured_content)
@@ -187,10 +205,12 @@ def test_cycle_view_survives_three_surfaces_and_default_mcp_budget(
                     67 if profile == "quanshu_v2_excerpt" else 66
                 )
                 assert sum(p["changsheng12"] is not None for p in view["palaces"]) == 2
+            else:
+                pass
             return r
 
     native = asyncio.run(call())
-    args = ["ziwei_birth"]
+    args = ["ziwei_birth_chart"]
     for name, value in inputs.items():
         args += ["--" + name.replace("_", "-"), str(value)]
     args += [
@@ -216,7 +236,7 @@ def test_cycle_view_survives_three_surfaces_and_default_mcp_budget(
     assert e["inputs"]["gender"] == gender
 
 
-def test_metadata_reference_helper_never_allows_business_deferral():
+def test_metadata_reference_helper_never_allows_business_deferral() -> None:
     with pytest.raises(AssertionError):
         asyncio.run(
             verified_inline_business(

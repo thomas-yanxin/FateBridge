@@ -8,8 +8,8 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.jyotish_balas import PLANETS
-from fatebridge.core.jyotish_war import BIMBA, STARS, THROUGH_HORA, war_bala
+from fatebridge.core.jyotish.jyotish_balas import PLANETS
+from fatebridge.core.jyotish.jyotish_war import BIMBA, STARS, THROUGH_HORA, war_bala
 
 FIXTURES = Path(__file__).parents[1] / "fixtures"
 PRIMARY = json.loads((FIXTURES / "jyotish-war-classical.json").read_text())
@@ -37,7 +37,7 @@ def calculate(lons, components, sthana, dig, scenarios=None):
     )
 
 
-def test_literal_source_constants_and_unusual_fixed_outer_disc_sizes():
+def test_literal_source_constants_and_unusual_fixed_outer_disc_sizes() -> None:
     assert BIMBA == PRIMARY["source"]["bimba_arcseconds"]
     assert list(THROUGH_HORA) == PRIMARY["through_hora_keys"]
     assert (
@@ -46,7 +46,7 @@ def test_literal_source_constants_and_unusual_fixed_outer_disc_sizes():
     assert float(BIMBA["Saturn"]) == 158.0
 
 
-def test_independent_hand_totals_divisor_and_signs():
+def test_independent_hand_totals_divisor_and_signs() -> None:
     case = PRIMARY["hand_case"]
     lons, components, sthana, dig = inputs()
     lons.update(case["longitudes"])
@@ -68,8 +68,8 @@ def test_independent_hand_totals_divisor_and_signs():
 @pytest.mark.parametrize("a,b", list(combinations(STARS, 2)))
 @pytest.mark.parametrize("reverse", [False, True])
 def test_all_ten_pairs_and_both_victor_orders_against_independent_fraction(
-    a, b, reverse
-):
+    a, b, reverse: bool
+) -> None:
     lons, components, sthana, dig = inputs()
     lons[a], lons[b] = (15.25, 15.0) if reverse else (15.0, 15.25)
     sthana["summary"][a]["total_virupa"] = 200
@@ -89,7 +89,7 @@ def test_all_ten_pairs_and_both_victor_orders_against_independent_fraction(
 
 
 @pytest.mark.parametrize("key", PRIMARY["through_hora_keys"])
-def test_every_through_hora_component_including_all_three_calendar_lords(key):
+def test_every_through_hora_component_including_all_three_calendar_lords(key) -> None:
     lons, components, sthana, dig = inputs()
     lons.update(Mars=100, Mercury=100.5)
     components[key]["summary"]["Mars"] = 30
@@ -98,7 +98,7 @@ def test_every_through_hora_component_including_all_three_calendar_lords(key):
 
 
 @pytest.mark.parametrize("key", PRIMARY["excluded"])
-def test_later_or_cyclic_strength_components_are_not_in_prewar_basis(key):
+def test_later_or_cyclic_strength_components_are_not_in_prewar_basis(key) -> None:
     lons, components, sthana, dig = inputs()
     lons.update(Mars=100, Mercury=100.5)
     sthana["summary"]["Mars"]["total_virupa"] = 100
@@ -107,7 +107,7 @@ def test_later_or_cyclic_strength_components_are_not_in_prewar_basis(key):
     assert calculate(lons, components, sthana, dig) == expected
 
 
-def test_literal_strict_distance_boundary_and_no_added_same_sign_gate():
+def test_literal_strict_distance_boundary_and_no_added_same_sign_gate() -> None:
     lons, components, sthana, dig = inputs()
     lons.update(Mars=100, Mercury=101)
     assert not calculate(lons, components, sthana, dig)["candidates"]
@@ -125,8 +125,8 @@ def test_literal_strict_distance_boundary_and_no_added_same_sign_gate():
     ],
 )
 def test_equal_and_origin_cut_cases_remain_missing_even_if_strength_difference_zero(
-    pair, expected
-):
+    pair, expected: str
+) -> None:
     lons, components, sthana, dig = inputs()
     lons.update(Mars=pair[0], Mercury=pair[1])
     result = calculate(lons, components, sthana, dig)
@@ -135,7 +135,9 @@ def test_equal_and_origin_cut_cases_remain_missing_even_if_strength_difference_z
     assert result["summary"]["Jupiter"] == 0
 
 
-def test_all_connected_three_planet_participants_stay_missing_including_chain_endpoint():
+def test_all_connected_three_planet_participants_stay_missing_including_chain_endpoint() -> (
+    None
+):
     lons, components, sthana, dig = inputs()
     lons.update(Mars=100, Mercury=100.75, Jupiter=101.5)
     result = calculate(lons, components, sthana, dig)
@@ -149,7 +151,7 @@ def test_all_connected_three_planet_participants_stay_missing_including_chain_en
     )
 
 
-def test_disjoint_pair_still_computes_when_other_pair_has_missing_basis():
+def test_disjoint_pair_still_computes_when_other_pair_has_missing_basis() -> None:
     lons, components, sthana, dig = inputs()
     lons.update(Mars=100, Mercury=100.5, Jupiter=200, Venus=200.5)
     dig["summary"]["Mercury"] = None
@@ -164,7 +166,7 @@ def test_disjoint_pair_still_computes_when_other_pair_has_missing_basis():
     )
 
 
-def test_sun_moon_nodes_never_hide_star_pair_and_no_arbitrary_sixty_cap():
+def test_sun_moon_nodes_never_hide_star_pair_and_no_arbitrary_sixty_cap() -> None:
     lons, components, sthana, dig = inputs()
     lons.update(Sun=10, Moon=10.01, Mars=100, Mercury=100.5, Rahu=100, Ketu=280)
     sthana["summary"]["Mars"]["total_virupa"] = 200
@@ -174,7 +176,9 @@ def test_sun_moon_nodes_never_hide_star_pair_and_no_arbitrary_sixty_cap():
     assert result["summary"]["Sun"] == result["summary"]["Moon"] == 0
 
 
-def test_nature_branches_keep_conserved_pair_contributions_without_choosing_highest():
+def test_nature_branches_keep_conserved_pair_contributions_without_choosing_highest() -> (
+    None
+):
     lons, components, sthana, dig = inputs()
     lons.update(Mars=100, Mercury=100.5)
     sthana["summary"]["Mars"]["total_virupa"] = 20
@@ -195,7 +199,7 @@ def test_nature_branches_keep_conserved_pair_contributions_without_choosing_high
 
 
 @pytest.mark.parametrize("value", [math.nan, math.inf, -math.inf, True])
-def test_invalid_strength_input_cannot_be_serialized_as_an_amount(value):
+def test_invalid_strength_input_cannot_be_serialized_as_an_amount(value) -> None:
     lons, components, sthana, dig = inputs()
     lons.update(Mars=100, Mercury=100.5)
     sthana["summary"]["Mars"]["total_virupa"] = value
@@ -204,7 +208,7 @@ def test_invalid_strength_input_cannot_be_serialized_as_an_amount(value):
 
 
 @pytest.mark.parametrize("case", ORACLE["rows"], ids=lambda c: c["id"])
-def test_pinned_third_party_agreement_and_counterexamples_are_retained(case):
+def test_pinned_third_party_agreement_and_counterexamples_are_retained(case) -> None:
     lons, components, sthana, dig = inputs()
     lons.update(zip(PLANETS, case["longitudes"]))
     for p, v in zip(PLANETS, case["sthana"]):

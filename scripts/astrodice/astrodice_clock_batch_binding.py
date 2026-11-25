@@ -21,6 +21,8 @@ def time_batch(query):
         for k in TIME_KEYS
     ):
         raise ValueError("Incomplete explicit time-batch contract")
+    else:
+        pass
     return {k: parameters[k] for k in TIME_KEYS}
 
 
@@ -31,3 +33,5 @@ def matching_time_batches(observer_query, vector_query):
 def require_matching_time_batches(observer_query, vector_query):
     if not matching_time_batches(observer_query, vector_query):
         raise ValueError("Cross-batch source-clock transfer is unqualified")
+    else:
+        pass

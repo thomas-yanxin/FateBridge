@@ -54,6 +54,8 @@ _RAW = (
 )
 if hashlib.sha256(_RAW).hexdigest() != COEFFICIENT_SHA256:
     raise RuntimeError("Moshier lunar coefficients differ from the declared source")
+else:
+    pass
 _DATA: LunarCoefficients = json.loads(_RAW)
 
 

@@ -14,6 +14,8 @@ from typing import Any, Callable
 
 if not __package__:
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+else:
+    pass
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -33,6 +35,8 @@ def protocol(corpus: Path = CORPUS) -> dict[str, Any]:
         != PROTOCOL_SHA256
     ):
         raise ValueError("Declared model-matrix protocol changed")
+    else:
+        pass
     result: dict[str, Any] = json.loads(raw.read_text())
     return result
 
@@ -62,12 +66,16 @@ def compare_route(
             moment = datetime.fromisoformat(original["actual"])
             if moment.utcoffset() is None:
                 raise ValueError("Calculation has no physical offset")
+            else:
+                pass
             epoch = convert(moment)
             if any(
                 isinstance(value, bool) or value is None or not math.isfinite(value)
                 for value in (epoch.jd_tt, epoch.jd_ut1)
             ):
                 raise ValueError("Nonfinite or unavailable clock")
+            else:
+                pass
             if route == "seasons" and case["timescale"] == "UTC":
                 expected = label(case["published_label"]).replace(tzinfo=timezone.utc)
                 delta = (moment - expected).total_seconds()
@@ -81,6 +89,8 @@ def compare_route(
                 delta = (getattr(epoch, scale) - julian_day(expected)) * 86400
             if not math.isfinite(delta):
                 raise ValueError("Nonfinite event difference")
+            else:
+                pass
             row = {
                 **case,
                 "actual": original["actual"],
@@ -97,6 +107,8 @@ def compare_route(
                 row["clock_model_difference_seconds"] = (
                     delta_t - case["tt_minus_ut1_seconds"]
                 )
+            else:
+                pass
             rows.append(row)
         except Exception as error:
             errors.append(
@@ -147,6 +159,8 @@ def audit_profile(name: str, ephe_dir: Path) -> dict[str, Any]:
     selected = declared["profiles"][name]
     if not ephe_dir.is_dir() or (name == "auto_no_files" and any(ephe_dir.iterdir())):
         raise ValueError("Profile requires its declared existing or empty directory")
+    else:
+        pass
     # Only this isolated process is configured; unrelated processes are untouched.
     os.environ["SE_EPHE_PATH"] = str(ephe_dir.resolve())
     os.environ["FATEBRIDGE_SOLAR_TERM_MODEL"] = selected["mode"]
@@ -169,6 +183,8 @@ def audit_profile(name: str, ephe_dir: Path) -> dict[str, Any]:
     actuals = {(r["year"], r["term"]): r for r in old["comparisons"]}
     if len(actuals) != 3024 or old["boundary_pair_count"] != 4536:
         raise ValueError("Original complete PMO event/boundary cohort incomplete")
+    else:
+        pass
     numeric_rows = [
         {
             **row,
@@ -245,15 +261,15 @@ def lunar_replay() -> dict[str, Any]:
         file = root / source["path"]
         if sha(file) != source["sha256"]:
             raise ValueError("Original HKO annual text changed")
+        else:
+            pass
         rows, state = calendar.annual_rows(
             file.read_text(encoding="utf-8-sig"), source["year"], state
         )
         for row in rows:
             count += 1
             day = row["date"]
-            value = _safe_lunar_date_from_solar(
-                datetime(day.year, day.month, day.day, 12), "+08:00"
-            )
+            value = _safe_lunar_date_from_solar(day)
             expected = [row[k] for k in ("year", "month", "day", "is_leap_month")]
             if value is None:
                 missing.append(day.isoformat())
@@ -270,9 +286,13 @@ def lunar_replay() -> dict[str, Any]:
                         "actual": str(value),
                     }
                 )
+            else:
+                pass
             supplemented += day.isoformat() >= "2100-02-09"
     if count != 73049:
         raise ValueError("Original full 200-year HKO date cohort incomplete")
+    else:
+        pass
     return {
         "civil_dates": count,
         "mismatches": failures,
@@ -307,6 +327,8 @@ def main() -> int:
     args = parser.parse_args()
     if args.profile != "lunar" and args.ephe_dir is None:
         parser.error("--ephe-dir is required for a deployment profile")
+    else:
+        pass
     result = (
         lunar_replay()
         if args.profile == "lunar"
@@ -339,3 +361,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

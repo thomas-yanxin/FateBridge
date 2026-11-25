@@ -9,7 +9,8 @@ from pathlib import Path
 import pytest
 
 from fatebridge.core.calendar import BaZiCalendar
-from fatebridge.services.metaphysics import _build_analysis_seed, calculate_liureng_gods
+from fatebridge.core.metaphysics.seed import build_analysis_seed
+from fatebridge.services.metaphysics import calculate_liureng_gods
 from tests.support.transports import SPECS, business, rest, surface_calls
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -24,11 +25,11 @@ HAVANA = REFERENCE["havana_cache_case"]
 
 
 @pytest.mark.parametrize("order", [(0, 1), (1, 0)])
-def test_same_wall_fold_cache_keeps_both_independent_month_expectations(order):
+def test_same_wall_fold_cache_keeps_both_independent_month_expectations(order) -> None:
     BaZiCalendar._get_four_pillars_cached.cache_clear()
     for index in order:
         probe = HAVANA["probes"][index]
-        seed = _build_analysis_seed(**AUDIT.payload(HAVANA, probe))
+        seed = build_analysis_seed(**AUDIT.payload(HAVANA, probe))
         assert list(seed.pillars["year"]) == HAVANA["year_pillar"]
         assert list(seed.pillars["month"]) == probe["month_pillar"]
         assert list(seed.pillars["day"]) == HAVANA["day_pillar_civil"]
@@ -36,11 +37,11 @@ def test_same_wall_fold_cache_keeps_both_independent_month_expectations(order):
         assert seed.calendar_context["current_solar_term"]["name"] == probe["term"]
     # Repeating either call after the other must still hit its own correct key.
     for index in order:
-        seed = _build_analysis_seed(**AUDIT.payload(HAVANA, HAVANA["probes"][index]))
+        seed = build_analysis_seed(**AUDIT.payload(HAVANA, HAVANA["probes"][index]))
         assert list(seed.pillars["month"]) == HAVANA["probes"][index]["month_pillar"]
 
 
-def test_all_declared_fold_projections_keep_source_precision_and_denominators():
+def test_all_declared_fold_projections_keep_source_precision_and_denominators() -> None:
     report = AUDIT.audit()
     assert report["comparison_count"] == report["calculation_matched_count"] == 54
     assert report["current_clock_matched_count"] == 54
@@ -62,19 +63,19 @@ def test_all_declared_fold_projections_keep_source_precision_and_denominators():
 
 
 @pytest.mark.parametrize("probe", HAVANA["probes"])
-def test_named_zone_and_verified_offset_match_the_same_fixed_offset_solar_label(probe):
+def test_named_zone_and_verified_offset_match_the_same_fixed_offset_solar_label(
+    probe,
+) -> None:
     payload = {
         **AUDIT.payload(HAVANA, probe),
         "use_true_solar_time": True,
         "analysis_longitude": HAVANA["longitude"],
     }
-    named = _build_analysis_seed(**payload)
-    fixed = _build_analysis_seed(
+    named = build_analysis_seed(**payload)
+    fixed = build_analysis_seed(
         **{**payload, "analysis_timezone": probe["offset"], "analysis_utc_offset": None}
     )
-    assert named.corrected_datetime.replace(
-        tzinfo=None
-    ) == fixed.corrected_datetime.replace(tzinfo=None)
+    assert named.clock == fixed.clock
     assert named.pillars == fixed.pillars
     # Different standard-meridian/DST decompositions may associate floating
     # additions differently; this is 6 ns, below the datetime microsecond.
@@ -93,6 +94,8 @@ def request(key, probe, solar):
     }
     if key == "jinkou":
         payload["di_fen"] = "子"
+    else:
+        pass
     if key == "liureng_runyear":
         payload.update(
             birth_year=1910,
@@ -103,6 +106,8 @@ def request(key, probe, solar):
             birth_longitude=116.4,
             gender="女",
         )
+    else:
+        pass
     return payload
 
 
@@ -111,8 +116,8 @@ def request(key, probe, solar):
 @pytest.mark.parametrize("solar", [False, True])
 @pytest.mark.parametrize("project", [False, True])
 def test_actual_offset_fold_and_pillars_agree_across_rest_native_mcp_cli(
-    key, probe, solar, project, surface_calls
-):
+    key: str, probe, solar: bool, project: bool, surface_calls
+) -> None:
     spec = SPECS[key]
     payload = request(key, probe, solar)
     branch = "jinkou" if key == "jinkou" else "liureng"
@@ -133,6 +138,8 @@ def test_actual_offset_fold_and_pillars_agree_across_rest_native_mcp_cli(
             *fields,
         ]
         options = dict(fields=fields, strict_fields=True, include_snapshot_text=False)
+    else:
+        pass
     http, protocol, code, cli = surface_calls(
         spec, payload, params=params, options=options, flags=flags
     )
@@ -158,6 +165,8 @@ def test_actual_offset_fold_and_pillars_agree_across_rest_native_mcp_cli(
                 else result[branch]["month_general"]
             )
             assert general["branch"] == "卯"  # 立冬换月建；月将仍待小雪中气。
+        else:
+            pass
         if solar:
             corrected = datetime.fromisoformat(
                 result[branch]["calendar_policy"]["corrected_clock"]
@@ -165,13 +174,15 @@ def test_actual_offset_fold_and_pillars_agree_across_rest_native_mcp_cli(
             assert (
                 corrected.tzinfo is None
             )  # A solar label is not a second civil instant.
+        else:
+            pass
 
 
 @pytest.mark.parametrize("key", ["liureng_gods", "liureng_runyear", "jinkou"])
 @pytest.mark.parametrize("kind", ["missing", "wrong_offset", "gap"])
 def test_ambiguous_missing_invalid_offset_and_gap_reject_on_every_transport(
-    key, kind, surface_calls
-):
+    key: str, kind: str, surface_calls
+) -> None:
     spec = SPECS[key]
     payload = request(key, HAVANA["probes"][0], False)
     if kind == "missing":
@@ -187,7 +198,9 @@ def test_ambiguous_missing_invalid_offset_and_gap_reject_on_every_transport(
         assert "liureng" not in body and "jinkou" not in body
 
 
-def test_explicit_offset_on_a_unique_clock_is_not_claimed_to_be_a_repeated_hour():
+def test_explicit_offset_on_a_unique_clock_is_not_claimed_to_be_a_repeated_hour() -> (
+    None
+):
     result = calculate_liureng_gods(
         analysis_year=2026,
         analysis_month=4,
@@ -203,7 +216,9 @@ def test_explicit_offset_on_a_unique_clock_is_not_claimed_to_be_a_repeated_hour(
     assert "重复钟时第" not in result["snapshot_text"]
 
 
-def test_independent_clock_reference_rejects_changed_expected_month(tmp_path):
+def test_independent_clock_reference_rejects_changed_expected_month(
+    tmp_path: Path,
+) -> None:
     dest = tmp_path / "reference"
     shutil.copytree(AUDIT.CORPUS, dest)
     path = dest / "reference.json"

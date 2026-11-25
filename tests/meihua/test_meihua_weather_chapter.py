@@ -7,9 +7,18 @@ from pathlib import Path
 
 import pytest
 
+from fatebridge.application.examples import suggested_fields
+from fatebridge.core.meihua.meihua_weather import weather_ruleset
 from fatebridge.services.meihua import calculate_meihua_cast
-from fatebridge.validation.meihua_weather_chapter import audit_weather_chapter
-from tests.support.transports import rest, surface_calls
+from tests.support.transports import (
+    SPECS,
+    business,
+    call_cli,
+    native,
+    rest,
+    surface_calls,
+)
+from validation.meihua_weather_chapter import audit_weather_chapter
 
 REFERENCES = Path(__file__).parents[1] / "fixtures/meihua_weather_chapter_v5"
 CASES = json.loads((REFERENCES / "cases.json").read_text())["cases"]
@@ -24,7 +33,7 @@ def calculate(case):
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
-def test_frozen_season_many_and_pair_probes(case):
+def test_frozen_season_many_and_pair_probes(case) -> None:
     output = calculate(case)
     cast = output["meihua"]
     weather = output["interpretation"]["weather"]
@@ -44,9 +53,11 @@ def test_frozen_season_many_and_pair_probes(case):
         assert [
             v["count"] for v in trace["frequency_assessment"]["counting_variants"]
         ] == expected["counts"]
+    else:
+        pass
 
 
-def test_fixed_quote_and_primary_wording_are_both_retained():
+def test_fixed_quote_and_primary_wording_are_both_retained() -> None:
     output = calculate(CASES[13])
     row = next(
         r
@@ -58,8 +69,7 @@ def test_fixed_quote_and_primary_wording_are_both_retained():
     assert row["textual_status"] == "fixed_transcription_with_facsimile_variants"
 
 
-def test_source_subject_is_not_reconstructed_to_match_familiar_text():
-    from fatebridge.core.meihua_weather import weather_ruleset
+def test_source_subject_is_not_reconstructed_to_match_familiar_text() -> None:
 
     rule = next(
         r for r in weather_ruleset()["rules"] if r["id"] == "long_rain_qian_clears"
@@ -72,7 +82,7 @@ def test_source_subject_is_not_reconstructed_to_match_familiar_text():
     )
 
 
-def test_frozen_witness_integration_does_not_become_textual_truth():
+def test_frozen_witness_integration_does_not_become_textual_truth() -> None:
     report = audit_weather_chapter(REFERENCES)
     assert report["selected_checks_passed"], report
     assert report["literal_mathematical_probe_count"] == 16
@@ -101,7 +111,9 @@ def test_frozen_witness_integration_does_not_become_textual_truth():
     )
 
 
-def test_weather_oracle_disagreement_stays_a_failure_after_rehash(tmp_path):
+def test_weather_oracle_disagreement_stays_a_failure_after_rehash(
+    tmp_path: Path,
+) -> None:
     reference = tmp_path / "fixtures/meihua_weather_chapter_v5"
     shutil.copytree(REFERENCES, reference)
     for name in ["meihua_weather_gen_v4", "meihua_v1"]:
@@ -123,7 +135,7 @@ def test_weather_oracle_disagreement_stays_a_failure_after_rehash(tmp_path):
     assert report["cases"][0]["disagreements"][0]["field"] == "status"
 
 
-def test_cloudy_is_not_a_dry_label_and_autumn_is_not_extraordinary_thunder():
+def test_cloudy_is_not_a_dry_label_and_autumn_is_not_extraordinary_thunder() -> None:
     output = calculate(CASES[10])
     weather = output["interpretation"]["weather"]
     row = next(r for r in weather["rule_trace"] if r["rule_id"] == "many_dui_cloudy")
@@ -148,10 +160,8 @@ def test_cloudy_is_not_a_dry_label_and_autumn_is_not_extraordinary_thunder():
     "index", [0, 5, 7, 9, 13, 14, 15], ids=lambda i: CASES[i]["id"]
 )
 def test_weather_selected_witnesses_and_conditions_agree_on_three_transports(
-    index, surface_calls
-):
-    from fatebridge.application.examples import suggested_fields
-    from tests.support.transports import SPECS, business, call_cli, native
+    index: int, surface_calls
+) -> None:
 
     spec = SPECS["meihua_cast"]
     case = CASES[index]
@@ -185,3 +195,5 @@ def test_weather_selected_witnesses_and_conditions_agree_on_three_transports(
             assert row["effective_status"] == case["expected"]["effective_status"]
         elif case["expected"]["status"] == "pending_context":
             assert case["expected"]["rule_id"] in weather["pending_rule_ids"]
+        else:
+            pass

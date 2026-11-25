@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from typing import Any, List
+from pydantic import BaseModel
 
-from fatebridge.application.bindings import lazy_service, raw_invoke
+from fatebridge.application.bindings import LazyService, lazy_service, raw_invoke
 from fatebridge.application.tool_spec import ToolSpec
 from fatebridge.core.requests.western_events import (
     AstroElectionRequest,
@@ -33,7 +33,9 @@ calculate_horary = lazy_service(
 )
 
 
-def _western_event_spec(name: str, service: Any, model: Any, label: str) -> ToolSpec:
+def _western_event_spec(
+    name: str, tool_name: str, service: LazyService, model: type[BaseModel], label: str
+) -> ToolSpec:
     """Register a western ephemeris-event technique (ingress chart / planetary return)."""
     return ToolSpec(
         key=f"astro_{name}",
@@ -62,33 +64,39 @@ def _western_event_spec(name: str, service: Any, model: Any, label: str) -> Tool
         operation_label_zh=label,
         family="western_event",
         cpu_bound=True,
-        rest_path=f"/api/astro/event/{name}",
-        mcp_name=f"astro_{name}",
+        include_snapshot_text=name not in {"horary", "election"},
+        optional_snapshot=True,
+        rest_path="/api/astrology/events/" + tool_name.replace("_", "-"),
+        mcp_name=tool_name,
         cli_request_file=name == "horary",
     )
 
 
-SPECS: List[ToolSpec] = [
+SPECS: list[ToolSpec] = [
     _western_event_spec(
         "mundane",
+        "mundane_ingress_chart",
         calculate_mundane,
         AstroMundaneRequest,
         "世俗入宫盘",
     ),
     _western_event_spec(
         "extrareturns",
+        "planetary_returns",
         calculate_extrareturns,
         AstroExtraReturnsRequest,
         "多重回归",
     ),
     _western_event_spec(
         "horary",
+        "horary_chart",
         calculate_horary,
         AstroHoraryRequest,
-        "卜卦判断",
+        "卜卦证据",
     ),
     _western_event_spec(
         "election",
+        "evaluate_election_time",
         calculate_election,
         AstroElectionRequest,
         "择日",

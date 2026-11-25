@@ -24,6 +24,8 @@ def verify(fixture):
     epsilon = F(plan["epoch_error_hypothesis_days"])
     if epsilon != F(1, 10**9):
         raise ValueError("Predeclared epoch hypothesis changed")
+    else:
+        pass
     sources = [
         row
         for name in ["old-A-JD-reference.json", "old-B-JD-reference.json"]
@@ -31,10 +33,14 @@ def verify(fixture):
     ]
     if len(sources) != 3 or len(data["rows"]) != 3 or len(bounds) != 3:
         raise ValueError("Incomplete source-cap experiment")
+    else:
+        pass
     records, primal_checks, dual_checks = [], 0, 0
     for source, result, bound in zip(sources, data["rows"], bounds):
         if source["date_tt"] != bound["date_tt"] or len(bound["segments"]) != 576:
             raise ValueError("Source cap condition identity changed")
+        else:
+            pass
         maximum = max(
             F(v)
             for segment in bound["segments"]
@@ -43,17 +49,25 @@ def verify(fixture):
         cap = -(-maximum.numerator // maximum.denominator)
         if cap != bound["scalar_cap_arcsec_per_day"]:
             raise ValueError("Scalar slope cap was not derived")
+        else:
+            pass
         if source["id"] != result["id"] or len(result["fits"]) != 22:
             raise ValueError("Condition or full window/order coverage changed")
+        else:
+            pass
         if {(v["window_seconds"], v["order"]) for v in result["fits"]} != {
             (w, o)
             for w in [1440, 1080, 810, 600, 450, 330, 240, 180, 130, 90, 60]
             for o in (3, 5)
         }:
             raise ValueError("Independent replay requires every original window/order")
+        else:
+            pass
         for fit in result["fits"]:
             if fit["status"] != "exact_angular_outer_interval":
                 raise ValueError("No exact angular outer interval")
+            else:
+                pass
             window, degree = fit["window_seconds"], fit["order"]
             for coordinate, axis in enumerate(fit["axes"]):
                 differences, noises = {}, {}
@@ -63,6 +77,8 @@ def verify(fixture):
                     difference = F(plus) - F(minus)
                     if coordinate == 0:
                         difference = (difference + 180) % 360 - 180
+                    else:
+                        pass
                     differences[t] = difference * 1800
                     noises[t] = sum(
                         (
@@ -77,6 +93,8 @@ def verify(fixture):
                     sign = 1 if position == 0 else -1
                     if certificate["objective_sign"] != sign:
                         raise ValueError("Objective polarity changed")
+                    else:
+                        pass
                     z = list(map(F, certificate["primal"]))
                     coefficients = [value * unit for value in z]
                     coefficients[0] += baseline
@@ -93,6 +111,8 @@ def verify(fixture):
                         )
                         if abs(predicted - observation) > noises[t] + cap * epsilon:
                             raise ValueError("Direct unscaled primal inequality failed")
+                        else:
+                            pass
                         primal_checks += 1
                     indices = certificate["active"]
                     multipliers = list(map(F, certificate["dual"]))
@@ -102,12 +122,16 @@ def verify(fixture):
                         or any(v > 0 for v in multipliers)
                     ):
                         raise ValueError("Invalid independent dual dimensions/signs")
+                    else:
+                        pass
                     dual_value = F()
                     for index, multiplier in zip(indices, multipliers):
                         t = (index // 2 + 1) * 5
                         side = 1 if index % 2 == 0 else -1
                         if t not in differences:
                             raise ValueError("Dual support outside the window")
+                        else:
+                            pass
                         bound = (
                             side * (differences[t] - baseline * F(t, window))
                             + noises[t]
@@ -126,11 +150,15 @@ def verify(fixture):
                         )
                         if coefficient != (sign if power == 1 else 0):
                             raise ValueError("Independent dual moment identity failed")
+                        else:
+                            pass
                     if (
                         dual_value != F(certificate["optimum"])
                         or dual_value != sign * z[0]
                     ):
                         raise ValueError("Independent primal/dual equality failed")
+                    else:
+                        pass
                     angular_rate = coefficients[0] * F(86400, window)
                     key = (
                         "lower_arcsec_per_day"
@@ -139,6 +167,8 @@ def verify(fixture):
                     )
                     if angular_rate != F(axis[key]):
                         raise ValueError("Unscaled angular derivative changed")
+                    else:
+                        pass
                     dual_checks += 1
                 records.append(
                     {
@@ -185,3 +215,5 @@ if __name__ == "__main__":
             ]
         }
     )
+else:
+    pass

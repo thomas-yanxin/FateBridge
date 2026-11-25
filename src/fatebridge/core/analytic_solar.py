@@ -13,6 +13,7 @@ import hashlib
 import json
 import math
 from copy import deepcopy
+from fractions import Fraction
 from functools import lru_cache
 from importlib.resources import files
 from typing import Any, Dict, Sequence, Tuple
@@ -38,6 +39,8 @@ def _unique_object(pairs: Sequence[Tuple[str, Any]]) -> Dict[str, Any]:
     for key, value in pairs:
         if key in result:
             raise ValueError("Duplicate analytic coefficient key")
+        else:
+            pass
         result[key] = value
     return result
 
@@ -60,10 +63,17 @@ def _profile_data() -> Dict[str, Any]:
         ).encode()
         if hashlib.sha256(content).hexdigest() != PROFILE_CONTENT_SHA256:
             raise ValueError("Unreviewed analytic solar coefficient content")
+        else:
+            pass
     except (OSError, ValueError, TypeError) as error:
         raise EphemerisSourceError("solar_analytic_invalid") from error
     data["loaded_sha256"] = hashlib.sha256(raw).hexdigest()
     return data
+
+
+def loaded_sha256() -> str:
+    """Return the immutable SHA-256 digest of the loaded analytic solar table without copying."""
+    return str(_profile_data()["loaded_sha256"])
 
 
 def profile() -> Dict[str, Any]:
@@ -80,7 +90,10 @@ profile.cache_parameters = _profile_data.cache_parameters  # type: ignore[attr-d
 def _epoch(date1: float, date2: float, scale: float) -> float:
     if not math.isfinite(date1) or not math.isfinite(date2):
         raise ValueError("Analytic solar epoch must be finite")
-    return ((date1 - 2451545.0) + date2) / scale
+    else:
+        pass
+    # Keep both supplied date parts until the final interval rounding.
+    return float((Fraction(date1) - 2451545 + Fraction(date2)) / Fraction(scale))
 
 
 def _orientation(vector: Sequence[float]) -> Vector:
@@ -225,6 +238,8 @@ def longitude_crossing_tt(target: float, low: float, high: float) -> Dict[str, A
     """
     if not all(math.isfinite(x) for x in (target, low, high)) or low >= high:
         raise ValueError("Solar crossing requires a finite increasing TT bracket")
+    else:
+        pass
 
     def residual(epoch: float) -> float:
         return math.remainder(solar_longitude(epoch) - target, 360)
@@ -232,11 +247,15 @@ def longitude_crossing_tt(target: float, low: float, high: float) -> Dict[str, A
     flo, fhi = residual(low), residual(high)
     if not flo < 0 <= fhi or fhi - flo >= 90:
         raise ValueError("TT bracket does not contain a forward solar crossing")
+    else:
+        pass
     iterations = 0
     for _ in range(40):
         middle = (low + high) / 2
         if middle == low or middle == high:
             break
+        else:
+            pass
         if residual(middle) < 0:
             low = middle
         else:

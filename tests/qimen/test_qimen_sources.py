@@ -9,7 +9,11 @@ from fatebridge.core.metaphysics.qimen import (
     QIMEN_YANG_TERMS,
     _qimen_ju_number_for_term,
 )
-from fatebridge.core.qimen_sources import SCAN_SOURCE, YANYI_FULL_VIEW, YANYI_VOLUMES
+from fatebridge.core.qimen.qimen_sources import (
+    SCAN_SOURCE,
+    YANYI_FULL_VIEW,
+    YANYI_VOLUMES,
+)
 from fatebridge.services.metaphysics import calculate_qimen_analysis
 
 REFERENCE = json.loads(
@@ -20,7 +24,7 @@ JU_CAPTIONS = json.loads(
 )
 
 
-def test_shared_sources_are_individual_chapters_rather_than_the_full_view():
+def test_shared_sources_are_individual_chapters_rather_than_the_full_view() -> None:
     assert YANYI_FULL_VIEW == REFERENCE["full_view"]["source"]
     assert YANYI_VOLUMES == {
         int(volume): record["source"] for volume, record in REFERENCE["volumes"].items()
@@ -38,8 +42,8 @@ def test_shared_sources_are_individual_chapters_rather_than_the_full_view():
     "season", ["yanyi_vol1_verse", "yanyi_vol3_table", "yanyi_vol3_prose"]
 )
 def test_actual_board_profiles_patterns_and_traces_keep_their_chapter_sources(
-    god, method, season
-):
+    god: str, method: str, season: str
+) -> None:
     result = calculate_qimen_analysis(
         analysis_year=2026,
         analysis_month=1,
@@ -80,6 +84,8 @@ def test_actual_board_profiles_patterns_and_traces_keep_their_chapter_sources(
     for palace in qimen["palaces"]:
         if palace["trigram"] == "中":
             continue
+        else:
+            pass
         evidence = palace["evidence"]
         assert evidence["star_season_source"] == season_source
         god_evidence = evidence["god_interpretation"]
@@ -107,6 +113,8 @@ def test_actual_board_profiles_patterns_and_traces_keep_their_chapter_sources(
             assert set(trace["sources"]) == {p["source"] for p in profiles.values()}
         elif trace["rule_id"] == "palace_relations":
             assert {sources[1], sources[2], season_source} <= set(trace["sources"])
+        else:
+            pass
     assert "全书导航：" in result["snapshot_text"]
     assert "逐卷固定转录：" in result["snapshot_text"]
     assert all(source in result["snapshot_text"] for source in sources.values())
@@ -121,6 +129,8 @@ def test_actual_board_profiles_patterns_and_traces_keep_their_chapter_sources(
         for use in diagram["uses"]
     ],
 )
-def test_each_term_yuan_ju_matches_the_visually_read_siku_caption(term, yuan, dun, ju):
+def test_each_term_yuan_ju_matches_the_visually_read_siku_caption(
+    term, yuan, dun, ju
+) -> None:
     assert _qimen_ju_number_for_term(current_term=term, yuan=yuan) == ju
     assert ("阳遁" if term in QIMEN_YANG_TERMS else "阴遁") == dun

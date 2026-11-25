@@ -14,14 +14,18 @@ BRANCHES = "子丑寅卯辰巳午未申酉戌亥"
 STEMS = "甲乙丙丁戊己庚辛壬癸"
 WATCH = (
     "src/fatebridge/core/metaphysics/liureng_emptiness.py",
-    "src/fatebridge/core/output_liuren_emptiness.py",
+    "src/fatebridge/core/contracts/output_liuren_emptiness.py",
     "src/fatebridge/core/metaphysics/liureng.py",
+    "src/fatebridge/core/metaphysics/liureng_course_layout.py",
+    "src/fatebridge/core/metaphysics/liureng_selection.py",
+    "src/fatebridge/core/metaphysics/liureng_year_fate.py",
     "src/fatebridge/core/metaphysics/ren_evidence.py",
     "src/fatebridge/core/metaphysics/common.py",
-    "src/fatebridge/core/output_chinese.py",
-    "src/fatebridge/core/output_ren_anchors.py",
+    "src/fatebridge/core/contracts/output_chinese.py",
+    "src/fatebridge/core/contracts/output_ren_anchors.py",
     "src/fatebridge/services/metaphysics.py",
     "src/fatebridge/core/export_contracts.py",
+    "src/fatebridge/core/export_presets.py",
     "src/fatebridge/data/agent_examples.json",
     "scripts/ren/audit_liuren_emptiness.py",
     "uv.lock",
@@ -36,17 +40,25 @@ def sha(path: Path) -> str:
 def reference(corpus: Path = CORPUS) -> dict[str, Any]:
     if sha(corpus / "freeze.json") != FROZEN_SHA256:
         raise ValueError("Frozen emptiness manifest changed")
+    else:
+        pass
     frozen = json.loads((corpus / "freeze.json").read_text())
     names = {"reference.json", "source-pages.pdf"}
     if set(frozen["files"]) != names or {p.name for p in corpus.iterdir()} != names | {
         "freeze.json"
     }:
         raise ValueError("Frozen emptiness inventory changed")
+    else:
+        pass
     if any(sha(corpus / n) != frozen["files"][n] for n in names):
         raise ValueError("Frozen emptiness source changed")
+    else:
+        pass
     result: dict[str, Any] = json.loads((corpus / "reference.json").read_text())
     if len(result["literal_xun_pairs"]) != 6 or len(result["synthetic_cases"]) != 6:
         raise ValueError("Frozen emptiness denominator changed")
+    else:
+        pass
     return result
 
 
@@ -186,6 +198,8 @@ def audit() -> dict[str, Any]:
                 )
                 if not ok:
                     matrix_failures.append(c)
+                else:
+                    pass
                 matrix_count += 1
     reference()
     after = {p: sha(ROOT / p) for p in WATCH}

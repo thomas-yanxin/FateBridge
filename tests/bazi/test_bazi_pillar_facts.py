@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.bazi_pattern_facts import (
+from fatebridge.core.bazi.bazi_pattern_facts import (
     check_pillar_pair_patterns,
     check_pillar_patterns,
 )
@@ -26,7 +26,7 @@ def reference():
     return json.loads(raw)
 
 
-def test_all_120_column_assignments_at_every_position(reference):
+def test_all_120_column_assignments_at_every_position(reference) -> None:
     for position in POSITIONS:
         for literal, expected in reference["column_matrix"].items():
             pillars = dict(zip(POSITIONS, [("甲", "子")] * 4))
@@ -43,7 +43,9 @@ def test_all_120_column_assignments_at_every_position(reference):
             }
 
 
-def test_all_valid_ordered_pillar_pairs_at_each_of_six_position_pairs(reference):
+def test_all_valid_ordered_pillar_pairs_at_each_of_six_position_pairs(
+    reference,
+) -> None:
     pairs = list(itertools.combinations(POSITIONS, 2))
     for left, right in pairs:
         for a, b in itertools.product(reference["sexagenary_pillars"], repeat=2):
@@ -63,7 +65,9 @@ def test_all_valid_ordered_pillar_pairs_at_each_of_six_position_pairs(reference)
             }
 
 
-def test_source_counterexamples_keep_principal_hidden_and_clash_definitions_apart():
+def test_source_counterexamples_keep_principal_hidden_and_clash_definitions_apart() -> (
+    None
+):
     pillars = dict(
         year=("戊", "子"), month=("壬", "午"), day=("丁", "丑"), hour=("乙", "巳")
     )

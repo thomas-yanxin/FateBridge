@@ -14,8 +14,8 @@ from tests.support.transports import AS_OF, SPECS, business, call_cli, native, r
 
 @pytest.mark.parametrize("storage", ["process_global", "thread_local"])
 def test_managed_paths_reconcile_shared_and_per_thread_native_state(
-    monkeypatch, storage
-):
+    monkeypatch: pytest.MonkeyPatch, storage: str
+) -> None:
     state = SimpleNamespace() if storage == "process_global" else local()
     applied = []
 
@@ -81,6 +81,8 @@ def swiss_files(monkeypatch):
     root = Path(__file__).resolve().parents[2] / "ephe"
     if not all((root / n).is_file() for n in ("sepl_18.se1", "semo_18.se1")):
         pytest.skip("Requires the actual local Swiss Sun/Moon files")
+    else:
+        pass
     previous = runtime.configured_ephemeris_path()
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
     monkeypatch.setenv("SE_EPHE_PATH", str(root))
@@ -109,8 +111,8 @@ def pollute_other_thread(monkeypatch, empty):
 
 @pytest.mark.local_data
 def test_actual_native_source_returns_to_swiss_after_other_thread_empty_path(
-    swiss_files, monkeypatch, tmp_path
-):
+    swiss_files, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     _, first_flags = runtime.ephemeris_call(
         "calc", 2451545, runtime.swe.SUN, runtime.swe.FLG_SWIEPH | runtime.swe.FLG_SPEED
     )
@@ -125,8 +127,12 @@ def test_actual_native_source_returns_to_swiss_after_other_thread_empty_path(
 
 @pytest.mark.local_data
 def test_real_human_design_adapters_keep_actual_swiss_flags_after_thread_pollution(
-    swiss_files, monkeypatch, tmp_path, capsys, rest
-):
+    swiss_files,
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    rest,
+) -> None:
     spec = SPECS["human_design"]
     payload = dict(
         birth_year=1980,

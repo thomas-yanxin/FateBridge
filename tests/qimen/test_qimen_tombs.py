@@ -10,19 +10,22 @@ import pytest
 from fatebridge.application.execution import execute_tool
 from fatebridge.core.execution_context import ExecutionOptions
 from fatebridge.core.local_techniques.qimen import build_qimen_with_options
-from fatebridge.core.qimen_tombs import describe_wonder_tombs, palace_wonder_tombs
+from fatebridge.core.metaphysics.common import SEXAGENARY_CYCLE
+from fatebridge.core.qimen.qimen_tombs import describe_wonder_tombs, palace_wonder_tombs
 from fatebridge.services.metaphysics import calculate_qimen_analysis
 from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.validation.claims import CalculationClaim
-from fatebridge.validation.qimen import verify_qimen_pattern_quotes
-from fatebridge.validation.qimen_tombs import audit_wonder_tomb_clauses
-from tests.qimen.test_qimen_depth import fixed_board, seed
+from tests.unit_test.fixtures.qimen import fixed_board, seed
+from validation.claims import CalculationClaim
+from validation.qimen import verify_qimen_pattern_quotes
+from validation.qimen_tombs import audit_wonder_tomb_clauses
 
 BUNDLE = Path(__file__).parents[1] / "fixtures/qimen_classical_v9"
 REFERENCE = json.loads((BUNDLE / "sources-and-tomb-clauses.json").read_text())
 
 
-def test_clause_audit_passes_observations_but_retains_two_unresolved_priorities():
+def test_clause_audit_passes_observations_but_retains_two_unresolved_priorities() -> (
+    None
+):
     report = audit_wonder_tomb_clauses(BUNDLE)
     assert report["implementation_disagreements"] == []
     assert report["selected_explicit_rule_cells"] == 3
@@ -35,7 +38,7 @@ def test_clause_audit_passes_observations_but_retains_two_unresolved_priorities(
 
 @pytest.mark.parametrize("stem", list("乙丙丁"))
 @pytest.mark.parametrize("trigram", list("坎坤震巽乾兑艮离"))
-def test_literal_candidate_is_compared_but_never_promoted(stem, trigram):
+def test_literal_candidate_is_compared_but_never_promoted(stem, trigram) -> None:
     result = palace_wonder_tombs(trigram, [stem])
     s = REFERENCE["clauses"]["wangzhang_enumeration"]["mapping"][stem]
     c = REFERENCE["clauses"]["opening_sentence_literal_candidate"]["mapping"][stem]
@@ -49,7 +52,7 @@ def test_literal_candidate_is_compared_but_never_promoted(stem, trigram):
     assert not result["candidate_adopted"] and not result["source_priority_resolved"]
 
 
-def test_agreement_on_bing_does_not_adjudicate_yi_and_ding():
+def test_agreement_on_bing_does_not_adjudicate_yi_and_ding() -> None:
     result = palace_wonder_tombs("乾", ["丙", "丁"])
     assert result["selected_matched_stems"] == ["丙"]
     assert result["unadopted_literal_candidate_matched_stems"] == ["丙", "丁"]
@@ -65,8 +68,9 @@ def test_agreement_on_bing_does_not_adjudicate_yi_and_ding():
 @pytest.mark.parametrize(
     "dun,ju", [(d, j) for d in ("阳遁", "阴遁") for j in range(1, 10)]
 )
-def test_formal_patterns_keep_named_enumeration_and_hosted_stems(monkeypatch, dun, ju):
-    from fatebridge.core.metaphysics.common import SEXAGENARY_CYCLE
+def test_formal_patterns_keep_named_enumeration_and_hosted_stems(
+    monkeypatch: pytest.MonkeyPatch, dun, ju
+) -> None:
 
     selected = REFERENCE["clauses"]["wangzhang_enumeration"]["mapping"]
     for hour in SEXAGENARY_CYCLE:
@@ -90,9 +94,11 @@ def test_formal_patterns_keep_named_enumeration_and_hosted_stems(monkeypatch, du
                 assert not p["qualification"]["tomb_evidence"][
                     "source_priority_resolved"
                 ]
+            else:
+                pass
 
 
-def test_actual_snapshot_keeps_selected_ding_gen_and_unadopted_difference():
+def test_actual_snapshot_keeps_selected_ding_gen_and_unadopted_difference() -> None:
     result = calculate_qimen_analysis(
         analysis_year=2026,
         analysis_month=1,
@@ -115,7 +121,7 @@ def test_actual_snapshot_keeps_selected_ding_gen_and_unadopted_difference():
     assert "王璋口径本宫命中丁" in result["snapshot_export"]["export_text"]
 
 
-def test_uncertain_candidate_is_not_a_selectable_certified_profile():
+def test_uncertain_candidate_is_not_a_selectable_certified_profile() -> None:
     with pytest.raises(ValueError, match="不支持的奇门选项"):
         build_qimen_with_options(
             seed(), {"tomb_profile": "opening_sentence_literal_candidate"}
@@ -153,7 +159,7 @@ def receipt():
     return payload, claim
 
 
-def test_whole_tomb_quote_preserves_source_priority_limit(receipt):
+def test_whole_tomb_quote_preserves_source_priority_limit(receipt) -> None:
     payload, claim = receipt
     assert (
         verify_qimen_pattern_quotes(payload, [claim])["status"]
@@ -162,7 +168,7 @@ def test_whole_tomb_quote_preserves_source_priority_limit(receipt):
 
 
 @pytest.mark.parametrize("change", ["drop", "adopt", "resolved", "erase_difference"])
-def test_tomb_quote_cannot_erase_or_adopt_the_candidate(receipt, change):
+def test_tomb_quote_cannot_erase_or_adopt_the_candidate(receipt, change: str) -> None:
     payload, claim = receipt
     altered = claim.model_dump()
     q = altered["value"]["qualification"]
@@ -186,12 +192,14 @@ def test_tomb_quote_cannot_erase_or_adopt_the_candidate(receipt, change):
     "trigram,stems",
     [("中", ["乙"]), ("坤", []), ("乾", ["甲"]), ("乾", ["乙丙"]), ("乾", [""])],
 )
-def test_no_center_missing_plane_or_invalid_stem_is_reported_as_absence(trigram, stems):
+def test_no_center_missing_plane_or_invalid_stem_is_reported_as_absence(
+    trigram: str, stems
+) -> None:
     with pytest.raises(ValueError):
         palace_wonder_tombs(trigram, stems)
 
 
-def test_reference_cannot_drop_a_clause_or_unresolved_priority(tmp_path):
+def test_reference_cannot_drop_a_clause_or_unresolved_priority(tmp_path: Path) -> None:
     b = tmp_path / "fixture"
     shutil.copytree(BUNDLE, b)
     p = b / "sources-and-tomb-clauses.json"

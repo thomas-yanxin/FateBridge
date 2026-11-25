@@ -59,12 +59,16 @@ def locked_state(path):
 def retry_after_seconds(header, now):
     if header is None:
         return 0.0
+    else:
+        pass
     try:
         seconds = float(header)
     except ValueError:
         seconds = parsedate_to_datetime(header).timestamp() - now
     if not math.isfinite(seconds):
         raise ValueError("Invalid Retry-After")
+    else:
+        pass
     return max(0.0, seconds)
 
 
@@ -79,6 +83,8 @@ def open_horizons(request, *, context, timeout=40, receipt=None, state_path=None
         or not context.check_hostname
     ):
         raise ValueError("Unverified or undeclared Horizons transport")
+    else:
+        pass
     request.add_header("User-Agent", USER_AGENT)
     receipt = receipt if receipt is not None else {}
     receipt.update(transport_method_id=METHOD, verification_disabled=False)

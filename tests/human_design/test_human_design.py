@@ -12,14 +12,18 @@ import pytest
 from pydantic import ValidationError
 
 from fatebridge.core.astro import runtime
-from fatebridge.core.human_design import (
+from fatebridge.core.human_design.human_design import (
     bodygraph,
     chart_at,
     longitude_activation,
     planetary_positions,
 )
-from fatebridge.core.human_design_evidence import reference_table_audit
-from fatebridge.core.human_design_mechanics import CENTER_GATES, CHANNELS, GATE_ORDER
+from fatebridge.core.human_design.human_design_evidence import reference_table_audit
+from fatebridge.core.human_design.human_design_mechanics import (
+    CENTER_GATES,
+    CHANNELS,
+    GATE_ORDER,
+)
 from fatebridge.core.requests.human_design import HumanDesignRequest
 from fatebridge.services.human_design import calculate_human_design
 
@@ -34,7 +38,7 @@ INPUT = dict(
 )
 
 
-def test_structure_is_complete_without_duplicate_gate_or_channel():
+def test_structure_is_complete_without_duplicate_gate_or_channel() -> None:
     assert sorted(GATE_ORDER) == list(range(1, 65))
     assert sorted(g for gates in CENTER_GATES.values() for g in gates) == list(
         range(1, 65)
@@ -55,12 +59,14 @@ def test_structure_is_complete_without_duplicate_gate_or_channel():
         (301.999, 60, 6),
     ],
 )
-def test_hand_checked_mandala_anchors(degrees, gate, line):
+def test_hand_checked_mandala_anchors(
+    degrees: float | int, gate: int, line: int
+) -> None:
     actual = longitude_activation(degrees)
     assert (actual["gate"], actual["line"]) == (gate, line)
 
 
-def test_every_gate_and_line_boundary_and_adjacent_float():
+def test_every_gate_and_line_boundary_and_adjacent_float() -> None:
     # Gate and line widths (5.625 and .9375) are exactly binary representable.
     for i, gate in enumerate(GATE_ORDER):
         for line in range(6):
@@ -79,7 +85,7 @@ def test_every_gate_and_line_boundary_and_adjacent_float():
             assert (before["gate"], before["line"]) != (gate, line + 1)
 
 
-def test_subdivision_against_independent_rational_reference():
+def test_subdivision_against_independent_rational_reference() -> None:
     # An arithmetic check, not an independent source for the mandala's gate order.
     randomizer = random.Random(86720)
     values = [randomizer.uniform(-1080, 1080) for _ in range(2000)]
@@ -100,7 +106,7 @@ def test_subdivision_against_independent_rational_reference():
 
 
 @pytest.mark.parametrize("value", [float("nan"), float("inf"), -float("inf")])
-def test_nonfinite_longitudes_rejected(value):
+def test_nonfinite_longitudes_rejected(value) -> None:
     with pytest.raises(ValueError):
         longitude_activation(value)
 
@@ -125,8 +131,8 @@ def test_nonfinite_longitudes_rejected(value):
     ],
 )
 def test_type_authority_hierarchy_with_counterexamples(
-    gates, type_id, subtype, authority
-):
+    gates, type_id: str, subtype: str | None, authority: str
+) -> None:
     graph = bodygraph(gates, [])
     assert (graph["type"], graph["subtype"], graph["authority"]) == (
         type_id,
@@ -135,7 +141,7 @@ def test_type_authority_hierarchy_with_counterexamples(
     )
 
 
-def test_definition_uses_union_of_sides_not_separate_channel_counts():
+def test_definition_uses_union_of_sides_not_separate_channel_counts() -> None:
     graph = bodygraph([5], [15])
     assert graph["type"] == "generator"
     assert graph["channels"][0]["mixed_only"] is True
@@ -146,7 +152,7 @@ def test_definition_uses_union_of_sides_not_separate_channel_counts():
     assert dormant["definition"]["kind"] == "none"
 
 
-def test_four_disconnected_components_and_single_gate_bridges():
+def test_four_disconnected_components_and_single_gate_bridges() -> None:
     graph = bodygraph([64, 47, 16, 48, 25, 51, 19, 49], [])
     assert graph["definition"]["kind"] == "quadruple_split"
     for gate in graph["definition"]["single_gate_bridges"]:
@@ -163,7 +169,7 @@ def test_four_disconnected_components_and_single_gate_bridges():
 
 
 @pytest.mark.parametrize("month,day", [(1, 1), (3, 20), (6, 21), (9, 22), (12, 31)])
-def test_design_epoch_solar_arc_across_seasons_and_wrap(month, day):
+def test_design_epoch_solar_arc_across_seasons_and_wrap(month: int, day: int) -> None:
     birth = datetime(2000, month, day, 12, tzinfo=timezone.utc)
     chart = chart_at(birth)
     solar = {
@@ -184,7 +190,7 @@ def test_design_epoch_solar_arc_across_seasons_and_wrap(month, day):
         ) % 360 == pytest.approx(180)
 
 
-def test_independent_jpl_positions_not_engine_generated_expected_values():
+def test_independent_jpl_positions_not_engine_generated_expected_values() -> None:
     data = json.loads((ROOT / "tests/fixtures/western-horizons.json").read_text())
     by_epoch = {}
     for reference in data["references"]:
@@ -196,6 +202,8 @@ def test_independent_jpl_positions_not_engine_generated_expected_values():
                 by_epoch[moment] = planetary_positions(datetime.fromisoformat(moment))[
                     "positions"
                 ]
+            else:
+                pass
             actual = by_epoch[moment][reference["body"]]["longitude"]
             error = (
                 abs((actual - row["apparent_ecliptic_longitude"] + 180) % 360 - 180)
@@ -208,7 +216,7 @@ def test_independent_jpl_positions_not_engine_generated_expected_values():
             )
 
 
-def test_independent_jpl_checks_design_solar_arc():
+def test_independent_jpl_checks_design_solar_arc() -> None:
     data = json.loads((ROOT / "tests/fixtures/human-design-horizons.json").read_text())
     rows = {row["utc"]: row["sun_longitude"] for row in data["rows"]}
     assert len(rows) == 8 and len(data["pairs"]) == 4
@@ -217,7 +225,9 @@ def test_independent_jpl_checks_design_solar_arc():
         assert abs(arc - 88) * 3600 <= data["tolerance_arcseconds"]
 
 
-def test_official_example_bodygraph_from_independently_transcribed_activations():
+def test_official_example_bodygraph_from_independently_transcribed_activations() -> (
+    None
+):
     data = json.loads(
         (ROOT / "tests/fixtures/human-design-official-example.json").read_text()
     )
@@ -232,7 +242,7 @@ def test_official_example_bodygraph_from_independently_transcribed_activations()
     assert sorted(sorted(c["gates"]) for c in graph["channels"]) == expected["channels"]
 
 
-def test_official_example_26_gate_lines_at_declared_nominal_birth_clock():
+def test_official_example_26_gate_lines_at_declared_nominal_birth_clock() -> None:
     data = json.loads(
         (ROOT / "tests/fixtures/human-design-official-example.json").read_text()
     )
@@ -256,7 +266,7 @@ def test_official_example_26_gate_lines_at_declared_nominal_birth_clock():
     }
 
 
-def test_primary_source_numeric_tables_preserve_unresolved_discrepancy():
+def test_primary_source_numeric_tables_preserve_unresolved_discrepancy() -> None:
     report = reference_table_audit()
     assert report["gate_ranges_matched"] == report["gate_ranges_checked"] == 64
     assert report["centers_matched"] == 64
@@ -274,7 +284,7 @@ def test_primary_source_numeric_tables_preserve_unresolved_discrepancy():
     assert report["full_text_acceptance_passed"] is False
 
 
-def test_29_1_2_choice_is_explicit_uniform_rule_not_hidden_source_rewrite():
+def test_29_1_2_choice_is_explicit_uniform_rule_not_hidden_source_rewrite() -> None:
     # Printed 25d16m15s Leo conflicts with the uniform 56m15s line width.
     assert longitude_activation(145.3)["line"] == 1
     report = reference_table_audit()
@@ -287,8 +297,10 @@ def test_29_1_2_choice_is_explicit_uniform_rule_not_hidden_source_rewrite():
     )
 
 
-def test_source_audit_cannot_pass_after_reference_cases_are_deleted(monkeypatch):
-    from fatebridge.core import human_design_evidence as module
+def test_source_audit_cannot_pass_after_reference_cases_are_deleted(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from fatebridge.core.human_design import human_design_evidence as module
 
     truncated = deepcopy(module.source_reference())
     truncated["gates"] = truncated["gates"][:1]
@@ -300,7 +312,7 @@ def test_source_audit_cannot_pass_after_reference_cases_are_deleted(monkeypatch)
 
 
 @pytest.mark.parametrize("removed", ["birth_hour", "birth_minute", "birth_timezone"])
-def test_no_default_for_unknown_time_or_timezone(removed):
+def test_no_default_for_unknown_time_or_timezone(removed: str) -> None:
     with pytest.raises(ValidationError):
         HumanDesignRequest(**{k: v for k, v in INPUT.items() if k != removed})
 
@@ -330,12 +342,12 @@ def test_no_default_for_unknown_time_or_timezone(removed):
         },
     ],
 )
-def test_bad_calendar_dst_and_unrelated_solar_rebasing_rejected(changes):
+def test_bad_calendar_dst_and_unrelated_solar_rebasing_rejected(changes) -> None:
     with pytest.raises((ValueError, ValidationError)):
         HumanDesignRequest(**{**INPUT, **changes})
 
 
-def test_civil_timezone_equivalence_and_sensitivity_scope():
+def test_civil_timezone_equivalence_and_sensitivity_scope() -> None:
     local = calculate_human_design(**INPUT, birth_time_uncertainty_minutes=10)
     utc = calculate_human_design(**{**INPUT, "birth_hour": 1, "birth_timezone": "UTC"})
     assert local["activations"] == utc["activations"]
@@ -347,18 +359,19 @@ def test_civil_timezone_equivalence_and_sensitivity_scope():
     assert len(local["time_sensitivity"]["comparisons"]) == 2
     assert utc["time_sensitivity"]["status"] == "not_assessed"
     assert local["validation"]["prediction"] == "not_validated"
-    assert local["validation"]["all_four_axes_full_marks"] is False
 
 
 @pytest.mark.native_engine_fault
-def test_missing_ephemeris_fails_without_low_precision_fallback(monkeypatch):
+def test_missing_ephemeris_fails_without_low_precision_fallback(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setattr(runtime, "swe", None)
     result = calculate_human_design(**INPUT)
     assert "error" in result
     assert "bodygraph" not in result
 
 
-def test_returned_source_evidence_cannot_mutate_later_runs():
+def test_returned_source_evidence_cannot_mutate_later_runs() -> None:
     first = calculate_human_design(**INPUT)
     original = deepcopy(first["gate_evidence"])
     first["gate_evidence"][0]["source_channel_pairs"][0][0] = -1
@@ -369,7 +382,9 @@ def test_returned_source_evidence_cannot_mutate_later_runs():
     assert second["rulesets"][0]["sources"]["rave_2001"].startswith("https://")
 
 
-def test_moshier_is_explicit_and_can_be_refused(monkeypatch, tmp_path):
+def test_moshier_is_explicit_and_can_be_refused(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     from fatebridge.application.execution import execute_tool
     from fatebridge.services.tool_catalog import CATALOG
     from tests.support.ephemeris_context import empty_ephemeris_path
@@ -387,11 +402,13 @@ def test_moshier_is_explicit_and_can_be_refused(monkeypatch, tmp_path):
 @pytest.mark.parametrize("flag,longitude", [(-1, float("nan")), (0, 100.0)])
 @pytest.mark.native_engine_fault
 def test_native_invalid_retflag_and_nonfinite_position_not_accepted(
-    monkeypatch, flag, longitude
-):
+    monkeypatch: pytest.MonkeyPatch, flag, longitude
+) -> None:
     def invalid(operation, *args):
         if operation == "calc":
             return (longitude, 0, 0, 0, 0, 0), flag
+        else:
+            pass
         return original(operation, *args)
 
     original = runtime.ephemeris_call

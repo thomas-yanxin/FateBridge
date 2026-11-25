@@ -8,19 +8,21 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.sukuyo import calendar_mansion, day_evidence
-from fatebridge.core.sukuyo_dayan_advance import month_comparison, research_scope
-from fatebridge.core.sukuyo_historical_calendar import date_reference
-from fatebridge.core.sukuyo_shoku766 import (
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence
+from fatebridge.core.sukuyo.sukuyo_dayan_advance import month_comparison, research_scope
+from fatebridge.core.sukuyo.sukuyo_historical_calendar import date_reference
+from fatebridge.core.sukuyo.sukuyo_shoku766 import (
     SOURCE,
     month_witness_comparison,
     validate_bundle,
     witness_lines,
 )
-from fatebridge.core.sukuyo_sources import load_source
+from fatebridge.core.sukuyo.sukuyo_sources import load_source
 
 
-def test_two_image_witnesses_match_before_code_facts_without_erasing_emendation():
+def test_two_image_witnesses_match_before_code_facts_without_erasing_emendation() -> (
+    None
+):
     raw = (
         Path(__file__).parents[1] / "data/sukuyo-shoku766-source-v1.json"
     ).read_bytes()
@@ -54,7 +56,7 @@ def test_two_image_witnesses_match_before_code_facts_without_erasing_emendation(
     assert not any(w["february_event_has_literal_day20"] for w in result["witnesses"])
 
 
-def test_condition_agreement_does_not_certify_a_history_or_rewrite_host():
+def test_condition_agreement_does_not_certify_a_history_or_rewrite_host() -> None:
     r = month_witness_comparison(766, 2, False, host_month_start_index=23)
     assert [
         v["matches_selected_host_month_start"] for v in r["conditional_inferences"]
@@ -67,7 +69,7 @@ def test_condition_agreement_does_not_certify_a_history_or_rewrite_host():
 
 
 @pytest.mark.parametrize("month,leap", [(2, True), (1, False), (3, False)])
-def test_not_extended_to_another_month_or_leap_key(month, leap):
+def test_not_extended_to_another_month_or_leap_key(month: int, leap: bool) -> None:
     assert month_witness_comparison(766, month, leap, host_month_start_index=22) is None
 
 
@@ -81,7 +83,9 @@ def test_not_extended_to_another_month_or_leap_key(month, leap):
         (766, 2, False, 60),
     ],
 )
-def test_bad_keys_are_not_silent_wrapping_or_coercion(year, month, leap, host):
+def test_bad_keys_are_not_silent_wrapping_or_coercion(
+    year: bool | int, month: int, leap: bool | int, host: bool | int
+) -> None:
     with pytest.raises(ValueError):
         month_witness_comparison(year, month, leap, host_month_start_index=host)
 
@@ -89,7 +93,7 @@ def test_bad_keys_are_not_silent_wrapping_or_coercion(year, month, leap, host):
 @pytest.mark.parametrize(
     "mutation", ["drop", "base", "editor", "day20", "human", "calendar"]
 )
-def test_witness_or_acceptance_tampering_rejected(mutation):
+def test_witness_or_acceptance_tampering_rejected(mutation: str) -> None:
     data = deepcopy(load_source(SOURCE).data)
     if mutation == "drop":
         data["witnesses"].pop()
@@ -107,7 +111,7 @@ def test_witness_or_acceptance_tampering_rejected(mutation):
         validate_bundle(data)
 
 
-def test_actual_month_days_bind_same_month_source_and_keep_all_52_conflicts():
+def test_actual_month_days_bind_same_month_source_and_keep_all_52_conflicts() -> None:
     first = date(766, 3, 19)
     for offset in range(30):
         c = date_reference(first + timedelta(days=offset))
@@ -128,7 +132,9 @@ def test_actual_month_days_bind_same_month_source_and_keep_all_52_conflicts():
     )
 
 
-def test_product_explanation_preserves_base_emendation_retrospection_and_limits():
+def test_product_explanation_preserves_base_emendation_retrospection_and_limits() -> (
+    None
+):
     c = calendar_mansion(
         "0766-03-19",
         "12:00:00",
@@ -152,7 +158,9 @@ def test_product_explanation_preserves_base_emendation_retrospection_and_limits(
     assert "乙亥" in text
 
 
-def test_complete_fixed_host_scope_preserves_every_before_code_row_and_unknown():
+def test_complete_fixed_host_scope_preserves_every_before_code_row_and_unknown() -> (
+    None
+):
     raw = (
         Path(__file__).parents[1] / "data/sukuyo-dayan-advance-host-v1.json"
     ).read_bytes()
@@ -192,7 +200,9 @@ def test_complete_fixed_host_scope_preserves_every_before_code_row_and_unknown()
 
 
 @pytest.mark.parametrize("civil,row", [("0766-04-18", None), ("0861-06-15", 325)])
-def test_no_selected_image_or_research_row_is_explicit_in_actual_product(civil, row):
+def test_no_selected_image_or_research_row_is_explicit_in_actual_product(
+    civil: str, row: int | None
+) -> None:
     c = calendar_mansion(
         civil, "12:00:00", "+09:00", calendar_basis="japanese_naoj_historical_utc09"
     )
@@ -202,6 +212,8 @@ def test_no_selected_image_or_research_row_is_explicit_in_actual_product(civil, 
     if row is not None:
         assert research["selected_row"]["row_number"] == row
         assert research["selected_original_witness_comparison"] is None
+    else:
+        pass
     text = day_evidence(c)["reading_text"]
     assert "274相合、52不同、1未知" in text
     assert "本组证据的真实预测样本数为0，现实预测效力未建立" in text

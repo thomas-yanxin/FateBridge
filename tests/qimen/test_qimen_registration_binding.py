@@ -7,12 +7,23 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.validation.qimen_study import QimenCommitment, audit_study
-from tests.qimen.test_qimen_study import (  # noqa: F401
+from tests.unit_test.fixtures.qimen_study import (
     AS_OF,
+    ISSUED,
     frozen_study,
     outcomes,
     packet,
+)
+from validation import qimen_study as research
+from validation.qimen_study import (
+    FrozenQimenPolicy,
+    QimenCommitment,
+    StudyInput,
+    audit_study,
+    commitment_fingerprint,
+    policy_fingerprint,
+    seal_forecasts,
+    study_input_fingerprint,
 )
 
 
@@ -35,8 +46,8 @@ from tests.qimen.test_qimen_study import (  # noqa: F401
     ],
 )
 def test_sealed_plan_fields_cannot_change_without_changing_evidence(
-    packet, field, value
-):
+    packet, field: str, value
+) -> None:
     # Also audit the unmodified packet so an unrelated engine error cannot
     # make a rejection test pass for the wrong reason.
     assert audit_study(packet, outcomes(), as_of=AS_OF)["registered_count"] == 3
@@ -46,7 +57,9 @@ def test_sealed_plan_fields_cannot_change_without_changing_evidence(
         audit_study(QimenCommitment.model_validate(raw), outcomes(), as_of=AS_OF)
 
 
-def test_abstention_cannot_be_removed_from_every_list_to_fake_full_coverage(packet):
+def test_abstention_cannot_be_removed_from_every_list_to_fake_full_coverage(
+    packet,
+) -> None:
     raw = packet.model_dump(mode="json")
     raw["study"]["plan"]["baseline_probability"] = 0.99
     raw["study"]["plan"]["cohort"] = [
@@ -74,8 +87,7 @@ def test_abstention_cannot_be_removed_from_every_list_to_fake_full_coverage(pack
         )
 
 
-def test_target_cannot_be_relabelled_consistently_in_plan_and_policy(packet):
-    from fatebridge.validation.qimen_study import FrozenQimenPolicy, policy_fingerprint
+def test_target_cannot_be_relabelled_consistently_in_plan_and_policy(packet) -> None:
 
     raw = packet.model_dump(mode="json")
     raw["study"]["plan"][
@@ -91,8 +103,7 @@ def test_target_cannot_be_relabelled_consistently_in_plan_and_policy(packet):
         audit_study(QimenCommitment.model_validate(raw), outcomes(), as_of=AS_OF)
 
 
-def test_new_packet_binds_the_same_complete_input_in_every_case(packet):
-    from fatebridge.validation.qimen_study import study_input_fingerprint
+def test_new_packet_binds_the_same_complete_input_in_every_case(packet) -> None:
 
     assert packet.format == "qimen_forecast_commitment_v3"
     expected = study_input_fingerprint(packet.study)
@@ -101,8 +112,9 @@ def test_new_packet_binds_the_same_complete_input_in_every_case(packet):
     assert set(packet.evidence) == {m.case_id for m in packet.study.plan.cohort}
 
 
-def test_updating_only_the_new_header_hash_still_fails_old_per_case_receipts(packet):
-    from fatebridge.validation.qimen_study import StudyInput, study_input_fingerprint
+def test_updating_only_the_new_header_hash_still_fails_old_per_case_receipts(
+    packet,
+) -> None:
 
     raw = packet.model_dump(mode="json")
     raw["study"]["plan"]["baseline_probability"] = 0.99
@@ -113,8 +125,7 @@ def test_updating_only_the_new_header_hash_still_fails_old_per_case_receipts(pac
         audit_study(QimenCommitment.model_validate(raw), outcomes(), as_of=AS_OF)
 
 
-def test_changing_only_envelope_hash_without_updating_forecasts_fails(packet):
-    from fatebridge.validation.qimen_study import StudyInput, study_input_fingerprint
+def test_changing_only_envelope_hash_without_updating_forecasts_fails(packet) -> None:
 
     raw = packet.model_dump(mode="json")
     raw["study"]["plan"]["baseline_probability"] = 0.99
@@ -129,9 +140,7 @@ def test_changing_only_envelope_hash_without_updating_forecasts_fails(packet):
 
 def test_whole_packet_reseal_is_rejected_against_independently_kept_original_digest(
     packet,
-):
-    from fatebridge.validation.qimen_study import commitment_fingerprint, seal_forecasts
-    from tests.qimen.test_qimen_study import ISSUED
+) -> None:
 
     original_digest = commitment_fingerprint(packet)
     study = packet.study.model_copy(deep=True)
@@ -147,13 +156,9 @@ def test_whole_packet_reseal_is_rejected_against_independently_kept_original_dig
         )
 
 
-def test_full_cohort_deletion_and_reseal_cannot_replace_the_anchored_packet(packet):
-    from fatebridge.validation.qimen_study import (
-        StudyInput,
-        commitment_fingerprint,
-        seal_forecasts,
-    )
-    from tests.qimen.test_qimen_study import ISSUED
+def test_full_cohort_deletion_and_reseal_cannot_replace_the_anchored_packet(
+    packet,
+) -> None:
 
     original_digest = commitment_fingerprint(packet)
     study = packet.study.model_dump(mode="json")
@@ -172,15 +177,14 @@ def test_full_cohort_deletion_and_reseal_cannot_replace_the_anchored_packet(pack
         )
 
 
-def test_data_kind_is_part_of_the_bound_study_input(packet):
+def test_data_kind_is_part_of_the_bound_study_input(packet) -> None:
     raw = packet.model_dump(mode="json")
     raw["study"]["plan"]["data_kind"] = "real_world_submission"
     with pytest.raises(ValueError, match="研究输入"):
         QimenCommitment.model_validate(raw)
 
 
-def test_issue_time_edit_is_caught_by_the_original_packet_anchor(packet):
-    from fatebridge.validation.qimen_study import commitment_fingerprint
+def test_issue_time_edit_is_caught_by_the_original_packet_anchor(packet) -> None:
 
     original_digest = commitment_fingerprint(packet)
     raw = packet.model_dump(mode="json")
@@ -195,15 +199,14 @@ def test_issue_time_edit_is_caught_by_the_original_packet_anchor(packet):
 @pytest.mark.parametrize(
     "value", ["0" * 64, "ABC", "a" * 63, "A" * 64, "a" * 64 + "\n"]
 )
-def test_wrong_or_malformed_expected_packet_digest_is_rejected(packet, value):
+def test_wrong_or_malformed_expected_packet_digest_is_rejected(packet, value) -> None:
     with pytest.raises(ValueError, match="指纹|SHA256"):
         audit_study(packet, outcomes(), as_of=AS_OF, expected_commitment_sha256=value)
 
 
 def test_digest_ignores_json_whitespace_and_key_order_but_does_not_authenticate_registration(
     packet,
-):
-    from fatebridge.validation.qimen_study import commitment_fingerprint
+) -> None:
 
     expected = commitment_fingerprint(packet)
     raw = json.loads(
@@ -221,14 +224,14 @@ def test_digest_ignores_json_whitespace_and_key_order_but_does_not_authenticate_
     assert not report["validated_qimen_predictor"] and not report["authority_certified"]
 
 
-def test_model_copy_bypass_is_revalidated_at_the_audit_boundary(packet):
+def test_model_copy_bypass_is_revalidated_at_the_audit_boundary(packet) -> None:
     changed = packet.model_copy(deep=True)
     changed.study.plan.baseline_probability = 0.99
     with pytest.raises(ValueError, match="研究输入"):
         audit_study(changed, outcomes(), as_of=AS_OF)
 
 
-def test_legacy_format_is_not_silently_upgraded_or_rehashed(packet):
+def test_legacy_format_is_not_silently_upgraded_or_rehashed(packet) -> None:
     raw = packet.model_dump(mode="json")
     raw["format"] = "qimen_forecast_commitment_v1"
     raw.pop("study_input_sha256")
@@ -237,12 +240,10 @@ def test_legacy_format_is_not_silently_upgraded_or_rehashed(packet):
 
 
 def test_real_submission_requires_independently_kept_digest_even_if_locally_consistent(
-    packet, monkeypatch
-):
+    packet, monkeypatch: pytest.MonkeyPatch
+) -> None:
     # Injected clocks and fictional subjects solely exercise the real-data
     # branch; this fixture is never empirical evidence.
-    from fatebridge.validation import qimen_study as research
-    from tests.qimen.test_qimen_study import ISSUED
 
     class Clock(datetime):
         current = ISSUED
@@ -275,10 +276,8 @@ def test_real_submission_requires_independently_kept_digest_even_if_locally_cons
 
 
 def test_cli_emits_seal_digest_and_accepts_only_the_matched_expected_packet(
-    packet, tmp_path, capsys
-):
-    from fatebridge.validation.qimen_study import commitment_fingerprint
-    from tests.qimen.test_qimen_study import ISSUED
+    packet, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
 
     spec = importlib.util.spec_from_file_location(
         "qimen_v2_cli", Path(__file__).parents[2] / "scripts/qimen/audit_qimen_study.py"

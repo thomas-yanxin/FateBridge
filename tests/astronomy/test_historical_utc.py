@@ -22,8 +22,8 @@ from fatebridge.core.astro.time_scales import (
     datetime_from_tt,
     ephemeris_time,
 )
-from fatebridge.core.human_design import chart_at, design_epoch
-from fatebridge.core.human_design_time import sun_at_tt
+from fatebridge.core.human_design.human_design import chart_at, design_epoch
+from fatebridge.core.human_design.human_design_time import sun_at_tt
 
 UTC = timezone.utc
 PRIMARY = json.loads(
@@ -33,7 +33,9 @@ PRIMARY = json.loads(
 )
 
 
-def test_primary_decimal_offsets_and_exact_tt_points_across_all_historical_years():
+def test_primary_decimal_offsets_and_exact_tt_points_across_all_historical_years() -> (
+    None
+):
     for row in PRIMARY["forward_rows"]:
         moment = datetime.fromisoformat(row["UTC"])
         assert historical_tai_minus_utc_exact(moment) == Fraction(
@@ -47,7 +49,9 @@ def test_primary_decimal_offsets_and_exact_tt_points_across_all_historical_years
 @pytest.mark.parametrize(
     "field", ["offset_seconds", "reference_mjd", "rate_seconds_per_day"]
 )
-def test_reloaded_coefficients_reach_both_clock_directions(year, field, monkeypatch):
+def test_reloaded_coefficients_reach_both_clock_directions(
+    year: int, field: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
     moment = datetime(year, 6, 15, 12, 34, 56, 125000, tzinfo=UTC)
     owner = "utc1960_table" if year == 1960 else "historical_utc_table"
     table = copy.deepcopy(getattr(historical, owner)())
@@ -59,7 +63,7 @@ def test_reloaded_coefficients_reach_both_clock_directions(year, field, monkeypa
     )
     before = historical_tai_minus_utc_exact(moment)
     original_point = historical_utc_to_tt_point(moment)
-    assert historical.historical_utc_from_tt_point(original_point) == moment
+    assert historical.historical_utc_from_tt(original_point) == moment
     increments = {
         "offset_seconds": "2",
         "reference_mjd": "1",
@@ -82,7 +86,7 @@ def test_reloaded_coefficients_reach_both_clock_directions(year, field, monkeypa
     assert historical_tai_minus_utc_exact(moment) == before + shift
     changed_point = historical_utc_to_tt_point(moment)
     assert changed_point.days - original_point.days == shift / 86400
-    assert historical.historical_utc_from_tt_point(changed_point) == moment
+    assert historical.historical_utc_from_tt(changed_point) == moment
 
 
 @pytest.mark.parametrize(
@@ -104,7 +108,9 @@ def test_reloaded_coefficients_reach_both_clock_directions(year, field, monkeypa
         ("1971-12-01", 9.811890),
     ],
 )
-def test_iers_historical_offsets_at_published_segment_boundaries(date, expected_offset):
+def test_iers_historical_offsets_at_published_segment_boundaries(
+    date: str, expected_offset: float
+) -> None:
     # Numeric expectations calculated from the published IERS rows and MJD
     # labels, without calling this implementation's table or conversion.
     instant = datetime.fromisoformat(date).replace(tzinfo=UTC)
@@ -118,6 +124,8 @@ def test_iers_historical_offsets_at_published_segment_boundaries(date, expected_
     assert times.method == "IERS_1961_1971_UTC_drift_to_TT_swiss_delta_t_to_UT1"
     if date not in {"1961-08-01", "1968-02-01"}:
         assert abs((datetime_from_tt(times.jd_tt) - instant).total_seconds()) < 0.0002
+    else:
+        pass
     # Step-related intervals have passed after five seconds, including the two
     # downward offset steps whose exact boundary lacks a unique affine label.
     after = instant + timedelta(seconds=5)
@@ -130,7 +138,9 @@ def test_iers_historical_offsets_at_published_segment_boundaries(date, expected_
 @pytest.mark.parametrize(
     "year,expected_drift", [(1961, 0.000648), (1963, 0.0005616), (1969, 0.001296)]
 )
-def test_historical_utc_retains_fractional_day_drift(year, expected_drift):
+def test_historical_utc_retains_fractional_day_drift(
+    year: int, expected_drift: float
+) -> None:
     midnight = datetime(year, 5, 17, tzinfo=UTC)
     difference = historical_tai_minus_utc(
         midnight + timedelta(hours=12)
@@ -139,14 +149,18 @@ def test_historical_utc_retains_fractional_day_drift(year, expected_drift):
 
 
 @pytest.mark.parametrize("year", range(1960, 1972))
-def test_every_historical_utc_year_round_trips_interior_fractional_seconds(year):
+def test_every_historical_utc_year_round_trips_interior_fractional_seconds(
+    year,
+) -> None:
     moment = datetime(year, 5, 17, 3, 12, 34, 500000, tzinfo=UTC)
     restored = datetime_from_tt(ephemeris_time(moment).jd_tt)
     assert abs((restored - moment).total_seconds()) < 0.0002
 
 
 @pytest.mark.parametrize("date", ["1959-12-31", "1972-01-01"])
-def test_historical_drift_does_not_extend_outside_its_published_scope(date):
+def test_historical_drift_does_not_extend_outside_its_published_scope(
+    date: str,
+) -> None:
     assert (
         historical_tai_minus_utc(datetime.fromisoformat(date).replace(tzinfo=UTC))
         is None
@@ -162,15 +176,17 @@ def test_historical_drift_does_not_extend_outside_its_published_scope(date):
     ],
 )
 def test_fractional_utc_adjustments_do_not_get_an_invented_datetime(
-    date, tt_minus_civil
-):
+    date: str, tt_minus_civil
+) -> None:
     instant = datetime.fromisoformat(date).replace(tzinfo=UTC)
     tt = _julian_day(instant) + tt_minus_civil / 86400
     with pytest.raises(HistoricalUTCAdjustment):
         datetime_from_tt(tt)
 
 
-def test_design_epoch_preserves_tt_when_fractional_utc_adjustment_has_no_unique_label():
+def test_design_epoch_preserves_tt_when_fractional_utc_adjustment_has_no_unique_label() -> (
+    None
+):
     # Freeze the source-defined April 1964 adjustment, not an engine-produced
     # expected civil clock. Swiss' independent solcross constructs the birth.
     design_tt = (
@@ -197,7 +213,9 @@ def test_design_epoch_preserves_tt_when_fractional_utc_adjustment_has_no_unique_
         design_epoch(birth)
 
 
-def test_corrected_historical_tt_is_used_for_the_actual_moon_calculation(monkeypatch):
+def test_corrected_historical_tt_is_used_for_the_actual_moon_calculation(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     # This minute crosses a Base boundary with local Swiss files. Moshier's
     # 0.37 arcsecond position difference puts it on the other side already, so
     # do not pretend one backend's Base is a universal independent oracle.
@@ -211,13 +229,15 @@ def test_corrected_historical_tt_is_used_for_the_actual_moon_calculation(monkeyp
     def observe(operation, *args, **kwargs):
         if operation == "calc" and args[1] == runtime.swe.MOON:
             moon_epochs.append(args[0])
+        else:
+            pass
         return original(operation, *args, **kwargs)
 
     monkeypatch.setattr(runtime, "ephemeris_call", observe)
     chart = chart_at(moment)
     # The nominal birth/design pair remains first. Later Moon calls must be
     # exactly the published root-candidate epochs, each observed once.
-    from fatebridge.core.human_design_solar_root_validation import (
+    from fatebridge.core.human_design.human_design_solar_root_validation import (
         verify_solar_root_context,
     )
 
@@ -229,6 +249,8 @@ def test_corrected_historical_tt_is_used_for_the_actual_moon_calculation(monkeyp
     family = precision["local_root_family"]
     if family is not None:
         declared.update(r["jd_tt"] for r in family["candidates"])
+    else:
+        pass
     assert len(moon_epochs) == len(declared)
     assert set(moon_epochs) == declared
     assert verify_solar_root_context(chart)["errors"] == []

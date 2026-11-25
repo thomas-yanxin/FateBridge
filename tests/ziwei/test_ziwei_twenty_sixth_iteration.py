@@ -14,9 +14,9 @@ import scripts.ziwei.audit_ziwei_natal_prerequisites as linkage_audit
 from fatebridge.application.examples import evidence_views
 from fatebridge.application.result_delivery import RESULT_STORE
 from fatebridge.cli import run
+from fatebridge.core.contracts.output_chinese import ZiweiHoroscopeNatalPrerequisites
 from fatebridge.core.metaphysics.ziwei import build_ziwei_chart
-from fatebridge.core.output_chinese import ZiweiHoroscopeNatalPrerequisites
-from fatebridge.core.ziwei_evidence import horoscope_natal_prerequisites
+from fatebridge.core.ziwei.ziwei_evidence import horoscope_natal_prerequisites
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.metaphysics import (
     _build_person_seed,
@@ -24,9 +24,10 @@ from fatebridge.services.metaphysics import (
 )
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.birth_input import create_person_info
+from tests.support.transports import call_calculation
 
 
-def test_existing_clock_inputs_check_both_profiles_and_sihua_sources():
+def test_existing_clock_inputs_check_both_profiles_and_sihua_sources() -> None:
     report = linkage_audit.audit_natal_prerequisites()
     assert report["reused_frozen_birth_inputs"] == 9
     assert report["profile_source_natal_charts"] == 36
@@ -39,7 +40,9 @@ def test_existing_clock_inputs_check_both_profiles_and_sihua_sources():
     )
 
 
-def test_linkage_audit_rejects_foreign_year_stems_and_false_run_metadata(monkeypatch):
+def test_linkage_audit_rejects_foreign_year_stems_and_false_run_metadata(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     original = linkage_audit.build_ziwei_horoscope
 
     def corrupted(*args, **kwargs):
@@ -73,7 +76,9 @@ def _person(**overrides):
 
 @pytest.mark.parametrize("profile", ["iztro_2_5_8", "quanshu_v2_excerpt"])
 @pytest.mark.parametrize("sihua", ["rule_profile", "naj_ming_v1"])
-def test_known_r25_bureau_chain_is_available_without_a_second_birth_run(profile, sihua):
+def test_known_r25_bureau_chain_is_available_without_a_second_birth_run(
+    profile: str, sihua: str
+) -> None:
     person = _person()
     chart = build_ziwei_chart(
         _build_person_seed(person), "男", rule_profile=profile, sihua_source=sihua
@@ -114,7 +119,7 @@ def test_known_r25_bureau_chain_is_available_without_a_second_birth_run(profile,
     assert decade["status"] == "not_started" and decade["first_age"] == 3
 
 
-def test_default_ruleset_omission_is_preserved_and_nested_traces_are_detached():
+def test_default_ruleset_omission_is_preserved_and_nested_traces_are_detached() -> None:
     chart = build_ziwei_chart(_build_person_seed(_person()), "男")
     original = deepcopy(chart)
     chain = horoscope_natal_prerequisites(chart)
@@ -128,7 +133,9 @@ def test_default_ruleset_omission_is_preserved_and_nested_traces_are_detached():
 
 
 @pytest.mark.parametrize("duplicate", [False, True])
-def test_missing_or_duplicate_source_steps_are_not_silently_recreated(duplicate):
+def test_missing_or_duplicate_source_steps_are_not_silently_recreated(
+    duplicate: bool,
+) -> None:
     chart = build_ziwei_chart(_build_person_seed(_person()), "男")
     if duplicate:
         chart["rule_trace"].append(deepcopy(chart["rule_trace"][0]))
@@ -141,15 +148,17 @@ def test_missing_or_duplicate_source_steps_are_not_silently_recreated(duplicate)
 @pytest.mark.parametrize(
     "field", ["separate_birth_run", "classical_birth_year_boundary_verified"]
 )
-def test_receipt_cannot_claim_a_separate_run_or_classical_year_boundary(field):
+def test_receipt_cannot_claim_a_separate_run_or_classical_year_boundary(
+    field: str,
+) -> None:
     with pytest.raises(ValidationError):
         ZiweiHoroscopeNatalPrerequisites.model_validate({field: True})
 
 
 @pytest.mark.parametrize("profile", ["iztro_2_5_8", "quanshu_v2_excerpt"])
 def test_birth_placement_year_stays_distinct_from_age_reference_and_target_year(
-    profile,
-):
+    profile: str,
+) -> None:
     person = _person(
         birth_year=1984,
         birth_month=2,
@@ -188,6 +197,8 @@ def _read_chain(reply):
     ref = reply.get("result_delivery")
     if ref is None:
         return reply["ziwei_horoscope"]["natal_prerequisites"]
+    else:
+        pass
     offset, parts = 0, []
     while True:
         page = RESULT_STORE.verified_page(
@@ -200,13 +211,15 @@ def _read_chain(reply):
         offset = page["next_offset"]
         if offset is None:
             break
+        else:
+            pass
     return json.loads("".join(parts))
 
 
 @pytest.mark.parametrize("profile", ["iztro_2_5_8", "quanshu_v2_excerpt"])
 def test_published_natal_chain_view_is_equal_in_rest_mcp_and_cli(
-    profile, monkeypatch, capsys
-):
+    profile: str, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
     api._reset_runtime_state_for_tests()
     monkeypatch.setattr(
         api,
@@ -250,11 +263,11 @@ def test_published_natal_chain_view_is_equal_in_rest_mcp_and_cli(
 
     async def native():
         async with Client(create_mcp_app(families="metaphysics")) as client:
-            r = await client.call_tool("ziwei_horoscope", {**inputs, **flags})
+            r = await call_calculation(client, "ziwei_timing", {**inputs, **flags})
             assert not r.is_error
             return r.structured_content
 
-    args = ["ziwei_horoscope"]
+    args = ["ziwei_timing"]
     for key, value in inputs.items():
         args += ["--" + key.replace("_", "-"), str(value)]
     args += [

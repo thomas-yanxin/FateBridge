@@ -14,8 +14,8 @@ IMPLEMENTATION = (
     "src/fatebridge/core/metaphysics/jinkou_stems.py",
     "src/fatebridge/core/metaphysics/jinkou.py",
     "src/fatebridge/core/metaphysics/ren_evidence.py",
-    "src/fatebridge/core/output_jinkou_stems.py",
-    "src/fatebridge/core/output_chinese.py",
+    "src/fatebridge/core/contracts/output_jinkou_stems.py",
+    "src/fatebridge/core/contracts/output_chinese.py",
     "src/fatebridge/services/metaphysics.py",
     "src/fatebridge/data/agent_examples.json",
     "scripts/ren/audit_jinkou_stems.py",
@@ -30,9 +30,13 @@ def reference(corpus: Path = CORPUS) -> dict[str, Any]:
     freeze = json.loads((corpus / "freeze.json").read_text())
     if {p.name for p in corpus.iterdir()} != set(freeze["files"]) | {"freeze.json"}:
         raise ValueError("Frozen stem-reference inventory changed")
+    else:
+        pass
     for name, value in freeze["files"].items():
         if sha(corpus / name) != value:
             raise ValueError(f"Frozen stem-reference source changed: {name}")
+        else:
+            pass
     result: dict[str, Any] = json.loads((corpus / "reference.json").read_text())
     return result
 
@@ -47,6 +51,8 @@ def expected_dun(ref: dict[str, Any], day: str, target: str) -> str:
     for branch in ref["branches"]:
         if branch == target:
             return str(ref["stems"][cursor])
+        else:
+            pass
         cursor = (cursor + 1) % 10
     raise ValueError("invalid reference branch")
 
@@ -228,6 +234,8 @@ def audit() -> dict[str, Any]:
                     reason="four-rule inventory changed",
                 )
             )
+        else:
+            pass
         expected_relation, expected_motion = "两干比和", None
         for rule in ref["directed_rules"]:
             rule_checks += 1
@@ -253,11 +261,15 @@ def audit() -> dict[str, Any]:
                         actual=row,
                     )
                 )
+            else:
+                pass
             if expected_match:
                 expected_relation, expected_motion = (
                     rule["relation"],
                     rule["motion_analogue"],
                 )
+            else:
+                pass
         expected_facts = expected_pair(ref, god_stem + god, general_stem + general)
         matched = (
             result["relation"] == expected_relation
@@ -278,6 +290,8 @@ def audit() -> dict[str, Any]:
                     actual=result,
                 )
             )
+        else:
+            pass
     pair_checks = pair_matches = 0
     for left, right in product(cycle(ref), repeat=2):
         pair_checks += 1
@@ -290,6 +304,8 @@ def audit() -> dict[str, Any]:
             failures.append(
                 dict(left=left, right=right, expected=expected, actual=actual)
             )
+        else:
+            pass
     unchanged = before == {p: sha(ROOT / p) for p in IMPLEMENTATION}
     literal_ok = all(
         r["matched"] for r in starts + literal_anchors + clauses + stem_pairs

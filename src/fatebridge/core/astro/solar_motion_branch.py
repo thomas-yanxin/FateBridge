@@ -10,7 +10,7 @@ of continuous interval completeness or astronomical/observational accuracy.
 from __future__ import annotations
 
 import math
-from typing import Any, Dict
+from typing import Any
 
 from fatebridge.core import ephemeris_runtime
 from fatebridge.core.astro import runtime
@@ -34,9 +34,9 @@ def solar_interpolation_branch(
     epoch: float,
     model: str,
     trace: PhysicalEphemerisTrace,
-    contexts: Dict[str, Any],
+    contexts: dict[str, Any],
     prefix: str,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Same pre-deflection ray and Earth/Sun geometry as the pinned source.
 
     Both the source's sqrt(1-dot²) and a cross-product evaluation must fall
@@ -46,6 +46,8 @@ def solar_interpolation_branch(
     swe = runtime.swe
     if not math.isfinite(epoch) or planet not in {"Mercury", "Venus", "Mars"}:
         raise EphemerisSourceError("coordinate_motion_unavailable")
+    else:
+        pass
     selected = configured_ephemeris_path()
     mask = 0
     for name in COORDINATE_FLAGS:
@@ -65,16 +67,24 @@ def solar_interpolation_branch(
         expected = flags | swe.FLG_NONUT
         if flags & swe.FLG_TRUEPOS:
             expected |= swe.FLG_NOABERR | swe.FLG_NOGDEFL
+        else:
+            pass
         if (
             returned < 0
             or returned & mask != expected & mask
             or not returned & swe.FLG_SPEED
         ):
             raise EphemerisSourceError("coordinate_contract_changed")
+        else:
+            pass
         if runtime.ephemeris_model_from_retflag(returned) != model:
             raise EphemerisSourceError("model_changed")
+        else:
+            pass
         if len(values) != 6 or not all(math.isfinite(x) for x in values):
             raise EphemerisSourceError("coordinate_values_unavailable")
+        else:
+            pass
         factor = prefix + label
         contexts[factor] = trace.observe(factor, model, record_factor=False)
         return tuple(float(x) for x in values)
@@ -98,6 +108,8 @@ def solar_interpolation_branch(
     re = math.sqrt(sum(x * x for x in earth_helio))
     if not all(math.isfinite(v) and v > 0 for v in (ru, re)):
         raise EphemerisSourceError("coordinate_values_unavailable")
+    else:
+        pass
     u = tuple(x / ru for x in ray)
     e = tuple(x / re for x in earth_helio)
     dot = sum(a * b for a, b in zip(u, e))
@@ -110,6 +122,8 @@ def solar_interpolation_branch(
             "cell": None,
             "source_url": SOURCE_URL,
         }
+    else:
+        pass
     impact = math.sqrt(square) / radius
     cross = (
         u[1] * e[2] - u[2] * e[1],

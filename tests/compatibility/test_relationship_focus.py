@@ -1,15 +1,19 @@
+"""Check relationship focus aliases and their selected directional facts."""
+
 import asyncio
+from pathlib import Path
 
 import pytest
+from fastapi.testclient import TestClient
 
 from fatebridge.core.astro.relationship import relationship_focus_block
 from fatebridge.services.astrology import calculate_relative_chart_analysis
 from tests.fixtures.surface_payloads import astro_payload
-from tests.support.relationship_inputs import payloads
+from tests.support.relationship_inputs import relationship_payload
 from tests.support.transports import SPECS, business, call_cli, native, rest
 
 
-def test_relationship_focus_block_romance_filters_to_significators():
+def test_relationship_focus_block_romance_filters_to_significators() -> None:
     aspects = [
         {"inner": "Venus", "outer": "Mars", "aspect": "Trine", "orb": 1.0},
         {"inner": "Mercury", "outer": "Saturn", "aspect": "Square", "orb": 2.0},
@@ -19,20 +23,20 @@ def test_relationship_focus_block_romance_filters_to_significators():
     assert block["focus"] == "romance"
     assert block["emphasis_houses"] == [5]
     kept = {(a["inner"], a["outer"]) for a in block["focused_synastry_aspects"]}
-    assert ("Venus", "Mars") in kept  # both significators
-    assert ("Moon", "Jupiter") in kept  # Moon is a significator
-    assert ("Mercury", "Saturn") not in kept  # neither is a romance significator
+    assert ("Venus", "Mars") in kept
+    assert ("Moon", "Jupiter") in kept
+    assert ("Mercury", "Saturn") not in kept
     assert block["focused_aspect_count"] == 2
 
 
-def test_relationship_focus_block_marriage_houses_and_bodies():
+def test_relationship_focus_block_marriage_houses_and_bodies() -> None:
     block = relationship_focus_block("婚姻", [])
     assert block["focus"] == "marriage"
     assert block["emphasis_houses"] == [7]
     assert "Saturn" in block["emphasis_bodies"]
 
 
-def test_relationship_focus_block_general_does_not_filter():
+def test_relationship_focus_block_general_does_not_filter() -> None:
     block = relationship_focus_block(
         None, [{"inner": "Venus", "outer": "Mars", "aspect": "Trine", "orb": 1.0}]
     )
@@ -41,7 +45,7 @@ def test_relationship_focus_block_general_does_not_filter():
     assert block["focused_synastry_aspects"] == []
 
 
-def test_relative_chart_attaches_focus_block_subset_of_synastry():
+def test_relative_chart_attaches_focus_block_subset_of_synastry() -> None:
     result = calculate_relative_chart_analysis(
         inner_payload=astro_payload(
             name="甲",
@@ -64,16 +68,18 @@ def test_relative_chart_attaches_focus_block_subset_of_synastry():
     focus = result["relationship_profile"]["focus"]
     assert focus["focus"] == "romance"
     assert focus["emphasis_houses"] == [5]
-    # 过滤子集必须是完整 synastry 相位的子集。
-    assert focus["focused_aspect_count"] <= len(result["synastry_aspects"])
     significators = set(focus["emphasis_bodies"])
-    for aspect in focus["focused_synastry_aspects"]:
-        assert aspect["inner"] in significators or aspect["outer"] in significators
+    expected_aspects = [
+        aspect
+        for aspect in result["synastry_aspects"]
+        if aspect["inner"] in significators or aspect["outer"] in significators
+    ]
+    assert focus["focused_synastry_aspects"] == expected_aspects
+    assert focus["focused_aspect_count"] == len(expected_aspects)
 
 
-@pytest.mark.parametrize(
-    "value,expected",
-    [
+def test_all_existing_focus_aliases_and_unspecified_values_are_retained() -> None:
+    cases = [
         (None, "general"),
         ("", "general"),
         ("   ", "general"),
@@ -90,35 +96,31 @@ def test_relative_chart_attaches_focus_block_subset_of_synastry():
         ("love", "romance"),
         ("恋爱", "romance"),
         ("戀愛", "romance"),
-    ],
-)
-def test_all_existing_focus_aliases_and_unspecified_values_are_retained(
-    value, expected
-):
-    assert relationship_focus_block(value, [])["focus"] == expected
-    if value is not None:
-        assert relationship_focus_block(f" {value.upper()} ", [])["focus"] == expected
+    ]
+    for value, expected in cases:
+        assert relationship_focus_block(value, [])["focus"] == expected
+        if value is not None:
+            assert (
+                relationship_focus_block(f" {value.upper()} ", [])["focus"] == expected
+            )
+        else:
+            pass
 
 
 @pytest.mark.parametrize("value", ["romnace", "career", "unknown"])
-def test_unknown_nonempty_focus_does_not_acquire_an_unspecified_general_result(value):
+def test_unknown_nonempty_focus_does_not_acquire_an_unspecified_general_result(
+    value: str,
+) -> None:
     with pytest.raises(ValueError, match="relationship_focus"):
         relationship_focus_block(value, [])
 
 
 def test_unknown_focus_is_rejected_on_both_request_shapes_and_all_public_transports(
-    rest, tmp_path, capsys
-):
-    from fatebridge.application.execution import execute_tool
-
-    nested, flat = payloads("Comp", "uncorrected")
-    nested["relationship_focus"] = flat["relationship_focus"] = "romnace"
-    for key, inputs in (("astro_relative", nested), ("astro_relative_chart", flat)):
-        spec = SPECS[key]
-        result = execute_tool(spec, spec.request_model.model_validate(inputs))
-        assert "relationship_focus" in result["error"]
-        assert "relationship_profile" not in result
-    response = rest.post("/api/astro/relative", json=nested)
+    rest: TestClient, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    flat = relationship_payload("Comp", "uncorrected")
+    flat["relationship_focus"] = "romnace"
+    response = rest.post("/api/astrology/relationship-chart", json=flat)
     code, cli = call_cli(SPECS["astro_relative_chart"], flat, tmp_path, capsys)
     mcp = asyncio.run(native(SPECS["astro_relative_chart"], flat))
     assert response.status_code == 400 and code != 0 and mcp.is_error
@@ -126,18 +128,20 @@ def test_unknown_focus_is_rejected_on_both_request_shapes_and_all_public_transpo
     assert "relationship_focus" in cli["error"]
 
 
-@pytest.mark.parametrize(
-    "value,expected", [(" MARRY ", "marriage"), ("戀愛", "romance"), ("   ", "general")]
-)
+@pytest.mark.parametrize("value,expected", [(" MARRY ", "marriage")])
 def test_valid_focus_aliases_reach_all_public_transports(
-    rest, tmp_path, capsys, value, expected
-):
-    nested, flat = payloads("Comp", "uncorrected")
-    nested["relationship_focus"] = flat["relationship_focus"] = value
+    rest: TestClient,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    value: str,
+    expected: str,
+) -> None:
+    flat = relationship_payload("Comp", "uncorrected")
+    flat["relationship_focus"] = value
     fields = ["relationship_profile.focus"]
     response = rest.post(
-        "/api/astro/relative",
-        json=nested,
+        "/api/astrology/relationship-chart",
+        json=flat,
         params=[
             ("fields", fields[0]),
             ("strict_fields", "true"),

@@ -304,9 +304,9 @@ uv run --locked --extra dev python -m scripts.ren.audit_ren_classical \
 
 ### 解释忠实与现实预测
 
-结构化事实引用可使用已有 `fatebridge.validation.claims.verify_calculation_claims`，绑定结构化引用的 `run_id`；提供另行可信保存的完整 `trusted_payload` 时，逐值核对完整结果。当前测试核验金口诀贵神名称，拒绝错引为旧值、跨结果或篡改完整结果；自由文本是否忠实仍需独立人工或盲评，不能由结构化校验代替。
+结构化事实引用可使用已有 `validation.claims.verify_calculation_claims`，绑定结构化引用的 `run_id`；提供另行可信保存的完整 `trusted_payload` 时，逐值核对完整结果。当前测试核验金口诀贵神名称，拒绝错引为旧值、跨结果或篡改完整结果；自由文本是否忠实仍需独立人工或盲评，不能由结构化校验代替。
 
-前瞻评估可复用已有 `scripts/evaluation/audit_prediction_study.py` 与 `fatebridge.validation.predictions`。该范围没有真实外部结果数据，`real_world_prediction=not_tested`。开始正式研究前，需要：
+前瞻评估可复用已有 `scripts/evaluation/audit_prediction_study.py` 与 `validation.predictions`。该范围没有真实外部结果数据，`real_world_prediction=not_tested`。开始正式研究前，需要：
 
 1. 固定一个可客观裁定、有限时间窗内的单一事件目标，写清未发生和无法裁定的条件。
 2. 在收集结局前冻结完整样本队列、规则/代码/解释策略、概率校准方法、对照基线和分析计划。不能从传统旺衰或动爻直接编造成功概率。

@@ -4,11 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from fatebridge.core.metaphysics.liureng_relation_tables import GOD_ELEMENTS
-from fatebridge.core.metaphysics.ren_sources import TANYUAN_SCAN_SHA256, TANYUAN_SOURCE
-
-from ...utils.data import EARTHLY_BRANCHES
-from .common import (
+from fatebridge.core.metaphysics.common import (
     ELEMENT_CONTROLS,
     ELEMENT_GENERATES,
     SEXAGENARY_INDEX,
@@ -17,9 +13,15 @@ from .common import (
     liuqin_against_day,
     stem_element_text,
 )
-from .liureng_course_conditions import course_conditions
-from .liureng_life_stages import life_stage_cycle
-from .liureng_ordered_patterns import ordered_transmission_patterns
+from fatebridge.core.metaphysics.liureng_course_conditions import course_conditions
+from fatebridge.core.metaphysics.liureng_life_stages import life_stage_cycle
+from fatebridge.core.metaphysics.liureng_ordered_patterns import (
+    ordered_transmission_patterns,
+)
+from fatebridge.core.metaphysics.liureng_relation_tables import GOD_ELEMENTS
+from fatebridge.core.metaphysics.liureng_trine_seasonal import nominal_seasonal_evidence
+from fatebridge.core.metaphysics.ren_sources import TANYUAN_SCAN_SHA256, TANYUAN_SOURCE
+from fatebridge.utils.data import EARTHLY_BRANCHES
 
 # Literal phase attributes in PDF86. Do not borrow Jin Kou's inherent stems:
 # this witness has 玄武癸亥 and 天后壬子, with the same water phase.
@@ -40,10 +42,16 @@ RULE_NAMES = (
 def phase_relation(left: str, right: str) -> str:
     if left == right:
         return "比和"
+    else:
+        pass
     if ELEMENT_GENERATES[left] == right:
         return "生"
+    else:
+        pass
     if ELEMENT_GENERATES[right] == left:
         return "受生"
+    else:
+        pass
     return "克" if ELEMENT_CONTROLS[left] == right else "受克"
 
 
@@ -56,6 +64,8 @@ def transmission_relations(
 ) -> dict[str, Any]:
     if day_ganzhi not in SEXAGENARY_INDEX:
         raise ValueError("三传关系需要有效日干支")
+    else:
+        pass
     day = stem_element_text(day_ganzhi[0])
     empty = kongwang_for_ganzhi(day_ganzhi)[:2]
     stages = life_stage_cycle(day_ganzhi[0])
@@ -69,6 +79,8 @@ def transmission_relations(
             or god not in GOD_ELEMENTS
         ):
             raise ValueError("三传关系的支神、地盘或天将无效")
+        else:
+            pass
         element, god_element = branch_element_text(branch), GOD_ELEMENTS[god]
         relation = phase_relation(god_element, element)
         rows.append(
@@ -96,6 +108,8 @@ def transmission_relations(
     upper = {int(l["index"]): l["upper_branch"] for l in lessons}
     if set(upper) != {1, 2, 3, 4} or len(lessons) != 4:
         raise ValueError("三传关系需要完整且不重复的四课")
+    else:
+        pass
     branches = [r["branch"] for r in rows]
     flags = {
         "birth_to_tomb": a["day_stem_life_stage"] == "长生"
@@ -130,11 +144,12 @@ def transmission_relations(
             )
         )
         if month_branch is not None:
-            from .liureng_trine_seasonal import nominal_seasonal_evidence
 
             trines[-1]["nominal_seasonal_evidence"] = (
                 nominal_seasonal_evidence(month_branch, element) if complete else None
             )
+        else:
+            pass
     return dict(
         ruleset_id="liuren_tanyuan_transmission_relations_v1",
         source_url=TANYUAN_SOURCE,

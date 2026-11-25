@@ -1,0 +1,327 @@
+{
+  "call_guidance": {
+    "evidence": "先读双方四柱与跨盘触点。按需增加 cross_chart_relations.directional_punishments 和 directional_ten_gods。natal_matches 记录哪方原局已具备同一组关系。",
+    "interpretation": "按两人的实际关系与问题解释，分别引用双方对应星位。"
+  },
+  "first_view": {
+    "fields": [
+      "relationship_type",
+      "person_info",
+      "element_relationship",
+      "natal_contexts.person1.four_pillars",
+      "natal_contexts.person2.four_pillars",
+      "cross_chart_relations.pairs",
+      "cross_chart_relations.groups"
+    ],
+    "include_snapshot_text": false,
+    "strict_fields": true
+  },
+  "input": {
+    "additionalProperties": false,
+    "description": "Request model for two-person compatibility analysis.",
+    "properties": {
+      "person1_birth_day": {
+        "description": "First person birth day",
+        "maximum": 31,
+        "minimum": 1,
+        "title": "Person1 Birth Day",
+        "type": "integer"
+      },
+      "person1_birth_hour": {
+        "description": "First person birth hour",
+        "maximum": 23,
+        "minimum": 0,
+        "title": "Person1 Birth Hour",
+        "type": "integer"
+      },
+      "person1_birth_longitude": {
+        "anyOf": [
+          {
+            "maximum": 180,
+            "minimum": -180,
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "First person birth longitude",
+        "title": "Person1 Birth Longitude"
+      },
+      "person1_birth_minute": {
+        "default": 0,
+        "description": "First person birth minute",
+        "maximum": 59,
+        "minimum": 0,
+        "title": "Person1 Birth Minute",
+        "type": "integer"
+      },
+      "person1_birth_month": {
+        "description": "First person birth month",
+        "maximum": 12,
+        "minimum": 1,
+        "title": "Person1 Birth Month",
+        "type": "integer"
+      },
+      "person1_birth_place": {
+        "default": "未提供",
+        "description": "First person birth place",
+        "title": "Person1 Birth Place",
+        "type": "string"
+      },
+      "person1_birth_second": {
+        "anyOf": [
+          {
+            "maximum": 59,
+            "minimum": 0,
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "第一人已知出生秒数，须同时提供出生分钟",
+        "title": "Person1 Birth Second"
+      },
+      "person1_birth_timezone": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "First person birth timezone",
+        "title": "Person1 Birth Timezone"
+      },
+      "person1_birth_utc_offset": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "第一人已确认的出生 UTC 偏移，用于消歧重复钟时",
+        "title": "Person1 Birth Utc Offset"
+      },
+      "person1_birth_year": {
+        "description": "First person birth year, e.g., 1990",
+        "maximum": 2100,
+        "minimum": 1900,
+        "title": "Person1 Birth Year",
+        "type": "integer"
+      },
+      "person1_gender": {
+        "default": "未知",
+        "description": "第一人性别（影响大运顺逆与部分六亲判断）。接受 男/女、male/female/m/f、阳/阴、乾/坤 等写法；省略默认 未知。",
+        "title": "Person1 Gender",
+        "type": "string"
+      },
+      "person1_name": {
+        "description": "First person name",
+        "title": "Person1 Name",
+        "type": "string"
+      },
+      "person1_use_true_solar_time": {
+        "default": true,
+        "description": "Enable true solar time for first person (八字 default on)",
+        "title": "Person1 Use True Solar Time",
+        "type": "boolean"
+      },
+      "person2_birth_day": {
+        "description": "Second person birth day",
+        "maximum": 31,
+        "minimum": 1,
+        "title": "Person2 Birth Day",
+        "type": "integer"
+      },
+      "person2_birth_hour": {
+        "description": "Second person birth hour",
+        "maximum": 23,
+        "minimum": 0,
+        "title": "Person2 Birth Hour",
+        "type": "integer"
+      },
+      "person2_birth_longitude": {
+        "anyOf": [
+          {
+            "maximum": 180,
+            "minimum": -180,
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Second person birth longitude",
+        "title": "Person2 Birth Longitude"
+      },
+      "person2_birth_minute": {
+        "default": 0,
+        "description": "Second person birth minute",
+        "maximum": 59,
+        "minimum": 0,
+        "title": "Person2 Birth Minute",
+        "type": "integer"
+      },
+      "person2_birth_month": {
+        "description": "Second person birth month",
+        "maximum": 12,
+        "minimum": 1,
+        "title": "Person2 Birth Month",
+        "type": "integer"
+      },
+      "person2_birth_place": {
+        "default": "未提供",
+        "description": "Second person birth place",
+        "title": "Person2 Birth Place",
+        "type": "string"
+      },
+      "person2_birth_second": {
+        "anyOf": [
+          {
+            "maximum": 59,
+            "minimum": 0,
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "第二人已知出生秒数，须同时提供出生分钟",
+        "title": "Person2 Birth Second"
+      },
+      "person2_birth_timezone": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Second person birth timezone",
+        "title": "Person2 Birth Timezone"
+      },
+      "person2_birth_utc_offset": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "第二人已确认的出生 UTC 偏移，用于消歧重复钟时",
+        "title": "Person2 Birth Utc Offset"
+      },
+      "person2_birth_year": {
+        "description": "Second person birth year, e.g., 1992",
+        "maximum": 2100,
+        "minimum": 1900,
+        "title": "Person2 Birth Year",
+        "type": "integer"
+      },
+      "person2_gender": {
+        "default": "未知",
+        "description": "第二人性别（影响大运顺逆与部分六亲判断）。接受 男/女、male/female/m/f、阳/阴、乾/坤 等写法；省略默认 未知。",
+        "title": "Person2 Gender",
+        "type": "string"
+      },
+      "person2_name": {
+        "description": "Second person name",
+        "title": "Person2 Name",
+        "type": "string"
+      },
+      "person2_use_true_solar_time": {
+        "default": true,
+        "description": "Enable true solar time for second person (八字 default on)",
+        "title": "Person2 Use True Solar Time",
+        "type": "boolean"
+      },
+      "relationship_type": {
+        "default": "general",
+        "description": "关系类型：general / marriage / friendship / business / family。用户未说明关系时保留 general；不能因两人性别或‘我们两个人’推断为婚姻。",
+        "enum": [
+          "general",
+          "marriage",
+          "friendship",
+          "business",
+          "family"
+        ],
+        "title": "Relationship Type",
+        "type": "string"
+      }
+    },
+    "required": [
+      "person1_name",
+      "person1_birth_year",
+      "person1_birth_month",
+      "person1_birth_day",
+      "person1_birth_hour",
+      "person2_name",
+      "person2_birth_year",
+      "person2_birth_month",
+      "person2_birth_day",
+      "person2_birth_hour"
+    ],
+    "title": "TwoPersonCompatibilityRequest",
+    "type": "object"
+  },
+  "method_contracts": [
+    {
+      "comparison_requirements": [
+        "相同方法合同、实现与数据版本、选项及实际计算层"
+      ],
+      "dependencies": [
+        "validated_request"
+      ],
+      "error_sources": [
+        "civil_clock",
+        "solar_clock",
+        "calendar_model",
+        "rule_adjudication"
+      ],
+      "implementation_refs": [
+        "src/fatebridge/services/birth_context.py"
+      ],
+      "limitations": [
+        "contract_v1是登记合同版本，不冒充上游原典或数值算法版本；实际版本另列runtime_method_ids",
+        "登记不认证全书、全部历史范围、连续区间稳定或现实预测"
+      ],
+      "method_id": "fatebridge.bazi_natal.contract_v1",
+      "output_paths": [
+        "natal_contexts",
+        "cross_chart_relations",
+        "directional_ten_gods"
+      ],
+      "prerequisites": [
+        "请求Schema及领域前提必须成立；条件分支以本次实际回执为准"
+      ],
+      "quantity_kind": "traditional_rule_result",
+      "role": "calculation",
+      "selector_fields": [],
+      "source_refs": [
+        "docs/bazi-assessment.md"
+      ],
+      "unit": "per_field",
+      "validation_scope": {
+        "numerical": "method_specific_reference_required",
+        "real_world_validity": "not_established",
+        "source_conformity": "not_fully_accepted"
+      }
+    }
+  ],
+  "tool": "bazi_compatibility"
+}

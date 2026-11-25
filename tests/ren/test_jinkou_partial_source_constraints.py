@@ -61,7 +61,7 @@ CASES = (
 
 
 @pytest.mark.parametrize("expected", CASES, ids=lambda c: c["id"])
-def test_missing_day_still_has_strict_partial_constraints(expected):
+def test_missing_day_still_has_strict_partial_constraints(expected) -> None:
     # This verifies the existing source pins, including the original images,
     # without replacing either source day's frozen None.
     reference()
@@ -90,8 +90,12 @@ def test_missing_day_still_has_strict_partial_constraints(expected):
             observed_general.add(general)
             if human == original["positions"][0]:
                 human_day_stems.add(day[0])
+            else:
+                pass
             if [human, god, general, original["positions"][3]] == original["positions"]:
                 full_candidates[mode].add(day)
+            else:
+                pass
     assert observed_general == {expected["derived_general"]}
     assert human_day_stems == expected["human_day_stems"]
     assert full_candidates == {
@@ -102,7 +106,7 @@ def test_missing_day_still_has_strict_partial_constraints(expected):
     assert original["day"] is None
 
 
-def test_partial_constraints_do_not_regrade_or_complete_the_original_cohort():
+def test_partial_constraints_do_not_regrade_or_complete_the_original_cohort() -> None:
     report = audit()
     assert (
         report["counts"]["original_denominator"],

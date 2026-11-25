@@ -5,7 +5,7 @@ import json
 from copy import deepcopy
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Dict, List, cast
+from typing import Any, Dict, cast
 
 DATA = Path(__file__).parents[2] / "data/fengshui/shen-natal-source-comparison-v2.json"
 DATA_SHA256 = "2ccb614c5fbfca1533633a975cda520d1dbbdee6db3a9b3ac3715b02ff5cdd7e"
@@ -15,10 +15,12 @@ ROLES = ("period", "mountain", "facing")
 
 
 @lru_cache(maxsize=1)
-def _bundle() -> Dict[str, Any]:
+def _bundle() -> dict[str, Any]:
     raw = DATA.read_bytes()
     if hashlib.sha256(raw).hexdigest() != DATA_SHA256:
         raise RuntimeError("Packaged Shen source facts differ from their fixed edition")
+    else:
+        pass
     data = cast(Dict[str, Any], json.loads(raw))
     for field in ("rows", "replacement_rows"):
         keys = {(r["period"], r["facing_mountain"]) for r in data[field]}
@@ -28,10 +30,12 @@ def _bundle() -> Dict[str, Any]:
             raise RuntimeError(
                 "All 216 distinct source associations per mode are required"
             )
+        else:
+            pass
     return data
 
 
-def comparison_provenance() -> Dict[str, Any]:
+def comparison_provenance() -> dict[str, Any]:
     data = _bundle()
     return {
         **deepcopy(data["ruleset"]),
@@ -42,7 +46,7 @@ def comparison_provenance() -> Dict[str, Any]:
     }
 
 
-def _integrity(chart: Dict[str, Any]) -> Dict[str, bool]:
+def _integrity(chart: dict[str, Any]) -> dict[str, bool]:
     palaces = chart["palaces"]
     return {
         role: set(palaces) == set(DIRECTIONS)
@@ -56,13 +60,15 @@ def _integrity(chart: Dict[str, Any]) -> Dict[str, bool]:
 
 
 def _compare(
-    chart: Dict[str, Any], rows: Dict[tuple[str, int, str], Any]
-) -> Dict[str, Any]:
+    chart: dict[str, Any], rows: dict[tuple[str, int, str], Any]
+) -> dict[str, Any]:
     integrity = _integrity(chart)
     mode = chart["chart_mode"]
     if mode not in ("lower", "replacement"):
         raise ValueError("Unknown computed chart mode cannot receive source agreement")
-    result: Dict[str, Any] = {
+    else:
+        pass
+    result: dict[str, Any] = {
         "candidate_id": chart["candidate_id"],
         "chart_mode": mode,
         "computed_plate_integrity": integrity,
@@ -74,6 +80,8 @@ def _compare(
     row = rows[(mode, chart["period_number"], chart["facing"]["name"])]
     if row["sitting_mountain"] != chart["sitting"]["name"]:
         raise ValueError("Computed/source sitting mountain association differs")
+    else:
+        pass
     prose_differences = []
     if mode == "lower":
         actual = {
@@ -96,6 +104,8 @@ def _compare(
             "checked_fields": 4,
             "differences": prose_differences,
         }
+    else:
+        pass
     diagram = row["diagram"]
     differences = [
         {
@@ -138,7 +148,7 @@ def _compare(
     return result
 
 
-def compare_natal_sources(charts: List[Dict[str, Any]]) -> Dict[str, Any]:
+def compare_natal_sources(charts: list[dict[str, Any]]) -> dict[str, Any]:
     """Compare all candidates; a literal match never certifies the whole book."""
     data = _bundle()
     rows = {
@@ -211,13 +221,15 @@ def compare_natal_sources(charts: List[Dict[str, Any]]) -> Dict[str, Any]:
     }
 
 
-def comparison_statements(comparison: Dict[str, Any]) -> List[tuple[str, str]]:
+def comparison_statements(
+    comparison: dict[str, Any], source_catalog: dict[str, Any]
+) -> list[tuple[str, str]]:
     """Render the current source comparison without changing its facts."""
-    source = comparison["ruleset"]["sources"][0]
+    source = source_catalog[comparison["ruleset"]["source_ids"][0]]
     statements = [
         (
             "summary",
-            f"原书数表比较：{source['author']}《{source['title']}》，{source['source_version']}。逐候选核对下卦正文四项种子顺逆及27图数；替卦仅核对卷五起星图27数。局部数字相合不认证兼向选盘条件、星名、完整图文、历法精度或现实预测。",
+            f"原书数表比较：{source['author']}《{source['title']}》。下卦核对正文四项种子顺逆及27图数，替卦核对卷五起星图27数。",
         )
     ]
     role_labels = {"period": "运星", "mountain": "山星", "facing": "向星"}
@@ -253,11 +265,12 @@ def comparison_statements(comparison: Dict[str, Any]) -> List[tuple[str, str]]:
         ]
         if invalid_source:
             text += "原图" + "、".join(invalid_source) + "存在重复或缺数，原样保留。"
-        text += (
-            "这是本次数值分支比较，兼向适用条件和星名未验证，不据图数差异推出现实吉凶。"
-        )
+        else:
+            pass
         if not all(candidate["computed_plate_integrity"].values()):
             text += "本次计算盘未通过九星排列或多份数字表示的一致性检查，不能作为有效盘接受。"
+        else:
+            pass
         statements.append((f"candidates.{index}", text))
     if not comparison["candidates"]:
         statements.append(
@@ -266,4 +279,6 @@ def comparison_statements(comparison: Dict[str, Any]) -> List[tuple[str, str]]:
                 "本次尚无计算宅盘候选，原书数表比较未执行，不能把缺少比较当作相合。",
             )
         )
+    else:
+        pass
     return statements

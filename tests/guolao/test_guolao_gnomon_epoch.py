@@ -8,8 +8,8 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core import guolao_gnomon_epoch as g
-from fatebridge.validation.guolao_gnomon_epoch import audit_gnomon_epoch
+from fatebridge.core.guolao import guolao_gnomon_epoch as g
+from validation.guolao_gnomon_epoch import audit_gnomon_epoch
 
 ROOT = Path(__file__).parents[2]
 FIXTURES = Path(__file__).parents[1] / "fixtures/guolao-gnomon-epoch-v1"
@@ -19,7 +19,9 @@ READING = g.load_gnomon_epoch(g.READING_PROFILE)
 
 
 @pytest.mark.parametrize("row", SOURCE["triads"])
-def test_every_published_triad_preserved_in_literal_profile_including_77_conflict(row):
+def test_every_published_triad_preserved_in_literal_profile_including_77_conflict(
+    row,
+) -> None:
     result = LITERAL.triad(row["season"], int(row["case_id"]))
     assert result["published_row"] == row
     conflict = row["season"] == "winter1279" and row["case_id"] == "25"
@@ -29,13 +31,17 @@ def test_every_published_triad_preserved_in_literal_profile_including_77_conflic
         assert result["arithmetic"]["span_days"] == 75
         assert row["span_days"] == "99"
         assert result["observations"][0]["observation_id"] == "77"
+    else:
+        pass
     assert result["physical_julian_day"] is None
     assert result["timezone"] is None
     assert not result["source_clock_to_modern_epoch_calibrated"]
 
 
 @pytest.mark.parametrize("row", SOURCE["triads"])
-def test_explicit_primary_reading_is_separate_with_only_one_referenced_row_change(row):
+def test_explicit_primary_reading_is_separate_with_only_one_referenced_row_change(
+    row,
+) -> None:
     result = READING.triad(row["season"], int(row["case_id"]))
     assert result["within_published_half_unit"]
     assert result["span_matches_published"]
@@ -51,7 +57,7 @@ def test_explicit_primary_reading_is_separate_with_only_one_referenced_row_chang
 
 
 @pytest.mark.parametrize("season", g.SEASONS)
-def test_season_means_keep_all_rows_and_exact_clock_interval_membership(season):
+def test_season_means_keep_all_rows_and_exact_clock_interval_membership(season) -> None:
     literal = LITERAL.season_mean(season)
     reading = READING.season_mean(season)
     assert reading["mean_within_published_half_unit"]
@@ -73,7 +79,7 @@ def test_season_means_keep_all_rows_and_exact_clock_interval_membership(season):
 )
 def test_fraction_formula_against_separate_decimal_equations_and_unit_scaling(
     mode, days, shadows
-):
+) -> None:
     result = g.three_shadow_elapsed(days, shadows, mode=mode, noon_basis=g.NOON_BASIS)
     with localcontext() as ctx:
         ctx.prec = 70
@@ -98,7 +104,9 @@ def test_fraction_formula_against_separate_decimal_equations_and_unit_scaling(
     )
 
 
-def test_clock_midpoint_is_a_comparison_value_and_zi_chu_is_not_modulo_wrapped():
+def test_clock_midpoint_is_a_comparison_value_and_zi_chu_is_not_modulo_wrapped() -> (
+    None
+):
     value = g.source_clock_bin("辰", "初", 3, clock_policy=g.CLOCK_POLICY)
     assert F(value["start_source_day_fraction_exact"]) == F(7, 24) + F(3, 100)
     assert F(value["end_source_day_fraction_exact"]) == F(7, 24) + F(4, 100)
@@ -111,7 +119,7 @@ def test_clock_midpoint_is_a_comparison_value_and_zi_chu_is_not_modulo_wrapped()
 
 
 @pytest.mark.parametrize("ke", [-1, 4, 5, True, 2.0, "2"])
-def test_little_ke_and_implicit_casts_not_fabricated(ke):
+def test_little_ke_and_implicit_casts_not_fabricated(ke) -> None:
     with pytest.raises((TypeError, ValueError)):
         g.source_clock_bin("辰", "初", ke, clock_policy=g.CLOCK_POLICY)
 
@@ -123,7 +131,7 @@ def test_little_ke_and_implicit_casts_not_fabricated(ke):
         {"mode": g.MODES[0], "noon_basis": "UTC_noon"},
     ],
 )
-def test_no_automatic_mode_or_universal_time_basis(kwargs):
+def test_no_automatic_mode_or_universal_time_basis(kwargs) -> None:
     with pytest.raises(ValueError):
         g.three_shadow_elapsed((0, 7, 8), (F(10), F(11), F(9)), **kwargs)
 
@@ -141,12 +149,12 @@ def test_no_automatic_mode_or_universal_time_basis(kwargs):
 )
 def test_invalid_measurements_not_sorted_filled_or_silently_interpolated(
     days, shadows, mode
-):
+) -> None:
     with pytest.raises(ValueError):
         g.three_shadow_elapsed(days, shadows, mode=mode, noon_basis=g.NOON_BASIS)
 
 
-def test_extrapolation_is_visible_and_does_not_become_bracketed_observation():
+def test_extrapolation_is_visible_and_does_not_become_bracketed_observation() -> None:
     row = g.three_shadow_elapsed(
         (0, 7, 8), (F(20), F(11), F(9)), mode=g.MODES[0], noon_basis=g.NOON_BASIS
     )
@@ -154,7 +162,7 @@ def test_extrapolation_is_visible_and_does_not_become_bracketed_observation():
     assert not row["linear_shadow_symmetry_is_exact_solar_motion"]
 
 
-def test_frozen_references_and_postcomparison_adjudication_are_distinct():
+def test_frozen_references_and_postcomparison_adjudication_are_distinct() -> None:
     initial = json.loads((FIXTURES / "reference.json").read_bytes())
     later = json.loads(
         (FIXTURES / "postcomparison-reading-reference.json").read_bytes()
@@ -176,7 +184,7 @@ def test_frozen_references_and_postcomparison_adjudication_are_distinct():
     assert not later["reading"]["source_55_06_constant_replaced"]
 
 
-def test_initial_failure_and_1279_summer_bin_conflict_survive_full_audit():
+def test_initial_failure_and_1279_summer_bin_conflict_survive_full_audit() -> None:
     report = audit_gnomon_epoch()
     assert report["matches_within_predeclared_printed_half_unit"] == 74
     assert not report["all_declared_spans_match"]
@@ -203,8 +211,8 @@ def test_initial_failure_and_1279_summer_bin_conflict_survive_full_audit():
     ],
 )
 def test_altered_reading_cannot_hide_postcomparison_choice(
-    tmp_path, monkeypatch, key, value
-):
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, key: str, value: bool | int | str
+) -> None:
     source = json.loads(g.COLLATION_DATA.read_bytes())
     source[key] = value
     target = tmp_path / "bad.json"
@@ -215,8 +223,8 @@ def test_altered_reading_cannot_hide_postcomparison_choice(
 
 
 def test_collation_provenance_is_loaded_snapshot_not_later_file_hash(
-    tmp_path, monkeypatch
-):
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     target = tmp_path / "reading.json"
     target.write_bytes(g.COLLATION_DATA.read_bytes())
     monkeypatch.setattr(g, "COLLATION_DATA", target)

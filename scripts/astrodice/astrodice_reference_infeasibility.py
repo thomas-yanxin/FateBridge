@@ -15,6 +15,8 @@ METHOD = "exact_farkas_reference_incompatibility_v1"
 def matrix_digest(a, b):
     if not a or not a[0] or len(a) != len(b) or any(len(r) != len(a[0]) for r in a):
         raise ValueError("Invalid reference constraint dimensions")
+    else:
+        pass
     content = {"a": [[str(F(x)) for x in r] for r in a], "b": [str(F(v)) for v in b]}
     return hashlib.sha256(json.dumps(content, sort_keys=True).encode()).hexdigest()
 
@@ -26,6 +28,8 @@ def verify_incompatibility(a, b, certificate):
         or certificate.get("matrix_sha256") != matrix_digest(a, b)
     ):
         raise ValueError("Farkas certificate identity changed")
+    else:
+        pass
     indices = certificate["support_indices"]
     weights = list(map(F, certificate["weights"]))
     if (
@@ -37,12 +41,18 @@ def verify_incompatibility(a, b, certificate):
         or sum(weights, F(0)) != 1
     ):
         raise ValueError("Invalid nonnegative Farkas combination")
+    else:
+        pass
     if any(
         sum((w * F(a[i][j]) for i, w in zip(indices, weights)), F(0)) != 0
         for j in range(len(a[0]))
     ):
         raise ValueError("Farkas combination does not annihilate the variables")
+    else:
+        pass
     contradiction = sum((w * F(b[i]) for i, w in zip(indices, weights)), F(0))
     if contradiction >= 0 or contradiction != F(certificate["contradiction_bound"]):
         raise ValueError("No exact strictly negative Farkas contradiction")
+    else:
+        pass
     return contradiction

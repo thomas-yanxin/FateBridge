@@ -30,6 +30,8 @@ def plan() -> dict:
     value = json.loads(raw)  # type: dict
     if len(value["epochs"]) != 17 or len({r["jd_tt"] for r in value["epochs"]}) != 17:
         raise ValueError("All distinct fixed epochs required")
+    else:
+        pass
     return value
 
 
@@ -48,6 +50,8 @@ def parse_response(raw: bytes, body: str) -> dict:
     payload = json.loads(raw)
     if "error" in payload:
         raise ValueError("Horizons returned an API error: " + str(payload["error"]))
+    else:
+        pass
     text = payload["result"]
     target = re.search(
         r"Target body name:\s*(.*?)\((\d+)\)\s*\{source:\s*([^}]+)\}", text
@@ -62,10 +66,14 @@ def parse_response(raw: bytes, body: str) -> dict:
         or int(center[2]) != 399
     ):
         raise ValueError("Wrong or missing target/observer identity")
+    else:
+        pass
     if not re.fullmatch(r"DE\d+", target[3].strip()) or not re.fullmatch(
         r"DE\d+", center[3].strip()
     ):
         raise ValueError("Unidentified JPL physical ephemeris")
+    else:
+        pass
     if (
         "Center-site name: GEOCENTRIC" not in text
         or "Date_________JDTT" not in text
@@ -73,18 +81,26 @@ def parse_response(raw: bytes, body: str) -> dict:
         or "ObsEcLat" not in text
     ):
         raise ValueError("Wrong or missing geocentric TT quantity31 context")
+    else:
+        pass
     if text.count("$$SOE") != 1 or text.count("$$EOE") != 1:
         raise ValueError("Missing or duplicate ephemeris table")
+    else:
+        pass
     table = text.split("$$SOE", 1)[1].split("$$EOE", 1)[0].strip()
     rows, seen = [], set()
     for cells in csv.reader(io.StringIO(table)):
         if len(cells) < 5:
             raise ValueError("Truncated Horizons coordinate row")
+        else:
+            pass
         jd, lon, lat = (float(cells[i]) for i in (0, 3, 4))
         if not all(math.isfinite(x) for x in (jd, lon, lat)) or not (
             0 <= lon < 360 and -90 <= lat <= 90
         ):
             raise ValueError("Unavailable or nonfinite Horizons coordinate")
+        else:
+            pass
         matches = [
             r
             for r in fixed["epochs"]
@@ -92,6 +108,8 @@ def parse_response(raw: bytes, body: str) -> dict:
         ]
         if len(matches) != 1 or matches[0]["id"] in seen:
             raise ValueError("Unmatched, ambiguous or duplicate TT epoch")
+        else:
+            pass
         match = matches[0]
         seen.add(match["id"])
         rows.append(
@@ -105,6 +123,8 @@ def parse_response(raw: bytes, body: str) -> dict:
         )
     if seen != {r["id"] for r in fixed["epochs"]}:
         raise ValueError("Incomplete fixed Horizons cohort")
+    else:
+        pass
     lookup = {r["id"]: r for r in rows}
     return {
         "body": body,
@@ -149,6 +169,8 @@ def collect(directory: Path) -> None:
         try:
             if process.returncode:
                 raise RuntimeError("Horizons transport failed")
+            else:
+                pass
             parsed = parse_response(process.stdout, body)
             records.append(parsed)
             status["parse_status"] = "complete_fixed_cohort"
@@ -184,10 +206,14 @@ def derive_de440(output: Path) -> None:
 
     if output.exists():
         raise FileExistsError(output)
+    else:
+        pass
     fixed = plan()
     for name, expected in fixed["reference_versions"].items():
         if version(name) != expected:
             raise ValueError("Reference dependency changed: " + name)
+        else:
+            pass
     path = ROOT / fixed["de440_kernel_path"]
     raw = path.read_bytes()
     if (
@@ -195,6 +221,8 @@ def derive_de440(output: Path) -> None:
         or hashlib.md5(raw).hexdigest() != fixed["de440_kernel_md5"]
     ):
         raise ValueError("Original DE440 kernel identity changed")
+    else:
+        pass
     kernel = load_file(str(path))
     try:
         ts = load.timescale(builtin=True)
@@ -240,3 +268,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+else:
+    pass

@@ -12,17 +12,9 @@ from fatebridge.core.fengshui.context import (
     expert_context_provenance,
 )
 from fatebridge.core.fengshui.context_inputs import EnvironmentalContext
-
-
-def orientation(**changes):
-    return {
-        "direction_confirmed": True,
-        "north_reference": "magnetic",
-        "floorplan_alignment_confirmed": True,
-        "center_confirmed": True,
-        "evidence": "现场核对参考北、户型旋转及全宅中心",
-        **changes,
-    }
+from tests.unit_test.fixtures.fengshui_layout import (
+    orientation,
+)
 
 
 def member(subject_id, gender="male", generation=1, roles=(), **changes):
@@ -41,7 +33,7 @@ def evaluate(**values):
     return analyze_environmental_context(context, ["annual_stars", "jinsuo"])
 
 
-def test_policy_is_versioned_sourced_and_does_not_change_personal_layer():
+def test_policy_is_versioned_sourced_and_does_not_change_personal_layer() -> None:
     result = analyze_environmental_context(None, ["bazhai", "jinsuo"])
     assert result["status"] == "not_requested"
     assert result["missing_inputs"] == []
@@ -63,7 +55,9 @@ def test_policy_is_versioned_sourced_and_does_not_change_personal_layer():
 @pytest.mark.parametrize(
     "natal_field", ["bazi", "ziwei", "favourable_elements", "other_people_charts"]
 )
-def test_environment_cannot_accept_or_secretly_merge_natal_chart_data(natal_field):
+def test_environment_cannot_accept_or_secretly_merge_natal_chart_data(
+    natal_field: str,
+) -> None:
     with pytest.raises(ValidationError, match="Extra inputs"):
         EnvironmentalContext.model_validate({natal_field: {"wood": True}})
 
@@ -73,7 +67,7 @@ def test_environment_cannot_accept_or_secretly_merge_natal_chart_data(natal_fiel
 )
 def test_sector_binding_requires_direction_alignment_and_center(
     direction, alignment, center
-):
+) -> None:
     result = evaluate(
         orientation=orientation(
             direction_confirmed=direction,
@@ -89,7 +83,7 @@ def test_sector_binding_requires_direction_alignment_and_center(
     assert result["status"] == ("complete" if ready else "partial")
 
 
-def test_reference_north_is_required_and_true_flags_do_not_accept_strings():
+def test_reference_north_is_required_and_true_flags_do_not_accept_strings() -> None:
     for values in (
         orientation(north_reference=None),
         orientation(direction_confirmed="yes"),
@@ -98,7 +92,7 @@ def test_reference_north_is_required_and_true_flags_do_not_accept_strings():
             EnvironmentalContext.model_validate({"orientation": values})
 
 
-def test_generation_beats_household_decision_power_and_spouse_own_rank():
+def test_generation_beats_household_decision_power_and_spouse_own_rank() -> None:
     result = evaluate(
         orientation=orientation(),
         household_composition_confirmed=True,
@@ -129,7 +123,9 @@ def test_generation_beats_household_decision_power_and_spouse_own_rank():
     assert not any(p["decision_making_power_used"] for p in people.values())
 
 
-def test_parent_and_birth_order_are_both_retained_when_no_older_generation_resides():
+def test_parent_and_birth_order_are_both_retained_when_no_older_generation_resides() -> (
+    None
+):
     result = evaluate(
         orientation=orientation(),
         household_composition_confirmed=True,
@@ -142,7 +138,7 @@ def test_parent_and_birth_order_are_both_retained_when_no_older_generation_resid
     assert all(not p["effects_inferred"] for p in result["household_correspondences"])
 
 
-def test_incomplete_household_does_not_promote_oldest_supplied_person_to_qian():
+def test_incomplete_household_does_not_promote_oldest_supplied_person_to_qian() -> None:
     result = evaluate(
         orientation=orientation(),
         household_members=[member("p", roles=["parent", "middle_child"])],
@@ -172,7 +168,9 @@ def test_incomplete_household_does_not_promote_oldest_supplied_person_to_qian():
         ("猪", "乾"),
     ],
 )
-def test_confirmed_zodiac_is_separate_index_with_opposite_secondary(zodiac, palace):
+def test_confirmed_zodiac_is_separate_index_with_opposite_secondary(
+    zodiac: str, palace: str
+) -> None:
     result = evaluate(
         household_members=[member("p", zodiac=zodiac)],
     )
@@ -188,7 +186,9 @@ def test_confirmed_zodiac_is_separate_index_with_opposite_secondary(zodiac, pala
     assert "SHEN_BRANCHES" in association["source_ids"]
 
 
-def test_zodiac_is_not_guessed_when_not_provided_and_nonresident_is_not_affected():
+def test_zodiac_is_not_guessed_when_not_provided_and_nonresident_is_not_affected() -> (
+    None
+):
     result = evaluate(
         orientation=orientation(),
         household_members=[
@@ -224,7 +224,7 @@ def test_zodiac_is_not_guessed_when_not_provided_and_nonresident_is_not_affected
         ],
     ],
 )
-def test_inconsistent_family_contract_is_rejected(members):
+def test_inconsistent_family_contract_is_rejected(members) -> None:
     with pytest.raises(ValidationError):
         EnvironmentalContext.model_validate({"household_members": members})
 
@@ -279,7 +279,9 @@ def floor_inputs():
     }
 
 
-def test_courtyard_is_first_floor_and_local_issue_not_transferred_to_suitable_other_floor():
+def test_courtyard_is_first_floor_and_local_issue_not_transferred_to_suitable_other_floor() -> (
+    None
+):
     result = evaluate(**floor_inputs())
     influence = result["floor_review"]["influences"][0]
     assignments = {p["subject_id"]: p["status"] for p in influence["subject_scope"]}
@@ -303,7 +305,9 @@ def test_courtyard_is_first_floor_and_local_issue_not_transferred_to_suitable_ot
     ["center_confirmed", "floorplan_alignment_confirmed", "uses_shared_orientation"],
 )
 @pytest.mark.parametrize("unconfirmed", [None, False])
-def test_global_geometry_does_not_supply_per_floor_geometry(field, unconfirmed):
+def test_global_geometry_does_not_supply_per_floor_geometry(
+    field: str, unconfirmed: bool | None
+) -> None:
     inputs = floor_inputs()
     inputs["floors"][1][field] = unconfirmed
     result = evaluate(**inputs)
@@ -317,9 +321,11 @@ def test_global_geometry_does_not_supply_per_floor_geometry(field, unconfirmed):
         assert (
             f"environmental_context.floors.second.{field}" in result["missing_inputs"]
         )
+    else:
+        pass
 
 
-def test_courtyard_uses_first_level_but_cannot_borrow_its_confirmed_center():
+def test_courtyard_uses_first_level_but_cannot_borrow_its_confirmed_center() -> None:
     inputs = floor_inputs()
     inputs["floors"][2].pop("center_confirmed")
     result = evaluate(**inputs)
@@ -342,7 +348,9 @@ def test_courtyard_uses_first_level_but_cannot_borrow_its_confirmed_center():
         ("unknown_usage", "usage_confirmation_required"),
     ],
 )
-def test_floor_exemption_does_not_extend_past_confirmed_conditions(change, expected):
+def test_floor_exemption_does_not_extend_past_confirmed_conditions(
+    change: str, expected: str
+) -> None:
     inputs = floor_inputs()
     if change == "unknown_extent":
         inputs["floor_influences"][0]["extent"] = "unknown"
@@ -381,7 +389,9 @@ def test_floor_exemption_does_not_extend_past_confirmed_conditions(change, expec
         "missing_suitability_evidence",
     ],
 )
-def test_floor_contract_rejects_inconsistent_or_unconfirmed_assertions(mutation):
+def test_floor_contract_rejects_inconsistent_or_unconfirmed_assertions(
+    mutation: str,
+) -> None:
     inputs = floor_inputs()
     if mutation == "yard_on_upper":
         inputs["floors"][2]["level"] = 2
@@ -437,7 +447,9 @@ def observation_inputs():
     }
 
 
-def test_no_direction_keeps_modern_reminders_low_and_unsourced_taboos_uncovered():
+def test_no_direction_keeps_modern_reminders_low_and_unsourced_taboos_uncovered() -> (
+    None
+):
     context = EnvironmentalContext.model_validate(observation_inputs())
     context.validate_references([], [])
     result = analyze_environmental_context(context, [])
@@ -459,7 +471,9 @@ def test_no_direction_keeps_modern_reminders_low_and_unsourced_taboos_uncovered(
     assert not any(f["direction_inferred"] or f["action_required"] for f in findings)
 
 
-def test_context_objects_do_not_force_fake_placement_and_reference_checks_cover_every_scope():
+def test_context_objects_do_not_force_fake_placement_and_reference_checks_cover_every_scope() -> (
+    None
+):
     inputs = observation_inputs()
     inputs["household_members"] = [member("person")]
     inputs["floors"] = [
@@ -488,7 +502,9 @@ def test_context_objects_do_not_force_fake_placement_and_reference_checks_cover_
         EnvironmentalContext.model_validate(bad)
 
 
-def test_existing_object_purpose_cannot_be_reassigned_by_environmental_definition():
+def test_existing_object_purpose_cannot_be_reassigned_by_environmental_definition() -> (
+    None
+):
     context = EnvironmentalContext.model_validate(
         {
             "orientation": orientation(),
@@ -539,12 +555,12 @@ def test_existing_object_purpose_cannot_be_reassigned_by_environmental_definitio
         },
     ],
 )
-def test_empty_context_or_definitions_alone_are_not_a_complete_review(values):
+def test_empty_context_or_definitions_alone_are_not_a_complete_review(values) -> None:
     with pytest.raises(ValidationError, match="至少提供"):
         EnvironmentalContext.model_validate(values)
 
 
-def test_declared_person_without_roles_or_floor_use_remains_partial():
+def test_declared_person_without_roles_or_floor_use_remains_partial() -> None:
     result = evaluate(orientation=orientation(), household_members=[member("p")])
     assert result["status"] == "partial"
     assert result["missing_inputs"] == [
@@ -552,7 +568,9 @@ def test_declared_person_without_roles_or_floor_use_remains_partial():
     ]
 
 
-def test_nested_schema_forbids_extra_chart_inputs_and_valid_request_matches_schema():
+def test_nested_schema_forbids_extra_chart_inputs_and_valid_request_matches_schema() -> (
+    None
+):
     schema = EnvironmentalContext.model_json_schema()
     Draft202012Validator.check_schema(schema)
     Draft202012Validator(schema).validate(observation_inputs())
@@ -570,14 +588,16 @@ def test_nested_schema_forbids_extra_chart_inputs_and_valid_request_matches_sche
 @pytest.mark.parametrize("space_index", [0, 2])
 @pytest.mark.parametrize("positive_list_omitted", [False, True])
 def test_local_exemption_requires_complete_usage_of_each_affected_level_space(
-    space_index, positive_list_omitted
-):
+    space_index: int, positive_list_omitted: bool
+) -> None:
     values = floor_inputs()
     floor = values["floors"][space_index]
     floor.pop("usage_confirmed")
     floor.pop("usage_evidence")
     if positive_list_omitted:
         floor.pop("subject_ids", None)
+    else:
+        pass
     result = evaluate(**values)
     person = next(
         p
@@ -594,8 +614,8 @@ def test_local_exemption_requires_complete_usage_of_each_affected_level_space(
 
 @pytest.mark.parametrize("space_index", [0, 2])
 def test_shared_scope_cannot_exclude_other_floor_user_without_complete_affected_usage(
-    space_index,
-):
+    space_index: int,
+) -> None:
     values = floor_inputs()
     values["floor_influences"][0].update(
         extent="shared_confirmed", shared_floor_ids=["first"]
@@ -611,7 +631,9 @@ def test_shared_scope_cannot_exclude_other_floor_user_without_complete_affected_
     assert assignments["up"] == "usage_confirmation_required"
 
 
-def test_confirmed_shared_usage_can_exclude_scope_without_asking_where_person_lives():
+def test_confirmed_shared_usage_can_exclude_scope_without_asking_where_person_lives() -> (
+    None
+):
     values = floor_inputs()
     values["floor_influences"][0].update(
         extent="shared_confirmed", shared_floor_ids=["first"]
@@ -630,8 +652,8 @@ def test_confirmed_shared_usage_can_exclude_scope_without_asking_where_person_li
 
 @pytest.mark.parametrize("influence", ["none", "positive", "unsuitable_elsewhere"])
 def test_usage_completion_is_not_requested_when_it_cannot_change_scope_or_exemption(
-    influence,
-):
+    influence: str,
+) -> None:
     values = floor_inputs()
     for floor in values["floors"]:
         floor.pop("usage_confirmed", None)
@@ -649,7 +671,9 @@ def test_usage_completion_is_not_requested_when_it_cannot_change_scope_or_exempt
 @pytest.mark.parametrize(
     "confirmed,evidence", [(True, None), (False, "未经确认的依据"), (True, "  ")]
 )
-def test_complete_usage_requires_explicit_nonblank_basis(confirmed, evidence):
+def test_complete_usage_requires_explicit_nonblank_basis(
+    confirmed: bool, evidence: str | None
+) -> None:
     values = floor_inputs()
     values["floors"][0].update(usage_confirmed=confirmed, usage_evidence=evidence)
     with pytest.raises(ValidationError):
@@ -671,7 +695,7 @@ def test_complete_usage_requires_explicit_nonblank_basis(confirmed, evidence):
 )
 def test_household_and_zodiac_indices_are_explicitly_separate_from_bazhai_minggua(
     methods, selected
-):
+) -> None:
     context = EnvironmentalContext.model_validate(
         {
             "orientation": orientation(),
@@ -702,8 +726,8 @@ def test_household_and_zodiac_indices_are_explicitly_separate_from_bazhai_minggu
 
 @pytest.mark.parametrize("with_orientation", [False, True])
 def test_explicit_symbolic_household_query_finishes_without_physical_binding(
-    with_orientation,
-):
+    with_orientation: bool,
+) -> None:
     values = {
         "household_scope": "symbolic_reference",
         "household_composition_confirmed": True,
@@ -711,6 +735,8 @@ def test_explicit_symbolic_household_query_finishes_without_physical_binding(
     }
     if with_orientation:
         values["orientation"] = orientation()
+    else:
+        pass
     result = analyze_environmental_context(
         EnvironmentalContext.model_validate(values), []
     )
@@ -725,7 +751,9 @@ def test_explicit_symbolic_household_query_finishes_without_physical_binding(
         assert association["application_status"] == "symbolic_reference_only"
 
 
-def test_default_physical_household_query_still_needs_geometry_and_symbolic_scope_does_not_clear_floor_requirements():
+def test_default_physical_household_query_still_needs_geometry_and_symbolic_scope_does_not_clear_floor_requirements() -> (
+    None
+):
     values = {
         "household_composition_confirmed": True,
         "household_members": [member("father", roles=["parent"])],

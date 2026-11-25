@@ -32,8 +32,8 @@ def _birth_info():
     [(1989, False), (2500, True)],
 )
 def test_timing_aggregate_preserves_results_without_an_active_releasing_period(
-    analysis_year, has_firdaria
-):
+    analysis_year: int, has_firdaria: bool
+) -> None:
     from fatebridge.services.western_timing import calculate_western_timing_analysis
     from tests.support.ephemeris_context import empty_ephemeris_path
 
@@ -73,7 +73,9 @@ def test_timing_aggregate_preserves_results_without_an_active_releasing_period(
     assert result["directions"]["secondary_progression"]["sun"]["absolute_degree"] >= 0
 
 
-def test_partial_analysis_date_preserves_every_supplied_field(monkeypatch):
+def test_partial_analysis_date_preserves_every_supplied_field(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     class FixedDatetime(datetime):
         @classmethod
         def now(cls, tz=None):
@@ -98,8 +100,12 @@ def test_partial_analysis_date_preserves_every_supplied_field(monkeypatch):
     ],
 )
 def test_default_analysis_day_fits_target_month(
-    monkeypatch, now, year, month, expected
-):
+    monkeypatch: pytest.MonkeyPatch,
+    now,
+    year: int | None,
+    month: int | None,
+    expected: str,
+) -> None:
     class FixedDatetime(datetime):
         @classmethod
         def now(cls, tz=None):
@@ -110,7 +116,9 @@ def test_default_analysis_day_fits_target_month(
     assert result.isoformat() == f"{expected}T10:00:00+08:00"
 
 
-def test_explicit_invalid_analysis_day_is_not_clamped(monkeypatch):
+def test_explicit_invalid_analysis_day_is_not_clamped(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     class FixedDatetime(datetime):
         @classmethod
         def now(cls, tz=None):
@@ -121,7 +129,9 @@ def test_explicit_invalid_analysis_day_is_not_clamped(monkeypatch):
         _common.build_analysis_datetime(_birth_info(), 2030, 2, 31)
 
 
-def test_transit_timezone_conversion_preserves_the_instant(monkeypatch):
+def test_transit_timezone_conversion_preserves_the_instant(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     import fatebridge.core.predictive.transit as transit
 
     captured = {}
@@ -158,8 +168,8 @@ def test_transit_timezone_conversion_preserves_the_instant(monkeypatch):
 @pytest.mark.parametrize("raises", [False, True])
 @pytest.mark.parametrize("env_path", [None, "/environment/ephe"])
 def test_native_subject_keeps_operator_path_even_on_failure(
-    monkeypatch, raises, env_path
-):
+    monkeypatch: pytest.MonkeyPatch, raises: bool, env_path: str | None
+) -> None:
     from fatebridge.core.predictive import native_chart
 
     paths = []
@@ -189,7 +199,9 @@ def test_native_subject_keeps_operator_path_even_on_failure(
 
 
 @pytest.mark.parametrize("env_path", [None, "/environment/ephe"])
-def test_return_solver_failure_preserves_operator_path(monkeypatch, env_path):
+def test_return_solver_failure_preserves_operator_path(
+    monkeypatch: pytest.MonkeyPatch, env_path: str | None
+) -> None:
     subject = _common.build_natal_subject(_birth_info())
     paths = []
     original_set_path = runtime.swe.set_ephe_path
@@ -222,8 +234,8 @@ def test_return_solver_failure_preserves_operator_path(monkeypatch, env_path):
 
 @pytest.mark.parametrize("env_path", [None, "/environment/ephe"])
 def test_concurrent_direct_call_waits_for_third_party_path_restoration(
-    monkeypatch, env_path
-):
+    monkeypatch: pytest.MonkeyPatch, env_path: str | None
+) -> None:
     state = {"path": "/operator/ephe"}
     attempted = Event()
     finished = Event()
@@ -253,7 +265,9 @@ def test_concurrent_direct_call_waits_for_third_party_path_restoration(
         assert future.result(timeout=2) == (env_path or "/operator/ephe")
 
 
-def test_predictive_chart_does_not_change_subsequent_core_precision(monkeypatch):
+def test_predictive_chart_does_not_change_subsequent_core_precision(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     from fatebridge.core.astro.chart import build_core_chart_payload
 
     pytest.importorskip("swisseph")
@@ -279,8 +293,8 @@ def test_predictive_chart_does_not_change_subsequent_core_precision(monkeypatch)
     [EphemerisSourceError("model_changed"), RuntimeError("unexpected house failure")],
 )
 def test_native_house_failure_preserves_source_and_programming_errors(
-    monkeypatch, failure
-):
+    monkeypatch: pytest.MonkeyPatch, failure
+) -> None:
     from fatebridge.core.predictive import native_chart
 
     def fail(*args, **kwargs):
@@ -293,7 +307,9 @@ def test_native_house_failure_preserves_source_and_programming_errors(
 
 
 @pytest.mark.native_engine_fault
-def test_predictive_house_source_error_reaches_rest_mcp_cli(monkeypatch, surface_calls):
+def test_predictive_house_source_error_reaches_rest_mcp_cli(
+    monkeypatch: pytest.MonkeyPatch, surface_calls
+) -> None:
     from fatebridge.core.predictive import native_chart
 
     def fail(*args, **kwargs):

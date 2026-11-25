@@ -1,0 +1,82 @@
+[
+  {
+    "birth_ut1": 1721426.0,
+    "birth_tt": 1721426.1220659416,
+    "sidereal": false
+  },
+  {
+    "birth_ut1": 1721426.0,
+    "birth_tt": 1721426.1220659416,
+    "sidereal": true
+  },
+  {
+    "birth_ut1": 1721430.0,
+    "birth_tt": 1721430.1220646265,
+    "sidereal": false
+  },
+  {
+    "birth_ut1": 1721430.0,
+    "birth_tt": 1721430.1220646265,
+    "sidereal": true
+  },
+  {
+    "birth_ut1": 1721435.0,
+    "birth_tt": 1721435.1220629825,
+    "sidereal": false
+  },
+  {
+    "birth_ut1": 1721435.0,
+    "birth_tt": 1721435.1220629825,
+    "sidereal": true
+  },
+  {
+    "birth_ut1": 1721440.0,
+    "birth_tt": 1721440.1220613387,
+    "sidereal": false
+  },
+  {
+    "birth_ut1": 1721440.0,
+    "birth_tt": 1721440.1220613387,
+    "sidereal": true
+  },
+  {
+    "birth_ut1": 1721457.0,
+    "birth_tt": 1721457.1220557499,
+    "sidereal": false
+  },
+  {
+    "birth_ut1": 1721457.0,
+    "birth_tt": 1721457.1220557499,
+    "sidereal": true
+  },
+  {
+    "birth_ut1": 2437512.00000063,
+    "birth_tt": 2437512.0003921404,
+    "sidereal": false
+  },
+  {
+    "birth_ut1": 2437512.00000063,
+    "birth_tt": 2437512.0003921404,
+    "sidereal": true
+  },
+  {
+    "birth_ut1": 2441500.0000045025,
+    "birth_tt": 2441500.0004998147,
+    "sidereal": false
+  },
+  {
+    "birth_ut1": 2441500.0000045025,
+    "birth_tt": 2441500.0004998147,
+    "sidereal": true
+  },
+  {
+    "birth_ut1": 2461045.0000033025,
+    "birth_tt": 2461045.000800741,
+    "sidereal": false
+  },
+  {
+    "birth_ut1": 2461045.0000033025,
+    "birth_tt": 2461045.000800741,
+    "sidereal": true
+  }
+]

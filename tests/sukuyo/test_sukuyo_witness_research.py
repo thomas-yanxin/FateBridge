@@ -7,9 +7,9 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.sukuyo import SU27_ORDER, calendar_mansion, day_evidence
-from fatebridge.core.sukuyo_hinoo_critical import critical_calendar_reference
-from fatebridge.core.sukuyo_profiles import fullmoon_calculation, source_bundle
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence
+from fatebridge.core.sukuyo.sukuyo_profiles import source_bundle
+from tests.unit_test.fixtures.sukuyo_readings import critical
 
 ROOT = Path(__file__).resolve().parents[2]
 REFERENCE = json.loads(
@@ -20,14 +20,7 @@ REFERENCE = json.loads(
 EXPECTED = REFERENCE["expected_bundle"]
 
 
-def critical():
-    return critical_calendar_reference(
-        source_bundle()["hinoo_addendum"],
-        [fullmoon_calculation(12, day, SU27_ORDER) for day in (1, 15, 30)],
-    )
-
-
-def test_hinoo_research_matches_the_complete_precode_source_reference():
+def test_hinoo_research_matches_the_complete_precode_source_reference() -> None:
     actual = critical()["image_witness_research"]
     fingerprint = actual.pop("source_bundle_sha256")
     assert len(fingerprint) == 64
@@ -35,7 +28,9 @@ def test_hinoo_research_matches_the_complete_precode_source_reference():
     assert all(value is False or value == 0 for value in actual["acceptance"].values())
 
 
-def test_positive_shinpukuji_calendar_discovery_does_not_select_a_glyph_or_clock():
+def test_positive_shinpukuji_calendar_discovery_does_not_select_a_glyph_or_clock() -> (
+    None
+):
     witness = critical()["image_witness_research"]["shinpukuji"]
     assert witness["calendar_passages_located"]
     assert [r["frame_one_based"] for r in witness["selected_previews"]] == [34, 35]
@@ -47,7 +42,7 @@ def test_positive_shinpukuji_calendar_discovery_does_not_select_a_glyph_or_clock
     assert not witness["whole_manuscript_collated"]
 
 
-def test_holder_catalogue_and_colophon_readings_remain_distinct():
+def test_holder_catalogue_and_colophon_readings_remain_distinct() -> None:
     w = critical()["image_witness_research"]["nagoya_composite"]
     assert w["different_editions_composite_as_holder_statement"]
     assert (
@@ -69,7 +64,7 @@ def test_holder_catalogue_and_colophon_readings_remain_distinct():
     assert not w["metadata_license_is_image_license"]
 
 
-def test_alternate_images_do_not_satisfy_missing_originals_or_item_identity():
+def test_alternate_images_do_not_satisfy_missing_originals_or_item_identity() -> None:
     research = critical()["image_witness_research"]
     capture, w = research["capture_summary"], research["naoj_legacy"]
     assert (capture["NIJL_previews_saved"], capture["NIJL_previews_planned"]) == (
@@ -92,7 +87,7 @@ def test_alternate_images_do_not_satisfy_missing_originals_or_item_identity():
     )
 
 
-def test_own_first_error_and_new_source_disagreements_are_not_erased():
+def test_own_first_error_and_new_source_disagreements_are_not_erased() -> None:
     w = critical()["image_witness_research"]["naoj_legacy"]
     count = w["legacy78_character_count_readings"]
     assert count["parent_first"] == "八千四百二十字"
@@ -119,8 +114,10 @@ def test_own_first_error_and_new_source_disagreements_are_not_erased():
 @pytest.mark.parametrize(
     "field", ["publisher_html_response_sha256", "downloaded_calendar_windows"]
 )
-def test_new_research_cannot_be_reused_with_a_different_taisho_context(field):
-    from fatebridge.core.sukuyo_witness_research import research_reference
+def test_new_research_cannot_be_reused_with_a_different_taisho_context(
+    field: str,
+) -> None:
+    from fatebridge.core.sukuyo.sukuyo_witness_research import research_reference
 
     source = copy.deepcopy(
         source_bundle()["hinoo_addendum"]["downloaded_primary_edition"]
@@ -141,8 +138,10 @@ def test_new_research_cannot_be_reused_with_a_different_taisho_context(field):
         ("acceptance", "intercalary_short_month_priority_established", True),
     ],
 )
-def test_false_source_upgrades_require_requalification(section, key, value):
-    from fatebridge.core.sukuyo_witness_research import validate_bundle
+def test_false_source_upgrades_require_requalification(
+    section: str, key: str, value: bool | int | str
+) -> None:
+    from fatebridge.core.sukuyo.sukuyo_witness_research import validate_bundle
 
     altered = copy.deepcopy(EXPECTED)
     altered[section][key] = value
@@ -150,8 +149,11 @@ def test_false_source_upgrades_require_requalification(section, key, value):
         validate_bundle(altered)
 
 
-def test_research_fingerprint_and_returned_data_are_from_one_detached_load():
-    from fatebridge.core.sukuyo_witness_research import SOURCE, research_reference
+def test_research_fingerprint_and_returned_data_are_from_one_detached_load() -> None:
+    from fatebridge.core.sukuyo.sukuyo_witness_research import (
+        SOURCE,
+        research_reference,
+    )
 
     source = source_bundle()["hinoo_addendum"]["downloaded_primary_edition"]
     first = research_reference(source)
@@ -173,8 +175,8 @@ def test_research_fingerprint_and_returned_data_are_from_one_detached_load():
     "date,candidates", [("1903-06-25", ["鬼", "参"]), ("1957-09-24", ["角", "轸"])]
 )
 def test_unresolved_calculations_and_conditional_delivery_keep_their_original_scope(
-    date, candidates
-):
+    date: str, candidates
+) -> None:
     result = calendar_mansion(
         date, calendar_profile="hinoo_t1299_host27", calendar_day_part="first_half"
     )
@@ -202,7 +204,7 @@ def test_unresolved_calculations_and_conditional_delivery_keep_their_original_sc
     assert "未确定" in text
 
 
-def test_ordinary_profile_does_not_silently_acquire_a_hinoo_reconstruction():
+def test_ordinary_profile_does_not_silently_acquire_a_hinoo_reconstruction() -> None:
     result = calendar_mansion("1903-06-25")
     assert result["profile_calculation"]["hinoo_source"] is None
     assert result["status"] == "partial" and result["leap_month_policy"] == "unresolved"

@@ -89,7 +89,7 @@ def reference() -> Reference:
 
 def test_original_frame_chains_preserve_every_exact_periodic_phase(
     reference: Reference,
-):
+) -> None:
     assert len(reference["compositions"]) == 4397
     for i, row in enumerate(reference["compositions"]):
         expected = Fraction(row["expected_phase"])
@@ -109,7 +109,7 @@ def test_original_frame_chains_preserve_every_exact_periodic_phase(
 
 def test_components_match_independent_boost120_and_mp700_including_tiny_offsets(
     reference: Reference,
-):
+) -> None:
     for i, row in enumerate(reference["compositions"]):
         sine, cosine = angles._sin_cos_degrees(Fraction(row["expected_phase"]))
         for actual, expected in ((sine, row["sine"]), (cosine, row["cosine"])):
@@ -117,9 +117,11 @@ def test_components_match_independent_boost120_and_mp700_including_tiny_offsets(
             assert error <= 2e-15, (i, row, actual, expected)
             if abs(expected) < 1e-8:
                 assert error <= 4 * math.ulp(expected), (i, row, actual, expected)
+            else:
+                pass
 
 
-def test_all_exact_composed_closed_direction_intervals(reference: Reference):
+def test_all_exact_composed_closed_direction_intervals(reference: Reference) -> None:
     count = 0
     for i, row in enumerate(reference["compositions"]):
         phase = angles.compose_degrees(*row["terms"])
@@ -135,7 +137,7 @@ def test_all_exact_composed_closed_direction_intervals(reference: Reference):
 
 def test_attached_rotation_arithmetic_preserves_exact_nonzero_changes(
     reference: Reference,
-):
+) -> None:
     assert len(reference["changes"]) == 14660
     for i, row in enumerate(reference["changes"]):
         before, after = (
@@ -146,13 +148,15 @@ def test_attached_rotation_arithmetic_preserves_exact_nonzero_changes(
         expected = float(Fraction(row["exact_delta"]))
         if expected == 180:
             expected = math.nextafter(180.0, 0.0)
+        else:
+            pass
         assert actual == expected, (i, row, actual)
         assert (actual != 0) is row["expected_changed"], (i, row, actual)
 
 
 def test_composed_affine_points_rectangle_vertices_and_actual_cgal_inverse(
     reference: Reference,
-):
+) -> None:
     for i, row in enumerate(reference["compositions"]):
         frame = geometry.GeometryRectangle(
             center=PlanPoint(x=row["origin"][0], y=row["origin"][1]),
@@ -183,7 +187,7 @@ def test_composed_affine_points_rectangle_vertices_and_actual_cgal_inverse(
 @pytest.mark.parametrize("control_index", range(28))
 def test_public_angle_facts_search_permissions_and_invalid_axis_retention(
     reference: Reference, control_index: int, surface_calls
-):
+) -> None:
     control = reference["public_controls"][control_index]
     fields = ["layout_analysis.workstation_layout_analysis"]
     options = dict(
@@ -202,6 +206,8 @@ def test_public_angle_facts_search_permissions_and_invalid_axis_retention(
             assert result["error_code"] == "validation_error"
             assert result["retryable"] is False
         return
+    else:
+        pass
     assert response.status_code == 200, response.text
     assert code == 0 and not protocol.is_error
     actual = business(response.json())
@@ -272,3 +278,5 @@ def test_public_angle_facts_search_permissions_and_invalid_axis_retention(
         )
         assert rule["matches"] is ("--" in name)
         assert rule["reference_frame"] == "seated_right_with_higher_left_object"
+    else:
+        pass

@@ -29,6 +29,8 @@ def field(inputs: list[float], coefficients: list[list[str]], digits: int) -> li
         zp = (curvature * (1 - e2) + height) * mp.sin(phi)
         if abs(latitude) == 90:
             xp = mp.mpf(0)
+        else:
+            pass
         radius = mp.hypot(xp, zp)
         phig = mp.atan2(zp, xp)
         s, c = (
@@ -56,6 +58,8 @@ def field(inputs: list[float], coefficients: list[list[str]], digits: int) -> li
                         / factorial(power - m)
                         * s ** (power - m)
                     )
+                else:
+                    pass
                 if power > m:
                     derivative.append(
                         coefficient
@@ -63,6 +67,8 @@ def field(inputs: list[float], coefficients: list[list[str]], digits: int) -> li
                         / factorial(power - m - 1)
                         * s ** (power - m - 1)
                     )
+                else:
+                    pass
             dm, dm1 = mp.fsum(polynomial), mp.fsum(derivative)
             schmidt = mp.sqrt(
                 mp.mpf(1 if m == 0 else 2) * factorial(n - m) / factorial(n + m)
@@ -114,6 +120,8 @@ def main() -> None:
         tuple(map(int, row[:2])) for row in coefficients
     } != {(n, m) for n in range(1, 13) for m in range(n + 1)}:
         raise ValueError("Original WMM degree12 coefficient population required")
+    else:
+        pass
     cases = json.loads(args.cases_file.read_text())
     cohorts, full_cohorts = [], []
     maximum_stability = mp.mpf(0)
@@ -130,6 +138,8 @@ def main() -> None:
                 maximum_stability = max(maximum_stability, stable)
                 if stable > mp.mpf("1e-50"):
                     raise ArithmeticError("The independent precision gate failed")
+                else:
+                    pass
                 expected.append([mp.nstr(mp.mpf(value), 25) for value in high])
                 full_rows.append(
                     dict(input_original=raw, reference_80=low, reference_120=high)
@@ -163,7 +173,11 @@ def main() -> None:
             args.full_output.write_text(
                 json.dumps(dict(**metadata, cohorts=full_cohorts), indent=2) + "\n"
             )
+        else:
+            pass
 
 
 if __name__ == "__main__":
     main()
+else:
+    pass

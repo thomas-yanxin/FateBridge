@@ -3,9 +3,12 @@
 import hashlib
 import json
 import math
+from pathlib import Path
 
 import pytest
 
+import scripts.astrodice.audit_astrodice_apparent_source as grader
+from fatebridge.core.astro import ephemeris, physical_sources, runtime, zodiac
 from scripts.astrodice.audit_astrodice_apparent_source import (
     FAIL,
     PASS,
@@ -18,11 +21,12 @@ from scripts.astrodice.audit_astrodice_apparent_source import (
 @pytest.mark.parametrize("lahiri_error", [False, True])
 @pytest.mark.parametrize("delivered_arcsec", [0, 0.003])
 def test_complete_audit_entry_keeps_delivered_rate_failure(
-    tmp_path, monkeypatch, lahiri_error, delivered_arcsec
-):
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    lahiri_error: bool,
+    delivered_arcsec: float | int,
+) -> None:
     """Exercise the audit entry; helper-only checks miss a misplaced callback."""
-    import scripts.astrodice.audit_astrodice_apparent_source as grader
-    from fatebridge.core.astro import ephemeris, physical_sources, runtime, zodiac
 
     identity = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
     zero = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
@@ -107,6 +111,8 @@ def test_complete_audit_entry_keeps_delivered_rate_failure(
     def lahiri(*args, motion_metadata, **kwargs):
         if lahiri_error:
             raise ValueError("Lahiri state unavailable")
+        else:
+            pass
         return {"Mercury": state("lahiri", motion_metadata)}
 
     monkeypatch.setattr(zodiac, "native_lahiri_positions", lahiri)
@@ -134,7 +140,7 @@ def broken():
     raise ValueError("Independent frame failure")
 
 
-def test_a_numeric_failure_survives_another_frames_state_error():
+def test_a_numeric_failure_survives_another_frames_state_error() -> None:
     calls = []
 
     def comparison(name, state):
@@ -148,7 +154,7 @@ def test_a_numeric_failure_survives_another_frames_state_error():
     assert calls == ["tropical"]
 
 
-def test_one_frame_error_still_allows_the_other_comparison():
+def test_one_frame_error_still_allows_the_other_comparison() -> None:
     result = collect_frames(
         {"tropical": broken, "lahiri": lambda: 1},
         lambda name, state: {"status": PASS, "rate": 0.5},
@@ -157,7 +163,7 @@ def test_one_frame_error_still_allows_the_other_comparison():
     assert result["frames"]["lahiri"] == {"status": PASS, "rate": 0.5}
 
 
-def test_a_projection_error_does_not_replace_an_already_failed_frame():
+def test_a_projection_error_does_not_replace_an_already_failed_frame() -> None:
     def compare(name, state):
         return {"status": FAIL, "rate": 1} if name == "tropical" else broken()
 
@@ -166,12 +172,12 @@ def test_a_projection_error_does_not_replace_an_already_failed_frame():
     assert result["frames"]["lahiri"]["type"] == "ValueError"
 
 
-def test_removing_a_declared_frame_cannot_turn_a_partial_audit_into_a_pass():
+def test_removing_a_declared_frame_cannot_turn_a_partial_audit_into_a_pass() -> None:
     with pytest.raises(ValueError, match="All declared"):
         collect_frames({"tropical": lambda: 1}, lambda name, state: {"status": PASS})
 
 
-def test_display_reference_adds_source_motion_and_moving_frame_once():
+def test_display_reference_adds_source_motion_and_moving_frame_once() -> None:
     identity = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
     rate, frame = 0.00073, 0.00091
     derivative = [[0, -frame, 0], [frame, 0, 0], [0, 0, 0]]
@@ -186,7 +192,7 @@ def test_display_reference_adds_source_motion_and_moving_frame_once():
     assert result["frame_check_difference_arcsec_per_day"] == 0
 
 
-def test_display_longitude_at_the_frame_pole_is_not_silently_divided_by_zero():
+def test_display_longitude_at_the_frame_pole_is_not_silently_divided_by_zero() -> None:
     identity = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
     center = {"direction_icrf": ["0", "0", "1"], "derivative_per_day": ["1", "0", "0"]}
     with pytest.raises(ValueError, match="ill-conditioned"):

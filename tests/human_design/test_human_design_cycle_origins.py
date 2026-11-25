@@ -9,18 +9,21 @@ import pytest
 from pydantic import ValidationError
 
 from fatebridge.application.execution import execute_tool
-from fatebridge.core.human_design_cycle_origins import comparison_rows, origin_body_row
-from fatebridge.core.human_design_cycles import (
+from fatebridge.core.human_design.human_design_cycle_origins import (
+    comparison_rows,
+    origin_body_row,
+)
+from fatebridge.core.human_design.human_design_cycles import (
     ROOT_SECONDS,
     derive_body_contacts,
 )
 from fatebridge.core.requests.human_design import HumanDesignRequest
 from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.validation.human_design import verify_human_design_reading
 from tests.support.ephemeris_case_runtime import (
     native_ephemeris_files_module as native_ephemeris_files_module,
 )
 from tests.support.reference_data import read, sha
+from validation.human_design import verify_human_design_reading
 
 pytestmark = pytest.mark.usefixtures("native_ephemeris_files_module")
 
@@ -54,14 +57,22 @@ def analytical_reader(case, base):
                     z, c = knots[index + 2]
                     if rate * ((c - b) / (z - y)) < 0:
                         rate = Fraction(0)
+                    else:
+                        pass
+                else:
+                    pass
                 return [t, float(value % 360), float(rate), 258]
+            else:
+                pass
         raise AssertionError("Unregistered analytic evaluation outside source curve")
 
     return evaluate
 
 
 @pytest.mark.parametrize("index", range(9))
-def test_both_origins_match_pre_edit_independent_rational_curves(analytic, index):
+def test_both_origins_match_pre_edit_independent_rational_curves(
+    analytic, index
+) -> None:
     case = analytic["rows"][index]
     for side, expected in case["expected"].items():
         epoch = float(frac(expected["origin_jd_tt"]))
@@ -81,7 +92,7 @@ def test_both_origins_match_pre_edit_independent_rational_curves(analytic, index
         assert converted["contacts"] == result["contacts"]
 
 
-def test_unequal_sets_remain_three_and_five_without_index_pairing(analytic):
+def test_unequal_sets_remain_three_and_five_without_index_pairing(analytic) -> None:
     primary, alternative = [], []
     for case in analytic["rows"][-3:]:
         for side, collection in [("personality", primary), ("design", alternative)]:
@@ -126,7 +137,7 @@ def complete():
     return value
 
 
-def test_request_requires_explicit_reference():
+def test_request_requires_explicit_reference() -> None:
     args = {
         k: v
         for k, v in read(E / "plan.json")["real_cases"][0].items()
@@ -137,7 +148,7 @@ def test_request_requires_explicit_reference():
         HumanDesignRequest(**args, compare_cycle_origins=True)
 
 
-def test_full_comparison_replays_without_native_sky_calls(complete):
+def test_full_comparison_replays_without_native_sky_calls(complete) -> None:
     with patch(
         "fatebridge.core.astro.runtime.ephemeris_call",
         side_effect=AssertionError("Verifier called native sky"),
@@ -182,7 +193,9 @@ def test_full_comparison_replays_without_native_sky_calls(complete):
         "missing_policy",
     ],
 )
-def test_correct_hash_cannot_legitimize_inconsistent_origins(complete, fault):
+def test_correct_hash_cannot_legitimize_inconsistent_origins(
+    complete, fault: str
+) -> None:
     value = deepcopy(complete)
     report = value["cycle_origin_comparison"]
     row = report["alternative"]["bodies"][0]
@@ -218,6 +231,8 @@ def test_correct_hash_cannot_legitimize_inconsistent_origins(complete, fault):
         del value["clock_evidence"]["compare_cycle_origins"]
     elif fault == "missing_policy":
         del value["calculation_policy"]["compare_cycle_origins"]
+    else:
+        pass
     proof = verify_human_design_reading((value))
     assert proof["status"] == "rejected"
     assert {"code": "cycle_origin_comparison_mismatch"} in proof["errors"]

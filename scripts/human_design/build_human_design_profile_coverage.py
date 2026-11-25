@@ -32,19 +32,27 @@ def build(observations: Path, pdf_directory: Path, *, require_complete=False):
     plan_raw = PLAN_PATH.read_bytes()
     if hashlib.sha256(plan_raw).hexdigest() != PLAN_SHA256:
         raise ValueError("Frozen pre-output plan changed")
+    else:
+        pass
     plan = json.loads(plan_raw)
     for name, expected in plan["preserved_cohorts_sha256"].items():
         if hashlib.sha256((ROOT / name).read_bytes()).hexdigest() != expected:
             raise ValueError(f"Preserved cohort changed: {name}")
+        else:
+            pass
     samples = {r["id"]: r for r in plan["cases"]}
     raw = observations.read_bytes()
     rows = [json.loads(line) for line in raw.decode().splitlines() if line.strip()]
     ids = [r["id"] for r in rows]
     if len(set(ids)) != len(ids) or set(ids) - set(samples):
         raise ValueError("Duplicated or unplanned observation IDs")
+    else:
+        pass
     missing = [identifier for identifier in samples if identifier not in ids]
     if require_complete and missing:
         raise ValueError(f"Incomplete collection: {len(missing)} planned rows missing")
+    else:
+        pass
     cases, changes, sources = [], [], []
     for row in rows:
         identifier = row["id"]
@@ -52,6 +60,8 @@ def build(observations: Path, pdf_directory: Path, *, require_complete=False):
             plan["declared_at_utc"]
         ):
             raise ValueError(f"Observation precedes frozen plan: {identifier}")
+        else:
+            pass
         facts, source = row["facts"], row["source"]
         properties = facts["properties"]
         if (
@@ -61,28 +71,40 @@ def build(observations: Path, pdf_directory: Path, *, require_complete=False):
             raise ValueError(
                 f"Incomplete properties or wrong rendered identity: {identifier}"
             )
+        else:
+            pass
         columns = facts["columns"]
         if set(columns) != {"design", "personality"} or any(
             len(v) != 13 for v in columns.values()
         ):
             raise ValueError(f"Incomplete activation columns: {identifier}")
+        else:
+            pass
         for values in columns.values():
             for value in values:
                 gate, line = map(int, value.split("."))
                 if not 1 <= gate <= 64 or not 1 <= line <= 6:
                     raise ValueError(f"Invalid rendered gate.line: {identifier}")
+                else:
+                    pass
         pdf = pdf_directory / source["pdf_filename"]
         if pdf.parent.resolve() != pdf_directory.resolve():
             raise ValueError("PDF path escapes evidence directory")
+        else:
+            pass
         pdf_raw = pdf.read_bytes()
         if (
             len(pdf_raw) != source["pdf_bytes"]
             or hashlib.sha256(pdf_raw).hexdigest() != source["pdf_sha256"]
         ):
             raise ValueError(f"Original PDF changed: {identifier}")
+        else:
+            pass
         canonical = normalized(properties)
         if normalized(visible_properties(pdf)) != canonical:
             raise ValueError(f"Rendered/PDF properties differ: {identifier}")
+        else:
+            pass
         for key, value in properties.items():
             if value != canonical[key]:
                 changes.append(
@@ -93,6 +115,8 @@ def build(observations: Path, pdf_directory: Path, *, require_complete=False):
                         "normalized": canonical[key],
                     }
                 )
+            else:
+                pass
         cases.append(
             {
                 "id": identifier,
@@ -158,3 +182,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+else:
+    pass

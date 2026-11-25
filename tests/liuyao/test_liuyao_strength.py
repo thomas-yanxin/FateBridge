@@ -2,16 +2,14 @@
 
 import hashlib
 import json
-from datetime import datetime
 from pathlib import Path
 
 import pytest
 
-from fatebridge.core.liuyao_judgment import build_conditional_analysis
-from fatebridge.core.liuyao_strength import PROFILE
+from fatebridge.core.liuyao.liuyao_strength import PROFILE
 from fatebridge.core.local_techniques.sixyao import build_sixyao_result
 from scripts.liuyao.build_profile import build_profile
-from tests.liuyao.test_liuyao_conditions import mounted
+from tests.unit_test.fixtures.liuyao import strength_case
 
 REFERENCE = Path(__file__).parents[1] / "fixtures/liuyao_strength_v5"
 CASES = json.loads((REFERENCE / "cases.json").read_text(encoding="utf-8"))["cases"]
@@ -25,22 +23,7 @@ RECEPTION_REFINEMENT = json.loads(
 )
 
 
-def classical(case):
-    info, lines = mounted(case["base_code"], case["changed_code"])
-    return build_conditional_analysis(
-        lines=lines,
-        hidden=[],
-        month=case["month"],
-        day_ganzhi=case["day_ganzhi"],
-        palace=info["current_palace_element"],
-        moment=datetime.fromisoformat("2000-01-07T12:00:00+08:00"),
-        focus_line=case["focus_line"],
-        focus_kinship=None,
-        timing_days=0,
-    )
-
-
-def test_frozen_source_defines_three_locations_despite_the_other_numeral():
+def test_frozen_source_defines_three_locations_despite_the_other_numeral() -> None:
     assert build_profile("strength") == PROFILE
     frozen = json.loads((REFERENCE / "freeze.json").read_text(encoding="utf-8"))
     for name, expected in frozen["sha256"].items():
@@ -49,19 +32,27 @@ def test_frozen_source_defines_three_locations_despite_the_other_numeral():
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
-def test_hand_transcribed_tomb_structures_and_strength_counterexamples(case):
-    result = classical(case)
+def test_hand_transcribed_tomb_structures_and_strength_counterexamples(case) -> None:
+    result = strength_case(case)
     assessment = result["classical_assessment"]
     focus = assessment["focus"]
     if "expected_focus_branch" in case:
         assert focus["branch"] == case["expected_focus_branch"]
+    else:
+        pass
     assert [r["location"] for r in focus["tombs"]] == case["expected_tomb_locations"]
     if "expected_tomb_branch" in case:
         assert focus["tomb_branch"] == case["expected_tomb_branch"]
+    else:
+        pass
     if "expected_supported" in case:
         assert focus["strength"]["is_supported"] is case["expected_supported"]
+    else:
+        pass
     if "expected_weak" in case:
         assert focus["strength"]["is_weak"] is case["expected_weak"]
+    else:
+        pass
     if "expected_true_tomb" in case:
         expected = case["expected_true_tomb"]
         if case["id"] == ERRATUM["case_id"]:
@@ -72,7 +63,11 @@ def test_hand_transcribed_tomb_structures_and_strength_counterexamples(case):
                 for a in focus["tombs"][0]["pending_breakers"]
             )
             expected = ERRATUM["corrected_condition"]
+        else:
+            pass
         assert focus["entered_tomb"] is expected
+    else:
+        pass
     if "expected_strength_status" in case:
         expected_status = case["expected_strength_status"]
         if case["id"] == RECEPTION_REFINEMENT["case_id"]:
@@ -86,6 +81,8 @@ def test_hand_transcribed_tomb_structures_and_strength_counterexamples(case):
                 for a in focus["strength"]["blocked_supports"]
             )
             expected_status = RECEPTION_REFINEMENT["new_expected_strength_status"]
+        else:
+            pass
         assert focus["strength"]["status"] == expected_status
         assert focus["strength"]["is_supported"] is (
             False if case["id"] == RECEPTION_REFINEMENT["case_id"] else None
@@ -93,6 +90,8 @@ def test_hand_transcribed_tomb_structures_and_strength_counterexamples(case):
         assert focus["strength"]["is_weak"] is (
             True if case["id"] == RECEPTION_REFINEMENT["case_id"] else None
         )
+    else:
+        pass
     for location in ("day", "month"):
         if case.get(f"expected_tomb_broken_by_{location}"):
             assert all(
@@ -100,11 +99,13 @@ def test_hand_transcribed_tomb_structures_and_strength_counterexamples(case):
                 for c in focus["tombs"]
             )
             assert all(c["is_true_tomb"] is False for c in focus["tombs"])
+        else:
+            pass
     assert "score" not in assessment and "outcome" not in assessment
 
 
-def test_numeral_variant_gets_a_same_edition_definition_update():
-    result = classical(CASES[0])
+def test_numeral_variant_gets_a_same_edition_definition_update() -> None:
+    result = strength_case(CASES[0])
     issue = result["role_effects"]["textual_issues"][0]
     assert issue["scan_reading"] == "元神入五墓；忌神入五墓"
     assert (
@@ -113,8 +114,8 @@ def test_numeral_variant_gets_a_same_edition_definition_update():
     )
 
 
-def test_role_atoms_reuse_the_same_run_strength_and_tomb_assessment():
-    result = classical(CASES[-1])
+def test_role_atoms_reuse_the_same_run_strength_and_tomb_assessment() -> None:
+    result = strength_case(CASES[-1])
     for role in result["role_effects"]["lines"]:
         p = role["position"]
         assessed = result["classical_assessment"]["lines"][p - 1]
@@ -126,15 +127,17 @@ def test_role_atoms_reuse_the_same_run_strength_and_tomb_assessment():
         assert role["strength_source_path"].endswith(f".lines.{p - 1}.strength")
 
 
-def test_month_tomb_is_separate_and_static_tomb_does_not_become_a_moving_actor():
-    focus = classical(CASES[2])["classical_assessment"]["focus"]
+def test_month_tomb_is_separate_and_static_tomb_does_not_become_a_moving_actor() -> (
+    None
+):
+    focus = strength_case(CASES[2])["classical_assessment"]["focus"]
     assert focus["month_tomb_relation"] is True
     assert all(c["location"] != "month" for c in focus["tombs"])
-    static = classical(CASES[5])["classical_assessment"]["focus"]
+    static = strength_case(CASES[5])["classical_assessment"]["focus"]
     assert static["tombs"] == [] and static["entered_tomb"] is False
 
 
-def test_original_moving_clash_cannot_break_a_transformed_tomb():
+def test_original_moving_clash_cannot_break_a_transformed_tomb() -> None:
     # Daguo lower Xun: line 3 is You metal; lower Dui makes its own
     # transformation Chou. Original line 6 is Wei and actually moves.
     case = {
@@ -144,7 +147,7 @@ def test_original_moving_clash_cannot_break_a_transformed_tomb():
         "day_ganzhi": "甲子",
         "focus_line": 3,
     }
-    focus = classical(case)["classical_assessment"]["focus"]
+    focus = strength_case(case)["classical_assessment"]["focus"]
     transformed = next(t for t in focus["tombs"] if t["location"] == "changed")
     assert transformed["branch"] == "丑" and transformed["position"] == 3
     assert any(
@@ -155,7 +158,7 @@ def test_original_moving_clash_cannot_break_a_transformed_tomb():
     assert all(a["location"] != "visible" for a in transformed["pending_breakers"])
 
 
-def test_day_tomb_opening_is_a_day_condition_without_an_event_prediction():
+def test_day_tomb_opening_is_a_day_condition_without_an_event_prediction() -> None:
     # This is a modern synthetic cast, not a recovered Gregorian year for
     # the original Heng example. Jan 8 is Yi-Chou; Jan 14 is Xin-Wei.
     result = build_sixyao_result(
@@ -180,7 +183,9 @@ def test_day_tomb_opening_is_a_day_condition_without_an_event_prediction():
     assert "probability" not in windows and "predicted_success" not in windows
 
 
-def test_snapshot_keeps_the_same_run_tomb_verdict_and_does_not_apply_it_to_changed_focus():
+def test_snapshot_keeps_the_same_run_tomb_verdict_and_does_not_apply_it_to_changed_focus() -> (
+    None
+):
     arguments = dict(
         date="2000-01-08",
         time="12:00:00",

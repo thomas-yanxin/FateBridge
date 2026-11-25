@@ -9,13 +9,15 @@ import sys
 from datetime import date
 from pathlib import Path
 
-from fatebridge.core.sukuyo import calendar_mansion, day_evidence
-from fatebridge.core.sukuyo_historical_calendar import SOURCE
-from fatebridge.core.sukuyo_sources import load_source
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence
+from fatebridge.core.sukuyo.sukuyo_historical_calendar import SOURCE
+from fatebridge.core.sukuyo.sukuyo_sources import load_source
 
 ROOT = Path(__file__).resolve().parents[2]
 if not __package__:
     sys.path.insert(0, str(ROOT))
+else:
+    pass
 FIXTURE = ROOT / "tests/data/sukuyo-historical-weekday-primary.json"
 
 
@@ -37,21 +39,29 @@ def verify_weekday(capture: Path | None = None) -> dict:
     ]:
         if excerpt not in text:
             raise ValueError("Quoted Hinoo weekday witness changed")
+        else:
+            pass
     if (
         capture is not None
         and hashlib.sha256(capture.read_bytes()).hexdigest()
         != fixture["source_metadata"]["sha256"]
     ):
         raise ValueError("Full historical weekday capture changed")
+    else:
+        pass
     if capture is not None and any(
         row["html"] not in capture.read_text()
         for row in fixture["selected_html_quotations"]
     ):
         raise ValueError("Weekday quotation differs from captured HTML")
+    else:
+        pass
     source = load_source(SOURCE)
     months = [m for m in source.data["months"] if [m[1], m[2], m[3]] == [840, 1, False]]
     if len(months) != 1 or len(fixture["expected_labels"]) != 8:
         raise ValueError("Bounded weekday control scope changed")
+    else:
+        pass
     rows, errors = [], []
     for offset, label in enumerate(fixture["expected_labels"]):
         civil = date.fromordinal(months[0][0] + offset)
@@ -77,6 +87,8 @@ def verify_weekday(capture: Path | None = None) -> dict:
             != row["printed_lunar_fields"]
         ):
             errors.append(row)
+        else:
+            pass
         rows.append(row)
     return {
         "format": "sukuyo_historical_weekday_control_v1",
@@ -109,3 +121,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

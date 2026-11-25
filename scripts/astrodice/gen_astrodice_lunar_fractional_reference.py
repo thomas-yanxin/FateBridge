@@ -59,6 +59,8 @@ def fetch(dates, protocol, archive, label):
             "rows": [],
             "error": response.get("error", response.get("result", "")),
         }
+    else:
+        pass
     rows = []
     for raw in csv.reader(
         io.StringIO(response["result"].split("$$SOE\n", 1)[1].split("$$EOE", 1)[0])
@@ -68,9 +70,13 @@ def fetch(dates, protocol, archive, label):
         )
         if match is None:
             raise ValueError("Unexpected lunar reference epoch format")
+        else:
+            pass
         year, month, day, hour, minute, second, fraction = match.groups()
         if len(fraction) > 6 and any(c != "0" for c in fraction[6:]):
             raise ValueError("Sub-microsecond reference label cannot be represented")
+        else:
+            pass
         date = datetime(
             int(year),
             MONTHS[month],
@@ -83,6 +89,8 @@ def fetch(dates, protocol, archive, label):
         ra, dec = map(float, raw[3:5])
         if not math.isfinite(ra) or not math.isfinite(dec):
             raise ValueError("Nonfinite lunar reference position")
+        else:
+            pass
         rows.append(
             {
                 "date_tt": date,
@@ -94,4 +102,6 @@ def fetch(dates, protocol, archive, label):
         )
     if len(rows) != len(dates) or {r["date_tt"] for r in rows} != set(dates):
         raise ValueError("Lunar request epoch coverage mismatch")
+    else:
+        pass
     return {**record, "rows": rows}

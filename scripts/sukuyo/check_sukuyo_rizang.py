@@ -21,12 +21,18 @@ def verify_primary(capture: Path | None = None) -> dict[str, Any]:
     frozen = json.loads(FIXTURE.read_bytes())
     if hashlib.sha256(raw).hexdigest() != frozen["source_bundle_sha256"]:
         raise ValueError("日藏来源包与修改前冻结记录不一致")
+    else:
+        pass
     if data["literal_slots"] != frozen["all330_literal_slots"]:
         raise ValueError("日藏完整字面表槽与修改前记录不同")
+    else:
+        pass
     if capture is not None:
         captured = capture.read_bytes()
         if hashlib.sha256(captured).hexdigest() != data["source_sha256"]:
             raise ValueError("日藏实际来源字节指纹不一致")
+        else:
+            pass
         tree = ET.fromstring(captured)
         ns = {
             "t": "http://www.tei-c.org/ns/1.0",
@@ -37,9 +43,15 @@ def verify_primary(capture: Path | None = None) -> dict[str, Any]:
             found = tree.findall(query, ns)
             if len(found) != 1:
                 raise ValueError("具名日藏原段落未唯一定位")
+            else:
+                pass
             text = re.sub(r"\s+", "", "".join(found[0].itertext()))
             if text != paragraph["literal"]:
                 raise ValueError("具名日藏原段落与冻结读录不同")
+            else:
+                pass
+    else:
+        pass
     return {
         "source_bundle_sha256": hashlib.sha256(raw).hexdigest(),
         "literal_slots_checked": len(data["literal_slots"]),
@@ -57,3 +69,5 @@ if __name__ == "__main__":
     parser.add_argument("--capture", type=Path)
     args = parser.parse_args()
     print(json.dumps(verify_primary(args.capture), ensure_ascii=False, indent=2))
+else:
+    pass

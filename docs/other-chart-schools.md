@@ -10,7 +10,7 @@ Gauquelin是36个顺时针分区，十二宫公开接口拒绝其名称，不静
 
 ## 德国中点盘
 
-`astro_germany_chart`（REST `/api/astro/germany`）和 `astro_chart` 的 `chart_variant=germany` 返回同一 `midpoint_analysis`。当前版本为 `hamburg_midpoint_geometry_v3`，作者为 FateBridge。
+`astro_germany_chart`（REST `/api/astrology/hamburg-midpoint-chart`）和 `astro_chart` 的 `chart_variant=germany` 返回同一 `midpoint_analysis`。当前版本为 `hamburg_midpoint_geometry_v3`，作者为 FateBridge。
 
 当前中点层提供：
 
@@ -87,7 +87,9 @@ v3 补齐该文第 13／16 条的两因素层。此前原生层虽有 22 因素�
 
 `midpoint_analysis.meridian_houses` 新增 `witte1923_natal_meridian_house_geometry_v1`，采用 [Witte 原刊页 34](https://www.astrax.de/pdf/26_Der%20progressive%20Meridian%20waehrend%20eines%20Jahres.pdf)描述的赤经等分构造与 Swiss `X`：从上天顶的赤经起每 30°取一个宫头，返回其黄经与赤经。黄经宽度一般不等；第一宫宫头为**赤道上升点**，不能替换实际 ASC。基础盘沿用所选宫制，当前默认 Placidus，与此具名子层分别读取。
 
-公开 `evidence_views.meridian_houses` 给出按需字段卡。`profile` 保留 UT1、原生角度模型采用的 TT、共享 TT、真黄赤交角和实际 Lahiri 视偏移；原生角度 TT 依照 `houses_ex` 的 `UT1+deltat_ex`，两种 TT 的差值不能直接当作出生钟时误差。确认的生时误差逐样点重算十二宫头，`birth_time_sensitivity.cusp_spans` 为样点范围；原始输入与宫头位于同 run 的 `time_sensitivity.samples`。未知误差保持 `not_assessed`，不视为零。
+公开 `evidence_views.meridian_houses` 包含宫头档案与生时样点。宫头计算使用明确传入的共享 TT 和 UT1。`profile` 记录用于角度计算的 TT、真黄赤交角、源黄道原点和当时的 Lahiri 视偏移。用交角求出赤经面与黄道交点后，加 `source_ecliptic_longitude_origin` 得到回归黄经，再减 `ayanamsha_apparent` 得到显示黄经，均按 360° 归一化。
+
+确认生时误差后，`time_sensitivity.samples` 逐项给出宫头、ARMC、交角、角度 TT、`meridian_source_ecliptic_longitude_origin` 和 `meridian_ayanamsha`。重放时使用该样点自己的参数。`birth_time_sensitivity.cusp_spans` 汇总有限样点的范围，未知误差的状态为 `not_assessed`。
 
 宫头层的原刊表在两个预声明黄赤交角模型下都保留残差，不调整本命钟时、天顶或参数去拟合。
 
@@ -121,14 +123,14 @@ Alfred Witte [1919 年《Sensitive Punkte》原刊扫描](https://astrax.de/pdf/
 
 换算规则 `fatebridge.local_solar_birth_clock.v1` 作者为 FateBridge。`person_info.clock_conversion`（德国盘位于 `base_chart` 下）保留原始无时区标签、基准、实际经度、UT1 与计算 UTC、来源和数值往返误差。LAT 另回显地心视太阳赤经、GAST、均时差、实际太阳星历模型和 IERS 恒星时模型。`person_info.birth_timezone=UTC` 与 `birth_datetime` 显示换算后的计算时刻；原钟时从 `clock_conversion.input_wall_datetime` 读取。13 等分文本导出也保留原钟时。微秒表示与小数 JD 的数值分辨率不构成生时记录或历史地球自转的准确度认证；`clock_accuracy_certified/measured_eop_applied` 均为 false。
 
-1960年前的 `utc_to_jd/jdet_to_utc` 使用[Swiss日期代码](https://github.com/aloistr/swisseph/blob/v2.10.03/swedate.c)声明的历史UT1转换。传输中的 `+00` 标签不声称原子UTC已经存在。历史来源、现代UTC和未来闰秒假设分别回显，不能把不同时间尺度之间的标签差当作同尺度天文误差。
+1960年前的 `utc_to_jd/jdet_to_utc` 使用[Swiss日期代码](https://github.com/aloistr/swisseph/blob/v2.10.03/swedate.c)声明的历史UT1转换。前原子时代的 LMT 换算在微秒显示量化前保留精确名义公历日，并以该点的小数秒调用历史时标接口。德国盘无生时网格时也用同一点计算太阳弧的日年钥匙。传输中的 `+00` 标签表示历史 UT1 的显示。历史来源、现代UTC和未来闰秒假设分别回显，不能把不同时间尺度之间的标签差当作同尺度天文误差。
 
-声明太阳钟时 ±N 分钟时，先分别换算该钟时区间的两端，再在相应物理 UTC 区间采样，保留名义时刻且间隔不超过 30 秒。结果增加 `input_clock_basis/recorded_interval_start_clock/recorded_interval_end_clock/requested_clock_radius_seconds`，`represented_radius_seconds` 表示映射后物理区间的最大半径。原钟时分钟与 UTC 秒数不强行视作完全等长；未知误差仍为 `not_assessed`。不支持的 UTC 闰秒标签会明确拒绝，避免滑到相邻时刻。
+声明 LMT／LAT 钟时 ±N 分钟时，先把两个太阳钟端点分别映射到 UTC，再在映射后的普通 UTC 标签上取样，保留两个端点和名义时刻。`input_clock_basis`、`recorded_interval_start_clock`、`recorded_interval_end_clock` 和 `requested_clock_radius_seconds` 记录原钟面与误差范围。`represented_radius_seconds` 是映射后端点与名义时刻之间最大的普通 UTC 标签差。未知误差保留 `not_assessed`，当前入口会拒绝 `23:59:60`。
 
 条件性 LMT 算术示例（未认证原刊的实际基准）：
 
 ```bash
-uv run --locked --extra dev fatebridge astro_germany_chart \
+uv run --locked --extra dev fatebridge hamburg_midpoint_chart \
   --birth-year 1879 --birth-month 5 --birth-day 14 --birth-hour 23 \
   --birth-longitude 10 --birth-latitude 53.55 \
   --birth-clock-basis local_mean_solar \
@@ -151,6 +153,8 @@ v2 增加 Udo Rudolph [《ABC für Planetenbilder》出版社摘页](https://wit
 德国盘及通用 `astro_chart` 的 `germany` 变体接受带时区偏移的 `analysis_datetime`，省略时仍只计算本命。新层为 `midpoint_analysis.solar_arc_analysis`，规则版本 `hamburg_true_solar_arc_v1`，作者 FateBridge。
 
 真太阳弧取次限太阳与本命太阳的实际回归黄经之差，并将同一弧度加到各本命因素。方法见 Klaus Bonert [2007 年作者摘文](https://www.astro.com/astrologie/in_sonnenbogen_g.htm)。本实现显式选择 **365.25 个 UTC 日历日对应 1 个 TT 星历日** 的儒略年符号钥匙，支持出生后 0–150 钥匙年；这不是寿命范围，也不宣称是 Witte 唯一的年长约定。UTC 日历减法不计闰秒，实际年长、两次太阳位置、TT 儒略日、浮点时间分辨率及实际星历模型均回显。太阳弧不固定为每年 1°，并同时回显与该简化值的差。
+
+公开名义入口及生时样点把有理日历钥加到保留的出生 TT，最后舍入为 Swiss 实际查询的 `progressed_julian_day_tt`。日子午复用该时刻，`key_years` 和 `elapsed_calendar_days` 分别保留显示值。 [固定历元对照](precision-acceptance.md#hamburg-progressed-tt-round94)
 
 确认的生时区间跨越当前钥匙年支持范围时，名义目标有效则继续交付本命、名义太阳弧和日推运；相应 `birth_time_sensitivity` 标为 `partial`，保留全部样点及未计算原因。`computed_sample_count/unavailable_sample_count` 分列数量，`source_pattern.sampled_status=underdetermined`不能当成全部不成立；偏差及坐标跨度仅覆盖已计算样点。
 
@@ -195,7 +199,9 @@ Witte 出版社 [AstrologicPC 手册第 7 页](https://witte-verlag.com/pdf/sour
 
 德国盘与 13 等分盘现在接受 `birth_time_uncertainty_minutes`：用户已确认的记录时刻正负误差，范围为 0–120 分钟。省略表示未知，返回 `not_assessed`；明确传 0 才评估单个已确认时刻。专用工具与通用 `astro_chart` 对应变体使用相同计算，其他未实现此功能的变体会拒绝该参数，避免静默忽略。
 
-实现版本为 `fatebridge.specialty_birth_time_sensitivity.v1`，作者 FateBridge。在**记录时刻的 UTC 时间轴**上取不超过 30 秒间隔的样点，包含两端和名义时刻；每个样点重新计算原生因素。跨夏令时回拨时不重新猜测含混的墙钟。若用户选择现有真太阳时重置模型，则在每个记录时刻重新应用该模型；记录 UTC 与计算 UTC 分别回显。微秒是 datetime 的表示精度，不是原始生时记录的精度。
+实现版本为 `fatebridge.specialty_birth_time_sensitivity.v1`，作者 FateBridge。样点包含两个端点和名义时刻，每个样点重新计算原生因素。民用输入按记录中心的物理历时取端点，LMT／LAT 保留两端解出的 TT 与 UT1。相邻 TT 样点至多相隔 30 SI 秒。`maximum_recorded_sample_gap_seconds` 报告普通 UTC 标签差；标签无法完整表达物理网格时，`recorded_physical_grid` 与各样点 `physical_timing` 交付实际间距和精确历元。旧闰秒对照与本轮物理网格对照分别保留。 [闰秒原门](precision-acceptance.md#specialty-grid-leap-time-round87) · [物理网格](precision-acceptance.md#recorded-grid-round90)
+
+跨夏令时回拨时，样点从已确定的 UTC 时刻换算。使用旧真太阳时重置模型时，每个记录时刻分别重算修正，交付同时保留记录与有效历元的 UTC 标签及其资格。正闰秒重置使用插入结束前的民用时区规则，名义起点取次日零时，太阳仍在实际样点的 TT 与 UT1 计算。微秒表示 `datetime` 的刻度，出生记录的精度取决于用户提供的资料。
 
 已计算的样点用 `factor_scope/factor_count` 明确范围：德国盘为 22 个汉堡因素，13 等分盘只需 14 个物理／参考因素，不读取假设轨道并标记 `hypothetical_element_source.status=not_used`。因此一个不适用于汉堡目录的自定义假设点文件不会阻塞 13 等分的物理分区；它也不会被偷偷用来生成错名因素。未声明误差时仍不生成任何样点。
 
@@ -233,7 +239,7 @@ Witte 出版社的[2024 进阶课程说明](https://witte-verlag.com/?catid=49&i
 
 ## 13 等分扇区的定义与边界
 
-`astro_chart13`（REST `/api/astro/chart13`）和 `astro_chart` 的 `chart_variant=chart13` 使用实际上升为起点，每区宽 `360/13` 度，区间沿黄道采用 `[start,end)`。它与另行选择的十二宫制独立，返回 `sector_profile`、13 个区间及各星的 `sector13`。
+`astro_chart13`（REST `/api/astrology/thirteen-sector-chart`）和 `astro_chart` 的 `chart_variant=chart13` 使用实际上升为起点，每区宽 `360/13` 度，区间沿黄道采用 `[start,end)`。它与另行选择的十二宫制独立，返回 `sector_profile`、13 个区间及各星的 `sector13`。
 
 13分区按输入浮点值的精确有理数分类，再输出显示数值。每颗星的 `sector13_evidence` 保留未舍入黄经和上升，避免按显示小数复算到相邻分区。未声明生时误差时标记未评估，声明后链接实际重排结果；数值精度不是出生记录精度。区间边界浮点显示是近似值，严格定义始终为 `ascendant+n*360/13`。
 
@@ -254,7 +260,7 @@ ASC无法在本角度模型中解析时，实际13扇区返回未定，后端约
 | 解释忠于计算 | 敏感点门槛、原文归因、度盘及零弧重复依据去重；真实接口核对本命／推运分层及生时条件 | 真实模型对话的盲审、跨轮资料修正与错误事实注入验收 |
 | 能够预测现实 | 已计算指定时刻的象征太阳弧；现实效果尚无结果数据 | 固定事件定义、时间窗、模型及基线，事前登记独立队列，记录失败与弃答，完成盲法结果核验和外部复现；当前 `not_tested` |
 
-当前未建立四项目标全部通过或系统整体权威的结论。现有[预测研究评估器](../src/fatebridge/validation/predictions.py)可用于登记后的二元结果，但本几何／符号推运层还没有固定可验证的事件预测模型或真实研究队列。
+当前未建立四项目标全部通过或系统整体权威的结论。现有[预测研究评估器](../validation/predictions.py)可用于登记后的二元结果，但本几何／符号推运层还没有固定可验证的事件预测模型或真实研究队列。
 
 预测研究评估器将每条预测和结果绑定完整方案，防止同一批记录在更换事件、窗口、基线或统计政策后直接重用。这项保护不增加现实预测样本或效力认证。
 
@@ -267,13 +273,13 @@ ASC无法在本角度模型中解析时，实际13扇区返回未定，后端约
 ```bash
 uv sync --locked --extra dev
 uv run --locked --extra dev python -m fatebridge.fetch_ephe --years 1800 2500
-uv run --locked --extra dev fatebridge astro_germany_chart \
+uv run --locked --extra dev fatebridge hamburg_midpoint_chart \
   --name 演示甲 --birth-year 1990 --birth-month 4 --birth-day 6 \
   --birth-hour 9 --birth-minute 33 --birth-place 上海 \
   --fields midpoint_analysis.profile midpoint_analysis.contact_counts midpoint_analysis.reading_guide midpoint_analysis.limitations \
   --strict-fields --no-include-snapshot-text
 
-uv run --locked --extra dev fatebridge astro_chart13 \
+uv run --locked --extra dev fatebridge thirteen_sector_chart \
   --name 演示甲 --birth-year 1990 --birth-month 4 --birth-day 6 \
   --birth-hour 9 --birth-minute 33 --birth-place 上海 \
   --fields sector_profile planets thirteen_sectors interpretation.variant_note \
@@ -304,7 +310,7 @@ uv run --locked --extra dev pytest -q tests/western/test_other_chart_historical_
 指定目标时刻并保留同一虚构资料的生时误差：
 
 ```bash
-uv run --locked --extra dev fatebridge astro_germany_chart \
+uv run --locked --extra dev fatebridge hamburg_midpoint_chart \
   --name '虚构：太阳弧验收' \
   --birth-year 2000 --birth-month 1 --birth-day 1 \
   --birth-hour 4 --birth-minute 30 --birth-timezone UTC \
@@ -319,7 +325,7 @@ uv run --locked --extra dev fatebridge astro_germany_chart \
 复现上述虚构反例，只读取原文解释及其生时条件：
 
 ```bash
-uv run --locked --extra dev fatebridge astro_germany_chart \
+uv run --locked --extra dev fatebridge hamburg_midpoint_chart \
   --name '虚构：生时误差反例' \
   --birth-year 2000 --birth-month 1 --birth-day 1 \
   --birth-hour 4 --birth-minute 30 --birth-timezone UTC \

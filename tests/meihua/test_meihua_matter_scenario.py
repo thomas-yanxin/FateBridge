@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
+from fatebridge.application.examples import suggested_fields
 from fatebridge.core.requests.meihua import MeihuaCastRequest
 from fatebridge.services.meihua import calculate_meihua_cast
 from tests.support.transports import SPECS, business, rest, surface_calls
@@ -23,7 +24,7 @@ TIME = {
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
-def test_manual_scenario_conditions(case):
+def test_manual_scenario_conditions(case) -> None:
     plain = calculate_meihua_cast(casting=case["casting"])
     assert plain["meihua"]["body_trigram"]["name"] == case["body"]
     assert [r["relation"] for r in plain["meihua"]["stage_relations"]] == case[
@@ -59,6 +60,8 @@ def test_manual_scenario_conditions(case):
             None if generation else False,
             None if not generation else False,
         ]
+    else:
+        pass
     assert [
         r["full_clause_applies"] for r in layer["relative_generation_clauses"]
     ] == relative_expected
@@ -78,20 +81,24 @@ def test_manual_scenario_conditions(case):
         assert decl["fact_path"] == "input_normalized.matter_scenario"
         assert out["input_normalized"]["matter_scenario"] == case["scenario"]
         assert "此项未采集" not in layer["summary"]
+    else:
+        pass
 
 
-def test_frozen_reference_bytes_and_reused_diagram_scope():
+def test_frozen_reference_bytes_and_reused_diagram_scope() -> None:
     m = json.loads((FIXTURE / "manifest.json").read_text())
     assert m["request_field_not_present"] is True
     assert m["production_generated_expected_values"] is False
     for name, digest in m["files"].items():
         if str(name).endswith((".py", ".py.txt")):
             continue
+        else:
+            pass
         assert hashlib.sha256((FIXTURE / name).read_bytes()).hexdigest() == digest
 
 
 @pytest.mark.parametrize("value", [True, 0, "", "bad", "favorable", {}, []])
-def test_unknown_scenario_values_are_rejected(value):
+def test_unknown_scenario_values_are_rejected(value) -> None:
     with pytest.raises(ValidationError):
         MeihuaCastRequest.model_validate(
             {"casting": CASES[0]["casting"], "matter_scenario": value}
@@ -99,7 +106,7 @@ def test_unknown_scenario_values_are_rejected(value):
 
 
 @pytest.mark.parametrize("scenario", ["favorable_matter", "unfavorable_matter"])
-def test_weather_cannot_receive_human_matter_scenario(scenario):
+def test_weather_cannot_receive_human_matter_scenario(scenario: str) -> None:
     out = calculate_meihua_cast(
         casting=CASES[0]["casting"],
         interpretation_topic="weather",
@@ -108,7 +115,7 @@ def test_weather_cannot_receive_human_matter_scenario(scenario):
     assert out["error_code"] == "validation_error"
 
 
-def test_negative_question_words_and_topic_do_not_replace_declaration():
+def test_negative_question_words_and_topic_do_not_replace_declaration() -> None:
     for topic in ["general", "planning", "reputation", "wealth", "transaction"]:
         out = calculate_meihua_cast(
             casting=CASES[0]["casting"],
@@ -124,7 +131,7 @@ def test_negative_question_words_and_topic_do_not_replace_declaration():
             )
 
 
-def test_candidate_scenario_shared_but_relation_and_clause_match_not_shared():
+def test_candidate_scenario_shared_but_relation_and_clause_match_not_shared() -> None:
     cast = {
         "method": "sound_groups",
         "first_count": 12,
@@ -148,7 +155,7 @@ def test_candidate_scenario_shared_but_relation_and_clause_match_not_shared():
     )
 
 
-def test_support_under_control_keeps_both_clause_and_existing_qualification():
+def test_support_under_control_keeps_both_clause_and_existing_qualification() -> None:
     out = calculate_meihua_cast(
         casting={"method": "existing", "hexagram_code": "011101", "moving_line": 1},
         matter_scenario="favorable_matter",
@@ -167,8 +174,7 @@ def test_support_under_control_keeps_both_clause_and_existing_qualification():
 
 
 @pytest.mark.parametrize("tool", ["meihua_cast", "meihua_analysis"])
-def test_declared_scenario_agrees_on_rest_mcp_cli(tool, surface_calls):
-    from fatebridge.application.examples import suggested_fields
+def test_declared_scenario_agrees_on_rest_mcp_cli(tool: str, surface_calls) -> None:
 
     spec = SPECS[tool]
     payload = {"casting": CASES[0]["casting"]} if tool == "meihua_cast" else dict(TIME)

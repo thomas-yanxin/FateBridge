@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.bazi_branch_facts import (
+from fatebridge.core.bazi.bazi_branch_facts import (
     check_clash_patterns,
     check_harmony_patterns,
 )
@@ -29,7 +29,7 @@ POSITIONS = ("year", "month", "day", "hour")
 @pytest.mark.parametrize(
     "table", ["ten_gods", "nayin", "hidden_stems", "life_stages", "hour_branches"]
 )
-def test_complete_discrete_tables_equal_pinned_external_reference(table):
+def test_complete_discrete_tables_equal_pinned_external_reference(table: str) -> None:
     for key, expected in REFERENCE[table].items():
         if table == "ten_gods":
             actual = get_ten_god(*key).value
@@ -44,7 +44,7 @@ def test_complete_discrete_tables_equal_pinned_external_reference(table):
         assert actual == expected, (table, key, actual, expected)
 
 
-def test_all_stem_assignments_preserve_pairs_without_claiming_transformation():
+def test_all_stem_assignments_preserve_pairs_without_claiming_transformation() -> None:
     # Synthetic algebraic assignments, not 10,000 valid calendar charts.
     # Candidate elements: 秘本子平真诠 PDF17–18; original scans reviewed.
     candidate_elements = dict(
@@ -77,7 +77,7 @@ def test_all_stem_assignments_preserve_pairs_without_claiming_transformation():
             assert "transform" not in combination
 
 
-def test_all_branch_assignments_equal_external_liuhe_liuchong_pairs():
+def test_all_branch_assignments_equal_external_liuhe_liuchong_pairs() -> None:
     # Other branch relations and whole-chart effects require their own sources.
     for branches in product(REFERENCE["branches"], repeat=4):
         chart = {p: ("甲", b) for p, b in zip(POSITIONS, branches)}
@@ -98,8 +98,8 @@ def test_all_branch_assignments_equal_external_liuhe_liuchong_pairs():
 
 @pytest.mark.parametrize("year,month,day", [(1984, 5, 10), (1998, 6, 1), (1999, 6, 1)])
 def test_raw_combination_and_nayin_facts_across_public_transports(
-    year, month, day, surface_calls
-):
+    year: int, month: int, day: int, surface_calls
+) -> None:
     payload = dict(
         name="虚构离散规则回归",
         gender="男",

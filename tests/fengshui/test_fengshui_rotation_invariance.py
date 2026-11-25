@@ -20,10 +20,11 @@ from fatebridge.core.fengshui.spatial_inputs import (
 )
 from fatebridge.services.fengshui import assess
 from tests.support.transports import SPECS, business, rest, surface_calls
+from tests.unit_test.fixtures.fengshui_measured import rotation_payload as payload_for
 
 
 @pytest.mark.parametrize("angle", [-1080, -720, -360, 0, 360, 720, 1080])
-def test_full_turns_preserve_closed_rectangle_and_coordinate_operations(angle):
+def test_full_turns_preserve_closed_rectangle_and_coordinate_operations(angle) -> None:
     frame = PlanPose(center=PlanPoint(x=1, y=2), rotation_degrees=angle)
     rectangle = PlanRectangle(**frame.model_dump(), width_m=2, depth_m=1)
     assert rectangle_xy(rectangle).bounds == (0, 1.5, 2, 2.5)
@@ -46,8 +47,8 @@ def test_full_turns_preserve_closed_rectangle_and_coordinate_operations(angle):
     ],
 )
 def test_exact_cardinal_components_keep_their_analytic_coordinates(
-    angle, point, ray_end
-):
+    angle: int, point, ray_end
+) -> None:
     origin = PlanPoint(x=0, y=0)
     result = transform_point(
         PlanPoint(x=1, y=0), PlanPose(center=origin, rotation_degrees=angle)
@@ -56,7 +57,7 @@ def test_exact_cardinal_components_keep_their_analytic_coordinates(
     assert list(ray_xy(origin, angle, 2).coords) == [(0, 0), ray_end]
 
 
-def test_two_finite_rotation_angles_compose_without_overflow():
+def test_two_finite_rotation_angles_compose_without_overflow() -> None:
     angle = 1e308
     rectangle = PlanRectangle(
         center=PlanPoint(x=0, y=0), width_m=1, depth_m=1, rotation_degrees=angle
@@ -68,65 +69,10 @@ def test_two_finite_rotation_angles_compose_without_overflow():
     assert Fraction(combined.rotation_degrees) % 360 == (Fraction(angle) * 2) % 360
 
 
-def payload_for(angle, center_x=1, width=2):
-    return {
-        "methods": [],
-        "workstation_layout": {
-            "scene": {
-                "frame_id": "analytic-closed-room",
-                "units": "m",
-                "boundary": {
-                    "vertices": [
-                        {"x": 0, "y": 0},
-                        {"x": 2, "y": 0},
-                        {"x": 2, "y": 4},
-                        {"x": 0, "y": 4},
-                    ]
-                },
-                "observation_basis": "measured",
-                "evidence": "Exact synthetic rectangle; no physical site is asserted.",
-                "inventory_confirmed": True,
-                "bodies": [
-                    {
-                        "object_id": "desk",
-                        "kind": "desk",
-                        "footprint": {
-                            "center": {"x": center_x, "y": 2},
-                            "width_m": width,
-                            "depth_m": 1,
-                            "rotation_degrees": angle,
-                        },
-                        "bottom_m": 0,
-                        "top_m": 0.75,
-                        "blocks_view": False,
-                    }
-                ],
-                "seats": [
-                    {
-                        "desk_id": "desk",
-                        "offset": {"x": 0, "y": -1.2},
-                        "facing_offset_degrees": 0,
-                        "body_width_m": 0.5,
-                        "body_depth_m": 0.5,
-                        "eye_height_m": 1.2,
-                        "head_height_m": 1.4,
-                        "view_half_angle_degrees": 80,
-                        "operating_zone": {
-                            "center": {"x": 0, "y": -1.2},
-                            "width_m": 0.4,
-                            "depth_m": 0.4,
-                        },
-                        "activity": "work",
-                        "sector_anchor": "seat",
-                    }
-                ],
-            }
-        },
-    }
-
-
 @pytest.mark.parametrize("angle,x,width", [(0, 1, 2), (720, 1, 2), (180, 0.25, 0.5)])
-def test_analytic_closed_room_retains_desk_and_seat_on_its_boundary(angle, x, width):
+def test_analytic_closed_room_retains_desk_and_seat_on_its_boundary(
+    angle: int, x: float | int, width: float | int
+) -> None:
     result = assess(**payload_for(angle, x, width))
     geometry = result["layout_analysis"]["workstation_layout_analysis"]["geometry"]
     assert geometry["physically_feasible"] is True, geometry["checks"]
@@ -135,8 +81,8 @@ def test_analytic_closed_room_retains_desk_and_seat_on_its_boundary(angle, x, wi
 
 @pytest.mark.parametrize("angle,x,width", [(720, 1, 2), (180, 0.25, 0.5)])
 def test_rotation_boundary_facts_agree_on_actual_three_transports(
-    angle, x, width, surface_calls
-):
+    angle: int, x: float | int, width: float | int, surface_calls
+) -> None:
     spec = SPECS["fengshui_assess"]
     payload = payload_for(angle, x, width)
     fields = ["layout_analysis"]

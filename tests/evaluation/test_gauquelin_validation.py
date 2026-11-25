@@ -5,7 +5,7 @@ from datetime import datetime
 
 import pytest
 
-from fatebridge.validation.gauquelin import (
+from validation.gauquelin import (
     FIELDS,
     LIMITS,
     clock_coherence,
@@ -45,7 +45,7 @@ def line(**changes):
     ).encode()
 
 
-def test_west_positive_is_negated_once_and_original_value_retained():
+def test_west_positive_is_negated_once_and_original_value_retained() -> None:
     row = parse_line(line(), 1066)
     assert row["issues"] == []
     assert row["longitude_east"] == 2.34
@@ -55,7 +55,7 @@ def test_west_positive_is_negated_once_and_original_value_retained():
     assert parse_line(line(), 1067)["cohort"] == "supplementary_54"
 
 
-def test_only_2400_rolls_the_printed_day_and_invalid_2401_is_rejected():
+def test_only_2400_rolls_the_printed_day_and_invalid_2401_is_rejected() -> None:
     value, rolled = source_datetime("1941 04 06", "24 00")
     assert value == datetime(1941, 4, 7)
     assert rolled is True
@@ -76,20 +76,20 @@ def test_only_2400_rolls_the_printed_day_and_invalid_2401_is_rejected():
         ({"regime": "x"}, "unknown_time_regime"),
     ],
 )
-def test_invalid_fields_are_retained_without_imputation(changes, issue):
+def test_invalid_fields_are_retained_without_imputation(changes, issue: str) -> None:
     row = parse_line(line(**changes), 1)
     assert row["case_id"] == "CF-1"
     assert any(s.startswith(issue) for s in row["issues"])
     assert clock_coherence(row)["status"] == "not_checked_invalid_input"
 
 
-def test_hash_pinning_rejects_changed_or_subset_source():
+def test_hash_pinning_rejects_changed_or_subset_source() -> None:
     with pytest.raises(ValueError, match="hash_mismatch"):
         decode_final3(line() + b"\n")
     assert parse_line(line()[:-1], 7)["issues"] == ["invalid_fixed_width"]
 
 
-def test_partial_clock_check_uses_full_day_difference_and_keeps_unknowns():
+def test_partial_clock_check_uses_full_day_difference_and_keeps_unknowns() -> None:
     row = parse_line(line(), 1)
     assert clock_coherence(row)["status"] == "coherent_at_source_resolution"
     row = parse_line(line(local_date="1900 01 02"), 1)
@@ -114,12 +114,12 @@ def test_partial_clock_check_uses_full_day_difference_and_keeps_unknowns():
 
 
 @pytest.mark.parametrize("hour,expected", [(-90, 1), (0, 10), (90, 19), (180, 28)])
-def test_equatorial_rise_upper_set_lower_anchors(hour, expected):
+def test_equatorial_rise_upper_set_lower_anchors(hour, expected: int) -> None:
     result = semiarc_sector(hour, 0, 0, 0)
     assert result["sector36"] == expected
 
 
-def test_clockwise_motion_and_geographic_symmetry():
+def test_clockwise_motion_and_geographic_symmetry() -> None:
     # Declination zero makes both semiarcs90 degrees at any nonpolar latitude.
     for lat in (-89, -45, 0, 45, 89):
         for hour in range(-90, 270, 10):
@@ -133,23 +133,27 @@ def test_clockwise_motion_and_geographic_symmetry():
 @pytest.mark.parametrize(
     "latitude,declination", [(80, 60), (80, -60), (-80, 60), (-80, -60)]
 )
-def test_circumpolar_points_do_not_receive_an_invented_sector(latitude, declination):
+def test_circumpolar_points_do_not_receive_an_invented_sector(
+    latitude, declination
+) -> None:
     result = semiarc_sector(0, latitude, 10, declination)
     assert result == {"status": "no_two_horizon_crossings", "sector36": None}
 
 
 @pytest.mark.parametrize("args", [(0, 90, 0, 0), (0, -90, 0, 0), (0, 0, 0, 90)])
-def test_poles_are_underdetermined(args):
+def test_poles_are_underdetermined(args) -> None:
     assert semiarc_sector(*args)["status"] == "underdetermined_pole"
 
 
-def test_twelve_sector_mapping_has_explicit_half_open_boundaries():
+def test_twelve_sector_mapping_has_explicit_half_open_boundaries() -> None:
     for k in range(12):
         cusp = 1.0 + k * 3
         assert sector12(cusp) == k + 1
         assert sector12(math.nextafter(cusp, math.inf)) == k + 1
         if k:
             assert sector12(math.nextafter(cusp, -math.inf)) == k
+        else:
+            pass
     for bad in (0, 37, True, float("nan"), float("inf"), "1"):
         with pytest.raises(ValueError):
             sector12(bad)
@@ -158,12 +162,12 @@ def test_twelve_sector_mapping_has_explicit_half_open_boundaries():
 @pytest.mark.parametrize(
     "args", [(True, 0, 0, 0), (0, 91, 0, 0), (0, 0, 0, float("nan"))]
 )
-def test_geometry_rejects_invalid_inputs(args):
+def test_geometry_rejects_invalid_inputs(args) -> None:
     with pytest.raises(ValueError):
         semiarc_sector(*args)
 
 
-def test_documented_native_boundary_bias_is_separate_from_raw_geometry_gate():
+def test_documented_native_boundary_bias_is_separate_from_raw_geometry_gate() -> None:
     from scripts.evaluation.audit_gauquelin_cfepp import geometry_comparison
 
     for point in (1.0, 3.5, 10.0, 19.0, 28.0, 36.5):
@@ -175,7 +179,7 @@ def test_documented_native_boundary_bias_is_separate_from_raw_geometry_gate():
     assert geometry_comparison(11, 10)["documented_policy_agreement"] is False
 
 
-def test_source_and_diagnostic_protocols_are_separately_pinned():
+def test_source_and_diagnostic_protocols_are_separately_pinned() -> None:
     import hashlib
     import json
 

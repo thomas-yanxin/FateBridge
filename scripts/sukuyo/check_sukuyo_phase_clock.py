@@ -9,7 +9,7 @@ import re
 from pathlib import Path
 from typing import Any
 
-from fatebridge.core.sukuyo_phase_clock import validate_selected_claims
+from fatebridge.core.sukuyo.sukuyo_phase_clock import validate_selected_claims
 from scripts.sukuyo.check_sukuyo_commentarial_clock import source_lines
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -23,6 +23,8 @@ def verify_primary(captures: dict[str, Path] | None = None) -> dict[str, Any]:
     fixture = json.loads(FIXTURE.read_bytes())
     if hashlib.sha256(raw).hexdigest() != fixture["source_bundle_sha256"]:
         raise ValueError("定日分时数据与冻结控制不同")
+    else:
+        pass
     for key, value in [
         ("phase_day_distinction", "phase_controls"),
         ("morning_reference", "morning_controls"),
@@ -30,17 +32,23 @@ def verify_primary(captures: dict[str, Path] | None = None) -> dict[str, Any]:
     ]:
         if data[key] != fixture[value]:
             raise ValueError("定日分时控制与来源不同")
+        else:
+            pass
     validate_selected_claims(data)
     sources = {row["id"]: row for row in data["sources"]}
     if fixture["source_capture_sha256"] != {
         key: row["capture_sha256"] for key, row in sources.items()
     }:
         raise ValueError("出版方来源身份与冻结控制不同")
+    else:
+        pass
     checked = []
     quotations = 0
     for key, path in (captures or {}).items():
         if key not in sources:
             raise ValueError("未登记定日分时来源")
+        else:
+            pass
         row = sources[key]
         actual = path.read_bytes()
         if (
@@ -48,8 +56,12 @@ def verify_primary(captures: dict[str, Path] | None = None) -> dict[str, Any]:
             or hashlib.sha256(actual).hexdigest() != row["capture_sha256"]
         ):
             raise ValueError("定日分时实际来源字节不同")
+        else:
+            pass
         if row["format"] == "SAT_HTML":
             actual = re.sub(rb"<button\b[^>]*>.*?</button>", b"", actual, flags=re.S)
+        else:
+            pass
         lines = source_lines(actual, row["format"])
         for quote in row["selected_quotations"]:
             window = re.sub(
@@ -63,6 +75,8 @@ def verify_primary(captures: dict[str, Path] | None = None) -> dict[str, Any]:
             )
             if quote["literal"] != window:
                 raise ValueError(f"定日分时选段与实际出版方行不同：{quote['locator']}")
+            else:
+                pass
             quotations += 1
         checked.append(key)
     return {
@@ -87,9 +101,13 @@ def main() -> None:
         key, path = value.split("=", 1)
         if key in captures:
             raise ValueError("重复定日分时来源")
+        else:
+            pass
         captures[key] = Path(path)
     print(json.dumps(verify_primary(captures), ensure_ascii=False, indent=2))
 
 
 if __name__ == "__main__":
     main()
+else:
+    pass

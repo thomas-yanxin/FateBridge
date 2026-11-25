@@ -12,10 +12,15 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[2]
 if not __package__:
     sys.path.insert(0, str(ROOT / "src"))
+else:
+    pass
 
-from fatebridge.core.sukuyo import SU27_ORDER
-from fatebridge.core.sukuyo_printed_special import SOURCE, printed_lower_comparison
-from fatebridge.core.sukuyo_sources import load_source
+from fatebridge.core.sukuyo.sukuyo import SU27_ORDER
+from fatebridge.core.sukuyo.sukuyo_printed_special import (
+    SOURCE,
+    printed_lower_comparison,
+)
+from fatebridge.core.sukuyo.sukuyo_sources import load_source
 
 FIXTURE = ROOT / "tests/data/sukuyo-wakita-special-primary.json"
 ALIASES = str.maketrans("軫畢張參", "轸毕张参")
@@ -27,6 +32,8 @@ def verify_printed_special(capture_dir: Path | None = None) -> dict[str, Any]:
     bundle = loaded.data
     if bundle["source_reference"] != fixture["source_reference"]:
         raise ValueError("Direct printed source metadata changed; revalidate")
+    else:
+        pass
     expected_tables = fixture["expected_literal_tables"]
     errors = []
     slots = {(r["label"], r["weekday_index"]): r for r in bundle["rows"]}
@@ -34,12 +41,16 @@ def verify_printed_special(capture_dir: Path | None = None) -> dict[str, Any]:
         (label, n) for label in expected_tables for n in range(7)
     }:
         raise ValueError("Direct printed slots are missing or duplicated")
+    else:
+        pass
     for (label, weekday), row in slots.items():
         literal = expected_tables[label][weekday]
         if row["literal_mansion"] != literal or row["mansion"] != (
             literal.translate(ALIASES) if literal is not None else None
         ):
             errors.append(["literal_slot", label, weekday])
+        else:
+            pass
         if literal is None:
             unresolved = fixture["unaccepted_glyph_slot"]
             if (
@@ -48,6 +59,10 @@ def verify_printed_special(capture_dir: Path | None = None) -> dict[str, Any]:
                 or row["candidate_readings_accepted_as_mansion"]
             ):
                 errors.append(["unaccepted_glyph_promoted", label, weekday])
+            else:
+                pass
+        else:
+            pass
     for name in SU27_ORDER:
         for weekday in range(7):
             result = printed_lower_comparison(name, weekday, [])
@@ -66,6 +81,8 @@ def verify_printed_special(capture_dir: Path | None = None) -> dict[str, Any]:
                 != (None if unresolved else bool(expected))
             ):
                 errors.append(["evaluated_cell", name, weekday])
+            else:
+                pass
     checked = []
     reference = fixture["source_reference"]
     if capture_dir is not None:
@@ -73,6 +90,8 @@ def verify_printed_special(capture_dir: Path | None = None) -> dict[str, Any]:
             path = capture_dir / image["file"]
             if hashlib.sha256(path.read_bytes()).hexdigest() != image["sha256"]:
                 raise ValueError("Direct printed image fingerprint changed")
+            else:
+                pass
             checked.append(image["file"])
         if (
             hashlib.sha256(
@@ -81,6 +100,10 @@ def verify_printed_special(capture_dir: Path | None = None) -> dict[str, Any]:
             != reference["manifest_sha256"]
         ):
             raise ValueError("Direct printed manifest fingerprint changed")
+        else:
+            pass
+    else:
+        pass
     return {
         "format": "sukuyo_printed_special_primary_check_v1",
         "source_bundle_sha256": loaded.sha256,
@@ -128,3 +151,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

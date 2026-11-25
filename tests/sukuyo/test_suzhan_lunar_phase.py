@@ -4,20 +4,21 @@ import json
 import math
 from copy import deepcopy
 from fractions import Fraction
+from pathlib import Path
 
 import pytest
 
 from fatebridge.core.astro import runtime
 from fatebridge.core.local_techniques.suzhan import build_suzhan_result
-from fatebridge.core.suzhan_lunar_phase import lunar_phase_reference
+from fatebridge.core.sukuyo.suzhan_lunar_phase import lunar_phase_reference
 from fatebridge.utils.errors import EphemerisSourceError
 from scripts.sukuyo.check_suzhan_lunar_phase import (
     FIXTURE,
     compare_available,
     compare_row,
 )
-from tests.sukuyo.test_sukuyo_transports import (
-    test_calendar_and_relations_across_all_real_transports as run_transport_check,
+from tests.unit_test.fixtures.sukuyo_transports import (
+    assert_sukuyo_transport_parity as run_transport_check,
 )
 
 REFERENCES = json.loads(FIXTURE.read_bytes())
@@ -39,7 +40,7 @@ def captured(sun=0.0, moon=0.0):
 
 
 @pytest.mark.parametrize("boundary", range(12, 360, 12))
-def test_all_29_internal_boundaries_keep_both_adjacent_binary_sides(boundary):
+def test_all_29_internal_boundaries_keep_both_adjacent_binary_sides(boundary) -> None:
     for moon, index in [
         (math.nextafter(boundary, -math.inf), boundary // 12),
         (float(boundary), boundary // 12 + 1),
@@ -64,7 +65,9 @@ def test_all_29_internal_boundaries_keep_both_adjacent_binary_sides(boundary):
         (300.0, 120.0, 16, False),
     ],
 )
-def test_wrap_and_subtraction_do_not_round_across_a_tithi(sun, moon, index, adjusted):
+def test_wrap_and_subtraction_do_not_round_across_a_tithi(
+    sun, moon, index: int, adjusted: bool
+) -> None:
     result = lunar_phase_reference(captured(sun, moon))
     ratio = result["elongation_exact_binary_ratio"]
     assert isinstance(ratio["numerator"], str) and isinstance(ratio["denominator"], str)
@@ -78,7 +81,7 @@ def test_wrap_and_subtraction_do_not_round_across_a_tithi(sun, moon, index, adju
 
 
 @pytest.mark.parametrize("bad", [None, True, "12", math.nan, math.inf, -1, 360])
-def test_invalid_longitude_is_not_converted_into_a_phase(bad):
+def test_invalid_longitude_is_not_converted_into_a_phase(bad) -> None:
     with pytest.raises(EphemerisSourceError):
         lunar_phase_reference(captured(moon=bad))
 
@@ -103,7 +106,9 @@ def test_invalid_longitude_is_not_converted_into_a_phase(bad):
         "FLG_JPLHOR_APPROX",
     ],
 )
-def test_coordinate_frame_changes_cannot_relabel_ra_or_geometric_values(flag):
+def test_coordinate_frame_changes_cannot_relabel_ra_or_geometric_values(
+    flag: str,
+) -> None:
     raw = captured()
     raw["ephemeris_provenance"]["by_body"]["Moon"]["ecliptic_return_flags"] |= getattr(
         runtime.swe, flag
@@ -117,7 +122,7 @@ def test_coordinate_frame_changes_cannot_relabel_ra_or_geometric_values(flag):
     "change",
     ["missing_body", "model", "missing_model", "ambiguous_bits", "flag_bool", "tt"],
 )
-def test_missing_or_changed_source_receipts_fail(change):
+def test_missing_or_changed_source_receipts_fail(change: str) -> None:
     raw = captured()
     receipt = raw["ephemeris_provenance"]["by_body"]["Moon"]
     if change == "missing_body":
@@ -137,8 +142,8 @@ def test_missing_or_changed_source_receipts_fail(change):
 
 
 def test_reference_consumes_only_captured_coordinates_and_returns_detached_sources(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     raw = captured(sun=357, moon=10)
     before = deepcopy(raw)
 
@@ -156,12 +161,12 @@ def test_reference_consumes_only_captured_coordinates_and_returns_detached_sourc
 
 
 @pytest.mark.parametrize("row", REFERENCES["api_response"]["phasedata"])
-def test_every_available_usno_minute_table_phase_uses_ut1_to_tt(row):
+def test_every_available_usno_minute_table_phase_uses_ut1_to_tt(row) -> None:
     checked = compare_row(row)
     assert checked["absolute_wrapped_elongation_residual_degrees"] <= 0.01
 
 
-def test_partial_reference_coverage_does_not_pass_the_frozen_five_year_gate():
+def test_partial_reference_coverage_does_not_pass_the_frozen_five_year_gate() -> None:
     report = compare_available()
     assert report["required_years"] == [1700, 1900, 2000, 2026, 2100]
     assert report["missing_years"] == [1700, 1900, 2000, 2100]
@@ -179,8 +184,8 @@ def test_partial_reference_coverage_does_not_pass_the_frozen_five_year_gate():
 
 
 def test_reference_rows_cannot_be_replaced_while_retaining_source_identity(
-    monkeypatch, tmp_path
-):
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     import scripts.sukuyo.check_suzhan_lunar_phase as checker
 
     data = deepcopy(REFERENCES)
@@ -193,7 +198,9 @@ def test_reference_rows_cannot_be_replaced_while_retaining_source_identity(
 
 
 @pytest.mark.parametrize("mode", [0, 1])
-def test_full_chart_keeps_calendar_naming_separate_from_physical_tithi(mode):
+def test_full_chart_keeps_calendar_naming_separate_from_physical_tithi(
+    mode: int,
+) -> None:
     result = build_suzhan_result(
         lat="31n13",
         lon="121e28",
@@ -221,7 +228,7 @@ def test_full_chart_keeps_calendar_naming_separate_from_physical_tithi(mode):
 @pytest.mark.parametrize(
     "options", [{"doubing_su28": False}, {"mansion_method": "legacy_equal28"}]
 )
-def test_non_astronomical_modes_do_not_manufacture_phase_coordinates(options):
+def test_non_astronomical_modes_do_not_manufacture_phase_coordinates(options) -> None:
     result = build_suzhan_result(
         lat="31n13",
         lon="121e28",
@@ -236,8 +243,8 @@ def test_non_astronomical_modes_do_not_manufacture_phase_coordinates(options):
 
 @pytest.mark.parametrize("mode", [0, 1])
 def test_actual_strict_deep_fields_agree_across_rest_native_mcp_and_cli(
-    monkeypatch, capsys, mode
-):
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], mode: int
+) -> None:
     run_transport_check(
         monkeypatch,
         capsys,

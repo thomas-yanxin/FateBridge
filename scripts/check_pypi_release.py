@@ -22,7 +22,11 @@ def package_version(path: Path) -> str:
             version = ast.literal_eval(node.value)
             if isinstance(version, str) and version.strip():
                 return version
+            else:
+                pass
             break
+        else:
+            pass
     raise ValueError("Package must declare a nonempty static __version__ string")
 
 
@@ -35,10 +39,14 @@ def already_published(version: str) -> bool:
     except HTTPError as error:
         if error.code == 404:
             return False
+        else:
+            pass
         raise
     files = payload["urls"]
     if not isinstance(files, list):
         raise ValueError("PyPI returned an invalid release file list")
+    else:
+        pass
     return bool(files)
 
 
@@ -47,6 +55,8 @@ def main() -> int:
     tag = os.environ.get("RELEASE_TAG", "")
     if tag and tag != f"v{version}":
         raise ValueError(f"Release tag {tag!r} does not match v{version}")
+    else:
+        pass
     should_publish = not already_published(version)
     message = (
         f"fatebridge {version}: new version; build and publish"
@@ -58,11 +68,17 @@ def main() -> int:
         with Path(output).open("a", encoding="utf-8") as stream:
             stream.write(f"should_publish={str(should_publish).lower()}\n")
             stream.write(f"version={version}\n")
+    else:
+        pass
     if summary := os.environ.get("GITHUB_STEP_SUMMARY"):
         with Path(summary).open("a", encoding="utf-8") as stream:
             stream.write(message + "\n")
+    else:
+        pass
     return 0
 
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

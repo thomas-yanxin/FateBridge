@@ -28,7 +28,9 @@ def prepared(tmp_path, index=0):
 
 
 @pytest.mark.parametrize("index", [0, 1, 2])
-def test_complete_precode_text_is_searched_using_explicit_codec(tmp_path, index):
+def test_complete_precode_text_is_searched_using_explicit_codec(
+    tmp_path: Path, index: int
+) -> None:
     row, baseline, candidate = prepared(tmp_path, index)
     result = search_sources(tmp_path, baseline, [candidate])
     assert result["verified_files"] == 1
@@ -39,7 +41,7 @@ def test_complete_precode_text_is_searched_using_explicit_codec(tmp_path, index)
     assert result["independent_observation_count"] is None
 
 
-def test_legacy_utf8_default_keeps_fail_closed_behavior(tmp_path):
+def test_legacy_utf8_default_keeps_fail_closed_behavior(tmp_path: Path) -> None:
     _, baseline, candidate = prepared(tmp_path)
     baseline.pop("text_encodings")
     with pytest.raises(ValueError, match="baseline text"):
@@ -58,14 +60,18 @@ def test_legacy_utf8_default_keeps_fail_closed_behavior(tmp_path):
         {"captured.html": 1},
     ],
 )
-def test_unknown_or_nontext_metadata_is_rejected_before_search(tmp_path, metadata):
+def test_unknown_or_nontext_metadata_is_rejected_before_search(
+    tmp_path: Path, metadata
+) -> None:
     _, baseline, candidate = prepared(tmp_path, 2)
     baseline["text_encodings"] = metadata
     with pytest.raises(ValueError, match="encoding"):
         search_sources(tmp_path, baseline, [candidate])
 
 
-def test_binary_files_remain_unexpanded_even_if_caller_declares_text_codec(tmp_path):
+def test_binary_files_remain_unexpanded_even_if_caller_declares_text_codec(
+    tmp_path: Path,
+) -> None:
     _, baseline, candidate = prepared(tmp_path, 2)
     path = tmp_path / "opaque.zip"
     path.write_bytes(b"opaque")
@@ -75,7 +81,9 @@ def test_binary_files_remain_unexpanded_even_if_caller_declares_text_codec(tmp_p
         search_sources(tmp_path, baseline, [candidate])
 
 
-def test_explicit_codec_never_allows_byte_drift_or_replacement_decode(tmp_path):
+def test_explicit_codec_never_allows_byte_drift_or_replacement_decode(
+    tmp_path: Path,
+) -> None:
     _, baseline, candidate = prepared(tmp_path)
     path = tmp_path / "captured.html"
     path.write_bytes(b"\xff")

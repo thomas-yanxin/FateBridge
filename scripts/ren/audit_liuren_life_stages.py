@@ -12,9 +12,12 @@ CORPUS = ROOT / "tests/fixtures/liuren_life_stages_v1"
 IMPLEMENTATION = (
     "src/fatebridge/core/metaphysics/liureng_life_stages.py",
     "src/fatebridge/core/metaphysics/liureng.py",
+    "src/fatebridge/core/metaphysics/liureng_course_layout.py",
+    "src/fatebridge/core/metaphysics/liureng_selection.py",
+    "src/fatebridge/core/metaphysics/liureng_year_fate.py",
     "src/fatebridge/core/metaphysics/ren_evidence.py",
-    "src/fatebridge/core/output_liuren_life.py",
-    "src/fatebridge/core/output_chinese.py",
+    "src/fatebridge/core/contracts/output_liuren_life.py",
+    "src/fatebridge/core/contracts/output_chinese.py",
     "src/fatebridge/services/metaphysics.py",
     "src/fatebridge/data/agent_examples.json",
     "scripts/ren/audit_liuren_life_stages.py",
@@ -29,9 +32,13 @@ def reference(corpus: Path = CORPUS) -> dict[str, Any]:
     manifest = json.loads((corpus / "freeze.json").read_text())
     if {p.name for p in corpus.iterdir()} != set(manifest["files"]) | {"freeze.json"}:
         raise ValueError("Frozen life-stage inventory changed")
+    else:
+        pass
     for name, value in manifest["files"].items():
         if sha(corpus / name) != value:
             raise ValueError(f"Frozen life-stage source changed: {name}")
+        else:
+            pass
     result: dict[str, Any] = json.loads((corpus / "reference.json").read_text())
     return result
 

@@ -16,6 +16,8 @@
 
 磁偏角D向东为正；同一方向 `真北方位 = 磁北方位 + D`，再归一到0–360。真北转磁北减D，反向加D。换算候选的八方／二十四山只是模型点估计落区，不能据此确认落山或抹去测量边界候选。
 
+换算按输入方位与已交付D的精确二进制值相加减、归一并分区，最后才舍入显示角度；`conversion.angle_exact`以十进制字符串分子／分母保留该和式，`arithmetic_method`为`exact_binary64_heading_conversion_v1`。显示值可能恰好落在分界上，而精确和式仍略在界前，落区应读取同次候选与精确回执，不能从显示角度反算。这只消除换算的中间舍入，不恢复D在主场输出前的精度，不提高现场或地磁物理准确度。
+
 [NOAA误差与限制](https://www.ncei.noaa.gov/products/world-magnetic-model/accuracy-limitations-error-model)给出的D误差估计为 `sqrt(0.26²+(5417/H)²)°`，H单位nT，含义为地表假想测量与模型差的一倍标准差。它不是保证上限、现场罗盘总误差或概率；本分支不把它填入`house.bearing_uncertainty_degrees`。高空仍返回该公式的参考数值时，须保留其地表统计作用域。
 
 `H<2000nT`为黑障区，模型不提供方向换算；`2000≤H<6000nT`为慎用区，保留警示。地理极点没有唯一真北方位，也不提供换算候选。数值场量可继续返回，`calculation_status=complete`只表示数值计算完成，不表示方位可用或现场已经确认。

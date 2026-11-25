@@ -8,7 +8,7 @@ All contacts use exact rational arithmetic on the supplied IEEE coordinates.
 from __future__ import annotations
 
 import math
-from datetime import datetime, timezone
+from datetime import datetime
 from fractions import Fraction
 from itertools import combinations
 from typing import Any, Dict, Mapping
@@ -32,31 +32,27 @@ from fatebridge.core.astro.progression_key_sources import (
 )
 from fatebridge.core.astro.reference_angles import qualify_reference_geometry
 from fatebridge.core.astro.sensitive import original_example_reading
+from fatebridge.core.astro.sensitivity_grid import RecordedBirthSample
+from fatebridge.core.astro.sensitivity_timing import (
+    SpecialtySampleTime,
+    SpecialtySampleTimes,
+)
+from fatebridge.core.astro.solar_arc_state import (
+    MAX_KEY_YEARS,
+    SolarArcSampleUnavailable,
+    SolarArcState,
+    SolarArcTimeRangeError,
+    resolve_solar_arc_state,
+)
 from fatebridge.core.astro.solar_ephemeris import SolarEphemerisBatch
 from fatebridge.core.astro.source_pattern import (
     source_pattern_sample,
     source_pattern_summary,
 )
+from fatebridge.core.astro.time_scales import ephemeris_time, utc_clock
 from fatebridge.core.astro.witte1925_table import source_table_analysis
 
 RULESET = "hamburg_true_solar_arc_v1"
-YEAR_DAYS = 365.25
-MAX_KEY_YEARS = 150.0
-
-
-class SolarArcTimeRangeError(ValueError):
-    """A stated symbolic key range, distinct from ephemeris/configuration faults."""
-
-    def __init__(self, key_years: float):
-        super().__init__(
-            "Solar arc supports target instants 0..150 Julian key years after birth"
-        )
-        self.key_years = key_years
-        self.reason_code = (
-            "target_before_birth_time_sample"
-            if key_years < 0
-            else "target_after_supported_key_range_for_sample"
-        )
 
 
 SOURCES = [
@@ -98,46 +94,24 @@ def solar_arc_state(
     """Calculate actual tropical solar displacement, with no one-degree shortcut."""
     if _batch is None:
         with SolarEphemerisBatch() as batch:
-            result = solar_arc_state(
-                birth_utc, birth_jd_tt, analysis_datetime, _batch=batch
+            result = dict(
+                resolve_solar_arc_state(
+                    birth_utc, birth_jd_tt, analysis_datetime, batch=batch
+                ).to_record()
             )
         result["sun_ephemeris_source"] = batch.result
         return result
-    if birth_utc.utcoffset() is None or analysis_datetime.utcoffset() is None:
-        raise ValueError("Solar-arc instants require explicit timezone offsets")
-    analysis_datetime = analysis_datetime.astimezone(timezone.utc)
-    birth_utc = birth_utc.astimezone(timezone.utc)
-    elapsed_days = (analysis_datetime - birth_utc).total_seconds() / 86400
-    key_years = elapsed_days / YEAR_DAYS
-    if not 0 <= key_years <= MAX_KEY_YEARS:
-        raise SolarArcTimeRangeError(key_years)
-    progressed_jd = birth_jd_tt + key_years
-    observations = [_batch.sun(jd) for jd in (birth_jd_tt, progressed_jd)]
-    positions = [row["longitude"] for row in observations]
-    models = [row["model"] for row in observations]
-    arc = (Fraction(positions[1]) - Fraction(positions[0])) % 360
-    return {
-        "analysis_utc": analysis_datetime.astimezone(timezone.utc).isoformat(),
-        "birth_effective_utc": birth_utc.astimezone(timezone.utc).isoformat(),
-        "elapsed_calendar_days": elapsed_days,
-        "year_days": YEAR_DAYS,
-        "key_years": key_years,
-        "birth_julian_day_tt": birth_jd_tt,
-        "progressed_julian_day_tt": progressed_jd,
-        "julian_day_resolution_seconds": math.ulp(birth_jd_tt) * 86400,
-        "natal_tropical_sun": positions[0],
-        "progressed_tropical_sun": positions[1],
-        "solar_arc_degrees": float(arc),
-        "one_degree_per_year_degrees": key_years,
-        "difference_from_one_degree_per_year": float(arc) - key_years,
-        "sun_ephemeris_models": models,
-        "sun_observation_indices": [row["index"] for row in observations],
-        "key_policy": "1 TT ephemeris day per 365.25 UTC calendar days; calendar subtraction ignores leap seconds; symbolic convention, not a measured event clock",
-    }
+    return dict(
+        resolve_solar_arc_state(
+            birth_utc, birth_jd_tt, analysis_datetime, batch=_batch
+        ).to_record()
+    )
 
 
-def rotate_factors(longitudes: Mapping[str, float], arc: float) -> Dict[str, float]:
-    if not math.isfinite(arc):
+def rotate_factors(
+    longitudes: Mapping[str, float], arc: float | Fraction
+) -> Dict[str, float]:
+    if not isinstance(arc, Fraction) and not math.isfinite(arc):
         raise ValueError("Solar arc must be finite")
     result = {}
     for name, value in longitudes.items():
@@ -148,7 +122,10 @@ def rotate_factors(longitudes: Mapping[str, float], arc: float) -> Dict[str, flo
 
 
 def biwheel_geometry(
-    longitudes: Mapping[str, float], arc_degrees: float, *, orb_degrees: float = 1.0
+    longitudes: Mapping[str, float],
+    arc_degrees: float | Fraction,
+    *,
+    orb_degrees: float = 1.0,
 ) -> Dict[str, Any]:
     """Two/three/four labelled factor references, with full untruncated hit lists.
 
@@ -157,7 +134,7 @@ def biwheel_geometry(
     This is not all possible interleaved natal/directed four-factor equations.
     """
     if (
-        not math.isfinite(arc_degrees)
+        (not isinstance(arc_degrees, Fraction) and not math.isfinite(arc_degrees))
         or not math.isfinite(orb_degrees)
         or not 0 <= orb_degrees <= 5
     ):
@@ -265,7 +242,7 @@ def biwheel_geometry(
     return {"dials": dials, "contact_counts": counts}
 
 
-def _reading(values: Mapping[str, float], arc: float) -> Dict[str, Any] | None:
+def _reading(values: Mapping[str, float], arc: Fraction) -> Dict[str, Any] | None:
     factors = {k: Fraction(v) for k, v in values.items()}
     factors["Midheaven"] = (factors["Midheaven"] + Fraction(arc)) % 360
     return original_example_reading(
@@ -274,7 +251,11 @@ def _reading(values: Mapping[str, float], arc: float) -> Dict[str, Any] | None:
 
 
 def enrich_solar_arc(
-    payload: Dict[str, Any], birth: AstroBirthInfo, analysis_datetime: datetime | None
+    payload: Dict[str, Any],
+    birth: AstroBirthInfo,
+    analysis_datetime: datetime | None,
+    *,
+    sample_times: SpecialtySampleTimes | None = None,
 ) -> None:
     if analysis_datetime is None:
         return
@@ -298,39 +279,78 @@ def enrich_solar_arc(
         }
         return
     uncertainty = layer["time_sensitivity"]
-    sample_states: list[Dict[str, Any] | SolarArcTimeRangeError] = []
+    sample_states: list[SolarArcState | SolarArcSampleUnavailable] = []
+    analysis_scales = ephemeris_time(analysis_datetime)
+    nominal_clock = (
+        sample_times.samples[sample_times.nominal_index]
+        if sample_times is not None
+        else None
+    )
+    birth_utc = birth.require_utc_datetime
+    # Reuse the retained source calendar, or the modeled UTC calendar from
+    # the atomic era. Historical inverse LAT keeps its existing clock rule.
+    if (
+        nominal_clock is None
+        and birth.native_epoch is not None
+        and (birth.native_epoch.source_calendar is not None or birth_utc.year >= 1960)
+    ):
+        recorded = RecordedBirthSample(birth.native_epoch)
+        nominal_clock = SpecialtySampleTime(
+            recorded, recorded.epoch, recorded.nominal_calendar
+        )
+    nominal_birth_tt = None
+    if nominal_clock is None:
+        nominal_birth_tt = (
+            birth.native_epoch.time.tt
+            if birth.native_epoch is not None
+            else utc_clock(birth_utc).tt
+        )
     # Collect ephemeris facts under one lock; expensive pure geometry follows
     # outside it. Compare each semantic role across the same birth-time grid,
     # rather than demanding one model across genuinely different epochs.
     with SolarEphemerisBatch() as batch:
-        profile = solar_arc_state(
-            birth.require_utc_datetime,
+        nominal_state = resolve_solar_arc_state(
+            birth_utc,
             layer["profile"]["julian_day_tt"],
             analysis_datetime,
-            _batch=batch,
+            batch=batch,
+            clock=nominal_clock,
+            birth_tt=nominal_birth_tt,
+            analysis_tt=analysis_scales.tt,
         )
-        natal_index, progressed_index = profile["sun_observation_indices"]
+        natal_index, progressed_index = nominal_state.sun_observation_indices
         batch.check_native(layer["profile"]["physical_ephemeris_source"], natal_index)
         cohorts = (PhysicalSourceCohort(), PhysicalSourceCohort())
         for cohort, index in zip(cohorts, (natal_index, progressed_index)):
             cohort.add(batch.source(index))
-        target = target_sun_state(analysis_datetime, _batch=batch)
+        target = target_sun_state(
+            analysis_datetime, _batch=batch, _scales=analysis_scales
+        )
         if uncertainty["status"] == "sampled":
-            for sample in uncertainty["samples"]:
+            for index, sample in enumerate(uncertainty["samples"]):
+                clock = (
+                    sample_times.samples[index] if sample_times is not None else None
+                )
                 try:
-                    computed_state = solar_arc_state(
-                        datetime.fromisoformat(sample["effective_utc"]),
+                    computed_state = resolve_solar_arc_state(
+                        (
+                            datetime.fromisoformat(sample["effective_utc"])
+                            if clock is None
+                            else None
+                        ),
                         sample["julian_day_tt"],
                         analysis_datetime,
-                        _batch=batch,
+                        batch=batch,
+                        clock=clock,
+                        analysis_tt=analysis_scales.tt,
                     )
-                except SolarArcTimeRangeError as error:
+                except SolarArcSampleUnavailable as error:
                     # The nominal chart is valid. Keep this confirmed sample
                     # as unknown; do not extrapolate, shorten the interval or
                     # reinterpret a model-range failure as absent geometry.
                     sample_states.append(error)
                     continue
-                indices = computed_state["sun_observation_indices"]
+                indices = computed_state.sun_observation_indices
                 sample_source = uncertainty["physical_ephemeris_sources"][
                     sample["physical_source_index"]
                 ]
@@ -338,10 +358,11 @@ def enrich_solar_arc(
                 for cohort, index in zip(cohorts, indices):
                     cohort.add(batch.source(index))
                 sample_states.append(computed_state)
+    profile: Dict[str, Any] = dict(nominal_state.to_record())
     profile["sun_ephemeris_source"] = batch.result
     profile["key_source_comparison"] = progression_key_source_comparison()
     values = {f["id"]: f["longitude"] for f in layer["factors"]}
-    arc = profile["solar_arc_degrees"]
+    arc = nominal_state.arc
     rotated = rotate_factors(values, arc)
     reading = _reading(values, arc)
     interpretations = []
@@ -357,7 +378,7 @@ def enrich_solar_arc(
                 "Midheaven": "solar_arc",
             },
             "analysis_utc": profile["analysis_utc"],
-            "solar_arc_degrees": arc,
+            "solar_arc_degrees": float(arc),
             "basis_expression": "Mars.natal+Jupiter.natal-Zeus.natal=Midheaven.solar_arc",
             "rule_id": "hamburg.udo1996.directed_mc.v1",
             "reading_zh": "依该书对推移MC占据敏感点的说明，此指定推运时刻满足个人目标与行动成效这一象征主题的几何条件；现实效果尚未验证。",
@@ -368,8 +389,12 @@ def enrich_solar_arc(
         "status": uncertainty["status"],
         "uncertainty_minutes": uncertainty["uncertainty_minutes"],
         "continuous_interval_proven": False,
-        "sample_frequency_is_probability": False,
         "scope": "Directed MC source pattern only; full biwheel contact-set stability not evaluated",
+        **(
+            {"recorded_physical_grid": uncertainty["recorded_physical_grid"]}
+            if "recorded_physical_grid" in uncertainty
+            else {}
+        ),
         **{
             key: uncertainty[key]
             for key in (
@@ -387,18 +412,24 @@ def enrich_solar_arc(
         assessments: list[Dict[str, Any] | None] = []
         samples = []
         unavailable = sum(
-            isinstance(state, SolarArcTimeRangeError) for state in sample_states
+            isinstance(state, SolarArcSampleUnavailable) for state in sample_states
         )
         for sample, state in zip(uncertainty["samples"], sample_states):
-            if isinstance(state, SolarArcTimeRangeError):
+            if isinstance(state, SolarArcSampleUnavailable):
                 assessments.append(None)
                 missing = {
                     "offset_seconds": sample["offset_seconds"],
                     "effective_utc": sample["effective_utc"],
                     "status": "unavailable",
                     "reason_code": state.reason_code,
-                    "key_years": state.key_years,
-                    "supported_key_years": [0.0, MAX_KEY_YEARS],
+                    **(
+                        {
+                            "key_years": state.key_years,
+                            "supported_key_years": [0.0, MAX_KEY_YEARS],
+                        }
+                        if isinstance(state, SolarArcTimeRangeError)
+                        else {}
+                    ),
                 }
                 samples.append({**missing, "julian_day_tt": sample["julian_day_tt"]})
                 day_samples.append(
@@ -420,10 +451,10 @@ def enrich_solar_arc(
                     "offset_seconds": sample["offset_seconds"],
                     "recorded_utc": sample["recorded_utc"],
                     "effective_utc": sample["effective_utc"],
-                    "julian_day_tt": state["birth_julian_day_tt"],
-                    "progressed_julian_day_tt": state["progressed_julian_day_tt"],
-                    "sun_observation_indices": state["sun_observation_indices"],
-                    "key_years": state["key_years"],
+                    "julian_day_tt": state.birth_julian_day_tt,
+                    "progressed_julian_day_tt": state.progressed_julian_day_tt,
+                    "sun_observation_indices": list(state.sun_observation_indices),
+                    "key_years": state.key_years,
                     **(
                         {"angle_definition": sample["angle_definition"]}
                         if "angle_definition" in sample
@@ -431,8 +462,8 @@ def enrich_solar_arc(
                     ),
                     **day_meridian_coordinates(
                         sample["factor_longitudes"]["Midheaven"],
-                        state["natal_tropical_sun"],
-                        state["solar_arc_degrees"],
+                        state.natal_tropical_sun,
+                        state.arc,
                         target["target_tropical_sun"],
                     ),
                 }
@@ -440,7 +471,7 @@ def enrich_solar_arc(
             assessment = source_pattern_sample(
                 sample["factor_longitudes"],
                 sample.get("angle_definition"),
-                solar_arc_degrees=state["solar_arc_degrees"],
+                solar_arc_degrees=state.arc,
             )
             assessments.append(assessment)
             samples.append(
@@ -449,10 +480,10 @@ def enrich_solar_arc(
                     "offset_seconds": sample["offset_seconds"],
                     "effective_utc": sample["effective_utc"],
                     "julian_day_tt": sample["julian_day_tt"],
-                    "progressed_julian_day_tt": state["progressed_julian_day_tt"],
-                    "sun_observation_indices": state["sun_observation_indices"],
-                    "sun_ephemeris_models": state["sun_ephemeris_models"],
-                    "solar_arc_degrees": state["solar_arc_degrees"],
+                    "progressed_julian_day_tt": state.progressed_julian_day_tt,
+                    "sun_observation_indices": list(state.sun_observation_indices),
+                    "sun_ephemeris_models": list(state.sun_ephemeris_models),
+                    "solar_arc_degrees": float(state.arc),
                     "directed_midheaven_longitude": assessment["midheaven_longitude"],
                     "source_direct_orb_degrees": assessment["direct_orb_degrees"],
                     "source_condition_met": assessment["condition_met"],
@@ -490,7 +521,7 @@ def enrich_solar_arc(
                     "status": "partial",
                     "computed_sample_count": computed,
                     "unavailable_sample_count": unavailable,
-                    "sample_scope_policy": "Keep all confirmed birth-time samples; no extrapolation outside the declared0..150 key-year range",
+                    "sample_scope_policy": "Keep all confirmed birth-time samples; compute only when a nominal calendar coordinate and a supported key are available",
                 }
                 if unavailable
                 else {}
@@ -546,14 +577,20 @@ def enrich_solar_arc(
         "birth_time_sensitivity": sensitivity,
         "daily_meridian": build_day_meridian(
             natal_upper_meridian=values["Midheaven"],
-            solar_profile=profile,
+            solar_state=nominal_state,
+            sun_observations=batch.observations,
+            sample_states=sample_states,
             target=target,
             uncertainty=uncertainty,
             samples=day_samples,
             native_profile=layer["profile"],
             native_factors=layer["factors"],
-            nominal_effective_utc=birth.require_utc_datetime.isoformat(),
+            nominal_effective_utc=birth_utc.isoformat(),
             supported_key_years=(0.0, MAX_KEY_YEARS),
+            sample_times=sample_times,
+            nominal_clock=nominal_clock,
+            nominal_birth_tt=nominal_birth_tt,
+            analysis_tt=analysis_scales.tt,
         ),
         "original_table_1925": source_table_analysis(),
         "sources": [
@@ -614,10 +651,10 @@ def enrich_solar_arc(
     }
     mixed = layer["solar_arc_analysis"]["mixed_pair_geometry"]
     mixed["birth_time_sensitivity"] = mixed_pair_sensitivity(
-        mixed,
+        nominal_state,
         values,
         uncertainty,
-        sensitivity.get("samples", []),
+        sample_states,
         nominal_angle_definition=layer["profile"].get("angle_definition"),
     )
     if mixed["birth_time_sensitivity"]["status"] in {"sampled", "partial"}:

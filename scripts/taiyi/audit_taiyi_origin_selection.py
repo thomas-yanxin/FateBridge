@@ -10,6 +10,9 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Iterator
 
+from fatebridge.services.divination import calculate_sanshiunited_analysis
+from fatebridge.services.metaphysics import calculate_taiyi_analysis
+
 ROOT = Path(__file__).resolve().parents[2]
 CORPUS = ROOT / "tests/fixtures/taiyi_origin_activation_v45"
 SOURCE_SHA = "817f6cf1aec21b790b8f15feec374fbd708de8033c9a678d07654c7301e551eb"
@@ -68,6 +71,8 @@ def inputs(row: dict[str, Any], *, solar: bool = False) -> dict[str, Any]:
     options = dict(calculation_mode="day" if row["mode"] == "day" else "hour")
     if row["mode"] == "key_hour":
         options["hour_profile"] = "key_hour_winter_jiazi_v1"
+    else:
+        pass
     if row["tool"] == "taiyi":
         return dict(
             analysis_year=wall.year,
@@ -81,6 +86,8 @@ def inputs(row: dict[str, Any], *, solar: bool = False) -> dict[str, Any]:
             use_true_solar_time=solar,
             **options,
         )
+    else:
+        pass
     return dict(
         date=wall.date().isoformat(),
         time=wall.time().isoformat(),
@@ -92,8 +99,6 @@ def inputs(row: dict[str, Any], *, solar: bool = False) -> dict[str, Any]:
 
 
 def calculate(row: dict[str, Any], *, solar: bool = False) -> dict[str, Any]:
-    from fatebridge.services.divination import calculate_sanshiunited_analysis
-    from fatebridge.services.metaphysics import calculate_taiyi_analysis
 
     fn = (
         calculate_taiyi_analysis

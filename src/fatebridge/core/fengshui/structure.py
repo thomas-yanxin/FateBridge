@@ -5,12 +5,12 @@ star or observed external form must never alter these geometric facts.
 """
 
 from itertools import combinations
-from typing import Any, Dict
+from typing import Any
 
-from .numeric_patterns import numeric_patterns
+from fatebridge.core.fengshui.numeric_patterns import numeric_patterns
 
 
-def natal_structure(chart: Dict[str, Any]) -> Dict[str, Any]:
+def natal_structure(chart: dict[str, Any]) -> dict[str, Any]:
     period = chart["period_number"]
     sitting = chart["sitting"]["direction"]
     facing = chart["facing"]["direction"]

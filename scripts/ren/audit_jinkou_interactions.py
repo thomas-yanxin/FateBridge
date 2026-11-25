@@ -16,8 +16,8 @@ IMPLEMENTATION = (
     "src/fatebridge/core/metaphysics/jinkou_strength.py",
     "src/fatebridge/core/metaphysics/jinkou_patterns.py",
     "src/fatebridge/core/metaphysics/ren_evidence.py",
-    "src/fatebridge/core/output_jinkou_interactions.py",
-    "src/fatebridge/core/output_chinese.py",
+    "src/fatebridge/core/contracts/output_jinkou_interactions.py",
+    "src/fatebridge/core/contracts/output_chinese.py",
     "src/fatebridge/services/metaphysics.py",
     "src/fatebridge/data/agent_examples.json",
     "scripts/ren/audit_jinkou_interactions.py",
@@ -32,9 +32,13 @@ def reference(corpus: Path = CORPUS) -> dict[str, Any]:
     freeze = json.loads((corpus / "freeze.json").read_text())
     if {p.name for p in corpus.iterdir()} != set(freeze["files"]) | {"freeze.json"}:
         raise ValueError("Frozen interaction inventory changed")
+    else:
+        pass
     for name, value in freeze["files"].items():
         if sha(corpus / name) != value:
             raise ValueError(f"Frozen interaction source changed: {name}")
+        else:
+            pass
     result: dict[str, Any] = json.loads((corpus / "reference.json").read_text())
     return result
 
@@ -46,6 +50,8 @@ def symbolic_rows(ref: dict[str, Any], elements: list[str]) -> list[dict[str, An
 def expected_condition(ref: dict[str, Any], a: str, b: str, relation: str) -> bool:
     if relation == "比和":
         return a == b
+    else:
+        pass
     edges = ref["phase_generations" if relation == "生" else "phase_controls"]
     return [a, b] in edges
 
@@ -122,10 +128,14 @@ def audit() -> dict[str, Any]:
             failures.append(
                 dict(elements=elements, reason="source rule inventory changed")
             )
+        else:
+            pass
         if len(result["pairs"]) != 6 or set(pairs) != set(
             combinations(ref["positions"], 2)
         ):
             failures.append(dict(elements=elements, reason="pair inventory changed"))
+        else:
+            pass
         for rule in ref["rules"]:
             rule_checks += 1
             expected = expected_rule(ref, rule, elements)
@@ -141,6 +151,8 @@ def audit() -> dict[str, Any]:
                         actual=row,
                     )
                 )
+            else:
+                pass
         for i, j in combinations(range(4), 2):
             pair_checks += 1
             a, b = elements[i], elements[j]
@@ -172,6 +184,8 @@ def audit() -> dict[str, Any]:
                 failures.append(
                     dict(elements=elements, expected_pair=expected_pair, actual=row)
                 )
+            else:
+                pass
         expected_ids = [
             r["id"] for r in ref["rules"] if expected_rule(ref, r, elements)
         ]
@@ -185,8 +199,12 @@ def audit() -> dict[str, Any]:
             failures.append(
                 dict(elements=elements, reason="summary differs from full facts")
             )
+        else:
+            pass
         if result["complete_classical_conformance"] is not False:
             failures.append(dict(elements=elements, reason="overclaimed conformance"))
+        else:
+            pass
     unchanged = before == {p: sha(ROOT / p) for p in IMPLEMENTATION}
     return dict(
         audit_id="jinkou_interactions_v1",

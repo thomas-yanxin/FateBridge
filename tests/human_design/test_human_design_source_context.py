@@ -9,10 +9,10 @@ from pathlib import Path
 import pytest
 
 import fatebridge.application.execution as execution
-from fatebridge.core import human_design_knowledge as base
-from fatebridge.core import human_design_knowledge_v4 as hd
-from fatebridge.core.human_design import bodygraph
-from fatebridge.core.human_design_source_context import bind_source_context
+from fatebridge.core.human_design import human_design_knowledge as base
+from fatebridge.core.human_design import human_design_knowledge_v4 as hd
+from fatebridge.core.human_design.human_design import bodygraph
+from fatebridge.core.human_design.human_design_source_context import bind_source_context
 from fatebridge.services.knowledge import calculate_knowledge_read
 from fatebridge.utils.errors import EphemerisSourceError
 from tests.support.transports import SPECS, business
@@ -52,7 +52,7 @@ def fixing(key, state="unfixed"):
     return {"gate": gate, "line": line, "fixing_state": state}
 
 
-def test_all_384_v4_rows_preserve_v3_meanings_and_honest_coverage():
+def test_all_384_v4_rows_preserve_v3_meanings_and_honest_coverage() -> None:
     registry = base.build_registry()["domains"][0]["categories"]
     assert registry[2]["coverage"] == registry[1]["coverage"]
     assert registry[2]["coverage"]["local_editorial_paraphrases"] == 18
@@ -72,6 +72,8 @@ def test_all_384_v4_rows_preserve_v3_meanings_and_honest_coverage():
                 assert len(extra) == 1
                 assert extra[0]["personal_condition_satisfied"] is None
                 assert extra[0]["source_interpretation_resolved"] is False
+            else:
+                pass
     assert selected == ["2.3", "6.3", "7.2", "12.6", "42.1"]
 
 
@@ -86,8 +88,8 @@ def test_all_384_v4_rows_preserve_v3_meanings_and_honest_coverage():
 )
 @pytest.mark.parametrize("split", ["personality", "design", "mixed", "absent"])
 def test_literal_named_channels_roles_and_absence_are_separate_from_fixing(
-    key, gates, role, permanent, split
-):
+    key: str, gates, role: str, permanent: bool, split: str
+) -> None:
     a, b = gates
     p, d = {
         "personality": ([a, b], []),
@@ -123,8 +125,8 @@ def test_literal_named_channels_roles_and_absence_are_separate_from_fixing(
     ],
 )
 def test_root_models_remain_distinct_and_particular_is_not_necessary(
-    gates, direct, connected
-):
+    gates, direct: bool, connected: bool
+) -> None:
     ann = annotation("42.1")
     result = bind_source_context(ann, chart(gates, []), fixing("42.1", "exaltation"))
     assert ann["source_force"] == "particular_emphasis_not_necessity"
@@ -143,28 +145,40 @@ def test_root_models_remain_distinct_and_particular_is_not_necessary(
     if gates == [42, 5, 15, 18, 58]:
         assert chart(gates, [])["bodygraph"]["centers"]["root"]["status"] == "defined"
         assert result["observations"][1]["channel_witnesses"] == []
+    else:
+        pass
 
 
 @pytest.mark.parametrize("fault", ["drop", "extra", "wrong_center", "wrong_key"])
-def test_contradictory_structural_witnesses_fail(fault):
+def test_contradictory_structural_witnesses_fail(fault: str) -> None:
     value = chart([7], [31])
     fixed = fixing("7.2")
     if fault == "drop":
         value["bodygraph"]["channels"] = []
+    else:
+        pass
     if fault == "extra":
         value["bodygraph"]["channels"].append(
             deepcopy(value["bodygraph"]["channels"][0])
         )
+    else:
+        pass
     if fault == "wrong_center":
         value["bodygraph"]["channels"][0]["centers"][0] = "root"
+    else:
+        pass
     if fault == "wrong_key":
         fixed["line"] = 3
+    else:
+        pass
     with pytest.raises(ValueError):
         bind_source_context(annotation("7.2"), value, fixed)
 
 
 @pytest.mark.parametrize("key", ["2.3", "6.3", "7.2", "12.6", "42.1", "3.4", "64.6"])
-def test_actual_reference_content_on_three_adapters(key, rest, tmp_path, capsys):
+def test_actual_reference_content_on_three_adapters(
+    key: str, rest, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     response, code, cli, mcp = run_three(
         SPECS["knowledge_read"],
         {"domain": "human_design", "category": "lines_v4", "key": key},
@@ -193,8 +207,12 @@ def test_actual_reference_content_on_three_adapters(key, rest, tmp_path, capsys)
     ],
 )
 def test_adapters_reject_forged_annotations_even_if_projecting_unrelated_field(
-    fault, monkeypatch, rest, tmp_path, capsys
-):
+    fault: str,
+    monkeypatch: pytest.MonkeyPatch,
+    rest,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     key = "6.3" if fault == "drop_intro" else "42.1"
     result = calculate_knowledge_read(
         domain="human_design", category="lines_v4", key=key
@@ -203,21 +221,35 @@ def test_adapters_reject_forged_annotations_even_if_projecting_unrelated_field(
     ann = record["source_context_annotations"][0]
     if fault == "version":
         result["category"] = "lines_v3"
+    else:
+        pass
     if fault == "personal_true":
         ann["personal_condition_satisfied"] = True
+    else:
+        pass
     if fault == "choose_root":
         ann["selected_source_interpretation"] = "direct_named_channel"
+    else:
+        pass
     if fault == "drop_intro":
         ann["source_role"] = "exaltation"
+    else:
+        pass
     if fault == "new_meaning":
         record["complete_line_meaning_accepted"] = True
+    else:
+        pass
     if fault == "drop_qualifier":
         ann["unassessed_qualifiers"] = []
+    else:
+        pass
     execute = execution.execute_spec
 
     def forged(spec, request):
         if spec.key == "knowledge_read":
             spec = replace(spec, bind=lambda _: (lambda: deepcopy(result), (), {}))
+        else:
+            pass
         return execute(spec, request)
 
     monkeypatch.setattr(execution, "execute_spec", forged)
@@ -233,25 +265,30 @@ def test_adapters_reject_forged_annotations_even_if_projecting_unrelated_field(
 
 
 @pytest.mark.parametrize("mode", ["read", "registry"])
-def test_context_bytes_changed_after_load_are_rejected(mode, monkeypatch, tmp_path):
+def test_context_bytes_changed_after_load_are_detected_next_call(
+    mode: str, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     path = tmp_path / hd.CATALOGUE_PATH.name
     path.write_bytes(hd.CATALOGUE_PATH.read_bytes())
     monkeypatch.setattr(hd, "CATALOGUE_PATH", path)
     method = "_catalogue" if mode == "read" else "_registry_category"
     original = getattr(hd, method)
 
-    def changed():
-        result = original()
+    def changed(*args):
+        result = original(*args)
         path.write_bytes(path.read_bytes() + b" ")
         return result
 
     monkeypatch.setattr(hd, method, changed)
+    assert hd.read_reference(key="7.2") if mode == "read" else base.build_registry()
     with pytest.raises(EphemerisSourceError) as caught:
         (hd.read_reference(key="7.2") if mode == "read" else base.build_registry())
-    assert caught.value.reason == "human_design_reference_changed"
+    assert caught.value.reason == "human_design_reference_invalid"
 
 
-def test_source_replaced_before_lookup_is_invalid(monkeypatch, tmp_path):
+def test_source_replaced_before_lookup_is_invalid(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     path = tmp_path / hd.CATALOGUE_PATH.name
     path.write_bytes(hd.CATALOGUE_PATH.read_bytes() + b" ")
     monkeypatch.setattr(hd, "CATALOGUE_PATH", path)

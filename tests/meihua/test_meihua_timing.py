@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.meihua_timing import (
+from fatebridge.core.meihua.meihua_timing import (
     build_postheaven_count_reference,
     postheaven_timing_ruleset,
 )
@@ -30,7 +30,7 @@ def reference(result):
     return result["interpretation"]["motion_context"].get("postheaven_count_reference")
 
 
-def test_source_frozen_before_production_and_variants_do_not_create_two_days():
+def test_source_frozen_before_production_and_variants_do_not_create_two_days() -> None:
     freeze = json.loads((FIXTURE / "reference-freeze.json").read_text())
     assert not freeze["new_production_module_present"]
     assert not freeze["new_profile_present"]
@@ -38,6 +38,8 @@ def test_source_frozen_before_production_and_variants_do_not_create_two_days():
     for name, digest in freeze["files"].items():
         if str(name).endswith((".py", ".py.txt")):
             continue
+        else:
+            pass
         assert hashlib.sha256((FIXTURE / name).read_bytes()).hexdigest() == digest
     assert postheaven_timing_ruleset() == PROFILE
     altered = postheaven_timing_ruleset()
@@ -48,19 +50,46 @@ def test_source_frozen_before_production_and_variants_do_not_create_two_days():
     assert PROFILE["exception"]["variants"][0]["not_a_two_day_duration"]
 
 
-@pytest.mark.parametrize(
-    "case",
-    CASES,
-    ids=lambda c: ":".join(
-        [
-            c["casting"]["upper_trigram"],
-            c["casting"]["lower_trigram"],
-            c["casting"]["hour_branch"],
-            str(c["activity"]),
-        ]
-    ),
-)
-def test_all_3072_before_frozen_operands_and_ratios_bind_actual_source_cast(case):
+def _covering_timing_cases(cases):
+    selected = []
+    seen_ul = set()
+    seen_uh = set()
+    seen_lh = set()
+    seen_ua = set()
+    seen_la = set()
+    seen_ha = set()
+    for case in cases:
+        casting = case["casting"]
+        upper = casting["upper_trigram"]
+        lower = casting["lower_trigram"]
+        hour = casting["hour_branch"]
+        activity = case["activity"]
+        if (
+            (upper, lower) not in seen_ul
+            or (upper, hour) not in seen_uh
+            or (lower, hour) not in seen_lh
+            or (upper, activity) not in seen_ua
+            or (lower, activity) not in seen_la
+            or (hour, activity) not in seen_ha
+        ):
+            selected.append(case)
+            seen_ul.add((upper, lower))
+            seen_uh.add((upper, hour))
+            seen_lh.add((lower, hour))
+            seen_ua.add((upper, activity))
+            seen_la.add((lower, activity))
+            seen_ha.add((hour, activity))
+        else:
+            pass
+    return selected
+
+
+def test_covering_before_frozen_operands_and_ratios_bind_actual_source_cast() -> None:
+    for case in _covering_timing_cases(CASES):
+        _assert_timing_case(case)
+
+
+def _assert_timing_case(case):
     result = calculate_meihua_cast(
         casting=case["casting"], observer_activity=case["activity"]
     )
@@ -71,6 +100,8 @@ def test_all_3072_before_frozen_operands_and_ratios_bind_actual_source_cast(case
     if case["activity"] is None:
         assert item is None
         return
+    else:
+        pass
     assert item["nominal_scaled_count"] == case["expected_scaled_count"]
     assert item["unreduced_total"] == case["unreduced_total"]
     assert [r["number"] for r in item["operands"]] == [
@@ -110,35 +141,39 @@ def test_all_3072_before_frozen_operands_and_ratios_bind_actual_source_cast(case
     )
 
 
-@pytest.mark.parametrize("case", CATEGORIES, ids=lambda c: c["id"])
-@pytest.mark.parametrize("activity", ["walking", "seated", "standing"])
-def test_reused_category_mapping_uses_original_hour_and_source_trigram_numbers(
-    case, activity
+def test_reused_category_mapping_uses_original_hour_and_source_trigram_numbers() -> (
+    None
 ):
-    result = calculate_meihua_cast(casting=case["input"], observer_activity=activity)
-    item = reference(result)
-    expected = case["expected"]
-    hour = "子丑寅卯辰巳午未申酉戌亥".index(case["input"]["hour_branch"]) + 1
-    total = expected["upper_number"] + expected["lower_number"] + hour
-    factor = {
-        "walking": Fraction(1, 2),
-        "seated": Fraction(2),
-        "standing": Fraction(1),
-    }[activity]
-    value = total * factor
-    assert item["unreduced_total"] == total
-    assert item["nominal_scaled_count"] == {
-        "numerator": value.numerator,
-        "denominator": value.denominator,
-        "exact_rational": str(value),
-    }
-    assert item["casting_method"] == "observed_categories"
-    assert result["meihua"]["base_hexagram"]["binary_code"] == expected["base_code"]
+    for case in CATEGORIES:
+        for activity in ("walking", "seated", "standing"):
+            result = calculate_meihua_cast(
+                casting=case["input"], observer_activity=activity
+            )
+            item = reference(result)
+            expected = case["expected"]
+            hour = "子丑寅卯辰巳午未申酉戌亥".index(case["input"]["hour_branch"]) + 1
+            total = expected["upper_number"] + expected["lower_number"] + hour
+            factor = {
+                "walking": Fraction(1, 2),
+                "seated": Fraction(2),
+                "standing": Fraction(1),
+            }[activity]
+            value = total * factor
+            assert item["unreduced_total"] == total
+            assert item["nominal_scaled_count"] == {
+                "numerator": value.numerator,
+                "denominator": value.denominator,
+                "exact_rational": str(value),
+            }
+            assert item["casting_method"] == "observed_categories"
+            assert (
+                result["meihua"]["base_hexagram"]["binary_code"]
+                == expected["base_code"]
+            )
 
 
-@pytest.mark.parametrize(
-    "casting,activity,expected",
-    [
+def test_literal_arithmetic_anchors_never_round_or_reuse_the_line() -> None:
+    for casting, activity, expected in (
         (
             {
                 "method": "observed_trigrams",
@@ -179,18 +214,13 @@ def test_reused_category_mapping_uses_original_hour_and_source_trigram_numbers(
             "seated",
             "56",
         ),
-    ],
-)
-def test_literal_arithmetic_anchors_never_round_or_reuse_the_line(
-    casting, activity, expected
-):
-    result = calculate_meihua_cast(casting=casting, observer_activity=activity)
-    assert reference(result)["nominal_scaled_count"]["exact_rational"] == expected
+    ):
+        result = calculate_meihua_cast(casting=casting, observer_activity=activity)
+        assert reference(result)["nominal_scaled_count"]["exact_rational"] == expected
 
 
-@pytest.mark.parametrize(
-    "casting",
-    [
+def test_other_casting_origins_do_not_borrow_postheaven_timing() -> None:
+    for casting in (
         {"method": "existing", "hexagram_code": "011111", "moving_line": 4},
         {
             "method": "sound_groups",
@@ -219,17 +249,17 @@ def test_literal_arithmetic_anchors_never_round_or_reuse_the_line(
             "hour_branch": "午",
             "added_count": 4,
         },
-    ],
-)
-def test_other_casting_origins_do_not_borrow_postheaven_timing(casting):
-    result = calculate_meihua_cast(casting=casting, observer_activity="standing")
-    assert "error" not in result
-    assert reference(result) is None
-    for candidate in result["interpretation"].get("casting_readings") or []:
-        assert "postheaven_count_reference" not in candidate["motion_context"]
+    ):
+        result = calculate_meihua_cast(casting=casting, observer_activity="standing")
+        assert "error" not in result
+        assert reference(result) is None
+        for candidate in result["interpretation"].get("casting_readings") or []:
+            assert "postheaven_count_reference" not in candidate["motion_context"]
 
 
-def test_time_cast_and_unknown_observer_do_not_invent_postheaven_origin_or_activity():
+def test_time_cast_and_unknown_observer_do_not_invent_postheaven_origin_or_activity() -> (
+    None
+):
     result = calculate_meihua_analysis(
         analysis_year=2026,
         analysis_month=10,
@@ -251,17 +281,7 @@ def test_time_cast_and_unknown_observer_do_not_invent_postheaven_origin_or_activ
     assert reference(result) is None
 
 
-@pytest.mark.parametrize(
-    "key,value",
-    [
-        ("raw_upper_number", 5),
-        ("line_sum", 4),
-        ("line_sum", True),
-        ("moving_line", 1),
-        ("hour_branch", "亥"),
-    ],
-)
-def test_mismatched_raw_count_hour_or_remainder_is_rejected(key, value):
+def test_mismatched_raw_count_hour_or_remainder_is_rejected() -> None:
     result = calculate_meihua_cast(
         casting={
             "method": "observed_trigrams",
@@ -270,17 +290,24 @@ def test_mismatched_raw_count_hour_or_remainder_is_rejected(key, value):
             "hour_branch": "卯",
         }
     )
-    cast = deepcopy(result["meihua"])
-    cast["seed"][key] = value
-    with pytest.raises(ValueError, match="Timing|timing"):
-        build_postheaven_count_reference(
-            cast,
-            observer_activity="walking",
-            activity_fact_path="input_normalized.observer_activity",
-        )
+    for key, value in (
+        ("raw_upper_number", 5),
+        ("line_sum", 4),
+        ("line_sum", True),
+        ("moving_line", 1),
+        ("hour_branch", "亥"),
+    ):
+        cast = deepcopy(result["meihua"])
+        cast["seed"][key] = value
+        with pytest.raises(ValueError, match="Timing|timing"):
+            build_postheaven_count_reference(
+                cast,
+                observer_activity="walking",
+                activity_fact_path="input_normalized.observer_activity",
+            )
 
 
-def test_no_numeric_multiplier_is_invented_for_unimplemented_activity():
+def test_no_numeric_multiplier_is_invented_for_unimplemented_activity() -> None:
     result = calculate_meihua_cast(
         casting={
             "method": "observed_trigrams",

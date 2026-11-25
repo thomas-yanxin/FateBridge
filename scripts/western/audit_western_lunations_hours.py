@@ -50,6 +50,8 @@ def audit(ephemeris_dir=None):
                 actual = _prenatal_syzygy(expected + 0.5)
                 if actual is None:
                     raise RuntimeError(f"Lunation unavailable: {case}")
+                else:
+                    pass
                 for body in (swe.SUN, swe.MOON):
                     _, flag = ephemeris_call(
                         "calc",
@@ -80,6 +82,8 @@ def audit(ephemeris_dir=None):
                 rise = _sun_event(jd, 0, 51.5, True)
                 if rise is None:
                     raise RuntimeError(f"Sunrise unavailable: {date}")
+                else:
+                    pass
                 before = _planetary_hours(rise - 1 / 86400, 0, 51.5, "UTC")
                 after = _planetary_hours(rise + 1 / 86400, 0, 51.5, "UTC")
                 dawns.append(
@@ -104,7 +108,7 @@ def audit(ephemeris_dir=None):
         "src/fatebridge/core/astro/classical.py",
         "src/fatebridge/core/astro/time_scales.py",
         "src/fatebridge/core/astro/chart.py",
-        "src/fatebridge/core/output_charts.py",
+        "src/fatebridge/core/contracts/output_charts.py",
         "src/fatebridge/services/astrology.py",
         "tests/western/test_western_lunations_hours.py",
         "tests/astronomy/test_swisseph_runtime_guards.py",
@@ -163,6 +167,8 @@ def main():
     args = parser.parse_args()
     if args.ephemeris_dir and not args.ephemeris_dir.is_dir():
         parser.error("ephemeris directory does not exist")
+    else:
+        pass
     report = audit(args.ephemeris_dir)
     encoded = json.dumps(report, ensure_ascii=False, indent=2, allow_nan=False) + "\n"
     if args.output:
@@ -192,7 +198,11 @@ def main():
         ]
     ):
         raise SystemExit(1)
+    else:
+        pass
 
 
 if __name__ == "__main__":
     main()
+else:
+    pass

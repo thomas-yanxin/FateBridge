@@ -16,7 +16,7 @@ ROOTS = json.loads(
 )
 
 
-def test_complete_root_grid_and_predeclared_tolerance_are_retained():
+def test_complete_root_grid_and_predeclared_tolerance_are_retained() -> None:
     assert len(ROOTS["cases"]) == 126
     assert ROOTS["protocol"]["cusp_tolerance_arcseconds"] == 1.0
     assert sum(c["status"] == "solved" for c in ROOTS["cases"]) == 90
@@ -29,7 +29,7 @@ def test_complete_root_grid_and_predeclared_tolerance_are_retained():
     )
 
 
-def test_new_scoped_audit_rejects_wrong_axis_or_wrong_root():
+def test_new_scoped_audit_rejects_wrong_axis_or_wrong_root() -> None:
     wrong = copy.deepcopy(REFERENCE)
     wrong["cases"][1]["erfa_vector_angles"]["midheaven"] += 10
     assert audit(wrong, ROOTS)["scoped_numerical_gate_passed"] is False
@@ -39,7 +39,7 @@ def test_new_scoped_audit_rejects_wrong_axis_or_wrong_root():
 
 
 @pytest.mark.parametrize("bad", [[0.0] * 11, [float("nan")] * 12])
-def test_incomplete_or_nonfinite_root_arrays_cannot_pass_the_audit(bad):
+def test_incomplete_or_nonfinite_root_arrays_cannot_pass_the_audit(bad) -> None:
     damaged = copy.deepcopy(ROOTS)
     damaged["cases"][3]["cusps"] = bad
     with pytest.raises(ValueError, match="twelve finite"):
@@ -47,7 +47,7 @@ def test_incomplete_or_nonfinite_root_arrays_cannot_pass_the_audit(bad):
 
 
 @pytest.mark.parametrize("case", ROOTS["cases"])
-def test_native_placidus_against_independent_monotone_roots(case):
+def test_native_placidus_against_independent_monotone_roots(case) -> None:
     p = case["input"]
     if case["status"] != "solved":
         with pytest.raises(runtime.swe.Error):
@@ -55,6 +55,8 @@ def test_native_placidus_against_independent_monotone_roots(case):
                 "houses_ex", p["jd_ut1"], p["latitude"], p["longitude"], b"P"
             )
         return
+    else:
+        pass
     native, _ = runtime.ephemeris_call(
         "houses_ex", p["jd_ut1"], p["latitude"], p["longitude"], b"P"
     )
@@ -65,7 +67,9 @@ def test_native_placidus_against_independent_monotone_roots(case):
 
 
 @pytest.mark.parametrize("theta", [0.0, 17.3, 359.999])
-def test_flat_ecliptic_has_analytic_thirty_degree_placidus_intervals(theta):
+def test_flat_ecliptic_has_analytic_thirty_degree_placidus_intervals(
+    theta: float,
+) -> None:
     result = solve_cusps(theta, 50.0, 0.0, 1e-11, 64)
     assert (
         max(

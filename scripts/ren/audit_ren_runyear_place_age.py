@@ -15,9 +15,12 @@ CORPUS = ROOT / "tests/fixtures/ren_runyear_place_age_v1"
 IMPLEMENTATION = (
     "src/fatebridge/core/metaphysics/ren_calendar.py",
     "src/fatebridge/core/metaphysics/liureng.py",
+    "src/fatebridge/core/metaphysics/liureng_course_layout.py",
+    "src/fatebridge/core/metaphysics/liureng_selection.py",
+    "src/fatebridge/core/metaphysics/liureng_year_fate.py",
     "src/fatebridge/core/requests/metaphysics.py",
-    "src/fatebridge/core/output_ren_clock.py",
-    "src/fatebridge/core/output_chinese.py",
+    "src/fatebridge/core/contracts/output_ren_clock.py",
+    "src/fatebridge/core/contracts/output_chinese.py",
     "src/fatebridge/services/metaphysics.py",
     "src/fatebridge/utils/places.py",
     "src/fatebridge/utils/timezones.py",
@@ -40,18 +43,26 @@ def reference(corpus: Path = CORPUS) -> dict[str, Any]:
     }
     if names != set(manifest["files"]):
         raise ValueError("Frozen runyear place/age inventory changed")
+    else:
+        pass
     for name, digest in manifest["files"].items():
         if sha(corpus / name) != digest:
             raise ValueError(f"Frozen runyear place/age source changed: {name}")
+        else:
+            pass
     ref: dict[str, Any] = json.loads((corpus / "reference.json").read_text())
     if [r["id"] for r in ref["cases"]] != [f"P{i:02}" for i in range(1, 29)]:
         raise ValueError("All 28 precommitted cases required")
+    else:
+        pass
     # Reconstruct literal UTC -> local labels using the copied database, never
     # the production resolver or service output. This is shared-ancestry data.
     for case in ref["cases"]:
         expected, data = case["expected"], case["input"]
         if "error" in expected:
             continue
+        else:
+            pass
         zone = expected["timezone"]
         tz: tzinfo
         if zone == "UTC":
@@ -65,6 +76,8 @@ def reference(corpus: Path = CORPUS) -> dict[str, Any]:
             for k in ("year", "month", "day", "hour", "minute")
         ) or local.fold != expected.get("fold", 0):
             raise ValueError(f"Literal birth UTC differs: {case['id']}")
+        else:
+            pass
         if "analysis_in_age_zone" in expected:
             analysis_zone = data["analysis_timezone"]
             atz: tzinfo
@@ -84,6 +97,10 @@ def reference(corpus: Path = CORPUS) -> dict[str, Any]:
             )
             if wall.astimezone(tz).isoformat() != expected["analysis_in_age_zone"]:
                 raise ValueError("Literal common-age-zone label differs")
+            else:
+                pass
+        else:
+            pass
     return ref
 
 
@@ -200,3 +217,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

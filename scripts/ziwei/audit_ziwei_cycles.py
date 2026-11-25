@@ -7,8 +7,8 @@ import json
 from pathlib import Path
 from typing import Any
 
-from fatebridge.core.ziwei_auxiliary import attach_natal_cycles
-from fatebridge.core.ziwei_cycle_sources import cycle_source_evidence
+from fatebridge.core.ziwei.ziwei_auxiliary import attach_natal_cycles
+from fatebridge.core.ziwei.ziwei_cycle_sources import cycle_source_evidence
 
 ROOT = Path(__file__).resolve().parents[2]
 FIXTURES = ROOT / "tests/data/ziwei_independent"
@@ -23,8 +23,12 @@ def walk(sequence: list[str], start: str, sign: int) -> dict[str, str]:
         pointer += sign
         if pointer == 12:
             pointer = 0
+        else:
+            pass
         if pointer == -1:
             pointer = 11
+        else:
+            pass
     return result
 
 
@@ -33,6 +37,8 @@ def audit_cycles(fixtures: Path = FIXTURES) -> dict[str, Any]:
     for e in json.loads((folder / "checksums.json").read_text())["files"]:
         if hashlib.sha256((folder / e["path"]).read_bytes()).hexdigest() != e["sha256"]:
             raise ValueError("Cycle source checksum mismatch: " + e["path"])
+        else:
+            pass
     source = json.loads((folder / "collation.json").read_text())
     production = json.loads(
         (ROOT / "src/fatebridge/data/classical/ziwei-naj-ming-cycles.json").read_text()
@@ -45,6 +51,8 @@ def audit_cycles(fixtures: Path = FIXTURES) -> dict[str, Any]:
     mismatches: list[dict[str, Any]] = []
     if production != expected_data:
         mismatches.append(dict(case="production_source_data"))
+    else:
+        pass
     stats = {
         p: {
             system: dict(matches=0, differences=0, unresolved=0)
@@ -127,6 +135,8 @@ def audit_cycles(fixtures: Path = FIXTURES) -> dict[str, Any]:
                                         actual=actual,
                                     )
                                 )
+                            else:
+                                pass
                             stats[profile][prefix][
                                 (
                                     "unresolved"
@@ -138,6 +148,8 @@ def audit_cycles(fixtures: Path = FIXTURES) -> dict[str, Any]:
                             if not known:
                                 invariant += int(expected is not None)
                                 unresolved += int(expected is None)
+                            else:
+                                pass
                         if (
                             evidence[prefix]["source_start"] != start
                             or evidence[prefix]["actual_start_branches"] != [start]
@@ -149,11 +161,15 @@ def audit_cycles(fixtures: Path = FIXTURES) -> dict[str, Any]:
                                     case=f"start/{profile}/{element}/{stem}/{gender}/{prefix}"
                                 )
                             )
+                        else:
+                            pass
                         expected_direction = (
                             ("顺行" if source_sign == 1 else "逆行") if known else None
                         )
                         if evidence[prefix]["source_direction"] != expected_direction:
                             mismatches.append(dict(case="source_direction"))
+                        else:
+                            pass
                         actual_direction = (
                             ("顺行" if actual_sign == 1 else "逆行") if known else None
                         )
@@ -162,10 +178,14 @@ def audit_cycles(fixtures: Path = FIXTURES) -> dict[str, Any]:
                             or evidence[prefix]["actual_direction"] != actual_direction
                         ):
                             mismatches.append(dict(case="actual_direction"))
+                        else:
+                            pass
                         if known and evidence[prefix]["direction_match"] != (
                             actual_direction == expected_direction
                         ):
                             mismatches.append(dict(case="direction_comparison"))
+                        else:
+                            pass
                         if not known and (
                             rules[prefix + "_direction"] is not None
                             or evidence[prefix]["direction_match"] is not None
@@ -173,6 +193,8 @@ def audit_cycles(fixtures: Path = FIXTURES) -> dict[str, Any]:
                             mismatches.append(
                                 dict(case="unknown_cannot_certify_direction")
                             )
+                        else:
+                            pass
                     if not known:
                         invariants = {
                             key: {
@@ -187,6 +209,10 @@ def audit_cycles(fixtures: Path = FIXTURES) -> dict[str, Any]:
                             or rules.get("gender_invariant_positions") != invariants
                         ):
                             mismatches.append(dict(case="unknown_invariant_receipt"))
+                        else:
+                            pass
+                    else:
+                        pass
                     cases += 1
     return {
         "method_id": source["id"],

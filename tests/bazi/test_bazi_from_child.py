@@ -13,9 +13,9 @@ from fatebridge.core.classical_from_child import (
     build_from_child_reference,
     from_child_snapshot_lines,
 )
+from fatebridge.core.contracts.output_bazi_evidence import EvidenceStructureProfile
+from fatebridge.core.contracts.output_from_child import FromChildReference
 from fatebridge.core.elements import ElementAnalysis
-from fatebridge.core.output_bazi_evidence import EvidenceStructureProfile
-from fatebridge.core.output_from_child import FromChildReference
 from fatebridge.core.rules import BaZiRules
 from tests.support.bazi_strength_reference_v3 import (
     assert_current_assessment_arithmetic,
@@ -30,7 +30,9 @@ def pillars(values):
 
 
 @pytest.mark.parametrize("case", [c for c in CASES if c["chapter"] == "順局"])
-def test_all_nine_exposed_source_routes_keep_their_visible_and_hidden_facts(case):
+def test_all_nine_exposed_source_routes_keep_their_visible_and_hidden_facts(
+    case,
+) -> None:
     p = pillars(case["pillars"])
     ref = build_from_child_reference(p)
     assert ref["ordinary_fuyi_requires_review"]
@@ -45,7 +47,7 @@ def test_all_nine_exposed_source_routes_keep_their_visible_and_hidden_facts(case
     assert from_child_snapshot_lines(profile)
 
 
-def test_month_visible_output_is_not_erased_by_a_peer_principal_branch():
+def test_month_visible_output_is_not_erased_by_a_peer_principal_branch() -> None:
     p = pillars(["庚子", "庚辰", "戊申", "辛酉"])
     ref = build_from_child_reference(p)
     month = ref["observed_conditions"][0]
@@ -68,7 +70,7 @@ def test_month_visible_output_is_not_erased_by_a_peer_principal_branch():
     }
 
 
-def test_hidden_wealth_and_obstructions_survive_instead_of_becoming_absent():
+def test_hidden_wealth_and_obstructions_survive_instead_of_becoming_absent() -> None:
     p = pillars(["己未", "丁丑", "丙戌", "戊戌"])
     ref = build_from_child_reference(p)
     wealth = ref["observed_conditions"][2]
@@ -102,8 +104,8 @@ def test_hidden_wealth_and_obstructions_survive_instead_of_becoming_absent():
     ],
 )
 def test_visible_opposing_stars_missing_wealth_and_missing_month_anchor_are_retained(
-    values, status
-):
+    values, status: str
+) -> None:
     ref = build_from_child_reference(pillars(values))
     assert ref["status"] == status
     assert not ref["ordinary_fuyi_requires_review"]
@@ -111,7 +113,9 @@ def test_visible_opposing_stars_missing_wealth_and_missing_month_anchor_are_reta
     FromChildReference.model_validate(ref)
 
 
-def test_all273_frozen_inputs_keep_current_arithmetic_and_from_child_reference():
+def test_all273_frozen_inputs_keep_current_arithmetic_and_from_child_reference() -> (
+    None
+):
     records = json.loads((ROOT / "tests/data/bazi/from-child-inputs.json").read_text())
     assert len(records) == 273
     for row in records:
@@ -125,7 +129,7 @@ def test_all273_frozen_inputs_keep_current_arithmetic_and_from_child_reference()
         FromChildReference.model_validate(profile["from_child_reference"])
 
 
-def test_structured_contract_keeps_projections_but_rejects_false_formation():
+def test_structured_contract_keeps_projections_but_rejects_false_formation() -> None:
     ref = build_from_child_reference(pillars(["庚子", "庚辰", "戊申", "辛酉"]))
     schema = FromChildReference.model_json_schema()
     for payload in [

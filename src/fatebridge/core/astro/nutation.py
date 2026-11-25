@@ -12,6 +12,8 @@ import math
 from pathlib import Path
 from typing import TypedDict
 
+from fatebridge.core.astro.tt_epoch import TTInstant
+
 
 class NutationParameters(TypedDict):
     source_url: str
@@ -25,6 +27,8 @@ _RAW = (
 ).read_bytes()
 if hashlib.sha256(_RAW).hexdigest() != COEFFICIENT_SHA256:
     raise RuntimeError("Nutation coefficients differ from the pinned native source")
+else:
+    pass
 _DATA: NutationParameters = json.loads(_RAW)
 SOURCE_URL = _DATA["source_url"]
 _TERMS = tuple(tuple(map(float, row)) for row in _DATA["terms"])
@@ -32,9 +36,9 @@ _FUNDAMENTAL = tuple(tuple(map(float, row)) for row in _DATA["fundamental_arcsec
 _AS2R = math.pi / 648000.0
 
 
-def nutation(epoch: float) -> tuple[float, float, float, float]:
+def nutation(epoch: float | TTInstant) -> tuple[float, float, float, float]:
     """dpsi,deps in degrees and analytic derivatives per TT argument day."""
-    t = (epoch - 2451545.0) / 36525.0
+    t = float((TTInstant.from_value(epoch).days - 2451545) / 36525)
     phases = []
     rates = []
     for polynomial in _FUNDAMENTAL:

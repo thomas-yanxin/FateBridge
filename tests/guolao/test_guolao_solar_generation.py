@@ -8,15 +8,20 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core import guolao_solar_generation as subject
-from fatebridge.core.guolao_conjunctions import GUJIN_COMPONENTS, solar_correction
-from fatebridge.core.guolao_daily_solar import POLICIES
-from fatebridge.validation.guolao_solar_generation import audit_solar_generation
+from fatebridge.core.guolao import guolao_solar_generation as subject
+from fatebridge.core.guolao.guolao_conjunctions import (
+    GUJIN_COMPONENTS,
+    solar_correction,
+)
+from fatebridge.core.guolao.guolao_daily_solar import POLICIES
+from validation.guolao_solar_generation import audit_solar_generation
 
 FIXTURE = Path(__file__).parents[1] / "fixtures/guolao-solar-generation-v1"
 
 
-def test_primary_images_plans_and_transcription_frozen_before_generator_output():
+def test_primary_images_plans_and_transcription_frozen_before_generator_output() -> (
+    None
+):
     reference = json.loads((FIXTURE / "reference.json").read_text())
     assert (
         hashlib.sha256(subject.DATA.read_bytes()).hexdigest()
@@ -31,7 +36,7 @@ def test_primary_images_plans_and_transcription_frozen_before_generator_output()
     assert not reference["complete_Gujin40_transcription_claimed"]
 
 
-def test_selected_checkpoint_fields_keep_literal_precision_and_blanks():
+def test_selected_checkpoint_fields_keep_literal_precision_and_blanks() -> None:
     raw = json.loads(subject.DATA.read_bytes())
     total = blank = 0
     for origin in ("winter", "summer"):
@@ -66,8 +71,8 @@ def test_selected_checkpoint_fields_keep_literal_precision_and_blanks():
     ],
 )
 def test_initial_seed_units_are_ten_thousand_source_fen_per_ancient_du(
-    origin, motion, difference, increment
-):
+    origin: str, motion: str, difference: str, increment: str
+) -> None:
     row = subject.load_generator(subject.GENERATOR_PROFILE).row(origin, 0)
     assert F(row["generated_motion_ancient_du_exact"]) == F(motion)
     assert F(row["generated_combined_difference_fen_exact"]) == F(difference)
@@ -76,7 +81,7 @@ def test_initial_seed_units_are_ten_thousand_source_fen_per_ancient_du(
     assert not row["rounding_applied"]
 
 
-def test_source_disagreements_are_retained_instead_of_tuning_recurrence():
+def test_source_disagreements_are_retained_instead_of_tuning_recurrence() -> None:
     audit = audit_solar_generation()
     rows = {
         (q["origin"], q["index"], q["field"]): q for q in audit["all_checkpoint_fields"]
@@ -93,7 +98,9 @@ def test_source_disagreements_are_retained_instead_of_tuning_recurrence():
     assert not audit["rounding_or_quantum_chosen_using_match_count"]
 
 
-def test_origin_and_terminal_blanks_are_not_fabricated_as_literal_zeros_or_rates():
+def test_origin_and_terminal_blanks_are_not_fabricated_as_literal_zeros_or_rates() -> (
+    None
+):
     generator = subject.load_generator(subject.GENERATOR_PROFILE)
     origin = generator.row("winter", 0)
     assert origin["generated_cumulative_correction_fen_exact"] == "0"
@@ -112,7 +119,9 @@ def test_origin_and_terminal_blanks_are_not_fabricated_as_literal_zeros_or_rates
     ) == F("24013.5032")
 
 
-def test_all185_integer_positions_obey_cubic_identity_without_an_accuracy_score():
+def test_all185_integer_positions_obey_cubic_identity_without_an_accuracy_score() -> (
+    None
+):
     audit = audit_solar_generation()
     rows = audit["all185_recurrence_polynomial_identities"]
     assert len(rows) == 185
@@ -122,7 +131,7 @@ def test_all185_integer_positions_obey_cubic_identity_without_an_accuracy_score(
     assert audit["modern_astronomical_reference_comparison"] is None
 
 
-def test_generated_values_compare_all366_literal_rates_without_rewriting_them():
+def test_generated_values_compare_all366_literal_rates_without_rewriting_them() -> None:
     model = subject.load_generated_daily_solar(subject.DAILY_PROFILE)
     assert model.literal.segments[1].rates[2] == F(".498519")
     assert model.trajectory.segments[1].rates[2] == F(".99851859")
@@ -137,7 +146,7 @@ def test_generated_values_compare_all366_literal_rates_without_rewriting_them():
     )
 
 
-def test_audit_does_not_present_generated_rate_sums_as_printed_source_values():
+def test_audit_does_not_present_generated_rate_sums_as_printed_source_values() -> None:
     model = subject.load_generated_daily_solar(subject.DAILY_PROFILE)
     report = model.audit()
     for record, generated, literal in zip(
@@ -164,7 +173,9 @@ def test_audit_does_not_present_generated_rate_sums_as_printed_source_values():
 
 
 @pytest.mark.parametrize("policy", POLICIES)
-def test_named_year_midnight_and_noon_grid_preserves_all_inputs_and_boundaries(policy):
+def test_named_year_midnight_and_noon_grid_preserves_all_inputs_and_boundaries(
+    policy,
+) -> None:
     model = subject.load_generated_daily_solar(subject.DAILY_PROFILE)
     for n in range(366):
         row = model.day(n, policy=policy)
@@ -193,7 +204,9 @@ def test_named_year_midnight_and_noon_grid_preserves_all_inputs_and_boundaries(p
             assert F(boundary["left_minus_right_du_exact"]) != 0
 
 
-def test_old_Gujin36_piecewise_correction_agrees_with_generated_interior_branches():
+def test_old_Gujin36_piecewise_correction_agrees_with_generated_interior_branches() -> (
+    None
+):
     generator = subject.load_generator(subject.GENERATOR_PROFILE)
     for n in range(89):
         source = solar_correction(F(n), profile_id=GUJIN_COMPONENTS)
@@ -208,7 +221,7 @@ def test_old_Gujin36_piecewise_correction_agrees_with_generated_interior_branche
 
 
 @pytest.mark.parametrize("value", [True, 1.0, F(1), "1"])
-def test_source_indices_do_not_coerce_floats_or_boolean_values(value):
+def test_source_indices_do_not_coerce_floats_or_boolean_values(value) -> None:
     with pytest.raises(TypeError):
         subject.load_generator(subject.GENERATOR_PROFILE).row("winter", value)
 
@@ -216,12 +229,14 @@ def test_source_indices_do_not_coerce_floats_or_boolean_values(value):
 @pytest.mark.parametrize(
     "origin,index", [("winter", -1), ("winter", 90), ("summer", -1), ("summer", 95)]
 )
-def test_generation_does_not_extend_past_selected_source_domain(origin, index):
+def test_generation_does_not_extend_past_selected_source_domain(
+    origin: str, index
+) -> None:
     with pytest.raises(ValueError):
         subject.load_generator(subject.GENERATOR_PROFILE).row(origin, index)
 
 
-def test_no_implicit_generator_profile_origin_or_daily_policy():
+def test_no_implicit_generator_profile_origin_or_daily_policy() -> None:
     with pytest.raises(ValueError):
         subject.load_generator("best_fit")
     with pytest.raises(ValueError):
@@ -236,8 +251,8 @@ def test_no_implicit_generator_profile_origin_or_daily_policy():
     "mutation", ["units", "seed", "float", "endpoint", "sign", "coefficients"]
 )
 def test_invalid_source_parameters_reject_instead_of_falling_back(
-    monkeypatch, tmp_path, mutation
-):
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, mutation: str
+) -> None:
     raw = json.loads(subject.DATA.read_bytes())
     branch = raw["branches"]["winter"]
     if mutation == "units":

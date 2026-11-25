@@ -10,13 +10,13 @@ import pytest
 from pydantic import ValidationError
 
 import fatebridge.application.execution as execution
+from fatebridge.core.contracts.output_chinese import Liuren
+from fatebridge.core.contracts.output_liuren_cross_harmony import LiurenCrossHarmony
+from fatebridge.core.contracts.output_ren_anchors import require_complete_ren_anchors
 from fatebridge.core.metaphysics.liureng_cross_harmony import (
     cross_harmony,
     cross_harmony_trace,
 )
-from fatebridge.core.output_chinese import Liuren
-from fatebridge.core.output_liuren_cross_harmony import LiurenCrossHarmony
-from fatebridge.core.output_ren_anchors import require_complete_ren_anchors
 from scripts.ren.audit_liuren_cross_harmony import (
     CORPUS,
     expected_facts,
@@ -42,7 +42,7 @@ def sky(rotation):
     return {b: branches[(i + rotation) % 12] for i, b in enumerate(branches)}
 
 
-def test_complete_frozen_answers_and_source_exception():
+def test_complete_frozen_answers_and_source_exception() -> None:
     rows = DATA["reference"]["contexts"]
     actual = []
     for row in rows:
@@ -59,7 +59,7 @@ def test_complete_frozen_answers_and_source_exception():
     } == {"甲寅", "庚申", "丁未", "己未", "癸丑"}
 
 
-def test_tanyuan_original_example_requires_both_crossed_pairs():
+def test_tanyuan_original_example_requires_both_crossed_pairs() -> None:
     value = cross_harmony("癸酉", sky(3))
     assert value["matched"] is True
     assert [(p["left_branch"], p["right_branch"]) for p in value["cross_pairs"]] == [
@@ -72,7 +72,9 @@ def test_tanyuan_original_example_requires_both_crossed_pairs():
 
 
 @pytest.mark.parametrize("day", ["甲寅", "庚申", "丁未", "己未", "癸丑"])
-def test_shared_anchor_facts_remain_true_but_named_pattern_is_excluded(day):
+def test_shared_anchor_facts_remain_true_but_named_pattern_is_excluded(
+    day: str,
+) -> None:
     rows = [
         r
         for r in DATA["reference"]["contexts"]
@@ -97,7 +99,9 @@ def test_shared_anchor_facts_remain_true_but_named_pattern_is_excluded(day):
         ("甲子", {**sky(0), "子": "丑", "丑": "子"}),
     ],
 )
-def test_invalid_or_noncyclic_inputs_cannot_manufacture_a_match(day, mapping):
+def test_invalid_or_noncyclic_inputs_cannot_manufacture_a_match(
+    day: str | None, mapping
+) -> None:
     with pytest.raises(ValueError):
         cross_harmony(day, mapping)
 
@@ -116,7 +120,7 @@ def test_invalid_or_noncyclic_inputs_cannot_manufacture_a_match(day, mapping):
         "wrong_match",
     ],
 )
-def test_contract_rejects_invented_present_facts(fault):
+def test_contract_rejects_invented_present_facts(fault: str) -> None:
     value = cross_harmony("癸酉", sky(3))
     if fault == "source":
         value["source_sha256"] = "invented"
@@ -149,12 +153,12 @@ def test_contract_rejects_invented_present_facts(fault):
         {"day_ganzhi": "癸酉", "day_stem_house": "亥"},
     ],
 )
-def test_sparse_sufficient_facts_cannot_contradict_their_conclusion(value):
+def test_sparse_sufficient_facts_cannot_contradict_their_conclusion(value) -> None:
     with pytest.raises(ValidationError):
         LiurenCrossHarmony.model_validate(value)
 
 
-def test_sparse_result_remains_a_projection_without_fabricated_siblings():
+def test_sparse_result_remains_a_projection_without_fabricated_siblings() -> None:
     value = LiurenCrossHarmony.model_validate({"matched": True})
     assert value.model_dump(exclude_unset=True) == {"matched": True}
     LiurenCrossHarmony.model_validate(
@@ -177,7 +181,9 @@ def test_sparse_result_remains_a_projection_without_fabricated_siblings():
 
 
 @pytest.mark.parametrize("fault", ["bytes", "coordinated_rehash", "extra", "missing"])
-def test_frozen_source_cannot_be_rewritten_or_narrowed(tmp_path, fault):
+def test_frozen_source_cannot_be_rewritten_or_narrowed(
+    tmp_path: Path, fault: str
+) -> None:
     folder = tmp_path / "source"
     shutil.copytree(CORPUS, folder)
     path = folder / "reference.json"
@@ -187,6 +193,8 @@ def test_frozen_source_cannot_be_rewritten_or_narrowed(tmp_path, fault):
             freeze = json.loads((folder / "freeze.json").read_text())
             freeze["files"][path.name] = sha(path)
             (folder / "freeze.json").write_text(json.dumps(freeze))
+        else:
+            pass
     elif fault == "extra":
         (folder / "remove-five-negative-cases.json").write_text("{}")
     else:
@@ -220,7 +228,9 @@ def results():
         "numeric_bool",
     ],
 )
-def test_full_output_checks_actual_day_board_and_unique_trace(results, key, fault):
+def test_full_output_checks_actual_day_board_and_unique_trace(
+    results, key: str, fault: str
+) -> None:
     value = copy.deepcopy(results[key])
     board = value["liureng"]
     trace = next(
@@ -230,6 +240,8 @@ def test_full_output_checks_actual_day_board_and_unique_trace(results, key, faul
         board.pop("cross_harmony")
         if fault == "old_version":
             board["ruleset"]["version"] = "0.0.0"
+        else:
+            pass
     elif fault == "foreign_consistent":
         day = "甲子" if board["cross_harmony"]["day_ganzhi"] != "甲子" else "乙丑"
         fake = cross_harmony(day, board["cross_harmony"]["sky_by_earth"])
@@ -249,7 +261,9 @@ def test_full_output_checks_actual_day_board_and_unique_trace(results, key, faul
     "key", ["liureng_gods", "liureng_runyear", "jinkou", "sanshiunited"]
 )
 @pytest.mark.parametrize("project", [False, True])
-def test_real_rest_native_mcp_cli_preserve_same_new_facts(key, project, surface_calls):
+def test_real_rest_native_mcp_cli_preserve_same_new_facts(
+    key: str, project: bool, surface_calls
+) -> None:
     spec = SPECS[key]
     path = "liureng.cross_harmony"
     params = [("as_of", AS_OF), ("response_char_limit", "0")]
@@ -270,6 +284,8 @@ def test_real_rest_native_mcp_cli_preserve_same_new_facts(key, project, surface_
             "false",
         ]
         options.update(fields=[path], strict_fields=True, include_snapshot_text=False)
+    else:
+        pass
     http, protocol, code, cli = surface_calls(
         spec,
         PAYLOADS[key],
@@ -291,8 +307,8 @@ def test_real_rest_native_mcp_cli_preserve_same_new_facts(key, project, surface_
 
 @pytest.mark.parametrize("project", [False, True])
 def test_broken_condition_is_rejected_before_projection_on_every_port(
-    project, monkeypatch, surface_calls
-):
+    project: bool, monkeypatch: pytest.MonkeyPatch, surface_calls
+) -> None:
     key = "liureng_gods"
     spec = SPECS[key]
     value = raw(key)
@@ -313,6 +329,8 @@ def test_broken_condition_is_rejected_before_projection_on_every_port(
         params += [("fields", "four_pillars"), ("strict_fields", "true")]
         flags += ["--fields", "four_pillars", "--strict-fields", "true"]
         options.update(fields=["four_pillars"], strict_fields=True)
+    else:
+        pass
     http, protocol, code, cli = surface_calls(
         spec,
         PAYLOADS[key],

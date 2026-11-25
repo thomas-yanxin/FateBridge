@@ -5,8 +5,9 @@ from datetime import datetime, timezone
 
 import pytest
 
-from fatebridge.core import guolao, guolao_timing
 from fatebridge.core.astro.birth import build_astro_birth_info
+from fatebridge.core.guolao import guolao, guolao_timing
+from fatebridge.core.sukuyo.suzhan_astronomy import build_equatorial_mansions
 from fatebridge.services.astrology import calculate_core_chart_analysis
 from fatebridge.utils.places import resolve_birth_place_context
 
@@ -23,7 +24,7 @@ CASE = dict(
 
 @pytest.mark.parametrize("zone", ["UTC", "+08:00", "Asia/Shanghai"])
 @pytest.mark.parametrize("solar", [False, True])
-def test_explicit_timezone_including_utc_is_known_input(zone, solar):
+def test_explicit_timezone_including_utc_is_known_input(zone: str, solar: bool) -> None:
     birth = build_astro_birth_info(
         **CASE, birth_timezone=zone, use_true_solar_time=solar, preserve_instant=True
     )
@@ -38,7 +39,9 @@ def test_explicit_timezone_including_utc_is_known_input(zone, solar):
 @pytest.mark.parametrize(
     "place,zone", [("上海", "Asia/Shanghai"), ("New York", "America/New_York")]
 )
-def test_resolved_place_can_supply_timezone_without_moving_the_clock(place, zone):
+def test_resolved_place_can_supply_timezone_without_moving_the_clock(
+    place: str, zone: str
+) -> None:
     birth = build_astro_birth_info(**CASE, birth_place=place)
     assert birth.timezone_source == "birth_place"
     assert birth.timezone == zone
@@ -55,8 +58,8 @@ def test_resolved_place_can_supply_timezone_without_moving_the_clock(place, zone
 @pytest.mark.parametrize("place", [None, "未提供", "虚构的未知出生地", "通州区"])
 @pytest.mark.parametrize("solar", [False, True])
 def test_unresolved_timezone_rejects_before_native_ephemeris_calls(
-    monkeypatch, place, solar
-):
+    monkeypatch: pytest.MonkeyPatch, place: str | None, solar: bool
+) -> None:
     assert resolve_birth_place_context(place).timezone is None
     birth = build_astro_birth_info(
         **CASE, birth_place=place, use_true_solar_time=solar, preserve_instant=True
@@ -83,7 +86,7 @@ def test_unresolved_timezone_rejects_before_native_ephemeris_calls(
     assert "guolao" not in result
 
 
-def test_direct_temporal_layer_rejects_unknown_birth_before_reading_a_payload():
+def test_direct_temporal_layer_rejects_unknown_birth_before_reading_a_payload() -> None:
     birth = build_astro_birth_info(**CASE)
     with pytest.raises(ValueError, match="未知出生时区"):
         guolao_timing.enrich_guolao_timing(
@@ -91,10 +94,9 @@ def test_direct_temporal_layer_rejects_unknown_birth_before_reading_a_payload():
         )
 
 
-def test_shared_position_only_consumer_keeps_its_existing_timezone_policy():
+def test_shared_position_only_consumer_keeps_its_existing_timezone_policy() -> None:
     # Suzhan shares the sky helper; Guolao's input policy belongs to its chart
     # and timing entry points, not to every caller of physical positions.
-    from fatebridge.core.suzhan_astronomy import build_equatorial_mansions
 
     birth = build_astro_birth_info(**CASE)
     shared = build_equatorial_mansions(birth)
@@ -104,7 +106,7 @@ def test_shared_position_only_consumer_keeps_its_existing_timezone_policy():
     assert shared == explicit
 
 
-def test_a_known_mean_solar_record_does_not_masquerade_as_default_utc():
+def test_a_known_mean_solar_record_does_not_masquerade_as_default_utc() -> None:
     # Shared builder provenance only; this does not enable noncivil Guolao input.
     birth = build_astro_birth_info(**CASE, birth_clock_basis="local_mean_solar")
     assert birth.timezone == "UTC"
@@ -112,7 +114,7 @@ def test_a_known_mean_solar_record_does_not_masquerade_as_default_utc():
     assert birth.clock_conversion is not None
 
 
-def test_shared_default_stays_tagged_but_western_chart_requires_a_known_zone():
+def test_shared_default_stays_tagged_but_western_chart_requires_a_known_zone() -> None:
     # Position-only legacy construction remains distinguishable. The Western
     # chart entrypoint now requires an explicit or place-resolved civil zone.
     birth = build_astro_birth_info(**CASE)
@@ -128,7 +130,7 @@ def test_shared_default_stays_tagged_but_western_chart_requires_a_known_zone():
     assert "error" not in explicit
 
 
-def test_explicit_different_offsets_cannot_be_replaced_by_a_longitude_guess():
+def test_explicit_different_offsets_cannot_be_replaced_by_a_longitude_guess() -> None:
     utc = calculate_core_chart_analysis(
         **CASE, birth_timezone="UTC", chart_variant="guolao_chart"
     )

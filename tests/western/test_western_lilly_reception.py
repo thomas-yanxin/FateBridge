@@ -15,29 +15,31 @@ from types import SimpleNamespace
 import pytest
 from jsonschema import Draft202012Validator
 
+from fatebridge.core.astro.astrology_election import _dignity
+from fatebridge.core.astro.astrology_horary import _applying_aspect, _planet_state
+from fatebridge.core.astro.horary_conditions import (
+    _moon_next_target,
+    evaluate_lilly_conditions,
+)
+from fatebridge.core.astro.lilly import dignity_at, pair_reception, reception
 from fatebridge.core.astro.parts import _essential_dignity
-from fatebridge.core.astrology_election import _dignity
-from fatebridge.core.astrology_horary import _applying_aspect, _planet_state
+from fatebridge.core.astro.ptolemy_terms import terms_at
 from fatebridge.core.classical_western import (
     build_planet_classical,
     essential_dignities,
 )
-from fatebridge.core.horary_conditions import (
-    _moon_next_target,
-    evaluate_lilly_conditions,
-)
-from fatebridge.core.lilly import dignity_at, pair_reception, reception
-from fatebridge.core.output_western import Horary
-from fatebridge.core.ptolemy_terms import terms_at
+from fatebridge.core.contracts.output_western import Horary
 from fatebridge.services.astrology import _build_classical_lines
 from fatebridge.services.western_horary import calculate_horary
-from tests.western.test_western_horary import QUESTION
+from tests.unit_test.fixtures.western_event_cases import QUESTION
 
 PATH = Path(__file__).parents[1] / "fixtures/western-lilly-reception-1647.json"
 REFERENCE = json.loads(PATH.read_text())
 
 
-def test_manual_source_frozen_before_runtime_and_not_substituted_by_another_edition():
+def test_manual_source_frozen_before_runtime_and_not_substituted_by_another_edition() -> (
+    None
+):
     assert (
         hashlib.sha256(PATH.read_bytes()).hexdigest()
         == "23f6494920ed94e9e5c82f8a4710590b3fcb3652c3f29e5f3314031c71fb4a99"
@@ -64,6 +66,8 @@ def printed_lords(longitude, sect):
         value = Decimal.from_float(longitude) % Decimal(360)
         if value < 0:
             value += 360
+        else:
+            pass
         index, degree = int(value // 30), value % 30
         sign = REFERENCE["term_endpoints"][index][0]
         term = next(
@@ -85,7 +89,9 @@ def printed_lords(longitude, sect):
 
 
 @pytest.mark.parametrize("sect", ["day", "night"])
-def test_all_printed_cells_and_every_term_boundary_have_decimal_reference(sect):
+def test_all_printed_cells_and_every_term_boundary_have_decimal_reference(
+    sect: str,
+) -> None:
     count = 0
     for index, row in enumerate(REFERENCE["term_endpoints"]):
         for _, endpoint in row[1:]:
@@ -111,21 +117,21 @@ def test_all_printed_cells_and_every_term_boundary_have_decimal_reference(sect):
 @pytest.mark.parametrize(
     "value", [-math.ulp(0.0), math.nextafter(30.0, 0), math.nextafter(360.0, 0)]
 )
-def test_unrounded_partition_is_not_promoted_during_float_delivery(value):
+def test_unrounded_partition_is_not_promoted_during_float_delivery(value) -> None:
     result = dignity_at("Venus", value, "day")
     assert result["lords"] == printed_lords(value, "day")
     assert 0 <= result["degree_in_sign"] < 30 and 0 <= result["longitude"] < 360
 
 
 @pytest.mark.parametrize("row", REFERENCE["p112_examples"])
-def test_printed_p112_reciprocal_examples(row):
+def test_printed_p112_reciprocal_examples(row) -> None:
     (first, lon_a), (second, lon_b) = row["bodies"].items()
     result = pair_reception(first, lon_a, second, lon_b, row.get("sect", "day"))
     assert result["mutual"] is True
     assert result["mutual_same_kind"] == row["mutual_same_kind"]
 
 
-def test_sect_specific_triplicity_and_mars_both_sects_water():
+def test_sect_specific_triplicity_and_mars_both_sects_water() -> None:
     day = pair_reception("Venus", 18, "Sun", 31, "day")
     night = pair_reception("Venus", 18, "Sun", 31, "night")
     assert "triplicity" in day["mutual_same_kind"]
@@ -138,7 +144,7 @@ def test_sect_specific_triplicity_and_mars_both_sects_water():
             assert "triplicity" in dignity_at("Mars", longitude, sect)["dignities"]
 
 
-def test_unknown_sect_is_unknown_only_for_affected_fact_not_an_invented_night():
+def test_unknown_sect_is_unknown_only_for_affected_fact_not_an_invented_night() -> None:
     result = dignity_at("Jupiter", 123.0, None)
     assert result["peregrine"] is None and result["unknown_dignities"] == ["triplicity"]
     assert reception("Jupiter", "Mercury", 123.0, None)["receives"] is None
@@ -164,7 +170,7 @@ def test_unknown_sect_is_unknown_only_for_affected_fact_not_an_invented_night():
     assert "三分待定" in text and "分值待定" in text and "(+0)" not in text
 
 
-def test_one_way_reception_is_not_mutual_and_same_body_not_bilateral():
+def test_one_way_reception_is_not_mutual_and_same_body_not_bilateral() -> None:
     result = pair_reception("Sun", 10, "Mars", 100, "day")
     assert result["mutual"] is False
     assert {
@@ -174,7 +180,9 @@ def test_one_way_reception_is_not_mutual_and_same_body_not_bilateral():
     assert same["mutual"] is None and same["directions"] == []
 
 
-def test_sign_only_summary_does_not_claim_peregrine_without_all_five_dignities():
+def test_sign_only_summary_does_not_claim_peregrine_without_all_five_dignities() -> (
+    None
+):
     for sign, longitude, minor_dignity in [
         ("Taurus", 55.0, "bound"),
         ("Sagittarius", 267.0, "face"),
@@ -186,13 +194,17 @@ def test_sign_only_summary_does_not_claim_peregrine_without_all_five_dignities()
 
 
 @pytest.mark.parametrize("row", REFERENCE["peregrine_examples"])
-def test_peregrine_means_no_positive_dignity_even_if_fallen(row):
+def test_peregrine_means_no_positive_dignity_even_if_fallen(row) -> None:
     result = dignity_at(row["planet"], row["longitude"], row["sect"])
     assert result["peregrine"] is row["peregrine"]
     if "simultaneous_debility" in row:
         assert row["simultaneous_debility"] in result["debilities"]
+    else:
+        pass
     if "positive_dignity" in row:
         assert row["positive_dignity"] in result["dignities"]
+    else:
+        pass
     shared = essential_dignities("Saturn", "Aries", 10.0, True)
     assert shared["peregrine"] is True and "fall" in shared["debilities"]
     assert "游离" in shared["labels_zh"] and "平" not in shared["labels_zh"]
@@ -231,7 +243,9 @@ def evaluate(states, first, second, *, sect="day", motion=None, zodiac="Tropic")
     return result
 
 
-def test_all_routes_are_kept_and_p126_translation_does_not_accept_exaltation_alone():
+def test_all_routes_are_kept_and_p126_translation_does_not_accept_exaltation_alone() -> (
+    None
+):
     states = synthetic_states(Sun=(15, 1.0))
     result = evaluate(states, "Sun", "Saturn", sect="night")
     assert any(r["mode"] == "direct" for r in result["routes"])
@@ -249,7 +263,7 @@ def test_all_routes_are_kept_and_p126_translation_does_not_accept_exaltation_alo
     )
 
 
-def test_p126_collection_reception_direction_is_endpoints_receive_collector():
+def test_p126_collection_reception_direction_is_endpoints_receive_collector() -> None:
     states = synthetic_states(Saturn=(350, 0.03), Venus=(42, 1.0), Mars=(256, 0.5))
     result = evaluate(states, "Venus", "Mars")
     route = next(r for r in result["routes"] if r.get("collector") == "Saturn")
@@ -261,7 +275,7 @@ def test_p126_collection_reception_direction_is_endpoints_receive_collector():
     assert route["status"] == "remaining_conditions_unverified"
 
 
-def test_p125_opposition_does_not_replace_mutual_domicile_with_exaltation():
+def test_p125_opposition_does_not_replace_mutual_domicile_with_exaltation() -> None:
     result = evaluate(
         synthetic_states(Saturn=(10, 0.03), Sun=(189, 1.0)), "Saturn", "Sun"
     )
@@ -295,7 +309,7 @@ def fake_motion(*events, ambiguous=()):
     }
 
 
-def test_native_window_order_gate_is_tristate_and_not_inferred_from_orb_order():
+def test_native_window_order_gate_is_tristate_and_not_inferred_from_orb_order() -> None:
     assert _moon_next_target("Saturn", fake_motion(("Saturn", 2451546.0)))[0] is True
     assert (
         _moon_next_target(
@@ -310,12 +324,21 @@ def test_native_window_order_gate_is_tristate_and_not_inferred_from_orb_order():
         )[0]
         is None
     )
+    edge = math.nextafter(2451546.0, math.inf)
+    assert (
+        _moon_next_target(
+            "Saturn", fake_motion(("Saturn", 2451546.0), ("Jupiter", edge))
+        )[0]
+        is True
+    )
     linear = fake_motion(("Saturn", 2451546.0))
     linear["constant_velocity_projection"] = True
     assert _moon_next_target("Saturn", linear)[0] is None
 
 
-def test_lunar_translation_route_uses_actual_event_order_gate_not_only_current_orb():
+def test_lunar_translation_route_uses_actual_event_order_gate_not_only_current_orb() -> (
+    None
+):
     states = synthetic_states(Moon=(24, 13), Mars=(23, 0.5), Saturn=(28, 0.03))
     for events, expected in [
         ((("Saturn", 2451546.0),), True),
@@ -336,7 +359,9 @@ def test_lunar_translation_route_uses_actual_event_order_gate_not_only_current_o
         assert route["full_path_accepted"] is False
 
 
-def test_unknown_zodiac_and_illegal_self_reception_do_not_get_source_acceptance():
+def test_unknown_zodiac_and_illegal_self_reception_do_not_get_source_acceptance() -> (
+    None
+):
     result = evaluate(synthetic_states(), "Mars", "Saturn", zodiac=None)
     assert result["coordinate_scope"] == "unknown_or_unsupported_zodiac"
     with pytest.raises(ValueError, match="Distinct"):
@@ -345,7 +370,9 @@ def test_unknown_zodiac_and_illegal_self_reception_do_not_get_source_acceptance(
         pair_reception("Pluto", 0, "Pluto", 0, "day")
 
 
-def test_native_service_carries_source_fact_receipts_and_keeps_whole_judgement_open():
+def test_native_service_carries_source_fact_receipts_and_keeps_whole_judgement_open() -> (
+    None
+):
     result = calculate_horary(**QUESTION, category="marriage")
     assert "error" not in result, result
     h = result["horary"]
@@ -357,18 +384,17 @@ def test_native_service_carries_source_fact_receipts_and_keeps_whole_judgement_o
     condition = h["perfection"]["lilly_conditions"]
     assert condition["chart_sect"] == "day"
     assert condition["coordinate_scope"] == "tropical_selected_edition"
-    assert h["perfection"]["perfects"] is None and h["verdict"] == "uncertain"
+    assert h["perfection"]["status"] == "source_conditions_incomplete"
     assert condition["principal_reception"]["mutual_same_kind"] == ["face"]
     assert condition["p112_mutual_reception"]["premise_satisfied"] is True
-    assert h["perfection"]["candidate"] is False
-    assert "reported_separately" in h["perfection"]["candidate_scope"]
-    assert "历史分离" in h["reasoning"]
+    assert condition["full_original_text_acceptance"] is False
+    assert h["perfection"]["event_history"]["status"] == "computed"
     assert "lilly_conditions" in result["snapshot_text"]
     fake = SimpleNamespace(sun=SimpleNamespace(abs_pos=123, speed=1))
     assert _planet_state(fake, "Sun")["essential_condition"]["chart_sect"] is None
 
 
 @pytest.mark.parametrize("value", [math.nan, math.inf, -math.inf])
-def test_invalid_longitude_is_rejected(value):
+def test_invalid_longitude_is_rejected(value) -> None:
     with pytest.raises(ValueError):
         dignity_at("Sun", value, "day")

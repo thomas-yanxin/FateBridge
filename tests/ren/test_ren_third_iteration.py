@@ -14,7 +14,7 @@ from fatebridge.services.metaphysics import (
     calculate_jinkou_analysis,
     calculate_liureng_gods,
 )
-from tests.ren.test_ren_classical_depth import AUDIT as V1
+from scripts.ren import audit_ren_classical
 
 ROOT = Path(__file__).resolve().parents[2]
 SPEC = importlib.util.spec_from_file_location(
@@ -30,7 +30,8 @@ def board(day, upper):
     houses = dict(zip("甲乙丙丁戊己庚辛壬癸", "寅辰巳未巳未申戌亥丑"))
     offset = (branches.index(upper) - branches.index(houses[day[0]])) % 12
     return build_liureng_board(
-        V1.make_seed(dict(day=day, hour="子")), month_general_override=branches[offset]
+        audit_ren_classical.make_seed(dict(day=day, hour="子")),
+        month_general_override=branches[offset],
     )
 
 
@@ -52,8 +53,8 @@ def board(day, upper):
     ],
 )
 def test_named_subtypes_follow_explicit_source_rules_and_selected_scan(
-    day, upper, labels
-):
+    day: str, upper: str, labels
+) -> None:
     result = board(day, upper)
     assert result["classification"]["labels"] == labels
     assert (
@@ -66,7 +67,9 @@ def test_named_subtypes_follow_explicit_source_rules_and_selected_scan(
     )
 
 
-def test_subtype_count_keeps_duplicate_lessons_even_when_selection_deduplicates():
+def test_subtype_count_keeps_duplicate_lessons_even_when_selection_deduplicates() -> (
+    None
+):
     result = board("甲子", "辰")
     assert result["classification"]["lower_thief_lessons"] == [1, 4]
     assert result["classification"]["upper_killer_lessons"] == []
@@ -83,8 +86,8 @@ def test_subtype_count_keeps_duplicate_lessons_even_when_selection_deduplicates(
     ],
 )
 def test_known_source_annotations_are_visible_without_overriding_the_calculation(
-    day, upper, annotation, page
-):
+    day: str, upper: str, annotation: str, page: int
+) -> None:
     result = board(day, upper)
     detail = result["classification"]
     assert detail["source_note"]["annotation"] == annotation
@@ -97,7 +100,7 @@ def test_known_source_annotations_are_visible_without_overriding_the_calculation
     assert f"影印表注{annotation}" in detail["basis"]
 
 
-def test_full_label_comparison_keeps_raw_errors_and_unresolved_annotations():
+def test_full_label_comparison_keeps_raw_errors_and_unresolved_annotations() -> None:
     report = AUDIT.audit()
     assert report["implemented_rule_checks_passed"]
     names = report["names"]
@@ -126,8 +129,8 @@ def test_full_label_comparison_keeps_raw_errors_and_unresolved_annotations():
     assert any(r["status"] == "unverified" for r in report["requirement_inventory"])
 
 
-def test_progressing_month_qi_is_not_the_seasonal_five_state_label():
-    result = V1.observe_jinkou(
+def test_progressing_month_qi_is_not_the_seasonal_five_state_label() -> None:
+    result = audit_ren_classical.observe_jinkou(
         dict(day="甲子", hour="子", ground="子", general="卯", month="寅")
     )
     general = next(row for row in result["rows"] if row["label"] == "将神")
@@ -144,8 +147,8 @@ def test_progressing_month_qi_is_not_the_seasonal_five_state_label():
     )
 
 
-def test_day_support_uses_day_branch_and_does_not_invent_a_daily_five_state():
-    result = V1.observe_jinkou(
+def test_day_support_uses_day_branch_and_does_not_invent_a_daily_five_state() -> None:
+    result = audit_ren_classical.observe_jinkou(
         dict(day="甲申", hour="子", ground="子", general="亥", month="寅")
     )
     qi = result["qi_evidence"]
@@ -160,7 +163,7 @@ def test_day_support_uses_day_branch_and_does_not_invent_a_daily_five_state():
 @pytest.mark.parametrize(
     "calculate", [calculate_liureng_gods, calculate_jinkou_analysis]
 )
-def test_supplied_seconds_survive_one_minute_zhongqi_transition(calculate):
+def test_supplied_seconds_survive_one_minute_zhongqi_transition(calculate) -> None:
     term = next(
         t for t in get_solar_terms_for_year(2026, "Asia/Shanghai") if t.name == "雨水"
     )
@@ -189,7 +192,7 @@ def test_supplied_seconds_survive_one_minute_zhongqi_transition(calculate):
 
 
 @pytest.mark.parametrize("name", ["naming.json", "qi.json", "source-pages.pdf"])
-def test_new_reference_cannot_silently_drift(tmp_path, name):
+def test_new_reference_cannot_silently_drift(tmp_path: Path, name: str) -> None:
     target = tmp_path / "reference"
     shutil.copytree(AUDIT.CORPUS, target)
     p = target / name
@@ -198,8 +201,8 @@ def test_new_reference_cannot_silently_drift(tmp_path, name):
         AUDIT.load_reference(target)
 
 
-def test_older_reference_layers_are_unchanged():
-    original = V1.load_frozen_corpus()
+def test_older_reference_layers_are_unchanged() -> None:
+    original = audit_ren_classical.load_frozen_corpus()
     assert len(original["cases"]["unresolved"]) == 2
     raw = json.loads(
         (ROOT / "tests/fixtures/ren_depth_v2/tanyuan-table.json").read_text()

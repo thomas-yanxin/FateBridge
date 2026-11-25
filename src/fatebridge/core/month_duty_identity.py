@@ -40,6 +40,8 @@ def build_month_duty_identities(
             identity = identities.get(claim["source_name"])
             if identity is None:
                 continue
+            else:
+                pass
             stem = identity["canonical_stem"]
             observations.append(
                 {

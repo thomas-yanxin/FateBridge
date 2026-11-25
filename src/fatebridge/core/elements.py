@@ -3,9 +3,11 @@ Five Elements analysis for BaZi calculations.
 """
 
 from collections import defaultdict
-from typing import Any, DefaultDict, Dict, List, Tuple
+from typing import Any, DefaultDict
 
-from ..utils.data import (
+from fatebridge.core.classical_force import adjudicate_classical_force
+from fatebridge.core.strength import assess_strength
+from fatebridge.utils.data import (
     BRANCH_ELEMENTS,
     BRANCH_HIDDEN_STEMS,
     DESTRUCTION_CYCLE,
@@ -14,11 +16,9 @@ from ..utils.data import (
     Element,
     get_ten_god,
 )
-from .classical_force import adjudicate_classical_force
-from .strength import assess_strength
 
 
-def _fuyi_elements(day_element: Element, strength: str) -> List[Element]:
+def _fuyi_elements(day_element: Element, strength: str) -> list[Element]:
     if strength == "强":
         controller = next(
             e
@@ -30,11 +30,15 @@ def _fuyi_elements(day_element: Element, strength: str) -> List[Element]:
             controller,
             DESTRUCTION_CYCLE[day_element],
         ]
+    else:
+        pass
     if strength == "弱":
         parent = next(
             e for e, generated in GENERATION_CYCLE.items() if generated == day_element
         )
         return [day_element, parent]
+    else:
+        pass
     return []
 
 
@@ -63,14 +67,14 @@ class ElementAnalysis:
     )
 
     @staticmethod
-    def seasonal_phases(month_branch: str) -> Dict[str, str]:
+    def seasonal_phases(month_branch: str) -> dict[str, str]:
         """各五行相对月令的旺衰相位（旺 / 相 / 休 / 囚 / 死）。
 
         经典确定映射，无主观加权：与月令同类为旺；月令所生为相；生月令者为休；
         克月令者为囚；月令所克者为死。补足 element_distribution 缺失的旺衰维度。
         """
         month_element = BRANCH_ELEMENTS[month_branch][0]
-        phases: Dict[str, str] = {}
+        phases: dict[str, str] = {}
         for element in Element:
             if element == month_element:
                 phase = "旺"
@@ -86,7 +90,7 @@ class ElementAnalysis:
         return phases
 
     @staticmethod
-    def count_elements(pillars: Dict[str, Tuple[str, str]]) -> Dict[Element, float]:
+    def count_elements(pillars: dict[str, tuple[str, str]]) -> dict[Element, float]:
         """Count the occurrence of each element in the chart."""
         element_count: DefaultDict[Element, float] = defaultdict(float)
 
@@ -106,11 +110,13 @@ class ElementAnalysis:
         return dict(element_count)
 
     @staticmethod
-    def convert_to_percentage(element_counts: Dict[Element, float]) -> Dict[str, float]:
+    def convert_to_percentage(element_counts: dict[Element, float]) -> dict[str, float]:
         """Convert element counts to percentages."""
         total = sum(element_counts.values())
         if total == 0:
             return {elem.value: 0.0 for elem in Element}
+        else:
+            pass
 
         percentages = {}
         for element, count in element_counts.items():
@@ -127,28 +133,29 @@ class ElementAnalysis:
             # 把残差并到占比最大的元素上，使总和恰为 100%。
             max_key = max(percentages.keys(), key=lambda k: percentages[k])
             percentages[max_key] = round(percentages[max_key] + residual, 1)
+        else:
+            pass
 
         return percentages
 
     @staticmethod
-    def validate_percentage_total(percentages: Dict[str, float]) -> bool:
+    def validate_percentage_total(percentages: dict[str, float]) -> bool:
         """Validate that percentages sum to 100% within tolerance."""
         total = sum(percentages.values())
         return abs(total - 100.0) <= 0.1
 
     @staticmethod
     def analyze_day_master_strength(
-        pillars: Dict[str, Tuple[str, str]],
-    ) -> Dict[str, Any]:
+        pillars: dict[str, tuple[str, str]],
+    ) -> dict[str, Any]:
         """Analyze the strength of the day master (日主)."""
         day_master_stem = pillars["day"][0]
         day_master_element, day_master_polarity = STEM_ELEMENTS[day_master_stem]
 
         element_counts = ElementAnalysis.count_elements(pillars)
         element_percentages = ElementAnalysis.convert_to_percentage(element_counts)
-        assessment = assess_strength(
-            pillars, ElementAnalysis.seasonal_phases(pillars["month"][1])
-        )
+        seasonal_phases = ElementAnalysis.seasonal_phases(pillars["month"][1])
+        assessment = assess_strength(pillars, seasonal_phases)
         return {
             "assessment": assessment,
             "engineering_index": assessment["engineering_index"],
@@ -165,15 +172,13 @@ class ElementAnalysis:
                 for element_enum, count in element_counts.items()
             },  # Keep raw scores for internal calculations
             "element_distribution_basis": ElementAnalysis.DISTRIBUTION_BASIS,
-            "element_seasonal_phase": ElementAnalysis.seasonal_phases(
-                pillars["month"][1]
-            ),
+            "element_seasonal_phase": seasonal_phases,
         }
 
     @staticmethod
     def analyze_ten_gods(
-        pillars: Dict[str, Tuple[str, str]],
-    ) -> Dict[str, List[Dict[str, str]]]:
+        pillars: dict[str, tuple[str, str]],
+    ) -> dict[str, list[dict[str, str]]]:
         """Analyze the Ten Gods relationships in the chart."""
         day_master_stem = pillars["day"][0]
         ten_gods_analysis = {}
@@ -193,6 +198,8 @@ class ElementAnalysis:
                         "ten_god": ten_god_relationship.value,
                     }
                 )
+            else:
+                pass
 
             # Analyze hidden stems in branch
             hidden_stems_in_branch = BRANCH_HIDDEN_STEMS[pillar_branch]
@@ -217,18 +224,22 @@ class ElementAnalysis:
 
     @staticmethod
     def get_engineering_favorable_elements(
-        day_master_analysis: Dict[str, Any],
-    ) -> List[Element]:
+        day_master_analysis: dict[str, Any],
+    ) -> list[Element]:
         """Preserve the declared engineering policy, without source adjudication."""
         day_master_element: Element | None = None
         for element_enum in Element:
             if element_enum.value == day_master_analysis["day_element"]:
                 day_master_element = element_enum
                 break
+            else:
+                pass
         if day_master_element is None:
             raise ValueError(
                 f"Unknown day element: {day_master_analysis['day_element']!r}"
             )
+        else:
+            pass
 
         assessment = day_master_analysis.get("assessment", {})
         if (
@@ -237,13 +248,15 @@ class ElementAnalysis:
             or assessment.get("status") == "boundary_sensitive"
         ):
             return []
+        else:
+            pass
         return _fuyi_elements(
             day_master_element,
             day_master_analysis["engineering_index"]["strength_level"],
         )
 
     @staticmethod
-    def get_favorable_elements(day_master_analysis: Dict[str, Any]) -> List[Element]:
+    def get_favorable_elements(day_master_analysis: dict[str, Any]) -> list[Element]:
         """Use a source conclusion only when its ordinary-balance route is established."""
         adjudication = day_master_analysis["classical_adjudication"]
         if (
@@ -252,12 +265,14 @@ class ElementAnalysis:
             or adjudication["body_strength"] is None
         ):
             return []
+        else:
+            pass
         return _fuyi_elements(
             Element(day_master_analysis["day_element"]), adjudication["body_strength"]
         )
 
     @staticmethod
-    def comprehensive_analysis(pillars: Dict[str, Tuple[str, str]]) -> Dict[str, Any]:
+    def comprehensive_analysis(pillars: dict[str, tuple[str, str]]) -> dict[str, Any]:
         """Perform comprehensive element analysis."""
         day_master_analysis = ElementAnalysis.analyze_day_master_strength(pillars)
         ten_gods_analysis = ElementAnalysis.analyze_ten_gods(pillars)
@@ -298,5 +313,7 @@ class ElementAnalysis:
             result["warning"] = (
                 f"百分比总和异常: {result['percentage_validation']['total']}%"
             )
+        else:
+            pass
 
         return result

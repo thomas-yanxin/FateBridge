@@ -6,14 +6,14 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.sukuyo import calendar_mansion, day_evidence
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence
 
 BEFORE_PATH = Path(__file__).parents[1] / "data/sukuyo-arc-clock-before-code-v111.json"
 BEFORE = json.loads(BEFORE_PATH.read_bytes())
 ROOT = Path(__file__).resolve().parents[2]
 
 
-def test_bound_first_readings_and_correction_are_unchanged():
+def test_bound_first_readings_and_correction_are_unchanged() -> None:
     for record in BEFORE["source_records"]:
         assert (
             hashlib.sha256((ROOT / record["public_record"]).read_bytes()).hexdigest()
@@ -21,7 +21,9 @@ def test_bound_first_readings_and_correction_are_unchanged():
         )
 
 
-def test_day_reference_exposes_layers_without_inventing_a_boundary_or_priority():
+def test_day_reference_exposes_layers_without_inventing_a_boundary_or_priority() -> (
+    None
+):
     calendar = calendar_mansion(
         "0806-07-23",
         "23:59:00",
@@ -52,9 +54,9 @@ def test_day_reference_exposes_layers_without_inventing_a_boundary_or_priority()
 
 
 def test_unknown_glyph_and_reported_exemplar_cannot_be_silently_normalized(
-    tmp_path, monkeypatch
-):
-    from fatebridge.core import sukuyo_arc_clock as source
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from fatebridge.core.sukuyo import sukuyo_arc_clock as source
 
     changed = json.loads(BEFORE_PATH.read_bytes())
     changed["selected_readings"][1]["accepted_unique_glyph"] = "晝"
@@ -66,8 +68,8 @@ def test_unknown_glyph_and_reported_exemplar_cannot_be_silently_normalized(
         source.arc_clock_reference()
 
 
-def test_reading_references_are_detached_from_caller_mutation():
-    from fatebridge.core.sukuyo_arc_clock import arc_clock_reference
+def test_reading_references_are_detached_from_caller_mutation() -> None:
+    from fatebridge.core.sukuyo.sukuyo_arc_clock import arc_clock_reference
 
     first = arc_clock_reference()
     first["selected_readings"][1]["accepted_unique_glyph"] = "每"

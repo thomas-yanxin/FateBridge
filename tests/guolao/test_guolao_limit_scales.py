@@ -8,7 +8,11 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.guolao_limits import LIMIT_SCALES, limit_scale, limit_scale_audit
+from fatebridge.core.guolao.guolao_limits import (
+    LIMIT_SCALES,
+    limit_scale,
+    limit_scale_audit,
+)
 
 ROOT = Path(__file__).parents[2]
 FIXTURE = Path(__file__).parents[1] / "fixtures/guolao-limit-scale-v1"
@@ -16,7 +20,9 @@ REFERENCE = json.loads((FIXTURE / "reference.json").read_text())
 
 
 @pytest.mark.parametrize("entry", REFERENCE["images"])
-def test_facsimiles_used_for_new_readings_keep_original_attribution_and_bytes(entry):
+def test_facsimiles_used_for_new_readings_keep_original_attribution_and_bytes(
+    entry,
+) -> None:
     assert (
         hashlib.sha256((FIXTURE / entry["path"]).read_bytes()).hexdigest()
         == entry["sha256"]
@@ -25,14 +31,14 @@ def test_facsimiles_used_for_new_readings_keep_original_attribution_and_bytes(en
 
 
 @pytest.mark.parametrize("entry", REFERENCE["image76"]["duration_transcriptions"])
-def test_duration_from_facsimile_not_a_generic_twelve_palace_default(entry):
+def test_duration_from_facsimile_not_a_generic_twelve_palace_default(entry) -> None:
     for palace in entry["palaces"]:
         assert limit_scale(palace).years == Fraction(entry["years_exact"])
         assert limit_scale(palace).palaces == tuple(entry["palaces"])
 
 
 @pytest.mark.parametrize("entry", REFERENCE["image77"]["selected_first_cell_intervals"])
-def test_selected_printed_inclusive_dates_agree_with_nominal_ruler(entry):
+def test_selected_printed_inclusive_dates_agree_with_nominal_ruler(entry) -> None:
     # Source dates have a one-based ordinal year/month/day. A printed end date
     # includes that entire nominal day. This check does not convert to UTC.
     def ordinal(parts):
@@ -44,7 +50,7 @@ def test_selected_printed_inclusive_dates_agree_with_nominal_ruler(entry):
     assert end * 360 == ordinal(entry["end_inclusive"])
 
 
-def test_known_printed_rate_discrepancies_are_visible_and_not_normalized():
+def test_known_printed_rate_discrepancies_are_visible_and_not_normalized() -> None:
     scales = {s["palaces"][0]: s for s in limit_scale_audit()["scales"]}
     assert scales["福德"]["printed_full_span_scale_degrees_exact"] == "299277/10000"
     assert scales["福德"]["printed_full_span_minus_30_exact"] == "-723/10000"
@@ -59,7 +65,7 @@ def test_known_printed_rate_discrepancies_are_visible_and_not_normalized():
     assert position["printed_rate_scale_degrees_exact"] == "299277/10000"
 
 
-def test_fifteenth_cell_disagreement_remains_in_source_oracle():
+def test_fifteenth_cell_disagreement_remains_in_source_oracle() -> None:
     observed = REFERENCE["image77"]["suspect_cell_preserved"]
     start, end = limit_scale("福德").cell_interval(15)
     assert start == Fraction(77, 15)
@@ -72,7 +78,9 @@ def test_fifteenth_cell_disagreement_remains_in_source_oracle():
 
 
 @pytest.mark.parametrize("scale", LIMIT_SCALES, ids=lambda s: s.palaces[0])
-def test_exact_fractional_boundaries_no_wrap_and_no_fabricated_next_palace(scale):
+def test_exact_fractional_boundaries_no_wrap_and_no_fabricated_next_palace(
+    scale,
+) -> None:
     tick = scale.years_per_degree
     epsilon = Fraction(1, 10**80)
     assert scale.position(tick - epsilon)["cell"] == 1
@@ -89,7 +97,7 @@ def test_exact_fractional_boundaries_no_wrap_and_no_fabricated_next_palace(scale
         scale.position(scale.years + epsilon)
 
 
-def test_manual_nonuniform_local_speed_examples_and_exact_inverse():
+def test_manual_nonuniform_local_speed_examples_and_exact_inverse() -> None:
     assert (
         limit_scale("官禄").position(Fraction(3, 2))["limit_scale_degrees_exact"] == "3"
     )
@@ -102,7 +110,9 @@ def test_manual_nonuniform_local_speed_examples_and_exact_inverse():
 
 
 @pytest.mark.parametrize("value", [0, 1.0, True, "1", None])
-def test_float_and_implicit_input_units_rejected(value):
+def test_float_and_implicit_input_units_rejected(
+    value: bool | float | int | str | None,
+) -> None:
     scale = limit_scale("官禄")
     with pytest.raises(TypeError):
         scale.position(value)
@@ -111,12 +121,12 @@ def test_float_and_implicit_input_units_rejected(value):
 
 
 @pytest.mark.parametrize("cell", [0, 31, -1, True, 1.0, "1"])
-def test_invalid_table_cells_rejected(cell):
+def test_invalid_table_cells_rejected(cell) -> None:
     with pytest.raises((ValueError, TypeError)):
         limit_scale("官禄").cell_interval(cell)
 
 
-def test_invalid_custom_scale_and_unresolved_life_limit_not_filled():
+def test_invalid_custom_scale_and_unresolved_life_limit_not_filled() -> None:
     with pytest.raises(ValueError):
         limit_scale("命")
     with pytest.raises(TypeError):
@@ -129,7 +139,7 @@ def test_invalid_custom_scale_and_unresolved_life_limit_not_filled():
         limit_scale("官禄").elapsed_years(Fraction(31))
 
 
-def test_source_six_palace_correction_does_not_become_global_modern_offset():
+def test_source_six_palace_correction_does_not_become_global_modern_offset() -> None:
     note = REFERENCE["image86"]
     assert note["short_palaces"] == ["亥", "戌", "酉", "申", "未", "卯"]
     assert note["rejected_old_examples"] == ["氐二過卯", "畢七過申"]

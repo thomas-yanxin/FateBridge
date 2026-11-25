@@ -20,6 +20,8 @@ def opposite_star_comparison(chart: dict[str, Any]) -> dict[str, Any]:
         or chart["chart_mode"] not in {"lower", "replacement"}
     ):
         raise ValueError("对宫比较须有九个不同宫位及已知宅盘模式")
+    else:
+        pass
     for role in ("mountain", "facing"):
         values = chart[role + "_chart"]
         if (
@@ -28,10 +30,14 @@ def opposite_star_comparison(chart: dict[str, Any]) -> dict[str, Any]:
             or sorted(values.values()) != list(range(1, 10))
         ):
             raise ValueError("对宫比较须保留两盘各自完整的一至九星")
+        else:
+            pass
     pairs = {}
     for direction in chart["flight_path"]:
         if direction == "C":
             continue
+        else:
+            pass
         opposite = OPPOSITE[direction]
         mountain = chart["mountain_chart"][direction]
         facing = chart["facing_chart"][opposite]

@@ -6,8 +6,8 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.sukuyo import calendar_mansion, day_evidence
-from fatebridge.core.sukuyo_weekday import (
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence
+from fatebridge.core.sukuyo.sukuyo_weekday import (
     classical_mean_cycle_arithmetic,
     classical_solar_recalculation,
     classical_weekday_arithmetic,
@@ -25,7 +25,7 @@ def fraction(row):
     return Fraction(row["numerator"], row["denominator"])
 
 
-def test_omission_printed_decimal_is_rounded_not_uniformly_truncated():
+def test_omission_printed_decimal_is_rounded_not_uniformly_truncated() -> None:
     result = classical_mean_cycle_arithmetic(137)
     omitted = result["omission_days"]
     assert omitted["rounded_decimal_12"] == "15112.873399715505"
@@ -34,7 +34,7 @@ def test_omission_printed_decimal_is_rounded_not_uniformly_truncated():
     assert fraction(omitted) + fraction(result["mean_accumulated_days"]) == 965850
 
 
-def test_general_bias_integer_and_later_fractional_methods_remain_distinct():
+def test_general_bias_integer_and_later_fractional_methods_remain_distinct() -> None:
     general = classical_weekday_arithmetic(2603, 0, 0)
     later = classical_mean_cycle_arithmetic(137)
     assert general["trace"]["omission_numerator"] == 10624850
@@ -48,7 +48,7 @@ def test_general_bias_integer_and_later_fractional_methods_remain_distinct():
     )
 
 
-def test_printed_scaled_year_is_divided_by_10000_before_multiplication():
+def test_printed_scaled_year_is_divided_by_10000_before_multiplication() -> None:
     result = classical_solar_recalculation(2603)
     assert fraction(result["baseline_year_days"]) == Fraction("365.242349669203")
     assert fraction(result["recalibrated_year_days"]) == Fraction("365.244342041162105")
@@ -65,7 +65,7 @@ def test_printed_scaled_year_is_divided_by_10000_before_multiplication():
     assert not result["modern_tropical_year_accuracy_accepted"]
 
 
-def test_printed_year_products_never_round_through_binary_float():
+def test_printed_year_products_never_round_through_binary_float() -> None:
     result = classical_solar_recalculation(2603)
     expected = Fraction("950731.022333144959315")
     assert fraction(result["recalibrated_accumulated_days"]) == expected
@@ -78,7 +78,7 @@ def test_printed_year_products_never_round_through_binary_float():
 
 
 @pytest.mark.parametrize("bad", [True, -1, 137.0, "137", None])
-def test_no_civil_year_inference_or_noninteger_cycle_counts(bad):
+def test_no_civil_year_inference_or_noninteger_cycle_counts(bad) -> None:
     for method in (classical_mean_cycle_arithmetic, classical_solar_recalculation):
         with pytest.raises(ValueError):
             method(bad)
@@ -92,8 +92,8 @@ def test_no_civil_year_inference_or_noninteger_cycle_counts(bad):
     ],
 )
 def test_missing_host_boundary_cannot_be_reported_as_verified_utc08(
-    basis, civil, expected
-):
+    basis: str, civil: str, expected: str
+) -> None:
     context = calendar_mansion(civil, "12:00:00", "+09:00", calendar_basis=basis)
     assert day_evidence(context)["weekday"]["luminary"] == expected
     del context["calendar_timezone"]
@@ -101,7 +101,9 @@ def test_missing_host_boundary_cannot_be_reported_as_verified_utc08(
         day_evidence(context)
 
 
-def test_source_discrepancy_is_retained_and_one_weekday_is_not_epoch_acceptance():
+def test_source_discrepancy_is_retained_and_one_weekday_is_not_epoch_acceptance() -> (
+    None
+):
     result = verify_recalculation()
     assert not result["errors"]
     assert len(result["decimal_product_controls"]) == 4
@@ -119,7 +121,7 @@ def test_source_discrepancy_is_retained_and_one_weekday_is_not_epoch_acceptance(
     assert not result["full_secular_correction_implemented"]
 
 
-def test_captures_fail_closed_when_image_bytes_change(tmp_path):
+def test_captures_fail_closed_when_image_bytes_change(tmp_path: Path) -> None:
     (tmp_path / FIXTURE["captured_pages"][0]["file"]).write_bytes(b"wrong image")
     with pytest.raises(ValueError, match="fingerprint"):
         verify_recalculation(tmp_path)

@@ -357,17 +357,20 @@
   },
   "input": {
     "additionalProperties": false,
+    "description": "Request model for Taiyi analysis.\n\n太乙 does NOT take 奇门's ``qimen_options`` (layout/palaceShift) — it used to\ninherit ``QimenAnalysisRequest`` purely to reuse the date/time fields, which\nleaked ``qimen_options`` onto the 太乙 schema where it is meaningless. The\nfields below are exactly what ``calculate_taiyi_analysis`` consumes.",
     "properties": {
       "analysis_day": {
         "description": "Analysis day (1-31)",
         "maximum": 31,
         "minimum": 1,
+        "title": "Analysis Day",
         "type": "integer"
       },
       "analysis_hour": {
         "description": "Analysis hour (0-23)",
         "maximum": 23,
         "minimum": 0,
+        "title": "Analysis Hour",
         "type": "integer"
       },
       "analysis_longitude": {
@@ -382,19 +385,22 @@
           }
         ],
         "default": null,
-        "description": "Analysis longitude"
+        "description": "Analysis longitude",
+        "title": "Analysis Longitude"
       },
       "analysis_minute": {
         "default": 0,
         "description": "Analysis minute (0-59)",
         "maximum": 59,
         "minimum": 0,
+        "title": "Analysis Minute",
         "type": "integer"
       },
       "analysis_month": {
         "description": "Analysis month (1-12)",
         "maximum": 12,
         "minimum": 1,
+        "title": "Analysis Month",
         "type": "integer"
       },
       "analysis_second": {
@@ -402,6 +408,7 @@
         "description": "起盘秒数，用于节气实刻边界；不是秒级预测精度。",
         "maximum": 59,
         "minimum": 0,
+        "title": "Analysis Second",
         "type": "integer"
       },
       "analysis_timezone": {
@@ -414,7 +421,8 @@
           }
         ],
         "default": null,
-        "description": "Analysis timezone (IANA name or UTC offset)"
+        "description": "Analysis timezone (IANA name or UTC offset)",
+        "title": "Analysis Timezone"
       },
       "analysis_utc_offset": {
         "anyOf": [
@@ -426,23 +434,13 @@
           }
         ],
         "default": null,
-        "description": "明确的输入民用UTC偏移，格式±HH:MM或±HH:MM:SS；与analysis_timezone在该钟时联合核对，用于选择夏令时回拨中的一次，不替换命名时区。省略仍拒绝重复钟时；不存在的钟时及与时区不符的偏移均拒绝。不能按盘面结果猜选偏移。"
+        "description": "明确的输入民用UTC偏移，格式±HH:MM或±HH:MM:SS；与analysis_timezone在该钟时联合核对，用于选择夏令时回拨中的一次，不替换命名时区。省略仍拒绝重复钟时；不存在的钟时及与时区不符的偏移均拒绝。不能按盘面结果猜选偏移。",
+        "title": "Analysis Utc Offset"
       },
       "analysis_year": {
         "description": "推算公历年，例如2026；历史儒略历标签须先明确转换，不按1582年自动切换历制。",
+        "title": "Analysis Year",
         "type": "integer"
-      },
-      "as_of": {
-        "anyOf": [
-          {
-            "type": "string"
-          },
-          {
-            "type": "null"
-          }
-        ],
-        "default": null,
-        "description": "Freeze implicit current time: ISO 8601 datetime with timezone"
       },
       "calculation_mode": {
         "default": "year",
@@ -453,27 +451,8 @@
           "day",
           "hour"
         ],
+        "title": "Calculation Mode",
         "type": "string"
-      },
-      "compact": {
-        "default": true,
-        "description": "紧凑 JSON 输出（无缩进）；设为 false 则美化缩进。默认 true。",
-        "type": "boolean"
-      },
-      "fields": {
-        "anyOf": [
-          {
-            "items": {
-              "type": "string"
-            },
-            "type": "array"
-          },
-          {
-            "type": "null"
-          }
-        ],
-        "default": null,
-        "description": "仅返回选定字段以节省 token：接受顶层键（如 'snapshot_text'）或点路径子字段（如 'bazi_birth.day_master'）。run_metadata 始终保留；留空请求全部字段，超出响应字符预算的部分由 result_delivery 保留供读取。无效路径默认附 projection_warnings；strict_fields=true 时拒绝。"
       },
       "gender": {
         "anyOf": [
@@ -485,7 +464,8 @@
           }
         ],
         "default": "未知",
-        "description": "性别（可选）。接受 男/女、male/female/m/f、阳/阴、乾/坤 等写法；省略默认 未知；当前年计不使用性别定局。"
+        "description": "性别（可选）。接受 男/女、male/female/m/f、阳/阴、乾/坤 等写法；省略默认 未知；当前年计不使用性别定局。",
+        "title": "Gender"
       },
       "hour_profile": {
         "anyOf": [
@@ -501,12 +481,8 @@
           }
         ],
         "default": null,
-        "description": "仅hour时计：省略用jinjing_hour_solstice_v1（现代至点置一）；key_hour_winter_jiazi_v1按金钥匙冬至前甲子日连续积时、时支合神和阴阳四门，仍为现代日期/23时子初适配，非古历全书认证。不可按吉凶结果择优。"
-      },
-      "include_snapshot_text": {
-        "default": true,
-        "description": "是否包含人类可读的 snapshot_text 文本段（默认随工具而定）；设为 false 可显著减少返回的 token 数。",
-        "type": "boolean"
+        "description": "仅hour时计：省略用jinjing_hour_solstice_v1（现代至点置一）；key_hour_winter_jiazi_v1按金钥匙冬至前甲子日连续积时、时支合神和阴阳四门，仍为现代日期/23时子初适配，非古历全书认证。不可按吉凶结果择优。",
+        "title": "Hour Profile"
       },
       "month_profile": {
         "anyOf": [
@@ -522,63 +498,21 @@
           }
         ],
         "default": null,
-        "description": "仅month：省略为jinjing_month_jie_360_v1；key_month_tianzheng_jie_v1采用金钥匙完年乘十二、加天地二正和本月名义序，仍以现代节月为界，非完整古历月界；源文门数冲突保留，不按吉凶择法。"
-      },
-      "parent_run_id": {
-        "anyOf": [
-          {
-            "type": "string"
-          },
-          {
-            "type": "null"
-          }
-        ],
-        "default": null,
-        "description": "Parent call's run_id; correlation only, no stored execution lookup"
-      },
-      "response_char_limit": {
-        "anyOf": [
-          {
-            "const": 0,
-            "type": "integer"
-          },
-          {
-            "maximum": 65536,
-            "minimum": 4096,
-            "type": "integer"
-          }
-        ],
-        "default": 8192,
-        "description": "完整 JSON 响应字符预算：0 不限制，或 4096–65536。MCP 默认 8192，REST/CLI 默认 0。超限不截断数据，返回 result_delivery 完整结果引用和可读取字段；按 manifest_uri 或字段分页读取原 run 的数据，不要重新计算或解析单页为完整文档。"
+        "description": "仅month：省略为jinjing_month_jie_360_v1；key_month_tianzheng_jie_v1采用金钥匙完年乘十二、加天地二正和本月名义序，仍以现代节月为界，非完整古历月界；源文门数冲突保留，不按吉凶择法。",
+        "title": "Month Profile"
       },
       "selected_sections": {
-        "default": [],
         "description": "Optional snapshot section titles for filtered export payload",
         "items": {
           "type": "string"
         },
+        "title": "Selected Sections",
         "type": "array"
-      },
-      "strict_fields": {
-        "default": false,
-        "description": "是否拒绝无效 fields 路径；默认 false，使用宽松投影并返回警告。",
-        "type": "boolean"
-      },
-      "trace_id": {
-        "anyOf": [
-          {
-            "type": "string"
-          },
-          {
-            "type": "null"
-          }
-        ],
-        "default": null,
-        "description": "Caller trace ID"
       },
       "use_true_solar_time": {
         "default": false,
         "description": "年计农历岁首按输入钟表日期；月计按真实节气瞬间。日/时计为true时用经度及均时差的本地真太阳钟，为false时按时区钟表标签计数。日计所选钟面零时换日，时计23时子初，不能混用。",
+        "title": "Use True Solar Time",
         "type": "boolean"
       },
       "year_profile": {
@@ -596,7 +530,8 @@
           }
         ],
         "default": null,
-        "description": "仅year：省略或jinjing_year_lunar_civil_v1保留通用现代农历岁首；jinjing_year_historical_table_v1选381—385晋历主表；jinjing_year_qiliang_table_v1选501—505齐梁史历表，保留502年闰四月及未决闰五月／六月候选。两者范围外均拒绝。输入仍用推算公历和明确时区；非全部古历、并立王朝异历或原典岁首裁定，不按吉凶择法。"
+        "description": "仅year：省略或jinjing_year_lunar_civil_v1保留通用现代农历岁首；jinjing_year_historical_table_v1选381—385晋历主表；jinjing_year_qiliang_table_v1选501—505齐梁史历表，保留502年闰四月及未决闰五月／六月候选。两者范围外均拒绝。输入仍用推算公历和明确时区；非全部古历、并立王朝异历或原典岁首裁定，不按吉凶择法。",
+        "title": "Year Profile"
       }
     },
     "required": [
@@ -605,6 +540,7 @@
       "analysis_day",
       "analysis_hour"
     ],
+    "title": "TaiyiAnalysisRequest",
     "type": "object"
   },
   "method_contracts": [

@@ -7,12 +7,20 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.validation.meihua_weather_policy_v2 import (
+from fatebridge.application.examples import suggested_fields
+from tests.support.transports import (
+    SPECS,
+    business,
+    call_cli,
+    native,
+    rest,
+    surface_calls,
+)
+from validation.meihua_weather_policy_v2 import (
     canonical_sha256,
     full_cohort_assessment,
     qualified_weather_label,
 )
-from tests.support.transports import rest, surface_calls
 
 REFERENCES = Path(__file__).parents[1] / "fixtures/meihua_weather_policy_v2"
 MANIFEST = json.loads((REFERENCES / "manifest.json").read_text())
@@ -35,6 +43,8 @@ def synthetic(case):
                 if conditional
                 else "qualified_by_source_control" if controlled else "matched"
             )
+        else:
+            pass
         traces.append(
             {
                 "rule_id": rule["id"],
@@ -65,7 +75,7 @@ def label(weather):
     )
 
 
-def test_frozen_policy_examples_keep_their_original_bytes():
+def test_frozen_policy_examples_keep_their_original_bytes() -> None:
     assert (
         hashlib.sha256((REFERENCES / "cases.json").read_bytes()).hexdigest()
         == MANIFEST["cases_sha256"]
@@ -75,7 +85,7 @@ def test_frozen_policy_examples_keep_their_original_bytes():
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
-def test_manually_declared_synthetic_policy_cases(case):
+def test_manually_declared_synthetic_policy_cases(case) -> None:
     result = label(synthetic(case))
     assert result["label"] == case["expected_label"]
     assert result["research_operationalization_only"]
@@ -98,7 +108,9 @@ def test_manually_declared_synthetic_policy_cases(case):
         "fake_engine_forecast",
     ],
 )
-def test_incomplete_or_changed_traces_cannot_supply_successful_labels(mutation):
+def test_incomplete_or_changed_traces_cannot_supply_successful_labels(
+    mutation: str,
+) -> None:
     weather = synthetic(CASES[0])
     row = next(r for r in weather["rule_trace"] if r["rule_id"] == "symbol_kan")
     if mutation == "version":
@@ -125,7 +137,7 @@ def test_incomplete_or_changed_traces_cannot_supply_successful_labels(mutation):
         label(weather)
 
 
-def test_one_correct_forecast_and_365_abstentions_cannot_pass_as_100_percent():
+def test_one_correct_forecast_and_365_abstentions_cannot_pass_as_100_percent() -> None:
     report = {
         "cohort_days": 366,
         "correct": 1,
@@ -161,10 +173,8 @@ def test_one_correct_forecast_and_365_abstentions_cannot_pass_as_100_percent():
 
 @pytest.mark.parametrize("tool", ["meihua_analysis", "meihua_cast"])
 def test_old_and_current_negative_studies_remain_separate_on_all_transports(
-    tool, surface_calls
-):
-    from fatebridge.application.examples import suggested_fields
-    from tests.support.transports import SPECS, business, call_cli, native
+    tool: str, surface_calls
+) -> None:
 
     spec = SPECS[tool]
     payload = (

@@ -8,6 +8,7 @@ from fastmcp import Client
 
 from fatebridge import mcp_server
 from fatebridge.cli import run as cli_run
+from tests.support.transports import call_calculation
 
 
 def save_json(path, value):
@@ -24,9 +25,13 @@ def file_payload(value, manifest, folder, name):
     reference = value.get("result_delivery")
     if not reference:
         return value
+    else:
+        pass
     locator = manifest or reference
     if manifest:
         verify_identity(reference, value["run_metadata"], manifest)
+    else:
+        pass
     raw = Path(locator["file_path"]).read_bytes()
     (folder / (name + "-same-run-file.json.gz")).write_bytes(
         gzip.compress(raw, mtime=0)
@@ -41,8 +46,11 @@ def file_payload(value, manifest, folder, name):
 
 async def native_with_manifest(spec, payload, as_of, flags, folder):
     async with Client(mcp_server.app) as client:
-        result = await client.call_tool(
-            spec.tool_name, {**payload, "as_of": as_of, **flags}, raise_on_error=False
+        result = await call_calculation(
+            client,
+            spec.tool_name,
+            {**payload, "as_of": as_of, **flags},
+            raise_on_error=False,
         )
         value = result.structured_content
         save_json(folder / "mcp-original-response.json", value)
@@ -54,6 +62,8 @@ async def native_with_manifest(spec, payload, as_of, flags, folder):
             manifest = json.loads(blocks[0].text)
             save_json(folder / "mcp-manifest.json", manifest)
             verify_identity(value["result_delivery"], value["run_metadata"], manifest)
+        else:
+            pass
         return result, manifest
 
 
@@ -61,8 +71,12 @@ def cli_payload(value, folder, capsys):
     reference = value.get("result_delivery")
     if not reference:
         return value
+    else:
+        pass
     if "file_path" in reference:
         return file_payload(value, None, folder, "cli")
+    else:
+        pass
     offset = 0
     pages = []
     while True:
@@ -87,6 +101,8 @@ def cli_payload(value, folder, capsys):
         pages.append(page["text"])
         if page["next_offset"] is None:
             break
+        else:
+            pass
         assert page["next_offset"] > offset
         offset = page["next_offset"]
     text = "".join(pages)

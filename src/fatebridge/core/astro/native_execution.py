@@ -10,32 +10,54 @@ from __future__ import annotations
 
 import hashlib
 import json
-import math
 import os
 import queue
-import re
 import subprocess
 import sys
 import time
-from dataclasses import fields
-from datetime import datetime
 from pathlib import Path
 from threading import Thread
-from typing import Any, Callable
+from typing import Any, Protocol
 
+from pydantic import JsonValue
+
+from fatebridge.core.astro.native_wire import (
+    RESULT_ENCODING,
+    NativeExecutionError,
+    decode,
+    decode_result,
+    encode,
+    encode_result,
+)
+from fatebridge.core.compressed_ephemeris import endpoint_context_evidence
+from fatebridge.core.ephemeris_paths import ephemeris_search_directories
 from fatebridge.core.execution_context import (
     clock_snapshot,
     merge_clock_reads,
 )
-from fatebridge.utils.civil_time import datetime_fromisoformat_preserving_offset
 from fatebridge.utils.errors import EphemerisSourceError, JyotishCalculationError
+
+__all__ = [
+    "RESULT_ENCODING",
+    "AuxiliaryInputs",
+    "NativeExecutionError",
+    "calculate",
+    "context_evidence",
+    "context_for_entry",
+    "decode",
+    "decode_result",
+    "encode",
+    "encode_result",
+    "in_native_worker",
+    "message_bytes",
+]
 
 _WORKER_ACTIVE = False
 _ENTRIES = {
-    "fatebridge.core.human_design_cycle_input.validate_cycle_reference",
+    "fatebridge.core.human_design.human_design_cycle_input.validate_cycle_reference",
     "fatebridge.services.human_design.calculate_human_design",
-    "fatebridge.core.jyotish.positions",
-    "fatebridge.core.jyotish.build_india",
+    "fatebridge.core.jyotish.jyotish.positions",
+    "fatebridge.core.jyotish.jyotish.build_india",
     "fatebridge.services.jyotish.calculate_vimshottari",
     "fatebridge.services.astrology.calculate_core_chart_analysis",
 }
@@ -44,28 +66,42 @@ _TIMEOUT = 1800.0
 _AUXILIARY_EVIDENCE: dict[str, Any] | None = None
 
 
+class NativeSampleObserver(Protocol):
+    def __call__(
+        self, offset_seconds: float, sample: dict[str, JsonValue], /
+    ) -> None: ...
+
+
 class AuxiliaryInputs:
     """Endpoint fingerprints, including absent files that could shadow a source.
 
-    Swiss 2.10.03 swi_fopen uses at most 20 path components; Unix accepts both
-    colon and semicolon, Windows semicolon. These are candidate identities,
-    not proof that a particular native call read a candidate file.
+    The ordered candidates follow the same path parser as source diagnostics.
+    Each identity describes a possible native input at the endpoint.
     """
 
     def __init__(self, search_path: str | None) -> None:
-        directories = re.split(";" if os.name == "nt" else "[;:]", search_path or ".")[
-            :20
-        ]
-        self.paths = [
-            Path(directory or ".").absolute() / name
-            for directory in directories
+        selected = search_path or "."
+        depths = {
+            name: len(ephemeris_search_directories(selected, filename=name))
             for name in ("swe_deltat.txt", "sedeltat.txt", "seleapsec.txt")
+        }
+        # Keep the receipt's three slots per root. An unreachable filename
+        # is absent by the native path-buffer rule, even if it exists on disk.
+        self.paths = [
+            directory.absolute() / name if index < depth else None
+            for index, directory in enumerate(ephemeris_search_directories(selected))
+            for name, depth in depths.items()
         ]
         self.initial = self.snapshot()
 
     def snapshot(self) -> list[Any]:
-        rows = []
+        rows: list[list[int | str | None]] = []
         for index, path in enumerate(self.paths):
+            if path is None:
+                rows.append([index, None, None])
+                continue
+            else:
+                pass
             try:
                 digest = hashlib.sha256()
                 with path.open("rb") as source:
@@ -74,7 +110,7 @@ class AuxiliaryInputs:
                         size += len(chunk)
                         digest.update(chunk)
                 rows.append([index, size, digest.hexdigest()])
-            except FileNotFoundError:
+            except (FileNotFoundError, NotADirectoryError):
                 rows.append([index, None, None])
             except OSError as error:
                 raise EphemerisSourceError("auxiliary_unavailable") from error
@@ -83,6 +119,8 @@ class AuxiliaryInputs:
     def check(self) -> None:
         if self.snapshot() != self.initial:
             raise EphemerisSourceError("auxiliary_changed_during")
+        else:
+            pass
 
     def evidence(self) -> dict[str, Any]:
         return {
@@ -92,142 +130,49 @@ class AuxiliaryInputs:
             "auxiliary_files_present": [
                 {
                     "search_index": index // 3,
-                    "filename": self.paths[index].name,
+                    "filename": path.name,
                     "bytes": size,
                     "sha256": digest,
                 }
-                for index, size, digest in self.initial
-                if digest is not None
+                for path, (index, size, digest) in zip(self.paths, self.initial)
+                if path is not None and digest is not None
             ],
             "scope": "Clock inversion, physical coordinates, houses, solar events and all grid samples share this private native context. Auxiliary search candidates are fingerprinted at calculation endpoints; identities do not prove atomic reads, table validity or astronomical accuracy.",
         }
 
 
 def context_for_entry(entry: str) -> dict[str, str]:
-    if entry == "fatebridge.core.human_design_cycle_input.validate_cycle_reference":
+    if (
+        entry
+        == "fatebridge.core.human_design.human_design_cycle_input.validate_cycle_reference"
+    ):
         return {
             "lifetime": "one_human_design_cycle_request_validation",
             "scope": "Request-only birth/reference TT ordering in a fresh native process. The calculation revalidates in its separate whole-operation context. Auxiliary candidate identities do not prove atomic reads, table validity or physical accuracy.",
         }
+    else:
+        pass
     if entry == "fatebridge.services.human_design.calculate_human_design":
-        from fatebridge.core.human_design_context import CONTEXT_LIFETIME, CONTEXT_SCOPE
+        from fatebridge.core.human_design.human_design_context import (
+            CONTEXT_LIFETIME,
+            CONTEXT_SCOPE,
+        )
 
         return {"lifetime": CONTEXT_LIFETIME, "scope": CONTEXT_SCOPE}
+    else:
+        pass
     return {}
 
 
 def context_evidence() -> dict[str, Any]:
-    from fatebridge.core.compressed_ephemeris import endpoint_context_evidence
-
     return {
         **(_AUXILIARY_EVIDENCE or {"mechanism": "local_engine_context"}),
         "compressed_file_endpoint_policy": endpoint_context_evidence(),
     }
 
 
-class NativeExecutionError(RuntimeError):
-    """Bounded, non-input-bearing failure of the private calculation process."""
-
-
 def in_native_worker() -> bool:
     return _WORKER_ACTIVE
-
-
-RESULT_ENCODING = "native_result_v1"
-
-
-def _json_tree(value: Any) -> bool:
-    """Exact finite JSON types only; do not erase tuples or typed objects."""
-    if value is None or type(value) in (str, bool, int):
-        return True
-    if type(value) is float:
-        return math.isfinite(value)
-    if type(value) is list:
-        return all(_json_tree(item) for item in value)
-    if type(value) is dict:
-        return all(type(key) is str and _json_tree(item) for key, item in value.items())
-    return False
-
-
-def encode_result(value: Any) -> Any:
-    """One explicit result envelope, preserving JSON and typed object values."""
-    if _json_tree(value):
-        return [RESULT_ENCODING, "json", value]
-    return [RESULT_ENCODING, "typed", encode(value)]
-
-
-def decode_result(value: Any) -> Any:
-    if not isinstance(value, list) or len(value) != 3 or value[0] != RESULT_ENCODING:
-        raise NativeExecutionError("Invalid native result envelope")
-    if value[1] == "json":
-        if not _json_tree(value[2]):
-            raise NativeExecutionError("Invalid native JSON tree")
-        return value[2]
-    if value[1] == "typed":
-        return decode(value[2])
-    raise NativeExecutionError("Invalid native result representation")
-
-
-def encode(value: Any) -> Any:
-    """Typed JSON only; maps cannot impersonate protocol type envelopes."""
-    from fatebridge.core.astro.birth import AstroBirthInfo
-
-    if value is None or isinstance(value, (str, bool, int)):
-        return value
-    if isinstance(value, float):
-        if not math.isfinite(value):
-            raise ValueError("Native calculation values must be finite")
-        return value
-    if isinstance(value, datetime):
-        zone = getattr(value.tzinfo, "key", None) or getattr(value.tzinfo, "zone", None)
-        return ["datetime", value.isoformat(), zone, value.fold]
-    if isinstance(value, AstroBirthInfo):
-        return [
-            "birth",
-            encode({f.name: getattr(value, f.name) for f in fields(value)}),
-        ]
-    if isinstance(value, dict):
-        return ["map", [[encode(k), encode(v)] for k, v in value.items()]]
-    if isinstance(value, (tuple, list)):
-        return [
-            "tuple" if isinstance(value, tuple) else "list",
-            [encode(v) for v in value],
-        ]
-    raise TypeError("Unsupported native calculation argument type")
-
-
-def decode(value: Any) -> Any:
-    if not isinstance(value, list):
-        if value is None or isinstance(value, (str, bool, int)):
-            return value
-        if isinstance(value, float) and math.isfinite(value):
-            return value
-        raise NativeExecutionError("Invalid native calculation value")
-    if not value:
-        raise NativeExecutionError("Invalid native calculation envelope")
-    tag = value[0]
-    if tag == "datetime" and len(value) == 4:
-        moment = datetime_fromisoformat_preserving_offset(value[1])
-        if value[2] is not None:
-            from fatebridge.utils.timezones import parse_timezone_name
-
-            # Use the package's pinned TZif, as birth normalization does. The
-            # host ZoneInfo database can contain different historical rules.
-            named = moment.replace(tzinfo=parse_timezone_name(value[2]), fold=value[3])
-            if named.utcoffset() != moment.utcoffset():
-                raise NativeExecutionError("Native datetime zone offset changed")
-            moment = named
-        return moment.replace(fold=value[3])
-    if tag == "birth" and len(value) == 2:
-        from fatebridge.core.astro.birth import AstroBirthInfo
-
-        return AstroBirthInfo(**decode(value[1]))
-    if tag == "map" and len(value) == 2:
-        return {decode(k): decode(v) for k, v in value[1]}
-    if tag in {"list", "tuple"} and len(value) == 2:
-        items = [decode(v) for v in value[1]]
-        return tuple(items) if tag == "tuple" else items
-    raise NativeExecutionError("Invalid native calculation envelope")
 
 
 def message_bytes(message: dict[str, Any]) -> bytes:
@@ -241,20 +186,20 @@ def message_bytes(message: dict[str, Any]) -> bytes:
     )
     if len(payload) > _MAX_MESSAGE:
         raise NativeExecutionError("Native calculation message exceeds limit")
+    else:
+        pass
     return payload
 
 
-def _receive(process: subprocess.Popen[bytes], deadline: float) -> Any:
-    assert process.stdout is not None
-    # Windows selectors cannot monitor anonymous pipes. One bounded reader is
-    # active at a time; a timeout kills/reaps the child in calculate's finally,
-    # closing the pipe and ending this reader as well.
+def _receive(process: subprocess.Popen[bytes], deadline: float) -> dict[str, Any]:
+    stdout = process.stdout
+    assert stdout is not None
+    # note (native IPC): Windows selectors cannot monitor anonymous pipes, so a bounded reader shares the child's deadline.
     received: queue.Queue[bytes | Exception] = queue.Queue(maxsize=1)
 
     def read() -> None:
         try:
-            assert process.stdout is not None
-            received.put(process.stdout.readline(_MAX_MESSAGE + 1))
+            received.put(stdout.readline(_MAX_MESSAGE + 1))
         except Exception as error:
             received.put(error)
 
@@ -267,16 +212,26 @@ def _receive(process: subprocess.Popen[bytes], deadline: float) -> Any:
             "Private native calculation exceeded its deadline"
         ) from error
     reader.join()
-    if isinstance(payload, Exception) or not payload:
+    if isinstance(payload, Exception):
+        raise NativeExecutionError(
+            "Private native calculation exited without a result"
+        ) from payload
+    elif not payload:
         raise NativeExecutionError("Private native calculation exited without a result")
+    else:
+        pass
     if len(payload) > _MAX_MESSAGE:
         raise NativeExecutionError("Native calculation message exceeds limit")
+    else:
+        pass
     try:
         message = json.loads(payload)
-    except (ValueError, UnicodeError) as error:
+    except ValueError as error:
         raise NativeExecutionError("Invalid native calculation response") from error
     if not isinstance(message, dict):
         raise NativeExecutionError("Invalid native calculation response")
+    else:
+        pass
     return message
 
 
@@ -297,13 +252,17 @@ def calculate(
 
     if entry not in _ENTRIES:
         raise NativeExecutionError("Unsupported private calculation entry")
+    else:
+        pass
     session = current_source_session()
     if session is None:
         raise NativeExecutionError("Private calculation requires a source session")
+    else:
+        pass
     options = dict(kwargs)
     auxiliary_path = effective_ephemeris_search_path()
     auxiliary = AuxiliaryInputs(auxiliary_path)
-    observer: Callable[..., Any] | None = options.pop("_sample_observer", None)
+    observer: NativeSampleObserver | None = options.pop("_sample_observer", None)
     request = {
         "entry": entry,
         "args": encode(args),
@@ -318,6 +277,8 @@ def calculate(
     }
     if current_policy() is not None:
         request["physical_ephemeris_policy"] = policy_mode()
+    else:
+        pass
     payload = message_bytes(request)
     worker = Path(__file__).with_name("_native_worker.py")
     deadline = time.monotonic() + _TIMEOUT
@@ -335,21 +296,29 @@ def calculate(
             while True:
                 response = _receive(process, deadline)
                 session.check()
-                auxiliary.check()
                 if response.get("kind") == "ready":
                     continue
+                else:
+                    pass
                 if response.get("kind") == "sample":
                     if observer is None:
                         raise NativeExecutionError("Unexpected native sample callback")
+                    else:
+                        pass
                     observer(*decode(response["args"]))
                     session.check()
                     process.stdin.write(message_bytes({"kind": "continue"}))
                     process.stdin.flush()
                     continue
+                else:
+                    pass
                 if response.get("kind") != "result":
                     raise NativeExecutionError(
                         "Invalid native calculation response kind"
                     )
+                else:
+                    pass
+                auxiliary.check()
                 merge_clock_reads(response.get("clock_reads", []))
                 if "error" in response:
                     error = response["error"]
@@ -357,20 +326,34 @@ def calculate(
                         policy = current_policy()
                         if policy is not None:
                             policy.failure = policy.failure or error["reason"]
+                        else:
+                            pass
                         raise EphemerisSourceError(error["reason"])
+                    else:
+                        pass
                     if error["type"] == "jyotish":
                         if error.get("reason") not in JyotishCalculationError.MESSAGES:
                             raise NativeExecutionError(
                                 "Invalid Jyotish integrity reason"
                             )
+                        else:
+                            pass
                         raise JyotishCalculationError(error["reason"])
+                    else:
+                        pass
                     if error["type"] == "value":
                         raise ValueError(error["message"])
+                    else:
+                        pass
                     if error["type"] == "import":
-                        raise ImportError(
+                        raise ModuleNotFoundError(
                             "Private native calculation dependency unavailable"
                         )
+                    else:
+                        pass
                     raise NativeExecutionError("Private native calculation failed")
+                else:
+                    pass
                 merge_worker_policy(response.get("physical_ephemeris_policy"))
                 result = decode_result(response["value"])
                 process.stdin.close()
@@ -379,10 +362,14 @@ def calculate(
                     raise NativeExecutionError(
                         "Private native calculation did not finish cleanly"
                     )
+                else:
+                    pass
                 return result
         finally:
             # Also runs on callback exceptions and cancellation. Reap exactly
             # this owned child; never leave private input in a long-lived pool.
             if process.poll() is None:
                 process.kill()
+            else:
+                pass
             process.wait()

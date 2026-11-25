@@ -13,12 +13,15 @@ CORPUS = ROOT / "tests/fixtures/liuren_ordered_patterns_v1"
 FREEZE_SHA256 = "3aec2c837246e7b76944af2b34aa1a1ae3bd75e62842dba44653d78eae1c7903"
 WATCH = (
     "src/fatebridge/core/metaphysics/liureng_ordered_patterns.py",
-    "src/fatebridge/core/output_liuren_ordered_patterns.py",
+    "src/fatebridge/core/contracts/output_liuren_ordered_patterns.py",
     "src/fatebridge/core/metaphysics/liureng_transmission_relations.py",
-    "src/fatebridge/core/output_liuren_transmission_relations.py",
+    "src/fatebridge/core/contracts/output_liuren_transmission_relations.py",
     "src/fatebridge/core/metaphysics/liureng.py",
+    "src/fatebridge/core/metaphysics/liureng_course_layout.py",
+    "src/fatebridge/core/metaphysics/liureng_selection.py",
+    "src/fatebridge/core/metaphysics/liureng_year_fate.py",
     "src/fatebridge/core/metaphysics/ren_evidence.py",
-    "src/fatebridge/core/output_ren_anchors.py",
+    "src/fatebridge/core/contracts/output_ren_anchors.py",
     "src/fatebridge/services/metaphysics.py",
     "scripts/ren/audit_liuren_ordered_patterns.py",
     "uv.lock",
@@ -33,14 +36,20 @@ def sha(path: Path) -> str:
 def reference(corpus: Path = CORPUS) -> dict[str, Any]:
     if sha(corpus / "freeze.json") != FREEZE_SHA256:
         raise ValueError("Frozen ordered-pattern reference manifest changed")
+    else:
+        pass
     frozen = json.loads((corpus / "freeze.json").read_text())
     names = {"readings.json", "protocol.json", "source-pages.pdf"}
     if set(frozen["files"]) != names or {p.name for p in corpus.iterdir()} != names | {
         "freeze.json"
     }:
         raise ValueError("Frozen ordered-pattern inventory changed")
+    else:
+        pass
     if any(sha(corpus / n) != frozen["files"][n] for n in names):
         raise ValueError("Frozen ordered-pattern source or readings changed")
+    else:
+        pass
     readings: dict[str, Any] = json.loads((corpus / "readings.json").read_text())
     return readings
 
@@ -91,6 +100,8 @@ def audit() -> dict[str, Any]:
         counts[wanted[0] if wanted else "none"] += 1
         if not correct:
             failures.append(row)
+        else:
+            pass
     boards = []
     for n in range(60):
         day = "甲乙丙丁戊己庚辛壬癸"[n % 10] + alphabet[n % 12]
@@ -116,6 +127,8 @@ def audit() -> dict[str, Any]:
             boards.append(row)
             if not row["matched"]:
                 failures.append(row)
+            else:
+                pass
     after = {p: sha(ROOT / p) for p in WATCH}
     reference()
     return dict(

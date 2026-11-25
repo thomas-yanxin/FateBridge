@@ -2,7 +2,7 @@
 
 `meihua_analysis` 以指定公历钟时查中国农历，执行《梅花易數》年月日時起例。`meihua_cast` 接收物件数量、声音、长度、已核定字形／四声、端法资料或已有单动爻卦。REST、MCP、CLI 共用计算；不以通过软件测试宣布全书符合或现实预测有效。
 
-[文档中心](README.md) · [时间入口合同](contracts/meihua_analysis.json) · [显式起卦合同](contracts/meihua_cast.json)
+[文档中心](README.md) · [时间入口合同](contracts/meihua_time_cast.json) · [显式起卦合同](contracts/meihua_cast.json)
 
 | 任务 | 阅读范围 |
 | --- | --- |
@@ -18,7 +18,7 @@
 
 ## 易卦基础职责与固定对照
 
-共享易卦层负责八卦爻序、六十四卦身份、本互错综变、体用关系、名义年月日時取数和卦名查询。此次完整审读 `core/divination.py`、`core/zhouyi.py`，另读三个现代卦义交付函数、两个查询请求类和两个查询服务函数，共36个具名定义、128项职责；类型、缓存、资料读取、编排与现代词典展示分别登记，不把这些数字称为独立算法总数。现代词典全文、全部问事解释和现实预测仍未完成独立验收。
+共享易卦层负责八卦爻序、六十四卦身份、本互错综变、体用关系、名义年月日時取数和卦名查询。`gua_lookup` 和 `gua_meanings` 按卦名或卦码查询结构，六十四卦附《周易》经文和版本出处。Agent 可按实际问题解释选定的卦爻和原文，并结合用户提供的现实背景提出建议。
 
 本轮修复两处实际问题。原八卦返回值与全局表共用可变爻数组，直接使用 Python 领域函数的调用者改动结果后会污染下一次计算；现在由共同交付函数复制爻数组，152个预先固定的隔离探针从全部失败降至0。该问题不表示远程 JSON 客户端可以修改服务器内存。原名称查询拒绝部分标准短名和繁体全名；现在从既有卦图和已归属的《周易》篇名派生精确索引，支持 `临`、`臨`、`天澤履`、`雷風恆`、`天山遯` 等，不另维护一套手写64卦别名表。八纯卦单名在 `auto` 模式仍取八卦，明确 `hexagram` 才取六爻卦；批量查询可用全名或六码选六爻卦。无法识别的爻序不再默认套用乾卦。
 
@@ -190,7 +190,7 @@ uv run --locked --extra dev fatebridge meihua_cast --casting '{"method":"observe
 例如固定参照中的2000年小寒位于香港钟时09:00:40附近，09:00:38与09:00:43的农历日期、时支及起卦数相同，节气月支分别为子、丑。秒级输入让接口能够表达两侧时刻，不改变太阳求根算法，也不认证用户钟表、历史UTC或预测精度。现有7项香港天文台节气日期分歧仍保留。紫金山天文台的[国家标准解读](https://pmo.cas.cn/xwdt2019/kpdt2019/202203/P020240201504886119982.pdf)提出用于日期判断的朔与节气计算须达到1秒要求；本次接口修复不等于已通过整套农历编算标准。
 
 ```bash
-uv run --locked --extra dev fatebridge meihua_analysis --analysis-year 2000 --analysis-month 1 --analysis-day 6 --analysis-hour 9 --analysis-minute 0 --analysis-second 43 --analysis-timezone=+08:00 --fields analysis_context meihua.seed meihua.calendar_policy.civil_clock_resolution calendar_context.bazi_month_boundary --strict-fields true --response-char-limit 0
+uv run --locked --extra dev fatebridge meihua_time_cast --analysis-year 2000 --analysis-month 1 --analysis-day 6 --analysis-hour 9 --analysis-minute 0 --analysis-second 43 --analysis-timezone=+08:00 --fields analysis_context meihua.seed meihua.calendar_policy.civil_clock_resolution calendar_context.bazi_month_boundary --strict-fields true --response-char-limit 0
 ```
 
 秒数实现前锁定的48次节气两侧参照（本地数据：`../tests/fixtures/meihua_input_seconds_v1/manifest.json`）覆盖2000、2025年全部节与中气，没有删去跨分钟的6次；42次两侧落在同一分钟。TT参照由独立实现读取DE440生成，再用[USNO公布的TAI−UTC表](https://maia.usno.navy.mil/ser7/tai-utc.dat)转换两年的现代UTC，两者仍共享DE440动力学，不能当作独立天文观测或现实占验。秒数审查保留变更范围与验收状态。
@@ -200,7 +200,7 @@ uv run --locked --extra dev fatebridge meihua_analysis --analysis-year 2000 --an
 [NIST的2026年规则](https://www.nist.gov/pml/time-and-frequency-division/popular-links/daylight-saving-time-dst)列明美国11月1日回拨：纽约`01:30`配`-04:00`为`05:30 UTC`，配`-05:00`为`06:30 UTC`。两者的地区、钟表日期和时支相同，不能为了体现差异而强求不同卦；两次交节比较的实际经过时长须相差3600秒。Lord Howe的半小时回拨按1800秒处理，不能一律写成一小时。
 
 ```bash
-uv run --locked --extra dev fatebridge meihua_analysis --analysis-year 2026 --analysis-month 11 --analysis-day 1 --analysis-hour 1 --analysis-minute 30 --analysis-timezone America/New_York --analysis-utc-offset=-05:00 --fields analysis_context meihua.seed meihua.calendar_policy.civil_clock_resolution calendar_context.bazi_month_boundary --strict-fields true --response-char-limit 0
+uv run --locked --extra dev fatebridge meihua_time_cast --analysis-year 2026 --analysis-month 11 --analysis-day 1 --analysis-hour 1 --analysis-minute 30 --analysis-timezone America/New_York --analysis-utc-offset=-05:00 --fields analysis_context meihua.seed meihua.calendar_policy.civil_clock_resolution calendar_context.bazi_month_boundary --strict-fields true --response-char-limit 0
 ```
 
 `analysis_context.civil_utc_offset/civil_instant_utc`和`meihua.calendar_policy.civil_clock_resolution`保留已核对偏移、实际UTC、fold及实际时区数据库版本与TZif名称，`rule_trace`保留消歧步骤。`fold=0/1`只用于区分重复钟时的先后，不是两个独立占验；普通UTC钟时规范为0。共享解析器此前让第二个等价候选把UTC标成1，现按[PEP495的含义](https://peps.python.org/pep-0495/)保留首个规范候选。该修复不改变UTC实际时刻或偏移。
@@ -237,10 +237,12 @@ uv run --locked --extra dev fatebridge meihua_analysis --analysis-year 2026 --an
 
 同年同名事件若返回不同交节时刻，状态为 `inconsistent_returned_instants`，保留各条事实路径，摘要说明本次时间依据存在冲突。缺少带偏移时刻时不猜时区；1900年或2101年事件没有本层年表，不否定该输入的其他有效计算。日标签相同、来源对照或软件测试通过均未建立现实预测效力。
 
+日期对照按公开结果绑定的同一钟面语法读取事件标签。带偏移的标签须保留全部可表示分量，越界时分秒、空小数或无法保留的非零尾数会留下不可比较状态及原标签。日本国立天文台的次级分钟标签审计也使用这个解析入口。 [固定钟面对照](precision-acceptance.md#meihua-solar-clock-profile-round49)
+
 仓库根目录可运行下面的合成输入，读取已离开相邻节气对、但仍作为月令起点的大雪记录：
 
 ```bash
-uv run --locked --extra dev fatebridge meihua_analysis \
+uv run --locked --extra dev fatebridge meihua_time_cast \
   --subject-file docs/examples/meihua-solar-date-reference.json \
   --fields meihua.calendar_policy.solar_term_date_reference summary \
   --strict-fields true --include-snapshot-text false --response-char-limit 0
@@ -258,13 +260,13 @@ uv run --locked --extra dev fatebridge meihua_analysis \
 
 原始爻辞仍保存在 `moving_yaoci.text`／`classical_yaoci.text`；展示与异文溯源另列 `moving_yaoci_rendering`／`classical_yaoci_rendering`。按固定修订的[维基文库“另”模板](https://zh.wikisource.org/w/index.php?title=Template:%E5%8F%A6&oldid=5438530)，`{{另|德車|得輿}}` 展示为“德車〔一作「得輿」〕”，保留两个完整读法及转录顺序，不择定某字为校勘正解。`variants` 保留原标记、两读和原文／展示偏移，偏移为从零起、末端不含的Unicode码点。未知或未完整解析的标记使 `display_text=null`、`status=unresolved_markup`，原文保留待核。全部384条经文中的44条、48个异文标记已有字面展示核对，这不等于全书影印校勘或解释模型验收。
 
-`moving_line_phase`、`position_hint`、卦义库的建议及 `action_hint/risk_hint` 是现代联想或建议。六条 `line_oracles` 中只有 `is_active=true` 是本次动爻；其余是其他爻单独变化的假设参考。动五爻不能证明事情已到现实结果阶段，动爻序号也不是发生日期。
+`line_oracles` 保留各爻单独变化的卦码、体用与爻辞。`is_active=true` 标识本次动爻。Agent 结合用户提供的事态解释当前卦图和所选条款。
 
 `moving_line_phase.stage` 保留六种现代爻位联想名称，`real_stage_inferred=false`；“五爻主位”不表示现实已到结果阶段。各条实际／假设爻的 `position_hint` 用于提出需要现实资料核实的问题，不把爻位写成已经发生的阶段。
 
-`line_oracles` 及 `moving_line_oracle` 的 `timing` 沿用“先小后大”等现代行动次序短语，`timing_scope=modern_action_order_hint_not_event_time`，不能读成应期。`transition_scope=computed_hexagram_change_not_real_outcome_forecast` 表示只确认哪一爻改变后得到哪一变卦；变卦的现代卦义不证明现实将如此发展。体用的生助、耗泄、制约是所列五行关系，其现实资源、权限、投入和阻力另须核实。原典条件断语与实际动爻经文仍原样保留。
+`line_oracles` 和 `moving_line_oracle` 返回爻位、对应变卦、实际或假设动爻的标记，以及《周易》爻辞。体用记录给出对应五行的生克泄耗关系。涉及现实资源、权限、投入和阻力时，由 Agent 结合用户提供的背景核实。
 
-首轮字段及 `reading/audit` 字段卡见[生成调用合同](contracts/meihua_analysis.json)。字段卡是 `fields` 的参考，不新增 `view` 参数；详细解释沿用同次结果。
+首轮字段及 `reading/audit` 字段卡见[生成调用合同](contracts/meihua_time_cast.json)。字段卡是 `fields` 的参考，不新增 `view` 参数；详细解释沿用同次结果。
 
 真实模型解释另按[梅花语义验收](#来源与规则范围)准备和执行。10个虚构单轮案例不等于已验收；只读MCP参照与模型实际收到的回执分开记录，未运行、未审阅和失败均保留。
 
@@ -332,7 +334,7 @@ uv run --locked --extra dev fatebridge meihua_cast --casting '{"method":"sound_g
 
 物数占的原文是“以時數配作下卦”“卦數並時數總除六”。例如1件物品、酉时，酉数10取下卦为兑2，动爻仍为 `(1+10)%6=5`，不是 `(1+2)%6=3`，也不再加一次10。数量9、酉时的上卦为乾1；按默认原数量取爻为1，按 `line_sum_basis=trigram_numbers` 的上卦卦序加原时数取爻为5。两个口径的体卦分别为乾与兑，必须随各自动爻解释。参数名称沿用显式入口，但物数占只约简上卦取数，原时数始终保留。
 
-当前 `counting_variants` 对物数与两段声音的分歧都给各自的本、变、互卦、原体和四段 `stage_relations`，事实路径指向对应候选，不能从选中卦借用体互、用互或变用关系。纯乾、纯坤的候选也分别从各自变卦取互；另一动爻可能连互卦一起改变。候选卦内的现代卦义仍标 `modern_editorial_summary`。
+`counting_variants` 对物数与两段声音的分歧分别返回候选的本、变、互卦、原体和四段 `stage_relations`。每组事实路径指向对应候选。纯乾、纯坤的候选各自从变卦取互，因此动爻不同时也可能得到不同的互卦。
 
 ```bash
 uv run --locked --extra dev fatebridge meihua_cast --casting '{"method":"sound_groups","first_count":1,"second_count":5,"hour_branch":"酉"}' --fields meihua.seed meihua.base_hexagram.name meihua.changed_hexagram.name --strict-fields true
@@ -358,7 +360,7 @@ uv run --locked --extra dev fatebridge meihua_cast --casting '{"method":"object_
 
 例如同用已报寅月时，卷五表列木旺、火相、水休、土囚，金未列；既有卷一月令标签仍按自己的所选条款显示，卷二、卷三资格条件继续以那些标签核对。此对照给出每个候选自身的原体、初用、体互、用互、变用及事实路径；缺月不填状态，天时分支保留原输出。节月与土月映射沿用既有软件约定，没有从该表推定新的历法边界。
 
-卷五此表处于测字材料语境，尚未裁定为人事体用的唯一主导规则；本层不会覆盖原旺衰或主摘要。年月日合参、净吉凶、应期、概率和现实结果仍为空。来源冻结、对照范围、旧门槛失败及分层验收见卷五表审查。
+卷五此表处于测字材料语境，尚未裁定为人事体用的主导规则。回归逐项核对 4,992 组卦形与节月组合，并用同输入对照检验卷五结果能否独立摘除。历史整包指纹留在原始参照中。
 
 ### 八卦生体克体的专属象义
 
@@ -461,7 +463,7 @@ uv run --locked --extra dev fatebridge meihua_cast --casting '{"method":"existin
 
 `casting_readings.topic_clause` 属于各候选自己的原体用。例如11声、1声、子时，原数动初爻为离体乾用，卦序数动五爻则乾体离用；交易所选章句分别为成迟与不成。即使两个候选初始都比和，其变用关系也可能相反，因此相同初始章句不等于相同过程或结局。
 
-“成迟”仅是原文相对措辞，未换算几天、几月；财象不等于可验证收益或投资建议。`success_probability/event_time/real_outcome_verdict` 均为 `null`。当前保留四章初始20条，求财另有下述补充句关系成分；进一步互变旺衰综合、应期方位和全章占断仍待完善；助手影印目读和软件测试不等于独立人类专家、真实模型语义或现实预测认证。
+“成迟”保留原文的相对措辞。当前收录四章初始 20 条，求财另有下述补充句关系成分。应期和现实结果字段 `event_time` 与 `real_outcome_verdict` 为 `null`。
 
 ```bash
 uv run --locked --extra dev fatebridge meihua_cast --casting '{"method":"existing","hexagram_code":"100111","moving_line":1}' --interpretation-topic transaction --fields interpretation.topic_reading --strict-fields true --response-char-limit 0
@@ -475,7 +477,7 @@ uv run --locked --extra dev fatebridge meihua_cast --casting '{"method":"existin
 
 “乾震多主动”“坤艮多主不动”的阈值及计数范围未明，保留原体一次的五角色计数和本互变六位置计数作为诊断，不自行定“多”。巽舟、离陆、坎失脱等句的角色范围亦未裁定；它们是所选原文记录，不自动选择交通方式或路线。所选影像末句作“坎防失脱。主纷争之应也”，该处目读未见“兑”字；固定转录1441921另作“坎妨失脱，兑主纷争”。两者分列，不用另一转录补影印主语。没有可指认的主语时，`actual_matching_roles=null`表示未赋予角色。
 
-出行章在用克体时的“祸”字仅作为历史用语记录，不构成现实灾祸判断；财象、可见／不见也不是实际行程、收益或会面结果。`event_time/success_probability/real_outcome_verdict`仍为`null`，出行补充层的方位、方式指令、灾祸及现实结果也不计算。原文舟／陆并非地理方位，不从这一章补指南针方向。来源、384卦形与13种节月上下文的检查见[出行与谒见测试](../tests/meihua/test_meihua_journeys.py)。
+出行章保留用克体时的原文措辞，以及舟、陆等出行方式。`event_time` 与 `real_outcome_verdict` 为 `null`。来源、384 卦形与 13 种节月上下文见[出行与谒见测试](../tests/meihua/test_meihua_journeys.py)。
 
 ```bash
 uv run --locked --extra dev fatebridge meihua_cast --casting '{"method":"existing","hexagram_code":"100111","moving_line":1}' --interpretation-topic travel --season-month-branch 申 --fields interpretation.topic_reading --strict-fields true --include-snapshot-text false --response-char-limit 0
@@ -489,7 +491,7 @@ uv run --locked --extra dev fatebridge meihua_cast --casting '{"method":"existin
 
 ### 已报外应的实物与形色资格
 
-两种梅花入口可选传 `external_observations`，每条须含明确的 `manifestation` 类别和 `label` 描述；目前只用于一般人事与六个显式题篇。未确认类别时省略整个资料，不从问句、未查看的现场或颜色自动猜测实物。空列表、未知类别、空白描述及天气分支携带这层体用资料会返回校验错误。最多12条只是软件保护，不是原典数量限制。
+两种梅花入口的人事题篇均可选传 `external_observations`。每条须含已确认的 `manifestation` 类别和 `label` 描述，可选填 `motion` 为 `moving` 或 `stationary`。未确认类别时省略外应。实际动静未知时省略该字段。空列表、未知类别、空白描述及 `weather` 分支携带外应会返回校验错误。同次已确认静室且无所闻见时也不能提交外应。软件最多接收 12 条。
 
 依据文明书局影印卷三《體用生尅之訣》，原PDF零起算108、109页，传统五行归属还要区分所报形态。选段目读与23组人工配对在实现前固定于材料清单（本地数据：`../tests/fixtures/meihua_external_v1/manifest.json`）。这不是已验证的物理因果、临床或灾祸评估；原书中的“真生真克”也不等于软件测得了作用强度。
 
@@ -538,7 +540,7 @@ uv run --locked --extra dev fatebridge meihua_cast --casting '{"method":"existin
 
 例如已有井卦、五爻动，原体巽：初用坎为用生体，体互兑为用克体，用互离为体生用，变用坤为体克用。四项关系并存；初始“进益”条款不能掩掉互卦中的受克和耗泄，生助受制与克体被制仍按原资格保留。这里没有因此算出实际净收入、投资结果或损失金额。
 
-`source_groups` 保留两句原文及各自成分；`all_named_components_present` 只说明所列成分在当前范围内是否全部出现。原文“及”的组合含义仍未唯一裁定，因此 `full_clause_applies=null`，不将这项布尔值当成完整财运断语。两侧成分可同时存在，不计票、不抵消，不覆盖原初始体用条款。`timing_reference` 保留原文卦气措辞，`event_time/real_financial_change/success_probability` 均为 `null`；已知起卦日期也不能自动转换成进财或破财日期。
+`source_groups` 保留两句原文及各自成分。`all_named_components_present` 表示该句所列成分是否齐备，两组可同时齐备。原文“及”的组合含义待裁定，因此 `full_clause_applies` 为 `null`。`timing_reference` 保留原文卦气措辞。
 
 `wealth` 字段卡用于本分支的摘要，`topic/topic_audit/audit` 卡也保留该层。计数有分歧时，另读 `interpretation.casting_readings[].wealth_components`，不能复用主候选的原体、季令或制约。这一补充只适用于所选求财篇；其他分支为 `null`，问题文字不会自动切换题篇。原初始20条、取数与天气研究政策保持原版本；新的局部关系成分配置单列 `meihua_wealth_components_nlc1925_v1@1.0.0`，不冒充全章或现实预测验收。
 
@@ -605,7 +607,7 @@ uv run --locked --extra dev fatebridge meihua_cast --casting '{"method":"existin
 uv run --locked --extra dev fatebridge meihua_cast --casting '{"method":"existing","hexagram_code":"101001","moving_line":4}' --interpretation-topic traveler --season-month-branch 寅 --fields interpretation.topic_reading --strict-fields true --include-snapshot-text false --response-char-limit 0
 ```
 
-归迟、未归、即归及不日不换算为天数；没有核实返归、行踪、安全或现实结果，`event_time`、`return_verified`、`real_location`、`hazard_verdict`、`success_probability` 和 `real_outcome` 保持 `null`。独立参照中8条互卦订正及所选原页的复核入口见[行人章测试](../tests/meihua/test_meihua_traveler.py)。这项扩展不改变已保留的天气失败验收，也不认证全书或预测能力。
+归迟、未归、即归及不日沿用原文措辞。独立参照中 8 条互卦订正及所选原页的复核入口见[行人章测试](../tests/meihua/test_meihua_traveler.py)。
 
 ### 婚姻章的两家角色、旺气与比利异文
 
@@ -727,7 +729,7 @@ uv run --locked --extra dev fatebridge meihua_cast --casting '{"method":"existin
 
 原PDF索引63的所选字序为“乾兌為霜雪霰雹”，固定转录1441921为“乾、兌為霜雪雹霰”，两者分别记录，不为统一顺序而改原文。索引64的“震離為電為雷應在夏天”“乾兌為霜為雪驗於冬月”另列为季令依据。本层不把“日”改写成晴或无雨，不把日、电、虹、霓解释成同时发生，也不擅自把霰、虹、霓定义为现代可评分观测量。
 
-这项补充没有裁定全章制化、无制例外或综合优先级；季令相符不能当作未受制天气判断。旧天气轨迹、控制、频数、朝暮与研究负结果保持原值。新增真实观测、独立模型语义验收均为0，`single_forecast/event_datetime/success_probability` 保持 `null`。原页、四项新增选段与既有雷象的对照、实现前1,920组参照见固定材料（本地数据：`../tests/fixtures/meihua_weather_attributions_v1/manifest.json`），范围及验证
+本项逐条核对季令条件，全章制化、无制例外和综合优先级仍待裁定。新增真实观测和独立模型语义验收均为 0。原页、四项新增选段与雷象的对照、实现前 1,920 组参照见固定材料（`../tests/fixtures/meihua_weather_attributions_v1/manifest.json`），范围及验证
 
 #### 1.7.0的朝暮与未定时段
 
@@ -781,4 +783,4 @@ uv run --locked --extra dev python -m pytest -q tests/meihua
 
 尚未完成物数超八和单组声音计数口径的唯一裁定、自动现场取象、自动音韵或字形取画、完整外应、精确事件应期及全书分类占断；原八个人事题篇分别保留原四章20条、出行／谒见10条、失物5条及行人5条；另支持家宅/屋舍十个文字分支，其中家宅比利的关系条件未裁定，另列求财成分、出行偏好、失物8卦方位类象、行人初用受生受克及外应资格。出行多字、舟陆等角色范围及末句主语仍未裁定，未完成全章综合；天时层仅覆盖所列条件条款。卷三存在「觀梅恒卦」等疑似讹误，不能用程序结果反向校改原文消除分歧。
 
-现实预测后续使用现有 `fatebridge.validation.predictions` 和 `scripts/evaluation/audit_prediction_study.py`：先固定可观察事件、时间窗、模型与解释政策、队列和基线；在事件窗口前记录预测，再独立判定结果。缺失、弃权及未随访必须保留，开发集与最终验收分开；不能从卦象关系生成假结果、事后改问题或只展示命中例。即使有限样本全对，也不能据此证明总体100%或最权威。
+现实预测后续使用现有 `validation.predictions` 和 `scripts/evaluation/audit_prediction_study.py`：先固定可观察事件、时间窗、模型与解释政策、队列和基线；在事件窗口前记录预测，再独立判定结果。缺失、弃权及未随访必须保留，开发集与最终验收分开；不能从卦象关系生成假结果、事后改问题或只展示命中例。即使有限样本全对，也不能据此证明总体100%或最权威。

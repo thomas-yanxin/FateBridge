@@ -15,6 +15,7 @@ from typing import Any, Iterator
 from unittest.mock import patch
 
 from fatebridge.core.astro import runtime
+from fatebridge.core.astro.native_execution import in_native_worker
 from fatebridge.services.human_design import calculate_human_design
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -25,6 +26,8 @@ PLAN_PATH = ROOT / "tests/fixtures/human-design-natal-source-plan.json"
 def isolated_source_change(kind: str, directory: Path) -> Iterator[dict[str, Any]]:
     if kind not in {"file_bytes", "temporary_path", "slot_edition", "late_file_bytes"}:
         raise ValueError("Unknown frozen source probe")
+    else:
+        pass
     private = directory / "ephe"
     private.mkdir()
     for name in ("sepl_18.se1", "semo_18.se1"):
@@ -33,6 +36,8 @@ def isolated_source_change(kind: str, directory: Path) -> Iterator[dict[str, Any
     other = directory / "other"
     if kind == "temporary_path":
         shutil.copytree(private, other)
+    else:
+        pass
     original = runtime.ephemeris_call
     getter = runtime.swe.get_current_file_data
     state: dict[str, Any] = {"native_sun_calls": 0, "mutation_performed": False}
@@ -50,6 +55,8 @@ def isolated_source_change(kind: str, directory: Path) -> Iterator[dict[str, Any
                 state["mutation_performed"] = True
                 with (private / "sepl_18.se1").open("ab") as handle:
                     handle.write(b"late-natal-source-change-regression")
+            else:
+                pass
             if count == 2 and kind != "late_file_bytes":
                 state["mutation_performed"] = True
                 if kind == "file_bytes":
@@ -57,8 +64,16 @@ def isolated_source_change(kind: str, directory: Path) -> Iterator[dict[str, Any
                         handle.write(b"natal-source-change-regression")
                 elif kind == "temporary_path":
                     os.environ["SE_EPHE_PATH"] = str(other)
+                else:
+                    pass
+            else:
+                pass
             if kind == "temporary_path" and count == 3:
                 os.environ["SE_EPHE_PATH"] = str(private)
+            else:
+                pass
+        else:
+            pass
         return result
 
     def metadata(slot):
@@ -70,6 +85,8 @@ def isolated_source_change(kind: str, directory: Path) -> Iterator[dict[str, Any
             and row[0]
         ):
             return (*row[:3], row[3] + 1)
+        else:
+            pass
         return row
 
     with (
@@ -82,8 +99,6 @@ def isolated_source_change(kind: str, directory: Path) -> Iterator[dict[str, Any
 
 
 def regression_checks() -> dict[str, Any]:
-    from fatebridge.core.astro.native_execution import in_native_worker
-
     if not in_native_worker():
         worker = ROOT / "scripts/human_design/human_design_source_fault_worker.py"
         done = subprocess.run(
@@ -95,17 +110,27 @@ def regression_checks() -> dict[str, Any]:
         )
         if done.returncode:
             raise RuntimeError("Controlled Human Design native fault worker failed")
+        else:
+            pass
         return json.loads(done.stdout)
+    else:
+        pass
     plan = json.loads(PLAN_PATH.read_text())
     if len(plan["cases"]) != 4:
         raise ValueError("Incomplete source controls")
+    else:
+        pass
     cases = []
     for case in plan["cases"]:
         with tempfile.TemporaryDirectory(
             prefix="hd-natal-file-acceptance-"
         ) as directory:
             with isolated_source_change(case["id"], Path(directory)) as state:
-                result = calculate_human_design(**plan["birth_input"])
+                # note (late mutation): The native comparison requests Moshier after the nominal chart.
+                result = calculate_human_design(
+                    **plan["birth_input"],
+                    compare_apparent_models=case["id"] == "late_file_bytes",
+                )
                 safe = str(directory) not in json.dumps(result)
                 passed = (
                     state["mutation_performed"]
@@ -150,3 +175,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

@@ -6,8 +6,8 @@ from fractions import Fraction as Q
 import pytest
 from pydantic import ValidationError
 
+from fatebridge.core.contracts.output_timing import TimingInteractions
 from fatebridge.core.elements import ElementAnalysis
-from fatebridge.core.output_timing import TimingInteractions
 from fatebridge.core.timing_interactions import analyze_timing_interactions
 from fatebridge.core.timing_strength import StrengthProjectionBaseline
 from tests.support.bazi_strength_reference_v3 import (
@@ -44,7 +44,7 @@ def projection(values, timing):
     return full["strength_projection"], a
 
 
-def test_unique_time_stem_changes_only_the_existing_month_stem_budget():
+def test_unique_time_stem_changes_only_the_existing_month_stem_budget() -> None:
     result, baseline = projection(
         ("乙卯", "己卯", "辛卯", "癸卯"),
         {"dayun": {"stem": "甲", "branch": "寅"}},
@@ -83,8 +83,8 @@ def test_unique_time_stem_changes_only_the_existing_month_stem_budget():
 @pytest.mark.parametrize("pair", ["甲己", "乙庚", "丙辛", "丁壬", "戊癸"])
 @pytest.mark.parametrize("reverse", [False, True])
 def test_all_five_pairs_both_directions_match_independent_existing_budget_math(
-    pair, reverse
-):
+    pair: str, reverse: bool
+) -> None:
     target, incoming = pair[::-1] if reverse else pair
     other = next(s for s in STEMS if s not in pair)
 
@@ -131,8 +131,8 @@ def test_all_five_pairs_both_directions_match_independent_existing_budget_math(
     ],
 )
 def test_day_match_repeated_partner_and_existing_combination_remain_blocked(
-    values, incoming
-):
+    values, incoming: str
+) -> None:
     result, _ = projection(values, {"dayun": {"stem": incoming, "branch": "寅"}})
     row = result["layers"][0]
     assert row["status"] == "blocked" and row["blocker_relation_ids"]
@@ -142,9 +142,11 @@ def test_day_match_repeated_partner_and_existing_combination_remain_blocked(
         assert any(
             r.startswith("natal.relations:") for r in row["blocker_relation_ids"]
         )
+    else:
+        pass
 
 
-def test_time_layers_do_not_compete_or_accumulate_into_a_fifth_natal_column():
+def test_time_layers_do_not_compete_or_accumulate_into_a_fifth_natal_column() -> None:
     values = ("乙卯", "己卯", "辛卯", "癸卯")
     first, _ = projection(values, {"dayun": {"stem": "甲", "branch": "寅"}})
     both, _ = projection(
@@ -160,7 +162,7 @@ def test_time_layers_do_not_compete_or_accumulate_into_a_fifth_natal_column():
 
 
 @pytest.mark.parametrize("layer", ["liunian", "liuyue", "liuri", "liushi"])
-def test_dayun_source_is_not_extended_to_other_time_scales(layer):
+def test_dayun_source_is_not_extended_to_other_time_scales(layer: str) -> None:
     result, _ = projection(
         ("乙卯", "己卯", "辛卯", "癸卯"),
         {layer: {"stem": "甲", "branch": "寅"}},
@@ -174,7 +176,7 @@ def test_dayun_source_is_not_extended_to_other_time_scales(layer):
     assert result["stem_binding_source"]["supported_layer"] == "dayun"
 
 
-def test_stem_retention_contract_rejects_invented_negative_or_excess_budget():
+def test_stem_retention_contract_rejects_invented_negative_or_excess_budget() -> None:
     result, _ = projection(
         ("乙卯", "己卯", "辛卯", "癸卯"), {"dayun": {"stem": "甲", "branch": "寅"}}
     )

@@ -12,9 +12,15 @@ from pydantic import ValidationError
 from fatebridge.application.examples import suggested_fields
 from fatebridge.application.result_delivery import RESULT_STORE
 from fatebridge.core.calendar import BaZiCalendar
+from fatebridge.core.contracts.output_strength_thresholds import (
+    StrengthThresholdArithmetic,
+)
 from fatebridge.core.elements import ElementAnalysis
-from fatebridge.core.output_strength_thresholds import StrengthThresholdArithmetic
 from fatebridge.core.strength import DEFAULT_POLICY, _evaluate
+from fatebridge.core.strength_thresholds import (
+    floating_support_share,
+    threshold_snapshot_lines,
+)
 from tests.support import bazi_strength_reference_v3 as current_reference
 from tests.support.transports import SPECS, business, call_cli, native
 from tests.support.transports import rest as _rest_fixture
@@ -44,6 +50,8 @@ def delivered_payload(value):
     delivery = value.get("result_delivery")
     if not delivery:
         return value
+    else:
+        pass
     run_id = value["run_metadata"]["run_id"]
     verified = RESULT_STORE.verified_page(delivery["result_id"], run_id)
     wrapper = json.loads(Path(delivery["file_path"]).read_bytes())
@@ -64,13 +72,40 @@ def evaluate(values, policy=DEFAULT_POLICY):
 
 
 @pytest.mark.parametrize("month_branch", "子丑寅卯辰巳午未申酉戌亥")
-def test_adopted_season_map_matches_all_literal_five_season_cells(month_branch):
+def test_adopted_season_map_matches_all_literal_five_season_cells(month_branch) -> None:
     assert ElementAnalysis.seasonal_phases(
         month_branch
     ) == current_reference.seasonal_phases(month_branch)
 
 
-def test_independent_v3_reference_has_a_closed_form_seasonal_budget_anchor():
+def test_special_structure_snapshot_reports_original_float_boundary_difference() -> (
+    None
+):
+    pillars = {
+        "year": ("甲", "申"),
+        "month": ("乙", "亥"),
+        "day": ("庚", "子"),
+        "hour": ("甲", "申"),
+    }
+    assessment = ElementAnalysis.analyze_day_master_strength(pillars)["assessment"]
+    receipt = assessment["threshold_arithmetic"]
+    assert receipt["share_exact"] == "3/20"
+    assert receipt["requires_special_structure_review"] is False
+    assert assessment["support_share"] == 0.15
+    assert assessment["requires_special_structure_review"] is False
+    assert (
+        floating_support_share(
+            assessment["effective_elements_unrounded"], receipt["day_element"]
+        )
+        < 0.15
+    )
+    lines = threshold_snapshot_lines(assessment)
+    (note,) = [line for line in lines if line.startswith("特殊结构复核阈值：")]
+    assert "精确份额3/20" in note
+    assert "同次复核标记为False" in note
+
+
+def test_independent_v3_reference_has_a_closed_form_seasonal_budget_anchor() -> None:
     # Four 寅 branches contain total physical 甲/丙/戊 budgets 40/7,20/7,10/7.
     # Revealed 甲 adds 5/4, the three rooted non-day 甲 add 6; spring's
     # 火相 and 土死 supply factors 3/2 and 1/2. No relation premise is needed.
@@ -98,7 +133,9 @@ def test_independent_v3_reference_has_a_closed_form_seasonal_budget_anchor():
         {"support_above_half": False},
     ],
 )
-def test_contradictory_exact_receipt_is_rejected_but_projection_stays_partial(patch):
+def test_contradictory_exact_receipt_is_rejected_but_projection_stays_partial(
+    patch,
+) -> None:
     values = next(r for r in NEAR if r["index"] == 39568)["pillars"]
     receipt = evaluate(
         values,
@@ -112,6 +149,10 @@ def test_contradictory_exact_receipt_is_rejected_but_projection_stays_partial(pa
                 patch[key] = "中和" if value != "中和" else "强"
             elif key == "share_exact" and value == receipt[key]:
                 patch[key] = "3/5" if value != "3/5" else "2/5"
+            else:
+                pass
+    else:
+        pass
     with pytest.raises(ValidationError):
         StrengthThresholdArithmetic.model_validate({**receipt, **patch})
     assert StrengthThresholdArithmetic.model_validate(
@@ -122,8 +163,8 @@ def test_contradictory_exact_receipt_is_rejected_but_projection_stays_partial(pa
 @pytest.mark.parametrize("birth", [(1988, 7, 5, 8), (1990, 3, 1, 12)])
 @pytest.mark.parametrize("key", KEYS)
 def test_boundary_births_use_independent_current_reference_on_all_public_transports(
-    key, birth, rest, tmp_path, capsys
-):
+    key, birth, rest, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     year, month, day, hour = birth
     selected = SPECS[key]
     calendar = BaZiCalendar.get_four_pillars(
@@ -146,6 +187,8 @@ def test_boundary_births_use_independent_current_reference_on_all_public_transpo
     }
     if key != "analyze_destiny":
         payload.update(analysis_year=2026, analysis_month=10, analysis_day=25)
+    else:
+        pass
     fields = suggested_fields(selected, view="thresholds")
     flags = {
         "fields": fields,
@@ -182,6 +225,8 @@ def test_boundary_births_use_independent_current_reference_on_all_public_transpo
             json.dumps(response.json(), ensure_ascii=False)
         )
         assert business(delivered_payload(response.json())) == business(local)
+    else:
+        pass
     selected.output_model.model_validate(local)
     receipt = local
     for part in fields[0].split("."):

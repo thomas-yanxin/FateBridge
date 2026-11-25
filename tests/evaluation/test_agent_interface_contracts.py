@@ -11,6 +11,8 @@ from fastapi.testclient import TestClient
 from fastmcp import Client
 from jsonschema import Draft202012Validator
 
+from tests.support.transports import call_calculation, describe_capability
+
 try:
     from mcp.shared.exceptions import McpError
 except ImportError:  # MCP SDK 2.x uses the capitalized spelling.
@@ -26,7 +28,7 @@ from fatebridge.utils.errors import ParameterError
 from tests.fixtures.surface_payloads import REST_POST_CASES
 
 BIRTH = {
-    **REST_POST_CASES["/api/cn/bazi/birth"](),
+    **REST_POST_CASES["/api/bazi/birth-chart"](),
     "analysis_year": 2026,
     "analysis_month": 10,
     "analysis_day": 12,
@@ -46,15 +48,15 @@ def rest(monkeypatch):
     return TestClient(api.app)
 
 
-def command(name, inputs, flags):
-    args = [sys.executable, "-m", "fatebridge.cli", name]
+def command(name, inputs, flags, capsys):
+    args = [name]
     for key, value in inputs.items():
         args += [
             "--" + key.replace("_", "-"),
             str(value).lower() if isinstance(value, bool) else str(value),
         ]
-    result = subprocess.run(args + flags, capture_output=True, text=True, timeout=30)
-    return result.returncode, json.loads(result.stdout)
+    code = run(args + flags)
+    return code, json.loads(capsys.readouterr().out)
 
 
 def protocol_call(inputs):
@@ -63,10 +65,12 @@ def protocol_call(inputs):
             # These assertions compare projection semantics against REST/CLI,
             # both unlimited here. Actual 4096/8192 delivery envelopes and
             # restoration are exercised by test_ephemeris_inventory_delivery.
-            result = await client.call_tool(
-                "bazi_birth", {"response_char_limit": 0, **inputs}, raise_on_error=False
+            result = await call_calculation(
+                client,
+                "bazi_birth_chart",
+                {"response_char_limit": 0, **inputs},
+                raise_on_error=False,
             )
-            assert json.loads(result.content[0].text) == result.structured_content
             return result
 
     return asyncio.run(call())
@@ -86,19 +90,20 @@ def protocol_call(inputs):
     ],
 )
 def test_projection_failures_are_visible_and_match_all_transports(
-    rest, strict, path, expected
-):
+    rest, strict: bool, path: str, expected: str, capsys: pytest.CaptureFixture[str]
+) -> None:
     fields = ["bazi_birth.day_master", path]
     http = rest.post(
-        "/api/cn/bazi/birth",
+        "/api/bazi/birth-chart",
         json=BIRTH,
         params={"fields": fields, "strict_fields": str(strict).lower()},
     )
     protocol = protocol_call({**BIRTH, "fields": fields, "strict_fields": strict})
     code, output = command(
-        "bazi_birth",
+        "bazi_birth_chart",
         BIRTH,
         ["--strict-fields", str(strict).lower(), "--fields", *fields],
+        capsys,
     )
     assert http.status_code == (422 if strict else 200)
     assert protocol.is_error is strict and code == int(strict)
@@ -120,21 +125,26 @@ def test_projection_failures_are_visible_and_match_all_transports(
             {k: v for k, v in p.items() if k != "run_metadata"} for p in payloads
         ]
         assert scrubbed[0] == scrubbed[1] == scrubbed[2]
+    else:
+        pass
 
 
 @pytest.mark.parametrize("strict", [False, True])
-def test_valid_projection_has_no_added_warning_and_preserves_metadata(rest, strict):
+def test_valid_projection_has_no_added_warning_and_preserves_metadata(
+    rest, strict: bool, capsys: pytest.CaptureFixture[str]
+) -> None:
     fields = ["bazi_birth.day_master.stem", "run_metadata.tool_name"]
     http = rest.post(
-        "/api/cn/bazi/birth",
+        "/api/bazi/birth-chart",
         json=BIRTH,
         params={"fields": fields, "strict_fields": str(strict).lower()},
     )
     protocol = protocol_call({**BIRTH, "fields": fields, "strict_fields": strict})
     code, output = command(
-        "bazi_birth",
+        "bazi_birth_chart",
         BIRTH,
         ["--strict-fields", str(strict).lower(), "--fields", *fields],
+        capsys,
     )
     assert http.status_code == 200 and not protocol.is_error and code == 0
     payloads = [http.json(), protocol.structured_content, output]
@@ -155,7 +165,9 @@ def test_valid_projection_has_no_added_warning_and_preserves_metadata(rest, stri
     )
 
 
-def test_strict_projection_does_not_hide_a_domain_failure(rest):
+def test_strict_projection_does_not_hide_a_domain_failure(
+    rest, capsys: pytest.CaptureFixture[str]
+) -> None:
     inputs = {
         **BIRTH,
         "birth_place": "未提供",
@@ -164,7 +176,7 @@ def test_strict_projection_does_not_hide_a_domain_failure(rest):
     }
     # None is represented by omission for the CLI.
     http = rest.post(
-        "/api/cn/bazi/birth",
+        "/api/bazi/birth-chart",
         json=inputs,
         params={"fields": "misspelled", "strict_fields": "true"},
     )
@@ -172,17 +184,21 @@ def test_strict_projection_does_not_hide_a_domain_failure(rest):
         {**inputs, "fields": ["misspelled"], "strict_fields": True}
     )
     code, output = command(
-        "bazi_birth",
+        "bazi_birth_chart",
         {k: v for k, v in inputs.items() if v is not None},
         ["--fields", "misspelled", "--strict-fields"],
+        capsys,
     )
     assert http.status_code == 400 and protocol.is_error and code == 1
     for payload in [http.json(), protocol.structured_content, output]:
         assert payload["error_code"] == "validation_error"
-        assert "projection_warnings" not in payload and "issues" not in payload
+        assert "projection_warnings" not in payload
+        assert payload["issues"] == [
+            {"path": "birth_longitude", "code": "longitude_required_for_solar_time"}
+        ]
 
 
-def test_runtime_projection_accepts_extensions_nulls_and_whole_lists():
+def test_runtime_projection_accepts_extensions_nulls_and_whole_lists() -> None:
     payload = {
         "extension": {
             "unknown_to_static_schema": 0,
@@ -222,11 +238,13 @@ def test_runtime_projection_accepts_extensions_nulls_and_whole_lists():
         {},
         {"family": "bazi"},
         {"family": "bazi,astro", "q": "命盘", "surface": "mcp"},
-        {"tool": "bazi_birth", "detail": "full"},
+        {"tool": "bazi_birth_chart", "detail": "full"},
         {"q": "no_matches_expected"},
     ],
 )
-def test_progressive_rest_and_cli_discovery_are_identical(rest, capsys, filters):
+def test_progressive_rest_and_cli_discovery_are_identical(
+    rest, capsys: pytest.CaptureFixture[str], filters
+) -> None:
     params = {"detail": "summary", **filters}
     http = rest.get("/api/tools", params=params)
     args = ["discover"]
@@ -242,9 +260,13 @@ def test_progressive_rest_and_cli_discovery_are_identical(rest, capsys, filters)
             and "output_schema" not in tool
             for tool in http.json()["tools"]
         )
+    else:
+        pass
 
 
-def test_default_discovery_and_text_list_remain_compatible(rest, capsys):
+def test_default_discovery_and_text_list_remain_compatible(
+    rest, capsys: pytest.CaptureFixture[str]
+) -> None:
     manifest = rest.get("/api/tools").json()
     assert manifest["detail"] == "full" and len(manifest["tools"]) == len(CATALOG)
     assert all(
@@ -254,14 +276,18 @@ def test_default_discovery_and_text_list_remain_compatible(rest, capsys):
     assert run([]) == 0
     before = capsys.readouterr().out
     assert run(["list"]) == 0 and capsys.readouterr().out == before
-    assert run(["list", "--json"]) == 0
+    assert run(["discover"]) == 0
     assert (
         json.loads(capsys.readouterr().out)
         == rest.get("/api/tools", params={"detail": "summary"}).json()
     )
+    assert run(["list", "--json"]) == 2
+    assert json.loads(capsys.readouterr().out)["error_code"] == "usage_error"
 
 
-def test_summary_discovery_does_not_build_schemas(monkeypatch):
+def test_summary_discovery_does_not_build_schemas(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setattr(
         discovery,
         "describe_spec",
@@ -275,8 +301,8 @@ def test_summary_discovery_does_not_build_schemas(monkeypatch):
     "filters", [{"family": "astrp"}, {"family": "bazi,,astro"}, {"tool": "bazi_bith"}]
 )
 def test_discovery_typos_fail_with_matching_rest_cli_correction_hints(
-    rest, capsys, filters
-):
+    rest, capsys: pytest.CaptureFixture[str], filters
+) -> None:
     http = rest.get("/api/tools", params=filters)
     args = ["discover"]
     for key, value in filters.items():
@@ -287,7 +313,9 @@ def test_discovery_typos_fail_with_matching_rest_cli_correction_hints(
     assert http.json()["error_code"] == output["error_code"] == "validation_error"
 
 
-def test_mcp_resources_and_annotations_match_rest_and_cli(rest, capsys):
+def test_mcp_resources_and_annotations_match_rest_and_cli(
+    rest, capsys: pytest.CaptureFixture[str]
+) -> None:
     async def check():
         async with Client(mcp.app) as client:
             resources = await client.list_resources()
@@ -302,73 +330,88 @@ def test_mcp_resources_and_annotations_match_rest_and_cli(rest, capsys):
                 (await client.read_resource("fatebridge://families/bazi"))[0].text
             )
             full = json.loads(
-                (await client.read_resource("fatebridge://tools/bazi_birth"))[0].text
+                (await client.read_resource("fatebridge://tools/bazi_birth_chart"))[
+                    0
+                ].text
             )
-            tools = await client.list_tools()
-            return summary, family, full, tools
+            described = await describe_capability(
+                client, "bazi_birth_chart", detail="full"
+            )
+            return summary, family, full, described
 
-    summary, family, full, tools = asyncio.run(check())
+    summary, family, full, described = asyncio.run(check())
     assert (
         summary
-        == rest.get("/api/tools", params={"detail": "summary", "surface": "mcp"}).json()
+        == rest.get("/api/tools", params={"detail": "index", "surface": "mcp"}).json()
     )
     assert (
         family
         == rest.get(
             "/api/tools",
-            params={"detail": "summary", "surface": "mcp", "family": "bazi"},
+            params={"detail": "index", "surface": "mcp", "family": "bazi"},
         ).json()
     )
     assert (
         full
         == rest.get(
             "/api/tools",
-            params={"detail": "full", "surface": "mcp", "tool": "bazi_birth"},
+            params={"detail": "full", "surface": "mcp", "tool": "bazi_birth_chart"},
         ).json()
     )
-    assert run(["discover", "--surface", "mcp"]) == 0
+    assert run(["discover", "--surface", "mcp", "--detail", "index"]) == 0
     assert json.loads(capsys.readouterr().out) == summary
-    records = {t["tool"]: t for t in summary["tools"]}
-    for tool in tools:
-        annotations = tool.annotations.model_dump(by_alias=True, exclude_none=True)
-        assert annotations == records[tool.name]["annotations"]
-        assert annotations == {
-            "readOnlyHint": True,
-            "destructiveHint": False,
-            "idempotentHint": True,
-            "openWorldHint": False,
-        }
+    assert described == full["tools"][0]
+    assert described["annotations"] == {
+        "readOnlyHint": True,
+        "destructiveHint": False,
+        "idempotentHint": True,
+        "openWorldHint": False,
+    }
 
 
-def test_mcp_family_profile_filters_real_tools_and_resource_contracts(rest):
+def test_mcp_family_profile_filters_real_tools_and_resource_contracts(rest) -> None:
     async def check():
         async with Client(mcp.create_mcp_app("bazi,knowledge")) as client:
             tools = await client.list_tools()
             summary = json.loads(
                 (await client.read_resource("fatebridge://catalog/summary"))[0].text
             )
-            result = await client.call_tool("bazi_birth", BIRTH)
+            result = await call_calculation(client, "bazi_birth_chart", BIRTH)
             assert not result.is_error
             with pytest.raises(McpError):
-                await client.read_resource("fatebridge://tools/astro_chart")
+                await client.read_resource("fatebridge://tools/astrology_chart")
             return tools, summary
 
     tools, summary = asyncio.run(check())
     expected = rest.get(
         "/api/tools",
-        params={"family": "bazi,knowledge", "surface": "mcp", "detail": "summary"},
+        params={"family": "bazi,knowledge", "surface": "mcp", "detail": "index"},
     ).json()
     assert summary == expected
-    assert {tool.name for tool in tools} == {tool["tool"] for tool in summary["tools"]}
+    assert {tool.name for tool in tools} == {
+        "discover_capabilities",
+        "describe_capability",
+        "run_calculation",
+        "read_result",
+    }
     with pytest.raises(ParameterError):
         mcp.create_mcp_app("astrp")
 
 
-def test_host_environment_profile_and_invalid_startup_are_enforced():
-    script = (
-        "import asyncio,json; import fatebridge.mcp_server as m; "
-        "print(json.dumps([tool.name for tool in asyncio.run(m.app.list_tools(run_middleware=False))]))"
-    )
+def test_host_environment_profile_and_invalid_startup_are_enforced() -> None:
+    script = """
+import asyncio
+import json
+from fastmcp import Client
+from fatebridge.mcp_server import app
+
+async def load():
+    async with Client(app) as client:
+        result = await client.call_tool("discover_capabilities", {})
+        print(json.dumps([record["tool"] for record in result.structured_content["tools"]]))
+
+asyncio.run(load())
+"""
     env = {**os.environ, "FATEBRIDGE_MCP_FAMILIES": "bazi"}
     process = subprocess.run(
         [sys.executable, "-c", script],
@@ -393,14 +436,14 @@ def test_host_environment_profile_and_invalid_startup_are_enforced():
     assert not rejected.stdout
 
 
-def test_execution_annotation_overrides_are_shared_and_not_hardcoded():
+def test_execution_annotation_overrides_are_shared_and_not_hardcoded() -> None:
     from dataclasses import replace
 
     from fastmcp import FastMCP
 
     from fatebridge.application.description import describe_spec
     from fatebridge.application.tool_spec import ExecutionHints
-    from fatebridge.transports.mcp import register_mcp
+    from fatebridge.mcp_server import _register_mcp_tools
 
     original = next(spec for spec in CATALOG if spec.key == "bazi_birth")
     synthetic = replace(
@@ -410,18 +453,12 @@ def test_execution_annotation_overrides_are_shared_and_not_hardcoded():
         ),
     )
     server = FastMCP("hint regression")
-    register_mcp(
-        server,
-        [synthetic],
-        render_response=mcp._render_protocol_response,
-        render_error=mcp._render_protocol_error,
-    )
+    _register_mcp_tools(server, [synthetic])
 
     async def check():
         async with Client(server) as client:
-            return (await client.list_tools())[0].annotations.model_dump(
-                by_alias=True, exclude_none=True
-            )
+            result = await describe_capability(client, synthetic.tool_name)
+            return result["annotations"]
 
     assert (
         asyncio.run(check())

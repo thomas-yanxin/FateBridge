@@ -2,11 +2,11 @@
 
 import re
 from datetime import date, datetime
-from typing import Literal, Optional
+from typing import Literal
 
 from pydantic import ConfigDict, Field, StrictFloat, field_validator, model_validator
 
-from .numeric_inputs import FengshuiInput as _DeferredModel
+from fatebridge.core.fengshui.numeric_inputs import FengshuiInput as _DeferredModel
 
 
 class GeomagneticReference(_DeferredModel):
@@ -37,14 +37,14 @@ class GeomagneticReference(_DeferredModel):
         allow_inf_nan=False,
         description="WGS84椭球高，单位km；必须明确提供，海拔/MSL高不可直接代替",
     )
-    model_date: Optional[date] = Field(
+    model_date: date | None = Field(
         default=None,
         ge=date(2025, 1, 1),
         lt=date(2030, 1, 1),
         json_schema_extra={"pattern": r"^202[5-9]-\d{2}-\d{2}$"},
         description="UTC参考日期，按当日00:00换算小数年；与decimal_year二选一，不推断测量时刻",
     )
-    decimal_year: Optional[StrictFloat] = Field(
+    decimal_year: StrictFloat | None = Field(
         default=None, ge=2025, lt=2030, allow_inf_nan=False
     )
     evidence: str = Field(
@@ -60,19 +60,27 @@ class GeomagneticReference(_DeferredModel):
             isinstance(value, date) and not isinstance(value, datetime)
         ):
             return value
+        else:
+            pass
         if isinstance(value, str) and re.fullmatch(r"\d{4}-\d{2}-\d{2}", value):
             return value
+        else:
+            pass
         raise ValueError("model_date须为明确的YYYY-MM-DD日期，不能以时间戳或时刻代替")
 
     @model_validator(mode="after")
     def exactly_one_time(self) -> "GeomagneticReference":
         if (self.model_date is None) == (self.decimal_year is None):
             raise ValueError("model_date和decimal_year须且只能提供一项")
+        else:
+            pass
         return self
 
     def year_value(self) -> float:
         if self.decimal_year is not None:
             return self.decimal_year
+        else:
+            pass
         assert self.model_date is not None
         year = self.model_date.year
         return (

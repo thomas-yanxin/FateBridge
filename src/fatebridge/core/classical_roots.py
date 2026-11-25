@@ -5,7 +5,7 @@ and 阴长生. It does not supply numeric coefficients or a universal strong lab
 """
 
 from copy import deepcopy
-from typing import Any, Dict, Literal, Tuple, TypedDict
+from typing import Any, Literal, TypedDict
 
 from fatebridge.core.classical_stages import (
     LU_SEATS,
@@ -15,7 +15,7 @@ from fatebridge.core.classical_stages import (
 )
 from fatebridge.utils.data import BRANCH_CONFLICTS, BRANCH_HIDDEN_STEMS, STEM_ELEMENTS
 
-PillarMap = Dict[str, Tuple[str, str]]
+PillarMap = dict[str, tuple[str, str]]
 SOURCE_ID = "ziping_root_categories_v1"
 
 
@@ -127,10 +127,10 @@ def classify_classical_root(stem: str, branch: str) -> RootClassification:
     }
 
 
-def build_classical_root_profile(pillars: PillarMap) -> Dict[str, Any]:
+def build_classical_root_profile(pillars: PillarMap) -> dict[str, Any]:
     """Retain physical root positions and the chosen text's distinct root views."""
     stem = pillars["day"][0]
-    rows: list[Dict[str, Any]] = []
+    rows: list[dict[str, Any]] = []
     for name in _POSITIONS:
         branch = pillars[name][1]
         rows.append(

@@ -5,10 +5,10 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.validation.human_design_official import official_chart_checks
 from tests.support.ephemeris_case_runtime import (
     native_ephemeris_files_module as native_ephemeris_files_module,
 )
+from validation.human_design_official import official_chart_checks
 
 pytestmark = pytest.mark.usefixtures("native_ephemeris_files_module")
 
@@ -23,7 +23,7 @@ def results():
     return official_chart_checks(COHORT)
 
 
-def test_original_report_and_real_neptune_failure_are_unchanged(results):
+def test_original_report_and_real_neptune_failure_are_unchanged(results) -> None:
     legacy = results
     assert legacy["gate_lines_checked"] == 338
     assert legacy["gate_lines_matched"] == 337
@@ -43,7 +43,9 @@ def test_original_report_and_real_neptune_failure_are_unchanged(results):
     ]
 
 
-def test_enhanced_report_adds_context_without_regrading_or_dropping_rows(results):
+def test_enhanced_report_adds_context_without_regrading_or_dropping_rows(
+    results,
+) -> None:
     enhanced = results
     assert [r["id"] for r in enhanced["cases"]] == [r["id"] for r in COHORT["cases"]]
     assert len(COHORT["missing_planned_ids"]) == 9
@@ -51,7 +53,9 @@ def test_enhanced_report_adds_context_without_regrading_or_dropping_rows(results
     assert COHORT["collection_status"] == "incomplete"
 
 
-def test_historical_75second_disagreements_remain_explicit_and_uncertified(results):
+def test_historical_75second_disagreements_remain_explicit_and_uncertified(
+    results,
+) -> None:
     enhanced = results
     summary = enhanced["birth_clock_link_summary"]
     expected = [
@@ -75,3 +79,5 @@ def test_historical_75second_disagreements_remain_explicit_and_uncertified(resul
             assert not clock["same_nominal_instant"]
             assert row["structure_checks"]["birth_utc"] is False
             assert row["status"] == "failed"
+        else:
+            pass

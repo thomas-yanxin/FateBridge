@@ -4,14 +4,7 @@ import math
 
 import pytest
 
-from fatebridge.validation.sukuyo_study import (
-    GAIN_METHOD,
-    SukuyoProtocol,
-    evaluate,
-    register,
-    seal_forecasts,
-)
-from tests.sukuyo.test_sukuyo_study import (
+from tests.unit_test.fixtures.sukuyo_study import (
     ARTIFACTS,
     EVALUATE_AT,
     EVIDENCE,
@@ -22,6 +15,13 @@ from tests.sukuyo.test_sukuyo_study import (
     forecasts,
     outcomes,
     protocol,
+)
+from validation.sukuyo_study import (
+    GAIN_METHOD,
+    SukuyoProtocol,
+    evaluate,
+    register,
+    seal_forecasts,
 )
 
 
@@ -60,6 +60,10 @@ def prepared(casewise=True, reverse=False):
         ]
         if reverse:
             plan["baseline_forecasts"].reverse()
+        else:
+            pass
+    else:
+        pass
     p = SukuyoProtocol.model_validate(raw)
     submitted = [
         f.model_copy(update={"case_id": str(i)})
@@ -80,12 +84,18 @@ def report(casewise=True, reverse=False, missing=False, abstained=False):
     p, submitted, observed, evidence, sources = prepared(casewise, reverse)
     if abstained:
         submitted[0] = submitted[0].model_copy(update={"probability": None})
+    else:
+        pass
     if reverse:
         submitted.reverse()
         observed.reverse()
+    else:
+        pass
     if missing:
         missing_id = observed.pop().case_id
         sources.pop(missing_id)
+    else:
+        pass
     registration = register(p, MODEL, at=REGISTER_AT, artifacts=ARTIFACTS)
     sealed = seal_forecasts(registration, submitted, at=SEAL_AT, evidence=evidence)
     return evaluate(
@@ -93,7 +103,9 @@ def report(casewise=True, reverse=False, missing=False, abstained=False):
     )
 
 
-def test_sukuyo_casewise_reference_uses_the_registered_case_not_a_constant_fallback():
+def test_sukuyo_casewise_reference_uses_the_registered_case_not_a_constant_fallback() -> (
+    None
+):
     result = report()
     assert result["metrics"]["baseline_brier_score"] == pytest.approx(0.0001)
     assert result["metrics"]["brier_score"] == pytest.approx(0.01)
@@ -109,7 +121,7 @@ def test_sukuyo_casewise_reference_uses_the_registered_case_not_a_constant_fallb
     assert result["real_world_efficacy"] == "not_established_by_synthetic_data"
 
 
-def test_sukuyo_strong_reference_can_reverse_skill_without_changing_forecasts():
+def test_sukuyo_strong_reference_can_reverse_skill_without_changing_forecasts() -> None:
     constant, strong = report(False), report(True)
     assert constant["forecast_records_sha256"] == strong["forecast_records_sha256"]
     assert constant["outcome_records_sha256"] == strong["outcome_records_sha256"]
@@ -118,7 +130,7 @@ def test_sukuyo_strong_reference_can_reverse_skill_without_changing_forecasts():
     assert not strong["authority_certified"] and not constant["authority_certified"]
 
 
-def test_sukuyo_reference_order_cannot_change_case_alignment():
+def test_sukuyo_reference_order_cannot_change_case_alignment() -> None:
     first, shuffled = report(), report(reverse=True)
     assert first["metrics"] == shuffled["metrics"]
     assert first["paired_brier_gain_interval"] == shuffled["paired_brier_gain_interval"]
@@ -126,8 +138,8 @@ def test_sukuyo_reference_order_cannot_change_case_alignment():
 
 @pytest.mark.parametrize("missing,abstained", [(True, False), (False, True)])
 def test_sukuyo_casewise_reference_keeps_missing_and_abstained_pairs(
-    missing, abstained
-):
+    missing: bool, abstained: bool
+) -> None:
     result = report(missing=missing, abstained=abstained)
     assert result["pair_count"] == 64
     assert result["coverage"] == 63 / 64

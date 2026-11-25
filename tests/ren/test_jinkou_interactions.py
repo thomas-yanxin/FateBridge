@@ -13,14 +13,23 @@ from pydantic import ValidationError
 
 import fatebridge.application.execution as execution
 from fatebridge.application.examples import evidence_views
+from fatebridge.core.contracts.output_jinkou_interactions import (
+    JinkouPositionInteractions,
+)
 from fatebridge.core.metaphysics.jinkou_interactions import position_interactions
 from fatebridge.core.metaphysics.jinkou_strength import internal_strength
-from fatebridge.core.output_jinkou_interactions import JinkouPositionInteractions
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.metaphysics import calculate_jinkou_analysis
-from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
 from tests.fixtures.mcp_result_delivery import read_full_result
-from tests.support.transports import AS_OF, SPECS, business, rest, surface_calls
+from tests.support.transports import (
+    AS_OF,
+    SPECS,
+    business,
+    call_calculation,
+    rest,
+    surface_calls,
+)
+from validation.claims import CalculationClaim, verify_calculation_claims
 
 ROOT = Path(__file__).resolve().parents[2]
 SPEC = importlib.util.spec_from_file_location(
@@ -45,7 +54,7 @@ def rows(text):
     return AUDIT.symbolic_rows(REFERENCE, list(text))
 
 
-def test_frozen_clauses_and_expansions_do_not_open_full_acceptance():
+def test_frozen_clauses_and_expansions_do_not_open_full_acceptance() -> None:
     result = AUDIT.audit()
     assert result["definition_matches"] == result["source_clause_count"] == 14
     assert (
@@ -62,7 +71,9 @@ def test_frozen_clauses_and_expansions_do_not_open_full_acceptance():
 
 
 @pytest.mark.parametrize("change", ["edit", "missing", "extra"])
-def test_source_inventory_cannot_remove_an_uncomfortable_condition(tmp_path, change):
+def test_source_inventory_cannot_remove_an_uncomfortable_condition(
+    tmp_path: Path, change: str
+) -> None:
     target = tmp_path / "corpus"
     shutil.copytree(AUDIT.CORPUS, target)
     if change == "edit":
@@ -78,7 +89,9 @@ def test_source_inventory_cannot_remove_an_uncomfortable_condition(tmp_path, cha
         AUDIT.reference(target)
 
 
-def test_deleted_rule_still_keeps_all_8750_required_comparisons(monkeypatch):
+def test_deleted_rule_still_keeps_all_8750_required_comparisons(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     import fatebridge.core.metaphysics.jinkou_interactions as module
 
     original = module.position_interactions
@@ -96,7 +109,7 @@ def test_deleted_rule_still_keeps_all_8750_required_comparisons(monkeypatch):
     assert result["failures"]
 
 
-def test_generation_chain_does_not_remove_separated_controls():
+def test_generation_chain_does_not_remove_separated_controls() -> None:
     actual = position_interactions(rows("木火土金"))
     assert "top_down_generation" in actual["matched_rule_ids"]
     assert (
@@ -114,7 +127,7 @@ def test_generation_chain_does_not_remove_separated_controls():
 
 
 @pytest.mark.parametrize("elements", ["木土金水", "土木金水"])
-def test_outer_battle_accepts_either_control_direction(elements):
+def test_outer_battle_accepts_either_control_direction(elements: str) -> None:
     result = position_interactions(rows(elements))
     battle = next(r for r in result["rule_evaluations"] if r["id"] == "outer_battle")
     assert (
@@ -123,7 +136,7 @@ def test_outer_battle_accepts_either_control_direction(elements):
 
 
 @pytest.mark.parametrize("bad", ["missing", "duplicate", "reversed", "phase"])
-def test_invalid_position_inputs_are_rejected(bad):
+def test_invalid_position_inputs_are_rejected(bad: str) -> None:
     subject = rows("木火土金")
     if bad == "missing":
         subject.pop()
@@ -139,8 +152,8 @@ def test_invalid_position_inputs_are_rejected(bad):
 
 @pytest.mark.parametrize("project", [False, True])
 def test_real_board_has_both_generation_and_control_on_all_ports(
-    project, surface_calls
-):
+    project: bool, surface_calls
+) -> None:
     spec = SPECS["jinkou"]
     fields = [
         "jinkou.position_interactions",
@@ -166,6 +179,8 @@ def test_real_board_has_both_generation_and_control_on_all_ports(
             "false",
         ]
         options.update(fields=fields, strict_fields=True, include_snapshot_text=False)
+    else:
+        pass
     http, protocol, code, cli = surface_calls(
         spec, PAYLOAD, params=params, options=options, flags=flags, cli_first=False
     )
@@ -197,6 +212,8 @@ def test_real_board_has_both_generation_and_control_on_all_ports(
                 if t["rule_id"] == "jinkou.position_interactions"
             )
             assert trace["result"] == interaction
+        else:
+            pass
     assert "jinkou.position_interactions" in evidence_views(spec)["core"]["fields"]
 
 
@@ -241,8 +258,8 @@ def corrupt(data, name):
 @pytest.mark.parametrize("fault", FAULTS)
 @pytest.mark.parametrize("project", [False, True])
 def test_complete_business_envelope_rejects_corruption_before_projection(
-    fault, project, monkeypatch, surface_calls
-):
+    fault, project: bool, monkeypatch: pytest.MonkeyPatch, surface_calls
+) -> None:
     spec = SPECS["jinkou"]
     valid = calculate_jinkou_analysis(**PAYLOAD)
     execution.validate_output(spec, valid)
@@ -259,6 +276,8 @@ def test_complete_business_envelope_rejects_corruption_before_projection(
             actual = replace(
                 actual, bind=lambda _: (lambda: copy.deepcopy(bad), (), {})
             )
+        else:
+            pass
         return original(actual, request)
 
     monkeypatch.setattr(execution, "execute_spec", broken)
@@ -269,6 +288,8 @@ def test_complete_business_envelope_rejects_corruption_before_projection(
         params.update(fields="analysis_type", strict_fields="true")
         options.update(fields=["analysis_type"], strict_fields=True)
         flags += ["--fields", "analysis_type", "--strict-fields", "true"]
+    else:
+        pass
     http, protocol, code, out = surface_calls(
         spec, PAYLOAD, params=params, options=options, flags=flags, cli_first=False
     )
@@ -286,7 +307,9 @@ def test_complete_business_envelope_rejects_corruption_before_projection(
         "complete_classical_conformance",
     ],
 )
-def test_sparse_projections_preserve_complete_arrays_and_false(field, surface_calls):
+def test_sparse_projections_preserve_complete_arrays_and_false(
+    field: str, surface_calls
+) -> None:
     spec = SPECS["jinkou"]
     path = "jinkou.position_interactions." + field
     http, protocol, code, cli = surface_calls(
@@ -323,7 +346,9 @@ def test_sparse_projections_preserve_complete_arrays_and_false(field, surface_ca
     spec.output_model.model_validate(cli)
 
 
-def test_selected_four_position_section_and_same_run_claims_are_faithful(surface_calls):
+def test_selected_four_position_section_and_same_run_claims_are_faithful(
+    surface_calls,
+) -> None:
     spec = SPECS["jinkou"]
     payload = {**PAYLOAD, "selected_sections": ["金口诀四位"]}
     http, protocol, code, cli = surface_calls(
@@ -359,7 +384,7 @@ def test_selected_four_position_section_and_same_run_claims_are_faithful(surface
     )
 
 
-def test_whole_rule_output_models_accept_all_625_phase_combinations():
+def test_whole_rule_output_models_accept_all_625_phase_combinations() -> None:
     from itertools import product
 
     for phases in product("木火土金水", repeat=4):
@@ -369,10 +394,11 @@ def test_whole_rule_output_models_accept_all_625_phase_combinations():
 
 
 @pytest.mark.asyncio
-async def test_published_first_view_recovers_all_relations_from_the_same_run():
+async def test_published_first_view_recovers_all_relations_from_the_same_run() -> None:
     contract = json.loads((ROOT / "docs/contracts/jinkou.json").read_text())
     async with Client(create_mcp_app()) as client:
-        response = await client.call_tool(
+        response = await call_calculation(
+            client,
             "jinkou",
             {
                 **PAYLOAD,

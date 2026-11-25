@@ -5,6 +5,16 @@ model calls. Each case uses a new temporary workspace and the current interprete
 real stdio MCP. The CLI default model is used unless --model is explicitly passed.
 """
 
+import sys as _sys
+from pathlib import Path as _Path
+
+_VAL_REPO_ROOT = _Path(__file__).resolve().parents[1]
+if str(_VAL_REPO_ROOT) not in _sys.path:
+    _sys.path.insert(0, str(_VAL_REPO_ROOT))
+else:
+    pass
+
+
 import argparse
 import asyncio
 import hashlib
@@ -16,17 +26,30 @@ import subprocess
 import sys
 import tempfile
 import time
-from datetime import datetime
 from pathlib import Path
-from typing import Any
 
-from fatebridge.validation.evaluation_assets import (
+import fastmcp
+import fastmcp.client.transports
+from pydantic import JsonValue
+
+from fatebridge.diagnostics import resolve_codex_cli
+from validation.agent_capture import read_capture
+from validation.agent_grading import GRADING_POLICY as GRADING_POLICY
+from validation.agent_grading import _same_argument_path as _same_argument_path
+from validation.agent_grading import error_response as error_response
+from validation.agent_grading import expected_error_call as expected_error_call
+from validation.agent_grading import grade_case as grade_case
+from validation.agent_grading import matches_expected_error as matches_expected_error
+from validation.agent_grading import observations as observations
+from validation.agent_grading import walk as walk
+from validation.evaluation_assets import (
     copy_case_evidence,
     evidence_source_files,
     prepare_evidence_workspace,
     resolve_source,
 )
-from fatebridge.validation.evaluation_environment import (
+from validation.evaluation_environment import (
+    NativeSelection,
     capture_selection,
     context_bytes,
     execution_directory,
@@ -34,12 +57,19 @@ from fatebridge.validation.evaluation_environment import (
     process_environment,
     selected_environment,
 )
+from validation.external_evaluation import (
+    LAYERS,
+    evaluation_summary,
+    freeze_external_selection,
+    load_external_suite,
+    load_frozen_selection,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 _LOCAL_DOC_DIRS = {"validation", "reviews", "plans", "superpowers"}
 
 
-def source_files(root=ROOT, *, extra_files=()):
+def source_files(root: Path = ROOT, *, extra_files: tuple[str, ...] = ()) -> list[Path]:
     selected = [root / name for name in ("AGENTS.md", "pyproject.toml", "uv.lock")]
     for name in (
         "scripts/evaluate_agent.py",
@@ -50,13 +80,21 @@ def source_files(root=ROOT, *, extra_files=()):
         path = root / name
         if path.is_file():
             selected.append(path)
+        else:
+            pass
     docs = root / "docs"
-    for folder in (docs, root / "src"):
+    for folder in (docs, root / "src", root / "validation"):
+        if not folder.exists():
+            continue
+        else:
+            pass
         for current, directories, files in os.walk(folder):
             directory = Path(current)
             excluded = {"__pycache__"}
             if directory == docs:
                 excluded.update(_LOCAL_DOC_DIRS)
+            else:
+                pass
             directories[:] = [name for name in directories if name not in excluded]
             selected.extend(
                 directory / name
@@ -69,17 +107,23 @@ def source_files(root=ROOT, *, extra_files=()):
         path = resolve_source(root, relative)
         if path not in selected:
             selected.append(path)
+        else:
+            pass
     return sorted(selected)
 
 
-def source_manifest(root=ROOT, *, extra_files=()):
+def source_manifest(
+    root: Path = ROOT, *, extra_files: tuple[str, ...] = ()
+) -> dict[str, str]:
     return {
         str(path.relative_to(root)): hashlib.sha256(path.read_bytes()).hexdigest()
         for path in source_files(root, extra_files=extra_files)
     }
 
 
-def freeze_source(target, root=ROOT, *, extra_files=()):
+def freeze_source(
+    target: Path, root: Path = ROOT, *, extra_files: tuple[str, ...] = ()
+) -> dict[str, str]:
     """Freeze one batch's instructions and executable backend, including dirty work."""
     manifest = source_manifest(root, extra_files=extra_files)
     # Before/copy/after hashes retain the same fail-closed consistency rule.
@@ -89,6 +133,8 @@ def freeze_source(target, root=ROOT, *, extra_files=()):
             raise RuntimeError(
                 "Source changed while snapshotting; retry the evaluation"
             )
+        else:
+            pass
         destination = target / name
         destination.parent.mkdir(parents=True, exist_ok=True)
         destination.write_bytes(data)
@@ -96,243 +142,9 @@ def freeze_source(target, root=ROOT, *, extra_files=()):
     frozen = source_manifest(target, extra_files=extra_files)
     if after != manifest or frozen != manifest:
         raise RuntimeError("Source changed while snapshotting; retry the evaluation")
+    else:
+        pass
     return manifest
-
-
-def walk(value):
-    if isinstance(value, dict):
-        yield value
-        for child in value.values():
-            yield from walk(child)
-    elif isinstance(value, list):
-        for child in value:
-            yield from walk(child)
-
-
-def observations(events):
-    calls, commands = [], []
-    for event in events:
-        # Only completed items: started/completed events refer to the same call.
-        if event.get("type") != "item.completed":
-            continue
-        item = event.get("item", {})
-        if item.get("type") == "mcp_tool_call":
-            calls.append(
-                {
-                    "server": item.get("server"),
-                    "tool": item.get("tool"),
-                    "arguments": item.get("arguments", {}),
-                    "status": item.get("status"),
-                    "error": item.get("error"),
-                    "protocol_error": bool(
-                        (item.get("result") or {}).get("isError")
-                        or (item.get("result") or {}).get("is_error")
-                    ),
-                    "error_response": error_response(item.get("result") or {}),
-                }
-            )
-        for node in walk(item):
-            if isinstance(node.get("command"), str):
-                commands.append(node["command"])
-    return calls, commands
-
-
-def error_response(result):
-    """Extract an actual structured error; never infer a code from prose."""
-    for key in ("structuredContent", "structured_content"):
-        value = result.get(key)
-        if isinstance(value, dict) and isinstance(value.get("error_code"), str):
-            return value
-    for block in result.get("content") or []:
-        if not isinstance(block, dict) or not isinstance(block.get("text"), str):
-            continue
-        try:
-            value = json.loads(block["text"])
-        except ValueError:
-            continue
-        if isinstance(value, dict) and isinstance(value.get("error_code"), str):
-            return value
-    return None
-
-
-def matches_expected_error(actual, expected):
-    """Only predeclared exact typed error fields can authorize a refusal case."""
-    required = {"error_code", "status_code", "retryable"}
-    return (
-        isinstance(actual, dict)
-        and isinstance(expected, dict)
-        and required <= expected.keys()
-        and type(expected["error_code"]) is str
-        and bool(expected["error_code"])
-        and type(expected["status_code"]) is int
-        and type(expected["retryable"]) is bool
-        and all(
-            key in actual
-            and type(value) in {str, int, bool, type(None)}
-            and type(actual.get(key)) is type(value)
-            and actual.get(key) == value
-            for key, value in expected.items()
-        )
-    )
-
-
-def expected_error_call(call, expected):
-    return (
-        (
-            (call["status"] == "completed" and call["protocol_error"])
-            or (
-                call["status"] == "failed"
-                and call.get("captured_returned_error") is not None
-            )
-        )
-        and not call["error"]
-        and matches_expected_error(call["error_response"], expected)
-    )
-
-
-def grade_case(case, events, final, returncode, captured_tool_records=None):
-    calls, commands = observations(events)
-    own = [c for c in calls if c["server"] == "fatebridge"]
-    # Some CLI versions mark a returned MCP business error as status=failed and
-    # omit isError. Only an identity-matched, independently captured server reply
-    # can distinguish that representation from a transport failure. Raw CLI
-    # status/protocol flags stay unchanged in the report.
-    if captured_tool_records is not None and len(own) == len(captured_tool_records):
-        identical = all(
-            c["tool"] == r.get("tool") and c["arguments"] == r.get("arguments")
-            for c, r in zip(own, captured_tool_records)
-        )
-        if identical:
-            for call, record in zip(own, captured_tool_records):
-                response = record.get("result") or {}
-                if (
-                    record.get("event") == "tool_call"
-                    and record.get("outcome") == "returned"
-                    and response.get("is_error") is True
-                    and call["error_response"] is not None
-                    and error_response(response) == call["error_response"]
-                    and matches_expected_error(
-                        error_response(response),
-                        case.get("expected_tool_errors", {}).get(call["tool"]),
-                    )
-                ):
-                    call["captured_returned_error"] = {
-                        "journal_record_sha256": record.get("sha256"),
-                        "is_error": True,
-                        "scope": "Matched actual server reply; raw CLI status retained",
-                    }
-    names = {c["tool"] for c in own}
-    failures = []
-    if returncode or not final.strip():
-        failures.append("execution_failed_or_empty_answer")
-    if any(c["server"] != "fatebridge" for c in calls):
-        failures.append("unexpected_external_service")
-    last = {c["tool"]: c for c in own}
-    expected_errors = case.get("expected_tool_errors", {})
-    if any(
-        (c["status"] == "failed" or c["error"] or c["protocol_error"])
-        and not expected_error_call(c, expected_errors.get(c["tool"]))
-        for c in last.values()
-    ):
-        failures.append("unrecovered_tool_failure")
-    for name, expected in expected_errors.items():
-        selected = [c for c in own if c["tool"] == name]
-        if not selected or not all(expected_error_call(c, expected) for c in selected):
-            failures.append("expected_tool_error_not_matched:" + name)
-    for choices in case.get("required_any", []):
-        if not names.intersection(choices):
-            failures.append("missing_tool:" + "|".join(choices))
-    if case.get("no_calculation") and any(
-        name
-        not in {
-            "knowledge_read",
-            "knowledge_registry",
-            "read_mcp_resource",
-            "list_mcp_resources",
-            "list_mcp_resource_templates",
-        }
-        for name in names
-    ):
-        failures.append("unexpected_calculation")
-    if names.intersection(case.get("forbidden_tools", [])):
-        failures.append("out_of_scope_tool")
-    if "allowed_tools" in case and names - set(case["allowed_tools"]):
-        failures.append("out_of_scope_tool")
-    for name, expected in case.get("arguments", {}).items():
-        selected = [c for c in own if c["tool"] == name]
-        if not selected or any(
-            c["arguments"].get(key) != value
-            for c in selected
-            for key, value in expected.items()
-        ):
-            failures.append("input_mismatch:" + name)
-    for name, expected in case.get("argument_paths", {}).items():
-        selected = [c for c in own if c["tool"] == name]
-        if not selected or any(
-            not _same_argument_path(c["arguments"], path, value)
-            for c in selected
-            for path, value in expected.items()
-        ):
-            failures.append("input_mismatch:" + name)
-    for name, expected in case.get("instant_arguments", {}).items():
-        selected = [c for c in own if c["tool"] == name]
-
-        def same_instant(actual, expected):
-            try:
-                actual_time = datetime.fromisoformat(actual)
-                expected_time = datetime.fromisoformat(expected)
-                return (
-                    actual_time.utcoffset() is not None
-                    and expected_time.utcoffset() is not None
-                    and actual_time == expected_time
-                )
-            except (TypeError, ValueError):
-                return False
-
-        if not selected or any(
-            not same_instant(c["arguments"].get(key), value)
-            for c in selected
-            for key, value in expected.items()
-        ):
-            failures.append("instant_mismatch:" + name)
-    for name, maximum in case.get("max_successful_calls", {}).items():
-        successful = [
-            c
-            for c in own
-            if c["tool"] == name
-            and c["status"] == "completed"
-            and not c["error"]
-            and not c["protocol_error"]
-        ]
-        if len(successful) > maximum:
-            failures.append("repeated_calculation:" + name)
-    for name, maximum in case.get("max_total_calls", {}).items():
-        if sum(c["tool"] == name for c in own) > maximum:
-            failures.append("repeated_tool_attempt:" + name)
-    if case.get("full_export"):
-        selected = [c for c in own if c["tool"] == case["full_export"]]
-        if not selected or selected[0]["arguments"].get("fields") is not None:
-            failures.append("projected_full_export")
-    return {
-        "mechanical_checks_passed": not failures,
-        "failures": failures,
-        "tool_calls": own,
-        "commands": commands,
-        "manual_review": case["manual_review"],
-    }
-
-
-# These ids describe predeclared case contracts, never model outcomes.
-GRADING_POLICY = "observed_tool_contracts_v3"
-
-
-def _same_argument_path(arguments, path, expected):
-    value = arguments
-    for part in path.split("."):
-        if not isinstance(value, dict) or part not in value:
-            return False
-        value = value[part]
-    return value == expected and isinstance(value, bool) == isinstance(expected, bool)
 
 
 # Keep evaluator descriptions in the source snapshot for the reviewer only.
@@ -343,7 +155,7 @@ EVALUATION_DOCS_EXCLUDED = _LOCAL_DOC_DIRS | {
 }
 
 
-def prepare_workspace(workspace, source=ROOT):
+def prepare_workspace(workspace: Path, source: Path = ROOT) -> None:
     shutil.copy2(source / "AGENTS.md", workspace / "AGENTS.md")
     shutil.copytree(source / "src", workspace / "src")
     shutil.copytree(
@@ -359,31 +171,40 @@ def prepare_workspace(workspace, source=ROOT):
         )
 
 
-def prepare_case_workspace(workspace: Path, source: Path, case: dict[str, Any]) -> None:
+def prepare_case_workspace(
+    workspace: Path, source: Path, case: dict[str, JsonValue]
+) -> None:
     mode = case.get("evidence_only_workspace", False)
     if type(mode) is not bool:
         raise ValueError("evidence_only_workspace must be a boolean")
+    else:
+        pass
     if mode:
         if not case.get("evidence_files"):
             raise ValueError("Evidence-only workspaces require declared evidence")
+        else:
+            pass
         prepare_evidence_workspace(workspace, source)
     else:
         prepare_workspace(workspace, source)
 
 
 def command_for(
-    cli,
-    workspace,
-    output,
-    case,
-    model=None,
-    backend_source=None,
-    native_selection=None,
-    native_working_directory=None,
-):
+    cli: str,
+    workspace: Path,
+    output: Path,
+    case: dict[str, JsonValue],
+    model: str | None = None,
+    backend_source: Path | None = None,
+    native_selection: NativeSelection | None = None,
+    native_working_directory: Path | None = None,
+) -> list[str]:
     if case.get("evidence_only_workspace") and backend_source is None:
         raise ValueError("Evidence-only models require a separate frozen MCP backend")
+    else:
+        pass
     backend = backend_source if case.get("evidence_only_workspace") else workspace
+    assert backend is not None
     command = [
         cli,
         "exec",
@@ -427,11 +248,16 @@ def command_for(
             "-X",
             "utf8",
             "-m",
-            "fatebridge.validation.agent_capture",
+            "validation.agent_capture",
         ]
+        settings["mcp_servers.fatebridge.env.PYTHONPATH"] = os.pathsep.join(
+            [str(backend), str(backend / "src")]
+        )
         settings["mcp_servers.fatebridge.env.FATEBRIDGE_EVALUATION_LOG"] = str(
             output / "mcp-calls.jsonl"
         )
+    else:
+        pass
     if native_working_directory is not None:
         settings["mcp_servers.fatebridge.cwd"] = str(native_working_directory)
         # Script mode keeps Python's initial import path in the frozen source.
@@ -439,7 +265,7 @@ def command_for(
         # could shadow the declared PYTHONPATH before our code starts. This
         # also works on Python3.10, which has no -P switch.
         entry = (
-            "src/fatebridge/validation/agent_capture.py"
+            "validation/agent_capture.py"
             if case.get("capture_payloads")
             else "src/fatebridge/mcp_server.py"
         )
@@ -448,24 +274,28 @@ def command_for(
             "utf8",
             str((backend / entry).absolute()),
         ]
+    else:
+        pass
     for key, value in settings.items():
         command.extend(["-c", key + "=" + json.dumps(value, ensure_ascii=False)])
     if model:
         command.extend(["--model", model])
+    else:
+        pass
     command.append("-")
     return command
 
 
 def run_case(
-    cli,
-    case,
-    output,
-    timeout,
-    model=None,
-    source=ROOT,
-    native_selection=None,
-    native_working_directory=None,
-):
+    cli: str,
+    case: dict[str, JsonValue],
+    output: Path,
+    timeout: int,
+    model: str | None = None,
+    source: Path = ROOT,
+    native_selection: NativeSelection | None = None,
+    native_working_directory: Path | None = None,
+) -> dict[str, JsonValue]:
     native_selection = (
         capture_selection() if native_selection is None else native_selection
     )
@@ -483,6 +313,8 @@ def run_case(
                 json.dumps(evidence, ensure_ascii=False, indent=2) + "\n",
                 encoding="utf-8",
             )
+        else:
+            pass
         command = (
             command_for(
                 cli,
@@ -545,11 +377,13 @@ def run_case(
             source_case_id=case["source_case_id"],
             semantic_status="pending",
         )
+    else:
+        pass
     if evidence:
         record["evidence_files"] = evidence
+    else:
+        pass
     if case.get("capture_payloads"):
-        from fatebridge.validation.agent_capture import read_capture
-
         try:
             captured = read_capture(target / "mcp-calls.jsonl")
             tool_records = [r for r in captured if r["event"] == "tool_call"]
@@ -590,13 +424,15 @@ def run_case(
         except (OSError, ValueError, KeyError, TypeError):
             record["failures"].append("missing_or_invalid_mcp_capture")
         record["mechanical_checks_passed"] = not record["failures"]
+    else:
+        pass
     (target / "grade.json").write_text(
         json.dumps(record, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
     )
     return record
 
 
-def model_prompt(case):
+def model_prompt(case: dict[str, JsonValue]) -> str:
     """Expose the operational tool contract, never hidden answer criteria.
 
     Earlier runs graded allowed_tools without telling the model about that
@@ -605,42 +441,45 @@ def model_prompt(case):
     allowed = case.get("allowed_tools")
     if allowed is None:
         return case["prompt"]
+    else:
+        pass
     if allowed == []:
         return (
             "本次运行的工具合同：不调用任何 FateBridge 工具。"
             "请按适用技能核对已确认资料并直接回应当前请求。\n\n" + case["prompt"]
         )
+    else:
+        pass
     return (
-        "本次运行的工具合同：只允许调用以下FateBridge工具："
+        "本次运行通过 run_calculation 调用能力，tool 只能选 "
         + "、".join(allowed)
-        + "。即使技能给出其他通用入口，也须遵守本次限定；不以别的计算工具替代。"
-        + "仍按适用技能核对输入、读取实际回执和同run分页。\n\n"
+        + "。按需用 discover_capabilities 或 describe_capability 核对合同，"
+        + "用 read_result 读取同次计算的结果。仍按适用技能核对输入和实际回执。\n\n"
         + case["prompt"]
     )
 
 
 async def prepare_references(
-    cases, output, source, native_selection=None, native_working_directory=None
-):
+    cases: list[dict[str, JsonValue]],
+    output: Path,
+    source: Path,
+    native_selection: NativeSelection | None = None,
+    native_working_directory: Path | None = None,
+) -> list[dict[str, JsonValue]]:
     """Call real MCP tools only; do not start a model or grade any answer."""
-    from fastmcp import Client
-    from fastmcp.client.transports import StdioTransport
-
-    from fatebridge.validation.external_evaluation import LAYERS
-
     target = output / "reference-payloads"
     target.mkdir()
     prompts = output / "model-prompts"
     prompts.mkdir()
-    transport = StdioTransport(
+    transport = fastmcp.client.transports.StdioTransport(
         command=sys.executable,
         args=(
-            ["-X", "utf8", "-m", "fatebridge.validation.agent_capture"]
+            ["-X", "utf8", "-m", "validation.agent_capture"]
             if native_working_directory is None
             else [
                 "-X",
                 "utf8",
-                str((source / "src/fatebridge/validation/agent_capture.py").absolute()),
+                str((source / "validation/agent_capture.py").absolute()),
             ]
         ),
         cwd=str(
@@ -648,7 +487,7 @@ async def prepare_references(
         ),
         env={
             **selected_environment(native_selection),
-            "PYTHONPATH": str(source / "src"),
+            "PYTHONPATH": os.pathsep.join([str(source), str(source / "src")]),
             "FATEBRIDGE_EVALUATION_LOG": str(output / "reference-mcp.jsonl"),
             "FATEBRIDGE_MCP_FAMILIES": "",
         },
@@ -656,7 +495,7 @@ async def prepare_references(
     )
     references = []
     worksheet = []
-    async with Client(transport) as client:
+    async with fastmcp.Client(transport) as client:
         for case in cases:
             (prompts / (case["id"] + ".txt")).write_text(
                 model_prompt(case), encoding="utf-8"
@@ -684,6 +523,8 @@ async def prepare_references(
                     split=case["split"],
                     source_case_id=case["source_case_id"],
                 )
+            else:
+                pass
             worksheet.append(row)
             if case.get("evidence_files"):
                 with tempfile.TemporaryDirectory(
@@ -693,6 +534,8 @@ async def prepare_references(
                     prepare_case_workspace(workspace, source, case)
                     evidence = copy_case_evidence(workspace, case, source)
                 row["evidence_files"] = evidence
+            else:
+                pass
             request = case.get("reference_request")
             if request is None:
                 references.append(
@@ -706,6 +549,8 @@ async def prepare_references(
                     }
                 )
                 continue
+            else:
+                pass
             arguments = {
                 **request["arguments"],
                 "fields": None,
@@ -716,8 +561,36 @@ async def prepare_references(
                 # External suites freeze their reviewed evidence projection.
                 # Keep historical cohorts' full-reference capture unchanged.
                 arguments["fields"] = request["arguments"].get("fields")
+            else:
+                pass
+            controls = {
+                "as_of",
+                "trace_id",
+                "parent_run_id",
+                "detail",
+                "fields",
+                "strict_fields",
+                "include_snapshot_text",
+                "response_char_limit",
+                "compact",
+            }
             response = await client.call_tool(
-                request["tool"], arguments, raise_on_error=False
+                "run_calculation",
+                {
+                    "tool": request["tool"],
+                    "detail": "standard",
+                    "arguments": {
+                        name: value
+                        for name, value in arguments.items()
+                        if name not in controls
+                    },
+                    **{
+                        name: value
+                        for name, value in arguments.items()
+                        if name in controls
+                    },
+                },
+                raise_on_error=False,
             )
             payload = response.structured_content
             path = target / (case["id"] + ".json")
@@ -755,8 +628,12 @@ async def prepare_references(
                     raise ValueError(
                         f"Expected reference MCP error not matched: {case['id']}"
                     )
+                else:
+                    pass
             elif response.is_error or payload is None:
                 raise ValueError(f"Reference MCP call failed: {case['id']}")
+            else:
+                pass
             references.append(
                 {
                     "case": case["id"],
@@ -789,7 +666,7 @@ async def prepare_references(
     return references
 
 
-def main():
+def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--output",
@@ -838,10 +715,14 @@ def main():
     args = parser.parse_args()
     if args.timeout <= 0:
         parser.error("--timeout must be positive")
+    else:
+        pass
     if bool(args.native_environment) != bool(args.native_environment_sha256):
         parser.error(
             "--native-environment and --native-environment-sha256 must be provided together"
         )
+    else:
+        pass
     try:
         if args.native_environment is None:
             native_selection = capture_selection()
@@ -856,13 +737,6 @@ def main():
     native_sha256 = hashlib.sha256(native_raw).hexdigest()
     external = None
     if args.external_suite:
-        from fatebridge.validation.external_evaluation import (
-            evaluation_summary,
-            freeze_external_selection,
-            load_external_suite,
-            load_frozen_selection,
-        )
-
         split = args.split or "development"
         try:
             external = (
@@ -881,31 +755,74 @@ def main():
     else:
         if args.split:
             parser.error("--split requires --external-suite")
+        else:
+            pass
         if args.cases_file is None:
             parser.error("--cases-file is required unless --external-suite is used")
-        dataset_bytes = args.cases_file.read_bytes()
-        document = json.loads(dataset_bytes)
+        else:
+            pass
+        try:
+            dataset_bytes = args.cases_file.read_bytes()
+            document: object = json.loads(dataset_bytes)
+        except (OSError, ValueError) as error:
+            parser.error(str(error))
+        if not isinstance(document, dict):
+            parser.error("Case dataset must be a JSON object")
+        else:
+            pass
         if document.get("suite_id") in ("mingli-bench-v1", "mingli-bench-v2"):
             parser.error("MingLi data requires --external-suite mingli-bench")
-        cases = document["cases"]
-        known = {case["id"] for case in cases}
-        if len(known) != len(cases):
-            parser.error("Case IDs must be unique")
+        else:
+            pass
+        raw_cases = document.get("cases")
+        if not isinstance(raw_cases, list):
+            parser.error("Case dataset must contain a case list")
+        else:
+            pass
+        known: set[str] = set()
+        cases = []
+        for case in raw_cases:
+            if not isinstance(case, dict):
+                parser.error("Evaluation cases must be JSON objects")
+            else:
+                pass
+            case_id = case.get("id")
+            if (
+                not isinstance(case_id, str)
+                or not case_id
+                or case_id in {".", ".."}
+                or any(character in case_id for character in ("/", "\\", "\x00"))
+            ):
+                parser.error("Case IDs must be nonempty safe file names")
+            else:
+                pass
+            if case_id in known:
+                parser.error("Case IDs must be unique")
+            else:
+                pass
+            known.add(case_id)
+            if not args.cases or case_id in args.cases:
+                cases.append(case)
+            else:
+                pass
         if args.cases and not set(args.cases) <= known:
             parser.error("Unknown case; available: " + ", ".join(sorted(known)))
-        cases = [c for c in cases if not args.cases or c["id"] in args.cases]
+        else:
+            pass
     if any({"expected_skill", "expected_skill_sets"} & case.keys() for case in cases):
         parser.error(
             "Cases with retired skill requirements need their original evaluator"
         )
-    from fatebridge.diagnostics import resolve_codex_cli
-
+    else:
+        pass
     cli = None if args.prepare_only else args.codex or resolve_codex_cli()["path"]
     output = args.output.expanduser().resolve()
     output.mkdir(parents=True, mode=0o700, exist_ok=False)
     os.chmod(output, 0o700)
     if external is not None:
         dataset_bytes = freeze_external_selection(external, output)
+    else:
+        pass
     (output / "case-dataset.json").write_bytes(dataset_bytes)
     (output / "native-environment.json").write_bytes(native_raw)
     if external is not None:
@@ -914,6 +831,8 @@ def main():
             output / "case-dataset.json", external["split"]
         )
         cases = external["cases"]
+    else:
+        pass
     source = output / "source"
     extra_files = evidence_source_files(cases, ROOT)
     manifest = freeze_source(source, extra_files=extra_files)
@@ -930,6 +849,8 @@ def main():
         frozen_manifest = source_manifest(source, extra_files=extra_files)
         if frozen_manifest != manifest:
             raise RuntimeError("Frozen source changed during reference preparation")
+        else:
+            pass
         command = [
             sys.executable,
             str(source / "scripts/evaluate_agent.py"),
@@ -951,10 +872,16 @@ def main():
             command.extend(
                 ["--external-suite", args.external_suite, "--split", external["split"]]
             )
+        else:
+            pass
         if args.codex:
             command.extend(["--codex", args.codex])
+        else:
+            pass
         if args.model:
             command.extend(["--model", args.model])
+        else:
+            pass
         proposal = {
             "command": command,
             "cwd": str(source),
@@ -985,6 +912,8 @@ def main():
             report["scope"] = (
                 "Frozen public competition adaptation and MCP references; no model or semantic evaluation"
             )
+        else:
+            pass
         (output / "preparation.json").write_text(
             json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
         )
@@ -995,6 +924,8 @@ def main():
             )
         )
         return 0
+    else:
+        pass
     report = {
         "scope": "real Codex model + current stdio MCP; fictional isolated cases",
         "cli": cli,
@@ -1019,6 +950,8 @@ def main():
         report["scope"] = (
             "Real Codex model + frozen stdio MCP; public competition adaptations; semantic review pending"
         )
+    else:
+        pass
     for case in cases:
         record = run_case(
             cli,
@@ -1037,6 +970,8 @@ def main():
         )
         if external is not None:
             report.update(evaluation_summary(external, report["cases"]))
+        else:
+            pass
         (output / "report.json").write_text(
             json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
         )
@@ -1052,8 +987,12 @@ def main():
         )
         if args.stop_on_execution_failure and record["exit_code"]:
             break
+        else:
+            pass
     return 0 if report["mechanical_checks_passed"] else 1
 
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

@@ -22,17 +22,25 @@ def sha(p: Path) -> str:
 def reference(folder: Path = CORPUS) -> dict[str, Any]:
     if sha(folder / "freeze.json") != FREEZE_SHA:
         raise ValueError("Frozen branch-star manifest changed")
+    else:
+        pass
     m = json.loads((folder / "freeze.json").read_text())
     names = {"reference.json", "source-pages.pdf"}
     if set(m["files"]) != names or {p.name for p in folder.iterdir()} != names | {
         "freeze.json"
     }:
         raise ValueError("Frozen branch-star source inventory changed")
+    else:
+        pass
     if any(sha(folder / n) != h for n, h in m["files"].items()):
         raise ValueError("Frozen branch-star source changed")
+    else:
+        pass
     value: dict[str, Any] = json.loads((folder / "reference.json").read_text())
     if len(value["synthetic_cases"]) != 5 or len(value["month_order"]) != 12:
         raise ValueError("Frozen branch-star denominators changed")
+    else:
+        pass
     return value
 
 
@@ -67,10 +75,10 @@ def audit() -> dict[str, Any]:
         if p.is_file() and "__pycache__" not in p.parts and p.suffix != ".pyc"
     ] + [Path(__file__).resolve()]
     before = {str(p.relative_to(ROOT)): sha(p) for p in source_paths}
-    from fatebridge.core.metaphysics.jinkou_branch_stars import branch_stars
-    from fatebridge.core.output_jinkou_branch_stars import (
+    from fatebridge.core.contracts.output_jinkou_branch_stars import (
         JinkouBranchStars,
     )
+    from fatebridge.core.metaphysics.jinkou_branch_stars import branch_stars
 
     errors = []
     digest = hashlib.sha256()
@@ -105,6 +113,8 @@ def audit() -> dict[str, Any]:
                     expected=wanted,
                 )
             )
+        else:
+            pass
 
     for month, branches in itertools.product(
         BRANCHES, itertools.product(BRANCHES, repeat=3)

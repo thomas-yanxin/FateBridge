@@ -6,7 +6,11 @@ This sidecar never applies a relation, transfers a budget or recalculates force.
 from itertools import combinations
 from typing import Any, Mapping, Sequence
 
-from fatebridge.core.bazi_branch_facts import classify_triple_members
+from fatebridge.core.bazi.bazi_branch_facts import classify_triple_members
+from fatebridge.core.punishment_resolution import (
+    MONTH_OFFICER_CLASH_RESOLVED,
+    REPETITION_NO_PUNISHMENT,
+)
 from fatebridge.utils.data import (
     BRANCH_COMBINATION_ELEMENT,
     BRANCH_SEASONAL_COMBINATIONS,
@@ -42,7 +46,12 @@ KNOWN_STATUSES = {
         "resolved_by_combination",
         "resolved_by_ordered_generation_path",
     },
-    "刑": {"active", "resolved_by_combination"},
+    "刑": {
+        "active",
+        "resolved_by_combination",
+        REPETITION_NO_PUNISHMENT,
+        MONTH_OFFICER_CLASH_RESOLVED,
+    },
     "自刑": {"active"},
     "天干合": {"binding", "day_master_or_contested_review"},
 }
@@ -75,10 +84,14 @@ def geometric_candidates(branches: Mapping[str, str]) -> list[dict[str, Any]]:
             seats = [p for p in ORDER if branches[p] in group]
             if {branches[p] for p in seats} == set(group):
                 add(kind, BUREAU_ELEMENT[bureau].value, seats)
+            else:
+                pass
     for pair in combinations(ORDER, 2):
         target = BRANCH_COMBINATION_ELEMENT.get(frozenset(branches[p] for p in pair))
         if target is not None:
             add("六合", target.value, pair)
+        else:
+            pass
     for group, bureau in BRANCH_TRIPLE_COMBINATIONS.items():
         for pair in combinations(ORDER, 2):
             if (
@@ -86,6 +99,8 @@ def geometric_candidates(branches: Mapping[str, str]) -> list[dict[str, Any]]:
                 == "peak_pair"
             ):
                 add("半合", BUREAU_ELEMENT[bureau].value, pair)
+            else:
+                pass
     return specs
 
 
@@ -181,6 +196,13 @@ def build_branch_combination_candidates(
                 decision = "suppressed_before_half_evaluation"
             else:
                 decision = "unclassified_unrecorded"
+        else:
+            pass
+        matching_statuses = (
+            [events[index].get("status") for index in matching]
+            if events is not None
+            else None
+        )
         rows.append(
             {
                 **spec,
@@ -191,8 +213,9 @@ def build_branch_combination_candidates(
                     else None
                 ),
                 "current_statuses": (
-                    [events[i]["status"] for i in matching]
-                    if events is not None
+                    matching_statuses
+                    if matching_statuses is not None
+                    and all(isinstance(status, str) for status in matching_statuses)
                     else None
                 ),
                 "claimed_blockers": claimed_blockers,

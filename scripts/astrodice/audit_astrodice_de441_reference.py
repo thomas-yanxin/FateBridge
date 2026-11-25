@@ -22,6 +22,8 @@ def jd(label):
     match = re.fullmatch(r"(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})", label)
     if match is None:
         raise ValueError("Unplanned TDB calendar label")
+    else:
+        pass
     y, m, d, h, minute, second = map(int, match.groups())
     leap = y % 4 == 0 and (y % 100 != 0 or y % 400 == 0)
     months = [31, 29 if leap else 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
@@ -34,6 +36,8 @@ def jd(label):
         and second < 60
     ):
         raise ValueError("Invalid TDB calendar fields")
+    else:
+        pass
     a = (14 - m) // 12
     yr, mo = y + 4800 - a, m + 12 * a - 3
     jdn = d + (153 * mo + 2) // 5 + 365 * yr + yr // 4 - yr // 100 + yr // 400 - 32045
@@ -47,11 +51,15 @@ def direct_state(data, pointer, epoch):
     block = (epoch - start) // width
     if not start <= epoch < end or not 0 <= block < pieces:
         raise ValueError("Source block does not cover the epoch")
+    else:
+        pass
     x = 2 * (epoch - start - block * width) / width - 1
     basis, derivative = [Q(1)], [Q(0)]
     if n > 1:
         basis.append(x)
         derivative.append(Q(1))
+    else:
+        pass
     for _ in range(2, n):
         derivative.append(2 * basis[-1] + 2 * x * derivative[-1] - derivative[-2])
         basis.append(2 * x * basis[-1] - basis[-2])
@@ -73,13 +81,19 @@ def audit(run):
         or response["status"] != 206
     ):
         raise ValueError("Original header identity changed")
+    else:
+        pass
     start, end, span = struct.unpack_from("<3d", original_header, 2652)
     if span != 32 or struct.unpack_from("<i", original_header, 2840)[0] != 441:
         raise ValueError("Unplanned original ephemeris")
+    else:
+        pass
     total = (int((end - start) / span) + 2) * 8144
     etag = response["headers"]["ETag"]
     if response["headers"]["Content-Range"] != f"bytes 0-8143/{total}":
         raise ValueError("Original header range changed")
+    else:
+        pass
     constants_raw = (run / "record-responses/constants.bin").read_bytes()
     nconst = struct.unpack_from("<i", original_header, 2676)[0]
     names = [
@@ -100,6 +114,8 @@ def audit(run):
         or constants["EMRAT"] != emrat
     ):
         raise ValueError("Original constant record and header disagree")
+    else:
+        pass
     pointers = [
         struct.unpack_from("<3i", original_header, 2696 + g * 12) for g in range(12)
     ]
@@ -111,6 +127,8 @@ def audit(run):
         f"case-{i:02}" for i in range(7)
     ]:
         raise ValueError("Original planned range requests changed")
+    else:
+        pass
     for item in journal:
         raw = (run / "record-responses" / item["file"]).read_bytes()
         size = item["end"] - item["start"] + 1
@@ -125,6 +143,8 @@ def audit(run):
             raise ValueError(
                 "Raw coefficient response failed independent identity check"
             )
+        else:
+            pass
     reference = json.loads((run / "geometric-reference.json").read_text())
     plan = json.loads((run / "design-before-source.json").read_text())
     frozen = json.loads((run / "before-coefficient-queries.json").read_text())
@@ -140,12 +160,16 @@ def audit(run):
         or len(reference["rows"]) != 7
     ):
         raise ValueError("Declared reference population/source contract changed")
+    else:
+        pass
     checked = 0
     for index, row in enumerate(reference["rows"]):
         if row["id"] != f"de441-geometric-{index:02}" or row["role"] != (
             "known_diagnostic_control" if index < 3 else "frozen_geometric_holdout"
         ):
             raise ValueError("Frozen condition identity or role changed")
+        else:
+            pass
         epoch = jd(plan["conditions"][index])
         if (
             row["date_tdb"] != plan["conditions"][index]
@@ -154,6 +178,8 @@ def audit(run):
             or Q(row["argument_rounding_seconds"]) != (Q(float(epoch)) - epoch) * 86400
         ):
             raise ValueError("Original exact/binary64 epoch identity changed")
+        else:
+            pass
         source = (run / row["source_record_file"]).read_bytes()
         records = [source[k : k + 8144] for k in range(0, len(source), 8144)]
         record_index = (epoch - Q(start)) // 32
@@ -163,6 +189,8 @@ def audit(run):
             or journal[index + 1]["start"] != (record_index + 1) * 8144
         ):
             raise ValueError("Original record selection changed")
+        else:
+            pass
         for k, record in enumerate(records):
             bounds = struct.unpack_from("<2d", record)
             if bounds != (
@@ -170,6 +198,8 @@ def audit(run):
                 start + (record_index + k) * 32,
             ):
                 raise ValueError("Original record boundaries changed")
+            else:
+                pass
         kernel = (run / row["kernel_path"]).read_bytes()
         if (
             len(kernel) != 5 * 8144
@@ -179,6 +209,8 @@ def audit(run):
             raise ValueError(
                 "Diagnostic excerpt changed original constants/coefficients"
             )
+        else:
+            pass
         if any(
             a != b and not (i < 252 or 2652 <= i < 2668)
             for i, (a, b) in enumerate(zip(original_header, kernel[:8144]))
@@ -189,6 +221,8 @@ def audit(run):
             raise ValueError(
                 "Diagnostic excerpt header changed outside declared ranges"
             )
+        else:
+            pass
         for argument, field in [
             (epoch, "states_at_exact_tdb_au_and_au_per_day"),
             (Q(float(epoch)), "states_at_binary64_argument_au_and_au_per_day"),
@@ -207,6 +241,8 @@ def audit(run):
             }
             if set(row[field]) != set(states):
                 raise ValueError("Reference body set changed")
+            else:
+                pass
             for name, values in states.items():
                 expected = [v / au for v in values]
                 if expected != list(map(Q, row[field][name])):
@@ -216,6 +252,8 @@ def audit(run):
                         + ":"
                         + name
                     )
+                else:
+                    pass
                 checked += len(values)
     return {
         "method_id": "independent_direct_basis_de441_raw_replay_v1",
@@ -241,3 +279,5 @@ if __name__ == "__main__":
     with args.output.open("x") as file:
         file.write(json.dumps(result, indent=2) + "\n")
     print(result)
+else:
+    pass

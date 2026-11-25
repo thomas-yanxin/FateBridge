@@ -7,8 +7,8 @@ from pathlib import Path
 
 import pytest
 
-import fatebridge.core.guolao_cardinals as module
-from fatebridge.core.guolao_huangchi import load_table
+import fatebridge.core.guolao.guolao_cardinals as module
+from fatebridge.core.guolao.guolao_huangchi import load_table
 
 ROOT = Path(__file__).parents[2]
 FIXTURE = Path(__file__).parents[1] / "fixtures/guolao-cardinals-v1"
@@ -16,7 +16,9 @@ REFERENCE = json.loads((FIXTURE / "reference.json").read_text())
 
 
 @pytest.mark.parametrize("profile", ["nlc166", "wikisource"])
-def test_printed_quarter_is_year_based_and_not_the_coordinate_circle(profile):
+def test_printed_quarter_is_year_based_and_not_the_coordinate_circle(
+    profile: str,
+) -> None:
     r = module.gujin43_cardinal_example(profile=profile)
     lane = r["printed_operands_lane"]
     assert F(lane["year_quarter_du_exact"]) == F("91.31055")
@@ -30,7 +32,7 @@ def test_printed_quarter_is_year_based_and_not_the_coordinate_circle(profile):
 
 
 @pytest.mark.parametrize("index", range(5))
-def test_all_five_source_cardinal_longitudes_are_compared_before_modulo(index):
+def test_all_five_source_cardinal_longitudes_are_compared_before_modulo(index) -> None:
     lane = module.gujin43_cardinal_example(profile="wikisource")[
         "printed_operands_lane"
     ]
@@ -39,11 +41,13 @@ def test_all_five_source_cardinal_longitudes_are_compared_before_modulo(index):
     assert F(actual["unwrapped_from_ji_start_du_exact"]) == F(expected)
     if index == 4:
         assert F(actual["modulo_circle_from_ji_start_du_exact"]) == F("4.6236")
+    else:
+        pass
     assert "mansion" not in actual and "longitude" not in actual
 
 
 @pytest.mark.parametrize("index", range(5))
-def test_source_times_preserve_full_cycle_wraps_and_fractional_days(index):
+def test_source_times_preserve_full_cycle_wraps_and_fractional_days(index) -> None:
     r = module.gujin43_cardinal_example(profile="wikisource")
     actual = r["cardinal_times"][index]
     assert F(actual["sexagenary_cycle_day_exact"]) == F(
@@ -59,7 +63,9 @@ def test_source_times_preserve_full_cycle_wraps_and_fractional_days(index):
 
 
 @pytest.mark.parametrize("profile", ["nlc166", "wikisource"])
-def test_unrounded_initial_rate_chain_preserves_both_quotients_and_residuals(profile):
+def test_unrounded_initial_rate_chain_preserves_both_quotients_and_residuals(
+    profile: str,
+) -> None:
     r = module.gujin43_cardinal_example(profile=profile)
     hand = REFERENCE["independent_hand_checks"]
     lane = r["unrounded_rate_lane"]
@@ -76,7 +82,7 @@ def test_unrounded_initial_rate_chain_preserves_both_quotients_and_residuals(pro
     assert not r["printed_precision_policy_established"]
 
 
-def test_mansion_relative_winter_degree_is_not_a_solstice_local_accumulation():
+def test_mansion_relative_winter_degree_is_not_a_solstice_local_accumulation() -> None:
     r = module.gujin43_cardinal_example(profile="wikisource")
     # Source says 初日下赤道率, not the row for this mansion-relative degree.
     wrong = load_table("wikisource").convert(
@@ -88,7 +94,9 @@ def test_mansion_relative_winter_degree_is_not_a_solstice_local_accumulation():
     )
 
 
-def test_held_printed_positions_are_not_raw_lane_training_labels(tmp_path, monkeypatch):
+def test_held_printed_positions_are_not_raw_lane_training_labels(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     before = module.gujin43_cardinal_example(profile="wikisource")
     data = json.loads(module.DATA.read_text())
     data["printed_winter_ecliptic_du"] = ["4", "3"]
@@ -110,7 +118,7 @@ def test_held_printed_positions_are_not_raw_lane_training_labels(tmp_path, monke
     )
 
 
-def test_frozen_source_excerpt_and_runtime_inputs_are_fingerprinted():
+def test_frozen_source_excerpt_and_runtime_inputs_are_fingerprinted() -> None:
     for path, key in [
         (FIXTURE / REFERENCE["excerpt_file"], "excerpt_sha256"),
         (module.DATA, "runtime_data_sha256"),
@@ -130,6 +138,6 @@ def test_frozen_source_excerpt_and_runtime_inputs_are_fingerprinted():
         assert r[key] is False
 
 
-def test_unavailable_source_profile_is_not_silently_replaced():
+def test_unavailable_source_profile_is_not_silently_replaced() -> None:
     with pytest.raises(ValueError):
         module.gujin43_cardinal_example(profile="best_fit")

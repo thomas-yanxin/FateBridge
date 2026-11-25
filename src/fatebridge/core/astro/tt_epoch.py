@@ -4,12 +4,10 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import datetime
 from fractions import Fraction
 
-_JD_UNIX = Fraction(4881175, 2)
-_MICROSECONDS_PER_DAY = 86_400_000_000
-_UNIX = datetime(1970, 1, 1, tzinfo=timezone.utc)
+from fatebridge.utils.civil_time import utc_calendar
 
 
 @dataclass(frozen=True)
@@ -27,11 +25,15 @@ class TTInstant:
     def __post_init__(self) -> None:
         if not isinstance(self.days, Fraction):
             raise TypeError("TTInstant requires an exact Fraction of TT days")
+        else:
+            pass
 
     @classmethod
     def from_float(cls, jd_tt: float) -> TTInstant:
         if isinstance(jd_tt, bool) or not math.isfinite(jd_tt):
             raise ValueError("TT point must be finite and numeric")
+        else:
+            pass
         return cls(Fraction(jd_tt))
 
     @classmethod
@@ -39,33 +41,46 @@ class TTInstant:
         return cls(cls.from_float(day).days + cls.from_float(fraction).days)
 
     @classmethod
+    def from_value(cls, value: float | TTInstant) -> TTInstant:
+        """Normalize a scalar boundary without manufacturing lost precision."""
+        return value if isinstance(value, TTInstant) else cls.from_float(value)
+
+    @classmethod
     def from_utc(
         cls, moment: datetime, *, tai_minus_utc_seconds: int | Fraction
     ) -> TTInstant:
-        """Encode an actual UTC datetime under a caller-declared offset.
+        """Encode an aware calendar instant under a caller-declared offset.
 
         This constructor does not validate an offset table or predict leap
         seconds. Python datetime cannot encode second60. Callers must choose
         and disclose their policy; arbitrary defaults are not supplied here.
+        The normalized UTC label may lie beyond datetime's calendar bounds.
         """
-        if moment.utcoffset() is None:
-            raise ValueError("UTC encoding requires a timezone-aware instant")
+        calendar = utc_calendar(moment)
         if isinstance(tai_minus_utc_seconds, bool) or not isinstance(
             tai_minus_utc_seconds, (int, Fraction)
         ):
             raise TypeError("Atomic offset must be exact integer or Fraction seconds")
-        elapsed = moment.astimezone(timezone.utc) - _UNIX
-        micros = (
-            elapsed.days * _MICROSECONDS_PER_DAY
-            + elapsed.seconds * 1_000_000
-            + elapsed.microseconds
-        )
+        else:
+            pass
         return cls(
-            _JD_UNIX
-            + Fraction(micros, _MICROSECONDS_PER_DAY)
+            calendar.julian_day_exact()
             + (tai_minus_utc_seconds + Fraction(4023, 125)) / 86400
         )
 
     def as_float(self) -> float:
         """Lossy interoperability only; exact comparisons must use days."""
         return float(self.days)
+
+    def shifted_by(self, days: float | Fraction) -> TTInstant:
+        """Retain a supplied local offset before any absolute-JD rounding."""
+        return TTInstant(self.days + Fraction(days))
+
+    def as_parts(self) -> tuple[float, float]:
+        """A scalar high part and its rounded exact residual for native APIs.
+
+        The Fraction remains the authoritative point. This adapter does not
+        claim that two binary64 values can represent every rational exactly.
+        """
+        high = float(self.days)
+        return high, float(self.days - Fraction(high))

@@ -2,19 +2,22 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Literal, Optional
+from typing import Any, Literal
 
 from pydantic import Field, model_validator
 
+from fatebridge.core.metaphysics.jinkou_year_fate import confirmed_natal_branch
 from fatebridge.core.metaphysics.ren_gods import DEFAULT_GUIREN_PROFILE, GuirenProfile
 from fatebridge.core.metaphysics.taiyi_hour import TaiyiHourProfile
 from fatebridge.core.metaphysics.taiyi_month import TaiyiMonthProfile
 from fatebridge.core.metaphysics.taiyi_year_calendar import TaiyiYearProfile
 from fatebridge.core.requests.base import _DeferredModel
 from fatebridge.core.requests.birth import FateBridgeRequest
-from fatebridge.core.ziwei_age import ZiweiAgeBasis
-from fatebridge.core.ziwei_rulesets import (
+from fatebridge.core.ziwei.ziwei_age import ZiweiAgeBasis
+from fatebridge.core.ziwei.ziwei_rulesets import (
+    DEFAULT_ZIWEI_DAY_DIVIDE,
     DEFAULT_ZIWEI_PROFILE,
+    ZiweiDayDivide,
     ZiweiRuleProfile,
     ZiweiSihuaSource,
 )
@@ -23,7 +26,7 @@ from fatebridge.core.ziwei_rulesets import (
 class ZiweiBirthRequest(FateBridgeRequest):
     """Request model for Zi Wei birth chart analysis."""
 
-    birth_utc_offset: Optional[str] = Field(
+    birth_utc_offset: str | None = Field(
         default=None,
         description="出生钟时的明确UTC偏移，格式±HH:MM或±HH:MM:SS；与解析后的birth_timezone核对，用于选择重复钟时，不替换命名时区。省略仍拒绝歧义或不存在的钟时。",
     )
@@ -36,7 +39,11 @@ class ZiweiBirthRequest(FateBridgeRequest):
         default="rule_profile",
         description="四化表：rule_profile沿用基础配置；naj_ming_v1显式取明刊卷三原页（庚日武同相、壬梁紫府武）。只选四化表，不代表整部原典获认证。",
     )
-    selected_sections: List[str] = Field(
+    day_divide: ZiweiDayDivide = Field(
+        default=DEFAULT_ZIWEI_DAY_DIVIDE,
+        description="晚子（23:00-23:59）分日口径：current（默认，当日农历与当日日/时干）或 forward（算次日早子农历与次日早子日/时干）。",
+    )
+    selected_sections: list[str] = Field(
         default_factory=list,
         description="Optional snapshot section titles for filtered export payload",
     )
@@ -45,7 +52,7 @@ class ZiweiBirthRequest(FateBridgeRequest):
 class ZiweiHoroscopeRequest(FateBridgeRequest):
     """Request model for 紫微斗数 horoscope (运限) at a target date-time."""
 
-    birth_utc_offset: Optional[str] = Field(
+    birth_utc_offset: str | None = Field(
         default=None,
         description="出生钟时的明确UTC偏移，格式±HH:MM或±HH:MM:SS；与出生时区核对并选择重复钟时，不替换命名时区。",
     )
@@ -64,7 +71,7 @@ class ZiweiHoroscopeRequest(FateBridgeRequest):
         default="Asia/Shanghai",
         description="目标钟表时间的时区，与出生时区独立；默认 Asia/Shanghai，不对目标时刻做真太阳时修正。",
     )
-    target_utc_offset: Optional[str] = Field(
+    target_utc_offset: str | None = Field(
         default=None,
         description="目标钟时的明确UTC偏移，格式±HH:MM或±HH:MM:SS；与target_timezone核对并选择重复钟时。省略仍拒绝歧义或不存在的目标钟时；实际先后按UTC瞬间比较。",
     )
@@ -80,7 +87,11 @@ class ZiweiHoroscopeRequest(FateBridgeRequest):
         default="rule_profile",
         description="本命与可用运限层共用所选四化表；naj_ming_v1取明刊原页。运限按宫干／时间干复用仍为软件约定，不据此认证古典运限法。",
     )
-    selected_sections: List[str] = Field(
+    day_divide: ZiweiDayDivide = Field(
+        default=DEFAULT_ZIWEI_DAY_DIVIDE,
+        description="晚子（23:00-23:59）分日口径：current（默认，当日农历与当日日/时干）或 forward（本命与目标均按次日早子起农历与日/时干）。",
+    )
+    selected_sections: list[str] = Field(
         default_factory=list,
         description="Optional snapshot section titles for filtered export payload",
     )
@@ -97,11 +108,15 @@ class ZiweiRulesRequest(_DeferredModel):
         default="rule_profile",
         description="要查询的实际四化表；naj_ming_v1为明刊卷三原页，不改变基础安星配置。",
     )
-    year_stem: Optional[str] = Field(
+    day_divide: ZiweiDayDivide = Field(
+        default=DEFAULT_ZIWEI_DAY_DIVIDE,
+        description="晚子（23:00-23:59）分日口径：current 或 forward。",
+    )
+    year_stem: str | None = Field(
         default=None,
         description="Optional heavenly stem filter, e.g. 甲",
     )
-    selected_sections: List[str] = Field(
+    selected_sections: list[str] = Field(
         default_factory=list,
         description="Optional snapshot section titles for filtered export payload",
     )
@@ -115,7 +130,7 @@ class LiuRengGodsRequest(_DeferredModel):
         default=DEFAULT_GUIREN_PROFILE,
         description="大六壬昼夜贵人表：liuren_common_v1 为既有表；tanyuan_xieji_v1 按探原日夜贵人歌。金口诀仅影响附带六壬盘，本课独立用古本表。",
     )
-    is_diurnal: Optional[bool] = Field(
+    is_diurnal: bool | None = Field(
         default=None,
         description="显式昼贵/夜贵：true 昼、false 夜；省略按卯至申昼、酉至寅夜。未自动计算当地星没星出。",
     )
@@ -131,24 +146,24 @@ class LiuRengGodsRequest(_DeferredModel):
         le=59,
         description="起课钟表秒数，保留交中气和太阳时辰边界；不代表秒级预测能力。",
     )
-    analysis_timezone: Optional[str] = Field(
+    analysis_timezone: str | None = Field(
         default=None, description="Analysis timezone (IANA name or UTC offset)"
     )
-    analysis_utc_offset: Optional[str] = Field(
+    analysis_utc_offset: str | None = Field(
         default=None,
         description="起课民用钟时的明确UTC偏移，格式±HH:MM或±HH:MM:SS；与analysis_timezone共同核对并选择重复时刻，不替换命名时区规则。省略时拒绝歧义或不存在的钟时。",
     )
-    analysis_longitude: Optional[float] = Field(
+    analysis_longitude: float | None = Field(
         default=None, ge=-180, le=180, description="Analysis longitude"
     )
-    gender: Optional[str] = Field(
+    gender: str | None = Field(
         default="未知",
         description=(
             "性别（可选）。接受 男/女、male/female/m/f、阳/阴、乾/坤 等写法；"
             "省略默认 未知。"
         ),
     )
-    selected_sections: List[str] = Field(
+    selected_sections: list[str] = Field(
         default_factory=list,
         description="Optional snapshot section titles for filtered export payload",
     )
@@ -161,11 +176,11 @@ class LiuRengGodsRequest(_DeferredModel):
 class LiuRengRunyearRequest(FateBridgeRequest):
     """Request model for Liu Ren runyear analysis."""
 
-    birth_timezone: Optional[str] = Field(
+    birth_timezone: str | None = Field(
         default=None,
         description="出生民用时区；显式值优先，否则按唯一解析的birth_place补全。已给但无法解析的地名、或只有经度时须明确时区；地理信息全缺时沿用Asia/Shanghai并标记默认假设。出生与分析瞬间均转换到该时区计算农历虚岁，不移动分析课盘。",
     )
-    birth_utc_offset: Optional[str] = Field(
+    birth_utc_offset: str | None = Field(
         default=None,
         description="出生民用钟时的明确UTC偏移，格式±HH:MM或±HH:MM:SS；与显式或出生地补全后的出生时区核对并选择重复时刻，不替换命名时区。省略时拒绝歧义或不存在的出生钟时。仅用于出生民用时刻与农历年，不移动分析起课时刻。",
     )
@@ -174,7 +189,7 @@ class LiuRengRunyearRequest(FateBridgeRequest):
         default=DEFAULT_GUIREN_PROFILE,
         description="大六壬昼夜贵人表；tanyuan_xieji_v1 仅采用探原贵人表，不代表全书取传配置。",
     )
-    is_diurnal: Optional[bool] = Field(
+    is_diurnal: bool | None = Field(
         default=None, description="分析时刻是否按昼贵起课；省略按时支区分昼夜。"
     )
     analysis_month: int = Field(ge=1, le=12, description="Analysis month (1-12)")
@@ -189,17 +204,17 @@ class LiuRengRunyearRequest(FateBridgeRequest):
         le=59,
         description="分析时刻秒数（0-59），保留中气换将与时辰边界。",
     )
-    analysis_timezone: Optional[str] = Field(
+    analysis_timezone: str | None = Field(
         default=None, description="Analysis timezone (IANA name or UTC offset)"
     )
-    analysis_utc_offset: Optional[str] = Field(
+    analysis_utc_offset: str | None = Field(
         default=None,
         description="起课民用钟时的明确UTC偏移，格式±HH:MM或±HH:MM:SS；与analysis_timezone共同核对并选择重复时刻，不替换命名时区规则。省略时拒绝歧义或不存在的钟时。",
     )
-    analysis_longitude: Optional[float] = Field(
+    analysis_longitude: float | None = Field(
         default=None, ge=-180, le=180, description="Analysis longitude"
     )
-    selected_sections: List[str] = Field(
+    selected_sections: list[str] = Field(
         default_factory=list,
         description="Optional snapshot section titles for filtered export payload",
     )
@@ -215,21 +230,27 @@ class QimenAnalysisRequest(_DeferredModel):
     analysis_minute: int = Field(
         default=0, ge=0, le=59, description="Analysis minute (0-59)"
     )
-    analysis_timezone: Optional[str] = Field(
+    analysis_second: int = Field(
+        default=0,
+        ge=0,
+        le=59,
+        description="起局钟表秒数（0-59），用于节气实刻与真太阳时辰边界；不代表秒级预测精度。",
+    )
+    analysis_timezone: str | None = Field(
         default=None, description="Analysis timezone (IANA name or UTC offset)"
     )
-    analysis_utc_offset: Optional[str] = Field(
+    analysis_utc_offset: str | None = Field(
         default=None,
         description="起局钟时的明确UTC偏移，格式±HH:MM或±HH:MM:SS；与analysis_timezone共同核对并消除重复小时歧义，不替换该时区的全年规则。省略时拒绝不明确或不存在的钟时。",
     )
-    analysis_longitude: Optional[float] = Field(
+    analysis_longitude: float | None = Field(
         default=None, ge=-180, le=180, description="Analysis longitude"
     )
-    qimen_options: Dict[str, Any] = Field(
+    qimen_options: dict[str, Any] = Field(
         default_factory=dict,
         description="奇门选项：ju_method=zhirun（默认置闰）/chaibu（拆补）；god_profile=yanyi_text（默认卷三正文）/yanyi_diagrams（卷四圆图）；season_profile=yanyi_vol1_verse（默认卷一赋）/yanyi_vol3_table/yanyi_vol3_prose；仅支持转盘layout=direct、palaceShift=0",
     )
-    selected_sections: List[str] = Field(
+    selected_sections: list[str] = Field(
         default_factory=list,
         description="Optional snapshot section titles for filtered export payload",
     )
@@ -267,36 +288,36 @@ class TaiyiAnalysisRequest(_DeferredModel):
         default="year",
         description="year年计附金镜年度十神；month按十二节月；day明确采用金钥匙冬至前甲子积日，不乘十二，所选钟面零时换日、二至实刻换遁，附十精及未决异数；hour按所选时计。月/日/时计均为声明的现代天文适配，非完整古历复原。",
     )
-    hour_profile: Optional[TaiyiHourProfile] = Field(
+    hour_profile: TaiyiHourProfile | None = Field(
         default=None,
         description="仅hour时计：省略用jinjing_hour_solstice_v1（现代至点置一）；key_hour_winter_jiazi_v1按金钥匙冬至前甲子日连续积时、时支合神和阴阳四门，仍为现代日期/23时子初适配，非古历全书认证。不可按吉凶结果择优。",
     )
-    month_profile: Optional[TaiyiMonthProfile] = Field(
+    month_profile: TaiyiMonthProfile | None = Field(
         default=None,
         description="仅month：省略为jinjing_month_jie_360_v1；key_month_tianzheng_jie_v1采用金钥匙完年乘十二、加天地二正和本月名义序，仍以现代节月为界，非完整古历月界；源文门数冲突保留，不按吉凶择法。",
     )
-    analysis_timezone: Optional[str] = Field(
+    analysis_timezone: str | None = Field(
         default=None, description="Analysis timezone (IANA name or UTC offset)"
     )
-    analysis_utc_offset: Optional[str] = Field(
+    analysis_utc_offset: str | None = Field(
         default=None,
         description="明确的输入民用UTC偏移，格式±HH:MM或±HH:MM:SS；与analysis_timezone在该钟时联合核对，用于选择夏令时回拨中的一次，不替换命名时区。省略仍拒绝重复钟时；不存在的钟时及与时区不符的偏移均拒绝。不能按盘面结果猜选偏移。",
     )
-    year_profile: Optional[TaiyiYearProfile] = Field(
+    year_profile: TaiyiYearProfile | None = Field(
         default=None,
         description="仅year：省略或jinjing_year_lunar_civil_v1保留通用现代农历岁首；jinjing_year_historical_table_v1选381—385晋历主表；jinjing_year_qiliang_table_v1选501—505齐梁史历表，保留502年闰四月及未决闰五月／六月候选。两者范围外均拒绝。输入仍用推算公历和明确时区；非全部古历、并立王朝异历或原典岁首裁定，不按吉凶择法。",
     )
-    analysis_longitude: Optional[float] = Field(
+    analysis_longitude: float | None = Field(
         default=None, ge=-180, le=180, description="Analysis longitude"
     )
-    gender: Optional[str] = Field(
+    gender: str | None = Field(
         default="未知",
         description=(
             "性别（可选）。接受 男/女、male/female/m/f、阳/阴、乾/坤 等写法；"
             "省略默认 未知；当前年计不使用性别定局。"
         ),
     )
-    selected_sections: List[str] = Field(
+    selected_sections: list[str] = Field(
         default_factory=list,
         description="Optional snapshot section titles for filtered export payload",
     )
@@ -309,24 +330,26 @@ class TaiyiAnalysisRequest(_DeferredModel):
 class JinkouAnalysisRequest(LiuRengGodsRequest):
     """Request model for Jin Kou analysis."""
 
-    di_fen: Optional[
+    di_fen: (
         Literal["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"]
-    ] = Field(
+        | None
+    ) = Field(
         default=None,
         description="地分十二地支；不填按时支作软件回退，并非已观测的来人方位。",
     )
-    natal_branch: Optional[
+    natal_branch: (
         Literal["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"]
-    ] = Field(
+        | None
+    ) = Field(
         default=None,
         description="问课对象已确认的本命年支，用于京本将命大绝配对及本命另课。另课以本命支作派生地分，保留本次占时，与原地分主课分列。省略且已给birth_year_ganzhi时取其明确年支；两者并给须一致。不由占时、地分或行年推定，不要求补猜出生时刻。",
     )
-    birth_year_ganzhi: Optional[str] = Field(
+    birth_year_ganzhi: str | None = Field(
         default=None,
         strict=True,
         description="已确认的完整出生年干支，须属六十甲子；供京本六甲旬起行年、本命年支和本命另课。本命另课不要求性别或岁序。不是公历年份，不从占时、年龄反推或代猜岁首。",
     )
-    year_fate_age: Optional[int] = Field(
+    year_fate_age: int | None = Field(
         default=None,
         strict=True,
         ge=1,
@@ -336,7 +359,6 @@ class JinkouAnalysisRequest(LiuRengGodsRequest):
 
     @model_validator(mode="after")
     def consistent_jinkou_natal_facts(self) -> "JinkouAnalysisRequest":
-        from fatebridge.core.metaphysics.jinkou_year_fate import confirmed_natal_branch
 
         confirmed_natal_branch(
             self.birth_year_ganzhi, self.natal_branch, self.year_fate_age

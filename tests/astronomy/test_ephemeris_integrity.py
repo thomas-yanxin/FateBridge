@@ -18,7 +18,7 @@ NAME = "sepl_96.se1"
 VALID = b"SW-referenced-planet-data"
 
 
-def test_windows_style_checkout_preserves_lahiri_source_bytes(tmp_path):
+def test_windows_style_checkout_preserves_lahiri_source_bytes(tmp_path: Path) -> None:
     root = Path(__file__).resolve().parents[2]
     repository = tmp_path / "repository"
     repository.mkdir()
@@ -87,8 +87,8 @@ def test_windows_style_checkout_preserves_lahiri_source_bytes(tmp_path):
     ],
 )
 def test_prefix_truncation_append_bit_change_and_wrong_body_are_rejected(
-    tmp_path, monkeypatch, payload
-):
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, payload
+) -> None:
     catalog = manifest_for_payloads({NAME: VALID})
     monkeypatch.setattr(fetch_ephe, "_download", lambda *a, **kw: payload)
     with pytest.raises(ValueError, match="selected edition"):
@@ -97,8 +97,8 @@ def test_prefix_truncation_append_bit_change_and_wrong_body_are_rejected(
 
 
 def test_invalid_cached_file_is_repaired_with_a_recoverable_original(
-    tmp_path, monkeypatch
-):
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     target = tmp_path / NAME
     previous = b"SW-wrong-cached-segment"
     target.write_bytes(previous)
@@ -119,8 +119,8 @@ def test_invalid_cached_file_is_repaired_with_a_recoverable_original(
 
 
 def test_failed_repair_leaves_existing_data_and_directory_unchanged(
-    tmp_path, monkeypatch
-):
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     target = tmp_path / NAME
     target.write_bytes(b"SW-original")
     catalog = manifest_for_payloads({NAME: VALID})
@@ -131,7 +131,9 @@ def test_failed_repair_leaves_existing_data_and_directory_unchanged(
     assert set(tmp_path.iterdir()) == {target}
 
 
-def test_failed_final_replacement_keeps_both_original_and_backup(tmp_path, monkeypatch):
+def test_failed_final_replacement_keeps_both_original_and_backup(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     target = tmp_path / NAME
     previous = b"SW-original-to-keep"
     target.write_bytes(previous)
@@ -140,6 +142,8 @@ def test_failed_final_replacement_keeps_both_original_and_backup(tmp_path, monke
     def interrupted(self, destination):
         if Path(destination) == target:
             raise OSError("simulated final replacement failure")
+        else:
+            pass
         return original_replace(self, destination)
 
     monkeypatch.setattr(Path, "replace", interrupted)
@@ -157,7 +161,9 @@ def test_failed_final_replacement_keeps_both_original_and_backup(tmp_path, monke
     }
 
 
-def test_concurrent_edit_is_preserved_instead_of_replaced(tmp_path, monkeypatch):
+def test_concurrent_edit_is_preserved_instead_of_replaced(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     target = tmp_path / NAME
     target.write_bytes(b"SW-before")
 
@@ -174,7 +180,9 @@ def test_concurrent_edit_is_preserved_instead_of_replaced(tmp_path, monkeypatch)
     assert set(tmp_path.iterdir()) == {target}
 
 
-def test_concurrent_identical_verified_result_can_be_reused(tmp_path, monkeypatch):
+def test_concurrent_identical_verified_result_can_be_reused(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     target = tmp_path / NAME
 
     def download(*a, **kw):
@@ -193,7 +201,9 @@ def test_concurrent_identical_verified_result_can_be_reused(tmp_path, monkeypatc
 
 
 @pytest.mark.parametrize("payload", [VALID, b"SW-invalid"])
-def test_verify_only_never_repairs_or_downloads(tmp_path, monkeypatch, payload):
+def test_verify_only_never_repairs_or_downloads(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, payload
+) -> None:
     target = tmp_path / NAME
     target.write_bytes(payload)
     catalog = manifest_for_payloads({NAME: VALID})
@@ -211,7 +221,9 @@ def test_verify_only_never_repairs_or_downloads(tmp_path, monkeypatch, payload):
     assert set(tmp_path.iterdir()) == {target}
 
 
-def test_custom_manifest_retains_custom_data_support(tmp_path, monkeypatch):
+def test_custom_manifest_retains_custom_data_support(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     custom = manifest_for_payloads({"custom.se1": VALID})
     file = tmp_path / "custom-manifest.json"
     file.write_text(json.dumps(custom))
@@ -232,14 +244,16 @@ def test_custom_manifest_retains_custom_data_support(tmp_path, monkeypatch):
 @pytest.mark.parametrize("name", ["../bad.se1", "/bad.se1", "x\\bad.se1", "x.se1?bad"])
 @pytest.mark.parametrize("verify_only", [False, True])
 def test_invalid_names_never_read_or_write_outside_destination(
-    tmp_path, monkeypatch, name, verify_only
-):
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, name: str, verify_only: bool
+) -> None:
     monkeypatch.setattr(
         fetch_ephe, "_download", lambda *a, **kw: pytest.fail("network")
     )
     args = ["--dest", str(tmp_path), "--files", name]
     if verify_only:
         args.append("--verify-only")
+    else:
+        pass
     assert fetch_ephe.main(args) == 1
     assert list(tmp_path.iterdir()) == []
 
@@ -247,7 +261,7 @@ def test_invalid_names_never_read_or_write_outside_destination(
 @pytest.mark.parametrize(
     "invalid", [[], {}, {"schema_version": True}, {"schema_version": 2}]
 )
-def test_invalid_manifest_has_a_clear_validation_error(tmp_path, invalid):
+def test_invalid_manifest_has_a_clear_validation_error(tmp_path: Path, invalid) -> None:
     file = tmp_path / "invalid.json"
     file.write_text(json.dumps(invalid))
     with pytest.raises(ValueError):
@@ -255,7 +269,7 @@ def test_invalid_manifest_has_a_clear_validation_error(tmp_path, invalid):
 
 
 @pytest.mark.local_data
-def test_packaged_catalog_matches_the_frozen_official_tree():
+def test_packaged_catalog_matches_the_frozen_official_tree() -> None:
     catalog = load_ephemeris_manifest()
     fixture = Path(__file__).parents[1] / "fixtures/swiss-ephemeris-upstream-tree.json"
     raw = fixture.read_bytes()
@@ -286,7 +300,7 @@ def test_packaged_catalog_matches_the_frozen_official_tree():
     )
 
 
-def test_default_catalog_is_not_mutable_by_its_caller():
+def test_default_catalog_is_not_mutable_by_its_caller() -> None:
     catalog = load_ephemeris_manifest()
     catalog["files"].clear()
     assert load_ephemeris_manifest()["files"]

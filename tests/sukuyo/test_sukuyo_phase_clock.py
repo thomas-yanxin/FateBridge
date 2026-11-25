@@ -1,23 +1,26 @@
 """Ritual phase conditions must not silently redefine a civil input day."""
 
 from copy import deepcopy
+from pathlib import Path
 
 import pytest
 
-from fatebridge.core.sukuyo import calendar_mansion, day_evidence
-from fatebridge.core.sukuyo_phase_clock import (
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence
+from fatebridge.core.sukuyo.sukuyo_phase_clock import (
     SOURCE,
     phase_clock_reference,
     validate_selected_claims,
 )
-from fatebridge.core.sukuyo_sources import load_source
+from fatebridge.core.sukuyo.sukuyo_sources import load_source
 from scripts.sukuyo.check_sukuyo_phase_clock import verify_primary
-from tests.sukuyo.test_sukuyo_transports import (
-    test_calendar_and_relations_across_all_real_transports as run_transport_check,
+from tests.unit_test.fixtures.sukuyo_transports import (
+    assert_sukuyo_transport_parity as run_transport_check,
 )
 
 
-def test_current_fifteenth_day_name_does_not_assert_the_ritual_phase_condition():
+def test_current_fifteenth_day_name_does_not_assert_the_ritual_phase_condition() -> (
+    None
+):
     calendar = calendar_mansion("2026-10-24", "05:30:00", "+08:00")
     before = deepcopy(calendar)
     day = day_evidence(calendar)
@@ -37,7 +40,7 @@ def test_current_fifteenth_day_name_does_not_assert_the_ritual_phase_condition()
     assert "不能只凭民用小月二十九天就判定条件成立" in text
 
 
-def test_selected_text_keeps_morning_character_and_thirty_time_debate():
+def test_selected_text_keeps_morning_character_and_thirty_time_debate() -> None:
     reference = phase_clock_reference(16)
     assert reference["host_day_number_reference"]["named_half"] == "黑"
     assert len(reference["sources"]) == 2
@@ -67,7 +70,9 @@ def test_selected_text_keeps_morning_character_and_thirty_time_debate():
         "unresolved",
     ],
 )
-def test_interpretive_controls_cannot_drift_from_the_selected_text(mutation):
+def test_interpretive_controls_cannot_drift_from_the_selected_text(
+    mutation: str,
+) -> None:
     data = load_source(SOURCE).data
     phase = data["phase_day_distinction"]
     if mutation == "condition_day":
@@ -97,7 +102,7 @@ def test_interpretive_controls_cannot_drift_from_the_selected_text(mutation):
 
 
 @pytest.mark.parametrize("mutation", ["duplicate", "omit"])
-def test_selected_source_context_cannot_be_duplicated_or_omitted(mutation):
+def test_selected_source_context_cannot_be_duplicated_or_omitted(mutation: str) -> None:
     data = load_source(SOURCE).data
     if mutation == "duplicate":
         data["sources"].append(deepcopy(data["sources"][0]))
@@ -107,7 +112,7 @@ def test_selected_source_context_cannot_be_duplicated_or_omitted(mutation):
         validate_selected_claims(data)
 
 
-def test_returned_data_cannot_change_later_readings_or_choose_a_leap_model():
+def test_returned_data_cannot_change_later_readings_or_choose_a_leap_model() -> None:
     first = phase_clock_reference(1)
     first["phase_day_distinction"]["commentarial_case"]["next_civil_day"] = 16
     assert (
@@ -133,12 +138,12 @@ def test_returned_data_cannot_change_later_readings_or_choose_a_leap_model():
 
 
 @pytest.mark.parametrize("day", [True, 0, 31, 1.5])
-def test_day_name_reference_rejects_non_dates(day):
+def test_day_name_reference_rejects_non_dates(day: bool | float | int) -> None:
     with pytest.raises(ValueError, match="1..30整数"):
         phase_clock_reference(day)
 
 
-def test_offline_checker_does_not_claim_actual_capture_or_phase_measurement():
+def test_offline_checker_does_not_claim_actual_capture_or_phase_measurement() -> None:
     result = verify_primary()
     assert result["numerical_controls_bound_to_selected_text"]
     assert not result["all_actual_captures_rechecked"]
@@ -147,7 +152,9 @@ def test_offline_checker_does_not_claim_actual_capture_or_phase_measurement():
 
 
 @pytest.mark.parametrize("source", ["T1796", "T2216"])
-def test_checker_rejects_substituted_publisher_bytes(tmp_path, source):
+def test_checker_rejects_substituted_publisher_bytes(
+    tmp_path: Path, source: str
+) -> None:
     path = tmp_path / source
     path.write_bytes(b"substituted")
     with pytest.raises(ValueError, match="实际来源字节不同"):
@@ -156,8 +163,8 @@ def test_checker_rejects_substituted_publisher_bytes(tmp_path, source):
 
 @pytest.mark.parametrize("date", ["2026-10-24", "2036-07-23"])
 def test_phase_and_time_reference_across_actual_rest_native_mcp_cli(
-    monkeypatch, capsys, date
-):
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], date: str
+) -> None:
     kwargs = (
         {}
         if date == "2026-10-24"

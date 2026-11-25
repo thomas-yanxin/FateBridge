@@ -20,7 +20,9 @@ def reference():
     return source.load_ren_boundary_reference()
 
 
-def test_reproduced_cohort_keeps_original_labels_and_interval_uncertainty(reference):
+def test_reproduced_cohort_keeps_original_labels_and_interval_uncertainty(
+    reference,
+) -> None:
     rows = reference.packet.seconds.rows
     assert len(rows) == 19248 and len(reference.minutes.rows) == 9744
     assert len(reference.packet.seconds.reference_clock_sofa_checks) == 233
@@ -35,7 +37,9 @@ def test_reproduced_cohort_keeps_original_labels_and_interval_uncertainty(refere
     assert reference.packet.seconds.new_independent_physical_events == 0
 
 
-def test_packet_retains_three_historical_original_input_identity_differences(reference):
+def test_packet_retains_three_historical_original_input_identity_differences(
+    reference,
+) -> None:
     observations = reference.packet.legacy_identity_observations
     assert {r["source"] for r in observations} == {
         "guard_freeze",
@@ -48,7 +52,7 @@ def test_packet_retains_three_historical_original_input_identity_differences(ref
     )
 
 
-def test_captured_producer_and_table_helper_import_no_candidate(reference):
+def test_captured_producer_and_table_helper_import_no_candidate(reference) -> None:
     for text in [reference.packet.producer_source, reference.packet.helper_source]:
         tree = ast.parse(text)
         imports = set()
@@ -57,6 +61,8 @@ def test_captured_producer_and_table_helper_import_no_candidate(reference):
                 imports.update(name.name.split(".")[0] for name in node.names)
             elif isinstance(node, ast.ImportFrom) and node.module:
                 imports.add(node.module.split(".")[0])
+            else:
+                pass
         assert "fatebridge" not in imports
 
 
@@ -74,8 +80,8 @@ def test_captured_producer_and_table_helper_import_no_candidate(reference):
     ],
 )
 def test_coordinated_outer_checksum_edit_keeps_inner_source_and_cohort_checks(
-    fault, tmp_path, monkeypatch
-):
+    fault: str, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     packet = json.loads(gzip.decompress(source.REFERENCE_PATH.read_bytes()))
     if fault == "producer":
         packet["producer_source"] += "\n# changed\n"
@@ -100,7 +106,7 @@ def test_coordinated_outer_checksum_edit_keeps_inner_source_and_cohort_checks(
         packet["seconds"]["inside_root_bracket_ids"] = []
     else:
         packet["solar_reference_sha256"] = "changed"
-    packed = gzip.compress(json.dumps(packet).encode(), mtime=0)
+    packed = gzip.compress(json.dumps(packet).encode(), compresslevel=1, mtime=0)
     path = tmp_path / "changed.json.gz"
     path.write_bytes(packed)
     monkeypatch.setattr(source, "REFERENCE_SHA256", hashlib.sha256(packed).hexdigest())
@@ -108,7 +114,9 @@ def test_coordinated_outer_checksum_edit_keeps_inner_source_and_cohort_checks(
         source.load_ren_boundary_reference(path)
 
 
-def test_portable_reference_needs_only_two_readers_and_two_current_data_files(tmp_path):
+def test_portable_reference_needs_only_two_readers_and_two_current_data_files(
+    tmp_path: Path,
+) -> None:
     root = Path(__file__).resolve().parents[2]
     names = [
         "scripts/astronomy/solar_term_reference.py",

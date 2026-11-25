@@ -53,6 +53,8 @@ def coefficients(text: str) -> list[dict]:
     dates = re.findall(r"\{\s*(\d+),\s*(\d+),\s*([\d.]+)\s*\}", changes)
     if len(rates) != 14 or len(dates) < 15 or int(dates[14][0]) != 1972:
         raise ValueError("Unrecognized SOFA pre-1972 coefficient arrays")
+    else:
+        pass
     return [
         {
             "effective_date": f"{int(year):04d}-{int(month):02d}-01",
@@ -79,6 +81,8 @@ def planned_clocks(rows: list[dict]) -> list[datetime]:
             moment = boundary + timedelta(seconds=seconds)
             if moment.year >= 1960:
                 clocks.add(moment)
+            else:
+                pass
     return sorted(clocks)
 
 
@@ -89,9 +93,13 @@ def build(source: Path, compiler: str) -> tuple[dict, dict]:
     }
     if digests != SOURCE_SHA256:
         raise ValueError("SOFA source bytes differ from the pinned official release")
+    else:
+        pass
     rows = coefficients((source / "dat.c").read_text())
     if rows[0]["effective_date"] != "1960-01-01":
         raise ValueError("SOFA reference does not begin at 1960 UTC")
+    else:
+        pass
     provenance = {
         "source_url": SOURCE_URL,
         "source_title": "IAU SOFA 2023-10-11 iauDat and UTC/TAI/TT routines",
@@ -167,6 +175,8 @@ def build(source: Path, compiler: str) -> tuple[dict, dict]:
             statuses.append(sofa.iauTaitt(a1, a2, ctypes.byref(t1), ctypes.byref(t2)))
             if any(status != 0 for status in statuses):
                 raise ValueError(f"SOFA rejected planned clock {moment}: {statuses}")
+            else:
+                pass
             cases.append(
                 {
                     "utc": moment.isoformat(),
@@ -196,6 +206,8 @@ def main() -> None:
         if args.check:
             if json.loads(target.read_text()) != data:
                 raise SystemExit(f"Frozen SOFA numeric facts differ: {target}")
+            else:
+                pass
         else:
             target.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n")
     print(
@@ -207,3 +219,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+else:
+    pass

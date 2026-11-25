@@ -19,7 +19,7 @@ def frac(row):
 
 
 @pytest.mark.parametrize("row", REFERENCE["derived_remainders"])
-def test_frozen_derived_worksheets_are_not_claimed_as_original_examples(row):
+def test_frozen_derived_worksheets_are_not_claimed_as_original_examples(row) -> None:
     result = source_qi_sequence(profile_id=row["profile"], year_label=row["year"])
     actual = result["terms"][row["term_index"]]
     assert actual["source_big_remainder"] == row["big"]
@@ -32,7 +32,7 @@ def test_frozen_derived_worksheets_are_not_claimed_as_original_examples(row):
 
 
 @pytest.mark.parametrize("p", REFERENCE["literal_profiles"], ids=lambda r: r["id"])
-def test_source_units_year_interval_cycle_origin_and_endpoint(p):
+def test_source_units_year_interval_cycle_origin_and_endpoint(p) -> None:
     result = source_qi_sequence(profile_id=p["id"], year_label=p["base_year"])
     assert result["accumulated_years"] == p["accumulated_years"]
     assert frac(result["source_year_days"]) == Fraction(
@@ -66,7 +66,9 @@ def test_source_units_year_interval_cycle_origin_and_endpoint(p):
             assert current["terms"][24][key] == following["terms"][0][key]
 
 
-def test_subdivision_is_not_a_modern_second_or_the_later_solar_motion_denominator():
+def test_subdivision_is_not_a_modern_second_or_the_later_solar_motion_denominator() -> (
+    None
+):
     result = source_qi_sequence(profile_id="songshi_tongyuan_v1", year_label=1155)
     row = result["terms"][17]
     assert row["source_subdivision_divisor"] == 180
@@ -80,7 +82,7 @@ def test_subdivision_is_not_a_modern_second_or_the_later_solar_motion_denominato
 
 
 @pytest.mark.parametrize("profile", ["songshi_jiyuan_v1", "songshi_tongyuan_v1"])
-def test_date_only_links_retain_the_one_day_bailu_conflict(profile):
+def test_date_only_links_retain_the_one_day_bailu_conflict(profile: str) -> None:
     dila_path = ROOT.parent / REFERENCE["prior_dila_excerpt"]
     dila = json.loads(dila_path.read_text())
     cycle = [
@@ -105,7 +107,7 @@ def test_date_only_links_retain_the_one_day_bailu_conflict(profile):
     assert REFERENCE["date_links"][1]["literal_term_day_agrees"] is False
 
 
-def test_witnesses_prior_anchors_and_nominal_calendar_caution():
+def test_witnesses_prior_anchors_and_nominal_calendar_caution() -> None:
     for row in REFERENCE["images"]:
         assert (
             hashlib.sha256((ROOT / row["file"]).read_bytes()).hexdigest()
@@ -121,13 +123,13 @@ def test_witnesses_prior_anchors_and_nominal_calendar_caution():
 
 
 @pytest.mark.parametrize("bad", [True, 1155.0, "1155", 0, -1, 10000, None])
-def test_year_label_is_an_explicit_integer_not_a_guessed_era(bad):
+def test_year_label_is_an_explicit_integer_not_a_guessed_era(bad) -> None:
     with pytest.raises(ValueError):
         source_qi_sequence(profile_id="songshi_tongyuan_v1", year_label=bad)
 
 
 @pytest.mark.parametrize("bad", [True, 17.0, "17", -1, 25, None])
-def test_term_index_cannot_be_coerced_or_overrun_the_second_winter(bad):
+def test_term_index_cannot_be_coerced_or_overrun_the_second_winter(bad) -> None:
     with pytest.raises(ValueError):
         source_term_remainder(
             profile_id="songshi_tongyuan_v1", accumulated_years=94251611, term_index=bad
@@ -135,20 +137,22 @@ def test_term_index_cannot_be_coerced_or_overrun_the_second_winter(bad):
 
 
 @pytest.mark.parametrize("bad", ["", "tongyuan", "auto", None])
-def test_calendar_is_not_selected_by_a_partial_name_or_default(bad):
+def test_calendar_is_not_selected_by_a_partial_name_or_default(bad: str | None) -> None:
     with pytest.raises(ValueError):
         source_qi_sequence(profile_id=bad, year_label=1155)
 
 
 @pytest.mark.parametrize("bad", [True, 94251611.0, "94251611", -1, None])
-def test_accumulated_year_count_is_not_silently_coerced(bad):
+def test_accumulated_year_count_is_not_silently_coerced(bad) -> None:
     with pytest.raises(ValueError):
         source_term_remainder(
             profile_id="songshi_tongyuan_v1", accumulated_years=bad, term_index=17
         )
 
 
-def test_audit_distinguishes_source_arithmetic_from_literal_agreement(monkeypatch):
+def test_audit_distinguishes_source_arithmetic_from_literal_agreement(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     from dataclasses import replace
 
     import fatebridge.core.song_qi as song

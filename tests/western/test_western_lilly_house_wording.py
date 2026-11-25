@@ -14,7 +14,9 @@ PROTOCOL = json.loads((FIXTURE / "protocol.json").read_text())
 HOUSE_CODES = {"F01", "F02", "F03", "F04", "F05", "D01", "D02"}
 
 
-def test_house_wording_reference_precedes_candidate_and_keeps_real_counterexamples():
+def test_house_wording_reference_precedes_candidate_and_keeps_real_counterexamples() -> (
+    None
+):
     verify_source_files(FIXTURE)
     assert len(PROTOCOL["cases"]) == 12
     assert not PROTOCOL["numeric_rule_or_source_weight_change"]
@@ -23,7 +25,7 @@ def test_house_wording_reference_precedes_candidate_and_keeps_real_counterexampl
 @pytest.mark.parametrize(
     "case", PROTOCOL["cases"], ids=lambda c: str(c["scored_house"])
 )
-def test_house_row_and_applied_text_describe_scoring_assignment(case):
+def test_house_row_and_applied_text_describe_scoring_assignment(case) -> None:
     states, data = inputs()
     state = states["Mars"]
     state["occupied_house"] = case["occupied_house"]
@@ -48,7 +50,9 @@ def test_house_row_and_applied_text_describe_scoring_assignment(case):
     assert applied["label_zh"] == r["label_zh"]
 
 
-def test_unknown_scoring_house_keeps_occupancy_known_without_claiming_its_score():
+def test_unknown_scoring_house_keeps_occupancy_known_without_claiming_its_score() -> (
+    None
+):
     states, data = inputs()
     states["Mars"]["occupied_house"] = 9
     states["Mars"]["house_assignment"] = {
@@ -64,7 +68,7 @@ def test_unknown_scoring_house_keeps_occupancy_known_without_claiming_its_score(
         assert r["label_zh"].startswith("计分归")
 
 
-def test_literal_source_occupancy_fallback_does_not_claim_cusp_computation():
+def test_literal_source_occupancy_fallback_does_not_claim_cusp_computation() -> None:
     states, data = inputs()
     value = result(states, data)
     r = row(value, "Mars", "F01")

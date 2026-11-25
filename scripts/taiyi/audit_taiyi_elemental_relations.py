@@ -4,16 +4,13 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 from fatebridge.core.metaphysics.taiyi_elemental_relations import (
     element_relation,
     elemental_guan_assessment,
 )
 from fatebridge.core.metaphysics.taiyi_year import cyclic_core, structural_patterns
-
-if TYPE_CHECKING:
-    from scripts.taiyi.build_taiyi_elemental_relations import CORPUS, source_data
 from scripts.taiyi.build_taiyi_elemental_relations import CORPUS, source_data
 
 

@@ -41,10 +41,10 @@
 
 ## 核验原始运行
 
-核验函数为 `fatebridge.validation.fengshui_reading.verify_fengshui_reading`。必须从可信执行端独立保管同次运行的完整原结果，通过 `trusted_payload` 传入；被核验文件自身不能充当另行保管的原结果。
+核验函数为 `validation.fengshui_reading.verify_fengshui_reading`。必须从可信执行端独立保管同次运行的完整原结果，通过 `trusted_payload` 传入；被核验文件自身不能充当另行保管的原结果。
 
 ```python
-from fatebridge.validation.fengshui_reading import verify_fengshui_reading
+from validation.fengshui_reading import verify_fengshui_reading
 
 report = verify_fengshui_reading(
     original_full_response,

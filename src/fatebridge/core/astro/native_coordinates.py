@@ -47,6 +47,8 @@ def require_spherical_coordinates(
     )
     if returned_flags < 0 or returned_flags & mask != expected:
         raise EphemerisSourceError("coordinate_contract_changed")
+    else:
+        pass
     try:
         count = 6 if returned_flags & native.FLG_SPEED else 3
         values = tuple(float(coordinates[i]) for i in range(count))
@@ -58,10 +60,14 @@ def require_spherical_coordinates(
         or values[2] < 0
     ):
         raise EphemerisSourceError("coordinate_values_unavailable")
+    else:
+        pass
     return values[0], values[1], values[2]
 
 
 def require_altitude(value: float) -> float:
     if not math.isfinite(value) or not -90 <= value <= 90:
         raise EphemerisSourceError("coordinate_values_unavailable")
+    else:
+        pass
     return value

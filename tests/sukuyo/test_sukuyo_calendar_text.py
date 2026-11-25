@@ -6,21 +6,19 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.application.execution import execute_tool
-from fatebridge.core.execution_context import ExecutionOptions
-from fatebridge.core.sukuyo import calendar_mansion, day_evidence
-from fatebridge.core.sukuyo_calendar_text import (
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence
+from fatebridge.core.sukuyo.sukuyo_calendar_text import (
     calendar_day_evidence,
     month_table_variant,
     source_bundle,
 )
-from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
-from fatebridge.validation.sukuyo import (
-    required_quote_paths,
+from tests.fixtures.mcp_result_delivery import read_full_result
+from tests.support.transports import call_calculation
+from tests.unit_test.fixtures.sukuyo_readings import payload, quotes
+from validation.claims import CalculationClaim, verify_calculation_claims
+from validation.sukuyo import (
     verify_sukuyo_context_claims,
 )
-from tests.fixtures.mcp_result_delivery import read_full_result
 
 FIXTURE = json.loads(
     (Path(__file__).parents[1] / "data/sukuyo-t1299-calendar-primary.json").read_text()
@@ -28,7 +26,7 @@ FIXTURE = json.loads(
 ALIASES = str.maketrans("虛婁畢參張軫", "虚娄毕参张轸")
 
 
-def test_every_printed_month_table_cell_matches_its_literal_source_row():
+def test_every_printed_month_table_cell_matches_its_literal_source_row() -> None:
     assert source_bundle()["source_sha256"] == FIXTURE["source_sha256"]
     count = 0
     for day, row in enumerate(FIXTURE["printed_month_table"], 1):
@@ -44,7 +42,7 @@ def test_every_printed_month_table_cell_matches_its_literal_source_row():
     assert count == 360
 
 
-def test_source_table_counterexamples_do_not_overwrite_the_selected_27_system():
+def test_source_table_counterexamples_do_not_overwrite_the_selected_27_system() -> None:
     # Printed 2/5=胃 disagrees with T1299's own 2/5=畢 example.
     # Printed 12/5=牛 cannot be silently removed or assigned by longitude.
     for case in FIXTURE["literal_examples"]:
@@ -60,7 +58,7 @@ def test_source_table_counterexamples_do_not_overwrite_the_selected_27_system():
     assert not c["source_table_variant"]["reference_is_primary_result"]
 
 
-def test_all_30_day_names_and_both_volume_name_variants():
+def test_all_30_day_names_and_both_volume_name_variants() -> None:
     upper = "建名 得财 威力 猛武 圆满 求名 友朋 大战 凶猛 善法 慈猛 名闻 最胜 勇猛 吉祥".split()
     lower = "建名 得财 威力 猛武 圆满 求名 朋友 力战 凶猛 善法 慈猛 名闻 最胜 勇猛 吉相".split()
     for day in range(1, 31):
@@ -73,7 +71,9 @@ def test_all_30_day_names_and_both_volume_name_variants():
         assert r["clock_evaluation_status"] == "not_computed"
 
 
-def test_verse_abbreviation_uses_explicit_inline_gloss_without_rewriting_literal():
+def test_verse_abbreviation_uses_explicit_inline_gloss_without_rewriting_literal() -> (
+    None
+):
     texts = "\n".join(c["text"] for c in FIXTURE["clauses"])
     assert "十一日夜" in texts and "一夜十五晝" in texts
     for day in (1, 11):
@@ -106,13 +106,15 @@ def test_verse_abbreviation_uses_explicit_inline_gloss_without_rewriting_literal
                 for v in verses
             )
             assert all("一夜十五晝" in v["source_excerpt"] for v in verses)
+        else:
+            pass
     r = calendar_day_evidence(8)
     assert not r["prose_verse_time_variant"]
     assert len(r["time_restrictions"]) == 5
     assert {v["release_after"] for v in r["time_restrictions"]} == {"midday"}
 
 
-def test_conditional_day_lists_retain_source_differences():
+def test_conditional_day_lists_retain_source_differences() -> None:
     # 14 appears only in lower prose's conditional list; 29 in upper's.
     for day, expected in [
         (14, ["unlisted", "conditional"]),
@@ -124,7 +126,7 @@ def test_conditional_day_lists_retain_source_differences():
         assert [v["assessment"] for v in r["classifications"]] == expected
 
 
-def test_named_day_activity_layer_is_independent_of_the_mansion():
+def test_named_day_activity_layer_is_independent_of_the_mansion() -> None:
     c = {
         "natal_su27": "参",
         "calendar_date": "2025-03-04",
@@ -157,7 +159,7 @@ def test_named_day_activity_layer_is_independent_of_the_mansion():
     )
 
 
-def test_native_reading_retains_each_matched_clause_and_time_caveat():
+def test_native_reading_retains_each_matched_clause_and_time_caveat() -> None:
     r = day_evidence(calendar_mansion("2025-03-04"), "奎", "marriage")
     text = r["reading_text"]
     assert "历日27宿为毕" in text and "28宿表此格为胃" in text
@@ -173,7 +175,7 @@ def test_native_reading_retains_each_matched_clause_and_time_caveat():
     assert "白一夜／白十一夜" in text and "None" not in text
 
 
-def test_snapshot_uses_resolved_coordinates_including_zero_gps_override():
+def test_snapshot_uses_resolved_coordinates_including_zero_gps_override() -> None:
     from fatebridge.services.divination import calculate_suzhan_analysis
 
     r = calculate_suzhan_analysis(
@@ -190,51 +192,12 @@ def test_snapshot_uses_resolved_coordinates_including_zero_gps_override():
 
 
 @pytest.mark.parametrize("value", [0, 31, 1.5, True])
-def test_invalid_day_cannot_be_coerced_or_wrapped(value):
+def test_invalid_day_cannot_be_coerced_or_wrapped(value: bool | float | int) -> None:
     with pytest.raises(ValueError):
         calendar_day_evidence(value)
 
 
-def payload(tool="suzhan", **changes):
-    spec = next(s for s in CATALOG if s.key == tool)
-    params = (
-        {
-            "lat": "31n13",
-            "lon": "121e28",
-            "date": "2025-03-04",
-            "time": "12:00:00",
-            "zone": "+08:00",
-            "natal_mansion": "奎",
-            "activity": "marriage",
-        }
-        if tool == "suzhan"
-        else {"person1_date": "1990-06-15", "person2_date": "1992-03-20"}
-    )
-    return execute_tool(
-        spec,
-        spec.request_model.model_validate({**params, **changes}),
-        options=ExecutionOptions(as_of="2026-10-22T12:00:00+08:00"),
-    )
-
-
-def quotes(result, focus):
-    receipt = result["run_metadata"]
-    out = []
-    for path in required_quote_paths(focus):
-        value = result
-        for key in path.split("."):
-            value = value[key]
-        out.append(
-            CalculationClaim(
-                path=path,
-                value=value,
-                run_id=receipt["run_id"],
-            )
-        )
-    return out
-
-
-def test_context_checker_rejects_cherry_picked_true_marriage_clause():
+def test_context_checker_rejects_cherry_picked_true_marriage_clause() -> None:
     result = payload()
     claims = quotes(result, "activity")
     assert (
@@ -270,7 +233,9 @@ def test_context_checker_rejects_cherry_picked_true_marriage_clause():
     )
 
 
-def test_context_checker_requires_both_directions_and_complete_structured_context():
+def test_context_checker_requires_both_directions_and_complete_structured_context() -> (
+    None
+):
     result = payload("sukuyo_compatibility")
     claims = quotes(result, "compatibility")
     assert (
@@ -314,7 +279,7 @@ def test_context_checker_requires_both_directions_and_complete_structured_contex
     )
 
 
-def test_partial_leap_context_is_quotable_without_certifying_a_mansion():
+def test_partial_leap_context_is_quotable_without_certifying_a_mansion() -> None:
     result = payload("sukuyo_compatibility", person1_date="2025-07-25")
     assert result["status"] == "partial" and result["person1_to_person2"] is None
     report = verify_sukuyo_context_claims(
@@ -324,7 +289,9 @@ def test_partial_leap_context_is_quotable_without_certifying_a_mansion():
     assert report["semantic_review_required"] and not report["authority_certified"]
 
 
-def test_lower_conditional_and_doctrinal_context_cannot_be_omitted_or_promoted():
+def test_lower_conditional_and_doctrinal_context_cannot_be_omitted_or_promoted() -> (
+    None
+):
     result = payload(activity="commerce")
     claims = quotes(result, "activity")
     assert (
@@ -351,7 +318,7 @@ def test_lower_conditional_and_doctrinal_context_cannot_be_omitted_or_promoted()
     )
 
 
-def test_hinoo_candidates_cannot_be_omitted_or_promoted_by_quotation():
+def test_hinoo_candidates_cannot_be_omitted_or_promoted_by_quotation() -> None:
     result = payload(
         "sukuyo_compatibility",
         person1_date="2024-08-04",
@@ -391,8 +358,8 @@ def test_hinoo_candidates_cannot_be_omitted_or_promoted_by_quotation():
 
 @pytest.mark.asyncio
 async def test_default_mcp_budget_preserves_the_full_original_context_without_recalculation(
-    monkeypatch, tmp_path
-):
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     from fastmcp import Client
 
     from fatebridge.application import result_delivery as delivery
@@ -403,7 +370,8 @@ async def test_default_mcp_budget_preserves_the_full_original_context_without_re
         delivery, "RESULT_STORE", delivery.ResultStore(tmp_path / "private")
     )
     async with Client(create_mcp_app()) as client:
-        result = await client.call_tool(
+        result = await call_calculation(
+            client,
             "suzhan",
             {
                 "lat": "31n13",
@@ -444,7 +412,7 @@ async def test_default_mcp_budget_preserves_the_full_original_context_without_re
         )
 
 
-def test_context_checker_requires_six_palace_transit_and_joint_reading_limits():
+def test_context_checker_requires_six_palace_transit_and_joint_reading_limits() -> None:
     result = payload(natal_mansion="娄")
     complete = quotes(result, "activity")
     assert (
@@ -463,7 +431,7 @@ def test_context_checker_requires_six_palace_transit_and_joint_reading_limits():
     assert report["semantic_review_required"]
 
 
-def test_context_checker_requires_taibai_missing_row_and_nonphysical_limits():
+def test_context_checker_requires_taibai_missing_row_and_nonphysical_limits() -> None:
     result = payload(date="2025-02-07")
     reference = result["sukuyo"]["taibai_direction_reference"]
     assert reference["lunar_day"] == 10

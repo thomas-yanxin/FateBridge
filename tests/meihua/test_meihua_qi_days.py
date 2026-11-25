@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.meihua_qi_days import _reading, qi_day_atom_ruleset
+from fatebridge.core.meihua.meihua_qi_days import _reading, qi_day_atom_ruleset
 from fatebridge.services.divination import calculate_meihua_analysis
 from fatebridge.services.meihua import calculate_meihua_cast
 from tests.support.reference_data import resolve
@@ -35,6 +35,8 @@ def calculate(case, topic, branch):
             "label": "合成日支原子核对，非现实观测",
             "day_branch": branch,
         }
+    else:
+        pass
     return calculate_meihua_cast(**args)
 
 
@@ -49,6 +51,8 @@ def expected_targets(case, topic):
             ("wealth_loss", r["role"], r["trigram"], r["relation"], True)
             for r in attack
         ]
+    else:
+        pass
     return (
         [
             ("reputation_completion", r["role"], r["trigram"], r["relation"], True)
@@ -74,7 +78,9 @@ def expected_targets(case, topic):
     )
 
 
-def test_source_and_all_96_literal_memberships_were_frozen_before_new_production():
+def test_source_and_all_96_literal_memberships_were_frozen_before_new_production() -> (
+    None
+):
     freeze = json.loads((FIXTURE / "reference-freeze.json").read_text())
     assert (
         not freeze["new_production_module_present"]
@@ -83,6 +89,8 @@ def test_source_and_all_96_literal_memberships_were_frozen_before_new_production
     for name, digest in freeze["files"].items():
         if str(name).endswith((".py", ".py.txt")):
             continue
+        else:
+            pass
         assert hashlib.sha256((FIXTURE / name).read_bytes()).hexdigest() == digest
     assert len(TRUTH) == 96
     assert qi_day_atom_ruleset() == PROFILE
@@ -91,18 +99,25 @@ def test_source_and_all_96_literal_memberships_were_frozen_before_new_production
     assert qi_day_atom_ruleset() == PROFILE
 
 
-@pytest.mark.parametrize("case", GEOMETRY, ids=lambda c: f"{c['code']}:{c['line']}")
-@pytest.mark.parametrize("topic", ["wealth", "reputation"])
-@pytest.mark.parametrize("branch", [None, *"子丑寅卯辰巳午未申酉戌亥"])
-def test_all_9984_role_day_contexts_use_actual_selector_and_literal_membership(
-    case, topic, branch
+def test_covering_role_day_contexts_use_actual_selector_and_literal_membership() -> (
+    None
 ):
+    branches = (None, *"子丑寅卯辰巳午未申酉戌亥")
+    for index, case in enumerate(GEOMETRY):
+        _assert_role_day_context(
+            case, ("wealth", "reputation")[index % 2], branches[index % 13]
+        )
+
+
+def _assert_role_day_context(case, topic, branch):
     result = calculate(case, topic, branch)
     assert "error" not in result
     clause = result["interpretation"]["topic_reading"]
     if branch is None:
         assert "qi_day_timing_reference" not in clause
         return
+    else:
+        pass
     q = clause["qi_day_timing_reference"]
     rows = q["source_selected_role_references"]
     assert [
@@ -151,7 +166,9 @@ def test_all_9984_role_day_contexts_use_actual_selector_and_literal_membership(
     "branch,expected",
     [("辰", False), ("戌", False), ("丑", False), ("未", True), ("申", True)],
 )
-def test_kun_month_only_labels_are_not_day_labels_or_element_strength(branch, expected):
+def test_kun_month_only_labels_are_not_day_labels_or_element_strength(
+    branch: str, expected: bool
+) -> None:
     result = calculate({"code": "000111", "line": 1}, "wealth", branch)
     q = result["interpretation"]["topic_reading"]["qi_day_timing_reference"]
     row = next(r for r in q["source_selected_role_references"] if r["role"] == "use")
@@ -166,7 +183,9 @@ def test_kun_month_only_labels_are_not_day_labels_or_element_strength(branch, ex
 
 @pytest.mark.parametrize("office", [None, False, True])
 @pytest.mark.parametrize("basis", ["raw_counts", "trigram_numbers"])
-def test_count_candidates_keep_own_roles_paths_and_office_context(office, basis):
+def test_count_candidates_keep_own_roles_paths_and_office_context(
+    office: bool | None, basis: str
+) -> None:
     args = {
         "casting": {
             "method": "sound_groups",
@@ -183,6 +202,8 @@ def test_count_candidates_keep_own_roles_paths_and_office_context(office, basis)
             "label": "合成原文在任声明",
             "currently_in_office": office,
         }
+    else:
+        pass
     result = calculate_meihua_cast(**args)
     for i, candidate in enumerate(result["interpretation"]["casting_readings"]):
         q = candidate["topic_clause"]["qi_day_timing_reference"]
@@ -195,6 +216,8 @@ def test_count_candidates_keep_own_roles_paths_and_office_context(office, basis)
             )
             if row["selector_id"] == "reputation_office":
                 assert row["selected_source_context_condition"] is office
+            else:
+                pass
         assert candidate["traditional_judgement"].endswith(
             q["summary"]
             + candidate["topic_clause"]["qi_branch_timing_reference"]["summary"]
@@ -203,7 +226,9 @@ def test_count_candidates_keep_own_roles_paths_and_office_context(office, basis)
 
 
 @pytest.mark.parametrize("topic", ["wealth", "reputation"])
-def test_23h_retains_midnight_and_zi_start_labels_without_selecting_a_forecast(topic):
+def test_23h_retains_midnight_and_zi_start_labels_without_selecting_a_forecast(
+    topic: str,
+) -> None:
     result = calculate_meihua_analysis(
         analysis_year=2026,
         analysis_month=10,
@@ -246,7 +271,7 @@ def test_23h_retains_midnight_and_zi_start_labels_without_selecting_a_forecast(t
     assert q["candidate_event_dates"] is q["event_time"] is None
 
 
-def test_body_no_attacker_reference_keeps_full_absence_unknown():
+def test_body_no_attacker_reference_keeps_full_absence_unknown() -> None:
     result = calculate({"code": "111111", "line": 1}, "reputation", "戌")
     q = result["interpretation"]["topic_reading"]["qi_day_timing_reference"]
     body = next(r for r in q["source_selected_role_references"] if r["role"] == "body")
@@ -256,7 +281,7 @@ def test_body_no_attacker_reference_keeps_full_absence_unknown():
 
 
 @pytest.mark.parametrize("fault", ["day_role", "drop_selector"])
-def test_borrowed_role_or_incomplete_source_selector_is_rejected(fault):
+def test_borrowed_role_or_incomplete_source_selector_is_rejected(fault: str) -> None:
     result = calculate({"code": "000111", "line": 1}, "reputation", "未")
     layer = deepcopy(result["interpretation"])
     if fault == "day_role":

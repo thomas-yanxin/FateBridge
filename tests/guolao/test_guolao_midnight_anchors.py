@@ -9,14 +9,14 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core import guolao_midnight_anchors as subject
-from fatebridge.core.guolao_daily_solar import POLICIES
-from fatebridge.validation.guolao_midnight_anchors import audit_midnight_anchors
+from fatebridge.core.guolao import guolao_midnight_anchors as subject
+from fatebridge.core.guolao.guolao_daily_solar import POLICIES
+from validation.guolao_midnight_anchors import audit_midnight_anchors
 
 FIXTURE = Path(__file__).parents[1] / "fixtures/guolao-midnight-anchors-v1"
 
 
-def test_original_pages_and_selector_readings_keep_frozen_source_identity():
+def test_original_pages_and_selector_readings_keep_frozen_source_identity() -> None:
     reference = json.loads((FIXTURE / "reference.json").read_text())
     assert (
         hashlib.sha256(subject.DATA.read_bytes()).hexdigest()
@@ -50,12 +50,12 @@ def test_original_pages_and_selector_readings_keep_frozen_source_identity():
     ],
 )
 def test_Gujin39_selector_does_not_substitute_the_Gujin43_previous_table_row(
-    cardinal, distance, rate
-):
+    cardinal: str, distance: int, rate: str
+) -> None:
     assert subject.gujin39_cardinal_rate(cardinal, distance_days=distance) == F(rate)
 
 
-def test_three_spring_anchors_differ_and_no_best_lane_is_selected():
+def test_three_spring_anchors_differ_and_no_best_lane_is_selected() -> None:
     report = audit_midnight_anchors()
     lanes = report["all_rate_policies"]
     expected = ["94.96098690875", "94.9601", "94.9603943607625"]
@@ -70,7 +70,7 @@ def test_three_spring_anchors_differ_and_no_best_lane_is_selected():
     assert not report["four_axis_perfect_scores_established"]
 
 
-def test_generated_cardinal_products_keep_all_precision_and_printed_residuals():
+def test_generated_cardinal_products_keep_all_precision_and_printed_residuals() -> None:
     model = subject.load_recomputed_midnight(
         subject.PROFILE, rate_policy=subject.RATE_POLICIES[2]
     )
@@ -99,7 +99,7 @@ def test_generated_cardinal_products_keep_all_precision_and_printed_residuals():
     assert F(rows[-1]["recomputed_midnight_du_exact"]) > model.generated.literal.circle
 
 
-def test_spring_product_against_independent_decimal_cubic_evaluation():
+def test_spring_product_against_independent_decimal_cubic_evaluation() -> None:
     # This oracle directly evaluates the source cubic, not the domain's
     # finite-difference recurrence or its Fraction multiplication.
     with localcontext() as context:
@@ -123,7 +123,7 @@ def test_spring_product_against_independent_decimal_cubic_evaluation():
 @pytest.mark.parametrize("policy", POLICIES)
 def test_complete_daily_grid_uses_selected_anchors_and_retains_boundary_semantics(
     rate_policy, policy
-):
+) -> None:
     model = subject.load_recomputed_midnight(subject.PROFILE, rate_policy=rate_policy)
     audit = model.audit()
     for n in range(366):
@@ -162,6 +162,8 @@ def test_complete_daily_grid_uses_selected_anchors_and_retains_boundary_semantic
                 assert boundary["left_minus_right_du_exact"] == "0"
             else:
                 assert F(boundary["left_minus_right_du_exact"]) != 0
+        else:
+            pass
     for segment in audit["segments"]:
         assert "printed_midnight_span_du_exact" not in segment
         assert "recomputed_midnight_span_du_exact" in segment
@@ -170,7 +172,7 @@ def test_complete_daily_grid_uses_selected_anchors_and_retains_boundary_semantic
 
 
 @pytest.mark.parametrize("distance", [None, True, 93.0, "93", F(93)])
-def test_unknown_or_noninteger_source_distance_is_not_coerced(distance):
+def test_unknown_or_noninteger_source_distance_is_not_coerced(distance) -> None:
     with pytest.raises(TypeError):
         subject.gujin39_cardinal_rate("spring", distance_days=distance)
 
@@ -187,13 +189,15 @@ def test_unknown_or_noninteger_source_distance_is_not_coerced(distance):
         ("unknown", None),
     ],
 )
-def test_source_selector_has_no_nearest_rate_fallback(cardinal, distance):
+def test_source_selector_has_no_nearest_rate_fallback(
+    cardinal: str, distance: int | None
+) -> None:
     with pytest.raises(ValueError):
         subject.gujin39_cardinal_rate(cardinal, distance_days=distance)
 
 
 @pytest.mark.parametrize("value", [True, 1.0, "1", F(1)])
-def test_daily_source_indices_do_not_accept_modern_or_coerced_inputs(value):
+def test_daily_source_indices_do_not_accept_modern_or_coerced_inputs(value) -> None:
     model = subject.load_recomputed_midnight(
         subject.PROFILE, rate_policy=subject.RATE_POLICIES[0]
     )
@@ -201,7 +205,7 @@ def test_daily_source_indices_do_not_accept_modern_or_coerced_inputs(value):
         model.day(value, policy=POLICIES[0])
 
 
-def test_no_implicit_profile_rate_selector_or_daily_difference_policy():
+def test_no_implicit_profile_rate_selector_or_daily_difference_policy() -> None:
     with pytest.raises(ValueError):
         subject.load_recomputed_midnight("best", rate_policy=subject.RATE_POLICIES[0])
     with pytest.raises(ValueError):
@@ -219,8 +223,8 @@ def test_no_implicit_profile_rate_selector_or_daily_difference_policy():
     ["source_sha", "generator_sha", "bool_index", "index_shift", "float_rate"],
 )
 def test_changed_source_parameters_reject_instead_of_rebaselining(
-    monkeypatch, tmp_path, mutation
-):
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, mutation: str
+) -> None:
     raw = json.loads(subject.DATA.read_bytes())
     if mutation == "source_sha":
         raw["source_daily_data_sha256"] = "0" * 64

@@ -20,6 +20,8 @@ from fatebridge.core.astro.physical_sources import PhysicalEphemerisTrace
 def require(condition: bool, message: str) -> None:
     if not condition:
         raise ValueError(message)
+    else:
+        pass
 
 
 p = argparse.ArgumentParser()
@@ -112,6 +114,8 @@ for request in reference["rows"]:
                         initial=values,
                         initial_flags=returned,
                     )
+                else:
+                    pass
                 require(
                     returned >= 0 and returned & mask == expected,
                     "Coordinate contract changed",

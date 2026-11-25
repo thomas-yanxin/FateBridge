@@ -8,26 +8,26 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core import sukuyo_historical_calendar as historical
-from fatebridge.core.sukuyo import calendar_mansion, day_evidence
-from fatebridge.validation.sukuyo_historical_sources import (
+from fatebridge.core.sukuyo import sukuyo_historical_calendar as historical
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence
+from scripts.sukuyo.check_sukuyo_documentary_dates import verify_documentary_controls
+from scripts.sukuyo.check_sukuyo_historical_daily import verify_daily_controls
+from validation.sukuyo_historical_sources import (
     _day_cycle_errors,
     parse_naoj,
     printed_day_ganzhi,
 )
-from scripts.sukuyo.check_sukuyo_documentary_dates import verify_documentary_controls
-from scripts.sukuyo.check_sukuyo_historical_daily import verify_daily_controls
 
 
 @pytest.mark.parametrize(
     "value", ["甲丑 (invalid)", "己卯", "己卯 (reading) extra", "丁辰 (invalid)"]
 )
-def test_malformed_or_non_cycle_source_labels_are_rejected(value):
+def test_malformed_or_non_cycle_source_labels_are_rejected(value: str) -> None:
     with pytest.raises(ValueError, match="sexagenary"):
         printed_day_ganzhi(value)
 
 
-def test_syntactically_valid_one_day_source_shift_is_detected():
+def test_syntactically_valid_one_day_source_shift_is_detected() -> None:
     facts = json.loads(
         (
             Path(__file__).parents[1] / "data/sukuyo-historical-edge-probes.json"
@@ -43,7 +43,7 @@ def test_syntactically_valid_one_day_source_shift_is_detected():
     assert len(errors) == 1 and errors[0]["ordinal"] == changed.ordinal
 
 
-def test_direct_daily_ganzhi_facts_keep_all_source_disagreements():
+def test_direct_daily_ganzhi_facts_keep_all_source_disagreements() -> None:
     result = verify_daily_controls()
     assert result["naoj_daily_printed_ganzhi_checked"] == 225
     assert not result["naoj_daily_printed_ganzhi_mismatches"]
@@ -51,7 +51,9 @@ def test_direct_daily_ganzhi_facts_keep_all_source_disagreements():
     assert len(result["separate_post_reform_legal_calendar_controls"]) == 1
 
 
-def test_every_printed_ganzhi_heading_in_the_bounded_chronicle_month_is_retained():
+def test_every_printed_ganzhi_heading_in_the_bounded_chronicle_month_is_retained() -> (
+    None
+):
     result = verify_documentary_controls()
     assert result["printed_controls_checked"] == 4
     assert result["bounded_month_count"] == 1
@@ -65,7 +67,9 @@ def test_every_printed_ganzhi_heading_in_the_bounded_chronicle_month_is_retained
     assert not result["independent_original_manuscript_collation"]
 
 
-def test_documentary_control_keeps_engine_errors_in_the_report(monkeypatch):
+def test_documentary_control_keeps_engine_errors_in_the_report(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     from scripts.sukuyo import check_sukuyo_documentary_dates as checker
 
     def corrupted(*args, **kwargs):
@@ -79,7 +83,9 @@ def test_documentary_control_keeps_engine_errors_in_the_report(monkeypatch):
     assert len(report["mismatches"]) == 4
 
 
-def test_documentary_capture_hash_is_checked_before_calendar_calculation(tmp_path):
+def test_documentary_capture_hash_is_checked_before_calendar_calculation(
+    tmp_path: Path,
+) -> None:
     from scripts.sukuyo import check_sukuyo_documentary_dates as checker
 
     fixture = json.loads(checker.FIXTURE.read_bytes())
@@ -90,7 +96,7 @@ def test_documentary_capture_hash_is_checked_before_calendar_calculation(tmp_pat
         verify_documentary_controls(capture_dir=tmp_path)
 
 
-def test_reference_midnight_is_explicit_and_is_not_a_bazi_or_ancient_boundary():
+def test_reference_midnight_is_explicit_and_is_not_a_bazi_or_ancient_boundary() -> None:
     before = calendar_mansion(
         "0903-07-12",
         time_text="23:59:59",
@@ -132,8 +138,8 @@ def test_reference_midnight_is_explicit_and_is_not_a_bazi_or_ancient_boundary():
     ],
 )
 def test_anchor_tampering_cannot_silently_change_reference_day_labels(
-    tmp_path, monkeypatch, key, value
-):
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, key: str, value
+) -> None:
     data = json.loads(historical.SOURCE.read_bytes())
     data["day_cycle_anchor"][key] = value
     path = tmp_path / "invalid.json"

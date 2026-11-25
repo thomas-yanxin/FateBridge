@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.canping import liunian_series
+from fatebridge.core.numerology.canping import liunian_series
 
 ROOT = Path(__file__).parents[1] / "fixtures/canping_relative_years_v1"
 REFERENCE = json.loads((ROOT / "reference.json").read_text())
@@ -23,7 +23,7 @@ NUMBER_KEYS = {
 }
 
 
-def test_explanatory_source_image_identity_is_fixed_separately_from_the_verse():
+def test_explanatory_source_image_identity_is_fixed_separately_from_the_verse() -> None:
     for image in (REFERENCE["image"], REFERENCE["previous_verse_image"]):
         assert (
             hashlib.sha256((ROOT / image["file"]).read_bytes()).hexdigest()
@@ -33,7 +33,9 @@ def test_explanatory_source_image_identity_is_fixed_separately_from_the_verse():
 
 
 @pytest.mark.parametrize("anchor", [None, 0])
-def test_unknown_century_advances_known_ganzhi_without_inventing_calendar_year(anchor):
+def test_unknown_century_advances_known_ganzhi_without_inventing_calendar_year(
+    anchor: int | None,
+) -> None:
     series = liunian_series(**ARGS, birth_year=anchor)
     assert len(series["rows"]) == 120
     assert series["birth_pillar_year"] is None
@@ -47,8 +49,8 @@ def test_unknown_century_advances_known_ganzhi_without_inventing_calendar_year(a
 
 @pytest.mark.parametrize("anchor", [0, 1984])
 def test_ages_before_explicit_first_period_have_no_number_text_or_substituted_luck_branch(
-    anchor,
-):
+    anchor: int,
+) -> None:
     rows = liunian_series(**ARGS, birth_year=anchor, end_age=4)["rows"]
     for row in rows[:2]:
         assert row["status"] == "not_started"
@@ -59,7 +61,9 @@ def test_ages_before_explicit_first_period_have_no_number_text_or_substituted_lu
 @pytest.mark.parametrize(
     "expected", REFERENCE["manual_numbers"], ids=lambda row: str(row["age"])
 )
-def test_unknown_calendar_year_uses_actual_relative_taisui_not_birth_day(expected):
+def test_unknown_calendar_year_uses_actual_relative_taisui_not_birth_day(
+    expected,
+) -> None:
     row = liunian_series(**ARGS, birth_year=0)["rows"][expected["age"] - 1]
     assert (row["ganzhi"], row["taisuiBranch"], row["dayunBranch"]) == (
         expected["ganzhi"],
@@ -71,7 +75,9 @@ def test_unknown_calendar_year_uses_actual_relative_taisui_not_birth_day(expecte
     assert row["verses"]["selectionNi"]["number"] == expected["num_ni"]
 
 
-def test_anchored_and_relative_rows_have_same_calculation_without_an_epoch_guess():
+def test_anchored_and_relative_rows_have_same_calculation_without_an_epoch_guess() -> (
+    None
+):
     relative = liunian_series(**ARGS, birth_year=0)
     anchored = liunian_series(**ARGS, birth_year=1984)
     assert all(
@@ -82,7 +88,7 @@ def test_anchored_and_relative_rows_have_same_calculation_without_an_epoch_guess
     assert [row["year"] for row in anchored["rows"]] == list(range(1984, 2104))
 
 
-def test_requested_late_age_slice_uses_birth_based_cycle_and_actual_luck_slot():
+def test_requested_late_age_slice_uses_birth_based_cycle_and_actual_luck_slot() -> None:
     series = liunian_series(**ARGS, start_age=13, end_age=13)
     assert len(series["rows"]) == 1
     row = series["rows"][0]
@@ -90,7 +96,7 @@ def test_requested_late_age_slice_uses_birth_based_cycle_and_actual_luck_slot():
     assert (row["numShun"], row["numNi"]) == (2409, 3009)
 
 
-def test_explicit_relative_extension_beyond_default_horizon_remains_supported():
+def test_explicit_relative_extension_beyond_default_horizon_remains_supported() -> None:
     row = liunian_series(**ARGS, start_age=121, end_age=121)["rows"][0]
     assert row["year"] is None and row["ganzhi"] == "甲子"
     assert row["dayunRange"] == "113-122" and row["dayunBranch"] == "丑"
@@ -110,6 +116,6 @@ def test_explicit_relative_extension_beyond_default_horizon_remains_supported():
 )
 def test_invalid_age_ranges_or_boolean_anchors_do_not_silently_produce_a_schedule(
     patch,
-):
+) -> None:
     with pytest.raises(ValueError):
         liunian_series(**(ARGS | patch))

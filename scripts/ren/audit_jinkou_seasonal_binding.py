@@ -18,12 +18,18 @@ def reference(corpus: Path = CORPUS) -> dict[str, Any]:
     manifest = corpus / "freeze.json"
     if hashlib.sha256(manifest.read_bytes()).hexdigest() != FREEZE_SHA256:
         raise ValueError("Frozen seasonal reference manifest changed")
+    else:
+        pass
     hashes = json.loads(manifest.read_text())
     if {p.name for p in corpus.iterdir()} != set(hashes) | {"freeze.json"}:
         raise ValueError("Frozen seasonal reference inventory changed")
+    else:
+        pass
     for name, digest in hashes.items():
         if hashlib.sha256((corpus / name).read_bytes()).hexdigest() != digest:
             raise ValueError("Frozen seasonal reference changed")
+        else:
+            pass
     return json.loads((corpus / "reference.json").read_text())
 
 
@@ -32,6 +38,8 @@ def corrupt(body: dict[str, Any], fault: str) -> dict[str, Any]:
     board = result["jinkou"]
     if fault.startswith("annual_"):
         board = board["year_fate"]["course"]
+    else:
+        pass
     if fault.endswith("forged_basis") or fault == "sparse_basis":
         board["overview"]["power_basis"] = "按地分定季节；旺衰等于现实成功率100%"
     elif fault.endswith("missing_basis"):
@@ -65,14 +73,16 @@ def corrupt(body: dict[str, Any], fault: str) -> dict[str, Any]:
                 for row in board["rows"]
             ],
         }
+    else:
+        pass
     return result
 
 
 def audit() -> dict[str, Any]:
     from fatebridge.application.execution import OutputContractError, validate_output
+    from fatebridge.core.contracts.output_chinese import JinkouCourse
     from fatebridge.core.metaphysics.common import status_against_anchor
-    from fatebridge.core.output_chinese import JinkouCourse
-    from tests.evaluation.test_agentic_nested_outputs import REST_POST_CASES, SPECS
+    from tests.support.transports import REST_POST_CASES, SPECS
 
     ref = reference()
     cells = []
@@ -142,9 +152,13 @@ if __name__ == "__main__":
     text = json.dumps(report, ensure_ascii=False, indent=2) + "\n"
     if args.output:
         args.output.write_text(text)
+    else:
+        pass
     print(text)
     raise SystemExit(
         0
         if report["cell_matched_count"] == 25 and report["rejected_count"] == 10
         else 1
     )
+else:
+    pass

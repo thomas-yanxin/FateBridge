@@ -46,6 +46,8 @@ uv run --locked --extra dev python -m pytest -q
 
 打包太阳交节的完整TT队列使用[自包含独立参考](data/solar_tt_de440_v1/README.md)，由 `scripts/astronomy/solar_term_reference.py` 在边界读取一次并提供有类型的记录。`astronomy/test_solar_term_reference.py` 覆盖1700—2300的全部年网格及两个上下文年、两条TT路径、来源改写拒绝和范围隔离。参考生成需要独立Skyfield环境与完整DE440；普通回归只读已固定资料，不下载内核，也不调用生产算法生成答案。
 
+太阳钟与民用时区边界使用[固定独立日时参考](data/solar_clock_labels_v1/README.md)。`astronomy/test_calendar_helper_tools.py`核对8个派生太阳钟的原标签、农历日期、时支及梅花取数，并确认交节仍按原民用瞬间；`integration/test_coordinate_and_calendar_transports.py`核对纽约与Apia的完整和严格投影三端结果。原5项钟面漂移保留，不把同源Swiss均时差诊断当作独立物理精度验收。
+
 原生节气求根的 `astronomy/test_solar_term_runtime.py` 进入自包含CI，21项控制覆盖缓存、双向搜索、无关缺档前缀、实际根区间混源拒绝与求精期间文件变化。这些符号控制只验证求根与来源边界；真实1800年交点另与独立Swiss SDK及原始文件回执比较，不把控制数量算成天文精度证据。
 
 六壬秒级和分钟传播读取[自包含边界参考](data/ren_boundary_sources_v1/README.md)。`ren/test_ren_reference.py`进入自包含CI，核对完整队列、生成来源、旧身份差异的历史记录、改写拒绝、区间不确定及独立目录读取；只需两个当前读取模块和两个资料包。`ren/test_ren_seconds.py`与`ren/test_ren_boundary_decisions.py`继续验证实际领域和三端结果，所需外部SPK／原生星历依各用例条件准备。旧原始数值与失败保留，不从生产输出重生期望值。
@@ -60,7 +62,7 @@ pytest 使用 `importlib` 导入模式，允许不同领域的同名模块一起
 
 测试精简以完整独立参考为准：参评逐格转录与复读对照覆盖的同值抽查无需另留；紫微亮度用完整独立转录同时核对20颗星、空缺分支和无亮度星。退役脚本的参数解析／JSON打印测试随入口移除；重复输入的计算、来源事实、解释和导出断言尽量在同次结果中核对，领域计算、来源校验和错误注入继续维护。
 
-八字来源状态、集合约束和错误事实共用 `bazi/test_bazi_source_comparison_transports.py` 的三端参数队列。风水来源测试直接执行各自完整审计，避免多个文件反复启动同一总审计进程；正文213／216、下卦图5831／5832、替卦图5829／5832等分歧仍由对应领域断言保留。
+八字来源状态和集合约束见 [当前来源对照](bazi/test_bazi_current_accuracy.py)与[公开来源条件](bazi/test_bazi_source_conditions_public.py)测试。风水来源测试直接执行各自完整审计，避免多个文件反复启动同一总审计进程；正文213／216、下卦图5831／5832、替卦图5829／5832等分歧仍由对应领域断言保留。
 
 原典字面冲突、数值超差和未裁定结果本身也需要回归：测试通过可能只证明这些失败被诚实保留。不得从当前计算输出重新生成期望值、删反例或把固定来源检查改成跳过。当前算法限制见[算法状态](../docs/algorithm-status.md)，验证方法见[计算与预测验收](../docs/prediction-validation.md)。
 
@@ -69,3 +71,5 @@ pytest 使用 `importlib` 导入模式，允许不同领域的同名模块一起
 梅花天气研究的机械、农历、节气与条件容量核验共用一个脚本入口；其输出文件保护按四种检查和全部原始故障参数化验证。符号可达性直接运行 `meihua/test_meihua_weather_reachability.py`，保留完整288组取数、1440组解释与午时失败，不再重复启动只写同一报告的专用进程。
 
 公共日期框架的 `astronomy/test_reference_frames.py` 读取独立ERFA／Swiss数值参考。`astronomy/test_de441_solar.py` 对独立原始JPL／CALCEPH／Skyfield的完整14905项检查正向黄经，并对上一修订全部16／21项失败的并集及1200补充交点实际调用年表求根，沿用原门槛。旧Moshier专属算术测试随无调用方实现退役，原失败与来源仍保留；有限通过不是全时域或SOTA认证。
+
+无原生引擎时的同源真黄道、赤道与GAST几何由 [western/test_western_offline_frame.py](western/test_western_offline_frame.py) 读取 [固定来源参考](data/offline_frame_v1.json)，进入自包含CI集合。42项源控制和一个公开昼夜反例只核对所选源框架，不能认证远期物理精度；执行状态见[审计记录](../docs/algorithm-audit-20261117.md)。

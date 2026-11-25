@@ -6,16 +6,17 @@ with occurrence counts, nor declare every helper to be the decisive 相神.
 """
 
 from itertools import product
-from typing import Any, Dict, List, Mapping, Tuple
+from typing import Any, Mapping
 
 from fatebridge.core.classical_stages import STAGE_PROFILE_ID, twelve_life_stage
+from fatebridge.core.month_use import match_month_uses
 from fatebridge.utils.data import (
     DESTRUCTION_CYCLE,
     GENERATION_CYCLE,
     STEM_ELEMENTS,
 )
 
-Pillars = Mapping[str, Tuple[str, str]]
+Pillars = Mapping[str, tuple[str, str]]
 ORDER = ("year", "month", "day", "hour")
 WEALTH = ("正财", "偏财")
 SEAL = ("正印", "偏印")
@@ -38,12 +39,12 @@ def star_id(pillar: str, location: str, stem: str) -> str:
 
 def build_classical_routes(
     pillars: Pillars,
-    gods: Dict[str, List[Dict[str, Any]]],
-    month: Dict[str, Any],
-) -> Dict[str, Any]:
+    gods: dict[str, list[dict[str, Any]]],
+    month: dict[str, Any],
+) -> dict[str, Any]:
     """Return actual routes and their unresolved conditions, never a fitted grade."""
     selected = month["selected_god"]
-    anchor_god = selected["ten_god"]
+    resolution = month["use_resolution"]
     specifications = (
         (
             "wealth_feeds_officer",
@@ -119,13 +120,13 @@ def build_classical_routes(
         ),
     )
 
-    def stars(names: Tuple[str, ...]) -> List[Dict[str, Any]]:
+    def stars(names: tuple[str, ...]) -> list[dict[str, Any]]:
         return [entry for name in names for entry in gods[name]]
 
-    def ref(entry: Dict[str, Any]) -> str:
+    def ref(entry: dict[str, Any]) -> str:
         return star_id(entry["pillar"], entry["location"], entry["stem"])
 
-    def root_condition(entries: List[Dict[str, Any]]) -> Dict[str, Any]:
+    def root_condition(entries: list[dict[str, Any]]) -> dict[str, Any]:
         revealed = [e for e in entries if e["location"] == "天干"]
         return {
             "revealed_stars": [ref(e) for e in revealed],
@@ -151,6 +152,8 @@ def build_classical_routes(
         for a, b in product(left, right):
             if ref(a) == ref(b):
                 continue
+            else:
+                pass
             ea, eb = STEM_ELEMENTS[a["stem"]][0], STEM_ELEMENTS[b["stem"]][0]
             if relation == "生":
                 observed = GENERATION_CYCLE[ea] == eb
@@ -163,6 +166,8 @@ def build_classical_routes(
                 )
             if not observed:
                 continue
+            else:
+                pass
             distance = abs(ORDER.index(a["pillar"]) - ORDER.index(b["pillar"]))
             competitors = []
             if relation == "合":
@@ -177,6 +182,8 @@ def build_classical_routes(
                         or frozenset((pillars[name][0], b["stem"])) in COMBINATIONS
                     )
                 ]
+            else:
+                pass
             edges.append(
                 {
                     "from_star": ref(a),
@@ -195,16 +202,21 @@ def build_classical_routes(
         helper_entries = (
             right if key in ("food_generates_wealth", "hurt_generates_wealth") else left
         )
-        applicable = anchor_god in allowed
+        month_match = match_month_uses(resolution, allowed)
         routes.append(
             {
                 "id": key,
                 "label": label,
                 "allowed_month_gods": list(allowed),
+                "month_use_match": month_match,
                 "status": (
-                    "not_applicable_to_selected_month"
-                    if not applicable
-                    else "observed_route" if edges else "relation_not_observed"
+                    "month_use_not_observed"
+                    if month_match["status"] == "not_observed"
+                    else (
+                        "requires_identity_adjudication"
+                        if month_match["status"] == "requires_identity_adjudication"
+                        else "observed_route" if edges else "relation_not_observed"
+                    )
                 ),
                 "star_refs": list(dict.fromkeys(ref(e) for e in left + right)),
                 "edges": edges,
@@ -224,6 +236,8 @@ def build_classical_routes(
     for wealth, seal in product(stars(WEALTH), stars(SEAL)):
         if wealth["location"] != "天干" or seal["location"] != "天干":
             continue
+        else:
+            pass
         lo, hi = sorted((ORDER.index(wealth["pillar"]), ORDER.index(seal["pillar"])))
         positions.append(
             {
@@ -239,6 +253,8 @@ def build_classical_routes(
     for output, wealth in product(stars(("食神", "伤官")), stars(WEALTH)):
         if output["location"] != "天干" or wealth["location"] != "天干":
             continue
+        else:
+            pass
         for root_name in ORDER:
             left = [r for r in output["roots"] if r["pillar"] == root_name]
             right = [r for r in wealth["roots"] if r["pillar"] == root_name]
@@ -255,16 +271,31 @@ def build_classical_routes(
                         "effect_status": "shared_branch_root_not_equal_force",
                     }
                 )
+            else:
+                pass
+    hurt_month = match_month_uses(resolution, ("伤官",))
+    metal_water_context: bool | None = False
+    if STEM_ELEMENTS[pillars["day"][0]][0].value == "金":
+        metal_water_context = (
+            True
+            if hurt_month["status"] == "matched"
+            else (
+                None
+                if hurt_month["status"] == "requires_identity_adjudication"
+                else False
+            )
+        )
+    else:
+        pass
     return {
         "method_id": "ziping_position_routes_v1",
         "life_stage_profile_id": STAGE_PROFILE_ID,
         "source": dict(SOURCE),
         "selected_month_role": selected,
+        "month_use_resolution": resolution,
         "routes": routes,
         "wealth_seal_positions": positions,
         "output_wealth_shared_roots": common_roots,
-        "metal_water_hurt_officer_context": (
-            STEM_ELEMENTS[pillars["day"][0]][0].value == "金" and anchor_god == "伤官"
-        ),
+        "metal_water_hurt_officer_context": metal_water_context,
         "scope": "月令取用、星位关系与根的存在；相神须全局论成败，不由生克合或同根直接认证。金水伤官见官另审调候，不能一见官就判破。",
     }

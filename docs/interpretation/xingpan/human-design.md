@@ -81,7 +81,7 @@
 
 太阳附近视位置、名义太阳圆盘投影与偏折延拓分歧，按本盘 `apparent_position_context` 及相应解释说明；名义投影不是实际遮掩或可见性观测。既有独立参考行属于其冻结TT，不把差值移植为另一个民用输入的实测误差。即使求根括区极窄、有限端点的门至Base一致，也不认证物理精度、整个连续区间或真实出生记录。
 
-用户要求完整解释精度边界时，同时读取 `solar_deflection_policy`、`policy_basis` 和 `original_human_design_software_convention_certified`：明确本次实际采用的太阳盘内透明质量偏折延拓，以及独立参考和原人类图软件口径尚未裁定的范围。只说明“名义圆盘不认证遮掩”没有交代偏折规范；不得把未说明的规范差异写成已经验收，也不把另一TT上的超差数值套入当前盘。
+解释精度时，读取 `solar_deflection_policy`、`policy_basis` 和 `apparent_position_context.method_id` 指向的 `rulesets` 条目。本次使用 Swiss 默认的太阳盘内透明质量偏折延拓。比对独立参考时注明参考所用的 TT 和算法。
 
 
 ## 坐标框架与观测原点

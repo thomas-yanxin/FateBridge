@@ -4,6 +4,17 @@
 
 ## [Unreleased]
 
+- 八字九专题、双人八字、流时、西占关系盘和择日改用结构化证据。移除产品评分、关系分档、占星卜问的成败代理，以及八字、西占、印占、星骰、梅花和人类图的泛用建议模板。查卦、六爻与统摄法交付卦图、规则条件或经文。Agent 结合用户背景解读，原典条目继续按需检索。
+- 西占与奇门知识卡改从现行规则表取值。西占七曜、宫位、相位与当前点表有专门条目，查询键以知识目录为准。八字神煞旧卡保留查法及待核出处，移除固定断语、五行行业表及两套导入的现代解读资料。
+- 占星卜问的 `perfection` 交付七曜事件、Lilly 条件和待核范围。严格投影改读 `horary.perfection.status` 或具名条件，旧的 `verdict`、`reasoning` 和单一候选分支已退役。
+- 果老移除重复的 `interpretation` 和 `interpretation_evidence`，由 `guolao` 交付安命、格局和时运依据。印占专题以结构化宫主位置、力量分支和来源取代重复释义。
+
+- 删除旧 REST 路径与 CLI 命令别名。MCP 客户端通过 `discover_capabilities` 查找能力、用 `describe_capability` 读取参数、用 `run_calculation` 执行，并通过 `read_result` 展开同次结果。已有客户端须更新调用方式。见 [API 参考](docs/api-reference.md#接口名称与升级)。
+
+- CLI 的 JSON 目录统一使用 `discover`，`list` 保留文本输出。MCP 成功结果只在 `structuredContent` 中交付，删除 JSON 文本镜像与对应的 `compact` 排版参数。失败时继续提供简短错误消息与结构化详情。
+
+- MCP 默认使用 `detail=compact`，REST 和 CLI 默认使用 `detail=standard`。需要完整计算证据时使用 `detail=audit`。发布包将 DE441 系数分片单独供应，使用该星历时按[星历安装说明](docs/ephemeris.md)配置。
+
 - 调用说明统一维护于 `AGENTS.md`，技术参考位于 `docs/interpretation/`；移除旧插件打包、主题配置、生成清单、场景接口与专用筛选参数，按实际工具目录和 family 选择能力。
 
 - 公开结果统一移除哈希与指纹，回执格式改为2.0；结果核验改用结果ID与原run，私有存储继续检查完整性。移除调用合同指纹缓存与旧回执输出夹具。

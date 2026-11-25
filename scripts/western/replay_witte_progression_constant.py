@@ -21,9 +21,13 @@ RECORD_SHA256 = "ccfdbaf79be14b5f5a4fef04728584c2b48175ca66382962d29ac5dffd1b525
 def seconds(parts: list[int]) -> int:
     if len(parts) != 3 or any(type(v) is not int for v in parts):
         raise ValueError("Printed time angle requires integer h/m/s")
+    else:
+        pass
     h, m, s = parts
     if h < 0 or not 0 <= m < 60 or not 0 <= s < 60:
         raise ValueError("Invalid printed time angle")
+    else:
+        pass
     # Accumulation in base60 is independent of the runtime source helper.
     total = 0
     for value in parts:
@@ -39,6 +43,8 @@ def replay(record: dict) -> dict:
             sign = term["sign"]
             if type(sign) is not int or sign not in (-1, 1):
                 raise ValueError("Invalid printed term sign")
+            else:
+                pass
             terms.append(sign * seconds(term["hms"]))
         actual, printed = sum(terms), seconds(row["printed_result_hms"])
         rows.append(
@@ -113,6 +119,8 @@ def main() -> int:
     raw = args.source_record.read_bytes()
     if hashlib.sha256(raw).hexdigest() != RECORD_SHA256:
         raise ValueError("Frozen progression-constant source checksum mismatch")
+    else:
+        pass
     record = json.loads(raw)
     if (
         args.source_pdf
@@ -120,6 +128,8 @@ def main() -> int:
         != record["source"]["source_pdf_sha256"]
     ):
         raise ValueError("Original progression-constant PDF checksum mismatch")
+    else:
+        pass
     report = replay(record)
     report["source_record_sha256"] = RECORD_SHA256
     report["source_pdf_bytes_checked"] = bool(args.source_pdf)
@@ -131,3 +141,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

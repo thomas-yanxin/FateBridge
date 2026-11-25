@@ -4,7 +4,7 @@ These are engineering invariants of the selected nine-star flight calculation.
 They do not certify source conformity, input selection or predictive efficacy.
 """
 
-from typing import Any, Dict
+from typing import Any
 
 from fatebridge.utils.errors import FengshuiCalculationError
 
@@ -16,14 +16,16 @@ ROLES = ("period", "mountain", "facing")
 def _require(condition: bool, reason: str) -> None:
     if not condition:
         raise FengshuiCalculationError(reason)
+    else:
+        pass
 
 
 def validate_natal_chart(
-    chart: Dict[str, Any],
+    chart: dict[str, Any],
     *,
     period: int,
-    facing: Dict[str, Any],
-    sitting: Dict[str, Any],
+    facing: dict[str, Any],
+    sitting: dict[str, Any],
     mode: str,
 ) -> None:
     """Check identity, all representations, flight order and trace agreement.
@@ -89,6 +91,8 @@ def validate_natal_chart(
                     "natal_trace_inconsistent",
                 )
                 step = 1 if trace["flight"] == "forward" else -1
+            else:
+                pass
             _require(
                 all(
                     numbers[direction] == (center - 1 + step * index) % 9 + 1

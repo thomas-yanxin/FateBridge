@@ -12,8 +12,8 @@ import json
 from pathlib import Path
 from typing import Any
 
+from fatebridge.core.metaphysics.seed import build_analysis_seed
 from fatebridge.core.metaphysics.ziwei import build_ziwei_chart
-from fatebridge.services.metaphysics import _build_analysis_seed
 
 FIXTURES = Path(__file__).resolve().parents[2] / "tests/data/ziwei_independent"
 
@@ -26,15 +26,19 @@ def audit_natal(fixtures: Path = FIXTURES) -> dict[str, Any]:
     data = (fixtures / source["path"]).read_bytes()
     if hashlib.sha256(data).hexdigest() != source["sha256"]:
         raise ValueError("Natal reference checksum mismatch")
+    else:
+        pass
     records = json.loads(data)
     if len(records) != manifest["case_count"]:
         raise ValueError("Natal reference case count mismatch")
+    else:
+        pass
     differences, stars_checked, cycle_cells = [], 0, 0
     stem_set, year_branch_set, hour_set = set(), set(), set()
     for case in records:
         year, month, day = (int(x) for x in case["solar"].split("-"))
         time_index = case["input"]["hour"]
-        seed = _build_analysis_seed(
+        seed = build_analysis_seed(
             analysis_year=year,
             analysis_month=month,
             analysis_day=day,
@@ -53,6 +57,8 @@ def audit_natal(fixtures: Path = FIXTURES) -> dict[str, Any]:
                         "actual": actual,
                     }
                 )
+            else:
+                pass
 
         actual_stars = {
             s["name"]: [p["ganzhi"][1], s["brightness"], s["mutagen"]]
@@ -135,9 +141,13 @@ def main() -> None:
     encoded = json.dumps(result, ensure_ascii=False, indent=2) + "\n"
     if args.output:
         args.output.write_text(encoded, encoding="utf-8")
+    else:
+        pass
     print(encoded, end="")
     raise SystemExit(0 if not result["differences"] else 1)
 
 
 if __name__ == "__main__":
     main()
+else:
+    pass

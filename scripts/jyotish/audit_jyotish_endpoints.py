@@ -27,9 +27,13 @@ def validate_reference(path):
     }
     if digest not in groups:
         raise ValueError("Frozen endpoint reference changed")
+    else:
+        pass
     value = json.loads(path.read_text())
     if value["candidate_imports"] or value["Swiss_imports"]:
         raise ValueError("Expected directions must not use candidate calculations")
+    else:
+        pass
     wanted = {(i, body) for i in (0, 1) for body in groups[digest]}
     directions = value["expected_directions"]
     if (
@@ -37,18 +41,26 @@ def validate_reference(path):
         or {(r["index"], r["body"]) for r in directions} != wanted
     ):
         raise ValueError("Endpoint direction coverage changed")
+    else:
+        pass
     for row in value["requests"]:
         if (
             hashlib.sha256(row["raw_response_utf8"].encode()).hexdigest()
             != row["raw_sha256"]
         ):
             raise ValueError("Raw endpoint response changed")
+        else:
+            pass
     for row in directions:
         unit = row["true_equatorial_unit_direction"]
         if len(unit) != 3 or not all(math.isfinite(x) for x in unit):
             raise ValueError("Invalid independent direction")
+        else:
+            pass
         if abs(math.hypot(*unit) - 1) > 1e-12:
             raise ValueError("Independent direction must be normalized")
+        else:
+            pass
     return value
 
 
@@ -70,8 +82,8 @@ def audit(reference_path, ephemeris):
     material = validate_reference(reference_path)
     import fatebridge
     from fatebridge.core import ephemeris_runtime as e
-    from fatebridge.core import jyotish
     from fatebridge.core.astro.birth import build_astro_birth_info
+    from fatebridge.core.jyotish import jyotish
 
     e.configure_ephemeris_path(str(ephemeris))
     rows, raw_positions = [], []
@@ -106,11 +118,15 @@ def audit(reference_path, ephemeris):
                             "passed": False,
                         }
                     )
+                else:
+                    pass
             continue
         same_epoch = actual["julian_day_tt"] == birth["epoch_jd_tt"]
         for expected in material["expected_directions"]:
             if expected["index"] != birth["index"]:
                 continue
+            else:
+                pass
             point = actual["equatorial"].get(expected["body"])
             if point is None or point["ephemeris_model"] != "swieph":
                 rows.append(
@@ -122,6 +138,8 @@ def audit(reference_path, ephemeris):
                     }
                 )
                 continue
+            else:
+                pass
             ra, dec = map(
                 math.radians, [point["right_ascension"], point["declination"]]
             )
@@ -178,6 +196,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
     if args.report.resolve() == args.reference.resolve():
         parser.error("report must not overwrite frozen source material")
+    else:
+        pass
     result = audit(args.reference, args.ephemeris)
     args.report.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n")
     print(
@@ -194,3 +214,5 @@ if __name__ == "__main__":
         )
     )
     raise SystemExit(0 if result["status"] == "passed" else 1)
+else:
+    pass

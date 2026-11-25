@@ -26,7 +26,8 @@ from fatebridge.utils.civil_clock import (
     resolve_civil_clock,
     utc_instant,
 )
-from fatebridge.validation.qimen_clock import audit_clock_fold
+from tests.support.transports import call_calculation
+from validation.qimen_clock import audit_clock_fold
 
 FIXTURES = Path(__file__).parents[1] / "fixtures/qimen_clock_fold_v1"
 REFERENCE = json.loads((FIXTURES / "reference.json").read_text())
@@ -34,7 +35,9 @@ REFERENCE = json.loads((FIXTURES / "reference.json").read_text())
 
 @pytest.mark.parametrize("case", REFERENCE["clock_probes"])
 @pytest.mark.parametrize("solar", [False, True])
-def test_published_havana_boundary_survives_repeated_midnight(case, solar):
+def test_published_havana_boundary_survives_repeated_midnight(
+    case, solar: bool
+) -> None:
     local = datetime.fromisoformat(case["utc"]).astimezone(ZoneInfo(REFERENCE["zone"]))
     assert local.isoformat() == case["local"] and local.fold == case["fold"]
     assert get_adjacent_solar_terms(local, REFERENCE["zone"])[0].name == case["term"]
@@ -70,7 +73,6 @@ def test_published_havana_boundary_survives_repeated_midnight(case, solar):
             result["qimen"]["calendar_policy"]["astronomical_term"]["name"]
             == case["term"]
         )
-        assert result["qimen"]["assessment"]["authority_certified"] is False
     assert dedicated["qimen"]["palaces"] == aggregate["qimen"]["palaces"]
     resolution = dedicated["qimen"]["calendar_policy"]["civil_clock_resolution"]
     assert resolution["instant_utc"] == case["utc"]
@@ -78,7 +80,7 @@ def test_published_havana_boundary_survives_repeated_midnight(case, solar):
     assert "民用时刻" in dedicated["snapshot_text"]
 
 
-def test_clock_auditor_has_two_observations_not_four_more_term_references():
+def test_clock_auditor_has_two_observations_not_four_more_term_references() -> None:
     report = audit_clock_fold(FIXTURES)
     assert report["disagreements"] == []
     assert report["independent_calendar_reference_count"] == 2
@@ -88,7 +90,9 @@ def test_clock_auditor_has_two_observations_not_four_more_term_references():
 
 
 @pytest.mark.parametrize("offset,fold", [("-04:00", 0), ("-05:00", 1)])
-def test_explicit_offset_resolves_both_instants_without_replacing_zone(offset, fold):
+def test_explicit_offset_resolves_both_instants_without_replacing_zone(
+    offset: str, fold: int
+) -> None:
     at = resolve_civil_clock(datetime(2026, 11, 1, 1, 30), "America/New_York", offset)
     assert at.fold == fold and at.tzinfo.key == "America/New_York"
     assert format_utc_offset(at.utcoffset()) == offset
@@ -108,18 +112,20 @@ def test_explicit_offset_resolves_both_instants_without_replacing_zone(offset, f
         (datetime(2026, 1, 1), "UTC", "+8", "须为"),
     ],
 )
-def test_offsets_never_invent_a_clock(wall, zone, offset, message):
+def test_offsets_never_invent_a_clock(
+    wall, zone: str, offset: str | None, message: str
+) -> None:
     with pytest.raises(ValueError, match=message):
         resolve_civil_clock(wall, zone, offset)
 
 
 @pytest.mark.parametrize("offset", ["+11:00", "+10:30"])
-def test_half_hour_fold_is_not_assumed_to_be_one_hour(offset):
+def test_half_hour_fold_is_not_assumed_to_be_one_hour(offset: str) -> None:
     at = resolve_civil_clock(datetime(2026, 4, 5, 1, 45), "Australia/Lord_Howe", offset)
     assert format_utc_offset(at.utcoffset()) == offset
 
 
-def test_historical_seconds_are_preserved_and_naive_instants_rejected():
+def test_historical_seconds_are_preserved_and_naive_instants_rejected() -> None:
     offset = timedelta(hours=8, minutes=5, seconds=43)
     assert format_utc_offset(offset) == "+08:05:43"
     at = resolve_civil_clock(datetime(1890, 1, 1), "Asia/Shanghai", "+08:05:43")
@@ -128,7 +134,7 @@ def test_historical_seconds_are_preserved_and_naive_instants_rejected():
         utc_instant(datetime(2026, 1, 1))
 
 
-def test_lichun_exact_instant_boundary():
+def test_lichun_exact_instant_boundary() -> None:
     term = next(t for t in get_solar_terms_for_year(2026, "UTC") if t.name == "立春")
     assert get_bazi_year(term.moment - timedelta(seconds=1), "UTC") == 2025
     assert get_bazi_year(term.moment, "UTC") == 2026
@@ -144,8 +150,15 @@ def test_lichun_exact_instant_boundary():
     ],
 )
 def test_explicit_offset_across_rest_mcp_cli(
-    monkeypatch, capsys, month, day, hour, offset, expected_hour, message
-):
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    month: int,
+    day: int,
+    hour: int,
+    offset: str,
+    expected_hour: int | None,
+    message: str | None,
+) -> None:
     api._reset_runtime_state_for_tests()
     monkeypatch.setattr(
         api,
@@ -171,7 +184,7 @@ def test_explicit_offset_across_rest_mcp_cli(
         response_char_limit=0,
     )
     response = TestClient(api.app).post(
-        "/api/cn/qimen",
+        "/api/qimen",
         json=payload,
         params=[
             ("as_of", controls["as_of"]),
@@ -183,8 +196,8 @@ def test_explicit_offset_across_rest_mcp_cli(
 
     async def protocol():
         async with Client(create_mcp_app()) as client:
-            return await client.call_tool(
-                "qimen", {**payload, **controls}, raise_on_error=False
+            return await call_calculation(
+                client, "qimen", {**payload, **controls}, raise_on_error=False
             )
 
     native = asyncio.run(protocol())
@@ -233,3 +246,145 @@ def test_explicit_offset_across_rest_mcp_cli(
             == expected_hour
         )
         assert "civil_clock_resolution" in str(selected[0]["qimen"]["rule_trace"])
+
+
+@pytest.mark.parametrize(
+    "term_name",
+    ["清明", "立冬"],
+)
+def test_qimen_dedicated_seconds_match_sanshi_across_solar_term_cutoff(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], term_name: str
+) -> None:
+    api._reset_runtime_state_for_tests()
+    monkeypatch.setattr(
+        api,
+        "API_KEY_AUTHENTICATOR",
+        api.ApiKeyAuthenticator(header_name="X-API-Key", api_keys={}),
+    )
+    term = next(t for t in get_solar_terms_for_year(2026, "UTC") if t.name == term_name)
+    before = term.moment.replace(microsecond=0)
+    if before >= term.moment:
+        before = before - timedelta(seconds=1)
+    else:
+        pass
+    after = before + timedelta(seconds=1)
+    assert before < term.moment <= after
+
+    snapshots = []
+    for instant in (before, after):
+        dedicated = calculate_qimen_analysis(
+            analysis_year=instant.year,
+            analysis_month=instant.month,
+            analysis_day=instant.day,
+            analysis_hour=instant.hour,
+            analysis_minute=instant.minute,
+            analysis_second=instant.second,
+            analysis_timezone="UTC",
+            analysis_longitude=0.0,
+            use_true_solar_time=False,
+            qimen_options={"ju_method": "chaibu"},
+        )
+        aggregate = calculate_sanshiunited_analysis(
+            date=instant.date().isoformat(),
+            time=instant.strftime("%H:%M:%S+00:00"),
+            zone="UTC",
+            gps_lat=0.0,
+            gps_lon=0.0,
+            use_true_solar_time=False,
+            qimen_options={"ju_method": "chaibu"},
+        )
+        assert dedicated["qimen"]["ju_term"] == aggregate["qimen"]["ju_term"]
+        assert dedicated["qimen"]["palaces"] == aggregate["qimen"]["palaces"]
+        assert (
+            dedicated["qimen"]["calendar_policy"]["astronomical_term"]["name"]
+            == aggregate["qimen"]["calendar_policy"]["astronomical_term"]["name"]
+        )
+        snapshots.append(dedicated)
+
+    assert snapshots[0]["qimen"]["ju_term"] != term_name
+    assert snapshots[1]["qimen"]["ju_term"] == term_name
+
+    # Verify REST, MCP, and CLI all accept analysis_second and match at the cutoff.
+    payload = dict(
+        analysis_year=before.year,
+        analysis_month=before.month,
+        analysis_day=before.day,
+        analysis_hour=before.hour,
+        analysis_minute=before.minute,
+        analysis_second=before.second,
+        analysis_timezone="UTC",
+        analysis_longitude=0.0,
+        use_true_solar_time=False,
+        qimen_options={"ju_method": "chaibu"},
+    )
+    fields = ["qimen", "snapshot_text"]
+    controls = dict(
+        as_of="2026-10-22T12:00:00+08:00",
+        fields=fields,
+        strict_fields=True,
+        response_char_limit=0,
+    )
+    response = TestClient(api.app).post(
+        "/api/qimen",
+        json=payload,
+        params=[
+            ("as_of", controls["as_of"]),
+            ("strict_fields", "true"),
+            ("response_char_limit", "0"),
+            *[("fields", f) for f in fields],
+        ],
+    )
+
+    async def protocol():
+        async with Client(create_mcp_app()) as client:
+            return await call_calculation(
+                client, "qimen", {**payload, **controls}, raise_on_error=False
+            )
+
+    native = asyncio.run(protocol())
+    capsys.readouterr()
+    code = run(
+        [
+            "qimen",
+            "--analysis-year",
+            str(before.year),
+            "--analysis-month",
+            str(before.month),
+            "--analysis-day",
+            str(before.day),
+            "--analysis-hour",
+            str(before.hour),
+            "--analysis-minute",
+            str(before.minute),
+            "--analysis-second",
+            str(before.second),
+            "--analysis-timezone",
+            "UTC",
+            "--analysis-longitude",
+            "0.0",
+            "--no-use-true-solar-time",
+            "--qimen-options",
+            json.dumps(payload["qimen_options"]),
+            "--as-of",
+            controls["as_of"],
+            "--strict-fields",
+            "--response-char-limit",
+            "0",
+            "--fields",
+            *fields,
+        ]
+    )
+    cli = json.loads(capsys.readouterr().out)
+    assert response.status_code == 200 and not native.is_error and code == 0
+    bodies = [response.json(), native.structured_content, cli]
+    assert all(
+        b["qimen"]["ju_term"] == snapshots[0]["qimen"]["ju_term"] for b in bodies
+    )
+    assert bodies[0]["qimen"] == bodies[1]["qimen"] == bodies[2]["qimen"]
+
+    for bad_second in (-1, 60):
+        bad_resp = TestClient(api.app).post(
+            "/api/qimen", json={**payload, "analysis_second": bad_second}
+        )
+        assert bad_resp.status_code == 422
+        assert bad_resp.json()["error_code"] == "validation_error"

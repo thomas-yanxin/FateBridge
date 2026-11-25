@@ -1,4 +1,4 @@
-"""Physical Earth attitude and explicit reduction of native geometry inputs.
+"""Reduce native geometry inputs using the selected physical Earth attitude.
 
 Sidereal time, houses and horizons share one pole, equinox and epoch pair.
 Solar-event consumers use the dedicated physical observer and optical solver;
@@ -10,7 +10,7 @@ from __future__ import annotations
 import math
 from fractions import Fraction
 from types import ModuleType
-from typing import Any, Callable, Dict, Sequence, Tuple
+from typing import Any, Protocol, Sequence
 
 from fatebridge.core.astro.earth_attitude import _correction as _correction
 from fatebridge.core.astro.earth_attitude import _rotation_tt as _rotation_tt
@@ -33,134 +33,25 @@ from fatebridge.core.astro.earth_rotation import iers2010_gast as iers2010_gast
 from fatebridge.core.astro.earth_rotation import (
     selected_sidereal_model as selected_sidereal_model,
 )
-from fatebridge.core.astro.iers_ut1 import active_ut1, ut1_reference
-from fatebridge.core.astro.reference_frames import rotate_spherical
-
-POLICY_ID = "fatebridge_physical_earth_attitude_v6"
-NATIVE_IERS_UT1_INTERVAL = (2396758.5, 2469807.5)
-
-
-def earth_rotation_policy(
-    julian_day_tt: float | None = None, julian_day_ut1: float | None = None
-) -> Dict[str, Any]:
-    import erfa
-
-    extension = julian_day_tt is not None and julian_day_ut1 is not None
-    value = {
-        "policy_id": POLICY_ID,
-        "sidereal_time_model": (
-            (
-                "IAU2006_2000A_CIO"
-                if selected_sidereal_model(julian_day_tt) == 3
-                else "Swiss_longterm_with_boundary_phase_alignment"
-            )
-            if extension and julian_day_tt is not None
-            else (
-                "Swiss_native"
-                if julian_day_tt is not None
-                else "not_selected_without_epoch"
-            )
-        ),
-        "implementation": (
-            "explicit_source_frame_reduction_and_physical_earth_attitude"
-            if extension
-            else "native_public_API"
-        ),
-        "model_epoch_jd_tt": julian_day_tt,
-        "model_epoch_jd_ut1": julian_day_ut1,
-        "modern_adoption_window_tt": {
-            "reference_jd": MODERN_REFERENCE_JD_TT,
-            "half_window_julian_centuries": 2.0,
-        },
-        "native_iers_interval_ut1": {
-            "start": NATIVE_IERS_UT1_INTERVAL[0],
-            "end": NATIVE_IERS_UT1_INTERVAL[1],
-        },
-        "native_interval_role": "Documented native switch points; not an application bypass",
-        "celestial_frame_model": (
-            "IAU2006_2000A"
-            if julian_day_tt is not None and selected_sidereal_model(julian_day_tt) == 3
-            else (
-                "native_longterm_triad_with_IAU_boundary_alignment"
-                if julian_day_tt is not None
-                else "not_selected_without_epoch"
-            )
-        ),
-        "celestial_frame_scope": "Physical pole and equinox; source coordinates are explicitly reduced from their own frame. Does not replace source ecliptic longitudes or dynamical ephemerides.",
-        "source_equatorial_frame_model": "Swiss2.10.03_default_Vondrak_nutation2000B_native_bias",
-        "origin_method": "ERFA_S06_and_equation_of_origins_from_the_same_NPB",
-        "erfa_version": str(erfa.version.erfa_version),
-        "selection_basis": "FateBridge near-J2000 window; longterm phase and complete equatorial triad aligned at each outer edge",
-        "longterm_phase_alignment": (
-            {
-                "method": "constant_GAST_offset_and_native_triad_transport_from_IAU_boundary",
-                "boundary_tt_jd": (
-                    MODERN_REFERENCE_JD_TT
-                    + (
-                        -MODERN_HALF_WINDOW_DAYS
-                        if julian_day_tt < MODERN_REFERENCE_JD_TT
-                        else MODERN_HALF_WINDOW_DAYS
-                    )
-                    if julian_day_tt is not None
-                    and selected_sidereal_model(julian_day_tt) == 4
-                    else None
-                ),
-                "native_longterm_variation_retained": True,
-                "absolute_accuracy_certified": False,
-                "derivative_continuity_certified": False,
-                "source_url": "https://www.astro.com/swisseph/swisseph.htm",
-                "source_section": "6.1",
-                "attribution": "FateBridge window placement and computed constants; Swiss documents the constant-offset continuity method",
-            }
-            if julian_day_tt is not None and selected_sidereal_model(julian_day_tt) == 4
-            else None
-        ),
-        "nutation_model": (
-            "IAU2000A_with_IAU2006_adjustments"
-            if julian_day_tt is not None and selected_sidereal_model(julian_day_tt) == 3
-            else (
-                "native_longterm_variation_after_boundary_triad_alignment"
-                if julian_day_tt is not None
-                else "not_selected_without_epoch"
-            )
-        ),
-        "tt_argument_policy": (
-            (
-                "selected_IERS_C04_UT1_to_TT"
-                if active_ut1.get() is not None
-                else "shared_default_DeltaT_minus1_before1960_SWIEPH_from1960"
-            )
-            if extension
-            else "native_internal_sidereal_time_argument"
-        ),
-        "other_astronomical_models": "not_mutated_by_rotation_adapter",
-        "geographic_longitude_policy": "Supplied terrestrial location retained; source-frame rays, house plane and receiver are reduced into the selected physical attitude",
-        "native_event_api_scope": "Raw SDK rise_trans/true_hor retain native conventions; published solar-event consumers use the physical domain solver",
-        "scope": "Managed sidereal time, houses, horizons and the two published solar-event definitions",
-        "measured_eop_applied": False,
-        "precision_scope": "Finite model/frame/observer/root agreement; no measured polar motion, remote absolute accuracy, derivative or all-input certification",
-        "source_url": "https://iers-conventions.obspm.fr/content/chapter5/icc5.pdf",
-        "origin_source_url": "https://github.com/liberfa/erfa/blob/v2.0.1/src/gst06.c",
-        "frame_source_url": "https://www.iausofa.org/2023-10-11c",
-        "native_frame_source_url": "https://github.com/aloistr/swisseph/blob/175e1fcb3108bcd5c0d146c803f51dcf23508012/swephlib.c",
-    }
-    reference = ut1_reference(julian_day_tt, julian_day_ut1)
-    if reference is not None:
-        value.update(
-            measured_eop_applied=True,
-            ut1_reference=reference,
-            precision_scope="Selected final daily UT1 series with declared interpolation; polar motion, CIP offsets and subdaily tides are not applied. Formal source errors are not complete physical uncertainty; native auxiliary geometry retains its documented model limits.",
-        )
-    return value
+from fatebridge.core.astro.native_coordinates import require_spherical_coordinates
+from fatebridge.core.astro.reference_frames import dot, rotate_spherical
+from fatebridge.core.astro.terrestrial_observer import house_site, terrestrial_frame
+from fatebridge.core.astro.ut1_epoch import UT1Instant
 
 
-def _extension(module: Any, jd_ut1: float) -> bool:
+class CalculateNativePosition(Protocol):
+    def __call__(
+        self, julian_day_tt: float, body_index: int, flags: int, /
+    ) -> tuple[Sequence[float], int]: ...
+
+
+def _extension(module: object, jd_ut1: float) -> bool:
     return isinstance(module, ModuleType) and math.isfinite(jd_ut1)
 
 
 def _argument(
-    args: Tuple[Any, ...],
-    kwargs: Dict[str, Any],
+    args: tuple[Any, ...],
+    kwargs: dict[str, Any],
     index: int,
     name: str,
     default: Any = None,
@@ -169,12 +60,14 @@ def _argument(
 
 
 def _changed(
-    args: Tuple[Any, ...], kwargs: Dict[str, Any], index: int, name: str, value: Any
-) -> Tuple[Tuple[Any, ...], Dict[str, Any]]:
+    args: tuple[Any, ...], kwargs: dict[str, Any], index: int, name: str, value: Any
+) -> tuple[tuple[Any, ...], dict[str, Any]]:
     if len(args) > index:
         result = list(args)
         result[index] = value
         return tuple(result), dict(kwargs)
+    else:
+        pass
     return args, {**kwargs, name: value}
 
 
@@ -185,12 +78,21 @@ def _longitude(value: float, correction: float) -> float:
 def native_rotation_call(
     module: Any,
     operation: str,
-    args: Tuple[Any, ...],
-    kwargs: Dict[str, Any],
+    args: tuple[Any, ...],
+    kwargs: dict[str, Any],
     *,
-    calculate: Callable[[float, int, int], tuple[Sequence[float], int]],
+    calculate: CalculateNativePosition,
 ) -> Any:
     backend = getattr(module, operation)
+    if operation == "house_pos" and "_sun_declination" in kwargs:
+        options = dict(kwargs)
+        sun_declination = options.pop("_sun_declination")
+        # Swiss takes Sunshine inverse declination from its last forward frame.
+        # Seed it and invert within this single managed runtime call.
+        module.houses_armc(*args[:3], args[4], sun_declination)
+        return backend(*args, **options)
+    else:
+        pass
     supported = {
         "sidtime",
         "houses",
@@ -200,25 +102,60 @@ def native_rotation_call(
     }
     if operation not in supported:
         return backend(*args, **kwargs)
+    else:
+        pass
     options = dict(kwargs)
     julian_day_tt = options.pop("_julian_day_tt", None)
+    return_sun_declination = options.pop("_return_sun_declination", False)
     kwargs = options
-    jd = _argument(args, kwargs, 0, "tjdut")
-    if jd is None:
+    ut1 = _argument(args, kwargs, 0, "tjdut")
+    if ut1 is None:
         return backend(*args, **kwargs)
+    else:
+        pass
+    jd = ut1.as_float() if isinstance(ut1, UT1Instant) else ut1
+    if isinstance(ut1, UT1Instant):
+        args, kwargs = _changed(args, kwargs, 0, "tjdut", jd)
+    else:
+        pass
     if operation in {"azalt", "azalt_rev"} and _extension(module, jd):
-        attitude = earth_attitude(module, jd, julian_day_tt=julian_day_tt)
+        attitude = earth_attitude(module, ut1, julian_day_tt=julian_day_tt)
         geopos = _argument(args, kwargs, 2, "geopos")
         flag = _argument(args, kwargs, 1, "flag")
-        delta = attitude.equator.greenwich_sidereal_degrees - module.sidtime(jd) * 15
+        reverse = operation == "azalt_rev"
+        twist = 0.0
+        if attitude.equator.polar_motion is None:
+            delta = (
+                attitude.equator.greenwich_sidereal_degrees - module.sidtime(jd) * 15
+            )
+            site = (_longitude(geopos[0], delta), *geopos[1:])
+        else:
+            frame = terrestrial_frame(
+                attitude.equator, longitude=geopos[0], latitude=geopos[1]
+            )
+            right_ascension, declination = frame.equatorial_site()
+            theta, phi = map(math.radians, (right_ascension, declination))
+            native_east = (-math.sin(theta), math.cos(theta), 0.0)
+            native_north = (
+                -math.sin(phi) * math.cos(theta),
+                -math.sin(phi) * math.sin(theta),
+                math.cos(phi),
+            )
+            twist = math.degrees(
+                math.atan2(dot(frame.east, native_north), dot(frame.east, native_east))
+            )
+            site = (
+                _longitude(right_ascension, -module.sidtime(jd) * 15),
+                declination,
+                *geopos[2:],
+            )
         updated, options = _changed(
             args,
             kwargs,
             2,
             "geopos",
-            (_longitude(geopos[0], delta), *geopos[1:]),
+            site,
         )
-        reverse = operation == "azalt_rev"
         updated, options = _changed(
             updated,
             options,
@@ -227,6 +164,15 @@ def native_rotation_call(
             module.HOR2EQU if reverse else module.EQU2HOR,
         )
         if reverse:
+            if attitude.equator.polar_motion is not None:
+                # The Python binding takes scalar azimuth/true_altitude,
+                # unlike the original C API's internal xin[2] array.
+                azimuth = _argument(args, kwargs, 3, "azimuth")
+                updated, options = _changed(
+                    updated, options, 3, "azimuth", (azimuth - twist) % 360
+                )
+            else:
+                pass
             ra, dec = backend(*updated, **options)
             longitude, latitude = ra, dec
             matrix = (
@@ -245,24 +191,30 @@ def native_rotation_call(
         result = rotate_spherical(matrix, longitude, latitude)
         if reverse:
             return result
+        else:
+            pass
         updated, options = _changed(
             updated, options, 5, "xin", (*result, coordinates[2])
         )
-        return backend(*updated, **options)
+        horizontal = backend(*updated, **options)
+        if attitude.equator.polar_motion is not None:
+            return ((horizontal[0] + twist) % 360, *horizontal[1:])
+        else:
+            pass
+        return horizontal
+    else:
+        pass
     if operation in {"houses", "houses_ex"} and _extension(module, jd):
-        attitude = earth_attitude(module, jd, julian_day_tt=julian_day_tt)
+        attitude = earth_attitude(module, ut1, julian_day_tt=julian_day_tt)
         latitude = _argument(args, kwargs, 1, "lat")
         longitude = _argument(args, kwargs, 2, "lon")
         house_code = _argument(args, kwargs, 3, "hsys", b"P")
         flags = (
             _argument(args, kwargs, 4, "flags", 0) if operation == "houses_ex" else 0
         )
-        armc = (attitude.house_sidereal_degrees + longitude) % 360
+        armc, latitude = house_site(attitude, longitude=longitude, latitude=latitude)
         sun_declination = 0.0
         if house_code.upper() == b"I":
-            from fatebridge.core.astro.native_coordinates import (
-                require_spherical_coordinates,
-            )
 
             sun, returned = calculate(
                 attitude.equator.jd_tt,
@@ -275,6 +227,8 @@ def native_rotation_call(
             _, sun_declination = rotate_spherical(
                 attitude.reduction.native_to_target, ra, dec
             )
+        else:
+            pass
         cusp_values, angle_values = module.houses_armc(
             armc,
             latitude,
@@ -287,7 +241,11 @@ def native_rotation_call(
             returned, ayanamsha = module.get_ayanamsa_ex(attitude.equator.jd_tt, flags)
             if returned < 0:
                 raise ValueError("Sidereal house origin is unavailable")
+            else:
+                pass
             origin -= Fraction(ayanamsha)
+        else:
+            pass
         cusps = tuple(
             float((Fraction(value) + origin) % 360) % 360 for value in cusp_values
         )
@@ -300,15 +258,27 @@ def native_rotation_call(
             cusps = tuple(float((start + index * 30) % 360) for index in range(12))
         elif house_code.upper() == b"N":
             cusps = tuple(index * 30.0 for index in range(12))
+        else:
+            pass
         if flags & module.FLG_RADIANS:
             cusps = tuple(map(math.radians, cusps))
             angles = tuple(map(math.radians, angles))
+        else:
+            pass
+        if return_sun_declination:
+            return cusps, angles, sun_declination
+        else:
+            pass
         return cusps, angles
+    else:
+        pass
     if operation == "sidtime" and _extension(module, jd):
         return (
             physical_equator(
-                module, jd, julian_day_tt=julian_day_tt
+                module, ut1, julian_day_tt=julian_day_tt
             ).greenwich_sidereal_degrees
             / 15
         )
+    else:
+        pass
     return backend(*args, **kwargs)

@@ -1,9 +1,10 @@
+from fatebridge.core.metaphysics.seed import build_analysis_seed
 from fatebridge.core.metaphysics.ziwei import (
     ZIWEI_SIHUA_RULES,
     build_ziwei_chart,
     build_ziwei_horoscope,
 )
-from fatebridge.services.metaphysics import _build_analysis_seed, _build_person_seed
+from fatebridge.services.metaphysics import _build_person_seed
 from fatebridge.utils.birth_input import create_person_info
 
 SCOPES = ["大限", "小限", "流年", "流月", "流日", "流时"]
@@ -15,7 +16,7 @@ def _horoscope_for(birth, target):
     person = create_person_info(**birth)
     natal_seed = _build_person_seed(person)
     chart = build_ziwei_chart(natal_seed, person.gender or "未知")
-    target_seed = _build_analysis_seed(
+    target_seed = build_analysis_seed(
         analysis_year=target["year"],
         analysis_month=target["month"],
         analysis_day=target["day"],
@@ -29,7 +30,7 @@ def _horoscope_for(birth, target):
     )
 
 
-def test_horoscope_has_six_scopes_with_expected_shape():
+def test_horoscope_has_six_scopes_with_expected_shape() -> None:
     h = _horoscope_for(BIRTH, TARGET)
     assert h["engine"] == "fatebridge-offline"
     assert h["nominal_age"] == 2026 - 1994 + 1
@@ -56,8 +57,8 @@ def test_horoscope_has_six_scopes_with_expected_shape():
         assert set(s["mutagen"].keys()) == {"化禄", "化权", "化科", "化忌"}
 
 
-def test_liunian_branch_matches_year_pillar_and_mutagen_from_year_stem():
-    target_seed = _build_analysis_seed(
+def test_liunian_branch_matches_year_pillar_and_mutagen_from_year_stem() -> None:
+    target_seed = build_analysis_seed(
         analysis_year=2026, analysis_month=6, analysis_day=19, analysis_hour=14
     )
     year_stem, year_branch = target_seed.pillars["year"]
@@ -68,7 +69,7 @@ def test_liunian_branch_matches_year_pillar_and_mutagen_from_year_stem():
     assert liunian["mutagen"] == dict(ZIWEI_SIHUA_RULES[year_stem])
 
 
-def test_daxian_palace_age_range_contains_nominal_age():
+def test_daxian_palace_age_range_contains_nominal_age() -> None:
     person = create_person_info(**BIRTH)
     natal_seed = _build_person_seed(person)
     chart = build_ziwei_chart(natal_seed, "男")

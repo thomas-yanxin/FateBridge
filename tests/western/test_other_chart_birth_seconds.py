@@ -2,7 +2,8 @@
 
 import json
 import math
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
+from fractions import Fraction
 from pathlib import Path
 
 import pytest
@@ -26,6 +27,14 @@ REFERENCE = json.loads(
 )
 SOURCE_INPUT = REFERENCE["adopted_input"]
 HAS_SWE = pytest.mark.skipif(runtime.swe is None, reason="Swiss Ephemeris required")
+
+# R59 western-specialty-angle/authority-observed/reference.json, 1879 case.
+# The bare Swiss replay and the SOFA/Swiss source-equator reference use the
+# same Gregorian clock, with separately computed ecliptic/equator models.
+HISTORICAL_UT1 = 2407484.4311342593
+LEGACY_ANGLES = {"Midheaven": 219.9000179371062, "Ascendant": 271.4013063882032}
+SELECTED_ANGLES = {"Midheaven": 219.9000178031256, "Ascendant": 271.40130658985964}
+ANGLE_GATE_DEGREES = 1e-8
 
 
 def _historical_angles(moment, longitude, latitude):
@@ -58,6 +67,8 @@ def _historical_angles(moment, longitude, latitude):
     east = (-math.sin(theta), math.cos(theta), 0.0)
     if sum(a * b for a, b in zip(vector, east)) < 0:
         vector = tuple(-v for v in vector)
+    else:
+        pass
     asc = (
         math.degrees(
             math.atan2(
@@ -71,7 +82,7 @@ def _historical_angles(moment, longitude, latitude):
 
 @HAS_SWE
 @pytest.mark.parametrize("variant", ["germany", "chart13"])
-def test_seconds_reach_public_core_coordinates_and_snapshot(variant):
+def test_seconds_reach_public_core_coordinates_and_snapshot(variant: str) -> None:
     model = AstroChartPolyRequest.model_validate(
         {**SOURCE_INPUT, "chart_variant": variant}
     )
@@ -81,25 +92,35 @@ def test_seconds_reach_public_core_coordinates_and_snapshot(variant):
     assert "22:20:50" in base["person_info"]["birth_datetime"]
     if variant == "chart13":
         assert "22:20:50" in result["snapshot_text"]
+    else:
+        pass
     instant = datetime.fromisoformat(REFERENCE["adopted_utc_label"])
     jd, mc, asc = _historical_angles(instant, 10.0, 53.55)
+    assert jd == HISTORICAL_UT1
+    assert {"Midheaven": mc, "Ascendant": asc} == pytest.approx(
+        LEGACY_ANGLES, rel=0, abs=ANGLE_GATE_DEGREES
+    )
+    assert base["chart_profile"]["julian_day_ut1"] == HISTORICAL_UT1
     if variant == "germany":
         layer = result["midpoint_analysis"]
         assert layer["time_sensitivity"]["status"] == "not_assessed"
         assert layer["time_sensitivity"]["uncertainty_minutes"] is None
         assert layer["profile"]["julian_day_ut1"] == jd
         actual = {row["id"]: row["longitude"] for row in layer["factors"]}
-        assert actual["Midheaven"] == pytest.approx(mc, abs=1e-8)
-        assert actual["Ascendant"] == pytest.approx(asc, abs=1e-8)
+        assert {point: actual[point] for point in SELECTED_ANGLES} == pytest.approx(
+            SELECTED_ANGLES, rel=0, abs=ANGLE_GATE_DEGREES
+        )
     else:
         assert result["time_sensitivity"]["status"] == "not_assessed"
         assert result["sector_profile"]["anchor_longitude"] == pytest.approx(
-            asc, abs=1e-8
+            SELECTED_ANGLES["Ascendant"], rel=0, abs=ANGLE_GATE_DEGREES
         )
 
 
 @HAS_SWE
-def test_source_seconds_change_real_contacts_instead_of_being_silently_truncated():
+def test_source_seconds_change_real_contacts_instead_of_being_silently_truncated() -> (
+    None
+):
     exact = calculate_germany_chart_analysis(**SOURCE_INPUT)["midpoint_analysis"]
     minute = calculate_germany_chart_analysis(**{**SOURCE_INPUT, "birth_second": 0})[
         "midpoint_analysis"
@@ -123,7 +144,9 @@ def test_source_seconds_change_real_contacts_instead_of_being_silently_truncated
 
 @HAS_SWE
 @pytest.mark.parametrize("variant", ["germany", "chart13"])
-def test_utc_sample_endpoints_keep_recorded_seconds_across_minute_rollover(variant):
+def test_physical_sample_endpoints_keep_elapsed_seconds_across_minute_rollover(
+    variant: str,
+) -> None:
     result = calculate_core_chart_analysis(
         **SOURCE_INPUT, chart_variant=variant, birth_time_uncertainty_minutes=0.25
     )
@@ -132,17 +155,30 @@ def test_utc_sample_endpoints_keep_recorded_seconds_across_minute_rollover(varia
         if variant == "germany"
         else result["time_sensitivity"]
     )
-    assert [row["recorded_utc"] for row in sensitivity["samples"]] == [
-        "1879-05-14T22:20:35+00:00",
-        "1879-05-14T22:20:50+00:00",
-        "1879-05-14T22:21:05+00:00",
+    samples = sensitivity["samples"]
+    tt_points = [
+        Fraction(row["physical_timing"]["recorded_tt_jd_exact"]) for row in samples
+    ]
+    assert [(point - tt_points[1]) * 86400 for point in tt_points] == [-15, 0, 15]
+    assert samples[1]["recorded_utc"] == REFERENCE["adopted_utc_label"]
+
+    # Before UTC, display labels follow the modeled UT1 inverse. Allow one
+    # native Julian-day cell and a microsecond of display rounding.
+    center = datetime.fromisoformat(REFERENCE["adopted_utc_label"])
+    label_error = timedelta(seconds=math.ulp(HISTORICAL_UT1) * 86400, microseconds=1)
+    for sample, elapsed in zip(samples, (-15, 0, 15)):
+        label = datetime.fromisoformat(sample["recorded_utc"])
+        assert abs(label - (center + timedelta(seconds=elapsed))) <= label_error
+    assert [datetime.fromisoformat(row["recorded_utc"]).minute for row in samples] == [
+        20,
+        20,
+        21,
     ]
     assert sensitivity["uncertainty_minutes"] == 0.25
-    assert sensitivity["sample_frequency_is_probability"] is False
 
 
 @HAS_SWE
-def test_exact_second_is_preserved_in_zero_arc_and_day_meridian():
+def test_exact_second_is_preserved_in_zero_arc_and_day_meridian() -> None:
     result = calculate_germany_chart_analysis(
         **SOURCE_INPUT,
         birth_time_uncertainty_minutes=0,
@@ -164,7 +200,9 @@ def test_exact_second_is_preserved_in_zero_arc_and_day_meridian():
 
 
 @HAS_SWE
-def test_equivalent_fractional_timezone_does_not_change_recorded_second_or_geometry():
+def test_equivalent_fractional_timezone_does_not_change_recorded_second_or_geometry() -> (
+    None
+):
     first = calculate_germany_chart_analysis(**SOURCE_INPUT)
     # A synthetic equivalent clock representation, not a claim about Hamburg's
     # historical timezone. The instant and geographic coordinates stay fixed.
@@ -186,7 +224,7 @@ def test_equivalent_fractional_timezone_does_not_change_recorded_second_or_geome
 
 
 @HAS_SWE
-def test_omitted_seconds_preserve_previous_default_business_output():
+def test_omitted_seconds_preserve_previous_default_business_output() -> None:
     assert calculate_germany_chart_analysis(
         **astro_payload()
     ) == calculate_germany_chart_analysis(**astro_payload(), birth_second=0)
@@ -196,7 +234,7 @@ def test_omitted_seconds_preserve_previous_default_business_output():
     "model", [AstroSpecialtyRequest, AstroGermanyRequest, AstroChartPolyRequest]
 )
 @pytest.mark.parametrize("value", [-1, 60, 59.5, None])
-def test_invalid_recorded_seconds_fail_the_public_request(model, value):
+def test_invalid_recorded_seconds_fail_the_public_request(model, value) -> None:
     with pytest.raises(ValidationError):
         model.model_validate(
             {
@@ -214,13 +252,17 @@ def test_invalid_recorded_seconds_fail_the_public_request(model, value):
 @pytest.mark.parametrize(
     "variant", ["chart", "hellen_chart", pytest.param("guolao_chart", marks=HAS_SWE)]
 )
-def test_nonzero_seconds_cannot_be_silently_ignored_in_other_variants(variant):
+def test_nonzero_seconds_cannot_be_silently_ignored_in_other_variants(
+    variant: str,
+) -> None:
     if variant != "guolao_chart":
         with pytest.raises(ValidationError, match="nonzero birth_second"):
             AstroChartPolyRequest.model_validate(
                 {**SOURCE_INPUT, "chart_variant": variant}
             )
         return
+    else:
+        pass
     # Guolao's current dedicated and polymorphic contracts support seconds.
     # Keep the case and verify actual use, rather than expecting rejection.
     request = AstroChartPolyRequest.model_validate(
@@ -246,7 +288,7 @@ def test_nonzero_seconds_cannot_be_silently_ignored_in_other_variants(variant):
 
 
 @HAS_SWE
-def test_india_supported_seconds_reach_the_actual_clock_and_positions():
+def test_india_supported_seconds_reach_the_actual_clock_and_positions() -> None:
     # India now supports seconds explicitly. Retain the no-silent-truncation
     # requirement with real calculations instead of rejecting a supported field.
     request = AstroChartPolyRequest.model_validate(
@@ -274,7 +316,7 @@ def test_india_supported_seconds_reach_the_actual_clock_and_positions():
     assert longitudes[0]["Sun"] != longitudes[1]["Sun"]
 
 
-def test_original_natal_table_and_later_clock_conversion_are_kept_distinct():
+def test_original_natal_table_and_later_clock_conversion_are_kept_distinct() -> None:
     assert (
         REFERENCE["source"]["pdf_sha256"]
         == "18fcf0aa0ce530fc3c594ed9ff42c92b536948b716c1b1e2ca7f69432dd345a2"
@@ -287,10 +329,12 @@ def test_original_natal_table_and_later_clock_conversion_are_kept_distinct():
 
 
 @HAS_SWE
-def test_cli_birth_second_flag_reaches_the_actual_public_clock(capsys):
+def test_cli_birth_second_flag_reaches_the_actual_public_clock(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     code = run(
         [
-            "astro_germany_chart",
+            "hamburg_midpoint_chart",
             "--birth-year",
             "1879",
             "--birth-month",

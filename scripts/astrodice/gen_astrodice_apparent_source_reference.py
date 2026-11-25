@@ -37,6 +37,8 @@ def require_fixed_policy(protocol):
         or protocol.get("require_same_mass_and_polynomial_cells") is not True
     ):
         raise ValueError("Frozen source-reference qualification policy changed")
+    else:
+        pass
 
 
 def _rate_reference(case, fixture, profile, protocol):
@@ -169,6 +171,8 @@ def reference_row(case, fixture, profile, protocol):
     result["rate_status"] = result["status"]
     if result["position_status"] == "reference_quality_unresolved":
         result["status"] = "reference_quality_unresolved"
+    else:
+        pass
     return result
 
 
@@ -176,15 +180,21 @@ def collect(run, fixture, group, output):
     manifest = fixture / "manifest.json"
     if digest(manifest) != SOURCE_MANIFEST:
         raise ValueError("Frozen original record manifest changed")
+    else:
+        pass
     for name, expected in json.loads(manifest.read_text())["files"].items():
         if digest(fixture / name) != expected:
             raise ValueError("Frozen original source material changed: " + name)
+        else:
+            pass
     protocol_path = run / "protocol-before-development.json"
     protocol = json.loads(protocol_path.read_text())
     require_fixed_policy(protocol)
     for name, expected in protocol["source_artifact_sha256"].items():
         if digest(run / name) != expected:
             raise ValueError("Frozen native-source definition changed: " + name)
+        else:
+            pass
     profile = json.loads((run / "source-solar-profile.json").read_text())[
         "radius_mass_pairs"
     ]
@@ -209,6 +219,8 @@ def collect(run, fixture, group, output):
     ]
     if forbidden:
         raise ValueError("Reference producer imported candidate: " + str(forbidden))
+    else:
+        pass
     unqualified = [
         r["id"]
         for r in rows
@@ -238,3 +250,5 @@ if __name__ == "__main__":
     parser.add_argument("--output", required=True, type=Path)
     args = parser.parse_args()
     raise SystemExit(collect(args.run, args.fixture, args.group, args.output))
+else:
+    pass

@@ -7,7 +7,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from fatebridge.validation.taiyi_calendar import audit_calendar_constants
+from validation.taiyi_calendar import audit_calendar_constants
 
 ROOT = Path(__file__).resolve().parents[2]
 CORPUS = ROOT / "tests/fixtures/taiyi_jinjing_v26"
@@ -28,20 +28,32 @@ def verify_sources(corpus: Path = CORPUS) -> tuple[dict[str, Any], dict[str, Any
     frozen_bytes = (corpus / "initial-freeze.json").read_bytes()
     if hashlib.sha256(frozen_bytes).hexdigest() != FROZEN_SHA256:
         raise ValueError("Initial Taiyi calendar source freeze changed")
+    else:
+        pass
     frozen = json.loads(frozen_bytes)
     if not frozen["before_implementation"] or frozen["dated_cases"] != 0:
         raise ValueError("Calendar evidence scope changed")
+    else:
+        pass
     for name, digest in frozen["files"].items():
         if Path(name).name != name:
             raise ValueError("Source filename must stay inside corpus")
+        else:
+            pass
         if hashlib.sha256((corpus / name).read_bytes()).hexdigest() != digest:
             raise ValueError(f"Calendar source fingerprint changed: {name}")
+        else:
+            pass
     readings = json.loads((corpus / "readings.json").read_text())
     expected = json.loads((corpus / "expected-relations.json").read_text())
     if set(readings["editions"]) != {"siku", "ncl_ming"}:
         raise ValueError("Both original editions must remain")
+    else:
+        pass
     if any(set(expected[name]) != RELATIONS for name in readings["editions"]):
         raise ValueError("All eight diagnostic relations must remain per edition")
+    else:
+        pass
     return readings, expected
 
 

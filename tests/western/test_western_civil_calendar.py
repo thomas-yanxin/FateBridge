@@ -8,15 +8,14 @@ import pytest
 from pydantic import ValidationError
 
 from fatebridge.core.civil_calendar import civil_datetime, gregorian_date
-from fatebridge.core.output_western import WesternCivilCalendarConversion
+from fatebridge.core.contracts.output_western import WesternCivilCalendarConversion
 from fatebridge.core.predictive.native_chart import build_native_subject
 from fatebridge.core.requests.western_events import (
     AstroElectionRequest,
     AstroHoraryRequest,
 )
 from scripts.western.audit_western_civil_calendar import audit
-from tests.western.test_western_election import CANDIDATE
-from tests.western.test_western_horary import QUESTION
+from tests.unit_test.fixtures.western_event_cases import CANDIDATE, QUESTION
 
 REFERENCE = json.loads(
     (
@@ -25,7 +24,7 @@ REFERENCE = json.loads(
 )
 
 
-def test_sealed_primary_and_supplementary_implementation_controls():
+def test_sealed_primary_and_supplementary_implementation_controls() -> None:
     value = audit()
     assert value["primary_numeric_examples"] == 2
     assert value["manual_conversion_controls"] == 13
@@ -35,7 +34,7 @@ def test_sealed_primary_and_supplementary_implementation_controls():
 
 
 @pytest.mark.parametrize("row", REFERENCE["manual_conversion_controls"])
-def test_frozen_manual_date_controls_and_clock_preservation(row):
+def test_frozen_manual_date_controls_and_clock_preservation(row) -> None:
     at, receipt = civil_datetime(*row["date"], 23, 59, row["calendar"])
     assert at.date() == date(*row["gregorian"]) and at.time().isoformat() == "23:59:00"
     WesternCivilCalendarConversion.model_validate(receipt)
@@ -54,8 +53,8 @@ def test_frozen_manual_date_controls_and_clock_preservation(row):
 )
 @pytest.mark.parametrize("year", [1700, 1800, 1900, 2100])
 def test_julian_century_leap_dates_validate_before_binding_and_gregorian_rejects(
-    model, prefix, inputs, year
-):
+    model, prefix: str, inputs, year: int
+) -> None:
     changed = {**inputs, prefix + "year": year, prefix + "month": 2, prefix + "day": 29}
     with pytest.raises(ValidationError):
         model.model_validate(changed)
@@ -82,13 +81,13 @@ def test_julian_century_leap_dates_validate_before_binding_and_gregorian_rejects
     ],
 )
 def test_invalid_dates_unknown_reform_and_unrepresentable_ranges_are_rejected(
-    calendar, values
-):
+    calendar: str, values
+) -> None:
     with pytest.raises(ValueError):
         gregorian_date(*values, calendar)
 
 
-def test_a_julian_only_label_has_no_fictional_same_label_gregorian_offset():
+def test_a_julian_only_label_has_no_fictional_same_label_gregorian_offset() -> None:
     at, value = civil_datetime(1700, 2, 29, 12, 0, "julian")
     assert at == datetime(1700, 3, 11, 12)
     assert value["same_label_gregorian_date_valid"] is False
@@ -102,7 +101,9 @@ def test_a_julian_only_label_has_no_fictional_same_label_gregorian_offset():
         ((2024, 10, 21, 1, 30), "America/New_York", "ambiguous"),
     ],
 )
-def test_timezone_gap_and_fold_validation_uses_the_converted_date(label, zone, error):
+def test_timezone_gap_and_fold_validation_uses_the_converted_date(
+    label, zone: str, error: str
+) -> None:
     normalized, _ = civil_datetime(*label, "julian")
     with pytest.raises(ValueError, match=error):
         build_native_subject(
@@ -116,8 +117,8 @@ def test_timezone_gap_and_fold_validation_uses_the_converted_date(label, zone, e
 
 @pytest.mark.parametrize("zodiac,house", [("Tropic", "R"), ("Sidereal", "W")])
 def test_equivalent_calendars_preserve_exact_native_epoch_positions_and_house_cusps(
-    zodiac, house
-):
+    zodiac: str, house: str
+) -> None:
     at, receipt = civil_datetime(1634, 7, 16, 11, 0, "julian")
     options = dict(
         name="fictional historical date-label control",

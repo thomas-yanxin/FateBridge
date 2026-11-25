@@ -25,18 +25,26 @@ def sha(path: Path) -> str:
 def reference(corpus: Path = CORPUS) -> dict[str, Any]:
     if sha(corpus / "freeze.json") != PIN:
         raise ValueError("Frozen qi reference identity changed")
+    else:
+        pass
     manifest = json.loads((corpus / "freeze.json").read_text())
     if {p.name for p in corpus.iterdir()} != set(manifest) | {"freeze.json"}:
         raise ValueError("Frozen qi reference inventory changed")
+    else:
+        pass
     for name, digest in manifest.items():
         if sha(corpus / name) != digest:
             raise ValueError("Frozen qi reference bytes changed: " + name)
+        else:
+            pass
     data = json.loads((corpus / "reference.json").read_text())
     if (
         sha(ROOT / "tests/fixtures/jinkou_month_building_v1/source.pdf")
         != data["source_sha256"]
     ):
         raise ValueError("Frozen qi original PDF changed")
+    else:
+        pass
     return data
 
 
@@ -61,16 +69,22 @@ def audit() -> dict[str, Any]:
         )
         if actual != expected:
             monthly_failures.append(dict(expected=expected, actual=actual))
+        else:
+            pass
     for expected in data["day_matrix"]:
         actual = day_qi_facts(expected["day_branch"], expected["jiangshen_branch"])
         want = {k: v for k, v in expected.items() if k != "jiangshen_branch"}
         if actual != want:
             daily_failures.append(dict(expected=want, actual=actual))
+        else:
+            pass
     count = 0
     for monthly in data["month_matrix"]:
         for daily in data["day_matrix"]:
             if daily["jiangshen_branch"] != monthly["jiangshen_branch"]:
                 continue
+            else:
+                pass
             expected = dict(
                 monthly, **{k: v for k, v in daily.items() if k != "jiangshen_branch"}
             )
@@ -96,9 +110,13 @@ def audit() -> dict[str, Any]:
             actual = {k: actual[k] for k in expected}
             if actual != expected:
                 combined_failures.append(dict(expected=expected, actual=actual))
+            else:
+                pass
             count += 1
     if before != {str(p.relative_to(ROOT)): sha(p) for p in paths}:
         raise ValueError("Source changed during qi-fidelity audit")
+    else:
+        pass
     return dict(
         reference_pin=PIN,
         month_matrix_count=len(data["month_matrix"]),
@@ -144,3 +162,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

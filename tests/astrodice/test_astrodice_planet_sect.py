@@ -8,8 +8,8 @@ import pytest
 from pydantic import ValidationError
 
 from fatebridge.core.astrodice import PLANETS, build_symbolic_evidence
+from fatebridge.core.contracts.output_astrodice import PlanetSectCondition
 from fatebridge.core.local_techniques.otherbu import build_otherbu_result
-from fatebridge.core.output_astrodice import PlanetSectCondition
 
 REFERENCE = json.loads(
     (
@@ -34,7 +34,7 @@ SIGNS = [
 
 
 @pytest.mark.parametrize("planet", PLANETS)
-def test_planet_assignment_agrees_with_separately_annotated_robbins_i7(planet):
+def test_planet_assignment_agrees_with_separately_annotated_robbins_i7(planet) -> None:
     result = build_otherbu_result(planet=planet, sign="Aries", house=0)
     condition = result["symbolic_details"]["planet_sect_condition"]
     expected = (
@@ -65,32 +65,6 @@ def test_planet_assignment_agrees_with_separately_annotated_robbins_i7(planet):
     source = next(r for r in result["rulesets"] if r["id"] == condition["ruleset_id"])
     assert source["source_url"] == REFERENCE["source_url"]
     assert source["version"].endswith("1940, I.7")
-    meaning = result["interpretation"]["planet_sect_meaning"]
-    assert meaning in result["snapshot_text"]
-    if expected is not None:
-        assert ("分派为昼曜" if expected == "day" else "分派为夜曜") in meaning
-        assert ("分派为夜曜" if expected == "day" else "分派为昼曜") not in meaning
-    elif planet == "Mercury":
-        assert "晨星时属昼曜" in meaning and "昏星时属夜曜" in meaning
-        assert "未选定水星的分派" in meaning
-    else:
-        assert "不在" in meaning and "未定义不等于逆派或失势" in meaning
-
-
-def test_all_1728_rolls_cannot_infer_sect_from_sign_or_house_number():
-    for planet in PLANETS:
-        baseline = build_symbolic_evidence(planet, "Aries", 0)
-        for sign, house in product(SIGNS, range(12)):
-            result = build_symbolic_evidence(planet, sign, house)
-            assert (
-                result["symbolic_details"]["planet_sect_condition"]
-                == baseline["symbolic_details"]["planet_sect_condition"]
-            )
-            assert (
-                result["interpretation"]["planet_sect_meaning"]
-                == baseline["interpretation"]["planet_sect_meaning"]
-            )
-            assert result["symbolic_details"]["triplicity_condition"]["sect"] is None
 
 
 @pytest.mark.parametrize(
@@ -104,8 +78,8 @@ def test_all_1728_rolls_cannot_infer_sect_from_sign_or_house_number():
     ],
 )
 def test_i7_natural_assignment_does_not_replace_i18_conditional_governance(
-    planet, sign, natural, triangle_night_role
-):
+    planet: str, sign: str, natural: str | None, triangle_night_role: str
+) -> None:
     details = build_symbolic_evidence(planet, sign, 0)["symbolic_details"]
     assert details["planet_sect_condition"]["natural_sect"] == natural
     assert (
@@ -117,8 +91,8 @@ def test_i7_natural_assignment_does_not_replace_i18_conditional_governance(
 @pytest.mark.parametrize("planet", ["Mercury", "Saturn", "Mars", "NorthNode"])
 @pytest.mark.parametrize("time,zodiacal", list(product(["00:30", "12:30"], [0, 1])))
 def test_actual_sky_day_night_and_zodiac_never_supply_the_roll_conditions(
-    planet, time, zodiacal
-):
+    planet: str, time, zodiacal
+) -> None:
     faces = {"planet": planet, "sign": "Aries", "house": 0}
     plain = build_otherbu_result(**faces)
     sky = build_otherbu_result(
@@ -133,23 +107,11 @@ def test_actual_sky_day_night_and_zodiac_never_supply_the_roll_conditions(
     assert sky["chart"] is not None
     for key in (
         "symbolic_details",
-        "interpretation",
         "rule_trace",
         "rulesets",
         "diceChart",
     ):
         assert sky[key] == plain[key]
-
-
-@pytest.mark.parametrize(
-    "planet,phrase",
-    [("Saturn", "白昼的温暖调和土星的冷性"), ("Mars", "夜间的湿润调和火星的干性")],
-)
-def test_destructive_stars_follow_i7_moderation_not_like_quality_assignment(
-    planet, phrase
-):
-    result = build_symbolic_evidence(planet, "Aries", 0)
-    assert phrase in result["interpretation"]["planet_sect_meaning"]
 
 
 @pytest.mark.parametrize(
@@ -161,6 +123,8 @@ def test_destructive_stars_follow_i7_moderation_not_like_quality_assignment(
         ("natural_sect", "neutral"),
     ],
 )
-def test_contract_rejects_an_invented_observed_condition(field, value):
+def test_contract_rejects_an_invented_observed_condition(
+    field: str, value: bool | str
+) -> None:
     with pytest.raises(ValidationError):
         PlanetSectCondition.model_validate({field: value})

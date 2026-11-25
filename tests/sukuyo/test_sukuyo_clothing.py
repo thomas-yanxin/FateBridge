@@ -6,14 +6,14 @@ from pathlib import Path
 import pytest
 
 from fatebridge.core.requests.divination import SuZhanRequest
-from fatebridge.core.sukuyo import calendar_mansion, day_evidence, rulesets
-from fatebridge.core.sukuyo_clothing import clothing_reference
-from fatebridge.validation.sukuyo import (
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence, rulesets
+from fatebridge.core.sukuyo.sukuyo_clothing import clothing_reference
+from scripts.sukuyo.audit_sukuyo_clothing_primary import verify_primary
+from tests.unit_test.fixtures.sukuyo_readings import payload, quotes
+from validation.sukuyo import (
     required_quote_paths,
     verify_sukuyo_context_claims,
 )
-from scripts.sukuyo.audit_sukuyo_clothing_primary import verify_primary
-from tests.sukuyo.test_sukuyo_calendar_text import payload, quotes
 
 FACTS = json.loads(
     (Path(__file__).parents[1] / "data/sukuyo-clothing-primary.json").read_bytes()
@@ -21,7 +21,9 @@ FACTS = json.loads(
 
 
 @pytest.mark.parametrize("row", FACTS["verse_rows"], ids=lambda row: row["mansion"])
-def test_all_27_literal_verse_cells_are_read_without_invented_outcome_scores(row):
+def test_all_27_literal_verse_cells_are_read_without_invented_outcome_scores(
+    row,
+) -> None:
     reference = clothing_reference({"natal_su27": row["mansion"]})
     candidate = reference["candidate_references"][0]
     assert candidate["verse"] == row
@@ -34,7 +36,7 @@ def test_all_27_literal_verse_cells_are_read_without_invented_outcome_scores(row
     assert not reference["real_world_event_prediction_evaluated"]
 
 
-def test_ming_并_is_not_repaired_to_井_or_assigned_a_negative_complement():
+def test_ming_并_is_not_repaired_to_井_or_assigned_a_negative_complement() -> None:
     reference = clothing_reference({"natal_su27": "井"})
     primary, ming = reference["candidate_references"][0]["comparisons"]
     assert primary["assessment"] == "favorable"
@@ -49,7 +51,9 @@ def test_ming_并_is_not_repaired_to_井_or_assigned_a_negative_complement():
     assert not reference["independent_ming_edition_collated"]
 
 
-def test_upper_heading_and_different_literal_forecasts_are_not_normalized_away():
+def test_upper_heading_and_different_literal_forecasts_are_not_normalized_away() -> (
+    None
+):
     wall = clothing_reference({"natal_su27": "壁"})["candidate_references"][0]
     assert wall["upper_literal_cutting_statement"]["literal_heading_mansion"] == "璧"
     corner = clothing_reference({"natal_su27": "角"})["candidate_references"][0]
@@ -58,7 +62,9 @@ def test_upper_heading_and_different_literal_forecasts_are_not_normalized_away()
 
 
 @pytest.mark.parametrize("name", ["牛", "并", "璧", "井宿", True])
-def test_invalid_or_unresolved_mansion_characters_are_not_guessed(name):
+def test_invalid_or_unresolved_mansion_characters_are_not_guessed(
+    name: bool | str,
+) -> None:
     with pytest.raises(ValueError):
         clothing_reference({"natal_su27": name})
 
@@ -75,7 +81,9 @@ def ids(result, key="matched_rules"):
     return {row["rule_id"] for row in result["activity_assessment"][key]}
 
 
-def test_tailoring_closure_preserves_opposing_chapter_and_explicit_making_clauses():
+def test_tailoring_closure_preserves_opposing_chapter_and_explicit_making_clauses() -> (
+    None
+):
     result = clothing("2025-02-11", ["tailoring_garments"])
     assert result["day_mansion"] == "张"
     assert {"t1299_clothing_02", "t1299_clothing_03", "t1299_clothing_18"} <= ids(
@@ -98,7 +106,9 @@ def test_tailoring_closure_preserves_opposing_chapter_and_explicit_making_clause
         )
 
 
-def test_mere_making_repair_and_missing_details_do_not_trigger_the_cutting_wearing_list():
+def test_mere_making_repair_and_missing_details_do_not_trigger_the_cutting_wearing_list() -> (
+    None
+):
     for details in ([], ["making_garments"], ["repairing_garments"]):
         result = clothing("2025-02-07", details)
         assert "t1299_clothing_01" not in ids(result)
@@ -107,7 +117,7 @@ def test_mere_making_repair_and_missing_details_do_not_trigger_the_cutting_weari
     assert "t1299_clothing_01" in ids(actual)
 
 
-def test_royal_identity_and_new_wearing_are_both_required():
+def test_royal_identity_and_new_wearing_are_both_required() -> None:
     ordinary = clothing("2025-02-04", ["wearing_new_garments"])
     royal_only = clothing("2025-02-04", ["royal_wearer"])
     royal = clothing("2025-02-04", ["wearing_new_garments", "royal_wearer"])
@@ -120,7 +130,9 @@ def test_royal_identity_and_new_wearing_are_both_required():
     assert ordinary["activity_assessment"]["evidence_status"] == "conflicted"
 
 
-def test_complete_hinoo_candidates_can_share_a_chapter_fact_without_a_unique_mansion():
+def test_complete_hinoo_candidates_can_share_a_chapter_fact_without_a_unique_mansion() -> (
+    None
+):
     result = clothing(
         "2024-08-04", ["tailoring_garments"], calendar_profile="hinoo_t1299_host27"
     )
@@ -134,7 +146,9 @@ def test_complete_hinoo_candidates_can_share_a_chapter_fact_without_a_unique_man
     assert "t1299_clothing_02" in ids(result)
 
 
-def test_an_incomplete_single_leap_candidate_does_not_establish_favorable_membership():
+def test_an_incomplete_single_leap_candidate_does_not_establish_favorable_membership() -> (
+    None
+):
     result = clothing("2020-05-23", ["tailoring_garments"])
     ref = result["clothing_reference"]
     assert ref["candidate_mansions"] == ["毕"]
@@ -143,7 +157,9 @@ def test_an_incomplete_single_leap_candidate_does_not_establish_favorable_member
     assert not {"t1299_clothing_01", "t1299_clothing_02"} & ids(result)
 
 
-def test_clothing_details_do_not_become_commerce_or_invented_purchase_evidence():
+def test_clothing_details_do_not_become_commerce_or_invented_purchase_evidence() -> (
+    None
+):
     with pytest.raises(ValueError):
         SuZhanRequest(
             date="2025-02-07",
@@ -156,7 +172,7 @@ def test_clothing_details_do_not_become_commerce_or_invented_purchase_evidence()
         )
 
 
-def test_complete_context_rejects_the_previous_missing_candidate_day_loophole():
+def test_complete_context_rejects_the_previous_missing_candidate_day_loophole() -> None:
     # Domain/verifier fixture, explicitly synthetic. The public sky-chart tool
     # requires a clock; this does not claim an accepted clockless tool request.
     result = {
@@ -195,7 +211,7 @@ def test_complete_context_rejects_the_previous_missing_candidate_day_loophole():
     )
 
 
-def test_clothing_reference_is_required_even_under_generic_activity_focus():
+def test_clothing_reference_is_required_even_under_generic_activity_focus() -> None:
     result = payload(
         date="2025-02-07",
         natal_mansion=None,
@@ -215,7 +231,7 @@ def test_clothing_reference_is_required_even_under_generic_activity_focus():
     assert "sukuyo.candidate_days" in required_quote_paths("day")
 
 
-def test_primary_source_quotes_and_all_apparatus_are_preserved():
+def test_primary_source_quotes_and_all_apparatus_are_preserved() -> None:
     report = verify_primary()
     assert report["verse_clauses"] == 27 and report["apparatus_records"] == 3
     assert report["action_rules_with_literal_source_quotes"] == 38
@@ -223,7 +239,7 @@ def test_primary_source_quotes_and_all_apparatus_are_preserved():
     assert not report["manual_action_annotation_independently_accepted"]
 
 
-def test_quoted_historical_weekday_sequence_does_not_supply_an_hourly_order():
+def test_quoted_historical_weekday_sequence_does_not_supply_an_hourly_order() -> None:
     from scripts.sukuyo.check_sukuyo_historical_weekday import verify_weekday
 
     report = verify_weekday()

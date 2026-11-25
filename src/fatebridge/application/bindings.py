@@ -1,210 +1,202 @@
-"""Lazy service resolution and validated request-to-service binding."""
+"""Resolve catalog services when binding a validated request."""
 
-import importlib
-import inspect
-from typing import Any, Callable, Dict, List, Optional, Set, Tuple
+from collections.abc import Mapping
+from dataclasses import dataclass
+from functools import cached_property
+from importlib import import_module
+from inspect import signature
+from typing import Protocol, runtime_checkable
 
 from pydantic import BaseModel
 
-from fatebridge.application.tool_spec import Bind, ServiceResult
-from fatebridge.utils.birth_input import PersonInfo, create_person_info
-
-
-def lazy_service(module: str, name: str) -> Callable[..., ServiceResult]:
-    """Return a proxy that imports ``module`` and resolves ``name`` on first call.
-
-    Lets the tool catalog declare a tool's service without importing the
-    service module
-    until that tool is actually invoked. The proxy carries an ``__fb_lazy__``
-    marker so binders can resolve the real function before scheduling execution.
-    """
-    cell: List[Callable[..., ServiceResult]] = []
-
-    def _proxy(*args: Any, **kwargs: Any) -> ServiceResult:
-        if not cell:
-            cell.append(getattr(importlib.import_module(module), name))
-        return cell[0](*args, **kwargs)
-
-    _proxy.__fb_lazy__ = (module, name)  # type: ignore[attr-defined]
-    _proxy.__name__ = name
-    _proxy.__qualname__ = name
-    return _proxy
-
-
-def resolve_service(service: Callable[..., Any]) -> Callable[..., Any]:
-    """Return the real service callable, importing it if ``service`` is lazy."""
-    marker = getattr(service, "__fb_lazy__", None)
-    if marker is None:
-        return service
-    module, name = marker
-    resolved: Callable[..., Any] = getattr(importlib.import_module(module), name)
-    return resolved
-
-
-def _resolver(
-    service: Callable[..., ServiceResult],
-) -> Callable[[], Callable[..., ServiceResult]]:
-    """Memoise lazy-proxy resolution so a bind unwraps its service exactly once.
-
-    Binders return the *resolved* domain function (not the proxy) so the unit of
-    work handed to the surfaces — REST's threadpool, MCP/CLI's direct call — is
-    the real service, while the import stays deferred until the first invocation.
-    """
-    cache: List[Callable[..., ServiceResult]] = []
-
-    def get() -> Callable[..., ServiceResult]:
-        if not cache:
-            cache.append(resolve_service(service))
-        return cache[0]
-
-    return get
-
-
-_PERSON_POSITIONAL = (
-    "birth_year",
-    "birth_month",
-    "birth_day",
-    "birth_hour",
-    "name",
-    "gender",
-    "birth_place",
+from fatebridge.application.tool_spec import (
+    Bind,
+    BoundServiceCall,
+    ResolvedService,
+    ServiceInput,
+    ServicePositionalInput,
+    ServiceResult,
 )
-_PERSON_KEYWORD = (
-    "birth_minute",
-    "birth_second",
-    "birth_timezone",
-    "birth_utc_offset",
-    "birth_longitude",
-    "use_true_solar_time",
+from fatebridge.utils.birth_input import PersonInfo
+
+
+@dataclass(frozen=True)
+class LazyService:
+    """Reference a service module without loading it during discovery."""
+
+    module_name: str
+    service_name: str
+
+    @cached_property
+    def resolved(self) -> ResolvedService:
+        service: object = getattr(import_module(self.module_name), self.service_name)
+        if isinstance(service, ResolvedService):
+            return service
+        else:
+            raise TypeError(f"{self.module_name}.{self.service_name} is not a service")
+
+    def __call__(
+        self, *positional: ServicePositionalInput, **keywords: ServiceInput
+    ) -> ServiceResult:
+        return self.resolved(*positional, **keywords)
+
+
+def lazy_service(module: str, name: str) -> LazyService:
+    return LazyService(module, name)
+
+
+def resolve_service(service: LazyService | ResolvedService) -> ResolvedService:
+    return service.resolved if isinstance(service, LazyService) else service
+
+
+PERSON_FIELDS = frozenset(
+    {
+        "birth_year",
+        "birth_month",
+        "birth_day",
+        "birth_hour",
+        "name",
+        "gender",
+        "birth_place",
+        "birth_minute",
+        "birth_second",
+        "birth_timezone",
+        "birth_utc_offset",
+        "birth_longitude",
+        "use_true_solar_time",
+    }
 )
 
 
 def _build_person(
-    data: Dict[str, Any],
+    data: Mapping[str, ServiceInput],
     prefix: str = "",
     *,
     true_solar_explicit: bool = True,
-    supplied_fields: Optional[Set[str]] = None,
+    supplied_fields: set[str] | None = None,
 ) -> PersonInfo:
-    def g(field: str, default: Any = None) -> Any:
-        return data.get(f"{prefix}{field}", default)
-
-    return create_person_info(
-        g("birth_year"),
-        g("birth_month"),
-        g("birth_day"),
-        g("birth_hour"),
-        g("name", "未提供"),
-        g("gender", "未知"),
-        g("birth_place", "未提供"),
-        birth_minute=(
-            g("birth_minute")
-            if supplied_fields is None or f"{prefix}birth_minute" in supplied_fields
-            else None
-        ),
-        birth_second=g("birth_second"),
-        birth_timezone=g("birth_timezone"),
-        birth_utc_offset=g("birth_utc_offset"),
-        birth_longitude=g("birth_longitude"),
-        use_true_solar_time=g("use_true_solar_time", False),
-        true_solar_explicit=true_solar_explicit,
-    )
+    person_arguments = {
+        "name": data.get(f"{prefix}name", "未提供"),
+        "birth_year": data.get(f"{prefix}birth_year"),
+        "birth_month": data.get(f"{prefix}birth_month"),
+        "birth_day": data.get(f"{prefix}birth_day"),
+        "birth_hour": data.get(f"{prefix}birth_hour"),
+        "gender": data.get(f"{prefix}gender", "未知"),
+        "birth_place": data.get(f"{prefix}birth_place", "未提供"),
+        "birth_timezone": data.get(f"{prefix}birth_timezone"),
+        "birth_utc_offset": data.get(f"{prefix}birth_utc_offset"),
+        "birth_longitude": data.get(f"{prefix}birth_longitude"),
+        "use_true_solar_time": data.get(f"{prefix}use_true_solar_time", False),
+        "true_solar_explicit": true_solar_explicit,
+    }
+    birth_minute = data.get(f"{prefix}birth_minute")
+    birth_second = data.get(f"{prefix}birth_second")
+    if birth_minute is not None and (
+        supplied_fields is None or f"{prefix}birth_minute" in supplied_fields
+    ):
+        person_arguments["birth_minute"] = birth_minute
+    else:
+        pass
+    if birth_second is not None:
+        person_arguments["birth_second"] = birth_second
+    else:
+        pass
+    return PersonInfo.model_validate(person_arguments)
 
 
 def person_invoke(
-    service: Callable[..., ServiceResult], *, also_pass: Tuple[str, ...] = ()
+    service: LazyService | ResolvedService, *, also_pass: tuple[str, ...] = ()
 ) -> Bind:
-    """Single-person tools: bind to service(person, **extras).
+    """Bind the birth input and forward the remaining validated request fields."""
+    forwarded_person_fields = PERSON_FIELDS.difference(also_pass)
 
-    ``extras`` is auto-derived as every request field that is NOT a standard
-    person field, so a tool only needs to declare its model. ``also_pass`` adds
-    back person fields that a service consumes a second time (e.g. a tool whose
-    analysis step also honours ``use_true_solar_time``).
-    """
-    person_fields = set(_PERSON_POSITIONAL) | set(_PERSON_KEYWORD)
-    get_service = _resolver(service)
-
-    def _bind(
-        req: BaseModel,
-    ) -> Tuple[Callable[..., ServiceResult], tuple, Dict[str, Any]]:
-        data = req.model_dump()
-        # 区分「用户显式要求真太阳时」与「吃了模型默认」：缺经度时前者 fail-loud、
-        # 后者降级为钟表时间并附 advisory（见 normalize_birth_time）。
-        explicit = "use_true_solar_time" in req.model_fields_set
+    def bind(request: BaseModel) -> BoundServiceCall:
+        arguments: dict[str, ServiceInput] = request.model_dump()
         person = _build_person(
-            data, true_solar_explicit=explicit, supplied_fields=req.model_fields_set
+            arguments,
+            true_solar_explicit="use_true_solar_time" in request.model_fields_set,
+            supplied_fields=request.model_fields_set,
         )
-        extras = {k: v for k, v in data.items() if k not in person_fields}
-        for field in also_pass:
-            if field in data:
-                extras[field] = data[field]
-        return get_service(), (person,), extras
+        return BoundServiceCall(
+            resolve_service(service),
+            (person,),
+            {
+                field: value
+                for field, value in arguments.items()
+                if field not in forwarded_person_fields
+            },
+        )
 
-    return _bind
+    return bind
 
 
 def pair_invoke(
-    service: Callable[..., ServiceResult],
+    service: LazyService | ResolvedService,
     *,
     relationship_field: str = "relationship_type",
 ) -> Bind:
-    """Two-person compatibility: bind to service(person1, person2, relationship)."""
-    get_service = _resolver(service)
+    """Bind each person with independent clock presence."""
 
-    def _bind(
-        req: BaseModel,
-    ) -> Tuple[Callable[..., ServiceResult], tuple, Dict[str, Any]]:
-        data = req.model_dump()
-        fields_set = req.model_fields_set
-        p1 = _build_person(
-            data,
+    def bind(request: BaseModel) -> BoundServiceCall:
+        arguments: dict[str, ServiceInput] = request.model_dump()
+        supplied_fields = request.model_fields_set
+        person1 = _build_person(
+            arguments,
             prefix="person1_",
-            true_solar_explicit="person1_use_true_solar_time" in fields_set,
-            supplied_fields=fields_set,
+            true_solar_explicit="person1_use_true_solar_time" in supplied_fields,
+            supplied_fields=supplied_fields,
         )
-        p2 = _build_person(
-            data,
+        person2 = _build_person(
+            arguments,
             prefix="person2_",
-            true_solar_explicit="person2_use_true_solar_time" in fields_set,
-            supplied_fields=fields_set,
+            true_solar_explicit="person2_use_true_solar_time" in supplied_fields,
+            supplied_fields=supplied_fields,
         )
-        rel = data.get(relationship_field, "general")
-        return get_service(), (p1, p2, rel), {}
+        relationship = arguments.get(relationship_field, "general")
+        return BoundServiceCall(
+            resolve_service(service), (person1, person2, relationship), {}
+        )
 
-    return _bind
+    return bind
+
+
+@runtime_checkable
+class ServiceInputProvider(Protocol):
+    def service_inputs(self) -> Mapping[str, ServiceInput]: ...
 
 
 def raw_invoke(
-    service: Callable[..., ServiceResult],
+    service: LazyService | ResolvedService,
     *,
-    fixed: Optional[Dict[str, Any]] = None,
+    fixed: Mapping[str, ServiceInput] | None = None,
 ) -> Bind:
-    """Bind every validated request field to the resolved service unchanged."""
-    get_service = _resolver(service)
-    explicit_solar_cache: List[bool] = []
+    """Forward validated service keywords, including declared clock presence."""
+    accepts_explicit_solar_time: bool | None = None
 
-    def _bind(
-        req: BaseModel,
-    ) -> Tuple[Callable[..., ServiceResult], tuple, Dict[str, Any]]:
-        resolved = get_service()
-        if not explicit_solar_cache:
-            explicit_solar_cache.append(
-                "true_solar_explicit" in inspect.signature(resolved).parameters
+    def bind(request: BaseModel) -> BoundServiceCall:
+        nonlocal accepts_explicit_solar_time
+        resolved = resolve_service(service)
+        if accepts_explicit_solar_time is None:
+            accepts_explicit_solar_time = (
+                "true_solar_explicit" in signature(resolved).parameters
             )
-        from fatebridge.core.requests.western_policy import service_inputs
-
-        data = service_inputs(req)
-        # Thread whether the user explicitly asked for true solar time so the
-        # service can fail-loud on an explicit request that lacks a longitude,
-        # yet gracefully fall back to civil time when the flag merely defaulted
-        # on (mirrors the person path in ``person_invoke``). Only inject into
-        # services that explicitly declare the parameter — never into a
-        # ``**kwargs`` dispatcher, which would forward the
-        # unknown kwarg to an inner service that does not accept it.
-        if explicit_solar_cache[0]:
-            data["true_solar_explicit"] = "use_true_solar_time" in req.model_fields_set
+        else:
+            pass
+        arguments: dict[str, ServiceInput] = (
+            dict(request.service_inputs())
+            if isinstance(request, ServiceInputProvider)
+            else request.model_dump()
+        )
+        if accepts_explicit_solar_time:
+            arguments["true_solar_explicit"] = (
+                "use_true_solar_time" in request.model_fields_set
+            )
+        else:
+            pass
         if fixed:
-            data = {**data, **fixed}
-        return resolved, (), data
+            arguments.update(fixed)
+        else:
+            pass
+        return BoundServiceCall(resolved, (), arguments)
 
-    return _bind
+    return bind

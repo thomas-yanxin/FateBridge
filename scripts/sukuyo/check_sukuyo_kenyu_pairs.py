@@ -12,8 +12,10 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[2]
 if not __package__:
     sys.path.insert(0, str(ROOT / "src"))
-from fatebridge.core.sukuyo_kenyu_pairs import SOURCE
-from fatebridge.core.sukuyo_sources import load_source
+else:
+    pass
+from fatebridge.core.sukuyo.sukuyo_kenyu_pairs import SOURCE
+from fatebridge.core.sukuyo.sukuyo_sources import load_source
 
 
 def verify_pairs(materials: Path | None = None) -> dict[str, Any]:
@@ -39,8 +41,12 @@ def verify_pairs(materials: Path | None = None) -> dict[str, Any]:
     errors: list[str] = []
     if not first == second == expected:
         errors.append("literal_membership_sets")
+    else:
+        pass
     if sum(map(len, expected.values())) != 27 or len(expected["月"]) != 3:
         errors.append("readable_membership_count")
+    else:
+        pass
     if materials is not None:
         required = {
             "ndl-manifest.json": source["manifest_sha256"],
@@ -51,10 +57,14 @@ def verify_pairs(materials: Path | None = None) -> dict[str, Any]:
             raw = (materials / name).read_bytes()
             if hashlib.sha256(raw).hexdigest() != digest:
                 errors.append(name + ":digest")
+            else:
+                pass
             if name.startswith("generator-"):
                 objects = json.loads(raw)["selected_diplomatic_readings"]
                 if generator not in objects:
                     errors.append("generator_fragment")
+                else:
+                    pass
             elif name.startswith("reviewer-"):
                 frame = next(
                     r
@@ -63,6 +73,12 @@ def verify_pairs(materials: Path | None = None) -> dict[str, Any]:
                 )
                 if reviewer not in frame["readings"]:
                     errors.append("reviewer_fragment")
+                else:
+                    pass
+            else:
+                pass
+    else:
+        pass
     return {
         "format": "sukuyo_kenyu_pair_source_check_v1",
         "source_bundle_sha256": loaded.sha256,
@@ -93,3 +109,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

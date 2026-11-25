@@ -49,6 +49,8 @@ def rendered_tuples(tip):
                 ["太旺", "旺极", "太衰", "衰极"], matches, strict=True
             )
         }
+    else:
+        pass
     text = tip.split("四态取用关系为：", 1)[1].split("。", 1)[0]
     found = {}
     for group in text.split("；"):
@@ -62,14 +64,14 @@ def rendered_tuples(tip):
     return found
 
 
-def test_current_card_wood_relationships_match_frozen_source():
+def test_current_card_wood_relationships_match_frozen_source() -> None:
     actual = rendered_tuples(card(ROOT / BUNDLE)["tips"][7])
     assert {k: v for k, v in actual.items() if k[0] == "木"} == {
         k: v for k, v in source_tuples().items() if k[0] == "木"
     }
 
 
-def test_all20_rendered_relations_and_structured_provenance_match_source():
+def test_all20_rendered_relations_and_structured_provenance_match_source() -> None:
     current = card(ROOT / BUNDLE)
     assert len(source_tuples()) == 20
     assert rendered_tuples(current["tips"][7]) == source_tuples()
@@ -83,7 +85,7 @@ def test_all20_rendered_relations_and_structured_provenance_match_source():
     assert current["curation"]["entry_revision"] == 3
 
 
-def test_reference_remains_bound_to_original_transcription_and_source_bytes():
+def test_reference_remains_bound_to_original_transcription_and_source_bytes() -> None:
     reference = read(ROOT / "tests/data/bazi/four-state-relations.json")
     census = read(ROOT / "tests/data/bazi/ditian-source-census.json")
     claim = next(

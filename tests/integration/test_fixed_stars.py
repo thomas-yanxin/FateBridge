@@ -28,7 +28,7 @@ _NATAL = dict(
 # ── pure: catalogue + precession ──────────────────────────────────────────────
 
 
-def test_catalogue_is_well_formed():
+def test_catalogue_is_well_formed() -> None:
     assert len(FIXED_STARS) == 20
     for star, data in FIXED_STARS.items():
         assert data["nature"]  # at least one Ptolemaic nature (traditional attr)
@@ -49,7 +49,7 @@ def natal_stars():
     return build_core_chart_payload(info, "hellen_chart")["fixed_stars"]
 
 
-def test_natal_chart_surfaces_antares_on_mercury(natal_stars):
+def test_natal_chart_surfaces_antares_on_mercury(natal_stars) -> None:
     # Real sky: Antares sits ~0.1° from this chart's Mercury.
     antares = [h for h in natal_stars if h["star"] == "Antares"]
     assert antares, "expected Antares conjunct a chart point"
@@ -57,7 +57,7 @@ def test_natal_chart_surfaces_antares_on_mercury(natal_stars):
     assert antares[0]["orb"] < 0.2
 
 
-def test_snapshot_renders_fixed_stars_section():
+def test_snapshot_renders_fixed_stars_section() -> None:
     payload = calculate_core_chart_analysis(
         chart_variant="hellen_chart", use_true_solar_time=True, **_NATAL
     )

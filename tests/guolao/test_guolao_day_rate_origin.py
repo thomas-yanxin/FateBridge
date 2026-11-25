@@ -7,14 +7,14 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core import guolao_cumulative_table as literal
-from fatebridge.core import guolao_day_rate as rate
+from fatebridge.core.guolao import guolao_cumulative_table as literal
+from fatebridge.core.guolao import guolao_day_rate as rate
 
 ROOT = Path(__file__).parents[2]
 FIXTURE = ROOT / "tests/fixtures/guolao-day-rate-origin-v1"
 
 
-def test_original_initial_cell_is_empty_and_inspection_is_pinned():
+def test_original_initial_cell_is_empty_and_inspection_is_pinned() -> None:
     reference = json.loads((FIXTURE / "reference.json").read_text())
     for artifact in reference["artifacts"]:
         contents = (FIXTURE / artifact["path"]).read_bytes()
@@ -27,7 +27,7 @@ def test_original_initial_cell_is_empty_and_inspection_is_pinned():
 
 
 @pytest.mark.parametrize("anomaly", ["0", ".041", "13.8183", "27.5546", "-27.5136"])
-def test_raw_empty_is_never_presented_as_a_printed_zero(anomaly):
+def test_raw_empty_is_never_presented_as_a_printed_zero(anomaly: str) -> None:
     result = rate.gujin45_day_rate(F(anomaly))
     assert result["whole_limit_index"] == 0
     assert result["selected_printed_day_rate_days"] is None
@@ -49,8 +49,8 @@ def test_raw_empty_is_never_presented_as_a_printed_zero(anomaly):
     "anomaly,angle", [(".041", "-443263/8000000"), ("13.8183", "443263/8000000")]
 )
 def test_both_interpolations_use_effective_zero_and_keep_analytic_half_increment(
-    method, anomaly, angle
-):
+    method, anomaly: str, angle: str
+) -> None:
     result = method(F(anomaly))
     assert result["selected_printed_day_rate_days"] is None
     assert result["selected_effective_day_rate_days"] == "0.0000"
@@ -59,12 +59,16 @@ def test_both_interpolations_use_effective_zero_and_keep_analytic_half_increment
     if method is literal.gujin_literal_lunar:
         assert result["source_selected_cumulative_ancient_du"] is None
         assert result["empty_cumulative_origin_interpreted_as_zero"]
+    else:
+        pass
 
 
 @pytest.mark.parametrize(
     "anomaly,index", [(".082", 1), ("9.5129", 116), ("13.7773", 168)]
 )
-def test_numeric_source_cells_and_endpoint_are_not_relabelled_as_empty(anomaly, index):
+def test_numeric_source_cells_and_endpoint_are_not_relabelled_as_empty(
+    anomaly: str, index: int
+) -> None:
     result = rate.gujin45_day_rate(F(anomaly))
     assert result["whole_limit_index"] == index
     assert result["selected_day_rate_source_mark"] == "numeric"
@@ -75,7 +79,7 @@ def test_numeric_source_cells_and_endpoint_are_not_relabelled_as_empty(anomaly, 
     assert not result["empty_day_rate_origin_interpreted_as_zero"]
 
 
-def test_unresolved_rate_is_not_filled_by_origin_policy():
+def test_unresolved_rate_is_not_filled_by_origin_policy() -> None:
     result = rate.gujin45_day_rate(F("7.285"))
     assert result["whole_limit_index"] is None
     assert result["selected_printed_day_rate_days"] is None
@@ -94,8 +98,8 @@ def test_unresolved_rate_is_not_filled_by_origin_policy():
 )
 @pytest.mark.parametrize("anomaly", [".041", "13.8183"])
 def test_conjunction_contains_raw_empty_and_real_velocity_without_numeric_failure(
-    monkeypatch, module, method, anomaly
-):
+    monkeypatch: pytest.MonkeyPatch, module, method, anomaly: str
+) -> None:
     context = module.source_conjunction(F(), 0, profile_id=module.GUJIN_COMPONENTS)
     context["lunar"]["anomaly_phase_days_exact"] = str(F(anomaly))
     monkeypatch.setattr(module, "source_conjunction", lambda *a, **kw: context)
@@ -117,8 +121,8 @@ def test_conjunction_contains_raw_empty_and_real_velocity_without_numeric_failur
     "index,flag", [(0, False), (0, None), (0, 1), (1, True), (1, 0)]
 )
 def test_empty_source_flag_cannot_be_missing_numeric_or_moved_to_another_cell(
-    tmp_path, monkeypatch, index, flag
-):
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, index: int, flag: bool | int | None
+) -> None:
     data = json.loads(rate.DATA.read_text())
     data["rows"][index]["printed_empty_origin"] = flag
     path = tmp_path / "bad-table.json"
@@ -128,7 +132,7 @@ def test_empty_source_flag_cannot_be_missing_numeric_or_moved_to_another_cell(
         rate.gujin45_day_rate(F(".041"))
 
 
-def test_audit_counts_empty_position_separately_from_numeric_source_cells():
+def test_audit_counts_empty_position_separately_from_numeric_source_cells() -> None:
     result = rate.audit_day_rate_table()
     assert result["model_id"] == "gujin_literal_day_rate_table_audit_v2"
     assert "literal_rate_count" not in result

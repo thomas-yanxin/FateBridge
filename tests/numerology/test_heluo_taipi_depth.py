@@ -7,9 +7,9 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core import heluo_texts as ht
-from fatebridge.core.heluo import _tiaowen, yao_text
-from fatebridge.core.heluo_timing import _selected_text
+from fatebridge.core.heluo import heluo_texts as ht
+from fatebridge.core.heluo.heluo import _tiaowen, yao_text
+from fatebridge.core.heluo.heluo_timing import _selected_text
 from fatebridge.utils.errors import NumerologySourceError
 from tests.support.heluo_source_facts import HEADER_COUNT, PENDING_COUNT
 
@@ -21,7 +21,7 @@ VERIFIED = json.loads((ROOT / "verified-readings.json").read_bytes())
 @pytest.mark.parametrize(
     "e", VERIFIED["entries"], ids=lambda e: e["hexagram"] + str(e["line"])
 )
-def test_complete_source_commentary_preserves_parent_and_all_conditions(e):
+def test_complete_source_commentary_preserves_parent_and_all_conditions(e) -> None:
     t = yao_text(e["hexagram"], e["line"])
     assert t["detail"] == "".join(s["text"] for s in e["sections"])
     assert t["commentary_sections"] == [
@@ -43,14 +43,14 @@ def test_complete_source_commentary_preserves_parent_and_all_conditions(e):
 @pytest.mark.parametrize(
     "e", VERIFIED["headers"], ids=lambda e: e["hexagram"] + str(e["line"])
 )
-def test_headers_use_this_printing_not_a_silent_zhouyi_replacement(e):
+def test_headers_use_this_printing_not_a_silent_zhouyi_replacement(e) -> None:
     t = yao_text(e["hexagram"], e["line"])
     assert t["yaoci"] == e["yaoci"]
     assert t["text_provenance"]["pdf_page"] == e["pdf_page"]
     assert t["text_provenance"]["header_content_sha256"] == ht.HEADER_CONTENT_SHA256
 
 
-def test_negative_xie_and_nested_female_conditions_are_not_flattened():
+def test_negative_xie_and_nested_female_conditions_are_not_flattened() -> None:
     t = yao_text("地天泰", 4)
     assert "功名難全" in t["commentary_sections"][1]["text"]
     assert t["commentary_branch_selection"]["status"] == "not_evaluated"
@@ -67,7 +67,7 @@ def test_negative_xie_and_nested_female_conditions_are_not_flattened():
     assert "尚遜者" in yao_text("天地否", 5)["detail"]
 
 
-def test_original_images_old_entries_and_withdrawn_draft_are_preserved():
+def test_original_images_old_entries_and_withdrawn_draft_are_preserved() -> None:
     for name, key in [
         ("reference.json", "draft_sha256"),
         ("amendments.json", "amendments_sha256"),
@@ -94,7 +94,7 @@ def test_original_images_old_entries_and_withdrawn_draft_are_preserved():
     )
 
 
-def test_parent_section_tampering_fails_even_if_quote_exists_elsewhere():
+def test_parent_section_tampering_fails_even_if_quote_exists_elsewhere() -> None:
     e = copy.deepcopy(
         next(
             e
@@ -109,7 +109,7 @@ def test_parent_section_tampering_fails_even_if_quote_exists_elsewhere():
         ht._commentary_cross_references(e)
 
 
-def test_tai2_cross_page_reference_does_not_omit_the_continued_sentence():
+def test_tai2_cross_page_reference_does_not_omit_the_continued_sentence() -> None:
     t = yao_text("地天泰", 2)
     ref = t["commentary_cross_references"][0]
     assert ref["source_quote"].endswith("長上有損，言語有傷。")

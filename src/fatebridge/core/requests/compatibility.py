@@ -2,19 +2,24 @@
 
 from __future__ import annotations
 
-from typing import Literal, Optional
+from typing import Literal
 
 from pydantic import Field, model_validator
 
 from fatebridge.core.requests.base import _DeferredModel
-from fatebridge.core.sukuyo_calendar_basis import SukuyoCalendarBasis
+from fatebridge.core.sukuyo.sukuyo_calendar_basis import SukuyoCalendarBasis
+from fatebridge.utils.birth_input import MAX_PERSON_BIRTH_YEAR, MIN_PERSON_BIRTH_YEAR
 
 
 class TwoPersonCompatibilityRequest(_DeferredModel):
     """Request model for two-person compatibility analysis."""
 
     person1_name: str = Field(description="First person name")
-    person1_birth_year: int = Field(description="First person birth year, e.g., 1990")
+    person1_birth_year: int = Field(
+        ge=MIN_PERSON_BIRTH_YEAR,
+        le=MAX_PERSON_BIRTH_YEAR,
+        description="First person birth year, e.g., 1990",
+    )
     person1_birth_month: int = Field(
         ge=1, le=12, description="First person birth month"
     )
@@ -33,10 +38,22 @@ class TwoPersonCompatibilityRequest(_DeferredModel):
     person1_birth_minute: int = Field(
         default=0, ge=0, le=59, description="First person birth minute"
     )
-    person1_birth_timezone: Optional[str] = Field(
+    person1_birth_timezone: str | None = Field(
         default=None, description="First person birth timezone"
     )
-    person1_birth_longitude: Optional[float] = Field(
+    person1_birth_utc_offset: str | None = Field(
+        default=None,
+        strict=True,
+        description="第一人已确认的出生 UTC 偏移，用于消歧重复钟时",
+    )
+    person1_birth_second: int | None = Field(
+        default=None,
+        ge=0,
+        le=59,
+        strict=True,
+        description="第一人已知出生秒数，须同时提供出生分钟",
+    )
+    person1_birth_longitude: float | None = Field(
         default=None, ge=-180, le=180, description="First person birth longitude"
     )
     person1_use_true_solar_time: bool = Field(
@@ -44,7 +61,11 @@ class TwoPersonCompatibilityRequest(_DeferredModel):
         description="Enable true solar time for first person (八字 default on)",
     )
     person2_name: str = Field(description="Second person name")
-    person2_birth_year: int = Field(description="Second person birth year, e.g., 1992")
+    person2_birth_year: int = Field(
+        ge=MIN_PERSON_BIRTH_YEAR,
+        le=MAX_PERSON_BIRTH_YEAR,
+        description="Second person birth year, e.g., 1992",
+    )
     person2_birth_month: int = Field(
         ge=1, le=12, description="Second person birth month"
     )
@@ -63,10 +84,22 @@ class TwoPersonCompatibilityRequest(_DeferredModel):
     person2_birth_minute: int = Field(
         default=0, ge=0, le=59, description="Second person birth minute"
     )
-    person2_birth_timezone: Optional[str] = Field(
+    person2_birth_timezone: str | None = Field(
         default=None, description="Second person birth timezone"
     )
-    person2_birth_longitude: Optional[float] = Field(
+    person2_birth_utc_offset: str | None = Field(
+        default=None,
+        strict=True,
+        description="第二人已确认的出生 UTC 偏移，用于消歧重复钟时",
+    )
+    person2_birth_second: int | None = Field(
+        default=None,
+        ge=0,
+        le=59,
+        strict=True,
+        description="第二人已知出生秒数，须同时提供出生分钟",
+    )
+    person2_birth_longitude: float | None = Field(
         default=None, ge=-180, le=180, description="Second person birth longitude"
     )
     person2_use_true_solar_time: bool = Field(
@@ -92,14 +125,14 @@ class SukuyoCompatibilityRequest(_DeferredModel):
         description="双方共用一套宿主历法，独立于各自出生时区与配宿档案；默认现代中国农历UTC+08。japanese_hutime_1002_1_utc09为1872-02-09至2031-01-22的HuTime冻结逐日参考、固定UTC+09，2015起属出版方参考推算，非历史地方时或逐年神宫刊本验收；范围外不回退中国历。japanese_naoj_historical_utc09为公元0001-01-01至1872-12-31的NAOJ历史月朔参考、固定UTC+09；早期纪年属重建，改历末月仅两天，保留跨出版方异日，非历史地方时或全部颁历验收。",
     )
 
-    person1_textual_pada: Optional[int] = Field(
+    person1_textual_pada: int | None = Field(
         default=None,
         ge=1,
         le=4,
         strict=True,
         description="第一人仅按历日宿名查原典分足表的显式足序；不表示已排得出生足位，省略保留四足",
     )
-    person2_textual_pada: Optional[int] = Field(
+    person2_textual_pada: int | None = Field(
         default=None,
         ge=1,
         le=4,
@@ -111,11 +144,11 @@ class SukuyoCompatibilityRequest(_DeferredModel):
         default="t1299_fullmoon27",
         description="默认T1299下卷望日逆顺及生日加十三法；Hinoo研究档案应用T2465闰月和小月分宿规则，宿主历法由calendar_basis另选",
     )
-    person1_calendar_day_part: Optional[Literal["first_half", "second_half"]] = Field(
+    person1_calendar_day_part: Literal["first_half", "second_half"] | None = Field(
         default=None,
         description="Hinoo档案下第一人的已确定原典日序前/后半；不按民用钟时猜测",
     )
-    person2_calendar_day_part: Optional[Literal["first_half", "second_half"]] = Field(
+    person2_calendar_day_part: Literal["first_half", "second_half"] | None = Field(
         default=None,
         description="Hinoo档案下第二人的已确定原典日序前/后半；不按民用钟时猜测",
     )
@@ -126,21 +159,21 @@ class SukuyoCompatibilityRequest(_DeferredModel):
     )
     person1_name: str = Field(default="甲方", description="First person name / label")
     person1_date: str = Field(description="First person birth date, e.g. 1990-06-15")
-    person1_time: Optional[str] = Field(
+    person1_time: str | None = Field(
         default=None,
         description="已知出生时间；未知可省略，按当地日期保留所选宿主历法的全部可能日期，不猜生时",
     )
-    person1_zone: Optional[str] = Field(
+    person1_zone: str | None = Field(
         default="+08:00",
         description="第一人出生时区，默认+08:00；按calendar_basis转换，不因日本参考自动改成东京",
     )
     person2_name: str = Field(default="乙方", description="Second person name / label")
     person2_date: str = Field(description="Second person birth date")
-    person2_time: Optional[str] = Field(
+    person2_time: str | None = Field(
         default=None,
         description="已知出生时间；未知可省略，按当地日期保留所选宿主历法的全部可能日期，不猜生时",
     )
-    person2_zone: Optional[str] = Field(
+    person2_zone: str | None = Field(
         default="+08:00",
         description="第二人出生时区，默认+08:00；按calendar_basis转换，不因日本参考自动改成东京",
     )
@@ -152,4 +185,6 @@ class SukuyoCompatibilityRequest(_DeferredModel):
             for p in (self.person1_calendar_day_part, self.person2_calendar_day_part)
         ):
             raise ValueError("原典日序半日只适用于明确选择的Hinoo研究档案")
+        else:
+            pass
         return self

@@ -7,8 +7,8 @@ import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 
+from fatebridge.core.astro.astrology_events import find_cardinal_ingress_utc
 from fatebridge.core.astro.geometry import _julian_day
-from fatebridge.core.astrology_events import find_cardinal_ingress_utc
 from fatebridge.core.ephemeris_runtime import configure_ephemeris_path, swe
 from fatebridge.core.predictive._common import build_subject
 from fatebridge.core.predictive.returns import build_return_payload
@@ -45,6 +45,8 @@ def audit(ephemeris_dir=None):
             != recording["response_sha256"]
         ):
             raise ValueError("Independent source recording hash mismatch")
+        else:
+            pass
     position_rows, return_rows, ingress_rows = [], [], []
     observed_models = set()
     with tempfile.TemporaryDirectory(prefix="fatebridge-western-timing-") as empty:
@@ -110,6 +112,8 @@ def audit(ephemeris_dir=None):
         for case in hko["cases"]:
             if case["term"] not in {"春分", "夏至", "秋分", "冬至"}:
                 continue
+            else:
+                pass
             actual = find_cardinal_ingress_utc(2026, case["term"])
             error = abs((actual - datetime.fromisoformat(case["at"])).total_seconds())
             ingress_rows.append(
@@ -134,12 +138,12 @@ def audit(ephemeris_dir=None):
         "src/fatebridge/core/astro/birth.py",
         "src/fatebridge/utils/timezones.py",
         "src/fatebridge/data/knowledge/western-leap-seconds.json",
-        "src/fatebridge/core/astrology_events.py",
-        "src/fatebridge/core/output_western.py",
-        "src/fatebridge/core/output_charts.py",
+        "src/fatebridge/core/astro/astrology_events.py",
+        "src/fatebridge/core/contracts/output_western.py",
+        "src/fatebridge/core/contracts/output_charts.py",
         "src/fatebridge/services/western_timing_tools.py",
         "src/fatebridge/api.py",
-        "src/fatebridge/core/ptolemy.py",
+        "src/fatebridge/core/astro/ptolemy.py",
         "tests/western/test_western_timing_accuracy.py",
         "tests/western/test_western_accuracy_transports.py",
         "scripts/western/gen_western_returns_reference.py",
@@ -247,6 +251,8 @@ def main():
     args = parser.parse_args()
     if args.ephemeris_dir and not args.ephemeris_dir.is_dir():
         parser.error("ephemeris directory does not exist")
+    else:
+        pass
     report = audit(args.ephemeris_dir)
     encoded = json.dumps(report, ensure_ascii=False, indent=2) + "\n"
     if args.output:
@@ -267,7 +273,11 @@ def main():
         for c in report[key]["cases"]
     ):
         raise SystemExit(1)
+    else:
+        pass
 
 
 if __name__ == "__main__":
     main()
+else:
+    pass

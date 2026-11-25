@@ -93,6 +93,8 @@ def main():
                 )
                 assert not reference.read()
                 break
+            else:
+                pass
             assert expected["record_type"] == "control"
             candidate_text = streams[completed % n].readline()
             candidate = json.loads(candidate_text)
@@ -158,3 +160,5 @@ def main():
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

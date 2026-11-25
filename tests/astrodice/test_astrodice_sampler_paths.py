@@ -22,8 +22,8 @@ def imported(name, path):
 
 @pytest.mark.parametrize("escape", [False, True])
 def test_actual_external_sampler_module_and_root_internal_escaping_symlink_are_rejected(
-    tmp_path, monkeypatch, escape
-):
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, escape: bool
+) -> None:
     project = tmp_path / "project"
     script = project / "scripts/astrodice/audit.py"
     script.parent.mkdir(parents=True)
@@ -77,8 +77,8 @@ def test_actual_external_sampler_module_and_root_internal_escaping_symlink_are_r
 
 
 def test_real_import_alias_for_same_project_is_admitted_without_faking_module_identity(
-    tmp_path, monkeypatch
-):
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     project = tmp_path / "project"
     script = project / "scripts/astrodice/audit.py"
     script.parent.mkdir(parents=True)

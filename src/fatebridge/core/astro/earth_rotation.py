@@ -8,12 +8,15 @@ from __future__ import annotations
 
 import math
 from fractions import Fraction
-from typing import Tuple
+
+import erfa
 
 from fatebridge.core.astro.reference_frames import Matrix
+from fatebridge.core.astro.tt_epoch import TTInstant
+from fatebridge.core.astro.ut1_epoch import UT1Instant
 from fatebridge.core.iers2010_series import EECT_TERMS
 
-MODERN_REFERENCE_JD_TT = 2451545.0
+MODERN_REFERENCE_JD_TT = 2451545
 
 
 _ERA_ORIGIN = Fraction("0.7790572732640")
@@ -25,13 +28,10 @@ _ERA_RATE = Fraction("1.00273781191135448")
 MODERN_HALF_WINDOW_DAYS = 2 * 36525.0
 
 
-def selected_sidereal_model(julian_day_tt: float) -> int:
-    if not math.isfinite(julian_day_tt):
-        raise ValueError("Rotation model epoch must be finite")
+def selected_sidereal_model(julian_day_tt: float | TTInstant) -> int:
+    point = TTInstant.from_value(julian_day_tt)
     return (
-        3
-        if abs(julian_day_tt - MODERN_REFERENCE_JD_TT) <= MODERN_HALF_WINDOW_DAYS
-        else 4
+        3 if abs(point.days - MODERN_REFERENCE_JD_TT) <= MODERN_HALF_WINDOW_DAYS else 4
     )
 
 
@@ -44,7 +44,7 @@ _LUNAR = (
 )
 
 
-def _fundamental_arguments(t: float) -> Tuple[float, ...]:
+def _fundamental_arguments(t: float) -> tuple[float, ...]:
     values = []
     for coefficients in _LUNAR:
         value = 0.0
@@ -61,23 +61,27 @@ def _fundamental_arguments(t: float) -> Tuple[float, ...]:
     return tuple(values)
 
 
-def _era_turn(jd_ut1: float) -> Fraction:
-    return (_ERA_ORIGIN + _ERA_RATE * (Fraction(jd_ut1) - 2451545)) % 1
+def _era_turn(jd_ut1: float | UT1Instant) -> Fraction:
+    point = UT1Instant.from_value(jd_ut1)
+    return (_ERA_ORIGIN + _ERA_RATE * (point.days - 2451545)) % 1
 
 
 def iers2010_gast(
-    jd_ut1: float, jd_tt: float, nutation_longitude: float, mean_obliquity: float
+    jd_ut1: float | UT1Instant,
+    jd_tt: float | TTInstant,
+    nutation_longitude: float,
+    mean_obliquity: float,
 ) -> float:
     """IERS Table 5.2e; degrees, UT1 for ERA and TT for polynomial/series."""
-    if not all(
-        math.isfinite(x) for x in (jd_ut1, jd_tt, nutation_longitude, mean_obliquity)
-    ):
+    ut1 = UT1Instant.from_value(jd_ut1)
+    if not all(math.isfinite(x) for x in (nutation_longitude, mean_obliquity)):
         raise ValueError("Rotation inputs must be finite")
-    # Keep the published decimal affine rotation and the supplied IEEE UT1
-    # point exact until the final angular sum and wrap. This does not restore
-    # civil-clock precision already lost before this point was supplied.
-    era_turn = _era_turn(jd_ut1)
-    t = (jd_tt - MODERN_REFERENCE_JD_TT) / 36525
+    else:
+        pass
+    # Keep the published affine rotation and the supplied UT1 point exact
+    # until the final angular sum. A scalar still denotes only its IEEE point.
+    era_turn = _era_turn(ut1)
+    t = float((TTInstant.from_value(jd_tt).days - MODERN_REFERENCE_JD_TT) / 36525)
     polynomial = 0.014506 + t * (
         4612.156534
         + t * (1.3915817 + t * (-0.00000044 + t * (-0.000029956 + t * (-0.0000000368))))
@@ -102,18 +106,16 @@ def iers2010_gast(
     return float((era_turn * 360 + Fraction(correction_arcseconds) / 3600) % 360) % 360
 
 
-def frame_gast(jd_ut1: float, jd_tt: float, matrix: Matrix) -> float:
+def frame_gast(
+    jd_ut1: float | UT1Instant, jd_tt: float | TTInstant, matrix: Matrix
+) -> float:
     """GAST from the same equinox NPB, S06 CIO locator and precise ERA.
 
     ERFA gst06 permits a supplied NPB model. The native matrix need not be
     full IAU 2006/2000A; observed pole offsets and polar motion are separate.
     """
-    import erfa
-
-    if not math.isfinite(jd_ut1) or not math.isfinite(jd_tt):
-        raise ValueError("Rotation epochs must be finite")
-    locator = float(erfa.s06(jd_tt, 0.0, matrix[2][0], matrix[2][1]))
+    ut1 = UT1Instant.from_value(jd_ut1)
+    point = TTInstant.from_value(jd_tt)
+    locator = float(erfa.s06(*point.as_parts(), matrix[2][0], matrix[2][1]))
     origins = float(erfa.eors(matrix, locator))
-    return (
-        float((_era_turn(jd_ut1) * 360 - Fraction(math.degrees(origins))) % 360) % 360
-    )
+    return float((_era_turn(ut1) * 360 - Fraction(math.degrees(origins))) % 360) % 360

@@ -36,7 +36,7 @@ def untimed():
         "missing_rulesets",
     ],
 )
-def test_rejects_invalid_date_only_layer_before_projection(untimed, fault):
+def test_rejects_invalid_date_only_layer_before_projection(untimed, fault: str) -> None:
     request, original = untimed
     result = deepcopy(original)
     if fault in {"chart", "astronomy"}:
@@ -53,11 +53,15 @@ def test_rejects_invalid_date_only_layer_before_projection(untimed, fault):
         result["validation"]["calculation_layers"]["astronomy"] = "computed"
     elif fault == "clock_request":
         request = request.model_copy(update={"time": "09:00:00"})
+    else:
+        pass
     with pytest.raises(OutputContractError):
         validate_output(SPEC, result, request=request)
 
 
-def test_correct_unknown_layers_validate_and_known_clock_still_requires_chart(untimed):
+def test_correct_unknown_layers_validate_and_known_clock_still_requires_chart(
+    untimed,
+) -> None:
     request, result = untimed
     validate_output(SPEC, result, request=request)
     request = request.model_copy(
@@ -96,8 +100,8 @@ def timed(untimed):
     ],
 )
 def test_known_clock_rejects_unknown_or_contradictory_declarations(
-    timed, untimed, fault
-):
+    timed, untimed, fault: str
+) -> None:
     request, original = timed
     result = deepcopy(original)
     if fault == "calendar_false":
@@ -125,7 +129,7 @@ def test_known_clock_rejects_unknown_or_contradictory_declarations(
         validate_output(SPEC, result, request=request)
 
 
-def test_unknown_clock_boolean_flags_are_not_integer_placeholders(untimed):
+def test_unknown_clock_boolean_flags_are_not_integer_placeholders(untimed) -> None:
     request, original = untimed
     result = deepcopy(original)
     result["params"]["birthTimeImputed"] = 0

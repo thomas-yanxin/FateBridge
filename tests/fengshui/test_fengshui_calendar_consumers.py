@@ -17,13 +17,13 @@ from fatebridge.core.fengshui.models import (
 from fatebridge.core.fengshui.monthly import monthly_stars
 from fatebridge.core.fengshui.xuankong import period_context
 from fatebridge.utils.timezones import parse_timezone_name
-from fatebridge.validation.fengshui_calendar_consumers import (
+from validation.fengshui_calendar_consumers import (
     check_consumer_observation,
     expected_sides,
     load_consumer_protocol,
     load_literal_month_table,
 )
-from fatebridge.validation.fengshui_solar_terms import load_solar_terms_reference
+from validation.fengshui_solar_terms import load_solar_terms_reference
 
 FIXTURES = Path(__file__).parents[1] / "data"
 
@@ -33,7 +33,9 @@ def reference():
     return load_solar_terms_reference(FIXTURES / "fengshui_all_terms_v1")
 
 
-def test_full_public_year_protocol_does_not_remove_the_old_numeric_gate(reference):
+def test_full_public_year_protocol_does_not_remove_the_old_numeric_gate(
+    reference,
+) -> None:
     p = load_consumer_protocol(
         FIXTURES / "fengshui_calendar_consumers_v1/protocol.json"
     )
@@ -54,8 +56,8 @@ def test_full_public_year_protocol_does_not_remove_the_old_numeric_gate(referenc
 
 
 def test_a_self_rehashed_or_shortened_protocol_cannot_replace_the_before_run_plan(
-    tmp_path,
-):
+    tmp_path: Path,
+) -> None:
     p = tmp_path / "protocol.json"
     p.write_text('{"years":[2026,2026]}')
     with pytest.raises(ValueError):
@@ -72,8 +74,8 @@ def test_a_self_rehashed_or_shortened_protocol_cannot_replace_the_before_run_pla
     ],
 )
 def test_independent_term_index_arithmetic_keeps_january_and_lichun_distinct(
-    index, expected
-):
+    index: int, expected
+) -> None:
     assert expected_sides({"year": 2026, "term_index": index}) == expected
 
 
@@ -112,8 +114,8 @@ def results(reference, offset, zone="UTC"):
     ],
 )
 def test_selected_timezones_keep_the_same_actual_reference_side(
-    reference, monkeypatch, offset, zone
-):
+    reference, monkeypatch: pytest.MonkeyPatch, offset, zone: str
+) -> None:
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "de440")
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
     row, moment, a, m, g, p = results(reference, offset, zone)
@@ -135,8 +137,8 @@ def test_selected_timezones_keep_the_same_actual_reference_side(
     ],
 )
 def test_semantic_counterexamples_are_rejected_by_the_independent_gate(
-    reference, monkeypatch, fault
-):
+    reference, monkeypatch: pytest.MonkeyPatch, fault: str
+) -> None:
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "de440")
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
     offset = 0 if fault in {"unique_month", "missing_candidate"} else 10

@@ -14,15 +14,16 @@ from fastmcp import Client
 
 import fatebridge.api as api
 from fatebridge.cli import run
-from fatebridge.core import guolao
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.birth import NativeSolarBirthInfo, build_astro_birth_info
 from fatebridge.core.astro.physical_epoch import PhysicalEpoch, utc_from_tt
+from fatebridge.core.guolao import guolao
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.astrology import calculate_core_chart_analysis
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.errors import EphemerisSourceError
-from tests.guolao.test_guolao_native_frames import fixed_moshier  # noqa:F401
+from tests.support.transports import call_calculation
+from tests.unit_test.fixtures.guolao import fixed_moshier as fixed_moshier
 
 FIXTURE = Path(__file__).parents[1] / "fixtures/guolao-native-solar-epoch-v1"
 REFERENCE = json.loads((FIXTURE / "reference-before-implementation.json").read_text())
@@ -57,8 +58,8 @@ def chart(args, **extra):
 @pytest.mark.parametrize("solar", [False, True])
 @pytest.mark.parametrize("zodiac", [0, 1])
 def test_native_birth_uses_physical_axes_and_preserves_the_supplied_hour(
-    fixed_moshier, era, basis, solar, zodiac
-):
+    fixed_moshier, era: str, basis, solar: bool, zodiac: int
+) -> None:
     args = args_for(era, basis)
     result = chart(args, use_true_solar_time=solar, zodiacal=zodiac)
     assert "error" not in result, result
@@ -74,8 +75,6 @@ def test_native_birth_uses_physical_axes_and_preserves_the_supplied_hour(
     assert result["person_info"]["birth_datetime"] == context["input_wall_datetime"]
     assert g["life_palace"]["birth_hour_branch"] == "子"
     assert g["validation"]["full_marks_established"] is False
-    assert "转换载体为None" not in result["interpretation"]["input_clock"]
-    assert "原生TT/UT1" in result["interpretation"]["input_clock"]
     assert "时区：None" not in result["snapshot_text"]
     if era == "year0":
         assert result["person_info"]["utc_datetime"].startswith("0000-12-31T12:")
@@ -85,6 +84,8 @@ def test_native_birth_uses_physical_axes_and_preserves_the_supplied_hour(
             assert g["profile"]["julian_day_ut1"] == float(
                 Fraction(REFERENCE["year_zero_lmt"]["expected_UT1_jd"])
             )
+        else:
+            pass
     else:
         assert result["person_info"]["utc_datetime"].startswith("1977-12-31T23:59:60.")
         assert native["utc_is_leap_second"] is True
@@ -97,11 +98,15 @@ def test_native_birth_uses_physical_axes_and_preserves_the_supplied_hour(
         assert g["god_positions"]["native_year_comparison"]["year"] == 1977
     if basis == BASES[0] and not solar:
         assert context["input_label_and_forward_hour_differ"] is None
+    else:
+        pass
 
 
 @pytest.mark.parametrize("era", ["year0", "second60"])
 @pytest.mark.parametrize("basis", BASES)
-def test_native_opt_in_cannot_masquerade_as_a_datetime(fixed_moshier, era, basis):
+def test_native_opt_in_cannot_masquerade_as_a_datetime(
+    fixed_moshier, era: str, basis
+) -> None:
     args = args_for(era, basis)
     with pytest.raises(ValueError, match="datetime"):
         build_astro_birth_info(**args)
@@ -117,7 +122,7 @@ def test_native_opt_in_cannot_masquerade_as_a_datetime(fixed_moshier, era, basis
 
 def test_year0_natal_sky_equals_an_existing_representable_fixed_offset_carrier(
     fixed_moshier,
-):
+) -> None:
     args = args_for("year0", BASES[0])
     native = chart(args)
     civil_args = {k: v for k, v in args.items() if k != "birth_clock_basis"}
@@ -135,8 +140,8 @@ def test_year0_natal_sky_equals_an_existing_representable_fixed_offset_carrier(
 @pytest.mark.parametrize("era", ["year0", "second60"])
 @pytest.mark.parametrize("month", [None, "jie_month", "chinese_lunar_utc8"])
 def test_native_target_sky_clears_birth_epoch_and_months_use_real_date_or_tt(
-    fixed_moshier, basis, era, month
-):
+    fixed_moshier, basis, era: str, month: str | None
+) -> None:
     target = datetime(2027, 6, 1, tzinfo=timezone.utc)
     result = chart(
         args_for(era, basis), analysis_datetime=target, guolao_month_basis=month
@@ -171,12 +176,14 @@ def test_native_target_sky_clears_birth_epoch_and_months_use_real_date_or_tt(
                     b["calendar_lookup_basis"]
                     == "unique_UTC8_date_only_no_epoch_substitution"
                 )
+    else:
+        pass
 
 
 @pytest.mark.parametrize("shift", [-1, 0, 1])
 def test_native_target_numerical_order_ties_are_not_silently_accepted(
     fixed_moshier, shift
-):
+) -> None:
     target = datetime(1, 1, 1, 1, tzinfo=timezone(timedelta(hours=13))) + timedelta(
         microseconds=shift
     )
@@ -186,8 +193,8 @@ def test_native_target_numerical_order_ties_are_not_silently_accepted(
 
 @pytest.mark.parametrize("hour,offset,accepted", [(0, 14, False), (1, 12, True)])
 def test_native_target_UTC_year0_orders_by_physical_TT(
-    fixed_moshier, hour, offset, accepted
-):
+    fixed_moshier, hour: int, offset: int, accepted: bool
+) -> None:
     target = datetime(1, 1, 1, hour, tzinfo=timezone(timedelta(hours=offset)))
     result = chart(args_for("year0", BASES[0]), analysis_datetime=target)
     if accepted:
@@ -204,7 +211,7 @@ def test_native_target_UTC_year0_orders_by_physical_TT(
 )
 def test_reused_27_published_leaps_reach_guolao_without_adjacent_second_substitution(
     fixed_moshier, row
-):
+) -> None:
     # Published TT is independent. UT1 and the synthetic input longitude are
     # model-derived controls, not 27 new observed celestial epochs.
     tt = float(row["jd_tt"])
@@ -238,7 +245,7 @@ def test_reused_27_published_leaps_reach_guolao_without_adjacent_second_substitu
     assert 60 <= float(profile["utc_datetime"][17:-6]) < 61
 
 
-def test_extended_future_epoch_reports_frozen_leap_assumption(fixed_moshier):
+def test_extended_future_epoch_reports_frozen_leap_assumption(fixed_moshier) -> None:
     jd = float(Fraction(REFERENCE["upper_lmt"]["expected_UT1_jd"]))
     epoch = PhysicalEpoch.from_ut1(jd)
     assert epoch.utc_datetime is None and epoch.utc_label.startswith("+010000-")
@@ -247,8 +254,8 @@ def test_extended_future_epoch_reports_frozen_leap_assumption(fixed_moshier):
 
 
 def test_strict_projection_keeps_native_axes_and_absent_datetime_carrier(
-    fixed_moshier, monkeypatch
-):
+    fixed_moshier, monkeypatch: pytest.MonkeyPatch
+) -> None:
     api._reset_runtime_state_for_tests()
     monkeypatch.setattr(
         api,
@@ -256,7 +263,7 @@ def test_strict_projection_keeps_native_axes_and_absent_datetime_carrier(
         api.ApiKeyAuthenticator(header_name="X-API-Key", api_keys={}),
     )
     response = TestClient(api.app).post(
-        "/api/astro/guolao",
+        "/api/astrology/guolao-chart",
         json=args_for("year0", BASES[0]),
         params=[
             ("fields", "guolao.profile.native_time_axis.utc_label"),
@@ -278,15 +285,16 @@ def test_strict_projection_keeps_native_axes_and_absent_datetime_carrier(
 
 @pytest.mark.parametrize("poison", ["TT", "UTC_label", "version", "source"])
 def test_native_source_or_epoch_disagreement_cannot_publish_a_chart(
-    fixed_moshier, poison
-):
+    fixed_moshier, poison: str
+) -> None:
     birth = build_astro_birth_info(
         **args_for("second60", BASES[1]), allow_native_solar_epoch=True
     )
     assert isinstance(birth, NativeSolarBirthInfo) and birth.native_epoch is not None
     if poison == "TT":
         epoch = birth.native_epoch
-        changed = replace(epoch.time, jd_tt=epoch.time.jd_tt + 1 / 86400)
+        assert epoch.time.tt is not None
+        changed = replace(epoch.time, tt=epoch.time.tt.shifted_by(Fraction(1, 86400)))
         birth = replace(birth, native_epoch=replace(epoch, time=changed))
     elif poison == "UTC_label":
         birth = replace(
@@ -309,8 +317,8 @@ def test_native_source_or_epoch_disagreement_cannot_publish_a_chart(
 
 @pytest.mark.parametrize("month", [None, "jie_month", "chinese_lunar_utc8"])
 def test_fractional_UTC_adjustment_keeps_primary_axes_without_inventing_a_label(
-    fixed_moshier, month
-):
+    fixed_moshier, month: str | None
+) -> None:
     # Reuse the pre-existing published1964 adjustment control. The longitude
     # is a supplementary model-derived input, not a new measured solar label.
     date = datetime(1964, 4, 1)
@@ -338,7 +346,6 @@ def test_fractional_UTC_adjustment_keeps_primary_axes_without_inventing_a_label(
     assert result["guolao"]["profile"]["native_time_axis"]["label_status"] == (
         "unrepresentable_historical_fractional_UTC_adjustment"
     )
-    assert "没有唯一UTC标签" in result["interpretation"]["input_clock"]
     if month is not None:
         m = result["guolao"]["timing"]["month_limit"]
         birth_month = m["birth_month"]
@@ -362,6 +369,8 @@ def test_fractional_UTC_adjustment_keeps_primary_axes_without_inventing_a_label(
                 birth_month["calendar_date_evidence"]["utc_clock_label_assigned"]
                 is False
             )
+    else:
+        pass
 
 
 @pytest.mark.parametrize("tool", ["astro_guolao", "astro_chart"])
@@ -372,14 +381,14 @@ def test_fractional_UTC_adjustment_keeps_primary_axes_without_inventing_a_label(
 )
 def test_native_three_surface_full_results_and_failures_agree(
     fixed_moshier,
-    monkeypatch,
-    capsys,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
     record_testsuite_property,
-    tool,
+    tool: str,
     era,
     basis,
     failed,
-):
+) -> None:
     if failed:
         native = guolao.runtime.ephemeris_call
 
@@ -391,13 +400,19 @@ def test_native_three_surface_full_results_and_failures_agree(
             ):
                 a = list(a)
                 a[2] |= runtime.swe.FLG_RADIANS
+            else:
+                pass
             return native(operation, *a, **kw)
 
         monkeypatch.setattr(guolao.runtime, "ephemeris_call", radians)
+    else:
+        pass
     spec = next(s for s in CATALOG if s.key == tool)
     payload = args_for(era, basis)
     if tool == "astro_chart":
         payload["chart_variant"] = "guolao_chart"
+    else:
+        pass
     options = dict(
         as_of="2026-10-25T00:00:00+08:00",
         include_snapshot_text=False,
@@ -421,15 +436,11 @@ def test_native_three_surface_full_results_and_failures_agree(
 
     async def call():
         async with Client(create_mcp_app()) as client:
-            result = await client.call_tool(
-                spec.tool_name, {**payload, **options}, raise_on_error=False
+            result = await call_calculation(
+                client, spec.tool_name, {**payload, **options}, raise_on_error=False
             )
             assert result.is_error is failed
-            return (
-                json.loads(result.content[0].text)
-                if failed
-                else result.structured_content
-            )
+            return result.structured_content
 
     mcp = asyncio.run(call())
     argv = [spec.tool_name]
@@ -457,6 +468,8 @@ def test_native_three_surface_full_results_and_failures_agree(
         path.parent.mkdir(parents=True, exist_ok=True)
         with path.open("x") as stream:
             json.dump(wire, stream, ensure_ascii=False)
+    else:
+        pass
     values = [
         {k: v for k, v in b.items() if k != "run_metadata"}
         for b in [response.json(), mcp, cli]

@@ -35,64 +35,79 @@ def load_frozen_corpus(corpus: Path = CORPUS, freeze: Path = FREEZE) -> dict[str
     expected_files = set(manifest["files"])
     if {p.name for p in corpus.glob("*.json")} != expected_files:
         raise ValueError("Reference file set differs from the frozen manifest")
+    else:
+        pass
     for name, expected_hash in manifest["files"].items():
         if digest(corpus / name) != expected_hash:
             raise ValueError(f"Reference changed after freeze: {name}")
+        else:
+            pass
     result = {p.stem: read_json(p) for p in sorted(corpus.glob("*.json"))}
     ids = [r["id"] for group in ("cases", "probes") for r in result[group]]
     if len(ids) != len(set(ids)):
         raise ValueError("Duplicate source record id")
+    else:
+        pass
     for case in result["cases"]:
         if len(case["pillars"]) != 4 or any(
             not isinstance(p, str) or len(p) != 2 for p in case["pillars"]
         ):
             raise ValueError("Source case must contain four explicit pillars")
+        else:
+            pass
         if case["adjudication"]["strength"] not in (None, "强", "弱", "中和"):
             raise ValueError("Invalid source strength annotation")
+        else:
+            pass
     result["freeze"] = manifest
     return result
 
 
 def observe(chart: list[str]) -> dict[str, Any]:
     # Load production only after independent source labels have been verified.
-    from fatebridge.analysis.career import CareerAnalysis
     from fatebridge.core.classical import determine_monthly_structure
     from fatebridge.core.elements import ElementAnalysis
     from fatebridge.core.rules import BaZiRules
-    from fatebridge.utils.data import STEM_ELEMENTS
 
     if len(chart) != 4 or any(not isinstance(p, str) or len(p) != 2 for p in chart):
         raise ValueError("Unknown or incomplete four pillars cannot be observed")
+    else:
+        pass
     pillars = {key: (p[0], p[1]) for key, p in zip(PILLAR_NAMES, chart)}
     elements = ElementAnalysis.comprehensive_analysis(pillars)
     profile = BaZiRules.build_structure_profile(pillars, elements)
-    career = CareerAnalysis._analyze_industries(
-        pillars, pillars["day"][0], STEM_ELEMENTS[pillars["day"][0]][0]
-    )
     return {
         "elements": elements,
         "monthly_structure": determine_monthly_structure(pillars, pillars["day"][0]),
         "structure_profile": profile,
-        "industry": career,
     }
 
 
 def compare(case: dict[str, Any], actual: dict[str, Any]) -> dict[str, Any]:
+    from fatebridge.core.month_use import match_month_uses
+
     reference = case["adjudication"]
+    monthly = actual["monthly_structure"]
+    source_god = reference["month_pattern"].removeprefix("杂气")
+    month_use_match = match_month_uses(monthly["use_resolution"], (source_god,))
     strength = actual["elements"]["day_master"]["strength_level"]
     expected_strength = reference["strength"]
     return {
         "month_pattern": {
             "reference": reference["month_pattern"],
-            "actual": actual["monthly_structure"],
+            "actual": monthly,
             "status": (
                 "match"
-                if actual["monthly_structure"]["label"].removesuffix("格")
-                == reference["month_pattern"].removeprefix("杂气")
+                if monthly["label"].removesuffix("格") == source_god
                 else "disagreement"
             ),
             "scope": "取格名称对比，不等于成格验收",
             "downstream": ["格局用神", "成败救应的起点", "喜忌解释"],
+        },
+        "month_use_identity": {
+            "reference_ten_god": source_god,
+            **month_use_match,
+            "scope": "核对所标注十神是否有合格取用见证。会支正偏未定时保留待裁，成格另审。",
         },
         "strength": {
             "reference": expected_strength,
@@ -137,6 +152,8 @@ def audit(split: str = "all") -> dict[str, Any]:
                     "status": "secondary_witness_not_independently_verified",
                 }
             )
+        else:
+            pass
         results.append(
             {
                 "id": case["id"],
@@ -155,6 +172,8 @@ def audit(split: str = "all") -> dict[str, Any]:
     for probe in data["probes"]:
         if split != "all" and probe["split"] != split:
             continue
+        else:
+            pass
         inp = probe["input"]
         if "day_stem" in inp:
             day_element = STEM_ELEMENTS[inp["day_stem"]][0]
@@ -189,6 +208,9 @@ def audit(split: str = "all") -> dict[str, Any]:
                 }
             )
     strengths = [r["comparison"]["strength"]["status"] for r in results]
+    month_use_statuses = [
+        r["comparison"]["month_use_identity"]["status"] for r in results
+    ]
     return {
         "profile_id": data["profile"]["profile_id"],
         "split": split,
@@ -200,6 +222,7 @@ def audit(split: str = "all") -> dict[str, Any]:
                 ROOT / "src/fatebridge/core/elements.py",
                 ROOT / "src/fatebridge/core/rules.py",
                 ROOT / "src/fatebridge/core/classical.py",
+                ROOT / "src/fatebridge/core/month_use.py",
                 ROOT / "src/fatebridge/core/strength.py",
                 ROOT / "src/fatebridge/core/storage_movement.py",
                 ROOT / "src/fatebridge/core/classical_stages.py",
@@ -207,9 +230,8 @@ def audit(split: str = "all") -> dict[str, Any]:
                 ROOT / "src/fatebridge/core/classical_force.py",
                 ROOT / "src/fatebridge/core/classical_routes.py",
                 ROOT / "src/fatebridge/core/classical_seasonal.py",
-                ROOT / "src/fatebridge/core/bazi_evidence.py",
+                ROOT / "src/fatebridge/core/bazi/bazi_evidence.py",
                 ROOT / "src/fatebridge/core/useful_elements.py",
-                ROOT / "src/fatebridge/analysis/career.py",
                 ROOT / "src/fatebridge/utils/data.py",
                 ROOT / "uv.lock",
                 Path(__file__).resolve(),
@@ -228,6 +250,14 @@ def audit(split: str = "all") -> dict[str, Any]:
                 r["comparison"]["month_pattern"]["status"] == "disagreement"
                 for r in results
             ),
+            "month_use_identity": {
+                status: month_use_statuses.count(status)
+                for status in (
+                    "matched",
+                    "requires_identity_adjudication",
+                    "not_observed",
+                )
+            },
             "strength_adjudicated": sum(
                 s != "not_adjudicated_by_source" for s in strengths
             ),
@@ -264,3 +294,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

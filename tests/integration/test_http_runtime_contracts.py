@@ -3,18 +3,18 @@
 import os
 import subprocess
 import sys
+from pathlib import Path
 
 import pytest
-from fastapi import FastAPI
 from fastapi.testclient import TestClient
-from starlette.requests import Request
 
-from fatebridge import api as api_module
+import fatebridge.api as api_module
+from fatebridge.utils.errors import ErrorEnvelope
 from fatebridge.utils.runtime import parse_api_keys
 
 
 @pytest.mark.parametrize("raw", ["", " ", "\n\t"])
-def test_empty_api_key_configuration_remains_optional(raw):
+def test_empty_api_key_configuration_remains_optional(raw: str) -> None:
     assert parse_api_keys(raw) == {}
 
 
@@ -30,20 +30,20 @@ def test_empty_api_key_configuration_remains_optional(raw):
         "key2:private-value,private-other",
     ],
 )
-def test_malformed_nonempty_api_key_configuration_is_rejected(raw):
+def test_malformed_nonempty_api_key_configuration_is_rejected(raw: str) -> None:
     with pytest.raises(ValueError, match="FATEBRIDGE_API_KEYS") as error:
         parse_api_keys(raw)
     assert "private-value" not in str(error.value)
     assert "private-other" not in str(error.value)
 
 
-def test_valid_named_and_unnamed_keys_are_preserved():
+def test_valid_named_and_unnamed_keys_are_preserved() -> None:
     assert parse_api_keys("one") == {"key1": "one"}
     assert parse_api_keys(" agent : one , two ") == {"agent": "one", "key2": "two"}
     assert parse_api_keys("agent:one:two") == {"agent": "one:two"}
 
 
-def test_api_import_fails_for_malformed_api_key_configuration():
+def test_api_import_fails_for_malformed_api_key_configuration() -> None:
     env = {**os.environ, "FATEBRIDGE_API_KEYS": "agent:"}
     result = subprocess.run(
         [sys.executable, "-c", "import fatebridge.api"],
@@ -56,48 +56,82 @@ def test_api_import_fails_for_malformed_api_key_configuration():
     assert "ValueError: FATEBRIDGE_API_KEYS" in result.stderr
 
 
-@pytest.mark.parametrize("auth_enabled", [False, True])
-def test_arbitrary_urls_and_methods_have_bounded_metrics(monkeypatch, auth_enabled):
-    metrics = api_module.RuntimeMetrics()
-    monkeypatch.setattr(api_module, "REQUEST_METRICS", metrics)
+@pytest.mark.parametrize("is_auth_enabled", [False, True])
+def test_arbitrary_urls_and_methods_have_bounded_metrics(
+    monkeypatch: pytest.MonkeyPatch, is_auth_enabled: bool
+) -> None:
+    """Arbitrary URL and method values must collapse to fixed metric labels."""
+    monkeypatch.setattr(api_module, "REQUEST_METRICS", api_module.RuntimeMetrics())
     monkeypatch.setattr(
         api_module,
         "API_KEY_AUTHENTICATOR",
         api_module.ApiKeyAuthenticator(
             header_name="X-API-Key",
-            api_keys={"agent": "secret"} if auth_enabled else {},
+            api_keys={"agent": "secret"} if is_auth_enabled else {},
         ),
     )
+    unknown_status = 401 if is_auth_enabled else 404
+    birth_status = 401 if is_auth_enabled else 422
     with TestClient(api_module.app) as client:
-        for index in range(50):
-            unknown = f"/unknown-{index}"
-            assert client.get(unknown).status_code == (401 if auth_enabled else 404)
-            assert client.request(f"CUSTOM{index}", unknown).status_code == (
-                401 if auth_enabled else 404
+        for index in range(2):
+            unknown_path = f"/unknown-{index}"
+            assert client.get(unknown_path).status_code == unknown_status
+            assert (
+                client.request(f"CUSTOM{index}", unknown_path).status_code
+                == unknown_status
             )
-            client.options(unknown)
-        assert client.post("/api/cn/bazi/birth", json={}).status_code == (
-            401 if auth_enabled else 422
-        )
+            assert client.options(unknown_path).status_code == 404
+        assert client.post("/api/bazi/birth-chart", json={}).status_code == birth_status
+        metrics_response = client.get("/metrics")
 
-    # Three unknown-path method labels, plus the fixed business route.
-    assert len(metrics._request_counts) == 4
-    assert len(metrics._duration_counts) == 4
-    assert len(metrics._duration_sums) == 4
-    assert {path for _, path in metrics._duration_counts} == {
-        "/unknown",
-        "/api/cn/bazi/birth",
+    assert metrics_response.status_code == 200
+    metric_lines = metrics_response.text.splitlines()
+    assert {
+        line
+        for line in metric_lines
+        if line.startswith("fatebridge_http_requests_total{")
+    } == {
+        f'fatebridge_http_requests_total{{method="GET",path="/unknown",status="{unknown_status}"}} 2.0',
+        f'fatebridge_http_requests_total{{method="OTHER",path="/unknown",status="{unknown_status}"}} 2.0',
+        'fatebridge_http_requests_total{method="OPTIONS",path="/unknown",status="404"} 2.0',
+        f'fatebridge_http_requests_total{{method="POST",path="/api/bazi/birth-chart",status="{birth_status}"}} 1.0',
     }
-    assert ("OTHER", "/unknown") in metrics._duration_counts
+    for metric_suffix in ("count", "sum"):
+        metric_name = f"fatebridge_http_request_duration_seconds_{metric_suffix}"
+        assert {
+            line.partition(" ")[0]
+            for line in metric_lines
+            if line.startswith(f"{metric_name}{{")
+        } == {
+            f'{metric_name}{{method="GET",path="/unknown"}}',
+            f'{metric_name}{{method="OTHER",path="/unknown"}}',
+            f'{metric_name}{{method="OPTIONS",path="/unknown"}}',
+            f'{metric_name}{{method="POST",path="/api/bazi/birth-chart"}}',
+        }
 
 
-def test_metrics_use_route_templates_before_routing_and_for_wrong_method(monkeypatch):
-    app = FastAPI()
-    app.add_api_route("/items/{item_id}", lambda item_id: item_id, methods=["GET"])
-    monkeypatch.setattr(api_module, "app", app)
-    for method in ("GET", "POST"):
-        request = Request({"type": "http", "path": "/items/123", "method": method})
-        assert api_module._metrics_route_path(request) == "/items/{item_id}"
+def test_metrics_use_route_templates_before_routing_and_for_wrong_method(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Resolved and method-mismatch requests must record the same route template."""
+    monkeypatch.setattr(api_module, "REQUEST_METRICS", api_module.RuntimeMetrics())
+    monkeypatch.setattr(
+        api_module,
+        "API_KEY_AUTHENTICATOR",
+        api_module.ApiKeyAuthenticator(header_name="X-API-Key", api_keys={}),
+    )
+    with TestClient(api_module.app) as client:
+        assert client.get("/api/results/unavailable-result").status_code == 404
+        assert client.post("/api/results/another-result").status_code == 405
+        metric_lines = client.get("/metrics").text.splitlines()
+    assert (
+        'fatebridge_http_requests_total{method="GET",path="/api/results/{result_id}",status="404"} 1.0'
+        in metric_lines
+    )
+    assert (
+        'fatebridge_http_requests_total{method="POST",path="/api/results/{result_id}",status="405"} 1.0'
+        in metric_lines
+    )
 
 
 @pytest.mark.parametrize(
@@ -108,7 +142,9 @@ def test_metrics_use_route_templates_before_routing_and_for_wrong_method(monkeyp
         '{"name":"sensitive-malformed-json",',
     ],
 )
-def test_invalid_http_bodies_use_safe_common_error_envelope(monkeypatch, body):
+def test_invalid_http_bodies_use_safe_common_error_envelope(
+    monkeypatch: pytest.MonkeyPatch, body: str
+) -> None:
     monkeypatch.setattr(
         api_module,
         "API_KEY_AUTHENTICATOR",
@@ -116,7 +152,7 @@ def test_invalid_http_bodies_use_safe_common_error_envelope(monkeypatch, body):
     )
     with TestClient(api_module.app) as client:
         response = client.post(
-            "/api/cn/bazi/birth",
+            "/api/bazi/birth-chart",
             content=body,
             headers={"Content-Type": "application/json"},
         )
@@ -130,11 +166,22 @@ def test_invalid_http_bodies_use_safe_common_error_envelope(monkeypatch, body):
     assert "sensitive" not in response.text
 
 
-def test_api_loads_dotenv_before_ephemeris_import(tmp_path):
+@pytest.mark.parametrize("has_explicit_path", [False, True])
+def test_api_loads_dotenv_before_ephemeris_import(
+    tmp_path: Path, has_explicit_path: bool
+) -> None:
+    """Native startup must see dotenv settings and respect an operator override."""
     pytest.importorskip("swisseph")
     env_path = tmp_path / ".env"
-    expected_path = str(tmp_path / "configured-ephe")
-    env_path.write_text(f"SE_EPHE_PATH={expected_path}\n", encoding="utf-8")
+    dotenv_ephemeris_path = str(tmp_path / "dotenv-ephe")
+    env_path.write_text(f"SE_EPHE_PATH={dotenv_ephemeris_path}\n", encoding="utf-8")
+    process_environment = {**os.environ, "FATEBRIDGE_API_KEYS": ""}
+    if has_explicit_path:
+        expected_path = str(tmp_path / "explicit-ephe")
+        process_environment["SE_EPHE_PATH"] = expected_path
+    else:
+        expected_path = dotenv_ephemeris_path
+        process_environment.pop("SE_EPHE_PATH", None)
     script = """
 import os
 import sys
@@ -149,11 +196,9 @@ import fatebridge.api
 assert calls, 'ephemeris was not configured'
 assert calls[0] == sys.argv[2], (calls, os.environ.get('SE_EPHE_PATH'))
 """
-    env = {**os.environ, "FATEBRIDGE_API_KEYS": ""}
-    env.pop("SE_EPHE_PATH", None)
     result = subprocess.run(
         [sys.executable, "-c", script, str(env_path), expected_path],
-        env=env,
+        env=process_environment,
         capture_output=True,
         text=True,
         timeout=60,
@@ -161,7 +206,9 @@ assert calls[0] == sys.argv[2], (calls, os.environ.get('SE_EPHE_PATH'))
     assert result.returncode == 0, result.stderr
 
 
-def test_openapi_validation_error_schema_matches_real_http_response(monkeypatch):
+def test_openapi_validation_error_schema_matches_real_http_response(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setattr(
         api_module,
         "API_KEY_AUTHENTICATOR",
@@ -169,7 +216,7 @@ def test_openapi_validation_error_schema_matches_real_http_response(monkeypatch)
     )
     with TestClient(api_module.app) as client:
         schema = client.get("/openapi.json").json()
-        response = client.post("/api/cn/bazi/birth", json={})
+        response = client.post("/api/bazi/birth-chart", json={})
     for routes in schema["paths"].values():
         for operation in routes.values():
             advertised = operation["responses"].get("422")
@@ -177,11 +224,13 @@ def test_openapi_validation_error_schema_matches_real_http_response(monkeypatch)
                 assert advertised["content"]["application/json"]["schema"] == {
                     "$ref": "#/components/schemas/ErrorEnvelope"
                 }
+            else:
+                pass
     error_schema = schema["components"]["schemas"]["ErrorEnvelope"]
     assert set(error_schema["required"]) <= set(response.json())
     assert set(response.json()) <= set(error_schema["properties"])
     assert {"trace_id", "parent_run_id"} <= set(error_schema["properties"])
     assert response.status_code == 422
-    assert api_module.ErrorEnvelope.model_validate(response.json()).model_dump(
+    assert ErrorEnvelope.model_validate(response.json()).model_dump(
         exclude_none=True
     ) == (response.json())

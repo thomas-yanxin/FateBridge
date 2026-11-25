@@ -16,6 +16,7 @@ from fatebridge.application import execution
 from fatebridge.application.examples import example_input
 from fatebridge.services.tool_catalog import CATALOG
 from tests.fixtures.surface_payloads import REST_POST_CASES
+from tests.support.transports import call_calculation
 
 SPECS = {spec.key: spec for spec in CATALOG}
 
@@ -38,8 +39,8 @@ def unresolved_pair():
 
 @pytest.mark.parametrize("preference_state", ["neutral", "unknown"])
 def test_empty_preferences_do_not_become_penalty_support_or_definite_match(
-    preference_state, monkeypatch
-):
+    preference_state: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
     from fatebridge.services import compatibility
 
     # These birthdays are inputs, not an independent oracle for whether a
@@ -71,88 +72,49 @@ def test_empty_preferences_do_not_become_penalty_support_or_definite_match(
         spec, spec.request_model.model_validate(unresolved_pair())
     )
     assert "error" not in result
-    for person in result["person_info"].values():
+    preferences_neutral = (
+        ["金", "木", "水", "火", "土"] if preference_state == "neutral" else []
+    )
+    for person in result["natal_contexts"].values():
         profile = person["preference_assessment"]
         assert profile["useful_elements"] == profile["avoid_elements"] == []
-    balance = result["detailed_analysis"]["element_balance"]
-    assert balance["balance_type"] == (
-        "相克中性参考" if preference_state == "neutral" else "相克取用待定"
-    )
-    assert {row["state"] for row in balance["control_evidence"]} == {preference_state}
-    assert not any("压制感" in line for line in balance["details"])
-    synergy = result["detailed_analysis"]["favorable_synergy"]
-    assert synergy["synergy_level"] == "待取用裁定"
-    assert not synergy["score_evidence"]["base_score_is_support_evidence"]
-    assert result["summary"]["status"] == "partial"
-    assert "未裁定" in result["summary"]["compatibility_level"]
-    scoring = result["summary"]["scoring"]
-    assert (
-        scoring["dependency_policy"]
-        == "shared_natal_inputs_not_independent_evidence_v1"
-    )
-    assert set(scoring["dimension_dependencies"]) == set(scoring["dimensions"])
-    assert "both_natal_pillars" in scoring["dimension_dependencies"]["pattern_synergy"]
-    assert (
-        "both_natal_pillars"
-        in scoring["dimension_dependencies"]["traditional_analysis"]
-    )
-    for path in (
-        ("summary", "overall_score"),
-        ("summary", "scoring", "unrounded_score"),
-        ("summary", "scoring", "dimensions", "element_balance", "weighted_score"),
-    ):
-        damaged = deepcopy(result)
-        owner = damaged
-        for key in path[:-1]:
-            owner = owner[key]
-        owner[path[-1]] += 1
-        with pytest.raises(execution.OutputContractError):
-            execution.validate_output(spec, damaged)
-    spec.output_model.model_validate(
-        {"summary": {"scoring": {"dimensions": {"element_balance": {"score": 74.0}}}}}
-    )
+        assert profile["neutral_elements"] == preferences_neutral
+    assert result["element_relationship"]["relationship_type"]
 
 
-@pytest.mark.parametrize("key", ["two_person_compatibility", "liushi_analysis"])
-def test_versioned_method_semantics_agree_on_discovery_transports(
-    key, monkeypatch, capsys
-):
+def test_compatibility_reports_both_out_of_range_birth_years(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     import fatebridge.api as api
-    from fatebridge.cli import run
-    from fatebridge.mcp_server import app
 
     monkeypatch.setattr(
         api,
         "API_KEY_AUTHENTICATOR",
         api.ApiKeyAuthenticator(header_name="X-API-Key", api_keys={}),
     )
-    spec = SPECS[key]
-    assert run(["describe", key]) == 0
-    local = json.loads(capsys.readouterr().out)
-    http = (
-        TestClient(api.app).get("/api/tools", params={"tool": key}).json()["tools"][0]
-    )
+    spec = SPECS["two_person_compatibility"]
+    inputs = example_input(spec) | {
+        "person1_birth_year": 1899,
+        "person2_birth_year": 2101,
+    }
 
-    async def native():
-        async with Client(app) as client:
-            contents = await client.read_resource(
-                f"fatebridge://tools/{spec.tool_name}"
-            )
-            return json.loads(contents[0].text)["tools"][0]
+    response = TestClient(api.app).post(spec.rest_path, json=inputs)
 
-    protocol = asyncio.run(native())
-    expected = [method.as_manifest() for method in spec.methods]
-    for record in (local, http, protocol):
-        assert record["method_contracts"] == expected
-        assert record["method_contract_coverage"] == "declared_subset"
-    inputs = example_input(spec) or REST_POST_CASES[spec.rest_path]()
-    result = execution.execute_spec(spec, spec.request_model.model_validate(inputs))
-    method = (
-        result["summary"]["scoring"]["method_id"]
-        if key == "two_person_compatibility"
-        else result["life_dimensions_assessment"]["method_id"]
-    )
-    assert method == expected[0]["method_id"]
+    assert response.status_code == 422
+    assert response.json()["issues"] == [
+        {
+            "path": "person1_birth_year",
+            "code": "greater_than_equal",
+            "message": "Input should be greater than or equal to 1900",
+            "constraints": {"ge": 1900},
+        },
+        {
+            "path": "person2_birth_year",
+            "code": "less_than_equal",
+            "message": "Input should be less than or equal to 2100",
+            "constraints": {"le": 2100},
+        },
+    ]
 
 
 @pytest.mark.parametrize(
@@ -164,11 +126,17 @@ def test_versioned_method_semantics_agree_on_discovery_transports(
         ("astro_chart", {"planets": [], "chart_profile": {}}),
         (
             "two_person_compatibility",
-            {"summary": {}, "detailed_analysis": {}, "traditional_compatibility": {}},
+            {
+                "natal_contexts": {},
+                "cross_chart_relations": {},
+                "directional_ten_gods": {},
+            },
         ),
     ],
 )
-def test_original_empty_success_counterexamples_are_internal_errors(key, body):
+def test_original_empty_success_counterexamples_are_internal_errors(
+    key: str, body
+) -> None:
     spec = SPECS[key]
     request = spec.request_model.model_validate(example_input(spec))
     broken = replace(spec, bind=lambda _: (lambda: body, (), {}))
@@ -188,8 +156,8 @@ def test_original_empty_success_counterexamples_are_internal_errors(key, body):
     ],
 )
 def test_complete_collections_require_distinct_members_without_restricting_projection(
-    key, root, identity
-):
+    key: str, root: str | None, identity: str
+) -> None:
     spec = SPECS[key]
     request = spec.request_model.model_validate(example_input(spec))
     result = execution.execute_spec(spec, request)
@@ -205,7 +173,7 @@ def test_complete_collections_require_distinct_members_without_restricting_proje
     spec.output_model.model_validate(projected)
 
 
-def test_complete_nested_fact_rules_are_published_and_fingerprinted():
+def test_complete_nested_fact_rules_are_published_and_fingerprinted() -> None:
     from fatebridge.core.schema_cache import model_schema
 
     schema = model_schema(SPECS["qimen"].output_model)
@@ -216,13 +184,17 @@ def test_complete_nested_fact_rules_are_published_and_fingerprinted():
 
 
 @pytest.mark.parametrize("spec", CATALOG, ids=lambda spec: spec.key)
-def test_no_catalog_tool_accepts_empty_objects_for_all_required_business_roots(spec):
+def test_no_catalog_tool_accepts_empty_objects_for_all_required_business_roots(
+    spec,
+) -> None:
     body = {field: {} for field in spec.required_output_fields}
     with pytest.raises(execution.OutputContractError):
         execution.validate_output(spec, body)
 
 
-def test_missing_required_timing_layer_fails_on_every_transport(monkeypatch, capsys):
+def test_missing_required_timing_layer_fails_on_every_transport(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
     import fatebridge.api as api
     from fatebridge.cli import run
     from fatebridge.core.timing import TimingAnalysis
@@ -232,7 +204,7 @@ def test_missing_required_timing_layer_fails_on_every_transport(monkeypatch, cap
     def unavailable(*args, **kwargs):
         raise EphemerisSourceError("solar_de440_invalid")
 
-    monkeypatch.setattr(TimingAnalysis, "calculate_liuyue", unavailable)
+    monkeypatch.setattr(TimingAnalysis, "calculate_liushi", unavailable)
     monkeypatch.setattr(
         api,
         "API_KEY_AUTHENTICATOR",
@@ -244,14 +216,15 @@ def test_missing_required_timing_layer_fails_on_every_transport(monkeypatch, cap
 
     async def native():
         async with Client(app) as client:
-            return await client.call_tool(
-                "liushi_analysis",
+            return await call_calculation(
+                client,
+                "bazi_hourly_timing",
                 {**inputs, "response_char_limit": 0},
                 raise_on_error=False,
             )
 
     protocol = asyncio.run(native())
-    argv = ["liushi_analysis"]
+    argv = ["bazi_hourly_timing"]
     for key, value in inputs.items():
         argv += [
             "--" + key.replace("_", "-"),
@@ -261,12 +234,12 @@ def test_missing_required_timing_layer_fails_on_every_transport(monkeypatch, cap
     local = json.loads(capsys.readouterr().out)
     assert http.status_code == 503 and protocol.is_error
     for result in [http.json(), protocol.structured_content, local]:
-        assert "error" in result and "life_dimensions" not in result
+        assert "error" in result and "liushi_info" not in result
 
 
 def test_human_design_audit_direct_entry_resolves_its_actual_script_dependencies(
-    tmp_path,
-):
+    tmp_path: Path,
+) -> None:
     script = (
         Path(__file__).resolve().parents[2]
         / "scripts/human_design/audit_human_design.py"

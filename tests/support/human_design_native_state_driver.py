@@ -10,7 +10,7 @@ sys.path[:0] = [str(root / "src"), str(root)]
 from fatebridge.application.execution import execute_tool  # noqa: E402
 from fatebridge.core.astro import native_execution, runtime  # noqa: E402
 from fatebridge.services.tool_catalog import CATALOG  # noqa: E402
-from fatebridge.validation.human_design import verify_human_design_reading  # noqa: E402
+from validation.human_design import verify_human_design_reading  # noqa: E402
 
 
 def main():
@@ -93,3 +93,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+else:
+    pass

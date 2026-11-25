@@ -1,13 +1,13 @@
 """Annual Zi Bai overlay, never a house natal chart."""
 
-from typing import Any, Dict
+from typing import Any
 
-from .calendar import year_context
-from .directions import rule_data, wrap9
-from .models import AnnualRequest
+from fatebridge.core.fengshui.calendar import year_context
+from fatebridge.core.fengshui.directions import rule_data, wrap9
+from fatebridge.core.fengshui.models import AnnualRequest
 
 
-def annual_stars(req: AnnualRequest) -> Dict[str, Any]:
+def annual_stars(req: AnnualRequest) -> dict[str, Any]:
     time = year_context(req.effective_year, req.query_at, req.timezone_name)
     year = time["effective_year"]
     if time.get("effective_year_status") == "requires_confirmation":
@@ -19,6 +19,8 @@ def annual_stars(req: AnnualRequest) -> Dict[str, Any]:
                 "annual_stars.confirmed_effective_year_due_to_boundary_precision"
             ],
         }
+    else:
+        pass
     if year is None:
         return {
             "status": "partial",
@@ -26,6 +28,8 @@ def annual_stars(req: AnnualRequest) -> Dict[str, Any]:
             "palaces": {},
             "missing_inputs": ["annual_stars.query_at_or_effective_year"],
         }
+    else:
+        pass
     center = wrap9(1 - (year - 1864))
     directions = rule_data("directions")
     stars = rule_data("annual_stars")

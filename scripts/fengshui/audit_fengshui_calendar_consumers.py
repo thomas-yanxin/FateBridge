@@ -1,17 +1,27 @@
 """Run the fixed full public-year calendar-consumer gate in a named configuration."""
 
+import sys as _sys
+from pathlib import Path as _Path
+
+_VAL_REPO_ROOT = _Path(__file__).resolve().parents[2]
+if str(_VAL_REPO_ROOT) not in _sys.path:
+    _sys.path.insert(0, str(_VAL_REPO_ROOT))
+else:
+    pass
+
+
 import argparse
 import json
 import os
 import tempfile
 from pathlib import Path
 
-from fatebridge.validation.fengshui_calendar_consumers import (
+from validation.fengshui_calendar_consumers import (
     audit_calendar_consumers,
     load_consumer_protocol,
     load_literal_month_table,
 )
-from fatebridge.validation.fengshui_solar_terms import load_solar_terms_reference
+from validation.fengshui_solar_terms import load_solar_terms_reference
 
 
 def main() -> int:
@@ -81,3 +91,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

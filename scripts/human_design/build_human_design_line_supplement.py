@@ -37,9 +37,13 @@ def encoded(value: dict) -> bytes:
 def build(pdf: Path) -> tuple[dict, dict]:
     if hashlib.sha256(pdf.read_bytes()).hexdigest() != SOURCE_SHA256:
         raise ValueError("Different public source copy; edition review required")
+    else:
+        pass
     raw = (DATA / "line-knowledge-v1.json").read_bytes()
     if hashlib.sha256(raw).hexdigest() != BASE_SHA256:
         raise ValueError("Never rewrite the frozen v1 catalogue")
+    else:
+        pass
     base = json.loads(raw)
     layout = subprocess.check_output(["pdftotext", "-layout", str(pdf), "-"], text=True)
     blocks = {(g, line): (page, text) for g, line, page, text in line_blocks(layout)}
@@ -53,6 +57,8 @@ def build(pdf: Path) -> tuple[dict, dict]:
             != original["source_layout_block_sha256"]
         ):
             raise ValueError("Supplement source block differs from original locator")
+        else:
+            pass
         row = {
             "key": f"2.{line}",
             "source_pdf_page_one_based": page,
@@ -75,6 +81,8 @@ def build(pdf: Path) -> tuple[dict, dict]:
             )
             if clause is None:
                 raise ValueError("Original conditional clause not observed")
+            else:
+                pass
             row["source_conditions"] = [
                 {
                     "id": "rave2001_2_3_exaltation_permanent_2_14",
@@ -99,10 +107,14 @@ def build(pdf: Path) -> tuple[dict, dict]:
             row["condition_review_status"] = (
                 "one_explicit_clause_locally_recorded_not_exhaustive"
             )
+        else:
+            pass
         if line == 6:
             row["source_reading_notes"] = [
                 "本条上升段也描述接纳视野狭窄，不把上升一概改写为正面能力。"
             ]
+        else:
+            pass
         rows.append(row)
     supplement = {
         "schema_version": 1,
@@ -152,6 +164,8 @@ def main() -> None:
         if args.check:
             if path.read_bytes() != raw:
                 raise SystemExit(f"Bound source supplement changed: {name}")
+            else:
+                pass
         elif path.exists():
             raise FileExistsError(f"Never overwrite a source revision: {path}")
         else:
@@ -161,3 +175,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+else:
+    pass

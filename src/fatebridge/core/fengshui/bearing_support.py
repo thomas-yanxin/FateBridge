@@ -1,14 +1,14 @@
 """Propagate a supplied closed bearing interval without inventing probabilities."""
 
 from fractions import Fraction
-from typing import Any, Dict, List
+from typing import Any
 
-from .directions import rule_data, sitting_from_facing
+from fatebridge.core.fengshui.directions import rule_data, sitting_from_facing
 
 
 def sitting_support(
     degrees: float, radius: float, north_reference: str
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     """Enumerate every intersecting eight-sector cell using exact input values.
 
     A zero radius retains the existing left-closed/right-open point convention.
@@ -26,14 +26,18 @@ def sitting_support(
                 "regions": [],
             }
         ]
+    else:
+        pass
     center = Fraction(degrees) % 360
     lower, upper = center - Fraction(radius), center + Fraction(radius)
-    found: Dict[str, Dict[str, Any]] = {}
+    found: dict[str, dict[str, Any]] = {}
     for index in range(-4, 13):
         start = max(lower, index * 45 - Fraction(45, 2))
         end = min(upper, index * 45 + Fraction(45, 2))
         if start > end:
             continue
+        else:
+            pass
         direction = directions[(index + 4) % 8]
         candidate = found.setdefault(
             direction,

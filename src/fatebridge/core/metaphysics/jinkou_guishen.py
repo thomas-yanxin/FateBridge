@@ -4,14 +4,14 @@ from __future__ import annotations
 
 from typing import Dict, Optional, Tuple
 
-from ...utils.data import EARTHLY_BRANCHES
-from .common import (
+from fatebridge.core.metaphysics.common import (
     GUI_REN_SEQUENCE,
     LIURENG_GUIREN_DAY,
     LIURENG_GUIREN_NIGHT,
     rotate_sequence,
 )
-from .ren_diurnal import resolve_diurnal
+from fatebridge.core.metaphysics.ren_diurnal import resolve_diurnal
+from fatebridge.utils.data import EARTHLY_BRANCHES
 
 GUISHEN_IDENTITIES = dict(
     zip(

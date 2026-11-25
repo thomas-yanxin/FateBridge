@@ -40,6 +40,8 @@ def build_report() -> dict[str, Any]:
                     "partial_transfer",
                 }:
                     value = min(1.0, value)
+                else:
+                    pass
                 trial = evaluate_strength_policy(
                     pillars, phases, replace(DEFAULT_POLICY, **{parameter.name: value})
                 )
@@ -59,6 +61,8 @@ def build_report() -> dict[str, Any]:
                             "strength": trial["strength_level"],
                         }
                     )
+                else:
+                    pass
         rows.append(
             {
                 "id": case["id"],
@@ -112,8 +116,12 @@ def main() -> None:
     if args.output is not None:
         args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_text(text)
+    else:
+        pass
     print(json.dumps(json.loads(text)["summary"], ensure_ascii=False))
 
 
 if __name__ == "__main__":
     main()
+else:
+    pass

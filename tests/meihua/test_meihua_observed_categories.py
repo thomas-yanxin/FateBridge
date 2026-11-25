@@ -8,9 +8,11 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
+from fatebridge.application.examples import suggested_fields
+from fatebridge.core.meihua.meihua_observed import observed_category_profile
 from fatebridge.core.requests.meihua import MeihuaCastRequest
 from fatebridge.services.meihua import calculate_meihua_cast
-from tests.meihua.test_meihua_external import at_path
+from tests.support.reference_data import resolve
 from tests.support.transports import SPECS, business, rest, surface_calls
 
 FIXTURE = Path(__file__).parents[1] / "fixtures/meihua_observed_categories_v1"
@@ -52,15 +54,15 @@ def assert_case(case):
     assert basis["direction"]["value"] == case["input"]["direction"]
     assert basis["direction"]["role"] == case["input"]["direction_role"]
     assert (
-        at_path(out, basis["subject"]["category_fact_path"])
+        resolve(out, basis["subject"]["category_fact_path"])
         == case["input"]["subject_category"]
     )
     assert (
-        at_path(out, basis["direction"]["value_fact_path"])
+        resolve(out, basis["direction"]["value_fact_path"])
         == case["input"]["direction"]
     )
     assert (
-        at_path(out, basis["direction"]["role_fact_path"])
+        resolve(out, basis["direction"]["role_fact_path"])
         == case["input"]["direction_role"]
     )
     assert basis["declaration_status"] == "caller_reported_unverified"
@@ -78,12 +80,14 @@ def assert_case(case):
 
 
 @pytest.mark.parametrize("case", ORIGINAL, ids=lambda c: c["id"])
-def test_five_reused_original_arithmetic_examples(case):
+def test_five_reused_original_arithmetic_examples(case) -> None:
     assert_case(case)
 
 
 @pytest.mark.parametrize("category,direction", PAIRS)
-def test_twelve_hours_for_each_source_category_and_direction(category, direction):
+def test_twelve_hours_for_each_source_category_and_direction(
+    category, direction
+) -> None:
     rows = [
         c
         for c in GRID
@@ -95,7 +99,7 @@ def test_twelve_hours_for_each_source_category_and_direction(category, direction
         assert_case(case)
 
 
-def test_frozen_reference_bytes_and_real_observation_count():
+def test_frozen_reference_bytes_and_real_observation_count() -> None:
     m = json.loads((FIXTURE / "manifest.json").read_text())
     assert m["implementation_not_present"] and m["request_method_not_present"]
     assert m["production_generated_expected_values"] is False
@@ -108,10 +112,12 @@ def test_frozen_reference_bytes_and_real_observation_count():
     for name, digest in m["files"].items():
         if str(name).endswith((".py", ".py.txt")):
             continue
+        else:
+            pass
         assert hashlib.sha256((FIXTURE / name).read_bytes()).hexdigest() == digest
 
 
-def test_from_toward_and_at_preserve_the_reported_side_without_inversion():
+def test_from_toward_and_at_preserve_the_reported_side_without_inversion() -> None:
     for role in ["from", "toward", "at"]:
         case = deepcopy(ORIGINAL[1])
         case["input"]["direction_role"] = role
@@ -121,7 +127,7 @@ def test_from_toward_and_at_preserve_the_reported_side_without_inversion():
         assert out["interpretation"]["external_omens"] is None
 
 
-def test_declared_fields_are_not_reclassified_by_question_or_description():
+def test_declared_fields_are_not_reclassified_by_question_or_description() -> None:
     inp = {
         **ORIGINAL[4]["input"],
         "subject_description": "虚构描述提到木、东、坤和数字八，不能替换明确字段",
@@ -150,7 +156,7 @@ def test_declared_fields_are_not_reclassified_by_question_or_description():
         {"lower_trigram": "坎"},
     ],
 )
-def test_unknown_or_mixed_facts_are_rejected(replacement):
+def test_unknown_or_mixed_facts_are_rejected(replacement) -> None:
     with pytest.raises(ValidationError):
         MeihuaCastRequest.model_validate(
             {"casting": {**ORIGINAL[0]["input"], **replacement}}
@@ -168,14 +174,16 @@ def test_unknown_or_mixed_facts_are_rejected(replacement):
         "hour_branch",
     ],
 )
-def test_necessary_source_facts_are_never_defaulted(missing):
+def test_necessary_source_facts_are_never_defaulted(missing: str) -> None:
     inp = dict(ORIGINAL[0]["input"])
     inp.pop(missing)
     with pytest.raises(ValidationError):
         MeihuaCastRequest.model_validate({"casting": inp})
 
 
-def test_new_mapping_preserves_existing_selected_cast_and_interpretation_facts():
+def test_new_mapping_preserves_existing_selected_cast_and_interpretation_facts() -> (
+    None
+):
     source = json.loads((FIXTURE / "source-reading.json").read_text())
     for c in ORIGINAL:
         new = calculate_meihua_cast(casting=c["input"], season_month_branch="子")
@@ -212,7 +220,7 @@ def test_new_mapping_preserves_existing_selected_cast_and_interpretation_facts()
             assert new["interpretation"][key] == old["interpretation"][key], key
 
 
-def test_weather_keeps_no_body_use_interpretation_after_source_lookup():
+def test_weather_keeps_no_body_use_interpretation_after_source_lookup() -> None:
     out = calculate_meihua_cast(
         casting=ORIGINAL[4]["input"], interpretation_topic="weather"
     )
@@ -223,8 +231,7 @@ def test_weather_keeps_no_body_use_interpretation_after_source_lookup():
     assert out["interpretation"]["evidence_scope"]["body_use_applied"] is False
 
 
-def test_profile_copy_does_not_change_future_mappings():
-    from fatebridge.core.meihua_observed import observed_category_profile
+def test_profile_copy_does_not_change_future_mappings() -> None:
 
     p = observed_category_profile()
     reference = json.loads((FIXTURE / "source-reading.json").read_text())
@@ -234,8 +241,7 @@ def test_profile_copy_does_not_change_future_mappings():
     assert observed_category_profile()["subjects"]["dry_wood"]["number"] == 3
 
 
-def test_new_category_method_agrees_on_rest_native_mcp_and_cli(surface_calls):
-    from fatebridge.application.examples import suggested_fields
+def test_new_category_method_agrees_on_rest_native_mcp_and_cli(surface_calls) -> None:
 
     spec = SPECS["meihua_cast"]
     payload = {"casting": ORIGINAL[4]["input"]}

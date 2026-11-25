@@ -1,14 +1,35 @@
 """Explicit-source Mei Hua application service; never substitute the clock."""
 
-from typing import Any, Optional
+from pydantic import JsonValue
 
 from fatebridge.core.divination import build_meihua_interpretation
-from fatebridge.core.meihua import build_meihua_evidence
-from fatebridge.core.meihua_casting import cast_explicit_meihua, explicit_ruleset
-from fatebridge.core.meihua_external import apply_external_omens
-from fatebridge.core.meihua_general_variants import (
+from fatebridge.core.meihua.meihua import build_meihua_evidence
+from fatebridge.core.meihua.meihua_casting import cast_explicit_meihua, explicit_ruleset
+from fatebridge.core.meihua.meihua_day_qi import (
+    apply_day_qi,
+    normalize_day_qi_context,
+    reported_day_qi_context,
+)
+from fatebridge.core.meihua.meihua_external import apply_external_omens
+from fatebridge.core.meihua.meihua_general_variants import (
     build_general_casting_readings,
     general_casting_summary,
+)
+from fatebridge.core.meihua.meihua_motion import apply_motion_context
+from fatebridge.core.meihua.meihua_observation import (
+    apply_observation_context,
+    ensure_observation_method_context,
+)
+from fatebridge.core.meihua.meihua_qi_branches import (
+    apply_qi_branch_timing_references,
+)
+from fatebridge.core.meihua.meihua_qi_days import apply_qi_day_timing_references
+from fatebridge.core.meihua.meihua_reputation import apply_reputation_supplement
+from fatebridge.core.meihua.meihua_situational import apply_situational_responses
+from fatebridge.core.meihua.meihua_stage_emphasis import apply_stage_emphasis
+from fatebridge.core.meihua.meihua_timing import apply_postheaven_count_reference
+from fatebridge.core.meihua.meihua_trigram_symbols import (
+    apply_trigram_relation_symbols,
 )
 from fatebridge.core.requests.meihua import MeihuaInterpretationOptions
 from fatebridge.core.zhouyi import classical_hexagram
@@ -18,20 +39,19 @@ from fatebridge.utils.errors import calculation_guard
 @calculation_guard("梅花显式起卦")
 def calculate_meihua_cast(
     *,
-    casting: dict[str, Any],
-    season_month_branch: Optional[str] = None,
-    question: Optional[str] = None,
+    casting: dict[str, JsonValue],
+    season_month_branch: str | None = None,
+    question: str | None = None,
     interpretation_topic: str = "general",
-    weather_context: Optional[dict[str, Any]] = None,
-    external_observations: Optional[list[dict[str, Any]]] = None,
-    matter_scenario: Optional[str] = None,
-    observer_activity: Optional[str] = None,
-    observation_context: Optional[dict[str, Any]] = None,
-    day_qi_context: Optional[dict[str, Any]] = None,
-    response_context: Optional[dict[str, Any]] = None,
-    reputation_context: Optional[dict[str, Any]] = None,
-) -> dict[str, Any]:
-    from fatebridge.core.meihua_day_qi import normalize_day_qi_context
+    weather_context: dict[str, JsonValue] | None = None,
+    external_observations: list[dict[str, JsonValue]] | None = None,
+    matter_scenario: str | None = None,
+    observer_activity: str | None = None,
+    observation_context: dict[str, JsonValue] | None = None,
+    day_qi_context: dict[str, JsonValue] | None = None,
+    response_context: dict[str, JsonValue] | None = None,
+    reputation_context: dict[str, JsonValue] | None = None,
+) -> dict[str, JsonValue]:
 
     normalized_day_qi = normalize_day_qi_context(day_qi_context, interpretation_topic)
     options = MeihuaInterpretationOptions.model_validate(
@@ -46,7 +66,6 @@ def calculate_meihua_cast(
             "external_observations": external_observations,
         }
     )
-    from fatebridge.core.meihua_observation import ensure_observation_method_context
 
     normalized_observation = (
         options.observation_context.model_dump(mode="json")
@@ -62,7 +81,6 @@ def calculate_meihua_cast(
         "cuo_hexagram",
         "zong_hexagram",
     ]:
-        cast[key]["meaning_source_kind"] = "modern_editorial_summary"
         cast[key]["classical"] = classical_hexagram(cast[key]["binary_code"])
     cast.update(
         build_meihua_evidence(
@@ -102,6 +120,8 @@ def calculate_meihua_cast(
             actual_month_length_validated=False,
             added_count_basis="caller_confirmed_count_not_automatic_glyph_strokes",
         )
+    else:
+        pass
     cast["evidence_scope"]["implemented"][0] = cast["seed"]["casting_method"]
     cast["evidence_scope"]["not_implemented"] = [
         "single_sound_count",
@@ -115,9 +135,10 @@ def calculate_meihua_cast(
     if season_month_branch is None:
         cast["evidence_scope"]["implemented"].remove("season")
         cast["evidence_scope"]["missing_context"] = ["season_month_branch"]
+    else:
+        pass
     interpretation = build_meihua_interpretation(
         cast,
-        question or "",
         interpretation_topic=interpretation_topic,
         weather_context=weather_context,
     )
@@ -136,6 +157,8 @@ def calculate_meihua_cast(
             interpretation["comprehensive_judgement"] = general_casting_summary(
                 interpretation["casting_readings"]
             )
+        else:
+            pass
         interpretation["evidence_scope"]["counting_candidate_readings"] = (
             "各候选沿用自身本互变、固定原体和同一已报节月，分别引用实际动爻经文；"
             "不以所选口径的旺衰、生克或爻辞代替另一候选。"
@@ -147,10 +170,14 @@ def calculate_meihua_cast(
         cast["evidence_scope"]["implemented"].append("selected_topic_clauses")
         if interpretation_topic == "wealth":
             cast["evidence_scope"]["implemented"].append("selected_wealth_components")
+        else:
+            pass
         if interpretation_topic == "lost_property":
             cast["evidence_scope"]["implemented"].append(
                 "selected_lost_property_changed_use_location_symbols"
             )
+        else:
+            pass
     interpretation["evidence_scope"]["no_universal_relation_verdict"] = True
     if cast["seed"].get("count_boundary_status") == "convention_changes_result":
         cast["evidence_scope"][
@@ -170,6 +197,8 @@ def calculate_meihua_cast(
             interpretation["evidence_scope"]["counting_convention"]
             + interpretation["comprehensive_judgement"]
         )
+    else:
+        pass
     tone_basis = cast["seed"].get("text_tone_basis")
     if tone_basis is not None:
         cast["evidence_scope"]["text_tone_basis"] = tone_basis
@@ -193,6 +222,8 @@ def calculate_meihua_cast(
             + comparison_note
             + interpretation["comprehensive_judgement"]
         )
+    else:
+        pass
     text_basis = cast["seed"].get("text_count_basis")
     if text_basis is not None:
         cast["evidence_scope"]["text_count_basis"] = text_basis
@@ -206,11 +237,17 @@ def calculate_meihua_cast(
                     "calculation_status"
                 ] = "conditional_on_textual_extent"
                 interpretation["status"] = "conditional_on_textual_extent"
+            else:
+                pass
             interpretation["comprehensive_judgement"] = (
                 "所选影印作百余字，精确上限未裁定；本次数量超过100，按明示软件扩展计算，"
                 "不能据此宣称该数量范围已获原文唯一裁定。"
                 + interpretation["comprehensive_judgement"]
             )
+        else:
+            pass
+    else:
+        pass
     apply_external_omens(
         cast,
         interpretation,
@@ -223,7 +260,6 @@ def calculate_meihua_cast(
             else None
         ),
     )
-    from fatebridge.core.meihua_stage_emphasis import apply_stage_emphasis
 
     apply_stage_emphasis(
         cast,
@@ -231,7 +267,6 @@ def calculate_meihua_cast(
         matter_scenario=options.matter_scenario,
         scenario_fact_path="input_normalized.matter_scenario",
     )
-    from fatebridge.core.meihua_motion import apply_motion_context
 
     apply_motion_context(
         cast,
@@ -239,10 +274,8 @@ def calculate_meihua_cast(
         observer_activity=options.observer_activity,
         observer_fact_path="input_normalized.observer_activity",
     )
-    from fatebridge.core.meihua_timing import apply_postheaven_count_reference
 
     apply_postheaven_count_reference(cast, interpretation)
-    from fatebridge.core.meihua_observation import apply_observation_context
 
     apply_observation_context(
         cast,
@@ -250,7 +283,6 @@ def calculate_meihua_cast(
         normalized_observation,
         context_fact_path="input_normalized.observation_context",
     )
-    from fatebridge.core.meihua_day_qi import apply_day_qi, reported_day_qi_context
 
     apply_day_qi(
         cast,
@@ -262,7 +294,6 @@ def calculate_meihua_cast(
         ),
         declared_fact_path="input_normalized.day_qi_context.day_branch",
     )
-    from fatebridge.core.meihua_situational import apply_situational_responses
 
     normalized_response = (
         options.response_context.model_dump(mode="json")
@@ -290,10 +321,10 @@ def calculate_meihua_cast(
         interpretation["comprehensive_judgement"] = (
             observation_basis["summary"] + interpretation["comprehensive_judgement"]
         )
-    from fatebridge.core.meihua_trigram_symbols import apply_trigram_relation_symbols
+    else:
+        pass
 
     apply_trigram_relation_symbols(cast, interpretation)
-    from fatebridge.core.meihua_reputation import apply_reputation_supplement
 
     normalized_reputation = (
         options.reputation_context.model_dump(mode="json", exclude_none=True)
@@ -306,10 +337,8 @@ def calculate_meihua_cast(
         context=normalized_reputation,
         context_fact_path="input_normalized.reputation_context",
     )
-    from fatebridge.core.meihua_qi_days import apply_qi_day_timing_references
 
     apply_qi_day_timing_references(cast, interpretation)
-    from fatebridge.core.meihua_qi_branches import apply_qi_branch_timing_references
 
     apply_qi_branch_timing_references(cast, interpretation)
     return {

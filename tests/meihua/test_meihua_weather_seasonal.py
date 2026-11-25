@@ -7,15 +7,23 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.meihua_weather import weather_ruleset
+from fatebridge.application.examples import suggested_fields
+from fatebridge.core.meihua.meihua_weather import weather_ruleset
 from fatebridge.services.divination import calculate_meihua_analysis
 from fatebridge.services.meihua import calculate_meihua_cast
-from fatebridge.validation.meihua_weather_policy_v2 import (
+from tests.support.transports import (
+    SPECS,
+    business,
+    call_cli,
+    native,
+    rest,
+    surface_calls,
+)
+from validation.meihua_weather_policy_v2 import (
     canonical_sha256,
     qualified_weather_label,
 )
-from fatebridge.validation.meihua_weather_seasonal import audit_weather_seasonal
-from tests.support.transports import rest, surface_calls
+from validation.meihua_weather_seasonal import audit_weather_seasonal
 
 REFERENCES = Path(__file__).parents[1] / "fixtures/meihua_weather_seasonal_v6"
 CASES = json.loads((REFERENCES / "cases.json").read_text())["cases"]
@@ -27,12 +35,14 @@ def audited():
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
-def test_frozen_seasonal_diagrams_and_conditions(case, audited):
+def test_frozen_seasonal_diagrams_and_conditions(case, audited) -> None:
     row = next(r for r in audited["cases"] if r["id"] == case["id"])
     assert not row["disagreements"], row
 
 
-def test_source_integration_is_not_independent_text_or_prediction_acceptance(audited):
+def test_source_integration_is_not_independent_text_or_prediction_acceptance(
+    audited,
+) -> None:
     assert audited["selected_checks_passed"]
     assert audited["literal_mathematical_probe_count"] == 16
     assert audited["new_seasonal_rule_count"] == 3
@@ -47,7 +57,7 @@ def test_source_integration_is_not_independent_text_or_prediction_acceptance(aud
     )
 
 
-def test_previous_35_rule_bodies_and_case_oracles_are_preserved():
+def test_previous_35_rule_bodies_and_case_oracles_are_preserved() -> None:
     old = json.loads(
         (REFERENCES.parent / "meihua_weather_policy_v2/profile.json").read_text()
     )
@@ -65,7 +75,9 @@ def test_previous_35_rule_bodies_and_case_oracles_are_preserved():
     )
 
 
-def test_facsimile_subject_and_graph_cannot_be_repaired_using_element_knowledge():
+def test_facsimile_subject_and_graph_cannot_be_repaired_using_element_knowledge() -> (
+    None
+):
     rules = {r["id"]: r for r in weather_ruleset()["rules"]}
     winter = rules["winter_kan_snow"]
     assert winter["quote"] == "坎之水，冬雪凜冽"
@@ -86,7 +98,7 @@ def test_facsimile_subject_and_graph_cannot_be_repaired_using_element_knowledge(
     )
 
 
-def test_calendar_month_is_not_an_unreported_weather_season():
+def test_calendar_month_is_not_an_unreported_weather_season() -> None:
     output = calculate_meihua_analysis(
         analysis_year=2026,
         analysis_month=2,
@@ -101,7 +113,7 @@ def test_calendar_month_is_not_an_unreported_weather_season():
     assert weather["single_forecast"] is None
 
 
-def test_old_2024_policy_cannot_silently_label_the_new_profile():
+def test_old_2024_policy_cannot_silently_label_the_new_profile() -> None:
     output = calculate_meihua_cast(
         casting=CASES[6]["casting"],
         interpretation_topic="weather",
@@ -117,7 +129,7 @@ def test_old_2024_policy_cannot_silently_label_the_new_profile():
         )
 
 
-def test_retained_casts_use_their_own_winter_kan_not_the_selected_casts():
+def test_retained_casts_use_their_own_winter_kan_not_the_selected_casts() -> None:
     # 9 -> 乾, 酉10 -> 兑: raw19 moves1; ordinal11 moves5.
     # Base110111, mutual101011; changed010111 versus110101.
     result = calculate_meihua_cast(
@@ -143,7 +155,9 @@ def test_retained_casts_use_their_own_winter_kan_not_the_selected_casts():
     assert raw["single_forecast"] is ordinal["single_forecast"] is None
 
 
-def test_a_wrong_predeclared_result_remains_a_disagreement_after_rehash(tmp_path):
+def test_a_wrong_predeclared_result_remains_a_disagreement_after_rehash(
+    tmp_path: Path,
+) -> None:
     target = tmp_path / "fixtures/meihua_weather_seasonal_v6"
     shutil.copytree(REFERENCES, target)
     for name in ["meihua_weather_gen_v4", "meihua_v1"]:
@@ -165,10 +179,8 @@ def test_a_wrong_predeclared_result_remains_a_disagreement_after_rehash(tmp_path
 
 @pytest.mark.parametrize("tool", ["meihua_analysis", "meihua_cast"])
 def test_seasonal_source_and_actual_qualification_survive_all_transports(
-    tool, surface_calls
-):
-    from fatebridge.application.examples import suggested_fields
-    from tests.support.transports import SPECS, business, call_cli, native
+    tool: str, surface_calls
+) -> None:
 
     spec = SPECS[tool]
     payload = (

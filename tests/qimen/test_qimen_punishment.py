@@ -14,19 +14,23 @@ import fatebridge.api as api
 from fatebridge.application.execution import execute_tool
 from fatebridge.cli import run
 from fatebridge.core.execution_context import ExecutionOptions
-from fatebridge.core.qimen_punishment import describe_punishment, palace_punishment
+from fatebridge.core.qimen.qimen_punishment import (
+    describe_punishment,
+    palace_punishment,
+)
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.validation.claims import CalculationClaim
-from fatebridge.validation.qimen import verify_qimen_pattern_quotes
-from fatebridge.validation.qimen_punishment import audit_punishment
-from tests.qimen.test_qimen_depth import fixed_board
+from tests.support.transports import call_calculation
+from tests.unit_test.fixtures.qimen import fixed_board
+from validation.claims import CalculationClaim
+from validation.qimen import verify_qimen_pattern_quotes
+from validation.qimen_punishment import audit_punishment
 
 BUNDLE = Path(__file__).parents[1] / "fixtures/qimen_classical_v10"
 REFERENCE = json.loads((BUNDLE / "sources-and-punishment.json").read_text())
 
 
-def test_source_audit_keeps_both_readings_and_unpassed_scope_priority():
+def test_source_audit_keeps_both_readings_and_unpassed_scope_priority() -> None:
     report = audit_punishment(BUNDLE)
     assert report["definition_count"] == 6
     assert report["definition_disagreements"] == []
@@ -48,7 +52,7 @@ def test_source_audit_keeps_both_readings_and_unpassed_scope_priority():
 @pytest.mark.parametrize("trigram", list("坎坤震巽乾兑艮离"))
 def test_six_named_heads_and_eight_palaces_follow_frozen_source_cells(
     definition, trigram
-):
+) -> None:
     result = palace_punishment(
         definition["xun_head"], trigram, [definition["hidden_stem"]]
     )
@@ -61,7 +65,9 @@ def test_six_named_heads_and_eight_palaces_follow_frozen_source_cells(
 
 
 @pytest.mark.parametrize("definition", REFERENCE["definitions"])
-def test_other_heads_instrument_geometry_does_not_become_current_zhifu(definition):
+def test_other_heads_instrument_geometry_does_not_become_current_zhifu(
+    definition,
+) -> None:
     next_head = REFERENCE["definitions"][
         (REFERENCE["definitions"].index(definition) + 1) % 6
     ]["xun_head"]
@@ -75,8 +81,8 @@ def test_other_heads_instrument_geometry_does_not_become_current_zhifu(definitio
 @pytest.mark.parametrize("dun", ["阳遁", "阴遁"])
 @pytest.mark.parametrize("ju", range(1, 10))
 def test_internal_1080_board_sweep_preserves_every_geometric_observation(
-    monkeypatch, dun, ju
-):
+    monkeypatch: pytest.MonkeyPatch, dun: str, ju
+) -> None:
     heads = REFERENCE["definitions"]
     by_stem = {r["hidden_stem"]: r for r in heads}
     for index in range(60):
@@ -93,6 +99,8 @@ def test_internal_1080_board_sweep_preserves_every_geometric_observation(
         for palace in board["palaces"]:
             if palace["trigram"] == "中":
                 continue
+            else:
+                pass
             e = palace["evidence"]["six_instrument_punishment"]
             geometry = [
                 s
@@ -126,7 +134,9 @@ def test_internal_1080_board_sweep_preserves_every_geometric_observation(
             )
 
 
-def test_hosted_current_instrument_is_preserved(monkeypatch):
+def test_hosted_current_instrument_is_preserved(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     board = fixed_board(monkeypatch, {"dun": "阳遁", "ju": 1, "hour": "辛亥"})
     palace = next(p for p in board["palaces"] if p["trigram"] == "巽")
     assert palace["heaven_stem"] != "壬" and "壬" in palace["heaven_stems"]
@@ -137,7 +147,7 @@ def test_hosted_current_instrument_is_preserved(monkeypatch):
     )
 
 
-def test_profile_return_cannot_mutate_the_selected_rule():
+def test_profile_return_cannot_mutate_the_selected_rule() -> None:
     profile = describe_punishment()
     profile["definitions"][0]["trigram"] = "离"
     profile["unresolved_example"]["broader_instrument_reading_adopted"] = False
@@ -159,7 +169,9 @@ def test_profile_return_cannot_mutate_the_selected_rule():
         ("甲子", "震", ["戊己"]),
     ],
 )
-def test_bad_inputs_do_not_turn_into_negative_observations(hour, trigram, stems):
+def test_bad_inputs_do_not_turn_into_negative_observations(
+    hour: str | None, trigram: str, stems
+) -> None:
     with pytest.raises(ValueError):
         palace_punishment(hour, trigram, stems)
 
@@ -175,7 +187,9 @@ def test_bad_inputs_do_not_turn_into_negative_observations(hour, trigram, stems)
         "erase_claim",
     ],
 )
-def test_source_audit_cannot_drop_inconvenient_evidence(tmp_path, mutation):
+def test_source_audit_cannot_drop_inconvenient_evidence(
+    tmp_path: Path, mutation: str
+) -> None:
     target = tmp_path / "bundle"
     shutil.copytree(BUNDLE, target)
     path = target / "sources-and-punishment.json"
@@ -200,7 +214,9 @@ def test_source_audit_cannot_drop_inconvenient_evidence(tmp_path, mutation):
 @pytest.mark.parametrize(
     "changed", ["head", "instrument", "scope", "formal_geometry", "source_reconciled"]
 )
-def test_whole_pattern_quote_cannot_erase_its_identity_or_uncertainty(changed):
+def test_whole_pattern_quote_cannot_erase_its_identity_or_uncertainty(
+    changed: str,
+) -> None:
     spec = next(s for s in CATALOG if s.tool_name == "qimen")
     payload = execute_tool(
         spec,
@@ -247,8 +263,11 @@ def test_whole_pattern_quote_cannot_erase_its_identity_or_uncertainty(changed):
 
 @pytest.mark.parametrize("hour,expected", [(6, False), (12, True)])
 def test_source_scope_and_geometry_survive_rest_native_mcp_and_cli(
-    monkeypatch, capsys, hour, expected
-):
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    hour: int,
+    expected: bool,
+) -> None:
     api._reset_runtime_state_for_tests()
     monkeypatch.setattr(
         api,
@@ -272,7 +291,7 @@ def test_source_scope_and_geometry_survive_rest_native_mcp_and_cli(
         response_char_limit=0,
     )
     response = TestClient(api.app).post(
-        "/api/cn/qimen",
+        "/api/qimen",
         json=payload,
         params=[
             ("as_of", controls["as_of"]),
@@ -284,8 +303,8 @@ def test_source_scope_and_geometry_survive_rest_native_mcp_and_cli(
 
     async def protocol():
         async with Client(create_mcp_app()) as client:
-            return await client.call_tool(
-                "qimen", {**payload, **controls}, raise_on_error=False
+            return await call_calculation(
+                client, "qimen", {**payload, **controls}, raise_on_error=False
             )
 
     native = asyncio.run(protocol())
@@ -352,3 +371,5 @@ def test_source_scope_and_geometry_survive_rest_native_mcp_and_cli(
         assert pattern["facts"]["hour_xun_head"] == "甲子"
         assert "非本时直符六仪的落刑宫几何观察：壬" in bodies[0]["snapshot_text"]
         assert "按暂定广义取法保留匹配" in bodies[0]["snapshot_text"]
+    else:
+        pass

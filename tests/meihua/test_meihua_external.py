@@ -7,23 +7,21 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
+from fatebridge.application.examples import suggested_fields
+from fatebridge.core.meihua.meihua_external import external_manifestation_ruleset
 from fatebridge.core.requests.meihua import MeihuaCastRequest
 from fatebridge.services.meihua import calculate_meihua_cast
+from tests.support.reference_data import resolve
 from tests.support.transports import SPECS, business, rest, surface_calls
 
 FIXTURE = Path(__file__).parents[1] / "fixtures/meihua_external_v1"
 CASES = json.loads((FIXTURE / "cases.json").read_text())["cases"]
 
 
-def at_path(out, path):
-    value = out
-    for part in path.split("."):
-        value = value[int(part)] if isinstance(value, list) else value[part]
-    return value
-
-
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
-def test_manual_source_pairs_preserve_raw_relation_and_distinct_qualification(case):
+def test_manual_source_pairs_preserve_raw_relation_and_distinct_qualification(
+    case,
+) -> None:
     plain = calculate_meihua_cast(casting=case["casting"])
     assert plain["meihua"]["body_trigram"]["name"] == case["body"]
     out = calculate_meihua_cast(
@@ -50,8 +48,8 @@ def test_manual_source_pairs_preserve_raw_relation_and_distinct_qualification(ca
         assert row["quote_original_pdf_indices"] == expected_pages
     else:
         assert row["quote"] is row["rule_id"] is None
-    assert at_path(out, row["body_fact_path"])["name"] == case["body"]
-    assert at_path(out, row["reported_fact_path"]) == case["observation"]
+    assert resolve(out, row["body_fact_path"])["name"] == case["body"]
+    assert resolve(out, row["reported_fact_path"]) == case["observation"]
     assert row["physical_causation_verified"] is False
     assert row["numeric_effect_strength"] is row["real_outcome"] is None
     assert layer["event_time"] is layer["combined_outcome"] is None
@@ -61,7 +59,7 @@ def test_manual_source_pairs_preserve_raw_relation_and_distinct_qualification(ca
     ]
 
 
-def test_frozen_source_and_manual_cases_are_unchanged():
+def test_frozen_source_and_manual_cases_are_unchanged() -> None:
     m = json.loads((FIXTURE / "manifest.json").read_text())
     assert (
         m["production_generated_expected_values"] is False
@@ -70,12 +68,16 @@ def test_frozen_source_and_manual_cases_are_unchanged():
     for name, digest in m["files"].items():
         if str(name).endswith((".py", ".py.txt")):
             continue
+        else:
+            pass
         assert hashlib.sha256((FIXTURE / name).read_bytes()).hexdigest() == digest
 
 
 @pytest.mark.parametrize("basis", ["raw_counts", "trigram_numbers"])
 @pytest.mark.parametrize("kind", ["furnace_flame", "actual_water", "fired_pottery"])
-def test_counting_candidates_keep_their_own_original_body_and_source_pair(basis, kind):
+def test_counting_candidates_keep_their_own_original_body_and_source_pair(
+    basis: str, kind: str
+) -> None:
     casting = {
         "method": "sound_groups",
         "first_count": 11,
@@ -110,8 +112,8 @@ def test_counting_candidates_keep_their_own_original_body_and_source_pair(basis,
             candidate["body"]
         ]
         assert row["body_fact_path"] == f"meihua.counting_variants.{i}.body_trigram"
-        assert at_path(out, row["body_fact_path"])["name"] == row["body"]
-        assert at_path(out, row["reported_fact_path"]) == {
+        assert resolve(out, row["body_fact_path"])["name"] == row["body"]
+        assert resolve(out, row["reported_fact_path"]) == {
             "manifestation": kind,
             "label": "虚构工程双候选",
         }
@@ -126,14 +128,14 @@ def test_counting_candidates_keep_their_own_original_body_and_source_pair(basis,
         [{"manifestation": "soil"}],
     ],
 )
-def test_absent_or_unknown_manifestations_are_not_invented(bad):
+def test_absent_or_unknown_manifestations_are_not_invented(bad) -> None:
     with pytest.raises(ValidationError):
         MeihuaCastRequest.model_validate(
             {"casting": CASES[0]["casting"], "external_observations": bad}
         )
 
 
-def test_weather_never_uses_external_body_relations():
+def test_weather_never_uses_external_body_relations() -> None:
     with pytest.raises(ValidationError):
         MeihuaCastRequest.model_validate(
             {
@@ -151,7 +153,9 @@ def test_weather_never_uses_external_body_relations():
 @pytest.mark.parametrize(
     "topic", ["general", "planning", "reputation", "wealth", "transaction"]
 )
-def test_selected_external_layer_is_available_without_changing_topic(topic):
+def test_selected_external_layer_is_available_without_changing_topic(
+    topic: str,
+) -> None:
     out = calculate_meihua_cast(
         casting=CASES[0]["casting"],
         interpretation_topic=topic,
@@ -165,7 +169,9 @@ def test_selected_external_layer_is_available_without_changing_topic(topic):
     assert "外应" in out["summary"]
 
 
-def test_no_observation_keeps_the_previous_summary_and_does_not_assert_absence():
+def test_no_observation_keeps_the_previous_summary_and_does_not_assert_absence() -> (
+    None
+):
     plain = calculate_meihua_cast(casting=CASES[0]["casting"])
     explicit_none = calculate_meihua_cast(
         casting=CASES[0]["casting"], external_observations=None
@@ -178,8 +184,9 @@ def test_no_observation_keeps_the_previous_summary_and_does_not_assert_absence()
 
 
 @pytest.mark.parametrize("tool", ["meihua_cast", "meihua_analysis"])
-def test_external_card_agrees_on_three_public_surfaces(tool, surface_calls):
-    from fatebridge.application.examples import suggested_fields
+def test_external_card_agrees_on_three_public_surfaces(
+    tool: str, surface_calls
+) -> None:
 
     spec = SPECS[tool]
     payload = (
@@ -213,8 +220,7 @@ def test_external_card_agrees_on_three_public_surfaces(tool, surface_calls):
     )
 
 
-def test_time_card_does_not_request_alternatives_that_time_casts_do_not_have():
-    from fatebridge.application.examples import suggested_fields
+def test_time_card_does_not_request_alternatives_that_time_casts_do_not_have() -> None:
 
     assert "interpretation.casting_readings" not in suggested_fields(
         SPECS["meihua_analysis"], view="external"
@@ -224,8 +230,7 @@ def test_time_card_does_not_request_alternatives_that_time_casts_do_not_have():
     )
 
 
-def test_returned_records_and_rules_cannot_mutate_input_or_cached_source():
-    from fatebridge.core.meihua_external import external_manifestation_ruleset
+def test_returned_records_and_rules_cannot_mutate_input_or_cached_source() -> None:
 
     observation = dict(CASES[0]["observation"])
     out = calculate_meihua_cast(

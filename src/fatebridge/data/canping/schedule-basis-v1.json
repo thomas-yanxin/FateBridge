@@ -1,6 +1,6 @@
 {
   "corpus_id": "canping_schedule_clauses_v1",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "review_status": "single_primary_image_reading; no_independent_second_review",
   "scope": "Six selected excerpts, not complete entries or complete books. Distinct books/editions retain distinct roles; a supplementary Zi Ping witness cannot fill an uncollated target-edition assertion.",
   "sources": {
@@ -33,7 +33,7 @@
       "pdf_page": 106,
       "printed_page": null,
       "locator": "右半页起大運訣，首三行",
-      "text": "行運專在月下論甲丙戊庚壬人屬陽乙丁己辛癸生人屬陰其法陽男陰女順數月下未來謂之順運陰男陽女逆數月下已往謂之逆運",
+      "text": "行運專在月下論甲丙戊庚壬生人屬陽乙丁己辛癸生人屬陰其法陽男陰女順數月下未來謂之順運陰男陽女逆數月下已往謂之逆運",
       "kind": "month_direction"
     },
     {

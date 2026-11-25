@@ -13,8 +13,8 @@ from pydantic import ValidationError
 
 import fatebridge.application.execution as execution
 from fatebridge.application.examples import evidence_views
+from fatebridge.core.contracts.output_jinkou_definitions import JinkouDefinitionEvidence
 from fatebridge.core.metaphysics.jinkou_definitions import definition_evidence
-from fatebridge.core.output_jinkou_definitions import JinkouDefinitionEvidence
 from fatebridge.services.metaphysics import calculate_jinkou_analysis
 from tests.fixtures.ren_anchors import ANCHOR_PAYLOADS
 from tests.support.transports import AS_OF, SPECS, business, rest, surface_calls
@@ -30,7 +30,7 @@ READINGS, FACTS = AUDIT.reference()
 PAYLOAD = ANCHOR_PAYLOADS["jinkou"]
 
 
-def test_new_witness_keeps_ambiguity_and_fixed_denominators():
+def test_new_witness_keeps_ambiguity_and_fixed_denominators() -> None:
     result = AUDIT.audit()
     assert result["engineering_checks_passed"]
     assert result["selected_pattern_notes"] == 6
@@ -55,7 +55,9 @@ def test_new_witness_keeps_ambiguity_and_fixed_denominators():
 
 
 @pytest.mark.parametrize("change", ["edit", "missing", "extra", "shrink"])
-def test_source_inventory_cannot_be_pruned_or_relabelled(tmp_path, change):
+def test_source_inventory_cannot_be_pruned_or_relabelled(
+    tmp_path: Path, change: str
+) -> None:
     target = tmp_path / "corpus"
     shutil.copytree(AUDIT.CORPUS, target)
     if change in {"edit", "shrink"}:
@@ -74,7 +76,7 @@ def test_source_inventory_cannot_be_pruned_or_relabelled(tmp_path, change):
         AUDIT.reference(target)
 
 
-def test_p59_literal_example_does_not_identify_one_ding_route():
+def test_p59_literal_example_does_not_identify_one_ding_route() -> None:
     value = definition_evidence(
         day_stem="戊",
         hour_branch="辰",
@@ -92,7 +94,9 @@ def test_p59_literal_example_does_not_identify_one_ding_route():
     assert all(r["identified_by_original_clause"] is None for r in routes.values())
 
 
-def test_two_different_pairings_fit_each_source_diagram_but_are_not_equivalent():
+def test_two_different_pairings_fit_each_source_diagram_but_are_not_equivalent() -> (
+    None
+):
     # These two phase vectors distinguish the candidate formulae. The book's
     # alternating diagram does not, so neither candidate is adopted as truth.
     for phases, expected in [
@@ -116,8 +120,8 @@ def test_two_different_pairings_fit_each_source_diagram_but_are_not_equivalent()
 
 @pytest.mark.parametrize("selected", [True, False])
 def test_conditional_twilight_example_changes_policy_selection_not_observed_twilight(
-    selected,
-):
+    selected: bool,
+) -> None:
     value = definition_evidence(
         day_stem="甲",
         hour_branch="寅",
@@ -148,8 +152,8 @@ FAULTS = [
 @pytest.mark.parametrize("fault", FAULTS, ids=lambda f: f[0])
 @pytest.mark.parametrize("project", [False, True])
 def test_unrelated_projection_cannot_hide_false_definition_facts(
-    fault, project, monkeypatch, surface_calls
-):
+    fault, project: bool, monkeypatch: pytest.MonkeyPatch, surface_calls
+) -> None:
     spec = SPECS["jinkou"]
     bad = calculate_jinkou_analysis(**PAYLOAD)
     cursor = bad["jinkou"]["definition_evidence"]
@@ -166,6 +170,8 @@ def test_unrelated_projection_cannot_hide_false_definition_facts(
             actual = replace(
                 actual, bind=lambda _: (lambda: copy.deepcopy(bad), (), {})
             )
+        else:
+            pass
         return original(actual, request)
 
     monkeypatch.setattr(execution, "execute_spec", broken)
@@ -178,6 +184,8 @@ def test_unrelated_projection_cannot_hide_false_definition_facts(
         params.update(fields="analysis_type", strict_fields="true")
         options.update(fields=["analysis_type"], strict_fields=True)
         flags += ["--fields", "analysis_type", "--strict-fields", "true"]
+    else:
+        pass
     http, protocol, code, output = surface_calls(
         spec, PAYLOAD, params=params, options=options, flags=flags, cli_first=False
     )
@@ -187,8 +195,8 @@ def test_unrelated_projection_cannot_hide_false_definition_facts(
 
 @pytest.mark.parametrize("project", [False, True])
 def test_three_ports_preserve_all_six_null_verdicts_and_same_run_facts(
-    project, surface_calls
-):
+    project: bool, surface_calls
+) -> None:
     spec = SPECS["jinkou"]
     fields = evidence_views(spec)["definition_witnesses"]["fields"]
     params = [("as_of", AS_OF), ("response_char_limit", "0")]
@@ -207,6 +215,8 @@ def test_three_ports_preserve_all_six_null_verdicts_and_same_run_facts(
             "false",
         ]
         options.update(fields=fields, strict_fields=True, include_snapshot_text=False)
+    else:
+        pass
     http, protocol, code, cli = surface_calls(
         spec, PAYLOAD, params=params, options=options, flags=flags, cli_first=False
     )
@@ -227,7 +237,9 @@ def test_three_ports_preserve_all_six_null_verdicts_and_same_run_facts(
     "field",
     ["entries", "ding_routes", "day_night_candidates", "cross_generation_hypotheses"],
 )
-def test_complete_gate_requires_evidence_but_projection_model_stays_sparse(field):
+def test_complete_gate_requires_evidence_but_projection_model_stays_sparse(
+    field: str,
+) -> None:
     spec = SPECS["jinkou"]
     valid = calculate_jinkou_analysis(**PAYLOAD)
     del valid["jinkou"]["definition_evidence"][field]
@@ -236,7 +248,7 @@ def test_complete_gate_requires_evidence_but_projection_model_stays_sparse(field
         execution.validate_output(spec, valid)
 
 
-def test_sparse_null_projections_and_unrelated_fields_are_still_valid():
+def test_sparse_null_projections_and_unrelated_fields_are_still_valid() -> None:
     value = {"observed_twilight_transition": None, "front_back_predicate": None}
     assert (
         JinkouDefinitionEvidence.model_validate(value).model_dump(exclude_unset=True)

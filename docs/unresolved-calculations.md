@@ -38,7 +38,7 @@
 | Family | 代表请求 | 下一步需要的证据 |
 | --- | ---: | --- |
 | `bazi` | 12／12 | 专项重复返回同一原局证据。优先用带明确成格、相神、救应或旺衰说法的独立命例，分开核对月令候选和最终作用，继续保留[原有 17 组旺衰分歧与集合约束](bazi-assessment.md#原典资料与未决范围)。 |
-| `compatibility` | 2／2 | 八字先补双方各自的取用依据，宿曜先核闰月所用历法与规则，不能借另一人或另一方法填缺项。见[双人评分](compatibility-scoring.md)与[宿曜证据](interpretation/shared/sukuyo-evidence.md)。 |
+| `compatibility` | 2／2 | 八字先补双方各自的取用依据，宿曜先核闰月所用历法与规则，不能借另一人或另一方法填缺项。见[双人八字取证](compatibility-scoring.md)与[宿曜证据](interpretation/shared/sukuyo-evidence.md)。 |
 | `timing` | 3／9 | 原局和时运已返回关系与部分预算投影；完整喜忌、制化须有独立岁运案例与明确适用域。[八字时运](bazi-timing.md)的阶段关系可以先解释。 |
 | `divination` | 8／11 | 六爻优先处理可核的作用前提；梅花区分题篇与季令、外应条件；河洛、参评、宿占需独立历表或书影，三式合参需共同事件和共同时间层。[覆盖矩阵](algorithm-coverage.md)分列各工具。 |
 | `metaphysics` | 7／8 | 继续核对[奇门版本分歧](qimen-depth-audit.md)、[太乙门法与寄支](taiyi-sanshi-audit.md)、[金口诀六条课钤及旺衰差异](liuren-jinkou-audit.md)和[紫微运限规则](ziwei.md)。候选只能解决其共有的盘面结论，不能代替原典取舍。 |

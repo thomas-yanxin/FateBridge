@@ -4,6 +4,7 @@ import asyncio
 import json
 import shutil
 from copy import deepcopy
+from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
@@ -13,7 +14,7 @@ import fatebridge.api as api
 import scripts.ziwei.audit_ziwei_time_input as audit
 from fatebridge.application.examples import evidence_views
 from fatebridge.cli import run
-from fatebridge.core.ziwei_calendar import calendar_basis
+from fatebridge.core.ziwei.ziwei_calendar import calendar_basis
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.metaphysics import (
     _build_person_seed,
@@ -25,6 +26,7 @@ from fatebridge.utils.birth_input import create_person_info
 from fatebridge.utils.solar_time import normalize_birth_time
 from scripts.ziwei.audit_ziwei_limits import _seed
 from tests.fixtures.mcp_receipt import verified_inline_business
+from tests.support.transports import call_calculation
 
 BIRTH = dict(
     birth_year=2000,
@@ -36,7 +38,9 @@ BIRTH = dict(
 )
 
 
-def test_receipt_audit_does_not_count_propagation_as_astronomical_certification():
+def test_receipt_audit_does_not_count_propagation_as_astronomical_certification() -> (
+    None
+):
     r = audit.audit_time_input()
     assert r["conditional_input_cases"] == 9
     assert r["profile_receipts_checked"] == 18
@@ -46,7 +50,9 @@ def test_receipt_audit_does_not_count_propagation_as_astronomical_certification(
     assert not r["full_calendar_acceptance_passed"]
 
 
-def test_false_applied_status_cannot_pass_audit(monkeypatch):
+def test_false_applied_status_cannot_pass_audit(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     original = audit.calculate_ziwei_birth
 
     def wrong(*args, **kwargs):
@@ -58,7 +64,7 @@ def test_false_applied_status_cannot_pass_audit(monkeypatch):
     assert len(audit.audit_time_input()["differences"]) == 8
 
 
-def test_time_input_source_checksum_is_required(tmp_path):
+def test_time_input_source_checksum_is_required(tmp_path: Path) -> None:
     shutil.copy(audit.FIXTURES / "time_input_manifest.json", tmp_path)
     manifest = json.loads((tmp_path / "time_input_manifest.json").read_text())
     (tmp_path / manifest["source_documents"][0]["path"]).write_text("changed")
@@ -81,7 +87,9 @@ def receipt(**kwargs):
         ({}, "default_timezone", True),
     ],
 )
-def test_receipt_preserves_actual_timezone_selection(extra, source, assumed):
+def test_receipt_preserves_actual_timezone_selection(
+    extra, source: str, assumed: bool
+) -> None:
     _, r = receipt(use_true_solar_time=False, **extra)
     assert r["timezone_source"] == source
     assert r["timezone_assumed"] is assumed
@@ -93,7 +101,7 @@ def test_receipt_preserves_actual_timezone_selection(extra, source, assumed):
     assert r["seconds_are_derived_not_birth_accuracy"]
 
 
-def test_explicit_longitude_does_not_hide_place_resolved_timezone():
+def test_explicit_longitude_does_not_hide_place_resolved_timezone() -> None:
     _, r = receipt(birth_place="杭州", birth_longitude=120.47)
     assert r["longitude_source"] == "birth_longitude"
     assert r["resolved_place"] is None
@@ -107,7 +115,7 @@ def test_explicit_longitude_does_not_hide_place_resolved_timezone():
     assert explicit["timezone_resolved_place"] is None
 
 
-def test_shared_normalizer_serialization_remains_opt_in():
+def test_shared_normalizer_serialization_remains_opt_in() -> None:
     p = create_person_info(**BIRTH, birth_place="杭州")
     n = normalize_birth_time(p)
     assert "timezone_source" not in n.as_dict()
@@ -117,7 +125,7 @@ def test_shared_normalizer_serialization_remains_opt_in():
     assert expanded == n.as_dict()
 
 
-def test_requested_solar_fallback_differs_from_explicit_civil_clock():
+def test_requested_solar_fallback_differs_from_explicit_civil_clock() -> None:
     result, fallback = receipt(
         birth_timezone="Asia/Shanghai",
         use_true_solar_time=True,
@@ -140,7 +148,7 @@ def test_requested_solar_fallback_differs_from_explicit_civil_clock():
     )
 
 
-def test_explicit_solar_without_longitude_still_rejects_missing_input():
+def test_explicit_solar_without_longitude_still_rejects_missing_input() -> None:
     result = calculate_ziwei_birth(
         create_person_info(**BIRTH, use_true_solar_time=True, true_solar_explicit=True)
     )
@@ -148,7 +156,9 @@ def test_explicit_solar_without_longitude_still_rejects_missing_input():
     assert "birth_longitude" in result["error"]
 
 
-def test_province_approximation_can_change_hour_and_must_not_claim_error_bound():
+def test_province_approximation_can_change_hour_and_must_not_claim_error_bound() -> (
+    None
+):
     coarse, c = receipt(
         birth_place="江苏省未收录地点",
         birth_timezone="Asia/Shanghai",
@@ -174,7 +184,7 @@ def test_province_approximation_can_change_hour_and_must_not_claim_error_bound()
     ) / 60 == pytest.approx(4 * (p["longitude"] - c["longitude"]), abs=1e-6)
 
 
-def test_receipt_carries_actual_dst_and_pinned_timezone_rules():
+def test_receipt_carries_actual_dst_and_pinned_timezone_rules() -> None:
     result, r = receipt(
         birth_year=1990,
         birth_month=7,
@@ -190,7 +200,7 @@ def test_receipt_carries_actual_dst_and_pinned_timezone_rules():
     assert not result["ziwei_birth"]["calendar_basis"]["classical_clock_rule_verified"]
 
 
-def test_receipt_is_copied_and_synthetic_inputs_do_not_fabricate_provenance():
+def test_receipt_is_copied_and_synthetic_inputs_do_not_fabricate_provenance() -> None:
     seed = _build_person_seed(
         create_person_info(**BIRTH, birth_place="杭州", use_true_solar_time=True)
     )
@@ -212,20 +222,25 @@ def test_receipt_is_copied_and_synthetic_inputs_do_not_fabricate_provenance():
     ],
 )
 def test_default_input_and_receipt_survive_rest_mcp_cli(
-    tool, extra, status, monkeypatch, capsys
-):
+    tool: str,
+    extra,
+    status: str,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     api._reset_runtime_state_for_tests()
     monkeypatch.setattr(
         api,
         "API_KEY_AUTHENTICATOR",
         api.ApiKeyAuthenticator(header_name="X-API-Key", api_keys={}),
     )
-    fields = evidence_views(next(s for s in CATALOG if s.key == tool))["time_input"][
-        "fields"
-    ]
+    spec = next(s for s in CATALOG if s.key == tool)
+    fields = evidence_views(spec)["time_input"]["fields"]
     inputs = {**BIRTH, "birth_timezone": "Asia/Shanghai", **extra}
     if tool == "ziwei_horoscope":
         inputs.update(target_year=2026, target_month=10, target_day=22, target_hour=12)
+    else:
+        pass
     opts = dict(
         as_of="2026-10-22T12:00:00+08:00",
         fields=fields,
@@ -233,7 +248,7 @@ def test_default_input_and_receipt_survive_rest_mcp_cli(
         include_snapshot_text=False,
     )
     rest = TestClient(api.app).post(
-        "/api/cn/ziwei/" + ("birth" if tool == "ziwei_birth" else "horoscope"),
+        spec.rest_path,
         json=inputs,
         params=[
             ("as_of", opts["as_of"]),
@@ -245,14 +260,14 @@ def test_default_input_and_receipt_survive_rest_mcp_cli(
 
     async def call():
         async with Client(create_mcp_app(families="metaphysics")) as client:
-            native = await client.call_tool(
-                tool, {**inputs, **opts}, raise_on_error=False
+            native = await call_calculation(
+                client, spec.tool_name, {**inputs, **opts}, raise_on_error=False
             )
             assert not native.is_error, native.content
             return await verified_inline_business(client, native.structured_content)
 
     native = asyncio.run(call())
-    args = [tool]
+    args = [spec.tool_name]
     for name, value in inputs.items():
         args += ["--" + name.replace("_", "-"), str(value)]
     args += [
@@ -280,7 +295,7 @@ def test_default_input_and_receipt_survive_rest_mcp_cli(
     assert not r["explicitly_requested"]
 
 
-def test_horoscope_reuses_birth_receipt_without_inventing_target_precision():
+def test_horoscope_reuses_birth_receipt_without_inventing_target_precision() -> None:
     p = create_person_info(
         **BIRTH, birth_timezone="Asia/Shanghai", use_true_solar_time=False
     )

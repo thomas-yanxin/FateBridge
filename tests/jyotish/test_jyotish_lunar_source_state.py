@@ -21,10 +21,10 @@ from fatebridge.core.astro import (
 )
 from fatebridge.core.astro.physical_sources import PhysicalEphemerisTrace
 from fatebridge.core.compressed_ephemeris import audit_compressed_endpoints
-from fatebridge.core.jyotish import positions
+from fatebridge.core.jyotish.jyotish import positions
 from fatebridge.utils.errors import EphemerisSourceError
-from tests.jyotish.test_jyotish_sources import restore_runtime  # noqa: F401
-from tests.jyotish.test_jyotish_sources import birth
+from tests.unit_test.fixtures.jyotish_sources import restore_runtime  # noqa: F401
+from tests.unit_test.fixtures.jyotish_sources import birth
 
 ROOT = Path(__file__).resolve().parents[2]
 REFERENCE_PATH = ROOT / "tests/fixtures/jyotish-lunar-source-state-reference-v1.json"
@@ -61,7 +61,9 @@ def policy_pair(row):
     return original, source
 
 
-def test_frozen_reference_identity_and_all770_source_projections(record_property):
+def test_frozen_reference_identity_and_all770_source_projections(
+    record_property,
+) -> None:
     assert hashlib.sha256(REFERENCE_PATH.read_bytes()).hexdigest() == (
         "936847905192123e398711b63a6edf54811a7d21cd669f502a06084084fa6e78"
     )
@@ -130,6 +132,8 @@ def test_frozen_reference_identity_and_all770_source_projections(record_property
                 line = 1e-6 if k == "angular_rate_arcsec_per_day" else 1e-12
                 if error > line:
                     failures.append((row["case_id"], scale, k, error))
+                else:
+                    pass
             assert (
                 abs(actual["spherical"]["radius"] - expected["spherical"]["radius"])
                 <= 1e-12
@@ -154,8 +158,8 @@ def test_frozen_reference_identity_and_all770_source_projections(record_property
 
 
 def test_all154_actual_managed_source_inputs_and_no_new_native_projection_queries(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     e.configure_ephemeris_path(str(ROOT / "ephe"))
     swe = runtime.swe
     for row in REFERENCE["rows"]:
@@ -195,7 +199,9 @@ def test_all154_actual_managed_source_inputs_and_no_new_native_projection_querie
             )
 
 
-def test_mutation_detection_preserves_cases_below_the_frozen_line(record_property):
+def test_mutation_detection_preserves_cases_below_the_frozen_line(
+    record_property,
+) -> None:
     actual_counts = dict(
         omit_observer=0,
         uniform_small=0,
@@ -263,6 +269,8 @@ def test_mutation_detection_preserves_cases_below_the_frozen_line(record_propert
                 key = "uniform_stress" if scale in {"2", "1/2"} else "uniform_small"
                 actual_counts[key] += error(uniform) > 1e-12
                 expected_counts[key] += mutants["uniform_clock_velocity_error"] > 1e-12
+            else:
+                pass
         if tt == 2451545.0:
             smooth = reference_frames.mv(
                 reference_frames.transpose(basis["mean_frame"]), p
@@ -281,6 +289,8 @@ def test_mutation_detection_preserves_cases_below_the_frozen_line(record_propert
             expected_counts["smooth_J2000"] += (
                 row["expected"]["smooth_decoder_position_error_arcsec"] > 1e-7
             )
+        else:
+            pass
     record_property("mutation_rejections_at_unchanged_lines", json.dumps(actual_counts))
     assert actual_counts == expected_counts
     assert actual_counts == dict(
@@ -310,7 +320,9 @@ def test_mutation_detection_preserves_cases_below_the_frozen_line(record_propert
         "missing_context",
     ],
 )
-def test_applied_corruption_fails_closed_without_touching_native(monkeypatch, fault):
+def test_applied_corruption_fails_closed_without_touching_native(
+    monkeypatch: pytest.MonkeyPatch, fault: str
+) -> None:
     row = REFERENCE["rows"][0]
     original, source = policy_pair(row)
     if fault == "epoch":
@@ -339,6 +351,8 @@ def test_applied_corruption_fails_closed_without_touching_native(monkeypatch, fa
         source["source_position_reproduction_arcsec"] = 1e-6
     elif fault == "missing_context":
         del original["source_context"]
+    else:
+        pass
 
     def forbidden(*args, **kwargs):
         raise AssertionError("Pure evidence projection must not call native")
@@ -358,7 +372,7 @@ def test_applied_corruption_fails_closed_without_touching_native(monkeypatch, fa
         "no_exact_source_window_stencil",
     ],
 )
-def test_unavailable_source_has_no_fabricated_state(reason):
+def test_unavailable_source_has_no_fabricated_state(reason: str) -> None:
     row = REFERENCE["rows"][0]
     original, _ = policy_pair(row)
     result = source_state.source_derivative_state_evidence(
@@ -368,7 +382,7 @@ def test_unavailable_source_has_no_fabricated_state(reason):
     assert "state" not in result and "decoded_J2000_source_state" not in result
 
 
-def test_actual_moshier_preserves_outer_inapplicability_reason(tmp_path):
+def test_actual_moshier_preserves_outer_inapplicability_reason(tmp_path: Path) -> None:
     e.configure_ephemeris_path(str(tmp_path))
     result = positions(birth(), ephemeris_policy="auto")
     context = result["physical_states"]["Moon"]["longitude_motion_context"]

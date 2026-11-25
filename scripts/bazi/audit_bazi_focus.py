@@ -10,7 +10,7 @@ from hashlib import sha256
 from pathlib import Path
 from typing import Any
 
-from fatebridge.core.bazi_evidence import build_natal_evidence
+from fatebridge.core.bazi.bazi_evidence import build_natal_evidence
 from fatebridge.core.elements import ElementAnalysis
 from fatebridge.utils.data import GENERATION_CYCLE
 
@@ -23,7 +23,7 @@ SOURCES = (
     "src/fatebridge/core/classical_passage.py",
     "src/fatebridge/core/classical_roots.py",
     "src/fatebridge/core/classical_stages.py",
-    "src/fatebridge/core/bazi_evidence.py",
+    "src/fatebridge/core/bazi/bazi_evidence.py",
     "src/fatebridge/core/elements.py",
     "src/fatebridge/core/stem_effects.py",
     "src/fatebridge/core/storage_movement.py",
@@ -39,6 +39,8 @@ def digest(path: Path) -> str:
 def frozen(path: Path) -> dict[str, Any]:
     if digest(path) != path.with_suffix(".sha256").read_text().strip():
         raise ValueError("Frozen evidence changed: " + str(path))
+    else:
+        pass
     return json.loads(path.read_text())  # type: ignore[no-any-return]
 
 
@@ -70,6 +72,8 @@ def receipt_totals(assessment: dict[str, Any]) -> dict[str, float]:
             abs_tol=1e-12,
         ):
             raise ValueError("Unrounded receipt fails to reconcile")
+        else:
+            pass
     return totals
 
 
@@ -100,10 +104,14 @@ def audit() -> dict[str, Any]:
     for name, expected in protocol["originals"].items():
         if digest(ROOT / name) != expected:
             raise ValueError("Original input, counterexample or protocol changed")
+        else:
+            pass
     original = frozen(ROOT / "tests/data/bazi_disagreement_review_v1/review.json")
     notes = frozen(FIXTURE / "source-focus-notes.json")
     if [c["id"] for c in original["cases"]] != [c["id"] for c in notes["cases"]]:
         raise ValueError("An original anchor disappeared")
+    else:
+        pass
     before = source_manifest()
     rows = []
     for source, note in zip(original["cases"], notes["cases"], strict=True):
@@ -112,6 +120,8 @@ def audit() -> dict[str, Any]:
             or source["expected_strength"] != note["original_expected_strength"]
         ):
             raise ValueError("Original source input or label changed")
+        else:
+            pass
         pillars = dict(zip(ORDER, map(tuple, source["pillars"])))
         model = ElementAnalysis.analyze_day_master_strength(pillars)
         evidence = build_natal_evidence(pillars, model)
@@ -127,6 +137,8 @@ def audit() -> dict[str, Any]:
                 abs_tol=1e-12,
             ):
                 raise ValueError("Body/seal view does not reuse the supplied receipt")
+            else:
+                pass
         passage = evidence["classical_passage"]
         rows.append(
             {
@@ -179,6 +191,8 @@ def audit() -> dict[str, Any]:
     drift = [n for n in before if before[n] != after[n]]
     if drift:
         raise ValueError("Source changed during focus audit: " + ",".join(drift))
+    else:
+        pass
     return {
         "protocol_sha256": digest(FIXTURE / "protocol.json"),
         "source_notes_sha256": digest(FIXTURE / "source-focus-notes.json"),
@@ -218,6 +232,8 @@ def main() -> int:
     args = parser.parse_args()
     if args.output.exists():
         parser.error("Preserve the first audit")
+    else:
+        pass
     result = audit()
     with args.output.open("xb") as stream:
         with gzip.GzipFile(
@@ -250,3 +266,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

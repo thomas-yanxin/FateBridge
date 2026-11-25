@@ -10,7 +10,9 @@ FIXTURE = Path(__file__).parents[1] / "fixtures/guolao-life-degree-facsimile-v1"
 
 
 @pytest.mark.parametrize("image", [76, 77, 78, 79, 86, 87])
-def test_selected_primary_image_bytes_match_frozen_attributed_sources(image):
+def test_selected_primary_image_bytes_match_frozen_attributed_sources(
+    image: int,
+) -> None:
     reference = json.loads((FIXTURE / "reference.json").read_text())
     entry = next(e for e in reference["images"] if e["image"] == image)
     assert (
@@ -21,7 +23,9 @@ def test_selected_primary_image_bytes_match_frozen_attributed_sources(image):
     assert reference["edition_id"] == "tohoku_luwei_10020000001141"
 
 
-def test_two_preserved_readings_do_not_become_a_universal_offset_or_modern_degree():
+def test_two_preserved_readings_do_not_become_a_universal_offset_or_modern_degree() -> (
+    None
+):
     reference = json.loads((FIXTURE / "reference.json").read_text())
     assert (
         reference["comparison"]["example1"]["same_column_target_numeric_text"] == "六"

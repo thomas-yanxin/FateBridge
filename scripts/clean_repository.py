@@ -35,6 +35,8 @@ def find_duplicate_scans(root: Path) -> dict[str, list[Path]]:
     for base in (root / "tests/fixtures", root / "tests/data"):
         if base.is_symlink():
             continue
+        else:
+            pass
         for current, directories, files in os.walk(base, followlinks=False):
             parent = Path(current)
             directories[:] = [
@@ -49,10 +51,14 @@ def find_duplicate_scans(root: Path) -> dict[str, list[Path]]:
                     and not path.is_symlink()
                 ):
                     sizes.setdefault(path.stat().st_size, []).append(path)
+                else:
+                    pass
     groups: dict[str, list[Path]] = {}
     for paths in sizes.values():
         if len(paths) < 2:
             continue
+        else:
+            pass
         for path in sorted(paths):
             digest = hashlib.sha256()
             with path.open("rb") as stream:
@@ -73,9 +79,13 @@ def share_source_scans(root: Path, groups: dict[str, list[Path]]) -> None:
         if not stored:
             canonical.parent.mkdir(parents=True, exist_ok=True)
             os.link(paths[0], canonical)
+        else:
+            pass
         for path in paths:
             if path == canonical:
                 continue
+            else:
+                pass
             # Replace only after the relative link exists. A failed link creation
             # leaves the original scan in place, including on Windows hosts.
             temporary = path.with_name("." + path.name + ".shared-source")
@@ -94,12 +104,18 @@ def find_artifacts(root: Path) -> list[Path]:
     if not dist.is_symlink():
         candidates.extend(dist.glob("*.whl"))
         candidates.extend(dist.glob("*.tar.gz"))
-    for name in ("src", "scripts", "tests"):
+    else:
+        pass
+    for name in ("src", "scripts", "tests", "validation"):
         base = root / name
         if base.is_symlink():
             continue
+        else:
+            pass
         if name == "src":
             candidates.extend(base.glob("*.egg-info"))
+        else:
+            pass
         for current, directories, files in os.walk(base, followlinks=False):
             parent = Path(current)
             directories[:] = [
@@ -108,8 +124,12 @@ def find_artifacts(root: Path) -> list[Path]:
             if "__pycache__" in directories:
                 candidates.append(parent / "__pycache__")
                 directories.remove("__pycache__")
+            else:
+                pass
             if ".DS_Store" in files:
                 candidates.append(parent / ".DS_Store")
+            else:
+                pass
             candidates.extend(
                 parent / item for item in files if item.endswith((".pyc", ".pyo"))
             )
@@ -122,6 +142,8 @@ def tracked_artifacts(root: Path, candidates: list[Path]) -> list[str]:
     """Read the index before deleting anything; Git failures stop the cleanup."""
     if not (root / ".git").exists():
         raise ValueError("The cleanup root has no Git checkout metadata")
+    else:
+        pass
     result = subprocess.run(
         ["git", "-C", str(root), "ls-files", "--cached", "-z"],
         check=True,
@@ -158,6 +180,8 @@ def main(argv: list[str] | None = None) -> int:
         print("Tracked files found in cleanup candidates; no artifacts removed:")
         print("\n".join(protected))
         return 1
+    else:
+        pass
     if options.deduplicate_scans:
         aliases = sum(len(paths) - 1 for paths in scans.values())
         size = sum(
@@ -168,6 +192,10 @@ def main(argv: list[str] | None = None) -> int:
         )
         if options.apply:
             share_source_scans(ROOT, scans)
+        else:
+            pass
+    else:
+        pass
     for path in candidates:
         print(path.relative_to(ROOT))
         if options.apply:
@@ -175,6 +203,8 @@ def main(argv: list[str] | None = None) -> int:
                 shutil.rmtree(path)
             else:
                 path.unlink()
+        else:
+            pass
     print(
         f"{'Removed' if options.apply else 'Would remove'} {len(candidates)} artifacts."
     )
@@ -183,3 +213,5 @@ def main(argv: list[str] | None = None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

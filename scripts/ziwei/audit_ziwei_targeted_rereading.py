@@ -7,7 +7,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from fatebridge.core.ziwei_sources import ziwei_day_source_evidence
+from fatebridge.core.ziwei.ziwei_sources import ziwei_day_source_evidence
 
 ROOT = Path(__file__).resolve().parents[2]
 FROZEN = ROOT / "tests/data/ziwei_independent/targeted_rereading_r24_v1"
@@ -24,6 +24,8 @@ def audit_targeted_rereading() -> dict[str, Any]:
             raise ValueError(
                 "Targeted rereading source checksum mismatch: " + record["path"]
             )
+        else:
+            pass
     report_path = FROZEN / "original-first-reading-frozen.json"
     first = json.loads(report_path.read_text())
     # These branch sets refer to this frozen reading, never to chart positions.
@@ -38,6 +40,8 @@ def audit_targeted_rereading() -> dict[str, Any]:
         literal_branches
     ) or len(manifest["target_inputs"]) != 5:
         raise ValueError("The five targeted inputs changed")
+    else:
+        pass
     rows = []
     for target in manifest["target_inputs"]:
         key = target["bureau"], target["day"]
@@ -77,6 +81,8 @@ def audit_targeted_rereading() -> dict[str, Any]:
     canonical = lambda value: json.dumps(value, ensure_ascii=False, sort_keys=True)
     if canonical(packaged) != canonical(expected):
         mismatches.append({"case": "package_differs_from_frozen_literal_rereading"})
+    else:
+        pass
     for row in rows:
         key = row["bureau"], row["day"]
         for branch in "子丑寅卯辰巳午未申酉戌亥":
@@ -98,6 +104,8 @@ def audit_targeted_rereading() -> dict[str, Any]:
                 mismatches.append(
                     {"case": [*key, branch], "expected": wanted, "actual": actual}
                 )
+            else:
+                pass
     return {
         "method_id": "ziwei_targeted_rereading_disclosure_r24_v1",
         "targeted_inputs": 5,

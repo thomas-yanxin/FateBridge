@@ -5,12 +5,12 @@ from decimal import Decimal
 
 import pytest
 
-from fatebridge.validation.meihua_weather_observation_mapping import (
+from validation.meihua_weather_observation_mapping import (
     CloudObservation,
     audit_rainfall_cloud_mapping,
     parse_hko_cloud,
 )
-from fatebridge.validation.meihua_weather_study import RainObservation
+from validation.meihua_weather_study import RainObservation
 
 DAY = date(2025, 1, 1)
 
@@ -29,7 +29,7 @@ def parse(raw):
     return parse_hko_cloud(raw, start=DAY, end=date(2025, 1, 4))
 
 
-def test_complete_cloud_is_a_percentage_not_sunshine_hours_or_eighths():
+def test_complete_cloud_is_a_percentage_not_sunshine_hours_or_eighths() -> None:
     values = parse(source("2025,1,1,100,C", "2025,1,2,0,C"))
     assert values[DAY].complete_percent() == Decimal("100")
     assert values[date(2025, 1, 2)].complete_percent() == Decimal("0")
@@ -38,26 +38,26 @@ def test_complete_cloud_is_a_percentage_not_sunshine_hours_or_eighths():
 
 
 @pytest.mark.parametrize("value", ["NaN", "Infinity", "-1", "100.1", "trace", "x"])
-def test_invalid_cloud_measurements_fail_closed(value):
+def test_invalid_cloud_measurements_fail_closed(value: str) -> None:
     with pytest.raises(ValueError):
         parse(source(f"2025,1,1,{value},C"))
 
 
-def test_incomplete_and_unavailable_values_remain_unknown():
+def test_incomplete_and_unavailable_values_remain_unknown() -> None:
     values = parse(source("2025,1,1,100,#", "2025,1,2,***,C"))
     assert values[DAY].cloud_percent == 100
     assert values[DAY].complete_percent() is None
     assert values[date(2025, 1, 2)].complete_percent() is None
 
 
-def test_duplicate_dates_and_undocumented_flags_are_rejected():
+def test_duplicate_dates_and_undocumented_flags_are_rejected() -> None:
     with pytest.raises(ValueError, match="Duplicate"):
         parse(source("2025,1,1,0,C", "2025,1,1,100,C"))
     with pytest.raises(ValueError, match="completeness"):
         parse(source("2025,1,1,100,unknown"))
 
 
-def test_dry_and100percent_cloud_does_not_supply_sunny_or_prior_weather():
+def test_dry_and100percent_cloud_does_not_supply_sunny_or_prior_weather() -> None:
     clouds = parse(source("2025,1,1,100,C", "2025,1,2,90,C"))
     rains = {
         DAY: RainObservation(DAY, "0", "C", "complete_numeric", Decimal("0")),
@@ -86,12 +86,12 @@ def test_dry_and100percent_cloud_does_not_supply_sunny_or_prior_weather():
 @pytest.mark.parametrize(
     "cohort", [[], ["2025-01-01", "2025-01-01"], ["2025-01-02", "2025-01-01"]]
 )
-def test_mapping_does_not_drop_repeated_or_reordered_dates(cohort):
+def test_mapping_does_not_drop_repeated_or_reordered_dates(cohort) -> None:
     with pytest.raises(ValueError, match="cohort"):
         audit_rainfall_cloud_mapping(cohort, {}, {})
 
 
-def test_inconsistent_observation_key_is_rejected():
+def test_inconsistent_observation_key_is_rejected() -> None:
     other = date(2025, 1, 2)
     clouds = {
         DAY: CloudObservation(other, "100", "C", "complete_numeric", Decimal(100))
@@ -101,7 +101,9 @@ def test_inconsistent_observation_key_is_rejected():
 
 
 @pytest.mark.parametrize("threshold", [Decimal("0"), Decimal("NaN")])
-def test_even_empty_observations_cannot_bypass_invalid_rain_threshold(threshold):
+def test_even_empty_observations_cannot_bypass_invalid_rain_threshold(
+    threshold,
+) -> None:
     with pytest.raises(ValueError, match="threshold"):
         audit_rainfall_cloud_mapping(
             ["2025-01-01"], {}, {}, rain_threshold_mm=threshold

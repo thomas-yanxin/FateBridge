@@ -1,0 +1,804 @@
+{
+  "scope": "Numerical propagation of 24 already selected unchanged 2024 DE440 roots; not independent certification of solar roots or physical sub-microsecond accuracy. Expected civil coordinate uses exact published TT=TAI+32.184s and UTC offset37s, independently evaluated from the frozen rational root. Frozen ERFA DTF2D/UTCTAI/TAITT input comparisons retained. No production inverse creates expected values.",
+  "source_artifact_sha256": "4233748d93077240ab5564c52d55c8beb3c72fc6dc1e129a506145603ea39d8f",
+  "source_urls": [
+    "https://github.com/liberfa/erfa/blob/v2.0.1/src/utctai.c",
+    "https://github.com/liberfa/erfa/blob/v2.0.1/src/taitt.c"
+  ],
+  "tai_minus_utc_seconds": 37,
+  "erfa_version": "2.0.1",
+  "rows": [
+    {
+      "index": 0,
+      "name": "小寒",
+      "root_tt_exact": "1385034422055193587277/562949953421312",
+      "civil_numerator": "116862279322872652698469483",
+      "civil_denominator": "47498902319923200000",
+      "display_utc": "2024-01-05T20:49:22.521403+00:00",
+      "frozen_ERFA_tt_parts": [
+        2460314.5,
+        0.868422516238426
+      ],
+      "frozen_ERFA_minus_exact_input_nanoseconds": 0.009368952305521816,
+      "samples": [
+        {
+          "label": "2024-01-05T20:49:22.521402+00:00",
+          "label_shift_microseconds": -1,
+          "before_root": true,
+          "current_term": "冬至"
+        },
+        {
+          "label": "2024-01-05T20:49:22.521403+00:00",
+          "label_shift_microseconds": 0,
+          "before_root": false,
+          "current_term": "小寒"
+        },
+        {
+          "label": "2024-01-05T20:49:22.521404+00:00",
+          "label_shift_microseconds": 1,
+          "before_root": false,
+          "current_term": "小寒"
+        }
+      ]
+    },
+    {
+      "index": 1,
+      "name": "大寒",
+      "root_tt_exact": "86565169321000017637/35184372088832",
+      "civil_numerator": "7303936159082232348870163",
+      "civil_denominator": "2968681394995200000",
+      "display_utc": "2024-01-20T14:07:20.736059+00:00",
+      "frozen_ERFA_tt_parts": [
+        2460329.5,
+        0.5892351858680556
+      ],
+      "frozen_ERFA_minus_exact_input_nanoseconds": 0.0009469804354012012,
+      "samples": [
+        {
+          "label": "2024-01-20T14:07:20.736058+00:00",
+          "label_shift_microseconds": -1,
+          "before_root": true,
+          "current_term": "小寒"
+        },
+        {
+          "label": "2024-01-20T14:07:20.736059+00:00",
+          "label_shift_microseconds": 0,
+          "before_root": true,
+          "current_term": "小寒"
+        },
+        {
+          "label": "2024-01-20T14:07:20.736060+00:00",
+          "label_shift_microseconds": 1,
+          "before_root": false,
+          "current_term": "大寒"
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "name": "立春",
+      "root_tt_exact": "1385051020380955820183/562949953421312",
+      "civil_numerator": "116863679806608841099913233",
+      "civil_denominator": "47498902319923200000",
+      "display_utc": "2024-02-04T08:27:07.597368+00:00",
+      "frozen_ERFA_tt_parts": [
+        2460344.5,
+        0.352972006574074
+      ],
+      "frozen_ERFA_minus_exact_input_nanoseconds": -0.005072768544778228,
+      "samples": [
+        {
+          "label": "2024-02-04T08:27:07.597367+00:00",
+          "label_shift_microseconds": -1,
+          "before_root": true,
+          "current_term": "大寒"
+        },
+        {
+          "label": "2024-02-04T08:27:07.597368+00:00",
+          "label_shift_microseconds": 0,
+          "before_root": false,
+          "current_term": "立春"
+        },
+        {
+          "label": "2024-02-04T08:27:07.597369+00:00",
+          "label_shift_microseconds": 1,
+          "before_root": false,
+          "current_term": "立春"
+        }
+      ]
+    },
+    {
+      "index": 3,
+      "name": "雨水",
+      "root_tt_exact": "86566210334371720761/35184372088832",
+      "civil_numerator": "7304023994585469799957663",
+      "civil_denominator": "2968681394995200000",
+      "display_utc": "2024-02-19T04:13:10.330364+00:00",
+      "frozen_ERFA_tt_parts": [
+        2460359.5,
+        0.1766147495833333
+      ],
+      "frozen_ERFA_minus_exact_input_nanoseconds": -0.0017012623629852897,
+      "samples": [
+        {
+          "label": "2024-02-19T04:13:10.330363+00:00",
+          "label_shift_microseconds": -1,
+          "before_root": true,
+          "current_term": "立春"
+        },
+        {
+          "label": "2024-02-19T04:13:10.330364+00:00",
+          "label_shift_microseconds": 0,
+          "before_root": false,
+          "current_term": "雨水"
+        },
+        {
+          "label": "2024-02-19T04:13:10.330365+00:00",
+          "label_shift_microseconds": 1,
+          "before_root": false,
+          "current_term": "雨水"
+        }
+      ]
+    },
+    {
+      "index": 4,
+      "name": "惊蛰",
+      "root_tt_exact": "1385067766438680677455/562949953421312",
+      "civil_numerator": "116865092755229375932238233",
+      "civil_denominator": "47498902319923200000",
+      "display_utc": "2024-03-05T02:22:46.165875+00:00",
+      "frozen_ERFA_tt_parts": [
+        2460374.5,
+        0.0999461791087963
+      ],
+      "frozen_ERFA_minus_exact_input_nanoseconds": 0.00044136072574474383,
+      "samples": [
+        {
+          "label": "2024-03-05T02:22:46.165874+00:00",
+          "label_shift_microseconds": -1,
+          "before_root": true,
+          "current_term": "雨水"
+        },
+        {
+          "label": "2024-03-05T02:22:46.165875+00:00",
+          "label_shift_microseconds": 0,
+          "before_root": true,
+          "current_term": "雨水"
+        },
+        {
+          "label": "2024-03-05T02:22:46.165876+00:00",
+          "label_shift_microseconds": 1,
+          "before_root": false,
+          "current_term": "惊蛰"
+        }
+      ]
+    },
+    {
+      "index": 5,
+      "name": "春分",
+      "root_tt_exact": "86567264234112872403/35184372088832",
+      "civil_numerator": "7304112917376129469751413",
+      "civil_denominator": "2968681394995200000",
+      "display_utc": "2024-03-20T03:06:24.153463+00:00",
+      "frozen_ERFA_tt_parts": [
+        2460389.5,
+        0.1302469613773148
+      ],
+      "frozen_ERFA_minus_exact_input_nanoseconds": -0.00018156401893065777,
+      "samples": [
+        {
+          "label": "2024-03-20T03:06:24.153462+00:00",
+          "label_shift_microseconds": -1,
+          "before_root": true,
+          "current_term": "惊蛰"
+        },
+        {
+          "label": "2024-03-20T03:06:24.153463+00:00",
+          "label_shift_microseconds": 0,
+          "before_root": false,
+          "current_term": "春分"
+        },
+        {
+          "label": "2024-03-20T03:06:24.153464+00:00",
+          "label_shift_microseconds": 1,
+          "before_root": false,
+          "current_term": "春分"
+        }
+      ]
+    },
+    {
+      "index": 6,
+      "name": "清明",
+      "root_tt_exact": "1385084764214174375739/562949953421312",
+      "civil_numerator": "116866526942536656724950733",
+      "civil_denominator": "47498902319923200000",
+      "display_utc": "2024-04-04T07:02:17.680519+00:00",
+      "frozen_ERFA_tt_parts": [
+        2460404.5,
+        0.29406093193287036
+      ],
+      "frozen_ERFA_minus_exact_input_nanoseconds": -0.0007304893188120332,
+      "samples": [
+        {
+          "label": "2024-04-04T07:02:17.680518+00:00",
+          "label_shift_microseconds": -1,
+          "before_root": true,
+          "current_term": "春分"
+        },
+        {
+          "label": "2024-04-04T07:02:17.680519+00:00",
+          "label_shift_microseconds": 0,
+          "before_root": true,
+          "current_term": "春分"
+        },
+        {
+          "label": "2024-04-04T07:02:17.680520+00:00",
+          "label_shift_microseconds": 1,
+          "before_root": false,
+          "current_term": "清明"
+        }
+      ]
+    },
+    {
+      "index": 7,
+      "name": "谷雨",
+      "root_tt_exact": "86568335729086687521/35184372088832",
+      "civil_numerator": "7304203324764545120332663",
+      "civil_denominator": "2968681394995200000",
+      "display_utc": "2024-04-19T13:59:45.457948+00:00",
+      "frozen_ERFA_tt_parts": [
+        2460419.5,
+        0.5839657632870371
+      ],
+      "frozen_ERFA_minus_exact_input_nanoseconds": 0.004347818503447343,
+      "samples": [
+        {
+          "label": "2024-04-19T13:59:45.457947+00:00",
+          "label_shift_microseconds": -1,
+          "before_root": true,
+          "current_term": "清明"
+        },
+        {
+          "label": "2024-04-19T13:59:45.457948+00:00",
+          "label_shift_microseconds": 0,
+          "before_root": false,
+          "current_term": "谷雨"
+        },
+        {
+          "label": "2024-04-19T13:59:45.457949+00:00",
+          "label_shift_microseconds": 1,
+          "before_root": false,
+          "current_term": "谷雨"
+        }
+      ]
+    },
+    {
+      "index": 8,
+      "name": "立夏",
+      "root_tt_exact": "1385102054514278639853/562949953421312",
+      "civil_numerator": "116867985811607954009569483",
+      "civil_denominator": "47498902319923200000",
+      "display_utc": "2024-05-05T00:10:05.062370+00:00",
+      "frozen_ERFA_tt_parts": [
+        2460435.5,
+        0.007803777430555554
+      ],
+      "frozen_ERFA_minus_exact_input_nanoseconds": -0.00010504919600862195,
+      "samples": [
+        {
+          "label": "2024-05-05T00:10:05.062369+00:00",
+          "label_shift_microseconds": -1,
+          "before_root": true,
+          "current_term": "谷雨"
+        },
+        {
+          "label": "2024-05-05T00:10:05.062370+00:00",
+          "label_shift_microseconds": 0,
+          "before_root": false,
+          "current_term": "立夏"
+        },
+        {
+          "label": "2024-05-05T00:10:05.062371+00:00",
+          "label_shift_microseconds": 1,
+          "before_root": false,
+          "current_term": "立夏"
+        }
+      ]
+    },
+    {
+      "index": 9,
+      "name": "小满",
+      "root_tt_exact": "86569424972455507309/35184372088832",
+      "civil_numerator": "7304295229673789289945163",
+      "civil_denominator": "2968681394995200000",
+      "display_utc": "2024-05-20T12:59:30.354731+00:00",
+      "frozen_ERFA_tt_parts": [
+        2460450.5,
+        0.5421242908680556
+      ],
+      "frozen_ERFA_minus_exact_input_nanoseconds": 0.002158566530852113,
+      "samples": [
+        {
+          "label": "2024-05-20T12:59:30.354730+00:00",
+          "label_shift_microseconds": -1,
+          "before_root": true,
+          "current_term": "立夏"
+        },
+        {
+          "label": "2024-05-20T12:59:30.354731+00:00",
+          "label_shift_microseconds": 0,
+          "before_root": true,
+          "current_term": "立夏"
+        },
+        {
+          "label": "2024-05-20T12:59:30.354732+00:00",
+          "label_shift_microseconds": 1,
+          "before_root": false,
+          "current_term": "小满"
+        }
+      ]
+    },
+    {
+      "index": 10,
+      "name": "芒种",
+      "root_tt_exact": "1385119599713598390977/562949953421312",
+      "civil_numerator": "116869466187800558010656983",
+      "civil_denominator": "47498902319923200000",
+      "display_utc": "2024-06-05T04:09:53.669978+00:00",
+      "frozen_ERFA_tt_parts": [
+        2460466.5,
+        0.17433858770833333
+      ],
+      "frozen_ERFA_minus_exact_input_nanoseconds": -0.0006557938831974752,
+      "samples": [
+        {
+          "label": "2024-06-05T04:09:53.669977+00:00",
+          "label_shift_microseconds": -1,
+          "before_root": true,
+          "current_term": "小满"
+        },
+        {
+          "label": "2024-06-05T04:09:53.669978+00:00",
+          "label_shift_microseconds": 0,
+          "before_root": false,
+          "current_term": "芒种"
+        },
+        {
+          "label": "2024-06-05T04:09:53.669979+00:00",
+          "label_shift_microseconds": 1,
+          "before_root": false,
+          "current_term": "芒种"
+        }
+      ]
+    },
+    {
+      "index": 11,
+      "name": "夏至",
+      "root_tt_exact": "86570527208203425481/35184372088832",
+      "civil_numerator": "7304388230815019885707663",
+      "civil_denominator": "2968681394995200000",
+      "display_utc": "2024-06-20T20:50:59.801389+00:00",
+      "frozen_ERFA_tt_parts": [
+        2460481.5,
+        0.8695484420023148
+      ],
+      "frozen_ERFA_minus_exact_input_nanoseconds": 0.0028258100428502075,
+      "samples": [
+        {
+          "label": "2024-06-20T20:50:59.801388+00:00",
+          "label_shift_microseconds": -1,
+          "before_root": true,
+          "current_term": "芒种"
+        },
+        {
+          "label": "2024-06-20T20:50:59.801389+00:00",
+          "label_shift_microseconds": 0,
+          "before_root": true,
+          "current_term": "芒种"
+        },
+        {
+          "label": "2024-06-20T20:50:59.801390+00:00",
+          "label_shift_microseconds": 1,
+          "before_root": false,
+          "current_term": "夏至"
+        }
+      ]
+    },
+    {
+      "index": 12,
+      "name": "小暑",
+      "root_tt_exact": "1385137289697397493739/562949953421312",
+      "civil_numerator": "116870958780183607306200733",
+      "civil_denominator": "47498902319923200000",
+      "display_utc": "2024-07-06T14:20:03.398558+00:00",
+      "frozen_ERFA_tt_parts": [
+        2460497.5,
+        0.598062298125
+      ],
+      "frozen_ERFA_minus_exact_input_nanoseconds": 0.0002190672603319399,
+      "samples": [
+        {
+          "label": "2024-07-06T14:20:03.398557+00:00",
+          "label_shift_microseconds": -1,
+          "before_root": true,
+          "current_term": "夏至"
+        },
+        {
+          "label": "2024-07-06T14:20:03.398558+00:00",
+          "label_shift_microseconds": 0,
+          "before_root": false,
+          "current_term": "小暑"
+        },
+        {
+          "label": "2024-07-06T14:20:03.398559+00:00",
+          "label_shift_microseconds": 1,
+          "before_root": false,
+          "current_term": "小暑"
+        }
+      ]
+    },
+    {
+      "index": 13,
+      "name": "大暑",
+      "root_tt_exact": "86571633889432919891/35184372088832",
+      "civil_numerator": "7304481607043758476551413",
+      "civil_denominator": "2968681394995200000",
+      "display_utc": "2024-07-22T07:44:25.731287+00:00",
+      "frozen_ERFA_tt_parts": [
+        2460513.5,
+        0.3233207787847222
+      ],
+      "frozen_ERFA_minus_exact_input_nanoseconds": -0.0013152084648027085,
+      "samples": [
+        {
+          "label": "2024-07-22T07:44:25.731286+00:00",
+          "label_shift_microseconds": -1,
+          "before_root": true,
+          "current_term": "小暑"
+        },
+        {
+          "label": "2024-07-22T07:44:25.731287+00:00",
+          "label_shift_microseconds": 0,
+          "before_root": false,
+          "current_term": "大暑"
+        },
+        {
+          "label": "2024-07-22T07:44:25.731288+00:00",
+          "label_shift_microseconds": 1,
+          "before_root": false,
+          "current_term": "大暑"
+        }
+      ]
+    },
+    {
+      "index": 14,
+      "name": "立秋",
+      "root_tt_exact": "1385154971493186402847/562949953421312",
+      "civil_numerator": "116872450681703296512188233",
+      "civil_denominator": "47498902319923200000",
+      "display_utc": "2024-08-07T00:09:16.454006+00:00",
+      "frozen_ERFA_tt_parts": [
+        2460529.5,
+        0.0072411806249999995
+      ],
+      "frozen_ERFA_minus_exact_input_nanoseconds": -4.2337461536590126e-05,
+      "samples": [
+        {
+          "label": "2024-08-07T00:09:16.454005+00:00",
+          "label_shift_microseconds": -1,
+          "before_root": true,
+          "current_term": "大暑"
+        },
+        {
+          "label": "2024-08-07T00:09:16.454006+00:00",
+          "label_shift_microseconds": 0,
+          "before_root": true,
+          "current_term": "大暑"
+        },
+        {
+          "label": "2024-08-07T00:09:16.454007+00:00",
+          "label_shift_microseconds": 1,
+          "before_root": false,
+          "current_term": "立秋"
+        }
+      ]
+    },
+    {
+      "index": 15,
+      "name": "处暑",
+      "root_tt_exact": "86572735126571147623/35184372088832",
+      "civil_numerator": "7304574523927296441438913",
+      "civil_denominator": "2968681394995200000",
+      "display_utc": "2024-08-22T14:55:02.956344+00:00",
+      "frozen_ERFA_tt_parts": [
+        2460544.5,
+        0.622362735462963
+      ],
+      "frozen_ERFA_minus_exact_input_nanoseconds": -0.0014648039723397233,
+      "samples": [
+        {
+          "label": "2024-08-22T14:55:02.956343+00:00",
+          "label_shift_microseconds": -1,
+          "before_root": true,
+          "current_term": "立秋"
+        },
+        {
+          "label": "2024-08-22T14:55:02.956344+00:00",
+          "label_shift_microseconds": 0,
+          "before_root": false,
+          "current_term": "处暑"
+        },
+        {
+          "label": "2024-08-22T14:55:02.956345+00:00",
+          "label_shift_microseconds": 1,
+          "before_root": false,
+          "current_term": "处暑"
+        }
+      ]
+    },
+    {
+      "index": 16,
+      "name": "白露",
+      "root_tt_exact": "1385172494120906769373/562949953421312",
+      "civil_numerator": "116873929153417202437819483",
+      "civil_denominator": "47498902319923200000",
+      "display_utc": "2024-09-07T03:11:20.835044+00:00",
+      "frozen_ERFA_tt_parts": [
+        2460560.5,
+        0.13368077597222222
+      ],
+      "frozen_ERFA_minus_exact_input_nanoseconds": -9.852692528511398e-05,
+      "samples": [
+        {
+          "label": "2024-09-07T03:11:20.835043+00:00",
+          "label_shift_microseconds": -1,
+          "before_root": true,
+          "current_term": "处暑"
+        },
+        {
+          "label": "2024-09-07T03:11:20.835044+00:00",
+          "label_shift_microseconds": 0,
+          "before_root": false,
+          "current_term": "白露"
+        },
+        {
+          "label": "2024-09-07T03:11:20.835045+00:00",
+          "label_shift_microseconds": 1,
+          "before_root": false,
+          "current_term": "白露"
+        }
+      ]
+    },
+    {
+      "index": 17,
+      "name": "秋分",
+      "root_tt_exact": "86573822631792482053/35184372088832",
+      "civil_numerator": "7304666282180346533970163",
+      "civil_denominator": "2968681394995200000",
+      "display_utc": "2024-09-22T12:43:39.596120+00:00",
+      "frozen_ERFA_tt_parts": [
+        2460575.5,
+        0.5311201402777779
+      ],
+      "frozen_ERFA_minus_exact_input_nanoseconds": 0.00836678736959584,
+      "samples": [
+        {
+          "label": "2024-09-22T12:43:39.596119+00:00",
+          "label_shift_microseconds": -1,
+          "before_root": true,
+          "current_term": "白露"
+        },
+        {
+          "label": "2024-09-22T12:43:39.596120+00:00",
+          "label_shift_microseconds": 0,
+          "before_root": false,
+          "current_term": "秋分"
+        },
+        {
+          "label": "2024-09-22T12:43:39.596121+00:00",
+          "label_shift_microseconds": 1,
+          "before_root": false,
+          "current_term": "秋分"
+        }
+      ]
+    },
+    {
+      "index": 18,
+      "name": "寒露",
+      "root_tt_exact": "1385189753466113175097/562949953421312",
+      "civil_numerator": "116875385410668992920781983",
+      "civil_denominator": "47498902319923200000",
+      "display_utc": "2024-10-07T18:59:57.344887+00:00",
+      "frozen_ERFA_tt_parts": [
+        2460590.5,
+        0.7924366769328703
+      ],
+      "frozen_ERFA_minus_exact_input_nanoseconds": -0.002361559381824918,
+      "samples": [
+        {
+          "label": "2024-10-07T18:59:57.344886+00:00",
+          "label_shift_microseconds": -1,
+          "before_root": true,
+          "current_term": "秋分"
+        },
+        {
+          "label": "2024-10-07T18:59:57.344887+00:00",
+          "label_shift_microseconds": 0,
+          "before_root": true,
+          "current_term": "秋分"
+        },
+        {
+          "label": "2024-10-07T18:59:57.344888+00:00",
+          "label_shift_microseconds": 1,
+          "before_root": false,
+          "current_term": "寒露"
+        }
+      ]
+    },
+    {
+      "index": 19,
+      "name": "霜降",
+      "root_tt_exact": "86574892116497193113/35184372088832",
+      "civil_numerator": "7304756519952306529657663",
+      "civil_denominator": "2968681394995200000",
+      "display_utc": "2024-10-22T22:14:44.412037+00:00",
+      "frozen_ERFA_tt_parts": [
+        2460605.5,
+        0.9277036578356482
+      ],
+      "frozen_ERFA_minus_exact_input_nanoseconds": 0.007257233846758027,
+      "samples": [
+        {
+          "label": "2024-10-22T22:14:44.412036+00:00",
+          "label_shift_microseconds": -1,
+          "before_root": true,
+          "current_term": "寒露"
+        },
+        {
+          "label": "2024-10-22T22:14:44.412037+00:00",
+          "label_shift_microseconds": 0,
+          "before_root": false,
+          "current_term": "霜降"
+        },
+        {
+          "label": "2024-10-22T22:14:44.412038+00:00",
+          "label_shift_microseconds": 1,
+          "before_root": false,
+          "current_term": "霜降"
+        }
+      ]
+    },
+    {
+      "index": 20,
+      "name": "立冬",
+      "root_tt_exact": "1385206720199135677777/562949953421312",
+      "civil_numerator": "116876816978767766584406983",
+      "civil_denominator": "47498902319923200000",
+      "display_utc": "2024-11-06T22:20:04.547011+00:00",
+      "frozen_ERFA_tt_parts": [
+        2460620.5,
+        0.931408923738426
+      ],
+      "frozen_ERFA_minus_exact_input_nanoseconds": 0.00525320865563117,
+      "samples": [
+        {
+          "label": "2024-11-06T22:20:04.547010+00:00",
+          "label_shift_microseconds": -1,
+          "before_root": true,
+          "current_term": "霜降"
+        },
+        {
+          "label": "2024-11-06T22:20:04.547011+00:00",
+          "label_shift_microseconds": 0,
+          "before_root": false,
+          "current_term": "立冬"
+        },
+        {
+          "label": "2024-11-06T22:20:04.547012+00:00",
+          "label_shift_microseconds": 1,
+          "before_root": false,
+          "current_term": "立冬"
+        }
+      ]
+    },
+    {
+      "index": 21,
+      "name": "小雪",
+      "root_tt_exact": "86575944269858702233/35184372088832",
+      "civil_numerator": "7304845295392183861657663",
+      "civil_denominator": "2968681394995200000",
+      "display_utc": "2024-11-21T19:56:29.762949+00:00",
+      "frozen_ERFA_tt_parts": [
+        2460635.5,
+        0.8317007748726851
+      ],
+      "frozen_ERFA_minus_exact_input_nanoseconds": -0.005424953087640461,
+      "samples": [
+        {
+          "label": "2024-11-21T19:56:29.762948+00:00",
+          "label_shift_microseconds": -1,
+          "before_root": true,
+          "current_term": "立冬"
+        },
+        {
+          "label": "2024-11-21T19:56:29.762949+00:00",
+          "label_shift_microseconds": 0,
+          "before_root": false,
+          "current_term": "小雪"
+        },
+        {
+          "label": "2024-11-21T19:56:29.762950+00:00",
+          "label_shift_microseconds": 1,
+          "before_root": false,
+          "current_term": "小雪"
+        }
+      ]
+    },
+    {
+      "index": 22,
+      "name": "大雪",
+      "root_tt_exact": "1385223443318690171419/562949953421312",
+      "civil_numerator": "116878227991980176985450733",
+      "civil_denominator": "47498902319923200000",
+      "display_utc": "2024-12-06T15:17:02.628649+00:00",
+      "frozen_ERFA_tt_parts": [
+        2460650.5,
+        0.637636720474537
+      ],
+      "frozen_ERFA_minus_exact_input_nanoseconds": -0.00225202165893279,
+      "samples": [
+        {
+          "label": "2024-12-06T15:17:02.628648+00:00",
+          "label_shift_microseconds": -1,
+          "before_root": true,
+          "current_term": "小雪"
+        },
+        {
+          "label": "2024-12-06T15:17:02.628649+00:00",
+          "label_shift_microseconds": 0,
+          "before_root": false,
+          "current_term": "大雪"
+        },
+        {
+          "label": "2024-12-06T15:17:02.628650+00:00",
+          "label_shift_microseconds": 1,
+          "before_root": false,
+          "current_term": "大雪"
+        }
+      ]
+    },
+    {
+      "index": 23,
+      "name": "冬至",
+      "root_tt_exact": "86576984263064460393/35184372088832",
+      "civil_numerator": "7304933044818919706407663",
+      "civil_denominator": "2968681394995200000",
+      "display_utc": "2024-12-21T09:20:34.201344+00:00",
+      "frozen_ERFA_tt_parts": [
+        2460665.5,
+        0.3900854785185185
+      ],
+      "frozen_ERFA_minus_exact_input_nanoseconds": -0.002341329491173383,
+      "samples": [
+        {
+          "label": "2024-12-21T09:20:34.201343+00:00",
+          "label_shift_microseconds": -1,
+          "before_root": true,
+          "current_term": "大雪"
+        },
+        {
+          "label": "2024-12-21T09:20:34.201344+00:00",
+          "label_shift_microseconds": 0,
+          "before_root": true,
+          "current_term": "大雪"
+        },
+        {
+          "label": "2024-12-21T09:20:34.201345+00:00",
+          "label_shift_microseconds": 1,
+          "before_root": false,
+          "current_term": "冬至"
+        }
+      ]
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 """Shared explicit source-admission control for Western requests."""
 
-from typing import Any, Literal, TypeGuard
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
@@ -17,12 +17,12 @@ class WesternEphemerisRequest(_DeferredModel):
     def uses_western_ephemeris_policy(self) -> bool:
         return True
 
-
-def uses_western_policy(request: BaseModel) -> TypeGuard[WesternEphemerisRequest]:
-    return (
-        isinstance(request, WesternEphemerisRequest)
-        and request.uses_western_ephemeris_policy()
-    )
+    def service_inputs(self) -> dict[str, Any]:
+        return self.model_dump(
+            exclude=(
+                {"ephemeris_policy"} if self.uses_western_ephemeris_policy() else set()
+            )
+        )
 
 
 def supports_western_policy_model(model: type[BaseModel]) -> bool:
@@ -31,10 +31,4 @@ def supports_western_policy_model(model: type[BaseModel]) -> bool:
     return (
         isinstance(extra, dict)
         and extra.get("x-fatebridge-western-data-policy") is True
-    )
-
-
-def service_inputs(request: BaseModel) -> dict[str, Any]:
-    return request.model_dump(
-        exclude={"ephemeris_policy"} if uses_western_policy(request) else set()
     )

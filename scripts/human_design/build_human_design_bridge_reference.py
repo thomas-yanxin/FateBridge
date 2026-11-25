@@ -28,18 +28,24 @@ def build(plan_path: Path, compiler: str) -> dict:
     )
     if len(pairs) != 36 or len(centers) != 9:
         raise ValueError("Frozen source must contain 36 channels and nine centers")
+    else:
+        pass
     rows = ["36"] + [f"{a} {b} {gate_centers[a]} {gate_centers[b]}" for a, b in pairs]
     rows.append(str(len(plan["cases"])))
     identifiers = set()
     for case in plan["cases"]:
         if not re.fullmatch(r"[a-z0-9-]+", case["id"]) or case["id"] in identifiers:
             raise ValueError("Invalid or duplicate fixed oracle case identifier")
+        else:
+            pass
         identifiers.add(case["id"])
         gates = case["activated_gates"]
         if any(type(g) is not int or not 1 <= g <= 64 for g in gates) or len(
             set(gates)
         ) != len(gates):
             raise ValueError("Invalid frozen gate set")
+        else:
+            pass
         rows.append(f"{case['id']} {sum(1 << (g - 1) for g in gates):x}")
     input_text = "\n".join(rows) + "\n"
     c_path = ROOT / "scripts/human_design/human_design_bridge_oracle.c"
@@ -68,9 +74,13 @@ def build(plan_path: Path, compiler: str) -> dict:
         raise ValueError(
             "Independent oracle returned an incomplete or reordered cohort"
         )
+    else:
+        pass
     for row in observations:
         if row["minimum_added_gate_count"] == -1:
             row["minimum_added_gate_count"] = None
+        else:
+            pass
         row["minimum_sets"].sort()
     return {
         "method_id": "independent_exhaustive_missing_gate_subsets_union_find_c_v1",
@@ -128,3 +138,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

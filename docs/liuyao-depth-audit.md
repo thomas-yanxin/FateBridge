@@ -66,7 +66,7 @@
 
 | 问题 | 当前计算行为 | 对照依据 |
 | --- | --- | --- |
-| 月令强弱不能直接等于全局有效性 | 区分临月建、同气次旺、相、休囚、月破；四土月按月建，未月火余气与丑月水余气另列 | 四时旺相章；影印第59页核实余“金水土”，原始转录仍不改 |
+| 节月季令与余气 | 区分临月建、同气次旺、相、休囚、月破。辰月木、未月火、丑月水分别列余气，戌月金归相 | 四时旺相章影印第 59–60 页。春令余“金水土”的原始转录保留，勘误独立记录 |
 | 只看月旺会漏掉有扶的暗动 | 静爻日冲，分别列月令有扶、明动生扶及全静旺爻生扶条件；冲空另列；其余保留“日破候选需复核生扶” | 第22章寅月己未日坤之师：二爻巳火明动生四爻丑土，丑虽月令休囚，原例仍作暗动 |
 | 明动遇冲、动化合不能忽略条件 | 明动逢冲不自动判散；动逢日月合、动化合将向外作用标为受合条件，日冲开双方时释放相应条件 | 第23章明动、第9章辰月戊申日乾之小畜，午化未合须待丑冲 |
 | 变爻不能跨位生克，也不能被其他原卦爻生克 | 变爻边只指向同位原动爻；其他本卦爻之间的条件边分开列，日月关系仍可作用于变爻 | 第15章子月卯日坤之晋；第14章动静生克 |
@@ -87,7 +87,7 @@
 取用与条件摘要由同次结构化结果生成。`focus.selected` 为空、多现或仅有伏神候选时，不能写成已选定某爻；`effect_status=combination_holds_outgoing_candidate` 不能读成已生扶；`efficacy=not_adjudicated` 不能读成真空、真绝或最终成败。
 
 ```bash
-uv run --locked --extra dev fatebridge sixyao \
+uv run --locked --extra dev fatebridge liuyao \
   --subject-file docs/examples/liuyao-conditional-demo.json \
   --fields input_normalized liuyao_evidence.conditional_analysis \
   --strict-fields true --include-snapshot-text false --response-char-limit 0
@@ -110,6 +110,14 @@ uv run --locked --extra dev fatebridge sixyao \
 影印三合章同时保留“一爻动而合局”“两爻动一爻不动亦成”及“两爻动不成须补”等句。目前明确区分三支齐全与两支缺一；首句未给其余条件，保留 `single_active_text_requires_review`，不擅改影印“一”为“三”。影印为“虚一待用”，另行记录转录的异文。未来新增校勘不能覆盖旧材料或事后改古例期望。
 
 `focus_kind=visible/changed/hidden/month/day` 明确所选来源。只给 `focus_line` 沿用本爻口径；只给六亲时，本爻与实际变爻多现公开候选，不能默认选择最有利的一项。显式变爻取用的角色仍描述原卦诸爻，原同位爻不冒充用神。日月取用没有虚构爻位。伏神及日月应期尚未实现对应规则，输出空窗口及明确状态；变爻逢值与本爻动逢合的规则分开。
+
+<a id="chen-month-residual-qi"></a>
+
+### 辰月木余气与旬空并见条件
+
+文明书局本卷一第 39 页（PDF 第 59 页）在辰月条写「木虽不旺还有余气」。`month_strength` 将辰月寅、卯的余气单列，月令档仍为 `休囚`，`monthly_supported` 为 `false`。卷二第 23–24 页（PDF 第 93–94 页）分别列日生扶、有气不动和季令真空。辛亥日旬空中的辰月木静爻同时命中前两条时，FateBridge 保留两条事实，按现行条件政策交付 `conflicting_or_unresolved_conditions` 和 `is_true_void=null`。永久空仍待裁。 [影印底本与逐条核对](historical-evidence.md#evidence-20261119-round58-liuyao-month-residual-qi-handoff-md)
+
+八个固定请求的两臂各有 24 次公开调用，REST、MCP、CLI 的完整业务在各臂一致，响应 Schema 前后一致。按影印、独立历法与纳支账本核对，144 个余气槽由 117 个相符到全部相符，141 个可裁静气槽由 123 个相符到全部相符。固定分类及可空真空各由 6/18 到 18/18。季令真空标签、未火、丑水、戌金和真实寅化卯对照通过各自原门。总旺衰、应期和古例终空仍有待裁事项。 [固定判据与前后结果](historical-evidence.md#evidence-20261119-round58-liuyao-month-residual-qi-comparison-json)
 
 三合候选保留成员来源、爻位、明暗动、缺支、日月补支和空破墓条件。内外动变只检查指定两爻及它们的实际变支，不任意拼接本变。三合与飞伏的文字摘要由同次结构化证据生成；既不从支持条目数量推吉凶，也不将 `formation_conditions_matched` 读作已经有效生克。
 
@@ -277,7 +285,7 @@ uv run --locked --extra dev python -m pytest -q tests/liuyao/test_liuyao_control
 uv run --locked --extra dev python -m scripts.catalogs.build_zhouyi_corpus --check
 uv run --locked --extra dev python -m scripts.liuyao.build_liuyao_sources --check
 uv run --locked --extra dev python -m pytest -q tests/liuyao/test_liuyao_depth.py tests/liuyao/test_liuyao_conditions.py tests/liuyao/test_liuyao_transports.py
-uv run --locked --extra dev fatebridge sixyao --subject-file docs/examples/liuyao-need-to-song.json --response-char-limit 0
+uv run --locked --extra dev fatebridge liuyao --subject-file docs/examples/liuyao-need-to-song.json --response-char-limit 0
 ```
 
 `--fetch` 才更新经文网络资料；默认构建与运行不联网。64×64 本卦变卦组合与 4⁶ 铜钱组合属于穷举结构校验，不能把 4,096 次循环叫作 4,096 个独立现实样本。
@@ -293,6 +301,12 @@ uv run --locked --extra dev fatebridge sixyao --subject-file docs/examples/liuya
 活动资格与强弱之间新增有限的未决条件收敛：每轮只增加待审位置，最多七次，不以遍历先后决定生克。同日比和扶持又相冲不能凭自身循环取得已确认根气；未决活动不会向三合、伏神、墓或后续生克输出确定作用。该处理防止已知前提未明时继续作确定推论，不声称已解决全局生克与解救。
 
 一条合成入墓标注曾漏审静丑的潜在活动，原“确定入墓”改列待审；输入勘误（本地数据：`../tests/fixtures/liuyao_clash_v10/prior-strength-errata.json`）保留原值与失败事实，不计原标注正确。另用无丑候选的明确合成对照核验可确认的真墓分支；开发案例不称盲测。
+
+<a id="moving-clash-residual-qi"></a>
+
+文明书局影印本第 59–60 页列出辰木、未火、丑水的月令余气，第 85 页将「有气」列为明动遇冲不散的依据。明动爻现从同一盘的月令结果读取余气。余气影响冲散这一项，日月克、回头冲克和静日破继续按各自条件判断。未火和丑水在此次修复前已有月令余气，两个案例均可独立复现冲散层遗漏。 [原页及条文裁定](historical-evidence.md#evidence-20261119-round58-liuyao-clash-source-adjudication-source-adjudication-md)
+
+八个固定请求每版在 REST、MCP 和 CLI 各执行一次，三端业务逐值一致。主焦点有气从 9/21 到 21/21，冲散状态从 15/24 到 24/24。四个负控盘的业务结果逐值相同；原弱动仍有未决状态。固定对照覆盖所选条文的局部条件，完整旺衰、弱动全局裁定及现实效验仍待独立验收。 [固定门槛及前后比较](historical-evidence.md#evidence-20261119-round58-liuyao-clash-source-adjudication-handoff-md)
 
 ## 向外生扶与受生条件
 
@@ -324,7 +338,7 @@ uv run --locked --extra dev fatebridge sixyao --subject-file docs/examples/liuya
 
 ## 现实预测的下一验收条件
 
-使用现有 [预注册评估器](../src/fatebridge/validation/predictions.py)和 [离线评估入口](../scripts/evaluation/audit_prediction_study.py)：先冻结问题定义、起卦输入、规则版本、解释到预测的映射、样本队列、时间窗和朴素基线，再在结果未知时保存预测，待时间窗成熟后独立判定结果。保留弃答、缺失及失败案例；报告覆盖率、样本数、校准、Brier 分数、基线差值与区间。不能事后改用神、反复起卦择优、挑中例、改评价问题，或将六爻规则分数直接转成成功概率。
+使用现有 [预注册评估器](../validation/predictions.py)和 [离线评估入口](../scripts/evaluation/audit_prediction_study.py)：先冻结问题定义、起卦输入、规则版本、解释到预测的映射、样本队列、时间窗和朴素基线，再在结果未知时保存预测，待时间窗成熟后独立判定结果。保留弃答、缺失及失败案例；报告覆盖率、样本数、校准、Brier 分数、基线差值与区间。不能事后改用神、反复起卦择优、挑中例、改评价问题，或将六爻规则分数直接转成成功概率。
 
 目前没有为本规则集登记这样的独立前瞻资料，故现实效力为 `not_established`。即使有限样本全部命中，区间和未观测条件仍须报告；评估器、文本哈希、可复现运行本身均不能授予“最权威预测系统”资格。
 

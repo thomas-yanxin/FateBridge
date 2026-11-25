@@ -8,7 +8,7 @@ seasonal table is a circulating baseline, not a fully verified critical edition.
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 from fatebridge.core.classical_roots import build_classical_root_profile
 from fatebridge.core.classical_seasonal import seasonal_reference_layers
@@ -18,6 +18,7 @@ from fatebridge.core.classical_stages import (
     YANG_BLADE_SEATS,
     twelve_life_stage,
 )
+from fatebridge.core.month_use import build_month_use_resolution
 from fatebridge.utils.data import (
     BRANCH_HIDDEN_STEMS,
     BRANCH_TRIPLE_COMBINATIONS,
@@ -26,7 +27,7 @@ from fatebridge.utils.data import (
     get_shishen,
 )
 
-PillarMap = Dict[str, Tuple[str, str]]
+PillarMap = dict[str, tuple[str, str]]
 
 # --------------------------------------------------------------------------- #
 # 十二长生 (Twelve Life Stages)
@@ -35,7 +36,7 @@ PillarMap = Dict[str, Tuple[str, str]]
 # A deterministic phase lookup; the stage alone does not establish 通根/旺衰.
 
 
-def life_stages_for_pillars(pillars: PillarMap) -> Dict[str, Any]:
+def life_stages_for_pillars(pillars: PillarMap) -> dict[str, Any]:
     """Map the day master's 十二长生 state across all four branches."""
     day_stem = pillars["day"][0]
     labels = {"year": "年支", "month": "月支", "day": "日支", "hour": "时支"}
@@ -68,7 +69,7 @@ def life_stages_for_pillars(pillars: PillarMap) -> Dict[str, Any]:
 # (本气/中气/余气), see which is 透出 on the other stems, and the ten-god of the
 # chosen stem names the 正格. 禄(比肩)/刃(劫财) are handled as the 建禄/月刃 specials.
 
-_TEN_GOD_TO_STRUCTURE: Dict[str, str] = {
+_TEN_GOD_TO_STRUCTURE: dict[str, str] = {
     "正官": "正官格",
     "七杀": "七杀格",
     "正财": "正财格",
@@ -81,12 +82,12 @@ _TEN_GOD_TO_STRUCTURE: Dict[str, str] = {
     "劫财": "月刃格",
 }
 
-_HIDDEN_ROLES: Tuple[str, ...] = ("本气", "中气", "余气")
+_HIDDEN_ROLES: tuple[str, ...] = ("本气", "中气", "余气")
 
 
 def _select_structure_god(
-    candidates: List[Dict[str, Any]], day_stem: str, pillars: PillarMap
-) -> Dict[str, Any]:
+    candidates: list[dict[str, Any]], day_stem: str, pillars: PillarMap
+) -> dict[str, Any]:
     """Pick which month-branch hidden stem defines the 格 (the tunable rule).
 
     Qualify the actual lu/yang-blade seat before choosing a 比劫 god. For
@@ -98,6 +99,8 @@ def _select_structure_god(
     if month_branch == LU_SEATS[day_stem]:
         lu_god = next(c for c in candidates if c["ten_god"] == "比肩")
         return {**lu_god, "is_special": True, "selection_rule": "qualified_lu_seat"}
+    else:
+        pass
     if month_branch == YANG_BLADE_SEATS.get(day_stem):
         blade_god = next(c for c in candidates if c["ten_god"] == "劫财")
         return {
@@ -105,6 +108,8 @@ def _select_structure_god(
             "is_special": True,
             "selection_rule": "qualified_yang_blade_seat",
         }
+    else:
+        pass
 
     transparent = [
         c
@@ -136,6 +141,8 @@ def _select_structure_god(
             "is_special": False,
             "selection_rule": "officer_with_wealth_seal_support",
         }
+    else:
+        pass
     # 杂气透干会支: preserve a revealed candidate supported by an actual
     # full/peak-containing half triad. This does not certify 合化 or 成格.
     meeting_supported = []
@@ -153,6 +160,10 @@ def _select_structure_god(
                 ):
                     meeting_supported.append(candidate)
                     break
+                else:
+                    pass
+    else:
+        pass
     chosen = (
         meeting_supported[0]
         if len(meeting_supported) == 1
@@ -169,7 +180,7 @@ def _select_structure_god(
     }
 
 
-def determine_monthly_structure(pillars: PillarMap, day_stem: str) -> Dict[str, Any]:
+def determine_monthly_structure(pillars: PillarMap, day_stem: str) -> dict[str, Any]:
     """Determine the canonical 月令正格 from the month branch.
 
     Returns the recognised 格 plus the factual derivation basis. Pure data —
@@ -182,7 +193,7 @@ def determine_monthly_structure(pillars: PillarMap, day_stem: str) -> Dict[str, 
     # (the day stem itself is 我, never the 格神).
     transparent_stems = {pillars[p][0] for p in ("year", "month", "hour")}
 
-    candidates: List[Dict[str, Any]] = []
+    candidates: list[dict[str, Any]] = []
     for rank, hidden_stem in enumerate(hidden):
         candidates.append(
             {
@@ -197,7 +208,22 @@ def determine_monthly_structure(pillars: PillarMap, day_stem: str) -> Dict[str, 
     label = _TEN_GOD_TO_STRUCTURE.get(god["ten_god"], f"{god['ten_god']}格")
     if not god["is_special"] and god["ten_god"] in ("比肩", "劫财"):
         label = "比劫待取格"
+    else:
+        pass
 
+    legacy_label = label
+    use_resolution = build_month_use_resolution(
+        pillars, god["stem"], candidates[0]["stem"]
+    )
+    miscellaneous = use_resolution["policy_scope"] == "miscellaneous_qi_source"
+    if miscellaneous:
+        label = "杂气月令取用候选" if use_resolution["witnesses"] else "杂气月令待取用"
+        god = {
+            **god,
+            "reference_scope": "旧单锚历史参考，不代表本次完整取用见证或最终格局。",
+        }
+    else:
+        pass
     transparency = "透干" if god["transparent"] else "未透（本气取格）"
     if god["is_special"]:
         basis = (
@@ -209,8 +235,19 @@ def determine_monthly_structure(pillars: PillarMap, day_stem: str) -> Dict[str, 
             f"对日主{day_stem}为{god['ten_god']}，{transparency}，取{label}。"
         )
 
+    if miscellaneous:
+        observed = (
+            "；".join(w["label"] for w in use_resolution["witnesses"])
+            or "暂无已建模透干/完整会支见证"
+        )
+        basis = f"月令{month_branch}：{observed}；资格并存，不裁成格、合化或全局喜忌。"
+    else:
+        pass
+
     return {
         "method_id": "month_command_qualified_officer_v3",
+        "use_resolution": use_resolution,
+        "legacy_selection_label": legacy_label,
         "month_branch": month_branch,
         "label": label,
         "structure_god": god,
@@ -233,7 +270,7 @@ def determine_monthly_structure(pillars: PillarMap, day_stem: str) -> Dict[str, 
             "locator": "论用神变化 PDF31–32；论正官 PDF65–66",
             "scope": "有限规则形式化；透干会支、兼格、成败救应未完整裁定",
         },
-        "selection_scope": "透干排序与杂气会支是本版本有限选择；并列、原典个案与兼格仍需分开审查，不能据标签认证成格。",
+        "selection_scope": "杂气取用以use_resolution全部见证为准；structure_god和legacy_selection_label只保旧单锚参考。其余月保既有有限方法。见证不认证成格。",
         "basis": basis,
     }
 
@@ -245,7 +282,7 @@ def determine_monthly_structure(pillars: PillarMap, day_stem: str) -> Dict[str, 
 # circulated 调候用神简表. It is school-variant at the margins — treat as the
 # mainstream baseline and validate against a preferred lineage source if needed.
 
-_DIAOHOU_TABLE: Dict[str, Dict[str, Tuple[str, Tuple[str, ...]]]] = {
+_DIAOHOU_TABLE: dict[str, dict[str, tuple[str, tuple[str, ...]]]] = {
     "甲": {
         "寅": ("丙", ("癸",)),
         "卯": ("庚", ("丙", "丁", "戊", "己")),
@@ -390,15 +427,17 @@ _DIAOHOU_TABLE: Dict[str, Dict[str, Tuple[str, Tuple[str, ...]]]] = {
 
 
 def seasonal_climate_god(
-    day_stem: str, month_branch: str, pillars: Optional[PillarMap] = None
-) -> Dict[str, Any]:
+    day_stem: str, month_branch: str, pillars: PillarMap | None = None
+) -> dict[str, Any]:
     """Return table candidates, source layers and optional factual positions."""
-    entry: Optional[Tuple[str, Tuple[str, ...]]] = _DIAOHOU_TABLE.get(day_stem, {}).get(
+    entry: tuple[str, tuple[str, ...]] | None = _DIAOHOU_TABLE.get(day_stem, {}).get(
         month_branch
     )
     if entry is None:
-        lookup: Dict[str, Any] = {"primary": None, "secondary": [], "available": False}
+        lookup: dict[str, Any] = {"primary": None, "secondary": [], "available": False}
         return seasonal_reference_layers(day_stem, month_branch, lookup, pillars)
+    else:
+        pass
     primary, secondary = entry
     return seasonal_reference_layers(
         day_stem,
@@ -413,7 +452,7 @@ def seasonal_climate_god(
 # --------------------------------------------------------------------------- #
 
 
-def build_classical_overview(pillars: PillarMap) -> Dict[str, Any]:
+def build_classical_overview(pillars: PillarMap) -> dict[str, Any]:
     """Bundle the three classical facts for the chart payload + snapshot."""
     day_stem = pillars["day"][0]
     month_branch = pillars["month"][1]
@@ -425,7 +464,7 @@ def build_classical_overview(pillars: PillarMap) -> Dict[str, Any]:
     }
 
 
-def classical_snapshot_lines(overview: Dict[str, Any]) -> List[str]:
+def classical_snapshot_lines(overview: dict[str, Any]) -> list[str]:
     """Render the classical overview into factual snapshot lines."""
     structure = overview["monthly_structure"]
     climate = overview["seasonal_climate"]
@@ -436,10 +475,16 @@ def classical_snapshot_lines(overview: Dict[str, Any]) -> List[str]:
     ]
     original = structure.get("original_structure", {})
     selected = structure.get("structure_god", {})
-    if original.get("ten_god") != selected.get("ten_god"):
+    if structure["use_resolution"][
+        "policy_scope"
+    ] != "miscellaneous_qi_source" and original.get("ten_god") != selected.get(
+        "ten_god"
+    ):
         lines.append(
             f"月令本气为{original.get('ten_god')}，有限规则所选为{selected.get('ten_god')}；变格、兼格及是否仍用本格须另判。"
         )
+    else:
+        pass
 
     if climate["available"]:
         secondary = "、".join(climate["secondary"]) if climate["secondary"] else "无"
@@ -474,5 +519,7 @@ def classical_snapshot_lines(overview: Dict[str, Any]) -> List[str]:
         )
         lines.append(f"原典根类（未判根损）：{categories}")
         lines.append("根类不替代全局旺衰；阴长生参考不补造藏干，冲只列候选。")
+    else:
+        pass
 
     return lines

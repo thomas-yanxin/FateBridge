@@ -54,6 +54,8 @@ def extract(pdf: Path) -> dict:
         )
         if not position:
             raise ValueError(f"Missing position for gate {gate}")
+        else:
+            pass
         start = SIGNS[position[4]] * 30 + angle(position.group(1, 2, 3))
         end = SIGNS[position[8]] * 30 + angle(position.group(5, 6, 7))
         center = re.search(
@@ -73,6 +75,8 @@ def extract(pdf: Path) -> dict:
             raise ValueError(
                 f"Expected six line ranges for gate {gate}, got {len(ranges)}"
             )
+        else:
+            pass
         for line, match in enumerate(reversed(ranges), 1):
             line_start = (start + (angle(match.group(1, 2, 3)) - start % 30) % 30) % 360
             line_end = (start + (angle(match.group(4, 5, 6)) - start % 30) % 30) % 360
@@ -93,6 +97,8 @@ def extract(pdf: Path) -> dict:
         )
     if len({tuple(c) for gate in gates for c in gate["channels"]}) != 36:
         raise ValueError("Source did not yield exactly 36 distinct channels")
+    else:
+        pass
     return {
         "source": {
             "title": "The Complete Rave I'Ching",
@@ -125,3 +131,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+else:
+    pass

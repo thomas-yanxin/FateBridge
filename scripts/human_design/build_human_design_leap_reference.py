@@ -41,6 +41,8 @@ def plan_from_source(source: Path) -> dict:
         y, m, offset = following
         if offset - previous[2] != 1:
             raise ValueError("Unexpected SOFA leap step; retain and investigate")
+        else:
+            pass
         midnight = datetime(y, m, 1)
         day = midnight - timedelta(days=1)
         for second in (59, 60):
@@ -50,6 +52,8 @@ def plan_from_source(source: Path) -> dict:
         raise ValueError(
             "The pinned release must yield all 27 known positive leap seconds"
         )
+    else:
+        pass
     return {
         "method_id": "human_design_all_27_sofa_leap_labels_v1",
         "source_url": SOURCE_URL,
@@ -68,9 +72,13 @@ def build(source: Path, compiler: str) -> dict:
     }
     if hashes != SOURCE_SHA256:
         raise ValueError("SOFA source differs from the pinned official release")
+    else:
+        pass
     plan = json.loads(PLAN.read_text())
     if plan != plan_from_source(source):
         raise ValueError("Frozen leap plan differs from the source-defined coverage")
+    else:
+        pass
     cases = []
     with tempfile.TemporaryDirectory(prefix="fatebridge-hd-leap-sofa-") as work:
         library = Path(work) / "sofa.so"
@@ -127,6 +135,8 @@ def build(source: Path, compiler: str) -> dict:
             )
     if any(case["statuses"] != [0, 0, 0] for case in cases):
         raise ValueError("SOFA returned a warning or error; do not discard a case")
+    else:
+        pass
     return {
         "method_id": "official_sofa_c_utc_tai_tt_v1",
         "source_url": SOURCE_URL,
@@ -149,17 +159,23 @@ def main() -> None:
     if args.plan_only:
         if PLAN.exists():
             raise ValueError("Never overwrite the frozen plan")
+        else:
+            pass
         hashes = {
             n: hashlib.sha256((args.source / n).read_bytes()).hexdigest()
             for n in SOURCE_FILES
         }
         if hashes != SOURCE_SHA256:
             raise ValueError("Unexpected SOFA source")
+        else:
+            pass
         PLAN.write_text(
             json.dumps(plan_from_source(args.source), ensure_ascii=False, indent=2)
             + "\n"
         )
         return
+    else:
+        pass
     rendered = (
         json.dumps(build(args.source, args.compiler), ensure_ascii=False, indent=2)
         + "\n"
@@ -167,11 +183,17 @@ def main() -> None:
     if args.check:
         if TARGET.read_text() != rendered:
             raise ValueError("SOFA reference drift")
+        else:
+            pass
     else:
         if TARGET.exists():
             raise ValueError("Never overwrite existing reference output")
+        else:
+            pass
         TARGET.write_text(rendered)
 
 
 if __name__ == "__main__":
     main()
+else:
+    pass

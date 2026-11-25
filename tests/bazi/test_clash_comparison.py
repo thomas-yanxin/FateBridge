@@ -9,12 +9,12 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from fatebridge.core.bazi_evidence import build_natal_evidence
+from fatebridge.core.bazi.bazi_evidence import build_natal_evidence
 from fatebridge.core.clash_comparison import (
     clash_comparison_snapshot_lines,
 )
+from fatebridge.core.contracts.output_clash_comparison import ClashComparison
 from fatebridge.core.elements import ElementAnalysis
-from fatebridge.core.output_clash_comparison import ClashComparison
 from fatebridge.core.strength import DEFAULT_POLICY, evaluate_strength_policy
 from tests.support.bazi_strength_reference_v3 import (
     assert_current_assessment_arithmetic,
@@ -29,7 +29,9 @@ def model(text):
     return ElementAnalysis.analyze_day_master_strength(pillars(text))["assessment"]
 
 
-def test_tender_wood_counterexample_discloses_physical_proxy_and_current_arithmetic():
+def test_tender_wood_counterexample_discloses_physical_proxy_and_current_arithmetic() -> (
+    None
+):
     a = model("丁丑 壬寅 丙申 壬辰")
     trace = a["clash_comparison"]
     # The old 中和 snapshot used reversed seasonal phases. Audit today's
@@ -57,7 +59,9 @@ def test_tender_wood_counterexample_discloses_physical_proxy_and_current_arithme
         ("甲子 丁丑 辛卯 己酉", {"木": "2", "金": "18/7"}, 2),
     ],
 )
-def test_initial_clash_budgets_are_rounded_once_after_exact_sum(text, expected, checks):
+def test_initial_clash_budgets_are_rounded_once_after_exact_sum(
+    text: str, expected, checks: int
+) -> None:
     # Literal controls from geometric hidden shares: visible stems do not
     # enter this proxy, and all natal positions contribute to each element.
     trace = model(text)["clash_comparison"]
@@ -73,7 +77,7 @@ def test_initial_clash_budgets_are_rounded_once_after_exact_sum(text, expected, 
         assert power["raw_budget"] == float(Fraction(expected[power["element"]]))
 
 
-def test_trace_and_snapshot_reuse_the_same_receipt_and_do_not_recompute():
+def test_trace_and_snapshot_reuse_the_same_receipt_and_do_not_recompute() -> None:
     p = pillars("丁丑 壬寅 丙申 壬辰")
     strength = ElementAnalysis.analyze_day_master_strength(p)
     receipt = strength["assessment"]["clash_comparison"]
@@ -95,7 +99,9 @@ def test_trace_and_snapshot_reuse_the_same_receipt_and_do_not_recompute():
         ("甲辰 戊戌 丙子 辛酉", "storage_movement"),
     ],
 )
-def test_non_power_branches_never_fabricate_a_winning_budget(text, branch):
+def test_non_power_branches_never_fabricate_a_winning_budget(
+    text: str, branch: str
+) -> None:
     a = model(text)
     row = next(
         r for r in a["clash_comparison"]["events"] if r["calculation_branch"] == branch
@@ -104,7 +110,53 @@ def test_non_power_branches_never_fabricate_a_winning_budget(text, branch):
     ClashComparison.model_validate(a["clash_comparison"])
 
 
-def test_no_clash_has_no_comparison_events():
+@pytest.mark.parametrize(
+    "hour,expected_status,expected_source",
+    [
+        (
+            "乙巳",
+            "resolved_by_combination",
+            "ziping_zi_chou_separated_clash_resolution_v1",
+        ),
+        (
+            "癸卯",
+            "resolved_by_combination",
+            "ziping_zi_chou_separated_clash_resolution_v1",
+        ),
+        ("壬寅", "active", "ditian_branch"),
+        ("辛亥", "resolved_by_combination", "ziping_7"),
+    ],
+)
+def test_separated_zi_chou_resolves_only_the_uncompeted_clash(
+    hour: str, expected_status: str, expected_source: str
+) -> None:
+    # 秘本子平真詮 PDF25／印16: year 子, month 午, and day 丑 can resolve that clash.
+    assessment = model(f"甲子 庚午 丁丑 {hour}")
+    trace = assessment["clash_comparison"]
+    event = next(
+        row for row in trace["events"] if row["positions"] == ["year", "month"]
+    )
+    assert event["event_status"] == expected_status
+    assert event["source_ref"] == expected_source
+    if expected_source == "ziping_zi_chou_separated_clash_resolution_v1":
+        assert event["powers"] is None
+        assert event["applied_root_retention"] is None
+        assert [s["pdf_pages"] for s in trace["sources"]] == [[25]]
+        assert not any(r["kind"] in {"六合", "半合"} for r in assessment["relations"])
+    else:
+        pass
+    if hour == "癸卯":
+        assert any(
+            row["kind"] == "刑"
+            and row["status"] == "active"
+            and row["positions"] == ["year", "hour"]
+            for row in assessment["relations"]
+        )
+    else:
+        pass
+
+
+def test_no_clash_has_no_comparison_events() -> None:
     empty = model("甲寅 乙卯 丙辰 丁未")["clash_comparison"]
     assert empty["events"] == []
 
@@ -112,7 +164,7 @@ def test_no_clash_has_no_comparison_events():
 @pytest.mark.parametrize(
     "damage", ["total", "double", "imaginary_root", "position", "branch_mode", "force"]
 )
-def test_contract_rejects_fabricated_calculation_facts(damage):
+def test_contract_rejects_fabricated_calculation_facts(damage: str) -> None:
     trace = copy.deepcopy(model("丁丑 壬寅 丙申 壬辰")["clash_comparison"])
     row = trace["events"][0]
     if damage == "total":
@@ -131,7 +183,9 @@ def test_contract_rejects_fabricated_calculation_facts(damage):
         ClashComparison.model_validate(trace)
 
 
-def test_parameters_not_used_in_the_proxy_do_not_silently_enter_its_explanation():
+def test_parameters_not_used_in_the_proxy_do_not_silently_enter_its_explanation() -> (
+    None
+):
     p = pillars("丁丑 壬寅 丙申 壬辰")
     phases = ElementAnalysis.seasonal_phases(p["month"][1])
     values = []
@@ -146,7 +200,9 @@ def test_parameters_not_used_in_the_proxy_do_not_silently_enter_its_explanation(
     assert values[0] == values[1]
 
 
-def test_all_retained_inputs_have_valid_clash_trace_and_current_exact_arithmetic():
+def test_all_retained_inputs_have_valid_clash_trace_and_current_exact_arithmetic() -> (
+    None
+):
     cases = json.loads(
         (Path(__file__).parents[1] / "data/bazi/clash-inputs.json").read_text()
     )

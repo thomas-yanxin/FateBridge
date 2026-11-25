@@ -5,29 +5,28 @@ from copy import deepcopy
 from fractions import Fraction
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Dict, List, Tuple, cast
+from typing import Any, Dict, cast
 
+from fatebridge.core.fengshui.calendar import lichun_resolution, year_context
+from fatebridge.core.fengshui.city_gate import analyze_city_gate
+from fatebridge.core.fengshui.directions import rule_data, wrap9
+from fatebridge.core.fengshui.integrity import validate_natal_chart
+from fatebridge.core.fengshui.models import HousePeriod, XuankongRequest
+from fatebridge.core.fengshui.source_comparison import compare_natal_sources
+from fatebridge.core.fengshui.structure import natal_structure
+from fatebridge.core.fengshui.structure_integrity import validate_natal_structure
 from fatebridge.utils.timezones import parse_timezone_name
-
-from .calendar import lichun_resolution, year_context
-from .city_gate import analyze_city_gate
-from .directions import rule_data, wrap9
-from .integrity import validate_natal_chart
-from .models import HousePeriod, XuankongRequest
-from .source_comparison import compare_natal_sources
-from .structure import natal_structure
-from .structure_integrity import validate_natal_structure
 
 
 @lru_cache(maxsize=1)
-def _bundle() -> Dict[str, Any]:
+def _bundle() -> dict[str, Any]:
     path = Path(__file__).parents[2] / "data" / "fengshui" / "xuankong-v1.json"
     bundle = cast(Dict[str, Any], json.loads(path.read_text(encoding="utf-8")))
     validate_replacement_catalog(bundle)
     return bundle
 
 
-def validate_replacement_catalog(bundle: Dict[str, Any]) -> None:
+def validate_replacement_catalog(bundle: dict[str, Any]) -> None:
     """Missing data must not masquerade as one of eleven legitimate same-star rows."""
     mountains = bundle["mountains"]
     catalog = bundle.get("replacement_catalog", {})
@@ -37,6 +36,8 @@ def validate_replacement_catalog(bundle: Dict[str, Any]) -> None:
         or set(catalog) != {m["name"] for m in mountains}
     ):
         raise ValueError("替星表须完整登记二十四山，缺项不能默认保留原星")
+    else:
+        pass
     changed = {}
     for mountain in mountains:
         name = mountain["name"]
@@ -52,21 +53,27 @@ def validate_replacement_catalog(bundle: Dict[str, Any]) -> None:
             or entry["changes_number"] != (star != original)
         ):
             raise ValueError(f"替星表{name}原星、替星或改数状态不完整或冲突")
+        else:
+            pass
         if star != original:
             changed[name] = star
+        else:
+            pass
     if (
         len(changed) != 13
         or any(type(n) is not int for n in bundle["replacement_stars"].values())
         or changed != bundle["replacement_stars"]
     ):
         raise ValueError("完整替星表须与十三改数山位及十一同数山位一致")
+    else:
+        pass
 
 
-def natal_rules() -> Dict[str, Any]:
+def natal_rules() -> dict[str, Any]:
     return deepcopy(_bundle())
 
 
-def natal_provenance() -> Dict[str, Any]:
+def natal_provenance() -> dict[str, Any]:
     bundle = natal_rules()
     selected = bundle["ruleset"]
     selected["sources"] = [
@@ -76,7 +83,7 @@ def natal_provenance() -> Dict[str, Any]:
     return cast(Dict[str, Any], selected)
 
 
-def _period_interval(index: int, timezone_name: str) -> Dict[str, Any]:
+def _period_interval(index: int, timezone_name: str) -> dict[str, Any]:
     start = 1864 + index * 20
     first = lichun_resolution(start, timezone_name)
     last = lichun_resolution(start + 20, timezone_name)
@@ -94,8 +101,8 @@ def _period_interval(index: int, timezone_name: str) -> Dict[str, Any]:
     }
 
 
-def period_context(period: HousePeriod) -> Dict[str, Any]:
-    result: Dict[str, Any] = {
+def period_context(period: HousePeriod) -> dict[str, Any]:
+    result: dict[str, Any] = {
         "basis": period.basis,
         "evidence": period.evidence,
         "qualifies_for_period_reset": period.qualifies_for_period_reset,
@@ -113,6 +120,8 @@ def period_context(period: HousePeriod) -> Dict[str, Any]:
             "valid_from": None,
             "valid_until": None,
         }
+    else:
+        pass
     time = year_context(
         period.effective_event_year, period.event_at, period.timezone_name
     )
@@ -132,12 +141,16 @@ def period_context(period: HousePeriod) -> Dict[str, Any]:
             "provisional_effective_event_year": time["provisional_effective_year"],
             "candidate_period_numbers": [index % 9 + 1 for index in indices],
         }
+    else:
+        pass
     event_boundary = None
     if period.event_at is not None:
         local_year = period.event_at.astimezone(
             parse_timezone_name(period.timezone_name)
         ).year
         event_boundary = lichun_resolution(local_year, period.timezone_name)
+    else:
+        pass
     if len(indices) > 1:
         reason = time.get("boundary_resolution", {}).get("uncertainty_reason", "")
         if reason.startswith("moshier"):
@@ -185,12 +198,18 @@ def period_context(period: HousePeriod) -> Dict[str, Any]:
             "valid_from": None,
             "valid_until": None,
         }
+    else:
+        pass
     window = _period_interval(indices[0], period.timezone_name)
     timing = window["timing"]
     if event_boundary is not None:
         timing["event_year_boundary"] = event_boundary
+    else:
+        pass
     if year_uncertain:
         event_fields["resolution_scope"] = "period_number_only_event_year_unconfirmed"
+    else:
+        pass
     return {
         **result,
         "number": window["number"],
@@ -209,32 +228,36 @@ def period_context(period: HousePeriod) -> Dict[str, Any]:
     }
 
 
-def _fly(center: int, yang: bool = True) -> Dict[str, int]:
+def _fly(center: int, yang: bool = True) -> dict[str, int]:
     return {
         d: wrap9(center + i * (1 if yang else -1))
         for i, d in enumerate(rule_data("flight_path"))
     }
 
 
-def _selector(angle: float) -> Tuple[int, str, str]:
+def _selector(angle: float) -> tuple[int, str, str]:
     mountains = _bundle()["mountains"]
     index = int(((angle + 7.5) % 360) // 15)
     mountain = mountains[index]
     offset = (angle - mountain["center_degrees"] + 180) % 360 - 180
     if abs(offset) < _bundle()["central_half_width_degrees"]:
         return index, "lower", "central_nine_degrees"
+    else:
+        pass
     neighbour = mountains[(index + (1 if offset > 0 else -1)) % 24]
     if (
         mountain["direction"] == neighbour["direction"]
         and mountain["polarity"] == neighbour["polarity"]
     ):
         return index, "lower", "same_palace_same_polarity_no_replacement"
+    else:
+        pass
     return index, "replacement", "cross_palace_or_different_polarity"
 
 
 def _selector_regions(
     angle: float, uncertainty: float
-) -> List[Tuple[Tuple[int, str, str], Dict[str, Any]]]:
+) -> list[tuple[tuple[int, str, str], dict[str, Any]]]:
     """Partition the *whole* interval; sampling endpoints alone misses small cells.
 
     At an exact dividing line include both one-sided limits. This is an explicit
@@ -273,19 +296,21 @@ def _selector_regions(
                         },
                     )
                 )
+            else:
+                pass
     return regions
 
 
-def _selectors(angle: float, uncertainty: float) -> List[Tuple[int, str, str]]:
-    found: Dict[Tuple[int, str], Tuple[int, str, str]] = {}
+def _selectors(angle: float, uncertainty: float) -> list[tuple[int, str, str]]:
+    found: dict[tuple[int, str], tuple[int, str, str]] = {}
     for selector, _ in _selector_regions(angle, uncertainty):
         found.setdefault(selector[:2], selector)
     return list(found.values())
 
 
 def _star_trace(
-    seed: int, physical: Dict[str, Any], period: int, mode: str
-) -> Dict[str, Any]:
+    seed: int, physical: dict[str, Any], period: int, mode: str
+) -> dict[str, Any]:
     rules = _bundle()
     home_star = period if seed == 5 else seed
     # In period 5 the forward base is the native Luo Shu chart: five is only
@@ -298,6 +323,8 @@ def _star_trace(
     replacement = rules["replacement_catalog"][mapped]["replacement_star_number"]
     if mode == "replacement" and seed != 5:
         center = replacement
+    else:
+        pass
     decision = (
         "lower_chart_not_using_replacement"
         if mode != "replacement"
@@ -338,7 +365,7 @@ def _star_trace(
     }
 
 
-def _chart(period: int, selector: Tuple[int, str, str]) -> Dict[str, Any]:
+def _chart(period: int, selector: tuple[int, str, str]) -> dict[str, Any]:
     index, mode, reason = selector
     mountains = _bundle()["mountains"]
     facing, sitting = mountains[index], mountains[(index + 12) % 24]
@@ -361,7 +388,7 @@ def _chart(period: int, selector: Tuple[int, str, str]) -> Dict[str, Any]:
         }
         for d in base
     }
-    chart: Dict[str, Any] = {
+    chart: dict[str, Any] = {
         "candidate_id": f"{period}:{sitting['name']}-{facing['name']}:{mode}",
         "period_number": period,
         "facing": deepcopy(facing),
@@ -383,17 +410,23 @@ def _chart(period: int, selector: Tuple[int, str, str]) -> Dict[str, Any]:
     return chart
 
 
-def xuankong_natal(req: XuankongRequest) -> Dict[str, Any]:
+def xuankong_natal(req: XuankongRequest) -> dict[str, Any]:
     house = req.house
     missing = []
     if house is None or house.facing_degrees is None:
         missing.append("xuankong_natal.house.facing_degrees_magnetic")
+    else:
+        pass
     if req.period is None:
         missing.append("xuankong_natal.period")
+    else:
+        pass
     period = period_context(req.period) if req.period is not None else None
     if period is not None and period["resolution_status"] != "resolved":
         missing.append("xuankong_natal.period.effective_year_or_period_confirmation")
-    result: Dict[str, Any] = {
+    else:
+        pass
+    result: dict[str, Any] = {
         "status": "partial",
         "subject_id": house.object_id if house is not None else "house",
         "period_context": period,
@@ -417,7 +450,7 @@ def xuankong_natal(req: XuankongRequest) -> Dict[str, Any]:
         "mountain_registry": natal_rules()["mountains"],
     }
     if req.city_gate is not None:
-        orientations: Dict[int, Dict[str, Any]] = {}
+        orientations: dict[int, dict[str, Any]] = {}
         if house is not None and house.facing_degrees is not None:
             mountains = _bundle()["mountains"]
             for selector, region in _selector_regions(
@@ -431,6 +464,8 @@ def xuankong_natal(req: XuankongRequest) -> Dict[str, Any]:
                     != house.sitting_trigram
                 ):
                     continue
+                else:
+                    pass
                 if index not in orientations:
                     orientations[index] = {
                         "orientation_candidate_id": "city-gate-facing:"
@@ -440,17 +475,27 @@ def xuankong_natal(req: XuankongRequest) -> Dict[str, Any]:
                         "bearing_regions": [],
                         "natal_modes_not_used": [],
                     }
+                else:
+                    pass
                 orientations[index]["bearing_regions"].append(region)
                 if mode not in orientations[index]["natal_modes_not_used"]:
                     orientations[index]["natal_modes_not_used"].append(mode)
+                else:
+                    pass
+        else:
+            pass
         result["city_gate_analysis"] = analyze_city_gate(
             req.city_gate, list(orientations.values()), _bundle()
         )
+    else:
+        pass
     if missing:
         result["source_comparison"] = compare_natal_sources([])
         return result
+    else:
+        pass
     assert house is not None and house.facing_degrees is not None and period is not None
-    supported: Dict[Tuple[int, str], Dict[str, Any]] = {}
+    supported: dict[tuple[int, str], dict[str, Any]] = {}
     for selector, region in _selector_regions(
         house.facing_degrees % 360, req.effective_bearing_uncertainty
     ):
@@ -477,15 +522,21 @@ def xuankong_natal(req: XuankongRequest) -> Dict[str, Any]:
                 "scope": "angle_support_only_not_probability_or_measurement_certification",
             }
             supported[key] = chart
+        else:
+            pass
         support = supported[key]["bearing_support"]
         support["regions"].append(region)
         if selector[2] not in support["mode_reasons"]:
             support["mode_reasons"].append(selector[2])
+        else:
+            pass
     candidates = list(supported.values())
     for chart in candidates:
         reasons = chart["bearing_support"]["mode_reasons"]
         if len(reasons) > 1:
             chart["mode_reason"] = "multiple_supported_angle_regions"
+        else:
+            pass
     if house.sitting_trigram is not None:
         directions = rule_data("directions")
         candidates = [
@@ -493,6 +544,8 @@ def xuankong_natal(req: XuankongRequest) -> Dict[str, Any]:
             for c in candidates
             if directions[c["sitting"]["direction"]]["trigram"] == house.sitting_trigram
         ]
+    else:
+        pass
     result["candidates"] = candidates
     result["source_comparison"] = compare_natal_sources(candidates)
     if len(candidates) == 1:

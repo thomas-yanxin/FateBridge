@@ -23,16 +23,24 @@ def sha(path: Path) -> str:
 def reference(folder: Path = CORPUS) -> dict[str, Any]:
     if sha(folder / "freeze.json") != PIN:
         raise ValueError("Frozen Siku scan identity changed")
+    else:
+        pass
     files = json.loads((folder / "freeze.json").read_text())["files"]
     if {p.name for p in folder.iterdir()} != set(files) | {"freeze.json"}:
         raise ValueError("Frozen Siku scan inventory changed")
+    else:
+        pass
     for name, digest in files.items():
         if sha(folder / name) != digest:
             raise ValueError("Frozen Siku scan content changed: " + name)
+        else:
+            pass
     from tests.support.ren_source_arithmetic import daquan_cross_scan
 
     if daquan_cross_scan(folder) != json.loads((folder / "reference.json").read_text()):
         raise ValueError("Independent source arithmetic differs")
+    else:
+        pass
     return {
         key: json.loads((folder / (key + ".json")).read_text())
         for key in ("readings", "examples", "reference", "witness", "protocol")
@@ -59,6 +67,8 @@ def audit() -> dict[str, Any]:
     placements = placement_reference()
     if OLD_PIN != review["protocol"]["old_reference_pin"]:
         raise ValueError("Original cross-harmony reference identity differs")
+    else:
+        pass
     from fatebridge.core.metaphysics.liureng_cross_harmony import cross_harmony
     from fatebridge.core.metaphysics.liureng_day_placements import (
         day_placement_patterns,
@@ -86,6 +96,8 @@ def audit() -> dict[str, Any]:
     ):
         if item["id"] != expected["id"]:
             raise ValueError("Printed mention and coordinate identities differ")
+        else:
+            pass
         if expected["input_status"] == "not_assessed_incomplete_context":
             illustrations.append(
                 dict(
@@ -97,6 +109,8 @@ def audit() -> dict[str, Any]:
                 )
             )
             continue
+        else:
+            pass
         actual = cross_harmony(expected["day_ganzhi"], expected["sky_by_earth"])
         selected = {k: actual[k] for k in ("stem_upper", "branch_upper", "matched")}
         agrees = selected == dict(
@@ -123,6 +137,8 @@ def audit() -> dict[str, Any]:
             sky,
         ):
             raise ValueError("Original day-placement and cross cohorts differ")
+        else:
+            pass
         actual = cross_harmony(day, sky)
         expected_old = expected_facts(row)
         placement = day_placement_patterns(day, sky)
@@ -144,6 +160,8 @@ def audit() -> dict[str, Any]:
     after = {str(p.relative_to(ROOT)): sha(p) for p in watched}
     if before != after:
         raise ValueError("Production source changed during Siku review")
+    else:
+        pass
     failures = [
         dict(kind="passage", **r) for r in passages if not r["selected_passage_agrees"]
     ]

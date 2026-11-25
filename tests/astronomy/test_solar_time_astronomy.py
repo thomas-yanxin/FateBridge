@@ -25,7 +25,7 @@ REFERENCE = json.loads((ROOT / "reference.json").read_text(encoding="utf-8"))
 CASES = REFERENCE["cases"]
 
 
-def test_expected_values_are_the_original_noaa_cache_not_engine_output():
+def test_expected_values_are_the_original_noaa_cache_not_engine_output() -> None:
     raw = (ROOT / REFERENCE["source_file"]).read_bytes()
     assert hashlib.sha256(raw).hexdigest() == REFERENCE["source_sha256"]
     assert len(CASES) == 366
@@ -43,10 +43,14 @@ def test_expected_values_are_the_original_noaa_cache_not_engine_output():
                 f"{{{table}}}covered-table-cell",
             ):
                 continue
+            else:
+                pass
             repeat = int(cell.get(f"{{{table}}}number-columns-repeated", "1"))
             cells.extend([cell] * min(repeat, 40 - len(cells)))
             if len(cells) == 40:
                 break
+            else:
+                pass
         assert (
             float(cells[21].get(f"{{{office}}}value"))
             == case["equation_of_time_minutes"]
@@ -60,7 +64,7 @@ def test_expected_values_are_the_original_noaa_cache_not_engine_output():
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda row: row["at_utc"][:10])
-def test_equation_of_time_agrees_with_all_published_cached_rows(case):
+def test_equation_of_time_agrees_with_all_published_cached_rows(case) -> None:
     actual = calculate_equation_of_time_minutes(datetime.fromisoformat(case["at_utc"]))
     assert (
         abs(actual - case["equation_of_time_minutes"]) * 60
@@ -68,7 +72,7 @@ def test_equation_of_time_agrees_with_all_published_cached_rows(case):
     )
 
 
-def test_one_physical_instant_has_one_eot_across_date_line_and_dst_offsets():
+def test_one_physical_instant_has_one_eot_across_date_line_and_dst_offsets() -> None:
     utc = datetime(2024, 2, 29, 23, 30, tzinfo=timezone.utc)
     expected = calculate_equation_of_time_minutes(utc)
     for offset in [-12, -5, 0, 8, 14]:
@@ -82,7 +86,9 @@ def test_one_physical_instant_has_one_eot_across_date_line_and_dst_offsets():
         )
 
 
-def test_apparent_correction_rejects_ambiguous_instants_or_missing_engine(monkeypatch):
+def test_apparent_correction_rejects_ambiguous_instants_or_missing_engine(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     with pytest.raises(ValueError, match="时区"):
         calculate_equation_of_time_minutes(datetime(2024, 1, 1))
     monkeypatch.setattr(ephemeris_runtime, "swe", None)
@@ -98,7 +104,7 @@ def test_apparent_correction_rejects_ambiguous_instants_or_missing_engine(monkey
     assert result["total_correction_minutes"] == 60
 
 
-def test_corrected_hour_boundary_and_method_are_not_hidden():
+def test_corrected_hour_boundary_and_method_are_not_hidden() -> None:
     person = create_person_info(
         2024,
         12,

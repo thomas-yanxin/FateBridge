@@ -6,6 +6,8 @@ from pathlib import Path
 
 import pytest
 
+from fatebridge.application.examples import suggested_fields
+from fatebridge.core.meihua.meihua_wealth import wealth_component_ruleset
 from fatebridge.services.meihua import calculate_meihua_cast
 from tests.support.transports import SPECS, business, rest, surface_calls
 
@@ -23,7 +25,7 @@ def at_path(out, path):
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
-def test_hand_geometry_and_all_four_wealth_components(case):
+def test_hand_geometry_and_all_four_wealth_components(case) -> None:
     out = calculate_meihua_cast(casting=case["casting"], interpretation_topic="wealth")
     cast = out["meihua"]
     assert cast["base_hexagram"]["binary_code"] == case["base_code"]
@@ -59,12 +61,7 @@ def test_hand_geometry_and_all_four_wealth_components(case):
         )
         assert group["junction_semantics"] == "not_adjudicated"
         assert group["full_clause_applies"] is None
-    assert (
-        reading["event_time"]
-        is reading["real_financial_change"]
-        is reading["success_probability"]
-        is None
-    )
+    assert reading["event_time"] is reading["real_financial_change"] is None
     assert reading["independent_observations"] == 0
     assert (
         reading["source_groups"]["gain"]["quote"]
@@ -76,19 +73,23 @@ def test_hand_geometry_and_all_four_wealth_components(case):
     )
 
 
-def test_original_fixture_bytes_and_hand_scope_are_locked():
+def test_original_fixture_bytes_and_hand_scope_are_locked() -> None:
     manifest = json.loads((FIXTURE / "manifest.json").read_text())
     assert manifest["expected_values_generated_by_production"] is False
     assert manifest["new_implementation_not_yet_present"] is True
     for name, digest in manifest["files"].items():
         if str(name).endswith((".py", ".py.txt")):
             continue
+        else:
+            pass
         assert hashlib.sha256((FIXTURE / name).read_bytes()).hexdigest() == digest
 
 
 @pytest.mark.parametrize("basis", ["raw_counts", "trigram_numbers"])
 @pytest.mark.parametrize("index", [7, 9])
-def test_every_count_candidate_uses_own_body_and_component_paths(basis, index):
+def test_every_count_candidate_uses_own_body_and_component_paths(
+    basis: str, index: int
+) -> None:
     casting = {**CASES[index]["casting"], "line_sum_basis": basis}
     out = calculate_meihua_cast(
         casting=casting, interpretation_topic="wealth", season_month_branch="午"
@@ -125,12 +126,12 @@ def test_every_count_candidate_uses_own_body_and_component_paths(basis, index):
 @pytest.mark.parametrize(
     "topic", ["general", "weather", "planning", "reputation", "transaction"]
 )
-def test_other_topics_never_borrow_wealth_components(topic):
+def test_other_topics_never_borrow_wealth_components(topic: str) -> None:
     out = calculate_meihua_cast(casting=CASES[0]["casting"], interpretation_topic=topic)
     assert out["interpretation"]["wealth_components"] is None
 
 
-def test_mixed_incoming_and_leaking_relations_are_visible_in_summary():
+def test_mixed_incoming_and_leaking_relations_are_visible_in_summary() -> None:
     out = calculate_meihua_cast(
         casting=CASES[0]["casting"], interpretation_topic="wealth"
     )
@@ -145,8 +146,7 @@ def test_mixed_incoming_and_leaking_relations_are_visible_in_summary():
 
 
 @pytest.mark.parametrize("tool", ["meihua_cast", "meihua_analysis"])
-def test_wealth_field_card_agrees_on_rest_mcp_cli(tool, surface_calls):
-    from fatebridge.application.examples import suggested_fields
+def test_wealth_field_card_agrees_on_rest_mcp_cli(tool: str, surface_calls) -> None:
 
     spec = SPECS[tool]
     payload = (
@@ -182,7 +182,7 @@ def test_wealth_field_card_agrees_on_rest_mcp_cli(tool, surface_calls):
     )
 
 
-def test_qualification_does_not_erase_relation_or_turn_into_money():
+def test_qualification_does_not_erase_relation_or_turn_into_money() -> None:
     out = calculate_meihua_cast(
         casting=CASES[0]["casting"],
         interpretation_topic="wealth",
@@ -204,7 +204,7 @@ def test_qualification_does_not_erase_relation_or_turn_into_money():
         )
 
 
-def test_partial_and_absent_source_components_never_become_whole_clause_match():
+def test_partial_and_absent_source_components_never_become_whole_clause_match() -> None:
     partial = calculate_meihua_cast(
         casting=CASES[2]["casting"], interpretation_topic="wealth"
     )["interpretation"]["wealth_components"]
@@ -220,8 +220,7 @@ def test_partial_and_absent_source_components_never_become_whole_clause_match():
     assert all(g["full_clause_applies"] is None for g in none["source_groups"].values())
 
 
-def test_cached_profile_and_role_evidence_are_isolated_from_returned_mutation():
-    from fatebridge.core.meihua_wealth import wealth_component_ruleset
+def test_cached_profile_and_role_evidence_are_isolated_from_returned_mutation() -> None:
 
     profile = wealth_component_ruleset()
     profile["rules"][0]["named_relations"].clear()

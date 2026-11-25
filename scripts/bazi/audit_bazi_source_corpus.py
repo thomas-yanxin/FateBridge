@@ -23,6 +23,8 @@ def compare_direction(
     ]
     if len(events) != 1:
         return {"status": "not_comparable", "matches": None}
+    else:
+        pass
     event = events[0]
     values = event.get("root_multipliers")
     if not values or set(values) != pair:
@@ -31,6 +33,8 @@ def compare_direction(
             "event_status": event["status"],
             "matches": None,
         }
+    else:
+        pass
     tied = len(set(values.values())) == 1
     weaker = None if tied else min(values, key=values.__getitem__)
     return {
@@ -55,6 +59,8 @@ def compare_application(
         "resolved_by_combination",
     }:
         return {"matches": None, "status": "not_comparable"}
+    else:
+        pass
     event = events[0]
     applied = event["status"] == "active"
     return {
@@ -82,6 +88,8 @@ def audit() -> dict[str, Any]:
         result = calculate_bazi_source_compare(*record["pillars"])
         if "error" in result:
             raise ValueError(result["error"])
+        else:
+            pass
         current = result["current_calculation"]
         expected = record["retained_strength_annotation"]
         adjudication = current["classical_adjudication"]
@@ -117,6 +125,8 @@ def audit() -> dict[str, Any]:
                     "actual_strength": row["actual_strength"],
                 }
             )
+        else:
+            pass
     claims = []
     for source_claim in data["local_comparison_claims"]:
         annotation = source_claim["annotation"]
@@ -197,6 +207,8 @@ def main() -> int:
     result = audit()
     if args.output:
         args.output.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n")
+    else:
+        pass
     print(
         json.dumps(
             {
@@ -214,3 +226,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

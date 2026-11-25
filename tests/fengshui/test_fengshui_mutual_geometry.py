@@ -20,13 +20,13 @@ from fatebridge.core.fengshui.timeliness import classify_timeliness
 from fatebridge.services import fengshui as service
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.errors import FengshuiCalculationError
-from fatebridge.validation.fengshui_mutual_geometry import (
+from tests.support.fengshui_transports import SPECS, mcp_call
+from tests.support.transports import rest_client
+from validation.fengshui_mutual_geometry import (
     audit_mutual_geometry_reference,
     load_mutual_geometry_reference,
 )
-from fatebridge.validation.fengshui_reading import verify_fengshui_reading
-from tests.support.fengshui_transports import mcp_call
-from tests.support.transports import rest_client
+from validation.fengshui_reading import verify_fengshui_reading
 
 SOURCE = Path(__file__).parents[1] / "data/fengshui_mutual_geometry_v1"
 
@@ -38,6 +38,8 @@ def inputs(current=7, angle=180):
             current_period_number=current,
             period_evidence="Synthetic explicit evaluation",
         )
+    else:
+        pass
     return {
         "house": {"facing_degrees": angle, "north_reference": "magnetic"},
         "period": {
@@ -54,7 +56,9 @@ def executed(value):
     return execute_tool(spec, spec.request_model.model_validate(value))
 
 
-def test_all_printed_positions_and_directed_overlaps_conform_without_five_credit():
+def test_all_printed_positions_and_directed_overlaps_conform_without_five_credit() -> (
+    None
+):
     result = audit_mutual_geometry_reference(load_mutual_geometry_reference(SOURCE))
     assert result["scoped_geometry_acceptance_passed"] is True
     assert (result["source_position_count"], result["ordered_overlap_paths"]) == (
@@ -67,7 +71,7 @@ def test_all_printed_positions_and_directed_overlaps_conform_without_five_credit
     assert result["real_world_prediction_established"] is False
 
 
-def test_seven_example_keeps_the_two_opposite_directional_lookups_separate():
+def test_seven_example_keeps_the_two_opposite_directional_lookups_separate() -> None:
     geo = classify_timeliness(4, 7)["mutual_use_reference"]["geometry"]
     assert [
         (
@@ -87,14 +91,16 @@ def test_seven_example_keeps_the_two_opposite_directional_lookups_separate():
 
 
 @pytest.mark.parametrize("current", [None, 5])
-def test_unknown_and_five_do_not_invent_a_trigram_or_diagram_proof(current):
+def test_unknown_and_five_do_not_invent_a_trigram_or_diagram_proof(
+    current: int | None,
+) -> None:
     geo = classify_timeliness(2, current)["mutual_use_reference"]["geometry"]
     assert geo["paths"] == geo["diagram_derived_numbers"] == []
     assert geo["diagram_members_match_table"] is None
     assert geo["printed_period_numbers"] == ([] if current is None else [5, 2, 8])
 
 
-def test_phase_and_membership_error_rejection_covers_every_star_and_period():
+def test_phase_and_membership_error_rejection_covers_every_star_and_period() -> None:
     for current in range(1, 10):
         for number in range(1, 10):
             actual = classify_timeliness(number, current)
@@ -124,7 +130,7 @@ def test_phase_and_membership_error_rejection_covers_every_star_and_period():
         "site_permission",
     ],
 )
-def test_semantically_wrong_trace_cannot_pass_with_correct_members(fault):
+def test_semantically_wrong_trace_cannot_pass_with_correct_members(fault: str) -> None:
     geo = deepcopy(classify_timeliness(4, 7)["mutual_use_reference"]["geometry"])
     if fault == "swap":
         geo["paths"].reverse()
@@ -144,7 +150,7 @@ def test_semantically_wrong_trace_cannot_pass_with_correct_members(fault):
         validate_mutual_geometry(geo, number=4, current=7)
 
 
-def test_rehashed_primary_capture_is_not_a_new_oracle(tmp_path):
+def test_rehashed_primary_capture_is_not_a_new_oracle(tmp_path: Path) -> None:
     folder = tmp_path / "source"
     shutil.copytree(SOURCE, folder)
     value = json.loads((folder / "reference.json").read_text())
@@ -163,8 +169,8 @@ def test_rehashed_primary_capture_is_not_a_new_oracle(tmp_path):
     "current,derived,five,unknown", [(7, 18, 0, 0), (5, 0, 18, 0), (None, 0, 0, 18)]
 )
 def test_served_reading_coverage_is_bound_to_the_actual_available_derivation(
-    current, derived, five, unknown
-):
+    current: int | None, derived: int, five: int, unknown: int
+) -> None:
     result = executed(inputs(current))
     checked = verify_fengshui_reading(result, trusted_payload=deepcopy(result))
     assert checked["status"] == "verified_served_fixed_reading"
@@ -194,6 +200,10 @@ def mutate_author(original, fault):
                 value["mutual_use_reference"]["numeric_membership"] = False
             elif fault == "geometry":
                 value["mutual_use_reference"]["geometry"]["paths"].reverse()
+            else:
+                pass
+        else:
+            pass
         return value
 
     return changed
@@ -202,19 +212,27 @@ def mutate_author(original, fault):
 @pytest.mark.parametrize("tool", ["xuankong_natal", "assess"])
 @pytest.mark.parametrize("fault", ["phase", "offset", "membership", "geometry"])
 def test_injected_author_errors_are_rejected_on_all_protocols(
-    monkeypatch, tmp_path, capsys, tool, fault
-):
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    tool: str,
+    fault: str,
+) -> None:
     monkeypatch.setattr(
         engine, "classify_timeliness", mutate_author(engine.classify_timeliness, fault)
     )
     value = inputs()
     if tool == "assess":
         value = {"methods": ["xuankong_natal"], "xuankong": value}
-    http = rest_client(monkeypatch).post("/api/fengshui/" + tool, json=value)
+    else:
+        pass
+    http = rest_client(monkeypatch).post(SPECS[tool].rest_path, json=value)
     mcp = asyncio.run(mcp_call(tool, value))
     path = tmp_path / "input.json"
     path.write_text(json.dumps(value))
-    code = run(["fengshui_" + tool, "--request-file", str(path), "--fields", "status"])
+    code = run(
+        [SPECS[tool].tool_name, "--request-file", str(path), "--fields", "status"]
+    )
     cli = json.loads(capsys.readouterr().out)
     assert http.status_code == 503 and mcp.is_error and code == 1
     for result in (http.json(), mcp.structured_content, cli):
@@ -225,8 +243,8 @@ def test_injected_author_errors_are_rejected_on_all_protocols(
 
 
 def test_service_seal_cannot_accept_a_self_consistent_but_wrong_candidate_star(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     original = service.analyze_natal_interpretation
 
     def wrong(*args, **kwargs):

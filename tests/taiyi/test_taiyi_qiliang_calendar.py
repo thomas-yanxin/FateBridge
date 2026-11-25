@@ -6,6 +6,7 @@ import json
 import shutil
 from copy import deepcopy
 from datetime import date, timedelta
+from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
@@ -15,15 +16,15 @@ import fatebridge.api as api
 from fatebridge.application.examples import suggested_fields
 from fatebridge.application.projection import project_fields
 from fatebridge.cli import run
+from fatebridge.core.contracts.output_chinese import Taiyi
+from fatebridge.core.contracts.output_taiyi_year_calendar import (
+    TaiyiHistoricalCalendarDisagreement,
+    TaiyiHistoricalLeapHypothesis,
+)
 from fatebridge.core.metaphysics.taiyi_year_calendar import (
     HISTORICAL_YEAR_PROFILE,
     QILIANG_YEAR_PROFILE,
     historical_year_context,
-)
-from fatebridge.core.output_chinese import Taiyi
-from fatebridge.core.output_taiyi_year_calendar import (
-    TaiyiHistoricalCalendarDisagreement,
-    TaiyiHistoricalLeapHypothesis,
 )
 from fatebridge.core.requests.metaphysics import TaiyiAnalysisRequest
 from fatebridge.mcp_server import create_mcp_app
@@ -38,7 +39,8 @@ from scripts.taiyi.audit_taiyi_qiliang_calendar import (
     verify_sources,
 )
 from tests.support.reference_data import resolve
-from tests.taiyi.test_taiyi_transports import _same_run_payload
+from tests.support.transports import SPECS, call_calculation
+from tests.unit_test.fixtures.taiyi import same_run_payload
 
 
 @pytest.fixture(scope="module")
@@ -59,6 +61,8 @@ def payload(key, day="0502-05-24", mode="year"):
             "calculation_mode": mode,
             "year_profile": QILIANG_YEAR_PROFILE,
         }
+    else:
+        pass
     return {
         "date": day,
         "time": "12:00:00",
@@ -72,7 +76,7 @@ def payload(key, day="0502-05-24", mode="year"):
 
 
 def cli_args(key, values):
-    args = [key]
+    args = [SPECS[key].tool_name]
     for name, value in values.items():
         args += [
             "--" + name.replace("_", "-"),
@@ -91,7 +95,9 @@ def rest_client(monkeypatch):
     return TestClient(api.app)
 
 
-def test_full_source_mapping_is_separate_from_ancient_calendar_acceptance(report):
+def test_full_source_mapping_is_separate_from_ancient_calendar_acceptance(
+    report,
+) -> None:
     verify_sources()
     assert (
         hashlib.sha256((CORPUS / "freeze.json").read_bytes()).hexdigest()
@@ -120,8 +126,8 @@ def test_full_source_mapping_is_separate_from_ancient_calendar_acceptance(report
 
 @pytest.mark.parametrize("rewrite_manifest", [False, True])
 def test_software_capture_or_source_expectations_cannot_be_rewritten(
-    tmp_path, rewrite_manifest
-):
+    tmp_path: Path, rewrite_manifest: bool
+) -> None:
     copied = tmp_path / "corpus"
     shutil.copytree(CORPUS, copied)
     p = copied / "readings.json"
@@ -132,6 +138,8 @@ def test_software_capture_or_source_expectations_cannot_be_rewritten(
         manifest = json.loads((copied / "freeze.json").read_text())
         manifest["files"][p.name] = hashlib.sha256(p.read_bytes()).hexdigest()
         (copied / "freeze.json").write_text(json.dumps(manifest))
+    else:
+        pass
     with pytest.raises(ValueError, match="V36"):
         verify_sources(copied)
 
@@ -146,7 +154,9 @@ def test_software_capture_or_source_expectations_cannot_be_rewritten(
         ("0505-01-23", 505),
     ],
 )
-def test_each_year_boundary_uses_input_civil_date_on_public_service(day, year):
+def test_each_year_boundary_uses_input_civil_date_on_public_service(
+    day: str, year: int
+) -> None:
     d = date.fromisoformat(day)
     after = public_case(d)["taiyi"]
     assert after["calendar_rules"]["year"] == year
@@ -168,8 +178,8 @@ def test_each_year_boundary_uses_input_civil_date_on_public_service(day, year):
     "day,month,expected_ganzhi", [("0502-05-24", 4, "戊子"), ("0505-03-23", 2, "壬寅")]
 )
 def test_printed_leap_month_and_unadjudicated_alternatives_are_both_visible(
-    day, month, expected_ganzhi
-):
+    day: str, month: int, expected_ganzhi: str
+) -> None:
     result = public_case(date.fromisoformat(day))
     h = result["taiyi"]["calendar_rules"]["historical_calendar"]
     assert (h["month"], h["day"], h["is_leap_month"], h["day_ganzhi"]) == (
@@ -188,7 +198,9 @@ def test_printed_leap_month_and_unadjudicated_alternatives_are_both_visible(
     assert "史历表" in h["display"] and "晋太元" not in h["display"]
 
 
-def test_liang_day8_calendar_fact_is_not_relabelled_as_a_restored_wang_day_chart():
+def test_liang_day8_calendar_fact_is_not_relabelled_as_a_restored_wang_day_chart() -> (
+    None
+):
     r = public_case(date(504, 7, 7))
     b = r["taiyi"]
     h = b["calendar_rules"]["historical_calendar"]
@@ -205,7 +217,9 @@ def test_liang_day8_calendar_fact_is_not_relabelled_as_a_restored_wang_day_chart
     )
 
 
-def test_solar_clock_crossing_does_not_replace_source_year_or_auto_select_profile():
+def test_solar_clock_crossing_does_not_replace_source_year_or_auto_select_profile() -> (
+    None
+):
     r = calculate_taiyi_analysis(
         analysis_year=504,
         analysis_month=2,
@@ -237,7 +251,7 @@ def test_solar_clock_crossing_does_not_replace_source_year_or_auto_select_profil
     assert "source_disagreements" not in old and "晋太元" in old["display"]
 
 
-def test_mutating_a_public_response_cannot_pollute_cached_source_evidence():
+def test_mutating_a_public_response_cannot_pollute_cached_source_evidence() -> None:
     first = calculate_taiyi_analysis(**payload("taiyi"))
     evidence = first["taiyi"]["calendar_rules"]["historical_calendar"]
     digest = evidence["source_data_sha256"]
@@ -258,12 +272,13 @@ def test_mutating_a_public_response_cannot_pollute_cached_source_evidence():
     Taiyi.model_validate(second["taiyi"])
 
 
-def test_mutating_mcp_evidence_cannot_change_the_next_sanshi_response():
+def test_mutating_mcp_evidence_cannot_change_the_next_sanshi_response() -> None:
     fields = ["taiyi.calendar_rules.historical_calendar"]
 
     async def invoke():
         async with Client(create_mcp_app()) as client:
-            first = await client.call_tool(
+            first = await call_calculation(
+                client,
                 "taiyi",
                 {
                     **payload("taiyi"),
@@ -280,8 +295,9 @@ def test_mutating_mcp_evidence_cannot_change_the_next_sanshi_response():
             evidence["source_disagreements"][0]["alternative_hypotheses"][0][
                 "leap_month"
             ] = 99
-            second = await client.call_tool(
-                "sanshiunited",
+            second = await call_calculation(
+                client,
+                "sanshi_combined_chart",
                 {
                     **payload("sanshiunited"),
                     "fields": fields,
@@ -302,7 +318,7 @@ def test_mutating_mcp_evidence_cannot_change_the_next_sanshi_response():
     asyncio.run(invoke())
 
 
-def test_every_new_source_leaf_can_be_projected_and_is_typed():
+def test_every_new_source_leaf_can_be_projected_and_is_typed() -> None:
     board = public_case(date(502, 5, 24))["taiyi"]
     h = board["calendar_rules"]["historical_calendar"]
     paths = ["taiyi.calendar_rules.historical_calendar." + key for key in h]
@@ -349,8 +365,12 @@ def test_every_new_source_leaf_can_be_projected_and_is_typed():
     ],
 )
 def test_source_date_disagreement_and_numeric_facts_match_rest_mcp_cli(
-    monkeypatch, capsys, key, day, expected
-):
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    key: str,
+    day: str,
+    expected,
+) -> None:
     p = payload(key, day)
     fields = [
         "taiyi.calendar_rules",
@@ -360,7 +380,9 @@ def test_source_date_disagreement_and_numeric_facts_match_rest_mcp_cli(
     ]
     if key == "sanshiunited":
         fields += ["synthesis.limitations"]
-    route = "/api/cn/taiyi" if key == "taiyi" else "/api/divination/sanshiunited"
+    else:
+        pass
+    route = "/api/taiyi" if key == "taiyi" else "/api/divination/sanshi"
     rest = rest_client(monkeypatch).post(
         route,
         json=p,
@@ -374,8 +396,9 @@ def test_source_date_disagreement_and_numeric_facts_match_rest_mcp_cli(
 
     async def invoke():
         async with Client(create_mcp_app()) as client:
-            result = await client.call_tool(
-                key,
+            result = await call_calculation(
+                client,
+                SPECS[key].tool_name,
                 {
                     **p,
                     "fields": fields,
@@ -407,20 +430,27 @@ def test_source_date_disagreement_and_numeric_facts_match_rest_mcp_cli(
             "齐梁" in mcp["synthesis"]["limitations"][0]
             and "未认证三式共同古历" in mcp["synthesis"]["limitations"][0]
         )
+    else:
+        pass
 
 
 @pytest.mark.parametrize("key", ["taiyi", "sanshiunited"])
 @pytest.mark.parametrize("mode", ["month", "day", "hour"])
 def test_new_year_profile_cannot_be_used_to_switch_month_day_or_hour_algorithms(
-    monkeypatch, capsys, key, mode
-):
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    key: str,
+    mode: str,
+) -> None:
     p = payload(key, mode=mode)
-    route = "/api/cn/taiyi" if key == "taiyi" else "/api/divination/sanshiunited"
+    route = "/api/taiyi" if key == "taiyi" else "/api/divination/sanshi"
     assert rest_client(monkeypatch).post(route, json=p).status_code == 400
 
     async def invoke():
         async with Client(create_mcp_app()) as client:
-            return await client.call_tool(key, p, raise_on_error=False)
+            return await call_calculation(
+                client, SPECS[key].tool_name, p, raise_on_error=False
+            )
 
     assert asyncio.run(invoke()).is_error
     capsys.readouterr()
@@ -432,16 +462,21 @@ def test_new_year_profile_cannot_be_used_to_switch_month_day_or_hour_algorithms(
     "day", ["0501-02-05", "0506-02-11", "0385-07-01", "2026-04-04"]
 )
 def test_all_surfaces_refuse_extrapolation_or_cross_profile_fallback(
-    monkeypatch, capsys, key, day
-):
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    key: str,
+    day: str,
+) -> None:
     p = payload(key, day)
-    route = "/api/cn/taiyi" if key == "taiyi" else "/api/divination/sanshiunited"
+    route = "/api/taiyi" if key == "taiyi" else "/api/divination/sanshi"
     response = rest_client(monkeypatch).post(route, json=p)
     assert response.status_code == 400 and "仅覆盖" in response.text
 
     async def invoke():
         async with Client(create_mcp_app()) as client:
-            return await client.call_tool(key, p, raise_on_error=False)
+            return await call_calculation(
+                client, SPECS[key].tool_name, p, raise_on_error=False
+            )
 
     assert asyncio.run(invoke()).is_error
     capsys.readouterr()
@@ -451,14 +486,15 @@ def test_all_surfaces_refuse_extrapolation_or_cross_profile_fallback(
 @pytest.mark.parametrize("key", ["taiyi", "sanshiunited"])
 @pytest.mark.parametrize("day", ["0502-05-24", "0504-07-07"])
 def test_published_first_view_keeps_business_conflict_facts_under_default_budget(
-    key, day
-):
+    key: str, day: str
+) -> None:
     spec = next(s for s in CATALOG if s.key == key)
 
     async def invoke():
         async with Client(create_mcp_app()) as client:
-            result = await client.call_tool(
-                key,
+            result = await call_calculation(
+                client,
+                SPECS[key].tool_name,
                 {
                     **payload(key, day),
                     "fields": suggested_fields(spec, view="historical_year_calendar"),
@@ -467,7 +503,7 @@ def test_published_first_view_keeps_business_conflict_facts_under_default_budget
                 },
             )
             assert not result.is_error
-            original = await _same_run_payload(
+            original = await same_run_payload(
                 client, result, require_business_inline=True
             )
             return original
@@ -480,12 +516,16 @@ def test_published_first_view_keeps_business_conflict_facts_under_default_budget
 
 
 @pytest.mark.parametrize("key", ["taiyi", "sanshiunited"])
-def test_full_default_budget_export_reconstructs_conflicts_from_the_same_run(key):
+def test_full_default_budget_export_reconstructs_conflicts_from_the_same_run(
+    key: str,
+) -> None:
     async def invoke():
         async with Client(create_mcp_app()) as client:
-            result = await client.call_tool(key, {**payload(key), "fields": None})
+            result = await call_calculation(
+                client, SPECS[key].tool_name, {**payload(key), "fields": None}
+            )
             assert not result.is_error
-            return await _same_run_payload(client, result)
+            return await same_run_payload(client, result)
 
     full = asyncio.run(invoke())
     assert full["taiyi"]["calendar_rules"]["historical_calendar"]["is_leap_month"]

@@ -13,7 +13,9 @@ RUN = (
 
 
 @pytest.mark.parametrize("split", ["development", "heldout"])
-def test_current_lunar_source_population_is_graded_without_snapshot_replay(split):
+def test_current_lunar_source_population_is_graded_without_snapshot_replay(
+    split: str,
+) -> None:
     result = audit(RUN, split, RUN / f"{split}-reference-first.json")
     assert len(result["rows"]) == 6
     assert result["position_line_arcsec"] == "0.02"

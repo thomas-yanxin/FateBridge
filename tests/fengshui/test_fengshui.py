@@ -34,7 +34,7 @@ REFERENCE = json.loads(
 )
 
 
-def test_independent_minggua_400_and_direction_table_64():
+def test_independent_minggua_400_and_direction_table_64() -> None:
     assert REFERENCE["commit"] == "2666304c5cb4ac13091c8c1fcdd4e40c218b275a"
     assert len(REFERENCE["minggua_numbers"]) == 200
     for year, male, female in REFERENCE["minggua_numbers"]:
@@ -65,7 +65,7 @@ def test_independent_minggua_400_and_direction_table_64():
         (2100, 8, 7),
     ],
 )
-def test_epoch_and_century_raw_numbers(year, male, female):
+def test_epoch_and_century_raw_numbers(year: int, male: int, female: int) -> None:
     for convention, raw in [("male", male), ("female", female)]:
         candidate = calculate_minggua(
             effective_birth_year=year, gender_convention=convention
@@ -76,14 +76,14 @@ def test_epoch_and_century_raw_numbers(year, male, female):
         )
 
 
-def test_raw_five_is_mapped_after_not_during_year_cycle():
+def test_raw_five_is_mapped_after_not_during_year_cycle() -> None:
     a = calculate_minggua(effective_birth_year=1864, gender_convention="female")
     b = calculate_minggua(effective_birth_year=1865, gender_convention="female")
     assert a["layers"]["minggua"]["candidates"][0]["palace_number"] == 8
     assert b["layers"]["minggua"]["candidates"][0]["palace_number"] == 6
 
 
-def test_unknown_convention_is_two_candidates_and_missing_birth_is_partial():
+def test_unknown_convention_is_two_candidates_and_missing_birth_is_partial() -> None:
     result = calculate_minggua(effective_birth_year=1990)
     assert result["status"] == "partial"
     assert [c["trigram"] for c in result["layers"]["minggua"]["candidates"]] == [
@@ -95,7 +95,7 @@ def test_unknown_convention_is_two_candidates_and_missing_birth_is_partial():
 
 
 @pytest.mark.parametrize("boundary,expected", [("lichun", 2025), ("january_1", 2026)])
-def test_birth_year_boundary_is_explicit(boundary, expected):
+def test_birth_year_boundary_is_explicit(boundary: str, expected: int) -> None:
     result = calculate_minggua(
         birth_at="2026-01-15T12:00:00+08:00",
         gender_convention="male",
@@ -104,7 +104,9 @@ def test_birth_year_boundary_is_explicit(boundary, expected):
     assert result["layers"]["minggua"]["time_context"]["effective_year"] == expected
 
 
-def test_lichun_before_at_after_and_timezone_equivalence(monkeypatch):
+def test_lichun_before_at_after_and_timezone_equivalence(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "de440")
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
     boundary = lichun(2026, "Asia/Shanghai")
@@ -153,7 +155,7 @@ def test_lichun_before_at_after_and_timezone_equivalence(monkeypatch):
     )
 
 
-def test_published_2026_annual_chart_and_period_wrap():
+def test_published_2026_annual_chart_and_period_wrap() -> None:
     actual = calculate_annual_stars(effective_year=2026)["layers"]["annual_stars"]
     # Joey Yap official TG26 booklet, printed p67. Literal external chart.
     assert {d: p["annual_star_number"] for d, p in actual["palaces"].items()} == {
@@ -205,14 +207,16 @@ def test_published_2026_annual_chart_and_period_wrap():
         (352.5, "N", "子"),
     ],
 )
-def test_half_open_compass_and_mountain_boundaries(angle, direction, mountain):
+def test_half_open_compass_and_mountain_boundaries(
+    angle: float | int, direction: str, mountain: str
+) -> None:
     context = bearing_context(angle, "magnetic")
     assert (context["direction"], context["mountain"]) == (direction, mountain)
     assert context["north_reference"] == "magnetic"
     assert bearing_context(angle, "true")["north_reference"] == "true"
 
 
-def test_house_uses_sitting_opposite_facing_and_keeps_each_resident():
+def test_house_uses_sitting_opposite_facing_and_keeps_each_resident() -> None:
     result = calculate_bazhai(**payload("bazhai"))["layers"]["bazhai"]
     assert result["house"]["sitting_trigram"] == "坎"
     assert result["house"]["sectors"]["S"]["star"]["name"] == "延年"
@@ -231,7 +235,7 @@ def test_house_uses_sitting_opposite_facing_and_keeps_each_resident():
     assert reverse["layers"]["bazhai"]["house"]["sitting_trigram"] == "离"
 
 
-def test_stove_location_and_fire_mouth_are_separate_and_opposite_preferences():
+def test_stove_location_and_fire_mouth_are_separate_and_opposite_preferences() -> None:
     findings = calculate_bazhai(**payload("bazhai"))["layers"]["bazhai"][
         "placement_findings"
     ]
@@ -251,7 +255,7 @@ def test_stove_location_and_fire_mouth_are_separate_and_opposite_preferences():
     )
 
 
-def test_jinsuo_all_eight_preferences_unknown_mixed_and_no_object_inference():
+def test_jinsuo_all_eight_preferences_unknown_mixed_and_no_object_inference() -> None:
     prefs = calculate_jinsuo()["layers"]["jinsuo"]["preferences"]
     assert {d: p["preferred_classification"] for d, p in prefs.items()} == {
         "N": "sand",
@@ -291,7 +295,7 @@ def test_jinsuo_all_eight_preferences_unknown_mixed_and_no_object_inference():
         )
 
 
-def test_three_method_output_preserves_scopes_sources_and_differences():
+def test_three_method_output_preserves_scopes_sources_and_differences() -> None:
     result = assess(**payload("assess"))
     FengshuiOutput.model_validate(result)
     assert result["status"] == "complete"
@@ -309,19 +313,24 @@ def test_three_method_output_preserves_scopes_sources_and_differences():
         for c in result["conflicts"]
     )
     assert "xuankong_natal" in result["coverage"]["not_requested_layers"]
+    registrations = {record["ruleset_id"]: record for record in result["rulesets"]}
     for name, layer in result["layers"].items():
         ruleset = layer["ruleset"]
         assert (
             ruleset["version"]
             == {"bazhai": "1.1.0", "jinsuo": "1.0.0", "annual_stars": "1.0.0"}[name]
         )
-        assert ruleset["source_ids"] == [s["source_id"] for s in ruleset["sources"]]
+        assert "sources" not in ruleset
+        citations = registrations[ruleset["ruleset_id"]]["source_citations"]
+        assert ruleset["source_ids"] == list(citations)
         assert all(
-            s["url"].startswith("https://") and s["scope"] for s in ruleset["sources"]
+            result["source_catalog"][source_id]["url"].startswith("https://")
+            and citations[source_id]["scope"]
+            for source_id in ruleset["source_ids"]
         )
 
 
-def test_missing_inputs_are_layer_specific_and_unselected_layers_not_computed():
+def test_missing_inputs_are_layer_specific_and_unselected_layers_not_computed() -> None:
     result = assess(methods=["bazhai", "jinsuo", "annual_stars"], effective_year=2026)
     assert result["status"] == "partial"
     assert result["layers"]["annual_stars"]["status"] == "complete"
@@ -429,12 +438,12 @@ def test_missing_inputs_are_layer_specific_and_unselected_layers_not_computed():
         (AssessRequest, {"floorplan_image": "cannot_infer"}),
     ],
 )
-def test_invalid_inputs_never_silently_default(model, inputs):
+def test_invalid_inputs_never_silently_default(model, inputs) -> None:
     with pytest.raises(ValidationError):
         model.model_validate(inputs)
 
 
-def test_rule_registry_is_not_mutable_through_response():
+def test_rule_registry_is_not_mutable_through_response() -> None:
     copy = provenance("jinsuo_basic_fixed_v1")
     copy["sources"][0]["scope"] = "changed"
     copy["conventions"].clear()
@@ -444,7 +453,7 @@ def test_rule_registry_is_not_mutable_through_response():
     assert rule_data("directions")["N"]["palace_number"] == 1
 
 
-def test_layered_snapshot_export_preserves_actual_facts_and_sources():
+def test_layered_snapshot_export_preserves_actual_facts_and_sources() -> None:
     result = assess(**payload("assess"))
     exported = result["snapshot_export"]
     assert not exported["missing_selected_sections"]

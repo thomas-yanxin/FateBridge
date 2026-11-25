@@ -10,10 +10,10 @@ from pathlib import Path
 import pytest
 
 from fatebridge.core.astro.birth import build_astro_birth_info
-from fatebridge.core.jyotish import build_india, positions
-from fatebridge.core.jyotish_balas import PLANETS, moon_nature_readings
-from fatebridge.core.jyotish_evidence import strength_context
-from fatebridge.core.jyotish_kala import (
+from fatebridge.core.jyotish.jyotish import build_india, positions
+from fatebridge.core.jyotish.jyotish_balas import PLANETS, moon_nature_readings
+from fatebridge.core.jyotish.jyotish_evidence import strength_context
+from fatebridge.core.jyotish.jyotish_kala import (
     ahargana_lords,
     ayana_values,
     nathonnatha,
@@ -47,7 +47,7 @@ def packet(rise=2451544.75, day_length=0.5, full_length=1.0):
 @pytest.mark.parametrize("stamp,count,year,month,weekday", PRIMARY["calendar_cases"])
 def test_exact_ahargana_matches_two_primary_worked_examples(
     stamp, count, year, month, weekday
-):
+) -> None:
     result = ahargana_lords(date.fromisoformat(stamp))
     assert (
         result["ahargana"],
@@ -61,7 +61,7 @@ def test_exact_ahargana_matches_two_primary_worked_examples(
 @pytest.mark.parametrize("ra,meridian,day_value,night_value", PRIMARY["natha_cases"])
 def test_apparent_solar_meridian_natha_not_civil_clock(
     ra, meridian, day_value, night_value
-):
+) -> None:
     result = nathonnatha(meridian, ra)
     for p in ("Sun", "Jupiter", "Venus"):
         assert result[p] == day_value
@@ -78,14 +78,16 @@ def test_apparent_solar_meridian_natha_not_civil_clock(
         (-23.45, "ayana_minus_23_45"),
     ],
 )
-def test_ayana_fixed_constant_and_hemisphere_signs(declination, key):
+def test_ayana_fixed_constant_and_hemisphere_signs(declination, key: str) -> None:
     result = ayana_values(dict.fromkeys(PLANETS, declination))
     assert result == pytest.approx(PRIMARY[key], abs=1e-12, rel=0)
     assert ayana_values(dict.fromkeys(PLANETS, 28.5))["Moon"] < 0  # no invented clamp
 
 
 @pytest.mark.parametrize("sun,moon,expected", PRIMARY["paksha_arcs"])
-def test_paksha_folds_longitude_wrap_and_keeps_nature_scenarios(sun, moon, expected):
+def test_paksha_folds_longitude_wrap_and_keeps_nature_scenarios(
+    sun, moon, expected
+) -> None:
     result = paksha_scenarios({"Sun": sun, "Moon": moon})
     assert result["benefic_value"] == pytest.approx(expected, abs=1e-12)
     assert result["malefic_value"] == pytest.approx(60 - expected, abs=1e-12)
@@ -98,7 +100,9 @@ def test_paksha_folds_longitude_wrap_and_keeps_nature_scenarios(sun, moon, expec
         )
 
 
-def test_rounded_paksha_tie_stays_conditional_through_war_kala_and_luminary_motion():
+def test_rounded_paksha_tie_stays_conditional_through_war_kala_and_luminary_motion() -> (
+    None
+):
     # A small positive Sun longitude puts the directed angle just below 90°.
     # The five stars only have one qualifying war pair, Mars and Mercury.
     raw = {
@@ -143,13 +147,13 @@ def test_rounded_paksha_tie_stays_conditional_through_war_kala_and_luminary_moti
 @pytest.mark.parametrize("elongation,expected", PRIMARY["moon_nature_options"])
 def test_conflicting_lunar_nature_readings_are_not_silently_collapsed(
     elongation, expected
-):
+) -> None:
     result = moon_nature_readings(Fraction(elongation))
     assert result["options"] == expected
     assert result["status"] == "author_readings_not_uniquely_adjudicated"
 
 
-def test_hora_all_seven_weekdays_and24_fixed_hours_against_primary_table():
+def test_hora_all_seven_weekdays_and24_fixed_hours_against_primary_table() -> None:
     for weekday in range(7):
         rise = 2451545.75 + weekday  # Sunday2000-01-02 at6UT, then following days
         for hour in range(24):
@@ -163,7 +167,9 @@ def test_hora_all_seven_weekdays_and24_fixed_hours_against_primary_table():
             )
 
 
-def test_sunrise_sunset_midnight_and_thirds_are_half_open_without_daily_clock_wrap():
+def test_sunrise_sunset_midnight_and_thirds_are_half_open_without_daily_clock_wrap() -> (
+    None
+):
     rise = 2451544.75
     ctx = packet(rise)
     for hours, day, part, ruler in [
@@ -179,6 +185,8 @@ def test_sunrise_sunset_midnight_and_thirds_are_half_open_without_daily_clock_wr
         # event endpoints, so test a point just inside each intended new third.
         if hours in {4, 8, 16, 20}:
             result = solar_parts(math.nextafter(rise + hours / 24, math.inf), 0, ctx)
+        else:
+            pass
         assert (result["is_day"], result["third_number"], result["tribhaga_lord"]) == (
             day,
             part,
@@ -205,8 +213,8 @@ def test_sunrise_sunset_midnight_and_thirds_are_half_open_without_daily_clock_wr
     "reference", EQUATORIAL["references"], ids=lambda ref: ref["body"]
 )
 def test_equatorial_positions_against_independently_rotated_jpl_iau7680(
-    reference, monkeypatch, tmp_path
-):
+    reference, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     assert EQUATORIAL["derivation"]["software"] == "pyerfa"
     assert (
         hashlib.sha256((FIXTURES / "jyotish-horizons.json").read_bytes()).hexdigest()
@@ -244,8 +252,8 @@ def test_equatorial_positions_against_independently_rotated_jpl_iau7680(
 
 @pytest.mark.parametrize("case", ORACLE["examples"])
 def test_hindu_solar_events_against_isolated_reference_and_preserve_non_aligned_outputs(
-    case, monkeypatch, tmp_path
-):
+    case, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
     y, m, d = case["date"]
     h, minute, _ = case["time"]
@@ -286,7 +294,9 @@ def test_hindu_solar_events_against_isolated_reference_and_preserve_non_aligned_
     }
 
 
-def test_polar_missing_rise_does_not_erase_independent_components_or_fill_fake_dawn():
+def test_polar_missing_rise_does_not_erase_independent_components_or_fill_fake_dawn() -> (
+    None
+):
     birth = build_astro_birth_info(**astro_payload())
     raw = positions(birth)
     result = temporal_balas(raw, {"events": []}, birth.longitude)
@@ -302,7 +312,9 @@ def test_polar_missing_rise_does_not_erase_independent_components_or_fill_fake_d
     )
 
 
-def test_timezone_labels_for_same_physical_instant_do_not_change_temporal_components():
+def test_timezone_labels_for_same_physical_instant_do_not_change_temporal_components() -> (
+    None
+):
     data = {
         **astro_payload(),
         "birth_timezone": "UTC",
@@ -317,7 +329,7 @@ def test_timezone_labels_for_same_physical_instant_do_not_change_temporal_compon
     assert utc["strengths"]["cheshta_bala"] == local["strengths"]["cheshta_bala"]
 
 
-def test_war_candidates_are_local_and_do_not_fabricate_zero_amounts():
+def test_war_candidates_are_local_and_do_not_fabricate_zero_amounts() -> None:
     birth = build_astro_birth_info(**astro_payload())
     raw = positions(birth)
     raw["longitudes"].update(
@@ -338,7 +350,9 @@ def test_war_candidates_are_local_and_do_not_fabricate_zero_amounts():
 
 
 @pytest.mark.native_engine_fault
-def test_strict_policy_checks_supporting_sun_events(monkeypatch, tmp_path):
+def test_strict_policy_checks_supporting_sun_events(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
     auto = solar_packet(2451545.0, 0, 0, "auto")
     assert auto["ephemeris_models"] == ["fatebridge_solar_horizon_de440_v1"]
@@ -351,7 +365,9 @@ def test_strict_policy_checks_supporting_sun_events(monkeypatch, tmp_path):
 
 
 @pytest.mark.native_engine_fault
-def test_equatorial_fallback_is_reported_and_strictly_rejected(monkeypatch, tmp_path):
+def test_equatorial_fallback_is_reported_and_strictly_rejected(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     from fatebridge.core.astro import runtime
 
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
@@ -368,6 +384,8 @@ def test_equatorial_fallback_is_reported_and_strictly_rejected(monkeypatch, tmp_
                     | runtime.swe.FLG_JPLEPH
                 )
             ) | runtime.swe.FLG_SWIEPH
+        else:
+            pass
         return values, returned
 
     monkeypatch.setattr(runtime.swe, "calc", ecliptic_as_files)
@@ -391,7 +409,7 @@ def test_equatorial_fallback_is_reported_and_strictly_rejected(monkeypatch, tmp_
     # This test deliberately lies about native backend flags. Isolate the
     # new motion dependency: it cannot reconstruct Swiss barycentric states
     # from analytical Moshier vectors. Real motion/source tests stay separate.
-    from fatebridge.core import jyotish
+    from fatebridge.core.jyotish import jyotish
 
     def synthetic_motion(planet, jd, coordinates, model, **kwargs):
         return {
@@ -424,7 +442,7 @@ def test_equatorial_fallback_is_reported_and_strictly_rejected(monkeypatch, tmp_
         positions(birth, ephemeris_policy="require_data_files")
 
 
-def test_real_polar_solar_day_remains_partial_without_fake_six_oclock():
+def test_real_polar_solar_day_remains_partial_without_fake_six_oclock() -> None:
     birth = build_astro_birth_info(
         birth_year=2026,
         birth_month=6,
@@ -442,8 +460,10 @@ def test_real_polar_solar_day_remains_partial_without_fake_six_oclock():
 
 
 @pytest.mark.native_engine_fault
-def test_time_lord_change_is_detected_even_with_only_d1_exported(monkeypatch):
-    from fatebridge.core import jyotish
+def test_time_lord_change_is_detected_even_with_only_d1_exported(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from fatebridge.core.jyotish import jyotish
 
     birth = build_astro_birth_info(**astro_payload())
     base = positions(birth)

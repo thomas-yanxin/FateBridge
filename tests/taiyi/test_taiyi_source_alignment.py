@@ -3,6 +3,7 @@
 import asyncio
 import json
 import shutil
+from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
@@ -12,28 +13,28 @@ import fatebridge.api as api
 from fatebridge.application.examples import suggested_fields
 from fatebridge.application.projection import project_fields
 from fatebridge.cli import run
+from fatebridge.core.contracts.output_chinese import Taiyi
 from fatebridge.core.metaphysics.taiyi_source_alignment import (
     count_source_assessment,
     source_alignment_text,
 )
-from fatebridge.core.metaphysics.taiyi_year import assemble_board, cyclic_core
-from fatebridge.core.output_chinese import Taiyi
+from fatebridge.core.metaphysics.taiyi_year import cyclic_core
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
 from scripts.taiyi.audit_taiyi_source_alignment import CORPUS, audit
 from scripts.taiyi.build_taiyi_source_alignment import source_data
 from tests.support.reference_data import resolve
-from tests.taiyi.test_taiyi_enclosures import transport_payload
-from tests.taiyi.test_taiyi_transports import _same_run_payload
+from tests.support.transports import SPECS, call_calculation
+from tests.unit_test.fixtures.taiyi import (
+    aligned_board,
+    same_run_payload,
+    transport_payload,
+)
 
 
-def board(ju, yin=False):
-    core = cyclic_core(ju, yin=yin)
-    core.update(ruler_branch="子", ruler_label="软件背景", heshen="丑")
-    return assemble_board(core)
-
-
-def test_full_positions_old_counts_and_source_recounts_have_separate_denominators():
+def test_full_positions_old_counts_and_source_recounts_have_separate_denominators() -> (
+    None
+):
     r = audit()
     assert r["source_rows"] == 144
     assert r["required_position_observations"] == 576
@@ -68,9 +69,9 @@ def test_full_positions_old_counts_and_source_recounts_have_separate_denominator
     ],
 )
 def test_upstream_marker_and_arithmetic_are_not_conflated(
-    ju, source, count, recount, diagnosis
-):
-    a = board(ju, yin=True)["count_source_assessment"]
+    ju: int, source: str, count: int, recount: int, diagnosis: str
+) -> None:
+    a = aligned_board(ju, yin=True)["count_source_assessment"]
     guest = next(c for c in a["counts"] if c["camp"] == "guest")
     assert guest["source_marker"] == source and guest["source_table_count"] == count
     assert guest["source_position_recount"]["count"] == recount
@@ -87,9 +88,9 @@ def test_upstream_marker_and_arithmetic_are_not_conflated(
     ],
 )
 def test_scanned_readings_do_not_silently_rewrite_transcription(
-    ju, yin, field, initial, text, scan, normalized
-):
-    a = board(ju, yin)["count_source_assessment"]
+    ju: int, yin: bool, field: str, initial: str, text: str, scan: str, normalized: str
+) -> None:
+    a = aligned_board(ju, yin)["count_source_assessment"]
     fact = next(p for p in a["positions"] if p["field"] == field)
     assert fact["transcription_literal"] == text and fact["source_literal"] == scan
     assert fact["initial_manual_literal"] == initial
@@ -98,16 +99,18 @@ def test_scanned_readings_do_not_silently_rewrite_transcription(
     assert initial in source_alignment_text(a) and scan in source_alignment_text(a)
     if ju == 59:
         assert "不是旧转录错误" in source_alignment_text(a)
+    else:
+        pass
 
 
-def test_initial_manual_glyphs_do_not_replace_exact_transcription_literals():
-    a = board(28)["count_source_assessment"]
+def test_initial_manual_glyphs_do_not_replace_exact_transcription_literals() -> None:
+    a = aligned_board(28)["count_source_assessment"]
     wenchang = next(p for p in a["positions"] if p["field"] == "wenchang_palace")
     assert wenchang["initial_manual_literal"] == "吕申"
     assert wenchang["transcription_literal"] == "呂申"
     jishen = next(
         p
-        for p in board(12)["count_source_assessment"]["positions"]
+        for p in aligned_board(12)["count_source_assessment"]["positions"]
         if p["field"] == "jishen"
     )
     assert jishen["initial_manual_literal"] == "卯"
@@ -115,10 +118,10 @@ def test_initial_manual_glyphs_do_not_replace_exact_transcription_literals():
     assert jishen["actual_value"] == jishen["source_value"] == "卯"
 
 
-def test_all_144_same_board_paths_and_original_counts_survive():
+def test_all_144_same_board_paths_and_original_counts_survive() -> None:
     for yin in (False, True):
         for ju in range(1, 73):
-            b = board(ju, yin)
+            b = aligned_board(ju, yin)
             a = b["count_source_assessment"]
             for fact in a["positions"]:
                 assert resolve(b, fact["actual_path"]) == fact["actual_value"]
@@ -127,9 +130,11 @@ def test_all_144_same_board_paths_and_original_counts_survive():
                 assert resolve(b, fact["actual_marker_path"]) == fact["actual_marker"]
             if a["summary"]["status"] == "differences_unadjudicated":
                 assert b["pattern_summary"]["source_table_warning"] == a["summary"]
+            else:
+                pass
 
 
-def test_returned_facsimile_notes_cannot_mutate_the_next_run_source():
+def test_returned_facsimile_notes_cannot_mutate_the_next_run_source() -> None:
     first = count_source_assessment(cyclic_core(41))
     first["facsimile_readings"][0]["facsimile_reading"] = "caller annotation"
     second = count_source_assessment(cyclic_core(41))
@@ -147,14 +152,14 @@ def test_returned_facsimile_notes_cannot_mutate_the_next_run_source():
         {"main_count": True},
     ],
 )
-def test_unknown_or_inconsistent_cyclic_identity_is_not_assumed_yang(changes):
+def test_unknown_or_inconsistent_cyclic_identity_is_not_assumed_yang(changes) -> None:
     c = {**cyclic_core(1), **changes}
     a = count_source_assessment(c)
     assert a["status"] == "not_assessed" and not a["counts"] and not a["positions"]
 
 
-def test_every_new_output_leaf_has_safe_partial_projection():
-    a = {"taiyi": board(43, yin=True)}
+def test_every_new_output_leaf_has_safe_partial_projection() -> None:
+    a = {"taiyi": aligned_board(43, yin=True)}
 
     def leaves(value, prefix):
         if isinstance(value, dict) and value:
@@ -181,7 +186,9 @@ def test_every_new_output_leaf_has_safe_partial_projection():
         "alter_collation",
     ],
 )
-def test_source_expectations_or_differences_cannot_be_removed(tmp_path, kind):
+def test_source_expectations_or_differences_cannot_be_removed(
+    tmp_path: Path, kind: str
+) -> None:
     d = tmp_path / "corpus"
     shutil.copytree(CORPUS, d)
     if kind in {"drop_row", "alter_old_count"}:
@@ -207,8 +214,11 @@ def test_source_expectations_or_differences_cannot_be_removed(tmp_path, kind):
 @pytest.mark.parametrize("key", ["taiyi", "sanshiunited"])
 @pytest.mark.parametrize("year", [1938, 1940, 1949])
 def test_actual_rest_mcp_cli_and_complete_first_source_view(
-    key, year, capsys, monkeypatch
-):
+    key: str,
+    year: int,
+    capsys: pytest.CaptureFixture[str],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     spec = next(s for s in CATALOG if s.key == key)
     payload = transport_payload(key, year)
     fields = ["taiyi.core_board", "taiyi.count_source_assessment"]
@@ -230,17 +240,26 @@ def test_actual_rest_mcp_cli_and_complete_first_source_view(
         )
     assert response.status_code == 200, response.text
     expected = response.json()["taiyi"]
-    args = [key, "--strict-fields", "--no-use-true-solar-time", "--fields", *fields]
+    args = [
+        SPECS[key].tool_name,
+        "--strict-fields",
+        "--no-use-true-solar-time",
+        "--fields",
+        *fields,
+    ]
     for name, value in payload.items():
         if name != "use_true_solar_time":
             args += ["--" + name.replace("_", "-"), str(value)]
+        else:
+            pass
     assert run(args) == 0
     assert json.loads(capsys.readouterr().out)["taiyi"] == expected
 
     async def call():
         async with Client(create_mcp_app()) as c:
-            selected = await c.call_tool(
-                key,
+            selected = await call_calculation(
+                c,
+                SPECS[key].tool_name,
                 {
                     **payload,
                     "fields": fields,
@@ -256,8 +275,9 @@ def test_actual_rest_mcp_cli_and_complete_first_source_view(
             view = suggested_fields(
                 spec, view="count_sources" if key == "taiyi" else "taiyi_count_sources"
             )
-            result = await c.call_tool(
-                key,
+            result = await call_calculation(
+                c,
+                SPECS[key].tool_name,
                 {
                     **payload,
                     "fields": view,
@@ -266,6 +286,6 @@ def test_actual_rest_mcp_cli_and_complete_first_source_view(
                 },
             )
             assert not result.is_error
-            await _same_run_payload(c, result, require_business_inline=True)
+            await same_run_payload(c, result, require_business_inline=True)
 
     asyncio.run(call())

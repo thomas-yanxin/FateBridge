@@ -1,11 +1,9 @@
 """Calculation anchors must survive cross-board swaps and full-output deletion."""
 
-import asyncio
 import copy
 import importlib.util
 import json
 import shutil
-from dataclasses import replace
 from pathlib import Path
 
 import pytest
@@ -17,11 +15,10 @@ from tests.support.transports import (
     AS_OF,
     SPECS,
     business,
-    call_cli,
-    native,
     rest,
     surface_calls,
 )
+from tests.unit_test.fixtures.ren_protocol import assert_output_fault_on_all_transports
 
 ROOT = Path(__file__).resolve().parents[2]
 MODULE = importlib.util.spec_from_file_location(
@@ -40,7 +37,7 @@ def outputs():
     return AUDIT.results()
 
 
-def test_predeclared_value_and_deletion_denominators_stay_separate():
+def test_predeclared_value_and_deletion_denominators_stay_separate() -> None:
     current = copy.deepcopy(REFERENCE["payloads"])
     assert current["sanshiunited"]["taiyi_options"].pop("accNum") == 0
     assert current == ANCHOR_PAYLOADS
@@ -55,7 +52,9 @@ def test_predeclared_value_and_deletion_denominators_stay_separate():
 
 
 @pytest.mark.parametrize("change", ["edit", "missing", "extra"])
-def test_anchor_reference_inventory_and_labels_are_immutable(tmp_path, change):
+def test_anchor_reference_inventory_and_labels_are_immutable(
+    tmp_path: Path, change: str
+) -> None:
     target = tmp_path / "corpus"
     shutil.copytree(AUDIT.CORPUS, target)
     if change == "edit":
@@ -71,45 +70,23 @@ def test_anchor_reference_inventory_and_labels_are_immutable(tmp_path, change):
         AUDIT.reference(target)
 
 
-def assert_broken_on_three_ports(
-    spec, bad, project, rest, monkeypatch, tmp_path, capsys
-):
-    original = execution.execute_spec
-
-    def broken(actual, request):
-        if actual.key == spec.key:
-            actual = replace(
-                actual, bind=lambda _: (lambda: copy.deepcopy(bad), (), {})
-            )
-        return original(actual, request)
-
-    monkeypatch.setattr(execution, "execute_spec", broken)
-    options = {}
-    params = dict(as_of=AS_OF, response_char_limit=0)
-    flags = ["--response-char-limit", "0"]
-    if project:
-        params.update(fields="analysis_type", strict_fields="true")
-        options.update(fields=["analysis_type"], strict_fields=True)
-        flags += ["--fields", "analysis_type", "--strict-fields", "true"]
-    payload = ANCHOR_PAYLOADS[spec.key]
-    http = rest.post(spec.rest_path, json=payload, params=params)
-    protocol = asyncio.run(native(spec, payload, **options))
-    code, result = call_cli(spec, payload, tmp_path, capsys, flags=flags)
-    assert http.status_code == 500 and protocol.is_error and code == 1
-    assert result["error_code"] == "internal_error"
-
-
 @pytest.mark.parametrize("fault", FAULTS, ids=lambda f: f["tool"] + "-" + f["id"])
 @pytest.mark.parametrize("project", [False, True])
 def test_cross_board_and_calendar_faults_fail_before_projection(
-    fault, project, outputs, rest, monkeypatch, tmp_path, capsys
-):
+    fault,
+    project: bool,
+    outputs,
+    rest,
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     valid, donor = outputs
     spec = SPECS[fault["tool"]]
     bad = AUDIT.corrupt(valid[spec.key], fault, donor)
     with pytest.raises(ValidationError):
         spec.output_model.model_validate(bad)
-    assert_broken_on_three_ports(
+    assert_output_fault_on_all_transports(
         spec, bad, project, rest, monkeypatch, tmp_path, capsys
     )
 
@@ -119,8 +96,14 @@ def test_cross_board_and_calendar_faults_fail_before_projection(
 )
 @pytest.mark.parametrize("project", [False, True])
 def test_full_service_cannot_delete_anchors_to_evade_conditional_guard(
-    fault, project, outputs, rest, monkeypatch, tmp_path, capsys
-):
+    fault,
+    project: bool,
+    outputs,
+    rest,
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     valid, _ = outputs
     spec = SPECS[fault["tool"]]
     bad = AUDIT.remove_anchor(valid[spec.key], fault["path"])
@@ -129,7 +112,7 @@ def test_full_service_cannot_delete_anchors_to_evade_conditional_guard(
     spec.output_model.model_validate(bad)
     with pytest.raises(execution.OutputContractError):
         execution.validate_output(spec, bad)
-    assert_broken_on_three_ports(
+    assert_output_fault_on_all_transports(
         spec, bad, project, rest, monkeypatch, tmp_path, capsys
     )
 
@@ -137,18 +120,20 @@ def test_full_service_cannot_delete_anchors_to_evade_conditional_guard(
 @pytest.mark.parametrize("key", ANCHOR_PAYLOADS)
 @pytest.mark.parametrize("project", [False, True])
 def test_valid_full_and_anchored_projections_still_agree_on_all_ports(
-    key, project, surface_calls
-):
+    key, project: bool, surface_calls
+) -> None:
     spec = SPECS[key]
     payload = ANCHOR_PAYLOADS[key]
     prefix = "subresults.liureng_gods." if key == "sanshiunited" else ""
     fields = [
         prefix + "four_pillars.day",
-        prefix + "liureng.xun_head",
-        prefix + "liureng.life_stages.day_stem",
+        "liureng.xun_head",
+        "liureng.life_stages.day_stem",
     ]
     if key == "jinkou":
         fields += ["jinkou.rows", "jinkou.stem_relations", "jinkou.overview"]
+    else:
+        pass
     params = [("as_of", AS_OF), ("response_char_limit", "0")]
     options = {}
     flags = ["--response-char-limit", "0"]
@@ -166,6 +151,8 @@ def test_valid_full_and_anchored_projections_still_agree_on_all_ports(
             "--include-snapshot-text",
             "false",
         ]
+    else:
+        pass
     http, protocol, code, result = surface_calls(
         spec, payload, params=params, options=options, flags=flags, cli_first=False
     )
@@ -200,15 +187,17 @@ def test_valid_full_and_anchored_projections_still_agree_on_all_ports(
         ),
     ],
 )
-def test_public_sparse_models_do_not_invent_missing_anchors(key, value):
+def test_public_sparse_models_do_not_invent_missing_anchors(key: str, value) -> None:
     assert (
         SPECS[key].output_model.model_validate(value).model_dump(exclude_unset=True)
         == value
     )
 
 
-def test_complete_gate_is_scoped_to_the_four_ren_tool_families():
-    from fatebridge.core.output_ren_anchors import require_complete_ren_anchors
+def test_complete_gate_is_scoped_to_the_four_ren_tool_families() -> None:
+    from fatebridge.core.contracts.output_ren_anchors import (
+        require_complete_ren_anchors,
+    )
 
     require_complete_ren_anchors("taiyi", {})
     require_complete_ren_anchors("qimen", {})

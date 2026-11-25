@@ -2,12 +2,12 @@
 
 from pydantic import BaseModel, JsonValue, TypeAdapter
 
-from .directions import rule_data
-from .models import AssessRequest
-from .natal_interpretation import _ordered_relationship
-from .spatial_angles import CompassDirection
-from .spatial_outputs import EvaluatedGeometry
-from .timeliness import classify_timeliness
+from fatebridge.core.fengshui.directions import rule_data
+from fatebridge.core.fengshui.models import AssessRequest
+from fatebridge.core.fengshui.natal_interpretation import _ordered_relationship
+from fatebridge.core.fengshui.spatial_angles import CompassDirection
+from fatebridge.core.fengshui.spatial_outputs import EvaluatedGeometry
+from fatebridge.core.fengshui.timeliness import classify_timeliness
 
 
 class StarFacts(BaseModel):
@@ -119,13 +119,19 @@ def conditioned_readings(
     spatial = req.workstation_layout
     if spatial is None:
         return [], []
+    else:
+        pass
     natal = facts.xuankong_natal
     if natal is None:
         return [], []
+    else:
+        pass
     interpretation = req.xuankong.interpretation if req.xuankong else None
     period = spatial.evaluation_period
     if period is None and interpretation:
         period = interpretation.current_period_number
+    else:
+        pass
     author_timeliness = spatial.timeliness_ruleset_id is not None or bool(
         interpretation and interpretation.timeliness_ruleset_id
     )
@@ -140,8 +146,12 @@ def conditioned_readings(
                 f"workstation_layout.scene.{seat.desk_id}.confirmed_chart_binding"
             )
             continue
+        else:
+            pass
         if not natal.candidates:
             missing.append("workstation_layout.computed_xuankong_natal")
+        else:
+            pass
         for direction in observation.location_directions:
             for chart in natal.candidates:
                 palace = chart.palaces[direction]
@@ -178,6 +188,8 @@ def conditioned_readings(
                             else "present" if external.water_present else "absent"
                         )
                     )
+                else:
+                    pass
                 time_layers = {}
                 time_contexts = {}
                 for name, layer in (
@@ -194,6 +206,10 @@ def conditioned_readings(
                         if number is not None:
                             time_layers[name] = number
                             time_contexts[name] = layer.time_context
+                        else:
+                            pass
+                    else:
+                        pass
                 host_scope = "not_selected"
                 host_reference = None
                 if interpretation and interpretation.host_guest_ruleset_id:
@@ -209,12 +225,20 @@ def conditioned_readings(
                         for source_candidate in host_guest.candidates:
                             if source_candidate.candidate_id != chart.candidate_id:
                                 continue
+                            else:
+                                pass
                             for axis in source_candidate.axes.values():
                                 if axis.direction == direction:
                                     host_scope = "existing_axis_operations_only_not_workstation_fortune"
                                     host_reference = TypeAdapter(
                                         dict[str, JsonValue]
                                     ).validate_python(axis.model_dump(mode="json"))
+                                else:
+                                    pass
+                    else:
+                        pass
+                else:
+                    pass
                 candidate = (
                     geometry.candidate_only
                     or observation.chart_binding_status != "confirmed"
@@ -287,6 +311,10 @@ def conditioned_readings(
             missing.append(
                 f"workstation_layout.scene.{seat.desk_id}.unambiguous_sector"
             )
+        else:
+            pass
     if author_timeliness and period is None:
         missing.append("workstation_layout.evaluation_period")
+    else:
+        pass
     return readings, list(dict.fromkeys(missing))

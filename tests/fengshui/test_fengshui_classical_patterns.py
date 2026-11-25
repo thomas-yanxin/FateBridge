@@ -12,10 +12,10 @@ from fatebridge.cli import run
 from fatebridge.core.fengshui.numeric_patterns import numeric_patterns
 from fatebridge.core.fengshui.xuankong import _chart, natal_rules
 from fatebridge.services.fengshui import calculate_xuankong_natal
-from fatebridge.validation.fengshui_patterns import audit_classical_patterns
-from tests.support.fengshui_transports import mcp_call
+from tests.support.fengshui_transports import SPECS, mcp_call
 from tests.support.mcp_result_assertions import without_transport
 from tests.support.transports import rest_client
+from validation.fengshui_patterns import audit_classical_patterns
 
 FOLDER = Path(__file__).parents[1] / "data/fengshui_patterns_v1"
 REFERENCE = json.loads((FOLDER / "reference.json").read_text())
@@ -41,7 +41,9 @@ def request(period=5, angle=225):
     }
 
 
-def test_complete216_domain_matches_original16_and28_lists_and_all_negative_cases():
+def test_complete216_domain_matches_original16_and28_lists_and_all_negative_cases() -> (
+    None
+):
     result = audit_classical_patterns(REFERENCE)
     assert result["scoped_acceptance_passed"]
     assert result["lower_chart_domain_checked"] == 216
@@ -54,7 +56,9 @@ def test_complete216_domain_matches_original16_and28_lists_and_all_negative_case
         assert hashlib.sha256((FOLDER / filename).read_bytes()).hexdigest() == digest
 
 
-def test_five_period_named_fan_is_not_mislabelled_as_five_in_center_or_whole_reversal():
+def test_five_period_named_fan_is_not_mislabelled_as_five_in_center_or_whole_reversal() -> (
+    None
+):
     c = chart(5, "坤")
     p = c["structure"]["classical_patterns"]
     assert p["parental_triples"]["all_nine_match"]
@@ -67,14 +71,16 @@ def test_five_period_named_fan_is_not_mislabelled_as_five_in_center_or_whole_rev
     )
 
 
-def test_whole_reversal_does_not_automatically_enter_the_original_named_list():
+def test_whole_reversal_does_not_automatically_enter_the_original_named_list() -> None:
     p = patterns(1, "午")
     assert p["ground_comparison"]["roles"]["facing"]["whole_ground_reverse"]
     assert not p["volume_two_named_refrain"]["numeric_match"]
     assert not p["parental_triples"]["all_nine_match"]
 
 
-def test_literal_one_period_forward_five_example_matches_fixed_ground_in_every_palace():
+def test_literal_one_period_forward_five_example_matches_fixed_ground_in_every_palace() -> (
+    None
+):
     c = chart(1, "丙")
     p = c["structure"]["classical_patterns"]
     assert c["trace"]["facing"]["center_star_number"] == 5
@@ -84,7 +90,9 @@ def test_literal_one_period_forward_five_example_matches_fixed_ground_in_every_p
 
 
 @pytest.mark.parametrize("period,expected", [(7, 8), (8, 9)])
-def test_zu_mian_note_uses_period_overlap_not_fixed_ground_at_NW(period, expected):
+def test_zu_mian_note_uses_period_overlap_not_fixed_ground_at_NW(
+    period: int, expected: int
+) -> None:
     c = chart(period, "酉")
     p = c["structure"]["classical_patterns"]
     role = p["ground_comparison"]["roles"]["facing"]
@@ -94,7 +102,9 @@ def test_zu_mian_note_uses_period_overlap_not_fixed_ground_at_NW(period, expecte
     assert not role["whole_ground_repeat"]
 
 
-def test_same_group_remainders_or_repeated_numbers_are_not_three_distinct_parent_stars():
+def test_same_group_remainders_or_repeated_numbers_are_not_three_distinct_parent_stars() -> (
+    None
+):
     c = chart(5, "坤")
     c["mountain_chart"] = deepcopy(c["period_chart"])
     c["facing_chart"] = deepcopy(c["period_chart"])
@@ -110,8 +120,8 @@ def test_same_group_remainders_or_repeated_numbers_are_not_three_distinct_parent
     "corruption", ["missing_palace", "duplicate_flight", "boolean", "duplicate_star"]
 )
 def test_incomplete_plates_cannot_masquerade_as_complete_negative_comparisons(
-    corruption,
-):
+    corruption: str,
+) -> None:
     c = chart(5, "坤")
     if corruption == "missing_palace":
         del c["mountain_chart"]["N"]
@@ -125,14 +135,16 @@ def test_incomplete_plates_cannot_masquerade_as_complete_negative_comparisons(
         numeric_patterns(c)
 
 
-def test_replacement_does_not_inherit_the_literal_lower_chart_case_verdict():
+def test_replacement_does_not_inherit_the_literal_lower_chart_case_verdict() -> None:
     p = patterns(5, "坤", "replacement")
     assert p["volume_two_named_refrain"]["applicable"] is False
     assert p["volume_two_named_refrain"]["numeric_match"] is None
     assert p["ground_comparison"]["reference_numbers"]["NW"] == 6
 
 
-def test_readable_snapshot_preserves_local_period_overlap_when_whole_plate_flags_are_false():
+def test_readable_snapshot_preserves_local_period_overlap_when_whole_plate_flags_are_false() -> (
+    None
+):
     result = calculate_xuankong_natal(**request(period=7, angle=270))
     lines = [
         line
@@ -144,7 +156,9 @@ def test_readable_snapshot_preserves_local_period_overlap_when_whole_plate_flags
     assert "与历史运盘同数宫位：NW" in lines[0]
 
 
-def test_reference_audit_rejects_dropped_rows_and_retains_valid_mutations_as_disagreements():
+def test_reference_audit_rejects_dropped_rows_and_retains_valid_mutations_as_disagreements() -> (
+    None
+):
     r = deepcopy(REFERENCE)
     r["parental_triples"]["families"][0]["periods"].pop()
     with pytest.raises(ValueError):
@@ -162,16 +176,21 @@ def test_reference_audit_rejects_dropped_rows_and_retains_valid_mutations_as_dis
 
 @pytest.mark.parametrize("name", ["xuankong_natal", "assess"])
 def test_new_patterns_match_rest_real_mcp_and_cli_with_sources(
-    monkeypatch, tmp_path, capsys, name
-):
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    name: str,
+) -> None:
     data = request()
     if name == "assess":
         data = {"methods": ["xuankong_natal"], "xuankong": data}
-    http = rest_client(monkeypatch).post("/api/fengshui/" + name, json=data)
+    else:
+        pass
+    http = rest_client(monkeypatch).post(SPECS[name].rest_path, json=data)
     protocol = asyncio.run(mcp_call(name, data))
     path = tmp_path / "patterns.json"
     path.write_text(json.dumps(data))
-    assert run(["fengshui_" + name, "--request-file", str(path)]) == 0
+    assert run([SPECS[name].tool_name, "--request-file", str(path)]) == 0
     cli = json.loads(capsys.readouterr().out)
     assert http.status_code == 200 and not protocol.is_error
     assert (
@@ -183,7 +202,7 @@ def test_new_patterns_match_rest_real_mcp_and_cli_with_sources(
     assert {"X10", "X11"}.issubset(set(cli["rulesets"][0]["source_ids"]))
 
 
-def test_real_mcp_projection_keeps_complete_numeric_reference_frames():
+def test_real_mcp_projection_keeps_complete_numeric_reference_frames() -> None:
     result = asyncio.run(
         mcp_call(
             "xuankong_natal",

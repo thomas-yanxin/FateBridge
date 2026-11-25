@@ -6,12 +6,12 @@ from pathlib import Path
 import pytest
 
 from fatebridge.core.requests.divination import SuZhanRequest
-from fatebridge.core.sukuyo import calendar_mansion, day_evidence
-from fatebridge.core.sukuyo_activities import source_bundle as upper_bundle
-from fatebridge.core.sukuyo_calendar_text import source_bundle as named_bundle
-from fatebridge.core.sukuyo_lower import activity_detail_closure
-from fatebridge.core.sukuyo_lower import source_bundle as mansion_bundle
-from fatebridge.core.sukuyo_lower_methods import source_bundle as method_bundle
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion, day_evidence
+from fatebridge.core.sukuyo.sukuyo_activities import source_bundle as upper_bundle
+from fatebridge.core.sukuyo.sukuyo_calendar_text import source_bundle as named_bundle
+from fatebridge.core.sukuyo.sukuyo_lower import activity_detail_closure
+from fatebridge.core.sukuyo.sukuyo_lower import source_bundle as mansion_bundle
+from fatebridge.core.sukuyo.sukuyo_lower_methods import source_bundle as method_bundle
 
 PRIMARY = json.loads(
     (Path(__file__).parents[1] / "data/sukuyo-action-scope-primary.json").read_bytes()
@@ -43,8 +43,8 @@ def ids(result, bucket="matched_rules"):
     ],
 )
 def test_lower_sunday_requires_actor_and_distance_but_upper_keeps_its_own_scope(
-    details, lower_applies
-):
+    details, lower_applies: bool
+) -> None:
     result = evidence("2025-03-02", "travel", details)
     assert ("t1299_lower_method_weekday_01" in ids(result)) is lower_applies
     assert ("t1299_activity_20" in ids(result)) is ("long_distance_journey" in details)
@@ -69,6 +69,8 @@ def test_lower_sunday_requires_actor_and_distance_but_upper_keeps_its_own_scope(
             "本次适用条件：下卷本条同时限定王公百官等行旅者及远行"
             in result["reading_text"]
         )
+    else:
+        pass
 
 
 @pytest.mark.parametrize(
@@ -82,7 +84,9 @@ def test_lower_sunday_requires_actor_and_distance_but_upper_keeps_its_own_scope(
         (["private_journey", "long_distance_journey"], True),
     ],
 )
-def test_private_purpose_is_not_inferred_from_departure_or_distance(details, applies):
+def test_private_purpose_is_not_inferred_from_departure_or_distance(
+    details, applies: bool
+) -> None:
     result = evidence("2025-03-03", "travel", details)
     assert ("t1299_lower_method_weekday_03" in ids(result)) is applies
     # Upper main text has 私精; it is not silently amended from lower 私情.
@@ -110,19 +114,25 @@ def test_private_purpose_is_not_inferred_from_departure_or_distance(details, app
         ),
     ],
 )
-def test_monday_existing_friends_gathering_is_not_a_new_friendship(details, expected):
+def test_monday_existing_friends_gathering_is_not_a_new_friendship(
+    details, expected
+) -> None:
     result = evidence("2025-03-03", "social", details)
     assert ids(result) == expected
     if details == ["social_gathering"]:
         assert result["activity_assessment"]["evidence_status"] == "favorable"
         assert "t1299_activity_22" in ids(result, "conditional_rules")
         assert "所问社交" in result["reading_text"]
+    else:
+        pass
     if len(details) == 2:
         assert result["activity_assessment"]["evidence_status"] == "conflicted"
         assert "须核对动作和卷别" in result["reading_text"]
+    else:
+        pass
 
 
-def test_friendship_scope_is_consistent_across_all_eighteen_selected_clauses():
+def test_friendship_scope_is_consistent_across_all_eighteen_selected_clauses() -> None:
     rules = [
         *upper_bundle()["rules"],
         *named_bundle()["activity_rules"],
@@ -145,7 +155,7 @@ def test_friendship_scope_is_consistent_across_all_eighteen_selected_clauses():
     )
 
 
-def test_new_facts_do_not_imply_each_other_or_departure():
+def test_new_facts_do_not_imply_each_other_or_departure() -> None:
     for detail in [
         "forming_friendship",
         "social_gathering",
@@ -184,7 +194,9 @@ def test_new_facts_do_not_imply_each_other_or_departure():
             )
 
 
-def test_generic_hundred_affairs_clauses_and_real_marriage_conflicts_are_preserved():
+def test_generic_hundred_affairs_clauses_and_real_marriage_conflicts_are_preserved() -> (
+    None
+):
     # A blanket source clause still covers each narrower action; the fix is
     # not a blanket removal of unfavorable evidence.
     for details in [["social_gathering"], ["forming_friendship"]]:
@@ -196,7 +208,7 @@ def test_generic_hundred_affairs_clauses_and_real_marriage_conflicts_are_preserv
     assert marriage["activity_assessment"]["evidence_status"] == "conflicted"
 
 
-def test_action_facts_do_not_change_calendar_chart_or_physical_sky():
+def test_action_facts_do_not_change_calendar_chart_or_physical_sky() -> None:
     from fatebridge.services.divination import calculate_suzhan_analysis
 
     results = [

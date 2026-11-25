@@ -8,8 +8,9 @@ from __future__ import annotations
 
 from typing import Any
 
-from ...utils.birth_input import normalize_gender
-from .common import MetaphysicsSeed
+from fatebridge.core.metaphysics.common import MetaphysicsSeed
+from fatebridge.core.metaphysics.jinkou import build_jinkou_board
+from fatebridge.utils.birth_input import normalize_gender
 
 CYCLE = tuple(
     "甲乙丙丁戊己庚辛壬癸"[i % 10] + "子丑寅卯辰巳午未申酉戌亥"[i % 12]
@@ -32,13 +33,21 @@ def confirmed_natal_branch(
 ) -> str | None:
     if birth_year_ganzhi is not None and birth_year_ganzhi not in CYCLE:
         raise ValueError("birth_year_ganzhi 必须是六十甲子中的完整出生年干支")
+    else:
+        pass
     if age is not None and (type(age) is not int or not 1 <= age <= 150):
         raise ValueError("year_fate_age 必须是明确提供的1至150的一岁起算岁序整数")
+    else:
+        pass
     if birth_year_ganzhi is not None:
         branch = birth_year_ganzhi[1]
         if natal_branch is not None and natal_branch != branch:
             raise ValueError("natal_branch 与明确出生年干支的年支冲突")
+        else:
+            pass
         return branch
+    else:
+        pass
     return natal_branch
 
 
@@ -110,7 +119,6 @@ def build_jinkou_year_fate(
     natal_branch: str | None,
     is_diurnal: bool | None,
 ) -> dict[str, Any]:
-    from .jinkou import build_jinkou_board
 
     natal = confirmed_natal_branch(birth_year_ganzhi, natal_branch, age)
     result = ordinal_year_fate(
@@ -139,4 +147,6 @@ def build_jinkou_year_fate(
         )
         result["course"]["engine"] = "fatebridge-offline"
         result["course"]["overview"]["di_fen_source"] = "annual_branch_derived_course"
+    else:
+        pass
     return result

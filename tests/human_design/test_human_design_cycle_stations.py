@@ -9,10 +9,10 @@ from pathlib import Path
 import pytest
 
 from fatebridge.application.execution import execute_tool
-from fatebridge.core import human_design_cycles as cycles
 from fatebridge.core.astro import native_execution, runtime
+from fatebridge.core.human_design import human_design_cycles as cycles
 from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.validation.human_design import verify_human_design_reading
+from validation.human_design import verify_human_design_reading
 
 ROOT = Path(__file__).resolve().parents[2]
 PLAN_PATH = ROOT / "tests/fixtures/human-design-cycle-station-plan.json"
@@ -42,7 +42,7 @@ def assert_adjacent_or_zero(lo, hi):
     assert lo == hi or math.nextafter(lo, math.inf) == hi
 
 
-def test_original_24_failures_and_exact_acceptance_bars_stay_frozen():
+def test_original_24_failures_and_exact_acceptance_bars_stay_frozen() -> None:
     assert len(PLAN["cases"]) == 24
     assert sum(c["native_peak_distinguishable"] for c in PLAN["cases"]) == 12
     assert (
@@ -60,8 +60,8 @@ def test_original_24_failures_and_exact_acceptance_bars_stay_frozen():
 
 @pytest.mark.parametrize("case", PLAN["cases"], ids=lambda c: c["id"])
 def test_every_original_oracle_preserves_the_distinguishable_roots_and_unresolved_controls(
-    case, monkeypatch
-):
+    case, monkeypatch: pytest.MonkeyPatch
+) -> None:
     monkeypatch.setattr(cycles, "HORIZON_DAYS", PLAN["horizon_days"])
     read = oracle(case)
     # This source-independent oracle still has TWO mathematical roots in every
@@ -125,8 +125,8 @@ def forbidden(*args, **kwargs):
 
 
 def test_real_all_cycle_brackets_and_selected_residuals_are_adjacent_or_zero(
-    complete, monkeypatch
-):
+    complete, monkeypatch: pytest.MonkeyPatch
+) -> None:
     assert [len(r["contacts"]) for r in complete["cycle_context"]["bodies"]] == [
         1,
         3,
@@ -165,8 +165,8 @@ def test_real_all_cycle_brackets_and_selected_residuals_are_adjacent_or_zero(
 
 @pytest.mark.parametrize("bad", PLAN["negative_receipts"])
 def test_preregistered_station_and_contact_forgeries_rejected_after_rehash(
-    complete, bad, monkeypatch
-):
+    complete, bad, monkeypatch: pytest.MonkeyPatch
+) -> None:
     run = deepcopy(complete)
     body = run["cycle_context"]["bodies"][0]
     station = body["station_witnesses"][0]
@@ -202,7 +202,9 @@ def test_preregistered_station_and_contact_forgeries_rejected_after_rehash(
     assert verify_human_design_reading(run)["status"] == "rejected"
 
 
-def test_distinct_nonzero_crossings_can_share_a_station_bracket_endpoint(monkeypatch):
+def test_distinct_nonzero_crossings_can_share_a_station_bracket_endpoint(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     # Preregistered nonzero shared-endpoint requirement: two opposite sign
     # crossings occupy adjacent TT cells and share a positive station value.
     # Their true quadratic zeros lie between representable instants.

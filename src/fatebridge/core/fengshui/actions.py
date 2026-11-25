@@ -1,13 +1,12 @@
 """Filter sourced actions by explicit permissions; never invent physical facts."""
 
-from typing import TYPE_CHECKING, Any, Dict, List, Optional
+from typing import Any
 
-if TYPE_CHECKING:
-    from .models import LayoutConstraint
+from fatebridge.core.fengshui.models import LayoutConstraint
 
 
 def permission_state(
-    constraint: Optional["LayoutConstraint"], routes: List[List[str]]
+    constraint: LayoutConstraint | None, routes: list[list[str]]
 ) -> str:
     """Routes are alternatives; operations within each route are conjunctive."""
     states = []
@@ -40,14 +39,16 @@ def permission_state(
 
 
 def apply_permission(
-    action: Dict[str, Any],
-    constraint: Optional["LayoutConstraint"],
-    routes: List[List[str]],
+    action: dict[str, Any],
+    constraint: LayoutConstraint | None,
+    routes: list[list[str]],
     *,
     status_key: str = "action_status",
 ) -> None:
     if constraint is None:
         return
+    else:
+        pass
     state = permission_state(constraint, routes)
     action["permission_status"] = state
     action["constraint_evidence"] = constraint.evidence
@@ -55,16 +56,18 @@ def apply_permission(
         action[status_key] = "blocked"
         action["pending_confirmations"] = []
         action["blocked_reason"] = "explicit_action_constraint"
+    else:
+        pass
 
 
 def sharp_corner_target_actions(
     object_id: str,
-    constraint: Optional["LayoutConstraint"],
+    constraint: LayoutConstraint | None,
     *,
     candidate_only: bool,
     rule_id: str,
-    source_ids: List[str],
-) -> List[Dict[str, Any]]:
+    source_ids: list[str],
+) -> list[dict[str, Any]]:
     """Legacy observations identify the seat, never the corner's source object.
 
     Moving that unknown source needs an independently identified object and
@@ -114,6 +117,8 @@ def sharp_corner_target_actions(
                     "required_for": "optional_action",
                 },
             )
+        else:
+            pass
         action = {
             "action_id": action_id,
             "action": action_name,

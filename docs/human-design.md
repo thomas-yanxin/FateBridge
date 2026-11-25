@@ -2,7 +2,7 @@
 
 [文档中心](README.md) · [算法覆盖](algorithm-coverage.md) · [调用合同](contracts/human_design.json)
 
-`human_design` 计算出生与设计两个时刻的激活、门／线／Color／Tone／Base、Variable、中心、通道、类型、权威、定义、桥接方案和Profile，并返回来源分歧及可核验的固定解释。REST 为 `POST /api/astro/human-design`，MCP 与 CLI 为 `human_design`；三端共用领域服务。
+`human_design` 计算出生与设计两个时刻的激活、门／线／Color／Tone／Base、Variable、中心、通道、类型、权威、定义、桥接方案和Profile，并返回来源分歧及可核验的固定解释。REST 为 `POST /api/human-design/chart`，MCP 与 CLI 为 `human_design`；三端共用领域服务。
 
 计算验证、原典解释、来源身份和现实预测分别报告。当前没有可用于认证现实预测的数据，完整原典、完整线义及出版方全部软件约定也未验收。内部算术一致或测试通过不能代替这些证据。
 
@@ -36,6 +36,8 @@ JPL原始文件头范围是TDB，返回`range_time_scale=TDB`及`start_julian_da
 1960年采用[IAU SOFA](https://www.iausofa.org/2023-10-11c)的UTC偏移／日漂移；1961–1971年采用[IERS UTC−TAI历史关系](https://hpiers.obspm.fr/eoppc/bul/bulc/UTC-TAI.history)。1960年前采用声明的历史UT1输入约定。UT1回算沿用同一时间策略；模型ΔT不是实测DUT1，也不证明当地出生钟已经核实。
 
 `birth_second=60`及周期参考中的60秒必须对应[IERS已公布正闰秒](https://hpiers.obspm.fr/iers/bul/bulc/Leap_Second.dat)；普通日期、错误当地分钟和未公布的未来插秒均拒绝。主盘保留经日历规则确认的原始UTC标签，浮点TT的逆算显示另列，不能混作同一精度来源。历史分数秒调整没有唯一民用标签时返回`null`及具名原因，计算仍在TT上进行。
+
+出生钟与周期参考共用同一套精确 TT 运算。它们取插秒前的 `TAI−UTC`，调用只收浮点的星历入口时舍入一次。当前插秒回执使用 v2，原 v1 回执按当时的运算顺序回放。 [固定闰秒门与回放对照](precision-acceptance.md#human-design-leap-epoch-round48)
 
 数字时区按十进制小时解释并舍入至最近微秒（中点取偶）；ISO小数小时／分钟保持自身单位。周期参考最多6位秒小数，使用精确民用标签及已声明时标关系比较先后，不能先转换成相同double TT再决定先后。微秒标签不认证微秒物理精度。
 

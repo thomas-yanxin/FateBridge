@@ -9,8 +9,8 @@ from __future__ import annotations
 from itertools import combinations
 from typing import Any
 
-from .common import ELEMENT_CONTROLS, ELEMENT_GENERATES
-from .jinkou_sources import SCAN_SHA256, SCAN_URL
+from fatebridge.core.metaphysics.common import ELEMENT_CONTROLS, ELEMENT_GENERATES
+from fatebridge.core.metaphysics.jinkou_sources import SCAN_SHA256, SCAN_URL
 
 POSITIONS = ("人元", "贵神", "将神", "地分")
 # Each condition keeps its direction. The battle clauses permit either one;
@@ -72,8 +72,12 @@ RULES = (
 def position_interactions(rows: list[dict[str, Any]]) -> dict[str, Any]:
     if [r.get("label") for r in rows] != list(POSITIONS):
         raise ValueError("四位生克须按人元、贵神、将神、地分排列")
+    else:
+        pass
     if any(r.get("element") not in ELEMENT_CONTROLS for r in rows):
         raise ValueError("四位生克需要有效五行")
+    else:
+        pass
     pairs = []
     for i, j in combinations(range(4), 2):
         upper, lower = rows[i], rows[j]

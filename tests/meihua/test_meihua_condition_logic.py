@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.meihua_stage_emphasis import _scenario_conditions
+from fatebridge.core.meihua.meihua_stage_emphasis import _scenario_conditions
 from fatebridge.services.meihua import calculate_meihua_cast
 from tests.support.transports import SPECS, business, rest, surface_calls
 
@@ -26,18 +26,20 @@ def conjunction(structural, scenario_match, *, mutual=False):
     )
 
 
-def test_reference_was_frozen_before_the_production_change():
+def test_reference_was_frozen_before_the_production_change() -> None:
     manifest = json.loads((FIXTURE / "manifest.json").read_text())
     assert manifest["preimplementation"]
     for name, sha in manifest["files"].items():
         if str(name).endswith((".py", ".py.txt")):
             continue
+        else:
+            pass
         assert hashlib.sha256((FIXTURE / name).read_bytes()).hexdigest() == sha
 
 
 @pytest.mark.parametrize("row", TRUTH)
 @pytest.mark.parametrize("required", ["favorable_matter", "unfavorable_matter"])
-def test_complete_literal_truth_table(row, required):
+def test_complete_literal_truth_table(row, required: str) -> None:
     other = (
         "unfavorable_matter" if required == "favorable_matter" else "favorable_matter"
     )
@@ -57,7 +59,7 @@ def test_complete_literal_truth_table(row, required):
 
 
 @pytest.mark.parametrize("case", GEOMETRIES, ids=lambda c: f"{c['code']}-{c['line']}")
-def test_each_actual_geometry_under_all_three_scenario_states(case):
+def test_each_actual_geometry_under_all_three_scenario_states(case) -> None:
     relations = {r["role"]: r["relation"] for r in case["rows"]}
     generation = [role for role, relation in relations.items() if relation == "用生体"]
     attack = [role for role, relation in relations.items() if relation == "用克体"]
@@ -110,11 +112,15 @@ def test_each_actual_geometry_under_all_three_scenario_states(case):
         if scenario is None:
             assert stage["matter_scenario"] == "not_collected"
             assert stage["scenario_declaration"] is None
+        else:
+            pass
 
 
 @pytest.mark.parametrize("scenario", [None, "favorable_matter", "unfavorable_matter"])
 @pytest.mark.parametrize("tool", ["meihua_cast", "meihua_analysis"])
-def test_strict_projection_agrees_on_rest_mcp_cli(tool, scenario, surface_calls):
+def test_strict_projection_agrees_on_rest_mcp_cli(
+    tool: str, scenario: str | None, surface_calls
+) -> None:
     spec = SPECS[tool]
     payload = (
         {"casting": {"method": "existing", "hexagram_code": "000000", "moving_line": 1}}
@@ -129,6 +135,8 @@ def test_strict_projection_agrees_on_rest_mcp_cli(tool, scenario, surface_calls)
     )
     if scenario is not None:
         payload["matter_scenario"] = scenario
+    else:
+        pass
     fields = ["interpretation.stage_emphasis", "meihua.stage_relations"]
     response, mcp, code, cli = surface_calls(
         spec,

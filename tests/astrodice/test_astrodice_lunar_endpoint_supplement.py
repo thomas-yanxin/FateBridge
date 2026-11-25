@@ -16,7 +16,9 @@ DIRECTORY = (
 )
 
 
-def test_independent_supplement_preserves_the_complete_original_stencil_and_hard_boundary():
+def test_independent_supplement_preserves_the_complete_original_stencil_and_hard_boundary() -> (
+    None
+):
     protocol, reference, checked = validate(DIRECTORY)
     assert checked["original_reference_bytes_unchanged"]
     assert checked["centers"] == 2 and checked["available"] == 1
@@ -50,12 +52,14 @@ def test_independent_supplement_preserves_the_complete_original_stencil_and_hard
         (Fraction(5373485), "10000ad-Jan-01 12:00:00"),
     ],
 )
-def test_julian_days_cross_both_python_calendar_boundaries(epoch, label):
+def test_julian_days_cross_both_python_calendar_boundaries(epoch, label: str) -> None:
     assert calendar_label(epoch) == label
 
 
 @pytest.mark.parametrize("fault", ["raw", "source_direction", "missing_status"])
-def test_supplement_tampering_is_rejected_without_a_candidate_oracle(tmp_path, fault):
+def test_supplement_tampering_is_rejected_without_a_candidate_oracle(
+    tmp_path: Path, fault: str
+) -> None:
     directory = tmp_path / "supplement"
     shutil.copytree(DIRECTORY, directory)
     reference_path = directory / "reference.json"

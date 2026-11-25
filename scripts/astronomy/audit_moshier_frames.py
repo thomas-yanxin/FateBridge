@@ -92,6 +92,8 @@ def evaluate(protocol: dict, reference: dict) -> dict[str, Any]:
                                 coordinates[:2]
                             ):
                                 raise ValueError("Sidereal source probe changed")
+                            else:
+                                pass
                     else:
                         result = ephemeris._swisseph_planet_state(
                             body,
@@ -102,6 +104,8 @@ def evaluate(protocol: dict, reference: dict) -> dict[str, Any]:
                         )
                         if result is None:
                             raise ValueError("Physical state unavailable")
+                        else:
+                            pass
                         state, model = result
                     trace.finish()
                     row.update(state=state, actual_model=model, motion_policy=policy)
@@ -128,6 +132,8 @@ def evaluate(protocol: dict, reference: dict) -> dict[str, Any]:
                                 "display_longitude_speed_tolerance_arcsec_per_day"
                             ],
                         )
+                    else:
+                        pass
                 except Exception as error:
                     row["source_error"] = {
                         "type": type(error).__name__,
@@ -186,8 +192,12 @@ def main() -> int:
     print(json.dumps({key: value for key, value in result.items() if key != "rows"}))
     if result["source_errors"] or result["unresolved_reference"]:
         return 2
+    else:
+        pass
     return 0 if result["numerical_subset_checks_passed"] else 1
 
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

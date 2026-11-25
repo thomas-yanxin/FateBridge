@@ -12,15 +12,14 @@ from types import SimpleNamespace
 
 import pytest
 
-from fatebridge.core.astrology_horary import (
+from fatebridge.core.astro.astrology_horary import (
     _applying_aspect,
-    _judge_perfection,
     _moon_void_of_course,
     _planet_state,
 )
-from fatebridge.core.horary_events import BODIES, solve_planetary_events
-from fatebridge.core.lilly_houses import dwelling_clause, house_condition
-from fatebridge.core.lilly_orbs import (
+from fatebridge.core.astro.horary_events import BODIES, solve_planetary_events
+from fatebridge.core.astro.lilly_houses import dwelling_clause, house_condition
+from fatebridge.core.astro.lilly_orbs import (
     DEFAULT_ORB_PROFILE,
     full_orbs,
     orb_receipt,
@@ -29,15 +28,16 @@ from fatebridge.core.lilly_orbs import (
 from fatebridge.core.requests.western_events import AstroHoraryRequest
 from fatebridge.services.western_horary import calculate_horary
 from tests.support.lunar_sampler import sampled_motion
-from tests.western.test_western_horary import QUESTION
-from tests.western.test_western_horary_motion import state
+from tests.unit_test.fixtures.western_event_cases import QUESTION, state
 
 FIXTURES = Path(__file__).parents[1] / "fixtures"
 SOURCE = json.loads((FIXTURES / "western-lilly-orbs-houses-1647.json").read_text())
 FIRST, SECOND = SOURCE["orb_tables"]
 
 
-def test_original_pages_and_manual_annotation_are_frozen_before_implementation():
+def test_original_pages_and_manual_annotation_are_frozen_before_implementation() -> (
+    None
+):
     assert (
         hashlib.sha256(
             (FIXTURES / "western-lilly-orbs-houses-1647.json").read_bytes()
@@ -60,7 +60,9 @@ def test_original_pages_and_manual_annotation_are_frozen_before_implementation()
     assert SOURCE["expert_reviewed"] is False
 
 
-def test_both_printed_columns_and_all_49_pair_radii_match_independent_fractions():
+def test_both_printed_columns_and_all_49_pair_radii_match_independent_fractions() -> (
+    None
+):
     for profile, table in SOURCE["orb_tables"].items():
         assert full_orbs(profile) == table
         receipt = orb_receipt(profile)
@@ -75,7 +77,7 @@ def test_both_printed_columns_and_all_49_pair_radii_match_independent_fractions(
     assert AstroHoraryRequest.model_fields["orb_profile"].default == FIRST
 
 
-def test_printed_venus_saturn_example_matches_first_column_moieties():
+def test_printed_venus_saturn_example_matches_first_column_moieties() -> None:
     row = SOURCE["printed_example"]
     result = _applying_aspect(
         state("Venus", row["Venus_longitude"], 1),
@@ -86,7 +88,9 @@ def test_printed_venus_saturn_example_matches_first_column_moieties():
     assert result["aspect"] == "trine" and result["orb_profile"] == FIRST
 
 
-def test_preexisting_hybrid_mars_allowance_is_rejected_without_erasing_source_variants():
+def test_preexisting_hybrid_mars_allowance_is_rejected_without_erasing_source_variants() -> (
+    None
+):
     for row in SOURCE["counterexamples"]:
         a, b = [state(p, lon, 1) for p, lon in zip(row["planets"], row["longitudes"])]
         for profile, key in ((FIRST, "first"), (SECOND, "second")):
@@ -97,8 +101,8 @@ def test_preexisting_hybrid_mars_allowance_is_rejected_without_erasing_source_va
 
 @pytest.mark.parametrize("profile,limit", [(FIRST, 7.25), (SECOND, 7.0)])
 def test_orb_equality_convention_classifies_adjacent_floats_before_rounding(
-    profile, limit
-):
+    profile, limit: float
+) -> None:
     a = state("Mars", 0, 0.5)
     for value, expected in (
         (math.nextafter(limit, 0), True),
@@ -111,24 +115,11 @@ def test_orb_equality_convention_classifies_adjacent_floats_before_rounding(
         ) is expected
 
 
-def test_profile_selection_is_local_for_proxy_lunar_annotations_and_concurrent_calls():
+def test_profile_selection_is_local_for_lunar_annotations_and_concurrent_calls() -> (
+    None
+):
     a, b = (state("Mars", 0, 1), state("Mercury", 7.125, 0.5))
-    moon = state("Moon", 7, 13)
-    states = {
-        p: state(p, lon, speed)
-        for p, lon, speed in [
-            ("Saturn", 201, 0.02),
-            ("Jupiter", 218, 0.1),
-            ("Sun", 194, 1),
-            ("Venus", 233, 1.2),
-        ]
-    }
-    states.update(Mars=a, Mercury=b, Moon=moon)
     for profile, expected in ((FIRST, True), (SECOND, False), (FIRST, True)):
-        value = _judge_perfection(
-            a, b, moon, states, "Mars", "Mercury", orb_profile=profile
-        )
-        assert (value["mode"] == "direct") is expected
         result = _moon_void_of_course(
             state("Moon", 0, 13),
             [state("Mars", 9.8, 0)],
@@ -152,14 +143,14 @@ def test_profile_selection_is_local_for_proxy_lunar_annotations_and_concurrent_c
     assert full_orbs(FIRST)["Mars"] == 7.5
 
 
-def test_unknown_orb_profile_fails_before_chart_construction():
+def test_unknown_orb_profile_fails_before_chart_construction() -> None:
     with pytest.raises(ValueError, match="orb_profile"):
         full_orbs("hybrid")
     result = calculate_horary(**QUESTION, orb_profile="hybrid")
     assert result["error_code"] == "validation_error" and "horary" not in result
 
 
-def test_house_rank_and_house_points_are_distinct_original_rows():
+def test_house_rank_and_house_points_are_distinct_original_rows() -> None:
     for rank, house in enumerate(SOURCE["p48_house_strength_order"], 1):
         row = house_condition(house, "R", "Tropic")
         assert row["p48_strength_rank"] == rank
@@ -187,7 +178,9 @@ def test_house_rank_and_house_points_are_distinct_original_rows():
         house_condition(0, "R", "Tropic")
 
 
-def test_native_occupied_house_is_not_confused_with_significator_role_or_guessed():
+def test_native_occupied_house_is_not_confused_with_significator_role_or_guessed() -> (
+    None
+):
     point = SimpleNamespace(abs_pos=20.0, speed=1.0, house="Tenth_House")
     result = _planet_state(SimpleNamespace(venus=point), "Venus")
     assert result["occupied_house"] == 10 and "house" not in result
@@ -235,7 +228,9 @@ def clause(states, history, querent="Venus", quesited="Mars", event_paths=None):
     )
 
 
-def test_dwelling_clause_computes_direction_without_promoting_subset_to_judgement():
+def test_dwelling_clause_computes_direction_without_promoting_subset_to_judgement() -> (
+    None
+):
     states, history = dwelling_inputs()
     result = clause(states, history)
     assert result["quesited_in_first_house"] is True
@@ -253,7 +248,9 @@ def test_dwelling_clause_computes_direction_without_promoting_subset_to_judgemen
     )
 
 
-def test_dwelling_alone_intervening_planet_and_late_ray_do_not_fabricate_transfer():
+def test_dwelling_alone_intervening_planet_and_late_ray_do_not_fabricate_transfer() -> (
+    None
+):
     states, history = dwelling_inputs()
     history["events"].insert(
         1,
@@ -276,7 +273,9 @@ def test_dwelling_alone_intervening_planet_and_late_ray_do_not_fabricate_transfe
     "ambiguity",
     ["unavailable", "missing", "overlap", "boundary", "tangent", "unresolved", "speed"],
 )
-def test_dwelling_retains_unknown_lunar_histories_and_numerical_ambiguity(ambiguity):
+def test_dwelling_retains_unknown_lunar_histories_and_numerical_ambiguity(
+    ambiguity: str,
+) -> None:
     states, history = dwelling_inputs()
     if ambiguity == "unavailable":
         history["status"] = "unavailable"
@@ -291,6 +290,8 @@ def test_dwelling_retains_unknown_lunar_histories_and_numerical_ambiguity(ambigu
         elif ambiguity == "tangent":
             event["topology"] = "tangent"
             event["root_bracket_tt"] = [0.4, 0.5]
+        else:
+            pass
         history["events"].append(event)
     elif ambiguity == "speed":
         states["Moon"]["speed"] = None
@@ -307,8 +308,8 @@ def test_dwelling_retains_unknown_lunar_histories_and_numerical_ambiguity(ambigu
 @pytest.mark.parametrize("other_ray", ["sextile", "square", "trine"])
 @pytest.mark.parametrize("occupied", [1, 10, None])
 def test_unordered_contacts_do_not_turn_a_historical_ray_into_a_definite_failure(
-    past, extra_first, other_ray, occupied
-):
+    past: bool, extra_first: bool, other_ray: str, occupied: int | None
+) -> None:
     states, history = dwelling_inputs()
     states["Mars"]["occupied_house"] = occupied
     for event, delta in zip(history["events"], [-1, 1]):
@@ -337,7 +338,7 @@ def test_unordered_contacts_do_not_turn_a_historical_ray_into_a_definite_failure
     assert result["full_judgement_accepted"] is False
 
 
-def test_dwelling_role_collisions_and_unknown_occupancy_are_explicit():
+def test_dwelling_role_collisions_and_unknown_occupancy_are_explicit() -> None:
     states, history = dwelling_inputs()
     for a, b in [("Mars", "Mars"), ("Moon", "Mars"), ("Venus", "Moon")]:
         result = clause(states, history, a, b)
@@ -349,7 +350,9 @@ def test_dwelling_role_collisions_and_unknown_occupancy_are_explicit():
     assert clause(states, history)["named_necessary_conditions_satisfied"] is False
 
 
-def test_matching_p126_receipts_remain_distinct_from_p127_necessary_subconditions():
+def test_matching_p126_receipts_remain_distinct_from_p127_necessary_subconditions() -> (
+    None
+):
     states, history = dwelling_inputs()
     result = clause(
         states,
@@ -369,7 +372,7 @@ def test_matching_p126_receipts_remain_distinct_from_p127_necessary_subcondition
     assert result["full_original_text_acceptance"] is False
 
 
-def test_actual_root_solver_feeds_dwelling_invariant_to_event_array_order():
+def test_actual_root_solver_feeds_dwelling_invariant_to_event_array_order() -> None:
     positions = {p: 40.0 for p in BODIES}
     speeds = {p: 0.0 for p in BODIES}
     positions.update(Moon=12.0, Mars=10.0, Venus=14.0)

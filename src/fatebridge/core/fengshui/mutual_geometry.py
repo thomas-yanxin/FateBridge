@@ -18,6 +18,8 @@ PATHS = (("later_heaven", "earlier_heaven"), ("earlier_heaven", "later_heaven"))
 def _require(condition: bool) -> None:
     if not condition:
         raise FengshuiCalculationError("natal_mutual_geometry_inconsistent")
+    else:
+        pass
 
 
 @lru_cache(maxsize=1)
@@ -29,6 +31,8 @@ def _facts() -> dict[str, Any]:
         data = json.loads(raw)
         if not isinstance(data, dict):
             raise FengshuiCalculationError("natal_mutual_geometry_inconsistent")
+        else:
+            pass
         return data
     except (OSError, ValueError, TypeError) as error:
         raise FengshuiCalculationError("natal_mutual_geometry_inconsistent") from error
@@ -182,6 +186,8 @@ def validate_author_geometries(
         if profile is None:
             _require(not require_current_version)
             return counts
+        else:
+            pass
         _require(profile["ruleset_id"] == "wang_zhongzhou_timeliness_v1")
         modern = profile["version"] == "1.1.0"
         _require(
@@ -197,6 +203,8 @@ def validate_author_geometries(
                     for layout in ("earlier_heaven", "later_heaven")
                 )
             )
+        else:
+            pass
         _require(
             type(interpretation["current_period_context"]["number"]) is type(current)
         )
@@ -204,6 +212,8 @@ def validate_author_geometries(
         charts = natal.get("candidates", [])
         if not charts and natal.get("chart") is not None:
             charts = [natal["chart"]]
+        else:
+            pass
         candidates = interpretation["candidates"]
         _require(len(candidates) == len(charts))
         for candidate, chart in zip(candidates, charts):
@@ -250,6 +260,8 @@ def validate_author_geometries(
                     validate_author_phase(author, number=number, current=current)
                     if not modern:
                         continue
+                    else:
+                        pass
                     value = author["mutual_use_reference"]["geometry"]
                     validate_mutual_geometry(value, number=number, current=current)
                     counts["checked"] += 1
@@ -284,6 +296,8 @@ def validate_author_phase(
             )
             if offset in offsets
         )
+    else:
+        pass
     labels = {
         "unknown": None,
         "prosperous": "旺",
@@ -303,6 +317,8 @@ def validate_author_phase(
     for key, value in expected.items():
         if type(author[key]) is not type(value) or author[key] != value:
             raise FengshuiCalculationError("natal_author_timeliness_inconsistent")
+        else:
+            pass
     members = (
         [] if current is None else _facts()["printed_mutual_numbers"][str(current)]
     )
@@ -315,3 +331,5 @@ def validate_author_phase(
         or actual["application_status"] != "numeric_reference_only_no_site_verdict"
     ):
         raise FengshuiCalculationError("natal_author_timeliness_inconsistent")
+    else:
+        pass

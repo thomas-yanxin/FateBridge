@@ -25,13 +25,13 @@ DAY_REFERENCE = json.loads(
 )
 
 
-def test_civil_day_epoch_at_pinned_year_and_leap_boundaries():
+def test_civil_day_epoch_at_pinned_year_and_leap_boundaries() -> None:
     for text, lunar_python, sxtwl in DAY_REFERENCE["day_rows"]:
         day = date.fromisoformat(text)
         assert get_day_ganzhi(day.year, day.month, day.day) == lunar_python == sxtwl
 
 
-def test_all_24_hours_at_pinned_calendar_boundaries():
+def test_all_24_hours_at_pinned_calendar_boundaries() -> None:
     for text, hour, (expected_day, expected_hour) in DAY_REFERENCE["day_hour_rows"]:
         day = date.fromisoformat(text)
         assert (
@@ -50,7 +50,7 @@ def test_all_24_hours_at_pinned_calendar_boundaries():
         )
 
 
-def test_lichun_boundary_updates_bazi_year_and_month():
+def test_lichun_boundary_updates_bazi_year_and_month() -> None:
     terms = {
         term.name: term for term in get_solar_terms_for_year(2024, "Asia/Shanghai")
     }
@@ -77,7 +77,7 @@ def test_lichun_boundary_updates_bazi_year_and_month():
 @pytest.mark.parametrize("route", ["year", "adjacent", "month"])
 def test_returned_solar_provenance_cannot_poison_later_boundaries(
     zone: str, route: str, request: pytest.FixtureRequest
-):
+) -> None:
     get_solar_terms_for_year.cache_clear()
     request.addfinalizer(get_solar_terms_for_year.cache_clear)
     term = get_solar_terms_for_year(2024, zone)[2]
@@ -99,7 +99,7 @@ def test_returned_solar_provenance_cannot_poison_later_boundaries(
     assert get_bazi_month_context(moment, zone)["branch"] == "寅"
 
 
-def test_dayun_start_details_use_jieqi_boundary():
+def test_dayun_start_details_use_jieqi_boundary() -> None:
     birth = datetime(2028, 4, 6, 9, 33)
 
     details = TimingAnalysis.calculate_dayun_start_details(
@@ -121,7 +121,7 @@ def test_dayun_start_details_use_jieqi_boundary():
     assert details["start_age_rounded"] == 10
 
 
-def test_day_pillars_use_the_civil_epoch_in_both_independent_calendars():
+def test_day_pillars_use_the_civil_epoch_in_both_independent_calendars() -> None:
     # Pinned lunar-python 1645ad3 and sxtwl_cpp f78cd5e agree. The original
     # unsupported offset snapshot and its 丁酉/辛亥 result are retained in the
     # audit evidence; a global eleven-day shift is not a calendar convention.
@@ -136,7 +136,7 @@ def test_day_pillars_use_the_civil_epoch_in_both_independent_calendars():
     assert pillars["hour"] == ("癸", "亥")
 
 
-def test_destiny_analysis_exposes_lunar_and_meihua_context():
+def test_destiny_analysis_exposes_lunar_and_meihua_context() -> None:
     person = create_person_info(
         2028,
         4,
@@ -159,7 +159,7 @@ def test_destiny_analysis_exposes_lunar_and_meihua_context():
     assert meihua["changed_hexagram"]["name"] == "山水蒙"
 
 
-def test_comprehensive_timing_returns_jieqi_grid_and_analysis_calendar():
+def test_comprehensive_timing_returns_jieqi_grid_and_analysis_calendar() -> None:
     person = create_person_info(
         2028,
         4,
@@ -211,7 +211,7 @@ def test_comprehensive_timing_returns_jieqi_grid_and_analysis_calendar():
     assert qingming_node["liuri"]["pillar"] == "己未"
 
 
-def test_build_calendar_context_marks_out_of_range_lunar_support():
+def test_build_calendar_context_marks_out_of_range_lunar_support() -> None:
     moment = datetime(2101, 1, 1, 12, 0, 0)
     pillars = BaZiCalendar.get_four_pillars(moment, timezone_name="Asia/Shanghai")
 
@@ -229,7 +229,7 @@ def test_build_calendar_context_marks_out_of_range_lunar_support():
     }
 
 
-def test_zi_shi_rolls_day_pillar_to_next_civil_day():
+def test_zi_shi_rolls_day_pillar_to_next_civil_day() -> None:
     same_day = create_person_info(2024, 2, 4, 22, "t", "男", "北京")
     zi_shi = create_person_info(2024, 2, 4, 23, "t", "男", "北京", birth_minute=30)
     next_day = create_person_info(2024, 2, 5, 1, "t", "男", "北京")

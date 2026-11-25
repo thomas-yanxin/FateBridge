@@ -6,7 +6,7 @@ from pathlib import Path
 from fatebridge.core import ephemeris_runtime as e
 from fatebridge.core.astro.birth import build_astro_birth_info
 from fatebridge.core.astro.birth_clock import solar_wall_clock
-from fatebridge.core.jyotish import build_india
+from fatebridge.core.jyotish.jyotish import build_india
 from fatebridge.services.jyotish import calculate_vimshottari
 
 mode = sys.argv[1]
@@ -23,9 +23,13 @@ os.environ.pop("FATEBRIDGE_JPL_FILE", None)
 if mode == "stale":
     e.configure_ephemeris_path(str(custom))
     e.ephemeris_call("deltat_ex", 2451545.0, e.swe.FLG_SWIEPH)
+else:
+    pass
 e.configure_ephemeris_path(str(empty))
 if mode == "manual":
     e.swe.set_delta_t_userdef(400 / 86400)
+else:
+    pass
 args = dict(
     birth_year=2000,
     birth_month=1,
@@ -58,4 +62,6 @@ if mode == "clean":
     out["shared_physical_LAT"] = solar_wall_clock(
         birth.utc_datetime, birth.longitude, "local_apparent_solar"
     ).isoformat()
+else:
+    pass
 print(json.dumps(out))

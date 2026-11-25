@@ -9,14 +9,16 @@ import pytest
 from fatebridge.core.local_techniques.qimen import (
     _render_qimen_source_disagreements,
 )
-from fatebridge.validation.qimen import audit_numeric_tables
-from tests.qimen.test_qimen_depth import fixed_board
+from tests.unit_test.fixtures.qimen import fixed_board
+from validation.qimen import audit_numeric_tables
 
 BUNDLE = Path(__file__).parents[1] / "fixtures/qimen_classical_v3"
 MANIFEST = json.loads((BUNDLE / "sources-and-tables.json").read_text())
 
 
-def test_complete_eighteen_tables_preserve_all_1080_rows_and_both_disagreements():
+def test_complete_eighteen_tables_preserve_all_1080_rows_and_both_disagreements() -> (
+    None
+):
     report = audit_numeric_tables(BUNDLE)
     assert report["table_count"] == 18
     assert report["case_count"] == 1080
@@ -60,7 +62,9 @@ def test_complete_eighteen_tables_preserve_all_1080_rows_and_both_disagreements(
 
 
 @pytest.mark.parametrize("deletion", ["table", "column", "hour", "duplicate"])
-def test_audit_refuses_reduced_or_duplicated_reference_coverage(tmp_path, deletion):
+def test_audit_refuses_reduced_or_duplicated_reference_coverage(
+    tmp_path: Path, deletion: str
+) -> None:
     shutil.copytree(BUNDLE, tmp_path / "reference")
     path = tmp_path / "reference/sources-and-tables.json"
     data = json.loads(path.read_text())
@@ -81,8 +85,8 @@ def test_audit_refuses_reduced_or_duplicated_reference_coverage(tmp_path, deleti
     "filename", [MANIFEST["excerpt_file"], "cadal-06056497-p118.jpg"]
 )
 def test_audit_refuses_changed_source_even_if_numeric_annotations_still_match(
-    tmp_path, filename
-):
+    tmp_path: Path, filename
+) -> None:
     shutil.copytree(BUNDLE, tmp_path / "reference")
     source = tmp_path / "reference" / filename
     source.write_bytes(source.read_bytes() + b"changed")
@@ -98,8 +102,13 @@ def test_audit_refuses_changed_source_even_if_numeric_annotations_still_match(
     ],
 )
 def test_live_board_retains_printed_palace_without_overriding_calculation(
-    monkeypatch, ju, hour, case_id, expected, computed
-):
+    monkeypatch: pytest.MonkeyPatch,
+    ju: int,
+    hour: str,
+    case_id: str,
+    expected: str,
+    computed: str,
+) -> None:
     board = fixed_board(monkeypatch, {"dun": "阴遁", "ju": ju, "hour": hour})
     d = board["source_disagreements"][0]
     assert d["case_id"] == case_id
@@ -111,8 +120,8 @@ def test_live_board_retains_printed_palace_without_overriding_calculation(
 
 
 def test_vol4_yin3_table_supports_leader_move_without_erasing_vol2_door_conflict(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     table = next(t for t in MANIFEST["tables"] if t["dun"] == "阴遁" and t["ju"] == 3)
     # Printed column 甲申, ninth hour 壬辰: star 8 / door 2, BEFORE centre hosting.
     assert table["palace_pairs"][2].split()[8] == "82"
@@ -130,7 +139,7 @@ def test_vol4_yin3_table_supports_leader_move_without_erasing_vol2_door_conflict
     )
 
 
-def test_centre_five_stays_raw_five_in_the_reference():
+def test_centre_five_stays_raw_five_in_the_reference() -> None:
     table = next(t for t in MANIFEST["tables"] if t["dun"] == "阳遁" and t["ju"] == 1)
     assert table["palace_pairs"][4].split()[0] == "55"  # 甲辰, 天禽/死门.
     assert table["leader_star_codes"][4] == "禽"

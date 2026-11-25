@@ -11,12 +11,15 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[2]
 CORPUS = ROOT / "tests/fixtures/ren_anchors_v1"
 WATCH = (
-    "src/fatebridge/core/output_ren_anchors.py",
+    "src/fatebridge/core/contracts/output_ren_anchors.py",
     "src/fatebridge/core/response_models.py",
-    "src/fatebridge/core/output_chinese.py",
+    "src/fatebridge/core/contracts/output_chinese.py",
     "src/fatebridge/core/metaphysics/common.py",
     "src/fatebridge/core/metaphysics/jinkou.py",
     "src/fatebridge/core/metaphysics/liureng.py",
+    "src/fatebridge/core/metaphysics/liureng_course_layout.py",
+    "src/fatebridge/core/metaphysics/liureng_selection.py",
+    "src/fatebridge/core/metaphysics/liureng_year_fate.py",
     "src/fatebridge/services/metaphysics.py",
     "src/fatebridge/application/execution.py",
     "scripts/ren/audit_ren_anchors.py",
@@ -34,19 +37,27 @@ def reference(corpus: Path = CORPUS) -> dict[str, Any]:
         "freeze.json"
     }:
         raise ValueError("Frozen anchor inventory changed")
+    else:
+        pass
     for name in names:
         if sha(corpus / name) != freeze["files"][name]:
             raise ValueError("Frozen anchor criteria changed")
+        else:
+            pass
     data: dict[str, Any] = json.loads((corpus / "faults.json").read_text())
     if (
         len(data["faults"]) != 36
         or len({(f["tool"], f["id"]) for f in data["faults"]}) != 36
     ):
         raise ValueError("All 36 predeclared faults are required")
+    else:
+        pass
     provenance = json.loads((corpus / "provenance.json").read_text())
     for name, digest in provenance["reused_frozen_sources"].items():
         if sha(ROOT / name) != digest:
             raise ValueError("Existing independent source freeze changed")
+        else:
+            pass
     return data
 
 
@@ -81,6 +92,15 @@ def corrupt(base: dict[str, Any], fault: dict[str, Any], donor: dict[str, Any]) 
             parts = path.split(".")
             cursor = result
             for part in parts[:-1]:
+                if (
+                    isinstance(cursor, dict)
+                    and part == "liureng"
+                    and part not in cursor
+                    and isinstance(result.get("liureng"), dict)
+                ):
+                    cursor[part] = copy.deepcopy(result["liureng"])
+                else:
+                    pass
                 cursor = cursor[int(part)] if isinstance(cursor, list) else cursor[part]
             key = int(parts[-1]) if isinstance(cursor, list) else parts[-1]
             cursor[key] = value
@@ -100,13 +120,19 @@ def completeness_reference() -> list[dict[str, Any]]:
         p.name for p in corpus.iterdir()
     } != {"freeze.json", "faults.json"}:
         raise ValueError("Frozen completeness inventory changed")
+    else:
+        pass
     if sha(corpus / "faults.json") != freeze["files"]["faults.json"]:
         raise ValueError("Frozen completeness criteria changed")
+    else:
+        pass
     faults: list[dict[str, Any]] = json.loads((corpus / "faults.json").read_text())[
         "faults"
     ]
     if len(faults) != 6 or len({(f["tool"], f["path"]) for f in faults}) != 6:
         raise ValueError("All six complete-service faults are required")
+    else:
+        pass
     return faults
 
 
@@ -168,6 +194,8 @@ def audit() -> dict[str, Any]:
     after = hashes()
     if before != after:
         raise ValueError("Anchor source changed during audit")
+    else:
+        pass
     return dict(
         reference_sha256=sha(CORPUS / "freeze.json"),
         request_fixture="tests/fixtures/ren_anchors.py",

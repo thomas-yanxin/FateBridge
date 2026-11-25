@@ -22,7 +22,7 @@ IMPLEMENTATION = (
     "src/fatebridge/core/metaphysics/jinkou_patterns.py",
     "src/fatebridge/core/metaphysics/jinkou_strength.py",
     "src/fatebridge/core/metaphysics/jinkou_qi.py",
-    "src/fatebridge/core/output_chinese.py",
+    "src/fatebridge/core/contracts/output_chinese.py",
     "src/fatebridge/services/metaphysics.py",
     "scripts/ren/audit_jinkou_relations.py",
     "scripts/ren/audit_jinkou_patterns.py",
@@ -41,9 +41,13 @@ def reference(corpus: Path = CORPUS) -> dict[str, Any]:
         p.name for p in corpus.iterdir()
     } != names | {"freeze.json"}:
         raise ValueError("Frozen relation inventory changed")
+    else:
+        pass
     for name, checksum in manifest["files"].items():
         if sha(corpus / name) != checksum:
             raise ValueError(f"Frozen relation reference changed: {name}")
+        else:
+            pass
     return json.loads((corpus / "reference.json").read_text())
 
 
@@ -90,6 +94,8 @@ def reconstruction_diagnostics() -> dict[str, Any]:
                 )
             )
             continue
+        else:
+            pass
         inputs = dict(
             day=case["day"],
             hour=case["hour"],
@@ -200,6 +206,8 @@ def audit() -> dict[str, Any]:
                             actual=item,
                         )
                     )
+                else:
+                    pass
     phase_branch = dict(zip("木火土金水", "寅午辰申子"))
     for position in ("人元", "贵神", "将神"):
         for phase, target in ref["si_bai"].items():
@@ -232,6 +240,8 @@ def audit() -> dict[str, Any]:
                             actual=item,
                         )
                     )
+                else:
+                    pass
     for rule in ref["calendar_rules"]:
         for position in rule["positions"]:
             for time_branch in BRANCHES:
@@ -269,6 +279,8 @@ def audit() -> dict[str, Any]:
                                 actual=item,
                             )
                         )
+                    else:
+                        pass
     reconstruction = reconstruction_diagnostics()
     unchanged = before == {name: sha(ROOT / name) for name in IMPLEMENTATION}
     return dict(
@@ -326,3 +338,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

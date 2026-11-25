@@ -8,19 +8,20 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from fatebridge.core.heluo import judge
-from fatebridge.core.heluo_lines import RULESET_ID, SOURCE_PATH, line_conditions
+from fatebridge.core.contracts.output_numerology import HeluoJudge
+from fatebridge.core.heluo.heluo import judge
+from fatebridge.core.heluo.heluo_lines import RULESET_ID, SOURCE_PATH, line_conditions
 from fatebridge.core.local_techniques.heluo import build_heluo_result
-from fatebridge.core.output_numerology import HeluoJudge
-from tests.numerology.test_heluo_month_depth import chart_for
-from tests.numerology.test_heluo_najia_depth import PILLARS
+from tests.unit_test.fixtures.heluo_charts import PILLARS, chart_for
 
 ROOT = Path(__file__).parents[1] / "fixtures/heluo_line_rules_v1"
 REFERENCE = json.loads((ROOT / "reference.json").read_text())
 
 
 @pytest.mark.parametrize("case", REFERENCE["named_zhongzong_illustrations"])
-def test_named_original_zhongzong_illustrations_use_the_actual_selected_line(case):
+def test_named_original_zhongzong_illustrations_use_the_actual_selected_line(
+    case,
+) -> None:
     chart = chart_for(case["gua"])
     assert chart["xian"]["lines"] == case["lines"]
     chart["xian"]["yuan"] = case["minority_pos"]
@@ -34,7 +35,7 @@ def test_named_original_zhongzong_illustrations_use_the_actual_selected_line(cas
 
 
 @pytest.mark.parametrize("case", REFERENCE["derived_pattern_cases"])
-def test_twelve_formula_arrangements_include_actual_line_selection(case):
+def test_twelve_formula_arrangements_include_actual_line_selection(case) -> None:
     chart = chart_for(case["gua"])
     assert chart["xian"]["lines"] == case["lines"]
     for pos in range(1, 7):
@@ -47,7 +48,7 @@ def test_twelve_formula_arrangements_include_actual_line_selection(case):
 @pytest.mark.parametrize(
     "pos,order", list(enumerate(REFERENCE["position_order"], start=1))
 )
-def test_literal_position_order_is_distinct_from_generic_parity(pos, order):
+def test_literal_position_order_is_distinct_from_generic_parity(pos, order) -> None:
     chart = chart_for("坤為地")
     chart["xian"]["yuan"] = pos
     result = judge(chart, PILLARS, "卯")
@@ -58,7 +59,7 @@ def test_literal_position_order_is_distinct_from_generic_parity(pos, order):
 
 
 @pytest.mark.parametrize("gua", ["乾為天", "坤為地", "地天泰", "天地否", "風地觀"])
-def test_pure_balanced_and_two_minority_lines_do_not_become_zhongzong(gua):
+def test_pure_balanced_and_two_minority_lines_do_not_become_zhongzong(gua: str) -> None:
     evidence = line_conditions(chart_for(gua))
     for row in evidence["phases"]:
         assert row["zhongzong"]["minority_pos"] is None
@@ -67,7 +68,9 @@ def test_pure_balanced_and_two_minority_lines_do_not_become_zhongzong(gua):
     assert evidence["ten_condition_score"] is None
 
 
-def test_half_year_or_month_branch_cannot_supply_an_unverified_yinyue_definition():
+def test_half_year_or_month_branch_cannot_supply_an_unverified_yinyue_definition() -> (
+    None
+):
     a = chart_for("地水師")
     a["xian"]["yuan"] = 2
     a["yangLing"] = True
@@ -82,7 +85,7 @@ def test_half_year_or_month_branch_cannot_supply_an_unverified_yinyue_definition
     assert source["solstice_half_year_substituted"] is False
 
 
-def test_loaded_source_hash_and_each_whole_page_witness_are_retained():
+def test_loaded_source_hash_and_each_whole_page_witness_are_retained() -> None:
     for page in REFERENCE["images"]:
         assert (
             hashlib.sha256((ROOT / page["file"]).read_bytes()).hexdigest()
@@ -108,7 +111,7 @@ def test_loaded_source_hash_and_each_whole_page_witness_are_retained():
     } == REFERENCE["literal_clauses"]
 
 
-def test_same_run_trace_snapshot_and_selected_phase_agree():
+def test_same_run_trace_snapshot_and_selected_phase_agree() -> None:
     result = build_heluo_result(
         date="1990-06-15",
         time="09:33",
@@ -152,6 +155,6 @@ def test_same_run_trace_snapshot_and_selected_phase_agree():
         {"phases": [{"zhongzong": {"match": "false"}}]},
     ],
 )
-def test_contract_does_not_certify_unknown_conditions_or_coerce_facts(invalid):
+def test_contract_does_not_certify_unknown_conditions_or_coerce_facts(invalid) -> None:
     with pytest.raises(ValidationError):
         HeluoJudge.model_validate({"line_conditions": invalid})

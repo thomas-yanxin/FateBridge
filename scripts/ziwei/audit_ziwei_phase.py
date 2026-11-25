@@ -47,11 +47,15 @@ def new_moons(text: str) -> list[datetime]:
             year = int(prefix)
         elif prefix:
             continue
+        else:
+            pass
         cell = re.fullmatch(
             r"([A-Z][a-z]{2})\s+(\d{1,2})\s+(\d{2}):(\d{2})", line[8:21]
         )
         if year is None or not cell:
             continue
+        else:
+            pass
         month, day, hour, minute = cell.groups()
         moments.append(
             datetime(
@@ -75,9 +79,13 @@ def audit_phase_days(fixtures: Path = FIXTURES) -> dict[str, Any]:
         data = (fixtures / source["path"]).read_bytes()
         if hashlib.sha256(data).hexdigest() != source["sha256"]:
             raise ValueError("NASA phase source checksum mismatch")
+        else:
+            pass
         moments.extend(new_moons(data.decode("utf-8")))
     if len(moments) != len(set(moments)):
         raise ValueError("Duplicate NASA new-moon boundary")
+    else:
+        pass
     moments = sorted(moments)
     offset = timezone(timedelta(hours=manifest["civil_day_offset_hours"]))
     local = [t.astimezone(offset) for t in moments]
@@ -91,11 +99,15 @@ def audit_phase_days(fixtures: Path = FIXTURES) -> dict[str, Any]:
     ]
     if not boundaries or boundaries[0].date() > start or boundaries[-1].date() <= end:
         raise ValueError("NASA boundary coverage is incomplete")
+    else:
+        pass
     if any(
         not 29 <= (b.date() - a.date()).days <= 30
         for a, b in zip(boundaries, boundaries[1:])
     ):
         raise ValueError("Missing or non-lunation NASA boundary")
+    else:
+        pass
     mismatches = []
     current = start
     checked = 0
@@ -107,6 +119,8 @@ def audit_phase_days(fixtures: Path = FIXTURES) -> dict[str, Any]:
             mismatches.append(
                 dict(solar=current.isoformat(), expected=expected, actual=actual)
             )
+        else:
+            pass
         checked += 1
         current += timedelta(days=1)
     near = [t for t in boundaries if start <= t.date() <= end]

@@ -1,27 +1,13 @@
 """The actual public BaZi/timing surfaces retain the same clock evidence."""
 
 import asyncio
+from pathlib import Path
 
 import pytest
 
-from tests.bazi.test_bazi_birth_seconds import BASE, SPECS
 from tests.support.transports import AS_OF, business, call_cli, inputs, native
 from tests.support.transports import rest as _shared_rest
-
-
-def receipt_path(spec):
-    if spec.key == "bazi_birth":
-        return "bazi_birth.calendar_context.birth_time_input"
-    if spec.family == "bazi" and spec.key != "analyze_destiny":
-        return f"{spec.key.removeprefix('bazi_')}_analysis.calendar_context.birth_time_input"
-    return "calendar_context.birth_time_input"
-
-
-def leaf(payload, path):
-    for part in path.split("."):
-        payload = payload[part]
-    return payload
-
+from tests.unit_test.fixtures.bazi_birth_clock import BASE, SPECS, leaf, receipt_path
 
 rest = _shared_rest
 
@@ -29,8 +15,13 @@ rest = _shared_rest
 @pytest.mark.parametrize("spec", SPECS, ids=lambda s: s.key)
 @pytest.mark.parametrize("project", [False, True])
 def test_seconds_and_component_receipt_on_every_actual_surface(
-    spec, project, rest, tmp_path, capsys, monkeypatch
-):
+    spec,
+    project: bool,
+    rest,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path / "empty"))
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "auto")
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
@@ -40,6 +31,8 @@ def test_seconds_and_component_receipt_on_every_actual_surface(
     if project:
         opts.update(fields=[receipt_path(spec)], strict_fields=True)
         flags += ["--fields", receipt_path(spec), "--strict-fields", "true"]
+    else:
+        pass
     result = asyncio.run(native(spec, payload, **opts))
     code, cli = call_cli(spec, payload, tmp_path, capsys, flags=flags)
     assert not result.is_error and code == 0
@@ -87,12 +80,16 @@ def test_seconds_and_component_receipt_on_every_actual_surface(
             if data.get("snapshot_text"):
                 assert "1990-05-15T10:20:59+00:00" in data["snapshot_text"]
                 assert "不认证" in data["snapshot_text"]
+            else:
+                pass
+        else:
+            pass
 
 
 @pytest.mark.parametrize("spec", SPECS, ids=lambda s: s.key)
 def test_invalid_second_reaches_no_complete_report_on_every_actual_surface(
-    spec, rest, tmp_path, capsys
-):
+    spec, rest, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     payload = {**inputs(spec), **BASE, "birth_minute": 20, "birth_second": 60}
     result = asyncio.run(native(spec, payload))
     code, cli = call_cli(spec, payload, tmp_path, capsys)
@@ -101,3 +98,5 @@ def test_invalid_second_reaches_no_complete_report_on_every_actual_surface(
     if spec.rest_path is not None:
         response = rest.post(spec.rest_path, json=payload)
         assert response.status_code == 422, response.text
+    else:
+        pass

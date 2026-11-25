@@ -6,11 +6,11 @@ from pathlib import Path
 
 import pytest
 
-from fatebridge.core.sukuyo_quotation_comparison import (
+from fatebridge.core.sukuyo.sukuyo_quotation_comparison import (
     quotation_lines,
     quotation_reference,
 )
-from fatebridge.core.sukuyo_zhidu_calendar import (
+from fatebridge.core.sukuyo.sukuyo_zhidu_calendar import (
     validate_zhidu,
     zhidu_lines,
     zhidu_reference,
@@ -23,7 +23,7 @@ def frozen():
     return json.loads(FIXTURE.read_bytes())
 
 
-def test_complete_reference_and_separate_before_code_numerical_oracle():
+def test_complete_reference_and_separate_before_code_numerical_oracle() -> None:
     expected = frozen()
     actual = zhidu_reference()
     assert actual["source_data"] == expected["source_data"]
@@ -31,7 +31,7 @@ def test_complete_reference_and_separate_before_code_numerical_oracle():
     assert actual["before_code_reference_sha256"] == actual["source_bundle_sha256"]
 
 
-def test_four_stable_slots_survive_the_reported_repeated_month_term():
+def test_four_stable_slots_survive_the_reported_repeated_month_term() -> None:
     data = zhidu_reference()["source_data"]
     rows = data["month_definitions"]["T1509"]
     assert [r["slot_id"] for r in rows] == [f"month_{i}" for i in range(1, 5)]
@@ -48,7 +48,7 @@ def test_four_stable_slots_survive_the_reported_repeated_month_term():
     assert data["month_definitions"]["T2122"][2]["reported_term_alternatives"] == []
 
 
-def test_enumeration_and_detailed_definition_remain_separate():
+def test_enumeration_and_detailed_definition_remain_separate() -> None:
     reference = zhidu_reference()
     data = reference["source_data"]
     enum = data["month_enumerations"]["T1509"]
@@ -64,7 +64,7 @@ def test_enumeration_and_detailed_definition_remain_separate():
     }
 
 
-def test_day_end_variant_is_not_moved_to_month_names_or_other_books():
+def test_day_end_variant_is_not_moved_to_month_names_or_other_books() -> None:
     sources = zhidu_reference()["source_data"]["sources"]
     note = sources["T2122"]["selected_apparatus"][0]
     assert note["app"]["lem"] == "旦"
@@ -76,7 +76,7 @@ def test_day_end_variant_is_not_moved_to_month_names_or_other_books():
     assert sources["T2122"]["apparatus_counts"]["selected_records"] == 6
 
 
-def test_volume_layers_and_unresolved_printed_character_are_not_unified():
+def test_volume_layers_and_unresolved_printed_character_are_not_unified() -> None:
     data = zhidu_reference()["source_data"]
     page = data["printed_pages"]["T1509"]
     assert page["page_and_volume_layers"]["margin_header_literal"].endswith("四十九")
@@ -92,7 +92,7 @@ def test_volume_layers_and_unresolved_printed_character_are_not_unified():
     assert not target["established_print_XML_character_discrepancy"]
 
 
-def test_year_branches_and_extra_arithmetic_assumptions_are_explicit():
+def test_year_branches_and_extra_arithmetic_assumptions_are_explicit() -> None:
     reference = zhidu_reference()
     data = reference["source_data"]
     assert data["intercalation_and_year"]["T1509"][
@@ -132,14 +132,14 @@ def test_year_branches_and_extra_arithmetic_assumptions_are_explicit():
         "real_prediction_efficacy_established",
     ],
 )
-def test_unestablished_scope_upgrades_require_a_new_source_review(key):
+def test_unestablished_scope_upgrades_require_a_new_source_review(key: str) -> None:
     data = copy.deepcopy(frozen()["source_data"])
     data["scope"][key] = True
     with pytest.raises(ValueError):
         validate_zhidu(data)
 
 
-def test_source_mutation_does_not_affect_later_calls_and_native_rejects_it():
+def test_source_mutation_does_not_affect_later_calls_and_native_rejects_it() -> None:
     reference = zhidu_reference()
     reference["source_data"]["printed_pages"]["T2122"]["after_twenty_ninth_day"][
         "unique_printed_character"
@@ -154,7 +154,7 @@ def test_source_mutation_does_not_affect_later_calls_and_native_rejects_it():
     )
 
 
-def test_native_rejects_arithmetic_not_supported_by_its_bound_literals():
+def test_native_rejects_arithmetic_not_supported_by_its_bound_literals() -> None:
     reference = zhidu_reference()
     reference["nominal_arithmetic"]["month4_written_T2122_minus_T1509"]["numerator"] = 0
     with pytest.raises(ValueError):
@@ -162,7 +162,7 @@ def test_native_rejects_arithmetic_not_supported_by_its_bound_literals():
 
 
 @pytest.mark.parametrize("change", ["boolean_integer", "float_integer", "zero_flag"])
-def test_native_rejects_nominal_values_with_different_json_types(change):
+def test_native_rejects_nominal_values_with_different_json_types(change: str) -> None:
     reference = zhidu_reference()
     arithmetic = reference["nominal_arithmetic"]
     if change == "boolean_integer":
@@ -178,14 +178,14 @@ def test_native_rejects_nominal_values_with_different_json_types(change):
 @pytest.mark.parametrize(
     "field", ["source_bundle_sha256", "before_code_reference_sha256"]
 )
-def test_parent_native_rejects_wrong_upstream_source_identity(field):
+def test_parent_native_rejects_wrong_upstream_source_identity(field: str) -> None:
     reference = quotation_reference()
     reference["upstream_calendar_context"][field] = "0" * 64
     with pytest.raises(ValueError, match="来源身份"):
         quotation_lines(reference)
 
 
-def test_current_quotation_requires_its_actual_upstream_context():
+def test_current_quotation_requires_its_actual_upstream_context() -> None:
     reference = quotation_reference()
     assert reference["upstream_context_round"] == 89
     assert (
@@ -208,7 +208,7 @@ def test_current_quotation_requires_its_actual_upstream_context():
         quotation_lines(reference)
 
 
-def test_archived_quotation_without_current_marker_keeps_its_historical_scope():
+def test_archived_quotation_without_current_marker_keeps_its_historical_scope() -> None:
     reference = quotation_reference()
     reference.pop("upstream_context_round")
     reference.pop("upstream_calendar_context")

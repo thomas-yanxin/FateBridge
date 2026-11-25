@@ -3,6 +3,7 @@
 import asyncio
 import json
 from copy import deepcopy
+from pathlib import Path
 from typing import get_args
 
 import pytest
@@ -23,53 +24,10 @@ from tests.support.mcp_result_assertions import (
     same_run_projected_response,
     without_transport,
 )
-from tests.support.transports import rest_client
-
-
-def surface_input(
-    goal="abundance", zone="near_right", basis="user_confirmed", healthy=None
-):
-    inputs = {
-        "methods": [],
-        "surface_layouts": [
-            {
-                "object_id": "work-surface",
-                "ruleset_id": "desktop_bagua_btb_v1",
-                "shape": "rectangular",
-                "anchor": "seated_near_edge",
-                "goal": goal,
-                "observation_basis": basis,
-                "evidence": "矩形桌面与坐者使用沿已确认，目标由使用者给出",
-                "items": [
-                    {
-                        "object_id": "specimen",
-                        "label": "室内盆栽",
-                        "representation": "living_plant",
-                        "zone": zone,
-                        "zone_observation_basis": basis,
-                        "observation_basis": basis,
-                        "evidence": "实际活植物",
-                    }
-                ],
-            }
-        ],
-        "surface_constraints": [
-            {
-                "object_id": "work-surface",
-                "can_move_items": True,
-                "can_add_items": False,
-                "feasible_zones": ["far_left"],
-                "evidence": "远左放得下且保留入口视野，允许移动已有物件",
-            }
-        ],
-    }
-    if healthy is not None:
-        inputs["surface_layouts"][0]["items"][0]["healthy"] = {
-            "value": healthy,
-            "observation_basis": "user_confirmed",
-            "evidence": "独立核对植物/鲜花状态，不从身份或位置推定",
-        }
-    return inputs
+from tests.support.transports import call_calculation, capability_contracts, rest_client
+from tests.unit_test.fixtures.fengshui_layout import (
+    surface_input,
+)
 
 
 def surface_result(inputs):
@@ -90,7 +48,7 @@ def surface_result(inputs):
         "far_right",
     ],
 )
-def test_published_seated_far_left_rule_from_every_start_zone(zone):
+def test_published_seated_far_left_rule_from_every_start_zone(zone: str) -> None:
     result = surface_result(surface_input(zone=zone, healthy=True))
     option = result["findings"][0]["action_options"][0]
     # Independent expectation from Cho's explicitly seated desk instruction.
@@ -112,14 +70,14 @@ def test_published_seated_far_left_rule_from_every_start_zone(zone):
         ),
     ],
 )
-def test_source_candidate_cannot_override_constraint(change, reason):
+def test_source_candidate_cannot_override_constraint(change, reason: str) -> None:
     inputs = surface_input()
     inputs["surface_constraints"][0].update(change)
     option = surface_result(inputs)["findings"][0]["action_options"][0]
     assert option["status"] == "blocked" and reason in option["constraint_reasons"]
 
 
-def test_locked_item_already_in_supported_zone_does_not_require_movement():
+def test_locked_item_already_in_supported_zone_does_not_require_movement() -> None:
     inputs = surface_input(zone="far_left", healthy=True)
     inputs["surface_constraints"][0].update(
         can_move_items=False, locked_item_ids=["specimen"]
@@ -129,7 +87,7 @@ def test_locked_item_already_in_supported_zone_does_not_require_movement():
 
 
 @pytest.mark.parametrize("part", ["boundary", "item"])
-def test_photo_hypothesis_never_becomes_ready(part):
+def test_photo_hypothesis_never_becomes_ready(part: str) -> None:
     inputs = surface_input()
     if part == "boundary":
         inputs["surface_layouts"][0]["observation_basis"] = "image_observed"
@@ -140,7 +98,7 @@ def test_photo_hypothesis_never_becomes_ready(part):
     assert result["status"] == "partial"
 
 
-def test_unconfirmed_feasibility_or_permission_stays_conditional():
+def test_unconfirmed_feasibility_or_permission_stays_conditional() -> None:
     for field in ("feasible_zones", "can_move_items"):
         inputs = surface_input()
         inputs["surface_constraints"][0].pop(field)
@@ -148,7 +106,7 @@ def test_unconfirmed_feasibility_or_permission_stays_conditional():
         assert option["status"] == "conditional_option"
 
 
-def test_labels_do_not_assign_elements_or_matching_side():
+def test_labels_do_not_assign_elements_or_matching_side() -> None:
     for name in ["电话", "水杯", "树脂陶土造型玩偶", "绿植", "999发财神器"]:
         inputs = surface_input()
         inputs["surface_layouts"][0]["items"][0].update(
@@ -162,7 +120,7 @@ def test_labels_do_not_assign_elements_or_matching_side():
         assert result["status"] == "partial"
 
 
-def test_other_goal_has_distinct_source_scope_without_forced_addition():
+def test_other_goal_has_distinct_source_scope_without_forced_addition() -> None:
     abundance = surface_result(surface_input())
     career = surface_result(surface_input(goal="career"))
     assert len(abundance["findings"][0]["action_options"]) == 1
@@ -176,7 +134,7 @@ def test_other_goal_has_distinct_source_scope_without_forced_addition():
     assert "dark_accessory" in symbols[0]["representations"]
 
 
-def test_existing_symbol_uses_authored_career_zone_without_purchase():
+def test_existing_symbol_uses_authored_career_zone_without_purchase() -> None:
     inputs = surface_input(goal="career")
     inputs["surface_layouts"][0]["items"][0].update(
         representation="water_image", label="海景图", zone="near_center"
@@ -191,7 +149,9 @@ def test_existing_symbol_uses_authored_career_zone_without_purchase():
     assert symbols[0]["source_ids"] == ["D3"]
 
 
-def test_ids_are_references_not_rule_selectors_and_mutation_cannot_poison_sources():
+def test_ids_are_references_not_rule_selectors_and_mutation_cannot_poison_sources() -> (
+    None
+):
     inputs = surface_input()
     original = surface_result(inputs)
     changed = deepcopy(inputs)
@@ -209,7 +169,7 @@ def test_ids_are_references_not_rule_selectors_and_mutation_cannot_poison_source
     )
 
 
-def test_personal_birth_and_facing_do_not_rotate_authored_surface_map():
+def test_personal_birth_and_facing_do_not_rotate_authored_surface_map() -> None:
     inputs = surface_input()
     original = surface_result(inputs)
     for year, direction in [(1987, "NE"), (1996, "S"), (2010, "NW")]:
@@ -254,14 +214,14 @@ def test_personal_birth_and_facing_do_not_rotate_authored_surface_map():
         },
     ],
 )
-def test_unknown_methods_frames_and_semantics_are_rejected(change):
+def test_unknown_methods_frames_and_semantics_are_rejected(change) -> None:
     inputs = surface_input()
     inputs["surface_layouts"][0].update(change)
     with pytest.raises(ValidationError):
         AssessRequest.model_validate(inputs)
 
 
-def test_constraints_cannot_invent_physical_facts():
+def test_constraints_cannot_invent_physical_facts() -> None:
     inputs = surface_input()
     inputs["surface_constraints"][0]["solid_backing"] = True
     with pytest.raises(ValidationError):
@@ -272,7 +232,7 @@ def test_constraints_cannot_invent_physical_facts():
         AssessRequest.model_validate(inputs)
 
 
-def test_representation_is_required_not_silently_downgraded_to_unknown():
+def test_representation_is_required_not_silently_downgraded_to_unknown() -> None:
     inputs = surface_input()
     del inputs["surface_layouts"][0]["items"][0]["representation"]
     with pytest.raises(ValidationError):
@@ -282,7 +242,7 @@ def test_representation_is_required_not_silently_downgraded_to_unknown():
     assert "representation" in str(error.value)
 
 
-def test_position_and_representation_evidence_are_independent():
+def test_position_and_representation_evidence_are_independent() -> None:
     inputs = surface_input(zone="far_left")
     inputs["surface_layouts"][0]["items"][0][
         "zone_observation_basis"
@@ -298,7 +258,7 @@ def test_position_and_representation_evidence_are_independent():
         Draft202012Validator(AssessRequest.model_json_schema()).validate(inputs)
 
 
-def test_shared_frame_guide_covers_exact_schema_regions_and_is_not_mutable():
+def test_shared_frame_guide_covers_exact_schema_regions_and_is_not_mutable() -> None:
     spec = next(s for s in CATALOG if s.key == "fengshui_assess")
     guide = call_guidance(spec)
     assert set(guide["zone_legend"]) == set(get_args(SurfaceZone))
@@ -315,7 +275,7 @@ def test_shared_frame_guide_covers_exact_schema_regions_and_is_not_mutable():
         ("birth_at", "effective_birth_year"),
     ],
 )
-def test_birth_choice_exclusivity_is_machine_visible_and_matches_runtime(pair):
+def test_birth_choice_exclusivity_is_machine_visible_and_matches_runtime(pair) -> None:
     values = {
         "birth_date": "1993-08-11",
         "birth_at": "1993-08-11T15:20:00+08:00",
@@ -333,7 +293,7 @@ def test_birth_choice_exclusivity_is_machine_visible_and_matches_runtime(pair):
     Draft202012Validator(AssessRequest.model_json_schema()).validate(inputs)
 
 
-def test_passage_is_not_the_actual_entrance_and_side_window_is_separate():
+def test_passage_is_not_the_actual_entrance_and_side_window_is_separate() -> None:
     result = assess(
         methods=[],
         form_observations=[
@@ -357,7 +317,7 @@ def test_passage_is_not_the_actual_entrance_and_side_window_is_separate():
 
 
 @pytest.mark.parametrize("purpose", ["bed", "stove"])
-def test_desk_window_source_does_not_expand_to_other_furniture(purpose):
+def test_desk_window_source_does_not_expand_to_other_furniture(purpose: str) -> None:
     result = assess(
         methods=[],
         form_observations=[
@@ -379,7 +339,9 @@ def test_desk_window_source_does_not_expand_to_other_furniture(purpose):
     ["passage_direct_line", "exposed_beam_over_user", "sharp_corner_points_at_user"],
 )
 @pytest.mark.parametrize("observed", [True, False])
-def test_additional_form_sources_use_explicit_observations_only(criterion, observed):
+def test_additional_form_sources_use_explicit_observations_only(
+    criterion: str, observed: bool
+) -> None:
     inputs = {
         "methods": [],
         "form_observations": [
@@ -405,8 +367,8 @@ def test_additional_form_sources_use_explicit_observations_only(criterion, obser
 
 
 def test_authored_surfaces_match_rest_mcp_cli_and_strict_projection(
-    monkeypatch, tmp_path, capsys
-):
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     inputs = surface_input()
     fields = ["layout_analysis.surface_analysis", "rulesets"]
     controls = {"fields": fields, "strict_fields": True, "include_snapshot_text": False}
@@ -422,11 +384,13 @@ def test_authored_surfaces_match_rest_mcp_cli_and_strict_projection(
 
     async def call():
         async with Client(create_mcp_app()) as client:
-            schemas = {t.name: t for t in await client.list_tools()}
-            Draft202012Validator(
-                schemas["fengshui_assess"].model_dump(by_alias=True)["inputSchema"]
-            ).validate({**inputs, **controls})
-            result = await client.call_tool("fengshui_assess", {**inputs, **controls})
+            schemas = await capability_contracts(client)
+            Draft202012Validator(schemas["fengshui_assess"]["input_schema"]).validate(
+                {**inputs, **controls}
+            )
+            result = await call_calculation(
+                client, "fengshui_assess", {**inputs, **controls}
+            )
             return await same_run_projected_response(client, result)
 
     protocol = asyncio.run(call())

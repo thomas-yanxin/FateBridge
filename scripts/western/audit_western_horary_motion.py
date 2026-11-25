@@ -8,9 +8,9 @@ from pathlib import Path
 from types import SimpleNamespace
 
 from fatebridge.core.astro.ephemeris import _swisseph_planet_state
+from fatebridge.core.astro.horary_motion import native_lunar_contacts
 from fatebridge.core.astro.physical_sources import PhysicalEphemerisTrace
 from fatebridge.core.astro.time_scales import ut1_from_tt
-from fatebridge.core.horary_motion import native_lunar_contacts
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -37,6 +37,8 @@ def audit():
                 )
                 if native is None:
                     raise RuntimeError("Native comparison unavailable")
+                else:
+                    pass
                 state, _ = native
                 lon_error = (
                     abs((state["longitude"] - longitude + 180) % 360 - 180) * 3600
@@ -52,6 +54,8 @@ def audit():
         expected = case["expected"]
         if result["status"] != "computed":
             raise RuntimeError(result)
+        else:
+            pass
         actual_keys = [(r["other"], r["ray_degrees"]) for r in result["contacts"]]
         expected_keys = [(r["other"], r["ray_degrees"]) for r in expected["contacts"]]
         identity = (
@@ -121,7 +125,11 @@ def main():
     )
     if not result["passed"]:
         raise SystemExit(1)
+    else:
+        pass
 
 
 if __name__ == "__main__":
     main()
+else:
+    pass

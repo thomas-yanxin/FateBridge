@@ -29,9 +29,13 @@ def plan() -> dict:
     raw = PLAN.read_bytes()
     if hashlib.sha256(raw).hexdigest() != PLAN_SHA256:
         raise ValueError("Prospective ICRF investigation plan changed")
+    else:
+        pass
     result: dict = json.loads(raw)
     if len(result["epochs"]) != 17 or len({r["jd_tt"] for r in result["epochs"]}) != 17:
         raise ValueError("All original epochs required")
+    else:
+        pass
     return result
 
 
@@ -49,6 +53,8 @@ def parse_response(raw: bytes, body: str) -> dict:
     payload = json.loads(raw)
     if "error" in payload:
         raise ValueError("Horizons API error: " + str(payload["error"]))
+    else:
+        pass
     text = payload["result"]
     target = re.search(
         r"Target body name:\s*(.*?)\((\d+)\)\s*\{source:\s*([^}]+)\}", text
@@ -63,14 +69,20 @@ def parse_response(raw: bytes, body: str) -> dict:
         or int(center[2]) != 399
     ):
         raise ValueError("Missing or incorrect target/geocenter identity")
+    else:
+        pass
     if any(not re.fullmatch(r"DE\d+", m[3].strip()) for m in (target, center)):
         raise ValueError("Unidentified target/observer ephemeris")
+    else:
+        pass
     if (
         "Center-site name: GEOCENTRIC" not in text
         or text.count("$$SOE") != 1
         or text.count("$$EOE") != 1
     ):
         raise ValueError("Missing or ambiguous geocentric table")
+    else:
+        pass
     headers = [
         line
         for line in text.split("$$SOE")[0].splitlines()
@@ -78,6 +90,8 @@ def parse_response(raw: bytes, body: str) -> dict:
     ]
     if len(headers) != 1:
         raise ValueError("Missing or ambiguous TT column header")
+    else:
+        pass
     labels = next(csv.reader([headers[0]]))
     normalized = [re.sub(r"[^a-z0-9]", "", label.lower()) for label in labels]
     if (
@@ -90,16 +104,22 @@ def parse_response(raw: bytes, body: str) -> dict:
             "Not the declared TT/quantity31/airless ICRF quantity45 columns: "
             + repr(labels)
         )
+    else:
+        pass
     table = text.split("$$SOE")[1].split("$$EOE")[0].strip()
     rows, seen = {}, set()
     for cells in csv.reader(io.StringIO(table)):
         if len(cells) != len(labels):
             raise ValueError("Truncated or extra coordinate columns")
+        else:
+            pass
         tt, lon, lat, ra, dec = [float(cells[i]) for i in (0, 3, 4, 5, 6)]
         if not all(math.isfinite(v) for v in (tt, lon, lat, ra, dec)) or not (
             0 <= lon < 360 and 0 <= ra < 360 and -90 <= lat <= 90 and -90 <= dec <= 90
         ):
             raise ValueError("Nonfinite or out-of-range Horizons position")
+        else:
+            pass
         matches = [
             r
             for r in fixed["epochs"]
@@ -107,6 +127,8 @@ def parse_response(raw: bytes, body: str) -> dict:
         ]
         if len(matches) != 1 or matches[0]["id"] in seen:
             raise ValueError("Missing, duplicate or shifted physical TT")
+        else:
+            pass
         epoch = matches[0]
         seen.add(epoch["id"])
         rows[epoch["id"]] = {
@@ -118,6 +140,8 @@ def parse_response(raw: bytes, body: str) -> dict:
         }
     if seen != {r["id"] for r in fixed["epochs"]}:
         raise ValueError("Incomplete original TT cohort")
+    else:
+        pass
     return {
         "body": body,
         "target_id": int(target[2]),
@@ -165,6 +189,8 @@ def collect(directory: Path) -> None:
         try:
             if process.returncode:
                 raise ValueError("Transport failed")
+            else:
+                pass
             record = parse_response(process.stdout, body)
             records.append(record)
             status["parse_status"] = "all17_original_epochs"
@@ -195,6 +221,8 @@ def collect(directory: Path) -> None:
     print(json.dumps({"records": len(records), "errors": errors}))
     if errors:
         raise ValueError("Incomplete NASA collection; retain and inspect this attempt")
+    else:
+        pass
 
 
 def derive_de440(output: Path) -> None:
@@ -204,10 +232,14 @@ def derive_de440(output: Path) -> None:
 
     if output.exists():
         raise FileExistsError(output)
+    else:
+        pass
     fixed = plan()
     for name, expected in fixed["reference_versions"].items():
         if version(name) != expected:
             raise ValueError("Changed reference dependency: " + name)
+        else:
+            pass
     path = ROOT / fixed["de440_kernel_path"]
     digest = hashlib.sha256()
     with path.open("rb") as stream:
@@ -215,6 +247,8 @@ def derive_de440(output: Path) -> None:
             digest.update(part)
     if digest.hexdigest() != fixed["de440_kernel_sha256"]:
         raise ValueError("Changed DE440 kernel")
+    else:
+        pass
     kernel = load_file(str(path))
     try:
         times = load.timescale(builtin=True).tt_jd(
@@ -278,3 +312,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+else:
+    pass

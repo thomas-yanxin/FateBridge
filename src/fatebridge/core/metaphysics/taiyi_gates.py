@@ -1,175 +1,39 @@
-"""Taiyi's own eight gates: explicit frames and source-scoped counters.
-
-The Wang annual/month counter and Li's constant-open comparison are distinct.
-No Qimen door is read here. A center-five anchor cannot become a ring palace.
-The hourly solstice-relative ordinal is not the classical 天正時實.
-"""
+"""Attach source-specific gates and determinate calculations to a Taiyi board."""
 
 from __future__ import annotations
 
 from typing import Any
 
+from fatebridge.core.metaphysics.taiyi_conditions import update_conjunction
+from fatebridge.core.metaphysics.taiyi_gate_frames import (
+    SECTOR_SOURCE,
+)
+from fatebridge.core.metaphysics.taiyi_gate_frames import SECTORS as SECTORS
+from fatebridge.core.metaphysics.taiyi_gate_frames import TONGZONG
+from fatebridge.core.metaphysics.taiyi_gate_frames import (
+    check_three_gates as check_three_gates,
+)
+from fatebridge.core.metaphysics.taiyi_gate_frames import gate_cycle as gate_cycle
+from fatebridge.core.metaphysics.taiyi_gate_frames import gate_frame as gate_frame
+from fatebridge.core.metaphysics.taiyi_gate_frames import (
+    key_day_gate_cycle as key_day_gate_cycle,
+)
+from fatebridge.core.metaphysics.taiyi_gate_frames import (
+    key_hour_gate_cycle as key_hour_gate_cycle,
+)
 from fatebridge.core.metaphysics.taiyi_geometry import (
-    PALACE_ORDER,
     PALACES,
     RING,
     count_to_taiyi,
     general_for_count,
 )
+from fatebridge.core.metaphysics.taiyi_hour import KEY_HOUR_PROFILE
+from fatebridge.core.metaphysics.taiyi_month import KEY_MONTH_PROFILE, month_source_data
 
-from .taiyi_conditions import update_conjunction
-from .taiyi_hour import KEY_HOUR_PROFILE
-from .taiyi_month import KEY_MONTH_PROFILE, month_source_data
-
-DOORS = tuple("开休生伤杜景死惊")
-GOOD = {"开", "休", "生"}
 JINJING = "https://zh.wikisource.org/wiki/太乙金鏡式經_(四庫全書本)/卷01#推八門占嵗計法"
-TONGZONG = "https://www.shidianguji.com/zh/book/CADAL02055529/chapter/1l5erjww44w8a"
 KEY = (
     "https://www.shidianguji.com/zh/book/NGJ89241199902106666022/chapter/1lq8dkylq3yn8"
 )
-# Four cardinal positions stand alone; each corner includes its two branches.
-# Vol. 2 explicitly puts 戌亥 in 乾一 and 辰巳 in 巽九. This is a directional
-# projection, not a change to the sixteen-spirit counting values.
-SECTORS = {
-    spirit: number
-    for number, spirits in (
-        (1, "戌乾亥"),
-        (8, "子"),
-        (3, "丑艮寅"),
-        (4, "卯"),
-        (9, "辰巽巳"),
-        (2, "午"),
-        (7, "未坤申"),
-        (6, "酉"),
-    )
-    for spirit in spirits
-}
-SECTOR_SOURCE = "https://zh.wikisource.org/wiki/太乙金鏡式經_(四庫全書本)/卷02"
-
-
-def key_hour_gate_cycle(accumulation: int, yin: bool) -> dict[str, Any]:
-    if type(accumulation) is not int or accumulation < 1 or type(yin) is not bool:
-        raise ValueError("金钥匙四门须完整正整数积时及明确阴阳遁")
-    phase = (accumulation - 1) % 120
-    index, in_gate = divmod(phase, 30)
-    doors = tuple("杜死伤景") if yin else tuple("开生惊休")
-    return {
-        "accumulation": accumulation,
-        "cycle_length": 120,
-        "cycle_unit": "double_hour",
-        "cycle_position": phase + 1,
-        "units_per_gate": 30,
-        "gate_index": index,
-        "unit_in_gate": in_gate + 1,
-        "duty_gate": doors[index],
-        "epoch_basis": "金钥匙时计完整积时；阴阳各用四门，不借年计八门序",
-    }
-
-
-def gate_cycle(accumulation: int) -> dict[str, Any]:
-    if type(accumulation) is not int or accumulation < 1:
-        raise ValueError("太乙八门积数必须是正整数")
-    phase = (accumulation - 1) % 240
-    index, in_gate = divmod(phase, 30)
-    return {
-        "accumulation": accumulation,
-        "cycle_length": 240,
-        "cycle_unit": "selected_count_unit",
-        "cycle_position": phase + 1,
-        "units_per_gate": 30,
-        "gate_index": index,
-        "unit_in_gate": in_gate + 1,
-        "duty_gate": DOORS[index],
-    }
-
-
-def key_day_gate_cycle(accumulation: int, yin: bool) -> dict[str, Any]:
-    result = key_hour_gate_cycle(accumulation, yin)
-    result.update(
-        cycle_unit="day",
-        source_modulus=240,
-        epoch_basis="金钥匙积日先约240，再循环阴阳各四门；实际门序120日复现，不乘十二。",
-    )
-    return result
-
-
-def gate_frame(
-    anchor: int, duty_gate: str, anchor_path: str, source_position: str | None = None
-) -> dict[str, Any]:
-    """Rotate gates in the physical order 乾坎艮震巽離坤兌, never 1..9."""
-    if type(anchor) is not int or anchor not in PALACES or duty_gate not in DOORS:
-        raise ValueError("太乙门盘需要实际宫位和已知直门")
-    if anchor == 5:
-        return {
-            "status": "not_assessed",
-            "anchor_number": 5,
-            "anchor_palace": "中",
-            "anchor_source_path": anchor_path,
-            "anchor_source_value": 5,
-            "reason": "中五无八方环位，不自动寄坤布门。",
-        }
-    start = PALACE_ORDER.index(anchor)
-    door_start = DOORS.index(duty_gate)
-    rows = [
-        {
-            "number": number,
-            "palace": PALACES[number],
-            "door": DOORS[(door_start + i - start) % 8],
-            "spirit_positions": [s for s in RING if SECTORS[s] == number],
-        }
-        for i, number in enumerate(PALACE_ORDER)
-    ]
-    return {
-        "status": "computed",
-        "anchor_number": anchor,
-        "anchor_palace": PALACES[anchor],
-        "anchor_source_path": anchor_path,
-        "anchor_source_value": (
-            source_position if source_position is not None else anchor
-        ),
-        "duty_gate": duty_gate,
-        "rows": rows,
-    }
-
-
-def check_three_gates(
-    frame: dict[str, Any], entities: list[dict[str, Any]], path: str
-) -> dict[str, Any]:
-    if frame["status"] != "computed":
-        return {
-            "status": "not_assessed",
-            "reason": frame["reason"],
-            "conditions_satisfied": None,
-            "frame_source_path": path,
-        }
-    checks = []
-    rows = frame["rows"]
-    for entity in entities:
-        sector = SECTORS[entity["position"]]
-        i, row = next((i, r) for i, r in enumerate(rows) if r["number"] == sector)
-        door = row["door"]
-        checks.append(
-            {
-                **entity,
-                "sector_number": sector,
-                "door": door,
-                "gate_source_path": f"{path}.rows.{i}",
-                "obstructs": door in GOOD,
-                "incomplete_kind": (
-                    "三门不具"
-                    if door == "休"
-                    else "两门不具" if door in {"开", "生"} else None
-                ),
-            }
-        )
-    return {
-        "status": "computed",
-        "conditions_satisfied": not any(c["obstructs"] for c in checks),
-        "checks": checks,
-        "frame_source_path": path,
-        "source": TONGZONG,
-    }
 
 
 def determinate_calculation(board: dict[str, Any], mode: str) -> dict[str, Any]:
@@ -182,6 +46,8 @@ def determinate_calculation(board: dict[str, Any], mode: str) -> dict[str, Any]:
             "status": "not_computed_for_selected_mode",
             "reason": "时计合神现用日支，定计时支加临尚待同派独立课例，未把年/月例混入。",
         }
+    else:
+        pass
     core = board["core_board"]
     ruler = core["suijun"] if mode == "year" else core["ruler_branch"]
     hegod = core["heshen"]
@@ -218,6 +84,8 @@ def determinate_calculation(board: dict[str, Any], mode: str) -> dict[str, Any]:
         result["source_comparison_scope"] = (
             "图45/46庚戌课例同一时计相位的定计数值参照；日期匹配另见calendar_rules.historical_date_reference，不认证完整古历、门盘或应验。"
         )
+    else:
+        pass
     core.update(
         dingmu=marker,
         set_count=result["count"],
@@ -232,14 +100,20 @@ def attach_gate_board(
 ) -> None:
     if mode not in {"year", "month", "day", "hour"}:
         raise ValueError("太乙八门仅接受本盘明确的year/month/day/hour计法")
+    else:
+        pass
     if (
         mode == "day"
         and board.get("calendar_rules", {}).get("day_profile")
         != "key_day_winter_jiazi_v1"
     ):
         raise ValueError("日计门盘仅支持明确的金钥匙积日配置")
+    else:
+        pass
     if mode == "year" and (type(year) is not int or not 1 <= year <= 9999):
         raise ValueError("年计八门必须沿用本盘已确定的整数农历年")
+    else:
+        pass
     core = board["core_board"]
     determinate = determinate_calculation(board, mode)
     board["determinate_calculation"] = determinate
@@ -247,6 +121,8 @@ def attach_gate_board(
         core.update(
             dingmu=None, set_count=None, set_general=None, set_vice_general=None
         )
+    else:
+        pass
     if determinate["status"] == "computed":
         marks = {
             p["palace"]: p["markers"]
@@ -259,6 +135,10 @@ def attach_gate_board(
         ]:
             if label not in marks[position]:
                 marks[position].append(label)
+            else:
+                pass
+    else:
+        pass
     source = {
         "id": "jinjing_wang_gates_240_v1",
         "version": "1.1.0",
@@ -428,8 +308,14 @@ def attach_gate_board(
                         name + "，不是本盘所用积月，不能择优替换"
                     )
                     gates["source_counter_alternatives"].append(alternative)
+            else:
+                pass
+        else:
+            pass
         update_conjunction(board["condition_assessment"])
         return
+    else:
+        pass
     if mode == "hour":
         gates.update(
             status="not_computed_for_selected_mode",
@@ -444,6 +330,8 @@ def attach_gate_board(
         }
         update_conjunction(board["condition_assessment"])
         return
+    else:
+        pass
     accumulation = (
         3361 + year - 724
         if mode == "year" and year is not None
@@ -509,6 +397,8 @@ def attach_gate_board(
             "frame_source_path": "taiyi.gates.old_open_frames.determinate",
         }
         old_frames["determinate"] = frame
+    else:
+        pass
     gates.update(
         status="computed",
         selected_profile=(
@@ -537,65 +427,9 @@ def attach_gate_board(
             determinate["marker"],
         )
         gates["dingmu_comparison_source"] = KEY
+    else:
+        pass
     board["gates"] = gates
     assessment = board["condition_assessment"]
     assessment["three_gates"] = selected_check
     update_conjunction(assessment)
-
-
-def gates_text(board: dict[str, Any]) -> str:
-    gates = board["gates"]
-    if gates["status"] != "computed":
-        return f"太乙八门未计算：{gates['reason']}"
-    counter = gates["counter"]
-    lines = [
-        f"太乙八门：{gates['selected_profile']}，积数{counter['accumulation']}，{counter['duty_gate']}门入第{counter['unit_in_gate']}计数单位。"
-    ]
-    is_key = gates["selected_profile"] in {
-        "key_hour_four_gates_120_v1",
-        "key_day_four_gates_120_v1",
-        "key_month_eight_gates_240_v1",
-    }
-    label = {"day": "日计阴阳四门", "hour": "时计阴阳四门", "month": "月计八门"}.get(
-        gates["calculation_mode"], "本计八门"
-    )
-    lines.append(
-        f"所选门法来源：金钥匙{label}（{KEY}），直门加定计目。"
-        if is_key
-        else f"所选门法来源：王希明卷一新术（{JINJING}）；三门主体补证：统宗卷二（{TONGZONG}）。"
-    )
-    lines.append(
-        "；".join(
-            f"{r['palace']}：{r['door']}门" for r in gates["moving_frame"]["rows"]
-        )
-    )
-    for check in board["condition_assessment"]["three_gates"].get("checks", []):
-        lines.append(
-            f"{check['label']}在{check['position']}，按本门盘临{check['door']}门：{check['incomplete_kind'] or '未触发三门不具条款'}。"
-        )
-    if is_key:
-        lines.append(board["condition_assessment"]["three_gates"]["reason"])
-        for comparison in gates.get("source_comparisons", []):
-            lines.append(
-                f"月门原文差异：{comparison['field']}原文{comparison['source_value']}，本盘规则推算{comparison['rule_derived_value']}；原读数保留。"
-            )
-        for alternative in gates.get("source_counter_alternatives", []):
-            lines.append(
-                f"月门诊断：{alternative['epoch_basis']}；{alternative['accumulation']}按240门周得{alternative['cycle_position']}，为{alternative['duty_gate']}门第{alternative['unit_in_gate']}月。"
-            )
-    else:
-        lines.append(
-            "李法常开四盘及定计目加临门盘另列比较，未混成同一判断；定计大将门盘仅布门，三门主体未裁定。"
-        )
-    result = board["determinate_calculation"]
-    if result["status"] == "computed":
-        path = " + ".join(f"{p['palace']}{p['value']}" for p in result["trace"]["path"])
-        lines.append(
-            f"定计目{result['marker']}：{path} = {result['count']}；定计大/参将{result['general']}/{result['vice_general']}。"
-        )
-        lines.append(f"定计补证：金钥匙续集（{KEY}），不把重审之算当另一份独立证据。")
-        for item in result.get("source_disagreements", []):
-            lines.append(
-                f"定计原文分歧：{item['field']}原文{item['source_value']}，按本盘算路{item['rule_derived_value']}；两值保留，未据程序改原文。"
-            )
-    return "\n".join(lines)

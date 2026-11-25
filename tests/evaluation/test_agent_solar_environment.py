@@ -7,8 +7,10 @@ import pytest
 from fastmcp import Client
 from fastmcp.client.transports import StdioTransport
 
+from fatebridge.utils.formatting import format_json_response
 from scripts.evaluate_agent import command_for
 from tests.fixtures.mcp_result_delivery import read_full_result
+from tests.support.transports import call_calculation
 
 ROOT = Path(__file__).resolve().parents[2]
 MODE = "FATEBRIDGE_SOLAR_TERM_MODEL"
@@ -21,13 +23,17 @@ def server_settings(command):
         if token == "-c":
             key, value = command[index + 1].split("=", 1)
             settings[key] = json.loads(value)
+        else:
+            pass
     return settings
 
 
 @pytest.mark.parametrize(
     "mode", ["auto", "native", "de440", "analytic", "spk", "invalid"]
 )
-def test_explicit_source_selection_survives_cli_mcp_environment(mode, monkeypatch):
+def test_explicit_source_selection_survives_cli_mcp_environment(
+    mode: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
     monkeypatch.setenv(MODE, mode)
     monkeypatch.setenv(SPK, "/data/solar kernel.bsp")
     settings = server_settings(command_for("codex", ROOT, Path("/output"), {}))
@@ -37,8 +43,8 @@ def test_explicit_source_selection_survives_cli_mcp_environment(mode, monkeypatc
 
 
 def test_unspecified_selection_stays_unspecified_and_secrets_are_not_forwarded(
-    monkeypatch,
-):
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.delenv(MODE, raising=False)
     monkeypatch.delenv(SPK, raising=False)
     monkeypatch.setenv("OPENAI_API_KEY", "test-value-must-not-be-forwarded")
@@ -57,8 +63,12 @@ def test_unspecified_selection_stays_unspecified_and_secrets_are_not_forwarded(
     ],
 )
 async def test_actual_mcp_uses_the_constructed_configuration(
-    mode, parent_after_build, expected, monkeypatch, tmp_path
-):
+    mode: str,
+    parent_after_build: str,
+    expected: str,
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
     monkeypatch.setenv(MODE, mode)
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
@@ -80,7 +90,8 @@ async def test_actual_mcp_uses_the_constructed_configuration(
         log_file=tmp_path / "mcp-stderr.log",
     )
     async with Client(transport) as client:
-        result = await client.call_tool(
+        result = await call_calculation(
+            client,
             "heluo",
             {
                 "date": "2024-03-28",
@@ -90,13 +101,14 @@ async def test_actual_mcp_uses_the_constructed_configuration(
                 "use_true_solar_time": False,
                 "fields": ["solar_term.boundary_context"],
                 "strict_fields": True,
+                "detail": "audit",
                 "include_snapshot_text": False,
                 "response_char_limit": 8192,
             },
             raise_on_error=False,
         )
         assert not result.is_error
-        assert len(result.content[0].text) <= 8192
+        assert len(format_json_response(result.structured_content)) <= 8192
         inline = result.structured_content
         receipt = inline["result_delivery"]
         assert "sha256" not in receipt

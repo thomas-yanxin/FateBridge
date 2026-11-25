@@ -6,21 +6,24 @@ from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
+from pytest import MonkeyPatch
 
-import fatebridge.core.heluo_lines as lines
-from fatebridge.core.heluo import _ying, judge
+import fatebridge.core.heluo.heluo_lines as lines
+from fatebridge.core.contracts.output_numerology import (
+    HeluoLineConditionRow,
+    HeluoSourceYouyuan,
+)
+from fatebridge.core.heluo.heluo import _ying, judge
 from fatebridge.core.local_techniques.heluo import build_heluo_result
-from fatebridge.core.output_numerology import HeluoLineConditionRow, HeluoSourceYouyuan
 from fatebridge.utils.errors import NumerologySourceError
-from tests.numerology.test_heluo_month_depth import chart_for
-from tests.numerology.test_heluo_najia_depth import PILLARS
+from tests.unit_test.fixtures.heluo_charts import PILLARS, chart_for
 
 ROOT = Path(__file__).parents[1] / "fixtures/heluo_support_v1"
 REFERENCE = json.loads((ROOT / "reference.json").read_text())
 
 
 @pytest.mark.parametrize("case", REFERENCE["derived_probes"])
-def test_named_yin_to_yang_clause_is_distinct_from_generic_opposition(case):
+def test_named_yin_to_yang_clause_is_distinct_from_generic_opposition(case) -> None:
     chart = chart_for(case["gua"])
     assert chart["xian"]["lines"] == case["lines"]
     chart["xian"]["yuan"] = case["pos"]
@@ -52,7 +55,9 @@ def test_named_yin_to_yang_clause_is_distinct_from_generic_opposition(case):
 
 
 @pytest.mark.parametrize("pair", REFERENCE["source_correspondence_pairs"])
-def test_all_six_existing_response_positions_preserve_direction_and_actual_bits(pair):
+def test_all_six_existing_response_positions_preserve_direction_and_actual_bits(
+    pair,
+) -> None:
     for selected, other in [pair, pair[::-1]]:
         for a, b in [(0, 0), (0, 1), (1, 0), (1, 1)]:
             chart = chart_for("坤為地")
@@ -65,7 +70,7 @@ def test_all_six_existing_response_positions_preserve_direction_and_actual_bits(
             assert aid["polarity_opposed"] is (a != b)
 
 
-def test_yin_line_reading_is_not_replaced_with_even_seat_or_other_phase():
+def test_yin_line_reading_is_not_replaced_with_even_seat_or_other_phase() -> None:
     chart = chart_for("雷地豫")
     chart["xian"]["yuan"] = 1  # odd seat, actual yin, corresponding yang
     chart["hou"]["lines"] = [1, 1, 1, 1, 1, 1]
@@ -78,7 +83,9 @@ def test_yin_line_reading_is_not_replaced_with_even_seat_or_other_phase():
     assert lines.line_conditions(chart)["phases"] == [first, second]
 
 
-def test_public_evidence_trace_and_snapshot_keep_the_same_phase_without_negative_omen():
+def test_public_evidence_trace_and_snapshot_keep_the_same_phase_without_negative_omen() -> (
+    None
+):
     result = build_heluo_result(
         date="1990-06-15",
         time="09:33",
@@ -134,7 +141,7 @@ def test_public_evidence_trace_and_snapshot_keep_the_same_phase_without_negative
         {"clause_match": "true"},
     ],
 )
-def test_contract_rejects_wrong_response_wrong_bits_and_wrong_clause(change):
+def test_contract_rejects_wrong_response_wrong_bits_and_wrong_clause(change) -> None:
     chart = chart_for("水地比")
     chart["xian"]["yuan"] = 2
     row = lines.line_conditions(chart)["phases"][0]
@@ -143,7 +150,7 @@ def test_contract_rejects_wrong_response_wrong_bits_and_wrong_clause(change):
         HeluoLineConditionRow.model_validate(row)
 
 
-def test_projected_known_fields_are_valid_without_inventing_missing_facts():
+def test_projected_known_fields_are_valid_without_inventing_missing_facts() -> None:
     r = HeluoSourceYouyuan.model_validate(
         {"corresponding_pos": 5, "clause_match": True}
     )
@@ -161,8 +168,8 @@ def test_projected_known_fields_are_valid_without_inventing_missing_facts():
     ],
 )
 def test_conflicting_source_conditions_are_source_failures_not_birth_input_errors(
-    tmp_path, monkeypatch, change
-):
+    tmp_path: Path, monkeypatch: MonkeyPatch, change
+) -> None:
     data = json.loads(lines.SOURCE_PATH.read_text())
     data["clauses"]["support"].update(change)
     path = tmp_path / "source.json"
@@ -177,7 +184,9 @@ def test_conflicting_source_conditions_are_source_failures_not_birth_input_error
         lines._source.cache_clear()
 
 
-def test_source_witnesses_original_references_and_variant_wording_remain_separate():
+def test_source_witnesses_original_references_and_variant_wording_remain_separate() -> (
+    None
+):
     for w in REFERENCE["witnesses"]:
         assert (
             hashlib.sha256((ROOT / w["file"]).read_bytes()).hexdigest() == w["sha256"]

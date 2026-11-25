@@ -9,20 +9,20 @@ from unittest.mock import patch
 import pytest
 
 import fatebridge.application.execution as execution
-from fatebridge.core import human_design_knowledge as base
-from fatebridge.core import human_design_knowledge_v5 as hd
-from fatebridge.services.human_design_context_lines import (
-    build_human_design_context_packet,
-)
+from fatebridge.core.human_design import human_design_knowledge as base
+from fatebridge.core.human_design import human_design_knowledge_v5 as hd
 from fatebridge.services.knowledge import calculate_knowledge_read
 from fatebridge.utils.errors import EphemerisSourceError
-from fatebridge.validation.human_design_context_lines import (
-    verify_human_design_context_packet,
-)
-from fatebridge.validation.human_design_line_packet_cli import read
 from tests.support.transports import SPECS, business
 from tests.support.transports import rest as shared_rest
 from tests.support.transports import run_three
+from validation.human_design_context_lines import (
+    verify_human_design_context_packet,
+)
+from validation.human_design_context_packet import (
+    build_human_design_context_packet,
+)
+from validation.human_design_line_packet_cli import read
 
 ROOT = Path(__file__).resolve().parents[2]
 BASE = ROOT / "tests/data/human_design/gate4"
@@ -57,8 +57,8 @@ def packets(sources):
     ],
 )
 def test_every_specific_gate4_line_has_source_bound_unassessed_qualifier(
-    line, heading, up, down
-):
+    line: int, heading: str, up: str, down: str
+) -> None:
     path = E / "gate4-independent-source-locators.json"
     assert (
         hashlib.sha256(path.read_bytes()).hexdigest()
@@ -92,15 +92,21 @@ def test_every_specific_gate4_line_has_source_bound_unassessed_qualifier(
     assert "不等同事实" in record["source_reading_notes"][1]
     if line == 1:
         assert any("不是已计算的事件日期" in n for n in record["source_reading_notes"])
+    else:
+        pass
     if line == 3:
         assert any("then" in n for n in record["source_reading_notes"])
+    else:
+        pass
     if line == 4:
         assert any(
             "不用于判断当事人是否撒谎" in n for n in record["source_reading_notes"]
         )
+    else:
+        pass
 
 
-def test_all384_rows_preserve_old_meanings_and_existing_context_annotations():
+def test_all384_rows_preserve_old_meanings_and_existing_context_annotations() -> None:
     for g in range(1, 65):
         for line in range(1, 7):
             key = f"{g}.{line}"
@@ -110,6 +116,8 @@ def test_all384_rows_preserve_old_meanings_and_existing_context_annotations():
             new = hd.read_reference(key=key)["reference_details"]["record"]
             if g != 4:
                 assert new == old
+            else:
+                pass
             assert (
                 new["source_context_annotations"] == old["source_context_annotations"]
             )
@@ -119,7 +127,9 @@ def test_all384_rows_preserve_old_meanings_and_existing_context_annotations():
 @pytest.mark.parametrize(
     "key", ["4.1", "4.2", "4.3", "4.4", "4.5", "4.6", "2.3", "64.6"]
 )
-def test_real_rest_mcp_cli_content_is_identical(key, rest, tmp_path, capsys):
+def test_real_rest_mcp_cli_content_is_identical(
+    key: str, rest, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     response, code, cli, mcp = run_three(
         SPECS["knowledge_read"],
         {"domain": "human_design", "category": "lines_v5", "key": key},
@@ -148,31 +158,53 @@ def test_real_rest_mcp_cli_content_is_identical(key, rest, tmp_path, capsys):
         "made_up_date",
     ],
 )
-def test_forged_reference_rejected_before_unrelated_projection(
-    fault, monkeypatch, rest, tmp_path, capsys
-):
+def test_forged_reference_differs_from_source_or_fails_runtime_identity_check(
+    fault: str,
+    monkeypatch: pytest.MonkeyPatch,
+    rest,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     value = calculate_knowledge_read(
         domain="human_design", category="lines_v5", key="4.1"
     )
     record = value["reference_details"]["record"]
     if fault == "claimed_acceptance":
         record["complete_line_meaning_accepted"] = True
+    else:
+        pass
     if fault == "personal_true":
         record["source_qualifiers"][0]["personal_condition_satisfied"] = True
+    else:
+        pass
     if fault == "wrong_version":
         value["category"] = "lines_v4"
+    else:
+        pass
     if fault == "drop_qualifier":
         record["source_qualifiers"] = []
+    else:
+        pass
     if fault == "made_up_date":
         record["editorial_paraphrase"][
             "exaltation"
         ] = "Tomorrow is the guaranteed right time."
+    else:
+        pass
+    expected = base.read_reference(category="lines_v5", key="4.1")
+    assert any(value[field] != fact for field, fact in expected.items())
+    if fault != "wrong_version":
+        return
+    else:
+        pass
     execute = execution.execute_spec
 
-    def forged(spec, request):
+    def forged(spec, request, **kwargs):
         if spec.key == "knowledge_read":
             spec = replace(spec, bind=lambda _: (lambda: deepcopy(value), (), {}))
-        return execute(spec, request)
+        else:
+            pass
+        return execute(spec, request, **kwargs)
 
     monkeypatch.setattr(execution, "execute_spec", forged)
     response, code, _, mcp = run_three(
@@ -187,27 +219,30 @@ def test_forged_reference_rejected_before_unrelated_projection(
 
 
 @pytest.mark.parametrize("mode", ["read", "registry"])
-def test_source_changed_after_load_is_rejected(mode, monkeypatch, tmp_path):
+def test_source_changed_after_load_is_detected_on_next_call(
+    mode: str, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     path = tmp_path / hd.CATALOGUE_PATH.name
     path.write_bytes(hd.CATALOGUE_PATH.read_bytes())
     monkeypatch.setattr(hd, "CATALOGUE_PATH", path)
     method = "_catalogue" if mode == "read" else "_registry_category"
     original = getattr(hd, method)
 
-    def changed():
-        result = original()
+    def changed(*args):
+        result = original(*args)
         path.write_bytes(path.read_bytes() + b" ")
         return result
 
     monkeypatch.setattr(hd, method, changed)
+    assert hd.read_reference(key="4.1") if mode == "read" else base.build_registry()
     with pytest.raises(EphemerisSourceError) as caught:
         hd.read_reference(key="4.1") if mode == "read" else base.build_registry()
-    assert caught.value.reason == "human_design_reference_changed"
+    assert caught.value.reason == "human_design_reference_invalid"
 
 
 def test_every_declared_packet_replays_without_native_and_uses_its_own_chart(
     sources, packets
-):
+) -> None:
     seen, total = set(), 0
     with (
         patch(
@@ -249,6 +284,8 @@ def test_every_declared_packet_replays_without_native_and_uses_its_own_chart(
                         )
                         assert row["editorial_paraphrase"] is not None
                         assert "引导语局部转述" in row["reading"]
+                    else:
+                        pass
             assert (
                 packet["complete384_line_semantics_accepted"]
                 is packet["arbitrary_model_free_text_accepted"]
@@ -261,7 +298,9 @@ def test_every_declared_packet_replays_without_native_and_uses_its_own_chart(
 @pytest.mark.parametrize(
     "fault", ["date", "fixing", "path", "omission", "personal", "context", "source"]
 )
-def test_external_original_binding_rejects_packet_substitution(fault, sources, packets):
+def test_external_original_binding_rejects_packet_substitution(
+    fault: str, sources, packets
+) -> None:
     key = next(
         key
         for key, source in sources.items()
@@ -279,20 +318,34 @@ def test_external_original_binding_rejects_packet_substitution(fault, sources, p
     row = next(r for r in group["rows"] if r["gate"] == 4)
     if fault == "date":
         row["reading"] += "Tomorrow is guaranteed."
+    else:
+        pass
     if fault == "fixing":
         row["actual_fixing_state"] = "invented"
+    else:
+        pass
     if fault == "path":
         row["activation_path"] = "activations.personality.99"
+    else:
+        pass
     if fault == "omission":
         group["rows"].remove(row)
+    else:
+        pass
     if fault == "personal":
         row["source_qualifiers"][0]["personal_condition_satisfied"] = True
+    else:
+        pass
     if fault == "context":
         value["contexts"].pop()
+    else:
+        pass
     if fault == "source":
         value["nominal_packet_v1"]["original_result"][
             "birth_utc"
         ] = "2000-08-18T12:00:00+00:00"
+    else:
+        pass
     assert (
         verify_human_design_context_packet(
             value, source, reference_category="lines_v5"

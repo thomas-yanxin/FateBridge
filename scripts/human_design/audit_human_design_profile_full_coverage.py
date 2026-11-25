@@ -7,6 +7,16 @@ profile cases and literal-name failures never become a passing full-coverage gat
 
 from __future__ import annotations
 
+import sys as _sys
+from pathlib import Path as _Path
+
+_VAL_REPO_ROOT = _Path(__file__).resolve().parents[2]
+if str(_VAL_REPO_ROOT) not in _sys.path:
+    _sys.path.insert(0, str(_VAL_REPO_ROOT))
+else:
+    pass
+
+
 import argparse
 import gzip
 import hashlib
@@ -17,8 +27,8 @@ from typing import Any
 import fatebridge
 from fatebridge.application.execution import execute_tool
 from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.validation.human_design import verify_human_design_reading
-from fatebridge.validation.human_design_official import (
+from validation.human_design import verify_human_design_reading
+from validation.human_design_official import (
     combine_official_chart_cohorts,
     official_chart_checks,
 )
@@ -44,6 +54,8 @@ def sha256(path: Path) -> str:
 def prepare(profile: dict[str, Any], root: Path = ROOT) -> dict[str, Any]:
     if sha256(root / PLAN) != PLAN_SHA256:
         raise ValueError("Original768 profile plan changed")
+    else:
+        pass
     plan = json.loads((root / PLAN).read_text())
     fingerprints = {PLAN: PLAN_SHA256}
     for name, expected in {
@@ -52,12 +64,16 @@ def prepare(profile: dict[str, Any], root: Path = ROOT) -> dict[str, Any]:
     }.items():
         if sha256(root / name) != expected:
             raise ValueError(f"Required original source changed: {name}")
+        else:
+            pass
         fingerprints[name] = expected
     cohorts = []
     for name, path, count in ORIGINALS:
         original = json.loads((root / path).read_text())
         if len(original["cases"]) != count:
             raise ValueError(f"Required original cohort count changed: {name}")
+        else:
+            pass
         cohorts.append((name, original))
     cohorts = [
         ("original19", combine_official_chart_cohorts(cohorts[0][1], cohorts[1][1])),
@@ -67,10 +83,14 @@ def prepare(profile: dict[str, Any], root: Path = ROOT) -> dict[str, Any]:
     ids = [r["id"] for r in profile["cases"]]
     if ids != [r["id"] for r in planned[: len(ids)]]:
         raise ValueError("Profile observations must retain the exact planned prefix")
+    else:
+        pass
     if any(
         a["birth_input"] != b["birth_input"] for a, b in zip(profile["cases"], planned)
     ):
         raise ValueError("Profile birth input differs from original frozen plan")
+    else:
+        pass
     missing = [r["id"] for r in planned[len(ids) :]]
     if (
         profile["planned_case_count"] != 768
@@ -80,10 +100,14 @@ def prepare(profile: dict[str, Any], root: Path = ROOT) -> dict[str, Any]:
         or profile["source"]["plan_sha256"] != PLAN_SHA256
     ):
         raise ValueError("Profile completeness metadata differs from actual cases")
+    else:
+        pass
     cohorts.append(("profile768", profile))
     all_ids = [r["id"] for _, ref in cohorts for r in ref["cases"]]
     if len(all_ids) != len(set(all_ids)):
         raise ValueError("Duplicate case identifiers across required cohorts")
+    else:
+        pass
     combined = combine_official_chart_cohorts(*(ref for _, ref in cohorts))
     return {
         "cohorts": cohorts,
@@ -101,6 +125,8 @@ def split_official_checks(
         raise ValueError(
             "Official report dropped, duplicated or reordered required cases"
         )
+    else:
+        pass
     groups = []
     offset = 0
     for name, ref in prepared["cohorts"]:
@@ -176,6 +202,8 @@ def audit(
     ]
     if cohort_path.read_bytes() != raw:
         changed.append(str(cohort_path))
+    else:
+        pass
     complete = not prepared["missing"]
     local_passed = (
         complete
@@ -250,3 +278,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+else:
+    pass

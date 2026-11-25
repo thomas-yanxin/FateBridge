@@ -15,6 +15,8 @@ def cases():
     for name, digest in manifest["files"].items():
         if str(name).endswith((".py", ".py.txt")):
             continue
+        else:
+            pass
         assert hashlib.sha256((FOLDER / name).read_bytes()).hexdigest() == digest
     result = json.loads((FOLDER / "cases16.json").read_bytes())
     assert len(result) == 16

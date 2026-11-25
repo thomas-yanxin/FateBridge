@@ -9,16 +9,16 @@ import pytest
 
 from fatebridge.core import almanac
 from fatebridge.core.calendar import BaZiCalendar
+from fatebridge.core.metaphysics.seed import build_analysis_seed
 from fatebridge.services.metaphysics import (
-    _build_analysis_seed,
     calculate_jinkou_analysis,
     calculate_liureng_gods,
 )
-from tests.ren.test_ren_transports import PAYLOAD
 from tests.support.ephemeris_case_runtime import (
     native_ephemeris_files as native_ephemeris_files,
 )
 from tests.support.transports import SPECS, native, rest, surface_calls
+from tests.unit_test.fixtures.ren_protocol import REN_PROTOCOL_PAYLOAD
 
 ROOT = Path(__file__).resolve().parents[2]
 SPEC = importlib.util.spec_from_file_location(
@@ -45,11 +45,11 @@ def linear_failure(monkeypatch):
 
 @pytest.mark.parametrize("key", ["liureng_gods", "liureng_runyear", "jinkou"])
 def test_failed_astronomical_terms_never_publish_a_fallback_board_in_any_transport(
-    key, linear_failure, surface_calls
-):
+    key: str, linear_failure, surface_calls
+) -> None:
     spec = SPECS[key]
     payload = {
-        **PAYLOAD,
+        **REN_PROTOCOL_PAYLOAD,
         "analysis_month": 2,
         "analysis_day": 19,
         "analysis_hour": 0,
@@ -59,6 +59,8 @@ def test_failed_astronomical_terms_never_publish_a_fallback_board_in_any_transpo
         payload.update(
             birth_year=1994, birth_month=8, birth_day=23, birth_hour=14, gender="女"
         )
+    else:
+        pass
     http, protocol, code, cli = surface_calls(spec, payload)
     assert http.status_code == 503 and code != 0 and protocol.is_error
     for body in (http.json(), cli, protocol.structured_content):
@@ -74,8 +76,8 @@ def test_failed_astronomical_terms_never_publish_a_fallback_board_in_any_transpo
     "mode,provider", [("native", "swisseph"), ("de440", "jpl_de440")]
 )
 def test_real_rainwater_case_uses_new_month_general_and_observed_dependencies(
-    mode, provider, monkeypatch, native_ephemeris_files
-):
+    mode: str, provider: str, monkeypatch: pytest.MonkeyPatch, native_ephemeris_files
+) -> None:
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", mode)
     kwargs = dict(
         analysis_year=2026,
@@ -104,9 +106,11 @@ def test_real_rainwater_case_uses_new_month_general_and_observed_dependencies(
         }
         if "jinkou" in result:
             assert result["jinkou"]["calendar_policy"] == policy
+        else:
+            pass
 
 
-def test_solar_clock_late_zi_crossing_does_not_advance_civil_month_boundary():
+def test_solar_clock_late_zi_crossing_does_not_advance_civil_month_boundary() -> None:
     kwargs = dict(
         analysis_year=2026,
         analysis_month=4,
@@ -137,8 +141,8 @@ def test_solar_clock_late_zi_crossing_does_not_advance_civil_month_boundary():
 
 
 @pytest.mark.parametrize("at", [datetime(2026, 3, 7, 12), datetime(2026, 3, 9, 12)])
-def test_solar_term_elapsed_fields_measure_physical_days_across_dst(at):
-    seed = _build_analysis_seed(
+def test_solar_term_elapsed_fields_measure_physical_days_across_dst(at) -> None:
+    seed = build_analysis_seed(
         analysis_year=at.year,
         analysis_month=at.month,
         analysis_day=at.day,
@@ -177,8 +181,8 @@ def test_solar_term_elapsed_fields_measure_physical_days_across_dst(at):
 @pytest.mark.parametrize("solar", [False, True])
 @pytest.mark.parametrize("month,day,hour", [(3, 8, 2), (11, 1, 1)])
 def test_physical_dst_gaps_and_folds_fail_before_apparent_solar_correction(
-    solar, month, day, hour
-):
+    solar: bool, month: int, day: int, hour: int
+) -> None:
     result = calculate_liureng_gods(
         analysis_year=2026,
         analysis_month=month,
@@ -193,7 +197,7 @@ def test_physical_dst_gaps_and_folds_fail_before_apparent_solar_correction(
     assert "liureng" not in result
 
 
-def test_every_hour_stem_group_matches_the_frozen_hko_table():
+def test_every_hour_stem_group_matches_the_frozen_hko_table() -> None:
     ref = AUDIT.reference()
     start = datetime(2000, 1, 1)
     for day in range(10):
@@ -212,8 +216,8 @@ def test_every_hour_stem_group_matches_the_frozen_hko_table():
 
 @pytest.mark.parametrize("mode", ["native", "de440"])
 def test_independent_2026_cohort_retains_date_precision_limits(
-    mode, monkeypatch, native_ephemeris_files
-):
+    mode: str, monkeypatch: pytest.MonkeyPatch, native_ephemeris_files
+) -> None:
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", mode)
     report = AUDIT.audit([2026], progress=False)
     assert report["totals"]["civil_dates"] == 365
@@ -236,8 +240,8 @@ def test_independent_2026_cohort_retains_date_precision_limits(
 
 
 def test_source_parser_rejects_omitted_rows_and_the_frozen_bundle_rejects_tampering(
-    tmp_path,
-):
+    tmp_path: Path,
+) -> None:
     source = (ROOT / "tests/data/ziwei_independent/hko/T2026c.txt").read_text(
         encoding="utf-8-sig"
     )

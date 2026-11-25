@@ -91,6 +91,8 @@ target = FIXTURE / "reference.json.gz"
 if args.check:
     if gzip.decompress(target.read_bytes()) != encoded:
         raise SystemExit("Frozen independent graph reference differs")
+    else:
+        pass
 else:
     target.write_bytes(gzip.compress(encoded, mtime=0))
 print(

@@ -10,9 +10,9 @@ import pytest
 from fatebridge.application.examples import suggested_fields
 from fatebridge.core.divination import (
     build_moving_line_oracle,
-    detect_question_domain,
     lookup_hexagram_by_code,
 )
+from fatebridge.core.meihua.meihua_text_reference import render_yaoci_text
 from fatebridge.services.divination import calculate_meihua_analysis
 from fatebridge.services.meihua import calculate_meihua_cast
 from tests.support.transports import SPECS, business, rest, surface_calls
@@ -36,21 +36,20 @@ BO = next(row for row in REFERENCE["rows"] if row["id"] == "23-6")
 
 
 @pytest.mark.parametrize("row", REFERENCE["rows"], ids=lambda row: row["id"])
-def test_display_quotes_retain_both_literal_readings(row):
+def test_display_quotes_retain_both_literal_readings(row) -> None:
     oracle = build_moving_line_oracle(
         lookup_hexagram_by_code(row["code"]),
         row["position"],
-        detect_question_domain(""),
     )
     assert oracle["classical_yaoci"]["text"] == row["raw_text"]
     expected = row["expected_display_text"]
     assert expected in oracle["judgement"]
-    assert oracle["summary"].startswith(oracle["judgement"])
 
 
 @pytest.mark.parametrize("row", REFERENCE["rows"], ids=lambda row: row["id"])
-def test_each_verse_rendering_matches_independent_full_text_and_source_spans(row):
-    from fatebridge.core.meihua_text_reference import render_yaoci_text
+def test_each_verse_rendering_matches_independent_full_text_and_source_spans(
+    row,
+) -> None:
 
     output = render_yaoci_text(row["raw_text"])
     assert output["display_text"] == row["expected_display_text"]
@@ -83,8 +82,7 @@ def test_each_verse_rendering_matches_independent_full_text_and_source_spans(row
 
 
 @pytest.mark.parametrize("row", REFERENCE["synthetic_cases"], ids=lambda row: row["id"])
-def test_unresolved_syntax_remains_visible_without_a_partial_quote(row):
-    from fatebridge.core.meihua_text_reference import render_yaoci_text
+def test_unresolved_syntax_remains_visible_without_a_partial_quote(row) -> None:
 
     out = render_yaoci_text(row["raw_text"])
     assert out["raw_text"] == row["raw_text"]
@@ -94,7 +92,7 @@ def test_unresolved_syntax_remains_visible_without_a_partial_quote(row):
     )
 
 
-def test_reference_and_actual_template_source_are_retained():
+def test_reference_and_actual_template_source_are_retained() -> None:
     corpus = Path(__file__).parents[2] / "src/fatebridge/data/classical/zhouyi.json"
     assert (
         hashlib.sha256(corpus.read_bytes()).hexdigest()
@@ -109,8 +107,7 @@ def test_reference_and_actual_template_source_are_retained():
     assert sum(len(row["variants"]) for row in REFERENCE["rows"]) == 48
 
 
-def test_renderer_and_original_corpus_are_not_mutated():
-    from fatebridge.core.meihua_text_reference import render_yaoci_text
+def test_renderer_and_original_corpus_are_not_mutated() -> None:
 
     raw = "{{另|德車|得輿}}"
     first = render_yaoci_text(raw)
@@ -123,7 +120,9 @@ def test_renderer_and_original_corpus_are_not_mutated():
     "topic",
     ["general", "planning", "reputation", "wealth", "transaction", "travel", "meeting"],
 )
-def test_selected_and_each_count_candidate_keep_their_own_source_verse(topic):
+def test_selected_and_each_count_candidate_keep_their_own_source_verse(
+    topic: str,
+) -> None:
     result = calculate_meihua_cast(casting=CAST, interpretation_topic=topic)
     assert "error" not in result
     interpretation = result["interpretation"]
@@ -152,9 +151,11 @@ def test_selected_and_each_count_candidate_keep_their_own_source_verse(topic):
         assert BO["expected_display_text"] in result["summary"]
         assert "{{" not in result["summary"]
         assert "{{" not in interpretation["comprehensive_judgement"]
+    else:
+        pass
 
 
-def test_time_entry_uses_its_actual_verse_and_preserves_calendar_and_cast():
+def test_time_entry_uses_its_actual_verse_and_preserves_calendar_and_cast() -> None:
     result = calculate_meihua_analysis(**TIME)
     assert "error" not in result
     assert result["meihua"]["base_hexagram"]["binary_code"] == "000001"
@@ -171,8 +172,8 @@ def test_time_entry_uses_its_actual_verse_and_preserves_calendar_and_cast():
 @pytest.mark.parametrize("view", [None, "reading"])
 @pytest.mark.parametrize("topic", ["general", "planning", "weather"])
 def test_published_reading_fields_agree_on_rest_mcp_and_cli(
-    tool, view, topic, surface_calls
-):
+    tool: str, view: str | None, topic: str, surface_calls
+) -> None:
     spec = SPECS[tool]
     payload = {"casting": CAST} if tool == "meihua_cast" else dict(TIME)
     payload["interpretation_topic"] = topic

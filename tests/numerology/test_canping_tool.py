@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from fatebridge.core.canping import (
+from fatebridge.core.numerology.canping import (
     build_snapshot_text,
     calculate,
     compute_number,
@@ -59,7 +59,7 @@ _HOROSA_NAYIN_PAIRS = [
 ]
 
 
-def test_canping_nayin_parity_with_fb_get_nayin():
+def test_canping_nayin_parity_with_fb_get_nayin() -> None:
     """FB get_nayin element must match horosa's NAYIN_ELEMENT for all 60 ganzhi."""
     for a, b, element in _HOROSA_NAYIN_PAIRS:
         for ganzhi in (a, b):
@@ -67,14 +67,14 @@ def test_canping_nayin_parity_with_fb_get_nayin():
             assert get_nayin(ganzhi[0], ganzhi[1])[-1] == element
 
 
-def test_canping_compute_number_documented_anchor():
+def test_canping_compute_number_documented_anchor() -> None:
     """本命 巳/午/火 → 2242/3242, the algorithm's own documented test case."""
     result = compute_number("巳", "午", "火")
     assert result["numShun"] == 2242
     assert result["numNi"] == 3242
 
 
-def test_canping_historical_snapshot_with_documented_primary_text_corrections():
+def test_canping_historical_snapshot_with_documented_primary_text_corrections() -> None:
     """Retain the historical port fixture and apply named, source-checked deltas."""
     result = calculate(
         year_gz="庚午",
@@ -108,7 +108,7 @@ def test_canping_historical_snapshot_with_documented_primary_text_corrections():
     assert build_snapshot_text(result).split("\n\n[参评选条与来源]")[0] == expected
 
 
-def test_canping_service_full_shape():
+def test_canping_service_full_shape() -> None:
     result = calculate_canping_analysis(
         date="1990-06-15",
         time="09:33:00",
@@ -130,7 +130,7 @@ def test_canping_service_full_shape():
     assert result["snapshot_text"].startswith("[起盘]")
 
 
-def test_canping_gu_method_uses_day_branch():
+def test_canping_gu_method_uses_day_branch() -> None:
     ming = calculate(
         year_gz="庚午",
         month_branch="寅",

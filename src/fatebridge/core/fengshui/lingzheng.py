@@ -4,19 +4,22 @@ import json
 from copy import deepcopy
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Dict, Optional, cast
+from typing import Any, Dict, cast
 
-from .directions import rule_data
-from .lingzheng_inputs import FixedLingzhengRequest, LingzhengObservation
+from fatebridge.core.fengshui.directions import rule_data
+from fatebridge.core.fengshui.lingzheng_inputs import (
+    FixedLingzhengRequest,
+    LingzhengObservation,
+)
 
 
 @lru_cache(maxsize=1)
-def _data() -> Dict[str, Any]:
+def _data() -> dict[str, Any]:
     p = Path(__file__).parents[2] / "data/fengshui/fixed-lingzheng-v1.json"
     return cast(Dict[str, Any], json.loads(p.read_text(encoding="utf-8")))
 
 
-def lingzheng_provenance() -> Dict[str, Any]:
+def lingzheng_provenance() -> dict[str, Any]:
     data = _data()
     return {
         **deepcopy(data["ruleset"]),
@@ -27,8 +30,8 @@ def lingzheng_provenance() -> Dict[str, Any]:
 
 
 def _condition(
-    role: str, observation: Optional[LingzhengObservation], ambiguous: bool
-) -> Dict[str, Any]:
+    role: str, observation: LingzhengObservation | None, ambiguous: bool
+) -> dict[str, Any]:
     requirements = (
         ["high_solid_terrain_present"]
         if role == "zheng"
@@ -81,25 +84,33 @@ def _condition(
 
 
 def analyze_fixed_lingzheng(
-    config: FixedLingzhengRequest, current: Optional[int], natal: Dict[str, Any]
-) -> Dict[str, Any]:
+    config: FixedLingzhengRequest, current: int | None, natal: dict[str, Any]
+) -> dict[str, Any]:
     """Use the explicit evaluation period; never rewrite a chart or select a half."""
     if current is not None and (
         type(current) is not int or current not in range(1, 10)
     ):
         raise ValueError("评价运必须为1至9的整数")
+    else:
+        pass
     if config.five_period_half is not None and current != 5:
         raise ValueError("五运分段仅适用于明确评价五运")
+    else:
+        pass
     directions = rule_data("directions")
     by_number = {p["palace_number"]: d for d, p in directions.items()}
     observations = {o.direction: o for o in config.observations}
     charts = natal.get("candidates", [])
     if not charts and natal.get("chart"):
         charts = [natal["chart"]]
+    else:
+        pass
     variants = []
     missing = []
     if not charts:
         missing.append("interpretation.fixed_lingzheng.computed_natal_for_comparison")
+    else:
+        pass
     if current is None:
         missing.append("interpretation.current_period_number")
     elif current == 5:
@@ -110,6 +121,8 @@ def analyze_fixed_lingzheng(
         )
         if config.five_period_half is None:
             missing.append("interpretation.fixed_lingzheng.five_period_half")
+        else:
+            pass
         for half in halves:
             variants.append(
                 {
@@ -155,6 +168,10 @@ def analyze_fixed_lingzheng(
                     and observations[direction].observation_basis == "image_observed"
                 ):
                     missing.append(f"{prefix}.user_or_measurement_confirmation")
+                else:
+                    pass
+            else:
+                pass
             comparisons = []
             for chart in charts:
                 p = chart["palaces"][direction]
@@ -211,6 +228,8 @@ def analyze_fixed_lingzheng(
                     }
                     for comparison in comparisons
                 )
+            else:
+                pass
         item = {
             "candidate_id": fixed_id,
             "candidate_only": ambiguous,

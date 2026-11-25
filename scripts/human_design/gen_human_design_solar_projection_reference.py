@@ -26,8 +26,12 @@ def derive() -> dict:
     source_raw = source_path.read_bytes()
     if hashlib.sha256(source_raw).hexdigest() != plan["source_reference_sha256"]:
         raise ValueError("Original complete seasonal input reference changed")
+    else:
+        pass
     if version("mpmath") != plan["oracle"]["version"]:
         raise ValueError("Independent arithmetic runtime changed")
+    else:
+        pass
     mp.dps = plan["oracle"]["decimal_precision"]
     source = json.loads(source_raw)
 
@@ -53,6 +57,8 @@ def derive() -> dict:
             for body, position in positions.items():
                 if body == "Sun":
                     continue
+                else:
+                    pass
                 target = [position[k] for k in ("longitude", "latitude", "distance_au")]
                 direction = vector(*target[:2])
                 a, z = solar_vector, direction
@@ -85,6 +91,8 @@ def derive() -> dict:
                 )
     if len(rows) != plan["case_count"]:
         raise ValueError("Not all declared geometry inputs were retained")
+    else:
+        pass
     return {
         "method_id": plan["method_id"],
         "plan_sha256": hashlib.sha256(PLAN.read_bytes()).hexdigest(),
@@ -108,6 +116,8 @@ def main() -> None:
     if args.check:
         if args.output.read_bytes() != compressed:
             raise SystemExit("Independent geometric reference bytes differ")
+        else:
+            pass
     else:
         args.output.write_bytes(compressed)
     print(json.dumps({"cases": 21600, "checked": args.check}))
@@ -115,3 +125,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+else:
+    pass

@@ -3,6 +3,7 @@
 import asyncio
 import json
 from copy import deepcopy
+from pathlib import Path
 
 import pytest
 from fastmcp import Client
@@ -14,11 +15,13 @@ from fatebridge.core.fengshui.models import AssessRequest
 from fatebridge.core.fengshui.output import FengshuiOutput
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.fengshui import assess
-from tests.fengshui.test_fengshui_material_facts import material_request
 from tests.fixtures.fengshui import payload
 from tests.support.fengshui_transports import mcp_call
 from tests.support.mcp_result_assertions import without_transport
-from tests.support.transports import rest_client
+from tests.support.transports import call_calculation, describe_capability, rest_client
+from tests.unit_test.fixtures.fengshui_layout import (
+    material_request,
+)
 
 
 def condition(value=True, basis="user_confirmed"):
@@ -119,6 +122,8 @@ def material_application_request(material="water", use="water_remedy", **conditi
     )
     if material == "living_plant":
         fact["plant_alive"] = True
+    else:
+        pass
     return request
 
 
@@ -127,7 +132,7 @@ def review(request):
 
 
 @pytest.mark.parametrize("activity", ["work", "study"])
-def test_activity_role_across_all_palaces_and_facing_changes(activity):
+def test_activity_role_across_all_palaces_and_facing_changes(activity: str) -> None:
     # The independent source expectation is the facing ROLE, not a fixed number.
     for direction in ("N", "NE", "E", "SE", "S", "SW", "W", "NW"):
         request = activity_request(activity, direction)
@@ -159,7 +164,7 @@ def test_activity_role_across_all_palaces_and_facing_changes(activity):
 
 
 @pytest.mark.parametrize("activity", ["meditation", "storage", "mixed", "unknown"])
-def test_non_work_uses_never_borrow_bed_or_door_rules(activity):
+def test_non_work_uses_never_borrow_bed_or_door_rules(activity: str) -> None:
     result = review(activity_request(activity))
     finding = result["findings"][0]
     assert finding["selected_star_role"] is None
@@ -169,7 +174,9 @@ def test_non_work_uses_never_borrow_bed_or_door_rules(activity):
     assert bool(result["missing_inputs"]) is (activity == "unknown")
 
 
-def test_activity_explanation_survives_unknown_location_external_forms_and_execution():
+def test_activity_explanation_survives_unknown_location_external_forms_and_execution() -> (
+    None
+):
     request = activity_request()
     request["placements"][0] = dict(
         object_id="desk",
@@ -191,7 +198,9 @@ def test_activity_explanation_survives_unknown_location_external_forms_and_execu
     assert not known["layout_analysis"]["workstation_analysis"]["missing_inputs"]
 
 
-def test_independent_version_keeps_old_interpretation_and_candidate_uncertainty():
+def test_independent_version_keeps_old_interpretation_and_candidate_uncertainty() -> (
+    None
+):
     request = activity_request()
     request["xuankong"]["interpretation"] = dict(
         current_period_number=9, period_evidence="显式评价九运"
@@ -220,7 +229,7 @@ def test_independent_version_keeps_old_interpretation_and_candidate_uncertainty(
     )
 
 
-def test_photographic_activity_never_becomes_confirmed_or_rotates_by_birth():
+def test_photographic_activity_never_becomes_confirmed_or_rotates_by_birth() -> None:
     request = activity_request()
     request["environmental_context"]["workstation_review"]["activities"][0][
         "observation_basis"
@@ -239,7 +248,9 @@ def test_photographic_activity_never_becomes_confirmed_or_rotates_by_birth():
 
 
 @pytest.mark.parametrize("operation", ["retain", "relocate", "add"])
-def test_barrier_gate_uses_actual_geometry_and_operation_permissions(operation):
+def test_barrier_gate_uses_actual_geometry_and_operation_permissions(
+    operation: str,
+) -> None:
     request = barrier_request(operation)
     assert review(request)["action_options"][0]["status"] == "ready"
     constrained = deepcopy(request)
@@ -250,6 +261,8 @@ def test_barrier_gate_uses_actual_geometry_and_operation_permissions(operation):
     assert action["status"] == ("ready" if operation == "retain" else "blocked")
     if operation != "retain":
         assert action["pending_confirmations"] == []
+    else:
+        pass
     request["environmental_context"]["workstation_review"]["entry_barriers"][0][
         "barrier_between_entry_and_user"
     ] = condition(False)
@@ -267,7 +280,9 @@ def test_barrier_gate_uses_actual_geometry_and_operation_permissions(operation):
         "physically_feasible",
     ],
 )
-def test_each_photo_fact_is_independent_and_cannot_make_action_ready(field):
+def test_each_photo_fact_is_independent_and_cannot_make_action_ready(
+    field: str,
+) -> None:
     request = barrier_request()
     relation = request["environmental_context"]["workstation_review"]["entry_barriers"][
         0
@@ -276,7 +291,7 @@ def test_each_photo_fact_is_independent_and_cannot_make_action_ready(field):
     assert review(request)["action_options"][0]["status"] != "ready"
 
 
-def test_absent_entry_line_needs_no_barrier_action_or_execution_followup():
+def test_absent_entry_line_needs_no_barrier_action_or_execution_followup() -> None:
     request = barrier_request()
     relation = request["environmental_context"]["workstation_review"]["entry_barriers"][
         0
@@ -288,7 +303,7 @@ def test_absent_entry_line_needs_no_barrier_action_or_execution_followup():
     assert result["action_options"] == [] and result["missing_inputs"] == []
 
 
-def test_material_conditions_separate_eligibility_dosage_and_action():
+def test_material_conditions_separate_eligibility_dosage_and_action() -> None:
     for moving in (None, False, True):
         request = material_application_request(
             water_clean=condition(), proportionate_to_space=condition()
@@ -297,6 +312,8 @@ def test_material_conditions_separate_eligibility_dosage_and_action():
             request["environmental_context"]["material_facts"][0]["application"][
                 "water_moving"
             ] = condition(moving)
+        else:
+            pass
         finding = assess(**request)["layout_analysis"]["material_analysis"]["findings"][
             0
         ]
@@ -323,7 +340,7 @@ def test_material_conditions_separate_eligibility_dosage_and_action():
     ]
 
 
-def test_computed_target_binding_is_separate_from_location_and_material_name():
+def test_computed_target_binding_is_separate_from_location_and_material_name() -> None:
     request = material_application_request(
         water_clean=condition(),
         water_moving=condition(),
@@ -365,7 +382,7 @@ def test_computed_target_binding_is_separate_from_location_and_material_name():
     assert app["target_binding"]["status"] == "element_mismatch"
 
 
-def test_all_moved_barrier_ends_require_fresh_same_relation():
+def test_all_moved_barrier_ends_require_fresh_same_relation() -> None:
     for object_id in ("entry", "desk", "screen"):
         request = barrier_request()
         request["layout_constraints"] = [
@@ -411,7 +428,7 @@ def test_all_moved_barrier_ends_require_fresh_same_relation():
         assert any("entry_barriers" in m for m in candidate["missing_inputs"])
 
 
-def test_corner_disagreements_do_not_cancel_wofs_rule_or_claim_consensus():
+def test_corner_disagreements_do_not_cancel_wofs_rule_or_claim_consensus() -> None:
     result = assess(
         methods=[],
         form_observations=[
@@ -441,8 +458,11 @@ def test_corner_disagreements_do_not_cancel_wofs_rule_or_claim_consensus():
     "factory", [activity_request, barrier_request, material_application_request]
 )
 def test_new_branches_match_rest_mcp_cli_and_strict_projection(
-    monkeypatch, tmp_path, capsys, factory
-):
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    factory,
+) -> None:
     request = factory()
     branch = (
         "material_analysis"
@@ -487,14 +507,12 @@ def test_new_branches_match_rest_mcp_cli_and_strict_projection(
     Draft202012Validator(FengshuiOutput.model_json_schema()).validate(cli)
 
 
-def test_published_schema_rejects_unknown_rules_and_strict_boolean_facts():
+def test_published_schema_rejects_unknown_rules_and_strict_boolean_facts() -> None:
     async def check():
         async with Client(create_mcp_app(families="fengshui")) as client:
-            schema = next(
-                t.model_dump(by_alias=True)["inputSchema"]
-                for t in await client.list_tools()
-                if t.name == "fengshui_assess"
-            )
+            schema = (await describe_capability(client, "fengshui_assess"))[
+                "input_schema"
+            ]
             for factory in (
                 activity_request,
                 barrier_request,
@@ -528,8 +546,11 @@ def test_published_schema_rejects_unknown_rules_and_strict_boolean_facts():
     ],
 )
 def test_invalid_references_rejected_identically_by_three_transports(
-    monkeypatch, tmp_path, capsys, bad_kind
-):
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    bad_kind: str,
+) -> None:
     request = barrier_request()
     context = request["environmental_context"]
     relation = context["workstation_review"]["entry_barriers"][0]
@@ -560,7 +581,7 @@ def test_invalid_references_rejected_identically_by_three_transports(
     )
 
 
-def test_evaluation_period_is_explicit_and_independent_of_natal_period():
+def test_evaluation_period_is_explicit_and_independent_of_natal_period() -> None:
     request = activity_request()
     assert all(
         c["timeliness"] == "unknown"
@@ -592,8 +613,8 @@ def test_evaluation_period_is_explicit_and_independent_of_natal_period():
     ],
 )
 def test_failed_application_condition_does_not_demand_remaining_observations(
-    material, use, conditions
-):
+    material: str, use: str, conditions
+) -> None:
     result = assess(**material_application_request(material, use, **conditions))
     finding = result["layout_analysis"]["material_analysis"]["findings"][0]
     assert finding["application_analysis"]["status"] == "conditions_not_met"
@@ -601,7 +622,7 @@ def test_failed_application_condition_does_not_demand_remaining_observations(
     assert result["coverage"]["analysis_progress"]["assessment_complete"]
 
 
-def test_health_and_alive_are_distinct_and_photo_health_remains_candidate():
+def test_health_and_alive_are_distinct_and_photo_health_remains_candidate() -> None:
     request = material_application_request(
         "living_plant", "wood_remedy", plant_healthy=condition(True, "image_observed")
     )
@@ -618,7 +639,7 @@ def test_health_and_alive_are_distinct_and_photo_health_remains_candidate():
         AssessRequest.model_validate(request)
 
 
-def test_ready_fresh_barrier_proposal_preserves_rule_identity_and_scope():
+def test_ready_fresh_barrier_proposal_preserves_rule_identity_and_scope() -> None:
     request = barrier_request()
     fresh = deepcopy(request["environmental_context"])
     request["layout_alternatives"] = [
@@ -651,7 +672,7 @@ def test_ready_fresh_barrier_proposal_preserves_rule_identity_and_scope():
     assert result["status"] == "blocked"
 
 
-def test_candidate_preserves_query_period_without_reusing_activity_geometry():
+def test_candidate_preserves_query_period_without_reusing_activity_geometry() -> None:
     request = activity_request()
     request["environmental_context"]["workstation_review"]["evaluation_period"] = dict(
         number=9, evidence="本次评价运"
@@ -684,7 +705,7 @@ def test_candidate_preserves_query_period_without_reusing_activity_geometry():
         AssessRequest.model_validate(request)
 
 
-def test_source_rules_resolve_and_references_never_enable_p3():
+def test_source_rules_resolve_and_references_never_enable_p3() -> None:
     from fatebridge.core.fengshui.workstation_sources import bundle, provenance
 
     data = bundle()
@@ -709,12 +730,16 @@ def test_source_rules_resolve_and_references_never_enable_p3():
                 assert set(trace["source_ids"]) <= set(
                     data["rules"][trace["rule_id"]]["source_ids"]
                 )
+            else:
+                pass
     assert data["non_btb_desktop_reference"]["status"] == "reference_only"
     assert data["non_btb_desktop_reference"]["placement_rules_enabled"] is False
 
 
 @pytest.mark.parametrize("material", ["unknown", None])
-def test_unknown_material_is_pending_identity_not_author_exclusion(material):
+def test_unknown_material_is_pending_identity_not_author_exclusion(
+    material: str | None,
+) -> None:
     request = material_application_request(material, "wood_remedy")
     fact = request["environmental_context"]["material_facts"][0]
     fact["colour"] = "green"  # Known colour cannot certify unknown material.
@@ -730,7 +755,7 @@ def test_unknown_material_is_pending_identity_not_author_exclusion(material):
     )
 
 
-def test_photo_dead_candidate_does_not_overrule_confirmed_health_fact():
+def test_photo_dead_candidate_does_not_overrule_confirmed_health_fact() -> None:
     request = material_application_request(
         "living_plant", "wood_remedy", plant_healthy=condition()
     )
@@ -741,7 +766,7 @@ def test_photo_dead_candidate_does_not_overrule_confirmed_health_fact():
     assert result["findings"][0]["candidate_only"] is True
 
 
-def test_material_application_facts_must_survive_a_real_barrier_move():
+def test_material_application_facts_must_survive_a_real_barrier_move() -> None:
     request = barrier_request()
     request["environmental_context"]["material_facts"] = [
         dict(
@@ -779,7 +804,7 @@ def test_material_application_facts_must_survive_a_real_barrier_move():
     )
 
 
-def test_star_pair_relationship_is_shared_mechanics_without_fortune_judgment():
+def test_star_pair_relationship_is_shared_mechanics_without_fortune_judgment() -> None:
     from fatebridge.core.divination import ELEMENT_CONTROLS, ELEMENT_GENERATES
 
     for direction in ("N", "E", "S", "W", "NE", "NW", "SE", "SW"):
@@ -808,7 +833,7 @@ def test_star_pair_relationship_is_shared_mechanics_without_fortune_judgment():
             assert candidate["overall_auspiciousness"] == "not_produced"
 
 
-def test_missing_engineering_fact_cannot_hide_behind_candidate_feasibility():
+def test_missing_engineering_fact_cannot_hide_behind_candidate_feasibility() -> None:
     request = barrier_request()
     fresh = deepcopy(request["environmental_context"])
     del fresh["workstation_review"]["entry_barriers"][0]["entrance_view_maintained"]
@@ -834,8 +859,8 @@ def test_missing_engineering_fact_cannot_hide_behind_candidate_feasibility():
 
 
 def test_default_budget_delivery_preserves_same_run_workstation_data(
-    monkeypatch, tmp_path
-):
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     import fatebridge.api as api
     from fatebridge.application import result_delivery as delivery
     from tests.support.result_delivery import reconstruct
@@ -846,7 +871,8 @@ def test_default_budget_delivery_preserves_same_run_workstation_data(
 
     async def native():
         async with Client(create_mcp_app(families="fengshui")) as client:
-            result = await client.call_tool(
+            result = await call_calculation(
+                client,
                 "fengshui_assess",
                 {**activity_request(), "include_snapshot_text": False},
             )
@@ -885,7 +911,7 @@ def test_default_budget_delivery_preserves_same_run_workstation_data(
         ("fengshui-material-application", "partial"),
     ],
 )
-def test_published_workstation_examples_are_executable(name, status):
+def test_published_workstation_examples_are_executable(name: str, status: str) -> None:
     from pathlib import Path
 
     path = Path(__file__).resolve().parents[2] / "docs/examples" / (name + ".json")
@@ -894,7 +920,13 @@ def test_published_workstation_examples_are_executable(name, status):
     if name == "fengshui-workstation-activity":
         assert "向星" in result["snapshot_text"]
         assert "真实水装置需求" in result["snapshot_text"]
+    else:
+        pass
     if name == "fengshui-entry-barrier":
         assert "入口隔挡" in result["snapshot_text"]
+    else:
+        pass
     if name == "fengshui-material-application":
         assert "剂量、目标位置" in result["snapshot_text"]
+    else:
+        pass

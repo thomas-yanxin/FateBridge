@@ -4,18 +4,21 @@ import json
 from copy import deepcopy
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Dict, Optional, cast
+from typing import Any, Dict, cast
 
-from .mutual_geometry import describe_mutual_geometry, geometry_provenance
+from fatebridge.core.fengshui.mutual_geometry import (
+    describe_mutual_geometry,
+    geometry_provenance,
+)
 
 
 @lru_cache(maxsize=1)
-def _data() -> Dict[str, Any]:
+def _data() -> dict[str, Any]:
     path = Path(__file__).parents[2] / "data/fengshui/wang-timeliness-v1.json"
     return cast(Dict[str, Any], json.loads(path.read_text(encoding="utf-8")))
 
 
-def timeliness_provenance() -> Dict[str, Any]:
+def timeliness_provenance() -> dict[str, Any]:
     data = _data()
     return {
         **deepcopy(data["ruleset"]),
@@ -24,7 +27,7 @@ def timeliness_provenance() -> Dict[str, Any]:
     }
 
 
-def classify_timeliness(number: int, current: Optional[int]) -> Dict[str, Any]:
+def classify_timeliness(number: int, current: int | None) -> dict[str, Any]:
     """Classify an actual star, never a palace number or an inferred period.
 
     The cyclic rule implements the printed nine-column table. The separate
@@ -33,10 +36,14 @@ def classify_timeliness(number: int, current: Optional[int]) -> Dict[str, Any]:
     """
     if type(number) is not int or number not in range(1, 10):
         raise ValueError("star number must be an integer from 1 through 9")
+    else:
+        pass
     if current is not None and (
         type(current) is not int or current not in range(1, 10)
     ):
         raise ValueError("current period must be an integer from 1 through 9")
+    else:
+        pass
     offset = None if current is None else (number - current) % 9
     phase = (
         "unknown"

@@ -26,7 +26,9 @@ def sealed(path):
 
 
 @pytest.mark.parametrize("spk", [False, True])
-def test_entire_known_oracle_through_each_scalar_model_caller(spk, monkeypatch):
+def test_entire_known_oracle_through_each_scalar_model_caller(
+    spk: bool, monkeypatch: pytest.MonkeyPatch
+) -> None:
     oracle = sealed(ROOT / "tests/data/bazi_tt_utc_exact_v1/oracle.json.gz")
     primary = json.loads(
         (ROOT / "tests/fixtures/historical-utc-domain-reference-v1.json").read_text()
@@ -37,6 +39,8 @@ def test_entire_known_oracle_through_each_scalar_model_caller(spk, monkeypatch):
     for row in oracle["rows"]:
         if row["status"] == "pre_atomic_policy_unadjudicated":
             continue
+        else:
+            pass
         jd = row["jd_tt"]
 
         def solver(*args, **kwargs):
@@ -49,7 +53,7 @@ def test_entire_known_oracle_through_each_scalar_model_caller(spk, monkeypatch):
 
         monkeypatch.setattr(provider, "longitude_crossing_tt", solver)
         if row["status"] == "normal" or row["id"] in rescued:
-            civil, receipt = almanac._solar_term_utc_via_analytic(2000, 0, {}, spk=spk)
+            civil, receipt = almanac._solar_term_utc_via_analytic(2000, 0, spk=spk)
             expected = (
                 rescued[row["id"]]["expected_UTC"]
                 if row["id"] in rescued
@@ -64,14 +68,14 @@ def test_entire_known_oracle_through_each_scalar_model_caller(spk, monkeypatch):
             )
         else:
             with pytest.raises(ValueError, match="UTC leap second not representable"):
-                almanac._solar_term_utc_via_analytic(2000, 0, {}, spk=spk)
+                almanac._solar_term_utc_via_analytic(2000, 0, spk=spk)
         seen += 1
     assert seen == 4173
 
 
 def test_explicit_root_conversion_error_cannot_publish_a_linear_year(
-    monkeypatch, tmp_path
-):
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     oracle = sealed(ROOT / "tests/data/bazi_tt_utc_exact_v1/oracle.json.gz")
     bad = next(r for r in oracle["rows"] if r["status"] == "unrepresentable_utc_label")
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "analytic")

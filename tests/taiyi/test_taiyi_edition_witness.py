@@ -10,9 +10,9 @@ from fastmcp import Client
 import fatebridge.api as api
 from fatebridge.cli import run
 from fatebridge.core.metaphysics.taiyi_source_alignment import source_alignment_text
-from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
-from tests.taiyi.test_taiyi_source_alignment import board
+from tests.support.transports import cached_mcp_app, call_calculation
+from tests.unit_test.fixtures.taiyi import aligned_board
 
 
 @pytest.mark.parametrize(
@@ -24,9 +24,9 @@ from tests.taiyi.test_taiyi_source_alignment import board
     ],
 )
 def test_named_1599_edition_support_is_bounded_and_preserves_jinjing(
-    ju, expected, old_shiji, old_guest, images
-):
-    assessment = board(ju, yin=True)["count_source_assessment"]
+    ju: int, expected, old_shiji: str, old_guest: int, images
+) -> None:
+    assessment = aligned_board(ju, yin=True)["count_source_assessment"]
     (witness,) = assessment["edition_comparisons"]
     assert witness["source_id"] == "wujing_yonezawa_wanli27_yin_v1"
     assert witness["catalog_url"] == (
@@ -67,16 +67,23 @@ def test_named_1599_edition_support_is_bounded_and_preserves_jinjing(
     assert "原《金镜》分歧保留" in text
 
 
-def test_unread_rows_and_yang_twins_do_not_acquire_edition_support():
+def test_unread_rows_and_yang_twins_do_not_acquire_edition_support() -> None:
     for yin, ju in [(False, 37), (False, 43), (False, 44), (True, 36), (True, 45)]:
-        assert board(ju, yin)["count_source_assessment"]["edition_comparisons"] == []
+        assert (
+            aligned_board(ju, yin)["count_source_assessment"]["edition_comparisons"]
+            == []
+        )
 
 
-def test_returned_witness_cannot_mutate_later_runs():
-    first = board(37, yin=True)["count_source_assessment"]["edition_comparisons"][0]
+def test_returned_witness_cannot_mutate_later_runs() -> None:
+    first = aligned_board(37, yin=True)["count_source_assessment"][
+        "edition_comparisons"
+    ][0]
     first["images"][0]["sha256"] = "caller annotation"
     first["observations"][2]["edition_value"] = "caller annotation"
-    second = board(37, yin=True)["count_source_assessment"]["edition_comparisons"][0]
+    second = aligned_board(37, yin=True)["count_source_assessment"][
+        "edition_comparisons"
+    ][0]
     assert second["images"][0]["sha256"] == (
         "dec593b89d9db04cfacfd1cb608bbbc10e0ec0b7a30aeb57c54c6494cc95bff9"
     )
@@ -92,15 +99,20 @@ def test_returned_witness_cannot_mutate_later_runs():
     ],
 )
 def test_three_selected_rows_against_independent_ring_and_integer_arithmetic(
-    ju, jishen, wenchang, expected_shiji, addends, expected_guest
-):
+    ju: int,
+    jishen: str,
+    wenchang: str,
+    expected_shiji: str,
+    addends,
+    expected_guest: int,
+) -> None:
     # Literal compass order and principal weights, independently from core tables.
     ring = "子丑艮寅卯辰巽巳午未坤申酉戌乾亥"
     weights = {"乾": 1, "子": 8, "艮": 3, "卯": 4, "巽": 9, "午": 2, "坤": 7, "酉": 6}
     steps = (ring.index(wenchang) - ring.index(jishen)) % 16
     marker = ring[(ring.index("艮") + steps) % 16]
     assert marker == expected_shiji
-    core = board(ju, yin=True)["core_board"]
+    core = aligned_board(ju, yin=True)["core_board"]
     assert core["shiji"] == marker
     target = next(p for p, value in weights.items() if value == core["taiyi_number"])
     values = [] if marker in weights else [1]
@@ -108,6 +120,8 @@ def test_three_selected_rows_against_independent_ring_and_integer_arithmetic(
     while ring[index] != target:
         if ring[index] in weights:
             values.append(weights[ring[index]])
+        else:
+            pass
         index = (index + 1) % 16
     assert values == addends and sum(values) == expected_guest
     assert core["guest_count"] == expected_guest
@@ -118,8 +132,13 @@ def test_three_selected_rows_against_independent_ring_and_integer_arithmetic(
     "day,hour,ju", [(24, 16, 37), (25, 4, 43), (25, 6, 44), (23, 16, 25)]
 )
 def test_actual_rest_mcp_cli_keep_both_editions(
-    key, day, hour, ju, capsys, monkeypatch
-):
+    key: str,
+    day: int,
+    hour: int,
+    ju: int,
+    capsys: pytest.CaptureFixture[str],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     # Modern hour-phase twins exercise delivery; no ancient civil date is inferred.
     if key == "taiyi":
         payload = {
@@ -167,20 +186,29 @@ def test_actual_rest_mcp_cli_keep_both_editions(
         1 if ju == 25 else 6
     )
     assert assessment["edition_comparisons"][0]["ju"] == ju
-    args = [key, "--strict-fields", "--no-use-true-solar-time", "--fields", *fields]
+    args = [
+        spec.tool_name,
+        "--strict-fields",
+        "--no-use-true-solar-time",
+        "--fields",
+        *fields,
+    ]
     for name, value in payload.items():
         if name != "use_true_solar_time":
             args += [
                 "--" + name.replace("_", "-"),
                 json.dumps(value) if isinstance(value, dict) else str(value),
             ]
+        else:
+            pass
     assert run(args) == 0
     assert json.loads(capsys.readouterr().out)["taiyi"] == expected
 
     async def call():
-        async with Client(create_mcp_app()) as client:
-            result = await client.call_tool(
-                key,
+        async with Client(cached_mcp_app()) as client:
+            result = await call_calculation(
+                client,
+                spec.tool_name,
                 {
                     **payload,
                     "fields": fields,
@@ -212,9 +240,9 @@ def test_actual_rest_mcp_cli_keep_both_editions(
     ],
 )
 def test_all_original_count_conflicts_have_named_variants_without_regrading(
-    yin, ju, field, printed, selected
-):
-    assessment = board(ju, yin)["count_source_assessment"]
+    yin: bool, ju: int, field: str, printed: int, selected: int
+) -> None:
+    assessment = aligned_board(ju, yin)["count_source_assessment"]
     (witness,) = assessment["edition_comparisons"]
     fact = next(f for f in witness["observations"] if f["field"] == field)
     assert fact["edition_value"] == printed
@@ -231,4 +259,6 @@ def test_all_original_count_conflicts_have_named_variants_without_regrading(
     if ju not in (43, 44):
         assert witness["required_observations"] == 1
         assert len(witness["unread_fields"]) == 5
+    else:
+        pass
     assert "原《金镜》分歧保留" in source_alignment_text(assessment)

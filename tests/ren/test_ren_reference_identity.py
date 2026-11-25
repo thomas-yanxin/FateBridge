@@ -53,6 +53,8 @@ def copy_reference(config, target):
         if Path(source).suffix == ".pdf":
             Path(destination).symlink_to(Path(source).resolve())
             return destination
+        else:
+            pass
         return shutil.copy2(source, destination)
 
     shutil.copytree(ROOT / config["folder"], target, copy_function=copy_file)
@@ -74,8 +76,8 @@ def rewrite_and_rehash(target, probe):
 
 @pytest.mark.parametrize("config", PROTOCOL["corpora"], ids=lambda c: c["id"])
 def test_unchanged_selected_reference_and_copied_reference_are_accepted(
-    config, tmp_path
-):
+    config, tmp_path: Path
+) -> None:
     source = ROOT / config["folder"]
     assert sha(source / "freeze.json") == config["freeze_sha256"]
     module = audit_module(config)
@@ -86,7 +88,9 @@ def test_unchanged_selected_reference_and_copied_reference_are_accepted(
 
 
 @pytest.mark.parametrize("probe", PROTOCOL["probes"], ids=lambda p: p["id"])
-def test_coordinated_reference_rewrite_cannot_replace_selected_witness(probe, tmp_path):
+def test_coordinated_reference_rewrite_cannot_replace_selected_witness(
+    probe, tmp_path: Path
+) -> None:
     config = CONFIGS[probe["corpus"]]
     original = ROOT / config["folder"]
     before = {p.name: sha(p) for p in original.iterdir()}

@@ -18,11 +18,12 @@ from fastmcp import Client
 
 import fatebridge.api as api
 from fatebridge.cli import run
-from fatebridge.core import guolao
 from fatebridge.core.astro.birth import build_astro_birth_info
-from fatebridge.core.guolao_clock import METHOD_ID, apparent_solar_clock
+from fatebridge.core.guolao import guolao
+from fatebridge.core.guolao.guolao_clock import METHOD_ID, apparent_solar_clock
 from fatebridge.mcp_server import create_mcp_app
-from tests.guolao.test_guolao_depth import chart
+from tests.support.transports import call_calculation
+from tests.unit_test.fixtures.guolao import chart
 
 FIXTURE = Path(__file__).parents[1] / "fixtures/guolao-apparent-clock-v1"
 REFERENCE = json.loads((FIXTURE / "reference.json").read_text())
@@ -37,7 +38,9 @@ FRAME_REFERENCE = json.loads(
 AS_OF = "2026-10-22T12:00:00+08:00"
 
 
-def test_solar_clock_exact_phase_day_branch_and_display_match_frozen_flint_sofa():
+def test_solar_clock_exact_phase_day_branch_and_display_match_frozen_flint_sofa() -> (
+    None
+):
     fixture = Path(__file__).parents[1] / "data/guolao/solar_day_flint_v1"
     raw = (fixture / "reference.json.gz").read_bytes()
     provenance = json.loads((fixture / "provenance.json").read_text())
@@ -64,14 +67,16 @@ def source_rows(filename):
 
 
 @pytest.mark.parametrize("asset", REFERENCE["assets"])
-def test_independently_fetched_jpl_raw_bytes_are_unchanged(asset):
+def test_independently_fetched_jpl_raw_bytes_are_unchanged(asset) -> None:
     raw = (FIXTURE / asset["path"]).read_bytes()
     assert len(raw) == asset["bytes"]
     assert hashlib.sha256(raw).hexdigest() == asset["sha256"]
 
 
 @pytest.mark.parametrize("index", [0, 1])
-def test_solar_clock_against_independent_jpl_ra_and_greenwich_sidereal_time(index):
+def test_solar_clock_against_independent_jpl_ra_and_greenwich_sidereal_time(
+    index: int,
+) -> None:
     sun = source_rows("geocentric_sun.json")[index]
     sidereal = source_rows("greenwich_sidereal.json")[index]
     # Preserve printed decimal precision, and derive the external oracle from
@@ -136,7 +141,7 @@ def manual_clock(**changes):
 
 
 @pytest.mark.parametrize("hour", list(range(1, 24, 2)))
-def test_all_twelve_half_open_hour_boundaries_use_exact_supplied_doubles(hour):
+def test_all_twelve_half_open_hour_boundaries_use_exact_supplied_doubles(hour) -> None:
     longitude = float((hour - 12) * 15)
     before = manual_clock(longitude=math.nextafter(longitude, -math.inf))
     at = manual_clock(longitude=longitude)
@@ -153,7 +158,7 @@ def test_all_twelve_half_open_hour_boundaries_use_exact_supplied_doubles(hour):
     assert Fraction(after["hour_boundary_distance_seconds_exact"]) > 0
 
 
-def test_solar_noon_midnight_east_west_dateline_and_date_carry():
+def test_solar_noon_midnight_east_west_dateline_and_date_carry() -> None:
     noon = manual_clock()
     assert noon["display"] == "2000-01-01T12:00:00"
     assert noon["birth_hour_branch"] == "午"
@@ -169,7 +174,9 @@ def test_solar_noon_midnight_east_west_dateline_and_date_carry():
     assert west["total_correction_seconds"] == -43200
 
 
-def test_equivalent_civil_offsets_change_correction_but_not_solar_label_or_hour():
+def test_equivalent_civil_offsets_change_correction_but_not_solar_label_or_hour() -> (
+    None
+):
     utc = datetime(2000, 1, 1, 12, tzinfo=timezone.utc)
     a = manual_clock(civil_datetime=utc)
     b = manual_clock(civil_datetime=utc.astimezone(timezone(timedelta(hours=8))))
@@ -187,8 +194,8 @@ def test_equivalent_civil_offsets_change_correction_but_not_solar_label_or_hour(
     ],
 )
 def test_unrepresentable_solar_date_does_not_replace_known_solar_hour_with_civil(
-    ut1, ra, civil, longitude, branch
-):
+    ut1: float, ra: float, civil, longitude, branch: str
+) -> None:
     # Helper scope only: other native calendar/ephemeris year limits remain.
     result = manual_clock(
         julian_day_ut1=ut1,
@@ -215,12 +222,14 @@ def test_unrepresentable_solar_date_does_not_replace_known_solar_hour_with_civil
         {"civil_datetime": datetime(2000, 1, 1)},
     ],
 )
-def test_invalid_solar_clock_operands_are_not_normalized_or_guessed(changes):
+def test_invalid_solar_clock_operands_are_not_normalized_or_guessed(changes) -> None:
     with pytest.raises((ValueError, TypeError)):
         manual_clock(**changes)
 
 
-def test_native_ignores_legacy_solar_display_and_keeps_sky_and_physical_instant():
+def test_native_ignores_legacy_solar_display_and_keeps_sky_and_physical_instant() -> (
+    None
+):
     birth = build_astro_birth_info(**CASE, preserve_instant=True)
     assert birth.solar_datetime.hour == 0  # old UTC-as-UT1 clock is before 01:00
     old_branch = "子丑寅卯辰巳午未申酉戌亥"[((birth.solar_datetime.hour + 1) // 2) % 12]
@@ -238,7 +247,9 @@ def test_native_ignores_legacy_solar_display_and_keeps_sky_and_physical_instant(
     assert on["guolao"]["profile"]["ruleset_id"] == "guolao_research_v7"
 
 
-def test_trace_reading_and_correction_all_use_returned_clock_and_keep_acceptance_false():
+def test_trace_reading_and_correction_all_use_returned_clock_and_keep_acceptance_false() -> (
+    None
+):
     result = chart(**CASE, analysis_datetime=datetime(2027, 6, 1, tzinfo=timezone.utc))
     g = result["guolao"]
     clock = g["profile"]["apparent_solar_clock"]
@@ -255,8 +266,6 @@ def test_trace_reading_and_correction_all_use_returned_clock_and_keep_acceptance
     assert result["person_info"]["true_solar"]["correction_minutes"] == round(
         clock["total_correction_seconds"] / 60, 4
     )
-    assert "同次太阳赤经与估算UT1" in result["interpretation"]["core_identity"]
-    assert "生时丑" in result["interpretation"]["core_identity"]
     assert g["timing"]["small_limit"]["life_branch"] == "辰"
     assert not g["validation"]["classical_acceptance_passed"]
     assert not clock["classical_clock_mapping_accepted"]
@@ -267,9 +276,12 @@ def test_trace_reading_and_correction_all_use_returned_clock_and_keep_acceptance
 @pytest.mark.parametrize(
     "solar,leaf_projection", [(False, False), (True, False), (True, True)]
 )
-def test_boundary_clock_and_reading_agree_on_actual_rest_native_mcp_and_cli(
-    monkeypatch, capsys, solar, leaf_projection
-):
+def test_boundary_clock_agrees_on_actual_rest_native_mcp_and_cli(
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    solar: bool,
+    leaf_projection: bool,
+) -> None:
     api._reset_runtime_state_for_tests()
     monkeypatch.setattr(
         api,
@@ -283,8 +295,6 @@ def test_boundary_clock_and_reading_agree_on_actual_rest_native_mcp_and_cli(
         "guolao.life_palace",
         "guolao.rule_trace",
         "guolao.validation",
-        "interpretation",
-        "interpretation_evidence",
     ]
     if leaf_projection:
         fields.remove("guolao.profile")
@@ -295,6 +305,8 @@ def test_boundary_clock_and_reading_agree_on_actual_rest_native_mcp_and_cli(
                 "guolao.profile.apparent_solar_clock.sun_apparent_right_ascension",
             ]
         )
+    else:
+        pass
     options = {
         "as_of": AS_OF,
         "fields": fields,
@@ -303,7 +315,7 @@ def test_boundary_clock_and_reading_agree_on_actual_rest_native_mcp_and_cli(
         "response_char_limit": 0,
     }
     rest = TestClient(api.app).post(
-        "/api/astro/guolao",
+        "/api/astrology/guolao-chart",
         json=payload,
         params=[
             ("as_of", AS_OF),
@@ -317,13 +329,13 @@ def test_boundary_clock_and_reading_agree_on_actual_rest_native_mcp_and_cli(
 
     async def call():
         async with Client(create_mcp_app()) as client:
-            return await client.call_tool(
-                "astro_guolao_chart", {**payload, **options}, raise_on_error=False
+            return await call_calculation(
+                client, "guolao_chart", {**payload, **options}, raise_on_error=False
             )
 
     native = asyncio.run(call())
     assert not native.is_error, native
-    args = ["astro_guolao_chart"]
+    args = ["guolao_chart"]
     for key, value in payload.items():
         args += ["--" + key.replace("_", "-"), str(value)]
     args += [

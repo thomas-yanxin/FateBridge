@@ -6,11 +6,12 @@ import json
 from pathlib import Path
 
 import pytest
+from pytest import MonkeyPatch
 
-from fatebridge.core import canping_texts as texts
-from fatebridge.core.canping_texts import lookup_record
+from fatebridge.core.numerology import canping_texts as texts
+from fatebridge.core.numerology.canping_texts import lookup_record
 from fatebridge.utils.errors import NumerologySourceError
-from tests.numerology.test_canping_rereading_depth import jpeg_dimensions
+from tests.unit_test.fixtures.canping_source import jpeg_dimensions
 
 ROOT = Path(__file__).parents[1] / "fixtures/canping_gold_rereading_v1"
 REFERENCE = json.loads((ROOT / "reference.json").read_text())
@@ -18,7 +19,7 @@ CELLS = REFERENCE["cells"]
 
 
 @pytest.mark.parametrize("cell", CELLS)
-def test_gold_revisions_retain_old_text_state_version_and_source(cell):
+def test_gold_revisions_retain_old_text_state_version_and_source(cell) -> None:
     out = lookup_record("金", cell["number"], cell["kind"])
     s = out["selection"]
     r = s["reading_revision"]
@@ -35,7 +36,7 @@ def test_gold_revisions_retain_old_text_state_version_and_source(cell):
 
 
 @pytest.mark.parametrize("page", REFERENCE["pages"])
-def test_seven_native_gold_pages_keep_source_pixels_and_coordinates(page):
+def test_seven_native_gold_pages_keep_source_pixels_and_coordinates(page) -> None:
     manifest = json.loads((ROOT / REFERENCE["source_manifest_file"]).read_text())
     canvas = manifest["sequences"][0]["canvases"][page["pdf_page"] - 1]
     assert (
@@ -58,7 +59,9 @@ def test_seven_native_gold_pages_keep_source_pixels_and_coordinates(page):
         assert r["reused_prior_region"] is False
 
 
-def test_only_four_whole_cells_gain_clear_status_and_prior_batches_stay_separate():
+def test_only_four_whole_cells_gain_clear_status_and_prior_batches_stay_separate() -> (
+    None
+):
     assert len(CELLS) == REFERENCE["reviewed_previous_uncertain_cells"] == 15
     assert (
         sum(c["state"] == "source_cell_visually_collated" for c in CELLS)
@@ -131,7 +134,7 @@ def test_only_four_whole_cells_gain_clear_status_and_prior_batches_stay_separate
     assert not s["numbered_table_clear_readings_complete"]
 
 
-def test_partial_flower_reading_cannot_borrow_same_number_female_completion():
+def test_partial_flower_reading_cannot_borrow_same_number_female_completion() -> None:
     r = lookup_record("金", 3314, "luck")
     s = r["selection"]
     assert r["text"] == "蕙蘭花□，各自逞馨香。"
@@ -147,7 +150,9 @@ def test_partial_flower_reading_cannot_borrow_same_number_female_completion():
 @pytest.mark.parametrize(
     "change", ["remove_gold", "duplicate_gold", "gold_revision_given_wood_id"]
 )
-def test_gold_rereading_requires_its_own_unique_witness(monkeypatch, change):
+def test_gold_rereading_requires_its_own_unique_witness(
+    monkeypatch: MonkeyPatch, change: str
+) -> None:
     original = texts._loaded
     loaded = copy.deepcopy(original(texts.COLLATION_PATH))
     d = loaded["data"]
@@ -185,7 +190,7 @@ def test_gold_rereading_requires_its_own_unique_witness(monkeypatch, change):
     assert error.value.as_result()["retryable"] is False
 
 
-def test_gold_witness_and_old_reading_are_isolated_copies():
+def test_gold_witness_and_old_reading_are_isolated_copies() -> None:
     s = texts.collation_summary()
     next(
         w

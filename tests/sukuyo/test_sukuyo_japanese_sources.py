@@ -10,8 +10,8 @@ from zipfile import ZipFile
 
 import pytest
 
-from fatebridge.core.sukuyo import calendar_mansion
-from fatebridge.validation.sukuyo_calendar_sources import (
+from fatebridge.core.sukuyo.sukuyo import calendar_mansion
+from validation.sukuyo_calendar_sources import (
     audit_candidate,
     parse_month,
     require_importable,
@@ -32,13 +32,17 @@ def captured_months():
             for civil, row in zip(dates, rows):
                 if row is not None:
                     yield parse_month(row, civil), row
+                else:
+                    pass
 
 
 def sample():
     return next((m, r) for m, r in captured_months() if m.leap and m.year == 2017)
 
 
-def test_quarantine_retains_all_observed_findings_and_narrow_independent_control():
+def test_quarantine_retains_all_observed_findings_and_narrow_independent_control() -> (
+    None
+):
     report = audit_candidate(FIXTURE)
     assert report["query_count"] == 2101
     assert report["unique_months"] == 1966
@@ -68,7 +72,9 @@ def test_quarantine_retains_all_observed_findings_and_narrow_independent_control
         require_importable(report)
 
 
-def test_cli_report_reproduction_still_exits_two_for_rejected_source(tmp_path):
+def test_cli_report_reproduction_still_exits_two_for_rejected_source(
+    tmp_path: Path,
+) -> None:
     output = tmp_path / "audit.json"
     command = [
         sys.executable,
@@ -97,7 +103,9 @@ def test_cli_report_reproduction_still_exits_two_for_rejected_source(tmp_path):
         ("uri", "http://datetime.hutime.org/calendar/1002.2/month/2457928.5"),
     ],
 )
-def test_ambiguous_or_malformed_months_cannot_enter_normalized_data(field, value):
+def test_ambiguous_or_malformed_months_cannot_enter_normalized_data(
+    field: str, value
+) -> None:
     _, source = sample()
     modified = deepcopy(source)
     modified[field] = value
@@ -105,7 +113,7 @@ def test_ambiguous_or_malformed_months_cannot_enter_normalized_data(field, value
         parse_month(modified, "2017-06-24")
 
 
-def test_false_string_is_false_and_printed_leap_fifth_is_not_ordinal_sixth():
+def test_false_string_is_false_and_printed_leap_fifth_is_not_ordinal_sixth() -> None:
     leap, _ = sample()
     assert (leap.year, leap.month, leap.leap) == (2017, 5, True)
     assert leap.start.isoformat() == "2017-06-24"
@@ -123,12 +131,14 @@ def test_false_string_is_false_and_printed_leap_fifth_is_not_ordinal_sixth():
         ("1989-01-08", (1988, 12, False)),
     ],
 )
-def test_published_exceptions_and_lunar_year_are_preserved(start, expected):
+def test_published_exceptions_and_lunar_year_are_preserved(
+    start: str, expected
+) -> None:
     month = next(m for m, _ in captured_months() if m.start.isoformat() == start)
     assert (month.year, month.month, month.leap) == expected
 
 
-def test_a_tokyo_birth_zone_does_not_silently_select_japanese_old_calendar():
+def test_a_tokyo_birth_zone_does_not_silently_select_japanese_old_calendar() -> None:
     actual = calendar_mansion("2017-06-24", "12:00:00", "Asia/Tokyo")
     assert actual["calendar_system"] == "modern_chinese_lunisolar"
     assert actual["calendar_timezone"] == "UTC+08:00"
@@ -139,7 +149,7 @@ def test_a_tokyo_birth_zone_does_not_silently_select_japanese_old_calendar():
     assert (japanese.month, japanese.leap) == (5, True)
 
 
-def test_changed_raw_archive_is_not_normalized_as_a_new_source(tmp_path):
+def test_changed_raw_archive_is_not_normalized_as_a_new_source(tmp_path: Path) -> None:
     import shutil
 
     shutil.copytree(FIXTURE, tmp_path / "candidate")

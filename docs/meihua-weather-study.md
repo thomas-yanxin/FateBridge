@@ -40,7 +40,7 @@
 
 ## 原365日前瞻账本的验真与结果接入
 
-[接入器](../src/fatebridge/validation/meihua_weather_prospective.py)核对原2026-11-01至2027-10-31账本、政策文档、365条已发预测和证据绑定，并用OpenSSL验证FreeTSA RFC 3161签名、nonce及清单摘要。原时间戳为2026-10-21 21:03:44 UTC，早于目标窗口；70次有雨、141次无雨、154次弃权保持原值，不用当前引擎重算，也不追补原先不存在的逐条方案哈希。
+[接入器](../validation/meihua_weather_prospective.py)核对原2026-11-01至2027-10-31账本、政策文档、365条已发预测和证据绑定，并用OpenSSL验证FreeTSA RFC 3161签名、nonce及清单摘要。原时间戳为2026-10-21 21:03:44 UTC，早于目标窗口；70次有雨、141次无雨、154次弃权保持原值，不用当前引擎重算，也不追补原先不存在的逐条方案哈希。
 
 原方案只允许在**2027-11-30 00:00香港时间之后做一次结果分析**。此前只核对账本、窗口及不透明结果字节的哈希，不解析雨量或评分；伪填未来`--as-of`不能提前开启真实数据分析。明确标为`synthetic`的未来时钟测试单列为合成重放。离线读取器不能认证系统时钟、来源或跨运行的一次分析纪律，需另存操作记录与独立复核。
 
@@ -107,7 +107,7 @@ uv run --locked --extra dev python -m pytest -q tests/meihua/test_meihua_weather
 
 午时120组状态全部为dry或abstain，并保留拒绝rain的逐项证书。因dry的正确贡献均属于同日期always_dry，在原全队列终点下不可能严格胜过这一基线；结论只约束该版本、政策与条件域。所有时支按原顺序报告，不按历史结果选时；旧1.0.0未来账本及273日29对158的失败保持独立。
 
-领域测试逐项核对完整队列和午时结构性失败；通过只表示事实与反例得到保留，不表示预测门槛通过。完整报告可由 `fatebridge.validation.meihua_weather_reachability.audit_time_weather_reachability()` 取得。诊断已知旧负结果，不属于盲验，也未新增公共预测工具。
+领域测试逐项核对完整队列和午时结构性失败；通过只表示事实与反例得到保留，不表示预测门槛通过。完整报告可由 `validation.meihua_weather_reachability.audit_time_weather_reachability()` 取得。诊断已知旧负结果，不属于盲验，也未新增公共预测工具。
 
 ## 相同旧标签的天气参考基线补充
 
@@ -133,7 +133,7 @@ uv run --locked --extra dev python -m pytest -q tests/meihua/test_meihua_calenda
 
 审计以所选时区的民用正午取数。相同正午时支只有有限的不同卦图组合，完整日期对照不能扩大为所有时辰、所有时区、全部384种单爻变化或全原典符合性。香港天文台关于2057-09-28、2089-09-04、2097-08-07新月日期可能相差一日的说明仍保留；公布历表标签相同不等于未来物理时刻已获分钟级认证。
 
-四个历法审计入口现以[包级源码检查](../src/fatebridge/validation/meihua_source_guard.py)记录开始与结束的软件包文件及随包资源，排除字节码和缓存。检查拒绝内容修改、删除和新增，大小及时间戳相同也不能掩盖字节变化。它只检查两次读取时的磁盘内容，仍应在新进程与稳定快照中运行；不证明任意热更新、进程已加载代码、外部依赖或原生星历资源全部一致。包级范围比所用依赖更宽，其他模块的并行改动也可能使审计失效，不应靠删去不匹配日期或缩小源文件清单求通过。
+四个历法审计入口现以[包级源码检查](../validation/meihua_source_guard.py)记录开始与结束的软件包文件及随包资源，排除字节码和缓存。检查拒绝内容修改、删除和新增，大小及时间戳相同也不能掩盖字节变化。它只检查两次读取时的磁盘内容，仍应在新进程与稳定快照中运行；不证明任意热更新、进程已加载代码、外部依赖或原生星历资源全部一致。包级范围比所用依赖更宽，其他模块的并行改动也可能使审计失效，不应靠删去不匹配日期或缩小源文件清单求通过。
 
 历表核对、独立公式、事实路径及守卫故障注入分别报告。这些检查不是实际模型解释评分或现实预测有效性认证。
 
@@ -167,7 +167,7 @@ uv run --locked --extra dev python -m scripts.meihua.audit_meihua_solar_seconds 
 
 ## 天气研究的官方农历日期标签绑定
 
-`fatebridge.validation.meihua_weather_calendar_binding.calendar_bound_weather_label(record)`在原演算绑定外，分别核对`calendar_actual/calendar_expected`的`year/month/day/is_leap_month`及日期政策。两份字段相同不代表正确：共同改成相隔12年的年份或共同改错闰标志仍可能保留卦象，核验必须拒绝。
+`validation.meihua_weather_calendar_binding.calendar_bound_weather_label(record)`在原演算绑定外，分别核对`calendar_actual/calendar_expected`的`year/month/day/is_leap_month`及日期政策。两份字段相同不代表正确：共同改成相隔12年的年份或共同改错闰标志仍可能保留卦象，核验必须拒绝。
 
 参考从HKO2022—2026中英文原始年表提取，先固定原文件、哈希、1,826行双语对照和10个字面锚点，不由生产库生成。闰月同时核对中文閏字；前两日缺前置月首锚点，支持范围为2022-01-03至2026-12-31的1,824日。整数农历年按研究春节换年政策派生，不冒充逐格印刷值。
 

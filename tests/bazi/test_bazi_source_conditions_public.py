@@ -15,7 +15,7 @@ PLAN = json.loads(DATA.read_text())
 
 
 @pytest.mark.parametrize("row", PLAN["reviews"], ids=lambda r: r["review"]["case_id"])
-def test_every_original_case_supplies_its_own_complete_source_conditions(row):
+def test_every_original_case_supplies_its_own_complete_source_conditions(row) -> None:
     result = calculate_bazi_source_compare(*row["review"]["pillars"])
     records = {r["reference_id"]: r for r in result["source_comparison"]["records"]}
     for binding in [{"reference_id": ref} for ref in row["reference_ids"]]:
@@ -66,10 +66,10 @@ def canonical(value):
         {"pillars": ["丙寅", "甲戌", "戊辰", "庚申"]},
     ],
 )
-def test_known_source_conditions_cannot_claim_other_text_or_adjudication(patch):
+def test_known_source_conditions_cannot_claim_other_text_or_adjudication(patch) -> None:
     from pydantic import ValidationError
 
-    from fatebridge.core.output_source_conditions import SourceConditionReview
+    from fatebridge.core.contracts.output_source_conditions import SourceConditionReview
 
     base = deepcopy(
         next(r["review"] for r in PLAN["reviews"] if r["review"]["case_id"] == "ML-02")
@@ -79,8 +79,8 @@ def test_known_source_conditions_cannot_claim_other_text_or_adjudication(patch):
         SourceConditionReview.model_validate({**base, **patch})
 
 
-def test_partial_readings_keep_only_supplied_facts_without_filling_unknowns():
-    from fatebridge.core.output_source_conditions import SourceConditionReview
+def test_partial_readings_keep_only_supplied_facts_without_filling_unknowns() -> None:
+    from fatebridge.core.contracts.output_source_conditions import SourceConditionReview
 
     row = next(
         r["review"] for r in PLAN["reviews"] if r["review"]["case_id"] == "ML-02"
@@ -103,7 +103,9 @@ def test_partial_readings_keep_only_supplied_facts_without_filling_unknowns():
         assert parsed.model_dump(exclude_unset=True) == before and value == before
 
 
-def test_duplicate_unknown_labels_and_returned_mutations_do_not_leak_to_cached_review():
+def test_duplicate_unknown_labels_and_returned_mutations_do_not_leak_to_cached_review() -> (
+    None
+):
     row = PLAN["reviews"][0]
     one = calculate_bazi_source_compare(*row["review"]["pillars"])
     before = deepcopy(one)
@@ -120,10 +122,12 @@ def test_duplicate_unknown_labels_and_returned_mutations_do_not_leak_to_cached_r
     assert calculate_bazi_source_compare(*row["review"]["pillars"]) == before
 
 
-def test_review_must_stay_on_its_actual_source_reference():
+def test_review_must_stay_on_its_actual_source_reference() -> None:
     from pydantic import ValidationError
 
-    from fatebridge.core.output_source_annotations import RegisteredSourceRecord
+    from fatebridge.core.contracts.output_source_annotations import (
+        RegisteredSourceRecord,
+    )
 
     row = PLAN["reviews"][0]
     identifier = [{"reference_id": ref} for ref in row["reference_ids"]][0][
@@ -143,13 +147,13 @@ def test_review_must_stay_on_its_actual_source_reference():
         RegisteredSourceRecord.model_validate(wrong)
 
 
-def test_public_data_contains_source_conditions_without_private_answers():
+def test_public_data_contains_source_conditions_without_private_answers() -> None:
     data = DATA.read_text()
     for key in ("expected_answer", "rubric", "actual_model_semantic_acceptance"):
         assert '"' + key + '"' not in data
 
 
-def test_entire_layer_tampering_is_rejected(monkeypatch):
+def test_entire_layer_tampering_is_rejected(monkeypatch: pytest.MonkeyPatch) -> None:
     from fatebridge.core import source_conditions
 
     source_conditions._published_plan.cache_clear()

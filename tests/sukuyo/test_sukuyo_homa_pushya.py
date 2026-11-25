@@ -1,21 +1,24 @@
 """A date match is not an accepted glyph, cited exemplar or clock rule."""
 
 from copy import deepcopy
+from pathlib import Path
 
 import pytest
 
-from fatebridge.core import sukuyo_commentarial_clock as clock
-from fatebridge.core.sukuyo import SU27_ORDER, calendar_mansion, day_evidence
-from fatebridge.core.sukuyo_profiles import _fullmoon_from_loaded, source_bundle
-from fatebridge.core.sukuyo_sources import LoadedSource
+from fatebridge.core.sukuyo import sukuyo_commentarial_clock as clock
+from fatebridge.core.sukuyo.sukuyo import SU27_ORDER, calendar_mansion, day_evidence
+from fatebridge.core.sukuyo.sukuyo_profiles import _fullmoon_from_loaded, source_bundle
+from fatebridge.core.sukuyo.sukuyo_sources import LoadedSource
 from scripts.sukuyo.check_sukuyo_homa_pushya import verify_primary
-from tests.sukuyo.test_sukuyo_transports import (
-    test_calendar_and_relations_across_all_real_transports as run_transport_check,
+from tests.unit_test.fixtures.sukuyo_transports import (
+    assert_sukuyo_transport_parity as run_transport_check,
 )
 
 
 @pytest.mark.parametrize("permutation", ["reverse", "rotate"])
-def test_anchor_month_labels_remain_authoritative_for_all_360_month_days(permutation):
+def test_anchor_month_labels_remain_authoritative_for_all_360_month_days(
+    permutation: str,
+) -> None:
     original = source_bundle()
     permuted = deepcopy(original)
     rows = permuted["fullmoon_anchors"]
@@ -35,7 +38,9 @@ def test_anchor_month_labels_remain_authoritative_for_all_360_month_days(permuta
 @pytest.mark.parametrize(
     "mutation", ["duplicate", "omit", "boolean", "string", "cow", "non_name"]
 )
-def test_incomplete_or_misidentified_month_anchor_tables_are_rejected(mutation):
+def test_incomplete_or_misidentified_month_anchor_tables_are_rejected(
+    mutation: str,
+) -> None:
     source = source_bundle()
     rows = source["fullmoon_anchors"]
     if mutation == "duplicate":
@@ -54,7 +59,9 @@ def test_incomplete_or_misidentified_month_anchor_tables_are_rejected(mutation):
         _fullmoon_from_loaded(1, 1, SU27_ORDER, source, "invalid")
 
 
-def test_selected_manuscript_dates_keep_twenty_third_and_unaccepted_star_glyph():
+def test_selected_manuscript_dates_keep_twenty_third_and_unaccepted_star_glyph() -> (
+    None
+):
     result = clock.commentarial_boundary_reference()
     manuscript = result["same_titled_manuscript_reference"]
     assert manuscript["source_reference"]["shelfmark"] == "109-5"
@@ -82,8 +89,8 @@ def test_selected_manuscript_dates_keep_twenty_third_and_unaccepted_star_glyph()
 
 @pytest.mark.parametrize("mutation", ["duplicate", "omit", "changed_T2216"])
 def test_manuscript_control_completeness_and_quoted_source_identity(
-    monkeypatch, mutation
-):
+    monkeypatch: pytest.MonkeyPatch, mutation: str
+) -> None:
     original = clock.load_source
     loaded = original(clock.MANUSCRIPT_SOURCE)
     data = loaded.data
@@ -108,7 +115,9 @@ def test_manuscript_control_completeness_and_quoted_source_identity(
         clock.commentarial_boundary_reference()
 
 
-def test_returned_manuscript_cannot_mutate_following_results_or_choose_precedence():
+def test_returned_manuscript_cannot_mutate_following_results_or_choose_precedence() -> (
+    None
+):
     first = clock.commentarial_boundary_reference()
     first["same_titled_manuscript_reference"]["monthly_day_observations"][7]["day"] = 22
     assert (
@@ -131,7 +140,9 @@ def test_returned_manuscript_cannot_mutate_following_results_or_choose_precedenc
     assert "必得速成与T2216皆得速成分别保留" in result["reading_text"]
 
 
-def test_offline_primary_check_does_not_claim_glyph_or_cited_exemplar_acceptance():
+def test_offline_primary_check_does_not_claim_glyph_or_cited_exemplar_acceptance() -> (
+    None
+):
     result = verify_primary()
     assert result["selected_month_day_controls"] == 12
     assert result["actual_image_bytes_rechecked"] == []
@@ -141,7 +152,9 @@ def test_offline_primary_check_does_not_claim_glyph_or_cited_exemplar_acceptance
 
 
 @pytest.mark.parametrize("kind", ["image", "manifest"])
-def test_primary_checker_rejects_replaced_capture_bytes(tmp_path, kind):
+def test_primary_checker_rejects_replaced_capture_bytes(
+    tmp_path: Path, kind: str
+) -> None:
     path = tmp_path / kind
     path.write_bytes(b"replaced")
     with pytest.raises(ValueError, match="指纹不一致"):
@@ -152,8 +165,8 @@ def test_primary_checker_rejects_replaced_capture_bytes(tmp_path, kind):
 
 @pytest.mark.parametrize("date", ["2024-09-25", "1903-06-25"])
 def test_actual_rest_native_mcp_cli_keep_physical_witness_and_existing_candidates(
-    monkeypatch, capsys, date
-):
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], date: str
+) -> None:
     run_transport_check(
         monkeypatch,
         capsys,

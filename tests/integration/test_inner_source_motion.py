@@ -38,7 +38,7 @@ def jpl(tmp_path, monkeypatch):
 
 
 @pytest.mark.parametrize("x", ["-0.5", "0", "0.25"])
-def test_dual_clenshaw_carries_the_known_second_derivative(x):
+def test_dual_clenshaw_carries_the_known_second_derivative(x: str) -> None:
     # 2+3T1-5T2+7T3 = 7-18x-10x^2+28x^3.
     with localcontext() as context:
         context.prec = 70
@@ -50,7 +50,7 @@ def test_dual_clenshaw_carries_the_known_second_derivative(x):
         assert v.d == 3 * (-20 + 168 * t)
 
 
-def test_fractional_source_epoch_is_not_rounded_to_a_float():
+def test_fractional_source_epoch_is_not_rounded_to_a_float() -> None:
     with source_records(FIXTURE) as reader, localcontext() as context:
         context.prec = 70
         epoch = Decimal.from_float(2451545.0)
@@ -61,14 +61,14 @@ def test_fractional_source_epoch_is_not_rounded_to_a_float():
         assert len(reader.receipts) == 1
 
 
-def test_exact_polynomial_seam_is_unqualified():
+def test_exact_polynomial_seam_is_unqualified() -> None:
     with source_records(FIXTURE) as reader:
         with pytest.raises(SourceDerivativeUnavailable, match="polynomial_boundary"):
             group(reader, Dual(2451544.5, 1), 0)
         assert reader.evidence()["polynomial_cells"]
 
 
-def test_source_mutation_is_fatal_after_a_cached_read(tmp_path):
+def test_source_mutation_is_fatal_after_a_cached_read(tmp_path: Path) -> None:
     path = tmp_path / "mutated.eph"
     path.write_bytes(FIXTURE.read_bytes())
     with pytest.raises(EphemerisSourceError, match="changed"):
@@ -83,8 +83,8 @@ def test_source_mutation_is_fatal_after_a_cached_read(tmp_path):
 @pytest.mark.parametrize("body", [e.swe.MERCURY, e.swe.VENUS])
 @pytest.mark.parametrize("sidereal", [False, True])
 def test_actual_domain_path_preserves_position_and_exposes_complete_rate(
-    jpl, body, sidereal
-):
+    jpl, body, sidereal: bool
+) -> None:
     with e.preserve_ephemeris_path():
         e.ephemeris_call("set_sid_mode", e.swe.SIDM_LAHIRI, 0.0, 0.0)
         flags = (
@@ -114,7 +114,9 @@ def test_actual_domain_path_preserves_position_and_exposes_complete_rate(
 
 
 @pytest.mark.parametrize("failure", ["unqualified", "fatal"])
-def test_failure_restores_the_center_and_retains_its_kind(jpl, monkeypatch, failure):
+def test_failure_restores_the_center_and_retains_its_kind(
+    jpl, monkeypatch: pytest.MonkeyPatch, failure: str
+) -> None:
     epoch = 2451545.123
     with e.preserve_ephemeris_path():
         e.ephemeris_call("set_sid_mode", e.swe.SIDM_LAHIRI, 0.0, 0.0)
@@ -145,7 +147,9 @@ def test_failure_restores_the_center_and_retains_its_kind(jpl, monkeypatch, fail
         assert e.ephemeris_call("calc", epoch, e.swe.MERCURY, flags) == (raw, returned)
 
 
-def test_isolated_native_J2000_shortcut_is_never_called_an_analytic_derivative():
+def test_isolated_native_J2000_shortcut_is_never_called_an_analytic_derivative() -> (
+    None
+):
     rate, policy = inner_motion.complete_inner_rate(
         "Mercury", 2451545.0, [0.0] * 6, "jpl"
     )

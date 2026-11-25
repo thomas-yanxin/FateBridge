@@ -7,14 +7,15 @@ from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
+from pytest import MonkeyPatch
 
-from fatebridge.core import heluo_months as months
-from fatebridge.core.heluo import MONTH_GUA, judge
-from fatebridge.core.output_numerology import HeluoMonthAffinity
+from fatebridge.core.contracts.output_numerology import HeluoMonthAffinity
+from fatebridge.core.heluo import heluo_months as months
+from fatebridge.core.heluo.heluo import MONTH_GUA, judge
 from fatebridge.core.requests.divination import HeluoRequest
 from fatebridge.utils.errors import NumerologySourceError
-from tests.numerology.test_heluo_month_depth import chart_for
-from tests.numerology.test_heluo_najia_depth import PILLARS
+from scripts.numerology.audit_numerology import month_source_profile_checks
+from tests.unit_test.fixtures.heluo_charts import PILLARS, chart_for
 
 ROOT = Path(__file__).parents[1] / "fixtures/heluo_month_profiles_v1"
 FRONT = json.loads((ROOT / "front-table-reference.json").read_bytes())
@@ -25,7 +26,7 @@ INTRO = {
 DIFFERENCES = json.loads((ROOT / "first-comparison.json").read_bytes())["differences"]
 
 
-def test_preproduction_reference_identity_and_failed_hypothesis_are_preserved():
+def test_preproduction_reference_identity_and_failed_hypothesis_are_preserved() -> None:
     manifest = json.loads((ROOT / "manifest.json").read_bytes())
     assert manifest["production_changes_started"] is False
     for name, digest in manifest["images_and_references"].items():
@@ -38,7 +39,7 @@ def test_preproduction_reference_identity_and_failed_hypothesis_are_preserved():
 
 
 @pytest.mark.parametrize("source", FRONT["assigned_months"], ids=lambda r: r["gua"])
-def test_every_month_of_every_source_hexagram_in_both_profiles(source):
+def test_every_month_of_every_source_hexagram_in_both_profiles(source) -> None:
     gua = source["gua"]
     chart = chart_for(gua)
     intro = INTRO.get(gua)
@@ -83,7 +84,7 @@ def test_every_month_of_every_source_hexagram_in_both_profiles(source):
 
 
 @pytest.mark.parametrize("row", DIFFERENCES, ids=lambda r: r["gua"])
-def test_source_choice_changes_computation_without_resolving_the_book(row):
+def test_source_choice_changes_computation_without_resolving_the_book(row) -> None:
     chart = chart_for(row["gua"])
     for m, expected_intro, expected_table in [
         (row["intro_month"], True, False),
@@ -107,7 +108,7 @@ def test_source_choice_changes_computation_without_resolving_the_book(row):
         } == {k: v for k, v in table.items() if k not in {"deTime", "month_affinity"}}
 
 
-def test_wuwang_has_direct_table_evidence_and_an_unstated_intro_month():
+def test_wuwang_has_direct_table_evidence_and_an_unstated_intro_month() -> None:
     result = months.month_affinity(chart_for("天雷無妄"), "酉", MONTH_GUA)
     assert result["source_consensus_match"] is None
     for p in result["phases"]:
@@ -121,7 +122,7 @@ def test_wuwang_has_direct_table_evidence_and_an_unstated_intro_month():
     assert any("五世" in s for s in result["unresolved"])
 
 
-def test_phase_consensus_or_does_not_treat_unknown_as_false_or_hide_positive():
+def test_phase_consensus_or_does_not_treat_unknown_as_false_or_hide_positive() -> None:
     chart = chart_for("火澤睽")
     chart["hou"] = chart_for("火天大有")["hou"]
     assert (
@@ -136,7 +137,9 @@ def test_phase_consensus_or_does_not_treat_unknown_as_false_or_hide_positive():
 
 
 @pytest.mark.parametrize("method", [None, "", "best", 1, True])
-def test_unknown_profile_is_rejected_at_request_and_domain(method):
+def test_unknown_profile_is_rejected_at_request_and_domain(
+    method: bool | int | str | None,
+) -> None:
     payload = dict(
         date="2000-02-10",
         time="12:00",
@@ -162,8 +165,8 @@ def test_unknown_profile_is_rejected_at_request_and_domain(method):
     ],
 )
 def test_fact_edits_cannot_retain_valid_source_identity(
-    monkeypatch, tmp_path, file_attr, cache, key
-):
+    monkeypatch: MonkeyPatch, tmp_path: Path, file_attr: str, cache: str, key: str
+) -> None:
     data = json.loads(getattr(months, file_attr).read_bytes())
     if key == "assigned_months":
         data[key][0]["month"] = 3
@@ -182,7 +185,7 @@ def test_fact_edits_cannot_retain_valid_source_identity(
         getattr(months, cache).cache_clear()
 
 
-def test_front_profile_consumes_its_source_instead_of_an_unused_legacy_table():
+def test_front_profile_consumes_its_source_instead_of_an_unused_legacy_table() -> None:
     bad = copy.deepcopy(MONTH_GUA)
     bad["卯"].remove("睽")
     with pytest.raises(NumerologySourceError):
@@ -199,8 +202,8 @@ def test_front_profile_consumes_its_source_instead_of_an_unused_legacy_table():
 )
 @pytest.mark.parametrize("invalid", [None, [], "not-a-source", 1])
 def test_non_object_source_is_a_source_error(
-    monkeypatch, tmp_path, file_attr, cache, invalid
-):
+    monkeypatch: MonkeyPatch, tmp_path: Path, file_attr: str, cache: str, invalid
+) -> None:
     p = tmp_path / "non-object.json"
     p.write_text(json.dumps(invalid))
     getattr(months, cache).cache_clear()
@@ -212,8 +215,9 @@ def test_non_object_source_is_a_source_error(
         getattr(months, cache).cache_clear()
 
 
-def test_main_auditor_keeps_literal_conflicts_separate_from_engineering_checks():
-    from scripts.numerology.audit_numerology import month_source_profile_checks
+def test_main_auditor_keeps_literal_conflicts_separate_from_engineering_checks() -> (
+    None
+):
 
     result = month_source_profile_checks()
     assert result["engine_profile_checks_passed"] is True

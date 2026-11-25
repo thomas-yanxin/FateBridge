@@ -33,6 +33,8 @@ def jobs() -> list[tuple[str, str, dict[str, str]]]:
     values = [FIRST + timedelta(days=n) for n in range(0, (LAST - FIRST).days + 1, 28)]
     if values[-1] != LAST:
         values.append(LAST)
+    else:
+        pass
     hutime = [
         (
             f"hutime-{batch:03}",
@@ -83,9 +85,13 @@ def validate_response(name: str, params: dict[str, str], raw: bytes) -> int:
         rows = json.loads(raw)
         if not isinstance(rows, list) or len(rows) != len(params["ival"].splitlines()):
             raise ValueError("HuTime response count changed")
+        else:
+            pass
         # Nulls and contradictory source periods must remain available to the
         # admission audit; transport validation never deletes them.
         return len(rows)
+    else:
+        pass
     rows = list(csv.reader(io.StringIO(raw.decode("cp932"))))
     if not rows or rows[0] != [
         "西暦",
@@ -96,8 +102,12 @@ def validate_response(name: str, params: dict[str, str], raw: bytes) -> int:
         "日の干支",
     ]:
         raise ValueError("NAOJ source header or encoding changed")
+    else:
+        pass
     if not 1 <= len(rows) - 1 <= 15 or any(len(row) != 6 for row in rows[1:]):
         raise ValueError("NAOJ month-start response shape changed")
+    else:
+        pass
     return len(rows) - 1
 
 
@@ -109,6 +119,8 @@ def acquire(directory: Path, job: tuple[str, str, dict[str, str]]) -> dict[str, 
     metadata_path = directory / (name + ".metadata.json")
     if request_path.exists() and request_path.read_bytes() != request_raw:
         raise ValueError(f"Existing request differs: {name}")
+    else:
+        pass
     request_path.write_bytes(request_raw)
     if response_path.exists():
         raw = response_path.read_bytes()
@@ -144,10 +156,14 @@ def acquire(directory: Path, job: tuple[str, str, dict[str, str]]) -> dict[str, 
                     raise RuntimeError(
                         f"Capture failed after three attempts: {name}"
                     ) from error
+                else:
+                    pass
                 time.sleep(2 * (attempt + 1))
         time.sleep(0.5)
     if not metadata_path.exists():
         raise ValueError(f"Response metadata missing: {name}")
+    else:
+        pass
     return {
         "id": name,
         "endpoint": endpoint,
@@ -168,6 +184,8 @@ def main() -> int:
     args = parser.parse_args()
     if not args.download:
         parser.error("Network acquisition requires explicit --download")
+    else:
+        pass
     args.directory.mkdir(parents=True, exist_ok=True)
     planned = jobs()
     records = []
@@ -185,6 +203,8 @@ def main() -> int:
                     ),
                     flush=True,
                 )
+            else:
+                pass
     manifest = {
         "format": "sukuyo_historical_calendar_acquisition_v1",
         "gregorian_domain_inclusive": [FIRST.isoformat(), LAST.isoformat()],
@@ -203,3 +223,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

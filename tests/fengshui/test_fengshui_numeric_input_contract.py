@@ -48,20 +48,22 @@ FIELDS = [
 def _adapter(module, model, field):
     cls = getattr(import_module("fatebridge.core.fengshui." + module), model)
     info = cls.model_fields[field]
-    return TypeAdapter(Annotated[info.annotation, *info.metadata])
+    return TypeAdapter(Annotated[(info.annotation, *info.metadata)])
 
 
 @pytest.mark.parametrize("module,model,field", FIELDS)
 @pytest.mark.parametrize(
     "invalid", [True, False, "2026", float("nan"), float("inf"), float("-inf")]
 )
-def test_all_declared_facts_reject_coercible_nonfacts(module, model, field, invalid):
+def test_all_declared_facts_reject_coercible_nonfacts(
+    module, model, field, invalid
+) -> None:
     with pytest.raises(ValidationError):
         _adapter(module, model, field).validate_python(invalid)
 
 
 @pytest.mark.parametrize("number", [8, 8.0, Decimal("8.0"), Fraction(16, 2)])
-def test_integral_json_numbers_keep_integer_semantics(number):
+def test_integral_json_numbers_keep_integer_semantics(number) -> None:
     assert (
         _adapter("models", "HousePeriod", "period_number").validate_python(number) == 8
     )
@@ -81,20 +83,20 @@ def test_integral_json_numbers_keep_integer_semantics(number):
         Fraction(8000000000000001, 1000000000000000),
     ],
 )
-def test_fractional_facts_are_never_rounded(number):
+def test_fractional_facts_are_never_rounded(number) -> None:
     with pytest.raises(ValidationError):
         _adapter("models", "HousePeriod", "period_number").validate_python(number)
 
 
 @pytest.mark.parametrize("number", [22, 22.5, Decimal("22.5"), Fraction(45, 2)])
-def test_valid_numeric_observations_remain_numbers(number):
+def test_valid_numeric_observations_remain_numbers(number) -> None:
     assert _adapter("models", "House", "facing_degrees").validate_python(
         number
     ) == float(number)
 
 
 @pytest.mark.parametrize("value", [date(2000, 1, 1), "2000-01-01"])
-def test_explicit_calendar_dates_are_preserved(value):
+def test_explicit_calendar_dates_are_preserved(value) -> None:
     assert _adapter("models", "MingguaRequest", "birth_date").validate_python(
         value
     ) == date(2000, 1, 1)
@@ -108,7 +110,7 @@ def test_explicit_calendar_dates_are_preserved(value):
         datetime.fromisoformat("2026-06-01T12:00:00+08:00"),
     ],
 )
-def test_explicit_clocks_identify_same_instant(value):
+def test_explicit_clocks_identify_same_instant(value) -> None:
     actual = _adapter("models", "AnnualRequest", "query_at").validate_python(value)
     assert actual == datetime.fromisoformat("2026-06-01T04:00:00+00:00")
 
@@ -128,18 +130,30 @@ def test_explicit_clocks_identify_same_instant(value):
         ("AnnualRequest", "query_at", "2026-06-01T25:00:00Z"),
     ],
 )
-def test_calendar_input_never_invents_missing_date_or_clock(model, field, value):
+def test_calendar_input_never_invents_missing_date_or_clock(
+    model: str, field: str, value
+) -> None:
     with pytest.raises(ValidationError):
         _adapter("models", model, field).validate_python(value)
 
 
-def test_mcp_flattened_parameters_retain_same_field_preconditions():
-    from fatebridge.core.fengshui.models import AnnualRequest
-    from fatebridge.transports.mcp import model_parameters
+@pytest.mark.asyncio
+async def test_mcp_arguments_retain_calendar_field_preconditions() -> None:
+    from fastmcp import Client
 
-    _, annotations = model_parameters(AnnualRequest)
-    adapter = TypeAdapter(annotations["query_at"])
-    for invalid in [2026, "2026", True, "2026-06-01"]:
-        with pytest.raises(ValidationError):
-            adapter.validate_python(invalid)
-    assert adapter.validate_python("2026-06-01T12:00:00+08:00").year == 2026
+    from tests.support.transports import cached_mcp_app, call_calculation
+
+    async with Client(cached_mcp_app("fengshui")) as client:
+        for invalid in [2026, "2026", True, "2026-06-01"]:
+            result = await call_calculation(
+                client, "fengshui_annual", {"query_at": invalid}, raise_on_error=False
+            )
+            assert result.is_error
+            assert any(
+                issue["path"] == "query_at"
+                for issue in result.structured_content["issues"]
+            )
+        result = await call_calculation(
+            client, "fengshui_annual", {"query_at": "2026-06-01T12:00:00+08:00"}
+        )
+        assert not result.is_error

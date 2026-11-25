@@ -29,7 +29,7 @@ Codex 负责理解问题、选择工具和解释结果，FateBridge 负责计算
 
 ## 2. 注册到 Codex
 
-复制 doctor 输出中的 `codex.add_command` 执行。下面是公开全部工具的语法示例；桌面环境请将示例中的 `codex` 换成 doctor 返回的 CLI 绝对路径：
+复制 doctor 输出中的 `codex.add_command` 执行。以下示例使用四个 MCP 工具访问全部计算能力。桌面环境请将 `codex` 换成 doctor 返回的 CLI 绝对路径。
 
 ```bash
 codex mcp add fatebridge \
@@ -55,7 +55,7 @@ Codex 使用 `[mcp_servers.fatebridge]`；其他 host 的 `mcpServers` JSON 不�
 
 注册或调整范围后，在新聊天中检查 FateBridge 工具是否可见；CLI TUI 可用 `/mcp` 查看连接。这一步有自己的意义：`codex mcp get` 只证明配置存在，doctor 只证明 MCP 进程可用，都不等于当前聊天已加载。配置约定依据 [OpenAI 官方 MCP 文档](https://developers.openai.com/codex/mcp)。
 
-想公开全部工具时，清空 `FATEBRIDGE_MCP_FAMILIES` 并重新启动连接；只需风水工具时设为 `fengshui`。更新已有配置中的同一条目即可。范围受限的连接只能调用当前目录公开的工具。
+只需风水能力时，把 `FATEBRIDGE_MCP_FAMILIES` 设为 `fengshui` 后重新启动连接。
 
 ## 3. 完成第一次对话
 
@@ -80,7 +80,7 @@ Codex 使用 `[mcp_servers.fatebridge]`；其他 host 的 `mcpServers` JSON 不�
 
 上述精简字段适合摘要咨询。若用户要完整 JSON、全部时间线或完整文件，就要在首次调用时改用 `fields=null`，保留默认响应预算及所需快照；超限后从 `result_delivery` 读取同一 run。先裁出摘要，再重新计算，不能补回原次运行的全文。资源分页、文件提取与同 run 校验见 [完整结果交付](agent-guide.md#完整结果交付与同次导出)。西占推运须显式传目标 `analysis_hour` / `analysis_minute`，并核对返回的 `analysis_context.analysis_datetime`；`as_of` 不替代目标钟时。
 
-双人关系中，`summary.overall_score` 是 0–100 的规则加权分，`traditional_compatibility.score` 是加减净分，`detailed_analysis.traditional_analysis.score` 是独立摩擦维度；三处的 `score_basis` 说明口径。不能平均、视为成功概率或用一个子项等级替代整体评价。首轮建议字段保留完整依据、人物和建议，避免为了补解释再计算一遍。
+双人八字首轮读双方四柱与 `cross_chart_relations`，两个人各自的取用状态及双向十神按需展开。`relationship_type` 为 Agent 提供对话语境。
 
 根目录 `AGENTS.md` 保留工程、资料与调用约束。常用输入合同与任务字段由 `scripts/build_codex_call_contracts.py` 从实际 MCP 生成到[按需合同目录](contracts/README.md)，一工具一文件，保留参数说明与完整约束。已连接且定义清楚时直接调用；仅离线核对或定义缺失时读取所选文件，不默认加载全部 Schema。
 
@@ -106,8 +106,8 @@ Codex 使用 `[mcp_servers.fatebridge]`；其他 host 的 `mcpServers` JSON 不�
 .venv/bin/fatebridge bazi_career \
   --subject-file examples/demo-subject.json \
   --as-of 2026-10-12T04:00:00Z \
-  --fields career_analysis.dominant_ten_gods.primary_career_type \
-           career_analysis.career_timing career_analysis.timing_context \
+  --fields career_analysis.evidence_chain.topic.first_view \
+           career_analysis.timing_context \
   --strict-fields --compact
 
 # 综合命盘也支持裁剪；子结果与根结果的运行凭据保留。
@@ -118,7 +118,7 @@ Codex 使用 `[mcp_servers.fatebridge]`；其他 host 的 `mcpServers` JSON 不�
   --strict-fields --compact
 ```
 
-`describe` 区分两种输出：`cli_usage` 是需替换占位符的语法模板；有 `cli_example` 时，该命令使用已验证的虚构输入，可直接执行。目录 key（如 `astro_hellen`）与公开名称（`astro_hellen_chart`）均可用于 CLI、describe 和发现查询；MCP 的 `tools/call` 仍使用实际发布的 `mcp_name`。`surfaces.cli_name` 明确标出正式命令。
+`describe` 区分两种输出：`cli_usage` 是需替换占位符的语法模板；有 `cli_example` 时，该命令使用已验证的虚构输入，可直接执行。目录 key（如 `astro_hellen`）与公开名称（`hellenistic_chart`）均可用于 CLI、describe 和发现查询；MCP 的 `tools/call` 使用现行 `mcp_name`，也兼容该工具先前发布的名称。`surfaces.cli_name` 明确标出正式命令。
 
 `profile` 按实际工具去重，`bazi,八字` 只计算一次并保留第一个标签；空体系列表会报错。单个体系失败时退出码为 1，即使只投影成功体系也会保留失败项，不能把部分失败解释为全部成功。`--no-include-snapshot-text` 移除各子结果顶层快照；导出文本仍可能保留，需要更小输出时用 `--fields`。
 

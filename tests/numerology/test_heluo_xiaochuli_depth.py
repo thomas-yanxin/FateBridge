@@ -6,11 +6,14 @@ import json
 from pathlib import Path
 
 import pytest
+from pytest import MonkeyPatch
 
-from fatebridge.core import heluo_texts as ht
-from fatebridge.core.heluo import _tiaowen, transform_houtian, yao_text
-from fatebridge.core.heluo_timing import _selected_text
+from fatebridge.core.heluo import heluo_hexagrams
+from fatebridge.core.heluo import heluo_texts as ht
+from fatebridge.core.heluo.heluo import _tiaowen, transform_houtian, yao_text
+from fatebridge.core.heluo.heluo_timing import _selected_text
 from fatebridge.utils.errors import NumerologySourceError
+from scripts.numerology import audit_numerology as audit
 from tests.support.heluo_source_facts import HEADER_COUNT, PENDING_COUNT
 
 ROOT = Path(__file__).parents[1] / "fixtures/heluo_xiaochuli_v1"
@@ -21,7 +24,7 @@ VERIFIED = json.loads((ROOT / "verified-readings.json").read_bytes())
 @pytest.mark.parametrize(
     "e", VERIFIED["entries"], ids=lambda e: e["hexagram"] + str(e["line"])
 )
-def test_all_source_words_and_actual_printed_sections_are_used(e):
+def test_all_source_words_and_actual_printed_sections_are_used(e) -> None:
     t = yao_text(e["hexagram"], e["line"])
     p = t["text_provenance"]
     assert t["detail"] == "".join(s["text"] for s in e["sections"])
@@ -43,7 +46,7 @@ def test_all_source_words_and_actual_printed_sections_are_used(e):
 
 
 @pytest.mark.parametrize("e", VERIFIED["headers"], ids=lambda e: str(e["line"]))
-def test_lu_headers_have_specific_primary_pages_and_separate_identity(e):
+def test_lu_headers_have_specific_primary_pages_and_separate_identity(e) -> None:
     t = yao_text("天澤履", e["line"])
     p = t["text_provenance"]
     assert t["yaoci"] == e["yaoci"] and p["pdf_page"] == e["pdf_page"]
@@ -52,7 +55,7 @@ def test_lu_headers_have_specific_primary_pages_and_separate_identity(e):
     assert p["source_pdf_sha256"] == VERIFIED["source_pdf_sha256"]
 
 
-def test_unprinted_buxie_does_not_create_a_false_or_fabricated_branch():
+def test_unprinted_buxie_does_not_create_a_false_or_fabricated_branch() -> None:
     t = yao_text("風天小畜", 3)
     sections = t["commentary_sections"]
     branch = t["commentary_branch_selection"]
@@ -70,7 +73,9 @@ def test_unprinted_buxie_does_not_create_a_false_or_fabricated_branch():
     )
 
 
-def test_conditional_xun_initial_and_normal_xun_fourth_share_only_the_gua_name():
+def test_conditional_xun_initial_and_normal_xun_fourth_share_only_the_gua_name() -> (
+    None
+):
     ref = VERIFIED["conditional_reference"]
     actual = yao_text("風天小畜", 1)["commentary_cross_references"][0]
     assert actual == {k: v for k, v in ref.items() if k != "comparison_normal_houtian"}
@@ -92,7 +97,7 @@ def test_conditional_xun_initial_and_normal_xun_fourth_share_only_the_gua_name()
     assert "變為引兌之小人" in yao_text("天澤履", 6)["detail"]
 
 
-def test_draft_withdrawals_are_not_counted_as_inherited_corrections():
+def test_draft_withdrawals_are_not_counted_as_inherited_corrections() -> None:
     assert (
         hashlib.sha256((ROOT / "reference.json").read_bytes()).hexdigest()
         == VERIFIED["draft_sha256"]
@@ -135,7 +140,7 @@ def test_draft_withdrawals_are_not_counted_as_inherited_corrections():
     assert ht.collation_summary()["pending_line_headers"] == PENDING_COUNT
 
 
-def test_rare_source_words_and_real_inherited_errors_remain_distinct():
+def test_rare_source_words_and_real_inherited_errors_remain_distinct() -> None:
     pairs = [
         ("風天小畜", 1, "僧道之儔耳", "僧道之壽耳"),
         ("風天小畜", 2, "為儕長", "為僚長"),
@@ -171,8 +176,8 @@ def test_rare_source_words_and_real_inherited_errors_remain_distinct():
 
 @pytest.mark.parametrize("fault", ["fabricated_buxie", "wrong_gua_exception"])
 def test_layout_exception_does_not_allow_fabricated_or_unregistered_omission(
-    fault, tmp_path, monkeypatch
-):
+    fault: str, tmp_path: Path, monkeypatch: MonkeyPatch
+) -> None:
     d = json.loads(ht.COMMENTARY_PATH.read_bytes())
     if fault == "fabricated_buxie":
         e = next(
@@ -203,8 +208,9 @@ def test_layout_exception_does_not_allow_fabricated_or_unregistered_omission(
 
 
 @pytest.mark.parametrize("fault", ["quote", "wrong_bits", "wrong_target"])
-def test_inconsistent_xiao_initial_reference_is_a_source_error(fault, monkeypatch):
-    from fatebridge.core import heluo_hexagrams
+def test_inconsistent_xiao_initial_reference_is_a_source_error(
+    fault: str, monkeypatch: MonkeyPatch
+) -> None:
 
     e = copy.deepcopy(
         next(
@@ -229,8 +235,9 @@ def test_inconsistent_xiao_initial_reference_is_a_source_error(fault, monkeypatc
         ht._commentary_cross_references(e)
 
 
-def test_audit_rejects_same_gua_but_wrong_reference_line(monkeypatch):
-    from scripts.numerology import audit_numerology as audit
+def test_audit_rejects_same_gua_but_wrong_reference_line(
+    monkeypatch: MonkeyPatch,
+) -> None:
 
     original = ht._commentary_cross_references
 
@@ -238,6 +245,8 @@ def test_audit_rejects_same_gua_but_wrong_reference_line(monkeypatch):
         rows = original(entry)
         if entry["hexagram"] == "風天小畜" and rows:
             rows[0]["target_line"] = 4
+        else:
+            pass
         return rows
 
     monkeypatch.setattr(ht, "_commentary_cross_references", wrong)

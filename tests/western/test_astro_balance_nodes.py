@@ -8,7 +8,7 @@
 from fatebridge.core.astro.parts import _balance
 
 
-def test_balance_excludes_lunar_nodes():
+def test_balance_excludes_lunar_nodes() -> None:
     planets = [
         {"id": "Sun", "element": "Fire", "modality": "Mutable"},
         {"id": "Moon", "element": "Air", "modality": "Mutable"},

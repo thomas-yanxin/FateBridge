@@ -3,6 +3,7 @@
 import asyncio
 import json
 from itertools import product
+from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
@@ -13,13 +14,13 @@ from fatebridge.application.description import describe_spec
 from fatebridge.application.execution import execute_tool
 from fatebridge.cli import run
 from fatebridge.core.execution_context import ExecutionOptions
-from fatebridge.core.jyotish import YEAR_DAYS
-from fatebridge.core.jyotish_strength import SOURCE as STRENGTH_SOURCE
+from fatebridge.core.jyotish.jyotish import YEAR_DAYS
+from fatebridge.core.jyotish.jyotish_strength import SOURCE as STRENGTH_SOURCE
 from fatebridge.core.public_output import same_public_value
-from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
 from tests.fixtures.surface_payloads import astro_payload
 from tests.support.result_delivery import assert_same_run_receipt
+from tests.support.transports import cached_mcp_app, call_calculation
 
 SPECS = {s.key: s for s in CATALOG}
 AS_OF = "2026-10-22T12:00:00+08:00"
@@ -53,14 +54,13 @@ def call_surfaces(monkeypatch, capsys, key, payload, fields):
     )
 
     async def protocol():
-        async with Client(create_mcp_app()) as client:
-            return await client.call_tool(
-                spec.tool_name, {**payload, **options}, raise_on_error=False
+        async with Client(cached_mcp_app()) as client:
+            return await call_calculation(
+                client, spec.tool_name, {**payload, **options}, raise_on_error=False
             )
 
     protocol_result = asyncio.run(protocol())
     native = protocol_result.structured_content
-    assert native == json.loads(protocol_result.content[0].text)
     args = [spec.tool_name]
     for name, value in payload.items():
         args += [
@@ -91,7 +91,9 @@ def call_surfaces(monkeypatch, capsys, key, payload, fields):
     return response.json()
 
 
-def test_1960_sofa_time_context_across_three_real_surfaces(monkeypatch, capsys):
+def test_1960_sofa_time_context_across_three_real_surfaces(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
     result = call_surfaces(
         monkeypatch,
         capsys,
@@ -118,8 +120,11 @@ def test_1960_sofa_time_context_across_three_real_surfaces(monkeypatch, capsys):
 
 @pytest.mark.parametrize("node_mode,basis", list(product(["mean", "true"], YEAR_DAYS)))
 def test_vimshottari_all_configurations_across_three_real_surfaces(
-    monkeypatch, capsys, node_mode, basis
-):
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    node_mode,
+    basis,
+) -> None:
     payload = {
         **astro_payload(),
         "analysis_year": 2026,
@@ -152,8 +157,8 @@ def test_vimshottari_all_configurations_across_three_real_surfaces(
 
 @pytest.mark.parametrize("node_mode", ["mean", "true"])
 def test_india_birth_uncertainty_and_theme_evidence_across_surfaces(
-    monkeypatch, capsys, node_mode
-):
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], node_mode: str
+) -> None:
     result = call_surfaces(
         monkeypatch,
         capsys,
@@ -173,8 +178,11 @@ def test_india_birth_uncertainty_and_theme_evidence_across_surfaces(
 @pytest.mark.parametrize("key", ["astro_india", "astro_vimshottari"])
 @pytest.mark.parametrize("profile", ["santhanam_27", "raman_30"])
 def test_extended_vargas_and_strength_profile_across_real_surfaces(
-    monkeypatch, capsys, key, profile
-):
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    key: str,
+    profile: str,
+) -> None:
     result = call_surfaces(
         monkeypatch,
         capsys,
@@ -204,8 +212,8 @@ def test_extended_vargas_and_strength_profile_across_real_surfaces(
 
 
 def test_nested_strength_summary_field_projects_across_real_surfaces(
-    monkeypatch, capsys
-):
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
     result = call_surfaces(
         monkeypatch,
         capsys,
@@ -225,8 +233,11 @@ def test_nested_strength_summary_field_projects_across_real_surfaces(
 @pytest.mark.native_engine_fault
 @pytest.mark.parametrize("key", ["astro_india", "astro_vimshottari"])
 def test_strict_data_file_policy_rejects_fallback_on_all_surfaces(
-    monkeypatch, capsys, tmp_path, key
-):
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    tmp_path: Path,
+    key: str,
+) -> None:
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
     api._reset_runtime_state_for_tests()
     monkeypatch.setattr(
@@ -240,12 +251,14 @@ def test_strict_data_file_policy_rejects_fallback_on_all_surfaces(
     assert "require_data_files" in response.text
 
     async def protocol():
-        async with Client(create_mcp_app()) as client:
-            return await client.call_tool(spec.tool_name, payload, raise_on_error=False)
+        async with Client(cached_mcp_app()) as client:
+            return await call_calculation(
+                client, spec.tool_name, payload, raise_on_error=False
+            )
 
     native = asyncio.run(protocol())
     assert native.is_error
-    assert "require_data_files" in native.content[0].text
+    assert "require_data_files" in native.structured_content["error"]
     args = [spec.tool_name]
     for name, value in payload.items():
         args += ["--" + name.replace("_", "-"), str(value)]
@@ -257,8 +270,8 @@ def test_strict_data_file_policy_rejects_fallback_on_all_surfaces(
 
 
 def test_physical_state_and_dispositor_fields_project_across_three_surfaces(
-    monkeypatch, capsys
-):
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
     result = call_surfaces(
         monkeypatch,
         capsys,
@@ -280,11 +293,13 @@ def test_physical_state_and_dispositor_fields_project_across_three_surfaces(
 
 @pytest.mark.parametrize("key", ["astro_india", "astro_vimshottari"])
 def test_future_time_context_and_identified_author_rules_across_surfaces(
-    monkeypatch, capsys, key
-):
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], key: str
+) -> None:
     payload = {**astro_payload(), "birth_year": 2099}
     if key == "astro_vimshottari":
         payload["analysis_year"] = 2101
+    else:
+        pass
     body = call_surfaces(
         monkeypatch,
         capsys,
@@ -323,7 +338,7 @@ def test_future_time_context_and_identified_author_rules_across_surfaces(
     }
 
 
-def test_discovery_has_nested_output_contracts_and_task_views():
+def test_discovery_has_nested_output_contracts_and_task_views() -> None:
     for key in ["astro_india", "astro_vimshottari"]:
         description = describe_spec(SPECS[key])
         assert description["evidence_views"]
@@ -339,7 +354,7 @@ def test_discovery_has_nested_output_contracts_and_task_views():
     assert {"Vimshottari", "DashaBirthBalance", "DashaPeriod"} <= set(schema["$defs"])
 
 
-def test_as_of_date_anchor_and_declared_current_clock_use():
+def test_as_of_date_anchor_and_declared_current_clock_use() -> None:
     spec = SPECS["astro_vimshottari"]
     request = spec.request_model.model_validate(astro_payload())
     result = execute_tool(
@@ -356,7 +371,7 @@ def test_as_of_date_anchor_and_declared_current_clock_use():
     [
         {"node_mode": "invalid"},
         {"divisions": [9, 9]},
-        {"divisions": [60]},
+        {"divisions": [99]},
         {"saptavargaja_profile": "unknown"},
         {"birth_time_uncertainty_minutes": -1},
         {"birth_time_uncertainty_minutes": 121},
@@ -366,14 +381,16 @@ def test_as_of_date_anchor_and_declared_current_clock_use():
         {"analysis_year": 2026, "analysis_month": 2, "analysis_day": 30},
     ],
 )
-def test_invalid_options_are_rejected_at_shared_schema(changes):
+def test_invalid_options_are_rejected_at_shared_schema(changes) -> None:
     with pytest.raises(ValueError):
         SPECS["astro_vimshottari"].request_model.model_validate(
             {**astro_payload(), **changes}
         )
 
 
-def test_polymorphic_india_matches_dedicated_service_and_other_variants_reject_options():
+def test_polymorphic_india_matches_dedicated_service_and_other_variants_reject_options() -> (
+    None
+):
     payload = {**astro_payload(), "node_mode": "true", "divisions": [9]}
     dedicated = execute_tool(
         SPECS["astro_india"],
@@ -392,7 +409,7 @@ def test_polymorphic_india_matches_dedicated_service_and_other_variants_reject_o
         SPECS["astro_chart"].request_model.model_validate(payload)
 
 
-def test_non_indian_chart_accepts_protocol_materialized_neutral_defaults():
+def test_non_indian_chart_accepts_protocol_materialized_neutral_defaults() -> None:
     spec = SPECS["astro_chart"]
     plain = execute_tool(
         spec, spec.request_model.model_validate(astro_payload()), include_metadata=False
@@ -409,7 +426,7 @@ def test_non_indian_chart_accepts_protocol_materialized_neutral_defaults():
     assert execute_tool(spec, request, include_metadata=False) == plain
 
 
-def test_non_indian_chart_rejects_custom_saptavargaja_profile():
+def test_non_indian_chart_rejects_custom_saptavargaja_profile() -> None:
     with pytest.raises(ValueError, match="india_chart"):
         SPECS["astro_chart"].request_model.model_validate(
             {**astro_payload(), "saptavargaja_profile": "raman_30"}
@@ -417,7 +434,9 @@ def test_non_indian_chart_rejects_custom_saptavargaja_profile():
 
 
 @pytest.mark.parametrize("key", ["astro_india", "astro_vimshottari"])
-def test_additional_balas_across_real_surfaces(monkeypatch, capsys, key):
+def test_additional_balas_across_real_surfaces(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], key: str
+) -> None:
     result = call_surfaces(
         monkeypatch,
         capsys,
@@ -460,7 +479,9 @@ def test_additional_balas_across_real_surfaces(monkeypatch, capsys, key):
     assert motion["summary"]["Mars"] is None
 
 
-def test_full_timeline_uses_same_run_pagination_and_hash(monkeypatch, tmp_path):
+def test_full_timeline_uses_same_run_pagination_and_hash(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     from fatebridge.application import result_delivery as delivery
     from fatebridge.services import jyotish
 
@@ -475,7 +496,7 @@ def test_full_timeline_uses_same_run_pagination_and_hash(monkeypatch, tmp_path):
     )
     client = TestClient(api.app)
     response = client.post(
-        "/api/astro/vimshottari",
+        "/api/astrology/vimshottari-dasha",
         json={**astro_payload(), "analysis_year": 2026},
         params={
             "include_snapshot_text": "false",
@@ -502,6 +523,8 @@ def test_full_timeline_uses_same_run_pagination_and_hash(monkeypatch, tmp_path):
         chunks.append(page["text"])
         if page["next_offset"] is None:
             break
+        else:
+            pass
         offset = page["next_offset"]
     text = "".join(chunks)
     assert len(text) == ref["total_chars"]

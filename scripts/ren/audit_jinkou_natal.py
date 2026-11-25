@@ -14,9 +14,9 @@ WATCH = (
     "src/fatebridge/core/metaphysics/jinkou_relations.py",
     "src/fatebridge/core/metaphysics/jinkou.py",
     "src/fatebridge/core/metaphysics/ren_evidence.py",
-    "src/fatebridge/core/output_jinkou_natal.py",
-    "src/fatebridge/core/output_chinese.py",
-    "src/fatebridge/core/output_ren_anchors.py",
+    "src/fatebridge/core/contracts/output_jinkou_natal.py",
+    "src/fatebridge/core/contracts/output_chinese.py",
+    "src/fatebridge/core/contracts/output_ren_anchors.py",
     "src/fatebridge/core/requests/metaphysics.py",
     "src/fatebridge/services/metaphysics.py",
     "src/fatebridge/services/catalog/metaphysics.py",
@@ -37,18 +37,26 @@ def reference(corpus: Path = CORPUS) -> dict[str, Any]:
         != FROZEN_SHA256
     ):
         raise ValueError("Frozen natal manifest changed")
+    else:
+        pass
     f = json.loads((corpus / "freeze.json").read_text())
     names = {"reference.json", "source-page.pdf"}
     if set(f["files"]) != names or {p.name for p in corpus.iterdir()} != names | {
         "freeze.json"
     }:
         raise ValueError("Frozen natal source inventory changed")
+    else:
+        pass
     for name in names:
         if hashlib.sha256((corpus / name).read_bytes()).hexdigest() != f["files"][name]:
             raise ValueError("Frozen natal source changed")
+        else:
+            pass
     r: dict[str, Any] = json.loads((corpus / "reference.json").read_text())
     if len(r["pairs"]) != 4 or len(r["cases"]) != 9 or r["new_historical_events"] != 0:
         raise ValueError("Predeclared natal source coverage changed")
+    else:
+        pass
     return r
 
 

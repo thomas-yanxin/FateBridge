@@ -14,6 +14,7 @@ import hashlib
 import json
 import os
 import shutil
+import subprocess
 import sys
 import tempfile
 import zipfile
@@ -30,8 +31,12 @@ def main() -> None:
     args = parser.parse_args()
     if not sys.flags.isolated:
         raise SystemExit("Run this script with python -I to isolate import paths")
+    else:
+        pass
     if any(n == "fatebridge" or n.startswith("fatebridge.") for n in sys.modules):
         raise SystemExit("FateBridge was imported before wheel selection")
+    else:
+        pass
     report = {
         "wheel": str(args.wheel.resolve()),
         "sha256": hashlib.sha256(args.wheel.read_bytes()).hexdigest(),
@@ -43,18 +48,18 @@ def main() -> None:
         os.environ.pop("SE_EPHE_PATH", None)
         sys.path.insert(0, str(stage))
         import fatebridge
-        from fatebridge.core.sukuyo import calendar_mansion
-        from fatebridge.core.sukuyo_calendar_text import calendar_day_evidence
-        from fatebridge.core.sukuyo_padas import palace_reference, reference_cell
+        from fatebridge.core.sukuyo.sukuyo import calendar_mansion
+        from fatebridge.core.sukuyo.sukuyo_calendar_text import calendar_day_evidence
+        from fatebridge.core.sukuyo.sukuyo_padas import palace_reference, reference_cell
         from fatebridge.services.divination import (
             calculate_sukuyo_compatibility,
             calculate_suzhan_analysis,
         )
         from fatebridge.services.tool_catalog import CATALOG
-        from fatebridge.validation.sukuyo import required_quote_paths
 
         assert Path(fatebridge.__file__).is_relative_to(stage)
-        from fatebridge.core import ephemeris_runtime, guolao
+        from fatebridge.core import ephemeris_runtime
+        from fatebridge.core.guolao import guolao
 
         catalogue_bytes = len(os.fsencode(str(guolao.DATA)))
         operator_bytes = max(160, 243 - catalogue_bytes)
@@ -83,30 +88,29 @@ def main() -> None:
             assert "error" not in long_path_result, long_path_result
             assert len(long_path_result["astronomy"]["boundaries"]) == 28
             assert os.environ["SE_EPHE_PATH"] == str(operator_directory)
+            # note (ephemeris): Vary only the catalogue path during the exact comparison.
+            separator_catalogue = stage / "catalogue;copy"
+            separator_catalogue.mkdir()
+            for filename in ("sefstars.txt", "sources.json"):
+                shutil.copy2(guolao.DATA / filename, separator_catalogue / filename)
+            with patch.object(guolao, "DATA", separator_catalogue):
+                separator_result = calculate_suzhan_analysis(
+                    lat="31n13",
+                    lon="121e28",
+                    date="2025-03-04",
+                    time="12:00:00",
+                    zone="+08:00",
+                    szchart=1,
+                )
+                assert "error" not in separator_result, separator_result
+                assert separator_result["chart"] == long_path_result["chart"]
+                assert separator_result["astronomy"] == long_path_result["astronomy"]
         finally:
             os.environ.pop("SE_EPHE_PATH", None)
             ephemeris_runtime.configure_ephemeris_path(previous_path)
-        # An installed package path can contain a literal native list delimiter.
-        # Verify the artifact's actual lookup, rather than only its helper.
-        separator_catalogue = stage / "catalogue;copy"
-        separator_catalogue.mkdir()
-        for name in ["sefstars.txt", "sources.json"]:
-            shutil.copy2(guolao.DATA / name, separator_catalogue / name)
-        with patch.object(guolao, "DATA", separator_catalogue):
-            separator_result = calculate_suzhan_analysis(
-                lat="31n13",
-                lon="121e28",
-                date="2025-03-04",
-                time="12:00:00",
-                zone="+08:00",
-                szchart=1,
-            )
-            assert "error" not in separator_result, separator_result
-            assert separator_result["chart"] == long_path_result["chart"]
-            assert separator_result["astronomy"] == long_path_result["astronomy"]
-        from fatebridge.core import suzhan_astronomy
         from fatebridge.core.astro import runtime as sky_runtime
         from fatebridge.core.astro.birth import build_astro_birth_info
+        from fatebridge.core.sukuyo import suzhan_astronomy
 
         reference_birth = build_astro_birth_info(
             birth_year=2000,
@@ -138,6 +142,10 @@ def main() -> None:
                     catalogue_file.write_bytes(altered_catalogue)
                 elif lookup_count == 2:
                     catalogue_file.write_bytes(original_catalogue)
+                else:
+                    pass
+            else:
+                pass
             return native_call(name, *args, **kwargs)
 
         try:
@@ -173,7 +181,7 @@ def main() -> None:
         report["native_catalogue_snapshot_and_loaded_metadata_receipt"] = (
             "passed_real_native_A_B_A_and_postcalculation_metadata_change"
         )
-        from fatebridge.core.sukuyo_taibai import taibai_direction_reference
+        from fatebridge.core.sukuyo.sukuyo_taibai import taibai_direction_reference
 
         assert taibai_direction_reference(9)["realm"] == "below_ground"
         assert taibai_direction_reference(9)["horizontal_direction"] is None
@@ -289,7 +297,7 @@ def main() -> None:
             skies[0]["chart"] == skies[1]["chart"]
             and skies[0]["astronomy"] == skies[1]["astronomy"]
         )
-        from fatebridge.core.sukuyo import day_evidence
+        from fatebridge.core.sukuyo.sukuyo import day_evidence
 
         monday = calendar_mansion("2025-03-03")
         gathering = day_evidence(
@@ -323,9 +331,13 @@ def main() -> None:
         assert "t1299_activity_20" in matched(tourist)
         assert "t1299_lower_method_weekday_01" not in matched(tourist)
         assert "t1299_lower_method_weekday_01" in matched(official)
-        from fatebridge.core.sukuyo import SU27_ORDER
-        from fatebridge.core.sukuyo_profiles import fullmoon_calculation
-        from fatebridge.core.sukuyo_profiles import source_bundle as profile_sources
+        from fatebridge.core.sukuyo.sukuyo import SU27_ORDER
+        from fatebridge.core.sukuyo.sukuyo_profiles import (
+            fullmoon_calculation,
+        )
+        from fatebridge.core.sukuyo.sukuyo_profiles import (
+            source_bundle as profile_sources,
+        )
 
         exposed_profile = profile_sources()
         exposed_profile["fullmoon_anchors"][0]["fullmoon_mansion"] = "角"
@@ -359,7 +371,6 @@ def main() -> None:
             (v["person1_su27"], v["pair"])
             for v in r["candidate_relation_analysis"]["rows"]
         ] == [("星", "栄親"), ("张", "命")]
-        assert "candidate_relation_analysis" in required_quote_paths("compatibility")
         results = [
             calculate_suzhan_analysis(
                 lat="31n13",
@@ -429,7 +440,6 @@ def main() -> None:
         }
         assert not natal_positions["seven_luminary_transits_evaluated"]
         assert not natal_positions["joint_reading_requirement"]["evaluated"]
-        assert "sukuyo.six_palace_reference" in required_quote_paths("activity")
         assert results[0]["astronomy"] == results[1]["astronomy"]
         assert results[0]["astronomy"] is not None
         c = calendar_mansion(
@@ -559,7 +569,7 @@ def main() -> None:
         )["sukuyo"]
         assert wall["activity_assessment"]["evidence_status"] == "conflicted"
         assert wall["directional_travel"]["physical_palace_computed"] is False
-        from fatebridge.core.sukuyo_special_days import special_day_evidence
+        from fatebridge.core.sukuyo.sukuyo_special_days import special_day_evidence
 
         well = special_day_evidence(
             "井", 2, weekday_basis="modern_utc_plus08_civil_midnight"
@@ -715,15 +725,13 @@ def main() -> None:
             clothes["sukuyo"]["clothing_reference"]["primary_assessment"] == "caution"
         )
         assert clothes["sukuyo"]["candidate_days"] == []
-        from fatebridge.core.sukuyo_clothing import clothing_reference
+        from fatebridge.core.sukuyo.sukuyo_clothing import clothing_reference
 
         ming = clothing_reference({"natal_su27": "井"})["candidate_references"][0][
             "comparisons"
         ][1]
         assert ming["assessment"] is None and not ming["applied_to_primary"]
-        assert "sukuyo.candidate_days" in required_quote_paths("activity")
-        assert "sukuyo.clothing_reference" in required_quote_paths("clothing")
-        from fatebridge.core.sukuyo_weekday import (
+        from fatebridge.core.sukuyo.sukuyo_weekday import (
             civil_weekday,
             classical_calibration_precision,
             classical_mean_cycle_arithmetic,
@@ -756,7 +764,7 @@ def main() -> None:
         assert not precision["complete_lunar_secular_derivation_accepted"]
         invalid_context = calendar_mansion("2025-03-04", "12:00:00", "+08:00")
         del invalid_context["calendar_timezone"]
-        from fatebridge.core.sukuyo import day_evidence
+        from fatebridge.core.sukuyo.sukuyo import day_evidence
 
         try:
             day_evidence(invalid_context)
@@ -788,56 +796,60 @@ def main() -> None:
                 schema = spec.output_model.model_json_schema()
                 if spec.key == "sukuyo_compatibility":
                     assert "SukuyoCandidateAnalysis" in schema["$defs"]
+                else:
+                    pass
+            else:
+                pass
         paths = [
-            "core/sukuyo_weekday.py",
+            "core/sukuyo/sukuyo_weekday.py",
             "data/sukuyo_t30107_weekday_arithmetic.json",
             "data/sukuyo_t30107_recalculation.json",
             "data/sukuyo_wakita_weekday.json",
             "data/sukuyo_t30107_calibration.json",
-            "core/sukuyo_clothing.py",
+            "core/sukuyo/sukuyo_clothing.py",
             "data/sukuyo_t1299_clothing.json",
-            "core/sukuyo_taibai.py",
+            "core/sukuyo/sukuyo_taibai.py",
             "data/sukuyo_t1299_taibai.json",
-            "core/sukuyo_historical_calendar.py",
+            "core/sukuyo/sukuyo_historical_calendar.py",
             "data/sukuyo_japanese_historical_v1.json",
-            "validation/sukuyo_historical_sources.py",
-            "core/sukuyo.py",
-            "core/sukuyo_calendar_basis.py",
-            "core/sukuyo_japanese_calendar.py",
-            "core/sukuyo_date_support.py",
-            "core/sukuyo_profiles.py",
-            "core/sukuyo_hinoo_critical.py",
+            "core/sukuyo/sukuyo.py",
+            "core/sukuyo/sukuyo_calendar_basis.py",
+            "core/sukuyo/sukuyo_japanese_calendar.py",
+            "core/sukuyo/sukuyo_date_support.py",
+            "core/sukuyo/sukuyo_profiles.py",
+            "core/sukuyo/sukuyo_hinoo_critical.py",
             "data/sukuyo_t2465_critical.json",
-            "core/sukuyo_lower.py",
-            "core/sukuyo_lower_methods.py",
-            "core/sukuyo_padas.py",
-            "core/sukuyo_sources.py",
-            "core/sukuyo_activities.py",
-            "core/sukuyo_calendar_text.py",
-            "core/sukuyo_directions.py",
-            "core/sukuyo_documentary.py",
-            "core/sukuyo_guchureki_clock.py",
+            "core/sukuyo/sukuyo_lower.py",
+            "core/sukuyo/sukuyo_lower_methods.py",
+            "core/sukuyo/sukuyo_padas.py",
+            "core/sukuyo/sukuyo_sources.py",
+            "core/sukuyo/sukuyo_activities.py",
+            "core/sukuyo/sukuyo_calendar_text.py",
+            "core/sukuyo/sukuyo_calendar_reading.py",
+            "core/sukuyo/sukuyo_hinoo_text.py",
+            "core/sukuyo/sukuyo_daily_source_reading.py",
+            "core/sukuyo/sukuyo_activity_day_reading.py",
+            "core/sukuyo/sukuyo_directions.py",
+            "core/sukuyo/sukuyo_documentary.py",
+            "core/sukuyo/sukuyo_guchureki_clock.py",
             "data/sukuyo_selected_text_layers.json",
             "data/sukuyo_japanese_selected_calendar.json",
-            "core/sukuyo_special_days.py",
-            "core/sukuyo_printed_special.py",
+            "core/sukuyo/sukuyo_special_days.py",
+            "core/sukuyo/sukuyo_printed_special.py",
             "data/sukuyo_wakita_special_days.json",
             "data/sukuyo_comparative_time_units.json",
             "data/sukuyo_t1299_clock_transposition.json",
             "data/sukuyo_naoj_guchureki_clock.json",
-            "core/sukuyo_sanjiu_days.py",
-            "core/sukuyo_six_palaces.py",
-            "core/suzhan_astronomy.py",
-            "core/guolao.py",
+            "core/sukuyo/sukuyo_sanjiu_days.py",
+            "core/sukuyo/sukuyo_six_palaces.py",
+            "core/sukuyo/suzhan_astronomy.py",
+            "core/guolao/guolao.py",
             "core/fixed_star_paths.py",
             "core/astro/birth.py",
             "core/astro/time_scales.py",
             "core/ephemeris_runtime.py",
-            "core/output_reference.py",
+            "core/contracts/output_reference.py",
             "core/local_techniques/suzhan.py",
-            "validation/sukuyo.py",
-            "validation/sukuyo_study.py",
-            "validation/sukuyo_calendar_sources.py",
             "services/divination.py",
             "data/sukuyo_t1299_calendar_profiles.json",
             "data/sukuyo_japanese_daily_v1.json",
@@ -877,7 +889,9 @@ def main() -> None:
             # observations, not only against source files or internal invariance.
             from fatebridge.core import ephemeris_runtime
             from fatebridge.core.astro.birth import build_astro_birth_info
-            from fatebridge.core.suzhan_astronomy import build_equatorial_mansions
+            from fatebridge.core.sukuyo.suzhan_astronomy import (
+                build_equatorial_mansions,
+            )
 
             reference_path = (
                 args.source_root / "tests/data/sukuyo-equatorial-horizons.json"
@@ -914,6 +928,8 @@ def main() -> None:
                                     birth_longitude=0,
                                 )
                             )
+                        else:
+                            pass
                         actual = next(
                             b
                             for b in skies[row["utc"]]["bodies"]
@@ -947,10 +963,22 @@ def main() -> None:
                 "maximum_error_arcseconds": max(sky_errors),
                 "scope": "Artifact Moshier path against frozen JPL positions; not ancient mansion-boundary acceptance or all-epoch accuracy.",
             }
-            from fatebridge.validation.sukuyo_calendar_sources import audit_candidate
+            checkout_checks = """import json
+from pathlib import Path
 
-            candidate = audit_candidate(
-                args.source_root / "tests/data/sukuyo_hutime_v1"
+from validation.sukuyo import required_quote_paths
+from validation.sukuyo_calendar_sources import audit_candidate
+
+assert "candidate_relation_analysis" in required_quote_paths("compatibility")
+assert "sukuyo.six_palace_reference" in required_quote_paths("activity")
+assert "sukuyo.candidate_days" in required_quote_paths("activity")
+assert "sukuyo.clothing_reference" in required_quote_paths("clothing")
+print(json.dumps(audit_candidate(Path("tests/data/sukuyo_hutime_v1"))))
+"""
+            candidate = json.loads(
+                subprocess.check_output(
+                    [sys.executable, "-E", "-c", checkout_checks], cwd=args.source_root
+                )
             )
             assert not candidate["structural_import_eligible"]
             assert not candidate["runtime_calendar_enabled"]
@@ -966,6 +994,8 @@ def main() -> None:
                 "source_archive_sha256": candidate["source_archive_sha256"],
                 "runtime_calendar_enabled": False,
             }
+        else:
+            pass
         report.update(
             {
                 "isolated_package_import": True,
@@ -1006,8 +1036,12 @@ def main() -> None:
     rendered = json.dumps(report, ensure_ascii=False, indent=2) + "\n"
     if args.output:
         args.output.write_text(rendered)
+    else:
+        pass
     print(rendered, end="")
 
 
 if __name__ == "__main__":
     main()
+else:
+    pass

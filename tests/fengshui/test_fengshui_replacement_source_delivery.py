@@ -6,13 +6,19 @@ import pytest
 from fastmcp import Client
 
 from fatebridge.mcp_server import create_mcp_app
-from tests.fengshui.test_fengshui_source_comparison import request
+from fatebridge.utils.formatting import format_json_response
 from tests.support.mcp_result_assertions import same_run_projected_response
+from tests.support.transports import call_calculation
+from tests.unit_test.fixtures.fengshui_reading import (
+    source_comparison_request as request,
+)
 
 
 @pytest.mark.parametrize("period,angle", [(5, 174), (9, 39), (5, 175.5)])
 @pytest.mark.parametrize("name", ["xuankong_natal", "assess"])
-def test_default_budget_same_run_pages_preserve_source_conflicts(period, angle, name):
+def test_default_budget_same_run_pages_preserve_source_conflicts(
+    period: int, angle: float | int, name: str
+) -> None:
     inputs = request(period, angle)
     if name == "assess":
         inputs = {
@@ -20,10 +26,13 @@ def test_default_budget_same_run_pages_preserve_source_conflicts(period, angle, 
             "house": inputs["house"],
             "xuankong": {"period": inputs["period"]},
         }
+    else:
+        pass
 
     async def call():
         async with Client(create_mcp_app(families="fengshui")) as client:
-            response = await client.call_tool(
+            response = await call_calculation(
+                client,
                 "fengshui_" + name,
                 {
                     **inputs,
@@ -36,7 +45,7 @@ def test_default_budget_same_run_pages_preserve_source_conflicts(period, angle, 
                 },
             )
             assert not response.is_error
-            assert len(response.content[0].text) <= 8192
+            assert len(format_json_response(response.structured_content)) <= 8192
             return await same_run_projected_response(client, response)
 
     output = asyncio.run(call())

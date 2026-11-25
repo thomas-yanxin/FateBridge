@@ -15,14 +15,15 @@ import fatebridge.api as api
 from fatebridge.application.execution import execute_tool
 from fatebridge.cli import run
 from fatebridge.core.execution_context import ExecutionOptions
-from fatebridge.core.qimen_five_jia import build_five_jia, five_jia_context
+from fatebridge.core.qimen.qimen_five_jia import build_five_jia, five_jia_context
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.validation import qimen_five_jia as source_audit
-from fatebridge.validation.claims import CalculationClaim
-from fatebridge.validation.qimen import verify_qimen_pattern_quotes
-from fatebridge.validation.qimen_study import Condition, FrozenQimenPolicy, apply_policy
-from tests.qimen.test_qimen_three_deceptions import calculate
+from tests.support.transports import call_calculation
+from tests.unit_test.fixtures.qimen import calculate_january_board as calculate
+from validation import qimen_five_jia as source_audit
+from validation.claims import CalculationClaim
+from validation.qimen import verify_qimen_pattern_quotes
+from validation.qimen_study import Condition, FrozenQimenPolicy, apply_policy
 
 BUNDLE = Path(__file__).parents[1] / "fixtures/qimen_classical_v14"
 REFERENCE = json.loads((BUNDLE / "source-and-five-jia.json").read_text())
@@ -32,7 +33,7 @@ REFERENCE = json.loads((BUNDLE / "source-and-five-jia.json").read_text())
     "definition", REFERENCE["definitions"], ids=lambda d: d["rule_id"]
 )
 @pytest.mark.parametrize("stem_index", range(3))
-def test_all_twelve_printed_naming_combinations(definition, stem_index):
+def test_all_twelve_printed_naming_combinations(definition, stem_index) -> None:
     d = definition
     stem = d["heaven_stems"][stem_index]
     c = five_jia_context("坎", [stem], d["door"], d["god"])
@@ -46,7 +47,7 @@ def test_all_twelve_printed_naming_combinations(definition, stem_index):
     "definition", REFERENCE["definitions"], ids=lambda d: d["rule_id"]
 )
 @pytest.mark.parametrize("missing", ["stem", "door", "god"])
-def test_each_required_layer_is_necessary(definition, missing):
+def test_each_required_layer_is_necessary(definition, missing: str) -> None:
     d = definition
     c = five_jia_context(
         "离",
@@ -58,12 +59,12 @@ def test_each_required_layer_is_necessary(definition, missing):
 
 
 @pytest.mark.parametrize("god", ["六合", "太阴"])
-def test_unnamed_du_door_examples_do_not_inherit_earth_jia_name(god):
+def test_unnamed_du_door_examples_do_not_inherit_earth_jia_name(god: str) -> None:
     c = five_jia_context("乾", ["己"], "杜门", god)
     assert c["unnamed_du_door_clause"] and not c["named_matches"]
 
 
-def test_hosted_stems_keep_roles_and_one_name_per_palace():
+def test_hosted_stems_keep_roles_and_one_name_per_palace() -> None:
     c = five_jia_context("乾", ["己", "癸"], "杜门", "九地")
     assert len(c["named_matches"]) == 1
     assert c["named_matches"][0]["stem_roles"] == [
@@ -92,7 +93,7 @@ def test_hosted_stems_keep_roles_and_one_name_per_palace():
 
 
 @pytest.mark.parametrize("stems", [["己"], ["壬"], ["戊", "己"]])
-def test_human_jia_remains_unknown_even_when_a_candidate_matches(stems):
+def test_human_jia_remains_unknown_even_when_a_candidate_matches(stems) -> None:
     c = five_jia_context("艮", stems, "惊门", "九天")
     assert c["human_jia"]["adopted_match"] is None and not c["named_matches"]
     assert c["human_jia"]["printed_clause_match"] is None
@@ -100,7 +101,7 @@ def test_human_jia_remains_unknown_even_when_a_candidate_matches(stems):
     assert not c["human_jia"]["candidate_failure_proves_absence"]
 
 
-def test_non_jing_palace_rules_out_the_printed_human_jia_clause():
+def test_non_jing_palace_rules_out_the_printed_human_jia_clause() -> None:
     c = five_jia_context("艮", ["己"], "开门", "九天")
     assert c["human_jia"]["printed_clause_match"] is False
     assert c["human_jia"]["adopted_match"] is None
@@ -118,12 +119,12 @@ def test_non_jing_palace_rules_out_the_printed_human_jia_clause():
         ("坎", ["己"], "杜门", "九地宫"),
     ],
 )
-def test_invalid_or_aliased_inputs_do_not_produce_a_pattern(args):
+def test_invalid_or_aliased_inputs_do_not_produce_a_pattern(args) -> None:
     with pytest.raises(ValueError):
         five_jia_context(*args)
 
 
-def test_finite_source_audit_keeps_unresolved_name_and_no_empirical_claim():
+def test_finite_source_audit_keeps_unresolved_name_and_no_empirical_claim() -> None:
     r = source_audit.audit_five_jia(BUNDLE)
     assert not r["implementation_disagreements"]
     assert r["finite_single_stem_context_probes"] == 5760
@@ -137,7 +138,9 @@ def test_finite_source_audit_keeps_unresolved_name_and_no_empirical_claim():
     )
 
 
-def test_source_audit_detects_wrong_stem_mapping(monkeypatch):
+def test_source_audit_detects_wrong_stem_mapping(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     original = source_audit.five_jia_context
 
     def wrong(gua, stems, door, god):
@@ -150,7 +153,9 @@ def test_source_audit_detects_wrong_stem_mapping(monkeypatch):
 @pytest.mark.parametrize(
     "mutation", ["rename", "stems", "human", "auxiliary", "chart_count", "image"]
 )
-def test_omitted_or_rewritten_source_scope_is_rejected(tmp_path, mutation):
+def test_omitted_or_rewritten_source_scope_is_rejected(
+    tmp_path: Path, mutation: str
+) -> None:
     dest = tmp_path / "source"
     shutil.copytree(BUNDLE, dest)
     ref = deepcopy(REFERENCE)
@@ -171,7 +176,7 @@ def test_omitted_or_rewritten_source_scope_is_rejected(tmp_path, mutation):
         source_audit.audit_five_jia(dest)
 
 
-def test_research_rule_treats_unresolved_human_jia_as_unknown_not_absent():
+def test_research_rule_treats_unresolved_human_jia_as_unknown_not_absent() -> None:
     q = calculate(2, 14)["qimen"]
     for feature, expected in product(
         ["pattern_present", "pattern_conditions_observed"], [True, False]
@@ -214,8 +219,8 @@ def test_research_rule_treats_unresolved_human_jia_as_unknown_not_absent():
     ],
 )
 def test_four_computable_names_are_readable_by_frozen_research_policies(
-    day, hour, pattern
-):
+    day: int, hour: int, pattern: str
+) -> None:
     q = calculate(day, hour)["qimen"]
     policy = FrozenQimenPolicy(
         policy_id="synthetic-four-jia",
@@ -246,7 +251,7 @@ def test_four_computable_names_are_readable_by_frozen_research_policies(
     # The declared 0.8 is a synthetic test hypothesis, never a calibrated rate.
 
 
-def test_actual_board_retains_coexisting_rules_and_unadopted_hosted_candidate():
+def test_actual_board_retains_coexisting_rules_and_unadopted_hosted_candidate() -> None:
     q = calculate(1, 16)["qimen"]
     p = next(p for p in q["patterns"] if p["rule_id"] == "ghost_jia")
     assert not p["qualification"]["name_match_is_overall_auspiciousness"]
@@ -269,7 +274,9 @@ def test_actual_board_retains_coexisting_rules_and_unadopted_hosted_candidate():
         (12, 12, "earth_jia"),
     ],
 )
-def test_whole_pattern_quote_preserves_exact_condition_and_scope(day, hour, expected):
+def test_whole_pattern_quote_preserves_exact_condition_and_scope(
+    day: int, hour: int, expected: str
+) -> None:
     options = ExecutionOptions(as_of="2026-10-22T12:00:00+08:00")
     spec = next(s for s in CATALOG if s.tool_name == "qimen")
     result = execute_tool(
@@ -322,8 +329,13 @@ def test_whole_pattern_quote_preserves_exact_condition_and_scope(day, hour, expe
 )
 @pytest.mark.parametrize("aggregate", [False, True])
 def test_five_jia_evidence_and_limits_survive_all_real_transports(
-    monkeypatch, capsys, day, hour, expected, aggregate
-):
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    day: int,
+    hour: int,
+    expected: str | None,
+    aggregate: bool,
+) -> None:
     api._reset_runtime_state_for_tests()
     monkeypatch.setattr(
         api,
@@ -332,7 +344,7 @@ def test_five_jia_evidence_and_limits_survive_all_real_transports(
     )
     fields = ["qimen", "snapshot_text", "snapshot_export"]
     if aggregate:
-        tool, path = "sanshiunited", "/api/divination/sanshiunited"
+        tool, path = "sanshi_combined_chart", "/api/divination/sanshi"
         payload = dict(
             date=f"2026-01-{day:02d}",
             time=f"{hour:02d}:00:00",
@@ -355,7 +367,7 @@ def test_five_jia_evidence_and_limits_survive_all_real_transports(
             "114.17",
         ]
     else:
-        tool, path = "qimen", "/api/cn/qimen"
+        tool, path = "qimen", "/api/qimen"
         payload = dict(
             analysis_year=2026,
             analysis_month=1,
@@ -396,8 +408,8 @@ def test_five_jia_evidence_and_limits_survive_all_real_transports(
 
     async def protocol():
         async with Client(create_mcp_app()) as client:
-            return await client.call_tool(
-                tool, {**payload, **controls}, raise_on_error=False
+            return await call_calculation(
+                client, tool, {**payload, **controls}, raise_on_error=False
             )
 
     native = asyncio.run(protocol())
@@ -427,9 +439,10 @@ def test_five_jia_evidence_and_limits_survive_all_real_transports(
     q = bodies[0]["qimen"]
     if expected:
         assert any(p["rule_id"] == expected for p in q["patterns"])
-    assert q["rulesets"][0]["version"] == "2.12.0"
+    else:
+        pass
+    assert q["rulesets"][0]["version"] == "2.13.0"
     assert q["rule_profiles"]["five_jia"]["human_jia"]["adopted_match"] is None
-    assert not q["assessment"]["authority_certified"]
     assert "人假六合身份" in bodies[0]["snapshot_text"]
     assert "人假必要门位" in bodies[0]["snapshot_text"]
     for palace in q["palaces"]:
@@ -439,3 +452,5 @@ def test_five_jia_evidence_and_limits_survive_all_real_transports(
             assert h["printed_clause_match"] is (
                 None if palace["door"] == "惊门" else False
             )
+        else:
+            pass

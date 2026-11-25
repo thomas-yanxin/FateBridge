@@ -38,7 +38,7 @@ def profile(tmp_path, monkeypatch):
     return payloads, calls
 
 
-def test_profile_covers_actual_supported_house_period_extrema():
+def test_profile_covers_actual_supported_house_period_extrema() -> None:
     schema = HousePeriod.model_json_schema()["properties"]["effective_event_year"]
     integer = next(row for row in schema["anyOf"] if row["type"] == "integer")
     minimum, maximum = integer["minimum"], integer["maximum"]
@@ -55,8 +55,8 @@ def test_profile_covers_actual_supported_house_period_extrema():
 
 
 def test_empty_installation_acquires_into_cache_and_discovers_all_four_files(
-    profile, capsys
-):
+    profile, capsys: pytest.CaptureFixture[str]
+) -> None:
     _, calls = profile
     assert install.verified_user_ephemeris_dir() is None
     assert ephemeris_runtime.default_ephe_dir() is None
@@ -73,7 +73,7 @@ def test_empty_installation_acquires_into_cache_and_discovers_all_four_files(
 
 
 @pytest.mark.parametrize("fault", ["partial", "bad_bytes", "wrong_edition"])
-def test_partial_or_unverified_cache_is_never_selected(profile, fault):
+def test_partial_or_unverified_cache_is_never_selected(profile, fault: str) -> None:
     payloads, _ = profile
     directory = install.user_ephemeris_dir()
     directory.mkdir(parents=True)
@@ -91,7 +91,7 @@ def test_partial_or_unverified_cache_is_never_selected(profile, fault):
     assert ephemeris_runtime.default_ephe_dir() is None
 
 
-def test_existing_checkout_is_preserved_and_completed(profile):
+def test_existing_checkout_is_preserved_and_completed(profile) -> None:
     payloads, calls = profile
     project = fetch_ephe.default_dest()
     project.mkdir(parents=True)
@@ -103,9 +103,32 @@ def test_existing_checkout_is_preserved_and_completed(profile):
     assert not install.user_ephemeris_dir().exists()
 
 
+def test_unusable_checkout_path_does_not_hide_verified_cache(
+    profile, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    payloads, calls = profile
+    checkout = tmp_path / "checkout;literal"
+    project = checkout / "ephe"
+    project.mkdir(parents=True)
+    (project / "sepl_18.se1").write_bytes(payloads["sepl_18.se1"])
+    monkeypatch.setattr(ephemeris_runtime, "_PROJECT_ROOT", checkout)
+    monkeypatch.setattr(fetch_ephe, "default_dest", lambda: project)
+    cached = install.user_ephemeris_dir()
+    cached.mkdir(parents=True)
+    for name, data in payloads.items():
+        (cached / name).write_bytes(data)
+
+    assert ephemeris_runtime.default_ephe_dir() == str(cached)
+    assert fetch_ephe.main(["--profile", "fengshui_calendar", "--verify-only"]) == 0
+    assert not calls
+
+
 def test_explicit_destination_and_explicit_runtime_path_remain_authoritative(
-    profile, tmp_path, monkeypatch, capsys
-):
+    profile,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     directory = tmp_path / "explicit"
     assert (
         fetch_ephe.main(["--profile", "fengshui_calendar", "--dest", str(directory)])
@@ -117,7 +140,9 @@ def test_explicit_destination_and_explicit_runtime_path_remain_authoritative(
     assert ephemeris_runtime.configure_ephemeris_path() == str(directory)
 
 
-def test_cache_does_not_override_existing_project_or_environment(profile, monkeypatch):
+def test_cache_does_not_override_existing_project_or_environment(
+    profile, monkeypatch: pytest.MonkeyPatch
+) -> None:
     payloads, _ = profile
     directory = install.user_ephemeris_dir()
     directory.mkdir(parents=True)
@@ -132,8 +157,8 @@ def test_cache_does_not_override_existing_project_or_environment(profile, monkey
 
 
 def test_profile_selection_rejects_conflicting_modes_and_bad_download(
-    profile, monkeypatch, capsys
-):
+    profile, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
     with pytest.raises(SystemExit):
         fetch_ephe.main(["--profile", "fengshui_calendar", "--years", "2026"])
     monkeypatch.setattr(
@@ -153,8 +178,8 @@ def test_profile_selection_rejects_conflicting_modes_and_bad_download(
     ],
 )
 def test_platform_cache_location_and_relative_xdg_rejection(
-    monkeypatch, tmp_path, system, suffix
-):
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, system: str, suffix: str
+) -> None:
     monkeypatch.setenv("XDG_CACHE_HOME", "relative-and-not-usable")
     monkeypatch.delenv("LOCALAPPDATA", raising=False)
     monkeypatch.setattr(install.platform, "system", lambda: system)
@@ -163,8 +188,11 @@ def test_platform_cache_location_and_relative_xdg_rejection(
 
 
 def test_unsupported_cache_path_cannot_claim_ready_or_download(
-    profile, monkeypatch, tmp_path, capsys
-):
+    profile,
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     directory = tmp_path / ("长" * 100)
     monkeypatch.setattr(install, "user_ephemeris_dir", lambda: directory)
     monkeypatch.setattr(fetch_ephe, "user_ephemeris_dir", lambda: directory)
@@ -174,7 +202,9 @@ def test_unsupported_cache_path_cannot_claim_ready_or_download(
     assert profile[1] == []
 
 
-def test_partial_explicit_cache_does_not_claim_automatic_discovery(profile, capsys):
+def test_partial_explicit_cache_does_not_claim_automatic_discovery(
+    profile, capsys: pytest.CaptureFixture[str]
+) -> None:
     assert (
         fetch_ephe.main(
             ["--files", "sepl_18.se1", "--dest", str(install.user_ephemeris_dir())]
@@ -184,7 +214,7 @@ def test_partial_explicit_cache_does_not_claim_automatic_discovery(profile, caps
     assert "Set SE_EPHE_PATH" in capsys.readouterr().out
 
 
-def test_doctor_reports_identity_and_setup_without_acquisition(profile):
+def test_doctor_reports_identity_and_setup_without_acquisition(profile) -> None:
     from fatebridge.diagnostics import diagnose
 
     before = diagnose(family="fengshui")["fengshui_calendar"]
@@ -199,8 +229,8 @@ def test_doctor_reports_identity_and_setup_without_acquisition(profile):
 
 
 def test_explicit_cache_behind_project_precedence_requires_explicit_path(
-    profile, capsys
-):
+    profile, capsys: pytest.CaptureFixture[str]
+) -> None:
     project = fetch_ephe.default_dest()
     project.mkdir(parents=True)
     (project / "user-managed.se1").write_bytes(b"SW-custom-unchanged")
@@ -222,8 +252,12 @@ def test_explicit_cache_behind_project_precedence_requires_explicit_path(
 
 @pytest.mark.parametrize("same", [True, False])
 def test_existing_environment_path_is_not_misreported_as_auto_discovery(
-    profile, monkeypatch, tmp_path, capsys, same
-):
+    profile,
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    same: bool,
+) -> None:
     destination = install.user_ephemeris_dir()
     monkeypatch.setenv(
         "SE_EPHE_PATH", str(destination if same else tmp_path / "operator-selected")
@@ -235,8 +269,11 @@ def test_existing_environment_path_is_not_misreported_as_auto_discovery(
 
 
 def test_semicolon_search_path_agrees_in_setup_and_domain_diagnostics(
-    profile, monkeypatch, tmp_path, capsys
-):
+    profile,
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     from fatebridge.diagnostics import diagnose
 
     monkeypatch.chdir(tmp_path)

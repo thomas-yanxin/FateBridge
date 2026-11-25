@@ -1,163 +1,48 @@
-#!/usr/bin/env python3
-"""
-时运影响分析模块
-
-本模块分析大运、流年、流月对原命局的具体影响：
-1. 五行力量变化分析
-2. 十神关系变化
-3. 格局影响分析
-4. 吉凶趋势判断
-"""
+"""Analyze the effect of timed pillars on a natal BaZi chart."""
 
 from datetime import datetime
-from typing import Any, Dict, List, Mapping, Optional
+from typing import Any, Dict
 
-from ..core.almanac import (
+from fatebridge.analysis.timing_element_shares import (
+    TimingElementEffects,
+    analyze_element_strength_changes,
+)
+from fatebridge.core.almanac import (
     DEFAULT_TIMEZONE,
     elapsed_days_between,
     localize_datetime,
 )
-from ..core.elements import ElementAnalysis
-from ..core.timing import TimingAnalysis
-from ..utils.birth_input import normalize_gender
-from ..utils.civil_time import utc_ordering_key
-from ..utils.data import BRANCH_ELEMENTS, BRANCH_HIDDEN_STEMS, STEM_ELEMENTS, Element
+from fatebridge.core.timing import TimingAnalysis
+from fatebridge.utils.birth_input import normalize_gender
+from fatebridge.utils.civil_time import (
+    datetime_fromisoformat_preserving_offset as parse_iso_datetime,
+)
+from fatebridge.utils.civil_time import utc_ordering_key
+from fatebridge.utils.data import (
+    Element,
+    check_branch_combination,
+    check_branch_conflict,
+)
 
 
 class TimingEffectsAnalysis:
     """时运影响分析类"""
 
-    @staticmethod
-    def _count_timing_pillar_elements(
-        timing_pillars: Mapping[str, Mapping[str, str]],
-    ) -> Dict[Element, float]:
-        """Count timing-pillar elements using the same weighting as chart counts."""
-        element_counts = {element: 0.0 for element in Element}
-
-        for timing_info in timing_pillars.values():
-            stem = timing_info["stem"]
-            branch = timing_info["branch"]
-
-            stem_element, _ = STEM_ELEMENTS[stem]
-            branch_element, _ = BRANCH_ELEMENTS[branch]
-            element_counts[stem_element] += 1.0
-            element_counts[branch_element] += 1.0
-
-            for hidden_stem in BRANCH_HIDDEN_STEMS[branch]:
-                hidden_element, _ = STEM_ELEMENTS[hidden_stem]
-                element_counts[hidden_element] += 0.5
-
-        return element_counts
-
-    @staticmethod
-    def analyze_element_strength_changes(
-        original_pillars: Dict,
-        timing_pillars: Dict,
-        original_element_counts: Optional[Dict[Element, float]] = None,
-    ) -> Dict:
-        """
-        分析时运对五行力量的影响
-
-        Args:
-            original_pillars: 原命局四柱
-            timing_pillars: 时运干支（大运、流年、流月）
-
-        Returns:
-            五行力量变化分析
-        """
-        source_counts = original_element_counts or ElementAnalysis.count_elements(
-            original_pillars
-        )
-        raw_original_counts = {
-            element: float(source_counts.get(element, 0.0)) for element in Element
-        }
-        timing_element_counts = TimingEffectsAnalysis._count_timing_pillar_elements(
-            timing_pillars
-        )
-        combined_counts = {
-            element: raw_original_counts[element] + timing_element_counts[element]
-            for element in Element
-        }
-        original_distribution = ElementAnalysis.convert_to_percentage(
-            raw_original_counts
-        )
-        new_distribution = ElementAnalysis.convert_to_percentage(combined_counts)
-
-        element_changes = {}
-        for element in Element:
-            element_name = element.value
-            original_count = original_distribution.get(element_name, 0.0)
-            new_count = new_distribution.get(element_name, 0.0)
-            change = new_count - original_count
-
-            element_changes[element_name] = {
-                "original": original_count,
-                "new": new_count,
-                "change": change,
-                "change_type": (
-                    "占比上升"
-                    if change > 0
-                    else "占比下降" if change < 0 else "占比不变"
-                ),
-            }
-
-        return {
-            "method_id": "structural_element_share_v1",
-            "counting_basis": {
-                "visible_stem": 1.0,
-                "branch_element": 1.0,
-                "each_hidden_stem": 0.5,
-                "timing_layer_weights": "equal",
-                "meaning": "structural_token_counts_not_effective_strength",
-            },
-            "interpretation_scope": "干支与藏干的结构计数占比；未计算行运后有效旺衰、合化和喜忌，不是吉凶评分或成功概率。",
-            "original_distribution": original_distribution,
-            "new_distribution": new_distribution,
-            "element_changes": element_changes,
-            "overall_effect": TimingEffectsAnalysis._evaluate_overall_effect(
-                element_changes
-            ),
-        }
-
-    @staticmethod
-    def _evaluate_overall_effect(element_changes: Dict) -> str:
-        """评估整体影响效果"""
-        positive_changes = sum(
-            1 for change in element_changes.values() if change["change"] > 0
-        )
-        negative_changes = sum(
-            1 for change in element_changes.values() if change["change"] < 0
-        )
-
-        if positive_changes or negative_changes:
-            return "五行结构占比发生变化（不代表旺衰或吉凶）"
-        return "五行结构占比不变（不代表力量不变）"
+    analyze_element_strength_changes = staticmethod(analyze_element_strength_changes)
 
     @staticmethod
     def analyze_dayun_effects(
-        birth_pillars: Dict,
+        birth_pillars: dict[str, tuple[str, str]],
         birth_date: datetime,
-        gender: Optional[str],
+        gender: str | None,
         analysis_age: int,
         timezone_name: str = DEFAULT_TIMEZONE,
-        original_element_counts: Optional[Dict[Element, float]] = None,
+        original_element_counts: dict[Element, float] | None = None,
         *,
-        analysis_moment: Optional[datetime] = None,
+        analysis_moment: datetime | None = None,
         allow_missing_gender: bool = False,
     ) -> Dict:
-        """
-        分析指定年龄的大运影响
-
-        Args:
-            birth_pillars: 出生四柱
-            birth_date: 出生日期
-            gender: 性别
-            analysis_age: 分析年龄
-            allow_missing_gender: 仅综合入口可保留缺性别的大运不可用状态；独立大运默认仍要求性别
-
-        Returns:
-            大运影响分析
-        """
+        """Select an active Dayun by exact instant or elapsed age, and describe its effects."""
         if allow_missing_gender and normalize_gender(gender) not in {"男", "女"}:
             return {
                 "status": "unavailable_missing_gender",
@@ -171,11 +56,16 @@ class TimingEffectsAnalysis:
                     ),
                 },
             }
+        else:
+            pass
         month_stem = birth_pillars["month"][0]
         month_branch = birth_pillars["month"][1]
 
-        timeline = TimingAnalysis.calculate_dayun_timeline(
-            birth_date, gender, (month_stem, month_branch), timezone_name
+        resolution = TimingAnalysis.resolve_dayun_start(
+            birth_date, gender, timezone_name
+        )
+        timeline = TimingAnalysis.build_dayun_timeline(
+            resolution, gender, (month_stem, month_branch), timezone_name
         )
         start_info = timeline["start_details"]
         start_age = start_info["start_age_unrounded"]
@@ -190,23 +80,24 @@ class TimingEffectsAnalysis:
             moment = localize_datetime(analysis_moment, timezone_name)
             instant = utc_ordering_key(moment)
             context["analysis_at"] = moment.isoformat()
-            start_at = datetime.fromisoformat(timeline["start_at"])
+            start_at = parse_iso_datetime(timeline["start_at"])
             before_start = instant < utc_ordering_key(start_at)
             period_index = next(
                 (
                     index
                     for index, item in enumerate(sequence)
-                    if utc_ordering_key(datetime.fromisoformat(item["start_at"]))
+                    if utc_ordering_key(parse_iso_datetime(item["start_at"]))
                     <= instant
-                    < utc_ordering_key(datetime.fromisoformat(item["end_at"]))
+                    < utc_ordering_key(parse_iso_datetime(item["end_at"]))
                 ),
                 len(sequence),
             )
             dayun_age = elapsed_days_between(start_at, moment) / 365.2425
         else:
-            before_start = analysis_age < start_age
+            elapsed_age = analysis_age - resolution.nominal_days / 3
+            before_start = elapsed_age < 0
+            period_index = elapsed_age // 10
             dayun_age = analysis_age - start_age
-            period_index = int(dayun_age // 10)
 
         if before_start:
             return {
@@ -214,17 +105,21 @@ class TimingEffectsAnalysis:
                 "message": f"尚未起运，约在{start_info['start_age_precise']}岁起运",
                 "timing_context": context,
             }
+        else:
+            pass
         if period_index >= len(sequence):
             return {
                 "status": "beyond_calculation",
                 "message": "超出计算范围",
                 "timing_context": context,
             }
+        else:
+            pass
 
         current_dayun = sequence[period_index]
         years_in_period = (
             elapsed_days_between(
-                datetime.fromisoformat(current_dayun["start_at"]),
+                parse_iso_datetime(current_dayun["start_at"]),
                 localize_datetime(analysis_moment, timezone_name),
             )
             / 365.2425
@@ -263,47 +158,29 @@ class TimingEffectsAnalysis:
                 "reference_term": start_info["reference_term"],
             },
             "element_effects": element_effects,
-            "summary": TimingEffectsAnalysis._generate_dayun_summary(
-                current_dayun, element_effects
-            ),
+            "summary": f"大运{current_dayun['pillar']}期间，{element_effects['overall_effect']}。",
         }
 
     @staticmethod
-    def _generate_dayun_summary(dayun_info: Dict, element_effects: Dict) -> str:
-        """生成大运影响总结"""
-        dayun_pillar = dayun_info["pillar"]
-        overall_effect = element_effects["overall_effect"]
-
-        return f"大运{dayun_pillar}期间，{overall_effect}。"
-
-    @staticmethod
     def analyze_liunian_effects(
-        birth_pillars: Dict,
+        birth_pillars: dict[str, tuple[str, str]],
         target_year: int,
-        original_element_counts: Optional[Dict[Element, float]] = None,
+        original_element_counts: dict[Element, float] | None = None,
         *,
-        moment: Optional[datetime] = None,
-        timezone_name: Optional[str] = None,
+        moment: datetime | None = None,
+        timezone_name: str | None = None,
     ) -> Dict:
-        """
-        分析流年影响
-
-        Args:
-            birth_pillars: 出生四柱
-            target_year: 目标年份
-            moment: 可选的具体时间点；若给出，流年会以立春为边界解析，
-                避免 1 月 / 早 2 月误判为前一年。
-            timezone_name: ``moment`` 的时区（仅在传入 moment 时使用）。
-
-        Returns:
-            流年影响分析
-        """
+        """Describe annual effects using the Li Chun year when an analysis instant is supplied."""
         # 获取流年信息；传入 moment 使 calculate_liunian 以立春为边界。
         liunian_kwargs: Dict = {}
         if moment is not None:
             liunian_kwargs["moment"] = moment
             if timezone_name is not None:
                 liunian_kwargs["timezone_name"] = timezone_name
+            else:
+                pass
+        else:
+            pass
         liunian_info = TimingAnalysis.calculate_liunian(target_year, **liunian_kwargs)
 
         # 分析流年对命局的影响
@@ -325,26 +202,16 @@ class TimingEffectsAnalysis:
 
     @staticmethod
     def analyze_liuyue_effects(
-        birth_pillars: Dict,
+        birth_pillars: dict[str, tuple[str, str]],
         target_year: int,
         target_month: int,
         target_day: int = 1,
         timezone_name: str = DEFAULT_TIMEZONE,
-        target_date: Optional[datetime] = None,
-        liuyue_info: Optional[Dict] = None,
-        original_element_counts: Optional[Dict[Element, float]] = None,
+        target_date: datetime | None = None,
+        liuyue_info: Dict | None = None,
+        original_element_counts: dict[Element, float] | None = None,
     ) -> Dict:
-        """
-        分析流月影响
-
-        Args:
-            birth_pillars: 出生四柱
-            target_year: 目标年份
-            target_month: 目标月份
-
-        Returns:
-            流月影响分析
-        """
+        """Describe the effects of the solar-term month pillar."""
         if liuyue_info is None:
             liuyue_info = TimingAnalysis.calculate_liuyue(
                 target_year,
@@ -353,6 +220,8 @@ class TimingEffectsAnalysis:
                 timezone_name=timezone_name,
                 target_date=target_date,
             )
+        else:
+            pass
 
         detailed_analysis = TimingAnalysis.analyze_liuyue_detailed(
             birth_pillars,
@@ -385,11 +254,11 @@ class TimingEffectsAnalysis:
 
     @staticmethod
     def analyze_liuri_effects(
-        birth_pillars: Dict,
+        birth_pillars: dict[str, tuple[str, str]],
         target_date: datetime,
         timezone_name: str = DEFAULT_TIMEZONE,
-        liuri_info: Optional[Dict] = None,
-        original_element_counts: Optional[Dict[Element, float]] = None,
+        liuri_info: Dict | None = None,
+        original_element_counts: dict[Element, float] | None = None,
     ) -> Dict:
         """
         分析流日影响。
@@ -398,6 +267,8 @@ class TimingEffectsAnalysis:
             liuri_info = TimingAnalysis.calculate_liuri(
                 target_date, timezone_name=timezone_name
             )
+        else:
+            pass
         detailed_analysis = TimingAnalysis.analyze_liuri_detailed(
             birth_pillars,
             target_date,
@@ -425,11 +296,11 @@ class TimingEffectsAnalysis:
 
     @staticmethod
     def analyze_liushi_effects(
-        birth_pillars: Dict,
+        birth_pillars: dict[str, tuple[str, str]],
         target_datetime: datetime,
         timezone_name: str = DEFAULT_TIMEZONE,
-        liushi_info: Optional[Dict] = None,
-        original_element_counts: Optional[Dict[Element, float]] = None,
+        liushi_info: Dict | None = None,
+        original_element_counts: dict[Element, float] | None = None,
     ) -> Dict:
         """
         分析流时影响。
@@ -438,6 +309,8 @@ class TimingEffectsAnalysis:
             liushi_info = TimingAnalysis.calculate_liushi(
                 target_datetime, timezone_name=timezone_name
             )
+        else:
+            pass
         detailed_analysis = TimingAnalysis.analyze_liushi_detailed(
             birth_pillars,
             target_datetime,
@@ -465,29 +338,18 @@ class TimingEffectsAnalysis:
 
     @staticmethod
     def analyze_liuyue_comprehensive(
-        birth_pillars: Dict,
+        birth_pillars: dict[str, tuple[str, str]],
         target_year: int,
         target_month: int,
         include_liunian: bool = True,
         target_day: int = 1,
         timezone_name: str = DEFAULT_TIMEZONE,
-        target_date: Optional[datetime] = None,
-        liuyue_info: Optional[Dict] = None,
-        liunian_analysis: Optional[Dict] = None,
-        original_element_counts: Optional[Dict[Element, float]] = None,
+        target_date: datetime | None = None,
+        liuyue_info: Dict | None = None,
+        liunian_analysis: Dict | None = None,
+        original_element_counts: dict[Element, float] | None = None,
     ) -> Dict:
-        """
-        流月的综合分析，包括与大运、流年的组合影响
-
-        Args:
-            birth_pillars: 出生四柱
-            target_year: 目标年份
-            target_month: 目标月份
-            include_liunian: 是否包含流年分析
-
-        Returns:
-            流月综合影响分析
-        """
+        """Describe the month and its optional branch relationship with the annual pillar."""
         # 基础流月分析
         liuyue_analysis = TimingEffectsAnalysis.analyze_liuyue_effects(
             birth_pillars,
@@ -500,7 +362,7 @@ class TimingEffectsAnalysis:
             original_element_counts=original_element_counts,
         )
 
-        result: Dict[str, Any] = {
+        result: dict[str, Any] = {
             "liuyue_analysis": liuyue_analysis,
             "combination_effects": {},
         }
@@ -515,6 +377,8 @@ class TimingEffectsAnalysis:
                     or datetime(target_year, target_month, target_day),
                     timezone_name=timezone_name,
                 )
+            else:
+                pass
             result["liunian_analysis"] = liunian_analysis
 
             liuyue_branch = liuyue_analysis["liuyue_info"]["branch"]
@@ -524,6 +388,8 @@ class TimingEffectsAnalysis:
                 liuyue_branch, liunian_branch, "流月", "流年"
             )
             result["combination_effects"]["liuyue_liunian"] = combination_analysis
+        else:
+            pass
 
         # 大运组合分析需要性别+出生日期等额外输入，本入口未提供这些参数，
         # 故不在此层伪造。需要大运联动时由上层 analyze_dayun_effects 负责。
@@ -538,21 +404,8 @@ class TimingEffectsAnalysis:
     def _analyze_branch_combination(
         branch1: str, branch2: str, type1: str, type2: str
     ) -> Dict:
-        """
-        分析两个地支的组合关系
-
-        Args:
-            branch1: 第一个地支
-            branch2: 第二个地支
-            type1: 第一个地支的类型描述
-            type2: 第二个地支的类型描述
-
-        Returns:
-            组合关系分析
-        """
-        from ..utils.data import check_branch_combination, check_branch_conflict
-
-        relations: List[Dict[str, Any]] = []
+        """Report structural pair relations for the two labeled branches."""
+        relations: list[dict[str, Any]] = []
 
         if check_branch_conflict(branch1, branch2):
             relations.append(
@@ -560,9 +413,10 @@ class TimingEffectsAnalysis:
                     "type": "六冲",
                     "description": f"{type1}{branch1}与{type2}{branch2}相冲",
                     "effect": "支冲关系成立，喜忌需结合原局",
-                    "impact_score": None,
                 }
             )
+        else:
+            pass
 
         if check_branch_combination(branch1, branch2):
             relations.append(
@@ -570,9 +424,10 @@ class TimingEffectsAnalysis:
                     "type": "六合",
                     "description": f"{type1}{branch1}与{type2}{branch2}六合",
                     "effect": "六合关系成立，合化与喜忌尚未判定",
-                    "impact_score": None,
                 }
             )
+        else:
+            pass
 
         if not relations:
             relations.append(
@@ -580,30 +435,22 @@ class TimingEffectsAnalysis:
                     "type": "普通",
                     "description": f"{type1}{branch1}与{type2}{branch2}关系普通",
                     "effect": "本二元检查未命中六冲或六合；不代表无其他关系",
-                    "impact_score": None,
                 }
             )
+        else:
+            pass
 
         return {
             "branch1": branch1,
             "branch2": branch2,
             "relations": relations,
-            "total_impact_score": None,
             "assessment_status": "context_required",
             "overall_effect": "关系已核对，吉凶未判定",
         }
 
     @staticmethod
     def _generate_comprehensive_liuyue_summary(analysis_result: Dict) -> str:
-        """
-        生成流月综合分析总结
-
-        Args:
-            analysis_result: 综合分析结果
-
-        Returns:
-            总结文本
-        """
+        """Summarize the monthly pillar, ten god, and branch relationships."""
         summary_parts = []
 
         # 流月基础信息
@@ -613,9 +460,10 @@ class TimingEffectsAnalysis:
         )
 
         # 流月详细分析
-        detailed = analysis_result["liuyue_analysis"]["detailed_analysis"]
-        fortune = detailed["fortune_analysis"]["overall_fortune"]
-        summary_parts.append(f"运势{fortune}")
+        stem_relation = analysis_result["liuyue_analysis"]["detailed_analysis"][
+            "shishen_analysis"
+        ]["stem_relation"]
+        summary_parts.append(f"十神{stem_relation}")
 
         # 组合效应
         combination_effects = analysis_result.get("combination_effects", {})
@@ -624,6 +472,8 @@ class TimingEffectsAnalysis:
                 summary_parts.append(
                     f"与{combo_key.replace('_', '、')}组合{combo_data['overall_effect']}"
                 )
+            else:
+                pass
 
         return "，".join(summary_parts) + "。"
 
@@ -633,8 +483,8 @@ class TimingEffectsAnalysis:
         liunian_analysis: Dict,
         liuyue_analysis: Dict,
         liuri_analysis: Dict,
-        combined_effects: Dict,
-        liushi_analysis: Optional[Dict] = None,
+        combined_effects: TimingElementEffects,
+        liushi_analysis: Dict | None = None,
     ) -> str:
         """生成综合时运分析总结"""
         summary_parts = []
@@ -642,6 +492,8 @@ class TimingEffectsAnalysis:
         if "dayun_info" in dayun_analysis:
             dayun_pillar = dayun_analysis["dayun_info"]["pillar"]
             summary_parts.append(f"大运{dayun_pillar}")
+        else:
+            pass
 
         liunian_pillar = liunian_analysis["liunian_info"]["pillar"]
         liuyue_pillar = liuyue_analysis["liuyue_info"]["pillar"]
@@ -654,6 +506,8 @@ class TimingEffectsAnalysis:
         if liushi_analysis and "liushi_info" in liushi_analysis:
             liushi_pillar = liushi_analysis["liushi_info"]["pillar"]
             summary_parts.append(f"流时{liushi_pillar}")
+        else:
+            pass
 
         overall_effect = combined_effects["overall_effect"]
 

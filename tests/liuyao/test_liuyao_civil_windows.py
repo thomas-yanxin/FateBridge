@@ -9,9 +9,10 @@ from zoneinfo import ZoneInfo
 
 import pytest
 
-from fatebridge.core.liuyao_judgment import timing_candidates
+from fatebridge.core.liuyao.liuyao_judgment import timing_candidates
 from fatebridge.core.local_techniques.sixyao import build_sixyao_result
 from fatebridge.utils.civil_intervals import local_interval_preimages
+from fatebridge.utils.civil_time import NominalClockLabel, gregorian_ordinal
 from fatebridge.utils.timezones import parse_timezone_name, timezone_rules_metadata
 
 REFERENCE = Path(__file__).parents[1] / "fixtures/liuyao_civil_windows_v26"
@@ -43,6 +44,8 @@ def assert_public_windows(result, case):
     for expected in PUBLIC["reference"]:
         if expected["zone"] != case["input"]["zone"]:
             continue
+        else:
+            pass
         rows = [w for w in windows if w["effective_date"] == expected["effective_date"]]
         assert [
             (
@@ -63,7 +66,7 @@ def assert_public_windows(result, case):
             assert "日柱标签" in civil["scope"]
 
 
-def test_reference_bytes_and_source_provider_are_exact():
+def test_reference_bytes_and_source_provider_are_exact() -> None:
     for name in ["freeze.json", "runtime-freeze.json", "public-freeze.json"]:
         frozen = json.loads((REFERENCE / name).read_text())
         for key in ["files_sha256", "source_files_sha256"]:
@@ -72,6 +75,8 @@ def test_reference_bytes_and_source_provider_are_exact():
                 # sources/, while the provider supplement includes that prefix.
                 if key == "source_files_sha256" and name == "freeze.json":
                     file = "sources/" + file
+                else:
+                    pass
                 assert (
                     hashlib.sha256((REFERENCE / file).read_bytes()).hexdigest()
                     == digest
@@ -89,13 +94,19 @@ def test_reference_bytes_and_source_provider_are_exact():
     CASES,
     ids=[f"{corpus}:{x['zone']}:{x['effective_date']}" for corpus, x in CASES],
 )
-def test_exact_preimages_match_independent_constant_offset_intersections(corpus, case):
+def test_exact_preimages_match_independent_constant_offset_intersections(
+    corpus, case
+) -> None:
     raw = (REFERENCE / "sources" / (case["tzif_sha256"] + ".tzif")).read_bytes()
     assert hashlib.sha256(raw).hexdigest() == case["tzif_sha256"]
     zone = ZoneInfo.from_file(io.BytesIO(raw), key=case["zone"])
     day = datetime.fromisoformat(case["effective_date"])
     start, end = day - timedelta(hours=1), day + timedelta(hours=23)
-    actual = local_interval_preimages(start, end, zone)
+    actual = []
+    for left, right in local_interval_preimages(start, end, zone):
+        low, high = left.as_datetime(), right.as_datetime()
+        assert low is not None and high is not None
+        actual.append((low, high))
     assert actual == intervals(case)
     assert [(b - a).total_seconds() for a, b in actual] == case[
         "expected_durations_seconds"
@@ -107,7 +118,7 @@ def test_exact_preimages_match_independent_constant_offset_intersections(corpus,
             assert not start <= instant.astimezone(zone).replace(tzinfo=None) < end
 
 
-def test_wholly_missing_local_interval_has_no_guessed_instant():
+def test_wholly_missing_local_interval_has_no_guessed_instant() -> None:
     zone = parse_timezone_name("Pacific/Apia")
     assert (
         local_interval_preimages(
@@ -117,11 +128,42 @@ def test_wholly_missing_local_interval_has_no_guessed_instant():
     )
 
 
+@pytest.mark.parametrize(
+    "key,day,wall_start,wall_end,components",
+    [
+        ("America/New_York", (10000, 3, 12), (2, 15), (2, 45), []),
+        (
+            "Australia/Lord_Howe",
+            (10000, 4, 2),
+            (1, 42),
+            (1, 43),
+            [
+                ("+010000-04-01T14:42:00+00:00", "+010000-04-01T14:43:00+00:00"),
+                ("+010000-04-01T15:12:00+00:00", "+010000-04-01T15:13:00+00:00"),
+            ],
+        ),
+    ],
+)
+def test_recurring_preimages_keep_the_auxiliary_utc_year(
+    key: str, day, wall_start, wall_end, components
+) -> None:
+    # An independent ZoneInfo scan in year 9600 supplies the UTC intervals
+    # above after adding the 400-year Gregorian cycle.
+    ordinal = gregorian_ordinal(*day)
+    start, end = (
+        NominalClockLabel(ordinal, (hour * 60 + minute) * 60_000_000)
+        for hour, minute in (wall_start, wall_end)
+    )
+    actual = local_interval_preimages(start, end, parse_timezone_name(key))
+    assert [(low.isoformat(), high.isoformat()) for low, high in actual] == components
+
+
 @pytest.mark.parametrize("hours", [0, 5.5, -12])
-def test_fixed_offset_day_retains_ordinary_continuous_interval(hours):
+def test_fixed_offset_day_retains_ordinary_continuous_interval(hours) -> None:
     zone = timezone(timedelta(hours=hours))
     start, end = datetime(2000, 1, 6, 23), datetime(2000, 1, 7, 23)
-    assert local_interval_preimages(start, end, zone) == [
+    actual = local_interval_preimages(start, end, zone)
+    assert [(low.as_datetime(), high.as_datetime()) for low, high in actual] == [
         (
             start.replace(tzinfo=zone).astimezone(UTC),
             end.replace(tzinfo=zone).astimezone(UTC),
@@ -138,13 +180,13 @@ def test_fixed_offset_day_retains_ordinary_continuous_interval(hours):
         (datetime(2000, 1, 1), datetime(2000, 1, 2, tzinfo=UTC)),
     ],
 )
-def test_invalid_interval_bounds_are_rejected(start, end):
+def test_invalid_interval_bounds_are_rejected(start, end) -> None:
     with pytest.raises(ValueError, match="ordered naive"):
         local_interval_preimages(start, end, UTC)
 
 
 @pytest.mark.parametrize("case", PUBLIC["cases"], ids=lambda x: x["input"]["zone"])
-def test_public_day_windows_keep_true_components_and_snapshot_labels(case):
+def test_public_day_windows_keep_true_components_and_snapshot_labels(case) -> None:
     result = build_sixyao_result(**case["input"])
     assert_public_windows(result, case)
     windows = result["liuyao_evidence"]["conditional_analysis"]["timing_candidates"][
@@ -162,10 +204,14 @@ def test_public_day_windows_keep_true_components_and_snapshot_labels(case):
             )
             assert civil["start_utc"] in result["snapshot_text"]
             assert civil["end_utc"] in result["snapshot_text"]
+        else:
+            pass
 
 
 @pytest.mark.parametrize("days", [0, 12])
-def test_original_valid_public_reproducer_no_longer_blames_the_cast_clock(days):
+def test_original_valid_public_reproducer_no_longer_blames_the_cast_clock(
+    days: int,
+) -> None:
     result = build_sixyao_result(
         date="2011-12-26",
         time="12:00:00",
@@ -188,7 +234,9 @@ def test_original_valid_public_reproducer_no_longer_blames_the_cast_clock(days):
         ("America/Goose_Bay", "1988-10-29", "23:30:00", "ambiguous local time"),
     ],
 )
-def test_invalid_user_clock_validation_is_unchanged(zone, day, clock, error):
+def test_invalid_user_clock_validation_is_unchanged(
+    zone: str, day: str, clock: str, error: str
+) -> None:
     with pytest.raises(ValueError, match=error):
         build_sixyao_result(
             date=day,
@@ -200,12 +248,13 @@ def test_invalid_user_clock_validation_is_unchanged(zone, day, clock, error):
         )
 
 
-def test_clipping_compares_actual_instants_in_the_second_fold():
+def test_clipping_compares_actual_instants_in_the_second_fold() -> None:
     zone = parse_timezone_name("America/Goose_Bay")
     moment = datetime(1988, 10, 30, 3, 30, tzinfo=UTC).astimezone(zone)
     assert moment.fold == 1
     timing = timing_candidates(
         moment=moment,
+        timezone_name="America/Goose_Bay",
         days=1,
         selected={"location": "visible", "branch": "午"},
         month="戌",

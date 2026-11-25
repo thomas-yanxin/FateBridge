@@ -1,7 +1,8 @@
-"""Bounded, named-edition evidence; never a replacement calculation table."""
+"""Compare selected Taiyi fields with named print-edition readings."""
 
 from collections.abc import Mapping
-from typing import NamedTuple
+from dataclasses import dataclass
+from typing import TypedDict
 
 FIELDS = (
     "taiyi_number",
@@ -13,7 +14,8 @@ FIELDS = (
 )
 
 
-class EditionRow(NamedTuple):
+@dataclass(frozen=True, slots=True)
+class EditionRow:
     ju: int
     values: tuple[int | str, ...]
     literals: tuple[str, ...]
@@ -165,18 +167,66 @@ YANG_IMAGE_SHA256 = {
 }
 
 
+class EditionImage(TypedDict):
+    book_number: int
+    image_number: int
+    url: str
+    sha256: str
+
+
+class EditionObservation(TypedDict):
+    field: str
+    actual_value: int | str
+    selected_source_value: int | str
+    selected_source_literal: str
+    edition_value: int | str
+    edition_literal: str
+    matches_current: bool
+    matches_selected_source: bool
+
+
+class EditionComparison(TypedDict):
+    source_id: str
+    source_title: str
+    classical_author: str
+    provider: str
+    catalog_identity: str
+    catalog_url: str
+    catalog_sha256: str
+    edition: str
+    bibliographic_note: str
+    chapter_image_url: str
+    chapter_image_sha256: str
+    location: str
+    review_status: str
+    count_conflict_status: str
+    scope: str
+    images: list[EditionImage]
+    observations: list[EditionObservation]
+    unread_fields: list[str]
+    ju: int
+    required_observations: int
+    matching_current_observations: int
+    matching_selected_source_observations: int
+    yin_dun: bool
+    textual_lineage_independence_established: bool
+    whole_work_acceptance_passed: bool
+
+
 def edition_comparisons(
     yin: bool,
     ju: int,
     actual_values: Mapping[str, int | str],
     selected_values: Mapping[str, int | str],
     selected_literals: Mapping[str, str],
-) -> list[dict[str, object]]:
+) -> list[EditionComparison]:
     """Compare collated fields only; never fill unread fields from the engine."""
     row = next((r for r in ROWS if r.yin == yin and r.ju == ju), None)
     if row is None:
         return []
-    observations = [
+    else:
+        pass
+    observations: list[EditionObservation] = [
         {
             "field": field,
             "actual_value": actual_values[field],

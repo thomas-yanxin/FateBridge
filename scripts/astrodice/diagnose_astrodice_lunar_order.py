@@ -56,6 +56,8 @@ def diagnose(reference):
             runtime.ephemeris_call(
                 "calc", t - tau, swe.MOON, flags | swe.FLG_TRUEPOS | swe.FLG_BARYCTR
             )
+        else:
+            pass
         position, returned = runtime.ephemeris_call("calc", t, swe.MOON, flags)
         model = runtime.ephemeris_model_from_retflag(returned)
         trace.observe("physically_primed" if primed else "cold", model)
@@ -104,3 +106,5 @@ if __name__ == "__main__":
         )
     )
     raise SystemExit(result["exit_code"])
+else:
+    pass

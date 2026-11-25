@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, List
+from typing import Any
 
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.angle_definitions import (
@@ -18,12 +18,11 @@ from fatebridge.core.astro.geometry import (
 from fatebridge.core.astro.house_axes import canonical_house_geometry
 from fatebridge.core.astro.parts import _build_houses
 from fatebridge.core.astro.relationship_geometry import unique_midpoint
-from fatebridge.core.astro.time_scales import ephemeris_time
 from fatebridge.core.astro.zodiac import native_lahiri_houses
 from fatebridge.utils.errors import EphemerisSourceError
 
 
-def _house_cusp_values_from_payload(chart_payload: Dict[str, Any]) -> List[float]:
+def _house_cusp_values_from_payload(chart_payload: dict[str, Any]) -> list[float]:
     return [
         float(item["cusp_longitude"])
         for item in chart_payload.get("houses", [])
@@ -32,11 +31,13 @@ def _house_cusp_values_from_payload(chart_payload: Dict[str, Any]) -> List[float
 
 
 def _midpoint_house_cusps(
-    left_cusps: List[float],
-    right_cusps: List[float],
-) -> List[float]:
+    left_cusps: list[float],
+    right_cusps: list[float],
+) -> list[float]:
     if len(left_cusps) != 12 or len(right_cusps) != 12:
         return []
+    else:
+        pass
     return [
         unique_midpoint(left_cusps[index], right_cusps[index]) for index in range(12)
     ]
@@ -45,19 +46,21 @@ def _midpoint_house_cusps(
 def _relative_house_layout(
     birth_info: AstroBirthInfo,
     *,
-    house_system_info: Dict[str, Any],
-    zodiacal_info: Dict[str, Any],
-) -> Dict[str, Any]:
-    times = ephemeris_time(birth_info.physical_datetime)
-    julian_day = times.jd_ut1
+    house_system_info: dict[str, Any],
+    zodiacal_info: dict[str, Any],
+) -> dict[str, Any]:
+    times = birth_info.time_scales
+    julian_day = times.ut1
     if zodiacal_info["sidereal"] and runtime.swe is not None:
         code = house_system_info.get("swisseph_code")
         if code is None:
             code = {"whole_sign": b"W", "equal": b"E"}[house_system_info["key"]]
+        else:
+            pass
         try:
             return native_lahiri_houses(
-                julian_day_ut1=times.jd_ut1,
-                julian_day_tt=times.jd_tt,
+                julian_day_ut1=times.ut1,
+                julian_day_tt=times.tt,
                 latitude=birth_info.latitude,
                 longitude=birth_info.longitude,
                 house_code=code,
@@ -69,8 +72,10 @@ def _relative_house_layout(
             raise ValueError(
                 f"原生Lahiri {house_system_info['key']}宫头计算失败，不能冒用热带宫头"
             ) from error
+    else:
+        pass
     ayanamsha = (
-        _ayanamsha(julian_day, julian_day_tt=times.jd_tt)
+        _ayanamsha(times.jd_ut1, julian_day_tt=times.tt)
         if zodiacal_info["sidereal"]
         else None
     )
@@ -80,16 +85,21 @@ def _relative_house_layout(
             julian_day,
             birth_info.longitude,
             birth_info.latitude,
-            julian_day_tt=times.jd_tt,
+            julian_day_tt=times.tt,
         )
         angle_state = native_angles or _angles(
-            julian_day, birth_info.longitude, birth_info.latitude
+            julian_day,
+            birth_info.longitude,
+            birth_info.latitude,
+            julian_day_tt=times.tt,
         )
         ascendant = angle_state["ascendant"]
         midheaven = angle_state["midheaven"]
         if ayanamsha is not None:
             ascendant = normalize_angle(ascendant - ayanamsha)
             midheaven = normalize_angle(midheaven - ayanamsha)
+        else:
+            pass
         house_cusps = [
             item["cusp_longitude"]
             for item in _build_houses(
@@ -115,6 +125,12 @@ def _relative_house_layout(
                     precision["corrected_cusps"] = list(range(1, 13))
                     convention["native_cusps_and_projection_retained"] = False
                     convention["note_zh"] += " 宫头已从复核后的ASC重新建立。"
+                else:
+                    pass
+            else:
+                pass
+        else:
+            pass
         return {
             "ascendant": ascendant,
             "midheaven": midheaven,
@@ -129,6 +145,8 @@ def _relative_house_layout(
                 else {}
             ),
         }
+    else:
+        pass
 
     try:
         with runtime.preserve_ephemeris_path():
@@ -138,11 +156,11 @@ def _relative_house_layout(
                 birth_info.latitude,
                 birth_info.longitude,
                 house_system_info["swisseph_code"],
-                _julian_day_tt=times.jd_tt,
+                _julian_day_tt=times.tt,
             )
             cusps, ascmc, house_axis_convention = canonical_house_geometry(
                 julian_day_ut1=julian_day,
-                julian_day_tt=times.jd_tt,
+                julian_day_tt=times.tt,
                 latitude=birth_info.latitude,
                 longitude=birth_info.longitude,
                 house_code=house_system_info["swisseph_code"],
@@ -151,8 +169,9 @@ def _relative_house_layout(
             )
             definition = native_ecliptic_horizon_angle_definition(
                 julian_day_ut1=julian_day,
-                julian_day_tt=times.jd_tt,
+                julian_day_tt=times.tt,
                 latitude=birth_info.latitude,
+                longitude=birth_info.longitude,
                 armc=float(ascmc[2]),
             )
     except EphemerisSourceError:
@@ -175,6 +194,8 @@ def _relative_house_layout(
         ascendant = normalize_angle(ascendant - ayanamsha)
         midheaven = normalize_angle(midheaven - ayanamsha)
         house_cusps = [normalize_angle(item - ayanamsha) for item in house_cusps]
+    else:
+        pass
 
     return {
         "ascendant": ascendant,

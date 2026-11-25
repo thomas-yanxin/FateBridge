@@ -6,18 +6,17 @@ import hashlib
 import json
 from datetime import date
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 
 from fatebridge.services.metaphysics import (
     calculate_ziwei_birth,
     calculate_ziwei_horoscope,
 )
 from fatebridge.utils.birth_input import create_person_info
+from scripts.ziwei.audit_ziwei_calendar_coverage import HkoRowsReader
 
 
-def audit_clock_basis(
-    hko_reader: Callable[..., list[dict[str, Any]]], fixtures: Path
-) -> dict[str, Any]:
+def audit_clock_basis(hko_reader: HkoRowsReader, fixtures: Path) -> dict[str, Any]:
     manifest = json.loads((fixtures / "clock_manifest.json").read_text())
     sources = json.loads((fixtures / "calendar_manifest.json").read_text())["sources"]
     sources_by_year = {s["year"]: s for s in sources}
@@ -26,6 +25,8 @@ def audit_clock_basis(
         raw = (fixtures / source["path"]).read_bytes()
         if hashlib.sha256(raw).hexdigest() != source["sha256"]:
             raise ValueError("Clock source checksum mismatch: " + source["path"])
+        else:
+            pass
 
     def expected(label: str) -> dict[str, Any]:
         year = int(label[:4])
@@ -34,13 +35,19 @@ def audit_clock_basis(
             raw = (fixtures / source["path"]).read_bytes()
             if hashlib.sha256(raw).hexdigest() != source["sha256"]:
                 raise ValueError("HKO clock cell checksum mismatch")
+            else:
+                pass
             tables[year] = {
                 r["solar"].isoformat(): r
                 for r in hko_reader(raw.decode("utf-8-sig"), year)
             }
+        else:
+            pass
         r = tables[year][label]
         if r["month"] is None or r["is_leap"] is None:
             raise ValueError("Clock case needs a complete independent HKO cell")
+        else:
+            pass
         return dict(
             year=r["year"], month=r["month"], day=r["day"], is_leap_month=r["is_leap"]
         )
@@ -75,6 +82,8 @@ def audit_clock_basis(
                 differences.append(
                     dict(case=case["id"], profile=profile, checks=checks)
                 )
+            else:
+                pass
             receipts.append(dict(case=case["id"], profile=profile, checks=checks))
 
     # The physical civil endpoints determine age independently of the natal
@@ -112,6 +121,8 @@ def audit_clock_basis(
             differences.append(
                 dict(case="civil_age_boundary", profile=profile, checks=checks)
             )
+        else:
+            pass
     return {
         "method_id": manifest["schema_version"],
         "independent_input_cases": len(manifest["cases"]),

@@ -40,6 +40,8 @@ def main() -> None:
                     installed / source_path.relative_to(repository / "src/ichingpy")
                 ).read_bytes()
             )
+        else:
+            pass
     engine = icp.SixLinesDivinationEngine()
     rows = []
     spirit_rows = []
@@ -84,6 +86,8 @@ def main() -> None:
                         "spirits": [line.spirit.label for line in original.lines],
                     }
                 )
+        else:
+            pass
     assert len(rows) == 4096 and len(spirit_rows) == 640
     reference = {
         "schema": "liuyao-independent-reference.v1",
@@ -136,3 +140,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+else:
+    pass

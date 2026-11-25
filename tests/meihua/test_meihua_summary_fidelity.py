@@ -8,7 +8,9 @@ from tests.support.transports import SPECS
 
 @pytest.mark.parametrize("tool", ["meihua_cast", "meihua_analysis"])
 @pytest.mark.parametrize("view", [None, "reading"])
-def test_default_reading_view_contains_complete_qualification(tool, view):
+def test_default_reading_view_contains_complete_qualification(
+    tool: str, view: str | None
+) -> None:
     fields = suggested_fields(SPECS[tool], view=view)
     if tool == "meihua_analysis" and view is None:
         # The compact time card carries the exact combined qualification in
@@ -19,4 +21,6 @@ def test_default_reading_view_contains_complete_qualification(tool, view):
             for field in fields
         )
         fields = suggested_fields(SPECS[tool], view="reading")
+    else:
+        pass
     assert fields.count("interpretation.seasonal_qualification") == 1

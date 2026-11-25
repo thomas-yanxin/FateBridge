@@ -9,12 +9,11 @@ from __future__ import annotations
 
 from typing import Any
 
+from fatebridge.core.metaphysics.common import GUI_REN_SEQUENCE, sexagenary_index_for
+from fatebridge.core.metaphysics.liureng_life_stages import build_life_stages
+from fatebridge.core.metaphysics.ren_evidence import xun_dun_stems
 from fatebridge.core.metaphysics.ren_sources import TANYUAN_SCAN_SHA256, TANYUAN_SOURCE
-
-from ...utils.data import EARTHLY_BRANCHES
-from .common import GUI_REN_SEQUENCE, sexagenary_index_for
-from .liureng_life_stages import build_life_stages
-from .ren_evidence import xun_dun_stems
+from fatebridge.utils.data import EARTHLY_BRANCHES
 
 MONTH_ORDER = "寅卯辰巳午未申酉戌亥子丑"
 HEAVEN_DE = dict(
@@ -42,24 +41,34 @@ def build_auxiliary_stars(
 ) -> dict[str, Any]:
     if len(day_ganzhi) != 2:
         raise ValueError("德禄马需要有效日干支")
+    else:
+        pass
     try:
         sexagenary_index_for(day_ganzhi)
     except KeyError as exc:
         raise ValueError("德禄马需要有效日干支") from exc
     if month_branch not in MONTH_ORDER or len(month_branch) != 1:
         raise ValueError("德禄马需要有效月建")
+    else:
+        pass
     stages = build_life_stages(day_ganzhi[0], sky_by_earth)
     branches = set(EARTHLY_BRANCHES)
     if set(god_by_sky) != branches or set(god_by_sky.values()) != set(GUI_REN_SEQUENCE):
         raise ValueError("德禄马需要完整且不重复的天将对应")
+    else:
+        pass
     if (
         len(lessons) != 4
         or [l.get("index") for l in lessons] != [1, 2, 3, 4]
         or any(l.get("upper_branch") not in branches for l in lessons)
     ):
         raise ValueError("德禄马需要四课上神")
+    else:
+        pass
     if len(transmissions) != 3 or any(t not in branches for t in transmissions):
         raise ValueError("德禄马需要完整三传")
+    else:
+        pass
     stem, day_branch = day_ganzhi[0], day_ganzhi[1]
     earth_by_sky = {sky: earth for earth, sky in sky_by_earth.items()}
     dun = xun_dun_stems(day_ganzhi)

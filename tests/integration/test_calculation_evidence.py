@@ -4,35 +4,64 @@ import asyncio
 import json
 from fractions import Fraction
 from pathlib import Path
+from typing import NoReturn
+from urllib.parse import urlsplit
 
 import pytest
 from fastapi.testclient import TestClient
 from fastmcp import Client
-from pydantic import ValidationError
+from fastmcp.client.client import CallToolResult
+from pydantic import JsonValue, ValidationError
 
+import fatebridge.api as api
+import fatebridge.application.result_delivery as delivery
 from fatebridge.application.execution import execute_tool
+from fatebridge.application.projection import project_fields
+from fatebridge.application.result_delivery import ResultStore, bound_response
+from fatebridge.cli import run
 from fatebridge.core.error_budget import (
     CombinedBound,
     ErrorComponent,
+    ErrorStatus,
+    ErrorUnit,
     circular_sector_candidates,
     combine_bounds,
     declared_error_budget,
 )
-from fatebridge.core.evidence_graph import (
+from fatebridge.core.execution_context import ExecutionOptions
+from fatebridge.core.method_contracts import MethodContract
+from fatebridge.mcp_server import app
+from fatebridge.services.tool_catalog import CATALOG
+from fatebridge.utils.json_digest import digest
+from tests.fixtures.surface_payloads import REST_POST_CASES
+from tests.support.transports import call_calculation
+from validation import evidence_graph
+from validation.evidence_graph import (
     EvidenceEdge,
     EvidenceGraph,
     affected_nodes,
     execution_evidence,
     shared_input_origins,
 )
-from fatebridge.core.method_contracts import COMPATIBILITY_INDEX
-from fatebridge.services.method_registration import EXCLUDED_TOOLS
-from fatebridge.services.tool_catalog import CATALOG
-from fatebridge.utils.json_digest import digest
-from tests.fixtures.surface_payloads import REST_POST_CASES
+
+DEPENDENCY_METHOD = MethodContract(
+    method_id="test.dependency.v1",
+    output_paths=("summary.score",),
+    quantity_kind="integer",
+    unit="count",
+    prerequisites=(),
+    dependencies=(),
+    comparison_requirements=(),
+    limitations=(),
+)
 
 
-def component(name, interval, unit="seconds", status="bounded"):
+def component(
+    name: str,
+    interval: tuple[float, float] | None,
+    unit: ErrorUnit = "seconds",
+    status: ErrorStatus = "bounded",
+) -> ErrorComponent:
     return ErrorComponent(
         component_id=name,
         source=name,
@@ -44,7 +73,7 @@ def component(name, interval, unit="seconds", status="bounded"):
     )
 
 
-def test_error_budget_keeps_unknowns_units_and_correlated_sources_distinct():
+def test_error_budget_keeps_unknowns_units_and_correlated_sources_distinct() -> None:
     with pytest.raises(ValidationError):
         CombinedBound(
             unit="degrees", status="bounded", interval=None, unresolved_components=()
@@ -72,7 +101,7 @@ def test_error_budget_keeps_unknowns_units_and_correlated_sources_distinct():
         combine_bounds((values[0], values[0]), "seconds")
 
 
-def test_interval_addition_rounds_outward_and_declared_range_is_conditional():
+def test_interval_addition_rounds_outward_and_declared_range_is_conditional() -> None:
     # In binary64, .1+.2 rounds above the exact sum of the stored operands.
     result = combine_bounds(
         (component("a", (0.1, 0.1)), component("b", (0.2, 0.2))), "seconds"
@@ -96,12 +125,14 @@ def test_interval_addition_rounds_outward_and_declared_range_is_conditional():
         ("bounded", (0, float("inf"))),
     ],
 )
-def test_unknowns_cannot_be_encoded_as_a_zero_bound(status, interval):
+def test_unknowns_cannot_be_encoded_as_a_zero_bound(
+    status: ErrorStatus, interval: tuple[float, float] | None
+) -> None:
     with pytest.raises(ValidationError):
         component("bad", interval, status=status)
 
 
-def test_input_precision_and_root_residual_do_not_certify_physical_accuracy():
+def test_input_precision_and_root_residual_do_not_certify_physical_accuracy() -> None:
     budget = declared_error_budget(
         ("civil_clock", "ephemeris_model", "numerical_solver"),
         {"birth_minute": 0},
@@ -131,7 +162,25 @@ def test_input_precision_and_root_residual_do_not_certify_physical_accuracy():
     assert Fraction(fractional[1]) >= exact_radius
 
 
-def test_continuous_angular_interval_covers_wrap_and_exact_sector_boundaries():
+@pytest.mark.parametrize("basis", ["local_mean_solar", "local_apparent_solar"])
+def test_recorded_solar_range_does_not_declare_civil_elapsed_seconds(
+    basis: str,
+) -> None:
+    budget = declared_error_budget(
+        ("civil_clock", "solar_clock"),
+        {"birth_clock_basis": basis, "birth_time_uncertainty_minutes": 1.0},
+        "origin",
+    )
+    civil = next(
+        entry for entry in budget["components"] if entry["source"] == "civil_clock"
+    )
+    assert civil["status"] == "unquantified"
+    assert civil["interval"] is None
+    assert civil["evidence_paths"] == []
+    assert budget["source_bounds_by_unit"][0]["interval"] is None
+
+
+def test_continuous_angular_interval_covers_wrap_and_exact_sector_boundaries() -> None:
     bounds = combine_bounds((component("sky", (-1, 1), "degrees"),), "degrees")
     assert circular_sector_candidates(0, bounds, 12) == (0, 11)
     assert circular_sector_candidates(30, bounds, 12) == (0, 1)
@@ -143,13 +192,15 @@ def test_continuous_angular_interval_covers_wrap_and_exact_sector_boundaries():
     assert circular_sector_candidates(40, unknown, 27) is None
 
 
-def test_execution_graph_binds_all_facts_preserves_partial_and_detects_bad_links():
+def test_execution_graph_binds_all_facts_preserves_partial_and_detects_bad_links() -> (
+    None
+):
     payload = {
         "summary": {"status": "partial", "score": 60},
         "detail": {"status": "conditional", "method_id": "test.source.v2", "empty": []},
     }
     value = execution_evidence(
-        (COMPATIBILITY_INDEX,), {"birth_year": 1990}, payload, "input-hash"
+        (DEPENDENCY_METHOD,), {"birth_year": 1990}, payload, "input-hash"
     )
     graph = EvidenceGraph.model_validate(value["graph"])
     assert graph.business_output_sha256 == digest(payload)
@@ -181,7 +232,7 @@ def test_execution_graph_binds_all_facts_preserves_partial_and_detects_bad_links
         EvidenceGraph.model_validate(cyclic)
 
 
-def test_evidence_paths_distinguish_literal_keys_from_nested_fields():
+def test_evidence_paths_distinguish_literal_keys_from_nested_fields() -> None:
     payload = {
         "basis": {
             "a.b": {"status": "literal-dot"},
@@ -190,7 +241,7 @@ def test_evidence_paths_distinguish_literal_keys_from_nested_fields():
             "a": {"b": {"status": "nested"}},
         }
     }
-    evidence = execution_evidence((COMPATIBILITY_INDEX,), {}, payload, "input")
+    evidence = execution_evidence((), {}, payload, "input")
     graph = EvidenceGraph.model_validate(evidence["graph"])
     assert {node.path for node in graph.nodes if node.kind == "rule_witness"} == {
         "/basis/a.b",
@@ -201,13 +252,17 @@ def test_evidence_paths_distinguish_literal_keys_from_nested_fields():
     for node in graph.nodes:
         if node.kind not in {"result", "rule_witness"}:
             continue
+        else:
+            pass
         value = payload
         for token in node.path[1:].split("/"):
             value = value[token.replace("~1", "/").replace("~0", "~")]
         assert node.value_sha256 == digest(value)
 
 
-def test_existing_rule_ledger_links_are_resolved_and_ambiguous_ids_stay_unknown():
+def test_existing_rule_ledger_links_are_resolved_and_ambiguous_ids_stay_unknown() -> (
+    None
+):
     ledger = {
         "ledger": {
             "nodes": [{"id": "birth_day", "value": "甲子"}],
@@ -222,7 +277,7 @@ def test_existing_rule_ledger_links_are_resolved_and_ambiguous_ids_stay_unknown(
         }
     }
     result = execution_evidence(
-        (COMPATIBILITY_INDEX,),
+        (),
         {"birth_minute": 0, "gender": None},
         ledger,
         "origin",
@@ -243,13 +298,15 @@ def test_existing_rule_ledger_links_are_resolved_and_ambiguous_ids_stay_unknown(
     assert "/ledger/rules/0" in graph.resolved_rule_dependencies
     ledger["ledger"]["nodes"].append({"id": "birth_day", "value": "乙丑"})
     ambiguous = EvidenceGraph.model_validate(
-        execution_evidence((COMPATIBILITY_INDEX,), {}, ledger, "origin")["graph"]
+        execution_evidence((), {}, ledger, "origin")["graph"]
     )
     assert "/ledger/rules/0" in ambiguous.unresolved_rule_dependencies
     assert not any(e.relation == "rule_input_witness" for e in ambiguous.edges)
 
 
-def test_standalone_resolution_policies_and_named_rule_dependencies_are_retained():
+def test_standalone_resolution_policies_and_named_rule_dependencies_are_retained() -> (
+    None
+):
     payload = {
         "basis": {
             "policy": {"resolution_policy": "keep_unresolved.v1"},
@@ -257,7 +314,7 @@ def test_standalone_resolution_policies_and_named_rule_dependencies_are_retained
             "conclusion": {"status": "partial", "depends_on": ["source.only.rule"]},
         }
     }
-    value = execution_evidence((COMPATIBILITY_INDEX,), {}, payload, "origin")
+    value = execution_evidence((), {}, payload, "origin")
     graph = EvidenceGraph.model_validate(value["graph"])
     assert graph.runtime_method_ids == ("keep_unresolved.v1",)
     assert "/basis/conclusion" in graph.resolved_rule_dependencies
@@ -269,17 +326,26 @@ def test_standalone_resolution_policies_and_named_rule_dependencies_are_retained
     )
 
 
-def test_all_in_scope_catalog_methods_have_real_sources_and_exclusions_stay_explicit():
+def test_all_catalog_methods_have_real_sources() -> None:
     root = Path(__file__).resolve().parents[2]
     for spec in CATALOG:
-        if spec.key in EXCLUDED_TOOLS:
-            assert not spec.methods
-            continue
         assert spec.methods, spec.key
         assert len({m.method_id for m in spec.methods}) == len(spec.methods)
         for method in spec.methods:
-            for path in (*method.implementation_refs, *method.source_refs):
+            for path in method.implementation_refs:
                 assert (root / path).is_file(), (spec.key, path)
+            assert method.source_refs, (spec.key, method.method_id)
+            for source in method.source_refs:
+                parsed = urlsplit(source)
+                if parsed.scheme:
+                    assert (
+                        parsed.scheme == "https" and parsed.hostname and parsed.path
+                    ), (
+                        spec.key,
+                        source,
+                    )
+                else:
+                    assert (root / source).is_file(), (spec.key, source)
             assert (
                 method.as_manifest()["validation_scope"]["real_world_validity"]
                 == "not_established"
@@ -287,12 +353,22 @@ def test_all_in_scope_catalog_methods_have_real_sources_and_exclusions_stay_expl
 
 
 def test_evidence_and_unknown_error_budget_are_equal_on_real_transports(
-    monkeypatch, capsys
-):
-    import fatebridge.api as api
-    from fatebridge.cli import run
-    from fatebridge.mcp_server import app
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """Return equal audit evidence without building the offline evidence graph."""
 
+    def unexpected_graph(
+        methods: tuple[MethodContract, ...],
+        inputs: dict[str, JsonValue],
+        payload: dict[str, JsonValue],
+        input_sha256: str,
+        supplied_fields: frozenset[str] | None = None,
+        generated_fields: frozenset[str] = frozenset(),
+        runtime_subtree_sha256: str | None = None,
+    ) -> NoReturn:
+        pytest.fail("Public execution built an offline evidence graph")
+
+    monkeypatch.setattr(evidence_graph, "execution_evidence", unexpected_graph)
     monkeypatch.setattr(
         api,
         "API_KEY_AUTHENTICATOR",
@@ -300,12 +376,16 @@ def test_evidence_and_unknown_error_budget_are_equal_on_real_transports(
     )
     spec = next(s for s in CATALOG if s.key == "qimen")
     inputs = REST_POST_CASES[spec.rest_path]()
-    response = TestClient(api.app).post(spec.rest_path, json=inputs)
-    args = [spec.tool_name, "--response-char-limit", "0"]
+    response = TestClient(api.app).post(
+        spec.rest_path, json=inputs, params={"detail": "audit"}
+    )
+    args = [spec.tool_name, "--detail", "audit", "--response-char-limit", "0"]
     for key, value in inputs.items():
         if isinstance(value, list):
             args += ["--" + key.replace("_", "-"), *map(str, value)]
             continue
+        else:
+            pass
         args += [
             "--" + key.replace("_", "-"),
             (
@@ -317,10 +397,12 @@ def test_evidence_and_unknown_error_budget_are_equal_on_real_transports(
     assert run(args) == 0
     local = json.loads(capsys.readouterr().out)
 
-    async def call():
+    async def call() -> CallToolResult:
         async with Client(app) as client:
-            return await client.call_tool(
-                spec.tool_name, {**inputs, "response_char_limit": 0}
+            return await call_calculation(
+                client,
+                spec.tool_name,
+                {**inputs, "detail": "audit", "response_char_limit": 0},
             )
 
     protocol = asyncio.run(call())
@@ -330,31 +412,31 @@ def test_evidence_and_unknown_error_budget_are_equal_on_real_transports(
         for r in (response.json(), local, protocol.structured_content)
     ]
     assert evidence[0] == evidence[1] == evidence[2]
-    graph = evidence[0]["graph"]
-    node_ids = {node["node_id"] for node in graph["nodes"]}
-    assert "environment:runtime" in node_ids
-    assert len(node_ids) == len(graph["nodes"])
-    assert all(
-        edge["source"] in node_ids and edge["target"] in node_ids
-        for edge in graph["edges"]
-    )
-    assert graph["unresolved_rule_dependencies"]
-    assert all("value_sha256" not in node for node in graph["nodes"])
+    assert set(evidence[0]) == {"registered_methods", "error_budget"}
+    assert evidence[0]["registered_methods"] == [
+        method.as_manifest() for method in spec.methods
+    ]
+    provenance = [
+        r["run_metadata"]["provenance"]
+        for r in (response.json(), local, protocol.structured_content)
+    ]
+    assert provenance[0] == provenance[1] == provenance[2]
     assert evidence[0]["error_budget"]["output_error_bounds"] is None
 
 
-def test_large_evidence_remains_available_in_same_run(monkeypatch, tmp_path):
-    import fatebridge.application.result_delivery as delivery
-    from fatebridge.application.projection import project_fields
-    from fatebridge.application.result_delivery import ResultStore, bound_response
-
+def test_large_evidence_remains_available_in_same_run(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """Fetch deferred evidence using the original run's verified result pages."""
     monkeypatch.setattr(delivery, "RESULT_STORE", ResultStore(tmp_path / "private"))
     spec = next(s for s in CATALOG if s.key == "qimen")
     request = spec.request_model.model_validate(REST_POST_CASES[spec.rest_path]())
-    result = execute_tool(spec, request)
+    default_result = execute_tool(spec, request)
+    assert "calculation_evidence" not in default_result["run_metadata"]
+    result = execute_tool(spec, request, options=ExecutionOptions(detail="audit"))
     selected = project_fields(
         result,
-        fields=["qimen.dun_type", "qimen.ju_number"],
+        fields=["qimen"],
         strict_fields=True,
     )
     bounded = bound_response(selected, 4096)
@@ -363,22 +445,21 @@ def test_large_evidence_remains_available_in_same_run(monkeypatch, tmp_path):
         "run_metadata.calculation_evidence"
         in bounded["result_delivery"]["deferred_fields"]
     )
-    restored = delivery.RESULT_STORE.page(
+    run_id = result["run_metadata"]["run_id"]
+    restored = delivery.RESULT_STORE.verified_page(
         bounded["result_delivery"]["result_id"],
+        run_id,
         path="run_metadata.calculation_evidence",
     )
     pieces = [restored["text"]]
     while restored["next_offset"] is not None:
-        restored = delivery.RESULT_STORE.page(
+        restored = delivery.RESULT_STORE.verified_page(
             bounded["result_delivery"]["result_id"],
+            run_id,
             offset=restored["next_offset"],
             path="run_metadata.calculation_evidence",
         )
         pieces.append(restored["text"])
     evidence = json.loads("".join(pieces))
     assert evidence == result["run_metadata"]["calculation_evidence"]
-    assert (
-        evidence["coverage"]
-        == bounded["run_metadata"]["calculation_evidence"]["coverage"]
-    )
-    assert "business_output_sha256" not in evidence["graph"]
+    assert restored["verification"]["run_id"] == run_id

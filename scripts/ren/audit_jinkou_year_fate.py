@@ -26,11 +26,17 @@ def references() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
         folder = ROOT / "tests/fixtures" / name
         if sha(folder / "freeze.json") != digest:
             raise ValueError("Frozen year-fate manifest changed")
+        else:
+            pass
         inventory = json.loads((folder / "freeze.json").read_text())["files"]
         if {p.name for p in folder.iterdir()} != set(inventory) | {"freeze.json"}:
             raise ValueError("Frozen year-fate inventory changed")
+        else:
+            pass
         if any(sha(folder / n) != h for n, h in inventory.items()):
             raise ValueError("Frozen year-fate source changed")
+        else:
+            pass
         out.append(json.loads((folder / "reference.json").read_text()))
     return out[0], out[1], out[2]
 
@@ -51,15 +57,15 @@ def audit() -> dict[str, Any]:
         "src/fatebridge/core/metaphysics/jinkou.py",
         "src/fatebridge/core/metaphysics/ren_evidence.py",
         "src/fatebridge/services/metaphysics.py",
-        "src/fatebridge/core/output_chinese.py",
+        "src/fatebridge/core/contracts/output_chinese.py",
         "src/fatebridge/core/requests/metaphysics.py",
         "scripts/ren/audit_jinkou_year_fate.py",
     ]
     names.extend(
         [
             "src/fatebridge/core/metaphysics/jinkou_relations.py",
-            "src/fatebridge/core/output_jinkou_natal.py",
-            "src/fatebridge/core/output_ren_anchors.py",
+            "src/fatebridge/core/contracts/output_jinkou_natal.py",
+            "src/fatebridge/core/contracts/output_ren_anchors.py",
             "src/fatebridge/data/agent_examples.json",
             "scripts/audit_ren_golden_evidence.py",
         ]

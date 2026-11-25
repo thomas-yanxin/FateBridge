@@ -10,7 +10,7 @@ from pathlib import Path
 import pytest
 
 import fatebridge.application.execution as execution
-from fatebridge.core.output_bazi_anchors import (
+from fatebridge.core.contracts.output_bazi_anchors import (
     require_complete_bazi_anchors,
 )
 from tests.support.transports import AS_OF, SPECS, business, call_cli, native
@@ -62,7 +62,9 @@ def baseline():
 
 @pytest.mark.parametrize("tool", TOOLS)
 @pytest.mark.parametrize("fault", ["absent", "empty", "null_leaf"])
-def test_current_full_results_require_independent_physical_anchors(tool, fault):
+def test_current_full_results_require_independent_physical_anchors(
+    tool, fault: str
+) -> None:
     value = deepcopy(base(tool)["result"])
     if tool == "analyze_destiny":
         owner, field, leaf = value, "day_master", "stem"
@@ -81,7 +83,7 @@ def test_current_full_results_require_independent_physical_anchors(tool, fault):
         execution.validate_output(SPECS[tool], value)
 
 
-def test_partial_and_historical_models_are_not_made_full_execution_models():
+def test_partial_and_historical_models_are_not_made_full_execution_models() -> None:
     for tool in TOOLS:
         spec = SPECS[tool]
         spec.output_model.model_validate({})
@@ -91,13 +93,17 @@ def test_partial_and_historical_models_are_not_made_full_execution_models():
             execution.validate_output(spec, partial)
 
 
-def test_supported_unknowns_and_empty_observations_survive_complete_validation():
+def test_supported_unknowns_and_empty_observations_survive_complete_validation() -> (
+    None
+):
     for row in baseline()["rows"]:
         execution.validate_output(SPECS[row["tool"]], row["result"])
         if row["tool"] == "bazi_marriage" and row["variant"] == "unknown_gender":
             value = row["result"]["marriage_analysis"]
             assert value["marriage_quality"]["score"] is None
             assert set(value["spouse_star"]["alternatives"]) == {"male", "female"}
+        else:
+            pass
         if row["variant"] == "manual_timing":
             ctx = row["result"][row["tool"].removeprefix("bazi_") + "_analysis"][
                 "timing_context"
@@ -106,6 +112,8 @@ def test_supported_unknowns_and_empty_observations_survive_complete_validation()
                 ctx["source"] == "explicit_pillar_overrides"
                 and "analysis_datetime" not in ctx
             )
+        else:
+            pass
         if row["tool"] == "analyze_destiny" and row["variant"].startswith(
             "solar_cross_"
         ):
@@ -114,9 +122,11 @@ def test_supported_unknowns_and_empty_observations_survive_complete_validation()
                 ctx["lunar_calendar"] is None
                 and ctx["lunar_calendar_support"]["supported"] is False
             )
+        else:
+            pass
 
 
-def test_error_envelopes_and_other_domain_guards_keep_their_own_contract():
+def test_error_envelopes_and_other_domain_guards_keep_their_own_contract() -> None:
     for tool in TOOLS:
         malformed = {"error": "无效输入", "error_code": "validation_error"}
         with pytest.raises(execution.OutputContractError):
@@ -128,7 +138,9 @@ def test_error_envelopes_and_other_domain_guards_keep_their_own_contract():
     require_complete_bazi_anchors("sixyao", {})
 
 
-def test_full_output_guard_never_calls_any_birth_or_strength_solver(monkeypatch):
+def test_full_output_guard_never_calls_any_birth_or_strength_solver(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     import fatebridge.services.birth_context as context
     from fatebridge.core.elements import ElementAnalysis
 
@@ -151,15 +163,19 @@ def base(tool):
 def projection(tool):
     if tool == "analyze_destiny":
         return "day_master.stem"
+    else:
+        pass
     if tool == "bazi_birth":
         return "bazi_birth.four_pillars.day.stem"
+    else:
+        pass
     return tool.removeprefix("bazi_") + "_analysis.evidence_chain.method_id"
 
 
 @pytest.mark.parametrize("tool", TOOLS)
 def test_actual_supported_surfaces_preserve_healthy_partial_projection(
-    tool, rest, tmp_path, capsys
-):
+    tool, rest, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     spec = SPECS[tool]
     payload = base(tool)["arguments"]
     path = projection(tool)
@@ -199,8 +215,12 @@ def test_actual_supported_surfaces_preserve_healthy_partial_projection(
 
 @pytest.mark.parametrize("tool", TOOLS)
 def test_all_supported_surfaces_reject_empty_complete_business_before_projection(
-    tool, rest, monkeypatch, tmp_path, capsys
-):
+    tool,
+    rest,
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     spec = SPECS[tool]
     payload = base(tool)["arguments"]
     path = projection(tool)
@@ -210,6 +230,8 @@ def test_all_supported_surfaces_reject_empty_complete_business_before_projection
     def corrupt(actual, parsed):
         if actual.key == tool:
             actual = replace(actual, bind=lambda _: (lambda: deepcopy(bad), (), {}))
+        else:
+            pass
         return original(actual, parsed)
 
     monkeypatch.setattr(execution, "execute_spec", corrupt)
@@ -236,3 +258,5 @@ def test_all_supported_surfaces_reject_empty_complete_business_before_projection
     if spec.rest_path is not None:
         http = rest.post(spec.rest_path, json=payload, params=opts)
         assert http.status_code == 500 and http.json()["error_code"] == "internal_error"
+    else:
+        pass

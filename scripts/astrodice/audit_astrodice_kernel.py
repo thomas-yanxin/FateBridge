@@ -24,6 +24,8 @@ def validate_reference(protocol, fixture):
     names = [r["body"] for r in references]
     if len(names) != len(set(names)) or set(names) != set(protocol["targets"]):
         raise ValueError("Reference body coverage differs from frozen protocol")
+    else:
+        pass
     for reference in references:
         raw = reference["raw_response_utf8"]
         if (
@@ -31,14 +33,20 @@ def validate_reference(protocol, fixture):
             or json.loads(raw) != reference["response"]
         ):
             raise ValueError("Raw reference response mismatch")
+        else:
+            pass
         text = reference["response"]["result"]
         if hashlib.sha256(text.encode()).hexdigest() != reference["result_sha256"]:
             raise ValueError("Raw reference result hash mismatch")
+        else:
+            pass
         if (
             reference["target_id"] != protocol["targets"][reference["body"]]
             or reference["parameters"]["COMMAND"] != f"'{reference['target_id']}'"
         ):
             raise ValueError("Reference target identity mismatch")
+        else:
+            pass
         for key, value in {
             "TIME_TYPE": "'TT'",
             "REF_SYSTEM": "'ICRF'",
@@ -49,6 +57,8 @@ def validate_reference(protocol, fixture):
         }.items():
             if reference["parameters"][key] != value:
                 raise ValueError("Reference frame/time/correction mismatch")
+            else:
+                pass
         # Horizons reports the zero-satellite Mercury/Venus barycenter aliases
         # with IDs 199/299 even when explicitly requested as 1/2.
         header_target = {1: 199, 2: 299}.get(
@@ -60,6 +70,8 @@ def validate_reference(protocol, fixture):
         header_number = re.search(r"\((\d+)\)", target_line)
         if header_number is None or header_number.group(1) != str(header_target):
             raise ValueError("Reference returned target header mismatch")
+        else:
+            pass
         if not all(
             x in text
             for x in [
@@ -69,6 +81,8 @@ def validate_reference(protocol, fixture):
             ]
         ):
             raise ValueError("Reference header mismatch")
+        else:
+            pass
         available = [r["date_tt"] for r in reference["rows"]]
         missing = [r["date_tt"] for r in reference["unavailable_requested_epochs"]]
         expected = protocol["dates_tt"] + protocol["supplemental_dates_tt"]
@@ -79,11 +93,15 @@ def validate_reference(protocol, fixture):
             or set(available) | set(missing) != set(expected)
         ):
             raise ValueError("Reference epoch coverage differs from frozen protocol")
+        else:
+            pass
         table = list(
             csv.reader(io.StringIO(text.split("$$SOE\n", 1)[1].split("$$EOE", 1)[0]))
         )
         if len(table) != len(reference["rows"]):
             raise ValueError("Parsed reference row coverage mismatch")
+        else:
+            pass
         for parsed, row in zip(reference["rows"], table):
             value = datetime.fromisoformat(parsed["date_tt"])
             jd = (
@@ -98,6 +116,8 @@ def validate_reference(protocol, fixture):
                 or parsed["velocity_au_per_day"] != list(map(float, row[5:8]))
             ):
                 raise ValueError("Parsed reference values differ from raw JPL rows")
+            else:
+                pass
         if missing:
             failed = reference["failed_original_request"]
             if (
@@ -107,6 +127,8 @@ def validate_reference(protocol, fixture):
                 or json.loads(failed["raw_response_utf8"]) != failed["response"]
             ):
                 raise ValueError("Missing-epoch evidence mismatch")
+            else:
+                pass
             error = failed["response"].get(
                 "error", failed["response"].get("result", "")
             )
@@ -118,6 +140,10 @@ def validate_reference(protocol, fixture):
                 or "No ephemeris" not in error
             ):
                 raise ValueError("Missing-epoch reason mismatch")
+            else:
+                pass
+        else:
+            pass
 
 
 def angular_error_arcsec(actual, expected):
@@ -135,6 +161,8 @@ def direction_derivative(position, velocity):
     radius = math.hypot(*position)
     if radius <= 0 or not math.isfinite(radius):
         raise ValueError("Invalid direction derivative radius")
+    else:
+        pass
     unit = [x / radius for x in position]
     radial = math.fsum(a * b for a, b in zip(unit, velocity))
     return [(v - u * radial) / radius for u, v in zip(unit, velocity)]
@@ -153,6 +181,8 @@ def velocity_diagnostics(values, returned, reference_row, protocol, speed_flag):
         expected = reference_row["velocity_au_per_day"]
         if len(expected) != 3 or not all(math.isfinite(v) for v in expected):
             raise ValueError("Invalid reference velocity")
+        else:
+            pass
         component = max(abs(a - b) for a, b in zip(actual, expected))
         actual_rate = direction_derivative(values[:3], actual)
         expected_rate = direction_derivative(reference_row["position_au"], expected)
@@ -194,9 +224,15 @@ def audit(protocol, fixture, *, expected_model="swieph", velocity_protocol=None)
             )
         ):
             raise ValueError("Velocity protocol identity or thresholds are invalid")
+        else:
+            pass
+    else:
+        pass
     swe = runtime.swe
     if swe is None:
         raise RuntimeError("This integration audit requires Swiss Ephemeris")
+    else:
+        pass
     flags = (
         swe.FLG_SWIEPH
         | swe.FLG_J2000
@@ -254,6 +290,8 @@ def audit(protocol, fixture, *, expected_model="swieph", velocity_protocol=None)
                     case["passes_available_numeric_check"] = (
                         case["passes_position_check"] and case["passes_velocity_check"]
                     )
+                else:
+                    pass
                 path, start, end, denum = swe.get_current_file_data(
                     1 if body == "Moon" and model != "jpl" else 0
                 )
@@ -265,6 +303,8 @@ def audit(protocol, fixture, *, expected_model="swieph", velocity_protocol=None)
                             start = header["start_julian_day_tdb"]
                             end = header["end_julian_day_tdb"]
                             denum = header["de_number"]
+                        else:
+                            pass
                         digest = hashlib.sha256()
                         with file.open("rb") as source:
                             for chunk in iter(lambda: source.read(1024 * 1024), b""):
@@ -279,8 +319,14 @@ def audit(protocol, fixture, *, expected_model="swieph", velocity_protocol=None)
                             "sha256": digest.hexdigest(),
                             "observed_bodies": [],
                         }
+                    else:
+                        pass
                     if body not in files[path]["observed_bodies"]:
                         files[path]["observed_bodies"].append(body)
+                    else:
+                        pass
+                else:
+                    pass
     failed = [c for c in cases if not c["passes_available_numeric_check"]]
     result = {
         "platform": platform.platform(),
@@ -340,6 +386,8 @@ def audit(protocol, fixture, *, expected_model="swieph", velocity_protocol=None)
                 ),
             }
         )
+    else:
+        pass
     return result
 
 
@@ -375,6 +423,8 @@ def main():
             velocity_protocol["reference_fixture_sha256"]
             == hashlib.sha256(args.reference.read_bytes()).hexdigest()
         )
+    else:
+        pass
     result = audit(
         json.loads(args.protocol.read_text()),
         fixture,
@@ -385,6 +435,8 @@ def main():
         result["velocity_protocol_sha256"] = hashlib.sha256(
             args.velocity_protocol.read_bytes()
         ).hexdigest()
+    else:
+        pass
     result["reference_sha256"] = hashlib.sha256(args.reference.read_bytes()).hexdigest()
     args.output.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n")
     print(
@@ -411,3 +463,5 @@ def main():
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

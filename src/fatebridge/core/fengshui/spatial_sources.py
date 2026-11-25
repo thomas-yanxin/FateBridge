@@ -6,7 +6,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict
 
-from .spatial_angles import CompassDirection
+from fatebridge.core.fengshui.spatial_angles import CompassDirection
 
 
 class RegisteredSource(BaseModel):

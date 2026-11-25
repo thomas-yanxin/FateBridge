@@ -73,12 +73,16 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
     }
     if not required <= {s["file"] for s in manifest["source_files"]}:
         raise ValueError("独立门表、课例及冲突底图不得移除")
+    else:
+        pass
     for item in manifest["source_files"]:
         if (
             hashlib.sha256((corpus / item["file"]).read_bytes()).hexdigest()
             != item["sha256"]
         ):
             raise ValueError("冻结门法参照指纹不符：" + item["file"])
+        else:
+            pass
     anchors = json.loads((corpus / "gate-anchors.json").read_text())["cases"]
     if (
         len(anchors) != 18
@@ -90,6 +94,8 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
         )
     ):
         raise ValueError("门表必须完整保留18行及纪年、干支、直门字段")
+    else:
+        pass
     anchor_diffs = []
     anchor_results = []
     unevaluated = []
@@ -111,6 +117,8 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
                 }
             )
             continue
+        else:
+            pass
         actual = {
             "duty_gate": gate_cycle(3361 + year - 724)["duty_gate"],
             "ganzhi": "甲乙丙丁戊己庚辛壬癸"[(year - 4) % 10]
@@ -129,6 +137,8 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
                         "note": case["note"],
                     }
                 )
+            else:
+                pass
         anchor_results.append({"id": case["id"], "actual": actual})
     cases = json.loads((corpus / "worked-cases.json").read_text())["cases"]
     if (
@@ -137,6 +147,8 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
         or any(set(c["expected"]) != CASE_FIELDS[c["id"]] for c in cases)
     ):
         raise ValueError("必须保留4条课例及所有已冻结字段，不能删除未通过读数")
+    else:
+        pass
     worked_diffs = []
     results = []
     checked = 0
@@ -174,6 +186,8 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
                             "note": case.get("note", ""),
                         }
                     )
+                else:
+                    pass
         results.append(
             {"id": case["id"], "actual": {k: actual[k] for k in case["expected"]}}
         )

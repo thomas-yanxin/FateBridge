@@ -8,8 +8,10 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+from fatebridge.core.almanac import localize_datetime
 from fatebridge.core.metaphysics.common import MetaphysicsSeed
 from fatebridge.core.metaphysics.ziwei import build_ziwei_chart
+from fatebridge.utils.civil_time import NominalClockLabel
 
 ROOT = Path(__file__).resolve().parents[2]
 FIXTURES = ROOT / "tests/data/ziwei_independent"
@@ -19,9 +21,10 @@ STEMS = "甲乙丙丁戊己庚辛壬癸"
 
 def _seed(year: int, month: int, day: int, hour: str, leap: bool) -> MetaphysicsSeed:
     """Synthetic lunar domain input; not a civil-date conversion claim."""
+
     return MetaphysicsSeed(
-        input_datetime=datetime(year, 1, 1),
-        corrected_datetime=datetime(year, 1, 1),
+        input_datetime=localize_datetime(datetime(year, 1, 1), "Asia/Shanghai"),
+        clock=NominalClockLabel.from_local_datetime(datetime(year, 1, 1)),
         timezone="Asia/Shanghai",
         longitude=None,
         applied_true_solar=False,
@@ -35,6 +38,7 @@ def _seed(year: int, month: int, day: int, hour: str, leap: bool) -> Metaphysics
                 "is_leap_month": leap,
             }
         },
+        input_offset_visible=False,
     )
 
 
@@ -81,6 +85,8 @@ def audit_prerequisites(fixtures: Path = FIXTURES) -> dict[str, Any]:
             raise ValueError(
                 f"Ming prerequisite source checksum mismatch: {item['path']}"
             )
+        else:
+            pass
     source = json.loads((directory / "collation.json").read_text())
     reference = directory / source["bureau_numbers"]["reference"]
     if (
@@ -88,9 +94,13 @@ def audit_prerequisites(fixtures: Path = FIXTURES) -> dict[str, Any]:
         != source["bureau_numbers"]["reference_sha256"]
     ):
         raise ValueError("Ming prerequisite bureau-heading reference changed")
+    else:
+        pass
     headings = json.loads(reference.read_text())
     if sorted(t["bureau"] for t in headings["tables"]) != [2, 3, 4, 5, 6]:
         raise ValueError("Ming prerequisite bureau-heading coverage incomplete")
+    else:
+        pass
     mismatches: list[dict[str, Any]] = []
     compiled = json.loads(
         (
@@ -100,6 +110,8 @@ def audit_prerequisites(fixtures: Path = FIXTURES) -> dict[str, Any]:
     for key, value in compiled.items():
         if source.get(key) != value:
             mismatches.append({"case": f"production_source_data/{key}"})
+        else:
+            pass
     # Assert the intended resource keys as well, so dropping a source section
     # cannot make compilation comparison vacuously pass.
     required = {
@@ -118,6 +130,8 @@ def audit_prerequisites(fixtures: Path = FIXTURES) -> dict[str, Any]:
     }
     if set(compiled) != required:
         mismatches.append({"case": "production_source_data/coverage"})
+    else:
+        pass
     # The source supplies three explicit first-month hour examples; the
     # remaining nine entries are transparent prose derivations, not quotations.
     for row in source["ming_shen"]["first_month_by_hour"]:
@@ -127,6 +141,8 @@ def audit_prerequisites(fixtures: Path = FIXTURES) -> dict[str, Any]:
             expected["shen_branch"],
         ]:
             mismatches.append({"case": f"derived_first_month/{row['hour']}"})
+        else:
+            pass
     normal_inputs = [
         (1984 + i, month, 1, hour, False)
         for i in range(10)
@@ -194,6 +210,8 @@ def audit_prerequisites(fixtures: Path = FIXTURES) -> dict[str, Any]:
                         "actual": actual,
                     }
                 )
+            else:
+                pass
             if (
                 evidence["expected"] != expected
                 or evidence["actual"] != actual
@@ -201,10 +219,14 @@ def audit_prerequisites(fixtures: Path = FIXTURES) -> dict[str, Any]:
                 or evidence["matches_source_chain"] != all(checks.values())
             ):
                 mismatches.append({"case": f"source_trace/{case}"})
+            else:
+                pass
             if not all(checks.values()):
                 policy_differences.append(
                     {"case": case, "expected": expected, "actual": actual}
                 )
+            else:
+                pass
             seen_ganzhi.add(actual["ming_ganzhi"])
             charts_checked += 1
     return {

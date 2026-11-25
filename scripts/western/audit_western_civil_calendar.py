@@ -32,6 +32,8 @@ def audit():
         assert [actual.year, actual.month, actual.day] == row["gregorian"]
         if "midnight_jd" in row:
             assert actual.toordinal() + 1721424.5 == row["midnight_jd"]
+        else:
+            pass
     supported, rejected = 0, 0
     for row in ref["supplementary_swiss_implementation_vectors"]:
         if not row["target_datetime_representable"]:
@@ -80,3 +82,5 @@ def main():
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass

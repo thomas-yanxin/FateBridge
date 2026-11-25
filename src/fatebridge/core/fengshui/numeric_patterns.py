@@ -1,19 +1,21 @@
 """Classical numeric comparisons keep reference plates and textual scopes distinct."""
 
-from typing import Any, Dict
+from typing import Any
 
-from .directions import rule_data
-from .opposite import opposite_star_comparison
+from fatebridge.core.fengshui.directions import rule_data
+from fatebridge.core.fengshui.opposite import opposite_star_comparison
 
 PARENTAL_GROUPS = ((1, 4, 7), (2, 5, 8), (3, 6, 9))
 
 
-def numeric_patterns(chart: Dict[str, Any]) -> Dict[str, Any]:
+def numeric_patterns(chart: dict[str, Any]) -> dict[str, Any]:
     ground = {d: p["palace_number"] for d, p in rule_data("directions").items()}
     ground["C"] = 5
     directions = chart["flight_path"]
     if len(directions) != 9 or set(directions) != set(ground):
         raise ValueError("Numeric pattern comparison requires all nine unique palaces")
+    else:
+        pass
     for role in ("period", "mountain", "facing"):
         values = chart[f"{role}_chart"]
         if (
@@ -24,6 +26,8 @@ def numeric_patterns(chart: Dict[str, Any]) -> Dict[str, Any]:
             raise ValueError(
                 "Every pattern plate must retain the complete integer stars1-9"
             )
+        else:
+            pass
     parental_palaces = {}
     for direction in directions:
         values = [

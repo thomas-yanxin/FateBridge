@@ -8,9 +8,10 @@ from pathlib import Path
 import pytest
 
 from fatebridge.core import ephemeris_runtime as e
-from fatebridge.core import guolao, suzhan_astronomy
 from fatebridge.core.astro.birth import build_astro_birth_info
 from fatebridge.core.astro.time_scales import datetime_from_tt
+from fatebridge.core.guolao import guolao
+from fatebridge.core.sukuyo import suzhan_astronomy
 
 FIXTURES = Path(__file__).parents[1] / "data/guolao"
 KERNEL = "guolao-de441-j2000.eph"
@@ -49,8 +50,8 @@ def birth(jd_tt=2451545.0):
 
 
 def test_position_only_sky_works_inside_kernel_without_auxiliary_epochs(
-    selected, monkeypatch
-):
+    selected, monkeypatch: pytest.MonkeyPatch
+) -> None:
     # The physical epoch is inside the original coefficient window, while
     # the ordinary +/-0.375-day first derivative stencil would leave it.
     jd = 2451408.625
@@ -72,7 +73,7 @@ def test_position_only_sky_works_inside_kernel_without_auxiliary_epochs(
     assert os.environ["FATEBRIDGE_JPL_FILE"] == KERNEL
 
 
-def test_opt_out_keeps_native_rates_and_explicit_not_requested_status(selected):
+def test_opt_out_keeps_native_rates_and_explicit_not_requested_status(selected) -> None:
     raw = guolao.positions(birth(), observer_geometry=False, correct_motion=False)
     assert raw["longitude_motion"]["status"] == "not_requested"
     assert set(
@@ -83,8 +84,8 @@ def test_opt_out_keeps_native_rates_and_explicit_not_requested_status(selected):
 
 
 def test_default_guolao_motion_and_position_only_sky_keep_same_coordinates(
-    selected, monkeypatch
-):
+    selected, monkeypatch: pytest.MonkeyPatch
+) -> None:
     observed = []
     original = guolao.corrected_longitude_motion
 

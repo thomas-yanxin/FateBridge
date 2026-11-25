@@ -30,8 +30,12 @@ def public_value(value: JsonValue) -> JsonValue:
     """
     if isinstance(value, dict):
         return public_payload(value)
+    else:
+        pass
     if isinstance(value, (list, tuple)):
         return [public_value(item) for item in value]
+    else:
+        pass
     return value
 
 

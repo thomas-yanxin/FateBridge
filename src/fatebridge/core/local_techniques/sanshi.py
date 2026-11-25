@@ -6,8 +6,24 @@ Pure relocation from the package facade.
 
 from __future__ import annotations
 
-from typing import Any, Dict, Optional
+from dataclasses import replace
+from typing import Any
 
+from fatebridge.core.local_techniques.chart import (
+    _build_metaphysics_analysis_context,
+    _build_metaphysics_seed,
+    _build_qimen_palace_overview_lines,
+    _normalize_date_text,
+    _normalize_time_text,
+    _render_qimen_palace_sections,
+)
+from fatebridge.core.local_techniques.qimen import (
+    _qimen_stem_context_lines,
+    _render_qimen_pattern_line,
+    _render_qimen_source_disagreements,
+    build_qimen_with_options,
+)
+from fatebridge.core.local_techniques.snapshot import join_lines, render_snapshot_text
 from fatebridge.core.metaphysics.common import MetaphysicsSeed
 from fatebridge.core.metaphysics.liureng import build_liureng_board
 from fatebridge.core.metaphysics.ren_calendar import require_ren_calendar
@@ -26,26 +42,10 @@ from fatebridge.core.metaphysics.taiyi_year import evidence_text
 from fatebridge.utils.formatting import create_pillar_dict
 from fatebridge.utils.places import DEFAULT_BIRTH_TIMEZONE
 
-from .chart import (
-    _build_metaphysics_analysis_context,
-    _build_metaphysics_seed,
-    _build_qimen_palace_overview_lines,
-    _normalize_date_text,
-    _normalize_time_text,
-    _render_qimen_palace_sections,
-)
-from .qimen import (
-    _qimen_stem_context_lines,
-    _render_qimen_pattern_line,
-    _render_qimen_source_disagreements,
-    build_qimen_with_options,
-)
-from .snapshot import join_lines, render_snapshot_text
-
 
 def _build_taiyi_with_options(
-    seed: MetaphysicsSeed, options: Optional[Dict[str, Any]]
-) -> Dict[str, Any]:
+    seed: MetaphysicsSeed, options: dict[str, Any] | None
+) -> dict[str, Any]:
     normalized = dict(options or {})
     unknown = set(normalized) - {
         "calculation_mode",
@@ -55,18 +55,28 @@ def _build_taiyi_with_options(
     }
     if unknown:
         raise ValueError("未实现的太乙选项：" + ", ".join(sorted(unknown)))
+    else:
+        pass
     mode = normalized.get("calculation_mode", "year")
     if not isinstance(mode, str) or mode not in {"year", "month", "day", "hour"}:
         raise ValueError("太乙calculation_mode仅支持year、month、day、hour")
+    else:
+        pass
     profile = normalized.get("hour_profile")
     if "hour_profile" in normalized and not isinstance(profile, str):
         raise ValueError("hour_profile必须是已发布时计配置名称")
+    else:
+        pass
     month_profile = normalized.get("month_profile")
     if "month_profile" in normalized and not isinstance(month_profile, str):
         raise ValueError("month_profile必须是已发布月计配置名称")
+    else:
+        pass
     year_profile = normalized.get("year_profile")
     if "year_profile" in normalized and not isinstance(year_profile, str):
         raise ValueError("year_profile必须是已发布年计配置名称")
+    else:
+        pass
     return build_taiyi_board(
         seed,
         gender="未知",
@@ -77,9 +87,9 @@ def _build_taiyi_with_options(
     )
 
 
-def _source_profiles(qimen: Dict[str, Any], liureng: Dict[str, Any]) -> Dict[str, Any]:
+def _source_profiles(qimen: dict[str, Any], liureng: dict[str, Any]) -> dict[str, Any]:
     """Keep source identities in a first view without copying whole audits."""
-    result: Dict[str, Any] = {"qimen": [], "liureng": []}
+    result: dict[str, Any] = {"qimen": [], "liureng": []}
     raw = [("qimen", f"qimen.rulesets.{i}", r) for i, r in enumerate(qimen["rulesets"])]
     raw.append(("liureng", "liureng.ruleset", liureng["ruleset"]))
     for technique, path, ruleset in raw:
@@ -110,12 +120,12 @@ def _source_profiles(qimen: Dict[str, Any], liureng: Dict[str, Any]) -> Dict[str
 def _build_sanshi_snapshot_text(
     *,
     seed: MetaphysicsSeed,
-    qimen_seed: Optional[MetaphysicsSeed],
-    qimen: Dict[str, Any],
-    taiyi: Dict[str, Any],
-    liureng: Dict[str, Any],
-    correspondences: Dict[str, Any],
-    noble_assessment: Dict[str, Any],
+    qimen_seed: MetaphysicsSeed | None,
+    qimen: dict[str, Any],
+    taiyi: dict[str, Any],
+    liureng: dict[str, Any],
+    correspondences: dict[str, Any],
+    noble_assessment: dict[str, Any],
 ) -> str:
     qimen_display_seed = qimen_seed or seed
     palace_lines = _build_qimen_palace_overview_lines(qimen)
@@ -250,18 +260,18 @@ def build_sanshiunited_result(
     *,
     date: str,
     time: str,
-    zone: Optional[str] = None,
+    zone: str | None = None,
     lat: Any = None,
     lon: Any = None,
-    gps_lat: Optional[float] = None,
-    gps_lon: Optional[float] = None,
-    qimen_options: Optional[Dict[str, Any]] = None,
-    taiyi_options: Optional[Dict[str, Any]] = None,
-    liureng_yue: Optional[str] = None,
-    liureng_is_diurnal: Optional[bool] = None,
+    gps_lat: float | None = None,
+    gps_lon: float | None = None,
+    qimen_options: dict[str, Any] | None = None,
+    taiyi_options: dict[str, Any] | None = None,
+    liureng_yue: str | None = None,
+    liureng_is_diurnal: bool | None = None,
     liureng_guiren_profile: GuirenProfile = DEFAULT_GUIREN_PROFILE,
     use_true_solar_time: bool = False,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     input_normalized = {
         "date": _normalize_date_text(date),
         "time": _normalize_time_text(time),
@@ -287,20 +297,17 @@ def build_sanshiunited_result(
         gps_lon=gps_lon,
         use_true_solar_time=bool(use_true_solar_time),
     )
-    qimen_seed = _build_metaphysics_seed(
-        date_text=input_normalized["date"],
-        time_text=input_normalized["time"],
-        timezone_name=input_normalized["zone"],
-        lat=lat,
-        lon=lon,
-        gps_lat=gps_lat,
-        gps_lon=gps_lon,
-        use_true_solar_time=bool(use_true_solar_time),
-    )
+    qimen_seed = seed
     qimen = build_qimen_with_options(qimen_seed, qimen_options)
     taiyi = _build_taiyi_with_options(seed, taiyi_options)
-    seed.calendar_context["ren_calendar_policy"] = require_ren_calendar(
-        seed, month_general_override=liureng_yue
+    seed = replace(
+        seed,
+        calendar_context={
+            **seed.calendar_context,
+            "ren_calendar_policy": require_ren_calendar(
+                seed, month_general_override=liureng_yue
+            ),
+        },
     )
     liureng = build_liureng_board(
         seed,
@@ -335,21 +342,17 @@ def build_sanshiunited_result(
             "analysis_context": qimen_analysis_context,
             "four_pillars": qimen_four_pillars,
             "calendar_context": qimen_seed.calendar_context,
-            "pan": qimen,
         },
         "taiyi": {
             "analysis_type": "太乙神数",
             "analysis_context": analysis_context,
             "four_pillars": four_pillars,
-            "calendar_context": seed.calendar_context,
-            "pan": taiyi,
         },
         "liureng_gods": {
             "analysis_type": "大六壬起课",
             "analysis_context": analysis_context,
             "four_pillars": four_pillars,
             "calendar_context": seed.calendar_context,
-            "liureng": liureng,
         },
     }
 
@@ -411,10 +414,6 @@ def build_sanshiunited_result(
                 "各术原典符合度须独立验收；本次太乙规则修正不认证奇门或六壬。",
                 "太乙各计法按实际时间层解释；时计至点和时辰边界采用已声明的现代时钟适配，不能外推分钟级事件应验。",
             ],
-        },
-        "sources": {
-            "four_pillars": four_pillars,
-            "calendar_context": seed.calendar_context,
         },
         "snapshot_text": snapshot_text,
         "summary": (

@@ -40,9 +40,13 @@ def load_reference(corpus: Path = CORPUS) -> dict[str, Any]:
         p.name for p in corpus.iterdir() if p.is_file()
     } != expected | {"freeze.json"}:
         raise ValueError("Reference file set changed")
+    else:
+        pass
     for name, checksum in frozen["files"].items():
         if sha(corpus / name) != checksum:
             raise ValueError(f"Reference changed after freeze: {name}")
+        else:
+            pass
     data = {
         Path(n).stem: json.loads((corpus / n).read_text())
         for n in expected
@@ -59,6 +63,8 @@ def load_reference(corpus: Path = CORPUS) -> dict[str, Any]:
     for name, checksum in data["calendar-sources"]["files"].items():
         if sha(ROOT / name) != checksum:
             raise ValueError(f"Reference calendar source changed: {name}")
+        else:
+            pass
     return data
 
 
@@ -72,7 +78,7 @@ def audit() -> dict[str, Any]:
     # Only after all source inventories have been verified, load production.
     from fatebridge.core.almanac import get_solar_terms_for_year
     from fatebridge.core.metaphysics.liureng import build_liureng_board
-    from fatebridge.services.metaphysics import _build_analysis_seed
+    from fatebridge.core.metaphysics.seed import build_analysis_seed
 
     def normal(text):
         return (
@@ -114,6 +120,8 @@ def audit() -> dict[str, Any]:
             raise ValueError(
                 "Reference transcription correction no longer matches retained source"
             )
+        else:
+            pass
         row = {
             "day": key[0],
             "gan_upper": key[1],
@@ -136,11 +144,17 @@ def audit() -> dict[str, Any]:
                 else "literal_disagreement"
             )
             row["calculation_basis"] = board["classification"]["basis"]
+        else:
+            pass
         comparisons.append(row)
         if not row["raw_matched"]:
             raw_failures.append(row)
+        else:
+            pass
         if not row["collated_matched"]:
             collated_failures.append(row)
+        else:
+            pass
         sequence = [
             board["three_transmissions"][k]["branch"]
             for k in ("initial", "middle", "final")
@@ -154,6 +168,8 @@ def audit() -> dict[str, Any]:
                     "expected": case["transmissions"],
                 }
             )
+        else:
+            pass
 
     qi_checks = []
 
@@ -195,12 +211,16 @@ def audit() -> dict[str, Any]:
     for name in ref["calendar-sources"]["files"]:
         if not name.endswith(".xml"):
             continue
+        else:
+            pass
         xml = ET.fromstring((ROOT / name).read_bytes())
         year = int(xml.tag.removeprefix("SolarTerms_"))
         terms = {t.name: t for t in get_solar_terms_for_year(year, "Asia/Hong_Kong")}
         published_rows = xml.findall("Data")
         if len(published_rows) != 24:
             raise ValueError("Reference solar-term inventory changed")
+        else:
+            pass
         for term, published in zip(TERM_NAMES, published_rows):
             at = datetime.fromisoformat(
                 f"{year}-{published.findtext('M')}-{published.findtext('D')}T{published.findtext('hm')}:00+08:00"
@@ -216,11 +236,13 @@ def audit() -> dict[str, Any]:
             )
             if term not in MAJORS:
                 continue
+            else:
+                pass
             for zone in ("Asia/Shanghai", "UTC", "America/New_York"):
                 actual = []
                 for minutes in (-2, 2):
                     local = (at + timedelta(minutes=minutes)).astimezone(ZoneInfo(zone))
-                    seed = _build_analysis_seed(
+                    seed = build_analysis_seed(
                         analysis_year=local.year,
                         analysis_month=local.month,
                         analysis_day=local.day,
@@ -334,12 +356,15 @@ def audit() -> dict[str, Any]:
                 name: sha(ROOT / name)
                 for name in (
                     "src/fatebridge/core/metaphysics/liureng.py",
+                    "src/fatebridge/core/metaphysics/liureng_course_layout.py",
+                    "src/fatebridge/core/metaphysics/liureng_selection.py",
+                    "src/fatebridge/core/metaphysics/liureng_year_fate.py",
                     "src/fatebridge/core/metaphysics/liureng_patterns.py",
                     "src/fatebridge/core/metaphysics/jinkou.py",
                     "src/fatebridge/core/metaphysics/jinkou_qi.py",
                     "src/fatebridge/core/metaphysics/ren_evidence.py",
                     "src/fatebridge/core/requests/metaphysics.py",
-                    "src/fatebridge/core/output_chinese.py",
+                    "src/fatebridge/core/contracts/output_chinese.py",
                     "src/fatebridge/services/metaphysics.py",
                     "src/fatebridge/core/almanac.py",
                     "src/fatebridge/core/calendar.py",
@@ -361,6 +386,8 @@ def main() -> int:
             json.dumps(report, ensure_ascii=False, indent=2, allow_nan=False) + "\n",
             encoding="utf-8",
         )
+    else:
+        pass
     print(
         json.dumps(
             dict(
@@ -391,3 +418,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+else:
+    pass
