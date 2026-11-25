@@ -30,6 +30,7 @@ from fatebridge.core.bazi_star_tables import (
     TIAN_XI_TARGETS,
     WEN_CHANG_TARGETS,
 )
+from fatebridge.core.calendar import BaZiCalendar
 from fatebridge.core.clash_comparison import clash_comparison_snapshot_lines
 from fatebridge.core.classical import (
     build_classical_overview,
@@ -829,7 +830,9 @@ def _build_base_bazi_payload(
     )
     classical_overview = build_classical_overview(birth_context.birth_pillars)
     timezone_name = normalized_birth_time.timezone
-    analysis_pillars = birth_context.birth_pillars
+    analysis_pillars = BaZiCalendar.get_four_pillars(
+        analysis_date, timezone_name=timezone_name
+    )
     analysis_calendar_context = build_calendar_context(
         analysis_date,
         timezone_name=timezone_name,
