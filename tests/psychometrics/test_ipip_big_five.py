@@ -29,7 +29,7 @@ from fatebridge.core.psychometrics.ipip_big_five import (
     score_ipip_big_five,
 )
 from fatebridge.services.tool_catalog import CATALOG
-from tests.support.transports import AS_OF, business, surface_calls  # noqa: F401
+from tests.support.transports import AS_OF, business, rest, surface_calls  # noqa: F401 — pytest fixtures
 
 EXPECTED_KEYING_BY_DOMAIN = {
     "extraversion": {
