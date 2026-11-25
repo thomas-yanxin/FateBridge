@@ -211,14 +211,15 @@ def test_every_outer_group_matches_independent_full_JPL_at_source_cell_edges() -
 def test_declared_frame_bias_matches_the_independent_ERFA_standard() -> None:
     expected = erfa.bp06(2451545.0, 0.0)[0]
     actual = de441_source._parameters()["frame_bias"]["ICRF_to_mean_J2000"]
-    assert (
-        max(
-            abs(a - b)
-            for row, other in zip(actual, expected)
-            for a, b in zip(row, other)
-        )
-        < 1e-22
-    )
+    # ERFA forms the small off-diagonal entries by subtracting unit-scale
+    # rotation products. Compiler contraction can change their low bits by
+    # a fraction of one unit-scale binary64 ULP. The manifest still verifies
+    # the exact distributed coefficient and matrix bytes independently.
+    assert max(
+        abs(a - b)
+        for row, other in zip(actual, expected, strict=True)
+        for a, b in zip(row, other, strict=True)
+    ) <= math.ulp(1.0)
 
 
 def test_source_coverage_and_nonfinite_epochs_do_not_return_an_old_orbit() -> None:

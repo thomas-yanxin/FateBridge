@@ -4,6 +4,7 @@ Synthetic solver instants exercise cache behavior, not celestial accuracy.
 Real Swiss return flags are tested separately from the requested flag.
 """
 
+import os
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -165,9 +166,9 @@ def test_file_change_during_a_year_discards_the_inconsistent_result(
         value = int(file.read_text())
         if first:
             first = False
+            stamp = file.stat()
             file.write_text("2")
-        else:
-            pass
+            os.utime(file, ns=(stamp.st_atime_ns, stamp.st_mtime_ns + 2_000_000_000))
         return value
 
     calls = install_symbolic_solver(monkeypatch, observation)

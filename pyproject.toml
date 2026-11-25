@@ -38,7 +38,7 @@ dependencies = [
     "lunardate>=0.2.2",
     "mpmath==1.3.0",
     "packaging>=23.0",  # doctor checks installed dependency version constraints
-    "pydantic>=2.0.0",
+    "pydantic>=2.12.0",
     "pyerfa>=2.0.1.5,<3",
     "pyswisseph==2.10.3.2",
     "python-dateutil>=2.8.0",

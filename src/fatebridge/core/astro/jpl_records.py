@@ -15,7 +15,11 @@ from fractions import Fraction
 from pathlib import Path
 from typing import Any, BinaryIO, Iterator
 
-from fatebridge.core.astro.jpl_kinematics import RECORD_BYTES, _signature
+from fatebridge.core.astro.jpl_kinematics import (
+    RECORD_BYTES,
+    _path_signature,
+    _signature,
+)
 from fatebridge.core.jpl_ephemeris import jpl_header
 from fatebridge.utils.errors import EphemerisSourceError
 
@@ -55,7 +59,7 @@ class SourceRecords:
     def check(self) -> None:
         if self.signature != _signature(
             os.fstat(self.stream.fileno())
-        ) or self.signature != _signature(self.path.stat()):
+        ) or self.signature != _path_signature(self.path):
             raise EphemerisSourceError("changed_during")
 
     def record(self, epoch: Fraction) -> tuple[float, ...]:

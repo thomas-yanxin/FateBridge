@@ -401,16 +401,22 @@ def _longitude_crossings(
             # Native speed only identifies a candidate cell. A grazing target
             # can be reached at a different, even single, representable TT point.
             a, b = previous_jd, jd
-            direction = 1.0 if previous[1] > 0.0 or current[1] < 0.0 else -1.0
+            direction = 1 if previous[1] > 0.0 or current[1] < 0.0 else -1
             turn_lon = same_source(turn)[0]
 
-            def altitude(at: float) -> float:
-                return direction * _wrapped_diff(same_source(at)[0], turn_lon)
+            def altitude(at: float) -> tuple[int, float]:
+                longitude = same_source(at)[0]
+                delta = longitude - turn_lon
+                # Rank the wrap and the original longitude separately to keep
+                # fine differences that subtraction or addition would round away.
+                wrap = int(delta < -180) - int(delta > 180)
+                return direction * wrap, direction * longitude
 
+            turn_score = (0, direction * turn_lon)
             c = b - _GOLDEN_RATIO_RECIPROCAL * (b - a)
             d = a + _GOLDEN_RATIO_RECIPROCAL * (b - a)
             fc, fd = altitude(c), altitude(d)
-            best = max((0.0, turn), (fc, c), (fd, d))
+            best = max((turn_score, turn), (fc, c), (fd, d))
             for _ in range(96):
                 if b - a <= 4 * math.ulp(max(abs(a), abs(b))) or c >= d:
                     break
@@ -430,8 +436,8 @@ def _longitude_crossings(
                     break
                 best = max(best, (altitude(a), a))
                 a = math.nextafter(a, math.inf)
-            improvement, extremum = best
-            if improvement > 0.0 and previous_jd < extremum < jd:
+            extremum_score, extremum = best
+            if extremum_score > turn_score and previous_jd < extremum < jd:
                 split_jds.add(extremum)
             for split_jd in sorted(split_jds):
                 knots.append((split_jd, same_source(split_jd)[0]))

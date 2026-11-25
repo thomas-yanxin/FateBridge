@@ -308,8 +308,9 @@ def test_return_rejects_a_different_known_de_edition(
     assert caught.value.reason == "model_changed"
 
 
+@pytest.mark.parametrize("reported_station_days", [0.52, 0.96])
 def test_return_retains_contact_at_a_single_representable_tt(
-    monkeypatch: pytest.MonkeyPatch,
+    monkeypatch: pytest.MonkeyPatch, reported_station_days: float
 ) -> None:
     reference_tt = 2451545.0
     turn = math.nextafter(reference_tt + 0.46, math.inf)
@@ -322,7 +323,7 @@ def test_return_retains_contact_at_a_single_representable_tt(
         "_planet_motion",
         lambda at, body, **options: (
             (at - turn) ** 2,
-            2 * (at - reference_tt - 0.52),
+            2 * (at - reference_tt - reported_station_days),
             0,
             (),
         ),

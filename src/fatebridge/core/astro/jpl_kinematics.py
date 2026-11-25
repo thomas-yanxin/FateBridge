@@ -40,8 +40,17 @@ GROUPS = {
 }
 
 
-def _signature(stat: os.stat_result) -> tuple:
+def _signature(stat: os.stat_result) -> tuple[int, int, int, int, int]:
     return stat.st_dev, stat.st_ino, stat.st_size, stat.st_mtime_ns, stat.st_ctime_ns
+
+
+def _path_signature(path: Path) -> tuple[int, int, int, int, int]:
+    # Windows directory and descriptor lookups can return different stat
+    # metadata for the same file. Compare equivalent handle results there.
+    if os.name == "nt":
+        with path.open("rb") as current:
+            return _signature(os.fstat(current.fileno()))
+    return _signature(path.stat())
 
 
 def source_kinematics(
@@ -58,7 +67,7 @@ def source_kinematics(
     try:
         with path.open("rb") as source:
             before = _signature(os.fstat(source.fileno()))
-            if before != _signature(path.stat()):
+            if before != _path_signature(path):
                 raise EphemerisSourceError("changed_during")
             if before[2] != info["bytes"]:
                 raise EphemerisSourceError("changed_during")
@@ -93,7 +102,7 @@ def source_kinematics(
             if (
                 len(raw) != RECORD_BYTES
                 or before != _signature(os.fstat(source.fileno()))
-                or before != _signature(path.stat())
+                or before != _path_signature(path)
             ):
                 raise EphemerisSourceError("changed_during")
     except OSError as error:
