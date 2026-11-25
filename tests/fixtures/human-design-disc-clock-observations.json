@@ -1,0 +1,1196 @@
+{
+  "source": {
+    "publisher": "Jovian Archive / Maia Mechanics public calculator",
+    "url": "https://jovianarchive.com/pages/get-your-human-design-chart",
+    "collected_at": "2026-10-25T10:07:11.315Z",
+    "plan_sha256": "2ad8f1dd94abba5540b881369c61fe8df7937a6ed103139fca5f4d882997daf0",
+    "observation_file_sha256": "c9e401f5dcc649c72dd8716bf880a5f2a19a219bd06e7f07dbacd9eb944eca4e",
+    "independent_pdf_properties_checked": 13,
+    "pdf_diagram_independently_transcribed": false,
+    "whitespace_changes": [
+      {
+        "id": "disc-full-17-saturn-209307190525",
+        "property": "Incarnation Cross",
+        "raw": "Right Angle Cross of Laws  (56/60 | 3/50)",
+        "normalized": "Right Angle Cross of Laws (56/60 | 3/50)"
+      },
+      {
+        "id": "disc-full-21-neptune-184002020325",
+        "property": "Incarnation Cross",
+        "raw": "Left Angle Cross of Refinement  (19/33 | 1/2)",
+        "normalized": "Left Angle Cross of Refinement (19/33 | 1/2)"
+      },
+      {
+        "id": "disc-full-22-neptune-184002020326",
+        "property": "Incarnation Cross",
+        "raw": "Left Angle Cross of Refinement  (19/33 | 1/2)",
+        "normalized": "Left Angle Cross of Refinement (19/33 | 1/2)"
+      }
+    ],
+    "pdf_sources": [
+      {
+        "id": "disc-full-01-mars-191905091413",
+        "pdf_filename": "disc-full-01-mars-191905091413.pdf",
+        "pdf_sha256": "b193ef35f52c486e399b4fdc7eca731e8624f9cd1b9965a85a1e6e9eab08bfdb",
+        "pdf_bytes": 400503
+      },
+      {
+        "id": "disc-full-02-mars-191905091414",
+        "pdf_filename": "disc-full-02-mars-191905091414.pdf",
+        "pdf_sha256": "e7acef88e93852033354e69f1e009430f221a8fd06718fadc509169d172a4b91",
+        "pdf_bytes": 400502
+      },
+      {
+        "id": "disc-full-06-jupiter-186512312123",
+        "pdf_filename": "disc-full-06-jupiter-186512312123.pdf",
+        "pdf_sha256": "8729751f750d43a1bcd65a75e3bc8d9c7cc91c24e6084f3c2b6cb30a643bc75b",
+        "pdf_bytes": 392765
+      },
+      {
+        "id": "disc-full-07-jupiter-194901010651",
+        "pdf_filename": "disc-full-07-jupiter-194901010651.pdf",
+        "pdf_sha256": "7cf7cb0bd2858ad0fe9d6d63b5054de8d66ac6ebfe37347da033159a3ae48300",
+        "pdf_bytes": 396652
+      },
+      {
+        "id": "disc-full-08-jupiter-203201010839",
+        "pdf_filename": "disc-full-08-jupiter-203201010839.pdf",
+        "pdf_sha256": "ce3d53f7508c43dae2f02dfdabd3b5c54a65dd7064c0dbf4ad64c4a4cdcdb41e",
+        "pdf_bytes": 397859
+      },
+      {
+        "id": "disc-full-09-jupiter-203201010840",
+        "pdf_filename": "disc-full-09-jupiter-203201010840.pdf",
+        "pdf_sha256": "83a8a1321a99ef992d968e6cd40b0ddfe404b07192a17ca51088ef1c8aa1671b",
+        "pdf_bytes": 397864
+      },
+      {
+        "id": "disc-full-10-jupiter-204401052157",
+        "pdf_filename": "disc-full-10-jupiter-204401052157.pdf",
+        "pdf_sha256": "af7097951c35438951d0525dc8bd6e822dbea8e2e16e247d481134d5bea56b8e",
+        "pdf_bytes": 398114
+      },
+      {
+        "id": "disc-full-14-saturn-181401120921",
+        "pdf_filename": "disc-full-14-saturn-181401120921.pdf",
+        "pdf_sha256": "ac8d1938eaa6743117bde7994faf29b9bc1cc04e0eb9125bb4352f03075ac517",
+        "pdf_bytes": 401395
+      },
+      {
+        "id": "disc-full-15-saturn-181401120922",
+        "pdf_filename": "disc-full-15-saturn-181401120922.pdf",
+        "pdf_sha256": "358e524f555e68c4a387ab2749a8c74bb18b845e5aec5e1e2df70a04eb2c159e",
+        "pdf_bytes": 401400
+      },
+      {
+        "id": "disc-full-16-saturn-181401120923",
+        "pdf_filename": "disc-full-16-saturn-181401120923.pdf",
+        "pdf_sha256": "7672d678b34ef8117d33c6aaa02d634ec86e4803b0274ec2b76a0f0a19184019",
+        "pdf_bytes": 401403
+      },
+      {
+        "id": "disc-full-17-saturn-209307190525",
+        "pdf_filename": "disc-full-17-saturn-209307190525.pdf",
+        "pdf_sha256": "d07a15ec74c55870ea67e2610058c9a738440d50324601b5ede09428c9fdf9d9",
+        "pdf_bytes": 397327
+      },
+      {
+        "id": "disc-full-21-neptune-184002020325",
+        "pdf_filename": "disc-full-21-neptune-184002020325.pdf",
+        "pdf_sha256": "53d6311dbeac5b244e22c3398f0f4396e918a1bdfb15300a5bcc1a479f2e667a",
+        "pdf_bytes": 396179
+      },
+      {
+        "id": "disc-full-22-neptune-184002020326",
+        "pdf_filename": "disc-full-22-neptune-184002020326.pdf",
+        "pdf_sha256": "6d4016b8a7849c2e5392e574af8c3bbca304e032a3349baa973106dc9bd95110",
+        "pdf_bytes": 396143
+      }
+    ]
+  },
+  "collection_status": "incomplete",
+  "planned_case_count": 22,
+  "observed_case_count": 13,
+  "missing_planned_ids": [
+    "disc-full-03-mars-235411141532",
+    "disc-full-04-mars-235411141533",
+    "disc-full-05-mars-235411141534",
+    "disc-full-11-jupiter-237601061131",
+    "disc-full-12-jupiter-237601061132",
+    "disc-full-13-jupiter-237601061133",
+    "disc-full-18-uranus-231912070853",
+    "disc-full-19-uranus-231912070854",
+    "disc-full-20-uranus-231912070855"
+  ],
+  "source_clock_links": [
+    {
+      "id": "disc-full-01-mars-191905091413",
+      "displayed_source_utc": "1919-05-09T14:13:00+00:00",
+      "planned_input_utc": "1919-05-09T14:13:00+00:00",
+      "exact_label_match": true,
+      "delta_seconds_source_label_minus_plan": 0.0,
+      "scope": "The PDF displays minutes; exact-label disagreement remains a failed link, not silently rounded or rebased. No independent local historical clock truth."
+    },
+    {
+      "id": "disc-full-02-mars-191905091414",
+      "displayed_source_utc": "1919-05-09T14:14:00+00:00",
+      "planned_input_utc": "1919-05-09T14:14:00+00:00",
+      "exact_label_match": true,
+      "delta_seconds_source_label_minus_plan": 0.0,
+      "scope": "The PDF displays minutes; exact-label disagreement remains a failed link, not silently rounded or rebased. No independent local historical clock truth."
+    },
+    {
+      "id": "disc-full-06-jupiter-186512312123",
+      "displayed_source_utc": "1865-12-31T21:23:00+00:00",
+      "planned_input_utc": "1865-12-31T21:23:00+00:00",
+      "exact_label_match": true,
+      "delta_seconds_source_label_minus_plan": 0.0,
+      "scope": "The PDF displays minutes; exact-label disagreement remains a failed link, not silently rounded or rebased. No independent local historical clock truth."
+    },
+    {
+      "id": "disc-full-07-jupiter-194901010651",
+      "displayed_source_utc": "1949-01-01T06:51:00+00:00",
+      "planned_input_utc": "1949-01-01T06:51:00+00:00",
+      "exact_label_match": true,
+      "delta_seconds_source_label_minus_plan": 0.0,
+      "scope": "The PDF displays minutes; exact-label disagreement remains a failed link, not silently rounded or rebased. No independent local historical clock truth."
+    },
+    {
+      "id": "disc-full-08-jupiter-203201010839",
+      "displayed_source_utc": "2032-01-01T08:39:00+00:00",
+      "planned_input_utc": "2032-01-01T08:39:00+00:00",
+      "exact_label_match": true,
+      "delta_seconds_source_label_minus_plan": 0.0,
+      "scope": "The PDF displays minutes; exact-label disagreement remains a failed link, not silently rounded or rebased. No independent local historical clock truth."
+    },
+    {
+      "id": "disc-full-09-jupiter-203201010840",
+      "displayed_source_utc": "2032-01-01T08:40:00+00:00",
+      "planned_input_utc": "2032-01-01T08:40:00+00:00",
+      "exact_label_match": true,
+      "delta_seconds_source_label_minus_plan": 0.0,
+      "scope": "The PDF displays minutes; exact-label disagreement remains a failed link, not silently rounded or rebased. No independent local historical clock truth."
+    },
+    {
+      "id": "disc-full-10-jupiter-204401052157",
+      "displayed_source_utc": "2044-01-05T21:57:00+00:00",
+      "planned_input_utc": "2044-01-05T21:57:00+00:00",
+      "exact_label_match": true,
+      "delta_seconds_source_label_minus_plan": 0.0,
+      "scope": "The PDF displays minutes; exact-label disagreement remains a failed link, not silently rounded or rebased. No independent local historical clock truth."
+    },
+    {
+      "id": "disc-full-14-saturn-181401120921",
+      "displayed_source_utc": "1814-01-12T09:20:00+00:00",
+      "planned_input_utc": "1814-01-12T09:21:15+00:00",
+      "exact_label_match": false,
+      "delta_seconds_source_label_minus_plan": -75.0,
+      "scope": "The PDF displays minutes; exact-label disagreement remains a failed link, not silently rounded or rebased. No independent local historical clock truth."
+    },
+    {
+      "id": "disc-full-15-saturn-181401120922",
+      "displayed_source_utc": "1814-01-12T09:21:00+00:00",
+      "planned_input_utc": "1814-01-12T09:22:15+00:00",
+      "exact_label_match": false,
+      "delta_seconds_source_label_minus_plan": -75.0,
+      "scope": "The PDF displays minutes; exact-label disagreement remains a failed link, not silently rounded or rebased. No independent local historical clock truth."
+    },
+    {
+      "id": "disc-full-16-saturn-181401120923",
+      "displayed_source_utc": "1814-01-12T09:22:00+00:00",
+      "planned_input_utc": "1814-01-12T09:23:15+00:00",
+      "exact_label_match": false,
+      "delta_seconds_source_label_minus_plan": -75.0,
+      "scope": "The PDF displays minutes; exact-label disagreement remains a failed link, not silently rounded or rebased. No independent local historical clock truth."
+    },
+    {
+      "id": "disc-full-17-saturn-209307190525",
+      "displayed_source_utc": "2093-07-19T05:25:00+00:00",
+      "planned_input_utc": "2093-07-19T05:25:00+00:00",
+      "exact_label_match": true,
+      "delta_seconds_source_label_minus_plan": 0.0,
+      "scope": "The PDF displays minutes; exact-label disagreement remains a failed link, not silently rounded or rebased. No independent local historical clock truth."
+    },
+    {
+      "id": "disc-full-21-neptune-184002020325",
+      "displayed_source_utc": "1840-02-02T03:24:00+00:00",
+      "planned_input_utc": "1840-02-02T03:25:15+00:00",
+      "exact_label_match": false,
+      "delta_seconds_source_label_minus_plan": -75.0,
+      "scope": "The PDF displays minutes; exact-label disagreement remains a failed link, not silently rounded or rebased. No independent local historical clock truth."
+    },
+    {
+      "id": "disc-full-22-neptune-184002020326",
+      "displayed_source_utc": "1840-02-02T03:25:00+00:00",
+      "planned_input_utc": "1840-02-02T03:26:15+00:00",
+      "exact_label_match": false,
+      "delta_seconds_source_label_minus_plan": -75.0,
+      "scope": "The PDF displays minutes; exact-label disagreement remains a failed link, not silently rounded or rebased. No independent local historical clock truth."
+    }
+  ],
+  "planet_order": [
+    "Sun",
+    "Earth",
+    "Moon",
+    "NorthNode",
+    "SouthNode",
+    "Mercury",
+    "Venus",
+    "Mars",
+    "Jupiter",
+    "Saturn",
+    "Uranus",
+    "Neptune",
+    "Pluto"
+  ],
+  "cases": [
+    {
+      "id": "disc-full-01-mars-191905091413",
+      "birth_input": {
+        "birth_year": 1919,
+        "birth_month": 5,
+        "birth_day": 9,
+        "birth_hour": 15,
+        "birth_minute": 13,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "displayed_birth_utc": "1919-05-09T14:13:00+00:00",
+      "columns": {
+        "design": [
+          "49.2",
+          "4.2",
+          "35.4",
+          "9.6",
+          "16.6",
+          "19.2",
+          "37.3",
+          "37.5",
+          "52.3",
+          "29.1",
+          "30.3",
+          "31.6",
+          "52.2"
+        ],
+        "personality": [
+          "2.5",
+          "1.5",
+          "47.2",
+          "34.5",
+          "20.5",
+          "42.2",
+          "12.4",
+          "2.5",
+          "39.3",
+          "4.3",
+          "55.2",
+          "31.5",
+          "52.2"
+        ]
+      },
+      "properties": {
+        "Authority": "Solar Plexus",
+        "Date and Time (Local)": "May 9, 1919, 15:13",
+        "Date and Time (UTC)": "May 9, 1919, 14:13",
+        "Definition": "Single",
+        "Incarnation Cross": "Left Angle Cross of Defiance (2/1 | 49/4)",
+        "Location": "London, United Kingdom",
+        "Name": "FateBridge fictional disc-full-01-mars-191905091413",
+        "Not-Self Theme": "Frustration",
+        "Profile": "5/2",
+        "Signature": "Satisfaction",
+        "Strategy": "Wait to Respond",
+        "Type": "Manifesting Generator",
+        "Variable": "PRR DRR"
+      },
+      "defined_channel_render_ids": [
+        "c1949",
+        "c2034",
+        "c3955",
+        "c952"
+      ],
+      "defined_centers": [
+        "root",
+        "sacral",
+        "solar_plexus",
+        "throat"
+      ],
+      "pdf_sha256": "b193ef35f52c486e399b4fdc7eca731e8624f9cd1b9965a85a1e6e9eab08bfdb",
+      "pdf_filename": "disc-full-01-mars-191905091413.pdf"
+    },
+    {
+      "id": "disc-full-02-mars-191905091414",
+      "birth_input": {
+        "birth_year": 1919,
+        "birth_month": 5,
+        "birth_day": 9,
+        "birth_hour": 15,
+        "birth_minute": 14,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "displayed_birth_utc": "1919-05-09T14:14:00+00:00",
+      "columns": {
+        "design": [
+          "49.2",
+          "4.2",
+          "35.4",
+          "9.6",
+          "16.6",
+          "19.2",
+          "37.3",
+          "37.5",
+          "52.3",
+          "29.1",
+          "30.3",
+          "31.6",
+          "52.2"
+        ],
+        "personality": [
+          "2.5",
+          "1.5",
+          "47.2",
+          "34.5",
+          "20.5",
+          "42.2",
+          "12.4",
+          "2.5",
+          "39.3",
+          "4.3",
+          "55.2",
+          "31.5",
+          "52.2"
+        ]
+      },
+      "properties": {
+        "Authority": "Solar Plexus",
+        "Date and Time (Local)": "May 9, 1919, 15:14",
+        "Date and Time (UTC)": "May 9, 1919, 14:14",
+        "Definition": "Single",
+        "Incarnation Cross": "Left Angle Cross of Defiance (2/1 | 49/4)",
+        "Location": "London, United Kingdom",
+        "Name": "FateBridge fictional disc-full-02-mars-191905091414",
+        "Not-Self Theme": "Frustration",
+        "Profile": "5/2",
+        "Signature": "Satisfaction",
+        "Strategy": "Wait to Respond",
+        "Type": "Manifesting Generator",
+        "Variable": "PRR DRR"
+      },
+      "defined_channel_render_ids": [
+        "c1949",
+        "c2034",
+        "c3955",
+        "c952"
+      ],
+      "defined_centers": [
+        "root",
+        "sacral",
+        "solar_plexus",
+        "throat"
+      ],
+      "pdf_sha256": "e7acef88e93852033354e69f1e009430f221a8fd06718fadc509169d172a4b91",
+      "pdf_filename": "disc-full-02-mars-191905091414.pdf"
+    },
+    {
+      "id": "disc-full-06-jupiter-186512312123",
+      "birth_input": {
+        "birth_year": 1865,
+        "birth_month": 12,
+        "birth_day": 31,
+        "birth_hour": 21,
+        "birth_minute": 23,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "displayed_birth_utc": "1865-12-31T21:23:00+00:00",
+      "columns": {
+        "design": [
+          "48.3",
+          "21.3",
+          "42.1",
+          "32.1",
+          "42.1",
+          "46.3",
+          "40.3",
+          "32.4",
+          "11.1",
+          "50.5",
+          "52.1",
+          "17.6",
+          "2.1"
+        ],
+        "personality": [
+          "38.1",
+          "39.1",
+          "52.2",
+          "57.3",
+          "51.3",
+          "11.1",
+          "11.5",
+          "11.4",
+          "38.1",
+          "44.3",
+          "15.4",
+          "17.5",
+          "24.6"
+        ]
+      },
+      "properties": {
+        "Authority": "Lunar Cycle",
+        "Date and Time (Local)": "December 31, 1865, 21:23",
+        "Date and Time (UTC)": "December 31, 1865, 21:23",
+        "Definition": "None",
+        "Incarnation Cross": "Right Angle Cross of Tension (38/39 | 48/21)",
+        "Location": "London, United Kingdom",
+        "Name": "FateBridge fictional disc-full-06-jupiter-186512312123",
+        "Not-Self Theme": "Disappointment",
+        "Profile": "1/3",
+        "Signature": "Surprise",
+        "Strategy": "Wait a Lunar Cycle",
+        "Type": "Reflector",
+        "Variable": "PLL DRR"
+      },
+      "defined_channel_render_ids": [],
+      "defined_centers": [],
+      "pdf_sha256": "8729751f750d43a1bcd65a75e3bc8d9c7cc91c24e6084f3c2b6cb30a643bc75b",
+      "pdf_filename": "disc-full-06-jupiter-186512312123.pdf"
+    },
+    {
+      "id": "disc-full-07-jupiter-194901010651",
+      "birth_input": {
+        "birth_year": 1949,
+        "birth_month": 1,
+        "birth_day": 1,
+        "birth_hour": 6,
+        "birth_minute": 51,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "displayed_birth_utc": "1949-01-01T06:51:00+00:00",
+      "columns": {
+        "design": [
+          "48.4",
+          "21.4",
+          "43.6",
+          "27.4",
+          "28.4",
+          "28.4",
+          "29.6",
+          "43.4",
+          "11.1",
+          "59.2",
+          "15.3",
+          "48.4",
+          "7.4"
+        ],
+        "personality": [
+          "38.2",
+          "39.2",
+          "41.1",
+          "27.1",
+          "28.1",
+          "61.2",
+          "5.4",
+          "60.1",
+          "38.1",
+          "40.1",
+          "12.6",
+          "48.6",
+          "7.4"
+        ]
+      },
+      "properties": {
+        "Authority": "Sacral",
+        "Date and Time (Local)": "January 1, 1949, 06:51",
+        "Date and Time (UTC)": "January 1, 1949, 06:51",
+        "Definition": "Split",
+        "Incarnation Cross": "Right Angle Cross of Tension (38/39 | 48/21)",
+        "Location": "London, United Kingdom",
+        "Name": "FateBridge fictional disc-full-07-jupiter-194901010651",
+        "Not-Self Theme": "Frustration",
+        "Profile": "2/4",
+        "Signature": "Satisfaction",
+        "Strategy": "Wait to Respond",
+        "Type": "Generator",
+        "Variable": "PRR DLL"
+      },
+      "defined_channel_render_ids": [
+        "c2838",
+        "c515"
+      ],
+      "defined_centers": [
+        "g",
+        "root",
+        "sacral",
+        "spleen"
+      ],
+      "pdf_sha256": "7cf7cb0bd2858ad0fe9d6d63b5054de8d66ac6ebfe37347da033159a3ae48300",
+      "pdf_filename": "disc-full-07-jupiter-194901010651.pdf"
+    },
+    {
+      "id": "disc-full-08-jupiter-203201010839",
+      "birth_input": {
+        "birth_year": 2032,
+        "birth_month": 1,
+        "birth_day": 1,
+        "birth_hour": 8,
+        "birth_minute": 39,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "displayed_birth_utc": "2032-01-01T08:39:00+00:00",
+      "columns": {
+        "design": [
+          "48.4",
+          "21.4",
+          "35.4",
+          "43.1",
+          "23.1",
+          "32.1",
+          "29.3",
+          "11.5",
+          "11.1",
+          "12.1",
+          "12.5",
+          "21.6",
+          "19.4"
+        ],
+        "personality": [
+          "38.2",
+          "39.2",
+          "4.2",
+          "1.5",
+          "2.5",
+          "11.1",
+          "34.4",
+          "55.3",
+          "38.2",
+          "45.1",
+          "12.3",
+          "21.4",
+          "19.5"
+        ]
+      },
+      "properties": {
+        "Authority": "Solar Plexus",
+        "Date and Time (Local)": "January 1, 2032, 08:39",
+        "Date and Time (UTC)": "January 1, 2032, 08:39",
+        "Definition": "Split",
+        "Incarnation Cross": "Right Angle Cross of Tension (38/39 | 48/21)",
+        "Location": "London, United Kingdom",
+        "Name": "FateBridge fictional disc-full-08-jupiter-203201010839",
+        "Not-Self Theme": "Anger",
+        "Profile": "2/4",
+        "Signature": "Peace",
+        "Strategy": "To Inform",
+        "Type": "Manifestor",
+        "Variable": "PLR DLL"
+      },
+      "defined_channel_render_ids": [
+        "c2145",
+        "c2343",
+        "c3955"
+      ],
+      "defined_centers": [
+        "ajna",
+        "heart",
+        "root",
+        "solar_plexus",
+        "throat"
+      ],
+      "pdf_sha256": "ce3d53f7508c43dae2f02dfdabd3b5c54a65dd7064c0dbf4ad64c4a4cdcdb41e",
+      "pdf_filename": "disc-full-08-jupiter-203201010839.pdf"
+    },
+    {
+      "id": "disc-full-09-jupiter-203201010840",
+      "birth_input": {
+        "birth_year": 2032,
+        "birth_month": 1,
+        "birth_day": 1,
+        "birth_hour": 8,
+        "birth_minute": 40,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "displayed_birth_utc": "2032-01-01T08:40:00+00:00",
+      "columns": {
+        "design": [
+          "48.4",
+          "21.4",
+          "35.4",
+          "43.1",
+          "23.1",
+          "32.1",
+          "29.3",
+          "11.5",
+          "11.1",
+          "12.1",
+          "12.5",
+          "21.6",
+          "19.4"
+        ],
+        "personality": [
+          "38.2",
+          "39.2",
+          "4.2",
+          "1.5",
+          "2.5",
+          "11.1",
+          "34.4",
+          "55.3",
+          "38.2",
+          "45.1",
+          "12.3",
+          "21.4",
+          "19.5"
+        ]
+      },
+      "properties": {
+        "Authority": "Solar Plexus",
+        "Date and Time (Local)": "January 1, 2032, 08:40",
+        "Date and Time (UTC)": "January 1, 2032, 08:40",
+        "Definition": "Split",
+        "Incarnation Cross": "Right Angle Cross of Tension (38/39 | 48/21)",
+        "Location": "London, United Kingdom",
+        "Name": "FateBridge fictional disc-full-09-jupiter-203201010840",
+        "Not-Self Theme": "Anger",
+        "Profile": "2/4",
+        "Signature": "Peace",
+        "Strategy": "To Inform",
+        "Type": "Manifestor",
+        "Variable": "PLR DLL"
+      },
+      "defined_channel_render_ids": [
+        "c2145",
+        "c2343",
+        "c3955"
+      ],
+      "defined_centers": [
+        "ajna",
+        "heart",
+        "root",
+        "solar_plexus",
+        "throat"
+      ],
+      "pdf_sha256": "83a8a1321a99ef992d968e6cd40b0ddfe404b07192a17ca51088ef1c8aa1671b",
+      "pdf_filename": "disc-full-09-jupiter-203201010840.pdf"
+    },
+    {
+      "id": "disc-full-10-jupiter-204401052157",
+      "birth_input": {
+        "birth_year": 2044,
+        "birth_month": 1,
+        "birth_day": 5,
+        "birth_hour": 21,
+        "birth_minute": 57,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "displayed_birth_utc": "2044-01-05T21:57:00+00:00",
+      "columns": {
+        "design": [
+          "57.3",
+          "51.3",
+          "38.1",
+          "25.2",
+          "46.2",
+          "48.5",
+          "28.3",
+          "7.4",
+          "11.6",
+          "1.5",
+          "4.3",
+          "24.5",
+          "30.6"
+        ],
+        "personality": [
+          "54.1",
+          "53.1",
+          "22.1",
+          "22.6",
+          "47.6",
+          "26.6",
+          "49.4",
+          "6.5",
+          "54.1",
+          "14.3",
+          "4.3",
+          "24.3",
+          "30.6"
+        ]
+      },
+      "properties": {
+        "Authority": "Splenic",
+        "Date and Time (Local)": "January 5, 2044, 21:57",
+        "Date and Time (UTC)": "January 5, 2044, 21:57",
+        "Definition": "Split",
+        "Incarnation Cross": "Right Angle Cross of Penetration (54/53 | 57/51)",
+        "Location": "London, United Kingdom",
+        "Name": "FateBridge fictional disc-full-10-jupiter-204401052157",
+        "Not-Self Theme": "Bitterness",
+        "Profile": "1/3",
+        "Signature": "Success",
+        "Strategy": "Wait for Recognition and the Invitation",
+        "Type": "Projector",
+        "Variable": "PLL DLR"
+      },
+      "defined_channel_render_ids": [
+        "c2551",
+        "c2838"
+      ],
+      "defined_centers": [
+        "g",
+        "heart",
+        "root",
+        "spleen"
+      ],
+      "pdf_sha256": "af7097951c35438951d0525dc8bd6e822dbea8e2e16e247d481134d5bea56b8e",
+      "pdf_filename": "disc-full-10-jupiter-204401052157.pdf"
+    },
+    {
+      "id": "disc-full-14-saturn-181401120921",
+      "birth_input": {
+        "birth_year": 1814,
+        "birth_month": 1,
+        "birth_day": 12,
+        "birth_hour": 9,
+        "birth_minute": 20,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "displayed_birth_utc": "1814-01-12T09:20:00+00:00",
+      "columns": {
+        "design": [
+          "32.4",
+          "42.4",
+          "31.2",
+          "31.6",
+          "41.6",
+          "50.3",
+          "34.1",
+          "13.3",
+          "59.4",
+          "38.5",
+          "14.2",
+          "5.3",
+          "22.3"
+        ],
+        "personality": [
+          "61.1",
+          "62.1",
+          "48.1",
+          "56.6",
+          "60.6",
+          "10.3",
+          "37.3",
+          "17.5",
+          "40.5",
+          "61.1",
+          "34.2",
+          "5.6",
+          "22.2"
+        ]
+      },
+      "properties": {
+        "Authority": "Solar Plexus",
+        "Date and Time (Local)": "January 12, 1814, 09:20",
+        "Date and Time (UTC)": "January 12, 1814, 09:20",
+        "Definition": "Triple Split",
+        "Incarnation Cross": "Right Angle Cross of Maya (61/62 | 32/42)",
+        "Location": "London, United Kingdom",
+        "Name": "FateBridge fictional disc-full-14-saturn-181401120921",
+        "Not-Self Theme": "Frustration",
+        "Profile": "1/4",
+        "Signature": "Satisfaction",
+        "Strategy": "Wait to Respond",
+        "Type": "Generator",
+        "Variable": "PRR DLL"
+      },
+      "defined_channel_render_ids": [
+        "c1034",
+        "c1762",
+        "c3740"
+      ],
+      "defined_centers": [
+        "ajna",
+        "g",
+        "heart",
+        "sacral",
+        "solar_plexus",
+        "throat"
+      ],
+      "pdf_sha256": "ac8d1938eaa6743117bde7994faf29b9bc1cc04e0eb9125bb4352f03075ac517",
+      "pdf_filename": "disc-full-14-saturn-181401120921.pdf"
+    },
+    {
+      "id": "disc-full-15-saturn-181401120922",
+      "birth_input": {
+        "birth_year": 1814,
+        "birth_month": 1,
+        "birth_day": 12,
+        "birth_hour": 9,
+        "birth_minute": 21,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "displayed_birth_utc": "1814-01-12T09:21:00+00:00",
+      "columns": {
+        "design": [
+          "32.4",
+          "42.4",
+          "31.2",
+          "31.6",
+          "41.6",
+          "50.3",
+          "34.1",
+          "13.3",
+          "59.4",
+          "38.5",
+          "14.2",
+          "5.3",
+          "22.3"
+        ],
+        "personality": [
+          "61.1",
+          "62.1",
+          "48.1",
+          "56.6",
+          "60.6",
+          "10.3",
+          "37.3",
+          "17.5",
+          "40.5",
+          "61.1",
+          "34.2",
+          "5.6",
+          "22.2"
+        ]
+      },
+      "properties": {
+        "Authority": "Solar Plexus",
+        "Date and Time (Local)": "January 12, 1814, 09:21",
+        "Date and Time (UTC)": "January 12, 1814, 09:21",
+        "Definition": "Triple Split",
+        "Incarnation Cross": "Right Angle Cross of Maya (61/62 | 32/42)",
+        "Location": "London, United Kingdom",
+        "Name": "FateBridge fictional disc-full-15-saturn-181401120922",
+        "Not-Self Theme": "Frustration",
+        "Profile": "1/4",
+        "Signature": "Satisfaction",
+        "Strategy": "Wait to Respond",
+        "Type": "Generator",
+        "Variable": "PRR DLL"
+      },
+      "defined_channel_render_ids": [
+        "c1034",
+        "c1762",
+        "c3740"
+      ],
+      "defined_centers": [
+        "ajna",
+        "g",
+        "heart",
+        "sacral",
+        "solar_plexus",
+        "throat"
+      ],
+      "pdf_sha256": "358e524f555e68c4a387ab2749a8c74bb18b845e5aec5e1e2df70a04eb2c159e",
+      "pdf_filename": "disc-full-15-saturn-181401120922.pdf"
+    },
+    {
+      "id": "disc-full-16-saturn-181401120923",
+      "birth_input": {
+        "birth_year": 1814,
+        "birth_month": 1,
+        "birth_day": 12,
+        "birth_hour": 9,
+        "birth_minute": 22,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "displayed_birth_utc": "1814-01-12T09:22:00+00:00",
+      "columns": {
+        "design": [
+          "32.4",
+          "42.4",
+          "31.2",
+          "31.6",
+          "41.6",
+          "50.3",
+          "34.1",
+          "13.3",
+          "59.4",
+          "38.5",
+          "14.2",
+          "5.3",
+          "22.3"
+        ],
+        "personality": [
+          "61.1",
+          "62.1",
+          "48.1",
+          "56.6",
+          "60.6",
+          "10.3",
+          "37.3",
+          "17.5",
+          "40.5",
+          "61.1",
+          "34.2",
+          "5.6",
+          "22.2"
+        ]
+      },
+      "properties": {
+        "Authority": "Solar Plexus",
+        "Date and Time (Local)": "January 12, 1814, 09:22",
+        "Date and Time (UTC)": "January 12, 1814, 09:22",
+        "Definition": "Triple Split",
+        "Incarnation Cross": "Right Angle Cross of Maya (61/62 | 32/42)",
+        "Location": "London, United Kingdom",
+        "Name": "FateBridge fictional disc-full-16-saturn-181401120923",
+        "Not-Self Theme": "Frustration",
+        "Profile": "1/4",
+        "Signature": "Satisfaction",
+        "Strategy": "Wait to Respond",
+        "Type": "Generator",
+        "Variable": "PRR DLL"
+      },
+      "defined_channel_render_ids": [
+        "c1034",
+        "c1762",
+        "c3740"
+      ],
+      "defined_centers": [
+        "ajna",
+        "g",
+        "heart",
+        "sacral",
+        "solar_plexus",
+        "throat"
+      ],
+      "pdf_sha256": "7672d678b34ef8117d33c6aaa02d634ec86e4803b0274ec2b76a0f0a19184019",
+      "pdf_filename": "disc-full-16-saturn-181401120923.pdf"
+    },
+    {
+      "id": "disc-full-17-saturn-209307190525",
+      "birth_input": {
+        "birth_year": 2093,
+        "birth_month": 7,
+        "birth_day": 19,
+        "birth_hour": 6,
+        "birth_minute": 25,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "displayed_birth_utc": "2093-07-19T05:25:00+00:00",
+      "columns": {
+        "design": [
+          "3.4",
+          "50.4",
+          "60.6",
+          "56.5",
+          "60.5",
+          "42.2",
+          "24.4",
+          "57.5",
+          "22.5",
+          "53.3",
+          "36.4",
+          "29.6",
+          "3.1"
+        ],
+        "personality": [
+          "56.2",
+          "60.2",
+          "16.6",
+          "62.6",
+          "61.6",
+          "52.6",
+          "59.2",
+          "50.3",
+          "25.6",
+          "56.2",
+          "36.6",
+          "59.1",
+          "3.3"
+        ]
+      },
+      "properties": {
+        "Authority": "Sacral",
+        "Date and Time (Local)": "July 19, 2093, 06:25",
+        "Date and Time (UTC)": "July 19, 2093, 05:25",
+        "Definition": "Split",
+        "Incarnation Cross": "Right Angle Cross of Laws (56/60 | 3/50)",
+        "Location": "London, United Kingdom",
+        "Name": "FateBridge fictional disc-full-17-saturn-209307190525",
+        "Not-Self Theme": "Frustration",
+        "Profile": "2/4",
+        "Signature": "Satisfaction",
+        "Strategy": "Wait to Respond",
+        "Type": "Generator",
+        "Variable": "PLR DLR"
+      },
+      "defined_channel_render_ids": [
+        "c2461",
+        "c360",
+        "c4253"
+      ],
+      "defined_centers": [
+        "ajna",
+        "head",
+        "root",
+        "sacral"
+      ],
+      "pdf_sha256": "d07a15ec74c55870ea67e2610058c9a738440d50324601b5ede09428c9fdf9d9",
+      "pdf_filename": "disc-full-17-saturn-209307190525.pdf"
+    },
+    {
+      "id": "disc-full-21-neptune-184002020325",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 3,
+        "birth_minute": 24,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "displayed_birth_utc": "1840-02-02T03:24:00+00:00",
+      "columns": {
+        "design": [
+          "1.2",
+          "2.2",
+          "14.3",
+          "63.3",
+          "64.3",
+          "14.4",
+          "18.3",
+          "11.4",
+          "28.1",
+          "9.5",
+          "63.2",
+          "19.3",
+          "51.3"
+        ],
+        "personality": [
+          "19.6",
+          "33.6",
+          "61.5",
+          "37.1",
+          "40.1",
+          "60.1",
+          "10.3",
+          "55.4",
+          "1.5",
+          "26.3",
+          "63.4",
+          "19.6",
+          "51.3"
+        ]
+      },
+      "properties": {
+        "Authority": "Solar Plexus",
+        "Date and Time (Local)": "February 2, 1840, 03:24",
+        "Date and Time (UTC)": "February 2, 1840, 03:24",
+        "Definition": "Split",
+        "Incarnation Cross": "Left Angle Cross of Refinement (19/33 | 1/2)",
+        "Location": "London, United Kingdom",
+        "Name": "FateBridge fictional disc-full-21-neptune-184002020325",
+        "Not-Self Theme": "Frustration",
+        "Profile": "6/2",
+        "Signature": "Satisfaction",
+        "Strategy": "Wait to Respond",
+        "Type": "Generator",
+        "Variable": "PRR DLR"
+      },
+      "defined_channel_render_ids": [
+        "c214",
+        "c3740"
+      ],
+      "defined_centers": [
+        "g",
+        "heart",
+        "sacral",
+        "solar_plexus"
+      ],
+      "pdf_sha256": "53d6311dbeac5b244e22c3398f0f4396e918a1bdfb15300a5bcc1a479f2e667a",
+      "pdf_filename": "disc-full-21-neptune-184002020325.pdf"
+    },
+    {
+      "id": "disc-full-22-neptune-184002020326",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 3,
+        "birth_minute": 25,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "displayed_birth_utc": "1840-02-02T03:25:00+00:00",
+      "columns": {
+        "design": [
+          "1.2",
+          "2.2",
+          "14.3",
+          "63.3",
+          "64.3",
+          "14.4",
+          "18.3",
+          "11.4",
+          "28.1",
+          "9.5",
+          "63.2",
+          "19.3",
+          "51.3"
+        ],
+        "personality": [
+          "19.6",
+          "33.6",
+          "61.5",
+          "37.1",
+          "40.1",
+          "60.1",
+          "10.3",
+          "55.4",
+          "1.5",
+          "26.3",
+          "63.4",
+          "19.6",
+          "51.3"
+        ]
+      },
+      "properties": {
+        "Authority": "Solar Plexus",
+        "Date and Time (Local)": "February 2, 1840, 03:25",
+        "Date and Time (UTC)": "February 2, 1840, 03:25",
+        "Definition": "Split",
+        "Incarnation Cross": "Left Angle Cross of Refinement (19/33 | 1/2)",
+        "Location": "London, United Kingdom",
+        "Name": "FateBridge fictional disc-full-22-neptune-184002020326",
+        "Not-Self Theme": "Frustration",
+        "Profile": "6/2",
+        "Signature": "Satisfaction",
+        "Strategy": "Wait to Respond",
+        "Type": "Generator",
+        "Variable": "PRR DRR"
+      },
+      "defined_channel_render_ids": [
+        "c214",
+        "c3740"
+      ],
+      "defined_centers": [
+        "g",
+        "heart",
+        "sacral",
+        "solar_plexus"
+      ],
+      "pdf_sha256": "6d4016b8a7849c2e5392e574af8c3bbca304e032a3349baa973106dc9bd95110",
+      "pdf_filename": "disc-full-22-neptune-184002020326.pdf"
+    }
+  ],
+  "scope": "All22 default-Skyfield versus direct-Swiss line-bin differences from the unchanged640independent minutes, no substitutions. Added after keeping the earlier five modern source cases. Model-informed development diagnostics, not blind. Historical/future clock conventions may confound source comparison; local input rounded to nearest whole minute because public UI hasmaxlength5 HH:mm, all such changes recorded. Source clock mismatches must remain failed or unresolved, not silently rebased. Original38criteria and old cohorts remain required. PDF13properties independently bound;26gate.lines and graph from visibleSVG. No old cohorts/criteria changed.",
+  "binding_producer_sha256": "f1e1c53fbf805773b1db62550f15e09539bdbe39500b7a926eacad78a40733a9"
+}

@@ -1,0 +1,47 @@
+{
+  "method_id": "human_design_native_context_isolation_plan_v1",
+  "before_sha256": "50c86b4334eee19b38533cbe905d17407021b9ad53c1d2a75be2cec9a7cfcf40",
+  "mandatory_birth_inputs": [
+    {
+      "birth_year": 1800,
+      "birth_month": 4,
+      "birth_day": 6,
+      "birth_hour": 9,
+      "birth_minute": 33,
+      "birth_timezone": "UTC"
+    },
+    {
+      "birth_year": 1900,
+      "birth_month": 4,
+      "birth_day": 6,
+      "birth_hour": 9,
+      "birth_minute": 33,
+      "birth_timezone": "UTC"
+    },
+    {
+      "birth_year": 1960,
+      "birth_month": 4,
+      "birth_day": 6,
+      "birth_hour": 9,
+      "birth_minute": 33,
+      "birth_timezone": "UTC"
+    },
+    {
+      "birth_year": 1990,
+      "birth_month": 4,
+      "birth_day": 6,
+      "birth_hour": 9,
+      "birth_minute": 33,
+      "birth_timezone": "UTC"
+    }
+  ],
+  "controlled_override_days": 0.1,
+  "checks": [
+    "Parent override cannot alter birth/design labels, TT/UT1, all26 activations, graph, profile, variables or fixed interpretation.",
+    "Parent native settings remain unchanged after the calculation.",
+    "Current auxiliary file candidates are pinned at the two endpoints; current configured files remain effective.",
+    "Every existing source-file fault probe remains executed inside a fresh fault-test process; do not propagate parent monkeypatches into production dispatch.",
+    "Real REST/MCP/CLI dispatch, same-run paged original results, installed wheel and original astronomy/source acceptance remain required."
+  ],
+  "scope": "Freeze all four original synthetic inputs including the two post1960 controls. No position tolerance, original source assertion or failed oracle is removed or relaxed. Experimental evidence is not production acceptance."
+}

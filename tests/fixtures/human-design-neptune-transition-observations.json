@@ -1,0 +1,1770 @@
+[
+  {
+    "id": "nt-184002020324",
+    "collected_at_utc": "2026-10-25T11:20:15.046Z",
+    "facts": {
+      "columns": {
+        "design": [
+          "1.2",
+          "2.2",
+          "14.3",
+          "63.3",
+          "64.3",
+          "14.4",
+          "18.3",
+          "11.4",
+          "28.1",
+          "9.5",
+          "63.2",
+          "19.3",
+          "51.3"
+        ],
+        "personality": [
+          "19.6",
+          "33.6",
+          "61.5",
+          "37.1",
+          "40.1",
+          "60.1",
+          "10.3",
+          "55.4",
+          "1.5",
+          "26.3",
+          "63.4",
+          "19.6",
+          "51.3"
+        ]
+      },
+      "defined_centers": [
+        "g",
+        "heart",
+        "sacral",
+        "solar_plexus"
+      ],
+      "defined_channel_render_ids": [
+        "c214",
+        "c3740"
+      ],
+      "properties": {
+        "Authority": "Solar Plexus",
+        "Date and Time (Local)": "February 2, 1840, 03:24",
+        "Date and Time (UTC)": "February 2, 1840, 03:24",
+        "Definition": "Split",
+        "Incarnation Cross": "Left Angle Cross of Refinement  (19/33 | 1/2)",
+        "Location": "London, United Kingdom",
+        "Name": "FateBridge fictional nt-184002020324",
+        "Not-Self Theme": "Frustration",
+        "Profile": "6/2",
+        "Signature": "Satisfaction",
+        "Strategy": "Wait to Respond",
+        "Type": "Generator",
+        "Variable": "PRR DLR"
+      }
+    },
+    "source": {
+      "pdf_filename": "nt-184002020324.pdf",
+      "pdf_sha256": "ff7ad5bc4b5ebd20b99b7e78f1f3b401e95c6b0e5f7a8b4ba41350c53107b264",
+      "pdf_bytes": 396155
+    }
+  },
+  {
+    "id": "nt-184002020325",
+    "collected_at_utc": "2026-10-25T11:20:23.764Z",
+    "facts": {
+      "columns": {
+        "design": [
+          "1.2",
+          "2.2",
+          "14.3",
+          "63.3",
+          "64.3",
+          "14.4",
+          "18.3",
+          "11.4",
+          "28.1",
+          "9.5",
+          "63.2",
+          "19.3",
+          "51.3"
+        ],
+        "personality": [
+          "19.6",
+          "33.6",
+          "61.5",
+          "37.1",
+          "40.1",
+          "60.1",
+          "10.3",
+          "55.4",
+          "1.5",
+          "26.3",
+          "63.4",
+          "19.6",
+          "51.3"
+        ]
+      },
+      "defined_centers": [
+        "g",
+        "heart",
+        "sacral",
+        "solar_plexus"
+      ],
+      "defined_channel_render_ids": [
+        "c214",
+        "c3740"
+      ],
+      "properties": {
+        "Authority": "Solar Plexus",
+        "Date and Time (Local)": "February 2, 1840, 03:25",
+        "Date and Time (UTC)": "February 2, 1840, 03:25",
+        "Definition": "Split",
+        "Incarnation Cross": "Left Angle Cross of Refinement  (19/33 | 1/2)",
+        "Location": "London, United Kingdom",
+        "Name": "FateBridge fictional nt-184002020325",
+        "Not-Self Theme": "Frustration",
+        "Profile": "6/2",
+        "Signature": "Satisfaction",
+        "Strategy": "Wait to Respond",
+        "Type": "Generator",
+        "Variable": "PRR DRR"
+      }
+    },
+    "source": {
+      "pdf_filename": "nt-184002020325.pdf",
+      "pdf_sha256": "69f7ceda084cd4b9752de05cd59674fa49ebc04935d4ab693529fea62817e3f5",
+      "pdf_bytes": 396120
+    }
+  },
+  {
+    "id": "nt-184002020312",
+    "collected_at_utc": "2026-10-25T11:23:23.696Z",
+    "facts": {
+      "columns": {
+        "design": [
+          "1.2",
+          "2.2",
+          "14.3",
+          "63.3",
+          "64.3",
+          "14.4",
+          "18.3",
+          "11.4",
+          "28.1",
+          "9.5",
+          "63.2",
+          "19.3",
+          "51.3"
+        ],
+        "personality": [
+          "19.6",
+          "33.6",
+          "61.5",
+          "37.1",
+          "40.1",
+          "60.1",
+          "10.3",
+          "55.4",
+          "1.5",
+          "26.3",
+          "63.4",
+          "19.5",
+          "51.3"
+        ]
+      },
+      "defined_centers": [
+        "g",
+        "heart",
+        "sacral",
+        "solar_plexus"
+      ],
+      "defined_channel_render_ids": [
+        "c214",
+        "c3740"
+      ],
+      "properties": {
+        "Authority": "Solar Plexus",
+        "Date and Time (Local)": "February 2, 1840, 03:12",
+        "Date and Time (UTC)": "February 2, 1840, 03:12",
+        "Definition": "Split",
+        "Incarnation Cross": "Left Angle Cross of Refinement  (19/33 | 1/2)",
+        "Location": "London, United Kingdom",
+        "Name": "FateBridge fictional nt-184002020312",
+        "Not-Self Theme": "Frustration",
+        "Profile": "6/2",
+        "Signature": "Satisfaction",
+        "Strategy": "Wait to Respond",
+        "Type": "Generator",
+        "Variable": "PRR DLR"
+      }
+    },
+    "source": {
+      "pdf_filename": "nt-184002020312.pdf",
+      "pdf_sha256": "e3aa871117fe15061236a0ceb5032ffd3d8aa655dc2ad996ffcda4c339dacf6f",
+      "pdf_bytes": 396135
+    }
+  },
+  {
+    "id": "nt-184002020342",
+    "collected_at_utc": "2026-10-25T11:23:29.847Z",
+    "facts": {
+      "columns": {
+        "design": [
+          "1.2",
+          "2.2",
+          "14.3",
+          "63.3",
+          "64.3",
+          "14.4",
+          "18.3",
+          "11.4",
+          "28.1",
+          "9.5",
+          "63.2",
+          "19.3",
+          "51.3"
+        ],
+        "personality": [
+          "19.6",
+          "33.6",
+          "61.6",
+          "37.1",
+          "40.1",
+          "60.1",
+          "10.3",
+          "55.4",
+          "1.5",
+          "26.3",
+          "63.4",
+          "19.6",
+          "51.3"
+        ]
+      },
+      "defined_centers": [
+        "g",
+        "heart",
+        "sacral",
+        "solar_plexus"
+      ],
+      "defined_channel_render_ids": [
+        "c214",
+        "c3740"
+      ],
+      "properties": {
+        "Authority": "Solar Plexus",
+        "Date and Time (Local)": "February 2, 1840, 03:42",
+        "Date and Time (UTC)": "February 2, 1840, 03:42",
+        "Definition": "Split",
+        "Incarnation Cross": "Left Angle Cross of Refinement  (19/33 | 1/2)",
+        "Location": "London, United Kingdom",
+        "Name": "FateBridge fictional nt-184002020342",
+        "Not-Self Theme": "Frustration",
+        "Profile": "6/2",
+        "Signature": "Satisfaction",
+        "Strategy": "Wait to Respond",
+        "Type": "Generator",
+        "Variable": "PRR DRR"
+      }
+    },
+    "source": {
+      "pdf_filename": "nt-184002020342.pdf",
+      "pdf_sha256": "7b91ad90e912dc23dd2e3e8a683f57a5aa083992d666dd559a3fecbe195cc88f",
+      "pdf_bytes": 396138
+    }
+  },
+  {
+    "id": "nt-184002020327",
+    "collected_at_utc": "2026-10-25T11:28:19.370Z",
+    "facts": {
+      "columns": {
+        "design": [
+          "1.2",
+          "2.2",
+          "14.3",
+          "63.3",
+          "64.3",
+          "14.4",
+          "18.3",
+          "11.4",
+          "28.1",
+          "9.5",
+          "63.2",
+          "19.3",
+          "51.3"
+        ],
+        "personality": [
+          "19.6",
+          "33.6",
+          "61.5",
+          "37.1",
+          "40.1",
+          "60.1",
+          "10.3",
+          "55.4",
+          "1.5",
+          "26.3",
+          "63.4",
+          "19.6",
+          "51.3"
+        ]
+      },
+      "defined_centers": [
+        "g",
+        "heart",
+        "sacral",
+        "solar_plexus"
+      ],
+      "defined_channel_render_ids": [
+        "c214",
+        "c3740"
+      ],
+      "properties": {
+        "Authority": "Solar Plexus",
+        "Date and Time (Local)": "February 2, 1840, 03:27",
+        "Date and Time (UTC)": "February 2, 1840, 03:27",
+        "Definition": "Split",
+        "Incarnation Cross": "Left Angle Cross of Refinement  (19/33 | 1/2)",
+        "Location": "London, United Kingdom",
+        "Name": "FateBridge fictional nt-184002020327",
+        "Not-Self Theme": "Frustration",
+        "Profile": "6/2",
+        "Signature": "Satisfaction",
+        "Strategy": "Wait to Respond",
+        "Type": "Generator",
+        "Variable": "PRR DRR"
+      }
+    },
+    "source": {
+      "pdf_filename": "nt-184002020327.pdf",
+      "pdf_sha256": "58e50267c9c89993208b656761ad701f66d0a4c45579f7bd2107501bb11cd6b8",
+      "pdf_bytes": 396123
+    }
+  },
+  {
+    "id": "nt-184002020319",
+    "collected_at_utc": "2026-10-25T11:28:25.875Z",
+    "facts": {
+      "columns": {
+        "design": [
+          "1.2",
+          "2.2",
+          "14.3",
+          "63.3",
+          "64.3",
+          "14.4",
+          "18.3",
+          "11.4",
+          "28.1",
+          "9.5",
+          "63.2",
+          "19.3",
+          "51.3"
+        ],
+        "personality": [
+          "19.6",
+          "33.6",
+          "61.5",
+          "37.1",
+          "40.1",
+          "60.1",
+          "10.3",
+          "55.4",
+          "1.5",
+          "26.3",
+          "63.4",
+          "19.6",
+          "51.3"
+        ]
+      },
+      "defined_centers": [
+        "g",
+        "heart",
+        "sacral",
+        "solar_plexus"
+      ],
+      "defined_channel_render_ids": [
+        "c214",
+        "c3740"
+      ],
+      "properties": {
+        "Authority": "Solar Plexus",
+        "Date and Time (Local)": "February 2, 1840, 03:19",
+        "Date and Time (UTC)": "February 2, 1840, 03:19",
+        "Definition": "Split",
+        "Incarnation Cross": "Left Angle Cross of Refinement  (19/33 | 1/2)",
+        "Location": "London, United Kingdom",
+        "Name": "FateBridge fictional nt-184002020319",
+        "Not-Self Theme": "Frustration",
+        "Profile": "6/2",
+        "Signature": "Satisfaction",
+        "Strategy": "Wait to Respond",
+        "Type": "Generator",
+        "Variable": "PRR DLR"
+      }
+    },
+    "source": {
+      "pdf_filename": "nt-184002020319.pdf",
+      "pdf_sha256": "111c7ca531eaada5d659010547620c56a97a9fe42c66742f0fcad990e97918db",
+      "pdf_bytes": 396146
+    }
+  },
+  {
+    "id": "nt-184002020315",
+    "collected_at_utc": "2026-10-25T11:28:44.148Z",
+    "facts": {
+      "columns": {
+        "design": [
+          "1.2",
+          "2.2",
+          "14.3",
+          "63.3",
+          "64.3",
+          "14.4",
+          "18.3",
+          "11.4",
+          "28.1",
+          "9.5",
+          "63.2",
+          "19.3",
+          "51.3"
+        ],
+        "personality": [
+          "19.6",
+          "33.6",
+          "61.5",
+          "37.1",
+          "40.1",
+          "60.1",
+          "10.3",
+          "55.4",
+          "1.5",
+          "26.3",
+          "63.4",
+          "19.6",
+          "51.3"
+        ]
+      },
+      "defined_centers": [
+        "g",
+        "heart",
+        "sacral",
+        "solar_plexus"
+      ],
+      "defined_channel_render_ids": [
+        "c214",
+        "c3740"
+      ],
+      "properties": {
+        "Authority": "Solar Plexus",
+        "Date and Time (Local)": "February 2, 1840, 03:15",
+        "Date and Time (UTC)": "February 2, 1840, 03:15",
+        "Definition": "Split",
+        "Incarnation Cross": "Left Angle Cross of Refinement  (19/33 | 1/2)",
+        "Location": "London, United Kingdom",
+        "Name": "FateBridge fictional nt-184002020315",
+        "Not-Self Theme": "Frustration",
+        "Profile": "6/2",
+        "Signature": "Satisfaction",
+        "Strategy": "Wait to Respond",
+        "Type": "Generator",
+        "Variable": "PRR DLR"
+      }
+    },
+    "source": {
+      "pdf_filename": "nt-184002020315.pdf",
+      "pdf_sha256": "f1762f16863727afac39d91dca23e3f34b44c5ca1ec67f3af21079a0460afbb7",
+      "pdf_bytes": 396155
+    }
+  },
+  {
+    "id": "nt-184002020313",
+    "collected_at_utc": "2026-10-25T11:28:50.134Z",
+    "facts": {
+      "columns": {
+        "design": [
+          "1.2",
+          "2.2",
+          "14.3",
+          "63.3",
+          "64.3",
+          "14.4",
+          "18.3",
+          "11.4",
+          "28.1",
+          "9.5",
+          "63.2",
+          "19.3",
+          "51.3"
+        ],
+        "personality": [
+          "19.6",
+          "33.6",
+          "61.5",
+          "37.1",
+          "40.1",
+          "60.1",
+          "10.3",
+          "55.4",
+          "1.5",
+          "26.3",
+          "63.4",
+          "19.6",
+          "51.3"
+        ]
+      },
+      "defined_centers": [
+        "g",
+        "heart",
+        "sacral",
+        "solar_plexus"
+      ],
+      "defined_channel_render_ids": [
+        "c214",
+        "c3740"
+      ],
+      "properties": {
+        "Authority": "Solar Plexus",
+        "Date and Time (Local)": "February 2, 1840, 03:13",
+        "Date and Time (UTC)": "February 2, 1840, 03:13",
+        "Definition": "Split",
+        "Incarnation Cross": "Left Angle Cross of Refinement  (19/33 | 1/2)",
+        "Location": "London, United Kingdom",
+        "Name": "FateBridge fictional nt-184002020313",
+        "Not-Self Theme": "Frustration",
+        "Profile": "6/2",
+        "Signature": "Satisfaction",
+        "Strategy": "Wait to Respond",
+        "Type": "Generator",
+        "Variable": "PRR DLR"
+      }
+    },
+    "source": {
+      "pdf_filename": "nt-184002020313.pdf",
+      "pdf_sha256": "a6a94e7349fc54e455e7a715ba1fc4446bab42ae07ab50d2445d0026b646280e",
+      "pdf_bytes": 396155
+    }
+  },
+  {
+    "id": "nt-184002020132",
+    "collected_at_utc": "2026-10-25T11:29:11.118Z",
+    "facts": {
+      "columns": {
+        "design": [
+          "1.2",
+          "2.2",
+          "14.2",
+          "63.3",
+          "64.3",
+          "14.4",
+          "18.3",
+          "11.4",
+          "28.1",
+          "9.5",
+          "63.2",
+          "19.3",
+          "51.3"
+        ],
+        "personality": [
+          "19.6",
+          "33.6",
+          "61.4",
+          "37.1",
+          "40.1",
+          "60.1",
+          "10.3",
+          "55.4",
+          "1.5",
+          "26.3",
+          "63.4",
+          "19.5",
+          "51.3"
+        ]
+      },
+      "defined_centers": [
+        "g",
+        "heart",
+        "sacral",
+        "solar_plexus"
+      ],
+      "defined_channel_render_ids": [
+        "c214",
+        "c3740"
+      ],
+      "properties": {
+        "Authority": "Solar Plexus",
+        "Date and Time (Local)": "February 2, 1840, 01:32",
+        "Date and Time (UTC)": "February 2, 1840, 01:32",
+        "Definition": "Split",
+        "Incarnation Cross": "Left Angle Cross of Refinement  (19/33 | 1/2)",
+        "Location": "London, United Kingdom",
+        "Name": "FateBridge fictional nt-184002020132",
+        "Not-Self Theme": "Frustration",
+        "Profile": "6/2",
+        "Signature": "Satisfaction",
+        "Strategy": "Wait to Respond",
+        "Type": "Generator",
+        "Variable": "PLR DRR"
+      }
+    },
+    "source": {
+      "pdf_filename": "nt-184002020132.pdf",
+      "pdf_sha256": "cb4934bb14300d8fa007a29398e61deb61a8b866dd01743c14e87b01b8f07eee",
+      "pdf_bytes": 396017
+    }
+  },
+  {
+    "id": "nt-184002020202",
+    "collected_at_utc": "2026-10-25T11:29:16.554Z",
+    "facts": {
+      "columns": {
+        "design": [
+          "1.2",
+          "2.2",
+          "14.2",
+          "63.3",
+          "64.3",
+          "14.4",
+          "18.3",
+          "11.4",
+          "28.1",
+          "9.5",
+          "63.2",
+          "19.3",
+          "51.3"
+        ],
+        "personality": [
+          "19.6",
+          "33.6",
+          "61.5",
+          "37.1",
+          "40.1",
+          "60.1",
+          "10.3",
+          "55.4",
+          "1.5",
+          "26.3",
+          "63.4",
+          "19.5",
+          "51.3"
+        ]
+      },
+      "defined_centers": [
+        "g",
+        "heart",
+        "sacral",
+        "solar_plexus"
+      ],
+      "defined_channel_render_ids": [
+        "c214",
+        "c3740"
+      ],
+      "properties": {
+        "Authority": "Solar Plexus",
+        "Date and Time (Local)": "February 2, 1840, 02:02",
+        "Date and Time (UTC)": "February 2, 1840, 02:02",
+        "Definition": "Split",
+        "Incarnation Cross": "Left Angle Cross of Refinement  (19/33 | 1/2)",
+        "Location": "London, United Kingdom",
+        "Name": "FateBridge fictional nt-184002020202",
+        "Not-Self Theme": "Frustration",
+        "Profile": "6/2",
+        "Signature": "Satisfaction",
+        "Strategy": "Wait to Respond",
+        "Type": "Generator",
+        "Variable": "PLR DLR"
+      }
+    },
+    "source": {
+      "pdf_filename": "nt-184002020202.pdf",
+      "pdf_sha256": "587c6ecc0835be17bb86a946f69972f47b287329bf7606e5ec1e58f5246f5c6b",
+      "pdf_bytes": 396034
+    }
+  },
+  {
+    "id": "nt-184002020147",
+    "collected_at_utc": "2026-10-25T11:29:40.408Z",
+    "facts": {
+      "columns": {
+        "design": [
+          "1.2",
+          "2.2",
+          "14.2",
+          "63.3",
+          "64.3",
+          "14.4",
+          "18.3",
+          "11.4",
+          "28.1",
+          "9.5",
+          "63.2",
+          "19.3",
+          "51.3"
+        ],
+        "personality": [
+          "19.6",
+          "33.6",
+          "61.4",
+          "37.1",
+          "40.1",
+          "60.1",
+          "10.3",
+          "55.4",
+          "1.5",
+          "26.3",
+          "63.4",
+          "19.5",
+          "51.3"
+        ]
+      },
+      "defined_centers": [
+        "g",
+        "heart",
+        "sacral",
+        "solar_plexus"
+      ],
+      "defined_channel_render_ids": [
+        "c214",
+        "c3740"
+      ],
+      "properties": {
+        "Authority": "Solar Plexus",
+        "Date and Time (Local)": "February 2, 1840, 01:47",
+        "Date and Time (UTC)": "February 2, 1840, 01:47",
+        "Definition": "Split",
+        "Incarnation Cross": "Left Angle Cross of Refinement  (19/33 | 1/2)",
+        "Location": "London, United Kingdom",
+        "Name": "FateBridge fictional nt-184002020147",
+        "Not-Self Theme": "Frustration",
+        "Profile": "6/2",
+        "Signature": "Satisfaction",
+        "Strategy": "Wait to Respond",
+        "Type": "Generator",
+        "Variable": "PLR DLR"
+      }
+    },
+    "source": {
+      "pdf_filename": "nt-184002020147.pdf",
+      "pdf_sha256": "0c5d3c5dcb5bdc4a30939f7ab250c22a7815015fa5b28fd892676923b41349ee",
+      "pdf_bytes": 396013
+    }
+  },
+  {
+    "id": "nt-184002020154",
+    "collected_at_utc": "2026-10-25T11:29:45.579Z",
+    "facts": {
+      "columns": {
+        "design": [
+          "1.2",
+          "2.2",
+          "14.2",
+          "63.3",
+          "64.3",
+          "14.4",
+          "18.3",
+          "11.4",
+          "28.1",
+          "9.5",
+          "63.2",
+          "19.3",
+          "51.3"
+        ],
+        "personality": [
+          "19.6",
+          "33.6",
+          "61.5",
+          "37.1",
+          "40.1",
+          "60.1",
+          "10.3",
+          "55.4",
+          "1.5",
+          "26.3",
+          "63.4",
+          "19.5",
+          "51.3"
+        ]
+      },
+      "defined_centers": [
+        "g",
+        "heart",
+        "sacral",
+        "solar_plexus"
+      ],
+      "defined_channel_render_ids": [
+        "c214",
+        "c3740"
+      ],
+      "properties": {
+        "Authority": "Solar Plexus",
+        "Date and Time (Local)": "February 2, 1840, 01:54",
+        "Date and Time (UTC)": "February 2, 1840, 01:54",
+        "Definition": "Split",
+        "Incarnation Cross": "Left Angle Cross of Refinement  (19/33 | 1/2)",
+        "Location": "London, United Kingdom",
+        "Name": "FateBridge fictional nt-184002020154",
+        "Not-Self Theme": "Frustration",
+        "Profile": "6/2",
+        "Signature": "Satisfaction",
+        "Strategy": "Wait to Respond",
+        "Type": "Generator",
+        "Variable": "PLR DLR"
+      }
+    },
+    "source": {
+      "pdf_filename": "nt-184002020154.pdf",
+      "pdf_sha256": "aa3586dbca5dd9cd1c88277581e4a9854a6196d0291b573167ececb8315e1a24",
+      "pdf_bytes": 396042
+    }
+  },
+  {
+    "id": "nt-184002020150",
+    "collected_at_utc": "2026-10-25T11:30:41.710Z",
+    "facts": {
+      "columns": {
+        "design": [
+          "1.2",
+          "2.2",
+          "14.2",
+          "63.3",
+          "64.3",
+          "14.4",
+          "18.3",
+          "11.4",
+          "28.1",
+          "9.5",
+          "63.2",
+          "19.3",
+          "51.3"
+        ],
+        "personality": [
+          "19.6",
+          "33.6",
+          "61.5",
+          "37.1",
+          "40.1",
+          "60.1",
+          "10.3",
+          "55.4",
+          "1.5",
+          "26.3",
+          "63.4",
+          "19.5",
+          "51.3"
+        ]
+      },
+      "defined_centers": [
+        "g",
+        "heart",
+        "sacral",
+        "solar_plexus"
+      ],
+      "defined_channel_render_ids": [
+        "c214",
+        "c3740"
+      ],
+      "properties": {
+        "Authority": "Solar Plexus",
+        "Date and Time (Local)": "February 2, 1840, 01:50",
+        "Date and Time (UTC)": "February 2, 1840, 01:50",
+        "Definition": "Split",
+        "Incarnation Cross": "Left Angle Cross of Refinement  (19/33 | 1/2)",
+        "Location": "London, United Kingdom",
+        "Name": "FateBridge fictional nt-184002020150",
+        "Not-Self Theme": "Frustration",
+        "Profile": "6/2",
+        "Signature": "Satisfaction",
+        "Strategy": "Wait to Respond",
+        "Type": "Generator",
+        "Variable": "PLR DLR"
+      }
+    },
+    "source": {
+      "pdf_filename": "nt-184002020150.pdf",
+      "pdf_sha256": "5f0fd38904225b558a8e2aa20c9bdf81ca2ae9ef7694b4924512e73d95dedb0a",
+      "pdf_bytes": 396040
+    }
+  },
+  {
+    "id": "nt-184002020148",
+    "collected_at_utc": "2026-10-25T11:30:47.911Z",
+    "facts": {
+      "columns": {
+        "design": [
+          "1.2",
+          "2.2",
+          "14.2",
+          "63.3",
+          "64.3",
+          "14.4",
+          "18.3",
+          "11.4",
+          "28.1",
+          "9.5",
+          "63.2",
+          "19.3",
+          "51.3"
+        ],
+        "personality": [
+          "19.6",
+          "33.6",
+          "61.5",
+          "37.1",
+          "40.1",
+          "60.1",
+          "10.3",
+          "55.4",
+          "1.5",
+          "26.3",
+          "63.4",
+          "19.5",
+          "51.3"
+        ]
+      },
+      "defined_centers": [
+        "g",
+        "heart",
+        "sacral",
+        "solar_plexus"
+      ],
+      "defined_channel_render_ids": [
+        "c214",
+        "c3740"
+      ],
+      "properties": {
+        "Authority": "Solar Plexus",
+        "Date and Time (Local)": "February 2, 1840, 01:48",
+        "Date and Time (UTC)": "February 2, 1840, 01:48",
+        "Definition": "Split",
+        "Incarnation Cross": "Left Angle Cross of Refinement  (19/33 | 1/2)",
+        "Location": "London, United Kingdom",
+        "Name": "FateBridge fictional nt-184002020148",
+        "Not-Self Theme": "Frustration",
+        "Profile": "6/2",
+        "Signature": "Satisfaction",
+        "Strategy": "Wait to Respond",
+        "Type": "Generator",
+        "Variable": "PLR DLR"
+      }
+    },
+    "source": {
+      "pdf_filename": "nt-184002020148.pdf",
+      "pdf_sha256": "4cdddb4ea4c87ae8cd1657fac9f6534abeb03da5ed7728dad05cb687925f982f",
+      "pdf_bytes": 396042
+    }
+  },
+  {
+    "id": "nt-184002020349",
+    "collected_at_utc": "2026-10-25T11:32:09.728Z",
+    "facts": {
+      "columns": {
+        "design": [
+          "1.2",
+          "2.2",
+          "14.3",
+          "63.3",
+          "64.3",
+          "14.4",
+          "18.3",
+          "11.4",
+          "28.1",
+          "9.5",
+          "63.2",
+          "19.3",
+          "51.3"
+        ],
+        "personality": [
+          "19.6",
+          "33.6",
+          "61.6",
+          "37.1",
+          "40.1",
+          "60.1",
+          "10.3",
+          "55.4",
+          "1.5",
+          "26.3",
+          "63.4",
+          "19.6",
+          "51.3"
+        ]
+      },
+      "defined_centers": [
+        "g",
+        "heart",
+        "sacral",
+        "solar_plexus"
+      ],
+      "defined_channel_render_ids": [
+        "c214",
+        "c3740"
+      ],
+      "properties": {
+        "Authority": "Solar Plexus",
+        "Date and Time (Local)": "February 2, 1840, 03:49",
+        "Date and Time (UTC)": "February 2, 1840, 03:49",
+        "Definition": "Split",
+        "Incarnation Cross": "Left Angle Cross of Refinement  (19/33 | 1/2)",
+        "Location": "London, United Kingdom",
+        "Name": "FateBridge fictional nt-184002020349",
+        "Not-Self Theme": "Frustration",
+        "Profile": "6/2",
+        "Signature": "Satisfaction",
+        "Strategy": "Wait to Respond",
+        "Type": "Generator",
+        "Variable": "PRR DRR"
+      }
+    },
+    "source": {
+      "pdf_filename": "nt-184002020349.pdf",
+      "pdf_sha256": "149bcab833946860fd5e55a4747e7395482c60f1edfb5efd2a995b0963c7421a",
+      "pdf_bytes": 396130
+    }
+  },
+  {
+    "id": "nt-184002020334",
+    "collected_at_utc": "2026-10-25T11:32:19.057Z",
+    "facts": {
+      "columns": {
+        "design": [
+          "1.2",
+          "2.2",
+          "14.3",
+          "63.3",
+          "64.3",
+          "14.4",
+          "18.3",
+          "11.4",
+          "28.1",
+          "9.5",
+          "63.2",
+          "19.3",
+          "51.3"
+        ],
+        "personality": [
+          "19.6",
+          "33.6",
+          "61.6",
+          "37.1",
+          "40.1",
+          "60.1",
+          "10.3",
+          "55.4",
+          "1.5",
+          "26.3",
+          "63.4",
+          "19.6",
+          "51.3"
+        ]
+      },
+      "defined_centers": [
+        "g",
+        "heart",
+        "sacral",
+        "solar_plexus"
+      ],
+      "defined_channel_render_ids": [
+        "c214",
+        "c3740"
+      ],
+      "properties": {
+        "Authority": "Solar Plexus",
+        "Date and Time (Local)": "February 2, 1840, 03:34",
+        "Date and Time (UTC)": "February 2, 1840, 03:34",
+        "Definition": "Split",
+        "Incarnation Cross": "Left Angle Cross of Refinement  (19/33 | 1/2)",
+        "Location": "London, United Kingdom",
+        "Name": "FateBridge fictional nt-184002020334",
+        "Not-Self Theme": "Frustration",
+        "Profile": "6/2",
+        "Signature": "Satisfaction",
+        "Strategy": "Wait to Respond",
+        "Type": "Generator",
+        "Variable": "PRR DRR"
+      }
+    },
+    "source": {
+      "pdf_filename": "nt-184002020334.pdf",
+      "pdf_sha256": "16c6255fc7c04c77c39b1df87685f76d507e2c2e6a4fccd9722b008943663592",
+      "pdf_bytes": 396138
+    }
+  },
+  {
+    "id": "nt-184002020326",
+    "collected_at_utc": "2026-10-25T11:32:46.438Z",
+    "facts": {
+      "columns": {
+        "design": [
+          "1.2",
+          "2.2",
+          "14.3",
+          "63.3",
+          "64.3",
+          "14.4",
+          "18.3",
+          "11.4",
+          "28.1",
+          "9.5",
+          "63.2",
+          "19.3",
+          "51.3"
+        ],
+        "personality": [
+          "19.6",
+          "33.6",
+          "61.5",
+          "37.1",
+          "40.1",
+          "60.1",
+          "10.3",
+          "55.4",
+          "1.5",
+          "26.3",
+          "63.4",
+          "19.6",
+          "51.3"
+        ]
+      },
+      "defined_centers": [
+        "g",
+        "heart",
+        "sacral",
+        "solar_plexus"
+      ],
+      "defined_channel_render_ids": [
+        "c214",
+        "c3740"
+      ],
+      "properties": {
+        "Authority": "Solar Plexus",
+        "Date and Time (Local)": "February 2, 1840, 03:26",
+        "Date and Time (UTC)": "February 2, 1840, 03:26",
+        "Definition": "Split",
+        "Incarnation Cross": "Left Angle Cross of Refinement  (19/33 | 1/2)",
+        "Location": "London, United Kingdom",
+        "Name": "FateBridge fictional nt-184002020326",
+        "Not-Self Theme": "Frustration",
+        "Profile": "6/2",
+        "Signature": "Satisfaction",
+        "Strategy": "Wait to Respond",
+        "Type": "Generator",
+        "Variable": "PRR DRR"
+      }
+    },
+    "source": {
+      "pdf_filename": "nt-184002020326.pdf",
+      "pdf_sha256": "c443b903fff9435a182a8e90a66c88479b3197cf88d233df076887368952e991",
+      "pdf_bytes": 396121
+    }
+  },
+  {
+    "id": "nt-184002020330",
+    "collected_at_utc": "2026-10-25T11:32:54.494Z",
+    "facts": {
+      "columns": {
+        "design": [
+          "1.2",
+          "2.2",
+          "14.3",
+          "63.3",
+          "64.3",
+          "14.4",
+          "18.3",
+          "11.4",
+          "28.1",
+          "9.5",
+          "63.2",
+          "19.3",
+          "51.3"
+        ],
+        "personality": [
+          "19.6",
+          "33.6",
+          "61.5",
+          "37.1",
+          "40.1",
+          "60.1",
+          "10.3",
+          "55.4",
+          "1.5",
+          "26.3",
+          "63.4",
+          "19.6",
+          "51.3"
+        ]
+      },
+      "defined_centers": [
+        "g",
+        "heart",
+        "sacral",
+        "solar_plexus"
+      ],
+      "defined_channel_render_ids": [
+        "c214",
+        "c3740"
+      ],
+      "properties": {
+        "Authority": "Solar Plexus",
+        "Date and Time (Local)": "February 2, 1840, 03:30",
+        "Date and Time (UTC)": "February 2, 1840, 03:30",
+        "Definition": "Split",
+        "Incarnation Cross": "Left Angle Cross of Refinement  (19/33 | 1/2)",
+        "Location": "London, United Kingdom",
+        "Name": "FateBridge fictional nt-184002020330",
+        "Not-Self Theme": "Frustration",
+        "Profile": "6/2",
+        "Signature": "Satisfaction",
+        "Strategy": "Wait to Respond",
+        "Type": "Generator",
+        "Variable": "PRR DRR"
+      }
+    },
+    "source": {
+      "pdf_filename": "nt-184002020330.pdf",
+      "pdf_sha256": "93e64389f6ca86ec0887839699158d446e31a73a30ef1cd36ced00f9c823fd66",
+      "pdf_bytes": 396123
+    }
+  },
+  {
+    "id": "nt-184002020332",
+    "collected_at_utc": "2026-10-25T11:33:40.570Z",
+    "facts": {
+      "columns": {
+        "design": [
+          "1.2",
+          "2.2",
+          "14.3",
+          "63.3",
+          "64.3",
+          "14.4",
+          "18.3",
+          "11.4",
+          "28.1",
+          "9.5",
+          "63.2",
+          "19.3",
+          "51.3"
+        ],
+        "personality": [
+          "19.6",
+          "33.6",
+          "61.5",
+          "37.1",
+          "40.1",
+          "60.1",
+          "10.3",
+          "55.4",
+          "1.5",
+          "26.3",
+          "63.4",
+          "19.6",
+          "51.3"
+        ]
+      },
+      "defined_centers": [
+        "g",
+        "heart",
+        "sacral",
+        "solar_plexus"
+      ],
+      "defined_channel_render_ids": [
+        "c214",
+        "c3740"
+      ],
+      "properties": {
+        "Authority": "Solar Plexus",
+        "Date and Time (Local)": "February 2, 1840, 03:32",
+        "Date and Time (UTC)": "February 2, 1840, 03:32",
+        "Definition": "Split",
+        "Incarnation Cross": "Left Angle Cross of Refinement  (19/33 | 1/2)",
+        "Location": "London, United Kingdom",
+        "Name": "FateBridge fictional nt-184002020332",
+        "Not-Self Theme": "Frustration",
+        "Profile": "6/2",
+        "Signature": "Satisfaction",
+        "Strategy": "Wait to Respond",
+        "Type": "Generator",
+        "Variable": "PRR DRR"
+      }
+    },
+    "source": {
+      "pdf_filename": "nt-184002020332.pdf",
+      "pdf_sha256": "a3cb532504ef8327bbc53f9de406f27a4fc2bd1221c6727a26838aa930ca8af0",
+      "pdf_bytes": 396123
+    }
+  },
+  {
+    "id": "nt-184002020333",
+    "collected_at_utc": "2026-10-25T11:33:48.877Z",
+    "facts": {
+      "columns": {
+        "design": [
+          "1.2",
+          "2.2",
+          "14.3",
+          "63.3",
+          "64.3",
+          "14.4",
+          "18.3",
+          "11.4",
+          "28.1",
+          "9.5",
+          "63.2",
+          "19.3",
+          "51.3"
+        ],
+        "personality": [
+          "19.6",
+          "33.6",
+          "61.5",
+          "37.1",
+          "40.1",
+          "60.1",
+          "10.3",
+          "55.4",
+          "1.5",
+          "26.3",
+          "63.4",
+          "19.6",
+          "51.3"
+        ]
+      },
+      "defined_centers": [
+        "g",
+        "heart",
+        "sacral",
+        "solar_plexus"
+      ],
+      "defined_channel_render_ids": [
+        "c214",
+        "c3740"
+      ],
+      "properties": {
+        "Authority": "Solar Plexus",
+        "Date and Time (Local)": "February 2, 1840, 03:33",
+        "Date and Time (UTC)": "February 2, 1840, 03:33",
+        "Definition": "Split",
+        "Incarnation Cross": "Left Angle Cross of Refinement  (19/33 | 1/2)",
+        "Location": "London, United Kingdom",
+        "Name": "FateBridge fictional nt-184002020333",
+        "Not-Self Theme": "Frustration",
+        "Profile": "6/2",
+        "Signature": "Satisfaction",
+        "Strategy": "Wait to Respond",
+        "Type": "Generator",
+        "Variable": "PRR DRR"
+      }
+    },
+    "source": {
+      "pdf_filename": "nt-184002020333.pdf",
+      "pdf_sha256": "ac4fff4ab3c6fc7d90c1483f6290680e03553f9bbe7702568ef35be993fcf467",
+      "pdf_bytes": 396121
+    }
+  },
+  {
+    "id": "nt-184002020034",
+    "collected_at_utc": "2026-10-25T11:34:28.504Z",
+    "facts": {
+      "columns": {
+        "design": [
+          "1.2",
+          "2.2",
+          "14.2",
+          "63.3",
+          "64.3",
+          "14.4",
+          "18.3",
+          "11.4",
+          "28.1",
+          "9.5",
+          "63.2",
+          "19.3",
+          "51.3"
+        ],
+        "personality": [
+          "19.5",
+          "33.5",
+          "61.4",
+          "37.1",
+          "40.1",
+          "60.1",
+          "10.3",
+          "55.4",
+          "1.5",
+          "26.3",
+          "63.4",
+          "19.5",
+          "51.3"
+        ]
+      },
+      "defined_centers": [
+        "g",
+        "heart",
+        "sacral",
+        "solar_plexus"
+      ],
+      "defined_channel_render_ids": [
+        "c214",
+        "c3740"
+      ],
+      "properties": {
+        "Authority": "Solar Plexus",
+        "Date and Time (Local)": "February 2, 1840, 00:34",
+        "Date and Time (UTC)": "February 2, 1840, 00:34",
+        "Definition": "Split",
+        "Incarnation Cross": "Left Angle Cross of Refinement  (19/33 | 1/2)",
+        "Location": "London, United Kingdom",
+        "Name": "FateBridge fictional nt-184002020034",
+        "Not-Self Theme": "Frustration",
+        "Profile": "5/2",
+        "Signature": "Satisfaction",
+        "Strategy": "Wait to Respond",
+        "Type": "Generator",
+        "Variable": "PRR DRR"
+      }
+    },
+    "source": {
+      "pdf_filename": "nt-184002020034.pdf",
+      "pdf_sha256": "f2591c1263886e28a1e2dfe1920a2e692aea0d5a9d3d64695934f649685b497a",
+      "pdf_bytes": 395927
+    }
+  },
+  {
+    "id": "nt-184002020104",
+    "collected_at_utc": "2026-10-25T11:34:36.320Z",
+    "facts": {
+      "columns": {
+        "design": [
+          "1.2",
+          "2.2",
+          "14.2",
+          "63.3",
+          "64.3",
+          "14.4",
+          "18.3",
+          "11.4",
+          "28.1",
+          "9.5",
+          "63.2",
+          "19.3",
+          "51.3"
+        ],
+        "personality": [
+          "19.6",
+          "33.6",
+          "61.4",
+          "37.1",
+          "40.1",
+          "60.1",
+          "10.3",
+          "55.4",
+          "1.5",
+          "26.3",
+          "63.4",
+          "19.5",
+          "51.3"
+        ]
+      },
+      "defined_centers": [
+        "g",
+        "heart",
+        "sacral",
+        "solar_plexus"
+      ],
+      "defined_channel_render_ids": [
+        "c214",
+        "c3740"
+      ],
+      "properties": {
+        "Authority": "Solar Plexus",
+        "Date and Time (Local)": "February 2, 1840, 01:04",
+        "Date and Time (UTC)": "February 2, 1840, 01:04",
+        "Definition": "Split",
+        "Incarnation Cross": "Left Angle Cross of Refinement  (19/33 | 1/2)",
+        "Location": "London, United Kingdom",
+        "Name": "FateBridge fictional nt-184002020104",
+        "Not-Self Theme": "Frustration",
+        "Profile": "6/2",
+        "Signature": "Satisfaction",
+        "Strategy": "Wait to Respond",
+        "Type": "Generator",
+        "Variable": "PLR DRR"
+      }
+    },
+    "source": {
+      "pdf_filename": "nt-184002020104.pdf",
+      "pdf_sha256": "b43c2a98cd6e3ab26f078b5fdf56a7b9232dcb7b45906d55f89f06995b3038d3",
+      "pdf_bytes": 396014
+    }
+  },
+  {
+    "id": "nt-184002020049",
+    "collected_at_utc": "2026-10-25T11:35:12.668Z",
+    "facts": {
+      "columns": {
+        "design": [
+          "1.2",
+          "2.2",
+          "14.2",
+          "63.3",
+          "64.3",
+          "14.4",
+          "18.3",
+          "11.4",
+          "28.1",
+          "9.5",
+          "63.2",
+          "19.3",
+          "51.3"
+        ],
+        "personality": [
+          "19.5",
+          "33.5",
+          "61.4",
+          "37.1",
+          "40.1",
+          "60.1",
+          "10.3",
+          "55.4",
+          "1.5",
+          "26.3",
+          "63.4",
+          "19.5",
+          "51.3"
+        ]
+      },
+      "defined_centers": [
+        "g",
+        "heart",
+        "sacral",
+        "solar_plexus"
+      ],
+      "defined_channel_render_ids": [
+        "c214",
+        "c3740"
+      ],
+      "properties": {
+        "Authority": "Solar Plexus",
+        "Date and Time (Local)": "February 2, 1840, 00:49",
+        "Date and Time (UTC)": "February 2, 1840, 00:49",
+        "Definition": "Split",
+        "Incarnation Cross": "Left Angle Cross of Refinement  (19/33 | 1/2)",
+        "Location": "London, United Kingdom",
+        "Name": "FateBridge fictional nt-184002020049",
+        "Not-Self Theme": "Frustration",
+        "Profile": "5/2",
+        "Signature": "Satisfaction",
+        "Strategy": "Wait to Respond",
+        "Type": "Generator",
+        "Variable": "PRR DRR"
+      }
+    },
+    "source": {
+      "pdf_filename": "nt-184002020049.pdf",
+      "pdf_sha256": "e833738f612912ecee8ab4d0da68f3bcb76576ef97db4bec12a635f3d17ef3fd",
+      "pdf_bytes": 395921
+    }
+  },
+  {
+    "id": "nt-184002020056",
+    "collected_at_utc": "2026-10-25T11:35:18.576Z",
+    "facts": {
+      "columns": {
+        "design": [
+          "1.2",
+          "2.2",
+          "14.2",
+          "63.3",
+          "64.3",
+          "14.4",
+          "18.3",
+          "11.4",
+          "28.1",
+          "9.5",
+          "63.2",
+          "19.3",
+          "51.3"
+        ],
+        "personality": [
+          "19.6",
+          "33.6",
+          "61.4",
+          "37.1",
+          "40.1",
+          "60.1",
+          "10.3",
+          "55.4",
+          "1.5",
+          "26.3",
+          "63.4",
+          "19.5",
+          "51.3"
+        ]
+      },
+      "defined_centers": [
+        "g",
+        "heart",
+        "sacral",
+        "solar_plexus"
+      ],
+      "defined_channel_render_ids": [
+        "c214",
+        "c3740"
+      ],
+      "properties": {
+        "Authority": "Solar Plexus",
+        "Date and Time (Local)": "February 2, 1840, 00:56",
+        "Date and Time (UTC)": "February 2, 1840, 00:56",
+        "Definition": "Split",
+        "Incarnation Cross": "Left Angle Cross of Refinement  (19/33 | 1/2)",
+        "Location": "London, United Kingdom",
+        "Name": "FateBridge fictional nt-184002020056",
+        "Not-Self Theme": "Frustration",
+        "Profile": "6/2",
+        "Signature": "Satisfaction",
+        "Strategy": "Wait to Respond",
+        "Type": "Generator",
+        "Variable": "PLR DRR"
+      }
+    },
+    "source": {
+      "pdf_filename": "nt-184002020056.pdf",
+      "pdf_sha256": "0658d89a706d5fa43ee62f82b41ed5321a00472221a94933a0393e1c6fd36930",
+      "pdf_bytes": 396013
+    }
+  },
+  {
+    "id": "nt-184002020052",
+    "collected_at_utc": "2026-10-25T11:35:53.044Z",
+    "facts": {
+      "columns": {
+        "design": [
+          "1.2",
+          "2.2",
+          "14.2",
+          "63.3",
+          "64.3",
+          "14.4",
+          "18.3",
+          "11.4",
+          "28.1",
+          "9.5",
+          "63.2",
+          "19.3",
+          "51.3"
+        ],
+        "personality": [
+          "19.6",
+          "33.6",
+          "61.4",
+          "37.1",
+          "40.1",
+          "60.1",
+          "10.3",
+          "55.4",
+          "1.5",
+          "26.3",
+          "63.4",
+          "19.5",
+          "51.3"
+        ]
+      },
+      "defined_centers": [
+        "g",
+        "heart",
+        "sacral",
+        "solar_plexus"
+      ],
+      "defined_channel_render_ids": [
+        "c214",
+        "c3740"
+      ],
+      "properties": {
+        "Authority": "Solar Plexus",
+        "Date and Time (Local)": "February 2, 1840, 00:52",
+        "Date and Time (UTC)": "February 2, 1840, 00:52",
+        "Definition": "Split",
+        "Incarnation Cross": "Left Angle Cross of Refinement  (19/33 | 1/2)",
+        "Location": "London, United Kingdom",
+        "Name": "FateBridge fictional nt-184002020052",
+        "Not-Self Theme": "Frustration",
+        "Profile": "6/2",
+        "Signature": "Satisfaction",
+        "Strategy": "Wait to Respond",
+        "Type": "Generator",
+        "Variable": "PLR DRR"
+      }
+    },
+    "source": {
+      "pdf_filename": "nt-184002020052.pdf",
+      "pdf_sha256": "7a0fe28e240ee9516438e153ce4887bec9fb6b555eba8f41b5baa643e339bd03",
+      "pdf_bytes": 396013
+    }
+  },
+  {
+    "id": "nt-184002020050",
+    "collected_at_utc": "2026-10-25T11:35:59.774Z",
+    "facts": {
+      "columns": {
+        "design": [
+          "1.2",
+          "2.2",
+          "14.2",
+          "63.3",
+          "64.3",
+          "14.4",
+          "18.3",
+          "11.4",
+          "28.1",
+          "9.5",
+          "63.2",
+          "19.3",
+          "51.3"
+        ],
+        "personality": [
+          "19.6",
+          "33.6",
+          "61.4",
+          "37.1",
+          "40.1",
+          "60.1",
+          "10.3",
+          "55.4",
+          "1.5",
+          "26.3",
+          "63.4",
+          "19.5",
+          "51.3"
+        ]
+      },
+      "defined_centers": [
+        "g",
+        "heart",
+        "sacral",
+        "solar_plexus"
+      ],
+      "defined_channel_render_ids": [
+        "c214",
+        "c3740"
+      ],
+      "properties": {
+        "Authority": "Solar Plexus",
+        "Date and Time (Local)": "February 2, 1840, 00:50",
+        "Date and Time (UTC)": "February 2, 1840, 00:50",
+        "Definition": "Split",
+        "Incarnation Cross": "Left Angle Cross of Refinement  (19/33 | 1/2)",
+        "Location": "London, United Kingdom",
+        "Name": "FateBridge fictional nt-184002020050",
+        "Not-Self Theme": "Frustration",
+        "Profile": "6/2",
+        "Signature": "Satisfaction",
+        "Strategy": "Wait to Respond",
+        "Type": "Generator",
+        "Variable": "PLR DRR"
+      }
+    },
+    "source": {
+      "pdf_filename": "nt-184002020050.pdf",
+      "pdf_sha256": "e9a98a84fbb4e7d0c614309d111c31942c1eb93adc6d8a3492ab6b3b977d07c6",
+      "pdf_bytes": 396013
+    }
+  }
+]

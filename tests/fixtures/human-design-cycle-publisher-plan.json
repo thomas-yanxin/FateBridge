@@ -1,0 +1,94 @@
+{
+  "source": {
+    "url": "https://cdn.shopify.com/s/files/1/0872/4984/6576/files/Life-Cycles-Analysis-preview.pdf?v=1757008879",
+    "publisher_page": "https://jovianarchive.com/products/life-cycles-analysis",
+    "pdf_sha256": "5bbc572b33609ee1f23e33ee7a36645ddc565da9f256635a95043295369a33e6",
+    "pdf_page_one_based": 10,
+    "printed_page": "2",
+    "attribution": "Ra Uru Hu, course2005; official publisher preview",
+    "subject": "Krishnamurti",
+    "literal_date": "1895-05-12",
+    "literal_clock": "12:25 PM",
+    "literal_place": "Madanapalle, India",
+    "timezone_supplied": false,
+    "expected_type": "Manifestor",
+    "expected_definition": "Single"
+  },
+  "preregistered_before_engine_probe": true,
+  "literal_hypotheses": [
+    {
+      "id": "literal-PM-IANA",
+      "input": {
+        "birth_year": 1895,
+        "birth_month": 5,
+        "birth_day": 12,
+        "birth_hour": 12,
+        "birth_minute": 25,
+        "birth_second": 0,
+        "birth_timezone": "Asia/Kolkata"
+      },
+      "scope": "Historical IANA location-zone hypothesis, not a publisher-supplied offset."
+    },
+    {
+      "id": "literal-PM-fixed-IST",
+      "input": {
+        "birth_year": 1895,
+        "birth_month": 5,
+        "birth_day": 12,
+        "birth_hour": 12,
+        "birth_minute": 25,
+        "birth_second": 0,
+        "birth_timezone": "+05:30"
+      },
+      "scope": "Fixed modern IST offset hypothesis; not asserted as historical civil time."
+    }
+  ],
+  "diagnostic_only_hypotheses": [
+    {
+      "id": "unprinted-AM-IANA",
+      "input": {
+        "birth_year": 1895,
+        "birth_month": 5,
+        "birth_day": 12,
+        "birth_hour": 0,
+        "birth_minute": 25,
+        "birth_second": 0,
+        "birth_timezone": "Asia/Kolkata"
+      },
+      "scope": "AM alternative is not the printed input and cannot count as literal conformance."
+    },
+    {
+      "id": "unprinted-AM-fixed-IST",
+      "input": {
+        "birth_year": 1895,
+        "birth_month": 5,
+        "birth_day": 12,
+        "birth_hour": 0,
+        "birth_minute": 25,
+        "birth_second": 0,
+        "birth_timezone": "+05:30"
+      },
+      "scope": "AM alternative is not the printed input and cannot count as literal conformance."
+    }
+  ],
+  "node_modes": [
+    "true",
+    "mean"
+  ],
+  "backends": [
+    "swieph",
+    "moshier"
+  ],
+  "requirements": [
+    "Preserve source clock12:25PM and missing-zone fact without repair.",
+    "Keep both literal hypotheses, both diagnostic hypotheses, both modes and both backends regardless of outcomes.",
+    "Only literal-PM hypotheses enter the literal comparison; never count unprinted AM success as acceptance.",
+    "No exact birth-epoch, full-source or real-world prediction certificate from this bounded example.",
+    "Retain all previous38professional criteria and original official/chart/physical failures."
+  ],
+  "unchanged_thresholds": {
+    "astronomy_arcsec": 2.0,
+    "physical_design_root_seconds": 5.0,
+    "clock_seconds": 0.0002
+  }
+}

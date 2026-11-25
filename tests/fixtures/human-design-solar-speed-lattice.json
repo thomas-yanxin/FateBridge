@@ -1,0 +1,3917 @@
+{
+  "method_id": "human_design_sun_speed_integer_lattice_reference_v1",
+  "reference_sha256": "949d4187a8bc6c4bacd8492a374c523d788cc72e73842c8e231850ff786733ca",
+  "generator_sha256": "b3038ccc3cbb905de12c5005a5b8fcb0cb1eb872a12cb104b3ae9006745075cc",
+  "native_version": "2.10.03",
+  "source_files": {
+    "sepl_12.se1": "8dccace2557601a223d5f8a7cf64de4e6bbb8a82b9b130b95a54d49adfbe546d",
+    "sepl_18.se1": "ca1393ceab3a44fbc895887cf789c68819ae6a1cbc9b22225872dbe4ccd99a66"
+  },
+  "cases": [
+    {
+      "label": "1800-01-01T00:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2378496.5,
+      "birth_sun_longitude": 280.42912719016266,
+      "lower_jd_tt": 2378409.1962983147,
+      "upper_jd_tt": 2378409.196298315,
+      "selected_jd_tt": 2378409.1962983147,
+      "selected_sun_longitude": 192.42912718998818,
+      "exact_residual": [
+        "6139",
+        "35184372088832"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "1800-01-01T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2378497.0,
+      "birth_sun_longitude": 280.93892533519164,
+      "lower_jd_tt": 2378409.7123421445,
+      "upper_jd_tt": 2378409.712342145,
+      "selected_jd_tt": 2378409.7123421445,
+      "selected_sun_longitude": 192.93892533507443,
+      "exact_residual": [
+        "1031",
+        "8796093022208"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "1800-07-02T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2378679.0,
+      "birth_sun_longitude": 100.25608323163638,
+      "lower_jd_tt": 2378587.7430923353,
+      "upper_jd_tt": 2378587.7430923358,
+      "selected_jd_tt": 2378587.7430923353,
+      "selected_sun_longitude": 12.256083231572221,
+      "exact_residual": [
+        "36119",
+        "562949953421312"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "1810-01-01T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2382149.0,
+      "birth_sun_longitude": 280.5041963278467,
+      "lower_jd_tt": 2382061.694913102,
+      "upper_jd_tt": 2382061.6949131023,
+      "selected_jd_tt": 2382061.6949131023,
+      "selected_sun_longitude": 192.50419632788146,
+      "exact_residual": [
+        "-611",
+        "17592186044416"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "1810-07-02T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2382331.0,
+      "birth_sun_longitude": 99.8565204854468,
+      "lower_jd_tt": 2382239.76316192,
+      "upper_jd_tt": 2382239.7631619205,
+      "selected_jd_tt": 2382239.76316192,
+      "selected_sun_longitude": 11.856520485385222,
+      "exact_residual": [
+        "17331",
+        "281474976710656"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "1820-01-01T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2385801.0,
+      "birth_sun_longitude": 280.06211786415395,
+      "lower_jd_tt": 2385713.670998963,
+      "upper_jd_tt": 2385713.6709989635,
+      "selected_jd_tt": 2385713.670998963,
+      "selected_sun_longitude": 192.0621178639445,
+      "exact_residual": [
+        "7369",
+        "35184372088832"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "1820-07-02T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2385984.0,
+      "birth_sun_longitude": 100.41614076314934,
+      "lower_jd_tt": 2385892.750101,
+      "upper_jd_tt": 2385892.7501010005,
+      "selected_jd_tt": 2385892.750101,
+      "selected_sun_longitude": 12.416140763102936,
+      "exact_residual": [
+        "26125",
+        "562949953421312"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "1830-01-01T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2389454.0,
+      "birth_sun_longitude": 280.6532506656487,
+      "lower_jd_tt": 2389366.6932996097,
+      "upper_jd_tt": 2389366.69329961,
+      "selected_jd_tt": 2389366.6932996097,
+      "selected_sun_longitude": 192.6532506654906,
+      "exact_residual": [
+        "1391",
+        "8796093022208"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "1830-07-02T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2389636.0,
+      "birth_sun_longitude": 100.01964970413121,
+      "lower_jd_tt": 2389544.7674607234,
+      "upper_jd_tt": 2389544.767460724,
+      "selected_jd_tt": 2389544.767460724,
+      "selected_sun_longitude": 12.019649704193128,
+      "exact_residual": [
+        "-4357",
+        "70368744177664"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "1840-01-01T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2393106.0,
+      "birth_sun_longitude": 280.21930804839235,
+      "lower_jd_tt": 2393018.6708954843,
+      "upper_jd_tt": 2393018.6708954847,
+      "selected_jd_tt": 2393018.6708954843,
+      "selected_sun_longitude": 192.21930804836975,
+      "exact_residual": [
+        "795",
+        "35184372088832"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "1840-07-02T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2393289.0,
+      "birth_sun_longitude": 100.57765686672548,
+      "lower_jd_tt": 2393197.7542881984,
+      "upper_jd_tt": 2393197.754288199,
+      "selected_jd_tt": 2393197.7542881984,
+      "selected_sun_longitude": 12.577656866682773,
+      "exact_residual": [
+        "3005",
+        "70368744177664"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "1850-01-01T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2396759.0,
+      "birth_sun_longitude": 280.79720449606964,
+      "lower_jd_tt": 2396671.679838346,
+      "upper_jd_tt": 2396671.6798383463,
+      "selected_jd_tt": 2396671.679838346,
+      "selected_sun_longitude": 192.79720449601612,
+      "exact_residual": [
+        "1883",
+        "35184372088832"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "1850-07-02T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2396941.0,
+      "birth_sun_longitude": 100.16849994890111,
+      "lower_jd_tt": 2396849.773611035,
+      "upper_jd_tt": 2396849.7736110357,
+      "selected_jd_tt": 2396849.7736110357,
+      "selected_sun_longitude": 12.168499948949451,
+      "exact_residual": [
+        "-27211",
+        "562949953421312"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "1860-01-01T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2400411.0,
+      "birth_sun_longitude": 280.36425951389236,
+      "lower_jd_tt": 2400323.657702281,
+      "upper_jd_tt": 2400323.6577022816,
+      "selected_jd_tt": 2400323.657702281,
+      "selected_sun_longitude": 192.36425951381898,
+      "exact_residual": [
+        "1291",
+        "17592186044416"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "1860-07-02T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2400594.0,
+      "birth_sun_longitude": 100.73795076563651,
+      "lower_jd_tt": 2400502.7626280836,
+      "upper_jd_tt": 2400502.762628084,
+      "selected_jd_tt": 2400502.762628084,
+      "selected_sun_longitude": 12.737950765686621,
+      "exact_residual": [
+        "-28209",
+        "562949953421312"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "1870-01-01T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2404064.0,
+      "birth_sun_longitude": 280.9405421128019,
+      "lower_jd_tt": 2403976.67420039,
+      "upper_jd_tt": 2403976.6742003905,
+      "selected_jd_tt": 2403976.6742003905,
+      "selected_sun_longitude": 192.94054211284404,
+      "exact_residual": [
+        "-1483",
+        "35184372088832"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "1870-07-02T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2404246.0,
+      "birth_sun_longitude": 100.33589739507389,
+      "lower_jd_tt": 2404154.789726422,
+      "upper_jd_tt": 2404154.7897264226,
+      "selected_jd_tt": 2404154.7897264226,
+      "selected_sun_longitude": 12.335897395101735,
+      "exact_residual": [
+        "-7839",
+        "281474976710656"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "1880-01-01T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2407716.0,
+      "birth_sun_longitude": 280.51139827600184,
+      "lower_jd_tt": 2407628.649993715,
+      "upper_jd_tt": 2407628.6499937153,
+      "selected_jd_tt": 2407628.6499937153,
+      "selected_sun_longitude": 192.51139827621657,
+      "exact_residual": [
+        "-7555",
+        "35184372088832"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "1880-07-02T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2407899.0,
+      "birth_sun_longitude": 100.9018867517871,
+      "lower_jd_tt": 2407807.7709819786,
+      "upper_jd_tt": 2407807.770981979,
+      "selected_jd_tt": 2407807.770981979,
+      "selected_sun_longitude": 12.901886751861188,
+      "exact_residual": [
+        "-20853",
+        "281474976710656"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "1890-01-01T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2411369.0,
+      "birth_sun_longitude": 281.091703608513,
+      "lower_jd_tt": 2411281.6694432106,
+      "upper_jd_tt": 2411281.669443211,
+      "selected_jd_tt": 2411281.6694432106,
+      "selected_sun_longitude": 193.09170360836853,
+      "exact_residual": [
+        "5083",
+        "35184372088832"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "1890-07-02T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2411551.0,
+      "birth_sun_longitude": 100.49149248537094,
+      "lower_jd_tt": 2411459.785705367,
+      "upper_jd_tt": 2411459.7857053676,
+      "selected_jd_tt": 2411459.785705367,
+      "selected_sun_longitude": 12.491492485148598,
+      "exact_residual": [
+        "7823",
+        "35184372088832"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "1900-01-01T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2415021.0,
+      "birth_sun_longitude": 280.66331121772237,
+      "lower_jd_tt": 2414933.648269686,
+      "upper_jd_tt": 2414933.6482696864,
+      "selected_jd_tt": 2414933.6482696864,
+      "selected_sun_longitude": 192.66331121793914,
+      "exact_residual": [
+        "-7627",
+        "35184372088832"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "1900-07-02T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2415203.0,
+      "birth_sun_longitude": 100.1078808319864,
+      "lower_jd_tt": 2415111.8086514976,
+      "upper_jd_tt": 2415111.808651498,
+      "selected_jd_tt": 2415111.8086514976,
+      "selected_sun_longitude": 12.107880831857875,
+      "exact_residual": [
+        "72357",
+        "562949953421312"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "1910-01-01T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2418673.0,
+      "birth_sun_longitude": 280.2162359654507,
+      "lower_jd_tt": 2418585.6276817545,
+      "upper_jd_tt": 2418585.627681755,
+      "selected_jd_tt": 2418585.627681755,
+      "selected_sun_longitude": 192.21623596549503,
+      "exact_residual": [
+        "-1559",
+        "35184372088832"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "1910-07-02T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2418855.0,
+      "birth_sun_longitude": 99.70066353148312,
+      "lower_jd_tt": 2418763.833345477,
+      "upper_jd_tt": 2418763.8333454775,
+      "selected_jd_tt": 2418763.8333454775,
+      "selected_sun_longitude": 11.700663531530742,
+      "exact_residual": [
+        "-26811",
+        "562949953421312"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "1920-01-01T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2422325.0,
+      "birth_sun_longitude": 279.79078458956957,
+      "lower_jd_tt": 2422237.60422933,
+      "upper_jd_tt": 2422237.6042293306,
+      "selected_jd_tt": 2422237.60422933,
+      "selected_sun_longitude": 191.79078458954885,
+      "exact_residual": [
+        "729",
+        "35184372088832"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "1920-07-02T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2422508.0,
+      "birth_sun_longitude": 100.26184004824923,
+      "lower_jd_tt": 2422416.812497401,
+      "upper_jd_tt": 2422416.8124974016,
+      "selected_jd_tt": 2422416.8124974016,
+      "selected_sun_longitude": 12.261840048313527,
+      "exact_residual": [
+        "-18099",
+        "281474976710656"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "1930-01-01T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2425978.0,
+      "birth_sun_longitude": 280.3675059054096,
+      "lower_jd_tt": 2425890.616907984,
+      "upper_jd_tt": 2425890.6169079845,
+      "selected_jd_tt": 2425890.6169079845,
+      "selected_sun_longitude": 192.36750590548166,
+      "exact_residual": [
+        "-317",
+        "4398046511104"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "1930-07-02T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2426160.0,
+      "birth_sun_longitude": 99.86269567168699,
+      "lower_jd_tt": 2426068.8419890637,
+      "upper_jd_tt": 2426068.841989064,
+      "selected_jd_tt": 2426068.841989064,
+      "selected_sun_longitude": 11.862695671720685,
+      "exact_residual": [
+        "-18967",
+        "562949953421312"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "1940-01-01T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2429630.0,
+      "birth_sun_longitude": 279.92818130681,
+      "lower_jd_tt": 2429542.594130389,
+      "upper_jd_tt": 2429542.5941303894,
+      "selected_jd_tt": 2429542.5941303894,
+      "selected_sun_longitude": 191.92818130696944,
+      "exact_residual": [
+        "-5609",
+        "35184372088832"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "1940-07-02T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2429813.0,
+      "birth_sun_longitude": 100.42463777466295,
+      "lower_jd_tt": 2429721.8272187477,
+      "upper_jd_tt": 2429721.827218748,
+      "selected_jd_tt": 2429721.827218748,
+      "selected_sun_longitude": 12.424637774877734,
+      "exact_residual": [
+        "-60455",
+        "281474976710656"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "1950-01-01T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2433283.0,
+      "birth_sun_longitude": 280.5140461856041,
+      "lower_jd_tt": 2433195.613394606,
+      "upper_jd_tt": 2433195.6133946064,
+      "selected_jd_tt": 2433195.6133946064,
+      "selected_sun_longitude": 192.5140461858121,
+      "exact_residual": [
+        "-3659",
+        "17592186044416"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "1950-07-02T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2433465.0,
+      "birth_sun_longitude": 100.02634626409699,
+      "lower_jd_tt": 2433373.84514582,
+      "upper_jd_tt": 2433373.8451458206,
+      "selected_jd_tt": 2433373.84514582,
+      "selected_sun_longitude": 12.026346264022461,
+      "exact_residual": [
+        "20977",
+        "281474976710656"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "1960-01-01T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2436935.0,
+      "birth_sun_longitude": 280.08428580030835,
+      "lower_jd_tt": 2436847.5946419802,
+      "upper_jd_tt": 2436847.5946419807,
+      "selected_jd_tt": 2436847.5946419807,
+      "selected_sun_longitude": 192.08428580050122,
+      "exact_residual": [
+        "-3393",
+        "17592186044416"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "1960-07-02T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2437118.0,
+      "birth_sun_longitude": 100.5831708649543,
+      "lower_jd_tt": 2437026.827449134,
+      "upper_jd_tt": 2437026.8274491346,
+      "selected_jd_tt": 2437026.8274491346,
+      "selected_sun_longitude": 12.583170865165311,
+      "exact_residual": [
+        "-59395",
+        "281474976710656"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "1970-01-01T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2440588.0,
+      "birth_sun_longitude": 280.6654495506615,
+      "lower_jd_tt": 2440500.605475656,
+      "upper_jd_tt": 2440500.6054756567,
+      "selected_jd_tt": 2440500.6054756567,
+      "selected_sun_longitude": 192.66544955087537,
+      "exact_residual": [
+        "-7525",
+        "35184372088832"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "1970-07-02T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2440770.0,
+      "birth_sun_longitude": 100.18417422568335,
+      "lower_jd_tt": 2440678.8532253373,
+      "upper_jd_tt": 2440678.853225338,
+      "selected_jd_tt": 2440678.853225338,
+      "selected_sun_longitude": 12.18417422577705,
+      "exact_residual": [
+        "-13187",
+        "140737488355328"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "1980-01-01T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2444240.0,
+      "birth_sun_longitude": 280.2238349787121,
+      "lower_jd_tt": 2444152.5815624148,
+      "upper_jd_tt": 2444152.581562415,
+      "selected_jd_tt": 2444152.5815624148,
+      "selected_sun_longitude": 192.2238349786585,
+      "exact_residual": [
+        "943",
+        "17592186044416"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "1980-07-02T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2444423.0,
+      "birth_sun_longitude": 100.73348067991826,
+      "lower_jd_tt": 2444331.8347558724,
+      "upper_jd_tt": 2444331.834755873,
+      "selected_jd_tt": 2444331.8347558724,
+      "selected_sun_longitude": 12.733480679694384,
+      "exact_residual": [
+        "63015",
+        "281474976710656"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "1990-01-01T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2447893.0,
+      "birth_sun_longitude": 280.8135898825684,
+      "lower_jd_tt": 2447805.595578335,
+      "upper_jd_tt": 2447805.5955783357,
+      "selected_jd_tt": 2447805.595578335,
+      "selected_sun_longitude": 192.81358988239805,
+      "exact_residual": [
+        "2997",
+        "17592186044416"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "1990-07-02T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2448075.0,
+      "birth_sun_longitude": 100.3521954843436,
+      "lower_jd_tt": 2447983.864477475,
+      "upper_jd_tt": 2447983.8644774756,
+      "selected_jd_tt": 2447983.864477475,
+      "selected_sun_longitude": 12.352195484322479,
+      "exact_residual": [
+        "743",
+        "35184372088832"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2000-01-01T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2451545.0,
+      "birth_sun_longitude": 280.36816555258,
+      "lower_jd_tt": 2451457.575581603,
+      "upper_jd_tt": 2451457.5755816037,
+      "selected_jd_tt": 2451457.575581603,
+      "selected_sun_longitude": 192.3681655524483,
+      "exact_residual": [
+        "4635",
+        "35184372088832"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2000-07-02T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2451728.0,
+      "birth_sun_longitude": 100.89714730649185,
+      "lower_jd_tt": 2451636.848176944,
+      "upper_jd_tt": 2451636.8481769445,
+      "selected_jd_tt": 2451636.8481769445,
+      "selected_sun_longitude": 12.897147306563056,
+      "exact_residual": [
+        "-5011",
+        "70368744177664"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2010-01-01T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2455198.0,
+      "birth_sun_longitude": 280.9598035970594,
+      "lower_jd_tt": 2455110.5849005706,
+      "upper_jd_tt": 2455110.584900571,
+      "selected_jd_tt": 2455110.5849005706,
+      "selected_sun_longitude": 192.9598035969301,
+      "exact_residual": [
+        "2275",
+        "17592186044416"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2010-07-02T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2455380.0,
+      "birth_sun_longitude": 100.5085406501976,
+      "lower_jd_tt": 2455288.8688721787,
+      "upper_jd_tt": 2455288.868872179,
+      "selected_jd_tt": 2455288.8688721787,
+      "selected_sun_longitude": 12.508540650181294,
+      "exact_residual": [
+        "9181",
+        "562949953421312"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2020-01-01T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2458850.0,
+      "birth_sun_longitude": 280.5184110132463,
+      "lower_jd_tt": 2458762.5717443265,
+      "upper_jd_tt": 2458762.571744327,
+      "selected_jd_tt": 2458762.5717443265,
+      "selected_sun_longitude": 192.51841101306616,
+      "exact_residual": [
+        "3169",
+        "17592186044416"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2020-07-02T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2459033.0,
+      "birth_sun_longitude": 101.05835056685926,
+      "lower_jd_tt": 2458941.8486344065,
+      "upper_jd_tt": 2458941.848634407,
+      "selected_jd_tt": 2458941.8486344065,
+      "selected_sun_longitude": 13.058350566785592,
+      "exact_residual": [
+        "81",
+        "1099511627776"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2030-01-01T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2462503.0,
+      "birth_sun_longitude": 281.11131475314244,
+      "lower_jd_tt": 2462415.58565633,
+      "upper_jd_tt": 2462415.5856563305,
+      "selected_jd_tt": 2462415.5856563305,
+      "selected_sun_longitude": 193.1113147532445,
+      "exact_residual": [
+        "-3591",
+        "35184372088832"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2030-07-02T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2462685.0,
+      "birth_sun_longitude": 100.67109649236644,
+      "lower_jd_tt": 2462593.8760536173,
+      "upper_jd_tt": 2462593.876053618,
+      "selected_jd_tt": 2462593.876053618,
+      "selected_sun_longitude": 12.671096492490005,
+      "exact_residual": [
+        "-34779",
+        "281474976710656"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2040-01-01T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2466155.0,
+      "birth_sun_longitude": 280.6659186040365,
+      "lower_jd_tt": 2466067.562314662,
+      "upper_jd_tt": 2466067.5623146626,
+      "selected_jd_tt": 2466067.562314662,
+      "selected_sun_longitude": 192.66591860397818,
+      "exact_residual": [
+        "513",
+        "8796093022208"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2040-07-02T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2466338.0,
+      "birth_sun_longitude": 101.21183405322401,
+      "lower_jd_tt": 2466246.857153951,
+      "upper_jd_tt": 2466246.8571539517,
+      "selected_jd_tt": 2466246.857153951,
+      "selected_sun_longitude": 13.211834053022265,
+      "exact_residual": [
+        "28393",
+        "140737488355328"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2050-01-01T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2469808.0,
+      "birth_sun_longitude": 281.2571141063345,
+      "lower_jd_tt": 2469720.570066736,
+      "upper_jd_tt": 2469720.5700667365,
+      "selected_jd_tt": 2469720.5700667365,
+      "selected_sun_longitude": 193.25711410653201,
+      "exact_residual": [
+        "-3475",
+        "17592186044416"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2050-07-02T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2469990.0,
+      "birth_sun_longitude": 100.82783442386653,
+      "lower_jd_tt": 2469898.882759495,
+      "upper_jd_tt": 2469898.8827594956,
+      "selected_jd_tt": 2469898.882759495,
+      "selected_sun_longitude": 12.827834423768861,
+      "exact_residual": [
+        "54985",
+        "562949953421312"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2060-01-01T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2473460.0,
+      "birth_sun_longitude": 280.81132405768017,
+      "lower_jd_tt": 2473372.553356278,
+      "upper_jd_tt": 2473372.5533562787,
+      "selected_jd_tt": 2473372.553356278,
+      "selected_sun_longitude": 192.81132405757637,
+      "exact_residual": [
+        "913",
+        "8796093022208"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2060-07-02T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2473643.0,
+      "birth_sun_longitude": 101.37852735845522,
+      "lower_jd_tt": 2473551.8707710924,
+      "upper_jd_tt": 2473551.870771093,
+      "selected_jd_tt": 2473551.870771093,
+      "selected_sun_longitude": 13.378527358504671,
+      "exact_residual": [
+        "-27841",
+        "562949953421312"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2070-01-01T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2477113.0,
+      "birth_sun_longitude": 281.3983174734405,
+      "lower_jd_tt": 2477025.562393447,
+      "upper_jd_tt": 2477025.5623934474,
+      "selected_jd_tt": 2477025.562393447,
+      "selected_sun_longitude": 193.39831747328702,
+      "exact_residual": [
+        "675",
+        "4398046511104"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2070-07-02T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2477295.0,
+      "birth_sun_longitude": 100.99033793160106,
+      "lower_jd_tt": 2477203.89401538,
+      "upper_jd_tt": 2477203.8940153806,
+      "selected_jd_tt": 2477203.8940153806,
+      "selected_sun_longitude": 12.990337931756464,
+      "exact_residual": [
+        "-21871",
+        "140737488355328"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2080-01-01T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2480765.0,
+      "birth_sun_longitude": 280.96489137158534,
+      "lower_jd_tt": 2480677.550150421,
+      "upper_jd_tt": 2480677.5501504214,
+      "selected_jd_tt": 2480677.5501504214,
+      "selected_sun_longitude": 192.96489137178068,
+      "exact_residual": [
+        "-6873",
+        "35184372088832"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2080-07-02T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2480948.0,
+      "birth_sun_longitude": 101.53972691183485,
+      "lower_jd_tt": 2480856.8691671183,
+      "upper_jd_tt": 2480856.869167119,
+      "selected_jd_tt": 2480856.869167119,
+      "selected_sun_longitude": 13.539726912001496,
+      "exact_residual": [
+        "-93815",
+        "562949953421312"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2090-01-01T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2484418.0,
+      "birth_sun_longitude": 281.55110750047925,
+      "lower_jd_tt": 2484330.5592002585,
+      "upper_jd_tt": 2484330.559200259,
+      "selected_jd_tt": 2484330.5592002585,
+      "selected_sun_longitude": 193.551107500307,
+      "exact_residual": [
+        "1515",
+        "8796093022208"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2090-07-02T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2484600.0,
+      "birth_sun_longitude": 101.1467575189215,
+      "lower_jd_tt": 2484508.8985086544,
+      "upper_jd_tt": 2484508.898508655,
+      "selected_jd_tt": 2484508.8985086544,
+      "selected_sun_longitude": 13.146757518795363,
+      "exact_residual": [
+        "71011",
+        "562949953421312"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2100-01-01T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2488070.0,
+      "birth_sun_longitude": 281.1127859555142,
+      "lower_jd_tt": 2487982.540598658,
+      "upper_jd_tt": 2487982.5405986584,
+      "selected_jd_tt": 2487982.5405986584,
+      "selected_sun_longitude": 193.11278595557613,
+      "exact_residual": [
+        "-2179",
+        "35184372088832"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2100-07-02T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2488252.0,
+      "birth_sun_longitude": 100.74615869908676,
+      "lower_jd_tt": 2488160.914806455,
+      "upper_jd_tt": 2488160.9148064554,
+      "selected_jd_tt": 2488160.914806455,
+      "selected_sun_longitude": 12.746158698879617,
+      "exact_residual": [
+        "116613",
+        "562949953421312"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2110-01-01T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2491722.0,
+      "birth_sun_longitude": 280.675494141325,
+      "lower_jd_tt": 2491634.5150884287,
+      "upper_jd_tt": 2491634.515088429,
+      "selected_jd_tt": 2491634.515088429,
+      "selected_sun_longitude": 192.67549414140686,
+      "exact_residual": [
+        "-2881",
+        "35184372088832"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2110-07-02T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2491904.0,
+      "birth_sun_longitude": 100.349423745503,
+      "lower_jd_tt": 2491812.9365619062,
+      "upper_jd_tt": 2491812.9365619067,
+      "selected_jd_tt": 2491812.9365619062,
+      "selected_sun_longitude": 12.34942374531681,
+      "exact_residual": [
+        "104817",
+        "562949953421312"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2120-01-01T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2495374.0,
+      "birth_sun_longitude": 280.24504734742834,
+      "lower_jd_tt": 2495286.496926186,
+      "upper_jd_tt": 2495286.4969261866,
+      "selected_jd_tt": 2495286.4969261866,
+      "selected_sun_longitude": 192.24504734763192,
+      "exact_residual": [
+        "-7163",
+        "35184372088832"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2120-07-02T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2495557.0,
+      "birth_sun_longitude": 100.91099903330978,
+      "lower_jd_tt": 2495465.924422481,
+      "upper_jd_tt": 2495465.9244224816,
+      "selected_jd_tt": 2495465.9244224816,
+      "selected_sun_longitude": 12.910999033331562,
+      "exact_residual": [
+        "-12263",
+        "562949953421312"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2130-01-01T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2499027.0,
+      "birth_sun_longitude": 280.81535077957665,
+      "lower_jd_tt": 2498939.5031103557,
+      "upper_jd_tt": 2498939.503110356,
+      "selected_jd_tt": 2498939.503110356,
+      "selected_sun_longitude": 192.8153507797664,
+      "exact_residual": [
+        "-1669",
+        "8796093022208"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2130-07-02T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2499209.0,
+      "birth_sun_longitude": 100.51100999338054,
+      "lower_jd_tt": 2499117.9536348144,
+      "upper_jd_tt": 2499117.953634815,
+      "selected_jd_tt": 2499117.953634815,
+      "selected_sun_longitude": 12.511009993434625,
+      "exact_residual": [
+        "-30447",
+        "562949953421312"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2140-01-01T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2502679.0,
+      "birth_sun_longitude": 280.3918955083319,
+      "lower_jd_tt": 2502591.4891245994,
+      "upper_jd_tt": 2502591.4891246,
+      "selected_jd_tt": 2502591.4891246,
+      "selected_sun_longitude": 192.39189550836372,
+      "exact_residual": [
+        "-1119",
+        "35184372088832"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2140-07-02T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2502862.0,
+      "birth_sun_longitude": 101.0727646573191,
+      "lower_jd_tt": 2502770.9281076607,
+      "upper_jd_tt": 2502770.928107661,
+      "selected_jd_tt": 2502770.9281076607,
+      "selected_sun_longitude": 13.072764657191476,
+      "exact_residual": [
+        "71845",
+        "562949953421312"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2150-01-01T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2506332.0,
+      "birth_sun_longitude": 280.9710273040638,
+      "lower_jd_tt": 2506244.503457112,
+      "upper_jd_tt": 2506244.5034571122,
+      "selected_jd_tt": 2506244.503457112,
+      "selected_sun_longitude": 192.97102730390498,
+      "exact_residual": [
+        "1397",
+        "8796093022208"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2150-07-02T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2506514.0,
+      "birth_sun_longitude": 100.6738597304264,
+      "lower_jd_tt": 2506422.9530504914,
+      "upper_jd_tt": 2506422.953050492,
+      "selected_jd_tt": 2506422.9530504914,
+      "selected_sun_longitude": 12.673859730337076,
+      "exact_residual": [
+        "50285",
+        "562949953421312"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2160-01-01T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2509984.0,
+      "birth_sun_longitude": 280.54345346847884,
+      "lower_jd_tt": 2509896.4861810748,
+      "upper_jd_tt": 2509896.486181075,
+      "selected_jd_tt": 2509896.4861810748,
+      "selected_sun_longitude": 192.54345346845204,
+      "exact_residual": [
+        "943",
+        "35184372088832"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2160-07-02T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2510167.0,
+      "birth_sun_longitude": 101.23031764958385,
+      "lower_jd_tt": 2510075.935494194,
+      "upper_jd_tt": 2510075.9354941943,
+      "selected_jd_tt": 2510075.935494194,
+      "selected_sun_longitude": 13.23031764955783,
+      "exact_residual": [
+        "7325",
+        "281474976710656"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2170-01-01T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2513637.0,
+      "birth_sun_longitude": 281.1151074461322,
+      "lower_jd_tt": 2513549.489919484,
+      "upper_jd_tt": 2513549.4899194846,
+      "selected_jd_tt": 2513549.4899194846,
+      "selected_sun_longitude": 193.1151074463228,
+      "exact_residual": [
+        "-6707",
+        "35184372088832"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2170-07-02T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2513819.0,
+      "birth_sun_longitude": 100.82644761860628,
+      "lower_jd_tt": 2513727.961630866,
+      "upper_jd_tt": 2513727.9616308664,
+      "selected_jd_tt": 2513727.961630866,
+      "selected_sun_longitude": 12.826447618432866,
+      "exact_residual": [
+        "12203",
+        "70368744177664"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2180-01-01T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2517289.0,
+      "birth_sun_longitude": 280.6895974520788,
+      "lower_jd_tt": 2517201.4717860846,
+      "upper_jd_tt": 2517201.471786085,
+      "selected_jd_tt": 2517201.471786085,
+      "selected_sun_longitude": 192.68959745209924,
+      "exact_residual": [
+        "-45",
+        "2199023255552"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2180-07-02T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2517472.0,
+      "birth_sun_longitude": 101.39370361524121,
+      "lower_jd_tt": 2517380.947004798,
+      "upper_jd_tt": 2517380.9470047983,
+      "selected_jd_tt": 2517380.947004798,
+      "selected_sun_longitude": 13.393703615123487,
+      "exact_residual": [
+        "66271",
+        "562949953421312"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2190-01-01T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2520942.0,
+      "birth_sun_longitude": 281.26193758925336,
+      "lower_jd_tt": 2520854.4850786948,
+      "upper_jd_tt": 2520854.485078695,
+      "selected_jd_tt": 2520854.485078695,
+      "selected_sun_longitude": 193.26193758938976,
+      "exact_residual": [
+        "-4799",
+        "35184372088832"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2190-07-02T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2521124.0,
+      "birth_sun_longitude": 100.9934252101452,
+      "lower_jd_tt": 2521032.9728149213,
+      "upper_jd_tt": 2521032.9728149218,
+      "selected_jd_tt": 2521032.9728149218,
+      "selected_sun_longitude": 12.993425210318419,
+      "exact_residual": [
+        "-97511",
+        "562949953421312"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2200-01-01T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2524594.0,
+      "birth_sun_longitude": 280.8346597519706,
+      "lower_jd_tt": 2524506.464746425,
+      "upper_jd_tt": 2524506.4647464254,
+      "selected_jd_tt": 2524506.464746425,
+      "selected_sun_longitude": 192.834659751798,
+      "exact_residual": [
+        "6073",
+        "35184372088832"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2200-07-02T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2524776.0,
+      "birth_sun_longitude": 100.59626845557189,
+      "lower_jd_tt": 2524684.9860287015,
+      "upper_jd_tt": 2524684.986028702,
+      "selected_jd_tt": 2524684.986028702,
+      "selected_sun_longitude": 12.596268455670096,
+      "exact_residual": [
+        "-27643",
+        "281474976710656"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2210-01-01T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2528246.0,
+      "birth_sun_longitude": 280.3949539669615,
+      "lower_jd_tt": 2528158.441771363,
+      "upper_jd_tt": 2528158.4417713634,
+      "selected_jd_tt": 2528158.441771363,
+      "selected_sun_longitude": 192.3949539668312,
+      "exact_residual": [
+        "4585",
+        "35184372088832"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2210-07-02T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2528428.0,
+      "birth_sun_longitude": 100.20422165313607,
+      "lower_jd_tt": 2528337.0121353623,
+      "upper_jd_tt": 2528337.0121353627,
+      "selected_jd_tt": 2528337.0121353623,
+      "selected_sun_longitude": 12.204221653027332,
+      "exact_residual": [
+        "1913",
+        "17592186044416"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2220-01-01T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2531898.0,
+      "birth_sun_longitude": 279.9633333132466,
+      "lower_jd_tt": 2531810.4272657866,
+      "upper_jd_tt": 2531810.427265787,
+      "selected_jd_tt": 2531810.427265787,
+      "selected_sun_longitude": 191.96333331328645,
+      "exact_residual": [
+        "-701",
+        "17592186044416"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2220-07-02T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2532081.0,
+      "birth_sun_longitude": 100.75511874026027,
+      "lower_jd_tt": 2531989.9952550884,
+      "upper_jd_tt": 2531989.995255089,
+      "selected_jd_tt": 2531989.995255089,
+      "selected_sun_longitude": 12.755118740391719,
+      "exact_residual": [
+        "-36999",
+        "281474976710656"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2230-01-01T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2535551.0,
+      "birth_sun_longitude": 280.5464044919149,
+      "lower_jd_tt": 2535463.434606071,
+      "upper_jd_tt": 2535463.4346060716,
+      "selected_jd_tt": 2535463.4346060716,
+      "selected_sun_longitude": 192.54640449204734,
+      "exact_residual": [
+        "-4659",
+        "35184372088832"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2230-07-02T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2535733.0,
+      "birth_sun_longitude": 100.36006343911292,
+      "lower_jd_tt": 2535642.0172214345,
+      "upper_jd_tt": 2535642.017221435,
+      "selected_jd_tt": 2535642.0172214345,
+      "selected_sun_longitude": 12.360063438887861,
+      "exact_residual": [
+        "126697",
+        "562949953421312"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2240-01-01T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2539203.0,
+      "birth_sun_longitude": 280.1105284788944,
+      "lower_jd_tt": 2539115.4137560446,
+      "upper_jd_tt": 2539115.413756045,
+      "selected_jd_tt": 2539115.413756045,
+      "selected_sun_longitude": 192.11052847907666,
+      "exact_residual": [
+        "-1603",
+        "8796093022208"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2240-07-02T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2539386.0,
+      "birth_sun_longitude": 100.91116003751067,
+      "lower_jd_tt": 2539295.0000165827,
+      "upper_jd_tt": 2539295.000016583,
+      "selected_jd_tt": 2539295.0000165827,
+      "selected_sun_longitude": 12.91116003749228,
+      "exact_residual": [
+        "647",
+        "35184372088832"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2250-01-01T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2542856.0,
+      "birth_sun_longitude": 280.69157677683415,
+      "lower_jd_tt": 2542768.4242292433,
+      "upper_jd_tt": 2542768.424229244,
+      "selected_jd_tt": 2542768.4242292433,
+      "selected_sun_longitude": 192.69157677675886,
+      "exact_residual": [
+        "2649",
+        "35184372088832"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2250-07-02T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2543038.0,
+      "birth_sun_longitude": 100.52435244503832,
+      "lower_jd_tt": 2542947.031958257,
+      "upper_jd_tt": 2542947.0319582573,
+      "selected_jd_tt": 2542947.031958257,
+      "selected_sun_longitude": 12.524352444910347,
+      "exact_residual": [
+        "72041",
+        "562949953421312"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2260-01-01T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2546508.0,
+      "birth_sun_longitude": 280.25041109639835,
+      "lower_jd_tt": 2546420.4042246644,
+      "upper_jd_tt": 2546420.404224665,
+      "selected_jd_tt": 2546420.404224665,
+      "selected_sun_longitude": 192.2504110966265,
+      "exact_residual": [
+        "-8027",
+        "35184372088832"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2260-07-02T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2546691.0,
+      "birth_sun_longitude": 101.07357268770065,
+      "lower_jd_tt": 2546600.016102263,
+      "upper_jd_tt": 2546600.0161022632,
+      "selected_jd_tt": 2546600.016102263,
+      "selected_sun_longitude": 13.073572687470612,
+      "exact_residual": [
+        "64749",
+        "281474976710656"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2270-01-01T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2550161.0,
+      "birth_sun_longitude": 280.84519620082017,
+      "lower_jd_tt": 2550073.419863765,
+      "upper_jd_tt": 2550073.4198637656,
+      "selected_jd_tt": 2550073.4198637656,
+      "selected_sun_longitude": 192.84519620086226,
+      "exact_residual": [
+        "-1481",
+        "35184372088832"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2270-07-02T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2550343.0,
+      "birth_sun_longitude": 100.68827237856172,
+      "lower_jd_tt": 2550252.029691333,
+      "upper_jd_tt": 2550252.0296913334,
+      "selected_jd_tt": 2550252.0296913334,
+      "selected_sun_longitude": 12.688272378753988,
+      "exact_residual": [
+        "-108237",
+        "562949953421312"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2280-01-01T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2553813.0,
+      "birth_sun_longitude": 280.404744236111,
+      "lower_jd_tt": 2553725.403949186,
+      "upper_jd_tt": 2553725.4039491867,
+      "selected_jd_tt": 2553725.4039491867,
+      "selected_sun_longitude": 192.4047442361136,
+      "exact_residual": [
+        "-91",
+        "35184372088832"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2280-07-02T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2553996.0,
+      "birth_sun_longitude": 101.23049803090167,
+      "lower_jd_tt": 2553905.0161020863,
+      "upper_jd_tt": 2553905.0161020868,
+      "selected_jd_tt": 2553905.0161020863,
+      "selected_sun_longitude": 13.230498030801268,
+      "exact_residual": [
+        "28261",
+        "281474976710656"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2290-01-01T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2557466.0,
+      "birth_sun_longitude": 280.991645499053,
+      "lower_jd_tt": 2557378.409988886,
+      "upper_jd_tt": 2557378.4099888867,
+      "selected_jd_tt": 2557378.409988886,
+      "selected_sun_longitude": 192.99164549902355,
+      "exact_residual": [
+        "259",
+        "8796093022208"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2290-07-02T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2557648.0,
+      "birth_sun_longitude": 100.84497341946069,
+      "lower_jd_tt": 2557557.0430029943,
+      "upper_jd_tt": 2557557.0430029947,
+      "selected_jd_tt": 2557557.0430029943,
+      "selected_sun_longitude": 12.84497341925196,
+      "exact_residual": [
+        "58751",
+        "281474976710656"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2300-01-01T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2561118.0,
+      "birth_sun_longitude": 280.54911672346276,
+      "lower_jd_tt": 2561030.390948779,
+      "upper_jd_tt": 2561030.3909487794,
+      "selected_jd_tt": 2561030.390948779,
+      "selected_sun_longitude": 192.54911672341188,
+      "exact_residual": [
+        "895",
+        "17592186044416"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2300-07-02T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2561300.0,
+      "birth_sun_longitude": 100.43634664699368,
+      "lower_jd_tt": 2561209.0619961177,
+      "upper_jd_tt": 2561209.061996118,
+      "selected_jd_tt": 2561209.0619961177,
+      "selected_sun_longitude": 12.436346646887172,
+      "exact_residual": [
+        "59961",
+        "562949953421312"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2310-01-01T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2564770.0,
+      "birth_sun_longitude": 280.1226148044293,
+      "lower_jd_tt": 2564682.3649561023,
+      "upper_jd_tt": 2564682.364956103,
+      "selected_jd_tt": 2564682.3649561023,
+      "selected_sun_longitude": 192.12261480429171,
+      "exact_residual": [
+        "4841",
+        "35184372088832"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2310-07-02T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2564952.0,
+      "birth_sun_longitude": 100.0528160281954,
+      "lower_jd_tt": 2564861.0857814196,
+      "upper_jd_tt": 2564861.08578142,
+      "selected_jd_tt": 2564861.0857814196,
+      "selected_sun_longitude": 12.052816027981443,
+      "exact_residual": [
+        "30111",
+        "140737488355328"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2320-01-01T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2568422.0,
+      "birth_sun_longitude": 279.67762920908456,
+      "lower_jd_tt": 2568334.3447215105,
+      "upper_jd_tt": 2568334.344721511,
+      "selected_jd_tt": 2568334.344721511,
+      "selected_sun_longitude": 191.67762920920856,
+      "exact_residual": [
+        "-4363",
+        "35184372088832"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2320-07-02T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2568605.0,
+      "birth_sun_longitude": 100.59926274287096,
+      "lower_jd_tt": 2568514.0746618337,
+      "upper_jd_tt": 2568514.074661834,
+      "selected_jd_tt": 2568514.0746618337,
+      "selected_sun_longitude": 12.599262742771671,
+      "exact_residual": [
+        "6987",
+        "70368744177664"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2330-01-01T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2572075.0,
+      "birth_sun_longitude": 280.2663862371102,
+      "lower_jd_tt": 2571987.355470759,
+      "upper_jd_tt": 2571987.3554707593,
+      "selected_jd_tt": 2571987.3554707593,
+      "selected_sun_longitude": 192.26638623718523,
+      "exact_residual": [
+        "-2639",
+        "35184372088832"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2330-07-02T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2572257.0,
+      "birth_sun_longitude": 100.21213552256341,
+      "lower_jd_tt": 2572166.091326441,
+      "upper_jd_tt": 2572166.0913264416,
+      "selected_jd_tt": 2572166.0913264416,
+      "selected_sun_longitude": 12.212135522716846,
+      "exact_residual": [
+        "-43187",
+        "281474976710656"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2340-01-01T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2575727.0,
+      "birth_sun_longitude": 279.83067272482305,
+      "lower_jd_tt": 2575639.34262513,
+      "upper_jd_tt": 2575639.3426251304,
+      "selected_jd_tt": 2575639.3426251304,
+      "selected_sun_longitude": 191.83067272486525,
+      "exact_residual": [
+        "-1485",
+        "35184372088832"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2340-07-02T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2575910.0,
+      "birth_sun_longitude": 100.7664067269613,
+      "lower_jd_tt": 2575819.0794827985,
+      "upper_jd_tt": 2575819.079482799,
+      "selected_jd_tt": 2575819.079482799,
+      "selected_sun_longitude": 12.766406727030414,
+      "exact_residual": [
+        "-4863",
+        "70368744177664"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2350-01-01T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2579380.0,
+      "birth_sun_longitude": 280.41674440537275,
+      "lower_jd_tt": 2579292.3541963636,
+      "upper_jd_tt": 2579292.354196364,
+      "selected_jd_tt": 2579292.3541963636,
+      "selected_sun_longitude": 192.41674440520842,
+      "exact_residual": [
+        "2891",
+        "17592186044416"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2350-07-02T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2579562.0,
+      "birth_sun_longitude": 100.36900005419132,
+      "lower_jd_tt": 2579471.0981303765,
+      "upper_jd_tt": 2579471.098130377,
+      "selected_jd_tt": 2579471.0981303765,
+      "selected_sun_longitude": 12.369000054142228,
+      "exact_residual": [
+        "27635",
+        "562949953421312"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2360-01-01T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2583032.0,
+      "birth_sun_longitude": 279.9833534794162,
+      "lower_jd_tt": 2582944.330356475,
+      "upper_jd_tt": 2582944.3303564754,
+      "selected_jd_tt": 2582944.330356475,
+      "selected_sun_longitude": 191.9833534794112,
+      "exact_residual": [
+        "177",
+        "35184372088832"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2360-07-02T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2583215.0,
+      "birth_sun_longitude": 100.92010996387232,
+      "lower_jd_tt": 2583124.0834661927,
+      "upper_jd_tt": 2583124.083466193,
+      "selected_jd_tt": 2583124.083466193,
+      "selected_sun_longitude": 12.920109963910624,
+      "exact_residual": [
+        "-21563",
+        "562949953421312"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2370-01-01T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2586685.0,
+      "birth_sun_longitude": 280.5605464356592,
+      "lower_jd_tt": 2586597.338699216,
+      "upper_jd_tt": 2586597.3386992165,
+      "selected_jd_tt": 2586597.3386992165,
+      "selected_sun_longitude": 192.5605464358342,
+      "exact_residual": [
+        "-6157",
+        "35184372088832"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2370-07-02T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2586867.0,
+      "birth_sun_longitude": 100.52857029837159,
+      "lower_jd_tt": 2586776.108813077,
+      "upper_jd_tt": 2586776.1088130777,
+      "selected_jd_tt": 2586776.108813077,
+      "selected_sun_longitude": 12.528570298265088,
+      "exact_residual": [
+        "14989",
+        "140737488355328"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2380-01-01T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2590337.0,
+      "birth_sun_longitude": 280.1265991598612,
+      "lower_jd_tt": 2590249.322947689,
+      "upper_jd_tt": 2590249.3229476893,
+      "selected_jd_tt": 2590249.3229476893,
+      "selected_sun_longitude": 192.12659915986535,
+      "exact_residual": [
+        "-73",
+        "17592186044416"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2380-07-02T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2590520.0,
+      "birth_sun_longitude": 101.09013333269877,
+      "lower_jd_tt": 2590429.101560854,
+      "upper_jd_tt": 2590429.1015608544,
+      "selected_jd_tt": 2590429.101560854,
+      "selected_sun_longitude": 13.09013333247076,
+      "exact_residual": [
+        "64179",
+        "281474976710656"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2390-01-01T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2593990.0,
+      "birth_sun_longitude": 280.7071364653995,
+      "lower_jd_tt": 2593902.332543746,
+      "upper_jd_tt": 2593902.3325437466,
+      "selected_jd_tt": 2593902.3325437466,
+      "selected_sun_longitude": 192.70713646553793,
+      "exact_residual": [
+        "-2435",
+        "17592186044416"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2390-07-02T12:00:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2594172.0,
+      "birth_sun_longitude": 100.6868056339372,
+      "lower_jd_tt": 2594081.1149923117,
+      "upper_jd_tt": 2594081.114992312,
+      "selected_jd_tt": 2594081.114992312,
+      "selected_sun_longitude": 12.686805634017178,
+      "exact_residual": [
+        "-45025",
+        "562949953421312"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2399-12-31T23:59:00 TT",
+      "backend": "swieph",
+      "request_flags": 258,
+      "birth_jd_tt": 2597641.4993055556,
+      "birth_sun_longitude": 279.7734505361267,
+      "lower_jd_tt": 2597553.794974725,
+      "upper_jd_tt": 2597553.7949747257,
+      "selected_jd_tt": 2597553.7949747257,
+      "selected_sun_longitude": 191.773450536213,
+      "exact_residual": [
+        "-3037",
+        "35184372088832"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "1800-01-01T00:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2378496.5,
+      "birth_sun_longitude": 280.4291416701681,
+      "lower_jd_tt": 2378409.1963280845,
+      "upper_jd_tt": 2378409.196328085,
+      "selected_jd_tt": 2378409.1963280845,
+      "selected_sun_longitude": 192.4291416700001,
+      "exact_residual": [
+        "739",
+        "4398046511104"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "1800-01-01T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2378497.0,
+      "birth_sun_longitude": 280.9389398731185,
+      "lower_jd_tt": 2378409.712371674,
+      "upper_jd_tt": 2378409.7123716744,
+      "selected_jd_tt": 2378409.7123716744,
+      "selected_sun_longitude": 192.93893987329912,
+      "exact_residual": [
+        "-6355",
+        "35184372088832"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "1800-07-02T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2378679.0,
+      "birth_sun_longitude": 100.25608075686868,
+      "lower_jd_tt": 2378587.7430954003,
+      "upper_jd_tt": 2378587.7430954007,
+      "selected_jd_tt": 2378587.7430954003,
+      "selected_sun_longitude": 12.25608075669746,
+      "exact_residual": [
+        "96391",
+        "562949953421312"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "1810-01-01T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2382149.0,
+      "birth_sun_longitude": 280.5042032613141,
+      "lower_jd_tt": 2382061.6949162213,
+      "upper_jd_tt": 2382061.694916222,
+      "selected_jd_tt": 2382061.6949162213,
+      "selected_sun_longitude": 192.50420326090264,
+      "exact_residual": [
+        "14477",
+        "35184372088832"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "1810-07-02T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2382331.0,
+      "birth_sun_longitude": 99.85652914595315,
+      "lower_jd_tt": 2382239.7631596206,
+      "upper_jd_tt": 2382239.763159621,
+      "selected_jd_tt": 2382239.763159621,
+      "selected_sun_longitude": 11.856529146182377,
+      "exact_residual": [
+        "-129045",
+        "562949953421312"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "1820-01-01T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2385801.0,
+      "birth_sun_longitude": 280.06212297943136,
+      "lower_jd_tt": 2385713.6710030306,
+      "upper_jd_tt": 2385713.671003031,
+      "selected_jd_tt": 2385713.671003031,
+      "selected_sun_longitude": 192.06212297980846,
+      "exact_residual": [
+        "-3317",
+        "8796093022208"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "1820-07-02T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2385984.0,
+      "birth_sun_longitude": 100.4161331921805,
+      "lower_jd_tt": 2385892.7501038555,
+      "upper_jd_tt": 2385892.750103856,
+      "selected_jd_tt": 2385892.750103856,
+      "selected_sun_longitude": 12.416133192869852,
+      "exact_residual": [
+        "-388073",
+        "562949953421312"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "1830-01-01T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2389454.0,
+      "birth_sun_longitude": 280.6532563508893,
+      "lower_jd_tt": 2389366.693299546,
+      "upper_jd_tt": 2389366.6932995464,
+      "selected_jd_tt": 2389366.693299546,
+      "selected_sun_longitude": 192.65325635081055,
+      "exact_residual": [
+        "2771",
+        "35184372088832"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "1830-07-02T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2389636.0,
+      "birth_sun_longitude": 100.01964249429895,
+      "lower_jd_tt": 2389544.7674477887,
+      "upper_jd_tt": 2389544.767447789,
+      "selected_jd_tt": 2389544.767447789,
+      "selected_sun_longitude": 12.01964249471023,
+      "exact_residual": [
+        "-115765",
+        "281474976710656"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "1840-01-01T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2393106.0,
+      "birth_sun_longitude": 280.2193126692967,
+      "lower_jd_tt": 2393018.6709025586,
+      "upper_jd_tt": 2393018.670902559,
+      "selected_jd_tt": 2393018.670902559,
+      "selected_sun_longitude": 192.2193126693607,
+      "exact_residual": [
+        "-563",
+        "8796093022208"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "1840-07-02T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2393289.0,
+      "birth_sun_longitude": 100.57765425762055,
+      "lower_jd_tt": 2393197.754286813,
+      "upper_jd_tt": 2393197.7542868135,
+      "selected_jd_tt": 2393197.754286813,
+      "selected_sun_longitude": 12.577654257340305,
+      "exact_residual": [
+        "157765",
+        "562949953421312"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "1850-01-01T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2396759.0,
+      "birth_sun_longitude": 280.7972105336227,
+      "lower_jd_tt": 2396671.6798387635,
+      "upper_jd_tt": 2396671.679838764,
+      "selected_jd_tt": 2396671.6798387635,
+      "selected_sun_longitude": 192.79721053343997,
+      "exact_residual": [
+        "3215",
+        "17592186044416"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "1850-07-02T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2396941.0,
+      "birth_sun_longitude": 100.16849356575959,
+      "lower_jd_tt": 2396849.7736157645,
+      "upper_jd_tt": 2396849.773615765,
+      "selected_jd_tt": 2396849.7736157645,
+      "selected_sun_longitude": 12.16849356562277,
+      "exact_residual": [
+        "77023",
+        "562949953421312"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "1860-01-01T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2400411.0,
+      "birth_sun_longitude": 280.36427193705686,
+      "lower_jd_tt": 2400323.6577142095,
+      "upper_jd_tt": 2400323.65771421,
+      "selected_jd_tt": 2400323.6577142095,
+      "selected_sun_longitude": 192.36427193704642,
+      "exact_residual": [
+        "367",
+        "35184372088832"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "1860-07-02T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2400594.0,
+      "birth_sun_longitude": 100.73795884227559,
+      "lower_jd_tt": 2400502.762637243,
+      "upper_jd_tt": 2400502.7626372436,
+      "selected_jd_tt": 2400502.762637243,
+      "selected_sun_longitude": 12.737958842106762,
+      "exact_residual": [
+        "95041",
+        "562949953421312"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "1870-01-01T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2404064.0,
+      "birth_sun_longitude": 280.9405487042863,
+      "lower_jd_tt": 2403976.674205213,
+      "upper_jd_tt": 2403976.6742052133,
+      "selected_jd_tt": 2403976.674205213,
+      "selected_sun_longitude": 192.94054870399924,
+      "exact_residual": [
+        "2525",
+        "8796093022208"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "1870-07-02T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2404246.0,
+      "birth_sun_longitude": 100.33590363855637,
+      "lower_jd_tt": 2404154.7897334304,
+      "upper_jd_tt": 2404154.789733431,
+      "selected_jd_tt": 2404154.7897334304,
+      "selected_sun_longitude": 12.335903638439008,
+      "exact_residual": [
+        "66071",
+        "562949953421312"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "1880-01-01T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2407716.0,
+      "birth_sun_longitude": 280.5114153819982,
+      "lower_jd_tt": 2407628.650013054,
+      "upper_jd_tt": 2407628.6500130543,
+      "selected_jd_tt": 2407628.650013054,
+      "selected_sun_longitude": 192.5114153819795,
+      "exact_residual": [
+        "657",
+        "35184372088832"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "1880-07-02T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2407899.0,
+      "birth_sun_longitude": 100.90188235495017,
+      "lower_jd_tt": 2407807.7709707776,
+      "upper_jd_tt": 2407807.770970778,
+      "selected_jd_tt": 2407807.770970778,
+      "selected_sun_longitude": 12.901882355325919,
+      "exact_residual": [
+        "-211525",
+        "562949953421312"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "1890-01-01T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2411369.0,
+      "birth_sun_longitude": 281.0917085910392,
+      "lower_jd_tt": 2411281.6694536754,
+      "upper_jd_tt": 2411281.669453676,
+      "selected_jd_tt": 2411281.669453676,
+      "selected_sun_longitude": 193.0917085912006,
+      "exact_residual": [
+        "-2839",
+        "17592186044416"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "1890-07-02T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2411551.0,
+      "birth_sun_longitude": 100.49149477999244,
+      "lower_jd_tt": 2411459.7857128885,
+      "upper_jd_tt": 2411459.785712889,
+      "selected_jd_tt": 2411459.7857128885,
+      "selected_sun_longitude": 12.49149477996626,
+      "exact_residual": [
+        "921",
+        "35184372088832"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "1900-01-01T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2415021.0,
+      "birth_sun_longitude": 280.6633122965829,
+      "lower_jd_tt": 2414933.648259585,
+      "upper_jd_tt": 2414933.6482595853,
+      "selected_jd_tt": 2414933.6482595853,
+      "selected_sun_longitude": 192.6633122966144,
+      "exact_residual": [
+        "-1109",
+        "35184372088832"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "1900-07-02T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2415203.0,
+      "birth_sun_longitude": 100.1078869501177,
+      "lower_jd_tt": 2415111.8086491153,
+      "upper_jd_tt": 2415111.8086491157,
+      "selected_jd_tt": 2415111.8086491153,
+      "selected_sun_longitude": 12.107886949889592,
+      "exact_residual": [
+        "128415",
+        "562949953421312"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "1910-01-01T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2418673.0,
+      "birth_sun_longitude": 280.21623669144554,
+      "lower_jd_tt": 2418585.6276871823,
+      "upper_jd_tt": 2418585.6276871827,
+      "selected_jd_tt": 2418585.6276871823,
+      "selected_sun_longitude": 192.21623669140857,
+      "exact_residual": [
+        "1301",
+        "35184372088832"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "1910-07-02T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2418855.0,
+      "birth_sun_longitude": 99.70065940196201,
+      "lower_jd_tt": 2418763.8333524587,
+      "upper_jd_tt": 2418763.833352459,
+      "selected_jd_tt": 2418763.833352459,
+      "selected_sun_longitude": 11.7006594023387,
+      "exact_residual": [
+        "-212055",
+        "562949953421312"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "1920-01-01T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2422325.0,
+      "birth_sun_longitude": 279.79078595784506,
+      "lower_jd_tt": 2422237.604225997,
+      "upper_jd_tt": 2422237.6042259973,
+      "selected_jd_tt": 2422237.604225997,
+      "selected_sun_longitude": 191.79078595772052,
+      "exact_residual": [
+        "2191",
+        "17592186044416"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "1920-07-02T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2422508.0,
+      "birth_sun_longitude": 100.26183656212969,
+      "lower_jd_tt": 2422416.8124934463,
+      "upper_jd_tt": 2422416.8124934467,
+      "selected_jd_tt": 2422416.8124934467,
+      "selected_sun_longitude": 12.261836562226295,
+      "exact_residual": [
+        "-54385",
+        "562949953421312"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "1930-01-01T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2425978.0,
+      "birth_sun_longitude": 280.3675118859908,
+      "lower_jd_tt": 2425890.616917426,
+      "upper_jd_tt": 2425890.6169174267,
+      "selected_jd_tt": 2425890.6169174267,
+      "selected_sun_longitude": 192.36751188605783,
+      "exact_residual": [
+        "-2359",
+        "35184372088832"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "1930-07-02T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2426160.0,
+      "birth_sun_longitude": 99.86270343470187,
+      "lower_jd_tt": 2426068.8419949454,
+      "upper_jd_tt": 2426068.841994946,
+      "selected_jd_tt": 2426068.8419949454,
+      "selected_sun_longitude": 11.86270343459703,
+      "exact_residual": [
+        "14755",
+        "140737488355328"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "1940-01-01T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2429630.0,
+      "birth_sun_longitude": 279.9281945478373,
+      "lower_jd_tt": 2429542.5941476445,
+      "upper_jd_tt": 2429542.594147645,
+      "selected_jd_tt": 2429542.594147645,
+      "selected_sun_longitude": 191.9281945479846,
+      "exact_residual": [
+        "-5183",
+        "35184372088832"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "1940-07-02T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2429813.0,
+      "birth_sun_longitude": 100.42464240628597,
+      "lower_jd_tt": 2429721.8272252954,
+      "upper_jd_tt": 2429721.827225296,
+      "selected_jd_tt": 2429721.827225296,
+      "selected_sun_longitude": 12.424642406408385,
+      "exact_residual": [
+        "-34457",
+        "281474976710656"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "1950-01-01T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2433283.0,
+      "birth_sun_longitude": 280.51404794811253,
+      "lower_jd_tt": 2433195.6133963894,
+      "upper_jd_tt": 2433195.61339639,
+      "selected_jd_tt": 2433195.6133963894,
+      "selected_sun_longitude": 192.51404794804327,
+      "exact_residual": [
+        "2437",
+        "35184372088832"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "1950-07-02T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2433465.0,
+      "birth_sun_longitude": 100.02634965196046,
+      "lower_jd_tt": 2433373.84515989,
+      "upper_jd_tt": 2433373.8451598906,
+      "selected_jd_tt": 2433373.84515989,
+      "selected_sun_longitude": 12.026349651887653,
+      "exact_residual": [
+        "20493",
+        "281474976710656"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "1960-01-01T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2436935.0,
+      "birth_sun_longitude": 280.08427596998416,
+      "lower_jd_tt": 2436847.59463757,
+      "upper_jd_tt": 2436847.5946375704,
+      "selected_jd_tt": 2436847.59463757,
+      "selected_sun_longitude": 192.08427596994485,
+      "exact_residual": [
+        "1383",
+        "35184372088832"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "1960-07-02T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2437118.0,
+      "birth_sun_longitude": 100.58317110610125,
+      "lower_jd_tt": 2437026.82745188,
+      "upper_jd_tt": 2437026.8274518806,
+      "selected_jd_tt": 2437026.82745188,
+      "selected_sun_longitude": 12.58317110596232,
+      "exact_residual": [
+        "78209",
+        "562949953421312"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "1970-01-01T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2440588.0,
+      "birth_sun_longitude": 280.6654507663614,
+      "lower_jd_tt": 2440500.6054802765,
+      "upper_jd_tt": 2440500.605480277,
+      "selected_jd_tt": 2440500.605480277,
+      "selected_sun_longitude": 192.66545076643084,
+      "exact_residual": [
+        "-2443",
+        "35184372088832"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "1970-07-02T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2440770.0,
+      "birth_sun_longitude": 100.18416644575795,
+      "lower_jd_tt": 2440678.853223448,
+      "upper_jd_tt": 2440678.8532234486,
+      "selected_jd_tt": 2440678.853223448,
+      "selected_sun_longitude": 12.18416644555613,
+      "exact_residual": [
+        "7101",
+        "35184372088832"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "1980-01-01T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2444240.0,
+      "birth_sun_longitude": 280.2238359645719,
+      "lower_jd_tt": 2444152.58155947,
+      "upper_jd_tt": 2444152.5815594704,
+      "selected_jd_tt": 2444152.5815594704,
+      "selected_sun_longitude": 192.22383596459028,
+      "exact_residual": [
+        "-647",
+        "35184372088832"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "1980-07-02T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2444423.0,
+      "birth_sun_longitude": 100.73347514339181,
+      "lower_jd_tt": 2444331.834752301,
+      "upper_jd_tt": 2444331.8347523017,
+      "selected_jd_tt": 2444331.834752301,
+      "selected_sun_longitude": 12.733475143344057,
+      "exact_residual": [
+        "26885",
+        "562949953421312"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "1990-01-01T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2447893.0,
+      "birth_sun_longitude": 280.81358456184586,
+      "lower_jd_tt": 2447805.595564636,
+      "upper_jd_tt": 2447805.5955646364,
+      "selected_jd_tt": 2447805.595564636,
+      "selected_sun_longitude": 192.81358456166552,
+      "exact_residual": [
+        "6345",
+        "35184372088832"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "1990-07-02T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2448075.0,
+      "birth_sun_longitude": 100.35220467489656,
+      "lower_jd_tt": 2447983.864499274,
+      "upper_jd_tt": 2447983.8644992746,
+      "selected_jd_tt": 2447983.8644992746,
+      "selected_sun_longitude": 12.352204674942085,
+      "exact_residual": [
+        "-25631",
+        "562949953421312"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2000-01-01T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2451545.0,
+      "birth_sun_longitude": 280.368166558278,
+      "lower_jd_tt": 2451457.575584815,
+      "upper_jd_tt": 2451457.5755848153,
+      "selected_jd_tt": 2451457.575584815,
+      "selected_sun_longitude": 192.3681665582439,
+      "exact_residual": [
+        "75",
+        "2199023255552"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2000-07-02T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2451728.0,
+      "birth_sun_longitude": 100.89715299847478,
+      "lower_jd_tt": 2451636.848193499,
+      "upper_jd_tt": 2451636.8481934993,
+      "selected_jd_tt": 2451636.8481934993,
+      "selected_sun_longitude": 12.897152998593928,
+      "exact_residual": [
+        "-33537",
+        "281474976710656"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2010-01-01T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2455198.0,
+      "birth_sun_longitude": 280.95980708862214,
+      "lower_jd_tt": 2455110.5849055666,
+      "upper_jd_tt": 2455110.584905567,
+      "selected_jd_tt": 2455110.584905567,
+      "selected_sun_longitude": 192.95980708872742,
+      "exact_residual": [
+        "-463",
+        "4398046511104"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2010-07-02T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2455380.0,
+      "birth_sun_longitude": 100.50852919004382,
+      "lower_jd_tt": 2455288.8688705456,
+      "upper_jd_tt": 2455288.868870546,
+      "selected_jd_tt": 2455288.8688705456,
+      "selected_sun_longitude": 12.508529190009888,
+      "exact_residual": [
+        "4775",
+        "140737488355328"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2020-01-01T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2458850.0,
+      "birth_sun_longitude": 280.5184217432597,
+      "lower_jd_tt": 2458762.5717550125,
+      "upper_jd_tt": 2458762.571755013,
+      "selected_jd_tt": 2458762.571755013,
+      "selected_sun_longitude": 192.51842174339671,
+      "exact_residual": [
+        "-4821",
+        "35184372088832"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2020-07-02T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2459033.0,
+      "birth_sun_longitude": 101.05834025528124,
+      "lower_jd_tt": 2458941.8486327934,
+      "upper_jd_tt": 2458941.848632794,
+      "selected_jd_tt": 2458941.848632794,
+      "selected_sun_longitude": 13.058340255468622,
+      "exact_residual": [
+        "-6593",
+        "35184372088832"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2030-01-01T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2462503.0,
+      "birth_sun_longitude": 281.11131132667407,
+      "lower_jd_tt": 2462415.585658438,
+      "upper_jd_tt": 2462415.5856584385,
+      "selected_jd_tt": 2462415.5856584385,
+      "selected_sun_longitude": 193.11131132667873,
+      "exact_residual": [
+        "-41",
+        "8796093022208"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2030-07-02T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2462685.0,
+      "birth_sun_longitude": 100.6710959898425,
+      "lower_jd_tt": 2462593.876071163,
+      "upper_jd_tt": 2462593.8760711635,
+      "selected_jd_tt": 2462593.8760711635,
+      "selected_sun_longitude": 12.671095989983172,
+      "exact_residual": [
+        "-9899",
+        "70368744177664"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2040-01-01T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2466155.0,
+      "birth_sun_longitude": 280.6659065889137,
+      "lower_jd_tt": 2466067.562294473,
+      "upper_jd_tt": 2466067.5622944734,
+      "selected_jd_tt": 2466067.562294473,
+      "selected_sun_longitude": 192.665906588891,
+      "exact_residual": [
+        "399",
+        "17592186044416"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2040-07-02T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2466338.0,
+      "birth_sun_longitude": 101.21183297682295,
+      "lower_jd_tt": 2466246.8571491037,
+      "upper_jd_tt": 2466246.857149104,
+      "selected_jd_tt": 2466246.8571491037,
+      "selected_sun_longitude": 13.211832976672365,
+      "exact_residual": [
+        "42385",
+        "281474976710656"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2050-01-01T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2469808.0,
+      "birth_sun_longitude": 281.25712356513435,
+      "lower_jd_tt": 2469720.5700629014,
+      "upper_jd_tt": 2469720.570062902,
+      "selected_jd_tt": 2469720.5700629014,
+      "selected_sun_longitude": 193.2571235651331,
+      "exact_residual": [
+        "11",
+        "8796093022208"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2050-07-02T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2469990.0,
+      "birth_sun_longitude": 100.82784423431202,
+      "lower_jd_tt": 2469898.882776416,
+      "upper_jd_tt": 2469898.8827764164,
+      "selected_jd_tt": 2469898.8827764164,
+      "selected_sun_longitude": 12.82784423433009,
+      "exact_residual": [
+        "-5085",
+        "281474976710656"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2060-01-01T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2473460.0,
+      "birth_sun_longitude": 280.8113216416983,
+      "lower_jd_tt": 2473372.553346162,
+      "upper_jd_tt": 2473372.5533461627,
+      "selected_jd_tt": 2473372.553346162,
+      "selected_sun_longitude": 192.81132164166098,
+      "exact_residual": [
+        "657",
+        "17592186044416"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2060-07-02T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2473643.0,
+      "birth_sun_longitude": 101.37852198769775,
+      "lower_jd_tt": 2473551.870772639,
+      "upper_jd_tt": 2473551.8707726393,
+      "selected_jd_tt": 2473551.8707726393,
+      "selected_sun_longitude": 13.378521987918933,
+      "exact_residual": [
+        "-62257",
+        "281474976710656"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2070-01-01T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2477113.0,
+      "birth_sun_longitude": 281.39832243055463,
+      "lower_jd_tt": 2477025.562391407,
+      "upper_jd_tt": 2477025.5623914073,
+      "selected_jd_tt": 2477025.562391407,
+      "selected_sun_longitude": 193.3983224304765,
+      "exact_residual": [
+        "2749",
+        "35184372088832"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2070-07-02T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2477295.0,
+      "birth_sun_longitude": 100.99033750356077,
+      "lower_jd_tt": 2477203.8940162687,
+      "upper_jd_tt": 2477203.894016269,
+      "selected_jd_tt": 2477203.894016269,
+      "selected_sun_longitude": 12.990337503783548,
+      "exact_residual": [
+        "-125415",
+        "562949953421312"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2080-01-01T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2480765.0,
+      "birth_sun_longitude": 280.9648986723164,
+      "lower_jd_tt": 2480677.550144203,
+      "upper_jd_tt": 2480677.5501442035,
+      "selected_jd_tt": 2480677.5501442035,
+      "selected_sun_longitude": 192.96489867240788,
+      "exact_residual": [
+        "-3219",
+        "35184372088832"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2080-07-02T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2480948.0,
+      "birth_sun_longitude": 101.53972066148317,
+      "lower_jd_tt": 2480856.8691647514,
+      "upper_jd_tt": 2480856.869164752,
+      "selected_jd_tt": 2480856.8691647514,
+      "selected_sun_longitude": 13.539720661264173,
+      "exact_residual": [
+        "61643",
+        "281474976710656"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2090-01-01T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2484418.0,
+      "birth_sun_longitude": 281.5511062908222,
+      "lower_jd_tt": 2484330.5591932028,
+      "upper_jd_tt": 2484330.559193203,
+      "selected_jd_tt": 2484330.5591932028,
+      "selected_sun_longitude": 193.55110629063472,
+      "exact_residual": [
+        "1649",
+        "8796093022208"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2090-07-02T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2484600.0,
+      "birth_sun_longitude": 101.14675979611208,
+      "lower_jd_tt": 2484508.8985114144,
+      "upper_jd_tt": 2484508.898511415,
+      "selected_jd_tt": 2484508.8985114144,
+      "selected_sun_longitude": 13.146759795884654,
+      "exact_residual": [
+        "128029",
+        "562949953421312"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2100-01-01T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2488070.0,
+      "birth_sun_longitude": 281.11278897727084,
+      "lower_jd_tt": 2487982.5405910094,
+      "upper_jd_tt": 2487982.54059101,
+      "selected_jd_tt": 2487982.54059101,
+      "selected_sun_longitude": 193.11278897758532,
+      "exact_residual": [
+        "-11065",
+        "35184372088832"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2100-07-02T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2488252.0,
+      "birth_sun_longitude": 100.7461523748261,
+      "lower_jd_tt": 2488160.9148080745,
+      "upper_jd_tt": 2488160.914808075,
+      "selected_jd_tt": 2488160.9148080745,
+      "selected_sun_longitude": 12.746152374406687,
+      "exact_residual": [
+        "118053",
+        "281474976710656"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2110-01-01T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2491722.0,
+      "birth_sun_longitude": 280.67551277658424,
+      "lower_jd_tt": 2491634.5151068023,
+      "upper_jd_tt": 2491634.515106803,
+      "selected_jd_tt": 2491634.515106803,
+      "selected_sun_longitude": 192.67551277674036,
+      "exact_residual": [
+        "-5493",
+        "35184372088832"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2110-07-02T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2491904.0,
+      "birth_sun_longitude": 100.34942957051742,
+      "lower_jd_tt": 2491812.936564412,
+      "upper_jd_tt": 2491812.9365644124,
+      "selected_jd_tt": 2491812.936564412,
+      "selected_sun_longitude": 12.349429570135689,
+      "exact_residual": [
+        "214893",
+        "562949953421312"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2120-01-01T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2495374.0,
+      "birth_sun_longitude": 280.2450343149947,
+      "lower_jd_tt": 2495286.496902224,
+      "upper_jd_tt": 2495286.4969022246,
+      "selected_jd_tt": 2495286.4969022246,
+      "selected_sun_longitude": 192.24503431510539,
+      "exact_residual": [
+        "-1947",
+        "17592186044416"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2120-07-02T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2495557.0,
+      "birth_sun_longitude": 100.9110141636582,
+      "lower_jd_tt": 2495465.924434761,
+      "upper_jd_tt": 2495465.9244347615,
+      "selected_jd_tt": 2495465.9244347615,
+      "selected_sun_longitude": 12.911014163846929,
+      "exact_residual": [
+        "-13281",
+        "70368744177664"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2130-01-01T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2499027.0,
+      "birth_sun_longitude": 280.8153729016898,
+      "lower_jd_tt": 2498939.503128675,
+      "upper_jd_tt": 2498939.5031286753,
+      "selected_jd_tt": 2498939.5031286753,
+      "selected_sun_longitude": 192.81537290207166,
+      "exact_residual": [
+        "-3359",
+        "8796093022208"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2130-07-02T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2499209.0,
+      "birth_sun_longitude": 100.51099411485099,
+      "lower_jd_tt": 2499117.95362385,
+      "upper_jd_tt": 2499117.9536238504,
+      "selected_jd_tt": 2499117.95362385,
+      "selected_sun_longitude": 12.510994114654812,
+      "exact_residual": [
+        "110437",
+        "562949953421312"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2140-01-01T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2502679.0,
+      "birth_sun_longitude": 280.39189859918866,
+      "lower_jd_tt": 2502591.48911471,
+      "upper_jd_tt": 2502591.4891147106,
+      "selected_jd_tt": 2502591.48911471,
+      "selected_sun_longitude": 192.39189859896712,
+      "exact_residual": [
+        "7795",
+        "35184372088832"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2140-07-02T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2502862.0,
+      "birth_sun_longitude": 101.07276623715367,
+      "lower_jd_tt": 2502770.9281034186,
+      "upper_jd_tt": 2502770.928103419,
+      "selected_jd_tt": 2502770.928103419,
+      "selected_sun_longitude": 13.072766237180698,
+      "exact_residual": [
+        "-7607",
+        "281474976710656"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2150-01-01T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2506332.0,
+      "birth_sun_longitude": 280.9710222967536,
+      "lower_jd_tt": 2506244.503440392,
+      "upper_jd_tt": 2506244.5034403927,
+      "selected_jd_tt": 2506244.5034403927,
+      "selected_sun_longitude": 192.971022297074,
+      "exact_residual": [
+        "-5637",
+        "17592186044416"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2150-07-02T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2506514.0,
+      "birth_sun_longitude": 100.67386208296129,
+      "lower_jd_tt": 2506422.953048887,
+      "upper_jd_tt": 2506422.9530488877,
+      "selected_jd_tt": 2506422.953048887,
+      "selected_sun_longitude": 12.673862082519586,
+      "exact_residual": [
+        "248659",
+        "562949953421312"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2160-01-01T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2509984.0,
+      "birth_sun_longitude": 280.54346360840185,
+      "lower_jd_tt": 2509896.486188621,
+      "upper_jd_tt": 2509896.4861886213,
+      "selected_jd_tt": 2509896.4861886213,
+      "selected_sun_longitude": 192.54346360856113,
+      "exact_residual": [
+        "-1401",
+        "8796093022208"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2160-07-02T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2510167.0,
+      "birth_sun_longitude": 101.23032062253326,
+      "lower_jd_tt": 2510075.9354929426,
+      "upper_jd_tt": 2510075.935492943,
+      "selected_jd_tt": 2510075.935492943,
+      "selected_sun_longitude": 13.230320622784175,
+      "exact_residual": [
+        "-141255",
+        "562949953421312"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2170-01-01T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2513637.0,
+      "birth_sun_longitude": 281.1151136992166,
+      "lower_jd_tt": 2513549.4899303387,
+      "upper_jd_tt": 2513549.489930339,
+      "selected_jd_tt": 2513549.4899303387,
+      "selected_sun_longitude": 193.11511369910392,
+      "exact_residual": [
+        "991",
+        "8796093022208"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2170-07-02T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2513819.0,
+      "birth_sun_longitude": 100.82643832539577,
+      "lower_jd_tt": 2513727.961620572,
+      "upper_jd_tt": 2513727.9616205725,
+      "selected_jd_tt": 2513727.9616205725,
+      "selected_sun_longitude": 12.826438325679815,
+      "exact_residual": [
+        "-159903",
+        "562949953421312"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2180-01-01T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2517289.0,
+      "birth_sun_longitude": 280.68959732691945,
+      "lower_jd_tt": 2517201.4717775867,
+      "upper_jd_tt": 2517201.471777587,
+      "selected_jd_tt": 2517201.4717775867,
+      "selected_sun_longitude": 192.68959732687705,
+      "exact_residual": [
+        "373",
+        "8796093022208"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2180-07-02T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2517472.0,
+      "birth_sun_longitude": 101.39370774105187,
+      "lower_jd_tt": 2517380.94702695,
+      "upper_jd_tt": 2517380.9470269503,
+      "selected_jd_tt": 2517380.94702695,
+      "selected_sun_longitude": 13.3937077407438,
+      "exact_residual": [
+        "43357",
+        "140737488355328"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2190-01-01T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2520942.0,
+      "birth_sun_longitude": 281.2619443868469,
+      "lower_jd_tt": 2520854.4850956895,
+      "upper_jd_tt": 2520854.48509569,
+      "selected_jd_tt": 2520854.4850956895,
+      "selected_sun_longitude": 193.2619443862013,
+      "exact_residual": [
+        "22715",
+        "35184372088832"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2190-07-02T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2521124.0,
+      "birth_sun_longitude": 100.99341486675766,
+      "lower_jd_tt": 2521032.9728106195,
+      "upper_jd_tt": 2521032.97281062,
+      "selected_jd_tt": 2521032.9728106195,
+      "selected_sun_longitude": 12.993414866511136,
+      "exact_residual": [
+        "138781",
+        "562949953421312"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2200-01-01T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2524594.0,
+      "birth_sun_longitude": 280.8346600984193,
+      "lower_jd_tt": 2524506.464750665,
+      "upper_jd_tt": 2524506.4647506652,
+      "selected_jd_tt": 2524506.4647506652,
+      "selected_sun_longitude": 192.83466009878387,
+      "exact_residual": [
+        "-12827",
+        "35184372088832"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2200-07-02T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2524776.0,
+      "birth_sun_longitude": 100.59626152363676,
+      "lower_jd_tt": 2524684.9860147727,
+      "upper_jd_tt": 2524684.986014773,
+      "selected_jd_tt": 2524684.9860147727,
+      "selected_sun_longitude": 12.596261523453954,
+      "exact_residual": [
+        "25727",
+        "140737488355328"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2210-01-01T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2528246.0,
+      "birth_sun_longitude": 280.39495597041,
+      "lower_jd_tt": 2528158.441769662,
+      "upper_jd_tt": 2528158.4417696623,
+      "selected_jd_tt": 2528158.4417696623,
+      "selected_sun_longitude": 192.39495597098426,
+      "exact_residual": [
+        "-5051",
+        "8796093022208"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2210-07-02T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2528428.0,
+      "birth_sun_longitude": 100.20421375401372,
+      "lower_jd_tt": 2528337.012120531,
+      "upper_jd_tt": 2528337.0121205314,
+      "selected_jd_tt": 2528337.012120531,
+      "selected_sun_longitude": 12.204213753398701,
+      "exact_residual": [
+        "173113",
+        "281474976710656"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2220-01-01T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2531898.0,
+      "birth_sun_longitude": 279.9633282050756,
+      "lower_jd_tt": 2531810.4272727347,
+      "upper_jd_tt": 2531810.427272735,
+      "selected_jd_tt": 2531810.4272727347,
+      "selected_sun_longitude": 191.96332820470784,
+      "exact_residual": [
+        "12939",
+        "35184372088832"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2220-07-02T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2532081.0,
+      "birth_sun_longitude": 100.7551257388771,
+      "lower_jd_tt": 2531989.9952640603,
+      "upper_jd_tt": 2531989.995264061,
+      "selected_jd_tt": 2531989.995264061,
+      "selected_sun_longitude": 12.75512573947333,
+      "exact_residual": [
+        "-335649",
+        "562949953421312"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2230-01-01T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2535551.0,
+      "birth_sun_longitude": 280.546402426238,
+      "lower_jd_tt": 2535463.434591982,
+      "upper_jd_tt": 2535463.4345919825,
+      "selected_jd_tt": 2535463.434591982,
+      "selected_sun_longitude": 192.54640242607815,
+      "exact_residual": [
+        "703",
+        "4398046511104"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2230-07-02T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2535733.0,
+      "birth_sun_longitude": 100.36005591338204,
+      "lower_jd_tt": 2535642.0172015945,
+      "upper_jd_tt": 2535642.017201595,
+      "selected_jd_tt": 2535642.017201595,
+      "selected_sun_longitude": 12.360055913391276,
+      "exact_residual": [
+        "-5199",
+        "562949953421312"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2240-01-01T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2539203.0,
+      "birth_sun_longitude": 280.1105325746187,
+      "lower_jd_tt": 2539115.4137553074,
+      "upper_jd_tt": 2539115.413755308,
+      "selected_jd_tt": 2539115.413755308,
+      "selected_sun_longitude": 192.11053257502198,
+      "exact_residual": [
+        "-7095",
+        "17592186044416"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2240-07-02T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2539386.0,
+      "birth_sun_longitude": 100.91116317883107,
+      "lower_jd_tt": 2539295.000030713,
+      "upper_jd_tt": 2539295.0000307136,
+      "selected_jd_tt": 2539295.0000307136,
+      "selected_sun_longitude": 12.911163178974903,
+      "exact_residual": [
+        "-10121",
+        "70368744177664"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2250-01-01T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2542856.0,
+      "birth_sun_longitude": 280.6915672379259,
+      "lower_jd_tt": 2542768.4242251725,
+      "upper_jd_tt": 2542768.424225173,
+      "selected_jd_tt": 2542768.424225173,
+      "selected_sun_longitude": 192.69156723808896,
+      "exact_residual": [
+        "-2869",
+        "17592186044416"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2250-07-02T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2543038.0,
+      "birth_sun_longitude": 100.52434576566455,
+      "lower_jd_tt": 2542947.0319638816,
+      "upper_jd_tt": 2542947.031963882,
+      "selected_jd_tt": 2542947.031963882,
+      "selected_sun_longitude": 12.52434576572899,
+      "exact_residual": [
+        "-36277",
+        "562949953421312"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2260-01-01T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2546508.0,
+      "birth_sun_longitude": 280.2504162991471,
+      "lower_jd_tt": 2546420.4042388927,
+      "upper_jd_tt": 2546420.404238893,
+      "selected_jd_tt": 2546420.4042388927,
+      "selected_sun_longitude": 192.25041629899053,
+      "exact_residual": [
+        "5509",
+        "35184372088832"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2260-07-02T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2546691.0,
+      "birth_sun_longitude": 101.07356925759032,
+      "lower_jd_tt": 2546600.0160829434,
+      "upper_jd_tt": 2546600.016082944,
+      "selected_jd_tt": 2546600.016082944,
+      "selected_sun_longitude": 13.073569257870163,
+      "exact_residual": [
+        "-157537",
+        "562949953421312"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2270-01-01T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2550161.0,
+      "birth_sun_longitude": 280.8451998997824,
+      "lower_jd_tt": 2550073.4198701065,
+      "upper_jd_tt": 2550073.419870107,
+      "selected_jd_tt": 2550073.419870107,
+      "selected_sun_longitude": 192.84519990018046,
+      "exact_residual": [
+        "-14005",
+        "35184372088832"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2270-07-02T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2550343.0,
+      "birth_sun_longitude": 100.68827128527055,
+      "lower_jd_tt": 2550252.029675844,
+      "upper_jd_tt": 2550252.0296758446,
+      "selected_jd_tt": 2550252.0296758446,
+      "selected_sun_longitude": 12.68827128591554,
+      "exact_residual": [
+        "-90775",
+        "140737488355328"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2280-01-01T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2553813.0,
+      "birth_sun_longitude": 280.40474629491405,
+      "lower_jd_tt": 2553725.40393375,
+      "upper_jd_tt": 2553725.4039337505,
+      "selected_jd_tt": 2553725.40393375,
+      "selected_sun_longitude": 192.40474629424878,
+      "exact_residual": [
+        "23407",
+        "35184372088832"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2280-07-02T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2553996.0,
+      "birth_sun_longitude": 101.23050259177082,
+      "lower_jd_tt": 2553905.0160993724,
+      "upper_jd_tt": 2553905.016099373,
+      "selected_jd_tt": 2553905.0160993724,
+      "selected_sun_longitude": 13.230502591092328,
+      "exact_residual": [
+        "190977",
+        "281474976710656"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2290-01-01T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2557466.0,
+      "birth_sun_longitude": 280.99164458795417,
+      "lower_jd_tt": 2557378.4099740675,
+      "upper_jd_tt": 2557378.409974068,
+      "selected_jd_tt": 2557378.409974068,
+      "selected_sun_longitude": 192.99164458798177,
+      "exact_residual": [
+        "-971",
+        "35184372088832"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2290-07-02T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2557648.0,
+      "birth_sun_longitude": 100.84497338976378,
+      "lower_jd_tt": 2557557.0429948904,
+      "upper_jd_tt": 2557557.042994891,
+      "selected_jd_tt": 2557557.042994891,
+      "selected_sun_longitude": 12.844973390097325,
+      "exact_residual": [
+        "-187769",
+        "562949953421312"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2300-01-01T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2561118.0,
+      "birth_sun_longitude": 280.5491175917203,
+      "lower_jd_tt": 2561030.390943154,
+      "upper_jd_tt": 2561030.3909431547,
+      "selected_jd_tt": 2561030.3909431547,
+      "selected_sun_longitude": 192.5491175923544,
+      "exact_residual": [
+        "-22311",
+        "35184372088832"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2300-07-02T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2561300.0,
+      "birth_sun_longitude": 100.43636283954503,
+      "lower_jd_tt": 2561209.062000593,
+      "upper_jd_tt": 2561209.0620005936,
+      "selected_jd_tt": 2561209.0620005936,
+      "selected_sun_longitude": 12.43636283965542,
+      "exact_residual": [
+        "-31073",
+        "281474976710656"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2310-01-01T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2564770.0,
+      "birth_sun_longitude": 280.1226289851124,
+      "lower_jd_tt": 2564682.364962158,
+      "upper_jd_tt": 2564682.3649621583,
+      "selected_jd_tt": 2564682.364962158,
+      "selected_sun_longitude": 192.12262898487097,
+      "exact_residual": [
+        "4247",
+        "17592186044416"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2310-07-02T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2564952.0,
+      "birth_sun_longitude": 100.05281662041372,
+      "lower_jd_tt": 2564861.085778477,
+      "upper_jd_tt": 2564861.0857784776,
+      "selected_jd_tt": 2564861.085778477,
+      "selected_sun_longitude": 12.052816620323924,
+      "exact_residual": [
+        "6319",
+        "70368744177664"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2320-01-01T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2568422.0,
+      "birth_sun_longitude": 279.6776468103196,
+      "lower_jd_tt": 2568334.344732149,
+      "upper_jd_tt": 2568334.3447321495,
+      "selected_jd_tt": 2568334.3447321495,
+      "selected_sun_longitude": 191.6776468105703,
+      "exact_residual": [
+        "-4411",
+        "17592186044416"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2320-07-02T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2568605.0,
+      "birth_sun_longitude": 100.59926498657786,
+      "lower_jd_tt": 2568514.074658446,
+      "upper_jd_tt": 2568514.0746584465,
+      "selected_jd_tt": 2568514.0746584465,
+      "selected_sun_longitude": 12.599264986654443,
+      "exact_residual": [
+        "-21555",
+        "281474976710656"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2330-01-01T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2572075.0,
+      "birth_sun_longitude": 280.266391714283,
+      "lower_jd_tt": 2571987.355458368,
+      "upper_jd_tt": 2571987.3554583685,
+      "selected_jd_tt": 2571987.355458368,
+      "selected_sun_longitude": 192.26639171419163,
+      "exact_residual": [
+        "1607",
+        "17592186044416"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2330-07-02T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2572257.0,
+      "birth_sun_longitude": 100.21214784629629,
+      "lower_jd_tt": 2572166.0913409493,
+      "upper_jd_tt": 2572166.0913409498,
+      "selected_jd_tt": 2572166.0913409498,
+      "selected_sun_longitude": 12.212147846644928,
+      "exact_residual": [
+        "-98133",
+        "281474976710656"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2340-01-01T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2575727.0,
+      "birth_sun_longitude": 279.8306842728185,
+      "lower_jd_tt": 2575639.342641516,
+      "upper_jd_tt": 2575639.3426415166,
+      "selected_jd_tt": 2575639.3426415166,
+      "selected_sun_longitude": 191.83068427283396,
+      "exact_residual": [
+        "-545",
+        "35184372088832"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2340-07-02T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2575910.0,
+      "birth_sun_longitude": 100.76640881039752,
+      "lower_jd_tt": 2575819.079479513,
+      "upper_jd_tt": 2575819.0794795137,
+      "selected_jd_tt": 2575819.0794795137,
+      "selected_sun_longitude": 12.766408810593722,
+      "exact_residual": [
+        "-110451",
+        "562949953421312"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2350-01-01T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2579380.0,
+      "birth_sun_longitude": 280.4167597738477,
+      "lower_jd_tt": 2579292.3542106776,
+      "upper_jd_tt": 2579292.354210678,
+      "selected_jd_tt": 2579292.354210678,
+      "selected_sun_longitude": 192.41675977414107,
+      "exact_residual": [
+        "-10323",
+        "35184372088832"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2350-07-02T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2579562.0,
+      "birth_sun_longitude": 100.36900591811452,
+      "lower_jd_tt": 2579471.098124768,
+      "upper_jd_tt": 2579471.0981247686,
+      "selected_jd_tt": 2579471.0981247686,
+      "selected_sun_longitude": 12.369005918772544,
+      "exact_residual": [
+        "-1447",
+        "2199023255552"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2360-01-01T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2583032.0,
+      "birth_sun_longitude": 279.983362678174,
+      "lower_jd_tt": 2582944.3303523525,
+      "upper_jd_tt": 2582944.330352353,
+      "selected_jd_tt": 2582944.3303523525,
+      "selected_sun_longitude": 191.9833626780697,
+      "exact_residual": [
+        "3669",
+        "35184372088832"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2360-07-02T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2583215.0,
+      "birth_sun_longitude": 100.92012024259773,
+      "lower_jd_tt": 2583124.083476642,
+      "upper_jd_tt": 2583124.0834766426,
+      "selected_jd_tt": 2583124.083476642,
+      "selected_sun_longitude": 12.920120241947012,
+      "exact_residual": [
+        "366323",
+        "562949953421312"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2370-01-01T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2586685.0,
+      "birth_sun_longitude": 280.5605477919432,
+      "lower_jd_tt": 2586597.3386885202,
+      "upper_jd_tt": 2586597.3386885207,
+      "selected_jd_tt": 2586597.3386885207,
+      "selected_sun_longitude": 192.5605477920566,
+      "exact_residual": [
+        "-3991",
+        "35184372088832"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2370-07-02T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2586867.0,
+      "birth_sun_longitude": 100.52857755236316,
+      "lower_jd_tt": 2586776.108814584,
+      "upper_jd_tt": 2586776.1088145846,
+      "selected_jd_tt": 2586776.108814584,
+      "selected_sun_longitude": 12.528577552215888,
+      "exact_residual": [
+        "82907",
+        "562949953421312"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2380-01-01T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2590337.0,
+      "birth_sun_longitude": 280.126614717017,
+      "lower_jd_tt": 2590249.322961352,
+      "upper_jd_tt": 2590249.3229613523,
+      "selected_jd_tt": 2590249.3229613523,
+      "selected_sun_longitude": 192.12661471724056,
+      "exact_residual": [
+        "-3933",
+        "17592186044416"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2380-07-02T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2590520.0,
+      "birth_sun_longitude": 101.09013227266777,
+      "lower_jd_tt": 2590429.1015566573,
+      "upper_jd_tt": 2590429.101556658,
+      "selected_jd_tt": 2590429.101556658,
+      "selected_sun_longitude": 13.090132272926482,
+      "exact_residual": [
+        "-18205",
+        "70368744177664"
+      ],
+      "native_calls": 43
+    },
+    {
+      "label": "2390-01-01T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2593990.0,
+      "birth_sun_longitude": 280.707147073242,
+      "lower_jd_tt": 2593902.3325631567,
+      "upper_jd_tt": 2593902.332563157,
+      "selected_jd_tt": 2593902.3325631567,
+      "selected_sun_longitude": 192.70714707308935,
+      "exact_residual": [
+        "1343",
+        "8796093022208"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2390-07-02T12:00:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2594172.0,
+      "birth_sun_longitude": 100.68679963188823,
+      "lower_jd_tt": 2594081.1149835805,
+      "upper_jd_tt": 2594081.114983581,
+      "selected_jd_tt": 2594081.1149835805,
+      "selected_sun_longitude": 12.68679963184451,
+      "exact_residual": [
+        "24615",
+        "562949953421312"
+      ],
+      "native_calls": 42
+    },
+    {
+      "label": "2399-12-31T23:59:00 TT",
+      "backend": "moshier",
+      "request_flags": 260,
+      "birth_jd_tt": 2597641.4993055556,
+      "birth_sun_longitude": 279.7734547814875,
+      "lower_jd_tt": 2597553.794980421,
+      "upper_jd_tt": 2597553.7949804217,
+      "selected_jd_tt": 2597553.794980421,
+      "selected_sun_longitude": 191.7734547813338,
+      "exact_residual": [
+        "5407",
+        "35184372088832"
+      ],
+      "native_calls": 42
+    }
+  ],
+  "scope": "The unchanged122reference birth epochs on2backends; integer binary64 index bisection with exact Fraction residuals and actual SPEED flags. Same library/files, not an independent sky model, source doctrine or continuous-root certificate."
+}

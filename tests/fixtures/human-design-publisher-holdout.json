@@ -1,0 +1,39 @@
+{
+  "source": {
+    "publisher": "myBodyGraph, developed by Ra Uru Hu's family",
+    "url": "https://app.mybodygraph.com/public/a26c31eb-5eda-5ac1-aa63-5efece78e042",
+    "linked_from": "https://www.mybodygraph.com/about-ra-uru-hu",
+    "birth_note_confirmation": "https://offer.jovianarchive.com/who-was-ra-uru-hu",
+    "retrieved_date": "2026-11-25",
+    "selection": "Publisher biography's own public chart, selected before running this example; no production implementation changed.",
+    "source_version": "Public shared chart retrieved 2026-11-25; no publisher software version supplied",
+    "design_date_display_timezone": "not explicitly labeled",
+    "activation_columns_transcribed": false
+  },
+  "example": {
+    "id": "ra-uru-hu-publisher-biography-holdout",
+    "birth_input": {
+      "birth_year": 1948,
+      "birth_month": 4,
+      "birth_day": 9,
+      "birth_hour": 0,
+      "birth_minute": 5,
+      "birth_timezone": "America/Toronto"
+    },
+    "displayed_local": "09 April 1948 @ 00:05",
+    "displayed_utc": "09 April 1948 @ 05:05",
+    "displayed_design_date": "12 January 1948 @ 13:19",
+    "place": "Montreal, Canada",
+    "expected": {
+      "type": "manifestor",
+      "strategy": "inform",
+      "authority": "splenic",
+      "definition": "single",
+      "profile": "5/1",
+      "cross_angle": "left",
+      "cross_name_literal": "The Clarion",
+      "cross_gates": [51, 57, 61, 62]
+    }
+  },
+  "acceptance_scope": "Finite publisher structural and four-gate comparison only. IANA America/Toronto is an explicit Montreal clock hypothesis checked against the printed UTC. The design-date zone remains unassigned; no timestamp tolerance or complete activation-line acceptance is inferred. No physical accuracy, full publisher terminology, source algorithm identity or predictive validity certification."
+}

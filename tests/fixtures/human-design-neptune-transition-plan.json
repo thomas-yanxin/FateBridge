@@ -1,0 +1,1841 @@
+{
+  "method_id": "pre_registered_four_source_transition_brackets_v1",
+  "declared_at_utc": "2026-10-25T11:13:47.591047+00:00",
+  "source_url": "https://jovianarchive.com/pages/get-your-human-design-chart",
+  "city": "London, United Kingdom",
+  "independent_centers_sha256": "c4c93bd3adc2887a138751ad5eda820a322e219b36af6f9952029917d3f95d21",
+  "events": [
+    {
+      "event_id": "neptune_boundary",
+      "body": "Neptune",
+      "target_id": 8,
+      "boundary_longitude": 312.3125,
+      "root_jd_tt": 2393137.644106207,
+      "root_bracket_jd_tt": [
+        2393137.6441062065,
+        2393137.644106207
+      ],
+      "root_bracket_seconds": 4.023313522338867e-05,
+      "root_residual_degrees": 1.1368683772161603e-13,
+      "skyfield_delta_t_seconds": 7.630493944689227,
+      "nominal_ut1_calendar_fields": "1840-02-02T03:27:23.145785",
+      "nearest_nominal_minute": "1840-02-02T03:27:00",
+      "source_before_label": "19.5",
+      "source_after_label": "19.6",
+      "query_left_local_label": "1840-02-02T03:12:00",
+      "query_right_local_label": "1840-02-02T03:42:00",
+      "left_case_index": 62,
+      "right_case_index": 92
+    },
+    {
+      "event_id": "moon_before",
+      "body": "Moon",
+      "target_id": 301,
+      "boundary_longitude": 294.5,
+      "root_jd_tt": 2393137.5747021385,
+      "root_bracket_jd_tt": [
+        2393137.574702138,
+        2393137.5747021385
+      ],
+      "root_bracket_seconds": 4.023313522338867e-05,
+      "root_residual_degrees": 9.821974344959017e-10,
+      "skyfield_delta_t_seconds": 7.630500950040588,
+      "nominal_ut1_calendar_fields": "1840-02-02T01:47:26.634275",
+      "nearest_nominal_minute": "1840-02-02T01:47:00",
+      "source_before_label": "61.4",
+      "source_after_label": "61.5",
+      "query_left_local_label": "1840-02-02T01:32:00",
+      "query_right_local_label": "1840-02-02T02:02:00",
+      "left_case_index": 31,
+      "right_case_index": 61
+    },
+    {
+      "event_id": "moon_after",
+      "body": "Moon",
+      "target_id": 301,
+      "boundary_longitude": 295.4375,
+      "root_jd_tt": 2393137.6486559813,
+      "root_bracket_jd_tt": [
+        2393137.6486559813,
+        2393137.6486559818
+      ],
+      "root_bracket_seconds": 4.023313522338867e-05,
+      "root_residual_degrees": -1.829221218940802e-10,
+      "skyfield_delta_t_seconds": 7.630493485521033,
+      "nominal_ut1_calendar_fields": "1840-02-02T03:33:56.246288",
+      "nearest_nominal_minute": "1840-02-02T03:34:00",
+      "source_before_label": "61.5",
+      "source_after_label": "61.6",
+      "query_left_local_label": "1840-02-02T03:19:00",
+      "query_right_local_label": "1840-02-02T03:49:00",
+      "left_case_index": 69,
+      "right_case_index": 99
+    },
+    {
+      "event_id": "sun_nearest",
+      "body": "Sun",
+      "target_id": 10,
+      "boundary_longitude": 312.3125,
+      "root_jd_tt": 2393137.53417423,
+      "root_bracket_jd_tt": [
+        2393137.5341742295,
+        2393137.53417423
+      ],
+      "root_bracket_seconds": 4.023313522338867e-05,
+      "root_residual_degrees": 3.319655661471188e-11,
+      "skyfield_delta_t_seconds": 7.630505041638105,
+      "nominal_ut1_calendar_fields": "1840-02-02T00:49:05.022972",
+      "nearest_nominal_minute": "1840-02-02T00:49:00",
+      "source_before_label": "19.5",
+      "source_after_label": "19.6",
+      "query_left_local_label": "1840-02-02T00:34:00",
+      "query_right_local_label": "1840-02-02T01:04:00",
+      "left_case_index": 0,
+      "right_case_index": 30
+    }
+  ],
+  "mandatory_repeat_case_ids": [
+    "nt-184002020324",
+    "nt-184002020325"
+  ],
+  "cases": [
+    {
+      "id": "nt-184002020034",
+      "nominal_local_label": "1840-02-02T00:34:00",
+      "engine_utc": "1840-02-02T00:35:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 0,
+        "birth_minute": 34,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "sun_nearest"
+      ]
+    },
+    {
+      "id": "nt-184002020035",
+      "nominal_local_label": "1840-02-02T00:35:00",
+      "engine_utc": "1840-02-02T00:36:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 0,
+        "birth_minute": 35,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "sun_nearest"
+      ]
+    },
+    {
+      "id": "nt-184002020036",
+      "nominal_local_label": "1840-02-02T00:36:00",
+      "engine_utc": "1840-02-02T00:37:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 0,
+        "birth_minute": 36,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "sun_nearest"
+      ]
+    },
+    {
+      "id": "nt-184002020037",
+      "nominal_local_label": "1840-02-02T00:37:00",
+      "engine_utc": "1840-02-02T00:38:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 0,
+        "birth_minute": 37,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "sun_nearest"
+      ]
+    },
+    {
+      "id": "nt-184002020038",
+      "nominal_local_label": "1840-02-02T00:38:00",
+      "engine_utc": "1840-02-02T00:39:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 0,
+        "birth_minute": 38,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "sun_nearest"
+      ]
+    },
+    {
+      "id": "nt-184002020039",
+      "nominal_local_label": "1840-02-02T00:39:00",
+      "engine_utc": "1840-02-02T00:40:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 0,
+        "birth_minute": 39,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "sun_nearest"
+      ]
+    },
+    {
+      "id": "nt-184002020040",
+      "nominal_local_label": "1840-02-02T00:40:00",
+      "engine_utc": "1840-02-02T00:41:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 0,
+        "birth_minute": 40,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "sun_nearest"
+      ]
+    },
+    {
+      "id": "nt-184002020041",
+      "nominal_local_label": "1840-02-02T00:41:00",
+      "engine_utc": "1840-02-02T00:42:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 0,
+        "birth_minute": 41,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "sun_nearest"
+      ]
+    },
+    {
+      "id": "nt-184002020042",
+      "nominal_local_label": "1840-02-02T00:42:00",
+      "engine_utc": "1840-02-02T00:43:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 0,
+        "birth_minute": 42,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "sun_nearest"
+      ]
+    },
+    {
+      "id": "nt-184002020043",
+      "nominal_local_label": "1840-02-02T00:43:00",
+      "engine_utc": "1840-02-02T00:44:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 0,
+        "birth_minute": 43,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "sun_nearest"
+      ]
+    },
+    {
+      "id": "nt-184002020044",
+      "nominal_local_label": "1840-02-02T00:44:00",
+      "engine_utc": "1840-02-02T00:45:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 0,
+        "birth_minute": 44,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "sun_nearest"
+      ]
+    },
+    {
+      "id": "nt-184002020045",
+      "nominal_local_label": "1840-02-02T00:45:00",
+      "engine_utc": "1840-02-02T00:46:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 0,
+        "birth_minute": 45,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "sun_nearest"
+      ]
+    },
+    {
+      "id": "nt-184002020046",
+      "nominal_local_label": "1840-02-02T00:46:00",
+      "engine_utc": "1840-02-02T00:47:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 0,
+        "birth_minute": 46,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "sun_nearest"
+      ]
+    },
+    {
+      "id": "nt-184002020047",
+      "nominal_local_label": "1840-02-02T00:47:00",
+      "engine_utc": "1840-02-02T00:48:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 0,
+        "birth_minute": 47,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "sun_nearest"
+      ]
+    },
+    {
+      "id": "nt-184002020048",
+      "nominal_local_label": "1840-02-02T00:48:00",
+      "engine_utc": "1840-02-02T00:49:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 0,
+        "birth_minute": 48,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "sun_nearest"
+      ]
+    },
+    {
+      "id": "nt-184002020049",
+      "nominal_local_label": "1840-02-02T00:49:00",
+      "engine_utc": "1840-02-02T00:50:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 0,
+        "birth_minute": 49,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "sun_nearest"
+      ]
+    },
+    {
+      "id": "nt-184002020050",
+      "nominal_local_label": "1840-02-02T00:50:00",
+      "engine_utc": "1840-02-02T00:51:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 0,
+        "birth_minute": 50,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "sun_nearest"
+      ]
+    },
+    {
+      "id": "nt-184002020051",
+      "nominal_local_label": "1840-02-02T00:51:00",
+      "engine_utc": "1840-02-02T00:52:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 0,
+        "birth_minute": 51,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "sun_nearest"
+      ]
+    },
+    {
+      "id": "nt-184002020052",
+      "nominal_local_label": "1840-02-02T00:52:00",
+      "engine_utc": "1840-02-02T00:53:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 0,
+        "birth_minute": 52,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "sun_nearest"
+      ]
+    },
+    {
+      "id": "nt-184002020053",
+      "nominal_local_label": "1840-02-02T00:53:00",
+      "engine_utc": "1840-02-02T00:54:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 0,
+        "birth_minute": 53,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "sun_nearest"
+      ]
+    },
+    {
+      "id": "nt-184002020054",
+      "nominal_local_label": "1840-02-02T00:54:00",
+      "engine_utc": "1840-02-02T00:55:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 0,
+        "birth_minute": 54,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "sun_nearest"
+      ]
+    },
+    {
+      "id": "nt-184002020055",
+      "nominal_local_label": "1840-02-02T00:55:00",
+      "engine_utc": "1840-02-02T00:56:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 0,
+        "birth_minute": 55,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "sun_nearest"
+      ]
+    },
+    {
+      "id": "nt-184002020056",
+      "nominal_local_label": "1840-02-02T00:56:00",
+      "engine_utc": "1840-02-02T00:57:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 0,
+        "birth_minute": 56,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "sun_nearest"
+      ]
+    },
+    {
+      "id": "nt-184002020057",
+      "nominal_local_label": "1840-02-02T00:57:00",
+      "engine_utc": "1840-02-02T00:58:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 0,
+        "birth_minute": 57,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "sun_nearest"
+      ]
+    },
+    {
+      "id": "nt-184002020058",
+      "nominal_local_label": "1840-02-02T00:58:00",
+      "engine_utc": "1840-02-02T00:59:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 0,
+        "birth_minute": 58,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "sun_nearest"
+      ]
+    },
+    {
+      "id": "nt-184002020059",
+      "nominal_local_label": "1840-02-02T00:59:00",
+      "engine_utc": "1840-02-02T01:00:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 0,
+        "birth_minute": 59,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "sun_nearest"
+      ]
+    },
+    {
+      "id": "nt-184002020100",
+      "nominal_local_label": "1840-02-02T01:00:00",
+      "engine_utc": "1840-02-02T01:01:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 1,
+        "birth_minute": 0,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "sun_nearest"
+      ]
+    },
+    {
+      "id": "nt-184002020101",
+      "nominal_local_label": "1840-02-02T01:01:00",
+      "engine_utc": "1840-02-02T01:02:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 1,
+        "birth_minute": 1,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "sun_nearest"
+      ]
+    },
+    {
+      "id": "nt-184002020102",
+      "nominal_local_label": "1840-02-02T01:02:00",
+      "engine_utc": "1840-02-02T01:03:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 1,
+        "birth_minute": 2,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "sun_nearest"
+      ]
+    },
+    {
+      "id": "nt-184002020103",
+      "nominal_local_label": "1840-02-02T01:03:00",
+      "engine_utc": "1840-02-02T01:04:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 1,
+        "birth_minute": 3,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "sun_nearest"
+      ]
+    },
+    {
+      "id": "nt-184002020104",
+      "nominal_local_label": "1840-02-02T01:04:00",
+      "engine_utc": "1840-02-02T01:05:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 1,
+        "birth_minute": 4,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "sun_nearest"
+      ]
+    },
+    {
+      "id": "nt-184002020132",
+      "nominal_local_label": "1840-02-02T01:32:00",
+      "engine_utc": "1840-02-02T01:33:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 1,
+        "birth_minute": 32,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "moon_before"
+      ]
+    },
+    {
+      "id": "nt-184002020133",
+      "nominal_local_label": "1840-02-02T01:33:00",
+      "engine_utc": "1840-02-02T01:34:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 1,
+        "birth_minute": 33,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "moon_before"
+      ]
+    },
+    {
+      "id": "nt-184002020134",
+      "nominal_local_label": "1840-02-02T01:34:00",
+      "engine_utc": "1840-02-02T01:35:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 1,
+        "birth_minute": 34,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "moon_before"
+      ]
+    },
+    {
+      "id": "nt-184002020135",
+      "nominal_local_label": "1840-02-02T01:35:00",
+      "engine_utc": "1840-02-02T01:36:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 1,
+        "birth_minute": 35,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "moon_before"
+      ]
+    },
+    {
+      "id": "nt-184002020136",
+      "nominal_local_label": "1840-02-02T01:36:00",
+      "engine_utc": "1840-02-02T01:37:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 1,
+        "birth_minute": 36,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "moon_before"
+      ]
+    },
+    {
+      "id": "nt-184002020137",
+      "nominal_local_label": "1840-02-02T01:37:00",
+      "engine_utc": "1840-02-02T01:38:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 1,
+        "birth_minute": 37,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "moon_before"
+      ]
+    },
+    {
+      "id": "nt-184002020138",
+      "nominal_local_label": "1840-02-02T01:38:00",
+      "engine_utc": "1840-02-02T01:39:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 1,
+        "birth_minute": 38,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "moon_before"
+      ]
+    },
+    {
+      "id": "nt-184002020139",
+      "nominal_local_label": "1840-02-02T01:39:00",
+      "engine_utc": "1840-02-02T01:40:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 1,
+        "birth_minute": 39,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "moon_before"
+      ]
+    },
+    {
+      "id": "nt-184002020140",
+      "nominal_local_label": "1840-02-02T01:40:00",
+      "engine_utc": "1840-02-02T01:41:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 1,
+        "birth_minute": 40,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "moon_before"
+      ]
+    },
+    {
+      "id": "nt-184002020141",
+      "nominal_local_label": "1840-02-02T01:41:00",
+      "engine_utc": "1840-02-02T01:42:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 1,
+        "birth_minute": 41,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "moon_before"
+      ]
+    },
+    {
+      "id": "nt-184002020142",
+      "nominal_local_label": "1840-02-02T01:42:00",
+      "engine_utc": "1840-02-02T01:43:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 1,
+        "birth_minute": 42,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "moon_before"
+      ]
+    },
+    {
+      "id": "nt-184002020143",
+      "nominal_local_label": "1840-02-02T01:43:00",
+      "engine_utc": "1840-02-02T01:44:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 1,
+        "birth_minute": 43,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "moon_before"
+      ]
+    },
+    {
+      "id": "nt-184002020144",
+      "nominal_local_label": "1840-02-02T01:44:00",
+      "engine_utc": "1840-02-02T01:45:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 1,
+        "birth_minute": 44,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "moon_before"
+      ]
+    },
+    {
+      "id": "nt-184002020145",
+      "nominal_local_label": "1840-02-02T01:45:00",
+      "engine_utc": "1840-02-02T01:46:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 1,
+        "birth_minute": 45,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "moon_before"
+      ]
+    },
+    {
+      "id": "nt-184002020146",
+      "nominal_local_label": "1840-02-02T01:46:00",
+      "engine_utc": "1840-02-02T01:47:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 1,
+        "birth_minute": 46,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "moon_before"
+      ]
+    },
+    {
+      "id": "nt-184002020147",
+      "nominal_local_label": "1840-02-02T01:47:00",
+      "engine_utc": "1840-02-02T01:48:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 1,
+        "birth_minute": 47,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "moon_before"
+      ]
+    },
+    {
+      "id": "nt-184002020148",
+      "nominal_local_label": "1840-02-02T01:48:00",
+      "engine_utc": "1840-02-02T01:49:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 1,
+        "birth_minute": 48,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "moon_before"
+      ]
+    },
+    {
+      "id": "nt-184002020149",
+      "nominal_local_label": "1840-02-02T01:49:00",
+      "engine_utc": "1840-02-02T01:50:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 1,
+        "birth_minute": 49,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "moon_before"
+      ]
+    },
+    {
+      "id": "nt-184002020150",
+      "nominal_local_label": "1840-02-02T01:50:00",
+      "engine_utc": "1840-02-02T01:51:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 1,
+        "birth_minute": 50,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "moon_before"
+      ]
+    },
+    {
+      "id": "nt-184002020151",
+      "nominal_local_label": "1840-02-02T01:51:00",
+      "engine_utc": "1840-02-02T01:52:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 1,
+        "birth_minute": 51,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "moon_before"
+      ]
+    },
+    {
+      "id": "nt-184002020152",
+      "nominal_local_label": "1840-02-02T01:52:00",
+      "engine_utc": "1840-02-02T01:53:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 1,
+        "birth_minute": 52,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "moon_before"
+      ]
+    },
+    {
+      "id": "nt-184002020153",
+      "nominal_local_label": "1840-02-02T01:53:00",
+      "engine_utc": "1840-02-02T01:54:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 1,
+        "birth_minute": 53,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "moon_before"
+      ]
+    },
+    {
+      "id": "nt-184002020154",
+      "nominal_local_label": "1840-02-02T01:54:00",
+      "engine_utc": "1840-02-02T01:55:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 1,
+        "birth_minute": 54,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "moon_before"
+      ]
+    },
+    {
+      "id": "nt-184002020155",
+      "nominal_local_label": "1840-02-02T01:55:00",
+      "engine_utc": "1840-02-02T01:56:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 1,
+        "birth_minute": 55,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "moon_before"
+      ]
+    },
+    {
+      "id": "nt-184002020156",
+      "nominal_local_label": "1840-02-02T01:56:00",
+      "engine_utc": "1840-02-02T01:57:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 1,
+        "birth_minute": 56,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "moon_before"
+      ]
+    },
+    {
+      "id": "nt-184002020157",
+      "nominal_local_label": "1840-02-02T01:57:00",
+      "engine_utc": "1840-02-02T01:58:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 1,
+        "birth_minute": 57,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "moon_before"
+      ]
+    },
+    {
+      "id": "nt-184002020158",
+      "nominal_local_label": "1840-02-02T01:58:00",
+      "engine_utc": "1840-02-02T01:59:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 1,
+        "birth_minute": 58,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "moon_before"
+      ]
+    },
+    {
+      "id": "nt-184002020159",
+      "nominal_local_label": "1840-02-02T01:59:00",
+      "engine_utc": "1840-02-02T02:00:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 1,
+        "birth_minute": 59,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "moon_before"
+      ]
+    },
+    {
+      "id": "nt-184002020200",
+      "nominal_local_label": "1840-02-02T02:00:00",
+      "engine_utc": "1840-02-02T02:01:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 2,
+        "birth_minute": 0,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "moon_before"
+      ]
+    },
+    {
+      "id": "nt-184002020201",
+      "nominal_local_label": "1840-02-02T02:01:00",
+      "engine_utc": "1840-02-02T02:02:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 2,
+        "birth_minute": 1,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "moon_before"
+      ]
+    },
+    {
+      "id": "nt-184002020202",
+      "nominal_local_label": "1840-02-02T02:02:00",
+      "engine_utc": "1840-02-02T02:03:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 2,
+        "birth_minute": 2,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "moon_before"
+      ]
+    },
+    {
+      "id": "nt-184002020312",
+      "nominal_local_label": "1840-02-02T03:12:00",
+      "engine_utc": "1840-02-02T03:13:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 3,
+        "birth_minute": 12,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "neptune_boundary"
+      ]
+    },
+    {
+      "id": "nt-184002020313",
+      "nominal_local_label": "1840-02-02T03:13:00",
+      "engine_utc": "1840-02-02T03:14:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 3,
+        "birth_minute": 13,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "neptune_boundary"
+      ]
+    },
+    {
+      "id": "nt-184002020314",
+      "nominal_local_label": "1840-02-02T03:14:00",
+      "engine_utc": "1840-02-02T03:15:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 3,
+        "birth_minute": 14,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "neptune_boundary"
+      ]
+    },
+    {
+      "id": "nt-184002020315",
+      "nominal_local_label": "1840-02-02T03:15:00",
+      "engine_utc": "1840-02-02T03:16:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 3,
+        "birth_minute": 15,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "neptune_boundary"
+      ]
+    },
+    {
+      "id": "nt-184002020316",
+      "nominal_local_label": "1840-02-02T03:16:00",
+      "engine_utc": "1840-02-02T03:17:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 3,
+        "birth_minute": 16,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "neptune_boundary"
+      ]
+    },
+    {
+      "id": "nt-184002020317",
+      "nominal_local_label": "1840-02-02T03:17:00",
+      "engine_utc": "1840-02-02T03:18:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 3,
+        "birth_minute": 17,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "neptune_boundary"
+      ]
+    },
+    {
+      "id": "nt-184002020318",
+      "nominal_local_label": "1840-02-02T03:18:00",
+      "engine_utc": "1840-02-02T03:19:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 3,
+        "birth_minute": 18,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "neptune_boundary"
+      ]
+    },
+    {
+      "id": "nt-184002020319",
+      "nominal_local_label": "1840-02-02T03:19:00",
+      "engine_utc": "1840-02-02T03:20:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 3,
+        "birth_minute": 19,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "neptune_boundary",
+        "moon_after"
+      ]
+    },
+    {
+      "id": "nt-184002020320",
+      "nominal_local_label": "1840-02-02T03:20:00",
+      "engine_utc": "1840-02-02T03:21:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 3,
+        "birth_minute": 20,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "neptune_boundary",
+        "moon_after"
+      ]
+    },
+    {
+      "id": "nt-184002020321",
+      "nominal_local_label": "1840-02-02T03:21:00",
+      "engine_utc": "1840-02-02T03:22:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 3,
+        "birth_minute": 21,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "neptune_boundary",
+        "moon_after"
+      ]
+    },
+    {
+      "id": "nt-184002020322",
+      "nominal_local_label": "1840-02-02T03:22:00",
+      "engine_utc": "1840-02-02T03:23:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 3,
+        "birth_minute": 22,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "neptune_boundary",
+        "moon_after"
+      ]
+    },
+    {
+      "id": "nt-184002020323",
+      "nominal_local_label": "1840-02-02T03:23:00",
+      "engine_utc": "1840-02-02T03:24:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 3,
+        "birth_minute": 23,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "neptune_boundary",
+        "moon_after"
+      ]
+    },
+    {
+      "id": "nt-184002020324",
+      "nominal_local_label": "1840-02-02T03:24:00",
+      "engine_utc": "1840-02-02T03:25:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 3,
+        "birth_minute": 24,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "neptune_boundary",
+        "moon_after"
+      ],
+      "repeat_prior_source_id": "disc-full-21-neptune-184002020325"
+    },
+    {
+      "id": "nt-184002020325",
+      "nominal_local_label": "1840-02-02T03:25:00",
+      "engine_utc": "1840-02-02T03:26:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 3,
+        "birth_minute": 25,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "neptune_boundary",
+        "moon_after"
+      ],
+      "repeat_prior_source_id": "disc-full-22-neptune-184002020326"
+    },
+    {
+      "id": "nt-184002020326",
+      "nominal_local_label": "1840-02-02T03:26:00",
+      "engine_utc": "1840-02-02T03:27:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 3,
+        "birth_minute": 26,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "neptune_boundary",
+        "moon_after"
+      ]
+    },
+    {
+      "id": "nt-184002020327",
+      "nominal_local_label": "1840-02-02T03:27:00",
+      "engine_utc": "1840-02-02T03:28:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 3,
+        "birth_minute": 27,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "neptune_boundary",
+        "moon_after"
+      ]
+    },
+    {
+      "id": "nt-184002020328",
+      "nominal_local_label": "1840-02-02T03:28:00",
+      "engine_utc": "1840-02-02T03:29:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 3,
+        "birth_minute": 28,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "neptune_boundary",
+        "moon_after"
+      ]
+    },
+    {
+      "id": "nt-184002020329",
+      "nominal_local_label": "1840-02-02T03:29:00",
+      "engine_utc": "1840-02-02T03:30:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 3,
+        "birth_minute": 29,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "neptune_boundary",
+        "moon_after"
+      ]
+    },
+    {
+      "id": "nt-184002020330",
+      "nominal_local_label": "1840-02-02T03:30:00",
+      "engine_utc": "1840-02-02T03:31:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 3,
+        "birth_minute": 30,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "neptune_boundary",
+        "moon_after"
+      ]
+    },
+    {
+      "id": "nt-184002020331",
+      "nominal_local_label": "1840-02-02T03:31:00",
+      "engine_utc": "1840-02-02T03:32:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 3,
+        "birth_minute": 31,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "neptune_boundary",
+        "moon_after"
+      ]
+    },
+    {
+      "id": "nt-184002020332",
+      "nominal_local_label": "1840-02-02T03:32:00",
+      "engine_utc": "1840-02-02T03:33:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 3,
+        "birth_minute": 32,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "neptune_boundary",
+        "moon_after"
+      ]
+    },
+    {
+      "id": "nt-184002020333",
+      "nominal_local_label": "1840-02-02T03:33:00",
+      "engine_utc": "1840-02-02T03:34:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 3,
+        "birth_minute": 33,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "neptune_boundary",
+        "moon_after"
+      ]
+    },
+    {
+      "id": "nt-184002020334",
+      "nominal_local_label": "1840-02-02T03:34:00",
+      "engine_utc": "1840-02-02T03:35:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 3,
+        "birth_minute": 34,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "neptune_boundary",
+        "moon_after"
+      ]
+    },
+    {
+      "id": "nt-184002020335",
+      "nominal_local_label": "1840-02-02T03:35:00",
+      "engine_utc": "1840-02-02T03:36:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 3,
+        "birth_minute": 35,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "neptune_boundary",
+        "moon_after"
+      ]
+    },
+    {
+      "id": "nt-184002020336",
+      "nominal_local_label": "1840-02-02T03:36:00",
+      "engine_utc": "1840-02-02T03:37:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 3,
+        "birth_minute": 36,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "neptune_boundary",
+        "moon_after"
+      ]
+    },
+    {
+      "id": "nt-184002020337",
+      "nominal_local_label": "1840-02-02T03:37:00",
+      "engine_utc": "1840-02-02T03:38:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 3,
+        "birth_minute": 37,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "neptune_boundary",
+        "moon_after"
+      ]
+    },
+    {
+      "id": "nt-184002020338",
+      "nominal_local_label": "1840-02-02T03:38:00",
+      "engine_utc": "1840-02-02T03:39:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 3,
+        "birth_minute": 38,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "neptune_boundary",
+        "moon_after"
+      ]
+    },
+    {
+      "id": "nt-184002020339",
+      "nominal_local_label": "1840-02-02T03:39:00",
+      "engine_utc": "1840-02-02T03:40:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 3,
+        "birth_minute": 39,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "neptune_boundary",
+        "moon_after"
+      ]
+    },
+    {
+      "id": "nt-184002020340",
+      "nominal_local_label": "1840-02-02T03:40:00",
+      "engine_utc": "1840-02-02T03:41:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 3,
+        "birth_minute": 40,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "neptune_boundary",
+        "moon_after"
+      ]
+    },
+    {
+      "id": "nt-184002020341",
+      "nominal_local_label": "1840-02-02T03:41:00",
+      "engine_utc": "1840-02-02T03:42:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 3,
+        "birth_minute": 41,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "neptune_boundary",
+        "moon_after"
+      ]
+    },
+    {
+      "id": "nt-184002020342",
+      "nominal_local_label": "1840-02-02T03:42:00",
+      "engine_utc": "1840-02-02T03:43:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 3,
+        "birth_minute": 42,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "neptune_boundary",
+        "moon_after"
+      ]
+    },
+    {
+      "id": "nt-184002020343",
+      "nominal_local_label": "1840-02-02T03:43:00",
+      "engine_utc": "1840-02-02T03:44:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 3,
+        "birth_minute": 43,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "moon_after"
+      ]
+    },
+    {
+      "id": "nt-184002020344",
+      "nominal_local_label": "1840-02-02T03:44:00",
+      "engine_utc": "1840-02-02T03:45:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 3,
+        "birth_minute": 44,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "moon_after"
+      ]
+    },
+    {
+      "id": "nt-184002020345",
+      "nominal_local_label": "1840-02-02T03:45:00",
+      "engine_utc": "1840-02-02T03:46:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 3,
+        "birth_minute": 45,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "moon_after"
+      ]
+    },
+    {
+      "id": "nt-184002020346",
+      "nominal_local_label": "1840-02-02T03:46:00",
+      "engine_utc": "1840-02-02T03:47:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 3,
+        "birth_minute": 46,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "moon_after"
+      ]
+    },
+    {
+      "id": "nt-184002020347",
+      "nominal_local_label": "1840-02-02T03:47:00",
+      "engine_utc": "1840-02-02T03:48:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 3,
+        "birth_minute": 47,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "moon_after"
+      ]
+    },
+    {
+      "id": "nt-184002020348",
+      "nominal_local_label": "1840-02-02T03:48:00",
+      "engine_utc": "1840-02-02T03:49:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 3,
+        "birth_minute": 48,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "moon_after"
+      ]
+    },
+    {
+      "id": "nt-184002020349",
+      "nominal_local_label": "1840-02-02T03:49:00",
+      "engine_utc": "1840-02-02T03:50:15+00:00",
+      "birth_input": {
+        "birth_year": 1840,
+        "birth_month": 2,
+        "birth_day": 2,
+        "birth_hour": 3,
+        "birth_minute": 49,
+        "birth_second": 0,
+        "birth_timezone": "Europe/London"
+      },
+      "candidate_events": [
+        "moon_after"
+      ]
+    }
+  ],
+  "potential_query_count": 100,
+  "maximum_distinct_queries": 30,
+  "completion_rule": "All four declared event windows must have observed lower before-label and upper after-label at adjacent local minutes, with every adaptive step retained and both repeated prior inputs stable excludingName. This completes finite source brackets only, never all potential-minute coverage or original professional acceptance.",
+  "procedure": [
+    "Query the two mandatory repeated input controls first.",
+    "For each event in fixed listed order, query its frozen left and right endpoints, reusing already saved observations.",
+    "If either endpoint is not the expected adjacent before/after label, preserve all rows and mark that event not_bracketed; do not expand or move the window.",
+    "While the integer minute width is greater than1, query the floor midpoint of the current endpoints. Move only left for the observed before-label or right for the observed after-label; any other label stops the event as unexpected_source_label.",
+    "Every query identity comes from the unchanged potential-case list. Do not resubmit an in-flight chart on timeout; reread actual UI and durable receipts.",
+    "Never delete observations or replace a failed/missing event with a different boundary. Preserve all12other properties and26activations from each acquired chart."
+  ],
+  "selection_scope": "Post-known-failure development diagnosis, not blind. Four geometry-selected windows and the complete adaptive procedure fixed before new official observations. Potential cases are decision-tree options, not a claim of100complete samples. Native and official clocks/backend identities remain separate hypotheses. No original scope, old reference, criterion or failed row changed."
+}

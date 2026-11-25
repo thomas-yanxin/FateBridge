@@ -1,0 +1,25 @@
+{
+  "declared_at_utc": "2026-10-25T11:25:01.468485+00:00",
+  "scope": "Component-comparison hypotheses fixed before interior adaptive boundary results, after two repeat controls and first Neptune window endpoints. Diagnostic, not blind. No free clock-offset fitting or rejection of inconvenient models.",
+  "centers_sha256": "c4c93bd3adc2887a138751ad5eda820a322e219b36af6f9952029917d3f95d21",
+  "native_models": [
+    "DE441_default",
+    "DE441_no_deflection",
+    "DE431_default",
+    "DE431_no_deflection",
+    "Moshier_default",
+    "Moshier_no_deflection"
+  ],
+  "independent_models": [
+    "DE440_Skyfield_default",
+    "DE440_Skyfield_no_deflection"
+  ],
+  "clock_hypotheses_seconds_local_minus_common_ut1": [
+    0,
+    -75
+  ],
+  "native_root_half_window_days": 0.1,
+  "root_iterations": 44,
+  "common_clock": "Swiss jdet_to_utc historicalUT1 under currentDE441 file setup, recorded as a hypothesis, not authentic source clock.",
+  "no_original_case_or_reference_replacement": true
+}

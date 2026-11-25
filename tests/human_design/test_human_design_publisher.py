@@ -6,16 +6,20 @@ import hashlib
 import json
 from copy import deepcopy
 from pathlib import Path
+from typing import Literal
 from unittest.mock import patch
 
 import pytest
 
+from fatebridge.application.execution import execute_tool
 from fatebridge.core.astro import native_execution, runtime
+from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
 from fatebridge.validation.human_design_publisher import (
     publisher_natal_checks,
     summarize_runs,
 )
+from scripts.human_design.audit_human_design_root_models import point_mass_gate_lines
 from scripts.human_design.build_human_design_publisher_natal_reference import (
     extract_facts,
     facts_from_page,
@@ -246,3 +250,93 @@ def test_current_native_audit_retains_all_fixed_hypotheses_and_both_backends(cur
         ("moshier", "mean"),
     }
     assert report["exact_birth_epoch_accepted"] is False
+
+
+@pytest.mark.parametrize(
+    "sun_longitude_degrees,earth_gate_line",
+    [(3.8749999999999996, "46.6"), (3.875, "18.1"), (3.8750000000000004, "18.1")],
+)
+def test_point_mass_ledger_preserves_the_exact_earth_opposition_boundary(
+    sun_longitude_degrees: float, earth_gate_line: str
+) -> None:
+    """Rounding the opposition first moved Earth into the next gate and line."""
+    assert (
+        point_mass_gate_lines([{"body": "Sun", "longitude": sun_longitude_degrees}])[
+            "Earth"
+        ]
+        == earth_gate_line
+    )
+
+
+@pytest.mark.parametrize(
+    "backend",
+    [
+        pytest.param("swieph", marks=pytest.mark.local_data),
+        "moshier",
+        pytest.param("finite_source_point_mass", marks=pytest.mark.local_data),
+    ],
+)
+def test_biography_publisher_holdout_keeps_model_and_source_scope_separate(
+    backend: Literal["swieph", "moshier", "finite_source_point_mass"],
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    reference = json.loads(
+        (ROOT / "tests/fixtures/human-design-publisher-holdout.json").read_text()
+    )
+    example = reference["example"]
+    monkeypatch.setenv(
+        "SE_EPHE_PATH", str(tmp_path if backend == "moshier" else ROOT / "ephe")
+    )
+    monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
+    specification = next(spec for spec in CATALOG if spec.key == "human_design")
+    reading = execute_tool(
+        specification,
+        specification.request_model(
+            **example["birth_input"],
+            compare_apparent_models=backend == "finite_source_point_mass",
+        ),
+    )
+    assert "error" not in reading, reading
+    assert reading["birth_utc"] == "1948-04-09T05:05:00+00:00"
+    expected = example["expected"]
+    if backend == "finite_source_point_mass":
+        comparison = reading["apparent_model_comparison"]
+        assert comparison["native_activations_replaced"] is False
+        root = comparison["candidate_design_root"]
+        assert root["status"] == "computed"
+        assert root["default_native_root_replaced"] is False
+        assert root["physical_time_error_bound_seconds"] is None
+        personality_sun = comparison["epochs"]["personality"]["positions"][0]
+        design_sun = comparison["candidate_design_epoch"]["positions"][0]
+        assert personality_sun["body"] == design_sun["body"] == "Sun"
+        gate_lines = [
+            point_mass_gate_lines(epoch["positions"])
+            for epoch in (
+                comparison["epochs"]["personality"],
+                comparison["candidate_design_epoch"],
+            )
+        ]
+        assert [
+            int(column[body].split(".")[0])
+            for column in gate_lines
+            for body in ("Sun", "Earth")
+        ] == expected["cross_gates"]
+    else:
+        assert {
+            activation["ephemeris_model"]
+            for column in reading["activations"].values()
+            for activation in column
+            if activation["body"] not in ("Earth", "NorthNode", "SouthNode")
+        } == {backend}
+        graph = reading["bodygraph"]
+        assert graph["type"] == expected["type"]
+        assert graph["strategy"] == expected["strategy"]
+        assert graph["authority"] == expected["authority"]
+        assert graph["definition"]["kind"] == expected["definition"]
+        assert reading["profile"] == expected["profile"]
+        assert reading["incarnation_cross"]["angle"] == expected["cross_angle"]
+        assert reading["incarnation_cross"]["gates"] == expected["cross_gates"]
+        assert reading["incarnation_cross"]["name"].casefold() == (
+            expected["cross_name_literal"].casefold()
+        )

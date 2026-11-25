@@ -4,6 +4,7 @@ import asyncio
 import json
 import math
 from fractions import Fraction
+from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
@@ -17,6 +18,7 @@ from fatebridge.core.astro.time_scales import ephemeris_time
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
+from tests.support.transports import AS_OF, three_surfaces
 
 SPEC = next(s for s in CATALOG if s.key == "human_design")
 INPUT = dict(
@@ -128,3 +130,79 @@ def test_full_solar_root_witness_and_precision_card_on_actual_three_surfaces(
         assert w["physical_time_accuracy_certified"] is False
         value.pop("run_metadata")
     assert expected == native == cli
+
+
+@pytest.mark.parametrize(
+    "empty_files", [pytest.param(False, marks=pytest.mark.local_data), True]
+)
+def test_original_neptune_birth_window_keeps_candidates_and_method_on_three_surfaces(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    empty_files: bool,
+) -> None:
+    root = Path(__file__).resolve().parents[2]
+    reference = json.loads(
+        (root / "tests/fixtures/human-design-disc-clock-observations.json").read_text()
+    )
+    case = next(
+        case
+        for case in reference["cases"]
+        if case["id"] == "disc-full-21-neptune-184002020325"
+    )
+    monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path if empty_files else root / "ephe"))
+    monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
+    reading = three_surfaces(
+        SPEC,
+        {**case["birth_input"], "birth_time_uncertainty_minutes": 1},
+        [
+            "activations",
+            "design_solver",
+            "time_sensitivity",
+            "calculation_policy",
+            "ephemeris_source_summary",
+        ],
+        AS_OF,
+        tmp_path,
+        monkeypatch,
+        capsys,
+    )
+    models = {
+        activation["ephemeris_model"]
+        for column in reading["activations"].values()
+        for activation in column
+        if activation["body"] not in ("Earth", "NorthNode", "SouthNode")
+    }
+    assert models == {"moshier" if empty_files else "swieph"}
+    precision = reading["design_solver"]["numerical_precision"]
+    assert precision["method_id"] == "human_design_observed_contact_solar_root_v2"
+    assert precision["physical_time_accuracy_certified"] is False
+    lattice = precision["local_solar_lattice"]
+    assert lattice["unique_physical_root_certified"] is False
+    endpoints = precision["design_body_endpoint_assessment"]
+    assert {row["jd_tt"] for row in endpoints["evaluations"]} == {
+        precision["lower"]["jd_tt"],
+        precision["upper"]["jd_tt"],
+    }
+    selected = endpoints["evaluations"][endpoints["selected_evaluation_index"]]
+    assert selected["jd_tt"] == reading["design_solver"]["design_jd_tt"]
+    design_sun = next(
+        activation
+        for activation in reading["activations"]["design"]
+        if activation["body"] == "Sun"
+    )
+    assert selected["native_positions"][0][0] == design_sun["longitude"]
+    family = precision["local_root_family"]
+    if lattice["multiple_numeric_contacts_observed"]:
+        assert {row["jd_tt"] for row in family["candidates"]} == {
+            lattice["samples"][index]["jd_tt"]
+            for index in lattice["candidate_epoch_indices"]
+        }
+        assert family["continuous_root_count_certified"] is False
+    else:
+        assert family is None
+    window = reading["time_sensitivity"]
+    assert window["sampling"]["grid_sample_count"] == 13
+    assert window["sampling"]["continuous_interval_certified"] is False
+    assert window["evaluation_witnesses"]["samples"]
+    assert reading["ephemeris_source_summary"]["accuracy_certified"] is False

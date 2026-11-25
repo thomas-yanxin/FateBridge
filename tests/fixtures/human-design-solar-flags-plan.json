@@ -1,0 +1,178 @@
+{
+  "before_sha256": "cfa7a2a9b2cc765719de76ae3fba822b8900392ac3713e7ddb205f5b6bf5f803",
+  "screen_sha256": "bbcafe66e28fa084a94df35fae1a6130a832aa3fdd6ac8654801c6191b767f2e",
+  "cases": [
+    {
+      "id": "legacy-0",
+      "input": {
+        "birth_year": 1974,
+        "birth_month": 8,
+        "birth_day": 20,
+        "birth_hour": 15,
+        "birth_minute": 25,
+        "birth_second": 4,
+        "birth_timezone": "UTC",
+        "node_mode": "true"
+      }
+    },
+    {
+      "id": "legacy-1",
+      "input": {
+        "birth_year": 1976,
+        "birth_month": 3,
+        "birth_day": 14,
+        "birth_hour": 16,
+        "birth_minute": 20,
+        "birth_second": 59,
+        "birth_timezone": "UTC",
+        "node_mode": "true"
+      }
+    },
+    {
+      "id": "legacy-2",
+      "input": {
+        "birth_year": 1999,
+        "birth_month": 2,
+        "birth_day": 28,
+        "birth_hour": 7,
+        "birth_minute": 32,
+        "birth_second": 26,
+        "birth_timezone": "UTC",
+        "node_mode": "true"
+      }
+    },
+    {
+      "id": "legacy-3",
+      "input": {
+        "birth_year": 2000,
+        "birth_month": 4,
+        "birth_day": 11,
+        "birth_hour": 18,
+        "birth_minute": 24,
+        "birth_second": 55,
+        "birth_timezone": "UTC",
+        "node_mode": "true"
+      }
+    },
+    {
+      "id": "legacy-4",
+      "input": {
+        "birth_year": 2000,
+        "birth_month": 4,
+        "birth_day": 20,
+        "birth_hour": 9,
+        "birth_minute": 31,
+        "birth_second": 26,
+        "birth_timezone": "UTC",
+        "node_mode": "true"
+      }
+    },
+    {
+      "id": "legacy-5",
+      "input": {
+        "birth_year": 2000,
+        "birth_month": 4,
+        "birth_day": 29,
+        "birth_hour": 18,
+        "birth_minute": 53,
+        "birth_second": 31,
+        "birth_timezone": "UTC",
+        "node_mode": "true"
+      }
+    },
+    {
+      "id": "legacy-6",
+      "input": {
+        "birth_year": 2000,
+        "birth_month": 5,
+        "birth_day": 5,
+        "birth_hour": 18,
+        "birth_minute": 1,
+        "birth_second": 19,
+        "birth_timezone": "UTC",
+        "node_mode": "true"
+      }
+    },
+    {
+      "id": "legacy-7",
+      "input": {
+        "birth_year": 1800,
+        "birth_month": 1,
+        "birth_day": 1,
+        "birth_hour": 12,
+        "birth_minute": 0,
+        "birth_timezone": "UTC",
+        "node_mode": "true"
+      }
+    },
+    {
+      "id": "legacy-8",
+      "input": {
+        "birth_year": 1900,
+        "birth_month": 1,
+        "birth_day": 1,
+        "birth_hour": 12,
+        "birth_minute": 0,
+        "birth_timezone": "UTC",
+        "node_mode": "true"
+      }
+    },
+    {
+      "id": "legacy-9",
+      "input": {
+        "birth_year": 2000,
+        "birth_month": 1,
+        "birth_day": 1,
+        "birth_hour": 12,
+        "birth_minute": 0,
+        "birth_timezone": "UTC",
+        "node_mode": "true"
+      }
+    },
+    {
+      "id": "legacy-10",
+      "input": {
+        "birth_year": 2399,
+        "birth_month": 12,
+        "birth_day": 31,
+        "birth_hour": 23,
+        "birth_minute": 59,
+        "birth_timezone": "UTC",
+        "node_mode": "true"
+      }
+    }
+  ],
+  "modes": [
+    "true",
+    "mean"
+  ],
+  "backends": [
+    "swieph",
+    "moshier"
+  ],
+  "requirements": [
+    "Root Sun requests same apparent-ecliptic-of-date position+SPEED flags as every activation; a return missing SPEED is rejected.",
+    "Birth, selected and each final endpoint solar witness equals actual Sun activation longitude exactly, no angular epsilon.",
+    "Same exact-rational88degree residual and adjacent-binary64TT selection policy; unchanged physical thresholds.",
+    "All1539old case IDs and old immutable fixtures retained; full current result, interval samples, complete backend comparison and three actual interfaces checked.",
+    "Full old1.36wheel and current1.37wheel outputs separately verified using their own rulesets; compare raw coordinates at common TT rather than hiding root changes."
+  ],
+  "negative_receipts": [
+    "missing_speed",
+    "wrong_backend",
+    "wrong_policy",
+    "missing_policy",
+    "birth_sun_ULP",
+    "endpoint_sun_ULP",
+    "selected_sun_ULP",
+    "missing_reference_policy",
+    "sample_policy",
+    "invented_accuracy"
+  ],
+  "unchanged_thresholds": {
+    "astronomy_arcsec": 2.0,
+    "physical_design_root_seconds": 5.0,
+    "clock_seconds": 0.0002
+  },
+  "scope": "Fix Sun request convention and exact internal binding, not certify native producer or physical submillisecond time. The488screen used a fixed ordering;185differences are not a population or error-rate estimate and its maximum is not public-chart physical error. All7professional gaps stay unchanged absent new evidence."
+}

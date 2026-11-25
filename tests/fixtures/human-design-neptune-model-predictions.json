@@ -1,0 +1,841 @@
+{
+  "plan_sha256": "2082a9c76e5da303ebc399e8b7c4194e5b9172c8b4d0e32c0f2686039b5e87a2",
+  "producer_sha256": "dceaf0738df17554300af0468d5ee08116abdfbff38f601af1aebef0c82904b5",
+  "native_version": "2.10.03",
+  "native_binary_sha256": "ad46dbe0eaf2321b245ed466ed6f7065a7d6faa7751f8134aba0776c4ccf3e4b",
+  "rows": [
+    {
+      "model": "DE441_default",
+      "event_id": "neptune_boundary",
+      "body": "Neptune",
+      "boundary_longitude": 312.3125,
+      "root_jd_tt": 2393137.6426554397,
+      "bracket_jd_tt": [
+        2393137.6426554397,
+        2393137.64265544
+      ],
+      "bracket_width_seconds": 4.023313522338867e-05,
+      "residual_degrees": -7.560174708487466e-12,
+      "native_file_de_number": 441,
+      "common_historical_ut1_calendar": "1840-02-02T03:25:17.825040",
+      "clock_tidal_acceleration": -25.936,
+      "clock_hypotheses": [
+        {
+          "local_minus_ut1_seconds": 0,
+          "predicted_local_calendar": "1840-02-02T03:25:17.825040"
+        },
+        {
+          "local_minus_ut1_seconds": -75,
+          "predicted_local_calendar": "1840-02-02T03:24:02.825040"
+        }
+      ]
+    },
+    {
+      "model": "DE441_default",
+      "event_id": "moon_before",
+      "body": "Moon",
+      "boundary_longitude": 294.5,
+      "root_jd_tt": 2393137.5747019025,
+      "bracket_jd_tt": [
+        2393137.574701902,
+        2393137.5747019025
+      ],
+      "bracket_width_seconds": 4.023313522338867e-05,
+      "residual_degrees": 2.9305056159500964e-09,
+      "native_file_de_number": 441,
+      "common_historical_ut1_calendar": "1840-02-02T01:47:26.639425",
+      "clock_tidal_acceleration": -25.936,
+      "clock_hypotheses": [
+        {
+          "local_minus_ut1_seconds": 0,
+          "predicted_local_calendar": "1840-02-02T01:47:26.639425"
+        },
+        {
+          "local_minus_ut1_seconds": -75,
+          "predicted_local_calendar": "1840-02-02T01:46:11.639425"
+        }
+      ]
+    },
+    {
+      "model": "DE441_default",
+      "event_id": "moon_after",
+      "body": "Moon",
+      "boundary_longitude": 295.4375,
+      "root_jd_tt": 2393137.648655746,
+      "bracket_jd_tt": [
+        2393137.648655746,
+        2393137.6486557466
+      ],
+      "bracket_width_seconds": 4.023313522338867e-05,
+      "residual_degrees": -8.913616511563305e-10,
+      "native_file_de_number": 441,
+      "common_historical_ut1_calendar": "1840-02-02T03:33:56.251518",
+      "clock_tidal_acceleration": -25.936,
+      "clock_hypotheses": [
+        {
+          "local_minus_ut1_seconds": 0,
+          "predicted_local_calendar": "1840-02-02T03:33:56.251518"
+        },
+        {
+          "local_minus_ut1_seconds": -75,
+          "predicted_local_calendar": "1840-02-02T03:32:41.251518"
+        }
+      ]
+    },
+    {
+      "model": "DE441_default",
+      "event_id": "sun_nearest",
+      "body": "Sun",
+      "boundary_longitude": 312.3125,
+      "root_jd_tt": 2393137.5341744474,
+      "bracket_jd_tt": [
+        2393137.5341744474,
+        2393137.534174448
+      ],
+      "bracket_width_seconds": 4.023313522338867e-05,
+      "residual_degrees": -4.553157850750722e-11,
+      "native_file_de_number": 441,
+      "common_historical_ut1_calendar": "1840-02-02T00:49:05.067309",
+      "clock_tidal_acceleration": -25.936,
+      "clock_hypotheses": [
+        {
+          "local_minus_ut1_seconds": 0,
+          "predicted_local_calendar": "1840-02-02T00:49:05.067309"
+        },
+        {
+          "local_minus_ut1_seconds": -75,
+          "predicted_local_calendar": "1840-02-02T00:47:50.067309"
+        }
+      ]
+    },
+    {
+      "model": "DE441_no_deflection",
+      "event_id": "neptune_boundary",
+      "body": "Neptune",
+      "boundary_longitude": 312.3125,
+      "root_jd_tt": 2393137.6223870544,
+      "bracket_jd_tt": [
+        2393137.6223870544,
+        2393137.622387055
+      ],
+      "bracket_width_seconds": 4.023313522338867e-05,
+      "residual_degrees": -2.7284841053187847e-12,
+      "native_file_de_number": 441,
+      "common_historical_ut1_calendar": "1840-02-02T02:56:06.636550",
+      "clock_tidal_acceleration": -25.936,
+      "clock_hypotheses": [
+        {
+          "local_minus_ut1_seconds": 0,
+          "predicted_local_calendar": "1840-02-02T02:56:06.636550"
+        },
+        {
+          "local_minus_ut1_seconds": -75,
+          "predicted_local_calendar": "1840-02-02T02:54:51.636550"
+        }
+      ]
+    },
+    {
+      "model": "DE441_no_deflection",
+      "event_id": "moon_before",
+      "body": "Moon",
+      "boundary_longitude": 294.5,
+      "root_jd_tt": 2393137.5747019025,
+      "bracket_jd_tt": [
+        2393137.574701902,
+        2393137.5747019025
+      ],
+      "bracket_width_seconds": 4.023313522338867e-05,
+      "residual_degrees": 2.9305056159500964e-09,
+      "native_file_de_number": 441,
+      "common_historical_ut1_calendar": "1840-02-02T01:47:26.639425",
+      "clock_tidal_acceleration": -25.936,
+      "clock_hypotheses": [
+        {
+          "local_minus_ut1_seconds": 0,
+          "predicted_local_calendar": "1840-02-02T01:47:26.639425"
+        },
+        {
+          "local_minus_ut1_seconds": -75,
+          "predicted_local_calendar": "1840-02-02T01:46:11.639425"
+        }
+      ]
+    },
+    {
+      "model": "DE441_no_deflection",
+      "event_id": "moon_after",
+      "body": "Moon",
+      "boundary_longitude": 295.4375,
+      "root_jd_tt": 2393137.648655746,
+      "bracket_jd_tt": [
+        2393137.648655746,
+        2393137.6486557466
+      ],
+      "bracket_width_seconds": 4.023313522338867e-05,
+      "residual_degrees": -8.913616511563305e-10,
+      "native_file_de_number": 441,
+      "common_historical_ut1_calendar": "1840-02-02T03:33:56.251518",
+      "clock_tidal_acceleration": -25.936,
+      "clock_hypotheses": [
+        {
+          "local_minus_ut1_seconds": 0,
+          "predicted_local_calendar": "1840-02-02T03:33:56.251518"
+        },
+        {
+          "local_minus_ut1_seconds": -75,
+          "predicted_local_calendar": "1840-02-02T03:32:41.251518"
+        }
+      ]
+    },
+    {
+      "model": "DE441_no_deflection",
+      "event_id": "sun_nearest",
+      "body": "Sun",
+      "boundary_longitude": 312.3125,
+      "root_jd_tt": 2393137.5341744474,
+      "bracket_jd_tt": [
+        2393137.5341744474,
+        2393137.534174448
+      ],
+      "bracket_width_seconds": 4.023313522338867e-05,
+      "residual_degrees": -4.553157850750722e-11,
+      "native_file_de_number": 441,
+      "common_historical_ut1_calendar": "1840-02-02T00:49:05.067309",
+      "clock_tidal_acceleration": -25.936,
+      "clock_hypotheses": [
+        {
+          "local_minus_ut1_seconds": 0,
+          "predicted_local_calendar": "1840-02-02T00:49:05.067309"
+        },
+        {
+          "local_minus_ut1_seconds": -75,
+          "predicted_local_calendar": "1840-02-02T00:47:50.067309"
+        }
+      ]
+    },
+    {
+      "model": "DE431_default",
+      "event_id": "neptune_boundary",
+      "body": "Neptune",
+      "boundary_longitude": 312.3125,
+      "root_jd_tt": 2393137.6452582255,
+      "bracket_jd_tt": [
+        2393137.6452582255,
+        2393137.645258226
+      ],
+      "bracket_width_seconds": 4.023313522338867e-05,
+      "residual_degrees": -3.865352482534945e-12,
+      "native_file_de_number": 431,
+      "common_historical_ut1_calendar": "1840-02-02T03:29:02.705736",
+      "clock_tidal_acceleration": -25.936,
+      "clock_hypotheses": [
+        {
+          "local_minus_ut1_seconds": 0,
+          "predicted_local_calendar": "1840-02-02T03:29:02.705736"
+        },
+        {
+          "local_minus_ut1_seconds": -75,
+          "predicted_local_calendar": "1840-02-02T03:27:47.705736"
+        }
+      ]
+    },
+    {
+      "model": "DE431_default",
+      "event_id": "moon_before",
+      "body": "Moon",
+      "boundary_longitude": 294.5,
+      "root_jd_tt": 2393137.5747017646,
+      "bracket_jd_tt": [
+        2393137.5747017646,
+        2393137.574701765
+      ],
+      "bracket_width_seconds": 4.023313522338867e-05,
+      "residual_degrees": -2.7725945983547717e-09,
+      "native_file_de_number": 431,
+      "common_historical_ut1_calendar": "1840-02-02T01:47:26.627516",
+      "clock_tidal_acceleration": -25.936,
+      "clock_hypotheses": [
+        {
+          "local_minus_ut1_seconds": 0,
+          "predicted_local_calendar": "1840-02-02T01:47:26.627516"
+        },
+        {
+          "local_minus_ut1_seconds": -75,
+          "predicted_local_calendar": "1840-02-02T01:46:11.627516"
+        }
+      ]
+    },
+    {
+      "model": "DE431_default",
+      "event_id": "moon_after",
+      "body": "Moon",
+      "boundary_longitude": 295.4375,
+      "root_jd_tt": 2393137.648655609,
+      "bracket_jd_tt": [
+        2393137.6486556088,
+        2393137.648655609
+      ],
+      "bracket_width_seconds": 4.023313522338867e-05,
+      "residual_degrees": 9.861764738161582e-10,
+      "native_file_de_number": 431,
+      "common_historical_ut1_calendar": "1840-02-02T03:33:56.239690",
+      "clock_tidal_acceleration": -25.936,
+      "clock_hypotheses": [
+        {
+          "local_minus_ut1_seconds": 0,
+          "predicted_local_calendar": "1840-02-02T03:33:56.239690"
+        },
+        {
+          "local_minus_ut1_seconds": -75,
+          "predicted_local_calendar": "1840-02-02T03:32:41.239690"
+        }
+      ]
+    },
+    {
+      "model": "DE431_default",
+      "event_id": "sun_nearest",
+      "body": "Sun",
+      "boundary_longitude": 312.3125,
+      "root_jd_tt": 2393137.5341738546,
+      "bracket_jd_tt": [
+        2393137.534173854,
+        2393137.5341738546
+      ],
+      "bracket_width_seconds": 4.023313522338867e-05,
+      "residual_degrees": 1.1232259566895664e-10,
+      "native_file_de_number": 431,
+      "common_historical_ut1_calendar": "1840-02-02T00:49:05.016092",
+      "clock_tidal_acceleration": -25.936,
+      "clock_hypotheses": [
+        {
+          "local_minus_ut1_seconds": 0,
+          "predicted_local_calendar": "1840-02-02T00:49:05.016092"
+        },
+        {
+          "local_minus_ut1_seconds": -75,
+          "predicted_local_calendar": "1840-02-02T00:47:50.016092"
+        }
+      ]
+    },
+    {
+      "model": "DE431_no_deflection",
+      "event_id": "neptune_boundary",
+      "body": "Neptune",
+      "boundary_longitude": 312.3125,
+      "root_jd_tt": 2393137.6251106192,
+      "bracket_jd_tt": [
+        2393137.625110619,
+        2393137.6251106192
+      ],
+      "bracket_width_seconds": 4.023313522338867e-05,
+      "residual_degrees": 2.3874235921539366e-12,
+      "native_file_de_number": 431,
+      "common_historical_ut1_calendar": "1840-02-02T03:00:01.952554",
+      "clock_tidal_acceleration": -25.936,
+      "clock_hypotheses": [
+        {
+          "local_minus_ut1_seconds": 0,
+          "predicted_local_calendar": "1840-02-02T03:00:01.952554"
+        },
+        {
+          "local_minus_ut1_seconds": -75,
+          "predicted_local_calendar": "1840-02-02T02:58:46.952554"
+        }
+      ]
+    },
+    {
+      "model": "DE431_no_deflection",
+      "event_id": "moon_before",
+      "body": "Moon",
+      "boundary_longitude": 294.5,
+      "root_jd_tt": 2393137.5747017646,
+      "bracket_jd_tt": [
+        2393137.5747017646,
+        2393137.574701765
+      ],
+      "bracket_width_seconds": 4.023313522338867e-05,
+      "residual_degrees": -2.7725945983547717e-09,
+      "native_file_de_number": 431,
+      "common_historical_ut1_calendar": "1840-02-02T01:47:26.627516",
+      "clock_tidal_acceleration": -25.936,
+      "clock_hypotheses": [
+        {
+          "local_minus_ut1_seconds": 0,
+          "predicted_local_calendar": "1840-02-02T01:47:26.627516"
+        },
+        {
+          "local_minus_ut1_seconds": -75,
+          "predicted_local_calendar": "1840-02-02T01:46:11.627516"
+        }
+      ]
+    },
+    {
+      "model": "DE431_no_deflection",
+      "event_id": "moon_after",
+      "body": "Moon",
+      "boundary_longitude": 295.4375,
+      "root_jd_tt": 2393137.648655609,
+      "bracket_jd_tt": [
+        2393137.6486556088,
+        2393137.648655609
+      ],
+      "bracket_width_seconds": 4.023313522338867e-05,
+      "residual_degrees": 9.861764738161582e-10,
+      "native_file_de_number": 431,
+      "common_historical_ut1_calendar": "1840-02-02T03:33:56.239690",
+      "clock_tidal_acceleration": -25.936,
+      "clock_hypotheses": [
+        {
+          "local_minus_ut1_seconds": 0,
+          "predicted_local_calendar": "1840-02-02T03:33:56.239690"
+        },
+        {
+          "local_minus_ut1_seconds": -75,
+          "predicted_local_calendar": "1840-02-02T03:32:41.239690"
+        }
+      ]
+    },
+    {
+      "model": "DE431_no_deflection",
+      "event_id": "sun_nearest",
+      "body": "Sun",
+      "boundary_longitude": 312.3125,
+      "root_jd_tt": 2393137.5341738546,
+      "bracket_jd_tt": [
+        2393137.534173854,
+        2393137.5341738546
+      ],
+      "bracket_width_seconds": 4.023313522338867e-05,
+      "residual_degrees": 1.1232259566895664e-10,
+      "native_file_de_number": 431,
+      "common_historical_ut1_calendar": "1840-02-02T00:49:05.016092",
+      "clock_tidal_acceleration": -25.936,
+      "clock_hypotheses": [
+        {
+          "local_minus_ut1_seconds": 0,
+          "predicted_local_calendar": "1840-02-02T00:49:05.016092"
+        },
+        {
+          "local_minus_ut1_seconds": -75,
+          "predicted_local_calendar": "1840-02-02T00:47:50.016092"
+        }
+      ]
+    },
+    {
+      "model": "Moshier_default",
+      "event_id": "neptune_boundary",
+      "body": "Neptune",
+      "boundary_longitude": 312.3125,
+      "root_jd_tt": 2393137.631868156,
+      "bracket_jd_tt": [
+        2393137.631868156,
+        2393137.6318681566
+      ],
+      "bracket_width_seconds": 4.023313522338867e-05,
+      "residual_degrees": -5.877609510207549e-11,
+      "native_file_de_number": null,
+      "common_historical_ut1_calendar": "1840-02-02T03:09:45.803743",
+      "clock_tidal_acceleration": -25.936,
+      "clock_hypotheses": [
+        {
+          "local_minus_ut1_seconds": 0,
+          "predicted_local_calendar": "1840-02-02T03:09:45.803743"
+        },
+        {
+          "local_minus_ut1_seconds": -75,
+          "predicted_local_calendar": "1840-02-02T03:08:30.803743"
+        }
+      ]
+    },
+    {
+      "model": "Moshier_default",
+      "event_id": "moon_before",
+      "body": "Moon",
+      "boundary_longitude": 294.5,
+      "root_jd_tt": 2393137.5746942745,
+      "bracket_jd_tt": [
+        2393137.574694274,
+        2393137.5746942745
+      ],
+      "bracket_width_seconds": 4.023313522338867e-05,
+      "residual_degrees": 1.1404495126043912e-09,
+      "native_file_de_number": null,
+      "common_historical_ut1_calendar": "1840-02-02T01:47:25.980366",
+      "clock_tidal_acceleration": -25.936,
+      "clock_hypotheses": [
+        {
+          "local_minus_ut1_seconds": 0,
+          "predicted_local_calendar": "1840-02-02T01:47:25.980366"
+        },
+        {
+          "local_minus_ut1_seconds": -75,
+          "predicted_local_calendar": "1840-02-02T01:46:10.980366"
+        }
+      ]
+    },
+    {
+      "model": "Moshier_default",
+      "event_id": "moon_after",
+      "body": "Moon",
+      "boundary_longitude": 295.4375,
+      "root_jd_tt": 2393137.64864893,
+      "bracket_jd_tt": [
+        2393137.64864893,
+        2393137.6486489302
+      ],
+      "bracket_width_seconds": 4.023313522338867e-05,
+      "residual_degrees": -6.714344635838643e-10,
+      "native_file_de_number": null,
+      "common_historical_ut1_calendar": "1840-02-02T03:33:55.662585",
+      "clock_tidal_acceleration": -25.936,
+      "clock_hypotheses": [
+        {
+          "local_minus_ut1_seconds": 0,
+          "predicted_local_calendar": "1840-02-02T03:33:55.662585"
+        },
+        {
+          "local_minus_ut1_seconds": -75,
+          "predicted_local_calendar": "1840-02-02T03:32:40.662585"
+        }
+      ]
+    },
+    {
+      "model": "Moshier_default",
+      "event_id": "sun_nearest",
+      "body": "Sun",
+      "boundary_longitude": 312.3125,
+      "root_jd_tt": 2393137.534173927,
+      "bracket_jd_tt": [
+        2393137.5341739263,
+        2393137.534173927
+      ],
+      "bracket_width_seconds": 4.023313522338867e-05,
+      "residual_degrees": 1.7394086171407253e-10,
+      "native_file_de_number": null,
+      "common_historical_ut1_calendar": "1840-02-02T00:49:05.022328",
+      "clock_tidal_acceleration": -25.936,
+      "clock_hypotheses": [
+        {
+          "local_minus_ut1_seconds": 0,
+          "predicted_local_calendar": "1840-02-02T00:49:05.022328"
+        },
+        {
+          "local_minus_ut1_seconds": -75,
+          "predicted_local_calendar": "1840-02-02T00:47:50.022328"
+        }
+      ]
+    },
+    {
+      "model": "Moshier_no_deflection",
+      "event_id": "neptune_boundary",
+      "body": "Neptune",
+      "boundary_longitude": 312.3125,
+      "root_jd_tt": 2393137.6112113637,
+      "bracket_jd_tt": [
+        2393137.6112113637,
+        2393137.611211364
+      ],
+      "bracket_width_seconds": 4.023313522338867e-05,
+      "residual_degrees": -1.7774937077774666e-10,
+      "native_file_de_number": null,
+      "common_historical_ut1_calendar": "1840-02-02T02:40:01.056875",
+      "clock_tidal_acceleration": -25.936,
+      "clock_hypotheses": [
+        {
+          "local_minus_ut1_seconds": 0,
+          "predicted_local_calendar": "1840-02-02T02:40:01.056875"
+        },
+        {
+          "local_minus_ut1_seconds": -75,
+          "predicted_local_calendar": "1840-02-02T02:38:46.056875"
+        }
+      ]
+    },
+    {
+      "model": "Moshier_no_deflection",
+      "event_id": "moon_before",
+      "body": "Moon",
+      "boundary_longitude": 294.5,
+      "root_jd_tt": 2393137.5746942745,
+      "bracket_jd_tt": [
+        2393137.574694274,
+        2393137.5746942745
+      ],
+      "bracket_width_seconds": 4.023313522338867e-05,
+      "residual_degrees": 1.1404495126043912e-09,
+      "native_file_de_number": null,
+      "common_historical_ut1_calendar": "1840-02-02T01:47:25.980366",
+      "clock_tidal_acceleration": -25.936,
+      "clock_hypotheses": [
+        {
+          "local_minus_ut1_seconds": 0,
+          "predicted_local_calendar": "1840-02-02T01:47:25.980366"
+        },
+        {
+          "local_minus_ut1_seconds": -75,
+          "predicted_local_calendar": "1840-02-02T01:46:10.980366"
+        }
+      ]
+    },
+    {
+      "model": "Moshier_no_deflection",
+      "event_id": "moon_after",
+      "body": "Moon",
+      "boundary_longitude": 295.4375,
+      "root_jd_tt": 2393137.64864893,
+      "bracket_jd_tt": [
+        2393137.64864893,
+        2393137.6486489302
+      ],
+      "bracket_width_seconds": 4.023313522338867e-05,
+      "residual_degrees": -6.714344635838643e-10,
+      "native_file_de_number": null,
+      "common_historical_ut1_calendar": "1840-02-02T03:33:55.662585",
+      "clock_tidal_acceleration": -25.936,
+      "clock_hypotheses": [
+        {
+          "local_minus_ut1_seconds": 0,
+          "predicted_local_calendar": "1840-02-02T03:33:55.662585"
+        },
+        {
+          "local_minus_ut1_seconds": -75,
+          "predicted_local_calendar": "1840-02-02T03:32:40.662585"
+        }
+      ]
+    },
+    {
+      "model": "Moshier_no_deflection",
+      "event_id": "sun_nearest",
+      "body": "Sun",
+      "boundary_longitude": 312.3125,
+      "root_jd_tt": 2393137.534173927,
+      "bracket_jd_tt": [
+        2393137.5341739263,
+        2393137.534173927
+      ],
+      "bracket_width_seconds": 4.023313522338867e-05,
+      "residual_degrees": 1.7394086171407253e-10,
+      "native_file_de_number": null,
+      "common_historical_ut1_calendar": "1840-02-02T00:49:05.022328",
+      "clock_tidal_acceleration": -25.936,
+      "clock_hypotheses": [
+        {
+          "local_minus_ut1_seconds": 0,
+          "predicted_local_calendar": "1840-02-02T00:49:05.022328"
+        },
+        {
+          "local_minus_ut1_seconds": -75,
+          "predicted_local_calendar": "1840-02-02T00:47:50.022328"
+        }
+      ]
+    },
+    {
+      "model": "DE440_Skyfield_default",
+      "event_id": "neptune_boundary",
+      "body": "Neptune",
+      "boundary_longitude": 312.3125,
+      "root_jd_tt": 2393137.644106207,
+      "bracket_jd_tt": [
+        2393137.6441062065,
+        2393137.644106207
+      ],
+      "bracket_width_seconds": 4.023313522338867e-05,
+      "residual_degrees": 1.1368683772161603e-13,
+      "native_file_de_number": null,
+      "common_historical_ut1_calendar": "1840-02-02T03:27:23.171333",
+      "clock_tidal_acceleration": -25.936,
+      "clock_hypotheses": [
+        {
+          "local_minus_ut1_seconds": 0,
+          "predicted_local_calendar": "1840-02-02T03:27:23.171333"
+        },
+        {
+          "local_minus_ut1_seconds": -75,
+          "predicted_local_calendar": "1840-02-02T03:26:08.171333"
+        }
+      ]
+    },
+    {
+      "model": "DE440_Skyfield_default",
+      "event_id": "moon_before",
+      "body": "Moon",
+      "boundary_longitude": 294.5,
+      "root_jd_tt": 2393137.5747021385,
+      "bracket_jd_tt": [
+        2393137.574702138,
+        2393137.5747021385
+      ],
+      "bracket_width_seconds": 4.023313522338867e-05,
+      "residual_degrees": 9.821974344959017e-10,
+      "native_file_de_number": null,
+      "common_historical_ut1_calendar": "1840-02-02T01:47:26.659823",
+      "clock_tidal_acceleration": -25.936,
+      "clock_hypotheses": [
+        {
+          "local_minus_ut1_seconds": 0,
+          "predicted_local_calendar": "1840-02-02T01:47:26.659823"
+        },
+        {
+          "local_minus_ut1_seconds": -75,
+          "predicted_local_calendar": "1840-02-02T01:46:11.659823"
+        }
+      ]
+    },
+    {
+      "model": "DE440_Skyfield_default",
+      "event_id": "moon_after",
+      "body": "Moon",
+      "boundary_longitude": 295.4375,
+      "root_jd_tt": 2393137.6486559813,
+      "bracket_jd_tt": [
+        2393137.6486559813,
+        2393137.6486559818
+      ],
+      "bracket_width_seconds": 4.023313522338867e-05,
+      "residual_degrees": -1.829221218940802e-10,
+      "native_file_de_number": null,
+      "common_historical_ut1_calendar": "1840-02-02T03:33:56.271836",
+      "clock_tidal_acceleration": -25.936,
+      "clock_hypotheses": [
+        {
+          "local_minus_ut1_seconds": 0,
+          "predicted_local_calendar": "1840-02-02T03:33:56.271836"
+        },
+        {
+          "local_minus_ut1_seconds": -75,
+          "predicted_local_calendar": "1840-02-02T03:32:41.271836"
+        }
+      ]
+    },
+    {
+      "model": "DE440_Skyfield_default",
+      "event_id": "sun_nearest",
+      "body": "Sun",
+      "boundary_longitude": 312.3125,
+      "root_jd_tt": 2393137.53417423,
+      "bracket_jd_tt": [
+        2393137.5341742295,
+        2393137.53417423
+      ],
+      "bracket_width_seconds": 4.023313522338867e-05,
+      "residual_degrees": 3.319655661471188e-11,
+      "native_file_de_number": null,
+      "common_historical_ut1_calendar": "1840-02-02T00:49:05.048520",
+      "clock_tidal_acceleration": -25.936,
+      "clock_hypotheses": [
+        {
+          "local_minus_ut1_seconds": 0,
+          "predicted_local_calendar": "1840-02-02T00:49:05.048520"
+        },
+        {
+          "local_minus_ut1_seconds": -75,
+          "predicted_local_calendar": "1840-02-02T00:47:50.048520"
+        }
+      ]
+    },
+    {
+      "model": "DE440_Skyfield_no_deflection",
+      "event_id": "neptune_boundary",
+      "body": "Neptune",
+      "boundary_longitude": 312.3125,
+      "root_jd_tt": 2393137.6223833305,
+      "bracket_jd_tt": [
+        2393137.62238333,
+        2393137.6223833305
+      ],
+      "bracket_width_seconds": 4.023313522338867e-05,
+      "residual_degrees": 2.1032064978498966e-12,
+      "native_file_de_number": null,
+      "common_historical_ut1_calendar": "1840-02-02T02:56:06.314806",
+      "clock_tidal_acceleration": -25.936,
+      "clock_hypotheses": [
+        {
+          "local_minus_ut1_seconds": 0,
+          "predicted_local_calendar": "1840-02-02T02:56:06.314806"
+        },
+        {
+          "local_minus_ut1_seconds": -75,
+          "predicted_local_calendar": "1840-02-02T02:54:51.314806"
+        }
+      ]
+    },
+    {
+      "model": "DE440_Skyfield_no_deflection",
+      "event_id": "moon_before",
+      "body": "Moon",
+      "boundary_longitude": 294.5,
+      "root_jd_tt": 2393137.5747021385,
+      "bracket_jd_tt": [
+        2393137.574702138,
+        2393137.5747021385
+      ],
+      "bracket_width_seconds": 4.023313522338867e-05,
+      "residual_degrees": 1.4524630387313664e-09,
+      "native_file_de_number": null,
+      "common_historical_ut1_calendar": "1840-02-02T01:47:26.659823",
+      "clock_tidal_acceleration": -25.936,
+      "clock_hypotheses": [
+        {
+          "local_minus_ut1_seconds": 0,
+          "predicted_local_calendar": "1840-02-02T01:47:26.659823"
+        },
+        {
+          "local_minus_ut1_seconds": -75,
+          "predicted_local_calendar": "1840-02-02T01:46:11.659823"
+        }
+      ]
+    },
+    {
+      "model": "DE440_Skyfield_no_deflection",
+      "event_id": "moon_after",
+      "body": "Moon",
+      "boundary_longitude": 295.4375,
+      "root_jd_tt": 2393137.6486559813,
+      "bracket_jd_tt": [
+        2393137.648655981,
+        2393137.6486559813
+      ],
+      "bracket_width_seconds": 4.023313522338867e-05,
+      "residual_degrees": 2.6489033189136535e-10,
+      "native_file_de_number": null,
+      "common_historical_ut1_calendar": "1840-02-02T03:33:56.271836",
+      "clock_tidal_acceleration": -25.936,
+      "clock_hypotheses": [
+        {
+          "local_minus_ut1_seconds": 0,
+          "predicted_local_calendar": "1840-02-02T03:33:56.271836"
+        },
+        {
+          "local_minus_ut1_seconds": -75,
+          "predicted_local_calendar": "1840-02-02T03:32:41.271836"
+        }
+      ]
+    },
+    {
+      "model": "DE440_Skyfield_no_deflection",
+      "event_id": "sun_nearest",
+      "body": "Sun",
+      "boundary_longitude": 312.3125,
+      "root_jd_tt": 2393137.53417423,
+      "bracket_jd_tt": [
+        2393137.5341742295,
+        2393137.53417423
+      ],
+      "bracket_width_seconds": 4.023313522338867e-05,
+      "residual_degrees": 1.3812950783176348e-11,
+      "native_file_de_number": null,
+      "common_historical_ut1_calendar": "1840-02-02T00:49:05.048520",
+      "clock_tidal_acceleration": -25.936,
+      "clock_hypotheses": [
+        {
+          "local_minus_ut1_seconds": 0,
+          "predicted_local_calendar": "1840-02-02T00:49:05.048520"
+        },
+        {
+          "local_minus_ut1_seconds": -75,
+          "predicted_local_calendar": "1840-02-02T00:47:50.048520"
+        }
+      ]
+    }
+  ],
+  "scope": "Component-comparison hypotheses fixed before interior adaptive boundary results, after two repeat controls and first Neptune window endpoints. Diagnostic, not blind. No free clock-offset fitting or rejection of inconvenient models. Models are candidates; matching four minute brackets cannot identify source internals or certify physical accuracy."
+}
