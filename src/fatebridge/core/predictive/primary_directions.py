@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 from fractions import Fraction
 from typing import Any, SupportsAbs
 
+from fatebridge.core.astro.angle_definitions import is_ascendant_resolved
 from fatebridge.core.astro.birth import AstroBirthInfo
 from fatebridge.core.astro.earth_attitude import earth_attitude
 from fatebridge.core.astro.geometry import (
@@ -276,7 +277,7 @@ def build_reprojected_primary_direction_chart_layers(
     asc_sign = normalize_sign_name(natal_subject.ascendant.sign)
 
     directed_points: dict[str, dict[str, Any]] = {}
-    for point_name in TIMING_POINT_NAMES:
+    for point_name in extract_reference_longitudes(natal_subject):
         right_ascension, declination = point_equatorial_position(
             point_name,
             natal_subject,
@@ -315,6 +316,7 @@ def build_reprojected_primary_direction_chart_layers(
     directed_axes = {
         point_name: directed_points[point_name]
         for point_name in PRIMARY_DIRECTION_PROMISSORS
+        if point_name in directed_points
     }
     return directed_points, directed_lots, directed_axes
 
@@ -439,6 +441,8 @@ def build_reprojected_mundane_primary_direction_chart_layers(
         directed_points[point_name] = longitude_to_point_dict(point_name, longitude)
 
     for point_name, base_coordinate in (("Ascendant", 0.0), ("Medium_Coeli", 90.0)):
+        if point_name == "Ascendant" and not is_ascendant_resolved(natal_subject):
+            continue
         _, declination = point_equatorial_position(
             point_name,
             natal_subject,
@@ -496,6 +500,7 @@ def build_reprojected_mundane_primary_direction_chart_layers(
     directed_axes = {
         point_name: directed_points[point_name]
         for point_name in PRIMARY_DIRECTION_PROMISSORS
+        if point_name in directed_points
     }
     return directed_points, directed_lots, directed_axes
 
@@ -600,11 +605,14 @@ def build_primary_direction_coordinate_rings(
 
     return {
         "points": {
-            name: entry(name, planet_label(name)) for name in TIMING_POINT_NAMES
+            name: entry(name, planet_label(name))
+            for name in TIMING_POINT_NAMES
+            if name in coordinate_map
         },
         "lots": {
             lot_key: entry(LOT_POINT_NAMES[lot_key], LOT_LABELS[lot_key])
             for lot_key in LOT_POINT_NAMES
+            if LOT_POINT_NAMES[lot_key] in coordinate_map
         },
     }
 
@@ -775,8 +783,11 @@ def build_primary_direction_targets_with_coordinates(
             "longitude": coordinate_map[point_name],
         }
         for point_name in TIMING_POINT_NAMES
+        if point_name in coordinate_map
     ]
     for lot_key, point_name in LOT_POINT_NAMES.items():
+        if point_name not in coordinate_map:
+            continue
         targets.append(
             {
                 "name": point_name,
@@ -839,6 +850,8 @@ def extract_primary_direction_coordinate_payload(
     if pd_method == "equatorial":
         diagnostics: dict[str, dict[str, Any]] = {}
         for point_name in TIMING_POINT_NAMES:
+            if point_name not in coordinate_map:
+                continue
             right_ascension, declination = point_equatorial_position(
                 point_name,
                 natal_subject,
@@ -873,7 +886,8 @@ def extract_primary_direction_coordinate_payload(
     else:
         pass
 
-    coordinate_map["Ascendant"] = 0.0
+    if "Ascendant" in coordinate_map:
+        coordinate_map["Ascendant"] = 0.0
     coordinate_map["Medium_Coeli"] = 90.0
     diagnostics = {
         "Ascendant": {
@@ -892,7 +906,10 @@ def extract_primary_direction_coordinate_payload(
         },
     }
 
-    for point_name in PRIMARY_DIRECTION_PROMISSORS:
+    if "Ascendant" not in coordinate_map:
+        del diagnostics["Ascendant"]
+
+    for point_name in diagnostics:
         right_ascension, declination = point_equatorial_position(
             point_name,
             natal_subject,
@@ -981,6 +998,7 @@ def build_primary_direction_points(
             combine_longitudes_exact(natal_longitudes[point_name], arc_degrees),
         )
         for point_name in PRIMARY_DIRECTION_PROMISSORS
+        if point_name in natal_longitudes
     }
 
 
@@ -1029,7 +1047,9 @@ def build_sign_change_payloads(
             ),
             point_name,
         )
-        directed_payload = directed_points[directed_name]
+        directed_payload = directed_points.get(directed_name)
+        if directed_payload is None:
+            continue
         if natal_payload["sign"] != directed_payload["sign"]:
             changes.append(
                 {
@@ -1219,7 +1239,10 @@ def build_primary_direction_analysis(
     events: list[_PrimaryDirectionEvent] = []
     seen_hits = set()
 
-    for promissor in PRIMARY_DIRECTION_PROMISSORS:
+    promissors = [
+        name for name in PRIMARY_DIRECTION_PROMISSORS if name in working_coordinates
+    ]
+    for promissor in promissors:
         promissor_longitude = working_coordinates[promissor]
         for target in targets:
             for aspect_degree in aspects:
@@ -1417,7 +1440,7 @@ def build_primary_direction_analysis(
         "coordinate_lots": coordinate_rings["lots"],
         "current_coordinate_points": current_coordinate_rings["points"],
         "current_coordinate_lots": current_coordinate_rings["lots"],
-        "promissors": PRIMARY_DIRECTION_PROMISSORS,
+        "promissors": promissors,
         "aspects": aspects,
         "current_age_years": float(working_current_age),
         "current_arc_degrees": float(current_arc),
@@ -1526,7 +1549,7 @@ def build_primary_direction_chart_payload(
             natal_lots,
             directed_lots,
         ),
-        "directed_ascendant": directed_axes["Ascendant"],
+        "directed_ascendant": directed_axes.get("Ascendant"),
         "directed_medium_coeli": directed_axes["Medium_Coeli"],
         "hits": current_hits[:8],
     }

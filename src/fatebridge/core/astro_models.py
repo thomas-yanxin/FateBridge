@@ -12,27 +12,7 @@ from fractions import Fraction
 from types import ModuleType
 from typing import Any, Protocol, Sequence
 
-from fatebridge.core.astro.earth_attitude import _correction as _correction
-from fatebridge.core.astro.earth_attitude import _rotation_tt as _rotation_tt
-from fatebridge.core.astro.earth_attitude import (
-    _standard_correction as _standard_correction,
-)
 from fatebridge.core.astro.earth_attitude import earth_attitude, physical_equator
-from fatebridge.core.astro.earth_rotation import (
-    MODERN_HALF_WINDOW_DAYS as MODERN_HALF_WINDOW_DAYS,
-)
-from fatebridge.core.astro.earth_rotation import (
-    MODERN_REFERENCE_JD_TT as MODERN_REFERENCE_JD_TT,
-)
-from fatebridge.core.astro.earth_rotation import _era_turn as _era_turn
-from fatebridge.core.astro.earth_rotation import (
-    _fundamental_arguments as _fundamental_arguments,
-)
-from fatebridge.core.astro.earth_rotation import frame_gast as frame_gast
-from fatebridge.core.astro.earth_rotation import iers2010_gast as iers2010_gast
-from fatebridge.core.astro.earth_rotation import (
-    selected_sidereal_model as selected_sidereal_model,
-)
 from fatebridge.core.astro.native_coordinates import require_spherical_coordinates
 from fatebridge.core.astro.reference_frames import dot, rotate_spherical
 from fatebridge.core.astro.terrestrial_observer import house_site, terrestrial_frame

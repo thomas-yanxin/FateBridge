@@ -14,6 +14,7 @@ from fatebridge.core.astro.astrology_horary import (
 from fatebridge.core.astro.astrology_tables import RULER_BY_SIGN
 from fatebridge.services.western_horary import calculate_horary
 from tests.support.lunar_sampler import sampled_motion
+from tests.support.transports import AS_OF, SPECS, business
 from tests.unit_test.fixtures.western_event_cases import QUESTION
 
 
@@ -115,3 +116,68 @@ def test_horary_envelope_has_snapshot_and_moon_block() -> None:
     assert result["analysis_context"]["house_system"]
     assert "[主星与原典条件]" in result["snapshot_text"]
     assert "verdict" not in result["horary"] and "reasoning" not in result["horary"]
+
+
+def test_horary_saturn_station_identity_and_event_order_reach_three_surfaces(
+    surface_calls,
+):
+    # JPL Horizons target 6 (system barycenter), IAU2006/2000A true ecliptic.
+    # Response SHA256: 21a988c0b0798ed4271d9ef110bbbe8d2d0ea5461740d4e0ef2151adf7d6ecc6.
+    reference_tt = 2459875.672683134
+    fields = [
+        "horary.perfection.event_history",
+        "horary.perfection.lilly_conditions.event_paths",
+    ]
+    response, protocol, code, cli = surface_calls(
+        SPECS["astro_horary"],
+        {
+            "question_year": 2022,
+            "question_month": 10,
+            "question_day": 30,
+            "question_hour": 12,
+            "timezone_name": "UTC",
+            "longitude": 0,
+            "latitude": 40,
+            "category": "marriage",
+        },
+        projection={
+            "fields": fields,
+            "strict_fields": True,
+            "include_snapshot_text": False,
+            "response_char_limit": 0,
+        },
+        rest_as_of=AS_OF,
+    )
+    assert response.status_code == 200, response.text
+    assert not protocol.is_error and code == 0
+    result = response.json()
+    assert business(result) == business(protocol.structured_content) == business(cli)
+    perfection = result["horary"]["perfection"]
+    history = perfection["event_history"]
+    assert history["status"] == "computed"
+    assert "Saturn" in history["ephemeris_reference_points"]["system_barycenters"]
+    station = next(
+        event
+        for event in history["events"]
+        if event["kind"] == "station" and event["bodies"] == ["Saturn"]
+    )
+    assert station["epoch_relation"] == "past" and station["direction"] == 1
+    assert abs(station["julian_day_tt"] - reference_tt) * 86400 <= 120
+    times = [event["julian_day_tt"] for event in history["events"]]
+    assert times == sorted(times)
+    direct = next(
+        path
+        for path in perfection["lilly_conditions"]["event_paths"]["paths"]
+        if path["mode"] == "direct"
+    )
+    eligible = [
+        event
+        for event in history["events"]
+        if event["kind"] == "contact"
+        and event["epoch_relation"] == "future"
+        and event["topology"] == "crossing"
+        and set(event["bodies"]) == set(direct["actors"])
+    ]
+    assert direct["future_contact"] == min(
+        eligible, key=lambda event: event["root_bracket_tt"][0]
+    )

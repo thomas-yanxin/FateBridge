@@ -541,7 +541,10 @@ ALMUTEN_FIGURIS_POINTS = ("Sun", "Moon", "Ascendant", "fortune", "syzygy")
 
 
 def build_almuten_figuris(
-    points: dict[str, dict[str, Any]], is_day: bool
+    points: dict[str, dict[str, Any]],
+    is_day: bool,
+    *,
+    unknown_points: tuple[str, ...] = (),
 ) -> dict[str, Any]:
     """Selected essential-dignity tally over the available hylegic points.
 
@@ -576,9 +579,18 @@ def build_almuten_figuris(
         for planet, weight in result["totals"].items():
             totals[planet] = totals.get(planet, 0) + weight
     return {
-        "winner": _almuten_winner(totals),
-        "totals": totals,
+        "winner": None if unknown_points else _almuten_winner(totals),
+        "totals": None if unknown_points else totals,
         "points": per_point,
+        **(
+            {
+                "status": "partial",
+                "unknown_points": list(unknown_points),
+                "known_totals": totals,
+            }
+            if unknown_points
+            else {}
+        ),
         "method": {
             "method_id": "available_hylegic_points_essential_tally_v1",
             "source_profile": "mixed_dorothean_egyptian_lilly",
@@ -1444,6 +1456,8 @@ def build_temperament(
     asc_ruler: str | None,
     sun_sign: str | None,
     moon_sign: str | None,
+    *,
+    ascendant_resolved: bool = True,
 ) -> dict[str, Any]:
     """Simplified Lilly-style qualities tally → dominant humor.
 
@@ -1468,6 +1482,17 @@ def build_temperament(
     add_planet("Sun")
     add_planet("Moon")
 
+    if not ascendant_resolved:
+        return {
+            "status": "partial",
+            "unknown_components": ["ascendant_sign", "ascendant_ruler"],
+            "known_tally": tally,
+            "tally": None,
+            "thermal": None,
+            "hygral": None,
+            "humor": None,
+            "cn": None,
+        }
     thermal = "hot" if tally["hot"] >= tally["cold"] else "cold"
     hygral = "moist" if tally["moist"] >= tally["dry"] else "dry"
     humor = _HUMORS[(thermal, hygral)]
@@ -1515,7 +1540,7 @@ def build_planet_classical(
         "orientality": orient,
         "sect_placement": sect_placement(planet, chart_sect, orient),
         "in_halb": in_halb(planet, chart_sect, above, orient),
-        "joy": planetary_joy(planet, house),
+        "joy": planetary_joy(planet, house) if house is not None else None,
         "retrograde": is_retrograde(longitude_speed),
         "out_of_bounds": (
             ecliptic_out_of_bounds(*source_ecliptic_coordinates, obliquity)

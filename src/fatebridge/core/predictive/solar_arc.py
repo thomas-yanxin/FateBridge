@@ -48,9 +48,12 @@ def build_solar_arc_payload(
         "moon": longitude_to_point_dict(
             "Moon", longitude_float(directed_points["Moon"])
         ),
-        "ascendant": longitude_to_point_dict(
-            "Ascendant",
-            longitude_float(directed_points["Ascendant"]),
+        "ascendant": (
+            longitude_to_point_dict(
+                "Ascendant", longitude_float(directed_points["Ascendant"])
+            )
+            if "Ascendant" in directed_points
+            else None
         ),
         "medium_coeli": longitude_to_point_dict(
             "Medium_Coeli",

@@ -82,11 +82,16 @@ def _build_standard_chart_snapshot_sections(
 
     hellenistic = payload.get("hellenistic", {})
     if chart_variant == "hellen_chart":
+        ascendant_ruler = hellenistic.get("ascendant_ruler")
+        angular_planets = hellenistic.get("angular_planets")
+        angular_labels = ", ".join(
+            PLANET_LABELS_ZH.get(item, item) for item in (angular_planets or [])
+        )
         detail_lines.extend(
             [
                 f"昼夜属性：{hellenistic.get('sect', '未知')}",
-                f"上升主星：{PLANET_LABELS_ZH.get(hellenistic.get('ascendant_ruler', ''), hellenistic.get('ascendant_ruler', '未知'))}",
-                f"角宫星体：{', '.join(PLANET_LABELS_ZH.get(item, item) for item in hellenistic.get('angular_planets', [])) or '无'}",
+                f"上升主星：{PLANET_LABELS_ZH.get(ascendant_ruler, '未知')}",
+                f"角宫星体：{angular_labels or ('未知' if angular_planets is None else '无')}",
             ]
         )
     else:
@@ -126,7 +131,12 @@ def _build_standard_chart_snapshot_sections(
     else:
         pass
 
-    greek_lines = ["无"]
+    greek_lines = (
+        ["福点：未知（上升无法确定）。"]
+        if chart_variant == "hellen_chart"
+        and hellenistic.get("ascendant_ruler") is None
+        else ["无"]
+    )
     lot_of_fortune = hellenistic.get("lot_of_fortune")
     if isinstance(lot_of_fortune, dict):
         greek_lines = [

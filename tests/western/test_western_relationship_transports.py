@@ -340,3 +340,48 @@ def test_composite_with_unresolved_ascendant_preserves_planets_aspects_and_mc(
         else:
             assert len(chart["houses"]) == 12
             assert all(planet["house"] is not None for planet in chart["planets"])
+
+
+@pytest.mark.parametrize("hsys", [0, 8])
+def test_synastry_house_gate_applies_only_to_the_target_chart(
+    hsys: int, surface_calls
+) -> None:
+    request = relationship_payload("Synastry", "uncorrected")
+    request.update(
+        inner_birth_year=2000,
+        inner_birth_month=1,
+        inner_birth_day=1,
+        inner_birth_hour=12,
+        inner_birth_minute=0,
+        inner_birth_timezone="UTC",
+        inner_birth_longitude=J2000_UNRESOLVED_ASC_SITE["birth_longitude"],
+        inner_birth_latitude=J2000_UNRESOLVED_ASC_SITE["birth_latitude"],
+        hsys=hsys,
+        zodiacal=0,
+    )
+    specification = SPECS["astro_relative_chart"]
+    response, protocol, code, cli = surface_calls(
+        specification,
+        request,
+        projection={
+            "fields": ["inner.chart", "outer.chart"],
+            "strict_fields": True,
+            "include_snapshot_text": False,
+            "response_char_limit": 0,
+        },
+    )
+    assert response.status_code == 200, response.text
+    assert code == 0 and not protocol.is_error
+    result = response.json()
+    assert business(result) == business(protocol.structured_content) == business(cli)
+    inner = result["inner"]["chart"]
+    outer = result["outer"]["chart"]
+    assert inner["angles"]["ascendant"]["longitude"] is None
+    assert inner["angles"]["midheaven"]["longitude"] is not None
+    assert outer["angles"]["ascendant"]["longitude"] is not None
+    assert len(inner["houses"]) == (12 if hsys == 8 else 0)
+    assert all(
+        (planet["house"] is not None) == (hsys == 8) for planet in inner["planets"]
+    )
+    assert len(outer["houses"]) == 12
+    assert inner["aspects"] and outer["aspects"]

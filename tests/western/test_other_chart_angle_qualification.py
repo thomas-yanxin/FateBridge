@@ -10,6 +10,7 @@ from fatebridge.services.astrology import (
     calculate_core_chart_analysis,
     calculate_germany_chart_analysis,
 )
+from tests.fixtures.surface_payloads import J2000_UNRESOLVED_ASC_SITE
 
 PAYLOAD = dict(
     name="虚构：黄道地平面退化核验",
@@ -320,3 +321,40 @@ def test_unknown_and_zero_uncertainty_do_not_resolve_the_nominal_ascendant(
             row["sector_by_sample"] == [None] and row["computed_sample_count"] == 0
             for row in sensitivity["sector_assignments"]
         )
+
+
+@pytest.mark.parametrize("hsys,known_houses", [(None, False), (8, True)])
+def test_hellenistic_derived_facts_respect_singular_ascendant(
+    hsys: int | None, known_houses: bool
+) -> None:
+    chart = calculate_core_chart_analysis(
+        birth_year=2000,
+        birth_month=1,
+        birth_day=1,
+        birth_hour=12,
+        birth_minute=0,
+        birth_timezone="UTC",
+        use_true_solar_time=False,
+        **J2000_UNRESOLVED_ASC_SITE,
+        hsys=hsys,
+        chart_variant="hellen_chart",
+    )
+    assert "error" not in chart, chart
+    assert (
+        chart["chart_profile"]["angle_definition"]["geometric_ascendant_resolved"]
+        is False
+    )
+    assert chart["hellenistic"]["ascendant_ruler"] is None
+    assert chart["hellenistic"]["lot_of_fortune"] is None
+    assert (chart["hellenistic"]["angular_planets"] is not None) == known_houses
+    classical = chart["classical"]
+    assert "fortune" not in classical["lots"]
+    assert bool(classical["topic_almutens"]) == known_houses
+    assert classical["planets"]["Sun"]["essential"]
+    assert (classical["planets"]["Sun"]["joy"] is not None) == known_houses
+    figuris = classical["almuten_figuris"]
+    assert figuris["status"] == "partial"
+    assert figuris["winner"] is None and figuris["totals"] is None
+    assert "Sun" in figuris["points"] and figuris["known_totals"]
+    assert classical["temperament"]["tally"] is None
+    assert classical["temperament"]["known_tally"]

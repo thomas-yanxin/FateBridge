@@ -257,7 +257,7 @@ def test_extra_returns_service_preserves_selected_side_and_original_display(
         western_events, "resolve_planet_returns", lambda *a, **k: selected
     )
     monkeypatch.setattr(
-        western_events, "planet_longitude_at_utc", lambda *a, **k: 120.0
+        western_events, "planet_motion_at_utc", lambda *a, **k: (120.0, 0.0, 0, ())
     )
     result = western_events.calculate_extrareturns(
         birth_year=2001,
@@ -286,15 +286,15 @@ def test_extra_returns_service_keeps_extended_utc_clock_coordinates(
     birth_labels = []
     reference_labels = []
 
-    def natal_longitude(planet_id, moment, *, sidereal=False):
+    def natal_motion(planet_id, moment, *, sidereal=False):
         birth_labels.append(moment.isoformat())
-        return 120.0
+        return 120.0, 0.0, 0, ()
 
     def resolve_returns(planet_id, longitude, *, reference_utc, **options):
         reference_labels.append(reference_utc.isoformat())
         return astrology_events.ResolvedPlanetReturns((), ())
 
-    monkeypatch.setattr(western_events, "planet_longitude_at_utc", natal_longitude)
+    monkeypatch.setattr(western_events, "planet_motion_at_utc", natal_motion)
     monkeypatch.setattr(western_events, "resolve_planet_returns", resolve_returns)
     result = calculate_extrareturns(
         birth_year=1,
@@ -430,7 +430,15 @@ def test_extra_returns_preserve_the_root_when_utc_has_no_datetime(
         )
     assert "error" not in result, result
     returns = result["extrareturns"]["returns"]
-    assert {row["body"] for row in returns} == {"Jupiter", "Saturn", "North Node"}
+    assert {row["body"] for row in returns} == {
+        "Saturn",
+        "Jupiter",
+        "Mars",
+        "Venus",
+        "Mercury",
+        "North Node",
+        "Chiron",
+    }
     node = next(row for row in returns if row["body"] == "North Node")
     assert (
         datetime.fromisoformat(node["most_recent_return"]["datetime_utc"]).year == year

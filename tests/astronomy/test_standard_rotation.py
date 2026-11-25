@@ -11,12 +11,12 @@ import pytest
 
 from fatebridge.core import ephemeris_runtime
 from fatebridge.core.astro import runtime
+from fatebridge.core.astro.earth_rotation import frame_gast, iers2010_gast
 from fatebridge.core.astro.iers_ut1 import use_ut1_source
 from fatebridge.core.astro.reference_frames import (
     iau_equatorial_frame,
     native_equatorial_frame,
 )
-from fatebridge.core.astro_models import frame_gast, iers2010_gast
 
 REFERENCE = json.loads(
     gzip.decompress(

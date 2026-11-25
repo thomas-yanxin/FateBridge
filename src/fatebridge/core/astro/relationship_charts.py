@@ -298,6 +298,10 @@ def _build_influence_chart_wrapper(
     zodiacal_info: dict[str, Any],
 ) -> dict[str, Any]:
     target_profile = house_chart["chart_profile"]
+    ascendant_resolved = is_ascendant_resolved(house_chart)
+    house_system_code = target_profile["house_system_code"]
+    houses_resolved = ascendant_resolved or house_system == "equal_mc"
+
     engine_profile = _derive_engine_profile(
         target_profile, source_chart["chart_profile"]
     )
@@ -321,6 +325,9 @@ def _build_influence_chart_wrapper(
         )
         for planet in sorted(source_chart["planets"], key=planet_display_order)
     ]
+    if not houses_resolved:
+        for planet in planets:
+            planet["house"] = None
     aspect_evidence = _build_aspects(planets, include_evidence=True)
     aspects = [
         {field: contact[field] for field in ("planet_a", "planet_b", "aspect", "orb")}
@@ -330,7 +337,7 @@ def _build_influence_chart_wrapper(
     reference_frame = f"{source_name}_planets_in_{target_name}_houses"
     profile_house_fields = {
         "house_system": house_system,
-        "house_system_code": target_profile["house_system_code"],
+        "house_system_code": house_system_code,
         "house_system_label_zh": target_profile["house_system_label_zh"],
     }
     profile_zodiac_fields = _relative_zodiac_profile_overrides(zodiacal_info)
@@ -348,14 +355,27 @@ def _build_influence_chart_wrapper(
             "aspect_policy": target_profile.get("aspect_policy"),
             "house_overlay_policy": "source ecliptic longitude in target cusp sectors; not a physical horizon recast",
             "reference_frame": reference_frame,
+            **(
+                {"angle_definition": target_profile["angle_definition"]}
+                if "angle_definition" in target_profile
+                else {}
+            ),
             **profile_house_fields,
             **profile_zodiac_fields,
         },
         "angles": {
-            "ascendant": chart_angle(ascendant),
+            "ascendant": (
+                chart_angle(ascendant)
+                if ascendant_resolved
+                else {"longitude": None, "sign": None, "sign_zh": None}
+            ),
             "midheaven": chart_angle(midheaven),
         },
-        "houses": _build_houses(ascendant, house_system, house_cusps=house_cusps),
+        "houses": (
+            _build_houses(ascendant, house_system, house_cusps=house_cusps)
+            if houses_resolved
+            else []
+        ),
         "planets": planets,
         "aspects": aspects,
         "aspect_evidence": aspect_evidence,
@@ -378,7 +398,11 @@ def _build_influence_chart_wrapper(
         },
         "chart": influence_chart,
         "summary": [
-            f"以 {target_name} 的宫位框架投影 {source_name} 的星体。",
+            (
+                f"以 {target_name} 的宫位框架投影 {source_name} 的星体。"
+                if houses_resolved
+                else f"{target_name} 的上升未定，影响图保留 {source_name} 的星体和相位。"
+            ),
             f"星体数量：{len(planets)}。",
             f"相位数量：{len(aspects)}。",
         ],

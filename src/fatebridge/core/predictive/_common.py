@@ -11,6 +11,7 @@ from datetime import tzinfo as DateTimeZone
 from fractions import Fraction
 from typing import Any, Literal
 
+from fatebridge.core.astro.angle_definitions import is_ascendant_resolved
 from fatebridge.core.astro.astrology_tables import (
     EGYPTIAN_BOUNDS_BY_SIGN as EGYPTIAN_BOUNDS_BY_SIGN,
 )
@@ -20,6 +21,7 @@ from fatebridge.core.astro.birth import (
     build_astro_birth_info,
     require_resolved_birth_timezone,
 )
+from fatebridge.core.astro.event_reference import ASC_INDEPENDENT_HOUSES
 from fatebridge.core.astro.geometry import (
     Angle,
     angular_separation_fraction,
@@ -473,6 +475,8 @@ def build_lot_point_dict(
 
 
 def build_lot_longitudes(natal_subject: NativeSubject) -> dict[str, Fraction]:
+    if not is_ascendant_resolved(natal_subject):
+        return {}
     sun = point_absolute_position(natal_subject, "Sun")
     moon = point_absolute_position(natal_subject, "Moon")
     asc = point_absolute_position(natal_subject, "Ascendant")
@@ -565,12 +569,24 @@ def extract_named_points(
     subject: NativeSubject,
     point_names: list[str],
 ) -> dict[str, dict[str, Any]]:
+    ascendant_resolved = is_ascendant_resolved(subject)
+    houses_resolved = ascendant_resolved or (
+        subject.houses_system_identifier in ASC_INDEPENDENT_HOUSES
+    )
     result = {}
     for point_name in point_names:
-        result[point_name.lower()] = point_to_dict(
-            point_name,
-            getattr(subject, point_attribute_name(point_name)),
+        point = point_to_dict(
+            point_name, getattr(subject, point_attribute_name(point_name))
         )
+        if point_name == "Ascendant" and not ascendant_resolved:
+            point = {
+                key: value if key in {"point", "point_label"} else None
+                for key, value in point.items()
+            }
+            point["status"] = "underdetermined_ascendant"
+        elif not houses_resolved:
+            point.update(house=None, house_label=None)
+        result[point_name.lower()] = point
     return result
 
 
@@ -582,9 +598,11 @@ def extract_named_longitudes(
     subject: NativeSubject,
     point_names: list[str],
 ) -> dict[str, float]:
+    ascendant_resolved = is_ascendant_resolved(subject)
     return {
         point_name: point_absolute_position(subject, point_name)
         for point_name in point_names
+        if ascendant_resolved or point_name != "Ascendant"
     }
 
 

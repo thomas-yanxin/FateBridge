@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import math
 import re
-from collections.abc import Mapping, Sequence
+from collections.abc import Iterator, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from fractions import Fraction
@@ -80,6 +80,14 @@ def _julian_day(moment: datetime | UTCCalendar) -> float:
 
 FileContext = tuple[tuple[str, float, float, int], ...]
 MotionSample = tuple[float, float, int, FileContext]
+MotionSource = tuple[int, frozenset[int]]
+
+
+def _motion_source(sample: MotionSample) -> MotionSource:
+    return sample[2], frozenset(
+        edition for _, _, _, edition in sample[3] if edition > 0
+    )
+
 
 BODY_SOURCE_NAMES: dict[int, str] = {
     0: "Sun",
@@ -356,22 +364,35 @@ def _longitude_crossings(
     step_days: float,
     *,
     sidereal: bool = False,
-) -> list[LongitudeCrossing]:
-    """Scan the whole finite TT window and refine each observed crossing."""
+    expected_source: MotionSource | None = None,
+    reverse: bool = False,
+) -> Iterator[LongitudeCrossing]:
+    """Yield refined crossings in the scan direction on the native TT axis."""
     if not math.isfinite(step_days) or step_days <= 0:
         raise ValueError("Longitude-crossing scan step must be finite and positive")
-    else:
-        pass
-    crossings: list[LongitudeCrossing] = []
-    previous_jd = start_jd
-    previous = _planet_motion(previous_jd, planet_id, sidereal=sidereal)
-    while previous_jd < end_jd:
-        jd = min(previous_jd + step_days, end_jd)
-        if jd <= previous_jd:
+    cursor, limit = (end_jd, start_jd) if reverse else (start_jd, end_jd)
+    sample = _planet_motion(cursor, planet_id, sidereal=sidereal)
+    if expected_source is not None and _motion_source(sample) != expected_source:
+        raise EphemerisSourceError("model_changed")
+    last_point: TTInstant | None = None
+    while cursor != limit:
+        following = (
+            max(cursor - step_days, limit)
+            if reverse
+            else min(cursor + step_days, limit)
+        )
+        if following == cursor:
             raise ValueError("Longitude-crossing scan step does not advance TT")
+        next_sample = _planet_motion(following, planet_id, sidereal=sidereal)
+        if (
+            expected_source is not None
+            and _motion_source(next_sample) != expected_source
+        ):
+            raise EphemerisSourceError("model_changed")
+        if reverse:
+            previous_jd, previous, jd, current = following, next_sample, cursor, sample
         else:
-            pass
-        current = _planet_motion(jd, planet_id, sidereal=sidereal)
+            previous_jd, previous, jd, current = cursor, sample, following, next_sample
 
         def same_source(at: float) -> MotionSample:
             value = _planet_motion(at, planet_id, sidereal=sidereal)
@@ -417,64 +438,50 @@ def _longitude_crossings(
                 split_jds.add(turn)
             else:
                 pass
-            # Native speed == 0 can differ slightly from the exact longitude
-            # extremum near a station; add the actual longitude extremum when
-            # it reaches further along the turn direction so grazing contacts
-            # are bracketed on both sides.
-            half_span = min(0.05, 0.5 * (jd - previous_jd))
-            a = max(previous_jd, turn - half_span)
-            b = min(jd, turn + half_span)
-            if a < b:
-                maximize_sign = (
-                    1.0
-                    if (previous[1] > 0.0 or (previous[1] == 0.0 and current[1] < 0.0))
-                    else -1.0
-                )
-                turn_lon = same_source(turn)[0]
-                c = b - _GOLDEN_RATIO_RECIPROCAL * (b - a)
-                d = a + _GOLDEN_RATIO_RECIPROCAL * (b - a)
-                fc = maximize_sign * _wrapped_diff(same_source(c)[0], previous[0])
-                fd = maximize_sign * _wrapped_diff(same_source(d)[0], previous[0])
-                for _ in range(48):
-                    if b - a <= 4.0 * math.ulp(max(abs(a), abs(b), 1.0)) or c >= d:
-                        break
-                    else:
-                        pass
-                    if fc < fd:
-                        a = c
-                        c = d
-                        fc = fd
-                        d = a + _GOLDEN_RATIO_RECIPROCAL * (b - a)
-                        fd = maximize_sign * _wrapped_diff(
-                            same_source(d)[0], previous[0]
-                        )
-                    else:
-                        b = d
-                        d = c
-                        fd = fc
-                        c = b - _GOLDEN_RATIO_RECIPROCAL * (b - a)
-                        fc = maximize_sign * _wrapped_diff(
-                            same_source(c)[0], previous[0]
-                        )
-                lon_extremum = 0.5 * (a + b)
-                if previous_jd < lon_extremum < jd:
-                    extremum_lon = same_source(lon_extremum)[0]
-                    if maximize_sign * _wrapped_diff(extremum_lon, turn_lon) > 0.0:
-                        split_jds.add(lon_extremum)
-                    else:
-                        pass
+            # Native speed only identifies a candidate cell. A grazing target
+            # can be reached at a different, even single, representable TT point.
+            a, b = previous_jd, jd
+            direction = 1.0 if previous[1] > 0.0 or current[1] < 0.0 else -1.0
+            turn_lon = same_source(turn)[0]
+
+            def altitude(at: float) -> float:
+                return direction * _wrapped_diff(same_source(at)[0], turn_lon)
+
+            c = b - _GOLDEN_RATIO_RECIPROCAL * (b - a)
+            d = a + _GOLDEN_RATIO_RECIPROCAL * (b - a)
+            fc, fd = altitude(c), altitude(d)
+            best = max((0.0, turn), (fc, c), (fd, d))
+            for _ in range(96):
+                if b - a <= 4 * math.ulp(max(abs(a), abs(b))) or c >= d:
+                    break
+                if fc < fd:
+                    a, c, fc = c, d, fd
+                    d = a + _GOLDEN_RATIO_RECIPROCAL * (b - a)
+                    fd = altitude(d)
                 else:
-                    pass
-            else:
-                pass
+                    b, d, fd = d, c, fc
+                    c = b - _GOLDEN_RATIO_RECIPROCAL * (b - a)
+                    fc = altitude(c)
+                best = max(best, (fc, c), (fd, d))
+            # Recheck the final bracket on the same binary64 axis as the native
+            # position call. A bracket this narrow contains only a few samples.
+            for _ in range(8):
+                if a > b:
+                    break
+                best = max(best, (altitude(a), a))
+                a = math.nextafter(a, math.inf)
+            improvement, extremum = best
+            if improvement > 0.0 and previous_jd < extremum < jd:
+                split_jds.add(extremum)
             for split_jd in sorted(split_jds):
                 knots.append((split_jd, same_source(split_jd)[0]))
         else:
             pass
         knots.append((jd, current[0]))
-        for (left_jd, left_longitude), (right_jd, right_longitude) in zip(
-            knots, knots[1:]
-        ):
+        cells = list(zip(knots, knots[1:]))
+        if reverse:
+            cells.reverse()
+        for (left_jd, left_longitude), (right_jd, right_longitude) in cells:
             left_diff = _wrapped_diff(left_longitude, target_longitude)
             right_diff = _wrapped_diff(right_longitude, target_longitude)
             if (
@@ -512,78 +519,45 @@ def _longitude_crossings(
                         low = mid
                     else:
                         high = mid
-                best_high = high
-                # Preserve the side through ordinary UTC quantization. An
-                # inserted second or a missing label remains on its TT axis;
-                # grazing tangents remain pinned to their solved TT contact.
+                point = TTInstant.from_float(high)
+                if point == last_point:
+                    continue
+                label, moment, leap = utc_from_tt(point, legacy_pre_utc=True)
+                original_display = label, moment, leap
+                # A civil display can round to the preceding TT sample. Keep
+                # root selection on native TT even when adjusting the label.
                 for _ in range(8):
-                    point = TTInstant.from_float(high)
-                    label, moment, leap = utc_from_tt(point, legacy_pre_utc=True)
-                    recovered = high
                     if moment is not None:
                         recovered = _julian_day(moment)
                     elif label is not None and not leap:
                         recovered = _julian_day(ZonedCalendar.from_isoformat(label).utc)
                     else:
-                        pass
-                    value = _wrapped_diff(
-                        same_source(recovered)[0],
-                        target_longitude,
-                    )
-                    on_crossed_side = value >= 0.0 if low_negative else value <= 0.0
-                    if on_crossed_side:
-                        if not crossings or point != crossings[-1].tt:
-                            crossings.append(
-                                LongitudeCrossing(
-                                    point,
-                                    moment,
-                                    label,
-                                    leap,
-                                    source_identity=source_id,
-                                )
-                            )
-                        else:
-                            pass
                         break
-                    else:
-                        pass
-                    next_high = math.nextafter(high, math.inf)
-                    current_diff = _wrapped_diff(same_source(high)[0], target_longitude)
-                    next_diff = _wrapped_diff(
-                        same_source(next_high)[0], target_longitude
-                    )
-                    next_on_side = (
-                        next_diff >= 0.0 if low_negative else next_diff <= 0.0
-                    )
-                    if not next_on_side and abs(next_diff) >= abs(current_diff):
-                        exact_point = TTInstant.from_float(best_high)
-                        exact_label, exact_moment, exact_leap = utc_from_tt(
-                            exact_point, legacy_pre_utc=True
-                        )
-                        if not crossings or exact_point != crossings[-1].tt:
-                            crossings.append(
-                                LongitudeCrossing(
-                                    exact_point,
-                                    exact_moment,
-                                    exact_label,
-                                    exact_leap,
-                                    source_identity=source_id,
-                                )
-                            )
-                        else:
-                            pass
+                    value = _wrapped_diff(same_source(recovered)[0], target_longitude)
+                    if value >= 0.0 if low_negative else value <= 0.0:
                         break
-                    else:
-                        pass
-                    high = next_high
+                    following = math.nextafter(high, math.inf)
+                    following_diff = _wrapped_diff(
+                        same_source(following)[0], target_longitude
+                    )
+                    if following_diff < 0.0 if low_negative else following_diff > 0.0:
+                        # A tangent or a sub-label-width pair can have no civil
+                        # representation on the crossed side.
+                        label, moment, leap = original_display
+                        break
+                    high = following
+                    label, moment, leap = utc_from_tt(
+                        TTInstant.from_float(high), legacy_pre_utc=True
+                    )
                 else:
                     raise EphemerisUnavailableError(
                         "Civil crossing instant could not preserve its crossing side"
                     )
-            else:
-                pass
-        previous_jd, previous = jd, current
-    return crossings
+                last_point = point
+                yield LongitudeCrossing(
+                    point, moment, label, leap, source_identity=source_id
+                )
+        cursor, sample = following, next_sample
 
 
 def resolve_longitude_crossing(
@@ -642,8 +616,14 @@ def planet_longitude_at_utc(
     sidereal: bool = False,
 ) -> float:
     """Tropical or native Lahiri longitude at a civil instant, used as natal anchor."""
-    _require_swe()
-    return _planet_motion(_julian_day(moment), planet_id, sidereal=sidereal)[0]
+    return planet_motion_at_utc(planet_id, moment, sidereal=sidereal)[0]
+
+
+def planet_motion_at_utc(
+    planet_id: int, moment: datetime | UTCCalendar, *, sidereal: bool = False
+) -> MotionSample:
+    """Native motion and returned source flags at the return anchor."""
+    return _planet_motion(_julian_day(moment), planet_id, sidereal=sidereal)
 
 
 def resolve_cardinal_ingress(year: int, term: str) -> LongitudeCrossing:
@@ -682,6 +662,7 @@ def resolve_planet_returns(
     past: int = 1,
     future: int = 1,
     sidereal: bool = False,
+    natal_motion: MotionSample | None = None,
 ) -> ResolvedPlanetReturns:
     """Return the requested nearest past/future crossings in a bounded scan.
 
@@ -702,66 +683,47 @@ def resolve_planet_returns(
         pass
     reference_jd = _julian_day(reference_utc)
     reference = Fraction(reference_jd)
+    expected_source = (
+        _motion_source(
+            natal_motion
+            if natal_motion is not None
+            else _planet_motion(reference_jd, planet_id, sidereal=sidereal)
+        )
+        if past or future
+        else None
+    )
     step_days = (
         min(0.5, period_days / 360.0)
         if period_days <= 400.0
         else min(1.0, period_days / 360.0)
     )
-    chunk_days = min(period_days, 365.25)
     selected: list[tuple[LongitudeCrossing, ...]] = []
     observed_identity: dict[str, object] | None = None
     for direction, count in ((-1, past), (1, future)):
-        if count == 0:
-            selected.append(())
-            continue
-        else:
-            pass
-        found: dict[Fraction, LongitudeCrossing] = {}
-        cursor = reference_jd
-        limit = reference_jd + direction * (period_days * (1.25 * count + 0.5) + 15.0)
-        while len(found) < count and cursor != limit:
-            # Advance contiguously from the reference, stopping as soon as the
-            # requested side is populated. Annual chunks avoid solving remote
-            # revolutions that cannot affect the nearest returned event.
-            following = (
-                max(limit, cursor - chunk_days)
-                if direction < 0
-                else min(limit, cursor + chunk_days)
+        found: list[LongitudeCrossing] = []
+        if count:
+            limit = reference_jd + direction * (
+                period_days * (1.25 * count + 0.5) + 15.0
             )
-            crossings = _longitude_crossings(
+            for crossing in _longitude_crossings(
                 planet_id,
                 natal_longitude,
-                min(cursor, following),
-                max(cursor, following),
+                min(reference_jd, limit),
+                max(reference_jd, limit),
                 step_days,
                 sidereal=sidereal,
-            )
-            for crossing in crossings:
-                if observed_identity is None and crossing.source_identity is not None:
+                expected_source=expected_source,
+                reverse=direction < 0,
+            ):
+                if direction > 0 and crossing.tt.days == reference:
+                    continue
+                if observed_identity is None:
                     observed_identity = crossing.source_identity
-                else:
-                    pass
-                if (
-                    crossing.tt.days <= reference
-                    if direction < 0
-                    else crossing.tt.days > reference
-                ):
-                    found[crossing.tt.days] = crossing
-                else:
-                    pass
-            cursor = following
-        ordered = sorted(found.values(), key=lambda at: at.tt.days)
-        selected.append(tuple(ordered[-count:] if direction < 0 else ordered[:count]))
-    if observed_identity is None:
-        sample = _planet_motion(reference_jd, planet_id, sidereal=sidereal)
-        observed_identity = _body_source_identity(
-            planet_id, sample[2], sample[3], sidereal=sidereal
-        )
-    else:
-        pass
-    return ResolvedPlanetReturns(
-        selected[0], selected[1], source_identity=observed_identity
-    )
+                found.append(crossing)
+                if len(found) == count:
+                    break
+        selected.append(tuple(reversed(found) if direction < 0 else found))
+    return ResolvedPlanetReturns(selected[0], selected[1], observed_identity)
 
 
 def find_planet_returns(
@@ -807,4 +769,5 @@ __all__ = [
     "find_cardinal_ingress_utc",
     "find_planet_returns",
     "planet_longitude_at_utc",
+    "planet_motion_at_utc",
 ]
