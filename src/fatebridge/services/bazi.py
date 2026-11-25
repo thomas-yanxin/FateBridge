@@ -51,7 +51,7 @@ from fatebridge.services.timing_state import (
     calculate_analysis_age,
 )
 from fatebridge.utils.birth_clock import birth_clock_snapshot_lines
-from fatebridge.utils.birth_input import PersonInfo
+from fatebridge.utils.birth_input import PersonInfo, normalize_gender
 from fatebridge.utils.data import (
     BRANCH_HIDDEN_STEMS,
     EARTHLY_BRANCHES,
@@ -945,6 +945,7 @@ def _parse_pillar_str(
 def _derive_current_pillars(
     birth_context: BirthComputationContext,
     analysis_date: datetime,
+    gender: str,
 ) -> tuple[tuple[str, str] | None, tuple[str, str] | None, dict[str, Any]]:
     """从命盘 + 分析日期内部推算当前大运、流年柱（用户无需自己知道大运）。"""
     normalized = birth_context.normalized_birth_time
@@ -952,7 +953,7 @@ def _derive_current_pillars(
     dayun_result = TimingEffectsAnalysis.analyze_dayun_effects(
         birth_context.birth_pillars,
         normalized.input_datetime,
-        birth_context.person.gender,
+        gender,
         calculate_analysis_age(normalized.input_datetime, analysis_date),
         timezone_name=timezone_name,
         original_element_counts=birth_context.original_element_counts,
@@ -1041,6 +1042,7 @@ def _run_bazi_dimension_analysis(
         liunian = _parse_pillar_str(liunian_pillar, "liunian_pillar")
         birth_context = build_birth_computation_context(person)
         pillars = birth_context.birth_pillars
+        gender = normalize_gender(person.gender)
 
         timing_context: dict[str, Any]
         if dayun is None or liunian is None:
@@ -1051,7 +1053,7 @@ def _run_bazi_dimension_analysis(
                 timezone_name=birth_context.normalized_birth_time.timezone,
             )
             auto_dayun, auto_liunian, timing_context = _derive_current_pillars(
-                birth_context, analysis_date
+                birth_context, analysis_date, gender
             )
             timing_context["overridden"] = {
                 "dayun_pillar": dayun is not None,
@@ -1068,20 +1070,20 @@ def _run_bazi_dimension_analysis(
             timing_context["dayun_pillar"] = "".join(dayun) if dayun else None
             timing_context["liunian_pillar"] = "".join(liunian) if liunian else None
             if timing_context["overridden"]["dayun_pillar"]:
-                if "dayun_status" in timing_context:
-                    timing_context["dayun_status"] = "explicit_override"
-                    timing_context["limitations"] = []
-                else:
-                    pass
-                # Keep the published fractional-year reference projectable,
-                # without presenting it as the age of the override pillar.
-                timing_context["dayun_age_basis"] = (
-                    "auto_derived_reference_not_override_pillar_age"
-                    if timing_context.get("dayun_age") is not None
-                    else "unavailable_for_override"
+                # A reviewable automatic age is independent of the supplied pillar.
+                timing_context.update(
+                    dayun_status="explicit_override",
+                    dayun_selection_basis=None,
+                    dayun_start_at=None,
+                    dayun_end_at=None,
+                    dayun_age_basis=(
+                        "auto_derived_reference_not_override_pillar_age"
+                        if timing_context.get("dayun_age") is not None
+                        else "unavailable_for_override"
+                    ),
                 )
-            else:
-                pass
+                if "limitations" in timing_context:
+                    timing_context["limitations"] = []
         else:
             # Explicit pillars still have a provenance contract. They do not
             # have an automatically derived age/date; do not invent those.
@@ -1089,6 +1091,12 @@ def _run_bazi_dimension_analysis(
                 "dayun_pillar": "".join(dayun),
                 "liunian_pillar": "".join(liunian),
                 "source": "explicit_pillar_overrides",
+                "dayun_status": "explicit_override",
+                "dayun_selection_basis": None,
+                "dayun_start_at": None,
+                "dayun_end_at": None,
+                "dayun_age": None,
+                "dayun_age_basis": "unavailable_for_override",
                 "overridden": {"dayun_pillar": True, "liunian_pillar": True},
             }
 
@@ -1103,7 +1111,7 @@ def _run_bazi_dimension_analysis(
             evidence,
             pillars,
             topic,
-            person.gender,
+            gender,
             dayun,
             liunian,
         )

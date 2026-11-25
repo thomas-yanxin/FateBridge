@@ -191,13 +191,21 @@ def test_unknown_gender_keeps_natal_stars_but_does_not_guess_direction() -> None
     assert [p["stars_detail"] for p in unknown["palaces"]] == [
         p["stars_detail"] for p in male["palaces"]
     ]
-    with pytest.raises(ValueError, match="需要明确性别"):
-        build_ziwei_horoscope(
-            birth_seed=synthetic_birth_clock(int((unknown)["lunar_date"]["year"])),
-            chart=unknown,
-            gender="未知",
-            target_seed=synthetic_seed(2026),
-        )
+    birth_clock = synthetic_birth_clock(unknown["lunar_date"]["year"])
+    target = synthetic_seed(2026)
+    partial = build_ziwei_horoscope(
+        birth_seed=birth_clock, chart=unknown, gender="未知", target_seed=target
+    )
+    known = build_ziwei_horoscope(
+        birth_seed=birth_clock, chart=male, gender="男", target_seed=target
+    )
+    assert partial["nominal_age"] == known["nominal_age"]
+    assert partial["scopes"][2:] == known["scopes"][2:]
+    for scope in partial["scopes"][:2]:
+        assert scope["status"] == "unavailable"
+        assert scope["unavailable_reason"] == "gender_required_for_direction"
+        assert scope["branch"] is scope["stem"] is scope["mutagen"] is None
+        assert scope["palace_map"] == scope["mutagen_natal_links"] == []
 
 
 def test_natal_leap_excerpt_is_not_silently_extended_to_target_months() -> None:
@@ -237,7 +245,7 @@ def test_unknown_nayin_and_invalid_profiles_or_dates_cannot_produce_plausible_ch
         build_ziwei_rules("not_a_stem")
     seed = synthetic_seed(2026)
     invalid = replace(seed, calendar_context={"lunar_calendar": {"month": 1, "day": 1}})
-    with pytest.raises(ValueError, match="目标农历年缺失"):
+    with pytest.raises(ValueError, match="紫微斗数运限.*农历年缺失"):
         build_ziwei_horoscope(
             birth_seed=synthetic_birth_clock(
                 int(

@@ -50,7 +50,7 @@ def horoscope_natal_prerequisites(chart: Dict[str, Any]) -> Dict[str, Any]:
         "origin": "same_calculation_internal_natal_chart",
         "ruleset": {
             key: chart["ruleset"][key]
-            for key in ("id", "version", "sihua_source")
+            for key in ("id", "version", "sihua_source", "leap_month_rule")
             if key in chart["ruleset"]
         },
         **{

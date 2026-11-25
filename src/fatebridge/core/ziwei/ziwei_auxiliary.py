@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, List
+from collections.abc import Mapping, Sequence
+from typing import Any, Dict, List, Literal, TypedDict
+
+from typing_extensions import NotRequired
 
 from fatebridge.core.ziwei.ziwei_rulesets import (
     IZTRO_SOURCE,
@@ -154,8 +157,6 @@ def attach_natal_cycles(
             cycle: {p["ganzhi"][1]: p[cycle] for p in palaces if p[cycle] is not None}
             for cycle in ("changsheng12", "boshi12")
         }
-    else:
-        pass
     return result
 
 
@@ -199,28 +200,83 @@ def chart_masters(
     }
 
 
-def flowing_lucun_stars(
-    scope_palaces: List[Dict[str, Any]],
+# iztro 2.5.8, src/star/location.ts. Stem columns follow 甲 through 癸.
+_FLOWING_STEM_TABLE = {
+    "天魁": "丑子亥亥丑子丑午卯卯",
+    "天钺": "未申酉酉未申未寅巳巳",
+    "文昌": "巳午申酉申酉亥子寅卯",
+    "文曲": "酉申午巳午巳卯寅子亥",
+}
+
+ZiweiFlowingScope = Literal["大限", "流年", "流月", "流日", "流时"]
+
+
+class FlowingStarPlacement(TypedDict):
+    star: str
+    scope: ZiweiFlowingScope
+    branch: str
+    scope_palace_name: str
+    natal_palace_name: str
+    rule_id: str
+    stem: NotRequired[str]
+    basis_branch: NotRequired[str]
+    source: str
+    system_id: NotRequired[str]
+    natal_stars_relocated: Literal[False]
+
+
+def flowing_horoscope_stars(
+    scope_palaces: Sequence[Mapping[str, str]],
     *,
+    scope: ZiweiFlowingScope,
     stem: str,
-) -> List[Dict[str, Any]]:
-    """流年禄羊陀; natal star locations are never moved or overwritten."""
-    index = EARTHLY_BRANCHES.index(ZIWEI_LUCUN_BY_STEM[stem])
-    result = []
-    for star, offset in (("禄存", 0), ("擎羊", 1), ("陀罗", -1)):
-        branch = EARTHLY_BRANCHES[(index + offset) % 12]
-        palace = next(p for p in scope_palaces if p["branch"] == branch)
-        result.append(
-            {
-                "star": star,
-                "scope": "流年",
-                "branch": branch,
-                "scope_palace_name": palace["scope_palace_name"],
-                "natal_palace_name": palace["natal_palace_name"],
-                "rule_id": "annual_lucun_yang_tuo",
-                "stem": stem,
-                "source": QUANSHU_SOURCE,
-                "natal_stars_relocated": False,
-            }
+    pillar_branch: str,
+) -> list[FlowingStarPlacement]:
+    """Project the pinned placements for the layer's supplied stem and branch."""
+    branches = EARTHLY_BRANCHES
+    lu = branches.index(ZIWEI_LUCUN_BY_STEM[stem])
+    stem_index = HEAVENLY_STEMS.index(stem)
+    branch_index = branches.index(pillar_branch)
+    annual = scope == "流年"
+    lu_rule = "annual_lucun_yang_tuo" if annual else "lu_yang_tuo_by_stem"
+    placements = [
+        ("禄存", branches[lu], lu_rule),
+        ("擎羊", branches[(lu + 1) % 12], lu_rule),
+        ("陀罗", branches[(lu - 1) % 12], lu_rule),
+        ("天魁", _FLOWING_STEM_TABLE["天魁"][stem_index], "kui_yue_by_stem"),
+        ("天钺", _FLOWING_STEM_TABLE["天钺"][stem_index], "kui_yue_by_stem"),
+        ("文昌", _FLOWING_STEM_TABLE["文昌"][stem_index], "flowing_chang_qu_by_stem"),
+        ("文曲", _FLOWING_STEM_TABLE["文曲"][stem_index], "flowing_chang_qu_by_stem"),
+        ("天马", "寅亥申巳"[branch_index % 4], "tianma_by_branch"),
+        ("红鸾", branches[(3 - branch_index) % 12], "luan_xi_by_branch"),
+        ("天喜", branches[(9 - branch_index) % 12], "luan_xi_by_branch"),
+    ]
+    if annual:
+        placements.append(
+            ("年解", branches[(10 - branch_index) % 12], "nianjie_by_year_branch")
         )
+
+    by_branch = {palace["branch"]: palace for palace in scope_palaces}
+    result: list[FlowingStarPlacement] = []
+    for star, branch, rule_id in placements:
+        palace = by_branch[branch]
+        record: FlowingStarPlacement = {
+            "star": star,
+            "scope": scope,
+            "branch": branch,
+            "scope_palace_name": palace["scope_palace_name"],
+            "natal_palace_name": palace["natal_palace_name"],
+            "rule_id": rule_id,
+            "source": IZTRO_SOURCE,
+            "natal_stars_relocated": False,
+        }
+        if rule_id.endswith("_branch"):
+            record["basis_branch"] = pillar_branch
+        else:
+            record["stem"] = stem
+        if rule_id == "annual_lucun_yang_tuo":
+            record["source"] = QUANSHU_SOURCE
+        else:
+            record["system_id"] = "iztro_2_5_8_horoscope"
+        result.append(record)
     return result

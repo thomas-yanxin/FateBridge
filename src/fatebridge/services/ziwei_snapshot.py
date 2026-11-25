@@ -6,7 +6,7 @@ from typing import Any
 
 from fatebridge.core.local_techniques.snapshot import join_lines
 from fatebridge.core.metaphysics.common import MetaphysicsSeed
-from fatebridge.core.ziwei.ziwei_calendar import basis_text
+from fatebridge.core.ziwei.ziwei_calendar import basis_text, placement_lunar_display
 from fatebridge.core.ziwei.ziwei_rulesets import DEFAULT_ZIWEI_DAY_DIVIDE
 from fatebridge.services.snapshot_builders import render_snapshot_text
 
@@ -16,7 +16,7 @@ def build_ziwei_snapshot_text(
     seed: MetaphysicsSeed,
     ziwei_birth: dict[str, Any],
 ) -> str:
-    lunar_calendar = seed.calendar_context.get("lunar_calendar") or {}
+    basis = ziwei_birth["calendar_basis"]
     ming_gong = ziwei_birth["ming_gong"]
     shen_gong = ziwei_birth["shen_gong"]
     sihua = ziwei_birth["sihua"]
@@ -46,11 +46,10 @@ def build_ziwei_snapshot_text(
             "起盘信息",
             join_lines(
                 [
-                    f"农历：{lunar_calendar.get('display') or '无'}",
-                    f"输入钟表时间：{seed.input_datetime.strftime('%Y-%m-%d %H:%M:%S')}",
-                    f"排盘时间：{seed.calendar_context['solar_datetime']}",
+                    f"排盘农历：{placement_lunar_display(basis)}",
+                    f"输入钟表时间：{basis['civil_datetime']}",
                     (
-                        f"四柱：{seed.pillars['year'][0]}{seed.pillars['year'][1]}年/"
+                        f"参考四柱（八字日界）：{seed.pillars['year'][0]}{seed.pillars['year'][1]}年/"
                         f"{seed.pillars['month'][0]}{seed.pillars['month'][1]}月/"
                         f"{seed.pillars['day'][0]}{seed.pillars['day'][1]}日/"
                         f"{seed.pillars['hour'][0]}{seed.pillars['hour'][1]}时"
@@ -59,7 +58,7 @@ def build_ziwei_snapshot_text(
                     f"下个节气：{seed.calendar_context['next_solar_term']['name']}",
                     f"时间算法：{'真太阳时' if seed.applied_true_solar else '直接时间'}",
                     f"生年天干：{ziwei_birth.get('year_stem', '无')}",
-                    basis_text(ziwei_birth["calendar_basis"]),
+                    basis_text(basis),
                     f"规则配置：{ziwei_birth['ruleset']['id']}；原典符合范围：{ziwei_birth['ruleset']['classical_conformance']}",
                     *(
                         [
@@ -117,7 +116,6 @@ def build_ziwei_snapshot_text(
 
 def build_ziwei_horoscope_snapshot_text(
     *,
-    seed: MetaphysicsSeed,
     target_seed: MetaphysicsSeed,
     horoscope: dict[str, Any],
 ) -> str:
@@ -132,8 +130,8 @@ def build_ziwei_horoscope_snapshot_text(
             "起盘信息",
             join_lines(
                 [
-                    f"出生：{seed.calendar_context['solar_datetime']}",
-                    f"目标：{target_seed.calendar_context['solar_datetime']}",
+                    f"出生民用时刻：{horoscope['calendar_basis']['birth']['civil_datetime']}",
+                    f"目标民用时刻：{horoscope['calendar_basis']['target']['civil_datetime']}",
                     f"虚岁：{horoscope.get('nominal_age', '无')}",
                     f"岁序方法：{horoscope['nominal_age_calendar']['method_id']}；参考时区：{horoscope['nominal_age_calendar']['timezone']}；原典岁首尚未认证",
                     f"目标时区：{target_seed.timezone}；目标时刻采用钟表时间",

@@ -2,18 +2,25 @@
 
 from __future__ import annotations
 
+from copy import deepcopy
 from typing import Any
 
 from fatebridge.core.metaphysics.common import MetaphysicsSeed
 from fatebridge.core.ziwei.ziwei_age import nominal_age_calendar
-from fatebridge.core.ziwei.ziwei_auxiliary import flowing_lucun_stars
+from fatebridge.core.ziwei.ziwei_auxiliary import (
+    ZiweiFlowingScope,
+    flowing_horoscope_stars,
+)
+from fatebridge.core.ziwei.ziwei_calendar import calendar_basis
 from fatebridge.core.ziwei.ziwei_childhood import childhood_limit
 from fatebridge.core.ziwei.ziwei_classical import annual_text_stars, annual_three_sha
+from fatebridge.core.ziwei.ziwei_cycle_sources import year_branch_cycles
 from fatebridge.core.ziwei.ziwei_evidence import (
     horoscope_natal_prerequisites,
     scope_palace_map,
 )
 from fatebridge.core.ziwei.ziwei_limit_sources import limit_source_evidence
+from fatebridge.core.ziwei.ziwei_named_patterns import limit_pattern_evidence
 from fatebridge.core.ziwei.ziwei_rulesets import (
     DEFAULT_ZIWEI_DAY_DIVIDE,
     DEFAULT_ZIWEI_PROFILE,
@@ -201,8 +208,8 @@ def build_ziwei_horoscope(
 ) -> dict[str, Any]:
     """Six scopes using lunar-year ages and the natal-month/hour Dou Jun.
 
-    Scope ``branch`` is the actual natal palace, not the calendar branch of
-    the target date. Month/day/hour stems still determine their own 四化.
+    Scope ``branch`` identifies the natal palace occupied by the active Ming.
+    The scope calendar stem and branch govern its own flowing stars.
     Flowing scopes retain the target clock. Age ordinals use one civil clock
     for both physical endpoints. A chart alone cannot supply its birth instant.
     """
@@ -244,16 +251,15 @@ def build_ziwei_horoscope(
     else:
         pass
 
-    target_state = resolve_ziwei_clock_state(
-        target_seed, resolved_day_divide, technique="紫微斗数运限"
-    )
     natal_lunar = chart["lunar_date"]
     age_calendar = nominal_age_calendar(
         birth_seed=birth_seed,
         target_seed=target_seed,
         birth_placement_year=int(natal_lunar["year"]),
-        target_civil_year=target_state.lunar_year,
         basis=nominal_age_basis,
+    )
+    target_state = resolve_ziwei_clock_state(
+        target_seed, resolved_day_divide, technique="紫微斗数运限"
     )
     nominal_age = age_calendar["nominal_age"]
     natal_year_branch = lunar_year_ganzhi(int(natal_lunar["year"]))[1]
@@ -263,43 +269,44 @@ def build_ziwei_horoscope(
     is_gender_known = canonical_gender in {"男", "女"}
     first_daxian_age = int(chart["wuxing_ju"]["number"])
     daxian: dict[str, Any]
-    if not is_gender_known:
+    if nominal_age < first_daxian_age:
+        # The six literal childhood labels do not establish a substitute
+        # formal decade, a decade palace stem, or decade transformations.
+        # Retain the scope slot with explicit nulls so absence is observable.
+        daxian = {
+            "scope": "大限",
+            "palace_name": None,
+            "scope_palace_role": None,
+            "natal_palace_name": None,
+            "branch": None,
+            "branch_index": None,
+            "palace_ganzhi": None,
+            "stem": None,
+            "mutagen": None,
+            "palace_map": [],
+            "mutagen_natal_links": [],
+            "stem_origin": None,
+            "status": "not_started",
+            "unavailable_reason": "before_selected_bureau_start_no_childhood_substitution",
+            "first_age": first_daxian_age,
+        }
+    elif not is_gender_known:
         daxian = _unavailable_gender_scope("大限", first_age=first_daxian_age)
+    else:
+        daxian_palace = palace_for_nominal_age(palaces, nominal_age)
+        daxian = _horoscope_scope(
+            "大限",
+            daxian_palace,
+            daxian_palace["ganzhi"][0],
+            rule_profile,
+            sihua_source=sihua_source,
+        )
+        daxian["status"] = "computed"
+        daxian["first_age"] = first_daxian_age
+
+    if not is_gender_known:
         xiaoxian = _unavailable_gender_scope("小限")
     else:
-        if nominal_age < first_daxian_age:
-            # The six literal childhood labels do not establish a substitute
-            # formal decade, a decade palace stem, or decade transformations.
-            # Retain the scope slot with explicit nulls so absence is observable.
-            daxian = {
-                "scope": "大限",
-                "palace_name": None,
-                "scope_palace_role": None,
-                "natal_palace_name": None,
-                "branch": None,
-                "branch_index": None,
-                "palace_ganzhi": None,
-                "stem": None,
-                "mutagen": None,
-                "palace_map": [],
-                "mutagen_natal_links": [],
-                "stem_origin": None,
-                "status": "not_started",
-                "unavailable_reason": "before_selected_bureau_start_no_childhood_substitution",
-                "first_age": first_daxian_age,
-            }
-        else:
-            daxian_palace = palace_for_nominal_age(palaces, nominal_age)
-            daxian = _horoscope_scope(
-                "大限",
-                daxian_palace,
-                daxian_palace["ganzhi"][0],
-                rule_profile,
-                sihua_source=sihua_source,
-            )
-            daxian["status"] = "computed"
-            daxian["first_age"] = first_daxian_age
-
         xiao_palace = _palace_by_branch(
             palaces, xiaoxian_branch(natal_year_branch, nominal_age, canonical_gender)
         )
@@ -312,12 +319,7 @@ def build_ziwei_horoscope(
             sihua_source=sihua_source,
         )
 
-    natal_month = effective_lunar_month(
-        int(natal_lunar["month"]),
-        int(natal_lunar["day"]),
-        bool(natal_lunar["is_leap_month"]),
-        rule_profile,
-    )
+    natal_month = chart["calendar_rules"]["effective_birth_month"]
     target_month = effective_lunar_month(
         target_state.lunar_month,
         target_state.lunar_day,
@@ -386,30 +388,54 @@ def build_ziwei_horoscope(
         day_origin,
         hour_origin,
     )
-    for scope_record, stem_origin in zip(scopes, stem_origins):
+    star_inputs: dict[ZiweiFlowingScope, tuple[str, str]] = {
+        "大限": (daxian["branch"], "decadal_palace"),
+        "流年": (target_year_branch, "target_lunar_year_pillar"),
+        "流月": (
+            ZIWEI_BRANCH_SEQUENCE[(target_month - 1) % 12],
+            "target_effective_lunar_month_pillar",
+        ),
+        "流日": (target_state.day_branch, "target_day_pillar"),
+        "流时": (target_state.hour_branch, "target_hour_pillar"),
+    }
+    for scope_record, stem_origin in zip(scopes, stem_origins, strict=True):
         if scope_record.get("status") in {"not_started", "unavailable"}:
             continue
-        else:
-            pass
         scope_record["stem_origin"] = stem_origin
         scope_record["palace_map"] = scope_palace_map(
             scope_record["branch"], palaces, ZIWEI_PALACE_SEQUENCE
         )
-        if scope_record["scope"] == "流年":
-            scope_record["flowing_stars"] = flowing_lucun_stars(
-                scope_record["palace_map"], stem=scope_record["stem"]
-            )
-            if rule_profile == "quanshu_v2_excerpt":
-                scope_record["flowing_stars"].extend(
-                    annual_text_stars(
-                        scope_record["palace_map"], year_branch=target_year_branch
-                    )
+        scope = scope_record["scope"]
+        if scope in star_inputs:
+            pillar_branch, branch_origin = star_inputs[scope]
+            scope_record["flowing_star_basis"] = {
+                "stem": scope_record["stem"],
+                "branch": pillar_branch,
+                "branch_origin": branch_origin,
+            }
+            if scope == "流月":
+                scope_record["flowing_star_basis"].update(
+                    effective_lunar_month=target_month,
+                    lunar_date={
+                        "year": target_state.lunar_year,
+                        "month": target_state.lunar_month,
+                        "day": target_state.lunar_day,
+                        "is_leap_month": target_state.is_leap_month,
+                    },
                 )
-                scope_record["annual_three_sha"] = annual_three_sha(target_year_branch)
-            else:
-                pass
-        else:
-            pass
+            scope_record["flowing_stars"] = flowing_horoscope_stars(
+                scope_record["palace_map"],
+                scope=scope,
+                stem=scope_record["stem"],
+                pillar_branch=pillar_branch,
+            )
+        if scope == "流年" and rule_profile == "quanshu_v2_excerpt":
+            scope_record["flowing_stars"].extend(
+                annual_text_stars(
+                    scope_record["palace_map"], year_branch=target_year_branch
+                )
+            )
+            scope_record["annual_three_sha"] = annual_three_sha(target_year_branch)
         scope_record["mutagen_natal_links"] = _link_mutagen_to_natal_stars(
             scope_record, palaces
         )
@@ -430,8 +456,29 @@ def build_ziwei_horoscope(
         scope="natal_table_reused_for_scopes_by_software_convention",
         dynamic_reuse_classically_verified=False,
     )
-    return {
+    lu_ma_branches = {
+        star["name"]: palace["ganzhi"][1]
+        for palace in palaces
+        for star in palace["stars_detail"]
+        if star["name"] in {"禄存", "天马"}
+    }
+    ruleset = ziwei_ruleset_metadata(
+        rule_profile,
+        sihua_source=sihua_source,
+        day_divide=resolved_day_divide,
+        natal_leap_month_policy=chart["ruleset"]["leap_month_rule"],
+    )
+    if "brightness_table" in chart["ruleset"]:
+        ruleset.update(
+            brightness_rule=chart["ruleset"]["brightness_rule"],
+            brightness_table=deepcopy(chart["ruleset"]["brightness_table"]),
+            unresolved=list(chart["ruleset"]["unresolved"]),
+        )
+    result: dict[str, Any] = {
         "engine": "fatebridge-offline",
+        "annual_cycles": year_branch_cycles(
+            target_year_branch, anchor_basis="target_lunar_year_branch"
+        ),
         "natal_prerequisites": horoscope_natal_prerequisites(chart),
         "nominal_age": nominal_age,
         "nominal_age_calendar": age_calendar,
@@ -440,10 +487,16 @@ def build_ziwei_horoscope(
         "ming_limit_subperiods": limit_subperiod_evidence(
             palaces, scopes, nominal_age=nominal_age
         ),
-        "calendar_rules": chart["calendar_rules"],
-        "ruleset": ziwei_ruleset_metadata(
-            rule_profile, sihua_source=sihua_source, day_divide=resolved_day_divide
+        "named_pattern_limit_evidence": limit_pattern_evidence(
+            target_lunar_year=target_state.lunar_year,
+            annual_branch=target_year_branch,
+            daxian_branch=daxian["branch"],
+            xiaoxian_branch=xiaoxian["branch"],
+            natal_lucun_branch=lu_ma_branches.get("禄存"),
+            natal_tianma_branch=lu_ma_branches.get("天马"),
         ),
+        "calendar_rules": chart["calendar_rules"],
+        "ruleset": ruleset,
         "source_comparison": limit_source_evidence(
             chart,
             scopes,
@@ -468,3 +521,18 @@ def build_ziwei_horoscope(
         },
         "scopes": scopes,
     }
+    if "calendar_basis" in chart:
+        result["calendar_basis"] = {
+            "birth": chart["calendar_basis"],
+            "target": calendar_basis(
+                target_seed,
+                placement_label=target_state.placement_label,
+                placement_context=target_state.lunar,
+                day_divide=resolved_day_divide,
+            ),
+            "nominal_age_rule": age_calendar["rule"],
+            "age_boundary_classically_verified": age_calendar[
+                "age_boundary_classically_verified"
+            ],
+        }
+    return result

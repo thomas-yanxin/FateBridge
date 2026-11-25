@@ -287,7 +287,7 @@ def audit_depth_classical(fixtures: Path = FIXTURES) -> dict[str, Any]:
         actual = {
             s["star"]: s["branch"]
             for s in annual["flowing_stars"]
-            if s["rule_id"] != "annual_lucun_yang_tuo"
+            if s["system_id"] in {"annual_virtues", "annual_four_flying_stars"}
         }
         check(f"annual/{branch}", actual, data["annual_by_year_branch"][branch])
         group = next(group for group in data["annual_sha_by_triad"] if branch in group)

@@ -25,13 +25,24 @@ from fatebridge.utils.timezones import (
 )
 
 
-def _minute_sensitivity(normalized: NormalizedBirthTime) -> dict[str, Any]:
+def _minute_sensitivity(
+    normalized: NormalizedBirthTime, birth_second: int | None
+) -> dict[str, Any]:
     """Two hypothetical seconds within the input minute, not guessed birth data.
 
     The base calculation keeps second zero. Re-evaluate solar correction at
     the other physical instant; do not add a frozen EOT across the minute.
     This is an endpoint comparison, not an uncertainty bound or a posterior.
     """
+    if birth_second is not None:
+        return {
+            "method_id": "ziwei_input_minute_endpoint_sensitivity_v1",
+            "clock_stage": "after_normalization_before_day_divide",
+            "assumption": "birth_second_supplied_no_hypothetical_minute_endpoints",
+            "birth_seconds_supplied": True,
+            "base_second": birth_second,
+            "observed_birth_precision_certified": False,
+        }
     start = normalized.corrected_datetime.replace(tzinfo=None)
     civil = normalized.input_datetime
     zone = parse_timezone_name(normalized.timezone)
@@ -66,6 +77,7 @@ def _minute_sensitivity(normalized: NormalizedBirthTime) -> dict[str, Any]:
     hours = [branches[((label.hour + 1) // 2) % 12] for label in placement]
     return dict(
         method_id="ziwei_input_minute_endpoint_sensitivity_v1",
+        clock_stage="after_normalization_before_day_divide",
         assumption=(
             "hypothetical_seconds_0_and_59_999999_within_the_given_civil_minute"
             if has_endpoint
@@ -146,8 +158,9 @@ def birth_clock_receipt(
             ).total_seconds(),
             6,
         ),
-        seconds_are_derived_not_birth_accuracy=True,
-        minute_sensitivity=_minute_sensitivity(normalized),
+        seconds_are_derived_not_birth_accuracy=person.birth_second is None
+        or normalized.applied,
+        minute_sensitivity=_minute_sensitivity(normalized, person.birth_second),
         advisories=advisories,
         precision_scope="conditional_on_resolved_inputs_not_verified_birthplace_or_historical_clock",
         source_basis={
@@ -168,12 +181,15 @@ def lunar_year_ganzhi(lunar_year: int) -> tuple[str, str]:
 
 @dataclass(frozen=True, kw_only=True)
 class ZiweiClockState:
+    placement_label: NominalClockLabel
+    lunar: dict[str, object]
     lunar_year: int
     lunar_month: int
     lunar_day: int
     is_leap_month: bool
     hour_branch: str
     day_stem: str
+    day_branch: str
     hour_stem: str
     is_late_zi: bool
 
@@ -181,56 +197,58 @@ class ZiweiClockState:
 def resolve_ziwei_clock_state(
     seed: MetaphysicsSeed, day_divide: ZiweiDayDivide, *, technique: str
 ) -> ZiweiClockState:
-    """Resolve consistent lunar date and day/hour stems under the selected late-zi split."""
+    """Resolve the placement label, lunar date and day/hour pillars together."""
+    placement_label = seed.clock
     year, month, day = seed.clock.date_parts
     hour = seed.clock.time_parts[0]
     is_late_zi = hour >= LATE_ZI_HOUR
-    if is_late_zi:
-        should_roll_over = day_divide == "forward"
-        if should_roll_over:
-            forward_clock = NominalClockLabel(seed.clock.ordinal + 1, 0)
-            lunar = get_lunar_context(
-                forward_clock,
-                timezone_name=seed.timezone,
-                civil_datetime=seed.input_datetime,
+    rollover = is_late_zi and day_divide == "forward"
+    if rollover:
+        placement_label = NominalClockLabel(seed.clock.ordinal + 1, 0)
+        lunar = get_lunar_context(
+            placement_label,
+            timezone_name=seed.timezone,
+            civil_datetime=seed.input_datetime,
+        )
+        if lunar is None:
+            raise ValueError(
+                f"{technique}需要农历月日，无法起盘：{lunar_supported_range_message()}"
             )
-            if lunar is None:
-                raise ValueError(
-                    f"{technique}需要农历月日，无法起盘：{lunar_supported_range_message()}"
-                )
-            else:
-                pass
-            lunar_month = lunar["month"]
-            lunar_day = lunar["day"]
-            assert isinstance(lunar_month, int)
-            assert isinstance(lunar_day, int)
-        else:
-            lunar, lunar_month, lunar_day = require_lunar_month_day(seed, technique)
-        hour_branch = "子"
-        day_stem = BaZiCalendar.calculate_day_pillar(
-            year, month, day, hour=hour, apply_late_zi_rollover=should_roll_over
-        )[0]
-        hour_stem = BaZiCalendar.calculate_hour_pillar(
-            year, month, day, hour, apply_late_zi_rollover=should_roll_over
-        )[0]
+        lunar_month, lunar_day = lunar["month"], lunar["day"]
+        assert isinstance(lunar_month, int) and isinstance(lunar_day, int)
     else:
         lunar, lunar_month, lunar_day = require_lunar_month_day(seed, technique)
-        hour_branch = seed.pillars["hour"][1]
-        day_stem = seed.pillars["day"][0]
-        hour_stem = seed.pillars["hour"][0]
-    lunar_year = lunar.get("year")
-    if lunar_year is None:
-        raise ValueError(f"{technique}需要完整农历年月日，无法起盘：农历年缺失")
+    if is_late_zi:
+        day_stem, day_branch = BaZiCalendar.calculate_day_pillar(
+            year,
+            month,
+            day,
+            hour=hour,
+            apply_late_zi_rollover=rollover,
+        )
+        hour_stem, hour_branch = BaZiCalendar.calculate_hour_pillar(
+            year,
+            month,
+            day,
+            hour,
+            apply_late_zi_rollover=rollover,
+        )
     else:
-        pass
-    assert isinstance(lunar_year, (int, str))
+        day_stem, day_branch = seed.pillars["day"]
+        hour_stem, hour_branch = seed.pillars["hour"]
+    lunar_year = lunar.get("year")
+    if not isinstance(lunar_year, int):
+        raise ValueError(f"{technique}需要完整农历年月日，无法起盘：农历年缺失")
     return ZiweiClockState(
-        lunar_year=int(lunar_year),
+        placement_label=placement_label,
+        lunar=lunar,
+        lunar_year=lunar_year,
         lunar_month=lunar_month,
         lunar_day=lunar_day,
         is_leap_month=bool(lunar.get("is_leap_month")),
         hour_branch=hour_branch,
         day_stem=day_stem,
+        day_branch=day_branch,
         hour_stem=hour_stem,
         is_late_zi=is_late_zi,
     )

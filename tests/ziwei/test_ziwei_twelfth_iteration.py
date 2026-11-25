@@ -14,7 +14,7 @@ import fatebridge.api as api
 import scripts.ziwei.audit_ziwei_time_input as audit
 from fatebridge.application.examples import evidence_views
 from fatebridge.cli import run
-from fatebridge.core.ziwei.ziwei_calendar import calendar_basis
+from fatebridge.core.metaphysics.ziwei import build_ziwei_chart
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.metaphysics import (
     _build_person_seed,
@@ -205,11 +205,11 @@ def test_receipt_is_copied_and_synthetic_inputs_do_not_fabricate_provenance() ->
         create_person_info(**BIRTH, birth_place="杭州", use_true_solar_time=True)
     )
     expected = deepcopy(seed.birth_time_normalization)
-    b = calendar_basis(seed)
-    assert b["time_input"] == expected
-    b["time_input"]["advisories"].append("changed")
+    chart = build_ziwei_chart(seed, "男", include_calendar_basis=True)
+    assert chart["calendar_basis"]["time_input"] == expected
+    chart["calendar_basis"]["time_input"]["advisories"].append("changed")
     assert seed.birth_time_normalization == expected
-    assert calendar_basis(_seed(1984))["time_input"] is None
+    assert "calendar_basis" not in build_ziwei_chart(_seed(1984), "男")
 
 
 @pytest.mark.parametrize("tool", ["ziwei_birth", "ziwei_horoscope"])

@@ -112,7 +112,7 @@ def test_known_r25_bureau_chain_is_available_without_a_second_birth_run(
     assert chain["ruleset"] == {
         k: v
         for k, v in chart["ruleset"].items()
-        if k in {"id", "version", "sihua_source"}
+        if k in {"id", "version", "sihua_source", "leap_month_rule"}
     }
     decade = next(s for s in result["scopes"] if s["scope"] == "大限")
     assert result["nominal_age"] == 2

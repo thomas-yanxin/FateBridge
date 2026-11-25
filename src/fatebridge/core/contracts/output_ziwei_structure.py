@@ -23,6 +23,7 @@ from fatebridge.core.contracts.output_ziwei_palaces import (
     ZiweiStructuralEvidence,
     ZiweiSymbolicProperties,
 )
+from fatebridge.core.ziwei.ziwei_named_patterns import NatalPatternStar, PatternRecord
 
 
 class ZiweiMingEntity(PartialOutput):
@@ -181,6 +182,7 @@ class ZiweiReadingView(PartialOutput):
 
 class ZiweiCalendarRules(PartialOutput):
     late_zi: str | None = None
+    day_divide: Literal["current", "forward"] | None = None
     leap_month: str | None = None
     year_boundary: str | None = None
     effective_birth_month: int | None = None
@@ -306,6 +308,54 @@ class ZiweiStructuralConditions(PartialOutput):
     real_world_efficacy: str | None = None
 
 
+class ZiweiPalaceSihuaOccurrence(PartialOutput):
+    palace_name: str
+    branch: str
+    calculation_path: str
+
+
+class ZiweiPalaceSihuaOrigin(PartialOutput):
+    source_palace: str
+    source_stem: str
+    source_branch: str
+    self_transformation: bool | None = Field(
+        description=(
+            "True when any target occurrence is in the source palace, false when "
+            "all located targets are elsewhere, and null when no target is located."
+        )
+    )
+
+
+class ZiweiPalaceSihuaGroup(PartialOutput):
+    transformation: Literal["化禄", "化权", "化科", "化忌"]
+    target_star: str
+    target_occurrences: list[ZiweiPalaceSihuaOccurrence] = Field(
+        description="Natal placements in chart order. Empty when unlocated."
+    )
+    origins: list[ZiweiPalaceSihuaOrigin] = Field(min_length=1)
+
+
+class ZiweiPalaceSihuaRelations(PartialOutput):
+    policy: Literal["selected_natal_table_reused_for_palace_stems"] | None = None
+    sihua_rule: str | None = None
+    groups: list[ZiweiPalaceSihuaGroup] | None = None
+
+
+class ZiweiChangQuFlank(PartialOutput):
+    ming_branch: str | None = None
+    adjacent_branches: list[str] | None = None
+    matched: bool | None = None
+
+
+class ZiweiNamedPatternEvidence(PartialOutput):
+    method_id: str | None = None
+    version: str | None = None
+    source: str | None = None
+    records: list[PatternRecord] | None = None
+    stars: list[NatalPatternStar] | None = None
+    chang_qu_flank: ZiweiChangQuFlank | None = None
+
+
 class ZiweiBirth(PartialOutput):
     engine: Annotated[str | None, FULL_FACT] = None
     calendar_basis: Annotated[ZiweiCalendarBasis | None, FULL_FACT] = None
@@ -316,11 +366,13 @@ class ZiweiBirth(PartialOutput):
     symbolic_properties: ZiweiSymbolicProperties | None = None
     ming_textual_properties: ZiweiMingProperties | None = None
     ming_structural_conditions: ZiweiStructuralConditions | None = None
+    named_patterns: ZiweiNamedPatternEvidence | None = None
     sihua_source_comparison: ZiweiSihuaSourceComparison | None = None
+    palace_sihua_relations: ZiweiPalaceSihuaRelations | None = None
     auxiliary_placement_sources: ZiweiAuxPlacementSources | None = None
     void_systems: ZiweiVoidSystems | None = None
     chart_masters: ZiweiChartMasters | None = None
-    calendar_cycles: ZiweiCycleRules | None = None
+    calendar_cycles: Annotated[ZiweiCycleRules | None, FULL_FACT] = None
     cycle_source_comparison: ZiweiCycleSourceComparison | None = None
     daxian_direction: str | None = None
     hour_branch: str | None = None

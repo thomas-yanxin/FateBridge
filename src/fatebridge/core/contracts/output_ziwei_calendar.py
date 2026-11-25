@@ -10,14 +10,19 @@ from fatebridge.core.contracts.output_chinese_calendar import LunarDate
 
 class ZiweiMinuteSensitivity(PartialOutput):
     method_id: str | None = None
+    clock_stage: Literal["after_normalization_before_day_divide"] | None = None
     assumption: str | None = None
     birth_seconds_supplied: bool | None = None
     base_second: int | None = None
     endpoint_seconds: list[float] | None = None
-    endpoint_placement_datetimes: list[str] | None = None
+    endpoint_placement_datetimes: list[str] | None = Field(
+        default=None, description="校时后、晚子分日前的钟面端点。"
+    )
     endpoint_hour_branches: list[str] | None = None
     crosses_hour_branch: bool | None = None
-    crosses_placement_date: bool | None = None
+    crosses_placement_date: bool | None = Field(
+        default=None, description="校时后、晚子分日前的钟面日期是否跨午夜。"
+    )
     endpoints_are_alternative_birth_facts: bool | None = None
     observed_birth_precision_certified: bool | None = None
     scope: str | None = None
@@ -98,7 +103,11 @@ class ZiweiCalendarBasis(PartialOutput):
     placement_clock: str | None = None
     placement_datetime: str | None = None
     civil_datetime: str | None = None
+    civil_instant_utc: str | None = None
+    apparent_solar_datetime: str | None = None
     timezone: str | None = None
+    day_divide: Literal["current", "forward"] | None = None
+    late_zi_rollover_applied: bool | None = None
     date_shift_days: int | None = None
     placement_lunar_date: LunarDate | None = None
     civil_date_lunar_date: LunarDate | None = None

@@ -1,43 +1,47 @@
-"""
-Static lookup tables ported from iztro (紫微斗数), kept separate from the
-placement logic in ``metaphysics.py`` so the transcribed data is auditable.
-
-Source of truth: iztro ``src/data/stars.ts`` -> ``STARS_INFO[*].brightness``.
-Each brightness row is ordered "从寅开始" (starting at 寅), which is exactly
-``fatebridge.utils.data.ZIWEI_BRANCH_SEQUENCE`` order, so no index translation
-is needed.
-Romanization map applied: miao=庙, wang=旺, de=得, li=利, ping=平, bu=不,
-xian=陷; iztro's empty string '' (brightness not applicable at that branch)
-becomes ``None`` here.
-
-Default-profile coverage boundary (亮度覆盖边界) — iztro ``stars.ts``:
-iztro defines a ``brightness`` array for **exactly 20 stars** — the 14 主星
-plus 文昌、文曲、火星、铃星、擎羊(iztro 别名 ``qingyangMin``)、陀罗。
-**所有其它星曜（天钺、天魁、左辅、右弼、禄存、天马、天刑、天姚等乙/丙级
-辅曜杂耀）在 iztro 中没有亮度数组**，因此 ``lookup_star_brightness`` 对它们
-返回 ``None`` 是**契约设计，而非数据缺漏**。换言之"天刑陷""天钺旺"这类判断
-不属于默认软件口径（也不属于 iztro）的亮度体系。覆盖集合由
-``tests/ziwei/test_ziwei_brightness_crosscheck.py`` 锁定，防止移植回归。
-
-``quanshu_v2_excerpt`` explicitly selects the pinned transcription's palace
-table instead. Its 240 published cells include 禄存 at eight branches; it is
-not a claim that the table and every prose passage in that volume agree.
-"""
+"""Independent, source-specific natal star brightness tables."""
 
 from __future__ import annotations
 
 import json
-from functools import lru_cache
+from copy import deepcopy
+from dataclasses import dataclass
+from functools import cache
 from importlib.resources import files
-from typing import Dict, List, Optional, Tuple, cast
+from typing import Dict, List, Literal, Optional, Tuple, TypedDict
 
 from fatebridge.core.ziwei.ziwei_rulesets import (
     DEFAULT_ZIWEI_PROFILE,
+    IZTRO_SOURCE,
+    QUANSHU_BRIGHTNESS_CONFLICT,
     validate_rule_profile,
 )
-from fatebridge.utils.data import ZIWEI_BRANCH_SEQUENCE
+from fatebridge.utils.data import EARTHLY_BRANCHES, ZIWEI_BRANCH_SEQUENCE
+from fatebridge.utils.errors import ParameterError
 
-_BRANCH_INDEX = {branch: i for i, branch in enumerate(ZIWEI_BRANCH_SEQUENCE)}
+ZiweiBrightnessSource = Literal[
+    "rule_profile",
+    "iztro_2_5_8",
+    "quanshu_v2_selected_table",
+    "ziwei_doushu_qs",
+    "ziwei_doushu_xd1",
+    "ziwei_doushu_zz",
+    "ziwei_doushu_xd2",
+]
+BRIGHTNESS_SOURCE_DESCRIPTION = (
+    "本命庙旺表。rule_profile（默认）沿用基础盘式。iztro_2_5_8 取软件原表，"
+    "quanshu_v2_selected_table 取《紫微斗数全书》卷二转录的十二宫表。"
+    "ziwei_doushu_qs、ziwei_doushu_xd1、ziwei_doushu_zz、ziwei_doushu_xd2 "
+    "取 Renhuai123/ziwei-doushu 固定版本软件对照表。空格为 null，不跨表补值。"
+    "安星、历法、四化及运限起法仍按各自规则。"
+)
+_SEVEN_GRADES = tuple("庙旺得利平不陷")
+_FIVE_GRADES = tuple("庙旺平闲陷")
+_COMPATIBILITY_VARIANTS = {
+    "ziwei_doushu_qs": "QS",
+    "ziwei_doushu_xd1": "XD1",
+    "ziwei_doushu_zz": "ZZ",
+    "ziwei_doushu_xd2": "XD2",
+}
 
 _MUTAGEN_SUFFIXES: Tuple[str, ...] = ("化禄", "化权", "化科", "化忌")
 
@@ -68,41 +72,156 @@ ZIWEI_STAR_BRIGHTNESS: Dict[str, List[Optional[str]]] = {
 }
 
 
-@lru_cache(maxsize=1)
-def _quanshu_brightness() -> Dict[str, List[Optional[str]]]:
-    data = json.loads(
+class _BrightnessMetadata(TypedDict):
+    id: str
+    source_kind: str
+    source_url: str
+    version: str
+    branch_order: List[str]
+    grade_scale: List[str]
+    aliases: Dict[str, str]
+    blank_meaning: str
+
+
+@dataclass(frozen=True)
+class ZiweiBrightnessTable:
+    _metadata: _BrightnessMetadata
+    _branch_index: Dict[str, int]
+    _rows: Dict[str, List[Optional[str]]]
+
+    @property
+    def id(self) -> str:
+        return self._metadata["id"]
+
+    def lookup(self, star: str, branch: str) -> Optional[str]:
+        row = self._rows.get(self._metadata["aliases"].get(star, star))
+        index = self._branch_index.get(branch)
+        return row[index] if row is not None and index is not None else None
+
+    def ruleset_fields(self, unresolved: List[str]) -> Dict[str, object]:
+        return {
+            "brightness_rule": self.id,
+            "brightness_table": deepcopy(self._metadata),
+            "unresolved": [
+                note
+                for note in unresolved
+                if note != QUANSHU_BRIGHTNESS_CONFLICT
+                or self.id == "quanshu_v2_selected_table"
+            ],
+        }
+
+
+class _QuanshuBrightness(TypedDict):
+    source: str
+    branch_order: List[str]
+    brightness: Dict[str, List[Optional[str]]]
+
+
+class _CompatibilityBrightness(TypedDict):
+    source: str
+    revision: str
+    branch_order: List[str]
+    name_aliases: Dict[str, str]
+    tables: Dict[str, Dict[str, List[Optional[str]]]]
+
+
+@cache
+def _compatibility_brightness() -> _CompatibilityBrightness:
+    data: _CompatibilityBrightness = json.loads(
         files("fatebridge")
-        .joinpath("data/classical/ziwei-quanshu-v2-table.json")
+        .joinpath("data/classical/ziwei-doushu-brightness.json")
         .read_text(encoding="utf-8")
     )
-    if data["branch_order"] != list(ZIWEI_BRANCH_SEQUENCE):
-        raise ValueError("紫微原典亮度表地支序不匹配")
+    return data
+
+
+@cache
+def _brightness_table(table_id: str) -> ZiweiBrightnessTable:
+    grades = _SEVEN_GRADES
+    expected_branches = ZIWEI_BRANCH_SEQUENCE
+    if table_id == "iztro_2_5_8":
+        rows = ZIWEI_STAR_BRIGHTNESS
+        branches = list(ZIWEI_BRANCH_SEQUENCE)
+        source_kind = "software_implementation"
+        source_url = f"{IZTRO_SOURCE.replace('/tree/', '/blob/')}/src/data/stars.ts"
+        version = "2.5.8"
+        aliases = {"qingyangMin": "擎羊"}
+    elif table_id == "quanshu_v2_selected_table":
+        classical: _QuanshuBrightness = json.loads(
+            files("fatebridge")
+            .joinpath("data/classical/ziwei-quanshu-v2-table.json")
+            .read_text(encoding="utf-8")
+        )
+        rows = classical["brightness"]
+        branches = classical["branch_order"]
+        source_kind = "classical_transcription"
+        source_url = classical["source"]
+        version = "oldid=1963110"
+        aliases = {}
     else:
-        pass
-    return cast(Dict[str, List[Optional[str]]], data["brightness"])
+        variant = _COMPATIBILITY_VARIANTS.get(table_id)
+        if variant is None:
+            raise ParameterError(
+                f"不支持的紫微庙旺表：{table_id!r}",
+                [
+                    {
+                        "path": "brightness_source",
+                        "code": "unsupported_brightness_source",
+                    }
+                ],
+            )
+        compatibility = _compatibility_brightness()
+        rows = compatibility["tables"][variant]
+        branches = compatibility["branch_order"]
+        expected_branches = EARTHLY_BRANCHES
+        source_kind = "software_compatibility"
+        source_url = compatibility["source"]
+        version = compatibility["revision"]
+        aliases = compatibility["name_aliases"]
+        if variant in {"ZZ", "XD2"}:
+            grades = _FIVE_GRADES
+    if branches != expected_branches or any(
+        len(row) != len(branches) for row in rows.values()
+    ):
+        raise ValueError(f"紫微庙旺表地支序或行宽错误：{table_id}")
+    return ZiweiBrightnessTable(
+        _metadata={
+            "id": table_id,
+            "source_kind": source_kind,
+            "source_url": source_url,
+            "version": version,
+            "branch_order": branches,
+            "grade_scale": list(grades),
+            "aliases": aliases,
+            "blank_meaning": "no_grade_recorded_for_star_and_branch_in_selected_table",
+        },
+        _branch_index={branch: index for index, branch in enumerate(branches)},
+        _rows=rows,
+    )
+
+
+def brightness_table_for(
+    rule_profile: str, brightness_source: ZiweiBrightnessSource
+) -> ZiweiBrightnessTable:
+    if brightness_source == "rule_profile":
+        return _brightness_table(
+            "quanshu_v2_selected_table"
+            if rule_profile == "quanshu_v2_excerpt"
+            else "iztro_2_5_8"
+        )
+    return _brightness_table(brightness_source)
 
 
 def lookup_star_brightness(
-    star: str, branch: str, *, rule_profile: str = DEFAULT_ZIWEI_PROFILE
+    star: str,
+    branch: str,
+    *,
+    rule_profile: str = DEFAULT_ZIWEI_PROFILE,
+    brightness_source: ZiweiBrightnessSource = "rule_profile",
 ) -> Optional[str]:
-    """Return the brightness char for ``star`` at earthly ``branch``.
-
-    Returns ``None`` when the star has no brightness, the branch is unknown,
-    or the branch is one where the star's brightness is not applicable.
-    """
+    """Return the selected table's literal label, or None with no recorded cell."""
     validate_rule_profile(rule_profile)
-    table = (
-        _quanshu_brightness()
-        if rule_profile == "quanshu_v2_excerpt"
-        else ZIWEI_STAR_BRIGHTNESS
-    )
-    row = table.get(star)
-    idx = _BRANCH_INDEX.get(branch)
-    if row is None or idx is None:
-        return None
-    else:
-        pass
-    return row[idx]
+    return brightness_table_for(rule_profile, brightness_source).lookup(star, branch)
 
 
 def split_star_mutagen(star_label: str) -> Tuple[str, Optional[str]]:
@@ -113,6 +232,4 @@ def split_star_mutagen(star_label: str) -> Tuple[str, Optional[str]]:
     for suffix in _MUTAGEN_SUFFIXES:
         if star_label.endswith(suffix):
             return star_label[: -len(suffix)], suffix
-        else:
-            pass
     return star_label, None
