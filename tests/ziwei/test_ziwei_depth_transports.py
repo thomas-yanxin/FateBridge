@@ -134,7 +134,19 @@ def test_profiles_and_evidence_match_all_public_surfaces(
         assert horoscope["interpretation_scope"]["scope_palace_map_supported"]
         annual = next(s for s in horoscope["scopes"] if s["scope"] == "流年")
         assert len(annual["palace_map"]) == 12
-        expected = {"禄存", "擎羊", "陀罗"}
+        expected = {
+            "禄存",
+            "擎羊",
+            "陀罗",
+            "天魁",
+            "天钺",
+            "文昌",
+            "文曲",
+            "天马",
+            "红鸾",
+            "天喜",
+            "年解",
+        }
         if profile == "quanshu_v2_excerpt":
             expected |= {"天德", "月德", "丧门", "吊客", "白虎", "官府"}
         else:

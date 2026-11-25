@@ -52,13 +52,14 @@ from fatebridge.core.metaphysics.ziwei import (
     build_ziwei_rules,
 )
 from fatebridge.core.ziwei.ziwei_calendar import (
-    calendar_basis,
     context_basis,
 )
 from fatebridge.core.ziwei.ziwei_rulesets import (
     DEFAULT_ZIWEI_DAY_DIVIDE,
     DEFAULT_ZIWEI_PROFILE,
+    ZiweiNatalLeapMonthPolicy,
 )
+from fatebridge.core.ziwei.ziwei_tables import ZiweiBrightnessSource
 from fatebridge.core.ziwei.ziwei_time_input import birth_clock_receipt
 from fatebridge.services.jinkou_snapshot import (
     build_jinkou_snapshot_text as _build_jinkou_snapshot_text,
@@ -152,10 +153,13 @@ def calculate_ziwei_birth(
     person: PersonInfo,
     *,
     selected_sections: list[str] | None = None,
+    render_snapshot: bool = True,
     rule_profile: str = DEFAULT_ZIWEI_PROFILE,
     sihua_source: str = "rule_profile",
+    brightness_source: ZiweiBrightnessSource = "rule_profile",
     day_divide: str = DEFAULT_ZIWEI_DAY_DIVIDE,
     birth_utc_offset: str | None = None,
+    natal_leap_month_policy: ZiweiNatalLeapMonthPolicy | None = None,
 ) -> dict[str, Any]:
     seed = _build_person_seed(person, birth_utc_offset=birth_utc_offset)
     ziwei_birth = build_ziwei_chart(
@@ -163,17 +167,13 @@ def calculate_ziwei_birth(
         person.gender or "未知",
         rule_profile=rule_profile,
         sihua_source=sihua_source,
+        brightness_source=brightness_source,
         day_divide=day_divide,
+        natal_leap_month_policy=natal_leap_month_policy,
+        include_calendar_basis=True,
     )
     ziwei_birth["engine"] = "fatebridge-offline"
-    ziwei_birth["calendar_basis"] = calendar_basis(seed)
-    snapshot_text = build_ziwei_snapshot_text(seed=seed, ziwei_birth=ziwei_birth)
-    snapshot_export = _build_snapshot_export(
-        technique="ziwei",
-        snapshot_text=snapshot_text,
-        selected_sections=selected_sections,
-    )
-    return {
+    result: dict[str, Any] = {
         "analysis_type": "紫微斗数命盘",
         "person_info": {
             "name": person.name or "未提供",
@@ -196,9 +196,16 @@ def calculate_ziwei_birth(
         "four_pillars": create_pillar_dict(seed.pillars),
         "calendar_context": seed.calendar_context,
         "ziwei_birth": ziwei_birth,
-        "snapshot_text": snapshot_text,
-        "snapshot_export": snapshot_export,
     }
+    if render_snapshot or selected_sections:
+        snapshot_text = build_ziwei_snapshot_text(seed=seed, ziwei_birth=ziwei_birth)
+        snapshot_export = _build_snapshot_export(
+            technique="ziwei",
+            snapshot_text=snapshot_text,
+            selected_sections=selected_sections,
+        )
+        result.update(snapshot_text=snapshot_text, snapshot_export=snapshot_export)
+    return result
 
 
 @calculation_guard("紫微斗数运限")
@@ -213,11 +220,14 @@ def calculate_ziwei_horoscope(
     target_timezone: str = "Asia/Shanghai",
     target_utc_offset: str | None = None,
     birth_utc_offset: str | None = None,
+    natal_leap_month_policy: ZiweiNatalLeapMonthPolicy | None = None,
     rule_profile: str = DEFAULT_ZIWEI_PROFILE,
     sihua_source: str = "rule_profile",
+    brightness_source: ZiweiBrightnessSource = "rule_profile",
     day_divide: str = DEFAULT_ZIWEI_DAY_DIVIDE,
     nominal_age_basis: str = "birth_civil_timezone",
     selected_sections: list[str] | None = None,
+    render_snapshot: bool = True,
 ) -> dict[str, Any]:
     seed = _build_person_seed(person, birth_utc_offset=birth_utc_offset)
     chart = build_ziwei_chart(
@@ -225,7 +235,10 @@ def calculate_ziwei_horoscope(
         person.gender or "未知",
         rule_profile=rule_profile,
         sihua_source=sihua_source,
+        brightness_source=brightness_source,
         day_divide=day_divide,
+        natal_leap_month_policy=natal_leap_month_policy,
+        include_calendar_basis=True,
     )
     target_seed = build_analysis_seed(
         analysis_year=target_year,
@@ -238,14 +251,6 @@ def calculate_ziwei_horoscope(
         timezone_field="target_timezone",
         utc_offset_field="target_utc_offset",
     )
-    # Compare actual civil instants, not corrected apparent-solar labels or
-    # just lunar years; same-year targets can still precede birth.
-    if utc_ordering_key(target_seed.input_datetime) < utc_ordering_key(
-        seed.input_datetime
-    ):
-        raise ValueError("紫微运限目标时刻早于出生时刻")
-    else:
-        pass
     horoscope = build_ziwei_horoscope(
         chart=chart,
         gender=person.gender or "未知",
@@ -254,23 +259,7 @@ def calculate_ziwei_horoscope(
         nominal_age_basis=nominal_age_basis,
         day_divide=day_divide,
     )
-    horoscope["calendar_basis"] = {
-        "birth": calendar_basis(seed),
-        "target": calendar_basis(target_seed),
-        "nominal_age_rule": horoscope["nominal_age_calendar"]["rule"],
-        "age_boundary_classically_verified": False,
-    }
-    # engine 已由 build_ziwei_horoscope 标记，无需在此重复盖章
-    # （与 calculate_ziwei_birth 不同：build_ziwei_chart 不自带 engine）。
-    snapshot_text = build_ziwei_horoscope_snapshot_text(
-        seed=seed, target_seed=target_seed, horoscope=horoscope
-    )
-    snapshot_export = _build_snapshot_export(
-        technique="ziwei_horoscope",
-        snapshot_text=snapshot_text,
-        selected_sections=selected_sections,
-    )
-    return {
+    result: dict[str, Any] = {
         "analysis_type": "紫微斗数运限",
         "person_info": {
             "name": person.name or "未提供",
@@ -307,9 +296,18 @@ def calculate_ziwei_horoscope(
             "analysis_minute": target_seed.clock.time_parts[1],
         },
         "ziwei_horoscope": horoscope,
-        "snapshot_text": snapshot_text,
-        "snapshot_export": snapshot_export,
     }
+    if render_snapshot or selected_sections:
+        snapshot_text = build_ziwei_horoscope_snapshot_text(
+            target_seed=target_seed, horoscope=horoscope
+        )
+        snapshot_export = _build_snapshot_export(
+            technique="ziwei_horoscope",
+            snapshot_text=snapshot_text,
+            selected_sections=selected_sections,
+        )
+        result.update(snapshot_text=snapshot_text, snapshot_export=snapshot_export)
+    return result
 
 
 @calculation_guard("紫微规则库")
@@ -317,8 +315,10 @@ def calculate_ziwei_rules(
     year_stem: str | None = None,
     *,
     selected_sections: list[str] | None = None,
+    render_snapshot: bool = True,
     rule_profile: str = DEFAULT_ZIWEI_PROFILE,
     sihua_source: str = "rule_profile",
+    brightness_source: ZiweiBrightnessSource = "rule_profile",
     day_divide: str = DEFAULT_ZIWEI_DAY_DIVIDE,
 ) -> dict[str, Any]:
     if year_stem is not None and year_stem not in set(GAN):
@@ -329,21 +329,23 @@ def calculate_ziwei_rules(
         year_stem,
         rule_profile=rule_profile,
         sihua_source=sihua_source,
+        brightness_source=brightness_source,
         day_divide=day_divide,
     )
     payload["engine"] = "fatebridge-offline"
-    snapshot_text = build_ziwei_rules_snapshot_text(payload)
-    snapshot_export = _build_snapshot_export(
-        technique="ziwei_rules",
-        snapshot_text=snapshot_text,
-        selected_sections=selected_sections,
-    )
-    return {
+    result: dict[str, Any] = {
         "analysis_type": "紫微规则库",
         **payload,
-        "snapshot_text": snapshot_text,
-        "snapshot_export": snapshot_export,
     }
+    if render_snapshot or selected_sections:
+        snapshot_text = build_ziwei_rules_snapshot_text(payload)
+        snapshot_export = _build_snapshot_export(
+            technique="ziwei_rules",
+            snapshot_text=snapshot_text,
+            selected_sections=selected_sections,
+        )
+        result.update(snapshot_text=snapshot_text, snapshot_export=snapshot_export)
+    return result
 
 
 @calculation_guard("大六壬起课")

@@ -69,7 +69,11 @@ def test_missing_lunar_year_cannot_use_different_lichun_year(
     )
     assert seed.calendar_context["lunar_calendar"]["year"] == lunar_year
     assert seed.pillars["year"] == bazi_year_pillar
-    assert build_ziwei_chart(seed, "男")["ming_gong"]["ganzhi"] == expected_ming
+    chart = build_ziwei_chart(seed, "男")
+    assert chart["ming_gong"]["ganzhi"] == expected_ming
+    cycles = chart["calendar_cycles"]["year_branch_cycles"]
+    assert cycles["year_branch"] == {2001: "巳", 1995: "亥"}[lunar_year]
+    assert cycles["suiqian"]["start_branch"] == cycles["year_branch"]
 
     incomplete_context = deepcopy(seed.calendar_context)
     del incomplete_context["lunar_calendar"]["year"]

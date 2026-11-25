@@ -1,8 +1,12 @@
 """Ziwei horoscope and limit output contracts."""
 
-from typing import Literal
+from typing import Annotated, Literal
 
-from fatebridge.core.contracts.output_base import OpenJsonValue, PartialOutput
+from fatebridge.core.contracts.output_base import (
+    FULL_FACT,
+    OpenJsonValue,
+    PartialOutput,
+)
 from fatebridge.core.contracts.output_chinese_calendar import LunarDate
 from fatebridge.core.contracts.output_ziwei_calendar import ZiweiHoroscopeCalendarBasis
 from fatebridge.core.contracts.output_ziwei_palaces import (
@@ -13,10 +17,17 @@ from fatebridge.core.contracts.output_ziwei_palaces import (
     ZiweiRuleTrace,
     ZiweiSihuaSourceComparison,
     ZiweiStar,
+    ZiweiYearBranchCycles,
 )
 from fatebridge.core.contracts.output_ziwei_structure import (
     WuxingJu,
     ZiweiCalendarRules,
+)
+from fatebridge.core.ziwei.ziwei_named_patterns import (
+    LimitPatternIndex,
+    PatternRecord,
+    PatternRule,
+    PatternSource,
 )
 
 
@@ -41,6 +52,23 @@ class ZiweiScopePalace(PartialOutput):
     natal_stars_detail: list[ZiweiStar] | None = None
 
 
+class ZiweiFlowingStarBasis(PartialOutput):
+    stem: str | None = None
+    branch: str | None = None
+    branch_origin: (
+        Literal[
+            "decadal_palace",
+            "target_lunar_year_pillar",
+            "target_effective_lunar_month_pillar",
+            "target_day_pillar",
+            "target_hour_pillar",
+        ]
+        | None
+    ) = None
+    effective_lunar_month: int | None = None
+    lunar_date: LunarDate | None = None
+
+
 class ZiweiScope(PartialOutput):
     scope: str | None = None
     status: str | None = None
@@ -57,6 +85,7 @@ class ZiweiScope(PartialOutput):
     mutagen_natal_links: list[ZiweiMutagenNatalLink] | None = None
     palace_map: list[ZiweiScopePalace] | None = None
     stem_origin: str | None = None
+    flowing_star_basis: ZiweiFlowingStarBasis | None = None
     flowing_stars: list[ZiweiFlowingStar] | None = None
     annual_three_sha: ZiweiAnnualThreeSha | None = None
 
@@ -224,7 +253,20 @@ class ZiweiHoroscopeNatalPrerequisites(PartialOutput):
     classical_birth_year_boundary_verified: Literal[False] | None = None
 
 
+class ZiweiLimitPatternEvidence(PartialOutput):
+    method_id: str | None = None
+    version: str | None = None
+    source: str | None = None
+    records: list[PatternRecord] | None = None
+    target_lunar_year: int | None = None
+    annual_branch: str | None = None
+    natal_lucun_branch: str | None = None
+    natal_tianma_branch: str | None = None
+    limit_indices: list[LimitPatternIndex] | None = None
+
+
 class ZiweiHoroscope(PartialOutput):
+    annual_cycles: Annotated[ZiweiYearBranchCycles | None, FULL_FACT] = None
     natal_prerequisites: ZiweiHoroscopeNatalPrerequisites | None = None
     sihua_source_comparison: ZiweiSihuaSourceComparison | None = None
     engine: str | None = None
@@ -236,6 +278,7 @@ class ZiweiHoroscope(PartialOutput):
     nominal_age_calendar: ZiweiNominalAgeCalendar | None = None
     childhood_limit: ZiweiChildhoodLimit | None = None
     ming_limit_subperiods: ZiweiLimitSubperiods | None = None
+    named_pattern_limit_evidence: ZiweiLimitPatternEvidence | None = None
     interpretation_scope: ZiweiInterpretationScope | None = None
     scopes: list[ZiweiScope] | None = None
 
@@ -245,7 +288,16 @@ class ZiweiFocusedRules(PartialOutput):
     year_stem: str | None = None
 
 
+class ZiweiNamedPatternCatalogue(PartialOutput):
+    id: str | None = None
+    version: str | None = None
+    sources: list[PatternSource] | None = None
+    notes: list[str] | None = None
+    rules: list[PatternRule] | None = None
+
+
 class ZiweiRuleCatalogue(PartialOutput):
+    named_patterns: ZiweiNamedPatternCatalogue | None = None
     ming_gong_method: str | None = None
     shen_gong_method: str | None = None
     palace_sequence: list[str] | None = None

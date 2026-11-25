@@ -131,6 +131,10 @@ def test_annual_virtues_and_flying_stars_are_not_natal_or_boshi_stars() -> None:
     assert target["白虎"]["branch"] == "卯"
     assert target["官府"]["branch"] == "亥"
     assert target["官府"]["system_id"] == "annual_four_flying_stars"
+    assert target["年解"]["branch"] == "卯"
+    assert target["年解"]["basis_branch"] == "未"
+    assert target["年解"]["system_id"] == "iztro_2_5_8_horoscope"
+    assert len(target) == len(annual["flowing_stars"]) == 17
     assert all(
         s["scope"] == "流年" and not s["natal_stars_relocated"] for s in target.values()
     )

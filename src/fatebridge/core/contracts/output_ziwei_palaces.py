@@ -1,6 +1,14 @@
 """Ziwei palaces, stars and source evidence."""
 
-from fatebridge.core.contracts.output_base import OpenJsonValue, PartialOutput
+from typing import Annotated, Literal
+
+from pydantic import Field
+
+from fatebridge.core.contracts.output_base import (
+    FULL_FACT,
+    OpenJsonValue,
+    PartialOutput,
+)
 from fatebridge.core.contracts.output_chinese_calendar import BranchName
 
 
@@ -11,7 +19,13 @@ class ZiweiPosition(BranchName):
 class ZiweiStar(PartialOutput):
     name: str | None = None
     label: str | None = None
-    brightness: str | None = None
+    brightness: str | None = Field(
+        default=None, description="庙旺表原档位。null 表示所选表未给该星该支定档。"
+    )
+    brightness_source: str | None = Field(
+        default=None,
+        description="显式选用的庙旺表 ID，与 ruleset.brightness_table.id 对应。",
+    )
     mutagen: str | None = None
 
 
@@ -66,6 +80,17 @@ class ZiweiSihuaSourceComparison(PartialOutput):
     differences: list[ZiweiSihuaSourceDifference] | None = None
 
 
+class ZiweiBrightnessTableReceipt(PartialOutput):
+    id: str | None = None
+    source_kind: str | None = None
+    source_url: str | None = None
+    version: str | None = None
+    branch_order: list[str] | None = None
+    grade_scale: list[str] | None = None
+    aliases: dict[str, str] | None = None
+    blank_meaning: str | None = None
+
+
 class ZiweiRuleset(PartialOutput):
     sihua_source: str | None = None
     sihua_source_url: str | None = None
@@ -75,11 +100,15 @@ class ZiweiRuleset(PartialOutput):
     classical_source: str | None = None
     source_kind: str | None = None
     overrides: list[str] | None = None
-    leap_month_rule: str | None = None
+    day_divide: Literal["current", "forward"] | None = None
+    leap_month_rule: (
+        Literal["split_at_day_15", "all_current_month", "all_next_month"] | None
+    ) = None
     sihua_rule: str | None = None
     target_leap_month_rule: str | None = None
     dynamic_sihua_rule: str | None = None
     brightness_rule: str | None = None
+    brightness_table: ZiweiBrightnessTableReceipt | None = None
     classical_conformance: str | None = None
     unresolved: list[str] | None = None
     real_world_efficacy: str | None = None
@@ -90,6 +119,33 @@ class ZiweiRuleTrace(PartialOutput):
     source: str | None = None
     inputs: dict[str, OpenJsonValue] | None = None
     outputs: dict[str, OpenJsonValue] | None = None
+
+
+class ZiweiYearCyclePosition(PartialOutput):
+    name: str
+    branch: str
+
+
+class ZiweiYearCycle(PartialOutput):
+    system_id: Annotated[str | None, FULL_FACT] = None
+    start_branch: Annotated[str | None, FULL_FACT] = None
+    positions: Annotated[list[ZiweiYearCyclePosition] | None, FULL_FACT] = Field(
+        default=None,
+        min_length=12,
+        max_length=12,
+        json_schema_extra={"x-fatebridge-full-result-unique-by": "branch"},
+    )
+
+
+class ZiweiYearBranchCycles(PartialOutput):
+    anchor_basis: Annotated[
+        Literal["natal_lunar_year_branch", "target_lunar_year_branch"] | None, FULL_FACT
+    ] = None
+    year_branch: Annotated[str | None, FULL_FACT] = None
+    direction: Annotated[Literal["forward"] | None, FULL_FACT] = None
+    source: Annotated[str | None, FULL_FACT] = None
+    suiqian: Annotated[ZiweiYearCycle | None, FULL_FACT] = None
+    jiangqian: Annotated[ZiweiYearCycle | None, FULL_FACT] = None
 
 
 class ZiweiCycleRules(PartialOutput):
@@ -106,6 +162,7 @@ class ZiweiCycleRules(PartialOutput):
     naming_note: str | None = None
     missing_gender_resolution: str | None = None
     gender_invariant_positions: dict[str, dict[str, str]] | None = None
+    year_branch_cycles: Annotated[ZiweiYearBranchCycles | None, FULL_FACT] = None
 
 
 class ZiweiCycleSourceHeader(PartialOutput):
@@ -169,6 +226,7 @@ class ZiweiFlowingStar(PartialOutput):
     natal_stars_relocated: bool | None = None
     system_id: str | None = None
     year_branch: str | None = None
+    basis_branch: str | None = None
 
 
 class ZiweiAnnualThreeSha(PartialOutput):

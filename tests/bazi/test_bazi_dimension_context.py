@@ -52,12 +52,22 @@ def test_unknown_gender_limits_dayun_without_losing_natal_or_liunian() -> None:
     assert result["career_analysis"]["evidence_chain"]["ten_gods"]
 
 
-def test_known_gender_produces_forward_dayun_for_yang_year_male() -> None:
-    person = create_person_info(1990, 5, 20, 10, "t", "男", "北京")  # 1990 庚午 阳年
+@pytest.mark.parametrize(
+    "gender, expected_dayun",
+    [
+        ("男", "乙酉"),
+        ("male", "乙酉"),
+        ("乾", "乙酉"),
+        ("female", "丁丑"),
+        ("坤", "丁丑"),
+    ],
+)
+def test_gender_aliases_select_dayun_direction(gender, expected_dayun) -> None:
+    person = create_person_info(1990, 5, 20, 10, "t", gender, "北京")
     tc = bazi.calculate_bazi_career(person, analysis_year=2026)["career_analysis"][
         "timing_context"
     ]
-    assert tc["dayun_pillar"] == "乙酉"  # forward (顺行) from month pillar
+    assert tc["dayun_pillar"] == expected_dayun
 
 
 @pytest.mark.parametrize(
@@ -122,12 +132,29 @@ def test_dimension_auto_derives_correct_dayun_and_liunian() -> None:
     assert abs(tc["dayun_age"] - 28.56) < 0.5
 
 
-def test_explicit_pillars_override_auto_derivation() -> None:
-    person = create_person_info(1990, 6, 15, 10, "t", "男", "北京")
+@pytest.mark.parametrize(
+    "gender, age_basis",
+    [
+        ("乾", "auto_derived_reference_not_override_pillar_age"),
+        ("未知", "unavailable_for_override"),
+    ],
+)
+def test_explicit_dayun_has_no_automatic_period(gender, age_basis) -> None:
+    person = create_person_info(1990, 6, 15, 10, "t", gender, "北京")
     tc = bazi.calculate_bazi_wealth(person, analysis_year=2026, dayun_pillar="壬戌")[
         "wealth_analysis"
     ]["timing_context"]
-    assert tc["overridden"]["dayun_pillar"] is True
+    assert tc["overridden"] == {"dayun_pillar": True, "liunian_pillar": False}
+    assert tc["dayun_pillar"] == "壬戌"
+    assert tc["liunian_pillar"] == "丙午"
+    assert tc["dayun_status"] == "explicit_override"
+    assert tc["dayun_age_basis"] == age_basis
+    assert (
+        tc["dayun_start_at"]
+        is tc["dayun_end_at"]
+        is tc["dayun_selection_basis"]
+        is None
+    )
 
 
 @pytest.mark.parametrize(

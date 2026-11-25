@@ -157,15 +157,23 @@ def test_annual_lucun_yang_tuo_follow_target_stem_without_moving_natal_stars() -
         "禄存": "午",
         "擎羊": "未",
         "陀罗": "巳",
+        "天魁": "子",
+        "天钺": "申",
+        "文昌": "酉",
+        "文曲": "巳",
+        "天马": "亥",
+        "红鸾": "午",
+        "天喜": "子",
+        "年解": "丑",
     }
     assert all(
         not s["natal_stars_relocated"] and s["scope"] == "流年"
         for s in annual["flowing_stars"]
     )
     assert chart == before
-    assert all(
-        "flowing_stars" not in s for s in result["scopes"] if s["scope"] != "流年"
-    )
+    assert {s["scope"] for s in result["scopes"] if "flowing_stars" not in s} == {
+        "小限"
+    }
 
 
 def test_natal_reference_is_frozen_independently_of_current_engine() -> None:

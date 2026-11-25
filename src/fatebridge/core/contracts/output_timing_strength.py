@@ -6,6 +6,7 @@ from typing import Literal
 from pydantic import JsonValue, model_validator
 
 from fatebridge.core.contracts.output_base import PartialOutput
+from fatebridge.core.timing_strength import StemBindingReviewReason
 
 
 class TimingStrengthBaseline(PartialOutput):
@@ -27,7 +28,24 @@ class ProjectedTimingHiddenRoot(PartialOutput):
     remaining_mass_exact: str | None = None
 
 
+class TimingStemBindingReview(PartialOutput):
+    candidate_relation_ids: list[str] | None = None
+    natal_partner_positions: list[Literal["year", "month", "day", "hour"]] | None = None
+    review_reasons: list[StemBindingReviewReason] | None = None
+    budget_admission: Literal["no_match", "eligible", "blocked"] | None = None
+    budget_applied: bool | None = None
+
+    @model_validator(mode="after")
+    def applied_requires_admission(self) -> "TimingStemBindingReview":
+        if self.budget_applied and (
+            self.budget_admission in {"blocked", "no_match"} or self.review_reasons
+        ):
+            raise ValueError("未准入的运干配对不能声明已施加预算")
+        return self
+
+
 class TimingRootEffectLayer(PartialOutput):
+    stem_binding_review: TimingStemBindingReview | None = None
     node_id: str | None = None
     status: Literal["projected", "blocked"] | None = None
     blocker_relation_ids: list[str] | None = None
@@ -45,6 +63,12 @@ class TimingRootEffectLayer(PartialOutput):
 
     @model_validator(mode="after")
     def unresolved_cannot_publish_projection(self) -> "TimingRootEffectLayer":
+        if (
+            self.status == "blocked"
+            and self.stem_binding_review is not None
+            and self.stem_binding_review.budget_applied
+        ):
+            raise ValueError("阻塞的岁运层不能声明已施加运干预算")
         if self.status == "blocked" and (
             self.hidden_roots
             or self.energies_exact

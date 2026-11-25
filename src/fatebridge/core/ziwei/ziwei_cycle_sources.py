@@ -1,13 +1,72 @@
-"""Cycle comparisons against a Ming collation, with unresolved directions kept."""
+"""Year-branch cycles and Ming-source comparisons for the natal cycles."""
 
 from __future__ import annotations
 
 import json
 from functools import lru_cache
 from importlib.resources import files
-from typing import Any, cast
+from typing import Any, Literal, TypedDict, cast
 
 from fatebridge.utils.birth_input import normalize_gender
+from fatebridge.utils.data import EARTHLY_BRANCHES
+
+_YEAR_CYCLE_SOURCE = (
+    "https://github.com/SylarLong/iztro/blob/2.5.8/src/star/decorativeStar.ts#L188-L275"
+)
+_SUIQIAN = tuple("岁建 晦气 丧门 贯索 官符 小耗 大耗 龙德 白虎 天德 吊客 病符".split())
+_JIANGQIAN = tuple(
+    "将星 攀鞍 岁驿 息神 华盖 劫煞 灾煞 天煞 指背 咸池 月煞 亡神".split()
+)
+
+_YearBranchBasis = Literal["natal_lunar_year_branch", "target_lunar_year_branch"]
+
+
+class _YearCyclePosition(TypedDict):
+    name: str
+    branch: str
+
+
+class _YearCycle(TypedDict):
+    system_id: str
+    start_branch: str
+    positions: list[_YearCyclePosition]
+
+
+class YearBranchCycles(TypedDict):
+    anchor_basis: _YearBranchBasis
+    year_branch: str
+    direction: Literal["forward"]
+    source: str
+    suiqian: _YearCycle
+    jiangqian: _YearCycle
+
+
+def year_branch_cycles(
+    year_branch: str, *, anchor_basis: _YearBranchBasis
+) -> YearBranchCycles:
+    """Rotate iztro's default labels from an already-resolved lunar year branch."""
+    year_index = EARTHLY_BRANCHES.index(year_branch)
+    # 子辰申、丑巳酉、寅午戌、卯未亥 share their 三合帝旺 branch.
+    jiangxing_index = (0, 9, 6, 3)[year_index % 4]
+
+    def rotate(start: int, labels: tuple[str, ...], system_id: str) -> _YearCycle:
+        return {
+            "system_id": system_id,
+            "start_branch": EARTHLY_BRANCHES[start],
+            "positions": [
+                {"name": name, "branch": EARTHLY_BRANCHES[(start + offset) % 12]}
+                for offset, name in enumerate(labels)
+            ],
+        }
+
+    return {
+        "anchor_basis": anchor_basis,
+        "year_branch": year_branch,
+        "direction": "forward",
+        "source": _YEAR_CYCLE_SOURCE,
+        "suiqian": rotate(year_index, _SUIQIAN, "iztro_2_5_8_suiqian_default"),
+        "jiangqian": rotate(jiangxing_index, _JIANGQIAN, "iztro_2_5_8_jiangqian"),
+    }
 
 
 @lru_cache(maxsize=1)
