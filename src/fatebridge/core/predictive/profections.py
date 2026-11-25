@@ -3,9 +3,13 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from fatebridge.core.astro.birth import AstroBirthInfo
+from fatebridge.core.astro.event_reference import (
+    unresolved_ascendant,
+    unresolved_houses,
+)
 from fatebridge.core.astrology_tables import RULER_BY_SIGN, SIGNS
 from fatebridge.utils.timezones import parse_timezone_name
 
@@ -20,6 +24,7 @@ from ._common import (
     resolve_local_birthday_anniversary,
     sign_label,
 )
+from .native_chart import NativeSubject
 
 
 def monthly_profection_segment(
@@ -52,7 +57,7 @@ def monthly_profection_index(
 
 def build_annual_profection_payload(
     birth_info: AstroBirthInfo,
-    natal_subject: Any,
+    natal_subject: NativeSubject,
     *,
     analysis_datetime: datetime,
 ) -> Dict[str, Any]:
@@ -60,11 +65,16 @@ def build_annual_profection_payload(
     analysis_datetime = anniversary.analysis_datetime
     last_birthday = anniversary.start
     age_years_int = anniversary.nominal_year - birth_info.local_datetime.year
-    asc_sign = normalize_sign_name(natal_subject.ascendant.sign)
-    asc_index = SIGNS.index(asc_sign)
+    asc_index = (
+        None
+        if unresolved_ascendant(natal_subject)
+        else SIGNS.index(normalize_sign_name(natal_subject.ascendant.sign))
+    )
     activated_house = (age_years_int % 12) + 1
-    activated_sign = SIGNS[(asc_index + activated_house - 1) % 12]
-    lord = RULER_BY_SIGN[activated_sign]
+    activated_sign = (
+        SIGNS[(asc_index + activated_house - 1) % 12] if asc_index is not None else None
+    )
+    lord = RULER_BY_SIGN[activated_sign] if activated_sign is not None else None
 
     next_birthday = resolve_local_birthday_anniversary(
         birth_info.local_datetime,
@@ -76,7 +86,9 @@ def build_annual_profection_payload(
         last_birthday, next_birthday, analysis_datetime
     )
     monthly_house = ((activated_house - 1 + months_since_birthday) % 12) + 1
-    monthly_sign = SIGNS[(asc_index + monthly_house - 1) % 12]
+    monthly_sign = (
+        SIGNS[(asc_index + monthly_house - 1) % 12] if asc_index is not None else None
+    )
 
     return {
         "age_years": age_years_int,
@@ -90,40 +102,46 @@ def build_annual_profection_payload(
         },
         "activated_house": activated_house,
         "activated_sign": activated_sign,
-        "activated_sign_label": sign_label(activated_sign),
+        "activated_sign_label": (
+            sign_label(activated_sign) if activated_sign is not None else None
+        ),
         "lord": lord,
-        "lord_label": planet_label(lord),
+        "lord_label": planet_label(lord) if lord is not None else None,
         "monthly_house": monthly_house,
         "monthly_sign": monthly_sign,
-        "monthly_sign_label": sign_label(monthly_sign),
+        "monthly_sign_label": (
+            sign_label(monthly_sign) if monthly_sign is not None else None
+        ),
     }
 
 
 def build_monthly_profections_payload(
     *,
     annual_house: int,
-    asc_sign: str,
+    asc_sign: Optional[str],
     year_start: datetime,
     year_end: datetime,
     analysis_datetime: datetime,
 ) -> List[Dict[str, Any]]:
     timeline: List[Dict[str, Any]] = []
-    asc_index = SIGNS.index(asc_sign)
+    asc_index = SIGNS.index(asc_sign) if asc_sign is not None else None
     instant = analysis_datetime.astimezone(timezone.utc)
     for month_offset in range(12):
         start, end = monthly_profection_segment(year_start, year_end, month_offset)
         house = ((annual_house - 1 + month_offset) % 12) + 1
-        sign_name = SIGNS[(asc_index + house - 1) % 12]
-        ruler = RULER_BY_SIGN[sign_name]
+        sign_name = (
+            SIGNS[(asc_index + house - 1) % 12] if asc_index is not None else None
+        )
+        ruler = RULER_BY_SIGN[sign_name] if sign_name is not None else None
         timeline.append(
             {
                 "month_index": month_offset + 1,
                 "house": house,
                 "house_label": f"第{house}宫",
                 "sign": sign_name,
-                "sign_label": sign_label(sign_name),
+                "sign_label": sign_label(sign_name) if sign_name is not None else None,
                 "lord": ruler,
-                "lord_label": planet_label(ruler),
+                "lord_label": planet_label(ruler) if ruler is not None else None,
                 "start": start.isoformat(),
                 "end": end.isoformat(),
                 "active": start.astimezone(timezone.utc)
@@ -136,7 +154,7 @@ def build_monthly_profections_payload(
 
 def build_given_year_payload(
     birth_info: AstroBirthInfo,
-    natal_subject: Any,
+    natal_subject: NativeSubject,
     *,
     analysis_datetime: datetime,
     annual_profection: Dict[str, Any],
@@ -173,27 +191,46 @@ def build_given_year_payload(
     )
     monthly_profections = build_monthly_profections_payload(
         annual_house=annual_profection["activated_house"],
-        asc_sign=normalize_sign_name(natal_subject.ascendant.sign),
+        asc_sign=(
+            None
+            if unresolved_ascendant(natal_subject)
+            else normalize_sign_name(natal_subject.ascendant.sign)
+        ),
         year_start=last_birthday,
         year_end=year_end,
         analysis_datetime=analysis_local,
     )
+    source_longitudes = extract_reference_longitudes(given_year_subject)
+    target_longitudes = extract_reference_longitudes(natal_subject)
+    if unresolved_ascendant(given_year_subject):
+        source_longitudes.pop("Ascendant")
+    if unresolved_ascendant(natal_subject):
+        target_longitudes.pop("Ascendant")
     hits = collect_aspect_hits(
-        source_longitudes=extract_reference_longitudes(given_year_subject),
-        target_longitudes=extract_reference_longitudes(natal_subject),
+        source_longitudes=source_longitudes,
+        target_longitudes=target_longitudes,
         orb_limit=1.5,
     )
+    points = {
+        "sun": point_to_dict("Sun", given_year_subject.sun),
+        "moon": point_to_dict("Moon", given_year_subject.moon),
+        "ascendant": point_to_dict("Ascendant", given_year_subject.ascendant),
+        "medium_coeli": point_to_dict("Medium_Coeli", given_year_subject.medium_coeli),
+    }
+    if unresolved_ascendant(given_year_subject):
+        points["ascendant"] = {
+            key: value if key in {"point", "point_label"} else None
+            for key, value in points["ascendant"].items()
+        }
+    if unresolved_houses(given_year_subject):
+        for point in points.values():
+            point["house"] = None
+            point["house_label"] = None
     return {
         "analysis_datetime": analysis_local.isoformat(),
         "year_start": last_birthday.isoformat(),
         "year_end": year_end.isoformat(),
-        "sun": point_to_dict("Sun", given_year_subject.sun),
-        "moon": point_to_dict("Moon", given_year_subject.moon),
-        "ascendant": point_to_dict("Ascendant", given_year_subject.ascendant),
-        "medium_coeli": point_to_dict(
-            "Medium_Coeli",
-            given_year_subject.medium_coeli,
-        ),
+        **points,
         "annual_profection": annual_profection,
         "monthly_profections": monthly_profections,
         "hits": hits[:8],

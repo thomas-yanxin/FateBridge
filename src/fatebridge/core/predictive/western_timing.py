@@ -6,6 +6,10 @@ from datetime import datetime
 from typing import Any, Dict, List, Mapping, Optional
 
 from fatebridge.core.astro.birth import AstroBirthInfo
+from fatebridge.core.astro.event_reference import (
+    unresolved_ascendant,
+    unresolved_houses,
+)
 from fatebridge.utils.house_systems import house_system_fields
 
 from ._common import (
@@ -18,6 +22,7 @@ from ._common import (
 )
 from .decennials import build_decennials_payload
 from .firdaria import build_firdaria_payload
+from .native_chart import NativeSubject
 from .primary_directions import (
     build_primary_direction_chart_payload,
     build_primary_directions_payload,
@@ -49,13 +54,31 @@ def _resolve_western_timing_return_location(
     }
 
 
-def _build_western_timing_natal_reference(natal_subject: Any) -> Dict[str, Any]:
+def _build_western_timing_natal_reference(
+    natal_subject: NativeSubject,
+) -> Dict[str, Any]:
     natal_reference = extract_reference_points(natal_subject)
-    natal_reference["calculation_basis"] = natal_subject.calculation_basis
     sect = determine_sect(natal_subject)
-    natal_reference["sect"] = {"key": sect, "label": sect_label(sect)}
-    natal_reference["lots"] = build_lot_payloads(natal_subject)
-    return natal_reference
+    if unresolved_ascendant(natal_subject):
+        point = natal_reference["ascendant"]
+        natal_reference["ascendant"] = {
+            key: value if key in {"point", "point_label"} else None
+            for key, value in point.items()
+        }
+    if unresolved_houses(natal_subject):
+        for point in natal_reference.values():
+            point["house"] = None
+            point["house_label"] = None
+    return {
+        **natal_reference,
+        "calculation_basis": natal_subject.calculation_basis,
+        "sect": {"key": sect, "label": sect_label(sect)},
+        "lots": (
+            None
+            if unresolved_ascendant(natal_subject)
+            else build_lot_payloads(natal_subject)
+        ),
+    }
 
 
 def _build_western_timing_analysis_context(
@@ -112,15 +135,15 @@ def _build_western_timing_module_summary(
     if technique == "givenyear":
         annual_profection = payload.get("annual_profection", {})
         return (
-            f"{prefix} 西占指定年盘：上升 {payload['ascendant']['sign_label']}，"
+            f"{prefix} 西占指定年盘：上升 {payload['ascendant']['sign_label'] or '未知'}，"
             f"年小限落第{annual_profection.get('activated_house')}宫"
-            f"{annual_profection.get('activated_sign_label')}。"
+            f"{annual_profection.get('activated_sign_label') or '未知'}。"
         )
 
     if technique == "profection":
         return (
             f"{prefix} 西占年小限：落第{payload['activated_house']}宫"
-            f"{payload['activated_sign_label']}，主星 {payload['lord_label']}。"
+            f"{payload['activated_sign_label'] or '未知'}，主星 {payload['lord_label'] or '未知'}。"
         )
 
     if technique == "primarydirect":
@@ -138,7 +161,7 @@ def _build_western_timing_module_summary(
         )
 
     if technique in {"zodialrelease", "zodiacal_releasing"}:
-        spirit_level_1 = payload["spirit"].get("current_level_1") or {}
+        spirit_level_1 = (payload["spirit"] or {}).get("current_level_1") or {}
         return (
             f"{prefix} 西占黄道释放：Spirit L1 "
             f"{spirit_level_1.get('sign_label', '未知')}。"
@@ -441,11 +464,7 @@ def build_western_timing_payload(
         house_system=house_system,
         zodiac_type=zodiac_type,
     )
-    natal_reference = extract_reference_points(natal_subject)
-    natal_reference["calculation_basis"] = natal_subject.calculation_basis
-    sect = determine_sect(natal_subject)
-    natal_reference["sect"] = {"key": sect, "label": sect_label(sect)}
-    natal_reference["lots"] = build_lot_payloads(natal_subject)
+    natal_reference = _build_western_timing_natal_reference(natal_subject)
 
     effective_return_longitude = (
         birth_info.longitude if return_longitude is None else return_longitude
@@ -554,7 +573,9 @@ def build_western_timing_payload(
 
     age_years = calculate_age_years(birth_info, analysis_datetime)
     firdaria_current = firdaria_payload["current_major"]
-    zr_spirit_current = zodiacal_releasing_payload["spirit"]["current_level_1"]
+    zr_spirit_current = (zodiacal_releasing_payload["spirit"] or {}).get(
+        "current_level_1"
+    )
     transit_top_hit = transit_payload["hits"][0] if transit_payload["hits"] else None
     summary = (
         f"{analysis_datetime.strftime('%Y-%m-%d')} 西占时运："
@@ -564,9 +585,9 @@ def build_western_timing_payload(
         f"{primary_directions_payload['time_key_label']} "
         f"{primary_directions_payload['coordinate_label']}"
         f" {primary_directions_payload['current_arc_degrees']:.2f}°，"
-        f"指定年盘上升 {given_year_payload['ascendant']['sign_label']}，"
+        f"指定年盘上升 {given_year_payload['ascendant']['sign_label'] or '未知'}，"
         f"年小限落第{profection_payload['activated_house']}宫"
-        f"{profection_payload['activated_sign_label']}，"
+        f"{profection_payload['activated_sign_label'] or '未知'}，"
         f"法达 {firdaria_current['planet_label'] if firdaria_current else '未知'}"
         f"/{(firdaria_payload['current_sub'] or {}).get('planet_label', '无小运')}，"
         f"Spirit 黄道释放 L1 {zr_spirit_current['sign_label'] if zr_spirit_current else '未知'}，"

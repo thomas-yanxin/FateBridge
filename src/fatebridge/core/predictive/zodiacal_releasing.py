@@ -6,6 +6,7 @@ from datetime import datetime, timedelta, timezone, tzinfo
 from typing import Any, Dict, List, Optional
 
 from fatebridge.core.astro.birth import AstroBirthInfo
+from fatebridge.core.astro.event_reference import unresolved_ascendant
 from fatebridge.core.astrology_tables import RULER_BY_SIGN, SIGNS
 from fatebridge.utils.timezones import parse_timezone_name
 
@@ -19,6 +20,7 @@ from ._common import (
     planet_label,
     sign_label,
 )
+from .native_chart import NativeSubject
 
 # 各星座的释放年数（黄道释放法）
 ZR_SIGN_PERIODS = {
@@ -327,21 +329,16 @@ def build_zodiacal_releasing_for_lot(
 
 def build_zodiacal_releasing_payload(
     birth_info: AstroBirthInfo,
-    natal_subject: Any,
+    natal_subject: NativeSubject,
     *,
     analysis_datetime: datetime,
 ) -> Dict[str, Any]:
-    lots = build_lot_payloads(natal_subject)
     # Selected reconstruction: Brennan/Schaim, episode192 (2019-02-11),
     # "Calculating Zodiacal Releasing Periods" and "Peak Periods":
     # https://theastrologypodcast.com/2019/02/11/zodiacal-releasing-an-ancient-timing-technique/
     # The origin advances only for coincident Spirit/Fortune signs. Natal lot
     # longitudes stay unchanged; every track's angular reference is Fortune.
-    fortune_sign = lots["lot_of_fortune"]["sign"]
-    spirit_start_sign = lots["lot_of_spirit"]["sign"]
-    if spirit_start_sign == fortune_sign:
-        spirit_start_sign = next_sign(spirit_start_sign)
-    return {
+    result: Dict[str, Any] = {
         "calculation_basis": {
             "method_id": "brennan_schaim_zodiacal_releasing_2019_v1",
             "source_authors": ["Chris Brennan", "Leisa Schaim"],
@@ -352,25 +349,40 @@ def build_zodiacal_releasing_payload(
             "year_days": ZR_LEVEL_UNIT_DAYS[1],
             "interval_time_basis": "elapsed_utc_days",
             "angular_reference_point": LOT_POINT_NAMES["lot_of_fortune"],
-            "angular_reference_sign": fortune_sign,
+            "angular_reference_sign": None,
             "spirit_same_sign_rule": "advance_spirit_one_sign",
             "published_levels": [1, 2, 3],
             "whole_procedure_certified": False,
         },
-        "spirit": build_zodiacal_releasing_for_lot(
-            "lot_of_spirit",
-            lots["lot_of_spirit"],
-            birth_info=birth_info,
-            analysis_datetime=analysis_datetime,
-            start_sign=spirit_start_sign,
-            fortune_sign=fortune_sign,
-        ),
-        "fortune": build_zodiacal_releasing_for_lot(
-            "lot_of_fortune",
-            lots["lot_of_fortune"],
-            birth_info=birth_info,
-            analysis_datetime=analysis_datetime,
-            start_sign=fortune_sign,
-            fortune_sign=fortune_sign,
-        ),
+        "spirit": None,
+        "fortune": None,
     }
+    if unresolved_ascendant(natal_subject):
+        return result
+    lots = build_lot_payloads(natal_subject)
+    fortune_sign = lots["lot_of_fortune"]["sign"]
+    spirit_start_sign = lots["lot_of_spirit"]["sign"]
+    if spirit_start_sign == fortune_sign:
+        spirit_start_sign = next_sign(spirit_start_sign)
+    result["calculation_basis"]["angular_reference_sign"] = fortune_sign
+    result.update(
+        {
+            "spirit": build_zodiacal_releasing_for_lot(
+                "lot_of_spirit",
+                lots["lot_of_spirit"],
+                birth_info=birth_info,
+                analysis_datetime=analysis_datetime,
+                start_sign=spirit_start_sign,
+                fortune_sign=fortune_sign,
+            ),
+            "fortune": build_zodiacal_releasing_for_lot(
+                "lot_of_fortune",
+                lots["lot_of_fortune"],
+                birth_info=birth_info,
+                analysis_datetime=analysis_datetime,
+                start_sign=fortune_sign,
+                fortune_sign=fortune_sign,
+            ),
+        }
+    )
+    return result

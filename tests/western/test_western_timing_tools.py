@@ -1,4 +1,5 @@
 import json
+import math
 from datetime import datetime, timedelta, timezone
 from fractions import Fraction
 from pathlib import Path
@@ -15,6 +16,7 @@ from fatebridge.core.predictive.decennials import (
 from fatebridge.core.predictive.native_chart import NativePoint, NativeSubject
 from fatebridge.services.western_timing_tools import calculate_timing_tool
 from tests.fixtures.surface_payloads import western_payload
+from tests.support.transports import SPECS, business, three_surfaces
 
 DECENNIAL_REFERENCE = json.loads(
     (Path(__file__).parents[1] / "fixtures/decennials-reference.json").read_text()
@@ -346,3 +348,234 @@ def test_decennials_payload_is_bounded_for_agent_consumption():
         for child in children:
             assert child["level"] == child_level
             assert child.get("sublevel", []) == []
+
+
+# Synthetic J2000 geometry: ARMC=90°, latitude=obliquity−90°. The
+# horizon normal (0, cos(phi), sin(phi)) opposes the ecliptic normal
+# (0, −sin(epsilon), cos(epsilon)); there is no unique intersection.
+def _qualification_payload(longitude_offset=0.0):
+    return {
+        "name": "synthetic-angle-qualification",
+        "birth_year": 2000,
+        "birth_month": 1,
+        "birth_day": 1,
+        "birth_hour": 12,
+        "birth_minute": 0,
+        "birth_place": "",
+        "birth_timezone": "UTC",
+        "birth_longitude": 169.54144401512139 + longitude_offset,
+        "birth_latitude": -66.5623231709126,
+        "house_system": "W",
+        "analysis_year": 2026,
+        "analysis_month": 5,
+        "analysis_day": 20,
+        "analysis_hour": 12,
+        "analysis_minute": 0,
+    }
+
+
+@pytest.mark.parametrize(
+    "longitude_offset", [0.0, -0.0001, 0.0001, -169.54144401512139]
+)
+@pytest.mark.parametrize(
+    "tool", ["profection", "givenyear", "zr", "western_timing_analysis"]
+)
+def test_timing_ascendant_qualification_three_surfaces(
+    tool, longitude_offset, tmp_path, monkeypatch, capsys
+):
+    fields = (
+        ["natal_reference", tool]
+        if tool != "western_timing_analysis"
+        else [
+            "natal_reference",
+            "time_lords.annual_profection",
+            "time_lords.zodiacal_releasing",
+            "directions.given_year",
+        ]
+    )
+    result = business(
+        three_surfaces(
+            SPECS[tool],
+            _qualification_payload(longitude_offset),
+            fields,
+            "2026-05-20T12:00:00Z",
+            tmp_path,
+            monkeypatch,
+            capsys,
+        )
+    )
+    natal = result["natal_reference"]
+    resolved = longitude_offset != 0
+    # The existing contract emits angle_definition only for a limited angle.
+    definition = natal["calculation_basis"].get("angle_definition") or {}
+    assert (definition.get("geometric_ascendant_resolved") is not False) is resolved
+    assert (natal["ascendant"]["longitude"] is not None) is resolved
+    assert (natal["sun"]["house"] is not None) is resolved
+    assert natal["sun"]["longitude"] is not None
+    assert natal["medium_coeli"]["longitude"] is not None
+    assert (natal["lots"] is not None) is resolved
+    if not resolved:
+        phi = math.radians(-66.5623231709126)
+        epsilon = math.radians(23.4376768290874)
+        # Independent two-plane cross product, not a copied qualification helper.
+        assert (
+            abs(math.cos(phi) * math.cos(epsilon) + math.sin(phi) * math.sin(epsilon))
+            < 1e-14
+        )
+    profection = (
+        result["time_lords"]["annual_profection"]
+        if tool == "western_timing_analysis"
+        else (
+            result["profection"]
+            if tool == "profection"
+            else (
+                result["givenyear"]["annual_profection"]
+                if tool == "givenyear"
+                else None
+            )
+        )
+    )
+    if profection is not None:
+        assert profection["age_years"] == 26
+        assert profection["activated_house"] == 3
+        assert profection["monthly_house"] == 7
+        assert profection["year_start"] == "2026-01-01T12:00:00+00:00"
+        assert profection["year_end"] == "2027-01-01T12:00:00+00:00"
+        for key in (
+            "activated_sign",
+            "activated_sign_label",
+            "lord",
+            "lord_label",
+            "monthly_sign",
+            "monthly_sign_label",
+        ):
+            assert (profection[key] is not None) is resolved
+    given = (
+        result["directions"]["given_year"]
+        if tool == "western_timing_analysis"
+        else result.get("givenyear")
+    )
+    if given is not None:
+        assert given["ascendant"]["longitude"] is not None  # analysis chart resolves
+        assert len(given["monthly_profections"]) == 12
+        assert [p["house"] for p in given["monthly_profections"]] == [
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            1,
+            2,
+        ]
+        for month in given["monthly_profections"]:
+            assert (month["sign"] is not None) is resolved
+            assert (month["lord"] is not None) is resolved
+        assert given["hits"]
+        if not resolved:
+            assert all(hit["target"] != "Ascendant" for hit in given["hits"])
+    zr = (
+        result["time_lords"]["zodiacal_releasing"]
+        if tool == "western_timing_analysis"
+        else result.get("zr")
+    )
+    if zr is not None:
+        assert zr["calculation_basis"]["year_days"] == 360.0
+        assert (
+            zr["calculation_basis"]["angular_reference_sign"] is not None
+        ) is resolved
+        for track in ("fortune", "spirit"):
+            assert (zr[track] is not None) is resolved
+
+
+@pytest.mark.parametrize(
+    "tool, fields",
+    [
+        (
+            "profection",
+            ["profection.activated_sign", "natal_reference.ascendant.longitude"],
+        ),
+        (
+            "zr",
+            ["zr.calculation_basis.angular_reference_sign", "zr.fortune", "zr.spirit"],
+        ),
+    ],
+)
+def test_timing_unknown_leaf_projection(tool, fields, tmp_path, monkeypatch, capsys):
+    result = three_surfaces(
+        SPECS[tool],
+        _qualification_payload(),
+        fields,
+        "2026-05-20T12:00:00Z",
+        tmp_path,
+        monkeypatch,
+        capsys,
+    )
+    if tool == "profection":
+        assert result == {
+            "profection": {"activated_sign": None},
+            "natal_reference": {"ascendant": {"longitude": None}},
+        }
+    else:
+        assert result == {
+            "zr": {
+                "calculation_basis": {"angular_reference_sign": None},
+                "fortune": None,
+                "spirit": None,
+            }
+        }
+
+
+@pytest.mark.parametrize("house_system", ["W", "M"])
+def test_given_year_uses_its_own_geometry(house_system):
+    from fatebridge.core.predictive._common import build_subject
+    from fatebridge.core.predictive.profections import (
+        build_annual_profection_payload,
+        build_given_year_payload,
+    )
+
+    birth = build_predictive_birth_info(
+        name="synthetic-normal-natal",
+        birth_year=1990,
+        birth_month=1,
+        birth_day=1,
+        birth_hour=12,
+        birth_minute=0,
+        birth_place="",
+        birth_timezone="UTC",
+        birth_longitude=169.54144401512139,
+        birth_latitude=-66.5623231709126,
+    )
+    natal = build_subject(
+        name="synthetic-normal-natal",
+        local_datetime=birth.local_datetime,
+        longitude=birth.longitude,
+        latitude=birth.latitude,
+        timezone_name="UTC",
+        house_system=house_system,
+    )
+    moment = datetime(2000, 1, 1, 12, tzinfo=timezone.utc)
+    annual = build_annual_profection_payload(birth, natal, analysis_datetime=moment)
+    given = build_given_year_payload(
+        birth,
+        natal,
+        analysis_datetime=moment,
+        annual_profection=annual,
+        return_longitude=birth.longitude,
+        return_latitude=birth.latitude,
+        return_timezone="UTC",
+        house_system=house_system,
+    )
+    assert annual["activated_sign"] is not None
+    assert given["ascendant"]["longitude"] is None
+    assert given["ascendant"]["house"] is None
+    assert given["sun"]["longitude"] is not None
+    assert given["medium_coeli"]["longitude"] is not None
+    assert (given["sun"]["house"] is not None) is (house_system == "M")
+    assert all(month["sign"] is not None for month in given["monthly_profections"])
+    assert given["hits"]
+    assert all(hit["source"] != "Ascendant" for hit in given["hits"])
