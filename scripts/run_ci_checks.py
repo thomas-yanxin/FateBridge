@@ -155,6 +155,16 @@ CHECKS = (
     "integration/test_mcp_native_contracts.py",
     "integration/test_complete_output_contracts.py",
     "integration/test_chart_variant_contracts.py",
+    "bazi/test_bazi_analysis_calendar_transports.py",
+    "meihua/test_meihua_summary_fidelity.py",
+    "ziwei/test_ziwei_brightness_sources.py",
+    "ziwei/test_ziwei_clock_receipt.py",
+    "ziwei/test_ziwei_flowing_stars.py",
+    "ziwei/test_ziwei_named_patterns.py",
+    "ziwei/test_ziwei_natal_leap_month.py",
+    "ziwei/test_ziwei_optional_snapshots.py",
+    "ziwei/test_ziwei_palace_sihua.py",
+    "ziwei/test_ziwei_year_branch_cycles.py",
     "quality/test_ci_runner.py",
 )
 POSIX_CHECKS = (
