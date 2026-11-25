@@ -1,0 +1,27 @@
+{
+  "id": "ren_calendar_guard_v1",
+  "frozen_before_production_correction": "2026-10-22T19:13:06.952857+00:00",
+  "disclosure": "Eight endpoint development calls exposed explicit-DE440 failures and mixed auto providers before this protocol; this is not a blind holdout.",
+  "public_input_years": [
+    1800,
+    2200
+  ],
+  "guard_years": [
+    1799,
+    2201
+  ],
+  "selection": "All 24 solar terms in both adjacent guard years; retain all 48. Also reuse all 48 terms in the two endpoint years from the earlier full1800 reference. No reference is selected by candidate residual.",
+  "root_tolerance_seconds": 1.0,
+  "method": "Skyfield1.53, fullDE440, geocentric apparent Sun, true ecliptic of date, IAU2000B,40 vector bisections. No production imports or root answers.",
+  "source_kernel_sha256": "a4ce9bf9b3282becc9f4b2ac3cebe03a2ae7599981aabd7265fd8482fff7c4b5",
+  "source_kernel_url": "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/de440.bsp",
+  "reused_reference_sha256": "7b64d68a9f91d9e0342ecadf39a423c736224b492128556187707e3ca3fb4e65",
+  "collector_sha256": "8c6edbf626106df4815f2d36a42d358397af177556367f1c3a0ea4c1a92b0619",
+  "versions": {
+    "skyfield": "1.53",
+    "numpy": "2.5.4",
+    "jplephem": "2.24"
+  },
+  "overlap": "48 new independent-method TT roots;48 reused roots. Both methods share DE440 lineage; no independent physical observations. TT checks do not authenticate historical/future civil time.",
+  "no_change_to_old_tolerances_or_failures": true
+}

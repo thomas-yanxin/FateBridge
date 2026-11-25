@@ -1,0 +1,68 @@
+{
+  "classification": "Integration reuse of an existing independent-method TT comparison; not a new holdout, observation, birth example, UTC calibration or expansion of published input years.",
+  "reused_fixture_sha256": {
+    "ren_calendar_guard_v1/protocol.json": "aa18e41ee2c220b171b05c4c1d1e2bea160c3060bccb6bc671ce30c63c2ac027",
+    "ren_calendar_guard_v1/reference.json": "067de02c05332c8ec6437c0393a02c1d7ff356b1ce0ed3d04bc3cc912a19d68c",
+    "ren_calendar_guard_v1/freeze.json": "7f93b89d2761b854672530e7d60bf99e201cfa962c80a63b3947d776c48f47d9"
+  },
+  "reused_TT_roots": 96,
+  "new_TT_roots": 0,
+  "new_observations": 0,
+  "new_original_horoscopes": 0,
+  "independent_second_review_completed": false,
+  "root_tolerance_seconds": 1.0,
+  "time_scale": "TT roots; future/historical UTC follows the actual provider conventions, not independently established civil clocks.",
+  "primary_documentation": [
+    "https://ssd.jpl.nasa.gov/planets/eph_export.html",
+    "https://www.iausofa.org/2023-10-11c"
+  ],
+  "endpoint_years": [
+    1800,
+    2200
+  ],
+  "civil_endpoint_probes": [
+    {
+      "date": "1800-01-01",
+      "time": "00:30",
+      "zone": "+14:00",
+      "utc_year": 1799,
+      "term": "冬至",
+      "yang_ling": true
+    },
+    {
+      "date": "1800-07-01",
+      "time": "12:00",
+      "zone": "UTC",
+      "utc_year": 1800,
+      "term": "夏至",
+      "yang_ling": false
+    },
+    {
+      "date": "2200-01-01",
+      "time": "12:00",
+      "zone": "UTC",
+      "utc_year": 2200,
+      "term": "冬至",
+      "yang_ling": true
+    },
+    {
+      "date": "2200-12-31",
+      "time": "23:30",
+      "zone": "-02:00",
+      "utc_year": 2201,
+      "term": "冬至",
+      "yang_ling": true
+    }
+  ],
+  "published_input_years_unchanged": [
+    1800,
+    2200
+  ],
+  "calendar_policies": [
+    "Current term and most recent solstice use inclusive <=; next four-li uses strict >.",
+    "Tuyong retains the named18 elapsed24-hour days convention, not a new reading of the classical seasonal-month passage.",
+    "Actual consumed current/solstice/next-li providers, model details, absolute instants and local context year must be retained.",
+    "The canonical adjacent-year allowance is not public authorization for1799/2201 requests under strict models.",
+    "Canping120-year projections near the end of an explicit model range remain a separate unresolved dependency; this Heluo fix does not certify them."
+  ]
+}
