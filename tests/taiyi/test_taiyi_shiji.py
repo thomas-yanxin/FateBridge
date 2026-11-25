@@ -423,10 +423,20 @@ def test_invalid_profile_rejected_by_every_surface(key, surface_calls):
         payload["shiji_profile"] = "invented_edition"
     else:
         payload["taiyi_options"] = {"shiji_profile": "invented_edition"}
-    http, protocol, code, cli = surface_calls(SPECS[key], payload, rest_as_of=AS_OF)
-    # Typed single-tool input fails schema validation; generic three-style
-    # options fail at the domain boundary with the standard calculation error.
-    assert http.status_code == (422 if key == "taiyi" else 200)
+    http, protocol, code, cli = surface_calls(
+        SPECS[key],
+        payload,
+        projection={
+            "fields": ["taiyi.core_board"],
+            "strict_fields": True,
+            "include_snapshot_text": False,
+            "response_char_limit": 0,
+        },
+        rest_as_of=AS_OF,
+    )
+    # Typed single-tool input fails schema validation (422); generic three-style
+    # options fail at the domain boundary with the standard input error (400).
+    assert http.status_code == (422 if key == "taiyi" else 400)
     assert protocol.is_error and code != 0
     assert "shiji_profile" in str(cli)
     if key == "sanshiunited":
