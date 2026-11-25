@@ -185,6 +185,58 @@ def test_fingerprint_is_of_the_validated_plan_not_pretty_json_file_bytes():
     assert report["record_plan_binding"]["outcome_bound_count"] == 1
 
 
+@pytest.mark.parametrize(
+    "input_name,replacement",
+    [
+        ("forecasts", "{}"),
+        ("outcomes", "{}"),
+        ("forecasts", '"probability":0.0,"probability":1.0'),
+        ("outcomes", '"occurred":false,"occurred":true'),
+        ("plan", '"baseline_probability":0.9,"baseline_probability":0.5'),
+    ],
+)
+def test_actual_cli_rejects_ambiguous_json_without_creating_report(
+    tmp_path: Path, input_name: str, replacement: str
+) -> None:
+    """Object-shaped record lists and duplicate members previously lost input facts."""
+    registered = plan()
+    inputs = {
+        "plan": registered.model_dump(mode="json"),
+        "forecasts": [forecast(0, 1.0, registered=registered).model_dump(mode="json")],
+        "outcomes": [outcome(0, True, registered=registered).model_dump(mode="json")],
+    }
+    command = [
+        sys.executable,
+        str(ROOT / "scripts/evaluation/audit_prediction_study.py"),
+    ]
+    for name, value in inputs.items():
+        content = json.dumps(value)
+        if name != input_name:
+            pass
+        elif replacement == "{}":
+            content = replacement
+        else:
+            original = {
+                "plan": '"baseline_probability": 0.5',
+                "forecasts": '"probability": 1.0',
+                "outcomes": '"occurred": true',
+            }[name]
+            assert original in content
+            content = content.replace(original, replacement)
+        path = tmp_path / f"{name}.json"
+        path.write_text(content, encoding="utf-8")
+        command.extend([f"--{name}", str(path)])
+    output = tmp_path / "report.json"
+    command.extend(["--as-of", AS_OF.isoformat(), "--output", str(output)])
+    result = subprocess.run(command, capture_output=True, text=True)
+    assert result.returncode != 0
+    assert not output.exists()
+    if replacement == "{}":
+        assert "valid list" in result.stderr
+    else:
+        assert "Duplicate JSON member" in result.stderr
+
+
 @pytest.mark.parametrize("mode", ["bound", "legacy", "wrong"])
 def test_actual_offline_cli_and_api_share_binding_rules_and_preserve_prior_report(
     tmp_path, mode

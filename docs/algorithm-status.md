@@ -64,6 +64,65 @@
 
 上述数字属于已登记的固定资料范围，不能推广成整个体系的准确率。未读取、缺失或未裁定的项目保持未知；原始失败、参考与门槛不能通过清理改判。
 
+## 余项验收与独立检出对账
+
+本节是2026-11-25的目录与发布状态快照，检出基点为 `c63968b5fe11b59e24a37d8aec4bd2c3d87751ed`。上文历史成绩没有在本单元重新认证。核对使用本工作树的已跟踪文件及GitHub实际PR头；主审计原件保持只读，其他工作树的本地资料和测试结果没有进入本单元。存在驱动、测试或PR不能代替对应原始资料、独立书证或现实结果。
+
+该基点实际有 `scripts/evaluation/`、`tests/evaluation/` 和 `docs/examples/prediction-study/{plan,forecasts,outcomes}.json`；示例是三个虚构主体、空预测及空结果。按 `git ls-files` 计，`tests/data/`有149个已跟踪文件，`tests/fixtures/`有56个已跟踪文件；研究正文提及的 `tests/data/meihua/weather_evidence`、`tests/fixtures/meihua-prospective-v1`、`tests/data/bazi_disagreement_review_v1` 及多组书证目录没有随该检出提供。不能据驱动文件存在声明这些历史研究已经重放。资料闭包和旧缺参考链接由单元22处理；本单元不重建原件、不改分母、不以合成数据补历史证据。
+
+### 首批PR的实际头
+
+2026-11-25 11:00 UTC查询时，PR193–203均为OPEN，`mergedAt=null`，远端master仍为上述基点。下表仅登记发布身份，没有在本单元检出或验收这些头；打开的PR不属于master已交付行为。
+
+| PR | 范围 | 查询到的完整头SHA |
+| --- | --- | --- |
+| [193](https://github.com/thomas-yanxin/FateBridge/pull/193) | 通蓍法显式输入 | `d44349012fb4dac3bc80fcf2dee8d4db08820e29` |
+| [194](https://github.com/thomas-yanxin/FateBridge/pull/194) | profile交付 | `c1a855346d0138baaa78294df931e8c2d101eb51` |
+| [195](https://github.com/thomas-yanxin/FateBridge/pull/195) | 西占时主ASC资格 | `d7772e5055894e046cdf983d66c627d00f5ff8ef` |
+| [196](https://github.com/thomas-yanxin/FateBridge/pull/196) | 太乙始击异本 | `179f7d776558f2911a8f991bd41688a0d8f2e315` |
+| [197](https://github.com/thomas-yanxin/FateBridge/pull/197) | 小限／给定年／ZR资格 | `14645211fce145d2fe9cc368850ae9357c20e497` |
+| [198](https://github.com/thomas-yanxin/FateBridge/pull/198) | 回归实际黄经根 | `c08da126caf6f9820510eb8587c592018cb96e83` |
+| [199](https://github.com/thomas-yanxin/FateBridge/pull/199) | 古典盘角点 | `74ed03547137f286f56f1796cba40fa8500def16` |
+| [200](https://github.com/thomas-yanxin/FateBridge/pull/200) | 关系盘角点 | `978eddb8a9ffb3d1f6f738a56ba8aee8e1cdb4a6` |
+| [201](https://github.com/thomas-yanxin/FateBridge/pull/201) | 八字分析柱 | `c995e2eef22d1b810fed6ef97e705190a6e875ff` |
+| [202](https://github.com/thomas-yanxin/FateBridge/pull/202) | 奇门秒级钟时 | `43440b340a0763529489c0605a50c31993021612` |
+| [203](https://github.com/thomas-yanxin/FateBridge/pull/203) | 紫微未知性别流层 | `e54f0dde1a6ad720f1f50f7ec067793c63ae2412` |
+
+### 本批26单元的证据归属
+
+同次查询已发布的本批PR均为OPEN。头SHA为查询快照；后续提交、合并或其他单元的验证须单独核对，不能沿用此表作验收。未查到对应PR表示该时点没有发现发布记录，不判断其他工作树的进度。各行保留批准范围中的原分母与缺口，具体当前结果应读取对应PR及其原回执。
+
+| 单元 | 实际驱动／证据归属 | 保留的门槛、分母或未决 | 查询到的对应PR与头SHA；均未在本单元验收 |
+| --- | --- | --- | --- |
+| 1 主限／行运ASC | `core/predictive/`；`tests/western/test_western_timing_tools.py` | 6个主限／法盘、4个行运及7个正常盘分别验；依赖#197资格意义 | [213](https://github.com/thomas-yanxin/FateBridge/pull/213) `7f7b7db08d334e3cd8b30f8fa3af06330545930e` |
+| 2 近极太阳根 | `core/astro/solar_events.py`；太阳地平测试 | 原53根、23通过及1毫秒线不重定 | [220](https://github.com/thomas-yanxin/FateBridge/pull/220) `97bc5ce6a661d17738d390c0fdde9aa939b34519` |
+| 3 停驻／事件排序 | `scripts/western/audit_western_event_paths.py` | 699本体／6质心；旧混合120秒门保留 | 未查到对应PR |
+| 4 Lilly强弱／福点 | `scripts/western/audit_western_lilly_{fortitudes,fortune}.py` | 3/7原印完整对照、福点3对−2、6°25′及五度门 | [208](https://github.com/thomas-yanxin/FateBridge/pull/208) `123882a4cc87f3ebc249de4b0f27c30eb90512fc` |
+| 5 候时钟时／条件 | `scripts/western/audit_western_election_conditions.py`；候时测试 | 7图、13组、117读数中45差及另17条件差 | 未查到对应PR |
+| 6 果老运动源 | `scripts/guolao/audit_guolao_{motion,moshier_motion}.py` | Swiss84/84；Moshier原27/84、后续52/84分列 | 未查到对应PR |
+| 7 果老原尺 | `tests/data/guolao/ruler_flint_v1/generate_reference.py` | 210格、七端点差、三组年率矛盾；22635项仅录文算术 | [215](https://github.com/thomas-yanxin/FateBridge/pull/215) `ff3e5070d3a95b3974fe7b436cb37e3b60b5cbf9` |
+| 8 八字力量 | `scripts/bazi/audit_bazi_authority.py` | 367记录／321输入、17组差、2项违规；独立人工双读未证 | [216](https://github.com/thomas-yanxin/FateBridge/pull/216) `be3480663b5efb060dc953c8bf098159c2367133` |
+| 9 八字合绊 | `core/{stem_effects,timing_strength}.py` | 配对与预算资格分开；有效根力和权重未裁定 | [210](https://github.com/thomas-yanxin/FateBridge/pull/210) `109888c73012dce98229ecfe9fc66eb5bddee1d2` |
+| 10 紫微晚子／流层 | `scripts/ziwei/audit_ziwei_limits.py` | 20例2440字段、旧18差；与#203分工 | 未查到对应PR |
+| 11 六壬／金口诀 | `scripts/ren/audit_ren_depth.py`、`audit_jinkou_construction_diagnosis.py` | 原64课、46/62；P35/P52第二底本身份仍需核实 | 未查到对应PR |
+| 12 太乙长周期 | `scripts/taiyi/audit_taiyi_long_cycles.py` | 720格、33格固定分歧；与#196分工 | [212](https://github.com/thomas-yanxin/FateBridge/pull/212) `be261dbd061c55ad05a7605310f11c10b0b36353` |
+| 13 玄空原图 | `core/fengshui/xuankong.py`；[玄空文档](fengshui-xuankong.md) | 216图、3正文及1格原图差；五黄作者口径分列 | [222](https://github.com/thomas-yanxin/FateBridge/pull/222) `feb99c2a259527cbab47891f2476d63b18c1cc5b` |
+| 14 参评／河洛 | `src/fatebridge/core/canping_texts.py`、`heluo_yuantang.py`；[数术文档](numerology-audit.md) | 1620格、450缺、47疑；月序未证不推现代日期 | [214](https://github.com/thomas-yanxin/FateBridge/pull/214) `7b28863f75fd60fc6a95ce550b90b862ab70ef75` |
+| 15 奇门／六爻 | `scripts/qimen/audit_qimen.py`；[六爻审计](liuyao-depth-audit.md) | 38盘8差、4096装卦证据；效力未定 | [218](https://github.com/thomas-yanxin/FateBridge/pull/218) `5b1f5689fcd73d08b70465facca12d48ece8e6e4` |
+| 16 梅花钟界／外应 | `scripts/meihua/`；[梅花文档](meihua.md) | 农历与交节向量分开；跨篇语义未证 | [211](https://github.com/thomas-yanxin/FateBridge/pull/211) `afb1e4bee22f5b8220946350ab7b8744bb1971a8` |
+| 17 印占六力 | `scripts/jyotish/`；`tests/jyotish/` | 54关系矛盾、19单元异文、64/96天文及两条月速未收敛 | [217](https://github.com/thomas-yanxin/FateBridge/pull/217) `088e0f361ef33e3f2459d62c8bf75cd4ab842e41` |
+| 18 Vimshottari | `tests/jyotish/test_jyotish_dasha_levels.py` | 309/309、27/27仅原范围；印例与深层端点分别核 | [219](https://github.com/thomas-yanxin/FateBridge/pull/219) `bd1a59327195aa096eaf172a91e2d8bcbe971bd0` |
+| 19 人类图 | `scripts/human_design/`；[人类图审计](human-design-algorithm-audit.md) | 原严格238/244根、337/338门线；三种模型分别记账 | 未查到对应余项PR；#209属于另一批交付改动 |
+| 20 宿曜历史钟面 | `tests/sukuyo/test_sukuyo_historical_calendar.py` | NAOJ/HuTime225日、210差；日期书证不由物理月相裁定 | 未查到对应PR |
+| 21 IPIP最小发布 | 批准范围为 `core/psychometrics/`、具名50题计分 | 基点没有该模块或常模材料；常模、中文词义和临床研究未证 | 未查到对应PR |
+| 22 资料闭包 | `scripts/run_ci_checks.py`；`scripts/check_docs.py` | 缺Horizons／Ren参考及旧文档链接归本单元；不得放宽数值门 | [224](https://github.com/thomas-yanxin/FateBridge/pull/224) `46dc3960915d3b81a58b873d47e750066192d0d2` |
+| 23 Agent交付 | `tests/integration/{test_capability_discovery,test_full_surface_validation,test_result_delivery}.py` | 本地协议、模型行为和部署分列；与#194分工 | 未查到对应PR |
+| 24 西占长尾 | `tests/western/test_western_{lifespan,timing_tools}.py` | 具名时间钥／边界／坐标分别核；与#195/#197分工 | [221](https://github.com/thomas-yanxin/FateBridge/pull/221) `d2922f075a929b980ccccd9a065f9064304ae8a3` |
+| 25 其余领域边界 | `tests/{astronomy,fengshui,western}/`及领域文档 | 交节、DST、太阳跨日、五黄和关系方法；原例及实际三端分别验 | [223](https://github.com/thomas-yanxin/FateBridge/pull/223) `41213c470369b18779648e05762aa3a13566d9ef` |
+| 26 实证协议对账 | `scripts/evaluation/audit_prediction_study.py`；`tests/evaluation/test_prediction_*.py` | 仅合成流程、冻结分母、基线、弃权及负例；现实效度未证 | 当前分支；发布身份见本PR |
+
+PR204–207及209是另一批输出／输入交付改动，不充当上述余项的书证或现实效度验收。所有未决的现实效度、人工双读和常模仍按真实状态保留。梅花原365日前瞻的分析时间仍为2027-11-30 00:00香港时间起的原门槛；其前不解析结果，资料和重放限制见[预测验证](prediction-validation.md#独立检出的资料与复跑资格)。
+
 ## 维护与历史材料
 
 当前文档维护现行行为、依据和限制；独立参考、反例及未裁定项保留。逐轮日志、旧算法回放和迁移哈希链已退出当前维护范围。清理与恢复规则见[仓库维护](repository-maintenance.md)。

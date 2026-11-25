@@ -5,12 +5,24 @@ import json
 from datetime import datetime
 from pathlib import Path
 
+from pydantic import JsonValue, TypeAdapter
+
 from fatebridge.validation.predictions import (
     Forecast,
     Outcome,
     StudyPlan,
     evaluate_study,
 )
+
+
+def unique_json_members(members: list[tuple[str, JsonValue]]) -> dict[str, JsonValue]:
+    json_object: dict[str, JsonValue] = {}
+    for member_name, member_value in members:
+        if member_name in json_object:
+            raise ValueError(f"Duplicate JSON member: {member_name}")
+        else:
+            json_object[member_name] = member_value
+    return json_object
 
 
 def main() -> int:
@@ -21,15 +33,23 @@ def main() -> int:
     parser.add_argument("--as-of", required=True)
     parser.add_argument("--output", required=True, type=Path)
     args = parser.parse_args()
-    plan = StudyPlan.model_validate_json(args.plan.read_text(encoding="utf-8"))
-    forecasts = [
-        Forecast.model_validate(row)
-        for row in json.loads(args.forecasts.read_text(encoding="utf-8"))
-    ]
-    outcomes = [
-        Outcome.model_validate(row)
-        for row in json.loads(args.outcomes.read_text(encoding="utf-8"))
-    ]
+    plan = StudyPlan.model_validate(
+        json.loads(
+            args.plan.read_text(encoding="utf-8"), object_pairs_hook=unique_json_members
+        )
+    )
+    forecasts = TypeAdapter(list[Forecast]).validate_python(
+        json.loads(
+            args.forecasts.read_text(encoding="utf-8"),
+            object_pairs_hook=unique_json_members,
+        )
+    )
+    outcomes = TypeAdapter(list[Outcome]).validate_python(
+        json.loads(
+            args.outcomes.read_text(encoding="utf-8"),
+            object_pairs_hook=unique_json_members,
+        )
+    )
     report = evaluate_study(
         plan,
         forecasts,
