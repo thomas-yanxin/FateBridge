@@ -436,6 +436,10 @@ CLI profile 沿用批量入口，子工具共用 as_of / trace，parent_run_id �
 | `POST` | `/api/knowledge/registry` | 内置知识目录 |
 | `POST` | `/api/knowledge/read` | 内置知识条目读取 |
 
+MCP / CLI 使用 `export_registry`、`export_parse`、`knowledge_registry`、`knowledge_read`；`calculate_export_parse` 和 `calculate_knowledge_read` 是 Python 服务函数名，不是工具别名。先按 `knowledge_registry(domain=...)` 返回的分类与键查找，再用 `knowledge_read` 读取。支持自动分类的域在键唯一时可省略 `category`；同键跨分类时须显式指定分类，未知键和歧义键返回错误，不以相似词条替代。
+
+`export_parse` 接收 `technique`、`content` 和可选 `selected_sections`。空字符串内容产生空段列表与空 `export_text`，所选默认段仍会列入 `missing_selected_sections`；Unicode 正文、无正文的具名段和重复标题段保留。`sections` 按原顺序逐段返回，`section_titles_detected` 与 `selected_sections` 各自去重。解析会去掉段首尾空白，并以两个换行连接导出段，因此往返核验比较规范化后的段内容，不把原始空白布局视为字节不变。再次传入 `export_text` 并沿用同一选择可保持这些段；显式未命中选择返回空文本，空选择使用默认规则。字段投影与同 run 读取仍遵循[输出体积规则](#25-字段投影与输出体积)。
+
 ### 4.4 Divination 与本地技法
 
 日历 helper 的全年列表位于 `jieqi_year`；农历查询的年柱、时柱分别使用

@@ -16,6 +16,7 @@ from tests.fixtures.surface_payloads import (
     REST_GET_CASES,
     REST_POST_CASES,
 )
+from tests.support.transports import AS_OF, SPECS, business, rest, surface_calls
 
 
 def _build_client(monkeypatch) -> TestClient:
@@ -201,3 +202,122 @@ def test_rest_reserved_field_guard_rejects_clashing_model():
 
     with pytest.raises(ValueError, match="reserved"):
         register_rest(_DummyApp(), [bad], execute_service=lambda *a, **k: None)
+
+
+@pytest.mark.parametrize(
+    ("tool_name", "arguments", "fields"),
+    [
+        ("export_registry", {"technique": "generic"}, ["selected_technique.key"]),
+        ("knowledge_registry", {"domain": "qimen"}, ["domains"]),
+        (
+            "knowledge_read",
+            {"domain": "qimen", "key": "休门"},
+            ["domain", "category", "key", "rendered_text"],
+        ),
+    ],
+)
+def test_reference_helpers_match_strict_projection_and_clock(
+    tool_name, arguments, fields, surface_calls
+):
+    response, protocol, code, local = surface_calls(
+        SPECS[tool_name],
+        arguments,
+        projection={
+            "fields": fields,
+            "strict_fields": True,
+            "include_snapshot_text": False,
+            "response_char_limit": 0,
+        },
+        rest_as_of=AS_OF,
+    )
+    assert response.status_code == 200, response.text
+    assert not protocol.is_error, protocol.content
+    assert json.loads(protocol.content[0].text) == protocol.structured_content
+    assert code == 0, local
+    outputs = [response.json(), protocol.structured_content, local]
+    assert business(outputs[0]) == business(outputs[1]) == business(outputs[2])
+    for output in outputs:
+        _assert_run_metadata(output)
+        assert output["run_metadata"]["tool_name"] == tool_name
+        assert output["run_metadata"]["effective_time"]["as_of"] == AS_OF
+        assert set(output) == {field.split(".")[0] for field in fields} | {
+            "run_metadata"
+        }
+    if tool_name == "knowledge_read":
+        assert local["category"] == "door"
+        assert local["key"] == "休门"
+        assert "休养" in local["rendered_text"]
+    elif tool_name == "knowledge_registry":
+        assert local["domains"][0]["domain"] == "qimen"
+        assert any(
+            category["name"] == "door" and "休门" in category["keys"]
+            for category in local["domains"][0]["categories"]
+        )
+    else:
+        assert local["selected_technique"] == {"key": "generic"}
+
+
+@pytest.mark.parametrize(
+    ("content", "selection", "expected_titles", "expected_blocks", "expected_missing"),
+    [
+        ("", [], [], [], ["起盘信息"]),
+        (
+            "[公开]\n中文 ☊ 😀 é\n\n【空段】\n\n[公开]\n第二段\n\n[空段]",
+            ["公开", "空段", "公开"],
+            ["公开", "空段"],
+            ["[公开]\n中文 ☊ 😀 é", "【空段】", "[公开]\n第二段", "[空段]"],
+            [],
+        ),
+    ],
+)
+def test_export_parse_roundtrip_preserves_unicode_empty_and_repeated_sections(
+    content,
+    selection,
+    expected_titles,
+    expected_blocks,
+    expected_missing,
+    surface_calls,
+):
+    request = {
+        "technique": "generic",
+        "content": content,
+        "selected_sections": selection,
+    }
+    fields = [
+        "export_text",
+        "sections",
+        "section_titles_detected",
+        "selected_sections",
+        "missing_selected_sections",
+    ]
+    first = None
+    for _ in range(2):
+        response, protocol, code, local = surface_calls(
+            SPECS["export_parse"],
+            request,
+            projection={
+                "fields": fields,
+                "strict_fields": True,
+                "response_char_limit": 0,
+            },
+            rest_as_of=AS_OF,
+        )
+        assert response.status_code == 200, response.text
+        assert not protocol.is_error, protocol.content
+        assert json.loads(protocol.content[0].text) == protocol.structured_content
+        assert code == 0, local
+        outputs = [response.json(), protocol.structured_content, local]
+        assert business(outputs[0]) == business(outputs[1]) == business(outputs[2])
+        for output in outputs:
+            assert output["run_metadata"]["effective_time"]["as_of"] == AS_OF
+        parsed = business(local)
+        assert parsed["section_titles_detected"] == expected_titles
+        assert parsed["missing_selected_sections"] == expected_missing
+        assert [section["content"] for section in parsed["sections"]] == expected_blocks
+        assert all(section["included"] for section in parsed["sections"])
+        assert parsed["export_text"] == "\n\n".join(expected_blocks)
+        if first is None:
+            first = parsed
+        else:
+            assert parsed == first
+        request["content"] = parsed["export_text"]

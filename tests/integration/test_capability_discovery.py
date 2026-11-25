@@ -7,13 +7,18 @@ self-describing MCP transport flags.
 
 from __future__ import annotations
 
+import asyncio
 import inspect
+import json
 from typing import get_args
 
 from fastapi.testclient import TestClient
+from fastmcp import Client
 
 from fatebridge.api import app
 from fatebridge.application.description import describe_spec
+from fatebridge.cli import run
+from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG, mcp_specs, rest_specs
 from fatebridge.transports.mcp import _make_mcp_fn
 
@@ -78,3 +83,67 @@ def test_mcp_transport_flags_are_self_describing() -> None:
             getattr(meta, "description", None) for meta in get_args(annotation)[1:]
         ]
         assert any(descriptions), f"MCP flag {flag!r} has no description"
+
+
+def test_reference_and_dice_discovery_publish_callable_baseline_names(capsys):
+    names = [
+        "otherbu",
+        "export_registry",
+        "export_parse",
+        "knowledge_registry",
+        "knowledge_read",
+    ]
+    records = {}
+    for name in names:
+        response = TestClient(app).get(
+            "/api/tools", params={"tool": name, "surface": "mcp", "detail": "summary"}
+        )
+        assert response.status_code == 200, response.text
+        assert response.json()["matched_count"] == 1
+        record = response.json()["tools"][0]
+        assert record["tool"] == record["surfaces"]["mcp_name"] == name
+        capsys.readouterr()
+        assert run(["discover", "--tool", name, "--surface", "mcp"]) == 0
+        local = json.loads(capsys.readouterr().out)
+        assert local["tools"] == [record]
+        records[name] = record
+
+    async def native():
+        async with Client(
+            create_mcp_app(families="divination,export,knowledge")
+        ) as client:
+            tools = {tool.name for tool in await client.list_tools()}
+            assert set(names) <= tools
+            for name in names:
+                resource = json.loads(
+                    (await client.read_resource(f"fatebridge://tools/{name}"))[0].text
+                )
+                assert resource["matched_count"] == 1
+                assert resource["tools"][0]["tool"] == records[name]["tool"]
+                assert resource["tools"][0]["surfaces"] == records[name]["surfaces"]
+
+    asyncio.run(native())
+
+
+def test_discovery_rejects_unpublished_names_instead_of_inventing_aliases(capsys):
+    names = ["astrodice", "calculate_export_parse", "calculate_knowledge_read"]
+    for name in names:
+        response = TestClient(app).get("/api/tools", params={"tool": name})
+        assert response.status_code == 422
+        assert response.json()["issues"] == [{"path": "tool", "code": "unknown_tool"}]
+        capsys.readouterr()
+        assert run(["discover", "--tool", name]) == 1
+        local = json.loads(capsys.readouterr().out)
+        assert local["issues"] == [{"path": "tool", "code": "unknown_tool"}]
+        assert run([name]) == 2
+        assert json.loads(capsys.readouterr().out)["error_code"] == "usage_error"
+
+    async def native():
+        async with Client(
+            create_mcp_app(families="divination,export,knowledge")
+        ) as client:
+            for name in names:
+                result = await client.call_tool(name, {}, raise_on_error=False)
+                assert result.is_error
+
+    asyncio.run(native())

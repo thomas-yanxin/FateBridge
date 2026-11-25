@@ -6,6 +6,8 @@
 
 `otherbu` 解读用户已有的三枚骰面，规则版本 `astrodice_symbolic_v7`。它不代替用户抽骰，不接收塔罗牌阵。缺失或无效骰面会被拒绝，不再默认为太阳、白羊、一宫。
 
+发现与调用都使用当前公开名称 `otherbu`：REST 为 `POST /api/divination/otherbu`，MCP / CLI 为 `otherbu`，family 为 `divination`。`astrodice` 是领域与文档名称，不是可调用别名。可用 `fatebridge discover --tool otherbu` 或 MCP 资源 `fatebridge://tools/otherbu` 获取当前合同；工具被 host 隐藏时，以实际公开集合为准。
+
 ## 输入
 
 `planet`、`sign`、`house` 三项必填。`house` 保持原有的 **0..11 索引**：实体骰子的第 1 宫传 `0`，第 12 宫传 `11`。输出 `symbolic_details.house_number` 为自然宫号 1..12。浮点数、布尔值、负数和越界值不能被截断或钳制。

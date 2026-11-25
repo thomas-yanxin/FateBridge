@@ -1,5 +1,3 @@
-from fatebridge.utils.formatting import format_json_response
-
 """Large responses stay bounded while the original run remains fully readable."""
 
 import asyncio
@@ -20,9 +18,11 @@ from fatebridge.cli import run
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.errors import ParameterError
+from fatebridge.utils.formatting import format_json_response
 from fatebridge.utils.private_files import ensure_private_directory, open_private_file
 from tests.fixtures.mcp_result_delivery import assert_same_run_receipt
 from tests.support.result_delivery import reconstruct, store
+from tests.support.transports import AS_OF, SPECS, rest, surface_calls
 
 
 def large_payload():
@@ -546,3 +546,75 @@ def test_rest_result_readers_require_api_key_and_report_bad_references(
         ).status_code
         == 404
     )
+
+
+def test_export_unicode_delivery_reads_original_run_on_every_transport(
+    store, surface_calls, rest, capsys
+):
+    blocks = ["[公开]\n" + "中文 ☊ 😀 é\n" * 600, "【空段】", "[公开]\n第二段"]
+    content = "\n\n".join(block.strip() for block in blocks)
+    fields = ["export_text", "sections", "selected_sections"]
+    controls = {"fields": fields, "strict_fields": True, "response_char_limit": 4096}
+    response, protocol, code, local = surface_calls(
+        SPECS["export_parse"],
+        {
+            "technique": "generic",
+            "content": content,
+            "selected_sections": ["公开", "空段"],
+        },
+        params={**controls, "as_of": AS_OF},
+        options={**controls, "compact": True},
+        flags=[
+            "--fields",
+            *fields,
+            "--strict-fields",
+            "--response-char-limit",
+            "4096",
+            "--compact",
+        ],
+    )
+    assert response.status_code == 200, response.text
+    assert not protocol.is_error, protocol.content
+    assert json.loads(protocol.content[0].text) == protocol.structured_content
+    assert code == 0, local
+    outputs = [response.json(), protocol.structured_content, local]
+    for output in outputs:
+        assert len(format_json_response(output, compact=True)) <= 4096
+        reference = output["result_delivery"]
+        result_id = reference["result_id"]
+        run_id = output["run_metadata"]["run_id"]
+        assert reconstruct(store, result_id, "export_text") == content
+        sections = reconstruct(store, result_id, "sections")
+        assert [section["content"] for section in sections] == [
+            block.strip() for block in blocks
+        ]
+        assert reconstruct(store, result_id, "run_metadata.run_id") == run_id
+        assert (
+            reconstruct(store, result_id, "run_metadata.effective_time.as_of") == AS_OF
+        )
+        verified = rest.get(
+            f"/api/results/{result_id}/verified",
+            params={"expected_run_id": run_id, "path": "export_text"},
+        )
+        assert verified.status_code == 200, verified.text
+        assert verified.json()["verification"]["run_id"] == run_id
+        assert verified.json()["verification"]["calculation_repeated"] is False
+        capsys.readouterr()
+        assert (
+            run(["result-read", result_id, "--run-id", run_id, "--path", "export_text"])
+            == 0
+        )
+        assert json.loads(capsys.readouterr().out) == verified.json()
+
+    async def native_reads():
+        async with Client(create_mcp_app(families="export")) as client:
+            for output in outputs:
+                result_id = output["result_delivery"]["result_id"]
+                run_id = output["run_metadata"]["run_id"]
+                resource = f"fatebridge://results/{result_id}/verified/{run_id}/fields/export_text/0"
+                page = json.loads((await client.read_resource(resource))[0].text)
+                assert page["verification"]["run_id"] == run_id
+                assert page["verification"]["calculation_repeated"] is False
+                assert format_json_response(content).startswith(page["text"])
+
+    asyncio.run(native_reads())
