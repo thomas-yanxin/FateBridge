@@ -228,9 +228,11 @@ CALCEPH 5.0.1与jplephem分别读取DE440、DE442，共4880个同钟、同源几
 
 原出版社样章也从当前官方链接重新取得，10页、355833字节，SHA-256仍为 `5bbc572b33609ee1f23e33ee7a36645ddc565da9f256635a95043295369a33e6`。运行原 `build_human_design_publisher_natal_reference.py --pdf <样章路径> --check` 与第10页图像核对，仍得到两项结构事实及参考散列 `d041734b1b08b6797587390ec176c66a08ee27dc34b984a540d6ec3bf5900154`。原文仍是1895-05-12、12:25 PM、Madanapalle，未印时区，不能将AM诊断或16次计算当成16个独立出版例。
 
-新增[出版留出事实](../tests/fixtures/human-design-publisher-holdout.json)来自[myBodyGraph官方传记所链接的Ra Uru Hu公开图](https://app.mybodygraph.com/public/a26c31eb-5eda-5ac1-aa63-5efece78e042)，以[Jovian Archive传记](https://offer.jovianarchive.com/who-was-ra-uru-hu)交叉核对出生日期、钟面与地点。这一输入和分享页此前不在本域开发测试中，先冻结页面所列本地00:05、UTC05:05、七项结构属性及四个十字门，再运行现有实现。Montreal的 `America/Toronto` 是显式IANA时区假设，用页面UTC检查；设计日期13:19没有显式时区，不能自行指定为UTC来裁定秒级根。没有取得可独立转录的完整26门线，完整门线接受数仍为零。
+新增[出版留出事实](../tests/fixtures/human-design-publisher-holdout.json)来自[myBodyGraph官方传记所链接的Ra Uru Hu公开图](https://app.mybodygraph.com/public/a26c31eb-5eda-5ac1-aa63-5efece78e042)，以[Jovian Archive传记](https://offer.jovianarchive.com/who-was-ra-uru-hu)交叉核对出生日期、钟面与地点。这一输入和分享页此前不在本域开发测试中，先冻结页面所列本地00:05、UTC05:05、七项结构属性及四个十字门，再运行现有实现。Montreal的 `America/Toronto` 是显式IANA时区假设，用页面UTC检查。最初文本视图的设计日期13:19没有时区，未自行指定为UTC。
 
-新测试分别运行原生Swiss、原生Moshier和既有有限源太阳点质量视位置模型。前两项核对七项页面结构属性及四个十字门；点质量模型只比较它自己太阳设计根导出的四个门，不借原生身体图为它补上结构或交点资格。其输入状态仍来自Swiss文件，同源模型比较不是第三套独立物理观测。页面名称只作这一出版页面的字面比较；与位置相符不能证明整套出版术语或384线原意。
+随后沿该公开分享页客户端的只读数据调用，取得[出版社公开JSON](https://charts.maiamechanics.com/api/charts/public/a26c31eb-5eda-5ac1-aa63-5efece78e042)，记录版本5、完整26条门线及 `1948-01-12T13:19:43Z` 设计标签。原响应SHA-256为 `57b024610a11ad6ef8ef3068cf84ec02b51edd78018626c753b2137164cbfba5`；客户端 `app.5623a478.js` 的SHA-256为 `f99ef95d584ef4abf4498c7bba86e2b4c38ac6fd88f1a48cafd8bcba8ddfbb05`。行星编号0–12及Design=0、Personality=1直接核对出版社客户端枚举，不通过物理位置推定标签。仓库仅保存所需事实和来源散列，排除账户字段、原始响应及客户端源码。完整门线的采集发生在初始粗事实检查之后、门线比较之前；这不是所有运行前预注册的盲测，也不是独立人工图像双读。设计标签的可见粒度为整秒，没有改用1秒容差替代原严格根或钟面门槛。
+
+新测试分别运行原生Swiss、原生Moshier和既有有限源太阳点质量视位置模型。前两项核对七项页面结构属性、四个十字门及26条门线；点质量模型比较自己设计根的22条非交点门线，不借原生身体图或四条交点激活为它补上资格。其输入状态仍来自Swiss文件，同源模型比较不是第三套独立物理观测。页面名称只作这一出版页面的字面比较；与位置相符不能证明整套出版术语或384线原意。
 
 另用 `uv run --locked --extra dev python scripts/human_design/audit_human_design_root_models.py --output <新报告路径>` 对原13份观察逐模型记账。驱动固定原观察及原计划字节散列，核对实际返回的原生后端；每个模型始终列出22例、572条计划门线、原338条已观察门线及9例缺项的234条门线。点质量模型采用自己的设计根，仅评估22条非交点激活／图，保留观察队列中52条交点缺项；不能把它们从完整计划的未评估计数中移走。Earth分类复用精确对宫入口，不先舍入太阳黄经加180度的结果。
 

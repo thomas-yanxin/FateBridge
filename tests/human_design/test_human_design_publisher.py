@@ -329,6 +329,13 @@ def test_biography_publisher_holdout_keeps_model_and_source_scope_separate(
             for activation in column
             if activation["body"] not in ("Earth", "NorthNode", "SouthNode")
         } == {backend}
+        gate_lines = [
+            {
+                activation["body"]: f"{activation['gate']}.{activation['line']}"
+                for activation in reading["activations"][side]
+            }
+            for side in ("personality", "design")
+        ]
         graph = reading["bodygraph"]
         assert graph["type"] == expected["type"]
         assert graph["strategy"] == expected["strategy"]
@@ -340,3 +347,13 @@ def test_biography_publisher_holdout_keeps_model_and_source_scope_separate(
         assert reading["incarnation_cross"]["name"].casefold() == (
             expected["cross_name_literal"].casefold()
         )
+    for side, observed in zip(("personality", "design"), gate_lines, strict=True):
+        published = dict(
+            zip(example["planet_order"], example["columns"][side], strict=True)
+        )
+        if backend == "finite_source_point_mass":
+            published.pop("NorthNode")
+            published.pop("SouthNode")
+        else:
+            pass
+        assert observed == published

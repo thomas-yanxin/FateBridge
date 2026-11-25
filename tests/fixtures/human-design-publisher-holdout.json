@@ -5,10 +5,16 @@
     "linked_from": "https://www.mybodygraph.com/about-ra-uru-hu",
     "birth_note_confirmation": "https://offer.jovianarchive.com/who-was-ra-uru-hu",
     "retrieved_date": "2026-11-25",
-    "selection": "Publisher biography's own public chart, selected before running this example; no production implementation changed.",
-    "source_version": "Public shared chart retrieved 2026-11-25; no publisher software version supplied",
-    "design_date_display_timezone": "not explicitly labeled",
-    "activation_columns_transcribed": false
+    "selection": "Publisher biography's own public chart selected before the initial structural checks. Complete line facts were subsequently retrieved from the public shared-page data before line comparisons; no production implementation was changed or fitted to either phase.",
+    "source_version": "Public chart data record version 5; publisher ephemeris software version remains unspecified",
+    "design_date_display_timezone": "not labeled in initial text view; subsequent public JSON explicitly supplies UTC",
+    "activation_columns_source": "Public JSON consumed by the official shared-page client, not an independent manual diagram transcription",
+    "public_data_url": "https://charts.maiamechanics.com/api/charts/public/a26c31eb-5eda-5ac1-aa63-5efece78e042",
+    "public_data_sha256": "57b024610a11ad6ef8ef3068cf84ec02b51edd78018626c753b2137164cbfba5",
+    "client_url": "https://app.mybodygraph.com/js/app.5623a478.js",
+    "client_sha256": "f99ef95d584ef4abf4498c7bba86e2b4c38ac6fd88f1a48cafd8bcba8ddfbb05",
+    "publisher_planet_ids": {"Sun": 0, "Earth": 1, "Moon": 2, "NorthNode": 3, "SouthNode": 4, "Mercury": 5, "Venus": 6, "Mars": 7, "Jupiter": 8, "Saturn": 9, "Uranus": 10, "Neptune": 11, "Pluto": 12},
+    "publisher_activation_ids": {"design": 0, "personality": 1}
   },
   "example": {
     "id": "ra-uru-hu-publisher-biography-holdout",
@@ -23,6 +29,12 @@
     "displayed_local": "09 April 1948 @ 00:05",
     "displayed_utc": "09 April 1948 @ 05:05",
     "displayed_design_date": "12 January 1948 @ 13:19",
+    "published_design_utc": "1948-01-12T13:19:43Z",
+    "planet_order": ["Sun", "Earth", "Moon", "NorthNode", "SouthNode", "Mercury", "Venus", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune", "Pluto"],
+    "columns": {
+      "personality": ["51.5", "57.5", "51.1", "2.1", "1.1", "25.3", "20.6", "7.6", "10.1", "7.3", "12.1", "48.3", "33.6"],
+      "design": ["61.1", "62.1", "41.3", "23.3", "43.3", "60.1", "49.5", "40.2", "26.1", "4.3", "12.1", "48.4", "7.2"]
+    },
     "place": "Montreal, Canada",
     "expected": {
       "type": "manifestor",
@@ -35,5 +47,5 @@
       "cross_gates": [51, 57, 61, 62]
     }
   },
-  "acceptance_scope": "Finite publisher structural and four-gate comparison only. IANA America/Toronto is an explicit Montreal clock hypothesis checked against the printed UTC. The design-date zone remains unassigned; no timestamp tolerance or complete activation-line acceptance is inferred. No physical accuracy, full publisher terminology, source algorithm identity or predictive validity certification."
+  "acceptance_scope": "One finite publisher example: seven structural properties, four cross gates and 26 published gate-lines. The case and coarse facts preceded initial runs; complete line facts were collected in a subsequent source-reading phase, so these are not preregistered-before-any-run blind line results. IANA America/Toronto is an explicit Montreal clock hypothesis checked against the published UTC. The public JSON's one-second design label supplies no subsecond source precision; original strict clock/root thresholds are not replaced by a one-second tolerance. No physical accuracy, complete publisher terminology, source algorithm identity or predictive validity certification. Account fields and raw responses are excluded from this fixture."
 }
