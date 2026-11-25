@@ -173,6 +173,7 @@ def surface_calls(rest, tmp_path, capsys):
         cli_first=True,
         projection=None,
         rest_as_of=None,
+        rest_payload=None,
     ):
         if projection is not None:
             options = projection
@@ -189,8 +190,8 @@ def surface_calls(rest, tmp_path, capsys):
                         str(value).lower() if isinstance(value, bool) else str(value)
                     )
         http = rest.post(
-            spec.rest_path,
-            json=payload,
+            rest_spec(spec).rest_path,
+            json=payload if rest_payload is None else rest_payload,
             **({"params": params} if params is not None else {}),
         )
         if cli_first:

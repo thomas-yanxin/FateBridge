@@ -41,18 +41,32 @@ def _composite_chart(
     )
     inner_planets = {item["id"]: item for item in inner_chart["planets"]}
     outer_planets = {item["id"]: item for item in outer_chart["planets"]}
+    source_angle_definitions = {
+        role: chart["chart_profile"]["angle_definition"]
+        for role, chart in (("inner", inner_chart), ("outer", outer_chart))
+        if "angle_definition" in chart["chart_profile"]
+    }
+    ascendant_resolved = all(
+        definition.get("geometric_ascendant_resolved") is not False
+        for definition in source_angle_definitions.values()
+    )
+    houses_resolved = ascendant_resolved or house_system == "equal_mc"
     house_cusps = (
         []
-        if house_system == "whole_sign"
+        if house_system == "whole_sign" or not houses_resolved
         else _midpoint_house_cusps(
             _house_cusp_values_from_payload(inner_chart),
             _house_cusp_values_from_payload(outer_chart),
         )
     )
     composite_planets: List[Dict[str, Any]] = []
-    ascendant = unique_midpoint(
-        inner_chart["angles"]["ascendant"]["longitude"],
-        outer_chart["angles"]["ascendant"]["longitude"],
+    ascendant = (
+        unique_midpoint(
+            inner_chart["angles"]["ascendant"]["longitude"],
+            outer_chart["angles"]["ascendant"]["longitude"],
+        )
+        if ascendant_resolved
+        else None
     )
     midheaven = unique_midpoint(
         inner_chart["angles"]["midheaven"]["longitude"],
@@ -71,11 +85,14 @@ def _composite_chart(
                 longitude,
                 (inner_planets[planet]["latitude"] + outer_planets[planet]["latitude"])
                 / 2.0,
-                ascendant,
+                ascendant if ascendant is not None else 0.0,
                 house_system,
                 house_cusps=house_cusps or None,
             )
         )
+    if not houses_resolved:
+        for planet_record in composite_planets:
+            planet_record["house"] = None
     aspect_evidence = _build_aspects(composite_planets, include_evidence=True)
     aspects = [
         {key: row[key] for key in ("planet_a", "planet_b", "aspect", "orb")}
@@ -89,6 +106,22 @@ def _composite_chart(
         },
         "chart_profile": {
             "chart_type": "composite",
+            **(
+                {
+                    "angle_definition": {
+                        "status": "composite_source_angle_qualifications",
+                        "geometric_ascendant_resolved": ascendant_resolved,
+                        "source_angle_definitions": source_angle_definitions,
+                        "note_zh": (
+                            "组合ASC与对应宫头须连同双源角度资格读取；"
+                            "任一源ASC不可解时不求ASC中点，依赖ASC的分宫未知。"
+                            "MC中点与独立MC宫制不受这项限制。"
+                        ),
+                    }
+                }
+                if source_angle_definitions
+                else {}
+            ),
             "aspect_policy": inner_chart.get("chart_profile", {}).get("aspect_policy"),
             "tradition": inner_chart.get("chart_profile", {}).get("tradition", False),
             "house_system": house_system,
@@ -118,8 +151,12 @@ def _composite_chart(
         "angles": {
             "ascendant": {
                 "longitude": ascendant,
-                "sign": _sign_name(ascendant),
-                "sign_zh": SIGN_LABELS_ZH[_sign_name(ascendant)],
+                "sign": _sign_name(ascendant) if ascendant is not None else None,
+                "sign_zh": (
+                    SIGN_LABELS_ZH[_sign_name(ascendant)]
+                    if ascendant is not None
+                    else None
+                ),
             },
             "midheaven": {
                 "longitude": midheaven,
@@ -127,10 +164,15 @@ def _composite_chart(
                 "sign_zh": SIGN_LABELS_ZH[_sign_name(midheaven)],
             },
         },
-        "houses": _build_houses(
-            ascendant,
-            house_system,
-            house_cusps=house_cusps or None,
+        "houses": (
+            _build_houses(
+                ascendant if ascendant is not None else 0.0,
+                house_system,
+                house_cusps=house_cusps or None,
+                midheaven=midheaven,
+            )
+            if houses_resolved
+            else []
         ),
         "planets": composite_planets,
         "aspects": aspects,
@@ -191,7 +233,7 @@ def _build_chart_from_positions(
     chart_type: str,
     person_info: Dict[str, Any],
     source_planets: List[Dict[str, Any]],
-    ascendant: float,
+    ascendant: Optional[float],
     midheaven: float,
     house_system: str,
     house_cusps: Optional[List[float]] = None,
@@ -199,17 +241,21 @@ def _build_chart_from_positions(
     profile_overrides: Optional[Dict[str, Any]] = None,
     engine_profile: Optional[Dict[str, str]] = None,
 ) -> Dict[str, Any]:
+    houses_resolved = ascendant is not None or house_system == "equal_mc"
     planets = [
         _build_planet_record(
             item["id"],
             item["longitude"],
             item.get("latitude", 0.0),
-            ascendant,
+            ascendant if ascendant is not None else 0.0,
             house_system,
             house_cusps=house_cusps,
         )
         for item in sorted(source_planets, key=_planet_sort_key)
     ]
+    if not houses_resolved:
+        for planet in planets:
+            planet["house"] = None
     aspect_evidence = _build_aspects(planets, include_evidence=True)
     aspects = [
         {key: row[key] for key in ("planet_a", "planet_b", "aspect", "orb")}
@@ -233,8 +279,12 @@ def _build_chart_from_positions(
         "angles": {
             "ascendant": {
                 "longitude": ascendant,
-                "sign": _sign_name(ascendant),
-                "sign_zh": SIGN_LABELS_ZH[_sign_name(ascendant)],
+                "sign": _sign_name(ascendant) if ascendant is not None else None,
+                "sign_zh": (
+                    SIGN_LABELS_ZH[_sign_name(ascendant)]
+                    if ascendant is not None
+                    else None
+                ),
             },
             "midheaven": {
                 "longitude": midheaven,
@@ -242,7 +292,16 @@ def _build_chart_from_positions(
                 "sign_zh": SIGN_LABELS_ZH[_sign_name(midheaven)],
             },
         },
-        "houses": _build_houses(ascendant, house_system, house_cusps=house_cusps),
+        "houses": (
+            _build_houses(
+                ascendant if ascendant is not None else 0.0,
+                house_system,
+                house_cusps=house_cusps,
+                midheaven=midheaven,
+            )
+            if houses_resolved
+            else []
+        ),
         "planets": planets,
         "aspects": aspects,
         "aspect_evidence": aspect_evidence,
@@ -294,9 +353,16 @@ def _build_influence_chart_wrapper(
     )
     target_name = house_chart["person_info"]["name"]
     source_name = source_chart["person_info"]["name"]
+    # The target chart owns both the partition and its horizon qualification.
+    house_system = house_chart["chart_profile"]["house_system"]
+    angle_definition = house_chart["chart_profile"].get("angle_definition", {})
+    ascendant_resolved = (
+        angle_definition.get("geometric_ascendant_resolved") is not False
+    )
     house_cusps = (
         None
         if house_system == "whole_sign"
+        or (not ascendant_resolved and house_system != "equal_mc")
         else _house_cusp_values_from_payload(house_chart)
     )
     influence_chart = _build_chart_from_positions(
@@ -306,13 +372,36 @@ def _build_influence_chart_wrapper(
             "name": f"{target_name}受{source_name}影响",
         },
         source_planets=source_chart["planets"],
-        ascendant=house_chart["angles"]["ascendant"]["longitude"],
+        ascendant=(
+            house_chart["angles"]["ascendant"]["longitude"]
+            if ascendant_resolved
+            else None
+        ),
         midheaven=house_chart["angles"]["midheaven"]["longitude"],
         house_system=house_system,
         house_cusps=house_cusps,
         summary_prefix=f"已生成 {target_name} 视角的影响图盘。",
         engine_profile=engine_profile,
         profile_overrides={
+            **(
+                {
+                    "angle_definition": (
+                        angle_definition
+                        if ascendant_resolved
+                        else {
+                            **angle_definition,
+                            "retained_ascendant_role": "source_chart_backend_convention_not_delivered",
+                            "note_zh": (
+                                "目标本命盘的ASC不可解；影响图盘不交付ASC，"
+                                "依赖ASC的分宫未知。原角度模型与条件指标来自目标本命盘；"
+                                "MC与独立MC宫制仍可用。"
+                            ),
+                        }
+                    )
+                }
+                if angle_definition
+                else {}
+            ),
             "aspect_policy": house_chart.get("chart_profile", {}).get("aspect_policy"),
             "house_overlay_policy": "source ecliptic longitude in target cusp sectors; not a physical horizon recast",
             "reference_frame": f"{source_name}_planets_in_{target_name}_houses",
