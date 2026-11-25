@@ -3,14 +3,26 @@
 import hashlib
 import json
 from datetime import datetime, timedelta, timezone
+from fractions import Fraction
 from pathlib import Path
 
 import pytest
 
+from fatebridge.core.jyotish import vimshottari
 from fatebridge.core.jyotish_dasha_levels import active_levels
+from tests.support.vimshottari import (
+    DAY_MICROSECONDS,
+    YEAR_DAYS,
+    quantize_microseconds,
+    reference_periods,
+)
 
 PATH = Path(__file__).parents[1] / "fixtures/jyotish-deep-dasha-primary.json"
-DATA = json.loads(PATH.read_text())
+DATA = (
+    json.loads(PATH.read_text())
+    if PATH.exists()
+    else {"deep_cases": [], "pratyantar_groups": []}
+)
 ORIGIN = datetime(2000, 1, 1, tzinfo=timezone.utc)
 
 
@@ -20,6 +32,9 @@ def ticks(value):
 
 
 def test_reference_frozen_before_kernel():
+    assert (
+        PATH.exists()
+    ), "Required pinned deep-dasha reference is absent; provision the original fixture"
     assert (
         hashlib.sha256(PATH.read_bytes()).hexdigest()
         == "adc61db103cbbfd4ff7185f5c55febb674cf6de04d683861237a339ac42ba99a"
@@ -135,3 +150,76 @@ def test_invalid_lord_basis_naive_range_and_endpoints():
     late = datetime(9999, 1, 1, tzinfo=timezone.utc)
     with pytest.raises(ValueError, match="datetime range"):
         active_levels("Sun", late, late, year_basis="savana_360", depth=3)
+
+
+def test_rao_example_50_printed_balance_and_calendar_discrepancy() -> None:
+    """Rao printed211 supplies a longitude and a clock, not a new ephemeris fit."""
+    birth = datetime.fromisoformat("2000-04-28T05:50:00-04:00").astimezone(timezone.utc)
+    printed_moon_degrees = Fraction(302 * 60 + 23, 60)
+    remaining_years = Fraction(257, 800) * 7
+    assert remaining_years == Fraction(1799, 800)
+    remaining_microseconds = int(remaining_years * 360 * DAY_MICROSECONDS)
+    assert remaining_microseconds == 69_945_120_000_000
+    result = vimshottari(
+        birth,
+        float(printed_moon_degrees),
+        birth,
+        year_basis="savana_360",
+        dasha_depth=6,
+    )
+    assert (result["seed"]["name"], result["seed"]["pada"]) == ("Dhanishta", 3)
+    assert result["birth_balance"]["lord"] == "Mars"
+    assert result["birth_balance"]["remaining_years"] == pytest.approx(
+        float(remaining_years), abs=1e-13
+    )
+    assert result["birth_balance"]["remaining_microseconds"] == remaining_microseconds
+    assert result["birth_balance"]["major_start"] == "1995-08-22T23:02:00+00:00"
+    assert result["birth_balance"]["major_end"] == "2002-07-16T23:02:00+00:00"
+    printed_approximate_end = datetime.fromisoformat("2002-07-15T19:00:00-04:00")
+    assert datetime.fromisoformat(result["birth_balance"]["major_end"]) - (
+        printed_approximate_end
+    ) == timedelta(days=1, minutes=2)
+    assert [row["lord"] for row in result["subdivisions"]["current_levels"]] == [
+        "Mars",
+        "Ketu",
+        "Jupiter",
+        "Venus",
+        "Venus",
+        "Ketu",
+    ]
+    assert result["current_sub"]["start"] < birth.isoformat()
+
+
+@pytest.mark.parametrize("year_basis", YEAR_DAYS)
+@pytest.mark.parametrize("depth", range(3, 7))
+@pytest.mark.parametrize("moon_degrees", [123.456, 302 + 23 / 60])
+def test_independent_rational_adjacent_microseconds(
+    year_basis: str, depth: int, moon_degrees: float
+) -> None:
+    """A rounded parent duration or inclusive end changes the selected deep chain."""
+    target_microseconds = 1000 * DAY_MICROSECONDS
+    _, reference_chain = reference_periods(
+        Fraction(moon_degrees), target_microseconds, year_basis, depth
+    )
+    edge_microseconds = quantize_microseconds(reference_chain[-1].end_microseconds)
+    probes = []
+    for displacement in (-1, 0, 1):
+        probe_microseconds = edge_microseconds + displacement
+        _, expected_chain = reference_periods(
+            Fraction(moon_degrees), probe_microseconds, year_basis, depth
+        )
+        result = vimshottari(
+            ORIGIN,
+            moon_degrees,
+            ORIGIN + timedelta(microseconds=probe_microseconds),
+            year_basis=year_basis,
+            dasha_depth=depth,
+        )
+        actual_chain = result["subdivisions"]["current_levels"]
+        for actual, expected in zip(actual_chain, expected_chain, strict=True):
+            assert actual["lord_chain"] == list(expected.lord_chain)
+            assert (actual["start"], actual["end"]) == expected.clocks(ORIGIN)
+        probes.append(actual_chain[-1])
+    assert probes[0]["end"] == probes[1]["start"]
+    assert probes[0]["lord_chain"] != probes[1]["lord_chain"]
+    assert probes[1] == probes[2]

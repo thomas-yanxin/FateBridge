@@ -36,7 +36,11 @@ SOURCE = {
     "title": "P.V.R. Narasimha Rao, Vedic Astrology: An Integrated Approach (2000; 2010 update)",
     "url": "https://www.vedicastrologer.org/articles/vedic_astro_textbook.pdf",
     "sha256": "1cafa828f34764ed5e85816882df2e8f0bc014c5c57ccdb27169416e117fd4db",
-    "sections": ["16.1 names; 16.2 Table38; 16.3 printed212/PDF223"],
+    "sections": [
+        "16.1 names printed209/PDF221",
+        "16.2 Table38 printed210/PDF222; Example50 printed211/PDF223",
+        "16.3 printed212/PDF224",
+    ],
     "scope": "Same cyclic lord order and year weights recursively divide complete parent periods. UTC nominal-day year conventions and microsecond rounding are implementation choices, not original-text precision or empirical timing accuracy.",
 }
 
