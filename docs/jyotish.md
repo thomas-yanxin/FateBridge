@@ -34,6 +34,20 @@ Raman运动表的54项关系矛盾、不同扫描见证的19个清晰单元差�
 
 Simon模型的派生平均太阳现从Earth的精确长期多项式加180后再作最终浮点交付；Nathonnatha昼夜组也各自由同一未舍入角度公式交付，不再用已显示的一组反推另一组。独立FLINT参考的26783个固定控制与187481项重叠字段检查在修复后相符，原失败完整保留。这是给定输入的公式算术改进，未提高出生记录、物理星历或TT／TDB的资格；来源、测试迁移和有限对照范围见[精确数值审查](jyotish-algorithm-audit.md#平均太阳与昼夜互补值的后续对照)。
 
+六力审查按以下具名定义逐项核验；公开结果通过各条`source_id`与`india.rulesets`关联作者、标题和地址，内部完整性指纹不随公开结果返回。领域源定义固定的Santhanam卷一指纹前缀为`13609f1a`，Raman扫描本为`727c8063`，Simon1994为`1730fe5b`；Raman的具体重印版仍未核定。
+
+| 分量／问题 | 本次计算选择及可重放字段 | 保留的未决范围 |
+| --- | --- | --- |
+| 月亮／水星性质 | `drik_bala.nature_context`区分Raman117–118盈亏与53第八日窗口；`scenarios`保留各性质贡献 | 第八日端点带及作者内分歧不压成单值；水星关联没有通用数值阈值 |
+| Drekkana | `sthana_bala.profile.drekkana_profile`独立选择Santhanam27.6或Raman36；物理D1内10度分段，各自使用15 Virupa | `source_reading_conflicts`保留Raman摘要60；选`raman_30`只改变七分盘分量，不替换Drekkana |
+| 五星运动力 | `cheshta_bala.model_context`给Simon平均位置、同帧几何真位置及逐星中点角距；内外行星的平均位置与Seeghrochcha角色分别声明 | 默认五星缺项；54项关系矛盾、19单元异文和早期34条冲突不以Simon模型裁定 |
+| 日月运动力 | 同性质分支的太阳Ayana与月亮Paksha，可与`kala_bala.components`逐项回放 | 五星选择Simon不改变日月的Santhanam来源，也不裁定月亮性质 |
+| 星战 | `kala_bala.components.yuddha_bala.evidence`给同分支前置输入和固定Bimba分母，按Raman76–77回放 | 上游仍各有作者口径；同经、跨零点和多星交战保留未决；Santhanam27.20不混入同一公式 |
+
+[部分力量回放](../tests/jyotish/test_jyotish_partial_strength.py)使用工程合成输入，分别检查性质端点、具名Drekkana分组，以及同一固定`as_of`下真实REST POST、FastMCP逐工具与CLI的严格投影。当前公开本命工具名称为`astro_india_chart`，不是`vedic_chart`。真实盘回放保留两对独立星战，以独立展开的有理数合计检查固定173.8分母，并从返回操作数重新展开圆周中点检查运动力；这些只证明给定操作数的算术和交付。默认与显式Simon两种请求都须保留`shadbala_assessment.total_virupa=null`。
+
+干净基线`c63968b5f`的旧六力集合在收集时缺少`tests/fixtures/jyotish-{balas,kala,sthana,war}-classical.json`、`jyotish-motion-primary.json`及`jyotish-strength-arithmetic-reference.json`等参考文件，不能把该集合称为本轮已通过。已跟踪的FLINT冻结参考与这些缺件分开核验；本轮不重新认证缺件所依赖的原页、54／19原分母，也不提高64／96天文对照及两条未收敛月速的资格。
+
 ## 名义盘、条件证据与解读范围
 
 Ketu由同次Rahu精确加180°得到。分盘、星宿与宿足使用这项未舍入派生关系，名义盘和时间误差采样采用同一口径；返回的经度仍为浮点数。独立传入的手工原盘继续尊重其显式Ketu值，不据Rahu重建。边界与三端回归见[对点分区测试](../tests/western/test_western_antipodes.py)，不构成独立天文精度认证。

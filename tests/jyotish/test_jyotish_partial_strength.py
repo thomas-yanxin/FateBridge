@@ -8,16 +8,19 @@ import copy
 import math
 from fractions import Fraction
 from itertools import combinations
+from pathlib import Path
 
 import pytest
 
 from fatebridge.core import jyotish_mean
-from fatebridge.core.jyotish_balas import PLANETS
+from fatebridge.core.jyotish_balas import PLANETS, moon_nature_readings
 from fatebridge.core.jyotish_evidence import cheshta_ruler_provenance
 from fatebridge.core.jyotish_motion import cheshta_arc
+from fatebridge.core.jyotish_sthana import drekkana
 from fatebridge.core.jyotish_strength import SOURCE_ID
 from fatebridge.core.jyotish_war import STARS, THROUGH_HORA, war_bala
 from tests.jyotish.test_jyotish_transports import call_surfaces
+from tests.support.transports import AS_OF, SPECS, three_surfaces
 
 DISCS = {
     "Mars": "9.4",
@@ -272,3 +275,183 @@ def test_actual_1977_origin_pair_magnitude_reaches_three_surfaces_without_a_verd
             abs(totals[0] - totals[1]) / Fraction("7.2")
         )
     assert india["strengths"]["shadbala_assessment"]["total_virupa"] is None
+
+
+@pytest.mark.parametrize(
+    "elongation_degrees,waxing_natures,eighth_day_natures",
+    [
+        (0, ["benefic", "malefic"], ["malefic"]),
+        (83, ["benefic"], ["malefic"]),
+        (84, ["benefic"], ["benefic", "malefic"]),
+        (96, ["benefic"], ["benefic"]),
+        (180, ["benefic", "malefic"], ["benefic"]),
+        (263, ["malefic"], ["benefic"]),
+        (264, ["malefic"], ["benefic", "malefic"]),
+        (276, ["malefic"], ["malefic"]),
+    ],
+)
+def test_named_moon_readings_keep_disagreement_and_eighth_tithi_endpoints(
+    elongation_degrees: int,
+    waxing_natures: list[str],
+    eighth_day_natures: list[str],
+) -> None:
+    readings = moon_nature_readings(Fraction(elongation_degrees))
+    assert readings["readings"] == {
+        "raman_117_118_waxing_waning": waxing_natures,
+        "raman_53_eighth_day_window": eighth_day_natures,
+    }
+    assert set(readings["options"]) == set(waxing_natures + eighth_day_natures)
+
+
+@pytest.mark.parametrize(
+    "planet,longitude_degrees,santhanam_virupa,raman_virupa",
+    [
+        ("Sun", 9.0, 15, 15),
+        ("Sun", 10.0, 0, 0),
+        ("Moon", 10.0, 15, 0),
+        ("Moon", 20.0, 0, 15),
+        ("Mercury", 10.0, 0, 15),
+        ("Mercury", 20.0, 15, 0),
+        ("Venus", 19.0, 15, 0),
+        ("Saturn", 29.0, 15, 0),
+    ],
+)
+def test_drekkana_uses_named_d1_groups_and_detailed_fifteen_virupa(
+    planet: str,
+    longitude_degrees: float,
+    santhanam_virupa: int,
+    raman_virupa: int,
+) -> None:
+    assert drekkana(longitude_degrees, planet, "santhanam_27_6")["value"] == (
+        santhanam_virupa
+    )
+    assert drekkana(longitude_degrees, planet, "raman_36")["value"] == raman_virupa
+
+
+@pytest.mark.parametrize("mean_model", ["unadjudicated", "simon1994_j2000"])
+def test_named_strength_sources_and_partial_facts_on_actual_public_chart(
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    tmp_path: Path,
+    mean_model: str,
+) -> None:
+    payload = {
+        "birth_year": 2023,
+        "birth_month": 3,
+        "birth_day": 2,
+        "birth_hour": 0,
+        "birth_timezone": "UTC",
+        "birth_longitude": 0,
+        "birth_latitude": 0,
+        "birth_time_uncertainty_minutes": 0,
+        "divisions": [],
+        "saptavargaja_profile": "raman_30",
+        "drekkana_profile": "raman_36",
+        "cheshta_model": mean_model,
+    }
+    result = three_surfaces(
+        SPECS["astro_india"],
+        payload,
+        ["india.charts.D1", "india.strengths", "india.rulesets"],
+        AS_OF,
+        tmp_path,
+        monkeypatch,
+        capsys,
+    )["india"]
+    strengths = result["strengths"]
+    sources = {source["id"]: source for source in result["rulesets"]}
+    assert "R. Santhanam" in sources[SOURCE_ID]["title"]
+    positional = strengths["sthana_bala"]
+    conflict = positional["source_reading_conflicts"][0]
+    assert (conflict["detailed_value_virupa"], conflict["summary_value_virupa"]) == (
+        15,
+        60,
+    )
+    assert conflict["applies_to_selected_profile"] is True
+    assert conflict["whole_book_acceptance"] is False
+    assert positional["profile"]["id"] == "raman_30"
+    assert positional["profile"]["drekkana_profile"]["id"] == "raman_36"
+    aspect = strengths["drik_bala"]
+    assert aspect["nature_context"]["mercury_status"] == (
+        "association_predicate_not_adjudicated"
+    )
+    assert aspect["source_witness"]["complete_single_original_accepted"] is False
+    assert aspect["source_id"] == "raman_graha_bhava_balas_section30_preview"
+    assert sources[aspect["source_id"]]["url"] == (
+        "https://astrojyotish.info/pdf/graha-bhava-balas.pdf"
+    )
+    for branch in aspect["scenarios"].values():
+        assert branch["natures"]["Mercury"] in {"benefic", "malefic"}
+    temporal = strengths["kala_bala"]["components"]
+    motion = strengths["cheshta_bala"]
+    for branch_name, branch in motion["scenarios"].items():
+        assert branch["Sun"] == temporal["ayana_bala"]["summary"]["Sun"]
+        assert (
+            branch["Moon"] == temporal["paksha_bala"]["scenarios"][branch_name]["Moon"]
+        )
+    model = motion["model_context"]
+    assert model["selected"] == mean_model
+    if mean_model == "unadjudicated":
+        assert model["status"] == "mean_model_unadjudicated"
+        assert motion["missing_planets"] == list(STARS)
+        assert all(motion["summary"][planet] is None for planet in STARS)
+    else:
+        assert model["status"] == "computed_declared_secular_model"
+        assert model["source_id"] == "simon1994_mean_j2000_1730fe5b"
+        assert "Simon et al.(1994)" in sources[model["source_id"]]["title"]
+        assert model["frame"] == "mean_dynamical_ecliptic_equinox_J2000"
+        assert motion["missing_planets"] == []
+        for planet, evidence in model["planet_evidence"].items():
+            mean_body, apogee_body = (
+                ("Sun", planet) if planet in {"Mercury", "Venus"} else (planet, "Sun")
+            )
+            assert evidence["mean_longitude"] == model["mean_longitudes"][mean_body]
+            assert evidence["seeghrochcha"] == model["mean_longitudes"][apogee_body]
+            assert (
+                evidence["true_longitude"]
+                == model["true_position_provenance"][planet]["longitude"]
+            )
+            assert model["true_position_provenance"][planet]["frame"] == model["frame"]
+            # note (FateBridge): Unwrap around the true position to independently check the circular midpoint.
+            true_degrees = Fraction(evidence["true_longitude"])
+            mean_degrees = Fraction(evidence["mean_longitude"])
+            turns = (-360, 0, 360)
+            unwrapped_mean_degrees = min(
+                (mean_degrees + turn for turn in turns),
+                key=lambda candidate: abs(candidate - true_degrees),
+            )
+            midpoint_degrees = (unwrapped_mean_degrees + true_degrees) / 2
+            apogee_degrees = Fraction(evidence["seeghrochcha"])
+            distance_degrees = min(
+                abs(apogee_degrees + turn - midpoint_degrees) for turn in turns
+            )
+            assert motion["summary"][planet] == float(distance_degrees / 3)
+    war = temporal["yuddha_bala"]
+    assert [pair["planets"] for pair in war["pairs"]] == [
+        ["Mercury", "Saturn"],
+        ["Jupiter", "Venus"],
+    ]
+    assert war["upstream_profile"]["sthana"]["id"] == "raman_30"
+    for branch in war["evidence"].values():
+        assert branch["pairs"][1]["fixed_disc_difference_arcseconds"] == 173.8
+        assert branch["pairs"][1]["winner"] == "Venus"
+        totals_virupa = []
+        for planet in ("Jupiter", "Venus"):
+            basis = branch["prewar_basis"][planet]
+            assert set(basis["inputs"]) == {"sthana_bala", "dig_bala", *THROUGH_HORA}
+            totals_virupa.append(
+                Fraction(basis["exact_paksha_virupa"])
+                + sum(
+                    (
+                        Fraction(value)
+                        for name, value in basis["inputs"].items()
+                        if name != "paksha_bala"
+                    ),
+                    Fraction(),
+                )
+            )
+        assert branch["pairs"][1]["amount_virupa"] == float(
+            abs(totals_virupa[0] - totals_virupa[1]) / Fraction("173.8")
+        )
+    assert strengths["shadbala_assessment"]["status"] == "not_complete"
+    assert strengths["shadbala_assessment"]["total_virupa"] is None
