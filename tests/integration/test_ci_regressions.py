@@ -44,7 +44,7 @@ from fatebridge.utils.private_files import (
     open_private_file,
 )
 from tests.support.output_facts import canonical_json
-from tests.support.transports import SPECS, native, rest, surface_calls
+from tests.support.transports import AS_OF, SPECS, business, native, rest, surface_calls
 
 
 @pytest.mark.parametrize(
@@ -590,34 +590,82 @@ assert 'fatebridge.core.predictive._common' not in sys.modules
     assert proc.returncode == 0, proc.stderr
 
 
-@pytest.mark.parametrize("field", ["taiyin", "taiyang", "shaoyang", "shaoyin"])
-@pytest.mark.parametrize("invalid", ["乾卦", ""])
+TONGSHEFA_INPUT = {"taiyin": "巽", "taiyang": "坤", "shaoyang": "震", "shaoyin": "震"}
+
+
+@pytest.mark.parametrize("field", list(TONGSHEFA_INPUT))
+@pytest.mark.parametrize("invalid", ["乾卦", "", None])
 def test_invalid_trigram_is_not_replaced_by_a_default(field, invalid):
     with pytest.raises(ValueError, match=field):
-        build_tongshefa_result(**{field: invalid})
+        build_tongshefa_result(**{**TONGSHEFA_INPUT, field: invalid})
 
 
-@pytest.mark.parametrize("field", ["taiyin", "taiyang", "shaoyang", "shaoyin"])
-def test_invalid_trigram_fails_on_all_transports(field, surface_calls):
-    spec = SPECS["tongshefa"]
-    payload = {field: "乾卦"}
-    response, protocol, code, local = surface_calls(spec, payload)
-    assert response.status_code == 400 and code == 1 and protocol.is_error
+@pytest.mark.parametrize("field", list(TONGSHEFA_INPUT))
+@pytest.mark.parametrize("invalid", ["乾卦", "", None, "omitted"])
+def test_invalid_trigram_fails_on_all_transports(field, invalid, surface_calls):
+    payload = {**TONGSHEFA_INPUT, field: invalid}
+    if invalid == "omitted":
+        payload.pop(field)
+    response, protocol, code, local = surface_calls(SPECS["tongshefa"], payload)
+    assert response.status_code == (422 if invalid in (None, "omitted") else 400)
+    assert code == (2 if invalid == "omitted" else 1) and protocol.is_error
     for output in [response.json(), local, protocol.structured_content]:
-        assert output["error_code"] == "validation_error"
-        assert field in output["error"]
+        assert output["error_code"] == (
+            "usage_error"
+            if output is local and invalid == "omitted"
+            else "validation_error"
+        )
+        assert field in json.dumps(output, ensure_ascii=False)
         assert "tongshefa" not in output
 
 
-def test_omitted_and_null_trigrams_keep_the_declared_default_chart():
-    result = build_tongshefa_result(
-        taiyin=None, taiyang=None, shaoyang=None, shaoyin=None
-    )
-    assert result["input_normalized"] == {
-        "taiyin": "巽",
-        "taiyang": "坤",
-        "shaoyang": "震",
-        "shaoyin": "震",
+def test_empty_trigrams_fail_on_all_transports(surface_calls):
+    response, protocol, code, local = surface_calls(SPECS["tongshefa"], {})
+    assert response.status_code == 422 and code == 2 and protocol.is_error
+    for output in [response.json(), local, protocol.structured_content]:
+        assert output["error_code"] == (
+            "usage_error" if output is local else "validation_error"
+        )
+        assert "tongshefa" not in output
+    with pytest.raises(ValueError, match="taiyin"):
+        build_tongshefa_result()
+
+
+@pytest.mark.parametrize("projected", [False, True])
+def test_explicit_tongshefa_matches_hand_calculated_hexagrams(surface_calls, projected):
+    # Lines are bottom to top: 巽=011, 坤=000, 震=100.
+    # Mutual uses positions 2,3,4 / 3,4,5; opposite inverts all six bits.
+    expected = {
+        "baseLeft": ("风雷益", "100011"),
+        "baseRight": ("地雷复", "100000"),
+        "mutualLeft": ("山地剥", "000001"),
+        "mutualRight": ("坤为地", "000000"),
+        "oppositeLeft": ("雷风恒", "011100"),
+        "oppositeRight": ("天风姤", "011111"),
     }
-    assert result["tongshefa"]["baseLeft"]["name"] == "风雷益"
-    assert result["tongshefa"]["baseRight"]["name"] == "地雷复"
+    options = {"strict_fields": True, "response_char_limit": 0}
+    if projected:
+        options["fields"] = [
+            f"tongshefa.{key}.{leaf}"
+            for key in expected
+            for leaf in ("name", "binary_code")
+        ]
+    http, protocol, code, local = surface_calls(
+        SPECS["tongshefa"], TONGSHEFA_INPUT, projection=options, rest_as_of=AS_OF
+    )
+    assert http.status_code == 200 and code == 0 and not protocol.is_error
+    bodies = [
+        business(body) for body in (http.json(), local, protocol.structured_content)
+    ]
+    assert bodies[0] == bodies[1] == bodies[2]
+    for key, (name, binary_code) in expected.items():
+        assert bodies[0]["tongshefa"][key]["name"] == name
+        assert bodies[0]["tongshefa"][key]["binary_code"] == binary_code
+        if projected:
+            assert bodies[0]["tongshefa"][key] == {
+                "name": name,
+                "binary_code": binary_code,
+            }
+    if not projected:
+        assert bodies[0]["input_normalized"] == TONGSHEFA_INPUT
+        assert bodies[0]["tongshefa"]["main_relation"] == "思克实"

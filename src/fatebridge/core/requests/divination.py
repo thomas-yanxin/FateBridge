@@ -93,12 +93,20 @@ class GuaMeiyiRequest(_DeferredModel):
 
 
 class TongSheFaRequest(_DeferredModel):
-    """Request model for tongshefa."""
+    """Four explicitly supplied trigrams; names are checked by the domain entry."""
 
-    taiyin: Optional[str] = Field(default="巽", description="Taiyin trigram")
-    taiyang: Optional[str] = Field(default="坤", description="Taiyang trigram")
-    shaoyang: Optional[str] = Field(default="震", description="Shaoyang trigram")
-    shaoyin: Optional[str] = Field(default="震", description="Shaoyin trigram")
+    taiyin: str = Field(
+        description="Explicit Taiyin trigram: 乾、兑、离、震、巽、坎、艮、坤"
+    )
+    taiyang: str = Field(
+        description="Explicit Taiyang trigram: 乾、兑、离、震、巽、坎、艮、坤"
+    )
+    shaoyang: str = Field(
+        description="Explicit Shaoyang trigram: 乾、兑、离、震、巽、坎、艮、坤"
+    )
+    shaoyin: str = Field(
+        description="Explicit Shaoyin trigram: 乾、兑、离、震、巽、坎、艮、坤"
+    )
 
 
 class SixYaoLineRequest(_DeferredModel):

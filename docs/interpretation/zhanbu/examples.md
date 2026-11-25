@@ -14,7 +14,8 @@ python3 -m fatebridge.cli qimen \
   --analysis-year 2026 --analysis-month 6 --analysis-day 18 --analysis-hour 15 \
   --strict-fields --no-include-snapshot-text --fields analysis_context qimen.ju_text qimen.dun_type qimen.zhifu qimen.zhishi qimen.palaces
 
-python3 -m fatebridge.cli tongshefa --fields summary
+python3 -m fatebridge.cli tongshefa \
+  --taiyin 巽 --taiyang 坤 --shaoyang 震 --shaoyin 震 --fields summary
 
 python3 -m fatebridge.cli sixyao --question "这个项目试点有什么需要留意" \
   --date 2026-06-18 --time 15:00:00 --seed 20260618 \

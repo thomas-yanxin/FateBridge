@@ -26,6 +26,7 @@ TOOLS = (
     "gua_lookup",
     "meihua_analysis",
     "meihua_cast",
+    "tongshefa",
     "astro_guolao_chart",
     "astro_germany_chart",
     "astro_chart13",

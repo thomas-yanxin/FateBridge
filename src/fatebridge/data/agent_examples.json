@@ -34,6 +34,12 @@
     }
   },
   "tools": {
+    "tongshefa": {
+      "taiyin": "巽",
+      "taiyang": "坤",
+      "shaoyang": "震",
+      "shaoyin": "震"
+    },
     "heluo": {
       "date": "1990-06-15",
       "time": "09:33:00",

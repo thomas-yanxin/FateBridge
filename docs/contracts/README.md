@@ -14,6 +14,7 @@
 - [gua_lookup](gua_lookup.json)
 - [meihua_analysis](meihua_analysis.json)
 - [meihua_cast](meihua_cast.json)
+- [tongshefa](tongshefa.json)
 - [astro_guolao_chart](astro_guolao_chart.json)
 - [astro_germany_chart](astro_germany_chart.json)
 - [astro_chart13](astro_chart13.json)

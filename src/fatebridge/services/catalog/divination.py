@@ -148,7 +148,7 @@ SPECS: List[ToolSpec] = [
         request_model=TongSheFaRequest,
         summary=(
             "统摄四卦组合：按实际给定的 taiyin/taiyang/shaoyang/shaoyin "
-            "组合左右卦、潜藏与亲和；不实现蓍草十八变或大衍随机起卦，固定默认不是用户起卦。"
+            "组合左右卦、潜藏与亲和；四卦必须全部显式提供，不实现蓍草十八变或大衍随机起卦。"
         ),
         operation_label_zh="通蓍法",
         family="divination",

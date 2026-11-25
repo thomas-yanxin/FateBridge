@@ -229,7 +229,7 @@ python3 -m fatebridge.cli --no-metadata bazi_birth <出生参数> \
 
 - `meihua_analysis`：梅花易数，读取结构化 `meihua` / `summary` / `interpretation`，`--question`（可选）+ 起卦时间必填 `--analysis-year/month/day/hour`（要按当下起卦就传当前日期时间）。
 - `sixyao`：六爻，`--question`，CLI 手摇用 `--coins`（六掷之和，初爻到上爻，每项 6/7/8/9）或 `--gua-code`，也可按时间起。`lines` 对象列表使用 REST/MCP 传入，CLI 不解析对象字符串。
-- `tongshefa`：统摄四卦组合，读取实际 `taiyin/taiyang/shaoyang/shaoyin`；固定默认不是用户起卦，不实现蓍草十八变／大衍随机起卦。
+- `tongshefa`：统摄四卦组合，读取实际 `taiyin/taiyang/shaoyang/shaoyin`；四卦均须显式提供，缺项或无效卦名报输入错误；不实现蓍草十八变／大衍随机起卦。
 - `gua_lookup` / `gua_meiyi`：卦象查询 / 卦义。
 - `qimen`：奇门遁甲，起局 + 用神。
 - `taiyi`：太乙神数，支持明确选择年／月／日／时计；合参对应选项放入`taiyi_options`。先按[太乙取证](../zhanbu/taiyi-sanshi.md)核模式、起元、钟面和实际证据，现代适配不冒称完整古历。年／月八门与定计用`gates`、`gate_comparison`、`determinate`分源深读；日计读`daily_calendar/daily_essences`，始击读`shiji_derivation`，原表读`count_sources`。`menju_jiangfa`为三值条件合取，时计三门仍未裁定；默认至点时计不附定计，显式`key_hour_winter_jiazi_v1`可读完整积时和定计并保留原例三项差异，不按有利结果换法。
