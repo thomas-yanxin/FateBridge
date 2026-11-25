@@ -41,7 +41,7 @@ def test_swiss_new_holdout_uses_the_unchanged_accuracy_line(ephemeris_files):
     _, path = ephemeris_files
     e.swe.close()
     e.configure_ephemeris_path(str(path))
-    report = evaluate(*loaded())
+    report = evaluate(*loaded(), backend="swieph")
     assert report["requested"] == len(report["rows"]) == 84
     assert report["source_errors"] == report["unresolved_reference"] == 0
     assert {row["actual_model"] for row in report["rows"]} == {"swieph"}
@@ -65,7 +65,14 @@ def test_moshier_audit_retains_all_external_failures_and_correct_exit(
     assert report["source_errors"] == report["unresolved_reference"] == 0
     assert {row["actual_model"] for row in report["rows"]} == {"moshier"}
     assert len({(row["body"], row["date_tt"]) for row in report["rows"]}) == 84
-    assert report["passed"] == sum(row["passed"] for row in report["rows"])
+    assert report["passed"] == sum(row["passed"] for row in report["rows"]) == 52
+    assert (
+        sum(
+            abs(row["native_signed_residual_arcsec_per_day"]) <= 0.002
+            for row in report["rows"]
+        )
+        == 27
+    )
     assert code == (0 if all(row["passed"] for row in report["rows"]) else 1)
     for row in report["rows"]:
         assert "native_signed_residual_arcsec_per_day" in row

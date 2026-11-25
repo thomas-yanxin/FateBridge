@@ -1,0 +1,15 @@
+{
+  "source_only": true,
+  "files": [
+    {
+      "path": "protocol.json",
+      "bytes": 2747,
+      "sha256": "9c46e6590bbdd5cfb891d499b03f889fffa258e6294b6b7e87bb2eab74b877d5"
+    },
+    {
+      "path": "reference.json",
+      "bytes": 1302755,
+      "sha256": "4fff4d0817aeb6e4514f6fbae75609357c52eb86c5acc228490470f6195758c3"
+    }
+  ]
+}
