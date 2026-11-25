@@ -5,6 +5,11 @@ These controls check selected derived arithmetic and service contracts. They do
 not certify natal ephemeris accuracy, complete classical methods or prediction.
 """
 
+import math
+from pathlib import Path
+
+import pytest
+
 from fatebridge.core.astrology_lifespan import (
     BALBILLUS_SMALL_YEARS,
     DOROTHEAN_TRIPLICITY_RULERS,
@@ -32,6 +37,7 @@ from fatebridge.services.western_lifespan import (
     calculate_yearsystem129,
 )
 from fatebridge.services.western_timing_tools import calculate_timing_tool
+from tests.support.transports import AS_OF, SPECS, three_surfaces
 
 BIRTH = dict(
     name="测试者",
@@ -364,3 +370,87 @@ def test_harmonic_natal_longitude_matches_chart_engine():
     sun = result["harmonic_chart"]["positions"]["sun"]
     expected = (sun["natal_absolute_degree"] * 7) % 360.0
     assert abs(sun["absolute_degree"] - round(expected, 4)) < 1e-3
+
+
+@pytest.mark.parametrize(
+    "birth_hour,expected_rulers",
+    [(12, ["Venus", "Mars", "Moon"]), (0, ["Mars", "Venus", "Moon"])],
+)
+def test_triplicity_source_sect_order_reaches_three_surfaces(
+    birth_hour: int,
+    expected_rulers: list[str],
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """Preserve the day/night water-trigon order documented by Houlding (1994)."""
+    result = three_surfaces(
+        SPECS["astro_triplicity_rulers"],
+        {
+            "birth_year": 2000,
+            "birth_month": 7,
+            "birth_day": 2,
+            "birth_hour": birth_hour,
+            "birth_minute": 0,
+            "birth_timezone": "UTC",
+            "birth_longitude": 0,
+            "birth_latitude": 0,
+        },
+        ["triplicity_rulers"],
+        AS_OF,
+        tmp_path,
+        monkeypatch,
+        capsys,
+    )
+    stages = result["triplicity_rulers"]["stages"]
+    assert [stage["ruler"] for stage in stages] == expected_rulers
+    assert [(stage["start_age"], stage["end_age"]) for stage in stages] == [
+        (0, 25),
+        (25, 50),
+        (50, 75),
+    ]
+
+
+@pytest.mark.parametrize("max_age_years", [19.0, math.nextafter(19.0, math.inf)])
+def test_small_year_preview_boundary_reaches_three_surfaces(
+    max_age_years: float,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """A preview includes a period only when its start precedes the age limit."""
+    result = three_surfaces(
+        SPECS["astro_yearsystem129"],
+        {**BIRTH, "max_age_years": max_age_years, "start_planet": "Sun"},
+        ["natal_reference", "yearsystem129"],
+        AS_OF,
+        tmp_path,
+        monkeypatch,
+        capsys,
+    )
+    source_small_years = {
+        "Sun": 19,
+        "Moon": 25,
+        "Saturn": 30,
+        "Jupiter": 12,
+        "Mars": 15,
+        "Venus": 8,
+        "Mercury": 20,
+    }
+    ordered_planets = sorted(
+        source_small_years,
+        key=lambda planet: result["natal_reference"][planet.lower()]["absolute_degree"],
+    )
+    sun_index = ordered_planets.index("Sun")
+    ordered_planets = ordered_planets[sun_index:] + ordered_planets[:sun_index]
+    periods = result["yearsystem129"]["periods"]
+    expected_count = 1 if max_age_years == 19 else 2
+    assert len(periods) == expected_count
+    assert [period["planet"] for period in periods] == ordered_planets[:expected_count]
+    assert periods[0]["start_age_years"] == 0
+    assert periods[0]["duration_years"] == 19
+    if expected_count == 2:
+        assert periods[1]["start_age_years"] == 19
+        assert periods[1]["duration_years"] == source_small_years[ordered_planets[1]]
+    else:
+        assert result["yearsystem129"]["total_cycle_years"] == 129

@@ -5,6 +5,7 @@ accuracy or the empirical validity of symbolic progression techniques.
 """
 
 from datetime import datetime, timezone
+from pathlib import Path
 
 import pytest
 
@@ -16,7 +17,15 @@ from fatebridge.core.ephemeris_runtime import (
     swe,
 )
 from fatebridge.services.western_lifespan import _body_declinations, calculate_vedicprog
-from tests.support.transports import SPECS, business, native, rest, surface_calls
+from tests.support.transports import (
+    AS_OF,
+    SPECS,
+    business,
+    native,
+    rest,
+    surface_calls,
+    three_surfaces,
+)
 
 BIRTH_INPUTS = dict(
     birth_year=1972,
@@ -161,3 +170,37 @@ def test_correct_progression_frames_reach_rest_mcp_cli(tool, surface_calls):
                 )[1]
                 assert row["natal_declination"] == round(natal_declination, 4)
                 assert row["progressed_declination"] == round(progressed_declination, 4)
+
+
+@pytest.mark.parametrize("arc_source,planet", [("Sun", swe.SUN), ("Moon", swe.MOON)])
+def test_planetary_arc_uses_secondary_motion_on_all_surfaces(
+    arc_source: str,
+    planet: int,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """Check the rigid arc against native positions at the independent clock vector."""
+    result = three_surfaces(
+        SPECS["astro_planetaryarc"],
+        {**BIRTH_INPUTS, "arc_source": arc_source},
+        ["natal_reference", "planetary_arc"],
+        AS_OF,
+        tmp_path,
+        monkeypatch,
+        capsys,
+    )
+    progression = result["planetary_arc"]
+    assert datetime.fromisoformat(progression["progressed_datetime"]) == PROGRESSED
+    source_arc_degrees = (
+        native_coordinates(planet, PROGRESSED)[0] - native_coordinates(planet, BIRTH)[0]
+    ) % 360
+    assert progression["arc_source"] == arc_source
+    assert progression["arc_degrees"] == pytest.approx(source_arc_degrees, abs=0.00005)
+    for body in ("sun", "moon", "mercury"):
+        expected_longitude_degrees = (
+            result["natal_reference"][body]["absolute_degree"] + source_arc_degrees
+        ) % 360
+        assert progression["positions"][body]["absolute_degree"] == pytest.approx(
+            expected_longitude_degrees, abs=1e-8
+        )

@@ -382,6 +382,16 @@ uv run --locked --extra dev --with pyerfa==2.0.1.5 --with numpy==2.5.4 python -m
 
 另从官网所指仓库编译[Astrolog 8.00固定提交](https://github.com/CruiserOne/Astrolog/tree/5bf172ea231c4b6ea3d7e09ca307571354a41e8a)，只关闭X11，数值源码未改。15个明示输入实际调用90次；提供已声明TT偏移后，二次推运四个公开位置的60个分量均在预定2角秒内，最大约0.605角秒；旧键有31个分量超界。逐历元原生位置加独立FLINT旋转的太阳弧参照也在2角秒内，最大约0.781角秒；旧键同组最大约0.509角秒，不能据新键过线宣称误差单调改善，历史UT1轴模型仍有差异。默认TT假设、历史UT1模型及单个DeltaT覆盖跨闰秒的差异全部保留，未将其混成同一物理框架。双方共享Swiss数值后端，这不是独立天文精度、完整方法或预测有效性的证据，也未证明全软件SOTA。
 
+## 长尾推运的来源与对照边界
+
+三分主星的昼夜换序与命灯选择可对照 Deborah Houlding 的[《The Classical Use of Triplicities》](https://www.skyscript.co.uk/triplicities.html)（初刊于《The Traditional Astrologer》6，1994年秋，引用 Dorotheus I.1、I.12）。例如水象昼盘为金星、火星、月亮，夜盘为火星、金星、月亮。该来源支持主星顺序与早、中、晚期的区分，不给固定75年总长，也不认证当前`thirds`的25年等分或`halves`的等分时间钥。`lifespan`是用户给定的名义区间，不是寿命计算。对应三端回归用合成昼／夜水象盘核顺序，等分只按当前软件约定核传递。
+
+`yearsystem129`沿用已声明的本命黄经轮序，七曜小年取值与[Balbillus校订本及异读](#balbillus比例削减与异法)分别核对；不能从小年之和129推导该轮序已经得到原典全程序认证。预览按`start_age_years < max_age_years`纳入完整周期，不截短末段；19岁和它的下一个可表示浮点数分别只包含太阳期及额外的下一期。星体弧则对照同一固定次限时刻的原生太阳／月亮坐标差，检查所选源及七曜刚性旋转，属于同Swiss后端的时间与坐标传递检查。
+
+Huber年龄点的每宫6年、72年返回上升并开始下一循环，可核[Astrological Psychology网站2022年12月9日的公开说明](https://astrologicalpsychology.org/2022/12/09/the-six-and-thirty-six-years-in-huber-age-progression/)；Koch宫选择与宫内按宫宽六等分另见[Mel Priestley《A primer on the Huber Age Point Cycle》](https://www.melpriestley.ca/a-primer-on-the-huber-age-point-cycle/)（2024年10月7日，现代讲解）。现有测试核宫头半开边界、周期末端排序、年度接触标签与真实三端。它们没有提供独立Koch制宫原书算例，也未核Huber完整低点、相位与解读程序。
+
+`astro_jaynesprog`当前计算次限赤纬的平行／反平行，不能据工具名称认定它覆盖Jayne全部推运。[Bill Meridian在Urania Trust所刊《Charles Jayne (1911–1985)》](https://www.uraniatrust.org/celebrated-astrologers/charles-jayne)（2016年3月7日）明确区分次限与“推运太阳赤纬减本命太阳赤纬”的赤纬弧，并提到正逆及半、整、倍弧。该回忆文章没有给出足以裁定本工具专属Jayne时间钥的完整算法；当前固定365.24219日年键、赤纬TT取值和接触容许度按已声明模型验算，专著版次与完整具名方法仍待独立原例。恒星次限同样只核当前Lahiri坐标及公共时间钥，不把它当作全部印度推运传统的认证。
+
 ## 极区天球四轴与制宫分支
 
 同一地点与时刻的天球子午线MC不随宫制变化。Swiss [6.4节](https://www.astro.com/swisseph/swisseph.htm)说明部分极区宫制会交换MC／IC，并使用逆向宫序；[固定版本源码](https://github.com/aloistr/swisseph/blob/v2.10.03/swehouse.c)也包含Polich-Page的相反分支处理。FateBridge现在以E计算中的东侧地平交点及赤经等于ARMC的子午线交点作为公开ASC／MC，保留所选宫制的原始宫头和落宫投影。存在相反分支时，`chart_profile.house_axis_convention`及推运的`calculation_basis.house_axis_convention`同时提供公开轴、原生制宫轴、黄道坐标系及来源；公开MC不要求等于第10宫宫头。该公共字段定义是FateBridge的显式选择，不能当成所有流派唯一的MC用语。
