@@ -70,8 +70,6 @@ class CIShard:
                 + "\n",
                 encoding="utf-8",
             )
-        else:
-            pass
 
 
 def pytest_addoption(parser: pytest.Parser) -> None:
@@ -87,8 +85,6 @@ def pytest_configure(config: pytest.Config) -> None:
     count: int = config.getoption("shard_count")
     if not 0 <= index < count:
         raise pytest.UsageError("shard-index must be in [0, shard-count)")
-    else:
-        pass
     weights: dict[str, float] = json.loads(
         (ROOT / ".github/ci-test-costs.json").read_text(encoding="utf-8")
     )

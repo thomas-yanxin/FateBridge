@@ -1,0 +1,24 @@
+{
+  "recorded_at_utc": "2026-10-22T23:29:34.930880+00:00",
+  "phase": "source_only_calendar_carry_reference_before_new_candidate",
+  "source": {
+    "path": "tests/data/bazi_boundary_decisions_v1/probes.json",
+    "sha256": "4912b449f484413b7dea61af35a4f93446d0710189f018f1a6c544842f0751fa"
+  },
+  "source_scope": "Archived calculated Jie and source-conditioned Gregorian software policy; shared astronomical frame, no independent observation or originaltext accuracy credit. UTC raw civil fixture isolates calendar carrying; not physical birth records.",
+  "hypothesis": "Reverse three-days-one-year civil calendar addition can jump backward at a nominal30day carry because the birth day is clipped in the resulting Gregorian month. A short pre-carry before_dayun state can be missed by original minute grid and natal event probes.",
+  "selection": "All archived Jie pairs spanning1900..2100; for every preceding Jie test k=1..132 inclusive at root+k*6elapsedhours, provided birth is1900..2100 and before the next Jie. Select every negative initial-boundary jump between carry-1microsecond and carry+1microsecond. Do not select using application output or discard awkward cases.",
+  "reference_arithmetic": "Integer elapsed microseconds multiplied120; divmod360nominaldays then30nominaldays; apply years/months together by Gregorian calendar.monthrange clipping, then days and remaining microseconds. Standard datetime/calendar only, no fatebridge/dateutil/ZoneInfo.",
+  "fixtures": "Whole-second nominal center=floor(carry)-30seconds, +/-1elapsedminute; analysis_at=manual_initial_boundary(carry-1microsecond)-40minutes. Keep all selected rows even if grid does not miss state; independent probes carry-10seconds, carry-1microsecond, carry, carry+1microsecond.",
+  "reference_precision_scope": "Exact integer software arithmetic on archived computed roots; microsecond representation is not astronomical or birth-record accuracy. Actual floating conversion differences diagnosed separately with fixed0.1second start_at tolerance; state labels have multi-second margins except exactcarry which remains diagnostic.",
+  "gates": [
+    "Freeze reference and collector hash before any actual after-source analysis.",
+    "Retain all source rows, exactcarry numerical issues, original grid and natal event evidence separately.",
+    "Actual before and future candidate run whole selected cohort; inspect current states and boundary envelopes separately.",
+    "No change to original dayun calendar policy, source labels, strength weights or full objective to obtain green.",
+    "No model executions, external expert or realworld predictions authorized."
+  ],
+  "new_independent_observation_credit": 0,
+  "full_goal_complete": false,
+  "overall_score": null
+}

@@ -121,15 +121,8 @@ jobs:
           key: quality-${{ runner.os }}-py3.12-${{ hashFiles('uv.lock', 'pyproject.toml') }}-${{ hashFiles('src/**/*.py', 'scripts/**/*.py', 'tests/**/*.py') }}
           restore-keys: |
             quality-${{ runner.os }}-py3.12-${{ hashFiles('uv.lock', 'pyproject.toml') }}-
-      - name: Check formatting
-        run: uv run --locked --extra dev black --check src/fatebridge scripts tests
-      - name: Check import order
-        run: uv run --locked --extra dev isort --check-only src/fatebridge scripts tests
-      - name: Run type checks
-        run: uv run --locked --extra dev mypy src/fatebridge/
-      - name: Check generated call contracts
-        run: |
-          uv run --locked --extra dev python scripts/build_codex_call_contracts.py --check
+      - name: Check repository files, formatting, types and generated contracts
+        run: uv run --locked --extra dev pre-commit run --hook-stage manual --all-files --show-diff-on-failure
 
   test:
     name: Tests (${{ matrix.environment.python }}, ${{ matrix.environment.os }}, ${{ matrix.environment.resolution }}, shard ${{ matrix.shard }})
@@ -265,12 +258,9 @@ jobs:
           for path in Path("ci-evidence").glob("*/ci-selection.json"):
               report = json.loads(path.read_text(encoding="utf-8"))
               attempt = int(path.parent.name.rsplit("-attempt", 1)[1])
-              shard_identity = (report["environment"], report["shard_index"])
-              previous_attempt = latest.get(shard_identity)
-              if previous_attempt is None or attempt > previous_attempt[0]:
-                  latest[shard_identity] = (attempt, report)
-              else:
-                  pass
+              key = (report["environment"], report["shard_index"])
+              if key not in latest or attempt > latest[key][0]:
+                  latest[key] = (attempt, report)
           assert len(latest) == 18, f"Expected 18 shard reports, found {len(latest)}"
           groups = defaultdict(list)
           for _, report in latest.values():
