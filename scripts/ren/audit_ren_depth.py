@@ -27,13 +27,13 @@ def sha(path: Path) -> str:
 def load_reference(corpus: Path = CORPUS) -> dict[str, Any]:
     frozen = json.loads((corpus / "freeze.json").read_text(encoding="utf-8"))
     expected = {"jinkou-internal.json", "tanyuan-rules.json", "tanyuan-table.json"}
-    if set(frozen["files"]) != expected or {
-        p.name for p in corpus.glob("*.json")
-    } != expected | {"freeze.json"}:
+    if set(frozen["files"]) != expected:
         raise ValueError("Reference file set changed")
     for name, checksum in frozen["files"].items():
         if sha(corpus / name) != checksum:
             raise ValueError(f"Reference changed after freeze: {name}")
+    if {p.name for p in corpus.glob("*.json")} != expected | {"freeze.json"}:
+        raise ValueError("Reference file set changed")
     return {
         Path(name).stem: json.loads((corpus / name).read_text(encoding="utf-8"))
         for name in expected
@@ -43,13 +43,13 @@ def load_reference(corpus: Path = CORPUS) -> dict[str, Any]:
 def load_scan_reference(corpus: Path = SCAN_CORPUS) -> dict[str, Any]:
     frozen = json.loads((corpus / "freeze.json").read_text(encoding="utf-8"))
     expected = {"collation.json", "selected-pages.pdf"}
-    if set(frozen["files"]) != expected or {
-        p.name for p in corpus.iterdir() if p.is_file()
-    } != expected | {"freeze.json"}:
+    if set(frozen["files"]) != expected:
         raise ValueError("Reference scan file set changed")
     for name, checksum in frozen["files"].items():
         if sha(corpus / name) != checksum:
             raise ValueError(f"Reference scan changed after freeze: {name}")
+    if {p.name for p in corpus.iterdir() if p.is_file()} != expected | {"freeze.json"}:
+        raise ValueError("Reference scan file set changed")
     data = json.loads((corpus / "collation.json").read_text(encoding="utf-8"))
     if len(data["missing_table_rows"]) != 8 or len(data["fuyin_table_rows"]) != 3:
         raise ValueError("Reference scan coverage changed")
@@ -300,13 +300,31 @@ def main() -> int:
     parser.add_argument("--output", type=Path)
     parser.add_argument("--require-source-conformance", action="store_true")
     args = parser.parse_args()
-    report = audit()
+    try:
+        report = audit()
+    except FileNotFoundError as error:
+        report = {
+            "status": "source_unavailable",
+            "missing_source_file": error.filename,
+            "implemented_excerpt_checks_passed": False,
+            "all_source_assertions_matched": False,
+            "classical_acceptance_passed": False,
+            "authority_certified": False,
+            "scope": "Source audit incomplete; historical scores are not remeasured.",
+        }
+    else:
+        report["status"] = "compared"
     if args.output:
         args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_text(
             json.dumps(report, ensure_ascii=False, indent=2, allow_nan=False) + "\n",
             encoding="utf-8",
         )
+    if report["status"] == "source_unavailable":
+        print(json.dumps(report, ensure_ascii=False))
+        return 1
+    else:
+        pass
     print(
         json.dumps(
             {

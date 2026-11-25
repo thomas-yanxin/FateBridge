@@ -188,8 +188,12 @@ def test_v2_freeze_rejects_drift_without_changing_v1(tmp_path, change):
         (target / "jinkou-internal.json").unlink()
     else:
         (target / "hidden.json").write_text("{}")
-    with pytest.raises(ValueError, match="Reference"):
-        AUDIT.load_reference(target)
+    if change == "missing":
+        with pytest.raises(FileNotFoundError, match="jinkou-internal.json"):
+            AUDIT.load_reference(target)
+    else:
+        with pytest.raises(ValueError, match="Reference"):
+            AUDIT.load_reference(target)
     assert V1.load_frozen_corpus()["cases"]["unresolved"]
 
 

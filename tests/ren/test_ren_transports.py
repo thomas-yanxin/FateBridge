@@ -38,8 +38,7 @@ PAYLOAD = dict(
 
 @pytest.fixture(autouse=True)
 def native_solar_control(monkeypatch, native_ephemeris_files):
-    # This module asserts actual Swiss native flags; keep its model premise
-    # explicit as the application's automatic solar policy evolves.
+    # Native policy can select bundled DE441 when optional Swiss files are absent.
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
 
 
@@ -143,15 +142,26 @@ def test_corrected_facts_survive_each_transport_and_field_projection(
         assert len(dependencies) == 5
         for dependency in dependencies:
             assert dependency["solver_time_scale"] == "TT"
-            assert dependency["ephemeris_model"] in {"swieph", "moshier", "jpl"}
-            assert dependency["ephemeris_retflags"]
-            assert dependency["ephemeris_library_version"]
-            for flags in dependency["ephemeris_retflags"]:
-                assert flags > 0
-                expected_model = (
-                    "moshier" if flags & 4 else "jpl" if flags & 1 else "swieph"
-                )
-                assert dependency["ephemeris_model"] == expected_model
+            if dependency["ephemeris_model"] == "fatebridge_de441_solar_v1":
+                assert dependency["ephemeris_retflags"] == []
+                assert dependency["ephemeris_library_version"] is None
+                source = dependency["solar_model_details"]
+                assert source["model_id"] == dependency["ephemeris_model"]
+                assert source["source_model_id"] == "bounded_de441_planetary_source_v3"
+                assert source["original_JPL_file_loaded_at_runtime"] is False
+                assert source["native_moshier_relabelled"] is False
+                assert source["accuracy_certified"] is False
+                assert len(source["coefficient_sha256"]) == 64
+            else:
+                assert dependency["ephemeris_model"] in {"swieph", "moshier", "jpl"}
+                assert dependency["ephemeris_retflags"]
+                assert dependency["ephemeris_library_version"]
+                for flags in dependency["ephemeris_retflags"]:
+                    assert flags > 0
+                    expected_model = (
+                        "moshier" if flags & 4 else "jpl" if flags & 1 else "swieph"
+                    )
+                    assert dependency["ephemeris_model"] == expected_model
             assert (
                 dependency["civil_time_method"] == "IERS_UTC_to_TT_swiss_delta_t_to_UT1"
             )

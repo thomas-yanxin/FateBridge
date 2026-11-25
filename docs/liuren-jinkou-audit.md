@@ -226,6 +226,21 @@ IMCCE OPALE保留三条来源时间路线：初始504项原生／解析各1项�
 
 新脚本输出逐项 `requirement_inventory`：完整支持范围历法、完整原典规则与真实模型自由文本验收仍未完成。严格三项完成命令返回 1，目标保持未完成；不会因新增计分项而把三个不符表注或其他未覆盖层隐藏。
 
+### 干净检出的余项复跑边界
+
+在 `c63968b5fe11b59e24a37d8aec4bd2c3d87751ed` 的独立干净检出复跑，`ren_depth_v2/freeze.json` 与 `jinkou_construction_diagnosis_v1/freeze.json` 均未随版本提供，原典比较无法开始。下文所述《探原》指定 NLC 158 页扫描、712 个转录键加 8 个书影补例、717/720 细名，以及金口诀原 64 课、46/62 四位重建均是既有记录，本轮没有重新测得这些成绩。不能以当前软件矩阵符合替代缺失原页，或把同一转录的第二托管站认作独立版次。
+
+两个驱动现在均可直接执行；金口诀驱动原先只有函数定义，直接运行会不做审计便退出 0。新增入口执行原有算术比较，默认退出码只表示所选算术核验，`--require-source-conformance` 另检查原典验收门槛。缺文件时写出 `status=source_unavailable`、具体 `missing_source_file` 和失败状态并退出 1，不输出冒充本轮实测的分子、分母。冻结文件内容或清单漂移仍是错误，不能按缺证静默放过。《探原》两个加载器仍以各自 manifest 内的哈希核成员，manifest 自身尚无代码固定摘要；在原始冻结资料缺失时不能补造该摘要，本轮不提高其来源身份保证。
+
+```bash
+uv run --locked --extra dev python scripts/ren/audit_ren_depth.py --output /tmp/ren-depth.json --require-source-conformance
+uv run --locked --extra dev python scripts/ren/audit_jinkou_construction_diagnosis.py --output /tmp/jinkou-construction.json --require-source-conformance
+```
+
+三端回放按实际交气来源检查回执：`native` 策略在缺可选 Swiss 文件时可以采用捆绑 `fatebridge_de441_solar_v1`，该分支须没有借来的 Swiss 返回标志或库版本，并保留具体 DE441 来源身份、系数摘要及未认证声明；实际 Swiss/JPL 分支仍核模型与返回标志对应。协议相等和来源身份检查不代替独立天文或原典验收。
+
+涉害同深、伏吟、昴星、别责、八专继续由九宗门所有者计算；本轮未取得可重读的指定版冻结资料，未作新的版次裁定。P35/P52 的原日时、昼夜仍须身份可辨的第二底本；没有这样的第二底本，昼夜穷举和四位逆推只能提供所选公式的约束，不能改原日时、原成绩或未决状态。没有新增独立书证，也没有提交书影或个人案例。
+
 ### 课内强弱、贵人异法与影印依据
 
 《金口诀古本》“贵神休旺所主”区分位内、四季与日下旺衰。分别返回 `internal_strength`、四位的 `internal_power/seasonal_power`。网上转录十二个明示例子的位内旺神和贵神旺衰逐一符合；其标签在独立参考（本地数据：`../tests/fixtures/ren_depth_v2/jinkou-internal.json`）中手工抄录，不由引擎生成。查完整书影十二例，因天乙图式差异为11/12，不能把该范围的转录核对当作十二例书影认证。

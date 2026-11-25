@@ -6,8 +6,10 @@ constraints of these selected formulae, not historical emendations or answers.
 
 from __future__ import annotations
 
+import argparse
 import copy
 import hashlib
+import importlib.util
 import json
 from collections import Counter
 from pathlib import Path
@@ -26,12 +28,12 @@ def reference(folder: Path = CORPUS) -> dict[str, Any]:
     if sha(folder / "freeze.json") != PIN:
         raise ValueError("Frozen construction diagnostic identity changed")
     manifest = json.loads((folder / "freeze.json").read_text())
-    if set(manifest) != {"reference.json", "protocol.json"} or {
-        p.name for p in folder.iterdir()
-    } != {*manifest, "freeze.json"}:
+    if set(manifest) != {"reference.json", "protocol.json"}:
         raise ValueError("Frozen construction diagnostic inventory changed")
     if any(sha(folder / n) != h for n, h in manifest.items()):
         raise ValueError("Frozen construction diagnostic reference changed")
+    if {p.name for p in folder.iterdir()} != {*manifest, "freeze.json"}:
+        raise ValueError("Frozen construction diagnostic inventory changed")
     value: dict[str, Any] = json.loads((folder / "reference.json").read_text())
     for n, h in value["source_pins"].items():
         if sha(ROOT / n) != h:
@@ -137,7 +139,13 @@ def audit() -> dict[str, Any]:
         build_jinkou_board,
     )
     from fatebridge.core.metaphysics.jinkou_stems import wuzidun_stem
-    from scripts.ren.audit_ren_classical import make_seed
+
+    seed_specification = importlib.util.spec_from_file_location(
+        "ren_classical", ROOT / "scripts/ren/audit_ren_classical.py"
+    )
+    assert seed_specification and seed_specification.loader
+    seed_reference = importlib.util.module_from_spec(seed_specification)
+    seed_specification.loader.exec_module(seed_reference)
 
     failures = []
     for (stem, day), expected_map in reference_grid.items():
@@ -199,7 +207,7 @@ def audit() -> dict[str, Any]:
             if a != b
         ]
         component_counts.update(differing)
-        seed = make_seed(
+        seed = seed_reference.make_seed(
             dict(
                 day=case["day"],
                 hour=case["hour"],
@@ -310,3 +318,45 @@ def audit() -> dict[str, Any]:
         goal_complete=False,
         scope="All64 source entries retained; selected symbolic construction, no real calendar dates or best-fit source edits",
     )
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--output", type=Path)
+    parser.add_argument("--require-source-conformance", action="store_true")
+    arguments = parser.parse_args()
+    try:
+        report = audit()
+    except FileNotFoundError as error:
+        report = {
+            "status": "source_unavailable",
+            "missing_source_file": error.filename,
+            "arithmetic_checks_passed": False,
+            "original_classical_acceptance_passed": False,
+            "goal_complete": False,
+            "scope": "Source audit incomplete; historical 46/62 is not remeasured.",
+        }
+    else:
+        report["status"] = "compared"
+    if arguments.output:
+        arguments.output.parent.mkdir(parents=True, exist_ok=True)
+        arguments.output.write_text(
+            json.dumps(report, ensure_ascii=False, indent=2, allow_nan=False) + "\n",
+            encoding="utf-8",
+        )
+    else:
+        pass
+    print(json.dumps(report, ensure_ascii=False, allow_nan=False))
+    return (
+        0
+        if report["arithmetic_checks_passed"]
+        and (
+            not arguments.require_source_conformance
+            or report["original_classical_acceptance_passed"]
+        )
+        else 1
+    )
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

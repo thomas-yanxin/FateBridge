@@ -1,8 +1,11 @@
 """Source cases, reference integrity and observable calculation boundaries."""
 
+import hashlib
 import importlib.util
 import json
 import shutil
+import subprocess
+import sys
 from copy import deepcopy
 from dataclasses import replace
 from datetime import datetime, timedelta
@@ -24,6 +27,7 @@ from fatebridge.services.metaphysics import (
     calculate_liureng_runyear,
 )
 from fatebridge.utils.birth_input import create_person_info
+from scripts.ren import audit_jinkou_construction_diagnosis, audit_ren_depth
 
 ROOT = Path(__file__).resolve().parents[2]
 SPEC = importlib.util.spec_from_file_location(
@@ -64,6 +68,96 @@ def test_source_drift_cannot_silently_improve_coverage(tmp_path, change):
         (corpus / "extra.json").write_text("{}")
     with pytest.raises(ValueError, match="Reference"):
         AUDIT.load_frozen_corpus(corpus)
+
+
+@pytest.mark.parametrize(
+    "module,loader_name,gate",
+    [
+        (audit_ren_depth, "load_reference", "implemented_excerpt_checks_passed"),
+        (audit_jinkou_construction_diagnosis, "reference", "arithmetic_checks_passed"),
+    ],
+)
+@pytest.mark.parametrize("strict", [False, True])
+def test_audit_commands_report_missing_sources_and_fail_closed(
+    module, loader_name, gate, strict, monkeypatch, tmp_path, capsys
+):
+    """A clean checkout with missing frozen evidence must emit a failed report."""
+    loader = getattr(module, loader_name)
+    missing_corpus = tmp_path / "absent-corpus"
+    monkeypatch.setattr(module, loader_name, lambda: loader(missing_corpus))
+    output = tmp_path / "report.json"
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        ["audit", "--output", str(output)]
+        + (["--require-source-conformance"] if strict else []),
+    )
+    assert module.main() == 1
+    report = json.loads(output.read_text())
+    assert json.loads(capsys.readouterr().out) == report
+    assert report["status"] == "source_unavailable"
+    assert report["missing_source_file"] == str(missing_corpus / "freeze.json")
+    assert report[gate] is False
+    assert "counts" not in report
+    assert "transcribed_table" not in report
+
+
+@pytest.mark.parametrize(
+    "module,loader_name,names",
+    [
+        (
+            audit_ren_depth,
+            "load_reference",
+            ["jinkou-internal.json", "tanyuan-rules.json", "tanyuan-table.json"],
+        ),
+        (
+            audit_ren_depth,
+            "load_scan_reference",
+            ["collation.json", "selected-pages.pdf"],
+        ),
+        (
+            audit_jinkou_construction_diagnosis,
+            "reference",
+            ["reference.json", "protocol.json"],
+        ),
+    ],
+)
+def test_missing_manifest_member_keeps_its_filename(
+    module, loader_name, names, monkeypatch, tmp_path
+):
+    """A missing member was misreported as an inventory drift before CLI handling."""
+    members = dict.fromkeys(names, hashlib.sha256(b"{}").hexdigest())
+    manifest = members if loader_name == "reference" else {"files": members}
+    freeze = tmp_path / "freeze.json"
+    freeze.write_text(json.dumps(manifest))
+    if loader_name == "reference":
+        monkeypatch.setattr(
+            module, "PIN", hashlib.sha256(freeze.read_bytes()).hexdigest()
+        )
+    else:
+        pass
+    for name in names[:-1]:
+        (tmp_path / name).write_bytes(b"{}")
+    with pytest.raises(FileNotFoundError) as caught:
+        getattr(module, loader_name)(tmp_path)
+    assert caught.value.filename == str(tmp_path / names[-1])
+
+
+@pytest.mark.parametrize(
+    "script", ["audit_ren_depth.py", "audit_jinkou_construction_diagnosis.py"]
+)
+def test_audit_scripts_have_an_executable_command(script, tmp_path):
+    """Executing the construction diagnostic used to silently do nothing."""
+    completed = subprocess.run(
+        [sys.executable, str(ROOT / "scripts/ren" / script), "--help"],
+        cwd=tmp_path,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert completed.returncode == 0, completed.stderr
+    assert "--require-source-conformance" in completed.stdout
+    assert "--output" in completed.stdout
 
 
 def source_case():
