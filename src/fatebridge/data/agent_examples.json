@@ -7219,17 +7219,18 @@
           "validation.all_three_axes_full_marks",
           "validation.prediction"
         ],
-        "purpose": "明确cycle_reference_datetime才计算首轮周期交会；保留逆行多次接触、有限搜索和缺失凯龙星数据，不按生日分期。参考输入最多6位小数秒，超限拒绝；reference_ordering以源定义连续TT核对不早于出生，微秒输入顺序不认证微秒天文精度。摘要保留文件来源和DE版本，完整逐点来源索引与TT求根见证读同一run的cycle_context。交会与已观测驻点细化到函数零值或相邻TT，保留精确残差和驻点速度区间；量化可能掩盖极近峰值，完整解析交会数量仍未认证。文件身份及数值收敛不认证物理时刻精度。"
+        "purpose": "提供cycle_reference_datetime或设置compare_cycle_origins=true可计算首轮周期交会；无参考日时reference_status为not_requested，保留交会和来源、参考相对位置为空。保留逆行多次接触、有限搜索和缺失凯龙星数据，不按生日分期。参考输入最多6位小数秒，超限拒绝；reference_ordering以源定义连续TT核对不早于出生，微秒输入顺序不认证微秒天文精度。摘要保留文件来源和DE版本，完整逐点来源索引与TT求根见证读同一run的cycle_context。交会与已观测驻点细化到函数零值或相邻TT，保留精确残差和驻点速度区间；量化可能掩盖极近峰值，完整解析交会数量仍未认证。文件身份及数值收敛不认证物理时刻精度。"
       },
       "cycle_origins": {
         "fields": [
           "cycle_origin_comparison.status",
+          "cycle_origin_comparison.reference_utc",
           "cycle_origin_comparison.selected_origin",
           "cycle_origin_comparison.hypothesis_origin",
           "cycle_origin_comparison.summary",
           "cycle_origin_comparison.interpretation"
         ],
-        "purpose": "须显式compare_cycle_origins=true并提供cycle_reference_datetime；比较人格主周期与实际设计TT原点的数学假设。保留两边全部交会的首末摘要、不同候选数量和未完成状态，不按序号配对、不认证设计原点为原典规则或指定第六线阶段。完整设计侧见证与文件来源读取同一run的cycle_origin_comparison.alternative，人格主见证仍读cycle_context。"
+        "purpose": "须显式compare_cycle_origins=true；比较人格主周期与实际设计TT原点的数学假设。cycle_reference_datetime可省略，省略时未请求相对某日的比较。保留两边全部交会的首末摘要、不同候选数量和未完成状态，不按序号配对、不认证设计原点为原典规则或指定第六线阶段。完整设计侧见证与文件来源读取同一run的cycle_origin_comparison.alternative，人格主见证仍读cycle_context。"
       },
       "additional_poles": {
         "fields": [

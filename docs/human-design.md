@@ -102,7 +102,7 @@ uv run --locked --extra dev python -m fatebridge.fetch_ephe --profile human_desi
 
 ## 可选行星周期交会
 
-`cycle_reference_datetime`须为不早于出生、带明确时区的ISO标签。省略即`not_requested`，不取当前钟。搜索人格出生黄经起算的土星首轮360°、天王星180°及凯龙首轮360°，上限65儒略年；这不是寿命或教学阶段。
+提供`cycle_reference_datetime`或显式设置`compare_cycle_origins=true`可请求周期搜索。参考时刻须为不早于出生且带明确时区的ISO标签。仅请求原点对照时，仍从人格出生TT和实际88°太阳弧设计TT分别搜索，保留交会和来源，`reference_status=not_requested`表示未请求相对某日的比较。两项均省略时不搜索。搜索范围为各自原点起65儒略年，涵盖土星首轮360°、天王星180°及凯龙首轮360°，不据此划分教学阶段。
 
 搜索使用2日TT网格、已观测速度变号及有限坐标极值补探，保留顺行、逆行和最后顺行候选。出生后逆行重访原黄经不等于完成一圈。根区间0.0002秒、驻点区间0.01秒及角度残差1e−7度是数值判据，不是天文误差界；12项量化近峰控制仍不认证连续根数。
 

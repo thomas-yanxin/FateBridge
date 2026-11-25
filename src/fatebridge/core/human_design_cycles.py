@@ -504,9 +504,11 @@ def derive_body_contacts(
 
 
 def reference_contact_relation(
-    row: dict[str, Any], reference_tt: float | Fraction
-) -> str:
+    row: dict[str, Any], reference_tt: float | Fraction | None
+) -> str | None:
     """Compare a declared reference and reported brackets without a sky call."""
+    if reference_tt is None:
+        return None
     contacts = row["contacts"]
     if row["status"] != "sampled_search_completed":
         return "not_assessed_incomplete_search"
@@ -536,17 +538,19 @@ def reference_contact_policy() -> dict[str, Any]:
 
 
 def summary_conventions(
-    source: dict[str, Any], ordering: dict[str, Any]
+    source: dict[str, Any], ordering: dict[str, Any] | None
 ) -> dict[str, Any]:
     """Retain the full convention descriptions in the complete calculation."""
     return {
         "summary_format": SUMMARY_FORMAT,
-        "reference_contact_ordering": reference_contact_policy(),
+        "reference_contact_ordering": (
+            reference_contact_policy() if ordering is not None else None
+        ),
         "arithmetic_scope": ARITHMETIC_SCOPE,
         "numerical_scope": SUMMARY_NUMERICAL_SCOPE,
         "sixth_line_scope": PHASE_SCOPE,
         "source_evidence_scope": cycle_source_summary(source)["scope"],
-        "reference_ordering_scope": ordering["scope"],
+        "reference_ordering_scope": ordering["scope"] if ordering is not None else None,
         "scope": SCOPE,
     }
 
@@ -567,9 +571,11 @@ def _cycle_summary_facts(context: dict[str, Any], profile: str) -> dict[str, Any
         }
     if context["ruleset"] != cycle_ruleset():
         raise ValueError("Unknown cycle reference/contact comparison ruleset")
-    reference_tt: float | Fraction = context["reference_jd_tt"]
-    ratio = context["reference_ordering"]["reference"]["exact_jd_tt"]
-    reference_tt = Fraction(int(ratio["numerator"]), int(ratio["denominator"]))
+    ordering = context["reference_ordering"]
+    reference_tt = None
+    if ordering is not None:
+        ratio = ordering["reference"]["exact_jd_tt"]
+        reference_tt = Fraction(int(ratio["numerator"]), int(ratio["denominator"]))
     summaries = []
     contact_keys = (
         "jd_tt",
@@ -606,10 +612,20 @@ def _cycle_summary_facts(context: dict[str, Any], profile: str) -> dict[str, Any
     result = {
         "status": context["status"],
         "reference_utc": context["reference_utc"],
-        "reference_ordering": {
-            key: context["reference_ordering"][key]
-            for key in ("method_id", "relation", "input_resolution_seconds", "scope")
-        },
+        "reference_ordering": (
+            {
+                key: ordering[key]
+                for key in (
+                    "method_id",
+                    "relation",
+                    "input_resolution_seconds",
+                    "scope",
+                )
+            }
+            if ordering is not None
+            else None
+        ),
+        **({"reference_status": "not_requested"} if ordering is None else {}),
         "phase_arithmetic_method": PHASE_METHOD,
         "root_method": ROOT_METHOD,
         "station_method": STATION_METHOD,
@@ -724,8 +740,6 @@ def calculate_cycle_context(
     require_swiss_files: bool,
     birth_sources: CycleBirthSources | None = None,
 ) -> dict[str, Any]:
-    if reference is None:
-        return {"status": "not_requested"}
     birth_tt = chart["time_scales"]["personality"]["jd_tt"]
     sources = birth_sources.trace if birth_sources is not None else CycleSourceTrace()
     traces: dict[str, dict[float, Row]] = {b: {} for b in BODIES}
@@ -763,13 +777,15 @@ def calculate_cycle_context(
             pass
     # Civil-time conversion resets native caches. Preserve the coherent birth
     # observations first; all later root evaluations still use continuous TT.
-    label, reference_tt = reference_epoch(reference)
-    birth_label = chart["birth_utc"]
-    if chart["time_scales"]["personality"]["method"].startswith("continuous_TT"):
-        birth_label = None
-    ordering = reference_ordering(birth_label, birth_tt, label, reference_tt)
-    if ordering["relation"] == "before":
-        raise ValueError("周期评估时刻不能早于出生瞬间")
+    label, reference_tt, ordering = None, None, None
+    if reference is not None:
+        label, reference_tt = reference_epoch(reference)
+        birth_label = chart["birth_utc"]
+        if chart["time_scales"]["personality"]["method"].startswith("continuous_TT"):
+            birth_label = None
+        ordering = reference_ordering(birth_label, birth_tt, label, reference_tt)
+        if ordering["relation"] == "before":
+            raise ValueError("周期评估时刻不能早于出生瞬间")
     bodies = []
     for body in BODIES:
         trace = traces[body]
@@ -810,6 +826,7 @@ def calculate_cycle_context(
         ),
         "reference_utc": label,
         "reference_jd_tt": reference_tt,
+        **({"reference_status": "not_requested"} if reference is None else {}),
         "birth_jd_tt": birth_tt,
         "reference_ordering": ordering,
         "origin": "personality_birth_longitude_explicit_computational_convention",

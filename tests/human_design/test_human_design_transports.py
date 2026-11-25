@@ -15,11 +15,18 @@ from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
 from fatebridge.validation.human_design import verify_human_design_reading
+from fatebridge.validation.human_design_clocks import verify_clock_records
+from fatebridge.validation.human_design_cycle_origins import (
+    verify_cycle_origin_comparison,
+)
+from fatebridge.validation.human_design_cycles import verify_cycle_context
 from tests.fixtures.mcp_receipt import verified_inline_business
 from tests.support.ephemeris_case_runtime import (
     native_ephemeris_files_module as native_ephemeris_files_module,
 )
 from tests.support.result_delivery import store as store
+from tests.support.transports import business
+from tests.support.transports import surface_calls as surface_calls
 
 pytestmark = pytest.mark.usefixtures("native_ephemeris_files_module")
 
@@ -35,8 +42,9 @@ INPUT = dict(
 
 
 @pytest.mark.parametrize("empty_files", [False, True])
+@pytest.mark.parametrize("mode", ["dated", "no_reference", "off"])
 def test_optional_cycle_contacts_and_compact_card_match_all_three_surfaces(
-    rest, capsys, monkeypatch, tmp_path, empty_files
+    surface_calls, monkeypatch, tmp_path, empty_files, mode
 ):
     from fatebridge.application.examples import evidence_views
 
@@ -50,62 +58,128 @@ def test_optional_cycle_contacts_and_compact_card_match_all_three_surfaces(
         "birth_hour": 0,
         "birth_minute": 0,
         "birth_timezone": "UTC",
-        "cycle_reference_datetime": "2029-07-01T00:00:00Z",
     }
-    response = rest.post(SPEC.rest_path, json=params)
+    if mode != "off":
+        params["compare_cycle_origins"] = True
+    if mode == "dated":
+        params["cycle_reference_datetime"] = "2029-07-01T00:00:00Z"
+    views = evidence_views(SPEC)
+    fields = [
+        *views["cycles"]["fields"],
+        "design_utc",
+        "time_scales",
+        "activations",
+        "calculation_policy",
+        "clock_evidence",
+        "cycle_context",
+    ]
+    if mode != "off":
+        fields.extend([*views["cycle_origins"]["fields"], "cycle_origin_comparison"])
+    response, native, code, cli = surface_calls(
+        SPEC,
+        params,
+        params={"response_char_limit": 0},
+        flags=["--response-char-limit", "0"],
+        projection=(
+            None
+            if mode == "off"
+            else {
+                "fields": fields,
+                "strict_fields": True,
+                "include_snapshot_text": False,
+                "response_char_limit": 0,
+            }
+        ),
+    )
     assert response.status_code == 200, response.text
+    assert not native.is_error and code == 0
     expected = response.json()
-    Draft202012Validator(SPEC.output_model.model_json_schema()).validate(expected)
+    assert business(expected) == business(native.structured_content) == business(cli)
+    validator = Draft202012Validator(SPEC.output_model.model_json_schema())
+    for result in (expected, native.structured_content, cli):
+        validator.validate(result)
+        replay = verify_clock_records(result)
+        cycles = verify_cycle_context(result, clock_replay=replay)
+        origins = verify_cycle_origin_comparison(result, clock_replay=replay)
+        assert cycles["errors"] == origins["errors"] == []
+        assert result["clock_evidence"]["native_execution_authenticated"] is False
+        count = (
+            cycles["checked_cycle_evaluation_count"]
+            + origins["checked_cycle_origin_evaluation_count"]
+        )
+        if mode == "off":
+            assert count == 0
+        else:
+            assert count > 30000
 
-    async def call():
-        async with Client(create_mcp_app(families="astro")) as client:
-            tools = {t.name: t for t in await client.list_tools()}
-            schema = tools["human_design"].model_dump(by_alias=True)
-            assert "cycle_reference_datetime" in schema["inputSchema"]["properties"]
-            result = await client.call_tool(
-                "human_design", {**params, "response_char_limit": 0}
-            )
-            assert not result.is_error
-            Draft202012Validator(schema["outputSchema"]).validate(
-                result.structured_content
-            )
-            card = await client.call_tool(
-                "human_design",
-                {
-                    **params,
-                    "fields": evidence_views(SPEC)["cycles"]["fields"],
-                    "strict_fields": True,
-                    "include_snapshot_text": False,
-                    "response_char_limit": 8192,
-                },
-            )
-            assert not card.is_error
-            if "result_delivery" in card.structured_content:
-                await verified_inline_business(client, card.structured_content)
-            assert card.structured_content["cycle_summary"] == expected["cycle_summary"]
-            return result.structured_content
-
-    native = asyncio.run(call())
-    flags = ["human_design"]
-    for key, value in params.items():
-        flags.extend(["--" + key.replace("_", "-"), str(value)])
-    assert run(flags) == 0
-    cli = json.loads(capsys.readouterr().out)
-    for result in (expected, native, cli):
-        verified = verify_human_design_reading(result)
-        assert verified["status"] == "verified_fixed_template_reading"
-        assert verified["checked_cycle_evaluation_count"] > 30000
+    context, summary = expected["cycle_context"], expected["cycle_summary"]
+    if mode == "off":
+        assert context == {"status": "not_requested"}
+        assert summary["bodies"] == []
+        assert "cycle_origin_comparison" not in expected
+    else:
+        comparison = expected["cycle_origin_comparison"]
+        assert comparison["selected_origin"]["jd_tt"] == context["birth_jd_tt"]
         assert (
-            result["cycle_summary"]["phase_arithmetic_method"]
+            comparison["hypothesis_origin"]["jd_tt"]
+            == expected["time_scales"]["design"]["jd_tt"]
+        )
+        assert (
+            summary["phase_arithmetic_method"]
             == "exact_binary_longitude_increments_with_integer_winding_v1"
         )
-        for body in result["cycle_context"]["bodies"]:
-            assert all("exact_residual" in event for event in body["contacts"])
-        assert [b["contact_count"] for b in result["cycle_summary"]["bodies"]] == (
+        for search in (context, comparison["alternative"]):
+            assert bool(search["source_evidence"]["files"]) is not empty_files
+            for body in search["bodies"]:
+                assert all("exact_residual" in event for event in body["contacts"])
+                assert bool(body["failure"]) is (
+                    empty_files and body["body"] == "Chiron"
+                )
+        assert [b["contact_count"] for b in summary["bodies"]] == (
             [1, 3, 0] if empty_files else [1, 3, 3]
         )
-        result.pop("run_metadata")
-    assert expected == native == cli
+        if mode == "dated":
+            ordering = context["reference_ordering"]
+            assert ordering["relation"] == "after"
+            assert (
+                comparison["reference_exact_jd_tt"]
+                == ordering["reference"]["exact_jd_tt"]
+            )
+            assert summary["reference_utc"] == "2029-07-01T00:00:00+00:00"
+        else:
+            for record in (context, summary, comparison):
+                assert record["reference_status"] == "not_requested"
+                assert record["reference_utc"] is None
+            assert context["reference_jd_tt"] is comparison["reference_jd_tt"] is None
+            assert (
+                context["reference_ordering"] is summary["reference_ordering"] is None
+            )
+            assert comparison["reference_exact_jd_tt"] is None
+            assert expected["clock_evidence"]["cycle_reference_datetime"] is None
+            assert "未请求相对某日的比较" in comparison["interpretation"]
+            for row in comparison["summary"]["bodies"]:
+                assert row["selected_personality"]["reference_relation"] is None
+                assert row["design_hypothesis"]["reference_relation"] is None
+            assert all(body["reference_relation"] is None for body in summary["bodies"])
+
+    if mode == "dated":
+
+        async def bounded_card():
+            async with Client(create_mcp_app(families="astro")) as client:
+                result = await client.call_tool(
+                    SPEC.tool_name,
+                    {
+                        **params,
+                        "fields": views["cycles"]["fields"],
+                        "strict_fields": True,
+                        "include_snapshot_text": False,
+                        "response_char_limit": 8192,
+                    },
+                )
+                assert not result.is_error
+                return await verified_inline_business(client, result.structured_content)
+
+        assert asyncio.run(bounded_card())["cycle_summary"] == summary
 
 
 @pytest.mark.parametrize(

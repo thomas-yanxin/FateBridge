@@ -1,6 +1,6 @@
 """Projectable Human Design calculation and evidence contracts."""
 
-from typing import Dict, List, Optional
+from typing import Dict, List, Literal, Optional
 
 from pydantic import JsonValue
 
@@ -419,6 +419,7 @@ class HDCycleReferenceContactOrdering(PartialOutput):
 
 class HDCycleSummary(PartialOutput):
     status: Optional[str] = None
+    reference_status: Optional[Literal["not_requested"]] = None
     reference_utc: Optional[str] = None
     reference_contact_ordering: Optional[HDCycleReferenceContactOrdering] = None
 

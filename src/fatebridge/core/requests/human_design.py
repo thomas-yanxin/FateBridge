@@ -42,11 +42,11 @@ class HumanDesignRequest(_DeferredModel):
     )
     cycle_reference_datetime: Optional[str] = Field(
         default=None,
-        description="可选带时区ISO时刻；当地时间的小数按最低已给单位（小时、分钟或秒）精确展开，最多6位，超限拒绝而非截断。提供才计算出生起65儒略年内土星首轮回归、天王星对冲及凯龙星首轮回归的多次交会与该时刻的相对位置。须在源定义的连续TT上不早于出生；输入顺序校验不认证微秒级天文精度。不按生日划阶段，不默认当前时间。有限采样不认证穷尽。",
+        description="可选带时区ISO时刻；当地时间的小数按最低已给单位（小时、分钟或秒）精确展开，最多6位，超限拒绝而非截断。提供时计算出生起65儒略年内土星首轮回归、天王星对冲及凯龙星首轮回归的多次交会与该时刻的相对位置。须在源定义的连续TT上不早于出生；输入顺序校验不认证微秒级天文精度。仅compare_cycle_origins=true时可无参考日搜索交会；不按生日划阶段，不默认当前时间。有限采样不认证穷尽。",
     )
     compare_cycle_origins: bool = Field(
         default=False,
-        description="可选比较人格与实际88度太阳弧设计TT两个周期原点；须同时提供cycle_reference_datetime。人格主结果不改，设计原点仅为数学敏感性假设，未获原典优先性认证；完整保留两边交会及失败，不指定首末触优先或人生阶段。",
+        description="可选比较人格与实际88度太阳弧设计TT两个周期原点，完整保留两边交会、来源及失败。cycle_reference_datetime可省略；省略时不评估相对某日的位置。设计原点为数学敏感性假设，不指定原典优先、首末触优先或人生阶段。",
     )
     compare_apparent_models: bool = Field(
         default=False,
@@ -55,8 +55,6 @@ class HumanDesignRequest(_DeferredModel):
 
     @model_validator(mode="after")
     def _validate_clock(self) -> "HumanDesignRequest":
-        if self.compare_cycle_origins and self.cycle_reference_datetime is None:
-            raise ValueError("周期原点对照须提供cycle_reference_datetime")
         resolve_birth_clock(
             birth_year=self.birth_year,
             birth_month=self.birth_month,
