@@ -9,6 +9,7 @@ from pydantic import Field, model_validator
 from fatebridge.core.metaphysics.ren_gods import DEFAULT_GUIREN_PROFILE, GuirenProfile
 from fatebridge.core.metaphysics.taiyi_hour import TaiyiHourProfile
 from fatebridge.core.metaphysics.taiyi_month import TaiyiMonthProfile
+from fatebridge.core.metaphysics.taiyi_shiji import TaiyiShijiProfile
 from fatebridge.core.metaphysics.taiyi_year_calendar import TaiyiYearProfile
 from fatebridge.core.requests.base import _DeferredModel
 from fatebridge.core.requests.birth import FateBridgeRequest
@@ -266,6 +267,10 @@ class TaiyiAnalysisRequest(_DeferredModel):
     calculation_mode: Literal["year", "month", "day", "hour"] = Field(
         default="year",
         description="year年计附金镜年度十神；month按十二节月；day明确采用金钥匙冬至前甲子积日，不乘十二，所选钟面零时换日、二至实刻换遁，附十精及未决异数；hour按所选时计。月/日/时计均为声明的现代天文适配，非完整古历复原。",
+    )
+    shiji_profile: Optional[TaiyiShijiProfile] = Field(
+        default=None,
+        description="始击版次：省略或jinjing_vol2_rotation_v1沿用卷二轮转；jinjing_vol3_table_v1仅阴37/43/44采用四库卷三实读始击、客算依卷二重算（阴37为27）；jinjing_vol3_table_literal_v1同三局采用原表客算（阴37为25）。其余局沿用轮转，非全卷三表复原，不按吉凶择版。",
     )
     hour_profile: Optional[TaiyiHourProfile] = Field(
         default=None,

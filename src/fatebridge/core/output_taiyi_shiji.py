@@ -22,6 +22,9 @@ class TaiyiShijiPair(PartialOutput):
 
 
 class TaiyiShijiDerivation(PartialOutput):
+    shiji_profile: Optional[str] = None
+    selected_source: Optional[str] = None
+    guest_count_basis: Optional[str] = None
     ruleset: Optional[TaiyiShijiRuleset] = None
     status: Optional[str] = None
     reason: Optional[str] = None

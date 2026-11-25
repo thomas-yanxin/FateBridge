@@ -1837,6 +1837,7 @@ def calculate_taiyi_analysis(
     hour_profile: Optional[str] = None,
     month_profile: Optional[str] = None,
     year_profile: Optional[str] = None,
+    shiji_profile: Optional[str] = None,
     use_true_solar_time: bool = False,
     true_solar_explicit: bool = True,
     selected_sections: Optional[List[str]] = None,
@@ -1861,6 +1862,7 @@ def calculate_taiyi_analysis(
         hour_profile=hour_profile,
         month_profile=month_profile,
         year_profile=year_profile,
+        shiji_profile=shiji_profile,
     )
     if analysis_utc_offset is not None:
         resolution = civil_clock_resolution(seed, analysis_utc_offset)

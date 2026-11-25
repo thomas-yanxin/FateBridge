@@ -196,6 +196,7 @@ def build_period_board(
     mode: str,
     hour_profile: str | None = None,
     month_profile: str | None = None,
+    shiji_profile: str | None = None,
 ) -> Dict[str, Any]:
     from .taiyi_gates import attach_gate_board
 
@@ -203,7 +204,9 @@ def build_period_board(
     frame = period_frame(seed, mode, hour_profile, month_profile)
     is_key_month = mode == "month" and month_profile == KEY_MONTH_PROFILE
     is_key_hour = mode == "hour" and hour_profile == KEY_HOUR_PROFILE
-    core = cyclic_core(frame["accumulation"], yin=frame["yin"])
+    core = cyclic_core(
+        frame["accumulation"], yin=frame["yin"], shiji_profile=shiji_profile
+    )
     ruler = frame["ruler_branch"]
     # A month/hour branch is a time label, not the annual 太岁. Do not put it
     # in suijun or render the annual name on a monthly/hourly board.

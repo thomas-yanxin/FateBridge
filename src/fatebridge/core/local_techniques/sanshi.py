@@ -52,6 +52,7 @@ def _build_taiyi_with_options(
         "hour_profile",
         "month_profile",
         "year_profile",
+        "shiji_profile",
     }
     if unknown:
         raise ValueError("未实现的太乙选项：" + ", ".join(sorted(unknown)))
@@ -74,6 +75,7 @@ def _build_taiyi_with_options(
         hour_profile=profile,
         month_profile=month_profile,
         year_profile=year_profile,
+        shiji_profile=normalized.get("shiji_profile"),
     )
 
 

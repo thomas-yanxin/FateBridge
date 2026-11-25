@@ -40,7 +40,9 @@ def count_categories(count: int) -> List[str]:
     return count_labels(count)
 
 
-def cyclic_core(accumulation: int, *, yin: bool = False) -> Dict[str, Any]:
+def cyclic_core(
+    accumulation: int, *, yin: bool = False, shiji_profile: str | None = None
+) -> Dict[str, Any]:
     """The two 72-ju cores, independent of a civil/calendar accumulation rule.
 
     Vol. 1 gives Yang from 乾 and Yin from 巽, three units per palace;
@@ -58,13 +60,26 @@ def cyclic_core(accumulation: int, *, yin: bool = False) -> Dict[str, Any]:
         taiyi_number = 10 - taiyi_number
         eyes = RING[(RING.index(eyes) + 8) % 16]
     jishen = BRANCHES[((8 if yin else 2) - (accumulation - 1)) % 12]
-    from .taiyi_shiji import rotate_shiji
+    from .taiyi_shiji import VOL3_YIN_ROWS, rotate_shiji, validate_shiji_profile
 
+    profile = validate_shiji_profile(shiji_profile)
     shiji = rotate_shiji(eyes, jishen)["derived_shiji"]
+    table_row = (
+        VOL3_YIN_ROWS.get(ju) if yin and profile != "jinjing_vol2_rotation_v1" else None
+    )
+    if table_row is not None:
+        shiji = table_row["shiji"]
     home = count_to_taiyi(eyes, taiyi_number)
     guest = count_to_taiyi(shiji, taiyi_number)
+    guest_count = guest["count"]
+    if table_row is not None and profile == "jinjing_vol3_table_literal_v1":
+        guest_count = table_row["guest_count"]
+        guest["selected_count"] = guest_count
+        guest["selected_count_basis"] = (
+            "卷三阴37/43/44原表字面；count与path保留卷二重算"
+        )
     main_general = general_for_count(home["count"])
-    guest_general = general_for_count(guest["count"])
+    guest_general = general_for_count(guest_count)
     return {
         "accumulation": accumulation,
         "yin_dun": yin,
@@ -75,10 +90,11 @@ def cyclic_core(accumulation: int, *, yin: bool = False) -> Dict[str, Any]:
         "wenchang_palace": eyes,
         "jishen": jishen,
         "shiji": shiji,
+        "shiji_profile": profile,
         "main_count": home["count"],
-        "guest_count": guest["count"],
+        "guest_count": guest_count,
         "main_count_des": count_categories(home["count"]),
-        "guest_count_des": count_categories(guest["count"]),
+        "guest_count_des": count_categories(guest_count),
         "main_general": main_general,
         "guest_general": guest_general,
         "main_vice_general": main_general * 3 % 10,
@@ -87,12 +103,12 @@ def cyclic_core(accumulation: int, *, yin: bool = False) -> Dict[str, Any]:
     }
 
 
-def yearly_core(year: int) -> Dict[str, Any]:
+def yearly_core(year: int, *, shiji_profile: str | None = None) -> Dict[str, Any]:
     """Resolve a CE year using vol. 1's 724 CE = 1,937,281 anchor."""
     if type(year) is not int or year < 1:
         raise ValueError("年计需要正整数公元年份")
     accumulation = 1937281 + year - 724
-    core = cyclic_core(accumulation)
+    core = cyclic_core(accumulation, shiji_profile=shiji_profile)
     core.update(
         {
             "kook_year": ("理天", "理地", "理人")[(accumulation - 1) % 3],
@@ -384,7 +400,10 @@ def calendar_summary(board: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def build_year_board(
-    seed: MetaphysicsSeed, gender: str, year_profile: str | None = None
+    seed: MetaphysicsSeed,
+    gender: str,
+    year_profile: str | None = None,
+    shiji_profile: str | None = None,
 ) -> Dict[str, Any]:
     from .taiyi_gates import attach_gate_board
     from .taiyi_long_cycles import attach_long_cycles
@@ -420,7 +439,7 @@ def build_year_board(
     if not isinstance(year_value, int):
         raise ValueError("太乙年计农历年份必须是整数")
     year = year_value
-    core = yearly_core(year)
+    core = yearly_core(year, shiji_profile=shiji_profile)
     board = assemble_board(core, calculation_mode="year")
     board.update(
         {
@@ -627,7 +646,13 @@ def evidence_text(board: Dict[str, Any]) -> str:
             if not trace["terminal_excluded"]
             else f"止于{trace['terminal_palace']}宫前"
         )
-        lines.append(f"{label}：{path} = {trace['count']}；{ending}。")
+        if "selected_count" in trace:
+            lines.append(
+                f"{label}卷二重算：{path} = {trace['count']}；{ending}。"
+                f"本盘选用{label}{trace['selected_count']}；{trace['selected_count_basis']}。"
+            )
+        else:
+            lines.append(f"{label}：{path} = {trace['count']}；{ending}。")
     lines.append(
         f"主大/主参：{core['main_general']}/{core['main_vice_general']}；客大/客参：{core['guest_general']}/{core['guest_vice_general']}。"
     )

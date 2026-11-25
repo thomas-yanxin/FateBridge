@@ -1799,6 +1799,7 @@ class TaiyiCore(PartialOutput):
     set_general: Optional[int] = None
     set_vice_general: Optional[int] = None
     shiji: Optional[str] = None
+    shiji_profile: Optional[str] = None
     sishen: Optional[str] = None
     suijun: Optional[str] = None
     taiyi_position: Optional[str] = None
@@ -1886,6 +1887,8 @@ class TaiyiCountStep(PartialOutput):
 
 
 class TaiyiCountTrace(PartialOutput):
+    selected_count: Optional[int] = None
+    selected_count_basis: Optional[str] = None
     count: Optional[int] = None
     path: Optional[List[TaiyiCountStep]] = None
     terminal_palace: Optional[str] = None

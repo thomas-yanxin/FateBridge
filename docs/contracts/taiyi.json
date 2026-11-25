@@ -559,6 +559,23 @@
         },
         "type": "array"
       },
+      "shiji_profile": {
+        "anyOf": [
+          {
+            "enum": [
+              "jinjing_vol2_rotation_v1",
+              "jinjing_vol3_table_v1",
+              "jinjing_vol3_table_literal_v1"
+            ],
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "始击版次：省略或jinjing_vol2_rotation_v1沿用卷二轮转；jinjing_vol3_table_v1仅阴37/43/44采用四库卷三实读始击、客算依卷二重算（阴37为27）；jinjing_vol3_table_literal_v1同三局采用原表客算（阴37为25）。其余局沿用轮转，非全卷三表复原，不按吉凶择版。"
+      },
       "strict_fields": {
         "default": false,
         "description": "是否拒绝无效 fields 路径；默认 false，使用宽松投影并返回警告。",
@@ -639,6 +656,7 @@
       "role": "calculation",
       "selector_fields": [
         "calculation_mode",
+        "shiji_profile",
         "hour_profile",
         "month_profile",
         "year_profile"

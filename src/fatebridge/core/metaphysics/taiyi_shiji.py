@@ -2,7 +2,44 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Literal, TypedDict
+
+TaiyiShijiProfile = Literal[
+    "jinjing_vol2_rotation_v1",
+    "jinjing_vol3_table_v1",
+    "jinjing_vol3_table_literal_v1",
+]
+DEFAULT_SHIJI_PROFILE: TaiyiShijiProfile = "jinjing_vol2_rotation_v1"
+
+
+class ShijiTableRow(TypedDict):
+    shiji: str
+    guest_count: int
+
+
+# Siku vol. 3, Yin 37/43/44. Only these independently read variants are
+# selected; other rows keep vol. 2 rotation. Vol. 3 Yin 37 prints 25 although
+# counting from its printed 大威(午) by vol. 2 gives 27.
+VOL3_YIN_ROWS: dict[int, ShijiTableRow] = {
+    37: {"shiji": "午", "guest_count": 25},
+    43: {"shiji": "坤", "guest_count": 38},
+    44: {"shiji": "酉", "guest_count": 31},
+}
+VOL3_SOURCE = "https://zh.wikisource.org/wiki/太乙金鏡式經_(四庫全書本)/卷03"
+
+
+def validate_shiji_profile(value: object) -> TaiyiShijiProfile:
+    """Validate untyped three-style options and direct Python entry points."""
+    if value is None or value == "jinjing_vol2_rotation_v1":
+        return "jinjing_vol2_rotation_v1"
+    if value == "jinjing_vol3_table_v1":
+        return "jinjing_vol3_table_v1"
+    if value == "jinjing_vol3_table_literal_v1":
+        return "jinjing_vol3_table_literal_v1"
+    raise ValueError(
+        "shiji_profile须选择jinjing_vol2_rotation_v1、jinjing_vol3_table_v1或jinjing_vol3_table_literal_v1"
+    )
+
 
 SOURCE_MANIFEST_SHA256 = (
     "9d8298d054398da8353b4af3fb69c3c26a0652d9e200014e88b64c78b97a16d5"
@@ -77,8 +114,21 @@ def shiji_derivation(core: dict[str, Any]) -> dict[str, Any]:
             "status": "not_assessed",
             "reason": "缺单一有效实际始击，不用推步终位填补原盘。",
         }
+    profile = core.get("shiji_profile", DEFAULT_SHIJI_PROFILE)
+    table_applied = (
+        core.get("yin_dun") is True
+        and core.get("kook_number") in VOL3_YIN_ROWS
+        and profile != DEFAULT_SHIJI_PROFILE
+    )
     return {
         **common,
+        "shiji_profile": profile,
+        "selected_source": VOL3_SOURCE if table_applied else RULESET["source"],
+        "guest_count_basis": (
+            "卷三原表字面"
+            if table_applied and profile == "jinjing_vol3_table_literal_v1"
+            else "卷二算路重算"
+        ),
         "status": "computed_from_actual_inputs",
         **rotation,
         "wenchang_path": "wenchang_palace",
@@ -93,10 +143,14 @@ def shiji_derivation_text(assessment: dict[str, Any]) -> str:
     if assessment["status"] == "not_assessed":
         return str(assessment["reason"])
     text = (
-        f"始击推步：天盘计神{assessment['jishen']}加地盘和德艮，"
+        f"始击口径：{assessment['shiji_profile']}；始击推步：天盘计神{assessment['jishen']}加地盘和德艮，"
         f"顺行{assessment['step_count']}个间隔，天盘文昌{assessment['wenchang']}"
         f"临地盘{assessment['derived_shiji']}；本盘实际始击{assessment['actual_shiji']}。"
     )
     if not assessment["matches_actual"]:
-        text += "推步终位与实际始击不同，保留本盘值待核。"
+        text += (
+            "按所选卷三实读始击，客算口径：" + assessment["guest_count_basis"] + "。"
+            if assessment["shiji_profile"] != DEFAULT_SHIJI_PROFILE
+            else "推步终位与实际始击不同，保留本盘值待核。"
+        )
     return text + str(assessment["scope"])

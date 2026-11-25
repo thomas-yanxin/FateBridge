@@ -29,6 +29,7 @@ from fatebridge.services.metaphysics import calculate_taiyi_analysis
 from fatebridge.services.tool_catalog import CATALOG
 from scripts.taiyi.audit_taiyi_shiji import CORPUS, audit, source_data
 from tests.support.reference_data import resolve
+from tests.support.transports import AS_OF, SPECS, business, rest, surface_calls
 from tests.taiyi.test_taiyi_enclosures import transport_payload
 from tests.taiyi.test_taiyi_transports import _same_run_payload
 
@@ -257,3 +258,223 @@ def test_real_rest_mcp_cli_and_new_first_views(key, mode, capsys, monkeypatch):
             await _same_run_payload(client, first, require_business_inline=True)
 
     asyncio.run(call())
+
+
+PROFILES = (
+    "jinjing_vol2_rotation_v1",
+    "jinjing_vol3_table_v1",
+    "jinjing_vol3_table_literal_v1",
+)
+# Independently read Siku vol. 3: CADAL06056494 native pages 120/121,
+# Yin 37 大威二十五; 43 大武三十八; 44 太蔟三十一. The prior
+# Wujing witnesses/hand pairs retain their original independent denominators.
+# Vol. 2 hand sums: 午→卯前 = 2+7+6+1+8+3=27;
+# 坤→午前 = 7+6+1+8+3+4+9=38; 酉→午前 = 6+1+8+3+4+9=31.
+VARIANT_FACTS = {
+    37: (("坤", 25, 5, 5), ("午", 27, 7, 1), ("午", 25, 5, 5)),
+    43: (("巳", 1, 1, 3), ("坤", 38, 8, 4), ("坤", 38, 8, 4)),
+    44: (("坤", 38, 8, 4), ("酉", 31, 1, 3), ("酉", 31, 1, 3)),
+}
+
+
+@pytest.mark.parametrize("ju", [37, 43, 44])
+@pytest.mark.parametrize("profile", PROFILES)
+def test_named_editions_close_guest_counts_generals_and_palaces(ju, profile):
+    from fatebridge.core.metaphysics.taiyi_geometry import PALACES
+
+    core = cyclic_core(ju, yin=True, shiji_profile=profile)
+    expected = VARIANT_FACTS[ju][PROFILES.index(profile)]
+    assert (
+        tuple(
+            core[k]
+            for k in ("shiji", "guest_count", "guest_general", "guest_vice_general")
+        )
+        == expected
+    )
+    assert all(
+        core[k] in range(1, 10)
+        for k in (
+            "main_general",
+            "main_vice_general",
+            "guest_general",
+            "guest_vice_general",
+        )
+    )
+    core.update(ruler_branch="子", ruler_label="测试", heshen="丑")
+    board = assemble_board(core)
+    marks = {
+        p["palace"]: p["markers"]
+        for p in [*board["palace_marks"], board["center_marks"]]
+    }
+    for label, palace in (
+        ("始击", expected[0]),
+        ("客大", PALACES[expected[2]]),
+        ("客參", PALACES[expected[3]]),
+    ):
+        assert label in marks[palace]
+    assert board["core_board"]["shiji_profile"] == profile
+    assert board["shiji_derivation"]["actual_shiji"] == expected[0]
+    trace = board["rule_trace"]["guest"]
+    assert sum(p["value"] for p in trace["path"]) == trace["count"]
+    if ju == 37 and profile == PROFILES[2]:
+        assert trace["count"] == 27 and trace["selected_count"] == 25
+        assert "卷三" in trace["selected_count_basis"]
+        assert {"客大", "客參"} <= set(marks["中"])
+    else:
+        assert trace["count"] == expected[1]
+    # Both full output and nested strict projections preserve all new facts.
+    Taiyi.model_validate(board)
+    for field in (
+        "core_board.shiji_profile",
+        "shiji_derivation.selected_source",
+        "rule_trace.guest",
+    ):
+        Taiyi.model_validate(
+            project_fields({"taiyi": board}, ["taiyi." + field], strict_fields=True)[
+                "taiyi"
+            ]
+        )
+
+
+def test_ordinary_rows_and_default_arithmetic_are_preserved_for_every_profile():
+    for yin in (False, True):
+        for ju in range(1, 73):
+            default = cyclic_core(ju, yin=yin)
+            assert default == cyclic_core(ju, yin=yin, shiji_profile=PROFILES[0])
+            for profile in PROFILES[1:]:
+                core = cyclic_core(ju, yin=yin, shiji_profile=profile)
+                if not yin or ju not in VARIANT_FACTS:
+                    assert {k: v for k, v in core.items() if k != "shiji_profile"} == {
+                        k: v for k, v in default.items() if k != "shiji_profile"
+                    }
+
+
+@pytest.mark.parametrize("mode", ["year", "month", "day", "hour"])
+@pytest.mark.parametrize("profile", PROFILES)
+def test_selected_profile_reaches_every_public_date_adapter(mode, profile):
+    result = calculate_taiyi_analysis(
+        **transport_payload("taiyi", 2026), calculation_mode=mode, shiji_profile=profile
+    )
+    board = result["taiyi"]
+    assert board["core_board"]["shiji_profile"] == profile
+    assert board["shiji_derivation"]["shiji_profile"] == profile
+    assert profile in result["snapshot_text"]
+
+
+@pytest.mark.parametrize("ju,month,day", [(37, 8, 30), (43, 9, 5), (44, 9, 6)])
+@pytest.mark.parametrize("profile", PROFILES)
+def test_same_edition_on_single_and_combined_real_surfaces(
+    ju, month, day, profile, surface_calls
+):
+    outputs = []
+    projection = {
+        "fields": [
+            "taiyi.core_board",
+            "taiyi.palace_marks",
+            "taiyi.center_marks",
+            "taiyi.rule_trace",
+            "taiyi.shiji_derivation",
+        ],
+        "strict_fields": True,
+        "include_snapshot_text": False,
+        "response_char_limit": 0,
+    }
+    for key in ("taiyi", "sanshiunited"):
+        payload = transport_payload(key, 2026)
+        if key == "taiyi":
+            payload.update(
+                analysis_month=month,
+                analysis_day=day,
+                calculation_mode="day",
+                shiji_profile=profile,
+            )
+        else:
+            payload.update(
+                date=f"2026-{month:02d}-{day:02d}",
+                taiyi_options={"calculation_mode": "day", "shiji_profile": profile},
+            )
+        http, protocol, code, cli = surface_calls(
+            SPECS[key], payload, projection=projection, rest_as_of=AS_OF
+        )
+        assert http.status_code == 200, http.text
+        assert not protocol.is_error and code == 0
+        assert (
+            business(http.json())
+            == business(protocol.structured_content)
+            == business(cli)
+        )
+        outputs.append(http.json()["taiyi"])
+    assert outputs[0] == outputs[1]
+    core = outputs[0]["core_board"]
+    assert core["kook_number"] == ju and core["yin_dun"]
+    assert (
+        tuple(
+            core[k]
+            for k in ("shiji", "guest_count", "guest_general", "guest_vice_general")
+        )
+        == VARIANT_FACTS[ju][PROFILES.index(profile)]
+    )
+
+
+@pytest.mark.parametrize("key", ["taiyi", "sanshiunited"])
+def test_invalid_profile_rejected_by_every_surface(key, surface_calls):
+    payload = transport_payload(key, 2026)
+    if key == "taiyi":
+        payload["shiji_profile"] = "invented_edition"
+    else:
+        payload["taiyi_options"] = {"shiji_profile": "invented_edition"}
+    http, protocol, code, cli = surface_calls(SPECS[key], payload, rest_as_of=AS_OF)
+    # Typed single-tool input fails schema validation; generic three-style
+    # options fail at the domain boundary with the standard calculation error.
+    assert http.status_code == (422 if key == "taiyi" else 200)
+    assert protocol.is_error and code != 0
+    assert "shiji_profile" in str(cli)
+    if key == "sanshiunited":
+        assert "error" in http.json() and "taiyi" not in http.json()
+
+
+@pytest.mark.parametrize("profile", PROFILES)
+def test_center_generals_on_2028_combined_representative(profile, surface_calls):
+    payload = {
+        "date": "2028-04-06",
+        "time": "09:33:00",
+        "zone": "+08:00",
+        "use_true_solar_time": False,
+        "taiyi_options": {"shiji_profile": profile},
+    }
+    projection = {
+        "fields": ["taiyi.core_board", "taiyi.center_marks"],
+        "strict_fields": True,
+        "response_char_limit": 0,
+    }
+    http, protocol, code, cli = surface_calls(
+        SPECS["sanshiunited"], payload, projection=projection, rest_as_of=AS_OF
+    )
+    assert http.status_code == 200 and not protocol.is_error and code == 0
+    assert (
+        business(http.json()) == business(protocol.structured_content) == business(cli)
+    )
+    board = http.json()["taiyi"]
+    assert board["core_board"]["guest_count"] == 25
+    assert (
+        board["core_board"]["guest_general"]
+        == board["core_board"]["guest_vice_general"]
+        == 5
+    )
+    assert {"客大", "客參"} <= set(board["center_marks"]["markers"])
+
+
+def test_literal_snapshot_distinguishes_selected_count_from_recount():
+    result = calculate_taiyi_analysis(
+        analysis_year=2026,
+        analysis_month=8,
+        analysis_day=30,
+        analysis_hour=12,
+        analysis_timezone="+08:00",
+        use_true_solar_time=False,
+        calculation_mode="day",
+        shiji_profile=PROFILES[2],
+    )
+    text = result["snapshot_text"]
+    assert "客算卷二重算：午2 + 坤7 + 酉6 + 乾1 + 子8 + 艮3 = 27" in text
+    assert "本盘选用客算25" in text
