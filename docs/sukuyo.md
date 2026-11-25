@@ -32,7 +32,26 @@
 
 当前合成研究协议检验资料绑定、盲法、完整上下文承诺与统计门槛；合成结果不建立现实有效性。来源校读、软件正确性、解释忠实与真实预测分别验收，分数不表示关系成功概率。
 
+历史历表比较保留原门槛：NAOJ 225 个范围内逐日控制、HuTime 210 个异日控制，要求各自原响应与所选参考或保留异文逐项零差；另留 1873-01-01 改历负控，不把新公历一月一日接为旧历。683,734 日的月首展开检查是同一 NAOJ 来源的实现互校，不能算独立书证。干净基线缺少 `tests/data/sukuyo_historical_calendar_v1/` 和 `tests/data/sukuyo_historical_daily_controls_v1/` 原始抓取档案，原测试因此三项失败；没有改成跳过、缩小分母或用生产 JSON 替代原响应。恢复可公开且指纹相符的档案前，225 日原响应验收和 210 日原响应验收仍未复证。
+
+当前可复跑的 210 日身份测试只检查已分发历表的保留事实与交付：主源为 [NAOJ 历日数据库](https://eco.mtk.nao.ac.jp/cgi-bin/koyomi/caldb.cgi)，异文源为 **HuTime 1001.1 历史日本历**，不是现代宿主 **1002.1**。七组各三十日，每组首日跨月或闰月、其后 29 日错一日；分歧均不代入 NAOJ 主宿。
+
+| 前推公历区间（含端点） | NAOJ 首日 | HuTime 1001.1 首日 | 提供方声明的来源分区 | 日数 |
+| --- | --- | --- | --- | --- |
+| 0009-12-03—0010-01-01 | 9 年十一月初一 | 9 年十月三十 | NAOJ 儀鳳暦平朔重建；HuTime《日本書紀暦日原典 新装版》 | 30 |
+| 0447-05-31—0447-06-29 | 447 年五月初一 | 447 年四月三十 | NAOJ 儀鳳暦平朔重建；HuTime《日本暦日原典 第四版》 | 30 |
+| 0448-10-14—0448-11-12 | 448 年九月初一 | 448 年八月三十 | NAOJ 儀鳳暦平朔重建；HuTime《日本暦日原典 第四版》 | 30 |
+| 0451-05-17—0451-06-15 | 451 年四月初一 | 451 年三月三十 | NAOJ 儀鳳暦平朔重建；HuTime《日本暦日原典 第四版》 | 30 |
+| 0452-09-30—0452-10-29 | 452 年九月初一 | 452 年八月三十 | NAOJ 儀鳳暦平朔重建；HuTime《日本暦日原典 第四版》 | 30 |
+| 0743-10-26—0743-11-24 | 743 年十月初一 | 743 年九月三十 | NAOJ 推算并校订；HuTime《日本暦日原典 第四版》 | 30 |
+| 0820-03-22—0820-04-20 | 820 年二月初一 | 820 年闰正月三十 | NAOJ 推算并校订；HuTime《日本暦日原典 第四版》 | 30 |
+
+随结果返回的 `source_independence_reference` 选取了两家声明中的共同书目：[NAOJ 说明](https://eco.mtk.nao.ac.jp/koyomi/wiki/C2C0B1A2C2C0CDDBCEF12FC6FCCBDCA4CECEF1C6FCA5C7A1BCA5BFA5D9A1BCA5B9.html)引内田正男《日本暦日原典》而未在所选声明指定版次，[HuTime 说明](https://www.hutime.jp/basicdata/calendar/calendars/Japanese.html)从允恭天皇三十四年正月初一开始指定第四版，更早则声明采用同作者《日本書紀暦日原典 新装版》。NAOJ 声明神武纪元至 453 年按儀鳳暦平朔推算，454 年开始用元嘉暦，后世随所行历法切换并作校订。表中来源分区来自这些提供方说明；共同书目标记不能解释为 0009 年那组也用相同的书，或两家逐条资料相互独立。当前尚未逐条校读原书、确定相同实物版本或每条数据依赖，也没有增加独立历史观测。因此异日、早期重建与历史地方日界仍未裁定；不借现代物理月相解决书证日期。
+
+钟面新增控制独立于历表真伪：按 [NIST 2026 年 DST 公告](https://www.nist.gov/pml/time-and-frequency-division/popular-links/daylight-saving-time-dst)的三月第二个星期日／十一月第一个星期日规则，2026-03-08 和 2026-11-01 的纽约当地未知时刻分别覆盖 23／25 小时；同一 UTC 原像在宿主 +08／+09 的午夜分别于 UTC 16／15 时切分。0806-09-20 的 NAOJ 月首承接小月，00、12、23:59:59 的已知钟面均不自动指派 T2465 文本半日。固定 `as_of` 的真实 REST POST、逐工具 MCP 与 CLI 对单人候选及双人交换方向进行完整响应与严格投影核对：轸→亢为衰、反向为友；角→亢为栄、反向为親。该验收证明软件保留具名规则与候选，不证明历史出生时制或关系预测效度。
+
 ```bash
+uv run --locked --extra dev python -m pytest -q -n 0 tests/sukuyo/test_sukuyo_host_clock.py tests/sukuyo/test_sukuyo_historical_calendar.py
 uv run --locked --extra dev pytest -n0 tests/sukuyo/test_sukuyo_profiles.py tests/sukuyo/test_sukuyo_historical_calendar.py tests/sukuyo/test_sukuyo_protocol_context.py
 ```
 

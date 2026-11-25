@@ -229,6 +229,57 @@ def test_returned_source_metadata_and_index_fingerprint_stay_coupled(
     assert later["source_provenance"]
 
 
+@pytest.mark.parametrize(
+    "first_date,lunar_year,lunar_month,previous_month,is_previous_leap",
+    [
+        ("0009-12-03", 9, 11, 10, False),
+        ("0447-05-31", 447, 5, 4, False),
+        ("0448-10-14", 448, 9, 8, False),
+        ("0451-05-17", 451, 4, 3, False),
+        ("0452-09-30", 452, 9, 8, False),
+        ("0743-10-26", 743, 10, 9, False),
+        ("0820-03-22", 820, 2, 1, True),
+    ],
+)
+def test_retained_210_dates_keep_historical_provider_identity(
+    first_date: str,
+    lunar_year: int,
+    lunar_month: int,
+    previous_month: int,
+    is_previous_leap: bool,
+) -> None:
+    """Retained variants must never become modern HuTime 1002.1 or primary facts."""
+    for day_offset in range(30):
+        civil_date = date.fromisoformat(first_date) + timedelta(days=day_offset)
+        source = historical.date_reference(civil_date)
+        comparison = source["cross_source_comparison"]
+        assert comparison["reference_provider"] == "NAOJ"
+        assert comparison["control_provider"] == "HuTime 1001.1"
+        assert comparison["reference_fields"] == [
+            lunar_year,
+            lunar_month,
+            day_offset + 1,
+            False,
+        ]
+        assert comparison["control_fields"] == (
+            [lunar_year, previous_month, 30, is_previous_leap]
+            if day_offset == 0
+            else [lunar_year, lunar_month, day_offset, False]
+        )
+        assert not comparison["control_applied_to_primary"]
+        assert comparison["partly_shared_historical_source_corpus"]
+        assert not source["historical_calendar_acceptance"]
+        assert source["date_provenance"] == (
+            "naoj_reconstructed_gihou_mean_new_moons_not_contemporary_observation"
+            if lunar_year <= 453
+            else "naoj_calculated_and_historically_corrected_japanese_calendar_reference"
+        )
+        lineage = source["source_independence_reference"]
+        assert not lineage["same_physical_edition_established"]
+        assert not lineage["per_record_dependency_established"]
+        assert lineage["independent_historical_observations_added"] == 0
+
+
 def test_default_and_modern_japanese_backends_do_not_load_historical_table(monkeypatch):
     monkeypatch.setattr(historical, "SOURCE", ROOT / "no-historical-table.json")
     assert calendar_mansion("2025-03-04")["natal_su27"] == "毕"
