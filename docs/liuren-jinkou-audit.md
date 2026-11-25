@@ -237,7 +237,7 @@ uv run --locked --extra dev python scripts/ren/audit_ren_depth.py --output /tmp/
 uv run --locked --extra dev python scripts/ren/audit_jinkou_construction_diagnosis.py --output /tmp/jinkou-construction.json --require-source-conformance
 ```
 
-三端回放按实际交气来源检查回执：`native` 策略在缺可选 Swiss 文件时可以采用捆绑 `fatebridge_de441_solar_v1`，该分支须没有借来的 Swiss 返回标志或库版本，并保留具体 DE441 来源身份、系数摘要及未认证声明；实际 Swiss/JPL 分支仍核模型与返回标志对应。协议相等和来源身份检查不代替独立天文或原典验收。
+三端回放按实际交气来源检查回执：`native` 策略在缺可选 Swiss 文件时可以采用捆绑 `fatebridge_de441_solar_v1`，该分支须没有借来的 Swiss 返回标志或库版本，并保留具体 DE441 来源身份、版本、表示方式及未认证声明；完整性哈希由内部校验使用，公开交付层按既有边界移除，三端不要求重新暴露。实际 Swiss/JPL 分支仍核模型与返回标志对应。协议相等和来源身份检查不代替独立天文或原典验收。
 
 涉害同深、伏吟、昴星、别责、八专继续由九宗门所有者计算；本轮未取得可重读的指定版冻结资料，未作新的版次裁定。P35/P52 的原日时、昼夜仍须身份可辨的第二底本；没有这样的第二底本，昼夜穷举和四位逆推只能提供所选公式的约束，不能改原日时、原成绩或未决状态。没有新增独立书证，也没有提交书影或个人案例。
 

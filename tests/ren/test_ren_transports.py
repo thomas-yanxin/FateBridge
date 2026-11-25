@@ -151,7 +151,13 @@ def test_corrected_facts_survive_each_transport_and_field_projection(
                 assert source["original_JPL_file_loaded_at_runtime"] is False
                 assert source["native_moshier_relabelled"] is False
                 assert source["accuracy_certified"] is False
-                assert len(source["coefficient_sha256"]) == 64
+                assert source["source_version"] == (
+                    "JPL DE441, Park-Folkner-Williams-Boggs 2021"
+                )
+                assert source["source_representation"] == (
+                    "original_DE441_cells_and_slots_bounded_binary_coefficient_quanta"
+                )
+                assert "coefficient_sha256" not in source
             else:
                 assert dependency["ephemeris_model"] in {"swieph", "moshier", "jpl"}
                 assert dependency["ephemeris_retflags"]
