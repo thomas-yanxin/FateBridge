@@ -18,8 +18,12 @@ def test_northern_degenerate_sector_candidate_survives_both_public_entries(
     entry, tmp_path, monkeypatch, capsys
 ):
     """An unresolved sampled ASC is unknown, not a fourteenth sector or stability."""
-    longitude, latitude = LOCATIONS[1]
-    request = {**PAYLOAD, "birth_longitude": longitude, "birth_latitude": latitude}
+    # In the physical J2000 house frame, ARMC is 270° and latitude is 90° − obliquity.
+    request = {
+        **PAYLOAD,
+        "birth_longitude": -10.458555984878615,
+        "birth_latitude": 66.5623231709126,
+    }
     if entry == "astro_chart":
         request["chart_variant"] = "chart13"
     else:

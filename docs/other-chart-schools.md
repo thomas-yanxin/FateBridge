@@ -262,7 +262,7 @@ ASC无法在本角度模型中解析时，实际13扇区返回未定，后端约
 
 ## 十三分区的未知样点边界（单元25）
 
-[北侧退化回归](../tests/western/test_other_chart_angle_qualification.py)沿用J2000合成位置−10.4585560625195°经度、66.56232328397007°纬度及±1分钟五样点，补核专用 `astro_chart13` 与通用 `astro_chart(chart_variant=chart13)`。对应REST为 `/api/astro/chart13`、`/api/astro/chart`，MCP／CLI使用各自工具名；实际路径仍由中央目录提供。真实三端读取同一固定 `as_of` 的严格字段，核对名义ASC未决时 `anchor_longitude=null`、`thirteen_sectors=[]`、各星 `sector13=null`，以及每个星的五样点中有一个未决。未知不是第14区，不得从其余四点推出整个连续区间稳定。
+[北侧退化回归](../tests/western/test_other_chart_angle_qualification.py)使用按当前宫轴参考系校准的 J2000 合成位置 −10.458555984878615° 经度、66.5623231709126° 纬度及 ±1 分钟五样点，补核专用 `astro_chart13` 与通用 `astro_chart(chart_variant=chart13)`。旧坐标在当前参考系下仍可解，交线对输入扰动高度敏感。对应REST为 `/api/astro/chart13`、`/api/astro/chart`，MCP／CLI使用各自工具名；实际路径仍由中央目录提供。真实三端读取同一固定 `as_of` 的严格字段，核对名义ASC未决时 `anchor_longitude=null`、`thirteen_sectors=[]`、各星 `sector13=null`，以及每个星的五样点中有一个未决。未知不是第14区，不得从其余四点推出整个连续区间稳定。
 
 该位置是既有数值退化反例，非观察地点；结果只检查共同模型的资格传递，不新增物理精度、独立出版坐标或现实预测样本。星历实质修复留在单元2，现有不确定性门槛保持。
 
