@@ -96,7 +96,9 @@ def test_edition_and_dispute_survive_real_boundary_transports(
     comparison = natal["source_comparison"]
     assert comparison["ruleset"]["version"] == "2.0.0"
     citations = rules[comparison["ruleset"]["ruleset_id"]]["source_citations"]
-    assert set(citations) == set(comparison["ruleset"]["source_ids"]) == {"SLC1", "SRC1"}
+    assert (
+        set(citations) == set(comparison["ruleset"]["source_ids"]) == {"SLC1", "SRC1"}
+    )
     assert all(
         "2011年6月第1版、2016年2月第3次印刷" in citation["source_version"]
         for citation in citations.values()
