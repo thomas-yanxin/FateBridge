@@ -612,14 +612,10 @@ def test_profile_legs_share_one_birth_instant_when_tz_omitted(
     assert payload["profile"]["bazi"]["bazi_birth"]["time_algorithm"] == "真太阳时"
 
 
-def test_profile_unifies_instant_even_for_uncatalogued_place(
-    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+@pytest.mark.parametrize("place", ["海安", "Unknown Birthplace"])
+def test_profile_resolves_place_without_guessing_a_timezone(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str], place: str
 ) -> None:
-    # 海安 is not in the offline place catalog, so no timezone can be derived
-    # from the name. The BaZi normalizer falls back to DEFAULT_BIRTH_TIMEZONE
-    # (Asia/Shanghai); the profile must apply the SAME fallback to the astro leg
-    # so an uncatalogued China birth does not silently leave the western leg on
-    # its 'UTC' default (the original bug for this very subject).
     subject = _write(
         tmp_path / "s.json",
         json.dumps(
@@ -631,7 +627,7 @@ def test_profile_unifies_instant_even_for_uncatalogued_place(
                 "birth_day": 10,
                 "birth_hour": 9,
                 "birth_minute": 55,
-                "birth_place": "海安",
+                "birth_place": place,
                 "birth_longitude": 120.45,
                 "birth_latitude": 32.54,
             }
@@ -639,11 +635,15 @@ def test_profile_unifies_instant_even_for_uncatalogued_place(
     )
     code = run(["profile", "--systems", "bazi,astro", "--subject-file", subject])
     payload = json.loads(capsys.readouterr().out)
-    assert code == 0
-    astro_pi = payload["profile"]["astro"]["person_info"]
-    assert astro_pi["birth_timezone"] != "UTC"
-    # 09:55 +08:00 (with a small true-solar shift) is an early-UTC instant.
-    assert astro_pi["utc_datetime"].startswith("2000-12-10T0")
+    assert payload["profile"]["bazi"]["bazi_birth"]["four_pillars"]
+    astro = payload["profile"]["astro"]
+    if place == "海安":
+        assert code == 0
+        assert astro["person_info"]["birth_timezone"] == "Asia/Shanghai"
+    else:
+        assert code == 1
+        assert astro["error_code"] == "validation_error"
+        assert "birth_timezone" in astro["error"]
 
 
 def test_profile_preserves_the_recorded_solar_clock_basis(
@@ -672,7 +672,21 @@ def test_profile_preserves_the_recorded_solar_clock_basis(
     assert person["utc_datetime"] == "1950-01-02T12:00:30.177600+00:00"
     assert person["clock_conversion"]["input_clock_basis"] == "local_mean_solar"
 
-    assert run(["profile", "--systems", "vedic_chart,bazi_birth_chart", *flags]) == 1
+    assert (
+        run(
+            [
+                "profile",
+                "--systems",
+                "vedic_chart,bazi_birth_chart",
+                *flags,
+                "--fields",
+                "profile.vedic_chart.person_info",
+                "profile.bazi_birth_chart.bazi_birth.four_pillars",
+                "--strict-fields",
+            ]
+        )
+        == 1
+    )
     legs = json.loads(capsys.readouterr().out)["profile"]
     assert legs["vedic_chart"]["person_info"] == person
     assert legs["bazi_birth_chart"]["issues"] == [
@@ -681,6 +695,58 @@ def test_profile_preserves_the_recorded_solar_clock_basis(
             "code": "extra_forbidden",
             "message": "Extra inputs are not permitted",
         }
+    ]
+
+
+def test_profile_invalid_place_reaches_child_request_validation(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    subject_path = Path(_full_subject(tmp_path))
+    subject = json.loads(subject_path.read_text(encoding="utf-8"))
+    del subject["birth_timezone"]
+    subject["birth_place"] = ["上海"]
+    subject_path.write_text(json.dumps(subject), encoding="utf-8")
+
+    assert (
+        run(
+            [
+                "profile",
+                "--systems",
+                "bazi",
+                "--subject-file",
+                str(subject_path),
+                "--fields",
+                "profile.bazi.bazi_birth.four_pillars",
+                "--strict-fields",
+            ]
+        )
+        == 1
+    )
+    payload = json.loads(capsys.readouterr().out)
+    error = payload["profile"]["bazi"]
+    assert error["error_code"] == "validation_error"
+    assert [(issue["path"], issue["code"]) for issue in error["issues"]] == [
+        ("birth_place", "string_type")
+    ]
+    assert error["trace_id"] == payload["run_metadata"]["trace_id"]
+
+    assert (
+        run(
+            [
+                "profile",
+                "--systems",
+                "bazi",
+                "--subject-file",
+                str(subject_path),
+                "--fields",
+                "profile.bazi.error.message",
+                "--strict-fields",
+            ]
+        )
+        == 1
+    )
+    assert json.loads(capsys.readouterr().out)["issues"] == [
+        {"path": "profile.bazi.error.message", "code": "non_object_projection_path"}
     ]
 
 
@@ -879,6 +945,30 @@ def test_profile_compact_matches_standalone_and_supports_runtime_projection(
     )
     projected = json.loads(capsys.readouterr().out)
     assert set(projected["profile"]["bazi"]["bazi_birth"]) == {"day_master"}
+
+    assert (
+        run(
+            [
+                "profile",
+                "--systems",
+                "bazi",
+                "--subject-file",
+                subject,
+                "--detail",
+                "compact",
+                "--as-of",
+                as_of,
+                "--fields",
+                "profile.bazi",
+                "profile.bazi.bazi_birth.ten_gods",
+                "--strict-fields",
+            ]
+        )
+        == 0
+    )
+    expanded = json.loads(capsys.readouterr().out)["profile"]["bazi"]["bazi_birth"]
+    assert expanded["four_pillars"] == leg["bazi_birth"]["four_pillars"]
+    assert expanded["ten_gods"]
 
     assert (
         run(

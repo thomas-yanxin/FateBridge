@@ -11,6 +11,9 @@ from fastapi.testclient import TestClient
 import fatebridge.api as api_module
 from fatebridge.utils.errors import ErrorEnvelope
 from fatebridge.utils.runtime import parse_api_keys
+from tests.support.transports import rest
+
+__all__ = ["rest"]
 
 
 @pytest.mark.parametrize("raw", ["", " ", "\n\t"])
@@ -164,6 +167,27 @@ def test_invalid_http_bodies_use_safe_common_error_envelope(
     }
     assert response.json()["issues"]
     assert "sensitive" not in response.text
+
+
+@pytest.mark.parametrize("response_budget", ["private-budget-text", "4096.0", "4095"])
+def test_invalid_http_response_budget_uses_a_safe_issue_code(
+    rest: TestClient, response_budget: str
+) -> None:
+    """Malformed and out-of-range budgets share a diagnostic without echoing the query."""
+    response = rest.post(
+        "/api/divination/gua",
+        params={"response_char_limit": response_budget},
+        json={"query": "乾"},
+    )
+    assert response.status_code == 422
+    assert response.json()["issues"] == [
+        {
+            "path": "response_char_limit",
+            "code": "invalid_response_limit",
+            "message": "response_char_limit 须为 0 或 4096–65536",
+        }
+    ]
+    assert response_budget not in response.text
 
 
 @pytest.mark.parametrize("has_explicit_path", [False, True])

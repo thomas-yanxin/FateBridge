@@ -8,14 +8,20 @@ self-describing MCP transport flags.
 from __future__ import annotations
 
 import asyncio
+import json
 
+import pytest
 from fastapi.testclient import TestClient
 from fastmcp import Client
 
 from fatebridge.api import app
 from fatebridge.application.description import describe_spec
+from fatebridge.cli import run
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG, mcp_specs, rest_specs
+from tests.support.transports import cached_mcp_app, discover_capabilities, rest
+
+__all__ = ["rest"]
 
 
 def _tools_payload() -> dict:
@@ -68,3 +74,52 @@ def test_mcp_transport_flags_are_self_describing() -> None:
         "response_char_limit",
     ):
         assert properties[flag]["description"]
+
+
+def test_reference_discovery_uses_public_names_and_resources(
+    rest: TestClient, capsys: pytest.CaptureFixture[str]
+) -> None:
+    names = {"export_formats", "export_parse", "knowledge_catalog", "knowledge_read"}
+    records = {}
+    for name in sorted(names):
+        response = rest.get(
+            "/api/tools", params={"tool": name, "surface": "mcp", "detail": "summary"}
+        )
+        assert response.status_code == 200, response.text
+        (record,) = response.json()["tools"]
+        assert record["tool"] == record["surfaces"]["mcp_name"] == name
+        assert (
+            run(["discover", "--tool", name, "--surface", "mcp", "--detail", "summary"])
+            == 0
+        )
+        assert json.loads(capsys.readouterr().out)["tools"] == [record]
+        records[name] = record["surfaces"]
+
+    retired = {"export_registry", "knowledge_registry", "calculate_knowledge_read"}
+    for name in sorted(retired):
+        assert rest.get("/api/tools", params={"tool": name}).status_code == 422
+        assert run(["discover", "--tool", name]) == 1
+        assert json.loads(capsys.readouterr().out)["issues"] == [
+            {"path": "tool", "code": "unknown_tool"}
+        ]
+
+    async def read_resources() -> None:
+        async with Client(cached_mcp_app(families="export,knowledge")) as client:
+            assert set(await discover_capabilities(client)) == names
+            for name in sorted(names):
+                manifest = json.loads(
+                    (await client.read_resource(f"fatebridge://tools/{name}"))[0].text
+                )
+                (contract,) = manifest["tools"]
+                assert contract["tool"] == name
+                assert contract["surfaces"] == records[name]
+            for name in sorted(retired):
+                result = await client.call_tool(
+                    "run_calculation",
+                    {"tool": name, "arguments": {}},
+                    raise_on_error=False,
+                )
+                assert result.is_error
+                assert result.structured_content["error_code"] == "unknown_tool"
+
+    asyncio.run(read_resources())

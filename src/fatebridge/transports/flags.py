@@ -8,16 +8,20 @@ from pydantic_core import PydanticCustomError
 from fatebridge.application.result_delivery import DEFAULT_MCP_RESPONSE_CHARS
 
 
+def invalid_response_budget() -> PydanticCustomError:
+    return PydanticCustomError(
+        "invalid_response_limit",
+        "response_char_limit 须为 0 或 4096–65536",
+    )
+
+
 def validate_response_budget(
     raw_budget: object, validate: ValidatorFunctionWrapHandler
 ) -> int:
     try:
         budget: int = validate(raw_budget)
     except ValidationError:
-        raise PydanticCustomError(
-            "invalid_response_limit",
-            "response_char_limit 须为 0 或 4096–65536",
-        ) from None
+        raise invalid_response_budget() from None
     else:
         return budget
 
