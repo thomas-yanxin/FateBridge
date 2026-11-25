@@ -19,7 +19,6 @@ from fatebridge.core import ephemeris_runtime as e
 from fatebridge.core.astro import moshier_motion as motion
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.birth import build_astro_birth_info
-from fatebridge.core.astro.reference import PLANET_SWISSEPH_IDS
 from fatebridge.core.astro.time_scales import datetime_from_tt
 from fatebridge.core.guolao import guolao
 from fatebridge.mcp_server import create_mcp_app
@@ -62,7 +61,7 @@ def birth_at_tt(jd):
 def native_longitude(jd, body):
     swe = e.swe
     coordinates, returned = runtime.ephemeris_call(
-        "calc", jd, PLANET_SWISSEPH_IDS[body], swe.FLG_MOSEPH | swe.FLG_SPEED
+        "calc", jd, getattr(swe, body.upper()), swe.FLG_MOSEPH | swe.FLG_SPEED
     )
     assert runtime.ephemeris_model_from_retflag(returned) == "moshier"
     return coordinates

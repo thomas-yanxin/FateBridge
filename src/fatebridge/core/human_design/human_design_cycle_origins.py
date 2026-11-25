@@ -64,7 +64,7 @@ def alternative_context(
     }
 
 
-def _endpoints(row: dict[str, Any], reference: Fraction) -> dict[str, Any]:
+def _endpoints(row: dict[str, Any], reference: Fraction | None) -> dict[str, Any]:
     keys = (
         "jd_tt",
         "utc_label",
@@ -91,7 +91,7 @@ def _endpoints(row: dict[str, Any], reference: Fraction) -> dict[str, Any]:
 def comparison_rows(
     primary: list[dict[str, Any]],
     alternative: list[dict[str, Any]],
-    reference: Fraction,
+    reference: Fraction | None,
 ) -> list[dict[str, Any]]:
     result = []
     if [r["body"] for r in primary] != list(BODIES) or [
@@ -122,8 +122,10 @@ def comparison_rows(
     return result
 
 
-def origin_reading(rows: list[dict[str, Any]]) -> str:
+def origin_reading(rows: list[dict[str, Any]], *, has_reference: bool) -> str:
     text = "人格出生原点的周期主结果保持；设计原点仅作来源未决条件下的数学敏感性对照。"
+    if not has_reference:
+        text += "未请求相对某日的比较。"
     names = {"Saturn": "土星", "Uranus": "天王星", "Chiron": "凯龙星"}
     for row in rows:
         a, b = row["selected_personality"], row["design_hypothesis"]
@@ -136,7 +138,10 @@ def origin_reading(rows: list[dict[str, Any]]) -> str:
                 else f"{label}候选缺少双侧见证，差值未知。"
             )
         if any(x["status"] != "sampled_search_completed" for x in (a, b)):
-            text += "至少一侧搜索未完成，参考位置保持未评估，不由零个已观察候选推断没有交会。"
+            text += "至少一侧搜索未完成，"
+            if has_reference:
+                text += "参考位置保持未评估，"
+            text += "不由零个已观察候选推断没有交会。"
         else:
             pass
     return (
@@ -148,8 +153,13 @@ def origin_reading(rows: list[dict[str, Any]]) -> str:
 def assemble_origin_comparison(
     chart: dict[str, Any], primary: dict[str, Any], alternative: dict[str, Any]
 ) -> dict[str, Any]:
-    ratio = primary["reference_ordering"]["reference"]["exact_jd_tt"]
-    reference = Fraction(int(ratio["numerator"]), int(ratio["denominator"]))
+    ordering = primary["reference_ordering"]
+    ratio = ordering["reference"]["exact_jd_tt"] if ordering is not None else None
+    reference = (
+        Fraction(int(ratio["numerator"]), int(ratio["denominator"]))
+        if ratio is not None
+        else None
+    )
     rows = comparison_rows(primary["bodies"], alternative["bodies"], reference)
     design = chart["time_scales"]["design"]["jd_tt"]
     personality = chart["time_scales"]["personality"]["jd_tt"]
@@ -194,6 +204,7 @@ def assemble_origin_comparison(
         "reference_utc": primary["reference_utc"],
         "reference_jd_tt": primary["reference_jd_tt"],
         "reference_exact_jd_tt": ratio,
+        **({"reference_status": "not_requested"} if reference is None else {}),
         "alternative": alternative,
         "summary": {
             "bodies": rows,
@@ -202,7 +213,7 @@ def assemble_origin_comparison(
             "physical_timing_accuracy_certified": False,
             "scope": SUMMARY_SCOPE,
         },
-        "interpretation": origin_reading(rows),
+        "interpretation": origin_reading(rows, has_reference=reference is not None),
         "first_last_priority_assigned": False,
         "source_disagreement_resolved": False,
         "continuous_completeness_certified": False,

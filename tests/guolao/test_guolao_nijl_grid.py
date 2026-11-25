@@ -266,3 +266,18 @@ def test_literal_inputs_do_not_round_wrap_or_guess_columns(
 ) -> None:
     with pytest.raises((TypeError, ValueError)):
         module.literal_cell(palace=palace, column=column)
+
+
+def test_selected_grid_witnesses_keep_the_frozen_bytes_and_base_binding():
+    raw = (ROOT / "validation/data/guolao/grid-witnesses-v1.json").read_bytes()
+    assert hashlib.sha256(raw).hexdigest() == (
+        "fa82d461ad618368e67089b7de0aeb18edfaaf80a64a9019bd65bc7511a217fe"
+    )
+    binding = json.loads(raw)["base_binding"]
+    base = load_grid()
+    assert binding == {
+        "source_id": base.source_id,
+        "source_image_sha256": base.source_image_sha256,
+        "data_sha256": base.data_sha256,
+        "marker_data_sha256": base.marker_data_sha256,
+    }

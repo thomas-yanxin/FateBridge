@@ -70,10 +70,6 @@ def calculate_human_design(
     compare_cycle_origins: bool = False,
     compare_apparent_models: bool = False,
 ) -> Dict[str, Any]:
-    if compare_cycle_origins and cycle_reference_datetime is None:
-        raise ValueError("周期原点对照须提供cycle_reference_datetime")
-    else:
-        pass
     clock = resolve_birth_clock(
         birth_year=birth_year,
         birth_month=birth_month,
@@ -86,7 +82,9 @@ def calculate_human_design(
     selected_path = configured_ephemeris_path()
     selected_jpl = configured_jpl_file()
     birth_sources = (
-        CycleBirthSources() if cycle_reference_datetime is not None else None
+        CycleBirthSources()
+        if cycle_reference_datetime is not None or compare_cycle_origins
+        else None
     )
     design_sources = CycleBirthSources() if compare_cycle_origins else None
 
@@ -140,7 +138,7 @@ def calculate_human_design(
             require_swiss_files=require_swiss_files,
             birth_sources=birth_sources,
         )
-        if cycle_reference_datetime is not None
+        if birth_sources is not None
         else {"status": "not_requested"}
     )
     origin_comparison = (

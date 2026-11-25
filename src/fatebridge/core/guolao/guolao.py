@@ -774,6 +774,7 @@ def build_chart(
         ),
         **({"seasonal_anchor_evidence": anchor_evidence} if anchor_evidence else {}),
         "degree_status": "unresolved_no_ascendant_substitution",
+        "degree_reason": "原典对度换算尚无法同时复现横看表和刊载算例，命度与命宿未裁定。",
     }
     trace.append(
         {

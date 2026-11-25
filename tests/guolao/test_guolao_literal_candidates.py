@@ -12,8 +12,29 @@ from fatebridge.core.guolao import guolao_literal_candidates as subject
 from fatebridge.core.guolao.guolao_calendar_year import gujin_fixed_qice_year
 from fatebridge.core.guolao.guolao_cumulative_table import gujin_literal_lunar
 from validation.guolao_literal_candidates import audit_literal_candidate_grid
+from validation.guolao_witnesses import audit_gujin45_witness_variants
 
 ROOT = Path(__file__).parents[2]
+
+
+def test_targeted_witness_readings_preserve_the_frozen_cells():
+    audit = audit_gujin45_witness_variants()
+    assert audit["source_data_sha256"] == (
+        "3320958d164bb4a8aa08a2ccaa5925d8304f2ebec9e46186296dce7ffaf8dece"
+    )
+    assert audit["additional_readings"] == 18
+    assert [
+        (cell["field"], cell["limit_index"], cell["distinct_observed_values"])
+        for cell in audit["cells"]
+    ] == [
+        ("day_rate_days", 90, ["7.2807", "7.3607"]),
+        ("day_rate_days", 154, ["12.6292", "12.6392"]),
+        ("day_rate_days", 166, ["13.6333"]),
+        ("signed_increment_ancient_du", 12, ["0.10225075", "0.10255075"]),
+        ("signed_increment_ancient_du", 155, ["-0.10225075"]),
+        ("signed_increment_ancient_du", 163, ["-0.10817275"]),
+    ]
+    assert all(cell["computational_override"] is None for cell in audit["cells"])
 
 
 @pytest.mark.parametrize(

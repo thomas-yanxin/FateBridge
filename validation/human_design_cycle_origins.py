@@ -45,10 +45,14 @@ def verify_cycle_origin_comparison(
             return {"errors": [], "checked_cycle_origin_evaluation_count": 0}
         else:
             pass
-        if supplied is None or payload["cycle_context"]["status"] == "not_requested":
+        primary = payload["cycle_context"]
+        if supplied is None or primary["status"] == "not_requested":
             raise ValueError("Missing requested origin comparison")
-        else:
-            pass
+        if (
+            proof["cycle_reference_datetime"] is None
+            and primary["reference_ordering"] is not None
+        ):
+            raise ValueError("Unrequested reference ordering for origin comparison")
         origin = payload["time_scales"]["design"]["jd_tt"]
         if not origin < payload["time_scales"]["personality"]["jd_tt"]:
             raise ValueError("Design origin is not the actual pre-birth epoch")
@@ -138,16 +142,21 @@ def verify_cycle_origin_comparison(
             alternative["source_evidence"],
             policy["require_swiss_files"],
         )
-        expected = assemble_origin_comparison(
-            payload, payload["cycle_context"], expected_alternative
-        )
+        expected = assemble_origin_comparison(payload, primary, expected_alternative)
         if not _same_value(supplied, expected):
             raise ValueError(
                 "Alternative derivation, comparison or interpretation mismatch"
             )
         else:
             pass
-    except (KeyError, TypeError, ValueError, IndexError, OverflowError, StopIteration):
+    except (
+        KeyError,
+        TypeError,
+        ValueError,
+        IndexError,
+        ArithmeticError,
+        StopIteration,
+    ):
         return {
             "errors": [{"code": "cycle_origin_comparison_mismatch"}],
             "checked_cycle_origin_evaluation_count": evaluated,

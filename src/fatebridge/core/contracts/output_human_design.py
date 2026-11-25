@@ -1,5 +1,7 @@
 """Projectable Human Design calculation and evidence contracts."""
 
+from typing import Literal
+
 from pydantic import JsonValue
 
 from fatebridge.core.contracts.output_base import PartialOutput
@@ -411,6 +413,7 @@ class HDCycleReferenceContactOrdering(PartialOutput):
 
 class HDCycleSummary(PartialOutput):
     status: str | None = None
+    reference_status: Literal["not_requested"] | None = None
     reference_utc: str | None = None
     reference_contact_ordering: HDCycleReferenceContactOrdering | None = None
 

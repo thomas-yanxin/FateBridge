@@ -473,14 +473,15 @@ def verify_clock_records(payload: dict[str, Any]) -> ClockReplay:
 
     walk(payload)
     context = payload["cycle_context"]
-    reference = payload["clock_evidence"]["cycle_reference_datetime"]
-    if context["status"] == "not_requested":
-        if reference is not None:
-            raise ValueError("Missing requested cycle clock")
-        else:
-            pass
-    else:
-        label, tt = replay.reference_epoch(reference)
+    evidence = payload["clock_evidence"]
+    reference = evidence["cycle_reference_datetime"]
+    requested = reference is not None or evidence.get("compare_cycle_origins", False)
+    if requested != (context["status"] != "not_requested"):
+        raise ValueError("Cycle search detached from request")
+    if requested:
+        label, tt = (
+            (None, None) if reference is None else replay.reference_epoch(reference)
+        )
         if (context["reference_utc"], context["reference_jd_tt"]) != (label, tt):
             raise ValueError("Cycle reference detached from input")
         else:

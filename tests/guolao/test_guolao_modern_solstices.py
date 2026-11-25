@@ -262,3 +262,20 @@ def test_optional_DE441_common_frame_diagnostic_requires_actual_files_and_retain
             )
         else:
             pass
+
+
+@pytest.mark.parametrize("mutation", ["duplicate_bracket", "missing_source_hash"])
+def test_changed_reference_bytes_are_rejected(tmp_path, monkeypatch, mutation):
+    original = audit.DATA.read_bytes()
+    reference = json.loads(original)
+    assert (json.dumps(reference, indent=2) + "\n").encode() == original
+    if mutation == "duplicate_bracket":
+        reference["reference_brackets"][-1] = reference["reference_brackets"][-2]
+    else:
+        del reference["source_component_data_hashes"]["gnomon-epoch-v1.json"]
+    data = tmp_path / audit.DATA.name
+    data.write_bytes((json.dumps(reference, indent=2) + "\n").encode())
+    monkeypatch.setattr(audit, "DATA", data)
+
+    with pytest.raises(ValueError, match="固定参考文件哈希改变"):
+        audit.load_reference()
