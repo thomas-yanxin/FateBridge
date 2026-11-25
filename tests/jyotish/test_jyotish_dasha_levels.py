@@ -31,6 +31,7 @@ def ticks(value):
     return (elapsed.days * 86400 + elapsed.seconds) * 1000000 + elapsed.microseconds
 
 
+@pytest.mark.local_data
 def test_reference_frozen_before_kernel():
     assert (
         PATH.exists()
@@ -44,6 +45,7 @@ def test_reference_frozen_before_kernel():
     assert sum(len(g["rows"]) for g in DATA["pratyantar_groups"]) == 2187
 
 
+@pytest.mark.local_data
 @pytest.mark.parametrize("case", DATA["pratyantar_groups"])
 def test_every_primary_pd_and_half_open_boundary(case):
     for expected in case["rows"]:
@@ -93,6 +95,7 @@ def test_every_primary_pd_and_half_open_boundary(case):
             ]
 
 
+@pytest.mark.local_data
 @pytest.mark.parametrize("case", DATA["deep_cases"])
 def test_deep_siblings_and_active_ancestry_match_frozen_rational_reference(case):
     result = active_levels(
