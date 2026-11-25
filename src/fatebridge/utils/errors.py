@@ -154,6 +154,7 @@ class EphemerisSourceError(ValueError):
 
     MESSAGES = {
         "solar_native_unavailable": "Selected native solar model could not solve the requested crossing; no linear approximation is returned",
+        "solar_horizon_sign_unstable": "Native Moshier solar height has unresolved repeated sign changes near a candidate crossing; no unique event time is returned. This is not evidence that the Sun never crosses the horizon",
         "solar_term_source_unverified": "Solar-term crossing lacks a verified current model and source record; no approximate boundary is returned",
         "horizon_direction_model_unavailable": "Eastern horizon direction requires a valid coherent native house-angle model",
         "house_projection_precision_unavailable": "House-plane direction or its half-open house could not be resolved at the available working precision",

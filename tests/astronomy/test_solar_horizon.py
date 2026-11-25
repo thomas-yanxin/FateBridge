@@ -4,6 +4,7 @@ import gzip
 import hashlib
 import json
 import math
+from contextlib import nullcontext
 from pathlib import Path
 
 import pytest
@@ -34,6 +35,18 @@ JPL_REFERENCE = json.loads(
         (ROOT / "tests/data/solar_horizon_v1/jpl-reference.json.gz").read_bytes()
     )
 )
+NATIVE_QUALIFICATION = json.loads(
+    gzip.decompress(
+        (
+            ROOT / "tests/data/solar_horizon_v1/native-sign-qualification.json.gz"
+        ).read_bytes()
+    )
+)
+UNQUALIFIED_MOSHIER_CASES = {
+    row["case"]
+    for row in NATIVE_QUALIFICATION["windows"]
+    if row["qualification"] == "solar_horizon_sign_unstable"
+}
 
 
 @pytest.fixture
@@ -212,6 +225,14 @@ def test_first_directed_event_against_independent_scipy_search(row, selected_pat
                 with pytest.raises(EphemerisSourceError):
                     solar_events.next_solar_event(case["query_ut1"], **kwargs)
                 continue
+            if (
+                row["family"] == "polar-cluster"
+                and expected["case"] in UNQUALIFIED_MOSHIER_CASES
+            ):
+                with pytest.raises(EphemerisSourceError) as raised:
+                    solar_events.next_solar_event(case["query_ut1"], **kwargs)
+                assert raised.value.reason == "solar_horizon_sign_unstable"
+                continue
             result = solar_events.next_solar_event(case["query_ut1"], **kwargs)
             want = next(
                 (
@@ -234,7 +255,17 @@ def test_first_directed_event_against_independent_scipy_search(row, selected_pat
 def test_complete_polar_sequence_keeps_every_ordered_crossing(row, selected_path):
     case, expected = row["input"], row["reference"]
     selected_path(False)
-    with use_ut1_source("swiss_delta_t"):
+    unqualified = expected["case"] in UNQUALIFIED_MOSHIER_CASES
+    with (
+        use_ut1_source("swiss_delta_t"),
+        (
+            pytest.raises(
+                EphemerisSourceError, match="unresolved repeated sign changes"
+            )
+            if unqualified
+            else nullcontext()
+        ),
+    ):
         events = solar_events.solar_crossings_in_window(
             case["query_ut1"],
             case["query_ut1"] + 26 / 24,
@@ -247,11 +278,14 @@ def test_complete_polar_sequence_keeps_every_ordered_crossing(row, selected_path
             ),
             ephemeris_flags=case["source_flags"],
         )
-    assert len(events) == len(expected["roots"]), row
-    for actual, wanted in zip(events, expected["roots"], strict=True):
-        assert actual.rising == (wanted["kind"] == "rise"), row
-        assert abs(actual.julian_day_ut1 - wanted["ut1"]) * 86400 <= 0.001, row
-        assert abs(actual.julian_day_tt - wanted["tt"]) * 86400 <= 0.001, row
+    if unqualified:
+        assert len(expected["roots"]) > 0
+    else:
+        assert len(events) == len(expected["roots"]), row
+        for actual, wanted in zip(events, expected["roots"], strict=True):
+            assert actual.rising == (wanted["kind"] == "rise"), row
+            assert abs(actual.julian_day_ut1 - wanted["ut1"]) * 86400 <= 0.001, row
+            assert abs(actual.julian_day_tt - wanted["tt"]) * 86400 <= 0.001, row
 
 
 @pytest.mark.local_data
@@ -345,6 +379,10 @@ def test_strict_source_admission_also_runs_when_no_polar_event_exists(
     kwargs = dict(longitude=0, latitude=90, rising=True, definition=definition)
     with use_ut1_source("swiss_delta_t"):
         assert solar_events.next_solar_event(2451545.0, **kwargs) is None
+        assert (
+            solar_events.next_solar_event(2451545.0, ephemeris_flags=4, **kwargs)
+            is None
+        )
         with pytest.raises(ValueError, match="require_data_files"):
             solar_events.next_solar_event(
                 2451545.0, ephemeris_policy="require_data_files", **kwargs
@@ -384,3 +422,64 @@ def test_optical_source_failure_restores_the_requested_receiver(
         )
     assert caught.value is failure
     assert len(sites) == 2 and sites[-1] == (121.47, 31.23, 25)
+
+
+def test_native_qualification_preserves_all_original_root_denominators():
+    """Numerical abstentions must not erase the original failed comparison rows."""
+    historic = NATIVE_QUALIFICATION["historical_53"]
+    assert (
+        NATIVE_QUALIFICATION["original_sign_reference_sha256"]
+        == REFERENCE["polar_adjacent_root_diagnostic"]["reference_sha256"]
+    )
+    assert len(historic["cases"]) == 25
+    assert historic["roots"] == 53
+    assert historic["baseline_tt_passes"] == historic["baseline_ut1_passes"] == 23
+    assert historic["original_c_roots_with_multiple_sign_changes"] == 53
+    assert historic["original_c_sign_changes"] == 739
+    native_rows = {
+        row["reference"]["case"]: row
+        for row in REFERENCE["events"]
+        if row["family"] == "polar-cluster" and row["input"]["source_flags"] == 4
+    }
+    assert len(native_rows) == len(NATIVE_QUALIFICATION["windows"]) == 96
+    assert sum(len(row["reference"]["roots"]) for row in native_rows.values()) == 192
+    for window in NATIVE_QUALIFICATION["windows"]:
+        assert len(window["roots"]) == len(
+            native_rows[window["case"]]["reference"]["roots"]
+        )
+        for diagnostic, expected in zip(
+            window["roots"],
+            native_rows[window["case"]]["reference"]["roots"],
+            strict=True,
+        ):
+            assert diagnostic["expected_ut1"] == expected["ut1"]
+            assert diagnostic["expected_tt"] == expected["tt"]
+    assert (
+        sum(len(native_rows[case]["reference"]["roots"]) for case in historic["cases"])
+        == 53
+    )
+    assert set(historic["cases"]) <= UNQUALIFIED_MOSHIER_CASES
+
+
+@pytest.mark.local_data
+def test_moshier_ambiguity_is_not_hidden_by_a_one_ulp_query_window(selected_path):
+    """Moving query bounds must not admit one arbitrary reversal of an unstable root."""
+    selected_path(False)
+    historic = NATIVE_QUALIFICATION["historical_53"]["baseline_replay"][0]
+    case = next(
+        row["input"]
+        for row in REFERENCE["events"]
+        if row["family"] == "polar-cluster"
+        and row["reference"]["case"] == historic["case"]
+    )
+    root_ut1 = historic["roots"][1]["actual_ut1"]
+    with use_ut1_source("swiss_delta_t"), pytest.raises(EphemerisSourceError) as raised:
+        solar_events.solar_crossings_in_window(
+            root_ut1,
+            math.nextafter(root_ut1, math.inf),
+            longitude=case["longitude"],
+            latitude=case["latitude"],
+            definition="hindu_geometric_center",
+            ephemeris_flags=4,
+        )
+    assert raised.value.reason == "solar_horizon_sign_unstable"

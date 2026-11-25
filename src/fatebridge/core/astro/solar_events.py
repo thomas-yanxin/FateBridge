@@ -9,7 +9,7 @@ Neither mode substitutes a source-native observer for the physical receiver.
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Callable, Literal, Sequence
 
 import erfa
@@ -38,6 +38,8 @@ from fatebridge.utils.errors import EphemerisSourceError
 SolarDefinition = Literal["hindu_geometric_center", "apparent_topocentric_center"]
 SOURCE_MASK = 7  # Original SEFLG_EPHMASK; all other requested flags must agree.
 SOLAR_EVENT_MODEL = "fatebridge.physical_solar_horizon_crossing.v4"
+MOSHIER_SIGN_SCAN_SECONDS = 0.02  # Original adjacent-UT1 diagnostic radius.
+MOSHIER_MAX_LOCAL_SIGN_CHANGES = 2  # Admit a resolved rise/set pair near tangency.
 
 
 @dataclass(frozen=True)
@@ -435,6 +437,10 @@ def solar_crossings_in_window(
     this gives half-open daily partitions one consistent event owner.
     Source, clock and convergence failures propagate; an empty list means
     only that this valid window contains no resolved directed crossing.
+    Native Moshier roots are checked on adjacent UT1 dates within 20 milliseconds,
+    including neighboring crossings outside the requested window. A resolved
+    rise/set pair is admitted; additional or unresolved sign changes are rejected.
+    This local admission policy does not certify continuity or physical accuracy.
     Atmosphere for the apparent-centre preset is fixed at sea level,
     1013.25 hPa, 0 Celsius and lapse rate 0.0065 K/m, as declared by its caller.
     """
@@ -503,12 +509,22 @@ def solar_crossings_in_window(
                 math.radians(observations[ut1].altitude_degrees)
             ) - math.sin(math.radians(horizon))
 
+        search_start_ut1, search_end_ut1 = start_ut1, end_ut1
+        if isinstance(fixed_source, NativeSolarSource):
+            value(start_ut1)
+            if observed_source is not None and observed_source[0] == "moshier":
+                search_start_ut1 -= MOSHIER_SIGN_SCAN_SECONDS / 86400
+                search_end_ut1 += MOSHIER_SIGN_SCAN_SECONDS / 86400
+            else:
+                pass
+        else:
+            pass
         grid = [
             point
-            for index in range(math.ceil((end_ut1 - start_ut1) * 12))
-            if (point := start_ut1 + index / 12) < end_ut1
+            for index in range(math.ceil((search_end_ut1 - search_start_ut1) * 12))
+            if (point := search_start_ut1 + index / 12) < search_end_ut1
         ]
-        grid.append(end_ut1)
+        grid.append(search_end_ut1)
         nodes = sorted(
             {
                 point
@@ -600,6 +616,53 @@ def solar_crossings_in_window(
                     rising,
                 )
             )
+        for crossing in crossings:
+            if (
+                crossing.ephemeris_model == "moshier"
+                and start_ut1 <= crossing.julian_day_ut1 <= end_ut1
+            ):
+                scan_ut1 = crossing.julian_day_ut1 - MOSHIER_SIGN_SCAN_SECONDS / 86400
+                scan_end_ut1 = (
+                    crossing.julian_day_ut1 + MOSHIER_SIGN_SCAN_SECONDS / 86400
+                )
+                resolved_crossing_count = sum(
+                    scan_ut1 <= neighbor.julian_day_ut1 <= scan_end_ut1
+                    for neighbor in crossings
+                )
+                allowed_sign_changes = min(
+                    MOSHIER_MAX_LOCAL_SIGN_CHANGES, resolved_crossing_count
+                )
+                previous_sign = 0
+                sign_changes = 0
+                while scan_ut1 <= scan_end_ut1:
+                    score = value(scan_ut1)
+                    current_sign = (score > 0) - (score < 0)
+                    if current_sign:
+                        if previous_sign and current_sign != previous_sign:
+                            sign_changes += 1
+                        else:
+                            pass
+                        previous_sign = current_sign
+                    else:
+                        pass
+                    if sign_changes > allowed_sign_changes:
+                        raise EphemerisSourceError("solar_horizon_sign_unstable")
+                    else:
+                        scan_ut1 = math.nextafter(scan_ut1, math.inf)
+            else:
+                pass
+        crossings = [
+            crossing
+            for crossing in crossings
+            if start_ut1 <= crossing.julian_day_ut1 <= end_ut1
+        ]
+        if crossings and crossings[0].ephemeris_model == "moshier":
+            crossings = [
+                replace(crossing, observation_evaluations=len(observations))
+                for crossing in crossings
+            ]
+        else:
+            pass
         return crossings
 
 
