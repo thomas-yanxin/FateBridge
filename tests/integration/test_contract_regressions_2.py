@@ -20,6 +20,7 @@ from fatebridge import api
 from fatebridge.application import execution
 from fatebridge.application.discovery import select_mcp_specs
 from fatebridge.cli import run
+from fatebridge.cli_arguments import _add_field_argument, _argument_type
 from fatebridge.core import almanac, solar_term_clock
 from fatebridge.core.astro import runtime
 from fatebridge.diagnostics import diagnose
@@ -140,7 +141,7 @@ def test_omitted_optional_value_still_uses_declared_default(
     ],
 )
 def test_textual_union_branch_is_not_discarded(annotation) -> None:
-    assert cli._argument_type(annotation) is str
+    assert _argument_type(annotation) is str
 
 
 def test_numeric_strictness_optional_and_list_items_still_reach_pydantic_as_integers() -> (
@@ -152,7 +153,7 @@ def test_numeric_strictness_optional_and_list_items_still_reach_pydantic_as_inte
 
     parser = argparse.ArgumentParser()
     for name, field in Numeric.model_fields.items():
-        cli._add_field_argument(parser, name, field)
+        _add_field_argument(parser, name, field)
     namespace = parser.parse_args(["--count", "3", "--items", "0", "2"])
     result = Numeric.model_validate(vars(namespace))
     assert result.count == 3 and result.items == [0, 2]

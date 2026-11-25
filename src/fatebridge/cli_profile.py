@@ -9,7 +9,7 @@ from pydantic import BaseModel, ValidationError
 
 from fatebridge.application.description import resolve_spec, spec_is_cli_safe
 from fatebridge.application.execution import result_is_error
-from fatebridge.application.projection import project_fields
+from fatebridge.application.projection import merge_projected_fields, project_fields
 from fatebridge.application.response_delivery import deliver_response
 from fatebridge.application.result_delivery import bound_response
 from fatebridge.application.tool_spec import ServiceResult, ToolSpec
@@ -33,7 +33,7 @@ from fatebridge.utils.errors import (
     validation_error_result,
 )
 from fatebridge.utils.formatting import format_json_response
-from fatebridge.utils.places import DEFAULT_BIRTH_TIMEZONE, resolve_birth_place_context
+from fatebridge.utils.places import resolve_birth_place_context
 
 
 class ProfileToolExecutor(Protocol):
@@ -95,11 +95,11 @@ def _resolve_profile_systems(
 
 def _unify_birth_instant(inputs: ServiceResult) -> None:
     """Fill a missing profile timezone so each leg shares one civil instant."""
-    if not inputs.get("birth_timezone"):
-        resolved = resolve_birth_place_context(inputs.get("birth_place"))
-        inputs["birth_timezone"] = resolved.timezone or DEFAULT_BIRTH_TIMEZONE
-    else:
-        pass
+    place = inputs.get("birth_place")
+    if not inputs.get("birth_timezone") and isinstance(place, str):
+        timezone = resolve_birth_place_context(place).timezone
+        if timezone is not None:
+            inputs["birth_timezone"] = timezone
 
 
 def run_profile(
@@ -211,8 +211,9 @@ def run_profile(
 
     include_snapshot_text = getattr(args, "include_snapshot_text", None)
     requested_fields = list(args.fields) if args.fields else None
-    profile: ServiceResult = {}
-    has_error = False
+    profile: dict[str, ServiceResult] = {}
+    raw_profile: dict[str, ServiceResult] = {}
+    failed_leg_business_roots: dict[str, set[str]] = {}
     for token, spec in resolved:
         field_names = set(spec.request_model.model_fields)
         if not is_civil_clock:
@@ -264,46 +265,65 @@ def run_profile(
                 detail=options.detail,
                 failed=failed,
             )
-            if whole_leg and not failed:
-                if (
-                    any(p.partition(".")[0] == "run_metadata" for p in subpaths)
-                    and "run_metadata" in raw_result
+            if whole_leg and not failed and subpaths:
+                explicit = deliver_response(
+                    raw_result,
+                    spec=spec,
+                    fields=subpaths,
+                    include_snapshot_text=leg_snapshot,
+                    detail=options.detail,
+                )
+                explicit.pop("projection_warnings", None)
+                if not any(
+                    path.partition(".")[0] == "run_metadata" for path in subpaths
                 ):
-                    result["run_metadata"] = raw_result["run_metadata"]
-                else:
-                    pass
-                if (
-                    any(p.partition(".")[0] == "snapshot_export" for p in subpaths)
-                    and "snapshot_export" in raw_result
-                ):
-                    result["snapshot_export"] = raw_result["snapshot_export"]
-                else:
-                    pass
-            else:
-                pass
+                    explicit.pop("run_metadata", None)
+                result = merge_projected_fields(result, explicit)
         except Exception as exc:  # noqa: BLE001 - report each leg independently
-            result = correlate_error(
+            raw_result = result = correlate_error(
                 handle_calculation_error(exc, spec.operation_label_zh), child_options
             )
         if result_is_error(result):
-            has_error = True
-        else:
-            pass
+            output_model = spec.output_model
+            failed_leg_business_roots[token] = (
+                set(output_model.model_fields).difference(result)
+                if output_model
+                else set()
+            )
         profile[token] = result
+        if requested_fields:
+            raw_profile[token] = raw_result if subpaths else result
 
     output: ServiceResult = {
         "analysis_type": "综合命盘",
         "systems": [token for token, _ in resolved],
-        "profile": profile,
+        "profile": dict(profile),
     }
     if not args.no_metadata:
         output["run_metadata"] = {**root_metadata, "effective_time": {"as_of": as_of}}
     else:
         pass
     if requested_fields:
+        # Failed legs still validate paths into their error envelope. A declared
+        # business root can be unavailable because that leg failed to calculate.
+        projection_fields = []
+        for path in requested_fields:
+            parts = path.split(".")
+            if (
+                len(parts) >= 3
+                and parts[0] == "profile"
+                and parts[2] in failed_leg_business_roots.get(parts[1], ())
+                and all(part and part.strip() == part for part in parts)
+            ):
+                projection_fields.append(".".join(parts[:2]))
+            else:
+                projection_fields.append(path)
         try:
             output = project_fields(
-                output, requested_fields, strict_fields=args.strict_fields
+                output,
+                projection_fields,
+                strict_fields=args.strict_fields,
+                validate_against={**output, "profile": dict(raw_profile)},
             )
         except ParameterError as exc:
             return emit_error(correlate_error(exc.as_result(), options), 1)
@@ -328,4 +348,4 @@ def run_profile(
     except ParameterError as exc:
         return emit_error(correlate_error(exc.as_result(), options), 1)
     print(format_json_response(output, compact=args.compact))
-    return 1 if has_error else 0
+    return 1 if failed_leg_business_roots else 0

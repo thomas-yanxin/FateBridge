@@ -13,7 +13,9 @@ from fatebridge.application.description import resolve_spec
 from fatebridge.cli import run
 from fatebridge.mcp_server import app as mcp_app
 from fatebridge.services.tool_catalog import CATALOG
+from tests.support.output_facts import canonical_json
 from tests.support.transports import (
+    AS_OF,
     SPECS,
     business,
     call_calculation,
@@ -267,6 +269,57 @@ def test_nongli_rejects_unresolved_civil_clock_on_every_transport(
         assert output["retryable"] is False
         assert reason in output["error"]
         assert "run_metadata" not in output
+
+
+@pytest.mark.parametrize(
+    "date,clock,lunar_day,year_pillar,month_pillar",
+    [
+        ("2024-02-04", "16:25", (12, 25), "癸卯", "乙丑"),
+        ("2024-02-04", "16:29", (12, 25), "甲辰", "丙寅"),
+        ("2024-02-10", "00:10", (12, 30), "甲辰", "丙寅"),
+    ],
+)
+def test_lunar_calendar_separates_civil_season_and_solar_day_across_surfaces(
+    date: str,
+    clock: str,
+    lunar_day: tuple[int, int],
+    year_pillar: str,
+    month_pillar: str,
+    surface_calls,
+) -> None:
+    # At 60°E the solar clock is hours behind the civil time in UTC+8.
+    response, protocol, code, cli = surface_calls(
+        SPECS["nongli_time"],
+        {
+            "date": date,
+            "time": clock,
+            "zone": "Asia/Shanghai",
+            "gps_lon": 60,
+            "time_alg": 0,
+        },
+        projection={
+            "detail": "audit",
+            "fields": [
+                "yearGanZi",
+                "monthGanZi",
+                "monthInt",
+                "dayInt",
+                "analysis_context.corrected_datetime",
+            ],
+            "strict_fields": True,
+            "response_char_limit": 0,
+        },
+        rest_as_of=AS_OF,
+    )
+    assert response.status_code == 200 and code == 0 and not protocol.is_error
+    assert (
+        canonical_json(response.json())
+        == canonical_json(protocol.structured_content)
+        == canonical_json(cli)
+    )
+    assert (cli["yearGanZi"], cli["monthGanZi"]) == (year_pillar, month_pillar)
+    assert (cli["monthInt"], cli["dayInt"]) == lunar_day
+    assert cli["analysis_context"]["corrected_datetime"] < f"{date} {clock}"
 
 
 def test_nongli_uses_selected_fold_for_seasonal_elapsed_time(surface_calls) -> None:

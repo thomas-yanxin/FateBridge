@@ -18,6 +18,7 @@ from fatebridge.transports.flags import (
     SNAPSHOT_FLAG_DESC,
     STRICT_FIELDS_DESC,
     ResponseCharLimit,
+    invalid_response_budget,
 )
 from fatebridge.utils.errors import ErrorEnvelope, handle_calculation_error
 
@@ -46,7 +47,10 @@ class RestCalculationExecutor(Protocol):
 
 def query_response_budget(raw_budget: str | int) -> int:
     # note (FastAPI): Convert query text before the union checks the literal zero.
-    return int(raw_budget) if isinstance(raw_budget, str) else raw_budget
+    try:
+        return int(raw_budget)
+    except ValueError:
+        raise invalid_response_budget() from None
 
 
 def register_rest(

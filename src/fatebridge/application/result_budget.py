@@ -119,10 +119,10 @@ def overflow_response(
 
     deferred: list[JsonValue] = [*fields, *deferred_metadata]
     delivery["deferred_fields"] = deferred
-    output: dict[str, JsonValue] = {
-        "run_metadata": metadata,
-        "result_delivery": delivery,
-    }
+    output: dict[str, JsonValue] = {}
+    if "run_metadata" in payload:
+        output["run_metadata"] = metadata
+    output["result_delivery"] = delivery
     is_output_within_budget = fits(output)
     if not is_output_within_budget and isinstance(metadata, dict):
         for key in ("provenance", "determinism"):

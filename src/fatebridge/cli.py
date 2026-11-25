@@ -21,12 +21,7 @@ from fatebridge.application.execution import (
 from fatebridge.application.response_delivery import deliver_response
 from fatebridge.application.result_delivery import RESULT_STORE, ResultStore
 from fatebridge.application.tool_spec import ServiceResult, ToolSpec
-from fatebridge.cli_arguments import _add_field_argument as _add_field_argument
-from fatebridge.cli_arguments import _argument_type as _argument_type
-from fatebridge.cli_arguments import _BooleanFlagAction as _BooleanFlagAction
-from fatebridge.cli_arguments import _unsupported_hint
-from fatebridge.cli_arguments import build_parser as build_parser
-from fatebridge.cli_arguments import emit_error
+from fatebridge.cli_arguments import _unsupported_hint, build_parser, emit_error
 from fatebridge.cli_inputs import (
     preload_request,
     preload_subject,
@@ -184,9 +179,14 @@ def run(argv: list[str] | None = None) -> int:
                 if args.directory is not None
                 else RESULT_STORE
             )
-            page = store.verified_page(
-                args.result_id, args.run_id, args.offset, args.path
-            )
+            if args.run_id is None:
+                page = store.page(
+                    args.result_id, args.offset, args.path, verify_integrity=True
+                )
+            else:
+                page = store.verified_page(
+                    args.result_id, args.run_id, args.offset, args.path
+                )
         except ParameterError as exc:
             return emit_error(exc.as_result(), 1)
         print(json.dumps(page, ensure_ascii=False, separators=(",", ":")))

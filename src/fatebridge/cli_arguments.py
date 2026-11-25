@@ -266,10 +266,10 @@ def build_parser(
     )
 
     result_reader = sub.add_parser(
-        "result-read", help="核对原 run 与存储完整性，再读取一页或点路径；不重算"
+        "result-read", help="核验存储完整性并分页读取原结果，不重算"
     )
     result_reader.add_argument("result_id")
-    result_reader.add_argument("--run-id", required=True, help="原 run_metadata.run_id")
+    result_reader.add_argument("--run-id", help="指定原回执的 run_id。无回执时可省略。")
     result_reader.add_argument(
         "--path", help="对象或数组数字索引点路径；省略读取全文分页"
     )

@@ -322,6 +322,7 @@ class ResultStore:
         *,
         allowed_tools: set[str] | None = None,
         expected_run_id: str | None = None,
+        verify_integrity: bool = False,
     ) -> dict[str, JsonValue]:
         if offset < 0:
             raise invalid_parameter(
@@ -337,11 +338,13 @@ class ResultStore:
         text = retained_result.payload_text
         payload = retained_result.payload
         verification: dict[str, JsonValue] = {}
-        if expected_run_id is not None:
+        if verify_integrity and expected_run_id is None and "run_metadata" in payload:
+            raise invalid_parameter(
+                "需要原回执的 run_id", "expected_run_id", "invalid_run_id"
+            )
+        if verify_integrity or expected_run_id is not None:
             if text is None:
                 text = format_json_response(payload)
-            else:
-                pass
             if (
                 hashlib.sha256(text.encode("utf-8")).hexdigest()
                 != retained_result.payload_digest
@@ -349,8 +352,7 @@ class ResultStore:
                 raise invalid_parameter(
                     "原结果完整性核验失败", "result_id", "result_digest_mismatch"
                 )
-            else:
-                pass
+        if expected_run_id is not None:
             run = payload.get("run_metadata") or {}
             if not isinstance(run, dict) or run.get("run_id") != expected_run_id:
                 raise invalid_parameter(

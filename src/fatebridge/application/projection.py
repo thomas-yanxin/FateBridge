@@ -16,10 +16,12 @@ def project_fields(
     fields: Iterable[str] | None,
     *,
     strict_fields: bool = False,
+    validate_against: ServiceResult | None = None,
 ) -> ServiceResult:
     """Select dotted object paths and keep the run receipt whole.
 
-    A whole parent takes precedence. Invalid paths raise in strict mode and become warnings otherwise.
+    A whole parent takes precedence. For shaped child results, callers may
+    validate a path against the original facts before detail and text omission.
     """
     if fields is None:
         return result
@@ -30,7 +32,9 @@ def project_fields(
         return result
     else:
         pass
-    issues = projection_issues(result, fields)
+    issues = projection_issues(
+        result if validate_against is None else validate_against, fields
+    )
     if issues and strict_fields:
         raise ParameterError("输出字段投影无效", [{**issue} for issue in issues])
     else:
@@ -47,6 +51,21 @@ def project_fields(
     else:
         pass
     return projected
+
+
+def merge_projected_fields(
+    base: dict[str, JsonValue], selected: dict[str, JsonValue]
+) -> dict[str, JsonValue]:
+    """Add explicit facts to an existing view without mutating either projection."""
+    merged = dict(base)
+    for name, value in selected.items():
+        current = merged.get(name)
+        merged[name] = (
+            merge_projected_fields(current, value)
+            if isinstance(current, dict) and isinstance(value, dict)
+            else value
+        )
+    return merged
 
 
 def projection_issues(

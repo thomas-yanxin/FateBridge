@@ -23,12 +23,16 @@ from tests.fixtures.surface_payloads import (
     REST_GET_CASES,
     REST_POST_CASES,
 )
+from tests.support.output_facts import canonical_json
 from tests.support.transports import (
+    AS_OF,
+    SPECS,
     cached_mcp_app,
     cached_output_validator,
     call_calculation,
     describe_capability,
     discover_capabilities,
+    surface_calls,
 )
 
 
@@ -341,3 +345,47 @@ def test_rest_reserved_field_guard_rejects_clashing_model() -> None:
     with pytest.raises(ValueError, match="reserved"):
         register_rest(app, [spec], execute_service=execute_tool)
     assert app.routes == existing_routes
+
+
+@pytest.mark.parametrize(
+    ("spec_key", "arguments", "field", "expected"),
+    [
+        (
+            "export_registry",
+            {"technique": "generic"},
+            "selected_technique.key",
+            {"key": "generic"},
+        ),
+        ("knowledge_read", {"domain": "qimen", "key": "休门"}, "category", "door"),
+    ],
+)
+def test_reference_helpers_share_strict_projection_and_clock(
+    spec_key: str,
+    arguments: dict[str, JsonValue],
+    field: str,
+    expected: JsonValue,
+    surface_calls,
+) -> None:
+    spec = SPECS[spec_key]
+    response, protocol, code, cli = surface_calls(
+        spec,
+        arguments,
+        projection={
+            "detail": "audit",
+            "fields": [field],
+            "strict_fields": True,
+            "response_char_limit": 0,
+        },
+        rest_as_of=AS_OF,
+    )
+    assert response.status_code == 200, response.text
+    assert not protocol.is_error, protocol.content
+    assert code == 0, cli
+    assert protocol.content == []
+    root = field.partition(".")[0]
+    assert canonical_json({root: expected}) == canonical_json(cli)
+    for result in (response.json(), protocol.structured_content, cli):
+        assert canonical_json(result) == canonical_json(cli)
+        assert_public_run_metadata(result)
+        assert result["run_metadata"]["tool_name"] == spec.tool_name
+        assert result["run_metadata"]["effective_time"]["as_of"] == AS_OF

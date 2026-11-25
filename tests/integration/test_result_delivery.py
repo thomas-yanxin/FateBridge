@@ -28,13 +28,16 @@ from fatebridge.utils.private_files import ensure_private_directory, open_privat
 from tests.fixtures.mcp_result_delivery import assert_same_run_receipt
 from tests.support.result_delivery import reconstruct, store
 from tests.support.transports import (
+    AS_OF,
+    SPECS,
     business,
     cached_mcp_app,
     call_calculation,
+    rest,
     surface_calls,
 )
 
-__all__ = ["store", "surface_calls"]
+__all__ = ["rest", "store", "surface_calls"]
 
 
 class SurfaceResponse(NamedTuple):
@@ -83,6 +86,46 @@ def test_bounded_delivery_preserves_all_values_and_original_receipt(
     ensure_private_directory(store.directory)
     os.close(open_private_file(Path(ref["file_path"]), os.O_RDONLY))
     assert delivery.bound_response(original, 0) == original
+
+
+def test_cli_overflow_preserves_audit_result_without_metadata(
+    store: delivery.ResultStore, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    spec = SPECS["bazi_birth"]
+    subject = tmp_path / "subject.json"
+    subject.write_text(json.dumps(example_input(spec)), encoding="utf-8")
+    argv = [
+        "--no-metadata",
+        spec.tool_name,
+        "--subject-file",
+        str(subject),
+        "--detail",
+        "audit",
+        "--as-of",
+        AS_OF,
+    ]
+    assert run(argv) == 0
+    complete = json.loads(capsys.readouterr().out)
+    assert run([*argv, "--response-char-limit", "4096"]) == 0
+    inline = json.loads(capsys.readouterr().out)
+    assert "run_metadata" not in inline and "run_metadata" not in complete
+    reference = inline["result_delivery"]
+    result_id = reference["result_id"]
+    assert reconstruct(store, result_id) == complete
+    read_args = ["result-read", result_id, "--directory", str(store.directory)]
+    assert run([*read_args, "--path", "bazi_birth.four_pillars"]) == 0
+    page = json.loads(capsys.readouterr().out)
+    assert json.loads(page["text"]) == complete["bazi_birth"]["four_pillars"]
+    assert "verification" not in page
+
+    file_path = Path(reference["file_path"])
+    record = json.loads(file_path.read_text(encoding="utf-8"))
+    record["payload"]["bazi_birth"]["four_pillars"] = {}
+    file_path.write_text(json.dumps(record), encoding="utf-8")
+    assert run(read_args) == 1
+    assert json.loads(capsys.readouterr().out)["issues"] == [
+        {"path": "result_id", "code": "result_digest_mismatch"}
+    ]
 
 
 def test_small_payload_is_not_rewritten_or_stored(store: delivery.ResultStore) -> None:
@@ -618,6 +661,88 @@ def test_western_event_compact_snapshots_render_only_on_request(
     else:
         assert not rendered
         assert all("snapshot_text" not in payload for payload in payloads)
+
+
+def test_export_unicode_is_readable_from_each_original_run(
+    store: delivery.ResultStore,
+    surface_calls: SurfaceCalls,
+    rest: TestClient,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    blocks = ["[公开]\n" + "中文 ☊ 😀 é\n" * 600, "【空段】", "[公开]\n第二段"]
+    blocks = [block.strip() for block in blocks]
+    content = "\n\n".join(blocks)
+    response, protocol, code, cli = surface_calls(
+        SPECS["export_parse"],
+        {
+            "technique": "generic",
+            "content": content,
+            "selected_sections": ["公开", "空段"],
+        },
+        projection={
+            "detail": "audit",
+            "fields": ["export_text", "sections"],
+            "strict_fields": True,
+            "response_char_limit": 4096,
+        },
+    )
+    assert response.status_code == 200, response.text
+    assert not protocol.is_error, protocol.content
+    assert code == 0, cli
+    assert len(response.text) <= 4096
+    assert len(format_json_response(protocol.structured_content)) <= 4096
+    assert len(format_json_response(cli, compact=False)) <= 4096
+    outputs = [response.json(), protocol.structured_content, cli]
+    for output in outputs:
+        result_id = output["result_delivery"]["result_id"]
+        run_id = output["run_metadata"]["run_id"]
+        assert reconstruct(store, result_id, "export_text") == content
+        sections = reconstruct(store, result_id, "sections")
+        assert [section["content"] for section in sections] == blocks
+        verified = rest.get(
+            f"/api/results/{result_id}/verified",
+            params={"expected_run_id": run_id, "path": "export_text"},
+        )
+        assert verified.status_code == 200, verified.text
+        assert verified.json()["verification"]["run_id"] == run_id
+        assert verified.json()["verification"]["calculation_repeated"] is False
+        assert (
+            run(
+                [
+                    "result-read",
+                    result_id,
+                    "--directory",
+                    str(store.directory),
+                    "--run-id",
+                    run_id,
+                    "--path",
+                    "export_text",
+                ]
+            )
+            == 0
+        )
+        assert json.loads(capsys.readouterr().out) == verified.json()
+
+    async def read_mcp_pages() -> None:
+        async with Client(cached_mcp_app(families="export")) as client:
+            for output in outputs:
+                result_id = output["result_delivery"]["result_id"]
+                run_id = output["run_metadata"]["run_id"]
+                resource = f"fatebridge://results/{result_id}/verified/{run_id}/fields/export_text"
+                fragments = []
+                offset = 0
+                while offset is not None:
+                    page = json.loads(
+                        (await client.read_resource(f"{resource}/{offset}"))[0].text
+                    )
+                    assert page["verification"]["run_id"] == run_id
+                    assert page["verification"]["calculation_repeated"] is False
+                    assert page["offset"] == offset
+                    fragments.append(page["text"])
+                    offset = page["next_offset"]
+                assert json.loads("".join(fragments)) == content
+
+    asyncio.run(read_mcp_pages())
 
 
 def test_result_reader_respects_mcp_tool_profiles(store: delivery.ResultStore) -> None:
