@@ -72,6 +72,28 @@ def test_the_entire_printed_example_keeps_its_failed_acceptance_and_row_differen
         "Moon",
     }
     assert evidence["full_original_text_acceptance"] is False
+    for comparison in evidence["comparisons"]:
+        assert comparison["printed_application_arithmetic_matches"] is True
+        assert len(comparison["row_comparisons"]) == 41
+        assert (
+            sum(
+                condition["literal_contribution"]
+                for condition in comparison["row_comparisons"]
+            )
+            == comparison["literal_table_balance"]
+        )
+        assert (
+            sum(
+                condition["printed_contribution"] or 0
+                for condition in comparison["row_comparisons"]
+            )
+            == comparison["printed_balance"]
+        )
+    sun = next(c for c in evidence["comparisons"] if c["planet"] == "Sun")
+    triplicity = next(c for c in sun["row_comparisons"] if c["row"] == "E03")
+    assert triplicity["printed_application_listed"] is False
+    assert triplicity["printed_contribution"] is None
+    assert triplicity["literal_contribution"] == 3
     LillyFortitudes.model_validate(evidence["candidate"])
 
 

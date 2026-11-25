@@ -54,7 +54,14 @@ def test_all_printed_rows_and_arithmetic_preserve_failed_original_application():
     assert value["p180_full_application_reproduced"] is False
     assert value["whole_audit_passed"] is False
     assert value["p180_printed_balance"] == -2
-    assert value["candidate_literal_balance"] != -2
+    assert value["candidate_literal_balance"] == 3
+    assert value["p180_printed_application_arithmetic_matches"] is True
+    assert Fraction(value["p177_next_cusp_gap_exact_degrees"]) == Fraction(385, 60)
+    assert len(value["p180_row_comparisons"]) == 28
+    clear = next(c for c in value["p180_row_comparisons"] if c["row"] == "P16")
+    assert clear["printed_application_listed"] is False
+    assert clear["printed_contribution"] is None
+    assert clear["literal_contribution"] == 5
     assert {r["row"] for r in value["p180_row_differences"]} >= {
         "P09",
         "P11",

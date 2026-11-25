@@ -122,6 +122,22 @@ def audit():
         p180_printed_balance=case["printed_balance"],
         candidate_literal_balance=candidate["literal_table_balance"],
         p180_row_differences=differences,
+        p180_row_comparisons=[
+            dict(
+                row=condition["code"],
+                condition=condition["condition"],
+                source_pages=condition["source_pages"],
+                printed_application_listed=condition["code"] in printed,
+                printed_contribution=printed.get(condition["code"]),
+                literal_contribution=condition["contribution"],
+                literal_status=condition["status"],
+            )
+            for condition in candidate["rows"]
+        ],
+        p180_printed_application_arithmetic_matches=(
+            sum(printed.values()) == case["printed_balance"]
+        ),
+        p177_next_cusp_gap_exact_degrees=assignment["next_cusp_gap_exact_degrees"],
         p180_full_application_reproduced=full_case,
         candidate=candidate,
         full_original_text_acceptance=False,

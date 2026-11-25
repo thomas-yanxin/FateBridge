@@ -125,6 +125,27 @@ def audit():
                 printed_balance=expected["printed_balance"],
                 literal_table_balance=observed["literal_table_balance"],
                 row_differences=changes,
+                row_comparisons=[
+                    dict(
+                        row=condition["code"],
+                        condition=condition["condition"],
+                        source_pages=condition["source_pages"],
+                        printed_application_listed=condition["code"] in declared,
+                        printed_contribution=declared.get(condition["code"]),
+                        literal_contribution=condition["contribution"],
+                        literal_status=condition["status"],
+                    )
+                    for condition in observed["rows"]
+                ],
+                printed_fortitudes=expected["printed_fortitudes"],
+                printed_debilities=expected["printed_debilities"],
+                printed_application_arithmetic_matches=(
+                    sum(value for value in declared.values() if value > 0)
+                    == expected["printed_fortitudes"]
+                    and -sum(value for value in declared.values() if value < 0)
+                    == expected["printed_debilities"]
+                    and sum(declared.values()) == expected["printed_balance"]
+                ),
                 unknown_rows=observed["unknown_rows"],
                 reproduced=observed["literal_table_balance"]
                 == expected["printed_balance"]
