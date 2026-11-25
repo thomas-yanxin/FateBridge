@@ -13,7 +13,6 @@
     "mpmath_digits": 90
   },
   "generator_sha256": "e47d433ce11d0295664b3e9d4993146120e8874343e82c1c48074f7b64a70860",
-  "generator_artifact": "~/.codex/artifacts/fatebridge-audit-20261117-round4/calendar/offline-frame/diagnose.py",
   "reference_criterion_arcsec": 0.001,
   "original_before_summary": {
     "controls": 42,

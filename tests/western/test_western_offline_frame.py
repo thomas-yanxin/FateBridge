@@ -3,6 +3,8 @@
 The reference uses original Swiss ECL_NUT/houses_armc and ERFA LTP, NUMAT,
 GST06's equation of origins, and ATIOQ without refraction or diurnal
 aberration. Its exact affine ERA is evaluated independently at 90 digits.
+The portable fixture omits the local generator location and preserves every
+reference input, expected result and tolerance from the original capture.
 Same-source geometry does not certify the physical model at remote epochs.
 """
 
@@ -33,7 +35,7 @@ def test_offline_true_ecliptic_geometry_matches_frozen_source_frame(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     assert hashlib.sha256(REFERENCE_PATH.read_bytes()).hexdigest() == (
-        "d00fe241573d9cf6f91d757db8bd7802e58ad0741b2f012c38ab4a274aa56035"
+        "3e0af39e7459a5d0b5270766dd7aeaf1953887fe8cc9db794eec6e5739eed299"
     )
     monkeypatch.setattr(runtime, "swe", None)
     tolerance = REFERENCE["reference_criterion_arcsec"]
@@ -86,7 +88,7 @@ def test_offline_classical_bounds_use_the_available_same_tt_source_frame(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     assert hashlib.sha256(CLASSICAL_REFERENCE_PATH.read_bytes()).hexdigest() == (
-        "ba2d21111648297cf239b7e732b6274c3c52eaf1d4b2b8a2a93372cab687f0c4"
+        "cdcc68cc57a63873074b8692133dd835debe2ae44f4527a8edd6f4e5eb5c5a8f"
     )
     monkeypatch.setattr(runtime, "swe", None)
     monkeypatch.setattr(ephemeris_runtime, "swe", None)

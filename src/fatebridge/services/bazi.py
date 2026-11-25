@@ -1065,7 +1065,6 @@ def _run_bazi_dimension_analysis(
                 "dayun_selection_basis": None,
                 "dayun_start_at": None,
                 "dayun_end_at": None,
-                "dayun_age": None,
                 "dayun_age_basis": "unavailable_for_override",
                 "overridden": {"dayun_pillar": True, "liunian_pillar": True},
             }

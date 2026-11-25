@@ -179,9 +179,23 @@ def test_working_projection_phase_survives_its_display_precision(
             ), row
 
 
+def _expects_chart_error(control: PublicControl) -> bool:
+    # The original control rejects drawing a chart without coordinates. The
+    # current request can still resolve its calendar from the supplied clock.
+    return (
+        control["expect_final_error"] and control["id"] != "suzhan-missing-coordinate"
+    )
+
+
 def _assert_public_control_value(
     value: dict[str, object], control: PublicControl, key: str
 ) -> None:
+    if control["id"] == "suzhan-missing-coordinate":
+        assert value["chart"] is value["astronomy"] is None
+        assert value["params"]["calculationMode"] == "calendar_with_clock"
+        assert value["params"]["coordinatesApplied"] is False
+        assert value["params"]["birthTimeImputed"] is False
+        return
     if control["reference_kind"] == "date_only":
         assert value["chart"] is value["astronomy"] is None
         assert value["params"]["birthTimeKnown"] is False
@@ -254,7 +268,7 @@ def test_frozen_source_geometry_reaches_qualified_public_models(
                 SPECS[key].rest_path, json=control["payload"], params=params
             )
         value = response.json()
-        if control["expect_final_error"]:
+        if _expects_chart_error(control):
             assert response.status_code == 400
             assert value["error_code"] == "validation_error"
             assert value["retryable"] is False
@@ -273,7 +287,7 @@ def test_frozen_source_geometry_representative_controls_agree_across_transports(
     for control in reference["public_controls"]:
         bucket = (
             control["key"],
-            control["expect_final_error"],
+            _expects_chart_error(control),
             control["reference_kind"],
         )
         if bucket not in seen:
@@ -309,7 +323,7 @@ def test_frozen_source_geometry_representative_controls_agree_across_transports(
             response, protocol, code, cli = surface_calls(
                 SPECS[key], control["payload"], projection=options
             )
-        if control["expect_final_error"]:
+        if _expects_chart_error(control):
             assert response.status_code == 400 and code != 0 and protocol.is_error
             for value in (response.json(), cli, protocol.structured_content):
                 assert value["error_code"] == "validation_error"

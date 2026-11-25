@@ -595,7 +595,6 @@
     }
   ],
   "source_generator_sha256": "0f82c413aafa93b4aa49da28994d83c6f35e95f1fbb068e740c7508495239b7f",
-  "source_generator_artifact": "~/.codex/artifacts/fatebridge-audit-20261117-round5/calendar/classical-source-diagnostic.py",
   "original_before_summary": {
     "unknown_obliquity_count": 4,
     "out_of_bounds_mismatches": 44
