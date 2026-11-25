@@ -62,6 +62,7 @@ class GuolaoLifePalace(PartialOutput):
     seasonal_anchor_policy: str | None = None
     seasonal_anchor_evidence: dict[str, OpenJsonValue] | None = None
     degree_status: str | None = None
+    degree_reason: str | None = None
 
 
 class GuolaoPalace(PartialOutput):

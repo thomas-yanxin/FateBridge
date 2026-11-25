@@ -15,7 +15,7 @@ import math
 import re
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 from fatebridge.core.astro.birth import build_astro_birth_info
 from fatebridge.core.astro.time_scales import datetime_from_tt
@@ -117,12 +117,15 @@ def load_reference(
     return protocol, reference
 
 
-def evaluate(protocol: dict, reference: dict) -> dict[str, Any]:
+def evaluate(
+    protocol: dict, reference: dict, *, backend: Literal["swieph", "moshier"]
+) -> dict[str, Any]:
     indexed = {
         target["body"]: {row["date_tt"]: row for row in target["rows"]}
         for target in reference["references"]
     }
     rows = []
+    physical_sources = []
     for date in protocol["dates_tt"]:
         jd = indexed["Moon"][date]["jd_tt"]
         raw = None
@@ -144,8 +147,13 @@ def evaluate(protocol: dict, reference: dict) -> dict[str, Any]:
             raw = guolao.positions(birth, observer_geometry=False)
             if abs(raw["julian_day_tt"] - jd) >= 1e-9:
                 raise ValueError("Civil inverse did not preserve the fixed TT epoch")
-            else:
-                pass
+            physical_sources.append(
+                {
+                    "date_tt": date,
+                    "julian_day_tt": raw["julian_day_tt"],
+                    "source": raw["longitude_motion"]["physical_ephemeris_source"],
+                }
+            )
         except Exception as exc:
             logger.exception(f"Guolao source evaluation failed at {date} TT")
             error = {"type": type(exc).__name__, "message": str(exc)}
@@ -176,6 +184,16 @@ def evaluate(protocol: dict, reference: dict) -> dict[str, Any]:
                         "future_leap_seconds_assumed_unchanged"
                     ],
                 )
+                provenance = raw["ephemeris_provenance"]["by_body"][name]
+                models = {
+                    key: provenance[key]
+                    for key in ("ecliptic_model", "equatorial_model")
+                }
+                if any(model != backend for model in models.values()):
+                    row["source_error"] = {
+                        "type": "EphemerisSourceError",
+                        "message": f"Requested {backend}; observed {models}",
+                    }
                 if ref["status"] == "available":
                     expected = ref["erfa_display_frame"][
                         "longitude_speed_degrees_per_day"
@@ -189,6 +207,7 @@ def evaluate(protocol: dict, reference: dict) -> dict[str, Any]:
                         )
                         * 3600,
                         passed=resolved
+                        and row["source_error"] is None
                         and math.isfinite(residual)
                         and abs(residual)
                         <= protocol["display_longitude_speed_tolerance_arcsec_per_day"],
@@ -202,6 +221,11 @@ def evaluate(protocol: dict, reference: dict) -> dict[str, Any]:
         "audit_version": "guolao_longitude_motion_v1",
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "scope": "Actual Guolao positions at twelve predeclared TT epochs for seven physical bodies. Swiss and NASA may share DE441 dynamics; not independent trajectory, whole-domain, classical-rule or outcome validation.",
+        "requested_backend": backend,
+        "actual_models": sorted(
+            {row["actual_model"] for row in rows if "actual_model" in row}
+        ),
+        "physical_ephemeris_sources": physical_sources,
         "requested": len(protocol["dates_tt"]) * len(protocol["targets"]),
         "passed": sum(row["passed"] for row in rows),
         "source_errors": sum(row["source_error"] is not None for row in rows),
@@ -225,6 +249,12 @@ def main() -> int:
         type=Path,
         default=ROOT / "tests/data/astro/guolao_motion/reference.json",
     )
+    parser.add_argument(
+        "--backend",
+        choices=("swieph", "moshier"),
+        default="swieph",
+        help="Require this actual model. Configure SE_EPHE_PATH separately.",
+    )
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     try:
@@ -239,11 +269,19 @@ def main() -> int:
         args.output.write_text(json.dumps(result, indent=2) + "\n")
         print(json.dumps(result))
         return 2
-    result = evaluate(protocol, reference)
+    result = evaluate(protocol, reference, backend=args.backend)
     result["protocol_sha256"] = PROTOCOL_SHA256
     result["reference_sha256"] = REFERENCE_SHA256
     args.output.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n")
-    print(json.dumps({k: v for k, v in result.items() if k != "rows"}))
+    print(
+        json.dumps(
+            {
+                k: v
+                for k, v in result.items()
+                if k not in {"rows", "physical_ephemeris_sources"}
+            }
+        )
+    )
     if result["source_errors"] or result["unresolved_reference"]:
         return 2
     else:

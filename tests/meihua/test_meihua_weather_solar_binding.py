@@ -244,16 +244,17 @@ def test_validator_does_not_import_production_calendar_or_weather_calculators() 
 def test_reference_hash_drift_is_not_accepted_as_better_agreement(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
-    target = tmp_path / "meihua"
-    target.mkdir()
+    target = tmp_path / "validation/data/meihua"
+    target.mkdir(parents=True)
     (target / "weather-solar-minutes-hko-v1.json").write_bytes(
         (FIXTURE / "profile.json").read_bytes() + b" "
     )
+    monkeypatch.setattr(binding, "REPO_ROOT", tmp_path)
     binding._profile.cache_clear()
-    with monkeypatch.context() as context:
-        context.setattr(binding, "files", lambda _: tmp_path)
+    try:
         with pytest.raises(ValueError, match="content changed"):
             binding.published_solar_month_context(
                 datetime.fromisoformat("2026-01-01T12:00:00+08:00")
             )
-    binding._profile.cache_clear()
+    finally:
+        binding._profile.cache_clear()

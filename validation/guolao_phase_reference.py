@@ -26,9 +26,9 @@ from fatebridge.core.ephemeris_runtime import (
 from fatebridge.core.guolao.guolao_historical import shoushi_winter_cycle
 from fatebridge.core.guolao.guolao_lunar_phases import KINDS, source_lunar_phase
 from fatebridge.core.lunar_phase_events import phase_events_tt
-from validation._paths import PACKAGE_ROOT
+from validation._paths import REPO_ROOT
 
-DATA = PACKAGE_ROOT / "data/guolao/nasa-phase-interval-reference-v1.json"
+DATA = REPO_ROOT / "validation/data/guolao/nasa-phase-interval-reference-v1.json"
 MONTHS = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split()
 CELL = re.compile(r"([A-Z][a-z]{2})\s+(\d{1,2})\s+(\d{2}):(\d{2})(?:\s+([TAHPtnp]))?")
 

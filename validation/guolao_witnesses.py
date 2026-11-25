@@ -9,9 +9,10 @@ from fractions import Fraction
 from pathlib import Path
 from typing import Any
 
-from validation._paths import PACKAGE_ROOT
+from validation._paths import PACKAGE_ROOT, REPO_ROOT
 
-DATA = PACKAGE_ROOT / "data/guolao/gujin45-witness-variants-v1.json"
+DATA = REPO_ROOT / "validation/data/guolao/gujin45-witness-variants-v1.json"
+BASELINE_DATA = PACKAGE_ROOT / "data/guolao"
 TARGETS = (
     ("day_rate_days", 90),
     ("day_rate_days", 154),
@@ -36,10 +37,10 @@ def _read() -> tuple[dict[str, Any], str, dict[str, dict[str, Any]]]:
     else:
         pass
     if (
-        not data["single_collator"]
-        or not data["prior_formula_and_witness_values_known"]
+        data["single_collator"] is not True
+        or data["prior_formula_and_witness_values_known"] is not True
         or any(
-            data[key]
+            data[key] is not False
             for key in [
                 "independent_second_collator",
                 "full_additional_table_transcription",
@@ -61,9 +62,9 @@ def _read() -> tuple[dict[str, Any], str, dict[str, dict[str, Any]]]:
     else:
         pass
     for name, digest in data["baseline_files_sha256"].items():
-        # Resolve through the package, including in an installed wheel.
+        # Keep the recorded source paths and resolve the baselines in the runtime package.
         filename = Path(name).name
-        contents = (DATA.parent / filename).read_bytes()
+        contents = (BASELINE_DATA / filename).read_bytes()
         if hashlib.sha256(contents).hexdigest() != digest:
             raise ValueError("四库本既有数据指纹改变，须重新审计而非自动重建基线")
         else:
@@ -78,11 +79,16 @@ def _read() -> tuple[dict[str, Any], str, dict[str, dict[str, Any]]]:
         for row in rows:
             if (
                 row["status"] != "legible_single_collator"
-                or not isinstance(row["pdf_page_one_based"], int)
+                or type(row["pdf_page_one_based"]) is not int
                 or row["pdf_page_one_based"] < 1
-                or not row["observed_glyphs"]
-                or not row["inspection_crop"]
-                or not row["complete_page_image"]
+                or any(
+                    not isinstance(row[key], str) or not row[key].strip()
+                    for key in (
+                        "observed_glyphs",
+                        "inspection_crop",
+                        "complete_page_image",
+                    )
+                )
             ):
                 raise ValueError("读数须有状态、字形和对应原页，不接受推算补字")
             else:
@@ -100,7 +106,10 @@ def _read() -> tuple[dict[str, Any], str, dict[str, dict[str, Any]]]:
 
 
 def audit_gujin45_witness_variants() -> dict[str, Any]:
-    """Compare all declared readings, without voting, fitting, or cell repair."""
+    """Compare all declared readings, without voting, fitting, or cell repair.
+
+    The reference fixture digest records the declaration made by the register.
+    """
     data, digest, baselines = _read()
     cells = []
     for position, (field, index) in enumerate(TARGETS):
@@ -115,6 +124,7 @@ def audit_gujin45_witness_variants() -> dict[str, Any]:
         else:
             pass
         baseline = baseline_row[field]
+        baseline_exact = Fraction(baseline)
         readings = [
             {
                 "witness_id": data["baseline_witness_id"],
@@ -129,15 +139,15 @@ def audit_gujin45_witness_variants() -> dict[str, Any]:
             row = witness["observations"][position]
             readings.append(
                 {
-                    "witness_id": witness["witness_id"],
                     **row,
+                    "witness_id": witness["witness_id"],
                     "source_url": witness["source_url"],
                     "difference_from_siku_exact": str(
-                        Fraction(row["value"]) - Fraction(baseline)
+                        Fraction(row["value"]) - baseline_exact
                     ),
                 }
             )
-        variants = sorted({row["value"] for row in readings}, key=Fraction)
+        variants = sorted(dict.fromkeys(row["value"] for row in readings), key=Fraction)
         cells.append(
             {
                 "field": field,
@@ -146,7 +156,7 @@ def audit_gujin45_witness_variants() -> dict[str, Any]:
                 "distinct_observed_values": variants,
                 "status": (
                     "unadjudicated_variant"
-                    if len(variants) > 1
+                    if any(Fraction(value) != baseline_exact for value in variants)
                     else "collated_agreement_not_textual_adjudication"
                 ),
                 "adjudicated_value": None,

@@ -17,10 +17,8 @@ from fatebridge.core.public_output import same_public_value as _same_value
 from fatebridge.services.tool_catalog import CATALOG
 from validation.human_design import verify_human_design_reading
 
-ROOT = Path(__file__).resolve().parents[1]
-PLAN = ROOT / "tests/fixtures/human-design-cycle-publisher-plan.json"
-REFERENCE = (
-    ROOT / "src/fatebridge/data/human_design/publisher-natal-2005-reference.json"
+REFERENCE_PATH = Path(
+    "validation/data/human_design/publisher-natal-2005-reference.json"
 )
 LEVELS = ("gate", "line", "color", "tone", "base")
 
@@ -223,11 +221,11 @@ def summarize_runs(plan: dict, reference: dict, runs: list[dict]) -> dict:
 
 def publisher_natal_checks(root: Path, *, capture: Path | None = None) -> dict:
     plan_path = root / "tests/fixtures/human-design-cycle-publisher-plan.json"
-    reference_path = (
-        root / "src/fatebridge/data/human_design/publisher-natal-2005-reference.json"
-    )
-    plan = json.loads(plan_path.read_text())
-    reference = json.loads(reference_path.read_text())
+    reference_path = root / REFERENCE_PATH
+    plan_bytes = plan_path.read_bytes()
+    reference_bytes = reference_path.read_bytes()
+    plan = json.loads(plan_bytes)
+    reference = json.loads(reference_bytes)
     spec = next(s for s in CATALOG if s.key == "human_design")
     runs = []
     with TemporaryDirectory() as empty:
@@ -251,8 +249,8 @@ def publisher_natal_checks(root: Path, *, capture: Path | None = None) -> dict:
     report = summarize_runs(plan, reference, runs)
     report.update(
         {
-            "plan_sha256": hashlib.sha256(plan_path.read_bytes()).hexdigest(),
-            "reference_sha256": hashlib.sha256(reference_path.read_bytes()).hexdigest(),
+            "plan_sha256": hashlib.sha256(plan_bytes).hexdigest(),
+            "reference_sha256": hashlib.sha256(reference_bytes).hexdigest(),
         }
     )
     if capture is not None:

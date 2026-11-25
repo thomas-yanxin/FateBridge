@@ -14,10 +14,10 @@ from collections import Counter
 from copy import deepcopy
 from datetime import datetime, timedelta, timezone
 from functools import lru_cache
-from importlib.resources import files
 from pathlib import Path
 from typing import Any
 
+from ._paths import REPO_ROOT
 from .meihua_weather_calendar_binding import (
     audit_calendar_bound_weather_study,
     calendar_bound_weather_label,
@@ -33,10 +33,8 @@ _BRANCHES = "子丑寅卯辰巳午未申酉戌亥"
 @lru_cache(maxsize=1)
 def _profile() -> dict[str, Any]:
     raw = (
-        files("fatebridge.data")
-        .joinpath("meihua/weather-solar-minutes-hko-v1.json")
-        .read_bytes()
-    )
+        REPO_ROOT / "validation/data/meihua/weather-solar-minutes-hko-v1.json"
+    ).read_bytes()
     if hashlib.sha256(raw).hexdigest() != PROFILE_SHA256:
         raise ValueError("Frozen weather solar-minute reference content changed")
     else:

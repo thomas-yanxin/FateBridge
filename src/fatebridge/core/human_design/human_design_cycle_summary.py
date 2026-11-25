@@ -106,11 +106,12 @@ def compact_cycle_summary(rich: dict[str, Any]) -> dict[str, Any]:
         "scope"
     ] = "逐次文件上下文，前后检查策略、身份、散列及同体同角色版本；凯龙轨道独立于Earth/太阳旗标。非原子读集或位置精度认证。"
     policy = result["reference_contact_ordering"]
-    result["reference_contact_ordering"] = {
-        "method_id": policy["method_id"],
-        "physical_accuracy_certified": policy["physical_accuracy_certified"],
-        "scope": "精确有理TT对所报闭合二进制TT括区；不认证物理交会、未来闰秒、连续根数、多触优先或第六线阶段。",
-    }
+    if policy is not None:
+        result["reference_contact_ordering"] = {
+            "method_id": policy["method_id"],
+            "physical_accuracy_certified": policy["physical_accuracy_certified"],
+            "scope": "精确有理TT对所报闭合二进制TT括区；不认证物理交会、未来闰秒、连续根数、多触优先或第六线阶段。",
+        }
     return result
 
 

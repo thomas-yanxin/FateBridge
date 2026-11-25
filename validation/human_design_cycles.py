@@ -36,10 +36,10 @@ def verify_cycle_context(
             expected = {"status": "not_requested"}
         else:
             summary_format = context.get("summary_format")
-            if summary_format not in (None, SUMMARY_FORMAT):
-                raise ValueError("Unknown cycle summary format")
-            else:
-                pass
+            if summary_format != SUMMARY_FORMAT and (
+                summary_format is not None or context["reference_utc"] is None
+            ):
+                raise ValueError("Unknown or missing cycle summary format")
             if not _same_value(context["ruleset"], cycle_ruleset()):
                 raise ValueError("Unknown cycle numerical ruleset")
             else:
@@ -50,35 +50,33 @@ def verify_cycle_context(
                 if clock_replay is not None
                 else verify_clock_records(payload)
             )
-            label, reference_tt = replay.reference_epoch(context["reference_utc"])
-            birth_label = payload["birth_utc"]
-            if payload["time_scales"]["personality"]["method"].startswith(
-                "continuous_TT"
-            ):
-                birth_label = None
-            else:
-                pass
-            proof = context["reference_ordering"]
-            ordering = reference_ordering(
-                birth_label, birth, label, reference_tt, replay_proof=proof
-            )
-            for key in ("birth", "reference"):
-                clock = ordering[key]
-                native = clock["source"].get("native_observation")
-                if (
-                    native is not None
-                    and (clock["utc_label"], native["jd_tt"], native["jd_ut1"])
-                    not in replay.civil
+            label, reference_tt, ordering = None, None, None
+            if context["reference_utc"] is not None:
+                label, reference_tt = replay.reference_epoch(context["reference_utc"])
+                birth_label = payload["birth_utc"]
+                if payload["time_scales"]["personality"]["method"].startswith(
+                    "continuous_TT"
                 ):
-                    raise ValueError(
-                        "Ordering lacks its actual historical clock observation"
-                    )
-                else:
-                    pass
-            if ordering["relation"] == "before":
-                raise ValueError("reference precedes birth")
-            else:
-                pass
+                    birth_label = None
+                proof = context["reference_ordering"]
+                if proof is None:
+                    raise ValueError("Dated cycle search lacks an ordering proof")
+                ordering = reference_ordering(
+                    birth_label, birth, label, reference_tt, replay_proof=proof
+                )
+                for key in ("birth", "reference"):
+                    clock = ordering[key]
+                    native = clock["source"].get("native_observation")
+                    if (
+                        native is not None
+                        and (clock["utc_label"], native["jd_tt"], native["jd_ut1"])
+                        not in replay.civil
+                    ):
+                        raise ValueError(
+                            "Ordering lacks its actual historical clock observation"
+                        )
+                if ordering["relation"] == "before":
+                    raise ValueError("reference precedes birth")
             policy = payload["calculation_policy"]["require_swiss_files"]
             if type(policy) is not bool:
                 raise ValueError("invalid backend policy")
@@ -166,6 +164,7 @@ def verify_cycle_context(
                 ),
                 "reference_utc": label,
                 "reference_jd_tt": reference_tt,
+                **({"reference_status": "not_requested"} if label is None else {}),
                 "birth_jd_tt": birth,
                 "reference_ordering": ordering,
                 "origin": "personality_birth_longitude_explicit_computational_convention",

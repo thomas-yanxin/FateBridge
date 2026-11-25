@@ -26,9 +26,10 @@ from fatebridge.core.guolao.guolao_modern_time import (
     solar_crossing_tt,
 )
 from fatebridge.core.guolao.guolao_year_labels import shoushi_year_context
-from validation._paths import PACKAGE_ROOT
+from validation._paths import PACKAGE_ROOT, REPO_ROOT
 
-DATA = PACKAGE_ROOT / "data/guolao/modern-solstices-v1.json"
+DATA = REPO_ROOT / "validation/data/guolao/modern-solstices-v1.json"
+REFERENCE_SHA256 = "13e114e329a1e3630a9c8b9638a85ce50bb1abf21a92b7ef2c47a11ededac230"
 PROFILE = "guolao_horizons_seasons_tt_clock_reference_v1"
 
 
@@ -135,6 +136,9 @@ def parse_horizons_observer(
 
 def load_reference() -> tuple[dict[str, Any], str]:
     blob = DATA.read_bytes()
+    fingerprint = hashlib.sha256(blob).hexdigest()
+    if fingerprint != REFERENCE_SHA256:
+        raise ValueError("固定参考文件哈希改变，须保留旧版并重新核验")
     source = json.loads(blob)
     plan = source["plan"]
     if (
@@ -151,12 +155,13 @@ def load_reference() -> tuple[dict[str, Any], str]:
         raise ValueError("固定参考、警示线或声明改变，不改样本迎合比较")
     else:
         pass
+    package_data = PACKAGE_ROOT / "data/guolao"
     for name, wanted in source["source_component_data_hashes"].items():
-        if hashlib.sha256((DATA.parent / name).read_bytes()).hexdigest() != wanted:
+        if hashlib.sha256((package_data / name).read_bytes()).hexdigest() != wanted:
             raise ValueError("具名原算链来源已改变，须重新核验")
         else:
             pass
-    return source, hashlib.sha256(blob).hexdigest()
+    return source, fingerprint
 
 
 def _source_clock_rows(case_id: str) -> list[dict[str, Any]]:

@@ -10,7 +10,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 PDF_SHA256 = "5bbc572b33609ee1f23e33ee7a36645ddc565da9f256635a95043295369a33e6"
 PDF_URL = "https://cdn.shopify.com/s/files/1/0872/4984/6576/files/Life-Cycles-Analysis-preview.pdf?v=1757008879"
-TARGET = ROOT / "src/fatebridge/data/human_design/publisher-natal-2005-reference.json"
+TARGET = ROOT / "validation/data/human_design/publisher-natal-2005-reference.json"
 
 
 def extract_facts(pdf: Path) -> dict:
@@ -85,18 +85,17 @@ def main() -> None:
     p.add_argument("--output", type=Path, default=TARGET)
     p.add_argument("--check", action="store_true")
     args = p.parse_args()
-    data = json.dumps(extract_facts(args.pdf), ensure_ascii=False, indent=2) + "\n"
+    text = json.dumps(extract_facts(args.pdf), ensure_ascii=False, indent=2) + "\n"
+    data = text.encode("utf-8")
     if args.check:
-        if args.output.read_text() != data:
+        if args.output.read_bytes() != data:
             raise SystemExit("Publisher natal reference differs from extraction")
         else:
             pass
     else:
-        args.output.write_text(data)
+        args.output.write_bytes(data)
     print(
-        json.dumps(
-            {"structural_facts": 2, "sha256": hashlib.sha256(data.encode()).hexdigest()}
-        )
+        json.dumps({"structural_facts": 2, "sha256": hashlib.sha256(data).hexdigest()})
     )
 
 

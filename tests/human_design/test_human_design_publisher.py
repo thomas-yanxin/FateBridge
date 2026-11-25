@@ -26,7 +26,7 @@ from validation.human_design_publisher import summarize_runs
 ROOT = Path(__file__).resolve().parents[2]
 PLAN_PATH = ROOT / "tests/fixtures/human-design-cycle-publisher-plan.json"
 REFERENCE_PATH = (
-    ROOT / "src/fatebridge/data/human_design/publisher-natal-2005-reference.json"
+    ROOT / "validation/data/human_design/publisher-natal-2005-reference.json"
 )
 PLAN = json.loads(PLAN_PATH.read_text())
 REFERENCE = json.loads(REFERENCE_PATH.read_text())

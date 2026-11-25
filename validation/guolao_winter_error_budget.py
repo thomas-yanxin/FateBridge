@@ -22,9 +22,9 @@ from fatebridge.core.guolao.guolao_winter_error_budget import (
     PROFILE,
     shoushi_winter_error_budget,
 )
-from validation._paths import PACKAGE_ROOT
+from validation._paths import PACKAGE_ROOT, REPO_ROOT
 
-DATA = PACKAGE_ROOT / "data/guolao/winter-error-budget-v1.json"
+DATA = REPO_ROOT / "validation/data/guolao/winter-error-budget-v1.json"
 REFERENCE_SHA256 = "567633e1694be7d1f234cd15a3658829f6a91b322e3d3e7986e43954b5725046"
 
 
@@ -93,8 +93,9 @@ def load_reference() -> tuple[dict[str, Any], str]:
             raise ValueError("独立参考夹逼、端点黄经或地方钟行不符")
         else:
             pass
+    package_data = PACKAGE_ROOT / "data/guolao"
     for name, wanted in plan["source_component_data_hashes"].items():
-        if hashlib.sha256((DATA.parent / name).read_bytes()).hexdigest() != wanted:
+        if hashlib.sha256((package_data / name).read_bytes()).hexdigest() != wanted:
             raise ValueError("原算链底本数据发生漂移，须重新核验")
         else:
             pass

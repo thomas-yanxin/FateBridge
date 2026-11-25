@@ -10,15 +10,14 @@ import hashlib
 import json
 from collections import Counter
 from fractions import Fraction
-from pathlib import Path
 from typing import Any
 
 from fatebridge.core.guolao.guolao_calendar_year import gujin_fixed_qice_year
 from fatebridge.core.guolao.guolao_historical import shoushi_winter_cycle
 from fatebridge.core.guolao.guolao_year_labels import shoushi_year_context
-from validation._paths import PACKAGE_ROOT
+from validation._paths import REPO_ROOT
 
-DATA = PACKAGE_ROOT / "data/guolao/official-calendar-reference-v1.json"
+DATA = REPO_ROOT / "validation/data/guolao/official-calendar-reference-v1.json"
 
 
 def compare_official_calendar(

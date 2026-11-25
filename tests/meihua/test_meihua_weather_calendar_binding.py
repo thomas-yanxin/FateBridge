@@ -178,16 +178,14 @@ def test_original_decision_and_record_are_unchanged_and_full_calendar_gates_stay
 
 
 def test_reference_integrity_rejects_content_drift(
-    monkeypatch: pytest.MonkeyPatch,
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
-    class Fake:
-        def joinpath(self, *args):
-            return self
-
-        def read_bytes(self):
-            return b"{}"
-
-    monkeypatch.setattr(binding, "files", lambda *args: Fake())
+    target = tmp_path / "validation/data/meihua"
+    target.mkdir(parents=True)
+    (target / "weather-calendar-hko-v1.json").write_bytes(
+        (FIXTURE / "calendar-profile.json").read_bytes() + b" "
+    )
+    monkeypatch.setattr(binding, "REPO_ROOT", tmp_path)
     binding._profile.cache_clear()
     try:
         with pytest.raises(ValueError, match="content changed"):

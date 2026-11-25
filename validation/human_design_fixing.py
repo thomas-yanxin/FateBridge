@@ -9,7 +9,6 @@ from __future__ import annotations
 import hashlib
 import json
 from collections import Counter
-from importlib.resources import files
 from pathlib import Path
 from typing import Any
 
@@ -18,10 +17,8 @@ from fatebridge.core.human_design.human_design_depth import line_fixings
 
 def fixing_marker_checks(root: Path) -> dict[str, Any]:
     raw = (
-        files("fatebridge.data")
-        .joinpath("human_design/fixing-2026-reference.json")
-        .read_bytes()
-    )
+        root / "validation/data/human_design/fixing-2026-reference.json"
+    ).read_bytes()
     reference = json.loads(raw)
     original = {}
     for source in reference["cohort_sources"]:
@@ -37,9 +34,11 @@ def fixing_marker_checks(root: Path) -> dict[str, Any]:
             else:
                 pass
             original[case["id"]] = case, cohort["planet_order"], source["sha256"]
-    if len(reference["cases"]) != len(original) or len(
-        {c["case_id"] for c in reference["cases"]}
-    ) != len(original):
+    if (
+        not original
+        or len(reference["cases"]) != len(original)
+        or len({c["case_id"] for c in reference["cases"]}) != len(original)
+    ):
         raise ValueError("Fixing reference omitted or duplicated an original case")
     else:
         pass

@@ -13,10 +13,10 @@ import json
 from copy import deepcopy
 from datetime import date
 from functools import lru_cache
-from importlib.resources import files
 from pathlib import Path
 from typing import Any
 
+from ._paths import REPO_ROOT
 from .meihua_weather_trace_binding import (
     STUDY_PINS,
     audit_bound_weather_study,
@@ -37,10 +37,8 @@ _POLICY = {
 @lru_cache(maxsize=1)
 def _profile() -> dict[str, Any]:
     raw = (
-        files("fatebridge.data")
-        .joinpath("meihua/weather-calendar-hko-v1.json")
-        .read_bytes()
-    )
+        REPO_ROOT / "validation/data/meihua/weather-calendar-hko-v1.json"
+    ).read_bytes()
     if hashlib.sha256(raw).hexdigest() != PROFILE_SHA256:
         raise ValueError("Frozen weather calendar reference content changed")
     else:
