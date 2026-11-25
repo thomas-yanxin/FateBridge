@@ -80,7 +80,7 @@ uv run --locked --extra dev python -m scripts.western.audit_western_ephemeris_co
 
 昼夜约定为地心太阳中心、无折射、真实高度 ≥0 为昼。行星的 `above_horizon` 也取实际地平高度，缺少高度时返回未知。行星时采用日出日落分段，有自己的视圆／折射口径；两者在地平附近不能当作同一定义。极区没有适用的象限宫位时仍报错，不悄悄替换宫制。
 
-无原生引擎时，捆绑DE441回退射线的Vondrak标量真黄道、77项章动真赤道、交角及GAST现在由同一TT／UT1对和来源所有者构成，不再混用Meeus平均恒星时和线性平均交角。固定42个同源控制的原77个轴值、42个高度超0.001角秒现均消除；一个合法合成输入原误判夜盘，修复后三端均交付日盘。此处核对同源几何定义，不认证远期物理姿态或原始出生钟时；无原生默认UT1仍明确采用UTC近似。实际回执的`approximate_angles`／`approximate_geometric_altitude`保持其精度限定，完整来源与版本见[本批审计](algorithm-audit-20261117.md#offline-frame-continuation)。
+无原生引擎时，捆绑DE441回退射线的Vondrak标量真黄道、77项章动真赤道、交角及GAST现在由同一TT／UT1对和来源所有者构成，不再混用Meeus平均恒星时和线性平均交角。固定42个同源控制的原77个轴值、42个高度超0.001角秒现均消除；一个合法合成输入原误判夜盘，修复后三端均交付日盘。此处核对同源几何定义，不认证远期物理姿态或原始出生钟时；无原生默认UT1仍明确采用UTC近似。实际回执的`approximate_angles`／`approximate_geometric_altitude`保持其精度限定，完整来源与版本见[离线坐标框架](#输入与天文精度)。
 
 卜卦／择日的 `ut1_source=iers_c04` 使用固定版本的 IERS20 C04 最终每日合成值，覆盖 **1962-01-01 00:00 至 2026-09-19 00:00 UTC（含端点）**，共23,638日。来源经 Astropy 官方数据镜像固定提交获取，原始文件与派生包均有SHA-256；没有宣称本次从IERS服务器成功直取。`swiss_delta_t` 保持默认。日间查询先移除真实TAI−UTC（含1972年前漂移／调整），在连续TT轴上先从源节点去除62项zonal模型，对UT1−TAI作四点Lagrange插值，再恢复zonal并加入声明的日内模型；闰秒不会当普通UTC秒插值。回执中的zonal项是解释字段，不能再次叠加。太阳时反解、恒星时与Lahiri选项沿用同一来源；没有外推、预测值或静默模型回退。覆盖外起盘返回错误；地心TT黄经事件搜索直接使用TT星历，不再因无关的试算UT1超范围而返回未知。宫位、地平与日出等仍要求对应UT1来源覆盖。这项可用性修复不提高外部位置核验成绩。
 
@@ -204,12 +204,13 @@ C04内部范围、插值与同模型反解现保留精确源轴和已解TT，公
 
 ```bash
 uv run --locked --extra dev pytest -q tests/western/test_western_lunations_hours.py tests/western/test_planetary_hours.py
-uv run --locked --extra dev python -m scripts.western.audit_western_lunations_hours --output /tmp/western-lunations-hours.json
 ```
 
 出界比较使用出生历元的真实黄赤交角，返回 `classical.obliquity`，不把当代固定阈值用于全部历史日期。星历存在但角度或地平计算退化时，整体精度标为混合，并保留 `angle_method/horizon_method`。
 
 `use_true_solar_time=true` 显式选择太阳时钟面重置，会改变计算时刻。普通西占默认使用民用钟时；该选项不能提高星历本身的物理精度。远古历法、历史时区精度、观测坐标精度、极区与近似轨道仍需分别验收。
+
+旧独立朔望／行星时审计仅覆盖其固定范围。独立审计脚本当前依赖已移除的太阳事件入口，可用上面的测试命令核对现行计算。
 
 ## 推运、返照与主限坐标
 
@@ -218,7 +219,6 @@ uv run --locked --extra dev python -m scripts.western.audit_western_lunations_ho
 `persian_directions` 推进日、月、水、金、火、木、土七曜，固定十颗本命星体及十二宫头，按未舍入年龄纳入大于零且不超过上限的相位命中。FateBridge 用出生地钟面加上精确弧换算的名义时长，每年取 `365.2421904` 日，交付所得地方日期。星阙的固定版本以显示年龄排序，把名义时长取整日后加到出生日期上。相位命中、截取顺序和日期采用各自的对照。 [波斯向运验收](precision-acceptance.md#persian-directed-round73)
 
 界推运沿既定埃及界表推进时，现在保留原始黄经的精确有理弧及半开区间，再转换显示年龄；参加星体也用同一弧区间归属。旧累计浮点与 `1e-9` 跳步会把普通盘的界段漏掉：2001-05-22 02:08 UTC、0°E／40°N的上升约3.038038°，约16.962—26.962岁的火星、土星两段曾被重复标成水星。修复不改界表、时间钥或来源选择；独立100位Decimal全局区间交集与两种时间钥的三端回归见 `tests/western/test_western_distribution_partition.py`。精确算术保留输入已有区别，不增加观测或原典精度。
-
 
 推运底座现在直接使用 `fatebridge_swisseph_native`，与本命盘共用 TT／UT1 政策，保留内部完整黄经、小数秒及用户输入的纬度。`natal_reference.calculation_basis`、行运／次限／返照的 `calculation_basis` 返回星历模型、时间尺度、TT／UT1、未来闰秒假设和黄道偏移。恒星黄道采用明确的 Lahiri 偏移，整宫宫头按该黄道的星座边界确定；不沿用第三方库的默认偏移或极区纬度夹限。
 
@@ -346,7 +346,7 @@ uv run --locked --extra dev python -m scripts.western.audit_western_lunations_ho
 
 结果保留本命月相、`phase_ingresses`、`progression_options`、`age_basis` 与 `solver`。每条交点分别给出原始TT投影、原生夹区、残差、精确民用点和星历日期；日期是用于次限计算的出生后星历时点，不是预言现实事件发生日。原固定 `12.1908°/年` 均速实现及其单一周期只属于旧 run；现模型不再返回 `progression_rate_deg_per_year/synodic_cycle_years`。旧版解读文档已明确披露均速近似，本次替换增加实际星历能力，不否认原披露。
 
-本轮对照与未决范围见[审计记录](algorithm-audit-20261117.md)。同源C数值吻合、独立星历对照、传输一致性和现实预测有效性分别验收，不由模型名称或数值分辨率授予SOTA资格。
+本轮对照与未决范围见[现行范围与未决项](algorithm-status.md)。同源C数值吻合、独立星历对照、传输一致性和现实预测有效性分别验收，不由模型名称或数值分辨率授予SOTA资格。
 
 ## 数值边界与显示
 
@@ -382,13 +382,13 @@ uv run --locked --extra dev python -m scripts.western.audit_western_lunations_ho
 
 `Marks` 分别计算“甲与双方Davison资料的Davison”和“乙与双方Davison资料的Davison”，以 `marks_charts.inner/outer` 返回；`chart` 为内方个人盘，`primary_chart_role=inner`。计算配方来自[Bob Marks 作者课文镜像](https://astroer.com/htmls/bob/bobmar/markschart28.0.htm)；原站返回404、镜像尚未与原始存档校勘。作者的个案成功陈述未被采纳为有效性证据。公开 `marks` 字段卡保留双方的 `marks_charts`，安全联合视图亦保留此根；非Marks模式为空对象。`chart` 不能被当成共同盘或复制给外方；字段卡主层为 `marks_chart_pair`。
 
-Marks只要求共同Davison数据及两个所选个人盘，不先起一张未交付的共同TimeSpace盘。固定40°N、0°／180°经度的球面共同中点在北极，个人中点在两侧65°N；原路径因无用共同盘的Placidus失败阻断个人盘。现仅在选中TimeSpace时起共同盘，Marks两个人盘按原Placidus／黄道返回，选中北极TimeSpace的原拒绝仍保持。两组原普通Marks完整结果不变，实际起盘次数各5→4；同一反例的REST／新stdio MCP／CLI由400／错误／1恢复为200／无错／0，成功完整业务三端相同。负控错误的REST／MCP／CLI状态封装差异完整保留。来源镜像、UT1与球面政策、数值及预测资格均未因此升级，见[模式准入记录](algorithm-audit-20261117.md#relationship-mode-dispatch)。
+Marks只要求共同Davison数据及两个所选个人盘，不先起一张未交付的共同TimeSpace盘。固定40°N、0°／180°经度的球面共同中点在北极，个人中点在两侧65°N；原路径因无用共同盘的Placidus失败阻断个人盘。现仅在选中TimeSpace时起共同盘，Marks两个人盘按原Placidus／黄道返回，选中北极TimeSpace的原拒绝仍保持。两组原普通Marks完整结果不变，实际起盘次数各5→4；同一反例的REST／新stdio MCP／CLI由400／错误／1恢复为200／无错／0，成功完整业务三端相同。负控错误的REST／MCP／CLI状态封装差异完整保留。来源镜像、UT1与球面政策、数值及预测资格均未因此升级，见[Marks 与时空中点盘](#关系盘的时间空间与方法)。
 
 各模式交付双方本命盘与 `synastry_aspects`，供核对实际跨盘相位和容许度。旧七曜启发式综合评分已退出公开计算。历史 v2 曾按未舍入容许度取最紧密的24条相位并保留精确并列，合成角度控制中交换双方均得63分。该检查仅覆盖旧公式的交换对称性。
 
 [Ptolemy《Tetrabiblos》IV.7，Robbins 1940](https://penelope.uchicago.edu/Thayer/E/Roman/Texts/Ptolemy/Tetrabiblos/4B%2A.html#7)优先考察双方日、月、上升和福点的星座关系，再考察位置高低与其他行星的见证。当前关系盘提供几何事实，该章的完整判断链仍待验收。
 
-球面中点保留经差和纬度和在近对跖时的微小量。经差接近 180° 时，先求经差的补角，再转弧度计算半角余弦。原 GeographicLib 2.1 冻结参考的 47 例双向比较为 94/94。另用高精度单位向量和核验 40 次近对跖计算，FateBridge 为 40/40，GeographicLib 2.1 的球面逆解加半程正解在这组为 0/40。两组分别记录，涵盖所列球面几何，MC 星历与原典解释另行验收。 [近对跖固定对照](precision-acceptance.md#davison-spherical-antipodes-round123) · [原 47 例参考](../tests/fixtures/western-geographiclib-midpoints.json)
+球面中点保留经差和纬度和在近对跖时的微小量。经差接近 180° 时，先求经差的补角，再转弧度计算半角余弦。原 GeographicLib 2.1 冻结参考的 47 例双向比较为 94/94。另用高精度单位向量和核验 40 次近对跖计算，FateBridge 为 40/40，GeographicLib 2.1 的球面逆解加半程正解在这组为 0/40。两组分别记录，涵盖所列球面几何，MC 星历与原典解释另行验收。 [近对跖固定对照](precision-acceptance.md#davison-spherical-antipodes-round123) · [球面中点参考资料](#关系盘参考资料)
 
 两地接近相反极点时，同样从精确补角求半纬差余弦。两个球面分量使用这一个值。新增 24 例双向对照中，FateBridge 与 GeographicLib 2.1 各通过 48/48，固定门为 1e-9°。 [近双极固定对照](precision-acceptance.md#davison-spherical-polar-components-round124)
 
@@ -396,6 +396,16 @@ Marks只要求共同Davison数据及两个所选个人盘，不先起一张未�
 uv run --locked --extra dev pytest -q tests/western/test_western_relationship_geometry.py tests/western/test_western_relationship_transports.py
 uv run --locked --extra dev python -m scripts.western.audit_western_relationship --output /tmp/western-relationship.json
 ```
+
+### 关系盘参考资料
+
+球面中点的冻结参考 `tests/fixtures/western-geographiclib-midpoints.json` 是另备的本地数据。向维护者取得原归档可复核历史结果；如需独立重建同类参考，从仓库根目录运行现行[生成脚本](../scripts/western/gen_western_relationship_reference.py)。脚本要求 GeographicLib Python 2.1。带符号经度短弧的另一组对照使用 GeographicLib JS 2.2.0。
+
+```bash
+uv run --locked --extra dev --with geographiclib==2.1 python scripts/western/gen_western_relationship_reference.py
+```
+
+命令写入 `tests/fixtures/western-geographiclib-midpoints.json`。保有冻结参考时，从另一份检出运行，避免覆盖原参考。
 
 ## 宫位与四轴的独立核验
 
@@ -655,7 +665,7 @@ uv run --locked --extra dev pytest -q tests/western/test_western_election_condit
 本阶段交付验收分别记录独立JPL对照、宿主与冻结Linux测试、六份共享快照的审查、安装包及未通过的共享检查；不把这些检查合并成原典全文或实际模型解释的认证。
 
 ```bash
-uv run --locked --extra dev pytest -q tests/western/test_western_horary_motion.py tests/western/test_contract_regressions_2.py
+uv run --locked --extra dev pytest -q tests/western/test_western_horary_motion.py tests/western/test_contract_regressions.py
 uv run --locked --extra dev python -m scripts.western.audit_western_horary_motion --output /tmp/western-horary-jpl.json
 ```
 
@@ -819,7 +829,7 @@ uv run --locked --extra dev pytest -q tests/western/test_western_natal_reference
 新JPL冻结参考（本地数据：`../tests/fixtures/western-event-paths-horizons.json`）来自两个21日TT窗口、7070组七曜黄经，原始响应逐字归档（本地数据：`../tests/fixtures/western-event-paths-raw.zip`）。预定2角秒、成相／入宫30秒和停滞120秒容差均未放宽。独立审计中106项事件的身份和数量一致，其中105项时刻符合容差；土星停滞约205秒差异仍未通过。原三点停滞参考、参考舍入问题及五点细化结果均保留，细化没有消除该差异。[Swiss官方](https://www.astro.com/swisseph/swephprg.htm)说明默认视位置与Horizons的IAU76/80及EOP参考框架不同；这是保留的上一轮本体中心对照；上节新的中心控制已定位土星系统质心与本体中心的混用。不能仅凭位置落在2角秒内就认证停滞时刻精度，也不能把同点通过改写成原本体中心比较通过。
 
 ```bash
-uv run --locked --extra dev pytest -q tests/western/test_western_event_paths.py tests/western/test_contract_regressions_2.py
+uv run --locked --extra dev pytest -q tests/western/test_western_event_paths.py tests/western/test_contract_regressions.py
 uv run --locked --extra dev python -m scripts.western.audit_western_event_paths --output /tmp/western-event-paths-evidence.json
 ```
 
@@ -932,7 +942,6 @@ uv run --locked --extra dev python -m scripts.western.audit_western_fidelity --o
 
 判断前条款的`strictures.code`直接使用同次`radicality.clauses`的`C01`至`C11`编号；未定义数值的C03不生成已满足警告，R01是时主对应条件。未提供实际历元黄赤交角时，私有出界辅助函数返回未知；公开组盘使用本次真实历元值。恒星使用当前SIMBAD／原生视位置。
 
-
 ### IERS公式的精确转数与模型差异
 
 自转v4保留原表十进制ERA初相和日速，在所给UT1浮点的精确有理点上组合转数；小角修正在角秒内补偿求和，直到最终周天归一后才转度数浮点。它保留内部算术低位，不恢复输入时刻已舍去的精度，不改变章动、黄赤交角或TT／UT1来源。旧v3输出及冻结参考保持，版本回执区分实际实现。
@@ -973,7 +982,6 @@ uv run --locked --extra dev python -m scripts.western.audit_western_fidelity --o
 
 第十七批共同源码冻结后的返照与春分盘共6次REST／新stdio MCP／CLI调用均成功，完整业务只排顶层运行回执后三端一致。返照原请求的13处每端变化完整保留，涉及土星、木星和北交点的前后侧及摘要；春分盘仅有after三端观察，不能作为修改前后服务对照。
 
-
 <a id="retained-ut1-round37"></a>
 
 ## 保留UT1源点与实际接口边界
@@ -988,14 +996,12 @@ uv run --locked --extra dev python -m scripts.western.audit_western_fidelity --o
 
 本轮当前仅独立静态peer确认所审32源闭包无剩余具体实现阻断，12新增节点不是12个算法或根因。两既定整秒点的保存数值对照中，10项限定gate各2/2，原source／TT／NPB／EO保持，给定源点RNE与显式IEEE旧GAST分别核对。这是条件数值关系，不是瞬时实测EOP或全域舍入证明。直接clock/frame的AFTER首流程出现观察器资格失败，原失败与另行恢复结果分列，不能称原流程全部成功。本段运行状态仅记本轮静态冻结时：四例公共BEFORE及一次D-library BEFORE已封存，十二次公共AFTER仍进行，D-library后续阶段单独存档；最终资格以R37外置报告／[精度验收](precision-acceptance.md)为准，本段不随运行进度更新。未以计划或源码审读声称三端、codec、全域数值、传统或预测通过。R36 EOT固定点负发现及旧B1严格1/2继续原样保留。
 
-
 <a id="event-quantity-and-window-reuse-round38"></a>
 ## 事件采样的实际消费量与同次来源观察
 
 共享逐体状态默认仍计算赤纬；行星事件和月亮接触的两个扫描消费者只在原问时之外显式不请求未使用的独立赤道量。行星扫描继续完整黄经日速修正，月亮扫描继续按原问时谓词交付完整运动政策，非问时原native速度guard不升级。源窗口guard把该次最终完整两槽观察传给实际消费者，物理所需槽不替代完整观察；不跨真实native操作缓存，不改光路、实际坐标或默认源错误合同。
 
 固定C01的REST／fresh MCP／CLI各一次全部完整成功，仅排顶层run_metadata后与同端R37基线及同版另外两端完整业务0差；Schema／实际MCP定义跨版不变，raw MCP对REST输入35差仍保留。该连续性与两lane有限实际工作量对照只支持减少重复工作，不提供新星历gold、墙钟速度门或全域／fault／物理证书。完整分母、私有路径20项字面差、通用partial-capture标签勘误及原失败见[本批精度验收](precision-acceptance.md#same-call-work-quantity-round38)。事件根、顺序与未知、旧JPL和原典分歧继续守各自范围。
-
 
 <a id="modern-c04-eop-round40"></a>
 ## 现行C04瞬时模型、极移与同次地面几何（R40）

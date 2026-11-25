@@ -21,7 +21,7 @@ R／C／T 投影保留原来的模型、收敛线和误差检查，将已有 mpm
 
 ## 固定对照与范围
 
-改代码前冻结标准、原始数学输入、124 个共享选择器请求，以及 62 个 REST／CLI／新 stdio MCP 请求。完整档案在 `/Users/thomas/.codex/artifacts/fatebridge-local-house-precision-20261112/`；仓库携带[固定参考及来源说明](../tests/data/local_house_geometry_cgal_v1/README.md)和[应用检查](../tests/integration/test_local_chart_geometry_reference.py)。档案分别保存原失败、后续补充、最终源码绑定和安装包结果，不把工程调用成功记作独立物理验收。
+改代码前冻结标准、原始数学输入、124 个共享选择器请求，以及 62 个 REST／CLI／新 stdio MCP 请求。可复查[固定参考及来源说明](../tests/data/local_house_geometry_cgal_v1/README.md)和[应用检查](../tests/integration/test_local_chart_geometry_reference.py)。档案分别保存原失败、后续补充、最终源码绑定和安装包结果，不把工程调用成功记作独立物理验收。
 
 数学参考实际执行 CGAL 6.2.1 的精确 `Direction_2` 圆周次序谓词，另以有理数区间公式交叉核对。相位到有理菱形方向的单调映射是本项目的明确胶水代码，不能算成 CGAL 独立提供的天文转换。240 个解析轮、159 个星座输入、31,784 个宫位／资格案例产生 35,447 项重叠检查；原 15,331 项失败照实保留，修复后该组无差异。另有 2,256 个非分区控制只验输入资格，不算数值成功。
 
@@ -45,4 +45,4 @@ R／C／T 投影保留原来的模型、收敛线和误差检查，将已有 mpm
 
 本地星图展示核心行星列表的七政记录；四余与功能宫属于源引擎的其他结构。`validation.chart_source` 保留规范引擎的原典命度未重建、研究口径和 `classical_acceptance_passed=false` 等限制；`rulesets.chart` 附加其五项来源分组。历法 `rulesets` 字典及已知钟时的三个计算层状态保持原合同。
 
-改动前固定 35 个请求：24 个缺失宫位控制、8 个普通果老控制、2 个无效请求和 1 个日期模式控制。三个真实接口原有 72 次内部错误，修复后这些请求返回各自可用层；两个无效请求仍按原合同拒绝。独立数值几何沿用原固定 CGAL 门槛，缺失宫位只做边界／来源保真检查，不算数值落宫成功。便携回归显式注入一份改动前的规范源结果，覆盖 24 个参数组合，见[固定来源说明](../tests/data/local_partial_house_v1/README.md)。实际协议、原始失败和源码绑定另存 `/Users/thomas/.codex/artifacts/fatebridge-local-partial-house-20261112/`；本项不认证完整果老原著、物理来源或预测效度。
+改动前固定 35 个请求：24 个缺失宫位控制、8 个普通果老控制、2 个无效请求和 1 个日期模式控制。三个真实接口原有 72 次内部错误，修复后这些请求返回各自可用层；两个无效请求仍按原合同拒绝。独立数值几何沿用原固定 CGAL 门槛，缺失宫位只做边界／来源保真检查，不算数值落宫成功。便携回归显式注入一份改动前的规范源结果，覆盖 24 个参数组合，见[固定来源说明](../tests/data/local_partial_house_v1/README.md)。实际协议、原始失败和源码绑定另存 外部研究档案；本项不认证完整果老原著、物理来源或预测效度。

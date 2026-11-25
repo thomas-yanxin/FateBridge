@@ -1,12 +1,12 @@
-# 太乙离散模型的第三方执行对照（2026-11-17）
+# 太乙离散模型的第三方对照
 
-本轮实际运行第三方公开实现，结论限定为：所选金镜循环、算路、年度巡行和门序的可比较离散字段相同。**没有发现可证的新增生产算术错误；没有据此修改生产算法。原《金镜》144局、288两算的11项不符及3处始击位置异文全部保留，太乙整体原典验收及SOTA仍未通过。**
+这组对照实际运行第三方公开实现，用于检查所选《金镜》循环、算路、年度巡行和门序。《金镜》144 局的 288 个两算仍有 11 项分歧，另有 3 处始击位置异文。
 
 本记录补充[太乙审计](taiyi-sanshi-audit.md)，不替换其原分母、版本、门槛或未知。跨年份的周期性重复输出不是同等数量的独立历史案例，比较字段数不能称为算法数、优化问题数、准确率或专家认证。
 
 ## 来源及独立性
 
-- 第三方为作者公开的 [lhttjdr/calendar](https://github.com/lhttjdr/calendar)，固定提交 `a61e8a3bc6238584e29eefb213922d5208d1f9d9`；直接使用[太乙Rust实现](https://github.com/lhttjdr/calendar/blob/a61e8a3bc6238584e29eefb213922d5208d1f9d9/rust/core/src/folk/taiyi.rs)与其 `bamen`、`geju`、`shijing`、`suanshu`、`zhushen` 模块。六份原文件均按原字节冻结，未更改参考算法，也未转译成FateBridge代码后充当外部程序。
+- 第三方为作者公开的 [lhttjdr/calendar](https://github.com/lhttjdr/calendar)；直接使用[太乙Rust实现](https://github.com/lhttjdr/calendar/blob/a61e8a3bc6238584e29eefb213922d5208d1f9d9/rust/core/src/folk/taiyi.rs)与其 `bamen`、`geju`、`shijing`、`suanshu`、`zhushen` 模块。六份原文件均按原字节冻结，未更改参考算法，也未转译成FateBridge代码后充当外部程序。
 - 双方共同采用《太乙金镜式经》的若干相同原始规则，因此**原始文献来源并不独立**。两者的数值执行分别来自外部Rust与本项目Python；本轮没有查清完整实现谱系、共同祖先或彼此参考历史，不能宣称已证明实现谱系完全独立。第三方作者身份与独立专家评审资格也未经本轮认证。
 - 本轮重新在线读取[《金镜》卷一](https://zh.wikisource.org/wiki/太乙金鏡式經_(四庫全書本)/卷01)、[卷二](https://zh.wikisource.org/wiki/太乙金鏡式經_(四庫全書本)/卷02)及[《武经总要》后集卷十八](https://zh.wikisource.org/wiki/武經總要_(四庫全書本)/後集卷18)的公开原文转录，以确认所比较的公式范围；网站转录不新增一个独立版本书影。原有冻结书影校勘继续适用。
 
@@ -36,22 +36,10 @@
 
 外部 `jiang` 由数字5返回 `None`，并在主大将为 `None` 时不再返回参将；FateBridge保留大将5、参将5及中宫星标。420个核心四将字段和1—40的4个单算将位字段因此不同。
 
-例如阳4局主算25，外部原字段 `zhu_da=None, zhu_can=None`，FateBridge原字段 `main_general=5, main_vice_general=5`。完整两边原字段均保存在 `summary.json` 的 `representation_differences`，未静默把 `None` 映成5、未计成相同，也未据软件约定裁定哪一方更权威。比较总要求为233,578字段，其中233,154可比相同、424表示差异待分层解释；没有消失的分母。
+例如阳4局主算25，外部原字段 `zhu_da=None, zhu_can=None`，FateBridge原字段 `main_general=5, main_vice_general=5`。`None` 和 `5` 各按原值比较，计为表示差异。比较总要求为233,578字段，其中233,154可比相同、424表示差异待分层解释；没有消失的分母。
 
 ## 原失败未重判
 
-原《金镜》完整144局、288两算仍为277相同、11不符：阳39/50主算；阴11/15/43/44/46客算；阴25/26/27/70主算。原始11条读数、当前值、逐项来源、576位置观察及原位重算全部另存 `original-classical-obligations.json`。阴37/43/44的始击位置分歧继续保留。
+原《金镜》完整144局、288两算仍为277相同、11不符：阳39/50主算；阴11/15/43/44/46客算；阴25/26/27/70主算。阴37/43/44的始击位置分歧继续保留。
 
 这批差异目前主要属于**同版规则与表文不一致、不同版本读数和规则解释未裁定**，并非发现一个通用算术错误后已能自然消除。外部程序与通则一致增加了实现对照证据，但不能单凭一致软件数量改写原表、为失败局设特例，或把原典问题降格成展示问题。完整文本谱系、版本校勘与预先未见答案的独立古例仍是实质缺口。
-
-## 复查材料与本轮改动
-
-完整材料位于本机 `~/.codex/artifacts/fatebridge-algorithms-20261117-taiyi/`：
-
-- `source-manifest.json`：固定提交、原始URL及六份Rust文件/原文说明的SHA256。
-- `comparison-protocol.json`：执行前范围、门槛、不可比政策及未验收范围。
-- `compare_reference.rs`、`calendar-reference/`、`reference-output.tsv`：外部调用驱动、原源码和逐行原始输出；为Rust模块路径复制的 `mod.rs` 与原 `taiyi.rs` 字节相同。
-- `compare.py`、`summary.json`、`original-classical-obligations.json`：逐字段比较、424项两边原值和旧分母/旧失败。
-- `comparisons.jsonl`：每个可比字段的两边原值和逐项结果。
-
-参考程序仅执行算法，没有运行其测试套件。FateBridge未运行pytest、CI、格式检查或项目构建，遵守本轮批量验证要求；编译外部参考程序是实际执行对照的准备步骤。未修改生产代码、旧冻结真值或验收阈值，未删除有效回归测试。本轮新增的是执行证据，**已修复生产问题数为0**，不得把审读或比较字段凑成50项优化问题。

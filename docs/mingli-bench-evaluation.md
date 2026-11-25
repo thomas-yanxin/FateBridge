@@ -45,7 +45,7 @@ uv run --locked --extra dev python scripts/evaluate_agent.py \
   --output /tmp/fatebridge-mingli-development-preparation
 ```
 
-`--output` 必须是新目录。`proposed-execution.json` 保留从冻结源码和封存案例实际运行的命令，执行该命令时保留来源侧和 `--external-suite`／`--split`，不切回普通虚构用例入口。也可直接启动当前源码的开发集真实模型评估：
+`--output` 必须是新目录。从当前检出运行下面的评估命令。若复用已封存的案例，用 `--cases-file` 指定该文件，并保持原 `--external-suite`、`--split` 及当时所选的原生星历参数。
 
 ```bash
 uv run --locked --extra dev python scripts/evaluate_agent.py \

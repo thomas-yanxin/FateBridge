@@ -21,9 +21,12 @@
 
 杂气月保留透干与完整会支的并存见证，旧单选结果只供追溯。孤官例、宣参国例和秦龙图例的当前格名都显示为“杂气月令取用候选”，原单格名比较记三项差异。审计分别核对乙官、己官和己伤官的透干见证。宣参国例的完整木局仍保留食伤类别，是否具有原书所论的作用与救应另待裁定。 [杂气月令规则和固定原例](bazi-assessment.md#month-use-witnesses-round35)
 
+先按[原典资料与未决范围](bazi-assessment.md#原典资料与未决范围)取得冻结命例。在源码检出目录运行：
+
 ```bash
+AUDIT_DIR=$(mktemp -d)
 uv run --locked --extra dev python -m scripts.bazi.audit_bazi_classical \
-  --output /tmp/fatebridge-classical-audit.json
+  --output "$AUDIT_DIR/classical-audit.json"
 ```
 
 当前此命令应退出 1，表示算法验收仍未通过。不得通过修改冻结命例或将未裁定强弱补成中和来取得满分。书目、冻结范围及分组状态见[原典对照](bazi-assessment.md#原典资料与未决范围)。
@@ -63,7 +66,9 @@ assert verification["status"] == "verified_structured_facts"
 
 `StudyPlan.registration_reference`保存外部事前登记引用，`interpretation_policy_sha256`冻结解释政策， `baseline_frozen_at`不得晚于计划登记时刻。每条`Forecast.interpretation_policy_sha256`必须与计划一致； 即使计算模型不变，也不能更换解释政策后混入同一评估。 描述性诊断允许资料尚未齐全，`protocol_blockers`会逐项列出缺失， `protocol_status`不会报为完整，且完整预注册门槛保持false；描述性指标仍可计算。 填写引用、时间及散列只构成内部声明，外部登记真实性和执行时间仍须独立核验。
 
-通用评估器v4另核对每条预测与结果的 `study_plan_sha256`，其值为 `digest(StudyPlan.model_validate_json(plan_text).model_dump(mode="json"))`。它绑定整个校验后方案，包含事件、窗口、队列、基线及统计政策；不是原始文件字节散列。错配直接拒绝，缺少绑定的记录仅可作数值诊断，但列出 `missing_forecast_plan_commitment`／`missing_outcome_plan_commitment`，不能通过完整预注册或统计证据门槛。不能在看过结果后补字段并冒充当初承诺。虚构完整流程见下方示例。审计脚本的输出路径必须尚不存在，避免覆盖以前的报告。
+预测和结果文件各须为 JSON 数组，所有输入 JSON 都拒绝任意深度的重复成员名。
+
+通用评估器 v4 核对每条预测与结果的 `study_plan_sha256`，其值为 `digest(StudyPlan.model_validate_json(plan_text).model_dump(mode="json"))`。它绑定整个校验后方案，包含事件、窗口、队列、基线及统计政策；不是原始文件字节散列。错配直接拒绝，缺少绑定的记录仅可作数值诊断，但列出 `missing_forecast_plan_commitment`／`missing_outcome_plan_commitment`，不能通过完整预注册或统计证据门槛。不能在看过结果后补字段并冒充当初承诺。虚构完整流程见下方示例。审计脚本的输出路径必须尚不存在，避免覆盖以前的报告。
 
 输出包括准确率、[NIST Wilson 准确率区间](https://www.itl.nist.gov/div898/handbook/prc/section2/prc241.htm)、Brier分数、固定基线比较与覆盖率。10/10的样本全对，在独立样本假设下95% Wilson下界仍约为72.25%；不能据此宣称总体准确率为100%。现新增`statistical_evidence_gate_met`，以配对损失的Hoeffding保守单侧界检验注册的技能阈值，并对登记检验次数作Bonferroni分配；`preregistered_performance_gate_met`表示点估计、覆盖及协议完整门槛，`registered_numeric_gate_met`只表示数值门槛；统计门槛也不能绕过协议缺失。该方法不是Brier技能比值的专用区间，也不证明现实记录真实性。
 
@@ -72,12 +77,13 @@ assert verification["status"] == "verified_structured_facts"
 可以直接运行不包含任何预测和结果的[虚构流程示例](examples/prediction-study/plan.json)：
 
 ```bash
+AUDIT_DIR=$(mktemp -d)
 uv run --locked --extra dev python -m scripts.evaluation.audit_prediction_study \
   --plan docs/examples/prediction-study/plan.json \
   --forecasts docs/examples/prediction-study/forecasts.json \
   --outcomes docs/examples/prediction-study/outcomes.json \
   --as-of 2028-01-02T00:00:00Z \
-  --output /tmp/fatebridge-prediction-audit.json
+  --output "$AUDIT_DIR/prediction-audit.json"
 ```
 
 预期 `evaluable_count=0`、`real_world_efficacy=not_tested`、`authority_certified=false`。退出 0 只表示评估流程成功执行。示例中的全零模型／解释政策散列、登记占位引用和三个虚构主体是流程占位，不能作为真实预注册使用。实际研究应另外创建带有真实固定模型、外部登记与独立结果的数据集；报告保留计划、预测及结果的散列，软件本身不能鉴定时间戳、来源真实性或盲法执行情况。

@@ -282,12 +282,12 @@ uv run --locked --extra dev fatebridge hamburg_midpoint_chart \
 uv run --locked --extra dev fatebridge thirteen_sector_chart \
   --name 演示甲 --birth-year 1990 --birth-month 4 --birth-day 6 \
   --birth-hour 9 --birth-minute 33 --birth-place 上海 \
-  --fields sector_profile planets thirteen_sectors interpretation.variant_note \
+  --fields sector_profile planets thirteen_sectors \
   --strict-fields --no-include-snapshot-text
 
 uv run --locked --extra dev pytest -q \
   tests/western/test_other_chart_physical_sources.py tests/western/test_other_chart_historical_reference.py \
-  tests/astronomy/test_contract_regressions.py tests/integration/test_runtime_and_errors.py \
+  tests/integration/test_chart_variant_contracts.py tests/integration/test_runtime_and_errors.py \
   tests/western/test_other_chart_clock_basis.py tests/western/test_other_chart_birth_seconds.py tests/western/test_contract_regressions.py \
   tests/western/test_other_chart_orbit_sources.py tests/astronomy/test_ephemeris_runtime.py \
   tests/western/test_other_chart_meridian_houses.py tests/western/test_contract_regressions.py tests/western/test_other_chart_meridian_native_clock.py \

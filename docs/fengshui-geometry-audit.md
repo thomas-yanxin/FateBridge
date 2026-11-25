@@ -161,4 +161,4 @@ CGAL原发布库包SHA-256为`8e7ce1e30e8ffcb3e69d153c3a561bb1f38bbb4becd8e6544c
 
 当前聊天连接的常驻MCP在修改后仍返回工程规则集`1.1.0`及原外接圆结果；本轮未重启该进程，不能将新进程和安装包的通过写成部署或常驻连接已更新。作者来源版本与工程规则集版本分别保留。
 
-全部原始参数、CGAL驱动与输出、旧路径差异、24个修改前固定的合成请求、职责和来源身份保存在 `/Users/thomas/.codex/artifacts/fatebridge-celestial-frame-20261114/spatial-ownership-and-candidate-audit-v1/`；小型独立参考见[便携足迹参考](../tests/data/fengshui_footprint_cgal_v1/README.md)。旧可见性、阴影、射线、周期角、点对参考及原典分歧保持各自原始分母与状态，没有据这批几何相符宣布风水或全算法SOTA。
+旧可见性、阴影、射线、周期角、点对参考及原典分歧保持各自原始分母与状态，没有据这批几何相符宣布风水或全算法SOTA。

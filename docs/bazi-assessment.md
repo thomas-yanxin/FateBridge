@@ -22,7 +22,7 @@
 
 `season_root_revelation_relations_v12` 按每个原柱的藏干预算、月支季相、透干、根损与关系状态计算。日干不为自己增加非日干预算；合局的合成预算不成为物理藏根。同一根参与多个关系时，保留最严格的剩余预算，不累加重复扣减。
 
-辰、午、酉、亥同支重见的自刑事件采用《三命通会》卷二〈论三刑〉的字面关系出处。工程层将重见事件标为活动，并使用 `0.90` 的根预算保留系数。五个固定公开盘的自刑出处得到更正，同批有理算术两臂各通过 45 项。 [原页和三端对照](~/.codex/artifacts/fatebridge-audit-20261122-round87/bazi-original-gate-punishment-source/handoff.md)
+辰、午、酉、亥同支重见的自刑事件采用《三命通会》卷二〈论三刑〉的字面关系出处。工程层将重见事件标为活动，并使用 `0.90` 的根预算保留系数。五个固定公开盘的自刑出处得到更正，同批有理算术两臂各通过 45 项。
 
 季相按木火土金水的旺相休囚死区分；藏干分配、显干激活、合绊及冲刑系数属于明确的软件参数。当前算法使用同次关系前提重建精确有理账本，阈值比较采用原始精确数，显示舍入不改变判级。天干只实施唯一相邻且不涉及日干的合绊，保留物理干字与五行；不实施未裁定的局部成化算法。
 
@@ -82,6 +82,10 @@
 
 ## 原典资料与未决范围
 
+冻结的十例资料需要从维护者取得原快照 `tests/data/bazi_classical_v1/`，其中 `cases.json` 记录书中标签和已裁定范围。取书影应使用[上海世界图书馆发行本《秘本子平真诠》](https://commons.wikimedia.org/wiki/File:NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf)，按原页重录所得资料应作为独立复核，不能代替冻结标签。
+
+1947 年任注本 PDF 第 416 页的 HJ06 写寅月寅时甲木“木嫩气虚”。逐条去除工程强档条件的静态对照最后仍落数值中和；来源所录弱档分歧继续保留。XQ30 原书“无土”仍未形成可删除午中己土的通用规则。子卯关系保留实际重复实体；《秘本子平真诠》丙子月官之刑只按所选条文的月令与实体条件准入。完整有效根力、寒暖、身印承接与作用优先顺序仍待裁定。
+
 当前随包的 [`bazi-source-annotations.json`](../src/fatebridge/data/reference/bazi-source-annotations.json) 有370条来源记录、324个字面输入。原367条记录和321个输入及后来两条〈寒暖〉命例完整保留，新增一条《三命通会》卷八字面命例。现有247条未提供明确日主三档，不能作为相符项。来源条件、书名、发行者、页码、原文锚点和编辑编释分别记录；古代四柱不认证现代公历、时区或人物身份。
 
 当前来源审计原24组不同输入先修复GS12，再由v12修复六组，仍有17组与保留三档编释不符，另有2项集合约束违规及4项局部冲向分歧。两项集合违规分别为SJ05从儿不以身强弱论的适用域，以及QQ02官印承受能力未定；不据“非弱”任意选强或中和。3个原集合约束均纳入回执；`--require-full`在完整原典验收未成立时退出1。冲突和未知不改成通过，不以新字段数量增加独立命例信用。
@@ -101,7 +105,6 @@ uv run --locked --extra dev pytest -n0 tests/bazi/test_bazi_current_accuracy.py 
 
 原典概念通过 `knowledge_read(domain="bazi", ...)` 查询；引文、作者、编者说明及当前程序定位分别归属。完整本命与专题字段见[按需合同](contracts/README.md)，时运边界见[八字时运](bazi-timing.md)。
 
-
 <a id="month-use-witnesses-round35"></a>
 ## 杂气月令的并存见证（R35）
 
@@ -111,12 +114,12 @@ uv run --locked --extra dev pytest -n0 tests/bazi/test_bazi_current_accuracy.py 
 
 固定五个内部SDK输入及两个独立定位实际公历请求先记录BEFORE，后各按预封来源核对。AFTER两公开请求经REST、fresh MCP及CLI各一次，领域完整且同例业务0差；实际会支的具体干／十神为null、family如实保留，缺申对照不生成完整申子辰，双透与透会同时进入适用路径。该有限证据不覆盖全部月份、全部路径、未命中身份待判分支或全部专题。财富链在analysis.wealth实际静态可达，不能因本次birth/SDK队列未调用它而称仅SDK或不可达；其追加同P01 REST BEFORE1与AFTER三端均完整，后者全业务一致；实际旧role/reference_scope与两处snapshot文本共4差，数值／见证／checks未变，REST输出由opaque改为共享两字段typed上下文。其他旧facts未借此宣称全部类型化，详细分窗见R35记录。
 
-原十例已在 R51 重跑。[原典审计脚本](../scripts/bazi/audit_bazi_classical.py)保留单一格名比较的 7/10，并另外用共享取用见证核对书中标注的十神，结果为 10/10。书影 PDF65–66 的孤官例、宣参国例分别有乙官与己官透干，PDF83 的秦龙图例有己伤官透干。宣参国例另有独立木局见证，其正偏身份仍由现行规则保留为未定。旧格名三条差异、旺衰 1/3、七例原书未裁旺衰，以及十例成格和用神／相神的未通过状态均保留。 [固定原例](../tests/data/bazi_classical_v1/cases.json) · [前后观察](historical-evidence.md#evidence-20261119-round51-bazi-source-month-identity)
+所选影印十例分别按单一格名与书中取用角色核对。[原典审计脚本](../scripts/bazi/audit_bazi_classical.py)保留单一格名比较的 7/10，并另外用共享取用见证核对书中标注的十神，结果为 10/10。书影 PDF65–66 的孤官例、宣参国例分别有乙官与己官透干，PDF83 的秦龙图例有己伤官透干。宣参国例另有独立木局见证，其正偏身份仍由现行规则保留为未定。旧格名三条差异、旺衰 1/3、七例原书未裁旺衰，以及十例成格和用神／相神的未通过状态均保留。 `tests/data/bazi_classical_v1/cases.json`（另备的固定命例）
 
 <a id="chen-store-ren-witness"></a>
 
 ## 辰月明壬的取用见证
 
-上海世界图书馆发行本《秘本子平真诠》的《论杂气》《论墓库刑冲》举出辰月明壬的甲印、丙煞、丁官、己财。现行 `revealed_month_store_stem` 在这四个日干的辰月盘中记录实际透出的壬、柱位及十神。源码按甲、丙、丁、己分别交付偏印、七杀、正官、正财，以及该例的 PDF 页码和书证。辰的字面藏干仍为戊、乙、癸。明壬、同字透癸与完整申子辰可以并存。乙日及其他未举日干的原典适用范围待校。遇辰戌冲时仍须另审通月令和实际作用，格局保持未裁定。 [国图藏本 PDF42–45](https://commons.wikimedia.org/wiki/File:NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf) · [两版书证](historical-evidence.md#evidence-20261119-round58-chen-ren-witness-source-adjudication-addendum-md)
+上海世界图书馆发行本《秘本子平真诠》的《论杂气》《论墓库刑冲》举出辰月明壬的甲印、丙煞、丁官、己财。现行 `revealed_month_store_stem` 在这四个日干的辰月盘中记录实际透出的壬、柱位及十神。源码按甲、丙、丁、己分别交付偏印、七杀、正官、正财，以及该例的 PDF 页码和书证。辰的字面藏干仍为戊、乙、癸。明壬、同字透癸与完整申子辰可以并存。乙日及其他未举日干的原典适用范围待校。遇辰戌冲时仍须另审通月令和实际作用，格局保持未裁定。 [国图藏本 PDF42–45](https://commons.wikimedia.org/wiki/File:NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf)
 
-固定九个命盘和两个财富正例的明壬见证由 0/11 补到 11/11。五个控制的完整业务逐值一致。修前修后各 48 次 REST、MCP、CLI 调用，同版每组完整业务相同，仅排除顶层 `run_metadata`。按规则 ID 对齐后，变化的路径和月用先决条件均引用该见证。原成格仍为 `not_adjudicated`，候选无选定路径。两工具输入 Schema 一致，输出 Schema 增加一项见证类型。 [完整对照](historical-evidence.md#evidence-20261119-round58-chen-ren-witness-saved-comparison-json) · [规则 ID 差异](historical-evidence.md#evidence-20261119-round58-chen-ren-witness-semantic-scope-review-json)
+固定九个命盘和两个财富正例的明壬见证由 0/11 补到 11/11。五个控制的完整业务逐值一致。修前修后各 48 次 REST、MCP、CLI 调用，同版每组完整业务相同，仅排除顶层 `run_metadata`。按规则 ID 对齐后，变化的路径和月用先决条件均引用该见证。原成格仍为 `not_adjudicated`，候选无选定路径。两工具输入 Schema 一致，输出 Schema 增加一项见证类型。
