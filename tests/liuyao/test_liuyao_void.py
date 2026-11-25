@@ -215,3 +215,35 @@ def test_modern_snapshot_keeps_void_and_back_control_conditions_from_same_run():
     assert "第2爻丑：原旬旬空" in result["snapshot_text"]
     assert "回头克受阻爻位：[5]" in result["snapshot_text"]
     assert detail["void_conditions"]["scope"] in result["snapshot_text"]
+
+
+def test_unfocused_chart_keeps_visible_and_hidden_void_conditions():
+    result = build_sixyao_result(
+        date="2000-04-27",
+        time="12:00:00",
+        gua_code="101011",
+        changed_code="101001",
+    )
+    detail = result["liuyao_evidence"]["conditional_analysis"]
+    void = detail["void_conditions"]
+    assert detail["focus"]["selected"] is None and void["focus"] is None
+    assert [row["position"] for row in void["lines"]] == list(range(1, 7))
+
+    original_void = void["lines"][1]
+    assert original_void["branch"] == "丑" and original_void["is_xunkong"] is True
+    assert original_void["is_true_void"] is None
+    changed_void = void["lines"][4]
+    assert changed_void["is_xunkong"] is False
+    assert changed_void["changed_is_xunkong"] is True
+
+    (hidden,) = void["hidden"]
+    assert (hidden["position"], hidden["branch"], hidden["flying_branch"]) == (
+        3,
+        "酉",
+        "亥",
+    )
+    assert hidden["is_xunkong"] is False
+    assert hidden["is_permanently_void"] is None
+    (support,) = hidden["not_empty_conditions"]
+    assert support["rule_id"] == "hidden_supported"
+    assert support["matched"] is None and support["status"] == "unresolved"
