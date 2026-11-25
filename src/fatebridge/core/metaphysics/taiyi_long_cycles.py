@@ -174,8 +174,13 @@ def four_spirit_records(accumulation: int) -> dict[str, AnnualMarker]:
             record["source_edition"] = (
                 "四库积年及三元表；明钞本地乙推法补证起九行序，未替换积年"
             )
-        else:
-            pass
+        elif name == "zhifu":
+            record["source_reference"] = (
+                "https://commons.wikimedia.org/wiki/File:CADAL06056495_太乙金鏡式經·卷五~卷十.djvu?page=15"
+            )
+            record["source_edition"] = (
+                "四库全书本卷五正文起五顺行；第16图表头下中元33格分歧未裁定，原表另列"
+            )
     return result
 
 

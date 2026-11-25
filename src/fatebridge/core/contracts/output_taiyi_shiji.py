@@ -31,6 +31,9 @@ class TaiyiYinShijiVariant(PartialOutput):
 class TaiyiShijiDerivation(PartialOutput):
     ruleset: TaiyiShijiRuleset | None = None
     shiji_profile: str | None = None
+    requested_shiji_profile: str | None = None
+    selected_source: str | None = None
+    guest_count_basis: str | None = None
     status: str | None = None
     reason: str | None = None
     scope: str | None = None

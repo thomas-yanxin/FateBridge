@@ -30,7 +30,7 @@ from fatebridge.services.metaphysics import calculate_taiyi_analysis
 from fatebridge.services.tool_catalog import CATALOG
 from scripts.taiyi.audit_taiyi_shiji import CORPUS, audit, source_data
 from tests.support.reference_data import resolve
-from tests.support.transports import call_calculation
+from tests.support.transports import AS_OF, SPECS, business, call_calculation
 from tests.unit_test.fixtures.taiyi import same_run_payload, transport_payload
 
 
@@ -277,3 +277,82 @@ def test_real_rest_mcp_cli_and_new_first_views(
             await same_run_payload(client, first, require_business_inline=True)
 
     asyncio.run(call())
+
+
+@pytest.mark.parametrize(
+    "month,day,ju,profile,spirit,count,recount,generals",
+    [
+        (8, 30, 37, "jinjing_vol2_rotation_v1", "坤", 25, 25, (5, 5)),
+        (8, 30, 37, "jinjing_vol3_table_v1", "午", 27, 27, (7, 1)),
+        (8, 30, 37, "jinjing_vol3_table_literal_v1", "午", 25, 27, (5, 5)),
+        (9, 5, 43, "jinjing_vol3_table_literal_v1", "坤", 38, 38, (8, 4)),
+        (9, 6, 44, "jinjing_vol3_table_literal_v1", "酉", 31, 31, (1, 3)),
+    ],
+)
+def test_sanshi_taiyi_editions_preserve_guest_count_and_trace(
+    month: int,
+    day: int,
+    ju: int,
+    profile: str,
+    spirit: str,
+    count: int,
+    recount: int,
+    generals: tuple[int, int],
+    surface_calls,
+) -> None:
+    payload = {
+        **transport_payload("sanshiunited", 2026),
+        "date": f"2026-{month:02d}-{day:02d}",
+        "taiyi_options": {"calculation_mode": "day", "shiji_profile": profile},
+    }
+    http, mcp, code, cli = surface_calls(
+        SPECS["sanshiunited"],
+        payload,
+        projection={
+            "detail": "audit",
+            "fields": [
+                "taiyi.core_board",
+                "taiyi.rule_trace.guest",
+                "taiyi.shiji_derivation",
+            ],
+            "strict_fields": True,
+            "response_char_limit": 0,
+            "include_snapshot_text": False,
+        },
+        rest_as_of=AS_OF,
+    )
+    assert http.status_code == 200, http.text
+    assert not mcp.is_error and code == 0
+    assert business(http.json()) == business(mcp.structured_content) == business(cli)
+    board = cli["taiyi"]
+    core = board["core_board"]
+    assert core["yin_dun"] is True and core["kook_number"] == ju
+    assert (core["shiji_profile"], core["shiji"], core["guest_count"]) == (
+        profile,
+        spirit,
+        count,
+    )
+    assert (core["guest_general"], core["guest_vice_general"]) == generals
+    trace = board["rule_trace"]["guest"]
+    assert trace["count"] == sum(step["value"] for step in trace["path"]) == recount
+    derivation = board["shiji_derivation"]
+    assert derivation["actual_shiji"] == spirit
+    if profile == "jinjing_vol3_table_literal_v1":
+        assert trace["selected_count"] == count
+        assert "卷三原表字面" in trace["selected_count_basis"]
+        assert derivation["guest_count_basis"] == "卷三原表字面"
+    elif profile == "jinjing_vol3_table_v1":
+        assert derivation["guest_count_basis"] == "卷二算路重算"
+
+
+@pytest.mark.parametrize("ju,yin", [(37, False), (38, True)])
+def test_outside_vol3_witness_reports_effective_rotation(ju: int, yin: bool) -> None:
+    requested = "jinjing_vol3_table_literal_v1"
+    core = cyclic_core(ju, yin=yin, shiji_profile=requested)
+    default = cyclic_core(ju, yin=yin)
+    assert core == {**default, "requested_shiji_profile": requested}
+    derivation = shiji_derivation(core)
+    assert derivation["shiji_profile"] == "jinjing_vol2_rotation_v1"
+    assert derivation["requested_shiji_profile"] == requested
+    assert "selected_source" not in derivation
+    assert "在本局无适用卷三行" in shiji_derivation_text(derivation)

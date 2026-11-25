@@ -11,6 +11,7 @@ from fatebridge.core.metaphysics.qimen import build_qimen_board, qimen_futou_for
 from fatebridge.services.divination import calculate_sanshiunited_analysis
 from fatebridge.services.metaphysics import calculate_qimen_analysis
 from fatebridge.utils.civil_time import NominalClockLabel
+from tests.support.transports import AS_OF, SPECS, business
 
 
 def _make_seed(
@@ -161,3 +162,91 @@ def test_all_1080_boards_preserve_stars_stems_doors_gods_and_leaders(dun, ju) ->
             assert all(p["heaven_stem"] == p["earth_stem"] for p in outer)
         else:
             pass
+
+
+@pytest.mark.parametrize(
+    "method,month,day,hour,term,ju,conflicts",
+    [
+        ("zhirun", 1, 19, 23, "大寒", "阳遁三局上元", []),
+        ("chaibu", 1, 19, 23, "小寒", "阳遁二局上元", []),
+        ("zhirun", 7, 5, 8, "小暑", "阴遁八局上元", []),
+        (
+            "chaibu",
+            7,
+            5,
+            8,
+            "夏至",
+            "阴遁九局上元",
+            [
+                (
+                    "vol4-yin9-gengchen-door",
+                    "坎",
+                    "坤",
+                    "unresolved_print_rule_disagreement",
+                )
+            ],
+        ),
+        (
+            "chaibu",
+            6,
+            26,
+            8,
+            "夏至",
+            "阴遁三局中元",
+            [
+                (
+                    "de-shi-yin3-renchen",
+                    "杜门",
+                    "开门",
+                    "unresolved_scan_rule_disagreement",
+                )
+            ],
+        ),
+    ],
+)
+def test_ju_method_keeps_printed_conflicts_visible_across_transports(
+    method: str,
+    month: int,
+    day: int,
+    hour: int,
+    term: str,
+    ju: str,
+    conflicts: list[tuple[str, str, str, str]],
+    surface_calls,
+) -> None:
+    http, mcp, code, cli = surface_calls(
+        SPECS["qimen"],
+        {
+            "analysis_year": 2026,
+            "analysis_month": month,
+            "analysis_day": day,
+            "analysis_hour": hour,
+            "analysis_timezone": "+08:00",
+            "use_true_solar_time": False,
+            "qimen_options": {"ju_method": method},
+        },
+        projection={
+            "detail": "audit",
+            "fields": [
+                f"qimen.{name}"
+                for name in ("ju_method", "ju_term", "ju_text", "source_disagreements")
+            ],
+            "strict_fields": True,
+            "response_char_limit": 0,
+            "include_snapshot_text": False,
+        },
+        rest_as_of=AS_OF,
+    )
+    assert http.status_code == 200, http.text
+    assert not mcp.is_error and code == 0
+    assert business(http.json()) == business(mcp.structured_content) == business(cli)
+    board = cli["qimen"]
+    assert (board["ju_method"], board["ju_term"], board["ju_text"]) == (
+        method,
+        term,
+        ju,
+    )
+    assert [
+        (row["case_id"], row["source_value"], row["computed_value"], row["status"])
+        for row in board["source_disagreements"]
+    ] == conflicts

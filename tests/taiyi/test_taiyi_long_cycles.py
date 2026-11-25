@@ -243,7 +243,11 @@ def test_current_source_conflict_is_visible_in_same_run_interpretation() -> None
         if annual_long_cycles(y)["records"]["zhifu"]["table_disagreement"]
     )
     result = standalone(year)
-    assert result["taiyi"]["long_cycles"]["records"]["zhifu"]["table_disagreement"]
+    zhifu = result["taiyi"]["long_cycles"]["records"]["zhifu"]
+    assert zhifu["table_disagreement"]
+    assert zhifu["table_position"] != zhifu["position"]
+    assert "CADAL06056495" in zhifu["source_reference"]
+    assert "中元33格分歧未裁定" in zhifu["source_edition"]
     assert "直符有异文：正文通则" in result["snapshot_text"]
     assert any(
         s["title"] == "年运十神" and s["included"]
