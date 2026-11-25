@@ -57,7 +57,7 @@ class KnowledgeReadRequest(_DeferredModel):
             "星体对 object_a/object_b 只给相位条目标注对象，不能单独定位词条；"
             "bazi / qimen：key（category 可省略，自动解析）；"
             "liureng：(jiang_name, tian_branch, di_branch)。"
-            "heluo/canping：按knowledge_registry的category和key读取具名来源；可自动解析唯一key。"
+            "heluo/canping：按 knowledge_catalog 的 category 和 key 读取具名来源，也可自动解析唯一 key。"
             "这些是参考原文及政策角色，不替代同run排盘适用性回执。"
             "human_design：category=lines，key=门.线，例如1.1；384线定位，整理与独立复核数见目录coverage，未整理爻义为null。保留来源条件及未知适用性，不得仅凭参考选定个人固定极性。"
         )
