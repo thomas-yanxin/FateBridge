@@ -18,9 +18,19 @@ from fatebridge.core.horary_events import (
     native_planetary_events,
     solve_planetary_events,
 )
-from tests.western.test_western_horary_motion import state
+from scripts.western import audit_western_event_paths
 
 FIXTURES = Path(__file__).parents[1] / "fixtures"
+LOCAL_EVENT_ARCHIVES = (
+    "western-event-paths-horizons.json",
+    "western-event-paths-protocol.json",
+    "western-event-paths-raw.zip",
+    "western-event-station-reference-refinement.json",
+    "western-event-frames-horizons.json",
+    "western-event-frames-protocol.json",
+    "western-event-reference-points-horizons.json",
+    "western-event-reference-points-protocol.json",
+)
 
 
 def synthetic(positions, speeds, *, acceleration=None, past=30, future=30):
@@ -46,7 +56,18 @@ def synthetic(positions, speeds, *, acceleration=None, past=30, future=30):
     history = solve_planetary_events(
         2451545.0, sample, past_days=past, future_days=future
     )
-    states = {p: state(p, defaults[p], rates[p]) for p in BODIES}
+    states = {
+        planet: {
+            "planet": planet,
+            "planet_label": planet,
+            "longitude": defaults[planet],
+            "speed": rates[planet],
+            "sign": "Aries",
+            "sign_label": "白羊",
+            "dignities": [],
+        }
+        for planet in BODIES
+    }
     return history, states
 
 
@@ -54,6 +75,11 @@ def paths(history, states, a="Mars", b="Saturn"):
     return evaluate_event_paths(history, a, b, "day", states, _applying_aspect)
 
 
+@pytest.mark.local_data
+@pytest.mark.skipif(
+    any(not (FIXTURES / filename).is_file() for filename in LOCAL_EVENT_ARCHIVES),
+    reason="Full frozen Horizons archives are local audit data",
+)
 def test_reference_protocol_and_initial_failed_station_oracle_are_preserved():
     reference = json.loads((FIXTURES / "western-event-paths-horizons.json").read_text())
     assert (
@@ -77,6 +103,146 @@ def test_reference_protocol_and_initial_failed_station_oracle_are_preserved():
         len(c["samples"]) == 7 and len(c["raw_responses"]) == 7
         for c in reference["cases"]
     )
+
+
+@pytest.mark.local_data
+@pytest.mark.skipif(
+    any(not (FIXTURES / filename).is_file() for filename in LOCAL_EVENT_ARCHIVES),
+    reason="Full frozen Horizons archives are local audit data",
+)
+@pytest.mark.parametrize("availability", ["unavailable", "identity_mismatch"])
+def test_audit_keeps_the_original_denominator_and_failure(monkeypatch, availability):
+    monkeypatch.setattr(
+        audit_western_event_paths,
+        "native_planetary_events",
+        lambda subject: {
+            "status": "unavailable",
+            "unavailable_reason": "Motion derivative did not converge",
+            "unavailable_code": "position_motion_not_converged",
+        },
+    )
+    if availability == "identity_mismatch":
+        monkeypatch.setattr(
+            audit_western_event_paths,
+            "native_planetary_events",
+            lambda subject: {
+                "status": "computed",
+                "events": [
+                    {
+                        "kind": "ingress",
+                        "bodies": ["Pluto"],
+                        "direction": 1,
+                        "julian_day_tt": subject.julian_day_tt,
+                    }
+                ],
+                "physical_ephemeris_source": {},
+                "longitude_frame": "synthetic",
+                "ephemeris_reference_points": {},
+            },
+        )
+        monkeypatch.setattr(
+            audit_western_event_paths,
+            "_swisseph_planet_state",
+            lambda planet, **options: ({"longitude": 0.0}, "synthetic"),
+        )
+    else:
+        pass
+    report = audit_western_event_paths.audit()
+    assert report["event_count"] == 106
+    assert report["passed_event_count"] == 0
+    assert report["all_cases_passed"] is False
+    assert report["all_event_identities_and_counts_match"] is False
+    assert len(report["cases"]) == 2
+    if availability == "unavailable":
+        assert report["compared_event_count"] == 0
+        assert all(
+            case["unavailable_code"] == "position_motion_not_converged"
+            for case in report["cases"]
+        )
+    else:
+        assert report["compared_event_count"] == 106
+        assert len(report["identity_failures"]) == 10
+        assert all(
+            failure["missing"] and failure["extra"]
+            for failure in report["identity_failures"]
+        )
+        assert len(report["remaining_failures"]) == 106
+        assert all(
+            row["native_julian_day_tt"] is None for row in report["remaining_failures"]
+        )
+
+    assert (
+        report["reference_definition"]["frame"] == "IAU2006/2000A_true_ecliptic_of_date"
+    )
+
+
+@pytest.mark.parametrize(
+    "frame",
+    ["IAU2006/2000A_true_ecliptic_of_date", "IAU2006/2000B_true_ecliptic_of_date"],
+)
+def test_same_frame_station_controls_preserve_body_and_barycenter_identity(frame):
+    controls = json.loads(
+        (FIXTURES / "western-event-station-controls.json").read_text()
+    )
+    assert controls["station_tolerance_seconds"] == 120
+    assert controls["native_reference_targets"]["Saturn"] == 6
+    assert controls["body_center_targets"]["Saturn"] == 699
+    reference_stations = []
+    for target in (699, 6):
+        station = next(
+            station
+            for station in controls["stations"]
+            if station["case_id"] == "1"
+            and station["frame"] == frame
+            and station["target"] == target
+        )
+        assert station["spacing_stability_seconds"] < 60
+        reference_stations.append(station["julian_day_tt"])
+    assert 200 < (reference_stations[0] - reference_stations[1]) * 86400 < 210
+
+
+@pytest.mark.parametrize("question_offset_days", [-0.0625, 0.0, 0.0625])
+def test_question_instant_owns_exact_contact_without_rounding_to_a_side(
+    question_offset_days,
+):
+    question_tt = 2451545.0
+    contact_tt = question_tt + question_offset_days
+
+    def sample(planet: str, julian_day_tt: float) -> dict[str, float]:
+        return {
+            "longitude": (
+                (10 + julian_day_tt - contact_tt) % 360 if planet == "Mercury" else 10.0
+            ),
+            "speed": 1.0 if planet == "Mercury" else 0.0,
+        }
+
+    history = solve_planetary_events(
+        question_tt,
+        sample,
+        past_days=0.125,
+        future_days=0.125,
+        bodies=("Mercury", "Saturn"),
+    )
+    contacts = [event for event in history["events"] if event["kind"] == "contact"]
+    assert len(contacts) == 1
+    assert contacts[0]["root_bracket_tt"] == [contact_tt, contact_tt]
+    assert contacts[0]["epoch_relation"] == (
+        "past"
+        if question_offset_days < 0
+        else "future" if question_offset_days > 0 else "question_boundary"
+    )
+
+
+def test_path_roles_are_invariant_under_history_permutation():
+    history, states = synthetic({}, {})
+    expected = paths(history, states)
+    history["events"].reverse()
+    actual = paths(history, states)
+    for result in (expected, actual):
+        for path in result["paths"]:
+            path.pop("transitions", None)
+            path.pop("intervening_contacts", None)
+    assert actual == expected
 
 
 @pytest.mark.parametrize(

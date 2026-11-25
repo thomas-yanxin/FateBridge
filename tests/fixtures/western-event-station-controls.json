@@ -1,0 +1,206 @@
+{
+  "source": "https://ssd.jpl.nasa.gov/api/horizons.api",
+  "source_sha256": {
+    "western-event-frames-horizons.json": "b3922b4e0e6ee1b38019714c37e378b0fd068a657f38c01f9b69db782548ba5c",
+    "western-event-reference-points-horizons.json": "6cffd8c638538212dac6248b97c8432b149dd7e512c86c4d92942c9a7fe44aba"
+  },
+  "primary_frame": "IAU2006/2000A_true_ecliptic_of_date",
+  "station_tolerance_seconds": 120,
+  "native_reference_targets": {
+    "Sun": 10,
+    "Moon": 301,
+    "Mercury": 199,
+    "Venus": 299,
+    "Mars": 4,
+    "Jupiter": 5,
+    "Saturn": 6
+  },
+  "body_center_targets": {
+    "Mars": 499,
+    "Jupiter": 599,
+    "Saturn": 699
+  },
+  "stations": [
+    {
+      "case_id": "0",
+      "frame": "IAU2006/2000A_true_ecliptic_of_date",
+      "reference_point": "body_center",
+      "target": 199,
+      "response_sha256": "7d337aabec7c5215aa9baf5fc3999335abc33344509f3697d9e23f8b09459109",
+      "kind": "station",
+      "bodies": [
+        "Mercury"
+      ],
+      "direction": -1,
+      "julian_day_tt": 2460402.4275344596,
+      "spacing_stability_seconds": 0.13078064913858434,
+      "coordinate_rounding_time_bound_seconds": 0.10965510180801333
+    },
+    {
+      "case_id": "0",
+      "frame": "IAU2006/2000B_true_ecliptic_of_date",
+      "reference_point": "body_center",
+      "target": 199,
+      "response_sha256": "7d337aabec7c5215aa9baf5fc3999335abc33344509f3697d9e23f8b09459109",
+      "kind": "station",
+      "bodies": [
+        "Mercury"
+      ],
+      "direction": -1,
+      "julian_day_tt": 2460402.427535374,
+      "spacing_stability_seconds": 0.13066613341897737,
+      "coordinate_rounding_time_bound_seconds": 0.10965532530857258
+    },
+    {
+      "case_id": "1",
+      "frame": "IAU2006/2000A_true_ecliptic_of_date",
+      "reference_point": "body_center",
+      "target": 699,
+      "response_sha256": "237c1a51817ffdf82d21cd1d30731470c172547cc6686f071db07d6f5c252e82",
+      "kind": "station",
+      "bodies": [
+        "Saturn"
+      ],
+      "direction": 1,
+      "julian_day_tt": 2459875.675059732,
+      "spacing_stability_seconds": 0.26081024302407885,
+      "coordinate_rounding_time_bound_seconds": 7.5740965991210345
+    },
+    {
+      "case_id": "1",
+      "frame": "IAU2006/2000A_true_ecliptic_of_date",
+      "reference_point": "body_center",
+      "target": 499,
+      "response_sha256": "31b6b1a0197086d88d34285d39bcf00470bc52b4f5d5c88b9f6f0669efecac46",
+      "kind": "station",
+      "bodies": [
+        "Mars"
+      ],
+      "direction": -1,
+      "julian_day_tt": 2459883.060301196,
+      "spacing_stability_seconds": 0.006229761314013871,
+      "coordinate_rounding_time_bound_seconds": 0.9025974968622805
+    },
+    {
+      "case_id": "1",
+      "frame": "IAU2006/2000B_true_ecliptic_of_date",
+      "reference_point": "body_center",
+      "target": 699,
+      "response_sha256": "237c1a51817ffdf82d21cd1d30731470c172547cc6686f071db07d6f5c252e82",
+      "kind": "station",
+      "bodies": [
+        "Saturn"
+      ],
+      "direction": 1,
+      "julian_day_tt": 2459875.6750786724,
+      "spacing_stability_seconds": 0.2607403824199772,
+      "coordinate_rounding_time_bound_seconds": 7.574015351532724
+    },
+    {
+      "case_id": "1",
+      "frame": "IAU2006/2000B_true_ecliptic_of_date",
+      "reference_point": "body_center",
+      "target": 499,
+      "response_sha256": "31b6b1a0197086d88d34285d39bcf00470bc52b4f5d5c88b9f6f0669efecac46",
+      "kind": "station",
+      "bodies": [
+        "Mars"
+      ],
+      "direction": -1,
+      "julian_day_tt": 2459883.0602980177,
+      "spacing_stability_seconds": 0.006722206877840531,
+      "coordinate_rounding_time_bound_seconds": 0.9025922377490703
+    },
+    {
+      "case_id": "0",
+      "frame": "IAU2006/2000A_true_ecliptic_of_date",
+      "reference_point": "native_reference_point",
+      "target": 199,
+      "response_sha256": "7d337aabec7c5215aa9baf5fc3999335abc33344509f3697d9e23f8b09459109",
+      "kind": "station",
+      "bodies": [
+        "Mercury"
+      ],
+      "direction": -1,
+      "julian_day_tt": 2460402.4275344596,
+      "spacing_stability_seconds": 0.13078064913858434,
+      "coordinate_rounding_time_bound_seconds": 0.10965510180801333
+    },
+    {
+      "case_id": "0",
+      "frame": "IAU2006/2000B_true_ecliptic_of_date",
+      "reference_point": "native_reference_point",
+      "target": 199,
+      "response_sha256": "7d337aabec7c5215aa9baf5fc3999335abc33344509f3697d9e23f8b09459109",
+      "kind": "station",
+      "bodies": [
+        "Mercury"
+      ],
+      "direction": -1,
+      "julian_day_tt": 2460402.427535374,
+      "spacing_stability_seconds": 0.13066613341897737,
+      "coordinate_rounding_time_bound_seconds": 0.10965532530857258
+    },
+    {
+      "case_id": "1",
+      "frame": "IAU2006/2000A_true_ecliptic_of_date",
+      "reference_point": "native_reference_point",
+      "target": 6,
+      "response_sha256": "21a988c0b0798ed4271d9ef110bbbe8d2d0ea5461740d4e0ef2151adf7d6ecc6",
+      "kind": "station",
+      "bodies": [
+        "Saturn"
+      ],
+      "direction": 1,
+      "julian_day_tt": 2459875.672683134,
+      "spacing_stability_seconds": 0.17963580656134848,
+      "coordinate_rounding_time_bound_seconds": 7.569869973247158
+    },
+    {
+      "case_id": "1",
+      "frame": "IAU2006/2000A_true_ecliptic_of_date",
+      "reference_point": "native_reference_point",
+      "target": 4,
+      "response_sha256": "190813a2bf822ed7107d586f715968062e4f432650150be2ceb6f7ea3bde9fa0",
+      "kind": "station",
+      "bodies": [
+        "Mars"
+      ],
+      "direction": -1,
+      "julian_day_tt": 2459883.060301196,
+      "spacing_stability_seconds": 0.006229685079894853,
+      "coordinate_rounding_time_bound_seconds": 0.9025974968699465
+    },
+    {
+      "case_id": "1",
+      "frame": "IAU2006/2000B_true_ecliptic_of_date",
+      "reference_point": "native_reference_point",
+      "target": 6,
+      "response_sha256": "21a988c0b0798ed4271d9ef110bbbe8d2d0ea5461740d4e0ef2151adf7d6ecc6",
+      "kind": "station",
+      "bodies": [
+        "Saturn"
+      ],
+      "direction": 1,
+      "julian_day_tt": 2459875.672702089,
+      "spacing_stability_seconds": 0.17955514978046927,
+      "coordinate_rounding_time_bound_seconds": 7.569789012006357
+    },
+    {
+      "case_id": "1",
+      "frame": "IAU2006/2000B_true_ecliptic_of_date",
+      "reference_point": "native_reference_point",
+      "target": 4,
+      "response_sha256": "190813a2bf822ed7107d586f715968062e4f432650150be2ceb6f7ea3bde9fa0",
+      "kind": "station",
+      "bodies": [
+        "Mars"
+      ],
+      "direction": -1,
+      "julian_day_tt": 2459883.0602980177,
+      "spacing_stability_seconds": 0.0067220891020514095,
+      "coordinate_rounding_time_bound_seconds": 0.9025922377508924
+    }
+  ],
+  "scope": "Small extracted controls from reused development observations; full raw archives remain required by the original 106-event audit. No fitted offsets or blind holdout."
+}
