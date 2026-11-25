@@ -16,6 +16,7 @@ from fatebridge.analysis.marriage import MarriageAnalysis
 from fatebridge.analysis.personality import PersonalityAnalysis
 from fatebridge.analysis.relatives import RelativesAnalysis
 from fatebridge.analysis.romance import RomanceAnalysis
+from fatebridge.analysis.timing_effects import TimingEffectsAnalysis
 from fatebridge.analysis.wealth import WealthAnalysis
 from fatebridge.core.almanac import (
     build_calendar_context,
@@ -43,22 +44,25 @@ from fatebridge.core.metaphysics.common import SEXAGENARY_INDEX, kongwang_for_ga
 from fatebridge.core.root_qualification import root_qualification_snapshot_lines
 from fatebridge.core.stem_effects import stem_energy_snapshot_lines
 from fatebridge.core.storage_movement import storage_movement_snapshot_lines
+from fatebridge.core.timing import TimingAnalysis
 from fatebridge.services.birth_context import (
     BirthComputationContext,
     build_birth_computation_context,
 )
 from fatebridge.services.birth_payload import build_destiny_payload
 from fatebridge.services.structured_snapshot import render_structured_snapshot_text
-from fatebridge.services.timing_state import build_current_timing_state
+from fatebridge.services.timing_state import (
+    build_current_timing_state,
+    calculate_analysis_age,
+)
 from fatebridge.utils.birth_clock import birth_clock_snapshot_lines
-from fatebridge.utils.birth_input import PersonInfo
+from fatebridge.utils.birth_input import PersonInfo, normalize_gender
 from fatebridge.utils.data import (
     BRANCH_HIDDEN_STEMS,
     EARTHLY_BRANCHES,
     HEAVENLY_STEMS,
     get_nayin,
     get_ten_god,
-    normalize_gender,
 )
 from fatebridge.utils.errors import (
     ParameterError,
@@ -956,33 +960,27 @@ def _parse_pillar_str(
 def _derive_current_pillars(
     birth_context: BirthComputationContext,
     analysis_date: datetime,
+    gender: str,
 ) -> Tuple[Optional[Tuple[str, str]], Optional[Tuple[str, str]], Dict[str, Any]]:
     """从命盘 + 分析日期内部推算当前大运、流年柱（用户无需自己知道大运）。"""
-    direction_known = normalize_gender(birth_context.person.gender) in (
-        "male",
-        "female",
+    normalized_birth = birth_context.normalized_birth_time
+    timezone_name = normalized_birth.timezone
+    dayun_result = TimingEffectsAnalysis.analyze_dayun_effects(
+        birth_context.birth_pillars,
+        normalized_birth.input_datetime,
+        gender,
+        calculate_analysis_age(normalized_birth.input_datetime, analysis_date),
+        timezone_name=timezone_name,
+        original_element_counts=birth_context.original_element_counts,
+        analysis_moment=analysis_date,
+        allow_missing_gender=True,
     )
-    if direction_known:
-        state = build_current_timing_state(birth_context, analysis_date=analysis_date)
-    else:
-        # Unknown 大运 direction limits that layer, not the natal chart or the
-        # solar-term year. Do not guess a direction or abort all nine topics.
-        from fatebridge.core.timing import TimingAnalysis
-
-        state = {
-            "liunian_analysis": {
-                "liunian_info": TimingAnalysis.calculate_liunian(
-                    analysis_date.year,
-                    moment=analysis_date,
-                    timezone_name=birth_context.normalized_birth_time.timezone,
-                )
-            }
-        }
-    dayun_result = state.get("dayun_analysis", {}) or {}
-    liunian_result = state.get("liunian_analysis", {}) or {}
-    dayun_pillar_str = (dayun_result.get("dayun_info") or {}).get("pillar")
-    liunian_pillar_str = (liunian_result.get("liunian_info") or {}).get("pillar")
-    timezone_name = birth_context.normalized_birth_time.timezone
+    dayun_info = dayun_result.get("dayun_info", {})
+    dayun_age_info = dayun_result.get("age_info", {})
+    dayun_pillar_str = dayun_info.get("pillar")
+    liunian_pillar_str = TimingAnalysis.calculate_liunian(
+        analysis_date.year, moment=analysis_date, timezone_name=timezone_name
+    )["pillar"]
     anchor = localize_datetime(analysis_date, timezone_name)
     # Date-only dimension APIs retain their historical midnight anchor. Expose
     # the boundary rather than treating an arbitrary clock time as equivalent.
@@ -1010,15 +1008,13 @@ def _derive_current_pillars(
         },
         "dayun_pillar": dayun_pillar_str,
         "liunian_pillar": liunian_pillar_str,
-        "dayun_age": (dayun_result.get("age_info") or {}).get("dayun_age"),
-        "dayun_selection_basis": (dayun_result.get("age_info") or {}).get(
-            "selection_basis"
-        ),
-        "dayun_start_at": (dayun_result.get("dayun_info") or {}).get("start_at"),
-        "dayun_end_at": (dayun_result.get("dayun_info") or {}).get("end_at"),
+        "dayun_age": dayun_age_info.get("dayun_age"),
+        "dayun_selection_basis": dayun_age_info.get("selection_basis"),
+        "dayun_start_at": dayun_info.get("start_at"),
+        "dayun_end_at": dayun_info.get("end_at"),
         "source": "auto-derived",
     }
-    if not direction_known:
+    if dayun_result.get("status") == "unavailable_missing_gender":
         context["dayun_status"] = "unavailable_gender_direction"
         context["limitations"] = [
             "未选定性别对应的大运顺逆；保留本命及独立流年，不推定大运柱。"
@@ -1055,6 +1051,7 @@ def _run_bazi_dimension_analysis(
         liunian = _parse_pillar_str(liunian_pillar, "liunian_pillar")
         birth_context = build_birth_computation_context(person)
         pillars = birth_context.birth_pillars
+        gender = normalize_gender(person.gender)
 
         timing_context: Dict[str, Any]
         if dayun is None or liunian is None:
@@ -1065,7 +1062,7 @@ def _run_bazi_dimension_analysis(
                 timezone_name=birth_context.normalized_birth_time.timezone,
             )
             auto_dayun, auto_liunian, timing_context = _derive_current_pillars(
-                birth_context, analysis_date
+                birth_context, analysis_date, gender
             )
             timing_context["overridden"] = {
                 "dayun_pillar": dayun is not None,
@@ -1078,9 +1075,12 @@ def _run_bazi_dimension_analysis(
             timing_context["dayun_pillar"] = "".join(dayun) if dayun else None
             timing_context["liunian_pillar"] = "".join(liunian) if liunian else None
             if timing_context["overridden"]["dayun_pillar"]:
-                if "dayun_status" in timing_context:
-                    timing_context["dayun_status"] = "explicit_override"
+                if "limitations" in timing_context:
                     timing_context["limitations"] = []
+                timing_context["dayun_status"] = "explicit_override"
+                timing_context["dayun_selection_basis"] = None
+                timing_context["dayun_start_at"] = None
+                timing_context["dayun_end_at"] = None
                 # Keep the published fractional-year reference projectable,
                 # without presenting it as the age of the override pillar.
                 timing_context["dayun_age_basis"] = (
@@ -1100,7 +1100,7 @@ def _run_bazi_dimension_analysis(
 
         analysis = analyzer(
             pillars,
-            gender=person.gender,
+            gender=gender,
             dayun_pillar=dayun,
             liunian_pillar=liunian,
         )
@@ -1116,7 +1116,7 @@ def _run_bazi_dimension_analysis(
             evidence,
             pillars,
             result_key.removesuffix("_analysis"),
-            person.gender,
+            gender,
             dayun,
             liunian,
         )

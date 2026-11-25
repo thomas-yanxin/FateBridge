@@ -6,8 +6,15 @@ import pytest
 
 from fatebridge.application.examples import evidence_views
 from fatebridge.core.output_bureau_season import BureauSeasonReference
-from tests.support.transports import SPECS, business, call_cli, inputs, native
+from tests.support.transports import (
+    SPECS,
+    business,
+    call_cli,
+    inputs,
+    native,
+)
 from tests.support.transports import rest as _shared_rest
+from tests.support.transports import run_three
 
 KEYS = [
     "bazi_birth",
@@ -115,3 +122,63 @@ def test_branch_group_and_actual_gate_match_on_rest_native_mcp_and_cli(
     assert row["criteria_differ"] is True
     assert row["classical_transformation"] == "not_adjudicated"
     assert result["calculation_effect"] == "none"
+
+
+@pytest.mark.parametrize("gender", [None, "乾"])
+def test_automatic_dayun_and_independent_liunian_match_across_surfaces(
+    gender, rest, tmp_path, capsys
+):
+    payload = {
+        "birth_year": 1990,
+        "birth_month": 5,
+        "birth_day": 20,
+        "birth_hour": 10,
+        "birth_minute": 0,
+        "birth_second": 0,
+        "birth_timezone": "Asia/Shanghai",
+        "use_true_solar_time": False,
+        "analysis_year": 2026,
+        "analysis_month": 10,
+        "analysis_day": 12,
+    }
+    if gender is not None:
+        payload["gender"] = gender
+    fields = [
+        "career_analysis.timing_context",
+        "career_analysis.evidence_chain.topic.timing",
+    ]
+    http, code, cli, protocol = run_three(
+        SPECS["bazi_career"], payload, fields, rest, tmp_path, capsys
+    )
+    assert http.status_code == 200, http.text
+    assert code == 0 and not protocol.is_error
+    assert (
+        business(http.json()) == business(protocol.structured_content) == business(cli)
+    )
+
+    analysis = cli["career_analysis"]
+    timing = analysis["timing_context"]
+    assert timing["analysis_datetime"] == "2026-10-12T00:00:00+08:00"
+    assert timing["liunian_pillar"] == "丙午"
+    assert timing["overridden"] == {"dayun_pillar": False, "liunian_pillar": False}
+    layers = [
+        (layer["layer"], layer["pillar"])
+        for layer in analysis["evidence_chain"]["topic"]["timing"]["layers"]
+    ]
+    if gender is None:
+        assert timing["dayun_status"] == "unavailable_gender_direction"
+        assert timing["dayun_pillar"] is None
+        assert timing["dayun_age"] is None
+        assert timing["dayun_start_at"] is None
+        assert timing["dayun_end_at"] is None
+        assert layers == [("liunian", "丙午")]
+    else:
+        assert "dayun_status" not in timing
+        assert timing["dayun_pillar"] == "乙酉"
+        assert timing["dayun_selection_basis"] == "civil_calendar_moment"
+        assert (
+            timing["dayun_start_at"]
+            < timing["analysis_datetime"]
+            < timing["dayun_end_at"]
+        )
+        assert layers == [("dayun", "乙酉"), ("liunian", "丙午")]

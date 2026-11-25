@@ -52,12 +52,48 @@ def test_unknown_gender_limits_dayun_without_losing_natal_or_liunian():
     assert result["career_analysis"]["evidence_chain"]["ten_gods"]
 
 
-def test_known_gender_produces_forward_dayun_for_yang_year_male():
-    person = create_person_info(1990, 5, 20, 10, "t", "男", "北京")  # 1990 庚午 阳年
-    tc = bazi.calculate_bazi_career(person, analysis_year=2026)["career_analysis"][
-        "timing_context"
-    ]
-    assert tc["dayun_pillar"] == "乙酉"  # forward (顺行) from month pillar
+@pytest.mark.parametrize(
+    "gender, expected_pillar",
+    [
+        ("男", "乙酉"),
+        (" MaLe ", "乙酉"),
+        ("乾", "乙酉"),
+        ("1", "乙酉"),
+        ("女", "丁丑"),
+        (" FeMaLe ", "丁丑"),
+        ("坤", "丁丑"),
+        ("0", "丁丑"),
+    ],
+)
+def test_known_gender_aliases_select_dayun_direction(gender, expected_pillar):
+    person = create_person_info(1990, 5, 20, 10, "t", gender, "北京")  # 庚午阳年
+    analysis = bazi.calculate_bazi_career(
+        person, analysis_year=2026, analysis_month=10, analysis_day=12
+    )["career_analysis"]
+    assert analysis["timing_context"]["dayun_pillar"] == expected_pillar
+    assert analysis["timing_context"]["liunian_pillar"] == "丙午"
+    assert "dayun_status" not in analysis["timing_context"]
+
+
+@pytest.mark.parametrize(
+    "alias, canonical, expected_basis", [("乾", "男", "male"), ("坤", "女", "female")]
+)
+def test_gender_aliases_share_timing_and_topic_rule_selection(
+    alias, canonical, expected_basis
+):
+    analyses = []
+    for gender in (alias, canonical):
+        person = create_person_info(1990, 5, 20, 10, "t", gender, "北京")
+        analysis = bazi.calculate_bazi_marriage(
+            person, analysis_year=2026, analysis_month=10, analysis_day=12
+        )["marriage_analysis"]
+        assert analysis["gender_basis"] == expected_basis
+        assert (
+            analysis["evidence_chain"]["topic"]["selection_basis"]
+            == "gendered_traditional_correspondence"
+        )
+        analyses.append(analysis)
+    assert analyses[0] == analyses[1]
 
 
 @pytest.mark.parametrize(
@@ -111,21 +147,57 @@ def test_romance_opposite_sex_star_differs_by_gender():
 
 def test_dimension_auto_derives_correct_dayun_and_liunian():
     person = create_person_info(1990, 6, 15, 10, "t", "男", "北京")
-    tc = bazi.calculate_bazi_wealth(person, analysis_year=2026)["wealth_analysis"][
-        "timing_context"
-    ]
+    tc = bazi.calculate_bazi_wealth(
+        person, analysis_year=2026, analysis_month=10, analysis_day=12
+    )["wealth_analysis"]["timing_context"]
     assert tc["liunian_pillar"] == "丙午"  # 2026 year ganzhi
     assert tc["dayun_pillar"] == "乙酉"
     assert tc["overridden"] == {"dayun_pillar": False, "liunian_pillar": False}
-    assert abs(tc["dayun_age"] - 28.56) < 0.5
+    assert tc["dayun_age"] == pytest.approx(28.88, abs=0.02)
 
 
-def test_explicit_pillars_override_auto_derivation():
-    person = create_person_info(1990, 6, 15, 10, "t", "男", "北京")
-    tc = bazi.calculate_bazi_wealth(person, analysis_year=2026, dayun_pillar="壬戌")[
-        "wealth_analysis"
-    ]["timing_context"]
-    assert tc["overridden"]["dayun_pillar"] is True
+@pytest.mark.parametrize(
+    "gender, age_basis",
+    [
+        ("乾", "auto_derived_reference_not_override_pillar_age"),
+        ("未知", "unavailable_for_override"),
+    ],
+)
+def test_explicit_dayun_overrides_auto_derivation(gender, age_basis):
+    person = create_person_info(1990, 6, 15, 10, "t", gender, "北京")
+    tc = bazi.calculate_bazi_wealth(
+        person,
+        analysis_year=2026,
+        analysis_month=10,
+        analysis_day=12,
+        dayun_pillar="壬戌",
+    )["wealth_analysis"]["timing_context"]
+    assert tc["dayun_pillar"] == "壬戌"
+    assert tc["liunian_pillar"] == "丙午"
+    assert tc["overridden"] == {"dayun_pillar": True, "liunian_pillar": False}
+    assert tc["dayun_status"] == "explicit_override"
+    assert tc["dayun_age_basis"] == age_basis
+    assert tc["dayun_selection_basis"] is None
+    assert tc["dayun_start_at"] is None
+    assert tc["dayun_end_at"] is None
+    if gender == "未知":
+        assert tc["dayun_age"] is None
+    else:
+        assert tc["dayun_age"] == pytest.approx(28.88, abs=0.02)
+
+
+def test_explicit_liunian_does_not_suppress_automatic_dayun():
+    person = create_person_info(1990, 5, 20, 10, "t", "乾", "北京")
+    tc = bazi.calculate_bazi_career(
+        person,
+        analysis_year=2026,
+        analysis_month=10,
+        analysis_day=12,
+        liunian_pillar="甲子",
+    )["career_analysis"]["timing_context"]
+    assert tc["dayun_pillar"] == "乙酉"
+    assert tc["liunian_pillar"] == "甲子"
+    assert tc["overridden"] == {"dayun_pillar": False, "liunian_pillar": True}
 
 
 @pytest.mark.parametrize("hour_branch", ["寅", "亥", "子"])
